@@ -57,7 +57,7 @@ export TZ="UTC"
 
 . "${srcdir}/scripts/common.sh"
 
-check_for_datefudge
+skip_if_no_datefudge
 
 eval "${GETPORT}"
 # Port for gnutls-serv

@@ -36,6 +36,8 @@ test_code_t test_dhe(gnutls_session_t state);
 test_code_t test_rfc7919(gnutls_session_t state);
 test_code_t test_dhe_group(gnutls_session_t state);
 test_code_t test_ssl3(gnutls_session_t state);
+test_code_t test_ssl3_with_extensions(gnutls_session_t state);
+test_code_t test_ssl3_unknown_ciphersuites(gnutls_session_t state);
 test_code_t test_aes(gnutls_session_t state);
 test_code_t test_camellia_cbc(gnutls_session_t state);
 test_code_t test_camellia_gcm(gnutls_session_t state);

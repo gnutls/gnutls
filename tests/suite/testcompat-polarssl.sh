@@ -42,7 +42,7 @@ fi
 # Check for datefudge
 . "${srcdir}/../scripts/common.sh"
 
-check_for_datefudge
+skip_if_no_datefudge
 
 cat /proc/cpuinfo|grep "model name"|grep "VIA Esther" >/dev/null 2>&1
 if test $? = 0; then

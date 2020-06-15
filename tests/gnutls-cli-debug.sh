@@ -48,7 +48,7 @@ SERV="${SERV} -q"
 
 . "${srcdir}/scripts/common.sh"
 
-check_for_datefudge
+skip_if_no_datefudge
 
 
 KEY1=${srcdir}/../doc/credentials/x509/key-rsa.pem

@@ -49,7 +49,7 @@ fi
 
 . "${srcdir}/../scripts/common.sh"
 
-check_for_datefudge
+skip_if_no_datefudge
 
 . "${srcdir}/testcompat-common"
 

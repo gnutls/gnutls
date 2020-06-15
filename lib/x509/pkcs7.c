@@ -2277,7 +2277,7 @@ static int write_attributes(ASN1_TYPE c2, const char *root,
 		/* If we add any attribute we should add them all */
 		/* Add hash */
 		digest_size = _gnutls_hash_get_algo_len(me);
-		ret = gnutls_hash_fast(me->id, data->data, data->size, digest);
+		ret = gnutls_hash_fast(MAC_TO_DIG(me->id), data->data, data->size, digest);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;

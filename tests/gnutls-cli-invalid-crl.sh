@@ -47,7 +47,7 @@ SERV="${SERV} -q"
 
 . "${srcdir}/scripts/common.sh"
 
-check_for_datefudge
+skip_if_no_datefudge
 
 echo "Checking whether connecting to a server but with an invalid CRL provided, returns the expected error"
 

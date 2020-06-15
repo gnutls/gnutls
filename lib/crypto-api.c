@@ -70,20 +70,30 @@ gnutls_cipher_init(gnutls_cipher_hd_t * handle,
 	if (e == NULL || (e->flags & GNUTLS_CIPHER_FLAG_ONLY_AEAD))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	*handle = gnutls_calloc(1, sizeof(api_cipher_hd_st));
-	if (*handle == NULL) {
+	h = gnutls_calloc(1, sizeof(api_cipher_hd_st));
+	if (h == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	h = *handle;
 	ret =
 	    _gnutls_cipher_init(&h->ctx_enc, e, key,
 				iv, 1);
+	if (ret < 0) {
+		gnutls_free(h);
+		return ret;
+	}
 
-	if (ret >= 0 && _gnutls_cipher_type(e) == CIPHER_BLOCK)
+	if (_gnutls_cipher_type(e) == CIPHER_BLOCK) {
 		ret =
 		    _gnutls_cipher_init(&h->ctx_dec, e, key, iv, 0);
+		if (ret < 0) {
+			gnutls_free(h);
+			return ret;
+		}
+	}
+
+	*handle = h;
 
 	return ret;
 }
@@ -194,6 +204,31 @@ _gnutls_cipher_get_iv(gnutls_cipher_hd_t handle, void *iv, size_t ivlen)
 	api_cipher_hd_st *h = handle;
 
 	return _gnutls_cipher_getiv(&h->ctx_enc, iv, ivlen);
+}
+
+/*-
+ * _gnutls_cipher_set_key:
+ * @handle: is a #gnutls_cipher_hd_t type
+ * @key: the key to set
+ * @keylen: the length of the key
+ *
+ * This function will set the key used by the cipher
+ *
+ * This is solely for validation purposes of our crypto
+ * implementation.  For other purposes, the key should be set at the time of
+ * cipher setup.  As such, this function only works with the internally
+ * registered ciphers.
+ *
+ * Returns: Zero or a negative error code on error.
+ *
+ * Since: 3.6.14
+ -*/
+int
+_gnutls_cipher_set_key(gnutls_cipher_hd_t handle, void *key, size_t keylen)
+{
+	api_cipher_hd_st *h = handle;
+
+	return _gnutls_cipher_setkey(&h->ctx_enc, key, keylen);
 }
 
 /**
@@ -553,7 +588,7 @@ int
 gnutls_hash_init(gnutls_hash_hd_t * dig,
 		 gnutls_digest_algorithm_t algorithm)
 {
-	if (is_mac_algo_forbidden(algorithm))
+	if (is_mac_algo_forbidden(DIG_TO_MAC(algorithm)))
 		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
 
 	*dig = gnutls_malloc(sizeof(digest_hd_st));
@@ -649,7 +684,7 @@ int
 gnutls_hash_fast(gnutls_digest_algorithm_t algorithm,
 		 const void *ptext, size_t ptext_len, void *digest)
 {
-	if (is_mac_algo_forbidden(algorithm))
+	if (is_mac_algo_forbidden(DIG_TO_MAC(algorithm)))
 		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
 
 	return _gnutls_hash_fast(algorithm, ptext, ptext_len, digest);
@@ -755,6 +790,7 @@ int gnutls_aead_cipher_init(gnutls_aead_cipher_hd_t *handle,
 {
 	api_aead_cipher_hd_st *h;
 	const cipher_entry_st *e;
+	int ret;
 
 	if (is_cipher_algo_forbidden(cipher))
 		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
@@ -763,15 +799,21 @@ int gnutls_aead_cipher_init(gnutls_aead_cipher_hd_t *handle,
 	if (e == NULL || e->type != CIPHER_AEAD)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	*handle = gnutls_calloc(1, sizeof(api_aead_cipher_hd_st));
-	if (*handle == NULL) {
+	h = gnutls_calloc(1, sizeof(api_aead_cipher_hd_st));
+	if (h == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	h = *handle;
+	ret = _gnutls_aead_cipher_init(h, cipher, key);
+	if (ret < 0) {
+		gnutls_free(h);
+		return ret;
+	}
 
-	return _gnutls_aead_cipher_init(h, cipher, key);
+	*handle = h;
+
+	return ret;
 }
 
 /**
@@ -891,32 +933,23 @@ gnutls_aead_cipher_encrypt(gnutls_aead_cipher_hd_t handle,
 struct iov_store_st {
 	void *data;
 	size_t size;
-	unsigned allocated;
 };
 
 static void iov_store_free(struct iov_store_st *s)
 {
-	if (s->allocated) {
-		gnutls_free(s->data);
-		s->allocated = 0;
-	}
+	gnutls_free(s->data);
 }
 
 static int iov_store_grow(struct iov_store_st *s, size_t length)
 {
-	if (s->allocated || s->data == NULL) {
-		s->size += length;
-		s->data = gnutls_realloc(s->data, s->size);
-		if (s->data == NULL)
-			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-		s->allocated = 1;
-	} else {
-		void *data = s->data;
-		size_t size = s->size + length;
-		s->data = gnutls_malloc(size);
-		memcpy(s->data, data, s->size);
-		s->size += length;
-	}
+	void *data;
+
+	s->size += length;
+	data = gnutls_realloc(s->data, s->size);
+	if (data == NULL)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+	s->data = data;
 	return 0;
 }
 
@@ -925,11 +958,6 @@ copy_from_iov(struct iov_store_st *dst, const giovec_t *iov, int iovcnt)
 {
 	memset(dst, 0, sizeof(*dst));
 	if (iovcnt == 0) {
-		return 0;
-	} else if (iovcnt == 1) {
-		dst->data = iov[0].iov_base;
-		dst->size = iov[0].iov_len;
-		/* implies: dst->allocated = 0; */
 		return 0;
 	} else {
 		int i;
@@ -944,11 +972,11 @@ copy_from_iov(struct iov_store_st *dst, const giovec_t *iov, int iovcnt)
 
 		p = dst->data;
 		for (i=0;i<iovcnt;i++) {
-			memcpy(p, iov[i].iov_base, iov[i].iov_len);
+			if (iov[i].iov_len > 0)
+				memcpy(p, iov[i].iov_base, iov[i].iov_len);
 			p += iov[i].iov_len;
 		}
 
-		dst->allocated = 1;
 		return 0;
 	}
 }
@@ -1400,4 +1428,99 @@ void gnutls_aead_cipher_deinit(gnutls_aead_cipher_hd_t handle)
 {
 	_gnutls_aead_cipher_deinit(handle);
 	gnutls_free(handle);
+}
+
+extern gnutls_crypto_kdf_st _gnutls_kdf_ops;
+
+/**
+ * gnutls_hkdf_extract:
+ * @mac: the mac algorithm used internally
+ * @key: the initial keying material
+ * @salt: the optional salt
+ * @output: the output value of the extract operation
+ *
+ * This function will derive a fixed-size key using the HKDF-Extract
+ * function as defined in RFC 5869.
+ *
+ * Returns: Zero or a negative error code on error.
+ *
+ * Since: 3.6.13
+ */
+int
+gnutls_hkdf_extract(gnutls_mac_algorithm_t mac,
+		    const gnutls_datum_t *key,
+		    const gnutls_datum_t *salt,
+		    void *output)
+{
+	/* MD5 is only allowed internally for TLS */
+	if (is_mac_algo_forbidden(mac))
+		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
+
+	return _gnutls_kdf_ops.hkdf_extract(mac, key->data, key->size,
+					    salt ? salt->data : NULL,
+					    salt ? salt->size : 0,
+					    output);
+}
+
+/**
+ * gnutls_hkdf_expand:
+ * @mac: the mac algorithm used internally
+ * @key: the pseudorandom key created with HKDF-Extract
+ * @info: the optional informational data
+ * @output: the output value of the expand operation
+ * @length: the desired length of the output key
+ *
+ * This function will derive a variable length keying material from
+ * the pseudorandom key using the HKDF-Expand function as defined in
+ * RFC 5869.
+ *
+ * Returns: Zero or a negative error code on error.
+ *
+ * Since: 3.6.13
+ */
+int
+gnutls_hkdf_expand(gnutls_mac_algorithm_t mac,
+		   const gnutls_datum_t *key,
+		   const gnutls_datum_t *info,
+		   void *output, size_t length)
+{
+	/* MD5 is only allowed internally for TLS */
+	if (is_mac_algo_forbidden(mac))
+		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
+
+	return _gnutls_kdf_ops.hkdf_expand(mac, key->data, key->size,
+					   info->data, info->size,
+					   output, length);
+}
+
+/**
+ * gnutls_pbkdf2:
+ * @mac: the mac algorithm used internally
+ * @key: the initial keying material
+ * @salt: the salt
+ * @iter_count: the iteration count
+ * @output: the output value
+ * @length: the desired length of the output key
+ *
+ * This function will derive a variable length keying material from
+ * a password according to PKCS #5 PBKDF2.
+ *
+ * Returns: Zero or a negative error code on error.
+ *
+ * Since: 3.6.13
+ */
+int
+gnutls_pbkdf2(gnutls_mac_algorithm_t mac,
+	      const gnutls_datum_t *key,
+	      const gnutls_datum_t *salt,
+	      unsigned iter_count,
+	      void *output, size_t length)
+{
+	/* MD5 is only allowed internally for TLS */
+	if (is_mac_algo_forbidden(mac))
+		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
+
+	return _gnutls_kdf_ops.pbkdf2(mac, key->data, key->size,
+				      salt->data, salt->size, iter_count,
+				      output, length);
 }

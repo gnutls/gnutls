@@ -1,3 +1,4 @@
+/.#configure.ac
 *~
 /ABOUT-NLS
 AUTHORS
@@ -188,7 +189,8 @@ fuzz/*_fuzzer
 *.gcda
 *.gcno
 *.gcov
-gl
+/gl/*
+!/gl/override
 /GNUmakefile
 GnuTLS-*-coverage/
 gnutls-*.tar.*
@@ -207,6 +209,7 @@ guile/src/Makefile.in
 guile/tests/Makefile
 guile/tests/Makefile.in
 INSTALL
+ldd.sh
 lib/accelerated/aarch64/libaarch64.la
 lib/accelerated/libaccelerated.la
 lib/accelerated/x86/libx86.la
@@ -231,7 +234,8 @@ lib/minitasn1/libminitasn1.la
 lib/minitasn1/Makefile
 lib/minitasn1/Makefile.in
 lib/nettle/libcrypto.la
-lib/nettle/curve448
+lib/nettle/backport
+lib/nettle/ecc
 lib/opencdk/libminiopencdk.la
 lib/opencdk/Makefile
 lib/opencdk/Makefile.in
@@ -340,6 +344,7 @@ tests/atfork
 tests/auto-verify
 tests/base64
 tests/base64-raw
+tests/buffer
 tests/cert
 tests/cert-key-exchange
 tests/cert-status
@@ -349,6 +354,7 @@ tests/certificate_set_x509_crl
 tests/certuniqueid
 tests/chainverify
 tests/chainverify-unsorted
+tests/cipher-alignment
 tests/cipher-test
 tests/client
 tests/client-fastopen
@@ -372,6 +378,7 @@ tests/cve-2009-1416
 tests/dane
 tests/dane-strcodes
 tests/datefudge-check
+tests/dh-compute
 tests/dh-params
 tests/dhepskself
 tests/dhex509self
@@ -382,6 +389,7 @@ tests/dtls-client-with-seccomp
 tests/dtls-etm
 tests/dtls-handshake-versions
 tests/dtls-max-record
+tests/dtls-pthread
 tests/dtls-record-check
 tests/dtls-rehandshake-anon
 tests/dtls-rehandshake-cert
@@ -398,9 +406,11 @@ tests/dtls1.0-cert-key-exchange
 tests/dtls1.2-cert-key-exchange
 tests/dtls10-cert-key-exchange
 tests/dtls12-cert-key-exchange
+tests/dtls_hello_random_value
 tests/duplicate-extensions
 tests/eagain
 tests/eagain-auto-auth
+tests/ecdh-compute
 tests/empty_retrieve_function
 tests/fallback-scsv
 tests/finished
@@ -410,6 +420,7 @@ tests/fips-test
 tests/gc
 tests/global-init
 tests/global-init-override
+tests/gnutls-ids
 tests/gnutls-strcodes
 tests/gnutls_ext_raw_parse
 tests/gnutls_ext_raw_parse_dtls
@@ -436,6 +447,7 @@ tests/insecure_key
 tests/iov
 tests/ip-check
 tests/ip-utils
+tests/kdf-api
 tests/key-export-pkcs8
 tests/key-id/Makefile
 tests/key-id/Makefile.in
@@ -449,6 +461,7 @@ tests/key-usage-ecdhe-rsa
 tests/key-usage-rsa
 tests/keygen
 tests/keylog-env
+tests/keylog-func
 tests/libpkcs11mock1.la
 tests/libpkcs11mock2.la
 tests/libutils.la
@@ -516,6 +529,8 @@ tests/mini-x509-ipaddr
 tests/mini-x509-kx
 tests/mini-x509-rehandshake
 tests/mini-xssl
+tests/missingissuer
+tests/missingissuer_aia
 tests/moredn
 tests/mpi
 tests/multi-alerts
@@ -532,6 +547,7 @@ tests/ocsp
 tests/ocsp-filename-memleak
 tests/ocsp-resp
 tests/oids
+tests/openconnect-dtls12
 tests/openpgp-auth
 tests/openpgp-auth2
 tests/openpgp-callback
@@ -612,6 +628,7 @@ tests/privkey-keygen
 tests/privkey-verify-broken
 tests/psk-file
 tests/pskself
+tests/pskself2
 tests/pubkey-import-export
 tests/random-art
 tests/rawpk-api
@@ -638,6 +655,8 @@ tests/resume-with-previous-stek
 tests/resume-with-record-size-limit
 tests/resume-with-stek-expiration
 tests/resume-x509
+tests/rfc7633-missing
+tests/rfc7633-ok
 tests/rng-fork
 tests/rng-no-onload
 tests/rng-op-key
@@ -660,6 +679,7 @@ tests/safe-renegotiation/srn2
 tests/safe-renegotiation/srn3
 tests/sanity-cpp
 tests/sec-params
+tests/secret-hook
 tests/send-client-cert
 tests/send-data-befor
 tests/send-data-before-handshake
@@ -687,6 +707,7 @@ tests/set_x509_key_file_ocsp_multi
 tests/set_x509_key_file_ocsp_multi2
 tests/set_x509_key_mem
 tests/set_x509_key_utf8
+tests/set_x509_ocsp_multi_cli
 tests/set_x509_ocsp_multi_invalid
 tests/set_x509_ocsp_multi_pem
 tests/set_x509_ocsp_multi_unknown
@@ -699,10 +720,12 @@ tests/sign-md5-rep
 tests/sign-pk-api
 tests/sign-verify
 tests/sign-verify-data
+tests/sign-verify-data-newapi
 tests/sign-verify-deterministic
 tests/sign-verify-ed25519-rfc8080
 tests/sign-verify-ext
 tests/sign-verify-ext4
+tests/sign-verify-newapi
 tests/simple
 tests/slow/cipher-api-test
 tests/slow/cipher-compat
@@ -716,6 +739,8 @@ tests/slow/hash-large
 tests/slow/keygen
 tests/slow/mac-override
 tests/softhsm-*.db/
+tests/softhsm-neg-no-key.config
+tests/softhsm-post-handshake-with-cert-pkcs11.config
 tests/spki
 tests/spki-abstract
 tests/srp
@@ -761,7 +786,10 @@ tests/suite/testpkcs11.debug
 tests/suite/testtpm.sh
 tests/suite/tlslite
 tests/suite/x509paths/X509tests
+tests/system-override-hash
+tests/system-override-sig
 tests/system-prio-file
+tests/time
 tests/tls-client-with-seccomp
 tests/tls-crt_type-neg
 tests/tls-etm
@@ -771,6 +799,7 @@ tests/tls-force-etm
 tests/tls-max-record
 tests/tls-neg-ext-key
 tests/tls-neg-ext4-key
+tests/tls-pthread
 tests/tls-record-size-limit
 tests/tls-record-size-limit-asym
 tests/tls-rehandshake-anon
@@ -821,6 +850,7 @@ tests/tls13-rehandshake-cert
 tests/tls13-resume-psk
 tests/tls13-resume-x509
 tests/tls13-server-kx-neg
+tests/tls13-without-timeout-func
 tests/tls13/anti_replay
 tests/tls13/change_cipher_spec
 tests/tls13/cookie
@@ -831,6 +861,7 @@ tests/tls13/key_share
 tests/tls13/key_update
 tests/tls13/key_update_multiple
 tests/tls13/multi-ocsp
+tests/tls13/no-auto-send-ticket
 tests/tls13/no-psk-exts
 tests/tls13/ocsp-client
 tests/tls13/post-handshake-with-cert
@@ -845,6 +876,7 @@ tests/tls13/psk-dumbfw
 tests/tls13/psk-ext
 tests/tls13/supported_versions
 tests/tls13/tls12-no-tls13-exts
+tests/tls_hello_random_value
 tests/tlsext-decoding
 tests/tlsfeature-crt
 tests/tlsfeature-ext
@@ -864,9 +896,11 @@ tests/x509-dn
 tests/x509-dn-decode
 tests/x509-dn-decode-compat
 tests/x509-extensions
+tests/x509-server-verify
 tests/x509-verify-with-crl
 tests/x509_altname
 tests/x509cert
+tests/x509cert-dntypes
 tests/x509cert-invalid
 tests/x509cert-tl
 tests/x509dn

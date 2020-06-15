@@ -80,7 +80,7 @@ int _gnutls_digest_exists(gnutls_digest_algorithm_t algo)
 {
 	const gnutls_crypto_digest_st *cc = NULL;
 
-	if (is_mac_algo_forbidden(algo))
+	if (is_mac_algo_forbidden(DIG_TO_MAC(algo)))
 		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
 
 	cc = _gnutls_get_crypto_digest(algo);
@@ -242,6 +242,7 @@ _gnutls_mac_init(mac_hd_st * mac, const mac_entry_st * e,
 		mac->output = cc->output;
 		mac->deinit = cc->deinit;
 		mac->copy = cc->copy;
+		mac->setkey = cc->setkey;
 
 		return 0;
 	}
@@ -257,6 +258,7 @@ _gnutls_mac_init(mac_hd_st * mac, const mac_entry_st * e,
 	mac->output = _gnutls_mac_ops.output;
 	mac->deinit = _gnutls_mac_ops.deinit;
 	mac->copy = _gnutls_mac_ops.copy;
+	mac->setkey = _gnutls_mac_ops.setkey;
 
 	if (_gnutls_mac_ops.setkey(mac->handle, key, keylen) < 0) {
 		gnutls_assert();

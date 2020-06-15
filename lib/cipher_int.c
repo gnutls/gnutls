@@ -102,6 +102,7 @@ _gnutls_cipher_init(cipher_hd_st *handle, const cipher_entry_st *e,
 		handle->tag = cc->tag;
 		handle->setiv = cc->setiv;
 		handle->getiv = cc->getiv;
+		handle->setkey = cc->setkey;
 
 		/* if cc->init() returns GNUTLS_E_NEED_FALLBACK we
 		 * use the default ciphers */
@@ -128,6 +129,7 @@ _gnutls_cipher_init(cipher_hd_st *handle, const cipher_entry_st *e,
 	handle->tag = _gnutls_cipher_ops.tag;
 	handle->setiv = _gnutls_cipher_ops.setiv;
 	handle->getiv = _gnutls_cipher_ops.getiv;
+	handle->setkey = _gnutls_cipher_ops.setkey;
 
 	/* otherwise use generic cipher interface
 	 */

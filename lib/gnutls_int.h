@@ -55,6 +55,8 @@ typedef int ssize_t;
 
 #include <nettle/memxor.h>
 
+#include "attribute.h"
+
 #define ENABLE_ALIGN16
 
 #ifdef __clang_major
@@ -74,26 +76,6 @@ typedef int ssize_t;
 #else
 # define likely
 # define unlikely
-#endif
-
-#if _GNUTLS_GCC_VERSION >= 30300
-# define attr_nonnull_all __attribute__ ((nonnull))
-# define attr_nonnull(a)  __attribute__ ((nonnull a))
-#else
-# define attr_nonnull_all
-# define attr_nonnull(a)
-#endif
-
-#if _GNUTLS_GCC_VERSION >= 30400 && (_GNUTLS_CLANG_VERSION == 0 || _GNUTLS_CLANG_VERSION >= 40000)
-# define attr_warn_unused_result __attribute__((warn_unused_result))
-#else
-# define attr_warn_unused_result
-#endif
-
-#if _GNUTLS_GCC_VERSION >= 70100
-# define FALLTHROUGH __attribute__ ((fallthrough))
-#else
-# define FALLTHROUGH
 #endif
 
 #include <gnutls/gnutls.h>
@@ -146,7 +128,7 @@ typedef int ssize_t;
 /* TLS Extensions */
 /* we can receive up to MAX_EXT_TYPES extensions.
  */
-#define MAX_EXT_TYPES 32
+#define MAX_EXT_TYPES 64
 
 /* TLS-internal extension (will be parsed after a ciphersuite is selected).
  * This amends the gnutls_ext_parse_type_t. Not exported yet to allow more refining
@@ -358,22 +340,24 @@ typedef enum extensions_t {
 	GNUTLS_EXTENSION_MAX /* not real extension - used for iterators */
 } extensions_t;
 
-#define GNUTLS_EXTENSION_MAX_VALUE 31
-#define ext_track_t uint32_t
+#define GNUTLS_EXTENSION_MAX_VALUE 63
+#define ext_track_t uint64_t
 
-#if GNUTLS_EXTENSION_MAX >= GNUTLS_EXTENSION_MAX_VALUE
-# error over limit
-#endif
+#include <verify.h>
 
-#if GNUTLS_EXTENSION_MAX >= MAX_EXT_TYPES
-# error over limit
-#endif
+verify(GNUTLS_EXTENSION_MAX < GNUTLS_EXTENSION_MAX_VALUE);
+verify(GNUTLS_EXTENSION_MAX < MAX_EXT_TYPES);
 
-/* we must provide at least 16 extensions for users to register */
-#if GNUTLS_EXTENSION_MAX_VALUE - GNUTLS_EXTENSION_MAX < 16
-# error not enough extension types; increase GNUTLS_EXTENSION_MAX_VALUE, MAX_EXT_TYPES and used_exts type
-#endif
+/* we must provide at least 16 extensions for users to register;
+ * increase GNUTLS_EXTENSION_MAX_VALUE, MAX_EXT_TYPES and used_exts
+ * type if this fails
+ */
+verify(GNUTLS_EXTENSION_MAX_VALUE - GNUTLS_EXTENSION_MAX >= 16);
 
+/* The 'verify' symbol from <verify.h> is used extensively in the
+ * code; undef it to avoid clash
+ */
+#undef verify
 
 typedef enum { CIPHER_STREAM, CIPHER_BLOCK, CIPHER_AEAD } cipher_type_t;
 
@@ -1243,6 +1227,8 @@ typedef struct {
 	unsigned int h_type;	/* the hooked type */
 	int16_t h_post;		/* whether post-generation/receive */
 
+	gnutls_keylog_func keylog_func;
+
 	/* holds the selected certificate and key.
 	 * use _gnutls_selected_certs_deinit() and _gnutls_selected_certs_set()
 	 * to change them.
@@ -1441,7 +1427,7 @@ typedef struct {
 
 	/* The saved username from PSK or SRP auth */
 	char saved_username[MAX_USERNAME_SIZE+1];
-	bool saved_username_set;
+	int saved_username_size;
 
 	/* Needed for TCP Fast Open (TFO), set by gnutls_transport_set_fastopen() */
 	tfo_st tfo;

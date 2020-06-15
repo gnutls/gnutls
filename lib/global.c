@@ -368,7 +368,6 @@ static int _gnutls_global_init(unsigned constructor)
 
 	_gnutls_register_accel_crypto();
 	_gnutls_cryptodev_init();
-	_gnutls_load_system_priorities();
 
 #ifdef ENABLE_FIPS140
 	/* These self tests are performed on the overridden algorithms
@@ -385,6 +384,7 @@ static int _gnutls_global_init(unsigned constructor)
 		_gnutls_fips_mode_reset_zombie();
 	}
 #endif
+	_gnutls_load_system_priorities();
 	_gnutls_switch_lib_state(LIB_STATE_OPERATIONAL);
 	ret = 0;
 

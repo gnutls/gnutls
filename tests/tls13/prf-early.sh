@@ -23,7 +23,7 @@ builddir="${builddir:-.}"
 
 . "${srcdir}/scripts/common.sh"
 
-check_for_datefudge
+skip_if_no_datefudge
 
 datefudge -s 2019-04-12 "${builddir}/tls13/prf-early" "$@"
 exit $?

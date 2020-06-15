@@ -39,19 +39,9 @@ static int
 data2hex(const void *data, size_t data_size,
 	 gnutls_datum_t *out);
 
-struct oid_to_string {
-	const char *oid;
-	unsigned oid_size;
-	const char *ldap_desc;
-	unsigned ldap_desc_size;
-	const char *asn_desc;	/* description in the pkix file if complex type */
-	unsigned int etype;	/* the libtasn1 ASN1_ETYPE or INVALID
-				 * if cannot be simply parsed */
-};
-
 #define ENTRY(oid, ldap, asn, etype) {oid, sizeof(oid)-1, ldap, sizeof(ldap)-1, asn, etype}
 
-/* when there is no ldap description */
+/* when there is no name description */
 #define ENTRY_ND(oid, asn, etype) {oid, sizeof(oid)-1, NULL, 0, asn, etype}
 
 /* This list contains all the OIDs that may be
@@ -144,18 +134,18 @@ static const struct oid_to_string _oid2str[] = {
 	{NULL, 0, NULL, 0, NULL, 0}
 };
 
-static const struct oid_to_string *get_oid_entry(const char *oid)
+const struct oid_to_string *_gnutls_oid_get_entry(const struct oid_to_string *ots, const char *oid)
 {
 	unsigned int i = 0;
 	unsigned len = strlen(oid);
 
 	do {
-		if (len == _oid2str[i].oid_size &&
-			strcmp(_oid2str[i].oid, oid) == 0)
-			return &_oid2str[i];
+		if (len == ots[i].oid_size &&
+			strcmp(ots[i].oid, oid) == 0)
+			return &ots[i];
 		i++;
 	}
-	while (_oid2str[i].oid != NULL);
+	while (ots[i].oid != NULL);
 
 	return NULL;
 }
@@ -165,9 +155,9 @@ const char *_gnutls_ldap_string_to_oid(const char *str, unsigned str_len)
 	unsigned int i = 0;
 
 	do {
-		if ((_oid2str[i].ldap_desc != NULL) &&
-		    (str_len == _oid2str[i].ldap_desc_size) &&
-		    (c_strncasecmp(_oid2str[i].ldap_desc, str, str_len) ==
+		if ((_oid2str[i].name_desc != NULL) &&
+		    (str_len == _oid2str[i].name_desc_size) &&
+		    (c_strncasecmp(_oid2str[i].name_desc, str, str_len) ==
 		     0))
 			return _oid2str[i].oid;
 		i++;
@@ -242,18 +232,7 @@ static int str_escape(const gnutls_datum_t * str, gnutls_datum_t * escaped)
  **/
 int gnutls_x509_dn_oid_known(const char *oid)
 {
-	unsigned int i = 0;
-	unsigned len = strlen(oid);
-
-	do {
-		if (len == _oid2str[i].oid_size &&
-			strcmp(_oid2str[i].oid, oid) == 0)
-			return 1;
-		i++;
-	}
-	while (_oid2str[i].oid != NULL);
-
-	return 0;
+	return _gnutls_oid_get_entry(_oid2str, oid) != NULL;
 }
 
 /**
@@ -272,17 +251,10 @@ int gnutls_x509_dn_oid_known(const char *oid)
  **/
 const char *gnutls_x509_dn_oid_name(const char *oid, unsigned int flags)
 {
-	unsigned int i = 0;
-	unsigned len = strlen(oid);
+	const struct oid_to_string *entry =_gnutls_oid_get_entry(_oid2str, oid);
 
-	do {
-		if ((_oid2str[i].oid_size == len) &&
-			strcmp(_oid2str[i].oid, oid) == 0 && _oid2str[i].ldap_desc != NULL)
-			return _oid2str[i].ldap_desc;
-		i++;
-	}
-	while (_oid2str[i].oid != NULL);
-
+	if (entry && entry->name_desc)
+		return entry->name_desc;
 	if (flags & GNUTLS_X509_DN_OID_RETURN_OID)
 		return oid;
 	else
@@ -450,7 +422,7 @@ _gnutls_x509_dn_to_string(const char *oid, void *value,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	oentry = get_oid_entry(oid);
+	oentry = _gnutls_oid_get_entry(_oid2str, oid);
 	if (oentry == NULL) {	/* unknown OID -> hex */
  unknown_oid:
 		ret = data2hex(value, value_size, str);
@@ -1469,7 +1441,7 @@ _gnutls_x509_encode_and_write_attribute(const char *given_oid,
 	int result;
 	const struct oid_to_string *oentry;
 
-	oentry = get_oid_entry(given_oid);
+	oentry = _gnutls_oid_get_entry(_oid2str, given_oid);
 	if (oentry == NULL) {
 		gnutls_assert();
 		_gnutls_debug_log("Cannot find OID: %s\n", given_oid);
@@ -1809,29 +1781,20 @@ gnutls_x509_crt_t *_gnutls_sort_clist(gnutls_x509_crt_t
 
 int _gnutls_check_if_sorted(gnutls_x509_crt_t * crt, int nr)
 {
-	void *prev_dn = NULL;
-	void *dn;
-	size_t prev_dn_size = 0, dn_size;
 	int i, ret;
 
 	/* check if the X.509 list is ordered */
 	if (nr > 1) {
 		for (i = 0; i < nr; i++) {
 			if (i > 0) {
-				dn = crt[i]->raw_dn.data;
-				dn_size = crt[i]->raw_dn.size;
-
-				if (dn_size != prev_dn_size
-				    || memcmp(dn, prev_dn, dn_size) != 0) {
+				if (!_gnutls_x509_compare_raw_dn(&crt[i]->raw_dn,
+				                                 &crt[i-1]->raw_issuer_dn)) {
 					ret =
 					    gnutls_assert_val
 					    (GNUTLS_E_CERTIFICATE_LIST_UNSORTED);
 					goto cleanup;
 				}
 			}
-
-			prev_dn = crt[i]->raw_issuer_dn.data;
-			prev_dn_size = crt[i]->raw_issuer_dn.size;
 		}
 	}
 	ret = 0;
@@ -1925,4 +1888,24 @@ gnutls_gost_paramset_t gnutls_oid_to_gost_paramset(const char *oid)
 		return GNUTLS_GOST_PARAMSET_CP_D;
 	else
 		return gnutls_assert_val(GNUTLS_GOST_PARAMSET_UNKNOWN);
+}
+
+int _gnutls_x509_get_version(ASN1_TYPE root, const char *name)
+{
+	uint8_t version[8];
+	int len, result;
+
+	len = sizeof(version);
+	result = asn1_read_value(root, name, version, &len);
+	if (result != ASN1_SUCCESS) {
+		if (result == ASN1_ELEMENT_NOT_FOUND)
+			return 1;	/* the DEFAULT version */
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	if (len != 1 || version[0] >= 0x80)
+		return gnutls_assert_val(GNUTLS_E_ASN1_DER_ERROR);
+
+	return (int) version[0] + 1;
 }

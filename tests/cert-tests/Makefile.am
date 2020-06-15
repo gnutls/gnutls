@@ -101,7 +101,7 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/cert-with-non-digits-time-ca.pem data/cert-with-non-digits-time.pem \
 	data/chain-512-leaf.pem data/chain-512-subca.pem data/chain-512-ca.pem \
 	templates/template-no-ca-honor.tmpl templates/template-no-ca-explicit.tmpl \
-	data/crq-cert-no-ca-explicit.pem data/crq-cert-no-ca-honor.pem
+	data/crq-cert-no-ca-explicit.pem data/crq-cert-no-ca-honor.pem data/commonName.cer
 
 dist_check_SCRIPTS = pathlen aki invalid-sig email \
 	pkcs7 pkcs7-broken-sigs privkey-import name-constraints certtool-long-cn crl provable-privkey \

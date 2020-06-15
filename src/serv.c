@@ -219,7 +219,7 @@ static void read_dh_params(void)
 	char tmpdata[2048];
 	int size;
 	gnutls_datum_t params;
-	FILE *fd;
+	FILE *fp;
 
 	if (gnutls_dh_params_init(&dh_params) < 0) {
 		fprintf(stderr, "Error in dh parameter initialization\n");
@@ -228,15 +228,15 @@ static void read_dh_params(void)
 
 	/* read the params file
 	 */
-	fd = fopen(dh_params_file, "r");
-	if (fd == NULL) {
+	fp = fopen(dh_params_file, "r");
+	if (fp == NULL) {
 		fprintf(stderr, "Could not open %s\n", dh_params_file);
 		exit(1);
 	}
 
-	size = fread(tmpdata, 1, sizeof(tmpdata) - 1, fd);
+	size = fread(tmpdata, 1, sizeof(tmpdata) - 1, fp);
 	tmpdata[size] = 0;
-	fclose(fd);
+	fclose(fp);
 
 	params.data = (unsigned char *) tmpdata;
 	params.size = size;
@@ -1071,12 +1071,12 @@ get_response(gnutls_session_t session, char *request,
 			*response_length = strlen(*response);
 			return 1;
 		} else if (ret == 0) {
+			*response = strdup(request);
 			if (*response == NULL) {
 				fprintf(stderr, "Memory error\n");
 				return 0;
 			}
-			*response = strdup(request);
-			*response_length = ((*response) ? strlen(*response) : 0);
+			*response_length = strlen(*response);
 		} else {
 			*response = NULL;
 			do {

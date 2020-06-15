@@ -172,7 +172,16 @@ flag = {
     name      = save-ocsp;
     arg-type  = string;
     descrip   = "Save the peer's OCSP status response in the provided file";
-    doc      = "";
+    doc       = "";
+    flags-cant = save-ocsp-multi;
+};
+
+flag = {
+    name      = save-ocsp-multi;
+    arg-type  = string;
+    descrip   = "Save all OCSP responses provided by the peer in this file";
+    doc       = "The file will contain a list of PEM encoded OCSP status responses if any were provided by the peer, starting with the one for the peer's server certificate.";
+    flags-cant = save-ocsp;
 };
 
 flag = {
@@ -460,6 +469,12 @@ flag = {
     arg-type  = number;
     descrip   = "Size of the exported keying material";
     doc      = "";
+};
+
+flag = {
+    name     = waitresumption;
+    descrip  = "Block waiting for the resumption data under TLS1.3";
+    doc      = "This option makes the client to block waiting for the resumption data under TLS1.3. The option has effect only when --resume is provided.";
 };
 
 doc-section = {

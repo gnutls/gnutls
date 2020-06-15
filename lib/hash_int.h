@@ -42,6 +42,7 @@ typedef int (*output_func) (void *src_ctx, void *digest,
 			    size_t digestsize);
 typedef void (*hash_deinit_func) (void *handle);
 typedef void *(*copy_func) (const void *handle);
+typedef int (*setkey_func) (void *handle, const void *key, size_t keysize);
 
 typedef struct {
 	const mac_entry_st *e;
@@ -65,6 +66,7 @@ typedef struct {
 	output_func output;
 	hash_deinit_func deinit;
 	copy_func copy;
+	setkey_func setkey;
 
 	void *handle;
 } mac_hd_st;
@@ -105,6 +107,13 @@ _gnutls_mac_set_nonce(mac_hd_st * handle, const void *nonce, size_t n_size)
 		return handle->setnonce(handle->handle, nonce, n_size);
 	return 0;
 }
+
+inline static int
+_gnutls_mac_setkey(mac_hd_st * handle, const void *key, size_t key_size)
+{
+	return handle->setkey(handle->handle, key, key_size);
+}
+
 
 void _gnutls_mac_deinit(mac_hd_st * handle, void *digest);
 

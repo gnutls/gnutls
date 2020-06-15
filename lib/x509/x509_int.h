@@ -495,23 +495,30 @@ gnutls_x509_crt_verify_data3(gnutls_x509_crt_t crt,
 			     const gnutls_datum_t *signature,
 			     unsigned int flags);
 
+int _gnutls_trust_list_get_issuer(gnutls_x509_trust_list_t list,
+				  gnutls_x509_crt_t cert,
+				  gnutls_x509_crt_t * issuer,
+				  unsigned int flags);
+
 unsigned int
-_gnutls_verify_crt_status(const gnutls_x509_crt_t * certificate_list,
-				int clist_size,
-				const gnutls_x509_crt_t * trusted_cas,
-				int tcas_size,
-				unsigned int flags,
-				const char *purpose,
-				gnutls_verify_output_function func);
+_gnutls_verify_crt_status(gnutls_x509_trust_list_t tlist,
+			  const gnutls_x509_crt_t * certificate_list,
+			  int clist_size,
+			  const gnutls_x509_crt_t * trusted_cas,
+			  int tcas_size,
+			  unsigned int flags,
+			  const char *purpose,
+			  gnutls_verify_output_function func);
 
 #ifdef ENABLE_PKCS11
 unsigned int
-_gnutls_pkcs11_verify_crt_status(const char* url,
-				const gnutls_x509_crt_t * certificate_list,
-				unsigned clist_size,
-				const char *purpose,
-				unsigned int flags,
-				gnutls_verify_output_function func);
+_gnutls_pkcs11_verify_crt_status(gnutls_x509_trust_list_t tlist,
+				 const char* url,
+				 const gnutls_x509_crt_t * certificate_list,
+				 unsigned clist_size,
+				 const char *purpose,
+				 unsigned int flags,
+				 gnutls_verify_output_function func);
 #endif
 
 int _gnutls_check_cert_sanity(gnutls_x509_crt_t cert);

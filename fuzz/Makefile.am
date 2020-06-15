@@ -30,6 +30,8 @@ FUZZERS = \
  gnutls_srp_client_fuzzer$(EXEEXT) \
  gnutls_srp_server_fuzzer$(EXEEXT) \
  gnutls_set_trust_file_fuzzer$(EXEEXT) \
+ gnutls_x509_crl_parser_fuzzer$(EXEEXT) \
+ gnutls_x509_crq_parser_fuzzer$(EXEEXT) \
  gnutls_x509_parser_fuzzer$(EXEEXT) \
  gnutls_ext_raw_parse_fuzzer$(EXEEXT)
 
@@ -57,6 +59,8 @@ gnutls_server_rawpk_fuzzer_SOURCES = gnutls_server_rawpk_fuzzer.c $(COMMON_SOURC
 gnutls_srp_client_fuzzer_SOURCES = gnutls_srp_client_fuzzer.c $(COMMON_SOURCES) mem.h srp.h
 gnutls_srp_server_fuzzer_SOURCES = gnutls_srp_server_fuzzer.c $(COMMON_SOURCES) mem.h srp.h
 gnutls_set_trust_file_fuzzer_SOURCES = gnutls_set_trust_file_fuzzer.c $(COMMON_SOURCES)
+gnutls_x509_crl_parser_fuzzer_SOURCES = gnutls_x509_crq_parser_fuzzer.c $(COMMON_SOURCES)
+gnutls_x509_crq_parser_fuzzer_SOURCES = gnutls_x509_crq_parser_fuzzer.c $(COMMON_SOURCES)
 gnutls_x509_parser_fuzzer_SOURCES = gnutls_x509_parser_fuzzer.c $(COMMON_SOURCES)
 gnutls_ext_raw_parse_fuzzer_SOURCES = gnutls_ext_raw_parse_fuzzer.c $(COMMON_SOURCES)
 
@@ -84,12 +88,13 @@ oss-fuzz:
 	for ccfile in *_fuzzer.c; do \
 	fuzzer=$$(basename $$ccfile .c); \
 	XLIBS="-lhogweed -lnettle -ltasn1 -lgmp -lidn2 -lunistring"; \
-	$$CXX $$CXXFLAGS -I$(top_srcdir)/lib/includes/ -I$(top_srcdir) \
-	"$${fuzzer}.c" -o "$${fuzzer}" \
+	$$CC $$CFLAGS -I$(top_srcdir)/lib/includes/ -I$(top_srcdir) \
+	-c "$${fuzzer}.c" -o "$${fuzzer}.o" ; \
+	$$CXX $$CXXFLAGS "$${fuzzer}.o" -o "$${fuzzer}" \
 	../lib/.libs/libgnutls.a $${LIB_FUZZING_ENGINE} \
 	-Wl,-Bstatic \
 	$${XLIBS} \
-	-Wl,-Bdynamic; \
+	-Wl,-Bdynamic || exit $?; \
 	done; \
 	fi
 

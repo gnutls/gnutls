@@ -34,7 +34,7 @@ fi
 
 . ${srcdir}/scripts/common.sh
 
-check_for_datefudge
+skip_if_no_datefudge
 
 #try verification
 datefudge -s "2010-10-10" \

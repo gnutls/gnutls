@@ -153,13 +153,25 @@ if test $? = 0;then
 	exit 1
 fi
 
+${VALGRIND} "${CERTTOOL}" -i --infile "${srcdir}/data/commonName.cer" | grep -v "Not After:" > ${TMPFILE1}
+if test $? != 0;then
+	echo "commonName cert output failed"
+	exit 1
+fi
+
+${DIFF} "${srcdir}/data/commonName.cer" ${TMPFILE1}
+if test $? != 0;then
+	exit 1
+fi
+
+
 rm -f ${TMPFILE1} ${TMPFILE2}
 
 export TZ="UTC"
 
 . ${srcdir}/../scripts/common.sh
 
-check_for_datefudge
+skip_if_no_datefudge
 
 cat "${srcdir}/../certs/cert-ecc256.pem" "${srcdir}/../certs/ca-cert-ecc.pem"|datefudge "2012-11-22" \
 ${VALGRIND} "${CERTTOOL}" --verify-chain

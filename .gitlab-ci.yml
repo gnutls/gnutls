@@ -7,7 +7,7 @@ stages:
 # name to allow expiration of old caches.
 
 cache:
-  key: "$CI_JOB_NAME-ver14"
+  key: "$CI_JOB_NAME-ver16"
   paths:
     - cache/
 
@@ -42,7 +42,7 @@ variables:
   FEDORA_BUILD: buildenv-fedora31
   MINGW_BUILD: buildenv-mingw
   ALPINE_BASE_BUILD: buildenv-alpine-base
-  CPPCHECK_OPTIONS: "--enable=warning --enable=style --enable=performance --enable=portability --std=c99 --suppressions-list=devel/cppcheck.suppressions -i lib/nettle/curve448 --template='{id}:{file}:{line},{severity},{message}'"
+  CPPCHECK_OPTIONS: "--enable=warning --enable=style --enable=performance --enable=portability --std=c99 --suppressions-list=devel/cppcheck.suppressions --template='{id}:{file}:{line},{severity},{message}'"
   GET_SOURCES_ATTEMPTS: "3"
 
 ##################################################
@@ -111,6 +111,7 @@ abi/coverage:
   - make pic-check
   - make -j$CHECKJOBS check
   - make local-code-coverage-output || true
+  - if objdump -R lib/.libs/libgnutls.so | grep INTERNAL ; then false ; fi
   tags:
   - shared
   - linux
@@ -289,7 +290,7 @@ static-analyzers.Fedora.x86_64:
   - scan-build --status-bugs -o scan-build-lib make -j$BUILDJOBS -C libdane
   - make -j$BUILDJOBS -C src/gl
   - scan-build --status-bugs -o scan-build-lib make -j$BUILDJOBS -C src
-  - cppcheck --force -q -Ilib/include -Igl/ -Ilib/ -I. --error-exitcode=1 lib/ -i lib/unistring -i lib/minitasn1 -i lib/nettle/backport -j2 $CPPCHECK_OPTIONS
+  - cppcheck --force -q -Ilib/include -Igl/ -Ilib/ -I. --error-exitcode=1 lib/ -i lib/unistring -i lib/minitasn1 -i lib/nettle/backport -i lib/nettle/ecc -j2 $CPPCHECK_OPTIONS
   - cppcheck --force -q -Ilib/include -Igl/ -Ilibdane/ -I. --error-exitcode=1 libdane/ -j2 $CPPCHECK_OPTIONS
   after_script:
   - /bin/true
@@ -387,6 +388,85 @@ MinGW64.DLLs:
     name: "${CI_PROJECT_NAME}-${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}"
     paths:
       - win64-build/
+  retry: 1
+
+MinGW64.DLLs.Vista+:
+  stage: stage1-testing
+  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$MINGW_BUILD
+  script:
+  - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
+  - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
+  - ./bootstrap
+  - export CC="ccache x86_64-w64-mingw32-gcc"
+ # Target Vista instead of XP, currently the default in mingw
+  - export CPPFLAGS="-D_WIN32_WINNT=0x600"
+  - export WINEPATH=/usr/x86_64-w64-mingw32/sys-root/mingw/bin
+  - dash ./configure --disable-gcc-warnings --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 --cache-file cache/config.cache --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-full-test-suite --disable-doc
+  - mingw64-make -j$BUILDJOBS
+  - mingw64-make -j$BUILDJOBS -C tests check
+# Combine generated apps and DLLs.
+#libwinpthread is required by libgcc
+#libffi is required by libp11-kit
+  - mkdir -p win64-build/bin win64-build/lib/includes
+  - cp lib/.libs/*.dll src/.libs/*.exe win64-build/bin
+  - x86_64-w64-mingw32-strip --strip-unneeded win64-build/bin/*.dll
+  - x86_64-w64-mingw32-strip win64-build/bin/*.exe
+  - cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libp11-*.dll win64-build/bin
+  - cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libnettle-*.dll win64-build/bin
+  - cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libhogweed-*.dll win64-build/bin
+  - cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libgmp-*.dll win64-build/bin
+  - cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libgcc*.dll win64-build/bin
+  - cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libwinpthread*.dll win64-build/bin
+  - cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libidn2-*.dll win64-build/bin
+  - cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libffi-*.dll win64-build/bin
+  - cp lib/.libs/*.a lib/*.def lib/gnutls.pc win64-build/lib
+  - cp lib/includes/gnutls/*.h win64-build/lib/includes
+  tags:
+  - shared
+  - docker
+  - linux
+  only:
+  - tags
+  artifacts:
+    name: "${CI_PROJECT_NAME}-${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}"
+    paths:
+      - win64-build/
+  retry: 1
+
+MinGW64.Vista+:
+  stage: stage1-testing
+  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$MINGW_BUILD
+  script:
+  - ./bootstrap
+  - export CC="ccache x86_64-w64-mingw32-gcc"
+ # Target Vista instead of XP, currently the default in mingw
+  - export CPPFLAGS="-D_WIN32_WINNT=0x600"
+  - export WINEPATH=/usr/x86_64-w64-mingw32/sys-root/mingw/bin
+  - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
+  - echo ':DOSWin:M::MZ::/usr/bin/wine64:' > /proc/sys/fs/binfmt_misc/register
+  - mkdir -p build
+  - cd build
+  - dash ../configure --disable-gcc-warnings --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 --cache-file ../cache/config.cache --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-full-test-suite --disable-non-suiteb-curves --disable-doc
+  # generate the certtool autogen file to check whether later compilation will modify it
+  - mingw64-make -j$BUILDJOBS -C src certtool-args.c.bak
+  - mingw64-make -j$BUILDJOBS
+  - mingw64-make -j$CHECKJOBS -C tests check
+  - cd ..
+  # since we use --enable-local-libopts the generated files must equal the .bak
+  - cmp build/src/certtool-args.c build/src/certtool-args.c.bak || false
+  tags:
+  - shared
+  - docker
+  - linux
+  except:
+  - tags
+  artifacts:
+    expire_in: 1 week
+    when: on_failure
+    paths:
+      - build/*.log
+      - build/tests/*.log
+      - build/tests/*/*.log
   retry: 1
 
 MinGW64:
@@ -658,6 +738,38 @@ nettle-master.Fedora:
   - popd
   - SUBMODULE_NOFETCH=1 ./bootstrap
   - PKG_CONFIG_PATH=$NETTLE_DIR/lib64/pkgconfig dash ./configure --cache-file cache/config.cache --disable-gcc-warnings --disable-doc --disable-guile
+  - make -j$BUILDJOBS
+  - PKG_CONFIG_PATH=$NETTLE_DIR/lib64/pkgconfig LD_LIBRARY_PATH=$NETTLE_DIR/lib64 make -j$CHECKJOBS check
+  tags:
+  - shared
+  - linux
+  except:
+  - tags
+  artifacts:
+    expire_in: 1 week
+    when: on_failure
+    paths:
+      - ./*.log
+      - fuzz/*.log
+      - tests/*.log
+      - tests/*/*.log
+      - tests/suite/*/*.log
+  retry: 1
+
+nettle-master-minigmp.Fedora:
+  stage: stage1-testing
+  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
+  script:
+  - git clone --depth 1 --branch master https://gitlab.com/gnutls/nettle.git nettle-git
+  - export NETTLE_DIR=${PWD}/nettle
+  - pushd nettle-git
+  - ./.bootstrap
+  - ./configure --disable-documentation --enable-mini-gmp --prefix=$NETTLE_DIR
+  - make -j$BUILDJOBS
+  - make -j$BUILDJOBS install
+  - popd
+  - SUBMODULE_NOFETCH=1 ./bootstrap
+  - PKG_CONFIG_PATH=$NETTLE_DIR/lib64/pkgconfig dash ./configure --cache-file cache/config.cache --disable-gcc-warnings --disable-doc --disable-guile --disable-full-test-suite
   - make -j$BUILDJOBS
   - PKG_CONFIG_PATH=$NETTLE_DIR/lib64/pkgconfig LD_LIBRARY_PATH=$NETTLE_DIR/lib64 make -j$CHECKJOBS check
   tags:

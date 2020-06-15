@@ -36,7 +36,7 @@ OUTFILE=out-pkcs7.$$.tmp
 
 . ${srcdir}/../scripts/common.sh
 
-check_for_datefudge
+skip_if_no_datefudge
 
 echo "Checking chain with insecure leaf"
 datefudge -s "2019-12-19" \

@@ -153,6 +153,12 @@ static void cipher_bench(int algo, int size, int aead)
 		return;
 	memset(_key, 0xf0, keysize);
 
+	/* For AES-XTS, the block and tweak key must be different */
+	if (algo == GNUTLS_CIPHER_AES_128_XTS ||
+		algo == GNUTLS_CIPHER_AES_256_XTS) {
+		memset((uint8_t *)_key + (keysize / 2), 0x0f, (keysize / 2));
+	}
+
 	_iv = malloc(ivsize);
 	if (_iv == NULL) {
 		free(_key);
@@ -303,6 +309,8 @@ void benchmark_cipher(int debug_level)
 	printf("\nChecking ciphers, payload size: %u\n", size * 1024);
 	cipher_bench(GNUTLS_CIPHER_3DES_CBC, size, 0);
 	cipher_bench(GNUTLS_CIPHER_AES_128_CBC, size, 0);
+	cipher_bench(GNUTLS_CIPHER_AES_128_XTS, size, 0);
+	cipher_bench(GNUTLS_CIPHER_AES_256_XTS, size, 0);
 	cipher_bench(GNUTLS_CIPHER_SALSA20_256, size, 0);
 	cipher_bench(GNUTLS_CIPHER_NULL, size, 1);
 #ifdef ENABLE_GOST

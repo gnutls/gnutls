@@ -1177,29 +1177,12 @@ gnutls_x509_crt_get_signature(gnutls_x509_crt_t cert,
  **/
 int gnutls_x509_crt_get_version(gnutls_x509_crt_t cert)
 {
-	uint8_t version[8];
-	int len, result;
-
 	if (cert == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	len = sizeof(version);
-	if ((result =
-	     asn1_read_value(cert->cert, "tbsCertificate.version", version,
-			     &len)) != ASN1_SUCCESS) {
-
-		if (result == ASN1_ELEMENT_NOT_FOUND)
-			return 1;	/* the DEFAULT version */
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	if (len != 1 || version[0] >= 0x80)
-		return gnutls_assert_val(GNUTLS_E_CERTIFICATE_ERROR);
-
-	return (int) version[0] + 1;
+	return _gnutls_x509_get_version(cert->cert, "tbsCertificate.version");
 }
 
 /**

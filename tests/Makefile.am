@@ -32,7 +32,7 @@ SUBDIRS += suite
 endif
 
 EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
-	ocsp-common.h cmocka-common.h virt-time.h \
+	ocsp-common.h cmocka-common.h virt-time.h test-chains-issuer.h test-chains-issuer-aia.h \
 	certs/ca-cert-ecc.pem  certs/cert-ecc256.pem  certs/cert-ecc521.pem \
 	certs/cert-rsa-2432.pem certs/ecc384.pem certs/ecc.pem hex.h \
 	certs/ca-ecc.pem certs/cert-ecc384.pem certs/cert-ecc.pem certs/ecc256.pem \
@@ -140,9 +140,11 @@ ctests += tls13/psk-dumbfw
 
 ctests += tls13-early-start
 
+ctests += tls13/no-auto-send-ticket
+
 ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniqueid tls-neg-ext-key \
 	 mpi certificate_set_x509_crl dn parse_ca x509-dn x509-dn-decode record-sizes \
-	 hostname-check cve-2008-4989 pkcs12_s2k chainverify record-sizes-range \
+	 hostname-check cve-2008-4989 pkcs12_s2k chainverify missingissuer missingissuer_aia record-sizes-range \
 	 crq_key_id x509sign-verify sign-verify cve-2009-1415 cve-2009-1416		\
 	 tls10-server-kx-neg tls11-server-kx-neg tls12-server-kx-neg ssl30-server-kx-neg \
 	 tls12-cipher-neg tls11-cipher-neg tls10-cipher-neg ssl30-cipher-neg \
@@ -217,7 +219,8 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 tls-record-size-limit-asym dh-compute ecdh-compute sign-verify-data-newapi \
 	 sign-verify-newapi sign-verify-deterministic iov aead-cipher-vec \
 	 tls13-without-timeout-func buffer status-request-revoked \
-	 set_x509_ocsp_multi_cli
+	 set_x509_ocsp_multi_cli kdf-api keylog-func \
+	 dtls_hello_random_value tls_hello_random_value x509cert-dntypes
 
 if HAVE_SECCOMP_TESTS
 ctests += dtls-with-seccomp tls-with-seccomp dtls-client-with-seccomp tls-client-with-seccomp
@@ -426,7 +429,7 @@ openssl_LDADD = ../extra/libgnutls-openssl.la $(LDADD)
 endif
 
 if HAVE_FORK
-ctests += x509self x509dn anonself pskself dhepskself	\
+ctests += x509self x509dn anonself pskself pskself2 dhepskself	\
 	setcredcrash tls12-resume-x509 tls12-resume-psk tls12-resume-anon \
 	tls13-resume-x509 tls13-resume-psk tls13-early-data tls13-early-data-neg \
 	resume-with-record-size-limit
@@ -564,6 +567,7 @@ endif
 
 if !WINDOWS
 indirect_tests += datefudge-check
+noinst_PROGRAMS = datefudge-check
 endif
 
 check_PROGRAMS = $(cpptests) $(ctests) $(indirect_tests)
