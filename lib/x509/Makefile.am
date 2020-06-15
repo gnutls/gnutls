@@ -56,6 +56,7 @@ libgnutls_x509_la_SOURCES =	\
 	pkcs7-attrs.c		\
 	pkcs7-crypt.c pkcs7_int.h \
 	pkcs7-digest.c		\
+	pkcs7-encrypted.c	\
 	pkcs7-sign.c		\
 	privkey.c		\
 	privkey_pkcs8.c		\

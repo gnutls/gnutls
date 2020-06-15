@@ -99,6 +99,16 @@
           "long-option": "verify-digest",
           "description": "Verify the provided PKCS #7 digested structure",
           "detail": "This option verifies the digested PKCS #7 structure. The --load-data option will utilize detached data."
+        },
+        {
+          "long-option": "encrypt",
+          "description": "Encrypt using a PKCS #7 structure",
+          "detail": "This option generates a PKCS #7 structure containing an encrypted data from infile. The data are stored within the structure."
+        },
+        {
+          "long-option": "decrypt",
+          "description": "Decrypt the provided PKCS #7 EncryptedData structure",
+          "detail": "This option decrypts the Encrypted PKCS #7 structure."
         }
       ]
     },
@@ -157,6 +167,12 @@
           "long-option": "empty-password",
           "description": "Enforce an empty password",
           "detail": "This option enforces an empty password. This is different than the NULL or no password in schemas like PKCS #8."
+        },
+	{
+          "long-option": "secretkey",
+          "description": "Secret key to use",
+          "detail": "You can use this option to specify the secret key in the command line. Note, that the command line arguments are available for view in others in the system.",
+          "argument-type": "string"
         },
         {
           "long-option": "cprint",

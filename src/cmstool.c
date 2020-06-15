@@ -248,6 +248,139 @@ static void pkcs7_verify_digest(common_info_st * cinfo, unsigned display_data)
 	app_exit(ecode);
 }
 
+static gnutls_cipher_algorithm_t name_to_cipher(const char *cipher)
+{
+	if (cipher == NULL) {
+#ifdef ENABLE_FIPS140
+		return GNUTLS_CIPHER_AES_128_CBC;
+#else /* compatibility mode - most implementations don't support PBES2 with AES */
+		return GNUTLS_CIPHER_3DES_CBC;
+#endif
+	} else if (strcasecmp(cipher, "3des") == 0) {
+		return GNUTLS_CIPHER_3DES_CBC;
+	} else if (strcasecmp(cipher, "aes-128") == 0) {
+		return GNUTLS_CIPHER_AES_128_CBC;
+	} else if (strcasecmp(cipher, "aes-192") == 0) {
+		return GNUTLS_CIPHER_AES_192_CBC;
+	} else if (strcasecmp(cipher, "aes-256") == 0) {
+		return GNUTLS_CIPHER_AES_256_CBC;
+	} else if (strcasecmp(cipher, "rc2-40") == 0) {
+		return GNUTLS_CIPHER_RC2_40_CBC;
+	}
+
+	fprintf(stderr, "unknown cipher %s\n", cipher);
+	app_exit(1);
+}
+
+static void pkcs7_encrypt(common_info_st * cinfo)
+{
+	gnutls_pkcs7_t pkcs7;
+	int ret;
+	size_t size;
+	gnutls_datum_t data;
+	gnutls_datum_t secret = {NULL, 0};
+	unsigned int flags = 0;
+
+	ret = gnutls_pkcs7_init(&pkcs7);
+	if (ret < 0) {
+		fprintf(stderr, "p7_init: %s\n", gnutls_strerror(ret));
+		app_exit(1);
+	}
+
+	data.data = (void *) fread_file(infile, 0, &size);
+	data.size = size;
+
+	if (!data.data) {
+		fprintf(stderr, "%s", infile ? "file" : "standard input");
+		app_exit(1);
+	}
+
+	if (!HAVE_OPT(SECRETKEY)) {
+		fprintf(stderr, "secret key not provided\n");
+		app_exit(1);
+	} else {
+		decode_seed(&secret, OPT_ARG(SECRETKEY), strlen(OPT_ARG(SECRETKEY)));
+	}
+
+	flags |= GNUTLS_PKCS7_EMBED_DATA;
+
+	ret = gnutls_pkcs7_encrypt(pkcs7, name_to_cipher(cinfo->pkcs_cipher), &secret, &data, NULL, flags);
+	if (ret < 0) {
+		fprintf(stderr, "Error signing: %s\n", gnutls_strerror(ret));
+		app_exit(1);
+	}
+
+	size = lbuffer_size;
+	ret = gnutls_pkcs7_export(pkcs7, cinfo->outcert_format, lbuffer, &size);
+	if (ret < 0) {
+		fprintf(stderr, "pkcs7_export: %s\n", gnutls_strerror(ret));
+		app_exit(1);
+	}
+
+	fwrite(lbuffer, 1, size, outfile);
+
+	gnutls_pkcs7_deinit(pkcs7);
+	app_exit(0);
+}
+
+static void pkcs7_decrypt(common_info_st * cinfo, unsigned display_data)
+{
+	gnutls_pkcs7_t pkcs7;
+	int ret, ecode;
+	size_t size;
+	gnutls_datum_t data;
+	gnutls_datum_t tmp = {NULL,0};
+	gnutls_datum_t secret = {NULL, 0};
+
+	ret = gnutls_pkcs7_init(&pkcs7);
+	if (ret < 0) {
+		fprintf(stderr, "p7_init: %s\n", gnutls_strerror(ret));
+		app_exit(1);
+	}
+
+	data.data = (void *) fread_file(infile, 0, &size);
+	data.size = size;
+
+	if (!data.data) {
+		fprintf(stderr, "%s", infile ? "file" : "standard input");
+		app_exit(1);
+	}
+
+	ret = gnutls_pkcs7_import(pkcs7, &data, cinfo->incert_format);
+	free(data.data);
+	if (ret < 0) {
+		fprintf(stderr, "import error: %s\n",
+			gnutls_strerror(ret));
+		app_exit(1);
+	}
+
+	if (!display_data)
+		fprintf(outfile, "eContent Type: %s\n", gnutls_pkcs7_get_embedded_data_oid(pkcs7));
+
+	if (!HAVE_OPT(SECRETKEY)) {
+		fprintf(stderr, "secret key not provided\n");
+		app_exit(1);
+	} else {
+		decode_seed(&secret, OPT_ARG(SECRETKEY), strlen(OPT_ARG(SECRETKEY)));
+	}
+
+	ret = gnutls_pkcs7_decrypt(pkcs7, &secret, &tmp);
+	if (ret < 0) {
+		fprintf(stderr, "Decrption status: failed: %s\n", gnutls_strerror(ret));
+		ecode = 1;
+	} else {
+		fprintf(stderr, "Decryption status: ok\n");
+		fwrite(tmp.data, 1, tmp.size, outfile);
+		gnutls_free(tmp.data);
+		tmp.data = NULL;
+		ecode = 0;
+	}
+
+	gnutls_pkcs7_deinit(pkcs7);
+	gnutls_free(secret.data);
+	app_exit(ecode);
+}
+
 static void cmd_parser(int argc, char **argv)
 {
 	int ret, privkey_op = 0;
@@ -396,6 +529,10 @@ static void cmd_parser(int argc, char **argv)
 		pkcs7_digest(&cinfo, 1);
 	else if (HAVE_OPT(VERIFY_DIGEST))
 		pkcs7_verify_digest(&cinfo, ENABLED_OPT(SHOW_DATA));
+	else if (HAVE_OPT(ENCRYPT))
+		pkcs7_encrypt(&cinfo);
+	else if (HAVE_OPT(DECRYPT))
+		pkcs7_decrypt(&cinfo, ENABLED_OPT(SHOW_DATA));
 	else
 		USAGE(1);
 

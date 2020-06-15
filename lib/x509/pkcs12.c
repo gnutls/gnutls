@@ -672,7 +672,7 @@ gnutls_pkcs12_get_bag(gnutls_pkcs12_t pkcs12,
 		goto cleanup;
 	}
 
-	/* ENC_DATA_OID needs decryption */
+	/* ENCRYPED_DATA_OID needs decryption */
 
 	result = _gnutls_x509_read_value(c2, root2, &bag->element[0].data);
 	if (result < 0) {
@@ -813,7 +813,7 @@ int gnutls_pkcs12_set_bag(gnutls_pkcs12_t pkcs12, gnutls_pkcs12_bag_t bag)
 
 	if (enc)
 		result =
-		    asn1_write_value(c2, "?LAST.contentType", ENC_DATA_OID,
+		    asn1_write_value(c2, "?LAST.contentType", ENCRYPTED_DATA_OID,
 				     1);
 	else
 		result =

@@ -229,6 +229,9 @@ gnutls_pkcs7_import(gnutls_pkcs7_t pkcs7, const gnutls_datum_t * data,
 	} else if (strcmp(data_oid, DIGESTED_DATA_OID) == 0) {
 		pkcs7->type = GNUTLS_PKCS7_DIGESTED;
 		result = _gnutls_pkcs7_decode_digested_data(pkcs7);
+	} else if (strcmp(data_oid, ENCRYPTED_DATA_OID) == 0) {
+		pkcs7->type = GNUTLS_PKCS7_ENCRYPTED;
+		result = _gnutls_pkcs7_decode_encrypted_data(pkcs7);
 	} else {
 		gnutls_assert();
 		_gnutls_debug_log("Unknown PKCS7 Content OID '%s'\n", pkcs7->encap_data_oid);
@@ -363,6 +366,9 @@ static int reencode(gnutls_pkcs7_t pkcs7)
 			break;
 		case GNUTLS_PKCS7_DIGESTED:
 			oid = DIGESTED_DATA_OID;
+			break;
+		case GNUTLS_PKCS7_ENCRYPTED:
+			oid = ENCRYPTED_DATA_OID;
 			break;
 		default:
 			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);

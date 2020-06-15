@@ -94,6 +94,13 @@ typedef struct gnutls_pkcs7_signature_info_st {
 	char pad[64];
 } gnutls_pkcs7_signature_info_st;
 
+typedef struct gnutls_pkcs7_encryption_info_st {
+	const char *enc_oid;
+	gnutls_datum_t enc_params;
+
+	gnutls_pkcs7_attrs_t unprotected_attrs;
+} gnutls_pkcs7_encryption_info_t;
+
 void gnutls_pkcs7_signature_info_deinit(gnutls_pkcs7_signature_info_st *info);
 int gnutls_pkcs7_get_signature_info(gnutls_pkcs7_t pkcs7, unsigned idx, gnutls_pkcs7_signature_info_st *info);
 
@@ -147,6 +154,17 @@ int gnutls_pkcs7_digest(gnutls_pkcs7_t pkcs7,
 int gnutls_pkcs7_verify_digest(gnutls_pkcs7_t pkcs7,
 			       const gnutls_datum_t *data, unsigned flags);
 int gnutls_pkcs7_get_digest_algo(gnutls_pkcs7_t pkcs7);
+
+void gnutls_pkcs7_encryption_info_deinit(gnutls_pkcs7_encryption_info_t *info);
+int gnutls_pkcs7_get_encryption_info(gnutls_pkcs7_t pkcs7, gnutls_pkcs7_encryption_info_t *info);
+
+int gnutls_pkcs7_encrypt(gnutls_pkcs7_t pkcs7,
+			 gnutls_cipher_algorithm_t cipher,
+			 const gnutls_datum_t *key,
+			 const gnutls_datum_t *data,
+			 gnutls_pkcs7_attrs_t unsigned_attrs,
+			 unsigned int flags);
+int gnutls_pkcs7_decrypt(gnutls_pkcs7_t pkcs7, const gnutls_datum_t *key, gnutls_datum_t *out);
 
 int gnutls_pkcs7_print(gnutls_pkcs7_t pkcs7,
 		       gnutls_certificate_print_formats_t format,

@@ -29,11 +29,9 @@
 /* PKCS #7
  */
 #define DATA_OID "1.2.840.113549.1.7.1"
-#define ENC_DATA_OID "1.2.840.113549.1.7.6"
-
 #define SIGNED_DATA_OID "1.2.840.113549.1.7.2"
 #define DIGESTED_DATA_OID "1.2.840.113549.1.7.5"
-
+#define ENCRYPTED_DATA_OID "1.2.840.113549.1.7.6"
 
 typedef enum schema_id {
 	PBES2_GENERIC=1,	/* when the algorithm is unknown, temporal use when reading only */
@@ -133,6 +131,7 @@ _gnutls_pkcs7_data_enc_info(const gnutls_datum_t * data, const struct pkcs_ciphe
 
 int _gnutls_pkcs7_decode_signed_data(gnutls_pkcs7_t pkcs7);
 int _gnutls_pkcs7_decode_digested_data(gnutls_pkcs7_t pkcs7);
+int _gnutls_pkcs7_decode_encrypted_data(gnutls_pkcs7_t pkcs7);
 
 int _gnutls_pkcs7_write_attr(asn1_node c2, const char *root, const char *oid, gnutls_datum_t *data);
 int _gnutls_pkcs7_write_attrs(asn1_node c2, const char *root, gnutls_pkcs7_attrs_t attrs);

@@ -327,6 +327,57 @@ static void _gnutls_pkcs7_print_digested(gnutls_pkcs7_t pkcs7,
 	adds(str, "\n");
 }
 
+static void _gnutls_pkcs7_print_encrypted(gnutls_pkcs7_t pkcs7,
+					  gnutls_certificate_print_formats_t format,
+					  gnutls_buffer_st * str)
+{
+	int ret, i;
+	gnutls_pkcs7_encryption_info_t info;
+	char *oid;
+	gnutls_datum_t data;
+	char prefix[128];
+	const struct oid_to_string * entry;
+	gnutls_cipher_algorithm_t ciph;
+
+	adds(str, "Content Type: Encrypted\n");
+
+	ret = gnutls_pkcs7_get_encryption_info(pkcs7, &info);
+	if (ret < 0)
+		return;
+
+	ciph = gnutls_oid_to_cipher(info.enc_oid);
+	if (ciph != GNUTLS_CIPHER_UNKNOWN)
+		addf(str, "Cipher: %s (%s)\n", gnutls_cipher_get_name(ciph), info.enc_oid);
+	else
+		addf(str, "Cipher: %s\n", info.enc_oid);
+
+	print_raw(str, "Cipher params", &info.enc_params);
+
+	if (format == GNUTLS_CRT_PRINT_FULL) {
+		if (info.unprotected_attrs) {
+			for (i = 0;; i++) {
+				ret =
+				    gnutls_pkcs7_get_attr(info.unprotected_attrs, i,
+							  &oid, &data, 0);
+				if (ret < 0)
+					break;
+				if (i == 0)
+					addf(str, "\tSigned Attributes:\n");
+
+				entry = _gnutls_oid_get_entry(pkcs7_attrs, oid);
+				snprintf(prefix, sizeof(prefix), "\t\t%s",
+						(entry && entry->name_desc) ? entry->name_desc : oid);
+				print_raw(str, prefix, &data);
+				gnutls_free(data.data);
+			}
+		}
+	}
+
+	adds(str, "\n");
+
+	gnutls_pkcs7_encryption_info_deinit(&info);
+}
+
 /**
  * gnutls_pkcs7_print:
  * @pkcs7: The PKCS7 struct to be printed
@@ -375,6 +426,9 @@ int gnutls_pkcs7_print(gnutls_pkcs7_t pkcs7,
 		break;
 	case GNUTLS_PKCS7_DIGESTED:
 		_gnutls_pkcs7_print_digested(pkcs7, format, &str);
+		break;
+	case GNUTLS_PKCS7_ENCRYPTED:
+		_gnutls_pkcs7_print_encrypted(pkcs7, format, &str);
 		break;
 	default:
 		adds(&str, "Unsupported PKCS#7 Content Type\n");
