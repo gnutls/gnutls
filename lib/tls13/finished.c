@@ -45,7 +45,7 @@ int _gnutls13_compute_finished(const mac_entry_st *prf,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret = gnutls_hash_fast(prf->id,
+	ret = gnutls_hash_fast(MAC_TO_DIG(prf->id),
 			       handshake_hash_buffer->data,
 			       handshake_hash_buffer->length,
 			       ts_hash);
