@@ -330,6 +330,15 @@ then
 	${VALGRIND} "${CERTTOOL}" --p7-verify --load-certificate "${srcdir}/../../doc/credentials/x509/cert-gost01.pem" <"${OUTFILE}"
 	rc=$?
 
+	if test "${rc}" != "1"; then
+		echo "${FILE}: PKCS7 struct signing succeeded verification with broken algo"
+		exit ${rc}
+	fi
+
+	FILE="gost01-signing-verify"
+	${VALGRIND} "${CERTTOOL}" --p7-verify --verify-allow-broken --load-certificate "${srcdir}/../../doc/credentials/x509/cert-gost01.pem" <"${OUTFILE}"
+	rc=$?
+
 	if test "${rc}" != "0"; then
 		echo "${FILE}: PKCS7 struct signing failed verification"
 		exit ${rc}

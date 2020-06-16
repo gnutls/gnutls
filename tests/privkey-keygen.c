@@ -64,6 +64,7 @@ static void sign_verify_data(gnutls_pk_algorithm_t algorithm, gnutls_x509_privke
 	gnutls_pubkey_t pubkey;
 	gnutls_datum_t signature;
 	gnutls_digest_algorithm_t digest;
+	unsigned vflags = 0;
 
 	assert(gnutls_privkey_init(&privkey) >= 0);
 
@@ -81,6 +82,9 @@ static void sign_verify_data(gnutls_pk_algorithm_t algorithm, gnutls_x509_privke
 	if (ret < 0)
 		fail("gnutls_pubkey_get_preferred_hash_algorithm\n");
 
+	if (digest == GNUTLS_DIG_GOSTR_94)
+		vflags |= GNUTLS_VERIFY_ALLOW_BROKEN;
+
 	/* sign arbitrary data */
 	ret = gnutls_privkey_sign_data(privkey, digest, 0,
 					&raw_data, &signature);
@@ -89,7 +93,7 @@ static void sign_verify_data(gnutls_pk_algorithm_t algorithm, gnutls_x509_privke
 
 	/* verify data */
 	ret = gnutls_pubkey_verify_data2(pubkey, gnutls_pk_to_sign(gnutls_pubkey_get_pk_algorithm(pubkey, NULL),digest),
-				0, &raw_data, &signature);
+				         vflags, &raw_data, &signature);
 	if (ret < 0)
 		fail("gnutls_pubkey_verify_data2\n");
 
