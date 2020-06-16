@@ -48,6 +48,7 @@ scripts_to_test = chain.sh \
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
 	LC_ALL="C"			\
+	PYTHON="$(PYTHON)"		\
 	VALGRIND="$(VALGRIND)"		\
 	top_builddir="$(top_builddir)"	\
 	srcdir="$(srcdir)"		\

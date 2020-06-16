@@ -462,6 +462,9 @@ fi
 
 AM_CONDITIONAL(WANT_TEST_SUITE, test "$full_test_suite" = "yes")
 
+# parts of the extended test suite use Python
+AM_PATH_PYTHON(,, [:])
+
 AC_ARG_ENABLE(oldgnutls-interop,
   AS_HELP_STRING([--enable-oldgnutls-interop], [enable interoperability testing with old gnutls version]),
     enable_oldgnutls_interop=$enableval, enable_oldgnutls_interop=no)
