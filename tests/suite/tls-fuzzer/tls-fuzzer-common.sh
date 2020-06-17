@@ -33,6 +33,10 @@ if ! test -d "${srcdir}/tls-fuzzer/tlsfuzzer" ; then
 	exit 77
 fi
 
+if test "${PYTHON}" = ":" ; then
+	exit 77
+fi
+
 pushd "${srcdir}/tls-fuzzer/tlsfuzzer"
 
 test -L ecdsa || ln -s ../python-ecdsa/src/ecdsa ecdsa
@@ -44,7 +48,7 @@ retval=0
 
 tls_fuzzer_prepare
 
-PYTHONPATH=. python tests/scripts_retention.py ${TMPFILE} ${SERV} 821
+PYTHONPATH=. "${PYTHON}" tests/scripts_retention.py ${TMPFILE} ${SERV} 821
 retval=$?
 
 rm -f ${TMPFILE}

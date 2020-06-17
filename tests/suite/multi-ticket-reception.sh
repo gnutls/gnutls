@@ -26,6 +26,10 @@ PYPATH="${srcdir}/tls-fuzzer/tlsfuzzer/"
 CLI="${CLI:-../../src/gnutls-cli${EXEEXT}}"
 unset RETCODE
 
+if test "${PYTHON}" = ":" ; then
+	exit 77
+fi
+
 if ! test -x "${TLSPY_SERV}"; then
 	exit 77
 fi
@@ -36,7 +40,7 @@ fi
 
 if test "${WINDIR}" != ""; then
 	exit 77
-fi 
+fi
 
 if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=15"
@@ -45,7 +49,7 @@ fi
 . "${srcdir}/../scripts/common.sh"
 
 KEY1=${srcdir}/tls-fuzzer/tlslite-ng/tests/serverX509Key.pem
-CERT1=${srcdir}/tls-fuzzer/tlsfuzzer/tests/serverX509Cert.pem 
+CERT1=${srcdir}/tls-fuzzer/tlsfuzzer/tests/serverX509Cert.pem
 
 #create links necessary for tlslite to function
 test -L "${srcdir}/tls-fuzzer/tlsfuzzer/ecdsa" || \
@@ -56,7 +60,7 @@ test -L "${srcdir}/tls-fuzzer/tlsfuzzer/tlslite" || \
 echo "Checking whether receiving 1 ticket succeeds (sanity)"
 
 eval "${GETPORT}"
-PYTHONPATH="${PYPATH}" ${TLSPY_SERV} server --tickets 1 -k ${KEY1} -c ${CERT1} 127.0.0.1:${PORT} &
+PYTHONPATH="${PYPATH}" "${PYTHON}" ${TLSPY_SERV} server --tickets 1 -k ${KEY1} -c ${CERT1} 127.0.0.1:${PORT} &
 PID=$!
 wait_server ${PID}
 
@@ -70,7 +74,7 @@ wait
 echo "Checking whether receiving 3 tickets in the same record succeeds"
 
 eval "${GETPORT}"
-PYTHONPATH="${PYPATH}" ${TLSPY_SERV} server --tickets 3 -k ${KEY1} -c ${CERT1} 127.0.0.1:${PORT} &
+PYTHONPATH="${PYPATH}" "${PYTHON}" ${TLSPY_SERV} server --tickets 3 -k ${KEY1} -c ${CERT1} 127.0.0.1:${PORT} &
 PID=$!
 wait_server ${PID}
 
@@ -84,7 +88,7 @@ wait
 echo "Checking whether receiving multiple tickets that span many records succeeds"
 
 eval "${GETPORT}"
-PYTHONPATH="${PYPATH}" ${TLSPY_SERV} server --tickets 1512 -k ${KEY1} -c ${CERT1} 127.0.0.1:${PORT} &
+PYTHONPATH="${PYPATH}" "${PYTHON}" ${TLSPY_SERV} server --tickets 1512 -k ${KEY1} -c ${CERT1} 127.0.0.1:${PORT} &
 PID=$!
 wait_server ${PID}
 
