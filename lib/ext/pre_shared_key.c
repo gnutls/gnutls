@@ -650,7 +650,7 @@ static int server_recv_params(gnutls_session_t session,
 	}
 
 	if (_gnutls_mac_get_algo_len(prf) != binder_recvd.size ||
-	    safe_memcmp(binder_value, binder_recvd.data, binder_recvd.size)) {
+	    gnutls_memcmp(binder_value, binder_recvd.data, binder_recvd.size)) {
 		gnutls_assert();
 		ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 		goto fail;
