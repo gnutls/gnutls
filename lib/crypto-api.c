@@ -891,32 +891,23 @@ gnutls_aead_cipher_encrypt(gnutls_aead_cipher_hd_t handle,
 struct iov_store_st {
 	void *data;
 	size_t size;
-	unsigned allocated;
 };
 
 static void iov_store_free(struct iov_store_st *s)
 {
-	if (s->allocated) {
-		gnutls_free(s->data);
-		s->allocated = 0;
-	}
+	gnutls_free(s->data);
 }
 
 static int iov_store_grow(struct iov_store_st *s, size_t length)
 {
-	if (s->allocated || s->data == NULL) {
-		s->size += length;
-		s->data = gnutls_realloc(s->data, s->size);
-		if (s->data == NULL)
-			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-		s->allocated = 1;
-	} else {
-		void *data = s->data;
-		size_t size = s->size + length;
-		s->data = gnutls_malloc(size);
-		memcpy(s->data, data, s->size);
-		s->size += length;
-	}
+	void *data;
+
+	s->size += length;
+	data = gnutls_realloc(s->data, s->size);
+	if (data == NULL)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+	s->data = data;
 	return 0;
 }
 
@@ -925,11 +916,6 @@ copy_from_iov(struct iov_store_st *dst, const giovec_t *iov, int iovcnt)
 {
 	memset(dst, 0, sizeof(*dst));
 	if (iovcnt == 0) {
-		return 0;
-	} else if (iovcnt == 1) {
-		dst->data = iov[0].iov_base;
-		dst->size = iov[0].iov_len;
-		/* implies: dst->allocated = 0; */
 		return 0;
 	} else {
 		int i;
@@ -944,11 +930,11 @@ copy_from_iov(struct iov_store_st *dst, const giovec_t *iov, int iovcnt)
 
 		p = dst->data;
 		for (i=0;i<iovcnt;i++) {
-			memcpy(p, iov[i].iov_base, iov[i].iov_len);
+			if (iov[i].iov_len > 0)
+				memcpy(p, iov[i].iov_base, iov[i].iov_len);
 			p += iov[i].iov_len;
 		}
 
-		dst->allocated = 1;
 		return 0;
 	}
 }
