@@ -714,6 +714,14 @@ void gnutls_deinit(gnutls_session_t session)
 	/* overwrite any temp TLS1.3 keys */
 	gnutls_memset(&session->key.proto, 0, sizeof(session->key.proto));
 
+	/* clear session ticket keys */
+	gnutls_memset(&session->key.session_ticket_key, 0,
+	              TICKET_MASTER_KEY_SIZE);
+	gnutls_memset(&session->key.previous_ticket_key, 0,
+	              TICKET_MASTER_KEY_SIZE);
+	gnutls_memset(&session->key.initial_stek, 0,
+	              TICKET_MASTER_KEY_SIZE);
+
 	gnutls_mutex_deinit(&session->internals.post_negotiation_lock);
 	gnutls_mutex_deinit(&session->internals.epoch_lock);
 
