@@ -360,7 +360,8 @@ static int compare_sig_algorithm(gnutls_x509_crt_t cert)
 	}
 
 	if (empty1 != empty2 ||
-	    sp1.size != sp2.size || safe_memcmp(sp1.data, sp2.data, sp1.size) != 0) {
+	    sp1.size != sp2.size ||
+	    (sp1.size > 0 && memcmp(sp1.data, sp2.data, sp1.size) != 0)) {
 		gnutls_assert();
 		ret = GNUTLS_E_CERTIFICATE_ERROR;
 		goto cleanup;

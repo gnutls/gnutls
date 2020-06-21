@@ -112,7 +112,7 @@ int _gnutls13_recv_finished(gnutls_session_t session)
 #if defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)
 # warning This is unsafe for production builds
 #else
-	if (safe_memcmp(verifier, buf.data, buf.length) != 0) {
+	if (gnutls_memcmp(verifier, buf.data, buf.length) != 0) {
 		gnutls_assert();
 		ret = GNUTLS_E_ERROR_IN_FINISHED_PACKET;
 		goto cleanup;
