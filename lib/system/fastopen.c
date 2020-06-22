@@ -38,7 +38,9 @@
 
 /* TCP Fast Open on OSX behaves differently from Linux, so define these helpers */
 #if defined __APPLE__ && defined __MACH__ && defined CONNECT_DATA_IDEMPOTENT && defined CONNECT_RESUME_ON_READ_WRITE
-# define TCP_FASTOPEN_OSX
+# if defined __has_builtin && __has_builtin(__builtin_available)
+#  define TCP_FASTOPEN_OSX
+# endif
 #elif defined TCP_FASTOPEN && defined MSG_FASTOPEN
 # define TCP_FASTOPEN_LINUX
 #endif
@@ -129,9 +131,15 @@ tfo_writev(gnutls_transport_ptr_t ptr, const giovec_t * iovec, int iovec_cnt)
 	}
 # elif defined(TCP_FASTOPEN_OSX)
 	{
-		sa_endpoints_t endpoints = { .sae_dstaddr = (struct sockaddr*)&p->connect_addr, .sae_dstaddrlen = p->connect_addrlen };
+		if(__builtin_available(macOS 10.11, iOS 9.0, tvOS 9.0, watchOS 2.0, *)) {
+			sa_endpoints_t endpoints = { .sae_dstaddr = (struct sockaddr*)&p->connect_addr, .sae_dstaddrlen = p->connect_addrlen };
 
-		ret = connectx(fd, &endpoints, SAE_ASSOCID_ANY, CONNECT_RESUME_ON_READ_WRITE | CONNECT_DATA_IDEMPOTENT, NULL, 0, NULL, NULL);
+			ret = connectx(fd, &endpoints, SAE_ASSOCID_ANY, CONNECT_RESUME_ON_READ_WRITE | CONNECT_DATA_IDEMPOTENT, NULL, 0, NULL, NULL);
+		}
+		else
+		{
+			ret = connect(fd, (struct sockaddr*)&p->connect_addr, p->connect_addrlen);
+		}
 		if (errno == ENOTCONN || errno == EINPROGRESS) {
 			gnutls_assert();
 			errno = EAGAIN;
