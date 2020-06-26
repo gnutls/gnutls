@@ -1893,4 +1893,38 @@ const gnutls_datum_t gnutls_modp_8192_group_generator = {
 };
 const unsigned int gnutls_modp_8192_key_bits = 512;
 
+unsigned
+_gnutls_dh_prime_is_fips_approved(const uint8_t *prime,
+				  size_t prime_size,
+				  const uint8_t *generator,
+				  size_t generator_size)
+{
+	static const struct {
+		const gnutls_datum_t *prime;
+		const gnutls_datum_t *generator;
+	} primes[] = {
+		{ &gnutls_ffdhe_8192_group_prime, &gnutls_ffdhe_8192_group_generator },
+		{ &gnutls_ffdhe_6144_group_prime, &gnutls_ffdhe_6144_group_generator },
+		{ &gnutls_ffdhe_4096_group_prime, &gnutls_ffdhe_4096_group_generator },
+		{ &gnutls_ffdhe_3072_group_prime, &gnutls_ffdhe_3072_group_generator },
+		{ &gnutls_ffdhe_2048_group_prime, &gnutls_ffdhe_2048_group_generator },
+		{ &gnutls_modp_8192_group_prime, &gnutls_modp_8192_group_generator },
+		{ &gnutls_modp_6144_group_prime, &gnutls_modp_6144_group_generator },
+		{ &gnutls_modp_4096_group_prime, &gnutls_modp_4096_group_generator },
+		{ &gnutls_modp_3072_group_prime, &gnutls_modp_3072_group_generator },
+		{ &gnutls_modp_2048_group_prime, &gnutls_modp_2048_group_generator },
+	};
+	size_t i;
+
+	for (i = 0; i < sizeof(primes) / sizeof(primes[0]); i++) {
+		if (primes[i].prime->size == prime_size &&
+		    memcmp(primes[i].prime->data, prime, primes[i].prime->size) == 0 &&
+		    primes[i].generator->size == generator_size &&
+		    memcmp(primes[i].generator->data, generator, primes[i].generator->size) == 0)
+			return 1;
+	}
+
+	return 0;
+}
+
 #endif

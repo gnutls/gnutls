@@ -468,6 +468,11 @@ void doit(void)
 	int sockets[2];
 	int err;
 
+	/* tls1_hello contains ServerKeyExchange with custom DH
+	 * parameters */
+	if (gnutls_fips140_mode_enabled())
+		exit(77);
+
 	signal(SIGPIPE, SIG_IGN);
 
 	err = socketpair(AF_UNIX, SOCK_STREAM, 0, sockets);
