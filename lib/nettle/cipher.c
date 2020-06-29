@@ -482,7 +482,7 @@ _xts_aes128_set_encrypt_key(struct xts_aes128_key *xts_key,
 			    const uint8_t *key)
 {
 	if (_gnutls_fips_mode_enabled() &&
-	    safe_memcmp(key, key + AES128_KEY_SIZE, AES128_KEY_SIZE) == 0)
+	    gnutls_memcmp(key, key + AES128_KEY_SIZE, AES128_KEY_SIZE) == 0)
 		_gnutls_switch_lib_state(LIB_STATE_ERROR);
 
 	xts_aes128_set_encrypt_key(xts_key, key);
@@ -493,7 +493,7 @@ _xts_aes128_set_decrypt_key(struct xts_aes128_key *xts_key,
 			    const uint8_t *key)
 {
 	if (_gnutls_fips_mode_enabled() &&
-	    safe_memcmp(key, key + AES128_KEY_SIZE, AES128_KEY_SIZE) == 0)
+	    gnutls_memcmp(key, key + AES128_KEY_SIZE, AES128_KEY_SIZE) == 0)
 		_gnutls_switch_lib_state(LIB_STATE_ERROR);
 
 	xts_aes128_set_decrypt_key(xts_key, key);
@@ -504,7 +504,7 @@ _xts_aes256_set_encrypt_key(struct xts_aes256_key *xts_key,
 			    const uint8_t *key)
 {
 	if (_gnutls_fips_mode_enabled() &&
-	    safe_memcmp(key, key + AES256_KEY_SIZE, AES256_KEY_SIZE) == 0)
+	    gnutls_memcmp(key, key + AES256_KEY_SIZE, AES256_KEY_SIZE) == 0)
 		_gnutls_switch_lib_state(LIB_STATE_ERROR);
 
 	xts_aes256_set_encrypt_key(xts_key, key);
@@ -515,7 +515,7 @@ _xts_aes256_set_decrypt_key(struct xts_aes256_key *xts_key,
 			    const uint8_t *key)
 {
 	if (_gnutls_fips_mode_enabled() &&
-	    safe_memcmp(key, key + AES256_KEY_SIZE, AES256_KEY_SIZE) == 0)
+	    gnutls_memcmp(key, key + AES256_KEY_SIZE, AES256_KEY_SIZE) == 0)
 		_gnutls_switch_lib_state(LIB_STATE_ERROR);
 
 	xts_aes256_set_decrypt_key(xts_key, key);
