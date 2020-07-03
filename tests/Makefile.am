@@ -515,7 +515,8 @@ dist_check_SCRIPTS += fastopen.sh pkgconfig.sh starttls.sh starttls-ftp.sh start
 	server-weak-keys.sh
 
 if !DISABLE_SYSTEM_CONFIG
-dist_check_SCRIPTS += system-override-sig-hash.sh system-override-versions.sh system-override-invalid.sh \
+dist_check_SCRIPTS += system-override-sig.sh system-override-hash.sh \
+	system-override-versions.sh system-override-invalid.sh \
 	system-override-curves.sh system-override-profiles.sh system-override-tls.sh \
 	system-override-kx.sh system-override-default-priority-string.sh
 endif
