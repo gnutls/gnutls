@@ -20,20 +20,9 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-srcdir="${srcdir:-.}"
+: ${builddir=.}
 TMPFILE=c.$$.tmp
 export GNUTLS_SYSTEM_PRIORITY_FAIL_ON_INVALID=1
-
-cat <<_EOF_ > ${TMPFILE}
-[overrides]
-
-insecure-hash = sha256
-insecure-hash = sha512
-_EOF_
-
-export GNUTLS_SYSTEM_PRIORITY_FILE="${TMPFILE}"
-
-${builddir}/system-override-hash
 
 cat <<_EOF_ > ${TMPFILE}
 [overrides]
@@ -45,10 +34,7 @@ _EOF_
 
 export GNUTLS_SYSTEM_PRIORITY_FILE="${TMPFILE}"
 
-${builddir}/system-override-sig
-if test $? != 0;then
-	echo "Could not parse config file"
-	exit 1
-fi
-
-exit 0
+"${builddir}/system-override-sig"
+rc=$?
+rm ${TMPFILE}
+exit $rc
