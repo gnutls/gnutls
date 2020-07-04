@@ -168,7 +168,13 @@ libgnutls_la_LIBADD += accelerated/libaccelerated.la
 endif
 
 if !WINDOWS
-thirdparty_libadd += $(LTLIBPTHREAD)
+# p11-kit does not work without threading support:
+# https://github.com/p11-glue/p11-kit/pull/183
+if ENABLE_PKCS11
+thirdparty_libadd += $(LIBPMULTITHREAD)
+else
+thirdparty_libadd += $(LIBPTHREAD)
+endif
 endif
 
 if NEEDS_LIBRT
