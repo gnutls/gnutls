@@ -737,7 +737,7 @@ nettle-master.Fedora:
   - make -j$BUILDJOBS install
   - popd
   - SUBMODULE_NOFETCH=1 ./bootstrap
-  - PKG_CONFIG_PATH=$NETTLE_DIR/lib64/pkgconfig dash ./configure --cache-file cache/config.cache --disable-gcc-warnings --disable-doc --disable-guile
+  - PKG_CONFIG_PATH=$NETTLE_DIR/lib64/pkgconfig dash ./configure --disable-gcc-warnings --disable-doc --disable-guile
   - make -j$BUILDJOBS
   - PKG_CONFIG_PATH=$NETTLE_DIR/lib64/pkgconfig LD_LIBRARY_PATH=$NETTLE_DIR/lib64 make -j$CHECKJOBS check
   tags:
@@ -769,7 +769,7 @@ nettle-master-minigmp.Fedora:
   - make -j$BUILDJOBS install
   - popd
   - SUBMODULE_NOFETCH=1 ./bootstrap
-  - PKG_CONFIG_PATH=$NETTLE_DIR/lib64/pkgconfig dash ./configure --cache-file cache/config.cache --disable-gcc-warnings --disable-doc --disable-guile --disable-full-test-suite
+  - PKG_CONFIG_PATH=$NETTLE_DIR/lib64/pkgconfig dash ./configure --disable-gcc-warnings --disable-doc --disable-guile --disable-full-test-suite
   - make -j$BUILDJOBS
   - PKG_CONFIG_PATH=$NETTLE_DIR/lib64/pkgconfig LD_LIBRARY_PATH=$NETTLE_DIR/lib64 make -j$CHECKJOBS check
   tags:
