@@ -51,6 +51,8 @@ gnutls_x509_trust_list_set_getissuer_function: Added
 GNUTLS_CIPHER_AES_128_SIV: Added
 GNUTLS_CIPHER_AES_256_SIV: Added
 GNUTLS_CIPHER_AES_192_GCM: Added
+GNUTLS_NO_AUTO_SEND_TICKET: Added
+gnutls_ext_get_name2: Added
 gnutls_pkcs7_print_signature_info: Added
 
 * Version 3.6.13 (released 2020-03-31)
