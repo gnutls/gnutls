@@ -288,7 +288,7 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 	switch (algo) {
 	case GNUTLS_PK_DH: {
 		bigint_t f, x, q, prime;
-		bigint_t k = NULL, ff = NULL, r = NULL;
+		bigint_t k = NULL, primesub1 = NULL, r = NULL;
 		unsigned int bits;
 
 		if (nonce != NULL)
@@ -299,21 +299,20 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 		q = priv->params[DH_Q];
 		prime = priv->params[DH_P];
 
-		ret = _gnutls_mpi_init_multi(&k, &ff, &r, NULL);
+		ret = _gnutls_mpi_init_multi(&k, &primesub1, &r, NULL);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		ret = _gnutls_mpi_add_ui(ff, f, 1);
+		ret = _gnutls_mpi_sub_ui(primesub1, prime, 1);
 		if (ret < 0) {
 			gnutls_assert();
 			goto dh_cleanup;
 		}
 
-		/* check if f==0,1, or f >= p-1.
-		 * or (ff=f+1) equivalently ff==1,2, ff >= p */
-		if ((_gnutls_mpi_cmp_ui(ff, 2) == 0)
-		    || (_gnutls_mpi_cmp_ui(ff, 1) == 0)
-		    || (_gnutls_mpi_cmp(ff, prime) >= 0)) {
+		/* check if f==0,1, or f >= p-1 */
+		if ((_gnutls_mpi_cmp_ui(f, 1) == 0)
+		    || (_gnutls_mpi_cmp_ui(f, 0) == 0)
+		    || (_gnutls_mpi_cmp(f, primesub1) >= 0)) {
 			gnutls_assert();
 			ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 			goto dh_cleanup;
@@ -354,6 +353,15 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 			goto dh_cleanup;
 		}
 
+		/* check if k==0,1, or k = p-1 */
+		if ((_gnutls_mpi_cmp_ui(k, 1) == 0)
+		    || (_gnutls_mpi_cmp_ui(k, 0) == 0)
+		    || (_gnutls_mpi_cmp(k, primesub1) == 0)) {
+			gnutls_assert();
+			ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+			goto dh_cleanup;
+		}
+
 		if (flags & PK_DERIVE_TLS13) {
 			ret =
 			    _gnutls_mpi_dprint_size(k, out,
@@ -370,7 +378,7 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 		ret = 0;
 dh_cleanup:
 		_gnutls_mpi_release(&r);
-		_gnutls_mpi_release(&ff);
+		_gnutls_mpi_release(&primesub1);
 		zrelease_temp_mpi_key(&k);
 		if (ret < 0)
 			goto cleanup;
