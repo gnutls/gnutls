@@ -229,25 +229,38 @@ _gost_params_to_pubkey(const gnutls_pk_params_st * pk_params,
 }
 #endif
 
-static void
+static int
 ecc_shared_secret(struct ecc_scalar *private_key,
 		  struct ecc_point *public_key, void *out, unsigned size)
 {
 	struct ecc_point r;
-	mpz_t x;
+	mpz_t x, y;
+	int ret = 0;
 
 	mpz_init(x);
+	mpz_init(y);
 	ecc_point_init(&r, public_key->ecc);
 
 	ecc_point_mul(&r, private_key, public_key);
 
-	ecc_point_get(&r, x, NULL);
+	ecc_point_get(&r, x, y);
+
+	/* Check if the point is not an identity element.  Note that this cannot
+	 * happen in nettle implementation, because it cannot represent an
+	 * infinity point. */
+	if (mpz_cmp_ui(x, 0) == 0 && mpz_cmp_ui(y, 0) == 0) {
+		ret = gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+		goto cleanup;
+	}
+
 	nettle_mpz_get_str_256(size, out, x);
 
+ cleanup:
 	mpz_clear(x);
+	mpz_clear(y);
 	ecc_point_clear(&r);
 
-	return;
+	return ret;
 }
 
 #define MAX_DH_BITS DEFAULT_MAX_VERIFY_BITS
@@ -423,8 +436,10 @@ dh_cleanup:
 				goto ecc_cleanup;
 			}
 
-			ecc_shared_secret(&ecc_priv, &ecc_pub, out->data,
-					  out->size);
+			ret = ecc_shared_secret(&ecc_priv, &ecc_pub, out->data,
+						out->size);
+			if (ret < 0)
+				gnutls_free(out->data);
 
 		      ecc_cleanup:
 			ecc_point_clear(&ecc_pub);
