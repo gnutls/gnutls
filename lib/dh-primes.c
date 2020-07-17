@@ -1894,25 +1894,28 @@ const gnutls_datum_t gnutls_modp_8192_group_generator = {
 const unsigned int gnutls_modp_8192_key_bits = 512;
 
 unsigned
-_gnutls_dh_prime_is_fips_approved(const uint8_t *prime,
-				  size_t prime_size,
-				  const uint8_t *generator,
-				  size_t generator_size)
+_gnutls_dh_prime_match_fips_approved(const uint8_t *prime,
+				     size_t prime_size,
+				     const uint8_t *generator,
+				     size_t generator_size,
+				     uint8_t **q,
+				     size_t *q_size)
 {
 	static const struct {
 		const gnutls_datum_t *prime;
 		const gnutls_datum_t *generator;
+		const gnutls_datum_t *q;
 	} primes[] = {
-		{ &gnutls_ffdhe_8192_group_prime, &gnutls_ffdhe_8192_group_generator },
-		{ &gnutls_ffdhe_6144_group_prime, &gnutls_ffdhe_6144_group_generator },
-		{ &gnutls_ffdhe_4096_group_prime, &gnutls_ffdhe_4096_group_generator },
-		{ &gnutls_ffdhe_3072_group_prime, &gnutls_ffdhe_3072_group_generator },
-		{ &gnutls_ffdhe_2048_group_prime, &gnutls_ffdhe_2048_group_generator },
-		{ &gnutls_modp_8192_group_prime, &gnutls_modp_8192_group_generator },
-		{ &gnutls_modp_6144_group_prime, &gnutls_modp_6144_group_generator },
-		{ &gnutls_modp_4096_group_prime, &gnutls_modp_4096_group_generator },
-		{ &gnutls_modp_3072_group_prime, &gnutls_modp_3072_group_generator },
-		{ &gnutls_modp_2048_group_prime, &gnutls_modp_2048_group_generator },
+		{ &gnutls_ffdhe_8192_group_prime, &gnutls_ffdhe_8192_group_generator, &gnutls_ffdhe_8192_group_q },
+		{ &gnutls_ffdhe_6144_group_prime, &gnutls_ffdhe_6144_group_generator, &gnutls_ffdhe_6144_group_q },
+		{ &gnutls_ffdhe_4096_group_prime, &gnutls_ffdhe_4096_group_generator, &gnutls_ffdhe_4096_group_q },
+		{ &gnutls_ffdhe_3072_group_prime, &gnutls_ffdhe_3072_group_generator, &gnutls_ffdhe_3072_group_q },
+		{ &gnutls_ffdhe_2048_group_prime, &gnutls_ffdhe_2048_group_generator, &gnutls_ffdhe_2048_group_q },
+		{ &gnutls_modp_8192_group_prime, &gnutls_modp_8192_group_generator, &gnutls_modp_8192_group_q },
+		{ &gnutls_modp_6144_group_prime, &gnutls_modp_6144_group_generator, &gnutls_modp_6144_group_q },
+		{ &gnutls_modp_4096_group_prime, &gnutls_modp_4096_group_generator, &gnutls_modp_4096_group_q },
+		{ &gnutls_modp_3072_group_prime, &gnutls_modp_3072_group_generator, &gnutls_modp_3072_group_q },
+		{ &gnutls_modp_2048_group_prime, &gnutls_modp_2048_group_generator, &gnutls_modp_2048_group_q },
 	};
 	size_t i;
 
@@ -1920,8 +1923,13 @@ _gnutls_dh_prime_is_fips_approved(const uint8_t *prime,
 		if (primes[i].prime->size == prime_size &&
 		    memcmp(primes[i].prime->data, prime, primes[i].prime->size) == 0 &&
 		    primes[i].generator->size == generator_size &&
-		    memcmp(primes[i].generator->data, generator, primes[i].generator->size) == 0)
+		    memcmp(primes[i].generator->data, generator, primes[i].generator->size) == 0) {
+			if (q) {
+				*q = primes[i].q->data;
+				*q_size = primes[i].q->size;
+			}
 			return 1;
+		}
 	}
 
 	return 0;

@@ -61,9 +61,11 @@ extern const gnutls_datum_t gnutls_modp_2048_group_generator;
 extern const unsigned int gnutls_modp_2048_key_bits;
 
 unsigned
-_gnutls_dh_prime_is_fips_approved(const uint8_t *prime,
-				  size_t prime_size,
-				  const uint8_t *generator,
-				  size_t generator_size);
+_gnutls_dh_prime_match_fips_approved(const uint8_t *prime,
+				     size_t prime_size,
+				     const uint8_t *generator,
+				     size_t generator_size,
+				     uint8_t **q,
+				     size_t *q_size);
 
 #endif /* GNUTLS_LIB_DH_H */
