@@ -71,6 +71,7 @@
 #include "int/dsa-compute-k.h"
 #include <gnettle.h>
 #include <fips.h>
+#include "dh.h"
 
 static inline const struct ecc_curve *get_supported_nist_curve(int curve);
 static inline const struct ecc_curve *get_supported_gost_curve(int curve);
@@ -2131,6 +2132,53 @@ edwards_curve_mul_g(gnutls_pk_algorithm_t algo,
 	}
 }
 
+static inline int
+dh_find_q(const gnutls_pk_params_st *pk_params, mpz_t q)
+{
+	gnutls_datum_t prime = { NULL, 0 };
+	gnutls_datum_t generator = { NULL, 0 };
+	uint8_t *data_q;
+	size_t n_q;
+	bigint_t _q;
+	int ret = 0;
+
+	ret = _gnutls_mpi_dprint(pk_params->params[DSA_P], &prime);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = _gnutls_mpi_dprint(pk_params->params[DSA_G], &generator);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	if (!_gnutls_dh_prime_match_fips_approved(prime.data,
+						  prime.size,
+						  generator.data,
+						  generator.size,
+						  &data_q,
+						  &n_q)) {
+		ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		goto cleanup;
+	}
+
+	if (_gnutls_mpi_init_scan_nz(&_q, data_q, n_q) != 0) {
+		ret = gnutls_assert_val(GNUTLS_E_MPI_SCAN_FAILED);
+		goto cleanup;
+	}
+
+	mpz_set(q, TOMPZ(_q));
+	_gnutls_mpi_release(&_q);
+
+ cleanup:
+	gnutls_free(prime.data);
+	gnutls_free(generator.data);
+
+	return ret;
+}
+
 /* To generate a DH key either q must be set in the params or
  * level should be set to the number of required bits.
  */
@@ -2212,6 +2260,9 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			mpz_t x, y;
 			int max_tries;
 			unsigned have_q = 0;
+			mpz_t q;
+			mpz_t primesub1;
+			mpz_t ypowq;
 
 			if (algo != params->algo)
 				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -2228,6 +2279,10 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			mpz_init(r);
 			mpz_init(x);
 			mpz_init(y);
+
+			mpz_init(q);
+			mpz_init(primesub1);
+			mpz_init(ypowq);
 
 			max_tries = 3;
 			do {
@@ -2260,7 +2315,39 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 					ret = GNUTLS_E_LIB_IN_ERROR_STATE;
 					goto dh_fail;
 				}
+
 			} while(mpz_cmp_ui(y, 1) == 0);
+
+#ifdef ENABLE_FIPS140
+			if (_gnutls_fips_mode_enabled()) {
+				/* Perform FFC full public key validation checks
+				 * according to SP800-56A (revision 3), 5.6.2.3.1.
+				 */
+
+				/* Step 1: 2 <= y <= p - 2 */
+				mpz_sub_ui(primesub1, pub.p, 1);
+
+				if (mpz_cmp_ui(y, 2) < 0 || mpz_cmp(y, primesub1) >= 0) {
+					ret = gnutls_assert_val(GNUTLS_E_RANDOM_FAILED);
+					goto dh_fail;
+				}
+
+				/* Step 2: 1 = y^q mod p */
+				if (have_q)
+					mpz_set(q, pub.q);
+				else {
+					ret = dh_find_q(params, q);
+					if (ret < 0)
+						goto dh_fail;
+				}
+
+				mpz_powm(ypowq, y, q, pub.p);
+				if (mpz_cmp_ui(ypowq, 1) != 0) {
+					ret = gnutls_assert_val(GNUTLS_E_RANDOM_FAILED);
+					goto dh_fail;
+				}
+			}
+#endif
 
 			ret = _gnutls_mpi_init_multi(&params->params[DSA_Y], &params->params[DSA_X], NULL);
 			if (ret < 0) {
@@ -2278,6 +2365,9 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			mpz_clear(r);
 			mpz_clear(x);
 			mpz_clear(y);
+			mpz_clear(q);
+			mpz_clear(primesub1);
+			mpz_clear(ypowq);
 
 			if (ret < 0)
 				goto fail;
