@@ -1552,6 +1552,80 @@ static inline const struct ecc_curve *get_supported_nist_curve(int curve)
 	}
 }
 
+static inline const char *get_supported_nist_curve_order(int curve)
+{
+	static const struct {
+		int curve;
+		const char *order;
+	} orders[] = {
+#ifdef ENABLE_NON_SUITEB_CURVES
+		{ GNUTLS_ECC_CURVE_SECP192R1,
+		  "ffffffffffffffffffffffff99def836"
+		  "146bc9b1b4d22831" },
+		{ GNUTLS_ECC_CURVE_SECP224R1,
+		  "ffffffffffffffffffffffffffff16a2"
+		  "e0b8f03e13dd29455c5c2a3d" },
+#endif
+		{ GNUTLS_ECC_CURVE_SECP256R1,
+		  "ffffffff00000000ffffffffffffffff"
+		  "bce6faada7179e84f3b9cac2fc632551" },
+		{ GNUTLS_ECC_CURVE_SECP384R1,
+		  "ffffffffffffffffffffffffffffffff"
+		  "ffffffffffffffffc7634d81f4372ddf"
+		  "581a0db248b0a77aecec196accc52973" },
+		{ GNUTLS_ECC_CURVE_SECP521R1,
+		  "1fffffffffffffffffffffffffffffff"
+		  "ffffffffffffffffffffffffffffffff"
+		  "ffa51868783bf2f966b7fcc0148f709a"
+		  "5d03bb5c9b8899c47aebb6fb71e91386"
+		  "409" },
+	};
+	size_t i;
+
+	for (i = 0; i < sizeof(orders)/sizeof(orders[0]); i++) {
+		if (orders[i].curve == curve)
+			return orders[i].order;
+	}
+	return NULL;
+}
+
+static inline const char *get_supported_nist_curve_modulus(int curve)
+{
+	static const struct {
+		int curve;
+		const char *order;
+	} orders[] = {
+#ifdef ENABLE_NON_SUITEB_CURVES
+		{ GNUTLS_ECC_CURVE_SECP192R1,
+		  "fffffffffffffffffffffffffffffffe"
+		  "ffffffffffffffff" },
+		{ GNUTLS_ECC_CURVE_SECP224R1,
+		  "ffffffffffffffffffffffffffffffff"
+		  "000000000000000000000001" },
+#endif
+		{ GNUTLS_ECC_CURVE_SECP256R1,
+		  "ffffffff000000010000000000000000"
+		  "00000000ffffffffffffffffffffffff" },
+		{ GNUTLS_ECC_CURVE_SECP384R1,
+		  "ffffffffffffffffffffffffffffffff"
+		  "fffffffffffffffffffffffffffffffe"
+		  "ffffffff0000000000000000ffffffff" },
+		{ GNUTLS_ECC_CURVE_SECP521R1,
+		  "1ff"
+		  "ffffffffffffffffffffffffffffffff"
+		  "ffffffffffffffffffffffffffffffff"
+		  "ffffffffffffffffffffffffffffffff"
+		  "ffffffffffffffffffffffffffffffff" },
+	};
+	size_t i;
+
+	for (i = 0; i < sizeof(orders)/sizeof(orders[0]); i++) {
+		if (orders[i].curve == curve)
+			return orders[i].order;
+	}
+	return NULL;
+}
+
 static inline const struct ecc_curve *get_supported_gost_curve(int curve)
 {
 	switch (curve) {
@@ -2507,6 +2581,10 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			struct ecc_scalar key;
 			struct ecc_point pub;
 			const struct ecc_curve *curve;
+			struct ecc_scalar n;
+			struct ecc_scalar m;
+			struct ecc_point r;
+			mpz_t x, y, xx, yy, nn, mm;
 
 			curve = get_supported_nist_curve(level);
 			if (curve == NULL)
@@ -2514,8 +2592,18 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 				    gnutls_assert_val
 				    (GNUTLS_E_ECC_UNSUPPORTED_CURVE);
 
+			mpz_init(x);
+			mpz_init(y);
+			mpz_init(xx);
+			mpz_init(yy);
+			mpz_init(nn);
+			mpz_init(mm);
+
 			ecc_scalar_init(&key, curve);
 			ecc_point_init(&pub, curve);
+			ecc_scalar_init(&n, curve);
+			ecc_scalar_init(&m, curve);
+			ecc_point_init(&r, curve);
 
 			ecdsa_generate_keypair(&pub, &key, NULL, rnd_func);
 			if (HAVE_LIB_ERROR()) {
@@ -2533,15 +2621,105 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			params->curve = level;
 			params->params_nr = ECC_PRIVATE_PARAMS;
 
-			ecc_point_get(&pub, TOMPZ(params->params[ECC_X]),
-				      TOMPZ(params->params[ECC_Y]));
+			ecc_point_get(&pub, x, y);
+
+#ifdef ENABLE_FIPS140
+			if (_gnutls_fips_mode_enabled()) {
+				/* Perform ECC full public key validation checks
+				 * according to SP800-56A (revision 3), 5.6.2.3.3.
+				 */
+
+				const char *order, *modulus;
+
+				/* Step 1: verify that Q is not an identity
+				 * element (an infinity point).  Note that this
+				 * cannot happen in the nettle implementation,
+				 * because it cannot represent an infinity point
+				 * on curves. */
+				if (mpz_cmp_ui(x, 0) == 0 && mpz_cmp_ui(y, 0) == 0) {
+					ret = gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+					goto ecc_fail;
+				}
+
+				/* Step 2: verify that both coordinates of Q are
+				 * in the range [0, p - 1].
+				 *
+				 * Step 3: verify that Q lie on the curve
+				 *
+				 * Both checks are performed in nettle.  */
+				if (!ecc_point_set(&r, x, y)) {
+					ret = gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+					goto ecc_fail;
+				}
+
+				/* Step 4: verify that n * Q, where n is the
+				 * curve order, result in an identity element
+				 *
+				 * Since nettle internally cannot represent an
+				 * identity element on curves, we validate this
+				 * instead:
+				 *
+				 *   (n - 1) * Q = -Q
+				 *
+				 * That effectively means: n * Q = -Q + Q = O
+				 */
+				order = get_supported_nist_curve_order(level);
+				if (unlikely(order == NULL)) {
+					ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+					goto ecc_fail;
+				}
+
+				ret = mpz_set_str(nn, order, 16);
+				if (unlikely(ret < 0)) {
+					ret = gnutls_assert_val(GNUTLS_E_MPI_SCAN_FAILED);
+					goto ecc_fail;
+				}
+
+				modulus = get_supported_nist_curve_modulus(level);
+				if (unlikely(modulus == NULL)) {
+					ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+					goto ecc_fail;
+				}
+
+				ret = mpz_set_str(mm, modulus, 16);
+				if (unlikely(ret < 0)) {
+					ret = gnutls_assert_val(GNUTLS_E_MPI_SCAN_FAILED);
+					goto ecc_fail;
+				}
+
+				/* (n - 1) * Q = -Q */
+				mpz_sub_ui (nn, nn, 1);
+				ecc_scalar_set(&n, nn);
+				ecc_point_mul(&r, &n, &r);
+				ecc_point_get(&r, xx, yy);
+				mpz_sub (mm, mm, y);
+
+				if (mpz_cmp(xx, x) != 0 || mpz_cmp(yy, mm) != 0) {
+					ret = gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+					goto ecc_fail;
+				}
+			}
+#endif
+
+			mpz_set(TOMPZ(params->params[ECC_X]), x);
+			mpz_set(TOMPZ(params->params[ECC_Y]), y);
+
 			ecc_scalar_get(&key, TOMPZ(params->params[ECC_K]));
 
 			ret = 0;
 
 		      ecc_fail:
+			mpz_clear(x);
+			mpz_clear(y);
+			mpz_clear(xx);
+			mpz_clear(yy);
+			mpz_clear(nn);
+			mpz_clear(mm);
 			ecc_point_clear(&pub);
 			ecc_scalar_clear(&key);
+			ecc_point_clear(&r);
+			ecc_scalar_clear(&n);
+			ecc_scalar_clear(&m);
 
 			if (ret < 0)
 				goto fail;
