@@ -902,7 +902,7 @@ void
  * can be used.
  *
  * The callback function should return 0 if the missing issuer certificate
- * for 'crt' was properly polulated and added to the 'tlist' using
+ * for 'crt' was properly populated and added to the 'tlist' using
  * gnutls_x509_trust_list_add_cas() or non-zero to continue the certificate list
  * verification but with issuer as %NULL.
  *
