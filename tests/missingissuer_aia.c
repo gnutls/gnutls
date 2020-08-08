@@ -81,7 +81,6 @@ static int getissuer_callback(gnutls_x509_trust_list_t tlist,
 			GNUTLS_IA_CAISSUERS_URI, &aia, NULL);
 	if (ret < 0) {
 		fprintf(stderr, "error: %s\n", gnutls_strerror(ret));
-		gnutls_free(aia.data);
 		return -1;
 	}
 
