@@ -282,8 +282,11 @@ int cert_verify(gnutls_session_t session, const char *hostname, const char *purp
 
 	gnutls_free(out.data);
 
-	if (status)
+	if (status) {
+		if (!(status & GNUTLS_CERT_INVALID))
+			abort();
 		return 0;
+	}
 
 	return 1;
 }
