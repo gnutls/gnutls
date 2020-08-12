@@ -533,7 +533,7 @@ struct gnutls_key_st {
 			uint8_t ap_rms[MAX_HASH_SIZE]; /* resumption_master_secret */
 		} tls13; /* tls1.3 */
 
-		/* Folow the SSL3.0 and TLS1.2 key exchanges */
+		/* Follow the SSL3.0 and TLS1.2 key exchanges */
 		struct {
 			/* For ECDH KX */
 			struct {

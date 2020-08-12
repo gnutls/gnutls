@@ -484,7 +484,7 @@ this functionality completely in 3.6.0.
 @cindex Raw public-keys
 
 There are situations in which a rather large certificate / certificate chain is undesirable or impractical.
-An example could be a resource contrained sensor network in which you do want to use authentication of and
+An example could be a resource constrained sensor network in which you do want to use authentication of and
 encryption between your devices but where your devices lack loads of memory or processing power. Furthermore,
 there are situations in which you don't want to or can't rely on a PKIX. TLS is, next to a PKIX environment,
 also commonly used with self-signed certificates in smaller deployments where the self-signed certificates

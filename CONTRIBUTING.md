@@ -2,7 +2,7 @@
 
  Anyone is welcome to contribute to GnuTLS. You can either take up
 tasks from our [planned list](https://gitlab.com/gnutls/gnutls/milestones),
-or suprise us with enhancement we didn't plan for. In all cases be prepared
+or surprise us with enhancement we didn't plan for. In all cases be prepared
 to defend and justify your enhancements, and get through few rounds
 of changes. 
 
@@ -92,7 +92,7 @@ E.g. ```gnutls_x509_crt_get_dn```, refers to the X.509
 certificate parsing part of gnutls. Some of the used prefixes are the
 following.
  * ```gnutls_x509_crt_``` for the X.509 certificate part
- * ```gnutls_session_``` for the TLS session part (but this may be omited)
+ * ```gnutls_session_``` for the TLS session part (but this may be omitted)
  * ```gnutls_handshake_``` for the TLS handshake part
  * ```gnutls_record_``` for the TLS record protocol part
  * ```gnutls_alert_``` for the TLS alert protocol part
@@ -176,7 +176,7 @@ in a way that may break existing applications which use the API in a
 reasonable way. If the existing function allows flags, then a new flag
 should be introduced to enable the new behavior.
 
-When it is necessary, or desireable to enable the new features by default
+When it is necessary, or desirable to enable the new features by default
 (e.g., TLS1.3 introduction), the "next" releases should be used (and
 introduced if necessary), to allow the modification to be tested for an
 extended amount of time (see the [Release policy](RELEASES.md)).
