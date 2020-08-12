@@ -1269,7 +1269,7 @@ with access to priority strings for overriding the default behavior,
 on configuration files, or other UI. Following such a principle,
 makes the GnuTLS library as the default settings provider. That is
 necessary and a good practice, because TLS protocol hardening and
-phasing out of legacy algorithms, is easier to co-ordinate when happens
+phasing out of legacy algorithms, is easier to coordinate when happens
 in a single library.
 
 @showfuncC{gnutls_set_default_priority,gnutls_set_default_priority_append,gnutls_priority_set_direct}

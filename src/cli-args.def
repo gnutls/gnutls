@@ -393,7 +393,7 @@ flag = {
     name      = recordsize;
     arg-type  = number;
     arg-range = "0->4096";
-    descrip   = "The maximum record size to advertize";
+    descrip   = "The maximum record size to advertise";
     doc      = "";
 };
 

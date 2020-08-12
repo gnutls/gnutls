@@ -1209,7 +1209,7 @@ test_code_t test_tls1_6_fallback(gnutls_session_t session)
 	return TEST_SUCCEED;
 }
 
-/* Advertize both TLS 1.0 and SSL 3.0. If the connection fails,
+/* Advertise both TLS 1.0 and SSL 3.0. If the connection fails,
  * but the previous SSL 3.0 test succeeded then disable TLS 1.0.
  */
 test_code_t test_tls_disable0(gnutls_session_t session)
@@ -1426,7 +1426,7 @@ void _gnutls_rsa_pms_set_version(gnutls_session_t session,
 test_code_t test_rsa_pms_version_check(gnutls_session_t session)
 {
 	int ret;
-	/* here we use an arbitary version in the RSA PMS
+	/* here we use an arbitrary version in the RSA PMS
 	 * to see whether to server will check this version.
 	 *
 	 * A normal server would abort this handshake.

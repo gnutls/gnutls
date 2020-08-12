@@ -237,7 +237,7 @@ int _gnutls_pkcs_flags_to_schema(unsigned int flags)
  * This function will return a human readable description of the
  * PKCS12 or PBES2 schema.
  *
- * Returns: a constrant string or %NULL on error.
+ * Returns: a constraint string or %NULL on error.
  *
  * Since: 3.4.0
  */
@@ -255,7 +255,7 @@ const char *gnutls_pkcs_schema_get_name(unsigned int schema)
  * This function will return the object identifier of the
  * PKCS12 or PBES2 schema.
  *
- * Returns: a constrant string or %NULL on error.
+ * Returns: a constraint string or %NULL on error.
  *
  * Since: 3.4.0
  */

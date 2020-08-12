@@ -178,7 +178,7 @@ int _gnutls_extract_name_constraints(ASN1_TYPE c2, const char *vstr,
 
 /*-
  * _gnutls_name_constraints_node_free:
- * @node: name constriants node
+ * @node: name constraints node
  *
  * Deallocate a list of name constraints nodes starting at the given node.
  -*/
