@@ -198,6 +198,70 @@ static void test_aead_cipher2(int algo)
 	return;
 }
 
+/* Test whether an invalid call to gnutls_aead_cipher_decrypt() is caught */
+static void test_aead_cipher3(int algo)
+{
+	int ret;
+	gnutls_aead_cipher_hd_t ch;
+	uint8_t key16[64];
+	uint8_t iv16[32];
+	uint8_t auth[32];
+	uint8_t ctext[128+32];
+	size_t ctext_len;
+	uint8_t ptext[128];
+	size_t ptext_len;
+	gnutls_datum_t key, iv;
+
+	key.data = key16;
+	key.size = gnutls_cipher_get_key_size(algo);
+	assert(key.size <= sizeof(key16));
+
+	iv.data = iv16;
+	iv.size = gnutls_cipher_get_iv_size(algo);
+	assert(iv.size <= sizeof(iv16));
+
+	memset(iv.data, 0xff, iv.size);
+	memset(key.data, 0xfe, key.size);
+	memset(ptext, 0xfa, sizeof(ptext));
+	memset(ctext, 0xfa, sizeof(ctext));
+	memset(auth, 0xfb, sizeof(auth));
+
+	gnutls_global_set_log_function(tls_log_func);
+	if (debug)
+		gnutls_global_set_log_level(4711);
+
+	ret = global_init();
+	if (ret < 0) {
+		fail("Cannot initialize library\n"); /*errcode 1 */
+	}
+
+	ret =
+	    gnutls_aead_cipher_init(&ch, algo, &key);
+	if (ret < 0)
+		fail("gnutls_aead_cipher_init failed\n"); /*errcode 1 */
+
+	ctext_len = sizeof(ctext)-1;
+	ret = gnutls_aead_cipher_encrypt(ch, iv.data, iv.size, auth, sizeof(auth),
+					 gnutls_cipher_get_tag_size(algo),
+					 ptext, sizeof(ptext)-1,
+					 ctext, &ctext_len);
+	if (ret < 0)
+		fail("could not encrypt data\n");
+
+	ptext_len = 0;
+	ret = gnutls_aead_cipher_decrypt(ch, iv.data, iv.size, auth, sizeof(auth),
+					 gnutls_cipher_get_tag_size(algo),
+					 ctext, sizeof(ctext)-1,
+					 ptext, &ptext_len);
+	if (ret >= 0)
+		fail("succeeded in decrypting data onto a short buffer\n");
+
+	gnutls_aead_cipher_deinit(ch);
+
+	gnutls_global_deinit();
+	return;
+}
+
 static void check_status(int status)
 {
 	if (WEXITSTATUS(status) != 0 ||
@@ -259,6 +323,25 @@ void start(const char *name, int algo, unsigned aead)
 		check_status(status);
 	} else {
 		test_aead_cipher2(algo);
+		exit(0);
+	}
+
+	/* check test_aead_cipher3 */
+
+	child = fork();
+	if (child < 0) {
+		perror("fork");
+		fail("fork");
+		return;
+	}
+
+	if (child) {
+		int status;
+		/* parent */
+		wait(&status);
+		check_status(status);
+	} else {
+		test_aead_cipher3(algo);
 		exit(0);
 	}
 }
