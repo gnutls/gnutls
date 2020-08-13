@@ -522,6 +522,7 @@ if test "$gl_gcc_warnings" = yes; then
   nw="$nw -Wstack-protector"        # Some functions cannot be protected
   nw="$nw -Wunsafe-loop-optimizations" # Warnings with no point
   nw="$nw -Wredundant-decls"        # Some files cannot be compiled with that (gl_fd_to_handle)
+  nw="$nw -Wtype-limits"            # Too many warnings in gnulib macros
 
   gl_MANYWARN_ALL_GCC([ws])
   gl_MANYWARN_COMPLEMENT(ws, [$ws], [$nw])
