@@ -40,7 +40,7 @@
 	    slow because these operations search all the way
 	    through the list.
 
-	queues: whats the difference between a queue and a list?
+	queues: what's the difference between a queue and a list?
 	    very little really.
 
     The system implemented here is a doubly linked list with previous

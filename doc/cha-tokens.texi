@@ -620,7 +620,7 @@ can access TPM URLs.
 The registered keys (that are stored in the TPM) can be listed using one of
 the following functions. Those keys are unfortunately only identified by
 their UUID and have no label or other human friendly identifier.
-Keys can be deleted from permament storage using @funcref{gnutls_tpm_privkey_delete}.
+Keys can be deleted from permanent storage using @funcref{gnutls_tpm_privkey_delete}.
 
 @showfuncC{gnutls_tpm_get_registered,gnutls_tpm_key_list_deinit,gnutls_tpm_key_list_get_url}
 

@@ -2164,7 +2164,7 @@ static int send_client_hello(gnutls_session_t session, int again)
 		}
 
 		if (session->internals.priorities->min_record_version != 0) {
-			/* Advertize the lowest supported (SSL 3.0) record packet
+			/* Advertise the lowest supported (SSL 3.0) record packet
 			 * version in record packets during the handshake.
 			 * That is to avoid confusing implementations
 			 * that do not support TLS 1.2 and don't know

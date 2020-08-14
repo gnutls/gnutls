@@ -96,7 +96,7 @@ kill ${PID}
 wait
 
 if ! test -f ${TMPFILE1};then
-	echo "Logfile shoule be created!"
+	echo "Logfile should be created!"
 	exit 1
 fi
 if test -s ${TMPFILE2};then
@@ -150,7 +150,7 @@ kill ${PID}
 wait
 
 if ! test -f ${TMPFILE1};then
-       echo "Logfile shoule be created!"
+       echo "Logfile should be created!"
        exit 1
 fi
 if test -s ${TMPFILE2};then
