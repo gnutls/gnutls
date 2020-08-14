@@ -224,6 +224,11 @@ gnutls_certificate_set_verify_limits(gnutls_certificate_credentials_t res,
 }
 
 #ifdef ENABLE_OCSP
+static int
+_gnutls_ocsp_verify_mandatory_stapling(gnutls_session_t session,
+				       gnutls_x509_crt_t cert,
+				       unsigned int * ocsp_status);
+
 /* If the certificate is revoked status will be GNUTLS_CERT_REVOKED.
  * 
  * Returns:
@@ -257,6 +262,22 @@ check_ocsp_response(gnutls_session_t session, gnutls_x509_crt_t cert,
 		check_failed = 1;
 		*ostatus |= GNUTLS_CERT_INVALID;
 		*ostatus |= GNUTLS_CERT_INVALID_OCSP_STATUS;
+		goto cleanup;
+	}
+
+	if (gnutls_ocsp_resp_get_status(resp) != GNUTLS_OCSP_RESP_SUCCESSFUL) {
+		ret = _gnutls_ocsp_verify_mandatory_stapling(session, cert, ostatus);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+		if (*ostatus & GNUTLS_CERT_MISSING_OCSP_STATUS) {
+			_gnutls_audit_log(session,
+					  "Missing basic OCSP response while required: %s.\n",
+					  gnutls_strerror(ret));
+			check_failed = 1;
+		}
+		ret = gnutls_assert_val(0);
 		goto cleanup;
 	}
 
