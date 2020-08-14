@@ -202,7 +202,13 @@ for f in $IMPORTS; do
 	;;
       */ecc-random.c )
 	sed \
-	  -e 's/"nettle-internal\.h"/"nettle-alloca.h"/' \
+	  -e '/^#include "nettle-internal\.h"/ { i\
+#include "nettle-alloca.h"\
+\
+void gnutls_ecc_scalar_random(struct ecc_scalar *, void *, nettle_random_func *);
+; d
+}' \
+	  -e 's/ecc_scalar_random/gnutls_ecc_scalar_random/' \
 	  -e 's/^    & (mpn_sub_n/    \& (int)(mpn_sub_n/' \
 	  $dst > $dst-t && mv $dst-t $dst
 	;;
