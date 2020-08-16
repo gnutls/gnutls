@@ -823,7 +823,17 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 		return ret;
 	}
 
-	_gnutls_handshake_log("HSK[%p]: Selected version %s\n", session, session->security_parameters.pversion->name);
+	/* Only at this point we know the version we are actually going to use
+	 * ("supported_versions" extension is parsed, user_hello_func is called,
+	 * legacy version negotiation is done). */
+	vers = get_version(session);
+	if (unlikely(vers == NULL))
+		return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
+
+	if (_gnutls_version_priority(session, vers->id) < 0)
+		return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
+
+	_gnutls_handshake_log("HSK[%p]: Selected version %s\n", session, vers->name);
 
 	/* select appropriate compression method */
 	ret =
