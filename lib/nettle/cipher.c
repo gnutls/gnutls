@@ -1288,6 +1288,10 @@ wrap_nettle_cipher_aead_decrypt(void *_ctx,
 		ctx->cipher->auth(ctx->ctx_ptr, auth_size, auth);
 
 		encr_size -= tag_size;
+
+		if (unlikely(plain_size < encr_size))
+			return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+
 		ctx->cipher->decrypt(ctx, encr_size, plain, encr);
 
 		ctx->cipher->tag(ctx->ctx_ptr, tag_size, tag);
@@ -1297,6 +1301,10 @@ wrap_nettle_cipher_aead_decrypt(void *_ctx,
 	} else {
 		/* CCM-style cipher */
 		encr_size -= tag_size;
+
+		if (unlikely(plain_size < encr_size))
+			return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+
 		ret = ctx->cipher->aead_decrypt(ctx,
 						nonce_size, nonce,
 						auth_size, auth,
