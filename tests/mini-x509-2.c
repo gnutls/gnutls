@@ -296,6 +296,7 @@ void start(const char *prio)
 			fail("gnutls_x509_crt_export2: %s\n", gnutls_strerror(ret));
 			exit(1);
 		}
+		assert(ret == 0);
 		gnutls_x509_crt_deinit(crt);
 
 		if (scert.size != mcert->size || memcmp(scert.data, mcert->data, mcert->size) != 0) {
@@ -331,6 +332,7 @@ void start(const char *prio)
 			fail("gnutls_x509_crt_export2: %s\n", gnutls_strerror(ret));
 			exit(1);
 		}
+		assert(ret == 0);
 		gnutls_x509_crt_deinit(crt);
 
 		if (ccert.size != mcert->size || memcmp(ccert.data, mcert->data, mcert->size) != 0) {

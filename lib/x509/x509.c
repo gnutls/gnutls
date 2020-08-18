@@ -2997,10 +2997,15 @@ gnutls_x509_crt_export2(gnutls_x509_crt_t cert,
 	if (!cert->modified && cert->der.size) {
 		if (format == GNUTLS_X509_FMT_DER)
 			return _gnutls_set_datum(out, cert->der.data, cert->der.size);
-		else
-			return _gnutls_fbase64_encode(PEM_X509_CERT2, cert->der.data,
-						      cert->der.size, out);
-
+		else {
+			int ret = _gnutls_fbase64_encode(PEM_X509_CERT2,
+							 cert->der.data,
+							 cert->der.size,
+							 out);
+			if (ret < 0)
+				return ret;
+			return 0;
+		}
 	}
 
 	return _gnutls_x509_export_int2(cert->cert, format, PEM_X509_CERT2,
