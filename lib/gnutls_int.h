@@ -1370,6 +1370,7 @@ typedef struct {
 #define HSK_RECORD_SIZE_LIMIT_RECEIVED (1<<26) /* server: record_size_limit extension was seen but not accepted yet */
 #define HSK_OCSP_REQUESTED (1<<27) /* server: client requested OCSP stapling */
 #define HSK_CLIENT_OCSP_REQUESTED (1<<28) /* client: server requested OCSP stapling */
+#define HSK_SERVER_HELLO_RECEIVED (1<<29) /* client: Server Hello message has been received */
 
 	/* The hsk_flags are for use within the ongoing handshake;
 	 * they are reset to zero prior to handshake start by gnutls_handshake. */
