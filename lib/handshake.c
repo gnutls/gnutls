@@ -2061,6 +2061,8 @@ read_server_hello(gnutls_session_t session,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
+	session->internals.hsk_flags |= HSK_SERVER_HELLO_RECEIVED;
+
 	return 0;
 }
 
@@ -2585,16 +2587,42 @@ int gnutls_rehandshake(gnutls_session_t session)
 	return 0;
 }
 
+/* This function checks whether the error code should be treated fatal
+ * or not, and also does the necessary state transition.  In
+ * particular, in the case of a rehandshake abort it resets the
+ * handshake's internal state.
+ */
 inline static int
 _gnutls_abort_handshake(gnutls_session_t session, int ret)
 {
-	if (((ret == GNUTLS_E_WARNING_ALERT_RECEIVED) &&
-	     (gnutls_alert_get(session) == GNUTLS_A_NO_RENEGOTIATION))
-	    || ret == GNUTLS_E_GOT_APPLICATION_DATA)
-		return 0;
+	switch (ret) {
+	case GNUTLS_E_WARNING_ALERT_RECEIVED:
+		if (gnutls_alert_get(session) == GNUTLS_A_NO_RENEGOTIATION) {
+			/* The server always toleretes a "no_renegotiation" alert. */
+			if (session->security_parameters.entity == GNUTLS_SERVER) {
+				STATE = STATE0;
+				return ret;
+			}
 
-	/* this doesn't matter */
-	return GNUTLS_E_INTERNAL_ERROR;
+			/* The client should tolerete a "no_renegotiation" alert only if:
+			 * - the initial handshake has completed, or
+			 * - a Server Hello is not yet received
+			 */
+			if (session->internals.initial_negotiation_completed ||
+			    !(session->internals.hsk_flags & HSK_SERVER_HELLO_RECEIVED)) {
+				STATE = STATE0;
+				return ret;
+			}
+
+			return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
+		}
+		return ret;
+	case GNUTLS_E_GOT_APPLICATION_DATA:
+		STATE = STATE0;
+		return ret;
+	default:
+		return ret;
+	}
 }
 
 
@@ -2756,13 +2784,7 @@ int gnutls_handshake(gnutls_session_t session)
 	}
 
 	if (ret < 0) {
-		/* In the case of a rehandshake abort
-		 * we should reset the handshake's internal state.
-		 */
-		if (_gnutls_abort_handshake(session, ret) == 0)
-			STATE = STATE0;
-
-		return ret;
+		return _gnutls_abort_handshake(session, ret);
 	}
 
 	/* clear handshake buffer */
