@@ -95,6 +95,12 @@ flag = {
 };
 
 flag = {
+    name      = crlf;
+    descrip   = "Do not replace CRLF by LF in Echo server mode";
+    doc      = "";
+};
+
+flag = {
     name      = udp;
     value     = u;
     descrip   = "Use DTLS (datagram TLS) over UDP";
