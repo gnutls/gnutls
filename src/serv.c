@@ -55,6 +55,7 @@
 /* global stuff */
 static int generate = 0;
 static int http = 0;
+static int strip_crlf = 1;
 static int x509ctype;
 static int debug = 0;
 
@@ -1058,7 +1059,8 @@ get_response(gnutls_session_t session, char *request,
 			*response = peer_print_data(session, response_length);
 	} else {
 		int ret;
-		strip(request);
+		if (strip_crlf != 0)
+			strip(request);
 		fprintf(stderr, "received cmd: %s\n", request);
 
 		ret = check_command(session, request, disable_client_cert);
@@ -1838,9 +1840,11 @@ static void cmd_parser(int argc, char **argv)
 	noticket = HAVE_OPT(NOTICKET);
 	earlydata = HAVE_OPT(EARLYDATA);
 
-	if (HAVE_OPT(ECHO))
+	if (HAVE_OPT(ECHO)) {
 		http = 0;
-	else
+		if (HAVE_OPT(CRLF))
+			strip_crlf = 0;
+	} else
 		http = 1;
 
 	record_max_size = OPT_VALUE_RECORDSIZE;
