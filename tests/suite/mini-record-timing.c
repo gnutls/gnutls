@@ -232,7 +232,7 @@ client(int fd, const char *prio, unsigned int text_size,
 
  restart:
 	do {
-		ret = gnutls_record_send(session, text, sizeof(text));
+		ret = gnutls_record_send(session, text, text_size);
 	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 	/* measure peer's processing time */
 
