@@ -306,17 +306,21 @@ static int check_phe_sha512(unsigned edx)
 
 static int check_phe_partial(void)
 {
-	const char *text = "test and test";
+	const char text[64] =
+		"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+		"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 	uint32_t iv[5] = { 0x67452301UL, 0xEFCDAB89UL,
 		0x98BADCFEUL, 0x10325476UL, 0xC3D2E1F0UL
 	};
 
-	padlock_sha1_blocks(iv, text, sizeof(text) - 1);
-	padlock_sha1_blocks(iv, text, sizeof(text) - 1);
+	/* If EAX is set to -1 (this is the case with padlock_sha1_blocks), the
+	 * xsha1 instruction takes a complete SHA-1 block (64 bytes), while it
+	 * takes arbitrary length data otherwise. */
+	padlock_sha1_blocks(iv, text, 1);
 
-	if (iv[0] == 0x9096E2D8UL && iv[1] == 0xA33074EEUL &&
-	    iv[2] == 0xCDBEE447UL && iv[3] == 0xEC7979D2UL &&
-	    iv[4] == 0x9D3FF5CFUL)
+	if (iv[0] == 0xDA4968EBUL && iv[1] == 0x2E377C1FUL &&
+	    iv[2] == 0x884E8F52UL && iv[3] == 0x83524BEBUL &&
+	    iv[4] == 0xE74EBDBDUL)
 		return 1;
 	else
 		return 0;
