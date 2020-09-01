@@ -914,6 +914,41 @@ void gnutls_x509_trust_list_set_getissuer_function(gnutls_x509_trust_list_t tlis
 	tlist->issuer_callback = func;
 }
 
+/**
+ * gnutls_x509_trust_list_set_ptr:
+ * @tlist: is a #gnutls_x509_trust_list_t type.
+ * @ptr: is the user pointer
+ *
+ * This function will set (associate) the user given pointer @ptr to
+ * the tlist structure. This pointer can be accessed with
+ * gnutls_x509_trust_list_get_ptr(). Useful in the callback function
+ * gnutls_x509_trust_list_set_getissuer_function.
+ *
+ * Since: 3.7.0
+ **/
+void gnutls_x509_trust_list_set_ptr(gnutls_x509_trust_list_t tlist, void *ptr)
+{
+	tlist->usr_ptr = ptr;
+}
+
+/**
+ * gnutls_x509_trust_list_get_ptr:
+ * @tlist: is a #gnutls_x509_trust_list_t type.
+ *
+ * Get user pointer for tlist. Useful in callback function
+ * gnutls_x509_trust_list_set_getissuer_function.
+ * This is the pointer set with gnutls_x509_trust_list_set_ptr().
+ *
+ * Returns: the user given pointer from the tlist structure, or
+ *   %NULL if it was never set.
+ *
+ * Since: 3.7.0
+ **/
+void *gnutls_x509_trust_list_get_ptr(gnutls_x509_trust_list_t tlist)
+{
+	return tlist->usr_ptr;
+}
+
 #define TEST_TEXT "test text"
 /* returns error if the certificate has different algorithm than
  * the given key parameters.

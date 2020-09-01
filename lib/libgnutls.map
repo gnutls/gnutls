@@ -1335,6 +1335,8 @@ GNUTLS_3_7_0
 {
  global:
 	gnutls_x509_trust_list_set_getissuer_function;
+	gnutls_x509_trust_list_get_ptr;
+	gnutls_x509_trust_list_set_ptr;
  local:
 	*;
 } GNUTLS_3_4;

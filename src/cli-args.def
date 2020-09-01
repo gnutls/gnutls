@@ -477,6 +477,14 @@ flag = {
     doc      = "This option makes the client to block waiting for the resumption data under TLS1.3. The option has effect only when --resume is provided.";
 };
 
+flag = {
+    name     = ca-auto-retrieve;
+    descrip  = "Enable automatic retrieval of missing CA certificates";
+    disabled;
+    disable  = "no";
+    doc      = "This option enables the client to automatically retrieve the missing intermediate CA certificates in the certificate chain, based on the Authority Information Access (AIA) extension.";
+};
+
 doc-section = {
   ds-type   = 'SEE ALSO'; // or anything else
   ds-format = 'texi';      // or texi or mdoc format
