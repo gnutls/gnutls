@@ -3342,13 +3342,12 @@ wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 			       TOMPZ(params->params[RSA_PRIME1])) == 0)
 			return gnutls_assert_val(GNUTLS_E_PK_INVALID_PRIVKEY);
 
-		/* marks RSA_COEF as present */
-		params->params_nr = RSA_PRIVATE_PARAMS - 2;
-
 		/* calculate exp1 [6] and exp2 [7] */
 		zrelease_mpi_key(&params->params[RSA_E1]);
 		zrelease_mpi_key(&params->params[RSA_E2]);
 
+		/* marks RSA_COEF as present */
+		params->params_nr = RSA_PRIVATE_PARAMS - 2;
 		ret = calc_rsa_exp(params);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
