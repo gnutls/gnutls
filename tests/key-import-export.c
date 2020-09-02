@@ -285,6 +285,20 @@ int check_x509_privkey(void)
 static
 int check_privkey_import_export(void)
 {
+	static const struct rsa_privkey_opt_args
+	{
+		gnutls_datum_t *_u, *_e1, *_e2;
+	}
+	rsa_opt_args[] =
+	{
+		{ NULL, NULL, NULL },
+		{ NULL, &_rsa_e1, &_rsa_e2 },
+		{ NULL, &_rsa_e1, NULL },
+		{ NULL, NULL, &_rsa_e2 },
+		{ &_rsa_u, NULL, NULL },
+		{ &_rsa_u, &_rsa_e1, NULL },
+		{ &_rsa_u, NULL, &_rsa_e2 },
+	};
 	gnutls_privkey_t key;
 	gnutls_datum_t p, q, g, y, x;
 	gnutls_datum_t m, e, u, e1, e2, d;
@@ -293,6 +307,7 @@ int check_privkey_import_export(void)
 	gnutls_digest_algorithm_t digest;
 	gnutls_gost_paramset_t paramset;
 #endif
+	unsigned i;
 	int ret;
 
 	global_init();
@@ -337,36 +352,22 @@ int check_privkey_import_export(void)
 	gnutls_privkey_deinit(key);
 
 	/* RSA */
-	ret = gnutls_privkey_init(&key);
-	if (ret < 0)
-		fail("error\n");
 
 	/* Optional arguments */
-	ret = gnutls_privkey_import_rsa_raw(key, &_rsa_m, &_rsa_e, &_rsa_d, &_rsa_p, &_rsa_q, NULL, NULL, NULL);
-	if (ret < 0)
-		fail("error\n");
+	for (i = 0; i < sizeof(rsa_opt_args) / sizeof(rsa_opt_args[0]); i++)
+	{
+		ret = gnutls_privkey_init(&key);
+		if (ret < 0)
+			fail("error\n");
 
-	ret = gnutls_privkey_import_rsa_raw(key, &_rsa_m, &_rsa_e, &_rsa_d, &_rsa_p, &_rsa_q, NULL, &_rsa_e1, &_rsa_e2);
-	if (ret < 0)
-		fail("error\n");
+		ret = gnutls_privkey_import_rsa_raw(key, &_rsa_m, &_rsa_e, &_rsa_d, &_rsa_p, &_rsa_q, rsa_opt_args[i]._u, rsa_opt_args[i]._e1, rsa_opt_args[i]._e2);
+		if (ret < 0)
+			fail("error\n");
 
-	ret = gnutls_privkey_import_rsa_raw(key, &_rsa_m, &_rsa_e, &_rsa_d, &_rsa_p, &_rsa_q, NULL, &_rsa_e1, NULL);
-	if (ret < 0)
-		fail("error\n");
+		gnutls_privkey_deinit(key);
+	}
 
-	ret = gnutls_privkey_import_rsa_raw(key, &_rsa_m, &_rsa_e, &_rsa_d, &_rsa_p, &_rsa_q, NULL, NULL, &_rsa_e2);
-	if (ret < 0)
-		fail("error\n");
-
-	ret = gnutls_privkey_import_rsa_raw(key, &_rsa_m, &_rsa_e, &_rsa_d, &_rsa_p, &_rsa_q, &_rsa_u, NULL, NULL);
-	if (ret < 0)
-		fail("error\n");
-
-	ret = gnutls_privkey_import_rsa_raw(key, &_rsa_m, &_rsa_e, &_rsa_d, &_rsa_p, &_rsa_q, &_rsa_u, &_rsa_e1, NULL);
-	if (ret < 0)
-		fail("error\n");
-
-	ret = gnutls_privkey_import_rsa_raw(key, &_rsa_m, &_rsa_e, &_rsa_d, &_rsa_p, &_rsa_q, &_rsa_u, NULL, &_rsa_e2);
+	ret = gnutls_privkey_init(&key);
 	if (ret < 0)
 		fail("error\n");
 
