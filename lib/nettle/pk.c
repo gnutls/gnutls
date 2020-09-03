@@ -3275,22 +3275,22 @@ static int calc_rsa_exp(gnutls_pk_params_st * params)
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
-	params->params[6] = params->params[7] = NULL;
+	params->params[RSA_E1] = params->params[RSA_E2] = NULL;
 
-	ret = _gnutls_mpi_init_multi(&tmp, &params->params[6], &params->params[7], NULL);
+	ret = _gnutls_mpi_init_multi(&tmp, &params->params[RSA_E1], &params->params[RSA_E2], NULL);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
 	/* [6] = d % p-1, [7] = d % q-1 */
-	_gnutls_mpi_sub_ui(tmp, params->params[3], 1);
+	_gnutls_mpi_sub_ui(tmp, params->params[RSA_PRIME1], 1);
 	ret =
-	    _gnutls_mpi_modm(params->params[6], params->params[2] /*d */ , tmp);
+	    _gnutls_mpi_modm(params->params[RSA_E1], params->params[RSA_PRIV] /*d */ , tmp);
 	if (ret < 0)
 		goto fail;
 
-	_gnutls_mpi_sub_ui(tmp, params->params[4], 1);
+	_gnutls_mpi_sub_ui(tmp, params->params[RSA_PRIME2], 1);
 	ret =
-	    _gnutls_mpi_modm(params->params[7], params->params[2] /*d */ , tmp);
+	    _gnutls_mpi_modm(params->params[RSA_E2], params->params[RSA_PRIV] /*d */ , tmp);
 	if (ret < 0)
 		goto fail;
 
@@ -3300,8 +3300,8 @@ static int calc_rsa_exp(gnutls_pk_params_st * params)
 
 fail:
 	zrelease_mpi_key(&tmp);
-	zrelease_mpi_key(&params->params[6]);
-	zrelease_mpi_key(&params->params[7]);
+	zrelease_mpi_key(&params->params[RSA_E1]);
+	zrelease_mpi_key(&params->params[RSA_E2]);
 
 	return ret;
 }
@@ -3346,6 +3346,8 @@ wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 		zrelease_mpi_key(&params->params[RSA_E1]);
 		zrelease_mpi_key(&params->params[RSA_E2]);
 
+		/* marks RSA_COEF as present */
+		params->params_nr = RSA_PRIVATE_PARAMS - 2;
 		ret = calc_rsa_exp(params);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
