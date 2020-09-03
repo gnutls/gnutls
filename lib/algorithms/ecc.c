@@ -123,7 +123,7 @@ gnutls_ecc_curve_entry_st ecc_curves[] = {
 	 * exchange (CryptoPro-XchA = CryptoPro-A and CryptoPro-XchB =
 	 * CryptoPro-C).
 	 *
-	 * Then TC26 (Standard comitee working on cryptographic standards) has
+	 * Then TC26 (Standard comittee working on cryptographic standards) has
 	 * defined one 256-bit curve (TC26-256-A) and three 512-bit curves
 	 * (TC26-512-A, -B, -C).
 	 *

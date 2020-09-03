@@ -139,7 +139,7 @@ void doit(void)
 	/* SHA1 */
 
 	err =
-	    gnutls_hash_fast(GNUTLS_MAC_SHA1, buf, size,
+	    gnutls_hash_fast(GNUTLS_DIG_SHA1, buf, size,
 			     digest);
 	if (err < 0)
 		fail("gnutls_hash_fast(SHA1) failed: %d\n", err);

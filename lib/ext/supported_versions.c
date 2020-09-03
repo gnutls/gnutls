@@ -71,7 +71,7 @@ supported_versions_recv_params(gnutls_session_t session,
 
 		/* do not parse this extension when we haven't TLS1.3
 		 * enabled. That is because we cannot handle earlier protocol
-		 * negotiotation (such as SSL3.0) with this */
+		 * negotiation (such as SSL3.0) with this */
 		if (vers && !vers->tls13_sem)
 			return 0;
 

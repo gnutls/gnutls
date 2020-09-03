@@ -31,7 +31,7 @@ if ! test -x "${CERTTOOL}"; then
 fi
 
 . ${srcdir}/scripts/common.sh
-check_for_datefudge
+skip_if_no_datefudge
 
 # Disable leak detection
 ASAN_OPTIONS="detect_leaks=0"

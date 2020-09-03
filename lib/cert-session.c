@@ -415,6 +415,7 @@ _gnutls_ocsp_verify_mandatory_stapling(gnutls_session_t session,
 
 			if (feature == 5 /* TLS ID for status request */) {
 				/* We sent a status request, the certificate mandates a reply, but we did not get any. */
+				*ocsp_status |= GNUTLS_CERT_INVALID;
 				*ocsp_status |= GNUTLS_CERT_MISSING_OCSP_STATUS;
 				break;
 			}

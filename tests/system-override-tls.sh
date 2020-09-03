@@ -40,7 +40,7 @@ fi
 
 . "${srcdir}/scripts/common.sh"
 
-check_for_datefudge
+skip_if_no_datefudge
 
 CERT="${srcdir}/certs/cert-ecc256.pem"
 KEY="${srcdir}/certs/ecc256.pem"

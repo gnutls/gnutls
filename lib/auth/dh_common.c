@@ -257,6 +257,14 @@ _gnutls_proc_dh_common_server_kx(gnutls_session_t session,
 		}
 	}
 
+#ifdef ENABLE_FIPS140
+	if (gnutls_fips140_mode_enabled() &&
+	    !_gnutls_dh_prime_match_fips_approved(data_p, n_p, data_g, n_g, NULL, NULL)) {
+		gnutls_assert();
+		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+	}
+#endif
+
 	if (_gnutls_mpi_init_scan_nz(&session->key.proto.tls12.dh.params.params[DH_G], data_g, _n_g) != 0) {
 		gnutls_assert();
 		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;

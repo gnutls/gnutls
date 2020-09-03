@@ -43,7 +43,9 @@ const char *override_prio = NULL;
 
 static int post_client_hello_callback(gnutls_session_t session)
 {
-	assert(gnutls_priority_set_direct(session, override_prio, NULL) >= 0);
+	if (override_prio) {
+		assert(gnutls_priority_set_direct(session, override_prio, NULL) >= 0);
+	}
 	pch_ok = 1;
 	return 0;
 }
@@ -54,7 +56,7 @@ static void tls_log_func(int level, const char *str)
 }
 
 static
-void start(const char *name, const char *prio, gnutls_protocol_t exp_version)
+void start(const char *name, const char *client_prio, const char *server_prio, int expected)
 {
 	/* Server stuff. */
 	gnutls_certificate_credentials_t serverx509cred;
@@ -83,7 +85,7 @@ void start(const char *name, const char *prio, gnutls_protocol_t exp_version)
 	assert(gnutls_init(&server, GNUTLS_SERVER)>=0);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
 				serverx509cred);
-	assert(gnutls_priority_set_direct(server, prio, NULL)>=0);
+	assert(gnutls_priority_set_direct(server, server_prio, NULL)>=0);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
@@ -94,15 +96,24 @@ void start(const char *name, const char *prio, gnutls_protocol_t exp_version)
 	assert(gnutls_init(&client, GNUTLS_CLIENT)>=0);
 	gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
 				clientx509cred);
-	assert(gnutls_priority_set_direct(client, prio, NULL)>=0);
+	assert(gnutls_priority_set_direct(client, client_prio, NULL)>=0);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
 
-	HANDSHAKE(client, server);
+	if (expected > 0) {
+		int ret;
 
-	assert(exp_version == gnutls_protocol_get_version(client));
-	assert(exp_version == gnutls_protocol_get_version(server));
+		HANDSHAKE(client, server);
+
+		ret = gnutls_protocol_get_version(client);
+		assert(expected == ret);
+
+		ret = gnutls_protocol_get_version(server);
+		assert(expected == ret);
+	} else {
+		HANDSHAKE_EXPECT(client, server, GNUTLS_E_AGAIN, GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
+	}
 
 	gnutls_bye(client, GNUTLS_SHUT_RDWR);
 	gnutls_bye(server, GNUTLS_SHUT_RDWR);
@@ -124,9 +135,15 @@ void start(const char *name, const char *prio, gnutls_protocol_t exp_version)
 void doit(void)
 {
 	override_prio = "NORMAL";
-	start("tls1.2-only", "NORMAL:-VERS-ALL:+VERS-TLS1.2", GNUTLS_TLS1_2);
-	start("tls1.3-only", "NORMAL:-VERS-ALL:+VERS-TLS1.3", GNUTLS_TLS1_3);
-	start("default", "NORMAL", GNUTLS_TLS1_3);
+	start("tls1.2-only", "NORMAL:-VERS-ALL:+VERS-TLS1.2", "NORMAL:-VERS-ALL:+VERS-TLS1.2", GNUTLS_TLS1_2);
+	start("tls1.3-only", "NORMAL:-VERS-ALL:+VERS-TLS1.3", "NORMAL:-VERS-ALL:+VERS-TLS1.3", GNUTLS_TLS1_3);
+	start("default", "NORMAL", "NORMAL", GNUTLS_TLS1_3);
 	override_prio = "NORMAL:-VERS-ALL:+VERS-TLS1.2";
-	start("default overriden to TLS1.2-only", "NORMAL", GNUTLS_TLS1_2);
+	start("default overriden to TLS1.2-only", "NORMAL", "NORMAL", GNUTLS_TLS1_2);
+	override_prio = NULL;
+	start("client tls1.2-only, server tls1.2-disabled",
+	      "NORMAL:-VERS-ALL:+VERS-TLS1.2", "NORMAL:-VERS-TLS1.2:-VERS-TLS1.1:-VERS-TLS1.0:-VERS-SSL3.0", -1);
+	override_prio = "NORMAL:-VERS-ALL:+VERS-TLS1.2";
+	start("client tls1.2-only, server tls1.2-disabled initially, but allow it afterwards",
+	      "NORMAL:-VERS-ALL:+VERS-TLS1.2", "NORMAL:-VERS-TLS1.2:-VERS-TLS1.1:-VERS-TLS1.0:-VERS-SSL3.0", GNUTLS_TLS1_2);
 }

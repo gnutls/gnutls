@@ -797,7 +797,7 @@ _gnutls_sign_get_hash_strength(gnutls_sign_algorithm_t sign)
 	if (unlikely(se == NULL))
 		return 0;
 
-	me = mac_to_entry(se->hash);
+	me = hash_to_entry(se->hash);
 	if (unlikely(me == NULL))
 		return 0;
 

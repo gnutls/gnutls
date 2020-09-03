@@ -491,8 +491,17 @@ unsigned gnutls_fips140_mode_enabled(void)
 #ifdef ENABLE_FIPS140
 	unsigned ret = _gnutls_fips_mode_enabled();
 
-	if (ret > GNUTLS_FIPS140_DISABLED)
+	if (ret > GNUTLS_FIPS140_DISABLED) {
+		/* If the previous run of selftests has failed, return as if
+		 * the FIPS mode is disabled. We could use HAVE_LIB_ERROR, if
+		 * we can assume that all the selftests run atomically from
+		 * the ELF constructor.
+		 */
+		if (_gnutls_get_lib_state() == LIB_STATE_ERROR)
+			return 0;
+
 		return ret;
+	}
 #endif
 	return 0;
 }

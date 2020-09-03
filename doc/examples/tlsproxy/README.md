@@ -31,7 +31,7 @@ Usage:
 A TLS client or server proxy
 
 Options:
-     -c, --connect ADDRRESS    Connect to ADDRESS
+     -c, --connect ADDRESS     Connect to ADDRESS
      -l, --listen ADDRESS      Listen on ADDRESS
      -K, --key FILE            Use FILE as private key
      -C, --cert FILE           Use FILE as public key

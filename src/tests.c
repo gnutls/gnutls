@@ -635,8 +635,16 @@ test_code_t test_ssl3_with_extensions(gnutls_session_t session)
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
 	ret = test_do_handshake(session);
-	if (ret == TEST_SUCCEED)
-		ssl3_ok = 1;
+	if (ssl3_ok != 0 && ret != TEST_SUCCEED) {
+		/* We need to disable extensions before trying TLS 1.0, because
+		 * it also may not work with extensions. There are known servers
+		 * which partially support both SSL 3.0 and TLS 1.0, but *both*
+		 * only with disabled extensions:
+		 *   https://gitlab.com/gnutls/gnutls/-/issues/958#note_309267384
+		 */
+		tls_ext_ok = 0;
+		strcat(rest, ":%NO_EXTENSIONS");
+	}
 
 	return ret;
 }
@@ -645,7 +653,7 @@ test_code_t test_ssl3_unknown_ciphersuites(gnutls_session_t session)
 {
 	int ret;
 	sprintf(prio_str, INIT_STR
-		ALL_CIPHERS ":" ALL_COMP ":+VERS-SSL3.0:%%NO_EXTENSIONS:"
+		ALL_CIPHERS ":" ALL_COMP ":+VERS-SSL3.0:"
 		ALL_MACS ":" ALL_KX ":%s", rest);
 	_gnutls_priority_set_direct(session, prio_str);
 
@@ -1040,7 +1048,8 @@ test_code_t test_record_padding(gnutls_session_t session)
 		if (ret == TEST_SUCCEED) {
 			tls1_ok = 1;
 			strcat(rest, ":%COMPAT");
-		}
+		} else
+			ret = TEST_IGNORE2; /* neither succeeded */
 	}
 
 	return ret;
@@ -1049,6 +1058,12 @@ test_code_t test_record_padding(gnutls_session_t session)
 test_code_t test_no_extensions(gnutls_session_t session)
 {
 	int ret;
+
+#ifdef ENABLE_SSL3
+	/* If already disabled by test_ssl3_with_extensions */
+	if (ssl3_ok != 0 && tls_ext_ok == 0)
+		return TEST_FAILED;
+#endif
 
 	sprintf(prio_str,
 		INIT_STR ALL_CIPHERS ":" ALL_COMP ":%s:"
@@ -1071,7 +1086,8 @@ test_code_t test_no_extensions(gnutls_session_t session)
 		if (ret == TEST_SUCCEED) {
 			tls_ext_ok = 0;
 			strcat(rest, ":%NO_EXTENSIONS");
-		}
+		} else
+			ret = TEST_IGNORE2; /* neither succeeded */
 	}
 
 	return ret;
@@ -1193,7 +1209,7 @@ test_code_t test_tls1_6_fallback(gnutls_session_t session)
 	return TEST_SUCCEED;
 }
 
-/* Advertize both TLS 1.0 and SSL 3.0. If the connection fails,
+/* Advertise both TLS 1.0 and SSL 3.0. If the connection fails,
  * but the previous SSL 3.0 test succeeded then disable TLS 1.0.
  */
 test_code_t test_tls_disable0(gnutls_session_t session)
@@ -1410,7 +1426,7 @@ void _gnutls_rsa_pms_set_version(gnutls_session_t session,
 test_code_t test_rsa_pms_version_check(gnutls_session_t session)
 {
 	int ret;
-	/* here we use an arbitary version in the RSA PMS
+	/* here we use an arbitrary version in the RSA PMS
 	 * to see whether to server will check this version.
 	 *
 	 * A normal server would abort this handshake.

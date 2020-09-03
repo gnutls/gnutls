@@ -360,7 +360,8 @@ static int compare_sig_algorithm(gnutls_x509_crt_t cert)
 	}
 
 	if (empty1 != empty2 ||
-	    sp1.size != sp2.size || safe_memcmp(sp1.data, sp2.data, sp1.size) != 0) {
+	    sp1.size != sp2.size ||
+	    (sp1.size > 0 && memcmp(sp1.data, sp2.data, sp1.size) != 0)) {
 		gnutls_assert();
 		ret = GNUTLS_E_CERTIFICATE_ERROR;
 		goto cleanup;
@@ -2996,10 +2997,15 @@ gnutls_x509_crt_export2(gnutls_x509_crt_t cert,
 	if (!cert->modified && cert->der.size) {
 		if (format == GNUTLS_X509_FMT_DER)
 			return _gnutls_set_datum(out, cert->der.data, cert->der.size);
-		else
-			return _gnutls_fbase64_encode(PEM_X509_CERT2, cert->der.data,
-						      cert->der.size, out);
-
+		else {
+			int ret = _gnutls_fbase64_encode(PEM_X509_CERT2,
+							 cert->der.data,
+							 cert->der.size,
+							 out);
+			if (ret < 0)
+				return ret;
+			return 0;
+		}
 	}
 
 	return _gnutls_x509_export_int2(cert->cert, format, PEM_X509_CERT2,

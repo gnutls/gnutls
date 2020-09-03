@@ -515,12 +515,15 @@ dist_check_SCRIPTS += fastopen.sh pkgconfig.sh starttls.sh starttls-ftp.sh start
 	server-weak-keys.sh
 
 if !DISABLE_SYSTEM_CONFIG
-dist_check_SCRIPTS += system-override-sig-hash.sh system-override-versions.sh system-override-invalid.sh \
+dist_check_SCRIPTS += system-override-sig.sh system-override-hash.sh \
+	system-override-versions.sh system-override-invalid.sh \
 	system-override-curves.sh system-override-profiles.sh system-override-tls.sh \
 	system-override-kx.sh system-override-default-priority-string.sh
 endif
 
 dist_check_SCRIPTS += gnutls-cli-self-signed.sh gnutls-cli-invalid-crl.sh gnutls-cli-rawpk.sh
+
+dist_check_SCRIPTS += dh-fips-approved.sh
 
 if ENABLE_PKCS11
 dist_check_SCRIPTS += p11-kit-trust.sh testpkcs11.sh certtool-pkcs11.sh

@@ -160,7 +160,7 @@ _gnutls_handshake_sign_data10(gnutls_session_t session,
 	dconcat.data = concat;
 	dconcat.size = _gnutls_hash_get_algo_len(me);
 
-	ret = gnutls_privkey_sign_hash(pkey, me->id, GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA,
+	ret = gnutls_privkey_sign_hash(pkey, MAC_TO_DIG(me->id), GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA,
 				       &dconcat, signature);
 	if (ret < 0) {
 		gnutls_assert();
@@ -788,7 +788,7 @@ _gnutls_handshake_sign_crt_vrfy10(gnutls_session_t session,
 	dconcat.data = concat;
 	dconcat.size = _gnutls_hash_get_algo_len(me);
 
-	ret = gnutls_privkey_sign_hash(pkey, me->id, GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA,
+	ret = gnutls_privkey_sign_hash(pkey, MAC_TO_DIG(me->id), GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA,
 				       &dconcat, signature);
 	if (ret < 0) {
 		gnutls_assert();

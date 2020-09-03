@@ -70,20 +70,30 @@ gnutls_cipher_init(gnutls_cipher_hd_t * handle,
 	if (e == NULL || (e->flags & GNUTLS_CIPHER_FLAG_ONLY_AEAD))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	*handle = gnutls_calloc(1, sizeof(api_cipher_hd_st));
-	if (*handle == NULL) {
+	h = gnutls_calloc(1, sizeof(api_cipher_hd_st));
+	if (h == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	h = *handle;
 	ret =
 	    _gnutls_cipher_init(&h->ctx_enc, e, key,
 				iv, 1);
+	if (ret < 0) {
+		gnutls_free(h);
+		return ret;
+	}
 
-	if (ret >= 0 && _gnutls_cipher_type(e) == CIPHER_BLOCK)
+	if (_gnutls_cipher_type(e) == CIPHER_BLOCK) {
 		ret =
 		    _gnutls_cipher_init(&h->ctx_dec, e, key, iv, 0);
+		if (ret < 0) {
+			gnutls_free(h);
+			return ret;
+		}
+	}
+
+	*handle = h;
 
 	return ret;
 }
@@ -553,7 +563,7 @@ int
 gnutls_hash_init(gnutls_hash_hd_t * dig,
 		 gnutls_digest_algorithm_t algorithm)
 {
-	if (is_mac_algo_forbidden(algorithm))
+	if (is_mac_algo_forbidden(DIG_TO_MAC(algorithm)))
 		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
 
 	*dig = gnutls_malloc(sizeof(digest_hd_st));
@@ -649,7 +659,7 @@ int
 gnutls_hash_fast(gnutls_digest_algorithm_t algorithm,
 		 const void *ptext, size_t ptext_len, void *digest)
 {
-	if (is_mac_algo_forbidden(algorithm))
+	if (is_mac_algo_forbidden(DIG_TO_MAC(algorithm)))
 		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
 
 	return _gnutls_hash_fast(algorithm, ptext, ptext_len, digest);
@@ -755,6 +765,7 @@ int gnutls_aead_cipher_init(gnutls_aead_cipher_hd_t *handle,
 {
 	api_aead_cipher_hd_st *h;
 	const cipher_entry_st *e;
+	int ret;
 
 	if (is_cipher_algo_forbidden(cipher))
 		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
@@ -763,15 +774,21 @@ int gnutls_aead_cipher_init(gnutls_aead_cipher_hd_t *handle,
 	if (e == NULL || e->type != CIPHER_AEAD)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	*handle = gnutls_calloc(1, sizeof(api_aead_cipher_hd_st));
-	if (*handle == NULL) {
+	h = gnutls_calloc(1, sizeof(api_aead_cipher_hd_st));
+	if (h == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	h = *handle;
+	ret = _gnutls_aead_cipher_init(h, cipher, key);
+	if (ret < 0) {
+		gnutls_free(h);
+		return ret;
+	}
 
-	return _gnutls_aead_cipher_init(h, cipher, key);
+	*handle = h;
+
+	return ret;
 }
 
 /**

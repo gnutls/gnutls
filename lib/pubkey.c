@@ -2092,10 +2092,16 @@ int _gnutls_pubkey_compatible_with_sig(gnutls_session_t session,
 	unsigned int sig_hash_size;
 	const mac_entry_st *me;
 	const gnutls_sign_entry_st *se;
+	int ret;
 
 	se = _gnutls_sign_to_entry(sign);
-	if (se == NULL && _gnutls_version_has_selectable_sighash(ver))
+	if (se != NULL) {
+		ret = pubkey_supports_sig(pubkey, se);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+	} else if (_gnutls_version_has_selectable_sighash(ver)) {
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
 
 	if (pubkey->params.algo == GNUTLS_PK_DSA) {
 		me = _gnutls_dsa_q_to_hash(&pubkey->params, &hash_size);
@@ -2157,9 +2163,6 @@ int _gnutls_pubkey_compatible_with_sig(gnutls_session_t session,
 			return gnutls_assert_val(GNUTLS_E_CONSTRAINT_ERROR);
 		}
 	}
-
-	if (se != NULL)
-		return pubkey_supports_sig(pubkey, se);
 
 	return 0;
 }

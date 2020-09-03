@@ -171,7 +171,7 @@ export TZ="UTC"
 
 . ${srcdir}/../scripts/common.sh
 
-check_for_datefudge
+skip_if_no_datefudge
 
 cat "${srcdir}/../certs/cert-ecc256.pem" "${srcdir}/../certs/ca-cert-ecc.pem"|datefudge "2012-11-22" \
 ${VALGRIND} "${CERTTOOL}" --verify-chain

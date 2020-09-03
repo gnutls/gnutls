@@ -441,11 +441,11 @@ session_ticket_send_params(gnutls_session_t session,
 		if (ret >= 0)
 			priv = epriv;
 
-		/* no previous data. Just advertize it */
+		/* no previous data. Just advertise it */
 		if (ret < 0)
 			return GNUTLS_E_INT_RET_0;
 
-		/* previous data had session tickets disabled. Don't advertize. Ignore. */
+		/* previous data had session tickets disabled. Don't advertise. Ignore. */
 		if (session->internals.flags & GNUTLS_NO_TICKETS)
 			return 0;
 

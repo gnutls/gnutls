@@ -104,7 +104,7 @@ _gnutls13_handshake_verify_data(gnutls_session_t session,
 		goto cleanup;
 	}
 
-	ret = gnutls_hash_fast(session->security_parameters.prf->id,
+	ret = gnutls_hash_fast(MAC_TO_DIG(session->security_parameters.prf->id),
 			       session->internals.handshake_hash_buffer.data,
 			       session->internals.handshake_hash_buffer_prev_len,
 			       prefix);
@@ -186,7 +186,7 @@ _gnutls13_handshake_sign_data(gnutls_session_t session,
 		goto cleanup;
 	}
 
-	ret = gnutls_hash_fast(session->security_parameters.prf->id,
+	ret = gnutls_hash_fast(MAC_TO_DIG(session->security_parameters.prf->id),
 			       session->internals.handshake_hash_buffer.data,
 			       session->internals.handshake_hash_buffer.length,
 			       tmp);

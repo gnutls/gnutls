@@ -45,7 +45,7 @@ int _gnutls13_compute_finished(const mac_entry_st *prf,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret = gnutls_hash_fast(prf->id,
+	ret = gnutls_hash_fast(MAC_TO_DIG(prf->id),
 			       handshake_hash_buffer->data,
 			       handshake_hash_buffer->length,
 			       ts_hash);
@@ -112,7 +112,7 @@ int _gnutls13_recv_finished(gnutls_session_t session)
 #if defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)
 # warning This is unsafe for production builds
 #else
-	if (safe_memcmp(verifier, buf.data, buf.length) != 0) {
+	if (gnutls_memcmp(verifier, buf.data, buf.length) != 0) {
 		gnutls_assert();
 		ret = GNUTLS_E_ERROR_IN_FINISHED_PACKET;
 		goto cleanup;

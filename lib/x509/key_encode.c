@@ -562,7 +562,7 @@ _gnutls_x509_write_gost_params(const gnutls_pk_params_st * params,
 
 	/* For compatibility per R 1323565.1.023—2018 provide digest OID only
 	 * for GOST-2001 keys or GOST-2012 keys with CryptoPro curves. Do not
-	 * set this optional paramter for TC26 curves */
+	 * set this optional parameter for TC26 curves */
 	if (params->algo == GNUTLS_PK_GOST_01)
 		oid = HASH_OID_GOST_R_3411_94_CRYPTOPRO_PARAMS;
 	else if (params->algo == GNUTLS_PK_GOST_12_256 &&

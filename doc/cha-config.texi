@@ -14,7 +14,7 @@ the environment variable @code{GNUTLS_SYSTEM_PRIORITY_FAIL_ON_INVALID} is
 set to 1, where it would cause the library to exit on unknown options.
 
 The location of the default configuration file is @code{/etc/gnutls/config},
-but its actual location may be overriden during compile time or at run-time
+but its actual location may be overridden during compile time or at run-time
 using the @code{GNUTLS_SYSTEM_PRIORITY_FILE} environment variable. The file
 used can be queried using @funcref{gnutls_get_system_config_file}.
 

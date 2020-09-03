@@ -71,6 +71,7 @@
 #include "int/dsa-compute-k.h"
 #include <gnettle.h>
 #include <fips.h>
+#include "dh.h"
 
 static inline const struct ecc_curve *get_supported_nist_curve(int curve);
 static inline const struct ecc_curve *get_supported_gost_curve(int curve);
@@ -229,25 +230,38 @@ _gost_params_to_pubkey(const gnutls_pk_params_st * pk_params,
 }
 #endif
 
-static void
+static int
 ecc_shared_secret(struct ecc_scalar *private_key,
 		  struct ecc_point *public_key, void *out, unsigned size)
 {
 	struct ecc_point r;
-	mpz_t x;
+	mpz_t x, y;
+	int ret = 0;
 
 	mpz_init(x);
+	mpz_init(y);
 	ecc_point_init(&r, public_key->ecc);
 
 	ecc_point_mul(&r, private_key, public_key);
 
-	ecc_point_get(&r, x, NULL);
+	ecc_point_get(&r, x, y);
+
+	/* Check if the point is not an identity element.  Note that this cannot
+	 * happen in nettle implementation, because it cannot represent an
+	 * infinity point. */
+	if (mpz_cmp_ui(x, 0) == 0 && mpz_cmp_ui(y, 0) == 0) {
+		ret = gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+		goto cleanup;
+	}
+
 	nettle_mpz_get_str_256(size, out, x);
 
+ cleanup:
 	mpz_clear(x);
+	mpz_clear(y);
 	ecc_point_clear(&r);
 
-	return;
+	return ret;
 }
 
 #define MAX_DH_BITS DEFAULT_MAX_VERIFY_BITS
@@ -288,7 +302,7 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 	switch (algo) {
 	case GNUTLS_PK_DH: {
 		bigint_t f, x, q, prime;
-		bigint_t k = NULL, ff = NULL, r = NULL;
+		bigint_t k = NULL, primesub1 = NULL, r = NULL;
 		unsigned int bits;
 
 		if (nonce != NULL)
@@ -299,21 +313,20 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 		q = priv->params[DH_Q];
 		prime = priv->params[DH_P];
 
-		ret = _gnutls_mpi_init_multi(&k, &ff, &r, NULL);
+		ret = _gnutls_mpi_init_multi(&k, &primesub1, &r, NULL);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		ret = _gnutls_mpi_add_ui(ff, f, 1);
+		ret = _gnutls_mpi_sub_ui(primesub1, prime, 1);
 		if (ret < 0) {
 			gnutls_assert();
 			goto dh_cleanup;
 		}
 
-		/* check if f==0,1, or f >= p-1.
-		 * or (ff=f+1) equivalently ff==1,2, ff >= p */
-		if ((_gnutls_mpi_cmp_ui(ff, 2) == 0)
-		    || (_gnutls_mpi_cmp_ui(ff, 1) == 0)
-		    || (_gnutls_mpi_cmp(ff, prime) >= 0)) {
+		/* check if f==0,1, or f >= p-1 */
+		if ((_gnutls_mpi_cmp_ui(f, 1) == 0)
+		    || (_gnutls_mpi_cmp_ui(f, 0) == 0)
+		    || (_gnutls_mpi_cmp(f, primesub1) >= 0)) {
 			gnutls_assert();
 			ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 			goto dh_cleanup;
@@ -354,6 +367,15 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 			goto dh_cleanup;
 		}
 
+		/* check if k==0,1, or k = p-1 */
+		if ((_gnutls_mpi_cmp_ui(k, 1) == 0)
+		    || (_gnutls_mpi_cmp_ui(k, 0) == 0)
+		    || (_gnutls_mpi_cmp(k, primesub1) == 0)) {
+			gnutls_assert();
+			ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+			goto dh_cleanup;
+		}
+
 		if (flags & PK_DERIVE_TLS13) {
 			ret =
 			    _gnutls_mpi_dprint_size(k, out,
@@ -370,7 +392,7 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 		ret = 0;
 dh_cleanup:
 		_gnutls_mpi_release(&r);
-		_gnutls_mpi_release(&ff);
+		_gnutls_mpi_release(&primesub1);
 		zrelease_temp_mpi_key(&k);
 		if (ret < 0)
 			goto cleanup;
@@ -415,8 +437,10 @@ dh_cleanup:
 				goto ecc_cleanup;
 			}
 
-			ecc_shared_secret(&ecc_priv, &ecc_pub, out->data,
-					  out->size);
+			ret = ecc_shared_secret(&ecc_priv, &ecc_pub, out->data,
+						out->size);
+			if (ret < 0)
+				gnutls_free(out->data);
 
 		      ecc_cleanup:
 			ecc_point_clear(&ecc_pub);
@@ -917,7 +941,7 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 
 			/* This call will return a valid MAC entry and
 			 * getters will check that is not null anyway. */
-			me = mac_to_entry(_gnutls_gost_digest(pk_params->algo));
+			me = hash_to_entry(_gnutls_gost_digest(pk_params->algo));
 			if (_gnutls_mac_get_algo_len(me) != vdata->size) {
 				gnutls_assert();
 				_gnutls_debug_log
@@ -987,7 +1011,7 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 				ret = _gnutls_ecdsa_compute_k(k,
 							      curve_id,
 							      pk_params->params[ECC_K],
-							      sign_params->dsa_dig,
+							      DIG_TO_MAC(sign_params->dsa_dig),
 							      vdata->data,
 							      vdata->size);
 				if (ret < 0)
@@ -1056,7 +1080,7 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 				ret = _gnutls_dsa_compute_k(k,
 							    pub.q,
 							    TOMPZ(priv),
-							    sign_params->dsa_dig,
+							    DIG_TO_MAC(sign_params->dsa_dig),
 							    vdata->data,
 							    vdata->size);
 				if (ret < 0)
@@ -1312,7 +1336,7 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 
 			/* This call will return a valid MAC entry and
 			 * getters will check that is not null anyway. */
-			me = mac_to_entry(_gnutls_gost_digest(pk_params->algo));
+			me = hash_to_entry(_gnutls_gost_digest(pk_params->algo));
 			if (_gnutls_mac_get_algo_len(me) != vdata->size)
 				return gnutls_assert_val(GNUTLS_E_PK_SIG_VERIFY_FAILED);
 
@@ -1526,6 +1550,80 @@ static inline const struct ecc_curve *get_supported_nist_curve(int curve)
 	default:
 		return NULL;
 	}
+}
+
+static inline const char *get_supported_nist_curve_order(int curve)
+{
+	static const struct {
+		int curve;
+		const char *order;
+	} orders[] = {
+#ifdef ENABLE_NON_SUITEB_CURVES
+		{ GNUTLS_ECC_CURVE_SECP192R1,
+		  "ffffffffffffffffffffffff99def836"
+		  "146bc9b1b4d22831" },
+		{ GNUTLS_ECC_CURVE_SECP224R1,
+		  "ffffffffffffffffffffffffffff16a2"
+		  "e0b8f03e13dd29455c5c2a3d" },
+#endif
+		{ GNUTLS_ECC_CURVE_SECP256R1,
+		  "ffffffff00000000ffffffffffffffff"
+		  "bce6faada7179e84f3b9cac2fc632551" },
+		{ GNUTLS_ECC_CURVE_SECP384R1,
+		  "ffffffffffffffffffffffffffffffff"
+		  "ffffffffffffffffc7634d81f4372ddf"
+		  "581a0db248b0a77aecec196accc52973" },
+		{ GNUTLS_ECC_CURVE_SECP521R1,
+		  "1fffffffffffffffffffffffffffffff"
+		  "ffffffffffffffffffffffffffffffff"
+		  "ffa51868783bf2f966b7fcc0148f709a"
+		  "5d03bb5c9b8899c47aebb6fb71e91386"
+		  "409" },
+	};
+	size_t i;
+
+	for (i = 0; i < sizeof(orders)/sizeof(orders[0]); i++) {
+		if (orders[i].curve == curve)
+			return orders[i].order;
+	}
+	return NULL;
+}
+
+static inline const char *get_supported_nist_curve_modulus(int curve)
+{
+	static const struct {
+		int curve;
+		const char *order;
+	} orders[] = {
+#ifdef ENABLE_NON_SUITEB_CURVES
+		{ GNUTLS_ECC_CURVE_SECP192R1,
+		  "fffffffffffffffffffffffffffffffe"
+		  "ffffffffffffffff" },
+		{ GNUTLS_ECC_CURVE_SECP224R1,
+		  "ffffffffffffffffffffffffffffffff"
+		  "000000000000000000000001" },
+#endif
+		{ GNUTLS_ECC_CURVE_SECP256R1,
+		  "ffffffff000000010000000000000000"
+		  "00000000ffffffffffffffffffffffff" },
+		{ GNUTLS_ECC_CURVE_SECP384R1,
+		  "ffffffffffffffffffffffffffffffff"
+		  "fffffffffffffffffffffffffffffffe"
+		  "ffffffff0000000000000000ffffffff" },
+		{ GNUTLS_ECC_CURVE_SECP521R1,
+		  "1ff"
+		  "ffffffffffffffffffffffffffffffff"
+		  "ffffffffffffffffffffffffffffffff"
+		  "ffffffffffffffffffffffffffffffff"
+		  "ffffffffffffffffffffffffffffffff" },
+	};
+	size_t i;
+
+	for (i = 0; i < sizeof(orders)/sizeof(orders[0]); i++) {
+		if (orders[i].curve == curve)
+			return orders[i].order;
+	}
+	return NULL;
 }
 
 static inline const struct ecc_curve *get_supported_gost_curve(int curve)
@@ -2108,6 +2206,53 @@ edwards_curve_mul_g(gnutls_pk_algorithm_t algo,
 	}
 }
 
+static inline int
+dh_find_q(const gnutls_pk_params_st *pk_params, mpz_t q)
+{
+	gnutls_datum_t prime = { NULL, 0 };
+	gnutls_datum_t generator = { NULL, 0 };
+	uint8_t *data_q;
+	size_t n_q;
+	bigint_t _q;
+	int ret = 0;
+
+	ret = _gnutls_mpi_dprint(pk_params->params[DSA_P], &prime);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = _gnutls_mpi_dprint(pk_params->params[DSA_G], &generator);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	if (!_gnutls_dh_prime_match_fips_approved(prime.data,
+						  prime.size,
+						  generator.data,
+						  generator.size,
+						  &data_q,
+						  &n_q)) {
+		ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		goto cleanup;
+	}
+
+	if (_gnutls_mpi_init_scan_nz(&_q, data_q, n_q) != 0) {
+		ret = gnutls_assert_val(GNUTLS_E_MPI_SCAN_FAILED);
+		goto cleanup;
+	}
+
+	mpz_set(q, TOMPZ(_q));
+	_gnutls_mpi_release(&_q);
+
+ cleanup:
+	gnutls_free(prime.data);
+	gnutls_free(generator.data);
+
+	return ret;
+}
+
 /* To generate a DH key either q must be set in the params or
  * level should be set to the number of required bits.
  */
@@ -2189,6 +2334,9 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			mpz_t x, y;
 			int max_tries;
 			unsigned have_q = 0;
+			mpz_t q;
+			mpz_t primesub1;
+			mpz_t ypowq;
 
 			if (algo != params->algo)
 				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -2205,6 +2353,10 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			mpz_init(r);
 			mpz_init(x);
 			mpz_init(y);
+
+			mpz_init(q);
+			mpz_init(primesub1);
+			mpz_init(ypowq);
 
 			max_tries = 3;
 			do {
@@ -2237,7 +2389,39 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 					ret = GNUTLS_E_LIB_IN_ERROR_STATE;
 					goto dh_fail;
 				}
+
 			} while(mpz_cmp_ui(y, 1) == 0);
+
+#ifdef ENABLE_FIPS140
+			if (_gnutls_fips_mode_enabled()) {
+				/* Perform FFC full public key validation checks
+				 * according to SP800-56A (revision 3), 5.6.2.3.1.
+				 */
+
+				/* Step 1: 2 <= y <= p - 2 */
+				mpz_sub_ui(primesub1, pub.p, 1);
+
+				if (mpz_cmp_ui(y, 2) < 0 || mpz_cmp(y, primesub1) >= 0) {
+					ret = gnutls_assert_val(GNUTLS_E_RANDOM_FAILED);
+					goto dh_fail;
+				}
+
+				/* Step 2: 1 = y^q mod p */
+				if (have_q)
+					mpz_set(q, pub.q);
+				else {
+					ret = dh_find_q(params, q);
+					if (ret < 0)
+						goto dh_fail;
+				}
+
+				mpz_powm(ypowq, y, q, pub.p);
+				if (mpz_cmp_ui(ypowq, 1) != 0) {
+					ret = gnutls_assert_val(GNUTLS_E_RANDOM_FAILED);
+					goto dh_fail;
+				}
+			}
+#endif
 
 			ret = _gnutls_mpi_init_multi(&params->params[DSA_Y], &params->params[DSA_X], NULL);
 			if (ret < 0) {
@@ -2255,6 +2439,9 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			mpz_clear(r);
 			mpz_clear(x);
 			mpz_clear(y);
+			mpz_clear(q);
+			mpz_clear(primesub1);
+			mpz_clear(ypowq);
 
 			if (ret < 0)
 				goto fail;
@@ -2394,6 +2581,10 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			struct ecc_scalar key;
 			struct ecc_point pub;
 			const struct ecc_curve *curve;
+			struct ecc_scalar n;
+			struct ecc_scalar m;
+			struct ecc_point r;
+			mpz_t x, y, xx, yy, nn, mm;
 
 			curve = get_supported_nist_curve(level);
 			if (curve == NULL)
@@ -2401,8 +2592,18 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 				    gnutls_assert_val
 				    (GNUTLS_E_ECC_UNSUPPORTED_CURVE);
 
+			mpz_init(x);
+			mpz_init(y);
+			mpz_init(xx);
+			mpz_init(yy);
+			mpz_init(nn);
+			mpz_init(mm);
+
 			ecc_scalar_init(&key, curve);
 			ecc_point_init(&pub, curve);
+			ecc_scalar_init(&n, curve);
+			ecc_scalar_init(&m, curve);
+			ecc_point_init(&r, curve);
 
 			ecdsa_generate_keypair(&pub, &key, NULL, rnd_func);
 			if (HAVE_LIB_ERROR()) {
@@ -2420,15 +2621,105 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			params->curve = level;
 			params->params_nr = ECC_PRIVATE_PARAMS;
 
-			ecc_point_get(&pub, TOMPZ(params->params[ECC_X]),
-				      TOMPZ(params->params[ECC_Y]));
+			ecc_point_get(&pub, x, y);
+
+#ifdef ENABLE_FIPS140
+			if (_gnutls_fips_mode_enabled()) {
+				/* Perform ECC full public key validation checks
+				 * according to SP800-56A (revision 3), 5.6.2.3.3.
+				 */
+
+				const char *order, *modulus;
+
+				/* Step 1: verify that Q is not an identity
+				 * element (an infinity point).  Note that this
+				 * cannot happen in the nettle implementation,
+				 * because it cannot represent an infinity point
+				 * on curves. */
+				if (mpz_cmp_ui(x, 0) == 0 && mpz_cmp_ui(y, 0) == 0) {
+					ret = gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+					goto ecc_fail;
+				}
+
+				/* Step 2: verify that both coordinates of Q are
+				 * in the range [0, p - 1].
+				 *
+				 * Step 3: verify that Q lie on the curve
+				 *
+				 * Both checks are performed in nettle.  */
+				if (!ecc_point_set(&r, x, y)) {
+					ret = gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+					goto ecc_fail;
+				}
+
+				/* Step 4: verify that n * Q, where n is the
+				 * curve order, result in an identity element
+				 *
+				 * Since nettle internally cannot represent an
+				 * identity element on curves, we validate this
+				 * instead:
+				 *
+				 *   (n - 1) * Q = -Q
+				 *
+				 * That effectively means: n * Q = -Q + Q = O
+				 */
+				order = get_supported_nist_curve_order(level);
+				if (unlikely(order == NULL)) {
+					ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+					goto ecc_fail;
+				}
+
+				ret = mpz_set_str(nn, order, 16);
+				if (unlikely(ret < 0)) {
+					ret = gnutls_assert_val(GNUTLS_E_MPI_SCAN_FAILED);
+					goto ecc_fail;
+				}
+
+				modulus = get_supported_nist_curve_modulus(level);
+				if (unlikely(modulus == NULL)) {
+					ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+					goto ecc_fail;
+				}
+
+				ret = mpz_set_str(mm, modulus, 16);
+				if (unlikely(ret < 0)) {
+					ret = gnutls_assert_val(GNUTLS_E_MPI_SCAN_FAILED);
+					goto ecc_fail;
+				}
+
+				/* (n - 1) * Q = -Q */
+				mpz_sub_ui (nn, nn, 1);
+				ecc_scalar_set(&n, nn);
+				ecc_point_mul(&r, &n, &r);
+				ecc_point_get(&r, xx, yy);
+				mpz_sub (mm, mm, y);
+
+				if (mpz_cmp(xx, x) != 0 || mpz_cmp(yy, mm) != 0) {
+					ret = gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+					goto ecc_fail;
+				}
+			}
+#endif
+
+			mpz_set(TOMPZ(params->params[ECC_X]), x);
+			mpz_set(TOMPZ(params->params[ECC_Y]), y);
+
 			ecc_scalar_get(&key, TOMPZ(params->params[ECC_K]));
 
 			ret = 0;
 
 		      ecc_fail:
+			mpz_clear(x);
+			mpz_clear(y);
+			mpz_clear(xx);
+			mpz_clear(yy);
+			mpz_clear(nn);
+			mpz_clear(mm);
 			ecc_point_clear(&pub);
 			ecc_scalar_clear(&key);
+			ecc_point_clear(&r);
+			ecc_scalar_clear(&n);
+			ecc_scalar_clear(&m);
 
 			if (ret < 0)
 				goto fail;

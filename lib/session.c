@@ -100,7 +100,7 @@ gnutls_session_get_data(gnutls_session_t session,
  * is received by the client. To ensure that such a ticket has been received use
  * gnutls_session_get_flags() and check for flag %GNUTLS_SFLAGS_SESSION_TICKET;
  * if this flag is not set, this function will wait for a new ticket within
- * an estimated rountrip, and if not received will return dummy data which
+ * an estimated roundtrip, and if not received will return dummy data which
  * cannot lead to resumption.
  *
  * To get notified when new tickets are received by the server

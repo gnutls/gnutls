@@ -396,7 +396,7 @@ _xts_aes128_set_encrypt_key(struct xts_aes128_key *xts_key,
 			    const uint8_t *key)
 {
 	if (_gnutls_fips_mode_enabled() &&
-	    safe_memcmp(key, key + AES128_KEY_SIZE, AES128_KEY_SIZE) == 0)
+	    gnutls_memcmp(key, key + AES128_KEY_SIZE, AES128_KEY_SIZE) == 0)
 		_gnutls_switch_lib_state(LIB_STATE_ERROR);
 
 	xts_aes128_set_encrypt_key(xts_key, key);
@@ -407,7 +407,7 @@ _xts_aes128_set_decrypt_key(struct xts_aes128_key *xts_key,
 			    const uint8_t *key)
 {
 	if (_gnutls_fips_mode_enabled() &&
-	    safe_memcmp(key, key + AES128_KEY_SIZE, AES128_KEY_SIZE) == 0)
+	    gnutls_memcmp(key, key + AES128_KEY_SIZE, AES128_KEY_SIZE) == 0)
 		_gnutls_switch_lib_state(LIB_STATE_ERROR);
 
 	xts_aes128_set_decrypt_key(xts_key, key);
@@ -418,7 +418,7 @@ _xts_aes256_set_encrypt_key(struct xts_aes256_key *xts_key,
 			    const uint8_t *key)
 {
 	if (_gnutls_fips_mode_enabled() &&
-	    safe_memcmp(key, key + AES256_KEY_SIZE, AES256_KEY_SIZE) == 0)
+	    gnutls_memcmp(key, key + AES256_KEY_SIZE, AES256_KEY_SIZE) == 0)
 		_gnutls_switch_lib_state(LIB_STATE_ERROR);
 
 	xts_aes256_set_encrypt_key(xts_key, key);
@@ -429,7 +429,7 @@ _xts_aes256_set_decrypt_key(struct xts_aes256_key *xts_key,
 			    const uint8_t *key)
 {
 	if (_gnutls_fips_mode_enabled() &&
-	    safe_memcmp(key, key + AES256_KEY_SIZE, AES256_KEY_SIZE) == 0)
+	    gnutls_memcmp(key, key + AES256_KEY_SIZE, AES256_KEY_SIZE) == 0)
 		_gnutls_switch_lib_state(LIB_STATE_ERROR);
 
 	xts_aes256_set_decrypt_key(xts_key, key);
@@ -1174,6 +1174,10 @@ wrap_nettle_cipher_aead_decrypt(void *_ctx,
 		ctx->cipher->auth(ctx->ctx_ptr, auth_size, auth);
 
 		encr_size -= tag_size;
+
+		if (unlikely(plain_size < encr_size))
+			return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+
 		ctx->cipher->decrypt(ctx, encr_size, plain, encr);
 
 		ctx->cipher->tag(ctx->ctx_ptr, tag_size, tag);
@@ -1183,6 +1187,10 @@ wrap_nettle_cipher_aead_decrypt(void *_ctx,
 	} else {
 		/* CCM-style cipher */
 		encr_size -= tag_size;
+
+		if (unlikely(plain_size < encr_size))
+			return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+
 		ret = ctx->cipher->aead_decrypt(ctx,
 						nonce_size, nonce,
 						auth_size, auth,
