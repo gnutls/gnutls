@@ -5,7 +5,14 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.6.15 (unreleased)
+* Version 3.6.15 (releases 2020-09-04)
+
+** libgnutls: Fixed "no_renegotiation" alert handling at incorrect timing.
+   The server sending a "no_renegotiation" alert in an unexpected timing,
+   followed by an invalid second handshake was able to cause a TLS 1.3 client to
+   crash via a null-pointer dereference. The crash happens in the application's
+   error handling path, where the gnutls_deinit function is called after
+   detecting a handshake failure (#1071).  [GNUTLS-SA-2020-09-04, CVSS: medium]
 
 ** libgnutls: If FIPS self-tests are failed, gnutls_fips140_mode_enabled() now
    indicates that with a false return value (!1306).
