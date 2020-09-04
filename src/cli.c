@@ -76,6 +76,11 @@
 
 #define MAX_BUF 4096
 
+#define HEADER_PATTERN "GET /%s HTTP/1.0\r\n" \
+  "Host: %s\r\n" \
+  "Accept: */*\r\n" \
+  "Connection: close\r\n\r\n"
+
 /* global stuff here */
 int resume, starttls, insecure, ranges, rehandshake, udp, mtu,
     inline_commands, waitresumption;
@@ -118,6 +123,10 @@ static gnutls_certificate_credentials_t xcred;
 static void check_server_cmd(socket_st * socket, int ret);
 static void init_global_tls_stuff(void);
 static int cert_verify_ocsp(gnutls_session_t session);
+static const char *host_from_url(const char *url, unsigned int *port, const char **path);
+static size_t get_data(void *buf, size_t size, size_t nmemb, void *userp);
+static int getissuer_callback(const gnutls_x509_trust_list_t tlist,
+		const gnutls_x509_crt_t cert);
 
 #define MAX_CRT 6
 static unsigned int x509_crt_size;
@@ -1949,6 +1958,7 @@ psk_callback(gnutls_session_t session, char **username,
 
 static void init_global_tls_stuff(void)
 {
+	gnutls_x509_trust_list_t tlist;
 	int ret;
 
 #ifdef ENABLE_PKCS11
@@ -1980,13 +1990,24 @@ static void init_global_tls_stuff(void)
 	gnutls_certificate_set_verify_flags(xcred, global_vflags);
 	gnutls_certificate_set_flags(xcred, GNUTLS_CERTIFICATE_VERIFY_CRLS);
 
+	if (gnutls_x509_trust_list_init(&tlist, 0) < 0) {
+		fprintf(stderr, "Trust list allocation memory error\n");
+		exit(1);
+	}
+	gnutls_certificate_set_trust_list(xcred, tlist, 0);
+
 	if (x509_cafile != NULL) {
-		ret = gnutls_certificate_set_x509_trust_file(xcred,
-							     x509_cafile,
-							     x509ctype);
+		ret = gnutls_x509_trust_list_add_trust_file(tlist,
+                                                            x509_cafile,
+                                                            NULL,
+                                                            x509ctype,
+                                                            GNUTLS_TL_USE_IN_TLS,
+                                                            0);
 	} else {
 		if (insecure == 0) {
-			ret = gnutls_certificate_set_x509_system_trust(xcred);
+			ret = gnutls_x509_trust_list_add_system_trust(tlist,
+                                                                      GNUTLS_TL_USE_IN_TLS,
+                                                                      0);
 			if (ret == GNUTLS_E_UNIMPLEMENTED_FEATURE) {
 				fprintf(stderr, "Warning: this system doesn't support a default trust store\n");
 				ret = 0;
@@ -2001,6 +2022,9 @@ static void init_global_tls_stuff(void)
 	} else {
 		log_msg(stdout, "Processed %d CA certificate(s).\n", ret);
 	}
+
+	if (ENABLED_OPT(CA_AUTO_RETRIEVE))
+		gnutls_x509_trust_list_set_getissuer_function(tlist, getissuer_callback);
 
 	if (x509_crlfile != NULL) {
 		ret =
@@ -2165,3 +2189,167 @@ cleanup:
 	return ok >= 1 ? (int) ok : -1;
 }
 #endif
+
+/* returns the host part of a URL */
+static const char *host_from_url(const char *url, unsigned int *port, const char **path)
+{
+	static char buffer[512];
+	char *p;
+
+	*port = 0;
+	*path = "";
+
+	if ((p = strstr(url, "http://")) != NULL) {
+		snprintf(buffer, sizeof(buffer), "%s", p + 7);
+		p = strchr(buffer, '/');
+		if (p != NULL) {
+			*p = 0;
+			*path = p+1;
+		}
+
+		p = strchr(buffer, ':');
+		if (p != NULL) {
+			*p = 0;
+			*port = atoi(p + 1);
+		}
+
+		return buffer;
+	} else {
+		return url;
+	}
+}
+
+static size_t get_data(void *buf, size_t size, size_t nmemb, void *userp)
+{
+	gnutls_datum_t *ud = userp;
+
+	size *= nmemb;
+
+	ud->data = realloc(ud->data, size + ud->size);
+	if (ud->data == NULL) {
+		fprintf(stderr, "Not enough memory for the request\n");
+		exit(1);
+	}
+
+	memcpy(&ud->data[ud->size], buf, size);
+	ud->size += size;
+
+	return size;
+}
+
+/* Returns 0 on ok, and -1 on error */
+static int
+getissuer_callback(const gnutls_x509_trust_list_t tlist,
+				const gnutls_x509_crt_t cert)
+{
+	gnutls_datum_t ud;
+	int ret;
+	gnutls_datum_t resp;
+	char *url = NULL;
+	char headers[1024];
+	char _service[16];
+	unsigned char *p;
+	const char *_hostname;
+	const char *path = "";
+	unsigned i;
+	unsigned int headers_size = 0, port;
+	socket_st hd;
+	gnutls_x509_crt_t issuer;
+	gnutls_datum_t data = { NULL, 0 };
+	static char buffer[MAX_BUF + 1];
+
+	sockets_init();
+
+	i = 0;
+	do {
+		ret = gnutls_x509_crt_get_authority_info_access(cert, i++,
+				GNUTLS_IA_CAISSUERS_URI,
+				&data,
+				NULL);
+	} while (ret == GNUTLS_E_UNKNOWN_ALGORITHM);
+
+	if (ret < 0) {
+		fprintf(stderr,
+				"*** Cannot find caIssuer URI in certificate: %s\n",
+				gnutls_strerror(ret));
+		return 0;
+	}
+
+	url = malloc(data.size + 1);
+	if (url == NULL) {
+		return -1;
+	}
+	memcpy(url, data.data, data.size);
+	url[data.size] = 0;
+
+	gnutls_free(data.data);
+
+	_hostname = host_from_url(url, &port, &path);
+	if (port != 0)
+		snprintf(_service, sizeof(_service), "%u", port);
+	else
+		strcpy(_service, "80");
+
+	fprintf(stderr, "Connecting to caIssuer server: %s...\n", _hostname);
+
+	memset(&ud, 0, sizeof(ud));
+
+	snprintf(headers, sizeof(headers), HEADER_PATTERN, path, _hostname);
+	headers_size = strlen(headers);
+
+	socket_open(&hd, _hostname, _service, NULL, SOCKET_FLAG_RAW|SOCKET_FLAG_SKIP_INIT, CONNECT_MSG, NULL);
+	socket_send(&hd, headers, headers_size);
+
+	do {
+		ret = socket_recv(&hd, buffer, sizeof(buffer));
+		if (ret > 0)
+			get_data(buffer, ret, 1, &ud);
+	} while (ret > 0);
+
+	if (ret < 0 || ud.size == 0) {
+		perror("recv");
+		ret = -1;
+		socket_bye(&hd, 0);
+		goto cleanup;
+	}
+
+	socket_bye(&hd, 0);
+
+	p = memmem(ud.data, ud.size, "\r\n\r\n", 4);
+	if (p == NULL) {
+		fprintf(stderr, "Cannot interpret HTTP response\n");
+		ret = -1;
+		goto cleanup;
+	}
+	p += 4;
+	resp.size = ud.size - (p - ud.data);
+	resp.data = p;
+
+	ret = gnutls_x509_crt_init(&issuer);
+	if (ret < 0) {
+		fprintf(stderr, "Memory error\n");
+		ret = -1;
+		goto cleanup;
+	}
+	ret = gnutls_x509_crt_import(issuer, &resp, GNUTLS_X509_FMT_DER);
+	if (ret < 0) {
+		fprintf(stderr, "Decoding error: %s\n", gnutls_strerror(ret));
+		ret = -1;
+		goto cleanup;
+	}
+	ret = gnutls_x509_trust_list_add_cas(tlist, &issuer, 1, 0);
+	if (ret < 0) {
+		fprintf(stderr, "Memory error\n");
+		ret = -1;
+		goto cleanup;
+	}
+
+	ret = 0;
+
+cleanup:
+	gnutls_free(data.data);
+	free(ud.data);
+	free(url);
+
+	return ret;
+}

@@ -1704,6 +1704,10 @@ typedef int gnutls_x509_trust_list_getissuer_function(gnutls_x509_trust_list_t t
 void gnutls_x509_trust_list_set_getissuer_function(gnutls_x509_trust_list_t tlist,
 				gnutls_x509_trust_list_getissuer_function *func);
 
+void gnutls_x509_trust_list_set_ptr(gnutls_x509_trust_list_t tlist, void *ptr);
+
+void *gnutls_x509_trust_list_get_ptr(gnutls_x509_trust_list_t tlist);
+
 void gnutls_certificate_set_trust_list
     (gnutls_certificate_credentials_t res,
      gnutls_x509_trust_list_t tlist, unsigned flags);
