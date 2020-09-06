@@ -637,52 +637,6 @@ AC_CHECK_FUNCS(nettle_rsa_sec_decrypt,
 )
 LIBS=$save_LIBS
 
-# Check if nettle has CFB8 support
-if test -z "$ac_cv_func_nettle_cfb8_encrypt"; then
-	# nettle_cfb8_decrypt in nettle upto 3.6 is known to be broken
-	if ! $PKG_CONFIG --atleast-version=3.6 nettle; then
-		ac_cv_func_nettle_cfb8_encrypt=no
-	fi
-fi
-
-save_LIBS=$LIBS
-LIBS="$LIBS $NETTLE_LIBS"
-AC_CHECK_FUNCS(nettle_cfb8_encrypt)
-LIBS=$save_LIBS
-AM_CONDITIONAL(NEED_CFB, [test "$ac_cv_func_nettle_cfb8_encrypt" != "yes"])
-
-# Check if nettle has CMAC support
-save_CFLAGS=$CFLAGS
-CFLAGS="$CFLAGS $NETTLE_CFLAGS"
-AC_CHECK_TYPES([union nettle_block8], , , [[#include <nettle/nettle-types.h>]])
-CFLAGS=$save_CFLAGS
-
-save_LIBS=$LIBS
-LIBS="$LIBS $NETTLE_LIBS"
-AC_CHECK_FUNCS(nettle_cmac128_update)
-LIBS=$save_LIBS
-AM_CONDITIONAL(NEED_CMAC, [test "$ac_cv_func_nettle_cmac128_update" != "yes"])
-
-# Check for CMAC-64 support
-save_LIBS=$LIBS
-LIBS="$LIBS $NETTLE_LIBS"
-AC_CHECK_FUNCS(nettle_cmac64_update)
-LIBS=$save_LIBS
-AM_CONDITIONAL(NEED_CMAC64, [test "$ac_cv_func_nettle_cmac64_update" != "yes"])
-
-# Check if nettle has XTS support
-save_LIBS=$LIBS
-LIBS="$LIBS $NETTLE_LIBS"
-AC_CHECK_FUNCS(nettle_xts_encrypt_message)
-LIBS=$save_LIBS
-AM_CONDITIONAL(NEED_XTS, [test "$ac_cv_func_nettle_xts_encrypt_message" != "yes"])
-
-# Check for Gosthash94 with CryptoPro S-box support
-save_LIBS=$LIBS
-LIBS="$LIBS $NETTLE_LIBS"
-AC_CHECK_FUNCS(nettle_gosthash94cp_update)
-LIBS=$save_LIBS
-
 # Check for GOST28147
 save_LIBS=$LIBS
 LIBS="$LIBS $NETTLE_LIBS"
@@ -694,32 +648,6 @@ save_LIBS=$LIBS
 LIBS="$LIBS $NETTLE_LIBS"
 AC_CHECK_FUNCS(nettle_streebog512_update)
 LIBS=$save_LIBS
-
-# Check for Curve448 and Ed448
-have_new_ecc=yes
-save_LIBS=$LIBS
-LIBS="$LIBS $HOGWEED_LIBS $NETTLE_LIBS"
-AC_CHECK_FUNCS([nettle_curve448_mul nettle_ed448_shake256_sign nettle_get_gost_gc256b nettle_get_gost_gc512a nettle_gostdsa_sign],
-	       [], [have_new_ecc=no])
-LIBS=$save_LIBS
-AS_IF([test "$have_new_ecc" != "yes"], AC_DEFINE([NEED_INT_ECC], 1, [Use backported Curve448/GOST R 34.10 DSA support]))
-AM_CONDITIONAL(NEED_INT_ECC, test "$have_new_ecc" != "yes")
-
-# Check if nettle has ChaCha20 initial block counter support
-have_chacha_set_counter=no
-save_LIBS=$LIBS
-LIBS="$LIBS $NETTLE_LIBS"
-AC_CHECK_FUNCS([nettle_chacha_set_counter],
-               [have_chacha_set_counter=yes])
-LIBS=$save_LIBS
-AM_CONDITIONAL(NEED_CHACHA, [test "$have_chacha_set_counter" != "yes"])
-
-# Check for SIV-CMAC
-save_LIBS=$LIBS
-LIBS="$LIBS $NETTLE_LIBS"
-AC_CHECK_FUNCS(nettle_siv_cmac_aes128_set_key)
-LIBS=$save_LIBS
-AM_CONDITIONAL(NEED_SIV, [test "$ac_cv_func_nettle_siv_cmac_aes128_set_key" != "yes"])
 
 # Check for Magma
 save_LIBS=$LIBS

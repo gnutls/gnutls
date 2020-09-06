@@ -28,11 +28,7 @@
 
 #ifndef HAVE_NETTLE_CMAC_KUZNYECHIK_UPDATE
 
-#ifdef HAVE_NETTLE_CMAC128_UPDATE
 #include <nettle/cmac.h>
-#else
-#include "backport/cmac.h"
-#endif
 
 #include "gost/cmac.h"
 

@@ -57,28 +57,11 @@
 #include <nettle/cbc.h>
 #include <nettle/gcm.h>
 #include <nettle/ccm.h>
-#ifdef HAVE_NETTLE_CHACHA_SET_COUNTER
 #include <nettle/chacha.h>
 #include <nettle/chacha-poly1305.h>
-#else
-#include "chacha.h"
-#include "chacha-poly1305.h"
-#endif
-#ifdef HAVE_NETTLE_CFB8_ENCRYPT
 #include <nettle/cfb.h>
-#else
-#include "cfb.h"
-#endif /* HAVE_NETTLE_CFB8_ENCRYPT */
-#ifdef HAVE_NETTLE_XTS_ENCRYPT_MESSAGE
 #include <nettle/xts.h>
-#else
-#include "xts.h"
-#endif
-#ifdef HAVE_NETTLE_SIV_CMAC_AES128_SET_KEY
 #include <nettle/siv-cmac.h>
-#else
-#include "siv-cmac.h"
-#endif
 #include <fips.h>
 
 struct nettle_cipher_ctx;

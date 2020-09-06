@@ -48,12 +48,7 @@
 #include <nettle/ecdsa.h>
 #include <nettle/ecc-curve.h>
 #include <nettle/curve25519.h>
-#if !NEED_INT_ECC
 #include <nettle/curve448.h>
-#else
-#include "ecc/curve448.h"
-#include "ecc/eddsa.h"
-#endif
 #include <nettle/eddsa.h>
 #include <nettle/version.h>
 #if ENABLE_GOST
