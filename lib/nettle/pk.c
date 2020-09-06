@@ -146,12 +146,12 @@ static void
 _rsa_params_to_privkey(const gnutls_pk_params_st * pk_params,
 		       struct rsa_private_key *priv)
 {
-	memcpy(priv->d, pk_params->params[2], SIZEOF_MPZT);
-	memcpy(priv->p, pk_params->params[3], SIZEOF_MPZT);
-	memcpy(priv->q, pk_params->params[4], SIZEOF_MPZT);
-	memcpy(priv->c, pk_params->params[5], SIZEOF_MPZT);
-	memcpy(priv->a, pk_params->params[6], SIZEOF_MPZT);
-	memcpy(priv->b, pk_params->params[7], SIZEOF_MPZT);
+	memcpy(priv->d, pk_params->params[RSA_PRIV], SIZEOF_MPZT);
+	memcpy(priv->p, pk_params->params[RSA_PRIME1], SIZEOF_MPZT);
+	memcpy(priv->q, pk_params->params[RSA_PRIME2], SIZEOF_MPZT);
+	memcpy(priv->c, pk_params->params[RSA_COEF], SIZEOF_MPZT);
+	memcpy(priv->a, pk_params->params[RSA_E1], SIZEOF_MPZT);
+	memcpy(priv->b, pk_params->params[RSA_E2], SIZEOF_MPZT);
 	/* we do not rsa_private_key_prepare() because it involves a multiplication.
 	 * we call it once when we import the parameters */
 	priv->size =
@@ -2511,14 +2511,14 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 				params->params_nr++;
 			}
 
-			mpz_set(TOMPZ(params->params[0]), pub.n);
-			mpz_set(TOMPZ(params->params[1]), pub.e);
-			mpz_set(TOMPZ(params->params[2]), priv.d);
-			mpz_set(TOMPZ(params->params[3]), priv.p);
-			mpz_set(TOMPZ(params->params[4]), priv.q);
-			mpz_set(TOMPZ(params->params[5]), priv.c);
-			mpz_set(TOMPZ(params->params[6]), priv.a);
-			mpz_set(TOMPZ(params->params[7]), priv.b);
+			mpz_set(TOMPZ(params->params[RSA_MODULUS]), pub.n);
+			mpz_set(TOMPZ(params->params[RSA_PUB]), pub.e);
+			mpz_set(TOMPZ(params->params[RSA_PRIV]), priv.d);
+			mpz_set(TOMPZ(params->params[RSA_PRIME1]), priv.p);
+			mpz_set(TOMPZ(params->params[RSA_PRIME2]), priv.q);
+			mpz_set(TOMPZ(params->params[RSA_COEF]), priv.c);
+			mpz_set(TOMPZ(params->params[RSA_E1]), priv.a);
+			mpz_set(TOMPZ(params->params[RSA_E2]), priv.b);
 
 			ret = 0;
 
