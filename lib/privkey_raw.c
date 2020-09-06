@@ -324,7 +324,7 @@ gnutls_privkey_export_gost_raw2(gnutls_privkey_t key,
  * @key: The structure to store the parsed key
  * @m: holds the modulus
  * @e: holds the public exponent
- * @d: holds the private exponent
+ * @d: holds the private exponent (optional)
  * @p: holds the first prime (p)
  * @q: holds the second prime (q)
  * @u: holds the coefficient (optional)
