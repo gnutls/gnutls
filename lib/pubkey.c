@@ -2581,15 +2581,17 @@ int gnutls_pubkey_verify_params(gnutls_pubkey_t key)
 int
 gnutls_pubkey_get_spki(gnutls_pubkey_t pubkey, gnutls_x509_spki_t spki, unsigned int flags)
 {
+	gnutls_x509_spki_t p = &pubkey->params.spki;
+
 	if (pubkey == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	if (pubkey->params.spki.pk == GNUTLS_PK_UNKNOWN)
+	if (p->pk == GNUTLS_PK_UNKNOWN)
 		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
-	memcpy(spki, &pubkey->params.spki, sizeof(gnutls_x509_spki_st));
+	memcpy(spki, p, sizeof(gnutls_x509_spki_st));
 
 	return 0;
 }
