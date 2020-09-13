@@ -1265,6 +1265,8 @@ void log_set(FILE *file)
 	logfile = file;
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-y2k"
 /* This is very similar to ctime() but it does not force a newline.
  */
 char *simple_ctime(const time_t *t, char out[SIMPLE_CTIME_BUF_SIZE])
@@ -1283,3 +1285,4 @@ char *simple_ctime(const time_t *t, char out[SIMPLE_CTIME_BUF_SIZE])
 	snprintf(out, SIMPLE_CTIME_BUF_SIZE, "[error]");
 	return out;
 }
+#pragma GCC diagnostic pop

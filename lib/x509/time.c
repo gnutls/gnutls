@@ -245,6 +245,8 @@ time_t _gnutls_x509_generalTime2gtime(const char *ttime)
 	return time2gtime(ttime, year);
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-y2k"
 /* tag will contain ASN1_TAG_UTCTime or ASN1_TAG_GENERALIZEDTime */
 static int
 gtime_to_suitable_time(time_t gtime, char *str_time, size_t str_time_size, unsigned *tag)
@@ -285,6 +287,7 @@ gtime_to_suitable_time(time_t gtime, char *str_time, size_t str_time_size, unsig
 
 	return 0;
 }
+#pragma GCC diagnostic pop
 
 static int
 gtime_to_generalTime(time_t gtime, char *str_time, size_t str_time_size)
