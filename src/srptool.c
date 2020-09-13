@@ -318,7 +318,7 @@ verify_passwd(const char *conffile, const char *tpasswd,
 
 	fclose(fp);
 
-	if ((iindex = read_conf_values(&g, &n, line)) < 0) {
+	if (read_conf_values(&g, &n, line) < 0) {
 		fprintf(stderr, "Cannot parse conf file '%s'\n", conffile);
 		return -1;
 	}
@@ -528,7 +528,7 @@ crypt_int(const char *username, const char *passwd, int salt_size,
 	do {			/* find the specified uindex in file */
 		p = fgets(line, sizeof(line) - 1, fp);
 	}
-	while (p != NULL && (iindex = atoi(p)) != uindex);
+	while (p != NULL && atoi(p) != uindex);
 
 	if (p == NULL) {
 		fprintf(stderr, "Cannot find entry in %s\n", tpasswd_conf);

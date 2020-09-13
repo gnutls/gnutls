@@ -897,18 +897,18 @@ static void print_subject_sign_tool(gnutls_buffer_st * str, const char *prefix, 
 
 static void print_issuer_sign_tool(gnutls_buffer_st * str, const char *prefix, const gnutls_datum_t *der)
 {
-	int ret, result;
+	int ret;
 	ASN1_TYPE tmpasn = ASN1_TYPE_EMPTY;
 	char asn1_err[ASN1_MAX_ERROR_DESCRIPTION_SIZE] = "";
 	gnutls_datum_t tmp;
 
-	if ((result = asn1_create_element(_gnutls_get_gnutls_asn(), "GNUTLS.IssuerSignTool",
-				 &tmpasn)) != ASN1_SUCCESS) {
+	if (asn1_create_element(_gnutls_get_gnutls_asn(), "GNUTLS.IssuerSignTool",
+				&tmpasn) != ASN1_SUCCESS) {
 		gnutls_assert();
 		goto hexdump;
 	}
 
-	if ((result = _asn1_strict_der_decode(&tmpasn, der->data, der->size, asn1_err)) != ASN1_SUCCESS) {
+	if (_asn1_strict_der_decode(&tmpasn, der->data, der->size, asn1_err) != ASN1_SUCCESS) {
 		gnutls_assert();
 		_gnutls_debug_log("_asn1_strict_der_decode: %s\n", asn1_err);
 		goto hexdump;

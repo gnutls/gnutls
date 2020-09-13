@@ -1074,13 +1074,12 @@ _gnutls_verify_crt_status(gnutls_x509_trust_list_t tlist,
 			flags |= GNUTLS_VERIFY_DO_NOT_ALLOW_X509_V1_CA_CRT;
 		}
 
-		if ((ret =
-                     verify_crt(tlist,
-                                certificate_list[i - 1],
+		if (!verify_crt(tlist,
+				certificate_list[i - 1],
 				&certificate_list[i], 1,
 				flags, &output,
 				&vparams,
-				i==1?1:0)) != 1) {
+				i==1?1:0)) {
 			gnutls_assert();
 			status |= output;
 			status |= GNUTLS_CERT_INVALID;

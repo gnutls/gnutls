@@ -575,7 +575,7 @@ static int server_recv_params(gnutls_session_t session,
 		/* This will unpack the session ticket if it is well
 		 * formed and has the expected name */
 		if (!(session->internals.flags & GNUTLS_NO_TICKETS) &&
-		    (ret = _gnutls13_unpack_session_ticket(session, &psk.identity, &ticket_data)) == 0) {
+		    _gnutls13_unpack_session_ticket(session, &psk.identity, &ticket_data) == 0) {
 			prf = ticket_data.prf;
 
 			session->internals.resumption_requested = 1;

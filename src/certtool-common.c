@@ -698,7 +698,7 @@ gnutls_pubkey_t load_public_key_or_import(int mand,
 		app_exit(1);
 	}
 
-	if (!privkey || (ret = gnutls_pubkey_import_privkey(pubkey, privkey, 0, 0)) < 0) {	/* could not get (e.g. on PKCS #11 */
+	if (!privkey || gnutls_pubkey_import_privkey(pubkey, privkey, 0, 0) < 0) {	/* could not get (e.g. on PKCS #11) */
 		gnutls_pubkey_deinit(pubkey);
 		pubkey = load_pubkey(0, info);
 		if (pubkey == NULL && mand) {

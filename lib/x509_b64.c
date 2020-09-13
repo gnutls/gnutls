@@ -86,7 +86,7 @@ _gnutls_fbase64_encode(const char *msg, const uint8_t * data,
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	bytes = pos = 0;
+	bytes = 0;
 	INCR(bytes, top_len, max);
 	pos = top_len;
 

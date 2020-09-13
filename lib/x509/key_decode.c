@@ -76,16 +76,15 @@ _gnutls_x509_read_rsa_pubkey(uint8_t * der, int dersize,
 	}
 
 
-	if ((result =
-	     _gnutls_x509_read_int(spk, "modulus",
-				   &params->params[0])) < 0) {
+	if (_gnutls_x509_read_int(spk, "modulus",
+				  &params->params[0]) < 0) {
 		gnutls_assert();
 		asn1_delete_structure(&spk);
 		return GNUTLS_E_ASN1_GENERIC_ERROR;
 	}
 
-	if ((result = _gnutls_x509_read_int(spk, "publicExponent",
-					    &params->params[1])) < 0) {
+	if (_gnutls_x509_read_int(spk, "publicExponent",
+				  &params->params[1]) < 0) {
 		gnutls_assert();
 		_gnutls_mpi_release(&params->params[0]);
 		asn1_delete_structure(&spk);
@@ -200,8 +199,7 @@ _gnutls_x509_read_dsa_params(uint8_t * der, int dersize,
 
 	/* Read p */
 
-	if ((result =
-	     _gnutls_x509_read_int(spk, "p", &params->params[0])) < 0) {
+	if (_gnutls_x509_read_int(spk, "p", &params->params[0]) < 0) {
 		gnutls_assert();
 		asn1_delete_structure(&spk);
 		return GNUTLS_E_ASN1_GENERIC_ERROR;
@@ -209,8 +207,7 @@ _gnutls_x509_read_dsa_params(uint8_t * der, int dersize,
 
 	/* Read q */
 
-	if ((result =
-	     _gnutls_x509_read_int(spk, "q", &params->params[1])) < 0) {
+	if (_gnutls_x509_read_int(spk, "q", &params->params[1]) < 0) {
 		gnutls_assert();
 		asn1_delete_structure(&spk);
 		_gnutls_mpi_release(&params->params[0]);
@@ -219,8 +216,7 @@ _gnutls_x509_read_dsa_params(uint8_t * der, int dersize,
 
 	/* Read g */
 
-	if ((result =
-	     _gnutls_x509_read_int(spk, "g", &params->params[2])) < 0) {
+	if (_gnutls_x509_read_int(spk, "g", &params->params[2]) < 0) {
 		gnutls_assert();
 		asn1_delete_structure(&spk);
 		_gnutls_mpi_release(&params->params[0]);
