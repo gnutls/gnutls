@@ -357,7 +357,7 @@ const gnutls_crypto_mac_st _gnutls_hmac_sha_padlock = {
 	.fast = wrap_padlock_hmac_fast
 };
 
-const gnutls_crypto_mac_st _gnutls_hmac_sha_padlock_nano = {
+const gnutls_crypto_mac_st _gnutls_hmac_sha_padlock_enhance = {
 	.init = wrap_padlock_hmac_init,
 	.setkey = wrap_padlock_hmac_setkey,
 	.setnonce = NULL,

@@ -383,7 +383,7 @@ const gnutls_crypto_digest_st _gnutls_sha_padlock = {
 	.fast = wrap_padlock_hash_fast
 };
 
-const gnutls_crypto_digest_st _gnutls_sha_padlock_nano = {
+const gnutls_crypto_digest_st _gnutls_sha_padlock_enhance = {
 	.init = wrap_padlock_hash_init,
 	.hash = wrap_padlock_hash_update,
 	.output = wrap_padlock_hash_output,
