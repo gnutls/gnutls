@@ -207,7 +207,7 @@ if test "${ENABLE_GOST}" = "1" && test "${GNUTLS_FORCE_FIPS_MODE}" != 1 ; then
 	echo "Checking output of gnutls-cli-debug for GOST-enabled server"
 
 	eval "${GETPORT}"
-	launch_server $$ --echo --priority "NORMAL" --x509keyfile ${KEY4} --x509certfile ${CERT4} >/dev/null 2>&1
+	launch_server $$ --echo --priority "NORMAL:+GOST" --x509keyfile ${KEY4} --x509certfile ${CERT4} >/dev/null 2>&1
 	PID=$!
 	wait_server ${PID}
 
