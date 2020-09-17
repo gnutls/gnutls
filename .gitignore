@@ -287,7 +287,8 @@ src/danetool
 src/danetool-args.c
 src/danetool-args.h
 src/gaa.skel
-src/gl
+src/gl/*
+!src/gl/override
 src/gnutls-cli
 src/gnutls-cli-debug
 src/gnutls-serv

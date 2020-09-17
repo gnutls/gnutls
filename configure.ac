@@ -20,7 +20,7 @@ dnl Process this file with autoconf to produce a configure script.
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301
 # USA
 
-AC_PREREQ(2.63)
+AC_PREREQ(2.64)
 
 dnl when updating version also update LT_REVISION in m4/hooks.m4
 AC_INIT([GnuTLS], [3.6.14], [bugs@gnutls.org])
@@ -523,6 +523,7 @@ if test "$gl_gcc_warnings" = yes; then
   nw="$nw -Wunsafe-loop-optimizations" # Warnings with no point
   nw="$nw -Wredundant-decls"        # Some files cannot be compiled with that (gl_fd_to_handle)
   nw="$nw -Wtype-limits"            # Too many warnings in gnulib macros
+  nw="$nw -Warith-conversion"       # Too compiler dependent
 
   gl_MANYWARN_ALL_GCC([ws])
   gl_MANYWARN_COMPLEMENT(ws, [$ws], [$nw])

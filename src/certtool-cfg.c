@@ -660,6 +660,8 @@ read_crq_set(gnutls_x509_crq_t crq, const char *input_str, const char *oid)
 	free(lineptr);
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
 /* The input_str should contain %d or %u to print the default.
  */
 static int64_t read_int_with_default(const char *input_str, long def)
@@ -714,6 +716,7 @@ static int64_t read_int_with_default(const char *input_str, long def)
 
 	return l;
 }
+#pragma GCC diagnostic pop
 
 int64_t read_int(const char *input_str)
 {
