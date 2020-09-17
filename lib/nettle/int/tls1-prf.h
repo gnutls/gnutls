@@ -25,7 +25,6 @@
 
 #include <nettle/nettle-meta.h>
 
-#define MAX_SEED_SIZE 200
 #define MAX_PRF_BYTES 200
 
 /* Namespace mangling */

@@ -48,6 +48,7 @@ P_hash( void *mac_ctx,
 	nettle_hash_digest_func *digest,
 	size_t digest_size,
 	size_t seed_size, const uint8_t *seed,
+	size_t label_size, const char *label,
 	size_t dst_length,
 	uint8_t *dst)
 {
@@ -60,6 +61,7 @@ P_hash( void *mac_ctx,
 
 	while(left > 0) {
 		if (started == 0) { /* A(0) */
+		        update(mac_ctx, label_size, (const uint8_t *)label); /* hash label */
 			update(mac_ctx, seed_size, seed);
 			started = 1;
 		} else {
@@ -68,6 +70,7 @@ P_hash( void *mac_ctx,
 		digest(mac_ctx, digest_size, Atmp); /* store A(i) */
 
 		update(mac_ctx, digest_size, Atmp); /* hash A(i) */
+		update(mac_ctx, label_size, (const uint8_t *)label); /* hash label */
 		update(mac_ctx, seed_size, seed); /* hash seed */
 
 		if (left < (ssize_t)digest_size)
@@ -88,18 +91,14 @@ tls10_prf(size_t secret_size, const uint8_t *secret,
 	  size_t seed_size, const uint8_t *seed,
 	  size_t length, uint8_t *dst)
 {
-	int l_s, cseed_size = seed_size + label_size;
+	int l_s;
 	const uint8_t *s1, *s2;
 	struct hmac_md5_ctx md5_ctx;
 	struct hmac_sha1_ctx sha1_ctx;
 	uint8_t o1[MAX_PRF_BYTES];
-	uint8_t cseed[MAX_SEED_SIZE];
 
-	if (cseed_size > MAX_SEED_SIZE || length > MAX_PRF_BYTES)
+	if (length > MAX_PRF_BYTES)
 		return 0;
-
-	memcpy(cseed, label, label_size);
-	memcpy(&cseed[label_size], seed, seed_size);
 
 	l_s = secret_size / 2;
 	s1 = &secret[0];
@@ -113,14 +112,14 @@ tls10_prf(size_t secret_size, const uint8_t *secret,
 	P_hash(&md5_ctx, (nettle_hash_update_func*)hmac_md5_update,
 		(nettle_hash_digest_func*)hmac_md5_digest,
 		MD5_DIGEST_SIZE,
-		cseed_size, cseed, length, o1);
+		seed_size, seed, label_size, label, length, o1);
 
 	hmac_sha1_set_key(&sha1_ctx, l_s, s2);
 
 	P_hash(&sha1_ctx, (nettle_hash_update_func*)hmac_sha1_update,
 		(nettle_hash_digest_func*)hmac_sha1_digest,
 		SHA1_DIGEST_SIZE,
-		cseed_size, cseed, length, dst);
+		seed_size, seed, label_size, label, length, dst);
 
 	memxor(dst, o1, length);
 
@@ -153,17 +152,8 @@ tls12_prf(void *mac_ctx,
 	  size_t seed_size, const uint8_t *seed,
 	  size_t length, uint8_t *dst)
 {
-	size_t cseed_size = seed_size + label_size;
-	uint8_t cseed[MAX_SEED_SIZE];
-
-	if (cseed_size > MAX_SEED_SIZE)
-		return 0;
-
-	memcpy(cseed, label, label_size);
-	memcpy(&cseed[label_size], seed, seed_size);
-
 	P_hash(mac_ctx, update, digest, digest_size,
-		cseed_size, cseed, length, dst);
+		seed_size, seed, label_size, label, length, dst);
 
 	return 1;
 }
