@@ -32,6 +32,7 @@
 
 abs_top_srcdir="${abs_top_srcdir:-$(pwd)/../../}"
 srcdir="${srcdir:-.}"
+GNUTLS_SERV="${SERV:-../../src/gnutls-serv${EXEEXT}}"
 CLI="${CLI:-../../src/gnutls-cli${EXEEXT}}"
 unset RETCODE
 
@@ -309,7 +310,7 @@ echo_cmd "${PREFIX}"
 echo_cmd "${PREFIX}###############################################"
 echo_cmd "${PREFIX}# Server mode tests (gnutls server-openssl cli#"
 echo_cmd "${PREFIX}###############################################"
-SERV="../../src/gnutls-serv${EXEEXT} -q"
+SERV="${GNUTLS_SERV} -q"
 
 # Note that openssl s_client does not return error code on failure
 

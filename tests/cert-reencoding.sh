@@ -24,7 +24,8 @@
 srcdir="${srcdir:-.}"
 CERTTOOL="${CERTTOOL:-../src/certtool${EXEEXT}}"
 OCSPTOOL="${OCSPTOOL:-../src/ocsptool${EXEEXT}}"
-GNUTLS_SERV="${GNUTLS_SERV:-../src/gnutls-serv${EXEEXT}}"
+GNUTLS_SERV="${SERV:-../src/gnutls-serv${EXEEXT}}"
+unset SERV
 GNUTLS_CLI="${GNUTLS_CLI:-../src/gnutls-cli${EXEEXT}}"
 DIFF="${DIFF:-diff}"
 SERVER_CERT_FILE="cert.$$.pem.tmp"
