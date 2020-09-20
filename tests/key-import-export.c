@@ -367,6 +367,38 @@ int check_privkey_import_export(void)
 		gnutls_privkey_deinit(key);
 	}
 
+	/* Optional private exponent */
+	ret = gnutls_privkey_init(&key);
+	if (ret < 0)
+		fail("error\n");
+
+	ret = gnutls_privkey_import_rsa_raw(key, &_rsa_m, &_rsa_e, NULL, &_rsa_p, &_rsa_q, NULL, NULL, NULL);
+	if (ret < 0)
+		fail("error\n");
+
+	ret = gnutls_privkey_export_rsa_raw2(key, &m, &e, &d, &p, &q, &u, &e1, &e2, 0);
+	if (ret < 0)
+		fail("error\n");
+
+	CMP("m", &m, rsa_m);
+	CMP("e", &e, rsa_e);
+	CMP("d", &d, rsa_d);
+	CMP("p", &p, rsa_p);
+	CMP("q", &q, rsa_q);
+	CMP("u", &u, rsa_u);
+	CMP("e1", &e1, rsa_e1);
+	CMP("e2", &e2, rsa_e2);
+	gnutls_free(m.data);
+	gnutls_free(e.data);
+	gnutls_free(d.data);
+	gnutls_free(p.data);
+	gnutls_free(q.data);
+	gnutls_free(u.data);
+	gnutls_free(e1.data);
+	gnutls_free(e2.data);
+
+	gnutls_privkey_deinit(key);
+
 	ret = gnutls_privkey_init(&key);
 	if (ret < 0)
 		fail("error\n");

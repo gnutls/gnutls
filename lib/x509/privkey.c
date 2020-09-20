@@ -900,13 +900,15 @@ gnutls_x509_privkey_import_rsa_raw2(gnutls_x509_privkey_t key,
 	}
 	key->params.params_nr++;
 
-	siz = d->size;
-	if (_gnutls_mpi_init_scan_nz(&key->params.params[RSA_PRIV], d->data, siz)) {
-		gnutls_assert();
-		ret = GNUTLS_E_MPI_SCAN_FAILED;
-		goto cleanup;
+	if (d) {
+		siz = d->size;
+		if (_gnutls_mpi_init_scan_nz(&key->params.params[RSA_PRIV], d->data, siz)) {
+			gnutls_assert();
+			ret = GNUTLS_E_MPI_SCAN_FAILED;
+			goto cleanup;
+		}
+		key->params.params_nr++;
 	}
-	key->params.params_nr++;
 
 	siz = p->size;
 	if (_gnutls_mpi_init_scan_nz(&key->params.params[RSA_PRIME1], p->data, siz)) {
