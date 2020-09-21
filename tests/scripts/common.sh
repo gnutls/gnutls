@@ -165,7 +165,7 @@ launch_server() {
 	shift
 
 	wait_for_free_port ${PORT}
-	${SERV} ${DEBUG} -p "${PORT}" $* >${LOGFILE-/dev/null} &
+	${SERV} ${DEBUG} -p "${PORT}" "$@" >${LOGFILE-/dev/null} &
 }
 
 launch_pkcs11_server() {
@@ -176,7 +176,7 @@ launch_pkcs11_server() {
 
 	wait_for_free_port ${PORT}
 
-	${VALGRIND} ${SERV} ${PROVIDER} ${DEBUG} -p "${PORT}" $* &
+	${VALGRIND} ${SERV} ${PROVIDER} ${DEBUG} -p "${PORT}" "$@" &
 }
 
 launch_bare_server() {
@@ -184,7 +184,7 @@ launch_bare_server() {
 	shift
 
 	wait_for_free_port ${PORT}
-	${SERV} $* >${LOGFILE-/dev/null} &
+	${SERV} "$@" >${LOGFILE-/dev/null} &
 }
 
 wait_server() {
