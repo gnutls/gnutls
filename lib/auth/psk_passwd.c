@@ -105,7 +105,7 @@ static bool username_matches(const gnutls_datum_t *username,
 		hexline.data = (void *) &line[1];
 		hexline.size = i - 1;
 
-		if ((retval = gnutls_hex_decode2(&hexline, &hex_username)) < 0)
+		if (gnutls_hex_decode2(&hexline, &hex_username) < 0)
 			return gnutls_assert_val(0);
 
 		if (hex_username.size == username->size)

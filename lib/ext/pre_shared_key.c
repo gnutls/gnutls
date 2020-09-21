@@ -277,6 +277,7 @@ client_send_params(gnutls_session_t session,
 	psk_auth_info_t info = NULL;
 	unsigned psk_id_len = 0;
 	unsigned binders_len, binders_pos;
+	tls13_ticket_st *ticket = &session->internals.tls13_ticket;
 
 	if (((session->internals.flags & GNUTLS_NO_TICKETS) ||
 	    session->internals.tls13_ticket.ticket.data == NULL) &&
@@ -295,47 +296,44 @@ client_send_params(gnutls_session_t session,
 
 	/* First, let's see if we have a session ticket to send */
 	if (!(session->internals.flags & GNUTLS_NO_TICKETS) &&
-	    session->internals.tls13_ticket.ticket.data != NULL) {
+	    ticket->ticket.data != NULL) {
+
 		/* We found a session ticket */
-		if (unlikely(session->internals.tls13_ticket.prf == NULL)) {
-			_gnutls13_session_ticket_unset(session);
+		if (unlikely(ticket->prf == NULL)) {
+			tls13_ticket_deinit(ticket);
 			ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 			goto cleanup;
 		}
 
-		prf_res = session->internals.tls13_ticket.prf;
+		prf_res = ticket->prf;
 
 		gnutls_gettime(&cur_time);
 		if (unlikely(_gnutls_timespec_cmp(&cur_time,
-						  &session->internals.
-						  tls13_ticket.
-						  arrival_time) < 0)) {
+						  &ticket->arrival_time) < 0)) {
 			gnutls_assert();
-			_gnutls13_session_ticket_unset(session);
+			tls13_ticket_deinit(ticket);
 			goto ignore_ticket;
 		}
 
 		/* Check whether the ticket is stale */
-		ticket_age = timespec_sub_ms(&cur_time,
-					     &session->internals.tls13_ticket.
-					     arrival_time);
-		if (ticket_age / 1000 > session->internals.tls13_ticket.lifetime) {
-			_gnutls13_session_ticket_unset(session);
+		ticket_age = timespec_sub_ms(&cur_time, &ticket->arrival_time);
+		if (ticket_age / 1000 > ticket->lifetime) {
+			tls13_ticket_deinit(ticket);
 			goto ignore_ticket;
 		}
 
-		ret = compute_psk_from_ticket(&session->internals.tls13_ticket, &rkey);
+		ret = compute_psk_from_ticket(ticket, &rkey);
 		if (ret < 0) {
-			_gnutls13_session_ticket_unset(session);
+			tls13_ticket_deinit(ticket);
 			goto ignore_ticket;
 		}
 
 		/* Calculate obfuscated ticket age, in milliseconds, mod 2^32 */
-		ob_ticket_age = ticket_age + session->internals.tls13_ticket.age_add;
+		ob_ticket_age = ticket_age + ticket->age_add;
 
 		if ((ret = _gnutls_buffer_append_data_prefix(extdata, 16,
-							     session->internals.tls13_ticket.ticket.data,
-							     session->internals.tls13_ticket.ticket.size)) < 0) {
+							     ticket->ticket.data,
+							     ticket->ticket.size)) < 0) {
 			gnutls_assert();
 			goto cleanup;
 		}
@@ -346,7 +344,7 @@ client_send_params(gnutls_session_t session,
 			goto cleanup;
 		}
 
-		psk_id_len += 6 + session->internals.tls13_ticket.ticket.size;
+		psk_id_len += 6 + ticket->ticket.size;
 		binders_len += 1 + _gnutls_mac_get_algo_len(prf_res);
 	}
 
@@ -577,7 +575,7 @@ static int server_recv_params(gnutls_session_t session,
 		/* This will unpack the session ticket if it is well
 		 * formed and has the expected name */
 		if (!(session->internals.flags & GNUTLS_NO_TICKETS) &&
-		    (ret = _gnutls13_unpack_session_ticket(session, &psk.identity, &ticket_data)) == 0) {
+		    _gnutls13_unpack_session_ticket(session, &psk.identity, &ticket_data) == 0) {
 			prf = ticket_data.prf;
 
 			session->internals.resumption_requested = 1;

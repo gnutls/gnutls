@@ -33,20 +33,11 @@ int _gnutls13_unpack_session_ticket(gnutls_session_t session,
 inline static
 void tls13_ticket_deinit(tls13_ticket_st *ticket)
 {
-	if (ticket) {
-		zeroize_temp_key(&ticket->resumption_master_secret,
-				 sizeof(ticket->resumption_master_secret));
+	zeroize_temp_key(&ticket->resumption_master_secret,
+			 sizeof(ticket->resumption_master_secret));
 
-		_gnutls_free_datum(&ticket->ticket);
-		memset(ticket, 0, sizeof(tls13_ticket_st));
-	}
-}
-
-inline static
-void _gnutls13_session_ticket_unset(gnutls_session_t session)
-{
-	if (session->internals.tls13_ticket.ticket.data != NULL)
-		tls13_ticket_deinit(&session->internals.tls13_ticket);
+	_gnutls_free_datum(&ticket->ticket);
+	memset(ticket, 0, sizeof(tls13_ticket_st));
 }
 
 #endif /* GNUTLS_LIB_TLS13_SESSION_TICKET_H */

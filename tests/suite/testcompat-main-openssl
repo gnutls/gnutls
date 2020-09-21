@@ -53,6 +53,7 @@ PORT="${PORT:-${RPORT}}"
 
 SERV=openssl
 OPENSSL_CLI="$SERV"
+SIGALGS=RSA+SHA1:RSA+SHA256
 
 echo "Compatibility checks using "`${SERV} version`
 ${SERV} version|grep -e '1\.[0-9]\..' >/dev/null 2>&1
@@ -88,6 +89,7 @@ if test $NO_DSS != 0;then
 	echo "Disabling interop tests for DSS ciphersuites"
 else
 	DSA_PARAMS="-dkey ${DSA_KEY} -dcert ${DSA_CERT}"
+	SIGALGS="$SIGALGS:DSA+SHA1:DSA+SHA256"
 fi
 
 ${SERV} ciphers -v ALL 2>&1|grep -e CAMELLIA >/dev/null 2>&1
@@ -154,7 +156,7 @@ run_client_suite() {
 		# It seems debian disabled SSL 3.0 completely on openssl
 
 		eval "${GETPORT}"
-		launch_bare_server $$ s_server -cipher ALL -quiet -www -accept "${PORT}" -keyform pem -certform pem -ssl3 ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" ${DSA_PARAMS} -Verify 1 -CAfile "${CA_CERT}" >/dev/null
+		launch_bare_server $$ s_server -cipher ALL -sigalgs "$SIGALGS" -quiet -www -accept "${PORT}" -keyform pem -certform pem -ssl3 ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" ${DSA_PARAMS} -Verify 1 -CAfile "${CA_CERT}" >/dev/null
 		PID=$!
 		wait_server ${PID}
 
@@ -211,7 +213,7 @@ run_client_suite() {
 
 	#-cipher RSA-AES128-SHA:DHE-DSS-AES128-SHA:DHE-RSA-AES128-SHA:ECDHE-RSA-AES128-SHA
 	eval "${GETPORT}"
-	launch_bare_server $$ s_server -cipher "ALL:@SECLEVEL=1" -quiet -www -accept "${PORT}" -keyform pem -certform pem -tls1 ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" ${DSA_PARAMS} -Verify 1 -CAfile "${CA_CERT}" >/dev/null
+	launch_bare_server $$ s_server -cipher "ALL:@SECLEVEL=1" -sigalgs "$SIGALGS" -quiet -www -accept "${PORT}" -keyform pem -certform pem -tls1 ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" ${DSA_PARAMS} -Verify 1 -CAfile "${CA_CERT}" >/dev/null
 	PID=$!
 	wait_server ${PID}
 
@@ -334,7 +336,7 @@ run_client_suite() {
 		# Tests requiring openssl 1.0.1 - TLS 1.2
 		#-cipher RSA-AES128-SHA:DHE-DSS-AES128-SHA:DHE-RSA-AES128-SHA:ECDHE-RSA-AES128-SHA
 		eval "${GETPORT}"
-		launch_bare_server $$ s_server -cipher 'ALL:@SECLEVEL=1' -quiet -www -accept "${PORT}" -keyform pem -certform pem -tls1_2 ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" ${DSA_PARAMS} -Verify 1 -CAfile "${CA_CERT}" >/dev/null
+		launch_bare_server $$ s_server -cipher 'ALL:@SECLEVEL=1' -sigalgs "$SIGALGS" -quiet -www -accept "${PORT}" -keyform pem -certform pem -tls1_2 ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" ${DSA_PARAMS} -Verify 1 -CAfile "${CA_CERT}" >/dev/null
 		PID=$!
 		wait_server ${PID}
 
@@ -634,7 +636,7 @@ run_server_suite() {
 		PID=$!
 		wait_server ${PID}
 
-		${OPENSSL_CLI} s_client -host localhost -cipher ALL:@SECLEVEL=1 -tls1 -port "${PORT}" -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
+		${OPENSSL_CLI} s_client -host localhost -cipher ALL:@SECLEVEL=1 -sigalgs "$SIGALGS" -tls1 -port "${PORT}" -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
 			fail ${PID} "Failed"
 
 		kill ${PID}
@@ -756,7 +758,7 @@ run_server_suite() {
 			PID=$!
 			wait_server ${PID}
 
-			${OPENSSL_CLI} s_client -cipher DHE -host localhost -cipher 'ALL:@SECLEVEL=1' -tls1_2 -port "${PORT}" -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
+			${OPENSSL_CLI} s_client -cipher DHE -host localhost -cipher 'ALL:@SECLEVEL=1' -sigalgs "$SIGALGS" -tls1_2 -port "${PORT}" -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
 				fail ${PID} "Failed"
 
 			kill ${PID}

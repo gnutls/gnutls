@@ -218,9 +218,7 @@ pwd_read_conf(const char *pconf_file, SRP_PWD_ENTRY * entry, int idx)
 		}
 
 		if (strncmp(indexstr, line, MAX(i, len)) == 0) {
-			if ((idx =
-			     parse_tpasswd_conf_values(entry,
-						       line)) >= 0) {
+			if (parse_tpasswd_conf_values(entry, line) >= 0) {
 				ret = 0;
 				goto cleanup;
 			} else {

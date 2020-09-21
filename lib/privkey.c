@@ -1879,15 +1879,17 @@ int gnutls_privkey_verify_params(gnutls_privkey_t key)
 int
 gnutls_privkey_get_spki(gnutls_privkey_t privkey, gnutls_x509_spki_t spki, unsigned int flags)
 {
+	gnutls_x509_spki_t p = &privkey->key.x509->params.spki;
+
 	if (privkey == NULL || privkey->type != GNUTLS_PRIVKEY_X509) {
 		gnutls_assert();
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
 
-	if (privkey->key.x509->params.spki.pk == GNUTLS_PK_UNKNOWN)
+	if (p->pk == GNUTLS_PK_UNKNOWN)
 		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
-	memcpy(spki, &privkey->key.x509->params.spki, sizeof(gnutls_x509_spki_st));
+	memcpy(spki, p, sizeof(gnutls_x509_spki_st));
 
 	return 0;
 }

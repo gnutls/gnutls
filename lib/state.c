@@ -706,7 +706,7 @@ void gnutls_deinit(gnutls_session_t session)
 	_gnutls_selected_certs_deinit(session);
 
 	/* destroy any session ticket we may have received */
-	_gnutls13_session_ticket_unset(session);
+	tls13_ticket_deinit(&session->internals.tls13_ticket);
 
 	/* we rely on priorities' internal reference counting */
 	gnutls_priority_deinit(session->internals.priorities);

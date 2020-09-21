@@ -52,6 +52,7 @@ int disable_system_calls(void)
 	}
 
 	ADD_SYSCALL(nanosleep, 0);
+	ADD_SYSCALL(clock_nanosleep, 0);
 	ADD_SYSCALL(time, 0);
 	ADD_SYSCALL(getpid, 0);
 	ADD_SYSCALL(gettimeofday, 0);
