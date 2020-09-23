@@ -244,7 +244,7 @@ TESTDATE="2018-03-01"
 
 # Start OpenSSL TLS server
 #
-launch_bare_server $$ \
+launch_bare_server \
 	  datefudge "${TESTDATE}" \
 	  "${OPENSSL}" s_server -cert ${SERVER_CERT_FILE} -key ${SERVER_KEY_FILE} \
 	  -CAfile ${CA_FILE} -port ${PORT} -Verify 1 -verify_return_error -www

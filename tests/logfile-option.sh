@@ -59,7 +59,7 @@ TMPFILE2=save-data2.$$.tmp
 OPTS="--sni-hostname example.com --verify-hostname example.com"
 
 eval "${GETPORT}"
-launch_server $$ --echo --priority NORMAL:+ECDHE-PSK:+DHE-PSK:+PSK --pskpasswd=${PSK}
+launch_server --echo --priority NORMAL:+ECDHE-PSK:+DHE-PSK:+PSK --pskpasswd=${PSK}
 PID=$!
 wait_server ${PID}
 
@@ -86,7 +86,7 @@ fi
 rm -f ${TMPFILE1} ${TMPFILE2}
 
 eval "${GETPORT}"
-launch_server $$ --echo --priority NORMAL:+ECDHE-PSK:+DHE-PSK:+PSK --pskpasswd=${PSK}
+launch_server --echo --priority NORMAL:+ECDHE-PSK:+DHE-PSK:+PSK --pskpasswd=${PSK}
 PID=$!
 wait_server ${PID}
 
@@ -115,7 +115,7 @@ rm -f ${TMPFILE1} ${TMPFILE2}
 
 echo "x509 functionality test"
 eval "${GETPORT}"
-launch_server $$ --echo --sni-hostname-fatal --sni-hostname example.com --x509keyfile ${KEY1} --x509certfile ${CERT1}
+launch_server --echo --sni-hostname-fatal --sni-hostname example.com --x509keyfile ${KEY1} --x509certfile ${CERT1}
 PID=$!
 wait_server ${PID}
 
@@ -141,7 +141,7 @@ fi
 rm -f ${TMPFILE1} ${TMPFILE2}
 
 eval "${GETPORT}"
-launch_server $$ --echo --sni-hostname-fatal --sni-hostname example.com --x509keyfile ${KEY1} --x509certfile ${CERT1}
+launch_server --echo --sni-hostname-fatal --sni-hostname example.com --x509keyfile ${KEY1} --x509certfile ${CERT1}
 PID=$!
 wait_server ${PID}
 

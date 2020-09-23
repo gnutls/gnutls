@@ -86,7 +86,7 @@ run_client_suite() {
 	fi
 
 	eval "${GETPORT}"
-	LD_LIBRARY_PATH=$LDPATH launch_server $$ --priority "NORMAL:+SHA256${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${DH_PARAMS}"
+	LD_LIBRARY_PATH=$LDPATH launch_server --priority "NORMAL:+SHA256${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${DH_PARAMS}"
 	PID=$!
 	wait_server ${PID}
 
@@ -150,7 +150,7 @@ run_server_suite() {
 	fi
 
 	eval "${GETPORT}"
-	launch_server $$ --priority "NORMAL:+SHA256${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${DH_PARAMS}"
+	launch_server --priority "NORMAL:+SHA256${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${DH_PARAMS}"
 	PID=$!
 	wait_server ${PID}
 

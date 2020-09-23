@@ -52,7 +52,7 @@ KEY1=${srcdir}/../doc/credentials/x509/key-rsa.pem
 CERT1=${srcdir}/../doc/credentials/x509/cert-rsa.pem
 
 eval "${GETPORT}"
-launch_server $$ --x509keyfile ${KEY1} --x509certfile ${CERT1} --udp -d 2
+launch_server --x509keyfile ${KEY1} --x509certfile ${CERT1} --udp -d 2
 PID=$!
 
 wait_udp_server $PID

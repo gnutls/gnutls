@@ -60,7 +60,7 @@ CERT1=${srcdir}/../doc/credentials/x509/cert-rsa.pem
 unset GNUTLS_SYSTEM_PRIORITY_FILE
 
 eval "${GETPORT}"
-launch_server $$ --echo --priority "NORMAL:-VERS-ALL:+VERS-TLS1.2" --x509keyfile ${KEY1} --x509certfile ${CERT1}
+launch_server --echo --priority "NORMAL:-VERS-ALL:+VERS-TLS1.2" --x509keyfile ${KEY1} --x509certfile ${CERT1}
 PID=$!
 wait_server ${PID}
 
@@ -89,7 +89,7 @@ KEY1=${srcdir}/../doc/credentials/x509/key-rsa.pem
 CERT1=${srcdir}/../doc/credentials/x509/cert-rsa.pem
 
 eval "${GETPORT}"
-launch_server $$ --echo --priority "NORMAL:-VERS-ALL:+VERS-TLS1.2" --x509keyfile ${KEY1} --x509certfile ${CERT1}
+launch_server --echo --priority "NORMAL:-VERS-ALL:+VERS-TLS1.2" --x509keyfile ${KEY1} --x509certfile ${CERT1}
 PID=$!
 wait_server ${PID}
 

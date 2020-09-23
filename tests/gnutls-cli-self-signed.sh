@@ -119,7 +119,7 @@ i2yISkQxkJZp8sTwSlIGZSBpuZcDq9AdUjan1WhGgl4hpHpjr3Y=
 __EOF__
 
 eval "${GETPORT}"
-launch_server $$ --echo --x509keyfile ${TMPFILE} --x509certfile ${TMPFILE}
+launch_server --echo --x509keyfile ${TMPFILE} --x509certfile ${TMPFILE}
 PID=$!
 wait_server ${PID}
 

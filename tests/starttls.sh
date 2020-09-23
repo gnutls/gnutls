@@ -33,7 +33,7 @@ SERV="${SERV} -q"
 echo "Checking STARTTLS"
 
 eval "${GETPORT}"
-launch_server $$ --echo --priority "NORMAL:+ANON-ECDH"
+launch_server --echo --priority "NORMAL:+ANON-ECDH"
 PID=$!
 wait_server ${PID}
 

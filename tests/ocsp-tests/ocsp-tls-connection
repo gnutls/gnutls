@@ -112,7 +112,7 @@ echo "=== Bringing OCSP server up ==="
 # if started repeatedly in a short time, probably a lack of
 # SO_REUSEADDR usage.
 PORT=${OCSP_PORT}
-launch_bare_server $$ \
+launch_bare_server \
 	  datefudge "${TESTDATE}" \
 	  "${OPENSSL}" ocsp -index "${srcdir}/ocsp-tests/certs/ocsp_index.txt" -text \
 	  -port "${OCSP_PORT}" \
@@ -150,7 +150,7 @@ fi
 echo "=== Test 1: Server with valid certificate ==="
 
 PORT=${TLS_SERVER_PORT}
-launch_bare_server $$ \
+launch_bare_server \
 	  datefudge "${TESTDATE}" \
 	  "${GNUTLS_SERV}" --echo --disable-client-cert \
 	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
@@ -195,7 +195,7 @@ echo "=== Test 2: Server with revoked certificate ==="
 eval "${GETPORT}"
 TLS_SERVER_PORT=$PORT
 
-launch_bare_server $$ \
+launch_bare_server \
 	  datefudge "${TESTDATE}" \
 	  "${GNUTLS_SERV}" --echo --disable-client-cert \
 	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_bad.key" \

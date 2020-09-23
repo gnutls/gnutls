@@ -85,7 +85,7 @@ for params in $ALLOWED_PARAMS; do
 	PARAMS=${srcdir}/../doc/credentials/dhparams/${params}.pem
 
 	eval "${GETPORT}"
-	launch_server $$ ${OPTS} --x509keyfile ${KEY1} --x509certfile ${CERT1} --dhparams ${PARAMS}
+	launch_server ${OPTS} --x509keyfile ${KEY1} --x509certfile ${CERT1} --dhparams ${PARAMS}
 	PID=$!
 	wait_server ${PID}
 
@@ -102,7 +102,7 @@ for params in $DISALLOWED_PARAMS; do
 	PARAMS=${srcdir}/../doc/credentials/dhparams/${params}.pem
 
 	eval "${GETPORT}"
-	launch_server $$ ${OPTS} --x509keyfile ${KEY1} --x509certfile ${CERT1} --dhparams ${PARAMS}
+	launch_server ${OPTS} --x509keyfile ${KEY1} --x509certfile ${CERT1} --dhparams ${PARAMS}
 	PID=$!
 	wait_server ${PID}
 

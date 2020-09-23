@@ -900,7 +900,7 @@ use_certificate_test () {
 	echo -n "* Using PKCS #11 with gnutls-cli (${txt})... "
 	# start server
 	eval "${GETPORT}"
-	launch_pkcs11_server $$ "${ADDITIONAL_PARAM}" --echo --priority NORMAL --x509certfile="${certfile}" \
+	launch_pkcs11_server "${ADDITIONAL_PARAM}" --echo --priority NORMAL --x509certfile="${certfile}" \
 		--x509keyfile="$keyfile" --x509cafile="${cafile}" \
 		--verify-client-cert --require-client-cert >>"${LOGFILE}" 2>&1
 

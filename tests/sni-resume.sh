@@ -52,7 +52,7 @@ echo "Checking if the SNI extension is parsed in gnutls-serv during" \
 TMPFILE="servoutput.$$.tmp"
 
 eval "${GETPORT}"
-launch_server $$ --echo --priority ${PRIORITY} --sni-hostname-fatal \
+launch_server --echo --priority ${PRIORITY} --sni-hostname-fatal \
 	      --sni-hostname server.example.com --noticket 2>${TMPFILE}
 PID=$!
 wait_server ${PID}

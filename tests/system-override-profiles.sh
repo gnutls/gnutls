@@ -47,7 +47,7 @@ CERT="${srcdir}/certs/cert-ecc256.pem"
 KEY="${srcdir}/certs/ecc256.pem"
 
 eval "${GETPORT}"
-launch_server $$ --echo --priority "NORMAL" --x509keyfile ${KEY} --x509certfile ${CERT}
+launch_server --echo --priority "NORMAL" --x509keyfile ${KEY} --x509certfile ${CERT}
 PID=$!
 wait_server ${PID}
 

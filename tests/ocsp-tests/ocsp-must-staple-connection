@@ -130,7 +130,7 @@ cp "${srcdir}/ocsp-tests/certs/ocsp_index.txt.attr" ${ATTRFILE}
 # if started repeatedly in a short time, probably a lack of
 # SO_REUSEADDR usage.
 PORT=${OCSP_PORT}
-launch_bare_server $$ \
+launch_bare_server \
 	  datefudge "${TESTDATE}" \
 	  "${OPENSSL}" ocsp -index "${INDEXFILE}" -text \
 	  -port "${OCSP_PORT}" \
@@ -171,7 +171,7 @@ fi
 echo "=== Test 1: Server with valid certificate - no staple ==="
 
 PORT=${TLS_SERVER_PORT}
-launch_bare_server $$ \
+launch_bare_server \
 	  datefudge "${TESTDATE}" \
 	  "${GNUTLS_SERV}" --echo --disable-client-cert \
 	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
@@ -203,7 +203,7 @@ eval "${GETPORT}"
 # Port for gnutls-serv
 TLS_SERVER_PORT=$PORT
 PORT=${TLS_SERVER_PORT}
-launch_bare_server $$ \
+launch_bare_server \
 	  datefudge "${TESTDATE}" \
 	  "${GNUTLS_SERV}" --echo --disable-client-cert \
 	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
@@ -238,7 +238,7 @@ eval "${GETPORT}"
 # Port for gnutls-serv
 TLS_SERVER_PORT=$PORT
 PORT=${TLS_SERVER_PORT}
-launch_bare_server $$ \
+launch_bare_server \
 	  datefudge "${TESTDATE}" \
 	  "${GNUTLS_SERV}" --echo --disable-client-cert \
 	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
@@ -274,7 +274,7 @@ eval "${GETPORT}"
 # Port for gnutls-serv
 TLS_SERVER_PORT=$PORT
 PORT=${TLS_SERVER_PORT}
-launch_bare_server $$ \
+launch_bare_server \
 	  datefudge "${TESTDATE}" \
 	  "${GNUTLS_SERV}" --echo --disable-client-cert \
 	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
@@ -332,7 +332,7 @@ fi
 
 echo "=== Test 5.1: Server with valid certificate - expired staple (ignoring errors) ==="
 
-launch_bare_server $$ \
+launch_bare_server \
 	  datefudge "${TESTDATE}" \
 	  "${GNUTLS_SERV}" --echo --disable-client-cert \
 	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
@@ -376,7 +376,7 @@ eval "${GETPORT}"
 # Port for gnutls-serv
 TLS_SERVER_PORT=$PORT
 PORT=${TLS_SERVER_PORT}
-launch_bare_server $$ \
+launch_bare_server \
 	  datefudge "${TESTDATE}" \
 	  "${GNUTLS_SERV}" --echo --disable-client-cert \
 	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
@@ -409,7 +409,7 @@ eval "${GETPORT}"
 # Port for gnutls-serv
 TLS_SERVER_PORT=$PORT
 PORT=${TLS_SERVER_PORT}
-launch_bare_server $$ \
+launch_bare_server \
 	  datefudge "${TESTDATE}" \
 	  "${GNUTLS_SERV}" --echo --disable-client-cert \
 	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
@@ -442,7 +442,7 @@ eval "${GETPORT}"
 # Port for gnutls-serv
 TLS_SERVER_PORT=$PORT
 PORT=${TLS_SERVER_PORT}
-launch_bare_server $$ \
+launch_bare_server \
 	  datefudge "${TESTDATE}" \
 	  "${GNUTLS_SERV}" --echo --disable-client-cert \
 	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
@@ -475,7 +475,7 @@ eval "${GETPORT}"
 # Port for gnutls-serv
 TLS_SERVER_PORT=$PORT
 PORT=${TLS_SERVER_PORT}
-launch_bare_server $$ \
+launch_bare_server \
 	  datefudge "${TESTDATE}" \
 	  "${GNUTLS_SERV}" --echo --disable-client-cert \
 	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \

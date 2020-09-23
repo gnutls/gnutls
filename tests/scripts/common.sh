@@ -161,16 +161,11 @@ wait_for_free_port()
 }
 
 launch_server() {
-	PARENT="$1"
-	shift
-
 	wait_for_free_port ${PORT}
 	${SERV} ${DEBUG} -p "${PORT}" "$@" >${LOGFILE-/dev/null} &
 }
 
 launch_pkcs11_server() {
-	PARENT="$1"
-	shift
 	PROVIDER="$1"
 	shift
 
@@ -180,9 +175,6 @@ launch_pkcs11_server() {
 }
 
 launch_bare_server() {
-	PARENT="$1"
-	shift
-
 	wait_for_free_port ${PORT}
 	${SERV} "$@" >${LOGFILE-/dev/null} &
 }

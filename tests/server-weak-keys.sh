@@ -54,7 +54,7 @@ KEY1=${srcdir}/certs/rsa-512.pem
 CERT1=${srcdir}/certs/rsa-512.pem
 
 eval "${GETPORT}"
-launch_server $$ --echo --priority "NORMAL" --x509keyfile ${KEY1} --x509certfile ${CERT1}
+launch_server --echo --priority "NORMAL" --x509keyfile ${KEY1} --x509certfile ${CERT1}
 PID=$!
 wait_server ${PID}
 

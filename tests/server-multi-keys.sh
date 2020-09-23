@@ -60,7 +60,7 @@ CAFILE=${srcdir}/../doc/credentials/x509/ca.pem
 TMPFILE=outcert.$$.tmp
 
 eval "${GETPORT}"
-launch_server $$ --echo --priority "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA" --x509keyfile ${KEY1} --x509certfile ${CERT1} \
+launch_server --echo --priority "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA" --x509keyfile ${KEY1} --x509certfile ${CERT1} \
 	--x509keyfile ${KEY2} --x509certfile ${CERT2} --x509keyfile ${KEY3} --x509certfile ${CERT3}
 PID=$!
 wait_server ${PID}

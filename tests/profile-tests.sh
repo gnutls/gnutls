@@ -81,7 +81,7 @@ _EOF_
 KEY="${CERT}"
 
 eval "${GETPORT}"
-launch_server $$ --echo --priority "NORMAL" --x509keyfile ${KEY} --x509certfile ${CERT}
+launch_server --echo --priority "NORMAL" --x509keyfile ${KEY} --x509certfile ${CERT}
 PID=$!
 wait_server ${PID}
 
@@ -145,7 +145,7 @@ _EOF_
 KEY="${CERT}"
 
 eval "${GETPORT}"
-launch_server $$ --echo --priority "NORMAL" --x509keyfile ${KEY} --x509certfile ${CERT}
+launch_server --echo --priority "NORMAL" --x509keyfile ${KEY} --x509certfile ${CERT}
 PID=$!
 wait_server ${PID}
 
@@ -213,7 +213,7 @@ _EOF_
 KEY="${CERT}"
 
 eval "${GETPORT}"
-launch_server $$ --echo --priority "NORMAL" --x509keyfile ${KEY} --x509certfile ${CERT}
+launch_server --echo --priority "NORMAL" --x509keyfile ${KEY} --x509certfile ${CERT}
 PID=$!
 wait_server ${PID}
 

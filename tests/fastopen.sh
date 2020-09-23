@@ -53,7 +53,7 @@ CERT1=${srcdir}/../doc/credentials/x509/cert-rsa.pem
 CA1=${srcdir}/../doc/credentials/x509/ca.pem
 
 eval "${GETPORT}"
-launch_server $$ --echo --x509keyfile ${KEY1} --x509certfile ${CERT1}
+launch_server --echo --x509keyfile ${KEY1} --x509certfile ${CERT1}
 PID=$!
 wait_server ${PID}
 
