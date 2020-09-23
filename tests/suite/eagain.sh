@@ -20,8 +20,8 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-srcdir="${srcdir:-.}"
-SERV="${SERV:-../../src/gnutls-serv${EXEEXT}}"
+: ${srcdir=.}
+: ${SERV=../../src/gnutls-serv${EXEEXT}}
 
 if ! test -x "${SERV}"; then
 	exit 77

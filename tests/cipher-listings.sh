@@ -20,10 +20,10 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-srcdir="${srcdir:-.}"
-CLI="${CLI:-../src/gnutls-cli${EXEEXT}}"
-DIFF="${DIFF:-diff -b -B}"
-SED="${SED:-sed}"
+: ${srcdir=.}
+: ${CLI=../src/gnutls-cli${EXEEXT}}
+: ${DIFF=diff -b -B}
+: ${SED=sed}
 unset RETCODE
 
 TMPFILE=cipher-listings.$$.tmp

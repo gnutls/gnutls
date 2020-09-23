@@ -20,7 +20,7 @@
 
 set -e
 
-srcdir="${srcdir:-.}"
+: ${srcdir=.}
 
 echo "Running PKITS CRT..."
 "${srcdir}/pkits_crt"

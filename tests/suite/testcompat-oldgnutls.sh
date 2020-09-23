@@ -30,9 +30,9 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
 # WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-abs_top_srcdir="${abs_top_srcdir:-$(pwd)/../../}"
-srcdir="${srcdir:-.}"
-CLI="${CLI:-../../src/gnutls-cli${EXEEXT}}"
+: ${abs_top_srcdir=$(pwd)/../../}
+: ${srcdir=.}
+: ${CLI=../../src/gnutls-cli${EXEEXT}}
 TMPFILE=testcompat-oldgnutls.$$.tmp
 
 # This assumes a root directory in /usr/local/OLDGNUTLS containing the
@@ -58,7 +58,7 @@ skip_if_no_datefudge
 
 . "${srcdir}/testcompat-common"
 
-PORT="${PORT:-${RPORT}}"
+: ${PORT=${RPORT}}
 
 SERV=/usr/local/OLDGNUTLS/usr/bin/gnutls-serv
 

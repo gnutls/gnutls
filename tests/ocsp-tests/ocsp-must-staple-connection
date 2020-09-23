@@ -18,13 +18,13 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-srcdir="${srcdir:-.}"
-CERTTOOL="${CERTTOOL:-../src/certtool${EXEEXT}}"
-OCSPTOOL="${OCSPTOOL:-../src/ocsptool${EXEEXT}}"
+: ${srcdir=.}
+: ${CERTTOOL=../src/certtool${EXEEXT}}
+: ${OCSPTOOL=../src/ocsptool${EXEEXT}}
 GNUTLS_SERV="${SERV:-../src/gnutls-serv${EXEEXT}}"
 unset SERV
-GNUTLS_CLI="${GNUTLS_CLI:-../src/gnutls-cli${EXEEXT}}"
-DIFF="${DIFF:-diff}"
+: ${GNUTLS_CLI=../src/gnutls-cli${EXEEXT}}
+: ${DIFF=diff}
 TEMPLATE_FILE="ms-out.$$.tmpl.tmp"
 SERVER_CERT_FILE="ms-cert.$$.pem.tmp"
 SERVER_CERT_NO_EXT_FILE="ms-cert-no-ext.$$.pem.tmp"

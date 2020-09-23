@@ -22,8 +22,8 @@
 
 #set -e
 
-srcdir="${srcdir:-.}"
-CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
+: ${srcdir=.}
+: ${CERTTOOL=../../src/certtool${EXEEXT}}
 TEMPLFILE=template-dsa.$$.tmp
 CAFILE=ca-dsa.$$.tmp
 SUBCAFILE=subca-dsa.$$.tmp

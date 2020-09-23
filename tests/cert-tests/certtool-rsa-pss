@@ -20,9 +20,9 @@
 
 #set -e
 
-srcdir="${srcdir:-.}"
-CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
-DIFF="${DIFF:-diff -b -B}"
+: ${srcdir=.}
+: ${CERTTOOL=../../src/certtool${EXEEXT}}
+: ${DIFF=diff -b -B}
 OUTFILE=cert-pss-privkey.$$.tmp
 TMPFILE=cert-pss.$$.tmp
 TMPFILE2=cert2-pss.$$.tmp

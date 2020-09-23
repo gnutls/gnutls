@@ -21,8 +21,8 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-srcdir="${srcdir:-.}"
-CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
+: ${srcdir=.}
+: ${CERTTOOL=../../src/certtool${EXEEXT}}
 
 if ! test -x "${CERTTOOL}"; then
 	exit 77
@@ -37,7 +37,7 @@ if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=1"
 fi
 
-DIFF="${DIFF:-diff -b -B}"
+: ${DIFF=diff -b -B}
 DEBUG=""
 
 TMPFILE=pkcs12.$$.tmp

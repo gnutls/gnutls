@@ -19,12 +19,12 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-srcdir="${srcdir:-.}"
-SERV="${SERV:-../src/gnutls-serv${EXEEXT}}"
-CLI="${CLI:-../src/gnutls-cli${EXEEXT}}"
+: ${srcdir=.}
+: ${SERV=../src/gnutls-serv${EXEEXT}}
+: ${CLI=../src/gnutls-cli${EXEEXT}}
 TMPFILE=config.$$.tmp
 TMPFILE2=log.$$.tmp
-STOCK_PRIORITY="${GNUTLS_SYSTEM_PRIORITY_FILE:-./system.prio}"
+STOCK_PRIORITY="${GNUTLS_SYSTEM_PRIORITY_FILE-./system.prio}"
 export GNUTLS_SYSTEM_PRIORITY_FAIL_ON_INVALID=1
 
 if ! test -x "${SERV}"; then

@@ -21,13 +21,13 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-srcdir="${srcdir:-.}"
-CERTTOOL="${CERTTOOL:-../src/certtool${EXEEXT}}"
-OCSPTOOL="${OCSPTOOL:-../src/ocsptool${EXEEXT}}"
+: ${srcdir=.}
+: ${CERTTOOL=../src/certtool${EXEEXT}}
+: ${OCSPTOOL=../src/ocsptool${EXEEXT}}
 GNUTLS_SERV="${SERV:-../src/gnutls-serv${EXEEXT}}"
 unset SERV
-GNUTLS_CLI="${GNUTLS_CLI:-../src/gnutls-cli${EXEEXT}}"
-DIFF="${DIFF:-diff}"
+: ${GNUTLS_CLI=../src/gnutls-cli${EXEEXT}}
+: ${DIFF=diff}
 SERVER_CERT_FILE="cert.$$.pem.tmp"
 SERVER_KEY_FILE="key.$$.pem.tmp"
 CLIENT_CERT_FILE="cli-cert.$$.pem.tmp"

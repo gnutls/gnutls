@@ -20,9 +20,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 #
 
-srcdir="${srcdir:-.}"
-SERV="${SERV:-../src/gnutls-serv${EXEEXT}}"
-DCLI="${DCLI:-../src/gnutls-cli-debug${EXEEXT}}"
+: ${srcdir=.}
+: ${SERV=../src/gnutls-serv${EXEEXT}}
+: ${DCLI=../src/gnutls-cli-debug${EXEEXT}}
 OUTFILE=cli-debug.$$.tmp
 TMPFILE=config.$$.tmp
 unset RETCODE

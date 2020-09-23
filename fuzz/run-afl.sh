@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-srcdir="${srcdir:-.}"
+: ${srcdir=.}
 export LD_LIBRARY_PATH=${srcdir}/../lib/.libs/
 
 cat ${srcdir}/../config.log|grep afl-gcc >/dev/null 2>&1

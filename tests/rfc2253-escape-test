@@ -22,7 +22,7 @@
 
 set -e
 
-CERTTOOL="${CERTTOOL:-../src/certtool${EXEEXT}}"
+: ${CERTTOOL=../src/certtool${EXEEXT}}
 
 if ! test -x "${CERTTOOL}"; then
 	exit 77

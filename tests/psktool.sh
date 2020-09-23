@@ -19,8 +19,8 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-srcdir="${srcdir:-.}"
-PSKTOOL="${PSKTOOL:-../src/psktool${EXEEXT}}"
+: ${srcdir=.}
+: ${PSKTOOL=../src/psktool${EXEEXT}}
 TMPFILE=psktool.$$.tmp
 
 if ! test -x "${PSKTOOL}"; then

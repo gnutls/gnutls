@@ -20,9 +20,9 @@
 
 #set -e
 
-srcdir="${srcdir:-.}"
-CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
-DIFF="${DIFF:-diff}"
+: ${srcdir=.}
+: ${CERTTOOL=../../src/certtool${EXEEXT}}
+: ${DIFF=diff}
 TMPFILE=sha3.$$.tmp
 
 if ! test -x "${CERTTOOL}"; then

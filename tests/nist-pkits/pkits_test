@@ -2,7 +2,7 @@
 
 set -e
 
-srcdir="${srcdir:-.}"
+: ${srcdir=.}
 
 test -d certs || unzip "${srcdir}/PKITS_data.zip"
 

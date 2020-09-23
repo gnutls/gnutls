@@ -25,8 +25,8 @@
 # line. This seems not to work under windows. It intentionally depends on
 # bash as few other shells cannot handle utf8 strings
 
-srcdir="${srcdir:-.}"
-CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
+: ${srcdir=.}
+: ${CERTTOOL=../../src/certtool${EXEEXT}}
 
 if ! test -x "${CERTTOOL}"; then
 	exit 77
@@ -36,7 +36,7 @@ if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=1"
 fi
 
-DIFF="${DIFF:-diff}"
+: ${DIFF=diff}
 DEBUG=""
 
 TMPFILE=pkcs12-utf8.$$.tmp

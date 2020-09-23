@@ -22,8 +22,8 @@
 
 # This checks whether OIDs > 2^32 are correctly decoded.
 
-srcdir="${srcdir:-.}"
-CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
+: ${srcdir=.}
+: ${CERTTOOL=../../src/certtool${EXEEXT}}
 OUTFILE="crl.$$.pem"
 
 if ! test -x "${CERTTOOL}"; then

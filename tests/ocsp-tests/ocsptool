@@ -21,10 +21,10 @@
 
 # Sanity check program for various ocsptool options
 
-srcdir="${srcdir:-.}"
-OCSPTOOL="${OCSPTOOL:-../src/ocsptool${EXEEXT}}"
-DIFF="${DIFF:-diff}"
-CMP="${CMP:-cmp}"
+: ${srcdir=.}
+: ${OCSPTOOL=../src/ocsptool${EXEEXT}}
+: ${DIFF=diff}
+: ${CMP=cmp}
 TMPFILE=ocsp.$$.tmp
 
 if ! test -x "${OCSPTOOL}"; then

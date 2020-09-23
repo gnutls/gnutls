@@ -22,9 +22,9 @@
 
 # This checks whether invalid UTF8 strings trigger valgrind warnings.
 
-srcdir="${srcdir:-.}"
-CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
-DIFF="${DIFF:-diff -b -B}"
+: ${srcdir=.}
+: ${CERTTOOL=../../src/certtool${EXEEXT}}
+: ${DIFF=diff -b -B}
 outfile="out.$$.pem"
 
 if ! test -x "${CERTTOOL}"; then

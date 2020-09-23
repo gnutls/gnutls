@@ -22,10 +22,10 @@
 
 export TZ="UTC"
 
-srcdir="${srcdir:-.}"
-CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
-DIFF="${DIFF:-diff}"
-ac_cv_sizeof_time_t="${ac_cv_sizeof_time_t:-8}"
+: ${srcdir=.}
+: ${CERTTOOL=../../src/certtool${EXEEXT}}
+: ${DIFF=diff}
+: ${ac_cv_sizeof_time_t=8}
 
 if ! test -x "${CERTTOOL}"; then
 	exit 77

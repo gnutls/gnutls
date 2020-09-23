@@ -20,10 +20,10 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-srcdir="${srcdir:-.}"
+: ${srcdir=.}
 TLSPY_SERV="${srcdir}/tls-fuzzer/tlslite-ng/scripts/tls.py"
 PYPATH="${srcdir}/tls-fuzzer/tlsfuzzer/"
-CLI="${CLI:-../../src/gnutls-cli${EXEEXT}}"
+: ${CLI=../../src/gnutls-cli${EXEEXT}}
 unset RETCODE
 
 if test "${PYTHON}" = ":" ; then

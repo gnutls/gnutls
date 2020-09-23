@@ -24,9 +24,9 @@
 
 # This is a reproducer for #767
 
-srcdir="${srcdir:-.}"
-CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
-DIFF="${DIFF:-diff}"
+: ${srcdir=.}
+: ${CERTTOOL=../../src/certtool${EXEEXT}}
+: ${DIFF=diff}
 
 if ! test -x "${CERTTOOL}"; then
 	exit 77

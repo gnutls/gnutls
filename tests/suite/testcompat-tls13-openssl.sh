@@ -30,10 +30,10 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
 # WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-abs_top_srcdir="${abs_top_srcdir:-$(pwd)/../../}"
-srcdir="${srcdir:-.}"
+: ${abs_top_srcdir=$(pwd)/../../}
+: ${srcdir=.}
 GNUTLS_SERV="${SERV:-../../src/gnutls-serv${EXEEXT}}"
-CLI="${CLI:-../../src/gnutls-cli${EXEEXT}}"
+: ${CLI=../../src/gnutls-cli${EXEEXT}}
 unset RETCODE
 
 if ! test -x "${CLI}"; then
@@ -54,7 +54,7 @@ skip_if_no_datefudge
 
 . "${srcdir}/testcompat-common"
 
-PORT="${PORT:-${RPORT}}"
+: ${PORT=${RPORT}}
 
 SERV=openssl
 OPENSSL_CLI="$SERV"

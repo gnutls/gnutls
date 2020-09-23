@@ -22,9 +22,9 @@
 
 # This checks whether OIDs > 2^32 are correctly decoded.
 
-srcdir="${srcdir:-.}"
-CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
-DIFF="${DIFF:-diff -b -B}"
+: ${srcdir=.}
+: ${CERTTOOL=../../src/certtool${EXEEXT}}
+: ${DIFF=diff -b -B}
 OUTFILE="long-oids.$$.pem.tmp"
 TMPFILE1="long-oids1.$$.pem.tmp"
 

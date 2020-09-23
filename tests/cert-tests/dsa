@@ -20,13 +20,13 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-srcdir="${srcdir:-.}"
-SERV="${SERV:-../../src/gnutls-serv}"
-CLI="${CLI:-../../src/gnutls-cli}"
+: ${srcdir=.}
+: ${SERV=../../src/gnutls-serv}
+: ${CLI=../../src/gnutls-cli}
 DEBUG=""
 unset RETCODE
 
-CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
+: ${CERTTOOL=../../src/certtool${EXEEXT}}
 
 if ! test -x "${CERTTOOL}"; then
 	exit 77

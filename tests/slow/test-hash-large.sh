@@ -27,7 +27,7 @@ if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
 
-srcdir="${srcdir:-.}"
+: ${srcdir=.}
 . "${srcdir}/../scripts/common.sh"
 
 run_test() {
