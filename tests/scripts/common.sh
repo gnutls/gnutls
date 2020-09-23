@@ -165,15 +165,6 @@ launch_server() {
 	${SERV} ${DEBUG} -p "${PORT}" "$@" >${LOGFILE-/dev/null} &
 }
 
-launch_pkcs11_server() {
-	PROVIDER="$1"
-	shift
-
-	wait_for_free_port ${PORT}
-
-	${VALGRIND} ${SERV} ${PROVIDER} ${DEBUG} -p "${PORT}" "$@" &
-}
-
 launch_bare_server() {
 	wait_for_free_port ${PORT}
 	${SERV} "$@" >${LOGFILE-/dev/null} &
