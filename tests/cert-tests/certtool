@@ -39,8 +39,8 @@ if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
 
-SETSID=$(which setsid)
-if test -n "${SETSID}";then
+: ${SETSID=setsid}
+if ("$SETSID" --version) >/dev/null 2>&1; then
 	${VALGRIND} "${CERTTOOL}" --generate-privkey --rsa --outfile ${TMPFILE1} --pkcs8 --password ${PASS}
 	if test $? != 0;then
 		echo "private key generation failed"

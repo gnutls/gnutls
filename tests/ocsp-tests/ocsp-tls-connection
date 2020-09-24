@@ -69,8 +69,8 @@ OCSP_PORT=$PORT
 SERVER_START_TIMEOUT=10
 
 # Check for OpenSSL
-OPENSSL=`which openssl`
-if ! test -x "${OPENSSL}"; then
+: ${OPENSSL=openssl}
+if ! ("$OPENSSL" version) > /dev/null 2>&1; then
     echo "You need openssl to run this test."
     exit 77
 fi

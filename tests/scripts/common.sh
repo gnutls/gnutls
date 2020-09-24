@@ -26,35 +26,43 @@ export TZ="UTC"
 # command in the caller's PFCMD, or exit, indicating an unsupported
 # test.  Prefer ss from iproute2 over the older netstat.
 have_port_finder() {
-	for file in $(which ss 2> /dev/null) /*bin/ss /usr/*bin/ss /usr/local/*bin/ss;do
-		if test -x "$file";then
-			PFCMD="$file";return 0
+	# Prefer PFCMD if set
+	if test "${PFCMD+set}" = set; then
+		return
+	fi
+
+	if (ss --version) > /dev/null 2>&1; then
+		PFCMD=ss
+		return
+	fi
+
+	# 'ss' might be installed in /sbin
+	for dir in /sbin /usr/sbin /usr/local/sbin; do
+		if ($dir/ss --version) > /dev/null 2>&1; then
+			PFCMD=$dir/ss
+			return
 		fi
 	done
 
-	if test -z "$PFCMD";then
-	for file in $(which netstat 2> /dev/null) /bin/netstat /usr/bin/netstat /usr/local/bin/netstat;do
-		if test -x "$file";then
-			PFCMD="$file";return 0
-		fi
-	done
+	# We can't assume netstat --version for portability reasons
+	if (type netstat) > /dev/null 2>&1; then
+		PFCMD=netstat
+		return
 	fi
 
-	if test -z "$PFCMD";then
-		echo "neither ss nor netstat found"
-		exit 1
-	fi
+	echo "neither ss nor netstat found" 1>&2
+	exit 77
 }
 
 check_if_port_in_use() {
-	local PORT="$1"
-	local PFCMD; have_port_finder
+	local PORT=$1
+	have_port_finder
 	$PFCMD -an|grep "[\:\.]$PORT" >/dev/null 2>&1
 }
 
 check_if_port_listening() {
-	local PORT="$1"
-	local PFCMD; have_port_finder
+	local PORT=$1
+	have_port_finder
 	$PFCMD -anl|grep "[\:\.]$PORT"|grep LISTEN >/dev/null 2>&1
 }
 
@@ -101,26 +109,20 @@ fail() {
 
 exit_if_non_x86()
 {
-which lscpu >/dev/null 2>&1
-if test $? = 0;then
-        $(which lscpu)|grep Architecture|grep x86
-        if test $? != 0;then
-                echo "non-x86 CPU detected"
-                exit 0
-        fi
-fi
+	if (lscpu --version) >/dev/null 2>&1 && \
+	    ! lscpu 2>/dev/null | grep 'Architecture:[	]*x86' >/dev/null; then
+		echo "non-x86 CPU detected"
+		exit
+	fi
 }
 
 exit_if_non_padlock()
 {
-which lscpu >/dev/null 2>&1
-if test $? = 0;then
-        $(which lscpu)|grep Flags|grep phe
-        if test $? != 0;then
-                echo "non-Via padlock CPU detected"
-                exit 0
-        fi
-fi
+	if (lscpu --version) >/dev/null 2>&1 && \
+	   ! lscpu 2>/dev/null | grep 'Flags:[	]*phe' >/dev/null; then
+		echo "non-Via padlock CPU detected"
+		exit
+	fi
 }
 
 wait_for_port()

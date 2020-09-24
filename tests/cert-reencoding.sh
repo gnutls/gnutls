@@ -68,8 +68,8 @@ TLS_SERVER_PORT=$PORT
 eval "${GETPORT}"
 
 # Check for OpenSSL
-OPENSSL=`which openssl`
-if ! test -x "${OPENSSL}"; then
+: ${OPENSSL=openssl}
+if ! ("$OPENSSL" version) > /dev/null 2>&1; then
     echo "You need openssl to run this test."
     exit 77
 fi

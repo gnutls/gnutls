@@ -69,8 +69,8 @@ OCSP_PORT=$PORT
 SERVER_START_TIMEOUT=10
 
 # Check for OpenSSL
-OPENSSL=`which openssl`
-if ! test -x "${OPENSSL}"; then
+: ${OPENSSL=openssl}
+if ! ("$OPENSSL" version) > /dev/null 2>&1; then
     echo "You need openssl to run this test."
     exit 77
 fi
@@ -316,8 +316,8 @@ eval "${GETPORT}"
 TLS_SERVER_PORT=$PORT
 PORT=${TLS_SERVER_PORT}
 
-TIMEOUT=$(which timeout)
-if test -n "$TIMEOUT";then
+: ${TIMEOUT=timeout}
+if ("$TIMEOUT" --version) >/dev/null 2>&1; then
 ${TIMEOUT} 30 "${SERV}" --echo --disable-client-cert \
 	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
 	  --x509certfile="${SERVER_CERT_FILE}" \
