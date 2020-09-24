@@ -30,9 +30,8 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
 # WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-: ${abs_top_srcdir=$(pwd)/../../}
 : ${srcdir=.}
-GNUTLS_SERV="${SERV:-../../src/gnutls-serv${EXEEXT}}"
+: ${SERV=../../src/gnutls-serv${EXEEXT}}
 : ${CLI=../../src/gnutls-cli${EXEEXT}}
 unset RETCODE
 
@@ -56,8 +55,7 @@ skip_if_no_datefudge
 
 : ${PORT=${RPORT}}
 
-SERV=openssl
-OPENSSL_CLI="$SERV"
+: ${OPENSSL=openssl}
 
 if test -z "$OUTPUT";then
 OUTPUT=/dev/null
@@ -69,7 +67,7 @@ echo_cmd() {
 	tee -a ${OUTPUT} <<<$(echo $1)
 }
 
-echo_cmd "Compatibility checks using "`${SERV} version`
+echo_cmd "Compatibility checks using "`${OPENSSL} version`
 
 echo_cmd "#################################################"
 echo_cmd "# Client mode tests (gnutls cli-openssl server) #"
@@ -86,7 +84,7 @@ run_client_suite() {
 
 
 	eval "${GETPORT}"
-	launch_bare_server s_server -ciphersuites ${OCIPHERSUITES} -groups 'X25519:P-256:X448:P-521:P-384' -quiet -www -accept "${PORT}" -keyform pem -certform pem ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" -CAfile "${CA_CERT}"
+	launch_bare_server "$OPENSSL" s_server -ciphersuites ${OCIPHERSUITES} -groups 'X25519:P-256:X448:P-521:P-384' -quiet -www -accept "${PORT}" -keyform pem -certform pem ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" -CAfile "${CA_CERT}"
 	PID=$!
 	wait_server ${PID}
 
@@ -119,7 +117,7 @@ run_client_suite() {
 	#test PSK ciphersuites
 	# disabled as I do not seem to be able to connect to openssl s_server with PSK
 	eval "${GETPORT}"
-	launch_bare_server s_server -quiet -www -accept "${PORT}" -psk_identity ${PSKID} -psk ${PSKKEY} -nocert
+	launch_bare_server "$OPENSSL" s_server -quiet -www -accept "${PORT}" -psk_identity ${PSKID} -psk ${PSKKEY} -nocert
 	PID=$!
 	wait_server ${PID}
 
@@ -141,7 +139,7 @@ run_client_suite() {
 
 	#test client certificates
 	eval "${GETPORT}"
-	launch_bare_server s_server -cipher "ALL" -quiet -www -accept "${PORT}" -keyform pem -certform pem ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" -Verify 1 -CAfile "${CA_CERT}" >>${OUTPUT} 2>&1
+	launch_bare_server "$OPENSSL" s_server -cipher "ALL" -quiet -www -accept "${PORT}" -keyform pem -certform pem ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" -Verify 1 -CAfile "${CA_CERT}" >>${OUTPUT} 2>&1
 	PID=$!
 	wait_server ${PID}
 
@@ -168,7 +166,7 @@ run_client_suite() {
 
 	echo_cmd "${PREFIX}Checking TLS 1.3 with Ed25519 certificate..."
 	eval "${GETPORT}"
-	launch_bare_server s_server -quiet -www -accept "${PORT}" -keyform pem -certform pem ${OPENSSL_DH_PARAMS_OPT} -key "${ED25519_KEY}" -cert "${ED25519_CERT}" -CAfile "${CA_CERT}"
+	launch_bare_server "$OPENSSL" s_server -quiet -www -accept "${PORT}" -keyform pem -certform pem ${OPENSSL_DH_PARAMS_OPT} -key "${ED25519_KEY}" -cert "${ED25519_CERT}" -CAfile "${CA_CERT}"
 	PID=$!
 	wait_server ${PID}
 
@@ -180,7 +178,7 @@ run_client_suite() {
 
 	echo_cmd "${PREFIX}Checking TLS 1.3 with Ed448 certificate..."
 	eval "${GETPORT}"
-	launch_bare_server s_server -quiet -www -accept "${PORT}" -keyform pem -certform pem ${OPENSSL_DH_PARAMS_OPT} -key "${ED448_KEY}" -cert "${ED448_CERT}" -CAfile "${CA_CERT}"
+	launch_bare_server "$OPENSSL" s_server -quiet -www -accept "${PORT}" -keyform pem -certform pem ${OPENSSL_DH_PARAMS_OPT} -key "${ED448_KEY}" -cert "${ED448_CERT}" -CAfile "${CA_CERT}"
 	PID=$!
 	wait_server ${PID}
 
@@ -192,7 +190,7 @@ run_client_suite() {
 
 	echo_cmd "${PREFIX}Checking TLS 1.3 with secp256r1 certificate..."
 	eval "${GETPORT}"
-	launch_bare_server s_server -quiet -www -accept "${PORT}" -keyform pem -certform pem ${OPENSSL_DH_PARAMS_OPT} -key "${ECC_KEY}" -cert "${ECC_CERT}" -CAfile "${CA_CERT}"
+	launch_bare_server "$OPENSSL" s_server -quiet -www -accept "${PORT}" -keyform pem -certform pem ${OPENSSL_DH_PARAMS_OPT} -key "${ECC_KEY}" -cert "${ECC_CERT}" -CAfile "${CA_CERT}"
 	PID=$!
 	wait_server ${PID}
 
@@ -204,7 +202,7 @@ run_client_suite() {
 
 	echo_cmd "${PREFIX}Checking TLS 1.3 with RSA-PSS certificate..."
 	eval "${GETPORT}"
-	launch_bare_server s_server -quiet -www -accept "${PORT}" -keyform pem -certform pem ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_PSS_KEY}" -cert "${RSA_PSS_CERT}" -CAfile "${CA_CERT}"
+	launch_bare_server "$OPENSSL" s_server -quiet -www -accept "${PORT}" -keyform pem -certform pem ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_PSS_KEY}" -cert "${RSA_PSS_CERT}" -CAfile "${CA_CERT}"
 	PID=$!
 	wait_server ${PID}
 
@@ -218,7 +216,7 @@ run_client_suite() {
 	echo_cmd "${PREFIX}Checking TLS 1.3 with resumption..."
 	testdir=`create_testdir tls13-openssl-resumption`
 	eval "${GETPORT}"
-	launch_bare_server s_server -quiet -www -accept "${PORT}" -keyform pem -certform pem ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" -CAfile "${CA_CERT}"
+	launch_bare_server "$OPENSSL" s_server -quiet -www -accept "${PORT}" -keyform pem -certform pem ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" -CAfile "${CA_CERT}"
 	PID=$!
 	wait_server ${PID}
 
@@ -232,7 +230,7 @@ run_client_suite() {
 	# Try resumption with HRR
 	echo_cmd "${PREFIX}Checking TLS 1.3 with resumption and HRR..."
 	eval "${GETPORT}"
-	launch_bare_server s_server -quiet -www -accept "${PORT}" -groups 'X25519:P-256' -keyform pem -certform pem ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" -CAfile "${CA_CERT}"
+	launch_bare_server "$OPENSSL" s_server -quiet -www -accept "${PORT}" -groups 'X25519:P-256' -keyform pem -certform pem ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" -CAfile "${CA_CERT}"
 	PID=$!
 	wait_server ${PID}
 
@@ -247,7 +245,7 @@ run_client_suite() {
 	echo_cmd "${PREFIX}Checking TLS 1.3 with resumption with early data..."
 	testdir=`create_testdir tls13-openssl-resumption`
 	eval "${GETPORT}"
-	launch_bare_server s_server -quiet -accept "${PORT}" -keyform pem -certform pem ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" -CAfile "${CA_CERT}" -early_data
+	launch_bare_server "$OPENSSL" s_server -quiet -accept "${PORT}" -keyform pem -certform pem ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" -CAfile "${CA_CERT}" -early_data
 	PID=$!
 	wait_server ${PID}
 
@@ -263,7 +261,7 @@ run_client_suite() {
 	echo_cmd "${PREFIX}Checking TLS 1.3 with resumption with early data..."
 	testdir=`create_testdir tls13-openssl-resumption`
 	eval "${GETPORT}"
-	launch_bare_server s_server -quiet -accept "${PORT}" -keyform pem -certform pem ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" -CAfile "${CA_CERT}" -early_data -max_early_data 1
+	launch_bare_server "$OPENSSL" s_server -quiet -accept "${PORT}" -keyform pem -certform pem ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" -CAfile "${CA_CERT}" -early_data -max_early_data 1
 	PID=$!
 	wait_server ${PID}
 
@@ -282,7 +280,7 @@ run_client_suite() {
 	testdir=`create_testdir tls13-openssl-keymatexport`
 	eval "${GETPORT}"
 	LOGFILE="${testdir}/server.out"
-	launch_bare_server s_server -accept "${PORT}" -keyform pem -certform pem ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" -CAfile "${CA_CERT}" -keymatexport label -keymatexportlen 20
+	launch_bare_server "$OPENSSL" s_server -accept "${PORT}" -keyform pem -certform pem ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" -CAfile "${CA_CERT}" -keymatexport label -keymatexportlen 20
 	unset LOGFILE
 	PID=$!
 	wait_server ${PID}
@@ -310,7 +308,7 @@ echo_cmd "${PREFIX}"
 echo_cmd "${PREFIX}###############################################"
 echo_cmd "${PREFIX}# Server mode tests (gnutls server-openssl cli#"
 echo_cmd "${PREFIX}###############################################"
-SERV="${GNUTLS_SERV} -q"
+SERV="${SERV} -q"
 
 # Note that openssl s_client does not return error code on failure
 
@@ -330,7 +328,7 @@ run_server_suite() {
 		PID=$!
 		wait_server ${PID}
 
-		${OPENSSL_CLI} s_client -ciphersuites ${OCIPHERSUITES} -host localhost -port "${PORT}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
+		${OPENSSL} s_client -ciphersuites ${OCIPHERSUITES} -host localhost -port "${PORT}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
 			fail ${PID} "Failed"
 
 		kill ${PID}
@@ -346,7 +344,7 @@ run_server_suite() {
 		PID=$!
 		wait_server ${PID}
 
-		${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
+		${OPENSSL} s_client -host localhost -port "${PORT}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
 			fail ${PID} "Failed"
 
 		kill ${PID}
@@ -359,14 +357,14 @@ run_server_suite() {
 	PID=$!
 	wait_server ${PID}
 
-	${OPENSSL_CLI} s_client -groups 'X25519:P-256:X448:P-521:P-384' -host localhost -port "${PORT}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
+	${OPENSSL} s_client -groups 'X25519:P-256:X448:P-521:P-384' -host localhost -port "${PORT}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
 		fail ${PID} "Failed"
 
 	echo_cmd "${PREFIX}Checking TLS 1.3 with rekey..."
 	expect - >/dev/null <<_EOF_
 set timeout 10
 set os_error_flag 1
-spawn ${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -CAfile "${CA_CERT}"
+spawn ${OPENSSL} s_client -host localhost -port "${PORT}" -CAfile "${CA_CERT}"
 
 expect "SSL-Session" {send "K\n"} timeout {exit 1}
 expect "KEYUPDATE" {send "HELLO\n"} timeout {exit 1}
@@ -394,23 +392,23 @@ _EOF_
 	wait_server ${PID}
 
 	echo_cmd "${PREFIX}Checking TLS 1.3 with RSA client certificate..."
-	${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
+	${OPENSSL} s_client -host localhost -port "${PORT}" -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
 		fail ${PID} "Failed"
 
 	echo_cmd "${PREFIX}Checking TLS 1.3 with RSA-PSS client certificate..."
-	${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -cert "${RSA_PSS_CLI_CERT}" -key "${RSA_PSS_CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
+	${OPENSSL} s_client -host localhost -port "${PORT}" -cert "${RSA_PSS_CLI_CERT}" -key "${RSA_PSS_CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
 		fail ${PID} "Failed"
 
 	echo_cmd "${PREFIX}Checking TLS 1.3 with secp256r1 client certificate..."
-	${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -cert "${ECC_CLI_CERT}" -key "${ECC_CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
+	${OPENSSL} s_client -host localhost -port "${PORT}" -cert "${ECC_CLI_CERT}" -key "${ECC_CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
 		fail ${PID} "Failed"
 
 	echo_cmd "${PREFIX}Checking TLS 1.3 with Ed25519 client certificate..."
-	${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -cert "${ED25519_CLI_CERT}" -key "${ED25519_CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
+	${OPENSSL} s_client -host localhost -port "${PORT}" -cert "${ED25519_CLI_CERT}" -key "${ED25519_CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
 		fail ${PID} "Failed"
 
 	echo_cmd "${PREFIX}Checking TLS 1.3 with Ed448 client certificate..."
-	${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -cert "${ED448_CLI_CERT}" -key "${ED448_CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
+	${OPENSSL} s_client -host localhost -port "${PORT}" -cert "${ED448_CLI_CERT}" -key "${ED448_CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
 		fail ${PID} "Failed"
 
 	kill ${PID}
@@ -426,7 +424,7 @@ _EOF_
 	expect - >/dev/null <<_EOF_
 set timeout 10
 set os_error_flag 1
-spawn ${OPENSSL_CLI} s_client -enable_pha -host localhost -port "${PORT}" -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}"
+spawn ${OPENSSL} s_client -enable_pha -host localhost -port "${PORT}" -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}"
 
 expect "SSL-Session" {send "**REAUTH**\n"} timeout {exit 1}
 expect {
@@ -464,7 +462,7 @@ _EOF_
 	PID=$!
 	wait_server ${PID}
 
-	${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
+	${OPENSSL} s_client -host localhost -port "${PORT}" -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
 		fail ${PID} "Failed"
 
 	kill ${PID}
@@ -477,7 +475,7 @@ _EOF_
 	PID=$!
 	wait_server ${PID}
 
-	${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
+	${OPENSSL} s_client -host localhost -port "${PORT}" -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
 		fail ${PID} "Failed"
 
 	kill ${PID}
@@ -490,7 +488,7 @@ _EOF_
 	PID=$!
 	wait_server ${PID}
 
-	${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
+	${OPENSSL} s_client -host localhost -port "${PORT}" -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
 		fail ${PID} "Failed"
 
 	kill ${PID}
@@ -503,7 +501,7 @@ _EOF_
 	PID=$!
 	wait_server ${PID}
 
-	${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
+	${OPENSSL} s_client -host localhost -port "${PORT}" -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
 		fail ${PID} "Failed"
 
 	kill ${PID}
@@ -519,7 +517,7 @@ _EOF_
 		PID=$!
 		wait_server ${PID}
 
-		${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -psk_identity "${PSKID}" -psk "${PSKKEY}" </dev/null >>${OUTPUT} || \
+		${OPENSSL} s_client -host localhost -port "${PORT}" -psk_identity "${PSKID}" -psk "${PSKKEY}" </dev/null >>${OUTPUT} || \
 			fail ${PID} "Failed"
 
 		kill ${PID}
@@ -535,9 +533,9 @@ _EOF_
 	wait_server ${PID}
 
 	{ echo a; sleep 1; } | \
-	${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -CAfile "${CA_CERT}" -sess_out "${testdir}/sess.pem" 2>&1 | grep "\:error\:" && \
+	${OPENSSL} s_client -host localhost -port "${PORT}" -CAfile "${CA_CERT}" -sess_out "${testdir}/sess.pem" 2>&1 | grep "\:error\:" && \
 		fail ${PID} "Failed"
-	${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -CAfile "${CA_CERT}" -sess_in "${testdir}/sess.pem" </dev/null 2>&1 > "${testdir}/server.out"
+	${OPENSSL} s_client -host localhost -port "${PORT}" -CAfile "${CA_CERT}" -sess_in "${testdir}/sess.pem" </dev/null 2>&1 > "${testdir}/server.out"
 	grep "\:error\:" "${testdir}/server.out" && \
 		fail ${PID} "Failed"
 	grep "^Reused, TLSv1.3" "${testdir}/server.out" || \
@@ -553,9 +551,9 @@ _EOF_
 	wait_server ${PID}
 
 	{ echo a; sleep 1; } | \
-	${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -curves 'X25519:P-256:X448:P-521:P-384' -CAfile "${CA_CERT}" -sess_out "${testdir}/sess-hrr.pem" 2>&1 | grep "\:error\:" && \
+	${OPENSSL} s_client -host localhost -port "${PORT}" -curves 'X25519:P-256:X448:P-521:P-384' -CAfile "${CA_CERT}" -sess_out "${testdir}/sess-hrr.pem" 2>&1 | grep "\:error\:" && \
 		fail ${PID} "Failed"
-	${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -curves 'X25519:P-256:X448:P-521:P-384' -CAfile "${CA_CERT}" -sess_in "${testdir}/sess-hrr.pem" </dev/null 2>&1 > "${testdir}/server.out"
+	${OPENSSL} s_client -host localhost -port "${PORT}" -curves 'X25519:P-256:X448:P-521:P-384' -CAfile "${CA_CERT}" -sess_in "${testdir}/sess-hrr.pem" </dev/null 2>&1 > "${testdir}/server.out"
 	grep "\:error\:" "${testdir}/server.out" && \
 		fail ${PID} "Failed"
 	grep "^Reused, TLSv1.3" "${testdir}/server.out" || \
@@ -573,9 +571,9 @@ _EOF_
 
 	echo "This file contains early data sent by the client" > "${testdir}/earlydata.txt"
 	{ echo a; sleep 1; } | \
-	${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -CAfile "${CA_CERT}" -sess_out "${testdir}/sess-earlydata.pem" 2>&1 | grep "\:error\:" && \
+	${OPENSSL} s_client -host localhost -port "${PORT}" -CAfile "${CA_CERT}" -sess_out "${testdir}/sess-earlydata.pem" 2>&1 | grep "\:error\:" && \
 		fail ${PID} "Failed"
-	${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -CAfile "${CA_CERT}" -sess_in "${testdir}/sess-earlydata.pem" -early_data "${testdir}/earlydata.txt" </dev/null 2>&1 > "${testdir}/server.out"
+	${OPENSSL} s_client -host localhost -port "${PORT}" -CAfile "${CA_CERT}" -sess_in "${testdir}/sess-earlydata.pem" -early_data "${testdir}/earlydata.txt" </dev/null 2>&1 > "${testdir}/server.out"
 	grep "\:error\:" "${testdir}/server.out" && \
 		fail ${PID} "Failed"
 	grep "^Reused, TLSv1.3" "${testdir}/server.out" || \
@@ -593,9 +591,9 @@ _EOF_
 
 	echo "This file contains early data sent by the client" > "${testdir}/earlydata.txt"
 	{ echo a; sleep 1; } | \
-	${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -CAfile "${CA_CERT}" -sess_out "${testdir}/sess-earlydata.pem" 2>&1 | grep "\:error\:" && \
+	${OPENSSL} s_client -host localhost -port "${PORT}" -CAfile "${CA_CERT}" -sess_out "${testdir}/sess-earlydata.pem" 2>&1 | grep "\:error\:" && \
 		fail ${PID} "Failed"
-	${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -CAfile "${CA_CERT}" -sess_in "${testdir}/sess-earlydata.pem" -early_data "${testdir}/earlydata.txt" </dev/null 2>&1 > "${testdir}/server.out"
+	${OPENSSL} s_client -host localhost -port "${PORT}" -CAfile "${CA_CERT}" -sess_in "${testdir}/sess-earlydata.pem" -early_data "${testdir}/earlydata.txt" </dev/null 2>&1 > "${testdir}/server.out"
 	grep "^Early data was rejected" "${testdir}/server.out" || \
 		fail ${PID} "Failed"
 

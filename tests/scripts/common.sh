@@ -160,14 +160,13 @@ wait_for_free_port()
 	return $ret
 }
 
-launch_server() {
-	wait_for_free_port ${PORT}
-	${SERV} ${DEBUG} -p "${PORT}" "$@" >${LOGFILE-/dev/null} &
+launch_bare_server() {
+	wait_for_free_port "$PORT"
+	"$@" >${LOGFILE-/dev/null} &
 }
 
-launch_bare_server() {
-	wait_for_free_port ${PORT}
-	${SERV} "$@" >${LOGFILE-/dev/null} &
+launch_server() {
+	launch_bare_server $VALGRIND $SERV $DEBUG -p "$PORT" "$@"
 }
 
 wait_server() {

@@ -24,9 +24,8 @@
 : ${srcdir=.}
 : ${CERTTOOL=../src/certtool${EXEEXT}}
 : ${OCSPTOOL=../src/ocsptool${EXEEXT}}
-GNUTLS_SERV="${SERV:-../src/gnutls-serv${EXEEXT}}"
-unset SERV
-: ${GNUTLS_CLI=../src/gnutls-cli${EXEEXT}}
+: ${SERV=../src/gnutls-serv${EXEEXT}}
+: ${CLI=../src/gnutls-cli${EXEEXT}}
 : ${DIFF=diff}
 SERVER_CERT_FILE="cert.$$.pem.tmp"
 SERVER_KEY_FILE="key.$$.pem.tmp"
@@ -42,11 +41,11 @@ if ! test -x "${OCSPTOOL}"; then
 	exit 77
 fi
 
-if ! test -x "${GNUTLS_SERV}"; then
+if ! test -x "${SERV}"; then
 	exit 77
 fi
 
-if ! test -x "${GNUTLS_CLI}"; then
+if ! test -x "${CLI}"; then
 	exit 77
 fi
 
@@ -252,7 +251,7 @@ SERVER_PID="${!}"
 wait_server "${SERVER_PID}"
 
 datefudge -s "${TESTDATE}" \
-      "${GNUTLS_CLI}" --x509certfile ${CLIENT_CERT_FILE} \
+      "${CLI}" --x509certfile ${CLIENT_CERT_FILE} \
       --x509keyfile ${CLIENT_KEY_FILE} --x509cafile=${CA_FILE} \
       --port="${PORT}" localhost </dev/null
 rc=$?
