@@ -66,8 +66,27 @@ check_if_port_listening() {
 	$PFCMD -anl|grep "[\:\.]$PORT"|grep LISTEN >/dev/null 2>&1
 }
 
+trap "rmdir \"$top_builddir/tests/port.lock.d\" > /dev/null 2>&1 || :" 1 15 2
+
+obtain_port_lock()
+{
+    local i
+    for i in 1 2 3 4 5 6; do
+        if mkdir "$top_builddir/tests/port.lock.d" > /dev/null 2>&1; then
+            return
+        fi
+        echo "try $i: obtaining port lock"
+	sleep 2
+    done
+    return 1
+}
+
 # Find a port number not currently in use.
 GETPORT='
+    obtain_port_lock()
+    if $? -ne 0; then
+        echo "failed to obtain port lock: continuing anyway"
+    fi
     rc=0
     unset myrandom
     while test $rc = 0; do
@@ -136,7 +155,7 @@ wait_for_port()
 		ret=$?
 		if test $ret != 0;then
 		check_if_port_in_use ${PORT}
-			echo try $i
+			echo "try $i: waiting for port"
 			sleep 2
 		else
 			break
@@ -173,13 +192,14 @@ launch_server() {
 
 wait_server() {
 	local PID=$1
-	trap "test -n \"${PID}\" && kill ${PID};exit 1" 1 15 2
+	trap "test -n \"${PID}\" && kill ${PID}; exit 1" 1 15 2
 	wait_for_port $PORT
 	if test $? != 0;then
 		echo "Server $PORT did not come up"
 		kill $PID
 		exit 1
 	fi
+	rmdir "$top_builddir/tests/port.lock.d" > /dev/null 2>&1 || :
 }
 
 wait_udp_server() {
