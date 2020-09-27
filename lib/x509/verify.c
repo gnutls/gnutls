@@ -1224,11 +1224,12 @@ _gnutls_pkcs11_verify_crt_status(gnutls_x509_trust_list_t tlist,
 		if (_gnutls_pkcs11_crt_is_known (url, certificate_list[i], vflags, &trusted_cert) != 0) {
 
 			status |= check_ca_sanity(trusted_cert, now, flags);
-			gnutls_x509_crt_deinit(trusted_cert);
 
 			if (func)
-				func(certificate_list[i],
+				func(trusted_cert,
 				     certificate_list[i], NULL, status);
+
+			gnutls_x509_crt_deinit(trusted_cert);
 
 			if (status != 0) {
 				return gnutls_assert_val(status);
