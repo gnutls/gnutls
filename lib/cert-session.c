@@ -568,7 +568,7 @@ _gnutls_x509_cert_verify_peers(gnutls_session_t session,
 		ret =
 			check_ocsp_response(session,
 					    peer_certificate_list[i],
-					    cred->tlist, 
+					    cred->tlist,
 					    verify_flags, cand_issuers,
 					    cand_issuers_size,
 					    &resp, &ocsp_status);
@@ -581,14 +581,25 @@ _gnutls_x509_cert_verify_peers(gnutls_session_t session,
 #endif
 
       skip_ocsp:
-	/* Verify certificate 
+	/* Verify certificate
 	 */
-	ret =
-	    gnutls_x509_trust_list_verify_crt2(cred->tlist,
-					       peer_certificate_list,
-					       peer_certificate_list_size,
-					       data, elements,
-					       verify_flags, status, NULL);
+	if (session->internals.cert_output_callback != NULL) {
+		_gnutls_debug_log("Print full certificate path validation to trust root.\n");
+	    ret =
+	        gnutls_x509_trust_list_verify_crt2(cred->tlist,
+					           peer_certificate_list,
+					           peer_certificate_list_size,
+					           data, elements,
+					           verify_flags, status,
+					           session->internals.cert_output_callback);
+	} else {
+	    ret =
+	        gnutls_x509_trust_list_verify_crt2(cred->tlist,
+					           peer_certificate_list,
+					           peer_certificate_list_size,
+					           data, elements,
+					           verify_flags, status, NULL);
+	}
 
 	if (ret < 0) {
 		gnutls_assert();

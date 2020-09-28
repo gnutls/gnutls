@@ -1622,14 +1622,18 @@ gnutls_x509_trust_list_iter_get_ca(gnutls_x509_trust_list_t list,
 
 void gnutls_x509_trust_list_iter_deinit(gnutls_x509_trust_list_iter_t iter);
 
-typedef int gnutls_verify_output_function(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,	/* The issuer if verification failed 
+typedef int gnutls_verify_output_function(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
+												 /* The issuer if verification failed
 												 * because of him. might be null.
 												 */
 					  gnutls_x509_crl_t crl,	/* The CRL that caused verification failure 
-									 * if any. Might be null. 
+									 * if any. Might be null.
 									 */
 					  unsigned int
 					  verification_output);
+
+void gnutls_session_set_verify_output_function(gnutls_session_t session,
+		gnutls_verify_output_function * func);
 
 int gnutls_x509_trust_list_verify_named_crt
     (gnutls_x509_trust_list_t list, gnutls_x509_crt_t cert,

@@ -789,6 +789,7 @@ APIMANS += gnutls_session_set_ptr.3
 APIMANS += gnutls_session_set_verify_cert.3
 APIMANS += gnutls_session_set_verify_cert2.3
 APIMANS += gnutls_session_set_verify_function.3
+APIMANS += gnutls_session_set_verify_output_function.3
 APIMANS += gnutls_session_supplemental_register.3
 APIMANS += gnutls_session_ticket_enable_client.3
 APIMANS += gnutls_session_ticket_enable_server.3
