@@ -208,14 +208,6 @@ wait_udp_server() {
 	sleep 4
 }
 
-if test -x /usr/bin/lockfile-create;then
-LOCKFILE="lockfile-create global"
-UNLOCKFILE="lockfile-remove global"
-else
-LOCKFILE="lockfile global.lock"
-UNLOCKFILE="rm -f global.lock"
-fi
-
 create_testdir() {
 	local PREFIX=$1
 	d=`mktemp -d -t ${PREFIX}.XXXXXX`
