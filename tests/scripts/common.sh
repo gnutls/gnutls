@@ -150,16 +150,17 @@ wait_for_port()
 	local PORT="$1"
 	sleep 1
 
-	for i in 1 2 3 4 5 6;do
+	local i=0
+	while test $i -lt 90; do
 		check_if_port_listening ${PORT}
 		ret=$?
-		if test $ret != 0;then
-		check_if_port_in_use ${PORT}
-			echo "try $i: waiting for port"
-			sleep 2
-		else
+		if test $ret = 0;then
 			break
 		fi
+		i=`expr $i + 1`
+		check_if_port_in_use ${PORT}
+		echo "try $i: waiting for port"
+		sleep 2
 	done
 	return $ret
 }
