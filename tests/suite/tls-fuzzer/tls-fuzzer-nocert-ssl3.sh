@@ -18,7 +18,7 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-srcdir="${srcdir:-.}"
+: ${srcdir=.}
 
 tls_fuzzer_prepare() {
 PRIORITY="NORMAL:%VERIFY_ALLOW_SIGN_WITH_SHA1:+ARCFOUR-128:+3DES-CBC:-VERS-ALL:+VERS-SSL3.0"

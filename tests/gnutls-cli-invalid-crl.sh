@@ -19,9 +19,9 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-srcdir="${srcdir:-.}"
-SERV="${SERV:-../src/gnutls-serv${EXEEXT}}"
-CLI="${CLI:-../src/gnutls-cli${EXEEXT}}"
+: ${srcdir=.}
+: ${SERV=../src/gnutls-serv${EXEEXT}}
+: ${CLI=../src/gnutls-cli${EXEEXT}}
 unset RETCODE
 TMPFILE=crl-inv.$$.pem.tmp
 CAFILE=crl-inv-ca.$$.pem.tmp
@@ -164,7 +164,7 @@ FQj9tqRIMQZIer3gaURWG8OZfntCAvtlSSwc1PjwLBXO9ZvNBw==
 __EOF__
 
 eval "${GETPORT}"
-launch_server $$ --echo --x509keyfile ${TMPFILE} --x509certfile ${TMPFILE}
+launch_server --echo --x509keyfile ${TMPFILE} --x509certfile ${TMPFILE}
 PID=$!
 wait_server ${PID}
 

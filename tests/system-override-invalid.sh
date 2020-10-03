@@ -20,8 +20,8 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-srcdir="${srcdir:-.}"
-CLI="${CLI:-../src/gnutls-cli${EXEEXT}}"
+: ${srcdir=.}
+: ${CLI=../src/gnutls-cli${EXEEXT}}
 TMPFILE=c.$$.tmp
 export GNUTLS_SYSTEM_PRIORITY_FAIL_ON_INVALID=1
 

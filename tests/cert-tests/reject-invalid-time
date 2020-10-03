@@ -19,10 +19,10 @@
 
 #set -e
 
-srcdir="${srcdir:-.}"
-CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
-PKGCONFIG="${PKG_CONFIG:-$(which pkg-config)}"
-DIFF="${DIFF:-diff -b -B}"
+: ${srcdir=.}
+: ${CERTTOOL=../../src/certtool${EXEEXT}}
+: ${PKG_CONFIG=pkg-config}
+: ${DIFF=diff -b -B}
 
 if ! test -x "${CERTTOOL}"; then
 	exit 77
@@ -32,9 +32,9 @@ if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
 
-${PKGCONFIG} --version >/dev/null || exit 77
+${PKG_CONFIG} --version >/dev/null || exit 77
 
-${PKGCONFIG} --atleast-version=4.12 libtasn1 || exit 77
+${PKG_CONFIG} --atleast-version=4.12 libtasn1 || exit 77
 
 # Check whether certificates with invalid time fields are accepted
 for file in openssl-invalid-time-format.pem;do

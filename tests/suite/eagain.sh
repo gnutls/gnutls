@@ -20,8 +20,8 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-srcdir="${srcdir:-.}"
-SERV="${SERV:-../../src/gnutls-serv${EXEEXT}}"
+: ${srcdir=.}
+: ${SERV=../../src/gnutls-serv${EXEEXT}}
 
 if ! test -x "${SERV}"; then
 	exit 77
@@ -36,7 +36,7 @@ eval "${GETPORT}"
 KEY1=${srcdir}/../../doc/credentials/x509/key-rsa.pem
 CERT1=${srcdir}/../../doc/credentials/x509/cert-rsa.pem
 
-launch_server $$ --echo --x509keyfile ${KEY1} --x509certfile ${CERT1}
+launch_server --echo --x509keyfile ${KEY1} --x509certfile ${CERT1}
 PID=$!
 wait_server ${PID}
 

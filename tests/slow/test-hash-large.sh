@@ -27,7 +27,7 @@ if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
 
-srcdir="${srcdir:-.}"
+: ${srcdir=.}
 . "${srcdir}/../scripts/common.sh"
 
 run_test() {
@@ -44,23 +44,19 @@ run_test() {
 #0x1: no optimizations
 #"": default optimizations
 
-SSSE3FLAG=""
-SHANIFLAG=""
-which lscpu >/dev/null 2>&1
-if test $? = 0;then
-        $(which lscpu)|grep Architecture|grep x86 >/dev/null
-        if test $? = 0;then
-                SSSE3FLAG="0x4"
+FLAGS=""
+if (lscpu --version) >/dev/null 2>&1; then
+        if lscpu 2>/dev/null | grep 'Flags:[	]*ssse3' >/dev/null; then
+                FLAGS="$FLAGS 0x4"
         fi
 
-        $(which lscpu)|grep Flags|grep sha_ni >/dev/null
-        if test $? = 0;then
-                SHANIFLAG="0x20"
+        if lscpu 2>/dev/null | grep 'Flags:[	]*sha_ni' >/dev/null; then
+                FLAGS="$FLAGS 0x20"
         fi
 fi
 
 WAITPID=""
-for flags in "" "0x1" ${SSSE3FLAG} ${SHANIFLAG};do
+for flags in "" "0x1" ${FLAGS};do
 	run_test ${flags} &
 	WAITPID="${WAITPID} $!"
 done

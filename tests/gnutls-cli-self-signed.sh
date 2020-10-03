@@ -19,9 +19,9 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-srcdir="${srcdir:-.}"
-SERV="${SERV:-../src/gnutls-serv${EXEEXT}}"
-CLI="${CLI:-../src/gnutls-cli${EXEEXT}}"
+: ${srcdir=.}
+: ${SERV=../src/gnutls-serv${EXEEXT}}
+: ${CLI=../src/gnutls-cli${EXEEXT}}
 unset RETCODE
 TMPFILE=self-signed.$$.pem.tmp
 
@@ -119,7 +119,7 @@ i2yISkQxkJZp8sTwSlIGZSBpuZcDq9AdUjan1WhGgl4hpHpjr3Y=
 __EOF__
 
 eval "${GETPORT}"
-launch_server $$ --echo --x509keyfile ${TMPFILE} --x509certfile ${TMPFILE}
+launch_server --echo --x509keyfile ${TMPFILE} --x509certfile ${TMPFILE}
 PID=$!
 wait_server ${PID}
 

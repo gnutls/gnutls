@@ -20,9 +20,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 #
 
-srcdir="${srcdir:-.}"
-SERV="${SERV:-../src/gnutls-serv${EXEEXT}}"
-CLI="${CLI:-../src/gnutls-cli${EXEEXT}}"
+: ${srcdir=.}
+: ${SERV=../src/gnutls-serv${EXEEXT}}
+: ${CLI=../src/gnutls-cli${EXEEXT}}
 TMPFILE=config.$$.tmp
 TMPFILE2=log.$$.tmp
 export GNUTLS_SYSTEM_PRIORITY_FAIL_ON_INVALID=1
@@ -47,7 +47,7 @@ CERT="${srcdir}/certs/cert-ecc256.pem"
 KEY="${srcdir}/certs/ecc256.pem"
 
 eval "${GETPORT}"
-launch_server $$ --echo --priority "NORMAL" --x509keyfile ${KEY} --x509certfile ${CERT}
+launch_server --echo --priority "NORMAL" --x509keyfile ${KEY} --x509certfile ${CERT}
 PID=$!
 wait_server ${PID}
 

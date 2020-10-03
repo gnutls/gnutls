@@ -20,9 +20,9 @@
 
 #set -e
 
-srcdir="${srcdir:-.}"
-CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
-DIFF="${DIFF:-diff -b -B}"
+: ${srcdir=.}
+: ${CERTTOOL=../../src/certtool${EXEEXT}}
+: ${DIFF=diff -b -B}
 TMPFILE1=certtool-file1.$$.tmp
 TMPFILE2=certtool-file2.$$.tmp
 PASS="1234"
@@ -39,8 +39,8 @@ if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
 
-SETSID=$(which setsid)
-if test -n "${SETSID}";then
+: ${SETSID=setsid}
+if ("$SETSID" --version) >/dev/null 2>&1; then
 	${VALGRIND} "${CERTTOOL}" --generate-privkey --rsa --outfile ${TMPFILE1} --pkcs8 --password ${PASS}
 	if test $? != 0;then
 		echo "private key generation failed"

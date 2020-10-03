@@ -20,9 +20,9 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-srcdir="${srcdir:-.}"
-SERV="${SERV:-../src/gnutls-serv${EXEEXT}}"
-CLI="${CLI:-../src/gnutls-cli${EXEEXT}}"
+: ${srcdir=.}
+: ${SERV=../src/gnutls-serv${EXEEXT}}
+: ${CLI=../src/gnutls-cli${EXEEXT}}
 unset RETCODE
 
 if ! test -x "${SERV}"; then
@@ -52,7 +52,7 @@ KEY1=${srcdir}/../doc/credentials/x509/key-rsa.pem
 CERT1=${srcdir}/../doc/credentials/x509/cert-rsa.pem
 
 eval "${GETPORT}"
-launch_server $$ --x509keyfile ${KEY1} --x509certfile ${CERT1} --udp -d 2
+launch_server --x509keyfile ${KEY1} --x509certfile ${CERT1} --udp -d 2
 PID=$!
 
 wait_udp_server $PID

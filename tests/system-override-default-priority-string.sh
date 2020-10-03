@@ -19,12 +19,12 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-srcdir="${srcdir:-.}"
-SERV="${SERV:-../src/gnutls-serv${EXEEXT}}"
-CLI="${CLI:-../src/gnutls-cli${EXEEXT}}"
+: ${srcdir=.}
+: ${SERV=../src/gnutls-serv${EXEEXT}}
+: ${CLI=../src/gnutls-cli${EXEEXT}}
 TMPFILE=config.$$.tmp
 TMPFILE2=log.$$.tmp
-STOCK_PRIORITY="${GNUTLS_SYSTEM_PRIORITY_FILE:-./system.prio}"
+STOCK_PRIORITY="${GNUTLS_SYSTEM_PRIORITY_FILE-./system.prio}"
 export GNUTLS_SYSTEM_PRIORITY_FAIL_ON_INVALID=1
 
 if ! test -x "${SERV}"; then
@@ -48,7 +48,7 @@ CERT1=${srcdir}/../doc/credentials/x509/cert-rsa.pem
 # Try whether a client connection with priority string None succeeds
 export GNUTLS_SYSTEM_PRIORITY_FILE="${srcdir}/system-override-default-priority-string.none.config"
 eval "${GETPORT}"
-launch_server $$ --echo --x509keyfile ${KEY1} --x509certfile ${CERT1}
+launch_server --echo --x509keyfile ${KEY1} --x509certfile ${CERT1}
 PID=$!
 wait_server ${PID}
 
@@ -61,7 +61,7 @@ wait
 # Try whether a client connection to an tls1.3 only server succeeds
 export GNUTLS_SYSTEM_PRIORITY_FILE="${srcdir}/system-override-default-priority-string.only-tls13.config"
 eval "${GETPORT}"
-launch_server $$ --echo --x509keyfile ${KEY1} --x509certfile ${CERT1}
+launch_server --echo --x509keyfile ${KEY1} --x509certfile ${CERT1}
 PID=$!
 wait_server ${PID}
 
@@ -80,7 +80,7 @@ wait
 export GNUTLS_SYSTEM_PRIORITY_FILE="${srcdir}/system-override-default-priority-string.bad.config"
 unset GNUTLS_SYSTEM_PRIORITY_FAIL_ON_INVALID
 eval "${GETPORT}"
-launch_server $$ --echo --x509keyfile ${KEY1} --x509certfile ${CERT1}
+launch_server --echo --x509keyfile ${KEY1} --x509certfile ${CERT1}
 PID=$!
 wait_server ${PID}
 

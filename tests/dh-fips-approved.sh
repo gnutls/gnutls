@@ -19,9 +19,9 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-srcdir="${srcdir:-.}"
-SERV="${SERV:-../src/gnutls-serv${EXEEXT}}"
-CLI="${CLI:-../src/gnutls-cli${EXEEXT}}"
+: ${srcdir=.}
+: ${SERV=../src/gnutls-serv${EXEEXT}}
+: ${CLI=../src/gnutls-cli${EXEEXT}}
 unset RETCODE
 
 if ! test -x "${SERV}"; then
@@ -85,7 +85,7 @@ for params in $ALLOWED_PARAMS; do
 	PARAMS=${srcdir}/../doc/credentials/dhparams/${params}.pem
 
 	eval "${GETPORT}"
-	launch_server $$ ${OPTS} --x509keyfile ${KEY1} --x509certfile ${CERT1} --dhparams ${PARAMS}
+	launch_server ${OPTS} --x509keyfile ${KEY1} --x509certfile ${CERT1} --dhparams ${PARAMS}
 	PID=$!
 	wait_server ${PID}
 
@@ -102,7 +102,7 @@ for params in $DISALLOWED_PARAMS; do
 	PARAMS=${srcdir}/../doc/credentials/dhparams/${params}.pem
 
 	eval "${GETPORT}"
-	launch_server $$ ${OPTS} --x509keyfile ${KEY1} --x509certfile ${CERT1} --dhparams ${PARAMS}
+	launch_server ${OPTS} --x509keyfile ${KEY1} --x509certfile ${CERT1} --dhparams ${PARAMS}
 	PID=$!
 	wait_server ${PID}
 

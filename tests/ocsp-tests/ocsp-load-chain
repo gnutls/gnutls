@@ -19,9 +19,9 @@
 
 #set -e
 
-srcdir="${srcdir:-.}"
-OCSPTOOL="${OCSPTOOL:-../src/ocsptool${EXEEXT}}"
-DIFF="${DIFF:-diff}"
+: ${srcdir=.}
+: ${OCSPTOOL=../src/ocsptool${EXEEXT}}
+: ${DIFF=diff}
 
 if ! test -x "${OCSPTOOL}"; then
 	exit 77

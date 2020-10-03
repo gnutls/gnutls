@@ -20,9 +20,9 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-srcdir="${srcdir:-.}"
-CERTTOOL="${CERTTOOL:-../src/certtool${EXEEXT}}"
-TPMTOOL="${TPMTOOL:-../src/tpmtool${EXEEXT}}"
+: ${srcdir=.}
+: ${CERTTOOL=../src/certtool${EXEEXT}}
+: ${TPMTOOL=../src/tpmtool${EXEEXT}}
 
 if [ "$(id -u)" -ne 0 ]; then
 	echo "Need to be root to run this test."

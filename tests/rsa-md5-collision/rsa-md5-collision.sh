@@ -21,8 +21,8 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-srcdir="${srcdir:-.}"
-CERTTOOL="${CERTTOOL:-../src/certtool${EXEEXT}}"
+: ${srcdir=.}
+: ${CERTTOOL=../src/certtool${EXEEXT}}
 TMPFILE1=rsa-md5.$$.tmp
 TMPFILE2=rsa-md5-2.$$.tmp
 

@@ -20,9 +20,9 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-srcdir="${srcdir:-.}"
-SERV="${SERV:-../src/gnutls-serv${EXEEXT}}"
-CLI="${CLI:-../src/gnutls-cli${EXEEXT}}"
+: ${srcdir=.}
+: ${SERV=../src/gnutls-serv${EXEEXT}}
+: ${CLI=../src/gnutls-cli${EXEEXT}}
 unset RETCODE
 CERTFILE1=rawpk-script1.$$.pem.tmp
 CERTFILE2=rawpk-script2.$$.pem.tmp
@@ -186,7 +186,7 @@ cleanup()
 echo " * testing server X.509, client RAW"
 
 eval "${GETPORT}"
-launch_server $$ --echo --x509keyfile ${CERTFILE1} --x509certfile ${CERTFILE1} --priority NORMAL:-CTYPE-CLI-ALL:+CTYPE-CLI-RAWPK --require-client-cert
+launch_server --echo --x509keyfile ${CERTFILE1} --x509certfile ${CERTFILE1} --priority NORMAL:-CTYPE-CLI-ALL:+CTYPE-CLI-RAWPK --require-client-cert
 PID=$!
 wait_server ${PID}
 
@@ -216,7 +216,7 @@ wait
 
 echo " * testing server RAW, client none"
 eval "${GETPORT}"
-launch_server $$ --echo --rawpkkeyfile ${CERTFILE2} --rawpkfile ${CERTFILE2} --priority NORMAL:+CTYPE-SRV-RAWPK
+launch_server --echo --rawpkkeyfile ${CERTFILE2} --rawpkfile ${CERTFILE2} --priority NORMAL:+CTYPE-SRV-RAWPK
 PID=$!
 wait_server ${PID}
 
@@ -247,7 +247,7 @@ wait
 
 echo " * testing server RAW, client RAW"
 eval "${GETPORT}"
-launch_server $$ --echo --rawpkkeyfile ${CERTFILE2} --rawpkfile ${CERTFILE2} --priority NORMAL:+CTYPE-SRV-RAWPK:-CTYPE-CLI-ALL:+CTYPE-CLI-RAWPK --require-client-cert
+launch_server --echo --rawpkkeyfile ${CERTFILE2} --rawpkfile ${CERTFILE2} --priority NORMAL:+CTYPE-SRV-RAWPK:-CTYPE-CLI-ALL:+CTYPE-CLI-RAWPK --require-client-cert
 PID=$!
 wait_server ${PID}
 
@@ -279,7 +279,7 @@ wait
 echo " * testing server X.509+RAW, client none"
 
 eval "${GETPORT}"
-launch_server $$ --echo --x509keyfile ${CERTFILE1} --x509certfile ${CERTFILE1} --rawpkkeyfile ${CERTFILE2} --rawpkfile ${CERTFILE2} --priority NORMAL:+CTYPE-SRV-RAWPK
+launch_server --echo --x509keyfile ${CERTFILE1} --x509certfile ${CERTFILE1} --rawpkkeyfile ${CERTFILE2} --rawpkfile ${CERTFILE2} --priority NORMAL:+CTYPE-SRV-RAWPK
 PID=$!
 wait_server ${PID}
 

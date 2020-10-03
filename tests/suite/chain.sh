@@ -20,11 +20,11 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-srcdir="${srcdir:-.}"
+: ${srcdir=.}
 mkdir -p x509paths
 cd x509paths
 
-CERTTOOL="${CERTTOOL:-../../../src/certtool${EXEEXT}}"
+: ${CERTTOOL=../../../src/certtool${EXEEXT}}
 
 if ! test -x "${CERTTOOL}"; then
 	exit 77

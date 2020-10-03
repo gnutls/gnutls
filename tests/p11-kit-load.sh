@@ -19,12 +19,12 @@
 
 #set -e
 
-srcdir="${srcdir:-.}"
-builddir="${builddir:-.}"
-CERTTOOL="${CERTTOOL:-../src/certtool${EXEEXT}}"
-P11TOOL="${P11TOOL:-../src/p11tool${EXEEXT}}"
-DIFF="${DIFF:-diff}"
-PKGCONFIG="${PKG_CONFIG:-$(which pkg-config)}"
+: ${srcdir=.}
+: ${builddir=.}
+: ${CERTTOOL=../src/certtool${EXEEXT}}
+: ${P11TOOL=../src/p11tool${EXEEXT}}
+: ${DIFF=diff}
+: ${PKG_CONFIG=pkg-config}
 TMP_SOFTHSM_DIR="./softhsm-load.$$.tmp"
 P11DIR="p11-kit-conf.$$.tmp"
 PIN=1234
@@ -46,9 +46,9 @@ for lib in ${libdir} ${libdir}/pkcs11 /usr/lib64/pkcs11/ /usr/lib/pkcs11/ /usr/l
 	fi
 done
 
-${PKGCONFIG} --version >/dev/null || exit 77
+${PKG_CONFIG} --version >/dev/null || exit 77
 
-${PKGCONFIG} --atleast-version=0.23.10 p11-kit-1
+${PKG_CONFIG} --atleast-version=0.23.10 p11-kit-1
 if test $? != 0;then
 	echo p11-kit 0.23.10 is required
 	exit 77

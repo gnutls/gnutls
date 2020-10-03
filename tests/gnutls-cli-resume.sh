@@ -20,9 +20,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 #
 
-srcdir="${srcdir:-.}"
-SERV="${SERV:-../src/gnutls-serv${EXEEXT}}"
-CLI="${CLI:-../src/gnutls-cli${EXEEXT}}"
+: ${srcdir=.}
+: ${SERV=../src/gnutls-serv${EXEEXT}}
+: ${CLI=../src/gnutls-cli${EXEEXT}}
 unset RETCODE
 
 if ! test -x "${SERV}"; then
@@ -45,7 +45,7 @@ KEY1=${srcdir}/../doc/credentials/x509/key-rsa.pem
 CERT1=${srcdir}/../doc/credentials/x509/cert-rsa.pem
 
 eval "${GETPORT}"
-launch_server $$ --echo --x509keyfile ${KEY1} --x509certfile ${CERT1}
+launch_server --echo --x509keyfile ${KEY1} --x509certfile ${CERT1}
 PID=$!
 wait_server ${PID}
 

@@ -1,7 +1,7 @@
 #!/bin/sh
 
-srcdir="${srcdir:-.}"
-top_builddir="${top_builddir:-../..}"
+: ${srcdir=.}
+: ${top_builddir=../..}
 
 nodejs --help >/dev/null 2>&1
 if test $? = 0; then

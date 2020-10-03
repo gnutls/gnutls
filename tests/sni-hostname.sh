@@ -19,9 +19,9 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-srcdir="${srcdir:-.}"
-SERV="${SERV:-../src/gnutls-serv${EXEEXT}}"
-CLI="${CLI:-../src/gnutls-cli${EXEEXT}}"
+: ${srcdir=.}
+: ${SERV=../src/gnutls-serv${EXEEXT}}
+: ${CLI=../src/gnutls-cli${EXEEXT}}
 unset RETCODE
 
 if ! test -x "${SERV}"; then
@@ -55,7 +55,7 @@ OPTS="--sni-hostname example.com --verify-hostname example.com"
 NOOPTS="--sni-hostname noexample.com --verify-hostname example.com"
 
 eval "${GETPORT}"
-launch_server $$ --echo --sni-hostname-fatal --sni-hostname example.com --x509keyfile ${KEY1} --x509certfile ${CERT1}
+launch_server --echo --sni-hostname-fatal --sni-hostname example.com --x509keyfile ${KEY1} --x509certfile ${CERT1}
 PID=$!
 wait_server ${PID}
 

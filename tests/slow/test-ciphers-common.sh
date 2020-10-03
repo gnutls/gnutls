@@ -23,7 +23,7 @@ if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
 
-srcdir="${srcdir:-.}"
+: ${srcdir=.}
 . "${srcdir}/../scripts/common.sh"
 
 ${PROG}
@@ -74,8 +74,8 @@ if test $ret != 0; then
 fi
 
 #SHANI
-$(which lscpu)|grep Flags|grep sha_ni >/dev/null
-if test $? = 0;then
+if (lscpu --version) >/dev/null 2>&1 && \
+   lscpu 2>/dev/null | grep 'Flags:[	]*sha_ni' >/dev/null; then
 	GNUTLS_CPUID_OVERRIDE=0x20 ${PROG}
 	ret=$?
 	if test $ret != 0; then

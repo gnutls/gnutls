@@ -20,9 +20,9 @@
 
 #set -e
 
-srcdir="${srcdir:-.}"
-CERTTOOL="${CERTTOOL:-../src/certtool${EXEEXT}}"
-DIFF="${DIFF:-diff -b -B}"
+: ${srcdir=.}
+: ${CERTTOOL=../src/certtool${EXEEXT}}
+: ${DIFF=diff -b -B}
 if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=15"
 fi

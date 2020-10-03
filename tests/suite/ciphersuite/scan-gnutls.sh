@@ -3,8 +3,8 @@
 
 echo 'var gnutls_ciphersuites = {'
 
-srcdir="${srcdir:-.}"
-top_builddir="${top_builddir:-../..}"
+: ${srcdir=.}
+: ${top_builddir=../..}
 
 gcc -E "${srcdir}/../../lib/algorithms/ciphersuites.c" -I"${top_builddir}" -I"${srcdir}/../../lib" -DHAVE_CONFIG_H -DHAVE_LIBNETTLE -I"${srcdir}/../../gl" -I"${srcdir}/../includes" -DENABLE_DHE -DENABLE_ECDHE -DENABLE_PSK -DENABLE_ANON -DENABLE_SRP \
 	| awk '/^static const gnutls_cipher_suite_entry_st cs_algorithms/, /;/ { print; }' \

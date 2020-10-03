@@ -22,8 +22,8 @@
 
 #set -e
 
-srcdir="${srcdir:-.}"
-CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
+: ${srcdir=.}
+: ${CERTTOOL=../../src/certtool${EXEEXT}}
 TMPFILE=ecdsa.$$.tmp
 TMPCA=ecdsa-ca.$$.tmp
 TMPCAKEY=ecdsa-ca-key.$$.tmp

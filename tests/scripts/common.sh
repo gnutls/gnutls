@@ -26,40 +26,67 @@ export TZ="UTC"
 # command in the caller's PFCMD, or exit, indicating an unsupported
 # test.  Prefer ss from iproute2 over the older netstat.
 have_port_finder() {
-	for file in $(which ss 2> /dev/null) /*bin/ss /usr/*bin/ss /usr/local/*bin/ss;do
-		if test -x "$file";then
-			PFCMD="$file";return 0
+	# Prefer PFCMD if set
+	if test "${PFCMD+set}" = set; then
+		return
+	fi
+
+	if (ss --version) > /dev/null 2>&1; then
+		PFCMD=ss
+		return
+	fi
+
+	# 'ss' might be installed in /sbin
+	for dir in /sbin /usr/sbin /usr/local/sbin; do
+		if ($dir/ss --version) > /dev/null 2>&1; then
+			PFCMD=$dir/ss
+			return
 		fi
 	done
 
-	if test -z "$PFCMD";then
-	for file in $(which netstat 2> /dev/null) /bin/netstat /usr/bin/netstat /usr/local/bin/netstat;do
-		if test -x "$file";then
-			PFCMD="$file";return 0
-		fi
-	done
+	# We can't assume netstat --version for portability reasons
+	if (type netstat) > /dev/null 2>&1; then
+		PFCMD=netstat
+		return
 	fi
 
-	if test -z "$PFCMD";then
-		echo "neither ss nor netstat found"
-		exit 1
-	fi
+	echo "neither ss nor netstat found" 1>&2
+	exit 77
 }
 
 check_if_port_in_use() {
-	local PORT="$1"
-	local PFCMD; have_port_finder
+	local PORT=$1
+	have_port_finder
 	$PFCMD -an|grep "[\:\.]$PORT" >/dev/null 2>&1
 }
 
 check_if_port_listening() {
-	local PORT="$1"
-	local PFCMD; have_port_finder
+	local PORT=$1
+	have_port_finder
 	$PFCMD -anl|grep "[\:\.]$PORT"|grep LISTEN >/dev/null 2>&1
+}
+
+trap "rmdir \"$top_builddir/tests/port.lock.d\" > /dev/null 2>&1 || :" 1 15 2
+
+obtain_port_lock()
+{
+    local i
+    for i in 1 2 3 4 5 6; do
+        if mkdir "$top_builddir/tests/port.lock.d" > /dev/null 2>&1; then
+            return
+        fi
+        echo "try $i: obtaining port lock"
+	sleep 2
+    done
+    return 1
 }
 
 # Find a port number not currently in use.
 GETPORT='
+    obtain_port_lock()
+    if $? -ne 0; then
+        echo "failed to obtain port lock: continuing anyway"
+    fi
     rc=0
     unset myrandom
     while test $rc = 0; do
@@ -101,26 +128,20 @@ fail() {
 
 exit_if_non_x86()
 {
-which lscpu >/dev/null 2>&1
-if test $? = 0;then
-        $(which lscpu)|grep Architecture|grep x86
-        if test $? != 0;then
-                echo "non-x86 CPU detected"
-                exit 0
-        fi
-fi
+	if (lscpu --version) >/dev/null 2>&1 && \
+	    ! lscpu 2>/dev/null | grep 'Architecture:[	]*x86' >/dev/null; then
+		echo "non-x86 CPU detected"
+		exit
+	fi
 }
 
 exit_if_non_padlock()
 {
-which lscpu >/dev/null 2>&1
-if test $? = 0;then
-        $(which lscpu)|grep Flags|grep phe
-        if test $? != 0;then
-                echo "non-Via padlock CPU detected"
-                exit 0
-        fi
-fi
+	if (lscpu --version) >/dev/null 2>&1 && \
+	   ! lscpu 2>/dev/null | grep 'Flags:[	]*phe' >/dev/null; then
+		echo "non-Via padlock CPU detected"
+		exit
+	fi
 }
 
 wait_for_port()
@@ -129,16 +150,17 @@ wait_for_port()
 	local PORT="$1"
 	sleep 1
 
-	for i in 1 2 3 4 5 6;do
+	local i=0
+	while test $i -lt 90; do
 		check_if_port_listening ${PORT}
 		ret=$?
-		if test $ret != 0;then
-		check_if_port_in_use ${PORT}
-			echo try $i
-			sleep 2
-		else
+		if test $ret = 0;then
 			break
 		fi
+		i=`expr $i + 1`
+		check_if_port_in_use ${PORT}
+		echo "try $i: waiting for port"
+		sleep 2
 	done
 	return $ret
 }
@@ -160,42 +182,25 @@ wait_for_free_port()
 	return $ret
 }
 
-launch_server() {
-	PARENT="$1"
-	shift
-
-	wait_for_free_port ${PORT}
-	${SERV} ${DEBUG} -p "${PORT}" "$@" >${LOGFILE-/dev/null} &
-}
-
-launch_pkcs11_server() {
-	PARENT="$1"
-	shift
-	PROVIDER="$1"
-	shift
-
-	wait_for_free_port ${PORT}
-
-	${VALGRIND} ${SERV} ${PROVIDER} ${DEBUG} -p "${PORT}" "$@" &
-}
-
 launch_bare_server() {
-	PARENT="$1"
-	shift
+	wait_for_free_port "$PORT"
+	"$@" >${LOGFILE-/dev/null} &
+}
 
-	wait_for_free_port ${PORT}
-	${SERV} "$@" >${LOGFILE-/dev/null} &
+launch_server() {
+	launch_bare_server $VALGRIND $SERV $DEBUG -p "$PORT" "$@"
 }
 
 wait_server() {
 	local PID=$1
-	trap "test -n \"${PID}\" && kill ${PID};exit 1" 1 15 2
+	trap "test -n \"${PID}\" && kill ${PID}; exit 1" 1 15 2
 	wait_for_port $PORT
 	if test $? != 0;then
 		echo "Server $PORT did not come up"
 		kill $PID
 		exit 1
 	fi
+	rmdir "$top_builddir/tests/port.lock.d" > /dev/null 2>&1 || :
 }
 
 wait_udp_server() {
@@ -203,14 +208,6 @@ wait_udp_server() {
 	trap "test -n \"${PID}\" && kill ${PID};exit 1" 1 15 2
 	sleep 4
 }
-
-if test -x /usr/bin/lockfile-create;then
-LOCKFILE="lockfile-create global"
-UNLOCKFILE="lockfile-remove global"
-else
-LOCKFILE="lockfile global.lock"
-UNLOCKFILE="rm -f global.lock"
-fi
 
 create_testdir() {
 	local PREFIX=$1

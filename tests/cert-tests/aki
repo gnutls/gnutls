@@ -22,10 +22,10 @@
 
 set -e
 
-srcdir="${srcdir:-.}"
-CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
+: ${srcdir=.}
+: ${CERTTOOL=../../src/certtool${EXEEXT}}
 TMPFILE=aki-$$.tmp
-DIFF="${DIFF:-diff -b -B}"
+: ${DIFF=diff -b -B}
 
 if ! test -x "${CERTTOOL}"; then
 	exit 77

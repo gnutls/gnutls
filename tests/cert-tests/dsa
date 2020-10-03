@@ -20,13 +20,13 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-srcdir="${srcdir:-.}"
-SERV="${SERV:-../../src/gnutls-serv}"
-CLI="${CLI:-../../src/gnutls-cli}"
+: ${srcdir=.}
+: ${SERV=../../src/gnutls-serv${EXEEXT}}
+: ${CLI=../../src/gnutls-cli${EXEEXT}}
 DEBUG=""
 unset RETCODE
 
-CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
+: ${CERTTOOL=../../src/certtool${EXEEXT}}
 
 if ! test -x "${CERTTOOL}"; then
 	exit 77
@@ -59,7 +59,7 @@ echo "Checking various DSA key sizes (port ${PORT})"
 echo "Checking DSA-1024 with TLS 1.0"
 
 eval "${GETPORT}"
-launch_server $$ --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0:+DHE-DSS:+SIGN-DSA-SHA256:+SIGN-DSA-SHA1" --x509certfile "${srcdir}/data/cert.dsa.1024.pem" --x509keyfile "${srcdir}/data/dsa.1024.pem"
+launch_server --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0:+DHE-DSS:+SIGN-DSA-SHA256:+SIGN-DSA-SHA1" --x509certfile "${srcdir}/data/cert.dsa.1024.pem" --x509keyfile "${srcdir}/data/dsa.1024.pem"
 PID=$!
 wait_server "${PID}"
 
@@ -93,7 +93,7 @@ wait
 echo "Checking DSA-1024 with TLS 1.2"
 
 eval "${GETPORT}"
-launch_server $$ --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2:+DHE-DSS:+SIGN-DSA-SHA256:+SIGN-DSA-SHA1" --x509certfile "${srcdir}/data/cert.dsa.1024.pem" --x509keyfile "${srcdir}/data/dsa.1024.pem"
+launch_server --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2:+DHE-DSS:+SIGN-DSA-SHA256:+SIGN-DSA-SHA1" --x509certfile "${srcdir}/data/cert.dsa.1024.pem" --x509keyfile "${srcdir}/data/dsa.1024.pem"
 PID=$!
 wait_server "${PID}"
 
@@ -126,7 +126,7 @@ wait
 #echo "Checking DSA-2048 with TLS 1.0"
 
 #eval "${GETPORT}"
-#launch_server $$ --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0" --x509certfile "${srcdir}/data/cert.dsa.2048.pem" --x509keyfile "${srcdir}/data/dsa.2048.pem"
+#launch_server --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0" --x509certfile "${srcdir}/data/cert.dsa.2048.pem" --x509keyfile "${srcdir}/data/dsa.2048.pem"
 #PID=$!
 #wait_server "${PID}"
 
@@ -140,7 +140,7 @@ wait
 echo "Checking DSA-2048 with TLS 1.2"
 
 eval "${GETPORT}"
-launch_server $$ --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2:+DHE-DSS:+SIGN-DSA-SHA256:+SIGN-DSA-SHA1" --x509certfile "${srcdir}/data/cert.dsa.2048.pem" --x509keyfile "${srcdir}/data/dsa.2048.pem"
+launch_server --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2:+DHE-DSS:+SIGN-DSA-SHA256:+SIGN-DSA-SHA1" --x509certfile "${srcdir}/data/cert.dsa.2048.pem" --x509keyfile "${srcdir}/data/dsa.2048.pem"
 PID=$!
 wait_server "${PID}"
 
@@ -154,7 +154,7 @@ wait
 
 #echo "Checking DSA-3072 with TLS 1.0"
 
-#launch_server $$ --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0" --x509certfile "${srcdir}/data/cert.dsa.3072.pem" --x509keyfile "${srcdir}/data/dsa.3072.pem"
+#launch_server --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0" --x509certfile "${srcdir}/data/cert.dsa.3072.pem" --x509keyfile "${srcdir}/data/dsa.3072.pem"
 #PID=$!
 #wait_server "${PID}"
 #
@@ -169,7 +169,7 @@ wait
 echo "Checking DSA-3072 with TLS 1.2"
 
 eval "${GETPORT}"
-launch_server $$ --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2:+DHE-DSS:+SIGN-DSA-SHA256:+SIGN-DSA-SHA1" --x509certfile "${srcdir}/data/cert.dsa.3072.pem" --x509keyfile "${srcdir}/data/dsa.3072.pem"
+launch_server --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2:+DHE-DSS:+SIGN-DSA-SHA256:+SIGN-DSA-SHA1" --x509certfile "${srcdir}/data/cert.dsa.3072.pem" --x509keyfile "${srcdir}/data/dsa.3072.pem"
 PID=$!
 wait_server "${PID}"
 

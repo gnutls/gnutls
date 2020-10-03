@@ -20,8 +20,8 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-srcdir="${srcdir:-.}"
-CERTTOOL="${CERTTOOL:-../src/certtool${EXEEXT}}"
+: ${srcdir=.}
+: ${CERTTOOL=../src/certtool${EXEEXT}}
 
 if ! test -x "${CERTTOOL}"; then
 	exit 77

@@ -21,13 +21,12 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-srcdir="${srcdir:-.}"
-CERTTOOL="${CERTTOOL:-../src/certtool${EXEEXT}}"
-OCSPTOOL="${OCSPTOOL:-../src/ocsptool${EXEEXT}}"
-GNUTLS_SERV="${SERV:-../src/gnutls-serv${EXEEXT}}"
-unset SERV
-GNUTLS_CLI="${GNUTLS_CLI:-../src/gnutls-cli${EXEEXT}}"
-DIFF="${DIFF:-diff}"
+: ${srcdir=.}
+: ${CERTTOOL=../src/certtool${EXEEXT}}
+: ${OCSPTOOL=../src/ocsptool${EXEEXT}}
+: ${SERV=../src/gnutls-serv${EXEEXT}}
+: ${CLI=../src/gnutls-cli${EXEEXT}}
+: ${DIFF=diff}
 SERVER_CERT_FILE="cert.$$.pem.tmp"
 SERVER_KEY_FILE="key.$$.pem.tmp"
 CLIENT_CERT_FILE="cli-cert.$$.pem.tmp"
@@ -42,11 +41,11 @@ if ! test -x "${OCSPTOOL}"; then
 	exit 77
 fi
 
-if ! test -x "${GNUTLS_SERV}"; then
+if ! test -x "${SERV}"; then
 	exit 77
 fi
 
-if ! test -x "${GNUTLS_CLI}"; then
+if ! test -x "${CLI}"; then
 	exit 77
 fi
 
@@ -69,8 +68,8 @@ TLS_SERVER_PORT=$PORT
 eval "${GETPORT}"
 
 # Check for OpenSSL
-OPENSSL=`which openssl`
-if ! test -x "${OPENSSL}"; then
+: ${OPENSSL=openssl}
+if ! ("$OPENSSL" version) > /dev/null 2>&1; then
     echo "You need openssl to run this test."
     exit 77
 fi
@@ -244,7 +243,7 @@ TESTDATE="2018-03-01"
 
 # Start OpenSSL TLS server
 #
-launch_bare_server $$ \
+launch_bare_server \
 	  datefudge "${TESTDATE}" \
 	  "${OPENSSL}" s_server -cert ${SERVER_CERT_FILE} -key ${SERVER_KEY_FILE} \
 	  -CAfile ${CA_FILE} -port ${PORT} -Verify 1 -verify_return_error -www
@@ -252,7 +251,7 @@ SERVER_PID="${!}"
 wait_server "${SERVER_PID}"
 
 datefudge -s "${TESTDATE}" \
-      "${GNUTLS_CLI}" --x509certfile ${CLIENT_CERT_FILE} \
+      "${CLI}" --x509certfile ${CLIENT_CERT_FILE} \
       --x509keyfile ${CLIENT_KEY_FILE} --x509cafile=${CA_FILE} \
       --port="${PORT}" localhost </dev/null
 rc=$?

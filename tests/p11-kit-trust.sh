@@ -20,10 +20,10 @@
 
 #set -e
 
-srcdir="${srcdir:-.}"
-P11TOOL="${P11TOOL:-../src/p11tool${EXEEXT}}"
-CERTTOOL="${CERTTOOL:-../src/certtool${EXEEXT}}"
-DIFF="${DIFF:-diff}"
+: ${srcdir=.}
+: ${P11TOOL=../src/p11tool${EXEEXT}}
+: ${CERTTOOL=../src/certtool${EXEEXT}}
+: ${DIFF=diff}
 
 EXPORTED_FILE=out.$$.tmp
 DER_FILE=out-der.$$.tmp

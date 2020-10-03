@@ -20,9 +20,9 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-srcdir="${srcdir:-.}"
-SERV="${SERV:-../src/gnutls-serv${EXEEXT}}"
-CLI="${CLI:-../src/gnutls-cli${EXEEXT}}"
+: ${srcdir=.}
+: ${SERV=../src/gnutls-serv${EXEEXT}}
+: ${CLI=../src/gnutls-cli${EXEEXT}}
 unset RETCODE
 
 . "${srcdir}/scripts/common.sh"
@@ -33,7 +33,7 @@ SERV="${SERV} -q"
 echo "Checking STARTTLS"
 
 eval "${GETPORT}"
-launch_server $$ --echo --priority "NORMAL:+ANON-ECDH"
+launch_server --echo --priority "NORMAL:+ANON-ECDH"
 PID=$!
 wait_server ${PID}
 

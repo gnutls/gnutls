@@ -20,8 +20,8 @@
 
 #set -e
 
-srcdir="${srcdir:-.}"
-CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
+: ${srcdir=.}
+: ${CERTTOOL=../../src/certtool${EXEEXT}}
 KEYFILE=eddsa-privkey.$$.tmp
 TMPFILE=eddsa.$$.tmp
 TMPFILE2=eddsa2.$$.tmp

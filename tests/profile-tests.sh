@@ -22,9 +22,9 @@
 
 # This program tests whether the profile keywords work as expected
 
-srcdir="${srcdir:-.}"
-SERV="${SERV:-../src/gnutls-serv${EXEEXT}}"
-CLI="${CLI:-../src/gnutls-cli${EXEEXT}}"
+: ${srcdir=.}
+: ${SERV=../src/gnutls-serv${EXEEXT}}
+: ${CLI=../src/gnutls-cli${EXEEXT}}
 TMPFILE=config.$$.tmp
 export GNUTLS_SYSTEM_PRIORITY_FAIL_ON_INVALID=1
 
@@ -81,7 +81,7 @@ _EOF_
 KEY="${CERT}"
 
 eval "${GETPORT}"
-launch_server $$ --echo --priority "NORMAL" --x509keyfile ${KEY} --x509certfile ${CERT}
+launch_server --echo --priority "NORMAL" --x509keyfile ${KEY} --x509certfile ${CERT}
 PID=$!
 wait_server ${PID}
 
@@ -145,7 +145,7 @@ _EOF_
 KEY="${CERT}"
 
 eval "${GETPORT}"
-launch_server $$ --echo --priority "NORMAL" --x509keyfile ${KEY} --x509certfile ${CERT}
+launch_server --echo --priority "NORMAL" --x509keyfile ${KEY} --x509certfile ${CERT}
 PID=$!
 wait_server ${PID}
 
@@ -213,7 +213,7 @@ _EOF_
 KEY="${CERT}"
 
 eval "${GETPORT}"
-launch_server $$ --echo --priority "NORMAL" --x509keyfile ${KEY} --x509certfile ${CERT}
+launch_server --echo --priority "NORMAL" --x509keyfile ${KEY} --x509certfile ${CERT}
 PID=$!
 wait_server ${PID}
 

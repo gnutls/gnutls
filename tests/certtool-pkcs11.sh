@@ -18,12 +18,12 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-srcdir="${srcdir:-.}"
-P11TOOL="${P11TOOL:-../src/p11tool${EXEEXT}}"
-CERTTOOL="${CERTTOOL:-../src/certtool${EXEEXT}}"
-DIFF="${DIFF:-diff -b -B}"
-SERV="${SERV:-../src/gnutls-serv${EXEEXT}}"
-CLI="${CLI:-../src/gnutls-cli${EXEEXT}}"
+: ${srcdir=.}
+: ${P11TOOL=../src/p11tool${EXEEXT}}
+: ${CERTTOOL=../src/certtool${EXEEXT}}
+: ${DIFF=diff -b -B}
+: ${SERV=../src/gnutls-serv${EXEEXT}}
+: ${CLI=../src/gnutls-cli${EXEEXT}}
 RETCODE=0
 
 if ! test -x "${P11TOOL}"; then

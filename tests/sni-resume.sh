@@ -19,9 +19,9 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-srcdir="${srcdir:-.}"
-SERV="${SERV:-../src/gnutls-serv${EXEEXT}}"
-CLI="${CLI:-../src/gnutls-cli${EXEEXT}}"
+: ${srcdir=.}
+: ${SERV=../src/gnutls-serv${EXEEXT}}
+: ${CLI=../src/gnutls-cli${EXEEXT}}
 unset RETCODE
 
 if ! test -x "${SERV}"; then
@@ -52,7 +52,7 @@ echo "Checking if the SNI extension is parsed in gnutls-serv during" \
 TMPFILE="servoutput.$$.tmp"
 
 eval "${GETPORT}"
-launch_server $$ --echo --priority ${PRIORITY} --sni-hostname-fatal \
+launch_server --echo --priority ${PRIORITY} --sni-hostname-fatal \
 	      --sni-hostname server.example.com --noticket 2>${TMPFILE}
 PID=$!
 wait_server ${PID}

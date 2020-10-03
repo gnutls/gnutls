@@ -1,6 +1,6 @@
 #!/bin/sh
 
-CERTTOOL="${CERTTOOL:-../../../src/certtool${EXEEXT}}"
+: ${CERTTOOL=../../../src/certtool${EXEEXT}}
 OUTPUT=out
 TEMPLATE=tmpl
 

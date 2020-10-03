@@ -20,9 +20,9 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-srcdir="${srcdir:-.}"
-SERV="${SERV:-../src/gnutls-serv${EXEEXT}}"
-CLI="${CLI:-../src/gnutls-cli${EXEEXT}}"
+: ${srcdir=.}
+: ${SERV=../src/gnutls-serv${EXEEXT}}
+: ${CLI=../src/gnutls-cli${EXEEXT}}
 unset RETCODE
 
 if ! test -x "${SERV}"; then
@@ -56,7 +56,7 @@ TMPFILE1=save-data1.$$.tmp
 TMPFILE2=save-data2.$$.tmp
 
 eval "${GETPORT}"
-launch_server $$ --echo --x509keyfile ${KEY1} --x509certfile ${CERT1} --ocsp-response=${OCSP1} --ignore-ocsp-response-errors -d 6
+launch_server --echo --x509keyfile ${KEY1} --x509certfile ${CERT1} --ocsp-response=${OCSP1} --ignore-ocsp-response-errors -d 6
 PID=$!
 wait_server ${PID}
 

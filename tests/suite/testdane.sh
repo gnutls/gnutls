@@ -18,8 +18,8 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-srcdir="${srcdir:-.}"
-DANETOOL="${DANETOOL:-../../src/danetool${EXEEXT}}"
+: ${srcdir=.}
+: ${DANETOOL=../../src/danetool${EXEEXT}}
 unset RETCODE
 
 if ! test -x "${DANETOOL}"; then

@@ -20,9 +20,9 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-srcdir="${srcdir:-.}"
-SERV="${SERV:-../src/gnutls-serv${EXEEXT}}"
-CLI="${CLI:-../src/gnutls-cli${EXEEXT}}"
+: ${srcdir=.}
+: ${SERV=../src/gnutls-serv${EXEEXT}}
+: ${CLI=../src/gnutls-cli${EXEEXT}}
 TMPFILE=config.$$.tmp
 TMPFILE2=log.$$.tmp
 export GNUTLS_SYSTEM_PRIORITY_FAIL_ON_INVALID=1
@@ -73,7 +73,7 @@ CERT1=${srcdir}/../doc/credentials/x509/cert-rsa.pem
 unset GNUTLS_SYSTEM_PRIORITY_FILE
 
 eval "${GETPORT}"
-launch_server $$ --echo --priority "NORMAL:-VERS-ALL:+VERS-TLS1.2:+VERS-TLS1.3" --x509keyfile ${KEY1} --x509certfile ${CERT1}
+launch_server --echo --priority "NORMAL:-VERS-ALL:+VERS-TLS1.2:+VERS-TLS1.3" --x509keyfile ${KEY1} --x509certfile ${CERT1}
 PID=$!
 wait_server ${PID}
 
@@ -91,7 +91,7 @@ KEY1=${srcdir}/../doc/credentials/x509/key-rsa.pem
 CERT1=${srcdir}/../doc/credentials/x509/cert-rsa.pem
 
 eval "${GETPORT}"
-launch_server $$ --echo --priority "NORMAL" --x509keyfile ${KEY1} --x509certfile ${CERT1}
+launch_server --echo --priority "NORMAL" --x509keyfile ${KEY1} --x509certfile ${CERT1}
 PID=$!
 wait_server ${PID}
 

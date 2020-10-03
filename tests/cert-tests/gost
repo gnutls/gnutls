@@ -21,8 +21,8 @@
 
 #set -e
 
-srcdir="${srcdir:-.}"
-CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
+: ${srcdir=.}
+: ${CERTTOOL=../../src/certtool${EXEEXT}}
 TMPFILE=gost.$$.tmp
 TMPCA=gost-ca.$$.tmp
 TMPCAKEY=gost-ca-key.$$.tmp

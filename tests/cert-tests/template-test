@@ -20,10 +20,10 @@
 
 #set -e
 
-srcdir="${srcdir:-.}"
-ac_cv_sizeof_time_t="${ac_cv_sizeof_time_t:-8}"
-CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
-DIFF="${DIFF:-diff}"
+: ${srcdir=.}
+: ${ac_cv_sizeof_time_t=8}
+: ${CERTTOOL=../../src/certtool${EXEEXT}}
+: ${DIFF=diff}
 
 if ! test -x "${CERTTOOL}"; then
 	exit 77
