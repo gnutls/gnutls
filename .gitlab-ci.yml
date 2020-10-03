@@ -35,13 +35,13 @@ after_script:
 
 variables:
   BUILD_IMAGES_PROJECT: gnutls/build-images
-  DEBIAN_BUILD: buildenv-debian
-  DEBIAN_CROSS_BUILD: buildenv-debian-cross
+  DEBIAN_BUILD: buildenv-debian-testing
+  DEBIAN_CROSS_BUILD: buildenv-debian-cross-testing
   DEBIAN_X86_CROSS_BUILD: buildenv-debian-x86-cross
   FEDORA28_BUILD: buildenv-f28
-  FEDORA_BUILD: buildenv-fedora32
-  MINGW_BUILD: buildenv-mingw
-  ALPINE_BASE_BUILD: buildenv-alpine-base
+  FEDORA_BUILD: buildenv-fedora33
+  MINGW_BUILD: buildenv-mingw-fedora33
+  ALPINE_BASE_BUILD: buildenv-alpine-base-nettle36
   CPPCHECK_OPTIONS: "--enable=warning --enable=style --enable=performance --enable=portability --std=c99 --suppressions-list=devel/cppcheck.suppressions --template='{id}:{file}:{line},{severity},{message}'"
   GET_SOURCES_ATTEMPTS: "3"
 
@@ -716,9 +716,6 @@ Debian.cross.i686-linux-gnu:
   retry: 1
 
 Debian.cross.arm-linux-gnueabihf:
-  <<: *Debian_cross_template
-
-Debian.cross.mips-linux-gnu:
   <<: *Debian_cross_template
 
 Debian.cross.aarch64-linux-gnu:
