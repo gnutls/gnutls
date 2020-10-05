@@ -36,5 +36,6 @@ int gnutls_digest_self_test(unsigned flags, gnutls_digest_algorithm_t digest);
 int gnutls_pk_self_test(unsigned flags, gnutls_pk_algorithm_t pk);
 int gnutls_hkdf_self_test(unsigned flags, gnutls_mac_algorithm_t mac);
 int gnutls_pbkdf2_self_test(unsigned flags, gnutls_mac_algorithm_t mac);
+int gnutls_tlsprf_self_test(unsigned flags, gnutls_mac_algorithm_t mac);
 
 #endif /* GNUTLS_SELF_TEST_H */

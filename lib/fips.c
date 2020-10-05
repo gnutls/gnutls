@@ -437,6 +437,13 @@ int _gnutls_fips_perform_self_checks2(void)
 		goto error;
 	}
 
+	/* TLS-PRF */
+	ret = gnutls_tlsprf_self_test(0, GNUTLS_MAC_SHA256);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
 	if (_gnutls_rnd_ops.self_test == NULL) {
 		gnutls_assert();
 		goto error;
