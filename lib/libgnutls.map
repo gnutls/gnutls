@@ -1348,6 +1348,7 @@ GNUTLS_FIPS140_3_4 {
 	gnutls_mac_self_test;
 	gnutls_digest_self_test;
 	gnutls_hkdf_self_test;
+	gnutls_pbkdf2_self_test;
 	#for FIPS140-2 validation
 	drbg_aes_reseed;
 	drbg_aes_init;

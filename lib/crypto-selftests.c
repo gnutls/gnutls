@@ -3076,3 +3076,110 @@ int gnutls_hkdf_self_test(unsigned flags, gnutls_mac_algorithm_t mac)
 
 	return 0;
 }
+
+struct pbkdf2_vectors_st {
+	const uint8_t *key;
+	size_t key_size;
+	const uint8_t *salt;
+	size_t salt_size;
+	unsigned iter_count;
+	const uint8_t *output;
+	size_t output_size;
+};
+
+const struct pbkdf2_vectors_st pbkdf2_sha256_vectors[] = {
+	/* RFC 7914: 11. Test Vectors for PBKDF2 with HMAC-SHA-256 */
+	{
+		STR(key, key_size, "passwd"),
+		STR(salt, salt_size, "salt"),
+		.iter_count = 1,
+		STR(output, output_size,
+		    "\x55\xac\x04\x6e\x56\xe3\x08\x9f\xec\x16\x91\xc2\x25\x44"
+		    "\xb6\x05\xf9\x41\x85\x21\x6d\xde\x04\x65\xe6\x8b\x9d\x57"
+		    "\xc2\x0d\xac\xbc\x49\xca\x9c\xcc\xf1\x79\xb6\x45\x99\x16"
+		    "\x64\xb3\x9d\x77\xef\x31\x7c\x71\xb8\x45\xb1\xe3\x0b\xd5"
+		    "\x09\x11\x20\x41\xd3\xa1\x97\x83"),
+	},
+	/* RFC 7914: 11. Test Vectors for PBKDF2 with HMAC-SHA-256 */
+	{
+		STR(key, key_size, "Password"),
+		STR(salt, salt_size, "NaCl"),
+		.iter_count = 80000,
+		STR(output, output_size,
+		    "\x4d\xdc\xd8\xf6\x0b\x98\xbe\x21\x83\x0c\xee\x5e\xf2\x27"
+		    "\x01\xf9\x64\x1a\x44\x18\xd0\x4c\x04\x14\xae\xff\x08\x87"
+		    "\x6b\x34\xab\x56\xa1\xd4\x25\xa1\x22\x58\x33\x54\x9a\xdb"
+		    "\x84\x1b\x51\xc9\xb3\x17\x6a\x27\x2b\xde\xbb\xa1\xd0\x78"
+		    "\x47\x8f\x62\xb3\x97\xf3\x3c\x8d"),
+	},
+};
+
+static int test_pbkdf2(gnutls_mac_algorithm_t mac,
+		       const struct pbkdf2_vectors_st *vectors,
+		       size_t vectors_size, unsigned flags)
+{
+	unsigned int i;
+
+	for (i = 0; i < vectors_size; i++) {
+		gnutls_datum_t key, salt;
+		uint8_t output[4096];
+		int ret;
+
+		key.data = (void *) vectors[i].key;
+		key.size = vectors[i].key_size;
+		salt.data = (void *) vectors[i].salt;
+		salt.size = vectors[i].salt_size;
+
+		ret = gnutls_pbkdf2(mac, &key, &salt, vectors[i].iter_count,
+				    output, vectors[i].output_size);
+		if (ret < 0) {
+			_gnutls_debug_log("error calculating PBKDF2: MAC-%s\n",
+					  gnutls_mac_get_name(mac));
+			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+		}
+
+		if (memcmp(output, vectors[i].output, vectors[i].output_size) != 0) {
+			_gnutls_debug_log
+			    ("PBKDF2: MAC-%s test vector failed!\n",
+			     gnutls_mac_get_name(mac));
+
+			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+		}
+	}
+
+	_gnutls_debug_log
+	    ("PBKDF2: MAC-%s self check succeeded\n",
+	     gnutls_mac_get_name(mac));
+
+	return 0;
+}
+
+/*-
+ * gnutls_pbkdf2_self_test:
+ * @flags: GNUTLS_SELF_TEST_FLAG flags
+ * @mac: the message authentication algorithm to use
+ *
+ * This function will run self tests on PBKDF2 with the provided mac.
+ *
+ * Returns: Zero or a negative error code on error.
+ *
+ * Since: 3.3.0-FIPS140
+ -*/
+int gnutls_pbkdf2_self_test(unsigned flags, gnutls_mac_algorithm_t mac)
+{
+	int ret;
+
+	if (flags & GNUTLS_SELF_TEST_FLAG_ALL)
+		mac = GNUTLS_MAC_UNKNOWN;
+
+	switch (mac) {
+	case GNUTLS_MAC_UNKNOWN:
+		CASE(GNUTLS_MAC_SHA256, test_pbkdf2, pbkdf2_sha256_vectors);
+
+		break;
+	default:
+		return gnutls_assert_val(GNUTLS_E_NO_SELF_TEST);
+	}
+
+	return 0;
+}
