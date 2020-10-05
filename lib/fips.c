@@ -398,6 +398,12 @@ int _gnutls_fips_perform_self_checks2(void)
 		goto error;
 	}
 
+	ret = gnutls_mac_self_test(0, GNUTLS_MAC_AES_CMAC_256);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
 	/* PK */
 	ret = gnutls_pk_self_test(0, GNUTLS_PK_RSA);
 	if (ret < 0) {
