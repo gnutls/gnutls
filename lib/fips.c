@@ -398,6 +398,12 @@ int _gnutls_fips_perform_self_checks2(void)
 		goto error;
 	}
 
+	ret = gnutls_mac_self_test(0, GNUTLS_MAC_AES_CMAC_256);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
 	/* PK */
 	ret = gnutls_pk_self_test(0, GNUTLS_PK_RSA);
 	if (ret < 0) {
@@ -418,6 +424,27 @@ int _gnutls_fips_perform_self_checks2(void)
 	}
 
 	ret = gnutls_pk_self_test(0, GNUTLS_PK_DH);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+	/* HKDF */
+	ret = gnutls_hkdf_self_test(0, GNUTLS_MAC_SHA256);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+	/* PBKDF2 */
+	ret = gnutls_pbkdf2_self_test(0, GNUTLS_MAC_SHA256);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+	/* TLS-PRF */
+	ret = gnutls_tlsprf_self_test(0, GNUTLS_MAC_SHA256);
 	if (ret < 0) {
 		gnutls_assert();
 		goto error;

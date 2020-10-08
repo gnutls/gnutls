@@ -2917,3 +2917,465 @@ int gnutls_digest_self_test(unsigned flags, gnutls_digest_algorithm_t digest)
 
 	return 0;
 }
+
+struct hkdf_vectors_st {
+	const uint8_t *ikm;
+	unsigned int ikm_size;
+	const uint8_t *salt;
+	unsigned int salt_size;
+	const uint8_t *prk;
+	unsigned int prk_size;
+	const uint8_t *info;
+	unsigned int info_size;
+	const uint8_t *okm;
+	unsigned int okm_size;
+};
+
+const struct hkdf_vectors_st hkdf_sha256_vectors[] = {
+	/* RFC 5869: A.1. Test Case 1: Basic test case with SHA-256 */
+	{
+		STR(ikm, ikm_size,
+		    "\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b"
+		    "\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b"),
+		STR(salt, salt_size,
+		    "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c"),
+		STR(prk, prk_size,
+		    "\x07\x77\x09\x36\x2c\x2e\x32\xdf\x0d\xdc\x3f\x0d\xc4\x7b"
+		    "\xba\x63\x90\xb6\xc7\x3b\xb5\x0f\x9c\x31\x22\xec\x84\x4a"
+		    "\xd7\xc2\xb3\xe5"),
+		STR(info, info_size,
+		    "\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9"),
+		STR(okm, okm_size,
+		    "\x3c\xb2\x5f\x25\xfa\xac\xd5\x7a\x90\x43\x4f\x64\xd0\x36"
+		    "\x2f\x2a\x2d\x2d\x0a\x90\xcf\x1a\x5a\x4c\x5d\xb0\x2d\x56"
+		    "\xec\xc4\xc5\xbf\x34\x00\x72\x08\xd5\xb8\x87\x18\x58\x65"),
+	},
+	/* RFC 5869: A.2. Test Case 2: Test with SHA-256 and longer inputs/outputs */
+	{
+		STR(ikm, ikm_size,
+		    "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d"
+		    "\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b"
+		    "\x1c\x1d\x1e\x1f\x20\x21\x22\x23\x24\x25\x26\x27\x28\x29"
+		    "\x2a\x2b\x2c\x2d\x2e\x2f\x30\x31\x32\x33\x34\x35\x36\x37"
+		    "\x38\x39\x3a\x3b\x3c\x3d\x3e\x3f\x40\x41\x42\x43\x44\x45"
+		    "\x46\x47\x48\x49\x4a\x4b\x4c\x4d\x4e\x4f"),
+		STR(salt, salt_size,
+		    "\x60\x61\x62\x63\x64\x65\x66\x67\x68\x69\x6a\x6b\x6c\x6d"
+		    "\x6e\x6f\x70\x71\x72\x73\x74\x75\x76\x77\x78\x79\x7a\x7b"
+		    "\x7c\x7d\x7e\x7f\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89"
+		    "\x8a\x8b\x8c\x8d\x8e\x8f\x90\x91\x92\x93\x94\x95\x96\x97"
+		    "\x98\x99\x9a\x9b\x9c\x9d\x9e\x9f\xa0\xa1\xa2\xa3\xa4\xa5"
+		    "\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf"),
+		STR(prk, prk_size,
+		    "\x06\xa6\xb8\x8c\x58\x53\x36\x1a\x06\x10\x4c\x9c\xeb\x35"
+		    "\xb4\x5c\xef\x76\x00\x14\x90\x46\x71\x01\x4a\x19\x3f\x40"
+		    "\xc1\x5f\xc2\x44"),
+		STR(info, info_size,
+		    "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd"
+		    "\xbe\xbf\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb"
+		    "\xcc\xcd\xce\xcf\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9"
+		    "\xda\xdb\xdc\xdd\xde\xdf\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7"
+		    "\xe8\xe9\xea\xeb\xec\xed\xee\xef\xf0\xf1\xf2\xf3\xf4\xf5"
+		    "\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff"),
+		STR(okm, okm_size,
+		    "\xb1\x1e\x39\x8d\xc8\x03\x27\xa1\xc8\xe7\xf7\x8c\x59\x6a"
+		    "\x49\x34\x4f\x01\x2e\xda\x2d\x4e\xfa\xd8\xa0\x50\xcc\x4c"
+		    "\x19\xaf\xa9\x7c\x59\x04\x5a\x99\xca\xc7\x82\x72\x71\xcb"
+		    "\x41\xc6\x5e\x59\x0e\x09\xda\x32\x75\x60\x0c\x2f\x09\xb8"
+		    "\x36\x77\x93\xa9\xac\xa3\xdb\x71\xcc\x30\xc5\x81\x79\xec"
+		    "\x3e\x87\xc1\x4c\x01\xd5\xc1\xf3\x43\x4f\x1d\x87"),
+	},
+};
+
+static int test_hkdf(gnutls_mac_algorithm_t mac,
+		     const struct hkdf_vectors_st *vectors,
+		     size_t vectors_size, unsigned flags)
+{
+	unsigned int i;
+
+	for (i = 0; i < vectors_size; i++) {
+		gnutls_datum_t ikm, prk, salt, info;
+		uint8_t output[4096];
+		int ret;
+
+		ikm.data = (void *) vectors[i].ikm;
+		ikm.size = vectors[i].ikm_size;
+		salt.data = (void *) vectors[i].salt;
+		salt.size = vectors[i].salt_size;
+
+		ret = gnutls_hkdf_extract(mac, &ikm, &salt, output);
+		if (ret < 0) {
+			_gnutls_debug_log("error extracting HKDF: MAC-%s\n",
+					  gnutls_mac_get_name(mac));
+			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+		}
+
+		if (memcmp(output, vectors[i].prk, vectors[i].prk_size) != 0) {
+			_gnutls_debug_log
+			    ("HKDF extract: MAC-%s test vector failed!\n",
+			     gnutls_mac_get_name(mac));
+
+			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+		}
+
+		prk.data = (void *) vectors[i].prk;
+		prk.size = vectors[i].prk_size;
+		info.data = (void *) vectors[i].info;
+		info.size = vectors[i].info_size;
+
+		ret = gnutls_hkdf_expand(mac, &prk, &info,
+					 output, vectors[i].okm_size);
+		if (ret < 0) {
+			_gnutls_debug_log("error extracting HKDF: MAC-%s\n",
+					  gnutls_mac_get_name(mac));
+			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+		}
+
+		if (memcmp(output, vectors[i].okm, vectors[i].okm_size) != 0) {
+			_gnutls_debug_log
+			    ("HKDF expand: MAC-%s test vector failed!\n",
+			     gnutls_mac_get_name(mac));
+
+			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+		}
+	}
+
+	_gnutls_debug_log
+	    ("HKDF: MAC-%s self check succeeded\n",
+	     gnutls_mac_get_name(mac));
+
+	return 0;
+}
+
+/*-
+ * gnutls_hkdf_self_test:
+ * @flags: GNUTLS_SELF_TEST_FLAG flags
+ * @mac: the message authentication algorithm to use
+ *
+ * This function will run self tests on HKDF with the provided mac.
+ *
+ * Returns: Zero or a negative error code on error.
+ *
+ * Since: 3.3.0-FIPS140
+ -*/
+int gnutls_hkdf_self_test(unsigned flags, gnutls_mac_algorithm_t mac)
+{
+	int ret;
+
+	if (flags & GNUTLS_SELF_TEST_FLAG_ALL)
+		mac = GNUTLS_MAC_UNKNOWN;
+
+	switch (mac) {
+	case GNUTLS_MAC_UNKNOWN:
+		CASE(GNUTLS_MAC_SHA256, test_hkdf, hkdf_sha256_vectors);
+
+		break;
+	default:
+		return gnutls_assert_val(GNUTLS_E_NO_SELF_TEST);
+	}
+
+	return 0;
+}
+
+struct pbkdf2_vectors_st {
+	const uint8_t *key;
+	size_t key_size;
+	const uint8_t *salt;
+	size_t salt_size;
+	unsigned iter_count;
+	const uint8_t *output;
+	size_t output_size;
+};
+
+const struct pbkdf2_vectors_st pbkdf2_sha256_vectors[] = {
+	/* RFC 7914: 11. Test Vectors for PBKDF2 with HMAC-SHA-256 */
+	{
+		STR(key, key_size, "passwd"),
+		STR(salt, salt_size, "salt"),
+		.iter_count = 1,
+		STR(output, output_size,
+		    "\x55\xac\x04\x6e\x56\xe3\x08\x9f\xec\x16\x91\xc2\x25\x44"
+		    "\xb6\x05\xf9\x41\x85\x21\x6d\xde\x04\x65\xe6\x8b\x9d\x57"
+		    "\xc2\x0d\xac\xbc\x49\xca\x9c\xcc\xf1\x79\xb6\x45\x99\x16"
+		    "\x64\xb3\x9d\x77\xef\x31\x7c\x71\xb8\x45\xb1\xe3\x0b\xd5"
+		    "\x09\x11\x20\x41\xd3\xa1\x97\x83"),
+	},
+	/* RFC 7914: 11. Test Vectors for PBKDF2 with HMAC-SHA-256 */
+	{
+		STR(key, key_size, "Password"),
+		STR(salt, salt_size, "NaCl"),
+		.iter_count = 80000,
+		STR(output, output_size,
+		    "\x4d\xdc\xd8\xf6\x0b\x98\xbe\x21\x83\x0c\xee\x5e\xf2\x27"
+		    "\x01\xf9\x64\x1a\x44\x18\xd0\x4c\x04\x14\xae\xff\x08\x87"
+		    "\x6b\x34\xab\x56\xa1\xd4\x25\xa1\x22\x58\x33\x54\x9a\xdb"
+		    "\x84\x1b\x51\xc9\xb3\x17\x6a\x27\x2b\xde\xbb\xa1\xd0\x78"
+		    "\x47\x8f\x62\xb3\x97\xf3\x3c\x8d"),
+	},
+};
+
+static int test_pbkdf2(gnutls_mac_algorithm_t mac,
+		       const struct pbkdf2_vectors_st *vectors,
+		       size_t vectors_size, unsigned flags)
+{
+	unsigned int i;
+
+	for (i = 0; i < vectors_size; i++) {
+		gnutls_datum_t key, salt;
+		uint8_t output[4096];
+		int ret;
+
+		key.data = (void *) vectors[i].key;
+		key.size = vectors[i].key_size;
+		salt.data = (void *) vectors[i].salt;
+		salt.size = vectors[i].salt_size;
+
+		ret = gnutls_pbkdf2(mac, &key, &salt, vectors[i].iter_count,
+				    output, vectors[i].output_size);
+		if (ret < 0) {
+			_gnutls_debug_log("error calculating PBKDF2: MAC-%s\n",
+					  gnutls_mac_get_name(mac));
+			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+		}
+
+		if (memcmp(output, vectors[i].output, vectors[i].output_size) != 0) {
+			_gnutls_debug_log
+			    ("PBKDF2: MAC-%s test vector failed!\n",
+			     gnutls_mac_get_name(mac));
+
+			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+		}
+	}
+
+	_gnutls_debug_log
+	    ("PBKDF2: MAC-%s self check succeeded\n",
+	     gnutls_mac_get_name(mac));
+
+	return 0;
+}
+
+/*-
+ * gnutls_pbkdf2_self_test:
+ * @flags: GNUTLS_SELF_TEST_FLAG flags
+ * @mac: the message authentication algorithm to use
+ *
+ * This function will run self tests on PBKDF2 with the provided mac.
+ *
+ * Returns: Zero or a negative error code on error.
+ *
+ * Since: 3.3.0-FIPS140
+ -*/
+int gnutls_pbkdf2_self_test(unsigned flags, gnutls_mac_algorithm_t mac)
+{
+	int ret;
+
+	if (flags & GNUTLS_SELF_TEST_FLAG_ALL)
+		mac = GNUTLS_MAC_UNKNOWN;
+
+	switch (mac) {
+	case GNUTLS_MAC_UNKNOWN:
+		CASE(GNUTLS_MAC_SHA256, test_pbkdf2, pbkdf2_sha256_vectors);
+
+		break;
+	default:
+		return gnutls_assert_val(GNUTLS_E_NO_SELF_TEST);
+	}
+
+	return 0;
+}
+
+struct tlsprf_vectors_st {
+	const uint8_t *key;
+	size_t key_size;
+	const uint8_t *label;
+	size_t label_size;
+	const uint8_t *seed;
+	size_t seed_size;
+	const uint8_t *output;
+	size_t output_size;
+};
+
+const struct tlsprf_vectors_st tls10prf_vectors[] = {
+	/* tests/tls10-prf.c: test1 */
+	{
+		STR(key, key_size,
+		    "\x26\x3b\xdb\xbb\x6f\x6d\x4c\x66\x4e\x05\x8d\x0a\xa9\xd3"
+		    "\x21\xbe"),
+		STR(label, label_size,
+		    "test label"),
+		STR(seed, seed_size,
+		    "\xb9\x20\x57\x3b\x19\x96\x01\x02\x4f\x04\xd6\xdc\x61\x96"
+		    "\x6e\x65"),
+		STR(output, output_size,
+		    "\x66\x17\x99\x37\x65\xfa\x6c\xa7\x03\xd1\x9e\xc7\x0d\xd5"
+		    "\xdd\x16\x0f\xfc\xc0\x77\x25\xfa\xfb\x71\x4a\x9f\x81\x5a"
+		    "\x2a\x30\xbf\xb7\xe3\xbb\xfb\x7e\xee\x57\x4b\x3b\x61\x3e"
+		    "\xb7\xfe\x80\xee\xc9\x69\x1d\x8c\x1b\x0e\x2d\x9b\x3c\x8b"
+		    "\x4b\x02\xb6\xb6\xd6\xdb\x88\xe2\x09\x46\x23\xef\x62\x40"
+		    "\x60\x7e\xda\x7a\xbe\x3c\x84\x6e\x82\xa3"),
+	},
+};
+
+const struct tlsprf_vectors_st tls12prf_sha256_vectors[] = {
+	/* tests/tls12-prf.c: sha256_test1 */
+	{
+		STR(key, key_size,
+		    "\x04\x50\xb0\xea\x9e\xcd\x36\x02\xee\x0d\x76\xc5\xc3\xc8"
+		    "\x6f\x4a"),
+		STR(label, label_size,
+		    "test label"),
+		STR(seed, seed_size,
+		    "\x20\x7a\xcc\x02\x54\xb8\x67\xf5\xb9\x25\xb4\x5a\x33\x60"
+		    "\x1d\x8b"),
+		STR(output, output_size,
+		    "\xae\x67\x9e\x0e\x71\x4f\x59\x75\x76\x37\x68\xb1\x66\x97"
+		    "\x9e\x1d"),
+	},
+	/* tests/tls12-prf.c: sha256_test2 */
+	{
+		STR(key, key_size,
+		    "\x34\x20\x4a\x9d\xf0\xbe\x6e\xb4\xe9\x25\xa8\x02\x7c\xf6"
+		    "\xc6\x02"),
+		STR(label, label_size,
+		    "test label"),
+		STR(seed, seed_size,
+		    "\x98\xb2\xc4\x0b\xcd\x66\x4c\x83\xbb\x92\x0c\x18\x20\x1a"
+		    "\x63\x95"),
+		STR(output, output_size,
+		    "\xaf\xa9\x31\x24\x53\xc2\x2f\xa8\x3d\x2b\x51\x1b\x37\x2d"
+		    "\x73\xa4\x02\xa2\xa6\x28\x73\x23\x9a\x51\xfa\xde\x45\x08"
+		    "\x2f\xaf\x3f\xd2\xbb\x7f\xfb\x3e\x9b\xf3\x6e\x28\xb3\x14"
+		    "\x1a\xab\xa4\x84\x00\x53\x32\xa9\xf9\xe3\x88\xa4\xd3\x29"
+		    "\xf1\x58\x7a\x4b\x31\x7d\xa0\x77\x08\xea\x1b\xa9\x5a\x53"
+		    "\xf8\x78\x67\x24\xbd\x83\xce\x4b\x03\xaf"),
+	},
+	/* tests/tls12-prf.c: sha256_test3 */
+	{
+		STR(key, key_size,
+		    "\xa3\x69\x1a\xa1\xf6\x81\x4b\x80\x59\x2b\xf1\xcf\x2a\xcf"
+		    "\x16\x97"),
+		STR(label, label_size,
+		    "test label"),
+		STR(seed, seed_size,
+		    "\x55\x23\xd4\x1e\x32\x0e\x69\x4d\x0c\x1f\xf5\x73\x4d\x83"
+		    "\x0b\x93\x3e\x46\x92\x70\x71\xc9\x26\x21"),
+		STR(output, output_size,
+		    "\x6a\xd0\x98\x4f\xa0\x6f\x78\xfe\x16\x1b\xd4\x6d\x7c\x26"
+		    "\x1d\xe4\x33\x40\xd7\x28\xdd\xdc\x3d\x0f\xf0\xdd\x7e\x0d"),
+	},
+	/* tests/tls12-prf.c: sha256_test4 */
+	{
+		STR(key, key_size,
+		    "\x21\x0e\xc9\x37\x06\x97\x07\xe5\x46\x5b\xc4\x6b\xf7\x79"
+		    "\xe1\x04\x10\x8b\x18\xfd\xb7\x93\xbe\x7b\x21\x8d\xbf\x14"
+		    "\x5c\x86\x41\xf3"),
+		STR(label, label_size,
+		    "test label"),
+		STR(seed, seed_size,
+		    "\x1e\x35\x1a\x0b\xaf\x35\xc7\x99\x45\x92\x43\x94\xb8\x81"
+		    "\xcf\xe3\x1d\xae\x8f\x1c\x1e\xd5\x4d\x3b"),
+		STR(output, output_size,
+		    "\x76\x53\xfa\x80\x9c\xde\x3b\x55\x3c\x4a\x17\xe2\xcd\xbc"
+		    "\xc9\x18\xf3\x65\x27\xf2\x22\x19\xa7\xd7\xf9\x5d\x97\x24"
+		    "\x3f\xf2\xd5\xde\xe8\x26\x5e\xf0\xaf\x03"),
+	},
+};
+
+const struct tlsprf_vectors_st tls12prf_sha384_vectors[] = {
+	/* tests/tls12-prf.c: sha384_test1
+	 * https://www.ietf.org/mail-archive/web/tls/current/msg03416.html
+	 */
+	{
+		STR(key, key_size,
+		    "\xb8\x0b\x73\x3d\x6c\xee\xfc\xdc\x71\x56\x6e\xa4\x8e\x55"
+		    "\x67\xdf"),
+		STR(label, label_size,
+		    "test label"),
+		STR(seed, seed_size,
+		    "\xcd\x66\x5c\xf6\xa8\x44\x7d\xd6\xff\x8b\x27\x55\x5e\xdb"
+		    "\x74\x65"),
+		STR(output, output_size,
+		    "\x7b\x0c\x18\xe9\xce\xd4\x10\xed\x18\x04\xf2\xcf\xa3\x4a"
+		    "\x33\x6a\x1c\x14\xdf\xfb\x49\x00\xbb\x5f\xd7\x94\x21\x07"
+		    "\xe8\x1c\x83\xcd\xe9\xca\x0f\xaa\x60\xbe\x9f\xe3\x4f\x82"
+		    "\xb1\x23\x3c\x91\x46\xa0\xe5\x34\xcb\x40\x0f\xed\x27\x00"
+		    "\x88\x4f\x9d\xc2\x36\xf8\x0e\xdd\x8b\xfa\x96\x11\x44\xc9"
+		    "\xe8\xd7\x92\xec\xa7\x22\xa7\xb3\x2f\xc3\xd4\x16\xd4\x73"
+		    "\xeb\xc2\xc5\xfd\x4a\xbf\xda\xd0\x5d\x91\x84\x25\x9b\x5b"
+		    "\xf8\xcd\x4d\x90\xfa\x0d\x31\xe2\xde\xc4\x79\xe4\xf1\xa2"
+		    "\x60\x66\xf2\xee\xa9\xa6\x92\x36\xa3\xe5\x26\x55\xc9\xe9"
+		    "\xae\xe6\x91\xc8\xf3\xa2\x68\x54\x30\x8d\x5e\xaa\x3b\xe8"
+		    "\x5e\x09\x90\x70\x3d\x73\xe5\x6f"),
+	},
+};
+
+static int test_tlsprf(gnutls_mac_algorithm_t mac,
+		       const struct tlsprf_vectors_st *vectors,
+		       size_t vectors_size, unsigned flags)
+{
+	unsigned int i;
+
+	for (i = 0; i < vectors_size; i++) {
+		char output[4096];
+		int ret;
+
+		ret = _gnutls_prf_raw(mac,
+				      vectors[i].key_size, vectors[i].key,
+				      vectors[i].label_size, (const char *)vectors[i].label,
+				      vectors[i].seed_size, vectors[i].seed,
+				      vectors[i].output_size, output);
+		if (ret < 0) {
+			_gnutls_debug_log("error calculating TLS-PRF: MAC-%s\n",
+					  gnutls_mac_get_name(mac));
+			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+		}
+
+		if (memcmp(output, vectors[i].output, vectors[i].output_size) != 0) {
+			_gnutls_debug_log
+			    ("TLS-PRF: MAC-%s test vector failed!\n",
+			     gnutls_mac_get_name(mac));
+
+			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+		}
+	}
+
+	_gnutls_debug_log
+	    ("TLS-PRF: MAC-%s self check succeeded\n",
+	     gnutls_mac_get_name(mac));
+
+	return 0;
+}
+
+/*-
+ * gnutls_tlsprf_self_test:
+ * @flags: GNUTLS_SELF_TEST_FLAG flags
+ * @mac: the message authentication algorithm to use
+ *
+ * This function will run self tests on TLS-PRF with the provided mac.
+ *
+ * Returns: Zero or a negative error code on error.
+ *
+ * Since: 3.3.0-FIPS140
+ -*/
+int gnutls_tlsprf_self_test(unsigned flags, gnutls_mac_algorithm_t mac)
+{
+	int ret;
+
+	if (flags & GNUTLS_SELF_TEST_FLAG_ALL)
+		mac = GNUTLS_MAC_UNKNOWN;
+
+	switch (mac) {
+	case GNUTLS_MAC_UNKNOWN:
+		NON_FIPS_CASE(GNUTLS_MAC_MD5_SHA1, test_tlsprf, tls10prf_vectors);
+		FALLTHROUGH;
+		CASE(GNUTLS_MAC_SHA256, test_tlsprf, tls12prf_sha256_vectors);
+		FALLTHROUGH;
+		CASE(GNUTLS_MAC_SHA384, test_tlsprf, tls12prf_sha384_vectors);
+
+		break;
+	default:
+		return gnutls_assert_val(GNUTLS_E_NO_SELF_TEST);
+	}
+
+	return 0;
+}
