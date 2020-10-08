@@ -23,8 +23,6 @@
 #include "gnutls_int.h"
 #include <gnutls/gnutls.h>
 
-#if defined(ENABLE_DHE) || defined(ENABLE_ANON)
-
 #include "dh.h"
 
 static const unsigned char ffdhe_generator = 0x02;
@@ -1934,5 +1932,3 @@ _gnutls_dh_prime_match_fips_approved(const uint8_t *prime,
 
 	return 0;
 }
-
-#endif
