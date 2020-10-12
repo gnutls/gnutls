@@ -211,7 +211,10 @@ FIPS140-2.Fedora.x86_64:
   - make -j$BUILDJOBS
   - make -j$CHECKJOBS check
   - mkdir -p lib/.libs/fipscheck
-  - fipshmac -d lib/.libs/fipscheck/ -s .hmac lib/.libs/libgnutls.so*
+  - |
+    for i in lib/.libs/libgnutls.so*; do
+      openssl sha256 -hmac orboDeJITITejsirpADONivirpUkvarP -hex $i | cut -f 2 -d ' ' > lib/.libs/fipscheck/$(basename $i).hmac
+    done
   - GNUTLS_FORCE_FIPS_MODE=1 make -j$CHECKJOBS check
   - cd ..
   tags:
