@@ -50,6 +50,7 @@
 #include "read-file.h"
 #include "sockets.h"
 #include "xalloc.h"
+#include "xsize.h"
 
 /* konqueror cannot handle sending the page in multiple
  * pieces.
@@ -562,7 +563,7 @@ static char *peer_print_info(gnutls_session_t session, int *ret_length,
 	char *http_buffer, *desc;
 	gnutls_kx_algorithm_t kx_alg;
 	size_t len = 20 * 1024 + strlen(header);
-	char *crtinfo = NULL, *crtinfo_old = NULL;
+	char *crtinfo = NULL;
 	gnutls_protocol_t version;
 	size_t ncrtinfo = 0;
 
@@ -600,17 +601,22 @@ static char *peer_print_info(gnutls_session_t session, int *ret_length,
 			    && gnutls_x509_crt_print(cert,
 						     GNUTLS_CRT_PRINT_FULL,
 						     &info) == 0) {
-				const char *post = "</PRE><P><PRE>";
+				const char post[] = "</PRE><P><PRE>";
+				char *crtinfo_new;
+				size_t ncrtinfo_new;
 				
-				crtinfo_old = crtinfo;
-				crtinfo =
-				    realloc(crtinfo,
-					    ncrtinfo + info.size +
-					    strlen(post) + 1);
-				if (crtinfo == NULL) {
-					free(crtinfo_old);
+				ncrtinfo_new = xsum3(ncrtinfo, info.size,
+						     sizeof(post));
+				if (size_overflow_p(ncrtinfo_new)) {
+					free(crtinfo);
 					return NULL;
 				}
+				crtinfo_new = realloc(crtinfo, ncrtinfo_new);
+				if (crtinfo_new == NULL) {
+					free(crtinfo);
+					return NULL;
+				}
+				crtinfo = crtinfo_new;
 				memcpy(crtinfo + ncrtinfo, info.data,
 				       info.size);
 				ncrtinfo += info.size;
