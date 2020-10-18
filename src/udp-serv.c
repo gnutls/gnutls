@@ -37,7 +37,6 @@
 #include <common.h>
 #include "udp-serv.h"
 #include "serv-args.h"
-#include "list.h"
 
 extern int disable_client_cert;
 

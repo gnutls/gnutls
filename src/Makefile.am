@@ -140,7 +140,7 @@ nodist_libcmd_ocsp_la_SOURCES = ocsptool-args.h ocsptool-args.c
 endif
 
 gnutls_serv_SOURCES =		\
-  list.h serv.c			\
+  serv.c			\
   udp-serv.c udp-serv.h		\
   common.h common.c		\
   certtool-common.h 
