@@ -1123,7 +1123,18 @@ static void terminate(int sig) __attribute__ ((__noreturn__));
 
 static void terminate(int sig)
 {
-	fprintf(stderr, "Exiting via signal %d\n", sig);
+	char buf[64] = { 0 };
+	char *p;
+
+	/* This code must be async-signal-safe. */
+	p = stpcpy(buf, "Exiting via signal ");
+
+	if (sig > 10)
+		*p++ = '0' + sig / 10;
+	*p++ = '0' + sig % 10;
+	*p++ = '\n';
+
+	write(STDERR_FILENO, buf, p - buf);
 	exit(1);
 }
 
