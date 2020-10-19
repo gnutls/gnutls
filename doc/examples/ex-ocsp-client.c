@@ -91,6 +91,10 @@ int main(int argc, char *argv[])
                                tmp.data);
 
                         hostname = malloc(tmp.size + 1);
+                        if (!hostname) {
+                                fprintf(stderr, "error: cannot allocate memory\n");
+                                exit(1);
+                        }
                         memcpy(hostname, tmp.data, tmp.size);
                         hostname[tmp.size] = 0;
 

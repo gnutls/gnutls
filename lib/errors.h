@@ -38,7 +38,47 @@
 #define gnutls_assert()
 #endif
 
-int _gnutls_asn2err(int asn_err) __GNUTLS_CONST__;
+inline static int _gnutls_asn2err(int asn_err) __GNUTLS_CONST__;
+
+inline static int _gnutls_asn2err(int asn_err)
+{
+	switch (asn_err) {
+#ifdef ASN1_TIME_ENCODING_ERROR
+	case ASN1_TIME_ENCODING_ERROR:
+		return GNUTLS_E_ASN1_TIME_ERROR;
+#endif
+	case ASN1_FILE_NOT_FOUND:
+		return GNUTLS_E_FILE_ERROR;
+	case ASN1_ELEMENT_NOT_FOUND:
+		return GNUTLS_E_ASN1_ELEMENT_NOT_FOUND;
+	case ASN1_IDENTIFIER_NOT_FOUND:
+		return GNUTLS_E_ASN1_IDENTIFIER_NOT_FOUND;
+	case ASN1_DER_ERROR:
+		return GNUTLS_E_ASN1_DER_ERROR;
+	case ASN1_VALUE_NOT_FOUND:
+		return GNUTLS_E_ASN1_VALUE_NOT_FOUND;
+	case ASN1_GENERIC_ERROR:
+		return GNUTLS_E_ASN1_GENERIC_ERROR;
+	case ASN1_VALUE_NOT_VALID:
+		return GNUTLS_E_ASN1_VALUE_NOT_VALID;
+	case ASN1_TAG_ERROR:
+		return GNUTLS_E_ASN1_TAG_ERROR;
+	case ASN1_TAG_IMPLICIT:
+		return GNUTLS_E_ASN1_TAG_IMPLICIT;
+	case ASN1_ERROR_TYPE_ANY:
+		return GNUTLS_E_ASN1_TYPE_ANY_ERROR;
+	case ASN1_SYNTAX_ERROR:
+		return GNUTLS_E_ASN1_SYNTAX_ERROR;
+	case ASN1_MEM_ERROR:
+		return GNUTLS_E_SHORT_MEMORY_BUFFER;
+	case ASN1_MEM_ALLOC_ERROR:
+		return GNUTLS_E_MEMORY_ERROR;
+	case ASN1_DER_OVERFLOW:
+		return GNUTLS_E_ASN1_DER_OVERFLOW;
+	default:
+		return GNUTLS_E_ASN1_GENERIC_ERROR;
+	}
+}
 
 void _gnutls_log(int, const char *fmt, ...)
 #ifdef __GNUC__

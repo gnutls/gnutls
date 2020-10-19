@@ -28,6 +28,7 @@
 
 #include "common.h"
 #include "serv-args.h"
+#include "udp-serv.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -38,16 +39,18 @@
 #include <sys/time.h>
 #include <sys/select.h>
 #include <fcntl.h>
-#include <list.h>
 #include <netdb.h>
 #include <unistd.h>
 #include <socket.h>
 
 /* Gnulib portability files. */
-#include "read-file.h"
+#include "gl_linked_list.h"
+#include "gl_xlist.h"
 #include "minmax.h"
+#include "read-file.h"
 #include "sockets.h"
-#include "udp-serv.h"
+#include "xalloc.h"
+#include "xsize.h"
 
 /* konqueror cannot handle sending the page in multiple
  * pieces.
@@ -145,16 +148,21 @@ static void cmd_parser(int argc, char **argv);
 #define HTTP_STATE_RESPONSE	2
 #define HTTP_STATE_CLOSING	3
 
-LIST_TYPE_DECLARE(listener_item, char *http_request; char *http_response;
-		  int request_length; int response_length;
-		  int response_written; int http_state;
-		  int listen_socket; int fd;
-		  gnutls_session_t tls_session;
-		  int handshake_ok;
-		  int close_ok;
-		  time_t start;
-		  int earlydata_eof;
-    );
+typedef struct {
+	char *http_request;
+	char *http_response;
+	int request_length;
+	int response_length;
+	int response_written;
+	int http_state;
+	int listen_socket;
+	int fd;
+	gnutls_session_t tls_session;
+	int handshake_ok;
+	int close_ok;
+	time_t start;
+	int earlydata_eof;
+} listener_item;
 
 static const char *safe_strerror(int value)
 {
@@ -164,8 +172,9 @@ static const char *safe_strerror(int value)
 	return ret;
 }
 
-static void listener_free(listener_item * j)
+static void listener_free(const void *elt)
 {
+	listener_item *j = (listener_item *)elt;
 
 	free(j->http_request);
 	free(j->http_response);
@@ -275,7 +284,7 @@ get_params(gnutls_session_t session, gnutls_params_type_t type,
 	return 0;
 }
 
-LIST_DECLARE_INIT(listener_list, listener_item, listener_free);
+static gl_list_t listener_list;
 
 static int cert_verify_callback(gnutls_session_t session)
 {
@@ -554,7 +563,7 @@ static char *peer_print_info(gnutls_session_t session, int *ret_length,
 	char *http_buffer, *desc;
 	gnutls_kx_algorithm_t kx_alg;
 	size_t len = 20 * 1024 + strlen(header);
-	char *crtinfo = NULL, *crtinfo_old = NULL;
+	char *crtinfo = NULL;
 	gnutls_protocol_t version;
 	size_t ncrtinfo = 0;
 
@@ -592,17 +601,22 @@ static char *peer_print_info(gnutls_session_t session, int *ret_length,
 			    && gnutls_x509_crt_print(cert,
 						     GNUTLS_CRT_PRINT_FULL,
 						     &info) == 0) {
-				const char *post = "</PRE><P><PRE>";
+				const char post[] = "</PRE><P><PRE>";
+				char *crtinfo_new;
+				size_t ncrtinfo_new;
 				
-				crtinfo_old = crtinfo;
-				crtinfo =
-				    realloc(crtinfo,
-					    ncrtinfo + info.size +
-					    strlen(post) + 1);
-				if (crtinfo == NULL) {
-					free(crtinfo_old);
+				ncrtinfo_new = xsum3(ncrtinfo, info.size,
+						     sizeof(post));
+				if (size_overflow_p(ncrtinfo_new)) {
+					free(crtinfo);
 					return NULL;
 				}
+				crtinfo_new = realloc(crtinfo, ncrtinfo_new);
+				if (crtinfo_new == NULL) {
+					free(crtinfo);
+					return NULL;
+				}
+				crtinfo = crtinfo_new;
 				memcpy(crtinfo + ncrtinfo, info.data,
 				       info.size);
 				ncrtinfo += info.size;
@@ -865,21 +879,25 @@ const char *human_addr(const struct sockaddr *sa, socklen_t salen,
 
 int wait_for_connection(void)
 {
-	listener_item *j;
 	fd_set rd, wr;
 	int n, sock = -1;
+	gl_list_iterator_t iter;
+	const void *elt;
 
 	FD_ZERO(&rd);
 	FD_ZERO(&wr);
 	n = 0;
 
-	lloopstart(listener_list, j) {
+	iter = gl_list_iterator(listener_list);
+	while (gl_list_iterator_next(&iter, &elt, NULL)) {
+		const listener_item *j = elt;
+
 		if (j->listen_socket) {
 			FD_SET(j->fd, &rd);
 			n = MAX(n, j->fd);
 		}
 	}
-	lloopend(listener_list, j);
+	gl_list_iterator_free(&iter);
 
 	/* waiting part */
 	n = select(n + 1, &rd, &wr, NULL, NULL);
@@ -891,14 +909,17 @@ int wait_for_connection(void)
 	}
 
 	/* find which one is ready */
-	lloopstart(listener_list, j) {
+	iter = gl_list_iterator(listener_list);
+	while (gl_list_iterator_next(&iter, &elt, NULL)) {
+		const listener_item *j = elt;
+
 		/* a new connection has arrived */
 		if (FD_ISSET(j->fd, &rd) && j->listen_socket) {
 			sock = j->fd;
 			break;
 		}
 	}
-	lloopend(listener_list, j);
+	gl_list_iterator_free(&iter);
 	return sock;
 }
 
@@ -997,8 +1018,8 @@ int listen_socket(const char *name, int listen_port, int socktype)
 		}
 
 		/* new list entry for the connection */
-		lappend(listener_list);
-		j = listener_list.tail;
+		j = xzalloc(sizeof(*j));
+		gl_list_add_last(listener_list, j);
 		j->listen_socket = 1;
 		j->fd = s;
 
@@ -1102,7 +1123,18 @@ static void terminate(int sig) __attribute__ ((__noreturn__));
 
 static void terminate(int sig)
 {
-	fprintf(stderr, "Exiting via signal %d\n", sig);
+	char buf[64] = { 0 };
+	char *p;
+
+	/* This code must be async-signal-safe. */
+	p = stpcpy(buf, "Exiting via signal ");
+
+	if (sig > 10)
+		*p++ = '0' + sig / 10;
+	*p++ = '0' + sig % 10;
+	*p++ = '\n';
+
+	write(STDERR_FILENO, buf, p - buf);
 	exit(1);
 }
 
@@ -1150,6 +1182,10 @@ int main(int argc, char **argv)
 #endif
 
 	sockets_init();
+
+	listener_list = gl_list_create_empty(GL_LINKED_LIST,
+					     NULL, NULL, listener_free,
+					     true);
 
 	if (nodb == 0)
 		wrap_db_init();
@@ -1499,7 +1535,12 @@ static void tcp_server(const char *name, int port)
 		exit(1);
 
 	for (;;) {
-		listener_item *j;
+		gl_list_iterator_t iter;
+		gl_list_node_t node;
+		const void *elt;
+		gl_list_t accepted_list = gl_list_create_empty(GL_LINKED_LIST,
+							       NULL, NULL, NULL,
+							       true);
 		fd_set rd, wr;
 		time_t now = time(0);
 #ifndef _WIN32
@@ -1511,7 +1552,9 @@ static void tcp_server(const char *name, int port)
 		n = 0;
 
 /* flag which connections we are reading or writing to within the fd sets */
-		lloopstart(listener_list, j) {
+		iter = gl_list_iterator(listener_list);
+		while (gl_list_iterator_next(&iter, &elt, &node)) {
+			listener_item *j = (listener_item *)elt;
 
 #ifndef _WIN32
 			val = fcntl(j->fd, F_GETFL, 0);
@@ -1541,8 +1584,9 @@ static void tcp_server(const char *name, int port)
 				FD_SET(j->fd, &wr);
 				n = MAX(n, j->fd);
 			}
+			gl_list_node_set_value(listener_list, node, j);
 		}
-		lloopend(listener_list, j);
+		gl_list_iterator_free(&iter);
 
 /* core operation */
 		tv.tv_sec = 10;
@@ -1556,7 +1600,9 @@ static void tcp_server(const char *name, int port)
 		}
 
 /* read or write to each connection as indicated by select()'s return argument */
-		lloopstart(listener_list, j) {
+		iter = gl_list_iterator(listener_list);
+		while (gl_list_iterator_next(&iter, &elt, &node)) {
+			listener_item *j = (listener_item *)elt;
 
 			/* a new connection has arrived */
 			if (FD_ISSET(j->fd, &rd) && j->listen_socket) {
@@ -1573,23 +1619,24 @@ static void tcp_server(const char *name, int port)
 					char timebuf[SIMPLE_CTIME_BUF_SIZE];
 					time_t tt = time(0);
 					char *ctt;
+					listener_item *jj;
 
 					/* new list entry for the connection */
-					lappend(listener_list);
-					j = listener_list.tail;
-					j->http_request =
+					jj = xzalloc(sizeof(*jj));
+					gl_list_add_last(accepted_list, jj);
+					jj->http_request =
 					    (char *) strdup("");
-					j->http_state = HTTP_STATE_REQUEST;
-					j->fd = accept_fd;
-					j->start = tt;
+					jj->http_state = HTTP_STATE_REQUEST;
+					jj->fd = accept_fd;
+					jj->start = tt;
 
-					j->tls_session = initialize_session(0);
-					gnutls_session_set_ptr(j->tls_session, j);
+					jj->tls_session = initialize_session(0);
+					gnutls_session_set_ptr(jj->tls_session, jj);
 					gnutls_transport_set_int
-					    (j->tls_session, accept_fd);
-					set_read_funcs(j->tls_session);
-					j->handshake_ok = 0;
-					j->close_ok = 0;
+					    (jj->tls_session, accept_fd);
+					set_read_funcs(jj->tls_session);
+					jj->handshake_ok = 0;
+					jj->close_ok = 0;
 
 					if (verbose != 0) {
 						ctt = simple_ctime(&tt, timebuf);
@@ -1775,16 +1822,27 @@ static void tcp_server(const char *name, int port)
 					j->http_state = HTTP_STATE_REQUEST;
 				}
 			}
+			gl_list_node_set_value(listener_list, node, j);
 		}
-		lloopend(listener_list, j);
+		gl_list_iterator_free(&iter);
 
 /* loop through all connections, closing those that are in error */
-		lloopstart(listener_list, j) {
+		iter = gl_list_iterator(listener_list);
+		while (gl_list_iterator_next(&iter, &elt, &node)) {
+			const listener_item *j = elt;
+
 			if (j->http_state == HTTP_STATE_CLOSING) {
-				ldeleteinc(listener_list, j);
+				gl_list_remove_node(listener_list, node);
 			}
 		}
-		lloopend(listener_list, j);
+		gl_list_iterator_free(&iter);
+
+		iter = gl_list_iterator(accepted_list);
+		while (gl_list_iterator_next(&iter, &elt, &node)) {
+			gl_list_add_last(listener_list, elt);
+		}
+		gl_list_iterator_free(&iter);
+		gl_list_free(accepted_list);
 	}
 
 
