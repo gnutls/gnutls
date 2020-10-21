@@ -82,8 +82,8 @@ unsigned int _gnutls_x86_cpuid_s[4];
 #endif
 
 #ifndef OSXSAVE_MASK
-/* OSXSAVE|FMA|MOVBE */
-# define OSXSAVE_MASK (0x8000000|0x1000|0x400000)
+/* OSXSAVE|MOVBE */
+# define OSXSAVE_MASK (0x8000000|0x400000)
 #endif
 
 #ifndef bit_MOVBE
@@ -188,7 +188,7 @@ static void capabilities_to_intel_cpuid(unsigned capabilities)
 
 	if (capabilities & INTEL_AVX) {
 		if ((a[1] & bit_AVX) && check_4th_gen_intel_features(a[1])) {
-			_gnutls_x86_cpuid_s[1] |= bit_AVX|bit_MOVBE;
+			_gnutls_x86_cpuid_s[1] |= bit_AVX|OSXSAVE_MASK;
 		} else {
 			_gnutls_debug_log
 			    ("AVX acceleration requested but not available\n");
