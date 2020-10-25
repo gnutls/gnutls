@@ -495,11 +495,30 @@ static void ch_handler(int sig)
 	wait(&status);
 	if (WEXITSTATUS(status) != 0 ||
 	    (WIFSIGNALED(status) && WTERMSIG(status) == SIGSEGV)) {
-		if (WIFSIGNALED(status))
-			fprintf(stderr, "Child died with sigsegv\n");
-		else
-			fprintf(stderr, "Child died with status %d\n",
-				WEXITSTATUS(status));
+		/* This code must be async-signal-safe. */
+		if (WIFSIGNALED(status)) {
+			const char msg[] = "Child died with sigsegv\n";
+			write(STDERR_FILENO, "Child died with sigsegv\n", sizeof(msg));
+		} else {
+			char buf[64] = { 0 };
+			char *p;
+
+			p = stpcpy(buf, "Child died with status ");
+
+			status = WEXITSTATUS(status) & 0377;
+			if (status > 100) {
+				*p++ = '0' + status / 100;
+				status %= 100;
+			}
+			if (status > 10) {
+				*p++ = '0' + status / 10;
+				status %= 10;
+			}
+			*p++ = '0' + status;
+			*p++ = '\n';
+
+			write(STDERR_FILENO, buf, p - buf);
+		}
 	}
 	return;
 }
