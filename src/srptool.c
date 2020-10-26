@@ -529,6 +529,7 @@ crypt_int(const char *username, const char *passwd, int salt_size,
 		p = fgets(line, sizeof(line) - 1, fp);
 	}
 	while (p != NULL && atoi(p) != uindex);
+	fclose(fp);
 
 	if (p == NULL) {
 		fprintf(stderr, "Cannot find entry in %s\n", tpasswd_conf);
@@ -536,7 +537,6 @@ crypt_int(const char *username, const char *passwd, int salt_size,
 	}
 	line[sizeof(line) - 1] = 0;
 
-	fclose(fp);
 	if ((iindex = read_conf_values(&g, &n, line)) < 0) {
 		fprintf(stderr, "Cannot parse conf file '%s'\n",
 			tpasswd_conf);
