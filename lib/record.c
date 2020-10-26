@@ -367,6 +367,7 @@ copy_record_version(gnutls_session_t session,
 	lver = get_version(session);
 	if (session->internals.initial_negotiation_completed ||
 	    htype != GNUTLS_HANDSHAKE_CLIENT_HELLO ||
+	    (session->internals.hsk_flags & HSK_HRR_RECEIVED) ||
 	    session->internals.default_record_version[0] == 0) {
 
 		if (unlikely(lver == NULL))
