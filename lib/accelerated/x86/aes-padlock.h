@@ -30,8 +30,8 @@ struct padlock_ctx {
 extern const gnutls_crypto_cipher_st _gnutls_aes_padlock;
 extern const gnutls_crypto_cipher_st _gnutls_aes_gcm_padlock;
 
-extern const gnutls_crypto_mac_st _gnutls_hmac_sha_padlock;
-extern const gnutls_crypto_digest_st _gnutls_sha_padlock;
+extern const gnutls_crypto_mac_st _gnutls_hmac_sha_padlock_oneshot;
+extern const gnutls_crypto_digest_st _gnutls_sha_padlock_oneshot;
 
 int padlock_aes_cipher_setkey(void *_ctx, const void *userkey,
 			      size_t keysize);
