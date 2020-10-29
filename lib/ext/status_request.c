@@ -487,6 +487,10 @@ int _gnutls_recv_server_certificate_status(gnutls_session_t session)
 	}
 
 	if (resp.data && resp.size > 0) {
+		for (unsigned int i = 0; i < info->nocsp; i++)
+			gnutls_free(info->raw_ocsp_list[i].data);
+		gnutls_free(info->raw_ocsp_list);
+
 		info->raw_ocsp_list = gnutls_malloc(sizeof(gnutls_datum_t));
 		if (info->raw_ocsp_list == NULL) {
 			ret = GNUTLS_E_MEMORY_ERROR;
