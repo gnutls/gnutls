@@ -41,7 +41,7 @@ fi
 echo "Checking PSK tool basic operations"
 
 # echo create a user and check whether a key is available
-"${PSKTOOL}" -p ${TMPFILE} -u test
+${VALGRIND} "${PSKTOOL}" -p ${TMPFILE} -u test
 if test $? != 0;then
 	echo "password generation failed..."
 	exit 1
@@ -63,7 +63,7 @@ fi
 
 # Create second user and check whether both exist
 
-"${PSKTOOL}" -p ${TMPFILE} -u user2
+${VALGRIND} "${PSKTOOL}" -p ${TMPFILE} -u user2
 if test $? != 0;then
 	echo "password generation failed..."
 	exit 1
@@ -78,6 +78,34 @@ fi
 grep 'user2:' ${TMPFILE} >/dev/null 2>&1
 if test $? != 0;then
 	echo "could not find second generated user..."
+	exit 1
+fi
+
+# Create third user with a special character in username
+
+${VALGRIND} "${PSKTOOL}" -p ${TMPFILE} -u user:3
+if test $? != 0;then
+	echo "password generation failed..."
+	exit 1
+fi
+
+grep '#757365723a33:' ${TMPFILE} >/dev/null 2>&1
+if test $? != 0;then
+	echo "could not find third generated user..."
+	exit 1
+fi
+
+# Modify the third user password
+
+${VALGRIND} "${PSKTOOL}" -p ${TMPFILE} -u user:3
+if test $? != 0;then
+	echo "password generation failed..."
+	exit 1
+fi
+
+matches=`grep '#757365723a33:' ${TMPFILE} 2>/dev/null | wc -l`
+if test $matches != 1;then
+	echo "duplicate entry for third generated user..."
 	exit 1
 fi
 

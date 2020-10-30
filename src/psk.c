@@ -58,6 +58,7 @@ int main(int argc, char **argv)
 #include <minmax.h>
 #include "close-stream.h"
 #include "getpass.h"
+#include "xsize.h"
 
 static int write_key(const char *username,
 		     const unsigned char *key, size_t key_size,
@@ -217,6 +218,7 @@ write_key(const char *username, const unsigned char *key, size_t key_size,
 	/* encode username if it contains special characters */
 	if (strcspn(username, ":\n") != strlen(username)) {
 		char *new_data;
+		size_t new_size;
 
 		tmp.data = (void *)username;
 		tmp.size = strlen(username);
@@ -229,16 +231,21 @@ write_key(const char *username, const unsigned char *key, size_t key_size,
 		}
 
 		/* prepend '#' */
-		new_data = gnutls_realloc(_username.data, _username.size + 2);
+		new_size = xsum(_username.size, 2);
+		if (size_overflow_p(new_size)) {
+			ret = -1;
+			goto out;
+		}
+		new_data = gnutls_realloc(_username.data, new_size);
 		if (!new_data) {
 			ret = -1;
 			goto out;
 		}
-		memmove(_username.data + 1, _username.data, _username.size);
+		memmove(new_data + 1, new_data, _username.size);
 		new_data[0] = '#';
-		new_data[_username.size] = '\0';
+		new_data[_username.size + 1] = '\0';
 		_username.data = (void *)new_data;
-		_username.size += 1;
+		_username.size = new_size - 1;
 	} else {
 		_username.data = (void *)strdup(username);
 		_username.size = strlen(username);
