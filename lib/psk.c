@@ -231,6 +231,11 @@ gnutls_psk_allocate_server_credentials(gnutls_psk_server_credentials_t *
  * #gnutls_psk_server_credentials_t type.  This password file
  * holds usernames and keys and will be used for PSK authentication.
  *
+ * Each entry in the file consists of a username, followed by a colon
+ * (':') and a hex-encoded key.  If the username contains a colon or
+ * any other special character, it can be hex-encoded preceded by a
+ * '#'.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
  **/

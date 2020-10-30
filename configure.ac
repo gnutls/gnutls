@@ -1209,7 +1209,6 @@ AC_CONFIG_FILES([
   libdane/includes/Makefile
   libdane/gnutls-dane.pc
   gl/Makefile
-  gl/tests/Makefile
   guile/Makefile
   guile/src/Makefile
   lib/Makefile
@@ -1231,6 +1230,7 @@ AC_CONFIG_FILES([
   src/Makefile
   src/args-std.def
   src/gl/Makefile
+  src/gl/tests/Makefile
   tests/Makefile
   tests/windows/Makefile
   tests/cert-tests/Makefile
