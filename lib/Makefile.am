@@ -183,6 +183,30 @@ endif
 
 if ENABLE_FIPS140
 thirdparty_libadd += $(FIPS140_LIBS) $(LTLIBDL)
+
+noinst_PROGRAMS = fipshmac
+fipshmac_SOURCES = fipshmac.c
+fipshmac_LDADD = libgnutls.la
+
+hmac_files = .libs/.$(gnutls_so).hmac
+
+all-local: $(hmac_files)
+
+.libs/.$(gnutls_so).hmac: libgnutls.la fipshmac
+	$(AM_V_GEN) $(builddir)/fipshmac .libs/$(gnutls_so) > $@-t && mv $@-t $@
+
+CLEANFILES = $(hmac_files)
+
+install-exec-hook: $(hmac_files)
+	for file in $(hmac_files); do \
+		$(INSTALL_DATA) $$file $(DESTDIR)$(libdir); \
+	done
+
+uninstall-hook:
+	for file in $(hmac_files); do \
+		basename=$$(expr $$file : '.*/\(.*\)'); \
+		$(DESTDIR)$(libdir)/$$basename; \
+	done
 endif
 
 if ENABLE_TROUSERS
