@@ -225,9 +225,9 @@ int _gnutls_pkcs_flags_to_schema(unsigned int flags)
 
 	gnutls_assert();
 	_gnutls_debug_log
-	    ("Selecting default encryption PKCS12_3DES_SHA1 (flags: %u).\n",
+	    ("Selecting default encryption PBES2_AES_256 (flags: %u).\n",
 	     flags);
-	return PKCS12_3DES_SHA1;
+	return PBES2_AES_256;
 }
 
 /**
