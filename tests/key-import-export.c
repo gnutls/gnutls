@@ -351,6 +351,31 @@ int check_privkey_import_export(void)
 	gnutls_free(x.data);
 	gnutls_privkey_deinit(key);
 
+	/* Optional y argument */
+	ret = gnutls_privkey_init(&key);
+	if (ret < 0)
+		fail("error\n");
+
+	ret = gnutls_privkey_import_dsa_raw(key, &_dsa_p, &_dsa_q, &_dsa_g, NULL, &_dsa_x);
+	if (ret < 0)
+		fail("error\n");
+
+	ret = gnutls_privkey_export_dsa_raw2(key, &p, &q, &g, &y, &x, 0);
+	if (ret < 0)
+		fail("error: %s\n", gnutls_strerror(ret));
+
+	CMP("p", &p, dsa_p);
+	CMP("q", &q, dsa_q);
+	CMP("g", &g, dsa_g);
+	CMP("y", &y, dsa_y);
+	CMP("x", &x, dsa_x);
+	gnutls_free(p.data);
+	gnutls_free(q.data);
+	gnutls_free(g.data);
+	gnutls_free(y.data);
+	gnutls_free(x.data);
+	gnutls_privkey_deinit(key);
+
 	/* RSA */
 
 	/* Optional arguments */

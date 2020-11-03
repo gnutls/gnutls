@@ -977,7 +977,7 @@ gnutls_x509_privkey_import_rsa_raw2(gnutls_x509_privkey_t key,
  * @p: holds the p
  * @q: holds the q
  * @g: holds the g
- * @y: holds the y
+ * @y: holds the y (optional)
  * @x: holds the x
  *
  * This function will convert the given DSA raw parameters to the
@@ -1026,11 +1026,13 @@ gnutls_x509_privkey_import_dsa_raw(gnutls_x509_privkey_t key,
 		goto cleanup;
 	}
 
-	siz = y->size;
-	if (_gnutls_mpi_init_scan_nz(&key->params.params[3], y->data, siz)) {
-		gnutls_assert();
-		ret = GNUTLS_E_MPI_SCAN_FAILED;
-		goto cleanup;
+	if (y) {
+		siz = y->size;
+		if (_gnutls_mpi_init_scan_nz(&key->params.params[3], y->data, siz)) {
+			gnutls_assert();
+			ret = GNUTLS_E_MPI_SCAN_FAILED;
+			goto cleanup;
+		}
 	}
 
 	siz = x->size;

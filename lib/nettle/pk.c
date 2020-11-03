@@ -3338,6 +3338,27 @@ static int calc_rsa_priv(gnutls_pk_params_st * params)
 	return 0;
 }
 
+static int calc_dsa_pub(gnutls_pk_params_st * params)
+{
+	int ret;
+
+	params->params[DSA_Y] = NULL;
+
+	ret = _gnutls_mpi_init(&params->params[DSA_Y]);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	/* y = g^x mod p */
+	ret = _gnutls_mpi_powm(params->params[DSA_Y], params->params[DSA_G],
+			params->params[DSA_X], params->params[DSA_P]);
+	if (ret < 0) {
+		zrelease_mpi_key(&params->params[DSA_Y]);
+		return gnutls_assert_val(ret);
+	}
+
+	return 0;
+}
+
 static int
 wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 		     gnutls_direction_t direction,
@@ -3433,7 +3454,13 @@ wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 						     params->spki.salt_size, pub_size,
 						     GNUTLS_E_PK_INVALID_PUBKEY_PARAMS);
 		}
-
+	} else if (algo == GNUTLS_PK_DSA) {
+		if (params->params[DSA_Y] == NULL) {
+			ret = calc_dsa_pub(params);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+			params->params_nr++;
+		}
 	}
 #if ENABLE_GOST
 	else if (algo == GNUTLS_PK_GOST_01 ||

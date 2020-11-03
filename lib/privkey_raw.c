@@ -381,7 +381,7 @@ error:
  * @p: holds the p
  * @q: holds the q
  * @g: holds the g
- * @y: holds the y
+ * @y: holds the y (optional)
  * @x: holds the x
  *
  * This function will convert the given DSA raw parameters to the
