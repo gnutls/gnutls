@@ -85,6 +85,7 @@ gostdsa_unmask_key (const struct ecc_curve *ecc,
  mpz_mul (temp, unmasked, key);
  mpz_mod (key, temp, q);
 
+ mpz_clear (q);
  mpz_clear (temp2);
  mpz_clear (temp);
  mpz_clear (unmasked);
