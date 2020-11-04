@@ -175,8 +175,9 @@ minimal.Fedora.x86_64:
 # with openssl 1.1.0, which include legacy algorithms like DSA.
 SSL-3.0.Fedora.x86_64:
   stage: stage1-testing
-  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA28_BUILD
+  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
+  - update-crypto-policies --set LEGACY
   - ./bootstrap
   - mkdir -p build
   - cd build
