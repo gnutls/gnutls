@@ -180,12 +180,12 @@ run_client_suite() {
 
 		if test "${NO_RC4}" != 1; then
 			eval "${GETPORT}"
-			launch_bare_server "$OPENSSL" s_server -quiet -www -accept "${PORT}" -keyform pem -certform pem -ssl3 ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" -cipher RC4-MD5 >/dev/null
+			launch_bare_server "$OPENSSL" s_server -quiet -www -accept "${PORT}" -keyform pem -certform pem -ssl3 ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" -cipher RC4-SHA >/dev/null
 			PID=$!
 			wait_server ${PID}
 
-			echo "${PREFIX}Checking SSL 3.0 with RSA-RC4-MD5..."
-			${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+ARCFOUR-128:+MD5:+SIGN-ALL:+COMP-NULL:+VERS-SSL3.0:+RSA${ADD}" --insecure </dev/null >/dev/null || \
+			echo "${PREFIX}Checking SSL 3.0 with RSA-RC4-SHA..."
+			${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+ARCFOUR-128:+SHA1:+SIGN-ALL:+COMP-NULL:+VERS-SSL3.0:+RSA${ADD}" --insecure </dev/null >/dev/null || \
 				fail ${PID} "Failed"
 
 			kill ${PID}
@@ -544,7 +544,7 @@ run_server_suite() {
 
 		echo "${PREFIX}Check SSL 3.0 with RSA ciphersuite"
 		eval "${GETPORT}"
-		launch_server --priority "NONE:+MD5:+ARCFOUR-128:+3DES-CBC:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+RSA${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${DH_PARAMS}"
+		launch_server --priority "NONE:+SHA1:+ARCFOUR-128:+3DES-CBC:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+RSA${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${DH_PARAMS}"
 		PID=$!
 		wait_server ${PID}
 
@@ -552,8 +552,8 @@ run_server_suite() {
 			fail ${PID} "Failed"
 
 		if test "${NO_RC4}" != 1; then
-			echo "${PREFIX}Check SSL 3.0 with RSA-RC4-MD5 ciphersuite"
-			${OPENSSL} s_client -host localhost -port "${PORT}" -ssl3 -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}" -cipher RC4-MD5 </dev/null 2>&1 | grep "\:error\:" && \
+			echo "${PREFIX}Check SSL 3.0 with RSA-RC4-SHA ciphersuite"
+			${OPENSSL} s_client -host localhost -port "${PORT}" -ssl3 -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}" -cipher RC4-SHA </dev/null 2>&1 | grep "\:error\:" && \
 				fail ${PID} "Failed"
 		fi
 
