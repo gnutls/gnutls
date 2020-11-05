@@ -562,12 +562,22 @@ FreeBSD.x86_64:
   image:
   script:
   - export CC="ccache clang"
+  - git clone --depth 1 --branch master https://gitlab.com/gnutls/nettle.git nettle-git
+  - export NETTLE_DIR=${PWD}/nettle
+  - cd nettle-git
+  - ./.bootstrap
+  - ./configure --enable-mini-gmp --disable-documentation --disable-openssl --prefix=$NETTLE_DIR
+  - gmake
+  - gmake install
+  - cd -
   - ./bootstrap
-  - export LDFLAGS="-L/usr/local/lib"
-  - ./configure --disable-full-test-suite
-    --cache-file cache/config.cache --disable-gcc-warnings --disable-guile --disable-doc
-  - gmake -j$(sysctl hw.ncpu | awk '{print $2}')
-  - gmake check -j$(sysctl hw.ncpu | awk '{print $2}')
+  - export LDFLAGS="-Wl,-rpath,$NETTLE_DIR/lib -L$NETTLE_DIR/lib -L/usr/local/lib"
+  - export PKG_CONFIG_PATH=$NETTLE_DIR/lib/pkgconfig
+  - export CPPFLAGS=`pkg-config hogweed --cflags-only-I`
+  - export LD_LIBRARY_PATH=$NETTLE_DIR/lib
+  - ./configure --disable-full-test-suite --cache-file cache/config.cache --disable-gcc-warnings --disable-guile --disable-doc --with-nettle-mini
+  - gmake V=1 2>&1 | tee make.log
+  - gmake check
   tags:
   - freebsd
   only:
