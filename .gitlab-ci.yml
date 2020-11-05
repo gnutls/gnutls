@@ -752,6 +752,7 @@ Debian.cross.arm-linux-gnueabihf:
 
 Debian.cross.aarch64-linux-gnu:
   <<: *Debian_cross_template
+  allow_failure: true
 
 nettle-master.Fedora:
   stage: stage1-testing
