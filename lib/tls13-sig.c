@@ -122,12 +122,8 @@ _gnutls13_handshake_verify_data(gnutls_session_t session,
 	p.data = buf.data;
 	p.size = buf.length;
 
-	/* Here we intentionally enable flag GNUTLS_VERIFY_ALLOW_BROKEN
-	 * because we have checked whether the currently used signature
-	 * algorithm is allowed in the session. */
-	ret = gnutls_pubkey_verify_data2(cert->pubkey, se->id,
-					 verify_flags|GNUTLS_VERIFY_ALLOW_BROKEN,
-					 &p, signature);
+	ret = gnutls_pubkey_verify_data2(cert->pubkey, se->id, verify_flags, &p,
+					 signature);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
