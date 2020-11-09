@@ -22,11 +22,21 @@ See the end for copying conditions.
    gnutls_ocsp_resp_get_response, and gnutls_ocsp_resp_get_extension
    (#805).
 
+** libgnutls: Added a new API to enable QUIC implementation (#826, #849, #850).
+
 ** API and ABI modifications:
 gnutls_x509_trust_list_set_getissuer_function: Added
 gnutls_x509_trust_list_get_ptr: Added
 gnutls_x509_trust_list_set_ptr: Added
 gnutls_session_set_verify_output_function: Added
+gnutls_record_encryption_level_t: New enum
+gnutls_handshake_read_func: New callback type
+gnutls_handshake_set_read_function: New function
+gnutls_handshake_write: New function
+gnutls_handshake_secret_func: New callback type
+gnutls_handshake_set_secret_function: New function
+gnutls_alert_read_func: New callback type
+gnutls_alert_set_read_function: New function
 
 * Version 3.6.14 (released 2020-06-03)
 
