@@ -1196,6 +1196,11 @@ typedef struct {
 	 */
 	gnutls_certificate_request_t send_cert_req;
 
+	/* callback to print the full path of certificate
+	 * validation to the trusted root.
+	 */
+	gnutls_verify_output_function *cert_output_callback;
+
 	size_t max_handshake_data_buffer_size;
 
 	/* PUSH & PULL functions.

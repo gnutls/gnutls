@@ -180,6 +180,144 @@ const gnutls_datum_t server_key = { server_key_pem,
 	sizeof(server_key_pem)
 };
 
+static void print_verification_res(unsigned int output)
+{
+	gnutls_datum_t pout;
+	int ret;
+
+	if (output) {
+		success("Not verified.");
+	} else {
+		success("Verified.");
+	}
+
+	ret =
+	    gnutls_certificate_verification_status_print(output,
+							 GNUTLS_CRT_X509,
+							 &pout, 0);
+	if (ret < 0) {
+		fprintf(stderr, "error: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+
+	success(" %s", pout.data);
+	gnutls_free(pout.data);
+}
+
+static const char *get_signature_algo(gnutls_x509_crt_t crt)
+{
+	int ret;
+	static char oid[128];
+
+	ret = gnutls_x509_crt_get_signature_algorithm(crt);
+	if (ret < 0 || ret == GNUTLS_SIGN_UNKNOWN) {
+		size_t oid_size = sizeof(oid);
+		ret = gnutls_x509_crt_get_signature_oid(crt, oid, &oid_size);
+		if (ret < 0)
+			return NULL;
+		return oid;
+	}
+
+	return gnutls_sign_get_name(ret);
+}
+
+static int cert_out_callback(gnutls_x509_crt_t cert,
+				 gnutls_x509_crt_t issuer,
+				 gnutls_x509_crl_t crl,
+				 unsigned int verification_output)
+{
+	char tmp[255];
+	size_t tmp_size;
+	gnutls_datum_t name = {NULL,0}, issuer_name = {NULL,0};
+	gnutls_datum_t serial = {NULL,0};
+	int ret;
+
+	success("Printing full certificate path validation to trust root.\n");
+
+	ret =
+	    gnutls_x509_crt_get_issuer_dn3(cert, &issuer_name, 0);
+	if (ret < 0) {
+		fprintf(stderr, "gnutls_x509_crt_get_issuer_dn: %s\n",
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	ret = gnutls_x509_crt_get_dn3(cert, &name, 0);
+	if (ret < 0) {
+		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+			name.data = 0;
+			name.size = 0;
+		} else {
+			fprintf(stderr, "gnutls_x509_crt_get_dn: %s\n",
+				gnutls_strerror(ret));
+			exit(1);
+		}
+	}
+
+	success("\tSubject: %s\n", name.data);
+	success("\tIssuer: %s\n", issuer_name.data);
+
+	if (issuer != NULL) {
+		gnutls_free(issuer_name.data);
+		ret =
+		    gnutls_x509_crt_get_dn3(issuer, &issuer_name, 0);
+		if (ret < 0) {
+			fprintf(stderr,
+				"gnutls_x509_crt_get_issuer_dn: %s\n",
+				gnutls_strerror(ret));
+			exit(1);
+		}
+
+		success("\tChecked against: %s\n", issuer_name.data);
+	}
+
+	success("\tSignature algorithm: %s\n", get_signature_algo(cert));
+
+	if (crl != NULL) {
+		gnutls_datum_t data;
+		gnutls_free(issuer_name.data);
+
+		ret =
+		    gnutls_x509_crl_get_issuer_dn3(crl, &issuer_name, 0);
+		if (ret < 0) {
+			fprintf(stderr,
+				"gnutls_x509_crl_get_issuer_dn: %s\n",
+				gnutls_strerror(ret));
+			exit(1);
+		}
+
+		tmp_size = sizeof(tmp);
+		ret =
+		    gnutls_x509_crl_get_number(crl, tmp, &tmp_size, NULL);
+		if (ret < 0) {
+			serial.data = (void*)gnutls_strdup("unnumbered");
+		} else {
+			data.data = (void *) tmp;
+			data.size = tmp_size;
+
+			ret = gnutls_hex_encode2(&data, &serial);
+			if (ret < 0) {
+				fprintf(stderr, "gnutls_hex_encode: %s\n",
+					gnutls_strerror(ret));
+				exit(1);
+			}
+		}
+		success("\tChecked against CRL[%s] of: %s\n",
+			serial.data, issuer_name.data);
+	}
+
+	success("\tOutput: ");
+	print_verification_res(verification_output);
+
+	success("\n\n");
+
+	gnutls_free(serial.data);
+	gnutls_free(name.data);
+	gnutls_free(issuer_name.data);
+
+	return 0;
+}
+
 static
 void test_failure(const char *name, const char *prio)
 {
@@ -267,6 +405,7 @@ void test_failure(const char *name, const char *prio)
 	if (ret < 0)
 		exit(1);
 
+	gnutls_session_set_verify_output_function(client, cert_out_callback);
 	assert(gnutls_priority_set_direct(client, prio, NULL) >= 0);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
