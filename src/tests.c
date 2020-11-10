@@ -678,7 +678,7 @@ test_code_t test_bye(gnutls_session_t session)
 	char data[20];
 	int secs = 6;
 #ifndef _WIN32
-	int old;
+	struct sigaction sa, old_sa;
 
 	signal(SIGALRM, got_alarm);
 #endif
@@ -699,7 +699,9 @@ test_code_t test_bye(gnutls_session_t session)
 		return TEST_FAILED;
 
 #ifndef _WIN32
-	old = siginterrupt(SIGALRM, 1);
+	(void) sigaction (SIGALRM, NULL, &sa);
+	sa.sa_flags &= ~SA_RESTART;
+	sigaction(SIGALRM, &sa, &old_sa);
 	alarm(secs);
 #else
 	setsockopt((int) gnutls_transport_get_ptr(session), SOL_SOCKET,
@@ -712,7 +714,7 @@ test_code_t test_bye(gnutls_session_t session)
 	while (ret > 0);
 
 #ifndef _WIN32
-	siginterrupt(SIGALRM, old);
+	sigaction(SIGALRM, &old_sa, NULL);
 #else
 	if (WSAGetLastError() == WSAETIMEDOUT ||
 	    WSAGetLastError() == WSAECONNABORTED)

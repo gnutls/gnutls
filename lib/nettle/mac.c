@@ -34,25 +34,11 @@
 #include <nettle/umac.h>
 #include <nettle/hkdf.h>
 #include <nettle/pbkdf2.h>
-#ifdef HAVE_NETTLE_CMAC128_UPDATE
 #include <nettle/cmac.h>
-#ifndef HAVE_NETTLE_CMAC64_UPDATE
-#include "cmac64.h"
-#endif /* HAVE_NETTLE_CMAC64_UPDATE */
-#else
-#include "cmac.h"
-#endif /* HAVE_NETTLE_CMAC128_UPDATE */
 #if ENABLE_GOST
 #include "gost/hmac-gost.h"
-#ifndef HAVE_NETTLE_GOSTHASH94CP_UPDATE
-#include "gost/gosthash94.h"
-#endif
-#ifndef HAVE_NETTLE_STREEBOG512_UPDATE
-#include "gost/streebog.h"
-#endif
 #ifndef HAVE_NETTLE_GOST28147_SET_KEY
 #include "gost/gost28147.h"
-#include "gost/cmac.h"
 #endif
 #include "gost/cmac.h"
 #endif

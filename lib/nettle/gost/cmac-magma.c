@@ -28,11 +28,7 @@
 
 #ifndef HAVE_NETTLE_CMAC_MAGMA_UPDATE
 
-#ifdef HAVE_NETTLE_CMAC64_UPDATE
 #include <nettle/cmac.h>
-#else
-#include "backport/cmac.h"
-#endif
 
 #include "magma.h"
 #include "cmac.h"

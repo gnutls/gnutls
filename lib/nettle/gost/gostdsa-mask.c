@@ -37,8 +37,15 @@
 
 #include <stdlib.h>
 
+#include <nettle/ecc-curve.h>
 #include "gostdsa2.h"
-#include "ecc/ecc-internal.h"
+
+#define GOST_GC256B_Q "ffffffffffffffffffffffffffffffff" \
+	"6c611070995ad10045841b09b761b893"
+#define GOST_GC512A_Q "ffffffffffffffffffffffffffffffff" \
+	"ffffffffffffffffffffffffffffffff" \
+	"27e69532f48d89116ff22b8d4e056060" \
+	"9b4b38abfad2b85dcacdb1411f10b275"
 
 /* Key comes in form .... M_2 M_1 K_0,
   unmask is K_i = K_i-1 * M_i mod Q */
@@ -56,7 +63,14 @@ gostdsa_unmask_key (const struct ecc_curve *ecc,
  mpz_init (unmasked);
  mpz_init (temp);
  mpz_init (temp2);
- mpz_roinit_n (q, ecc->q.m, ecc->q.size);
+
+ if (ecc == nettle_get_gost_gc256b ())
+   mpz_init_set_str (q, GOST_GC256B_Q, 16);
+ else if (ecc == nettle_get_gost_gc512a ())
+   mpz_init_set_str (q, GOST_GC512A_Q, 16);
+ else
+   abort ();
+
  mpz_tdiv_r_2exp (unmasked, key, bits);
  mpz_tdiv_q_2exp (key, key, bits);
  keybits -= bits;
@@ -71,6 +85,7 @@ gostdsa_unmask_key (const struct ecc_curve *ecc,
  mpz_mul (temp, unmasked, key);
  mpz_mod (key, temp, q);
 
+ mpz_clear (q);
  mpz_clear (temp2);
  mpz_clear (temp);
  mpz_clear (unmasked);
