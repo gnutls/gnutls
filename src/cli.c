@@ -126,7 +126,9 @@ static int cert_verify_ocsp(gnutls_session_t session);
 static const char *host_from_url(const char *url, unsigned int *port, const char **path);
 static size_t get_data(void *buf, size_t size, size_t nmemb, void *userp);
 static int getissuer_callback(const gnutls_x509_trust_list_t tlist,
-		const gnutls_x509_crt_t cert);
+			      const gnutls_x509_crt_t cert,
+			      gnutls_x509_crt_t **issuers,
+			      unsigned int *issuers_size);
 
 #define MAX_CRT 6
 static unsigned int x509_crt_size;
@@ -2240,7 +2242,9 @@ static size_t get_data(void *buf, size_t size, size_t nmemb, void *userp)
 /* Returns 0 on ok, and -1 on error */
 static int
 getissuer_callback(const gnutls_x509_trust_list_t tlist,
-				const gnutls_x509_crt_t cert)
+		   const gnutls_x509_crt_t cert,
+		   gnutls_x509_crt_t **issuers,
+		   unsigned int *issuers_size)
 {
 	gnutls_datum_t ud;
 	int ret;
@@ -2331,15 +2335,10 @@ getissuer_callback(const gnutls_x509_trust_list_t tlist,
 		ret = -1;
 		goto cleanup;
 	}
-	ret = gnutls_x509_crt_import(issuer, &resp, GNUTLS_X509_FMT_DER);
+	ret = gnutls_x509_crt_list_import2(issuers, issuers_size, &resp,
+					   GNUTLS_X509_FMT_DER, 0);
 	if (ret < 0) {
 		fprintf(stderr, "Decoding error: %s\n", gnutls_strerror(ret));
-		ret = -1;
-		goto cleanup;
-	}
-	ret = gnutls_x509_trust_list_add_cas(tlist, &issuer, 1, 0);
-	if (ret < 0) {
-		fprintf(stderr, "Memory error\n");
 		ret = -1;
 		goto cleanup;
 	}
