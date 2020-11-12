@@ -34,7 +34,7 @@ extern "C" {
 #endif
 /* *INDENT-ON* */
 
-#define GNUTLS_PKCS11_MAX_PIN_LEN 32
+#define GNUTLS_PKCS11_MAX_PIN_LEN 256
 
 /**
  * gnutls_pkcs11_token_callback_t:
