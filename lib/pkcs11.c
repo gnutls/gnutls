@@ -598,7 +598,8 @@ gnutls_pkcs11_obj_set_info(gnutls_pkcs11_obj_t obj,
 		break;
 	default:
 		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
+		ret = GNUTLS_E_INVALID_REQUEST;
+		goto cleanup;
 	}
 
 	ret = 0;
