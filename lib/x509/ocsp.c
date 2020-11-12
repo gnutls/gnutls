@@ -2103,7 +2103,7 @@ _ocsp_resp_verify_direct(gnutls_ocsp_resp_const_t resp,
 		goto done;
 	}
 
-	_gnutls_cert_log("ocsp signer", signercert); \
+	_gnutls_cert_log("ocsp signer", signercert);
 
 	rc = gnutls_pubkey_import_x509(pubkey, signercert, 0);
 	if (rc != GNUTLS_E_SUCCESS) {
