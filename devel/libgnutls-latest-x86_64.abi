@@ -30,6 +30,7 @@
     <elf-symbol name='_gnutls_cidr_to_string' version='GNUTLS_PRIVATE_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='_gnutls_cipher_get_iv' version='GNUTLS_FIPS140_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='_gnutls_cipher_to_entry' version='GNUTLS_PRIVATE_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='_gnutls_crypto_register_cipher' version='GNUTLS_PRIVATE_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='_gnutls_decode_ber_rs_raw' version='GNUTLS_FIPS140_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='_gnutls_digest_exists' version='GNUTLS_PRIVATE_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='_gnutls_ecc_curve_is_supported' version='GNUTLS_PRIVATE_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
