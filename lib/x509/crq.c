@@ -284,7 +284,7 @@ gnutls_x509_crq_get_dn(gnutls_x509_crq_t crq, char *buf, size_t * buf_size)
 /**
  * gnutls_x509_crq_get_dn2:
  * @crq: should contain a #gnutls_x509_crq_t type
- * @dn: a pointer to a structure to hold the name
+ * @dn: a pointer to a structure to hold the name; must be freed using gnutls_free()
  *
  * This function will allocate buffer and copy the name of the Certificate 
  * request. The name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as
@@ -314,7 +314,7 @@ int gnutls_x509_crq_get_dn2(gnutls_x509_crq_t crq, gnutls_datum_t * dn)
 /**
  * gnutls_x509_crq_get_dn3:
  * @crq: should contain a #gnutls_x509_crq_t type
- * @dn: a pointer to a structure to hold the name
+ * @dn: a pointer to a structure to hold the name; must be freed using gnutls_free()
  * @flags: zero or %GNUTLS_X509_DN_FLAG_COMPAT
  *
  * This function will allocate buffer and copy the name of the Certificate 

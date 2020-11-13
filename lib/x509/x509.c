@@ -704,7 +704,7 @@ gnutls_x509_crt_get_issuer_dn(gnutls_x509_crt_t cert, char *buf,
 /**
  * gnutls_x509_crt_get_issuer_dn2:
  * @cert: should contain a #gnutls_x509_crt_t type
- * @dn: a pointer to a structure to hold the name
+ * @dn: a pointer to a structure to hold the name; must be freed using gnutls_free()
  *
  * This function will allocate buffer and copy the name of issuer of the Certificate.
  * The name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as
@@ -735,7 +735,7 @@ gnutls_x509_crt_get_issuer_dn2(gnutls_x509_crt_t cert, gnutls_datum_t * dn)
 /**
  * gnutls_x509_crt_get_issuer_dn3:
  * @cert: should contain a #gnutls_x509_crt_t type
- * @dn: a pointer to a structure to hold the name
+ * @dn: a pointer to a structure to hold the name; must be freed using gnutls_free()
  * @flags: zero or %GNUTLS_X509_DN_FLAG_COMPAT
  *
  * This function will allocate buffer and copy the name of issuer of the Certificate.
@@ -888,7 +888,7 @@ gnutls_x509_crt_get_dn(gnutls_x509_crt_t cert, char *buf,
 /**
  * gnutls_x509_crt_get_dn2:
  * @cert: should contain a #gnutls_x509_crt_t type
- * @dn: a pointer to a structure to hold the name
+ * @dn: a pointer to a structure to hold the name; must be freed using gnutls_free()
  *
  * This function will allocate buffer and copy the name of the Certificate.
  * The name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as
@@ -918,7 +918,7 @@ int gnutls_x509_crt_get_dn2(gnutls_x509_crt_t cert, gnutls_datum_t * dn)
 /**
  * gnutls_x509_crt_get_dn3:
  * @cert: should contain a #gnutls_x509_crt_t type
- * @dn: a pointer to a structure to hold the name
+ * @dn: a pointer to a structure to hold the name; must be freed using gnutls_free()
  * @flags: zero or %GNUTLS_X509_DN_FLAG_COMPAT
  *
  * This function will allocate buffer and copy the name of the Certificate.

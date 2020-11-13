@@ -300,7 +300,7 @@ gnutls_x509_crl_get_dn_oid(gnutls_x509_crl_t crl,
 /**
  * gnutls_x509_crl_get_issuer_dn2:
  * @crl: should contain a #gnutls_x509_crl_t type
- * @dn: a pointer to a structure to hold the name
+ * @dn: a pointer to a structure to hold the name; must be freed using gnutls_free()
  *
  * This function will allocate buffer and copy the name of the CRL issuer.
  * The name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as
@@ -331,7 +331,7 @@ gnutls_x509_crl_get_issuer_dn2(gnutls_x509_crl_t crl, gnutls_datum_t * dn)
 /**
  * gnutls_x509_crl_get_issuer_dn3:
  * @crl: should contain a #gnutls_x509_crl_t type
- * @dn: a pointer to a structure to hold the name
+ * @dn: a pointer to a structure to hold the name; must be freed using gnutls_free()
  * @flags: zero or %GNUTLS_X509_DN_FLAG_COMPAT
  *
  * This function will allocate buffer and copy the name of the CRL issuer.
