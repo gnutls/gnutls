@@ -1690,38 +1690,52 @@ _gnutls_check_valid_key_id(const gnutls_datum_t *key_id,
 	return result;
 }
 
-/* Takes a certificate list and orders it with subject, issuer order.
+/* Sort a certficate list in place with subject, issuer order. @clist_size must
+ * be equal to or less than %DEFAULT_MAX_VERIFY_DEPTH.
  *
- * *clist_size contains the size of the ordered list (which is always less or
- * equal to the original).
- * @func: the function to call to elements outside the sort.
+ * Returns the index in clist where the initial contiguous segment ends. If the
+ * chain contains multiple segments separated by gaps (e.g., missing issuers),
+ * the caller shall call this function multiple times.
  *
- * This function is intentionally kept simple to be easily verified
- * so that it can be used with untrusted chains. The introduction
- * of the func parameter added significant complexity in that aspect.
- * If more demanding use-cases need to be handled, consider splitting
- * that function.
+ * For example, suppose we want the following certificate chain as a result of
+ * sorting:
  *
- * Returns the sorted list which may be the original clist.
+ *   A -> (B) -> C -> D -> E -> (F) -> G -> H -> I
  *
+ * from the input [A, C, E, D, G, I, H] (B and F are missing).
+ *
+ * On the first call of this function:
+ *
+ *   _gnutls_sort_clist(clist, clist_size)
+ *
+ * it returns 1, meaning that the first segment only contains A.  The content of
+ * @clist will remain the same [A, C, E, D, G, I, H].
+ *
+ * Then the caller will call this function again, starting from the second
+ * element:
+ *
+ *   _gnutls_sort_clist(&clist[1], clist_size - 1)
+ *
+ * This time it returns 3, meaning that the first segment contains [C, D, E].
+ * The content of @clist will be [A, C, D, E, G, I, H].
+ *
+ * Finally, after calling the function on the remaining elements:
+ *
+ *   _gnutls_sort_clist(&clist[1 + 3], clist_size - (1 + 3))
+ *
+ * It will return 3, meaning that the first segment contains [G, H, I].  At this
+ * point, sorting of @clist is complete.
  */
-gnutls_x509_crt_t *_gnutls_sort_clist(gnutls_x509_crt_t
-				     sorted[DEFAULT_MAX_VERIFY_DEPTH],
-				     gnutls_x509_crt_t *clist,
-				     unsigned int *clist_size,
-				     gnutls_cert_vfunc func)
+unsigned int _gnutls_sort_clist(gnutls_x509_crt_t *clist,
+				unsigned int clist_size)
 {
 	int prev;
-	unsigned int j, i;
+	unsigned int i, j, k;
 	int issuer[DEFAULT_MAX_VERIFY_DEPTH];	/* contain the index of the issuers */
 	bool insorted[DEFAULT_MAX_VERIFY_DEPTH]; /* non zero if clist[i] used in sorted list */
-	unsigned orig_size = *clist_size;
+	gnutls_x509_crt_t sorted[DEFAULT_MAX_VERIFY_DEPTH];
 
-	/* Do not bother sorting if too many certificates are given.
-	 * Prevent any DoS attacks.
-	 */
-	if (*clist_size > DEFAULT_MAX_VERIFY_DEPTH)
-		return clist;
+	assert(clist_size <= DEFAULT_MAX_VERIFY_DEPTH);
 
 	for (i = 0; i < DEFAULT_MAX_VERIFY_DEPTH; i++) {
 		issuer[i] = -1;
@@ -1732,51 +1746,46 @@ gnutls_x509_crt_t *_gnutls_sort_clist(gnutls_x509_crt_t
 	 * in issuer array. O(n^2) so consider that before
 	 * increasing DEFAULT_MAX_VERIFY_DEPTH.
 	 */
-	for (i = 0; i < *clist_size; i++) {
-		for (j = 1; j < *clist_size; j++) {
+	for (i = 0; i < clist_size; i++) {
+		for (j = 1; j < clist_size; j++) {
 			if (i == j)
 				continue;
 
-			if (gnutls_x509_crt_check_issuer(clist[i],
-							 clist[j]) != 0) {
+			if (gnutls_x509_crt_check_issuer(clist[i], clist[j])) {
 				issuer[i] = j;
 				break;
 			}
 		}
 	}
 
-	/* the first element is always included */
 	sorted[0] = clist[0];
 	insorted[0] = 1;
 
-	if (issuer[0] == -1) {
-		*clist_size = 1;
-		goto exit;
-	}
-
 	prev = 0;
-	for (i = 1; i < *clist_size; i++) {
+	for (i = 1; i < clist_size; i++) {
 		prev = issuer[prev];
 		if (prev < 0) {	/* no issuer */
-			*clist_size = i;
 			break;
 		}
+
 		sorted[i] = clist[prev];
 		insorted[prev] = 1;
 	}
 
- exit:
-	if (func) {
-		/* call func() on all the elements that were
-		 * not used in the sorted list */
-		for (i = 1; i < orig_size; i++) {
-			if (insorted[i] == 0) {
-				func(clist[i]);
-			}
+	/* append the remaining certs */
+	for (j = 1, k = i; j < clist_size; j++) {
+		if (!insorted[j]) {
+			sorted[k++] = clist[j];
 		}
 	}
 
-	return sorted;
+	/* write out the sorted list */
+	assert(k == clist_size);
+	for (j = 0; j < clist_size; j++) {
+		clist[j] = sorted[j];
+	}
+
+	return i;
 }
 
 int _gnutls_check_if_sorted(gnutls_x509_crt_t * crt, int nr)

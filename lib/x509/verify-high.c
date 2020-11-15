@@ -1310,8 +1310,14 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 		}
 	}
 
-	if (!(flags & GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN))
-		cert_list = _gnutls_sort_clist(sorted, cert_list, &cert_list_size, NULL);
+	if (!(flags & GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN) &&
+	    cert_list_size <= DEFAULT_MAX_VERIFY_DEPTH) {
+		for (i = 0; i < cert_list_size; i++) {
+			sorted[i] = cert_list[i];
+		}
+		cert_list = sorted;
+		cert_list_size = _gnutls_sort_clist(cert_list, cert_list_size);
+	}
 
 	cert_list_size = shorten_clist(list, cert_list, cert_list_size);
 	if (cert_list_size <= 0)

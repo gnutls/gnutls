@@ -283,11 +283,8 @@ int x509_crt_to_raw_pubkey(gnutls_x509_crt_t crt,
 
 typedef void (*gnutls_cert_vfunc)(gnutls_x509_crt_t);
 
-gnutls_x509_crt_t *_gnutls_sort_clist(gnutls_x509_crt_t
-				     sorted[DEFAULT_MAX_VERIFY_DEPTH],
-				     gnutls_x509_crt_t * clist,
-				     unsigned int *clist_size,
-				     gnutls_cert_vfunc func);
+unsigned int _gnutls_sort_clist(gnutls_x509_crt_t *clist,
+				unsigned int clist_size);
 
 int _gnutls_check_if_sorted(gnutls_x509_crt_t * crt, int nr);
 
