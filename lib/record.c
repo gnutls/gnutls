@@ -2340,3 +2340,74 @@ void gnutls_record_set_timeout(gnutls_session_t session, unsigned int ms)
 {
 	session->internals.record_timeout_ms = ms;
 }
+
+/**
+ * gnutls_handshake_write:
+ * @session: is a #gnutls_session_t type.
+ * @level: the current encryption level for reading a handshake message
+ * @data: the (const) handshake data to be processed
+ * @data_size: the size of data
+ *
+ * This function processes a handshake message in the encryption level
+ * specified with @level. Prior to calling this function, a handshake
+ * read callback must be set on @session. Use
+ * gnutls_handshake_set_read_function() to do this.
+ *
+ * Since: 3.7.0
+ */
+int
+gnutls_handshake_write(gnutls_session_t session,
+			gnutls_record_encryption_level_t level,
+			const void *data, size_t data_size)
+{
+	record_parameters_st *record_params;
+	record_state_st *record_state;
+	mbuffer_st *bufel;
+	uint8_t *p;
+	int ret;
+
+	/* DTLS is not supported */
+	if (IS_DTLS(session))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	/* When using this, the outgoing handshake messages should
+	 * also be handled manually */
+	if (!session->internals.h_read_func)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	if (session->internals.initial_negotiation_completed) {
+		const version_entry_st *vers = get_version(session);
+		if (unlikely(vers == NULL || !vers->tls13_sem))
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
+
+	ret = _gnutls_epoch_get(session, EPOCH_READ_CURRENT, &record_params);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	record_state = &record_params->read;
+	if (record_state->level > level)
+		return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
+
+	bufel = _mbuffer_alloc_align16(data_size, 0);
+	if (bufel == NULL)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+	memcpy(_mbuffer_get_udata_ptr(bufel), data, data_size);
+	_mbuffer_set_udata_size(bufel, data_size);
+	p = _mbuffer_get_udata_ptr(bufel);
+	bufel->htype = p[0];
+
+	if (sequence_increment(session, &record_state->sequence_number) != 0) {
+		_mbuffer_xfree(&bufel);
+		return gnutls_assert_val(GNUTLS_E_RECORD_LIMIT_REACHED);
+	}
+
+	_gnutls_record_buffer_put(session, GNUTLS_HANDSHAKE,
+				  record_state->sequence_number, bufel);
+
+	if (session->internals.initial_negotiation_completed)
+		return _gnutls13_recv_async_handshake(session);
+
+	return 0;
+}

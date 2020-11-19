@@ -520,6 +520,10 @@ _tls13_set_keys(gnutls_session_t session, hs_stage_t stage,
 						 buf, sizeof(buf), NULL));
 	}
 
+	client_write->level = server_write->level = stage == STAGE_HS ?
+		GNUTLS_ENCRYPTION_LEVEL_HANDSHAKE :
+		GNUTLS_ENCRYPTION_LEVEL_APPLICATION;
+
 	return 0;
 }
 
@@ -1105,6 +1109,67 @@ _gnutls_epoch_free(gnutls_session_t session, record_parameters_st * params)
 	gnutls_free(params);
 }
 
+static int
+_gnutls_call_secret_func(gnutls_session_t session,
+			 hs_stage_t stage,
+			 bool for_read, bool for_write)
+{
+	const mac_entry_st *prf = NULL;
+	gnutls_record_encryption_level_t level;
+	void *secret_read = NULL, *secret_write = NULL;
+
+	if (session->internals.h_secret_func == NULL)
+		return 0;
+
+	switch (stage) {
+	case STAGE_EARLY:
+		prf = session->key.binders[0].prf;
+		level = GNUTLS_ENCRYPTION_LEVEL_EARLY;
+		if (for_read) {
+			if (unlikely(session->security_parameters.entity == GNUTLS_CLIENT))
+				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+			secret_read = session->key.proto.tls13.e_ckey;
+		}
+		break;
+	case STAGE_HS:
+		prf = session->security_parameters.prf;
+		level = GNUTLS_ENCRYPTION_LEVEL_HANDSHAKE;
+		if (for_read)
+			secret_read = session->security_parameters.
+				entity == GNUTLS_CLIENT ?
+				session->key.proto.tls13.hs_skey :
+				session->key.proto.tls13.hs_ckey;
+		if (for_write)
+			secret_write = session->security_parameters.
+				entity == GNUTLS_CLIENT ?
+				session->key.proto.tls13.hs_ckey :
+				session->key.proto.tls13.hs_skey;
+		break;
+	case STAGE_APP:
+	case STAGE_UPD_OURS:
+	case STAGE_UPD_PEERS:
+		prf = session->security_parameters.prf;
+		level = GNUTLS_ENCRYPTION_LEVEL_APPLICATION;
+		if (for_read)
+			secret_read = session->security_parameters.
+				entity == GNUTLS_CLIENT ?
+				session->key.proto.tls13.ap_skey :
+				session->key.proto.tls13.ap_ckey;
+		if (for_write)
+			secret_write = session->security_parameters.
+				entity == GNUTLS_CLIENT ?
+				session->key.proto.tls13.ap_ckey :
+				session->key.proto.tls13.ap_skey;
+		break;
+	default:
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+	}
+
+	return session->internals.h_secret_func(session, level,
+						secret_read, secret_write,
+						prf->output_size);
+}
+
 int _tls13_connection_state_init(gnutls_session_t session, hs_stage_t stage)
 {
 	const uint16_t epoch_next =
@@ -1121,6 +1186,10 @@ int _tls13_connection_state_init(gnutls_session_t session, hs_stage_t stage)
 
 	session->security_parameters.epoch_read = epoch_next;
 	session->security_parameters.epoch_write = epoch_next;
+
+	ret = _gnutls_call_secret_func(session, stage, 1, 1);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	return 0;
 }
@@ -1141,6 +1210,10 @@ int _tls13_read_connection_state_init(gnutls_session_t session, hs_stage_t stage
 
 	session->security_parameters.epoch_read = epoch_next;
 
+	ret = _gnutls_call_secret_func(session, stage, 1, 0);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
 	return 0;
 }
 
@@ -1159,6 +1232,10 @@ int _tls13_write_connection_state_init(gnutls_session_t session, hs_stage_t stag
 			      session->security_parameters.cs->name);
 
 	session->security_parameters.epoch_write = epoch_next;
+
+	ret = _gnutls_call_secret_func(session, stage, 0, 1);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	return 0;
 }
@@ -1181,4 +1258,21 @@ _tls13_init_record_state(gnutls_cipher_algorithm_t algo, record_state_st *state)
 	state->is_aead = 1;
 
 	return 0;
+}
+
+/**
+ * gnutls_handshake_set_secret_function:
+ * @session: is a #gnutls_session_t type.
+ * @func: the secret func
+ *
+ * This function will set a callback to be called when a new traffic
+ * secret is installed.
+ *
+ * Since: 3.7.0
+ */
+void
+gnutls_handshake_set_secret_function(gnutls_session_t session,
+				     gnutls_handshake_secret_func func)
+{
+	session->internals.h_secret_func = func;
 }

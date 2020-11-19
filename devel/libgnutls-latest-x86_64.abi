@@ -77,6 +77,7 @@
     <elf-symbol name='gnutls_alert_get_strname' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_alert_send' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_alert_send_appropriate' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='gnutls_alert_set_read_function' version='GNUTLS_3_7_0' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_alpn_get_selected_protocol' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_alpn_set_protocols' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_anon_allocate_client_credentials' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
@@ -302,7 +303,10 @@
     <elf-symbol name='gnutls_handshake_set_post_client_hello_function' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_handshake_set_private_extensions' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_handshake_set_random' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='gnutls_handshake_set_read_function' version='GNUTLS_3_7_0' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='gnutls_handshake_set_secret_function' version='GNUTLS_3_7_0' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_handshake_set_timeout' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='gnutls_handshake_write' version='GNUTLS_3_7_0' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_hash' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_hash_copy' version='GNUTLS_3_6_9' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_hash_deinit' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>

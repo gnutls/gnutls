@@ -1474,6 +1474,40 @@ gnutls_handshake_set_hook_function(gnutls_session_t session,
 }
 
 /**
+ * gnutls_handshake_set_read_function:
+ * @session: is #gnutls_session_t type
+ * @func: is the function to be called
+ *
+ * This function will set a callback to be called when a handshake
+ * message is being sent.
+ *
+ * Since: 3.7.0
+ */
+void
+gnutls_handshake_set_read_function(gnutls_session_t session,
+				   gnutls_handshake_read_func func)
+{
+	session->internals.h_read_func = func;
+}
+
+/**
+ * gnutls_alert_set_read_function:
+ * @session: is #gnutls_session_t type
+ * @func: is the function to be called
+ *
+ * This function will set a callback to be called when an alert
+ * message is being sent.
+ *
+ * Since: 3.7.0
+ */
+void
+gnutls_alert_set_read_function(gnutls_session_t session,
+			       gnutls_alert_read_func func)
+{
+	session->internals.alert_read_func = func;
+}
+
+/**
  * gnutls_record_get_state:
  * @session: is a #gnutls_session_t type
  * @read: if non-zero the read parameters are returned, otherwise the write

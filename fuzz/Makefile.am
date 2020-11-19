@@ -33,7 +33,9 @@ FUZZERS = \
  gnutls_x509_crl_parser_fuzzer$(EXEEXT) \
  gnutls_x509_crq_parser_fuzzer$(EXEEXT) \
  gnutls_x509_parser_fuzzer$(EXEEXT) \
- gnutls_ext_raw_parse_fuzzer$(EXEEXT)
+ gnutls_ext_raw_parse_fuzzer$(EXEEXT) \
+ gnutls_handshake_client_fuzzer$(EXEEXT) \
+ gnutls_handshake_server_fuzzer$(EXEEXT)
 
 check_PROGRAMS = $(FUZZERS)
 
@@ -43,6 +45,7 @@ gnutls_base64_decoder_fuzzer_SOURCES = gnutls_base64_decoder_fuzzer.c $(COMMON_S
 gnutls_base64_encoder_fuzzer_SOURCES = gnutls_base64_encoder_fuzzer.c $(COMMON_SOURCES)
 gnutls_client_fuzzer_SOURCES = gnutls_client_fuzzer.c $(COMMON_SOURCES) mem.h certs.h
 gnutls_client_rawpk_fuzzer_SOURCES = gnutls_client_rawpk_fuzzer.c $(COMMON_SOURCES) mem.h certs.h
+gnutls_handshake_client_fuzzer_SOURCES = gnutls_handshake_client_fuzzer.c $(COMMON_SOURCES) handshake.h
 gnutls_dn_parser_fuzzer_SOURCES = gnutls_dn_parser_fuzzer.c $(COMMON_SOURCES)
 gnutls_idna_parser_fuzzer_SOURCES = gnutls_idna_parser_fuzzer.c $(COMMON_SOURCES)
 gnutls_ocsp_req_parser_fuzzer_SOURCES = gnutls_ocsp_req_parser_fuzzer.c $(COMMON_SOURCES)
@@ -56,6 +59,7 @@ gnutls_psk_server_fuzzer_SOURCES = gnutls_psk_server_fuzzer.c $(COMMON_SOURCES) 
 gnutls_reverse_idna_parser_fuzzer_SOURCES = gnutls_reverse_idna_parser_fuzzer.c $(COMMON_SOURCES)
 gnutls_server_fuzzer_SOURCES = gnutls_server_fuzzer.c $(COMMON_SOURCES) mem.h certs.h
 gnutls_server_rawpk_fuzzer_SOURCES = gnutls_server_rawpk_fuzzer.c $(COMMON_SOURCES) mem.h certs.h
+gnutls_handshake_server_fuzzer_SOURCES = gnutls_handshake_server_fuzzer.c $(COMMON_SOURCES) handshake.h certs.h
 gnutls_srp_client_fuzzer_SOURCES = gnutls_srp_client_fuzzer.c $(COMMON_SOURCES) mem.h srp.h
 gnutls_srp_server_fuzzer_SOURCES = gnutls_srp_server_fuzzer.c $(COMMON_SOURCES) mem.h srp.h
 gnutls_set_trust_file_fuzzer_SOURCES = gnutls_set_trust_file_fuzzer.c $(COMMON_SOURCES)
