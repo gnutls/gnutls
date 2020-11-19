@@ -324,7 +324,7 @@ gnutls_ocsp_resp_import2(gnutls_ocsp_resp_t resp,
 	}
 #define OCSP_BASIC "1.3.6.1.5.5.7.48.1.1"
 
-	if (resp->response_type_oid.size == sizeof(OCSP_BASIC)
+	if (resp->response_type_oid.size == sizeof(OCSP_BASIC) - 1
 	    && memcmp(resp->response_type_oid.data, OCSP_BASIC,
 		      resp->response_type_oid.size) == 0) {
 
@@ -795,6 +795,8 @@ gnutls_ocsp_req_add_cert(gnutls_ocsp_req_t req,
  * The caller needs to deallocate memory by calling gnutls_free() on
  * @oid->data and @data->data.
  *
+ * Since 3.7.0 @oid->size does not account for the terminating null byte.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error code is returned.  If you have reached the last
  *   extension available %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will
@@ -1087,6 +1089,9 @@ int gnutls_ocsp_resp_get_status(gnutls_ocsp_resp_const_t resp)
  * response type OID of an response for diagnostic purposes.
  * Otherwise gnutls_ocsp_resp_import() will decode the basic OCSP
  * response part and the caller need not worry about that aspect.
+ *
+ * Since 3.7.0 @response_type_oid->size does not account for the terminating
+ * null byte.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -1668,6 +1673,8 @@ gnutls_ocsp_resp_get_single(gnutls_ocsp_resp_const_t resp,
  *
  * The caller needs to deallocate memory by calling gnutls_free() on
  * @oid->data and @data->data.
+ *
+ * Since 3.7.0 @oid->size does not account for the terminating null byte.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error code is returned.  If you have reached the last

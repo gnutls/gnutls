@@ -1776,12 +1776,6 @@ _gnutls_parse_general_name2(ASN1_TYPE src, const char *src_name,
 			return ret;
 		}
 
-		if (type == GNUTLS_SAN_REGISTERED_ID && tmp.size > 0) {
-			/* see #805; OIDs contain the null termination byte */
-			assert(tmp.data[tmp.size-1] == 0);
-			tmp.size--;
-		}
-
 		/* _gnutls_x509_read_value() null terminates */
 		dname->size = tmp.size;
 		dname->data = tmp.data;

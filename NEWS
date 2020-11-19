@@ -16,6 +16,12 @@ See the end for copying conditions.
    output the complete path to the trusted root during certificate
    chain verification (#1012)
 
+** libgnutls: OIDs exposed as gnutls_datum_t no longer account for the
+   terminating null bytes, while the data field is null terminated.
+   The affected API functions are: gnutls_ocsp_req_get_extension,
+   gnutls_ocsp_resp_get_response, and gnutls_ocsp_resp_get_extension
+   (#805).
+
 ** API and ABI modifications:
 gnutls_x509_trust_list_set_getissuer_function: Added
 gnutls_x509_trust_list_get_ptr: Added

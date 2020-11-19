@@ -692,7 +692,7 @@ x509_read_value(ASN1_TYPE c, const char *root,
 	}
 
 	if (etype == ASN1_ETYPE_BIT_STRING) {
-		len = (len + 7)/8;
+		len = (len + 7) / 8;
 	}
 
 	tmp = gnutls_malloc((size_t) len + 1);
@@ -710,10 +710,21 @@ x509_read_value(ASN1_TYPE c, const char *root,
 			goto cleanup;
 		}
 
-		if (etype == ASN1_ETYPE_BIT_STRING) {
-			ret->size = (len+7) / 8;
-		} else {
+		switch (etype) {
+		case ASN1_ETYPE_BIT_STRING:
+			ret->size = (len + 7) / 8;
+			break;
+		case ASN1_ETYPE_OBJECT_ID:
+			if (len > 0) {
+				ret->size = len - 1;
+			} else {
+				result = gnutls_assert_val(GNUTLS_E_ASN1_DER_ERROR);
+				goto cleanup;
+			}
+			break;
+		default:
 			ret->size = (unsigned) len;
+			break;
 		}
 	} else {
 		ret->size = 0;
