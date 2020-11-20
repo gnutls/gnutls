@@ -211,6 +211,8 @@ const gnutls_crypto_cipher_st
  * registering a cipher to be used with the new AEAD API introduced in
  * GnuTLS 3.4.0. Internally GnuTLS uses the new AEAD API.
  *
+ * Deprecated: since 3.7.0 it is no longer possible to override cipher implementation
+ *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
  * Since: 3.4.0
@@ -224,6 +226,20 @@ gnutls_crypto_register_cipher(gnutls_cipher_algorithm_t algorithm,
 			      gnutls_cipher_encrypt_func encrypt,
 			      gnutls_cipher_decrypt_func decrypt,
 			      gnutls_cipher_deinit_func deinit)
+{
+	_gnutls_debug_log("called the deprecated gnutls_crypto_register_cipher()\n");
+	return 0;
+}
+
+int
+_gnutls_crypto_register_cipher(gnutls_cipher_algorithm_t algorithm,
+			       int priority,
+			       gnutls_cipher_init_func init,
+			       gnutls_cipher_setkey_func setkey,
+			       gnutls_cipher_setiv_func setiv,
+			       gnutls_cipher_encrypt_func encrypt,
+			       gnutls_cipher_decrypt_func decrypt,
+			       gnutls_cipher_deinit_func deinit)
 {
 	gnutls_crypto_cipher_st *s = gnutls_calloc(1, sizeof(gnutls_crypto_cipher_st));
 	if (s == NULL)
@@ -261,6 +277,8 @@ gnutls_crypto_register_cipher(gnutls_cipher_algorithm_t algorithm,
  * The functions registered will be used with the new AEAD API introduced in
  * GnuTLS 3.4.0. Internally GnuTLS uses the new AEAD API.
  *
+ * Deprecated: since 3.7.0 it is no longer possible to override cipher implementation
+ *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
  * Since: 3.4.0
@@ -274,17 +292,8 @@ gnutls_crypto_register_aead_cipher(gnutls_cipher_algorithm_t algorithm,
 			      gnutls_cipher_aead_decrypt_func aead_decrypt,
 			      gnutls_cipher_deinit_func deinit)
 {
-	gnutls_crypto_cipher_st *s = gnutls_calloc(1, sizeof(gnutls_crypto_cipher_st));
-	if (s == NULL)
-		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-
-	s->init = init;
-	s->setkey = setkey;
-	s->aead_encrypt = aead_encrypt;
-	s->aead_decrypt = aead_decrypt;
-	s->deinit = deinit;
-
-	return gnutls_crypto_single_cipher_register(algorithm, priority, s, 1);
+	_gnutls_debug_log("called the deprecated gnutls_crypto_register_aead_cipher()\n");
+	return 0;
 }
 
 /*-
@@ -409,6 +418,8 @@ const gnutls_crypto_digest_st
  *  and CPU-assisted of 80.
  * The algorithm with the lowest priority will be used by gnutls.
  *
+ * Deprecated: since 3.7.0 it is no longer possible to override cipher implementation
+ *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
  * Since: 3.4.0
@@ -424,19 +435,8 @@ gnutls_crypto_register_mac(gnutls_mac_algorithm_t algorithm,
 			   gnutls_mac_deinit_func deinit,
 			   gnutls_mac_fast_func hash_fast)
 {
-	gnutls_crypto_mac_st *s = gnutls_calloc(1, sizeof(gnutls_crypto_mac_st));
-	if (s == NULL)
-		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-
-	s->init = init;
-	s->setkey = setkey;
-	s->setnonce = setnonce;
-	s->hash = hash;
-	s->output = output;
-	s->fast = hash_fast;
-	s->deinit = deinit;
-
-	return gnutls_crypto_single_mac_register(algorithm, priority, s, 1);
+	_gnutls_debug_log("called the deprecated gnutls_crypto_register_mac()\n");
+	return 0;
 }
 
 /**
@@ -455,6 +455,8 @@ gnutls_crypto_register_mac(gnutls_mac_algorithm_t algorithm,
  *  and CPU-assisted of 80.
  * The algorithm with the lowest priority will be used by gnutls.
  *
+ * Deprecated: since 3.7.0 it is no longer possible to override cipher implementation
+ *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
  * Since: 3.4.0
@@ -468,15 +470,6 @@ gnutls_crypto_register_digest(gnutls_digest_algorithm_t algorithm,
 			   gnutls_digest_deinit_func deinit,
 			   gnutls_digest_fast_func hash_fast)
 {
-	gnutls_crypto_digest_st *s = gnutls_calloc(1, sizeof(gnutls_crypto_digest_st));
-	if (s == NULL)
-		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-
-	s->init = init;
-	s->hash = hash;
-	s->output = output;
-	s->fast = hash_fast;
-	s->deinit = deinit;
-
-	return gnutls_crypto_single_digest_register(algorithm, priority, s, 1);
+	_gnutls_debug_log("called the deprecated gnutls_crypto_register_digest()\n");
+	return 0;
 }

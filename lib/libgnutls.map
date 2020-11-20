@@ -1447,4 +1447,6 @@ GNUTLS_PRIVATE_3_4 {
 	_gnutls_buffer_unescape;
 	_gnutls_buffer_pop_datum;
 	_gnutls_buffer_clear;
+	# needed by tests/cipher-alignment
+	_gnutls_crypto_register_cipher;
 } GNUTLS_3_4;

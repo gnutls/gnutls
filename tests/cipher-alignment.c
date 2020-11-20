@@ -128,6 +128,16 @@ struct myaes_ctx {
 
 static unsigned aes_init = 0;
 
+extern int
+_gnutls_crypto_register_cipher(gnutls_cipher_algorithm_t algorithm,
+			       int priority,
+			       gnutls_cipher_init_func init,
+			       gnutls_cipher_setkey_func setkey,
+			       gnutls_cipher_setiv_func setiv,
+			       gnutls_cipher_encrypt_func encrypt,
+			       gnutls_cipher_decrypt_func decrypt,
+			       gnutls_cipher_deinit_func deinit);
+
 static int
 myaes_init(gnutls_cipher_algorithm_t algorithm, void **_ctx, int enc)
 {
@@ -499,7 +509,7 @@ void doit(void)
 
 	global_init();
 
-	ret = gnutls_crypto_register_cipher(GNUTLS_CIPHER_AES_128_CBC, 1,
+	ret = _gnutls_crypto_register_cipher(GNUTLS_CIPHER_AES_128_CBC, 1,
 		myaes_init,
 		myaes_setkey,
 		myaes_setiv,

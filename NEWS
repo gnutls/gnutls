@@ -24,6 +24,9 @@ See the end for copying conditions.
 
 ** libgnutls: Added a new API to enable QUIC implementation (#826, #849, #850).
 
+** libgnutls: the crypto implementation override APIs deprecated in 3.6.9 are
+   now no-op (#790).
+
 ** API and ABI modifications:
 gnutls_x509_trust_list_set_getissuer_function: Added
 gnutls_x509_trust_list_get_ptr: Added
@@ -37,6 +40,10 @@ gnutls_handshake_secret_func: New callback type
 gnutls_handshake_set_secret_function: New function
 gnutls_alert_read_func: New callback type
 gnutls_alert_set_read_function: New function
+gnutls_crypto_register_cipher: Deprecated; no-op
+gnutls_crypto_register_aead_cipher: Deprecated; no-op
+gnutls_crypto_register_mac: Deprecated; no-op
+gnutls_crypto_register_digest: Deprecated; no-op
 
 * Version 3.6.14 (released 2020-06-03)
 

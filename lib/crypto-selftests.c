@@ -2298,9 +2298,7 @@ static int test_digest(gnutls_digest_algorithm_t dig,
 			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
 
 		copy = gnutls_hash_copy(hd);
-		/* Returning NULL is not an error here for the time being, but
-		 * it might become one later */
-		if (!copy && secure_getenv("GNUTLS_TEST_SUITE_RUN"))
+		if (!copy)
 			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
 
 		ret = gnutls_hash(hd,
@@ -2604,9 +2602,7 @@ static int test_mac(gnutls_mac_algorithm_t mac,
 			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
 
 		copy = gnutls_hmac_copy(hd);
-		/* Returning NULL is not an error here for the time being, but
-		 * it might become one later */
-		if (!copy && secure_getenv("GNUTLS_TEST_SUITE_RUN"))
+		if (!copy)
 			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
 
 		ret = gnutls_hmac(hd,

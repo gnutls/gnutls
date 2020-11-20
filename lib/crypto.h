@@ -30,5 +30,13 @@ const gnutls_crypto_digest_st
 const gnutls_crypto_mac_st *_gnutls_get_crypto_mac(gnutls_mac_algorithm_t
 						   algo);
 void _gnutls_crypto_deregister(void);
+int _gnutls_crypto_register_cipher(gnutls_cipher_algorithm_t algorithm,
+				   int priority,
+				   gnutls_cipher_init_func init,
+				   gnutls_cipher_setkey_func setkey,
+				   gnutls_cipher_setiv_func setiv,
+				   gnutls_cipher_encrypt_func encrypt,
+				   gnutls_cipher_decrypt_func decrypt,
+				   gnutls_cipher_deinit_func deinit);
 
 #endif /* GNUTLS_LIB_CRYPTO_H */
