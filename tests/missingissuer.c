@@ -36,7 +36,7 @@
 #include "utils.h"
 #include "test-chains-issuer.h"
 
-#define DEFAULT_THEN 1256803113
+#define DEFAULT_THEN 1605514504
 static time_t then = DEFAULT_THEN;
 
 /* GnuTLS internally calls time() to find out the current time when
@@ -56,34 +56,37 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "|<%d>| %s", level, str);
 }
 
+struct getissuer_data {
+	const char **insert;
+	unsigned int count;
+};
+
 static int getissuer_callback(gnutls_x509_trust_list_t tlist,
-			      const gnutls_x509_crt_t crt)
+			      const gnutls_x509_crt_t crt,
+			      gnutls_x509_crt_t **issuers,
+			      unsigned int *issuers_size)
 {
-	gnutls_x509_crt_t issuer;
 	gnutls_datum_t tmp;
 	int ret;
+	unsigned int i;
+	struct getissuer_data *data;
 
-	ret = gnutls_x509_crt_init(&issuer);
-	if (ret < 0) {
-		fprintf(stderr, "error: %s\n", gnutls_strerror(ret));
+	data = gnutls_x509_trust_list_get_ptr(tlist);
+
+	tmp.data = (unsigned char *)data->insert[data->count];
+	if (!tmp.data) {
+		fprintf(stderr, "getissuer_callback is called more times than expected\n");
 		return -1;
 	}
 
-	tmp.data = (unsigned char *)missing_cert_insert;
-	tmp.size = strlen(missing_cert_insert);
+	tmp.size = strlen(data->insert[data->count]);
 
-	ret = gnutls_x509_crt_import(issuer, &tmp, GNUTLS_X509_FMT_PEM);
+	data->count++;
+
+	ret = gnutls_x509_crt_list_import2(issuers, issuers_size, &tmp,
+					   GNUTLS_X509_FMT_PEM, 0);
 	if (ret < 0) {
 		fprintf(stderr, "error: %s\n", gnutls_strerror(ret));
-		gnutls_x509_crt_deinit(issuer);
-		return -1;
-	}
-
-	/* This transfers the ownership of `issuer` to `tlist`. */
-	ret = gnutls_x509_trust_list_add_cas(tlist, &issuer, 1, 0);
-	if (ret < 0) {
-		fprintf(stderr, "error: %s\n", gnutls_strerror(ret));
-		gnutls_x509_crt_deinit(issuer);
 		return -1;
 	}
 
@@ -94,14 +97,16 @@ static int getissuer_callback(gnutls_x509_trust_list_t tlist,
 				tmp.size, tmp.data);
 	gnutls_free(tmp.data);
 
-	assert(gnutls_x509_crt_print(issuer, GNUTLS_CRT_PRINT_ONELINE, &tmp) >= 0);
+	for (i = 0; i < *issuers_size; i++) {
+		assert(gnutls_x509_crt_print((*issuers)[i], GNUTLS_CRT_PRINT_ONELINE, &tmp) >= 0);
 
-	if (debug)
-		printf("\t Appended issuer certificate is: %.*s\n",
-				tmp.size, tmp.data);
-	gnutls_free(tmp.data);
+		if (debug)
+			printf("\t Appended issuer certificate is: %.*s\n",
+			       tmp.size, tmp.data);
+		gnutls_free(tmp.data);
+	}
+
 	return 0;
-
 }
 
 void doit(void)
@@ -113,7 +118,7 @@ void doit(void)
 	gnutls_x509_crt_t certs[MAX_CHAIN];
 	gnutls_x509_crt_t ca;
 	gnutls_datum_t tmp;
-	size_t j;
+	size_t i, j;
 
 	/* The overloading of time() seems to work in linux (ELF?)
 	 * systems only. Disable it on windows.
@@ -134,103 +139,127 @@ void doit(void)
 	if (debug)
 		gnutls_global_set_log_level(4711);
 
-	for (j = 0; j < MAX_CHAIN; j++) {
-		if (debug > 2)
-			printf("\tAdding certificate %d...", (int)j);
+	for (i = 0; chains[i].chain; i++) {
+		struct getissuer_data data;
 
-		ret = gnutls_x509_crt_init(&certs[j]);
-		if (ret < 0) {
-			fprintf(stderr,
+		printf("[%d]: Chain '%s'...\n", (int)i, chains[i].name);
+
+		for (j = 0; chains[i].chain[j]; j++) {
+			if (debug > 2)
+				printf("\tAdding certificate %d...", (int)j);
+
+			ret = gnutls_x509_crt_init(&certs[j]);
+			if (ret < 0) {
+				fprintf(stderr,
 					"gnutls_x509_crt_init[%d]: %s\n",
 					(int)j, gnutls_strerror(ret));
-			exit(1);
-		}
+				exit(1);
+			}
 
-		tmp.data = (unsigned char *)missing_issuer_chain[j];
-		tmp.size = strlen(missing_issuer_chain[j]);
+			tmp.data = (unsigned char *)chains[i].chain[j];
+			tmp.size = strlen(chains[i].chain[j]);
 
-		ret =
-			gnutls_x509_crt_import(certs[j], &tmp,
-					GNUTLS_X509_FMT_PEM);
-		if (debug > 2)
-			printf("done\n");
-		if (ret < 0) {
-			fprintf(stderr,
+			ret =
+				gnutls_x509_crt_import(certs[j], &tmp,
+						       GNUTLS_X509_FMT_PEM);
+			if (debug > 2)
+				printf("done\n");
+			if (ret < 0) {
+				fprintf(stderr,
 					"gnutls_x509_crt_import[%d]: %s\n",
 					(int)j,
 					gnutls_strerror(ret));
+				exit(1);
+			}
+
+			gnutls_x509_crt_print(certs[j],
+					      GNUTLS_CRT_PRINT_ONELINE, &tmp);
+			if (debug)
+				printf("\tCertificate %d: %.*s\n", (int)j,
+				       tmp.size, tmp.data);
+			gnutls_free(tmp.data);
+		}
+
+		if (debug > 2)
+			printf("\tAdding CA certificate...");
+
+		ret = gnutls_x509_crt_init(&ca);
+		if (ret < 0) {
+			fprintf(stderr, "gnutls_x509_crt_init: %s\n",
+				gnutls_strerror(ret));
 			exit(1);
 		}
 
-		gnutls_x509_crt_print(certs[j],
-				GNUTLS_CRT_PRINT_ONELINE, &tmp);
+		tmp.data = (unsigned char *)*chains[i].ca;
+		tmp.size = strlen(*chains[i].ca);
+
+		ret = gnutls_x509_crt_import(ca, &tmp, GNUTLS_X509_FMT_PEM);
+		if (ret < 0) {
+			fprintf(stderr, "gnutls_x509_crt_import: %s\n",
+				gnutls_strerror(ret));
+			exit(1);
+		}
+
+		if (debug > 2)
+			printf("done\n");
+
+		gnutls_x509_crt_print(ca, GNUTLS_CRT_PRINT_ONELINE, &tmp);
 		if (debug)
-			printf("\tCertificate %d: %.*s\n", (int)j,
-					tmp.size, tmp.data);
+			printf("\tCA Certificate: %.*s\n", tmp.size, tmp.data);
 		gnutls_free(tmp.data);
+
+		if (debug)
+			printf("\tVerifying...");
+
+		gnutls_x509_trust_list_init(&tl, 0);
+
+		ret = gnutls_x509_trust_list_add_cas(tl, &ca, 1, 0);
+		if (ret != 1) {
+			fail("gnutls_x509_trust_list_add_trust_mem\n");
+			exit(1);
+		}
+
+		data.count = 0;
+		data.insert = chains[i].insert;
+
+		gnutls_x509_trust_list_set_ptr(tl, &data);
+		gnutls_x509_trust_list_set_getissuer_function(tl, getissuer_callback);
+
+		ret = gnutls_x509_trust_list_verify_crt(tl, certs, j,
+							chains[i].verify_flags,
+							&verify_status,
+							NULL);
+		if (ret < 0) {
+			fprintf(stderr,
+				"gnutls_x509_trust_list_verify_crt: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+
+		if (verify_status != chains[i].expected_verify_result) {
+			gnutls_datum_t out1, out2;
+			gnutls_certificate_verification_status_print
+				(verify_status, GNUTLS_CRT_X509, &out1, 0);
+			gnutls_certificate_verification_status_print
+				(chains[i].expected_verify_result,
+				 GNUTLS_CRT_X509, &out2, 0);
+			fail("chain[%s]:\nverify_status: %d: %s\nexpected: %d: %s\n", chains[i].name, verify_status, out1.data, chains[i].expected_verify_result, out2.data);
+			gnutls_free(out1.data);
+			gnutls_free(out2.data);
+
+		} else if (debug)
+			printf("done\n");
+
+		if (debug)
+			printf("\tCleanup...");
+
+		gnutls_x509_trust_list_deinit(tl, 0);
+		gnutls_x509_crt_deinit(ca);
+		for (j = 0; chains[i].chain[j]; j++)
+			gnutls_x509_crt_deinit(certs[j]);
+
+		if (debug)
+			printf("done\n\n\n");
 	}
-
-	if (debug > 2)
-		printf("\tAdding CA certificate...");
-
-	ret = gnutls_x509_crt_init(&ca);
-	if (ret < 0) {
-		fprintf(stderr, "gnutls_x509_crt_init: %s\n",
-				gnutls_strerror(ret));
-		exit(1);
-	}
-
-	tmp.data = (unsigned char *)missing_issuer_chain[MAX_CHAIN-1];
-	tmp.size = strlen(missing_issuer_chain[MAX_CHAIN-1]);
-
-	ret = gnutls_x509_crt_import(ca, &tmp, GNUTLS_X509_FMT_PEM);
-	if (ret < 0) {
-		fprintf(stderr, "gnutls_x509_crt_import: %s\n",
-				gnutls_strerror(ret));
-		exit(1);
-	}
-
-	if (debug > 2)
-		printf("done\n");
-
-	gnutls_x509_crt_print(ca, GNUTLS_CRT_PRINT_ONELINE, &tmp);
-	if (debug)
-		printf("\tCA Certificate: %.*s\n", tmp.size, tmp.data);
-	gnutls_free(tmp.data);
-
-	if (debug)
-		printf("\tVerifying...");
-
-	gnutls_x509_trust_list_init(&tl, 0);
-
-	ret = gnutls_x509_trust_list_add_cas(tl, &ca, 1, 0);
-	if (ret != 1) {
-		fail("gnutls_x509_trust_list_add_trust_mem\n");
-		exit(1);
-	}
-
-	gnutls_x509_trust_list_set_getissuer_function(tl, getissuer_callback);
-
-	ret = gnutls_x509_trust_list_verify_crt(tl, certs, MAX_CHAIN,
-			0,
-			&verify_status,
-			NULL);
-	if (ret < 0) {
-		fprintf(stderr,
-				"gnutls_x509_crt_list_verify: %s\n", gnutls_strerror(ret));
-		exit(1);
-	}
-
-	if (debug)
-		printf("\tCleanup...");
-
-	gnutls_x509_trust_list_deinit(tl, 1);
-
-	for (j = 0; j < MAX_CHAIN; j++)
-		gnutls_x509_crt_deinit(certs[j]);
-
-	if (debug)
-		printf("done\n\n\n");
 
 	gnutls_global_deinit();
 

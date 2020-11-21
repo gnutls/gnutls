@@ -647,25 +647,6 @@ static unsigned verify_crt(gnutls_x509_trust_list_t tlist,
 	if (tcas_size >= 1)
 		issuer = find_issuer(cert, trusted_cas, tcas_size);
 
-	if (issuer == NULL && tlist != NULL && tlist->issuer_callback != NULL) {
-		_gnutls_debug_log("Missing issuer callback set.\n");
-
-		/* missing issuer is populated by the callback */
-		ret = tlist->issuer_callback(tlist, cert);
-		if (ret < 0) {
-			/* if the callback fails, continue as though the callback
-			 * wasn't invoked i.e issuer remains NULL */
-			gnutls_assert();
-			issuer = NULL;
-		}
-
-		ret = _gnutls_trust_list_get_issuer(tlist, cert, &issuer, 0);
-		if (ret < 0) {
-			gnutls_assert();
-			issuer = NULL;
-		}
-	}
-
 	ret =
 	    _gnutls_x509_get_signed_data(cert->cert, &cert->der, "tbsCertificate",
 					 &cert_signed_data);

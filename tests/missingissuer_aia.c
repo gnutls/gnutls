@@ -36,7 +36,7 @@
 #include "utils.h"
 #include "test-chains-issuer-aia.h"
 
-#define DEFAULT_THEN 1256803113
+#define DEFAULT_THEN 1605443778
 static time_t then = DEFAULT_THEN;
 
 /* GnuTLS internally calls time() to find out the current time when
@@ -57,12 +57,14 @@ static void tls_log_func(int level, const char *str)
 }
 
 static int getissuer_callback(gnutls_x509_trust_list_t tlist,
-			      const gnutls_x509_crt_t crt)
+			      const gnutls_x509_crt_t crt,
+			      gnutls_x509_crt_t **issuers,
+			      unsigned int *issuers_size)
 {
 	int ret;
-	gnutls_x509_crt_t issuer;
 	gnutls_datum_t aia;
 	gnutls_datum_t tmp;
+	unsigned int i;
 
 	assert(gnutls_x509_crt_print(crt, GNUTLS_CRT_PRINT_ONELINE, &tmp) >= 0);
 
@@ -70,12 +72,6 @@ static int getissuer_callback(gnutls_x509_trust_list_t tlist,
 		printf("\t Certificate missing issuer is: %.*s\n",
 				tmp.size, tmp.data);
 	gnutls_free(tmp.data);
-
-	ret = gnutls_x509_crt_init(&issuer);
-	if (ret < 0) {
-		fprintf(stderr, "error: %s\n", gnutls_strerror(ret));
-		return -1;
-	}
 
 	ret = gnutls_x509_crt_get_authority_info_access(crt, 1,
 			GNUTLS_IA_CAISSUERS_URI, &aia, NULL);
@@ -93,27 +89,22 @@ static int getissuer_callback(gnutls_x509_trust_list_t tlist,
 	tmp.data = (unsigned char *)missing_cert_aia_insert;
 	tmp.size = strlen(missing_cert_aia_insert);
 
-	ret = gnutls_x509_crt_import(issuer, &tmp, GNUTLS_X509_FMT_PEM);
+	ret = gnutls_x509_crt_list_import2(issuers, issuers_size, &tmp,
+					   GNUTLS_X509_FMT_PEM, 0);
 	if (ret < 0) {
 		fprintf(stderr, "error: %s\n", gnutls_strerror(ret));
-		gnutls_x509_crt_deinit(issuer);
 		return -1;
 	}
 
-	/* This transfers the ownership of `issuer` to `tlist`. */
-	ret = gnutls_x509_trust_list_add_cas(tlist, &issuer, 1, 0);
-	if (ret < 0) {
-		fprintf(stderr, "error: %s\n", gnutls_strerror(ret));
-		gnutls_x509_crt_deinit(issuer);
-		return -1;
+	for (i = 0; i < *issuers_size; i++) {
+		assert(gnutls_x509_crt_print(*issuers[i], GNUTLS_CRT_PRINT_ONELINE, &tmp) >= 0);
+
+		if (debug)
+			printf("\t Appended missing certificate is: %.*s\n",
+			       tmp.size, tmp.data);
+		gnutls_free(tmp.data);
 	}
 
-	assert(gnutls_x509_crt_print(issuer, GNUTLS_CRT_PRINT_ONELINE, &tmp) >= 0);
-
-	if (debug)
-		printf("\t Appended missing certificate is: %.*s\n",
-				tmp.size, tmp.data);
-	gnutls_free(tmp.data);
 	return 0;
 }
 
@@ -138,7 +129,6 @@ void doit(void)
 	ret = global_init();
 	if (ret != 0) {
 		fail("%d: %s\n", ret, gnutls_strerror(ret));
-		exit(1);
 	}
 
 	gnutls_global_set_time_function(mytime);
@@ -193,8 +183,8 @@ void doit(void)
 		exit(1);
 	}
 
-	tmp.data = (unsigned char *)missing_cert_aia[MAX_CHAIN-1];
-	tmp.size = strlen(missing_cert_aia[MAX_CHAIN-1]);
+	tmp.data = (unsigned char *)missing_cert_aia_ca[0];
+	tmp.size = strlen(missing_cert_aia_ca[0]);
 
 	ret = gnutls_x509_crt_import(ca, &tmp, GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
@@ -219,7 +209,6 @@ void doit(void)
 	ret = gnutls_x509_trust_list_add_cas(tl, &ca, 1, 0);
 	if (ret != 1) {
 		fail("gnutls_x509_trust_list_add_trust_mem\n");
-		exit(1);
 	}
 
 	gnutls_x509_trust_list_set_getissuer_function(tl, getissuer_callback);
@@ -229,9 +218,15 @@ void doit(void)
 			&verify_status,
 			NULL);
 	if (ret < 0) {
-		fprintf(stderr,
-				"gnutls_x509_crt_list_verify: %s\n", gnutls_strerror(ret));
-		exit(1);
+		fail("gnutls_x509_crt_list_verify: %s\n", gnutls_strerror(ret));
+	}
+	if (verify_status) {
+		gnutls_datum_t out;
+
+		gnutls_certificate_verification_status_print
+			(verify_status, GNUTLS_CRT_X509, &out, 0);
+		fail("verification failed: %s\n", out.data);
+		gnutls_free(out.data);
 	}
 
 	if (debug)

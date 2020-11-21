@@ -890,13 +890,21 @@ void
  * This function sets a callback to be called when the peer's certificate
  * chain is incomplete due a missing intermediate certificate/certificates.
  *
- * The callback's function prototype is defined in `abstract.h':
- * int (*callback)(
- * gnutls_x509_trust_list_t tlist,
- * const gnutls_x509_crt_t crt);
+ * The callback's function prototype is defined in <gnutls/x509.h> as:
+ *
+ *   int (*callback)(gnutls_x509_trust_list_t list,
+ *                   const gnutls_x509_crt_t cert,
+ *                   gnutls_x509_crt_t **issuers,
+ *                   unsigned int *issuers_size);
  *
  * If the callback function is provided then gnutls will call it, in the
  * certificate verification procedure.
+ *
+ * On a successful call, the callback shall allocate the 'issuers' array with
+ * gnutls_x509_crt_list_import2(). The ownership of both the array and the
+ * elements is transferred to the caller and thus the application does not need
+ * to maintain the memory after the call.
+ *
  * To verify or obtain the certificate the verification functions such as
  * gnutls_x509_trust_list_verify_crt() and gnutls_x509_trust_list_verify_crt2()
  * can be used.
