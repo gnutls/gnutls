@@ -560,10 +560,14 @@ gnutls_store_pubkey(const char *db_name,
 
 	_gnutls_debug_log("Configuration file: %s\n", db_name);
 
-	tdb->store(db_name, host, service, expiration, &pubkey);
+	ret = tdb->store(db_name, host, service, expiration, &pubkey);
 
 	if (need_free) {
 		_gnutls_free_datum(&pubkey);
+	}
+
+	if (ret < 0) {
+		return gnutls_assert_val(GNUTLS_E_DB_ERROR);
 	}
 
 	return GNUTLS_E_SUCCESS;
@@ -638,8 +642,11 @@ gnutls_store_commitment(const char *db_name,
 
 	_gnutls_debug_log("Configuration file: %s\n", db_name);
 
-	tdb->cstore(db_name, host, service, expiration,
-		(gnutls_digest_algorithm_t)me->id, hash);
+	ret = tdb->cstore(db_name, host, service, expiration,
+			  (gnutls_digest_algorithm_t)me->id, hash);
+	if (ret < 0) {
+		return gnutls_assert_val(GNUTLS_E_DB_ERROR);
+	}
 
 	return 0;
 }
