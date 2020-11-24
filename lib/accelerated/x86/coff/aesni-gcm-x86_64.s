@@ -42,6 +42,7 @@
 .def	_aesni_ctr32_ghash_6x;	.scl 3;	.type 32;	.endef
 .p2align	5
 _aesni_ctr32_ghash_6x:
+
 	vmovdqu	32(%r11),%xmm2
 	subq	$6,%rdx
 	vpxor	%xmm4,%xmm4,%xmm4
@@ -350,6 +351,7 @@ _aesni_ctr32_ghash_6x:
 
 	.byte	0xf3,0xc3
 
+
 .globl	aesni_gcm_decrypt
 .def	aesni_gcm_decrypt;	.scl 2;	.type 32;	.endef
 .p2align	5
@@ -490,6 +492,7 @@ aesni_gcm_decrypt:
 .def	_aesni_ctr32_6x;	.scl 3;	.type 32;	.endef
 .p2align	5
 _aesni_ctr32_6x:
+
 	vmovdqu	0-128(%rcx),%xmm4
 	vmovdqu	32(%r11),%xmm2
 	leaq	-1(%rbp),%r13
@@ -576,6 +579,7 @@ _aesni_ctr32_6x:
 	vpshufb	%xmm0,%xmm1,%xmm1
 	vpxor	%xmm4,%xmm14,%xmm14
 	jmp	.Loop_ctr32
+
 
 
 .globl	aesni_gcm_encrypt

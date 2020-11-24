@@ -49,6 +49,7 @@
 .text
 
 
+.private_extern __gnutls_arm_cpuid_s
 .globl _sha256_block_data_order
 
 .align 6
@@ -2049,6 +2050,3 @@ L_00_48:
  ldr x29,[x29]
  add sp,sp,#16*4+16
  ret
-
-
-.comm __gnutls_arm_cpuid_s,4,4

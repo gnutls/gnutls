@@ -939,6 +939,7 @@ aesni_ccm64_encrypt_blocks:
 	movq	40(%rsp),%r8
 	movq	48(%rsp),%r9
 
+
 	leaq	-88(%rsp),%rsp
 	movaps	%xmm6,(%rsp)
 	movaps	%xmm7,16(%rsp)
@@ -1015,6 +1016,7 @@ aesni_ccm64_encrypt_blocks:
 	movq	8(%rsp),%rdi
 	movq	16(%rsp),%rsi
 	.byte	0xf3,0xc3
+
 .LSEH_end_aesni_ccm64_encrypt_blocks:
 .globl	aesni_ccm64_decrypt_blocks
 .def	aesni_ccm64_decrypt_blocks;	.scl 2;	.type 32;	.endef
@@ -1030,6 +1032,7 @@ aesni_ccm64_decrypt_blocks:
 	movq	%r9,%rcx
 	movq	40(%rsp),%r8
 	movq	48(%rsp),%r9
+
 
 	leaq	-88(%rsp),%rsp
 	movaps	%xmm6,(%rsp)
@@ -1141,6 +1144,7 @@ aesni_ccm64_decrypt_blocks:
 	movq	8(%rsp),%rdi
 	movq	16(%rsp),%rsi
 	.byte	0xf3,0xc3
+
 .LSEH_end_aesni_ccm64_decrypt_blocks:
 .globl	aesni_ctr32_encrypt_blocks
 .def	aesni_ctr32_encrypt_blocks;	.scl 2;	.type 32;	.endef
@@ -3046,6 +3050,7 @@ aesni_ocb_encrypt:
 .def	__ocb_encrypt6;	.scl 3;	.type 32;	.endef
 .p2align	5
 __ocb_encrypt6:
+
 	pxor	%xmm9,%xmm15
 	movdqu	(%rbx,%r12,1),%xmm11
 	movdqa	%xmm10,%xmm12
@@ -3145,9 +3150,11 @@ __ocb_encrypt6:
 	.byte	0xf3,0xc3
 
 
+
 .def	__ocb_encrypt4;	.scl 3;	.type 32;	.endef
 .p2align	5
 __ocb_encrypt4:
+
 	pxor	%xmm9,%xmm15
 	movdqu	(%rbx,%r12,1),%xmm11
 	movdqa	%xmm10,%xmm12
@@ -3214,9 +3221,11 @@ __ocb_encrypt4:
 	.byte	0xf3,0xc3
 
 
+
 .def	__ocb_encrypt1;	.scl 3;	.type 32;	.endef
 .p2align	5
 __ocb_encrypt1:
+
 	pxor	%xmm15,%xmm7
 	pxor	%xmm9,%xmm7
 	pxor	%xmm2,%xmm8
@@ -3247,6 +3256,7 @@ __ocb_encrypt1:
 
 .byte	102,15,56,221,215
 	.byte	0xf3,0xc3
+
 
 
 .globl	aesni_ocb_decrypt
@@ -3519,6 +3529,7 @@ aesni_ocb_decrypt:
 .def	__ocb_decrypt6;	.scl 3;	.type 32;	.endef
 .p2align	5
 __ocb_decrypt6:
+
 	pxor	%xmm9,%xmm15
 	movdqu	(%rbx,%r12,1),%xmm11
 	movdqa	%xmm10,%xmm12
@@ -3612,9 +3623,11 @@ __ocb_decrypt6:
 	.byte	0xf3,0xc3
 
 
+
 .def	__ocb_decrypt4;	.scl 3;	.type 32;	.endef
 .p2align	5
 __ocb_decrypt4:
+
 	pxor	%xmm9,%xmm15
 	movdqu	(%rbx,%r12,1),%xmm11
 	movdqa	%xmm10,%xmm12
@@ -3677,9 +3690,11 @@ __ocb_decrypt4:
 	.byte	0xf3,0xc3
 
 
+
 .def	__ocb_decrypt1;	.scl 3;	.type 32;	.endef
 .p2align	5
 __ocb_decrypt1:
+
 	pxor	%xmm15,%xmm7
 	pxor	%xmm9,%xmm7
 	pxor	%xmm7,%xmm2
@@ -3709,6 +3724,7 @@ __ocb_decrypt1:
 
 .byte	102,15,56,223,215
 	.byte	0xf3,0xc3
+
 
 .globl	aesni_cbc_encrypt
 .def	aesni_cbc_encrypt;	.scl 2;	.type 32;	.endef
@@ -4687,7 +4703,6 @@ __aesni_set_encrypt_key:
 	addq	$8,%rsp
 
 	.byte	0xf3,0xc3
-
 .LSEH_end_set_encrypt_key:
 
 .p2align	4
@@ -4758,6 +4773,7 @@ __aesni_set_encrypt_key:
 	shufps	$170,%xmm1,%xmm1
 	xorps	%xmm1,%xmm2
 	.byte	0xf3,0xc3
+
 
 
 .p2align	6

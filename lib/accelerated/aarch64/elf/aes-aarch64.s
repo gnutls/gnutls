@@ -147,7 +147,12 @@ aes_v8_set_encrypt_key:
 .Loop192:
  tbl v6.16b,{v4.16b},v2.16b
  ext v5.16b,v0.16b,v3.16b,#12
+
+
+
+
  st1 {v4.8b},[x2],#8
+
  aese v6.16b,v0.16b
  subs w1,w1,#1
 
@@ -618,6 +623,9 @@ aes_v8_ctr32_encrypt_blocks:
  ldr w5,[x3,#240]
 
  ldr w8, [x4, #12]
+
+
+
  ld1 {v0.4s},[x4]
 
  ld1 {v16.4s,v17.4s},[x3]

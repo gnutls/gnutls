@@ -49,6 +49,7 @@
 .text
 
 
+.hidden _gnutls_arm_cpuid_s
 .globl sha512_block_data_order
 .type sha512_block_data_order,%function
 .align 6
@@ -1604,7 +1605,4 @@ sha512_block_armv8:
  ldr x29,[sp],#16
  ret
 .size sha512_block_armv8,.-sha512_block_armv8
-
-
-.comm _gnutls_arm_cpuid_s,4,4
 .section .note.GNU-stack,"",%progbits

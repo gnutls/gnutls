@@ -1832,6 +1832,7 @@ sha256_block_data_order_shaext:
 	movq	%r8,%rdx
 
 _shaext_shortcut:
+
 	leaq	-88(%rsp),%rsp
 	movaps	%xmm6,-8-80(%rax)
 	movaps	%xmm7,-8-64(%rax)
@@ -2050,6 +2051,7 @@ _shaext_shortcut:
 	movq	8(%rsp),%rdi
 	movq	16(%rsp),%rsi
 	.byte	0xf3,0xc3
+
 .LSEH_end_sha256_block_data_order_shaext:
 .def	sha256_block_data_order_ssse3;	.scl 3;	.type 32;	.endef
 .p2align	6
@@ -5501,6 +5503,8 @@ sha256_block_data_order_avx2:
 
 	leaq	448(%rsp),%rsp
 
+
+
 	addl	0(%rdi),%eax
 	addl	4(%rdi),%ebx
 	addl	8(%rdi),%ecx
@@ -5526,15 +5530,17 @@ sha256_block_data_order_avx2:
 	jbe	.Loop_avx2
 	leaq	(%rsp),%rbp
 
+
+
+
 .Ldone_avx2:
-	leaq	(%rbp),%rsp
-	movq	88(%rsp),%rsi
+	movq	88(%rbp),%rsi
 
 	vzeroupper
-	movaps	64+32(%rsp),%xmm6
-	movaps	64+48(%rsp),%xmm7
-	movaps	64+64(%rsp),%xmm8
-	movaps	64+80(%rsp),%xmm9
+	movaps	64+32(%rbp),%xmm6
+	movaps	64+48(%rbp),%xmm7
+	movaps	64+64(%rbp),%xmm8
+	movaps	64+80(%rbp),%xmm9
 	movq	-48(%rsi),%r15
 
 	movq	-40(%rsi),%r14

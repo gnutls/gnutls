@@ -49,6 +49,7 @@
 .text
 
 
+.hidden _gnutls_arm_cpuid_s
 .globl sha256_block_data_order
 .type sha256_block_data_order,%function
 .align 6
@@ -2050,6 +2051,4 @@ sha256_block_neon:
  add sp,sp,#16*4+16
  ret
 .size sha256_block_neon,.-sha256_block_neon
-
-.comm _gnutls_arm_cpuid_s,4,4
 .section .note.GNU-stack,"",%progbits
