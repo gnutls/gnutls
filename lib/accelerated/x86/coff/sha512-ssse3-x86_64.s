@@ -5494,6 +5494,8 @@ sha512_block_data_order_avx2:
 
 	leaq	1152(%rsp),%rsp
 
+
+
 	addq	0(%rdi),%rax
 	addq	8(%rdi),%rbx
 	addq	16(%rdi),%rcx
@@ -5519,17 +5521,19 @@ sha512_block_data_order_avx2:
 	jbe	.Loop_avx2
 	leaq	(%rsp),%rbp
 
+
+
+
 .Ldone_avx2:
-	leaq	(%rbp),%rsp
-	movq	152(%rsp),%rsi
+	movq	152(%rbp),%rsi
 
 	vzeroupper
-	movaps	128+32(%rsp),%xmm6
-	movaps	128+48(%rsp),%xmm7
-	movaps	128+64(%rsp),%xmm8
-	movaps	128+80(%rsp),%xmm9
-	movaps	128+96(%rsp),%xmm10
-	movaps	128+112(%rsp),%xmm11
+	movaps	128+32(%rbp),%xmm6
+	movaps	128+48(%rbp),%xmm7
+	movaps	128+64(%rbp),%xmm8
+	movaps	128+80(%rbp),%xmm9
+	movaps	128+96(%rbp),%xmm10
+	movaps	128+112(%rbp),%xmm11
 	movq	-48(%rsi),%r15
 
 	movq	-40(%rsi),%r14

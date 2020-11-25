@@ -1490,10 +1490,10 @@ _shaext_shortcut:
 	movaps	-8-16(%rax),%xmm9
 	movq	%rax,%rsp
 .Lepilogue_shaext:
-
 	movq	8(%rsp),%rdi
 	movq	16(%rsp),%rsi
 	.byte	0xf3,0xc3
+
 .LSEH_end_sha1_block_data_order_shaext:
 .def	sha1_block_data_order_ssse3;	.scl 3;	.type 32;	.endef
 .p2align	4

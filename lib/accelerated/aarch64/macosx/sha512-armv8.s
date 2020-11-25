@@ -49,6 +49,7 @@
 .text
 
 
+.private_extern __gnutls_arm_cpuid_s
 .globl _sha512_block_data_order
 
 .align 6
@@ -1603,7 +1604,3 @@ Loop_hw:
 
  ldr x29,[sp],#16
  ret
-
-
-
-.comm __gnutls_arm_cpuid_s,4,4
