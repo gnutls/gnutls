@@ -49,6 +49,7 @@ int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 	gnutls_session_t session;
 	gnutls_certificate_credentials_t xcred;
 	struct mem_st memdata;
+	unsigned int retry;
 
 	res = gnutls_init(&session, GNUTLS_CLIENT);
 	assert(res >= 0);
@@ -69,6 +70,7 @@ int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 	gnutls_transport_set_pull_function(session, error_pull);
 	gnutls_handshake_set_read_function(session, handshake_discard);
 
+	retry = 0;
 	do {
 		res = gnutls_handshake(session);
 		if (res == GNUTLS_E_AGAIN) {
@@ -76,6 +78,12 @@ int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 				res = GNUTLS_E_INTERNAL_ERROR;
 				break;
 			}
+			if (retry > HANDSHAKE_MAX_RETRY_COUNT) {
+				break;
+			}
+			retry++;
+		} else {
+			retry = 0;
 		}
 	} while (res < 0 && gnutls_error_is_fatal(res) == 0);
 

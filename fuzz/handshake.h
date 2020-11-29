@@ -24,6 +24,8 @@
 #ifndef HANDSHAKE_H
 # define HANDSHAKE_H
 
+#define HANDSHAKE_MAX_RETRY_COUNT 10
+
 typedef struct mem_st {
 	const uint8_t *data;
 	size_t size;
