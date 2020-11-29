@@ -2370,6 +2370,10 @@ gnutls_handshake_write(gnutls_session_t session,
 	if (IS_DTLS(session))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
+	/* Nothing to do */
+	if (data_size == 0)
+		return gnutls_assert_val(0);
+
 	/* When using this, the outgoing handshake messages should
 	 * also be handled manually */
 	if (!session->internals.h_read_func)
