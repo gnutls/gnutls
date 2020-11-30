@@ -173,7 +173,7 @@ static int read_attr_and_val(const char **ptr,
 
 	/* remove spaces from the end */
 	while(val->size > 0 && c_isspace(val->data[val->size-1])) {
-		if (val->size-2 > 0 && val->data[val->size-2] == '\\')
+		if (val->size > 2 && val->data[val->size-2] == '\\')
 			break;
 		val->size--;
 	}
