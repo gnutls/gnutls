@@ -888,7 +888,8 @@ void
  * @func: is the callback function
  *
  * This function sets a callback to be called when the peer's certificate
- * chain is incomplete due a missing intermediate certificate/certificates.
+ * chain is incomplete due a missing intermediate certificate. The callback
+ * may provide the missing certificate for use during verification.
  *
  * The callback's function prototype is defined in <gnutls/x509.h> as:
  *
@@ -897,22 +898,19 @@ void
  *                   gnutls_x509_crt_t **issuers,
  *                   unsigned int *issuers_size);
  *
- * If the callback function is provided then gnutls will call it, in the
- * certificate verification procedure.
+ * If the callback function is provided then gnutls will call it during the
+ * certificate verification procedure. The callback may wish to use
+ * gnutls_x509_crt_get_authority_info_access() to get a URI from which
+ * to attempt to download the missing issuer certificate, if available.
  *
  * On a successful call, the callback shall allocate the 'issuers' array with
  * gnutls_x509_crt_list_import2(). The ownership of both the array and the
  * elements is transferred to the caller and thus the application does not need
  * to maintain the memory after the call.
  *
- * To verify or obtain the certificate the verification functions such as
- * gnutls_x509_trust_list_verify_crt() and gnutls_x509_trust_list_verify_crt2()
- * can be used.
- *
  * The callback function should return 0 if the missing issuer certificate
- * for 'crt' was properly populated and added to the 'tlist' using
- * gnutls_x509_trust_list_add_cas() or non-zero to continue the certificate list
- * verification but with issuer as %NULL.
+ * for 'crt' was properly populated and added to the 'issuers', or non-zero
+ * to continue the certificate list verification but with issuer as %NULL.
  *
  * Since: 3.7.0
  **/
