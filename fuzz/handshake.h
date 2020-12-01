@@ -24,6 +24,8 @@
 #ifndef HANDSHAKE_H
 # define HANDSHAKE_H
 
+#define HANDSHAKE_MAX_RETRY_COUNT 10
+
 typedef struct mem_st {
 	const uint8_t *data;
 	size_t size;
@@ -60,7 +62,7 @@ handshake_pull(gnutls_session_t session, mem_st *data)
 		return -1;
 	}
 
-	level = (data->data[0] << 24) | (data->data[1] << 16) |
+	level = ((unsigned)data->data[0] << 24) | (data->data[1] << 16) |
 		(data->data[2] << 8) | data->data[3];
 
 	data->size -= 4;
@@ -70,7 +72,7 @@ handshake_pull(gnutls_session_t session, mem_st *data)
 		return -1;
 	}
 
-	size = (data->data[0] << 24) | (data->data[1] << 16) |
+	size = ((unsigned)data->data[0] << 24) | (data->data[1] << 16) |
 		(data->data[2] << 8) | data->data[3];
 
 	data->size -= 4;
