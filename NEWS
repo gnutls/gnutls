@@ -5,16 +5,17 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.7.0 (unreleased)
+* Version 3.7.0 (released 2020-12-02)
 
-** libgnutls: Depend on nettle 3.6.
+** libgnutls: Depend on nettle 3.6 (!1322).
 
 ** libgnutls: Added a new API that provides a callback function to
-   retrieve missing certificates from incomplete certificate chains (#202).
+   retrieve missing certificates from incomplete certificate chains
+   (#202, #968, #1100).
 
 ** libgnutls: Added a new API that provides a callback function to
    output the complete path to the trusted root during certificate
-   chain verification (#1012)
+   chain verification (#1012).
 
 ** libgnutls: OIDs exposed as gnutls_datum_t no longer account for the
    terminating null bytes, while the data field is null terminated.
@@ -22,10 +23,19 @@ See the end for copying conditions.
    gnutls_ocsp_resp_get_response, and gnutls_ocsp_resp_get_extension
    (#805).
 
-** libgnutls: Added a new API to enable QUIC implementation (#826, #849, #850).
+** libgnutls: Added a new set of API to enable QUIC implementation (#826, #849,
+   #850).
 
-** libgnutls: the crypto implementation override APIs deprecated in 3.6.9 are
+** libgnutls: The crypto implementation override APIs deprecated in 3.6.9 are
    now no-op (#790).
+
+** libgnutls: Added MAGMA/KUZNYECHIK CTR-ACPKM and CMAC support (!1161).
+
+** libgnutls: Support for padlock has been fixed to make it work with Zhaoxin
+   CPU (#1079).
+
+** libgnutls: The maximum PIN length for PKCS #11 has been increased from 31
+   bytes to 255 bytes (#932).
 
 ** API and ABI modifications:
 gnutls_x509_trust_list_set_getissuer_function: Added
@@ -44,6 +54,40 @@ gnutls_crypto_register_cipher: Deprecated; no-op
 gnutls_crypto_register_aead_cipher: Deprecated; no-op
 gnutls_crypto_register_mac: Deprecated; no-op
 gnutls_crypto_register_digest: Deprecated; no-op
+
+* Version 3.6.15 (releases 2020-09-04)
+
+** libgnutls: Fixed "no_renegotiation" alert handling at incorrect timing.
+   The server sending a "no_renegotiation" alert in an unexpected timing,
+   followed by an invalid second handshake was able to cause a TLS 1.3 client to
+   crash via a null-pointer dereference. The crash happens in the application's
+   error handling path, where the gnutls_deinit function is called after
+   detecting a handshake failure (#1071).  [GNUTLS-SA-2020-09-04, CVSS: medium]
+
+** libgnutls: If FIPS self-tests are failed, gnutls_fips140_mode_enabled() now
+   indicates that with a false return value (!1306).
+
+** libgnutls: Under FIPS mode, the generated ECDH/DH public keys are checked
+   accordingly to SP800-56A rev 3 (!1295, !1299).
+
+** libgnutls: gnutls_x509_crt_export2() now returns 0 upon success, rather than
+   the size of the internal base64 blob (#1025). The new behavior aligns to the
+   existing documentation.
+
+** libgnutls: Certificate verification failue due to OCSP must-stapling is not
+   honered is now correctly marked with the GNUTLS_CERT_INVALID flag
+   (!1317). The new behavior aligns to the existing documentation.
+
+** libgnutls: The audit log message for weak hashes is no longer printed twice
+   (!1301).
+
+** libgnutls: Fixed version negotiation when TLS 1.3 is enabled and TLS 1.2 is
+   disabled in the priority string. Previously, even when TLS 1.2 is explicitly
+   disabled with "-VERS-TLS1.2", the server still offered TLS 1.2 if TLS 1.3 is
+   enabled (#1054).
+
+** API and ABI modifications:
+No changes since last version.
 
 * Version 3.6.14 (released 2020-06-03)
 
