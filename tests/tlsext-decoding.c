@@ -70,7 +70,7 @@ static void client_log_func(int level, const char *str)
 }
 
 #define RECORD_PAYLOAD_POS 5
-#define HANDSHAKE_CS_POS (39)
+#define HANDSHAKE_ID_POS (38)
 static ssize_t odd_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 {
 	uint8_t *d = (void*)data;
@@ -79,15 +79,21 @@ static ssize_t odd_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 	int pos;
 
 	if (d[0] == 22 && d[5] == GNUTLS_HANDSHAKE_CLIENT_HELLO) {
+		uint8_t isize;
+
+		/* skip session ID (this can be non-empty in TLS 1.3) */
+		isize = d[RECORD_PAYLOAD_POS+HANDSHAKE_ID_POS];
+		isize += 1;
+
 		/* skip ciphersuites */
-		csize = d[RECORD_PAYLOAD_POS+HANDSHAKE_CS_POS+1] + (d[RECORD_PAYLOAD_POS+HANDSHAKE_CS_POS] << 8);
+		csize = d[RECORD_PAYLOAD_POS+HANDSHAKE_ID_POS+isize+1] + (d[RECORD_PAYLOAD_POS+HANDSHAKE_ID_POS+isize] << 8);
 		csize += 2;
 
 		/* skip compression methods */
-		osize = d[RECORD_PAYLOAD_POS+HANDSHAKE_CS_POS+csize];
+		osize = d[RECORD_PAYLOAD_POS+HANDSHAKE_ID_POS+isize+csize];
 		osize += 1;
 
-		pos = RECORD_PAYLOAD_POS+HANDSHAKE_CS_POS+csize+osize;
+		pos = RECORD_PAYLOAD_POS+HANDSHAKE_ID_POS+isize+csize+osize;
 
 		if (reduce) {
 			if (d[pos+1] != 0x00) {

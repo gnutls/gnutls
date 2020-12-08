@@ -2211,6 +2211,7 @@ static int send_client_hello(gnutls_session_t session, int again)
 			goto cleanup;
 		}
 
+		uint8_t *resumed_session_id = session->internals.resumed_security_parameters.session_id;
 #ifdef TLS13_APPENDIX_D4
 		if (max_ver->tls13_sem &&
 		    session->security_parameters.session_id_size == 0) {
@@ -2225,13 +2226,15 @@ static int send_client_hello(gnutls_session_t session, int again)
 				gnutls_assert();
 				goto cleanup;
 			}
+			resumed_session_id = session->security_parameters.session_id;
+			session_id_len = session->security_parameters.session_id_size;
 		}
 #endif
 
 		/* Copy the Session ID - if any
 		 */
 		ret = _gnutls_buffer_append_data_prefix(&extdata, 8,
-							session->internals.resumed_security_parameters.session_id,
+							resumed_session_id,
 							session_id_len);
 		if (ret < 0) {
 			gnutls_assert();
