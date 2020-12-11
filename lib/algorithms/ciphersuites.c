@@ -1675,7 +1675,7 @@ _gnutls_get_client_ciphersuites(gnutls_session_t session,
 
 /**
  * gnutls_priority_get_cipher_suite_index:
- * @pcache: is a #gnutls_prioritity_t type.
+ * @pcache: is a #gnutls_priority_t type.
  * @idx: is an index number.
  * @sidx: internal index of cipher suite to get information about.
  *

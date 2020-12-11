@@ -1802,7 +1802,7 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 
 /**
  * gnutls_priority_init2:
- * @priority_cache: is a #gnutls_prioritity_t type.
+ * @priority_cache: is a #gnutls_priority_t type.
  * @priorities: is a string describing priorities (may be %NULL)
  * @err_pos: In case of an error this will have the position in the string the error occurred
  * @flags: zero or %GNUTLS_PRIORITY_INIT_DEF_APPEND
@@ -1957,7 +1957,7 @@ gnutls_priority_init2(gnutls_priority_t * priority_cache,
 
 /**
  * gnutls_priority_init:
- * @priority_cache: is a #gnutls_prioritity_t type.
+ * @priority_cache: is a #gnutls_priority_t type.
  * @priorities: is a string describing priorities (may be %NULL)
  * @err_pos: In case of an error this will have the position in the string the error occurred
  *
@@ -2288,7 +2288,7 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 
 /**
  * gnutls_priority_deinit:
- * @priority_cache: is a #gnutls_prioritity_t type.
+ * @priority_cache: is a #gnutls_priority_t type.
  *
  * Deinitializes the priority cache.
  **/
@@ -2469,7 +2469,7 @@ int gnutls_set_default_priority_append(gnutls_session_t session,
 
 /**
  * gnutls_priority_ecc_curve_list:
- * @pcache: is a #gnutls_prioritity_t type.
+ * @pcache: is a #gnutls_priority_t type.
  * @list: will point to an integer list
  *
  * Get a list of available elliptic curves in the priority
@@ -2504,7 +2504,7 @@ gnutls_priority_ecc_curve_list(gnutls_priority_t pcache,
 
 /**
  * gnutls_priority_group_list:
- * @pcache: is a #gnutls_prioritity_t type.
+ * @pcache: is a #gnutls_priority_t type.
  * @list: will point to an integer list
  *
  * Get a list of available groups in the priority
@@ -2527,7 +2527,7 @@ gnutls_priority_group_list(gnutls_priority_t pcache,
 
 /**
  * gnutls_priority_kx_list:
- * @pcache: is a #gnutls_prioritity_t type.
+ * @pcache: is a #gnutls_priority_t type.
  * @list: will point to an integer list
  *
  * Get a list of available key exchange methods in the priority
@@ -2549,7 +2549,7 @@ gnutls_priority_kx_list(gnutls_priority_t pcache,
 
 /**
  * gnutls_priority_cipher_list:
- * @pcache: is a #gnutls_prioritity_t type.
+ * @pcache: is a #gnutls_priority_t type.
  * @list: will point to an integer list
  *
  * Get a list of available ciphers in the priority
@@ -2571,7 +2571,7 @@ gnutls_priority_cipher_list(gnutls_priority_t pcache,
 
 /**
  * gnutls_priority_mac_list:
- * @pcache: is a #gnutls_prioritity_t type.
+ * @pcache: is a #gnutls_priority_t type.
  * @list: will point to an integer list
  *
  * Get a list of available MAC algorithms in the priority
@@ -2593,7 +2593,7 @@ gnutls_priority_mac_list(gnutls_priority_t pcache,
 
 /**
  * gnutls_priority_compression_list:
- * @pcache: is a #gnutls_prioritity_t type.
+ * @pcache: is a #gnutls_priority_t type.
  * @list: will point to an integer list
  *
  * Get a list of available compression method in the priority
@@ -2614,7 +2614,7 @@ gnutls_priority_compression_list(gnutls_priority_t pcache,
 
 /**
  * gnutls_priority_protocol_list:
- * @pcache: is a #gnutls_prioritity_t type.
+ * @pcache: is a #gnutls_priority_t type.
  * @list: will point to an integer list
  *
  * Get a list of available TLS version numbers in the priority
@@ -2636,7 +2636,7 @@ gnutls_priority_protocol_list(gnutls_priority_t pcache,
 
 /**
  * gnutls_priority_sign_list:
- * @pcache: is a #gnutls_prioritity_t type.
+ * @pcache: is a #gnutls_priority_t type.
  * @list: will point to an integer list
  *
  * Get a list of available signature algorithms in the priority
@@ -2658,7 +2658,7 @@ gnutls_priority_sign_list(gnutls_priority_t pcache,
 
 /**
  * gnutls_priority_certificate_type_list:
- * @pcache: is a #gnutls_prioritity_t type.
+ * @pcache: is a #gnutls_priority_t type.
  * @list: will point to an integer list
  *
  * Get a list of available certificate types in the priority
@@ -2685,7 +2685,7 @@ gnutls_priority_certificate_type_list(gnutls_priority_t pcache,
 
 /**
  * gnutls_priority_certificate_type_list2:
- * @pcache: is a #gnutls_prioritity_t type.
+ * @pcache: is a #gnutls_priority_t type.
  * @list: will point to an integer list.
  * @target: is a #gnutls_ctype_target_t type. Valid arguments are
  *   GNUTLS_CTYPE_CLIENT and GNUTLS_CTYPE_SERVER
