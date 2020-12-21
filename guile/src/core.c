@@ -3422,7 +3422,6 @@ scm_init_gnutls (void)
 {
 #include "core.x"
 
-  /* Use Guile's allocation routines, which will run the GC if need be.  */
   (void) gnutls_global_init ();
 
   scm_gnutls_define_enums ();
