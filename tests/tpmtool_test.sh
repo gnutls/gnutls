@@ -138,6 +138,7 @@ start_tcsd()
 	local tcsd_conf=$workdir/tcsd.conf
 	local tcsd_system_ps_file=$workdir/system_ps_file
 	local tcsd_pidfile=$workdir/tcsd.pid
+	local owner
 
 	start_swtpm "$workdir"
 	[ $? -ne 0 ] && return 1
@@ -146,20 +147,36 @@ start_tcsd()
 port = $TCSD_LISTEN_PORT
 system_ps_file = $tcsd_system_ps_file
 _EOF_
+	# older versions of trousers require tss:tss ownership of the
+	# config file, later ones root:tss
+	for owner in tss root; do
+		if [ "$owner" = "tss" ]; then
+			chmod 0600 $tcsd_conf
+		else
+			chmod 0640 $tcsd_conf
+		fi
+		chown $owner:tss $tcsd_conf
 
-	chown tss:tss $tcsd_conf
-	chmod 0600 $tcsd_conf
+		bash -c "TCSD_USE_TCP_DEVICE=1 TCSD_TCP_DEVICE_PORT=$SWTPM_SERVER_PORT tcsd -c $tcsd_conf -e -f &>/dev/null & echo \$! > $tcsd_pidfile; wait" &
+		BASH_PID=$!
 
-	bash -c "TCSD_USE_TCP_DEVICE=1 TCSD_TCP_DEVICE_PORT=$SWTPM_SERVER_PORT tcsd -c $tcsd_conf -e -f &>/dev/null & echo \$! > $tcsd_pidfile; wait" &
-	BASH_PID=$!
+		if wait_for_file $tcsd_pidfile 3; then
+			echo "Could not get TCSD's PID file"
+			return 1
+		fi
 
-	if wait_for_file $tcsd_pidfile 3; then
-		echo "Could not get TCSD's PID file"
-		return 1
-	fi
+		sleep 0.5
+		TCSD_PID=$(cat $tcsd_pidfile)
+		kill -0 "${TCSD_PID}"
+		if [ $? -ne 0 ]; then
+			# Try again with other owner
+			continue
+		fi
+		return 0
+	done
 
-	TCSD_PID=$(cat $tcsd_pidfile)
-	return 0
+	echo "TCSD could not be started"
+	return 1
 }
 
 stop_tcsd()
