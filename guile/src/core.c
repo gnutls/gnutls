@@ -1,5 +1,5 @@
 /* GnuTLS --- Guile bindings for GnuTLS.
-   Copyright (C) 2007-2014, 2016, 2019 Free Software Foundation, Inc.
+   Copyright (C) 2007-2014, 2016, 2019, 2020 Free Software Foundation, Inc.
 
    GnuTLS is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -96,11 +96,13 @@ const char scm_gnutls_array_error_message[] =
 static SCM weak_refs;
 
 /* Register a weak reference from @FROM to @TO, such that the lifetime of TO is
-   greater than or equal to that of FROM.  */
+   greater than or equal to that of FROM.  TO is added to the list of weak
+   references of FROM.  */
 static void
 register_weak_reference (SCM from, SCM to)
 {
-  scm_hashq_set_x (weak_refs, from, to);
+  SCM refs = scm_cons (to, scm_hashq_ref (weak_refs, from, SCM_EOL));
+  scm_hashq_set_x (weak_refs, from, refs);
 }
 
 
