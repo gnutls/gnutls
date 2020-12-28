@@ -145,6 +145,8 @@ void doit(void)
 		printf("[%d]: Chain '%s'...\n", (int)i, chains[i].name);
 
 		for (j = 0; chains[i].chain[j]; j++) {
+			assert(j < MAX_CHAIN);
+
 			if (debug > 2)
 				printf("\tAdding certificate %d...", (int)j);
 
