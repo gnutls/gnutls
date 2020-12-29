@@ -50,7 +50,8 @@ if test $? = 0; then
 	exit 77
 fi
 
-timeout 1800 datefudge "2012-09-2" "${srcdir}/testcompat-main-polarssl"
+timeout 1800 datefudge "2012-09-02" \
+"${srcdir}/testcompat-polarssl-serv-common.sh" ":%COMPAT"
 
 ret=$?
 test $ret = 124 && exit 77

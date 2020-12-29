@@ -39,7 +39,11 @@ LDADD = ../../lib/libgnutls.la \
 prime_check_LDADD = $(LDADD) -lhogweed -lgmp
 
 scripts_to_test = chain.sh \
-	testrng.sh testcompat-polarssl.sh testcompat-openssl.sh \
+	testrng.sh \
+	testcompat-polarssl-serv.sh \
+	testcompat-polarssl-serv-compat.sh \
+	testcompat-polarssl-serv-no-etm.sh \
+	testcompat-openssl.sh \
 	testrandom.sh tls-fuzzer/tls-fuzzer-nocert.sh \
 	tls-fuzzer/tls-fuzzer-cert.sh tls-fuzzer/tls-fuzzer-alpn.sh \
 	tls-fuzzer/tls-fuzzer-nocert-tls13.sh tls-fuzzer/tls-fuzzer-psk.sh \
