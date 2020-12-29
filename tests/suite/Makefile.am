@@ -43,7 +43,15 @@ scripts_to_test = chain.sh \
 	testcompat-polarssl-serv.sh \
 	testcompat-polarssl-serv-compat.sh \
 	testcompat-polarssl-serv-no-etm.sh \
-	testcompat-openssl.sh \
+	testcompat-openssl-cli.sh \
+	testcompat-openssl-cli-compat.sh \
+	testcompat-openssl-cli-no-etm.sh \
+	testcompat-openssl-serv.sh \
+	testcompat-openssl-serv-compat.sh \
+	testcompat-openssl-serv-no-etm.sh \
+	testcompat-openssl-serv-no-tickets.sh \
+	testcompat-openssl-serv-no-safe-renegotiation.sh \
+	testcompat-openssl-serv-safe-renegotiation.sh \
 	testrandom.sh tls-fuzzer/tls-fuzzer-nocert.sh \
 	tls-fuzzer/tls-fuzzer-cert.sh tls-fuzzer/tls-fuzzer-alpn.sh \
 	tls-fuzzer/tls-fuzzer-nocert-tls13.sh tls-fuzzer/tls-fuzzer-psk.sh \
