@@ -79,7 +79,9 @@ TESTS_ENVIRONMENT += ENABLE_SSL3=1
 endif
 
 if ENABLE_TLS13_INTEROP
-scripts_to_test += testcompat-tls13-openssl.sh
+scripts_to_test += \
+	testcompat-openssl-tls13-cli.sh \
+	testcompat-openssl-tls13-serv.sh
 endif
 
 if ENABLE_OLDGNUTLS_INTEROP
