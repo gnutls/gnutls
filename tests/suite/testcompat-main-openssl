@@ -896,7 +896,7 @@ run_server_suite() {
 		wait_udp_server ${PID}
 
 
-		${OPENSSL} s_client -host localhost -port "${PORT}" -cipher 'ALL:@SECLEVEL=1' -dtls1 -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
+		${OPENSSL} s_client -host localhost -port "${PORT}" -cipher 'ALL:@SECLEVEL=1' -sigalgs "$SIGALGS" -dtls1 -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
 			fail ${PID} "Failed"
 
 		kill ${PID}
