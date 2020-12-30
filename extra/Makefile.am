@@ -45,7 +45,8 @@ defexec_DATA =
 
 # OpenSSL
 
-libgnutls_openssl_la_LDFLAGS = -no-undefined
+libgnutls_openssl_la_LDFLAGS = -no-undefined \
+			       -export-symbols-regex "^[[:upper:]]"
 
 if ENABLE_OPENSSL
 lib_LTLIBRARIES = libgnutls-openssl.la
