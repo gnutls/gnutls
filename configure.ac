@@ -145,7 +145,7 @@ case "$host" in
     dnl intended minimum runtime version.
     LDFLAGS="$LDFLAGS -Wl,-no_weak_imports"
     AC_MSG_CHECKING([whether the linker supports -Wl,-no_weak_imports])
-    AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <sys/select.h>], [fd_set rfds; FD_ZERO(&rfds); FD_SET(0, &rfds);])],
+    AC_LINK_IFELSE([AC_LANG_PROGRAM([], [])],
       [AC_MSG_RESULT(yes)], [AC_MSG_RESULT(no); LDFLAGS="$save_LDFLAGS"])
   ;;
   *solaris*)
@@ -413,6 +413,23 @@ fi
 if test "$ac_cv_func_clock_gettime" != "yes";then
   AC_LIB_HAVE_LINKFLAGS(rt,, [#include <time.h>], [clock_gettime (0, 0);])
   gnutls_needs_librt=yes
+fi
+
+if test "$have_macosx" = "yes";then
+  dnl Remove -no_weak_imports from LDFLAGS after testing for function
+  dnl availability; keeping it included later breaks code that uses
+  dnl FD_SET, which since Xcode 11.4 implicitly adds a call to the
+  dnl weakly linked function __darwin_check_fd_set_overflow. We only
+  dnl need it above to make sure that we don't detect functions that
+  dnl are linked weakly (and can end up null at runtime) unless
+  dnl we check for their availability at runtime.
+  new_LDFLAGS=""
+  for f in $LDFLAGS; do
+    if test "$f" != "-Wl,-no_weak_imports"; then
+      new_LDFLAGS="$new_LDFLAGS $f"
+    fi
+  done
+  LDFLAGS="$new_LDFLAGS"
 fi
 
 AC_ARG_WITH(included-unistring, AS_HELP_STRING([--with-included-unistring],
