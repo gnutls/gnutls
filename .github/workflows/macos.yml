@@ -1,0 +1,43 @@
+name: MacOS CI
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: macos-11.0
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: false
+      - name: install dependencies
+        run: |
+          brew update
+          for pkg in openssl autoconf automake autogen libtool nettle p11-kit libtasn1 gettext bison; do
+            brew install $pkg || true
+          done
+          for pkg in nettle wget p11-kit libtasn1; do
+            brew upgrade $pkg || true
+          done
+      - name: update path
+        run: |
+          echo /usr/local/opt/gettext/bin >>${GITHUB_PATH}
+          echo /usr/local/opt/bison/bin >>${GITHUB_PATH}
+      - name: bootstrap
+        run: ./bootstrap
+      - name: configure
+        run: |
+          CC=clang ./configure --disable-full-test-suite --disable-valgrind-tests --disable-doc --disable-guile --disable-dependency-tracking
+      - name: make
+        run: |
+          make -j$(sysctl -n hw.ncpu) || make -j$(sysctl -n hw.ncpu) V=1
+      - name: make check
+        run: |
+          make -j$(sysctl -n hw.ncpu) check gl_public_submodule_commit=
+      - name: show debug info
+        if: failure()
+        run: |
+          find . -name 'test-suite.log' -execdir grep -il "FAILED" {} \; -exec echo {} \; -exec cat {} \;
+          for i in $(ls tests/*.log fuzz/*.log); do
+            echo "" && echo $i && cat $i
+          done
+          cat config.log
