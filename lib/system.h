@@ -52,10 +52,8 @@ extern CertEnumCRLsInStoreFunc pCertEnumCRLsInStore;
 
 int system_errno(gnutls_transport_ptr_t);
 
-#ifdef _WIN32
 ssize_t system_write(gnutls_transport_ptr_t ptr, const void *data,
 		     size_t data_size);
-#else
 #define HAVE_WRITEV
 ssize_t system_writev(gnutls_transport_ptr_t ptr, const giovec_t * iovec,
 		      int iovec_cnt);
@@ -65,7 +63,6 @@ ssize_t system_writev_tfo(gnutls_session_t ptr, const giovec_t * iovec,
 		      int iovec_cnt);
 ssize_t system_writev_nosignal_tfo(gnutls_session_t ptr, const giovec_t * iovec,
 		      int iovec_cnt);
-#endif
 ssize_t system_read(gnutls_transport_ptr_t ptr, void *data,
 		    size_t data_size);
 
