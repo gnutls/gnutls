@@ -53,8 +53,8 @@ static void genkey(gnutls_ecc_curve_t curve, gnutls_datum_t *x,
 		fail("error\n");
 }
 
-static void compute_key(gnutls_ecc_curve_t curve, gnutls_datum_t *x,
-			gnutls_datum_t *y, gnutls_datum_t *key,
+static void compute_key(gnutls_ecc_curve_t curve, const gnutls_datum_t *x,
+			const gnutls_datum_t *y, const gnutls_datum_t *key,
 			const gnutls_datum_t *peer_x,
 			const gnutls_datum_t *peer_y,
                         int expect_error,
