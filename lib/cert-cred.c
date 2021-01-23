@@ -809,7 +809,7 @@ void gnutls_certificate_set_retrieve_function2
  * gnutls_session_t,
  * const struct gnutls_cert_retr_st *info,
  * gnutls_pcert_st **certs,
- * unsigned int *pcert_length,
+ * unsigned int *certs_length,
  * gnutls_ocsp_data_st **ocsp,
  * unsigned int *ocsp_length,
  * gnutls_privkey_t *privkey,
@@ -823,13 +823,13 @@ void gnutls_certificate_set_retrieve_function2
  * @pk_algos contains a list with server's acceptable public key algorithms.
  * The certificate returned should support the server's given algorithms.
  *
- * The callback should fill-in the following values.
+ * The callback should fill-in the following values:
  *
- * @pcert should contain an allocated list of certificates and public keys.
- * @pcert_length is the size of the previous list.
+ * @certs should contain an allocated list of certificates and public keys.
+ * @certs_length is the size of the previous list.
  * @ocsp should contain an allocated list of OCSP responses.
  * @ocsp_length is the size of the previous list.
- * @pkey is the private key.
+ * @privkey is the private key.
  *
  * If flags in the callback are set to %GNUTLS_CERT_RETR_DEINIT_ALL then
  * all provided values must be allocated using gnutls_malloc(), and will
@@ -837,10 +837,17 @@ void gnutls_certificate_set_retrieve_function2
  *
  * The callback function should set the certificate and OCSP response
  * list to be sent, and return 0 on success. If no certificates are available,
- * the @pcert_length and @ocsp_length should be set to zero. The return
+ * the @certs_length and @ocsp_length should be set to zero. The return
  * value (-1) indicates error and the handshake will be terminated. If both
  * certificates are set in the credentials and a callback is available, the
  * callback takes predence.
+ *
+ * Raw public-keys:
+ * In case raw public-keys are negotiated as certificate type, certificates
+ * that would normally hold the public-key material are not available. In that case,
+ * @certs contains an allocated list with only the public key. Since there is no
+ * certificate, there is also no certificate status. Therefore, OCSP information
+ * should not be set.
  *
  * Since: 3.6.3
  **/
