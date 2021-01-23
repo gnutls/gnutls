@@ -468,9 +468,6 @@ tests/libpkcs11mock1.la
 tests/libpkcs11mock2.la
 tests/libutils.la
 tests/long-session-id
-tests/memset
-tests/memset0
-tests/memset1
 tests/mini
 tests/mini-alignment
 tests/mini-alpn

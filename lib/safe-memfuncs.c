@@ -34,25 +34,8 @@
  **/
 void gnutls_memset(void *data, int c, size_t size)
 {
-	volatile unsigned volatile_zero;
-	volatile char *vdata = (volatile char*)data;
-#ifdef HAVE_EXPLICIT_BZERO
-	if (c == 0) {
-		explicit_bzero(data, size);
-		return;
-	}
-#endif
-	volatile_zero = 0;
-
-	/* This is based on a nice trick for safe memset,
-	 * sent by David Jacobson in the openssl-dev mailing list.
-	 */
-
-	if (size > 0) {
-		do {
-			memset(data, c, size);
-		} while(vdata[volatile_zero] != c);
-	}
+	explicit_bzero(data, size);
+	memset(data, c, size);
 }
 
 /**

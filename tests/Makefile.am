@@ -160,7 +160,7 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 mini-emsgsize-dtls chainverify-unsorted mini-overhead tls12-ffdhe \
 	 mini-dtls-heartbeat mini-x509-callbacks key-openssl priorities priorities-groups	\
 	 gnutls_x509_privkey_import gnutls_x509_crt_list_import time x509-server-verify \
-	 sign-verify-ext4 tls-neg-ext4-key resume-lifetime memset0 memset1 \
+	 sign-verify-ext4 tls-neg-ext4-key resume-lifetime \
 	 mini-dtls-srtp rsa-encrypt-decrypt mini-loss-time gnutls-strcodes \
 	 mini-record mini-dtls-record handshake-timeout mini-record-range \
 	 cert-status fips-mode-pthread rsa-psk global-init sec-params sign-verify-data \
@@ -269,14 +269,6 @@ tls_pthread_LDADD = $(LDADD) -lpthread
 fips_mode_pthread_LDADD = $(LDADD) -lpthread
 dtls_pthread_LDADD = $(LDADD) -lpthread
 rng_pthread_LDADD = $(LDADD) -lpthread
-
-memset0_CFLAGS = -DCHAR=0x0
-memset0_SOURCES = memset.c
-memset0_LDADD = $(LDADD)
-
-memset1_CFLAGS = -DCHAR=0xa
-memset1_SOURCES = memset.c
-memset1_LDADD = $(LDADD)
 
 tls12_rollback_detection_CFLAGS = -DTLS12
 tls12_rollback_detection_SOURCES = tls13/rnd-rollback-detection.c
