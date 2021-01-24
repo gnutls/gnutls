@@ -443,7 +443,6 @@ tests/hex
 tests/hostname-check
 tests/hostname-check-utf8
 tests/infoaccess
-tests/init_fds
 tests/init_roundtrip
 tests/insecure_key
 tests/iov
