@@ -2094,17 +2094,19 @@ static int send_client_hello(gnutls_session_t session, int again)
 	const version_entry_st *hver, *min_ver, *max_ver;
 	uint8_t tver[2];
 	gnutls_buffer_st extdata;
-	int rehandshake = 0;
+	bool rehandshake = false;
+	bool resuming = false;
 	unsigned add_sr_scsv = 0;
+	uint8_t *session_id =
+		session->internals.resumed_security_parameters.session_id;
 	uint8_t session_id_len =
-	    session->internals.resumed_security_parameters.session_id_size;
-
+		session->internals.resumed_security_parameters.session_id_size;
 
 	if (again == 0) {
 		/* note that rehandshake is different than resuming
 		 */
 		if (session->internals.initial_negotiation_completed)
-			rehandshake = 1;
+			rehandshake = true;
 
 		ret = _gnutls_buffer_init_handshake_mbuffer(&extdata);
 		if (ret < 0)
@@ -2121,6 +2123,8 @@ static int send_client_hello(gnutls_session_t session, int again)
 				hver = _gnutls_legacy_version_max(session);
 		} else {
 			/* we are resuming a session */
+			resuming = true;
+
 			hver =
 			    session->internals.resumed_security_parameters.
 			    pversion;
@@ -2208,11 +2212,8 @@ static int send_client_hello(gnutls_session_t session, int again)
 			goto cleanup;
 		}
 
-		uint8_t *resumed_session_id = session->internals.resumed_security_parameters.session_id;
 #ifdef TLS13_APPENDIX_D4
-		if (max_ver->tls13_sem &&
-		    session->security_parameters.session_id_size == 0) {
-
+		if (max_ver->tls13_sem && !resuming) {
 			/* Under TLS1.3 we generate a random session ID to make
 			 * the TLS1.3 session look like a resumed TLS1.2 session */
 			ret = _gnutls_generate_session_id(session->security_parameters.
@@ -2223,7 +2224,7 @@ static int send_client_hello(gnutls_session_t session, int again)
 				gnutls_assert();
 				goto cleanup;
 			}
-			resumed_session_id = session->security_parameters.session_id;
+			session_id = session->security_parameters.session_id;
 			session_id_len = session->security_parameters.session_id_size;
 		}
 #endif
@@ -2231,7 +2232,7 @@ static int send_client_hello(gnutls_session_t session, int again)
 		/* Copy the Session ID - if any
 		 */
 		ret = _gnutls_buffer_append_data_prefix(&extdata, 8,
-							resumed_session_id,
+							session_id,
 							session_id_len);
 		if (ret < 0) {
 			gnutls_assert();

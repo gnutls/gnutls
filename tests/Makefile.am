@@ -118,6 +118,8 @@ ctests = tls13/supported_versions tls13/tls12-no-tls13-exts \
 
 ctests += tls13/hello_retry_request
 
+ctests += tls13/hello_retry_request_resume
+
 ctests += tls13/psk-ext
 
 ctests += tls13/key_update

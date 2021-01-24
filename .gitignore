@@ -857,6 +857,7 @@ tests/tls13/change_cipher_spec
 tests/tls13/cookie
 tests/tls13/hello_random_value
 tests/tls13/hello_retry_request
+tests/tls13/hello_retry_request_resume
 tests/tls13/key_limits
 tests/tls13/key_share
 tests/tls13/key_update
