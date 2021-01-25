@@ -1824,7 +1824,7 @@ int _gnutls_dh_generate_key(gnutls_dh_params_t dh_params,
 	params.params[DH_P] = _gnutls_mpi_copy(dh_params->params[0]);
 	params.params[DH_G] = _gnutls_mpi_copy(dh_params->params[1]);
 
-	params.params_nr = 3; /* include empty q */
+	params.params_nr = 5;
 	params.algo = GNUTLS_PK_DH;
 
 	priv_key->data = NULL;
@@ -1856,6 +1856,7 @@ int _gnutls_dh_generate_key(gnutls_dh_params_t dh_params,
 	gnutls_free(priv_key->data);
  cleanup:
 	gnutls_pk_params_clear(&params);
+	gnutls_pk_params_release(&params);
 	return ret;
 }
 
@@ -1869,8 +1870,12 @@ int _gnutls_dh_compute_key(gnutls_dh_params_t dh_params,
 	int ret;
 
 	gnutls_pk_params_init(&pub);
-	gnutls_pk_params_init(&priv);
+	pub.params_nr = 5;
 	pub.algo = GNUTLS_PK_DH;
+
+	gnutls_pk_params_init(&priv);
+	priv.params_nr = 5;
+	priv.algo = GNUTLS_PK_DH;
 
 	if (_gnutls_mpi_init_scan_nz
 		    (&pub.params[DH_Y], peer_key->data,
@@ -1893,9 +1898,6 @@ int _gnutls_dh_compute_key(gnutls_dh_params_t dh_params,
 		goto cleanup;
 	}
 
-	priv.params_nr = 3; /* include, possibly empty, q */
-	priv.algo = GNUTLS_PK_DH;
-
 	Z->data = NULL;
 
 	ret = _gnutls_pk_derive(GNUTLS_PK_DH, Z, &priv, &pub);
@@ -1907,7 +1909,9 @@ int _gnutls_dh_compute_key(gnutls_dh_params_t dh_params,
 	ret = 0;
  cleanup:
 	gnutls_pk_params_clear(&pub);
+	gnutls_pk_params_release(&pub);
 	gnutls_pk_params_clear(&priv);
+	gnutls_pk_params_release(&priv);
 	return ret;
 }
 
@@ -1919,6 +1923,7 @@ int _gnutls_ecdh_generate_key(gnutls_ecc_curve_t curve,
 	int ret;
 
 	gnutls_pk_params_init(&params);
+	params.params_nr = 3;
 	params.curve = curve;
 	params.algo = GNUTLS_PK_ECDSA;
 
@@ -1960,6 +1965,7 @@ int _gnutls_ecdh_generate_key(gnutls_ecc_curve_t curve,
 	gnutls_free(k->data);
  cleanup:
 	gnutls_pk_params_clear(&params);
+	gnutls_pk_params_release(&params);
 	return ret;
 }
 
@@ -1973,10 +1979,14 @@ int _gnutls_ecdh_compute_key(gnutls_ecc_curve_t curve,
 	int ret;
 
 	gnutls_pk_params_init(&pub);
-	gnutls_pk_params_init(&priv);
-
+	pub.params_nr = 3;
 	pub.algo = GNUTLS_PK_ECDSA;
 	pub.curve = curve;
+
+	gnutls_pk_params_init(&priv);
+	priv.params_nr = 3;
+	priv.algo = GNUTLS_PK_ECDSA;
+	priv.curve = curve;
 
 	if (_gnutls_mpi_init_scan_nz
 		    (&pub.params[ECC_Y], peer_y->data,
@@ -1993,8 +2003,6 @@ int _gnutls_ecdh_compute_key(gnutls_ecc_curve_t curve,
 		    gnutls_assert_val(GNUTLS_E_MPI_SCAN_FAILED);
 		goto cleanup;
 	}
-
-	pub.params_nr = 2;
 
 	if (_gnutls_mpi_init_scan_nz
 		    (&priv.params[ECC_Y], y->data,
@@ -2020,11 +2028,6 @@ int _gnutls_ecdh_compute_key(gnutls_ecc_curve_t curve,
 		goto cleanup;
 	}
 
-
-	priv.params_nr = 3;
-	priv.algo = GNUTLS_PK_ECDSA;
-	priv.curve = curve;
-
 	Z->data = NULL;
 
 	ret = _gnutls_pk_derive(GNUTLS_PK_ECDSA, Z, &priv, &pub);
@@ -2036,7 +2039,9 @@ int _gnutls_ecdh_compute_key(gnutls_ecc_curve_t curve,
 	ret = 0;
  cleanup:
 	gnutls_pk_params_clear(&pub);
+	gnutls_pk_params_release(&pub);
 	gnutls_pk_params_clear(&priv);
+	gnutls_pk_params_release(&priv);
 	return ret;
 }
 

@@ -55,18 +55,18 @@ static void params(gnutls_dh_params_t *dh_params, const gnutls_datum_t *p,
 		fail("error\n");
 }
 
-static void genkey(gnutls_dh_params_t *dh_params,
+static void genkey(const gnutls_dh_params_t dh_params,
 		   gnutls_datum_t *priv_key, gnutls_datum_t *pub_key)
 {
 	int ret;
 
-	ret = _gnutls_dh_generate_key(*dh_params, priv_key, pub_key);
+	ret = _gnutls_dh_generate_key(dh_params, priv_key, pub_key);
 	if (ret != 0)
 		fail("error\n");
 }
 
-static void compute_key(const char *name, gnutls_dh_params_t *dh_params,
-			gnutls_datum_t *priv_key, gnutls_datum_t *pub_key,
+static void compute_key(const char *name, const gnutls_dh_params_t dh_params,
+			const gnutls_datum_t *priv_key, const gnutls_datum_t *pub_key,
 			const gnutls_datum_t *peer_key, int expect_error,
 			gnutls_datum_t *result, bool expect_success)
 {
@@ -74,7 +74,7 @@ static void compute_key(const char *name, gnutls_dh_params_t *dh_params,
 	bool success;
 	int ret;
 
-	ret = _gnutls_dh_compute_key(*dh_params, priv_key, pub_key,
+	ret = _gnutls_dh_compute_key(dh_params, priv_key, pub_key,
 				     peer_key, &Z);
 	if (expect_error != ret)
 		fail("%s: error %d (expected %d)\n", name, ret, expect_error);
@@ -150,9 +150,9 @@ void doit(void)
 		params(&dh_params, &test_data[i].prime, &test_data[i].q,
 		       &test_data[i].generator);
 
-		genkey(&dh_params, &priv_key, &pub_key);
+		genkey(dh_params, &priv_key, &pub_key);
 
-		compute_key(test_data[i].name, &dh_params, &priv_key,
+		compute_key(test_data[i].name, dh_params, &priv_key,
 			    &pub_key, &test_data[i].peer_key,
 			    test_data[i].expected_error, NULL, 0);
 
