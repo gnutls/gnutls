@@ -600,7 +600,7 @@ endif
 
 
 if WANT_TEST_SUITE
-
+TEST_EXTENSIONS = .sh
 LOG_COMPILER = $(VALGRIND)
 endif
 

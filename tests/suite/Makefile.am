@@ -115,8 +115,4 @@ TESTS = $(scripts_to_test) prime-check
 prime_check_CPPFLAGS = $(AM_CPPFLAGS) $(NETTLE_CFLAGS)
 
 TEST_EXTENSIONS = .sh
-
-if WANT_TEST_SUITE
 LOG_COMPILER = $(VALGRIND)
-SH_LOG_COMPILER =
-endif
