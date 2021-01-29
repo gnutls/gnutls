@@ -664,14 +664,14 @@ key_share_send_params(gnutls_session_t session,
 {
 	unsigned i;
 	int ret;
-	unsigned char *lengthp;
-	unsigned int cur_length;
 	unsigned int generated = 0;
 	const gnutls_group_entry_st *group;
 	const version_entry_st *ver;
 
 	/* this extension is only being sent on client side */
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
+		unsigned int length_pos;
+
 		ver = _gnutls_version_max(session);
 		if (unlikely(ver == NULL || ver->key_shares == 0))
 			return 0;
@@ -679,15 +679,12 @@ key_share_send_params(gnutls_session_t session,
 		if (!have_creds_for_tls13(session))
 			return 0;
 
-		/* write the total length later */
-		lengthp = &extdata->data[extdata->length];
+		length_pos = extdata->length;
 
 		ret =
 		    _gnutls_buffer_append_prefix(extdata, 16, 0);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
-
-		cur_length = extdata->length;
 
 		if (session->internals.hsk_flags & HSK_HRR_RECEIVED) { /* we know the group */
 			group = get_group(session);
@@ -736,7 +733,8 @@ key_share_send_params(gnutls_session_t session,
 		}
 
 		/* copy actual length */
-		_gnutls_write_uint16(extdata->length - cur_length, lengthp);
+		_gnutls_write_uint16(extdata->length - length_pos - 2,
+				     &extdata->data[length_pos]);
 
 	} else { /* server */
 		ver = get_version(session);
