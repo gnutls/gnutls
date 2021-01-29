@@ -267,7 +267,7 @@ client_send_params(gnutls_session_t session,
 	size_t spos;
 	gnutls_datum_t username = {NULL, 0};
 	gnutls_datum_t user_key = {NULL, 0}, rkey = {NULL, 0};
-	gnutls_datum_t client_hello;
+	unsigned client_hello_len;
 	unsigned next_idx;
 	const mac_entry_st *prf_res = NULL;
 	const mac_entry_st *prf_psk = NULL;
@@ -428,8 +428,7 @@ client_send_params(gnutls_session_t session,
 	assert(extdata->length >= sizeof(mbuffer_st));
 	assert(ext_offset >= (ssize_t)sizeof(mbuffer_st));
 	ext_offset -= sizeof(mbuffer_st);
-	client_hello.data = extdata->data+sizeof(mbuffer_st);
-	client_hello.size = extdata->length-sizeof(mbuffer_st);
+	client_hello_len = extdata->length-sizeof(mbuffer_st);
 
 	next_idx = 0;
 
@@ -440,6 +439,11 @@ client_send_params(gnutls_session_t session,
 	}
 
 	if (prf_res && rkey.size > 0) {
+		gnutls_datum_t client_hello;
+
+		client_hello.data = extdata->data+sizeof(mbuffer_st);
+		client_hello.size = client_hello_len;
+
 		ret = compute_psk_binder(session, prf_res,
 					 binders_len, binders_pos,
 					 ext_offset, &rkey, &client_hello, 1,
@@ -474,6 +478,11 @@ client_send_params(gnutls_session_t session,
 	}
 
 	if (prf_psk && user_key.size > 0 && info) {
+		gnutls_datum_t client_hello;
+
+		client_hello.data = extdata->data+sizeof(mbuffer_st);
+		client_hello.size = client_hello_len;
+
 		ret = compute_psk_binder(session, prf_psk,
 					 binders_len, binders_pos,
 					 ext_offset, &user_key, &client_hello, 0,
