@@ -162,6 +162,7 @@ static void client(int fd, unsigned flags, unsigned tickets)
 	}
 
 	close(fd);
+	gnutls_certificate_free_credentials(x509_cred);
 	gnutls_free(session_data.data);
 
 	gnutls_global_deinit();
