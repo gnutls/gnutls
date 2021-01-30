@@ -598,11 +598,8 @@ else
 TESTS_ENVIRONMENT += ENABLE_GOST=0
 endif
 
-
-if WANT_TEST_SUITE
 TEST_EXTENSIONS = .sh
 LOG_COMPILER = $(VALGRIND)
-endif
 
 distclean-local:
 	rm -rf softhsm-*.db softhsm-*.config *.tmp tmp-* x509-crt-list-import-url.config.db port.lock.d
