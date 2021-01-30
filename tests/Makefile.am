@@ -482,7 +482,7 @@ if !WINDOWS
 # List of tests not available/functional under windows
 #
 
-dist_check_SCRIPTS += dtls/dtls dtls/dtls-resume #dtls/dtls-nb
+dist_check_SCRIPTS += dtls/dtls.sh dtls/dtls-resume.sh #dtls/dtls-nb
 
 indirect_tests += dtls-stress
 
@@ -492,10 +492,10 @@ dtls_stress_LDADD = $(COMMON_GNUTLS_LDADD) \
 
 dist_check_SCRIPTS += fastopen.sh pkgconfig.sh starttls.sh starttls-ftp.sh starttls-smtp.sh \
 	starttls-lmtp.sh starttls-pop3.sh starttls-xmpp.sh starttls-nntp.sh starttls-sieve.sh \
-	ocsp-tests/ocsp-tls-connection ocsp-tests/ocsp-must-staple-connection \
-	ocsp-tests/ocsp-test cipher-listings.sh sni-hostname.sh server-multi-keys.sh \
-	psktool.sh ocsp-tests/ocsp-load-chain gnutls-cli-save-data.sh gnutls-cli-debug.sh \
-	sni-resume.sh ocsp-tests/ocsptool cert-reencoding.sh pkcs7-cat.sh long-crl.sh \
+	ocsp-tests/ocsp-tls-connection.sh ocsp-tests/ocsp-must-staple-connection.sh \
+	ocsp-tests/ocsp-test.sh cipher-listings.sh sni-hostname.sh server-multi-keys.sh \
+	psktool.sh ocsp-tests/ocsp-load-chain.sh gnutls-cli-save-data.sh gnutls-cli-debug.sh \
+	sni-resume.sh ocsp-tests/ocsptool.sh cert-reencoding.sh pkcs7-cat.sh long-crl.sh \
 	serv-udp.sh logfile-option.sh gnutls-cli-resume.sh profile-tests.sh \
 	server-weak-keys.sh
 
