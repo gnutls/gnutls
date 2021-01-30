@@ -382,11 +382,13 @@ fedora-valgrind/test:
   extends:
     - .test
     - .fedora
+  script:
+    - GNUTLS_TEST_TIMEOUT=600000 make -j$(nproc) check
   dependencies:
     - fedora-valgrind/build
   needs:
     - fedora-valgrind/build
-  timeout: 2h
+  timeout: 5h
 
 fedora-threadsan/build:
   extends:
