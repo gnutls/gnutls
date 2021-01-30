@@ -84,7 +84,7 @@ static void client(int sd, const char *prio)
 				clientx509cred);
 
 	gnutls_transport_set_int(session, sd);
-	gnutls_handshake_set_timeout(session, 60 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 
 	do {
 		ret = gnutls_handshake(session);
@@ -181,7 +181,7 @@ static void server(int sd, const char *prio)
 				serverx509cred);
 
 	gnutls_transport_set_int(session, sd);
-	gnutls_handshake_set_timeout(session, 60 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 
 	do {
 		ret = gnutls_handshake(session);

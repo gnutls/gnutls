@@ -148,7 +148,7 @@ static void client(int fd)
 	 */
 	gnutls_init(&session, GNUTLS_CLIENT | GNUTLS_DATAGRAM);
 	gnutls_dtls_set_mtu(session, 1500);
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 
 	/* Use default priorities */
 	gnutls_priority_set_direct(session,
@@ -229,7 +229,7 @@ static void server(int fd)
 					    GNUTLS_X509_FMT_PEM);
 
 	gnutls_init(&session, GNUTLS_SERVER | GNUTLS_DATAGRAM);
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 	gnutls_dtls_set_mtu(session, SERVER_MTU);
 
 	/* avoid calling all the priority functions, since the defaults

@@ -47,6 +47,7 @@ int main(int argc, char **argv)
 #include <unistd.h>
 #include <gnutls/gnutls.h>
 #include <signal.h>
+#include <limits.h>
 #include <poll.h>
 #include <errno.h>
 
@@ -378,6 +379,7 @@ static void server(int sd)
 	char buf[1024];
 	int ret;
 	struct pollfd pfd;
+	unsigned int timeout;
 
 	/* send a TLS 1.x message trace accepting RSA-MD5 */
 
@@ -389,8 +391,12 @@ static void server(int sd)
 	pfd.events = POLLIN;
 	pfd.revents = 0;
 
+	timeout = get_timeout();
+	if (timeout > INT_MAX)
+		fail("invalid timeout value\n");
+
 	do {
-		ret = poll(&pfd, 1, 10000);
+		ret = poll(&pfd, 1, (int)timeout);
 	} while (ret == -1 && errno == EINTR);
 
 	if (ret == -1 || ret == 0) {
@@ -435,7 +441,7 @@ static void client(int sd)
 	 * are adequate.
 	 */
 	gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+DHE-RSA:+AES-128-GCM", NULL);
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 	gnutls_server_name_set(session, GNUTLS_NAME_DNS, "localhost", strlen("localhost"));
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);

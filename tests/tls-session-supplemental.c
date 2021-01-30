@@ -133,7 +133,7 @@ static void client(int sd, const char *prio, unsigned server_only)
 	/* Initialize TLS session
 	 */
 	gnutls_init(&session, GNUTLS_CLIENT);
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 
 	assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);
 
@@ -206,7 +206,7 @@ static void server(int sd, const char *prio, unsigned server_only)
 					    GNUTLS_X509_FMT_PEM);
 
 	gnutls_init(&session, GNUTLS_SERVER);
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 
 	assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);
 

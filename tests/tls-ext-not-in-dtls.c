@@ -105,7 +105,7 @@ static void client(int fd, int type)
 		assert(gnutls_session_ext_register(session, "explicit-tls", TLS_EXT_EXPL_TLS, GNUTLS_EXT_TLS, ext_recv, ext_send, NULL, NULL, NULL, GNUTLS_EXT_FLAG_CLIENT_HELLO|GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO|GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO|GNUTLS_EXT_FLAG_TLS)>=0);
 	}
 
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 
 	assert(gnutls_priority_set_direct(session, "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:+VERS-TLS1.0", NULL) >= 0);
 
@@ -209,7 +209,7 @@ static void server(int fd, int type)
 
 	assert(gnutls_init(&session, GNUTLS_SERVER|GNUTLS_POST_HANDSHAKE_AUTH|GNUTLS_DATAGRAM) >= 0);
 
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 	gnutls_handshake_set_hook_function(session, GNUTLS_HANDSHAKE_ANY,
 					   GNUTLS_HOOK_BOTH,
 					   hellos_callback);

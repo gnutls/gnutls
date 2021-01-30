@@ -23,6 +23,8 @@
 #ifndef GNUTLS_TESTS_UTILS_H
 #define GNUTLS_TESTS_UTILS_H
 
+#include <assert.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
@@ -175,6 +177,34 @@ inline static void check_wait_status(int status)
 inline static void check_wait_status_for_sig(int status)
 {
 	_check_wait_status(status, 1);
+}
+
+inline static unsigned int get_timeout(void) {
+	const char *envvar;
+	unsigned long int ul;
+
+	envvar = getenv("GNUTLS_TEST_TIMEOUT");
+	if (!envvar || *envvar == '\0')
+		return 20 * 1000;
+
+	ul = strtoul(envvar, NULL, 10);
+	assert(ul <= UINT_MAX);
+
+	return (unsigned int) ul;
+}
+
+inline static unsigned int get_dtls_retransmit_timeout(void) {
+	const char *envvar;
+	unsigned long int ul;
+
+	envvar = getenv("GNUTLS_TEST_DTLS_RETRANSMIT_TIMEOUT");
+	if (!envvar || *envvar == '\0')
+		return get_timeout() / 10;
+
+	ul = strtoul(envvar, NULL, 10);
+	assert(ul <= UINT_MAX);
+
+	return (unsigned int) ul;
 }
 
 #endif /* GNUTLS_TESTS_UTILS_H */

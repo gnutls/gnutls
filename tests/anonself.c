@@ -192,7 +192,7 @@ static void server(int sd, const char *prio)
 
 	assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);
 
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
 
 	gnutls_dh_set_prime_bits(session, DH_BITS);

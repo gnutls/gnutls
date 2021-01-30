@@ -85,7 +85,7 @@ static void client(int fd, const char *prio, unsigned etm, int eret)
 	gnutls_certificate_allocate_credentials(&x509_cred);
 
 	assert(gnutls_init(&session, GNUTLS_CLIENT)>=0);
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 
 	/* Use default priorities */
 	assert(gnutls_priority_set_direct(session, prio, NULL)>=0);
@@ -200,7 +200,7 @@ static void server(int fd, const char *prio, unsigned etm, int eret)
 	gnutls_anon_allocate_server_credentials(&anoncred);
 
 	assert(gnutls_init(&session, GNUTLS_SERVER)>=0);
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.

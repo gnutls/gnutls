@@ -189,7 +189,7 @@ static void client(int sds[], const char *prio)
 
 		/* Perform the TLS handshake
 		 */
-		gnutls_handshake_set_timeout(session, 20 * 1000);
+		gnutls_handshake_set_timeout(session, get_timeout());
 		do {
 			ret = gnutls_handshake(session);
 		} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
@@ -305,7 +305,7 @@ static void server(int sds[], const char *prio)
 
 		gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, serverx509cred);
 		gnutls_transport_set_int(session, sd);
-		gnutls_handshake_set_timeout(session, 20 * 1000);
+		gnutls_handshake_set_timeout(session, get_timeout());
 
 		do {
 			ret = gnutls_handshake(session);

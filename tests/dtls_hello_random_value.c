@@ -145,7 +145,7 @@ static void client(int sd, const char *priority)
 
 	gnutls_transport_set_int(session, sd);
 	gnutls_dtls_set_mtu(session, 1500);
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 
 	gnutls_handshake_set_hook_function(session, GNUTLS_HANDSHAKE_ANY,
 					   GNUTLS_HOOK_BOTH, hello_callback);
@@ -261,7 +261,7 @@ static void server(int sd, const char *priority)
 				serverx509cred);
 
 	gnutls_transport_set_int(session, sd);
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 	gnutls_dtls_set_mtu(session, 1500);
 
 	gnutls_dtls_prestate_set(session, &prestate);

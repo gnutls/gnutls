@@ -108,7 +108,7 @@ static void client(int fd)
 	 */
 	assert(gnutls_init(&session, GNUTLS_CLIENT)>=0);
 
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 
 	ret = gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 	if (ret < 0)
@@ -271,7 +271,7 @@ static void server(int fd)
 
 	gnutls_init(&session, GNUTLS_SERVER);
 
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 
 	assert(gnutls_certificate_set_x509_key_file(x509_cred,
 						    SOFTHSM_URL

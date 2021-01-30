@@ -44,7 +44,9 @@ void doit(void)
 
 #else
 
+#include <limits.h>
 #include <netinet/in.h>
+#include <poll.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/wait.h>
@@ -147,8 +149,7 @@ static void client(int fd, unsigned cache)
 	gnutls_session_t session;
 	/* Need to enable anonymous KX specifically. */
 
-	fd_set rfds;
-	struct timeval tv;
+	unsigned int timeout;
 
 	global_init();
 
@@ -164,7 +165,7 @@ static void client(int fd, unsigned cache)
 	 */
 	gnutls_init(&session, GNUTLS_CLIENT | GNUTLS_DATAGRAM);
 	gnutls_dtls_set_mtu(session, 1500);
-	gnutls_dtls_set_timeouts(session, 6 * 1000, 60 * 1000);
+	gnutls_dtls_set_timeouts(session, get_dtls_retransmit_timeout(), get_timeout());
 	//gnutls_transport_set_push_function(session, push);
 
 	/* Use default priorities */
@@ -178,22 +179,29 @@ static void client(int fd, unsigned cache)
 
 	gnutls_transport_set_int(session, fd);
 
+	timeout = get_timeout();
+	if (timeout > INT_MAX)
+		fail("invalid timeout value\n");
+
 	/* Perform the TLS handshake
 	 */
 	do {
+		struct pollfd pfd;
+
 		ret = gnutls_handshake(session);
 
 		if (ret == GNUTLS_E_AGAIN && gnutls_record_get_direction(session) == 0) {
 			int rv;
-			FD_ZERO(&rfds);
-			FD_SET(fd, &rfds);
+			pfd.fd = fd;
+			pfd.events = POLLIN;
+			pfd.revents = 0;
 
-			tv.tv_sec = 2;
-			tv.tv_usec = 0;
+			do {
+				rv = poll(&pfd, 1, (int)timeout);
+			} while (rv == -1 && errno == EINTR);
 
-			rv = select(fd+1, &rfds, NULL, NULL, &tv);
 			if (rv == -1)
-				perror("select()");
+				perror("poll()");
 			else if (!rv)
 				fail("test %d: No data were received.\n", cache);
 		}
@@ -261,7 +269,7 @@ static void server(int fd, unsigned cache)
 					    GNUTLS_X509_FMT_PEM);
 
 	gnutls_init(&session, GNUTLS_SERVER | GNUTLS_DATAGRAM);
-	gnutls_dtls_set_timeouts(session, 5 * 1000, 60 * 1000);
+	gnutls_dtls_set_timeouts(session, get_dtls_retransmit_timeout(), get_timeout());
 	gnutls_dtls_set_mtu(session, 400);
 	if (cache != 0)
 		gnutls_transport_set_push_function(session, push);

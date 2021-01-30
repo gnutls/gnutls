@@ -133,7 +133,7 @@ static void client(int fd)
 	/* Initialize TLS session
 	 */
 	gnutls_init(&session, GNUTLS_CLIENT|GNUTLS_DATAGRAM);
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 
 	assert(gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-DTLS1.2", NULL)>= 0);
 
@@ -201,7 +201,7 @@ static void server(int fd)
 					    GNUTLS_X509_FMT_PEM);
 
 	gnutls_init(&session, GNUTLS_SERVER|GNUTLS_DATAGRAM);
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 
 	gnutls_handshake_set_hook_function(session, GNUTLS_HANDSHAKE_CLIENT_HELLO,
 					   GNUTLS_HOOK_POST,

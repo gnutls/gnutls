@@ -139,7 +139,7 @@ static void client(int sds[], const char *data, size_t size, size_t maxsize)
 
 		/* Perform the TLS handshake
 		 */
-		gnutls_handshake_set_timeout(session, 20 * 1000);
+		gnutls_handshake_set_timeout(session, get_timeout());
 		do {
 			ret = gnutls_handshake(session);
 		}

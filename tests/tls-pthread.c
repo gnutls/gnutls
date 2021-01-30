@@ -230,7 +230,7 @@ static void client(int fd, const char *prio, unsigned flags)
 		init_flags |= GNUTLS_ENABLE_FALSE_START;
 
 	assert(gnutls_init(&session, init_flags) >= 0);
-	gnutls_handshake_set_timeout(session, 60 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 
 	assert(gnutls_priority_set_direct(session, prio, NULL)>=0);
 
@@ -294,7 +294,7 @@ static void server(int fd, const char *prio, unsigned flags)
 		init_flags |= GNUTLS_ENABLE_EARLY_START;
 
 	assert(gnutls_init(&session, init_flags)>=0);
-	gnutls_handshake_set_timeout(session, 60 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 
 	assert(gnutls_priority_set_direct(session, prio, NULL)>=0);
 

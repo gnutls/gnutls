@@ -115,7 +115,7 @@ static void client(int fd)
 
 	assert(gnutls_init(&session, GNUTLS_CLIENT|GNUTLS_KEY_SHARE_TOP)>=0);
 
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 	gnutls_session_set_ptr(session, &ctx);
 
 	ret = gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-SECP256R1:+GROUP-X25519", NULL);
@@ -162,7 +162,7 @@ static void server(int fd)
 
 	gnutls_init(&session, GNUTLS_SERVER);
 
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 
 	/* server only supports x25519, client advertises secp256r1 */
 	assert(gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-X25519", NULL)>=0);

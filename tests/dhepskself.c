@@ -160,7 +160,7 @@ static gnutls_session_t initialize_tls_session(void)
 	 */
 	gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-TLS1.2:+DHE-PSK", NULL);
 
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 	gnutls_credentials_set(session, GNUTLS_CRD_PSK, server_pskcred);
 
 	return session;
