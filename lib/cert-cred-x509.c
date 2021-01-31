@@ -744,6 +744,9 @@ gnutls_certificate_set_x509_key(gnutls_certificate_credentials_t res,
 	gnutls_pcert_st *pcerts = NULL;
 	gnutls_str_array_t names;
 
+	if (cert_list == NULL || cert_list_size < 1)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 	_gnutls_str_array_init(&names);
 
 	/* this should be first
@@ -1143,8 +1146,12 @@ gnutls_certificate_set_x509_trust(gnutls_certificate_credentials_t res,
 				  int ca_list_size)
 {
 	int ret, i, j;
-	gnutls_x509_crt_t *new_list = gnutls_malloc(ca_list_size * sizeof(gnutls_x509_crt_t));
+	gnutls_x509_crt_t *new_list;
 
+	if (ca_list == NULL || ca_list_size < 1)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	new_list = gnutls_malloc(ca_list_size * sizeof(gnutls_x509_crt_t));
 	if (!new_list)
 		return GNUTLS_E_MEMORY_ERROR;
 
