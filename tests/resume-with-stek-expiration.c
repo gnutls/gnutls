@@ -297,11 +297,13 @@ static void run(const char *name, const char *prio, int resumption_should_succee
 
 	if (child) {
 		/* We are the parent */
+		close(sockets[1]);
 		server(sockets[0], resumption_should_succeed, rounds, prio);
 		waitpid(child, &status, 0);
 		check_wait_status(status);
 	} else {
 		/* We are the child */
+		close(sockets[0]);
 		client(sockets[1], resumption_should_succeed, rounds, prio);
 		exit(0);
 	}
