@@ -981,9 +981,9 @@ int gnutls_session_is_resumed(gnutls_session_t session)
 {
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
 		const version_entry_st *ver = get_version(session);
-		if (ver && ver->tls13_sem &&
-		    session->internals.resumed)
-			return 1;
+		if (ver && ver->tls13_sem) {
+			return session->internals.resumed;
+		}
 
 		if (session->security_parameters.session_id_size > 0 &&
 		    session->security_parameters.session_id_size ==
