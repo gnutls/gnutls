@@ -341,7 +341,7 @@ int gnutls_bye(gnutls_session_t session, gnutls_close_request_t how)
 
 inline static void session_unresumable(gnutls_session_t session)
 {
-	session->internals.resumable = RESUME_FALSE;
+	session->internals.resumable = false;
 }
 
 /* returns 0 if session is valid

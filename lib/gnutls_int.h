@@ -361,9 +361,6 @@ verify(GNUTLS_EXTENSION_MAX_VALUE - GNUTLS_EXTENSION_MAX >= 16);
 
 typedef enum { CIPHER_STREAM, CIPHER_BLOCK, CIPHER_AEAD } cipher_type_t;
 
-#define RESUME_TRUE 1
-#define RESUME_FALSE 0
-
 /* Record Protocol */
 typedef enum content_type_t {
 	GNUTLS_CHANGE_CIPHER_SPEC = 20, GNUTLS_ALERT,
@@ -1086,7 +1083,7 @@ typedef struct {
 	gnutls_buffer_st handshake_hash_buffer;	/* used to keep the last received handshake
 						 * message */
 
-	bool resumable;	/* TRUE or FALSE - if we can resume that session */
+	bool resumable;	/* if we can resume that session */
 
 	send_ticket_state_t ticket_state; /* used by gnutls_session_ticket_send() */
 	bye_state_t bye_state; /* used by gnutls_bye() */
@@ -1100,7 +1097,7 @@ typedef struct {
 						 * no interruption has happened.
 						 */
 
-	bool invalid_connection;	/* true or FALSE - if this session is valid */
+	bool invalid_connection;	/* if this session is valid */
 
 	bool may_not_read;	/* if it's 0 then we can read/write, otherwise it's forbidden to read/write
 				 */
@@ -1135,7 +1132,7 @@ typedef struct {
 	uint16_t dh_prime_bits; /* srp_prime_bits */
 
 	/* resumed session */
-	bool resumed;	/* RESUME_TRUE or FALSE - if we are resuming a session */
+	bool resumed;	/* if we are resuming a session */
 
 	/* server side: non-zero if resumption was requested by client
 	 * client side: non-zero if we set resumption parameters */

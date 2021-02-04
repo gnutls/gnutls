@@ -419,7 +419,7 @@ static void handshake_internal_state_clear1(gnutls_session_t session)
 	session->internals.last_handshake_in = -1;
 	session->internals.last_handshake_out = -1;
 
-	session->internals.resumable = RESUME_TRUE;
+	session->internals.resumable = true;
 
 	session->internals.handshake_suspicious_loops = 0;
 	session->internals.dtls.hsk_read_seq = 0;
@@ -640,7 +640,7 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 	return 0;
 }
 
-/* returns RESUME_FALSE or RESUME_TRUE.
+/* returns false or true.
  */
 int _gnutls_session_is_resumable(gnutls_session_t session)
 {
@@ -989,7 +989,7 @@ int gnutls_session_is_resumed(gnutls_session_t session)
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
 		const version_entry_st *ver = get_version(session);
 		if (ver && ver->tls13_sem &&
-		    session->internals.resumed != RESUME_FALSE)
+		    session->internals.resumed)
 			return 1;
 
 		if (session->security_parameters.session_id_size > 0 &&
@@ -1004,7 +1004,7 @@ int gnutls_session_is_resumed(gnutls_session_t session)
 			      session_id_size) == 0)
 			return 1;
 	} else {
-		if (session->internals.resumed != RESUME_FALSE)
+		if (session->internals.resumed)
 			return 1;
 	}
 

@@ -201,7 +201,7 @@ generate_session_ticket(gnutls_session_t session, tls13_ticket_st *ticket)
 	tls13_ticket_st ticket_data;
 
 	gnutls_gettime(&now);
-	if (session->internals.resumed != RESUME_FALSE) {
+	if (session->internals.resumed) {
 		/* If we are resuming ensure that we don't extend the lifetime
 		 * of the ticket past the original session expiration time */
 		if (now.tv_sec >= session->security_parameters.timestamp + session->internals.expire_time)

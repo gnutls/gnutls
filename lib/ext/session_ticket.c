@@ -370,7 +370,7 @@ unpack_session(gnutls_session_t session, const gnutls_datum_t *state)
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	session->internals.resumed = RESUME_TRUE;
+	session->internals.resumed = true;
 	return 0;
 }
 
@@ -656,7 +656,7 @@ int _gnutls_send_new_session_ticket(gnutls_session_t session, int again)
 		/* Under TLS1.2 with session tickets, the session ID is used for different
 		 * purposes than the TLS1.0 session ID. Ensure that there is an internally
 		 * set value which the server will see on the original and resumed sessions */
-		if (session->internals.resumed != RESUME_TRUE) {
+		if (!session->internals.resumed) {
 			ret = _gnutls_generate_session_id(session->security_parameters.
 							  session_id,
 							  &session->security_parameters.

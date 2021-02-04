@@ -68,9 +68,9 @@ int _dtls_wait_and_retransmit(gnutls_session_t session);
 inline static int _dtls_is_async(gnutls_session_t session)
 {
 	if ((session->security_parameters.entity == GNUTLS_SERVER
-	     && session->internals.resumed == RESUME_FALSE)
+	     && !session->internals.resumed)
 	    || (session->security_parameters.entity == GNUTLS_CLIENT
-		&& session->internals.resumed == RESUME_TRUE))
+		&& session->internals.resumed))
 		return 1;
 	else
 		return 0;
