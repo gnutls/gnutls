@@ -32,25 +32,32 @@
 
 : ${srcdir=.}
 
-export TZ="UTC"
-
 if test "${GNUTLS_FORCE_FIPS_MODE}" = 1;then
 	echo "Cannot run in FIPS140-2 mode"
 	exit 77
 fi
+
+if ! test -x /usr/bin/openssl; then
+	echo "You need openssl to run this test"
+	exit 77
+fi
+
+/usr/bin/openssl version|grep fips >/dev/null 2>&1
+if test $? = 0 || test "${ENABLE_NON_SUITEB_CURVES}" != "1"; then
+	export FIPS_CURVES=1
+else
+	export FIPS_CURVES=0
+fi
+
+export TZ="UTC"
 
 # Check for datefudge
 . "${srcdir}/../scripts/common.sh"
 
 skip_if_no_datefudge
 
-cat /proc/cpuinfo|grep "model name"|grep "VIA Esther" >/dev/null 2>&1
-if test $? = 0; then
-	echo "PolarSSL is broken on VIA processors"
-	exit 77
-fi
-
-timeout 1800 datefudge "2012-09-2" "${srcdir}/testcompat-main-polarssl"
+timeout 1800 datefudge "2012-09-02" \
+"${srcdir}/testcompat-openssl-serv-common.sh" ":%NO_TICKETS"
 
 ret=$?
 test $ret = 124 && exit 77

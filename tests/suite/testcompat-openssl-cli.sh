@@ -56,7 +56,8 @@ export TZ="UTC"
 
 skip_if_no_datefudge
 
-timeout 1800 datefudge "2012-09-2" "${srcdir}/testcompat-main-openssl"
+timeout 1800 datefudge "2012-09-02" \
+"${srcdir}/testcompat-openssl-cli-common.sh"
 
 ret=$?
 test $ret = 124 && exit 77
