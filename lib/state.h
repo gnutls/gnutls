@@ -101,8 +101,6 @@ void _gnutls_handshake_internal_state_clear(gnutls_session_t);
 
 int _gnutls_session_is_psk(gnutls_session_t session);
 
-int _gnutls_openpgp_send_fingerprint(gnutls_session_t session);
-
 void reset_binders(gnutls_session_t session);
 
 inline static int
