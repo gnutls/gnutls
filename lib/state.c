@@ -640,13 +640,6 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 	return 0;
 }
 
-/* returns false or true.
- */
-int _gnutls_session_is_resumable(gnutls_session_t session)
-{
-	return session->internals.resumable;
-}
-
 
 /**
  * gnutls_deinit:
