@@ -61,9 +61,6 @@
 #include <valgrind/memcheck.h>
 #endif
 
-#define TRUE 1
-#define FALSE 0
-
 static int check_if_null_comp_present(gnutls_session_t session,
 					     uint8_t * data, int datalen);
 static int handshake_client(gnutls_session_t session);
@@ -3093,7 +3090,7 @@ static int handshake_client(gnutls_session_t session)
 	case STATE16:
 		STATE = STATE16;
 		if (!session->internals.resumed) {
-			ret = send_handshake_final(session, TRUE);
+			ret = send_handshake_final(session, true);
 			IMED_RET("send handshake final 2", ret, 1);
 		} else {
 			ret = _gnutls_recv_new_session_ticket(session);
@@ -3123,17 +3120,17 @@ static int handshake_client(gnutls_session_t session)
 			IMED_RET("recv handshake new session ticket", ret,
 				 1);
 		} else {
-			ret = recv_handshake_final(session, TRUE);
+			ret = recv_handshake_final(session, true);
 			IMED_RET("recv handshake final", ret, 1);
 		}
 		FALLTHROUGH;
 	case STATE19:
 		STATE = STATE19;
 		if (!session->internals.resumed) {
-			ret = recv_handshake_final(session, FALSE);
+			ret = recv_handshake_final(session, false);
 			IMED_RET("recv handshake final 2", ret, 1);
 		} else {
-			ret = send_handshake_final(session, FALSE);
+			ret = send_handshake_final(session, false);
 			IMED_RET("send handshake final", ret, 1);
 		}
 
@@ -3245,7 +3242,7 @@ static int send_handshake_final(gnutls_session_t session, int init)
 		}
 		/* Initialize the connection session (start encryption) - in case of client
 		 */
-		if (init == TRUE) {
+		if (init) {
 			ret = _gnutls_connection_state_init(session);
 			if (ret < 0) {
 				gnutls_assert();
@@ -3330,7 +3327,7 @@ static int recv_handshake_final(gnutls_session_t session, int init)
 			session->internals.dtls.hsk_read_seq++;
 
 		/* Initialize the connection session (start encryption) - in case of server */
-		if (init == TRUE) {
+		if (init) {
 			ret = _gnutls_connection_state_init(session);
 			if (ret < 0) {
 				gnutls_assert();
@@ -3524,10 +3521,10 @@ static int handshake_server(gnutls_session_t session)
 	case STATE15:
 		STATE = STATE15;
 		if (!session->internals.resumed) {	/* if we are not resuming */
-			ret = recv_handshake_final(session, TRUE);
+			ret = recv_handshake_final(session, true);
 			IMED_RET("recv handshake final", ret, 1);
 		} else {
-			ret = send_handshake_final(session, TRUE);
+			ret = send_handshake_final(session, true);
 			IMED_RET("send handshake final 2", ret, 1);
 		}
 		FALLTHROUGH;
@@ -3541,7 +3538,7 @@ static int handshake_server(gnutls_session_t session)
 	case STATE17:
 		STATE = STATE17;
 		if (!session->internals.resumed) {	/* if we are not resuming */
-			ret = send_handshake_final(session, FALSE);
+			ret = send_handshake_final(session, false);
 			IMED_RET("send handshake final", ret, 1);
 
 			if (session->security_parameters.entity ==
@@ -3552,7 +3549,7 @@ static int handshake_server(gnutls_session_t session)
 				    (session);
 			}
 		} else {
-			ret = recv_handshake_final(session, FALSE);
+			ret = recv_handshake_final(session, false);
 			IMED_RET("recv handshake final 2", ret, 1);
 		}
 
