@@ -1,5 +1,5 @@
 /* GnuTLS --- Guile bindings for GnuTLS.
-   Copyright (C) 2007-2014, 2016, 2019, 2020 Free Software Foundation, Inc.
+   Copyright (C) 2007-2014, 2016, 2019, 2020, 2021 Free Software Foundation, Inc.
 
    GnuTLS is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -2735,7 +2735,7 @@ SCM_DEFINE (scm_gnutls_x509_certificate_key_id, "x509-certificate-key-id",
   SCM result;
   scm_t_array_handle c_id_handle;
   gnutls_x509_crt_t c_cert;
-  scm_t_uint8 *c_id;
+  uint8_t *c_id;
   size_t c_id_len = 20;
 
   c_cert = scm_to_gnutls_x509_certificate (cert, 1, FUNC_NAME);
@@ -2767,7 +2767,7 @@ SCM_DEFINE (scm_gnutls_x509_certificate_authority_key_id,
   SCM result;
   scm_t_array_handle c_id_handle;
   gnutls_x509_crt_t c_cert;
-  scm_t_uint8 *c_id;
+  uint8_t *c_id;
   size_t c_id_len = 20;
 
   c_cert = scm_to_gnutls_x509_certificate (cert, 1, FUNC_NAME);
@@ -2798,7 +2798,7 @@ SCM_DEFINE (scm_gnutls_x509_certificate_subject_key_id,
   SCM result;
   scm_t_array_handle c_id_handle;
   gnutls_x509_crt_t c_cert;
-  scm_t_uint8 *c_id;
+  uint8_t *c_id;
   size_t c_id_len = 20;
 
   c_cert = scm_to_gnutls_x509_certificate (cert, 1, FUNC_NAME);
