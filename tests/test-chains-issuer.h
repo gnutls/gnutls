@@ -24,7 +24,7 @@
 #ifndef GNUTLS_TESTS_TEST_CHAINS_ISSUER_H
 #define GNUTLS_TESTS_TEST_CHAINS_ISSUER_H
 
-#define MAX_CHAIN 6
+#define MAX_CHAIN 15
 
 #define SERVER_CERT "-----BEGIN CERTIFICATE-----\n"			\
 	"MIIDATCCAbmgAwIBAgIUQdvdegP8JFszFHLfV4+lrEdafzAwPQYJKoZIhvcNAQEK\n" \
@@ -338,7 +338,98 @@ static const char *missing_middle_unrelated_extra_insert[] = {
 	NULL,
 };
 
+static const char *missing_middle_single_duplicate[] = {
+	SERVER_CERT,
+	SERVER_CERT,
+	CA_CERT_5,
+	CA_CERT_5,
+	CA_CERT_4,
+	CA_CERT_4,
+	CA_CERT_2,
+	CA_CERT_2,
+	CA_CERT_1,
+	CA_CERT_1,
+	NULL,
+};
+
+static const char *missing_middle_multiple_duplicate[] = {
+	SERVER_CERT,
+	SERVER_CERT,
+	CA_CERT_5,
+	CA_CERT_5,
+	CA_CERT_4,
+	CA_CERT_4,
+	CA_CERT_1,
+	CA_CERT_1,
+	NULL,
+};
+
+static const char *missing_last_single_duplicate[] = {
+	SERVER_CERT,
+	SERVER_CERT,
+	CA_CERT_5,
+	CA_CERT_5,
+	CA_CERT_4,
+	CA_CERT_4,
+	CA_CERT_3,
+	CA_CERT_3,
+	CA_CERT_2,
+	CA_CERT_2,
+	NULL,
+};
+
+static const char *missing_last_multiple_duplicate[] = {
+	SERVER_CERT,
+	SERVER_CERT,
+	CA_CERT_5,
+	CA_CERT_5,
+	CA_CERT_4,
+	CA_CERT_4,
+	CA_CERT_3,
+	CA_CERT_3,
+	NULL,
+};
+
+static const char *missing_skip_single_duplicate[] = {
+	SERVER_CERT,
+	SERVER_CERT,
+	CA_CERT_5,
+	CA_CERT_5,
+	CA_CERT_3,
+	CA_CERT_3,
+	CA_CERT_1,
+	CA_CERT_1,
+	NULL,
+};
+
+static const char *missing_skip_multiple_duplicate[] = {
+	SERVER_CERT,
+	SERVER_CERT,
+	CA_CERT_5,
+	CA_CERT_5,
+	CA_CERT_3,
+	CA_CERT_3,
+	NULL,
+};
+
 static const char *missing_ca[] = {
+	CA_CERT_0,
+	NULL,
+};
+
+static const char *middle_single_duplicate_ca[] = {
+	SERVER_CERT,
+	CA_CERT_5,
+	CA_CERT_0,
+	CA_CERT_4,
+	CA_CERT_0,
+	CA_CERT_2,
+	CA_CERT_0,
+	CA_CERT_1,
+	NULL,
+};
+
+static const char *missing_middle_single_duplicate_ca_unrelated_insert[] = {
 	CA_CERT_0,
 	NULL,
 };
@@ -377,6 +468,14 @@ static struct chains {
 	{ "skip multiple unsorted", missing_skip_multiple_unsorted, missing_skip_multiple_insert, missing_ca, 0, 0 },
 	{ "unrelated", missing_middle_single, missing_middle_unrelated_insert, missing_ca, 0, GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_NOT_FOUND },
 	{ "unrelated extra", missing_middle_single, missing_middle_unrelated_extra_insert, missing_ca, 0, 0 },
+	{ "middle single duplicate", missing_middle_single_duplicate, missing_middle_single_insert, missing_ca, 0, 0 },
+	{ "middle multiple duplicate", missing_middle_multiple_duplicate, missing_middle_multiple_insert, missing_ca, 0, 0 },
+	{ "last single duplicate", missing_last_single_duplicate, missing_last_single_insert, missing_ca, 0, 0 },
+	{ "last multiple duplicate", missing_last_multiple_duplicate, missing_last_multiple_insert, missing_ca, 0, 0 },
+	{ "skip single duplicate", missing_skip_single_duplicate, missing_skip_single_insert, missing_ca, 0, 0 },
+	{ "skip multiple duplicate", missing_skip_multiple_duplicate, missing_skip_multiple_insert, missing_ca, 0, 0 },
+	{ "middle single duplicate ca", middle_single_duplicate_ca, missing_middle_single_insert, missing_ca, 0, 0 },
+	{ "middle single duplicate ca - insert unrelated", middle_single_duplicate_ca, missing_middle_single_duplicate_ca_unrelated_insert, missing_ca, 0, GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_NOT_FOUND },
 	{ NULL, NULL, NULL, NULL },
 };
 

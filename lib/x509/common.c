@@ -1758,6 +1758,14 @@ unsigned int _gnutls_sort_clist(gnutls_x509_crt_t *clist,
 	 * increasing DEFAULT_MAX_VERIFY_DEPTH.
 	 */
 	for (i = 0; i < clist_size; i++) {
+		/* Self-signed certificate found in the chain; skip it
+		 * as it should only appear in the trusted set.
+		 */
+		if (gnutls_x509_crt_check_issuer(clist[i], clist[i])) {
+			_gnutls_cert_log("self-signed cert found", clist[i]);
+			continue;
+		}
+
 		for (j = 1; j < clist_size; j++) {
 			if (i == j)
 				continue;
