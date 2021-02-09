@@ -42,6 +42,8 @@
 #include <state.h>
 #include <random.h>
 
+#include <nettle/memxor.h>
+
 static int encrypt_packet(gnutls_session_t session,
 			    uint8_t * cipher_data, int cipher_size,
 			    gnutls_datum_t * plain,

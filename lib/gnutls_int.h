@@ -53,8 +53,6 @@ typedef int ssize_t;
 #endif
 #include <time.h>
 
-#include <nettle/memxor.h>
-
 #include "attribute.h"
 
 #define ENABLE_ALIGN16
