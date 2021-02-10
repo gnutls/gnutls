@@ -54,7 +54,7 @@ static int generate_normal_master(gnutls_session_t session,
 
 int _gnutls_generate_master(gnutls_session_t session, int keep_premaster)
 {
-	if (session->internals.resumed == RESUME_FALSE)
+	if (!session->internals.resumed)
 		return generate_normal_master(session, &session->key.key,
 					      keep_premaster);
 	else if (session->internals.premaster_set) {

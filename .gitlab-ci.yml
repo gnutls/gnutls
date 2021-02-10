@@ -329,7 +329,6 @@ fedora-FIPS140-2/build:
     - ./bootstrap
     - dash ./configure --disable-gcc-warnings --cache-file $CCACHE_FILE --disable-non-suiteb-curves --enable-fips140-mode --disable-doc --disable-full-test-suite --disable-guile
     - make -j$BUILDJOBS
-    - make -j$CHECKJOBS check
     - mkdir -p lib/.libs/fipscheck
     - |
       for i in lib/.libs/libgnutls.so*; do

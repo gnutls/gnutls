@@ -238,7 +238,7 @@ _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 		       session->security_parameters.client_random,
 		       GNUTLS_RANDOM_SIZE);
 
-		session->internals.resumed = RESUME_TRUE;
+		session->internals.resumed = true;
 		return 0;
 	} else {
 		ret = _gnutls_generate_session_id(
@@ -247,7 +247,7 @@ _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		session->internals.resumed = RESUME_FALSE;
+		session->internals.resumed = false;
 	}
 
 	return sret;

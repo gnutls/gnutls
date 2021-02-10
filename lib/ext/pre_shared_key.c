@@ -696,7 +696,7 @@ static int server_recv_params(gnutls_session_t session,
 			}
 		}
 
-		session->internals.resumed = RESUME_TRUE;
+		session->internals.resumed = true;
 		_gnutls_handshake_log("EXT[%p]: selected resumption PSK identity (%d)\n", session, psk_index);
 	}
 
@@ -819,7 +819,7 @@ static int _gnutls_psk_recv_params(gnutls_session_t session,
 			for (i=0;i<sizeof(session->key.binders)/sizeof(session->key.binders[0]);i++) {
 				if (session->key.binders[i].prf != NULL && session->key.binders[i].idx == selected_identity) {
 					if (session->key.binders[i].resumption) {
-						session->internals.resumed = RESUME_TRUE;
+						session->internals.resumed = true;
 						_gnutls_handshake_log("EXT[%p]: selected PSK-resumption mode\n", session);
 					} else {
 						_gnutls_handshake_log("EXT[%p]: selected PSK mode\n", session);

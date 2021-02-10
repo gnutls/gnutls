@@ -210,7 +210,7 @@ int _gnutls13_handshake_client(gnutls_session_t session)
 
 	SAVE_TRANSCRIPT;
 
-	if (session->internals.resumed != RESUME_FALSE)
+	if (session->internals.resumed)
 		_gnutls_set_resumed_parameters(session);
 
 	return 0;
@@ -325,7 +325,7 @@ static int generate_hs_traffic_keys(gnutls_session_t session)
 	if ((session->security_parameters.entity == GNUTLS_CLIENT &&
 	      (!(session->internals.hsk_flags & HSK_KEY_SHARE_RECEIVED) ||
 	        (!(session->internals.hsk_flags & HSK_PSK_KE_MODE_DHE_PSK) &&
-	           session->internals.resumed != RESUME_FALSE))) ||
+	           session->internals.resumed))) ||
 	    (session->security_parameters.entity == GNUTLS_SERVER &&
 	      !(session->internals.hsk_flags & HSK_KEY_SHARE_SENT))) {
 
@@ -506,7 +506,7 @@ int _gnutls13_handshake_server(gnutls_session_t session)
 
 		FALLTHROUGH;
 	case STATE109:
-		if (session->internals.resumed != RESUME_FALSE)
+		if (session->internals.resumed)
 			_gnutls_set_resumed_parameters(session);
 
 		if (session->internals.hsk_flags & HSK_EARLY_START_USED) {

@@ -272,7 +272,7 @@ int _gnutls_server_register_current_session(gnutls_session_t session)
 	key.data = session->security_parameters.session_id;
 	key.size = session->security_parameters.session_id_size;
 
-	if (session->internals.resumable == RESUME_FALSE) {
+	if (!session->internals.resumable) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_SESSION;
 	}

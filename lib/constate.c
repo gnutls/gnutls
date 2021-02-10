@@ -814,7 +814,7 @@ int _gnutls_read_connection_state_init(gnutls_session_t session)
 	/* Update internals from CipherSuite selected.
 	 * If we are resuming just copy the connection session
 	 */
-	if (session->internals.resumed != RESUME_FALSE &&
+	if (session->internals.resumed &&
 	    session->security_parameters.entity == GNUTLS_CLIENT)
 		_gnutls_set_resumed_parameters(session);
 
@@ -850,7 +850,7 @@ int _gnutls_write_connection_state_init(gnutls_session_t session)
 /* Update internals from CipherSuite selected.
  * If we are resuming just copy the connection session
  */
-	if (session->internals.resumed != RESUME_FALSE &&
+	if (session->internals.resumed &&
 	    session->security_parameters.entity == GNUTLS_SERVER)
 		_gnutls_set_resumed_parameters(session);
 
