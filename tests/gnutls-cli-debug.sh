@@ -184,12 +184,10 @@ cat <<_EOF_ > ${TMPFILE}
 tls-disabled-cipher = CAMELLIA-128-CBC
 tls-disabled-cipher = CAMELLIA-256-CBC
 _EOF_
-export GNUTLS_SYSTEM_PRIORITY_FILE="${TMPFILE}"
 
+GNUTLS_SYSTEM_PRIORITY_FILE="${TMPFILE}" \
 timeout 1800 datefudge "2017-08-9" \
 "${DCLI}" -p "${PORT}" localhost >$OUTFILE 2>&1 || fail ${PID} "gnutls-cli-debug run should have succeeded!"
-
-unset GNUTLS_SYSTEM_PRIORITY_FILE
 
 kill ${PID}
 wait
