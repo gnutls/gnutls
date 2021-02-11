@@ -23,7 +23,7 @@ variables:
   # time even increases (e.g. due to more cache misses).
   # $BUILDJOBS seems to be best with $(nproc)+1, while $CHECKJOBS can be much
   # higher because several tests have a large I/O waiting time.
-  # The numbers are hard-coded since FreeBSD doesn't know the nproc command.
+  # The numbers are hard-coded for the platforms without the nproc command.
   BUILDJOBS: 2
   CHECKJOBS: 16
 
@@ -178,39 +178,6 @@ doc-dist.Fedora:
     - make -j$CHECKJOBS distcheck DISTCHECK_CONFIGURE_FLAGS="--enable-local-libopts --disable-tests"
     - make -j$CHECKJOBS distcheck
 
-
-# That is a specific runner that we cannot enable universally.
-# We restrict it to builds under the $BUILD_IMAGES_PROJECT project.
-FreeBSD.x86_64:
-  extends:
-    - .test
-  needs: [] # builds own artifacts, no need to wait
-  variables:
-    COMPILER: clang
-  image:
-  script:
-    - git clone --depth 1 --branch master https://gitlab.com/gnutls/nettle.git nettle-git
-    - export NETTLE_DIR=${PWD}/nettle
-    - cd nettle-git
-    - ./.bootstrap
-    - ./configure --enable-mini-gmp --disable-documentation --disable-openssl --prefix=$NETTLE_DIR
-    - gmake
-    - gmake install
-    - cd -
-    - ./bootstrap
-    - export LDFLAGS="-Wl,-rpath,$NETTLE_DIR/lib -L$NETTLE_DIR/lib -L/usr/local/lib"
-    - export PKG_CONFIG_PATH=$NETTLE_DIR/lib/pkgconfig
-    - export CPPFLAGS=`pkg-config hogweed --cflags-only-I`
-    - export LD_LIBRARY_PATH=$NETTLE_DIR/lib
-    - ./configure --disable-full-test-suite --cache-file $CCACHE_FILE --disable-gcc-warnings --disable-guile --disable-doc --with-nettle-mini
-    - gmake V=1 2>&1 | tee make.log
-    - gmake check
-  tags:
-    - freebsd
-  only:
-    - branches@gnutls/gnutls
-  except:
-    - tags
 
 # Two runs, one with normal backend and another with pkcs11 trust store
 UB+ASAN-Werror.Fedora.x86_64.gcc:
