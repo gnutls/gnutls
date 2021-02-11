@@ -366,6 +366,38 @@ fedora-minimal/test:
   needs:
     - fedora-minimal/build
 
+fedora-interop/test:
+  extends:
+    - .test
+    - .fedora
+  dependencies:
+    - fedora-minimal/build
+  needs:
+    - fedora-minimal/build
+  parallel:
+    matrix:
+      - COMPONENT:
+          - openssl
+          #- nss # currently fails on Fedora due to NSS bug
+        TYPE:
+          - 2way
+          #- 3way # these tests take too long, plan is to split them
+          #- 4way
+          #- 5way
+          #- p256
+          #- p384
+          #- p521
+          #- rsae
+          #- rsapss
+  allow_failure: true
+  script:
+    - git clone --depth=1 https://gitlab.com/redhat-crypto/tests/interop.git
+    - cd interop/
+    - echo "Tests to run:"
+    - tmt run plans -n interop tests -f "tag:interop-gnutls" -f "tag:interop-$TYPE" -f "tag:interop-$COMPONENT"  discover -v
+    - echo "Run the tests:"
+    - tmt run -a plans -n interop tests -f "tag:interop-gnutls" -f "tag:interop-$TYPE" -f "tag:interop-$COMPONENT" provision -h local execute -h tmt --interactive
+
 fedora-SSL-3.0/build:
   extends:
     - .build
