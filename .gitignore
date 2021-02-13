@@ -438,6 +438,7 @@ tests/handshake-large-cert
 tests/handshake-large-packet
 tests/handshake-timeout
 tests/handshake-versions
+tests/handshake-write
 tests/hex
 tests/hostname-check
 tests/hostname-check-utf8
@@ -583,6 +584,7 @@ tests/pkcs11-token-raw
 tests/pkcs11/gnutls_pcert_list_import_x509_file
 tests/pkcs11/gnutls_x509_crt_list_import_url
 tests/pkcs11/list-objects
+tests/pkcs11/list-tokens
 tests/pkcs11/pkcs11-chainverify
 tests/pkcs11/pkcs11-combo
 tests/pkcs11/pkcs11-ec-privkey-test

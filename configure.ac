@@ -1006,7 +1006,7 @@ fi
 dnl Guile bindings.
 AC_MSG_CHECKING([whether building Guile bindings])
 AC_ARG_ENABLE(guile,
-	AS_HELP_STRING([--enable-guile], [build GNU Guile bindings]),
+	AS_HELP_STRING([--disable-guile], [don't build GNU Guile bindings]),
 		[opt_guile_bindings=$enableval], [opt_guile_bindings=yes])
 AC_MSG_RESULT($opt_guile_bindings)
 
