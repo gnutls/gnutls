@@ -257,13 +257,11 @@ tls12_rehandshake_cert_LDADD = $(CMOCKA_LDADD)
 
 gnutls_record_overhead_CPPFLAGS = $(AM_CPPFLAGS) \
 	-I$(top_srcdir)/gl	\
-	-I$(top_builddir)/gl	\
-	$(NETTLE_CFLAGS)
+	-I$(top_builddir)/gl
 
 ip_utils_CPPFLAGS = $(AM_CPPFLAGS) \
 	-I$(top_srcdir)/gl	\
-	-I$(top_builddir)/gl	\
-	$(NETTLE_CFLAGS)
+	-I$(top_builddir)/gl
 
 endif
 
@@ -439,38 +437,31 @@ endif
 
 gc_CPPFLAGS = $(AM_CPPFLAGS) \
 	-I$(top_srcdir)/gl	\
-	-I$(top_builddir)/gl	\
-	$(NETTLE_CFLAGS)
+	-I$(top_builddir)/gl
 
 mpi_CPPFLAGS = $(AM_CPPFLAGS) \
 	-I$(top_srcdir)/gl	\
-	-I$(top_builddir)/gl	\
-	$(NETTLE_CFLAGS)
+	-I$(top_builddir)/gl
 
 atfork_CPPFLAGS = $(AM_CPPFLAGS) \
 	-I$(top_srcdir)/gl	\
-	-I$(top_builddir)/gl	\
-	$(NETTLE_CFLAGS)
+	-I$(top_builddir)/gl
 
 pkcs12_s2k_CPPFLAGS = $(AM_CPPFLAGS) \
 	-I$(top_srcdir)/gl	\
-	-I$(top_builddir)/gl	\
-	$(NETTLE_CFLAGS)
+	-I$(top_builddir)/gl
 
 name_constraints_merge_CPPFLAGS = $(AM_CPPFLAGS) \
 	-I$(top_srcdir)/gl	\
-	-I$(top_builddir)/gl	\
-	$(NETTLE_CFLAGS)
+	-I$(top_builddir)/gl
 
 murmur3_CPPFLAGS = $(AM_CPPFLAGS) \
 	-I$(top_srcdir)/gl	\
-	-I$(top_builddir)/gl	\
-	$(NETTLE_CFLAGS)
+	-I$(top_builddir)/gl
 
 tls13_anti_replay_CPPFLAGS = $(AM_CPPFLAGS) \
 	-I$(top_srcdir)/gl	\
-	-I$(top_builddir)/gl	\
-	$(NETTLE_CFLAGS)
+	-I$(top_builddir)/gl
 
 iov_CPPFLAGS = $(AM_CPPFLAGS) \
 	-I$(top_srcdir)/gl	\
