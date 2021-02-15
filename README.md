@@ -92,7 +92,7 @@ and mbedtls.
 Debian/Ubuntu:
 ```
 apt-get install -y valgrind nodejs softhsm2 datefudge lcov libssl-dev libcmocka-dev expect libev-dev
-apt-get install -y dieharder openssl abigail-tools socat net-tools ppp lockfile-progs util-linux
+apt-get install -y dieharder openssl abigail-tools socat net-tools ppp util-linux
 ```
 
 __NOTE:__ `libubsan0` and `libasan1` are required on older versions of Ubuntu <= 16.04. This packages must be manually added on these versions:
@@ -104,7 +104,7 @@ apt-get install -y v libubsan0 libasan1
 Fedora/RHEL:
 ```
 yum install -y valgrind libasan libasan-static libubsan nodejs softhsm datefudge lcov openssl-devel expect libev-devel
-yum install -y dieharder mbedtls-utils openssl libabigail libcmocka-devel socat lockfile-progs util-linux
+yum install -y dieharder mbedtls-utils openssl libabigail libcmocka-devel socat util-linux
 ```
 
 
