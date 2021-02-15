@@ -87,7 +87,7 @@ and mbedtls.
 * [dieharder](https://www.phy.duke.edu/~rgb/General/dieharder.php) (for testing PRNG)
 * [lcov](https://linux-test-project.github.io/) (for code coverage)
 * [util-linux](https://github.com/karelzak/util-linux) or just [lscpu](https://github.com/NanXiao/lscpu) (for CPU feature detection)
-* [libev](hhttp://software.schmorp.de/pkg/libev.html) (for testing)
+* [libev](http://software.schmorp.de/pkg/libev.html) (for testing)
 
 Debian/Ubuntu:
 ```
