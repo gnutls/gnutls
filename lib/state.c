@@ -588,16 +588,12 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 #endif
 	handshake_internal_state_clear1(*session);
 
-#ifdef HAVE_WRITEV
 #ifdef MSG_NOSIGNAL
 	if (flags & GNUTLS_NO_SIGNAL)
 		gnutls_transport_set_vec_push_function(*session, system_writev_nosignal);
 	else
 #endif
 		gnutls_transport_set_vec_push_function(*session, system_writev);
-#else
-	gnutls_transport_set_push_function(*session, system_write);
-#endif
 	(*session)->internals.pull_timeout_func = gnutls_system_recv_timeout;
 	(*session)->internals.pull_func = system_read;
 	(*session)->internals.errno_func = system_errno;

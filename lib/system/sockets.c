@@ -79,6 +79,48 @@ system_write(gnutls_transport_ptr ptr, const void *data, size_t data_size)
 {
 	return send(GNUTLS_POINTER_TO_INT(ptr), data, data_size, 0);
 }
+
+ssize_t
+system_writev(gnutls_transport_ptr_t ptr, const giovec_t * iovec,
+	      int iovec_cnt)
+{
+	WSABUF bufs[iovec_cnt];
+	DWORD bytes_sent;
+	int to_send_cnt = 0;
+	size_t to_send_bytes = 0;
+
+	while (to_send_cnt < iovec_cnt && to_send_bytes < SSIZE_MAX) {
+		bufs[to_send_cnt].buf = iovec[to_send_cnt].iov_base;
+
+		if (to_send_bytes + iovec[to_send_cnt].iov_len > SSIZE_MAX) {
+			/* Return value limit: successful result value cannot
+			 * exceed SSIZE_MAX */
+			size_t space_left = (size_t)SSIZE_MAX - to_send_bytes;
+			bufs[to_send_cnt].len = (unsigned long)
+					(space_left > ULONG_MAX ?
+						ULONG_MAX : space_left);
+			to_send_cnt++;
+			break;
+		}
+		if (iovec[to_send_cnt].iov_len > ULONG_MAX) {
+			/* WSASend() limitation */
+			bufs[to_send_cnt].len = ULONG_MAX;
+			to_send_cnt++;
+			break;
+		}
+		bufs[to_send_cnt].len =
+			(unsigned long) iovec[to_send_cnt].iov_len;
+		to_send_bytes += iovec[to_send_cnt].iov_len;
+		to_send_cnt++;
+	}
+
+	if (WSASend(GNUTLS_POINTER_TO_INT(ptr), bufs, to_send_cnt, &bytes_sent,
+			0, NULL, NULL) != 0)
+		return -1;
+
+	return (ssize_t)bytes_sent;
+}
+
 #else				/* POSIX */
 int system_errno(gnutls_transport_ptr_t ptr)
 {
