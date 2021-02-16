@@ -950,7 +950,10 @@ psk_server_credentials::psk_server_credentials ():credentials
         throw (exception (ret));
       }
 
-    return *dst;
+    std::swap (this->params, dst->params);
+    delete dst;
+
+    return *this;
   }
 
 // RSA
@@ -1003,7 +1006,10 @@ psk_server_credentials::psk_server_credentials ():credentials
         throw (exception (ret));
       }
 
-    return *dst;
+    std::swap (this->params, dst->params);
+    delete dst;
+
+    return *this;
   }
 
   void rsa_params::import_raw (const gnutls_datum_t & m,
