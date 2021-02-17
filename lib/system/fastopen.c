@@ -218,7 +218,7 @@ gnutls_transport_set_fastopen(gnutls_session_t session,
 {
 	if (connect_addrlen > (socklen_t)sizeof(session->internals.tfo.connect_addr)) {
 		gnutls_assert();
-		abort();
+		return;
 	}
 
 	if (session->security_parameters.entity == GNUTLS_SERVER) {

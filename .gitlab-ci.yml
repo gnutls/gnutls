@@ -435,8 +435,8 @@ fedora-static-analyzers/test:
   needs:
     - fedora-static-analyzers/build
   script:
-    - cppcheck --force -q -Ilib/include -Igl/ -Ilib/ -I. --error-exitcode=1 lib/ -i lib/unistring -i lib/minitasn1 -i lib/nettle/backport -i lib/nettle/ecc -j2 $CPPCHECK_OPTIONS
-    - cppcheck --force -q -Ilib/include -Igl/ -Ilibdane/ -I. --error-exitcode=1 libdane/ -j2 $CPPCHECK_OPTIONS
+    - cppcheck --force -q -Ilib/includes -Igl/ -Ilib/ -I. --error-exitcode=1 lib/ -i lib/unistring -i lib/minitasn1 -i lib/nettle/backport -i lib/nettle/ecc -j2 $CPPCHECK_OPTIONS
+    - cppcheck --force -q -Ilib/includes -Igl/ -Ilibdane/ -I. --error-exitcode=1 libdane/ -j2 $CPPCHECK_OPTIONS
 
 # TODO this does not work, so we keep using old job doc-dist.Fedora
 # Keeping it here until I figure it out.

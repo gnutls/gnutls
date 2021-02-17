@@ -39,14 +39,7 @@ bool hex_decode(const char *str, size_t slen, void *buf, size_t bufsize)
 	return slen == 0 && bufsize == 0;
 }
 
-static char hexchar(unsigned int val)
-{
-	if (val < 10)
-		return '0' + val;
-	if (val < 16)
-		return 'a' + val - 10;
-	abort();
-}
+static const char HEX_CHARS[] = "0123456789abcdef";
 
 bool hex_encode(const void *buf, size_t bufsize, char *dest, size_t destsize)
 {
@@ -59,8 +52,8 @@ bool hex_encode(const void *buf, size_t bufsize, char *dest, size_t destsize)
 		unsigned int c = ((const unsigned char *)buf)[used];
 		if (destsize < 3)
 			return false;
-		*(dest++) = hexchar(c >> 4);
-		*(dest++) = hexchar(c & 0xF);
+		*(dest++) = HEX_CHARS[(c >> 4) & 0xF];
+		*(dest++) = HEX_CHARS[c & 0xF];
 		used++;
 		destsize -= 2;
 	}
