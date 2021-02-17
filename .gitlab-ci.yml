@@ -296,11 +296,6 @@ fedora-FIPS140-2/build:
     - ./bootstrap
     - dash ./configure --disable-gcc-warnings --cache-file $CCACHE_FILE --disable-non-suiteb-curves --enable-fips140-mode --disable-doc --disable-full-test-suite --disable-guile
     - make -j$BUILDJOBS
-    - mkdir -p lib/.libs/fipscheck
-    - |
-      for i in lib/.libs/libgnutls.so*; do
-        openssl sha256 -hmac orboDeJITITejsirpADONivirpUkvarP -hex $i | cut -f 2 -d ' ' > lib/.libs/fipscheck/$(basename $i).hmac
-      done
     # build tests, but don't execute them
     - GNUTLS_FORCE_FIPS_MODE=1 make -j$BUILDJOBS check TESTS=""
 
