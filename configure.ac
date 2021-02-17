@@ -647,7 +647,7 @@ AM_CONDITIONAL(ENABLE_NON_SUITEB_CURVES, test "$enable_non_suiteb" = "yes")
 
 # We MUST require a Nettle version that has rsa_sec_decrypt now.
 save_LIBS=$LIBS
-LIBS="$LIBS $HOGWEED_LIBS $NETTLE_LIBS"
+LIBS="$LIBS $HOGWEED_LIBS $NETTLE_LIBS $GMP_LIBS"
 AC_CHECK_FUNCS(nettle_rsa_sec_decrypt,
     [],
     [AC_MSG_ERROR([Nettle lacks the required rsa_sec_decrypt function])]
