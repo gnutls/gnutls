@@ -397,7 +397,7 @@ namespace gnutls
     gnutls_db_remove_session (s);
   }
 
-  bool server_session::db_check_entry (gnutls_datum_t & session_data) const
+  bool server_session::db_check_entry (const gnutls_datum_t & session_data) const
   {
     int ret = gnutls_db_check_entry (s, session_data);
 
@@ -416,7 +416,7 @@ namespace gnutls
     gnutls_credentials_clear (s);
   }
 
-  void session::set_credentials (credentials & cred)
+  void session::set_credentials (const credentials & cred)
   {
     RETWRAP (gnutls_credentials_set (s, cred.get_type (), cred.ptr ()));
   }
