@@ -210,10 +210,7 @@ API_FILES=gnutls-api.texi socket-api.texi x509-api.texi pkcs12-api.texi \
 	dtls-api.texi crypto-api.texi ocsp-api.texi tpm-api.texi dane-api.texi \
 	pkcs7-api.texi
 
-clean-local:
-	-rm -f stamp_enums stamp_functions
-	-rm -rf functions/ enums/
-	-rm -f $(API_FILES)
+MAINTAINERCLEANFILES += stamp_enums stamp_functions functions enums
 
 gnutls_TEXINFOS += $(API_FILES)
 
