@@ -741,6 +741,7 @@ LIBS=$save_LIBS
 
 gnutls_so=libgnutls.so.`expr "$LT_CURRENT" - "$LT_AGE"`
 AC_DEFINE_UNQUOTED([GNUTLS_LIBRARY_SONAME], ["$gnutls_so"], [The soname of gnutls library])
+AC_SUBST([gnutls_so])
 
 AC_MSG_CHECKING([whether to build libdane])
 AC_ARG_ENABLE(libdane,

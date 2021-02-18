@@ -219,6 +219,7 @@ libdane/gnutls-dane.pc
 libdane/libgnutls-dane.la
 lib/ext/libgnutls_ext.la
 lib/extras/libgnutls_extras.la
+lib/fipshmac
 lib/gcrypt/libcrypto.la
 lib/gnutls-api.texi
 lib/gnutls.pc
