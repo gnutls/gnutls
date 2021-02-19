@@ -372,6 +372,8 @@ fedora-valgrind/build:
     - CFLAGS="-O2 -g -fno-builtin-strcmp" ./configure --disable-gcc-warnings --disable-doc --cache-file $CCACHE_FILE --disable-guile --disable-full-test-suite --enable-valgrind-tests
     - make -j$BUILDJOBS
     - make -j$BUILDJOBS check TESTS=""
+  only:
+    - branches@gnutls/gnutls
 
 fedora-valgrind/test:
   extends:
@@ -384,6 +386,8 @@ fedora-valgrind/test:
   needs:
     - fedora-valgrind/build
   timeout: 5h
+  only:
+    - branches@gnutls/gnutls
 
 fedora-threadsan/build:
   extends:
