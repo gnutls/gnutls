@@ -89,7 +89,7 @@ static void client(int fd, const char *prio)
 	/* Initialize TLS session
 	 */
 	gnutls_init(&session, GNUTLS_CLIENT);
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 
 	/* Use default priorities */
 	assert(gnutls_priority_set_direct(session,
@@ -189,7 +189,7 @@ static void server(int fd, const char *prio)
 		exit(1);
 
 	gnutls_init(&session, GNUTLS_SERVER);
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.

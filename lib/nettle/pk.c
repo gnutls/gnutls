@@ -548,6 +548,8 @@ _wrap_nettle_pk_encrypt(gnutls_pk_algorithm_t algo,
 	int ret;
 	mpz_t p;
 
+	FAIL_IF_LIB_ERROR;
+
 	mpz_init(p);
 
 	switch (algo) {
@@ -609,6 +611,8 @@ _wrap_nettle_pk_decrypt(gnutls_pk_algorithm_t algo,
 			const gnutls_pk_params_st * pk_params)
 {
 	int ret;
+
+	FAIL_IF_LIB_ERROR;
 
 	plaintext->data = NULL;
 
@@ -703,6 +707,8 @@ _wrap_nettle_pk_decrypt2(gnutls_pk_algorithm_t algo,
 	uint32_t is_err;
 	int ret;
 	nettle_random_func *random_func;
+
+	FAIL_IF_LIB_ERROR;
 
 	if (algo != GNUTLS_PK_RSA || plaintext == NULL) {
 		gnutls_assert();
@@ -862,6 +868,8 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 	int ret;
 	unsigned int hash_len;
 	const mac_entry_st *me;
+
+	FAIL_IF_LIB_ERROR;
 
 	if (IS_EC(algo)) {
 		/* check if the curve relates to the algorithm used */
@@ -1282,6 +1290,8 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 	unsigned int hash_len;
 	bigint_t tmp[2] = { NULL, NULL };
 
+	FAIL_IF_LIB_ERROR;
+
 	if (IS_EC(algo)) {
 		/* check if the curve relates to the algorithm used */
 		if (gnutls_ecc_curve_get_pk(pk_params->curve) != algo)
@@ -1663,6 +1673,8 @@ wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 {
 	int ret;
 	unsigned int i, q_bits;
+
+	FAIL_IF_LIB_ERROR;
 
 	params->algo = algo;
 
@@ -2266,6 +2278,8 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 	unsigned int i;
 	unsigned rnd_level;
 	nettle_random_func *rnd_func;
+
+	FAIL_IF_LIB_ERROR;
 
 	if (IS_EC(algo)) {
 		/* check if the curve relates to the algorithm used */

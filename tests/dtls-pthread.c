@@ -220,7 +220,7 @@ static void client(int fd, const char *prio, unsigned do_thread, unsigned false_
 
 	assert(gnutls_init(&session, flags|GNUTLS_DATAGRAM) >= 0);
 	gnutls_dtls_set_mtu(session, 1500);
-	gnutls_dtls_set_timeouts(session, 6 * 1000, 60 * 1000);
+	gnutls_dtls_set_timeouts(session, get_dtls_retransmit_timeout(), get_timeout());
 
 	assert(gnutls_priority_set_direct(session, prio, NULL)>=0);
 
@@ -276,7 +276,7 @@ static void server(int fd, const char *prio, unsigned do_thread)
 					    GNUTLS_X509_FMT_PEM)>=0);
 
 	assert(gnutls_init(&session, GNUTLS_SERVER | GNUTLS_DATAGRAM)>=0);
-	gnutls_dtls_set_timeouts(session, 5 * 1000, 60 * 1000);
+	gnutls_dtls_set_timeouts(session, get_dtls_retransmit_timeout(), get_timeout());
 	gnutls_dtls_set_mtu(session, 400);
 
 	assert(gnutls_priority_set_direct(session, prio, NULL)>=0);

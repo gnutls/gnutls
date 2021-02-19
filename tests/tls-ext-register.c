@@ -148,7 +148,7 @@ static void client(int sd, const char *prio)
 				clientx509cred);
 
 	gnutls_transport_set_int(session, sd);
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 
 	/* Perform the TLS handshake
 	 */
@@ -259,7 +259,7 @@ static void server(int sd, const char *prio)
 	assert(gnutls_ext_register("ext_server", TLSEXT_TYPE_SAMPLE, GNUTLS_EXT_TLS, ext_recv_server_params, ext_send_server_params, NULL, NULL, NULL)>=0);
 
 	gnutls_transport_set_int(session, sd);
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 
 	ret = gnutls_handshake(session);
 	if (ret < 0) {

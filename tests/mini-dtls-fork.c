@@ -222,7 +222,7 @@ static void client(int fd, unsigned do_fork)
 	 */
 	gnutls_init(&session, GNUTLS_CLIENT | GNUTLS_DATAGRAM);
 	gnutls_dtls_set_mtu(session, 1500);
-	gnutls_dtls_set_timeouts(session, 6 * 1000, 60 * 1000);
+	gnutls_dtls_set_timeouts(session, get_dtls_retransmit_timeout(), get_timeout());
 	//gnutls_transport_set_push_function(session, push);
 
 	/* Use default priorities */
@@ -292,7 +292,7 @@ static void server(int fd, unsigned do_fork)
 					    GNUTLS_X509_FMT_PEM);
 
 	gnutls_init(&session, GNUTLS_SERVER | GNUTLS_DATAGRAM);
-	gnutls_dtls_set_timeouts(session, 5 * 1000, 60 * 1000);
+	gnutls_dtls_set_timeouts(session, get_dtls_retransmit_timeout(), get_timeout());
 	gnutls_dtls_set_mtu(session, 400);
 
 	/* avoid calling all the priority functions, since the defaults

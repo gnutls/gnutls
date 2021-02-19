@@ -109,7 +109,7 @@ static void client(int fd)
 	 */
 	gnutls_init(&session, GNUTLS_CLIENT);
 
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 
 	ret = gnutls_priority_set_direct(session, PRIO, NULL);
 	if (ret < 0)
@@ -212,7 +212,7 @@ static void server(int fd)
  retry:
 	gnutls_init(&session, GNUTLS_SERVER);
 
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 
 	assert(gnutls_priority_set_direct(session, "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:+VERS-TLS1.1:+VERS-TLS1.0", NULL)>=0);
 

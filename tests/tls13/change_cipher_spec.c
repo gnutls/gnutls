@@ -94,7 +94,7 @@ static void client(int fd, unsigned ccs_check)
 	gnutls_init(&session, GNUTLS_CLIENT|GNUTLS_POST_HANDSHAKE_AUTH);
 
 	gnutls_session_set_ptr(session, &ccs_check);
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 	if (ccs_check) {
 		gnutls_handshake_set_hook_function(session, GNUTLS_HANDSHAKE_ANY,
 						   GNUTLS_HOOK_PRE,
@@ -243,7 +243,7 @@ static void server(int fd, unsigned ccs_check)
 
 	gnutls_init(&session, GNUTLS_SERVER);
 
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 
 	if (ccs_check)
 		gnutls_handshake_set_hook_function(session, GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC,

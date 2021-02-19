@@ -113,7 +113,7 @@ static void client(int fd, int *resume, unsigned rounds, const char *prio)
 				       clientx509cred);
 
 		gnutls_transport_set_int(session, fd);
-		gnutls_handshake_set_timeout(session, 20 * 1000);
+		gnutls_handshake_set_timeout(session, get_timeout());
 
 		/* Perform TLS handshake and obtain session ticket */
 		if (client_handshake(session, &session_data,
@@ -171,7 +171,7 @@ static void server(int fd, unsigned rounds, const char *prio)
 		}
 
 		gnutls_transport_set_int(session, fd);
-		gnutls_handshake_set_timeout(session, 20 * 1000);
+		gnutls_handshake_set_timeout(session, get_timeout());
 
 		virt_sec_sleep(TICKET_ROTATION_PERIOD-1);
 

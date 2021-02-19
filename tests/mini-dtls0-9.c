@@ -102,7 +102,7 @@ static void client(int fd, int proto, int cipher, int mac)
 	 */
 	gnutls_init(&session, GNUTLS_CLIENT | GNUTLS_DATAGRAM);
 	gnutls_dtls_set_mtu(session, 1500);
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 
 	/* Use default priorities */
 	gnutls_priority_set_direct(session,
@@ -205,7 +205,7 @@ static void server(int fd, int proto, int cipher, int mac)
 	gnutls_certificate_allocate_credentials(&xcred);
 
 	gnutls_init(&session, GNUTLS_SERVER | GNUTLS_DATAGRAM);
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 	gnutls_dtls_set_mtu(session, 1500);
 
 	/* avoid calling all the priority functions, since the defaults

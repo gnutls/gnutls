@@ -147,7 +147,7 @@ static void client(int sds[], struct params_res *params)
 
 		/* Perform the TLS handshake
 		 */
-		gnutls_dtls_set_timeouts(session, 3*1000, 240 * 1000);
+		gnutls_dtls_set_timeouts(session, get_dtls_retransmit_timeout(), get_timeout());
 		do {
 			ret = gnutls_handshake(session);
 		} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
@@ -310,7 +310,7 @@ static void server(int sds[], struct params_res *params)
 						    &session_ticket_key);
 
 		gnutls_transport_set_int(session, sd);
-		gnutls_dtls_set_timeouts(session, 3*1000, 240 * 1000);
+		gnutls_dtls_set_timeouts(session, get_dtls_retransmit_timeout(), get_timeout());
 		
 		do {
 			ret = gnutls_handshake(session);

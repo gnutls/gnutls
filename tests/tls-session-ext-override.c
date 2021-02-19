@@ -144,7 +144,7 @@ static void client(int sd)
 				clientx509cred);
 
 	gnutls_transport_set_int(session, sd);
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 
 	ret = gnutls_session_ext_register(session, "ext_client", overridden_extension, GNUTLS_EXT_TLS, ext_recv_client_params, ext_send_client_params, NULL, NULL, NULL, 0);
 	if (ret != GNUTLS_E_ALREADY_REGISTERED)
@@ -235,7 +235,7 @@ static void server(int sd)
 		fail("client: register extension\n");
 
 	gnutls_transport_set_int(session, sd);
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 
 	ret = gnutls_handshake(session);
 	if (ret < 0) {

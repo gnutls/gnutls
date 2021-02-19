@@ -92,7 +92,7 @@ static void client(int fd, unsigned flag, const char *prio)
 	 */
 	gnutls_init(&session, GNUTLS_CLIENT|flag);
 
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 
 	ret = gnutls_priority_set_direct(session, prio, NULL);
 	if (ret < 0)
@@ -215,7 +215,7 @@ static void server(int fd, gnutls_group_t exp_group, unsigned ngroups)
 
 	gnutls_init(&session, GNUTLS_SERVER);
 
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 	gnutls_handshake_set_hook_function(session, GNUTLS_HANDSHAKE_ANY,
 					   GNUTLS_HOOK_BOTH,
 					   client_hello_callback);

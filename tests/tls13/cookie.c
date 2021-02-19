@@ -125,7 +125,7 @@ static void client(int sd)
 				clientx509cred);
 
 	gnutls_transport_set_int(session, sd);
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 
 	/* Perform the TLS handshake
 	 */
@@ -191,7 +191,7 @@ static void server(int sd)
 		fail("server: cannot register: %s", gnutls_strerror(ret));
 
 	gnutls_transport_set_int(session, sd);
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 
 	ret = gnutls_handshake(session);
 	if (ret < 0) {

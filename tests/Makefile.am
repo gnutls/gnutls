@@ -112,7 +112,7 @@ ctests = tls13/supported_versions tls13/tls12-no-tls13-exts \
 	tls13/post-handshake-with-cert tls13/post-handshake-without-cert \
 	tls13/cookie tls13/key_share tls13/prf tls13/post-handshake-with-cert-ticket \
 	tls12-rollback-detection tls11-rollback-detection \
-	tls12-check-rollback-val tls11-check-rollback-val tls13/hello_random_value \
+	tls12-check-rollback-val tls11-check-rollback-val \
 	tls13/post-handshake-with-psk tls13/post-handshake-with-cert-auto \
 	tls13/anti_replay
 
@@ -160,13 +160,13 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 mini-emsgsize-dtls chainverify-unsorted mini-overhead tls12-ffdhe \
 	 mini-dtls-heartbeat mini-x509-callbacks key-openssl priorities priorities-groups	\
 	 gnutls_x509_privkey_import gnutls_x509_crt_list_import time x509-server-verify \
-	 sign-verify-ext4 tls-neg-ext4-key resume-lifetime memset0 memset1 \
+	 sign-verify-ext4 tls-neg-ext4-key resume-lifetime \
 	 mini-dtls-srtp rsa-encrypt-decrypt mini-loss-time gnutls-strcodes \
 	 mini-record mini-dtls-record handshake-timeout mini-record-range \
 	 cert-status fips-mode-pthread rsa-psk global-init sec-params sign-verify-data \
 	 fips-test fips-override-test mini-global-load name-constraints x509-extensions \
 	 long-session-id mini-x509-callbacks-intr mini-dtls-lowmtu set_x509_key_file-late \
-	 crlverify mini-dtls-discard init_fds mini-record-failure openconnect-dtls12 \
+	 crlverify mini-dtls-discard mini-record-failure openconnect-dtls12 \
 	 tls12-rehandshake-cert-2 custom-urls set_x509_key_mem set_x509_key_file \
 	 tls12-rehandshake-cert-auto tls12-rehandshake-set-prio \
 	 mini-chain-unsorted x509-verify-with-crl mini-dtls-mtu privkey-verify-broken \
@@ -222,7 +222,7 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 sign-verify-newapi sign-verify-deterministic iov aead-cipher-vec \
 	 tls13-without-timeout-func buffer status-request-revoked \
 	 set_x509_ocsp_multi_cli kdf-api keylog-func handshake-write \
-	 dtls_hello_random_value tls_hello_random_value x509cert-dntypes
+	 x509cert-dntypes
 
 if HAVE_SECCOMP_TESTS
 ctests += dtls-with-seccomp tls-with-seccomp dtls-client-with-seccomp tls-client-with-seccomp
@@ -269,14 +269,6 @@ tls_pthread_LDADD = $(LDADD) -lpthread
 fips_mode_pthread_LDADD = $(LDADD) -lpthread
 dtls_pthread_LDADD = $(LDADD) -lpthread
 rng_pthread_LDADD = $(LDADD) -lpthread
-
-memset0_CFLAGS = -DCHAR=0x0
-memset0_SOURCES = memset.c
-memset0_LDADD = $(LDADD)
-
-memset1_CFLAGS = -DCHAR=0xa
-memset1_SOURCES = memset.c
-memset1_LDADD = $(LDADD)
 
 tls12_rollback_detection_CFLAGS = -DTLS12
 tls12_rollback_detection_SOURCES = tls13/rnd-rollback-detection.c
@@ -490,7 +482,7 @@ if !WINDOWS
 # List of tests not available/functional under windows
 #
 
-dist_check_SCRIPTS += dtls/dtls dtls/dtls-resume #dtls/dtls-nb
+dist_check_SCRIPTS += dtls/dtls.sh dtls/dtls-resume.sh #dtls/dtls-nb
 
 indirect_tests += dtls-stress
 
@@ -500,10 +492,10 @@ dtls_stress_LDADD = $(COMMON_GNUTLS_LDADD) \
 
 dist_check_SCRIPTS += fastopen.sh pkgconfig.sh starttls.sh starttls-ftp.sh starttls-smtp.sh \
 	starttls-lmtp.sh starttls-pop3.sh starttls-xmpp.sh starttls-nntp.sh starttls-sieve.sh \
-	ocsp-tests/ocsp-tls-connection ocsp-tests/ocsp-must-staple-connection \
-	ocsp-tests/ocsp-test cipher-listings.sh sni-hostname.sh server-multi-keys.sh \
-	psktool.sh ocsp-tests/ocsp-load-chain gnutls-cli-save-data.sh gnutls-cli-debug.sh \
-	sni-resume.sh ocsp-tests/ocsptool cert-reencoding.sh pkcs7-cat.sh long-crl.sh \
+	ocsp-tests/ocsp-tls-connection.sh ocsp-tests/ocsp-must-staple-connection.sh \
+	ocsp-tests/ocsp-test.sh cipher-listings.sh sni-hostname.sh server-multi-keys.sh \
+	psktool.sh ocsp-tests/ocsp-load-chain.sh gnutls-cli-save-data.sh gnutls-cli-debug.sh \
+	sni-resume.sh ocsp-tests/ocsptool.sh cert-reencoding.sh pkcs7-cat.sh long-crl.sh \
 	serv-udp.sh logfile-option.sh gnutls-cli-resume.sh profile-tests.sh \
 	server-weak-keys.sh
 
@@ -606,11 +598,8 @@ else
 TESTS_ENVIRONMENT += ENABLE_GOST=0
 endif
 
-
-if WANT_TEST_SUITE
-
+TEST_EXTENSIONS = .sh
 LOG_COMPILER = $(VALGRIND)
-endif
 
 distclean-local:
 	rm -rf softhsm-*.db softhsm-*.config *.tmp tmp-* x509-crt-list-import-url.config.db port.lock.d

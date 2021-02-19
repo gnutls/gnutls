@@ -117,7 +117,7 @@ static void client(int sd)
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
 				clientx509cred);
 
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 	gnutls_transport_set_int(session, sd);
 
 	/* Perform the TLS handshake
@@ -236,7 +236,7 @@ static void server(int sd)
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
 				serverx509cred);
 
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 	gnutls_transport_set_int(session, sd);
 	ret = gnutls_handshake(session);
 	if (ret < 0) {

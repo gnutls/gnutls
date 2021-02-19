@@ -174,7 +174,7 @@ static void client(int sd, const char *name, const char *prio, unsigned flags, u
 				clientx509cred);
 
 	gnutls_transport_set_int(session, sd);
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 
 	ret = gnutls_session_ext_register(session, "ext_ign", TLSEXT_TYPE_IGN, GNUTLS_EXT_TLS, ext_recv_client_ign_params, ext_send_client_ign_params, NULL, NULL, NULL, flags);
 	if (ret < 0)
@@ -271,7 +271,7 @@ static void server(int sd, const char *name, const char *prio, unsigned flags, u
 	assert(gnutls_session_ext_register(session, "ext_server", TLSEXT_TYPE_SAMPLE, GNUTLS_EXT_TLS, ext_recv_server_params, ext_send_server_params, NULL, NULL, NULL, flags) >= 0);
 
 	gnutls_transport_set_int(session, sd);
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 
 	ret = gnutls_handshake(session);
 	if (ret < 0) {

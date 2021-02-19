@@ -24,6 +24,7 @@
 #include <config.h>
 #endif
 
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -92,6 +93,7 @@ static void client(int sd)
 	char buf[1024];
 	int ret;
 	struct pollfd pfd;
+	unsigned int timeout;
 
 	/* send a TLS 1.x hello with duplicate extensions */
 	
@@ -103,8 +105,12 @@ static void client(int sd)
 	pfd.events = POLLIN;
 	pfd.revents = 0;
 
+	timeout = get_timeout();
+	if (timeout > INT_MAX)
+		fail("invalid timeout value\n");
+
 	do {
-		ret = poll(&pfd, 1, 10000);
+		ret = poll(&pfd, 1, (int)timeout);
 	} while (ret == -1 && errno == EINTR);
 
 	if (ret == -1 || ret == 0) {
@@ -157,7 +163,7 @@ static void server(int sd)
 	 * are adequate.
 	 */
 	gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-TLS1.0:+VERS-TLS1.1:+VERS-TLS1.2", NULL);
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 

@@ -112,7 +112,7 @@ static void client(int fd, unsigned flags, unsigned tickets)
 	 */
 	assert(gnutls_init(&session, GNUTLS_CLIENT|flags)>=0);
 
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 
 	ret = gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:+VERS-TLS1.0", NULL);
 	if (ret < 0)
@@ -162,6 +162,7 @@ static void client(int fd, unsigned flags, unsigned tickets)
 	}
 
 	close(fd);
+	gnutls_certificate_free_credentials(x509_cred);
 	gnutls_free(session_data.data);
 
 	gnutls_global_deinit();
@@ -194,7 +195,7 @@ static void server(int fd, unsigned flags,
 	assert(gnutls_init(&session, GNUTLS_SERVER|flags)>=0);
 
 	assert(gnutls_session_ticket_enable_server(session, &skey) >= 0);
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, get_timeout());
 
 	assert(gnutls_priority_set_direct(session, "NORMAL:+VERS-TLS1.3", NULL)>=0);
 
@@ -226,7 +227,7 @@ static void server(int fd, unsigned flags,
 		assert(gnutls_init(&session, GNUTLS_SERVER|flags)>=0);
 
 		assert(gnutls_session_ticket_enable_server(session, &skey) >= 0);
-		gnutls_handshake_set_timeout(session, 20 * 1000);
+		gnutls_handshake_set_timeout(session, get_timeout());
 		assert(gnutls_priority_set_direct(session, "NORMAL:+VERS-TLS1.3", NULL)>=0);
 
 		gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);

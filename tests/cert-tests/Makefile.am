@@ -103,46 +103,46 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	templates/template-no-ca-honor.tmpl templates/template-no-ca-explicit.tmpl \
 	data/crq-cert-no-ca-explicit.pem data/crq-cert-no-ca-honor.pem data/commonName.cer
 
-dist_check_SCRIPTS = pathlen aki invalid-sig email \
-	pkcs7 pkcs7-broken-sigs privkey-import name-constraints certtool-long-cn crl provable-privkey \
-	provable-dh userid sha2-test sha2-dsa-test provable-privkey-dsa2048 \
-	provable-privkey-rsa2048 provable-privkey-gen-default pkcs7-constraints \
-	pkcs7-constraints2 certtool-long-oids pkcs7-cat cert-sanity cert-critical \
-	pkcs12 certtool-crl-decoding pkcs12-encode pkcs12-corner-cases inhibit-anypolicy \
-	smime cert-time alt-chain pkcs7-list-sign pkcs7-eddsa certtool-ecdsa \
-	key-id pkcs8 pkcs8-decode ecdsa illegal-rsa pkcs8-invalid key-invalid \
-	pkcs8-eddsa certtool-subca certtool-verify-profiles x509-duplicate-ext
+dist_check_SCRIPTS = pathlen.sh aki.sh invalid-sig.sh email.sh \
+	pkcs7.sh pkcs7-broken-sigs.sh privkey-import.sh name-constraints.sh certtool-long-cn.sh crl.sh provable-privkey.sh \
+	provable-dh.sh userid.sh sha2-test.sh sha2-dsa-test.sh provable-privkey-dsa2048.sh \
+	provable-privkey-rsa2048.sh provable-privkey-gen-default.sh pkcs7-constraints.sh \
+	pkcs7-constraints2.sh certtool-long-oids.sh pkcs7-cat.sh cert-sanity.sh cert-critical.sh \
+	pkcs12.sh certtool-crl-decoding.sh pkcs12-encode.sh pkcs12-corner-cases.sh inhibit-anypolicy.sh \
+	smime.sh cert-time.sh alt-chain.sh pkcs7-list-sign.sh pkcs7-eddsa.sh certtool-ecdsa.sh \
+	key-id.sh pkcs8.sh pkcs8-decode.sh ecdsa.sh illegal-rsa.sh pkcs8-invalid.sh key-invalid.sh \
+	pkcs8-eddsa.sh certtool-subca.sh certtool-verify-profiles.sh x509-duplicate-ext.sh
 
-dist_check_SCRIPTS += key-id ecdsa pkcs8-invalid key-invalid pkcs8-decode pkcs8 pkcs8-eddsa \
-	certtool-utf8 crq
+dist_check_SCRIPTS += key-id.sh ecdsa.sh pkcs8-invalid.sh key-invalid.sh pkcs8-decode.sh pkcs8.sh pkcs8-eddsa.sh \
+	certtool-utf8.sh crq.sh
 
 if STRICT_DER_TIME
-dist_check_SCRIPTS += cert-non-digits-time reject-invalid-time
+dist_check_SCRIPTS += cert-non-digits-time.sh reject-invalid-time.sh
 else
-dist_check_SCRIPTS += tolerate-invalid-time
+dist_check_SCRIPTS += tolerate-invalid-time.sh
 endif
 
 if WANT_TEST_SUITE
-dist_check_SCRIPTS += provable-dh-default
+dist_check_SCRIPTS += provable-dh-default.sh
 endif
 
 if !WINDOWS
-dist_check_SCRIPTS += template-test pem-decoding othername-test krb5-test sha3-test md5-test \
-	tlsfeature-test template-exts-test pkcs1-pad pkcs12-utf8 rsa-pss-pad dsa certtool
+dist_check_SCRIPTS += template-test.sh pem-decoding.sh othername-test.sh krb5-test.sh sha3-test.sh md5-test.sh \
+	tlsfeature-test.sh template-exts-test.sh pkcs1-pad.sh pkcs12-utf8.sh rsa-pss-pad.sh dsa.sh certtool.sh
 endif
 
 if ENABLE_DANE
-dist_check_SCRIPTS += dane
+dist_check_SCRIPTS += dane.sh
 endif
 
 if ENABLE_GOST
-dist_check_SCRIPTS += gost
+dist_check_SCRIPTS += gost.sh
 if !WINDOWS
-dist_check_SCRIPTS += pkcs12-gost pkcs8-gost
+dist_check_SCRIPTS += pkcs12-gost.sh pkcs8-gost.sh
 endif
 endif
 
-dist_check_SCRIPTS += certtool-rsa-pss certtool-eddsa
+dist_check_SCRIPTS += certtool-rsa-pss.sh certtool-eddsa.sh
 
 TESTS = $(dist_check_SCRIPTS)
 
