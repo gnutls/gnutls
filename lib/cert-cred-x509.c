@@ -254,7 +254,7 @@ parse_pem_cert_mem(gnutls_certificate_credentials_t res,
 		goto cleanup;
 	}
 
-	pcerts = gnutls_malloc(sizeof(gnutls_pcert_st) * count);
+	pcerts = _gnutls_reallocarray(NULL, count, sizeof(gnutls_pcert_st));
 	if (pcerts == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
@@ -441,7 +441,8 @@ read_cert_url(gnutls_certificate_credentials_t res, gnutls_privkey_t key, const 
 
 	_gnutls_str_array_init(&names);
 
-	ccert = gnutls_malloc(sizeof(*ccert)*MAX_PKCS11_CERT_CHAIN);
+	ccert = _gnutls_reallocarray(NULL, MAX_PKCS11_CERT_CHAIN,
+				     sizeof(*ccert));
 	if (ccert == NULL) {
 		gnutls_assert();
 		ret = GNUTLS_E_MEMORY_ERROR;
@@ -770,7 +771,8 @@ gnutls_certificate_set_x509_key(gnutls_certificate_credentials_t res,
 	}
 
 	/* load certificates */
-	pcerts = gnutls_malloc(sizeof(gnutls_pcert_st) * cert_list_size);
+	pcerts = _gnutls_reallocarray(NULL, cert_list_size,
+				      sizeof(gnutls_pcert_st));
 	if (pcerts == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
@@ -901,8 +903,9 @@ gnutls_certificate_get_x509_crt(gnutls_certificate_credentials_t res,
 	}
 
 	*crt_list_size = res->certs[index].cert_list_length;
-	*crt_list = gnutls_malloc(
-		res->certs[index].cert_list_length * sizeof (gnutls_x509_crt_t));
+	*crt_list = _gnutls_reallocarray(NULL,
+					 res->certs[index].cert_list_length,
+					 sizeof (gnutls_x509_crt_t));
 	if (*crt_list == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
@@ -1151,7 +1154,8 @@ gnutls_certificate_set_x509_trust(gnutls_certificate_credentials_t res,
 	if (ca_list == NULL || ca_list_size < 1)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	new_list = gnutls_malloc(ca_list_size * sizeof(gnutls_x509_crt_t));
+	new_list = _gnutls_reallocarray(NULL, ca_list_size,
+					sizeof(gnutls_x509_crt_t));
 	if (!new_list)
 		return GNUTLS_E_MEMORY_ERROR;
 
@@ -1335,12 +1339,15 @@ gnutls_certificate_set_x509_crl(gnutls_certificate_credentials_t res,
 				int crl_list_size)
 {
 	int ret, i, j;
-	gnutls_x509_crl_t *new_crl = gnutls_malloc(crl_list_size * sizeof(gnutls_x509_crl_t));
-	unsigned flags = GNUTLS_TL_USE_IN_TLS;
+	gnutls_x509_crl_t *new_crl;
+	unsigned flags;
 
+	flags = GNUTLS_TL_USE_IN_TLS;
 	if (res->flags & GNUTLS_CERTIFICATE_VERIFY_CRLS)
 		flags |= GNUTLS_TL_VERIFY_CRL|GNUTLS_TL_FAIL_ON_INVALID_CRL;
 
+	new_crl = _gnutls_reallocarray(NULL, crl_list_size,
+				       sizeof(gnutls_x509_crl_t));
 	if (!new_crl)
 		return GNUTLS_E_MEMORY_ERROR;
 

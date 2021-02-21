@@ -1262,7 +1262,7 @@ gnutls_x509_crl_list_import2(gnutls_x509_crl_t ** crls,
 	unsigned int init = 1024;
 	int ret;
 
-	*crls = gnutls_malloc(sizeof(gnutls_x509_crl_t) * init);
+	*crls = _gnutls_reallocarray(NULL, init, sizeof(gnutls_x509_crl_t));
 	if (*crls == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
@@ -1272,9 +1272,8 @@ gnutls_x509_crl_list_import2(gnutls_x509_crl_t ** crls,
 	    gnutls_x509_crl_list_import(*crls, &init, data, format,
 					flags | GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED);
 	if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER) {
-		*crls =
-		    gnutls_realloc_fast(*crls,
-					sizeof(gnutls_x509_crl_t) * init);
+		*crls = _gnutls_reallocarray_fast(*crls, init,
+						  sizeof(gnutls_x509_crl_t));
 		if (*crls == NULL) {
 			gnutls_assert();
 			return GNUTLS_E_MEMORY_ERROR;

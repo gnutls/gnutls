@@ -923,7 +923,9 @@ gnutls_session_ext_register(gnutls_session_t session,
 			tmp_mod.validity |= GNUTLS_EXT_FLAG_TLS;
 	}
 
-	exts = gnutls_realloc(session->internals.rexts, (session->internals.rexts_size+1)*sizeof(*exts));
+	exts = _gnutls_reallocarray(session->internals.rexts,
+				    session->internals.rexts_size + 1,
+				    sizeof(*exts));
 	if (exts == NULL) {
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 	}

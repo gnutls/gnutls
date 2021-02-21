@@ -185,7 +185,8 @@ gnutls_pcert_list_import_x509_raw(gnutls_pcert_st *pcert_list,
 	unsigned int i = 0, j;
 	gnutls_x509_crt_t *crt;
 
-	crt = gnutls_malloc((*pcert_list_size) * sizeof(gnutls_x509_crt_t));
+	crt = _gnutls_reallocarray(NULL, *pcert_list_size,
+				   sizeof(gnutls_x509_crt_t));
 
 	if (crt == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);

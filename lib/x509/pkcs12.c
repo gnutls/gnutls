@@ -1455,10 +1455,9 @@ static int make_chain(gnutls_x509_crt_t ** chain, unsigned int *chain_len,
 			    != 0)
 				goto skip;
 
-			*chain =
-			    gnutls_realloc_fast(*chain,
-						sizeof((*chain)[0]) *
-						++(*chain_len));
+			*chain = _gnutls_reallocarray_fast(*chain,
+							   ++(*chain_len),
+							   sizeof((*chain)[0]));
 			if (*chain == NULL) {
 				gnutls_assert();
 				return GNUTLS_E_MEMORY_ERROR;
@@ -1779,11 +1778,9 @@ gnutls_pkcs12_simple_parse(gnutls_pkcs12_t p12,
 
 				if (memcmp(cert_id, key_id, cert_id_size) != 0) {	/* they don't match - skip the certificate */
 					_extra_certs =
-						gnutls_realloc_fast
-						(_extra_certs,
-						 sizeof(_extra_certs
-							[0]) *
-						 ++_extra_certs_len);
+						_gnutls_reallocarray_fast(_extra_certs,
+									  ++_extra_certs_len,
+									  sizeof(_extra_certs[0]));
 					if (!_extra_certs) {
 						gnutls_assert();
 						ret =

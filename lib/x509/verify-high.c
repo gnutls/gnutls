@@ -129,9 +129,9 @@ cert_set_add(struct cert_set_st *set, const gnutls_x509_crt_t cert)
 	hash %= set->size;
 
 	set->node[hash].certs =
-		gnutls_realloc_fast(set->node[hash].certs,
-				    (set->node[hash].size + 1) *
-				    sizeof(*set->node[hash].certs));
+		_gnutls_reallocarray_fast(set->node[hash].certs,
+					  set->node[hash].size + 1,
+					  sizeof(*set->node[hash].certs));
 	if (!set->node[hash].certs) {
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 	}
@@ -298,10 +298,9 @@ trust_list_add_compat(gnutls_x509_trust_list_t list,
 			       gnutls_x509_crt_t cert)
 {
 	list->keep_certs =
-		    gnutls_realloc_fast(list->keep_certs,
-					(list->keep_certs_size +
-					 1) *
-					sizeof(list->keep_certs[0]));
+		_gnutls_reallocarray_fast(list->keep_certs,
+					  list->keep_certs_size + 1,
+					  sizeof(list->keep_certs[0]));
 	if (list->keep_certs == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
@@ -380,11 +379,9 @@ gnutls_x509_trust_list_add_cas(gnutls_x509_trust_list_t list,
 		}
 
 		list->node[hash].trusted_cas =
-		    gnutls_realloc_fast(list->node[hash].trusted_cas,
-					(list->node[hash].trusted_ca_size +
-					 1) *
-					sizeof(list->node[hash].
-					       trusted_cas[0]));
+			_gnutls_reallocarray_fast(list->node[hash].trusted_cas,
+						  list->node[hash].trusted_ca_size + 1,
+						  sizeof(list->node[hash].trusted_cas[0]));
 		if (list->node[hash].trusted_cas == NULL) {
 			gnutls_assert();
 			return i;
@@ -671,9 +668,9 @@ gnutls_x509_trust_list_remove_cas(gnutls_x509_trust_list_t list,
 		 * ensure that a server certificate will also get rejected.
 		 */
 		list->blacklisted =
-		    gnutls_realloc_fast(list->blacklisted,
-				(list->blacklisted_size + 1) *
-				sizeof(list->blacklisted[0]));
+			_gnutls_reallocarray_fast(list->blacklisted,
+						  list->blacklisted_size + 1,
+						  sizeof(list->blacklisted[0]));
 		if (list->blacklisted == NULL)
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
@@ -729,10 +726,9 @@ gnutls_x509_trust_list_add_named_crt(gnutls_x509_trust_list_t list,
 	hash %= list->size;
 
 	list->node[hash].named_certs =
-	    gnutls_realloc_fast(list->node[hash].named_certs,
-				(list->node[hash].named_cert_size +
-				 1) *
-				sizeof(list->node[hash].named_certs[0]));
+		_gnutls_reallocarray_fast(list->node[hash].named_certs,
+					  list->node[hash].named_cert_size + 1,
+					  sizeof(list->node[hash].named_certs[0]));
 	if (list->node[hash].named_certs == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
@@ -842,12 +838,9 @@ gnutls_x509_trust_list_add_crls(gnutls_x509_trust_list_t list,
 			}
 		}
 
-		tmp =
-		    gnutls_realloc(list->node[hash].crls,
-					(list->node[hash].crl_size +
-					 1) *
-					sizeof(list->node[hash].
-					       crls[0]));
+		tmp = _gnutls_reallocarray(list->node[hash].crls,
+					   list->node[hash].crl_size + 1,
+					   sizeof(list->node[hash].crls[0]));
 		if (tmp == NULL) {
 			ret = i;
 			gnutls_assert();

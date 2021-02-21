@@ -217,7 +217,10 @@ find_ext_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
 		rv = pkcs11_get_attribute_avalue(sinfo->module, sinfo->pks, obj, CKA_VALUE, &ext);
 		if (rv == CKR_OK) {
 
-			find_data->exts = gnutls_realloc_fast(find_data->exts, (1+find_data->exts_size)*sizeof(find_data->exts[0]));
+			find_data->exts =
+				_gnutls_reallocarray_fast(find_data->exts,
+							  find_data->exts_size + 1,
+							  sizeof(find_data->exts[0]));
 			if (find_data->exts == NULL) {
 				ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 				goto cleanup;

@@ -252,8 +252,8 @@ _gnutls_supplemental_register(gnutls_supplemental_entry_st *entry)
 			return gnutls_assert_val(GNUTLS_E_ALREADY_REGISTERED);
 	}
 
-	p = gnutls_realloc_fast(suppfunc,
-				sizeof(*suppfunc) * (suppfunc_size + 1));
+	p = _gnutls_reallocarray_fast(suppfunc, suppfunc_size + 1,
+				      sizeof(*suppfunc));
 	if (!p) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;

@@ -137,7 +137,7 @@ int subject_alt_names_set(struct name_st **names,
 	void *tmp;
 	int ret;
 
-	tmp = gnutls_realloc(*names, (*size + 1) * sizeof((*names)[0]));
+	tmp = _gnutls_reallocarray(*names, *size + 1, sizeof((*names)[0]));
 	if (tmp == NULL) {
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 	}
@@ -2317,9 +2317,8 @@ int crl_dist_points_set(gnutls_x509_crl_dist_points_t cdp,
 	void *tmp;
 
 	/* new dist point */
-	tmp =
-	    gnutls_realloc(cdp->points,
-			   (cdp->size + 1) * sizeof(cdp->points[0]));
+	tmp = _gnutls_reallocarray(cdp->points, cdp->size + 1,
+				   sizeof(cdp->points[0]));
 	if (tmp == NULL) {
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 	}
@@ -2734,7 +2733,7 @@ int gnutls_x509_aia_set(gnutls_x509_aia_t aia,
 	void *tmp;
 	unsigned indx;
 
-	tmp = gnutls_realloc(aia->aia, (aia->size + 1) * sizeof(aia->aia[0]));
+	tmp = _gnutls_reallocarray(aia->aia, aia->size + 1, sizeof(aia->aia[0]));
 	if (tmp == NULL) {
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 	}
@@ -2786,7 +2785,8 @@ static int parse_aia(ASN1_TYPE c2, gnutls_x509_aia_t aia)
 		}
 
 		indx = aia->size;
-		tmp = gnutls_realloc(aia->aia, (aia->size + 1) * sizeof(aia->aia[0]));
+		tmp = _gnutls_reallocarray(aia->aia, aia->size + 1,
+					   sizeof(aia->aia[0]));
 		if (tmp == NULL) {
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 		}
