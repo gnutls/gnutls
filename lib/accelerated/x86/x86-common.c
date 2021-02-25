@@ -674,6 +674,13 @@ void register_x86_padlock_crypto(unsigned capabilities)
 			gnutls_assert();
 		}
 
+		ret =
+		    gnutls_crypto_single_cipher_register
+		    (GNUTLS_CIPHER_AES_192_CBC, 80, &_gnutls_aes_padlock, 0);
+		if (ret < 0) {
+			gnutls_assert();
+		}
+
 		/* register GCM ciphers */
 		ret =
 		    gnutls_crypto_single_cipher_register
