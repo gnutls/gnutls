@@ -41,7 +41,8 @@ aes_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx, int enc)
 {
 	/* we use key size to distinguish */
 	if (algorithm != GNUTLS_CIPHER_AES_128_CBC
-	    && algorithm != GNUTLS_CIPHER_AES_256_CBC)
+	    && algorithm != GNUTLS_CIPHER_AES_256_CBC
+		&& algorithm != GNUTLS_CIPHER_AES_192_CBC)
 		return GNUTLS_E_INVALID_REQUEST;
 
 	*_ctx = gnutls_calloc(1, sizeof(struct padlock_ctx));
@@ -59,7 +60,8 @@ padlock_aes_cipher_setkey(void *_ctx, const void *userkey, size_t keysize)
 {
 	struct padlock_ctx *ctx = _ctx;
 	struct padlock_cipher_data *pce;
-	struct aes256_ctx nc;
+	struct aes192_ctx nc192;
+	struct aes256_ctx nc256;
 
 	memset(_ctx, 0, sizeof(struct padlock_cipher_data));
 
@@ -74,17 +76,28 @@ padlock_aes_cipher_setkey(void *_ctx, const void *userkey, size_t keysize)
 		memcpy(pce->ks.rd_key, userkey, 16);
 		pce->cword.b.keygen = 0;
 		break;
+	case 24:
+		pce->cword.b.ksize = 1;
+		pce->cword.b.rounds = 12;
+		if (ctx->enc)
+				aes192_set_encrypt_key(&nc192, userkey);
+		else
+			aes192_set_decrypt_key(&nc192, userkey);
+		memcpy(pce->ks.rd_key, nc192.keys, sizeof(nc192.keys));
+		pce->ks.rounds = _AES192_ROUNDS;
+		pce->cword.b.keygen = 1;
+		break;
 	case 32:
 		pce->cword.b.ksize = 2;
 		pce->cword.b.rounds = 14;
 
 		/* expand key using nettle */
 		if (ctx->enc)
-			aes256_set_encrypt_key(&nc, userkey);
+			aes256_set_encrypt_key(&nc256, userkey);
 		else
-			aes256_set_decrypt_key(&nc, userkey);
+			aes256_set_decrypt_key(&nc256, userkey);
 
-		memcpy(pce->ks.rd_key, nc.keys, sizeof(nc.keys));
+		memcpy(pce->ks.rd_key, nc256.keys, sizeof(nc256.keys));
 		pce->ks.rounds = _AES256_ROUNDS;
 
 		pce->cword.b.keygen = 1;
