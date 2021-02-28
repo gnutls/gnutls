@@ -311,8 +311,8 @@ static bool _gnutls_has_cert_credentials(gnutls_session_t session,
  * and in some cases a matching certificate exists. A check for
  * the latter can be toggled via the parameter @check_credentials.
  */
-int
-_gnutls_session_cert_type_supported(gnutls_session_t session,
+bool
+_gnutls_session_is_cert_type_supported(gnutls_session_t session,
 				    gnutls_certificate_type_t cert_type,
 				    bool check_credentials,
 				    gnutls_ctype_target_t target)

@@ -173,8 +173,7 @@ static int _gnutls_client_cert_type_recv_params(gnutls_session_t session,
 			                      session, gnutls_certificate_type_get_name(cert_type));
 
 			// Check for support of this cert type
-			if (_gnutls_session_cert_type_supported
-					(session, cert_type, false, GNUTLS_CTYPE_CLIENT) == 0) {
+			if (_gnutls_session_is_cert_type_supported(session, cert_type, false, GNUTLS_CTYPE_CLIENT) == 0) {
 				found = 1;
 				break;
 			}
@@ -253,7 +252,7 @@ static int _gnutls_client_cert_type_send_params(gnutls_session_t session,
 			for (i = 0; i < cert_priorities->num_priorities; i++) {
 				cert_type = cert_priorities->priorities[i];
 
-				if (_gnutls_session_cert_type_supported(session, cert_type,
+				if (_gnutls_session_is_cert_type_supported(session, cert_type,
 				    true, GNUTLS_CTYPE_CLIENT) == 0) {
 					/* Check whether we are allowed to store another cert type
 					 * in our buffer. In other words, prevent a possible buffer

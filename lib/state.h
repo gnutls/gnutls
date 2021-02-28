@@ -77,7 +77,7 @@ _gnutls_hello_set_default_version(gnutls_session_t session,
 	}
 
 
-int _gnutls_session_cert_type_supported(gnutls_session_t session,
+bool _gnutls_session_is_cert_type_supported(gnutls_session_t session,
 				    gnutls_certificate_type_t cert_type,
 				    bool check_credentials,
 				    gnutls_ctype_target_t target);
