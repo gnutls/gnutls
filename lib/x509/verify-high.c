@@ -1495,10 +1495,10 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 
 		/* If the issuer of the certificate is known, no need
 		 * for further processing. */
-		if (_gnutls_trust_list_get_issuer(list,
-						  cert_list[i - 1],
-						  &issuer,
-						  0) == 0) {
+		if (gnutls_x509_trust_list_get_issuer(list,
+						      cert_list[i - 1],
+						      &issuer,
+						      0) == 0) {
 			cert_list_size = i;
 			break;
 		}
