@@ -236,16 +236,6 @@ static int _gnutls_global_init(unsigned constructor)
 
 	_gnutls_init++;
 	if (_gnutls_init > 1) {
-		if (_gnutls_init == 2 && _gnutls_init_ret == 0) {
-			/* some applications may close the urandom fd 
-			 * before calling gnutls_global_init(). in that
-			 * case reopen it */
-			ret = _gnutls_rnd_check();
-			if (ret < 0) {
-				gnutls_assert();
-				goto out;
-			}
-		}
 		ret = _gnutls_init_ret;
 		goto out;
 	}
