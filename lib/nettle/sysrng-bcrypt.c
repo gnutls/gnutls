@@ -64,11 +64,6 @@ int _rnd_get_system_entropy_win32(void* rnd, size_t size)
 	return 0;
 }
 
-int _rnd_system_entropy_check(void)
-{
-	return 0;
-}
-
 int _rnd_system_entropy_init(void)
 {
 	NTSTATUS err = BCryptOpenAlgorithmProvider

@@ -159,12 +159,6 @@ static int _rnd_get_system_entropy_urandom(void* _rnd, size_t size)
 	return 0;
 }
 
-int _rnd_system_entropy_check(void)
-{
-	/* A no-op now when we open and close /dev/urandom every time */
-	return 0;
-}
-
 int _rnd_system_entropy_init(void)
 {
 	int urandom_fd;
