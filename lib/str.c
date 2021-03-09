@@ -138,6 +138,36 @@ gnutls_buffer_append_data(gnutls_buffer_t dest, const void *data,
 	return 0;
 }
 
+#ifdef AGGRESSIVE_REALLOC
+
+/* Use a simpler logic for reallocation; i.e., always call
+ * gnutls_realloc_fast() and do not reclaim the no-longer-used
+ * area which has been removed from the beginning of buffer
+ * with _gnutls_buffer_pop_datum().  This helps hit more
+ * issues when running under valgrind.
+ */
+int _gnutls_buffer_resize(gnutls_buffer_st * dest, size_t new_size)
+{
+	size_t unused;
+
+	if (unlikely(dest->data != NULL && dest->allocd == NULL))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	unused = MEMSUB(dest->data, dest->allocd);
+	dest->allocd =
+	    gnutls_realloc_fast(dest->allocd, new_size);
+	if (dest->allocd == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+	dest->max_length = new_size;
+	dest->data = dest->allocd + unused;
+
+	return 0;
+}
+
+#else
+
 int _gnutls_buffer_resize(gnutls_buffer_st * dest, size_t new_size)
 {
 	if (unlikely(dest->data != NULL && dest->allocd == NULL))
@@ -170,6 +200,8 @@ int _gnutls_buffer_resize(gnutls_buffer_st * dest, size_t new_size)
 		return 0;
 	}
 }
+
+#endif
 
 /* Appends the provided string. The null termination byte is appended
  * but not included in length.
