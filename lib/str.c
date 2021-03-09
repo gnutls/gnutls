@@ -113,7 +113,7 @@ gnutls_buffer_append_data(gnutls_buffer_t dest, const void *data,
 			   size_t data_size)
 {
 	size_t const tot_len = data_size + dest->length;
-	size_t const unused = MEMSUB(dest->data, dest->allocd);
+	int ret;
 
 	if (unlikely(dest->data != NULL && dest->allocd == NULL))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -126,25 +126,9 @@ gnutls_buffer_append_data(gnutls_buffer_t dest, const void *data,
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 	}
 
-	if (dest->max_length >= tot_len) {
-
-		if (dest->max_length - unused <= tot_len) {
-			align_allocd_with_data(dest);
-		}
-	} else {
-		size_t const new_len =
-		    MAX(data_size, MIN_CHUNK) + MAX(dest->max_length,
-						    MIN_CHUNK);
-
-		dest->allocd = gnutls_realloc_fast(dest->allocd, new_len);
-		if (dest->allocd == NULL) {
-			gnutls_assert();
-			return GNUTLS_E_MEMORY_ERROR;
-		}
-		dest->max_length = new_len;
-		dest->data = dest->allocd + unused;
-
-		align_allocd_with_data(dest);
+	ret = _gnutls_buffer_resize(dest, tot_len);
+	if (ret < 0) {
+		return ret;
 	}
 	assert(dest->data != NULL);
 
