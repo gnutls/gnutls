@@ -389,6 +389,33 @@ fedora-valgrind/test:
   only:
     - branches@gnutls/gnutls
 
+fedora-valgrind-aggressive/build:
+  extends:
+    - .build
+    - .fedora
+  script:
+    - ./bootstrap
+    # gcc in fedora31 inlines strcmp in a way that causes valgrind errors
+    - CFLAGS="-O2 -g -fno-builtin-strcmp -DAGGRESSIVE_REALLOC" ./configure --disable-gcc-warnings --disable-doc --cache-file $CCACHE_FILE --disable-guile --disable-full-test-suite --enable-valgrind-tests
+    - make -j$BUILDJOBS
+    - make -j$BUILDJOBS check TESTS=""
+  only:
+    - branches@gnutls/gnutls
+
+fedora-valgrind-aggressive/test:
+  extends:
+    - .test
+    - .fedora
+  script:
+    - GNUTLS_TEST_TIMEOUT=600000 make -j$(nproc) check
+  dependencies:
+    - fedora-valgrind-aggressive/build
+  needs:
+    - fedora-valgrind-aggressive/build
+  timeout: 5h
+  only:
+    - branches@gnutls/gnutls
+
 fedora-threadsan/build:
   extends:
     - .build
