@@ -87,15 +87,6 @@ void _gnutls_buffer_clear(gnutls_buffer_st * str)
 
 #define MIN_CHUNK 1024
 
-static void align_allocd_with_data(gnutls_buffer_st * dest)
-{
-	assert(dest->allocd != NULL);
-	assert(dest->data != NULL);
-	if (dest->length)
-		memmove(dest->allocd, dest->data, dest->length);
-	dest->data = dest->allocd;
-}
-
 /**
  * gnutls_buffer_append_data:
  * @dest: the buffer to append to
@@ -155,18 +146,27 @@ int _gnutls_buffer_resize(gnutls_buffer_st * dest, size_t new_size)
 
 	unused = MEMSUB(dest->data, dest->allocd);
 	dest->allocd =
-	    gnutls_realloc_fast(dest->allocd, new_size);
+	    gnutls_realloc_fast(dest->allocd, new_size + unused);
 	if (dest->allocd == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-	dest->max_length = new_size;
+	dest->max_length = new_size + unused;
 	dest->data = dest->allocd + unused;
 
 	return 0;
 }
 
 #else
+
+static void align_allocd_with_data(gnutls_buffer_st * dest)
+{
+	assert(dest->allocd != NULL);
+	assert(dest->data != NULL);
+	if (dest->length)
+		memmove(dest->allocd, dest->data, dest->length);
+	dest->data = dest->allocd;
+}
 
 int _gnutls_buffer_resize(gnutls_buffer_st * dest, size_t new_size)
 {
