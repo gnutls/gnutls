@@ -5,6 +5,36 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.7.1 (released 2021-03-10)
+
+** libgnutls: Fixed potential use-after-free in sending "key_share"
+   and "pre_shared_key" extensions. When sending those extensions, the
+   client may dereference a pointer no longer valid after
+   realloc. This happens only when the client sends a large Client
+   Hello message, e.g., when HRR is sent in a resumed session
+   previously negotiated large FFDHE parameters, because the initial
+   allocation of the buffer is large enough without having to call
+   realloc (#1151).  [GNUTLS-SA-2021-03-10, CVSS: low]
+
+** libgnutls: Fixed a regression in handling duplicated certs in a
+   chain (#1131).
+
+** libgnutls: Fixed sending of session ID in TLS 1.3 middlebox
+   compatibiltiy mode. In that mode the client shall always send a
+   non-zero session ID to make the handshake resemble the TLS 1.2
+   resumption; this was not true in the previous versions (#1074).
+
+** libgnutls: W32 performance improvement with a new sendmsg()-like
+   transport implementation (!1377).
+
+** libgnutls: Removed dependency on the external 'fipscheck' package,
+   when compiled with --enable-fips140-mode (#1101).
+
+** libgnutls: Added padlock acceleration for AES-192-CBC (#1004).
+
+** API and ABI modifications:
+No changes since last version.
+
 * Version 3.7.0 (released 2020-12-02)
 
 ** libgnutls: Depend on nettle 3.6 (!1322).
