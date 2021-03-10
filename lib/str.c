@@ -155,12 +155,12 @@ int _gnutls_buffer_resize(gnutls_buffer_st * dest, size_t new_size)
 
 	unused = MEMSUB(dest->data, dest->allocd);
 	dest->allocd =
-	    gnutls_realloc_fast(dest->allocd, new_size);
+	    gnutls_realloc_fast(dest->allocd, new_size + unused);
 	if (dest->allocd == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-	dest->max_length = new_size;
+	dest->max_length = new_size + unused;
 	dest->data = dest->allocd + unused;
 
 	return 0;
