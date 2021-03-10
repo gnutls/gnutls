@@ -308,14 +308,14 @@ static int check_fast_pclmul(void)
 	unsigned int a,b,c,d;
 	unsigned int family,model;
 
-	if (__get_cpuid(1, &a, &b, &c, &d))
+	if (!__get_cpuid(1, &a, &b, &c, &d))
 		return 0;
 
 	family = ((a >> 8) & 0x0F);
 	model = ((a >> 4) & 0x0F) + ((a >> 12) & 0xF0);
 
-	if(((family == 0x6) && (model == 0xf || model == 0x19)) ||
-		((family == 0x7) && (model == 0x1B || model == 0x3B)))
+	if (((family == 0x6) && (model == 0xf || model == 0x19)) ||
+	    ((family == 0x7) && (model == 0x1B || model == 0x3B)))
 		return 1;
 	else
 		return 0;
@@ -584,7 +584,7 @@ void register_x86_padlock_crypto(unsigned capabilities)
 			/* register GCM ciphers */
 			_gnutls_debug_log
 				("Zhaoxin GCM accelerator was detected\n");
-			if (check_avx_movbe() && !check_fast_pclmul()) {
+			if (check_avx_movbe() && check_fast_pclmul()) {
 				_gnutls_debug_log
 				    ("Zhaoxin GCM accelerator (AVX) was detected\n");
 				ret =
