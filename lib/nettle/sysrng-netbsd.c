@@ -71,11 +71,6 @@ int _rnd_system_entropy_init(void)
 	return 0;
 }
 
-int _rnd_system_entropy_check(void)
-{
-	return 0;
-}
-
 void _rnd_system_entropy_deinit(void)
 {
 	return;

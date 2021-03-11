@@ -46,10 +46,6 @@
 #include <sys/time.h>
 #include <fcntl.h>
 
-static int _gnutls_urandom_fd = -1;
-static ino_t _gnutls_urandom_fd_ino = 0;
-static dev_t _gnutls_urandom_fd_rdev = 0;
-
 get_entropy_func _rnd_get_system_entropy = NULL;
 
 #if defined(__linux__)
@@ -127,11 +123,18 @@ static int _rnd_get_system_entropy_urandom(void* _rnd, size_t size)
 {
 	uint8_t* rnd = _rnd;
 	uint32_t done;
+	int urandom_fd;
+
+	urandom_fd = open("/dev/urandom", O_RDONLY);
+	if (urandom_fd < 0) {
+		_gnutls_debug_log("Cannot open /dev/urandom!\n");
+		return GNUTLS_E_RANDOM_DEVICE_ERROR;
+	}
 
 	for (done = 0; done < size;) {
 		int res;
 		do {
-			res = read(_gnutls_urandom_fd, rnd + done, size - done);
+			res = read(urandom_fd, rnd + done, size - done);
 		} while (res < 0 && errno == EINTR);
 
 		if (res <= 0) {
@@ -145,74 +148,51 @@ static int _rnd_get_system_entropy_urandom(void* _rnd, size_t size)
 					("Failed to read /dev/urandom: end of file\n");
 			}
 
+			close(urandom_fd);
 			return GNUTLS_E_RANDOM_DEVICE_ERROR;
 		}
 
 		done += res;
 	}
 
-	return 0;
-}
-
-/* This is called when gnutls_global_init() is called for second time.
- * It must check whether any resources are still available.
- * The particular problem it solves is to verify that the urandom fd is still
- * open (for applications that for some reason closed all fds */
-int _rnd_system_entropy_check(void)
-{
-	int ret;
-	struct stat st;
-
-	if (_gnutls_urandom_fd == -1) /* not using urandom */
-		return 0;
-
-	ret = fstat(_gnutls_urandom_fd, &st);
-	if (ret < 0 || st.st_ino != _gnutls_urandom_fd_ino || st.st_rdev != _gnutls_urandom_fd_rdev) {
-		return _rnd_system_entropy_init();
-	}
+	close(urandom_fd);
 	return 0;
 }
 
 int _rnd_system_entropy_init(void)
 {
-	int old;
-	struct stat st;
+	int urandom_fd;
 
 #if defined(__linux__)
 	/* Enable getrandom() usage if available */
 	if (have_getrandom()) {
 		_rnd_get_system_entropy = _rnd_get_system_entropy_getrandom;
-		_gnutls_debug_log("getrandom random generator was detected\n");
+		_gnutls_debug_log("getrandom random generator was selected\n");
 		return 0;
+	} else {
+		_gnutls_debug_log("getrandom is not available\n");
 	}
 #endif
 
-	/* First fallback: /dev/unrandom */
-	_gnutls_urandom_fd = open("/dev/urandom", O_RDONLY);
-	if (_gnutls_urandom_fd < 0) {
-		_gnutls_debug_log("Cannot open urandom!\n");
+	/* Fallback: /dev/urandom */
+
+	/* Check that we can open it */
+	urandom_fd = open("/dev/urandom", O_RDONLY);
+	if (urandom_fd < 0) {
+		_gnutls_debug_log("Cannot open /dev/urandom during initialization!\n");
 		return gnutls_assert_val(GNUTLS_E_RANDOM_DEVICE_ERROR);
 	}
-
-	old = fcntl(_gnutls_urandom_fd, F_GETFD);
-	if (old != -1)
-		fcntl(_gnutls_urandom_fd, F_SETFD, old | FD_CLOEXEC);
-
-	if (fstat(_gnutls_urandom_fd, &st) >= 0) {
-		_gnutls_urandom_fd_ino = st.st_ino;
-		_gnutls_urandom_fd_rdev = st.st_rdev;
-	}
+	close(urandom_fd);
 
 	_rnd_get_system_entropy = _rnd_get_system_entropy_urandom;
+	_gnutls_debug_log("/dev/urandom random generator was selected\n");
 
 	return 0;
 }
 
 void _rnd_system_entropy_deinit(void)
 {
-	if (_gnutls_urandom_fd >= 0) {
-		close(_gnutls_urandom_fd);
-		_gnutls_urandom_fd = -1;
-	}
+	/* A no-op now when we open and close /dev/urandom every time */
+	return;
 }
 

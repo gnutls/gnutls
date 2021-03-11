@@ -35,7 +35,6 @@
 #include <fips.h>
 
 int _rnd_system_entropy_init(void);
-int _rnd_system_entropy_check(void);
 void _rnd_system_entropy_deinit(void);
 
 typedef int (*get_entropy_func)(void* rnd, size_t size);
