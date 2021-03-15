@@ -54,7 +54,7 @@ verify_certificate_chain(const char *hostname,
         CHECK(gnutls_x509_trust_list_add_crls(tlist, crl_list, crl_list_size,
                                               GNUTLS_TL_VERIFY_CRL, 0));
 
-        cert = malloc(sizeof(*cert) * cert_chain_length);
+        cert = gnutls_calloc(cert_chain_length, sizeof(*cert));
         assert(cert != NULL);
 
         /* Import all the certificates in the chain to
@@ -103,6 +103,11 @@ verify_certificate_chain(const char *hostname,
                     ("The certificate's owner does not match hostname '%s'\n",
                      hostname);
         }
+
+        for (i = 0; i < cert_chain_length; i++) {
+                gnutls_x509_crt_deinit(cert[i]);
+        }
+	gnutls_free(cert);
 
         gnutls_x509_trust_list_deinit(tlist, 1);
 
