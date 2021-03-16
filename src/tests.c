@@ -587,17 +587,26 @@ test_code_t test_dhe_group(gnutls_session_t session)
 			gnutls_datum_t p3;
 			
 			ret2 = gnutls_dh_params_init(&dhp);
-			if (ret2 < 0)
+			if (ret2 < 0) {
+				fclose(fp);
 				return TEST_FAILED;
+			}
 
 			ret2 = gnutls_dh_params_import_raw(dhp, &prime, &gen);
-			if (ret2 < 0)
+			if (ret2 < 0) {
+				gnutls_dh_params_deinit(dhp);
+				fclose(fp);
 				return TEST_FAILED;
+			}
 
 			ret2 = gnutls_dh_params_export2_pkcs3(dhp, GNUTLS_X509_FMT_PEM, &p3);
-			if (ret2 < 0)
+			if (ret2 < 0) {
+				gnutls_dh_params_deinit(dhp);
+				fclose(fp);
 				return TEST_FAILED;
+			}
 
+			gnutls_dh_params_deinit(dhp);
 			fprintf(fp, "\n%s\n", p3.data);
 			gnutls_free(p3.data);
 		}

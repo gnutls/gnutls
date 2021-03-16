@@ -109,6 +109,7 @@ bindtoaddress (char *addrport)
   if (!rp)
     {
       fprintf (stderr, "Error binding to %s:%s: %m\n", addr, port);
+      freeaddrinfo (result);
       return -1;
     }
 
@@ -172,6 +173,7 @@ connecttoaddress (char *addrport)
   if (!rp)
     {
       fprintf (stderr, "Error connecting to %s:%s: %m\n", addr, port);
+      freeaddrinfo (result);
       return -1;
     }
 
@@ -341,26 +343,32 @@ processoptions (int argc, char **argv)
 	  break;
 
 	case 'c':
+	  free (connectaddr);
 	  connectaddr = strdup (optarg);
 	  break;
 
 	case 'l':
+	  free (listenaddr);
 	  listenaddr = strdup (optarg);
 	  break;
 
 	case 'K':
+	  free (keyfile);
 	  keyfile = strdup (optarg);
 	  break;
 
 	case 'C':
+	  free (certfile);
 	  certfile = strdup (optarg);
 	  break;
 
 	case 'A':
+	  free (cacertfile);
 	  cacertfile = strdup (optarg);
 	  break;
 
 	case 'H':
+	  free (hostname);
 	  hostname = strdup (optarg);
 	  break;
 

@@ -519,6 +519,7 @@ socket_open2(socket_st * hd, const char *hostname, const char *service,
 				 NI_NUMERICHOST | NI_NUMERICSERV)) != 0) {
 			fprintf(stderr, "getnameinfo(): %s\n",
 				gai_strerror(err));
+			close(sd);
 			continue;
 		}
 
@@ -550,8 +551,10 @@ socket_open2(socket_st * hd, const char *hostname, const char *service,
 			if (msg)
 				log_msg(stdout, "%s '%s:%s'...\n", msg, buffer, portname);
 
-			if ((err = connect(sd, ptr->ai_addr, ptr->ai_addrlen)) < 0)
+			if ((err = connect(sd, ptr->ai_addr, ptr->ai_addrlen)) < 0) {
+				close(sd);
 				continue;
+			}
 		}
 
 		hd->fd = sd;
@@ -565,6 +568,7 @@ socket_open2(socket_st * hd, const char *hostname, const char *service,
 			hd->session = init_tls_session(hostname);
 			if (hd->session == NULL) {
 				fprintf(stderr, "error initializing session\n");
+				close(sd);
 				exit(1);
 			}
 		}
@@ -574,6 +578,7 @@ socket_open2(socket_st * hd, const char *hostname, const char *service,
 				ret = gnutls_record_send_early_data(hd->session, hd->edata.data, hd->edata.size);
 				if (ret < 0) {
 					fprintf(stderr, "error sending early data\n");
+					close(sd);
 					exit(1);
 				}
 			}
@@ -598,11 +603,13 @@ socket_open2(socket_st * hd, const char *hostname, const char *service,
 			if (err == GNUTLS_E_PUSH_ERROR) { /* failed connecting */
 				gnutls_deinit(hd->session);
 				hd->session = NULL;
+				close(sd);
 				continue;
 			}
 			else if (err < 0) {
 				if (!(flags & SOCKET_FLAG_DONT_PRINT_ERRORS))
 					fprintf(stderr, "*** handshake has failed: %s\n", gnutls_strerror(err));
+				close(sd);
 				exit(1);
 			}
 		}
