@@ -28,6 +28,7 @@ IMAGES = \
 	gnutls-handshake-state.png	\
 	gnutls-layers.png gnutls-modauth.png \
 	gnutls-client-server-use-case.png			\
+	gnutls-crypto-layers.png				\
 	gnutls-handshake-sequence.png gnutls-internals.png	\
 	gnutls-logo.png gnutls-x509.png	\
 	pkcs11-vision.png
