@@ -219,8 +219,7 @@ find_ext_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
 
 			find_data->exts = gnutls_realloc_fast(find_data->exts, (1+find_data->exts_size)*sizeof(find_data->exts[0]));
 			if (find_data->exts == NULL) {
-				gnutls_assert();
-				ret = pkcs11_rv_to_err(rv);
+				ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 				goto cleanup;
 			}
 
