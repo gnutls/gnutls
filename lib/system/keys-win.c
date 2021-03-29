@@ -974,7 +974,8 @@ void gnutls_system_key_iter_deinit(gnutls_system_key_iter_t iter)
 {
 	if (ncrypt_init == 0)
 		return;
-
+	if (iter->cert != NULL)
+		CertFreeCertificateContext(iter->cert);
 	CertCloseStore(iter->store, 0);
 	gnutls_free(iter);
 }
