@@ -40,6 +40,7 @@
 #include "x509/x509_int.h"
 
 #include <atfork.h>
+#include "intprops.h"
 
 #define MAX_PROVIDERS 16
 
@@ -3290,6 +3291,11 @@ find_multi_objs_cb(struct ck_function_list *module, struct pkcs11_session_info *
 	       && count > 0) {
 		unsigned j;
 		gnutls_datum_t id;
+
+		if (unlikely(INT_ADD_OVERFLOW(find_data->current, count))) {
+			ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+			goto fail;
+		}
 
 		find_data->p_list =
 			_gnutls_reallocarray_fast(find_data->p_list,

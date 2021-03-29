@@ -31,6 +31,7 @@
 #include "x509_ext_int.h"
 #include "virt-san.h"
 #include <gnutls/x509-ext.h>
+#include "intprops.h"
 
 #define MAX_ENTRIES 64
 struct gnutls_subject_alt_names_st {
@@ -136,6 +137,10 @@ int subject_alt_names_set(struct name_st **names,
 {
 	void *tmp;
 	int ret;
+
+	if (unlikely(INT_ADD_OVERFLOW(*size, 1))) {
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+	}
 
 	tmp = _gnutls_reallocarray(*names, *size + 1, sizeof((*names)[0]));
 	if (tmp == NULL) {
@@ -2316,6 +2321,10 @@ int crl_dist_points_set(gnutls_x509_crl_dist_points_t cdp,
 {
 	void *tmp;
 
+	if (unlikely(INT_ADD_OVERFLOW(cdp->size, 1))) {
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+	}
+
 	/* new dist point */
 	tmp = _gnutls_reallocarray(cdp->points, cdp->size + 1,
 				   sizeof(cdp->points[0]));
@@ -2733,6 +2742,10 @@ int gnutls_x509_aia_set(gnutls_x509_aia_t aia,
 	void *tmp;
 	unsigned indx;
 
+	if (unlikely(INT_ADD_OVERFLOW(aia->size, 1))) {
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+	}
+
 	tmp = _gnutls_reallocarray(aia->aia, aia->size + 1, sizeof(aia->aia[0]));
 	if (tmp == NULL) {
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
@@ -2785,6 +2798,9 @@ static int parse_aia(ASN1_TYPE c2, gnutls_x509_aia_t aia)
 		}
 
 		indx = aia->size;
+		if (unlikely(INT_ADD_OVERFLOW(aia->size, 1))) {
+			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		}
 		tmp = _gnutls_reallocarray(aia->aia, aia->size + 1,
 					   sizeof(aia->aia[0]));
 		if (tmp == NULL) {

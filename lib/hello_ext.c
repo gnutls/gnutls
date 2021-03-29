@@ -57,6 +57,7 @@
 #include <num.h>
 #include <ext/client_cert_type.h>
 #include <ext/server_cert_type.h>
+#include "intprops.h"
 
 static void
 unset_ext_data(gnutls_session_t session, const struct hello_ext_entry_st *, unsigned idx);
@@ -921,6 +922,10 @@ gnutls_session_ext_register(gnutls_session_t session,
 			tmp_mod.validity |= GNUTLS_EXT_FLAG_DTLS;
 		else
 			tmp_mod.validity |= GNUTLS_EXT_FLAG_TLS;
+	}
+
+	if (unlikely(INT_ADD_OVERFLOW(session->internals.rexts_size, 1))) {
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 	}
 
 	exts = _gnutls_reallocarray(session->internals.rexts,

@@ -38,6 +38,7 @@
 #include <auth/cert.h>
 
 #include <assert.h>
+#include "intprops.h"
 
 typedef struct gnutls_ocsp_req_int {
 	ASN1_TYPE req;
@@ -1905,6 +1906,11 @@ gnutls_ocsp_resp_get_certs(gnutls_ocsp_resp_const_t resp,
 			goto error;
 		}
 
+		if (unlikely(INT_ADD_OVERFLOW(ctr, 2))) {
+			ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+			goto error;
+		}
+
 		tmpcerts2 = _gnutls_reallocarray_fast(tmpcerts, ctr + 2,
 						      sizeof(*tmpcerts));
 		if (tmpcerts2 == NULL) {
@@ -2454,6 +2460,11 @@ gnutls_ocsp_resp_list_import2(gnutls_ocsp_resp_t **ocsps,
 			ret = gnutls_ocsp_resp_import2(resp, &p, GNUTLS_X509_FMT_PEM);
 			if (ret < 0) {
 				gnutls_assert();
+				goto fail;
+			}
+
+			if (unlikely(INT_ADD_OVERFLOW(*size, 1))) {
+				ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 				goto fail;
 			}
 

@@ -28,6 +28,7 @@
 #include <pkcs11_int.h>
 #include <p11-kit/p11-kit.h>
 #include "pkcs11x.h"
+#include "intprops.h"
 
 struct find_ext_data_st {
 	/* in */
@@ -216,6 +217,11 @@ find_ext_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
 	while(pkcs11_find_objects(sinfo->module, sinfo->pks, &obj, 1, &count) == CKR_OK && count == 1) {
 		rv = pkcs11_get_attribute_avalue(sinfo->module, sinfo->pks, obj, CKA_VALUE, &ext);
 		if (rv == CKR_OK) {
+
+			if (unlikely(INT_ADD_OVERFLOW(find_data->exts_size, 1))) {
+				ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+				goto cleanup;
+			}
 
 			find_data->exts =
 				_gnutls_reallocarray_fast(find_data->exts,

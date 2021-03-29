@@ -43,6 +43,7 @@
 #include "x509/common.h"
 #include "dh.h"
 #include "cert-cred.h"
+#include "intprops.h"
 
 
 /*
@@ -55,6 +56,10 @@ _gnutls_certificate_credential_append_keypair(gnutls_certificate_credentials_t r
 				       gnutls_pcert_st * crt,
 				       int nr)
 {
+	if (unlikely(INT_ADD_OVERFLOW(res->ncerts, 1))) {
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+	}
+
 	res->sorted_cert_idx = _gnutls_reallocarray_fast(res->sorted_cert_idx,
 							 res->ncerts + 1,
 							 sizeof(unsigned int));

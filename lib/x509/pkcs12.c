@@ -37,6 +37,7 @@
 #include "x509_int.h"
 #include "pkcs7_int.h"
 #include <random.h>
+#include "intprops.h"
 
 
 /* Decodes the PKCS #12 auth_safe, and returns the allocated raw data,
@@ -1455,6 +1456,10 @@ static int make_chain(gnutls_x509_crt_t ** chain, unsigned int *chain_len,
 			    != 0)
 				goto skip;
 
+			if (unlikely(INT_ADD_OVERFLOW(*chain_len, 1))) {
+				return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+			}
+
 			*chain = _gnutls_reallocarray_fast(*chain,
 							   ++(*chain_len),
 							   sizeof((*chain)[0]));
@@ -1777,6 +1782,11 @@ gnutls_pkcs12_simple_parse(gnutls_pkcs12_t p12,
 				}
 
 				if (memcmp(cert_id, key_id, cert_id_size) != 0) {	/* they don't match - skip the certificate */
+					if (unlikely(INT_ADD_OVERFLOW(_extra_certs_len, 1))) {
+						ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+						goto done;
+					}
+
 					_extra_certs =
 						_gnutls_reallocarray_fast(_extra_certs,
 									  ++_extra_certs_len,
