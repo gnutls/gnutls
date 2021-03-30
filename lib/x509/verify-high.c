@@ -34,6 +34,7 @@
 #include <common.h>
 #include <gnutls/x509-ext.h>
 #include "verify-high.h"
+#include "intprops.h"
 
 struct named_cert_st {
 	gnutls_x509_crt_t cert;
@@ -128,10 +129,14 @@ cert_set_add(struct cert_set_st *set, const gnutls_x509_crt_t cert)
 	hash = hash_pjw_bare(cert->raw_dn.data, cert->raw_dn.size);
 	hash %= set->size;
 
+	if (unlikely(INT_ADD_OVERFLOW(set->node[hash].size, 1))) {
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+	}
+
 	set->node[hash].certs =
-		gnutls_realloc_fast(set->node[hash].certs,
-				    (set->node[hash].size + 1) *
-				    sizeof(*set->node[hash].certs));
+		_gnutls_reallocarray_fast(set->node[hash].certs,
+					  set->node[hash].size + 1,
+					  sizeof(*set->node[hash].certs));
 	if (!set->node[hash].certs) {
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 	}
@@ -297,11 +302,14 @@ static int
 trust_list_add_compat(gnutls_x509_trust_list_t list,
 			       gnutls_x509_crt_t cert)
 {
+	if (unlikely(INT_ADD_OVERFLOW(list->keep_certs_size, 1))) {
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+	}
+
 	list->keep_certs =
-		    gnutls_realloc_fast(list->keep_certs,
-					(list->keep_certs_size +
-					 1) *
-					sizeof(list->keep_certs[0]));
+		_gnutls_reallocarray_fast(list->keep_certs,
+					  list->keep_certs_size + 1,
+					  sizeof(list->keep_certs[0]));
 	if (list->keep_certs == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
@@ -379,12 +387,15 @@ gnutls_x509_trust_list_add_cas(gnutls_x509_trust_list_t list,
 			}
 		}
 
+		if (unlikely(INT_ADD_OVERFLOW(list->node[hash].trusted_ca_size, 1))) {
+			gnutls_assert();
+			return i;
+		}
+
 		list->node[hash].trusted_cas =
-		    gnutls_realloc_fast(list->node[hash].trusted_cas,
-					(list->node[hash].trusted_ca_size +
-					 1) *
-					sizeof(list->node[hash].
-					       trusted_cas[0]));
+			_gnutls_reallocarray_fast(list->node[hash].trusted_cas,
+						  list->node[hash].trusted_ca_size + 1,
+						  sizeof(list->node[hash].trusted_cas[0]));
 		if (list->node[hash].trusted_cas == NULL) {
 			gnutls_assert();
 			return i;
@@ -666,14 +677,18 @@ gnutls_x509_trust_list_remove_cas(gnutls_x509_trust_list_t list,
 			}
 		}
 
+		if (unlikely(INT_ADD_OVERFLOW(list->blacklisted_size, 1))) {
+			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		}
+
 		/* Add the CA (or plain) certificate to the black list as well.
 		 * This will prevent a subordinate CA from being valid, and
 		 * ensure that a server certificate will also get rejected.
 		 */
 		list->blacklisted =
-		    gnutls_realloc_fast(list->blacklisted,
-				(list->blacklisted_size + 1) *
-				sizeof(list->blacklisted[0]));
+			_gnutls_reallocarray_fast(list->blacklisted,
+						  list->blacklisted_size + 1,
+						  sizeof(list->blacklisted[0]));
 		if (list->blacklisted == NULL)
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
@@ -728,11 +743,14 @@ gnutls_x509_trust_list_add_named_crt(gnutls_x509_trust_list_t list,
 			  cert->raw_issuer_dn.size);
 	hash %= list->size;
 
+	if (unlikely(INT_ADD_OVERFLOW(list->node[hash].named_cert_size, 1))) {
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+	}
+
 	list->node[hash].named_certs =
-	    gnutls_realloc_fast(list->node[hash].named_certs,
-				(list->node[hash].named_cert_size +
-				 1) *
-				sizeof(list->node[hash].named_certs[0]));
+		_gnutls_reallocarray_fast(list->node[hash].named_certs,
+					  list->node[hash].named_cert_size + 1,
+					  sizeof(list->node[hash].named_certs[0]));
 	if (list->node[hash].named_certs == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
@@ -842,19 +860,17 @@ gnutls_x509_trust_list_add_crls(gnutls_x509_trust_list_t list,
 			}
 		}
 
-		tmp =
-		    gnutls_realloc(list->node[hash].crls,
-					(list->node[hash].crl_size +
-					 1) *
-					sizeof(list->node[hash].
-					       crls[0]));
-		if (tmp == NULL) {
-			ret = i;
+		if (unlikely(INT_ADD_OVERFLOW(list->node[hash].crl_size, 1))) {
 			gnutls_assert();
-			if (flags & GNUTLS_TL_NO_DUPLICATES)
-				while (i < crl_size)
-					gnutls_x509_crl_deinit(crl_list[i++]);
-			return ret;
+			goto error;
+		}
+
+		tmp = _gnutls_reallocarray(list->node[hash].crls,
+					   list->node[hash].crl_size + 1,
+					   sizeof(list->node[hash].crls[0]));
+		if (tmp == NULL) {
+			gnutls_assert();
+			goto error;
 		}
 		list->node[hash].crls = tmp;
 
@@ -868,6 +884,13 @@ gnutls_x509_trust_list_add_crls(gnutls_x509_trust_list_t list,
 	}
 
 	return j;
+
+ error:
+	ret = i;
+	if (flags & GNUTLS_TL_NO_DUPLICATES)
+		while (i < crl_size)
+			gnutls_x509_crl_deinit(crl_list[i++]);
+	return ret;
 }
 
 /* Takes a certificate list and shortens it if there are

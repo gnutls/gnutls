@@ -43,6 +43,7 @@
 #include "x509/common.h"
 #include "dh.h"
 #include "cert-cred.h"
+#include "intprops.h"
 
 
 /*
@@ -55,15 +56,19 @@ _gnutls_certificate_credential_append_keypair(gnutls_certificate_credentials_t r
 				       gnutls_pcert_st * crt,
 				       int nr)
 {
-	res->sorted_cert_idx = gnutls_realloc_fast(res->sorted_cert_idx,
-						(1 + res->ncerts) *
-						sizeof(unsigned int));
+	if (unlikely(INT_ADD_OVERFLOW(res->ncerts, 1))) {
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+	}
+
+	res->sorted_cert_idx = _gnutls_reallocarray_fast(res->sorted_cert_idx,
+							 res->ncerts + 1,
+							 sizeof(unsigned int));
 	if (res->sorted_cert_idx == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-	res->certs = gnutls_realloc_fast(res->certs,
-					 (1 + res->ncerts) *
-					 sizeof(certs_st));
+	res->certs = _gnutls_reallocarray_fast(res->certs,
+					       res->ncerts + 1,
+					       sizeof(certs_st));
 	if (res->certs == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
@@ -204,7 +209,8 @@ gnutls_certificate_set_key(gnutls_certificate_credentials_t res,
 		gnutls_privkey_set_pin_function(key, res->pin.cb,
 						res->pin.data);
 
-	new_pcert_list = gnutls_malloc(sizeof(gnutls_pcert_st) * pcert_list_size);
+	new_pcert_list = _gnutls_reallocarray(NULL, pcert_list_size,
+					      sizeof(gnutls_pcert_st));
 	if (new_pcert_list == NULL) {
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 	}
@@ -451,7 +457,8 @@ static gnutls_pcert_st *alloc_and_load_x509_certs(gnutls_x509_crt_t *
 	if (certs == NULL)
 		return NULL;
 
-	local_certs = gnutls_malloc(sizeof(gnutls_pcert_st) * ncerts);
+	local_certs = _gnutls_reallocarray(NULL, ncerts,
+					   sizeof(gnutls_pcert_st));
 	if (local_certs == NULL) {
 		gnutls_assert();
 		return NULL;

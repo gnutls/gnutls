@@ -3700,7 +3700,7 @@ gnutls_x509_crt_list_import2(gnutls_x509_crt_t ** certs,
 	unsigned int init = 1024;
 	int ret;
 
-	*certs = gnutls_malloc(sizeof(gnutls_x509_crt_t) * init);
+	*certs = _gnutls_reallocarray(NULL, init, sizeof(gnutls_x509_crt_t));
 	if (*certs == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
@@ -3710,9 +3710,8 @@ gnutls_x509_crt_list_import2(gnutls_x509_crt_t ** certs,
 	    gnutls_x509_crt_list_import(*certs, &init, data, format,
 					flags | GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED);
 	if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER) {
-		*certs =
-		    gnutls_realloc_fast(*certs,
-					sizeof(gnutls_x509_crt_t) * init);
+		*certs = _gnutls_reallocarray_fast(*certs, init,
+						   sizeof(gnutls_x509_crt_t));
 		if (*certs == NULL) {
 			gnutls_assert();
 			return GNUTLS_E_MEMORY_ERROR;
@@ -4375,7 +4374,7 @@ gnutls_x509_crt_list_import_url(gnutls_x509_crt_t **certs,
 		gnutls_free(issuer.data);
 	}
 
-	*certs = gnutls_malloc(total*sizeof(gnutls_x509_crt_t));
+	*certs = _gnutls_reallocarray(NULL, total, sizeof(gnutls_x509_crt_t));
 	if (*certs == NULL) {
 		ret = GNUTLS_E_MEMORY_ERROR;
 		goto cleanup;

@@ -40,6 +40,7 @@
 #include "x509/x509_int.h"
 
 #include <atfork.h>
+#include "intprops.h"
 
 #define MAX_PROVIDERS 16
 
@@ -3059,8 +3060,8 @@ find_privkeys(struct pkcs11_session_info *sinfo,
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
 
-	list->key_ids =
-	    gnutls_malloc(sizeof(gnutls_buffer_st) * list->key_ids_size);
+	list->key_ids = _gnutls_reallocarray(NULL, list->key_ids_size,
+					     sizeof(gnutls_buffer_st));
 	if (list->key_ids == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
@@ -3277,7 +3278,7 @@ find_multi_objs_cb(struct ck_function_list *module, struct pkcs11_session_info *
 		return pkcs11_rv_to_err(rv);
 	}
 
-	ctx = gnutls_malloc(OBJECTS_A_TIME*sizeof(ctx[0]));
+	ctx = _gnutls_reallocarray(NULL, OBJECTS_A_TIME, sizeof(ctx[0]));
 	if (ctx == NULL) {
 		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 		goto fail;
@@ -3291,7 +3292,15 @@ find_multi_objs_cb(struct ck_function_list *module, struct pkcs11_session_info *
 		unsigned j;
 		gnutls_datum_t id;
 
-		find_data->p_list = gnutls_realloc_fast(find_data->p_list, (find_data->current+count)*sizeof(find_data->p_list[0]));
+		if (unlikely(INT_ADD_OVERFLOW(find_data->current, count))) {
+			ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+			goto fail;
+		}
+
+		find_data->p_list =
+			_gnutls_reallocarray_fast(find_data->p_list,
+						  find_data->current + count,
+						  sizeof(find_data->p_list[0]));
 		if (find_data->p_list == NULL) {
 			ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 			goto fail;

@@ -48,6 +48,7 @@
 #include "supplemental.h"
 #include "errors.h"
 #include "num.h"
+#include "intprops.h"
 
 typedef struct gnutls_supplemental_entry_st {
 	char *name;
@@ -252,8 +253,12 @@ _gnutls_supplemental_register(gnutls_supplemental_entry_st *entry)
 			return gnutls_assert_val(GNUTLS_E_ALREADY_REGISTERED);
 	}
 
-	p = gnutls_realloc_fast(suppfunc,
-				sizeof(*suppfunc) * (suppfunc_size + 1));
+	if (unlikely(INT_ADD_OVERFLOW(suppfunc_size, 1))) {
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+	}
+
+	p = _gnutls_reallocarray_fast(suppfunc, suppfunc_size + 1,
+				      sizeof(*suppfunc));
 	if (!p) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;

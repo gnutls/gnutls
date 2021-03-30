@@ -23,7 +23,7 @@
 #include "gnutls_int.h"
 #include "errors.h"
 #include <num.h>
-#include <xsize.h>
+#include "xalloc-oversized.h"
 
 gnutls_alloc_function gnutls_secure_malloc = malloc;
 gnutls_alloc_function gnutls_malloc = malloc;
@@ -32,16 +32,6 @@ gnutls_realloc_function gnutls_realloc = realloc;
 
 void *(*gnutls_calloc) (size_t, size_t) = calloc;
 char *(*gnutls_strdup) (const char *) = _gnutls_strdup;
-
-void *_gnutls_calloc(size_t nmemb, size_t size)
-{
-	void *ret;
-	size_t n = xtimes(nmemb, size);
-	ret = (size_in_bounds_p(n) ? gnutls_malloc(n) : NULL);
-	if (ret != NULL)
-		memset(ret, 0, size);
-	return ret;
-}
 
 /* This realloc will free ptr in case realloc
  * fails.
@@ -54,6 +44,23 @@ void *gnutls_realloc_fast(void *ptr, size_t size)
 		return ptr;
 
 	ret = gnutls_realloc(ptr, size);
+	if (ret == NULL) {
+		gnutls_free(ptr);
+	}
+
+	return ret;
+}
+
+/* This will free ptr in case reallocarray fails.
+ */
+void *_gnutls_reallocarray_fast(void *ptr, size_t nmemb, size_t size)
+{
+	void *ret;
+
+	if (size == 0)
+		return ptr;
+
+	ret = _gnutls_reallocarray(ptr, nmemb, size);
 	if (ret == NULL) {
 		gnutls_free(ptr);
 	}
@@ -75,6 +82,12 @@ char *_gnutls_strdup(const char *str)
 	if (ret != NULL)
 		memcpy(ret, str, siz);
 	return ret;
+}
+
+void *_gnutls_reallocarray(void *ptr, size_t nmemb, size_t size)
+{
+	return xalloc_oversized(nmemb, size) ? NULL :
+		gnutls_realloc(ptr, nmemb * size);
 }
 
 #if 0

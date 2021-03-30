@@ -38,6 +38,7 @@
 #include <auth/cert.h>
 
 #include <assert.h>
+#include "intprops.h"
 
 typedef struct gnutls_ocsp_req_int {
 	ASN1_TYPE req;
@@ -1905,9 +1906,13 @@ gnutls_ocsp_resp_get_certs(gnutls_ocsp_resp_const_t resp,
 			goto error;
 		}
 
-		tmpcerts2 =
-		    gnutls_realloc_fast(tmpcerts,
-					(ctr + 2) * sizeof(*tmpcerts));
+		if (unlikely(INT_ADD_OVERFLOW(ctr, 2))) {
+			ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+			goto error;
+		}
+
+		tmpcerts2 = _gnutls_reallocarray_fast(tmpcerts, ctr + 2,
+						      sizeof(*tmpcerts));
 		if (tmpcerts2 == NULL) {
 			gnutls_assert();
 			ret = GNUTLS_E_MEMORY_ERROR;
@@ -2458,7 +2463,14 @@ gnutls_ocsp_resp_list_import2(gnutls_ocsp_resp_t **ocsps,
 				goto fail;
 			}
 
-			new_ocsps = gnutls_realloc(*ocsps, (*size + 1)*sizeof(gnutls_ocsp_resp_t));
+			if (unlikely(INT_ADD_OVERFLOW(*size, 1))) {
+				ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+				goto fail;
+			}
+
+			new_ocsps = _gnutls_reallocarray(*ocsps,
+							 *size + 1,
+							 sizeof(gnutls_ocsp_resp_t));
 			if (new_ocsps == NULL) {
 				resp = NULL;
 				gnutls_assert();
@@ -2492,7 +2504,7 @@ gnutls_ocsp_resp_list_import2(gnutls_ocsp_resp_t **ocsps,
 			goto cleanup;
 		}
 
-		*ocsps = gnutls_malloc(1*sizeof(gnutls_ocsp_resp_t));
+		*ocsps = gnutls_malloc(sizeof(gnutls_ocsp_resp_t));
 		if (*ocsps == NULL) {
 			gnutls_assert();
 			ret = GNUTLS_E_MEMORY_ERROR;
