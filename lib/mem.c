@@ -23,7 +23,6 @@
 #include "gnutls_int.h"
 #include "errors.h"
 #include <num.h>
-#include <xsize.h>
 #include "xalloc-oversized.h"
 
 gnutls_alloc_function gnutls_secure_malloc = malloc;
@@ -33,16 +32,6 @@ gnutls_realloc_function gnutls_realloc = realloc;
 
 void *(*gnutls_calloc) (size_t, size_t) = calloc;
 char *(*gnutls_strdup) (const char *) = _gnutls_strdup;
-
-void *_gnutls_calloc(size_t nmemb, size_t size)
-{
-	void *ret;
-	size_t n = xtimes(nmemb, size);
-	ret = (size_in_bounds_p(n) ? gnutls_malloc(n) : NULL);
-	if (ret != NULL)
-		memset(ret, 0, size);
-	return ret;
-}
 
 /* This realloc will free ptr in case realloc
  * fails.

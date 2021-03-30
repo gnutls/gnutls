@@ -31,7 +31,6 @@
 void *gnutls_realloc_fast(void *ptr, size_t size);
 void *_gnutls_reallocarray_fast(void *ptr, size_t nmemb, size_t size);
 
-void *_gnutls_calloc(size_t nmemb, size_t size);
 char *_gnutls_strdup(const char *);
 
 void *_gnutls_reallocarray(void *, size_t, size_t);
