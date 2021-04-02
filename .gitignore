@@ -235,7 +235,8 @@ lib/minitasn1/Makefile
 lib/minitasn1/Makefile.in
 lib/nettle/libcrypto.la
 lib/nettle/backport
-lib/nettle/ecc
+lib/nettle/ecc/*
+!lib/nettle/ecc/override
 lib/opencdk/libminiopencdk.la
 lib/opencdk/Makefile
 lib/opencdk/Makefile.in

@@ -1,0 +1,3 @@
+^lib/nettle/ecc/override/ecc-gostdsa-verify.c.diff
+^lib/nettle/ecc/override/ecc-internal.h.diff
+^lib/nettle/ecc/override/eddsa-hash.c.diff
