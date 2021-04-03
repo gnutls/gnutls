@@ -1,0 +1,128 @@
+From b4953c24746af418aa005c4f64c80623af1c68ad Mon Sep 17 00:00:00 2001
+From: Bruno Haible <bruno@clisp.org>
+Date: Wed, 29 Jul 2020 18:18:18 +0200
+Subject: [PATCH] parse-datetime: Fix compilation error with bison 3.7.
+
+* modules/parse-datetime (Makefile.am): Create a generated header file
+parse-datetime-gen.h in the source directory. Correct #include and
+---
+ ChangeLog              |  7 +++++++
+ modules/parse-datetime | 18 ++++++++++++------
+ 2 files changed, 19 insertions(+), 6 deletions(-)
+
+diff --git a/modules/parse-datetime b/modules/parse-datetime
+index b4375fda43..39aaf6c592 100644
+--- a/modules/parse-datetime
++++ b/modules/parse-datetime
+@@ -45,15 +45,21 @@ Makefile.am:
+ parse-datetime.c: parse-datetime.y
+ 	$(AM_V_YACC)$(PARSE_DATETIME_BISON) -d $(YFLAGS) $(AM_YFLAGS) $(srcdir)/parse-datetime.y \
+ 	&& test ':' = '$(PARSE_DATETIME_BISON)' || { \
+-	  sed -e 's|".*/parse-datetime.y"|"parse-datetime.y"|' < parse-datetime.tab.c > parse-datetime.c-t \
++	  sed -e 's|".*/parse-datetime\.y"|"parse-datetime.y"|' \
++	      -e 's|"parse-datetime\.tab\.c"|"parse-datetime.c"|' \
++	      -e 's|"parse-datetime\.tab\.h"|"parse-datetime-gen.h"|' \
++	      < parse-datetime.tab.c > parse-datetime.c-tmp \
++	  && sed -e 's|"parse-datetime\.tab\.h"|"parse-datetime-gen.h"|' \
++	         < parse-datetime.tab.h > parse-datetime-gen.h-tmp \
+ 	  && rm -f parse-datetime.tab.c parse-datetime.tab.h \
+-	  && mv parse-datetime.c-t $(srcdir)/parse-datetime.c; \
++	  && mv parse-datetime.c-tmp $(srcdir)/parse-datetime.c \
++	  && mv parse-datetime-gen.h-tmp $(srcdir)/parse-datetime-gen.h; \
+ 	}
+ lib_SOURCES += parse-datetime.y
+-BUILT_SOURCES += parse-datetime.c
+-MOSTLYCLEANFILES += parse-datetime.tab.c parse-datetime.tab.h parse-datetime.c-t
+-MAINTAINERCLEANFILES += parse-datetime.c
+-EXTRA_DIST += parse-datetime.c
++BUILT_SOURCES += parse-datetime.c parse-datetime-gen.h
++MOSTLYCLEANFILES += parse-datetime.tab.c parse-datetime.tab.h parse-datetime.c-tmp parse-datetime-gen.h-tmp
++MAINTAINERCLEANFILES += parse-datetime.c parse-datetime-gen.h
++EXTRA_DIST += parse-datetime.c parse-datetime-gen.h
+ 
+ Include:
+ "parse-datetime.h"
+-- 
+2.30.2
+
+From c6e65c2e9fc89cc1a3b743d370f69d222fbdb6bb Mon Sep 17 00:00:00 2001
+From: Bruno Haible <bruno@clisp.org>
+Date: Sat, 1 Aug 2020 16:02:16 +0200
+Subject: [PATCH] parse-datetime: Fix wrong #line statements.
+
+* modules/parse-datetime (Makefile.am): Correct #line statements also in
+parse-datetime-gen.h.
+---
+ ChangeLog              | 6 ++++++
+ modules/parse-datetime | 3 ++-
+ 2 files changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/modules/parse-datetime b/modules/parse-datetime
+index 39aaf6c592..fb49ebb353 100644
+--- a/modules/parse-datetime
++++ b/modules/parse-datetime
+@@ -49,7 +49,8 @@ parse-datetime.c: parse-datetime.y
+ 	      -e 's|"parse-datetime\.tab\.c"|"parse-datetime.c"|' \
+ 	      -e 's|"parse-datetime\.tab\.h"|"parse-datetime-gen.h"|' \
+ 	      < parse-datetime.tab.c > parse-datetime.c-tmp \
+-	  && sed -e 's|"parse-datetime\.tab\.h"|"parse-datetime-gen.h"|' \
++	  && sed -e 's|".*/parse-datetime\.y"|"parse-datetime.y"|' \
++	         -e 's|"parse-datetime\.tab\.h"|"parse-datetime-gen.h"|' \
+ 	         < parse-datetime.tab.h > parse-datetime-gen.h-tmp \
+ 	  && rm -f parse-datetime.tab.c parse-datetime.tab.h \
+ 	  && mv parse-datetime.c-tmp $(srcdir)/parse-datetime.c \
+-- 
+2.30.2
+
+From 8002ca7b56acb46b42eeac4a343e112a8ee283cf Mon Sep 17 00:00:00 2001
+From: Bruno Haible <bruno@clisp.org>
+Date: Sun, 13 Sep 2020 22:03:16 +0200
+Subject: [PATCH] parse-datetime: Make the build rule work with parallel
+ 'make'.
+
+Reported by Daiki Ueno <ueno@gnu.org> in
+<https://lists.gnu.org/archive/html/bug-gnulib/2020-09/msg00036.html>.
+
+* modules/parse-datetime (Makefile.am): Use a phony target and the
+general idiom for rules that produce multiple files.
+---
+ ChangeLog              |  8 ++++++++
+ modules/parse-datetime | 12 +++++++++++-
+ 2 files changed, 19 insertions(+), 1 deletion(-)
+
+ 2020-09-13  Ben Pfaff  <blp@cs.stanford.edu>
+ 
+ 	getpass: Check for nonnull prompt argument while avoiding warnings.
+diff --git a/modules/parse-datetime b/modules/parse-datetime
+index 14675194eb..a16b90f7d5 100644
+--- a/modules/parse-datetime
++++ b/modules/parse-datetime
+@@ -43,7 +43,10 @@ Makefile.am:
+ # Additionally, here we assume GNU Bison and therefore don't need the ylwrap
+ # script.
+ # Therefore we override this rule.
+-parse-datetime.c: parse-datetime.y
++# Since this is a rule that produces multiple files, we apply the idiom from
++# <https://lists.gnu.org/archive/html/bug-make/2020-09/msg00008.html>, so that
++# it works also in parallel 'make'.
++generate-parse-datetime:
+ 	$(AM_V_YACC)$(PARSE_DATETIME_BISON) -d $(YFLAGS) $(AM_YFLAGS) $(srcdir)/parse-datetime.y \
+ 	&& test ':' = '$(PARSE_DATETIME_BISON)' || { \
+ 	  sed -e 's|".*/parse-datetime\.y"|"parse-datetime.y"|' \
+@@ -57,6 +60,13 @@ parse-datetime.c: parse-datetime.y
+ 	  && mv parse-datetime.c-tmp $(srcdir)/parse-datetime.c \
+ 	  && mv parse-datetime-gen.h-tmp $(srcdir)/parse-datetime-gen.h; \
+ 	}
++.PHONY: generate-parse-datetime
++# The above rule will generate files with time stamp order
++# parse-datetime.y <= parse-datetime.c <= parse-datetime-gen.h.
++parse-datetime.c: parse-datetime.y
++	@{ test -f $(srcdir)/parse-datetime.c && test ! $(srcdir)/parse-datetime.c -ot $(srcdir)/parse-datetime.y; } || $(MAKE) generate-parse-datetime
++parse-datetime-gen.h: parse-datetime.c
++	@{ test -f $(srcdir)/parse-datetime-gen.h && test ! $(srcdir)/parse-datetime-gen.h -ot $(srcdir)/parse-datetime.c; } || $(MAKE) generate-parse-datetime
+ lib_SOURCES += parse-datetime.y
+ BUILT_SOURCES += parse-datetime.c parse-datetime-gen.h
+ MOSTLYCLEANFILES += parse-datetime.tab.c parse-datetime.tab.h parse-datetime.c-tmp parse-datetime-gen.h-tmp
+-- 
+2.30.2
+
