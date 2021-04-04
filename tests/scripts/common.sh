@@ -187,6 +187,11 @@ launch_bare_server() {
 	${SERV} $* >${LOGFILE-/dev/null} &
 }
 
+launch_bare_server2() {
+	wait_for_free_port "$PORT"
+	"$@" >${LOGFILE-/dev/null} &
+}
+
 wait_server() {
 	local PID=$1
 	trap "test -n \"${PID}\" && kill ${PID};exit 1" 1 15 2
