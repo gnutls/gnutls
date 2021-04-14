@@ -2298,8 +2298,10 @@ static int test_digest(gnutls_digest_algorithm_t dig,
 			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
 
 		copy = gnutls_hash_copy(hd);
-		if (!copy)
-			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+		if (!copy) {
+			_gnutls_debug_log("copy is not supported for: %s\n",
+					  gnutls_digest_get_name(dig));
+		}
 
 		ret = gnutls_hash(hd,
 				  &vectors[i].plaintext[1],
@@ -2602,8 +2604,10 @@ static int test_mac(gnutls_mac_algorithm_t mac,
 			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
 
 		copy = gnutls_hmac_copy(hd);
-		if (!copy)
-			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+		if (!copy) {
+			_gnutls_debug_log("copy is not supported for: %s\n",
+					  gnutls_mac_get_name(mac));
+		}
 
 		ret = gnutls_hmac(hd,
 				  &vectors[i].plaintext[1],
