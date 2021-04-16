@@ -5,6 +5,11 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.7.2 (unreleased)
+
+** libgnutls: The priority string option %DISABLE_TLS13_COMPAT_MODE was added
+   to disable TLS 1.3 middlebox compatibility mode
+
 * Version 3.7.1 (released 2021-03-10)
 
 ** libgnutls: Fixed potential use-after-free in sending "key_share"
