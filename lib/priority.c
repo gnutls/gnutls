@@ -989,6 +989,10 @@ static void enable_server_precedence(gnutls_priority_t c)
 {
 	c->server_precedence = 1;
 }
+static void disable_tls13_compat_mode(gnutls_priority_t c)
+{
+	c->tls13_compat_mode = false;
+}
 static void dummy_func(gnutls_priority_t c)
 {
 }
@@ -2005,6 +2009,11 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 	 * when we make it the default.
 	 */
 	(*priority_cache)->sr = SR_PARTIAL;
+	/* For now TLS 1.3 middlebox compatibility mode is enabled by default.
+	 * This will eventually be disabled by default and moved to the %COMPAT
+	 * setting.
+	 */
+	(*priority_cache)->tls13_compat_mode = true;
 	(*priority_cache)->min_record_version = 1;
 	gnutls_atomic_init(&(*priority_cache)->usage_cnt);
 

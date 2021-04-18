@@ -950,6 +950,7 @@ struct gnutls_priority_st {
 	bool have_psk;
 	bool force_etm;
 	unsigned int additional_verify_flags;
+	bool tls13_compat_mode;
 
 	/* TLS_FALLBACK_SCSV */
 	bool fallback;

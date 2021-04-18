@@ -843,6 +843,7 @@ tests/tls12-rollback-detection
 tests/tls12-server-kx-neg
 tests/tls13-cert-key-exchange
 tests/tls13-cipher-neg
+tests/tls13-compat-mode
 tests/tls13-early-data
 tests/tls13-early-data-neg
 tests/tls13-early-start

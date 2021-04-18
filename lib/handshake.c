@@ -2213,7 +2213,9 @@ static int send_client_hello(gnutls_session_t session, int again)
 		}
 
 #ifdef TLS13_APPENDIX_D4
-		if (max_ver->tls13_sem && !resuming) {
+		if (max_ver->tls13_sem &&
+		    session->internals.priorities->tls13_compat_mode &&
+		    !resuming) {
 			/* Under TLS1.3 we generate a random session ID to make
 			 * the TLS1.3 session look like a resumed TLS1.2 session */
 			ret = _gnutls_generate_session_id(session->security_parameters.

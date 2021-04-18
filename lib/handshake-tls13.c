@@ -84,11 +84,13 @@ int _gnutls13_handshake_client(gnutls_session_t session)
 	case STATE99:
 	case STATE100:
 #ifdef TLS13_APPENDIX_D4
-		/* We send it before keys are generated. That works because CCS
-		 * is always being cached and queued and not being sent directly */
-		ret = _gnutls_send_change_cipher_spec(session, AGAIN(STATE100));
-		STATE = STATE100;
-		IMED_RET("send change cipher spec", ret, 0);
+		if (session->internals.priorities->tls13_compat_mode) {
+			/* We send it before keys are generated. That works because CCS
+			 * is always being cached and queued and not being sent directly */
+			ret = _gnutls_send_change_cipher_spec(session, AGAIN(STATE100));
+			STATE = STATE100;
+			IMED_RET("send change cipher spec", ret, 0);
+		}
 #endif
 		FALLTHROUGH;
 	case STATE101:
@@ -385,9 +387,11 @@ int _gnutls13_handshake_server(gnutls_session_t session)
 		FALLTHROUGH;
 	case STATE92:
 #ifdef TLS13_APPENDIX_D4
-		ret = _gnutls_send_change_cipher_spec(session, AGAIN(STATE92));
-		STATE = STATE92;
-		IMED_RET("send change cipher spec", ret, 0);
+		if (session->internals.priorities->tls13_compat_mode) {
+			ret = _gnutls_send_change_cipher_spec(session, AGAIN(STATE92));
+			STATE = STATE92;
+			IMED_RET("send change cipher spec", ret, 0);
+		}
 #endif
 		FALLTHROUGH;
 	case STATE93:
@@ -416,7 +420,8 @@ int _gnutls13_handshake_server(gnutls_session_t session)
 #ifdef TLS13_APPENDIX_D4
 		/* don't send CCS twice: when HRR has already been
 		 * sent, CCS should have followed it (see above) */
-		if (!(session->internals.hsk_flags & HSK_HRR_SENT)) {
+		if (session->internals.priorities->tls13_compat_mode &&
+		    !(session->internals.hsk_flags & HSK_HRR_SENT)) {
 			ret = _gnutls_send_change_cipher_spec(session, AGAIN(STATE100));
 			STATE = STATE100;
 			IMED_RET("send change cipher spec", ret, 0);
