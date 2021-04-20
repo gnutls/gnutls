@@ -33,6 +33,7 @@
 #include <locks.h>
 #include <system.h>
 #include <accelerated/cryptodev.h>
+#include <accelerated/afalg.h>
 #include <accelerated/accelerated.h>
 #include <fips.h>
 #include <atfork.h>
@@ -358,6 +359,7 @@ static int _gnutls_global_init(unsigned constructor)
 
 	_gnutls_register_accel_crypto();
 	_gnutls_cryptodev_init();
+	_gnutls_afalg_init();
 
 #ifdef ENABLE_FIPS140
 	/* These self tests are performed on the overridden algorithms

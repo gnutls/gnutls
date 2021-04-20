@@ -344,6 +344,18 @@ LIBTASN1_MINIMUM=4.9
     AC_DEFINE([ENABLE_CRYPTODEV], 1, [Enable cryptodev support])
   fi
 
+  # For AF_ALG
+  AC_MSG_CHECKING([whether to add AF_ALG support])
+  AC_ARG_ENABLE(afalg,
+    AS_HELP_STRING([--enable-afalg], [enable AF_ALG support]),
+  enable_afalg=$enableval,enable_afalg=no)
+  AC_MSG_RESULT($enable_afalg)
+
+  if test "$enable_afalg" = "yes"; then
+    AC_DEFINE([ENABLE_AFALG], 1, [Enable AF_ALG support])
+  fi
+  AM_CONDITIONAL(ENABLE_AFALG, test "$enable_afalg" != "no")
+
   AC_MSG_CHECKING([whether to disable OCSP support])
   AC_ARG_ENABLE(ocsp,
     AS_HELP_STRING([--disable-ocsp],

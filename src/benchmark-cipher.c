@@ -200,7 +200,7 @@ static void cipher_bench(int algo, int size, int aead)
 		}
 
 		do {
-			out_size = step+64;
+			out_size = step+tag_size;
 			assert(gnutls_aead_cipher_encrypt(actx, iv.data, iv.size, NULL, 0, tag_size,
 				i, step, output, &out_size) >= 0);
 			st.size += step;
