@@ -2216,15 +2216,17 @@ static int send_client_hello(gnutls_session_t session, int again)
 		if (max_ver->tls13_sem &&
 		    session->internals.priorities->tls13_compat_mode &&
 		    !resuming) {
-			/* Under TLS1.3 we generate a random session ID to make
-			 * the TLS1.3 session look like a resumed TLS1.2 session */
-			ret = _gnutls_generate_session_id(session->security_parameters.
-							  session_id,
-							  &session->security_parameters.
-							  session_id_size);
-			if (ret < 0) {
-				gnutls_assert();
-				goto cleanup;
+			if (!(session->internals.hsk_flags & HSK_HRR_RECEIVED)) {
+				/* Under TLS1.3 we generate a random session ID to make
+				 * the TLS1.3 session look like a resumed TLS1.2 session */
+				ret = _gnutls_generate_session_id(session->security_parameters.
+								  session_id,
+								  &session->security_parameters.
+								  session_id_size);
+				if (ret < 0) {
+					gnutls_assert();
+					goto cleanup;
+				}
 			}
 			session_id = session->security_parameters.session_id;
 			session_id_len = session->security_parameters.session_id_size;

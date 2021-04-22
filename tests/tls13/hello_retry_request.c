@@ -69,9 +69,13 @@ static void client_log_func(int level, const char *str)
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
 
+#define HANDSHAKE_SESSION_ID_POS 34
+
 struct ctx_st {
 	unsigned hrr_seen;
 	unsigned hello_counter;
+	uint8_t session_id[32];
+	size_t session_id_len;
 };
 
 static int hello_callback(gnutls_session_t session, unsigned int htype,
@@ -84,12 +88,28 @@ static int hello_callback(gnutls_session_t session, unsigned int htype,
 		ctx->hrr_seen = 1;
 
 	if (htype == GNUTLS_HANDSHAKE_CLIENT_HELLO && post == GNUTLS_HOOK_POST) {
+		size_t session_id_len;
+		uint8_t *session_id;
+
+		assert(msg->size > HANDSHAKE_SESSION_ID_POS + 1);
+		session_id_len = msg->data[HANDSHAKE_SESSION_ID_POS];
+		session_id = &msg->data[HANDSHAKE_SESSION_ID_POS + 1];
+
 		if (ctx->hello_counter > 0) {
 			assert(msg->size > 4);
 			if (msg->data[0] != 0x03 || msg->data[1] != 0x03) {
 				fail("version is %d.%d expected 3,3\n", (int)msg->data[0], (int)msg->data[1]);
 			}
+
+			if (session_id_len != ctx->session_id_len ||
+			    memcmp(session_id, ctx->session_id, session_id_len) != 0) {
+				fail("different legacy_session_id is sent after HRR\n");
+			}
 		}
+
+		ctx->session_id_len = session_id_len;
+		memcpy(ctx->session_id, session_id, session_id_len);
+
 		ctx->hello_counter++;
 	}
 
