@@ -17,19 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "errors.h"
-#include "gnutls_int.h"
-#include <gnutls/crypto.h>
-#include "errors.h"
-#include <accelerated/afalg.h>
-#include "malloca.h"
+#include "config.h"
 
-#include <sys/uio.h>
+#include <accelerated/afalg.h>
 
 #ifdef ENABLE_AFALG
 
+#include "errors.h"
+#include "gnutls_int.h"
+
+#include <gnutls/crypto.h>
 #include <kcapi.h>
 #include <limits.h>
+#include "malloca.h"
 
 /************************ Symmetric cipher algorithms ************************/
 
