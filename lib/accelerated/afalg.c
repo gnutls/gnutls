@@ -17,19 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "errors.h"
-#include "gnutls_int.h"
-#include <gnutls/crypto.h>
-#include "errors.h"
-#include <accelerated/afalg.h>
-#include "malloca.h"
+#include "config.h"
 
-#include <sys/uio.h>
+#include <accelerated/afalg.h>
 
 #ifdef ENABLE_AFALG
 
+#include "errors.h"
+#include "gnutls_int.h"
+
+#include <gnutls/crypto.h>
 #include <kcapi.h>
 #include <limits.h>
+#include "malloca.h"
 
 /************************ Symmetric cipher algorithms ************************/
 
@@ -49,12 +49,14 @@ static const char *gnutls_cipher_map[] = {
 	[GNUTLS_CIPHER_CAMELLIA_192_CBC] = "cbc(camellia)",
 	[GNUTLS_CIPHER_CAMELLIA_256_CBC] = "cbc(camellia)",
 	[GNUTLS_CIPHER_SALSA20_256] = "salsa20",
+	[GNUTLS_CIPHER_AES_128_XTS] = "xts(aes)",
+	[GNUTLS_CIPHER_AES_256_XTS] = "xts(aes)",
 };
 
 static int
 afalg_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx, int enc)
 {
-	struct kcapi_handle *handle = NULL;
+	struct kcapi_handle *handle;
 	struct kcapi_ctx *ctx;
 
 	if (kcapi_cipher_init(&handle, gnutls_cipher_map[algorithm], 0) < 0) {
@@ -62,8 +64,12 @@ afalg_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx, int enc)
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	ctx = (struct kcapi_ctx *)gnutls_calloc(1, sizeof(struct kcapi_ctx) +
-						   kcapi_cipher_ivsize(handle));
+	if (unlikely(kcapi_cipher_ivsize(handle) > MAX_CIPHER_IV_SIZE)) {
+		gnutls_assert();
+		return GNUTLS_E_INTERNAL_ERROR;
+	}
+
+	ctx = gnutls_malloc(sizeof(struct kcapi_ctx));
 	if (ctx == NULL) {
 		gnutls_assert();
 		kcapi_cipher_destroy(handle);
@@ -192,7 +198,7 @@ static int afalg_cipher_register(void)
 	for (i = 0;
 	     i < sizeof(gnutls_cipher_map) / sizeof(gnutls_cipher_map[0]);
 	     i++) {
-		struct kcapi_handle *handle = NULL;
+		struct kcapi_handle *handle;
 
 		if (gnutls_cipher_map[i] == 0)
 			continue;
@@ -245,7 +251,7 @@ static void afalg_aead_deinit(void *_ctx)
 static int
 afalg_aead_init(gnutls_cipher_algorithm_t algorithm, void **_ctx, int enc)
 {
-	struct kcapi_handle *handle = NULL;
+	struct kcapi_handle *handle;
 	struct kcapi_aead_ctx *ctx;
 
 	if (kcapi_aead_init(&handle, gnutls_aead_map[algorithm], 0) < 0) {
@@ -253,8 +259,7 @@ afalg_aead_init(gnutls_cipher_algorithm_t algorithm, void **_ctx, int enc)
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	ctx = (struct kcapi_aead_ctx *)gnutls_calloc(1,
-					sizeof(struct kcapi_aead_ctx));
+	ctx = gnutls_malloc(sizeof(struct kcapi_aead_ctx));
 	if (ctx == NULL) {
 		gnutls_assert();
 		kcapi_aead_destroy(handle);
@@ -527,7 +532,7 @@ static int afalg_aead_register(void)
 	for (i = 0;
 	     i < sizeof(gnutls_aead_map) / sizeof(gnutls_aead_map[0]);
 	     i++) {
-		struct kcapi_handle *handle = NULL;
+		struct kcapi_handle *handle;
 
 		if (gnutls_aead_map[i] == 0)
 			continue;
@@ -563,7 +568,7 @@ static const char *gnutls_mac_map[] = {
 
 static int afalg_mac_init(gnutls_mac_algorithm_t algorithm, void **ctx)
 {
-	struct kcapi_handle *handle = NULL;
+	struct kcapi_handle *handle;
 
 	if (kcapi_md_init(&handle, gnutls_mac_map[algorithm], 0) < 0) {
 		gnutls_assert();
@@ -632,7 +637,7 @@ static int afalg_mac_fast(gnutls_mac_algorithm_t algorithm, const void *nonce,
 			  size_t nonce_size, const void *key, size_t keysize,
 			  const void *text, size_t textsize, void *digest)
 {
-	struct kcapi_handle *handle = NULL;
+	struct kcapi_handle *handle;
 	int ret = GNUTLS_E_ENCRYPTION_FAILED;
 
 	if (kcapi_md_init(&handle, gnutls_mac_map[algorithm], 0) < 0) {
@@ -689,7 +694,7 @@ static int afalg_mac_register(void)
 	for (i = 0;
 	     i < sizeof(gnutls_mac_map) / sizeof(gnutls_mac_map[0]);
 	     i++) {
-		struct kcapi_handle *handle = NULL;
+		struct kcapi_handle *handle;
 
 		if (gnutls_mac_map[i] == 0)
 			continue;
@@ -725,7 +730,7 @@ static const char *gnutls_digest_map[] = {
 
 static int afalg_digest_init(gnutls_digest_algorithm_t algorithm, void **ctx)
 {
-	struct kcapi_handle *handle = NULL;
+	struct kcapi_handle *handle;
 
 	if (kcapi_md_init(&handle, gnutls_digest_map[algorithm], 0) < 0) {
 		gnutls_assert();
@@ -740,7 +745,7 @@ static int afalg_digest_init(gnutls_digest_algorithm_t algorithm, void **ctx)
 static int afalg_digest_fast(gnutls_digest_algorithm_t algorithm,
 			     const void *text, size_t textsize, void *digest)
 {
-	struct kcapi_handle *handle = NULL;
+	struct kcapi_handle *handle;
 	int ret = GNUTLS_E_ENCRYPTION_FAILED;
 
 	if (kcapi_md_init(&handle, gnutls_digest_map[algorithm], 0) < 0) {
@@ -791,7 +796,7 @@ static int afalg_digest_register(void)
 	for (i = 0;
 	     i < sizeof(gnutls_digest_map) / sizeof(gnutls_digest_map[0]);
 	     i++) {
-		struct kcapi_handle *handle = NULL;
+		struct kcapi_handle *handle;
 
 		if (gnutls_digest_map[i] == 0)
 			continue;
