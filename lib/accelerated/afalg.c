@@ -49,6 +49,8 @@ static const char *gnutls_cipher_map[] = {
 	[GNUTLS_CIPHER_CAMELLIA_192_CBC] = "cbc(camellia)",
 	[GNUTLS_CIPHER_CAMELLIA_256_CBC] = "cbc(camellia)",
 	[GNUTLS_CIPHER_SALSA20_256] = "salsa20",
+	[GNUTLS_CIPHER_AES_128_XTS] = "xts(aes)",
+	[GNUTLS_CIPHER_AES_256_XTS] = "xts(aes)",
 };
 
 static int
