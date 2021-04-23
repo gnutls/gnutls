@@ -10,6 +10,10 @@ See the end for copying conditions.
 ** libgnutls: The priority string option %DISABLE_TLS13_COMPAT_MODE was added
    to disable TLS 1.3 middlebox compatibility mode
 
+** libgnutls: The Linux kernel AF_ALG based acceleration has been added.
+   This can be enabled with --enable-afalg configure option, when libkcapi
+   package is installed (#308).
+
 * Version 3.7.1 (released 2021-03-10)
 
 ** libgnutls: Fixed potential use-after-free in sending "key_share"
