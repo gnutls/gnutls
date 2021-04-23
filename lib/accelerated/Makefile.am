@@ -62,5 +62,6 @@ AM_CFLAGS += -DASM_X86_64
 endif
 
 if ENABLE_AFALG
-libaccelerated_la_LDFLAGS = -lkcapi
+AM_CPPFLAGS += $(LIBKCAPI_CFLAGS)
+libaccelerated_la_LIBADD += $(LIBKCAPI_LIBS)
 endif
