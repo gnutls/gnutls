@@ -911,11 +911,11 @@ pack_security_parameters(gnutls_session_t session, gnutls_buffer_st * ps)
 	BUFFER_APPEND_NUM(ps, session->security_parameters.client_ctype);
 	BUFFER_APPEND_NUM(ps, session->security_parameters.server_ctype);
 
+	BUFFER_APPEND(ps, session->security_parameters.cs->id, 2);
+
 	/* if we are under TLS 1.3 do not pack keys or params negotiated using an extension
 	 * they are not necessary */
 	if (!session->security_parameters.pversion->tls13_sem) {
-		BUFFER_APPEND(ps, session->security_parameters.cs->id, 2);
-
 		BUFFER_APPEND_PFX1(ps, session->security_parameters.master_secret,
 			      GNUTLS_MASTER_SIZE);
 		BUFFER_APPEND_PFX1(ps, session->security_parameters.client_random,
@@ -1026,12 +1026,12 @@ unpack_security_parameters(gnutls_session_t session, gnutls_buffer_st * ps)
 		       session->internals.resumed_security_parameters.
 		       server_ctype);
 
-	if (!session->internals.resumed_security_parameters.pversion->tls13_sem) {
-		BUFFER_POP(ps, cs, 2);
-		session->internals.resumed_security_parameters.cs = ciphersuite_to_entry(cs);
-		if (session->internals.resumed_security_parameters.cs == NULL)
-			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	BUFFER_POP(ps, cs, 2);
+	session->internals.resumed_security_parameters.cs = ciphersuite_to_entry(cs);
+	if (session->internals.resumed_security_parameters.cs == NULL)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
+	if (!session->internals.resumed_security_parameters.pversion->tls13_sem) {
 		/* master secret */
 		ret = _gnutls_buffer_pop_datum_prefix8(ps, &t);
 		if (ret < 0) {

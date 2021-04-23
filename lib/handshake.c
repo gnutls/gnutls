@@ -55,6 +55,7 @@
 #include <random.h>
 #include <dtls.h>
 #include "secrets.h"
+#include "tls13/early_data.h"
 #include "tls13/session_ticket.h"
 #include "locks.h"
 #ifdef HAVE_VALGRIND_MEMCHECK_H
@@ -786,6 +787,38 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
+	}
+
+	if (session->internals.hsk_flags & HSK_EARLY_DATA_ACCEPTED) {
+		const cipher_entry_st *ce;
+		const mac_entry_st *me;
+		record_parameters_st *params;
+
+		ce = cipher_to_entry(session->internals.
+				     resumed_security_parameters.
+				     cs->block_algorithm);
+		me = mac_to_entry(session->internals.
+				  resumed_security_parameters.
+				  cs->mac_algorithm);
+
+		ret = _gnutls_epoch_get(session, EPOCH_NEXT, &params);
+		if (ret < 0) {
+			return gnutls_assert_val(ret);
+		}
+
+		params->cipher = ce;
+		params->mac = me;
+
+		ret = _tls13_read_connection_state_init(session, STAGE_EARLY);
+		if (ret < 0) {
+			return gnutls_assert_val(ret);
+		}
+
+		_gnutls_epoch_bump(session);
+		ret = _gnutls_epoch_dup(session, EPOCH_READ_CURRENT);
+		if (ret < 0) {
+			return gnutls_assert_val(ret);
+		}
 	}
 
 	/* resumed by session_ticket extension */
@@ -2308,6 +2341,43 @@ static int send_client_hello(gnutls_session_t session, int again)
 
 	ret = _gnutls_send_handshake(session, bufel,
 				     GNUTLS_HANDSHAKE_CLIENT_HELLO);
+
+	if (session->internals.hsk_flags & HSK_EARLY_DATA_IN_FLIGHT) {
+		const cipher_entry_st *ce;
+		const mac_entry_st *me;
+		record_parameters_st *params;
+
+		ce = cipher_to_entry(session->internals.
+				     resumed_security_parameters.
+				     cs->block_algorithm);
+		me = mac_to_entry(session->internals.
+				  resumed_security_parameters.
+				  cs->mac_algorithm);
+
+		ret = _gnutls_epoch_get(session, EPOCH_NEXT, &params);
+		if (ret < 0) {
+			return gnutls_assert_val(ret);
+		}
+
+		params->cipher = ce;
+		params->mac = me;
+
+		ret = _tls13_write_connection_state_init(session, STAGE_EARLY);
+		if (ret < 0) {
+			return gnutls_assert_val(ret);
+		}
+
+		_gnutls_epoch_bump(session);
+		ret = _gnutls_epoch_dup(session, EPOCH_WRITE_CURRENT);
+		if (ret < 0) {
+			return gnutls_assert_val(ret);
+		}
+
+		ret = _gnutls13_send_early_data(session);
+		if (ret < 0) {
+			return gnutls_assert_val(ret);
+		}
+	}
 
 	return ret;
 

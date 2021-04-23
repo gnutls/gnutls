@@ -70,11 +70,19 @@ static void client_log_func(int level, const char *str)
 /* A very basic TLS client.
  */
 
-#define SESSIONS 3
 #define MAX_BUF 1024
 #define MSG "Hello TLS"
 #define EARLY_MSG "Hello TLS, it's early"
-#define PRIORITY "NORMAL:-VERS-ALL:+VERS-TLS1.3"
+
+/* This test makes connection 3 times with different ciphersuites: first with
+ * TLS_AES_128_GCM_SHA256, then TLS_AES_256_GCM_SHA384 two times.  The reason
+ * for doing this is to check that the early data is encrypted with the
+ * ciphersuite selected during the initial handshake, not the resuming
+ * handshakes.
+ */
+#define SESSIONS 3
+#define TLS13_AES_128_GCM "NORMAL:-VERS-ALL:+VERS-TLS1.3:+AES-128-GCM"
+#define TLS13_AES_256_GCM "NORMAL:-VERS-ALL:+VERS-TLS1.3:+AES-256-GCM"
 
 static const
 gnutls_datum_t hrnd = {(void*)"\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 32};
@@ -120,7 +128,7 @@ static void client(int sds[], const char *data, size_t size, size_t maxsize)
 		int sd = sds[t];
 
 		assert(gnutls_init(&session, GNUTLS_CLIENT)>=0);
-		assert(gnutls_priority_set_direct(session, PRIORITY, NULL)>=0);
+		assert(gnutls_priority_set_direct(session, t == 0 ? TLS13_AES_128_GCM : TLS13_AES_256_GCM, NULL)>=0);
 
 		gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
@@ -289,7 +297,7 @@ static void server(int sds[], const char *data, size_t size, size_t maxsize)
 
 		assert(gnutls_init(&session, GNUTLS_SERVER|GNUTLS_ENABLE_EARLY_DATA)>=0);
 
-		assert(gnutls_priority_set_direct(session, PRIORITY, NULL)>=0);
+		assert(gnutls_priority_set_direct(session, t == 0 ? TLS13_AES_128_GCM : TLS13_AES_256_GCM, NULL)>=0);
 
 		gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
