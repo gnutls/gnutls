@@ -62,8 +62,12 @@ afalg_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx, int enc)
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	ctx = (struct kcapi_ctx *)gnutls_calloc(1, sizeof(struct kcapi_ctx) +
-						   kcapi_cipher_ivsize(handle));
+	if (unlikely(kcapi_cipher_ivsize(handle) > MAX_CIPHER_IV_SIZE)) {
+		gnutls_assert();
+		return GNUTLS_E_INTERNAL_ERROR;
+	}
+
+	ctx = (struct kcapi_ctx *)gnutls_calloc(1, sizeof(struct kcapi_ctx));
 	if (ctx == NULL) {
 		gnutls_assert();
 		kcapi_cipher_destroy(handle);
