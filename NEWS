@@ -37,6 +37,9 @@ See the end for copying conditions.
 gnutls_early_cipher_get: Added
 gnutls_early_prf_hash_get: Added
 
+** guile: Writes to a session record port no longer throw an exception upon
+   GNUTLS_E_AGAIN or GNUTLS_E_INTERRUPTED.
+
 * Version 3.7.1 (released 2021-03-10)
 
 ** libgnutls: Fixed potential use-after-free in sending "key_share"
