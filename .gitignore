@@ -3,6 +3,13 @@
 /ABOUT-NLS
 AUTHORS
 ABOUT-NLS
+# GNU global
+GPATH
+GSYMS
+GRTAGS
+GTAGS
+# ctags, etags
+TAGS
 aclocal.m4
 aminclude_static.am
 autom4te.cache/

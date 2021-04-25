@@ -861,7 +861,8 @@ gnutls_x509_crt_get_issuer_dn_oid(gnutls_x509_crt_t cert,
  * described in RFC4514. The output string will be ASCII or UTF-8
  * encoded, depending on the certificate data.
  *
- * If @buf is null then only the size will be filled.
+ * The @buf returned will be null terminated and the @buf_size will account
+ * for the trailing null. If @buf is null then only the size will be filled.
  *
  * This function does not output a fully RFC4514 compliant string, if
  * that is required see gnutls_x509_crt_get_dn3().
