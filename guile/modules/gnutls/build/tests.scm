@@ -1,5 +1,5 @@
 ;;; GnuTLS --- Guile bindings for GnuTLS.
-;;; Copyright (C) 2011-2012, 2016 Free Software Foundation, Inc.
+;;; Copyright (C) 2011-2012, 2016, 2021 Free Software Foundation, Inc.
 ;;;
 ;;; GnuTLS is free software; you can redistribute it and/or
 ;;; modify it under the terms of the GNU Lesser General Public
@@ -35,7 +35,8 @@ display a backtrace.  Otherwise, return THUNK's return value."
          (lambda () #t)
          (lambda ()
            (format (current-error-port)
-                   "~%throw to `~a' with args ~s~%" key args)
+                   "~%throw to `~a' with args ~s [PID ~a]~%"
+                   key args (getpid))
            (display-backtrace (make-stack #t) (current-output-port)))
          (lambda ()
            (exit 1)))

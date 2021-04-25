@@ -1,5 +1,5 @@
 /* GnuTLS --- Guile bindings for GnuTLS.
-   Copyright (C) 2007-2014, 2016, 2019 Free Software Foundation, Inc.
+   Copyright (C) 2007-2014, 2016, 2019, 2020, 2021 Free Software Foundation, Inc.
 
    GnuTLS is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -96,11 +96,13 @@ const char scm_gnutls_array_error_message[] =
 static SCM weak_refs;
 
 /* Register a weak reference from @FROM to @TO, such that the lifetime of TO is
-   greater than or equal to that of FROM.  */
+   greater than or equal to that of FROM.  TO is added to the list of weak
+   references of FROM.  */
 static void
 register_weak_reference (SCM from, SCM to)
 {
-  scm_hashq_set_x (weak_refs, from, to);
+  SCM refs = scm_cons (to, scm_hashq_ref (weak_refs, from, SCM_EOL));
+  scm_hashq_set_x (weak_refs, from, refs);
 }
 
 
@@ -2733,7 +2735,7 @@ SCM_DEFINE (scm_gnutls_x509_certificate_key_id, "x509-certificate-key-id",
   SCM result;
   scm_t_array_handle c_id_handle;
   gnutls_x509_crt_t c_cert;
-  scm_t_uint8 *c_id;
+  uint8_t *c_id;
   size_t c_id_len = 20;
 
   c_cert = scm_to_gnutls_x509_certificate (cert, 1, FUNC_NAME);
@@ -2765,7 +2767,7 @@ SCM_DEFINE (scm_gnutls_x509_certificate_authority_key_id,
   SCM result;
   scm_t_array_handle c_id_handle;
   gnutls_x509_crt_t c_cert;
-  scm_t_uint8 *c_id;
+  uint8_t *c_id;
   size_t c_id_len = 20;
 
   c_cert = scm_to_gnutls_x509_certificate (cert, 1, FUNC_NAME);
@@ -2796,7 +2798,7 @@ SCM_DEFINE (scm_gnutls_x509_certificate_subject_key_id,
   SCM result;
   scm_t_array_handle c_id_handle;
   gnutls_x509_crt_t c_cert;
-  scm_t_uint8 *c_id;
+  uint8_t *c_id;
   size_t c_id_len = 20;
 
   c_cert = scm_to_gnutls_x509_certificate (cert, 1, FUNC_NAME);
@@ -3422,7 +3424,6 @@ scm_init_gnutls (void)
 {
 #include "core.x"
 
-  /* Use Guile's allocation routines, which will run the GC if need be.  */
   (void) gnutls_global_init ();
 
   scm_gnutls_define_enums ();
