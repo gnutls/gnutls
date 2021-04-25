@@ -475,7 +475,7 @@ pkcs11_tls_neg_pkcs11_no_key_LDADD = $(LDADD) $(LIBDL)
 endif
 endif
 
-dist_check_SCRIPTS = rfc2253-escape-test rsa-md5-collision/rsa-md5-collision.sh systemkey.sh tls13/prf-early.sh
+dist_check_SCRIPTS = rfc2253-escape-test.sh rsa-md5-collision/rsa-md5-collision.sh systemkey.sh tls13/prf-early.sh
 
 if !WINDOWS
 
