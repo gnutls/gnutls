@@ -2120,7 +2120,7 @@ ssize_t gnutls_record_send_early_data(gnutls_session_t session,
  * @data: the buffer that the data will be read into
  * @data_size: the number of requested bytes
  *
- * This function can be used by a searver to retrieve data sent early
+ * This function can be used by a server to retrieve data sent early
  * in the handshake processes when resuming a session.  This is used
  * to implement a zero-roundtrip (0-RTT) mode.  It has the same
  * semantics as gnutls_record_recv().

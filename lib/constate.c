@@ -336,11 +336,19 @@ _tls13_set_early_keys(gnutls_session_t session,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	ret = _tls13_expand_secret(session, "key", 3, NULL, 0, session->key.proto.tls13.e_ckey, key_size, key_block);
+	ret = _tls13_expand_secret2(session->internals.
+				    resumed_security_parameters.prf,
+				    "key", 3, NULL, 0,
+				    session->key.proto.tls13.e_ckey,
+				    key_size, key_block);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret = _tls13_expand_secret(session, "iv", 2, NULL, 0, session->key.proto.tls13.e_ckey, iv_size, iv_block);
+	ret = _tls13_expand_secret2(session->internals.
+				    resumed_security_parameters.prf,
+				    "iv", 2, NULL, 0,
+				    session->key.proto.tls13.e_ckey,
+				    iv_size, iv_block);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -592,10 +600,19 @@ _gnutls_set_cipher_suite2(gnutls_session_t session,
 			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 		return 0;
-	} else {
-		if (params->initialized
-		    || params->cipher != NULL || params->mac != NULL)
-			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+	}
+
+	/* The params shouldn't have been initialized at this point, unless we
+	 * are doing trial encryption/decryption of early data.
+	 */
+	if (unlikely
+	    (!((session->internals.hsk_flags & HSK_EARLY_DATA_IN_FLIGHT &&
+		!IS_SERVER(session)) ||
+	       (session->internals.hsk_flags & HSK_EARLY_DATA_ACCEPTED &&
+		IS_SERVER(session))) &&
+	     (params->initialized
+	      || params->cipher != NULL || params->mac != NULL))) {
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 	}
 
 	if (_gnutls_cipher_is_ok(cipher_algo) == 0
@@ -655,7 +672,10 @@ int _gnutls_epoch_set_keys(gnutls_session_t session, uint16_t epoch, hs_stage_t 
 	int key_size;
 	record_parameters_st *params;
 	int ret;
-	const version_entry_st *ver = get_version(session);
+	const version_entry_st *ver =
+		stage == STAGE_EARLY && !IS_SERVER(session) ?
+		session->internals.resumed_security_parameters.pversion :
+		get_version(session);
 
 	if (unlikely(ver == NULL))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
@@ -1200,12 +1220,18 @@ int _tls13_read_connection_state_init(gnutls_session_t session, hs_stage_t stage
 	    session->security_parameters.epoch_next;
 	int ret;
 
+	if (unlikely(stage == STAGE_EARLY && !IS_SERVER(session))) {
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+	}
+
 	ret = _gnutls_epoch_set_keys(session, epoch_next, stage);
 	if (ret < 0)
 		return ret;
 
 	_gnutls_handshake_log("HSK[%p]: TLS 1.3 set read key with cipher suite: %s\n",
 			      session,
+			      stage == STAGE_EARLY ?
+			      session->internals.resumed_security_parameters.cs->name :
 			      session->security_parameters.cs->name);
 
 	session->security_parameters.epoch_read = epoch_next;
@@ -1223,12 +1249,18 @@ int _tls13_write_connection_state_init(gnutls_session_t session, hs_stage_t stag
 	    session->security_parameters.epoch_next;
 	int ret;
 
+	if (unlikely(stage == STAGE_EARLY && IS_SERVER(session))) {
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+	}
+
 	ret = _gnutls_epoch_set_keys(session, epoch_next, stage);
 	if (ret < 0)
 		return ret;
 
 	_gnutls_handshake_log("HSK[%p]: TLS 1.3 set write key with cipher suite: %s\n",
 			      session,
+			      stage == STAGE_EARLY ?
+			      session->internals.resumed_security_parameters.cs->name :
 			      session->security_parameters.cs->name);
 
 	session->security_parameters.epoch_write = epoch_next;
