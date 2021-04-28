@@ -19,6 +19,9 @@ See the end for copying conditions.
    benefit of 0-RTT, but also works under certain assumptions hold (e.g., the
    same ciphersuite is selected in initial and resumption handshake) (#1146).
 
+** certtool: When signing a CSR, CRL distribution point (CDP) is no longer
+   copied from the signing CA by default (#1126).
+
 * Version 3.7.1 (released 2021-03-10)
 
 ** libgnutls: Fixed potential use-after-free in sending "key_share"

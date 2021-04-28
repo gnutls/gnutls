@@ -781,10 +781,8 @@ generate_certificate(gnutls_privkey_t * ret_key,
 	/* always set CRL distribution points on CAs, but also on certificates
 	 * generated with --generate-self-signed. The latter is to retain
 	 * compatibility with previous versions of certtool. */
-	if (ca_status || (!proxy && ca_crt == NULL)) {
+	if (ca_status || !proxy) {
 		get_crl_dist_point_set(crt);
-	} else if (!proxy && ca_crt != NULL) {
-		gnutls_x509_crt_cpy_crl_dist_points(crt, ca_crt);
 	}
 
 	*ret_key = key;
