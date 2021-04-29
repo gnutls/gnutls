@@ -45,13 +45,15 @@ static struct timespec _now_ts;
 		_now_ts.tv_sec += s; \
 	}
 
-#define virt_time_init() { \
-		_now = time(0); \
+#define virt_time_init_at(d) { \
+		_now = (d); \
 		gnutls_global_set_time_function(mytime); \
 		_now_ts.tv_sec = _now; \
 		_now_ts.tv_nsec = 0; \
 		_gnutls_global_set_gettime_function(mygettime); \
 	}
+
+#define virt_time_init() virt_time_init_at(time(0))
 
 
 static time_t mytime(time_t * t)
