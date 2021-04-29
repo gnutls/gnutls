@@ -1299,14 +1299,17 @@ gnutls_group_t gnutls_group_get(gnutls_session_t session);
 
 /* get information on the current session */
 gnutls_cipher_algorithm_t gnutls_cipher_get(gnutls_session_t session);
+gnutls_cipher_algorithm_t gnutls_early_cipher_get(gnutls_session_t session);
 gnutls_kx_algorithm_t gnutls_kx_get(gnutls_session_t session);
 gnutls_mac_algorithm_t gnutls_mac_get(gnutls_session_t session);
 gnutls_digest_algorithm_t gnutls_prf_hash_get(const gnutls_session_t session);
+gnutls_digest_algorithm_t
+gnutls_early_prf_hash_get(const gnutls_session_t session);
 gnutls_certificate_type_t
 gnutls_certificate_type_get(gnutls_session_t session);
 gnutls_certificate_type_t
 gnutls_certificate_type_get2(gnutls_session_t session,
-								gnutls_ctype_target_t target);
+			     gnutls_ctype_target_t target);
 
 int gnutls_sign_algorithm_get(gnutls_session_t session);
 int gnutls_sign_algorithm_get_client(gnutls_session_t session);

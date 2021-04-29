@@ -368,6 +368,25 @@ secret_callback(gnutls_session_t session,
 		if (level == GNUTLS_ENCRYPTION_LEVEL_EARLY) {
 			fail("early secret is set on initial connection\n");
 		}
+	} else {
+		if (level == GNUTLS_ENCRYPTION_LEVEL_EARLY) {
+			gnutls_cipher_algorithm_t cipher_algo;
+			gnutls_digest_algorithm_t digest_algo;
+
+			cipher_algo = gnutls_early_cipher_get(session);
+			if (cipher_algo != GNUTLS_CIPHER_AES_128_GCM) {
+				fail("unexpected cipher used for early data: %s != %s\n",
+				     gnutls_cipher_get_name(cipher_algo),
+				     gnutls_cipher_get_name(GNUTLS_CIPHER_AES_128_GCM));
+			}
+
+			digest_algo = gnutls_early_prf_hash_get(session);
+			if (digest_algo != GNUTLS_DIG_SHA256) {
+				fail("unexpected PRF hash used for early data: %s != %s\n",
+				     gnutls_digest_get_name(digest_algo),
+				     gnutls_digest_get_name(GNUTLS_DIG_SHA256));
+			}
+		}
 	}
 
 	if (secret_size > MAX_SECRET_SIZE) {
@@ -473,6 +492,13 @@ client(int sds[], const struct fixture *fixture)
 			check_secrets(callback_data.secrets,
 				      callback_data.secret_callback_called,
 				      &fixture->client_secrets[t]);
+		}
+
+		ret = gnutls_cipher_get(session);
+		if ((t == 0 && ret != GNUTLS_CIPHER_AES_128_GCM) ||
+		    (t > 0 && ret != GNUTLS_CIPHER_CHACHA20_POLY1305)) {
+			fail("negotiated unexpected cipher: %s\n",
+			     gnutls_cipher_get_name(ret));
 		}
 
 		if (t == 0) {
@@ -662,6 +688,13 @@ server(int sds[], const struct fixture *fixture)
 		if (!gnutls_rnd_works) {
 			success("server: gnutls_rnd() could not be overridden\n");
 			goto skip_early_data;
+		}
+
+		ret = gnutls_cipher_get(session);
+		if ((t == 0 && ret != GNUTLS_CIPHER_AES_128_GCM) ||
+		    (t > 0 && ret != GNUTLS_CIPHER_CHACHA20_POLY1305)) {
+			fail("negotiated unexpected cipher: %s\n",
+			     gnutls_cipher_get_name(ret));
 		}
 
 #if TRACE == TRACE_SERVER
