@@ -61,6 +61,10 @@ int _gnutls13_send_end_of_early_data(gnutls_session_t session, unsigned again)
 	      session->internals.hsk_flags & HSK_EARLY_DATA_ACCEPTED))
 		return 0;
 
+	if (session->internals.flags & GNUTLS_NO_END_OF_EARLY_DATA) {
+		return 0;
+	}
+
 	if (again == 0) {
 		ret = _gnutls_buffer_init_handshake_mbuffer(&buf);
 		if (ret < 0)
@@ -81,14 +85,16 @@ int _gnutls13_recv_end_of_early_data(gnutls_session_t session)
 	      session->internals.hsk_flags & HSK_EARLY_DATA_ACCEPTED))
 		return 0;
 
-	ret = _gnutls_recv_handshake(session, GNUTLS_HANDSHAKE_END_OF_EARLY_DATA, 0, &buf);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
+	if (!(session->internals.flags & GNUTLS_NO_END_OF_EARLY_DATA)) {
+		ret = _gnutls_recv_handshake(session, GNUTLS_HANDSHAKE_END_OF_EARLY_DATA, 0, &buf);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
 
-	if (buf.length != 0) {
-		gnutls_assert();
-		ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
-		goto cleanup;
+		if (buf.length != 0) {
+			gnutls_assert();
+			ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+			goto cleanup;
+		}
 	}
 
 	session->internals.hsk_flags &= ~HSK_EARLY_DATA_IN_FLIGHT;
