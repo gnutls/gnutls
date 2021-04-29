@@ -74,15 +74,15 @@ static void client_log_func(int level, const char *str)
 #define MSG "Hello TLS"
 #define EARLY_MSG "Hello TLS, it's early"
 
-/* This test makes connection 3 times with different ciphersuites: first with
- * TLS_AES_128_GCM_SHA256, then TLS_AES_256_GCM_SHA384 two times.  The reason
- * for doing this is to check that the early data is encrypted with the
- * ciphersuite selected during the initial handshake, not the resuming
- * handshakes.
+/* This test makes connection 3 times with different ciphersuites:
+ * first with TLS_AES_128_GCM_SHA256, then
+ * TLS_CHACHA20_POLY1305_SHA256 two times.  The reason for doing this
+ * is to check that the early data is encrypted with the ciphersuite
+ * selected during the initial handshake, not the resuming handshakes.
  */
 #define SESSIONS 3
-#define TLS13_AES_128_GCM "NORMAL:-VERS-ALL:+VERS-TLS1.3:+AES-128-GCM"
-#define TLS13_AES_256_GCM "NORMAL:-VERS-ALL:+VERS-TLS1.3:+AES-256-GCM"
+#define TLS13_AES_128_GCM "NONE:+VERS-TLS1.3:+AES-128-GCM:+AEAD:+SIGN-RSA-PSS-RSAE-SHA384:+GROUP-SECP256R1"
+#define TLS13_CHACHA20_POLY1305 "NONE:+VERS-TLS1.3:+CHACHA20-POLY1305:+AEAD:+SIGN-RSA-PSS-RSAE-SHA384:+GROUP-SECP256R1"
 
 static const
 gnutls_datum_t hrnd = {(void*)"\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 32};
@@ -128,7 +128,7 @@ static void client(int sds[], const char *data, size_t size, size_t maxsize)
 		int sd = sds[t];
 
 		assert(gnutls_init(&session, GNUTLS_CLIENT)>=0);
-		assert(gnutls_priority_set_direct(session, t == 0 ? TLS13_AES_128_GCM : TLS13_AES_256_GCM, NULL)>=0);
+		assert(gnutls_priority_set_direct(session, t == 0 ? TLS13_AES_128_GCM : TLS13_CHACHA20_POLY1305, NULL)>=0);
 
 		gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
@@ -297,7 +297,7 @@ static void server(int sds[], const char *data, size_t size, size_t maxsize)
 
 		assert(gnutls_init(&session, GNUTLS_SERVER|GNUTLS_ENABLE_EARLY_DATA)>=0);
 
-		assert(gnutls_priority_set_direct(session, t == 0 ? TLS13_AES_128_GCM : TLS13_AES_256_GCM, NULL)>=0);
+		assert(gnutls_priority_set_direct(session, t == 0 ? TLS13_AES_128_GCM : TLS13_CHACHA20_POLY1305, NULL)>=0);
 
 		gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
@@ -454,6 +454,11 @@ start(const char *data, size_t size, size_t maxsize)
 
 void doit(void)
 {
+	/* TLS_CHACHA20_POLY1305_SHA256 is needed for this test */
+	if (gnutls_fips140_mode_enabled()) {
+		exit(77);
+	}
+
 	start(EARLY_MSG, sizeof(EARLY_MSG), MAX_BUF);
 	start(EARLY_MSG, sizeof(EARLY_MSG), 10);
 }
