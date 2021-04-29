@@ -86,7 +86,12 @@ early_data_send_params(gnutls_session_t session,
 		if (session->internals.hsk_flags & HSK_EARLY_DATA_ACCEPTED)
 			return GNUTLS_E_INT_RET_0;
 	} else {
-		if (session->internals.early_data_presend_buffer.length > 0) {
+		/* early data is enabled and resuming a TLS 1.3 session */
+		if (session->internals.flags & GNUTLS_ENABLE_EARLY_DATA &&
+		    !(session->internals.resumption_requested == 0 &&
+		      session->internals.premaster_set == 0) &&
+		    session->internals.resumed_security_parameters.pversion &&
+		    session->internals.resumed_security_parameters.pversion->tls13_sem) {
 			session->internals.hsk_flags |= HSK_EARLY_DATA_IN_FLIGHT;
 			return GNUTLS_E_INT_RET_0;
 		}

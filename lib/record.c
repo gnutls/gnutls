@@ -2098,6 +2098,10 @@ ssize_t gnutls_record_send_early_data(gnutls_session_t session,
 	if (session->security_parameters.entity != GNUTLS_CLIENT)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
+	if (data_size == 0) {
+		return 0;
+	}
+
 	if (xsum(session->internals.
 		 early_data_presend_buffer.length,
 		 data_size) >
@@ -2110,6 +2114,8 @@ ssize_t gnutls_record_send_early_data(gnutls_session_t session,
 				       data_size);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
+
+	session->internals.flags |= GNUTLS_ENABLE_EARLY_DATA;
 
 	return ret;
 }
