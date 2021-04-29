@@ -107,11 +107,12 @@ noinst_LTLIBRARIES = libutils.la
 libutils_la_SOURCES = utils.h utils.c seccomp.c utils-adv.c
 libutils_la_LIBADD = ../lib/libgnutls.la
 
-indirect_tests = tls13/prf-early system-override-hash system-override-sig
+indirect_tests = system-override-hash system-override-sig
 
 ctests = tls13/supported_versions tls13/tls12-no-tls13-exts \
 	tls13/post-handshake-with-cert tls13/post-handshake-without-cert \
-	tls13/cookie tls13/key_share tls13/prf tls13/post-handshake-with-cert-ticket \
+	tls13/cookie tls13/key_share tls13/prf tls13/prf-early \
+	tls13/post-handshake-with-cert-ticket \
 	tls12-rollback-detection tls11-rollback-detection \
 	tls12-check-rollback-val tls11-check-rollback-val \
 	tls13/post-handshake-with-psk tls13/post-handshake-with-cert-auto \
@@ -477,7 +478,7 @@ pkcs11_tls_neg_pkcs11_no_key_LDADD = $(LDADD) $(LIBDL)
 endif
 endif
 
-dist_check_SCRIPTS = rfc2253-escape-test.sh rsa-md5-collision/rsa-md5-collision.sh systemkey.sh tls13/prf-early.sh
+dist_check_SCRIPTS = rfc2253-escape-test.sh rsa-md5-collision/rsa-md5-collision.sh systemkey.sh
 
 if !WINDOWS
 
