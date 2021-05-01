@@ -1254,20 +1254,42 @@ gnutls_session_channel_binding(gnutls_session_t session,
 			       gnutls_channel_binding_t cbtype,
 			       gnutls_datum_t * cb)
 {
-	if (cbtype != GNUTLS_CB_TLS_UNIQUE)
-		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-
 	if (!session->internals.initial_negotiation_completed)
 		return GNUTLS_E_CHANNEL_BINDING_NOT_AVAILABLE;
 
-	cb->size = session->internals.cb_tls_unique_len;
-	cb->data = gnutls_malloc(cb->size);
-	if (cb->data == NULL)
-		return GNUTLS_E_MEMORY_ERROR;
+	if (cbtype == GNUTLS_CB_TLS_UNIQUE) {
+		const version_entry_st *ver = get_version(session);
+		if (unlikely(ver == NULL || ver->tls13_sem))
+			return GNUTLS_E_INVALID_REQUEST;
 
-	memcpy(cb->data, session->internals.cb_tls_unique, cb->size);
+		cb->size = session->internals.cb_tls_unique_len;
+		cb->data = gnutls_malloc(cb->size);
+		if (cb->data == NULL)
+			return GNUTLS_E_MEMORY_ERROR;
 
-	return 0;
+		memcpy(cb->data, session->internals.cb_tls_unique, cb->size);
+
+		return 0;
+	}
+
+	if (cbtype == GNUTLS_CB_TLS_EXPORTER) {
+#define RFC5705_LABEL_DATA "EXPORTER-Channel-Binding"
+#define RFC5705_LABEL_LEN 24
+#define EXPORTER_CTX_DATA ""
+#define EXPORTER_CTX_LEN 0
+
+		cb->size = 32;
+		cb->data = gnutls_malloc(cb->size);
+		if (cb->data == NULL)
+			return GNUTLS_E_MEMORY_ERROR;
+
+		return gnutls_prf_rfc5705 (session,
+				RFC5705_LABEL_LEN, RFC5705_LABEL_DATA,
+				EXPORTER_CTX_LEN, EXPORTER_CTX_DATA,
+				cb->size, (char *) cb->data);
+	}
+
+	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }
 
 /**
