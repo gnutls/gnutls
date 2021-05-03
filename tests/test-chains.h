@@ -4106,6 +4106,163 @@ static const char *superseding_ca[] = {
 	NULL
 };
 
+static const char *rsa_sha1_in_trusted[] = {
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIID0jCCAoqgAwIBAgIUezaBB7f4TW75oc3UV57oJvXmbBYwDQYJKoZIhvcNAQEL\n"
+	"BQAwGTEXMBUGA1UEAxMOR251VExTIHRlc3QgQ0EwHhcNMjEwNTAzMTQyNzIxWhcN\n"
+	"MjIwNTAzMTQyNzIxWjA3MRgwFgYDVQQDEw90ZXN0LmdudXRscy5vcmcxGzAZBgNV\n"
+	"BAoTEkdudVRMUyB0ZXN0IHNlcnZlcjCCAVIwDQYJKoZIhvcNAQEBBQADggE/ADCC\n"
+	"AToCggExALRrJ5glr8H/HsqwfvTYvO1DhmdUXdq0HsKQX4M8AhH8E3KFsoikZUEL\n"
+	"dl8jvoqf/nlLczsux0s8vxbJl1U1F/OhckswwuAnlBLzVgDmzoJLEV2kHpv6+rkb\n"
+	"Kk0Ytbql5gzHqKihbaqIhNyWDrJsHDWq58eUPfnVx8KiDUuzbnr3CF/FCc0Vkxr3\n"
+	"mN8qTGaJJO0f0BZjgWWlWDuhzSVim5mBVAgXGOx8LwiiOyhXMp0XRwqG+2KxQZnm\n"
+	"+96o6iB+8xvuuuqaIWQpkvKtc+UZBZ03U+IRnxhfIrriiw0AjJ4vp4c9QL5KoqWS\n"
+	"CAwuYcBYfJqZ4dasgzklzz4b7eujbZ3LxTjewcdumzQUvjA+gpAeuUqaduTvMwxG\n"
+	"ojFy9sNhC/iqZ4n0peV2N6Epn4B5qnUCAwEAAaOBkzCBkDAMBgNVHRMBAf8EAjAA\n"
+	"MBoGA1UdEQQTMBGCD3Rlc3QuZ251dGxzLm9yZzATBgNVHSUEDDAKBggrBgEFBQcD\n"
+	"ATAPBgNVHQ8BAf8EBQMDB6AAMB0GA1UdDgQWBBRIIzRTCokxOEpa6sq20qbezh0r\n"
+	"GDAfBgNVHSMEGDAWgBQedyNtZzEfkQebli/s/MhG/ozhAzANBgkqhkiG9w0BAQsF\n"
+	"AAOCATEAXs8lOV231HQerhSGEjZJz0vBuA3biKYlu3cwCTKvF6EOyYMSWOnfqqD0\n"
+	"eDhpo1pzGtUa2zYLHagb+sU2NSTe0sqP+PK1giUg8X8/tRtWKk1p/m76yK/3iaty\n"
+	"flgz+eMai4xQu2FvAJzIASFjM9R+Pgpcf/zdvkiUPv8Rdm9FieyAZnJSo9hJHLxN\n"
+	"x60tfC5yyswdbGGW0GbJ2kr+xMfVZvxgO/x6AXlOaUGQ+jZAu9eJwFQMDW5h5/S1\n"
+	"PJkIt7f7jkU33cG+BawcjhT0GzxuvDnnCG0L7/z7bR+Sw2kNKqHbHorzv91R20Oh\n"
+	"CIISJPkiiP+mYcglTp1d9gw09GwSkGbldb9ibfc0hKyxiImFfIiTqDbXJcpKH98o\n"
+	"W8hWkb20QURlY+QM5MD49znfhPKMTQ==\n"
+	"-----END CERTIFICATE-----\n",
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIID2TCCAkGgAwIBAgIUWsb4DATcefXbo0WrBfgqVMvPGawwDQYJKoZIhvcNAQEL\n"
+	"BQAwHjEcMBoGA1UEAxMTR251VExTIHRlc3Qgcm9vdCBDQTAeFw0yMTA1MDMxNDI2\n"
+	"MzVaFw0yMjA1MDMxNDI2MzVaMBkxFzAVBgNVBAMTDkdudVRMUyB0ZXN0IENBMIIB\n"
+	"UjANBgkqhkiG9w0BAQEFAAOCAT8AMIIBOgKCATEAnORCsX1unl//fy2d1054XduI\n"
+	"g/3CqVBaT3Hca65SEoDwh0KiPtQoOgZLdKY2cobGs/ojYtOjcs0KnlPYdmtjEh6W\n"
+	"EhuJU95v4TQdC4OLMiE56eIGq252hZAbHoTL84Q14DxQWGuzQK830iml7fbw2WcI\n"
+	"cRQ8vFGs8SzfXw63+MI6Fq6iMAQIqP08WzGmRRzL5wvCiPhCVkrPmwbXoABub6AA\n"
+	"sYwWPJB91M9/lx5gFH5k9/iPfi3s2Kg3F8MOcppqFYjxDSnsfiz6eMh1+bYVIAo3\n"
+	"67vGVYHigXMEZC2FezlwIHaZzpEoFlY3a7LFJ00yrjQ910r8UE+CEMTYzE40D0ol\n"
+	"CMo7FA9RCjeO3bUIoYaIdVTUGWEGHWSeoxGei9Gkm6u+ASj8f+i0jxdD2qXsewID\n"
+	"AQABo2QwYjAPBgNVHRMBAf8EBTADAQH/MA8GA1UdDwEB/wQFAwMHBAAwHQYDVR0O\n"
+	"BBYEFB53I21nMR+RB5uWL+z8yEb+jOEDMB8GA1UdIwQYMBaAFCApU0Q1pxZL+AW3\n"
+	"GctysPWxl+SfMA0GCSqGSIb3DQEBCwUAA4IBgQBbboeDr/rLT1tZWrdHq8FvflGm\n"
+	"EpxZIRU4DdDD/SUCWSPQvjBq0MvuKxs5FfJCKrDf2kS2qlZ1rO0AuWwREoDeTOEc\n"
+	"arjFoCry+JQ+USqS5F4gsp4XlYvli27iMp3dlnhFXEQQy7/y+gM5c9wnMi8v/LUz\n"
+	"AV6QHX0fkb4XeazeJ+Nq0EkjqiYxylN6mP+5LAEMBG/wGviAoviQ5tN9zdoQs/nT\n"
+	"3jTw3cOauuPjdcOTfo71+/MtBzhPchgNIyQo4aB40XVWsLAoruL/3CFFlTniihtd\n"
+	"zA2zA7JvbuuKx6BOv2IbWOUweb732ZpYbDgEcXp/6Cj/SIUGxidpEgdCJGqyqdC7\n"
+	"b58ujxclC6QTcicw+SX5LBox8WGLfj+x+V3uVBz9+EK608xphTj4kLh9peII9v3n\n"
+	"vBUoZRTiUTCvH4AJJgAfa3mYrSxzueuqBOwXcvZ+8OJ0J1CP21pmK5nxR7f1nm9Q\n"
+	"sYA1VHfC2dtyAYlByeF5iHl5hFR6vy1jJyzxg2M=\n"
+	"-----END CERTIFICATE-----\n",
+	NULL
+};
+
+static const char *rsa_sha1_in_trusted_ca[] = {
+	/* This CA is generated with the same key as rsa_sha1_in_trusted[1], but
+	 * self-signed using SHA-1.
+	 */
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIDYzCCAhugAwIBAgIUahO8CvYPHTAltKCC2rAIcXUiLlAwDQYJKoZIhvcNAQEF\n"
+	"BQAwGTEXMBUGA1UEAxMOR251VExTIHRlc3QgQ0EwHhcNMjEwNTAzMTQyMDM1WhcN\n"
+	"MjIwNTAzMTQyMDM1WjAZMRcwFQYDVQQDEw5HbnVUTFMgdGVzdCBDQTCCAVIwDQYJ\n"
+	"KoZIhvcNAQEBBQADggE/ADCCAToCggExAJzkQrF9bp5f/38tnddOeF3biIP9wqlQ\n"
+	"Wk9x3GuuUhKA8IdCoj7UKDoGS3SmNnKGxrP6I2LTo3LNCp5T2HZrYxIelhIbiVPe\n"
+	"b+E0HQuDizIhOeniBqtudoWQGx6Ey/OENeA8UFhrs0CvN9Ippe328NlnCHEUPLxR\n"
+	"rPEs318Ot/jCOhauojAECKj9PFsxpkUcy+cLwoj4QlZKz5sG16AAbm+gALGMFjyQ\n"
+	"fdTPf5ceYBR+ZPf4j34t7NioNxfDDnKaahWI8Q0p7H4s+njIdfm2FSAKN+u7xlWB\n"
+	"4oFzBGQthXs5cCB2mc6RKBZWN2uyxSdNMq40PddK/FBPghDE2MxONA9KJQjKOxQP\n"
+	"UQo3jt21CKGGiHVU1BlhBh1knqMRnovRpJurvgEo/H/otI8XQ9ql7HsCAwEAAaND\n"
+	"MEEwDwYDVR0TAQH/BAUwAwEB/zAPBgNVHQ8BAf8EBQMDBwQAMB0GA1UdDgQWBBQe\n"
+	"dyNtZzEfkQebli/s/MhG/ozhAzANBgkqhkiG9w0BAQUFAAOCATEAYLm/4DfUp+mA\n"
+	"S/23a2bwybJoPCMzKZpi+veXkqoq/a/BCUkFpqnjpVjz0ujVKK121oeOPBAa/mG1\n"
+	"Y3fJYP+b3PloL/6xj/8680TveGirCr0Rp/8XWa8lt+Ge8DM3mfTGWFTWHa0lD9VK\n"
+	"gjV1oNZNLe5SKA6dJLAp/NjCxc/vuOkThQPeaoO5Iy/Z6m7CpTLO7T4syJFtDmSn\n"
+	"Pa/yFUDTgJYFlGVM+KC1r8bhZ6Ao1CAXTcT5Lcbe/aCcyk6B3J2AnYsqPMVNEVhb\n"
+	"9eMGO/WG24hMLy6eb1r/yL8uQ/uGi2rRlNJN8GTg09YR7l5fHrHxuHc/sme0jsnJ\n"
+	"wtqGLCJsrh7Ae1fKVUueO00Yx9BGuzLswMvnT5f0oYs0jrXgMrTbIWS/DjOcYIHb\n"
+	"w3SV1ZRcNg==\n"
+	"-----END CERTIFICATE-----\n",
+	NULL
+};
+
+static const char *rsa_sha1_not_in_trusted[] = {
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIID0jCCAoqgAwIBAgIUNCvPV9OvyuVMtnkC3ZAvh959h4MwDQYJKoZIhvcNAQEL\n"
+	"BQAwGTEXMBUGA1UEAxMOR251VExTIHRlc3QgQ0EwHhcNMjEwNTA0MDg0NzAzWhcN\n"
+	"MjIwNTA0MDg0NzAzWjA3MRgwFgYDVQQDEw90ZXN0LmdudXRscy5vcmcxGzAZBgNV\n"
+	"BAoTEkdudVRMUyB0ZXN0IHNlcnZlcjCCAVIwDQYJKoZIhvcNAQEBBQADggE/ADCC\n"
+	"AToCggExALRrJ5glr8H/HsqwfvTYvO1DhmdUXdq0HsKQX4M8AhH8E3KFsoikZUEL\n"
+	"dl8jvoqf/nlLczsux0s8vxbJl1U1F/OhckswwuAnlBLzVgDmzoJLEV2kHpv6+rkb\n"
+	"Kk0Ytbql5gzHqKihbaqIhNyWDrJsHDWq58eUPfnVx8KiDUuzbnr3CF/FCc0Vkxr3\n"
+	"mN8qTGaJJO0f0BZjgWWlWDuhzSVim5mBVAgXGOx8LwiiOyhXMp0XRwqG+2KxQZnm\n"
+	"+96o6iB+8xvuuuqaIWQpkvKtc+UZBZ03U+IRnxhfIrriiw0AjJ4vp4c9QL5KoqWS\n"
+	"CAwuYcBYfJqZ4dasgzklzz4b7eujbZ3LxTjewcdumzQUvjA+gpAeuUqaduTvMwxG\n"
+	"ojFy9sNhC/iqZ4n0peV2N6Epn4B5qnUCAwEAAaOBkzCBkDAMBgNVHRMBAf8EAjAA\n"
+	"MBoGA1UdEQQTMBGCD3Rlc3QuZ251dGxzLm9yZzATBgNVHSUEDDAKBggrBgEFBQcD\n"
+	"ATAPBgNVHQ8BAf8EBQMDB6AAMB0GA1UdDgQWBBRIIzRTCokxOEpa6sq20qbezh0r\n"
+	"GDAfBgNVHSMEGDAWgBQedyNtZzEfkQebli/s/MhG/ozhAzANBgkqhkiG9w0BAQsF\n"
+	"AAOCATEAWs/Qa1Ebydwo4Ke2KEdy5cUTSZjnoz93XpbrP9W60MJ4d2DIQPcYUcLF\n"
+	"+glez+mRtVXDRtH5V/4yZX1EdgrPVQGeVlO5HbNiYyYw/Yj3H6kzWtUbBxdOAOE/\n"
+	"/ul8RCKKMfvYBHCBgjBMW0aFm31Q1Z8m8nanBusyJ0DG1scBHu4/3vTCZthZAxc5\n"
+	"3l3t/jjsNRS+k5t6Ay8nEY1tAZSGVqN8qufzO2NBO06sQagp09FTfDh581OBcVtF\n"
+	"X7O0cffAWHk3JoywzEWFEAhVPqFlk07wG2O+k+fYZfavsJko5q+yWkxu8RDh4wAx\n"
+	"7UzKudGOQ+NhfYJ7N7V1/RFg1z75gE3GTUX7qmGZEVDOsMyiuUeYg8znyYpBV55Q\n"
+	"4BNr0ukwmwOdvUf+ksCu6PdOGaqThA==\n"
+	"-----END CERTIFICATE-----\n",
+	/* ICA with SHA1 signature */
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIID2TCCAkGgAwIBAgIUYaKJkQft87M1TF+Jd30py3yIq4swDQYJKoZIhvcNAQEF\n"
+	"BQAwHjEcMBoGA1UEAxMTR251VExTIHRlc3Qgcm9vdCBDQTAeFw0yMTA1MDQwODQ1\n"
+	"NDdaFw0yMjA1MDQwODQ1NDdaMBkxFzAVBgNVBAMTDkdudVRMUyB0ZXN0IENBMIIB\n"
+	"UjANBgkqhkiG9w0BAQEFAAOCAT8AMIIBOgKCATEAnORCsX1unl//fy2d1054XduI\n"
+	"g/3CqVBaT3Hca65SEoDwh0KiPtQoOgZLdKY2cobGs/ojYtOjcs0KnlPYdmtjEh6W\n"
+	"EhuJU95v4TQdC4OLMiE56eIGq252hZAbHoTL84Q14DxQWGuzQK830iml7fbw2WcI\n"
+	"cRQ8vFGs8SzfXw63+MI6Fq6iMAQIqP08WzGmRRzL5wvCiPhCVkrPmwbXoABub6AA\n"
+	"sYwWPJB91M9/lx5gFH5k9/iPfi3s2Kg3F8MOcppqFYjxDSnsfiz6eMh1+bYVIAo3\n"
+	"67vGVYHigXMEZC2FezlwIHaZzpEoFlY3a7LFJ00yrjQ910r8UE+CEMTYzE40D0ol\n"
+	"CMo7FA9RCjeO3bUIoYaIdVTUGWEGHWSeoxGei9Gkm6u+ASj8f+i0jxdD2qXsewID\n"
+	"AQABo2QwYjAPBgNVHRMBAf8EBTADAQH/MA8GA1UdDwEB/wQFAwMHBAAwHQYDVR0O\n"
+	"BBYEFB53I21nMR+RB5uWL+z8yEb+jOEDMB8GA1UdIwQYMBaAFCApU0Q1pxZL+AW3\n"
+	"GctysPWxl+SfMA0GCSqGSIb3DQEBBQUAA4IBgQAewBcAGUGX28I5PDtuJkxoHonD\n"
+	"muHdXpYnrz1YXN4b7odNXockz++Xovgj126fo+PeWgmaaCic98ZcGnyVTi9+3oqN\n"
+	"2Bf4NNfyzSccgZZTphzbwjMcnc983HLQgsLSAOVivPHj5GEN58EWWamc9yA0VjGn\n"
+	"cuYmFN2dlFA8/ClEbVGu3UXBe6OljR5zUr+6oiSp2J+Rl7SerVSHlst07iU2tkeB\n"
+	"dlfOD5CquUGSka3SKvEfvu5SwYrCQVfYB6eMLInm7A0/ca0Jn3Oh4fMf2rIg/E3K\n"
+	"qsopxsu8BXrLoGK4MxbxPA65JpczhZgilQQi3e3RIvxrvyD2qamjaNbyG5cr8mW4\n"
+	"VOLf3vUORbkTi5sE7uRMu2B3z3N7ajsuQM8RHB17hOCB2FO/8rermq/oeJNtx57L\n"
+	"5s5NxCHYTksQ4gkpR4gfTIO/zwXJSwGa/Zi2y2wIi/1qr7lppBsKV2rDWX7QiIeA\n"
+	"PxOxyJA2eSeqCorz9vk3aHXleSpxsWGgKiJVmV0=\n"
+	"-----END CERTIFICATE-----\n",
+	NULL
+};
+
+static const char *rsa_sha1_not_in_trusted_ca[] = {
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIEDTCCAnWgAwIBAgIUd5X8NZput+aNPEd9h92r4KAu16MwDQYJKoZIhvcNAQEL\n"
+	"BQAwHjEcMBoGA1UEAxMTR251VExTIHRlc3Qgcm9vdCBDQTAeFw0yMTA1MDMxNDI1\n"
+	"MDNaFw0yMjA1MDMxNDI1MDNaMB4xHDAaBgNVBAMTE0dudVRMUyB0ZXN0IHJvb3Qg\n"
+	"Q0EwggGiMA0GCSqGSIb3DQEBAQUAA4IBjwAwggGKAoIBgQCsFAaMb/iRN+OFqQNh\n"
+	"OkkXGZlb+eLerLuB9ELnYwyLIh4MTXh0RjFZdCQLsQHfY/YFv0C50rmoXTA/d3Ef\n"
+	"K/P243KjX0XBWjO9TBuN0zth50eq94zf69yxA/a+kmT+O5YLfhi2ELM5F3IjOUoZ\n"
+	"lL0IGlFJwauAkaNylp/Evd5nW7g5DUJvMm4A3RXNfZt9gAD4lPRwryQq9jxT48Xu\n"
+	"fB0kAPEG/l/Izbz2rYin5+nySL+a0CSNuEbITxidtMhveB747oR0QS2sMQKji1ur\n"
+	"pRJ945SHiYJIgVuFAJc9StikSyIrxZgK45kAzcQAyRWWKiMNH5PprGFYJp+ypwhm\n"
+	"1t8Bphj2RFJAG3XRRZF/9uJIYc5mEHCsZFZ/IFRaKqyN30kAUijgNt+lW5mZXVFU\n"
+	"aqzV2zHjSG8jsGdia3cfBP46Z1q2eAh5jOCucTq1F7qZdVhOFmP9jFE6Uy5Kbwgc\n"
+	"kNAnsEllQeJQL2odVa7woKkZZ4M/c72X5tpBU38Rs3krn3sCAwEAAaNDMEEwDwYD\n"
+	"VR0TAQH/BAUwAwEB/zAPBgNVHQ8BAf8EBQMDBwQAMB0GA1UdDgQWBBQgKVNENacW\n"
+	"S/gFtxnLcrD1sZfknzANBgkqhkiG9w0BAQsFAAOCAYEAaZMV71mZ9FYoVdpho61h\n"
+	"WWPs5GppQLJ1w70DNtGZ+lFrk/KopeDvOu1i61QLWRzcZCZMl+npiX1KH5kjVo3v\n"
+	"C9G8kdMW6EVRk5p6qCJMPFN2U+grMMp50aY5kmw+/v+Lhk5T/VG93l63P91FkUre\n"
+	"o8qhOudJExoUnR1uB9M6HMAxVn8Lm/N1LGPiP6A6Pboo716H7mg/A7pv9zoZ6jUp\n"
+	"7x693mA/b3I/QpDx/nJcmcdqxgEuW+aRlFXgnYZRFAawxi+5M9EwCWbkSTO4OMHP\n"
+	"Qlvak3tJO+wb92b0cICOOtzIPgQ+caiLg9d0FvesALmQzDmNmtqynoO85+Ia2Ywh\n"
+	"nxKPlpeImhLN9nGl9sOeW2m4mnA5r0h1vgML4v/MWL4TQhXallc31uFNj5HyFaTh\n"
+	"6Mr0g3GeQgN0jpT+aIOiKuW9fLts54+Ntj1NN40slqi3Y+/Yd6xhj+NgmbRvybZu\n"
+	"tnYFXKC0Q+QUf38horqG2Mc3/uh8MOm0eYUXwGJOdXYD\n"
+	"-----END CERTIFICATE-----\n",
+	NULL
+};
+
 #if defined __clang__ || __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5)
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wunused-variable"
@@ -4277,6 +4434,14 @@ static struct
   { "ed448 - ok", ed448, &ed448[0], GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_ULTRA),
     0, NULL, 1584352960, 1},
   { "superseding - ok", superseding, superseding_ca, 0, 0, 0, 1590928011 },
+  { "rsa-sha1 in trusted - ok",
+    rsa_sha1_in_trusted, rsa_sha1_in_trusted_ca,
+    GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_MEDIUM),
+    0, NULL, 1620052390, 1},
+  { "rsa-sha1 not in trusted - not ok",
+    rsa_sha1_not_in_trusted, rsa_sha1_not_in_trusted_ca,
+    GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_MEDIUM),
+    GNUTLS_CERT_INSECURE_ALGORITHM | GNUTLS_CERT_INVALID, NULL, 1620118136, 1},
   { NULL, NULL, NULL, 0, 0}
 };
 
