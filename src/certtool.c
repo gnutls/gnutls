@@ -1423,7 +1423,7 @@ static void cmd_parser(int argc, char **argv)
 	}
 
 	if (HAVE_OPT(VERIFY_PROFILE)) {
-		if (strcasecmp(OPT_ARG(VERIFY_PROFILE), "none")) {
+		if (strcasecmp(OPT_ARG(VERIFY_PROFILE), "none") == 0) {
 			cinfo.verification_profile = (gnutls_sec_param_t)GNUTLS_PROFILE_UNKNOWN;
 		} else {
 			cinfo.verification_profile = (gnutls_sec_param_t)gnutls_certificate_verification_profile_get_id(OPT_ARG(VERIFY_PROFILE));
