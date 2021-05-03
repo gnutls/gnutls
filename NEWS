@@ -22,6 +22,10 @@ See the end for copying conditions.
 ** certtool: When signing a CSR, CRL distribution point (CDP) is no longer
    copied from the signing CA by default (#1126).
 
+** libgnutls: The GNUTLS_NO_EXPLICIT_INIT envvar has been renamed to
+   GNUTLS_NO_IMPLICIT_INIT to reflect the purpose (#1178). The former is now
+   deprecated and will be removed in the future releases.
+
 * Version 3.7.1 (released 2021-03-10)
 
 ** libgnutls: Fixed potential use-after-free in sending "key_share"
