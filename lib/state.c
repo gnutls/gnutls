@@ -1254,20 +1254,117 @@ gnutls_session_channel_binding(gnutls_session_t session,
 			       gnutls_channel_binding_t cbtype,
 			       gnutls_datum_t * cb)
 {
-	if (cbtype != GNUTLS_CB_TLS_UNIQUE)
-		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-
 	if (!session->internals.initial_negotiation_completed)
 		return GNUTLS_E_CHANNEL_BINDING_NOT_AVAILABLE;
 
-	cb->size = session->internals.cb_tls_unique_len;
-	cb->data = gnutls_malloc(cb->size);
-	if (cb->data == NULL)
-		return GNUTLS_E_MEMORY_ERROR;
+	if (cbtype == GNUTLS_CB_TLS_UNIQUE) {
+		const version_entry_st *ver = get_version(session);
+		if (unlikely(ver == NULL || ver->tls13_sem))
+			return GNUTLS_E_INVALID_REQUEST;
 
-	memcpy(cb->data, session->internals.cb_tls_unique, cb->size);
+		cb->size = session->internals.cb_tls_unique_len;
+		cb->data = gnutls_malloc(cb->size);
+		if (cb->data == NULL)
+			return GNUTLS_E_MEMORY_ERROR;
 
-	return 0;
+		memcpy(cb->data, session->internals.cb_tls_unique, cb->size);
+
+		return 0;
+	}
+
+	if (cbtype == GNUTLS_CB_TLS_SERVER_END_POINT) {
+		const gnutls_datum_t *ders;
+		unsigned int num_certs = 1;
+		int ret;
+		size_t rlen;
+		gnutls_x509_crt_t cert;
+		gnutls_digest_algorithm_t algo;
+
+		/* Only X509 certificates are supported for this binding type */
+		ret = gnutls_certificate_type_get (session);
+		if (ret != GNUTLS_CRT_X509)
+			return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+
+		if (session->security_parameters.entity == GNUTLS_CLIENT)
+			ders = gnutls_certificate_get_peers (session, &num_certs);
+		else
+			ders = gnutls_certificate_get_ours (session);
+
+		/* Previous check indicated we have x509 but you never know */
+		if (!ders || num_certs == 0)
+			return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+
+		ret = gnutls_x509_crt_list_import (&cert, &num_certs, ders,
+				GNUTLS_X509_FMT_DER, 0);
+		/* Again, this is not supposed to happen (normally) */
+		if (ret < 0 || num_certs == 0)
+			return GNUTLS_E_CHANNEL_BINDING_NOT_AVAILABLE;
+
+		/* Obtain signature algorithm used by certificate */
+		ret = gnutls_x509_crt_get_signature_algorithm (cert);
+		if (ret < 0 || ret == GNUTLS_SIGN_UNKNOWN)
+			return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+
+		/* obtain hash function from signature and normalize it */
+		algo = gnutls_sign_get_hash_algorithm (ret);
+		switch (algo) {
+		case GNUTLS_DIG_MD5:
+		case GNUTLS_DIG_SHA1:
+			algo = GNUTLS_DIG_SHA256;
+			break;
+		case GNUTLS_DIG_UNKNOWN:
+		case GNUTLS_DIG_NULL:
+		case GNUTLS_DIG_MD5_SHA1:
+			/* double hashing not supported either */
+			gnutls_x509_crt_deinit (cert);
+			return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+		default:
+			/* no-op */
+			algo = algo;
+		}
+
+		/* preallocate 512 bits buffer as maximum supported digest */
+		rlen = MAX_HASH_SIZE;
+		cb->data = gnutls_malloc(rlen);
+		if (cb->data == NULL) {
+			gnutls_x509_crt_deinit (cert);
+			return GNUTLS_E_MEMORY_ERROR;
+		}
+
+		ret = gnutls_x509_crt_get_fingerprint (cert, algo, cb->data,
+				&rlen);
+		if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER) {
+			cb->data = gnutls_realloc_fast (cb->data, cb->size);
+			if (cb->data == NULL) {
+				gnutls_x509_crt_deinit (cert);
+				return GNUTLS_E_MEMORY_ERROR;
+			}
+			ret = gnutls_x509_crt_get_fingerprint (cert, algo,
+					cb->data, &rlen);
+		}
+		cb->size = rlen;
+		gnutls_x509_crt_deinit (cert);
+		return ret;
+	}
+
+	if (cbtype == GNUTLS_CB_TLS_EXPORTER) {
+#define RFC5705_LABEL_DATA "EXPORTER-Channel-Binding"
+#define RFC5705_LABEL_LEN 24
+#define EXPORTER_CTX_DATA ""
+#define EXPORTER_CTX_LEN 0
+
+		cb->size = 32;
+		cb->data = gnutls_malloc(cb->size);
+		if (cb->data == NULL)
+			return GNUTLS_E_MEMORY_ERROR;
+
+		return gnutls_prf_rfc5705 (session,
+				RFC5705_LABEL_LEN, RFC5705_LABEL_DATA,
+				EXPORTER_CTX_LEN, EXPORTER_CTX_DATA,
+				cb->size, (char *) cb->data);
+	}
+
+	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }
 
 /**

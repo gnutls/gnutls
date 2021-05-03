@@ -8501,6 +8501,8 @@
     <enum-decl name='__anonymous_enum__' is-anonymous='yes' id='type-id-725'>
       <underlying-type type-id='type-id-41'/>
       <enumerator name='GNUTLS_CB_TLS_UNIQUE' value='0'/>
+      <enumerator name='GNUTLS_CB_TLS_SERVER_END_POINT' value='1'/>
+      <enumerator name='GNUTLS_CB_TLS_EXPORTER' value='2'/>
     </enum-decl>
     <typedef-decl name='gnutls_channel_binding_t' type-id='type-id-725' id='type-id-726'/>
     <function-decl name='gnutls_session_channel_binding' mangled-name='gnutls_session_channel_binding' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='gnutls_session_channel_binding@@GNUTLS_3_4'>
