@@ -197,7 +197,7 @@ generate_private_key_int(common_info_st * cinfo)
 
 	if (provable && (!GNUTLS_PK_IS_RSA(key_type) && key_type != GNUTLS_PK_DSA)) {
 		fprintf(stderr,
-			"The --provable parameter cannot be used with ECDSA keys.\n");
+			"The --provable parameter can only be used with RSA and DSA keys.\n");
 		app_exit(1);
 	}
 
