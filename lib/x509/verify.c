@@ -416,14 +416,19 @@ unsigned _gnutls_is_broken_sig_allowed(const gnutls_sign_entry_st *se, unsigned 
 #define CASE_SEC_PARAM(profile, level) \
 	case profile: \
 		sym_bits = gnutls_sec_param_to_symmetric_bits(level); \
-		hash = gnutls_sign_get_hash_algorithm(sigalg); \
-		entry = mac_to_entry(hash); \
-		if (hash <= 0 || entry == NULL) { \
+		se = _gnutls_sign_to_entry(sigalg); \
+		if (unlikely(se == NULL)) { \
+			_gnutls_cert_log("cert", crt); \
+			_gnutls_debug_log(#level": certificate's signature algorithm is unknown\n"); \
+			return gnutls_assert_val(0); \
+		} \
+		if (unlikely(se->hash == GNUTLS_DIG_UNKNOWN)) {	\
 			_gnutls_cert_log("cert", crt); \
 			_gnutls_debug_log(#level": certificate's signature hash is unknown\n"); \
 			return gnutls_assert_val(0); \
 		} \
-		if (_gnutls_sign_get_hash_strength(sigalg) < sym_bits) { \
+		if (!trusted && \
+		    _gnutls_sign_get_hash_strength(sigalg) < sym_bits) { \
 			_gnutls_cert_log("cert", crt); \
 			_gnutls_debug_log(#level": certificate's signature hash strength is unacceptable (is %u bits, needed %u)\n", _gnutls_sign_get_hash_strength(sigalg), sym_bits); \
 			return gnutls_assert_val(0); \
@@ -450,19 +455,22 @@ unsigned _gnutls_is_broken_sig_allowed(const gnutls_sign_entry_st *se, unsigned 
  * @crt: a certificate
  * @issuer: the certificates issuer (allowed to be NULL)
  * @sigalg: the signature algorithm used
+ * @trusted: whether @crt is treated as trusted (e.g., present in the system
+ *           trust list); if it is true, the check on signature algorithm will
+ *           be skipped
  * @flags: the specified verification flags
  */
 static unsigned is_level_acceptable(
 	gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
-	gnutls_sign_algorithm_t sigalg, unsigned flags)
+	gnutls_sign_algorithm_t sigalg, bool trusted,
+	unsigned flags)
 {
 	gnutls_certificate_verification_profiles_t profile = GNUTLS_VFLAGS_TO_PROFILE(flags);
-	const mac_entry_st *entry;
 	int issuer_pkalg = 0, pkalg, ret;
 	unsigned bits = 0, issuer_bits = 0, sym_bits = 0;
 	gnutls_pk_params_st params;
 	gnutls_sec_param_t sp;
-	int hash;
+	const gnutls_sign_entry_st *se;
 	gnutls_certificate_verification_profiles_t min_profile;
 
 	min_profile = _gnutls_get_system_wide_verification_profile();
@@ -799,7 +807,7 @@ static unsigned verify_crt(gnutls_x509_trust_list_t tlist,
 	}
 
 	if (sigalg >= 0 && se) {
-		if (is_level_acceptable(cert, issuer, sigalg, flags) == 0) {
+		if (is_level_acceptable(cert, issuer, sigalg, false, flags) == 0) {
 			MARK_INVALID(GNUTLS_CERT_INSECURE_ALGORITHM);
 		}
 
@@ -894,7 +902,7 @@ unsigned check_ca_sanity(const gnutls_x509_crt_t issuer,
 
 	/* we explicitly allow CAs which we do not support their self-algorithms
 	 * to pass. */
-	if (ret >= 0 && !is_level_acceptable(issuer, NULL, sigalg, flags)) {
+	if (ret >= 0 && !is_level_acceptable(issuer, NULL, sigalg, true, flags)) {
 		status |= GNUTLS_CERT_INSECURE_ALGORITHM|GNUTLS_CERT_INVALID;
 	}
 
