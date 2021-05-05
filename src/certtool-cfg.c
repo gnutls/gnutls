@@ -1564,7 +1564,7 @@ int default_crl_number(unsigned char* serial, size_t *size)
  * that contains a default value that will be displayed to the user and
  * maximum size of the buffer that it can fill. When the function
  * returns, either the buffer is not modified to use the default value
- * or it's contents are changed to reflect the user-entered value.
+ * or its contents are changed to reflect the user-entered value.
  **/
 static
 void read_serial_value(unsigned char *serial, size_t *size, size_t max_size,

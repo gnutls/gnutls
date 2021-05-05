@@ -45,7 +45,7 @@ static int proc_vko_gost_client_kx(gnutls_session_t session,
  * random PMS. Then encrypted PMS and client's ephemeral public key are wrappen
  * in ASN.1 structure and sent in KX message.
  *
- * Server uses decodes ASN.1 structure and uses it's own private key and
+ * Server uses decodes ASN.1 structure and uses its own private key and
  * client's ephemeral public key to unwrap PMS.
  *
  * Note, this KX is not PFS one, despite using ephemeral key pairs on client

@@ -1249,7 +1249,7 @@ gnutls_x509_crt_set_expiration_time(gnutls_x509_crt_t cert,
  * as an opaque field by several CAs. For this reason this function
  * accepts any kind of data as a serial number. To be consistent
  * with the X.509/PKIX specifications the provided @serial should be 
- * a big-endian positive number (i.e. it's leftmost bit should be zero).
+ * a big-endian positive number (i.e. its leftmost bit should be zero).
  *
  * The size of the serial is restricted to 20 bytes maximum by RFC5280.
  * This function allows writing more than 20 bytes but the generated
