@@ -353,12 +353,12 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get_id(const char *name)
 	return ret;
 }
 
-int _gnutls_ecc_curve_mark_disabled(const char *name)
+int _gnutls_ecc_curve_mark_disabled(gnutls_ecc_curve_t curve)
 {
 	gnutls_ecc_curve_entry_st *p;
 
 	for(p = ecc_curves; p->name != NULL; p++) {
-		if (c_strcasecmp(p->name, name) == 0) {
+		if (p->id == curve) {
 			p->supported = 0;
 			return 0;
 		}
