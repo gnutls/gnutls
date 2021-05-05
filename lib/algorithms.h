@@ -345,11 +345,11 @@ typedef enum hash_security_level_t {
 	_INSECURE
 } hash_security_level_t;
 
-int _gnutls_ecc_curve_mark_disabled(const char *name);
-int _gnutls_sign_mark_insecure(const char *name, hash_security_level_t);
-int _gnutls_digest_mark_insecure(const char *name);
+int _gnutls_ecc_curve_mark_disabled(gnutls_ecc_curve_t curve);
+int _gnutls_sign_mark_insecure(gnutls_sign_algorithm_t, hash_security_level_t);
+int _gnutls_digest_mark_insecure(gnutls_digest_algorithm_t dig);
 unsigned _gnutls_digest_is_insecure(gnutls_digest_algorithm_t dig);
-int _gnutls_version_mark_disabled(const char *name);
+int _gnutls_version_mark_disabled(gnutls_protocol_t version);
 gnutls_protocol_t _gnutls_protocol_get_id_if_supported(const char *name);
 
 #define GNUTLS_SIGN_FLAG_TLS13_OK	1 /* if it is ok to use under TLS1.3 */

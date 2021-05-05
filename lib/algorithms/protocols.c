@@ -198,13 +198,13 @@ version_is_valid_for_session(gnutls_session_t session,
 	return 0;
 }
 
-int _gnutls_version_mark_disabled(const char *name)
+int _gnutls_version_mark_disabled(gnutls_protocol_t version)
 {
 #ifndef DISABLE_SYSTEM_CONFIG
 	version_entry_st *p;
 
 	for (p = sup_versions; p->name != NULL; p++)
-		if (c_strcasecmp(p->name, name) == 0) {
+		if (p->id == version) {
 			p->supported = 0;
 			return 0;
 		}

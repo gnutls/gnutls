@@ -291,13 +291,13 @@ gnutls_digest_algorithm_t gnutls_digest_get_id(const char *name)
 	return ret;
 }
 
-int _gnutls_digest_mark_insecure(const char *name)
+int _gnutls_digest_mark_insecure(gnutls_digest_algorithm_t dig)
 {
 #ifndef DISABLE_SYSTEM_CONFIG
 	mac_entry_st *p;
 
 	for(p = hash_algorithms; p->name != NULL; p++) {
-		if (p->oid != NULL && c_strcasecmp(p->name, name) == 0) {
+		if (p->oid != NULL && p->id == (gnutls_mac_algorithm_t)dig) {
 			p->flags |= GNUTLS_MAC_FLAG_PREIMAGE_INSECURE;
 			return 0;
 		}

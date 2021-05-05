@@ -462,7 +462,7 @@ bool _gnutls_sign_is_secure2(const gnutls_sign_entry_st *se, unsigned int flags)
 		return (se->slevel==_SECURE || se->slevel == _INSECURE_FOR_CERTS)?1:0;
 }
 
-int _gnutls_sign_mark_insecure(const char *name, hash_security_level_t level)
+int _gnutls_sign_mark_insecure(gnutls_sign_algorithm_t sign, hash_security_level_t level)
 {
 #ifndef DISABLE_SYSTEM_CONFIG
 	gnutls_sign_entry_st *p;
@@ -471,7 +471,7 @@ int _gnutls_sign_mark_insecure(const char *name, hash_security_level_t level)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	for(p = sign_algorithms; p->name != NULL; p++) {
-		if (c_strcasecmp(p->name, name) == 0) {
+		if (p->id && p->id == sign) {
 				p->slevel = level;
 			return 0;
 		}
