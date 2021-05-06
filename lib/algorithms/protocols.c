@@ -198,6 +198,7 @@ version_is_valid_for_session(gnutls_session_t session,
 	return 0;
 }
 
+/* This is only called by cfg_apply in priority.c, in blocklisting mode. */
 int _gnutls_version_mark_disabled(gnutls_protocol_t version)
 {
 #ifndef DISABLE_SYSTEM_CONFIG
@@ -205,7 +206,73 @@ int _gnutls_version_mark_disabled(gnutls_protocol_t version)
 
 	for (p = sup_versions; p->name != NULL; p++)
 		if (p->id == version) {
-			p->supported = 0;
+			p->supported = false;
+			return 0;
+		}
+
+#endif
+	return GNUTLS_E_INVALID_REQUEST;
+}
+
+/* This is only called by cfg_apply in priority.c, in allowlisting mode. */
+void _gnutls_version_mark_revertible_all(void)
+{
+#ifndef DISABLE_SYSTEM_CONFIG
+	version_entry_st *p;
+
+	for (p = sup_versions; p->name != NULL; p++) {
+		p->supported_revertible = true;
+	}
+
+#endif
+}
+
+/**
+ * gnutls_protocol_mark_disabled:
+ * @version: is a (gnutls) version number
+ *
+ * Mark @version as disabled system wide. This only works if the allowlisting
+ * mode is used in the configuration file.
+ *
+ */
+int gnutls_protocol_mark_disabled(gnutls_protocol_t version)
+{
+#ifndef DISABLE_SYSTEM_CONFIG
+	version_entry_st *p;
+
+	for (p = sup_versions; p->name != NULL; p++)
+		if (p->id == version) {
+			if (!p->supported_revertible) {
+				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			}
+			p->supported = false;
+			return 0;
+		}
+
+#endif
+	return GNUTLS_E_INVALID_REQUEST;
+}
+
+/**
+ * gnutls_protocol_mark_enabled:
+ * @version: is a (gnutls) version number
+ *
+ * Invalidate previous system wide setting that marked @version as
+ * disabled. This only works if the allowlisting mode is used in the
+ * configuration file.
+ *
+ */
+int gnutls_protocol_mark_enabled(gnutls_protocol_t version)
+{
+#ifndef DISABLE_SYSTEM_CONFIG
+	version_entry_st *p;
+
+	for (p = sup_versions; p->name != NULL; p++)
+		if (p->id == version) {
+			if (!p->supported_revertible) {
+				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			}
+			p->supported = true;
 			return 0;
 		}
 
@@ -467,6 +534,25 @@ const gnutls_protocol_t *gnutls_protocol_list(void)
 	}
 
 	return supported_protocols;
+}
+
+/* Return all versions, including non-supported ones.
+ */
+const gnutls_protocol_t *_gnutls_protocol_list(void)
+{
+	const version_entry_st *p;
+	static gnutls_protocol_t protocols[MAX_ALGOS] = { 0 };
+
+	if (protocols[0] == 0) {
+		int i = 0;
+
+		for (p = sup_versions; p->name != NULL; p++) {
+			protocols[i++] = p->id;
+		}
+		protocols[i++] = 0;
+	}
+
+	return protocols;
 }
 
 /* Returns a version number given the major and minor numbers.

@@ -1355,6 +1355,21 @@ GNUTLS_3_7_2
 	*;
 } GNUTLS_3_7_0;
 
+GNUTLS_3_7_3
+{
+ global:
+	gnutls_ecc_curve_mark_disabled;
+	gnutls_ecc_curve_mark_enabled;
+	gnutls_sign_mark_insecure;
+	gnutls_sign_mark_secure;
+	gnutls_digest_mark_insecure;
+	gnutls_digest_mark_secure;
+	gnutls_protocol_mark_disabled;
+	gnutls_protocol_mark_enabled;
+ local:
+	*;
+} GNUTLS_3_7_2;
+
 GNUTLS_FIPS140_3_4 {
   global:
 	gnutls_cipher_self_test;

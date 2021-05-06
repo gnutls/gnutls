@@ -519,6 +519,12 @@ dist_check_SCRIPTS += system-override-sig.sh system-override-hash.sh \
 	system-override-curves.sh system-override-profiles.sh system-override-tls.sh \
 	system-override-kx.sh system-override-default-priority-string.sh \
 	system-override-sig-tls.sh system-override-hash-filters-prf.sh
+
+dist_check_SCRIPTS += system-override-sig-allowlist.sh \
+	system-override-hash-allowlist.sh \
+	system-override-versions-allowlist.sh \
+	system-override-curves-allowlist.sh \
+	system-override-special-allowlist.sh
 endif
 
 dist_check_SCRIPTS += gnutls-cli-self-signed.sh gnutls-cli-invalid-crl.sh gnutls-cli-rawpk.sh

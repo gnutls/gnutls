@@ -291,6 +291,7 @@ gnutls_digest_algorithm_t gnutls_digest_get_id(const char *name)
 	return ret;
 }
 
+/* This is only called by cfg_apply in priority.c, in blocklisting mode. */
 int _gnutls_digest_mark_insecure(gnutls_digest_algorithm_t dig)
 {
 #ifndef DISABLE_SYSTEM_CONFIG
@@ -299,6 +300,76 @@ int _gnutls_digest_mark_insecure(gnutls_digest_algorithm_t dig)
 	for(p = hash_algorithms; p->name != NULL; p++) {
 		if (p->oid != NULL && p->id == (gnutls_mac_algorithm_t)dig) {
 			p->flags |= GNUTLS_MAC_FLAG_PREIMAGE_INSECURE;
+			return 0;
+		}
+	}
+
+#endif
+	return GNUTLS_E_INVALID_REQUEST;
+}
+
+/* This is only called by cfg_apply in priority.c, in allowlisting mode. */
+void _gnutls_digest_mark_insecure_all(void)
+{
+#ifndef DISABLE_SYSTEM_CONFIG
+	mac_entry_st *p;
+
+	for(p = hash_algorithms; p->name != NULL; p++) {
+		p->flags |= GNUTLS_MAC_FLAG_PREIMAGE_INSECURE_REVERTIBLE |
+			GNUTLS_MAC_FLAG_PREIMAGE_INSECURE;
+	}
+
+#endif
+}
+
+/**
+ * gnutls_digest_mark_insecure:
+ * @dig: is a digest algorithm
+ *
+ * Mark @dig as insecure system wide. This only works if the allowlisting mode
+ * is used in the configuration file.
+ *
+ * Since: 3.7.3
+ */
+int gnutls_digest_mark_insecure(gnutls_digest_algorithm_t dig)
+{
+#ifndef DISABLE_SYSTEM_CONFIG
+	mac_entry_st *p;
+
+	for(p = hash_algorithms; p->name != NULL; p++) {
+		if (p->oid != NULL && p->id == (gnutls_mac_algorithm_t)dig) {
+			if (!(p->flags & GNUTLS_MAC_FLAG_PREIMAGE_INSECURE_REVERTIBLE)) {
+				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			}
+			p->flags |= GNUTLS_MAC_FLAG_PREIMAGE_INSECURE;
+			return 0;
+		}
+	}
+
+#endif
+	return GNUTLS_E_INVALID_REQUEST;
+}
+
+/**
+ * gnutls_digest_mark_secure:
+ * @dig: is a digest algorithm
+ *
+ * Invalidate previous system wide setting that marked @dig as insecure. This
+ * only works if the allowlisting mode is used in the configuration file.
+ *
+ * Since: 3.7.3
+ */
+int gnutls_digest_mark_secure(gnutls_digest_algorithm_t dig)
+{
+#ifndef DISABLE_SYSTEM_CONFIG
+	mac_entry_st *p;
+
+	for(p = hash_algorithms; p->name != NULL; p++) {
+		if (p->oid != NULL && p->id == (gnutls_mac_algorithm_t)dig) {
+			if (!(p->flags & GNUTLS_MAC_FLAG_PREIMAGE_INSECURE_REVERTIBLE)) {
+				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			}
+			p->flags &= ~GNUTLS_MAC_FLAG_PREIMAGE_INSECURE;
 			return 0;
 		}
 	}
@@ -318,6 +389,21 @@ unsigned _gnutls_digest_is_insecure(gnutls_digest_algorithm_t dig)
 	}
 
 	return 1;
+}
+
+bool _gnutls_digest_is_insecure2(gnutls_digest_algorithm_t dig,	unsigned flags)
+{
+	const mac_entry_st *p;
+
+	for(p = hash_algorithms; p->name != NULL; p++) {
+		if (p->oid != NULL && p->id == (gnutls_mac_algorithm_t)dig) {
+			return (p->flags & GNUTLS_MAC_FLAG_PREIMAGE_INSECURE &&
+				!(flags & GNUTLS_MAC_FLAG_ALLOW_INSECURE_REVERTIBLE &&
+				  p->flags & GNUTLS_MAC_FLAG_PREIMAGE_INSECURE_REVERTIBLE));
+		}
+	}
+
+	return true;
 }
 
 /**

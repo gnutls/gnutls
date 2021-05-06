@@ -453,15 +453,22 @@ unsigned gnutls_sign_is_secure(gnutls_sign_algorithm_t algorithm)
 
 bool _gnutls_sign_is_secure2(const gnutls_sign_entry_st *se, unsigned int flags)
 {
-	if (se->hash != GNUTLS_DIG_UNKNOWN && _gnutls_digest_is_insecure(se->hash))
-		return gnutls_assert_val(0);
+	if (se->hash != GNUTLS_DIG_UNKNOWN &&
+	    _gnutls_digest_is_insecure2(se->hash,
+					flags & GNUTLS_SIGN_FLAG_ALLOW_INSECURE_REVERTIBLE ?
+					GNUTLS_MAC_FLAG_ALLOW_INSECURE_REVERTIBLE :
+					0)) {
+		return gnutls_assert_val(false);
+	}
 
-	if (flags & GNUTLS_SIGN_FLAG_SECURE_FOR_CERTS)
-		return (se->slevel==_SECURE)?1:0;
-	else
-		return (se->slevel==_SECURE || se->slevel == _INSECURE_FOR_CERTS)?1:0;
+	return (flags & GNUTLS_SIGN_FLAG_SECURE_FOR_CERTS ?
+		se->slevel == _SECURE :
+		(se->slevel == _SECURE || se->slevel == _INSECURE_FOR_CERTS)) ||
+		(flags & GNUTLS_SIGN_FLAG_ALLOW_INSECURE_REVERTIBLE &&
+		 se->flags & GNUTLS_SIGN_FLAG_INSECURE_REVERTIBLE);
 }
 
+/* This is only called by cfg_apply in priority.c, in blocklisting mode. */
 int _gnutls_sign_mark_insecure(gnutls_sign_algorithm_t sign, hash_security_level_t level)
 {
 #ifndef DISABLE_SYSTEM_CONFIG
@@ -472,7 +479,102 @@ int _gnutls_sign_mark_insecure(gnutls_sign_algorithm_t sign, hash_security_level
 
 	for(p = sign_algorithms; p->name != NULL; p++) {
 		if (p->id && p->id == sign) {
+			if (p->slevel < level)
 				p->slevel = level;
+			return 0;
+		}
+	}
+#endif
+	return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+}
+
+/* This is only called by cfg_apply in priority.c, in allowlisting mode. */
+void _gnutls_sign_mark_insecure_all(hash_security_level_t level)
+{
+#ifndef DISABLE_SYSTEM_CONFIG
+	gnutls_sign_entry_st *p;
+
+	for(p = sign_algorithms; p->name != NULL; p++) {
+		if (p->slevel < level)
+			p->slevel = level;
+		p->flags |= GNUTLS_SIGN_FLAG_INSECURE_REVERTIBLE;
+	}
+#endif
+}
+
+/**
+ * gnutls_sign_mark_insecure:
+ * @sign: the sign algorithm
+ * @flags: %GNUTLS_SIGN_FLAG_SECURE_FOR_CERTS or 0
+ *
+ * Mark @sign as insecure system wide. This only works if the
+ * allowlisting mode is used in the configuration file.
+ *
+ * If @flags has %GNUTLS_SIGN_FLAG_SECURE_FOR_CERTS bit set,
+ * and the algorithm was previously considered secure for all purposes,
+ * it only marks the algorithm as insecure for the use with certificates.
+ *
+ * Since: 3.7.3
+ */
+int gnutls_sign_mark_insecure(gnutls_sign_algorithm_t sign, unsigned flags)
+{
+#ifndef DISABLE_SYSTEM_CONFIG
+	gnutls_sign_entry_st *p;
+
+	for(p = sign_algorithms; p->name != NULL; p++) {
+		if (p->id && p->id == sign) {
+			if (!(p->flags & GNUTLS_SIGN_FLAG_INSECURE_REVERTIBLE)) {
+				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			}
+			if (flags & GNUTLS_SIGN_FLAG_SECURE_FOR_CERTS) {
+				if (p->slevel < _INSECURE_FOR_CERTS)
+					p->slevel = _INSECURE_FOR_CERTS;
+			} else {
+				p->slevel = _INSECURE;
+			}
+			return 0;
+		}
+	}
+#endif
+	return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+}
+// TODO: really not sure about the intuitiveness of the interface of this one,
+//       the flag naming isn't ideal here
+
+/**
+ * gnutls_sign_mark_secure:
+ * @sign: the sign algorithm
+ * @flags: %GNUTLS_SIGN_FLAG_SECURE_FOR_CERTS or 0
+ *
+ * Invalidate previous system wide setting that marked @sign as
+ * insecure. This only works if the algorithm is marked as insecure
+ * with gnutls_sign_mark_insecure() or through the allowlisting mode
+ * in the configuration file.
+ *
+ * If @flags has %GNUTLS_SIGN_FLAG_SECURE_FOR_CERTS bit set,
+ * it marks it the algorithm as secure for all purposes.
+ * If the absence of this flag, it will mark it as
+ * "secure, but not for certificates" at most,
+ * but it won't restrict anything either.
+ *
+ * Since: 3.7.3
+ */
+int gnutls_sign_mark_secure(gnutls_sign_algorithm_t sign, unsigned flags)
+{
+#ifndef DISABLE_SYSTEM_CONFIG
+	gnutls_sign_entry_st *p;
+
+	for(p = sign_algorithms; p->name != NULL; p++) {
+		if (p->id && p->id == sign) {
+			if (!(p->flags & GNUTLS_SIGN_FLAG_INSECURE_REVERTIBLE)) {
+				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			}
+			if (flags & GNUTLS_SIGN_FLAG_SECURE_FOR_CERTS) {
+				p->slevel = _SECURE;
+			} else {
+				if (p->slevel > _INSECURE_FOR_CERTS)
+					p->slevel = _INSECURE_FOR_CERTS;
+			}
 			return 0;
 		}
 	}

@@ -7,6 +7,11 @@ See the end for copying conditions.
 
 * Version 3.7.3 (unreleased)
 
+** libgnutls: The allowlisting configuration mode has been added to the system-wide
+   settings. In this mode, all the algorithms are initially marked as insecure
+   or disabled, while the applications can re-enable them either through the
+   [overrides] section of the configuration file or the new API (#1172).
+
 ** certtool: Certtool can now generate, manipulate, and evaluate x25519 and
    x448 public keys, private keys, and certificates.
 ** libgnutls: disabling a hashing algorithm through "insecure-hash"
@@ -16,6 +21,14 @@ See the end for copying conditions.
 ** API and ABI modifications:
 GNUTLS_PRIVKEY_FLAG_RSA_PSS_FIXED_SALT_LENGTH: new flag in gnutls_privkey_flags_t
 GNUTLS_VERIFY_RSA_PSS_FIXED_SALT_LENGTH: new flag in gnutls_certificate_verify_flags
+gnutls_ecc_curve_mark_disabled: Added.
+gnutls_ecc_curve_mark_enabled: Added.
+gnutls_sign_mark_insecure: Added.
+gnutls_sign_mark_secure: Added.
+gnutls_digest_mark_insecure: Added.
+gnutls_digest_mark_secure: Added.
+gnutls_protocol_mark_disabled: Added.
+gnutls_protocol_mark_enabled: Added.
 
 * Version 3.7.2 (released 2021-05-29)
 

@@ -665,6 +665,8 @@ typedef struct gnutls_group_entry_st {
 
 #define GNUTLS_MAC_FLAG_PREIMAGE_INSECURE	1  /* if this algorithm should not be trusted for pre-image attacks */
 #define GNUTLS_MAC_FLAG_CONTINUOUS_MAC		(1 << 1) /* if this MAC should be used in a 'continuous' way in TLS */
+#define GNUTLS_MAC_FLAG_PREIMAGE_INSECURE_REVERTIBLE	(1 << 2)  /* if this algorithm should not be trusted for pre-image attacks, but can be enabled through API */
+#define GNUTLS_MAC_FLAG_ALLOW_INSECURE_REVERTIBLE	(1 << 3)  /* when checking with _gnutls_digest_is_insecure2, don't treat revertible setting as fatal */
 /* This structure is used both for MACs and digests
  */
 typedef struct mac_entry_st {
@@ -688,6 +690,7 @@ typedef struct {
 	uint8_t minor;		/* defined by the protocol */
 	transport_t transport;	/* Type of transport, stream or datagram */
 	bool supported;	/* 0 not supported, > 0 is supported */
+	bool supported_revertible;
 	bool explicit_iv;
 	bool extensions;	/* whether it supports extensions */
 	bool selectable_sighash;	/* whether signatures can be selected */

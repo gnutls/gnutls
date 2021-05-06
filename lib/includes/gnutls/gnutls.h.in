@@ -1438,6 +1438,16 @@ const char *
 				 gnutls_mac_algorithm_t * mac,
 				 gnutls_protocol_t * min_version);
 
+  /* functions for run-time enablement of algorithms */
+int gnutls_ecc_curve_mark_disabled(gnutls_ecc_curve_t curve);
+int gnutls_ecc_curve_mark_enabled(gnutls_ecc_curve_t curve);
+int gnutls_sign_mark_insecure(gnutls_sign_algorithm_t sign, unsigned flags);
+int gnutls_sign_mark_secure(gnutls_sign_algorithm_t sign, unsigned flags);
+int gnutls_digest_mark_insecure(gnutls_digest_algorithm_t dig);
+int gnutls_digest_mark_secure(gnutls_digest_algorithm_t dig);
+int gnutls_protocol_mark_disabled(gnutls_protocol_t version);
+int gnutls_protocol_mark_enabled(gnutls_protocol_t version);
+
   /* error functions */
 int gnutls_error_is_fatal(int error) __GNUTLS_CONST__;
 int gnutls_error_to_alert(int err, int *level);

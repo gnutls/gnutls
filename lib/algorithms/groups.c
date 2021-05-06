@@ -276,6 +276,24 @@ gnutls_group_t gnutls_group_get_id(const char *name)
 	return ret;
 }
 
+
+/* Similar to gnutls_group_get_id, except that it does not check if
+ * the curve is supported.
+ */
+gnutls_group_t _gnutls_group_get_id(const char *name)
+{
+	gnutls_group_t ret = GNUTLS_GROUP_INVALID;
+
+	GNUTLS_GROUP_LOOP(
+		if (c_strcasecmp(p->name, name) == 0) {
+			ret = p->id;
+			break;
+		}
+	);
+
+	return ret;
+}
+
 /**
  * gnutls_group_get_name:
  * @group: is an element from %gnutls_group_t

@@ -74,6 +74,7 @@ configuration file and can be
 @item @code{insecure-sig-for-cert}: to mark the signature algorithm as insecure when used in certificates.
 @item @code{insecure-sig}: to mark the signature algorithm as insecure for any use.
 @item @code{insecure-hash}: to mark the hash algorithm as insecure for digital signature use (provides a more generic way to disable digital signatures for broken hash algorithms).
+@item @code{disabled-curve}: to disable the specified elliptic curve.
 @item @code{disabled-version}: to disable the specified TLS versions.
 @item @code{tls-disabled-cipher}: to disable the specified ciphers for use in the TLS or DTLS protocols.
 @item @code{tls-disabled-mac}: to disable the specified MAC algorithms for use in the TLS or DTLS protocols.
@@ -82,10 +83,38 @@ configuration file and can be
 @end itemize
 
 Each of the options can be repeated multiple times when multiple values need
-to be disabled.
+to be disabled or enabled.
 
 The valid values for the options above can be found in the 'Protocols', 'Digests'
 'PK-signatures', 'Protocols', 'Ciphrers', and 'MACs' fields of the output of @code{gnutls-cli --list}.
+
+Sometimes the system administrator wants to enable only specific
+algorithms, despite the library defaults. GnuTLS provides an
+alternative mode of overriding: allowlisting.
+
+In the allowlisting mode, all the algorithms are initially marked as
+insecure or disabled, and shall be explicitly turned on by the options
+in the @code{[overrides]} section. Those options are mutually
+exclusive to the above ones for the blocklisting mode (the default)
+@itemize
+@item @code{secure-sig-for-cert}: to mark the signature algorithm as secure when used in certificates.
+@item @code{secure-sig}: to mark the signature algorithm as secure for any use.
+@item @code{secure-hash}: to mark the hash algorithm as secure for digital signature use (provides a more generic way to enable digital signatures for broken hash algorithms).
+@item @code{enabled-curve}: to enable the specified elliptic curve.
+@item @code{enabled-version}: to enable the specified TLS versions.
+@item @code{tls-enabled-cipher}: to enable the specified ciphers for use in the TLS or DTLS protocols.
+@item @code{tls-enabled-mac}: to enable the specified MAC algorithms for use in the TLS or DTLS protocols.
+@item @code{tls-enabled-group}: to enable the specified group for use in the TLS or DTLS protocols.
+@item @code{tls-enabled-kx}: to enable the specified key exchange algorithms for use in the TLS or DTLS protocols (applies to TLS1.2 or earlier).
+@end itemize
+
+The allowlisting mode can be enabled by adding @code{override-mode =
+allowlist} in the @code{[global]} section.
+
+When the allowlisting mode is in effect, it is also possible for the applications to modify the setting through the API.
+
+@showfuncD{gnutls_ecc_curve_mark_enabled,gnutls_sign_mark_secure,gnutls_digest_mark_secure,gnutls_protocol_mark_enabled}
+@showfuncD{gnutls_ecc_curve_mark_disabled,gnutls_sign_mark_insecure,gnutls_digest_mark_insecure,gnutls_protocol_mark_disabled}
 
 @subsection Examples
 
@@ -118,6 +147,20 @@ tls-disabled-cipher = aes-128-cbc
 tls-disabled-cipher = aes-256-cbc
 tls-disabled-mac = sha1
 tls-disabled-group = group-ffdhe8192
+@end example
+
+The following example demonstrates the use of the allowlisting
+mode. It disables all the signature algorithms but
+@code{RSA-SHA256}. Note that the hash algorithm @code{SHA256} also
+needs to be explicitly enabled.
+
+@example
+[global]
+override-mode = allowlist
+
+[overrides]
+secure-hash = sha256
+secure-sig = rsa-sha256
 @end example
 
 @node Querying for disabled algorithms and protocols

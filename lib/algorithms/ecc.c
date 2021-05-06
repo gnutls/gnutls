@@ -353,13 +353,83 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get_id(const char *name)
 	return ret;
 }
 
+/* This is only called by cfg_apply in priority.c, in blocklisting mode. */
 int _gnutls_ecc_curve_mark_disabled(gnutls_ecc_curve_t curve)
 {
 	gnutls_ecc_curve_entry_st *p;
 
 	for(p = ecc_curves; p->name != NULL; p++) {
 		if (p->id == curve) {
-			p->supported = 0;
+			p->supported = false;
+			return 0;
+		}
+	}
+
+	return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+}
+
+/* This is only called by cfg_apply in priority.c, in allowlisting mode. */
+void _gnutls_ecc_curve_mark_disabled_all(void)
+{
+	gnutls_ecc_curve_entry_st *p;
+
+	for(p = ecc_curves; p->name != NULL; p++) {
+		p->supported = false;
+		p->supported_revertible = true;
+	}
+}
+
+/**
+ * gnutls_ecc_curve_mark_enabled:
+ * @curve: is an ECC curve
+ *
+ * Mark @curve as disabled system wide. This setting can be reverted with
+ * gnutls_ecc_curve_mark_enabled(). This only works if the configuration file
+ * uses the allowlisting mode.
+ *
+ * Returns: 0 on success or negative error code otherwise.
+ *
+ * Since: 3.7.3
+ */
+int gnutls_ecc_curve_mark_disabled(gnutls_ecc_curve_t curve)
+{
+	gnutls_ecc_curve_entry_st *p;
+
+	for(p = ecc_curves; p->name != NULL; p++) {
+		if (p->id == curve) {
+			if (!p->supported_revertible) {
+				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			}
+			p->supported = false;
+			return 0;
+		}
+	}
+
+	return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+}
+
+/**
+ * gnutls_ecc_curve_mark_enabled:
+ * @curve: is an ECC curve
+ *
+ * Invalidate previous system wide setting that marked @curve as disabled. This
+ * only works if the curve is disabled with gnutls_ecc_curve_mark_disabled() or
+ * through the allowlisting mode in the configuration file.
+ *
+ * Returns: 0 on success or negative error code otherwise.
+ *
+ * Since: 3.7.3
+ */
+int gnutls_ecc_curve_mark_enabled(gnutls_ecc_curve_t curve)
+{
+	gnutls_ecc_curve_entry_st *p;
+
+	for(p = ecc_curves; p->name != NULL; p++) {
+		if (p->id == curve) {
+			if (!p->supported_revertible) {
+				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			}
+			p->supported = true;
 			return 0;
 		}
 	}
