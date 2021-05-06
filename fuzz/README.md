@@ -87,7 +87,7 @@ xdg-open <URI given by previous command>
 # repeat the last three steps after changing *fuzzer.c
 ```
 
-Each fuzzer target has it's own files/functions to cover, e.g.
+Each fuzzer target has its own files/functions to cover, e.g.
 `gnutls_base64_decode_fuzzer` covers lib/x509_b64.c.
 
 To work on corpora for better coverage, `cd fuzz` and use e.g.

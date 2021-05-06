@@ -998,15 +998,15 @@ encryption_key
 # cRLSign flag in RFC5280 terminology.
 #crl_signing_key
 
-# The keyAgreement flag of RFC5280. It's purpose is loosely
+# The keyAgreement flag of RFC5280. Its purpose is loosely
 # defined. Not use it unless required by a protocol.
 #key_agreement
 
-# The dataEncipherment flag of RFC5280. It's purpose is loosely
+# The dataEncipherment flag of RFC5280. Its purpose is loosely
 # defined. Not use it unless required by a protocol.
 #data_encipherment
 
-# The nonRepudiation flag of RFC5280. It's purpose is loosely
+# The nonRepudiation flag of RFC5280. Its purpose is loosely
 # defined. Not use it unless required by a protocol.
 #non_repudiation
 
