@@ -81,6 +81,7 @@ gnutls_ecc_curve_entry_st ecc_curves[] = {
 	},
 	{
 	 .name = "X25519",
+         .oid = ECDH_X25519_OID,
 	 .id = GNUTLS_ECC_CURVE_X25519,
 	 .group = GNUTLS_GROUP_X25519,
 	 .pk = GNUTLS_PK_ECDH_X25519,
@@ -98,6 +99,7 @@ gnutls_ecc_curve_entry_st ecc_curves[] = {
 	},
 	{
 	 .name = "X448",
+         .oid = ECDH_X448_OID,
 	 .id = GNUTLS_ECC_CURVE_X448,
 	 .pk = GNUTLS_PK_ECDH_X448,
 	 .size = 56,
