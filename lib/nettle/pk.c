@@ -831,6 +831,19 @@ get_eddsa_curve(gnutls_pk_algorithm_t algo)
 	}
 }
 
+static inline gnutls_ecc_curve_t
+get_ecdh_curve(gnutls_pk_algorithm_t algo)
+{
+	switch (algo) {
+	case GNUTLS_PK_ECDH_X25519:
+		return GNUTLS_ECC_CURVE_X25519;
+	case GNUTLS_PK_ECDH_X448:
+		return GNUTLS_ECC_CURVE_X448;
+	default:
+		return gnutls_assert_val(GNUTLS_ECC_CURVE_INVALID);
+	}
+}
+
 static inline int
 eddsa_sign(gnutls_pk_algorithm_t algo,
 	   const uint8_t *pub,
@@ -3098,6 +3111,34 @@ wrap_nettle_pk_verify_priv_params(gnutls_pk_algorithm_t algo,
 		ret = 0;
 		break;
 	}
+	case GNUTLS_PK_ECDH_X25519:
+	case GNUTLS_PK_ECDH_X448: {
+		gnutls_ecc_curve_t curve;
+		const gnutls_ecc_curve_entry_st *e;
+		uint8_t pub[57]; /* can accommodate both curves */
+
+		curve = get_ecdh_curve(algo);
+		e = _gnutls_ecc_curve_get_params(curve);
+		if (e == NULL)
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+		if (params->raw_pub.data == NULL) {
+			return 0; /* nothing to verify */
+		}
+
+		if (params->raw_pub.size != e->size)
+			return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+
+		ret = edwards_curve_mul_g(algo, pub, params->raw_priv.data);
+		if (ret < 0)
+			return ret;
+
+		if (memcmp(params->raw_pub.data, pub, e->size) != 0)
+			return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+
+		ret = 0;
+                break;
+        }
 #if ENABLE_GOST
 	case GNUTLS_PK_GOST_01:
 	case GNUTLS_PK_GOST_12_256:
