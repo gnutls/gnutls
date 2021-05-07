@@ -69,6 +69,8 @@ _encode_privkey(gnutls_x509_privkey_t pkey, gnutls_datum_t * raw)
 	switch (pkey->params.algo) {
 	case GNUTLS_PK_EDDSA_ED25519:
 	case GNUTLS_PK_EDDSA_ED448:
+	case GNUTLS_PK_ECDH_X25519:
+	case GNUTLS_PK_ECDH_X448:
 		/* we encode as octet string (which is going to be stored inside
 		 * another octet string). No comments. */
 		ret = _gnutls_x509_encode_string(ASN1_ETYPE_OCTET_STRING,

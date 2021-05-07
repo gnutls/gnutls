@@ -1802,6 +1802,8 @@ wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 	case GNUTLS_PK_ECDSA:
 	case GNUTLS_PK_EDDSA_ED25519:
 	case GNUTLS_PK_EDDSA_ED448:
+	case GNUTLS_PK_ECDH_X25519:
+	case GNUTLS_PK_ECDH_X448:
 #if ENABLE_GOST
 	case GNUTLS_PK_GOST_01:
 	case GNUTLS_PK_GOST_12_256:

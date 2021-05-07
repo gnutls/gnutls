@@ -283,6 +283,8 @@ _gnutls_x509_write_pubkey_params(const gnutls_pk_params_st * params,
 		return _gnutls_x509_write_ecc_params(params->curve, der);
 	case GNUTLS_PK_EDDSA_ED25519:
 	case GNUTLS_PK_EDDSA_ED448:
+	case GNUTLS_PK_ECDH_X25519:
+	case GNUTLS_PK_ECDH_X448:
 		der->data = NULL;
 		der->size = 0;
 
@@ -867,7 +869,8 @@ _gnutls_asn1_encode_ecc(asn1_node * c2, gnutls_pk_params_st * params)
 		goto cleanup;
 	}
 
-	if (curve_is_eddsa(params->curve)) {
+	if (curve_is_eddsa(params->curve) ||
+            curve_is_modern_ecdh(params->curve)) {
 		if (params->raw_pub.size == 0 || params->raw_priv.size == 0)
 			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 		ret =
@@ -1071,6 +1074,8 @@ int _gnutls_asn1_encode_privkey(asn1_node * c2,
 	case GNUTLS_PK_ECDSA:
 	case GNUTLS_PK_EDDSA_ED25519:
 	case GNUTLS_PK_EDDSA_ED448:
+	case GNUTLS_PK_ECDH_X25519:
+	case GNUTLS_PK_ECDH_X448:
 		return _gnutls_asn1_encode_ecc(c2, params);
 	case GNUTLS_PK_GOST_01:
 	case GNUTLS_PK_GOST_12_256:

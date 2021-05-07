@@ -62,6 +62,8 @@ unsigned pubkey_to_bits(const gnutls_pk_params_st * params)
 	case GNUTLS_PK_ECDSA:
 	case GNUTLS_PK_EDDSA_ED25519:
 	case GNUTLS_PK_EDDSA_ED448:
+	case GNUTLS_PK_ECDH_X25519:
+	case GNUTLS_PK_ECDH_X448:
 	case GNUTLS_PK_GOST_01:
 	case GNUTLS_PK_GOST_12_256:
 	case GNUTLS_PK_GOST_12_512:
@@ -1175,7 +1177,9 @@ gnutls_pubkey_export_ecc_raw2(gnutls_pubkey_t key,
 		*curve = key->params.curve;
 
 	if (key->params.algo == GNUTLS_PK_EDDSA_ED25519 ||
-	    key->params.algo == GNUTLS_PK_EDDSA_ED448) {
+	    key->params.algo == GNUTLS_PK_EDDSA_ED448 ||
+	    key->params.algo == GNUTLS_PK_ECDH_X25519 ||
+	    key->params.algo == GNUTLS_PK_ECDH_X448) {
 		if (x) {
 			ret = _gnutls_set_datum(x, key->params.raw_pub.data, key->params.raw_pub.size);
 			if (ret < 0)
