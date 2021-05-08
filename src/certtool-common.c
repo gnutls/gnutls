@@ -1647,6 +1647,10 @@ gnutls_pk_algorithm_t figure_key_type(const char *key_type)
 		return GNUTLS_PK_EDDSA_ED25519;
 	else if (strcasecmp(key_type, "ed448") == 0)
 		return GNUTLS_PK_EDDSA_ED448;
+	else if (strcasecmp(key_type, "x25519") == 0)
+		return GNUTLS_PK_ECDH_X25519;
+	else if (strcasecmp(key_type, "x448") == 0)
+		return GNUTLS_PK_ECDH_X448;
 	else if (strcasecmp(key_type, "dsa") == 0)
 		return GNUTLS_PK_DSA;
 	else if (strcasecmp(key_type, "ecdsa") == 0 || strcasecmp(key_type, "ecc") == 0)
