@@ -566,6 +566,10 @@ generate_certificate(gnutls_privkey_t * ret_key,
 				if (result)
 					usage |=
 					    GNUTLS_KEY_KEY_ENCIPHERMENT;
+			} else if (pk == GNUTLS_PK_ECDH_X25519 ||
+                                   pk == GNUTLS_PK_ECDH_X448) {
+                                /* X25519 and X448 are only for key agreement. */
+                                usage |= GNUTLS_KEY_KEY_AGREEMENT;
 			} else {
 				usage |= GNUTLS_KEY_DIGITAL_SIGNATURE;
 			}
