@@ -3507,6 +3507,30 @@ wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 		}
 
 		params->raw_pub.size = params->raw_priv.size;
+	} else if (algo == GNUTLS_PK_ECDH_X25519 ||
+		   algo == GNUTLS_PK_ECDH_X448) {
+		if (unlikely(get_ecdh_curve(algo) != params->curve))
+			return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+
+		if (params->raw_priv.data == NULL)
+			return gnutls_assert_val(GNUTLS_E_PK_INVALID_PRIVKEY);
+
+		if (params->raw_pub.data == NULL) {
+			params->raw_pub.data = gnutls_malloc(params->raw_priv.size);
+		}
+
+		if (params->raw_pub.data == NULL)
+			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+		ret = edwards_curve_mul_g(algo,
+					  params->raw_pub.data,
+					  params->raw_priv.data);
+		if (ret < 0) {
+			gnutls_free(params->raw_pub.data);
+			return ret;
+		}
+
+		params->raw_pub.size = params->raw_priv.size;
 	} else if (algo == GNUTLS_PK_RSA_PSS) {
 		if (params->params_nr < RSA_PRIVATE_PARAMS - 3)
 			return gnutls_assert_val(GNUTLS_E_PK_INVALID_PRIVKEY);
