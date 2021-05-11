@@ -40,7 +40,7 @@ int _tls13_derive_secret(gnutls_session_t session,
 int _tls13_derive_secret2(const mac_entry_st *prf,
 			  const char *label, unsigned label_size,
 			  const uint8_t *tbh, size_t tbh_size,
-			  const uint8_t secret[MAX_CIPHER_KEY_SIZE],
+			  const uint8_t secret[MAX_HASH_SIZE],
 			  void *out);
 
 int _tls13_expand_secret(gnutls_session_t session,
@@ -52,7 +52,7 @@ int _tls13_expand_secret(gnutls_session_t session,
 int _tls13_expand_secret2(const mac_entry_st *prf,
 			  const char *label, unsigned label_size,
 			  const uint8_t *msg, size_t msg_size,
-			  const uint8_t secret[MAX_CIPHER_KEY_SIZE],
+			  const uint8_t secret[MAX_HASH_SIZE],
 			  unsigned out_size, void *out);
 
 #endif /* GNUTLS_LIB_SECRETS_H */
