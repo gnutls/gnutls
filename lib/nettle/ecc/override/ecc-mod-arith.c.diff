@@ -1,0 +1,19 @@
+diff --git a/ecc-mod-arith.c b/ecc-mod-arith.c
+index f2e47f67..959eae1c 100644
+--- a/ecc-mod-arith.c
++++ b/ecc-mod-arith.c
+@@ -125,3 +125,14 @@ ecc_mod_sqr (const struct ecc_modulo *m, mp_limb_t *rp,
+   mpn_sqr (rp, ap, m->size);
+   m->reduce (m, rp);
+ }
++
++void
++ecc_mod_mul_canonical (const struct ecc_modulo *m, mp_limb_t *rp,
++		       const mp_limb_t *ap, const mp_limb_t *bp)
++{
++  mp_limb_t cy;
++  ecc_mod_mul(m, rp, ap, bp);
++
++  cy = mpn_sub_n (rp + m->size, rp, m->m, m->size);
++  cnd_copy (!cy, rp, rp + m->size, m->size);
++}

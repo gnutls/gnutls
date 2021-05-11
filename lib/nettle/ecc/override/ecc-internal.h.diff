@@ -1,0 +1,26 @@
+diff --git a/ecc-internal.h b/ecc-internal.h
+index 9e24e0ce..2cc9b137 100644
+--- a/ecc-internal.h
++++ b/ecc-internal.h
+@@ -49,6 +49,7 @@
+ #define ecc_mod_submul_1 _nettle_ecc_mod_submul_1
+ #define ecc_mod_mul _nettle_ecc_mod_mul
+ #define ecc_mod_sqr _nettle_ecc_mod_sqr
++#define ecc_mod_mul_canonical _nettle_ecc_mod_mul_canonical
+ #define ecc_mod_random _nettle_ecc_mod_random
+ #define ecc_mod _nettle_ecc_mod
+ #define ecc_mod_inv _nettle_ecc_mod_inv
+@@ -256,6 +257,13 @@ void
+ ecc_mod_sqr (const struct ecc_modulo *m, mp_limb_t *rp,
+ 	     const mp_limb_t *ap);
+ 
++/* mul function produces a canonical result, 0 <= R < M, needs 2*m->size limbs
++ * at rp.
++ */
++void
++ecc_mod_mul_canonical (const struct ecc_modulo *m, mp_limb_t *rp,
++		       const mp_limb_t *ap, const mp_limb_t *bp);
++
+ /* mod q operations. */
+ void
+ ecc_mod_random (const struct ecc_modulo *m, mp_limb_t *xp,

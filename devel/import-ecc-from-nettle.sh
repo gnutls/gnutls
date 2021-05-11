@@ -96,6 +96,10 @@ for f in $IMPORTS; do
       echo "Copying file $dst"
     fi
     cp $src $dst
+    if test -e $DST/override/$f.diff; then
+      echo "Patching file $dst"
+      patch -s -d $DST -p1 < $DST/override/$f.diff
+    fi
     # Use <nettle/*.h> for public headers.
     for h in $PUBLIC; do
       p=$(echo $h | sed 's/\./\\./g')
