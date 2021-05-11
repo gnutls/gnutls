@@ -28,7 +28,7 @@ variables:
   CHECKJOBS: 16
 
 cache:
-  key: "$CI_JOB_NAME-ver20"
+  key: "$CI_JOB_NAME-ver21"
   paths:
     - cache/
 
