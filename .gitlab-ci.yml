@@ -12,9 +12,9 @@ variables:
   DEBIAN_BUILD: buildenv-debian-testing
   DEBIAN_CROSS_BUILD: buildenv-debian-cross-testing
   DEBIAN_X86_CROSS_BUILD: buildenv-debian-x86-cross
-  FEDORA_BUILD: buildenv-fedora33
-  MINGW_BUILD: buildenv-mingw-fedora33
-  ALPINE_BASE_BUILD: buildenv-alpine-base-nettle36
+  FEDORA_BUILD: buildenv-fedora34
+  MINGW_BUILD: buildenv-mingw-fedora34
+  ALPINE_BASE_BUILD: buildenv-alpine-base
   COMPILER: gcc
   CPPCHECK_OPTIONS: "--enable=warning --enable=style --enable=performance --enable=portability --std=c99 --suppressions-list=devel/cppcheck.suppressions --template='{id}:{file}:{line},{severity},{message}'"
   GET_SOURCES_ATTEMPTS: "3"
@@ -28,7 +28,7 @@ variables:
   CHECKJOBS: 16
 
 cache:
-  key: "$CI_JOB_NAME-ver21"
+  key: "$CI_JOB_NAME-ver22"
   paths:
     - cache/
 
