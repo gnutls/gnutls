@@ -851,6 +851,7 @@ const char *get_confirmed_pass(bool empty_ok)
 
 			pass = getpass("Enter password: ");
 			copy = strdup(pass);
+			CHECK_MALLOC(copy);
 			pass = getpass("Confirm password: ");
 		}
 		while (strcmp(pass, copy) != 0

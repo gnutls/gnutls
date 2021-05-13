@@ -1135,7 +1135,7 @@ static void terminate(int sig)
 	*p++ = '\n';
 
 	write(STDERR_FILENO, buf, p - buf);
-	exit(1);
+	_exit(1);
 }
 
 

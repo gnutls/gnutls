@@ -132,6 +132,10 @@ _gnutls_nss_keylog_func(gnutls_session_t session,
 	return 0;
 }
 
+/* GCC analyzer doesn't like static FILE pointer */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wanalyzer-file-leak"
+
 void _gnutls_nss_keylog_write(gnutls_session_t session,
 			      const char *label,
 			      const uint8_t *secret, size_t secret_size)
@@ -171,6 +175,8 @@ void _gnutls_nss_keylog_deinit(void)
 		keylog = NULL;
 	}
 }
+
+#pragma GCC diagnostic pop
 
 /* here we generate the TLS Master secret.
  */

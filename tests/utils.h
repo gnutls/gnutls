@@ -30,6 +30,7 @@
 #include <signal.h>
 #include <string.h>
 #include <stdarg.h>
+#include <unistd.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/pkcs11.h>
 
@@ -160,7 +161,7 @@ inline static void _check_wait_status(int status, unsigned sigonly)
 		} else {
 			if (!sigonly) {
 				if (WEXITSTATUS(status) == 77)
-					exit(77);
+					_exit(77);
 				fail("Child died with status %d\n",
 				     WEXITSTATUS(status));
 			}

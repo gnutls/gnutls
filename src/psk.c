@@ -247,7 +247,11 @@ write_key(const char *username, const unsigned char *key, size_t key_size,
 		_username.data = (void *)new_data;
 		_username.size = new_size - 1;
 	} else {
-		_username.data = (void *)strdup(username);
+		_username.data = (void *)gnutls_strdup(username);
+		if (!_username.data) {
+			ret = -1;
+			goto out;
+		}
 		_username.size = strlen(username);
 	}
 

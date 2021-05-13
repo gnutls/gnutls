@@ -67,7 +67,7 @@ gnutls_pin_callback_t gnutls_pkcs11_get_pin_function(void **userdata)
 int
 _gnutls_retrieve_pin(struct pin_info_st *pin_info, const char *url, const char *label,
 		     unsigned flags,
-		     char pin[GNUTLS_PKCS11_MAX_PIN_LEN], unsigned pin_size)
+		     char *pin, unsigned pin_size)
 {
 	int ret;
 

@@ -110,6 +110,7 @@ static int generate_create_conf(const char *tpasswd_conf)
 			g = gnutls_srp_8192_group_generator;
 		} else {
 			fprintf(stderr, "Unknown index: %d\n", index);
+			fclose(fp);
 			return -1;
 		}
 
@@ -585,6 +586,7 @@ crypt_int(const char *username, const char *passwd, int salt_size,
 			fprintf(stderr, "Cannot open '%s' for read\n",
 				tmpname);
 			(void)remove(tmpname);
+			fclose(fp);
 			return -1;
 		}
 
