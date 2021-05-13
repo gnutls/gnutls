@@ -160,7 +160,8 @@ static void client(int sds[])
 
 	global_init();
 
-	virt_time_init();
+	/* date --date='TZ="UTC" 2019-04-12' +%s */
+	virt_time_init_at(1555027200);
 
 	if (debug) {
 		gnutls_global_set_log_function(client_log_func);
@@ -302,7 +303,8 @@ static void server(int sds[])
 	 */
 	global_init();
 
-	virt_time_init();
+	/* date --date='TZ="UTC" 2019-04-12' +%s */
+	virt_time_init_at(1555027200);
 
 	if (debug) {
 		gnutls_global_set_log_function(server_log_func);

@@ -1150,6 +1150,11 @@ _gnutls_call_secret_func(gnutls_session_t session,
 				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 			secret_read = session->key.proto.tls13.e_ckey;
 		}
+		if (for_write) {
+			if (unlikely(session->security_parameters.entity == GNUTLS_SERVER))
+				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+			secret_write = session->key.proto.tls13.e_ckey;
+		}
 		break;
 	case STAGE_HS:
 		prf = session->security_parameters.prf;

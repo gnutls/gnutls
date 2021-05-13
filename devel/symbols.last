@@ -12,6 +12,7 @@ GNUTLS_3_6_6@GNUTLS_3_6_6
 GNUTLS_3_6_8@GNUTLS_3_6_8
 GNUTLS_3_6_9@GNUTLS_3_6_9
 GNUTLS_3_7_0@GNUTLS_3_7_0
+GNUTLS_3_7_2@GNUTLS_3_7_2
 _gnutls_global_init_skip@GNUTLS_3_4
 gnutls_aead_cipher_decrypt@GNUTLS_3_4
 gnutls_aead_cipher_decryptv2@GNUTLS_3_6_10
@@ -203,6 +204,8 @@ gnutls_dtls_prestate_set@GNUTLS_3_4
 gnutls_dtls_set_data_mtu@GNUTLS_3_4
 gnutls_dtls_set_mtu@GNUTLS_3_4
 gnutls_dtls_set_timeouts@GNUTLS_3_4
+gnutls_early_cipher_get@GNUTLS_3_7_2
+gnutls_early_prf_hash_get@GNUTLS_3_7_2
 gnutls_ecc_curve_get@GNUTLS_3_4
 gnutls_ecc_curve_get_id@GNUTLS_3_4
 gnutls_ecc_curve_get_name@GNUTLS_3_4

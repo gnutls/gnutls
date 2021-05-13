@@ -26,6 +26,10 @@ See the end for copying conditions.
    GNUTLS_NO_IMPLICIT_INIT to reflect the purpose (#1178). The former is now
    deprecated and will be removed in the future releases.
 
+** API and ABI modifications:
+gnutls_early_cipher_get: Added
+gnutls_early_prf_hash_get: Added
+
 * Version 3.7.1 (released 2021-03-10)
 
 ** libgnutls: Fixed potential use-after-free in sending "key_share"

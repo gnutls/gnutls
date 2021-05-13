@@ -92,6 +92,40 @@ gnutls_cipher_algorithm_t gnutls_cipher_get(gnutls_session_t session)
 }
 
 /**
+ * gnutls_early_cipher_get:
+ * @session: is a #gnutls_session_t type.
+ *
+ * Get the cipher algorithm used for encrypting early data.
+ *
+ * Returns: the cipher used for early data, a
+ *   #gnutls_cipher_algorithm_t type.
+ *
+ * Since: 3.7.2
+ **/
+gnutls_cipher_algorithm_t gnutls_early_cipher_get(gnutls_session_t session)
+{
+	const cipher_entry_st *ce;
+
+	if (!(session->internals.hsk_flags & HSK_EARLY_DATA_IN_FLIGHT)) {
+		return gnutls_assert_val(GNUTLS_CIPHER_UNKNOWN);
+	}
+
+	if (unlikely(session->internals.
+		     resumed_security_parameters.cs == NULL)) {
+		return gnutls_assert_val(GNUTLS_CIPHER_UNKNOWN);
+	}
+
+	ce = cipher_to_entry(session->internals.
+			     resumed_security_parameters.
+			     cs->block_algorithm);
+	if (unlikely(ce == NULL)) {
+		return gnutls_assert_val(GNUTLS_CIPHER_UNKNOWN);
+	}
+
+	return ce->id;
+}
+
+/**
  * gnutls_certificate_type_get:
  * @session: is a #gnutls_session_t type.
  *
@@ -257,6 +291,39 @@ gnutls_prf_hash_get(const gnutls_session_t session)
 		return gnutls_assert_val(GNUTLS_DIG_UNKNOWN);
 
 	return (gnutls_digest_algorithm_t)session->security_parameters.prf->id;
+}
+
+/**
+ * gnutls_early_prf_hash_get:
+ * @session: is a #gnutls_session_t type.
+ *
+ * Get the hash algorithm used as a PRF to derive keys for encrypting
+ * early data in TLS 1.3.
+ *
+ * Returns: the hash algorithm used for early data, a
+ *    #gnutls_digest_algorithm_t value.
+ *
+ * Since: 3.7.2
+ **/
+gnutls_digest_algorithm_t
+gnutls_early_prf_hash_get(const gnutls_session_t session)
+{
+	if (!(session->internals.hsk_flags & HSK_EARLY_DATA_IN_FLIGHT)) {
+		return gnutls_assert_val(GNUTLS_DIG_UNKNOWN);
+	}
+
+	if (unlikely(session->internals.
+		     resumed_security_parameters.prf == NULL)) {
+		return gnutls_assert_val(GNUTLS_DIG_UNKNOWN);
+	}
+
+	if (unlikely(session->internals.
+		     resumed_security_parameters.prf->id >= GNUTLS_MAC_AEAD)) {
+		return gnutls_assert_val(GNUTLS_DIG_UNKNOWN);
+	}
+
+	return (gnutls_digest_algorithm_t)session->internals.
+		resumed_security_parameters.prf->id;
 }
 
 void reset_binders(gnutls_session_t session)
