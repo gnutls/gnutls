@@ -40,7 +40,7 @@ LDADD = $(top_builddir)/tests/libutils.la \
 ctests =
 
 if WINDOWS
-lib_LTLIBRARIES = ncrypt.la crypt32.la
+check_LTLIBRARIES = ncrypt.la crypt32.la
 
 ncrypt_la_SOURCES = ncrypt.c
 crypt32_la_SOURCES = crypt32.c

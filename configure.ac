@@ -120,7 +120,7 @@ case "$host" in
   *mingw32* | *mingw64*)
     have_win=yes
     AC_DEFINE([_UNICODE], [1], [Defined to 1 for Unicode (wide chars) APIs])
-    GNUTLS_LIBS_PRIVATE="${GNUTLS_LIBS_PRIVATE} -lcrypt32"
+    GNUTLS_LIBS_PRIVATE="${GNUTLS_LIBS_PRIVATE} -ladvapi32 -lcrypt32"
     AC_PREPROC_IFELSE([AC_LANG_PROGRAM(
       [[#include <windows.h>
        #if defined(_WIN32_WINNT) && _WIN32_WINNT >= 0x0600
