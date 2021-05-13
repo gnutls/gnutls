@@ -7,7 +7,7 @@ short-usage   = "systemkey-tool [options]\nsystemkey-tool --help for usage instr
 explain       = "";
 
 #define  OUTFILE_OPT   1
-#define  INFILE_OPT   1
+#define  INFILE_OPT   0
 #include args-std.def
 
 flag = {
@@ -22,14 +22,6 @@ flag = {
     arg-name  = "url";
     descrip   = "Delete the key identified by the given URL.";
     doc      = "";
-};
-
-flag = {
-    name      = inder;
-    descrip   = "Use the DER format for keys.";
-    disabled;
-    disable   = "no";
-    doc       = "The input files will be assumed to be in DER format.";
 };
 
 flag = {

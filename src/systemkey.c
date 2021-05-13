@@ -50,12 +50,11 @@ static void cmd_parser(int argc, char **argv);
 static void systemkey_delete(const char *url, FILE * outfile);
 static void systemkey_list(FILE * outfile);
 
-static gnutls_x509_crt_fmt_t incert_format, outcert_format;
-static gnutls_x509_crt_fmt_t inkey_format, outkey_format;
+static gnutls_x509_crt_fmt_t outcert_format;
+static gnutls_x509_crt_fmt_t outkey_format;
 
 static FILE *outfile;
 static const char *outfile_name = NULL;
-static FILE *infile;
 int batch = 0;
 int ask_pass = 0;
 
@@ -95,14 +94,6 @@ static void cmd_parser(int argc, char **argv)
 		printf("Setting log level to %d\n", (int) OPT_VALUE_DEBUG);
 	}
 
-	if (HAVE_OPT(INDER)) {
-		incert_format = GNUTLS_X509_FMT_DER;
-		inkey_format = GNUTLS_X509_FMT_DER;
-	} else {
-		incert_format = GNUTLS_X509_FMT_PEM;
-		inkey_format = GNUTLS_X509_FMT_PEM;
-	}
-
 	if (HAVE_OPT(OUTDER)) {
 		outcert_format = GNUTLS_X509_FMT_DER;
 		outkey_format = GNUTLS_X509_FMT_DER;
@@ -120,15 +111,6 @@ static void cmd_parser(int argc, char **argv)
 		outfile_name = OPT_ARG(OUTFILE);
 	} else
 		outfile = stdout;
-
-	if (HAVE_OPT(INFILE)) {
-		infile = fopen(OPT_ARG(INFILE), "rb");
-		if (infile == NULL) {
-			fprintf(stderr, "%s", OPT_ARG(INFILE));
-			app_exit(1);
-		}
-	} else
-		infile = stdin;
 
 	if (HAVE_OPT(DELETE)) {
 		systemkey_delete(OPT_ARG(DELETE), outfile);
