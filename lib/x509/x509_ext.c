@@ -1129,6 +1129,33 @@ int gnutls_x509_ext_import_key_usage(const gnutls_datum_t * ext,
 	return 0;
 }
 
+static int _last_key_usage_set_bit(int usage)
+{
+/* the byte ordering is a bit strange here, see how GNUTLS_KEY_* is laid out, and how 
+ * asn1_write_value() writes out BIT STRING objects.
+ */
+        if (usage & GNUTLS_KEY_DECIPHER_ONLY)
+                return 9;
+        else if (usage & GNUTLS_KEY_ENCIPHER_ONLY)
+                return 8;
+        else if (usage & GNUTLS_KEY_CRL_SIGN)
+                return 7;
+        else if (usage & GNUTLS_KEY_KEY_CERT_SIGN)
+                return 6;
+        else if (usage & GNUTLS_KEY_KEY_AGREEMENT)
+                return 5;
+        else if (usage & GNUTLS_KEY_DATA_ENCIPHERMENT)
+                return 4;
+        else if (usage & GNUTLS_KEY_KEY_ENCIPHERMENT)
+                return 3;
+        else if (usage & GNUTLS_KEY_NON_REPUDIATION)
+                return 2;
+        else if (usage & GNUTLS_KEY_DIGITAL_SIGNATURE)
+                return 1;
+        else
+                return 0;
+}
+
 /**
  * gnutls_x509_ext_export_key_usage:
  * @usage: an ORed sequence of the GNUTLS_KEY_* elements.
@@ -1159,8 +1186,8 @@ int gnutls_x509_ext_export_key_usage(unsigned int usage, gnutls_datum_t * ext)
 	str[1] = usage >> 8;
 
 	/* Since KeyUsage is a BIT STRING, the input to asn1_write_value
-	 * is the number of bits to be read. */
-	result = asn1_write_value(c2, "", str, 9);
+	 * is the number of bits to be written/read. */
+	result = asn1_write_value(c2, "", str, _last_key_usage_set_bit(usage));
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		asn1_delete_structure(&c2);
