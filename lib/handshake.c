@@ -58,6 +58,8 @@
 #include "tls13/early_data.h"
 #include "tls13/session_ticket.h"
 #include "locks.h"
+#include "system/ktls.h"
+
 
 static int check_if_null_comp_present(gnutls_session_t session,
 					     uint8_t * data, int datalen);
@@ -2808,6 +2810,12 @@ int gnutls_handshake(gnutls_session_t session)
 	const version_entry_st *vers = get_version(session);
 	int ret;
 
+#ifdef ENABLE_KTLS
+	int sockin, sockout;
+	gnutls_transport_get_int2(session, &sockin, &sockout);
+	_gnutls_ktls_enable(session, sockin, sockout);	
+#endif 
+
 	if (unlikely(session->internals.initial_negotiation_completed)) {
 		if (vers->tls13_sem) {
 			if (session->security_parameters.entity == GNUTLS_CLIENT) {
@@ -2902,6 +2910,14 @@ int gnutls_handshake(gnutls_session_t session)
 			session->internals.ertt = timespec_sub_ms(&handshake_finish_time, &session->internals.handshake_start_time)/4;
 		}
 	}
+
+#ifdef ENABLE_KTLS
+	if (IS_KTLS_ENABLED(session)) {
+		ret = _gnutls_ktls_set_keys(session);
+		if (ret < 0)
+			return ret;
+	}
+#endif
 
 	return 0;
 }

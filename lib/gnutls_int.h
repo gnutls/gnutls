@@ -175,6 +175,9 @@ typedef enum record_send_state_t {
 /* To check whether we have a DTLS session */
 #define IS_DTLS(session) (session->internals.transport == GNUTLS_DGRAM)
 
+/* To check whether we have a KTLS enabled */
+#define IS_KTLS_ENABLED(session) (session->internals.ktls_enabled)
+
 /* the maximum size of encrypted packets */
 #define DEFAULT_MAX_RECORD_SIZE 16384
 #define DEFAULT_MAX_EARLY_DATA_SIZE 16384
@@ -1487,6 +1490,11 @@ typedef struct {
 	/* Protects _gnutls_epoch_gc() from _gnutls_epoch_get(); these may be
 	 * called in parallel when false start is used and false start is used. */
 	void *epoch_lock;
+
+	/* indicates whether or not was KTLS initialized properly. */
+	bool ktls_enabled;
+	int recv_fd;
+	int send_fd;
 
 	/* If you add anything here, check _gnutls_handshake_internal_state_clear().
 	 */
