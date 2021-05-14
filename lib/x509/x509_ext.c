@@ -2161,6 +2161,16 @@ int gnutls_x509_ext_export_policies(gnutls_x509_policies_t policies,
 			goto cleanup;
 		}
 
+                if (policies->policy[j].qualifiers == 0) {
+                        /* remove the optional policyQualifiers if none are present. */
+                        result = asn1_write_value(c2, "?LAST.policyQualifiers", NULL, 0); 
+                        if (result != ASN1_SUCCESS) {
+                                gnutls_assert();
+                                result = _gnutls_asn2err(result);
+                                goto cleanup;
+                        }
+                }
+
 		for (i = 0;
 		     i < MIN(policies->policy[j].qualifiers,
 			     GNUTLS_MAX_QUALIFIERS); i++) {
