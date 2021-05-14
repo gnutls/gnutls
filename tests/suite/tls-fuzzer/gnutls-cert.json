@@ -96,5 +96,24 @@
                          "-p", "@PORT@"]
 	 }
      ]
+    },
+    {"server_command": ["@SERVER@", "--http",
+                 "--x509keyfile", "tests/serverX509Key.pem",
+                 "--x509certfile", "tests/serverX509Cert.pem",
+                 "--debug=6",
+                 "--priority=NORMAL:+VERS-TLS1.2",
+                 "--port=@PORT@"],
+     "environment": {"PYTHONPATH" : "."},
+     "server_hostname": "localhost",
+     "server_port": @PORT@,
+     "tests" : [
+         {"name" : "test-certificate-request.py",
+          "arguments" : ["-k", "tests/clientX509Key.pem",
+                         "-c", "tests/clientX509Cert.pem",
+                         "-p", "@PORT@",
+                         "-s", "sha256+rsa rsa_pss_pss_sha256 rsa_pss_rsae_sha256 sha256+ecdsa rsa_pss_rsae_sha256 sha384+rsa rsa_pss_pss_sha384 rsa_pss_rsae_sha384 sha384+ecdsa ed448 sha512+rsa rsa_pss_pss_sha512 rsa_pss_rsae_sha512 sha512+ecdsa sha1+rsa sha1+ecdsa",
+                         "check cert types in cert request"]
+         }
+     ]
     }
 ]
