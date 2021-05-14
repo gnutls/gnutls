@@ -1,4 +1,5 @@
 stages:
+  - bootstrap
   - build
   - test
   - archive
@@ -48,6 +49,25 @@ default:
     # after_script is executed in separate shell
     - *prepare-ccache
     - ccache -s
+
+.bootstrap:
+  stage: bootstrap
+  tags:
+    - shared
+    - linux
+  script:
+    - SUBMODULE_NOFETCH=1 ./bootstrap
+  artifacts:
+    expire_in: 1 day
+    #when: on_failure
+    paths:
+      - ./
+    exclude:
+      - .git/ # passing forward .git causes warnings and possibly problems
+      - ./**/.git/ # passing forward .git causes warnings and possibly problems
+      - ./**/*.c
+      - ./**/*.h
+      - ./**/*.o
 
 .build:
   stage: build
@@ -158,9 +178,9 @@ doc-dist.Fedora:
   extends:
     - .test
     - .fedora
-  needs: [] # can be run immediately
+  needs:
+    - fedora/bootstrap
   script:
-    - SUBMODULE_NOFETCH=1 ./bootstrap
     - GUILE=/usr/bin/guile2.2
     - GUILD=/usr/bin/guild2.2
     - guile_snarf=/usr/bin/guile-snarf2.2
@@ -185,9 +205,9 @@ UB+ASAN-Werror.Fedora.x86_64.gcc:
   extends:
     - .test
     - .fedora
-  needs: [] # builds own artifacts, no need to wait
+  needs:
+    - fedora/bootstrap
   script:
-    - ./bootstrap
     - export UBSAN_OPTIONS=print_stacktrace=1
     - export LSAN_OPTIONS=suppressions=$(pwd)/devel/lsan.supp
     - export CFLAGS="-std=c99 -O1 -g -Wno-cpp -Werror -fno-omit-frame-pointer -fsanitize=undefined,bool,alignment,null,enum,bounds-strict,address,leak,nonnull-attribute -fno-sanitize-recover=all -fsanitize-address-use-after-scope"
@@ -214,16 +234,23 @@ UB+ASAN-Werror.Fedora.x86_64.gcc:
     - linux
   except:
     - tags
+
 ##############################################################################
 ########################### Fedora pipelines #################################
 ##############################################################################
+
+fedora/bootstrap:
+  extends:
+    - .bootstrap
+    - .fedora
 
 fedora-notools/build:
   extends:
     - .build
     - .fedora
+  needs:
+    - fedora/bootstrap
   script:
-    - ./bootstrap
     - dash ./configure --cache-file $CCACHE_FILE --disable-gcc-warnings --disable-full-test-suite --disable-doc --disable-guile --disable-tools --enable-tests
     - make -j$BUILDJOBS
     # build tests, but don't execute them
@@ -242,8 +269,9 @@ fedora-minimal/build:
   extends:
     - .build
     - .fedora
+  needs:
+    - fedora/bootstrap
   script:
-    - ./bootstrap
     - dnf remove -y libunistring-devel libtasn1-devel libidn-devel
     - dash ./configure --cache-file $CCACHE_FILE --with-included-libtasn1
       --disable-doc --disable-dtls-srtp-support --disable-alpn-support --disable-tests
@@ -272,9 +300,10 @@ fedora-SSL-3.0/build:
   extends:
     - .build
     - .fedora
+  needs:
+    - fedora/bootstrap
   script:
     - update-crypto-policies --set LEGACY
-    - ./bootstrap
     - dash ./configure --disable-tls13-interop --disable-gcc-warnings --cache-file $CCACHE_FILE --enable-sha1-support --enable-ssl3-support --enable-seccomp-tests --disable-doc --disable-guile --disable-strict-der-time
     - make -j$BUILDJOBS
     # build tests, but don't execute them
@@ -293,8 +322,9 @@ fedora-FIPS140-2/build:
   extends:
     - .build
     - .fedora
+  needs:
+    - fedora/bootstrap
   script:
-    - ./bootstrap
     - dash ./configure --disable-gcc-warnings --cache-file $CCACHE_FILE --disable-non-suiteb-curves --enable-fips140-mode --disable-doc --disable-full-test-suite --disable-guile
     - make -j$BUILDJOBS
     # build tests, but don't execute them
@@ -315,6 +345,8 @@ fedora-FIPS140-2/test:
   extends:
     - .build
     - .fedora-nettle
+  needs:
+    - fedora/bootstrap
   script:
     - git clone --depth 1 --branch master https://gitlab.com/gnutls/nettle.git nettle-git
     - pushd nettle-git
@@ -323,7 +355,6 @@ fedora-FIPS140-2/test:
     - make -j$BUILDJOBS
     - make -j$BUILDJOBS install
     - popd
-    - SUBMODULE_NOFETCH=1 ./bootstrap
     - PKG_CONFIG_PATH=${PWD}/$NETTLE_DIR/lib64/pkgconfig dash ./configure --disable-gcc-warnings --disable-doc --disable-guile
     - make -j$BUILDJOBS
     - make -j$BUILDJOBS check TESTS=""
@@ -367,8 +398,9 @@ fedora-valgrind/build:
   extends:
     - .build
     - .fedora
+  needs:
+    - fedora/bootstrap
   script:
-    - ./bootstrap
     # gcc in fedora31 inlines strcmp in a way that causes valgrind errors
     - CFLAGS="-O2 -g -fno-builtin-strcmp" ./configure --disable-gcc-warnings --disable-doc --cache-file $CCACHE_FILE --disable-guile --disable-full-test-suite --enable-valgrind-tests
     - make -j$BUILDJOBS
@@ -394,8 +426,9 @@ fedora-valgrind-aggressive/build:
   extends:
     - .build
     - .fedora
+  needs:
+    - fedora/bootstrap
   script:
-    - ./bootstrap
     # gcc in fedora31 inlines strcmp in a way that causes valgrind errors
     - CFLAGS="-O2 -g -fno-builtin-strcmp -DAGGRESSIVE_REALLOC" ./configure --disable-gcc-warnings --disable-doc --cache-file $CCACHE_FILE --disable-guile --disable-full-test-suite --enable-valgrind-tests
     - make -j$BUILDJOBS
@@ -421,8 +454,9 @@ fedora-threadsan/build:
   extends:
     - .build
     - .fedora
+  needs:
+    - fedora/bootstrap
   script:
-    - ./bootstrap
     - CFLAGS="-fsanitize=thread -g -O2" CXXFLAGS=$CFLAGS
       dash ./configure --disable-gcc-warnings --disable-doc --cache-file $CCACHE_FILE --disable-non-suiteb-curves --disable-guile --enable-fips140-mode --disable-full-test-suite
     - make -j$BUILDJOBS
@@ -443,9 +477,10 @@ fedora-static-analyzers/build:
   extends:
     - .build
     - .fedora
+  needs:
+    - fedora/bootstrap
   #TODO originally, before_script was set to "/bin/true".. is there a reason not to create the cache?
   script:
-    - ./bootstrap
     - scan-build ./configure --cache-file $CCACHE_FILE --disable-doc --disable-guile --enable-fips140-mode
     - make -j$BUILDJOBS syntax-check gnulib_dir=$GNULIB_SRCDIR
     - make -j$BUILDJOBS -C gl
@@ -517,9 +552,9 @@ fedora-abicoverage/build:
   extends:
     - .build
     - .fedora
+  needs:
+    - fedora/bootstrap
   script:
-  script:
-    - SUBMODULE_NOFETCH=1 ./bootstrap
     - GUILE=/usr/bin/guile2.2
     - GUILD=/usr/bin/guild2.2
     - guile_snarf=/usr/bin/guile-snarf2.2
@@ -561,15 +596,21 @@ fedora-abicoverage/test:
 ########################### Debian pipelines #################################
 ##############################################################################
 
+debian/bootstrap:
+  extends:
+    - .bootstrap
+    - .debian
+
 debian/build:
   extends:
     - .build
     - .debian
+  needs:
+    - debian/bootstrap
   script:
-  - ./bootstrap
-  - dash ./configure --enable-oldgnutls-interop --disable-gcc-warnings --cache-file $CCACHE_FILE --disable-doc --disable-guile LDFLAGS='-Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now'
-  - make -j$BUILDJOBS
-  - make -j$BUILDJOBS check TESTS=""
+    - dash ./configure --enable-oldgnutls-interop --disable-gcc-warnings --cache-file $CCACHE_FILE --disable-doc --disable-guile LDFLAGS='-Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now'
+    - make -j$BUILDJOBS
+    - make -j$BUILDJOBS check TESTS=""
 
 debian/test:
   extends:
@@ -592,7 +633,6 @@ debian/test:
     # cross-compile mode even though --build is given
     - export CC_FOR_BUILD="ccache gcc"
     - export CC="ccache $host-gcc"
-    - ./bootstrap
     # Debian's softhsm package is not multiarch yet. Missing softhsm libraries
     # for the target will cause the test suite to fail when p11-kit is enabled.
     - dash ./configure --build=$build --host=$host --disable-gcc-warnings
@@ -618,10 +658,17 @@ debian/test:
     - docker
     - linux
 
+debian-cross-i686/bootstrap:
+  extends:
+    - .bootstrap
+    - .debian-cross-i686
+
 debian-cross/i686-linux-gnu/build: # name is important, see .debian-cross/build
   extends:
     - .debian-cross/build
     - .debian-cross-i686
+  needs:
+    - debian-cross-i686/bootstrap
 
 debian-cross/i686-linux-gnu/test:
   extends:
@@ -632,10 +679,17 @@ debian-cross/i686-linux-gnu/test:
   needs:
     - debian-cross/i686-linux-gnu/build
 
+debian-cross-other/bootstrap:
+  extends:
+    - .bootstrap
+    - .debian-cross-other
+
 debian-cross/arm-linux-gnueabihf/build: # name is important, see .debian-cross/build
   extends:
     - .debian-cross/build
     - .debian-cross-other
+  needs:
+    - debian-cross-other/bootstrap
 
 debian-cross/arm-linux-gnueabihf/test:
   extends:
@@ -651,6 +705,8 @@ debian-cross/aarch64-linux-gnu/build: # name is important, see .debian-cross/bui
   extends:
     - .debian-cross/build
     - .debian-cross-other
+  needs:
+    - debian-cross-other/bootstrap
 
 debian-cross/aarch64-linux-gnu/test:
   extends:
@@ -663,23 +719,22 @@ debian-cross/aarch64-linux-gnu/test:
   timeout: 2h
   allow_failure: true
 
+##############################################################################
+########################### MinGW pipelines ##################################
+##############################################################################
+
 .mingw/build:
   extends:
     - .build
   script:
 #    - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
 #    - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
-    - ./bootstrap
     - dash ./configure --disable-gcc-warnings --host=${arch_name}-w64-mingw32 --target=${arch_name}-w64-mingw32 --cache-file $CCACHE_FILE --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-full-test-suite --disable-doc
     # since we use --enable-local-libopts the generated files must equal the .bak
     - mingw${arch_bits}-make -j$BUILDJOBS -C src certtool-args.c.bak
     - cmp src/certtool-args.c src/certtool-args.c.bak || false # TODO not really sure about what is this for
     - mingw${arch_bits}-make -j$BUILDJOBS
     - mingw${arch_bits}-make -j$BUILDJOBS -C tests check TESTS=""
-
-##############################################################################
-########################### MinGW pipelines ##################################
-##############################################################################
 
 .mingw/test:
   extends:
@@ -715,10 +770,17 @@ debian-cross/aarch64-linux-gnu/test:
     paths:
       - win${arch_bits}-build/
 
+mingw/bootstrap:
+  extends:
+    - .bootstrap
+    - .mingw
+
 mingw64/build:
   extends:
     - .mingw/build
     - .mingw64
+  needs:
+    - mingw/bootstrap
 
 mingw64/test:
   extends:
@@ -744,6 +806,8 @@ mingw64-vista/build:
     - .mingw/build
     - .mingw64
     - .mingw-vista
+  needs:
+    - mingw/bootstrap
 
 mingw64-vista/test:
   extends:
@@ -770,6 +834,8 @@ mingw32/build:
   extends:
     - .mingw/build
     - .mingw32
+  needs:
+    - mingw/bootstrap
 
 mingw32/test:
   extends:
@@ -795,6 +861,8 @@ mingw32-vista/build:
     - .mingw/build
     - .mingw32
     - .mingw-vista
+  needs:
+    - mingw/bootstrap
 
 mingw32-vista/test:
   extends:
