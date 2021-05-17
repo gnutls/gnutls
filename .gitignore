@@ -854,6 +854,7 @@ tests/tls13-cipher-neg
 tests/tls13-compat-mode
 tests/tls13-early-data
 tests/tls13-early-data-neg
+tests/tls13-early-data-neg2
 tests/tls13-early-start
 tests/tls13-rehandshake-cert
 tests/tls13-resume-psk
