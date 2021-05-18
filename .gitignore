@@ -921,7 +921,7 @@ tests/x509sign-verify-gost
 tests/x509sign-verify-rsa
 tests/x509sign-verify2
 tests/x509signself
-*.tmp*
+*.tmp
 tmp-*
 *.trs
 win32
