@@ -101,7 +101,8 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/cert-with-non-digits-time-ca.pem data/cert-with-non-digits-time.pem \
 	data/chain-512-leaf.pem data/chain-512-subca.pem data/chain-512-ca.pem \
 	templates/template-no-ca-honor.tmpl templates/template-no-ca-explicit.tmpl \
-	data/crq-cert-no-ca-explicit.pem data/crq-cert-no-ca-honor.pem data/commonName.cer
+	data/crq-cert-no-ca-explicit.pem data/crq-cert-no-ca-honor.pem data/commonName.cer \
+	templates/simple-policy.tmpl data/simple-policy.pem
 
 dist_check_SCRIPTS = pathlen.sh aki.sh invalid-sig.sh email.sh \
 	pkcs7.sh pkcs7-broken-sigs.sh privkey-import.sh name-constraints.sh certtool-long-cn.sh crl.sh provable-privkey.sh \
@@ -128,7 +129,8 @@ endif
 
 if !WINDOWS
 dist_check_SCRIPTS += template-test.sh pem-decoding.sh othername-test.sh krb5-test.sh sha3-test.sh md5-test.sh \
-	tlsfeature-test.sh template-exts-test.sh pkcs1-pad.sh pkcs12-utf8.sh rsa-pss-pad.sh dsa.sh certtool.sh
+	tlsfeature-test.sh template-exts-test.sh pkcs1-pad.sh pkcs12-utf8.sh rsa-pss-pad.sh dsa.sh certtool.sh \
+	template-policy-test.sh
 endif
 
 if ENABLE_DANE
