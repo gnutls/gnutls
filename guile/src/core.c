@@ -539,7 +539,7 @@ SCM_DEFINE (scm_gnutls_set_server_session_certificate_request_x,
 #define FUNC_NAME s_scm_gnutls_set_server_session_certificate_request_x
 {
   gnutls_session_t c_session;
-  gnutls_certificate_status_t c_request;
+  gnutls_certificate_request_t c_request;
 
   c_session = scm_to_gnutls_session (session, 1, FUNC_NAME);
   c_request = scm_to_gnutls_certificate_request (request, 2, FUNC_NAME);
