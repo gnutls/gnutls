@@ -322,7 +322,7 @@ decode_complex_string(const struct oid_to_string *oentry, void *value,
 {
 	char str[MAX_STRING_LEN], tmpname[128];
 	int len = -1, result;
-	ASN1_TYPE tmpasn = ASN1_TYPE_EMPTY;
+	asn1_node tmpasn = NULL;
 	char asn1_err[ASN1_MAX_ERROR_DESCRIPTION_SIZE] = "";
 	unsigned int etype;
 	gnutls_datum_t td = {NULL, 0};
@@ -521,7 +521,7 @@ gnutls_x509_subject_alt_name_t _gnutls_x509_san_find_type(char *str_type)
  * to PEM or DER raw data.
  */
 int
-_gnutls_x509_export_int_named(ASN1_TYPE asn1_data, const char *name,
+_gnutls_x509_export_int_named(asn1_node asn1_data, const char *name,
 			      gnutls_x509_crt_fmt_t format,
 			      const char *pem_header,
 			      unsigned char *output_data,
@@ -566,7 +566,7 @@ _gnutls_x509_export_int_named(ASN1_TYPE asn1_data, const char *name,
  * to PEM or DER raw data.
  */
 int
-_gnutls_x509_export_int_named2(ASN1_TYPE asn1_data, const char *name,
+_gnutls_x509_export_int_named2(asn1_node asn1_data, const char *name,
 			       gnutls_x509_crt_fmt_t format,
 			       const char *pem_header,
 			       gnutls_datum_t * out)
@@ -669,7 +669,7 @@ _gnutls_x509_decode_string(unsigned int etype,
  * the required data size (and places a null byte).
  */
 static int
-x509_read_value(ASN1_TYPE c, const char *root,
+x509_read_value(asn1_node c, const char *root,
 		gnutls_datum_t * ret, unsigned allow_null)
 {
 	int len = 0, result;
@@ -741,14 +741,14 @@ x509_read_value(ASN1_TYPE c, const char *root,
 }
 
 int
-_gnutls_x509_read_value(ASN1_TYPE c, const char *root,
+_gnutls_x509_read_value(asn1_node c, const char *root,
 			gnutls_datum_t * ret)
 {
 	return x509_read_value(c, root, ret, 0);
 }
 
 int
-_gnutls_x509_read_null_value(ASN1_TYPE c, const char *root,
+_gnutls_x509_read_null_value(asn1_node c, const char *root,
 			gnutls_datum_t * ret)
 {
 	return x509_read_value(c, root, ret, 1);
@@ -761,7 +761,7 @@ _gnutls_x509_read_null_value(ASN1_TYPE c, const char *root,
  * at the end of a readable string value (which is not accounted into size)
  */
 int
-_gnutls_x509_read_string(ASN1_TYPE c, const char *root,
+_gnutls_x509_read_string(asn1_node c, const char *root,
 			 gnutls_datum_t * ret, unsigned int etype, unsigned int allow_ber)
 {
 	int len = 0, result;
@@ -846,18 +846,18 @@ int _gnutls_x509_encode_string(unsigned int etype,
 	return 0;
 }
 
-/* DER Encodes the src ASN1_TYPE and stores it to
+/* DER Encodes the src asn1_node and stores it to
  * the given datum. If str is non zero then the data are encoded as
  * an OCTET STRING.
  */
 int
-_gnutls_x509_der_encode(ASN1_TYPE src, const char *src_name,
+_gnutls_x509_der_encode(asn1_node src, const char *src_name,
 			gnutls_datum_t * res, int str)
 {
 	int size, result;
 	int asize;
 	uint8_t *data = NULL;
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 
 	size = 0;
 	result = asn1_der_coding(src, src_name, NULL, &size, NULL);
@@ -926,14 +926,14 @@ _gnutls_x509_der_encode(ASN1_TYPE src, const char *src_name,
 
 }
 
-/* DER Encodes the src ASN1_TYPE and stores it to
+/* DER Encodes the src asn1_node and stores it to
  * dest in dest_name. Useful to encode something and store it
  * as OCTET. If str is non null then the data are encoded as
  * an OCTET STRING.
  */
 int
-_gnutls_x509_der_encode_and_copy(ASN1_TYPE src, const char *src_name,
-				 ASN1_TYPE dest, const char *dest_name,
+_gnutls_x509_der_encode_and_copy(asn1_node src, const char *src_name,
+				 asn1_node dest, const char *dest_name,
 				 int str)
 {
 	int result;
@@ -962,10 +962,10 @@ _gnutls_x509_der_encode_and_copy(ASN1_TYPE src, const char *src_name,
 	return 0;
 }
 
-/* Writes the value of the datum in the given ASN1_TYPE.
+/* Writes the value of the datum in the given asn1_node.
  */
 int
-_gnutls_x509_write_value(ASN1_TYPE c, const char *root,
+_gnutls_x509_write_value(asn1_node c, const char *root,
 			 const gnutls_datum_t * data)
 {
 	int ret;
@@ -981,10 +981,10 @@ _gnutls_x509_write_value(ASN1_TYPE c, const char *root,
 	return 0;
 }
 
-/* Writes the value of the datum in the given ASN1_TYPE as a string.
+/* Writes the value of the datum in the given asn1_node as a string.
  */
 int
-_gnutls_x509_write_string(ASN1_TYPE c, const char *root,
+_gnutls_x509_write_string(asn1_node c, const char *root,
 			  const gnutls_datum_t * data, unsigned int etype)
 {
 	int ret;
@@ -1031,7 +1031,7 @@ _asnstr_append_name(char *name, size_t name_size, const char *part1,
  *
  */
 int
-_gnutls_x509_encode_and_copy_PKI_params(ASN1_TYPE dst,
+_gnutls_x509_encode_and_copy_PKI_params(asn1_node dst,
 					const char *dst_name,
 					const gnutls_pk_params_st * params)
 {
@@ -1104,7 +1104,7 @@ _gnutls_x509_encode_PKI_params(gnutls_datum_t * der,
 			       const gnutls_pk_params_st * params)
 {
 	int ret;
-	ASN1_TYPE tmp;
+	asn1_node tmp;
 
 	ret = asn1_create_element(_gnutls_get_pkix(),
 				  "PKIX1.Certificate", &tmp);
@@ -1137,7 +1137,7 @@ _gnutls_x509_encode_PKI_params(gnutls_datum_t * der,
  * ASN.1 structure. src_name should be something like "tbsCertificate.subjectPublicKeyInfo".
  */
 int
-_gnutls_x509_get_pk_algorithm(ASN1_TYPE src, const char *src_name,
+_gnutls_x509_get_pk_algorithm(asn1_node src, const char *src_name,
 			      gnutls_ecc_curve_t *curve,
 			      unsigned int *bits)
 {
@@ -1195,7 +1195,7 @@ _gnutls_x509_get_pk_algorithm(ASN1_TYPE src, const char *src_name,
  * returns them into signed_data.
  */
 int
-_gnutls_x509_get_signed_data(ASN1_TYPE src,  const gnutls_datum_t *der,
+_gnutls_x509_get_signed_data(asn1_node src,  const gnutls_datum_t *der,
 			     const char *src_name,
 			     gnutls_datum_t * signed_data)
 {
@@ -1232,7 +1232,7 @@ _gnutls_x509_get_signed_data(ASN1_TYPE src,  const gnutls_datum_t *der,
 
 /*-
  * gnutls_x509_get_signature_algorithm:
- * @src: should contain an ASN1_TYPE structure
+ * @src: should contain an asn1_node structure
  * @src_name: the description of the signature field
  *
  * This function will return a value of the #gnutls_sign_algorithm_t
@@ -1243,7 +1243,7 @@ _gnutls_x509_get_signed_data(ASN1_TYPE src,  const gnutls_datum_t *der,
  *   error.
  -*/
 int
-_gnutls_x509_get_signature_algorithm(ASN1_TYPE src, const char *src_name)
+_gnutls_x509_get_signature_algorithm(asn1_node src, const char *src_name)
 {
 	int result;
 	char name[128];
@@ -1302,7 +1302,7 @@ _gnutls_x509_get_signature_algorithm(ASN1_TYPE src, const char *src_name)
  * returns them into signed_data.
  */
 int
-_gnutls_x509_get_signature(ASN1_TYPE src, const char *src_name,
+_gnutls_x509_get_signature(asn1_node src, const char *src_name,
 			   gnutls_datum_t * signature)
 {
 	int result, len;
@@ -1371,12 +1371,12 @@ static int is_printable(char p)
 	return 0;
 }
 
-static int write_complex_string(ASN1_TYPE asn_struct, const char *where,
+static int write_complex_string(asn1_node asn_struct, const char *where,
 				const struct oid_to_string *oentry,
 				const uint8_t * data, size_t data_size)
 {
 	char tmp[128];
-	ASN1_TYPE c2;
+	asn1_node c2;
 	int result;
 	const char *string_type;
 	unsigned int i;
@@ -1442,7 +1442,7 @@ static int write_complex_string(ASN1_TYPE asn_struct, const char *where,
  */
 int
 _gnutls_x509_encode_and_write_attribute(const char *given_oid,
-					ASN1_TYPE asn1_struct,
+					asn1_node asn1_struct,
 					const char *where,
 					const void *_data,
 					int data_size, int multi)
@@ -1547,7 +1547,7 @@ int _gnutls_strdatum_to_buf(gnutls_datum_t * d, void *buf,
 }
 
 int
-_gnutls_x509_get_raw_field2(ASN1_TYPE c2, const gnutls_datum_t * raw,
+_gnutls_x509_get_raw_field2(asn1_node c2, const gnutls_datum_t * raw,
 			 const char *whom, gnutls_datum_t * dn)
 {
 	int result, len1;
@@ -1918,7 +1918,7 @@ gnutls_gost_paramset_t gnutls_oid_to_gost_paramset(const char *oid)
 		return gnutls_assert_val(GNUTLS_GOST_PARAMSET_UNKNOWN);
 }
 
-int _gnutls_x509_get_version(ASN1_TYPE root, const char *name)
+int _gnutls_x509_get_version(asn1_node root, const char *name)
 {
 	uint8_t version[8];
 	int len, result;

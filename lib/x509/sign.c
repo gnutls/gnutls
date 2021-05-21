@@ -39,11 +39,11 @@
 #include <pk.h>
 
 /* This is the same as the _gnutls_x509_sign, but this one will decode
- * the ASN1_TYPE given, and sign the DER data. Actually used to get the DER
+ * the asn1_node given, and sign the DER data. Actually used to get the DER
  * of the TBS and sign it on the fly.
  */
 int
-_gnutls_x509_get_tbs(ASN1_TYPE cert, const char *tbs_name,
+_gnutls_x509_get_tbs(asn1_node cert, const char *tbs_name,
 		     gnutls_datum_t * tbs)
 {
 	return _gnutls_x509_der_encode(cert, tbs_name, tbs, 0);
@@ -88,7 +88,7 @@ _gnutls_x509_crt_get_spki_params(gnutls_x509_crt_t crt,
 
 /*-
  * _gnutls_x509_pkix_sign - This function will sign a CRL or a certificate with a key
- * @src: should contain an ASN1_TYPE
+ * @src: should contain an asn1_node
  * @issuer: is the certificate of the certificate issuer
  * @issuer_key: holds the issuer's private key
  *
@@ -99,7 +99,7 @@ _gnutls_x509_crt_get_spki_params(gnutls_x509_crt_t crt,
  *   negative error value.
  -*/
 int
-_gnutls_x509_pkix_sign(ASN1_TYPE src, const char *src_name,
+_gnutls_x509_pkix_sign(asn1_node src, const char *src_name,
 		       gnutls_digest_algorithm_t dig,
 		       unsigned int flags,
 		       gnutls_x509_crt_t issuer,

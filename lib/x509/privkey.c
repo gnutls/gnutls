@@ -52,7 +52,7 @@ int gnutls_x509_privkey_init(gnutls_x509_privkey_t * key)
 	*key = gnutls_calloc(1, sizeof(gnutls_x509_privkey_int));
 
 	if (*key) {
-		(*key)->key = ASN1_TYPE_EMPTY;
+		(*key)->key = NULL;
 		return 0;	/* success */
 	}
 
@@ -68,7 +68,7 @@ void _gnutls_x509_privkey_reinit(gnutls_x509_privkey_t key)
 
 	if (key->key)
 		asn1_delete_structure2(&key->key, ASN1_DELETE_FLAG_ZEROIZE);
-	key->key = ASN1_TYPE_EMPTY;
+	key->key = NULL;
 }
 
 /**
@@ -126,12 +126,12 @@ gnutls_x509_privkey_cpy(gnutls_x509_privkey_t dst,
 /* Converts an RSA PKCS#1 key to
  * an internal structure (gnutls_private_key)
  */
-ASN1_TYPE
+asn1_node
 _gnutls_privkey_decode_pkcs1_rsa_key(const gnutls_datum_t * raw_key,
 				     gnutls_x509_privkey_t pkey)
 {
 	int result;
-	ASN1_TYPE pkey_asn;
+	asn1_node pkey_asn;
 
 	gnutls_pk_params_init(&pkey->params);
 
@@ -223,7 +223,7 @@ _gnutls_privkey_decode_pkcs1_rsa_key(const gnutls_datum_t * raw_key,
  * an internal structure (gnutls_private_key)
  */
 int
-_gnutls_privkey_decode_ecc_key(ASN1_TYPE* pkey_asn, const gnutls_datum_t * raw_key,
+_gnutls_privkey_decode_ecc_key(asn1_node* pkey_asn, const gnutls_datum_t * raw_key,
 			       gnutls_x509_privkey_t pkey, gnutls_ecc_curve_t curve)
 {
 	int ret;
@@ -336,11 +336,11 @@ _gnutls_privkey_decode_ecc_key(ASN1_TYPE* pkey_asn, const gnutls_datum_t * raw_k
 }
 
 
-static ASN1_TYPE
+static asn1_node
 decode_dsa_key(const gnutls_datum_t * raw_key, gnutls_x509_privkey_t pkey)
 {
 	int result;
-	ASN1_TYPE dsa_asn;
+	asn1_node dsa_asn;
 	gnutls_datum_t seed = {NULL,0};
 	char oid[MAX_OID_SIZE];
 	int oid_size;

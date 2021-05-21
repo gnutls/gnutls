@@ -61,16 +61,16 @@
 
 struct gnutls_x509_crl_iter {
 	/* This is used to optimize reads by gnutls_x509_crl_iter_crt_serial() */
-	ASN1_TYPE rcache;
+	asn1_node rcache;
 	unsigned rcache_idx;
 };
 
 typedef struct gnutls_x509_crl_int {
-	ASN1_TYPE crl;
+	asn1_node crl;
 
 	unsigned expanded;
 	/* This is used to optimize reads by gnutls_x509_crl_get_crt_serial2() */
-	ASN1_TYPE rcache;
+	asn1_node rcache;
 	unsigned rcache_idx;
 	int use_extensions;
 
@@ -79,11 +79,11 @@ typedef struct gnutls_x509_crl_int {
 } gnutls_x509_crl_int;
 
 typedef struct gnutls_x509_dn_st {
-	ASN1_TYPE asn;
+	asn1_node asn;
 } gnutls_x509_dn_st;
 
 typedef struct gnutls_x509_crt_int {
-	ASN1_TYPE cert;
+	asn1_node cert;
 	int use_extensions;
 	unsigned expanded; /* a certificate has been expanded */
 	unsigned modified; /* the cached values below may no longer be valid */
@@ -112,7 +112,7 @@ typedef struct gnutls_x509_crt_int {
 #define MODIFIED(crt) crt->modified=1
 
 typedef struct gnutls_x509_crq_int {
-	ASN1_TYPE crq;
+	asn1_node crq;
 } gnutls_x509_crq_int;
 
 typedef struct gnutls_pkcs7_attrs_st {
@@ -122,12 +122,12 @@ typedef struct gnutls_pkcs7_attrs_st {
 } gnutls_pkcs7_attrs_st;
 
 typedef struct gnutls_pkcs7_int {
-	ASN1_TYPE pkcs7;
+	asn1_node pkcs7;
 
 	char encap_data_oid[MAX_OID_SIZE];
 
 	gnutls_datum_t der_signed_data;
-	ASN1_TYPE signed_data;
+	asn1_node signed_data;
 	unsigned expanded;
 } gnutls_pkcs7_int;
 
@@ -148,7 +148,7 @@ typedef struct gnutls_x509_privkey_int {
 	unsigned expanded;
 	unsigned flags;
 
-	ASN1_TYPE key;
+	asn1_node key;
 	struct pin_info_st pin;
 } gnutls_x509_privkey_int;
 
@@ -162,9 +162,9 @@ int _gnutls_x509_crl_get_raw_issuer_dn(gnutls_x509_crl_t crl,
 				       gnutls_datum_t * dn);
 
 /* sign.c */
-int _gnutls_x509_get_tbs(ASN1_TYPE cert, const char *tbs_name,
+int _gnutls_x509_get_tbs(asn1_node cert, const char *tbs_name,
 			 gnutls_datum_t * tbs);
-int _gnutls_x509_pkix_sign(ASN1_TYPE src, const char *src_name,
+int _gnutls_x509_pkix_sign(asn1_node src, const char *src_name,
 			   gnutls_digest_algorithm_t,
 			   unsigned int flags,
 			   gnutls_x509_crt_t issuer,
@@ -186,49 +186,49 @@ int _gnutls_x509_crt_get_spki_params(gnutls_x509_crt_t issuer,
 #define OID_LDAP_UID			"0.9.2342.19200300.100.1.1"
 #define OID_PKCS9_EMAIL			"1.2.840.113549.1.9.1"
 
-int _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
+int _gnutls_x509_parse_dn(asn1_node asn1_struct,
 			  const char *asn1_rdn_name, char *buf,
 			  size_t * sizeof_buf,
 			  unsigned flags);
 
 int
-_gnutls_x509_get_dn(ASN1_TYPE asn1_struct,
+_gnutls_x509_get_dn(asn1_node asn1_struct,
 		    const char *asn1_rdn_name, gnutls_datum_t * dn,
 		    unsigned flags);
 
 int
-_gnutls_x509_parse_dn_oid(ASN1_TYPE asn1_struct,
+_gnutls_x509_parse_dn_oid(asn1_node asn1_struct,
 			  const char *asn1_rdn_name,
 			  const char *given_oid, int indx,
 			  unsigned int raw_flag, gnutls_datum_t * out);
 
-int _gnutls_x509_set_dn_oid(ASN1_TYPE asn1_struct,
+int _gnutls_x509_set_dn_oid(asn1_node asn1_struct,
 			    const char *asn1_rdn_name, const char *oid,
 			    int raw_flag, const char *name,
 			    int sizeof_name);
 
-int _gnutls_x509_get_dn_oid(ASN1_TYPE asn1_struct,
+int _gnutls_x509_get_dn_oid(asn1_node asn1_struct,
 			    const char *asn1_rdn_name,
 			    int indx, void *_oid, size_t * sizeof_oid);
 
 int _gnutls_encode_othername_data(unsigned flags, const void *data, unsigned data_size, gnutls_datum_t *output);
 
-int _gnutls_parse_general_name(ASN1_TYPE src, const char *src_name,
+int _gnutls_parse_general_name(asn1_node src, const char *src_name,
 			       int seq, void *name, size_t * name_size,
 			       unsigned int *ret_type, int othername_oid);
 
 int
-_gnutls_parse_general_name2(ASN1_TYPE src, const char *src_name,
+_gnutls_parse_general_name2(asn1_node src, const char *src_name,
 			   int seq, gnutls_datum_t *dname, 
 			   unsigned int *ret_type, int othername_oid);
 
 int
-_gnutls_write_new_general_name(ASN1_TYPE ext, const char *ext_name,
+_gnutls_write_new_general_name(asn1_node ext, const char *ext_name,
 		       gnutls_x509_subject_alt_name_t type,
 		       const void *data, unsigned int data_size);
 
 int
-_gnutls_write_new_othername(ASN1_TYPE ext, const char *ext_name,
+_gnutls_write_new_othername(asn1_node ext, const char *ext_name,
 		       const char *oid,
 		       const void *data, unsigned int data_size);
 
@@ -248,15 +248,15 @@ _gnutls_x509_verify_algorithm(gnutls_digest_algorithm_t * hash,
 /* privkey.h */
 void _gnutls_x509_privkey_reinit(gnutls_x509_privkey_t key);
 
-ASN1_TYPE _gnutls_privkey_decode_pkcs1_rsa_key(const gnutls_datum_t *
+asn1_node _gnutls_privkey_decode_pkcs1_rsa_key(const gnutls_datum_t *
 					       raw_key,
 					       gnutls_x509_privkey_t pkey);
-int _gnutls_privkey_decode_ecc_key(ASN1_TYPE* pkey_asn, const gnutls_datum_t *
+int _gnutls_privkey_decode_ecc_key(asn1_node* pkey_asn, const gnutls_datum_t *
 					 raw_key,
 					 gnutls_x509_privkey_t pkey,
 					 gnutls_ecc_curve_t curve);
 
-int _gnutls_privkey_decode_eddsa_key(ASN1_TYPE* pkey_asn,
+int _gnutls_privkey_decode_eddsa_key(asn1_node* pkey_asn,
 		const gnutls_datum_t *raw_key,
 		gnutls_x509_privkey_t pkey,
 		gnutls_ecc_curve_t curve);
@@ -270,7 +270,7 @@ _gnutls_x509_read_gost_params(uint8_t * der, int dersize,
 			      gnutls_pk_params_st * params,
 			      gnutls_pk_algorithm_t algo);
 
-int _gnutls_asn1_encode_privkey(ASN1_TYPE * c2,
+int _gnutls_asn1_encode_privkey(asn1_node * c2,
 				gnutls_pk_params_st * params);
 
 void _gnutls_x509_privkey_get_spki_params(gnutls_x509_privkey_t key,
@@ -320,7 +320,7 @@ _gnutls_x509_ext_gen_number(const uint8_t * number, size_t nr_size,
 
 
 int
-_gnutls_write_general_name(ASN1_TYPE ext, const char *ext_name,
+_gnutls_write_general_name(asn1_node ext, const char *ext_name,
 		       gnutls_x509_subject_alt_name_t type,
 		       const void *data, unsigned int data_size);
 
@@ -367,39 +367,39 @@ _gnutls_x509_write_pubkey_params(const gnutls_pk_params_st * params,
 int _gnutls_x509_write_pubkey(const gnutls_pk_params_st * params,
 			      gnutls_datum_t * der);
 
-int _gnutls_x509_read_uint(ASN1_TYPE node, const char *value,
+int _gnutls_x509_read_uint(asn1_node node, const char *value,
 			   unsigned int *ret);
 
 int _gnutls_x509_read_der_int(uint8_t * der, int dersize, bigint_t * out);
 int _gnutls_x509_read_der_uint(uint8_t * der, int dersize, unsigned int *out);
 
-int _gnutls_x509_read_int(ASN1_TYPE node, const char *value,
+int _gnutls_x509_read_int(asn1_node node, const char *value,
 			  bigint_t * ret_mpi);
-int _gnutls_x509_write_int(ASN1_TYPE node, const char *value, bigint_t mpi,
+int _gnutls_x509_write_int(asn1_node node, const char *value, bigint_t mpi,
 			   int lz);
 
-int _gnutls_x509_write_uint32(ASN1_TYPE node, const char *value,
+int _gnutls_x509_write_uint32(asn1_node node, const char *value,
 			      uint32_t num);
 
 
-int _gnutls_x509_read_key_int(ASN1_TYPE node, const char *value,
+int _gnutls_x509_read_key_int(asn1_node node, const char *value,
 			  bigint_t * ret_mpi);
-int _gnutls_x509_write_key_int(ASN1_TYPE node, const char *value, bigint_t mpi,
+int _gnutls_x509_write_key_int(asn1_node node, const char *value, bigint_t mpi,
 			   int lz);
 
-int _gnutls_x509_read_key_int_le(ASN1_TYPE node, const char *value,
+int _gnutls_x509_read_key_int_le(asn1_node node, const char *value,
 				 bigint_t * ret_mpi);
-int _gnutls_x509_write_key_int_le(ASN1_TYPE node, const char *value,
+int _gnutls_x509_write_key_int_le(asn1_node node, const char *value,
 				  bigint_t mpi);
 
-int _gnutls_x509_read_pkalgo_params(ASN1_TYPE src, const char *src_name,
+int _gnutls_x509_read_pkalgo_params(asn1_node src, const char *src_name,
 				  gnutls_x509_spki_st *params, unsigned is_sig);
-int _gnutls_x509_write_sign_params(ASN1_TYPE dst, const char *dst_name,
+int _gnutls_x509_write_sign_params(asn1_node dst, const char *dst_name,
 				   const gnutls_sign_entry_st *se, gnutls_x509_spki_st *params);
 
 #define _gnutls_x509_read_sign_params(src,name,params) _gnutls_x509_read_pkalgo_params(src,name,params,1)
 #define _gnutls_x509_read_spki_params(src,name,params) _gnutls_x509_read_pkalgo_params(src,name,params,0)
-int _gnutls_x509_write_spki_params(ASN1_TYPE dst, const char *dst_name,
+int _gnutls_x509_write_spki_params(asn1_node dst, const char *dst_name,
 				   gnutls_x509_spki_st *params);
 
 inline static int
@@ -429,7 +429,7 @@ _gnutls_x509_crq_read_spki_params(gnutls_x509_crq_t crt,
 #include <gnutls/pkcs12.h>
 
 typedef struct gnutls_pkcs12_int {
-	ASN1_TYPE pkcs12;
+	asn1_node pkcs12;
 	unsigned expanded;
 } gnutls_pkcs12_int;
 
@@ -470,7 +470,7 @@ int _pkcs12_decode_safe_contents(const gnutls_datum_t * content,
 				 gnutls_pkcs12_bag_t bag);
 
 int
-_pkcs12_encode_safe_contents(gnutls_pkcs12_bag_t bag, ASN1_TYPE * content,
+_pkcs12_encode_safe_contents(gnutls_pkcs12_bag_t bag, asn1_node * content,
 			     int *enc);
 
 int _pkcs12_decode_crt_bag(gnutls_pkcs12_bag_type_t type,
@@ -540,7 +540,7 @@ typedef struct name_constraints_node_st {
 	struct name_constraints_node_st *next;
 } name_constraints_node_st;
 
-int _gnutls_extract_name_constraints(ASN1_TYPE c2, const char *vstr,
+int _gnutls_extract_name_constraints(asn1_node c2, const char *vstr,
 				    name_constraints_node_st ** _nc);
 void _gnutls_name_constraints_node_free (name_constraints_node_st *node);
 int _gnutls_x509_name_constraints_merge(gnutls_x509_name_constraints_t nc,

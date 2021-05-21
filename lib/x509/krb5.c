@@ -139,7 +139,7 @@ static krb5_principal_data *name_to_principal(const char *_name)
 int _gnutls_krb5_principal_to_der(const char *name, gnutls_datum_t * der)
 {
 	int ret, result;
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 	krb5_principal_data *princ;
 	unsigned i;
 
@@ -208,7 +208,7 @@ int _gnutls_krb5_principal_to_der(const char *name, gnutls_datum_t * der)
 	return ret;
 }
 
-static int principal_to_str(ASN1_TYPE c2, gnutls_buffer_st * str)
+static int principal_to_str(asn1_node c2, gnutls_buffer_st * str)
 {
 	gnutls_datum_t realm = { NULL, 0 };
 	gnutls_datum_t component = { NULL, 0 };
@@ -292,7 +292,7 @@ int _gnutls_krb5_der_to_principal(const gnutls_datum_t * der,
 				  gnutls_datum_t * name)
 {
 	int ret, result;
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 	gnutls_buffer_st str;
 
 	_gnutls_buffer_init(&str);

@@ -36,7 +36,7 @@
 int _x509_encode_provable_seed(gnutls_x509_privkey_t pkey, gnutls_datum_t *der)
 {
 
-	ASN1_TYPE c2;
+	asn1_node c2;
 	int ret, result;
 	const char *oid;
 
@@ -85,7 +85,7 @@ int _x509_encode_provable_seed(gnutls_x509_privkey_t pkey, gnutls_datum_t *der)
 int _x509_decode_provable_seed(gnutls_x509_privkey_t pkey, const gnutls_datum_t *der)
 {
 
-	ASN1_TYPE c2;
+	asn1_node c2;
 	int ret, result;
 	char oid[MAX_OID_SIZE];
 	int oid_size;

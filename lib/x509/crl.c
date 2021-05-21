@@ -842,13 +842,13 @@ int _gnutls_x509_crl_cpy(gnutls_x509_crl_t dest, gnutls_x509_crl_t src)
 }
 
 static int
-_get_authority_key_id(gnutls_x509_crl_t cert, ASN1_TYPE * c2,
+_get_authority_key_id(gnutls_x509_crl_t cert, asn1_node * c2,
 		      unsigned int *critical)
 {
 	int ret;
 	gnutls_datum_t id;
 
-	*c2 = ASN1_TYPE_EMPTY;
+	*c2 = NULL;
 
 	if (cert == NULL) {
 		gnutls_assert();
@@ -920,7 +920,7 @@ gnutls_x509_crl_get_authority_key_gn_serial(gnutls_x509_crl_t crl,
 					    unsigned int *critical)
 {
 	int ret, result, len;
-	ASN1_TYPE c2;
+	asn1_node c2;
 
 	ret = _get_authority_key_id(crl, &c2, critical);
 	if (ret < 0)
@@ -985,7 +985,7 @@ gnutls_x509_crl_get_authority_key_id(gnutls_x509_crl_t crl, void *id,
 				     unsigned int *critical)
 {
 	int result, len, ret;
-	ASN1_TYPE c2;
+	asn1_node c2;
 
 	ret = _get_authority_key_id(crl, &c2, critical);
 	if (ret < 0)

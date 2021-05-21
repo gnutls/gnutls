@@ -498,7 +498,7 @@ gnutls_dh_params_import_pkcs3(gnutls_dh_params_t params,
 			      const gnutls_datum_t * pkcs3_params,
 			      gnutls_x509_crt_fmt_t format)
 {
-	ASN1_TYPE c2;
+	asn1_node c2;
 	int result, need_free = 0;
 	unsigned int q_bits;
 	gnutls_datum_t _params;
@@ -666,7 +666,7 @@ gnutls_dh_params_export2_pkcs3(gnutls_dh_params_t params,
 			       gnutls_x509_crt_fmt_t format,
 			       gnutls_datum_t * out)
 {
-	ASN1_TYPE c2;
+	asn1_node c2;
 	int result;
 	size_t g_size, p_size;
 	uint8_t *p_data, *g_data;

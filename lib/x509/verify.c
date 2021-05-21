@@ -1331,7 +1331,7 @@ cleanup:
 
 static int
 _gnutls_x509_validate_sign_params(gnutls_pk_algorithm_t pk_algorithm,
-				  ASN1_TYPE cert,
+				  asn1_node cert,
 				  const char *name,
 				  gnutls_x509_spki_st *sig_params)
 {

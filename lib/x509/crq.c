@@ -204,7 +204,7 @@ gnutls_x509_crq_get_private_key_usage_period(gnutls_x509_crq_t crq,
 					     unsigned int *critical)
 {
 	int result, ret;
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 	uint8_t buf[128];
 	size_t buf_size = sizeof(buf);
 
@@ -1316,7 +1316,7 @@ gnutls_x509_crq_get_extension_info(gnutls_x509_crq_t crq, unsigned indx,
 	char name[MAX_NAME_SIZE];
 	char *extensions = NULL;
 	size_t extensions_size = 0;
-	ASN1_TYPE c2;
+	asn1_node c2;
 	int len;
 
 	if (!crq) {
@@ -1477,7 +1477,7 @@ gnutls_x509_crq_get_extension_data2(gnutls_x509_crq_t crq,
 	char name[MAX_NAME_SIZE];
 	unsigned char *extensions = NULL;
 	size_t extensions_size = 0;
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 
 	if (!crq) {
 		gnutls_assert();
@@ -1669,7 +1669,7 @@ get_subject_alt_name(gnutls_x509_crq_t crq,
 		     unsigned int *critical, int othername_oid)
 {
 	int result;
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 	gnutls_x509_subject_alt_name_t type;
 	gnutls_datum_t dnsname = { NULL, 0 };
 	size_t dns_size = 0;
@@ -2289,7 +2289,7 @@ gnutls_x509_crq_get_key_purpose_oid(gnutls_x509_crq_t crq,
 	char tmpstr[MAX_NAME_SIZE];
 	int result, len;
 	gnutls_datum_t prev = { NULL, 0 };
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 	size_t prev_size = 0;
 
 	if (oid)
@@ -2389,7 +2389,7 @@ gnutls_x509_crq_set_key_purpose_oid(gnutls_x509_crq_t crq,
 {
 	int result;
 	gnutls_datum_t prev = { NULL, 0 }, der_data;
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 	size_t prev_size = 0;
 
 	/* Read existing extension, if there is one.
@@ -2785,7 +2785,7 @@ gnutls_x509_crq_set_private_key_usage_period(gnutls_x509_crq_t crq,
 {
 	int result;
 	gnutls_datum_t der_data;
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 
 	if (crq == NULL) {
 		gnutls_assert();

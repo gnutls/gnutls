@@ -330,7 +330,7 @@ _gnutls_mpi_bprint_size(const bigint_t a, uint8_t *buf, size_t size)
  * steps.
  */
 static int
-__gnutls_x509_read_int(ASN1_TYPE node, const char *value,
+__gnutls_x509_read_int(asn1_node node, const char *value,
 		       bigint_t * ret_mpi, unsigned int flags)
 {
 	int result;
@@ -377,7 +377,7 @@ __gnutls_x509_read_int(ASN1_TYPE node, const char *value,
 }
 
 int
-_gnutls_x509_read_int(ASN1_TYPE node, const char *value,
+_gnutls_x509_read_int(asn1_node node, const char *value,
 		      bigint_t * ret_mpi)
 {
 	return __gnutls_x509_read_int(node, value, ret_mpi,
@@ -385,7 +385,7 @@ _gnutls_x509_read_int(ASN1_TYPE node, const char *value,
 }
 
 int
-_gnutls_x509_read_key_int(ASN1_TYPE node, const char *value,
+_gnutls_x509_read_key_int(asn1_node node, const char *value,
 		      bigint_t * ret_mpi)
 {
 	return __gnutls_x509_read_int(node, value, ret_mpi,
@@ -393,7 +393,7 @@ _gnutls_x509_read_key_int(ASN1_TYPE node, const char *value,
 }
 
 int
-_gnutls_x509_read_key_int_le(ASN1_TYPE node, const char *value,
+_gnutls_x509_read_key_int_le(asn1_node node, const char *value,
 			     bigint_t * ret_mpi)
 {
 	return __gnutls_x509_read_int(node, value, ret_mpi,
@@ -404,7 +404,7 @@ _gnutls_x509_read_key_int_le(ASN1_TYPE node, const char *value,
 /* Writes the specified integer into the specified node.
  */
 static int
-__gnutls_x509_write_int(ASN1_TYPE node, const char *value, bigint_t mpi,
+__gnutls_x509_write_int(asn1_node node, const char *value, bigint_t mpi,
 			unsigned int flags)
 {
 	uint8_t *tmpstr;
@@ -459,7 +459,7 @@ __gnutls_x509_write_int(ASN1_TYPE node, const char *value, bigint_t mpi,
 }
 
 int
-_gnutls_x509_write_int(ASN1_TYPE node, const char *value, bigint_t mpi,
+_gnutls_x509_write_int(asn1_node node, const char *value, bigint_t mpi,
 		       int lz)
 {
 	return __gnutls_x509_write_int(node, value, mpi,
@@ -467,7 +467,7 @@ _gnutls_x509_write_int(ASN1_TYPE node, const char *value, bigint_t mpi,
 }
 
 int
-_gnutls_x509_write_key_int(ASN1_TYPE node, const char *value, bigint_t mpi,
+_gnutls_x509_write_key_int(asn1_node node, const char *value, bigint_t mpi,
 		       int lz)
 {
 	return __gnutls_x509_write_int(node, value, mpi,
@@ -476,7 +476,7 @@ _gnutls_x509_write_key_int(ASN1_TYPE node, const char *value, bigint_t mpi,
 }
 
 int
-_gnutls_x509_write_key_int_le(ASN1_TYPE node, const char *value, bigint_t mpi)
+_gnutls_x509_write_key_int_le(asn1_node node, const char *value, bigint_t mpi)
 {
 	return __gnutls_x509_write_int(node, value, mpi,
 				       GNUTLS_X509_INT_OVERWRITE |

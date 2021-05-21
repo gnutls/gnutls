@@ -42,13 +42,13 @@
 
 static const uint8_t one = 1;
 
-/* Decodes the PKCS #7 signed data, and returns an ASN1_TYPE,
+/* Decodes the PKCS #7 signed data, and returns an asn1_node,
  * which holds them. If raw is non null then the raw decoded
  * data are copied (they are locally allocated) there.
  */
 static int _decode_pkcs7_signed_data(gnutls_pkcs7_t pkcs7)
 {
-	ASN1_TYPE c2;
+	asn1_node c2;
 	int len, result;
 	gnutls_datum_t tmp = {NULL, 0};
 
@@ -477,7 +477,7 @@ void gnutls_pkcs7_signature_info_deinit(gnutls_pkcs7_signature_info_st * info)
 static time_t parse_time(gnutls_pkcs7_t pkcs7, const char *root)
 {
 	char tval[128];
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 	time_t ret;
 	int result, len;
 
@@ -1484,7 +1484,7 @@ static int reencode(gnutls_pkcs7_t pkcs7)
 {
 	int result;
 
-	if (pkcs7->signed_data != ASN1_TYPE_EMPTY) {
+	if (pkcs7->signed_data != NULL) {
 		disable_opt_fields(pkcs7);
 
 		/* Replace the old content with the new
@@ -1581,11 +1581,11 @@ gnutls_pkcs7_export2(gnutls_pkcs7_t pkcs7,
 /* Creates an empty signed data structure in the pkcs7
  * structure and returns a handle to the signed data.
  */
-static int create_empty_signed_data(ASN1_TYPE pkcs7, ASN1_TYPE * sdata)
+static int create_empty_signed_data(asn1_node pkcs7, asn1_node * sdata)
 {
 	int result;
 
-	*sdata = ASN1_TYPE_EMPTY;
+	*sdata = NULL;
 
 	if ((result = asn1_create_element
 	     (_gnutls_get_pkix(), "PKIX1.pkcs-7-SignedData",
@@ -1662,7 +1662,7 @@ int gnutls_pkcs7_set_crt_raw(gnutls_pkcs7_t pkcs7, const gnutls_datum_t * crt)
 	/* If the signed data are uninitialized
 	 * then create them.
 	 */
-	if (pkcs7->signed_data == ASN1_TYPE_EMPTY) {
+	if (pkcs7->signed_data == NULL) {
 		/* The pkcs7 structure is new, so create the
 		 * signedData.
 		 */
@@ -1937,7 +1937,7 @@ int gnutls_pkcs7_set_crl_raw(gnutls_pkcs7_t pkcs7, const gnutls_datum_t * crl)
 	/* If the signed data are uninitialized
 	 * then create them.
 	 */
-	if (pkcs7->signed_data == ASN1_TYPE_EMPTY) {
+	if (pkcs7->signed_data == NULL) {
 		/* The pkcs7 structure is new, so create the
 		 * signedData.
 		 */
@@ -2048,7 +2048,7 @@ int gnutls_pkcs7_delete_crl(gnutls_pkcs7_t pkcs7, int indx)
 	return result;
 }
 
-static int write_signer_id(ASN1_TYPE c2, const char *root,
+static int write_signer_id(asn1_node c2, const char *root,
 			   gnutls_x509_crt_t signer, unsigned flags)
 {
 	int result;
@@ -2122,7 +2122,7 @@ static int write_signer_id(ASN1_TYPE c2, const char *root,
 	return 0;
 }
 
-static int add_attrs(ASN1_TYPE c2, const char *root, gnutls_pkcs7_attrs_t attrs,
+static int add_attrs(asn1_node c2, const char *root, gnutls_pkcs7_attrs_t attrs,
 		     unsigned already_set)
 {
 	char name[256];
@@ -2172,7 +2172,7 @@ static int add_attrs(ASN1_TYPE c2, const char *root, gnutls_pkcs7_attrs_t attrs,
 	return 0;
 }
 
-static int write_attributes(ASN1_TYPE c2, const char *root,
+static int write_attributes(asn1_node c2, const char *root,
 			    const gnutls_datum_t * data,
 			    const mac_entry_st * me,
 			    gnutls_pkcs7_attrs_t other_attrs, unsigned flags)
@@ -2348,7 +2348,7 @@ int gnutls_pkcs7_sign(gnutls_pkcs7_t pkcs7,
 	if (pkcs7 == NULL || me == NULL)
 		return GNUTLS_E_INVALID_REQUEST;
 
-	if (pkcs7->signed_data == ASN1_TYPE_EMPTY) {
+	if (pkcs7->signed_data == NULL) {
 		result =
 		    asn1_create_element(_gnutls_get_pkix(),
 					"PKIX1.pkcs-7-SignedData",

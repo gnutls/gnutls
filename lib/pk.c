@@ -72,7 +72,7 @@ _gnutls_encode_ber_rs_raw(gnutls_datum_t * sig_value,
 			  const gnutls_datum_t * r,
 			  const gnutls_datum_t * s)
 {
-	ASN1_TYPE sig;
+	asn1_node sig;
 	int result, ret;
 	uint8_t *tmp = NULL;
 
@@ -137,7 +137,7 @@ _gnutls_encode_ber_rs_raw(gnutls_datum_t * sig_value,
 int
 _gnutls_encode_ber_rs(gnutls_datum_t * sig_value, bigint_t r, bigint_t s)
 {
-	ASN1_TYPE sig;
+	asn1_node sig;
 	int result;
 
 	if ((result =
@@ -178,7 +178,7 @@ int
 _gnutls_decode_ber_rs(const gnutls_datum_t * sig_value, bigint_t * r,
 		      bigint_t * s)
 {
-	ASN1_TYPE sig;
+	asn1_node sig;
 	int result;
 
 	if ((result =
@@ -253,7 +253,7 @@ int
 _gnutls_decode_ber_rs_raw(const gnutls_datum_t * sig_value, gnutls_datum_t *r,
 			  gnutls_datum_t *s)
 {
-	ASN1_TYPE sig;
+	asn1_node sig;
 	int result;
 
 	if ((result =
@@ -592,7 +592,7 @@ encode_ber_digest_info(const mac_entry_st * e,
 			const gnutls_datum_t * digest,
 			gnutls_datum_t * output)
 {
-	ASN1_TYPE dinfo = ASN1_TYPE_EMPTY;
+	asn1_node dinfo = NULL;
 	int result;
 	const char *algo;
 	uint8_t *tmp_output;
@@ -726,7 +726,7 @@ gnutls_decode_ber_digest_info(const gnutls_datum_t * info,
 		       gnutls_digest_algorithm_t * hash,
 		       unsigned char * digest, unsigned int *digest_size)
 {
-	ASN1_TYPE dinfo = ASN1_TYPE_EMPTY;
+	asn1_node dinfo = NULL;
 	int result;
 	char str[MAX(MAX_OID_SIZE, MAX_HASH_SIZE)];
 	int len;

@@ -68,13 +68,13 @@ inline static int _gnutls_global_init_skip(void)
 #endif
 
 /* created by asn1c */
-extern const ASN1_ARRAY_TYPE gnutls_asn1_tab[];
-extern const ASN1_ARRAY_TYPE pkix_asn1_tab[];
+extern const asn1_static_node gnutls_asn1_tab[];
+extern const asn1_static_node pkix_asn1_tab[];
 void *_gnutls_file_mutex;
 void *_gnutls_pkcs11_mutex;
 
-ASN1_TYPE _gnutls_pkix1_asn = ASN1_TYPE_EMPTY;
-ASN1_TYPE _gnutls_gnutls_asn = ASN1_TYPE_EMPTY;
+asn1_node _gnutls_pkix1_asn = NULL;
+asn1_node _gnutls_gnutls_asn = NULL;
 
 gnutls_log_func _gnutls_log_func = NULL;
 gnutls_audit_log_func _gnutls_audit_log_func = NULL;
@@ -280,7 +280,7 @@ static int _gnutls_global_init(unsigned constructor)
 		goto out;
 	}
 
-	_gnutls_pkix1_asn = ASN1_TYPE_EMPTY;
+	_gnutls_pkix1_asn = NULL;
 	res = asn1_array2tree(pkix_asn1_tab, &_gnutls_pkix1_asn, NULL);
 	if (res != ASN1_SUCCESS) {
 		gnutls_assert();

@@ -86,7 +86,7 @@ _gnutls_decrypt_pbes1_des_md5_data(const char *password,
 int _gnutls_check_pkcs_cipher_schema(const char *oid);
 
 int
-_gnutls_pkcs_raw_decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
+_gnutls_pkcs_raw_decrypt_data(schema_id schema, asn1_node pkcs8_asn,
 	     const char *root, const char *password,
 	     const struct pbkdf2_params *kdf_params,
 	     const struct pbe_enc_params *enc_params,
@@ -111,7 +111,7 @@ _gnutls_read_pkcs_schema_params(schema_id * schema, const char *password,
 			struct pbe_enc_params *enc_params);
 
 int
-_gnutls_pkcs_write_schema_params(schema_id schema, ASN1_TYPE pkcs8_asn,
+_gnutls_pkcs_write_schema_params(schema_id schema, asn1_node pkcs8_asn,
 		    const char *where,
 		    const struct pbkdf2_params *kdf_params,
 		    const struct pbe_enc_params *enc_params);
