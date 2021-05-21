@@ -1672,7 +1672,7 @@ gnutls_x509_crt_get_spki(gnutls_x509_crt_t cert, gnutls_x509_spki_t spki, unsign
  *
  */
 int
-_gnutls_parse_general_name2(ASN1_TYPE src, const char *src_name,
+_gnutls_parse_general_name2(asn1_node src, const char *src_name,
 			   int seq, gnutls_datum_t *dname,
 			   unsigned int *ret_type, int othername_oid)
 {
@@ -1793,7 +1793,7 @@ _gnutls_parse_general_name2(ASN1_TYPE src, const char *src_name,
  * Type is also returned as a parameter in case of an error.
  */
 int
-_gnutls_parse_general_name(ASN1_TYPE src, const char *src_name,
+_gnutls_parse_general_name(asn1_node src, const char *src_name,
 			   int seq, void *name, size_t * name_size,
 			   unsigned int *ret_type, int othername_oid)
 {
@@ -3999,7 +3999,7 @@ gnutls_x509_crt_get_issuer_unique_id(gnutls_x509_crt_t crt, char *buf,
 }
 
 static int
-legacy_parse_aia(ASN1_TYPE src,
+legacy_parse_aia(asn1_node src,
 		  unsigned int seq, int what, gnutls_datum_t * data)
 {
 	int len;
@@ -4170,7 +4170,7 @@ gnutls_x509_crt_get_authority_info_access(gnutls_x509_crt_t crt,
 {
 	int ret;
 	gnutls_datum_t aia;
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 
 	if (crt == NULL) {
 		gnutls_assert();

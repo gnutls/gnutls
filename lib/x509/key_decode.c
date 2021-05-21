@@ -58,7 +58,7 @@ _gnutls_x509_read_rsa_pubkey(uint8_t * der, int dersize,
 			     gnutls_pk_params_st * params)
 {
 	int result;
-	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
+	asn1_node spk = NULL;
 
 	if ((result = asn1_create_element
 	     (_gnutls_get_gnutls_asn(), "GNUTLS.RSAPublicKey", &spk))
@@ -175,7 +175,7 @@ _gnutls_x509_read_dsa_params(uint8_t * der, int dersize,
 			     gnutls_pk_params_st * params)
 {
 	int result;
-	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
+	asn1_node spk = NULL;
 
 	if ((result = asn1_create_element
 	     (_gnutls_get_pkix(), "PKIX1.Dss-Parms",
@@ -241,7 +241,7 @@ _gnutls_x509_read_ecc_params(uint8_t * der, int dersize,
 			     unsigned int * curve)
 {
 	int ret;
-	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
+	asn1_node spk = NULL;
 	char oid[MAX_OID_SIZE];
 	int oid_size;
 
@@ -294,8 +294,8 @@ _gnutls_x509_read_rsa_pss_params(uint8_t * der, int dersize,
 				 gnutls_x509_spki_st * params)
 {
 	int result;
-	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node spk = NULL;
+	asn1_node c2 = NULL;
 	gnutls_digest_algorithm_t digest;
 	char oid[MAX_OID_SIZE] = "";
 	int size;
@@ -442,7 +442,7 @@ _gnutls_x509_read_gost_params(uint8_t * der, int dersize,
 			      gnutls_pk_algorithm_t algo)
 {
 	int ret;
-	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
+	asn1_node spk = NULL;
 	char oid[MAX_OID_SIZE];
 	int oid_size;
 	gnutls_ecc_curve_t curve;

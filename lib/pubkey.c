@@ -369,7 +369,7 @@ gnutls_pubkey_parse_ecc_eddsa_params(const gnutls_datum_t *parameters,
 				     gnutls_ecc_curve_t *outcurve)
 {
 	gnutls_ecc_curve_t curve = GNUTLS_ECC_CURVE_INVALID;
-	ASN1_TYPE asn1 = ASN1_TYPE_EMPTY;
+	asn1_node asn1 = NULL;
 	unsigned int etype = ASN1_ETYPE_INVALID;
 	char str[MAX_OID_SIZE];
 	int str_size;
@@ -622,7 +622,7 @@ gnutls_pubkey_export(gnutls_pubkey_t key,
 		     size_t * output_data_size)
 {
 	int result;
-	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
+	asn1_node spk = NULL;
 
 	if (key == NULL) {
 		gnutls_assert();
@@ -686,7 +686,7 @@ gnutls_pubkey_export2(gnutls_pubkey_t key,
 		      gnutls_x509_crt_fmt_t format, gnutls_datum_t * out)
 {
 	int result;
-	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
+	asn1_node spk = NULL;
 
 	if (key == NULL) {
 		gnutls_assert();
@@ -1223,7 +1223,7 @@ gnutls_pubkey_import(gnutls_pubkey_t key,
 {
 	int result = 0, need_free = 0;
 	gnutls_datum_t _data;
-	ASN1_TYPE spk;
+	asn1_node spk;
 
 	if (key == NULL) {
 		gnutls_assert();

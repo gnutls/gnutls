@@ -39,7 +39,7 @@
 #include "attributes.h"
 #include "prov-seed.h"
 
-static int _decode_pkcs8_ecc_key(ASN1_TYPE pkcs8_asn,
+static int _decode_pkcs8_ecc_key(asn1_node pkcs8_asn,
 				 gnutls_x509_privkey_t pkey);
 static
 int pkcs8_key_info(const gnutls_datum_t * raw_key,
@@ -64,7 +64,7 @@ inline static int
 _encode_privkey(gnutls_x509_privkey_t pkey, gnutls_datum_t * raw)
 {
 	int ret;
-	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
+	asn1_node spk = NULL;
 
 	switch (pkey->params.algo) {
 	case GNUTLS_PK_EDDSA_ED25519:
@@ -159,11 +159,11 @@ _encode_privkey(gnutls_x509_privkey_t pkey, gnutls_datum_t * raw)
 /* 
  * Encodes a PKCS #1 private key to a PKCS #8 private key
  * info. The output will be allocated and stored into der. Also
- * the ASN1_TYPE of private key info will be returned.
+ * the asn1_node of private key info will be returned.
  */
 static int
 encode_to_private_key_info(gnutls_x509_privkey_t pkey,
-			   gnutls_datum_t * der, ASN1_TYPE * pkey_info)
+			   gnutls_datum_t * der, asn1_node * pkey_info)
 {
 	int result, len;
 	uint8_t null = 0;
@@ -313,12 +313,12 @@ encode_to_private_key_info(gnutls_x509_privkey_t pkey,
  */
 static int
 encode_to_pkcs8_key(schema_id schema, const gnutls_datum_t * der_key,
-		    const char *password, ASN1_TYPE * out)
+		    const char *password, asn1_node * out)
 {
 	int result;
 	gnutls_datum_t key = { NULL, 0 };
 	gnutls_datum_t tmp = { NULL, 0 };
-	ASN1_TYPE pkcs8_asn = ASN1_TYPE_EMPTY;
+	asn1_node pkcs8_asn = NULL;
 	struct pbkdf2_params kdf_params;
 	struct pbe_enc_params enc_params;
 	const struct pkcs_cipher_schema_st *s;
@@ -439,7 +439,7 @@ gnutls_x509_privkey_export_pkcs8(gnutls_x509_privkey_t key,
 				 void *output_data,
 				 size_t * output_data_size)
 {
-	ASN1_TYPE pkcs8_asn = NULL, pkey_info;
+	asn1_node pkcs8_asn = NULL, pkey_info;
 	int ret;
 	gnutls_datum_t tmp = {NULL, 0};
 	schema_id schema;
@@ -640,7 +640,7 @@ gnutls_x509_privkey_export2_pkcs8(gnutls_x509_privkey_t key,
 				  const char *password,
 				  unsigned int flags, gnutls_datum_t * out)
 {
-	ASN1_TYPE pkcs8_asn = NULL, pkey_info;
+	asn1_node pkcs8_asn = NULL, pkey_info;
 	int ret;
 	gnutls_datum_t tmp = {NULL, 0};
 	schema_id schema;
@@ -715,7 +715,7 @@ gnutls_x509_privkey_export2_pkcs8(gnutls_x509_privkey_t key,
 		}
 
 static int pkcs8_key_decrypt(const gnutls_datum_t * raw_key,
-			     ASN1_TYPE pkcs8_asn, const char *password,
+			     asn1_node pkcs8_asn, const char *password,
 			     gnutls_x509_privkey_t pkey)
 {
 	int result, len;
@@ -798,7 +798,7 @@ static int pkcs8_key_decrypt(const gnutls_datum_t * raw_key,
 static int check_for_decrypted(const gnutls_datum_t *der)
 {
 	int result;
-	ASN1_TYPE pkcs8_asn = ASN1_TYPE_EMPTY;
+	asn1_node pkcs8_asn = NULL;
 
 	if ((result =
 	     asn1_create_element(_gnutls_get_pkix(),
@@ -833,7 +833,7 @@ int pkcs8_key_info(const gnutls_datum_t * raw_key,
 	int params_start, params_end, params_len;
 	struct pbe_enc_params enc_params;
 	schema_id schema;
-	ASN1_TYPE pkcs8_asn = ASN1_TYPE_EMPTY;
+	asn1_node pkcs8_asn = NULL;
 
 	memset(&enc_params, 0, sizeof(enc_params));
 
@@ -934,7 +934,7 @@ pkcs8_key_decode(const gnutls_datum_t * raw_key,
 		 unsigned int decrypt)
 {
 	int result;
-	ASN1_TYPE pkcs8_asn = ASN1_TYPE_EMPTY;
+	asn1_node pkcs8_asn = NULL;
 
 	if ((result =
 	     asn1_create_element(_gnutls_get_pkix(),
@@ -969,7 +969,7 @@ pkcs8_key_decode(const gnutls_datum_t * raw_key,
 /* Decodes an RSA privateKey from a PKCS8 structure.
  */
 static int
-_decode_pkcs8_rsa_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
+_decode_pkcs8_rsa_key(asn1_node pkcs8_asn, gnutls_x509_privkey_t pkey)
 {
 	int ret;
 	gnutls_datum_t tmp = {NULL, 0};
@@ -998,7 +998,7 @@ _decode_pkcs8_rsa_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
 /* Decodes an RSA-PSS privateKey from a PKCS8 structure.
  */
 static int
-_decode_pkcs8_rsa_pss_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
+_decode_pkcs8_rsa_pss_key(asn1_node pkcs8_asn, gnutls_x509_privkey_t pkey)
 {
 	int ret;
 	gnutls_datum_t tmp = {NULL, 0};
@@ -1043,7 +1043,7 @@ _decode_pkcs8_rsa_pss_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
 /* Decodes an ECC privateKey from a PKCS8 structure.
  */
 static int
-_decode_pkcs8_ecc_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
+_decode_pkcs8_ecc_key(asn1_node pkcs8_asn, gnutls_x509_privkey_t pkey)
 {
 	int ret;
 	gnutls_datum_t tmp = {NULL, 0};
@@ -1087,7 +1087,7 @@ _decode_pkcs8_ecc_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
 }
 
 static int
-_decode_pkcs8_eddsa_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey, const char *oid)
+_decode_pkcs8_eddsa_key(asn1_node pkcs8_asn, gnutls_x509_privkey_t pkey, const char *oid)
 {
 	int ret;
 	gnutls_datum_t tmp;
@@ -1164,7 +1164,7 @@ _privkey_decode_gost_key(const gnutls_datum_t * raw_key,
 			goto error;
 		}
 	} else if (raw_key->data[0] == ASN1_TAG_INTEGER) {
-		ASN1_TYPE pkey_asn;
+		asn1_node pkey_asn;
 
 		/* Very old format: INTEGER packed in OCTET STRING */
 		if ((ret = asn1_create_element(_gnutls_get_gnutls_asn(),
@@ -1194,7 +1194,7 @@ _privkey_decode_gost_key(const gnutls_datum_t * raw_key,
 		}
 		asn1_delete_structure2(&pkey_asn, ASN1_DELETE_FLAG_ZEROIZE);
 	} else if (raw_key->data[0] == ASN1_TAG_OCTET_STRING) {
-		ASN1_TYPE pkey_asn;
+		asn1_node pkey_asn;
 
 		/* format: OCTET STRING packed in OCTET STRING */
 		if ((ret = asn1_create_element(_gnutls_get_gnutls_asn(),
@@ -1241,7 +1241,7 @@ _privkey_decode_gost_key(const gnutls_datum_t * raw_key,
 /* Decodes a GOST privateKey from a PKCS8 structure.
  */
 static int
-_decode_pkcs8_gost_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey,
+_decode_pkcs8_gost_key(asn1_node pkcs8_asn, gnutls_x509_privkey_t pkey,
 		       gnutls_pk_algorithm_t algo)
 {
 	int ret;
@@ -1312,7 +1312,7 @@ error:
 /* Decodes an DSA privateKey and params from a PKCS8 structure.
  */
 static int
-_decode_pkcs8_dsa_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
+_decode_pkcs8_dsa_key(asn1_node pkcs8_asn, gnutls_x509_privkey_t pkey)
 {
 	int ret;
 	gnutls_datum_t tmp = {NULL, 0};
@@ -1399,7 +1399,7 @@ decode_private_key_info(const gnutls_datum_t * der,
 {
 	int result, len;
 	char oid[MAX_OID_SIZE];
-	ASN1_TYPE pkcs8_asn = ASN1_TYPE_EMPTY;
+	asn1_node pkcs8_asn = NULL;
 	gnutls_datum_t sder;
 	int ret;
 

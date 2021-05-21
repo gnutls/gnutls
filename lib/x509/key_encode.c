@@ -56,7 +56,7 @@ _gnutls_x509_write_rsa_pubkey(const gnutls_pk_params_st * params,
 			      gnutls_datum_t * der)
 {
 	int result;
-	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
+	asn1_node spk = NULL;
 
 	der->data = NULL;
 	der->size = 0;
@@ -302,7 +302,7 @@ _gnutls_x509_write_dsa_params(const gnutls_pk_params_st * params,
 			      gnutls_datum_t * der)
 {
 	int result;
-	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
+	asn1_node spk = NULL;
 
 	der->data = NULL;
 	der->size = 0;
@@ -362,7 +362,7 @@ _gnutls_x509_write_ecc_params(const gnutls_ecc_curve_t curve,
 			      gnutls_datum_t * der)
 {
 	int result;
-	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
+	asn1_node spk = NULL;
 	const char *oid;
 
 	der->data = NULL;
@@ -413,8 +413,8 @@ _gnutls_x509_write_rsa_pss_params(const gnutls_x509_spki_st *params,
 				  gnutls_datum_t *der)
 {
 	int result;
-	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node spk = NULL;
+	asn1_node c2 = NULL;
 	const char *oid;
 	gnutls_datum_t tmp = { NULL, 0 };
 
@@ -531,7 +531,7 @@ _gnutls_x509_write_gost_params(const gnutls_pk_params_st * params,
 			      gnutls_datum_t * der)
 {
 	int result;
-	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
+	asn1_node spk = NULL;
 	const char *oid;
 
 	der->data = NULL;
@@ -629,7 +629,7 @@ _gnutls_x509_write_dsa_pubkey(const gnutls_pk_params_st * params,
 			      gnutls_datum_t * der)
 {
 	int result;
-	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
+	asn1_node spk = NULL;
 
 	der->data = NULL;
 	der->size = 0;
@@ -669,7 +669,7 @@ _gnutls_x509_write_dsa_pubkey(const gnutls_pk_params_st * params,
 /* Encodes the RSA parameters into an ASN.1 RSA private key structure.
  */
 static int
-_gnutls_asn1_encode_rsa(ASN1_TYPE * c2, gnutls_pk_params_st * params)
+_gnutls_asn1_encode_rsa(asn1_node * c2, gnutls_pk_params_st * params)
 {
 	int result, ret;
 	uint8_t null = '\0';
@@ -696,9 +696,9 @@ _gnutls_asn1_encode_rsa(ASN1_TYPE * c2, gnutls_pk_params_st * params)
 	 */
 
 	/* first make sure that no previously allocated data are leaked */
-	if (*c2 != ASN1_TYPE_EMPTY) {
+	if (*c2 != NULL) {
 		asn1_delete_structure(c2);
-		*c2 = ASN1_TYPE_EMPTY;
+		*c2 = NULL;
 	}
 
 	if ((result = asn1_create_element
@@ -803,7 +803,7 @@ _gnutls_asn1_encode_rsa(ASN1_TYPE * c2, gnutls_pk_params_st * params)
 /* Encodes the ECC parameters into an ASN.1 ECPrivateKey structure.
  */
 static int
-_gnutls_asn1_encode_ecc(ASN1_TYPE * c2, gnutls_pk_params_st * params)
+_gnutls_asn1_encode_ecc(asn1_node * c2, gnutls_pk_params_st * params)
 {
 	int ret;
 	uint8_t one = '\x01';
@@ -815,9 +815,9 @@ _gnutls_asn1_encode_ecc(ASN1_TYPE * c2, gnutls_pk_params_st * params)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	/* first make sure that no previously allocated data are leaked */
-	if (*c2 != ASN1_TYPE_EMPTY) {
+	if (*c2 != NULL) {
 		asn1_delete_structure(c2);
-		*c2 = ASN1_TYPE_EMPTY;
+		*c2 = NULL;
 	}
 
 	if ((ret = asn1_create_element
@@ -909,7 +909,7 @@ cleanup:
 }
 
 static int
-_gnutls_asn1_encode_gost(ASN1_TYPE * c2, gnutls_pk_params_st * params)
+_gnutls_asn1_encode_gost(asn1_node * c2, gnutls_pk_params_st * params)
 {
 	int ret;
 	const char *oid;
@@ -920,9 +920,9 @@ _gnutls_asn1_encode_gost(ASN1_TYPE * c2, gnutls_pk_params_st * params)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	/* first make sure that no previously allocated data are leaked */
-	if (*c2 != ASN1_TYPE_EMPTY) {
+	if (*c2 != NULL) {
 		asn1_delete_structure(c2);
-		*c2 = ASN1_TYPE_EMPTY;
+		*c2 = NULL;
 	}
 
 	if ((ret = asn1_create_element
@@ -952,15 +952,15 @@ cleanup:
 /* Encodes the DSA parameters into an ASN.1 DSAPrivateKey structure.
  */
 static int
-_gnutls_asn1_encode_dsa(ASN1_TYPE * c2, gnutls_pk_params_st * params)
+_gnutls_asn1_encode_dsa(asn1_node * c2, gnutls_pk_params_st * params)
 {
 	int result, ret;
 	const uint8_t null = '\0';
 
 	/* first make sure that no previously allocated data are leaked */
-	if (*c2 != ASN1_TYPE_EMPTY) {
+	if (*c2 != NULL) {
 		asn1_delete_structure(c2);
-		*c2 = ASN1_TYPE_EMPTY;
+		*c2 = NULL;
 	}
 
 	if ((result = asn1_create_element
@@ -1027,7 +1027,7 @@ cleanup:
 	return ret;
 }
 
-int _gnutls_asn1_encode_privkey(ASN1_TYPE * c2,
+int _gnutls_asn1_encode_privkey(asn1_node * c2,
 				gnutls_pk_params_st * params)
 {
 	switch (params->algo) {

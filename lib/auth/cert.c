@@ -137,7 +137,7 @@ check_pk_algo_in_list(const gnutls_pk_algorithm_t *
  */
 static int cert_get_issuer_dn(gnutls_pcert_st * cert, gnutls_datum_t * odn)
 {
-	ASN1_TYPE dn;
+	asn1_node dn;
 	int len, result;
 	int start, end;
 

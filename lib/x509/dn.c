@@ -33,7 +33,7 @@
  * Name (you need a parser just to read a name in the X.509 protocols!!!)
  */
 
-static int append_elements(ASN1_TYPE asn1_struct, const char *asn1_rdn_name, gnutls_buffer_st *str, int k1, unsigned last)
+static int append_elements(asn1_node asn1_struct, const char *asn1_rdn_name, gnutls_buffer_st *str, int k1, unsigned last)
 {
 	int k2, result, max_k2;
 	int len;
@@ -197,7 +197,7 @@ static int append_elements(ASN1_TYPE asn1_struct, const char *asn1_rdn_name, gnu
 }
 
 int
-_gnutls_x509_get_dn(ASN1_TYPE asn1_struct,
+_gnutls_x509_get_dn(asn1_node asn1_struct,
 		    const char *asn1_rdn_name, gnutls_datum_t * dn,
 		    unsigned flags)
 {
@@ -258,7 +258,7 @@ _gnutls_x509_get_dn(ASN1_TYPE asn1_struct,
  * That is to point in the rndSequence.
  */
 int
-_gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
+_gnutls_x509_parse_dn(asn1_node asn1_struct,
 		      const char *asn1_rdn_name, char *buf,
 		      size_t * buf_size, unsigned flags)
 {
@@ -314,7 +314,7 @@ _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
  * OID found, 1 the second etc.
  */
 int
-_gnutls_x509_parse_dn_oid(ASN1_TYPE asn1_struct,
+_gnutls_x509_parse_dn_oid(asn1_node asn1_struct,
 			  const char *asn1_rdn_name,
 			  const char *given_oid, int indx,
 			  unsigned int raw_flag, gnutls_datum_t * out)
@@ -476,7 +476,7 @@ _gnutls_x509_parse_dn_oid(ASN1_TYPE asn1_struct,
  * OID found, 1 the second etc.
  */
 int
-_gnutls_x509_get_dn_oid(ASN1_TYPE asn1_struct,
+_gnutls_x509_get_dn_oid(asn1_node asn1_struct,
 			const char *asn1_rdn_name,
 			int indx, void *_oid, size_t * sizeof_oid)
 {
@@ -603,7 +603,7 @@ _gnutls_x509_get_dn_oid(ASN1_TYPE asn1_struct,
  */
 static int
 _gnutls_x509_write_attribute(const char *given_oid,
-			     ASN1_TYPE asn1_struct, const char *where,
+			     asn1_node asn1_struct, const char *where,
 			     const void *_data, int sizeof_data)
 {
 	char tmp[128];
@@ -645,7 +645,7 @@ _gnutls_x509_write_attribute(const char *given_oid,
  * The output is allocated and stored in value.
  */
 int
-_gnutls_x509_decode_and_read_attribute(ASN1_TYPE asn1_struct,
+_gnutls_x509_decode_and_read_attribute(asn1_node asn1_struct,
 				       const char *where, char *oid,
 				       int oid_size,
 				       gnutls_datum_t * value, int multi,
@@ -701,7 +701,7 @@ _gnutls_x509_decode_and_read_attribute(ASN1_TYPE asn1_struct,
  *
  */
 int
-_gnutls_x509_set_dn_oid(ASN1_TYPE asn1_struct,
+_gnutls_x509_set_dn_oid(asn1_node asn1_struct,
 			const char *asn1_name, const char *given_oid,
 			int raw_flag, const char *name, int sizeof_name)
 {
@@ -888,7 +888,7 @@ gnutls_x509_rdn_get_by_oid(const gnutls_datum_t * idn, const char *oid,
 			   void *buf, size_t * buf_size)
 {
 	int result;
-	ASN1_TYPE dn = ASN1_TYPE_EMPTY;
+	asn1_node dn = NULL;
 	gnutls_datum_t td;
 
 	if (buf_size == 0) {
@@ -943,7 +943,7 @@ gnutls_x509_rdn_get_oid(const gnutls_datum_t * idn,
 			unsigned indx, void *buf, size_t * buf_size)
 {
 	int result;
-	ASN1_TYPE dn = ASN1_TYPE_EMPTY;
+	asn1_node dn = NULL;
 
 	if (buf_size == 0) {
 		return GNUTLS_E_INVALID_REQUEST;

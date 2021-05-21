@@ -111,7 +111,7 @@ static int validate_name_constraints_node(gnutls_x509_subject_alt_name_t type,
 	return GNUTLS_E_SUCCESS;
 }
 
-int _gnutls_extract_name_constraints(ASN1_TYPE c2, const char *vstr,
+int _gnutls_extract_name_constraints(asn1_node c2, const char *vstr,
 									 name_constraints_node_st ** _nc)
 {
 	int ret;

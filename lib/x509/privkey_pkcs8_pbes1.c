@@ -41,7 +41,7 @@ int _gnutls_read_pbkdf1_params(const uint8_t * data, int data_size,
 		       struct pbkdf2_params *kdf_params,
 		       struct pbe_enc_params *enc_params)
 {
-	ASN1_TYPE pasn = ASN1_TYPE_EMPTY;
+	asn1_node pasn = NULL;
 	int len;
 	int ret, result;
 

@@ -559,8 +559,8 @@ int
 gnutls_x509_dn_get_rdn_ava(gnutls_x509_dn_t dn,
 			   int irdn, int iava, gnutls_x509_ava_st * ava)
 {
-	ASN1_TYPE rdn, elem;
-	ASN1_DATA_NODE vnode;
+	asn1_node rdn, elem;
+	asn1_data_node_st vnode;
 	long len;
 	int lenlen, remlen, ret;
 	char rbuf[MAX_NAME_SIZE];

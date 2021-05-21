@@ -221,7 +221,7 @@ int gnutls_x509_ext_import_subject_alt_names(const gnutls_datum_t * ext,
 					  gnutls_subject_alt_names_t sans,
 					  unsigned int flags)
 {
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 	int result, ret;
 	unsigned int i;
 	gnutls_datum_t san, othername_oid;
@@ -300,7 +300,7 @@ int gnutls_x509_ext_import_subject_alt_names(const gnutls_datum_t * ext,
 int gnutls_x509_ext_export_subject_alt_names(gnutls_subject_alt_names_t sans,
 					  gnutls_datum_t * ext)
 {
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 	int result, ret;
 	unsigned i;
 
@@ -371,7 +371,7 @@ int gnutls_x509_ext_import_name_constraints(const gnutls_datum_t * ext,
 					 unsigned int flags)
 {
 	int result, ret;
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 	gnutls_x509_name_constraints_t nc2 = NULL;
 
 	result = asn1_create_element
@@ -466,7 +466,7 @@ int gnutls_x509_ext_export_name_constraints(gnutls_x509_name_constraints_t nc,
 {
 	int ret, result;
 	uint8_t null = 0;
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 	struct name_constraints_node_st *tmp;
 
 	if (nc->permitted == NULL && nc->excluded == NULL)
@@ -605,7 +605,7 @@ int gnutls_x509_ext_import_subject_key_id(const gnutls_datum_t * ext,
 				       gnutls_datum_t * id)
 {
 	int result, ret;
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 
 	if (ext->size == 0 || ext->data == NULL) {
 		gnutls_assert();
@@ -657,7 +657,7 @@ int gnutls_x509_ext_import_subject_key_id(const gnutls_datum_t * ext,
 int gnutls_x509_ext_export_subject_key_id(const gnutls_datum_t * id,
 				       gnutls_datum_t * ext)
 {
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 	int ret, result;
 
 	result =
@@ -899,7 +899,7 @@ int gnutls_x509_ext_import_authority_key_id(const gnutls_datum_t * ext,
 {
 	int ret;
 	unsigned i;
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 	gnutls_datum_t san, othername_oid;
 	unsigned type;
 
@@ -999,7 +999,7 @@ int gnutls_x509_ext_import_authority_key_id(const gnutls_datum_t * ext,
 int gnutls_x509_ext_export_authority_key_id(gnutls_x509_aki_t aki,
 					 gnutls_datum_t * ext)
 {
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 	unsigned i;
 	int result, ret;
 
@@ -1094,7 +1094,7 @@ int gnutls_x509_ext_export_authority_key_id(gnutls_x509_aki_t aki,
 int gnutls_x509_ext_import_key_usage(const gnutls_datum_t * ext,
 				  unsigned int *key_usage)
 {
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 	int len, result;
 	uint8_t str[2];
 
@@ -1172,7 +1172,7 @@ static int _last_key_usage_set_bit(int usage)
  **/
 int gnutls_x509_ext_export_key_usage(unsigned int usage, gnutls_datum_t * ext)
 {
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 	int result;
 	uint8_t str[2];
 
@@ -1254,7 +1254,7 @@ int gnutls_x509_ext_import_inhibit_anypolicy(const gnutls_datum_t * ext,
  **/
 int gnutls_x509_ext_export_inhibit_anypolicy(unsigned int skipcerts, gnutls_datum_t * ext)
 {
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 	int result, ret;
 
 	result = asn1_create_element(_gnutls_get_gnutls_asn(), "GNUTLS.DSAPublicKey", &c2);
@@ -1303,7 +1303,7 @@ int gnutls_x509_ext_import_private_key_usage_period(const gnutls_datum_t * ext,
 						 time_t * expiration)
 {
 	int result, ret;
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 
 	result = asn1_create_element
 	    (_gnutls_get_pkix(), "PKIX1.PrivateKeyUsagePeriod", &c2);
@@ -1356,7 +1356,7 @@ int gnutls_x509_ext_export_private_key_usage_period(time_t activation,
 						 gnutls_datum_t * ext)
 {
 	int result;
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 
 	result =
 	    asn1_create_element(_gnutls_get_pkix(),
@@ -1408,7 +1408,7 @@ int gnutls_x509_ext_export_private_key_usage_period(time_t activation,
 int gnutls_x509_ext_import_basic_constraints(const gnutls_datum_t * ext,
 					  unsigned int *ca, int *pathlen)
 {
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 	char str[128]="";
 	int len, result;
 
@@ -1476,7 +1476,7 @@ int gnutls_x509_ext_import_basic_constraints(const gnutls_datum_t * ext,
 int gnutls_x509_ext_export_basic_constraints(unsigned int ca, int pathlen,
 					  gnutls_datum_t * ext)
 {
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 	const char *str;
 	int result;
 
@@ -1550,7 +1550,7 @@ int gnutls_x509_ext_import_proxy(const gnutls_datum_t *ext, int *pathlen,
 			         char **policyLanguage, char **policy,
 			         size_t *sizeof_policy)
 {
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 	int result;
 	gnutls_datum_t value1 = { NULL, 0 };
 	gnutls_datum_t value2 = { NULL, 0 };
@@ -1643,7 +1643,7 @@ int gnutls_x509_ext_export_proxy(int pathLenConstraint, const char *policyLangua
 			      const char *policy, size_t sizeof_policy,
 			      gnutls_datum_t * ext)
 {
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 	int result;
 
 	result = asn1_create_element(_gnutls_get_pkix(),
@@ -1703,7 +1703,7 @@ int gnutls_x509_ext_export_proxy(int pathLenConstraint, const char *policyLangua
 static int decode_user_notice(const void *data, size_t size,
 			      gnutls_datum_t * txt)
 {
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 	int ret, len;
 	char choice_type[64];
 	char name[128];
@@ -1920,7 +1920,7 @@ int gnutls_x509_ext_import_policies(const gnutls_datum_t * ext,
 				 gnutls_x509_policies_t policies,
 				 unsigned int flags)
 {
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 	char tmpstr[128];
 	char tmpoid[MAX_OID_SIZE];
 	gnutls_datum_t tmpd = { NULL, 0 };
@@ -2061,7 +2061,7 @@ static int encode_user_notice(const gnutls_datum_t * txt,
 			      gnutls_datum_t * der_data)
 {
 	int result;
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 
 	if ((result =
 	     asn1_create_element(_gnutls_get_pkix(),
@@ -2129,7 +2129,7 @@ int gnutls_x509_ext_export_policies(gnutls_x509_policies_t policies,
 	int result;
 	unsigned i, j;
 	gnutls_datum_t der_data = {NULL, 0}, tmpd;
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 	const char *oid;
 
 	result =
@@ -2433,7 +2433,7 @@ int gnutls_x509_ext_import_crl_dist_points(const gnutls_datum_t * ext,
 					unsigned int flags)
 {
 	int result;
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 	char name[MAX_NAME_SIZE];
 	int len, ret;
 	uint8_t reasons[2];
@@ -2536,7 +2536,7 @@ int gnutls_x509_ext_import_crl_dist_points(const gnutls_datum_t * ext,
 int gnutls_x509_ext_export_crl_dist_points(gnutls_x509_crl_dist_points_t cdp,
 					gnutls_datum_t * ext)
 {
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 	int result;
 	uint8_t reasons[2];
 	unsigned i;
@@ -2809,7 +2809,7 @@ int gnutls_x509_aia_set(gnutls_x509_aia_t aia,
 }
 
 
-static int parse_aia(ASN1_TYPE c2, gnutls_x509_aia_t aia)
+static int parse_aia(asn1_node c2, gnutls_x509_aia_t aia)
 {
 	int len;
 	char nptr[MAX_NAME_SIZE];
@@ -2892,7 +2892,7 @@ int gnutls_x509_ext_import_aia(const gnutls_datum_t * ext,
 					      unsigned int flags)
 {
 	int ret;
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 
 	if (ext->size == 0 || ext->data == NULL) {
 		gnutls_assert();
@@ -2943,7 +2943,7 @@ int gnutls_x509_ext_export_aia(gnutls_x509_aia_t aia,
 					      gnutls_datum_t * ext)
 {
 	int ret, result;
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 	unsigned int i;
 
 	ret = asn1_create_element(_gnutls_get_pkix(),
@@ -3118,7 +3118,7 @@ int gnutls_x509_ext_import_key_purposes(const gnutls_datum_t * ext,
 {
 	char tmpstr[MAX_NAME_SIZE];
 	int result, ret;
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 	gnutls_datum_t oid = {NULL, 0};
 	unsigned i;
 
@@ -3189,7 +3189,7 @@ int gnutls_x509_ext_export_key_purposes(gnutls_x509_key_purposes_t p,
 				     gnutls_datum_t * ext)
 {
 	int result, ret;
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 	unsigned i;
 
 	result = asn1_create_element
@@ -3250,7 +3250,7 @@ void gnutls_x509_ext_deinit(gnutls_x509_ext_st *ext)
 
 int _gnutls_x509_decode_ext(const gnutls_datum_t *der, gnutls_x509_ext_st *out)
 {
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 	char str_critical[10];
 	char oid[MAX_OID_SIZE];
 	int result, len, ret;
@@ -3319,7 +3319,7 @@ int _gnutls_x509_decode_ext(const gnutls_datum_t *der, gnutls_x509_ext_st *out)
 
 /* flags can be zero or GNUTLS_EXT_FLAG_APPEND
  */
-static int parse_tlsfeatures(ASN1_TYPE c2, gnutls_x509_tlsfeatures_t f, unsigned flags)
+static int parse_tlsfeatures(asn1_node c2, gnutls_x509_tlsfeatures_t f, unsigned flags)
 {
 	char nptr[MAX_NAME_SIZE];
 	int result;
@@ -3395,7 +3395,7 @@ int gnutls_x509_ext_import_tlsfeatures(const gnutls_datum_t * ext,
 				       unsigned int flags)
 {
 	int ret;
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 
 	if (ext->size == 0 || ext->data == NULL) {
 		gnutls_assert();
@@ -3448,7 +3448,7 @@ int gnutls_x509_ext_export_tlsfeatures(gnutls_x509_tlsfeatures_t f,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 	int ret;
 	unsigned i;
 

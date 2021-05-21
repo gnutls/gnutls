@@ -898,7 +898,7 @@ static void print_subject_sign_tool(gnutls_buffer_st * str, const char *prefix, 
 static void print_issuer_sign_tool(gnutls_buffer_st * str, const char *prefix, const gnutls_datum_t *der)
 {
 	int ret;
-	ASN1_TYPE tmpasn = ASN1_TYPE_EMPTY;
+	asn1_node tmpasn = NULL;
 	char asn1_err[ASN1_MAX_ERROR_DESCRIPTION_SIZE] = "";
 	gnutls_datum_t tmp;
 

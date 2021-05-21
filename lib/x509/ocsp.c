@@ -41,14 +41,14 @@
 #include "intprops.h"
 
 typedef struct gnutls_ocsp_req_int {
-	ASN1_TYPE req;
+	asn1_node req;
 	unsigned init;
 } gnutls_ocsp_req_int;
 
 typedef struct gnutls_ocsp_resp_int {
-	ASN1_TYPE resp;
+	asn1_node resp;
 	gnutls_datum_t response_type_oid;
-	ASN1_TYPE basicresp;
+	asn1_node basicresp;
 	gnutls_datum_t der;
 	unsigned init;
 } gnutls_ocsp_resp_int;

@@ -37,7 +37,7 @@
 int _gnutls_x509_read_der_int(uint8_t * der, int dersize, bigint_t * out)
 {
 	int result;
-	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
+	asn1_node spk = NULL;
 
 	/* == INTEGER */
 	if ((result = asn1_create_element
@@ -72,7 +72,7 @@ int _gnutls_x509_read_der_int(uint8_t * der, int dersize, bigint_t * out)
 int _gnutls_x509_read_der_uint(uint8_t * der, int dersize, unsigned int *out)
 {
 	int result;
-	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
+	asn1_node spk = NULL;
 
 	/* == INTEGER */
 	if ((result = asn1_create_element
@@ -108,7 +108,7 @@ int _gnutls_x509_read_der_uint(uint8_t * der, int dersize, unsigned int *out)
 /* Extracts DSA and RSA parameters from a certificate.
  */
 int
-_gnutls_get_asn_mpis(ASN1_TYPE asn, const char *root,
+_gnutls_get_asn_mpis(asn1_node asn, const char *root,
 		     gnutls_pk_params_st * params)
 {
 	int result;
@@ -223,7 +223,7 @@ _gnutls_x509_crq_get_mpis(gnutls_x509_crq_t cert,
  * This is the "signatureAlgorithm" fields.
  */
 int
-_gnutls_x509_read_pkalgo_params(ASN1_TYPE src, const char *src_name,
+_gnutls_x509_read_pkalgo_params(asn1_node src, const char *src_name,
 			      gnutls_x509_spki_st *spki, unsigned is_sig)
 {
 	int result;
@@ -277,7 +277,7 @@ _gnutls_x509_read_pkalgo_params(ASN1_TYPE src, const char *src_name,
 	return 0;
 }
 
-static int write_oid_and_params(ASN1_TYPE dst, const char *dst_name, const char *oid, gnutls_x509_spki_st *params)
+static int write_oid_and_params(asn1_node dst, const char *dst_name, const char *oid, gnutls_x509_spki_st *params)
 {
 	int result;
 	char name[128];
@@ -328,7 +328,7 @@ static int write_oid_and_params(ASN1_TYPE dst, const char *dst_name, const char 
 }
 
 int
-_gnutls_x509_write_spki_params(ASN1_TYPE dst, const char *dst_name,
+_gnutls_x509_write_spki_params(asn1_node dst, const char *dst_name,
 			       gnutls_x509_spki_st *params)
 {
 	const char *oid;
@@ -352,7 +352,7 @@ _gnutls_x509_write_spki_params(ASN1_TYPE dst, const char *dst_name,
 }
 
 int
-_gnutls_x509_write_sign_params(ASN1_TYPE dst, const char *dst_name,
+_gnutls_x509_write_sign_params(asn1_node dst, const char *dst_name,
 			       const gnutls_sign_entry_st *se, gnutls_x509_spki_st *params)
 {
 	const char *oid;
@@ -380,7 +380,7 @@ _gnutls_x509_write_sign_params(ASN1_TYPE dst, const char *dst_name,
  * steps.
  */
 int
-_gnutls_x509_read_uint(ASN1_TYPE node, const char *value,
+_gnutls_x509_read_uint(asn1_node node, const char *value,
 		       unsigned int *ret)
 {
 	int len, result;
@@ -428,7 +428,7 @@ _gnutls_x509_read_uint(ASN1_TYPE node, const char *value,
 /* Writes the specified integer into the specified node.
  */
 int
-_gnutls_x509_write_uint32(ASN1_TYPE node, const char *value, uint32_t num)
+_gnutls_x509_write_uint32(asn1_node node, const char *value, uint32_t num)
 {
 	uint8_t tmpstr[5];
 	int result;

@@ -79,7 +79,7 @@ _gnutls_gost_keytrans_encrypt(gnutls_pk_params_st *pub,
 	gnutls_datum_t kek;
 	gnutls_datum_t enc, imit;
 	gnutls_digest_algorithm_t digalg;
-	ASN1_TYPE kx;
+	asn1_node kx;
 
 	if (pub->algo == GNUTLS_PK_GOST_01)
 		digalg = GNUTLS_DIG_GOSTR_94;
@@ -176,7 +176,7 @@ _gnutls_gost_keytrans_decrypt(gnutls_pk_params_st *priv,
 			      gnutls_datum_t *out)
 {
 	int ret;
-	ASN1_TYPE kx;
+	asn1_node kx;
 	gnutls_pk_params_st pub;
 	gnutls_datum_t kek;
 	gnutls_datum_t ukm2, enc, imit;

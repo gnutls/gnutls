@@ -165,7 +165,7 @@ _pkcs12_decode_crt_bag(gnutls_pkcs12_bag_type_t type,
 		       const gnutls_datum_t * in, gnutls_datum_t * out)
 {
 	int ret;
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 
 	switch (type) {
 	case GNUTLS_BAG_CERTIFICATE:
@@ -266,7 +266,7 @@ _pkcs12_encode_crt_bag(gnutls_pkcs12_bag_type_t type,
 		       const gnutls_datum_t * raw, gnutls_datum_t * out)
 {
 	int ret;
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	asn1_node c2 = NULL;
 
 	switch (type) {
 	case GNUTLS_BAG_CERTIFICATE:
@@ -716,7 +716,7 @@ gnutls_pkcs12_bag_encrypt(gnutls_pkcs12_bag_t bag, const char *pass,
 			  unsigned int flags)
 {
 	int ret;
-	ASN1_TYPE safe_cont = ASN1_TYPE_EMPTY;
+	asn1_node safe_cont = NULL;
 	gnutls_datum_t der = { NULL, 0 };
 	gnutls_datum_t enc = { NULL, 0 };
 	schema_id id;
