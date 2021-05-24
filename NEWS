@@ -5,7 +5,25 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.6.15 (releases 2020-09-04)
+* Version 3.6.16 (released 2021-05-24)
+
+** libgnutls: Fixed potential miscalculation of ECDSA/EdDSA code backported from
+   Nettle.  In GnuTLS, as long as it is built and linked against the fixed
+   version of Nettle, this only affects GOST curves.  [CVE-2021-20305]
+
+** libgnutls: Fixed potential use-after-free in sending "key_share"
+   and "pre_shared_key" extensions. When sending those extensions, the
+   client may dereference a pointer no longer valid after
+   realloc. This happens only when the client sends a large Client
+   Hello message, e.g., when HRR is sent in a resumed session
+   previously negotiated large FFDHE parameters, because the initial
+   allocation of the buffer is large enough without having to call
+   realloc (#1151).  [GNUTLS-SA-2021-03-10, CVSS: low]
+
+** API and ABI modifications:
+No changes since last version.
+
+* Version 3.6.15 (released 2020-09-04)
 
 ** libgnutls: Fixed "no_renegotiation" alert handling at incorrect timing.
    The server sending a "no_renegotiation" alert in an unexpected timing,
