@@ -562,6 +562,7 @@ static int server_recv_params(gnutls_session_t session,
 	uint32_t ticket_age = UINT32_MAX;
 	struct timespec ticket_creation_time = { 0, 0 };
 	bool resuming;
+	bool refuse_early_data = false;
 
 	ret = _gnutls13_psk_ext_parser_init(&psk_parser, data, len);
 	if (ret < 0) {
@@ -686,22 +687,28 @@ static int server_recv_params(gnutls_session_t session,
 
 		_gnutls_copy_psk_username(info, &psk.identity);
 		_gnutls_handshake_log("EXT[%p]: selected PSK identity: %s (%d)\n", session, info->username, psk_index);
+
+		/* We currently only support early data in resuming connection,
+		 * due to lack of API function to associate encryption
+		 * parameters with external PSK.
+		 */
+		refuse_early_data = true;
 	} else {
-		if (session->internals.hsk_flags & HSK_EARLY_DATA_ACCEPTED) {
+		if (session->internals.hsk_flags & HSK_EARLY_DATA_IN_FLIGHT) {
 			if (session->internals.anti_replay) {
 				ret = _gnutls_anti_replay_check(session->internals.anti_replay,
 								ticket_age,
 								&ticket_creation_time,
 								&binder_recvd);
 				if (ret < 0) {
-					session->internals.hsk_flags &= ~HSK_EARLY_DATA_ACCEPTED;
+					refuse_early_data = true;
 					_gnutls_handshake_log("EXT[%p]: replay detected; rejecting early data\n",
 						      session);
 				}
 			} else {
+				refuse_early_data = true;
 				_gnutls_handshake_log("EXT[%p]: anti-replay is not enabled; rejecting early data\n",
 						      session);
-				session->internals.hsk_flags &= ~HSK_EARLY_DATA_ACCEPTED;
 			}
 		}
 
@@ -710,6 +717,15 @@ static int server_recv_params(gnutls_session_t session,
 	}
 
 	session->internals.hsk_flags |= HSK_PSK_SELECTED;
+
+	if ((session->internals.flags & GNUTLS_ENABLE_EARLY_DATA) &&
+	    (session->internals.hsk_flags & HSK_EARLY_DATA_IN_FLIGHT) &&
+	    !refuse_early_data &&
+	    !(session->internals.hsk_flags & HSK_HRR_SENT)) {
+		session->internals.hsk_flags |= HSK_EARLY_DATA_ACCEPTED;
+		_gnutls_handshake_log("EXT[%p]: early data accepted\n",
+				      session);
+	}
 
 	/* Reference the selected pre-shared key */
 	session->key.binders[0].psk.data = key.data;
