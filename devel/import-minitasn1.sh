@@ -6,7 +6,8 @@
 set +e
 
 : ${srcdir=.}
-SRC=$srcdir/devel/libtasn1/lib
+DIR=$srcdir/devel/libtasn1
+SRC=$DIR/lib
 DST=$srcdir/lib/minitasn1
 
 IMPORTS="
@@ -28,7 +29,7 @@ libtasn1.h
 
 test -d $DST || mkdir $DST
 
-ASN1_VERSION=`grep AC_INIT $SRC/../configure.ac | sed -e 's/.*\],\[\([^]]*\)\],\[.*/\1/g'`
+ASN1_VERSION=`git --git-dir $DIR/.git describe | sed 's/^v\([0-9]*\.[0-9]*\.[0-9]\)*.*/\1/'`
 ASN1_VERSION_MAJOR=`echo ${ASN1_VERSION} | cut -d . -f 1`
 ASN1_VERSION_MINOR=`echo ${ASN1_VERSION} | cut -d . -f 2`
 ASN1_VERSION_PATCH=`echo ${ASN1_VERSION} | cut -d . -f 3`
