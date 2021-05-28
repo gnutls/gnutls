@@ -352,7 +352,7 @@ LIBTASN1_MINIMUM=4.9
   AC_MSG_RESULT($enable_afalg)
 
   if test "$enable_afalg" = "yes"; then
-    PKG_CHECK_MODULES(LIBKCAPI, [libkcapi >= 1.2.1], [], [enable_afalg=no])
+    PKG_CHECK_MODULES(LIBKCAPI, [libkcapi >= 1.3.0], [], [enable_afalg=no])
   fi
   if test "$enable_afalg" = "yes"; then
     AC_DEFINE([ENABLE_AFALG], 1, [Enable AF_ALG support])
