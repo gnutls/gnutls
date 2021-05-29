@@ -7,12 +7,10 @@
  2. Update of release date in [NEWS](NEWS), and bump of version number in
     [configure.ac](configure.ac) as well as soname numbers in [m4/hooks.m4](m4/hooks.m4).
  3. make distcheck
- 4. git tag -s $(VERSION). The 3.6.12 was including both the 3.6.12 and
-    gnutls_3_6_12 tags, but it may make sense to only use the version from
-    now on.
- 5. git push && git push --tags
- 6. make dist && gpg --sign --detach gnutls-$(VERSION).tar.xz
- 7. scp gnutls-$(VERSION).tar.xz* ftp.gnupg.org:/home/ftp/gcrypt/gnutls/v3.6/
+ 4. git tag -s $VERSION
+ 5. git push && git push $VERSION
+ 6. gpg --detach-sign gnutls-$VERSION.tar.xz
+ 7. scp gnutls-$VERSION.tar.xz* ftp.gnupg.org:/home/ftp/gcrypt/gnutls/v$(expr $VERSION : '\([0-9]*\.[0-9]*\)')/
  8. Create and send announcement email based on previously sent email to the list and
     [NEWS](NEWS) file.
  9. Create a NEWS entry at [web-pages repository](https://gitlab.com/gnutls/web-pages/-/tree/master/news-entries),
