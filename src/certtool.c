@@ -363,13 +363,13 @@ generate_certificate(gnutls_privkey_t * ret_key,
 		} else {
 			get_dn_crt_set(crt);
 
+			get_country_crt_set(crt);
+			get_state_crt_set(crt);
+			get_locality_crt_set(crt);
+			get_organization_crt_set(crt);
+			get_unit_crt_set(crt);
 			get_cn_crt_set(crt);
 			get_uid_crt_set(crt);
-			get_unit_crt_set(crt);
-			get_organization_crt_set(crt);
-			get_locality_crt_set(crt);
-			get_state_crt_set(crt);
-			get_country_crt_set(crt);
 			get_dc_set(TYPE_CRT, crt);
 
 			get_oid_crt_set(crt);
@@ -1923,15 +1923,15 @@ void generate_request(common_info_st * cinfo)
 	 */
 	get_dn_crq_set(crq);
 
-	get_cn_crq_set(crq);
-	get_unit_crq_set(crq);
-	get_organization_crq_set(crq);
-	get_locality_crq_set(crq);
-	get_state_crq_set(crq);
 	get_country_crq_set(crq);
+	get_state_crq_set(crq);
+	get_locality_crq_set(crq);
+	get_organization_crq_set(crq);
+	get_unit_crq_set(crq);
+	get_cn_crq_set(crq);
 
-	get_dc_set(TYPE_CRQ, crq);
 	get_uid_crq_set(crq);
+	get_dc_set(TYPE_CRQ, crq);
 	get_oid_crq_set(crq);
 
 	get_dns_name_set(TYPE_CRQ, crq);

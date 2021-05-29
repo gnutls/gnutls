@@ -102,12 +102,12 @@ rm -f "${OUTFILE}" "${OUTFILE2}"
 
 # Test interactive CRQ creation with very long input
 cat >$TMPFILE <<__EOF__
+
+
+
+
+
 super-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-long.com
-
-
-
-
-
 
 
 super-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-long.com
