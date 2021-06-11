@@ -268,8 +268,9 @@ flag = {
 flag = {
     name      = write;
     descrip   = "Writes the loaded objects to a PKCS #11 token";
-    doc = "It can be used to write private, public keys, certificates or secret keys to a token. Must be combined with
-    one of --load-privkey, --load-pubkey, --load-certificate option.";
+    doc = "It can be used to write private, public keys, certificates or secret keys to a token. Must be combined with one of --load-privkey, --load-pubkey, --load-certificate option.
+
+When writing a certificate object, its CKA_ID is set to the same CKA_ID of the corresponding public key, if it exists on the token; otherwise it will be derived from the X.509 Subject Key Identifier of the certificate. If this behavior is undesired, write the public key to the token beforehand.";
 };
 
 flag = {
