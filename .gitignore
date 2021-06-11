@@ -795,6 +795,7 @@ tests/suite/tlslite
 tests/suite/x509paths/X509tests
 tests/system-override-hash
 tests/system-override-sig
+tests/system-override-sig-tls
 tests/system-prio-file
 tests/time
 tests/tls-channel-binding

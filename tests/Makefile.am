@@ -108,7 +108,7 @@ noinst_LTLIBRARIES = libutils.la
 libutils_la_SOURCES = utils.h utils.c seccomp.c utils-adv.c
 libutils_la_LIBADD = ../lib/libgnutls.la
 
-indirect_tests = system-override-hash system-override-sig
+indirect_tests = system-override-hash system-override-sig system-override-sig-tls
 
 ctests = tls13/supported_versions tls13/tls12-no-tls13-exts \
 	tls13/post-handshake-with-cert tls13/post-handshake-without-cert \
@@ -509,7 +509,8 @@ if !DISABLE_SYSTEM_CONFIG
 dist_check_SCRIPTS += system-override-sig.sh system-override-hash.sh \
 	system-override-versions.sh system-override-invalid.sh \
 	system-override-curves.sh system-override-profiles.sh system-override-tls.sh \
-	system-override-kx.sh system-override-default-priority-string.sh
+	system-override-kx.sh system-override-default-priority-string.sh \
+	system-override-sig-tls.sh
 endif
 
 dist_check_SCRIPTS += gnutls-cli-self-signed.sh gnutls-cli-invalid-crl.sh gnutls-cli-rawpk.sh
