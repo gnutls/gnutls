@@ -1737,10 +1737,13 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 	for (i = 0; i < priority_cache->_sign_algo.num_priorities; i++) {
 		se = _gnutls_sign_to_entry(priority_cache->_sign_algo.priorities[i]);
 		if (se != NULL && priority_cache->sigalg.size < sizeof(priority_cache->sigalg.entry)/sizeof(priority_cache->sigalg.entry[0])) {
-			/* if the signature algorithm semantics are not compatible with
-			 * the protocol's, then skip. */
-			if ((se->aid.tls_sem & tls_sig_sem) == 0)
+			/* if the signature algorithm semantics is not
+			 * compatible with the protocol's, or the algorithm is
+			 * marked as insecure, then skip. */
+			if ((se->aid.tls_sem & tls_sig_sem) == 0 ||
+			    !_gnutls_sign_is_secure2(se, 0)) {
 				continue;
+			}
 			priority_cache->sigalg.entry[priority_cache->sigalg.size++] = se;
 		}
 	}
