@@ -985,7 +985,10 @@ write_to_session_record_port (SCM port, const void *data, size_t size)
       c_result = gnutls_record_send (c_session, (char *) data + c_sent,
                                      size - c_sent);
       if (EXPECT_FALSE (c_result < 0))
-        scm_gnutls_error (c_result, FUNC_NAME);
+	{
+	  if (c_result != GNUTLS_E_AGAIN && c_result != GNUTLS_E_INTERRUPTED)
+	    scm_gnutls_error (c_result, FUNC_NAME);
+	}
       else
         c_sent += c_result;
     }
@@ -1069,7 +1072,8 @@ read_from_session_record_port (SCM port, SCM dst, size_t start, size_t count)
 #undef FUNC_NAME
 
 /* Return the file descriptor that backs PORT.  This function is called upon a
-   blocking read--i.e., 'read_from_session_record_port' returned -1.  */
+   blocking read--i.e., 'read_from_session_record_port' or
+   'write_to_session_record_port' returned -1.  */
 static int
 session_record_port_fd (SCM port)
 {
@@ -1097,7 +1101,16 @@ write_to_session_record_port (SCM port, SCM src, size_t start, size_t count)
   c_session = scm_to_gnutls_session (session, 1, FUNC_NAME);
   data = (char *) SCM_BYTEVECTOR_CONTENTS (src) + start;
 
-  result = gnutls_record_send (c_session, data, count);
+  do
+    result = gnutls_record_send (c_session, data, count);
+  while (result == GNUTLS_E_INTERRUPTED
+	 || (result == GNUTLS_E_AGAIN
+	     && !SCM_GNUTLS_SESSION_TRANSPORT_IS_FD (c_session)));
+
+  if (result == GNUTLS_E_AGAIN
+      && SCM_GNUTLS_SESSION_TRANSPORT_IS_FD (c_session))
+    /* Tell Guile that reading would block.  */
+    return (size_t) -1;
 
   if (EXPECT_FALSE (result < 0))
     scm_gnutls_error (result, FUNC_NAME);
