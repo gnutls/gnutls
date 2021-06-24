@@ -937,8 +937,6 @@ gnutls_certificate_get_x509_crt(gnutls_certificate_credentials_t res,
  * structure and must not be deallocated. It will be automatically deallocated
  * when the @res structure is deinitialized.
  *
- * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
- *
  * Since: 3.2.2
  **/
 void
