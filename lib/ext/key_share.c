@@ -656,6 +656,18 @@ key_share_recv_params(gnutls_session_t session,
 	return 0;
 }
 
+static inline bool
+pk_type_is_ecdhx(gnutls_pk_algorithm_t pk)
+{
+	return pk == GNUTLS_PK_ECDH_X25519 || pk == GNUTLS_PK_ECDH_X448;
+}
+
+static inline bool
+pk_type_equal(gnutls_pk_algorithm_t a, gnutls_pk_algorithm_t b)
+{
+	return a == b || (pk_type_is_ecdhx(a) && pk_type_is_ecdhx(b));
+}
+
 /* returns data_size or a negative number on failure
  */
 static int
@@ -710,12 +722,18 @@ key_share_send_params(gnutls_session_t session,
 			/* generate key shares for out top-(max_groups) groups
 			 * if they are of different PK type. */
 			for (i = 0; i < session->internals.priorities->groups.size; i++) {
+				unsigned int j;
+
 				group = session->internals.priorities->groups.entry[i];
 
-				if (generated == 1 && group->pk == selected_groups[0])
+				for (j = 0; j < generated; j++) {
+					if (pk_type_equal(group->pk, selected_groups[j])) {
+						break;
+					}
+				}
+				if (j < generated) {
 					continue;
-				else if (generated == 2 && (group->pk == selected_groups[1] || group->pk == selected_groups[0]))
-					continue;
+				}
 
 				selected_groups[generated] = group->pk;
 
