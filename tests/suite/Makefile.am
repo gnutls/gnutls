@@ -115,4 +115,5 @@ TESTS = $(scripts_to_test) prime-check
 prime_check_CPPFLAGS = $(AM_CPPFLAGS) $(NETTLE_CFLAGS)
 
 TEST_EXTENSIONS = .sh
+SH_LOG_COMPILER = $(SHELL)
 LOG_COMPILER = $(VALGRIND)
