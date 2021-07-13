@@ -62,6 +62,10 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
 	ocsp-tests/response1.pem ocsp-tests/response2.pem \
 	ocsp-tests/certs/server_good.key ocsp-tests/certs/server_bad.key ocsp-tests/certs/server_good.template \
 	ocsp-tests/certs/server_bad.template ocsp-tests/certs/ocsp-staple-unrelated.der ocsp-tests/suppressions.valgrind \
+	ocsp-tests/signer-verify/response-ca.der \
+	ocsp-tests/signer-verify/response-delegated.der \
+	ocsp-tests/signer-verify/response-non-delegated.der \
+	ocsp-tests/signer-verify/trust.pem \
 	data/listings-DTLS1.0 data/listings-SSL3.0 data/listings-TLS1.0 data/listings-TLS1.1 \
 	data/listings-legacy1 data/listings-legacy2 data/listings-legacy3 data/listings-legacy4 \
 	data/listings-old-SSL3.0-TLS1.1 data/listings-SSL3.0-TLS1.1 \
@@ -503,7 +507,7 @@ dist_check_SCRIPTS += fastopen.sh pkgconfig.sh starttls.sh starttls-ftp.sh start
 	psktool.sh ocsp-tests/ocsp-load-chain.sh gnutls-cli-save-data.sh gnutls-cli-debug.sh \
 	sni-resume.sh ocsp-tests/ocsptool.sh cert-reencoding.sh pkcs7-cat.sh long-crl.sh \
 	serv-udp.sh logfile-option.sh gnutls-cli-resume.sh profile-tests.sh \
-	server-weak-keys.sh
+	server-weak-keys.sh ocsp-tests/ocsp-signer-verify.sh
 
 if !DISABLE_SYSTEM_CONFIG
 dist_check_SCRIPTS += system-override-sig.sh system-override-hash.sh \
