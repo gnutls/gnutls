@@ -2374,15 +2374,15 @@ gnutls_ocsp_resp_verify(gnutls_ocsp_resp_const_t resp,
 				rc = GNUTLS_E_SUCCESS;
 				goto done;
 			}
-		}
-	}
 
-	rc = check_ocsp_purpose(signercert);
-	if (rc < 0) {
-		gnutls_assert();
-		*verify = GNUTLS_OCSP_VERIFY_SIGNER_KEYUSAGE_ERROR;
-		rc = GNUTLS_E_SUCCESS;
-		goto done;
+			rc = check_ocsp_purpose(signercert);
+			if (rc < 0) {
+				gnutls_assert();
+				*verify = GNUTLS_OCSP_VERIFY_SIGNER_KEYUSAGE_ERROR;
+				rc = GNUTLS_E_SUCCESS;
+				goto done;
+			}
+		}
 	}
 
 	rc = _ocsp_resp_verify_direct(resp, signercert, verify, flags);
