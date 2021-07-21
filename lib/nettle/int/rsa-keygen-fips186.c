@@ -267,9 +267,31 @@ _rsa_generate_fips186_4_keypair(struct rsa_public_key *pub,
 	struct dss_params_validation_seeds cert;
 	unsigned l = n_size / 2;
 
-	FIPS_RULE(n_size == 2048 && seed_length != 14 * 2, 0, "seed length other than 28 bytes\n");
-	FIPS_RULE(n_size == 3072 && seed_length != 16 * 2, 0, "seed length other than 32 bytes\n");
-	FIPS_RULE(n_size != 2048 && n_size != 3072, 0, "unsupported size for modulus\n");
+	switch (n_size) {
+	case 2048:      /* SP 800-56B rev 2 Appendix D and FIPS 140-2 IG 7.5 */
+		FIPS_RULE(seed_length != 14 * 2, 0, "seed length other than 28 bytes\n");
+		break;
+	case 3072:      /* SP 800-56B rev 2 Appendix D and FIPS 140-2 IG 7.5 */
+		FIPS_RULE(seed_length != 16 * 2, 0, "seed length other than 32 bytes\n");
+		break;
+	case 4096:      /* SP 800-56B rev 2 Appendix D */
+		FIPS_RULE(seed_length != 19 * 2, 0, "seed length other than 38 bytes\n");
+		break;
+	case 6144:      /* SP 800-56B rev 2 Appendix D */
+		FIPS_RULE(seed_length != 22 * 2, 0, "seed length other than 44 bytes\n");
+		break;
+	case 7680:      /* FIPS 140-2 IG 7.5 */
+		FIPS_RULE(seed_length != 24 * 2, 0, "seed length other than 48 bytes\n");
+		break;
+	case 8192:      /* SP 800-56B rev 2 Appendix D */
+		FIPS_RULE(seed_length != 25 * 2, 0, "seed length other than 50 bytes\n");
+		break;
+	case 15360:     /* FIPS 140-2 IG 7.5 */
+		FIPS_RULE(seed_length != 32 * 2, 0, "seed length other than 64 bytes\n");
+		break;
+	default:
+		FIPS_RULE(false, 0, "unsupported modulus size\n");
+	}
 
 	if (!mpz_tstbit(pub->e, 0)) {
 		_gnutls_debug_log("Unacceptable e (it is even)\n");
