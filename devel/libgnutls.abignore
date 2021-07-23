@@ -105,3 +105,21 @@ name = gnutls_x509_ct_sct_get
 
 [suppress_function]
 name = gnutls_transport_is_ktls_enabled
+
+[suppress_function]
+name = gnutls_fips140_context_init
+
+[suppress_function]
+name = gnutls_fips140_context_deinit
+
+[suppress_function]
+name = gnutls_fips140_push_context
+
+[suppress_function]
+name = gnutls_fips140_pop_context
+
+[suppress_function]
+name = gnutls_fips140_get_operation_state
+
+[suppress_type]
+name = gnutls_fips140_operation_state_t

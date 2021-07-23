@@ -3348,6 +3348,45 @@ void gnutls_fips140_set_mode(gnutls_fips_mode_t mode, unsigned flags);
 		gnutls_fips140_set_mode(GNUTLS_FIPS140_STRICT, GNUTLS_FIPS140_SET_MODE_THREAD); \
 	} while(0)
 
+typedef struct gnutls_fips140_context_st *gnutls_fips140_context_t;
+
+int gnutls_fips140_context_init(gnutls_fips140_context_t *context);
+void gnutls_fips140_context_deinit(gnutls_fips140_context_t context);
+
+/**
+ * gnutls_fips140_operation_state_t:
+ * @GNUTLS_FIPS140_OP_INITIAL: no previous operation has done
+ * @GNUTLS_FIPS140_OP_APPROVED: the previous operation was FIPS approved
+ * @GNUTLS_FIPS140_OP_NOT_APPROVED: the previous operation was not FIPS approved
+ * @GNUTLS_FIPS140_OP_ERROR: the previous operation caused an error regardless of FIPS
+ *
+ * The FIPS operation state set by the preceding operation.
+ *
+ * There are state transition rules among the enum values:
+ * - When the context is attached to a thread, it will be set to reset
+ *   to the %GNUTLS_FIPS140_OP_INITIAL state
+ * - From the %GNUTLS_FIPS140_OP_INITIAL state, the context can
+ *   transition to either %GNUTLS_FIPS140_OP_APPROVED,
+ *   %GNUTLS_FIPS140_OP_NOT_APPROVED, or %GNUTLS_FIPS140_OP_ERROR
+ * - From the %GNUTLS_FIPS140_OP_APPROVED state, the context can
+ *   transition to %GNUTLS_FIPS140_OP_NOT_APPROVED
+ * - All other transitions are prohibited.
+ *
+ * Since: 3.7.3
+ */
+typedef enum {
+        GNUTLS_FIPS140_OP_INITIAL,
+        GNUTLS_FIPS140_OP_APPROVED,
+        GNUTLS_FIPS140_OP_NOT_APPROVED,
+        GNUTLS_FIPS140_OP_ERROR
+} gnutls_fips140_operation_state_t;
+
+gnutls_fips140_operation_state_t
+gnutls_fips140_get_operation_state(gnutls_fips140_context_t context);
+
+int gnutls_fips140_push_context(gnutls_fips140_context_t context);
+int gnutls_fips140_pop_context(void);
+
   /* Gnutls error codes. The mapping to a TLS alert is also shown in
    * comments.
    */

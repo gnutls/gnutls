@@ -1370,6 +1370,11 @@ GNUTLS_3_7_3
 	gnutls_digest_set_secure;
 	gnutls_protocol_set_enabled;
 	gnutls_transport_is_ktls_enabled;
+	gnutls_fips140_context_init;
+	gnutls_fips140_context_deinit;
+	gnutls_fips140_get_operation_state;
+	gnutls_fips140_push_context;
+	gnutls_fips140_pop_context;
  local:
 	*;
 } GNUTLS_3_7_2;
