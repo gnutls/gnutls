@@ -1931,6 +1931,9 @@ gnutls_pubkey_verify_data2(gnutls_pubkey_t pubkey,
 		return gnutls_assert_val(ret);
 
 	params.pk = se->pk;
+	if (flags & GNUTLS_VERIFY_RSA_PSS_FIXED_SALT_LENGTH) {
+		params.flags |= GNUTLS_PK_FLAG_RSA_PSS_FIXED_SALT_LENGTH;
+	}
 
 	me = hash_to_entry(se->hash);
 	if (me == NULL && !_gnutls_pk_is_not_prehashed(se->pk))

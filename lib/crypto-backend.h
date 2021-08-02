@@ -243,7 +243,8 @@ typedef struct {
 typedef enum {
 	GNUTLS_PK_FLAG_NONE = 0,
 	GNUTLS_PK_FLAG_PROVABLE = 1,
-	GNUTLS_PK_FLAG_REPRODUCIBLE = 2
+	GNUTLS_PK_FLAG_REPRODUCIBLE = 2,
+	GNUTLS_PK_FLAG_RSA_PSS_FIXED_SALT_LENGTH = 4
 } gnutls_pk_flag_t;
 
 #define FIX_SIGN_PARAMS(params, flags, dig) do {		\

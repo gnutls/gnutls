@@ -959,6 +959,9 @@ int gnutls_x509_crl_set_number(gnutls_x509_crl_t crl,
  *   as in the TLS 1.0 protocol. Not all functions accept this flag.
  * @GNUTLS_VERIFY_IGNORE_UNKNOWN_CRIT_EXTENSIONS: This signals the verification
  *   process, not to fail on unknown critical extensions.
+ * @GNUTLS_VERIFY_RSA_PSS_FIXED_SALT_LENGTH: Disallow RSA-PSS signatures made
+ *   with mismatching salt length with digest length, as mandated in RFC 8446
+ *   4.2.3.
  *
  * Enumeration of different certificate verify flags. Additional
  * verification profiles can be set using GNUTLS_PROFILE_TO_VFLAGS()
@@ -980,7 +983,8 @@ typedef enum gnutls_certificate_verify_flags {
 	GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS = 1 << 12,
 	GNUTLS_VERIFY_USE_TLS1_RSA = 1 << 13,
 	GNUTLS_VERIFY_IGNORE_UNKNOWN_CRIT_EXTENSIONS = 1 << 14,
-	GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1 = 1 << 15
+	GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1 = 1 << 15,
+	GNUTLS_VERIFY_RSA_PSS_FIXED_SALT_LENGTH = 1 << 16
 	/* cannot exceed 2^24 due to GNUTLS_PROFILE_TO_VFLAGS() */
 } gnutls_certificate_verify_flags;
 

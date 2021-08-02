@@ -5,6 +5,12 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.7.3 (unreleased)
+
+** API and ABI modifications:
+GNUTLS_PRIVKEY_FLAG_RSA_PSS_FIXED_SALT_LENGTH: new flag in gnutls_privkey_flags_t
+GNUTLS_VERIFY_RSA_PSS_FIXED_SALT_LENGTH: new flag in gnutls_certificate_verify_flags
+
 * Version 3.7.2 (released 2021-05-29)
 
 ** libgnutls: The priority string option %DISABLE_TLS13_COMPAT_MODE was added
