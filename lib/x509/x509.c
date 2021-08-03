@@ -1687,9 +1687,9 @@ _gnutls_parse_general_name2(asn1_node src, const char *src_name,
 		seq++;	/* 0->1, 1->2 etc */
 
 		if (src_name[0] != 0)
-			snprintf(nptr, sizeof(nptr), "%s.?%u", src_name, seq);
+			snprintf(nptr, sizeof(nptr), "%s.?%d", src_name, seq);
 		else
-			snprintf(nptr, sizeof(nptr), "?%u", seq);
+			snprintf(nptr, sizeof(nptr), "?%d", seq);
 	} else {
 		snprintf(nptr, sizeof(nptr), "%s", src_name);
 	}
@@ -1737,11 +1737,11 @@ _gnutls_parse_general_name2(asn1_node src, const char *src_name,
 
 			if (src_name[0] != 0)
 				snprintf(nptr, sizeof(nptr),
-					 "%s.?%u.otherName.type-id",
+					 "%s.?%d.otherName.type-id",
 					 src_name, seq);
 			else
 				snprintf(nptr, sizeof(nptr),
-					 "?%u.otherName.type-id", seq);
+					 "?%d.otherName.type-id", seq);
 
 			len = sizeof(oid);
 

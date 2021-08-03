@@ -254,12 +254,11 @@ int _gnutls_ext_sr_send_cs(gnutls_session_t session)
 			return GNUTLS_E_MEMORY_ERROR;
 		}
 		epriv = priv;
-	}
 
-	if (set != 0)
 		_gnutls_hello_ext_set_priv(session,
 					     GNUTLS_EXTENSION_SAFE_RENEGOTIATION,
 					     epriv);
+	}
 
 	return 0;
 }

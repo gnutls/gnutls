@@ -1386,8 +1386,7 @@ gnutls_session_channel_binding(gnutls_session_t session,
 			gnutls_x509_crt_deinit (cert);
 			return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 		default:
-			/* no-op */
-			algo = algo;
+			break;
 		}
 
 		/* preallocate 512 bits buffer as maximum supported digest */

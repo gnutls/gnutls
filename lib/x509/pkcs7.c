@@ -1769,7 +1769,7 @@ int gnutls_pkcs7_delete_crt(gnutls_pkcs7_t pkcs7, int indx)
 	/* Step 2. Delete the certificate.
 	 */
 
-	snprintf(root2, sizeof(root2), "certificates.?%u", indx + 1);
+	snprintf(root2, sizeof(root2), "certificates.?%d", indx + 1);
 
 	result = asn1_write_value(pkcs7->signed_data, root2, NULL, 0);
 	if (result != ASN1_SUCCESS) {
@@ -2033,7 +2033,7 @@ int gnutls_pkcs7_delete_crl(gnutls_pkcs7_t pkcs7, int indx)
 	/* Delete the crl.
 	 */
 
-	snprintf(root2, sizeof(root2), "crls.?%u", indx + 1);
+	snprintf(root2, sizeof(root2), "crls.?%d", indx + 1);
 
 	result = asn1_write_value(pkcs7->signed_data, root2, NULL, 0);
 	if (result != ASN1_SUCCESS) {

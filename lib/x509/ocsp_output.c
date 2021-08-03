@@ -530,11 +530,13 @@ print_resp(gnutls_buffer_st * str, gnutls_ocsp_resp_const_t resp,
 		       "algorithm that can be forged.\n"));
 	}
 
-	/* Signature. */
 	if (format == GNUTLS_OCSP_PRINT_FULL) {
 		gnutls_datum_t sig;
+		gnutls_x509_crt_t *certs;
+		size_t ncerts, i;
+		gnutls_datum_t out;
 
-
+		/* Signature. */
 		ret = gnutls_ocsp_resp_get_signature(resp, &sig);
 		if (ret < 0)
 			addf(str, "error: get_signature: %s\n",
@@ -546,14 +548,8 @@ print_resp(gnutls_buffer_st * str, gnutls_ocsp_resp_const_t resp,
 
 			gnutls_free(sig.data);
 		}
-	}
 
-	/* certs */
-	if (format == GNUTLS_OCSP_PRINT_FULL) {
-		gnutls_x509_crt_t *certs;
-		size_t ncerts, i;
-		gnutls_datum_t out;
-
+		/* certs */
 		ret = gnutls_ocsp_resp_get_certs(resp, &certs, &ncerts);
 		if (ret < 0)
 			addf(str, "error: get_certs: %s\n",

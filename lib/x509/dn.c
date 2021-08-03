@@ -49,10 +49,10 @@ static int append_elements(asn1_node asn1_struct, const char *asn1_rdn_name, gnu
 	/* create a string like "tbsCertList.issuer.rdnSequence.?1"
 	 */
 	if (asn1_rdn_name[0] != 0)
-		snprintf(tmpbuffer1, sizeof(tmpbuffer1), "%s.?%u",
+		snprintf(tmpbuffer1, sizeof(tmpbuffer1), "%s.?%d",
 			 asn1_rdn_name, k1);
 	else
-		snprintf(tmpbuffer1, sizeof(tmpbuffer1), "?%u",
+		snprintf(tmpbuffer1, sizeof(tmpbuffer1), "?%d",
 			 k1);
 
 	len = sizeof(value) - 1;
@@ -80,10 +80,10 @@ static int append_elements(asn1_node asn1_struct, const char *asn1_rdn_name, gnu
 
 		if (tmpbuffer1[0] != 0)
 			snprintf(tmpbuffer2, sizeof(tmpbuffer2),
-				 "%s.?%u", tmpbuffer1, k2);
+				 "%s.?%d", tmpbuffer1, k2);
 		else
 			snprintf(tmpbuffer2, sizeof(tmpbuffer2),
-				 "?%u", k2);
+				 "?%d", k2);
 
 		/* Try to read the RelativeDistinguishedName attributes.
 		 */
@@ -336,10 +336,10 @@ _gnutls_x509_parse_dn_oid(asn1_node asn1_struct,
 		/* create a string like "tbsCertList.issuer.rdnSequence.?1"
 		 */
 		if (asn1_rdn_name[0] != 0)
-			snprintf(tmpbuffer1, sizeof(tmpbuffer1), "%s.?%u",
+			snprintf(tmpbuffer1, sizeof(tmpbuffer1), "%s.?%d",
 				 asn1_rdn_name, k1);
 		else
-			snprintf(tmpbuffer1, sizeof(tmpbuffer1), "?%u",
+			snprintf(tmpbuffer1, sizeof(tmpbuffer1), "?%d",
 				 k1);
 
 		len = sizeof(value) - 1;
@@ -365,10 +365,10 @@ _gnutls_x509_parse_dn_oid(asn1_node asn1_struct,
 
 			if (tmpbuffer1[0] != 0)
 				snprintf(tmpbuffer2, sizeof(tmpbuffer2),
-					 "%s.?%u", tmpbuffer1, k2);
+					 "%s.?%d", tmpbuffer1, k2);
 			else
 				snprintf(tmpbuffer2, sizeof(tmpbuffer2),
-					 "?%u", k2);
+					 "?%d", k2);
 
 			/* Try to read the RelativeDistinguishedName attributes.
 			 */
@@ -496,10 +496,10 @@ _gnutls_x509_get_dn_oid(asn1_node asn1_struct,
 		/* create a string like "tbsCertList.issuer.rdnSequence.?1"
 		 */
 		if (asn1_rdn_name[0] != 0)
-			snprintf(tmpbuffer1, sizeof(tmpbuffer1), "%s.?%u",
+			snprintf(tmpbuffer1, sizeof(tmpbuffer1), "%s.?%d",
 				 asn1_rdn_name, k1);
 		else
-			snprintf(tmpbuffer1, sizeof(tmpbuffer1), "?%u",
+			snprintf(tmpbuffer1, sizeof(tmpbuffer1), "?%d",
 				 k1);
 
 		len = sizeof(value) - 1;
@@ -525,10 +525,10 @@ _gnutls_x509_get_dn_oid(asn1_node asn1_struct,
 
 			if (tmpbuffer1[0] != 0)
 				snprintf(tmpbuffer2, sizeof(tmpbuffer2),
-					 "%s.?%u", tmpbuffer1, k2);
+					 "%s.?%d", tmpbuffer1, k2);
 			else
 				snprintf(tmpbuffer2, sizeof(tmpbuffer2),
-					 "?%u", k2);
+					 "?%d", k2);
 
 			/* Try to read the RelativeDistinguishedName attributes.
 			 */

@@ -89,10 +89,10 @@ _x509_parse_attribute(asn1_node asn1_struct,
 		/* create a string like "attribute.?1"
 		 */
 		if (attr_name[0] != 0)
-			snprintf(tmpbuffer1, sizeof(tmpbuffer1), "%s.?%u",
+			snprintf(tmpbuffer1, sizeof(tmpbuffer1), "%s.?%d",
 				 attr_name, k1);
 		else
-			snprintf(tmpbuffer1, sizeof(tmpbuffer1), "?%u",
+			snprintf(tmpbuffer1, sizeof(tmpbuffer1), "?%d",
 				 k1);
 
 		len = sizeof(value) - 1;
@@ -244,7 +244,7 @@ _x509_set_attribute(asn1_node asn, const char *root,
 	do {
 		k++;
 
-		snprintf(name, sizeof(name), "%s.?%u", root, k);
+		snprintf(name, sizeof(name), "%s.?%d", root, k);
 
 		len = sizeof(extnID) - 1;
 		result = asn1_read_value(asn, name, extnID, &len);

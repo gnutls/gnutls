@@ -385,7 +385,7 @@ char *gnutls_session_get_desc(gnutls_session_t session)
 	if (group_name == NULL && _gnutls_kx_is_dhe(kx)) {
 		dh_bits = gnutls_dh_get_prime_bits(session);
 		if (dh_bits > 0)
-			snprintf(_group_name, sizeof(_group_name), "CUSTOM%u", dh_bits);
+			snprintf(_group_name, sizeof(_group_name), "CUSTOM%d", dh_bits);
 		else
 			snprintf(_group_name, sizeof(_group_name), "CUSTOM");
 		group_name = _group_name;
