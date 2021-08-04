@@ -684,7 +684,7 @@ gnutls_x509_crl_iter_crt_serial(gnutls_x509_crl_t crl,
 		(*iter)->rcache_idx = 1;
 	} else {
 		snprintf(serial_name, sizeof(serial_name),
-			 "?%d", (*iter)->rcache_idx);
+			 "?%u", (*iter)->rcache_idx);
 		(*iter)->rcache = asn1_find_node ((*iter)->rcache, serial_name);
 	}
 	if ((*iter)->rcache == NULL) {
@@ -694,7 +694,7 @@ gnutls_x509_crl_iter_crt_serial(gnutls_x509_crl_t crl,
 	}
 
 	snprintf(serial_name, sizeof(serial_name),
-		 "?%d.userCertificate", (*iter)->rcache_idx);
+		 "?%u.userCertificate", (*iter)->rcache_idx);
 
 	_serial_size = *serial_size;
 	result =
@@ -713,7 +713,7 @@ gnutls_x509_crl_iter_crt_serial(gnutls_x509_crl_t crl,
 
 	if (t) {
 		snprintf(date_name, sizeof(date_name),
-			 "?%d.revocationDate", (*iter)->rcache_idx);
+			 "?%u.revocationDate", (*iter)->rcache_idx);
 		*t = _gnutls_x509_get_time((*iter)->rcache, date_name, 0);
 	}
 

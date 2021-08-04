@@ -475,7 +475,7 @@ _pkcs12_decode_safe_contents(const gnutls_datum_t * content,
 			for (j = 0; j < attributes; j++) {
 
 				snprintf(root, sizeof(root),
-					 "?%u.bagAttributes.?%u", i + 1,
+					 "?%u.bagAttributes.?%d", i + 1,
 					 j + 1);
 
 				result =
@@ -621,7 +621,7 @@ gnutls_pkcs12_get_bag(gnutls_pkcs12_t pkcs12,
 	/* Step 2. Parse the AuthenticatedSafe
 	 */
 
-	snprintf(root2, sizeof(root2), "?%u.contentType", indx + 1);
+	snprintf(root2, sizeof(root2), "?%d.contentType", indx + 1);
 
 	len = sizeof(oid) - 1;
 	result = asn1_read_value(c2, root2, oid, &len);
@@ -640,7 +640,7 @@ gnutls_pkcs12_get_bag(gnutls_pkcs12_t pkcs12,
 	/* Not encrypted Bag
 	 */
 
-	snprintf(root2, sizeof(root2), "?%u.content", indx + 1);
+	snprintf(root2, sizeof(root2), "?%d.content", indx + 1);
 
 	if (strcmp(oid, DATA_OID) == 0) {
 		result = _parse_safe_contents(c2, root2, bag);

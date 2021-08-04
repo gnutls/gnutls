@@ -53,7 +53,7 @@ _gnutls_get_extension(asn1_node asn, const char *root,
 	do {
 		k++;
 
-		snprintf(name, sizeof(name), "%s.?%u", root, k);
+		snprintf(name, sizeof(name), "%s.?%d", root, k);
 
 		_gnutls_str_cpy(name2, sizeof(name2), name);
 		_gnutls_str_cat(name2, sizeof(name2), ".extnID");
@@ -140,7 +140,7 @@ get_indx_extension(asn1_node asn, const char *root,
 	out->data = NULL;
 	out->size = 0;
 
-	snprintf(name, sizeof(name), "%s.?%u.extnValue", root, indx+1);
+	snprintf(name, sizeof(name), "%s.?%d.extnValue", root, indx+1);
 
 	ret = _gnutls_x509_read_value(asn, name, out);
 	if (ret < 0)
@@ -238,7 +238,7 @@ static int get_extension_oid(asn1_node asn, const char *root,
 	do {
 		k++;
 
-		snprintf(name, sizeof(name), "%s.?%u", root, k);
+		snprintf(name, sizeof(name), "%s.?%d", root, k);
 
 		_gnutls_str_cpy(name2, sizeof(name2), name);
 		_gnutls_str_cat(name2, sizeof(name2), ".extnID");
@@ -430,9 +430,9 @@ _gnutls_set_extension(asn1_node asn, const char *root,
 		k++;
 
 		if (root[0] != 0)
-			snprintf(name, sizeof(name), "%s.?%u", root, k);
+			snprintf(name, sizeof(name), "%s.?%d", root, k);
 		else
-			snprintf(name, sizeof(name), "?%u", k);
+			snprintf(name, sizeof(name), "?%d", k);
 
 		len = sizeof(extnID) - 1;
 		result = asn1_read_value(asn, name, extnID, &len);
