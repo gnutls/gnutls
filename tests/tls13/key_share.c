@@ -24,31 +24,15 @@
 #endif
 
 #include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
-
-#if defined(_WIN32)
-
-int main()
-{
-	exit(77);
-}
-
-#else
-
 #include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
 #include <gnutls/gnutls.h>
-#include <gnutls/dtls.h>
-#include <signal.h>
 
 #include "cert-common.h"
 #include "utils.h"
 #include "tls13/ext-parse.h"
+#include "eagain-common.h"
 
 /* This program tests the Key Share behavior in Client Hello,
  * and whether the flags to gnutls_init for key share are followed.
@@ -59,65 +43,11 @@ const char *testname = "";
 #define myfail(fmt, ...) \
 	fail("%s: "fmt, testname, ##__VA_ARGS__)
 
-static void server_log_func(int level, const char *str)
+const char *side = "";
+
+static void tls_log_func(int level, const char *str)
 {
-	fprintf(stderr, "server|<%d>| %s", level, str);
-}
-
-static void client_log_func(int level, const char *str)
-{
-	fprintf(stderr, "client|<%d>| %s", level, str);
-}
-
-
-
-#define MAX_BUF 1024
-
-static void client(int fd, unsigned flag, const char *prio)
-{
-	int ret;
-	gnutls_certificate_credentials_t x509_cred;
-	gnutls_session_t session;
-
-	global_init();
-
-	if (debug) {
-		gnutls_global_set_log_function(client_log_func);
-		gnutls_global_set_log_level(7);
-	}
-
-	gnutls_certificate_allocate_credentials(&x509_cred);
-
-	/* Initialize TLS session
-	 */
-	gnutls_init(&session, GNUTLS_CLIENT|flag);
-
-	gnutls_handshake_set_timeout(session, get_timeout());
-
-	ret = gnutls_priority_set_direct(session, prio, NULL);
-	if (ret < 0)
-		myfail("cannot set TLS 1.3 priorities\n");
-
-	/* put the anonymous credentials to the current session
-	 */
-	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
-
-	gnutls_transport_set_int(session, fd);
-
-	/* Perform the TLS handshake
-	 */
-	do {
-		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
-
-	close(fd);
-
-	gnutls_deinit(session);
-
-	gnutls_certificate_free_credentials(x509_cred);
-
-	gnutls_global_deinit();
+	fprintf(stderr, "%s|<%d>| %s", side, level, str);
 }
 
 unsigned int tls_id_to_group[] = {
@@ -191,115 +121,85 @@ static int client_hello_callback(gnutls_session_t session, unsigned int htype,
 	return 0;
 }
 
-static void server(int fd, gnutls_group_t exp_group, unsigned ngroups)
+static void start(const char *name, const char *prio, unsigned flag,
+		  gnutls_group_t group, unsigned ngroups)
 {
-	int ret;
-	char buffer[MAX_BUF + 1];
-	gnutls_session_t session;
-	gnutls_certificate_credentials_t x509_cred;
+	int sret, cret;
+	gnutls_certificate_credentials_t scred, ccred;
+	gnutls_session_t server, client;
 	ctx_st ctx;
-
-	/* this must be called once in the program
-	 */
-	global_init();
-	memset(buffer, 0, sizeof(buffer));
-
-	if (debug) {
-		gnutls_global_set_log_function(server_log_func);
-		gnutls_global_set_log_level(4711);
-	}
-
-	gnutls_certificate_allocate_credentials(&x509_cred);
-	gnutls_certificate_set_x509_key_mem(x509_cred, &server_cert,
-					    &server_key,
-					    GNUTLS_X509_FMT_PEM);
-
-	gnutls_init(&session, GNUTLS_SERVER);
-
-	gnutls_handshake_set_timeout(session, get_timeout());
-	gnutls_handshake_set_hook_function(session, GNUTLS_HANDSHAKE_ANY,
-					   GNUTLS_HOOK_BOTH,
-					   client_hello_callback);
-	ctx.group = exp_group;
-	ctx.ngroups = ngroups;
-	gnutls_session_set_ptr(session, &ctx);
-
-	/* avoid calling all the priority functions, since the defaults
-	 * are adequate.
-	 */
-	gnutls_priority_set_direct(session, "NORMAL:+VERS-TLS1.3", NULL);
-
-	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
-
-	gnutls_transport_set_int(session, fd);
-
-	do {
-		ret = gnutls_handshake(session);
-		if (ret == GNUTLS_E_INTERRUPTED) { /* expected */
-			break;
-		}
-	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
-
-	if (ret < 0)
-		myfail("handshake error: %s\n", gnutls_strerror(ret));
-
-	if (gnutls_group_get(session) != exp_group)
-		myfail("group doesn't match the expected: %s\n", gnutls_group_get_name(gnutls_group_get(session)));
-
-	close(fd);
-	gnutls_deinit(session);
-
-	gnutls_certificate_free_credentials(x509_cred);
-
-	gnutls_global_deinit();
-
-	if (debug)
-		success("server: client/server hello were verified\n");
-}
-
-static void ch_handler(int sig)
-{
-	int status = 0;
-	wait(&status);
-	check_wait_status(status);
-	return;
-}
-
-static void start(const char *name, const char *prio, unsigned flag, gnutls_group_t group, unsigned ngroups)
-{
-	int fd[2];
-	int ret;
-	pid_t child;
-
-	signal(SIGCHLD, ch_handler);
-	signal(SIGPIPE, SIG_IGN);
 
 	testname = name;
 	success("== test %s ==\n", testname);
 
-	ret = socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
-	if (ret < 0) {
-		perror("socketpair");
-		exit(1);
-	}
+	global_init();
+	gnutls_global_set_log_function(tls_log_func);
+	if (debug)
+		gnutls_global_set_log_level(9);
 
-	child = fork();
-	if (child < 0) {
-		perror("fork");
-		fail("fork");
-		exit(1);
-	}
+	/* Init server */
+	assert(gnutls_certificate_allocate_credentials(&scred) >= 0);
+	assert(gnutls_certificate_set_x509_key_mem(scred,
+						   &server_cert,
+						   &server_key,
+						   GNUTLS_X509_FMT_PEM) >= 0);
 
-	if (child) {
-		/* parent */
-		close(fd[1]);
-		server(fd[0], group, ngroups);
-		kill(child, SIGTERM);
-	} else {
-		close(fd[0]);
-		client(fd[1], flag, prio);
-		exit(0);
-	}
+	gnutls_init(&server, GNUTLS_SERVER);
+
+	gnutls_handshake_set_hook_function(server, GNUTLS_HANDSHAKE_ANY,
+					   GNUTLS_HOOK_BOTH,
+					   client_hello_callback);
+	ctx.group = group;
+	ctx.ngroups = ngroups;
+	gnutls_session_set_ptr(server, &ctx);
+
+	/* avoid calling all the priority functions, since the defaults
+	 * are adequate.
+	 */
+	gnutls_priority_set_direct(server, "NORMAL:+VERS-TLS1.3", NULL);
+
+	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, scred);
+	gnutls_transport_set_push_function(server, server_push);
+	gnutls_transport_set_pull_function(server, server_pull);
+	gnutls_transport_set_ptr(server, server);
+
+	/* Init client */
+	gnutls_certificate_allocate_credentials(&ccred);
+	assert(gnutls_certificate_set_x509_trust_mem
+	       (ccred, &ca3_cert, GNUTLS_X509_FMT_PEM) >= 0);
+
+	gnutls_init(&client, GNUTLS_CLIENT|flag);
+
+	cret = gnutls_priority_set_direct(client, prio, NULL);
+	if (cret < 0)
+		myfail("cannot set TLS 1.3 priorities\n");
+
+	/* put the anonymous credentials to the current session
+	 */
+	gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE, ccred);
+
+	gnutls_transport_set_push_function(client, client_push);
+	gnutls_transport_set_pull_function(client, client_pull);
+	gnutls_transport_set_ptr(client, client);
+
+	HANDSHAKE(client, server);
+	if (debug)
+		success("Handshake established\n");
+
+	if (gnutls_group_get(server) != group)
+		myfail("group doesn't match the expected: %s\n", gnutls_group_get_name(gnutls_group_get(server)));
+
+	gnutls_bye(client, GNUTLS_SHUT_WR);
+	gnutls_bye(server, GNUTLS_SHUT_WR);
+
+	gnutls_deinit(client);
+	gnutls_deinit(server);
+
+	gnutls_certificate_free_credentials(scred);
+	gnutls_certificate_free_credentials(ccred);
+
+	gnutls_global_deinit();
+	reset_buffers();
 }
 
 void doit(void)
@@ -331,5 +231,3 @@ void doit(void)
 	start("default groups(2): x25519", "NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-X25519:+GROUP-SECP256R1:+GROUP-SECP384R1:+GROUP-FFDHE2048", 0, GNUTLS_GROUP_X25519, 2);
 	start("default groups(2): ffdhe2048", "NORMAL:-KX-ALL:+DHE-RSA:+ECDHE-RSA:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-FFDHE2048:+GROUP-SECP256R1:+GROUP-SECP384R1:+GROUP-X25519:+GROUP-FFDHE3072", 0, GNUTLS_GROUP_FFDHE2048, 2);
 }
-
-#endif				/* _WIN32 */
