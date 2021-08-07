@@ -209,6 +209,8 @@ generate_normal_master(gnutls_session_t session,
 		       session->security_parameters.server_random,
 		       GNUTLS_RANDOM_SIZE);
 
+		_gnutls_memory_mark_defined(session->security_parameters.master_secret,
+					    GNUTLS_MASTER_SIZE);
 #ifdef ENABLE_SSL3
 		if (get_num_version(session) == GNUTLS_SSL3) {
 			ret =
@@ -227,6 +229,9 @@ generate_normal_master(gnutls_session_t session,
 					GNUTLS_MASTER_SIZE,
 					session->security_parameters.
 					master_secret);
+		if (ret < 0)
+			_gnutls_memory_mark_undefined(session->security_parameters.master_secret,
+						      GNUTLS_MASTER_SIZE);
 	} else {
 		gnutls_datum_t shash = {NULL, 0};
 
@@ -239,6 +244,8 @@ generate_normal_master(gnutls_session_t session,
 			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 #endif
 
+		_gnutls_memory_mark_defined(session->security_parameters.master_secret,
+					    GNUTLS_MASTER_SIZE);
 		ret =
 		    _gnutls_PRF(session, premaster->data, premaster->size,
 				EXT_MASTER_SECRET, EXT_MASTER_SECRET_SIZE,
@@ -246,6 +253,9 @@ generate_normal_master(gnutls_session_t session,
 				GNUTLS_MASTER_SIZE,
 				session->security_parameters.
 				master_secret);
+		if (ret < 0)
+			_gnutls_memory_mark_undefined(session->security_parameters.master_secret,
+						      GNUTLS_MASTER_SIZE);
 
 		gnutls_free(shash.data);
 	}

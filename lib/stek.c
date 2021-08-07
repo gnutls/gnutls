@@ -21,9 +21,6 @@
  */
 #include "gnutls_int.h"
 #include "stek.h"
-#ifdef HAVE_VALGRIND_MEMCHECK_H
-#include <valgrind/memcheck.h>
-#endif
 
 #define NAME_POS (0)
 #define KEY_POS (TICKET_KEY_NAME_SIZE)
@@ -145,12 +142,9 @@ static int rotate(gnutls_session_t session)
 		/* Replace old key with new one, and call callback if provided */
 		call_rotation_callback(session, key, t);
 		session->key.totp.last_result = t;
+		_gnutls_memory_mark_defined(session->key.session_ticket_key,
+					    sizeof(key));
 		memcpy(session->key.session_ticket_key, key, sizeof(key));
-#ifdef HAVE_VALGRIND_MEMCHECK_H
-		if (RUNNING_ON_VALGRIND)
-			VALGRIND_MAKE_MEM_DEFINED(session->key.session_ticket_key,
-						  TICKET_MASTER_KEY_SIZE);
-#endif
 
 		session->key.totp.was_rotated = 1;
 	} else if (t < 0) {
@@ -257,10 +251,7 @@ int _gnutls_get_session_ticket_decryption_key(gnutls_session_t session,
 					      gnutls_datum_t *enc_key)
 {
 	int retval;
-	gnutls_datum_t key = {
-		.data = session->key.session_ticket_key,
-		.size = TICKET_MASTER_KEY_SIZE
-	};
+	uint8_t *key_data;
 
 	if (unlikely(session == NULL || ticket_data == NULL || ticket_data->data == NULL))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
@@ -276,38 +267,42 @@ int _gnutls_get_session_ticket_decryption_key(gnutls_session_t session,
 	 * We compare the first 16 bytes --> The key_name field.
 	 */
 	if (memcmp(ticket_data->data,
-		   &key.data[NAME_POS],
-		   TICKET_KEY_NAME_SIZE) == 0)
+		   &session->key.session_ticket_key[NAME_POS],
+		   TICKET_KEY_NAME_SIZE) == 0) {
+		key_data = session->key.session_ticket_key;
 		goto key_found;
-
-	key.size = TICKET_MASTER_KEY_SIZE;
-	key.data = session->key.previous_ticket_key;
+	}
 
 	/*
 	 * Current key is not valid.
 	 * Compute previous key and see if that matches.
 	 */
-	if ((retval = rotate_back_and_peek(session, key.data)) < 0)
+	_gnutls_memory_mark_defined(session->key.previous_ticket_key, TICKET_MASTER_KEY_SIZE);
+	if ((retval = rotate_back_and_peek(session, session->key.previous_ticket_key)) < 0) {
+		_gnutls_memory_mark_undefined(session->key.previous_ticket_key, TICKET_MASTER_KEY_SIZE);
 		return gnutls_assert_val(retval);
+	}
 
 	if (memcmp(ticket_data->data,
-		   &key.data[NAME_POS],
-		   TICKET_KEY_NAME_SIZE) == 0)
+		   &session->key.previous_ticket_key[NAME_POS],
+		   TICKET_KEY_NAME_SIZE) == 0) {
+		key_data = session->key.previous_ticket_key;
 		goto key_found;
+	}
 
 	return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 
 key_found:
 	if (key_name) {
-		key_name->data = &key.data[NAME_POS];
+		key_name->data = &key_data[NAME_POS];
 		key_name->size = TICKET_KEY_NAME_SIZE;
 	}
 	if (mac_key) {
-		mac_key->data = &key.data[MAC_SECRET_POS];
+		mac_key->data = &key_data[MAC_SECRET_POS];
 		mac_key->size = TICKET_MAC_SECRET_SIZE;
 	}
 	if (enc_key) {
-		enc_key->data = &key.data[KEY_POS];
+		enc_key->data = &key_data[KEY_POS];
 		enc_key->size = TICKET_CIPHER_KEY_SIZE;
 	}
 
@@ -334,6 +329,8 @@ int _gnutls_initialize_session_ticket_key_rotation(gnutls_session_t session, con
 	if (unlikely(session->key.totp.last_result != 0))
 		return GNUTLS_E_INVALID_REQUEST;
 
+	_gnutls_memory_mark_defined(session->key.initial_stek,
+				    TICKET_MASTER_KEY_SIZE);
 	memcpy(session->key.initial_stek, key->data, key->size);
 
 	session->key.totp.was_rotated = 0;
