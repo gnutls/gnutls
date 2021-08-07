@@ -1491,6 +1491,13 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 		{
 			struct rsa_public_key pub;
 
+			if ((sign_params->flags &
+			     GNUTLS_PK_FLAG_RSA_PSS_FIXED_SALT_LENGTH) &&
+			    sign_params->salt_size != vdata->size) {
+				return gnutls_assert_val
+					(GNUTLS_E_PK_SIG_VERIFY_FAILED);
+			}
+
 			ret = _rsa_params_to_pubkey(pk_params, &pub);
 			if (ret < 0)
 				return

@@ -122,6 +122,7 @@ _gnutls13_handshake_verify_data(gnutls_session_t session,
 	p.data = buf.data;
 	p.size = buf.length;
 
+	verify_flags |= GNUTLS_VERIFY_RSA_PSS_FIXED_SALT_LENGTH;
 	ret = gnutls_pubkey_verify_data2(cert->pubkey, se->id, verify_flags, &p,
 					 signature);
 	if (ret < 0) {
@@ -200,7 +201,9 @@ _gnutls13_handshake_sign_data(gnutls_session_t session,
 	p.data = buf.data;
 	p.size = buf.length;
 
-	ret = gnutls_privkey_sign_data2(pkey, se->id, 0, &p, signature);
+	ret = gnutls_privkey_sign_data2(pkey, se->id,
+					GNUTLS_PRIVKEY_FLAG_RSA_PSS_FIXED_SALT_LENGTH,
+					&p, signature);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
