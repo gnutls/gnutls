@@ -156,19 +156,21 @@ void start(const char *prio)
 	memset(&v1, 0, sizeof(v1));
 	memset(&v2, 0, sizeof(v2));
 
-	/* check master secret */
-	gnutls_session_get_master_secret(server, &v1);
-	if (v1.size <= 0) {
-		fail("error in server's master secret\n");
-	}
+	if (gnutls_protocol_get_version(client) != GNUTLS_TLS1_3) {
+		/* check master secret */
+		gnutls_session_get_master_secret(server, &v1);
+		if (v1.size <= 0) {
+			fail("error in server's master secret\n");
+		}
 
-	gnutls_session_get_master_secret(client, &v2);
-	if (v2.size <= 0) {
-		fail("error in client's master secret\n");
-	}
+		gnutls_session_get_master_secret(client, &v2);
+		if (v2.size <= 0) {
+			fail("error in client's master secret\n");
+		}
 
-	if (v1.size != v2.size || memcmp(v1.data, v2.data, v1.size) != 0) {
-		fail("master secret don't match!\n");
+		if (v1.size != v2.size || memcmp(v1.data, v2.data, v1.size) != 0) {
+			fail("master secret don't match!\n");
+		}
 	}
 	
 	gnutls_bye(client, GNUTLS_SHUT_RDWR);

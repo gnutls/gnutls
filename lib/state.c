@@ -55,9 +55,6 @@
 #include "ext/cert_types.h"
 #include "locks.h"
 #include "kx.h"
-#ifdef HAVE_VALGRIND_MEMCHECK_H
-#include <valgrind/memcheck.h>
-#endif
 
 /* to be used by supplemental data support to disable TLS1.3
  * when supplemental data have been globally registered */
@@ -640,19 +637,19 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 	 * runtime before being used. Mark such regions with a
 	 * valgrind client request as undefined.
 	 */
-#ifdef HAVE_VALGRIND_MEMCHECK_H
-	if (RUNNING_ON_VALGRIND) {
-		if (flags & GNUTLS_CLIENT)
-			VALGRIND_MAKE_MEM_UNDEFINED((*session)->security_parameters.client_random,
-						    GNUTLS_RANDOM_SIZE);
-		if (flags & GNUTLS_SERVER) {
-			VALGRIND_MAKE_MEM_UNDEFINED((*session)->security_parameters.server_random,
-						    GNUTLS_RANDOM_SIZE);
-			VALGRIND_MAKE_MEM_UNDEFINED((*session)->key.session_ticket_key,
-						    TICKET_MASTER_KEY_SIZE);
-		}
-	}
-#endif
+	_gnutls_memory_mark_undefined((*session)->security_parameters.master_secret,
+				      GNUTLS_MASTER_SIZE);
+	_gnutls_memory_mark_undefined((*session)->security_parameters.client_random,
+				      GNUTLS_RANDOM_SIZE);
+	_gnutls_memory_mark_undefined((*session)->security_parameters.server_random,
+				      GNUTLS_RANDOM_SIZE);
+	_gnutls_memory_mark_undefined((*session)->key.session_ticket_key,
+				      TICKET_MASTER_KEY_SIZE);
+	_gnutls_memory_mark_undefined((*session)->key.previous_ticket_key,
+				      TICKET_MASTER_KEY_SIZE);
+	_gnutls_memory_mark_undefined((*session)->key.initial_stek,
+				      TICKET_MASTER_KEY_SIZE);
+
 	handshake_internal_state_clear1(*session);
 
 #ifdef MSG_NOSIGNAL
@@ -771,12 +768,26 @@ void gnutls_deinit(gnutls_session_t session)
 	gnutls_memset(&session->key.proto, 0, sizeof(session->key.proto));
 
 	/* clear session ticket keys */
+	_gnutls_memory_mark_defined(session->key.session_ticket_key,
+				    TICKET_MASTER_KEY_SIZE);
 	gnutls_memset(&session->key.session_ticket_key, 0,
 	              TICKET_MASTER_KEY_SIZE);
+	_gnutls_memory_mark_undefined(session->key.session_ticket_key,
+				      TICKET_MASTER_KEY_SIZE);
+
+	_gnutls_memory_mark_defined(session->key.previous_ticket_key,
+				    TICKET_MASTER_KEY_SIZE);
 	gnutls_memset(&session->key.previous_ticket_key, 0,
 	              TICKET_MASTER_KEY_SIZE);
+	_gnutls_memory_mark_undefined(session->key.previous_ticket_key,
+				      TICKET_MASTER_KEY_SIZE);
+
+	_gnutls_memory_mark_defined(session->key.initial_stek,
+				    TICKET_MASTER_KEY_SIZE);
 	gnutls_memset(&session->key.initial_stek, 0,
 	              TICKET_MASTER_KEY_SIZE);
+	_gnutls_memory_mark_undefined(session->key.initial_stek,
+				      TICKET_MASTER_KEY_SIZE);
 
 	gnutls_mutex_deinit(&session->internals.post_negotiation_lock);
 	gnutls_mutex_deinit(&session->internals.epoch_lock);
