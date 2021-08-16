@@ -95,6 +95,20 @@ const char key2[] =
     "F3bDyqlxSOm7uxF/K3YzI44v8/D8GGnLBTpN+ANBdiY=\n"
     "-----END RSA PRIVATE KEY-----\n";
 
+static int good_pwd_cb(void* userdata, int attempt, const char* token_url,
+		       const char* token_label, unsigned int flags,
+		       char* pin, size_t pin_max) {
+	snprintf(pin, pin_max, "%s", "123456");
+	return 0;
+}
+
+static int bad_pwd_cb(void* userdata, int attempt, const char* token_url,
+		      const char* token_label, unsigned int flags,
+		      char* pin, size_t pin_max) {
+	snprintf(pin, pin_max, "%s", "bad");
+	return 0;
+}
+
 void doit(void)
 {
 	gnutls_x509_privkey_t pkey;
@@ -163,6 +177,63 @@ void doit(void)
 					"123456", 0);
 	if (ret < 0) {
 		fail("gnutls_x509_privkey_import2: %s\n",
+		     gnutls_strerror(ret));
+	}
+	gnutls_x509_privkey_deinit(pkey);
+
+	/*
+	 * Pin callback passwords will only be used if the password supplied to
+	 * gnutls_x509_privkey_import2 in NULL.  Consider possible combinations
+	 * of passwords supplied via the import function/pin callback:
+	 *  good/bad => success
+	 *  NULL/good => success
+	 *  NULL/bad  => failure
+	 */
+
+	/* import_openssl good / callback bad => success */
+	ret = gnutls_x509_privkey_init(&pkey);
+	if (ret < 0)
+		fail("gnutls_x509_privkey_init: %d\n", ret);
+
+	gnutls_x509_privkey_set_pin_function(pkey, bad_pwd_cb, NULL);
+	key.data = (void *) key1;
+	key.size = sizeof(key1);
+	ret = gnutls_x509_privkey_import2(pkey, &key, GNUTLS_X509_FMT_PEM,
+					  "123456", 0);
+	if (ret < 0) {
+		fail("gnutls_x509_privkey_import2 (good func/bad pin): %s\n",
+		     gnutls_strerror(ret));
+	}
+	gnutls_x509_privkey_deinit(pkey);
+
+	/* import_openssl NULL / callback good => success */
+	ret = gnutls_x509_privkey_init(&pkey);
+	if (ret < 0)
+		fail("gnutls_x509_privkey_init: %d\n", ret);
+
+	gnutls_x509_privkey_set_pin_function(pkey, good_pwd_cb, NULL);
+	key.data = (void *) key1;
+	key.size = sizeof(key1);
+	ret = gnutls_x509_privkey_import2(pkey, &key, GNUTLS_X509_FMT_PEM,
+					  NULL, 0);
+	if (ret < 0) {
+		fail("gnutls_x509_privkey_import2 (good pin): %s\n",
+		     gnutls_strerror(ret));
+	}
+	gnutls_x509_privkey_deinit(pkey);
+
+	/* import_openssl NULL / callback bad => success */
+	ret = gnutls_x509_privkey_init(&pkey);
+	if (ret < 0)
+		fail("gnutls_x509_privkey_init: %d\n", ret);
+
+	gnutls_x509_privkey_set_pin_function(pkey, bad_pwd_cb, NULL);
+	key.data = (void *) key1;
+	key.size = sizeof(key1);
+	ret = gnutls_x509_privkey_import2(pkey, &key, GNUTLS_X509_FMT_PEM,
+					  NULL, 0);
+	if (ret != GNUTLS_E_DECRYPTION_FAILED) {
+		fail("gnutls_x509_privkey_import2 (bad pin): %s\n",
 		     gnutls_strerror(ret));
 	}
 	gnutls_x509_privkey_deinit(pkey);
