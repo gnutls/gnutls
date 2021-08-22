@@ -1,5 +1,6 @@
 ;;; GnuTLS --- Guile bindings for GnuTLS.
-;;; Copyright (C) 2007-2012, 2014, 2015, 2016, 2019 Free Software Foundation, Inc.
+;;; Copyright (C) 2007-2012, 2014, 2015, 2016, 2019, 2021 Free Software
+;;; Foundation, Inc.
 ;;;
 ;;; GnuTLS is free software; you can redistribute it and/or
 ;;; modify it under the terms of the GNU Lesser General Public
@@ -89,7 +90,8 @@
            x509-certificate-subject-key-id
            x509-certificate-subject-alternative-name
            x509-certificate-public-key-algorithm x509-certificate-key-usage
-           import-x509-private-key pkcs8-import-x509-private-key
+           x509-certificate-fingerprint import-x509-private-key
+           pkcs8-import-x509-private-key
 
            ;; record layer
            record-send record-receive!
