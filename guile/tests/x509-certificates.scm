@@ -46,6 +46,10 @@
   ;; The certificate's SHA-1 fingerprint.
   "7c55df47de718869d55998ee1e9301331ccd0601")
 
+(define %sha256-fingerprint
+  ;; The certificate's SHA-256 fingerprint.
+  "0db40a5ee20169d25f090e4d165d87266b1a04722cddec4da36692c81c3096f6")
+
 
 (define (file-size file)
   (stat:size (stat file)))
@@ -87,6 +91,9 @@
                        (x509-subject-alternative-name->string type))))
                (equal? (u8vector->hex-string
                         (x509-certificate-fingerprint cert digest/sha1))
-                       %sha1-fingerprint))))))
+                       %sha1-fingerprint)
+               (equal? (u8vector->hex-string
+                        (x509-certificate-fingerprint cert digest/sha256))
+                       %sha256-fingerprint))))))
 
 ;;; arch-tag: eef09b52-30e8-472a-8b93-cb636434f6eb

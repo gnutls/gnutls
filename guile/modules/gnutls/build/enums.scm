@@ -325,7 +325,7 @@
 
 (define %digest-enum
   (make-enum-type 'digest "gnutls_digest_algorithm_t"
-                  '(null md5 sha1 rmd160 md2)
+                  '(null md5 sha1 rmd160 md2 sha256)
                   #f
                   "GNUTLS_DIG_"))
 

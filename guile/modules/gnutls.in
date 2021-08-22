@@ -153,6 +153,7 @@
            digest/sha1
            digest/rmd160
            digest/md2
+           digest/sha256
            compression-method/null
            compression-method/deflate
            compression-method/lzo
