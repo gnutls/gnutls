@@ -1,5 +1,5 @@
 ;;; GnuTLS --- Guile bindings for GnuTLS.
-;;; Copyright (C) 2007-2012 Free Software Foundation, Inc.
+;;; Copyright (C) 2007-2012, 2021 Free Software Foundation, Inc.
 ;;;
 ;;; GnuTLS is free software; you can redistribute it and/or
 ;;; modify it under the terms of the GNU Lesser General Public
@@ -25,7 +25,8 @@
 (use-modules (gnutls)
              (gnutls build tests)
              (srfi srfi-4)
-             (srfi srfi-11))
+             (srfi srfi-11)
+             (ice-9 format))
 
 (define %certificate-file
   (search-path %load-path "x509-certificate.pem"))
@@ -41,9 +42,22 @@
   ;; The certificate's signature algorithm.
   sign-algorithm/rsa-sha1)
 
+(define %sha1-fingerprint
+  ;; The certificate's SHA-1 fingerprint.
+  "7c55df47de718869d55998ee1e9301331ccd0601")
+
+(define %sha256-fingerprint
+  ;; The certificate's SHA-256 fingerprint.
+  "0db40a5ee20169d25f090e4d165d87266b1a04722cddec4da36692c81c3096f6")
+
 
 (define (file-size file)
   (stat:size (stat file)))
+
+(define (u8vector->hex-string u8vector)
+  (string-join (map (lambda (u8) (format #f "~2,'0x" u8))
+                    (u8vector->list u8vector))
+               ""))
 
 
 (run-test
@@ -74,6 +88,12 @@
                               cert 0)))
                  (and (string? name)
                       (string?
-                       (x509-subject-alternative-name->string type)))))))))
+                       (x509-subject-alternative-name->string type))))
+               (equal? (u8vector->hex-string
+                        (x509-certificate-fingerprint cert digest/sha1))
+                       %sha1-fingerprint)
+               (equal? (u8vector->hex-string
+                        (x509-certificate-fingerprint cert digest/sha256))
+                       %sha256-fingerprint))))))
 
 ;;; arch-tag: eef09b52-30e8-472a-8b93-cb636434f6eb
