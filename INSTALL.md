@@ -31,9 +31,10 @@ by running './configure --help'.
     sudo make install
 ```
 
-The commands above build and install the static archive (libgnutls.a),
-the shared object (libgnutls.so), and additional binaries such as certtool 
-and gnutls-cli.
+The commands above build and install the shared object (libgnutls.so),
+and additional binaries such as certtool and gnutls-cli. To build the
+static archive (libgnutls.a), add --enable-static to the `./configure`
+command.
 
 The library depends on libnettle and gmplib. 
 * gmplib: for big number arithmetic, https://gmplib.org/
