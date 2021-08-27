@@ -82,8 +82,10 @@ static void terminate(void)
 {
 	int status = 0;
 
-	kill(child, SIGTERM);
-	wait(&status);
+	if (child) {
+		kill(child, SIGTERM);
+		wait(&status);
+	}
 	exit(1);
 }
 

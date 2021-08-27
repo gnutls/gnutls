@@ -205,7 +205,7 @@ static gnutls_session_t initialize_tls_session(void)
 static void terminate(void)
 {
 	int status;
-
+	assert(child);
 	kill(child, SIGTERM);
 	wait(&status);
 	exit(1);

@@ -218,6 +218,7 @@ pid_t child;
 
 static void terminate(void)
 {
+	assert(child);
 	kill(child, SIGTERM);
 	exit(1);
 }

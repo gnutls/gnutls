@@ -184,7 +184,7 @@ static void client(int fd, int profile)
 static void terminate(void)
 {
 	int status;
-
+	assert(child);
 	kill(child, SIGTERM);
 	wait(&status);
 	exit(1);
