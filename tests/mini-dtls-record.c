@@ -247,12 +247,12 @@ static void client(int fd)
 
 			if (recv_msg_seq[current] == -1) {
 				fail("received message sequence differs\n");
-				terminate();
+				exit(1);
 			}
 			if (((uint32_t)recv_msg_seq[current]) != useq) {
 				fail("received message sequence differs (current: %u, got: %u, expected: %u)\n",
 				     (unsigned)current, (unsigned)useq, (unsigned)recv_msg_seq[current]);
-				terminate();
+				exit(1);
 			}
 
 			current++;

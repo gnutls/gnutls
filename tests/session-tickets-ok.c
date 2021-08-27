@@ -112,7 +112,7 @@ static void client(int fd, const char *prio)
 
 	if (ret < 0) {
 		fail("client: Handshake failed: %s\n", gnutls_strerror(ret));
-		terminate();
+		exit(1);
 	} else {
 		if (debug)
 			success("client: Handshake was completed\n");
