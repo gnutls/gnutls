@@ -50,8 +50,6 @@ int main()
 #include "cert-common.h"
 #include "utils.h"
 
-static void terminate(void);
-
 /* This program tests that a client cannot send any unencrypted data
  * during the handshake process. That is to ensure we protect buggy clients
  * from transmitting sensitive data over the wire.
@@ -179,13 +177,6 @@ static void client(int fd, const char *prio)
 
 /* These are global */
 pid_t child;
-
-static void terminate(void)
-{
-	assert(child);
-	kill(child, SIGTERM);
-	exit(1);
-}
 
 static void server(int fd, const char *prio)
 {

@@ -52,8 +52,6 @@ int main()
 #include "cert-common.h"
 #include "utils.h"
 
-static void terminate(void);
-
 /* This program tests that handshakes do not include a session ticket
  * if the flag GNUTLS_NO_TICKETS is specified under TLS 1.2.
  *
@@ -166,13 +164,6 @@ static void client(int fd, const char *prio, unsigned int flags)
 
 /* These are global */
 pid_t child;
-
-static void terminate(void)
-{
-	assert(child);
-	kill(child, SIGTERM);
-	exit(1);
-}
 
 static void server(int fd, const char *prio, unsigned int flags)
 {
