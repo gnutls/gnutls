@@ -293,6 +293,7 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 				  unsigned int flags)
 {
 	int ret;
+	bool not_approved = false;
 
 	switch (algo) {
 	case GNUTLS_PK_DH: {
@@ -300,8 +301,10 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 		bigint_t k = NULL, primesub1 = NULL, r = NULL;
 		unsigned int bits;
 
-		if (nonce != NULL)
-			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		if (nonce != NULL) {
+			ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			goto cleanup;
+		}
 
 		f = pub->params[DH_Y];
 		x = priv->params[DH_X];
@@ -309,8 +312,10 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 		prime = priv->params[DH_P];
 
 		ret = _gnutls_mpi_init_multi(&k, &primesub1, &r, NULL);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
 
 		ret = _gnutls_mpi_sub_ui(primesub1, prime, 1);
 		if (ret < 0) {
@@ -343,7 +348,7 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 		} else if ((flags & PK_DERIVE_TLS13) &&
 			   _gnutls_fips_mode_enabled()) {
 			/* Mandatory in FIPS mode for TLS 1.3 */
-			ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+			ret = gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 			goto dh_cleanup;
 		}
 
@@ -355,6 +360,9 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 			goto dh_cleanup;
 		}
 
+		if (bits < 2048) {
+			not_approved = true;
+		}
 
 		ret = _gnutls_mpi_powm(k, f, x, prime);
 		if (ret < 0) {
@@ -366,8 +374,7 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 		if ((_gnutls_mpi_cmp_ui(k, 1) == 0)
 		    || (_gnutls_mpi_cmp_ui(k, 0) == 0)
 		    || (_gnutls_mpi_cmp(k, primesub1) == 0)) {
-			gnutls_assert();
-			ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+			ret = gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 			goto dh_cleanup;
 		}
 
@@ -402,24 +409,34 @@ dh_cleanup:
 
 			out->data = NULL;
 
-			if (nonce != NULL)
-				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			if (nonce != NULL) {
+				ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+				goto cleanup;
+			}
 
 			curve = get_supported_nist_curve(priv->curve);
-			if (curve == NULL)
-				return
-				    gnutls_assert_val
-				    (GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+			if (curve == NULL) {
+				ret = gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+				goto cleanup;
+			}
+
+			/* P-192 is not supported in FIPS 140-3 */
+			if (priv->curve == GNUTLS_ECC_CURVE_SECP192R1) {
+				not_approved = true;
+			}
 
 			ret = _ecc_params_to_pubkey(pub, &ecc_pub, curve);
-			if (ret < 0)
-				return gnutls_assert_val(ret);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
 
 			ret =
 			    _ecc_params_to_privkey(priv, &ecc_priv, curve);
 			if (ret < 0) {
 				ecc_point_clear(&ecc_pub);
-				return gnutls_assert_val(ret);
+				gnutls_assert();
+				goto cleanup;
 			}
 
 			out->size = gnutls_ecc_curve_get_size(priv->curve);
@@ -449,13 +466,20 @@ dh_cleanup:
 		{
 			unsigned size = gnutls_ecc_curve_get_size(priv->curve);
 
-			if (nonce != NULL)
-				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			/* Edwards curves are not approved */
+			not_approved = true;
+
+			if (nonce != NULL) {
+				ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+				goto cleanup;
+			}
 
 			/* The point is in pub, while the private part (scalar) in priv. */
 
-			if (size == 0 || priv->raw_priv.size != size)
-				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			if (size == 0 || priv->raw_priv.size != size) {
+				ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+				goto cleanup;
+			}
 
 			out->data = gnutls_malloc(size);
 			if (out->data == NULL) {
@@ -486,25 +510,35 @@ dh_cleanup:
 		struct ecc_point ecc_pub;
 		const struct ecc_curve *curve;
 
+		/* GOST curves are not approved */
+		not_approved = true;
+
 		out->data = NULL;
 
 		curve = get_supported_gost_curve(priv->curve);
-		if (curve == NULL)
-			return
-			    gnutls_assert_val
-			    (GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+		if (curve == NULL) {
+			gnutls_assert();
+			ret = GNUTLS_E_ECC_UNSUPPORTED_CURVE;
+			goto cleanup;
+		}
 
-		if (nonce == NULL)
-			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		if (nonce == NULL) {
+			gnutls_assert();
+			ret = GNUTLS_E_INVALID_REQUEST;
+			goto cleanup;
+		}
 
 		ret = _gost_params_to_pubkey(pub, &ecc_pub, curve);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
 
 		ret = _gost_params_to_privkey(priv, &ecc_priv, curve);
 		if (ret < 0) {
 			ecc_point_clear(&ecc_pub);
-			return gnutls_assert_val(ret);
+			gnutls_assert();
+			goto cleanup;
 		}
 
 		out->size = 2 * gnutls_ecc_curve_get_size(priv->curve);
@@ -535,6 +569,13 @@ dh_cleanup:
 	ret = 0;
 
       cleanup:
+	if (ret < 0) {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
+	} else if (not_approved) {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_NOT_APPROVED);
+	} else {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_APPROVED);
+	}
 
 	return ret;
 }
@@ -598,6 +639,12 @@ _wrap_nettle_pk_encrypt(gnutls_pk_algorithm_t algo,
 	ret = 0;
 
       cleanup:
+	if (ret < 0) {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
+	} else {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_NOT_APPROVED);
+	}
+
 	mpz_clear(p);
 
 	FAIL_IF_LIB_ERROR;
@@ -628,14 +675,15 @@ _wrap_nettle_pk_decrypt(gnutls_pk_algorithm_t algo,
 
 			_rsa_params_to_privkey(pk_params, &priv);
 			ret = _rsa_params_to_pubkey(pk_params, &pub);
-			if (ret < 0)
-				return
-				    gnutls_assert_val(ret);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
 
-			if (ciphertext->size != pub.size)
-				return
-				    gnutls_assert_val
-				    (GNUTLS_E_DECRYPTION_FAILED);
+			if (ciphertext->size != pub.size) {
+				ret = gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
+				goto cleanup;
+			}
 
 			if (_gnutls_mpi_init_scan_nz
 			    (&c, ciphertext->data,
@@ -684,8 +732,12 @@ _wrap_nettle_pk_decrypt(gnutls_pk_algorithm_t algo,
 	ret = 0;
 
       cleanup:
-	if (ret < 0)
+	if (ret < 0) {
 		gnutls_free(plaintext->data);
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
+	} else {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_NOT_APPROVED);
+	}
 
 	FAIL_IF_LIB_ERROR;
 	return ret;
@@ -711,21 +763,26 @@ _wrap_nettle_pk_decrypt2(gnutls_pk_algorithm_t algo,
 	FAIL_IF_LIB_ERROR;
 
 	if (algo != GNUTLS_PK_RSA || plaintext == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_INTERNAL_ERROR;
+		ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+		goto fail;
 	}
 
 	_rsa_params_to_privkey(pk_params, &priv);
 	ret = _rsa_params_to_pubkey(pk_params, &pub);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
+	if (ret < 0) {
+		gnutls_assert();
+		goto fail;
+	}
 
-	if (ciphertext->size != pub.size)
-		return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
+	if (ciphertext->size != pub.size) {
+		ret = gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
+		goto fail;
+	}
 
 	if (_gnutls_mpi_init_scan_nz(&c, ciphertext->data,
 				     ciphertext->size) != 0) {
-		return gnutls_assert_val (GNUTLS_E_MPI_SCAN_FAILED);
+		ret = gnutls_assert_val(GNUTLS_E_MPI_SCAN_FAILED);
+		goto fail;
 	}
 
 	if (_gnutls_get_lib_state() == LIB_STATE_SELFTEST)
@@ -734,6 +791,13 @@ _wrap_nettle_pk_decrypt2(gnutls_pk_algorithm_t algo,
 		random_func = rnd_nonce_func;
 	ret = rsa_sec_decrypt(&pub, &priv, NULL, random_func,
 			     plaintext_size, plaintext, TOMPZ(c));
+
+	/* The decrypt operation is infallible; treat the approved
+	 * operation as complete at this point, regardless of any
+	 * decryption failure detected below.
+	 */
+	_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_NOT_APPROVED);
+
 	/* after this point, any conditional on failure that cause differences
 	 * in execution may create a timing or cache access pattern side
 	 * channel that can be used as an oracle, so thread very carefully */
@@ -747,6 +811,11 @@ _wrap_nettle_pk_decrypt2(gnutls_pk_algorithm_t algo,
 	is_err |= CONSTCHECK_EQUAL(ret, 0);
 	/* then return GNUTLS_E_DECRYPTION_FAILED */
 	return (int)((is_err * UINT_MAX) & GNUTLS_E_DECRYPTION_FAILED);
+
+ fail:
+	_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
+
+	return ret;
 }
 
 #define CHECK_INVALID_RSA_PSS_PARAMS(dig_size, salt_size, pub_size, err) \
@@ -881,22 +950,25 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 	int ret;
 	unsigned int hash_len;
 	const mac_entry_st *me;
+	bool not_approved = false;
 
 	FAIL_IF_LIB_ERROR;
 
-	if (IS_EC(algo)) {
-		/* check if the curve relates to the algorithm used */
-		if (gnutls_ecc_curve_get_pk(pk_params->curve) != algo)
-			return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+	/* check if the curve relates to the algorithm used */
+	if (IS_EC(algo) && gnutls_ecc_curve_get_pk(pk_params->curve) != algo) {
+		ret = gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+		goto cleanup;
 	}
 
 	/* deterministic ECDSA/DSA is prohibited under FIPS except in
 	 * the selftests */
-	if (_gnutls_fips_mode_enabled() &&
-	    _gnutls_get_lib_state() != LIB_STATE_SELFTEST &&
-	    (algo == GNUTLS_PK_DSA || algo == GNUTLS_PK_ECDSA) &&
-	    (sign_params->flags & GNUTLS_PK_FLAG_REPRODUCIBLE))
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	if ((algo == GNUTLS_PK_DSA || algo == GNUTLS_PK_ECDSA) &&
+	    (sign_params->flags & GNUTLS_PK_FLAG_REPRODUCIBLE) &&
+	    _gnutls_fips_mode_enabled() &&
+	    _gnutls_get_lib_state() != LIB_STATE_SELFTEST) {
+		ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		goto cleanup;
+	}
 
 	switch (algo) {
 	case GNUTLS_PK_EDDSA_ED25519:	/* we do EdDSA */
@@ -904,12 +976,19 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 		{
 			const gnutls_ecc_curve_entry_st *e;
 
-			if (unlikely(get_eddsa_curve(algo) != pk_params->curve))
-				return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+			/* EdDSA is not approved yet */
+			not_approved = true;
+
+			if (unlikely(get_eddsa_curve(algo) != pk_params->curve)) {
+				ret = gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+				goto cleanup;
+			}
 
 			e = _gnutls_ecc_curve_get_params(pk_params->curve);
-			if (e == NULL)
-				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			if (e == NULL) {
+				ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+				goto cleanup;
+			}
 
 			signature->data = gnutls_malloc(e->sig_size);
 			if (signature->data == NULL) {
@@ -943,28 +1022,33 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 			struct dsa_signature sig;
 			const struct ecc_curve *curve;
 
+			/* GOSTDSA is not approved */
+			not_approved = true;
+
 			curve = get_supported_gost_curve(pk_params->curve);
-			if (curve == NULL)
-				return
-				    gnutls_assert_val
-				    (GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+			if (curve == NULL) {
+				ret = gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+				goto cleanup;
+			}
 
 			ret =
 			    _ecc_params_to_privkey(pk_params, &priv,
 						   curve);
-			if (ret < 0)
-				return gnutls_assert_val(ret);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
 
 			/* This call will return a valid MAC entry and
 			 * getters will check that is not null anyway. */
 			me = hash_to_entry(_gnutls_gost_digest(pk_params->algo));
 			if (_gnutls_mac_get_algo_len(me) != vdata->size) {
-				gnutls_assert();
 				_gnutls_debug_log
 				    ("Security level of algorithm requires hash %s(%zd)\n",
 				     _gnutls_mac_get_name(me),
 				     _gnutls_mac_get_algo_len(me));
-				return GNUTLS_E_INVALID_REQUEST;
+				ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+				goto cleanup;
 			}
 
 			dsa_signature_init(&sig);
@@ -997,21 +1081,39 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 			nettle_random_func *random_func;
 
 			curve = get_supported_nist_curve(curve_id);
-			if (curve == NULL)
-				return
-				    gnutls_assert_val
-				    (GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+			if (curve == NULL) {
+				ret = gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+				goto cleanup;
+			}
+
+			/* P-192 is not supported in FIPS 140-3 */
+			if (curve_id == GNUTLS_ECC_CURVE_SECP192R1) {
+				not_approved = true;
+			}
 
 			ret =
 			    _ecc_params_to_privkey(pk_params, &priv,
 						   curve);
-			if (ret < 0)
-				return gnutls_assert_val(ret);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
 
 			dsa_signature_init(&sig);
 
 			me = _gnutls_dsa_q_to_hash(pk_params,
 						   &hash_len);
+
+			/* Only SHA-2 is allowed in FIPS 140-3 */
+			switch (me->id) {
+			case GNUTLS_MAC_SHA256:
+			case GNUTLS_MAC_SHA384:
+			case GNUTLS_MAC_SHA512:
+			case GNUTLS_MAC_SHA224:
+				break;
+			default:
+				not_approved = true;
+			}
 
 			if (hash_len > vdata->size) {
 				gnutls_assert();
@@ -1070,6 +1172,10 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 			mpz_t k;
 			void *random_ctx;
 			nettle_random_func *random_func;
+
+			/* DSA is currently being defined as sunset with the
+			 * current draft of FIPS 186-5 */
+			not_approved = true;
 
 			memset(&priv, 0, sizeof(priv));
 			memset(&pub, 0, sizeof(pub));
@@ -1140,10 +1246,20 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 			mpz_t s;
 
 			_rsa_params_to_privkey(pk_params, &priv);
+
+			/* RSA key size should be 2048-bit or larger in FIPS
+			 * 140-3.  In addition to this, only SHA-2 is allowed
+			 * for SigGen; it is checked in pk_prepare_hash lib/pk.c
+			 */
+			if (unlikely(priv.size < 256)) {
+				not_approved = true;
+			}
+
 			ret = _rsa_params_to_pubkey(pk_params, &pub);
-			if (ret < 0)
-				return
-				    gnutls_assert_val(ret);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
 
 			mpz_init(s);
 
@@ -1181,10 +1297,22 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 			mpz_t s;
 
 			_rsa_params_to_privkey(pk_params, &priv);
+
+			/* RSA key size should be 2048-bit or larger in FIPS
+			 * 140-3.  In addition to this, only SHA-2 is allowed
+			 * for SigGen; however, Nettle only support SHA256,
+			 * SHA384, and SHA512 for RSA-PSS (see
+			 * _rsa_pss_sign_digest_tr in this file for details).
+			 */
+			if (unlikely(priv.size < 256)) {
+				not_approved = true;
+			}
+
 			ret = _rsa_params_to_pubkey(pk_params, &pub);
-			if (ret < 0)
-				return
-				    gnutls_assert_val(ret);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
 
 			mpz_init(s);
 
@@ -1223,6 +1351,13 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 	ret = 0;
 
       cleanup:
+	if (ret < 0) {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
+	} else if (not_approved) {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_NOT_APPROVED);
+	} else {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_APPROVED);
+	}
 
 	FAIL_IF_LIB_ERROR;
 	return ret;
@@ -1302,13 +1437,14 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 	int ret;
 	unsigned int hash_len;
 	bigint_t tmp[2] = { NULL, NULL };
+	bool not_approved = false;
 
 	FAIL_IF_LIB_ERROR;
 
-	if (IS_EC(algo)) {
-		/* check if the curve relates to the algorithm used */
-		if (gnutls_ecc_curve_get_pk(pk_params->curve) != algo)
-			return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+	/* check if the curve relates to the algorithm used */
+	if (IS_EC(algo) && gnutls_ecc_curve_get_pk(pk_params->curve) != algo) {
+		ret = gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+		goto cleanup;
 	}
 
 	switch (algo) {
@@ -1317,18 +1453,29 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 		{
 			const gnutls_ecc_curve_entry_st *e;
 
-			if (unlikely(get_eddsa_curve(algo) != pk_params->curve))
-				return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+			/* EdDSA is not approved yet */
+			not_approved = true;
+
+			if (unlikely(get_eddsa_curve(algo) != pk_params->curve)) {
+				ret = gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+				goto cleanup;
+			}
 
 			e = _gnutls_ecc_curve_get_params(pk_params->curve);
-			if (e == NULL)
-				return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+			if (e == NULL) {
+				ret = gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+				goto cleanup;
+			}
 
-			if (signature->size != e->sig_size)
-				return gnutls_assert_val(GNUTLS_E_PK_SIG_VERIFY_FAILED);
+			if (signature->size != e->sig_size) {
+				ret = gnutls_assert_val(GNUTLS_E_PK_SIG_VERIFY_FAILED);
+				goto cleanup;
+			}
 
-			if (pk_params->raw_pub.size != e->size)
-				return gnutls_assert_val(GNUTLS_E_PK_SIGN_FAILED);
+			if (pk_params->raw_pub.size != e->size) {
+				ret = gnutls_assert_val(GNUTLS_E_PK_SIGN_FAILED);
+				goto cleanup;
+			}
 
 			ret = eddsa_verify(algo,
 					   pk_params->raw_pub.data,
@@ -1346,23 +1493,30 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 			const struct ecc_curve *curve;
 			const mac_entry_st *me;
 
+			/* GOSTDSA is not approved */
+			not_approved = true;
+
 			curve = get_supported_gost_curve(pk_params->curve);
-			if (curve == NULL)
-				return
-				    gnutls_assert_val
-				    (GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+			if (curve == NULL) {
+				ret = gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+				goto cleanup;
+			}
 
 			/* This call will return a valid MAC entry and
 			 * getters will check that is not null anyway. */
 			me = hash_to_entry(_gnutls_gost_digest(pk_params->algo));
-			if (_gnutls_mac_get_algo_len(me) != vdata->size)
-				return gnutls_assert_val(GNUTLS_E_PK_SIG_VERIFY_FAILED);
+			if (_gnutls_mac_get_algo_len(me) != vdata->size) {
+				ret = gnutls_assert_val(GNUTLS_E_PK_SIG_VERIFY_FAILED);
+				goto cleanup;
+			}
 
 			ret =
 			    _gnutls_decode_gost_rs(signature, &tmp[0],
 						  &tmp[1]);
-			if (ret < 0)
-				return gnutls_assert_val(ret);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
 
 			ret =
 			    _gost_params_to_pubkey(pk_params, &pub, curve);
@@ -1391,18 +1545,21 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 			struct dsa_signature sig;
 			int curve_id = pk_params->curve;
 			const struct ecc_curve *curve;
+			const mac_entry_st *me;
 
 			curve = get_supported_nist_curve(curve_id);
-			if (curve == NULL)
-				return
-				    gnutls_assert_val
-				    (GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+			if (curve == NULL) {
+				ret = gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+				goto cleanup;
+			}
 
 			ret =
 			    _gnutls_decode_ber_rs(signature, &tmp[0],
 						  &tmp[1]);
-			if (ret < 0)
-				return gnutls_assert_val(ret);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
 
 			ret =
 			    _ecc_params_to_pubkey(pk_params, &pub, curve);
@@ -1414,7 +1571,20 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 			memcpy(sig.r, tmp[0], SIZEOF_MPZT);
 			memcpy(sig.s, tmp[1], SIZEOF_MPZT);
 
-			_gnutls_dsa_q_to_hash(pk_params, &hash_len);
+			me = _gnutls_dsa_q_to_hash(pk_params, &hash_len);
+
+			/* SHA-1 is allowed for SigVer in FIPS 140-3 in legacy
+			 * mode */
+			switch (me->id) {
+			case GNUTLS_MAC_SHA1:
+			case GNUTLS_MAC_SHA256:
+			case GNUTLS_MAC_SHA384:
+			case GNUTLS_MAC_SHA512:
+			case GNUTLS_MAC_SHA224:
+				break;
+			default:
+				not_approved = true;
+			}
 
 			if (hash_len > vdata->size)
 				hash_len = vdata->size;
@@ -1436,6 +1606,10 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 			struct dsa_params pub;
 			struct dsa_signature sig;
 			bigint_t y;
+
+			/* DSA is currently being defined as sunset with the
+			 * current draft of FIPS 186-5 */
+			not_approved = true;
 
 			ret =
 			    _gnutls_decode_ber_rs(signature, &tmp[0],
@@ -1471,14 +1645,24 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 			struct rsa_public_key pub;
 
 			ret = _rsa_params_to_pubkey(pk_params, &pub);
-			if (ret < 0)
-				return
-				    gnutls_assert_val(ret);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
 
-			if (signature->size != pub.size)
-				return
-				    gnutls_assert_val
-				    (GNUTLS_E_PK_SIG_VERIFY_FAILED);
+			/* RSA key size should be 2048-bit or larger in FIPS
+			 * 140-3.  In addition to this, only SHA-1 and SHA-2 are
+			 * allowed for SigVer; it is checked in
+			 * _pkcs1_rsa_verify_sig in lib/pubkey.c
+			 */
+			if (unlikely(pub.size < 256)) {
+				not_approved = true;
+			}
+
+			if (signature->size != pub.size) {
+				ret = gnutls_assert_val(GNUTLS_E_PK_SIG_VERIFY_FAILED);
+				goto cleanup;
+			}
 
 			ret =
 			    _gnutls_mpi_init_scan_nz(&tmp[0], signature->data,
@@ -1507,19 +1691,30 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 			if ((sign_params->flags &
 			     GNUTLS_PK_FLAG_RSA_PSS_FIXED_SALT_LENGTH) &&
 			    sign_params->salt_size != vdata->size) {
-				return gnutls_assert_val
-					(GNUTLS_E_PK_SIG_VERIFY_FAILED);
+				ret = gnutls_assert_val(GNUTLS_E_PK_SIG_VERIFY_FAILED);
+				goto cleanup;
 			}
 
 			ret = _rsa_params_to_pubkey(pk_params, &pub);
-			if (ret < 0)
-				return
-				    gnutls_assert_val(ret);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
 
-			if (signature->size != pub.size)
-				return
-				    gnutls_assert_val
-				    (GNUTLS_E_PK_SIG_VERIFY_FAILED);
+			/* RSA key size should be 2048-bit or larger in FIPS
+			 * 140-3.  In addition to this, only SHA-1 and SHA-2 are
+			 * allowed for SigVer, while Nettle only supports
+			 * SHA256, SHA384, and SHA512 for RSA-PSS (see
+			 * _rsa_pss_verify_digest in this file for the details).
+			 */
+			if (unlikely(pub.size < 256)) {
+				not_approved = true;
+			}
+
+			if (signature->size != pub.size) {
+				ret = gnutls_assert_val(GNUTLS_E_PK_SIG_VERIFY_FAILED);
+				goto cleanup;
+			}
 
 			ret =
 			    _gnutls_mpi_init_scan_nz(&tmp[0], signature->data,
@@ -1550,6 +1745,13 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 	}
 
       cleanup:
+	if (ret < 0) {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
+	} else if (not_approved) {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_NOT_APPROVED);
+	} else {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_APPROVED);
+	}
 
 	_gnutls_mpi_release(&tmp[0]);
 	_gnutls_mpi_release(&tmp[1]);
@@ -2081,15 +2283,16 @@ int _gnutls_ecdh_compute_key(gnutls_ecc_curve_t curve,
 
 static int pct_test(gnutls_pk_algorithm_t algo, const gnutls_pk_params_st* params)
 {
-int ret;
-gnutls_datum_t sig = {NULL, 0};
-const char const_data[20] = "onetwothreefourfive";
-const char const_data_sha256[32] = "onetwothreefourfivesixseveneight";
-const char const_data_sha384[48] = "onetwothreefourfivesixseveneightnineteneleventwe";
-const char const_data_sha512[64] = "onetwothreefourfivesixseveneightnineteneleventwelvethirteenfourt";
-gnutls_datum_t ddata, tmp = {NULL,0};
-char* gen_data = NULL;
-gnutls_x509_spki_st spki;
+	int ret;
+	gnutls_datum_t sig = {NULL, 0};
+	const char const_data[20] = "onetwothreefourfive";
+	const char const_data_sha256[32] = "onetwothreefourfivesixseveneight";
+	const char const_data_sha384[48] = "onetwothreefourfivesixseveneightnineteneleventwe";
+	const char const_data_sha512[64] = "onetwothreefourfivesixseveneightnineteneleventwelvethirteenfourt";
+	gnutls_datum_t ddata, tmp = {NULL,0};
+	char* gen_data = NULL;
+	gnutls_x509_spki_st spki;
+	gnutls_fips140_context_t context;
 
 	memcpy(&spki, &params->spki, sizeof(spki));
 
@@ -2136,28 +2339,44 @@ gnutls_x509_spki_st spki;
 
 	switch (algo) {
 	case GNUTLS_PK_RSA:
+		/* Push a temporary FIPS context because _gnutls_pk_encrypt and
+		 * _gnutls_pk_decrypt below will mark RSAES-PKCS1-v1_5 operation
+		 * non-approved */
+		if (gnutls_fips140_context_init(&context) < 0) {
+			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
+			goto cleanup;
+		}
+		if (gnutls_fips140_push_context(context) < 0) {
+			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
+			gnutls_fips140_context_deinit(context);
+			goto cleanup;
+		}
+
 		ret = _gnutls_pk_encrypt(algo, &sig, &ddata, params);
 		if (ret < 0) {
 			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
-			goto cleanup;
 		}
-
-		if (ddata.size == sig.size && memcmp(ddata.data, sig.data, sig.size) == 0) {
+		if (ret == 0 &&
+		    ddata.size == sig.size &&
+		    memcmp(ddata.data, sig.data, sig.size) == 0) {
 			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
-			gnutls_assert();
-			goto cleanup;
+		}
+		if (ret == 0 &&
+		    _gnutls_pk_decrypt(algo, &tmp, &sig, params) < 0) {
+			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
+		}
+		if (ret == 0 &&
+		    !(tmp.size == ddata.size &&
+		      memcmp(tmp.data, ddata.data, tmp.size) == 0)) {
+			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
 		}
 
-		ret = _gnutls_pk_decrypt(algo, &tmp, &sig, params);
+		if (unlikely(gnutls_fips140_pop_context() < 0)) {
+			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
+		}
+		gnutls_fips140_context_deinit(context);
+
 		if (ret < 0) {
-			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
-			gnutls_assert();
-			goto cleanup;
-		}
-
-		if (tmp.size != ddata.size || memcmp(tmp.data, ddata.data, tmp.size) != 0) {
-			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
-			gnutls_assert();
 			goto cleanup;
 		}
 
@@ -2300,13 +2519,14 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 	unsigned int i;
 	unsigned rnd_level;
 	nettle_random_func *rnd_func;
+	bool not_approved = false;
 
 	FAIL_IF_LIB_ERROR;
 
-	if (IS_EC(algo)) {
-		/* check if the curve relates to the algorithm used */
-		if (gnutls_ecc_curve_get_pk(level) != algo)
-			return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+	/* check if the curve relates to the algorithm used */
+	if (IS_EC(algo) && gnutls_ecc_curve_get_pk(level) != algo) {
+		ret = gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+		goto cleanup;
 	}
 
 	if (ephemeral) {
@@ -2324,8 +2544,14 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			struct dsa_params pub;
 			mpz_t x, y;
 
-			if (params->params[DSA_Q] == NULL)
-				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			/* DSA is currently being defined as sunset with the
+			 * current draft of FIPS 186-5 */
+			not_approved = true;
+
+			if (params->params[DSA_Q] == NULL) {
+				ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+				goto cleanup;
+			}
 
 			_dsa_params_get(params, &pub);
 
@@ -2357,7 +2583,7 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			mpz_clear(y);
 
 			if (ret < 0)
-				goto fail;
+				goto cleanup;
 
 			break;
 		}
@@ -2374,8 +2600,10 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			mpz_t primesub1;
 			mpz_t ypowq;
 
-			if (algo != params->algo)
-				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			if (algo != params->algo) {
+				ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+				goto cleanup;
+			}
 
 			_dsa_params_get(params, &pub);
 
@@ -2383,8 +2611,10 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 				have_q = 1;
 
 			/* This check is for the case !ENABLE_FIPS140 */
-			if (algo == GNUTLS_PK_DSA && have_q == 0)
-				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			if (algo == GNUTLS_PK_DSA && have_q == 0) {
+				ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+				goto cleanup;
+			}
 
 			mpz_init(r);
 			mpz_init(x);
@@ -2480,7 +2710,7 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			mpz_clear(ypowq);
 
 			if (ret < 0)
-				goto fail;
+				goto cleanup;
 
 			break;
 		}
@@ -2526,6 +2756,8 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 					} while (ret != 1 && ++retries < 3);
 				}
 			} else {
+				not_approved = true;
+
 				ret =
 				    rsa_generate_keypair(&pub, &priv, NULL,
 						 rnd_func, NULL, NULL,
@@ -2547,6 +2779,10 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 				params->params_nr++;
 			}
 
+			/* In FIPS 140-3, pub.n should be 2048-bit or larger; it
+			 * is assured in rsa_generate_fips186_4_keypair in
+			 * lib/nettle/int/rsa-keygen-fips186.c. */
+
 			mpz_set(TOMPZ(params->params[RSA_MODULUS]), pub.n);
 			mpz_set(TOMPZ(params->params[RSA_PUB]), pub.e);
 			mpz_set(TOMPZ(params->params[RSA_PRIV]), priv.d);
@@ -2563,7 +2799,7 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			rsa_public_key_clear(&pub);
 
 			if (ret < 0)
-				goto fail;
+				goto cleanup;
 
 			break;
 		}
@@ -2572,31 +2808,42 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 		{
 			unsigned size = gnutls_ecc_curve_get_size(level);
 
-			if (params->pkflags & GNUTLS_PK_FLAG_PROVABLE)
-				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			/* EdDSA is not approved yet */
+			not_approved = true;
 
-			if (unlikely(get_eddsa_curve(algo) != level))
-				return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+			if (params->pkflags & GNUTLS_PK_FLAG_PROVABLE) {
+				ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+				goto cleanup;
+			}
 
-			if (size == 0)
-				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			if (unlikely(get_eddsa_curve(algo) != level)) {
+				ret = gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+				goto cleanup;
+			}
+
+			if (size == 0) {
+				ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+				goto cleanup;
+			}
 
 			params->curve = level;
 
 			params->raw_priv.data = gnutls_malloc(size);
-			if (params->raw_priv.data == NULL)
-				return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+			if (params->raw_priv.data == NULL) {
+				ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+				goto cleanup;
+			}
 
 			params->raw_pub.data = gnutls_malloc(size);
 			if (params->raw_pub.data == NULL) {
 				ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-				goto fail;
+				goto cleanup;
 			}
 
 			ret = gnutls_rnd(rnd_level, params->raw_priv.data, size);
 			if (ret < 0) {
 				ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-				goto fail;
+				goto cleanup;
 			}
 			params->raw_pub.size = size;
 			params->raw_priv.size = size;
@@ -2605,7 +2852,7 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 					       params->raw_pub.data,
 					       params->raw_priv.data);
 			if (ret < 0)
-				goto fail;
+				goto cleanup;
 
 			break;
 		}
@@ -2623,10 +2870,15 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			mpz_t x, y, xx, yy, nn, mm;
 
 			curve = get_supported_nist_curve(level);
-			if (curve == NULL)
-				return
-				    gnutls_assert_val
-				    (GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+			if (curve == NULL) {
+				ret = gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+				goto cleanup;
+			}
+
+			/* P-192 is not supported in FIPS 140-3 */
+			if (level == GNUTLS_ECC_CURVE_SECP192R1) {
+				not_approved = true;
+			}
 
 			mpz_init(x);
 			mpz_init(y);
@@ -2734,6 +2986,8 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 					ret = gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
 					goto ecc_fail;
 				}
+			} else {
+				not_approved = true;
 			}
 #endif
 
@@ -2758,7 +3012,7 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			ecc_scalar_clear(&m);
 
 			if (ret < 0)
-				goto fail;
+				goto cleanup;
 
 			break;
 		}
@@ -2775,15 +3029,20 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			const struct ecc_curve *curve;
 			const mac_entry_st *me;
 
+			/* GOST curves are not approved */
+			not_approved = true;
+
 			curve = get_supported_gost_curve(level);
-			if (curve == NULL)
-				return
-				    gnutls_assert_val
-				    (GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+			if (curve == NULL) {
+				ret = gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+				goto cleanup;
+			}
 
 			me = hash_to_entry(_gnutls_gost_digest(algo));
-			if (!me || me->output_size * 8 != ecc_bit_size(curve))
-				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			if (!me || me->output_size * 8 != ecc_bit_size(curve)) {
+				ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+				goto cleanup;
+			}
 
 			ecc_scalar_init(&key, curve);
 			ecc_point_init(&pub, curve);
@@ -2816,7 +3075,7 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			ecc_scalar_clear(&key);
 
 			if (ret < 0)
-				goto fail;
+				goto cleanup;
 
 			break;
 		}
@@ -2826,32 +3085,38 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 		{
 			unsigned size = gnutls_ecc_curve_get_size(level);
 
-			if (size == 0)
-				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			not_approved = true;
+
+			if (size == 0) {
+				ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+				goto cleanup;
+			}
 
 			params->curve = level;
 
 			params->raw_priv.data = gnutls_malloc(size);
-			if (params->raw_priv.data == NULL)
-				return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+			if (params->raw_priv.data == NULL) {
+				ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+				goto cleanup;
+			}
 
 			params->raw_pub.data = gnutls_malloc(size);
 			if (params->raw_pub.data == NULL) {
 				ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-				goto fail;
+				goto cleanup;
 			}
 
 			ret = gnutls_rnd(rnd_level, params->raw_priv.data, size);
 			if (ret < 0) {
 				ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-				goto fail;
+				goto cleanup;
 			}
 			params->raw_pub.size = size;
 			params->raw_priv.size = size;
 
 			ret = edwards_curve_mul_g(algo, params->raw_pub.data, params->raw_priv.data);
 			if (ret < 0)
-				goto fail;
+				goto cleanup;
 			break;
 		}
 	default:
@@ -2865,21 +3130,24 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 	ret = pct_test(algo, params);
 	if (ret < 0) {
 		gnutls_assert();
-		goto fail;
+		goto cleanup;
 	}
 #endif
 
-	FAIL_IF_LIB_ERROR;
-	return 0;
-
-      fail:
-
-	for (i = 0; i < params->params_nr; i++) {
-		_gnutls_mpi_release(&params->params[i]);
+ cleanup:
+	if (ret < 0) {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
+		for (i = 0; i < params->params_nr; i++) {
+			_gnutls_mpi_release(&params->params[i]);
+		}
+		params->params_nr = 0;
+		gnutls_free(params->raw_priv.data);
+		gnutls_free(params->raw_pub.data);
+	} else if (not_approved) {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_NOT_APPROVED);
+	} else {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_APPROVED);
 	}
-	params->params_nr = 0;
-	gnutls_free(params->raw_priv.data);
-	gnutls_free(params->raw_pub.data);
 
 	FAIL_IF_LIB_ERROR;
 	return ret;

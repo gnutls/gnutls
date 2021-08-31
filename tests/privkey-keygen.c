@@ -49,7 +49,7 @@ static int sec_param[MAX_TRIES] =
 
 static void tls_log_func(int level, const char *str)
 {
-	fprintf(stderr, "%s |<%d>| %s", "crq_key_id", level, str);
+	fprintf(stderr, "%s |<%d>| %s", "privkey-keygen", level, str);
 }
 
 const gnutls_datum_t raw_data = {
@@ -102,10 +102,47 @@ static void sign_verify_data(gnutls_pk_algorithm_t algorithm, gnutls_x509_privke
 	gnutls_free(signature.data);
 }
 
+static unsigned int
+is_approved_pk_algo(gnutls_pk_algorithm_t algo) {
+	switch (algo) {
+	case GNUTLS_PK_RSA:
+	case GNUTLS_PK_RSA_PSS:
+	case GNUTLS_PK_EC:
+		return 1;
+	default:
+		return 0;
+	}
+}
+
 void doit(void)
 {
 	gnutls_x509_privkey_t pkey, dst;
 	int ret, algorithm, i;
+	gnutls_fips140_context_t fips_context;
+	gnutls_fips140_operation_state_t fips_state;
+
+#define FIPS_PUSH_CONTEXT() do {					\
+	if (gnutls_fips140_mode_enabled()) {				\
+		ret = gnutls_fips140_push_context(fips_context);	\
+		if (ret < 0) {						\
+			fail("gnutls_fips140_push_context failed\n");	\
+		}							\
+	}								\
+} while (0)
+
+#define FIPS_POP_CONTEXT(state) do {					\
+	if (gnutls_fips140_mode_enabled()) {				\
+		ret = gnutls_fips140_pop_context();			\
+		if (ret < 0) {						\
+			fail("gnutls_fips140_context_pop failed\n");	\
+		}							\
+		fips_state = gnutls_fips140_get_operation_state(fips_context); \
+		if (fips_state != GNUTLS_FIPS140_OP_ ## state) {	\
+			fail("operation state is not " # state " (%d)\n", \
+			     fips_state);				\
+		}							\
+	}								\
+} while (0)
 
 	ret = global_init();
 	if (ret < 0)
@@ -114,6 +151,11 @@ void doit(void)
 	gnutls_global_set_log_function(tls_log_func);
 	if (debug)
 		gnutls_global_set_log_level(4711);
+
+	ret = gnutls_fips140_context_init(&fips_context);
+	if (ret < 0) {
+		fail("Cannot initialize FIPS context\n");
+	}
 
 	for (i = 0; i < MAX_TRIES; i++) {
 		for (algorithm = GNUTLS_PK_RSA; algorithm <= GNUTLS_PK_MAX;
@@ -150,6 +192,7 @@ void doit(void)
 				     ret);
 			}
 
+			FIPS_PUSH_CONTEXT();
 			ret =
 			    gnutls_x509_privkey_generate(pkey, algorithm,
 							 gnutls_sec_param_to_pk_bits
@@ -163,6 +206,11 @@ void doit(void)
 				success("Key[%s] generation ok: %d\n",
 					gnutls_pk_algorithm_get_name
 					(algorithm), ret);
+			}
+			if (is_approved_pk_algo(algorithm)) {
+				FIPS_POP_CONTEXT(APPROVED);
+			} else {
+				FIPS_POP_CONTEXT(NOT_APPROVED);
 			}
 
 			ret = gnutls_x509_privkey_verify_params(pkey);
@@ -181,8 +229,21 @@ void doit(void)
 				fail("gnutls_x509_privkey_generate after cpy (%s): %s (%d)\n", gnutls_pk_algorithm_get_name(algorithm), gnutls_strerror(ret), ret);
 			}
 
+			FIPS_PUSH_CONTEXT();
 			sign_verify_data(algorithm, pkey);
+			if (is_approved_pk_algo(algorithm)) {
+				FIPS_POP_CONTEXT(APPROVED);
+			} else {
+				FIPS_POP_CONTEXT(NOT_APPROVED);
+			}
+
+			FIPS_PUSH_CONTEXT();
 			sign_verify_data(algorithm, dst);
+			if (is_approved_pk_algo(algorithm)) {
+				FIPS_POP_CONTEXT(APPROVED);
+			} else {
+				FIPS_POP_CONTEXT(NOT_APPROVED);
+			}
 
 			gnutls_x509_privkey_deinit(pkey);
 			gnutls_x509_privkey_deinit(dst);
