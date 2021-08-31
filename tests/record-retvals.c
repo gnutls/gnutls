@@ -182,12 +182,12 @@ static void client(int fd, const char *prio, int ign)
 
 		if (ret < 0) {
 			fail("server (%s): Error sending %d byte packet: %s\n", prio, i, gnutls_strerror(ret));
-			terminate();
+			exit(1);
 		}
 
 		if (ret > 0 && ret != (int)i) {
 			fail("server (%s): Error sending %d byte packet: sent: %d\n", prio, i, ret);
-			terminate();
+			exit(1);
 		}
 	}
 
@@ -257,6 +257,7 @@ pid_t child;
 
 static void terminate(void)
 {
+	assert(child);
 	kill(child, SIGTERM);
 	exit(1);
 }

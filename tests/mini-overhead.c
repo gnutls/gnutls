@@ -214,6 +214,7 @@ static gnutls_session_t initialize_tls_session(const char *prio)
 
 static void terminate(void)
 {
+	assert(child);
 	kill(child, SIGTERM);
 	exit(1);
 }

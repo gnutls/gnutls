@@ -125,13 +125,13 @@ static void client(int fd, const char *prio, int ign)
 	ret = gnutls_alert_send(session, GNUTLS_AL_WARNING, GNUTLS_A_USER_CANCELED);
 	if (ret < 0) {
 		fail("server: Error sending user cancelled alert: %s\n", gnutls_strerror(ret));
-		terminate();
+		exit(1);
 	}
 
 	ret = gnutls_alert_send(session, GNUTLS_AL_FATAL, GNUTLS_A_DECRYPT_ERROR);
 	if (ret < 0) {
 		fail("server: Error sending decrypt error alert: %s\n", gnutls_strerror(ret));
-		terminate();
+		exit(1);
 	}
 
 	close(fd);
@@ -149,6 +149,7 @@ pid_t child;
 
 static void terminate(void)
 {
+	assert(child);
 	kill(child, SIGTERM);
 	exit(1);
 }

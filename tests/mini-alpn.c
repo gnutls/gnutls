@@ -162,7 +162,7 @@ static void client(int fd, const char *protocol0, const char *protocol2, const c
 static void terminate(void)
 {
 	int status;
-
+	assert(child);
 	kill(child, SIGTERM);
 	wait(&status);
 	exit(1);

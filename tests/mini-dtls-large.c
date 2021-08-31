@@ -132,7 +132,7 @@ static void client(int fd)
 
 	if (ret < 0) {
 		fail("recv: %s\n", gnutls_strerror(ret));
-		terminate();
+		exit(1);
 	}
 
 	close(fd);

@@ -142,7 +142,7 @@ static void client(int fd, int server_init)
 				if (ret2 < 0) {
 					fail("pong: %s\n",
 					     gnutls_strerror(ret));
-					terminate();
+					exit(1);
 				}
 			}
 		}
@@ -151,7 +151,7 @@ static void client(int fd, int server_init)
 
 		if (ret < 0) {
 			fail("recv: %s\n", gnutls_strerror(ret));
-			terminate();
+			exit(1);
 		}
 	} else {
 		do {
@@ -167,7 +167,7 @@ static void client(int fd, int server_init)
 
 		if (ret < 0) {
 			fail("ping: %s\n", gnutls_strerror(ret));
-			terminate();
+			exit(1);
 		}
 	}
 
@@ -205,7 +205,7 @@ static gnutls_session_t initialize_tls_session(void)
 static void terminate(void)
 {
 	int status;
-
+	assert(child);
 	kill(child, SIGTERM);
 	wait(&status);
 	exit(1);

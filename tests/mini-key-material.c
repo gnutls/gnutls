@@ -82,8 +82,10 @@ static void terminate(void)
 {
 	int status = 0;
 
-	kill(child, SIGTERM);
-	wait(&status);
+	if (child) {
+		kill(child, SIGTERM);
+		wait(&status);
+	}
 	exit(1);
 }
 
@@ -140,7 +142,7 @@ static void client(int fd)
 
 	if (ret < 0) {
 		fail("client: Handshake failed: %s\n", strerror(ret));
-		terminate();
+		exit(1);
 	} else {
 		if (debug)
 			success("client: Handshake was completed\n");
@@ -154,13 +156,13 @@ static void client(int fd)
 	ret = gnutls_cipher_get(session);
 	if (ret != GNUTLS_CIPHER_AES_128_CBC) {
 		fprintf(stderr, "negotiated unexpected cipher: %s\n", gnutls_cipher_get_name(ret));
-		terminate();
+		exit(1);
 	}
 
 	ret = gnutls_mac_get(session);
 	if (ret != GNUTLS_MAC_SHA1) {
 		fprintf(stderr, "negotiated unexpected mac: %s\n", gnutls_mac_get_name(ret));
-		terminate();
+		exit(1);
 	}
 
 	iv_size = 16;
@@ -173,7 +175,7 @@ static void client(int fd)
 	if (ret < 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		gnutls_perror(ret);
-		terminate();
+		exit(1);
 	}
 	p = key_material;
 
@@ -182,33 +184,33 @@ static void client(int fd)
 	if (ret < 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		gnutls_perror(ret);
-		terminate();
+		exit(1);
 	}
 
 	if (memcmp(wseq_number, "\x00\x00\x00\x00\x00\x00\x00\x01", 8) != 0) {
 		dump("wseq:", wseq_number, 8);
 		fprintf(stderr, "error in %d\n", __LINE__);
-		terminate();
+		exit(1);
 	}
 
 	ret = gnutls_record_get_state(session, 1, &read_mac_key, &read_iv, &read_cipher_key, rseq_number);
 	if (ret < 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		gnutls_perror(ret);
-		terminate();
+		exit(1);
 	}
 
 	if (memcmp(rseq_number, "\x00\x00\x00\x00\x00\x00\x00\x01", 8) != 0) {
 		dump("rseq:", rseq_number, 8);
 		fprintf(stderr, "error in %d\n", __LINE__);
-		terminate();
+		exit(1);
 	}
 
 	if (hash_size != mac_key.size || memcmp(p, mac_key.data, hash_size) != 0) {
 		dump("MAC:", mac_key.data, mac_key.size);
 		dump("Block:", key_material, block_size);
 		fprintf(stderr, "error in %d\n", __LINE__);
-		terminate();
+		exit(1);
 	}
 	p+= hash_size;
 
@@ -216,31 +218,31 @@ static void client(int fd)
 		dump("MAC:", read_mac_key.data, read_mac_key.size);
 		dump("Block:", key_material, block_size);
 		fprintf(stderr, "error in %d\n", __LINE__);
-		terminate();
+		exit(1);
 	}
 	p+= hash_size;
 
 	if (key_size != cipher_key.size || memcmp(p, cipher_key.data, key_size) != 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
-		terminate();
+		exit(1);
 	}
 	p+= key_size;
 
 	if (key_size != read_cipher_key.size || memcmp(p, read_cipher_key.data, key_size) != 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
-		terminate();
+		exit(1);
 	}
 	p+= key_size;
 
 	if (iv_size != iv.size || memcmp(p, iv.data, iv_size) != 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
-		terminate();
+		exit(1);
 	}
 	p+=iv_size;
 
 	if (iv_size != read_iv.size || memcmp(p, read_iv.data, iv_size) != 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
-		terminate();
+		exit(1);
 	}
 
 	/* check sequence numbers */
@@ -255,26 +257,26 @@ static void client(int fd)
 	if (ret < 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		gnutls_perror(ret);
-		terminate();
+		exit(1);
 	}
 
 	if (memcmp(wseq_number, "\x00\x00\x00\x00\x00\x00\x00\x06", 8) != 0) {
 		dump("wseq:", wseq_number, 8);
 		fprintf(stderr, "error in %d\n", __LINE__);
-		terminate();
+		exit(1);
 	}
 
 	ret = gnutls_record_get_state(session, 1, NULL, NULL, NULL, rseq_number);
 	if (ret < 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		gnutls_perror(ret);
-		terminate();
+		exit(1);
 	}
 
 	if (memcmp(rseq_number, "\x00\x00\x00\x00\x00\x00\x00\x01", 8) != 0) {
 		dump("wseq:", wseq_number, 8);
 		fprintf(stderr, "error in %d\n", __LINE__);
-		terminate();
+		exit(1);
 	}
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 

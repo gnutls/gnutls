@@ -50,8 +50,6 @@ int main()
 #include "cert-common.h"
 #include "utils.h"
 
-static void terminate(void);
-
 /* This program tests that a client cannot send any unencrypted data
  * during the handshake process. That is to ensure we protect buggy clients
  * from transmitting sensitive data over the wire.
@@ -135,7 +133,7 @@ static void client(int fd, const char *prio)
 
 	if (ret < 0) {
 		fail("client: Handshake failed: %s\n", gnutls_strerror(ret));
-		terminate();
+		exit(1);
 	} else {
 		if (debug)
 			success("client: Handshake was completed\n");
@@ -160,7 +158,7 @@ static void client(int fd, const char *prio)
 		goto end;
 	} else if (ret < 0) {
 		fail("client: Error: %s\n", gnutls_strerror(ret));
-		terminate();
+		exit(1);
 	}
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);
@@ -179,12 +177,6 @@ static void client(int fd, const char *prio)
 
 /* These are global */
 pid_t child;
-
-static void terminate(void)
-{
-	kill(child, SIGTERM);
-	exit(1);
-}
 
 static void server(int fd, const char *prio)
 {

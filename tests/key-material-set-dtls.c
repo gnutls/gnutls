@@ -71,8 +71,10 @@ static void terminate(void)
 {
 	int status = 0;
 
-	kill(child, SIGTERM);
-	wait(&status);
+	if (child) {
+		kill(child, SIGTERM);
+		wait(&status);
+	}
 	exit(1);
 }
 
@@ -127,7 +129,7 @@ static void client(int fd)
 
 	if (ret < 0) {
 		fail("client: Handshake failed: %s\n", strerror(ret));
-		terminate();
+		exit(1);
 	} else {
 		if (debug)
 			success("client: Handshake was completed\n");
@@ -141,13 +143,13 @@ static void client(int fd)
 	ret = gnutls_cipher_get(session);
 	if (ret != GNUTLS_CIPHER_AES_128_CBC) {
 		fprintf(stderr, "negotiated unexpected cipher: %s\n", gnutls_cipher_get_name(ret));
-		terminate();
+		exit(1);
 	}
 
 	ret = gnutls_mac_get(session);
 	if (ret != GNUTLS_MAC_SHA1) {
 		fprintf(stderr, "negotiated unexpected mac: %s\n", gnutls_mac_get_name(ret));
-		terminate();
+		exit(1);
 	}
 
 	/* save state */
@@ -155,14 +157,14 @@ static void client(int fd)
 	if (ret < 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		gnutls_perror(ret);
-		terminate();
+		exit(1);
 	}
 
 	ret = gnutls_record_get_state(session, 1, NULL, NULL, NULL, rseq_number);
 	if (ret < 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		gnutls_perror(ret);
-		terminate();
+		exit(1);
 	}
 
 	/* skip past the sliding window */
@@ -187,14 +189,14 @@ static void client(int fd)
 	if (ret < 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		gnutls_perror(ret);
-		terminate();
+		exit(1);
 	}
 
 	ret = gnutls_record_set_state(session, 1, rseq_number);
 	if (ret < 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		gnutls_perror(ret);
-		terminate();
+		exit(1);
 	}
 
 	ret = gnutls_record_send(session, "ping", 4);

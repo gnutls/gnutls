@@ -146,7 +146,7 @@ static void client(int fd, int server_init, const char *prio)
 		if (ret < 0) {
 			fail("2nd client gnutls_handshake: %s\n",
 			     gnutls_strerror(ret));
-			terminate();
+			exit(1);
 		}
 	} else {
 		do {
@@ -201,7 +201,7 @@ pid_t child;
 static void terminate(void)
 {
 	int status;
-
+	assert(child);
 	kill(child, SIGTERM);
 	wait(&status);
 	exit(1);
