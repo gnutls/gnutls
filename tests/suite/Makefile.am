@@ -58,14 +58,15 @@ scripts_to_test = chain.sh \
 	tls-fuzzer/tls-fuzzer-nolimit.sh tls-fuzzer/tls-fuzzer-nolimit-tls13.sh \
 	multi-ticket-reception.sh
 
-TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
-	LC_ALL="C"			\
-	PYTHON="$(PYTHON)"		\
-	VALGRIND="$(VALGRIND)"		\
-	top_builddir="$(top_builddir)"	\
-	srcdir="$(srcdir)"		\
-	ASAN_OPTIONS="detect_leaks=0"	\
-	GNUTLS_TEST_SUITE_RUN=1		\
+TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT)					\
+	LC_ALL="C"							\
+	PYTHON="$(PYTHON)"						\
+	VALGRIND="$(VALGRIND)"						\
+	top_builddir="$(top_builddir)"					\
+	abs_top_builddir="$(abs_top_builddir)"				\
+	srcdir="$(srcdir)"						\
+	ASAN_OPTIONS="detect_leaks=0"					\
+	GNUTLS_TEST_SUITE_RUN=1						\
 	GNUTLS_SYSTEM_PRIORITY_FILE=$(abs_top_srcdir)/tests/system.prio \
 	OPENSSL_ia32cap=0x00000000
 
