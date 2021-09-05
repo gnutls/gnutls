@@ -242,7 +242,7 @@ wait
 
 # Try resumption with early data
 echo_cmd "${PREFIX}Checking TLS 1.3 with resumption with early data..."
-testdir=`create_testdir tls13-openssl-resumption`
+testdir=`create_testdir tls13-openssl-earlydata`
 eval "${GETPORT}"
 launch_bare_server "$OPENSSL" s_server -quiet -accept "${PORT}" -keyform pem -certform pem ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" -CAfile "${CA_CERT}" -early_data
 PID=$!
@@ -258,7 +258,7 @@ wait
 
 # Try resumption with early data with small limit
 echo_cmd "${PREFIX}Checking TLS 1.3 with resumption with early data..."
-testdir=`create_testdir tls13-openssl-resumption`
+testdir=`create_testdir tls13-openssl-earlydata-limit`
 eval "${GETPORT}"
 launch_bare_server "$OPENSSL" s_server -quiet -accept "${PORT}" -keyform pem -certform pem ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" -CAfile "${CA_CERT}" -early_data -max_early_data 1
 PID=$!
