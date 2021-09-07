@@ -39,16 +39,16 @@ fi
 
 pushd "${srcdir}/tls-fuzzer/tlsfuzzer"
 
-test -L ecdsa || ln -s ../python-ecdsa/src/ecdsa ecdsa
-test -L tlslite || ln -s ../tlslite-ng/tlslite tlslite 2>/dev/null
-
 wait_for_free_port $PORT
 
 retval=0
 
 tls_fuzzer_prepare
 
-PYTHONPATH=. "${PYTHON}" tests/scripts_retention.py ${TMPFILE} ${SERV} 821
+export PYTHONDONTWRITEBYTECODE=never
+
+PYTHONPATH=../python-ecdsa/src:../tlslite-ng:. \
+"${PYTHON}" tests/scripts_retention.py ${TMPFILE} ${SERV} 821
 retval=$?
 
 rm -f ${TMPFILE}
