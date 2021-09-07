@@ -54,10 +54,27 @@ have_port_finder() {
 	exit 77
 }
 
+reserve_port() {
+	local PORT=$1
+	mkdir "$abs_top_builddir/tests/port.lock.d.$PORT" > /dev/null 2>&1 || return 1
+	echo "reserved port $PORT"
+	trap "unreserve_port $PORT" 0 1 15 2
+}
+
+unreserve_port() {
+	local PORT=$1
+	echo "unreserved port $PORT"
+	rmdir "$abs_top_builddir/tests/port.lock.d.$PORT" > /dev/null 2>&1 || :
+}
+
 check_if_port_in_use() {
 	local PORT=$1
+	reserve_port $PORT
 	have_port_finder
-	$PFCMD -an|grep "[\:\.]$PORT" >/dev/null 2>&1
+	if ! $PFCMD -an|grep "[\:\.]$PORT" >/dev/null 2>&1; then
+		return 1
+	fi
+	unreserve_port $PORT
 }
 
 check_if_port_listening() {
@@ -66,27 +83,8 @@ check_if_port_listening() {
 	$PFCMD -anl|grep "[\:\.]$PORT"|grep LISTEN >/dev/null 2>&1
 }
 
-trap "rmdir \"$top_builddir/tests/port.lock.d\" > /dev/null 2>&1 || :" 1 15 2
-
-obtain_port_lock()
-{
-    local i
-    for i in 1 2 3 4 5 6; do
-        if mkdir "$top_builddir/tests/port.lock.d" > /dev/null 2>&1; then
-            return
-        fi
-        echo "try $i: obtaining port lock"
-	sleep 2
-    done
-    return 1
-}
-
 # Find a port number not currently in use.
 GETPORT='
-    obtain_port_lock()
-    if $? -ne 0; then
-        echo "failed to obtain port lock: continuing anyway"
-    fi
     rc=0
     unset myrandom
     while test $rc = 0; do
@@ -200,7 +198,6 @@ wait_server() {
 		kill $PID
 		exit 1
 	fi
-	rmdir "$top_builddir/tests/port.lock.d" > /dev/null 2>&1 || :
 }
 
 wait_udp_server() {

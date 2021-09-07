@@ -240,39 +240,39 @@ grep '^\*\*\* This is a resumed session' "${testdir}/client.out" || \
 kill ${PID}
 wait
 
-# Try resumption with early data
-echo_cmd "${PREFIX}Checking TLS 1.3 with resumption with early data..."
-testdir=`create_testdir tls13-openssl-resumption`
-eval "${GETPORT}"
-launch_bare_server "$OPENSSL" s_server -quiet -accept "${PORT}" -keyform pem -certform pem ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" -CAfile "${CA_CERT}" -early_data
-PID=$!
-wait_server ${PID}
+# # Try resumption with early data
+# echo_cmd "${PREFIX}Checking TLS 1.3 with resumption with early data..."
+# testdir=`create_testdir tls13-openssl-earlydata`
+# eval "${GETPORT}"
+# launch_bare_server "$OPENSSL" s_server -quiet -accept "${PORT}" -keyform pem -certform pem ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" -CAfile "${CA_CERT}" -early_data
+# PID=$!
+# wait_server ${PID}
 
-echo "This file contains early data sent by the client" > "${testdir}/earlydata.txt"
-${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NORMAL:-VERS-ALL:+VERS-TLS1.3:+GROUP-ALL${ADD}" --earlydata "${testdir}/earlydata.txt" --insecure --inline-commands <<< '^resume^'| tee "${testdir}/client.out" >> ${OUTPUT}
-grep '^\*\*\* This is a resumed session' "${testdir}/client.out" || \
-	fail ${PID} "Failed"
+# echo "This file contains early data sent by the client" > "${testdir}/earlydata.txt"
+# ${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NORMAL:-VERS-ALL:+VERS-TLS1.3:+GROUP-ALL${ADD}" --earlydata "${testdir}/earlydata.txt" --insecure --inline-commands <<< '^resume^'| tee "${testdir}/client.out" >> ${OUTPUT}
+# grep '^\*\*\* This is a resumed session' "${testdir}/client.out" || \
+#       fail ${PID} "Failed"
 
-kill ${PID}
-wait
+# kill ${PID}
+# wait
 
-# Try resumption with early data with small limit
-echo_cmd "${PREFIX}Checking TLS 1.3 with resumption with early data..."
-testdir=`create_testdir tls13-openssl-resumption`
-eval "${GETPORT}"
-launch_bare_server "$OPENSSL" s_server -quiet -accept "${PORT}" -keyform pem -certform pem ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" -CAfile "${CA_CERT}" -early_data -max_early_data 1
-PID=$!
-wait_server ${PID}
+# # Try resumption with early data with small limit
+# echo_cmd "${PREFIX}Checking TLS 1.3 with resumption with early data..."
+# testdir=`create_testdir tls13-openssl-earlydata-limit`
+# eval "${GETPORT}"
+# launch_bare_server "$OPENSSL" s_server -quiet -accept "${PORT}" -keyform pem -certform pem ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" -CAfile "${CA_CERT}" -early_data -max_early_data 1
+# PID=$!
+# wait_server ${PID}
 
-echo "This file contains early data sent by the client" > "${testdir}/earlydata.txt"
-${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NORMAL:-VERS-ALL:+VERS-TLS1.3:+GROUP-ALL${ADD}" --earlydata "${testdir}/earlydata.txt" --insecure --inline-commands <<< '^resume^'|& tee "${testdir}/client.out" >> ${OUTPUT}
-grep '^\*\*\* This is a resumed session' "${testdir}/client.out" || \
-	fail ${PID} "Failed"
-grep '^\*\*\* Received alert \[10\]: Unexpected message' "${testdir}/client.out" || \
-	fail ${PID} "Failed"
+# echo "This file contains early data sent by the client" > "${testdir}/earlydata.txt"
+# ${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NORMAL:-VERS-ALL:+VERS-TLS1.3:+GROUP-ALL${ADD}" --earlydata "${testdir}/earlydata.txt" --insecure --inline-commands <<< '^resume^'|& tee "${testdir}/client.out" >> ${OUTPUT}
+# grep '^\*\*\* This is a resumed session' "${testdir}/client.out" || \
+#       fail ${PID} "Failed"
+# grep '^\*\*\* Received alert \[10\]: Unexpected message' "${testdir}/client.out" || \
+#       fail ${PID} "Failed"
 
-kill ${PID}
-wait
+# kill ${PID}
+# wait
 
 # Try exporting keying material
 echo_cmd "${PREFIX}Checking TLS 1.3 to export keying material..."
