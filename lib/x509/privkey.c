@@ -736,11 +736,9 @@ gnutls_x509_privkey_import2(gnutls_x509_privkey_t key,
 		if (ret >= 0)
 			return ret;
 
-		if (ret < 0) {
-			gnutls_assert();
-			saved_ret = ret;
-			/* fall through to PKCS #8 decoding */
-		}
+		gnutls_assert();
+		saved_ret = ret;
+		/* fall through to PKCS #8 decoding */
 	}
 
 	if ((password != NULL || (flags & GNUTLS_PKCS_NULL_PASSWORD))

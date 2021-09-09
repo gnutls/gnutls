@@ -165,7 +165,8 @@ int _gnutls_extract_name_constraints(asn1_node c2, const char *vstr,
 		tmp.data = NULL;
 	}
 
-	if (ret < 0 && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+	assert(ret < 0);
+	if (ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
 		gnutls_assert();
 		goto cleanup;
 	}

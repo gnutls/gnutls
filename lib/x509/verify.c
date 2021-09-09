@@ -1715,7 +1715,7 @@ gnutls_x509_crl_verify(gnutls_x509_crl_t crl,
 			if (verify)
 				*verify |= GNUTLS_CERT_INVALID;
 			goto cleanup;
-		} else if (result >= 0) {
+		} else {
 			result = 0; /* everything ok */
 		}
 	}

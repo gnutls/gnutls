@@ -934,6 +934,8 @@ dane_verify_session_crt(dane_state_t s,
 	const gnutls_datum_t *cert_list;
 	unsigned int cert_list_size = 0;
 	unsigned int type;
+	gnutls_x509_crt_t crt, ca;
+	gnutls_certificate_credentials_t sc;
 	int ret;
 
 	cert_list = gnutls_certificate_get_peers(session, &cert_list_size);
@@ -944,76 +946,71 @@ dane_verify_session_crt(dane_state_t s,
 	type = gnutls_certificate_type_get(session);
 
 	/* this list may be incomplete, try to get the self-signed CA if any */
-	if (cert_list_size > 0) {
-		gnutls_x509_crt_t crt, ca;
-		gnutls_certificate_credentials_t sc;
-
-		ret = gnutls_x509_crt_init(&crt);
-		if (ret < 0) {
-			gnutls_assert();
-			goto failsafe;
-		}
-
-		ret = gnutls_x509_crt_import(crt, &cert_list[cert_list_size-1], GNUTLS_X509_FMT_DER);
-		if (ret < 0) {
-			gnutls_assert();
-			gnutls_x509_crt_deinit(crt);
-			goto failsafe;
-		}
-
-		/* if it is already self signed continue normally */
-		ret = gnutls_x509_crt_check_issuer(crt, crt);
-		if (ret != 0) {
-			gnutls_assert();
-			gnutls_x509_crt_deinit(crt);
-			goto failsafe;
-		}
-
-		/* chain does not finish in a self signed cert, try to obtain the issuer */
-		ret = gnutls_credentials_get(session, GNUTLS_CRD_CERTIFICATE, (void**)&sc);
-		if (ret < 0) {
-			gnutls_assert();
-			gnutls_x509_crt_deinit(crt);
-			goto failsafe;
-		}
-
-		ret = gnutls_certificate_get_issuer(sc, crt, &ca, 0);
-		if (ret < 0) {
-			gnutls_assert();
-			gnutls_x509_crt_deinit(crt);
-			goto failsafe;
-		}
-
-		/* make the new list */
-		gnutls_datum_t *new_cert_list;
-
-		new_cert_list = gnutls_malloc((cert_list_size + 1) * sizeof(gnutls_datum_t));
-		if (new_cert_list == NULL) {
-			gnutls_assert();
-			gnutls_x509_crt_deinit(crt);
-			goto failsafe;
-		}
-
-		memcpy(new_cert_list, cert_list, cert_list_size*sizeof(gnutls_datum_t));
-
-		ret = gnutls_x509_crt_export2(ca, GNUTLS_X509_FMT_DER, &new_cert_list[cert_list_size]);
-		if (ret < 0) {
-			gnutls_assert();
-			free(new_cert_list);
-			gnutls_x509_crt_deinit(crt);
-			goto failsafe;
-		}
-
-		ret = dane_verify_crt(s, new_cert_list, cert_list_size+1, type,
-			       hostname, proto, port, sflags, vflags,
-			       verify);
-		if (ret < 0) {
-			gnutls_assert();
-		}
-		gnutls_free(new_cert_list[cert_list_size].data);
-		free(new_cert_list);
-		return ret;
+	ret = gnutls_x509_crt_init(&crt);
+	if (ret < 0) {
+		gnutls_assert();
+		goto failsafe;
 	}
+
+	ret = gnutls_x509_crt_import(crt, &cert_list[cert_list_size-1], GNUTLS_X509_FMT_DER);
+	if (ret < 0) {
+		gnutls_assert();
+		gnutls_x509_crt_deinit(crt);
+		goto failsafe;
+	}
+
+	/* if it is already self signed continue normally */
+	ret = gnutls_x509_crt_check_issuer(crt, crt);
+	if (ret != 0) {
+		gnutls_assert();
+		gnutls_x509_crt_deinit(crt);
+		goto failsafe;
+	}
+
+	/* chain does not finish in a self signed cert, try to obtain the issuer */
+	ret = gnutls_credentials_get(session, GNUTLS_CRD_CERTIFICATE, (void**)&sc);
+	if (ret < 0) {
+		gnutls_assert();
+		gnutls_x509_crt_deinit(crt);
+		goto failsafe;
+	}
+
+	ret = gnutls_certificate_get_issuer(sc, crt, &ca, 0);
+	if (ret < 0) {
+		gnutls_assert();
+		gnutls_x509_crt_deinit(crt);
+		goto failsafe;
+	}
+
+	/* make the new list */
+	gnutls_datum_t *new_cert_list;
+
+	new_cert_list = gnutls_malloc((cert_list_size + 1) * sizeof(gnutls_datum_t));
+	if (new_cert_list == NULL) {
+		gnutls_assert();
+		gnutls_x509_crt_deinit(crt);
+		goto failsafe;
+	}
+
+	memcpy(new_cert_list, cert_list, cert_list_size*sizeof(gnutls_datum_t));
+
+	ret = gnutls_x509_crt_export2(ca, GNUTLS_X509_FMT_DER, &new_cert_list[cert_list_size]);
+	if (ret < 0) {
+		gnutls_assert();
+		free(new_cert_list);
+		gnutls_x509_crt_deinit(crt);
+		goto failsafe;
+	}
+
+	ret = dane_verify_crt(s, new_cert_list, cert_list_size+1, type,
+			      hostname, proto, port, sflags, vflags,
+			      verify);
+	if (ret < 0) {
+		gnutls_assert();
+	}
+	gnutls_free(new_cert_list[cert_list_size].data);
+	free(new_cert_list);
+	return ret;
 
  failsafe:
 	return dane_verify_crt(s, cert_list, cert_list_size, type,

@@ -947,8 +947,9 @@ int gnutls_x509_ext_import_authority_key_id(const gnutls_datum_t * ext,
 			break;
 	}
 
+	assert(ret < 0);
 	aki->cert_issuer.size = i;
-	if (ret < 0 && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
+	if (ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
 	    && ret != GNUTLS_E_ASN1_ELEMENT_NOT_FOUND) {
 		gnutls_assert();
 		gnutls_free(san.data);
@@ -2864,8 +2865,9 @@ static int parse_aia(asn1_node c2, gnutls_x509_aia_t aia)
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 		}
 	}
-	
-	if (ret < 0 && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+
+	assert(ret < 0);
+	if (ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
 		return ret;
 	}
 

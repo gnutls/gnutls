@@ -790,7 +790,8 @@ gnutls_ext_register(const char *name, int id, gnutls_ext_parse_type_t parse_poin
 			gid = extfunc[i]->gid + 1;
 	}
 
-	if (gid > GNUTLS_EXTENSION_MAX_VALUE || gid >= sizeof(extfunc)/sizeof(extfunc[0]))
+	assert(gid < sizeof(extfunc)/sizeof(extfunc[0]));
+	if (gid > GNUTLS_EXTENSION_MAX_VALUE)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
 	tmp_mod = gnutls_calloc(1, sizeof(*tmp_mod));
