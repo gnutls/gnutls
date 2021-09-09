@@ -70,7 +70,8 @@ static int _gnutls_server_cert_type_recv_params(gnutls_session_t session,
 {
 	int ret;
 	gnutls_certificate_type_t cert_type;
-	uint8_t i, found = 0;
+	size_t i;
+	bool found = false;
 	const uint8_t* pdata = data;
 
 	/* Only activate this extension if we have cert credentials set
@@ -120,7 +121,7 @@ static int _gnutls_server_cert_type_recv_params(gnutls_session_t session,
 		// Check whether what we got back is actually offered by us
 		for (i = 0; i < sent_cert_types.size; i++) {
 			if (IANA2cert_type(sent_cert_types.data[i]) == cert_type)
-				found = 1;
+				found = true;
 		}
 
 		if (found) {
@@ -173,7 +174,7 @@ static int _gnutls_server_cert_type_recv_params(gnutls_session_t session,
 
 			// Check for support of this cert type
 			if (_gnutls_session_is_cert_type_supported(session, cert_type, true, GNUTLS_CTYPE_SERVER) == 0) {
-				found = 1;
+				found = true;
 				break;
 			}
 		}
@@ -209,7 +210,7 @@ static int _gnutls_server_cert_type_send_params(gnutls_session_t session,
 
 	if (!IS_SERVER(session)) {	// Client mode
 		uint8_t cert_types[GNUTLS_CRT_MAX]; // The list with supported (IANA) cert types. Inv: 0 <= cert type Id < 256
-		uint8_t i = 0, num_cert_types = 0;
+		size_t i, num_cert_types = 0;
 		priority_st* cert_priorities;
 		gnutls_datum_t tmp_cert_types; // For type conversion
 
