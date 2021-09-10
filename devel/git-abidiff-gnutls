@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# This is a diff driver that works on the .abi files during GnuTLS
+# development.  To use, copy this file to ~/.local/bin and issue the
+# following command to update your git configuration:
+#
+#   git config diff.abi.command ~/.local/bin/git-abidiff-gnutls
+
+top_srcdir=$(git rev-parse --show-toplevel)
+bold=$(tput bold)
+normal=$(tput sgr0)
+
+echo "${bold}$1${normal}"
+abidiff --suppressions "$top_srcdir/devel/libgnutls.abignore" \
+	--hd2 "$top_srcdir/lib/includes/gnutls/" \
+	"$2" "$5" || :

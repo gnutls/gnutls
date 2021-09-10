@@ -1,0 +1,2 @@
+# See devel/git-abidiff-gnutls for making this useful.
+devel/*.abi diff=abi
