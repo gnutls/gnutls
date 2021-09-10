@@ -96,6 +96,7 @@ oss-fuzz:
 	-c "$${fuzzer}.c" -o "$${fuzzer}.o" ; \
 	$$CXX $$CXXFLAGS "$${fuzzer}.o" -o "$${fuzzer}" \
 	../lib/.libs/libgnutls.a $${LIB_FUZZING_ENGINE} \
+	-Wl,-z,muldefs \
 	-Wl,-Bstatic \
 	$${XLIBS} \
 	-Wl,-Bdynamic || exit $?; \
