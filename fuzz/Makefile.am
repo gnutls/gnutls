@@ -95,7 +95,7 @@ oss-fuzz:
 	$$CC $$CFLAGS -I$(top_srcdir)/lib/includes/ -I$(top_srcdir) \
 	-c "$${fuzzer}.c" -o "$${fuzzer}.o" ; \
 	$$CXX $$CXXFLAGS "$${fuzzer}.o" -o "$${fuzzer}" \
-	../lib/.libs/libgnutls.a $${LIB_FUZZING_ENGINE} \
+	$$LDFLAGS ../lib/.libs/libgnutls.a $${LIB_FUZZING_ENGINE} \
 	-Wl,-z,muldefs \
 	-Wl,-Bstatic \
 	$${XLIBS} \
