@@ -88,7 +88,7 @@ void doit(void)
 			if (gnutls_pk_get_id
 			    (gnutls_pk_algorithm_get_name(algs[i]))
 			    != algs[i])
-				fail("gnutls_pk id's doesn't match\n");
+				fail("gnutls_pk id doesn't match\n");
 		}
 
 		pk = gnutls_pk_get_id("foo");
@@ -109,6 +109,8 @@ void doit(void)
 			fail("gnutls_sign_list return NULL\n");
 
 		for (i = 0; algs[i]; i++) {
+			gnutls_digest_algorithm_t hash;
+
 			if (debug)
 				printf("sign_list[%d] = %d = %s = %d\n",
 					(int) i, algs[i],
@@ -120,7 +122,17 @@ void doit(void)
 			if (gnutls_sign_get_id
 			    (gnutls_sign_algorithm_get_name(algs[i])) !=
 			    algs[i])
-				fail("gnutls_sign id's doesn't match\n");
+				fail("gnutls_sign id for %s doesn't match\n",
+				     gnutls_sign_algorithm_get_name(algs[i]));
+
+			hash = gnutls_sign_get_hash_algorithm(algs[i]);
+			if (hash != GNUTLS_DIG_UNKNOWN) {
+				const char *name = gnutls_digest_get_name(hash);
+				if (gnutls_digest_get_id(name) != hash)
+					fail("gnutls_digest id for %s doesn't match %s\n",
+					     gnutls_sign_algorithm_get_name(algs[i]),
+					     name);
+			}
 		}
 
 		pk = gnutls_sign_get_id("foo");
