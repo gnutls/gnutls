@@ -473,6 +473,10 @@ int _gnutls13_unpack_session_ticket(gnutls_session_t session,
 	if (unlikely(data == NULL || ticket_data == NULL))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
+	if (!session->key.stek_initialized) {
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
+
 	/* Check MAC and decrypt ticket */
 	ret = _gnutls_decrypt_session_ticket(session, data, &decrypted);
 	if (ret < 0)

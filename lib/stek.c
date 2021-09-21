@@ -207,6 +207,10 @@ int _gnutls_get_session_ticket_encryption_key(gnutls_session_t session,
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
+	if (!session->key.stek_initialized) {
+		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+	}
+
 	if ((retval = rotate(session)) < 0)
 		return gnutls_assert_val(retval);
 
@@ -258,6 +262,10 @@ int _gnutls_get_session_ticket_decryption_key(gnutls_session_t session,
 
 	if (ticket_data->size < TICKET_KEY_NAME_SIZE)
 		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+
+	if (!session->key.stek_initialized) {
+		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+	}
 
 	if ((retval = rotate(session)) < 0)
 		return gnutls_assert_val(retval);
@@ -333,6 +341,7 @@ int _gnutls_initialize_session_ticket_key_rotation(gnutls_session_t session, con
 				    TICKET_MASTER_KEY_SIZE);
 	memcpy(session->key.initial_stek, key->data, key->size);
 
+	session->key.stek_initialized = true;
 	session->key.totp.was_rotated = 0;
 	return 0;
 }

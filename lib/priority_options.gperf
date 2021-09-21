@@ -9,6 +9,7 @@ COMPAT, enable_compat
 DUMBFW, enable_dumbfw
 NO_EXTENSIONS, enable_no_extensions
 NO_TICKETS, enable_no_tickets
+NO_TICKETS_TLS12, enable_no_tickets_tls12
 NO_ETM, enable_no_etm
 FORCE_ETM, enable_force_etm
 NO_SESSION_HASH, enable_no_ext_master_secret

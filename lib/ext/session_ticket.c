@@ -20,6 +20,12 @@
  *
  */
 
+/* This file implements the TLS session ticket extension.
+ *
+ * Note that the extension is only used in TLS 1.2.  For TLS 1.3, session
+ * tickets are sent as part of pre_shared_key extension (see pre_shared_key.c).
+ */
+
 #include "gnutls_int.h"
 #include "errors.h"
 #include <fips.h>
@@ -189,9 +195,6 @@ _gnutls_decrypt_session_ticket(gnutls_session_t session,
 	uint8_t cmac[TICKET_MAC_SIZE];
 	struct ticket_st ticket;
 	int ret;
-
-	/* callers must have that checked */
-	assert(!(session->internals.flags & GNUTLS_NO_TICKETS));
 
 	/* Retrieve ticket decryption keys */
 	if (_gnutls_get_session_ticket_decryption_key(session,
@@ -385,7 +388,7 @@ session_ticket_recv_params(gnutls_session_t session,
 	gnutls_datum_t state;
 	int ret;
 
-	if (session->internals.flags & GNUTLS_NO_TICKETS)
+	if (session->internals.flags & (GNUTLS_NO_TICKETS | GNUTLS_NO_TICKETS_TLS12))
 		return 0;
 
 	if (session->security_parameters.entity == GNUTLS_SERVER) {
@@ -429,7 +432,7 @@ session_ticket_send_params(gnutls_session_t session,
 	gnutls_ext_priv_data_t epriv;
 	int ret;
 
-	if (session->internals.flags & GNUTLS_NO_TICKETS)
+	if (session->internals.flags & (GNUTLS_NO_TICKETS | GNUTLS_NO_TICKETS_TLS12))
 		return 0;
 
 	if (session->security_parameters.entity == GNUTLS_SERVER) {
@@ -635,10 +638,16 @@ int _gnutls_send_new_session_ticket(gnutls_session_t session, int again)
 	gnutls_datum_t ticket_data;
 
 	if (again == 0) {
-		if (session->internals.flags & GNUTLS_NO_TICKETS)
+		if (session->internals.flags & (GNUTLS_NO_TICKETS |
+						GNUTLS_NO_TICKETS_TLS12)) {
 			return 0;
-		if (!session->internals.session_ticket_renew)
+		}
+		if (!session->key.stek_initialized) {
 			return 0;
+		}
+		if (!session->internals.session_ticket_renew) {
+			return 0;
+		}
 
 		_gnutls_handshake_log
 		    ("HSK[%p]: sending session ticket\n", session);
@@ -733,7 +742,8 @@ int _gnutls_recv_new_session_ticket(gnutls_session_t session)
 	session_ticket_ext_st *priv = NULL;
 	gnutls_ext_priv_data_t epriv;
 
-	if (session->internals.flags & GNUTLS_NO_TICKETS)
+	if (session->internals.flags & (GNUTLS_NO_TICKETS |
+					GNUTLS_NO_TICKETS_TLS12))
 		return 0;
 	if (!session->internals.session_ticket_renew)
 		return 0;

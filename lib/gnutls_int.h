@@ -584,6 +584,10 @@ struct gnutls_key_st {
 		/* Initial key supplied by the caller */
 		initial_stek[TICKET_MASTER_KEY_SIZE];
 
+	/* Whether the initial_stek is set through
+	 * gnutls_session_ticket_enable_server() */
+	bool stek_initialized;
+
 	/* this is used to hold the peers authentication data
 	 */
 	/* auth_info_t structures SHOULD NOT contain malloced
@@ -954,6 +958,7 @@ struct gnutls_priority_st {
 	bool server_precedence;
 	bool allow_server_key_usage_violation; /* for test suite purposes only */
 	bool no_tickets;
+	bool no_tickets_tls12;
 	bool have_cbc;
 	bool have_psk;
 	bool force_etm;
