@@ -320,6 +320,11 @@ const version_entry_st *_gnutls_version_max(gnutls_session_t session)
 	gnutls_protocol_t cur_prot;
 	const version_entry_st *p, *max = NULL;
 
+	if (!session->internals.priorities) {
+		gnutls_assert();
+		return NULL;
+	}
+
 	for (i = 0; i < session->internals.priorities->protocol.num_priorities;
 	     i++) {
 		cur_prot =
