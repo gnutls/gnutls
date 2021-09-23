@@ -1031,7 +1031,7 @@ int _gnutls_params_get_ecc_raw(const gnutls_pk_params_st* params,
 
 	e = _gnutls_ecc_curve_get_params(params->curve);
 
-	if (_curve_is_eddsa(e)) {
+	if (_curve_is_eddsa(e) || _curve_is_modern_ecdh(e)) {
 		if (x) {
 			ret = _gnutls_set_datum(x, params->raw_pub.data, params->raw_pub.size);
 			if (ret < 0) {
@@ -1216,6 +1216,8 @@ pk_prepare_hash(gnutls_pk_algorithm_t pk,
 	case GNUTLS_PK_ECDSA:
 	case GNUTLS_PK_EDDSA_ED25519:
 	case GNUTLS_PK_EDDSA_ED448:
+	case GNUTLS_PK_ECDH_X25519:
+	case GNUTLS_PK_ECDH_X448:
 	case GNUTLS_PK_GOST_01:
 	case GNUTLS_PK_GOST_12_256:
 	case GNUTLS_PK_GOST_12_512:

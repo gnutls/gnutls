@@ -475,10 +475,26 @@ inline static int _curve_is_eddsa(const gnutls_ecc_curve_entry_st * e)
 	return 0;
 }
 
+inline static int _curve_is_modern_ecdh(const gnutls_ecc_curve_entry_st * e)
+{
+	if (unlikely(e == NULL))
+		return 0;
+	if (e->pk == GNUTLS_PK_ECDH_X25519 ||
+	    e->pk == GNUTLS_PK_ECDH_X448)
+		return 1;
+	return 0;
+}
+
 inline static int curve_is_eddsa(gnutls_ecc_curve_t id)
 {
 	const gnutls_ecc_curve_entry_st *e = _gnutls_ecc_curve_get_params(id);
 	return _curve_is_eddsa(e);
+}
+
+inline static int curve_is_modern_ecdh(gnutls_ecc_curve_t id)
+{
+	const gnutls_ecc_curve_entry_st *e = _gnutls_ecc_curve_get_params(id);
+	return _curve_is_modern_ecdh(e);
 }
 
 static inline int _gnutls_kx_is_ecc(gnutls_kx_algorithm_t kx)

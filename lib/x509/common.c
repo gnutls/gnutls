@@ -630,7 +630,8 @@ _gnutls_x509_decode_string(unsigned int etype,
 	if (td.data == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-	memcpy(td.data, str, str_size);
+        if (str_size > 0)
+                memcpy(td.data, str, str_size);
 	td.data[str_size] = 0;
 
 	if (allow_ber)

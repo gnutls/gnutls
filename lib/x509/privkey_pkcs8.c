@@ -69,6 +69,8 @@ _encode_privkey(gnutls_x509_privkey_t pkey, gnutls_datum_t * raw)
 	switch (pkey->params.algo) {
 	case GNUTLS_PK_EDDSA_ED25519:
 	case GNUTLS_PK_EDDSA_ED448:
+	case GNUTLS_PK_ECDH_X25519:
+	case GNUTLS_PK_ECDH_X448:
 		/* we encode as octet string (which is going to be stored inside
 		 * another octet string). No comments. */
 		ret = _gnutls_x509_encode_string(ASN1_ETYPE_OCTET_STRING,
@@ -1136,6 +1138,56 @@ _decode_pkcs8_eddsa_key(asn1_node pkcs8_asn, gnutls_x509_privkey_t pkey, const c
 	}
 }
 
+static int
+_decode_pkcs8_modern_ecdh_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey, const char *oid)
+{
+	int ret;
+	gnutls_datum_t tmp;
+	gnutls_ecc_curve_t curve = GNUTLS_ECC_CURVE_INVALID;
+	const gnutls_ecc_curve_entry_st *ce;
+
+	gnutls_pk_params_init(&pkey->params);
+
+	curve = gnutls_oid_to_ecc_curve(oid);
+	if (curve == GNUTLS_ECC_CURVE_INVALID) {
+		_gnutls_debug_log("PKCS#8: unknown curve OID %s\n", oid);
+		return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+	}
+
+	ce = _gnutls_ecc_curve_get_params(curve);
+	if (_curve_is_modern_ecdh(ce)) {
+		ret = _gnutls_x509_read_string(pkcs8_asn, "privateKey", &tmp, ASN1_ETYPE_OCTET_STRING, 1);
+		if (ret < 0) {
+			gnutls_assert();
+			return gnutls_assert_val(ret);
+		}
+
+		if (tmp.size != ce->size) {
+			gnutls_free(tmp.data);
+			return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+		}
+		gnutls_free(pkey->params.raw_priv.data);
+		switch (curve) {
+		case GNUTLS_ECC_CURVE_X25519:
+			pkey->params.algo = GNUTLS_PK_ECDH_X25519;
+			break;
+		case GNUTLS_ECC_CURVE_X448:
+			pkey->params.algo = GNUTLS_PK_ECDH_X448;
+			break;
+		default:
+			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+		}
+		pkey->params.raw_priv.data = tmp.data;
+		pkey->params.raw_priv.size = tmp.size;
+		pkey->params.curve = curve;
+
+		tmp.data = NULL;
+		return 0;
+	} else {
+		return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+	}
+}
+
 /* Converts a GOST key to
  * an internal structure (gnutls_private_key)
  */
@@ -1460,6 +1512,10 @@ decode_private_key_info(const gnutls_datum_t * der,
 		case GNUTLS_PK_EDDSA_ED25519:
 		case GNUTLS_PK_EDDSA_ED448:
 			result = _decode_pkcs8_eddsa_key(pkcs8_asn, pkey, oid);
+			break;
+		case GNUTLS_PK_ECDH_X25519:
+		case GNUTLS_PK_ECDH_X448:
+			result = _decode_pkcs8_modern_ecdh_key(pkcs8_asn, pkey, oid);
 			break;
 		case GNUTLS_PK_GOST_01:
 		case GNUTLS_PK_GOST_12_256:
