@@ -29,7 +29,7 @@
 #include <sys/time.h>
 
 #ifdef _WIN32
-# if defined(__MINGW32__) && !defined(__MINGW64__) && __MINGW32_MAJOR_VERSION <= 3 && __MINGW32_MINOR_VERSION <= 20
+# if defined(__MINGW32__) && !defined(__MINGW64_VERSION_MAJOR) && __MINGW32_MAJOR_VERSION <= 3 && __MINGW32_MINOR_VERSION <= 20
 #  define NEED_CERT_ENUM_CRLS
 typedef PCCRL_CONTEXT WINAPI(*CertEnumCRLsInStoreFunc) (HCERTSTORE
 							 hCertStore,
