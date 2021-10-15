@@ -3,7 +3,13 @@
 
 #include "gnutls_int.h"
 
-int _gnutls_ktls_enable(gnutls_session_t session, int sockin, int sockout);
+enum{
+	KTLS_RECV = 1,
+	KTLS_SEND,
+	KTLS_DUPLEX,
+};
+
+int _gnutls_ktls_enable(gnutls_session_t session);
 int _gnutls_ktls_set_keys(gnutls_session_t session);
 int _gnutls_ktls_send_control_msg(gnutls_session_t session, unsigned char record_type,
 		const void *data, size_t data_size);

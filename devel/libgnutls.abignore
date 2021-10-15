@@ -102,3 +102,6 @@ name = gnutls_x509_ct_sct_get_version
 
 [suppress_function]
 name = gnutls_x509_ct_sct_get
+
+[suppress_function]
+name = gnutls_transport_is_ktls_enabled

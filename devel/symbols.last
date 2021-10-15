@@ -881,6 +881,7 @@ gnutls_transport_get_int2@GNUTLS_3_4
 gnutls_transport_get_int@GNUTLS_3_4
 gnutls_transport_get_ptr2@GNUTLS_3_4
 gnutls_transport_get_ptr@GNUTLS_3_4
+gnutls_transport_is_ktls_enabled@GNUTLS_3_7_3
 gnutls_transport_set_errno@GNUTLS_3_4
 gnutls_transport_set_errno_function@GNUTLS_3_4
 gnutls_transport_set_fastopen@GNUTLS_3_4

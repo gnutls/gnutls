@@ -2811,10 +2811,8 @@ int gnutls_handshake(gnutls_session_t session)
 	int ret;
 
 #ifdef ENABLE_KTLS
-	int sockin, sockout;
-	gnutls_transport_get_int2(session, &sockin, &sockout);
-	_gnutls_ktls_enable(session, sockin, sockout);	
-#endif 
+	_gnutls_ktls_enable(session);
+#endif
 
 	if (unlikely(session->internals.initial_negotiation_completed)) {
 		if (vers->tls13_sem) {
@@ -2912,10 +2910,8 @@ int gnutls_handshake(gnutls_session_t session)
 	}
 
 #ifdef ENABLE_KTLS
-	if (IS_KTLS_ENABLED(session)) {
-		ret = _gnutls_ktls_set_keys(session);
-		if (ret < 0)
-			return ret;
+	if (IS_KTLS_ENABLED(session, KTLS_DUPLEX)) {
+		_gnutls_ktls_set_keys(session);
 	}
 #endif
 
