@@ -43,6 +43,8 @@ void gnutls_transport_set_fastopen(gnutls_session_t session,
                                    socklen_t connect_addrlen,
                                    unsigned int flags);
 
+int gnutls_transport_is_ktls_enabled(gnutls_session_t session);
+
 /* *INDENT-OFF* */
 #ifdef __cplusplus
 }

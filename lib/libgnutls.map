@@ -1363,6 +1363,7 @@ GNUTLS_3_7_3
 	gnutls_sign_set_secure_for_certs;
 	gnutls_digest_set_secure;
 	gnutls_protocol_set_enabled;
+	gnutls_transport_is_ktls_enabled;
  local:
 	*;
 } GNUTLS_3_7_2;

@@ -43,7 +43,7 @@ static void client_log_func(int level, const char *str)
 }
 
 #define MAX_BUF 1024
-#define MSG "Hello world!"
+#define MSG "Hello world!\0"
 
 
 static void client(int fd, const char *prio)
@@ -63,12 +63,13 @@ static void client(int fd, const char *prio)
 	gnutls_certificate_allocate_credentials(&x509_cred);
 
 	gnutls_init(&session, GNUTLS_CLIENT);
-	gnutls_handshake_set_timeout(session, get_timeout());
+	gnutls_handshake_set_timeout(session, 0);
+
 	assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);
+
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
+
 	gnutls_transport_set_int(session, fd);
-	if (ret < 0)
-		fail("client: error in enabling KTLS: %s\n", gnutls_strerror(ret));
 
 	do {
 		ret = gnutls_handshake(session);
@@ -77,28 +78,22 @@ static void client(int fd, const char *prio)
 
 	if (ret < 0) {
 		fail("client: Handshake failed\n");
-		close(fd);
-		gnutls_deinit(session);
-		exit(1);
+		goto end;
 	}
 	if (debug)
 		success("client: Handshake was completed\n");
 
+	ret = gnutls_transport_is_ktls_enabled(session);
+	if (ret != 3){
+		fail("client: KTLS was not properly inicialized\n");
+		goto end;
+	}
+
 	/* server send message via gnutls_record_send */
-	int i = 0;
 	do{
-		memset(buffer, 0, MAX_BUF + 1);
-		do{
-			ret = gnutls_record_recv(session, buffer, sizeof(buffer));
-		}
-		while(ret == GNUTLS_E_AGAIN);
-
-		if(strncmp(buffer, MSG+i*MAX_BUF, MAX_BUF))
-			fail("client: Message doesn't match\n");
-	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
-
-	if (debug)
-		success ("client: messages received\n");
+		ret = gnutls_record_recv(session, buffer, sizeof(buffer));
+	}
+	while(ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 	if (ret == 0) {
 			success
@@ -106,13 +101,24 @@ static void client(int fd, const char *prio)
 		goto end;
 	} else if (ret < 0) {
 		fail("client: Error: %s\n", gnutls_strerror(ret));
-		exit(1);
+		goto end;
 	}
+
+	if(strncmp(buffer, MSG, ret)){
+		fail("client: Message doesn't match\n");
+		goto end;
+	}
+
+	if (debug)
+		success ("client: messages received\n");
+
 
 	ret = gnutls_bye(session, GNUTLS_SHUT_RDWR);
 	if (ret < 0) {
 		fail("client: error in closing session: %s\n", gnutls_strerror(ret));
 	}
+
+	ret = 0;
  end:
 
 	close(fd);
@@ -122,11 +128,15 @@ static void client(int fd, const char *prio)
 	gnutls_certificate_free_credentials(x509_cred);
 
 	gnutls_global_deinit();
+
+	if (ret != 0)
+		exit(1);
 }
 
 pid_t child;
 static void terminate(void)
 {
+	assert(child);
 	kill(child, SIGTERM);
 	exit(1);
 }
@@ -152,7 +162,7 @@ static void server(int fd, const char *prio)
 		exit(1);
 
 	gnutls_init(&session, GNUTLS_SERVER);
-	gnutls_handshake_set_timeout(session, get_timeout());
+	gnutls_handshake_set_timeout(session, 0);
 
 	assert(gnutls_priority_set_direct(session, prio, NULL)>=0);
 
@@ -166,33 +176,34 @@ static void server(int fd, const char *prio)
 	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret < 0) {
-		close(fd);
-		gnutls_deinit(session);
 		fail("server: Handshake has failed (%s)\n\n",
 		     gnutls_strerror(ret));
-		terminate();
+		goto end;
 	}
 	if (debug)
 		success("server: Handshake was completed\n");
 
+	ret = gnutls_transport_is_ktls_enabled(session);
+	if (ret != 3){
+		fail("server: KTLS was not properly inicialized\n");
+		goto end;
+	}
 	do {
-		ret = gnutls_record_send(session, MSG, strlen(MSG));
+		ret = gnutls_record_send(session, MSG, strlen(MSG)+1);
 	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 	if (ret < 0) {
-		close(fd);
-		gnutls_deinit(session);
-		gnutls_certificate_free_credentials(x509_cred);
-		gnutls_global_deinit();
 		fail("server: data sending has failed (%s)\n\n",
 		     gnutls_strerror(ret));
-		terminate();
+			 goto end;
 	}
 
 	ret = gnutls_bye(session, GNUTLS_SHUT_RDWR);
 	if (ret < 0) {
 		fail("server: error in closing session: %s\n", gnutls_strerror(ret));
 
+	ret = 0;
+end:
 	close(fd);
 	gnutls_deinit(session);
 
@@ -200,9 +211,18 @@ static void server(int fd, const char *prio)
 
 	gnutls_global_deinit();
 
+	if (ret){
+		terminate();
+	}
+
 	if (debug)
 		success("server: finished\n");
 	}
+}
+
+static void ch_handler(int sig)
+{
+	return;
 }
 
 static void run(const char *prio)
@@ -215,7 +235,7 @@ static void run(const char *prio)
 
 	success("running ktls test with %s\n", prio);
 
-	signal(SIGCHLD, SIG_IGN);
+	signal(SIGCHLD, ch_handler);
 	signal(SIGPIPE, SIG_IGN);
 
 	listener = socket(AF_INET, SOCK_STREAM, 0);
@@ -246,6 +266,7 @@ static void run(const char *prio)
 	}
 
 	if (child) {
+		int status;
 		/* parent */
 		ret = listen(listener, 1);
 		if (ret == -1) {
@@ -257,7 +278,9 @@ static void run(const char *prio)
 			fail("error in accept(): %s\n", strerror(errno));
 		}
 		server(fd, prio);
-		kill(child, SIGTERM);
+
+		wait(&status);
+		check_wait_status(status);
 	} else {
 		fd = socket(AF_INET, SOCK_STREAM, 0);
 		if (fd == -1){
@@ -273,10 +296,10 @@ static void run(const char *prio)
 
 void doit(void)
 {
-	run("NORMAL:-VERS-ALL:+VERS-TLS1.2:+AES-128-GCM");
-	run("NORMAL:-VERS-ALL:+VERS-TLS1.2:+AES-256-GCM");
-	run("NORMAL:-VERS-ALL:+VERS-TLS1.3:+AES-128-GCM");
-	run("NORMAL:-VERS-ALL:+VERS-TLS1.3:+AES-256-GCM");
+	run("NORMAL:-VERS-ALL:+VERS-TLS1.2:-CIPHER-ALL:+AES-128-GCM");
+	run("NORMAL:-VERS-ALL:+VERS-TLS1.2:-CIPHER-ALL:+AES-256-GCM");
+	run("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM");
+	run("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-256-GCM");
 }
 
 #endif				/* _WIN32 */
