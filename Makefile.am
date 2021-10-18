@@ -79,7 +79,7 @@ pic-check:
 	false; \
 	fi
 
-ABIDW_COMMON = --no-show-locs --no-corpus-path
+ABIDW_COMMON = --drop-private-types --no-show-locs --no-corpus-path
 ABIGNORE_FILE = "$(top_srcdir)/devel/libgnutls.abignore"
 SYMBOLS_LAST_FILE = "$(top_srcdir)/devel/symbols.last"
 LIBGNUTLS_ABI_LAST_FILE = "$(top_srcdir)/devel/abi-dump/libgnutls-latest-$$(uname -m).abi"
