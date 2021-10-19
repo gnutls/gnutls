@@ -79,18 +79,18 @@ pic-check:
 	false; \
 	fi
 
-ABIDW_COMMON = --no-show-locs --no-corpus-path
+ABIDW_COMMON = --drop-private-types --no-show-locs --no-corpus-path
 ABIGNORE_FILE = "$(top_srcdir)/devel/libgnutls.abignore"
 SYMBOLS_LAST_FILE = "$(top_srcdir)/devel/symbols.last"
-LIBGNUTLS_ABI_LAST_FILE = "$(top_srcdir)/devel/libgnutls-latest-$$(uname -m).abi"
-LIBDANE_ABI_LAST_FILE = "$(top_srcdir)/devel/libdane-latest-$$(uname -m).abi"
+LIBGNUTLS_ABI_LAST_FILE = "$(top_srcdir)/devel/abi-dump/libgnutls-latest-$$(uname -m).abi"
+LIBDANE_ABI_LAST_FILE = "$(top_srcdir)/devel/abi-dump/libdane-latest-$$(uname -m).abi"
 
 abi-dump-versioned: lib/libgnutls.la libdane/libgnutls-dane.la
 	@echo "**************************************************************************"
 	@echo "Generating versioned ABI files of current gnutls and gnutls-dane libraries"
 	@echo "**************************************************************************"
-	@abidw lib/.libs/libgnutls.so $(ABIDW_COMMON) --suppressions $(ABIGNORE_FILE) --out-file "$(srcdir)/devel/libgnutls-$(VERSION)-$$(uname -m).abi"
-	@abidw libdane/.libs/libgnutls-dane.so $(ABIDW_COMMON) --out-file "$(srcdir)/devel/libdane-$(VERSION)-$$(uname -m).abi"
+	@abidw lib/.libs/libgnutls.so $(ABIDW_COMMON) --suppressions $(ABIGNORE_FILE) --out-file "$(srcdir)/devel/abi-dump/libgnutls-$(VERSION)-$$(uname -m).abi"
+	@abidw libdane/.libs/libgnutls-dane.so $(ABIDW_COMMON) --out-file "$(srcdir)/devel/abi-dump/libdane-$(VERSION)-$$(uname -m).abi"
 
 abi-dump-latest: lib/libgnutls.la libdane/libgnutls-dane.la
 	@echo "****************************************************************"
@@ -123,7 +123,7 @@ abi-check-latest: lib/libgnutls.la libdane/libgnutls-dane.la
 
 ABICHECK_COMMON = --no-added-syms
 abi-check: lib/libgnutls.la libdane/libgnutls-dane.la
-	@for file in $$(echo $(srcdir)/devel/libgnutls-*-$$(uname -m).abi);do \
+	@for file in $$(echo $(srcdir)/devel/abi-dump/libgnutls-*-$$(uname -m).abi);do \
 		echo "Comparing libgnutls with $$file"; \
 		abidiff $${file} lib/.libs/libgnutls.so $(ABICHECK_COMMON) --suppressions $(ABIGNORE_FILE) --hd2 "$(srcdir)/lib/includes/gnutls/" --hd2 $(builddir)/lib/includes/gnutls/; \
 		if test $$? != 0;then \
@@ -133,7 +133,7 @@ abi-check: lib/libgnutls.la libdane/libgnutls-dane.la
 			exit 1; \
 		fi; \
 	done
-	@for file in $$(echo $(srcdir)/devel/libdane-*-$$(uname -m).abi);do \
+	@for file in $$(echo $(srcdir)/devel/abi-dump/libdane-*-$$(uname -m).abi);do \
 		echo "Comparing libgnutls-dane with $$file"; \
 		abidiff $${file} libdane/.libs/libgnutls-dane.so $(ABICHECK_COMMON) --hd2 "$(srcdir)/libdane/includes/gnutls/" --hd2 $(builddir)/lib/includes/gnutls/; \
 		if test $$? != 0;then \

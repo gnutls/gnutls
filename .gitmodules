@@ -19,3 +19,6 @@
 [submodule "devel/libtasn1"]
 	path = devel/libtasn1
 	url = https://gitlab.com/gnutls/libtasn1.git
+[submodule "devel/abi-dump"]
+	path = devel/abi-dump
+	url = https://gitlab.com/gnutls/abi-dump.git
