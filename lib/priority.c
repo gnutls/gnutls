@@ -1539,6 +1539,7 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 	unsigned have_tls13 = 0, have_srp = 0;
 	unsigned have_pre_tls12 = 0, have_tls12 = 0;
 	unsigned have_psk = 0, have_null = 0, have_rsa_psk = 0;
+	gnutls_digest_algorithm_t prf_digest;
 
 	/* have_psk indicates that a PSK key exchange compatible
 	 * with TLS1.3 is enabled. */
@@ -1685,6 +1686,12 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 			if (ce == NULL)
 				continue;
 
+			prf_digest = MAC_TO_DIG(ce->prf);
+			if (prf_digest == GNUTLS_DIG_UNKNOWN)
+				continue;
+			if (_gnutls_digest_is_insecure(prf_digest))
+				continue;
+
 			if (priority_cache->cs.size < MAX_CIPHERSUITE_SIZE)
 				priority_cache->cs.entry[priority_cache->cs.size++] = ce;
 		}
@@ -1698,6 +1705,12 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 					priority_cache->_cipher.priorities[j],
 					priority_cache->_mac.priorities[z]);
 				if (ce == NULL)
+					continue;
+
+				prf_digest = MAC_TO_DIG(ce->prf);
+				if (prf_digest == GNUTLS_DIG_UNKNOWN)
+					continue;
+				if (_gnutls_digest_is_insecure(prf_digest))
 					continue;
 
 				if (priority_cache->cs.size == MAX_CIPHERSUITE_SIZE)
