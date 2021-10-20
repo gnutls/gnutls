@@ -1682,10 +1682,11 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 			ce = cipher_suite_get(
 				0, priority_cache->_cipher.priorities[j],
 				priority_cache->_mac.priorities[z]);
+			if (ce == NULL)
+				continue;
 
-			if (ce != NULL && priority_cache->cs.size < MAX_CIPHERSUITE_SIZE) {
+			if (priority_cache->cs.size < MAX_CIPHERSUITE_SIZE)
 				priority_cache->cs.entry[priority_cache->cs.size++] = ce;
-			}
 		}
 	}
 
@@ -1696,18 +1697,20 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 					priority_cache->_kx.priorities[i],
 					priority_cache->_cipher.priorities[j],
 					priority_cache->_mac.priorities[z]);
+				if (ce == NULL)
+					continue;
 
-				if (ce != NULL && priority_cache->cs.size < MAX_CIPHERSUITE_SIZE) {
-					priority_cache->cs.entry[priority_cache->cs.size++] = ce;
-					if (!have_ec && (_gnutls_kx_is_ecc(ce->kx_algorithm) ||
-							 _gnutls_kx_is_vko_gost(ce->kx_algorithm))) {
-						have_ec = 1;
-						add_ec(priority_cache);
-					}
-					if (!have_dh && _gnutls_kx_is_dhe(ce->kx_algorithm)) {
-						have_dh = 1;
-						add_dh(priority_cache);
-					}
+				if (priority_cache->cs.size == MAX_CIPHERSUITE_SIZE)
+					continue;
+				priority_cache->cs.entry[priority_cache->cs.size++] = ce;
+				if (!have_ec && (_gnutls_kx_is_ecc(ce->kx_algorithm) ||
+						 _gnutls_kx_is_vko_gost(ce->kx_algorithm))) {
+					have_ec = 1;
+					add_ec(priority_cache);
+				}
+				if (!have_dh && _gnutls_kx_is_dhe(ce->kx_algorithm)) {
+					have_dh = 1;
+					add_dh(priority_cache);
 				}
 			}
 		}
