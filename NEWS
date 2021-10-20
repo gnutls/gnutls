@@ -9,6 +9,9 @@ See the end for copying conditions.
 
 ** certtool: Certtool can now generate, manipulate, and evaluate x25519 and
    x448 public keys, private keys, and certificates.
+** libgnutls: disabling a hashing algorithm through "insecure-hash"
+   configuration directive now also disables TLS ciphersuites that use it
+   as a PRF algorithm.
 
 ** API and ABI modifications:
 GNUTLS_PRIVKEY_FLAG_RSA_PSS_FIXED_SALT_LENGTH: new flag in gnutls_privkey_flags_t
