@@ -1220,6 +1220,7 @@ AC_MSG_NOTICE([External hardware support:
   Random gen. variant:  $rnd_variant
   PKCS#11 support:      $with_p11_kit
   TPM support:          $with_tpm
+  KTLS support:         $enable_ktls
 ])
 if test -n "$ac_trousers_lib";then
 AC_MSG_NOTICE([

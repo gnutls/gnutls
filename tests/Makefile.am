@@ -437,6 +437,10 @@ ctests += x509self x509dn anonself pskself pskself2 dhepskself	\
 	resume-with-record-size-limit
 endif
 
+if ENABLE_KTLS
+ctests += gnutls_ktls
+endif
+
 gc_CPPFLAGS = $(AM_CPPFLAGS) \
 	-I$(top_srcdir)/gl	\
 	-I$(top_builddir)/gl

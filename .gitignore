@@ -923,6 +923,7 @@ tests/x509sign-verify-gost
 tests/x509sign-verify-rsa
 tests/x509sign-verify2
 tests/x509signself
+tests/gnutls_ktls
 *.tmp
 tmp-*
 *.trs
