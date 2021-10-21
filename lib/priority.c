@@ -1539,6 +1539,7 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 	unsigned have_tls13 = 0, have_srp = 0;
 	unsigned have_pre_tls12 = 0, have_tls12 = 0;
 	unsigned have_psk = 0, have_null = 0, have_rsa_psk = 0;
+	gnutls_digest_algorithm_t prf_digest;
 
 	/* have_psk indicates that a PSK key exchange compatible
 	 * with TLS1.3 is enabled. */
@@ -1682,10 +1683,17 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 			ce = cipher_suite_get(
 				0, priority_cache->_cipher.priorities[j],
 				priority_cache->_mac.priorities[z]);
+			if (ce == NULL)
+				continue;
 
-			if (ce != NULL && priority_cache->cs.size < MAX_CIPHERSUITE_SIZE) {
+			prf_digest = MAC_TO_DIG(ce->prf);
+			if (prf_digest == GNUTLS_DIG_UNKNOWN)
+				continue;
+			if (_gnutls_digest_is_insecure(prf_digest))
+				continue;
+
+			if (priority_cache->cs.size < MAX_CIPHERSUITE_SIZE)
 				priority_cache->cs.entry[priority_cache->cs.size++] = ce;
-			}
 		}
 	}
 
@@ -1696,18 +1704,26 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 					priority_cache->_kx.priorities[i],
 					priority_cache->_cipher.priorities[j],
 					priority_cache->_mac.priorities[z]);
+				if (ce == NULL)
+					continue;
 
-				if (ce != NULL && priority_cache->cs.size < MAX_CIPHERSUITE_SIZE) {
-					priority_cache->cs.entry[priority_cache->cs.size++] = ce;
-					if (!have_ec && (_gnutls_kx_is_ecc(ce->kx_algorithm) ||
-							 _gnutls_kx_is_vko_gost(ce->kx_algorithm))) {
-						have_ec = 1;
-						add_ec(priority_cache);
-					}
-					if (!have_dh && _gnutls_kx_is_dhe(ce->kx_algorithm)) {
-						have_dh = 1;
-						add_dh(priority_cache);
-					}
+				prf_digest = MAC_TO_DIG(ce->prf);
+				if (prf_digest == GNUTLS_DIG_UNKNOWN)
+					continue;
+				if (_gnutls_digest_is_insecure(prf_digest))
+					continue;
+
+				if (priority_cache->cs.size == MAX_CIPHERSUITE_SIZE)
+					continue;
+				priority_cache->cs.entry[priority_cache->cs.size++] = ce;
+				if (!have_ec && (_gnutls_kx_is_ecc(ce->kx_algorithm) ||
+						 _gnutls_kx_is_vko_gost(ce->kx_algorithm))) {
+					have_ec = 1;
+					add_ec(priority_cache);
+				}
+				if (!have_dh && _gnutls_kx_is_dhe(ce->kx_algorithm)) {
+					have_dh = 1;
+					add_dh(priority_cache);
 				}
 			}
 		}
