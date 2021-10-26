@@ -157,8 +157,13 @@ As such, some questions to answer before adding a new API:
    13.0 is made available? Would it harm the addition of a new protocol?
 
 
-The make rule 'abi-check' verifies that the ABI remained compatible since
-the last tagged release. It relies on the git tree and libabigail.
+The make rule 'abi-check' verifies that the ABI remained compatible
+since the last tagged release, which is maintained in a separate
+[abi-dump](https://gitlab.com/gnutls/abi-dump) repository. During
+development, the new APIs should be explicitly ignored with the last
+section of [devel/libgnutls.abignore](devel/libgnutls.abignore). When
+a new version is released and the abi-dump repository is updated, the
+section will be cleared.
 
 The above do not apply to the C++ library; this library's ABI should not
 be considered stable.
