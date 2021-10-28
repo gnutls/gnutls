@@ -39,6 +39,7 @@
 #include "profiles.h"
 #include "c-strcase.h"
 #include "inih/ini.h"
+#include "locks.h"
 #include "profiles.h"
 #include "name_val_array.h"
 
@@ -1000,6 +1001,8 @@ static void dummy_func(gnutls_priority_t c)
 #include <priority_options.h>
 
 static gnutls_certificate_verification_profiles_t system_wide_verification_profile = GNUTLS_PROFILE_UNKNOWN;
+/* Lock for updating system_wide_priority_strings{,_init} */
+GNUTLS_STATIC_MUTEX(system_wide_priority_strings_mutex);
 static name_val_array_t system_wide_priority_strings = NULL;
 static unsigned system_wide_priority_strings_init = 0;
 static unsigned system_wide_default_priority_string = 0;
@@ -1311,27 +1314,29 @@ static void _gnutls_update_system_priorities(void)
 	struct stat sb;
 	FILE *fp;
 
+	GNUTLS_STATIC_MUTEX_LOCK(system_wide_priority_strings_mutex);
+
 	if (stat(system_priority_file, &sb) < 0) {
 		_gnutls_debug_log("cfg: unable to access: %s: %d\n",
 				  system_priority_file, errno);
-		return;
+		goto out;
 	}
 
 	if (system_wide_priority_strings_init != 0 &&
 	    sb.st_mtime == system_priority_last_mod) {
 		_gnutls_debug_log("cfg: system priority %s has not changed\n",
 				  system_priority_file);
-		return;
+		goto out;
 	}
 
-	if (system_wide_priority_strings_init != 0)
-		_name_val_array_clear(&system_wide_priority_strings);
+	_name_val_array_clear(&system_wide_priority_strings);
+	system_wide_priority_strings_init = 0;
 
 	fp = fopen(system_priority_file, "re");
 	if (fp == NULL) {
 		_gnutls_debug_log("cfg: unable to open: %s: %d\n",
 				  system_priority_file, errno);
-		return;
+		goto out;
 	}
 	ret = ini_parse_file(fp, cfg_ini_handler, NULL);
 	fclose(fp);
@@ -1340,7 +1345,7 @@ static void _gnutls_update_system_priorities(void)
 				  system_priority_file, ret);
 		if (fail_on_invalid_config)
 			exit(1);
-		return;
+		goto out;
 	}
 
 	_gnutls_debug_log("cfg: loaded system priority %s mtime %lld\n",
@@ -1348,6 +1353,9 @@ static void _gnutls_update_system_priorities(void)
 			  (unsigned long long)sb.st_mtime);
 
 	system_priority_last_mod = sb.st_mtime;
+
+ out:
+	GNUTLS_STATIC_MUTEX_UNLOCK(system_wide_priority_strings_mutex);
 }
 
 void _gnutls_load_system_priorities(void)
@@ -1368,6 +1376,7 @@ void _gnutls_load_system_priorities(void)
 void _gnutls_unload_system_priorities(void)
 {
 	_name_val_array_clear(&system_wide_priority_strings);
+	system_wide_priority_strings_init = 0;
 	_clear_default_system_priority();
 	system_priority_last_mod = 0;
 }
