@@ -533,9 +533,13 @@ fedora-static-analyzers/test:
     - fedora-static-analyzers/build
   needs:
     - fedora-static-analyzers/build
+  cache:
+    paths:
+      - cache/cppcheck
   script:
-    - cppcheck --force -q -Ilib/includes -Igl/ -Ilib/ -I. --error-exitcode=1 lib/ -i lib/unistring -i lib/minitasn1 -i lib/nettle/backport -i lib/nettle/ecc -j2 $CPPCHECK_OPTIONS
-    - cppcheck --force -q -Ilib/includes -Igl/ -Ilibdane/ -I. --error-exitcode=1 libdane/ -j2 $CPPCHECK_OPTIONS
+    - mkdir -p cache/cppcheck
+    - cppcheck --cppcheck-build-dir=cache/cppcheck --force -q -Ilib/includes -Igl/ -Ilib/ -I. --error-exitcode=1 lib/ -i lib/unistring -i lib/minitasn1 -i lib/nettle/backport -i lib/nettle/ecc -j2 $CPPCHECK_OPTIONS
+    - cppcheck --cppcheck-build-dir=cache/cppcheck --force -q -Ilib/includes -Igl/ -Ilibdane/ -I. --error-exitcode=1 libdane/ -j2 $CPPCHECK_OPTIONS
 
 # TODO this does not work, so we keep using old job doc-dist.Fedora
 # Keeping it here until I figure it out.
