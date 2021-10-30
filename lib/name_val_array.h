@@ -38,11 +38,6 @@ typedef struct name_val_array_st {
 	struct name_val_array_st *next;
 } *name_val_array_t;
 
-inline static void _name_val_array_init(name_val_array_t * head)
-{
-	*head = NULL;
-}
-
 inline static void _name_val_array_clear(name_val_array_t * head)
 {
 	name_val_array_t prev, array = *head;

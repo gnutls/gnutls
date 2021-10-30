@@ -26,6 +26,7 @@
 #include <gnutls/gnutls.h>
 #include "gnutls_int.h"
 #include <system.h>
+#include "glthread/lock.h"
 
 #ifdef HAVE_STDATOMIC_H
 # include <stdatomic.h>
@@ -75,5 +76,10 @@ extern mutex_unlock_func gnutls_mutex_unlock;
 # define GNUTLS_STATIC_MUTEX_LOCK(mutex)
 # define GNUTLS_STATIC_MUTEX_UNLOCK(mutex)
 #endif
+
+#define GNUTLS_STATIC_RWLOCK(rwlock) gl_rwlock_define_initialized(static, rwlock)
+#define GNUTLS_STATIC_RWLOCK_RDLOCK gl_rwlock_rdlock
+#define GNUTLS_STATIC_RWLOCK_WRLOCK gl_rwlock_wrlock
+#define GNUTLS_STATIC_RWLOCK_UNLOCK gl_rwlock_unlock
 
 #endif /* GNUTLS_LIB_LOCKS_H */
