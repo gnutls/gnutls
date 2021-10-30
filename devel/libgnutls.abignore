@@ -54,3 +54,6 @@ changed_enumerators = GNUTLS_SEC_PARAM_MAX
 [suppress_function]
 name = gnutls_ocsp_status_request_is_checked
 return_type_name = unsigned int
+
+# The following should be removed in the new release, after updating the
+# abi-dump repository:
