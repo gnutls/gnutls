@@ -1102,7 +1102,8 @@ int trust_list_get_issuer_by_dn(gnutls_x509_trust_list_t list,
  * gnutls_x509_trust_list_get_issuer:
  * @list: The list
  * @cert: is the certificate to find issuer for
- * @issuer: Will hold the issuer if any. Should be treated as constant.
+ * @issuer: Will hold the issuer if any. Should be treated as constant
+ *   unless %GNUTLS_TL_GET_COPY is set in @flags.
  * @flags: flags from %gnutls_trust_list_flags_t (%GNUTLS_TL_GET_COPY is applicable)
  *
  * This function will find the issuer of the given certificate.
@@ -1521,7 +1522,8 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 		if (gnutls_x509_trust_list_get_issuer(list,
 						      cert_list[i - 1],
 						      &issuer,
-						      0) == 0) {
+						      GNUTLS_TL_GET_COPY) == 0) {
+			gnutls_x509_crt_deinit(issuer);
 			cert_list_size = i;
 			break;
 		}
