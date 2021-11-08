@@ -598,6 +598,7 @@ TESTS_ENVIRONMENT +=						\
 	GNUTLS_TEST_SUITE_RUN=1					\
 	builddir="$(builddir)"					\
 	top_builddir="$(top_builddir)"				\
+	abs_top_builddir="$(abs_top_builddir)"			\
 	libdir="$(libdir)"					\
 	srcdir="$(srcdir)"
 
