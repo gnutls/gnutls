@@ -73,4 +73,5 @@ TESTS_ENVIRONMENT =						\
 	EXEEXT=$(EXEEXT)			\
 	GNUTLS_SYSTEM_PRIORITY_FILE=$(abs_top_srcdir)/tests/system.prio \
 	top_builddir="$(top_builddir)"		\
+	abs_top_builddir="$(abs_top_builddir)"	\
 	srcdir="$(srcdir)"

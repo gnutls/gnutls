@@ -61,6 +61,7 @@ TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
 	OPENSSL_ia32cap=0x00000000				\
 	GNUTLS_SYSTEM_PRIORITY_FILE=$(abs_top_srcdir)/tests/system.prio	\
 	top_builddir="$(top_builddir)"				\
+	abs_top_builddir="$(abs_top_builddir)"			\
 	srcdir="$(srcdir)"
 
 if WINDOWS

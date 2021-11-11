@@ -155,6 +155,7 @@ TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
 	VALGRIND="$(VALGRIND)"			\
 	LIBTOOL="$(LIBTOOL)"			\
 	top_builddir="$(top_builddir)"		\
+	abs_top_builddir="$(abs_top_builddir)"	\
 	ac_cv_sizeof_time_t="$(ac_cv_sizeof_time_t)" \
 	ASAN_OPTIONS="detect_leaks=0:exitcode=6" \
 	GNUTLS_TEST_SUITE_RUN=1			\
