@@ -147,6 +147,8 @@ char *get_tmpname(char s[TMPNAME_SIZE]);
 void track_temp_files(void);
 void delete_temp_files(void);
 
+int tcp_connect(const char* addr, unsigned port);
+
 /* This must be implemented elsewhere. */
 extern void doit(void);
 
