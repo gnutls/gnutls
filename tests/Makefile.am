@@ -528,7 +528,9 @@ dist_check_SCRIPTS += system-override-sig-allowlist.sh \
 	system-override-hash-allowlist.sh \
 	system-override-versions-allowlist.sh \
 	system-override-curves-allowlist.sh \
-	system-override-special-allowlist.sh
+	system-override-special-allowlist.sh \
+	protocol-set-allowlist.sh
+indirect_tests += protocol-set-allowlist
 endif
 
 dist_check_SCRIPTS += gnutls-cli-self-signed.sh gnutls-cli-invalid-crl.sh gnutls-cli-rawpk.sh
