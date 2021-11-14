@@ -852,10 +852,32 @@ AM_CONDITIONAL(P11KIT_0_23_11_API, $PKG_CONFIG --atleast-version=0.23.11 p11-kit
 AM_CONDITIONAL(ENABLE_PKCS11, test "$with_p11_kit" != "no")
 
 AC_ARG_WITH(tpm,
+	AS_HELP_STRING([--without-tpm2],
+		[Disable TPM2 support.]),
+	[with_tpm2=$withval], [with_tpm2=auto])
+if test "$with_tpm2" != "no"; then
+	PKG_CHECK_MODULES(TSS2, [tss2-esys tss2-mu tss2-tctildr],
+		[have_tpm2=yes], [have_tpm2=no])
+	if test "$have_tpm2" = "yes"; then
+		tss2lib="tss2-esys tss2-mu tss2-tctildr"
+		AC_DEFINE([HAVE_TSS2], 1, [Have TSS2])
+	elif test "$with_tpm2" = "yes"; then
+		AC_MSG_ERROR([[
+***
+*** TPM2 support was requested but the required libraries were not found.
+*** To disable TPM2 support use --without-tpm2, otherwise you may get tpm2-tss from
+*** https://github.com/tpm2-software/tpm2-tss
+*** ]])
+	fi
+fi
+
+AM_CONDITIONAL(ENABLE_TPM2, test "$have_tpm2" = "yes")
+
+AC_ARG_WITH(tpm,
 	AS_HELP_STRING([--without-tpm],
 		[Disable TPM (trousers) support.]),
 		[with_tpm=$withval], [with_tpm=yes])
-if test "$with_tpm" != "no"; then
+if test "$with_tpm" != "no" && test "$with_tpm2" = "no"; then
     LIBS="$oldlibs -ltspi"
     AC_MSG_CHECKING([for tss library])
     AC_LINK_IFELSE([AC_LANG_PROGRAM([
@@ -875,9 +897,12 @@ if test "$with_tpm" != "no"; then
 *** ]])
 		  with_tpm=no])
     LIBS="$oldlibs"
+else
+    with_tpm=no
 fi
 
 AM_CONDITIONAL(ENABLE_TROUSERS, test "$with_tpm" != "no")
+
 
 for l in /usr/lib64 /usr/lib /lib64 /lib /usr/lib/x86_64-linux-gnu/; do
     if test -f "${l}/libtspi.so.1";then
@@ -1220,11 +1245,19 @@ AC_MSG_NOTICE([External hardware support:
   Random gen. variant:  $rnd_variant
   PKCS#11 support:      $with_p11_kit
   TPM support:          $with_tpm
+  TPM2 support:         $have_tpm2
   KTLS support:         $enable_ktls
 ])
-if test -n "$ac_trousers_lib";then
+
+if test -n "$ac_trousers_lib" && test "$with_tpm" != "no";then
 AC_MSG_NOTICE([
   TPM library:          $ac_trousers_lib
+])
+fi
+
+if test "$with_tpm2" != "no";then
+AC_MSG_NOTICE([
+  TPM2 library:         $tss2lib
 ])
 fi
 

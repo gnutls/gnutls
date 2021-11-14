@@ -350,5 +350,9 @@ systemkey-args.h: systemkey-args.stamp
 systemkey-args.c: systemkey-args.stamp
 systemkey-args.stamp: args-std.def
 
+tpm2key-args.h: tpm2key-args.stamp
+tpm2key-args.c: tpm2key-args.stamp
+tpm2key-args.stamp: args-std.def
+
 mech-list.h: gen-mech-list.sh
 	$(AM_V_GEN) $(srcdir)/gen-mech-list.sh > $@.tmp && mv $@.tmp $@

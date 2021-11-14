@@ -174,4 +174,12 @@ GostR3410-KeyTransport ::= SEQUENCE {
 	transportParameters	[0] IMPLICIT GostR3410-TransportParameters OPTIONAL
 }
 
+TPMKey ::= SEQUENCE {
+    type            OBJECT IDENTIFIER,
+    emptyAuth       [0] EXPLICIT BOOLEAN OPTIONAL,
+    parent          INTEGER,
+    pubkey          OCTET STRING,
+    privkey         OCTET STRING
+}
+
 END
