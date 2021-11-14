@@ -1012,7 +1012,7 @@ struct cfg {
 };
 
 /* Lock for reading and writing system_wide_config */
-GNUTLS_STATIC_RWLOCK(system_wide_config_rwlock);
+GNUTLS_RWLOCK(system_wide_config_rwlock);
 static struct cfg system_wide_config;
 
 static unsigned fail_on_invalid_config = 0;
@@ -1308,13 +1308,17 @@ static int cfg_ini_handler(void *_ctx, const char *section, const char *name, co
 	return 1;
 }
 
-static void _gnutls_update_system_priorities(void)
+static int _gnutls_update_system_priorities(void)
 {
-	int ret = 0;
+	int ret, err = 0;
 	struct stat sb;
 	FILE *fp;
 
-	GNUTLS_STATIC_RWLOCK_RDLOCK(system_wide_config_rwlock);
+	ret = gnutls_rwlock_rdlock(&system_wide_config_rwlock);
+	if (ret < 0) {
+		return gnutls_assert_val(ret);
+	}
+
 	if (stat(system_priority_file, &sb) < 0) {
 		_gnutls_debug_log("cfg: unable to access: %s: %d\n",
 				  system_priority_file, errno);
@@ -1328,9 +1332,12 @@ static void _gnutls_update_system_priorities(void)
 		goto out;
 	}
 
-	GNUTLS_STATIC_RWLOCK_UNLOCK(system_wide_config_rwlock);
+	(void)gnutls_rwlock_unlock(&system_wide_config_rwlock);
 
-	GNUTLS_STATIC_RWLOCK_WRLOCK(system_wide_config_rwlock);
+	ret = gnutls_rwlock_wrlock(&system_wide_config_rwlock);
+	if (ret < 0) {
+		return gnutls_assert_val(ret);
+	}
 
 	/* Another thread has successfully updated the system wide config (with
 	 * the same modification time as checked above), while upgrading to
@@ -1350,11 +1357,11 @@ static void _gnutls_update_system_priorities(void)
 				  system_priority_file, errno);
 		goto out;
 	}
-	ret = ini_parse_file(fp, cfg_ini_handler, NULL);
+	err = ini_parse_file(fp, cfg_ini_handler, NULL);
 	fclose(fp);
-	if (ret != 0) {
+	if (err) {
 		_gnutls_debug_log("cfg: unable to parse: %s: %d\n",
-				  system_priority_file, ret);
+				  system_priority_file, err);
 		goto out;
 	}
 
@@ -1366,16 +1373,19 @@ static void _gnutls_update_system_priorities(void)
 	system_priority_last_mod = sb.st_mtime;
 
  out:
-	GNUTLS_STATIC_RWLOCK_UNLOCK(system_wide_config_rwlock);
+	(void)gnutls_rwlock_unlock(&system_wide_config_rwlock);
 
-	if (ret != 0 && fail_on_invalid_config) {
+	if (err && fail_on_invalid_config) {
 		exit(1);
 	}
+
+	return ret;
 }
 
 void _gnutls_load_system_priorities(void)
 {
 	const char *p;
+	int ret;
 
 	p = secure_getenv("GNUTLS_SYSTEM_PRIORITY_FILE");
 	if (p != NULL)
@@ -1385,7 +1395,11 @@ void _gnutls_load_system_priorities(void)
 	if (p != NULL && p[0] == '1' && p[1] == 0)
 		fail_on_invalid_config = 1;
 
-	_gnutls_update_system_priorities();
+	ret = _gnutls_update_system_priorities();
+	if (ret < 0) {
+		_gnutls_debug_log("failed to update system priorities: %s\n",
+				  gnutls_strerror(ret));
+	}
 }
 
 void _gnutls_unload_system_priorities(void)
@@ -1423,88 +1437,101 @@ char *_gnutls_resolve_priorities(const char* priorities)
 {
 	const char *p = priorities;
 	char *additional = NULL;
-	char *ret = NULL;
+	char *resolved = NULL;
 	const char *ss, *ss_next;
 	unsigned ss_len, ss_next_len;
 	size_t n, n2 = 0;
+	int ret;
 
-	while (c_isspace(*p))
+	while (c_isspace(*p)) {
 		p++;
+	}
 
-	if (*p == '@') {
-		ss = p+1;
-		additional = strchr(ss, ':');
-		if (additional != NULL) {
-			additional++;
-		}
-
-		/* Always try to refresh the cached data, to
-		 * allow it to be updated without restarting
-		 * all applications
-		 */
-		_gnutls_update_system_priorities();
-
-		do {
-			ss_next = strchr(ss, ',');
-			if (ss_next != NULL) {
-				if (additional && ss_next > additional)
-					ss_next = NULL;
-				else
-					ss_next++;
-			}
-
-			if (ss_next) {
-				ss_len = ss_next - ss - 1;
-				ss_next_len = additional - ss_next - 1;
-			} else if (additional) {
-				ss_len = additional - ss - 1;
-				ss_next_len = 0;
-			} else {
-				ss_len = strlen(ss);
-				ss_next_len = 0;
-			}
-
-			GNUTLS_STATIC_RWLOCK_RDLOCK(system_wide_config_rwlock);
-			p = _name_val_array_value(system_wide_config.priority_strings, ss, ss_len);
-
-			_gnutls_debug_log("resolved '%.*s' to '%s', next '%.*s'\n",
-					  ss_len, ss, S(p), ss_next_len, S(ss_next));
-
-			if (p) {
-				n = strlen(p);
-				if (additional) {
-					n2 = strlen(additional);
-				}
-
-				ret = gnutls_malloc(n+n2+1+1);
-				if (ret) {
-					memcpy(ret, p, n);
-					if (additional != NULL) {
-						ret[n] = ':';
-						memcpy(&ret[n+1], additional, n2);
-						ret[n+n2+1] = 0;
-					} else {
-						ret[n] = 0;
-					}
-				}
-			}
-			GNUTLS_STATIC_RWLOCK_UNLOCK(system_wide_config_rwlock);
-
-			ss = ss_next;
-		} while (ss && ret == NULL);
-
-		if (ret == NULL) {
-			_gnutls_debug_log("unable to resolve %s\n", priorities);
-		}
-	} else {
+	/* Cannot reduce further. */
+	if (*p != '@') {
 		return gnutls_strdup(p);
 	}
 
-	if (ret != NULL) {
-		_gnutls_debug_log("selected priority string: %s\n", ret);
+	ss = p+1;
+	additional = strchr(ss, ':');
+	if (additional) {
+		additional++;
 	}
 
-	return ret;
+	/* Always try to refresh the cached data, to allow it to be
+	 * updated without restarting all applications.
+	 */
+	ret = _gnutls_update_system_priorities();
+	if (ret < 0) {
+		_gnutls_debug_log("failed to update system priorities: %s\n",
+				  gnutls_strerror(ret));
+	}
+
+	do {
+		ss_next = strchr(ss, ',');
+		if (ss_next) {
+			if (additional && ss_next > additional) {
+				ss_next = NULL;
+			} else {
+				ss_next++;
+			}
+		}
+
+		if (ss_next) {
+			ss_len = ss_next - ss - 1;
+			ss_next_len = additional - ss_next - 1;
+		} else if (additional) {
+			ss_len = additional - ss - 1;
+			ss_next_len = 0;
+		} else {
+			ss_len = strlen(ss);
+			ss_next_len = 0;
+		}
+
+		ret = gnutls_rwlock_rdlock(&system_wide_config_rwlock);
+		if (ret < 0) {
+			_gnutls_debug_log("cannot read system priority strings: %s\n",
+					  gnutls_strerror(ret));
+			break;
+		}
+
+		p = _name_val_array_value(system_wide_config.priority_strings,
+					  ss, ss_len);
+
+		_gnutls_debug_log("resolved '%.*s' to '%s', next '%.*s'\n",
+				  ss_len, ss, S(p), ss_next_len, S(ss_next));
+
+		if (p) {
+			n = strlen(p);
+			if (additional) {
+				n2 = strlen(additional);
+			}
+
+			resolved = gnutls_malloc(n+n2+1+1);
+			if (resolved) {
+				memcpy(resolved, p, n);
+				if (additional) {
+					resolved[n] = ':';
+					memcpy(&resolved[n+1], additional, n2);
+					resolved[n+n2+1] = 0;
+				} else {
+					resolved[n] = 0;
+				}
+			}
+		}
+
+		(void)gnutls_rwlock_unlock(&system_wide_config_rwlock);
+
+		ss = ss_next;
+	} while (ss && !resolved);
+
+	if (resolved) {
+		_gnutls_debug_log("selected priority string: %s\n", resolved);
+	} else {
+		_gnutls_debug_log("unable to resolve %s\n", priorities);
+	}
+
+	return resolved;
 }
 
 static void add_ec(gnutls_priority_t priority_cache)
@@ -1572,7 +1599,10 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 
 	/* The following requires a lock so there are no inconsistencies in the
 	 * members of system_wide_config loaded from the config file. */
-	GNUTLS_STATIC_RWLOCK_RDLOCK(system_wide_config_rwlock);
+	ret = gnutls_rwlock_rdlock(&system_wide_config_rwlock);
+	if (ret < 0) {
+		return gnutls_assert_val(ret);
+	}
 
 	/* disable key exchanges which are globally disabled */
 	z = 0;
@@ -1853,7 +1883,7 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 	}
 
  out:
-	GNUTLS_STATIC_RWLOCK_UNLOCK(system_wide_config_rwlock);
+	gnutls_rwlock_unlock(&system_wide_config_rwlock);
 	return ret;
 }
 

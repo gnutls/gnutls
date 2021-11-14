@@ -90,3 +90,30 @@ gnutls_static_mutex_unlock(gnutls_static_mutex_t lock)
 	}
 	return 0;
 }
+
+int
+gnutls_rwlock_rdlock(gnutls_rwlock_t rwlock)
+{
+	if (unlikely(glthread_rwlock_rdlock(rwlock))) {
+		return gnutls_assert_val(GNUTLS_E_LOCKING_ERROR);
+	}
+	return 0;
+}
+
+int
+gnutls_rwlock_wrlock(gnutls_rwlock_t rwlock)
+{
+	if (unlikely(glthread_rwlock_wrlock(rwlock))) {
+		return gnutls_assert_val(GNUTLS_E_LOCKING_ERROR);
+	}
+	return 0;
+}
+
+int
+gnutls_rwlock_unlock(gnutls_rwlock_t rwlock)
+{
+	if (unlikely(glthread_rwlock_unlock(rwlock))) {
+		return gnutls_assert_val(GNUTLS_E_LOCKING_ERROR);
+	}
+	return 0;
+}

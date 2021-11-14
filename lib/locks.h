@@ -43,9 +43,15 @@ typedef gl_lock_t *gnutls_static_mutex_t;
 int gnutls_static_mutex_lock(gnutls_static_mutex_t lock);
 int gnutls_static_mutex_unlock(gnutls_static_mutex_t lock);
 
-#define GNUTLS_STATIC_RWLOCK(rwlock) gl_rwlock_define_initialized(static, rwlock)
-#define GNUTLS_STATIC_RWLOCK_RDLOCK gl_rwlock_rdlock
-#define GNUTLS_STATIC_RWLOCK_WRLOCK gl_rwlock_wrlock
-#define GNUTLS_STATIC_RWLOCK_UNLOCK gl_rwlock_unlock
+/* Unlike static mutexes, static rwlocks can be locked/unlocked with
+ * the functions defined below, because there is no way to replace
+ * those functions.
+ */
+#define GNUTLS_RWLOCK(rwlock) gl_rwlock_define_initialized(static, rwlock)
+typedef gl_rwlock_t *gnutls_rwlock_t;
+
+int gnutls_rwlock_rdlock(gnutls_rwlock_t rwlock);
+int gnutls_rwlock_wrlock(gnutls_rwlock_t rwlock);
+int gnutls_rwlock_unlock(gnutls_rwlock_t rwlock);
 
 #endif /* GNUTLS_LIB_LOCKS_H */
