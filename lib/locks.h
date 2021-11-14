@@ -25,57 +25,23 @@
 
 #include <gnutls/gnutls.h>
 #include "gnutls_int.h"
-#include <system.h>
+#include "system.h"
 #include "glthread/lock.h"
-
-#ifdef HAVE_STDATOMIC_H
-# include <stdatomic.h>
-#endif
 
 extern mutex_init_func gnutls_mutex_init;
 extern mutex_deinit_func gnutls_mutex_deinit;
 extern mutex_lock_func gnutls_mutex_lock;
 extern mutex_unlock_func gnutls_mutex_unlock;
 
-#if defined(HAVE_WIN32_LOCKS)
-# include <windows.h>
-
-/* Idea based based on comment 2 at:
- * https://stackoverflow.com/questions/3555859/is-it-possible-to-do-static-initialization-of-mutexes-in-windows
+/* If a mutex is initialized with GNUTLS_STATIC_MUTEX, it must be
+ * locked/unlocked with the gnutls_static_mutex_* functions defined
+ * below instead of the above gnutls_mutex_* functions, because the
+ * latter can be replaced with gnutls_global_set_mutex().
  */
-# define GNUTLS_STATIC_MUTEX(mutex) \
-	static CRITICAL_SECTION *mutex = NULL
-
-# define GNUTLS_STATIC_MUTEX_LOCK(mutex) \
-	if (mutex == NULL) { \
-		CRITICAL_SECTION *mutex##tmp = malloc(sizeof(CRITICAL_SECTION)); \
-		InitializeCriticalSection(mutex##tmp); \
-		if (InterlockedCompareExchangePointer((PVOID*)&mutex, (PVOID)mutex##tmp, NULL) != NULL) { \
-			DeleteCriticalSection(mutex##tmp); \
-			free(mutex##tmp); \
-		} \
-	} \
-	EnterCriticalSection(mutex)
-
-# define GNUTLS_STATIC_MUTEX_UNLOCK(mutex) \
-	LeaveCriticalSection(mutex)
-
-#elif defined(HAVE_PTHREAD_LOCKS)
-# include <pthread.h>
-# define GNUTLS_STATIC_MUTEX(mutex) \
-	static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER
-
-# define GNUTLS_STATIC_MUTEX_LOCK(mutex) \
-	pthread_mutex_lock(&mutex)
-
-# define GNUTLS_STATIC_MUTEX_UNLOCK(mutex) \
-	pthread_mutex_unlock(&mutex)
-
-#else
-# define GNUTLS_STATIC_MUTEX(mutex)
-# define GNUTLS_STATIC_MUTEX_LOCK(mutex)
-# define GNUTLS_STATIC_MUTEX_UNLOCK(mutex)
-#endif
+#define GNUTLS_STATIC_MUTEX(lock) gl_lock_define_initialized(static, lock)
+typedef gl_lock_t *gnutls_static_mutex_t;
+int gnutls_static_mutex_lock(gnutls_static_mutex_t lock);
+int gnutls_static_mutex_unlock(gnutls_static_mutex_t lock);
 
 #define GNUTLS_STATIC_RWLOCK(rwlock) gl_rwlock_define_initialized(static, rwlock)
 #define GNUTLS_STATIC_RWLOCK_RDLOCK gl_rwlock_rdlock

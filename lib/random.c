@@ -79,9 +79,12 @@ inline static int _gnutls_rnd_init(void)
 			return GNUTLS_E_RANDOM_FAILED;
 		}
 
-		GNUTLS_STATIC_MUTEX_LOCK(gnutls_rnd_ctx_list_mutex);
+		ret = gnutls_static_mutex_lock(&gnutls_rnd_ctx_list_mutex);
+		if (ret < 0) {
+			return gnutls_assert_val(ret);
+		}
 		ret = append(gnutls_rnd_ctx);
-		GNUTLS_STATIC_MUTEX_UNLOCK(gnutls_rnd_ctx_list_mutex);
+		(void)gnutls_static_mutex_unlock(&gnutls_rnd_ctx_list_mutex);
 		if (ret < 0) {
 			gnutls_assert();
 			_gnutls_rnd_ops.deinit(gnutls_rnd_ctx);

@@ -154,7 +154,9 @@ void _gnutls_nss_keylog_write(gnutls_session_t session,
 		char client_random_hex[2*GNUTLS_RANDOM_SIZE+1];
 		char secret_hex[2*MAX_HASH_SIZE+1];
 
-		GNUTLS_STATIC_MUTEX_LOCK(keylog_mutex);
+		if (gnutls_static_mutex_lock(&keylog_mutex) < 0) {
+			return;
+		}
 		fprintf(keylog, "%s %s %s\n",
 			label,
 			_gnutls_bin2hex(session->security_parameters.
@@ -164,7 +166,7 @@ void _gnutls_nss_keylog_write(gnutls_session_t session,
 			_gnutls_bin2hex(secret, secret_size,
 					secret_hex, sizeof(secret_hex), NULL));
 		fflush(keylog);
-		GNUTLS_STATIC_MUTEX_UNLOCK(keylog_mutex);
+		(void)gnutls_static_mutex_unlock(&keylog_mutex);
 	}
 }
 

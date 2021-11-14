@@ -72,3 +72,21 @@ int ret;
 	if (ret < 0)
 		_gnutls_debug_log("error in gnutls_global_init(): %s\n", gnutls_strerror(ret));
 }
+
+int
+gnutls_static_mutex_lock(gnutls_static_mutex_t lock)
+{
+	if (unlikely(glthread_lock_lock(lock))) {
+		return gnutls_assert_val(GNUTLS_E_LOCKING_ERROR);
+	}
+	return 0;
+}
+
+int
+gnutls_static_mutex_unlock(gnutls_static_mutex_t lock)
+{
+	if (unlikely(glthread_lock_unlock(lock))) {
+		return gnutls_assert_val(GNUTLS_E_LOCKING_ERROR);
+	}
+	return 0;
+}

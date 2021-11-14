@@ -232,7 +232,10 @@ static int _gnutls_global_init(unsigned constructor)
 	const char* e;
 
 	if (!constructor) {
-		GNUTLS_STATIC_MUTEX_LOCK(global_init_mutex);
+		ret = gnutls_static_mutex_lock(&global_init_mutex);
+		if (ret < 0) {
+			return gnutls_assert_val(ret);
+		}
 	}
 
 	_gnutls_init++;
@@ -383,7 +386,7 @@ static int _gnutls_global_init(unsigned constructor)
       out:
 	_gnutls_init_ret = ret;
 	if (!constructor) {
-		GNUTLS_STATIC_MUTEX_UNLOCK(global_init_mutex);
+		(void)gnutls_static_mutex_unlock(&global_init_mutex);
 	}
 	return ret;
 }
@@ -391,7 +394,9 @@ static int _gnutls_global_init(unsigned constructor)
 static void _gnutls_global_deinit(unsigned destructor)
 {
 	if (!destructor) {
-		GNUTLS_STATIC_MUTEX_LOCK(global_init_mutex);
+		if (gnutls_static_mutex_lock(&global_init_mutex) < 0) {
+			return;
+		}
 	}
 
 	if (_gnutls_init == 1) {
@@ -441,7 +446,7 @@ static void _gnutls_global_deinit(unsigned destructor)
 
  fail:
 	if (!destructor) {
-		GNUTLS_STATIC_MUTEX_UNLOCK(global_init_mutex);
+		(void)gnutls_static_mutex_unlock(&global_init_mutex);
 	}
 }
 
