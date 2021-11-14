@@ -54,4 +54,9 @@ int gnutls_rwlock_rdlock(gnutls_rwlock_t rwlock);
 int gnutls_rwlock_wrlock(gnutls_rwlock_t rwlock);
 int gnutls_rwlock_unlock(gnutls_rwlock_t rwlock);
 
+#define GNUTLS_ONCE(once) gl_once_define(static, once)
+typedef gl_once_t *gnutls_once_t;
+
+int gnutls_once(gnutls_once_t once, void (*init_func) (void));
+
 #endif /* GNUTLS_LIB_LOCKS_H */

@@ -117,3 +117,12 @@ gnutls_rwlock_unlock(gnutls_rwlock_t rwlock)
 	}
 	return 0;
 }
+
+int
+gnutls_once(gnutls_once_t once, void (*init_func) (void))
+{
+	if (unlikely(glthread_once(once, init_func))) {
+		return gnutls_assert_val(GNUTLS_E_LOCKING_ERROR);
+	}
+	return 0;
+}

@@ -136,19 +136,26 @@ _gnutls_nss_keylog_func(gnutls_session_t session,
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wanalyzer-file-leak"
 
+GNUTLS_ONCE(keylog_once);
+
+static void
+keylog_once_init(void)
+{
+	const char *keylogfile;
+
+	keylogfile = secure_getenv("SSLKEYLOGFILE");
+	if (keylogfile != NULL && *keylogfile != '\0') {
+		keylog = fopen(keylogfile, "ae");
+		_gnutls_debug_log("unable to open keylog file %s\n",
+				  keylogfile);
+	}
+}
+
 void _gnutls_nss_keylog_write(gnutls_session_t session,
 			      const char *label,
 			      const uint8_t *secret, size_t secret_size)
 {
-	static const char *keylogfile = NULL;
-	static unsigned checked_env = 0;
-
-	if (!checked_env) {
-		checked_env = 1;
-		keylogfile = secure_getenv("SSLKEYLOGFILE");
-		if (keylogfile != NULL)
-			keylog = fopen(keylogfile, "ae");
-	}
+	(void)gnutls_once(&keylog_once, keylog_once_init);
 
 	if (keylog) {
 		char client_random_hex[2*GNUTLS_RANDOM_SIZE+1];

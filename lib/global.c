@@ -420,6 +420,9 @@ static void _gnutls_global_deinit(unsigned destructor)
 #ifdef HAVE_TROUSERS
 		_gnutls_tpm_global_deinit();
 #endif
+#ifdef HAVE_TPM2
+		_gnutls_tpm2_deinit();
+#endif
 
 		_gnutls_nss_keylog_deinit();
 	} else {

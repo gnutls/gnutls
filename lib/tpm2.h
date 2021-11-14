@@ -26,13 +26,20 @@
 
 #include "pin.h"
 
+/* Functions used outside tpm2.c */
+
+void _gnutls_tpm2_deinit(void);
+int _gnutls_load_tpm2_key(gnutls_privkey_t pkey, const gnutls_datum_t *fdata);
+
+/* Functions only used in tpm2.c */
+
 struct tpm2_info_st;
 
 struct tpm2_info_st *tpm2_info_init(struct pin_info_st *pin);
 
-void release_tpm2_ctx(struct tpm2_info_st *info);
+void tpm2_tcti_deinit(void);
 
-int _gnutls_load_tpm2_key(gnutls_privkey_t pkey, const gnutls_datum_t *fdata);
+void release_tpm2_ctx(struct tpm2_info_st *info);
 
 int install_tpm2_key(struct tpm2_info_st *info, gnutls_privkey_t pkey,
 		     unsigned int parent, bool emptyauth,
