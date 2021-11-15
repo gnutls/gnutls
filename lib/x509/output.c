@@ -430,6 +430,99 @@ static void print_ski(gnutls_buffer_st * str, gnutls_datum_t *der)
 	gnutls_free(id.data);
 }
 
+static void print_time(gnutls_buffer_st *str, time_t timestamp)
+{
+	char s[42];
+	size_t max = sizeof(s);
+	struct tm t;
+
+	if (gmtime_r(&timestamp, &t) == NULL) {
+		addf(str, "error: gmtime_r (%lu)\n", timestamp);
+		return;
+	}
+
+	if (strftime(s, max, "%a, %b %d %H:%M:%S UTC %Y", &t) == 0)
+		addf(str, "error: strftime (%lu)\n", timestamp);
+	else
+		addf(str, "%s\n", s);
+}
+
+static void print_scts(gnutls_buffer_st * str, const gnutls_datum_t *der,
+		       const char *prefix)
+{
+	int retval;
+	unsigned int version;
+	time_t timestamp;
+	gnutls_datum_t logid = { NULL, 0 }, sig = { NULL, 0 };
+	gnutls_sign_algorithm_t sigalg;
+	gnutls_x509_ct_scts_t scts;
+
+	retval = gnutls_x509_ext_ct_scts_init(&scts);
+	if (retval < 0) {
+		addf(str, "error: gnutls_x509_ext_ct_scts_init(): %s\n",
+		     gnutls_strerror(retval));
+		return;
+	}
+
+	retval = gnutls_x509_ext_ct_import_scts(der, scts, 0);
+	if (retval < 0) {
+		addf(str, "error: gnutls_x509_ext_ct_import_scts(): %s\n",
+		     gnutls_strerror(retval));
+		goto cleanup;
+	}
+
+	for (int i = 0;; i++) {
+		retval = gnutls_x509_ct_sct_get_version(scts, i, &version);
+		if (retval == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+			break;
+
+		addf(str, _("%s\t\t\tSigned Certificate Timestamp %d:\n"),
+		     prefix, (i+1));
+
+		if (version != 1) {
+			addf(str, _("%s\t\t\t\tVersion: %d (unknown SCT version)\n"),
+			     prefix, version);
+			continue;
+		}
+
+		retval = gnutls_x509_ct_sct_get(scts, i,
+						&timestamp,
+						&logid,
+						&sigalg, &sig);
+		if (retval < 0) {
+			addf(str, "error: could not get SCT info: %s\n",
+			     gnutls_strerror(retval));
+			break;
+		}
+
+		addf(str, _("%s\t\t\t\tVersion: %d\n"),
+		     prefix, version);
+		addf(str, _("%s\t\t\t\tLog ID: "), prefix);
+		_gnutls_buffer_hexprint(str, logid.data, logid.size);
+		addf(str, "\n");
+		addf(str, _("%s\t\t\t\tTime: "), prefix);
+		print_time(str, timestamp);
+		addf(str, _("%s\t\t\t\tExtensions: none\n"), /* there are no extensions defined for v1 */
+		     prefix);
+		addf(str, _("%s\t\t\t\tSignature algorithm: %s\n"),
+		     prefix, gnutls_sign_get_name(sigalg));
+		addf(str, _("%s\t\t\t\tSignature: "), prefix);
+		_gnutls_buffer_hexprint(str, sig.data, sig.size);
+		addf(str, "\n");
+
+		_gnutls_free_datum(&sig);
+		_gnutls_free_datum(&logid);
+		sig.data = NULL;
+		logid.data = NULL;
+	}
+
+cleanup:
+	_gnutls_free_datum(&sig);
+	_gnutls_free_datum(&logid);
+	gnutls_x509_ext_ct_scts_deinit(scts);
+}
+
+
 #define TYPE_CRT 2
 #define TYPE_CRQ 3
 
@@ -1226,6 +1319,11 @@ static void print_extension(gnutls_buffer_st * str, const char *prefix,
 		     critical ? _("critical") : _("not critical"));
 
 		print_aia(str, der);
+	} else if (strcmp(oid, GNUTLS_X509EXT_OID_CT_SCT_V1) == 0) {
+		addf(str, _("%s\t\tCT Precertificate SCTs (%s):\n"),
+		     prefix, critical ? _("critical") : _("not critical"));
+
+		print_scts(str, der, prefix);
 	} else if (strcmp(oid, "2.5.29.30") == 0) {
 		if (idx->nc) {
 			addf(str,
