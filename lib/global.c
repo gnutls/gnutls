@@ -70,7 +70,6 @@ inline static int _gnutls_global_init_skip(void)
 /* created by asn1c */
 extern const asn1_static_node gnutls_asn1_tab[];
 extern const asn1_static_node pkix_asn1_tab[];
-void *_gnutls_file_mutex;
 void *_gnutls_pkcs11_mutex;
 
 asn1_node _gnutls_pkix1_asn = NULL;
@@ -312,12 +311,6 @@ static int _gnutls_global_init(unsigned constructor)
 		goto out;
 	}
 
-	ret = gnutls_mutex_init(&_gnutls_file_mutex);
-	if (ret < 0) {
-		gnutls_assert();
-		goto out;
-	}
-
 	ret = gnutls_mutex_init(&_gnutls_pkcs11_mutex);
 	if (ret < 0) {
 		gnutls_assert();
@@ -437,7 +430,6 @@ static void _gnutls_global_deinit(unsigned destructor)
 
 		_gnutls_nss_keylog_deinit();
 
-		gnutls_mutex_deinit(&_gnutls_file_mutex);
 		gnutls_mutex_deinit(&_gnutls_pkcs11_mutex);
 	} else {
 		if (_gnutls_init > 0)
