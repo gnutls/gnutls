@@ -32,6 +32,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include "ext/session_ticket.h"
+#include <sys/sendfile.h>
 
 /**
  * gnutls_transport_is_ktls_enabled:
@@ -261,6 +262,31 @@ int _gnutls_ktls_set_keys(gnutls_session_t session)
 	return 0;
 }
 
+ssize_t _gnutls_ktls_send_file(gnutls_session_t session, int fd,
+		off_t *offset, size_t count)
+{
+	ssize_t ret;
+	int sockin, sockout;
+
+	assert(session != NULL);
+
+	gnutls_transport_get_int2(session, &sockin, &sockout);
+
+	ret = sendfile(sockout, fd, offset, count);
+	if (ret == -1){
+		switch(errno) {
+			case EINTR:
+				return GNUTLS_E_INTERRUPTED;
+			case EAGAIN:
+				return GNUTLS_E_AGAIN;
+			default:
+				return GNUTLS_E_PUSH_ERROR;
+		}
+	}
+
+	return ret;
+}
+
 int _gnutls_ktls_send_control_msg(gnutls_session_t session,
 		unsigned char record_type, const void *data, size_t data_size)
 {
@@ -430,6 +456,11 @@ void _gnutls_ktls_enable(gnutls_session_t session) {
 }
 
 int _gnutls_ktls_set_keys(gnutls_session_t session) {
+	return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
+}
+
+ssize_t _gnutls_ktls_send_file(gnutls_session_t session, int fd,
+		off_t *offset, size_t count) {
 	return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 }
 

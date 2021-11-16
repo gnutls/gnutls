@@ -55,6 +55,7 @@
 #include <xsize.h>
 #include "locks.h"
 #include "system/ktls.h"
+#include <sys/sendfile.h>
 
 struct tls_record_st {
 	uint16_t header_size;
@@ -2131,6 +2132,29 @@ ssize_t gnutls_record_send_early_data(gnutls_session_t session,
 	session->internals.flags |= GNUTLS_ENABLE_EARLY_DATA;
 
 	return ret;
+}
+
+/**
+ * gnutls_record_send_file:
+ * @session: is a #gnutls_session_t type.
+ * @fd: file descriptor from which to read data.
+ * @offset: position in file from which to start reading.
+ *          after function returns, it point to position following
+ *          last read byte.
+ * @count: is the length of the data to be read from file and send.
+ *
+ * sends data via sendfile function.
+ *
+ * Returns: The number of bytes sent, or a negative error code.
+ **/
+ssize_t gnutls_record_send_file(gnutls_session_t session, int fd,
+		off_t *offset, size_t count)
+{
+	if (IS_KTLS_ENABLED(session, GNUTLS_KTLS_SEND)) {
+		return _gnutls_ktls_send_file(session, fd, offset, count);
+	} else {
+		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
+	}
 }
 
 /**

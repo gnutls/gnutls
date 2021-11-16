@@ -45,7 +45,6 @@ static void client_log_func(int level, const char *str)
 #define MAX_BUF 1024
 #define MSG "Hello world!"
 
-
 static void client(int fd, const char *prio)
 {
 	int ret;
@@ -90,6 +89,7 @@ static void client(int fd, const char *prio)
 	}
 
 	/* server send message via gnutls_record_send */
+	memset(buffer, 0, sizeof(buffer));
 	do{
 		ret = gnutls_record_recv(session, buffer, sizeof(buffer));
 	}
@@ -112,6 +112,29 @@ static void client(int fd, const char *prio)
 	if (debug)
 		success ("client: messages received\n");
 
+	/* server send message via gnutls_record_sendfile */
+	memset(buffer, 0, sizeof(buffer));
+	do{
+		ret = gnutls_record_recv(session, buffer, sizeof(buffer));
+	}
+	while(ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+
+	if (ret == 0) {
+			success
+			    ("client: Peer has closed the TLS connection\n");
+		goto end;
+	} else if (ret < 0) {
+		fail("client: Error: %s\n", gnutls_strerror(ret));
+		goto end;
+	}
+
+	if(strncmp(buffer, MSG, ret)){
+		fail("client: Message doesn't match\n");
+		goto end;
+	}
+
+	if (debug)
+		success ("client: messages received\n");
 
 	ret = gnutls_bye(session, GNUTLS_SHUT_RDWR);
 	if (ret < 0) {
@@ -198,8 +221,38 @@ static void server(int fd, const char *prio)
 			 goto end;
 	}
 
-	ret = gnutls_bye(session, GNUTLS_SHUT_RDWR);
+	/* send file
+	 */
+	FILE *fp = tmpfile();
+	if (fp == NULL){
+		fail("temporary file for testing couldn't be created");
+		ret = gnutls_bye(session, GNUTLS_SHUT_RDWR);
+		if (ret < 0)
+			fail("server: error in closing session: %s\n", gnutls_strerror(ret));
+		goto end;
+	}
+
+	fputs(MSG, fp);
+	rewind(fp);
+
+	off_t offset = 0;
+	if (fp == NULL) {
+		fail("server: couldn't open file for testing ...send_file() function");
+		goto end;
+	}
+
+	do {
+		ret = gnutls_record_send_file(session, fileno(fp), &offset, 512);
+	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+
 	if (ret < 0) {
+		fail("server: data sending has failed (%s)\n\n",
+		     gnutls_strerror(ret));
+			 goto end;
+	}
+
+	ret = gnutls_bye(session, GNUTLS_SHUT_RDWR);
+	if (ret < 0)
 		fail("server: error in closing session: %s\n", gnutls_strerror(ret));
 
 	ret = 0;
@@ -217,7 +270,6 @@ end:
 
 	if (debug)
 		success("server: finished\n");
-	}
 }
 
 static void ch_handler(int sig)
