@@ -1342,6 +1342,12 @@ GNUTLS_3_7_0
 	gnutls_x509_trust_list_get_ptr;
 	gnutls_x509_trust_list_set_ptr;
 	gnutls_session_set_verify_output_function;
+	gnutls_x509_ext_ct_scts_init;
+	gnutls_x509_ext_ct_scts_deinit;
+	gnutls_x509_ext_ct_import_scts;
+	gnutls_x509_ext_ct_export_scts;
+	gnutls_x509_ct_sct_get_version;
+	gnutls_x509_ct_sct_get;
  local:
 	*;
 } GNUTLS_3_6_14;
