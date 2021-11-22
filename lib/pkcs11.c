@@ -46,7 +46,7 @@
 
 #define MAX_SLOTS 48
 
-extern void *_gnutls_pkcs11_mutex;
+GNUTLS_STATIC_MUTEX(pkcs11_mutex);
 
 struct gnutls_pkcs11_provider_st {
 	struct ck_function_list *module;
@@ -279,7 +279,7 @@ int _gnutls_pkcs11_check_init(init_level_t req_level, void *priv, pkcs11_reinit_
 {
 	int ret, sret = 0;
 
-	ret = gnutls_mutex_lock(&_gnutls_pkcs11_mutex);
+	ret = gnutls_static_mutex_lock(&pkcs11_mutex);
 	if (ret != 0)
 		return gnutls_assert_val(GNUTLS_E_LOCKING_ERROR);
 
@@ -351,7 +351,7 @@ int _gnutls_pkcs11_check_init(init_level_t req_level, void *priv, pkcs11_reinit_
 	ret = sret;
 
  cleanup:
-	gnutls_mutex_unlock(&_gnutls_pkcs11_mutex);
+	gnutls_static_mutex_unlock(&pkcs11_mutex);
 
 	return ret;
 }

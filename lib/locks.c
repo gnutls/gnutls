@@ -43,32 +43,77 @@
  * unless really needed to. GnuTLS will use the appropriate locks for the running
  * system.
  *
- * Note that since the move to implicit initialization of GnuTLS on library
- * load, calling this function will deinitialize the library, and re-initialize
- * it after the new locking functions are set.
+ * This function must be called prior to any other GnuTLS function; otherwise
+ * the behavior is undefined.
  *
- * This function must be called prior to any other gnutls function.
- * 
+ * Deprecated: This function is discouraged on GnuTLS 3.7.3 or later.
+ *
  * Since: 2.12.0
  **/
 void
 gnutls_global_set_mutex(mutex_init_func init, mutex_deinit_func deinit,
 			mutex_lock_func lock, mutex_unlock_func unlock)
 {
-int ret;
-
-	if (init == NULL || deinit == NULL || lock == NULL
-	    || unlock == NULL)
+	if (init == NULL || deinit == NULL || lock == NULL || unlock == NULL) {
 		return;
-
-	gnutls_global_deinit();
+	}
 
 	gnutls_mutex_init = init;
 	gnutls_mutex_deinit = deinit;
 	gnutls_mutex_lock = lock;
 	gnutls_mutex_unlock = unlock;
+}
 
-	ret = gnutls_global_init();
-	if (ret < 0)
-		_gnutls_debug_log("error in gnutls_global_init(): %s\n", gnutls_strerror(ret));
+int
+gnutls_static_mutex_lock(gnutls_static_mutex_t lock)
+{
+	if (unlikely(glthread_lock_lock(lock))) {
+		return gnutls_assert_val(GNUTLS_E_LOCKING_ERROR);
+	}
+	return 0;
+}
+
+int
+gnutls_static_mutex_unlock(gnutls_static_mutex_t lock)
+{
+	if (unlikely(glthread_lock_unlock(lock))) {
+		return gnutls_assert_val(GNUTLS_E_LOCKING_ERROR);
+	}
+	return 0;
+}
+
+int
+gnutls_rwlock_rdlock(gnutls_rwlock_t rwlock)
+{
+	if (unlikely(glthread_rwlock_rdlock(rwlock))) {
+		return gnutls_assert_val(GNUTLS_E_LOCKING_ERROR);
+	}
+	return 0;
+}
+
+int
+gnutls_rwlock_wrlock(gnutls_rwlock_t rwlock)
+{
+	if (unlikely(glthread_rwlock_wrlock(rwlock))) {
+		return gnutls_assert_val(GNUTLS_E_LOCKING_ERROR);
+	}
+	return 0;
+}
+
+int
+gnutls_rwlock_unlock(gnutls_rwlock_t rwlock)
+{
+	if (unlikely(glthread_rwlock_unlock(rwlock))) {
+		return gnutls_assert_val(GNUTLS_E_LOCKING_ERROR);
+	}
+	return 0;
+}
+
+int
+gnutls_once(gnutls_once_t once, void (*init_func) (void))
+{
+	if (unlikely(glthread_once(once, init_func))) {
+		return gnutls_assert_val(GNUTLS_E_LOCKING_ERROR);
+	}
+	return 0;
 }

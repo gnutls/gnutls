@@ -66,13 +66,13 @@
 #include <string.h>
 
 #include "tpm2.h"
+#include "locks.h"
 
 #include <tss2/tss2_mu.h>
 #include <tss2/tss2_esys.h>
 #include <tss2/tss2_tctildr.h>
 
 struct tpm2_info_st {
-	TSS2_TCTI_CONTEXT *tcti_ctx;
 	TPM2B_PUBLIC pub;
 	TPM2B_PRIVATE priv;
 	TPM2B_DIGEST userauth;
@@ -84,6 +84,8 @@ struct tpm2_info_st {
 	unsigned int parent;
 	struct pin_info_st *pin_info;
 };
+
+static TSS2_TCTI_CONTEXT *tcti_ctx;
 
 #define PRIMARY_HASH_ALGORITHM TPM2_ALG_SHA256
 #define PRIMARY_OBJECT_ATTRIBUTES (TPMA_OBJECT_USERWITHAUTH |		\
@@ -357,7 +359,7 @@ static int init_tpm2_key(ESYS_CONTEXT **ctx, ESYS_TR *key_handle,
 
 	_gnutls_debug_log("tpm2: establishing connection with TPM\n");
 
-	rc = Esys_Initialize(ctx, info->tcti_ctx, NULL);
+	rc = Esys_Initialize(ctx, tcti_ctx, NULL);
 	if (rc) {
 		gnutls_assert();
 		_gnutls_debug_log("tpm2: Esys_Initialize failed: 0x%x\n", rc);
@@ -693,9 +695,18 @@ int tpm2_ec_sign_hash_fn(gnutls_privkey_t key, gnutls_sign_algorithm_t algo,
 	return ret;
 }
 
-int install_tpm2_key(struct tpm2_info_st *info, gnutls_privkey_t pkey,
-		     unsigned int parent, bool emptyauth,
-		     gnutls_datum_t *privdata, gnutls_datum_t *pubdata)
+GNUTLS_ONCE(tcti_once);
+
+void
+tpm2_tcti_deinit(void)
+{
+	if (tcti_ctx) {
+		Tss2_TctiLdr_Finalize(&tcti_ctx);
+	}
+}
+
+static void
+tcti_once_init(void)
 {
 	const char *tcti;
 	const char * const tcti_vars[] = {
@@ -707,16 +718,6 @@ int install_tpm2_key(struct tpm2_info_st *info, gnutls_privkey_t pkey,
 	size_t i;
 	TSS2_RC rc;
 
-	if (!parent_is_persistent(parent) &&
-	    parent != TPM2_RH_OWNER && parent != TPM2_RH_NULL &&
-	    parent != TPM2_RH_ENDORSEMENT && parent != TPM2_RH_PLATFORM) {
-		_gnutls_debug_log("tpm2: Invalid TPM2 parent handle 0x%08x\n",
-				  parent);
-		return gnutls_assert_val(GNUTLS_E_TPM_ERROR);
-	}
-
-	info->parent = parent;
-
 	for (i = 0; i < sizeof(tcti_vars) / sizeof(tcti_vars[0]); i++) {
 		tcti = secure_getenv(tcti_vars[i]);
 		if (tcti && *tcti != '\0') {
@@ -726,13 +727,35 @@ int install_tpm2_key(struct tpm2_info_st *info, gnutls_privkey_t pkey,
 		}
 	}
 	if (tcti && *tcti != '\0') {
-		rc = Tss2_TctiLdr_Initialize(tcti, &info->tcti_ctx);
+		rc = Tss2_TctiLdr_Initialize(tcti, &tcti_ctx);
 		if (rc) {
 			_gnutls_debug_log("tpm2: TSS2_TctiLdr_Initialize failed: 0x%x\n",
 					  rc);
-			return gnutls_assert_val(GNUTLS_E_TPM_ERROR);
 		}
 	}
+}
+
+int install_tpm2_key(struct tpm2_info_st *info, gnutls_privkey_t pkey,
+		     unsigned int parent, bool emptyauth,
+		     gnutls_datum_t *privdata, gnutls_datum_t *pubdata)
+{
+	TSS2_RC rc;
+
+	(void)gnutls_once(&tcti_once, tcti_once_init);
+
+	if (!tcti_ctx) {
+		return gnutls_assert_val(GNUTLS_E_TPM_ERROR);
+	}
+
+	if (!parent_is_persistent(parent) &&
+	    parent != TPM2_RH_OWNER && parent != TPM2_RH_NULL &&
+	    parent != TPM2_RH_ENDORSEMENT && parent != TPM2_RH_PLATFORM) {
+		_gnutls_debug_log("tpm2: Invalid TPM2 parent handle 0x%08x\n",
+				  parent);
+		return gnutls_assert_val(GNUTLS_E_TPM_ERROR);
+	}
+
+	info->parent = parent;
 
 	rc = Tss2_MU_TPM2B_PRIVATE_Unmarshal(privdata->data, privdata->size, NULL,
 					     &info->priv);
@@ -781,9 +804,6 @@ void release_tpm2_ctx(struct tpm2_info_st *info)
 			    sizeof(info->ownerauth.buffer));
 		zeroize_key(info->userauth.buffer,
 			    sizeof(info->userauth.buffer));
-		if (info->tcti_ctx) {
-			Tss2_TctiLdr_Finalize(&info->tcti_ctx);
-		}
 		gnutls_free(info);
 	}
 }

@@ -31,134 +31,54 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#ifdef _WIN32
-# include <windows.h>
-# include <wincrypt.h>
-
-#else /* !_WIN32 */
-
-# ifdef HAVE_PTHREAD_LOCKS
-#  include <pthread.h>
-# endif
-
-#endif
+#include "glthread/lock.h"
 
 /* System specific lock function wrappers.
  */
 
 /* Thread stuff */
 
-#ifdef HAVE_WIN32_LOCKS
 static int gnutls_system_mutex_init(void **priv)
 {
-	CRITICAL_SECTION *lock = malloc(sizeof(CRITICAL_SECTION));
+	gl_lock_t *lock = malloc(sizeof(gl_lock_t));
 
-	if (lock == NULL)
+	if (!lock) {
 		return GNUTLS_E_MEMORY_ERROR;
+	}
 
-	InitializeCriticalSection(lock);
-
-	*priv = lock;
-
-	return 0;
-}
-
-static int gnutls_system_mutex_deinit(void **priv)
-{
-	DeleteCriticalSection((CRITICAL_SECTION *) * priv);
-	free(*priv);
-
-	return 0;
-}
-
-static int gnutls_system_mutex_lock(void **priv)
-{
-	EnterCriticalSection((CRITICAL_SECTION *) * priv);
-	return 0;
-}
-
-static int gnutls_system_mutex_unlock(void **priv)
-{
-	LeaveCriticalSection((CRITICAL_SECTION *) * priv);
-	return 0;
-}
-
-#endif				/* WIN32_LOCKS */
-
-#ifdef HAVE_PTHREAD_LOCKS
-
-static int gnutls_system_mutex_init(void **priv)
-{
-	pthread_mutex_t *lock = malloc(sizeof(pthread_mutex_t));
-	int ret;
-
-	if (lock == NULL)
-		return GNUTLS_E_MEMORY_ERROR;
-
-	ret = pthread_mutex_init(lock, NULL);
-	if (ret) {
+	if (glthread_lock_init(lock)) {
 		free(lock);
-		gnutls_assert();
-		return GNUTLS_E_LOCKING_ERROR;
+		return gnutls_assert_val(GNUTLS_E_LOCKING_ERROR);
 	}
 
 	*priv = lock;
-
 	return 0;
 }
 
 static int gnutls_system_mutex_deinit(void **priv)
 {
-	pthread_mutex_destroy((pthread_mutex_t *) * priv);
+	if (glthread_lock_destroy((gl_lock_t *) * priv)) {
+		return gnutls_assert_val(GNUTLS_E_LOCKING_ERROR);
+	}
 	free(*priv);
 	return 0;
 }
 
 static int gnutls_system_mutex_lock(void **priv)
 {
-	if (pthread_mutex_lock((pthread_mutex_t *) * priv)) {
-		gnutls_assert();
-		return GNUTLS_E_LOCKING_ERROR;
+	if (glthread_lock_lock((gl_lock_t *) * priv)) {
+		return gnutls_assert_val(GNUTLS_E_LOCKING_ERROR);
 	}
-
 	return 0;
 }
 
 static int gnutls_system_mutex_unlock(void **priv)
 {
-	if (pthread_mutex_unlock((pthread_mutex_t *) * priv)) {
-		gnutls_assert();
-		return GNUTLS_E_LOCKING_ERROR;
+	if (glthread_lock_unlock((gl_lock_t *) * priv)) {
+		return gnutls_assert_val(GNUTLS_E_LOCKING_ERROR);
 	}
-
 	return 0;
 }
-
-#endif				/* PTHREAD_LOCKS */
-
-#ifdef HAVE_NO_LOCKS
-
-static int gnutls_system_mutex_init(void **priv)
-{
-	return 0;
-}
-
-static int gnutls_system_mutex_deinit(void **priv)
-{
-	return 0;
-}
-
-static int gnutls_system_mutex_lock(void **priv)
-{
-	return 0;
-}
-
-static int gnutls_system_mutex_unlock(void **priv)
-{
-	return 0;
-}
-
-#endif				/* NO_LOCKS */
 
 mutex_init_func gnutls_mutex_init = gnutls_system_mutex_init;
 mutex_deinit_func gnutls_mutex_deinit = gnutls_system_mutex_deinit;

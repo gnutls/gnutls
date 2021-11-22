@@ -35,6 +35,8 @@
 #include <system.h>
 #include <locks.h>
 
+GNUTLS_STATIC_MUTEX(file_mutex);
+
 struct gnutls_tdb_int {
 	gnutls_tdb_store_func store;
 	gnutls_tdb_store_commitment_func cstore;
@@ -57,8 +59,6 @@ int store_pubkey(const char *db_name, const char *host,
 		 const gnutls_datum_t * pubkey);
 
 static int find_config_file(char *file, size_t max_size);
-
-extern void *_gnutls_file_mutex;
 
 struct gnutls_tdb_int default_tdb = {
 	store_pubkey,
@@ -404,7 +404,7 @@ int store_pubkey(const char *db_name, const char *host,
 	gnutls_datum_t b64key = { NULL, 0 };
 	int ret;
 
-	ret = gnutls_mutex_lock(&_gnutls_file_mutex);
+	ret = gnutls_static_mutex_lock(&file_mutex);
 	if (ret != 0)
 		return gnutls_assert_val(GNUTLS_E_LOCKING_ERROR);
 
@@ -434,7 +434,7 @@ int store_pubkey(const char *db_name, const char *host,
 	if (fp != NULL)
 		fclose(fp);
 
-	gnutls_mutex_unlock(&_gnutls_file_mutex);
+	gnutls_static_mutex_unlock(&file_mutex);
 	gnutls_free(b64key.data);
 
 	return ret;
