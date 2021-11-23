@@ -125,6 +125,7 @@ void doit(void)
 	gnutls_fips140_operation_state_t fips_state;
 	gnutls_datum_t signature;
 	unsigned int bits;
+	uint8_t hmac[64];
 
 	fprintf(stderr,
 		"Please note that if in FIPS140 mode, you need to assure the library's integrity prior to running this test\n");
@@ -200,6 +201,42 @@ void doit(void)
 	if (ret != GNUTLS_E_UNWANTED_ALGORITHM) {
 		fail("gnutls_hmac_init succeeded for md5\n");
 	}
+
+	/* HMAC with key equal to or longer than 112 bits: approved */
+	FIPS_PUSH_CONTEXT();
+	ret = gnutls_hmac_init(&mh, GNUTLS_MAC_SHA256, key.data, key.size);
+	if (ret < 0) {
+		fail("gnutls_hmac_init failed\n");
+	}
+	gnutls_hmac_deinit(mh, NULL);
+	FIPS_POP_CONTEXT(APPROVED);
+
+	/* HMAC with key shorter than 112 bits: not approved */
+	FIPS_PUSH_CONTEXT();
+	ret = gnutls_hmac_init(&mh, GNUTLS_MAC_SHA256, key.data, 13);
+	if (ret < 0) {
+		fail("gnutls_hmac_init failed\n");
+	}
+	gnutls_hmac_deinit(mh, NULL);
+	FIPS_POP_CONTEXT(NOT_APPROVED);
+
+	/* HMAC with key equal to or longer than 112 bits: approved */
+	FIPS_PUSH_CONTEXT();
+	ret = gnutls_hmac_fast(GNUTLS_MAC_SHA256, key.data, key.size,
+			       data.data, data.size, hmac);
+	if (ret < 0) {
+		fail("gnutls_hmac_fast failed\n");
+	}
+	FIPS_POP_CONTEXT(APPROVED);
+
+	/* HMAC with key shorter than 112 bits: not approved */
+	FIPS_PUSH_CONTEXT();
+	ret = gnutls_hmac_fast(GNUTLS_MAC_SHA256, key.data, 13,
+			       data.data, data.size, hmac);
+	if (ret < 0) {
+		fail("gnutls_hmac_fast failed\n");
+	}
+	FIPS_POP_CONTEXT(NOT_APPROVED);
 
 	ret = gnutls_rnd(GNUTLS_RND_NONCE, key16, sizeof(key16));
 	if (ret < 0) {
