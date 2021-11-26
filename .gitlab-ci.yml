@@ -389,7 +389,7 @@ fedora-FIPS140-2/test:
     - make -j$BUILDJOBS
     - make -j$BUILDJOBS install
     - popd
-    - PKG_CONFIG_PATH=${PWD}/$NETTLE_DIR/lib64/pkgconfig dash ./configure --disable-gcc-warnings --disable-doc --disable-guile --with-pkcs12-iter-count=10000
+    - PKG_CONFIG_PATH=${PWD}/nettle-git/$NETTLE_DIR/lib64/pkgconfig dash ./configure --disable-gcc-warnings --disable-doc --disable-guile --with-pkcs12-iter-count=10000
     - make -j$BUILDJOBS
     - make -j$BUILDJOBS check TESTS=""
 
@@ -398,7 +398,7 @@ fedora-FIPS140-2/test:
     - .test
     - .fedora-nettle
   script:
-    - PKG_CONFIG_PATH=${PWD}/$NETTLE_DIR/lib64/pkgconfig LD_LIBRARY_PATH=${PWD}/$NETTLE_DIR/lib64 make -j$CHECKJOBS check
+    - PKG_CONFIG_PATH=${PWD}/nettle-git/$NETTLE_DIR/lib64/pkgconfig LD_LIBRARY_PATH=${PWD}/nettle-git/$NETTLE_DIR/lib64 make -j$CHECKJOBS check
 
 fedora-nettle/build:
   extends:
