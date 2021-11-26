@@ -105,12 +105,14 @@ system_writev(gnutls_transport_ptr_t ptr, const giovec_t * iovec,
 			to_send_cnt++;
 			break;
 		}
+#ifdef _WIN64
 		if (iovec[to_send_cnt].iov_len > ULONG_MAX) {
 			/* WSASend() limitation */
 			bufs[to_send_cnt].len = ULONG_MAX;
 			to_send_cnt++;
 			break;
 		}
+#endif
 		bufs[to_send_cnt].len =
 			(unsigned long) iovec[to_send_cnt].iov_len;
 		to_send_bytes += iovec[to_send_cnt].iov_len;
