@@ -84,12 +84,15 @@ ssize_t
 system_writev(gnutls_transport_ptr_t ptr, const giovec_t * iovec,
 	      int iovec_cnt)
 {
-	WSABUF bufs[iovec_cnt];
+	WSABUF bufs[32];
 	DWORD bytes_sent;
-	int to_send_cnt = 0;
+	DWORD to_send_cnt = 0;
 	size_t to_send_bytes = 0;
 
-	while (to_send_cnt < iovec_cnt && to_send_bytes < SSIZE_MAX) {
+	if ((size_t)iovec_cnt > sizeof(bufs) / sizeof(bufs[0]))
+		iovec_cnt = sizeof(bufs) / sizeof(bufs[0]);
+
+	while (to_send_cnt < (DWORD)iovec_cnt && to_send_bytes < SSIZE_MAX) {
 		bufs[to_send_cnt].buf = iovec[to_send_cnt].iov_base;
 
 		if (to_send_bytes + iovec[to_send_cnt].iov_len > SSIZE_MAX) {
@@ -102,12 +105,14 @@ system_writev(gnutls_transport_ptr_t ptr, const giovec_t * iovec,
 			to_send_cnt++;
 			break;
 		}
+#ifdef _WIN64
 		if (iovec[to_send_cnt].iov_len > ULONG_MAX) {
 			/* WSASend() limitation */
 			bufs[to_send_cnt].len = ULONG_MAX;
 			to_send_cnt++;
 			break;
 		}
+#endif
 		bufs[to_send_cnt].len =
 			(unsigned long) iovec[to_send_cnt].iov_len;
 		to_send_bytes += iovec[to_send_cnt].iov_len;
