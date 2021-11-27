@@ -152,7 +152,7 @@ TESTS = $(dist_check_SCRIPTS)
 # which are not trivial, and makes no point to address.
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
 	LC_ALL="C"				\
-	VALGRIND="$(VALGRIND)"			\
+	VALGRIND='$(LOG_VALGRIND)'		\
 	LIBTOOL="$(LIBTOOL)"			\
 	top_builddir="$(top_builddir)"		\
 	abs_top_builddir="$(abs_top_builddir)"	\
@@ -179,6 +179,9 @@ endif
 if DISABLE_BASH_TESTS
 TESTS_ENVIRONMENT += DISABLE_BASH_TESTS=1
 endif
+
+AM_VALGRINDFLAGS = --suppressions=$(srcdir)/suppressions.valgrind
+LOG_COMPILER = $(LOG_VALGRIND)
 
 distclean-local:
 	rm -rf tmp-* *.tmp

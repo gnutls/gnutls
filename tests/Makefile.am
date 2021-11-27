@@ -620,7 +620,9 @@ endif
 
 TEST_EXTENSIONS = .sh
 SH_LOG_COMPILER = $(SHELL)
-LOG_COMPILER = $(VALGRIND)
+
+AM_VALGRINDFLAGS = --suppressions=$(srcdir)/suppressions.valgrind
+LOG_COMPILER = $(LOG_VALGRIND)
 
 distclean-local:
 	rm -rf softhsm-*.db softhsm-*.config *.tmp tmp-* x509-crt-list-import-url.config.db port.lock.d

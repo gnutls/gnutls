@@ -459,7 +459,9 @@ fi
 AM_CONDITIONAL(HAVE_LIBUNISTRING, test "$ac_have_unistring" = "yes")
 
 # specify our own suppressions file; this needs to be set before gl_INIT
-DEFAULT_VALGRINDFLAGS='-q --error-exitcode=1 --leak-check=full --track-origins=yes --gen-suppressions=all --suppressions=\$(srcdir)/suppressions.valgrind'
+DEFAULT_VALGRINDFLAGS='-q --error-exitcode=1 --leak-check=full --track-origins=yes --gen-suppressions=all'
+
+gl_VALGRIND_TESTS_DEFAULT_NO
 
 dnl Note that g*l_INIT are run after we check for library capabilities,
 dnl to prevent issues from caching lib dependencies. See discussion
@@ -558,8 +560,6 @@ if test "$gl_gcc_warnings" = yes; then
   gl_WARN_ADD([-Wabi=11])
   gl_WARN_ADD([-fdiagnostics-show-option])
 fi
-
-gl_VALGRIND_TESTS_DEFAULT_NO
 
 if test "$gl_cv_opt_valgrind_tests" != no; then
   gl_WARN_ADD([-fno-builtin-strcmp])

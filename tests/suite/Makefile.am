@@ -61,7 +61,7 @@ scripts_to_test = chain.sh \
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT)					\
 	LC_ALL="C"							\
 	PYTHON="$(PYTHON)"						\
-	VALGRIND="$(VALGRIND)"						\
+	VALGRIND='$(LOG_VALGRIND)'					\
 	top_builddir="$(top_builddir)"					\
 	abs_top_builddir="$(abs_top_builddir)"				\
 	srcdir="$(srcdir)"						\
@@ -117,4 +117,6 @@ prime_check_CPPFLAGS = $(AM_CPPFLAGS) $(NETTLE_CFLAGS)
 
 TEST_EXTENSIONS = .sh
 SH_LOG_COMPILER = $(SHELL)
-LOG_COMPILER = $(VALGRIND)
+
+AM_VALGRINDFLAGS = --suppressions=$(srcdir)/suppressions.valgrind
+LOG_COMPILER = $(LOG_VALGRIND)
