@@ -9,8 +9,9 @@
    in [configure.ac](configure.ac) as well as soname numbers in
    [m4/hooks.m4](m4/hooks.m4).
 1. Remove the last section of [devel/libgnutls.abignore], update the
-   *.abi files under [devel/abi-dump] submodule, and push changes
-   to the [abi-dump repository]; then do `make abi-check`
+   *.abi files under [devel/abi-dump] submodule, run `make
+   abi-dump-latest`, and push any changes to the [abi-dump
+   repository]; then do `make abi-check`
 1. Create a tarball and detached GPG signature:
 ```console
 make distcheck
