@@ -159,11 +159,23 @@ As such, some questions to answer before adding a new API:
 
 The make rule 'abi-check' verifies that the ABI remained compatible
 since the last tagged release, which is maintained in a separate
-[abi-dump](https://gitlab.com/gnutls/abi-dump) repository. During
-development, the new APIs should be explicitly ignored with the last
-section of [devel/libgnutls.abignore](devel/libgnutls.abignore). When
-a new version is released and the abi-dump repository is updated, the
-section will be cleared.
+[abi-dump](https://gitlab.com/gnutls/abi-dump) repository. This
+repository shall be updated upon each release if any changes are
+introduced in the ABI.
+
+To add new API during development cycle, follow the steps below:
+
+0. If there is no section in [lib/libgnutls.map](lib/libgnutls.map),
+   corresponding to the next release, add it, deriving from the
+   previous interface
+1. Add new symbols in that section
+2. Run `make abi-check-latest`; this will report differences as
+   errors.  Edit the last section of
+   [devel/libgnutls.abignore](devel/libgnutls.abignore) to suppress
+   them.
+
+When a new version is released and the abi-dump repository is updated,
+the section will be cleared.
 
 The above do not apply to the C++ library; this library's ABI should not
 be considered stable.
