@@ -276,22 +276,21 @@ _gnutls_encrypt_session_ticket(gnutls_session_t session,
 {
 	cipher_hd_st cipher_hd;
 	gnutls_datum_t IV;
-	gnutls_datum_t encrypted_state = {NULL,0};
+	gnutls_datum_t encrypted_state;
+	gnutls_datum_t result = { NULL, 0 };
 	uint8_t iv[TICKET_IV_SIZE];
 	gnutls_datum_t stek_cipher_key, stek_mac_key, stek_key_name;
 	struct ticket_st ticket;
 	int ret;
 
 	encrypted_state.size = ((state->size + TICKET_BLOCK_SIZE - 1) / TICKET_BLOCK_SIZE) * TICKET_BLOCK_SIZE;
-	ticket_data->size = TICKET_KEY_NAME_SIZE + TICKET_IV_SIZE + 2 +
+	result.size = TICKET_KEY_NAME_SIZE + TICKET_IV_SIZE + 2 +
 	    encrypted_state.size + TICKET_MAC_SIZE;
-	ticket_data->data = gnutls_calloc(1, ticket_data->size);
-	if (!ticket_data->data) {
-		gnutls_assert();
-		ret = GNUTLS_E_MEMORY_ERROR;
-		goto cleanup;
+	result.data = gnutls_calloc(1, result.size);
+	if (!result.data) {
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 	}
-	encrypted_state.data = ticket_data->data + TICKET_KEY_NAME_SIZE + TICKET_IV_SIZE + 2;
+	encrypted_state.data = result.data + TICKET_KEY_NAME_SIZE + TICKET_IV_SIZE + 2;
 	memcpy(encrypted_state.data, state->data, state->size);
 
 	/* Retrieve ticket encryption keys */
@@ -344,17 +343,16 @@ _gnutls_encrypt_session_ticket(gnutls_session_t session,
 		goto cleanup2;
 	}
 
-	encrypted_state.data = NULL;
-
-	pack_ticket(&ticket, ticket_data);
-
-	ret = 0;
+	pack_ticket(&ticket, &result);
+	ticket_data->data = result.data;
+	ticket_data->size = result.size;
+	result.data = NULL;
 
 cleanup2:
 	_gnutls_cipher_deinit(&cipher_hd);
 
 cleanup:
-	_gnutls_free_datum(&encrypted_state);
+	_gnutls_free_datum(&result);
 
 	return ret;
 }
