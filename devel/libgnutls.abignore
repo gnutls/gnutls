@@ -57,3 +57,17 @@ return_type_name = unsigned int
 
 # The following should be removed in the new release, after updating the
 # abi-dump repository:
+[suppress_function]
+name = gnutls_digest_set_secure
+
+[suppress_function]
+name = gnutls_ecc_curve_set_enabled
+
+[suppress_function]
+name = gnutls_protocol_set_enabled
+
+[suppress_function]
+name = gnutls_sign_set_secure
+
+[suppress_function]
+name = gnutls_sign_set_secure_for_certs

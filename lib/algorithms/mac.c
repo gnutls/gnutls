@@ -291,14 +291,66 @@ gnutls_digest_algorithm_t gnutls_digest_get_id(const char *name)
 	return ret;
 }
 
-int _gnutls_digest_mark_insecure(const char *name)
+/* This is only called by cfg_apply in priority.c, in blocklisting mode. */
+int _gnutls_digest_mark_insecure(gnutls_digest_algorithm_t dig)
 {
 #ifndef DISABLE_SYSTEM_CONFIG
 	mac_entry_st *p;
 
 	for(p = hash_algorithms; p->name != NULL; p++) {
-		if (p->oid != NULL && c_strcasecmp(p->name, name) == 0) {
+		if (p->oid != NULL && p->id == (gnutls_mac_algorithm_t)dig) {
 			p->flags |= GNUTLS_MAC_FLAG_PREIMAGE_INSECURE;
+			return 0;
+		}
+	}
+
+#endif
+	return GNUTLS_E_INVALID_REQUEST;
+}
+
+/* This is only called by cfg_apply in priority.c, in allowlisting mode. */
+void _gnutls_digest_mark_insecure_all(void)
+{
+#ifndef DISABLE_SYSTEM_CONFIG
+	mac_entry_st *p;
+
+	for(p = hash_algorithms; p->name != NULL; p++) {
+		p->flags |= GNUTLS_MAC_FLAG_PREIMAGE_INSECURE_REVERTIBLE |
+			GNUTLS_MAC_FLAG_PREIMAGE_INSECURE;
+	}
+
+#endif
+}
+
+/**
+ * gnutls_digest_set_secure:
+ * @dig: is a digest algorithm
+ * @secure: whether to mark the digest algorithm secure
+ *
+ * Modify the previous system wide setting that marked @dig as secure
+ * or insecure. This only has effect when the algorithm is enabled
+ * through the allowlisting mode in the configuration file, or when
+ * the setting is modified with a prior call to this function.
+ *
+ * Since: 3.7.3
+ */
+int
+gnutls_digest_set_secure(gnutls_digest_algorithm_t dig,
+			 unsigned int secure)
+{
+#ifndef DISABLE_SYSTEM_CONFIG
+	mac_entry_st *p;
+
+	for(p = hash_algorithms; p->name != NULL; p++) {
+		if (p->oid != NULL && p->id == (gnutls_mac_algorithm_t)dig) {
+			if (!(p->flags & GNUTLS_MAC_FLAG_PREIMAGE_INSECURE_REVERTIBLE)) {
+				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			}
+			if (secure) {
+				p->flags &= ~GNUTLS_MAC_FLAG_PREIMAGE_INSECURE;
+			} else {
+				p->flags |= GNUTLS_MAC_FLAG_PREIMAGE_INSECURE;
+			}
 			return 0;
 		}
 	}
@@ -318,6 +370,21 @@ unsigned _gnutls_digest_is_insecure(gnutls_digest_algorithm_t dig)
 	}
 
 	return 1;
+}
+
+bool _gnutls_digest_is_insecure2(gnutls_digest_algorithm_t dig,	unsigned flags)
+{
+	const mac_entry_st *p;
+
+	for(p = hash_algorithms; p->name != NULL; p++) {
+		if (p->oid != NULL && p->id == (gnutls_mac_algorithm_t)dig) {
+			return (p->flags & GNUTLS_MAC_FLAG_PREIMAGE_INSECURE &&
+				!(flags & GNUTLS_MAC_FLAG_ALLOW_INSECURE_REVERTIBLE &&
+				  p->flags & GNUTLS_MAC_FLAG_PREIMAGE_INSECURE_REVERTIBLE));
+		}
+	}
+
+	return true;
 }
 
 /**

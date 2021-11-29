@@ -345,15 +345,27 @@ typedef enum hash_security_level_t {
 	_INSECURE
 } hash_security_level_t;
 
-int _gnutls_ecc_curve_mark_disabled(const char *name);
-int _gnutls_sign_mark_insecure(const char *name, hash_security_level_t);
-int _gnutls_digest_mark_insecure(const char *name);
+int _gnutls_ecc_curve_mark_disabled(gnutls_ecc_curve_t curve);
+int _gnutls_sign_mark_insecure(gnutls_sign_algorithm_t, hash_security_level_t);
+int _gnutls_digest_mark_insecure(gnutls_digest_algorithm_t dig);
 unsigned _gnutls_digest_is_insecure(gnutls_digest_algorithm_t dig);
-int _gnutls_version_mark_disabled(const char *name);
+bool _gnutls_digest_is_insecure2(gnutls_digest_algorithm_t dig,	unsigned flags);
+const gnutls_protocol_t *_gnutls_protocol_list(void);
+int _gnutls_version_mark_disabled(gnutls_protocol_t version);
 gnutls_protocol_t _gnutls_protocol_get_id_if_supported(const char *name);
+
+/* these functions are for revertible settings, meaning that algorithms marked
+ * as disabled/insecure with mark_*_all functions can be re-enabled with
+ * mark_{enabled,secure} functions */
+void _gnutls_ecc_curve_mark_disabled_all(void);
+void _gnutls_sign_mark_insecure_all(hash_security_level_t level);
+void _gnutls_digest_mark_insecure_all(void);
+void _gnutls_version_mark_revertible_all(void);
 
 #define GNUTLS_SIGN_FLAG_TLS13_OK	1 /* if it is ok to use under TLS1.3 */
 #define GNUTLS_SIGN_FLAG_CRT_VRFY_REVERSE (1 << 1) /* reverse order of bytes in CrtVrfy signature */
+#define GNUTLS_SIGN_FLAG_INSECURE_REVERTIBLE (1 << 2)
+#define GNUTLS_SIGN_FLAG_ALLOW_INSECURE_REVERTIBLE (1 << 3)
 struct gnutls_sign_entry_st {
 	const char *name;
 	const char *oid;
@@ -448,6 +460,7 @@ typedef struct gnutls_ecc_curve_entry_st {
 	unsigned sig_size;	/* the size of curve signatures in bytes (EdDSA) */
 	unsigned gost_curve;
 	bool supported;
+	bool supported_revertible;
 	gnutls_group_t group;
 } gnutls_ecc_curve_entry_st;
 
@@ -459,6 +472,7 @@ unsigned _gnutls_ecc_curve_is_supported(gnutls_ecc_curve_t);
 gnutls_group_t _gnutls_ecc_curve_get_group(gnutls_ecc_curve_t);
 const gnutls_group_entry_st *_gnutls_tls_id_to_group(unsigned num);
 const gnutls_group_entry_st * _gnutls_id_to_group(unsigned id);
+gnutls_group_t _gnutls_group_get_id(const char *name);
 
 gnutls_ecc_curve_t _gnutls_ecc_bits_to_curve(gnutls_pk_algorithm_t pk, int bits);
 #define MAX_ECC_CURVE_SIZE 66

@@ -198,14 +198,62 @@ version_is_valid_for_session(gnutls_session_t session,
 	return 0;
 }
 
-int _gnutls_version_mark_disabled(const char *name)
+/* This is only called by cfg_apply in priority.c, in blocklisting mode. */
+int _gnutls_version_mark_disabled(gnutls_protocol_t version)
 {
 #ifndef DISABLE_SYSTEM_CONFIG
 	version_entry_st *p;
 
 	for (p = sup_versions; p->name != NULL; p++)
-		if (c_strcasecmp(p->name, name) == 0) {
-			p->supported = 0;
+		if (p->id == version) {
+			p->supported = false;
+			return 0;
+		}
+
+#endif
+	return GNUTLS_E_INVALID_REQUEST;
+}
+
+/* This is only called by cfg_apply in priority.c, in allowlisting mode. */
+void _gnutls_version_mark_revertible_all(void)
+{
+#ifndef DISABLE_SYSTEM_CONFIG
+	version_entry_st *p;
+
+	for (p = sup_versions; p->name != NULL; p++) {
+		p->supported_revertible = true;
+	}
+
+#endif
+}
+
+/**
+ * gnutls_protocol_set_enabled:
+ * @version: is a (gnutls) version number
+ * @enabled: whether to enable the protocol
+ *
+ * Mark the previous system wide setting that marked @version as
+ * enabled or disabled. This only has effect when the version is
+ * enabled through the allowlisting mode in the configuration file, or
+ * when the setting is modified with a prior call to this function.
+ *
+ * Returns: 0 on success or negative error code otherwise.
+ *
+ * Since: 3.7.3
+ */
+int
+gnutls_protocol_set_enabled(gnutls_protocol_t version,
+			    unsigned int enabled)
+{
+#ifndef DISABLE_SYSTEM_CONFIG
+	version_entry_st *p;
+
+	for (p = sup_versions; p->name != NULL; p++)
+		if (p->id == version) {
+			if (!p->supported_revertible) {
+				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			}
+			p->supported = enabled;
 			return 0;
 		}
 
@@ -467,6 +515,25 @@ const gnutls_protocol_t *gnutls_protocol_list(void)
 	}
 
 	return supported_protocols;
+}
+
+/* Return all versions, including non-supported ones.
+ */
+const gnutls_protocol_t *_gnutls_protocol_list(void)
+{
+	const version_entry_st *p;
+	static gnutls_protocol_t protocols[MAX_ALGOS] = { 0 };
+
+	if (protocols[0] == 0) {
+		int i = 0;
+
+		for (p = sup_versions; p->name != NULL; p++) {
+			protocols[i++] = p->id;
+		}
+		protocols[i++] = 0;
+	}
+
+	return protocols;
 }
 
 /* Returns a version number given the major and minor numbers.
