@@ -55,5 +55,15 @@ changed_enumerators = GNUTLS_SEC_PARAM_MAX
 name = gnutls_ocsp_status_request_is_checked
 return_type_name = unsigned int
 
+# these functions are only available when compiled with --enable-fips140-mode
+[suppress_function]
+name = drbg_aes_generate
+
+[suppress_function]
+name = drbg_aes_init
+
+[suppress_function]
+name = drbg_aes_reseed
+
 # The following should be removed in the new release, after updating the
 # abi-dump repository:
