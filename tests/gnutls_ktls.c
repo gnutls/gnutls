@@ -43,7 +43,7 @@ static void client_log_func(int level, const char *str)
 }
 
 #define MAX_BUF 1024
-#define MSG "Hello world!\0"
+#define MSG "Hello world!"
 
 
 static void client(int fd, const char *prio)
@@ -84,7 +84,7 @@ static void client(int fd, const char *prio)
 		success("client: Handshake was completed\n");
 
 	ret = gnutls_transport_is_ktls_enabled(session);
-	if (ret != 3){
+	if (!(ret & GNUTLS_KTLS_RECV)){
 		fail("client: KTLS was not properly inicialized\n");
 		goto end;
 	}
@@ -184,7 +184,7 @@ static void server(int fd, const char *prio)
 		success("server: Handshake was completed\n");
 
 	ret = gnutls_transport_is_ktls_enabled(session);
-	if (ret != 3){
+	if (!(ret & GNUTLS_KTLS_SEND)){
 		fail("server: KTLS was not properly inicialized\n");
 		goto end;
 	}

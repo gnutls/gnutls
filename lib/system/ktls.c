@@ -39,33 +39,34 @@
  *
  * Checks if KTLS is now enabled and was properly inicialized.
  *
- * Returns: 1 for enabled, 0 otherwise
+ * Returns: %GNUTLS_KTLS_RECV, %GNUTLS_KTLS_SEND, %GNUTLS_KTLS_DUPLEX, otherwise 0
  *
- * Since: 3.7.2
+ * Since: 3.7.3
  **/
-int gnutls_transport_is_ktls_enabled(gnutls_session_t session){
-	if (unlikely(!session->internals.initial_negotiation_completed))
-		return gnutls_assert_val(GNUTLS_E_UNAVAILABLE_DURING_HANDSHAKE);
+gnutls_transport_ktls_enable_flags_t
+gnutls_transport_is_ktls_enabled(gnutls_session_t session){
+	if (unlikely(!session->internals.initial_negotiation_completed)){
+		_gnutls_debug_log("Initial negotiation is not yet complete");
+		return 0;
+	}
 
 	return session->internals.ktls_enabled;
 }
 
-int _gnutls_ktls_enable(gnutls_session_t session)
+void _gnutls_ktls_enable(gnutls_session_t session)
 {
 	int sockin, sockout;
 	session->internals.ktls_enabled = 0;
 	gnutls_transport_get_int2(session, &sockin, &sockout);
 
 	if (setsockopt(sockin, SOL_TCP, TCP_ULP, "tls", sizeof ("tls")) == 0)
-		session->internals.ktls_enabled |= KTLS_RECV;
+		session->internals.ktls_enabled |= GNUTLS_KTLS_RECV;
 
 	if (sockin != sockout) {
 		if (setsockopt(sockout, SOL_TCP, TCP_ULP, "tls", sizeof ("tls")) == 0)
-			session->internals.ktls_enabled |= KTLS_SEND;
+			session->internals.ktls_enabled |= GNUTLS_KTLS_SEND;
 	} else
-		session->internals.ktls_enabled |= KTLS_SEND;
-
-	return 0;
+		session->internals.ktls_enabled |= GNUTLS_KTLS_SEND;
 }
 
 int _gnutls_ktls_set_keys(gnutls_session_t session)
@@ -95,7 +96,7 @@ int _gnutls_ktls_set_keys(gnutls_session_t session)
 		return ret;
 	}
 
-	if(session->internals.ktls_enabled & KTLS_RECV){
+	if(session->internals.ktls_enabled & GNUTLS_KTLS_RECV){
 		switch (cipher) {
 			case GNUTLS_CIPHER_AES_128_GCM:
 			{
@@ -128,7 +129,7 @@ int _gnutls_ktls_set_keys(gnutls_session_t session)
 
 				if (setsockopt (sockin, SOL_TLS, TLS_RX,
 						&crypto_info, sizeof (crypto_info))) {
-					session->internals.ktls_enabled ^= KTLS_RECV;
+					session->internals.ktls_enabled &= ~GNUTLS_KTLS_RECV;
 					return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 				}
 			}
@@ -163,7 +164,7 @@ int _gnutls_ktls_set_keys(gnutls_session_t session)
 
 				if (setsockopt (sockin, SOL_TLS, TLS_RX,
 						&crypto_info, sizeof (crypto_info))) {
-					session->internals.ktls_enabled ^= KTLS_RECV;
+					session->internals.ktls_enabled &= ~GNUTLS_KTLS_RECV;
 					return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 				}
 			}
@@ -179,7 +180,7 @@ int _gnutls_ktls_set_keys(gnutls_session_t session)
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 	}
 
-	if(session->internals.ktls_enabled & KTLS_SEND){
+	if(session->internals.ktls_enabled & GNUTLS_KTLS_SEND){
 		switch (cipher) {
 			case GNUTLS_CIPHER_AES_128_GCM:
 			{
@@ -212,7 +213,7 @@ int _gnutls_ktls_set_keys(gnutls_session_t session)
 
 				if (setsockopt (sockout, SOL_TLS, TLS_TX,
 						&crypto_info, sizeof (crypto_info))) {
-					session->internals.ktls_enabled ^= KTLS_SEND;
+					session->internals.ktls_enabled &= ~GNUTLS_KTLS_SEND;
 					return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 				}
 			}
@@ -247,7 +248,7 @@ int _gnutls_ktls_set_keys(gnutls_session_t session)
 
 				if (setsockopt (sockout, SOL_TLS, TLS_TX,
 						&crypto_info, sizeof (crypto_info))) {
-					session->internals.ktls_enabled ^= KTLS_SEND;
+					session->internals.ktls_enabled &= ~GNUTLS_KTLS_SEND;
 					return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 				}
 			}
@@ -419,12 +420,13 @@ int _gnutls_ktls_recv_int(gnutls_session_t session, content_type_t type,
 }
 
 #else //ENABLE_KTLS
-int gnutls_transport_is_ktls_enabled(gnutls_session_t session){
+gnutls_transport_ktls_enable_flags_t
+gnutls_transport_is_ktls_enabled(gnutls_session_t session){
 	return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 }
 
-int _gnutls_ktls_enable(gnutls_session_t session){
-	return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
+void _gnutls_ktls_enable(gnutls_session_t session){
+	return;
 }
 
 int _gnutls_ktls_set_keys(gnutls_session_t session) {
@@ -436,7 +438,8 @@ int _gnutls_ktls_send_control_msg(gnutls_session_t session,
 	return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 }
 
-int _gnutls_ktls_recv_int(gnutls_session_t session, content_type_t type, void *data, size_t data_size) {
+int _gnutls_ktls_recv_int(gnutls_session_t session, content_type_t type,
+		void *data, size_t data_size) {
 	return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 }
 

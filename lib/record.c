@@ -289,7 +289,7 @@ int gnutls_bye(gnutls_session_t session, gnutls_close_request_t how)
 
 	switch (BYE_STATE) {
 	case BYE_STATE0:
-		if (!IS_KTLS_ENABLED(session, KTLS_SEND))
+		if (!IS_KTLS_ENABLED(session, GNUTLS_KTLS_SEND))
 			ret = _gnutls_io_write_flush(session);
 		BYE_STATE = BYE_STATE0;
 		if (ret < 0) {
@@ -309,7 +309,7 @@ int gnutls_bye(gnutls_session_t session, gnutls_close_request_t how)
 	case BYE_STATE2:
 		BYE_STATE = BYE_STATE2;
 		if (how == GNUTLS_SHUT_RDWR) {
-			if (IS_KTLS_ENABLED(session, KTLS_SEND)){
+			if (IS_KTLS_ENABLED(session, GNUTLS_KTLS_SEND)){
 				do {
 					ret = _gnutls_ktls_recv_int(session,
 							GNUTLS_ALERT, NULL, 0);
@@ -2035,7 +2035,7 @@ gnutls_record_send2(gnutls_session_t session, const void *data,
 
 	switch(session->internals.rsend_state) {
 		case RECORD_SEND_NORMAL:
-			if (IS_KTLS_ENABLED(session, KTLS_SEND)) {
+			if (IS_KTLS_ENABLED(session, GNUTLS_KTLS_SEND)) {
 				return _gnutls_ktls_send(session, data, data_size);
 			} else {
 				return _gnutls_send_tlen_int(session, GNUTLS_APPLICATION_DATA,
@@ -2306,7 +2306,7 @@ gnutls_record_recv(gnutls_session_t session, void *data, size_t data_size)
 			return gnutls_assert_val(GNUTLS_E_UNAVAILABLE_DURING_HANDSHAKE);
 	}
 
-	if (IS_KTLS_ENABLED(session, KTLS_RECV)) {
+	if (IS_KTLS_ENABLED(session, GNUTLS_KTLS_RECV)) {
 		return _gnutls_ktls_recv(session, data, data_size);
 	} else {
 		return _gnutls_recv_int(session, GNUTLS_APPLICATION_DATA,
