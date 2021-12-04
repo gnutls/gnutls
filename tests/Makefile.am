@@ -161,7 +161,7 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 nul-in-x509-names x509_altname pkcs12_encode mini-x509	gnutls_session_set_id \
 	 rng-fork mini-eagain-dtls resume-dtls empty_retrieve_function \
 	 tls13-rehandshake-cert gnutls_ext_raw_parse handshake-large-cert \
-	 x509cert x509cert-tl infoaccess mini-dtls-hello-verify sign-verify-ed25519-rfc8080 \
+	 x509cert x509cert-tl x509cert-ct infoaccess mini-dtls-hello-verify sign-verify-ed25519-rfc8080 \
 	 trustdb-tofu dtls-rehandshake-anon mini-alpn mini-dtls-large \
 	 mini-termination mini-x509-cas mini-x509-2 pkcs12_simple tls-pthread \
 	 mini-emsgsize-dtls chainverify-unsorted mini-overhead tls12-ffdhe \
