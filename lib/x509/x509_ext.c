@@ -3536,7 +3536,7 @@ struct gnutls_x509_ct_scts_st {
 
 static void _gnutls_free_scts(struct gnutls_x509_ct_scts_st *scts)
 {
-	for (unsigned i = 0; i < scts->size; i++)
+	for (size_t i = 0; i < scts->size; i++)
 		_gnutls_free_datum(&scts->scts[i].signature);
 	gnutls_free(scts->scts);
 	scts->size = 0;
@@ -3645,7 +3645,7 @@ static const struct sct_sign_algorithm_st algos[] = {
 static gnutls_sign_algorithm_t get_sigalg(uint8_t hash_algo, uint8_t sig_algo)
 {
 	const struct sct_sign_algorithm_st *algo;
-	unsigned i, num_algos = sizeof(algos) / sizeof(algos[0]);
+	size_t i, num_algos = sizeof(algos) / sizeof(algos[0]);
 
 	if (hash_algo == 0 || sig_algo == 0)
 		return GNUTLS_SIGN_UNKNOWN;
@@ -3665,7 +3665,7 @@ static gnutls_sign_algorithm_t get_sigalg(uint8_t hash_algo, uint8_t sig_algo)
 static int write_sigalg(gnutls_sign_algorithm_t sigalg, uint8_t out[])
 {
 	const struct sct_sign_algorithm_st *algo;
-	unsigned i, num_algos = sizeof(algos) / sizeof(algos[0]);
+	size_t i, num_algos = sizeof(algos) / sizeof(algos[0]);
 
 	for (i = 0; i < num_algos; i++) {
 		algo = &algos[i];
@@ -3928,7 +3928,7 @@ int gnutls_x509_ext_ct_export_scts(const gnutls_x509_ct_scts_t scts, gnutls_datu
 				 + sizeof(uint16_t);  /* Signature length */
 
 	ttl_size = 0;
-	for (unsigned i = 0; i < scts->size; i++)
+	for (size_t i = 0; i < scts->size; i++)
 		ttl_size += base_size + scts->scts[i].signature.size;
 
 	_gnutls_buffer_init(&buf);
@@ -3936,7 +3936,7 @@ int gnutls_x509_ext_ct_export_scts(const gnutls_x509_ct_scts_t scts, gnutls_datu
 	/* Start with the length of the whole string */
 	_gnutls_buffer_append_prefix(&buf, 16, ttl_size);
 
-	for (unsigned i = 0; i < scts->size; i++) {
+	for (size_t i = 0; i < scts->size; i++) {
 		if ((ret = _gnutls_export_ct_v1_sct(&buf,
 						    &scts->scts[i], base_size)) < 0) {
 			gnutls_assert();
