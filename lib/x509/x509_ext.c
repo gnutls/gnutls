@@ -3766,22 +3766,17 @@ static int _gnutls_ct_sct_add(struct ct_sct_st *sct,
 }
 
 static int _gnutls_export_ct_v1_sct(gnutls_buffer_st *buf,
-				    const struct ct_sct_st *sct, size_t base_size)
+				    const struct ct_sct_st *sct)
 {
 	int ret;
 	uint8_t tstamp_out[8], sigalg[2];
 	/* There are no extensions defined for v1 */
 	const uint8_t extensions[2] = { 0x00, 0x00 };
+	size_t length_offset;
 
-	/*
-	 * The caller of this function will allocate 'out' so that it will always have enough room
-	 * to write the requested SCT. Hence we don't need to bounds-check 'out' here.
-	 * Currently this function is only called at gnutls_x509_ext_ct_export_scts().
-	 */
-
-	/* Length field */
-	if ((ret = _gnutls_buffer_append_prefix(buf, 16,
-						base_size + sct->signature.size - sizeof(uint16_t))) < 0)
+	/* Length field; filled later */
+	length_offset = buf->length;
+	if ((ret = _gnutls_buffer_append_prefix(buf, 16, 0)) < 0)
 		return gnutls_assert_val(ret);
 
 	/* Version */
@@ -3817,6 +3812,10 @@ static int _gnutls_export_ct_v1_sct(gnutls_buffer_st *buf,
 	if ((ret = _gnutls_buffer_append_data_prefix(buf, 16,
 						     sct->signature.data, sct->signature.size)) < 0)
 		return gnutls_assert_val(ret);
+
+	/* Fill the length */
+	_gnutls_write_uint16(buf->length - length_offset - 2,
+			     buf->data + length_offset);
 
 	return 0;
 }
@@ -3916,33 +3915,24 @@ int gnutls_x509_ext_ct_import_scts(const gnutls_datum_t *ext, gnutls_x509_ct_sct
 int gnutls_x509_ext_ct_export_scts(const gnutls_x509_ct_scts_t scts, gnutls_datum_t *ext)
 {
 	int ret;
-	size_t ttl_size;
 	gnutls_buffer_st buf;
-
-	const size_t base_size = sizeof(uint16_t)  /* length of the whole part */
-				 + 1  /* version */
-				 + SCT_V1_LOGID_SIZE  /* Log ID */
-				 + sizeof(uint64_t)  /* Timestamp */
-				 + 2  /* Extensions */
-				 + 2  /* hash and signature algorithms */
-				 + sizeof(uint16_t);  /* Signature length */
-
-	ttl_size = 0;
-	for (size_t i = 0; i < scts->size; i++)
-		ttl_size += base_size + scts->scts[i].signature.size;
 
 	_gnutls_buffer_init(&buf);
 
-	/* Start with the length of the whole string */
-	_gnutls_buffer_append_prefix(&buf, 16, ttl_size);
+	/* Start with the length of the whole string; the actual
+	 * length is filled later */
+	_gnutls_buffer_append_prefix(&buf, 16, 0);
 
 	for (size_t i = 0; i < scts->size; i++) {
 		if ((ret = _gnutls_export_ct_v1_sct(&buf,
-						    &scts->scts[i], base_size)) < 0) {
+						    &scts->scts[i])) < 0) {
 			gnutls_assert();
 			goto cleanup;
 		}
 	}
+
+	/* Fill the length */
+	_gnutls_write_uint16(buf.length - 2, buf.data);
 
 	/* DER-encode the whole thing as an opaque OCTET STRING, as the spec mandates */
 	ret = _gnutls_x509_encode_string(
