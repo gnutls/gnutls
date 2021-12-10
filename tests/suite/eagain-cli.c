@@ -50,7 +50,7 @@ static const char
 /* Connects to the peer and returns a socket
  * descriptor.
  */
-static int tcp_connect(void)
+static int _tcp_connect_eagain(void)
 {
 	const char *PORT = getenv("PORT");
 	const char *SERVER = "127.0.0.1";	//verisign.com
@@ -222,7 +222,7 @@ static void try(const char *name, const char *prio)
 		gnutls_server_name_set(session, GNUTLS_NAME_DNS,
 				       "localhost", strlen("localhost"));
 
-		sd = tcp_connect();
+		sd = _tcp_connect_eagain();
 
 		/* associate gnutls with socket */
 		gnutls_transport_set_int(session, sd);

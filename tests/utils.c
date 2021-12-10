@@ -34,6 +34,7 @@
 #ifndef _WIN32
 #include <netinet/in.h>
 #include <sys/socket.h>
+#include <arpa/inet.h>
 #else
 #include <windows.h>		/* for Sleep */
 #include <winbase.h>
@@ -325,3 +326,23 @@ void delete_temp_files(void)
 		p = next;
 	}
 }
+
+
+#ifndef _WIN32
+int tcp_connect(const char* addr, unsigned port)
+{
+	int sock;
+	struct sockaddr_in sa = {0};
+	memset(&sa, 0, sizeof(sa));
+	sock = socket(AF_INET, SOCK_STREAM, 0);
+	if (sock == -1)
+	    return -1;
+	sa.sin_family = AF_INET;
+	sa.sin_port = htons(port);
+	if (inet_pton(AF_INET, addr, &sa.sin_addr) != 1)
+	    return -1;
+	if (connect(sock, (struct sockaddr*) &sa, sizeof(sa)) != 0)
+	    return -1;
+	return sock;
+}
+#endif
