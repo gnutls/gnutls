@@ -592,7 +592,7 @@ TESTS_ENVIRONMENT +=						\
 	CC="$(CC)"						\
 	CFLAGS="$(CFLAGS)"					\
 	LC_ALL="C"						\
-	LSAN_OPTIONS=suppressions=gnutls-asan.supp		\
+	LSAN_OPTIONS=suppressions=$(srcdir)/gnutls-asan.supp	\
 	CAFILE=$(srcdir)/cert-tests/data/ca-certs.pem		\
 	P11MOCKLIB1=$(abs_builddir)/.libs/libpkcs11mock1.so	\
 	P11MOCKLIB2=$(abs_builddir)/.libs/libpkcs11mock2.so	\
