@@ -260,7 +260,7 @@ static int _ctx_init(gnutls_digest_algorithm_t algo,
 	case GNUTLS_DIG_SHA384:
 		sha384_init(&ctx->ctx.sha384);
 		ctx->update = (update_func) aarch64_sha512_update;
-		ctx->digest = (digest_func) sha512_digest;
+		ctx->digest = (digest_func) sha384_digest;
 		ctx->init = (init_func) sha384_init;
 		ctx->ctx_ptr = &ctx->ctx.sha384;
 		ctx->length = SHA384_DIGEST_SIZE;
