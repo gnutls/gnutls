@@ -47,6 +47,7 @@ We require several tools to check out and build the software, including:
 * [swtpm](https://github.com/stefanberger/swtpm) (for TPM test; optional)
 * [tpm-tools](https://trousers.sourceforge.net/) (for TPM test; optional)
 * [tpm2-tools](https://github.com/tpm2-software/tpm2-tools/) (for TPM 2.0 test; optional)
+* [tpm2-tss-engine](https://github.com/tpm2-software/tpm2-tss-engine/) (for TPM 2.0 test; optional)
 * [ncat](https://nmap.org/download.html) (for TPM test; optional)
 * [expect](https://core.tcl.tk/expect/index) (for TPM test; optional)
 
