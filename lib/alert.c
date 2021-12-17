@@ -182,7 +182,7 @@ gnutls_alert_send(gnutls_session_t session, gnutls_alert_level_t level,
 		return ret;
 	}
 
-	if (IS_KTLS_ENABLED(session)) {
+	if (IS_KTLS_ENABLED(session, GNUTLS_KTLS_SEND)) {
 		ret =
 			_gnutls_ktls_send_control_msg(session, GNUTLS_ALERT, data, 2);
 	} else {
