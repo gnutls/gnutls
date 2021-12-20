@@ -900,7 +900,7 @@ int gnutls_pkcs12_generate_mac2(gnutls_pkcs12_t pkcs12, gnutls_mac_algorithm_t m
 {
 	uint8_t salt[8], key[MAX_HASH_SIZE];
 	int result;
-	const int iter = 10*1024;
+	const int iter = PKCS12_ITER_COUNT;
 	mac_hd_st td1;
 	gnutls_datum_t tmp = { NULL, 0 };
 	unsigned mac_size, key_len;
