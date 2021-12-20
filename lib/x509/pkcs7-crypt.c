@@ -1552,7 +1552,7 @@ _gnutls_pkcs_generate_key(schema_id schema,
 		goto cleanup;
 	}
 
-	kdf_params->iter_count = 5 * 1024 + rnd[0];
+	kdf_params->iter_count = PKCS12_ITER_COUNT;
 	key->size = kdf_params->key_size =
 	    gnutls_cipher_get_key_size(enc_params->cipher);
 
