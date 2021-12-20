@@ -20,6 +20,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 : ${srcdir=.}
+: ${builddir=.}
 : ${SERV=../src/gnutls-serv${EXEEXT}}
 : ${CLI=../src/gnutls-cli${EXEEXT}}
 : ${CERTTOOL=../src/certtool${EXEEXT}}
@@ -70,14 +71,18 @@ override-mode		= allowlist
 
 [overrides]
   enabled-curve= seCp384r1  
+enabled-curve =X448 
 _EOF_
 export GNUTLS_SYSTEM_PRIORITY_FILE="${TMPFILE_CONFIG}"
 export GNUTLS_SYSTEM_PRIORITY_FAIL_ON_INVALID=1
-INITIALLY_ENABLED_CURVES="SECP384R1"
-INITIALLY_DISABLED_CURVES="SECP256R1 SECP521R1 X25519 X448"
-EXAMPLE_DISABLED_PRIORITY=NORMAL:-CURVE-ALL:+CURVE-SECP256R1:+CURVE-SECP521R1
+export INITIALLY_ENABLED_CURVES="SECP384R1 X448"
+export INITIALLY_DISABLED_CURVES="SECP256R1 SECP521R1 X25519"
+EXAMPLE_DISABLED_PRIORITY=NORMAL:-CURVE-ALL:+CURVE-SECP256R1:+CURVE-SECP521R1:+CURVE-X25519
 
 export GNUTLS_DEBUG_LEVEL=3
+
+
+# --list output
 
 "${CLI}" --list|grep ^Groups >"${TMPFILE_OBSERVED_LOG}"
 cat "${TMPFILE_OBSERVED_LOG}"
@@ -95,7 +100,8 @@ for curve in ${INITIALLY_ENABLED_CURVES}; do
 	fi
 done
 
-# Try whether a client connection with a disabled curve will succeed.
+
+# TLS: try whether a client connection with a disabled curve will succeed
 
 KEY1=${srcdir}/../doc/credentials/x509/key-rsa.pem
 CERT1=${srcdir}/../doc/credentials/x509/cert-rsa.pem
@@ -118,7 +124,7 @@ export GNUTLS_SYSTEM_PRIORITY_FILE="${TMPFILE_CONFIG}"
 kill ${PID}
 wait
 
-# Try whether a server connection with a disabled curve will succeed.
+# TLS: try whether a server connection with a disabled curve will succeed
 
 KEY1=${srcdir}/../doc/credentials/x509/key-rsa.pem
 CERT1=${srcdir}/../doc/credentials/x509/cert-rsa.pem
@@ -135,5 +141,71 @@ ${VALGRIND} "${CLI}" -p "${PORT}" 127.0.0.1 --priority ${EXAMPLE_DISABLED_PRIORI
 
 kill ${PID}
 wait
+
+export GNUTLS_SYSTEM_PRIORITY_FILE="${TMPFILE_CONFIG}"
+
+
+# Key generation using certtool
+
+for curve in ${INITIALLY_ENABLED_CURVES}; do
+	key_type=ecdsa
+	test $curve = X448 && key_type=x448
+	test $curve = X25519 && key_type=x25519
+	${VALGRIND} ${CERTTOOL} \
+		--generate-privkey --key-type=$key_type --curve=$curve \
+		--outfile "${TMPFILE_KEY}"
+	EX=$?
+	if test $EX != 0; then
+		echo "key generation using $curve has failed ($EX)"
+		exit $EX
+	fi
+done
+
+for curve in ${INITIALLY_DISABLED_CURVES}; do
+	key_type=ecdsa
+	test $curve = X448 && key_type=x448
+	test $curve = X25519 && key_type=x25519
+	${VALGRIND} ${CERTTOOL} \
+		--generate-privkey --key-type=$key_type --curve=$curve \
+		--outfile "${TMPFILE_KEY}" &> ${TMPFILE_OBSERVED_LOG}
+	EX=$?
+	if test $EX != 1; then
+		echo "key generation using $curve has succeeded unexpectedly"
+		exit $EX
+	fi
+	if ! ${GREP} -Fqx "Unsupported curve: $curve" "${TMPFILE_OBSERVED_LOG}"
+	then
+		${CAT} "${TMPFILE_OBSERVED_LOG}"
+		echo "'Unsupported curve: $curve' not found in the output"
+		exit 1
+	fi
+done
+
+
+# Test key generation and gnutls_ecc_curve_set_enabled
+# using system-override-curves-allowlist.c
+
+${CAT} > "${TMPFILE_EXPECTED_LOG}" <<EOF
+disableable: SECP384R1
+disableable: X448
+reenableable: SECP256R1
+reenableable: SECP521R1
+reenableable: X25519
+EOF
+
+${VALGRIND} "${builddir}/system-override-curves-allowlist" \
+	> ${TMPFILE_OBSERVED_LOG}
+EX=$?
+if test $EX != 0; then
+	${CAT} ${TMPFILE_OBSERVED_LOG}
+	echo "system-override-curves-allowlist(.c) failed with $EX"
+	exit $EX
+fi
+${DIFF} "${TMPFILE_EXPECTED_LOG}" "${TMPFILE_OBSERVED_LOG}"
+EX=$?
+if test $EX != 0; then
+	echo "system-override-curves-allowlist(.c) produced unexpected output"
+	exit 1
+fi
 
 exit 0
