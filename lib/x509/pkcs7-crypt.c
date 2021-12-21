@@ -1576,7 +1576,7 @@ _gnutls_pkcs_generate_key(schema_id schema,
 			 p->schema == PBES2_GOST28147_89_CPD)
 			kdf_params->mac = GNUTLS_MAC_GOSTR_94;
 		else
-			kdf_params->mac = GNUTLS_MAC_SHA1;
+			kdf_params->mac = GNUTLS_MAC_SHA256;
 		ret = _gnutls_pbes2_string_to_key(pass_len, password,
 						  kdf_params,
 						  kdf_params->key_size,
