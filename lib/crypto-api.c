@@ -543,7 +543,9 @@ gnutls_hmac_fast(gnutls_mac_algorithm_t algorithm,
  * This function will create a copy of MAC context, containing all its current
  * state. Copying contexts for MACs registered using
  * gnutls_crypto_register_mac() is not supported and will always result in an
- * error.
+ * error. In addition to that, some of the MAC implementations do not support
+ * this operation. Applications should check the return value and provide a
+ * proper fallback.
  *
  * Returns: new MAC context or NULL in case of an error.
  *
@@ -697,7 +699,9 @@ gnutls_hash_fast(gnutls_digest_algorithm_t algorithm,
  * This function will create a copy of Message Digest context, containing all
  * its current state. Copying contexts for Message Digests registered using
  * gnutls_crypto_register_digest() is not supported and will always result in
- * an error.
+ * an error. In addition to that, some of the Message Digest implementations do
+ * not support this operation. Applications should check the return value and
+ * provide a proper fallback.
  *
  * Returns: new Message Digest context or NULL in case of an error.
  *
