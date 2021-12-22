@@ -368,9 +368,10 @@ void register_x86_padlock_crypto(unsigned capabilities)
 	int ret, phe;
 	unsigned edx;
 
-	memset(_gnutls_x86_cpuid_s, 0, sizeof(_gnutls_x86_cpuid_s));
 	if (check_zhaoxin() == 0)
 		return;
+
+	memset(_gnutls_x86_cpuid_s, 0, sizeof(_gnutls_x86_cpuid_s));
 
 	if (capabilities == 0){
 		if(!read_cpuid_vals(_gnutls_x86_cpuid_s))
