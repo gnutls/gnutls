@@ -788,7 +788,9 @@ static int wrap_nettle_hash_fast(gnutls_digest_algorithm_t algo,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ctx.update(&ctx, text_size, text);
+	if (text_size > 0) {
+		ctx.update(&ctx, text_size, text);
+	}
 	ctx.digest(&ctx, ctx.length, digest);
 
 	return 0;
