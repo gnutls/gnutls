@@ -1,0 +1,53 @@
+[
+  {
+    "meta": {
+      "explain": "",
+      "desc": "",
+      "prog-name": "psktool",
+      "prog-desc": "Program to create PSK parameters.\n",
+      "detail": "Program  that generates random keys for use with TLS-PSK. The\nkeys are stored in hexadecimal format in a key file.",
+      "prog-title": "GnuTLS PSK tool",
+      "short-usage": "psktool [options]\npsktool --help for usage instructions.\n"
+    },
+    "options": [
+      {
+        "desc": "Enable debugging",
+        "detail": "Specifies the debug level.",
+        "arg-min": "0 ",
+        "arg-max": " 9999",
+        "arg-type": "number",
+        "short-option": "d",
+        "long-option": "debug"
+      },
+      {
+        "long-option": "keysize",
+        "desc": "Specify the key size in bytes (default is 32-bytes or 256-bits)",
+        "short-option": "s",
+        "arg-type": "number",
+        "detail": "",
+        "arg-min": "0 ",
+        "arg-max": " 512"
+      },
+      {
+        "long-option": "username",
+        "desc": "Specify the username to use",
+        "arg-type": "string",
+        "detail": "",
+        "short-option": "u"
+      },
+      {
+        "long-option": "pskfile",
+        "detail": "This option will specify the pre-shared key file to store the generated keys.",
+        "short-option": "p",
+        "arg-type": "string",
+        "desc": "Specify a pre-shared key file"
+      },
+      {
+        "deprecated": "",
+        "desc": "Specify a pre-shared key file",
+        "aliases": "pskfile",
+        "long-option": "passwd"
+      }
+    ]
+  }
+]

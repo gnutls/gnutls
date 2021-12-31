@@ -1,0 +1,332 @@
+[
+  {
+    "meta": {
+      "desc": "",
+      "prog-desc": "Simple server program to act as an HTTPS or TLS echo service.",
+      "explain": "",
+      "short-usage": "Usage: gnutls-serv [options]\ngnutls-serv --help for usage instructions.\n",
+      "detail": "Server program that listens to incoming TLS connections.",
+      "prog-name": "gnutls-serv",
+      "prog-title": "GnuTLS server"
+    },
+    "options": [
+      {
+        "arg-type": "number",
+        "arg-max": " 9999",
+        "arg-min": "0 ",
+        "short-option": "d",
+        "detail": "Specifies the debug level.",
+        "long-option": "debug",
+        "desc": "Enable debugging"
+      },
+      {
+        "arg-type": "string",
+        "detail": "Server name of type host_name that the server will recognise as its own. If the server receives client hello with different name, it will send a warning-level unrecognized_name alert.",
+        "desc": "Server's hostname for server name extension",
+        "long-option": "sni-hostname"
+      },
+      {
+        "long-option": "sni-hostname-fatal",
+        "desc": "Send fatal alert on sni-hostname mismatch",
+        "detail": ""
+      },
+      {
+        "max": "NOLIMIT",
+        "detail": "Specify the (textual) ALPN protocol for the server to use.",
+        "desc": "Specify ALPN protocol to be enabled by the server",
+        "long-option": "alpn",
+        "arg-type": "string",
+        "stack-arg": ""
+      },
+      {
+        "detail": "",
+        "long-option": "alpn-fatal",
+        "desc": "Send fatal alert on non-matching ALPN name"
+      },
+      {
+        "desc": "Don't accept session tickets",
+        "detail": "",
+        "long-option": "noticket"
+      },
+      {
+        "detail": "",
+        "long-option": "earlydata",
+        "desc": "Accept early data"
+      },
+      {
+        "arg-type": "number",
+        "desc": "The maximum early data size to accept",
+        "detail": "",
+        "arg-max": "",
+        "long-option": "maxearlydata",
+        "arg-min": "1"
+      },
+      {
+        "long-option": "nocookie",
+        "detail": "",
+        "desc": "Don't require cookie on DTLS sessions"
+      },
+      {
+        "detail": "",
+        "long-option": "generate",
+        "short-option": "g",
+        "desc": "Generate Diffie-Hellman parameters"
+      },
+      {
+        "short-option": "q",
+        "desc": "Suppress some messages",
+        "long-option": "quiet",
+        "detail": ""
+      },
+      {
+        "long-option": "nodb",
+        "desc": "Do not use a resumption database",
+        "detail": ""
+      },
+      {
+        "desc": "Act as an HTTP server",
+        "long-option": "http",
+        "detail": ""
+      },
+      {
+        "desc": "Act as an Echo server",
+        "detail": "",
+        "long-option": "echo"
+      },
+      {
+        "long-option": "crlf",
+        "desc": "Do not replace CRLF by LF in Echo server mode",
+        "detail": ""
+      },
+      {
+        "desc": "Use DTLS (datagram TLS) over UDP",
+        "short-option": "u",
+        "long-option": "udp",
+        "detail": ""
+      },
+      {
+        "arg-type": "number",
+        "desc": "Set MTU for datagram TLS",
+        "arg-min": "0",
+        "detail": "",
+        "arg-max": "17000",
+        "long-option": "mtu"
+      },
+      {
+        "detail": "",
+        "long-option": "srtp-profiles",
+        "desc": "Offer SRTP profiles",
+        "arg-type": "string"
+      },
+      {
+        "desc": "Do not request a client certificate",
+        "short-option": "a",
+        "conflicts": "require-client-cert",
+        "detail": "",
+        "long-option": "disable-client-cert"
+      },
+      {
+        "disabled": "",
+        "detail": "This option before 3.6.0 used to imply --verify-client-cert.\nSince 3.6.0 it will no longer verify the certificate by default.",
+        "long-option": "require-client-cert",
+        "desc": "Require a client certificate",
+        "short-option": "r"
+      },
+      {
+        "disabled": "",
+        "desc": "If a client certificate is sent then verify it.",
+        "detail": "Do not require, but if a client certificate is sent then verify it and close the connection if invalid.",
+        "long-option": "verify-client-cert"
+      },
+      {
+        "long-option": "heartbeat",
+        "desc": "Activate heartbeat support",
+        "detail": "Regularly ping client via heartbeat extension messages",
+        "short-option": "b"
+      },
+      {
+        "desc": "Use DER format for certificates to read from",
+        "detail": "",
+        "long-option": "x509fmtder"
+      },
+      {
+        "detail": "TLS algorithms and protocols to enable. You can\nuse predefined sets of ciphersuites such as PERFORMANCE,\nNORMAL, SECURE128, SECURE256. The default is NORMAL.\n\nCheck  the  GnuTLS  manual  on  section  ``Priority strings'' for more\ninformation on allowed keywords",
+        "arg-type": "string",
+        "long-option": "priority",
+        "desc": "Priorities string"
+      },
+      {
+        "detail": "",
+        "long-option": "dhparams",
+        "arg-type": "file",
+        "file-exists": "yes",
+        "desc": "DH params file to use"
+      },
+      {
+        "arg-type": "string",
+        "desc": "Certificate file or PKCS #11 URL to use",
+        "detail": "",
+        "long-option": "x509cafile"
+      },
+      {
+        "desc": "CRL file to use",
+        "detail": "",
+        "arg-type": "file",
+        "file-exists": "yes",
+        "long-option": "x509crlfile"
+      },
+      {
+        "detail": "",
+        "deprecated": "",
+        "long-option": "pgpkeyfile",
+        "file-exists": "yes",
+        "desc": "PGP Key file to use",
+        "arg-type": "file"
+      },
+      {
+        "stack-arg": "",
+        "max": "NOLIMIT",
+        "long-option": "x509keyfile",
+        "detail": "Specify the private key file or URI to use; it must correspond to\nthe certificate specified in --x509certfile. Multiple keys and certificates\ncan be specified with this option and in that case each occurrence of keyfile\nmust be followed by the corresponding x509certfile or vice-versa.",
+        "desc": "X.509 key file or PKCS #11 URL to use",
+        "arg-type": "string"
+      },
+      {
+        "detail": "Specify the certificate file or URI to use; it must correspond to\nthe key specified in --x509keyfile. Multiple keys and certificates\ncan be specified with this option and in that case each occurrence of keyfile\nmust be followed by the corresponding x509certfile or vice-versa.",
+        "arg-type": "string",
+        "stack-arg": "",
+        "max": "NOLIMIT",
+        "long-option": "x509certfile",
+        "desc": "X.509 Certificate file or PKCS #11 URL to use"
+      },
+      {
+        "aliases": "x509keyfile",
+        "long-option": "x509dsakeyfile",
+        "desc": "Alternative X.509 key file or PKCS #11 URL to use",
+        "deprecated": ""
+      },
+      {
+        "long-option": "x509dsacertfile",
+        "desc": "Alternative X.509 Certificate file or PKCS #11 URL to use",
+        "deprecated": "",
+        "aliases": "x509certfile"
+      },
+      {
+        "deprecated": "",
+        "long-option": "x509ecckeyfile",
+        "aliases": "x509keyfile",
+        "desc": "Alternative X.509 key file or PKCS #11 URL to use"
+      },
+      {
+        "desc": "Alternative X.509 Certificate file or PKCS #11 URL to use",
+        "aliases": "x509certfile",
+        "deprecated": "",
+        "long-option": "x509ecccertfile"
+      },
+      {
+        "stack-arg": "",
+        "long-option": "rawpkkeyfile",
+        "max": "NOLIMIT",
+        "desc": "Private key file (PKCS #8 or PKCS #12) or PKCS #11 URL to use",
+        "arg-type": "string",
+        "detail": "Specify the private key file or URI to use; it must correspond to\nthe raw public-key specified in --rawpkfile. Multiple key pairs\ncan be specified with this option and in that case each occurrence of keyfile\nmust be followed by the corresponding rawpkfile or vice-versa.\n\nIn order to instruct the application to negotiate raw public keys one\nmust enable the respective certificate types via the priority strings (i.e. CTYPE-CLI-*\nand CTYPE-SRV-* flags).\n\nCheck  the  GnuTLS  manual  on  section  ``Priority strings'' for more\ninformation on how to set certificate types."
+      },
+      {
+        "detail": "Specify the raw public-key file to use; it must correspond to\nthe private key specified in --rawpkkeyfile. Multiple key pairs\ncan be specified with this option and in that case each occurrence of keyfile\nmust be followed by the corresponding rawpkfile or vice-versa.\n\nIn order to instruct the application to negotiate raw public keys one\nmust enable the respective certificate types via the priority strings (i.e. CTYPE-CLI-*\nand CTYPE-SRV-* flags).\n\nCheck  the  GnuTLS  manual  on  section  ``Priority strings'' for more\ninformation on how to set certificate types.",
+        "requires": "rawpkkeyfile",
+        "desc": "Raw public-key file to use",
+        "stack-arg": "",
+        "max": "NOLIMIT",
+        "long-option": "rawpkfile",
+        "arg-type": "string"
+      },
+      {
+        "detail": "",
+        "desc": "SRP password file to use",
+        "long-option": "srppasswd",
+        "file-exists": "yes",
+        "arg-type": "file"
+      },
+      {
+        "desc": "SRP password configuration file to use",
+        "long-option": "srppasswdconf",
+        "file-exists": "yes",
+        "arg-type": "file",
+        "detail": ""
+      },
+      {
+        "detail": "",
+        "file-exists": "yes",
+        "desc": "PSK password file to use",
+        "arg-type": "file",
+        "long-option": "pskpasswd"
+      },
+      {
+        "arg-type": "string",
+        "desc": "PSK identity hint to use",
+        "detail": "",
+        "long-option": "pskhint"
+      },
+      {
+        "desc": "The OCSP response to send to client",
+        "max": "NOLIMIT",
+        "detail": "If the client requested an OCSP response, return data from this file to the client.",
+        "long-option": "ocsp-response",
+        "stack-arg": "",
+        "arg-type": "string"
+      },
+      {
+        "long-option": "ignore-ocsp-response-errors",
+        "desc": "Ignore any errors when setting the OCSP response",
+        "detail": "That option instructs gnutls to not attempt to match the provided OCSP responses with the certificates."
+      },
+      {
+        "desc": "The port to connect to",
+        "detail": "",
+        "arg-type": "number",
+        "short-option": "p",
+        "long-option": "port"
+      },
+      {
+        "desc": "Print a list of the supported algorithms and modes",
+        "detail": "Print a list of the supported algorithms and modes. If a priority string is given then only the enabled ciphersuites are shown.",
+        "short-option": "l",
+        "long-option": "list"
+      },
+      {
+        "desc": "Specify the PKCS #11 provider library",
+        "file-exists": "yes",
+        "arg-type": "file",
+        "detail": "This will override the default options in /etc/gnutls/pkcs11.conf",
+        "long-option": "provider"
+      },
+      {
+        "arg-type": "string",
+        "long-option": "keymatexport",
+        "detail": "",
+        "desc": "Label used for exporting keying material"
+      },
+      {
+        "desc": "Size of the exported keying material",
+        "long-option": "keymatexportsize",
+        "arg-type": "number",
+        "detail": ""
+      },
+      {
+        "desc": "The maximum record size to advertise",
+        "arg-max": "16384",
+        "arg-type": "number",
+        "detail": "",
+        "long-option": "recordsize",
+        "arg-min": "0"
+      },
+      {
+        "detail": "",
+        "arg-type": "file",
+        "long-option": "httpdata",
+        "file-exists": "yes",
+        "desc": "The data used as HTTP response"
+      }
+    ]
+  }
+]

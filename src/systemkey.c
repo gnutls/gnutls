@@ -44,7 +44,7 @@
 #include <read-file.h>
 
 #include "certtool-common.h"
-#include "systemkey-args.h"
+#include "systemkey-tool-options.h"
 
 static void cmd_parser(int argc, char **argv);
 static void systemkey_delete(const char *url, FILE * outfile);

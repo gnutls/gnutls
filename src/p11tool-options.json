@@ -1,0 +1,452 @@
+[
+  {
+    "meta": {
+      "explain": "",
+      "short-usage": "p11tool [options] [url]\np11tool --help for usage instructions.\n",
+      "desc": "",
+      "prog-name": "p11tool",
+      "prog-desc": "Program to handle PKCS #11 smart cards and security modules.\n",
+      "detail": "Program that allows operations on PKCS #11 smart cards\nand security modules. \n\nTo use PKCS #11 tokens with GnuTLS the p11-kit configuration files need to be setup.\nThat is create a .module file in /etc/pkcs11/modules with the contents 'module: /path/to/pkcs11.so'.\nAlternatively the configuration file /etc/gnutls/pkcs11.conf has to exist and contain a number\nof lines of the form 'load=/usr/lib/opensc-pkcs11.so'.\n\nYou can provide the PIN to be used for the PKCS #11 operations with the environment variables\nGNUTLS_PIN and GNUTLS_SO_PIN.\n",
+      "reorder-args": "",
+      "argument": "[url]",
+      "prog-title": "GnuTLS PKCS #11 tool"
+    },
+    "options": []
+  },
+  {
+    "meta": {
+      "desc": "Tokens",
+      "id": "token-related-options"
+    },
+    "options": [
+      {
+        "long-option": "list-tokens",
+        "detail": "",
+        "desc": "List all available tokens"
+      },
+      {
+        "desc": "List the URLs available tokens",
+        "detail": "This is a more compact version of --list-tokens.",
+        "long-option": "list-token-urls"
+      },
+      {
+        "detail": "",
+        "desc": "List all available mechanisms in a token",
+        "long-option": "list-mechanisms"
+      },
+      {
+        "long-option": "initialize",
+        "desc": "Initializes a PKCS #11 token",
+        "detail": ""
+      },
+      {
+        "desc": "Initializes/Resets a PKCS #11 token user PIN",
+        "detail": "",
+        "long-option": "initialize-pin"
+      },
+      {
+        "long-option": "initialize-so-pin",
+        "detail": "This initializes the security officer's PIN. When used non-interactively use the GNUTLS_NEW_SO_PIN\nenvironment variables to initialize SO's PIN.",
+        "desc": "Initializes/Resets a PKCS #11 token security officer PIN."
+      },
+      {
+        "arg-type": "string",
+        "detail": "Alternatively the GNUTLS_PIN environment variable may be used.",
+        "desc": "Specify the PIN to use on token operations",
+        "long-option": "set-pin"
+      },
+      {
+        "desc": "Specify the Security Officer's PIN to use on token initialization",
+        "detail": "Alternatively the GNUTLS_SO_PIN environment variable may be used.",
+        "long-option": "set-so-pin",
+        "arg-type": "string"
+      }
+    ]
+  },
+  {
+    "meta": {
+      "desc": "Object listing",
+      "id": "object-list-related-options"
+    },
+    "options": [
+      {
+        "long-option": "list-all",
+        "detail": "All objects available in the token will be listed. That includes\nobjects which are potentially unaccessible using this tool.",
+        "desc": "List all available objects in a token"
+      },
+      {
+        "detail": "That option will also provide more information on the\ncertificates, for example, expand the attached extensions in a trust\ntoken (like p11-kit-trust).",
+        "desc": "List all available certificates in a token",
+        "long-option": "list-all-certs"
+      },
+      {
+        "detail": "That option will only display certificates which have a private\nkey associated with them (share the same ID).",
+        "long-option": "list-certs",
+        "desc": "List all certificates that have an associated private key"
+      },
+      {
+        "long-option": "list-all-privkeys",
+        "detail": "Lists all the private keys in a token that match the specified URL.",
+        "desc": "List all available private keys in a token"
+      },
+      {
+        "aliases": "list-all-privkeys",
+        "long-option": "list-privkeys"
+      },
+      {
+        "aliases": "list-all-privkeys",
+        "long-option": "list-keys"
+      },
+      {
+        "detail": "",
+        "desc": "List all available certificates marked as trusted",
+        "long-option": "list-all-trusted"
+      },
+      {
+        "detail": "",
+        "conflicts": "export-stapled export-chain export-pubkey",
+        "long-option": "export",
+        "desc": "Export the object specified by the URL"
+      },
+      {
+        "desc": "Export the certificate object specified by the URL",
+        "detail": "Exports the certificate specified by the URL while including any attached extensions to it.\nSince attached extensions are a p11-kit extension, this option is only\navailable on p11-kit registered trust modules.",
+        "conflicts": "export export-chain export-pubkey",
+        "long-option": "export-stapled"
+      },
+      {
+        "conflicts": "export-stapled export export-pubkey",
+        "desc": "Export the certificate specified by the URL and its chain of trust",
+        "detail": "Exports the certificate specified by the URL and generates its chain of trust based on the stored certificates in the module.",
+        "long-option": "export-chain"
+      },
+      {
+        "desc": "Export the public key for a private key",
+        "conflicts": "export-stapled export export-chain",
+        "long-option": "export-pubkey",
+        "detail": "Exports the public key for the specified private key"
+      },
+      {
+        "long-option": "info",
+        "detail": "",
+        "desc": "List information on an available object in a token"
+      },
+      {
+        "aliases": "mark-trusted",
+        "long-option": "trusted"
+      },
+      {
+        "aliases": "mark-distrusted",
+        "long-option": "distrusted"
+      }
+    ]
+  },
+  {
+    "meta": {
+      "desc": "Key generation",
+      "id": "keygen-related-options"
+    },
+    "options": [
+      {
+        "desc": "Generate private-public key pair of given type",
+        "arg-type": "string",
+        "detail": "Generates a private-public key pair in the specified token.\nAcceptable types are RSA, ECDSA, Ed25519, and DSA. Should be combined with --sec-param or --bits.",
+        "long-option": "generate-privkey"
+      },
+      {
+        "desc": "Generate an RSA private-public key pair",
+        "long-option": "generate-rsa",
+        "detail": "Generates an RSA private-public key pair on the specified token.\nShould be combined with --sec-param or --bits.",
+        "deprecated": ""
+      },
+      {
+        "deprecated": "",
+        "desc": "Generate a DSA private-public key pair",
+        "detail": "Generates a DSA private-public key pair on the specified token.\nShould be combined with --sec-param or --bits.",
+        "long-option": "generate-dsa"
+      },
+      {
+        "deprecated": "",
+        "desc": "Generate an ECDSA private-public key pair",
+        "long-option": "generate-ecc",
+        "detail": "Generates an ECDSA private-public key pair on the specified token.\nShould be combined with --curve, --sec-param or --bits."
+      },
+      {
+        "desc": "Specify the number of bits for the key generate",
+        "detail": "For applications which have no key-size restrictions the\n--sec-param option is recommended, as the sec-param levels will adapt\nto the acceptable security levels with the new versions of gnutls.",
+        "long-option": "bits",
+        "arg-type": "number"
+      },
+      {
+        "detail": "Supported values are secp192r1, secp224r1, secp256r1, secp384r1 and secp521r1.",
+        "long-option": "curve",
+        "arg-type": "string",
+        "desc": "Specify the curve used for EC key generation"
+      },
+      {
+        "long-option": "sec-param",
+        "desc": "Specify the security level",
+        "detail": "This is alternative to the bits option. Available options are [low, legacy, medium, high, ultra].",
+        "arg-name": "Security parameter",
+        "arg-type": "string"
+      }
+    ]
+  },
+  {
+    "meta": {
+      "desc": "Writing objects",
+      "id": "write-object-related-options"
+    },
+    "options": [
+      {
+        "conflicts": "write",
+        "arg-type": "string",
+        "long-option": "set-id",
+        "desc": "Set the CKA_ID (in hex) for the specified by the URL object",
+        "detail": "Modifies or sets the CKA_ID in the specified by the URL object. The ID should be specified in hexadecimal format without a '0x' prefix."
+      },
+      {
+        "long-option": "set-label",
+        "desc": "Set the CKA_LABEL for the specified by the URL object",
+        "detail": "Modifies or sets the CKA_LABEL in the specified by the URL object",
+        "conflicts": "write set-id",
+        "arg-type": "string"
+      },
+      {
+        "long-option": "write",
+        "desc": "Writes the loaded objects to a PKCS #11 token",
+        "detail": "It can be used to write private, public keys, certificates or secret keys to a token. Must be combined with one of --load-privkey, --load-pubkey, --load-certificate option.\n\nWhen writing a certificate object, its CKA_ID is set to the same CKA_ID of the corresponding public key, if it exists on the token; otherwise it will be derived from the X.509 Subject Key Identifier of the certificate. If this behavior is undesired, write the public key to the token beforehand."
+      },
+      {
+        "long-option": "delete",
+        "desc": "Deletes the objects matching the given PKCS #11 URL",
+        "detail": ""
+      },
+      {
+        "arg-type": "string",
+        "detail": "",
+        "long-option": "label",
+        "desc": "Sets a label for the write operation"
+      },
+      {
+        "desc": "Sets an ID for the write operation",
+        "detail": "Sets the CKA_ID to be set by the write operation. The ID should be specified in hexadecimal format without a '0x' prefix.",
+        "arg-type": "string",
+        "long-option": "id"
+      },
+      {
+        "detail": "Marks the generated key with the CKA_WRAP flag.",
+        "long-option": "mark-wrap",
+        "disabled": "",
+        "disable-prefix": "no-",
+        "desc": "Marks the generated key to be a wrapping key"
+      },
+      {
+        "disabled": "",
+        "long-option": "mark-trusted",
+        "disable-prefix": "no-",
+        "conflicts": "mark-distrusted",
+        "desc": "Marks the object to be written as trusted",
+        "detail": "Marks the object to be generated/written with the CKA_TRUST flag."
+      },
+      {
+        "detail": "Ensures that the objects retrieved have the CKA_X_TRUST flag.\nThis is p11-kit trust module extension, thus this flag is only valid with\np11-kit registered trust modules.",
+        "desc": "When retrieving objects, it requires the objects to be distrusted (blacklisted)",
+        "conflicts": "mark-trusted",
+        "long-option": "mark-distrusted"
+      },
+      {
+        "disable-prefix": "no-",
+        "desc": "Marks the object to be written for decryption",
+        "detail": "Marks the object to be generated/written with the CKA_DECRYPT flag set to true.",
+        "disabled": "",
+        "long-option": "mark-decrypt"
+      },
+      {
+        "disable-prefix": "no-",
+        "detail": "Marks the object to be generated/written with the CKA_SIGN flag set to true.",
+        "disabled": "",
+        "long-option": "mark-sign",
+        "desc": "Marks the object to be written for signature generation"
+      },
+      {
+        "disable-prefix": "no-",
+        "desc": "Marks the object to be written as a CA",
+        "long-option": "mark-ca",
+        "disabled": "",
+        "detail": "Marks the object to be generated/written with the CKA_CERTIFICATE_CATEGORY as CA."
+      },
+      {
+        "disable-prefix": "no-",
+        "long-option": "mark-private",
+        "desc": "Marks the object to be written as private",
+        "detail": "Marks the object to be generated/written with the CKA_PRIVATE flag. The written object will require a PIN to be used.",
+        "disabled": ""
+      },
+      {
+        "long-option": "ca",
+        "aliases": "mark-ca"
+      },
+      {
+        "aliases": "mark-private",
+        "long-option": "private"
+      },
+      {
+        "disabled": "",
+        "desc": "Marks the object to be written as always authenticate",
+        "long-option": "mark-always-authenticate",
+        "disable-prefix": "no-",
+        "detail": "Marks the object to be generated/written with the CKA_ALWAYS_AUTHENTICATE flag. The written object will Mark the object as requiring authentication (pin entry) before every operation."
+      },
+      {
+        "detail": "This secret key will be written to the module if --write is specified.",
+        "arg-type": "string",
+        "desc": "Provide a hex encoded secret key",
+        "long-option": "secret-key"
+      },
+      {
+        "arg-type": "file",
+        "file-exists": "yes",
+        "long-option": "load-privkey",
+        "desc": "Private key file to use",
+        "detail": ""
+      },
+      {
+        "arg-type": "file",
+        "file-exists": "yes",
+        "desc": "Public key file to use",
+        "long-option": "load-pubkey",
+        "detail": ""
+      },
+      {
+        "arg-type": "file",
+        "desc": "Certificate file to use",
+        "detail": "",
+        "long-option": "load-certificate",
+        "file-exists": "yes"
+      }
+    ]
+  },
+  {
+    "meta": {
+      "desc": "Other options",
+      "id": "other-options"
+    },
+    "options": [
+      {
+        "desc": "Enable debugging",
+        "arg-max": " 9999",
+        "short-option": "d",
+        "arg-type": "number",
+        "detail": "Specifies the debug level.",
+        "arg-min": "0 ",
+        "long-option": "debug"
+      },
+      {
+        "arg-type": "string",
+        "detail": "",
+        "long-option": "outfile",
+        "desc": "Output file"
+      },
+      {
+        "desc": "Force (user) login to token",
+        "detail": "",
+        "long-option": "login",
+        "disable-prefix": "no-",
+        "disabled": ""
+      },
+      {
+        "long-option": "so-login",
+        "disabled": "",
+        "disable-prefix": "no-",
+        "desc": "Force security officer login to token",
+        "detail": "Forces login to the token as security officer (admin)."
+      },
+      {
+        "long-option": "admin-login",
+        "aliases": "so-login"
+      },
+      {
+        "desc": "Tests the signature operation of the provided object",
+        "long-option": "test-sign",
+        "detail": "It can be used to test the correct operation of the signature operation.\nIf both a private and a public key are available this operation will sign and verify\nthe signed data."
+      },
+      {
+        "detail": "This option can be combined with --test-sign, to sign with\na specific signature algorithm variant. The only option supported is 'RSA-PSS', and should be\nspecified in order to use RSA-PSS signature on RSA keys.",
+        "arg-type": "string",
+        "long-option": "sign-params",
+        "desc": "Sign with a specific signature algorithm"
+      },
+      {
+        "long-option": "hash",
+        "detail": "This option can be combined with test-sign. Available hash functions are SHA1, RMD160, SHA256, SHA384, SHA512, SHA3-224, SHA3-256, SHA3-384, SHA3-512.",
+        "desc": "Hash algorithm to use for signing",
+        "arg-type": "string"
+      },
+      {
+        "desc": "Generate random data",
+        "detail": "Asks the token to generate a number of bytes of random bytes.",
+        "arg-type": "number",
+        "long-option": "generate-random"
+      },
+      {
+        "detail": "",
+        "short-option": "8",
+        "long-option": "pkcs8",
+        "desc": "Use PKCS #8 format for private keys"
+      },
+      {
+        "long-option": "inder",
+        "desc": "Use DER/RAW format for input",
+        "disable-prefix": "no-",
+        "detail": "Use DER/RAW format for input certificates and private keys.",
+        "disabled": ""
+      },
+      {
+        "long-option": "inraw",
+        "aliases": "inder"
+      },
+      {
+        "disable-prefix": "no-",
+        "detail": "The output will be in DER or RAW format.",
+        "long-option": "outder",
+        "desc": "Use DER format for output certificates, private keys, and DH parameters",
+        "disabled": ""
+      },
+      {
+        "long-option": "outraw",
+        "aliases": "outder"
+      },
+      {
+        "long-option": "provider",
+        "arg-type": "file",
+        "desc": "Specify the PKCS #11 provider library",
+        "detail": "This will override the default options in /etc/gnutls/pkcs11.conf"
+      },
+      {
+        "arg-type": "string",
+        "desc": "Specify parameters for the PKCS #11 provider library",
+        "deprecated": "",
+        "detail": "This is a PKCS#11 internal option used by few modules.\n    Mainly for testing PKCS#11 modules.",
+        "long-option": "provider-opts"
+      },
+      {
+        "disable-prefix": "no-",
+        "long-option": "detailed-url",
+        "disabled": "",
+        "desc": "Print detailed URLs",
+        "detail": ""
+      },
+      {
+        "desc": "Print a compact listing using only the URLs",
+        "long-option": "only-urls",
+        "detail": ""
+      },
+      {
+        "detail": "In batch mode there will be no prompts, all parameters need to be specified on command line.",
+        "long-option": "batch",
+        "desc": "Disable all interaction with the tool"
+      }
+    ]
+  }
+]

@@ -71,7 +71,7 @@
 #include <common.h>
 #include <socket.h>
 
-#include <cli-args.h>
+#include "gnutls-cli-options.h"
 #include <ocsptool-common.h>
 
 #define MAX_BUF 4096

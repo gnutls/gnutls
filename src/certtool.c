@@ -50,7 +50,7 @@
 
 #include <certtool-cfg.h>
 #include <common.h>
-#include "certtool-args.h"
+#include "certtool-options.h"
 #include "certtool-common.h"
 
 #define MAX_HASH_SIZE 64
@@ -1265,12 +1265,12 @@ static void cmd_parser(int argc, char **argv)
 
 	fix_lbuffer(0);
 
-	if (HAVE_OPT(INDER) || HAVE_OPT(INRAW))
+	if (HAVE_OPT(INDER))
 		incert_format = GNUTLS_X509_FMT_DER;
 	else
 		incert_format = GNUTLS_X509_FMT_PEM;
 
-	if (HAVE_OPT(OUTDER) || HAVE_OPT(OUTRAW))
+	if (HAVE_OPT(OUTDER))
 		outcert_format = GNUTLS_X509_FMT_DER;
 	else
 		outcert_format = GNUTLS_X509_FMT_PEM;

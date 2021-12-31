@@ -1215,7 +1215,6 @@ AC_CONFIG_FILES([
   lib/unistring/Makefile
   po/Makefile.in
   src/Makefile
-  src/args-std.def
   src/gl/Makefile
   src/gl/tests/Makefile
   tests/Makefile

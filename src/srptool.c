@@ -40,7 +40,7 @@
 #include <getpass.h>
 #include <minmax.h>
 
-#include <srptool-args.h>
+#include "srptool-options.h"
 
 /* This may need some rewrite. A lot of stuff which should be here
  * are in the library, which is not good.
