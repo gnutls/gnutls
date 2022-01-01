@@ -116,6 +116,41 @@ write_privkey () {
 		exit_error
 	fi
 	echo ok
+
+	echo -n "* Checking whether object was not marked always authenticate... "
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --list-privkeys "${token};object=gnutls-client2" | grep "CKA_ALWAYS_AUTH" >/dev/null 2>&1
+	if test $? != 1; then
+		echo "private object was always authenticate"
+		exit_error
+	fi
+	echo ok
+}
+
+# $1: token
+# $2: PIN
+# $3: filename
+# ${srcdir}/testpkcs11-certs/client.key
+write_privkey_always_auth () {
+	export GNUTLS_PIN="$2"
+	filename="$3"
+	token="$1"
+
+	echo -n "* Writing a client private key... "
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --write --label gnutls-client2 --load-privkey "${filename}" --mark-always-authenticate "${token}" >>"${LOGFILE}" 2>&1
+	if test $? = 0; then
+		echo ok
+	else
+		echo failed
+		exit_error
+	fi
+
+	echo -n "* Checking whether object was marked always authenticate... "
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --list-privkeys "${token};object=gnutls-client2" | grep "CKA_ALWAYS_AUTH" >/dev/null 2>&1
+	if test $? != 0; then
+		echo "private object was not always authenticate"
+		exit_error
+	fi
+	echo ok
 }
 
 # $1: token
@@ -1131,6 +1166,7 @@ reset_pins "${TOKEN}" "${TEST_PIN}" "${TEST_SO_PIN}"
 
 #write a given privkey
 write_privkey "${TOKEN}" "${TEST_PIN}" "${srcdir}/testpkcs11-certs/client.key"
+write_privkey_always_auth "${TOKEN}" "${TEST_PIN}" "${srcdir}/testpkcs11-certs/client.key"
 
 generate_temp_ecc_privkey "${TOKEN}" "${TEST_PIN}" 256
 delete_temp_privkey "${TOKEN}" "${TEST_PIN}" ecc-256

@@ -361,6 +361,13 @@ flag = {
 };
 
 flag = {
+    name      = mark-always-authenticate;
+    disable   = "no";
+    descrip   = "Marks the object to be written as always authenticate";
+    doc = "Marks the object to be generated/written with the CKA_ALWAYS_AUTHENTICATE flag. The written object will Mark the object as requiring authentication (pin entry) before every operation.";
+};
+
+flag = {
     name      = secret-key;
     arg-type  = string;
     descrip   = "Provide a hex encoded secret key";
