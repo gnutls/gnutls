@@ -279,12 +279,7 @@ src/benchmark-tls
 src/certtool
 src/certtool-options.c
 src/certtool-options.h
-src/cfg/Makefile
-src/cfg/Makefile.in
-src/cfg/platon/Makefile
-src/cfg/platon/Makefile.in
-src/cfg/platon/str/Makefile
-src/cfg/platon/str/Makefile.in
+src/dumpcfg
 src/gnutls-cli-options.c
 src/gnutls-cli-options.h
 src/gnutls-cli-debug-options.c
@@ -300,7 +295,7 @@ src/gnutls-cli
 src/gnutls-cli-debug
 src/gnutls-serv
 src/invoke-*.menu
-src/libcfg.la
+src/libcerttool-cfg.la
 src/libcmd-certtool.la
 src/libcmd-cli-debug.la
 src/libcmd-cli.la
