@@ -25,7 +25,7 @@ AC_PREREQ(2.64)
 dnl when updating version also update LT_REVISION in m4/hooks.m4
 AC_INIT([GnuTLS], [3.7.2], [bugs@gnutls.org])
 AC_CONFIG_AUX_DIR([build-aux])
-AC_CONFIG_MACRO_DIRS([m4 src/gl/m4 src/libopts/m4 lib/unistring/m4])
+AC_CONFIG_MACRO_DIRS([m4 src/gl/m4 lib/unistring/m4])
 AC_CANONICAL_HOST
 
 AM_INIT_AUTOMAKE([1.12.2 foreign subdir-objects no-dist-gzip dist-xz -Wall -Wno-override])
@@ -938,30 +938,16 @@ AC_SUBST(TROUSERS_LIB)
 
 AM_MISSING_PROG([AUTOGEN], [autogen])
 
-included_libopts=no
-if test "$enable_tools" != "no" || test "$enable_doc" != "no"; then
+if test "$enable_doc" != "no"; then
 	AC_CHECK_PROGS([autogen], [autogen])
 
 	if test -z "$autogen"; then
 		AC_MSG_WARN([[
 ***
-*** autogen not found. Will not link against system libopts.
+*** autogen not found. Documentation for tools will not be generated.
 *** ]])
-		dnl simulate specifying option on the command line
-		included_libopts=yes
 	fi
-	LIBOPTS_CHECK([src/libopts])
-	if test "$NEED_LIBOPTS_DIR" = "true";then
-		dnl replace libopts-generated files with distributed backups, if present
-		included_libopts=yes
-	fi
-else
-	# Need to ensure the relevant conditionals get set
-	gl_STDNORETURN_H
-	AM_CONDITIONAL([INSTALL_LIBOPTS],[false])
 fi
-
-AM_CONDITIONAL(NEED_LIBOPTS, test "$included_libopts" = "yes")
 
 # For minitasn1.
 AC_CHECK_SIZEOF(unsigned long int, 4)
@@ -1239,7 +1225,6 @@ AC_MSG_NOTICE([summary of build options:
   Valgrind:             $opt_valgrind_tests ${VALGRIND}
   CFlags:               ${CFLAGS}
   Library types:        Shared=${enable_shared}, Static=${enable_static}
-  Local libopts:        ${included_libopts}
   Local libtasn1:       ${included_libtasn1}
   Local unistring:      ${included_unistring}
   Use nettle-mini:      ${mini_nettle}

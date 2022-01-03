@@ -69,8 +69,8 @@ Available backport repos, APT-Pinning or source code compilating can be used to 
 
 Fedora/RHEL:
 ```
-yum install -y dash git autoconf libtool gettext-devel automake autogen patch
-yum install -y nettle-devel p11-kit-devel autogen-libopts-devel libunistring-devel
+yum install -y dash git autoconf libtool gettext-devel automake patch
+yum install -y nettle-devel p11-kit-devel libunistring-devel
 yum install -y tpm2-tss-devel trousers-devel guile22-devel libtasn1-devel libidn2-devel gawk gperf
 yum install -y libtasn1-tools unbound-devel bison gtk-doc texinfo texlive
 ```
@@ -159,7 +159,7 @@ yum install -y wine mingw32-nettle mingw32-libtasn1 mingw32-gcc
 and build as:
 
 ```
-mingw32-configure --enable-local-libopts --disable-non-suiteb-curves --disable-doc --without-p11-kit
+mingw32-configure --disable-non-suiteb-curves --disable-doc --without-p11-kit
 mingw32-make
 mingw32-make check
 ```
