@@ -110,7 +110,6 @@ doc/gnutls.vr
 doc/gnutls.vrs
 doc/gnutls.xml
 doc/ia-api.texi
-doc/invoke-*.menu
 doc/invoke-*.texi
 doc/latex/cha-tokens.tex
 doc/latex/cha-upgrade.tex
