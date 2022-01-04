@@ -486,7 +486,7 @@ fi
 AM_CONDITIONAL(WANT_TEST_SUITE, test "$full_test_suite" = "yes")
 
 # parts of the extended test suite use Python
-AM_PATH_PYTHON(,, [:])
+AM_PATH_PYTHON([3.6],, [:])
 
 AC_ARG_ENABLE(oldgnutls-interop,
   AS_HELP_STRING([--enable-oldgnutls-interop], [enable interoperability testing with old gnutls version]),
@@ -1224,6 +1224,7 @@ AC_CONFIG_FILES([
   tests/slow/Makefile
   tests/suite/Makefile
   fuzz/Makefile
+  python/Makefile
 ])
 
 AC_OUTPUT

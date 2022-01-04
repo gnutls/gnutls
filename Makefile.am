@@ -28,7 +28,7 @@ DISTCHECK_CONFIGURE_FLAGS = \
 	--with-guile-extension-dir='$$(libdir)/guile/$$(GUILE_EFFECTIVE_VERSION)/extensions' \
 	AUTOGEN=false
 
-SUBDIRS = gl lib extra
+SUBDIRS = gl lib extra python
 
 if ENABLE_DANE
 SUBDIRS += libdane
