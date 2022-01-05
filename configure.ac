@@ -936,19 +936,6 @@ fi
 AC_DEFINE_UNQUOTED([TROUSERS_LIB], ["$ac_trousers_lib"], [the location of the trousers library])
 AC_SUBST(TROUSERS_LIB)
 
-AM_MISSING_PROG([AUTOGEN], [autogen])
-
-if test "$enable_doc" != "no"; then
-	AC_CHECK_PROGS([autogen], [autogen])
-
-	if test -z "$autogen"; then
-		AC_MSG_WARN([[
-***
-*** autogen not found. Documentation for tools will not be generated.
-*** ]])
-	fi
-fi
-
 # For minitasn1.
 AC_CHECK_SIZEOF(unsigned long int, 4)
 AC_CHECK_SIZEOF(unsigned int, 4)
