@@ -98,6 +98,10 @@ unsigned opt_to_flags(common_info_st *cinfo, unsigned *key_usage)
 		/* else set the defaults of the token */
 	}
 
+	if (ENABLED_OPT(MARK_ALWAYS_AUTHENTICATE)) {
+		flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_ALWAYS_AUTH;
+	}
+
 	if (HAVE_OPT(MARK_DISTRUSTED)) {
 		flags |=
 		    GNUTLS_PKCS11_OBJ_FLAG_MARK_DISTRUSTED;
