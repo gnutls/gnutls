@@ -905,7 +905,7 @@ void
  * chain is incomplete due a missing intermediate certificate. The callback
  * may provide the missing certificate for use during verification.
  *
- * The callback's function prototype is defined in <gnutls/x509.h> as:
+ * The callback's function prototype is defined in gnutls/x509.h as:
  *
  *   int (*callback)(gnutls_x509_trust_list_t list,
  *                   const gnutls_x509_crt_t cert,
