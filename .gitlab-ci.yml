@@ -13,8 +13,8 @@ variables:
   DEBIAN_BUILD: buildenv-debian-testing
   DEBIAN_CROSS_BUILD: buildenv-debian-cross-testing
   DEBIAN_X86_CROSS_BUILD: buildenv-debian-x86-cross
-  FEDORA_BUILD: buildenv-fedora34
-  MINGW_BUILD: buildenv-mingw-fedora34
+  FEDORA_BUILD: buildenv-fedora35
+  MINGW_BUILD: buildenv-mingw-fedora35
   ALPINE_BASE_BUILD: buildenv-alpine-base
   COMPILER: gcc
   CPPCHECK_OPTIONS: "--enable=warning --enable=performance --enable=portability --std=c99 --suppressions-list=devel/cppcheck.suppressions --template='{id}:{file}:{line},{severity},{message}'"
@@ -770,13 +770,15 @@ debian-cross/aarch64-linux-gnu/test:
 #    - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
     - dash ./configure --disable-gcc-warnings --host=${arch_name}-w64-mingw32 --target=${arch_name}-w64-mingw32 --cache-file $CCACHE_FILE --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --disable-non-suiteb-curves --disable-full-test-suite --disable-doc --with-pkcs12-iter-count=10000
     - mingw${arch_bits}-make -j$BUILDJOBS
-    - mingw${arch_bits}-make -j$BUILDJOBS -C tests check TESTS=""
+    # https://bugzilla.redhat.com/show_bug.cgi?id=2049401
+    - mingw${arch_bits}-make -j$BUILDJOBS -C $PWD/tests check TESTS=""
 
 .mingw/test:
   extends:
     - .test
   script:
-    - mingw${arch_bits}-make -j$CHECKJOBS -C tests check
+    # https://bugzilla.redhat.com/show_bug.cgi?id=2049401
+    - mingw${arch_bits}-make -j$CHECKJOBS -C $PWD/tests check
 
 .mingw/archive:
   stage: archive
