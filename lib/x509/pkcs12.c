@@ -1044,7 +1044,7 @@ int gnutls_pkcs12_generate_mac2(gnutls_pkcs12_t pkcs12, gnutls_mac_algorithm_t m
  **/
 int gnutls_pkcs12_generate_mac(gnutls_pkcs12_t pkcs12, const char *pass)
 {
-	return gnutls_pkcs12_generate_mac2(pkcs12, GNUTLS_MAC_SHA1, pass);
+	return gnutls_pkcs12_generate_mac2(pkcs12, GNUTLS_MAC_SHA256, pass);
 }
 
 /**
