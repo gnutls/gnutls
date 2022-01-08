@@ -32,6 +32,12 @@ gnutls_sign_set_secure: Added.
 gnutls_sign_set_secure_for_certs: Added.
 gnutls_digest_set_secure: Added.
 gnutls_protocol_set_enabled: Added.
+gnutls_fips140_context_init: New function
+gnutls_fips140_context_deinit: New function
+gnutls_fips140_push_context: New function
+gnutls_fips140_pop_context: New function
+gnutls_fips140_get_operation_state: New function
+gnutls_fips140_operation_state_t: New enum
 
 * Version 3.7.2 (released 2021-05-29)
 

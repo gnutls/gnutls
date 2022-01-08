@@ -80,7 +80,7 @@ int _gnutls_digest_exists(gnutls_digest_algorithm_t algo)
 {
 	const gnutls_crypto_digest_st *cc = NULL;
 
-	if (is_mac_algo_forbidden(DIG_TO_MAC(algo)))
+	if (!is_mac_algo_allowed(DIG_TO_MAC(algo)))
 		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
 
 	cc = _gnutls_get_crypto_digest(algo);
@@ -197,7 +197,7 @@ int _gnutls_mac_exists(gnutls_mac_algorithm_t algo)
 	if (algo == GNUTLS_MAC_AEAD)
 		return 1;
 
-	if (is_mac_algo_forbidden(algo))
+	if (!is_mac_algo_allowed(algo))
 		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
 
 	cc = _gnutls_get_crypto_mac(algo);

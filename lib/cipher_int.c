@@ -55,7 +55,7 @@ int _gnutls_cipher_exists(gnutls_cipher_algorithm_t cipher)
 	const gnutls_crypto_cipher_st *cc;
 	int ret;
 
-	if (is_cipher_algo_forbidden(cipher))
+	if (!is_cipher_algo_allowed(cipher))
 		return 0;
 
 	/* All the other ciphers are disabled on the back-end library.

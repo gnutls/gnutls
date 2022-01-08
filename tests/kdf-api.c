@@ -32,6 +32,32 @@
 
 #define MAX_BUF 1024
 
+static gnutls_fips140_context_t fips_context;
+static gnutls_fips140_operation_state_t fips_state;
+
+#define FIPS_PUSH_CONTEXT() do {					\
+	if (gnutls_fips140_mode_enabled()) {				\
+		ret = gnutls_fips140_push_context(fips_context);	\
+		if (ret < 0) {						\
+			fail("gnutls_fips140_push_context failed\n");	\
+		}							\
+	}								\
+} while (0)
+
+#define FIPS_POP_CONTEXT(state) do {					\
+	if (gnutls_fips140_mode_enabled()) {				\
+		ret = gnutls_fips140_pop_context();			\
+		if (ret < 0) {						\
+			fail("gnutls_fips140_context_pop failed\n");	\
+		}							\
+		fips_state = gnutls_fips140_get_operation_state(fips_context); \
+		if (fips_state != GNUTLS_FIPS140_OP_ ## state) {	\
+			fail("operation state is not " # state " (%d)\n", \
+			     fips_state);				\
+		}							\
+	}								\
+} while (0)
+
 static void
 test_hkdf(gnutls_mac_algorithm_t mac,
 	  const char *ikm_hex,
@@ -48,6 +74,7 @@ test_hkdf(gnutls_mac_algorithm_t mac,
 	gnutls_datum_t prk;
 	gnutls_datum_t okm;
 	uint8_t buf[MAX_BUF];
+	int ret;
 
 	success("HKDF test with %s\n", gnutls_mac_get_name(mac));
 
@@ -60,7 +87,9 @@ test_hkdf(gnutls_mac_algorithm_t mac,
 	hex.size = strlen(salt_hex);
 	assert(gnutls_hex_decode2(&hex, &salt) >= 0);
 
+	FIPS_PUSH_CONTEXT();
 	assert(gnutls_hkdf_extract(mac, &ikm, &salt, buf) >= 0);
+	FIPS_POP_CONTEXT(NOT_APPROVED);
 	gnutls_free(ikm.data);
 	gnutls_free(salt.data);
 
@@ -79,7 +108,9 @@ test_hkdf(gnutls_mac_algorithm_t mac,
 	hex.size = strlen(info_hex);
 	assert(gnutls_hex_decode2(&hex, &info) >= 0);
 
+	FIPS_PUSH_CONTEXT();
 	assert(gnutls_hkdf_expand(mac, &prk, &info, buf, length) >= 0);
+	FIPS_POP_CONTEXT(NOT_APPROVED);
 	gnutls_free(info.data);
 
 	okm.data = buf;
@@ -106,6 +137,7 @@ test_pbkdf2(gnutls_mac_algorithm_t mac,
 	gnutls_datum_t salt;
 	gnutls_datum_t okm;
 	uint8_t buf[MAX_BUF];
+	int ret;
 
 	success("PBKDF2 test with %s\n", gnutls_mac_get_name(mac));
 
@@ -117,7 +149,9 @@ test_pbkdf2(gnutls_mac_algorithm_t mac,
 	hex.size = strlen(salt_hex);
 	assert(gnutls_hex_decode2(&hex, &salt) >= 0);
 
+	FIPS_PUSH_CONTEXT();
 	assert(gnutls_pbkdf2(mac, &ikm, &salt, iter_count, buf, length) >= 0);
+	FIPS_POP_CONTEXT(APPROVED);
 	gnutls_free(ikm.data);
 	gnutls_free(salt.data);
 
@@ -135,6 +169,8 @@ test_pbkdf2(gnutls_mac_algorithm_t mac,
 void
 doit(void)
 {
+	assert(gnutls_fips140_context_init(&fips_context) >= 0);
+
 	/* Test vector from RFC 5869.  More thorough testing is done
 	 * in nettle. */
 	test_hkdf(GNUTLS_MAC_SHA256,
@@ -157,4 +193,6 @@ doit(void)
 		    4096,
 		    20,
 		    "4b007901b765489abead49d926f721d065a429c1");
+
+	gnutls_fips140_context_deinit(fips_context);
 }

@@ -30,6 +30,11 @@
 #include <gnutls/abstract.h>
 #include <gnutls/x509.h>
 
+/* Test illegal use of gnutls_cipher_* and gnutls_aead_cipher_*
+ * API. This test is written using fork, because some of the test
+ * cases may hit assertion failure in Nettle and crash the process.
+ */
+
 #if defined(WIN32)
 int main(int argc, char **argv)
 {

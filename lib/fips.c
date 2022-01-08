@@ -33,6 +33,12 @@
 #include "gthreads.h"
 
 unsigned int _gnutls_lib_state = LIB_STATE_POWERON;
+
+struct gnutls_fips140_context_st {
+	gnutls_fips140_operation_state_t state;
+	struct gnutls_fips140_context_st *next;
+};
+
 #ifdef ENABLE_FIPS140
 
 #include <dlfcn.h>
@@ -45,6 +51,8 @@ unsigned int _gnutls_lib_state = LIB_STATE_POWERON;
  * operation on a thread */
 static gnutls_fips_mode_t _global_fips_mode = -1;
 static _Thread_local gnutls_fips_mode_t _tfips_mode = -1;
+
+static _Thread_local gnutls_fips140_context_t _tfips_context = NULL;
 
 static int _skip_integrity_checks = 0;
 
@@ -598,4 +606,178 @@ void _gnutls_lib_simulate_error(void)
 void _gnutls_lib_force_operational(void)
 {
 	_gnutls_switch_lib_state(LIB_STATE_OPERATIONAL);
+}
+
+/**
+ * gnutls_fips140_context_init:
+ * @context: location to store @gnutls_fips140_context_t
+ *
+ * Create and initialize the FIPS context object.
+ *
+ * Returns: 0 upon success, a negative error code otherwise
+ *
+ * Since: 3.7.3
+ */
+int
+gnutls_fips140_context_init(gnutls_fips140_context_t *context)
+{
+	*context = gnutls_malloc(sizeof(struct gnutls_fips140_context_st));
+	if (!*context) {
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+	}
+	(*context)->state = GNUTLS_FIPS140_OP_INITIAL;
+	return 0;
+}
+
+/**
+ * gnutls_fips140_context_deinit:
+ * @context: a #gnutls_fips140_context_t
+ *
+ * Uninitialize and release the FIPS context @context.
+ *
+ * Since: 3.7.3
+ */
+void
+gnutls_fips140_context_deinit(gnutls_fips140_context_t context)
+{
+	gnutls_free(context);
+}
+
+/**
+ * gnutls_fips140_get_operation_state:
+ * @context: a #gnutls_fips140_context_t
+ *
+ * Get the previous operation state of @context in terms of FIPS.
+ *
+ * Returns: a #gnutls_fips140_operation_state_t
+ *
+ * Since: 3.7.3
+ */
+gnutls_fips140_operation_state_t
+gnutls_fips140_get_operation_state(gnutls_fips140_context_t context)
+{
+	return context->state;
+}
+
+/**
+ * gnutls_fips140_push_context:
+ * @context: a #gnutls_fips140_context_t
+ *
+ * Associate the FIPS @context to the current thread, diverting the
+ * currently active context. If a cryptographic operation is ongoing
+ * in the current thread, e.g., gnutls_aead_cipher_init() is called
+ * but gnutls_aead_cipher_deinit() is not yet called, it returns an
+ * error %GNUTLS_E_INVALID_REQUEST.
+ *
+ * The operation state of @context will be reset to
+ * %GNUTLS_FIPS140_OP_INITIAL.
+ *
+ * Returns: 0 upon success, a negative error code otherwise
+ *
+ * Since: 3.7.3
+ */
+int
+gnutls_fips140_push_context(gnutls_fips140_context_t context)
+{
+#ifdef ENABLE_FIPS140
+	context->next = _tfips_context;
+	_tfips_context = context;
+
+	context->state = GNUTLS_FIPS140_OP_INITIAL;
+	return 0;
+#else
+	return GNUTLS_E_INVALID_REQUEST;
+#endif
+}
+
+/**
+ * gnutls_fips140_pop_context:
+ *
+ * Dissociate the FIPS context currently
+ * active on the current thread, reverting to the previously active
+ * context. If a cryptographic operation is ongoing in the current
+ * thread, e.g., gnutls_aead_cipher_init() is called but
+ * gnutls_aead_cipher_deinit() is not yet called, it returns an error
+ * %GNUTLS_E_INVALID_REQUEST.
+ *
+ * Returns: 0 upon success, a negative error code otherwise
+ *
+ * Since: 3.7.3
+ */
+int
+gnutls_fips140_pop_context(void)
+{
+#ifdef ENABLE_FIPS140
+	if (!_tfips_context) {
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
+
+	_tfips_context = _tfips_context->next;
+	return 0;
+#else
+	return GNUTLS_E_INVALID_REQUEST;
+#endif
+}
+
+static inline const char *
+operation_state_to_string(gnutls_fips140_operation_state_t state)
+{
+	switch (state) {
+	case GNUTLS_FIPS140_OP_INITIAL:
+		return "initial";
+	case GNUTLS_FIPS140_OP_APPROVED:
+		return "approved";
+	case GNUTLS_FIPS140_OP_NOT_APPROVED:
+		return "not-approved";
+	case GNUTLS_FIPS140_OP_ERROR:
+		return "error";
+	default:
+		/*NOTREACHED*/
+		assert(0);
+		return NULL;
+	}
+}
+
+gnutls_fips140_operation_state_t
+_gnutls_transit_fips_state(gnutls_fips140_operation_state_t current,
+			   gnutls_fips140_operation_state_t next)
+{
+	switch (current) {
+	case GNUTLS_FIPS140_OP_INITIAL:
+		/* initial can be transitioned to any state */
+		_gnutls_debug_log("FIPS140-2 operation mode switched from initial to %s\n",
+				  operation_state_to_string(next));
+		return next;
+	case GNUTLS_FIPS140_OP_APPROVED:
+		/* approved can only be transitioned to not-approved */
+		if (next == GNUTLS_FIPS140_OP_NOT_APPROVED) {
+			_gnutls_debug_log("FIPS140-2 operation mode switched from approved to %s\n",
+					  operation_state_to_string(next));
+			return next;
+		}
+		FALLTHROUGH;
+	default:
+		/* other transitions are prohibited */
+		if (next != current) {
+			_gnutls_debug_log("FIPS140-2 operation mode cannot be switched from %s to %s\n",
+					  operation_state_to_string(current),
+					  operation_state_to_string(next));
+		}
+		return current;
+	}
+}
+
+void
+_gnutls_switch_fips_state(gnutls_fips140_operation_state_t state)
+{
+#ifdef ENABLE_FIPS140
+	if (!_tfips_context) {
+		_gnutls_debug_log("FIPS140-2 context is not set\n");
+		return;
+	}
+	_tfips_context->state =
+		_gnutls_transit_fips_state(_tfips_context->state, state);
+#else
+	(void)state;
+#endif
 }

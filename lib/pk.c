@@ -1200,6 +1200,18 @@ pk_prepare_hash(gnutls_pk_algorithm_t pk,
 	case GNUTLS_PK_RSA:
 		if (unlikely(hash == NULL))
 			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+		/* Only SHA-2 is allowed in FIPS 140-3 */
+		switch (hash->id) {
+		case GNUTLS_MAC_SHA256:
+		case GNUTLS_MAC_SHA384:
+		case GNUTLS_MAC_SHA512:
+		case GNUTLS_MAC_SHA224:
+			break;
+		default:
+			_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_NOT_APPROVED);
+		}
+
 		/* Encode the digest as a DigestInfo
 		 */
 		if ((ret =
