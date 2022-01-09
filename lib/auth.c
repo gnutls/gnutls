@@ -439,7 +439,7 @@ _gnutls_auth_info_init(gnutls_session_t session,
 
 				_gnutls_free_auth_info(session);
 
-				session->key.auth_info = calloc(1, size);
+				session->key.auth_info = gnutls_calloc(1, size);
 				if (session->key.auth_info == NULL) {
 					gnutls_assert();
 					return GNUTLS_E_MEMORY_ERROR;
