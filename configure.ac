@@ -594,6 +594,24 @@ if [ test "$enable_fips" = "yes" ];then
             fips_key="orboDeJITITejsirpADONivirpUkvarP")
 
     AC_DEFINE_UNQUOTED([FIPS_KEY], ["$fips_key"], [The FIPS140-2 integrity key])
+
+    AC_ARG_WITH(fips140-module-name, AS_HELP_STRING([--with-fips140-module-name],
+                                 [specify the FIPS140 module name]),
+            fips_module_name="$withval",
+            fips_module_name=none)
+
+    if test "x$fips_module_name" != xnone; then
+       AC_DEFINE_UNQUOTED([FIPS_MODULE_NAME], ["$fips_module_name"], [The FIPS140 module name])
+    fi
+
+    AC_ARG_WITH(fips140-module-version, AS_HELP_STRING([--with-fips140-module-version],
+                                 [specify the FIPS140 module version]),
+            fips_module_version="$withval",
+            fips_module_version=none)
+
+    if test "x$fips_module_version" != xnone; then
+       AC_DEFINE_UNQUOTED([FIPS_MODULE_VERSION], ["$fips_module_version"], [The FIPS140 module version])
+    fi
   else
     enable_fips=no
     AC_MSG_WARN([[

@@ -533,6 +533,12 @@ static void _DESTRUCTOR lib_deinit(void)
 }
 
 static const struct gnutls_library_config_st _gnutls_library_config[] = {
+#ifdef FIPS_MODULE_NAME
+	{ "fips-module-name", FIPS_MODULE_NAME },
+#endif
+#ifdef FIPS_MODULE_VERSION
+	{ "fips-module-version", FIPS_MODULE_VERSION },
+#endif
 	{ "libgnutls-soname", GNUTLS_LIBRARY_SONAME },
 	{ "libnettle-soname", NETTLE_LIBRARY_SONAME },
 	{ "libhogweed-soname", HOGWEED_LIBRARY_SONAME },
@@ -547,6 +553,10 @@ static const struct gnutls_library_config_st _gnutls_library_config[] = {
  *
  * Returns the library configuration as key value pairs.
  * Currently defined keys are:
+ *
+ *  - fips-module-name: the name of the FIPS140 module
+ *
+ *  - fips-module-version: the version of the FIPS140 module
  *
  *  - libgnutls-soname: the SONAME of the library itself
  *
