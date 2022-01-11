@@ -123,3 +123,6 @@ name = gnutls_fips140_get_operation_state
 
 [suppress_type]
 name = gnutls_fips140_operation_state_t
+
+[suppress_function]
+name = gnutls_get_library_config

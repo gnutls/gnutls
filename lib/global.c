@@ -531,3 +531,41 @@ static void _DESTRUCTOR lib_deinit(void)
 
 	_gnutls_global_deinit(1);
 }
+
+static const struct gnutls_library_config_st _gnutls_library_config[] = {
+	{ "libgnutls-soname", GNUTLS_LIBRARY_SONAME },
+	{ "libnettle-soname", NETTLE_LIBRARY_SONAME },
+	{ "libhogweed-soname", HOGWEED_LIBRARY_SONAME },
+	{ "libgmp-soname", GMP_LIBRARY_SONAME },
+	{ "hardware-features", HW_FEATURES },
+	{ "tls-features", TLS_FEATURES },
+	{ NULL, NULL }
+};
+
+/**
+ * gnutls_get_library_config:
+ *
+ * Returns the library configuration as key value pairs.
+ * Currently defined keys are:
+ *
+ *  - libgnutls-soname: the SONAME of the library itself
+ *
+ *  - libnettle-soname: the library SONAME of linked libnettle
+ *
+ *  - libhogweed-soname: the library SONAME of linked libhogweed
+ *
+ *  - libgmp-soname: the library SONAME of linked libgmp
+ *
+ *  - hardware-features: enabled hardware support features
+ *
+ *  - tls-features: enabled TLS protocol features
+ *
+ * Returns: a NUL-terminated %gnutls_library_config_st array
+ *
+ * Since: 3.7.3
+ */
+const gnutls_library_config_st *
+gnutls_get_library_config(void)
+{
+	return _gnutls_library_config;
+}

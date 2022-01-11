@@ -1232,6 +1232,11 @@ typedef struct {
 	unsigned int size;
 } gnutls_datum_t;
 
+typedef struct gnutls_library_config_st {
+	const char *name;
+	const char *value;
+} gnutls_library_config_st;
+
 
 typedef struct gnutls_params_st {
 	gnutls_params_type_t type;
@@ -2283,6 +2288,8 @@ int gnutls_certificate_set_rawpk_key_file(gnutls_certificate_credentials_t cred,
  */
 int gnutls_global_init(void);
 void gnutls_global_deinit(void);
+
+const gnutls_library_config_st *gnutls_get_library_config(void);
 
   /**
    * gnutls_time_func:
