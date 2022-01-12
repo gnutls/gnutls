@@ -636,6 +636,7 @@ typedef struct cipher_entry_st {
 typedef struct gnutls_cipher_suite_entry_st {
 	const char *name;
 	const uint8_t id[2];
+	const char *canonical_name;
 	gnutls_cipher_algorithm_t block_algorithm;
 	gnutls_kx_algorithm_t kx_algorithm;
 	gnutls_mac_algorithm_t mac_algorithm;

@@ -14,6 +14,7 @@ GNUTLS_3_6_9@GNUTLS_3_6_9
 GNUTLS_3_7_0@GNUTLS_3_7_0
 GNUTLS_3_7_2@GNUTLS_3_7_2
 GNUTLS_3_7_3@GNUTLS_3_7_3
+GNUTLS_3_7_4@GNUTLS_3_7_4
 _gnutls_global_init_skip@GNUTLS_3_4
 gnutls_aead_cipher_decrypt@GNUTLS_3_4
 gnutls_aead_cipher_decryptv2@GNUTLS_3_6_10
@@ -148,6 +149,7 @@ gnutls_cipher_set_iv@GNUTLS_3_4
 gnutls_cipher_suite_get_name@GNUTLS_3_4
 gnutls_cipher_suite_info@GNUTLS_3_4
 gnutls_cipher_tag@GNUTLS_3_4
+gnutls_ciphersuite_get@GNUTLS_3_7_4
 gnutls_compression_get@GNUTLS_3_4
 gnutls_compression_get_id@GNUTLS_3_4
 gnutls_compression_get_name@GNUTLS_3_4

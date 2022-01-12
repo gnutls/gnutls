@@ -357,6 +357,7 @@ tests/chainverify
 tests/chainverify-unsorted
 tests/cipher-alignment
 tests/cipher-test
+tests/ciphersuite-name
 tests/client
 tests/client-fastopen
 tests/client-sign-md5-rep

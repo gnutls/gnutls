@@ -323,6 +323,35 @@ gnutls_early_prf_hash_get(const gnutls_session_t session)
 		resumed_security_parameters.prf->id;
 }
 
+/**
+ * gnutls_ciphersuite_get:
+ * @session: is a #gnutls_session_t type.
+ *
+ * Get the canonical name of negotiated TLS ciphersuite.  The names
+ * returned by this function match the IANA registry, with one
+ * exception:
+ *
+ *   TLS_DHE_DSS_RC4_128_SHA { 0x00, 0x66 }
+ *
+ * which is reserved for compatibility.
+ *
+ * To get a detailed description of the current ciphersuite, it is
+ * recommended to use gnutls_session_get_desc().
+ *
+ * Returns: a string that contains the canonical name of a TLS ciphersuite,
+ *     or %NULL if the handshake is not completed.
+ *
+ * Since: 3.7.4
+ **/
+const char *
+gnutls_ciphersuite_get(gnutls_session_t session)
+{
+	if (unlikely(session->internals.handshake_in_progress)) {
+		return NULL;
+	}
+	return session->security_parameters.cs->canonical_name;
+}
+
 void reset_binders(gnutls_session_t session)
 {
 	_gnutls_free_temp_key_datum(&session->key.binders[0].psk);

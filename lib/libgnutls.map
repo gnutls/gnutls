@@ -1380,6 +1380,14 @@ GNUTLS_3_7_3
 	*;
 } GNUTLS_3_7_2;
 
+GNUTLS_3_7_4
+{
+ global:
+	gnutls_ciphersuite_get;
+ local:
+	*;
+} GNUTLS_3_7_3;
+
 GNUTLS_FIPS140_3_4 {
   global:
 	gnutls_cipher_self_test;
