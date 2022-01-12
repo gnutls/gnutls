@@ -71,6 +71,8 @@ void print_cert_info2(gnutls_session_t, int flag, FILE *fp, int print_cert);
 void print_list(const char *priorities, int verbose);
 int cert_verify(gnutls_session_t session, const char *hostname, const char *purpose);
 
+int compress_cert_set_methods(gnutls_session_t session, const char *string);
+
 const char *raw_to_string(const unsigned char *raw, size_t raw_size);
 const char *raw_to_hex(const unsigned char *raw, size_t raw_size);
 const char *raw_to_base64(const unsigned char *raw, size_t raw_size);

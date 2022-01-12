@@ -5,6 +5,14 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.7.4 (unreleased)
+
+** Added support for certificate compression as defined in RFC8879.
+
+** API and ABI modifications:
+gnutls_compress_certificate_get_selected_method: Added
+gnutls_compress_certificate_set_methods: Added
+
 * Version 3.7.3 (released 2022-01-17)
 
 ** libgnutls: The allowlisting configuration mode has been added to the system-wide

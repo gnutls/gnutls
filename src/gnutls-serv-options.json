@@ -139,6 +139,12 @@
         "long-option": "verify-client-cert"
       },
       {
+        "arg-type": "string",
+        "long-option": "compress-cert",
+        "desc": "Compress certificate",
+        "detail": "This option sets a list of supported compression methods for certificate compression. Use comma delimited list of compression methods such as \"zlib,brotli,zstd\"."
+      },
+      {
         "long-option": "heartbeat",
         "desc": "Activate heartbeat support",
         "detail": "Regularly ping client via heartbeat extension messages",

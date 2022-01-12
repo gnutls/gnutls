@@ -21,20 +21,25 @@
  */
 
 #include "gnutls_int.h"
+#include "compress.h"
 #include "errors.h"
 #include "extv.h"
 #include "handshake.h"
 #include "tls13/certificate.h"
 #include "auth/cert.h"
 #include "mbuffers.h"
+#include "ext/compress_certificate.h"
 #include "ext/status_request.h"
 
 static int parse_cert_extension(void *ctx, unsigned tls_id, const uint8_t *data, unsigned data_size);
 static int parse_cert_list(gnutls_session_t session, uint8_t * data, size_t data_size);
+static int compress_certificate(gnutls_buffer_st * buf, unsigned cert_pos_mark,
+			        gnutls_compression_method_t comp_method);
+static int decompress_certificate(gnutls_buffer_st * buf);
 
 int _gnutls13_recv_certificate(gnutls_session_t session)
 {
-	int ret;
+	int ret, err, decompress_cert = 0;
 	gnutls_buffer_st buf;
 	unsigned optional = 0;
 
@@ -52,6 +57,14 @@ int _gnutls13_recv_certificate(gnutls_session_t session)
 	}
 
 	ret = _gnutls_recv_handshake(session, GNUTLS_HANDSHAKE_CERTIFICATE_PKT, 0, &buf);
+	if (ret == GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET) {
+		/* check if we received compressed certificate */
+		err = _gnutls_recv_handshake(session, GNUTLS_HANDSHAKE_COMPRESSED_CERTIFICATE_PKT, 0, &buf);
+		if (err >= 0) {
+			decompress_cert = 1;
+			ret = err;
+		}
+	}
 	if (ret < 0) {
 		if (ret == GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET && session->internals.send_cert_req)
 			return gnutls_assert_val(GNUTLS_E_NO_CERTIFICATE_FOUND);
@@ -63,6 +76,15 @@ int _gnutls13_recv_certificate(gnutls_session_t session)
 		gnutls_assert();
 		ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 		goto cleanup;
+	}
+
+	if (decompress_cert) {
+		ret = decompress_certificate(&buf);
+		if (ret < 0) {
+			gnutls_assert();
+			gnutls_alert_send(session, GNUTLS_AL_FATAL, GNUTLS_A_BAD_CERTIFICATE);
+			goto cleanup;
+		}
 	}
 
 	if (session->internals.initial_negotiation_completed &&
@@ -195,16 +217,23 @@ int append_status_request(void *_ctx, gnutls_buffer_st *buf)
 
 int _gnutls13_send_certificate(gnutls_session_t session, unsigned again)
 {
-	int ret;
+	int ret, compress_cert;
 	gnutls_pcert_st *apr_cert_list = NULL;
 	gnutls_privkey_t apr_pkey = NULL;
 	int apr_cert_list_length = 0;
 	mbuffer_st *bufel = NULL;
 	gnutls_buffer_st buf;
-	unsigned pos_mark, ext_pos_mark;
+	unsigned pos_mark, ext_pos_mark, cert_pos_mark;
 	unsigned i;
 	struct ocsp_req_ctx_st ctx;
 	gnutls_certificate_credentials_t cred;
+	gnutls_compression_method_t comp_method;
+	gnutls_handshake_description_t h_type;
+
+	comp_method = gnutls_compress_certificate_get_selected_method(session);
+	compress_cert = comp_method != GNUTLS_COMP_UNKNOWN;
+	h_type = compress_cert ? GNUTLS_HANDSHAKE_COMPRESSED_CERTIFICATE_PKT
+			       : GNUTLS_HANDSHAKE_CERTIFICATE_PKT;
 
 	if (again == 0) {
 		if (!session->internals.initial_negotiation_completed &&
@@ -235,6 +264,8 @@ int _gnutls13_send_certificate(gnutls_session_t session, unsigned again)
 		ret = _gnutls_buffer_init_handshake_mbuffer(&buf);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
+
+		cert_pos_mark = buf.length;
 
 		if (session->security_parameters.entity == GNUTLS_CLIENT) {
 			ret = _gnutls_buffer_append_data_prefix(&buf, 8,
@@ -312,10 +343,18 @@ int _gnutls13_send_certificate(gnutls_session_t session, unsigned again)
 
 		_gnutls_write_uint24(buf.length-pos_mark-3, &buf.data[pos_mark]);
 
+		if (compress_cert) {
+			ret = compress_certificate(&buf, cert_pos_mark, comp_method);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+		}
+
 		bufel = _gnutls_buffer_to_mbuffer(&buf);
 	}
 
-	return _gnutls_send_handshake(session, bufel, GNUTLS_HANDSHAKE_CERTIFICATE_PKT);
+	return _gnutls_send_handshake(session, bufel, h_type);
 
  cleanup:
 	_gnutls_buffer_clear(&buf);
@@ -523,3 +562,101 @@ parse_cert_list(gnutls_session_t session, uint8_t * data, size_t data_size)
 
 }
 
+static int
+compress_certificate(gnutls_buffer_st * buf, unsigned cert_pos_mark,
+		     gnutls_compression_method_t comp_method)
+{
+	int ret, method_num;
+	size_t comp_bound;
+	gnutls_datum_t plain, comp = { NULL, 0 };
+
+	method_num = _gnutls_compress_certificate_method2num(comp_method);
+	if (method_num == GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER)
+		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+
+	plain.data = buf->data + cert_pos_mark;
+	plain.size = buf->length - cert_pos_mark;
+
+	comp_bound = _gnutls_compress_bound(comp_method, plain.size);
+	if (comp_bound == 0)
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+	comp.data = gnutls_malloc(comp_bound);
+	if (comp.data == NULL)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+	ret = _gnutls_compress(comp_method, comp.data, comp_bound, plain.data, plain.size);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+	comp.size = ret;
+
+	buf->length = cert_pos_mark;
+	ret = _gnutls_buffer_append_prefix(buf, 16, method_num);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+	ret = _gnutls_buffer_append_prefix(buf, 24, plain.size);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+	ret = _gnutls_buffer_append_data_prefix(buf, 24, comp.data, comp.size);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+	
+cleanup:
+	gnutls_free(comp.data);
+	return ret;
+}
+
+static int
+decompress_certificate(gnutls_buffer_st * buf)
+{
+	int ret;
+	size_t method_num, plain_exp_len;
+	gnutls_datum_t comp, plain = { NULL, 0 };
+	gnutls_compression_method_t comp_method;
+
+	ret = _gnutls_buffer_pop_prefix16(buf, &method_num, 0);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+	comp_method = _gnutls_compress_certificate_num2method(method_num);
+
+	ret = _gnutls_buffer_pop_prefix24(buf, &plain_exp_len, 0);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = _gnutls_buffer_pop_datum_prefix24(buf, &comp);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	plain.data = gnutls_malloc(plain_exp_len);
+	if (plain.data == NULL)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+	ret = _gnutls_decompress(comp_method, plain.data, plain_exp_len, comp.data, comp.size);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+	plain.size = ret;
+
+	if (plain.size != plain_exp_len) {
+		gnutls_assert();
+		ret = GNUTLS_E_DECOMPRESSION_FAILED;
+		goto cleanup;
+	}
+
+	_gnutls_buffer_clear(buf);
+	ret = _gnutls_buffer_append_data(buf, plain.data, plain.size);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+cleanup:
+	gnutls_free(plain.data);
+	return ret;
+}

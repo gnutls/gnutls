@@ -333,6 +333,7 @@ typedef enum extensions_t {
 	GNUTLS_EXTENSION_PSK_KE_MODES,
 	GNUTLS_EXTENSION_RECORD_SIZE_LIMIT,
 	GNUTLS_EXTENSION_MAX_RECORD_SIZE,
+	GNUTLS_EXTENSION_COMPRESS_CERTIFICATE,
 	/*
 	 * pre_shared_key and dumbfw must always be the last extensions,
 	 * in that order */
@@ -1497,6 +1498,10 @@ typedef struct {
 
 	/* indicates whether or not was KTLS initialized properly. */
 	int ktls_enabled;
+
+	/* Compression method for certificate compression */
+	gnutls_compression_method_t compress_certificate_method;
+
 	/* If you add anything here, check _gnutls_handshake_internal_state_clear().
 	 */
 } internals_st;

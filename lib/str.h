@@ -123,17 +123,18 @@ int _gnutls_buffer_pop_data(gnutls_buffer_st *, void *, size_t size);
 void _gnutls_buffer_pop_datum(gnutls_buffer_st *, gnutls_datum_t *,
 			      size_t max_size);
 
+/* 32-bit prefix */
+int _gnutls_buffer_pop_prefix32(gnutls_buffer_st * buf, size_t * data_size, int check);
+int _gnutls_buffer_pop_prefix24(gnutls_buffer_st * buf, size_t * data_size, int check);
+int _gnutls_buffer_pop_prefix16(gnutls_buffer_st * buf, size_t * data_size, int check);
 int _gnutls_buffer_pop_prefix8(gnutls_buffer_st *, uint8_t *, int check);
 
 /* 32-bit prefix */
-int _gnutls_buffer_pop_prefix32(gnutls_buffer_st * buf, size_t * data_size,
-			        int check);
-
-int _gnutls_buffer_pop_prefix24(gnutls_buffer_st * buf, size_t * data_size,
-			        int check);
-
-/* 32-bit prefix */
 int _gnutls_buffer_pop_datum_prefix32(gnutls_buffer_st * buf,
+				      gnutls_datum_t * data);
+
+/* 24-bit prefix */
+int _gnutls_buffer_pop_datum_prefix24(gnutls_buffer_st * buf,
 				      gnutls_datum_t * data);
 
 /* 16-bit prefix */

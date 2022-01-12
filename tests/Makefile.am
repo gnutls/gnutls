@@ -121,7 +121,8 @@ ctests = tls13/supported_versions tls13/tls12-no-tls13-exts \
 	tls12-rollback-detection tls11-rollback-detection \
 	tls12-check-rollback-val tls11-check-rollback-val \
 	tls13/post-handshake-with-psk tls13/post-handshake-with-cert-auto \
-	tls13/anti_replay
+	tls13/anti_replay tls13/compress-cert tls13/compress-cert-neg \
+	tls13/compress-cert-neg2
 
 ctests += tls13/hello_retry_request
 

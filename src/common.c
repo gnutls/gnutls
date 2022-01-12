@@ -291,6 +291,58 @@ int cert_verify(gnutls_session_t session, const char *hostname, const char *purp
 	return 1;
 }
 
+/* Parse input string and set certificate compression methods */
+int compress_cert_set_methods(gnutls_session_t session, const char *string)
+{
+	int ret = 0, i = 0;
+	char *s = NULL, *t = NULL, *str = NULL;
+	size_t methods_len = 0;
+	gnutls_compression_method_t *methods = NULL;
+
+	if (!string || !*string)
+		return 0;
+
+	str = strdup(string);
+	if (!str) {
+		ret = GNUTLS_E_MEMORY_ERROR;
+		fprintf(stderr, "Could not set certificate compression methods: %s\n",
+			gnutls_strerror(ret));
+		goto cleanup;
+	}
+
+	methods_len = 1;
+	for (s = str; *s; ++s)
+		if (*s == ',')
+			++methods_len;
+	
+	methods = gnutls_malloc(methods_len * sizeof(gnutls_compression_method_t));
+	if (!methods) {
+		ret = GNUTLS_E_MEMORY_ERROR;
+		fprintf(stderr, "Could not set certificate compression methods: %s\n",
+			gnutls_strerror(ret));
+		goto cleanup;
+	}
+
+	for (s = str, i = 0; (t = strchr(s, ',')); s = t + 1, ++i) {
+		*t = '\0';
+		methods[i] = gnutls_compression_get_id(s);
+	}
+	methods[i] = gnutls_compression_get_id(s);
+
+	ret = gnutls_compress_certificate_set_methods(session, methods, methods_len);
+	if (ret < 0) {
+		fprintf(stderr, "Could not set certificate compression methods: %s\n",
+			gnutls_strerror(ret));
+		goto cleanup;
+	}
+
+cleanup:
+	free(str);
+	free(methods);
+
+	return ret;
+}
+
 static void
 print_dh_info(gnutls_session_t session, const char *str, int print)
 {
