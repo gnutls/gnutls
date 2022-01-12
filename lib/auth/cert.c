@@ -790,6 +790,10 @@ _gnutls_proc_x509_crt(gnutls_session_t session,
 	}
 
 	info = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
+	if (unlikely(!info)) {
+		gnutls_assert();
+		return ret;
+	}
 
 	if (data == NULL || data_size == 0) {
 		gnutls_assert();
@@ -962,13 +966,17 @@ int _gnutls_proc_rawpk_crt(gnutls_session_t session,
 	}
 
 	ret = _gnutls_auth_info_init(session, GNUTLS_CRD_CERTIFICATE,
-															sizeof(cert_auth_info_st), 1);
+				     sizeof(cert_auth_info_st), 1);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
 	info = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
+	if (unlikely(!info)) {
+		gnutls_assert();
+		goto cleanup;
+	}
 
 	/* Copy our imported certificate into the auth info structure
 	 * and free our temporary cert storage peer_certificate.

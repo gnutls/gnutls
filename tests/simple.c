@@ -128,7 +128,12 @@ void doit(void)
 			hash = gnutls_sign_get_hash_algorithm(algs[i]);
 			if (hash != GNUTLS_DIG_UNKNOWN) {
 				const char *name = gnutls_digest_get_name(hash);
-				if (gnutls_digest_get_id(name) != hash)
+				gnutls_digest_algorithm_t hash2 = gnutls_digest_get_id(name);
+				/* gnutls_digest_get_id returns
+				 * GNUTLS_DIG_UNKNOWN if the algorithm is not
+				 * compiled in.
+				 */
+				if (hash2 != GNUTLS_DIG_UNKNOWN && hash2 != hash)
 					fail("gnutls_digest id for %s doesn't match %s\n",
 					     gnutls_sign_algorithm_get_name(algs[i]),
 					     name);
