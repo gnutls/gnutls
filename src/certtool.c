@@ -2960,7 +2960,7 @@ void generate_pkcs12(common_info_st * cinfo)
 	if (cinfo->hash != GNUTLS_DIG_UNKNOWN)
 		mac = (gnutls_mac_algorithm_t)cinfo->hash;
 	else
-		mac = GNUTLS_MAC_SHA1;
+		mac = GNUTLS_MAC_SHA256;
 
 	if (HAVE_OPT(P12_NAME)) {
 		name = OPT_ARG(P12_NAME);

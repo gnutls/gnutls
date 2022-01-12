@@ -160,6 +160,7 @@ TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
 	ASAN_OPTIONS="detect_leaks=0:exitcode=6" \
 	GNUTLS_TEST_SUITE_RUN=1			\
 	GNUTLS_SYSTEM_PRIORITY_FILE=$(abs_top_srcdir)/tests/system.prio \
+	PKCS12_ITER_COUNT="$(PKCS12_ITER_COUNT)" \
 	srcdir="$(srcdir)"
 
 if ENABLE_FIPS140

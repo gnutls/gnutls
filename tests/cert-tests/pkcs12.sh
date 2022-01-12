@@ -40,8 +40,11 @@ fi
 : ${DIFF=diff}
 DEBUG=""
 
-TMPFILE=pkcs12.$$.tmp
-TMPFILE_PEM=pkcs12.$$.pem.tmp
+. "${srcdir}/../scripts/common.sh"
+testdir=`create_testdir pkcs12`
+
+TMPFILE=$testdir/pkcs12
+TMPFILE_PEM=$testdir/pkcs12.pem
 
 DEBUG="1"
 
@@ -101,7 +104,7 @@ if test ${rc} != 0; then
 	exit 1
 fi
 
-${VALGRIND} "${CERTTOOL}" --p12-info --inder --password 1234 --infile $TMPFILE >${TMPFILE_PEM} 2>/dev/null
+${VALGRIND} "${CERTTOOL}" --p12-info --inder --password 1234 --infile $TMPFILE|tr -d '\r' >${TMPFILE_PEM} 2>/dev/null
 rc=$?
 if test ${rc} != 0; then
 	echo "PKCS12 FATAL decrypting/decoding"
@@ -121,5 +124,44 @@ rc=$?
 if test "${rc}" != "0"; then
 	exit ${rc}
 fi
+
+INFO_EXP=$testdir/p12-info.exp
+INFO_OUT=$testdir/p12-info.out
+
+cat >$INFO_EXP <<EOF
+MAC info:
+	MAC: SHA256 (2.16.840.1.101.3.4.2.1)
+	Salt size: 8
+	Iteration count: $PKCS12_ITER_COUNT
+
+BAG #0
+	Type: Encrypted
+	Cipher: AES-128-CBC
+	Schema: PBES2-AES128-CBC (2.16.840.1.101.3.4.1.2)
+	Iteration count: $PKCS12_ITER_COUNT
+
+BAG #1
+	Elements: 1
+	Type: PKCS #8 Encrypted key
+	PKCS #8 information:
+		Cipher: AES-128-CBC
+		Schema: PBES2-AES128-CBC (2.16.840.1.101.3.4.1.2)
+		Iteration count: $PKCS12_ITER_COUNT
+
+EOF
+
+sed -n '/^\(MAC\|BAG\)/,/^$/p' ${TMPFILE_PEM} | \
+sed -e '/^[ 	]*Salt:/d' \
+    -e '/^BAG #[0-9]*/,$ { /^[ 	]*Salt size:/d }' > ${INFO_OUT}
+
+diff ${INFO_EXP} ${INFO_OUT}
+
+rc=$?
+
+if test "${rc}" != "0"; then
+	exit ${rc}
+fi
+
+rm -rf "${testdir}"
 
 exit 0

@@ -601,6 +601,16 @@ if [ test "$enable_fips" = "yes" ];then
   fi
 fi
 
+AC_ARG_WITH([pkcs12-iter-count],
+	[AS_HELP_STRING([--with-pkcs12-iter-count],
+	  [specify iteration count for PKCS\#12 key derivation @<:@default=600000@:>@])],
+	[pkcs12_iter_count="$withval"],
+        [pkcs12_iter_count=600000])
+
+AC_DEFINE_UNQUOTED([PKCS12_ITER_COUNT], [$pkcs12_iter_count],
+	[The iteration count for PKCS\#12 key derivation])
+AC_SUBST([PKCS12_ITER_COUNT], [$pkcs12_iter_count])
+
 PKG_CHECK_MODULES(CMOCKA, [cmocka >= 1.0.1], [with_cmocka=yes], [with_cmocka=no])
 AM_CONDITIONAL(HAVE_CMOCKA, test "$with_cmocka" != "no")
 
