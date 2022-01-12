@@ -81,13 +81,16 @@ unsigned int _gnutls_x86_cpuid_s[4];
 # define bit_AVX 0x10000000
 #endif
 
-#ifndef OSXSAVE_MASK
-/* OSXSAVE|MOVBE */
-# define OSXSAVE_MASK (0x8000000|0x400000)
+#ifndef bit_OSXSAVE
+# define bit_OSXSAVE 0x8000000
 #endif
 
 #ifndef bit_MOVBE
 # define bit_MOVBE 0x00400000
+#endif
+
+#ifndef OSXSAVE_MASK
+# define OSXSAVE_MASK (bit_OSXSAVE|bit_MOVBE)
 #endif
 
 #define bit_PADLOCK (0x3 << 6)
@@ -127,7 +130,7 @@ static unsigned read_cpuid_vals(unsigned int vals[4])
 	unsigned t1, t2, t3;
 	vals[0] = vals[1] = vals[2] = vals[3] = 0;
 
-	if (!__get_cpuid(1, &t1, &vals[0], &vals[1], &t2))
+	if (!__get_cpuid(1, &t1, &t2, &vals[1], &vals[0]))
 		return 0;
 	/* suppress AVX512; it works conditionally on certain CPUs on the original code */
 	vals[1] &= 0xfffff7ff;
@@ -368,9 +371,10 @@ void register_x86_padlock_crypto(unsigned capabilities)
 	int ret, phe;
 	unsigned edx;
 
-	memset(_gnutls_x86_cpuid_s, 0, sizeof(_gnutls_x86_cpuid_s));
 	if (check_zhaoxin() == 0)
 		return;
+
+	memset(_gnutls_x86_cpuid_s, 0, sizeof(_gnutls_x86_cpuid_s));
 
 	if (capabilities == 0){
 		if(!read_cpuid_vals(_gnutls_x86_cpuid_s))
@@ -835,39 +839,60 @@ void register_x86_padlock_crypto(unsigned capabilities)
 }
 #endif
 
-static unsigned check_intel_or_amd(void)
+enum x86_cpu_vendor {
+	X86_CPU_VENDOR_OTHER,
+	X86_CPU_VENDOR_INTEL,
+	X86_CPU_VENDOR_AMD,
+};
+
+static enum x86_cpu_vendor check_x86_cpu_vendor(void)
 {
 	unsigned int a, b, c, d;
 
-	if (!__get_cpuid(0, &a, &b, &c, &d))
-		return 0;
-
-	if ((memcmp(&b, "Genu", 4) == 0 &&
-	     memcmp(&d, "ineI", 4) == 0 &&
-	     memcmp(&c, "ntel", 4) == 0) ||
-	    (memcmp(&b, "Auth", 4) == 0 &&
-	     memcmp(&d, "enti", 4) == 0 && memcmp(&c, "cAMD", 4) == 0)) {
-		return 1;
+	if (!__get_cpuid(0, &a, &b, &c, &d)) {
+		return X86_CPU_VENDOR_OTHER;
 	}
 
-	return 0;
+	if (memcmp(&b, "Genu", 4) == 0 &&
+	    memcmp(&d, "ineI", 4) == 0 &&
+	    memcmp(&c, "ntel", 4) == 0) {
+		return X86_CPU_VENDOR_INTEL;
+	}
+
+	if (memcmp(&b, "Auth", 4) == 0 &&
+	    memcmp(&d, "enti", 4) == 0 &&
+	    memcmp(&c, "cAMD", 4) == 0) {
+		return X86_CPU_VENDOR_AMD;
+	}
+
+	return X86_CPU_VENDOR_OTHER;
 }
 
 static
 void register_x86_intel_crypto(unsigned capabilities)
 {
 	int ret;
+	enum x86_cpu_vendor vendor;
 
 	memset(_gnutls_x86_cpuid_s, 0, sizeof(_gnutls_x86_cpuid_s));
 
-	if (check_intel_or_amd() == 0)
+	vendor = check_x86_cpu_vendor();
+	if (vendor == X86_CPU_VENDOR_OTHER) {
 		return;
+	}
 
 	if (capabilities == 0) {
 		if (!read_cpuid_vals(_gnutls_x86_cpuid_s))
 			return;
 	} else {
 		capabilities_to_intel_cpuid(capabilities);
+	}
+
+	/* CRYPTOGAMS uses the (1 << 30) bit as an indicator of Intel CPUs */
+	if (vendor == X86_CPU_VENDOR_INTEL) {
+		_gnutls_x86_cpuid_s[0] |= 1 << 30;
+	} else {
+		_gnutls_x86_cpuid_s[0] &= ~(1 << 30);
 	}
 
 	if (check_ssse3()) {
