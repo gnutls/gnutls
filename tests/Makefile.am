@@ -530,6 +530,7 @@ dist_check_SCRIPTS += system-override-sig-allowlist.sh \
 	system-override-curves-allowlist.sh \
 	system-override-special-allowlist.sh \
 	protocol-set-allowlist.sh
+indirect_tests += system-override-curves-allowlist
 indirect_tests += protocol-set-allowlist
 endif
 
