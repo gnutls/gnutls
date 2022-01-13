@@ -47,14 +47,14 @@ TMPFILE_PEM=pkcs12.$$.pem.tmp
 ${VALGRIND} "${CERTTOOL}" --to-p12 --password 123456 --p12-name "my-key" --load-certificate "${srcdir}/../certs/cert-ecc256.pem" --load-privkey "${srcdir}/../certs/ecc256.pem" --load-ca-certificate "${srcdir}/../certs/ca-cert-ecc.pem" --outder --outfile $TMPFILE >/dev/null
 rc=$?
 if test ${rc} != 0; then
-	echo "PKCS12 FATAL encoding 2"
+	echo "PKCS12 FATAL encoding 2 (--outder)"
 	exit 1
 fi
 
 ${VALGRIND} "${CERTTOOL}" --p12-info --inder --password 123456 --infile $TMPFILE >${TMPFILE_PEM} 2>/dev/null
 rc=$?
 if test ${rc} != 0; then
-	echo "PKCS12 FATAL decrypting/decoding 2"
+	echo "PKCS12 FATAL decrypting/decoding 2 (--inder)"
 	exit 1
 fi
 
@@ -73,18 +73,18 @@ if test "$count" != "2"; then
 fi
 
 # Check whether we can encode a PKCS#12 file with cert / key and CRL
-${VALGRIND} "${CERTTOOL}" --to-p12 --password 123456 --pkcs-cipher aes-128 --p12-name "my-combo-key" --load-crl "${srcdir}/data/crl-demo1.pem" --load-certificate "${srcdir}/../certs/cert-ecc256.pem" --load-privkey "${srcdir}/../certs/ecc256.pem" --load-ca-certificate "${srcdir}/../certs/ca-cert-ecc.pem" --outder --outfile $TMPFILE >/dev/null
+${VALGRIND} "${CERTTOOL}" --to-p12 --password 123456 --pkcs-cipher aes-128 --p12-name "my-combo-key" --load-crl "${srcdir}/data/crl-demo1.pem" --load-certificate "${srcdir}/../certs/cert-ecc256.pem" --load-privkey "${srcdir}/../certs/ecc256.pem" --load-ca-certificate "${srcdir}/../certs/ca-cert-ecc.pem" --outraw --outfile $TMPFILE >/dev/null
 rc=$?
 if test ${rc} != 0; then
-	echo "PKCS12 FATAL encoding 3"
+	echo "PKCS12 FATAL encoding 3 (--outraw)"
 	exit 1
 fi
 
 # Check whether the contents are the expected ones
-${VALGRIND} "${CERTTOOL}" --p12-info --inder --password 123456 --infile $TMPFILE >${TMPFILE_PEM} 2>/dev/null
+${VALGRIND} "${CERTTOOL}" --p12-info --inraw --password 123456 --infile $TMPFILE >${TMPFILE_PEM} 2>/dev/null
 rc=$?
 if test ${rc} != 0; then
-	echo "PKCS12 FATAL decrypting/decoding 3"
+	echo "PKCS12 FATAL decrypting/decoding 3 (--inraw)"
 	exit 1
 fi
 
