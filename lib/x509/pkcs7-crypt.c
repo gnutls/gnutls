@@ -1569,7 +1569,7 @@ _gnutls_pkcs_generate_key(schema_id schema,
 
 	if (p->pbes2 != 0) {
 		if (p->schema == PBES2_GOST28147_89_TC26Z)
-			kdf_params->mac = GNUTLS_MAC_STREEBOG_256;
+			kdf_params->mac = GNUTLS_MAC_STREEBOG_512;
 		else if (p->schema == PBES2_GOST28147_89_CPA ||
 			 p->schema == PBES2_GOST28147_89_CPB ||
 			 p->schema == PBES2_GOST28147_89_CPC ||
