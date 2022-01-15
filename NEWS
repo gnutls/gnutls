@@ -24,6 +24,12 @@ See the end for copying conditions.
    will be disallowed for encryption after December 31, 2023:
    https://csrc.nist.gov/publications/detail/sp/800-131a/rev-2/final
 
+** libgnutls: Optimized support for AES-SIV-CMAC algorithms (#1217, #1312).
+   The existing AEAD API that works in a scatter-gather fashion
+   (gnutls_aead_cipher_encryptv2) has been extended to support AES-SIV-CMAC.
+   For further optimization, new function (gnutls_aead_cipher_set_key) has been
+   added to set key on the existing AEAD handle without re-allocation.
+
 ** The configure arguments for Brotli and Zstandard (zstd) support
    have changed to reflect the previous help text: they are now
    --with-brotli/--with-zstd respectively (#1342).
@@ -33,6 +39,7 @@ See the end for copying conditions.
 
 ** API and ABI modifications:
 GNUTLS_NO_TICKETS_TLS12: New flag
+gnutls_aead_cipher_set_key: New function
 
 * Version 3.7.4 (released 2022-03-17)
 

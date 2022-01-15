@@ -990,6 +990,38 @@ int gnutls_aead_cipher_init(gnutls_aead_cipher_hd_t *handle,
 }
 
 /**
+ * gnutls_aead_cipher_set_key:
+ * @handle: is a #gnutls_aead_cipher_hd_t type.
+ * @key: The key to be used for encryption
+ *
+ * This function will set a new key without re-initializing the
+ * context.
+ *
+ * Returns: Zero or a negative error code on error.
+ *
+ * Since: 3.7.5
+ **/
+int gnutls_aead_cipher_set_key(gnutls_aead_cipher_hd_t handle,
+			       const gnutls_datum_t *key)
+{
+	const cipher_entry_st* e;
+	int ret;
+
+	e = cipher_to_entry(handle->ctx_enc.e->id);
+	if (e == NULL || e->type != CIPHER_AEAD) {
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
+
+	ret = handle->ctx_enc.setkey(handle->ctx_enc.handle,
+				     key->data, key->size);
+	if (ret < 0) {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
+	}
+
+	return ret;
+}
+
+/**
  * gnutls_aead_cipher_decrypt:
  * @handle: is a #gnutls_aead_cipher_hd_t type.
  * @nonce: the nonce to set

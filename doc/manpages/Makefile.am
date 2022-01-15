@@ -172,6 +172,7 @@ APIMANS += gnutls_aead_cipher_encrypt.3
 APIMANS += gnutls_aead_cipher_encryptv.3
 APIMANS += gnutls_aead_cipher_encryptv2.3
 APIMANS += gnutls_aead_cipher_init.3
+APIMANS += gnutls_aead_cipher_set_key.3
 APIMANS += gnutls_alert_get.3
 APIMANS += gnutls_alert_get_name.3
 APIMANS += gnutls_alert_get_strname.3

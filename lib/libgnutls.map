@@ -1391,6 +1391,14 @@ GNUTLS_3_7_4
 	*;
 } GNUTLS_3_7_3;
 
+GNUTLS_3_7_5
+{
+ global:
+	gnutls_aead_cipher_set_key;
+ local:
+	*;
+} GNUTLS_3_7_4;
+
 GNUTLS_FIPS140_3_4 {
   global:
 	gnutls_cipher_self_test;
