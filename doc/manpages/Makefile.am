@@ -43,61 +43,107 @@ endif
 EXTRA_DIST += $(TOOLS_MANS) $(SRP_MANS) $(DANE_MANS)
 MAINTAINERCLEANFILES += $(TOOLS_MANS) $(SRP_MANS) $(DANE_MANS)
 
-# Note that our .def files depend on autogen
-# supporting the @subheading texi keyword. This
-# is not currently the case so we do remove it
-# before processing. Once the new version of autogen
-# is out, replace the sed and tmp files with a simple
-# autogen -L ../../src -DMAN_SECTION=1 -Tagman-cmd.tpl $<
-certtool.1: ../../src/certtool-args.def
-	-sed 's/@subheading \(.*\)/@*\n@var{\1}\n@*/' $< > "$<".tmp && \
-	autogen -L ../../src -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
-	rm -f "$<".tmp
+$(man_MANS): $(top_srcdir)/doc/scripts/gen-cmd-man.py
 
-ocsptool.1: ../../src/ocsptool-args.def
-	-sed 's/@subheading \(.*\)/@*\n@var{\1}\n@*/' $< > "$<".tmp && \
-	autogen -L ../../src -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
-	rm -f "$<".tmp
+GEN_CMD_MAN_OPTIONS = \
+	--license=gpl3+ \
+	--version='$(VERSION)' \
+	--authors='Nikos Mavrogiannopoulos, Simon Josefsson and others; see /usr/share/doc/gnutls/AUTHORS for a complete list.' \
+	--copyright-year=2020-2021 \
+	--copyright-holder='Free Software Foundation, and others all rights reserved.' \
+	--bug-email=bugs@gnutls.org
 
-danetool.1: ../../src/danetool-args.def
-	-sed 's/@subheading \(.*\)/@*\n@var{\1}\n@*/' $< > "$<".tmp && \
-	autogen -L ../../src -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
-	rm -f "$<".tmp
+certtool.1: $(top_srcdir)/doc/certtool-see-also.texi $(top_srcdir)/doc/certtool-examples.texi $(top_srcdir)/doc/certtool-files.texi
+certtool.1: $(top_srcdir)/src/certtool-options.json
+	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
+		$(PYTHON) $(top_srcdir)/doc/scripts/gen-cmd-man.py \
+		--see-also $(top_srcdir)/doc/certtool-see-also.texi \
+		--examples $(top_srcdir)/doc/certtool-examples.texi \
+		--files $(top_srcdir)/doc/certtool-files.texi \
+		$(GEN_CMD_MAN_OPTIONS) \
+		$< $@
 
-gnutls-cli.1: ../../src/cli-args.def
-	-sed 's/@subheading \(.*\)/@*\n@var{\1}\n@*/' $< > "$<".tmp && \
-	autogen -L ../../src -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
-	rm -f "$<".tmp
+ocsptool.1: $(top_srcdir)/doc/ocsptool-see-also.texi $(top_srcdir)/doc/ocsptool-examples.texi $(top_srcdir)/doc/ocsptool-description.texi
+ocsptool.1: $(top_srcdir)/src/ocsptool-options.json
+	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
+		$(PYTHON) $(top_srcdir)/doc/scripts/gen-cmd-man.py \
+		--see-also $(top_srcdir)/doc/ocsptool-see-also.texi \
+		--examples $(top_srcdir)/doc/ocsptool-examples.texi \
+		--description $(top_srcdir)/doc/ocsptool-description.texi \
+		$(GEN_CMD_MAN_OPTIONS) \
+		$< $@
 
-gnutls-serv.1: ../../src/serv-args.def
-	-sed 's/@subheading \(.*\)/@*\n@var{\1}\n@*/' $< > "$<".tmp && \
-	autogen -L ../../src -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
-	rm -f "$<".tmp
+danetool.1: $(top_srcdir)/doc/danetool-see-also.texi $(top_srcdir)/doc/danetool-examples.texi
+danetool.1: $(top_srcdir)/src/danetool-options.json
+	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
+		$(PYTHON) $(top_srcdir)/doc/scripts/gen-cmd-man.py \
+		--see-also $(top_srcdir)/doc/danetool-see-also.texi \
+		--examples $(top_srcdir)/doc/danetool-examples.texi \
+		$(GEN_CMD_MAN_OPTIONS) \
+		$< $@
 
-gnutls-cli-debug.1: ../../src/cli-debug-args.def
-	-sed 's/@subheading \(.*\)/@*\n@var{\1}\n@*/' $< > "$<".tmp && \
-	autogen -L ../../src -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
-	rm -f "$<".tmp
+gnutls-cli.1: $(top_srcdir)/doc/gnutls-cli-see-also.texi $(top_srcdir)/doc/gnutls-cli-examples.texi
+gnutls-cli.1: $(top_srcdir)/src/gnutls-cli-options.json
+	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
+		$(PYTHON) $(top_srcdir)/doc/scripts/gen-cmd-man.py \
+		--see-also $(top_srcdir)/doc/gnutls-cli-see-also.texi \
+		--examples $(top_srcdir)/doc/gnutls-cli-examples.texi \
+		$(GEN_CMD_MAN_OPTIONS) \
+		$< $@
 
-srptool.1: ../../src/srptool-args.def
-	-sed 's/@subheading \(.*\)/@*\n@var{\1}\n@*/' $< > "$<".tmp && \
-	autogen -L ../../src -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
-	rm -f "$<".tmp
+gnutls-serv.1: $(top_srcdir)/doc/gnutls-serv-see-also.texi $(top_srcdir)/doc/gnutls-serv-examples.texi
+gnutls-serv.1: $(top_srcdir)/src/gnutls-serv-options.json
+	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
+		$(PYTHON) $(top_srcdir)/doc/scripts/gen-cmd-man.py \
+		--see-also $(top_srcdir)/doc/gnutls-serv-see-also.texi \
+		--examples $(top_srcdir)/doc/gnutls-serv-examples.texi \
+		$(GEN_CMD_MAN_OPTIONS) \
+		$< $@
 
-p11tool.1: ../../src/p11tool-args.def
-	-sed 's/@subheading \(.*\)/@*\n@var{\1}\n@*/' $< > "$<".tmp && \
-	autogen -L ../../src -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
-	rm -f "$<".tmp
+gnutls-cli-debug.1: $(top_srcdir)/doc/gnutls-cli-debug-see-also.texi $(top_srcdir)/doc/gnutls-cli-debug-examples.texi
+gnutls-cli-debug.1: $(top_srcdir)/src/gnutls-cli-debug-options.json
+	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
+		$(PYTHON) $(top_srcdir)/doc/scripts/gen-cmd-man.py \
+		--see-also $(top_srcdir)/doc/gnutls-cli-debug-see-also.texi \
+		--examples $(top_srcdir)/doc/gnutls-cli-debug-examples.texi \
+		$(GEN_CMD_MAN_OPTIONS) \
+		$< $@
 
-tpmtool.1: ../../src/tpmtool-args.def
-	-sed 's/@subheading \(.*\)/@*\n@var{\1}\n@*/' $< > "$<".tmp && \
-	autogen -L ../../src -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
-	rm -f "$<".tmp
+srptool.1: $(top_srcdir)/doc/srptool-see-also.texi $(top_srcdir)/doc/srptool-examples.texi
+srptool.1: $(top_srcdir)/src/srptool-options.json
+	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
+		$(PYTHON) $(top_srcdir)/doc/scripts/gen-cmd-man.py \
+		--see-also $(top_srcdir)/doc/srptool-see-also.texi \
+		--examples $(top_srcdir)/doc/srptool-examples.texi \
+		$(GEN_CMD_MAN_OPTIONS) \
+		$< $@
 
-psktool.1: ../../src/psktool-args.def
-	-sed 's/@subheading \(.*\)/@*\n@var{\1}\n@*/' $< > "$<".tmp && \
-	autogen -L ../../src -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
-	rm -f "$<".tmp
+p11tool.1: $(top_srcdir)/doc/p11tool-see-also.texi $(top_srcdir)/doc/p11tool-examples.texi
+p11tool.1: $(top_srcdir)/src/p11tool-options.json
+	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
+		$(PYTHON) $(top_srcdir)/doc/scripts/gen-cmd-man.py \
+		--see-also $(top_srcdir)/doc/p11tool-see-also.texi \
+		--examples $(top_srcdir)/doc/p11tool-examples.texi \
+		$(GEN_CMD_MAN_OPTIONS) \
+		$< $@
+
+tpmtool.1: $(top_srcdir)/doc/tpmtool-see-also.texi $(top_srcdir)/doc/tpmtool-examples.texi
+tpmtool.1: $(top_srcdir)/src/tpmtool-options.json
+	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
+		$(PYTHON) $(top_srcdir)/doc/scripts/gen-cmd-man.py \
+		--see-also $(top_srcdir)/doc/tpmtool-see-also.texi \
+		--examples $(top_srcdir)/doc/tpmtool-examples.texi \
+		$(GEN_CMD_MAN_OPTIONS) \
+		$< $@
+
+psktool.1: $(top_srcdir)/doc/psktool-see-also.texi $(top_srcdir)/doc/psktool-examples.texi
+psktool.1: $(top_srcdir)/src/psktool-options.json
+	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
+		$(PYTHON) $(top_srcdir)/doc/scripts/gen-cmd-man.py \
+		--see-also $(top_srcdir)/doc/psktool-see-also.texi \
+		--examples $(top_srcdir)/doc/psktool-examples.texi \
+		$(GEN_CMD_MAN_OPTIONS) \
+		$< $@
 
 APIMANS =
 APIMANS += dane_cert_type_name.3

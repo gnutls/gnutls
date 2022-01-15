@@ -515,7 +515,7 @@ dist_check_SCRIPTS += fastopen.sh pkgconfig.sh starttls.sh starttls-ftp.sh start
 	psktool.sh ocsp-tests/ocsp-load-chain.sh gnutls-cli-save-data.sh gnutls-cli-debug.sh \
 	sni-resume.sh ocsp-tests/ocsptool.sh cert-reencoding.sh pkcs7-cat.sh long-crl.sh \
 	serv-udp.sh logfile-option.sh gnutls-cli-resume.sh profile-tests.sh \
-	server-weak-keys.sh ocsp-tests/ocsp-signer-verify.sh
+	server-weak-keys.sh ocsp-tests/ocsp-signer-verify.sh cfg-test.sh
 
 if !DISABLE_SYSTEM_CONFIG
 dist_check_SCRIPTS += system-override-sig.sh system-override-hash.sh \
@@ -635,3 +635,31 @@ LOG_COMPILER = $(LOG_VALGRIND)
 
 distclean-local:
 	rm -rf softhsm-*.db softhsm-*.config *.tmp tmp-* x509-crt-list-import-url.config.db port.lock.d
+
+EXTRA_DIST +=						\
+	fixtures/templates/arb-extensions.tmpl.exp		\
+	fixtures/templates/crit-extensions.tmpl.exp		\
+	fixtures/templates/inhibit-anypolicy.tmpl.exp		\
+	fixtures/templates/simple-policy.tmpl.exp		\
+	fixtures/templates/template-crq.tmpl.exp		\
+	fixtures/templates/template-dates-after2038.tmpl.exp	\
+	fixtures/templates/template-date.tmpl.exp		\
+	fixtures/templates/template-dn-err.tmpl.exp		\
+	fixtures/templates/template-dn.tmpl.exp			\
+	fixtures/templates/template-generalized.tmpl.exp	\
+	fixtures/templates/template-krb5name.tmpl.exp		\
+	fixtures/templates/template-long-dns.tmpl.exp		\
+	fixtures/templates/template-long-serial.tmpl.exp	\
+	fixtures/templates/template-nc.tmpl.exp			\
+	fixtures/templates/template-no-ca-explicit.tmpl.exp	\
+	fixtures/templates/template-no-ca-honor.tmpl.exp	\
+	fixtures/templates/template-no-ca.tmpl.exp		\
+	fixtures/templates/template-othername.tmpl.exp		\
+	fixtures/templates/template-othername-xmpp.tmpl.exp	\
+	fixtures/templates/template-overflow2.tmpl.exp		\
+	fixtures/templates/template-overflow.tmpl.exp		\
+	fixtures/templates/template-test.tmpl.exp		\
+	fixtures/templates/template-tlsfeature-crq.tmpl.exp	\
+	fixtures/templates/template-tlsfeature.tmpl.exp		\
+	fixtures/templates/template-unique.tmpl.exp		\
+	fixtures/templates/template-utf8.tmpl.exp

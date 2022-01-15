@@ -27,7 +27,7 @@
 #include <config.h>
 
 #include "common.h"
-#include "serv-args.h"
+#include "gnutls-serv-options.h"
 #include "udp-serv.h"
 #include <stdio.h>
 #include <stdlib.h>

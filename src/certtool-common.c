@@ -40,7 +40,7 @@
 #include <fcntl.h>
 #include <common.h>
 #include "certtool-common.h"
-#include "certtool-args.h"
+#include "certtool-options.h"
 #include "certtool-cfg.h"
 #include "common.h"
 #include <minmax.h>

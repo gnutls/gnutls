@@ -39,7 +39,7 @@ int main(int argc, char **argv)
 #include <stdlib.h>
 #include <errno.h>
 #include <gnutls/gnutls.h>
-#include <psktool-args.h>
+#include "psktool-options.h"
 
 #include <gnutls/crypto.h>	/* for random */
 

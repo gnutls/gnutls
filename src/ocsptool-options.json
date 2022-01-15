@@ -1,0 +1,164 @@
+[
+  {
+    "meta": {
+      "explain": "",
+      "prog-title": "GnuTLS OCSP tool",
+      "desc": "",
+      "prog-name": "ocsptool",
+      "detail": "ocsptool is a program that can parse and print information about\nOCSP requests/responses, generate requests and verify responses. Unlike\nother GnuTLS applications it outputs DER encoded structures by default\nunless the '--outpem' option is specified.",
+      "short-usage": "ocsptool [options]\nocsptool --help for usage instructions.\n",
+      "prog-desc": "Program to handle OCSP request/responses."
+    },
+    "options": [
+      {
+        "arg-type": "number",
+        "arg-min": "0 ",
+        "desc": "Enable debugging",
+        "detail": "Specifies the debug level.",
+        "short-option": "d",
+        "arg-max": " 9999",
+        "long-option": "debug"
+      },
+      {
+        "desc": "More verbose output",
+        "detail": "",
+        "short-option": "V",
+        "long-option": "verbose",
+        "disabled": "",
+        "max": "NOLIMIT"
+      },
+      {
+        "long-option": "infile",
+        "arg-type": "file",
+        "desc": "Input file",
+        "file-exists": "yes",
+        "detail": ""
+      },
+      {
+        "arg-type": "string",
+        "long-option": "outfile",
+        "desc": "Output file",
+        "detail": ""
+      },
+      {
+        "arg-type": "string",
+        "detail": "Connects to the specified HTTP OCSP server and queries on the validity of the loaded certificate.\nIts argument can be a URL or a plain server name. It can be combined with --load-chain, where it checks\nall certificates in the provided chain, or with --load-cert and\n--load-issuer options. The latter checks the provided certificate\nagainst its specified issuer certificate.",
+        "long-option": "ask",
+        "arg-name": "server name|url",
+        "arg-optional": "",
+        "desc": "Ask an OCSP/HTTP server on a certificate validity"
+      },
+      {
+        "long-option": "verify-response",
+        "desc": "Verify response",
+        "detail": "Verifies the provided OCSP response against the system trust\nanchors (unless --load-trust is provided). It requires the --load-signer\nor --load-chain options to obtain the signer of the OCSP response.",
+        "short-option": "e"
+      },
+      {
+        "long-option": "request-info",
+        "short-option": "i",
+        "desc": "Print information on a OCSP request",
+        "detail": "Display detailed information on the provided OCSP request."
+      },
+      {
+        "desc": "Print information on a OCSP response",
+        "detail": "Display detailed information on the provided OCSP response.",
+        "short-option": "j",
+        "long-option": "response-info"
+      },
+      {
+        "detail": "",
+        "desc": "Generates an OCSP request",
+        "short-option": "q",
+        "long-option": "generate-request"
+      },
+      {
+        "disabled": "yes",
+        "detail": "",
+        "long-option": "nonce",
+        "disable-prefix": "no-",
+        "desc": "Use (or not) a nonce to OCSP request"
+      },
+      {
+        "file-exists": "yes",
+        "desc": "Reads a set of certificates forming a chain from file",
+        "detail": "",
+        "arg-type": "file",
+        "long-option": "load-chain"
+      },
+      {
+        "desc": "Reads issuer's certificate from file",
+        "long-option": "load-issuer",
+        "detail": "",
+        "file-exists": "yes",
+        "arg-type": "file"
+      },
+      {
+        "desc": "Reads the certificate to check from file",
+        "file-exists": "yes",
+        "arg-type": "file",
+        "detail": "",
+        "long-option": "load-cert"
+      },
+      {
+        "long-option": "load-trust",
+        "detail": "When verifying an OCSP response read the trust anchors from the\nprovided file. When this is not provided, the system's trust anchors will be\nused.",
+        "arg-type": "file",
+        "file-exists": "yes",
+        "desc": "Read OCSP trust anchors from file",
+        "conflicts": "load-signer"
+      },
+      {
+        "long-option": "load-signer",
+        "arg-type": "file",
+        "file-exists": "yes",
+        "conflicts": "load-trust",
+        "detail": "",
+        "desc": "Reads the OCSP response signer from file"
+      },
+      {
+        "long-option": "inder",
+        "disable-prefix": "no-",
+        "detail": "",
+        "desc": "Use DER format for input certificates and private keys",
+        "disabled": ""
+      },
+      {
+        "detail": "The output will be in DER encoded format. Unlike other GnuTLS tools, this is the default for this tool",
+        "long-option": "outder",
+        "desc": "Use DER format for output of responses (this is the default)"
+      },
+      {
+        "long-option": "outpem",
+        "desc": "Use PEM format for output of responses",
+        "detail": "The output will be in PEM format."
+      },
+      {
+        "file-exists": "yes",
+        "detail": "",
+        "short-option": "Q",
+        "arg-type": "file",
+        "long-option": "load-request",
+        "desc": "Reads the DER encoded OCSP request from file"
+      },
+      {
+        "detail": "",
+        "file-exists": "yes",
+        "long-option": "load-response",
+        "arg-type": "file",
+        "short-option": "S",
+        "desc": "Reads the DER encoded OCSP response from file"
+      },
+      {
+        "desc": "Ignore any verification errors",
+        "long-option": "ignore-errors",
+        "detail": ""
+      },
+      {
+        "detail": "This can be combined with --verify-response.",
+        "long-option": "verify-allow-broken",
+        "desc": "Allow broken algorithms, such as MD5 for verification"
+      }
+    ]
+  }
+]

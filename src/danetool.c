@@ -48,7 +48,7 @@
 #include <minmax.h>
 
 #include <common.h>
-#include "danetool-args.h"
+#include "danetool-options.h"
 #include "certtool-common.h"
 #include "socket.h"
 
@@ -154,7 +154,7 @@ static void cmd_parser(int argc, char **argv)
 
 	memset(&cinfo, 0, sizeof(cinfo));
 
-	if (HAVE_OPT(INDER) || HAVE_OPT(INRAW))
+	if (HAVE_OPT(INDER))
 		cinfo.incert_format = GNUTLS_X509_FMT_DER;
 	else
 		cinfo.incert_format = GNUTLS_X509_FMT_PEM;

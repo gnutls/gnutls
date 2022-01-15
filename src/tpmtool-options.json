@@ -1,0 +1,133 @@
+[
+  {
+    "meta": {
+      "prog-name": "tpmtool",
+      "desc": "",
+      "short-usage": "tpmtool [options]\ntpmtool --help for usage instructions.\n",
+      "prog-desc": "Program to handle TPM as a cryptographic device.\n",
+      "detail": "Program that allows handling cryptographic data from the TPM chip.",
+      "explain": "",
+      "prog-title": "GnuTLS TPM tool"
+    },
+    "options": [
+      {
+        "short-option": "d",
+        "arg-max": " 9999",
+        "desc": "Enable debugging",
+        "arg-min": "0 ",
+        "long-option": "debug",
+        "arg-type": "number",
+        "detail": "Specifies the debug level."
+      },
+      {
+        "long-option": "infile",
+        "arg-type": "file",
+        "file-exists": "yes",
+        "desc": "Input file",
+        "detail": ""
+      },
+      {
+        "detail": "",
+        "desc": "Output file",
+        "long-option": "outfile",
+        "arg-type": "string"
+      },
+      {
+        "desc": "Generate an RSA private-public key pair",
+        "detail": "Generates an RSA private-public key pair in the TPM chip. \nThe key may be stored in file system and protected by a PIN, or stored (registered)\nin the TPM chip flash.",
+        "long-option": "generate-rsa"
+      },
+      {
+        "requires": "generate-rsa",
+        "desc": "Any generated key will be registered in the TPM",
+        "long-option": "register",
+        "detail": ""
+      },
+      {
+        "conflicts": "legacy",
+        "requires": "generate-rsa",
+        "long-option": "signing",
+        "desc": "Any generated key will be a signing key",
+        "detail": ""
+      },
+      {
+        "desc": "Any generated key will be a legacy key",
+        "conflicts": "signing",
+        "detail": "",
+        "requires": "generate-rsa",
+        "long-option": "legacy"
+      },
+      {
+        "requires": "register",
+        "desc": "Any registered key will be a user key",
+        "long-option": "user",
+        "detail": "The generated key will be stored in a user specific persistent storage.",
+        "conflicts": "system"
+      },
+      {
+        "detail": "The generated key will be stored in system persistent storage.",
+        "long-option": "system",
+        "desc": "Any registered key will be a system key",
+        "conflicts": "user",
+        "requires": "register"
+      },
+      {
+        "detail": "",
+        "arg-type": "string",
+        "arg-name": "url",
+        "long-option": "pubkey",
+        "desc": "Prints the public key of the provided key"
+      },
+      {
+        "detail": "",
+        "long-option": "list",
+        "desc": "Lists all stored keys in the TPM"
+      },
+      {
+        "arg-type": "string",
+        "desc": "Delete the key identified by the given URL (UUID).",
+        "arg-name": "url",
+        "long-option": "delete",
+        "detail": ""
+      },
+      {
+        "arg-name": "url",
+        "long-option": "test-sign",
+        "arg-type": "string",
+        "desc": "Tests the signature operation of the provided object",
+        "detail": "It can be used to test the correct operation of the signature operation.\nThis operation will sign and verify the signed data."
+      },
+      {
+        "arg-name": "Security parameter",
+        "arg-type": "string",
+        "detail": "This is alternative to the bits option. Note however that the\nvalues allowed by the TPM chip are quantized and given values may be rounded up.",
+        "long-option": "sec-param",
+        "desc": "Specify the security level [low, legacy, medium, high, ultra]."
+      },
+      {
+        "desc": "Specify the number of bits for key generate",
+        "arg-type": "number",
+        "detail": "",
+        "long-option": "bits"
+      },
+      {
+        "long-option": "inder",
+        "disable-prefix": "no-",
+        "detail": "The input files will be assumed to be in the portable\nDER format of TPM. The default format is a custom format used by various\nTPM tools",
+        "desc": "Use the DER format for keys.",
+        "disabled": ""
+      },
+      {
+        "disabled": "",
+        "long-option": "outder",
+        "desc": "Use DER format for output keys",
+        "detail": "The output will be in the TPM portable DER format.",
+        "disable-prefix": "no-"
+      },
+      {
+        "desc": "SRK has well known password (20 bytes of zeros)",
+        "long-option": "srk-well-known"
+      }
+    ]
+  }
+]

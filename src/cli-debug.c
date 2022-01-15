@@ -35,7 +35,7 @@
 #include <tests.h>
 #include <common.h>
 #include <ctype.h>
-#include <cli-debug-args.h>
+#include "gnutls-cli-debug-options.h"
 #include <socket.h>
 
 /* Gnulib portability files. */

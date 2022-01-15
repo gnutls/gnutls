@@ -34,7 +34,7 @@
 #include <time.h>
 #include <timespec.h>
 #include <parse-datetime.h>
-#include <autoopts/options.h>
+#include "cfg.h"
 #include <intprops.h>
 #include <gnutls/crypto.h>
 #include <libtasn1.h>
@@ -244,29 +244,29 @@ void cfg_init(void)
 	cfg.skip_certs = -1;
 }
 
-#define READ_MULTI_LINE(name, s_name) \
-  val = optionGetValue(pov, name); \
-  if (val != NULL && val->valType == OPARG_TYPE_STRING) \
+#define READ_MULTI_LINE(k_name, s_name) \
+  val = cfg_next(pov, k_name); \
+  if (val != NULL) \
   { \
     if (s_name == NULL) { \
       i = 0; \
       s_name = malloc(sizeof(char*)*MAX_ENTRIES); \
       CHECK_MALLOC(s_name); \
       do { \
-	if (val && strcmp(val->pzName, name)!=0) \
+	if (val && strcmp(val->name, k_name)!=0) \
 	  continue; \
-	s_name[i] = strdup(val->v.strVal); \
+	s_name[i] = strdup(val->value); \
 	i++; \
 	  if (i>=MAX_ENTRIES) \
 	    break; \
-      } while((val = optionNextValue(pov, val)) != NULL); \
+      } while((val = cfg_next(val + 1, val->name)) != NULL); \
       s_name[i] = NULL; \
     } \
   }
 
-#define READ_MULTI_LINE_TOKENIZED(name, s_name) \
-  val = optionGetValue(pov, name); \
-  if (val != NULL && val->valType == OPARG_TYPE_STRING) \
+#define READ_MULTI_LINE_TOKENIZED(k_name, s_name) \
+  val = cfg_next(pov, k_name); \
+  if (val != NULL) \
   { \
     char *str; \
     char *p; \
@@ -275,12 +275,12 @@ void cfg_init(void)
       s_name = malloc(sizeof(char*)*MAX_ENTRIES); \
       CHECK_MALLOC(s_name); \
       do { \
-	if (val && strcmp(val->pzName, name)!=0) \
+	if (val && strcmp(val->name, k_name)!=0) \
 	  continue; \
-	str = strdup(val->v.strVal); \
+	str = strdup(val->value); \
 	CHECK_MALLOC(str); \
 	if ((p=strchr(str, ' ')) == NULL && (p=strchr(str, '\t')) == NULL) { \
-	  fprintf(stderr, "Error parsing %s\n", name); \
+	  fprintf(stderr, "Error parsing %s\n", k_name); \
 	  exit(1); \
 	} \
 	p[0] = 0; \
@@ -288,7 +288,7 @@ void cfg_init(void)
 	s_name[i] = strdup(str); \
 	while(*p==' ' || *p == '\t') p++; \
 	if (p[0] == 0) { \
-	  fprintf(stderr, "Error (2) parsing %s\n", name); \
+	  fprintf(stderr, "Error (2) parsing %s\n", k_name); \
 	  exit(1); \
 	} \
 	s_name[i+1] = strdup(p); \
@@ -296,13 +296,13 @@ void cfg_init(void)
 	free(str); \
 	if (i>=MAX_ENTRIES) \
 	  break; \
-      } while((val = optionNextValue(pov, val)) != NULL); \
+      } while((val = cfg_next(val + 1, val->name)) != NULL); \
       s_name[i] = NULL; \
     } \
   }
 
 #define READ_BOOLEAN(name, s_name) \
-  val = optionGetValue(pov, name); \
+  val = cfg_next(pov, name); \
   if (val != NULL) \
     { \
       s_name = 1; \
@@ -310,13 +310,10 @@ void cfg_init(void)
 
 /* READ_NUMERIC only returns a long */
 #define READ_NUMERIC(name, s_name) \
-  val = optionGetValue(pov, name); \
+  val = cfg_next(pov, name); \
   if (val != NULL) \
     { \
-      if (val->valType == OPARG_TYPE_NUMERIC) \
-	s_name = val->v.longVal; \
-      else if (val->valType == OPARG_TYPE_STRING) \
-	s_name = strtol(val->v.strVal, NULL, 10); \
+      s_name = strtol(val->value, NULL, 10); \
     }
 
 #define HEX_DECODE(hex, output, output_size) \
@@ -345,17 +342,17 @@ void cfg_init(void)
 	}
 
 
-static int handle_option(const tOptionValue* val)
+static int handle_option(cfg_option_t val)
 {
-unsigned j;
-unsigned len, cmp;
+	unsigned j;
+	unsigned len, cmp;
 
 	for (j=0;j<sizeof(available_options)/sizeof(available_options[0]);j++) {
 		len = strlen(available_options[j].name);
 		if (len > 2 && available_options[j].name[len-1] == '*')
-			cmp = strncasecmp(val->pzName, available_options[j].name, len-1);
+			cmp = strncasecmp(val->name, available_options[j].name, len-1);
 		else
-			cmp = strcasecmp(val->pzName, available_options[j].name);
+			cmp = strcasecmp(val->name, available_options[j].name);
 
 		if (cmp == 0) {
 			if (available_options[j].type != OPTION_MULTI_LINE &&
@@ -375,24 +372,21 @@ int template_parse(const char *template)
 	/* Parsing return code */
 	unsigned int i;
 	int ret;
-	tOptionValue const *pov;
-	const tOptionValue *val, *prev;
+	cfg_option_t pov;
+	cfg_option_t val;
 	char tmpstr[256];
 
-	pov = configFileLoad(template);
+	pov = cfg_load(template);
 	if (pov == NULL) {
 		perror("configFileLoad");
 		fprintf(stderr, "Error loading template: %s\n", template);
 		exit(1);
 	}
 
-	val = optionGetValue(pov, NULL);
-	while (val != NULL) {
+	for (val = pov; val->name; val++) {
 		if (handle_option(val) == 0) {
-			fprintf(stderr, "Warning: skipping unknown option '%s'\n", val->pzName);
+			fprintf(stderr, "Warning: skipping unknown option '%s'\n", val->name);
 		}
-		prev = val;
-		val = optionNextValue(pov, prev);
 	}
 
 	/* Option variables */
@@ -406,92 +400,90 @@ int template_parse(const char *template)
 		READ_MULTI_LINE("o", cfg.organization);
 	}
 
-	val = optionGetValue(pov, "locality");
-	if (val != NULL && val->valType == OPARG_TYPE_STRING)
-		cfg.locality = strdup(val->v.strVal);
+	val = cfg_next(pov, "locality");
+	if (val != NULL)
+		cfg.locality = strdup(val->value);
 
-	val = optionGetValue(pov, "state");
-	if (val != NULL && val->valType == OPARG_TYPE_STRING)
-		cfg.state = strdup(val->v.strVal);
+	val = cfg_next(pov, "state");
+	if (val != NULL)
+		cfg.state = strdup(val->value);
 
-	val = optionGetValue(pov, "dn");
-	if (val != NULL && val->valType == OPARG_TYPE_STRING)
-		cfg.dn = strdup(val->v.strVal);
+	val = cfg_next(pov, "dn");
+	if (val != NULL)
+		cfg.dn = strdup(val->value);
 
-	val = optionGetValue(pov, "cn");
-	if (val != NULL && val->valType == OPARG_TYPE_STRING)
-		cfg.cn = strdup(val->v.strVal);
+	val = cfg_next(pov, "cn");
+	if (val != NULL)
+		cfg.cn = strdup(val->value);
 
-	val = optionGetValue(pov, "uid");
-	if (val != NULL && val->valType == OPARG_TYPE_STRING)
-		cfg.uid = strdup(val->v.strVal);
+	val = cfg_next(pov, "uid");
+	if (val != NULL)
+		cfg.uid = strdup(val->value);
 
-	val = optionGetValue(pov, "issuer_unique_id");
-	if (val != NULL && val->valType == OPARG_TYPE_STRING)
-		HEX_DECODE(val->v.strVal, cfg.issuer_unique_id, cfg.issuer_unique_id_size);
+	val = cfg_next(pov, "issuer_unique_id");
+	if (val != NULL)
+		HEX_DECODE(val->value, cfg.issuer_unique_id, cfg.issuer_unique_id_size);
 
-	val = optionGetValue(pov, "subject_unique_id");
-	if (val != NULL && val->valType == OPARG_TYPE_STRING)
-		HEX_DECODE(val->v.strVal, cfg.subject_unique_id, cfg.subject_unique_id_size);
+	val = cfg_next(pov, "subject_unique_id");
+	if (val != NULL)
+		HEX_DECODE(val->value, cfg.subject_unique_id, cfg.subject_unique_id_size);
 
-	val = optionGetValue(pov, "challenge_password");
-	if (val != NULL && val->valType == OPARG_TYPE_STRING)
-		cfg.challenge_password = strdup(val->v.strVal);
+	val = cfg_next(pov, "challenge_password");
+	if (val != NULL)
+		cfg.challenge_password = strdup(val->value);
 
-	val = optionGetValue(pov, "password");
-	if (val != NULL && val->valType == OPARG_TYPE_STRING)
-		cfg.password = strdup(val->v.strVal);
+	val = cfg_next(pov, "password");
+	if (val != NULL)
+		cfg.password = strdup(val->value);
 
-	val = optionGetValue(pov, "pkcs9_email");
-	if (val != NULL && val->valType == OPARG_TYPE_STRING)
-		cfg.pkcs9_email = strdup(val->v.strVal);
+	val = cfg_next(pov, "pkcs9_email");
+	if (val != NULL)
+		cfg.pkcs9_email = strdup(val->value);
 
-	val = optionGetValue(pov, "country");
-	if (val != NULL && val->valType == OPARG_TYPE_STRING)
-		cfg.country = strdup(val->v.strVal);
+	val = cfg_next(pov, "country");
+	if (val != NULL)
+		cfg.country = strdup(val->value);
 
-	val = optionGetValue(pov, "expiration_date");
-	if (val != NULL && val->valType == OPARG_TYPE_STRING)
-		cfg.expiration_date = strdup(val->v.strVal);
+	val = cfg_next(pov, "expiration_date");
+	if (val != NULL)
+		cfg.expiration_date = strdup(val->value);
 
-	val = optionGetValue(pov, "activation_date");
-	if (val != NULL && val->valType == OPARG_TYPE_STRING)
-		cfg.activation_date = strdup(val->v.strVal);
+	val = cfg_next(pov, "activation_date");
+	if (val != NULL)
+		cfg.activation_date = strdup(val->value);
 
-	val = optionGetValue(pov, "crl_revocation_date");
-	if (val != NULL && val->valType == OPARG_TYPE_STRING)
-		cfg.revocation_date = strdup(val->v.strVal);
+	val = cfg_next(pov, "crl_revocation_date");
+	if (val != NULL)
+		cfg.revocation_date = strdup(val->value);
 
-	val = optionGetValue(pov, "crl_this_update_date");
-	if (val != NULL && val->valType == OPARG_TYPE_STRING)
-		cfg.this_update_date = strdup(val->v.strVal);
+	val = cfg_next(pov, "crl_this_update_date");
+	if (val != NULL)
+		cfg.this_update_date = strdup(val->value);
 
-	val = optionGetValue(pov, "crl_next_update_date");
-	if (val != NULL && val->valType == OPARG_TYPE_STRING)
-		cfg.next_update_date = strdup(val->v.strVal);
+	val = cfg_next(pov, "crl_next_update_date");
+	if (val != NULL)
+		cfg.next_update_date = strdup(val->value);
 
 	READ_NUMERIC("inhibit_anypolicy_skip_certs", cfg.skip_certs);
 
 	for (i = 0; i < MAX_POLICIES; i++) {
 		snprintf(tmpstr, sizeof(tmpstr), "policy%d", i + 1);
-		val = optionGetValue(pov, tmpstr);
-		if (val != NULL && val->valType == OPARG_TYPE_STRING)
-			cfg.policy_oid[i] = strdup(val->v.strVal);
+		val = cfg_next(pov, tmpstr);
+		if (val != NULL)
+			cfg.policy_oid[i] = strdup(val->value);
 
 		if (cfg.policy_oid[i] != NULL) {
 			snprintf(tmpstr, sizeof(tmpstr), "policy%d_url",
 				 i + 1);
-			val = optionGetValue(pov, tmpstr);
-			if (val != NULL
-			    && val->valType == OPARG_TYPE_STRING)
-				cfg.policy_url[i] = strdup(val->v.strVal);
+			val = cfg_next(pov, tmpstr);
+			if (val != NULL)
+				cfg.policy_url[i] = strdup(val->value);
 
 			snprintf(tmpstr, sizeof(tmpstr), "policy%d_txt",
 				 i + 1);
-			val = optionGetValue(pov, tmpstr);
-			if (val != NULL
-			    && val->valType == OPARG_TYPE_STRING) {
-				cfg.policy_txt[i] = strdup(val->v.strVal);
+			val = cfg_next(pov, tmpstr);
+			if (val != NULL) {
+				cfg.policy_txt[i] = strdup(val->value);
 			}
 		}
 	}
@@ -523,27 +515,27 @@ int template_parse(const char *template)
 
 	READ_MULTI_LINE("crl_dist_points", cfg.crl_dist_points);
 
-	val = optionGetValue(pov, "pkcs12_key_name");
-	if (val != NULL && val->valType == OPARG_TYPE_STRING)
-		cfg.pkcs12_key_name = strdup(val->v.strVal);
+	val = cfg_next(pov, "pkcs12_key_name");
+	if (val != NULL)
+		cfg.pkcs12_key_name = strdup(val->value);
 
 
-	val = optionGetValue(pov, "serial");
-	if (val != NULL && val->valType == OPARG_TYPE_STRING)
-		SERIAL_DECODE(val->v.strVal, cfg.serial, cfg.serial_size);
+	val = cfg_next(pov, "serial");
+	if (val != NULL)
+		SERIAL_DECODE(val->value, cfg.serial, cfg.serial_size);
 
 	READ_NUMERIC("expiration_days", cfg.expiration_days);
 	READ_NUMERIC("crl_next_update", cfg.crl_next_update);
 
-	val = optionGetValue(pov, "crl_number");
-	if (val != NULL && val->valType == OPARG_TYPE_STRING)
-		SERIAL_DECODE(val->v.strVal, cfg.crl_number, cfg.crl_number_size);
+	val = cfg_next(pov, "crl_number");
+	if (val != NULL)
+		SERIAL_DECODE(val->value, cfg.crl_number, cfg.crl_number_size);
 
 	READ_NUMERIC("path_len", cfg.path_len);
 
-	val = optionGetValue(pov, "proxy_policy_language");
-	if (val != NULL && val->valType == OPARG_TYPE_STRING)
-		cfg.proxy_policy_language = strdup(val->v.strVal);
+	val = cfg_next(pov, "proxy_policy_language");
+	if (val != NULL)
+		cfg.proxy_policy_language = strdup(val->value);
 
 	READ_MULTI_LINE("ocsp_uri", cfg.ocsp_uris);
 	READ_MULTI_LINE("ca_issuers_uri", cfg.ca_issuers_uris);
@@ -570,7 +562,7 @@ int template_parse(const char *template)
 
 	READ_MULTI_LINE("tls_feature", cfg.tls_features);
 
-	optionUnloadNested(pov);
+	cfg_free(pov);
 
 	return 0;
 }

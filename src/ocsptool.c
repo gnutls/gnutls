@@ -39,7 +39,7 @@
 #include <minmax.h>
 
 #include <ocsptool-common.h>
-#include <ocsptool-args.h>
+#include "ocsptool-options.h"
 #include "certtool-common.h"
 
 FILE *outfile;

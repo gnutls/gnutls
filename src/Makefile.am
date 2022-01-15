@@ -17,52 +17,34 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-# src/gl is being added by the top level makefile
-SUBDIRS = 
+OPTIONS_BUILT = \
+	srptool-options.c srptool-options.h \
+	psktool-options.c psktool-options.h \
+	ocsptool-options.h ocsptool-options.c \
+	gnutls-serv-options.c gnutls-serv-options.h \
+	gnutls-cli-options.c gnutls-cli-options.h \
+	gnutls-cli-debug-options.c gnutls-cli-debug-options.h \
+	certtool-options.c certtool-options.h \
+	danetool-options.c danetool-options.h \
+	p11tool-options.c p11tool-options.h \
+	tpmtool-options.c tpmtool-options.h \
+	systemkey-tool-options.c systemkey-tool-options.h
 
-ARGS_BUILT = \
-	srptool-args.c srptool-args.h \
-	psktool-args.c psktool-args.h \
-	ocsptool-args.h ocsptool-args.c \
-	serv-args.c serv-args.h \
-	cli-args.c cli-args.h \
-	cli-debug-args.c cli-debug-args.h \
-	certtool-args.c certtool-args.h \
-	danetool-args.c danetool-args.h \
-	p11tool-args.c p11tool-args.h \
-	tpmtool-args.c tpmtool-args.h \
-	systemkey-args.c systemkey-args.h
+OPTIONS_JSON = \
+	certtool-options.json gnutls-cli-debug-options.json gnutls-cli-options.json tpmtool-options.json \
+	systemkey-tool-options.json srptool-options.json ocsptool-options.json p11tool-options.json \
+	danetool-options.json gnutls-serv-options.json psktool-options.json
 
-# We bundle autogen-generated files as *.bak files.  This is awkward,
-# but it covers the common use-cases where autogen/libopts is
-# installed or not.  Do not attempt to simplify it unless autogen
-# gains a support for better handling of intermediate files with
-# autotools.
-ARGS_BAK = \
-	srptool-args.c.bak srptool-args.h.bak \
-	psktool-args.c.bak psktool-args.h.bak \
-	ocsptool-args.h.bak ocsptool-args.c.bak \
-	serv-args.c.bak serv-args.h.bak \
-	cli-args.c.bak cli-args.h.bak \
-	cli-debug-args.c.bak cli-debug-args.h.bak \
-	certtool-args.c.bak certtool-args.h.bak \
-	danetool-args.c.bak danetool-args.h.bak \
-	p11tool-args.c.bak p11tool-args.h.bak \
-	tpmtool-args.c.bak tpmtool-args.h.bak \
-	systemkey-args.c.bak systemkey-args.h.bak
+OPTIONS_STAMP = \
+	certtool-options.stamp gnutls-cli-debug-options.stamp gnutls-cli-options.stamp tpmtool-options.stamp \
+	systemkey-tool-options.stamp srptool-options.stamp ocsptool-options.stamp p11tool-options.stamp \
+	danetool-options.stamp gnutls-serv-options.stamp psktool-options.stamp
 
-ARGS_STAMPS = \
-	certtool-args.stamp cli-debug-args.stamp cli-args.stamp tpmtool-args.stamp \
-	systemkey-args.stamp srptool-args.stamp ocsptool-args.stamp p11tool-args.stamp \
-	danetool-args.stamp serv-args.stamp psktool-args.stamp
+BUILT_SOURCES = $(OPTIONS_BUILT)
 
-BUILT_SOURCES = $(ARGS_BUILT)
+EXTRA_DIST = gen-mech-list.sh gen-getopt.py $(OPTIONS_JSON) $(OPTIONS_BUILT) $(OPTIONS_STAMP)
 
-DISTCLEANFILES = $(BUILT_SOURCES) $(ARGS_STAMPS)
-
-EXTRA_DIST = gen-mech-list.sh $(ARGS_BAK)
-
-MAINTAINERCLEANFILES = $(ARGS_BAK)
+MAINTAINERCLEANFILES = $(OPTIONS_BUILT) $(OPTIONS_STAMP)
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = \
@@ -71,16 +53,7 @@ AM_CPPFLAGS = \
 	-I$(builddir)/../lib/includes		\
 	-I$(srcdir)/../lib/includes		\
 	-I$(srcdir)/../libdane/includes		\
-	-I$(srcdir)/../extra/includes	\
-	$(LIBOPTS_CFLAGS)
-
-if NEED_LIBOPTS
-LIBOPTS = libopts/libopts.la
-SUBDIRS += libopts
-AM_CPPFLAGS += -I$(srcdir)/libopts
-else
-LIBOPTS = $(LIBOPTS_LDADD)
-endif
+	-I$(srcdir)/../extra/includes
 
 bin_PROGRAMS = psktool gnutls-cli-debug certtool gnutls-serv gnutls-cli
 if ENABLE_SRP
@@ -112,30 +85,27 @@ noinst_LTLIBRARIES =
 
 if ENABLE_SRP
 srptool_SOURCES = srptool.c
-srptool_LDADD = ../lib/libgnutls.la libcmd-srp.la $(LIBOPTS) ../gl/libgnu.la 
+srptool_LDADD = ../lib/libgnutls.la libcmd-srp.la ../gl/libgnu.la 
 srptool_LDADD += $(LTLIBINTL) gl/libgnu_gpl.la
 noinst_LTLIBRARIES += libcmd-srp.la
-libcmd_srp_la_SOURCES = srptool-args.def
-nodist_libcmd_srp_la_SOURCES = srptool-args.c srptool-args.h
+libcmd_srp_la_SOURCES = srptool-options.c srptool-options.h
 endif
 
 psktool_SOURCES = psk.c
-psktool_LDADD = ../lib/libgnutls.la libcmd-psk.la $(LIBOPTS) ../gl/libgnu.la 
+psktool_LDADD = ../lib/libgnutls.la libcmd-psk.la ../gl/libgnu.la 
 psktool_LDADD += $(LTLIBINTL) gl/libgnu_gpl.la
 noinst_LTLIBRARIES += libcmd-psk.la
-libcmd_psk_la_SOURCES = psktool-args.def
-nodist_libcmd_psk_la_SOURCES = psktool-args.c psktool-args.h
+libcmd_psk_la_SOURCES = psktool-options.c psktool-options.h
 
 
 if ENABLE_OCSP
 
 ocsptool_SOURCES = ocsptool.c ocsptool-common.h ocsptool-common.c certtool-common.c \
 	socket.c common.c common.h socket.h
-ocsptool_LDADD = ../lib/libgnutls.la libcmd-ocsp.la $(LIBOPTS) ../gl/libgnu.la 
+ocsptool_LDADD = ../lib/libgnutls.la libcmd-ocsp.la ../gl/libgnu.la 
 ocsptool_LDADD += $(LTLIBINTL) $(GETADDRINFO_LIB) gl/libgnu_gpl.la $(LIBIDN_LIBS)
 noinst_LTLIBRARIES += libcmd-ocsp.la
-libcmd_ocsp_la_SOURCES = ocsptool-args.def
-nodist_libcmd_ocsp_la_SOURCES = ocsptool-args.h ocsptool-args.c
+libcmd_ocsp_la_SOURCES = ocsptool-options.h ocsptool-options.c
 
 endif
 
@@ -145,12 +115,11 @@ gnutls_serv_SOURCES =		\
   common.h common.c		\
   certtool-common.h 
 gnutls_serv_LDADD = ../lib/libgnutls.la
-gnutls_serv_LDADD += libcmd-serv.la $(LIBOPTS) ../gl/libgnu.la
+gnutls_serv_LDADD += libcmd-serv.la ../gl/libgnu.la
 gnutls_serv_LDADD += $(LTLIBINTL) gl/libgnu_gpl.la
 gnutls_serv_LDADD += $(LIBSOCKET) $(GETADDRINFO_LIB) $(LIBIDN_LIBS)
 noinst_LTLIBRARIES += libcmd-serv.la
-libcmd_serv_la_SOURCES = serv-args.def
-nodist_libcmd_serv_la_SOURCES = serv-args.c serv-args.h
+libcmd_serv_la_SOURCES = gnutls-serv-options.c gnutls-serv-options.h
 
 BENCHMARK_SRCS = benchmark-cipher.c benchmark.c benchmark.h benchmark-tls.c
 
@@ -164,25 +133,23 @@ gnutls_cli_LDADD = ../lib/libgnutls.la -lm
 if ENABLE_DANE
 gnutls_cli_LDADD += ../libdane/libgnutls-dane.la
 endif
-gnutls_cli_LDADD += libcmd-cli.la $(LIBOPTS) ../gl/libgnu.la $(LTLIBINTL) $(LIBIDN_LIBS)
+gnutls_cli_LDADD += libcmd-cli.la ../gl/libgnu.la $(LTLIBINTL) $(LIBIDN_LIBS)
 gnutls_cli_LDADD += $(LIBSOCKET) $(GETADDRINFO_LIB) $(LIB_CLOCK_GETTIME) \
 	 $(SERVENT_LIB) gl/libgnu_gpl.la
 noinst_LTLIBRARIES += libcmd-cli.la
-libcmd_cli_la_SOURCES = cli-args.def
-nodist_libcmd_cli_la_SOURCES = cli-args.c cli-args.h
+libcmd_cli_la_SOURCES = gnutls-cli-options.c gnutls-cli-options.h
 
 gnutls_cli_debug_SOURCES = cli-debug.c tests.h tests.c \
 		socket.c socket.h common.h common.c
 gnutls_cli_debug_LDADD = ../lib/libgnutls.la libcmd-cli-debug.la 
-gnutls_cli_debug_LDADD += $(LIBOPTS) ../gl/libgnu.la gl/libgnu_gpl.la
+gnutls_cli_debug_LDADD += ../gl/libgnu.la gl/libgnu_gpl.la
 gnutls_cli_debug_LDADD += $(LTLIBINTL) $(LIBIDN_LIBS)
 gnutls_cli_debug_LDADD += $(LIBSOCKET) $(GETADDRINFO_LIB)
 noinst_LTLIBRARIES += libcmd-cli-debug.la
-libcmd_cli_debug_la_SOURCES = cli-debug-args.def
-nodist_libcmd_cli_debug_la_SOURCES = cli-debug-args.c cli-debug-args.h
+libcmd_cli_debug_la_SOURCES = gnutls-cli-debug-options.c gnutls-cli-debug-options.h
 
 #certtool
-COMMON_LIBS = $(LIBOPTS) $(LTLIBINTL)
+COMMON_LIBS = $(LTLIBINTL)
 if ENABLE_MINITASN1
 COMMON_LIBS += ../lib/minitasn1/libminitasn1.la ../gl/libgnu.la 
 AM_CPPFLAGS += -I$(top_srcdir)/lib/minitasn1
@@ -196,10 +163,8 @@ certtool_LDADD = ../lib/libgnutls.la
 certtool_LDADD += libcmd-certtool.la ../gl/libgnu.la gl/libgnu_gpl.la
 
 noinst_LTLIBRARIES += libcmd-certtool.la
-libcmd_certtool_la_SOURCES = certtool-args.def \
-	certtool-cfg.h certtool-cfg.c
-nodist_libcmd_certtool_la_SOURCES = certtool-args.c certtool-args.h
-libcmd_certtool_la_LIBADD = ../lib/libgnutls.la gl/libgnu_gpl.la ../gl/libgnu.la 
+libcmd_certtool_la_SOURCES = certtool-options.c certtool-options.h
+libcmd_certtool_la_LIBADD = libcerttool-cfg.la ../lib/libgnutls.la gl/libgnu_gpl.la ../gl/libgnu.la 
 libcmd_certtool_la_LIBADD += $(COMMON_LIBS)
 libcmd_certtool_la_LIBADD += $(LTLIBREADLINE) gl/libgnu_gpl.la
 libcmd_certtool_la_LIBADD += $(INET_PTON_LIB) $(LIB_CLOCK_GETTIME)
@@ -213,10 +178,8 @@ danetool_LDADD += ../libdane/libgnutls-dane.la
 endif
 
 noinst_LTLIBRARIES += libcmd-danetool.la
-libcmd_danetool_la_SOURCES = danetool-args.def \
-	certtool-cfg.h certtool-cfg.c
-nodist_libcmd_danetool_la_SOURCES = danetool-args.c danetool-args.h
-libcmd_danetool_la_LIBADD = ../lib/libgnutls.la gl/libgnu_gpl.la ../gl/libgnu.la 
+libcmd_danetool_la_SOURCES = danetool-options.c danetool-options.h
+libcmd_danetool_la_LIBADD = libcerttool-cfg.la ../lib/libgnutls.la gl/libgnu_gpl.la ../gl/libgnu.la 
 libcmd_danetool_la_LIBADD += $(COMMON_LIBS)
 libcmd_danetool_la_LIBADD += $(LTLIBREADLINE)
 libcmd_danetool_la_LIBADD += $(INET_PTON_LIB) $(LIB_CLOCK_GETTIME)
@@ -225,7 +188,7 @@ libcmd_danetool_la_LIBADD += $(INET_PTON_LIB) $(LIB_CLOCK_GETTIME)
 if ENABLE_PKCS11
 
 BUILT_SOURCES += mech-list.h
-p11tool_SOURCES = p11tool-args.def p11tool.c pkcs11.c certtool-common.c \
+p11tool_SOURCES = p11tool-options.json p11tool.c pkcs11.c certtool-common.c \
 	certtool-extras.c p11tool.h common.c mech-list.h
 p11tool_CPPFLAGS = $(AM_CPPFLAGS) $(P11_KIT_CFLAGS)
 p11tool_LDADD = ../lib/libgnutls.la
@@ -233,26 +196,22 @@ p11tool_LDADD += libcmd-p11tool.la ../gl/libgnu.la gl/libgnu_gpl.la
 p11tool_LDADD += $(COMMON_LIBS)
 
 noinst_LTLIBRARIES += libcmd-p11tool.la
-libcmd_p11tool_la_SOURCES = p11tool-args.def \
-	certtool-cfg.h certtool-cfg.c
-nodist_libcmd_p11tool_la_SOURCES = p11tool-args.c p11tool-args.h
-libcmd_p11tool_la_LIBADD = ../lib/libgnutls.la gl/libgnu_gpl.la ../gl/libgnu.la 
+libcmd_p11tool_la_SOURCES = p11tool-options.c p11tool-options.h
+libcmd_p11tool_la_LIBADD = libcerttool-cfg.la ../lib/libgnutls.la gl/libgnu_gpl.la ../gl/libgnu.la 
 libcmd_p11tool_la_LIBADD += $(LTLIBREADLINE) $(INET_PTON_LIB) $(LIB_CLOCK_GETTIME)
 
 endif # ENABLE_PKCS11
 
 if ENABLE_TROUSERS
 
-tpmtool_SOURCES = tpmtool-args.def tpmtool.c certtool-common.c certtool-extras.c common.c
+tpmtool_SOURCES = tpmtool-options.json tpmtool.c certtool-common.c certtool-extras.c common.c
 tpmtool_LDADD = ../lib/libgnutls.la
 tpmtool_LDADD += libcmd-tpmtool.la ../gl/libgnu.la gl/libgnu_gpl.la
 tpmtool_LDADD += $(COMMON_LIBS)
 
 noinst_LTLIBRARIES += libcmd-tpmtool.la
-libcmd_tpmtool_la_SOURCES = tpmtool-args.def \
-	certtool-cfg.h certtool-cfg.c
-nodist_libcmd_tpmtool_la_SOURCES = tpmtool-args.c tpmtool-args.h
-libcmd_tpmtool_la_LIBADD = ../lib/libgnutls.la gl/libgnu_gpl.la ../gl/libgnu.la 
+libcmd_tpmtool_la_SOURCES = tpmtool-options.c tpmtool-options.h
+libcmd_tpmtool_la_LIBADD = libcerttool-cfg.la ../lib/libgnutls.la gl/libgnu_gpl.la ../gl/libgnu.la 
 libcmd_tpmtool_la_LIBADD += $(LTLIBREADLINE) $(INET_PTON_LIB) $(LIB_CLOCK_GETTIME)
 
 endif # ENABLE_TROUSERS
@@ -263,96 +222,60 @@ systemkey_LDADD += libcmd-systemkey.la ../gl/libgnu.la gl/libgnu_gpl.la
 systemkey_LDADD += $(COMMON_LIBS)
 
 noinst_LTLIBRARIES += libcmd-systemkey.la
-libcmd_systemkey_la_SOURCES = systemkey-args.def \
-	certtool-cfg.h certtool-cfg.c
-nodist_libcmd_systemkey_la_SOURCES = systemkey-args.c systemkey-args.h
-libcmd_systemkey_la_LIBADD = ../lib/libgnutls.la gl/libgnu_gpl.la ../gl/libgnu.la 
+libcmd_systemkey_la_SOURCES = systemkey-tool-options.c systemkey-tool-options.h
+libcmd_systemkey_la_LIBADD = libcerttool-cfg.la ../lib/libgnutls.la gl/libgnu_gpl.la ../gl/libgnu.la 
 libcmd_systemkey_la_LIBADD += $(LTLIBREADLINE) $(INET_PTON_LIB) $(LIB_CLOCK_GETTIME)
 
-SUFFIXES = .stamp .def .c.bak .h.bak
+noinst_LTLIBRARIES += libcerttool-cfg.la
+libcerttool_cfg_la_SOURCES = certtool-cfg.h certtool-cfg.c cfg.c cfg.h
+libcerttool_cfg_la_LIBADD = ../gl/libgnu.la gl/libgnu_gpl.la
 
-if NEED_LIBOPTS
-# case --enable-local-libopts: We do not call AUTOGEN unless the .bak files are missing
-.def.stamp:
-	$(AM_V_GEN) b=`echo $@ | sed 's/.stamp$$//'`; \
-	if ! test -f $(srcdir)/$${b}.c.bak;then \
-		echo "No .bak files found; will call autogen"; \
-		$(AUTOGEN) $<; \
-	else \
-		echo "Re-using .bak files"; \
-		rm -f $${b}.c $${b}.h; \
-		cp -p $(srcdir)/$${b}.c.bak $${b}.c; \
-		cp -p $(srcdir)/$${b}.h.bak $${b}.h; \
-	fi
-	touch $@
-else
-# default case. We call autogen, and if that fails we resort to the bundled files.
-.def.stamp:
-	$(AM_V_GEN) $(AUTOGEN) $< || { \
-		srcdir=''; \
+noinst_PROGRAMS = dumpcfg
+dumpcfg_SOURCES = cfg.c cfg.h
+dumpcfg_CFLAGS = -DTEST=1
+dumpcfg_LDADD = ../gl/libgnu.la gl/libgnu_gpl.la
+
+SUFFIXES = .stamp .json
+
+OPTIONS_STAMP: $(srcdir)/gen-getopt.py
+
+.json.stamp:
+	$(AM_V_GEN) { \
 		b=`echo $@ | sed 's/.stamp$$//'`; \
-		test -f ./$${b}.def || srcdir=$(srcdir)/; \
-		cp -p $${srcdir}$${b}.c.bak $${b}.c; \
-		cp -p $${srcdir}$${b}.h.bak $${b}.h; \
+		PYTHONPATH='$(top_srcdir)/python' \
+		$(PYTHON) $(srcdir)/gen-getopt.py \
+		--bug-email bugs@gnutls.org \
+		--copyright-year 2000-2021 \
+		--copyright-holder 'Free Software Foundation, and others' \
+		--license gpl3+ \
+		--version '$(VERSION)' $< \
+			$${b}.c $${b}.h; \
 	} && \
 	touch $@
-endif
 
-.c.c.bak:
-	-@rm -f $@
-	$(AM_V_GEN) cp -p $< $@
+danetool-options.stamp: danetool-options.json
+ocsptool-options.stamp: ocsptool-options.json
+tpmtool-options.stamp: tpmtool-options.json
+p11tool-options.stamp: p11tool-options.json
+psktool-options.stamp: psktool-options.json
+gnutls-cli-debug-options.stamp: gnutls-cli-debug-options.json
+gnutls-cli-options.stamp: gnutls-cli-options.json
+gnutls-serv-options.stamp: gnutls-serv-options.json
+srptool-options.stamp: srptool-options.json
+certtool-options.stamp: certtool-options.json
+systemkey-tool-options.stamp: systemkey-tool-options.json
 
-.h.h.bak:
-	-@rm -f $@
-	$(AM_V_GEN) cp -p $< $@
-
-danetool-args.h: danetool-args.stamp
-danetool-args.c: danetool-args.stamp
-danetool-args.stamp: args-std.def
-
-ocsptool-args.h: ocsptool-args.stamp
-ocsptool-args.c: ocsptool-args.stamp
-ocsptool-args.stamp: args-std.def
-
-tpmtool-args.h: tpmtool-args.stamp
-tpmtool-args.c: tpmtool-args.stamp
-tpmtool-args.stamp: args-std.def
-
-p11tool-args.h: p11tool-args.stamp
-p11tool-args.c: p11tool-args.stamp
-p11tool-args.stamp: args-std.def
-
-psktool-args.h: psktool-args.stamp
-psktool-args.c: psktool-args.stamp
-psktool-args.stamp: args-std.def
-
-cli-debug-args.h: cli-debug-args.stamp
-cli-debug-args.c: cli-debug-args.stamp
-cli-debug-args.stamp: args-std.def
-
-cli-args.h: cli-args.stamp
-cli-args.c: cli-args.stamp
-cli-args.stamp: args-std.def
-
-serv-args.h: serv-args.stamp
-serv-args.c: serv-args.stamp
-serv-args.stamp: args-std.def
-
-srptool-args.h: srptool-args.stamp
-srptool-args.c: srptool-args.stamp
-srptool-args.stamp: args-std.def
-
-certtool-args.h: certtool-args.stamp
-certtool-args.c: certtool-args.stamp
-certtool-args.stamp: args-std.def
-
-systemkey-args.h: systemkey-args.stamp
-systemkey-args.c: systemkey-args.stamp
-systemkey-args.stamp: args-std.def
-
-tpm2key-args.h: tpm2key-args.stamp
-tpm2key-args.c: tpm2key-args.stamp
-tpm2key-args.stamp: args-std.def
+danetool-options.c danetool-options.h: danetool-options.stamp
+ocsptool-options.c ocsptool-options.h: ocsptool-options.stamp
+tpmtool-options.c tpmtool-options.h: tpmtool-options.stamp
+p11tool-options.c p11tool-options.h: p11tool-options.stamp
+psktool-options.c psktool-options.h: psktool-options.stamp
+gnutls-cli-debug-options.c gnutls-cli-debug-options.h: gnutls-cli-debug-options.stamp
+gnutls-cli-options.c gnutls-cli-options.h: gnutls-cli-options.stamp
+gnutls-serv-options.c gnutls-serv-options.h: gnutls-serv-options.stamp
+srptool-options.c srptool-options.h: srptool-options.stamp
+certtool-options.c certtool-options.h: certtool-options.stamp
+systemkey-tool-options.c systemkey-tool-options.h: systemkey-tool-options.stamp
 
 mech-list.h: gen-mech-list.sh
 	$(AM_V_GEN) $(srcdir)/gen-mech-list.sh > $@.tmp && mv $@.tmp $@

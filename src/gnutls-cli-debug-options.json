@@ -1,0 +1,53 @@
+[
+  {
+    "meta": {
+      "argument": "[hostname]",
+      "reorder-args": "",
+      "explain": "",
+      "prog-title": "GnuTLS debug client",
+      "short-usage": "Usage: gnutls-cli-debug [options] hostname\ngnutls-cli --help for usage instructions.\n",
+      "detail": "TLS debug client. It sets up multiple TLS connections to \na server and queries its capabilities. It was created to assist in debugging \nGnuTLS, but it might be useful to extract a TLS server's capabilities.\nIt connects to a TLS server, performs tests and print the server's \ncapabilities. If called with the `-V' parameter more checks will be performed.\nCan be used to check for servers with special needs or bugs.",
+      "prog-desc": "Simple client program to check TLS server capabilities.",
+      "prog-name": "gnutls-cli-debug",
+      "desc": ""
+    },
+    "options": [
+      {
+        "short-option": "d",
+        "detail": "Specifies the debug level.",
+        "arg-max": " 9999",
+        "arg-type": "number",
+        "arg-min": "0 ",
+        "long-option": "debug",
+        "desc": "Enable debugging"
+      },
+      {
+        "max": "NOLIMIT",
+        "disabled": "",
+        "desc": "More verbose output",
+        "short-option": "V",
+        "long-option": "verbose",
+        "detail": ""
+      },
+      {
+        "short-option": "p",
+        "long-option": "port",
+        "arg-min": "0 ",
+        "desc": "The port to connect to",
+        "arg-max": " 65536",
+        "arg-type": "number",
+        "detail": ""
+      },
+      {
+        "aliases": "starttls-proto",
+        "long-option": "app-proto"
+      },
+      {
+        "detail": "Specify the application layer protocol for STARTTLS. If the protocol is supported, gnutls-cli will proceed to the TLS negotiation.",
+        "arg-type": "string",
+        "desc": "The application protocol to be used to obtain the server's certificate (https, ftp, smtp, imap, ldap, xmpp, lmtp, pop3, nntp, sieve, postgres)",
+        "long-option": "starttls-proto"
+      }
+    ]
+  }
+]

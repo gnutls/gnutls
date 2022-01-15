@@ -36,7 +36,7 @@
 #include <errno.h>
 #include <common.h>
 #include "udp-serv.h"
-#include "serv-args.h"
+#include "gnutls-serv-options.h"
 
 extern int disable_client_cert;
 

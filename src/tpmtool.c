@@ -44,7 +44,7 @@
 #include <read-file.h>
 
 #include "certtool-common.h"
-#include "tpmtool-args.h"
+#include "tpmtool-options.h"
 #include "common.h"
 
 static void cmd_parser(int argc, char **argv);
