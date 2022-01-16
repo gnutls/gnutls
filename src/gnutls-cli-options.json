@@ -387,6 +387,11 @@
         "desc": "Reports the status of the FIPS140-2 mode in gnutls library"
       },
       {
+        "detail": "",
+        "long-option": "list-config",
+        "desc": "Reports the configuration of the library"
+      },
+      {
         "desc": "Redirect informational messages to a specific file.",
         "arg-type": "string",
         "long-option": "logfile",
