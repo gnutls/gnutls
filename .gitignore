@@ -271,6 +271,7 @@ Makefile.user
 *.o
 *.out
 *.plist
+python/__pycache__/
 src/benchmark
 src/benchmark-cipher
 src/benchmark-tls
@@ -624,6 +625,7 @@ tests/priority-set
 tests/priority-set2
 tests/privkey-keygen
 tests/privkey-verify-broken
+tests/protocol-set-allowlist
 tests/psk-file
 tests/pskself
 tests/pskself2
@@ -784,6 +786,7 @@ tests/suite/testpkcs11.debug
 tests/suite/testtpm.sh
 tests/suite/tlslite
 tests/suite/x509paths/X509tests
+tests/system-override-curves-allowlist
 tests/system-override-hash
 tests/system-override-sig
 tests/system-override-sig-tls
