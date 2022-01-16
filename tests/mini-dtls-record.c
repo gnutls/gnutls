@@ -111,6 +111,7 @@ static ssize_t odd_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 	}
 
 	stored_messages[current] = malloc(len);
+	assert(stored_messages[current]);
 	memcpy(stored_messages[current], data, len);
 	stored_sizes[current] = len;
 
