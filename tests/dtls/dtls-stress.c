@@ -564,12 +564,14 @@ static void filter_permute_state_run(filter_permute_state_t * state,
 				     gnutls_transport_ptr_t fd,
 				     const unsigned char *buffer, size_t len)
 {
-	unsigned char *data = malloc(len);
+	unsigned char *data;
 	int packet = state->order[state->count];
 
 	if (debug > 2)
 		log("running permutation for %s/%d/%d\n", state->name, packetCount, state->count);
 
+	data = malloc(len);
+	assert(data);
 	memcpy(data, buffer, len);
 	state->packets[packet].data = data;
 	state->packets[packet].size = len;

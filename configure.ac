@@ -63,6 +63,9 @@ AX_CODE_COVERAGE
 
 AM_MAINTAINER_MODE([enable])
 
+AM_MISSING_PROG([GPERF], [gperf])
+AM_MISSING_PROG([ASN1PARSER], [asn1Parser])
+
 AC_ARG_ENABLE(bash-tests,
   AS_HELP_STRING([--disable-bash-tests], [skip some tests that badly need bash]),
     enable_bash_tests=$enableval, enable_bash_tests=yes)

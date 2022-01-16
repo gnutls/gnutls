@@ -259,12 +259,12 @@ libgnutlsxx_la_LIBADD = libgnutls.la
 endif
 
 pkix_asn1_tab.c: $(srcdir)/pkix.asn
-	-asn1Parser $(srcdir)/pkix.asn pkix_asn1_tab.c
+	$(AM_V_GEN)$(ASN1PARSER) $(srcdir)/pkix.asn pkix_asn1_tab.c
 
 gnutls_asn1_tab.c: $(srcdir)/gnutls.asn
-	-asn1Parser $(srcdir)/gnutls.asn gnutls_asn1_tab.c
+	$(AM_V_GEN)$(ASN1PARSER) $(srcdir)/gnutls.asn gnutls_asn1_tab.c
 
 priority_options.h: $(srcdir)/priority_options.gperf
-	-gperf --global-table -t $^ > $@-tmp \
+	$(V_GPERF)$(GPERF) --global-table -t $^ > $@-tmp \
 	&& sed 's/^const struct priority_options_st \*/static const struct priority_options_st \*/' <$@-tmp >$@ \
 	&& rm -f $@-tmp
