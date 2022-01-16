@@ -68,8 +68,6 @@ if ENABLE_DANE
 bin_PROGRAMS += danetool
 endif
 
-noinst_PROGRAMS = systemkey
-
 if ENABLE_PKCS11
 
 # TPM makes use of PKCS #11 callbacks
@@ -81,7 +79,7 @@ bin_PROGRAMS += p11tool
 endif
 
 noinst_LTLIBRARIES =
-
+noinst_PROGRAMS =
 
 if ENABLE_SRP
 srptool_SOURCES = srptool.c
@@ -216,6 +214,7 @@ libcmd_tpmtool_la_LIBADD += $(LTLIBREADLINE) $(INET_PTON_LIB) $(LIB_CLOCK_GETTIM
 
 endif # ENABLE_TROUSERS
 
+noinst_PROGRAMS += systemkey
 systemkey_SOURCES = systemkey.c certtool-common.c common.c
 systemkey_LDADD = ../lib/libgnutls.la
 systemkey_LDADD += libcmd-systemkey.la ../gl/libgnu.la gl/libgnu_gpl.la
@@ -230,7 +229,7 @@ noinst_LTLIBRARIES += libcerttool-cfg.la
 libcerttool_cfg_la_SOURCES = certtool-cfg.h certtool-cfg.c cfg.c cfg.h
 libcerttool_cfg_la_LIBADD = ../gl/libgnu.la gl/libgnu_gpl.la
 
-noinst_PROGRAMS = dumpcfg
+noinst_PROGRAMS += dumpcfg
 dumpcfg_SOURCES = cfg.c cfg.h
 dumpcfg_CFLAGS = -DTEST=1
 dumpcfg_LDADD = ../gl/libgnu.la gl/libgnu_gpl.la
