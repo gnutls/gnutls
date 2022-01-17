@@ -1121,7 +1121,8 @@ gnutls_aead_cipher_encrypt(gnutls_aead_cipher_hd_t handle,
 
 struct iov_store_st {
 	void *data;
-	size_t size;
+	size_t length;
+	size_t capacity;
 };
 
 static void iov_store_free(struct iov_store_st *s)
@@ -1131,65 +1132,66 @@ static void iov_store_free(struct iov_store_st *s)
 
 static int iov_store_grow(struct iov_store_st *s, size_t length)
 {
-	void *data;
+	void *new_data;
+	size_t new_capacity = s->capacity;
 
-	if (INT_ADD_OVERFLOW(s->size, length)) {
+	if (INT_ADD_OVERFLOW(new_capacity, length)) {
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
-	s->size += length;
-	data = gnutls_realloc(s->data, s->size);
-	if (data == NULL)
+	new_capacity += length;
+	new_data = gnutls_realloc(s->data, new_capacity);
+	if (!new_data) {
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-
-	s->data = data;
+	}
+	s->data = new_data;
+	s->capacity = new_capacity;
 	return 0;
 }
 
 static int
-copy_from_iov(struct iov_store_st *dst, const giovec_t *iov, int iovcnt)
+append_from_iov(struct iov_store_st *dst, const giovec_t *iov, int iovcnt)
 {
-	memset(dst, 0, sizeof(*dst));
-	if (iovcnt == 0) {
-		return 0;
-	} else {
+	if (iovcnt > 0) {
 		int i;
 		uint8_t *p;
+		void *new_data;
+		size_t new_capacity = dst->capacity;
 
-		dst->size = 0;
-		for (i=0;i<iovcnt;i++) {
-			if (INT_ADD_OVERFLOW(dst->size, iov[i].iov_len)) {
+		for (i = 0; i < iovcnt; i++) {
+			if (INT_ADD_OVERFLOW(new_capacity, iov[i].iov_len)) {
 				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 			}
-			dst->size += iov[i].iov_len;
+			new_capacity += iov[i].iov_len;
 		}
-		dst->data = gnutls_malloc(dst->size);
-		if (dst->data == NULL)
+		new_data = gnutls_realloc(dst->data, new_capacity);
+		if (!new_data) {
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-
-		p = dst->data;
-		for (i=0;i<iovcnt;i++) {
-			if (iov[i].iov_len > 0)
-				memcpy(p, iov[i].iov_base, iov[i].iov_len);
-			p += iov[i].iov_len;
 		}
+		dst->data = new_data;
+		dst->capacity = new_capacity;
 
-		return 0;
+		p = (uint8_t *) dst->data + dst->length;
+		for (i = 0; i < iovcnt; i++) {
+			if (iov[i].iov_len > 0) {
+				memcpy(p, iov[i].iov_base, iov[i].iov_len);
+			}
+			p += iov[i].iov_len;
+			dst->length += iov[i].iov_len;
+		}
 	}
+	return 0;
 }
 
 static int
-copy_to_iov(struct iov_store_st *src, size_t size,
+copy_to_iov(const uint8_t *data, size_t size,
 	    const giovec_t *iov, int iovcnt)
 {
 	size_t offset = 0;
 	int i;
 
-	if (unlikely(src->size < size))
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-
 	for (i = 0; i < iovcnt && size > 0; i++) {
 		size_t to_copy = MIN(size, iov[i].iov_len);
-		memcpy(iov[i].iov_base, (uint8_t *) src->data + offset, to_copy);
+		memcpy(iov[i].iov_base, (uint8_t *) data + offset, to_copy);
 		offset += to_copy;
 		size -= to_copy;
 	}
@@ -1197,6 +1199,8 @@ copy_to_iov(struct iov_store_st *src, size_t size,
 		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
 	return 0;
 }
+
+#define IOV_STORE_INIT { NULL, 0, 0 }
 
 static int
 aead_cipher_encryptv_fallback(gnutls_aead_cipher_hd_t handle,
@@ -1206,8 +1210,8 @@ aead_cipher_encryptv_fallback(gnutls_aead_cipher_hd_t handle,
 			      const giovec_t *iov, int iovcnt,
 			      void *ctext, size_t *ctext_len)
 {
-	struct iov_store_st auth;
-	struct iov_store_st ptext;
+	struct iov_store_st auth = IOV_STORE_INIT;
+	struct iov_store_st ptext = IOV_STORE_INIT;
 	int ret;
 
 	if (tag_size == 0)
@@ -1217,13 +1221,13 @@ aead_cipher_encryptv_fallback(gnutls_aead_cipher_hd_t handle,
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
 
-	ret = copy_from_iov(&auth, auth_iov, auth_iovcnt);
+	ret = append_from_iov(&auth, auth_iov, auth_iovcnt);
 	if (ret < 0) {
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 		return gnutls_assert_val(ret);
 	}
 
-	ret = copy_from_iov(&ptext, iov, iovcnt);
+	ret = append_from_iov(&ptext, iov, iovcnt);
 	if (ret < 0) {
 		iov_store_free(&auth);
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
@@ -1231,9 +1235,9 @@ aead_cipher_encryptv_fallback(gnutls_aead_cipher_hd_t handle,
 	}
 
 	ret = gnutls_aead_cipher_encrypt(handle, nonce, nonce_len,
-					 auth.data, auth.size,
+					 auth.data, auth.length,
 					 tag_size,
-					 ptext.data, ptext.size,
+					 ptext.data, ptext.length,
 					 ctext, ctext_len);
 	iov_store_free(&auth);
 	iov_store_free(&ptext);
@@ -1394,9 +1398,9 @@ aead_cipher_encryptv2_fallback(gnutls_aead_cipher_hd_t handle,
 			       void *tag, size_t *tag_size)
 {
 	size_t _tag_size;
-	struct iov_store_st auth;
-	struct iov_store_st ptext;
-	size_t ptext_size;
+	struct iov_store_st auth = IOV_STORE_INIT;
+	struct iov_store_st ptext = IOV_STORE_INIT;
+	size_t ctext_size;
 	int ret;
 
 	if (tag_size == NULL || *tag_size == 0)
@@ -1409,19 +1413,17 @@ aead_cipher_encryptv2_fallback(gnutls_aead_cipher_hd_t handle,
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
 
-	ret = copy_from_iov(&auth, auth_iov, auth_iovcnt);
+	ret = append_from_iov(&auth, auth_iov, auth_iovcnt);
 	if (ret < 0) {
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 		return gnutls_assert_val(ret);
 	}
 
-	ret = copy_from_iov(&ptext, iov, iovcnt);
+	ret = append_from_iov(&ptext, iov, iovcnt);
 	if (ret < 0) {
 		gnutls_assert();
 		goto error;
 	}
-
-	ptext_size = ptext.size;
 
 	/* append space for tag */
 	ret = iov_store_grow(&ptext, _tag_size);
@@ -1430,17 +1432,18 @@ aead_cipher_encryptv2_fallback(gnutls_aead_cipher_hd_t handle,
 		goto error;
 	}
 
+	ctext_size = ptext.capacity;
 	ret = gnutls_aead_cipher_encrypt(handle, nonce, nonce_len,
-					 auth.data, auth.size,
+					 auth.data, auth.length,
 					 _tag_size,
-					 ptext.data, ptext_size,
-					 ptext.data, &ptext.size);
+					 ptext.data, ptext.length,
+					 ptext.data, &ctext_size);
 	if (ret < 0) {
 		gnutls_assert();
 		goto error;
 	}
 
-	ret = copy_to_iov(&ptext, ptext_size, iov, iovcnt);
+	ret = copy_to_iov(ptext.data, ptext.length, iov, iovcnt);
 	if (ret < 0) {
 		gnutls_assert();
 		goto error;
@@ -1448,7 +1451,7 @@ aead_cipher_encryptv2_fallback(gnutls_aead_cipher_hd_t handle,
 
 	if (tag != NULL)
 		memcpy(tag,
-		       (uint8_t *) ptext.data + ptext_size,
+		       (uint8_t *) ptext.data + ptext.length,
 		       _tag_size);
 	if (tag_size != NULL)
 		*tag_size = _tag_size;
@@ -1603,9 +1606,9 @@ aead_cipher_decryptv2_fallback(gnutls_aead_cipher_hd_t handle,
 			       const giovec_t *iov, int iovcnt,
 			       void *tag, size_t tag_size)
 {
-	struct iov_store_st auth;
-	struct iov_store_st ctext;
-	size_t ctext_size;
+	struct iov_store_st auth = IOV_STORE_INIT;
+	struct iov_store_st ctext = IOV_STORE_INIT;
+	size_t ptext_size;
 	int ret;
 
 	if (tag_size == 0)
@@ -1615,19 +1618,17 @@ aead_cipher_decryptv2_fallback(gnutls_aead_cipher_hd_t handle,
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
 
-	ret = copy_from_iov(&auth, auth_iov, auth_iovcnt);
+	ret = append_from_iov(&auth, auth_iov, auth_iovcnt);
 	if (ret < 0) {
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 		return gnutls_assert_val(ret);
 	}
 
-	ret = copy_from_iov(&ctext, iov, iovcnt);
+	ret = append_from_iov(&ctext, iov, iovcnt);
 	if (ret < 0) {
 		gnutls_assert();
 		goto error;
 	}
-
-	ctext_size = ctext.size;
 
 	/* append tag */
 	ret = iov_store_grow(&ctext, tag_size);
@@ -1635,19 +1636,21 @@ aead_cipher_decryptv2_fallback(gnutls_aead_cipher_hd_t handle,
 		gnutls_assert();
 		goto error;
 	}
-	memcpy((uint8_t *) ctext.data + ctext_size, tag, tag_size);
+	memcpy((uint8_t *) ctext.data + ctext.length, tag, tag_size);
+	ctext.length += tag_size;
 
+	ptext_size = ctext.capacity;
 	ret = gnutls_aead_cipher_decrypt(handle, nonce, nonce_len,
-					 auth.data, auth.size,
+					 auth.data, auth.length,
 					 tag_size,
-					 ctext.data, ctext.size,
-					 ctext.data, &ctext_size);
+					 ctext.data, ctext.length,
+					 ctext.data, &ptext_size);
 	if (ret < 0) {
 		gnutls_assert();
 		goto error;
 	}
 
-	ret = copy_to_iov(&ctext, ctext_size, iov, iovcnt);
+	ret = copy_to_iov(ctext.data, ptext_size, iov, iovcnt);
 	if (ret < 0) {
 		gnutls_assert();
 		goto error;
