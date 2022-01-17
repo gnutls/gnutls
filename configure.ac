@@ -594,6 +594,24 @@ if [ test "$enable_fips" = "yes" ];then
             fips_key="orboDeJITITejsirpADONivirpUkvarP")
 
     AC_DEFINE_UNQUOTED([FIPS_KEY], ["$fips_key"], [The FIPS140-2 integrity key])
+
+    AC_ARG_WITH(fips140-module-name, AS_HELP_STRING([--with-fips140-module-name],
+                                 [specify the FIPS140 module name]),
+            fips_module_name="$withval",
+            fips_module_name=none)
+
+    if test "x$fips_module_name" != xnone; then
+       AC_DEFINE_UNQUOTED([FIPS_MODULE_NAME], ["$fips_module_name"], [The FIPS140 module name])
+    fi
+
+    AC_ARG_WITH(fips140-module-version, AS_HELP_STRING([--with-fips140-module-version],
+                                 [specify the FIPS140 module version]),
+            fips_module_version="$withval",
+            fips_module_version=none)
+
+    if test "x$fips_module_version" != xnone; then
+       AC_DEFINE_UNQUOTED([FIPS_MODULE_VERSION], ["$fips_module_version"], [The FIPS140 module version])
+    fi
   else
     enable_fips=no
     AC_MSG_WARN([[
@@ -864,7 +882,7 @@ AM_CONDITIONAL(P11KIT_0_23_11_API, $PKG_CONFIG --atleast-version=0.23.11 p11-kit
 
 AM_CONDITIONAL(ENABLE_PKCS11, test "$with_p11_kit" != "no")
 
-AC_ARG_WITH(tpm,
+AC_ARG_WITH(tpm2,
 	AS_HELP_STRING([--without-tpm2],
 		[Disable TPM2 support.]),
 	[with_tpm2=$withval], [with_tpm2=auto])
@@ -1141,6 +1159,70 @@ AC_SUBST(LIBGNUTLS_CFLAGS)
 AM_CONDITIONAL(NEEDS_LIBRT, test "$gnutls_needs_librt" = "yes")
 
 AC_DEFINE([GNUTLS_INTERNAL_BUILD], 1, [We allow temporarily usage of deprecated functions - until they are removed.])
+
+hw_features=
+if test "$enable_cryptodev" = yes; then
+	hw_features="$hw_features cryptodev"
+fi
+if test "$enable_afalg" = yes; then
+	hw_features="$hw_features afalg"
+fi
+if test "$use_padlock" = yes; then
+	hw_features="$hw_features padlock"
+fi
+if test "$with_p11_kit" = yes; then
+	hw_features="$hw_features pkcs11"
+fi
+if test "$with_tpm" = yes; then
+	hw_features="$hw_features tpm"
+fi
+if test "$have_tpm2" = yes; then
+	hw_features="$hw_features tpm2"
+fi
+if test "$enable_ktls" = yes; then
+	hw_features="$hw_features ktls"
+fi
+hw_features=`eval 'expr "$hw_features" : " \(.*\)"'`
+AC_DEFINE_UNQUOTED([HW_FEATURES], ["$hw_features"],
+	[The enabled hardware features])
+
+tls_features=
+if test "$ac_enable_ssl3" = yes; then
+	tls_features="$tls_features ssl3"
+fi
+if test "$ac_enable_ssl2" = yes; then
+	tls_features="$tls_features ssl2-compat"
+fi
+if test "$ac_enable_srtp" = yes; then
+	tls_features="$tls_features srtp"
+fi
+if test "$ac_enable_alpn" = yes; then
+	tls_features="$tls_features alpn"
+fi
+if test "$ac_enable_ocsp" = yes; then
+	tls_features="$tls_features ocsp"
+fi
+if test "$ac_enable_srp" = yes; then
+	tls_features="$tls_features srp"
+fi
+if test "$ac_enable_psk" = yes; then
+	tls_features="$tls_features psk"
+fi
+if test "$ac_enable_dhe" = yes; then
+	tls_features="$tls_features dhe"
+fi
+if test "$ac_enable_ecdhe" = yes; then
+	tls_features="$tls_features ecdhe"
+fi
+if test "$ac_enable_anon" = yes; then
+	tls_features="$tls_features auth-anon"
+fi
+if test "$ac_enable_heartbeat" = yes; then
+	tls_features="$tls_features heartbeat"
+fi
+tls_features=`eval 'expr "$tls_features" : " \(.*\)"'`
+AC_DEFINE_UNQUOTED([TLS_FEATURES], ["$tls_features"],
+	[The enabled TLS features])
 
 AC_DEFINE([fread_file], [_gnutls_fread_file], [static lib rename])
 AC_DEFINE([read_file], [_gnutls_read_file], [static lib rename])

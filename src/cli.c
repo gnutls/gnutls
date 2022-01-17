@@ -1640,6 +1640,15 @@ static void cmd_parser(int argc, char **argv)
 		exit(1);
 	}
 
+	if (HAVE_OPT(LIST_CONFIG)) {
+		const gnutls_library_config_st *p;
+
+		for (p = gnutls_get_library_config(); p->name; p++) {
+			log_msg(stdout, "%s: %s\n", p->name, p->value);
+		}
+		exit(0);
+	}
+
 	if (HAVE_OPT(BENCHMARK_CIPHERS)) {
 		benchmark_cipher(OPT_VALUE_DEBUG);
 		exit(0);

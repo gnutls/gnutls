@@ -531,3 +531,51 @@ static void _DESTRUCTOR lib_deinit(void)
 
 	_gnutls_global_deinit(1);
 }
+
+static const struct gnutls_library_config_st _gnutls_library_config[] = {
+#ifdef FIPS_MODULE_NAME
+	{ "fips-module-name", FIPS_MODULE_NAME },
+#endif
+#ifdef FIPS_MODULE_VERSION
+	{ "fips-module-version", FIPS_MODULE_VERSION },
+#endif
+	{ "libgnutls-soname", GNUTLS_LIBRARY_SONAME },
+	{ "libnettle-soname", NETTLE_LIBRARY_SONAME },
+	{ "libhogweed-soname", HOGWEED_LIBRARY_SONAME },
+	{ "libgmp-soname", GMP_LIBRARY_SONAME },
+	{ "hardware-features", HW_FEATURES },
+	{ "tls-features", TLS_FEATURES },
+	{ NULL, NULL }
+};
+
+/**
+ * gnutls_get_library_config:
+ *
+ * Returns the library configuration as key value pairs.
+ * Currently defined keys are:
+ *
+ *  - fips-module-name: the name of the FIPS140 module
+ *
+ *  - fips-module-version: the version of the FIPS140 module
+ *
+ *  - libgnutls-soname: the SONAME of the library itself
+ *
+ *  - libnettle-soname: the library SONAME of linked libnettle
+ *
+ *  - libhogweed-soname: the library SONAME of linked libhogweed
+ *
+ *  - libgmp-soname: the library SONAME of linked libgmp
+ *
+ *  - hardware-features: enabled hardware support features
+ *
+ *  - tls-features: enabled TLS protocol features
+ *
+ * Returns: a NUL-terminated %gnutls_library_config_st array
+ *
+ * Since: 3.7.3
+ */
+const gnutls_library_config_st *
+gnutls_get_library_config(void)
+{
+	return _gnutls_library_config;
+}

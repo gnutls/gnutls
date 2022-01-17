@@ -1375,6 +1375,7 @@ GNUTLS_3_7_3
 	gnutls_fips140_get_operation_state;
 	gnutls_fips140_push_context;
 	gnutls_fips140_pop_context;
+	gnutls_get_library_config;
  local:
 	*;
 } GNUTLS_3_7_2;
