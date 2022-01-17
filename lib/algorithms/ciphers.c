@@ -286,7 +286,8 @@ static const cipher_entry_st algorithms[] = {
 	  .type = CIPHER_AEAD,
 	  .explicit_iv = 16,
 	  .cipher_iv = 16,
-	  .flags = GNUTLS_CIPHER_FLAG_ONLY_AEAD,
+	  .flags = GNUTLS_CIPHER_FLAG_ONLY_AEAD |
+	  GNUTLS_CIPHER_FLAG_TAG_PREFIXED,
 	  .tagsize = 16},
 	{ .name = "AES-256-SIV",
 	  .id = GNUTLS_CIPHER_AES_256_SIV,
@@ -295,7 +296,8 @@ static const cipher_entry_st algorithms[] = {
 	  .type = CIPHER_AEAD,
 	  .explicit_iv = 16,
 	  .cipher_iv = 16,
-	  .flags = GNUTLS_CIPHER_FLAG_ONLY_AEAD,
+	  .flags = GNUTLS_CIPHER_FLAG_ONLY_AEAD |
+	  GNUTLS_CIPHER_FLAG_TAG_PREFIXED,
 	  .tagsize = 16},
 	{ .name = "GOST28147-TC26Z-CNT",
 	  .id = GNUTLS_CIPHER_GOST28147_TC26Z_CNT,

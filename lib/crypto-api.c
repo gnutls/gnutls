@@ -1397,10 +1397,14 @@ aead_cipher_encryptv2_fallback(gnutls_aead_cipher_hd_t handle,
 			       const giovec_t *iov, int iovcnt,
 			       void *tag, size_t *tag_size)
 {
-	size_t _tag_size;
 	struct iov_store_st auth = IOV_STORE_INIT;
 	struct iov_store_st ptext = IOV_STORE_INIT;
+	uint8_t *ptext_data;
+	size_t ptext_size;
+	uint8_t *ctext_data;
 	size_t ctext_size;
+	uint8_t *_tag;
+	size_t _tag_size;
 	int ret;
 
 	if (tag_size == NULL || *tag_size == 0)
@@ -1419,42 +1423,78 @@ aead_cipher_encryptv2_fallback(gnutls_aead_cipher_hd_t handle,
 		return gnutls_assert_val(ret);
 	}
 
-	ret = append_from_iov(&ptext, iov, iovcnt);
-	if (ret < 0) {
-		gnutls_assert();
-		goto error;
-	}
+	if (handle->ctx_enc.e->flags & GNUTLS_CIPHER_FLAG_TAG_PREFIXED) {
+		/* prepend space for tag */
+		ret = iov_store_grow(&ptext, _tag_size);
+		if (ret < 0) {
+			gnutls_assert();
+			goto error;
+		}
+		ptext.length = _tag_size;
 
-	/* append space for tag */
-	ret = iov_store_grow(&ptext, _tag_size);
-	if (ret < 0) {
-		gnutls_assert();
-		goto error;
+		ret = append_from_iov(&ptext, iov, iovcnt);
+		if (ret < 0) {
+			gnutls_assert();
+			goto error;
+		}
+
+		/* We must set ptext_data after the above
+		 * grow/append opereations, otherwise it will point to an invalid pointer after realloc.
+		 */
+		ptext_data = (uint8_t *) ptext.data + _tag_size;
+		ptext_size = ptext.length - _tag_size;
+	} else {
+		ret = append_from_iov(&ptext, iov, iovcnt);
+		if (ret < 0) {
+			gnutls_assert();
+			goto error;
+		}
+
+		/* append space for tag */
+		ret = iov_store_grow(&ptext, _tag_size);
+		if (ret < 0) {
+			gnutls_assert();
+			goto error;
+		}
+
+		/* We must set ptext_data after the above
+		 * grow/append opereations, otherwise it will point to an invalid pointer after realloc.
+		 */
+		ptext_data = ptext.data;
+		ptext_size = ptext.length;
 	}
 
 	ctext_size = ptext.capacity;
 	ret = gnutls_aead_cipher_encrypt(handle, nonce, nonce_len,
 					 auth.data, auth.length,
 					 _tag_size,
-					 ptext.data, ptext.length,
+					 ptext_data, ptext_size,
 					 ptext.data, &ctext_size);
 	if (ret < 0) {
 		gnutls_assert();
 		goto error;
 	}
 
-	ret = copy_to_iov(ptext.data, ptext.length, iov, iovcnt);
+	if (handle->ctx_enc.e->flags & GNUTLS_CIPHER_FLAG_TAG_PREFIXED) {
+		ctext_data = (uint8_t *)ptext.data + _tag_size;
+		_tag = ptext.data;
+	} else {
+		ctext_data = ptext.data;
+		_tag = (uint8_t *)ptext.data + ptext_size;
+	}
+
+	ret = copy_to_iov(ctext_data, ptext_size, iov, iovcnt);
 	if (ret < 0) {
 		gnutls_assert();
 		goto error;
 	}
 
-	if (tag != NULL)
-		memcpy(tag,
-		       (uint8_t *) ptext.data + ptext.length,
-		       _tag_size);
-	if (tag_size != NULL)
+	if (tag != NULL) {
+		memcpy(tag, _tag, _tag_size);
+	}
+	if (tag_size != NULL) {
 		*tag_size = _tag_size;
+	}
 
  error:
 	iov_store_free(&auth);
@@ -1608,6 +1648,7 @@ aead_cipher_decryptv2_fallback(gnutls_aead_cipher_hd_t handle,
 {
 	struct iov_store_st auth = IOV_STORE_INIT;
 	struct iov_store_st ctext = IOV_STORE_INIT;
+	uint8_t *ctext_data;
 	size_t ptext_size;
 	int ret;
 
@@ -1624,27 +1665,54 @@ aead_cipher_decryptv2_fallback(gnutls_aead_cipher_hd_t handle,
 		return gnutls_assert_val(ret);
 	}
 
-	ret = append_from_iov(&ctext, iov, iovcnt);
-	if (ret < 0) {
-		gnutls_assert();
-		goto error;
-	}
+	if (handle->ctx_enc.e->flags & GNUTLS_CIPHER_FLAG_TAG_PREFIXED) {
+		/* prepend tag */
+		ret = iov_store_grow(&ctext, tag_size);
+		if (ret < 0) {
+			gnutls_assert();
+			goto error;
+		}
+		memcpy(ctext.data, tag, tag_size);
+		ctext.length += tag_size;
 
-	/* append tag */
-	ret = iov_store_grow(&ctext, tag_size);
-	if (ret < 0) {
-		gnutls_assert();
-		goto error;
+		ret = append_from_iov(&ctext, iov, iovcnt);
+		if (ret < 0) {
+			gnutls_assert();
+			goto error;
+		}
+
+		/* We must set ctext_data after the above
+		 * grow/append opereations, otherwise it will point to an invalid pointer after realloc.
+		 */
+		ctext_data = (uint8_t *) ctext.data + tag_size;
+	} else {
+		ret = append_from_iov(&ctext, iov, iovcnt);
+		if (ret < 0) {
+			gnutls_assert();
+			goto error;
+		}
+
+		/* append tag */
+		ret = iov_store_grow(&ctext, tag_size);
+		if (ret < 0) {
+			gnutls_assert();
+			goto error;
+		}
+		memcpy((uint8_t *) ctext.data + ctext.length, tag, tag_size);
+		ctext.length += tag_size;
+
+		/* We must set ctext_data after the above
+		 * grow/append opereations, otherwise it will point to an invalid pointer after realloc.
+		 */
+		ctext_data = ctext.data;
 	}
-	memcpy((uint8_t *) ctext.data + ctext.length, tag, tag_size);
-	ctext.length += tag_size;
 
 	ptext_size = ctext.capacity;
 	ret = gnutls_aead_cipher_decrypt(handle, nonce, nonce_len,
 					 auth.data, auth.length,
 					 tag_size,
 					 ctext.data, ctext.length,
-					 ctext.data, &ptext_size);
+					 ctext_data, &ptext_size);
 	if (ret < 0) {
 		gnutls_assert();
 		goto error;
