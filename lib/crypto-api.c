@@ -32,6 +32,7 @@
 #include <fips.h>
 #include "crypto-api.h"
 #include "iov.h"
+#include "intprops.h"
 
 typedef struct api_cipher_hd_st {
 	cipher_hd_st ctx_enc;
@@ -1132,6 +1133,9 @@ static int iov_store_grow(struct iov_store_st *s, size_t length)
 {
 	void *data;
 
+	if (INT_ADD_OVERFLOW(s->size, length)) {
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
 	s->size += length;
 	data = gnutls_realloc(s->data, s->size);
 	if (data == NULL)
@@ -1152,8 +1156,12 @@ copy_from_iov(struct iov_store_st *dst, const giovec_t *iov, int iovcnt)
 		uint8_t *p;
 
 		dst->size = 0;
-		for (i=0;i<iovcnt;i++)
+		for (i=0;i<iovcnt;i++) {
+			if (INT_ADD_OVERFLOW(dst->size, iov[i].iov_len)) {
+				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			}
 			dst->size += iov[i].iov_len;
+		}
 		dst->data = gnutls_malloc(dst->size);
 		if (dst->data == NULL)
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
