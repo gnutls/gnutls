@@ -5,29 +5,69 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.7.3 (unreleased)
+* Version 3.7.3 (released 2022-01-17)
 
 ** libgnutls: The allowlisting configuration mode has been added to the system-wide
    settings. In this mode, all the algorithms are initially marked as insecure
    or disabled, while the applications can re-enable them either through the
    [overrides] section of the configuration file or the new API (#1172).
 
-** certtool: Certtool can now generate, manipulate, and evaluate x25519 and
-   x448 public keys, private keys, and certificates.
+** The build infrastructure no longer depends on GNU AutoGen for generating
+   command-line option handling, template file parsing in certtool, and
+   documentation generation (#773, #774). This change also removes run-time or
+   bundled dependency on the libopts library, and requires Python 3.6 or later
+   to regenerate the distribution tarball.
 
-** libgnutls: disabling a hashing algorithm through "insecure-hash"
-   configuration directive now also disables TLS ciphersuites that use it
-   as a PRF algorithm.
+   Note that this brings in known backward incompatibility in command-line
+   tools, such as long options are now case sensitive, while previously they
+   were treated in a case insensitive manner: for example --RSA is no longer a
+   valid option of certtool. The existing scripts using GnuTLS tools may need
+   adjustment for this change.
 
 ** libgnutls: The tpm2-tss-engine compatible private blobs can be loaded and
-   used as a gnutls_privkey_t. The code was originally written for the
-   OpenConnect VPN project by David Woodhouse. To generate such blobs,
-   use the tpm2tss-genkey tool from tpm2-tss-engine:
+   used as a gnutls_privkey_t (#594). The code was originally written for the
+   OpenConnect VPN project by David Woodhouse. To generate such blobs, use the
+   tpm2tss-genkey tool from tpm2-tss-engine:
    https://github.com/tpm2-software/tpm2-tss-engine/#rsa-operations
+   or the tpm2_encodeobject tool from unreleased tpm2-tools.
+
+** libgnutls: The library now transparently enables Linux KTLS
+   (kernel TLS) when the feature is compiled in with --enable-ktls configuration
+   option (#1113). If the KTLS initialization fails it automatically falls back
+   to the user space implementation.
+
+** certtool: The certtool command can now read the Certificate Transparency
+   (RFC 6962) SCT extension (#232).  New API functions are also provided to
+   access and manipulate the extension values.
+
+** certtool: The certtool command can now generate, manipulate, and evaluate
+   x25519 and x448 public keys, private keys, and certificates.
+
+** libgnutls: Disabling a hashing algorithm through "insecure-hash"
+   configuration directive now also disables TLS ciphersuites that use it as a
+   PRF algorithm.
+
+** libgnutls: PKCS#12 files are now created with modern algorithms by default
+   (!1499).  Previously certtool used PKCS12-3DES-SHA1 for key derivation and
+   HMAC-SHA1 as an integity measure in PKCS#12.  Now it uses AES-128-CBC with
+   PBKDF2 and SHA-256 for both key derivation and MAC algorithms, and the
+   default PBKDF2 iteration count has been increased to 600000.
 
 ** libgnutls: PKCS#12 keys derived using GOST algorithm now uses
-   HMAC_GOSTR3411_2012_512 instead of HMAC_GOSTR3411_2012_256 for
-   integrity, to conform with the latest TC-26 requirements
+   HMAC_GOSTR3411_2012_512 instead of HMAC_GOSTR3411_2012_256 for integrity, to
+   conform with the latest TC-26 requirements (#1225).
+
+** libgnutls: The library now provides a means to report the status of approved
+   cryptographic operations (!1465). To adhere to the FIPS140-3 IG 2.4.C., this
+   complements the existing mechanism to prohibit the use of unapproved
+   algorithms by making the library unusable state.
+
+** gnutls-cli: The gnutls-cli command now provides a --list-config option to
+   print the library configuration (!1508).
+
+** libgnutls: Fixed possible race condition in
+   gnutls_x509_trust_list_verify_crt2 when a single trust list object is shared
+   among multiple threads (#1277). [GNUTLS-SA-2022-01-17, CVSS: low]
 
 ** API and ABI modifications:
 GNUTLS_PRIVKEY_FLAG_RSA_PSS_FIXED_SALT_LENGTH: new flag in gnutls_privkey_flags_t
@@ -43,6 +83,8 @@ gnutls_fips140_push_context: New function
 gnutls_fips140_pop_context: New function
 gnutls_fips140_get_operation_state: New function
 gnutls_fips140_operation_state_t: New enum
+gnutls_transport_is_ktls_enabled: New function
+gnutls_get_library_configuration: New function
 
 * Version 3.7.2 (released 2021-05-29)
 

@@ -251,5 +251,6 @@ void doit(void)
 		}
 	}
 
+	gnutls_fips140_context_deinit(fips_context);
 	gnutls_global_deinit();
 }
