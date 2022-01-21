@@ -116,7 +116,7 @@ with_config_file() {
 
 # Smoke --list, @SYSTEM
 
-with_config_file "${CLI}" --list -d 4 --priority @SYSTEM &>"${TMPFILE_LIST}"
+with_config_file "${CLI}" --list -d 4 --priority @SYSTEM > "${TMPFILE_LIST}" 2>&1
 if test $? != 0; then
 	${CAT} "${TMPFILE_LIST}"
 	echo 'fails with just @SYSTEM'
@@ -131,7 +131,7 @@ fi
 # Smoke-test that TLS 1.3 is enableable with these algorithms
 
 with_config_file \
-	"${CLI}" --list -d 4 --priority @SYSTEM:+VERS-TLS1.3 &>"${TMPFILE_LIST}"
+	"${CLI}" --list -d 4 --priority @SYSTEM:+VERS-TLS1.3 > "${TMPFILE_LIST}" 2>&1
 if test $? != 0; then
 	${CAT} "${TMPFILE_LIST}"
 	echo 'listing algorithms fails with @SYSTEM:+VERS-TLS1.3'
@@ -146,7 +146,7 @@ fi
 # Smoke-test that TLS 1.1 is enableable with these algorithms
 
 with_config_file \
-	"${CLI}" --list -d 4 --priority @SYSTEM:+VERS-TLS1.1 &>"${TMPFILE_LIST}"
+	"${CLI}" --list -d 4 --priority @SYSTEM:+VERS-TLS1.1 > "${TMPFILE_LIST}" 2>&1
 if test $? != 0; then
 	${CAT} "${TMPFILE_LIST}"
 	echo 'listing algorithms fails with @SYSTEM:+VERS-TLS1.1'
