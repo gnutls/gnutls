@@ -71,7 +71,7 @@ export GNUTLS_SYSTEM_PRIORITY_FAIL_ON_INVALID=1
 
 # Smoke --list, @SYSTEM
 
-${CLI} --list -d 4 --priority @SYSTEM &>"${TMPOUTFILE}"
+${CLI} --list -d 4 --priority @SYSTEM > "${TMPOUTFILE}" 2>&1
 if test $? != 0; then
 	cat "${TMPOUTFILE}"
 	echo 'fails with just @SYSTEM'
@@ -97,7 +97,7 @@ ${SED} 's/for @SYSTEM/for ---PRIORITY---/' "${TMPOUTFILE}" > "${TMPREFFILE}"
 
 # Smoke-test a no-op %STATELESS_COMPRESSION, expect --list to stay the same
 
-${CLI} --list -d 4 --priority @SYSTEM:%STATELESS_COMPRESSION &>"${TMPOUTFILE}"
+${CLI} --list -d 4 --priority @SYSTEM:%STATELESS_COMPRESSION > "${TMPOUTFILE}" 2>&1
 if test $? != 0; then
 	cat "${TMPOUTFILE}"
 	echo 'fails with %STATELESS_COMPRESSION'
@@ -112,7 +112,7 @@ fi
 
 # Smoke-test %NONEXISTING_OPTION, expect a syntax error
 
-${CLI} --list -d 4 --priority @SYSTEM:%NONEXISTING_OPTION &>"${TMPOUTFILE}"
+${CLI} --list -d 4 --priority @SYSTEM:%NONEXISTING_OPTION > "${TMPOUTFILE}" 2>&1
 if test $? = 0; then
 	cat "${TMPOUTFILE}"
 	echo 'unknown option was not caught'
@@ -132,7 +132,7 @@ while read special; do
 		continue  # see below
 	fi
 	prio="@SYSTEM:%$special"
-	${CLI} --list -d 4 --priority "$prio" &>"${TMPOUTFILE}"
+	${CLI} --list -d 4 --priority "$prio" > "${TMPOUTFILE}" 2>&1
 	if test $? != 0; then
 		cat "${TMPOUTFILE}"
 		echo "fails with $prio"
@@ -148,7 +148,7 @@ done < "${TMPSPECIAL}"
 
 # Check that %NO_EXTENSIONS changes the output, capping it to TLS 1.2
 
-${CLI} --list -d 4 --priority @SYSTEM:%NO_EXTENSIONS &>"${TMPOUTFILE}"
+${CLI} --list -d 4 --priority @SYSTEM:%NO_EXTENSIONS > "${TMPOUTFILE}" 2>&1
 if test $? != 0; then
 	cat "${TMPOUTFILE}"
 	echo 'fails with just @SYSTEM'
