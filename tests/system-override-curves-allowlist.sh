@@ -167,7 +167,7 @@ for curve in ${INITIALLY_DISABLED_CURVES}; do
 	test $curve = X25519 && key_type=x25519
 	${VALGRIND} ${CERTTOOL} \
 		--generate-privkey --key-type=$key_type --curve=$curve \
-		--outfile "${TMPFILE_KEY}" &> ${TMPFILE_OBSERVED_LOG}
+		--outfile "${TMPFILE_KEY}" > ${TMPFILE_OBSERVED_LOG} 2>&1
 	EX=$?
 	if test $EX != 1; then
 		echo "key generation using $curve has succeeded unexpectedly"
