@@ -33,7 +33,7 @@ TMPOUTFILE=out.$$.tmp
 
 # Sanity
 
-${CLI} --list -d 4 --priority NORMAL &>"${TMPOUTFILE}"
+${CLI} --list -d 4 --priority NORMAL > "${TMPOUTFILE}" 2>&1
 if test $? != 0; then
 	cat "${TMPOUTFILE}"
 	echo 'fails just listing ciphersuites for NORMAL'
@@ -64,7 +64,7 @@ _EOF_
 export GNUTLS_SYSTEM_PRIORITY_FILE="${TMPCFGFILE}"
 export GNUTLS_SYSTEM_PRIORITY_FAIL_ON_INVALID=1
 
-${CLI} --list -d 4 --priority NORMAL &>"${TMPOUTFILE}"
+${CLI} --list -d 4 --priority NORMAL > "${TMPOUTFILE}" 2>&1
 if ${GREP} -Fq TLS_AES_256_GCM_SHA384 "${TMPOUTFILE}"; then
 	cat "${TMPOUTFILE}"
 	echo 'TLS_AES_256_GCM_SHA384 (TLS 1.3) has not disappeared'
