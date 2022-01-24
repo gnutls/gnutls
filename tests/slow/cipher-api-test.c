@@ -253,13 +253,19 @@ static void test_aead_cipher3(int algo)
 	if (ret < 0)
 		fail("could not encrypt data\n");
 
+	assert(ctext_len >= 128);
+	assert(ctext_len < sizeof(ctext));
+
 	ptext_len = 0;
 	ret = gnutls_aead_cipher_decrypt(ch, iv.data, iv.size, auth, sizeof(auth),
 					 gnutls_cipher_get_tag_size(algo),
-					 ctext, sizeof(ctext)-1,
+					 ctext, ctext_len,
 					 ptext, &ptext_len);
 	if (ret >= 0)
 		fail("succeeded in decrypting data onto a short buffer\n");
+
+	if (ret != GNUTLS_E_SHORT_MEMORY_BUFFER)
+		fail("wrong kind of error on decrypting onto a short buffer\n");
 
 	gnutls_aead_cipher_deinit(ch);
 
