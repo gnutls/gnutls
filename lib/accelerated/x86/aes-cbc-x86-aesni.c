@@ -100,6 +100,9 @@ aes_encrypt(void *_ctx, const void *src, size_t src_size,
 {
 	struct aes_ctx *ctx = _ctx;
 
+	if (unlikely(dst_size < src_size))
+		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+
 	if (unlikely(src_size % 16 != 0))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
@@ -113,6 +116,9 @@ aes_decrypt(void *_ctx, const void *src, size_t src_size,
 	    void *dst, size_t dst_size)
 {
 	struct aes_ctx *ctx = _ctx;
+
+	if (unlikely(dst_size < src_size))
+		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
 
 	if (unlikely(src_size % 16 != 0))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);

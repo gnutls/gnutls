@@ -233,6 +233,9 @@ aes_gcm_encrypt(void *_ctx, const void *src, size_t src_size,
 	if (unlikely(ctx->finished))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
+	if (unlikely(length < src_size))
+		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+
 	if (blocks > 0) {
 		ctr32_encrypt_blocks(src, dst,
 				     blocks,
@@ -267,6 +270,9 @@ aes_gcm_decrypt(void *_ctx, const void *src, size_t src_size,
 
 	if (unlikely(ctx->finished))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	if (unlikely(dst_size < src_size))
+		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
 
 	gcm_ghash(ctx, src, src_size);
 	ctx->gcm.len.u[1] += src_size;

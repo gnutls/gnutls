@@ -91,6 +91,9 @@ aes_aarch64_encrypt(void *_ctx, const void *src, size_t src_size,
 	if (unlikely(src_size % 16 != 0))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
+	if (unlikely(dst_size < src_size))
+		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+
 	aes_v8_cbc_encrypt(src, dst, src_size, ALIGN16(&ctx->expanded_key),
 			  ctx->iv, 1);
 	return 0;
@@ -104,6 +107,9 @@ aes_aarch64_decrypt(void *_ctx, const void *src, size_t src_size,
 
 	if (unlikely(src_size % 16 != 0))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	if (unlikely(dst_size < src_size))
+		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
 
 	aes_v8_cbc_encrypt(src, dst, src_size, ALIGN16(&ctx->expanded_key),
 			  ctx->iv, 0);

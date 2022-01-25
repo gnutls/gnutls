@@ -128,6 +128,11 @@ cryptodev_encrypt(void *_ctx, const void *src, size_t src_size,
 	ctx->cryp.op = COP_ENCRYPT;
 	ctx->cryp.flags = COP_FLAG_WRITE_IV;
 
+	if (unlikely(dst_size < src_size)) {
+		gnutls_assert();
+		return GNUTLS_E_SHORT_MEMORY_BUFFER;
+	}
+
 	if (ioctl(ctx->cfd, CIOCCRYPT, &ctx->cryp)) {
 		gnutls_assert();
 		return GNUTLS_E_CRYPTODEV_IOCTL_ERROR;
@@ -147,6 +152,11 @@ cryptodev_decrypt(void *_ctx, const void *src, size_t src_size,
 	ctx->cryp.dst = dst;
 	ctx->cryp.op = COP_DECRYPT;
 	ctx->cryp.flags = COP_FLAG_WRITE_IV;
+
+	if (unlikely(dst_size < src_size)) {
+		gnutls_assert();
+		return GNUTLS_E_SHORT_MEMORY_BUFFER;
+	}
 
 	if (ioctl(ctx->cfd, CIOCCRYPT, &ctx->cryp)) {
 		gnutls_assert();

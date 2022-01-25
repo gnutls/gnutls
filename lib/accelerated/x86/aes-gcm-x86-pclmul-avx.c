@@ -188,6 +188,9 @@ aes_gcm_encrypt(void *_ctx, const void *src, size_t src_size,
 	if (unlikely(ctx->finished))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
+	if (unlikely(length < src_size))
+		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+
 	if (blocks > 0) {
 		aesni_ctr32_encrypt_blocks(src, dst,
 					   blocks,
@@ -334,13 +337,13 @@ aesni_gcm_aead_decrypt(void *_ctx,
 	if (unlikely(encr_size < tag_size))
 		return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 
+	if (unlikely(plain_size < encr_size - tag_size))
+		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+
 	aes_gcm_setiv(ctx, nonce, nonce_size);
 	aes_gcm_auth(ctx, auth, auth_size);
 
 	encr_size -= tag_size;
-
-	if (unlikely(plain_size < encr_size))
-		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
 
 	if (encr_size >= 96) {
 		s = aesni_gcm_decrypt(encr, plain, encr_size, ALIGN16(&ctx->expanded_key),

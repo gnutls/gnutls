@@ -118,6 +118,9 @@ aes_ccm_aead_decrypt(void *_ctx,
 	if (unlikely(encr_size < tag_size))
 		return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 
+	if (unlikely(plain_size < encr_size - tag_size))
+		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+
 	ret = ccm_decrypt_message(&ctx->key, x86_aes_encrypt,
 				  nonce_size, nonce,
 				  auth_size, auth,
