@@ -10,7 +10,7 @@ aes_gcm_aead_encrypt(void *ctx,
 		   	void *encr, size_t encr_size)
 {
 	/* proper AEAD cipher */
-	if (unlikely(encr_size < plain_size + tag_size))
+	if (unlikely(encr_size - tag_size < plain_size))
 		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
 
 	aes_gcm_setiv(ctx, nonce, nonce_size);

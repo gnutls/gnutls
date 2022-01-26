@@ -421,7 +421,7 @@ static int afalg_aead_encrypt(void *_ctx, const void *nonce, size_t nonce_size,
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	if (encr_size < plain_size + tag_size) {
+	if (encr_size - tag_size < plain_size) {
 		ret = GNUTLS_E_SHORT_MEMORY_BUFFER;
 		gnutls_assert();
 		goto end;
