@@ -267,12 +267,13 @@ int _gnutls_ktls_send_control_msg(gnutls_session_t session,
 	const char *buf = data;
 	ssize_t ret;
 	int sockin, sockout;
+	size_t data_to_send = data_size;
 
 	assert (session != NULL);
 
 	gnutls_transport_get_int2(session, &sockin, &sockout);
 
-	while (data_size > 0) {
+	while (data_to_send > 0) {
 		char cmsg[CMSG_SPACE(sizeof (unsigned char))];
 		struct msghdr msg = { 0 };
 		struct iovec msg_iov;   /* Vector of data to send/receive into. */
@@ -291,7 +292,7 @@ int _gnutls_ktls_send_control_msg(gnutls_session_t session,
 		msg.msg_controllen = hdr->cmsg_len;
 
 		msg_iov.iov_base = (void *)buf;
-		msg_iov.iov_len = data_size;
+		msg_iov.iov_len = data_to_send;
 
 		msg.msg_iov = &msg_iov;
 		msg.msg_iovlen = 1;
@@ -310,10 +311,10 @@ int _gnutls_ktls_send_control_msg(gnutls_session_t session,
 		}
 
 		buf += ret;
-		data_size -= ret;
+		data_to_send -= ret;
 	}
 
-	return 0;
+	return data_size;
 }
 
 int _gnutls_ktls_recv_control_msg(gnutls_session_t session,
