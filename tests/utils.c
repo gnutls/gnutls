@@ -332,17 +332,22 @@ void delete_temp_files(void)
 int tcp_connect(const char* addr, unsigned port)
 {
 	int sock;
-	struct sockaddr_in sa = {0};
+	struct sockaddr_in sa;
 	memset(&sa, 0, sizeof(sa));
 	sock = socket(AF_INET, SOCK_STREAM, 0);
-	if (sock == -1)
-	    return -1;
+	if (sock == -1) {
+		return -1;
+	}
 	sa.sin_family = AF_INET;
 	sa.sin_port = htons(port);
-	if (inet_pton(AF_INET, addr, &sa.sin_addr) != 1)
-	    return -1;
-	if (connect(sock, (struct sockaddr*) &sa, sizeof(sa)) != 0)
-	    return -1;
+	if (inet_pton(AF_INET, addr, &sa.sin_addr) != 1) {
+		close(sock);
+		return -1;
+	}
+	if (connect(sock, (struct sockaddr*) &sa, sizeof(sa)) != 0) {
+		close(sock);
+		return -1;
+	}
 	return sock;
 }
 #endif
