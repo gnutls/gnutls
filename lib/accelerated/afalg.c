@@ -134,8 +134,11 @@ static int afalg_cipher_encrypt(void *_ctx, const void *src, size_t src_size,
 		return gnutls_assert_val(GNUTLS_E_ENCRYPTION_FAILED);
 	}
 
+	if (unlikely(dst_size < src_size))
+		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+
 	iov.iov_base = (void *)dst;
-	iov.iov_len = (src_size > dst_size) ? dst_size : src_size;
+	iov.iov_len = src_size;
 
 	if (kcapi_cipher_stream_op(ctx->handle, &iov, 1) < 0) {
 		gnutls_assert();
@@ -162,8 +165,11 @@ static int afalg_cipher_decrypt(void *_ctx, const void *src, size_t src_size,
 		return gnutls_assert_val(GNUTLS_E_ENCRYPTION_FAILED);
 	}
 
+	if (unlikely(dst_size < src_size))
+		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+
 	iov.iov_base = (void *)dst;
-	iov.iov_len = (src_size > dst_size) ? dst_size : src_size;
+	iov.iov_len = src_size;
 
 	if (kcapi_cipher_stream_op(ctx->handle, &iov, 1) < 0) {
 		gnutls_assert();
@@ -313,6 +319,12 @@ static int afalg_aead_decrypt(void *_ctx,
 		goto end;
 	}
 
+	if (unlikely(plain_size < encr_size - tag_size)) {
+		gnutls_assert();
+		ret = GNUTLS_E_SHORT_MEMORY_BUFFER;
+		goto end;
+	}
+
 	/* Init stream once. */
 	if (!ctx->taglen_set) {
 		ctx->taglen_set = 1;
@@ -409,7 +421,7 @@ static int afalg_aead_encrypt(void *_ctx, const void *nonce, size_t nonce_size,
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	if (encr_size < plain_size + tag_size) {
+	if (unlikely(encr_size - tag_size < plain_size)) {
 		ret = GNUTLS_E_SHORT_MEMORY_BUFFER;
 		gnutls_assert();
 		goto end;

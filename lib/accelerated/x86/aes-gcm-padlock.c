@@ -137,6 +137,9 @@ aes_gcm_encrypt(void *_ctx, const void *src, size_t src_size,
 {
 	struct gcm_padlock_aes_ctx *ctx = _ctx;
 
+	if (unlikely(length < src_size))
+		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+
 	GCM_ENCRYPT(ctx, padlock_aes_encrypt, src_size, dst, src);
 
 	return 0;
@@ -147,6 +150,9 @@ aes_gcm_decrypt(void *_ctx, const void *src, size_t src_size,
 		void *dst, size_t dst_size)
 {
 	struct gcm_padlock_aes_ctx *ctx = _ctx;
+
+	if (unlikely(dst_size < src_size))
+		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
 
 	GCM_DECRYPT(ctx, padlock_aes_encrypt, src_size, dst, src);
 	return 0;

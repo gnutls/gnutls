@@ -26,6 +26,7 @@ fi
 : ${srcdir=.}
 . "${srcdir}/../scripts/common.sh"
 
+echo default cipher tests
 ${PROG}
 ret=$?
 if test $ret != 0; then
@@ -33,7 +34,7 @@ if test $ret != 0; then
 	exit $ret
 fi
 
-# All optimizations disabled
+echo all optimizations disabled
 GNUTLS_CPUID_OVERRIDE=0x1 ${PROG}
 ret=$?
 if test $ret != 0; then
@@ -43,6 +44,7 @@ fi
 
 exit_if_non_x86
 
+echo AESNI
 GNUTLS_CPUID_OVERRIDE=0x2 ${PROG}
 ret=$?
 if test $ret != 0; then
@@ -50,6 +52,7 @@ if test $ret != 0; then
 	exit $ret
 fi
 
+echo SSEE3
 GNUTLS_CPUID_OVERRIDE=0x4 ${PROG}
 ret=$?
 if test $ret != 0; then
@@ -57,7 +60,7 @@ if test $ret != 0; then
 	exit $ret
 fi
 
-#AESNI+PCLMUL
+echo AESNI+PCLMUL
 GNUTLS_CPUID_OVERRIDE=0xA ${PROG}
 ret=$?
 if test $ret != 0; then
@@ -65,7 +68,7 @@ if test $ret != 0; then
 	exit $ret
 fi
 
-#AESNI+PCLMUL+AVX
+echo AESNI+PCLMUL+AVX
 GNUTLS_CPUID_OVERRIDE=0x1A ${PROG}
 ret=$?
 if test $ret != 0; then
@@ -73,7 +76,7 @@ if test $ret != 0; then
 	exit $ret
 fi
 
-#SHANI
+echo SHANI
 if (lscpu --version) >/dev/null 2>&1 && \
    lscpu 2>/dev/null | grep 'Flags:[	]*sha_ni' >/dev/null; then
 	GNUTLS_CPUID_OVERRIDE=0x20 ${PROG}
@@ -84,6 +87,7 @@ if (lscpu --version) >/dev/null 2>&1 && \
 	fi
 fi
 
+echo padlock
 GNUTLS_CPUID_OVERRIDE=0x100000 ${PROG}
 ret=$?
 if test $ret != 0; then
@@ -91,6 +95,7 @@ if test $ret != 0; then
 	exit $ret
 fi
 
+echo padlock PHE
 GNUTLS_CPUID_OVERRIDE=0x200000 ${PROG}
 ret=$?
 if test $ret != 0; then
@@ -98,6 +103,7 @@ if test $ret != 0; then
 	exit $ret
 fi
 
+echo padlock PHE SHA512
 GNUTLS_CPUID_OVERRIDE=0x400000 ${PROG}
 ret=$?
 if test $ret != 0; then

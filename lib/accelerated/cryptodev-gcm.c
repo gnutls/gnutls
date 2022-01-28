@@ -137,8 +137,8 @@ aes_gcm_encrypt(void *_ctx, const void *src, size_t src_size,
 	/* the GCM in kernel will place the tag after the
 	 * encrypted data.
 	 */
-	if (dst_size < src_size + GCM_BLOCK_SIZE)
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	if (unlikely(dst_size - GCM_BLOCK_SIZE < src_size))
+		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
 
 	ctx->cryp.len = src_size;
 	ctx->cryp.src = (void *) src;
@@ -175,6 +175,9 @@ aes_gcm_decrypt(void *_ctx, const void *src, size_t src_size,
 
 	ctx->cryp.auth_len = ctx->auth_data_size;
 	ctx->cryp.auth_src = ctx->auth_data;
+
+	if (unlikely(dst_size < src_size - GCM_BLOCK_SIZE))
+		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
 
 	if (ioctl(ctx->cfd, CIOCAUTHCRYPT, &ctx->cryp)) {
 		gnutls_assert();

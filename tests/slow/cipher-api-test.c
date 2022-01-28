@@ -30,7 +30,7 @@
 #include <gnutls/abstract.h>
 #include <gnutls/x509.h>
 
-/* Test illegal use of gnutls_cipher_* and gnutls_aead_cipher_*
+/* Test legal and illegal use of gnutls_cipher_* and gnutls_aead_cipher_*
  * API. This test is written using fork, because some of the test
  * cases may hit assertion failure in Nettle and crash the process.
  */
@@ -53,8 +53,52 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "<%d>| %s", level, str);
 }
 
+/* (Non-AEAD) Test a happy path where everything works */
+static void test_cipher_happy(int algo)
+{
+	int ret;
+	gnutls_cipher_hd_t ch;
+	uint8_t key16[64];
+	uint8_t iv16[32];
+	uint8_t data[128];
+	gnutls_datum_t key, iv;
+
+	key.data = key16;
+	key.size = gnutls_cipher_get_key_size(algo);
+	assert(key.size <= sizeof(key16));
+
+	iv.data = iv16;
+	iv.size = gnutls_cipher_get_iv_size(algo);
+	assert(iv.size <= sizeof(iv16));
+
+	memset(iv.data, 0xff, iv.size);
+	memset(key.data, 0xfe, key.size);
+	memset(data, 0xfa, sizeof(data));
+
+	gnutls_global_set_log_function(tls_log_func);
+	if (debug)
+		gnutls_global_set_log_level(4711);
+
+	ret = global_init();
+	if (ret < 0) {
+		fail("Cannot initialize library\n");
+	}
+
+	ret = gnutls_cipher_init(&ch, algo, &key, &iv);
+	if (ret < 0)
+		fail("gnutls_cipher_init failed\n");
+
+	ret = gnutls_cipher_encrypt(ch, data, sizeof(data));
+	if (ret < 0)
+		fail("gnutls_cipher_encrypt failed\n");
+
+	gnutls_cipher_deinit(ch);
+
+	gnutls_global_deinit();
+}
+
 /* Test whether an invalid call to gnutls_cipher_encrypt() is caught */
-static void test_cipher(int algo)
+static void test_cipher_invalid_partial(int algo)
 {
 	int ret;
 	gnutls_cipher_hd_t ch;
@@ -84,8 +128,7 @@ static void test_cipher(int algo)
 		fail("Cannot initialize library\n"); /*errcode 1 */
 	}
 
-	ret =
-	    gnutls_cipher_init(&ch, algo, &key, &iv);
+	ret = gnutls_cipher_init(&ch, algo, &key, &iv);
 	if (ret < 0)
 		fail("gnutls_cipher_init failed\n"); /*errcode 1 */
 
@@ -93,14 +136,91 @@ static void test_cipher(int algo)
 	ret = gnutls_cipher_encrypt(ch, data, sizeof(data)-1);
 	if (ret >= 0)
 		fail("succeeded in encrypting partial data on block cipher\n");
+	if (ret != GNUTLS_E_INVALID_REQUEST)
+		fail("wrong kind of error on decrypting onto a short buffer,"
+		     "%s instead of GNUTLS_E_INVALID_REQUEST\n",
+		     gnutls_strerror_name(ret));
 
 	gnutls_cipher_deinit(ch);
 
 	gnutls_global_deinit();
 }
 
+/* Test AEAD encryption/decryption */
+static void test_aead_happy(int algo)
+{
+	int ret;
+	gnutls_aead_cipher_hd_t ch;
+	uint8_t key16[64];
+	uint8_t iv16[32];
+	uint8_t auth[32];
+	uint8_t ctext[128+32];
+	size_t ctext_len;
+	uint8_t ptext[128];
+	uint8_t otext[128];
+	size_t ptext_len;
+	gnutls_datum_t key, iv;
+	size_t tag_len;
+
+	key.data = key16;
+	key.size = gnutls_cipher_get_key_size(algo);
+	assert(key.size <= sizeof(key16));
+
+	iv.data = iv16;
+	iv.size = gnutls_cipher_get_iv_size(algo);
+	assert(iv.size <= sizeof(iv16));
+
+	ptext_len = sizeof(ptext);
+	tag_len = gnutls_cipher_get_tag_size(algo);
+
+	memset(iv.data, 0xff, iv.size);
+	memset(key.data, 0xfe, key.size);
+	memset(ptext, 0xfa, sizeof(ptext));
+	memset(otext, 0xfc, sizeof(otext));
+	memset(ctext, 0xfa, sizeof(ctext));
+	memset(auth, 0xfb, sizeof(auth));
+
+	gnutls_global_set_log_function(tls_log_func);
+	if (debug)
+		gnutls_global_set_log_level(4711);
+
+	ret = global_init();
+	if (ret < 0)
+		fail("Cannot initialize library\n");
+
+	ret = gnutls_aead_cipher_init(&ch, algo, &key);
+	if (ret < 0)
+		fail("gnutls_aead_cipher_init failed\n");
+
+	ctext_len = sizeof(ctext);
+	ret = gnutls_aead_cipher_encrypt(ch, iv.data, iv.size,
+					 auth, sizeof(auth), tag_len,
+					 ptext, sizeof(ptext),
+					 ctext, &ctext_len);
+	if (ret < 0)
+		fail("could not encrypt data\n");
+
+	if (ctext_len != sizeof(ptext) + tag_len)
+		fail("output ciphertext length mismatch\n");
+
+	ret = gnutls_aead_cipher_decrypt(ch, iv.data, iv.size,
+					 auth, sizeof(auth), tag_len,
+					 ctext, ctext_len,
+					 ptext, &ptext_len);
+	if (ret < 0)
+		fail("could not decrypt data: %s\n", gnutls_strerror(ret));
+
+	if (!memcmp(ptext, otext, sizeof(ptext)))
+		fail("mismatch of decrypted data\n");
+
+	gnutls_aead_cipher_deinit(ch);
+
+	gnutls_global_deinit();
+	return;
+}
+
 /* Test whether an invalid gnutls_cipher_add_auth() is caught */
-static void test_aead_cipher1(int algo)
+static void test_aead_invalid_add_auth(int algo)
 {
 	int ret;
 	gnutls_cipher_hd_t ch;
@@ -133,8 +253,7 @@ static void test_aead_cipher1(int algo)
 		fail("Cannot initialize library\n"); /*errcode 1 */
 	}
 
-	ret =
-	    gnutls_cipher_init(&ch, algo, &key, &iv);
+	ret = gnutls_cipher_init(&ch, algo, &key, &iv);
 	if (ret < 0)
 		fail("gnutls_cipher_init failed\n"); /*errcode 1 */
 
@@ -144,7 +263,11 @@ static void test_aead_cipher1(int algo)
 
 	ret = gnutls_cipher_add_auth(ch, data, 16);
 	if (ret >= 0)
-		fail("succeeded in adding auth data data after partial data were given\n");
+		fail("succeeded in adding auth data after partial data were given\n");
+	if (ret != GNUTLS_E_INVALID_REQUEST)
+		fail("wrong kind of error on decrypting onto a short buffer,"
+		     "%s instead of GNUTLS_E_INVALID_REQUEST\n",
+		     gnutls_strerror_name(ret));
 
 	gnutls_cipher_deinit(ch);
 
@@ -153,7 +276,7 @@ static void test_aead_cipher1(int algo)
 }
 
 /* Test whether an invalid call to gnutls_cipher_encrypt() is caught */
-static void test_aead_cipher2(int algo)
+static void test_aead_invalid_partial_encrypt(int algo)
 {
 	int ret;
 	gnutls_cipher_hd_t ch;
@@ -183,8 +306,7 @@ static void test_aead_cipher2(int algo)
 		fail("Cannot initialize library\n"); /*errcode 1 */
 	}
 
-	ret =
-	    gnutls_cipher_init(&ch, algo, &key, &iv);
+	ret = gnutls_cipher_init(&ch, algo, &key, &iv);
 	if (ret < 0)
 		fail("gnutls_cipher_init failed\n"); /*errcode 1 */
 
@@ -196,6 +318,10 @@ static void test_aead_cipher2(int algo)
 	ret = gnutls_cipher_encrypt(ch, data, sizeof(data));
 	if (ret >= 0)
 		fail("succeeded in encrypting partial data after partial data were given\n");
+	if (ret != GNUTLS_E_INVALID_REQUEST)
+		fail("wrong kind of error on decrypting onto a short buffer,"
+		     "%s instead of GNUTLS_E_INVALID_REQUEST\n",
+		     gnutls_strerror_name(ret));
 
 	gnutls_cipher_deinit(ch);
 
@@ -204,7 +330,7 @@ static void test_aead_cipher2(int algo)
 }
 
 /* Test whether an invalid call to gnutls_aead_cipher_decrypt() is caught */
-static void test_aead_cipher3(int algo)
+static void test_aead_invalid_short_decrypt(int algo)
 {
 	int ret;
 	gnutls_aead_cipher_hd_t ch;
@@ -216,6 +342,7 @@ static void test_aead_cipher3(int algo)
 	uint8_t ptext[128];
 	size_t ptext_len;
 	gnutls_datum_t key, iv;
+	size_t tag_len;
 
 	key.data = key16;
 	key.size = gnutls_cipher_get_key_size(algo);
@@ -224,6 +351,8 @@ static void test_aead_cipher3(int algo)
 	iv.data = iv16;
 	iv.size = gnutls_cipher_get_iv_size(algo);
 	assert(iv.size <= sizeof(iv16));
+
+	tag_len = gnutls_cipher_get_tag_size(algo);
 
 	memset(iv.data, 0xff, iv.size);
 	memset(key.data, 0xfe, key.size);
@@ -236,30 +365,35 @@ static void test_aead_cipher3(int algo)
 		gnutls_global_set_log_level(4711);
 
 	ret = global_init();
-	if (ret < 0) {
-		fail("Cannot initialize library\n"); /*errcode 1 */
-	}
-
-	ret =
-	    gnutls_aead_cipher_init(&ch, algo, &key);
 	if (ret < 0)
-		fail("gnutls_aead_cipher_init failed\n"); /*errcode 1 */
+		fail("Cannot initialize library\n");
 
-	ctext_len = sizeof(ctext)-1;
-	ret = gnutls_aead_cipher_encrypt(ch, iv.data, iv.size, auth, sizeof(auth),
-					 gnutls_cipher_get_tag_size(algo),
-					 ptext, sizeof(ptext)-1,
+	ret = gnutls_aead_cipher_init(&ch, algo, &key);
+	if (ret < 0)
+		fail("gnutls_aead_cipher_init failed\n");
+
+	ctext_len = sizeof(ctext);
+	ret = gnutls_aead_cipher_encrypt(ch, iv.data, iv.size,
+					 auth, sizeof(auth), tag_len,
+					 ptext, sizeof(ptext),
 					 ctext, &ctext_len);
 	if (ret < 0)
 		fail("could not encrypt data\n");
 
+	if (ctext_len != sizeof(ptext) + tag_len)
+		fail("output ciphertext length mismatch\n");
+
 	ptext_len = 0;
-	ret = gnutls_aead_cipher_decrypt(ch, iv.data, iv.size, auth, sizeof(auth),
-					 gnutls_cipher_get_tag_size(algo),
-					 ctext, sizeof(ctext)-1,
+	ret = gnutls_aead_cipher_decrypt(ch, iv.data, iv.size,
+					 auth, sizeof(auth), tag_len,
+					 ctext, ctext_len,
 					 ptext, &ptext_len);
 	if (ret >= 0)
 		fail("succeeded in decrypting data onto a short buffer\n");
+	if (ret != GNUTLS_E_SHORT_MEMORY_BUFFER)
+		fail("wrong kind of error on decrypting onto a short buffer,"
+		     "%s instead of GNUTLS_E_SHORT_MEMORY_BUFFER\n",
+		     gnutls_strerror_name(ret));
 
 	gnutls_aead_cipher_deinit(ch);
 
@@ -280,74 +414,56 @@ static void check_status(int status)
 	}
 }
 
+typedef void subtest(int algo);
+
+static void fork_subtest(subtest func, int algo) {
+	pid_t child;
+
+	child = fork();
+	if (child < 0) {
+		perror("fork");
+		fail("fork");
+		return;
+	}
+
+	if (child) {
+		int status;
+		/* parent */
+		wait(&status);
+		check_status(status);
+	} else {
+		func(algo);
+		exit(0);
+	}
+};
+
 static
 void start(const char *name, int algo, unsigned aead)
 {
-	pid_t child;
-
 	success("trying %s\n", name);
 
 	signal(SIGPIPE, SIG_IGN);
 
-	child = fork();
-	if (child < 0) {
-		perror("fork");
-		fail("fork");
-		return;
+	success("trying %s: test_cipher_happy\n", name);
+	fork_subtest(test_cipher_happy, algo);
+
+	if (!aead) {
+		success("trying %s: test_cipher_invalid_partial\n", name);
+		fork_subtest(test_cipher_invalid_partial, algo);
 	}
 
-	if (child) {
-		int status;
-		/* parent */
-		wait(&status);
-		check_status(status);
-	} else {
-		if (!aead)
-			test_cipher(algo);
-		else
-			test_aead_cipher1(algo);
-		exit(0);
-	}
+	if (aead) {
+		success("trying %s: test_aead_happy\n", name);
+		fork_subtest(test_aead_happy, algo);
 
-	if (!aead)
-		return;
+		success("trying %s: test_aead_invalid_add_auth\n", name);
+		fork_subtest(test_aead_invalid_add_auth, algo);
 
-	/* check test_aead_cipher2 */
+		success("trying %s: test_aead_invalid_partial_encrypt\n", name);
+		fork_subtest(test_aead_invalid_partial_encrypt, algo);
 
-	child = fork();
-	if (child < 0) {
-		perror("fork");
-		fail("fork");
-		return;
-	}
-
-	if (child) {
-		int status;
-		/* parent */
-		wait(&status);
-		check_status(status);
-	} else {
-		test_aead_cipher2(algo);
-		exit(0);
-	}
-
-	/* check test_aead_cipher3 */
-
-	child = fork();
-	if (child < 0) {
-		perror("fork");
-		fail("fork");
-		return;
-	}
-
-	if (child) {
-		int status;
-		/* parent */
-		wait(&status);
-		check_status(status);
-	} else {
-		test_aead_cipher3(algo);
-		exit(0);
+		success("trying %s: test_aead_invalid_short_decrypt\n", name);
+		fork_subtest(test_aead_invalid_short_decrypt, algo);
 	}
 }
 

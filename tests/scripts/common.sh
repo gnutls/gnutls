@@ -127,7 +127,7 @@ fail() {
 exit_if_non_x86()
 {
 	if (lscpu --version) >/dev/null 2>&1 && \
-	    ! lscpu 2>/dev/null | grep 'Architecture:[	]*x86' >/dev/null; then
+	    ! lscpu 2>/dev/null | grep 'Architecture:[	 ]*x86' >/dev/null; then
 		echo "non-x86 CPU detected"
 		exit
 	fi
@@ -136,7 +136,7 @@ exit_if_non_x86()
 exit_if_non_padlock()
 {
 	if (lscpu --version) >/dev/null 2>&1 && \
-	   ! lscpu 2>/dev/null | grep 'Flags:[	]*phe' >/dev/null; then
+	   ! lscpu 2>/dev/null | grep 'Flags:[	 ]*phe' >/dev/null; then
 		echo "non-Via padlock CPU detected"
 		exit
 	fi

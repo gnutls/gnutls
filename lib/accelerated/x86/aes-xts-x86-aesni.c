@@ -119,6 +119,9 @@ x86_aes_xts_encrypt(void *_ctx, const void *src, size_t src_size,
 {
 	struct x86_aes_xts_ctx *ctx = _ctx;
 
+	if (unlikely(dst_size < src_size))
+		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+
 	if (src_size < 16)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
@@ -132,6 +135,9 @@ x86_aes_xts_decrypt(void *_ctx, const void *src, size_t src_size,
 	    void *dst, size_t dst_size)
 {
 	struct x86_aes_xts_ctx *ctx = _ctx;
+
+	if (unlikely(dst_size < src_size))
+		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
 
 	if (src_size < 16)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
