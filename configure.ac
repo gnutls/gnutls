@@ -908,7 +908,7 @@ AC_ARG_WITH(tpm,
 	AS_HELP_STRING([--without-tpm],
 		[Disable TPM (trousers) support.]),
 		[with_tpm=$withval], [with_tpm=yes])
-if test "$with_tpm" != "no" && test "$with_tpm2" = "no"; then
+if test "$with_tpm" != "no"; then
     LIBS="$oldlibs -ltspi"
     AC_MSG_CHECKING([for tss library])
     AC_LINK_IFELSE([AC_LANG_PROGRAM([
