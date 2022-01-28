@@ -8,9 +8,10 @@
 1. Update of release date in [NEWS](NEWS), and bump of version number
    in [configure.ac](configure.ac) as well as soname numbers in
    [m4/hooks.m4](m4/hooks.m4).
-1. Remove the last section of [devel/libgnutls.abignore], update the
-   *.abi files under [devel/abi-dump] submodule, run `make
-   abi-dump-latest`, and push any changes to the [abi-dump
+1. Remove the last section of
+   [devel/libgnutls.abignore](devel/libgnutls.abignore), update the
+   *.abi files under [devel/abi-dump](devel/abi-dump) submodule, run
+   `make abi-dump-latest`, and push any changes to the [abi-dump
    repository]; then do `make abi-check`
 1. Create a tarball and detached GPG signature:
 ```console
