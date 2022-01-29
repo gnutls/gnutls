@@ -65,6 +65,24 @@ def get_chars(options) -> Mapping[str, Union[str, int]]:
     return chars
 
 
+# Reserved keywords in C, from 6.4.1 of N1570
+KEYWORDS = {
+    'auto', 'break', 'case', 'char', 'const', 'continue', 'default', 'do',
+    'double', 'else', 'enum', 'extern', 'float', 'for', 'goto', 'if', 'inline',
+    'int', 'long', 'register', 'restrict', 'return', 'short', 'signed',
+    'sizeof', 'static', 'struct', 'switch', 'typedef', 'union', 'unsigned',
+    'void', 'volatile', 'while', '_Alignas', '_Alignof', '_Atomic', '_Bool',
+    '_Complex', '_Generic', '_Imaginary', '_Noreturn', '_Static_assert',
+    '_Thread_local',
+}
+
+
+def escape_c_keyword(name: str) -> str:
+    while name in KEYWORDS:
+        name += '_'
+    return name
+
+
 def mangle(name: str) -> str:
     return ''.join([c if c in 'abcdefghijklmnopqrstuvwxyz0123456789_' else '_'
                     for c in name.lower()])
@@ -111,6 +129,7 @@ def gen_c(meta: Mapping[str, str],
         arg_type = option.get('arg-type')
         lower_opt = mangle(long_opt)
         upper_opt = lower_opt.upper()
+        lower_opt = escape_c_keyword(lower_opt)
 
         # aliases are handled differently
         if 'aliases' in option:
@@ -487,6 +506,7 @@ def gen_h(meta: Mapping[str, str],
         arg_type = option.get('arg-type')
         lower_opt = mangle(long_opt)
         upper_opt = lower_opt.upper()
+        lower_opt = escape_c_keyword(lower_opt)
 
         # aliases are handled differently
         if 'aliases' in option:
