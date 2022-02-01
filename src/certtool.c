@@ -206,8 +206,12 @@ generate_private_key_int(common_info_st * cinfo)
 			"Note that DSA keys with size over 1024 may cause incompatibility problems when used with earlier than TLS 1.2 versions.\n\n");
 
 	if ((HAVE_OPT(SEED) || provable) && GNUTLS_PK_IS_RSA(key_type)) {
-		if (bits != 2048 && bits != 3072) {
-			fprintf(stderr, "Note that the FIPS 186-4 key generation restricts keys to 2048 and 3072 bits\n");
+		/* Keep in sync with seed_length_for_modulus_size in
+		 * lib/nettle/int/rsa-keygen-fips186.c. */
+		if (bits != 2048 && bits != 3072 && bits != 4096 &&
+		    bits != 6144 && bits != 7680 && bits != 8192 &&
+		    bits != 15360) {
+			fprintf(stderr, "Note that the FIPS 186-4 key generation restricts keys to be of known lengths (2048, 3072, etc)\n");
 		}
 	}
 
@@ -225,7 +229,15 @@ generate_private_key_int(common_info_st * cinfo)
 		kdata[kdata_size++].size = cinfo->seed_size;
 
 		if (GNUTLS_PK_IS_RSA(key_type)) {
-			if ((bits == 3072 && cinfo->seed_size != 32) || (bits == 2048 && cinfo->seed_size != 28)) {
+			/* Keep in sync with seed_length_for_modulus_size in
+			 * lib/nettle/int/rsa-keygen-fips186.c. */
+			if ((bits == 2048 && cinfo->seed_size != 28) ||
+			    (bits == 3072 && cinfo->seed_size != 32) ||
+			    (bits == 4096 && cinfo->seed_size != 38) ||
+			    (bits == 6144 && cinfo->seed_size != 44) ||
+			    (bits == 7680 && cinfo->seed_size != 48) ||
+			    (bits == 8192 && cinfo->seed_size != 50) ||
+			    (bits == 15360 && cinfo->seed_size != 64)) {
 				fprintf(stderr, "The seed size (%d) doesn't match the size of the request security level; use -d 2 for more information.\n", (int)cinfo->seed_size);
 			}
 		} else if (key_type == GNUTLS_PK_DSA) {
