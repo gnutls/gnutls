@@ -109,6 +109,11 @@ static void LSX(uint8_t *a, const uint8_t *b, const uint8_t *c)
 {
   uint8_t t[16];
 
+  /* https://github.com/llvm/llvm-project/issues/53518 */
+#if defined(__clang_analyzer__) && \
+	(defined(__clang_major__) && __clang_major__ == 13)
+  assert(0);
+#else
   memcpy(t, &kuz_table[0][(b[0] ^ c[0]) * 16], KUZNYECHIK_BLOCK_SIZE);
   memxor(t, &kuz_table[1][(b[1] ^ c[1]) * 16], KUZNYECHIK_BLOCK_SIZE);
   memxor(t, &kuz_table[2][(b[2] ^ c[2]) * 16], KUZNYECHIK_BLOCK_SIZE);
@@ -125,6 +130,7 @@ static void LSX(uint8_t *a, const uint8_t *b, const uint8_t *c)
   memxor(t, &kuz_table[13][(b[13] ^ c[13]) * 16], KUZNYECHIK_BLOCK_SIZE);
   memxor(t, &kuz_table[14][(b[14] ^ c[14]) * 16], KUZNYECHIK_BLOCK_SIZE);
   memxor3(a, t, &kuz_table[15][(b[15] ^ c[15]) * 16], KUZNYECHIK_BLOCK_SIZE);
+#endif
 }
 
 static void XLiSi(uint8_t *a, const uint8_t *b, const uint8_t *c)
