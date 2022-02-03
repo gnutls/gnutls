@@ -27,6 +27,7 @@
 #include "config.h"
 #endif
 
+#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -248,6 +249,33 @@ cleanup:
 	return ret;
 }
 
+/* Return the pre-defined seed length for modulus size, or 0 when the
+ * modulus size is unsupported.
+ */
+static inline unsigned
+seed_length_for_modulus_size(unsigned modulus_size)
+{
+	switch (modulus_size) {
+	case 2048:      /* SP 800-56B rev 2 Appendix D and FIPS 140-2 IG 7.5 */
+		return 14 * 2;
+	case 3072:      /* SP 800-56B rev 2 Appendix D and FIPS 140-2 IG 7.5 */
+		return 16 * 2;
+	case 4096:      /* SP 800-56B rev 2 Appendix D */
+		return 19 * 2;
+	case 6144:      /* SP 800-56B rev 2 Appendix D */
+		return 22 * 2;
+	case 7680:      /* FIPS 140-2 IG 7.5 */
+		return 24 * 2;
+	case 8192:      /* SP 800-56B rev 2 Appendix D */
+		return 25 * 2;
+	case 15360:     /* FIPS 140-2 IG 7.5 */
+		return 32 * 2;
+	default:
+		return 0;
+	}
+
+}
+
 /* This generates p,q params using the B.3.2.2 algorithm in FIPS 186-4.
  * 
  * The hash function used is SHA384.
@@ -266,32 +294,14 @@ _rsa_generate_fips186_4_keypair(struct rsa_public_key *pub,
 	int ret;
 	struct dss_params_validation_seeds cert;
 	unsigned l = n_size / 2;
+	unsigned s = seed_length_for_modulus_size(n_size);
 
-	switch (n_size) {
-	case 2048:      /* SP 800-56B rev 2 Appendix D and FIPS 140-2 IG 7.5 */
-		FIPS_RULE(seed_length != 14 * 2, 0, "seed length other than 28 bytes\n");
-		break;
-	case 3072:      /* SP 800-56B rev 2 Appendix D and FIPS 140-2 IG 7.5 */
-		FIPS_RULE(seed_length != 16 * 2, 0, "seed length other than 32 bytes\n");
-		break;
-	case 4096:      /* SP 800-56B rev 2 Appendix D */
-		FIPS_RULE(seed_length != 19 * 2, 0, "seed length other than 38 bytes\n");
-		break;
-	case 6144:      /* SP 800-56B rev 2 Appendix D */
-		FIPS_RULE(seed_length != 22 * 2, 0, "seed length other than 44 bytes\n");
-		break;
-	case 7680:      /* FIPS 140-2 IG 7.5 */
-		FIPS_RULE(seed_length != 24 * 2, 0, "seed length other than 48 bytes\n");
-		break;
-	case 8192:      /* SP 800-56B rev 2 Appendix D */
-		FIPS_RULE(seed_length != 25 * 2, 0, "seed length other than 50 bytes\n");
-		break;
-	case 15360:     /* FIPS 140-2 IG 7.5 */
-		FIPS_RULE(seed_length != 32 * 2, 0, "seed length other than 64 bytes\n");
-		break;
-	default:
+	if (!s) {
 		FIPS_RULE(false, 0, "unsupported modulus size\n");
 	}
+
+	FIPS_RULE(seed_length != s, 0,
+		  "seed length other than %u bytes\n", s);
 
 	if (!mpz_tstbit(pub->e, 0)) {
 		_gnutls_debug_log("Unacceptable e (it is even)\n");
@@ -405,10 +415,6 @@ _rsa_generate_fips186_4_keypair(struct rsa_public_key *pub,
 	return ret;
 }
 
-/* Not entirely accurate but a good precision
- */
-#define SEED_LENGTH(bits) (_gnutls_pk_bits_to_subgroup_bits(bits)/8)
-
 /* This generates p,q params using the B.3.2.2 algorithm in FIPS 186-4.
  * 
  * The hash function used is SHA384.
@@ -429,11 +435,10 @@ rsa_generate_fips186_4_keypair(struct rsa_public_key *pub,
 	unsigned seed_length;
 	int ret;
 
-	FIPS_RULE(n_size != 2048 && n_size != 3072, 0, "size of prime of other than 2048 or 3072\n");
+	seed_length = seed_length_for_modulus_size(n_size);
+	FIPS_RULE(!seed_length, 0, "unsupported modulus size\n");
 
-	seed_length = SEED_LENGTH(n_size);
-	if (seed_length > sizeof(seed))
-		return 0;
+	assert(seed_length <= sizeof(seed));
 
 	random(random_ctx, seed_length, seed);
 
