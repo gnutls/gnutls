@@ -70,6 +70,29 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "|<%d>| %s", level, str);
 }
 
+#define FIPS_PUSH_CONTEXT() do {					\
+	if (gnutls_fips140_mode_enabled()) {				\
+		ret = gnutls_fips140_push_context(fips_context);	\
+		if (ret < 0) {						\
+			fail("gnutls_fips140_push_context failed\n");	\
+		}							\
+	}								\
+} while (0)
+
+#define FIPS_POP_CONTEXT(state) do {					\
+	if (gnutls_fips140_mode_enabled()) {				\
+		ret = gnutls_fips140_pop_context();			\
+		if (ret < 0) {						\
+			fail("gnutls_fips140_context_pop failed\n");	\
+		}							\
+		fips_state = gnutls_fips140_get_operation_state(fips_context); \
+		if (fips_state != GNUTLS_FIPS140_OP_ ## state) {	\
+			fail("operation state is not " # state " (%d)\n", \
+			     fips_state);				\
+		}							\
+	}								\
+} while (0)
+
 void doit(void)
 {
 	gnutls_pkcs12_t pkcs12;
@@ -82,6 +105,8 @@ void doit(void)
 	char outbuf[10240];
 	size_t size;
 	unsigned tests, i;
+	gnutls_fips140_context_t fips_context;
+	gnutls_fips140_operation_state_t fips_state;
 
 	ret = global_init();
 	if (ret < 0) {
@@ -92,6 +117,11 @@ void doit(void)
 	gnutls_global_set_log_function(tls_log_func);
 	if (debug)
 		gnutls_global_set_log_level(4711);
+
+	ret = gnutls_fips140_context_init(&fips_context);
+	if (ret < 0) {
+		fail("Cannot initialize FIPS context\n");
+	}
 
 	/* Read certs. */
 	ret = gnutls_x509_crt_init(&client);
@@ -196,6 +226,8 @@ void doit(void)
 		gnutls_pkcs12_bag_deinit(bag);
 	}
 
+	FIPS_PUSH_CONTEXT();
+
 	/* MAC the structure, export and print. */
 	ret = gnutls_pkcs12_generate_mac2(pkcs12, GNUTLS_MAC_SHA1, "pass");
 	if (ret < 0) {
@@ -203,11 +235,19 @@ void doit(void)
 		exit(1);
 	}
 
+	FIPS_POP_CONTEXT(NOT_APPROVED);
+
+	FIPS_PUSH_CONTEXT();
+
 	ret = gnutls_pkcs12_verify_mac(pkcs12, "pass");
 	if (ret < 0) {
 		fprintf(stderr, "verify_mac: %s (%d)\n", gnutls_strerror(ret), ret);
 		exit(1);
 	}
+
+	FIPS_POP_CONTEXT(NOT_APPROVED);
+
+	FIPS_PUSH_CONTEXT();
 
 	ret = gnutls_pkcs12_generate_mac2(pkcs12, GNUTLS_MAC_SHA256, "passwd");
 	if (ret < 0) {
@@ -215,11 +255,19 @@ void doit(void)
 		exit(1);
 	}
 
+	FIPS_POP_CONTEXT(NOT_APPROVED);
+
+	FIPS_PUSH_CONTEXT();
+
 	ret = gnutls_pkcs12_verify_mac(pkcs12, "passwd");
 	if (ret < 0) {
 		fprintf(stderr, "verify_mac2: %s (%d)\n", gnutls_strerror(ret), ret);
 		exit(1);
 	}
+
+	FIPS_POP_CONTEXT(NOT_APPROVED);
+
+	FIPS_PUSH_CONTEXT();
 
 	ret = gnutls_pkcs12_generate_mac2(pkcs12, GNUTLS_MAC_SHA512, "passwd1");
 	if (ret < 0) {
@@ -227,11 +275,19 @@ void doit(void)
 		exit(1);
 	}
 
+	FIPS_POP_CONTEXT(NOT_APPROVED);
+
+	FIPS_PUSH_CONTEXT();
+
 	ret = gnutls_pkcs12_verify_mac(pkcs12, "passwd1");
 	if (ret < 0) {
 		fprintf(stderr, "verify_mac2: %s (%d)\n", gnutls_strerror(ret), ret);
 		exit(1);
 	}
+
+	FIPS_POP_CONTEXT(NOT_APPROVED);
+
+	FIPS_PUSH_CONTEXT();
 
 	size = sizeof(outbuf);
 	ret =
@@ -242,10 +298,13 @@ void doit(void)
 		exit(1);
 	}
 
+	FIPS_POP_CONTEXT(NOT_APPROVED);
+
 	if (debug)
 		fwrite(outbuf, size, 1, stdout);
 
 	/* Cleanup. */
+	gnutls_fips140_context_deinit(fips_context);
 	gnutls_pkcs12_deinit(pkcs12);
 	gnutls_x509_crt_deinit(client);
 	gnutls_x509_crt_deinit(ca);

@@ -286,13 +286,26 @@ gnutls_pkcs12_export(gnutls_pkcs12_t pkcs12,
 		     gnutls_x509_crt_fmt_t format, void *output_data,
 		     size_t * output_data_size)
 {
+	int ret;
+
 	if (pkcs12 == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	return _gnutls_x509_export_int(pkcs12->pkcs12, format, PEM_PKCS12,
-				       output_data, output_data_size);
+	ret = _gnutls_x509_export_int(pkcs12->pkcs12, format, PEM_PKCS12,
+				      output_data, output_data_size);
+
+	if (ret < 0) {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
+	} else {
+		/* PKCS#12 export is always non-approved, because the MAC
+		 * calculation involves non-approved KDF (PKCS#12 KDF) and
+		 * without MAC the protection is insufficient.
+		 */
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_NOT_APPROVED);
+	}
+	return ret;
 }
 
 /**
@@ -317,13 +330,25 @@ int
 gnutls_pkcs12_export2(gnutls_pkcs12_t pkcs12,
 		      gnutls_x509_crt_fmt_t format, gnutls_datum_t * out)
 {
+	int ret;
+
 	if (pkcs12 == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	return _gnutls_x509_export_int2(pkcs12->pkcs12, format, PEM_PKCS12,
-					out);
+	ret = _gnutls_x509_export_int2(pkcs12->pkcs12, format, PEM_PKCS12,
+				       out);
+	if (ret < 0) {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
+	} else {
+		/* PKCS#12 export is always non-approved, because the MAC
+		 * calculation involves non-approved KDF (PKCS#12 KDF) and
+		 * without MAC the protection is insufficient.
+		 */
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_NOT_APPROVED);
+	}
+	return ret;
 }
 
 static int oid2bag(const char *oid)
@@ -1025,9 +1050,12 @@ int gnutls_pkcs12_generate_mac2(gnutls_pkcs12_t pkcs12, gnutls_mac_algorithm_t m
 		goto cleanup;
 	}
 
+	/* _gnutls_pkcs12_string_to_key is not a FIPS approved operation */
+	_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_NOT_APPROVED);
 	return 0;
 
       cleanup:
+	_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 	_gnutls_free_datum(&tmp);
 	return result;
 }
@@ -1203,8 +1231,11 @@ pkcs12_try_gost:
 		goto cleanup;
 	}
 
+	/* _gnutls_pkcs12_string_to_key is not a FIPS approved operation */
+	_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_NOT_APPROVED);
 	result = 0;
  cleanup:
+	_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 	_gnutls_free_datum(&tmp);
 	_gnutls_free_datum(&salt);
 	return result;
