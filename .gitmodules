@@ -22,3 +22,6 @@
 [submodule "devel/abi-dump"]
 	path = devel/abi-dump
 	url = https://gitlab.com/gnutls/abi-dump.git
+[submodule "devel/cligen"]
+	path = devel/cligen
+	url = https://gitlab.com/gnutls/cligen.git

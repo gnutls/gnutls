@@ -540,8 +540,6 @@ fedora-static-analyzers/test:
     paths:
       - cache/cppcheck
   script:
-    - MYPYPATH=$PWD/python mypy python/*.py doc/scripts/*.py src/*.py
-    - flake8 python/*.py doc/scripts/*.py src/*.py
     - mkdir -p cache/cppcheck
     - cppcheck --cppcheck-build-dir=cache/cppcheck --force -q -Ilib/includes -Igl/ -Ilib/ -I. --error-exitcode=1 lib/ -i lib/unistring -i lib/minitasn1 -i lib/nettle/backport -i lib/nettle/ecc -j2 $CPPCHECK_OPTIONS
     - cppcheck --cppcheck-build-dir=cache/cppcheck --force -q -Ilib/includes -Igl/ -Ilibdane/ -I. --error-exitcode=1 libdane/ -j2 $CPPCHECK_OPTIONS

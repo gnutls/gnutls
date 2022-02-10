@@ -40,14 +40,23 @@ endif
 
 -include $(top_srcdir)/doc/doc.mk
 
+CLIGEN_ARGS = \
+	--bug-email bugs@gnutls.org \
+	--copyright-year 2000-2021 \
+	--copyright-holder 'Free Software Foundation, and others' \
+	--license gpl3+ \
+	--package '$(PACKAGE)' \
+	--version '$(VERSION)'
+
 INVOKE_GNUTLS_CLI_TEXI_DEPS = gnutls-cli-see-also.texi gnutls-cli-examples.texi
 EXTRA_DIST += $(INVOKE_GNUTLS_CLI_TEXI_DEPS)
 invoke-gnutls-cli.texi: $(INVOKE_GNUTLS_CLI_TEXI_DEPS)
 invoke-gnutls-cli.texi: $(top_srcdir)/src/gnutls-cli-options.json
 	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(srcdir)/scripts/gen-cmd-texi.py \
-		--see-also $(srcdir)/gnutls-cli-see-also.texi \
-		--examples $(srcdir)/gnutls-cli-examples.texi \
+		$(PYTHON) $(top_srcdir)/python/cli-docgen.py \
+		--format texi $(CLIGEN_ARGS) \
+		--include see-also=$(srcdir)/gnutls-cli-see-also.texi \
+		--include examples=$(srcdir)/gnutls-cli-examples.texi \
 		$< $@
 
 INVOKE_GNUTLS_CLI_DEBUG_TEXI_DEPS = gnutls-cli-debug-see-also.texi gnutls-cli-debug-examples.texi
@@ -55,9 +64,10 @@ EXTRA_DIST += $(INVOKE_GNUTLS_CLI_DEBUG_TEXI_DEPS)
 invoke-gnutls-cli-debug.texi: $(INVOKE_GNUTLS_CLI_DEBUG_TEXI_DEPS)
 invoke-gnutls-cli-debug.texi: $(top_srcdir)/src/gnutls-cli-debug-options.json
 	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(srcdir)/scripts/gen-cmd-texi.py \
-		--see-also $(srcdir)/gnutls-cli-debug-see-also.texi \
-		--examples $(srcdir)/gnutls-cli-debug-examples.texi \
+		$(PYTHON) $(top_srcdir)/python/cli-docgen.py \
+		--format texi $(CLIGEN_ARGS) \
+		--include see-also=$(srcdir)/gnutls-cli-debug-see-also.texi \
+		--include examples=$(srcdir)/gnutls-cli-debug-examples.texi \
 		$< $@
 
 INVOKE_GNUTLS_SERV_TEXI_DEPS = gnutls-serv-see-also.texi gnutls-serv-examples.texi
@@ -65,9 +75,10 @@ EXTRA_DIST += $(INVOKE_GNUTLS_SERV_TEXI_DEPS)
 invoke-gnutls-serv.texi: $(INVOKE_GNUTLS_SERV_TEXI_DEPS)
 invoke-gnutls-serv.texi: $(top_srcdir)/src/gnutls-serv-options.json
 	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(srcdir)/scripts/gen-cmd-texi.py \
-		--see-also $(srcdir)/gnutls-serv-see-also.texi \
-		--examples $(srcdir)/gnutls-serv-examples.texi \
+		$(PYTHON) $(top_srcdir)/python/cli-docgen.py \
+		--format texi $(CLIGEN_ARGS) \
+		--include see-also=$(srcdir)/gnutls-serv-see-also.texi \
+		--include examples=$(srcdir)/gnutls-serv-examples.texi \
 		$< $@
 
 INVOKE_CERTTOOL_TEXI_DEPS = certtool-see-also.texi certtool-examples.texi certtool-files.texi
@@ -75,10 +86,11 @@ EXTRA_DIST += $(INVOKE_CERTTOOL_TEXI_DEPS)
 invoke-certtool.texi: $(INVOKE_CERTTOOL_TEXI_DEPS)
 invoke-certtool.texi: $(top_srcdir)/src/certtool-options.json
 	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(srcdir)/scripts/gen-cmd-texi.py \
-		--see-also $(srcdir)/certtool-see-also.texi \
-		--examples $(srcdir)/certtool-examples.texi \
-		--files $(srcdir)/certtool-files.texi \
+		$(PYTHON) $(top_srcdir)/python/cli-docgen.py \
+		--format texi $(CLIGEN_ARGS) \
+		--include see-also=$(srcdir)/certtool-see-also.texi \
+		--include examples=$(srcdir)/certtool-examples.texi \
+		--include files=$(srcdir)/certtool-files.texi \
 		--level 1 \
 		--section-node \
 		$< $@
@@ -88,10 +100,11 @@ EXTRA_DIST += $(INVOKE_OCSPTOOL_TEXI_DEPS)
 invoke-ocsptool.texi: $(INVOKE_OCSPTOOL_TEXI_DEPS)
 invoke-ocsptool.texi: $(top_srcdir)/src/ocsptool-options.json
 	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(srcdir)/scripts/gen-cmd-texi.py \
-		--see-also $(srcdir)/ocsptool-see-also.texi \
-		--examples $(srcdir)/ocsptool-examples.texi \
-		--description $(srcdir)/ocsptool-description.texi \
+		$(PYTHON) $(top_srcdir)/python/cli-docgen.py \
+		--format texi $(CLIGEN_ARGS) \
+		--include see-also=$(srcdir)/ocsptool-see-also.texi \
+		--include examples=$(srcdir)/ocsptool-examples.texi \
+		--include description=$(srcdir)/ocsptool-description.texi \
 		--level 1 \
 		--section-node \
 		$< $@
@@ -101,9 +114,10 @@ EXTRA_DIST += $(INVOKE_DANETOOL_TEXI_DEPS)
 invoke-danetool.texi: $(INVOKE_DANETOOL_TEXI_DEPS)
 invoke-danetool.texi: $(top_srcdir)/src/danetool-options.json
 	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(srcdir)/scripts/gen-cmd-texi.py \
-		--see-also $(srcdir)/danetool-see-also.texi \
-		--examples $(srcdir)/danetool-examples.texi \
+		$(PYTHON) $(top_srcdir)/python/cli-docgen.py \
+		--format texi $(CLIGEN_ARGS) \
+		--include see-also=$(srcdir)/danetool-see-also.texi \
+		--include examples=$(srcdir)/danetool-examples.texi \
 		--level 1 \
 		--section-node \
 		$< $@
@@ -113,9 +127,10 @@ EXTRA_DIST += $(INVOKE_SRPTOOL_TEXI_DEPS)
 invoke-srptool.texi: $(INVOKE_SRPTOOL_TEXI_DEPS)
 invoke-srptool.texi: $(top_srcdir)/src/srptool-options.json
 	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(srcdir)/scripts/gen-cmd-texi.py \
-		--see-also $(srcdir)/srptool-see-also.texi \
-		--examples $(srcdir)/srptool-examples.texi \
+		$(PYTHON) $(top_srcdir)/python/cli-docgen.py \
+		--format texi $(CLIGEN_ARGS) \
+		--include see-also=$(srcdir)/srptool-see-also.texi \
+		--include examples=$(srcdir)/srptool-examples.texi \
 		--level 2 \
 		--section-node \
 		$< $@
@@ -125,9 +140,10 @@ EXTRA_DIST += $(INVOKE_PSKTOOL_TEXI_DEPS)
 invoke-psktool.texi: $(INVOKE_PSKTOOL_TEXI_DEPS)
 invoke-psktool.texi: $(top_srcdir)/src/psktool-options.json
 	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(srcdir)/scripts/gen-cmd-texi.py \
-		--see-also $(srcdir)/psktool-see-also.texi \
-		--examples $(srcdir)/psktool-examples.texi \
+		$(PYTHON) $(top_srcdir)/python/cli-docgen.py \
+		--format texi $(CLIGEN_ARGS) \
+		--include see-also=$(srcdir)/psktool-see-also.texi \
+		--include examples=$(srcdir)/psktool-examples.texi \
 		--level 2 \
 		--section-node \
 		$< $@
@@ -137,9 +153,10 @@ EXTRA_DIST += $(INVOKE_P11TOOL_TEXI_DEPS)
 invoke-p11tool.texi: $(INVOKE_P11TOOL_TEXI_DEPS)
 invoke-p11tool.texi: $(top_srcdir)/src/p11tool-options.json
 	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(srcdir)/scripts/gen-cmd-texi.py \
-		--see-also $(srcdir)/p11tool-see-also.texi \
-		--examples $(srcdir)/p11tool-examples.texi \
+		$(PYTHON) $(top_srcdir)/python/cli-docgen.py \
+		--format texi $(CLIGEN_ARGS) \
+		--include see-also=$(srcdir)/p11tool-see-also.texi \
+		--include examples=$(srcdir)/p11tool-examples.texi \
 		--level 1 \
 		--section-node \
 		$< $@
@@ -149,9 +166,10 @@ EXTRA_DIST += $(INVOKE_TPMTOOL_TEXI_DEPS)
 invoke-tpmtool.texi: $(INVOKE_TPMTOOL_TEXI_DEPS)
 invoke-tpmtool.texi: $(top_srcdir)/src/tpmtool-options.json
 	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(srcdir)/scripts/gen-cmd-texi.py \
-		--see-also $(srcdir)/tpmtool-see-also.texi \
-		--examples $(srcdir)/tpmtool-examples.texi \
+		$(PYTHON) $(top_srcdir)/python/cli-docgen.py \
+		--format texi $(CLIGEN_ARGS) \
+		--include see-also=$(srcdir)/tpmtool-see-also.texi \
+		--include examples=$(srcdir)/tpmtool-examples.texi \
 		--level 1 \
 		--section-node \
 		$< $@
@@ -172,7 +190,7 @@ AUTOGENED_DOC = invoke-gnutls-cli.texi invoke-gnutls-cli-debug.texi \
 	invoke-ocsptool.texi invoke-psktool.texi invoke-p11tool.texi \
 	invoke-tpmtool.texi invoke-danetool.texi
 
-$(AUTOGENED_DOC): $(srcdir)/scripts/gen-cmd-texi.py
+$(AUTOGENED_DOC): $(top_srcdir)/python/cli-docgen.py
 
 gnutls_TEXINFOS += stamp_functions
 

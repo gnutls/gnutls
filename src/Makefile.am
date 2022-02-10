@@ -42,7 +42,7 @@ OPTIONS_STAMP = \
 
 BUILT_SOURCES = $(OPTIONS_BUILT)
 
-EXTRA_DIST = gen-mech-list.sh gen-getopt.py $(OPTIONS_JSON) $(OPTIONS_BUILT) $(OPTIONS_STAMP)
+EXTRA_DIST = gen-mech-list.sh $(OPTIONS_JSON) $(OPTIONS_BUILT) $(OPTIONS_STAMP)
 
 MAINTAINERCLEANFILES = $(OPTIONS_BUILT) $(OPTIONS_STAMP)
 
@@ -236,19 +236,25 @@ dumpcfg_LDADD = ../gl/libgnu.la gl/libgnu_gpl.la
 
 SUFFIXES = .stamp .json
 
-OPTIONS_STAMP: $(srcdir)/gen-getopt.py
+OPTIONS_STAMP: $(top_srcdir)/python/cli-codegen.py
+
+CLIGEN_ARGS = \
+	--bug-email bugs@gnutls.org \
+	--copyright-year 2000-2021 \
+	--copyright-holder 'Free Software Foundation, and others' \
+	--license gpl3+ \
+	--package '$(PACKAGE)' \
+	--version '$(VERSION)'
 
 .json.stamp:
 	$(AM_V_GEN) { \
 		b=`echo $@ | sed 's/.stamp$$//'`; \
 		PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(srcdir)/gen-getopt.py \
-		--bug-email bugs@gnutls.org \
-		--copyright-year 2000-2021 \
-		--copyright-holder 'Free Software Foundation, and others' \
-		--license gpl3+ \
-		--version '$(VERSION)' $< \
-			$${b}.c $${b}.h; \
+		$(PYTHON) $(top_srcdir)/python/cli-codegen.py $(CLIGEN_ARGS) \
+			$< $${b}.c $${b}.h; \
+		echo "#define optionProcess(a,b,c) process_options(b,c)" >> $${b}.h; \
+		echo "#define STACKCT_OPT OPTS_COUNT" >> $${b}.h; \
+		echo "#define STACKLST_OPT OPTS_ARRAY" >> $${b}.h; \
 	} && \
 	touch $@
 
