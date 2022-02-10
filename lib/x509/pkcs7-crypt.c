@@ -1130,8 +1130,7 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, asn1_node pkcs8_asn,
 	gnutls_datum_t enc = { NULL, 0 };
 	uint8_t *key = NULL;
 	gnutls_datum_t dkey, d_iv;
-	cipher_hd_st ch;
-	int ch_init = 0;
+	gnutls_cipher_hd_t ch = NULL;
 	int key_size, ret;
 	unsigned int pass_len = 0;
 	const struct pkcs_cipher_schema_st *p;
@@ -1237,8 +1236,7 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, asn1_node pkcs8_asn,
 	d_iv.data = (uint8_t *) enc_params->iv;
 	d_iv.size = enc_params->iv_size;
 
-	ret =
-	    _gnutls_cipher_init(&ch, ce, &dkey, &d_iv, 0);
+	ret = gnutls_cipher_init(&ch, ce->id, &dkey, &d_iv);
 
 	gnutls_free(key);
 
@@ -1247,9 +1245,7 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, asn1_node pkcs8_asn,
 		goto error;
 	}
 
-	ch_init = 1;
-
-	ret = _gnutls_cipher_decrypt(&ch, enc.data, enc.size);
+	ret = gnutls_cipher_decrypt(ch, enc.data, enc.size);
 	if (ret < 0) {
 		gnutls_assert();
 		ret = GNUTLS_E_DECRYPTION_FAILED;
@@ -1281,7 +1277,7 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, asn1_node pkcs8_asn,
 		decrypted_data->size = enc.size;
 	}
 
-	_gnutls_cipher_deinit(&ch);
+	gnutls_cipher_deinit(ch);
 
 	ret = 0;
 
@@ -1294,8 +1290,9 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, asn1_node pkcs8_asn,
 	gnutls_free(password);
 	gnutls_free(enc.data);
 	gnutls_free(key);
-	if (ch_init != 0)
-		_gnutls_cipher_deinit(&ch);
+	if (ch) {
+		gnutls_cipher_deinit(ch);
+	}
 	return ret;
 }
 
@@ -1725,8 +1722,7 @@ _gnutls_pkcs_raw_encrypt_data(const gnutls_datum_t * plain,
 	int data_size;
 	uint8_t *data = NULL;
 	gnutls_datum_t d_iv;
-	cipher_hd_st ch;
-	int ch_init = 0;
+	gnutls_cipher_hd_t ch = NULL;
 	uint8_t pad, pad_size;
 	const cipher_entry_st *ce;
 
@@ -1756,18 +1752,13 @@ _gnutls_pkcs_raw_encrypt_data(const gnutls_datum_t * plain,
 
 	d_iv.data = (uint8_t *) enc_params->iv;
 	d_iv.size = enc_params->iv_size;
-	result =
-	    _gnutls_cipher_init(&ch, cipher_to_entry(enc_params->cipher),
-				key, &d_iv, 1);
-
+	result = gnutls_cipher_init(&ch, enc_params->cipher, key, &d_iv);
 	if (result < 0) {
 		gnutls_assert();
 		goto error;
 	}
 
-	ch_init = 1;
-
-	result = _gnutls_cipher_encrypt(&ch, data, data_size);
+	result = gnutls_cipher_encrypt(ch, data, data_size);
 	if (result < 0) {
 		gnutls_assert();
 		goto error;
@@ -1776,13 +1767,14 @@ _gnutls_pkcs_raw_encrypt_data(const gnutls_datum_t * plain,
 	encrypted->data = data;
 	encrypted->size = data_size;
 
-	_gnutls_cipher_deinit(&ch);
+	gnutls_cipher_deinit(ch);
 
 	return 0;
 
  error:
 	gnutls_free(data);
-	if (ch_init != 0)
-		_gnutls_cipher_deinit(&ch);
+	if (ch) {
+		gnutls_cipher_deinit(ch);
+	}
 	return result;
 }

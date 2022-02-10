@@ -104,9 +104,17 @@ void doit(void)
 	int ret, indx;
 	char outbuf[10240];
 	size_t size;
-	unsigned tests, i;
+	unsigned i;
 	gnutls_fips140_context_t fips_context;
 	gnutls_fips140_operation_state_t fips_state;
+	size_t n_tests = 0;
+	struct tests {
+		const char *name;
+		gnutls_x509_crt_t crt;
+		const char *friendly_name;
+		unsigned bag_encrypt_flags;
+		int bag_encrypt_expected;
+	} tests[2];
 
 	ret = global_init();
 	if (ret < 0) {
@@ -157,21 +165,34 @@ void doit(void)
 		exit(1);
 	}
 
-	/* Generate and add PKCS#12 cert bags. */
-	if (!gnutls_fips140_mode_enabled()) {
-		tests = 2; /* include RC2 */
-	} else {
-		tests = 1;
-	}
+	tests[n_tests].name = "3DES";
+	tests[n_tests].crt = client;
+	tests[n_tests].friendly_name = "client";
+	tests[n_tests].bag_encrypt_flags = GNUTLS_PKCS8_USE_PKCS12_3DES;
+	tests[n_tests].bag_encrypt_expected = 0;
+	n_tests++;
 
-	for (i = 0; i < tests; i++) {
+	tests[n_tests].name = "RC2-40";
+	tests[n_tests].crt = ca;
+	tests[n_tests].friendly_name = "ca";
+	tests[n_tests].bag_encrypt_flags = GNUTLS_PKCS_USE_PKCS12_RC2_40;
+	if (gnutls_fips140_mode_enabled()) {
+		tests[n_tests].bag_encrypt_expected =
+			GNUTLS_E_UNWANTED_ALGORITHM;
+	} else {
+		tests[n_tests].bag_encrypt_expected = 0;
+	}
+	n_tests++;
+
+	/* Generate and add PKCS#12 cert bags. */
+	for (i = 0; i < n_tests; i++) {
 		ret = gnutls_pkcs12_bag_init(&bag);
 		if (ret < 0) {
 			fprintf(stderr, "bag_init: %s (%d)\n", gnutls_strerror(ret), ret);
 			exit(1);
 		}
 
-		ret = gnutls_pkcs12_bag_set_crt(bag, i == 0 ? client : ca);
+		ret = gnutls_pkcs12_bag_set_crt(bag, tests[i].crt);
 		if (ret < 0) {
 			fprintf(stderr, "set_crt: %s (%d)\n", gnutls_strerror(ret), ret);
 			exit(1);
@@ -180,16 +201,14 @@ void doit(void)
 		indx = ret;
 
 		ret = gnutls_pkcs12_bag_set_friendly_name(bag, indx,
-							  i ==
-							  0 ? "client" :
-							  "ca");
+							  tests[i].friendly_name);
 		if (ret < 0) {
 			fprintf(stderr, "set_friendly_name: %s (%d)\n", gnutls_strerror(ret), ret);
 			exit(1);
 		}
 
 		size = sizeof(key_id_buf);
-		ret = gnutls_x509_crt_get_key_id(i == 0 ? client : ca, 0,
+		ret = gnutls_x509_crt_get_key_id(tests[i].crt, 0,
 						 key_id_buf, &size);
 		if (ret < 0) {
 			fprintf(stderr, "get_key_id: %s (%d)\n", gnutls_strerror(ret), ret);
@@ -206,14 +225,11 @@ void doit(void)
 		}
 
 		ret = gnutls_pkcs12_bag_encrypt(bag, "pass",
-						i ==
-						0 ?
-						GNUTLS_PKCS8_USE_PKCS12_3DES
-						:
-						GNUTLS_PKCS_USE_PKCS12_RC2_40);
-		if (ret < 0) {
-			fprintf(stderr, "bag_encrypt: %d: %s", ret,
-				i == 0 ? "3DES" : "RC2-40");
+						tests[i].bag_encrypt_flags);
+		if (ret != tests[i].bag_encrypt_expected) {
+			fprintf(stderr, "bag_encrypt: returned %d, expected %d: %s", ret,
+				tests[i].bag_encrypt_expected,
+				tests[i].name);
 			exit(1);
 		}
 
