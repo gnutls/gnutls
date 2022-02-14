@@ -1159,9 +1159,6 @@ cfg_apply(struct cfg *cfg, struct ini_ctx *ctx)
 	}
 
 	if (cfg->allowlisting) {
-		unsigned tls_sig_sem = 0;
-		size_t j;
-
 		_gnutls_digest_mark_insecure_all();
 		for (i = 0; i < ctx->hashes_size; i++) {
 			int ret = gnutls_digest_set_secure(ctx->hashes[i], 1);
@@ -1175,6 +1172,7 @@ cfg_apply(struct cfg *cfg, struct ini_ctx *ctx)
 			if (unlikely(ret < 0)) {
 				return ret;
 			}
+			cfg->sigs[i] = ctx->sigs[i];
 		}
 		for (i = 0; i < ctx->sigs_for_cert_size; i++) {
 			int ret = gnutls_sign_set_secure_for_certs(ctx->sigs_for_cert[i],
@@ -1184,28 +1182,19 @@ cfg_apply(struct cfg *cfg, struct ini_ctx *ctx)
 			}
 		}
 		_gnutls_version_mark_revertible_all();
-		for (i = 0, j = 0; i < ctx->versions_size; i++) {
-			const version_entry_st *vers;
-			vers = version_to_entry(ctx->versions[i]);
-			if (vers && vers->supported) {
-				tls_sig_sem |= vers->tls_sig_sem;
-				cfg->versions[j++] = vers->id;
+		for (i = 0; i < ctx->versions_size; i++) {
+			int ret;
+			ret = gnutls_protocol_set_enabled(ctx->versions[i], 1);
+			if (unlikely(ret < 0)) {
+				return gnutls_assert_val(ret);
 			}
+			cfg->versions[i] = ctx->versions[i];
 		}
 		_gnutls_ecc_curve_mark_disabled_all();
 		for (i = 0; i < ctx->curves_size; i++) {
 			int ret = gnutls_ecc_curve_set_enabled(ctx->curves[i], 1);
 			if (unlikely(ret < 0)) {
 				return ret;
-			}
-		}
-		for (i = 0, j = 0; i < ctx->sigs_size; i++) {
-			const gnutls_sign_entry_st *se;
-
-			se = _gnutls_sign_to_entry(ctx->sigs[i]);
-			if (se != NULL && se->aid.tls_sem & tls_sig_sem &&
-			    _gnutls_sign_is_secure2(se, 0)) {
-				cfg->sigs[j++] = se->id;
 			}
 		}
 	} else {
