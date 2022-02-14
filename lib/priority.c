@@ -1735,109 +1735,126 @@ static int cfg_ini_handler(void *_ctx, const char *section, const char *name, co
 	return 1;
 }
 
-static int
-update_system_wide_priority_string(void)
+static int /* not locking system_wide_config */
+construct_system_wide_priority_string(gnutls_buffer_st* buf)
 {
-	gnutls_buffer_st buf;
 	int ret;
 	size_t i;
 
-	_gnutls_buffer_init(&buf);
+	_gnutls_buffer_init(buf);
 
-	ret = _gnutls_buffer_append_str(&buf, "NONE");
+	ret = _gnutls_buffer_append_str(buf, "NONE");
 	if (ret < 0) {
-		_gnutls_buffer_clear(&buf);
+		_gnutls_buffer_clear(buf);
 		return ret;
 	}
 
 	for (i = 0; system_wide_config.kxs[i] != 0; i++) {
-		ret = _gnutls_buffer_append_str(&buf, ":+");
+		ret = _gnutls_buffer_append_str(buf, ":+");
 		if (ret < 0) {
-			_gnutls_buffer_clear(&buf);
+			_gnutls_buffer_clear(buf);
 			return ret;
 		}
 
-		ret = _gnutls_buffer_append_str(&buf,
+		ret = _gnutls_buffer_append_str(buf,
 						gnutls_kx_get_name(system_wide_config.kxs[i]));
 		if (ret < 0) {
-			_gnutls_buffer_clear(&buf);
+			_gnutls_buffer_clear(buf);
 			return ret;
 		}
 	}
 
 	for (i = 0; system_wide_config.groups[i] != 0; i++) {
-		ret = _gnutls_buffer_append_str(&buf, ":+GROUP-");
+		ret = _gnutls_buffer_append_str(buf, ":+GROUP-");
 		if (ret < 0) {
-			_gnutls_buffer_clear(&buf);
+			_gnutls_buffer_clear(buf);
 			return ret;
 		}
 
-		ret = _gnutls_buffer_append_str(&buf,
+		ret = _gnutls_buffer_append_str(buf,
 						gnutls_group_get_name(system_wide_config.groups[i]));
 		if (ret < 0) {
-			_gnutls_buffer_clear(&buf);
+			_gnutls_buffer_clear(buf);
 			return ret;
 		}
 	}
 
 	for (i = 0; system_wide_config.ciphers[i] != 0; i++) {
-		ret = _gnutls_buffer_append_str(&buf, ":+");
+		ret = _gnutls_buffer_append_str(buf, ":+");
 		if (ret < 0) {
-			_gnutls_buffer_clear(&buf);
+			_gnutls_buffer_clear(buf);
 			return ret;
 		}
 
-		ret = _gnutls_buffer_append_str(&buf,
+		ret = _gnutls_buffer_append_str(buf,
 						gnutls_cipher_get_name(system_wide_config.ciphers[i]));
 		if (ret < 0) {
-			_gnutls_buffer_clear(&buf);
+			_gnutls_buffer_clear(buf);
 			return ret;
 		}
 	}
 
 	for (i = 0; system_wide_config.macs[i] != 0; i++) {
-		ret = _gnutls_buffer_append_str(&buf, ":+");
+		ret = _gnutls_buffer_append_str(buf, ":+");
 		if (ret < 0) {
-			_gnutls_buffer_clear(&buf);
+			_gnutls_buffer_clear(buf);
 			return ret;
 		}
 
-		ret = _gnutls_buffer_append_str(&buf,
+		ret = _gnutls_buffer_append_str(buf,
 						gnutls_mac_get_name(system_wide_config.macs[i]));
 		if (ret < 0) {
-			_gnutls_buffer_clear(&buf);
+			_gnutls_buffer_clear(buf);
 			return ret;
 		}
 	}
 
 	for (i = 0; system_wide_config.sigs[i] != 0; i++) {
-		ret = _gnutls_buffer_append_str(&buf, ":+SIGN-");
+		ret = _gnutls_buffer_append_str(buf, ":+SIGN-");
 		if (ret < 0) {
-			_gnutls_buffer_clear(&buf);
+			_gnutls_buffer_clear(buf);
 			return ret;
 		}
 
-		ret = _gnutls_buffer_append_str(&buf,
+		ret = _gnutls_buffer_append_str(buf,
 						gnutls_sign_get_name(system_wide_config.sigs[i]));
 		if (ret < 0) {
-			_gnutls_buffer_clear(&buf);
+			_gnutls_buffer_clear(buf);
 			return ret;
 		}
 	}
 
 	for (i = 0; system_wide_config.versions[i] != 0; i++) {
-		ret = _gnutls_buffer_append_str(&buf, ":+VERS-");
+		ret = _gnutls_buffer_append_str(buf, ":+VERS-");
 		if (ret < 0) {
-			_gnutls_buffer_clear(&buf);
+			_gnutls_buffer_clear(buf);
 			return ret;
 		}
 
-		ret = _gnutls_buffer_append_str(&buf,
+		ret = _gnutls_buffer_append_str(buf,
 						gnutls_protocol_get_name(system_wide_config.versions[i]));
 		if (ret < 0) {
-			_gnutls_buffer_clear(&buf);
+			_gnutls_buffer_clear(buf);
 			return ret;
 		}
+	}
+	return 0;
+}
+
+static int /* not locking system_wide_config */
+update_system_wide_priority_string(void)
+{
+	/* doesn't do locking, _gnutls_update_system_priorities does */
+	gnutls_buffer_st buf;
+	int ret;
+
+	ret = construct_system_wide_priority_string(&buf);
+	if (ret < 0) {
+		_gnutls_debug_log("cfg: unable to construct "
+				  "system-wide priority string: %s",
+				  gnutls_strerror(ret));
+		_gnutls_buffer_clear(&buf);
+		return ret;
 	}
 
 	gnutls_free(system_wide_config.priority_string);
