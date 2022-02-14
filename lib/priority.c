@@ -1864,11 +1864,12 @@ update_system_wide_priority_string(void)
 	return 0;
 }
 
-static int _gnutls_update_system_priorities(void)
+static int _gnutls_update_system_priorities(bool defer_system_wide)
 {
 	int ret, err = 0;
 	struct stat sb;
 	FILE *fp;
+	gnutls_buffer_st buf;
 	struct ini_ctx ctx;
 
 	ret = gnutls_rwlock_rdlock(&system_wide_config_rwlock);
@@ -1883,10 +1884,12 @@ static int _gnutls_update_system_priorities(void)
 	}
 
 	if (system_priority_file_loaded &&
-	    sb.st_mtime == system_priority_last_mod) {
+	    system_priority_last_mod == sb.st_mtime) {
 		_gnutls_debug_log("cfg: system priority %s has not changed\n",
 				  system_priority_file);
-		goto out;
+		if (system_wide_config.priority_string) {
+			goto out;  /* nothing to do */
+		}
 	}
 
 	(void)gnutls_rwlock_unlock(&system_wide_config_rwlock);
@@ -1896,54 +1899,71 @@ static int _gnutls_update_system_priorities(void)
 		return gnutls_assert_val(ret);
 	}
 
-	/* Another thread has successfully updated the system wide config (with
-	 * the same modification time as checked above), while upgrading to
-	 * write lock; no need to reload.
+	/* Another thread could have successfully re-read system-wide config,
+	 * skip re-reading if the mtime it has used is exactly the same.
 	 */
-	if (system_priority_file_loaded &&
-	    system_priority_last_mod == sb.st_mtime) {
-		goto out;
+	if (system_priority_file_loaded) {
+		system_priority_file_loaded =
+			(system_priority_last_mod == sb.st_mtime);
 	}
 
-	system_priority_file_loaded = 0;
-	_name_val_array_clear(&system_wide_config.priority_strings);
+	if (!system_priority_file_loaded) {
+		_name_val_array_clear(&system_wide_config.priority_strings);
 
-	gnutls_free(system_wide_config.priority_string);
-	system_wide_config.priority_string = NULL;
+		gnutls_free(system_wide_config.priority_string);
+		system_wide_config.priority_string = NULL;
 
-	fp = fopen(system_priority_file, "re");
-	if (fp == NULL) {
-		_gnutls_debug_log("cfg: unable to open: %s: %d\n",
-				  system_priority_file, errno);
-		goto out;
-	}
-	/* Parsing the configuration file needs to be done in 2 phases: first
-	 * parsing the [global] section and then the other sections, because the
-	 * [global] section modifies the parsing behavior.
-	 */
-	memset(&ctx, 0, sizeof(ctx));
-	err = ini_parse_file(fp, global_ini_handler, &ctx);
-	if (!err) {
-		if (fseek(fp, 0L, SEEK_SET) < 0) {
-			_gnutls_debug_log("cfg: unable to rewind: %s\n",
-					  system_priority_file);
-			if (fail_on_invalid_config)
-				exit(1);
+		fp = fopen(system_priority_file, "re");
+		if (fp == NULL) {
+			_gnutls_debug_log("cfg: unable to open: %s: %d\n",
+					  system_priority_file, errno);
+			goto out;
 		}
-		err = ini_parse_file(fp, cfg_ini_handler, &ctx);
-	}
-	fclose(fp);
-	if (err) {
+		/* Parsing the configuration file needs to be done in 2 phases:
+		 * first parsing the [global] section
+		 * and then the other sections,
+		 * because the [global] section modifies the parsing behavior.
+		 */
+		memset(&ctx, 0, sizeof(ctx));
+		err = ini_parse_file(fp, global_ini_handler, &ctx);
+		if (!err) {
+			if (fseek(fp, 0L, SEEK_SET) < 0) {
+				_gnutls_debug_log("cfg: unable to rewind: %s\n",
+						  system_priority_file);
+				if (fail_on_invalid_config)
+					exit(1);
+			}
+			err = ini_parse_file(fp, cfg_ini_handler, &ctx);
+		}
+		fclose(fp);
+		if (err) {
+			ini_ctx_deinit(&ctx);
+			_gnutls_debug_log("cfg: unable to parse: %s: %d\n",
+					  system_priority_file, err);
+			goto out;
+		}
+		cfg_apply(&system_wide_config, &ctx);
 		ini_ctx_deinit(&ctx);
-		_gnutls_debug_log("cfg: unable to parse: %s: %d\n",
-				  system_priority_file, err);
-		goto out;
+		_gnutls_debug_log("cfg: loaded system config %s mtime %lld\n",
+				  system_priority_file,
+				  (unsigned long long)sb.st_mtime);
+
 	}
-	cfg_apply(&system_wide_config, &ctx);
-	ini_ctx_deinit(&ctx);
 
 	if (system_wide_config.allowlisting) {
-		ret = update_system_wide_priority_string();
+		if (defer_system_wide) {
+			/* try constructing a priority string,
+			 * but don't apply it yet, at this point
+			 * we're only interested in whether we can */
+			ret = construct_system_wide_priority_string(&buf);
+			_gnutls_buffer_clear(&buf);
+			_gnutls_debug_log("cfg: deferred setting "
+					  "system-wide priority string\n");
+		} else {
+			ret = update_system_wide_priority_string();
+			_gnutls_debug_log("cfg: finalized "
+					  "system-wide priority string\n");
+		}
 		if (ret < 0) {
 			_gnutls_debug_log("cfg: unable to build priority string: %s\n",
 					  gnutls_strerror(ret));
@@ -1952,10 +1972,6 @@ static int _gnutls_update_system_priorities(void)
 			goto out;
 		}
 	}
-
-	_gnutls_debug_log("cfg: loaded system priority %s mtime %lld\n",
-			  system_priority_file,
-			  (unsigned long long)sb.st_mtime);
 
 	system_priority_file_loaded = 1;
 	system_priority_last_mod = sb.st_mtime;
@@ -1970,7 +1986,7 @@ static int _gnutls_update_system_priorities(void)
 	return ret;
 }
 
-void _gnutls_load_system_priorities(void)
+void _gnutls_prepare_to_load_system_priorities(void)
 {
 	const char *p;
 	int ret;
@@ -1983,7 +1999,7 @@ void _gnutls_load_system_priorities(void)
 	if (p != NULL && p[0] == '1' && p[1] == 0)
 		fail_on_invalid_config = 1;
 
-	ret = _gnutls_update_system_priorities();
+	ret = _gnutls_update_system_priorities(true /* defer_system_wide */);
 	if (ret < 0) {
 		_gnutls_debug_log("failed to update system priorities: %s\n",
 				  gnutls_strerror(ret));
@@ -2050,7 +2066,7 @@ char *_gnutls_resolve_priorities(const char* priorities)
 	/* Always try to refresh the cached data, to allow it to be
 	 * updated without restarting all applications.
 	 */
-	ret = _gnutls_update_system_priorities();
+	ret = _gnutls_update_system_priorities(false /* defer_system_wide */);
 	if (ret < 0) {
 		_gnutls_debug_log("failed to update system priorities: %s\n",
 				  gnutls_strerror(ret));
