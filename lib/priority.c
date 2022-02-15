@@ -1040,6 +1040,10 @@ struct cfg {
 	gnutls_kx_algorithm_t kxs[MAX_ALGOS+1];
 	gnutls_sign_algorithm_t sigs[MAX_ALGOS+1];
 	gnutls_protocol_t versions[MAX_ALGOS+1];
+
+	gnutls_digest_algorithm_t hashes[MAX_ALGOS+1];
+	gnutls_ecc_curve_t ecc_curves[MAX_ALGOS+1];
+	gnutls_sign_algorithm_t sigs_for_cert[MAX_ALGOS+1];
 };
 
 static inline void
@@ -1145,12 +1149,158 @@ cfg_steal(struct cfg *dst, struct cfg *src)
 	memcpy(dst->macs, src->macs, sizeof(src->macs));
 	memcpy(dst->groups, src->groups, sizeof(src->groups));
 	memcpy(dst->kxs, src->kxs, sizeof(src->kxs));
+	memcpy(dst->hashes, src->hashes, sizeof(src->hashes));
+	memcpy(dst->ecc_curves, src->ecc_curves, sizeof(src->ecc_curves));
+	memcpy(dst->sigs, src->sigs, sizeof(src->sigs));
+	memcpy(dst->sigs_for_cert, src->sigs_for_cert,
+	       sizeof(src->sigs_for_cert));
+}
+
+/*
+ * synchronizing changes from struct cfg to global `lib/algorithms` arrays
+ */
+
+/* global side-effect! modifies `flags` in `hash_algorithms[]` */
+static inline int /* allowlisting-only */
+_cfg_hashes_remark(struct cfg* cfg)
+{
+	size_t i;
+	_gnutls_digest_mark_insecure_all();
+	for (i = 0; cfg->hashes[i] != 0; i++) {
+		int ret = gnutls_digest_set_secure(cfg->hashes[i], 1);
+		if (unlikely(ret < 0)) {
+			return gnutls_assert_val(ret);
+		}
+	}
+	return 0;
+}
+
+/* global side-effect! modifies `flags` in `sign_algorithms[]` */
+static inline int /* allowlisting-only */
+_cfg_sigs_remark(struct cfg* cfg)
+{
+	size_t i;
+	_gnutls_sign_mark_insecure_all(_INSECURE);
+	for (i = 0; cfg->sigs[i] != 0; i++) {
+		int ret = gnutls_sign_set_secure(cfg->sigs[i], 1);
+		if (unlikely(ret < 0)) {
+			return gnutls_assert_val(ret);
+		}
+	}
+	for (i = 0; cfg->sigs_for_cert[i] != 0; i++) {
+		int ret = gnutls_sign_set_secure_for_certs(
+				cfg->sigs_for_cert[i], 1
+		);
+		if (unlikely(ret < 0)) {
+			return gnutls_assert_val(ret);
+		}
+	}
+	return 0;
+}
+
+/* global side-effect! modifies `supported` in `sup_versions[]` */
+static inline int /* allowlisting-only */
+_cfg_versions_remark(struct cfg* cfg)
+{
+	size_t i;
+	_gnutls_version_mark_revertible_all();
+	for (i = 0; cfg->versions[i] != 0; i++) {
+		int ret = gnutls_protocol_set_enabled(cfg->versions[i], 1);
+		if (unlikely(ret < 0)) {
+			return gnutls_assert_val(ret);
+		}
+	}
+	return 0;
+}
+
+/* global side-effect! modifies `supported` in `ecc_curves[]` */
+static inline int /* allowlisting-only */
+_cfg_ecc_curves_remark(struct cfg* cfg)
+{
+	size_t i;
+	_gnutls_ecc_curve_mark_disabled_all();
+	for (i = 0; cfg->ecc_curves[i] != 0; i++) {
+		int ret = gnutls_ecc_curve_set_enabled(cfg->ecc_curves[i], 1);
+		if (unlikely(ret < 0)) {
+			return gnutls_assert_val(ret);
+		}
+	}
+	return 0;
+}
+
+/*
+ * setting arrays of struct cfg: from other arrays
+ */
+
+static inline int /* allowlisting-only */
+cfg_hashes_set_array(struct cfg* cfg,
+		     gnutls_digest_algorithm_t* src, size_t len)
+{
+	if (unlikely(len >= MAX_ALGOS)) {
+		return gnutls_assert_val(GNUTLS_A_INTERNAL_ERROR);
+	}
+	if (len) {
+		memcpy(cfg->hashes,
+		       src, sizeof(gnutls_digest_algorithm_t) * len);
+	}
+	cfg->hashes[len] = 0;
+	return _cfg_hashes_remark(cfg);
+}
+
+static inline int /* allowlisting-only */
+cfg_sigs_set_arrays(struct cfg* cfg,
+		    gnutls_sign_algorithm_t* src, size_t len,
+		    gnutls_sign_algorithm_t* src_for_cert, size_t len_for_cert)
+{
+	if (unlikely(len >= MAX_ALGOS)) {
+		return gnutls_assert_val(GNUTLS_A_INTERNAL_ERROR);
+	}
+	if (unlikely(len_for_cert >= MAX_ALGOS)) {
+		return gnutls_assert_val(GNUTLS_A_INTERNAL_ERROR);
+	}
+	if (len) {
+		memcpy(cfg->sigs, src, sizeof(gnutls_sign_algorithm_t) * len);
+	}
+	if (len_for_cert) {
+		memcpy(cfg->sigs_for_cert, src_for_cert,
+		       sizeof(gnutls_sign_algorithm_t) * len_for_cert);
+	}
+	cfg->sigs[len] = 0;
+	cfg->sigs_for_cert[len_for_cert] = 0;
+	return _cfg_sigs_remark(cfg);
+}
+
+static inline int /* allowlisting-only */
+cfg_versions_set_array(struct cfg* cfg, gnutls_protocol_t* src, size_t len)
+{
+	if (unlikely(len >= MAX_ALGOS)) {
+		return gnutls_assert_val(GNUTLS_A_INTERNAL_ERROR);
+	}
+	if (len) {
+		memcpy(cfg->versions, src, sizeof(gnutls_protocol_t) * len);
+	}
+	cfg->versions[len] = 0;
+	return _cfg_versions_remark(cfg);
+}
+
+static inline int /* allowlisting-only */
+cfg_ecc_curves_set_array(struct cfg* cfg, gnutls_ecc_curve_t* src, size_t len)
+{
+	if (unlikely(len >= MAX_ALGOS)) {
+		return gnutls_assert_val(GNUTLS_A_INTERNAL_ERROR);
+	}
+	if (len) {
+		memcpy(cfg->ecc_curves, src, sizeof(gnutls_ecc_curve_t) * len);
+	}
+	cfg->ecc_curves[len] = 0;
+	return _cfg_ecc_curves_remark(cfg);
 }
 
 static inline int
 cfg_apply(struct cfg *cfg, struct ini_ctx *ctx)
 {
 	size_t i;
+	int ret;
 
 	cfg_steal(cfg, &ctx->cfg);
 
@@ -1159,72 +1309,61 @@ cfg_apply(struct cfg *cfg, struct ini_ctx *ctx)
 	}
 
 	if (cfg->allowlisting) {
-		_gnutls_digest_mark_insecure_all();
-		for (i = 0; i < ctx->hashes_size; i++) {
-			int ret = gnutls_digest_set_secure(ctx->hashes[i], 1);
-			if (unlikely(ret < 0)) {
-				return ret;
-			}
+		/* also updates `flags` of global `hash_algorithms[]` */
+		ret = cfg_hashes_set_array(cfg, ctx->hashes, ctx->hashes_size);
+		if (unlikely(ret < 0)) {
+			return gnutls_assert_val(ret);
 		}
-		_gnutls_sign_mark_insecure_all(_INSECURE);
-		for (i = 0; i < ctx->sigs_size; i++) {
-			int ret = gnutls_sign_set_secure(ctx->sigs[i], 1);
-			if (unlikely(ret < 0)) {
-				return ret;
-			}
-			cfg->sigs[i] = ctx->sigs[i];
+		/* also updates `flags` of global `sign_algorithms[]` */
+		ret = cfg_sigs_set_arrays(cfg, ctx->sigs, ctx->sigs_size,
+					  ctx->sigs_for_cert,
+					  ctx->sigs_for_cert_size);
+		if (unlikely(ret < 0)) {
+			return gnutls_assert_val(ret);
 		}
-		for (i = 0; i < ctx->sigs_for_cert_size; i++) {
-			int ret = gnutls_sign_set_secure_for_certs(ctx->sigs_for_cert[i],
-								   1);
-			if (unlikely(ret < 0)) {
-				return ret;
-			}
+		/* also updates `supported` field of global `sup_versions[]` */
+		ret = cfg_versions_set_array(cfg,
+					     ctx->versions, ctx->versions_size);
+		if (unlikely(ret < 0)) {
+			return gnutls_assert_val(ret);
 		}
-		_gnutls_version_mark_revertible_all();
-		for (i = 0; i < ctx->versions_size; i++) {
-			int ret;
-			ret = gnutls_protocol_set_enabled(ctx->versions[i], 1);
-			if (unlikely(ret < 0)) {
-				return gnutls_assert_val(ret);
-			}
-			cfg->versions[i] = ctx->versions[i];
-		}
-		_gnutls_ecc_curve_mark_disabled_all();
-		for (i = 0; i < ctx->curves_size; i++) {
-			int ret = gnutls_ecc_curve_set_enabled(ctx->curves[i], 1);
-			if (unlikely(ret < 0)) {
-				return ret;
-			}
+		/* also updates `supported` field of global `ecc_curves[]` */
+		ret = cfg_ecc_curves_set_array(cfg,
+					       ctx->curves, ctx->curves_size);
+		if (unlikely(ret < 0)) {
+			return gnutls_assert_val(ret);
 		}
 	} else {
+		/* updates same global arrays as above, but doesn't store
+		 * the algorithms into the `struct cfg` as allowlisting does.
+		 * blocklisting doesn't allow relaxing the restrictions */
 		for (i = 0; i < ctx->hashes_size; i++) {
-			int ret = _gnutls_digest_mark_insecure(ctx->hashes[i]);
+			ret = _gnutls_digest_mark_insecure(ctx->hashes[i]);
 			if (unlikely(ret < 0)) {
 				return ret;
 			}
 		}
 		for (i = 0; i < ctx->sigs_size; i++) {
-			int ret = _gnutls_sign_mark_insecure(ctx->sigs[i],
+			ret = _gnutls_sign_mark_insecure(ctx->sigs[i],
 							     _INSECURE);
 			if (unlikely(ret < 0)) {
 				return ret;
 			}
 		}
 		for (i = 0; i < ctx->sigs_for_cert_size; i++) {
-			int ret = _gnutls_sign_mark_insecure(ctx->sigs_for_cert[i], _INSECURE_FOR_CERTS);
+			ret = _gnutls_sign_mark_insecure(ctx->sigs_for_cert[i], _INSECURE_FOR_CERTS);
 			if (unlikely(ret < 0)) {
 				return ret;
 			}
 		}
 		for (i = 0; i < ctx->versions_size; i++) {
-			int ret = _gnutls_version_mark_disabled(ctx->versions[i]);
+			ret = _gnutls_version_mark_disabled(ctx->versions[i]);
 			if (unlikely(ret < 0)) {
 				return ret;
 			}
 		}
 		for (i = 0; i < ctx->curves_size; i++) {
-			int ret = _gnutls_ecc_curve_mark_disabled(ctx->curves[i]);
+			ret = _gnutls_ecc_curve_mark_disabled(ctx->curves[i]);
 			if (unlikely(ret < 0)) {
 				return ret;
 			}
