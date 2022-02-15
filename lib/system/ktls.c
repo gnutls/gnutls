@@ -422,12 +422,11 @@ int _gnutls_ktls_recv_int(gnutls_session_t session, content_type_t type,
 
 #else //ENABLE_KTLS
 gnutls_transport_ktls_enable_flags_t
-gnutls_transport_is_ktls_enabled(gnutls_session_t session){
-	return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
+gnutls_transport_is_ktls_enabled(gnutls_session_t session) {
+	return 0;
 }
 
-void _gnutls_ktls_enable(gnutls_session_t session){
-	return;
+void _gnutls_ktls_enable(gnutls_session_t session) {
 }
 
 int _gnutls_ktls_set_keys(gnutls_session_t session) {
