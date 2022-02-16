@@ -70,6 +70,29 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "|<%d>| %s", level, str);
 }
 
+#define FIPS_PUSH_CONTEXT() do {					\
+	if (gnutls_fips140_mode_enabled()) {				\
+		ret = gnutls_fips140_push_context(fips_context);	\
+		if (ret < 0) {						\
+			fail("gnutls_fips140_push_context failed\n");	\
+		}							\
+	}								\
+} while (0)
+
+#define FIPS_POP_CONTEXT(state) do {					\
+	if (gnutls_fips140_mode_enabled()) {				\
+		ret = gnutls_fips140_pop_context();			\
+		if (ret < 0) {						\
+			fail("gnutls_fips140_context_pop failed\n");	\
+		}							\
+		fips_state = gnutls_fips140_get_operation_state(fips_context); \
+		if (fips_state != GNUTLS_FIPS140_OP_ ## state) {	\
+			fail("operation state is not " # state " (%d)\n", \
+			     fips_state);				\
+		}							\
+	}								\
+} while (0)
+
 void doit(void)
 {
 	gnutls_pkcs12_t pkcs12;
@@ -81,7 +104,17 @@ void doit(void)
 	int ret, indx;
 	char outbuf[10240];
 	size_t size;
-	unsigned tests, i;
+	unsigned i;
+	gnutls_fips140_context_t fips_context;
+	gnutls_fips140_operation_state_t fips_state;
+	size_t n_tests = 0;
+	struct tests {
+		const char *name;
+		gnutls_x509_crt_t crt;
+		const char *friendly_name;
+		unsigned bag_encrypt_flags;
+		int bag_encrypt_expected;
+	} tests[2];
 
 	ret = global_init();
 	if (ret < 0) {
@@ -92,6 +125,11 @@ void doit(void)
 	gnutls_global_set_log_function(tls_log_func);
 	if (debug)
 		gnutls_global_set_log_level(4711);
+
+	ret = gnutls_fips140_context_init(&fips_context);
+	if (ret < 0) {
+		fail("Cannot initialize FIPS context\n");
+	}
 
 	/* Read certs. */
 	ret = gnutls_x509_crt_init(&client);
@@ -127,21 +165,34 @@ void doit(void)
 		exit(1);
 	}
 
-	/* Generate and add PKCS#12 cert bags. */
-	if (!gnutls_fips140_mode_enabled()) {
-		tests = 2; /* include RC2 */
-	} else {
-		tests = 1;
-	}
+	tests[n_tests].name = "3DES";
+	tests[n_tests].crt = client;
+	tests[n_tests].friendly_name = "client";
+	tests[n_tests].bag_encrypt_flags = GNUTLS_PKCS8_USE_PKCS12_3DES;
+	tests[n_tests].bag_encrypt_expected = 0;
+	n_tests++;
 
-	for (i = 0; i < tests; i++) {
+	tests[n_tests].name = "RC2-40";
+	tests[n_tests].crt = ca;
+	tests[n_tests].friendly_name = "ca";
+	tests[n_tests].bag_encrypt_flags = GNUTLS_PKCS_USE_PKCS12_RC2_40;
+	if (gnutls_fips140_mode_enabled()) {
+		tests[n_tests].bag_encrypt_expected =
+			GNUTLS_E_UNWANTED_ALGORITHM;
+	} else {
+		tests[n_tests].bag_encrypt_expected = 0;
+	}
+	n_tests++;
+
+	/* Generate and add PKCS#12 cert bags. */
+	for (i = 0; i < n_tests; i++) {
 		ret = gnutls_pkcs12_bag_init(&bag);
 		if (ret < 0) {
 			fprintf(stderr, "bag_init: %s (%d)\n", gnutls_strerror(ret), ret);
 			exit(1);
 		}
 
-		ret = gnutls_pkcs12_bag_set_crt(bag, i == 0 ? client : ca);
+		ret = gnutls_pkcs12_bag_set_crt(bag, tests[i].crt);
 		if (ret < 0) {
 			fprintf(stderr, "set_crt: %s (%d)\n", gnutls_strerror(ret), ret);
 			exit(1);
@@ -150,16 +201,14 @@ void doit(void)
 		indx = ret;
 
 		ret = gnutls_pkcs12_bag_set_friendly_name(bag, indx,
-							  i ==
-							  0 ? "client" :
-							  "ca");
+							  tests[i].friendly_name);
 		if (ret < 0) {
 			fprintf(stderr, "set_friendly_name: %s (%d)\n", gnutls_strerror(ret), ret);
 			exit(1);
 		}
 
 		size = sizeof(key_id_buf);
-		ret = gnutls_x509_crt_get_key_id(i == 0 ? client : ca, 0,
+		ret = gnutls_x509_crt_get_key_id(tests[i].crt, 0,
 						 key_id_buf, &size);
 		if (ret < 0) {
 			fprintf(stderr, "get_key_id: %s (%d)\n", gnutls_strerror(ret), ret);
@@ -176,14 +225,11 @@ void doit(void)
 		}
 
 		ret = gnutls_pkcs12_bag_encrypt(bag, "pass",
-						i ==
-						0 ?
-						GNUTLS_PKCS8_USE_PKCS12_3DES
-						:
-						GNUTLS_PKCS_USE_PKCS12_RC2_40);
-		if (ret < 0) {
-			fprintf(stderr, "bag_encrypt: %d: %s", ret,
-				i == 0 ? "3DES" : "RC2-40");
+						tests[i].bag_encrypt_flags);
+		if (ret != tests[i].bag_encrypt_expected) {
+			fprintf(stderr, "bag_encrypt: returned %d, expected %d: %s", ret,
+				tests[i].bag_encrypt_expected,
+				tests[i].name);
 			exit(1);
 		}
 
@@ -196,6 +242,8 @@ void doit(void)
 		gnutls_pkcs12_bag_deinit(bag);
 	}
 
+	FIPS_PUSH_CONTEXT();
+
 	/* MAC the structure, export and print. */
 	ret = gnutls_pkcs12_generate_mac2(pkcs12, GNUTLS_MAC_SHA1, "pass");
 	if (ret < 0) {
@@ -203,11 +251,19 @@ void doit(void)
 		exit(1);
 	}
 
+	FIPS_POP_CONTEXT(NOT_APPROVED);
+
+	FIPS_PUSH_CONTEXT();
+
 	ret = gnutls_pkcs12_verify_mac(pkcs12, "pass");
 	if (ret < 0) {
 		fprintf(stderr, "verify_mac: %s (%d)\n", gnutls_strerror(ret), ret);
 		exit(1);
 	}
+
+	FIPS_POP_CONTEXT(NOT_APPROVED);
+
+	FIPS_PUSH_CONTEXT();
 
 	ret = gnutls_pkcs12_generate_mac2(pkcs12, GNUTLS_MAC_SHA256, "passwd");
 	if (ret < 0) {
@@ -215,11 +271,19 @@ void doit(void)
 		exit(1);
 	}
 
+	FIPS_POP_CONTEXT(NOT_APPROVED);
+
+	FIPS_PUSH_CONTEXT();
+
 	ret = gnutls_pkcs12_verify_mac(pkcs12, "passwd");
 	if (ret < 0) {
 		fprintf(stderr, "verify_mac2: %s (%d)\n", gnutls_strerror(ret), ret);
 		exit(1);
 	}
+
+	FIPS_POP_CONTEXT(NOT_APPROVED);
+
+	FIPS_PUSH_CONTEXT();
 
 	ret = gnutls_pkcs12_generate_mac2(pkcs12, GNUTLS_MAC_SHA512, "passwd1");
 	if (ret < 0) {
@@ -227,11 +291,19 @@ void doit(void)
 		exit(1);
 	}
 
+	FIPS_POP_CONTEXT(NOT_APPROVED);
+
+	FIPS_PUSH_CONTEXT();
+
 	ret = gnutls_pkcs12_verify_mac(pkcs12, "passwd1");
 	if (ret < 0) {
 		fprintf(stderr, "verify_mac2: %s (%d)\n", gnutls_strerror(ret), ret);
 		exit(1);
 	}
+
+	FIPS_POP_CONTEXT(NOT_APPROVED);
+
+	FIPS_PUSH_CONTEXT();
 
 	size = sizeof(outbuf);
 	ret =
@@ -242,10 +314,13 @@ void doit(void)
 		exit(1);
 	}
 
+	FIPS_POP_CONTEXT(NOT_APPROVED);
+
 	if (debug)
 		fwrite(outbuf, size, 1, stdout);
 
 	/* Cleanup. */
+	gnutls_fips140_context_deinit(fips_context);
 	gnutls_pkcs12_deinit(pkcs12);
 	gnutls_x509_crt_deinit(client);
 	gnutls_x509_crt_deinit(ca);
