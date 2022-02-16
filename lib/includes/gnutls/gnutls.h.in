@@ -1809,6 +1809,9 @@ const char *
 				     gnutls_cipher_algorithm_t cipher_algorithm,
 				     gnutls_mac_algorithm_t mac_algorithm) __GNUTLS_CONST__;
 
+const char *
+gnutls_ciphersuite_get(gnutls_session_t session) __GNUTLS_CONST__;
+
 /* get the currently used protocol version */
 gnutls_protocol_t gnutls_protocol_get_version(gnutls_session_t session);
 

@@ -284,6 +284,7 @@ APIMANS += gnutls_cipher_get_tag_size.3
 APIMANS += gnutls_cipher_init.3
 APIMANS += gnutls_cipher_list.3
 APIMANS += gnutls_cipher_set_iv.3
+APIMANS += gnutls_ciphersuite_get.3
 APIMANS += gnutls_cipher_suite_get_name.3
 APIMANS += gnutls_cipher_suite_info.3
 APIMANS += gnutls_cipher_tag.3

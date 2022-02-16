@@ -70,3 +70,5 @@ name = drbg_aes_reseed
 
 # The following should be removed in the new release, after updating the
 # abi-dump repository:
+[suppress_function]
+name = gnutls_ciphersuite_get
