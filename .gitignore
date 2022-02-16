@@ -920,6 +920,7 @@ tests/x509sign-verify-rsa
 tests/x509sign-verify2
 tests/x509signself
 tests/gnutls_ktls
+tests/record-sendfile
 *.tmp
 tmp-*
 *.trs
