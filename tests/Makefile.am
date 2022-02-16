@@ -441,6 +441,8 @@ if ENABLE_KTLS
 ctests += gnutls_ktls
 endif
 
+ctests += record-sendfile
+
 gc_CPPFLAGS = $(AM_CPPFLAGS) \
 	-I$(top_srcdir)/gl	\
 	-I$(top_builddir)/gl
