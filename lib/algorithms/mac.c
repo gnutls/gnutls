@@ -322,24 +322,8 @@ void _gnutls_digest_mark_insecure_all(void)
 #endif
 }
 
-/**
- * gnutls_digest_set_secure:
- * @dig: is a digest algorithm
- * @secure: whether to mark the digest algorithm secure
- *
- * Modify the previous system wide setting that marked @dig as secure
- * or insecure. This only has effect when the algorithm is enabled
- * through the allowlisting mode in the configuration file, or when
- * the setting is modified with a prior call to this function.
- *
- * This function must be called prior to any session priority setting functions;
- * otherwise the behavior is undefined.
- *
- * Since: 3.7.3
- */
 int
-gnutls_digest_set_secure(gnutls_digest_algorithm_t dig,
-			 unsigned int secure)
+_gnutls_digest_set_secure(gnutls_digest_algorithm_t dig, unsigned int secure)
 {
 #ifndef DISABLE_SYSTEM_CONFIG
 	mac_entry_st *p;

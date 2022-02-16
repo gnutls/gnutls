@@ -37,15 +37,21 @@
  * This is not a test by itself.
  * This is a helper for the real test in protocol-set-allowlist.sh.
  * It executes sequences of commands like:
- *     > connect -> connection established: (TLS1.2)-(RSA)-(AES-128-GCM)
- *     > protocol_set_disabled TLS1.2 -> OK
- *     > connect -> bad priority: (actually, any arrow-less text can go here)
+ *     > protocol_set_disabled TLS1.2
+ *     > protocol_set_enabled TLS1.1
+ *     > connect
+ *     > protocol_set_enabled TLS1.2
+ *     > protocol_set_disabled TLS1.1
+ *     > connect -> connection established
  * where `connect` connects to $TEST_SERVER_PORT using $TEST_SERVER_CA,
  * and gnutls_protocol_set_enabled simply call the underlying API.
  * leaving the outer test to check return code and output:
- *     connect -> connection established: (TLS1.2)-(RSA)-(AES-128-GCM)
  *     protocol_set_disabled TLS1.2 -> OK
- *     connect -> bad priority: No or insufficient priorities were set.
+ *     protocol_set_enabled TLS1.1 -> OK
+ *     connect -> connection established: (TLS1.1)-(RSA)-(AES-128-CBC)-(SHA1)
+ *     protocol_set_enabled TLS1.2 -> INVALID_REQUEST
+ *     protocol_set_disabled TLS1.1 -> INVALID_REQUEST
+ *     connect -> connection established: (TLS1.1)-(RSA)-(AES-128-CBC)-(SHA1)
  */
 
 #define _assert(cond, format, ...) if (!(cond)) \
@@ -58,6 +64,7 @@ void test_echo_server(gnutls_session_t session);
 void cmd_connect(const char* ca_file, unsigned port);
 void cmd_protocol_set_disabled(const char* name);
 void cmd_protocol_set_enabled(const char* name);
+void cmd_reinit(void);
 const char* unprefix(const char* s, const char* prefix);
 
 
@@ -167,15 +174,32 @@ void cmd_connect(const char* ca_file, unsigned port)
 
 void cmd_protocol_set_disabled(const char* name)
 {
-	_check(gnutls_protocol_set_enabled(parse_protocol(name), 0) >= 0);
-	printf("protocol_set_disabled %s -> OK\n", name);
+	int ret;
+	ret = gnutls_protocol_set_enabled(parse_protocol(name), 0);
+	printf("protocol_set_disabled %s -> %s\n", name,
+			ret == 0 ? "OK" :
+			ret == GNUTLS_E_INVALID_REQUEST ? "INVALID_REQUEST" :
+			gnutls_strerror(ret));
 }
 
 
 void cmd_protocol_set_enabled(const char* name)
 {
-	_check(gnutls_protocol_set_enabled(parse_protocol(name), 1) >= 0);
-	printf("protocol_set_enabled %s -> OK\n", name);
+	int ret;
+	ret = gnutls_protocol_set_enabled(parse_protocol(name), 1);
+	printf("protocol_set_enabled %s -> %s\n", name,
+			ret == 0 ? "OK" :
+			ret == GNUTLS_E_INVALID_REQUEST ? "INVALID_REQUEST" :
+			gnutls_strerror(ret));
+}
+
+
+void cmd_reinit(void)
+{
+	int ret;
+	gnutls_global_deinit();
+	ret = gnutls_global_init();
+	printf("reinit -> %s\n", ret == 0 ? "OK" : gnutls_strerror(ret));
 }
 
 
@@ -204,8 +228,6 @@ void doit(void)
 	_assert(port_str, "TEST_SERVER_PORT is not set");
 	port = parse_port(port_str);
 
-	_check(gnutls_global_init() >= 0);
-
 	while (!feof(stdin)) {
 		memset(cmd_buf, '\0', MAX_CMD_LEN + 1);
 		fgets(cmd_buf, MAX_CMD_LEN, stdin);
@@ -220,6 +242,8 @@ void doit(void)
 			cmd_protocol_set_disabled(p);
 		else if ((p = unprefix(cmd_buf, "> protocol_set_enabled ")))
 			cmd_protocol_set_enabled(p);
+		else if (!strcmp(cmd_buf, "> reinit"))
+			cmd_reinit();
 		else if ((p = unprefix(cmd_buf, "> ")))
 			_fail("Unknown command `%s`\n", p);
 		else
@@ -227,6 +251,5 @@ void doit(void)
 					cmd_buf);
 	}
 
-	gnutls_global_deinit();
 	exit(0);
 }

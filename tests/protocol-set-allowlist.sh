@@ -25,6 +25,7 @@
 # from within the shell wrapper protocol-set-allowlist.sh
 # The shell part of it feeds commands into a C helper
 # and compares its output to the reference output.
+# Commands are derived from the reference output.
 
 : ${srcdir=.}
 : ${builddir=.}
@@ -161,6 +162,9 @@ fi
 ### Harness for the actual tests
 
 test_with_helper() {
+	echo '#'
+	echo "# $1"
+	echo '#'
 	${CAT} > "$TMPFILE_EXPECTED_LOG"
 	${SED} 's/\(.*\) -> .*/> \1/' "${TMPFILE_EXPECTED_LOG}" \
 		> "${TMPFILE_INPUT_SCRIPT}"
@@ -197,46 +201,72 @@ launch_server --echo --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2" \
 SERVER_PID=$!
 wait_server ${SERVER_PID}
 
-# ["gnutls_protocol_set_enabled can disable, TLS"]
-# With a configuration file allowlisting a specific TLS protocol version (1.2),
-# gnutls_protocol_set_enabled can disable it.
-test_with_helper <<EOF
+test_with_helper 'connects by default with 1.2' <<EOF
 connect -> connection established: (TLS1.2)-(RSA)-(AES-128-GCM)
+EOF
+
+test_with_helper 'connecting prevents new API from working' <<EOF
+connect -> connection established: (TLS1.2)-(RSA)-(AES-128-GCM)
+protocol_set_disabled TLS1.2 -> INVALID_REQUEST
+connect -> connection established: (TLS1.2)-(RSA)-(AES-128-GCM)
+EOF
+
+test_with_helper 'disabling TLS 1.2 leaves us with no versions' <<EOF
 protocol_set_disabled TLS1.2 -> OK
+connect -> bad priority: No or insufficient priorities were set.
+protocol_set_enabled TLS1.2 -> INVALID_REQUEST
 connect -> bad priority: No or insufficient priorities were set.
 EOF
 
-# ["gnutls_protocol_set_enabled disables revertibly, TLS"]
-# consecutive gnutls_protocol_set_enabled can make connection possible
-# (with a different session handle).
-test_with_helper <<EOF
-connect -> connection established: (TLS1.2)-(RSA)-(AES-128-GCM)
+test_with_helper \
+	'disabling is revertible if done before the first gnutls_init' << EOF
 protocol_set_disabled TLS1.2 -> OK
-connect -> bad priority: No or insufficient priorities were set.
 protocol_set_enabled TLS1.2 -> OK
 connect -> connection established: (TLS1.2)-(RSA)-(AES-128-GCM)
-EOF
-
-# Just a random long-ish scenario
-test_with_helper <<EOF
-connect -> connection established: (TLS1.2)-(RSA)-(AES-128-GCM)
-protocol_set_disabled TLS1.2 -> OK
-connect -> bad priority: No or insufficient priorities were set.
-protocol_set_enabled TLS1.3 -> OK
-connect -> bad priority: No or insufficient priorities were set.
-protocol_set_disabled TLS1.3 -> OK
-protocol_set_enabled TLS1.2 -> OK
+protocol_set_disabled TLS1.2 -> INVALID_REQUEST
+protocol_set_enabled TLS1.2 -> INVALID_REQUEST
 connect -> connection established: (TLS1.2)-(RSA)-(AES-128-GCM)
 EOF
 
-# !!! CURRENTLY NOT WORKING AS EXPECTED !!!
-# Insufficient priority vs handshake failed
-#test_with_helper <<EOF
+# Reinit after restricting algorithms has problems with FIPS self-tests
+#test_with_helper 'library reinitialization resets changes' <<EOF
 #protocol_set_disabled TLS1.2 -> OK
 #connect -> bad priority: No or insufficient priorities were set.
-#protocol_set_enabled TLS1.3 -> OK
-#connect -> handshake failed: A packet with illegal or unsupported version was received.
+#reinit -> OK
+#connect -> connection established: (TLS1.2)-(RSA)-(AES-128-GCM)
 #EOF
+
+# Reinit after restricting algorithms has problems with FIPS self-tests
+#test_with_helper \
+#	'library reinitialization allows new API again, but resets changes' \
+#	<<EOF
+#protocol_set_disabled TLS1.2 -> OK
+#connect -> bad priority: No or insufficient priorities were set.
+#protocol_set_enabled TLS1.2 -> INVALID_REQUEST
+#connect -> bad priority: No or insufficient priorities were set.
+#reinit -> OK
+#connect -> connection established: (TLS1.2)-(RSA)-(AES-128-GCM)
+#protocol_set_disabled TLS1.2 -> INVALID_REQUEST
+#connect -> connection established: (TLS1.2)-(RSA)-(AES-128-GCM)
+#reinit -> OK
+#protocol_set_disabled TLS1.2 -> OK
+#protocol_set_enabled TLS1.2 -> OK
+#connect -> connection established: (TLS1.2)-(RSA)-(AES-128-GCM)
+#protocol_set_disabled TLS1.2 -> INVALID_REQUEST
+#EOF
+
+test_with_helper 'Insufficient priority vs handshake failed: 1/2' <<EOF
+protocol_set_disabled TLS1.2 -> OK
+connect -> bad priority: No or insufficient priorities were set.
+EOF
+
+test_with_helper 'Insufficient priority vs handshake failed: 2/2' <<EOF
+protocol_set_disabled TLS1.2 -> OK
+protocol_set_enabled TLS1.3 -> OK
+connect -> handshake failed: A TLS fatal alert has been received.
+EOF
+# TLS 1.3 does some masquerading as TLS 1.2, I guess, so it's not
+# handshake failed: A packet with illegal or unsupported version was received.
 
 terminate_proc ${SERVER_PID}
 
@@ -244,105 +274,161 @@ terminate_proc ${SERVER_PID}
 
 eval "${GETPORT}"
 # server is launched without allowlisting config file in effect
-launch_server -d9 --echo --priority NORMAL \
+launch_server --echo --priority NORMAL \
 	--x509keyfile "${TMPFILE_KEY}" --x509certfile "${TMPFILE_CERT}"
 SERVER_PID=$!
 wait_server ${SERVER_PID}
 
-# !!! CURRENTLY NOT WORKING AS EXPECTED !!!
-# smoke-test enabling with protocol_set
-#test_with_helper <<EOF
-#connect -> connection established: (TLS1.2)-(RSA)-(AES-128-GCM)
-#protocol_set_enabled TLS1.3 -> OK
-#connect -> connection established: (TLS1.3)-(DHE-FFDHE3072)-(RSA-PSS-RSAE-SHA256)-(AES-128-GCM)
-#EOF
+# sanity-test
+test_with_helper 'sanity test against liberal server' <<EOF
+connect -> connection established: (TLS1.2)-(RSA)-(AES-128-GCM)
+EOF
 
-# !!! CURRENTLY NOT WORKING AS EXPECTED !!!
-# ["gnutls_protocol_set_enabled enables, TLS"]
-# with a configuration file not allowlisting a specific TLS protocol version,
-# enabling that version with gnutls_protocol_set_enabled
-# allows connecting to a server accepting this TLS protocol version alone
-#test_with_helper <<EOF
-#connect -> connection established: (TLS1.2)-(RSA)-(AES-128-GCM)
-#protocol_set_enabled TLS1.3 -> OK
-#connect -> connection established: (TLS1.3)-(DHE-FFDHE3072)-(RSA-PSS-RSAE-SHA256)-(AES-128-GCM)
-#EOF
+test_with_helper 'smoke-test enabling' <<EOF
+protocol_set_enabled TLS1.3 -> OK
+connect -> connection established: (TLS1.3)-(DHE-FFDHE3072)-(RSA-PSS-RSAE-SHA256)-(AES-128-GCM)
+EOF
 
-# !!! CURRENTLY NOT WORKING AS EXPECTED !!!
-# ["gnutls_protocol_set_enabled enables revertibly, TLS"]
-# consecutive gnutls_protocol_set
-# can prevent the client from connecting (with a different session handle)
-#test_with_helper <<EOF
-#connect -> connection established: (TLS1.2)-(RSA)-(AES-128-GCM)
-#protocol_set_enabled TLS1.1 -> OK
-#connect -> connection established: (TLS1.2)-(RSA)-(AES-128-GCM)
-#protocol_set_disabled TLS1.2 -> OK
-#connect -> connection established: (TLS1.1)-(RSA)-(AES-128-CBC)-(SHA1)
-#protocol_set_disabled TLS1.1 -> OK
-#connect -> bad priority: No or insufficient priorities were set.
-#EOF
-# Alternative one
-#test_with_helper <<EOF
-#connect -> connection established: (TLS1.2)-(RSA)-(AES-128-GCM)
-#protocol_set_enabled TLS1.3 -> OK
-#connect -> connection established: (TLS1.3)-(DHE-FFDHE3072)-(RSA-PSS-RSAE-SHA256)-(AES-128-GCM)
-#protocol_set_disabled TLS1.3 -> OK
-#connect -> connection established: (TLS1.2)-(RSA)-(AES-128-GCM)
-#EOF
+test_with_helper 'going down to TLS1.1' <<EOF
+protocol_set_enabled TLS1.1 -> OK
+protocol_set_disabled TLS1.2 -> OK
+connect -> connection established: (TLS1.1)-(RSA)-(AES-128-CBC)-(SHA1)
+EOF
 
-# !!! CURRENTLY NOT WORKING AS EXPECTED !!!
-# ["gnutls_protocol_set_disabled disables selectively, TLS"]
-# gnutls_protocol_set_disabled with a specific version
-# doesn't disable other previously enabled version.
-# ["gnutls_protocol_set_enabled enables selectively, TLS"]
-# gnutls_protocol_set_enabled enabling a specific version
-# doesn't enable other previously disabled version.
-#test_with_helper <<EOF
-#connect -> connection established: (TLS1.2)-(RSA)-(AES-128-GCM)
-#protocol_set_enabled TLS1.3 -> OK
-#protocol_set_enabled TLS1.2 -> OK
-#protocol_set_enabled TLS1.1 -> OK
-#connect -> connection established: (TLS1.3)-(DHE-FFDHE3072)-(RSA-PSS-RSAE-SHA256)-(AES-128-GCM)
-#protocol_set_disabled TLS1.3 -> OK
-#connect -> connection established: (TLS1.2)-(RSA)-(AES-128-GCM)
-#protocol_set_disabled TLS1.2 -> OK
-#connect -> connection established: (TLS1.1)-(RSA)-(AES-128-CBC)-(SHA1)
-#protocol_set_disabled TLS1.1 -> OK
-#connect -> bad priority: No or insufficient priorities were set.
-#protocol_set_enabled TLS1.1 -> OK
-#connect -> connection established: (TLS1.1)-(RSA)-(AES-128-CBC)-(SHA1)
-#protocol_set_enabled TLS1.2 -> OK
-#connect -> connection established: (TLS1.1)-(RSA)-(AES-128-CBC)-(SHA1)
-#protocol_set_enabled TLS1.3 -> OK
-#connect -> connection established: (TLS1.3)-(DHE-FFDHE3072)-(RSA-PSS-RSAE-SHA256)-(AES-128-GCM)
-#EOF
+test_with_helper 'going up to TLS 1.3' <<EOF
+protocol_set_enabled TLS1.3 -> OK
+connect -> connection established: (TLS1.3)-(DHE-FFDHE3072)-(RSA-PSS-RSAE-SHA256)-(AES-128-GCM)
+EOF
+
+test_with_helper 'useless toggles' <<EOF
+protocol_set_disabled TLS1.2 -> OK
+protocol_set_disabled TLS1.2 -> OK
+protocol_set_enabled TLS1.2 -> OK
+protocol_set_enabled TLS1.1 -> OK
+protocol_set_enabled TLS1.1 -> OK
+protocol_set_enabled TLS1.3 -> OK
+protocol_set_disabled TLS1.1 -> OK
+protocol_set_disabled TLS1.3 -> OK
+connect -> connection established: (TLS1.2)-(RSA)-(AES-128-GCM)
+EOF
+
+test_with_helper 'disable does not overdisable: 1/2' <<EOF
+protocol_set_enabled TLS1.3 -> OK
+protocol_set_enabled TLS1.2 -> OK
+protocol_set_enabled TLS1.1 -> OK
+protocol_set_disabled TLS1.3 -> OK
+protocol_set_disabled TLS1.1 -> OK
+connect -> connection established: (TLS1.2)-(RSA)-(AES-128-GCM)
+EOF
+
+test_with_helper 'disable does not overdisable: 2/2' <<EOF
+protocol_set_enabled TLS1.3 -> OK
+protocol_set_enabled TLS1.2 -> OK
+protocol_set_enabled TLS1.1 -> OK
+protocol_set_disabled TLS1.3 -> OK
+protocol_set_disabled TLS1.2 -> OK
+connect -> connection established: (TLS1.1)-(RSA)-(AES-128-CBC)-(SHA1)
+EOF
 
 terminate_proc ${SERVER_PID}
 
-### Tests against a TLS 1.1 & 1.3 server (1.2 disabled)
-
+#### Tests against a TLS 1.3 server
+#
 eval "${GETPORT}"
 # server is launched without allowlisting config file in effect
-launch_server -d9 --echo \
-	--priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.1:+VERS-TLS1.3" \
+launch_server --echo \
+	--priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3" \
 	--x509keyfile "${TMPFILE_KEY}" --x509certfile "${TMPFILE_CERT}"
 SERVER_PID=$!
 wait_server ${SERVER_PID}
 
-# !!! CURRENTLY NOT WORKING AS EXPECTED !!!
-#test_with_helper <<EOF
-#connect -> handshake failed: A packet with illegal or unsupported version was received.
-#protocol_set_enabled TLS1.1 -> OK
-#connect -> connection established: (TLS1.1)-(RSA)-(AES-128-CBC)-(SHA1)
-#protocol_set_enabled TLS1.3 -> OK
-#connect -> connection established: (TLS1.3)-(DHE-FFDHE3072)-(RSA-PSS-RSAE-SHA256)-(AES-128-GCM)
-#protocol_set_disabled TLS1.3 -> OK
-#connect -> connection established: (TLS1.1)-(RSA)-(AES-128-CBC)-(SHA1)
-#protocol_set_disabled TLS1.1 -> OK
-#connect -> handshake failed: A packet with illegal or unsupported version was received.
-#protocol_set_disabled TLS1.2 -> OK
-#connect -> bad priority: No or insufficient priorities were set.
-#EOF
+test_with_helper 'sanity negative' <<EOF
+connect -> handshake failed: A TLS fatal alert has been received.
+protocol_set_enabled TLS1.3 -> INVALID_REQUEST
+protocol_set_enabled TLS1.1 -> INVALID_REQUEST
+protocol_set_disabled TLS1.2 -> INVALID_REQUEST
+connect -> handshake failed: A TLS fatal alert has been received.
+EOF
+
+test_with_helper 'enable 1.3' <<EOF
+protocol_set_enabled TLS1.3 -> OK
+connect -> connection established: (TLS1.3)-(DHE-FFDHE3072)-(RSA-PSS-RSAE-SHA256)-(AES-128-GCM)
+EOF
+
+test_with_helper 'enable 1.3 only' <<EOF
+protocol_set_disabled TLS1.2 -> OK
+protocol_set_enabled TLS1.3 -> OK
+connect -> connection established: (TLS1.3)-(DHE-FFDHE3072)-(RSA-PSS-RSAE-SHA256)-(AES-128-GCM)
+EOF
+
+test_with_helper 'enable 1.1' <<EOF
+protocol_set_enabled TLS1.1 -> OK
+connect -> handshake failed: A TLS fatal alert has been received.
+EOF
+
+# A special case according to a comment in set_ciphersuite_list:
+# > we require TLS1.2 to be enabled if TLS1.3 is asked for, and
+# > a pre-TLS1.2 protocol is there; that is because servers which
+# > do not support TLS1.3 will negotiate TLS1.2 if seen a TLS1.3 handshake
+test_with_helper 'enable 1.1 and 1.3 only - does not work as you expect' <<EOF
+protocol_set_enabled TLS1.3 -> OK
+protocol_set_disabled TLS1.2 -> OK
+protocol_set_enabled TLS1.1 -> OK
+connect -> handshake failed: A packet with illegal or unsupported version was received.
+EOF
+
+test_with_helper 'enable 1.1 and 1.3' <<EOF
+protocol_set_enabled TLS1.3 -> OK
+protocol_set_enabled TLS1.1 -> OK
+connect -> connection established: (TLS1.3)-(DHE-FFDHE3072)-(RSA-PSS-RSAE-SHA256)-(AES-128-GCM)
+EOF
+
+test_with_helper 'enable 1.1 and 1.3, different order' <<EOF
+protocol_set_enabled TLS1.1 -> OK
+protocol_set_enabled TLS1.3 -> OK
+connect -> connection established: (TLS1.3)-(DHE-FFDHE3072)-(RSA-PSS-RSAE-SHA256)-(AES-128-GCM)
+EOF
+
+terminate_proc ${SERVER_PID}
+
+#### Tests against a TLS 1.1 + TLS 1.2 server
+#
+eval "${GETPORT}"
+# server is launched without allowlisting config file in effect
+launch_server --echo \
+	--priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.1:+VERS-TLS1.2" \
+	--x509keyfile "${TMPFILE_KEY}" --x509certfile "${TMPFILE_CERT}"
+SERVER_PID=$!
+wait_server ${SERVER_PID}
+
+test_with_helper 'sanity 1.2' <<EOF
+connect -> connection established: (TLS1.2)-(RSA)-(AES-128-GCM)
+EOF
+
+test_with_helper 'enable 1.1' <<EOF
+protocol_set_enabled TLS1.1 -> OK
+connect -> connection established: (TLS1.2)-(RSA)-(AES-128-GCM)
+EOF
+
+test_with_helper 'enable 1.1 only' <<EOF
+protocol_set_enabled TLS1.1 -> OK
+protocol_set_disabled TLS1.2 -> OK
+connect -> connection established: (TLS1.1)-(RSA)-(AES-128-CBC)-(SHA1)
+EOF
+
+test_with_helper 'enable 1.1 and 1.3 only' <<EOF
+protocol_set_enabled TLS1.3 -> OK
+protocol_set_disabled TLS1.2 -> OK
+protocol_set_enabled TLS1.1 -> OK
+connect -> connection established: (TLS1.1)-(RSA)-(AES-128-CBC)-(SHA1)
+EOF
+
+test_with_helper 'enable 1.1 and 1.3 only, different order' <<EOF
+protocol_set_enabled TLS1.1 -> OK
+protocol_set_disabled TLS1.2 -> OK
+protocol_set_enabled TLS1.3 -> OK
+connect -> connection established: (TLS1.1)-(RSA)-(AES-128-CBC)-(SHA1)
+EOF
 
 terminate_proc ${SERVER_PID}
 
