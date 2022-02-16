@@ -3831,13 +3831,24 @@ gnutls_digest_set_secure(gnutls_digest_algorithm_t dig, unsigned int secure)
  * @secure: whether to mark the sign algorithm secure
  *
  * Modify the previous system wide setting that marked @sign as secure
- * or insecure.  This only has effect when the algorithm is marked as
- * secure through the allowlisting mode in the configuration file, or
- * when the setting is modified with a prior call to this function.
+ * or insecure.  Calling this function is allowed
+ * only if allowlisting mode is set in the configuration file,
+ * and only if the system-wide TLS priority string
+ * has not been initialized yet.
+ * The intended usage is to provide applications with a way
+ * to expressly deviate from the distribution or site defaults
+ * inherited from the configuration file.
+ * The modification is composable with further modifications
+ * performed through the priority string mechanism.
+ *
+ * This function is not thread-safe and is intended to be called
+ * in the main thread at the beginning of the process execution.
  *
  * Even when @secure is true, @sign is not marked as secure for the
  * use in certificates.  Use gnutls_sign_set_secure_for_certs() to
  * mark it secure as well for certificates.
+ *
+ * Returns: 0 on success or negative error code otherwise.
  *
  * Since: 3.7.3
  */
@@ -3882,15 +3893,25 @@ gnutls_sign_set_secure(gnutls_sign_algorithm_t sign, unsigned int secure)
  * @secure: whether to mark the sign algorithm secure for certificates
  *
  * Modify the previous system wide setting that marked @sign as secure
- * or insecure for the use in certificates. This only has effect when
- * the algorithm is marked as secure through the allowlisting mode in
- * the configuration file, or when the setting is modified with a
- * prior call to this function.
+ * or insecure for the use in certificates.  Calling this fuction is allowed
+ * only if allowlisting mode is set in the configuration file,
+ * and only if the system-wide TLS priority string
+ * has not been initialized yet.
+ * The intended usage is to provide applications with a way
+ * to expressly deviate from the distribution or site defaults
+ * inherited from the configuration file.
+ * The modification is composable with further modifications
+ * performed through the priority string mechanism.
  *
+ * This function is not thread-safe and is intended to be called
+ * in the main thread at the beginning of the process execution.
+
  * When @secure is true, @sign is marked as secure for any use unlike
  * gnutls_sign_set_secure().  Otherwise, it is marked as insecure only
  * for the use in certificates.  Use gnutls_sign_set_secure() to mark
  * it insecure for any uses.
+ *
+ * Returns: 0 on success or negative error code otherwise.
  *
  * Since: 3.7.3
  */
@@ -3934,10 +3955,19 @@ gnutls_sign_set_secure_for_certs(gnutls_sign_algorithm_t sign,
  * @version: is a (gnutls) version number
  * @enabled: whether to enable the protocol
  *
- * Mark the previous system wide setting that marked @version as
- * enabled or disabled. This only has effect when the version is
- * enabled through the allowlisting mode in the configuration file, or
- * when the setting is modified with a prior call to this function.
+ * Control the previous system-wide setting that marked @version as
+ * enabled or disabled.  Calling this fuction is allowed
+ * only if allowlisting mode is set in the configuration file,
+ * and only if the system-wide TLS priority string
+ * has not been initialized yet.
+ * The intended usage is to provide applications with a way
+ * to expressly deviate from the distribution or site defaults
+ * inherited from the configuration file.
+ * The modification is composable with further modifications
+ * performed through the priority string mechanism.
+ *
+ * This function is not thread-safe and is intended to be called
+ * in the main thread at the beginning of the process execution.
  *
  * Returns: 0 on success or negative error code otherwise.
  *
@@ -3977,9 +4007,18 @@ gnutls_protocol_set_enabled(gnutls_protocol_t version, unsigned int enabled)
  * @enabled: whether to enable the curve
  *
  * Modify the previous system wide setting that marked @curve as
- * enabled or disabled.  This only has effect when the curve is
- * enabled through the allowlisting mode in the configuration file, or
- * when the setting is modified with a prior call to this function.
+ * enabled or disabled.  Calling this fuction is allowed
+ * only if allowlisting mode is set in the configuration file,
+ * and only if the system-wide TLS priority string
+ * has not been initialized yet.
+ * The intended usage is to provide applications with a way
+ * to expressly deviate from the distribution or site defaults
+ * inherited from the configuration file.
+ * The modification is composable with further modifications
+ * performed through the priority string mechanism.
+ *
+ * This function is not thread-safe and is intended to be called
+ * in the main thread at the beginning of the process execution.
  *
  * Returns: 0 on success or negative error code otherwise.
  *
