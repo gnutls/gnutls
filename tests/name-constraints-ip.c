@@ -190,7 +190,7 @@ static void check_generation_reading_basic_checking(void **glob_state)
 	} while(ret == 0);
 
 	if (i-1 != num_permitted) {
-		fail_msg("Could not read all contraints; read %d, expected %d\n", i-1, num_permitted);
+		fail_msg("Could not read all constraints; read %d, expected %d\n", i-1, num_permitted);
 	}
 
 	i = 0;
@@ -203,7 +203,7 @@ static void check_generation_reading_basic_checking(void **glob_state)
 	} while(ret == 0);
 
 	if (i-1 != num_excluded) {
-		fail_msg("Could not read all excluded contraints; read %d, expected %d\n", i-1, num_excluded);
+		fail_msg("Could not read all excluded constraints; read %d, expected %d\n", i-1, num_excluded);
 	}
 
 	/* 3: test the name constraints check function */

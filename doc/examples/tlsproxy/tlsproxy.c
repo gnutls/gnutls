@@ -292,7 +292,7 @@ Usage:\n\
 A TLS client or server proxy\n\
 \n\
 Options:\n\
-     -c, --connect ADDRRESS    Connect to ADDRESS\n\
+     -c, --connect ADDRESS     Connect to ADDRESS\n\
      -l, --listen ADDRESS      Listen on ADDRESS\n\
      -K, --key FILE            Use FILE as private key\n\
      -C, --cert FILE           Use FILE as public key\n\

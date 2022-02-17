@@ -469,7 +469,7 @@ gnutls_hmac_init(gnutls_hmac_hd_t * dig,
 		not_approved = true;
 	}
 
-	/* Key lengthes less than 112 bits are not approved */
+	/* Key lengths of less than 112 bits are not approved */
 	if (keylen < 14) {
 		not_approved = true;
 	}
@@ -632,7 +632,7 @@ gnutls_hmac_fast(gnutls_mac_algorithm_t algorithm,
 		not_approved = true;
 	}
 
-	/* Key lengthes less than 112 bits are not approved */
+	/* Key lengths of less than 112 bits are not approved */
 	if (keylen < 14) {
 		not_approved = true;
 	}

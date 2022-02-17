@@ -1531,7 +1531,7 @@ static const char *modified2[] = {
 };
 
 /* Empty intersection of 2 permitted DNS names,
- * non-intuitive contraints order (more specific higher) */
+ * non-intuitive constraints order (more specific higher) */
 static const char *nc_bad0[] = {
   /* Alternative DNSname: two.example.org */
   "-----BEGIN CERTIFICATE-----\n"

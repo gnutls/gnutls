@@ -34,7 +34,7 @@
 #include "cert-common.h"
 
 /* Tests whether the post_client_hello callback can modify
- * the avalable priorities. This is used by apache's mod_gnutls.
+ * the available priorities. This is used by apache's mod_gnutls.
  */
 
 const char *side;
@@ -139,7 +139,7 @@ void doit(void)
 	start("tls1.3-only", "NORMAL:-VERS-ALL:+VERS-TLS1.3", "NORMAL:-VERS-ALL:+VERS-TLS1.3", GNUTLS_TLS1_3);
 	start("default", "NORMAL", "NORMAL", GNUTLS_TLS1_3);
 	override_prio = "NORMAL:-VERS-ALL:+VERS-TLS1.2";
-	start("default overriden to TLS1.2-only", "NORMAL", "NORMAL", GNUTLS_TLS1_2);
+	start("default overridden to TLS1.2-only", "NORMAL", "NORMAL", GNUTLS_TLS1_2);
 	override_prio = NULL;
 	start("client tls1.2-only, server tls1.2-disabled",
 	      "NORMAL:-VERS-ALL:+VERS-TLS1.2", "NORMAL:-VERS-TLS1.2:-VERS-TLS1.1:-VERS-TLS1.0:-VERS-SSL3.0", -1);

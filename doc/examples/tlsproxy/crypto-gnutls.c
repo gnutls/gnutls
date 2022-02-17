@@ -144,7 +144,7 @@ verify_certificate_callback (gnutls_session_t session)
 
   if (ret < 0)
     {
-      debugout (s, "Could not verfify peer certificate due to an error\n");
+      debugout (s, "Could not verify peer certificate due to an error\n");
       return GNUTLS_E_CERTIFICATE_ERROR;
     }
 

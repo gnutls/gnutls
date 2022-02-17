@@ -34,7 +34,7 @@
  * gnutls-cli localhost:5556 --priority NORMAL:-CTYPE-ALL:+CTYPE-CLI-RAWPK:+CTYPE-SRV-RAWPK --no-ca-verification
  * 
  * The above yields a handshake where both the client and server present
- * a raw public-key to eachother.
+ * a raw public-key to each other.
  */
 
 #include <assert.h>

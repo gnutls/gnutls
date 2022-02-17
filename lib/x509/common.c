@@ -1704,7 +1704,7 @@ _gnutls_check_valid_key_id(const gnutls_datum_t *key_id,
 	return result;
 }
 
-/* Sort a certficate list in place with subject, issuer order. @clist_size must
+/* Sort a certificate list in place with subject, issuer order. @clist_size must
  * be equal to or less than %DEFAULT_MAX_VERIFY_DEPTH.
  *
  * Returns the index in clist where the initial contiguous segment ends. If the

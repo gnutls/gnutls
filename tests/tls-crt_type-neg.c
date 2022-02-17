@@ -23,7 +23,7 @@
 #include <config.h>
 #endif
 
-/* This program tests the certificate type negotiation mechnism for
+/* This program tests the certificate type negotiation mechanism for
  * the handshake as specified in RFC7250 */
 
 #include <stdio.h>
@@ -288,7 +288,7 @@ test_case_st tests[] = {
 		 * Request client cert: no
 		 * Handshake: should complete without errors
 		 * Negotiation: a Raw PK server cert and client cert. Under TLS 1.3
-		 *   a respons is always sent by the server also when no client
+		 *   a response is always sent by the server also when no client
 		 *   cert is requested. This is necessary for post-handshake authentication
 		 *   to work.
 		 */

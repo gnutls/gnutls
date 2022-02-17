@@ -60,7 +60,7 @@ void doit(void)
 # define P11LIB "libpkcs11mock1.so"
 #endif
 
-/* Tests whether we can use gnutls_privkey_sign() under mutliple threads
+/* Tests whether we can use gnutls_privkey_sign() under multiple threads
  * with the same key when PKCS#11 is in use.
  */
 
