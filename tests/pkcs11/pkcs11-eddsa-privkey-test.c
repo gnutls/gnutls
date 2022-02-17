@@ -107,6 +107,11 @@ void doit(void)
 		fail("%d: %s\n", ret, gnutls_strerror(ret));
 	}
 
+	if (gnutls_fips140_mode_enabled()) {
+		gnutls_global_deinit();
+		return;
+	}
+
 	gnutls_pkcs11_set_pin_function(pin_func, NULL);
 	gnutls_global_set_log_function(tls_log_func);
 	if (debug)

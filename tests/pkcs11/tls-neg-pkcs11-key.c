@@ -268,6 +268,7 @@ typedef struct test_st {
 	int exp_serv_err;
 	int needs_eddsa;
 	int needs_decryption;
+	int nofips;
 	unsigned requires_pkcs11_pss;
 } test_st;
 
@@ -340,6 +341,7 @@ static const test_st tests[] = {
 	 .cert = &server_ca3_eddsa_cert,
 	 .key = &server_ca3_eddsa_key,
 	 .exp_kx = GNUTLS_KX_ECDHE_RSA,
+	 .nofips = 1
 	},
 	{.name = "tls1.3: ecc key",
 	 .pk = GNUTLS_PK_ECDSA,
@@ -392,7 +394,8 @@ static const test_st tests[] = {
 	 .prio = "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA",
 	 .cert = &server_ca3_eddsa_cert,
 	 .key = &server_ca3_eddsa_key,
-	 .exp_kx = GNUTLS_KX_ECDHE_RSA
+	 .exp_kx = GNUTLS_KX_ECDHE_RSA,
+	 .nofips = 1
 	}
 };
 
@@ -448,6 +451,9 @@ void doit(void)
 	have_eddsa = verify_eddsa_presence();
 
 	for (i=0;i<sizeof(tests)/sizeof(tests[0]);i++) {
+		if (tests[i].nofips && gnutls_fips140_mode_enabled())
+			continue;
+
 		if (tests[i].needs_eddsa && !have_eddsa)
 			continue;
 
