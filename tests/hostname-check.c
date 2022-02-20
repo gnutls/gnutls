@@ -521,7 +521,7 @@ char pem10[] =
     "X.509 Certificate Information:\n"
     "	Version: 3\n"
     "	Serial Number (hex): 0b5d0a870d09\n"
-    "	Issuer: C=NN,O=Edel Curl Arctic Illudium Research Cloud,CN=Nothern Nowhere Trust Anchor\n"
+    "	Issuer: C=NN,O=Edel Curl Arctic Illudium Research Cloud,CN=Northern Nowhere Trust Anchor\n"
     "	Validity:\n"
     "		Not Before: Tue Aug 04 22:07:33 UTC 2009\n"
     "		Not After: Sat Oct 21 22:07:33 UTC 2017\n"

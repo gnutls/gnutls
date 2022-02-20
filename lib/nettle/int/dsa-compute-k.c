@@ -33,7 +33,7 @@
 
 #define BITS_TO_LIMBS(bits) (((bits) + GMP_NUMB_BITS - 1) / GMP_NUMB_BITS)
 
-/* The maximum size of q, choosen from the fact that we support
+/* The maximum size of q, chosen from the fact that we support
  * 521-bit elliptic curve generator and 512-bit DSA subgroup at
  * maximum. */
 #define MAX_Q_BITS 521

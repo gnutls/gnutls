@@ -149,7 +149,7 @@ void doit(void)
 	} while(ret == 0);
 
 	if (i-1 != 8) {
-		fail("Could not read all contraints; read %d, expected %d\n", i-1, 8);
+		fail("Could not read all constraints; read %d, expected %d\n", i-1, 8);
 	}
 
 	gnutls_x509_name_constraints_deinit(nc);
@@ -222,7 +222,7 @@ void doit(void)
 	} while(ret == 0);
 
 	if (i-1 != permitted) {
-		fail("Could not read all contraints; read %d, expected %d\n", i-1, permitted);
+		fail("Could not read all constraints; read %d, expected %d\n", i-1, permitted);
 	}
 
 	i = 0;
@@ -242,7 +242,7 @@ void doit(void)
 	} while(ret == 0);
 
 	if (i-1 != excluded) {
-		fail("Could not read all excluded contraints; read %d, expected %d\n", i-1, excluded);
+		fail("Could not read all excluded constraints; read %d, expected %d\n", i-1, excluded);
 	}
 
 	/* 3: test the name constraints check function */

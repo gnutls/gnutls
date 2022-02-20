@@ -56,7 +56,7 @@ check_binding_data(gnutls_session_t client, gnutls_session_t server,
 	if (gnutls_session_channel_binding(client, cbtype, &client_cb)
 			!= GNUTLS_E_SUCCESS) {
 		if (negative == 0) {
-			fail("Cannot get client bidning %s\n", cbname);
+			fail("Cannot get client binding %s\n", cbname);
 			return 1;
 		}
 	} else if(negative) {
@@ -66,7 +66,7 @@ check_binding_data(gnutls_session_t client, gnutls_session_t server,
 	if (gnutls_session_channel_binding(server, cbtype, &server_cb)
 			!= GNUTLS_E_SUCCESS) {
 		if (negative == 0) {
-			fail("Cannot get server bidning %s\n", cbname);
+			fail("Cannot get server binding %s\n", cbname);
 			return -1;
 		}
 	} else if(negative) {

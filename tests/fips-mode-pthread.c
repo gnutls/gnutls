@@ -52,7 +52,7 @@ void doit(void)
 #else
 
 /* Tests whether we can use gnutls_fips140_set_mode() and
- * gnutls_fips140_mode_enabled() under mutliple threads.
+ * gnutls_fips140_mode_enabled() under multiple threads.
  */
 
 typedef struct thread_data_st {

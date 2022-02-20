@@ -51,7 +51,7 @@ void doit(void)
 
 #else
 
-/* Tests whether we can use gnutls_rnd() under mutliple threads.
+/* Tests whether we can use gnutls_rnd() under multiple threads.
  * We do a basic checking of random data match when gnutls_rnd()
  * is called in parallel.
  */

@@ -28,7 +28,7 @@
 #include <stdlib.h>
 
 /* In this test we check whether the server will bail out after receiving
- * a bunch of warning alerts. That is to avoid DoS due to the assymetry of
+ * a bunch of warning alerts. That is to avoid DoS due to the asymmetry of
  * cost of sending an alert vs the cost of receiving.
  */
 
