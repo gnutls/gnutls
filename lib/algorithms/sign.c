@@ -516,6 +516,9 @@ void _gnutls_sign_mark_insecure_all(hash_security_level_t level)
  * use in certificates.  Use gnutls_sign_set_secure_for_certs() to
  * mark it secure as well for certificates.
  *
+ * This function must be called prior to any session priority setting functions;
+ * otherwise the behavior is undefined.
+ *
  * Since: 3.7.3
  */
 int
@@ -559,6 +562,9 @@ gnutls_sign_set_secure(gnutls_sign_algorithm_t sign,
  * gnutls_sign_set_secure().  Otherwise, it is marked as insecure only
  * for the use in certificates.  Use gnutls_sign_set_secure() to mark
  * it insecure for any uses.
+ *
+ * This function must be called prior to any session priority setting functions;
+ * otherwise the behavior is undefined.
  *
  * Since: 3.7.3
  */
