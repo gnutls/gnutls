@@ -43,7 +43,7 @@
 #include "profiles.h"
 #include "name_val_array.h"
 
-#define MAX_ELEMENTS 64
+#define MAX_ELEMENTS GNUTLS_MAX_ALGORITHM_NUM
 
 #define ENABLE_PROFILE(c, profile) do { \
 	c->additional_verify_flags &= 0x00ffffff; \
