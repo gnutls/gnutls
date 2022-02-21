@@ -208,6 +208,7 @@ static const cipher_entry_st algorithms[] = {
 	  .explicit_iv = 8,
 	  .cipher_iv = 12,
 	  .tagsize = 16},
+#ifdef ENABLE_GOST
 	{ .name = "GOST28147-TC26Z-CFB",
 	  .id = GNUTLS_CIPHER_GOST28147_TC26Z_CFB,
 	  .blocksize = 8,
@@ -243,7 +244,7 @@ static const cipher_entry_st algorithms[] = {
 	  .type = CIPHER_STREAM,
 	  .implicit_iv = 8,
 	  .cipher_iv = 8},
-
+#endif
 	{ .name = "AES-128-CFB8",
 	  .id = GNUTLS_CIPHER_AES_128_CFB8,
 	  .blocksize = 16,
@@ -297,6 +298,7 @@ static const cipher_entry_st algorithms[] = {
 	  .cipher_iv = 16,
 	  .flags = GNUTLS_CIPHER_FLAG_ONLY_AEAD,
 	  .tagsize = 16},
+#ifdef ENABLE_GOST
 	{ .name = "GOST28147-TC26Z-CNT",
 	  .id = GNUTLS_CIPHER_GOST28147_TC26Z_CNT,
 	  .blocksize = 8,
@@ -318,6 +320,7 @@ static const cipher_entry_st algorithms[] = {
 	  .type = CIPHER_STREAM,
 	  .implicit_iv = 8,
 	  .cipher_iv = 16},
+#endif
 	{ .name = "3DES-CBC",
 	  .id = GNUTLS_CIPHER_3DES_CBC,
 	  .blocksize = 8,
