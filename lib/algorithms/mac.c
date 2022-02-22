@@ -332,6 +332,9 @@ void _gnutls_digest_mark_insecure_all(void)
  * through the allowlisting mode in the configuration file, or when
  * the setting is modified with a prior call to this function.
  *
+ * This function must be called prior to any session priority setting functions;
+ * otherwise the behavior is undefined.
+ *
  * Since: 3.7.3
  */
 int
