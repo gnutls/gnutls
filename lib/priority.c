@@ -309,7 +309,9 @@ static const int _kx_priority_secure[] = {
 static const int* kx_priority_secure = _kx_priority_secure;
 
 static const int _kx_priority_gost[] = {
+#ifdef ENABLE_GOST
 	GNUTLS_KX_VKO_GOST_12,
+#endif
 	0,
 };
 static const int* kx_priority_gost = _kx_priority_gost;
@@ -507,9 +509,10 @@ static const int _sign_priority_secure192[] = {
 static const int* sign_priority_secure192 = _sign_priority_secure192;
 
 static const int _sign_priority_gost[] = {
+#ifdef ENABLE_GOST
 	GNUTLS_SIGN_GOST_256,
 	GNUTLS_SIGN_GOST_512,
-
+#endif
 	0
 };
 static const int* sign_priority_gost = _sign_priority_gost;
@@ -531,13 +534,17 @@ static const int *cipher_priority_normal = _cipher_priority_normal_default;
 static const int *mac_priority_normal = mac_priority_normal_default;
 
 static const int _cipher_priority_gost[] = {
+#ifdef ENABLE_GOST
 	GNUTLS_CIPHER_GOST28147_TC26Z_CNT,
+#endif
 	0
 };
 static const int *cipher_priority_gost = _cipher_priority_gost;
 
 static const int _mac_priority_gost[] = {
+#ifdef ENABLE_GOST
 	GNUTLS_MAC_GOST28147_TC26Z_IMIT,
+#endif
 	0
 };
 static const int *mac_priority_gost = _mac_priority_gost;
