@@ -1883,6 +1883,90 @@ static int _wrap_nettle_pk_curve_exists(gnutls_ecc_curve_t curve)
 	}
 }
 
+static int _wrap_nettle_pk_exists(gnutls_pk_algorithm_t pk)
+{
+	switch (pk) {
+	case GNUTLS_PK_RSA:
+	case GNUTLS_PK_DSA:
+	case GNUTLS_PK_DH:
+	case GNUTLS_PK_ECDSA:
+	case GNUTLS_PK_ECDH_X25519:
+	case GNUTLS_PK_RSA_PSS:
+	case GNUTLS_PK_EDDSA_ED25519:
+#if ENABLE_GOST
+	case GNUTLS_PK_GOST_01:
+	case GNUTLS_PK_GOST_12_256:
+	case GNUTLS_PK_GOST_12_512:
+#endif
+	case GNUTLS_PK_ECDH_X448:
+	case GNUTLS_PK_EDDSA_ED448:
+		return 1;
+	default:
+		return 0;
+	}
+}
+
+static int _wrap_nettle_pk_sign_exists(gnutls_sign_algorithm_t sign)
+{
+	switch (sign) {
+	case GNUTLS_SIGN_RSA_SHA1:
+	case GNUTLS_SIGN_DSA_SHA1:
+	case GNUTLS_SIGN_RSA_MD5:
+	case GNUTLS_SIGN_RSA_MD2:
+	case GNUTLS_SIGN_RSA_RMD160:
+	case GNUTLS_SIGN_RSA_SHA256:
+	case GNUTLS_SIGN_RSA_SHA384:
+	case GNUTLS_SIGN_RSA_SHA512:
+	case GNUTLS_SIGN_RSA_SHA224:
+	case GNUTLS_SIGN_DSA_SHA224:
+	case GNUTLS_SIGN_DSA_SHA256:
+	case GNUTLS_SIGN_ECDSA_SHA1:
+	case GNUTLS_SIGN_ECDSA_SHA224:
+	case GNUTLS_SIGN_ECDSA_SHA256:
+	case GNUTLS_SIGN_ECDSA_SHA384:
+	case GNUTLS_SIGN_ECDSA_SHA512:
+	case GNUTLS_SIGN_DSA_SHA384:
+	case GNUTLS_SIGN_DSA_SHA512:
+	case GNUTLS_SIGN_ECDSA_SHA3_224:
+	case GNUTLS_SIGN_ECDSA_SHA3_256:
+	case GNUTLS_SIGN_ECDSA_SHA3_384:
+	case GNUTLS_SIGN_ECDSA_SHA3_512:
+
+	case GNUTLS_SIGN_DSA_SHA3_224:
+	case GNUTLS_SIGN_DSA_SHA3_256:
+	case GNUTLS_SIGN_DSA_SHA3_384:
+	case GNUTLS_SIGN_DSA_SHA3_512:
+	case GNUTLS_SIGN_RSA_SHA3_224:
+	case GNUTLS_SIGN_RSA_SHA3_256:
+	case GNUTLS_SIGN_RSA_SHA3_384:
+	case GNUTLS_SIGN_RSA_SHA3_512:
+
+	case GNUTLS_SIGN_RSA_PSS_SHA256:
+	case GNUTLS_SIGN_RSA_PSS_SHA384:
+	case GNUTLS_SIGN_RSA_PSS_SHA512:
+	case GNUTLS_SIGN_EDDSA_ED25519:
+	case GNUTLS_SIGN_RSA_RAW:
+
+	case GNUTLS_SIGN_ECDSA_SECP256R1_SHA256:
+	case GNUTLS_SIGN_ECDSA_SECP384R1_SHA384:
+	case GNUTLS_SIGN_ECDSA_SECP521R1_SHA512:
+
+	case GNUTLS_SIGN_RSA_PSS_RSAE_SHA256:
+	case GNUTLS_SIGN_RSA_PSS_RSAE_SHA384:
+	case GNUTLS_SIGN_RSA_PSS_RSAE_SHA512:
+
+#if ENABLE_GOST
+	case GNUTLS_SIGN_GOST_94:
+	case GNUTLS_SIGN_GOST_256:
+	case GNUTLS_SIGN_GOST_512:
+#endif
+	case GNUTLS_SIGN_EDDSA_ED448:
+		return 1;
+	default:
+		return 0;
+	}
+}
+
 /* Generates algorithm's parameters. That is:
  *  For DSA: p, q, and g are generated.
  *  For RSA: nothing
@@ -3872,4 +3956,6 @@ gnutls_crypto_pk_st _gnutls_pk_ops = {
 	.pk_fixup_private_params = wrap_nettle_pk_fixup,
 	.derive = _wrap_nettle_pk_derive,
 	.curve_exists = _wrap_nettle_pk_curve_exists,
+	.pk_exists = _wrap_nettle_pk_exists,
+	.sign_exists = _wrap_nettle_pk_sign_exists
 };

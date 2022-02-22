@@ -24,6 +24,7 @@
 #include <algorithms.h>
 #include "errors.h"
 #include <x509/common.h>
+#include "pk.h"
 
 
 /* KX mappings to PK algorithms */
@@ -203,8 +204,11 @@ const gnutls_pk_algorithm_t *gnutls_pk_list(void)
 		int i = 0;
 
 		GNUTLS_PK_LOOP(
-			if (p->id != GNUTLS_PK_UNKNOWN && supported_pks[i > 0 ? (i - 1) : 0] != p->id)
-				supported_pks[i++] = p->id
+			if (p->id != GNUTLS_PK_UNKNOWN &&
+			    supported_pks[i > 0 ? (i - 1) : 0] != p->id &&
+			    _gnutls_pk_exists(p->id)) {
+				supported_pks[i++] = p->id;
+			}
 		);
 		supported_pks[i++] = 0;
 	}

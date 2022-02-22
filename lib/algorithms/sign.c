@@ -27,6 +27,7 @@
 #include <x509/common.h>
 #include <assert.h>
 #include "c-strcase.h"
+#include "pk.h"
 
 /* signature algorithms;
  */
@@ -631,7 +632,8 @@ const gnutls_sign_algorithm_t *gnutls_sign_list(void)
 
 		GNUTLS_SIGN_LOOP(
 			/* list all algorithms, but not duplicates */
-			if (supported_sign[i] != p->id) {
+			if (supported_sign[i] != p->id &&
+			    _gnutls_pk_sign_exists(p->id)) {
 				assert(i+1 < MAX_ALGOS);
 				supported_sign[i++] = p->id;
 				supported_sign[i+1] = 0;
