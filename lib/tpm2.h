@@ -37,7 +37,7 @@ struct tpm2_info_st;
 
 struct tpm2_info_st *tpm2_info_init(struct pin_info_st *pin);
 
-void tpm2_tcti_deinit(void);
+void tpm2_esys_deinit(void);
 
 void release_tpm2_ctx(struct tpm2_info_st *info);
 

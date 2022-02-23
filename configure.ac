@@ -882,6 +882,8 @@ AM_CONDITIONAL(P11KIT_0_23_11_API, $PKG_CONFIG --atleast-version=0.23.11 p11-kit
 
 AM_CONDITIONAL(ENABLE_PKCS11, test "$with_p11_kit" != "no")
 
+need_ltlibdl=no
+
 AC_ARG_WITH(tpm2,
 	AS_HELP_STRING([--without-tpm2],
 		[Disable TPM2 support.]),
@@ -892,6 +894,8 @@ if test "$with_tpm2" != "no"; then
 	if test "$have_tpm2" = "yes"; then
 		tss2lib="tss2-esys tss2-mu tss2-tctildr"
 		AC_DEFINE([HAVE_TSS2], 1, [Have TSS2])
+		with_tpm2=yes
+		need_ltlibdl=yes
 	elif test "$with_tpm2" = "yes"; then
 		AC_MSG_ERROR([[
 ***
@@ -920,7 +924,8 @@ if test "$with_tpm" != "no"; then
 		   AC_SUBST([TSS_LIBS], [-ltspi])
 		   AC_SUBST([TSS_CFLAGS], [])
 		   AC_DEFINE([HAVE_TROUSERS], 1, [Enable TPM])
-		   with_tpm=yes],
+		   with_tpm=yes,
+		   need_ltlibdl=yes],
 		  [AC_MSG_RESULT(no)
 		   AC_MSG_WARN([[
 *** 
@@ -956,6 +961,9 @@ fi
 
 AC_DEFINE_UNQUOTED([TROUSERS_LIB], ["$ac_trousers_lib"], [the location of the trousers library])
 AC_SUBST(TROUSERS_LIB)
+
+
+AM_CONDITIONAL(NEED_LTLIBDL, test "$need_ltlibdl" = yes)
 
 # For minitasn1.
 AC_CHECK_SIZEOF(unsigned long int, 4)
@@ -1389,7 +1397,7 @@ AC_MSG_NOTICE([External hardware support:
   Random gen. variant:  $rnd_variant
   PKCS#11 support:      $with_p11_kit
   TPM support:          $with_tpm
-  TPM2 support:         $have_tpm2
+  TPM2 support:         $with_tpm2
   KTLS support:         $enable_ktls
 ])
 

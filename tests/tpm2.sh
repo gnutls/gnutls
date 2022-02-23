@@ -21,8 +21,6 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-set +e
-
 : ${srcdir=.}
 : ${CERTTOOL=../src/certtool${EXEEXT}}
 KEYPEMFILE=tpmkey.$$.key.pem
@@ -192,6 +190,10 @@ run_tests()
 
 	echo " - Generating ${KEYPEMFILE}"
 	tpm2tss-genkey -a ${kalg} -o ${OPASS} ${KEYPEMFILE}
+	if [ $? -ne 0 ]; then
+		echo "unable to generate key"
+		return 1
+	fi
 	cat ${KEYPEMFILE}
 
 	echo " - Generating certificate based on key"
@@ -200,6 +202,10 @@ run_tests()
 	"${CERTTOOL}" --generate-self-signed -d 3 \
 		--load-privkey "${KEYPEMFILE}" \
 		--template "${srcdir}/cert-tests/templates/template-test.tmpl"
+	if [ $? -ne 0 ]; then
+		echo "unable to generate certificate"
+		return 1
+	fi
 
 	if test "${kalg}" = "rsa";then
 		echo " - Generating RSA-PSS certificate based on key"
@@ -207,6 +213,10 @@ run_tests()
 			--load-privkey "${KEYPEMFILE}" \
 			--sign-params rsa-pss \
 			--template "${srcdir}/cert-tests/templates/template-test.tmpl"
+		if [ $? -ne 0 ]; then
+			echo "unable to generate certificate"
+			return 1
+		fi
 	fi
 
 	stop_swtpm
