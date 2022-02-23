@@ -150,6 +150,7 @@ case "$host" in
     AC_MSG_CHECKING([whether the linker supports -Wl,-no_weak_imports])
     AC_LINK_IFELSE([AC_LANG_PROGRAM([], [])],
       [AC_MSG_RESULT(yes)], [AC_MSG_RESULT(no); LDFLAGS="$save_LDFLAGS"])
+    GNUTLS_LIBS_PRIVATE="${GNUTLS_LIBS_PRIVATE} -framework Security -framework CoreFoundation"
   ;;
   *solaris*)
     have_elf=yes
