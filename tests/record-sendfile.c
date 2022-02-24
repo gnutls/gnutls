@@ -7,7 +7,7 @@
 
 #if defined(_WIN32)
 
-int main(void)
+int main()
 {
 	exit(77);
 }
@@ -32,6 +32,7 @@ int main(void)
 #include "cert-common.h"
 #include "utils.h"
 
+
 static void server_log_func(int level, const char *str)
 {
 	fprintf(stderr, "server|<%d>| %s", level, str);
@@ -44,6 +45,7 @@ static void client_log_func(int level, const char *str)
 
 #define MAX_BUF 1024
 #define MSG "Hello world!"
+#define OFFSET 2
 
 static void client(int fd, const char *prio)
 {
@@ -82,13 +84,6 @@ static void client(int fd, const char *prio)
 	if (debug)
 		success("client: Handshake was completed\n");
 
-	ret = gnutls_transport_is_ktls_enabled(session);
-	if (!(ret & GNUTLS_KTLS_RECV)){
-		fail("client: KTLS was not properly inicialized\n");
-		goto end;
-	}
-
-	/* server send message via gnutls_record_send */
 	memset(buffer, 0, sizeof(buffer));
 	do{
 		ret = gnutls_record_recv(session, buffer, sizeof(buffer));
@@ -104,31 +99,7 @@ static void client(int fd, const char *prio)
 		goto end;
 	}
 
-	if(strncmp(buffer, MSG, ret)){
-		fail("client: Message doesn't match\n");
-		goto end;
-	}
-
-	if (debug)
-		success ("client: messages received\n");
-
-	/* server send message via gnutls_record_sendfile */
-	memset(buffer, 0, sizeof(buffer));
-	do{
-		ret = gnutls_record_recv(session, buffer, sizeof(buffer));
-	}
-	while(ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
-
-	if (ret == 0) {
-			success
-			    ("client: Peer has closed the TLS connection\n");
-		goto end;
-	} else if (ret < 0) {
-		fail("client: Error: %s\n", gnutls_strerror(ret));
-		goto end;
-	}
-
-	if(strncmp(buffer, MSG, ret)){
+	if(strncmp(buffer, MSG + OFFSET, ret)){
 		fail("client: Message doesn't match\n");
 		goto end;
 	}
@@ -154,14 +125,6 @@ static void client(int fd, const char *prio)
 
 	if (ret != 0)
 		exit(1);
-}
-
-pid_t child;
-static void terminate(void)
-{
-	assert(child);
-	kill(child, SIGTERM);
-	exit(1);
 }
 
 static void server(int fd, const char *prio)
@@ -203,26 +166,10 @@ static void server(int fd, const char *prio)
 		     gnutls_strerror(ret));
 		goto end;
 	}
+
 	if (debug)
 		success("server: Handshake was completed\n");
 
-	ret = gnutls_transport_is_ktls_enabled(session);
-	if (!(ret & GNUTLS_KTLS_SEND)){
-		fail("server: KTLS was not properly inicialized\n");
-		goto end;
-	}
-	do {
-		ret = gnutls_record_send(session, MSG, strlen(MSG)+1);
-	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
-
-	if (ret < 0) {
-		fail("server: data sending has failed (%s)\n\n",
-		     gnutls_strerror(ret));
-			 goto end;
-	}
-
-	/* send file
-	 */
 	FILE *fp = tmpfile();
 	if (fp == NULL){
 		fail("temporary file for testing couldn't be created");
@@ -235,7 +182,7 @@ static void server(int fd, const char *prio)
 	fputs(MSG, fp);
 	rewind(fp);
 
-	off_t offset = 0;
+	off_t offset = OFFSET;
 	if (fp == NULL) {
 		fail("server: couldn't open file for testing ...send_file() function");
 		goto end;
@@ -246,7 +193,7 @@ static void server(int fd, const char *prio)
 	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 	if (ret < 0) {
-		fail("server: data sending has failed (%s)\n\n",
+		fail("server: sending file has failed (%s)\n\n",
 		     gnutls_strerror(ret));
 			 goto end;
 	}
@@ -264,86 +211,42 @@ end:
 
 	gnutls_global_deinit();
 
-	if (ret){
-		terminate();
-	}
-
 	if (debug)
 		success("server: finished\n");
 }
 
-static void ch_handler(int sig)
+static
+void run(const char *prio)
 {
-	return;
-}
-
-static void run(const char *prio)
-{
+	int fd[2];
 	int ret;
-	struct sockaddr_in saddr;
-	socklen_t addrlen;
-	int listener;
-	int fd;
+	pid_t child;
 
-	success("running ktls test with %s\n", prio);
+	success("testing with %s\n", prio);
 
-	signal(SIGCHLD, ch_handler);
-	signal(SIGPIPE, SIG_IGN);
-
-	listener = socket(AF_INET, SOCK_STREAM, 0);
-	if (listener == -1){
-		fail("error in listener(): %s\n", strerror(errno));
-	}
-
-	memset(&saddr, 0, sizeof(saddr));
-	saddr.sin_family = AF_INET;
-	saddr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-	saddr.sin_port = 0;
-
-	ret = bind(listener, (struct sockaddr*)&saddr, sizeof(saddr));
-	if (ret == -1){
-		fail("error in bind(): %s\n", strerror(errno));
-	}
-
-	addrlen = sizeof(saddr);
-	ret = getsockname(listener, (struct sockaddr*)&saddr, &addrlen);
-	if (ret == -1){
-		fail("error in getsockname(): %s\n", strerror(errno));
+	ret = socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
+	if (ret < 0) {
+		perror("socketpair");
+		exit(1);
 	}
 
 	child = fork();
 	if (child < 0) {
-		fail("error in fork(): %s\n", strerror(errno));
+		perror("fork");
+		fail("fork");
 		exit(1);
 	}
 
 	if (child) {
-		int status;
 		/* parent */
-		ret = listen(listener, 1);
-		if (ret == -1) {
-			fail("error in listen(): %s\n", strerror(errno));
-		}
-
-		fd = accept(listener, NULL, NULL);
-		if (fd == -1) {
-			fail("error in accept(): %s\n", strerror(errno));
-		}
-		server(fd, prio);
-
-		wait(&status);
-		check_wait_status(status);
+		close(fd[1]);
+		server(fd[0], prio);
 	} else {
-		fd = socket(AF_INET, SOCK_STREAM, 0);
-		if (fd == -1){
-			fail("error in socket(): %s\n", strerror(errno));
-			exit(1);
-		}
-		usleep(1000000);
-		connect(fd, (struct sockaddr*)&saddr, addrlen);
-		client(fd, prio);
+		close(fd[0]);
+		client(fd[1], prio);
 		exit(0);
 	}
+
 }
 
 void doit(void)
@@ -353,5 +256,4 @@ void doit(void)
 	run("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM");
 	run("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-256-GCM");
 }
-
 #endif				/* _WIN32 */

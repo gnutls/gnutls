@@ -72,3 +72,6 @@ name = drbg_aes_reseed
 # abi-dump repository:
 [suppress_function]
 name = gnutls_ciphersuite_get
+
+[suppress_function]
+name = gnutls_record_send_file

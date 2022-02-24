@@ -1384,6 +1384,7 @@ GNUTLS_3_7_4
 {
  global:
 	gnutls_ciphersuite_get;
+	gnutls_record_send_file;
  local:
 	*;
 } GNUTLS_3_7_3;
