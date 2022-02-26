@@ -55,6 +55,7 @@
 #include <xsize.h>
 #include "locks.h"
 #include "system/ktls.h"
+#include <intprops.h>
 
 
 struct tls_record_st {
@@ -2138,80 +2139,93 @@ ssize_t gnutls_record_send_early_data(gnutls_session_t session,
  * gnutls_record_send_file:
  * @session: is a #gnutls_session_t type.
  * @fd: file descriptor from which to read data.
- * @offset: Is relative to file offset, denotes the starting location for reading.
- *          after function returns, it point to position following
+ * @offset: Is relative to file offset, denotes the starting location for
+ *          reading.  after function returns, it point to position following
  *          last read byte.
  * @count: is the length of the data in bytes to be read from file and send.
  *
- * This function sends data from @fd. If KTLS (kernel TLS) is enabled, it will use the
- * sendfile() system call to avoid overhead of copying data between user space and the
- * kernel. Otherwise, this functionality is only emulated by calling read() and
- * gnutls_record_send() in a loop; thus it will not work in non-blocking mode. If this
- * limitation matters, check whether KTLS is enabled using
+ * This function sends data from @fd. If KTLS (kernel TLS) is enabled, it will
+ * use the sendfile() system call to avoid overhead of copying data between user
+ * space and the kernel. Otherwise, this functionality is merely emulated by
+ * calling read() and gnutls_record_send(). If this implementation is
+ * suboptimal, check whether KTLS is enabled using
  * gnutls_transport_is_ktls_enabled().
  *
- * if @offset is NULL then file offset is incremented by number of bytes send, otherwise file offset
- * remains unchanged.
+ * If @offset is NULL then file offset is incremented by number of bytes send,
+ * otherwise file offset remains unchanged.
  *
  * Returns: The number of bytes sent, or a negative error code.
  **/
 ssize_t gnutls_record_send_file(gnutls_session_t session, int fd,
-		off_t *offset, size_t count)
+				off_t *offset, size_t count)
 {
-	int ret;
-	size_t buf_len, data_to_send;
-	size_t send = 0;
+	ssize_t ret;
+	size_t buf_len;
+	size_t sent = 0;
 	uint8_t *buf;
+	off_t saved_offset = 0;
 
 	if (IS_KTLS_ENABLED(session, GNUTLS_KTLS_SEND)) {
 		return _gnutls_ktls_send_file(session, fd, offset, count);
 	}
 
-	if (offset != NULL && lseek(fd, *offset, SEEK_CUR) == -1)
+	if (offset != NULL) {
+		saved_offset = lseek(fd, 0, SEEK_CUR);
+		if (saved_offset == (off_t)-1) {
 			return GNUTLS_E_FILE_ERROR;
+		}
+		if (lseek(fd, *offset, SEEK_CUR) == -1) {
+			return GNUTLS_E_FILE_ERROR;
+		}
+	}
 
 	buf_len = MIN(count, MAX(max_record_send_size(session, NULL), 512));
 
-	buf = malloc(buf_len);
+	buf = gnutls_malloc(buf_len);
 	if (buf == NULL) {
 		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
+		ret = GNUTLS_E_MEMORY_ERROR;
+		goto end;
 	}
 
-	while (send < count) {
-		if (count - send < buf_len)
-			buf_len = count - send;
-
-		ret = read(fd, buf, buf_len);
-		if (ret == 0) //eof
+	while (sent < count) {
+		ret = read(fd, buf, MIN(buf_len, count - sent));
+		if (ret == 0) {
 			break;
-		else if (ret == -1){
+		} else if (ret == -1){
+			if (errno == EAGAIN) {
+				ret = GNUTLS_E_AGAIN;
+				goto end;
+			}
 			ret = GNUTLS_E_FILE_ERROR;
 			goto end;
 		}
 
-		data_to_send = ret;
-		while (data_to_send > 0) {
-			ret = gnutls_record_send(session, buf, data_to_send);
-			if (ret < 0) {
-				if (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN)
-					continue;
-				else
-					goto end;
-			}
-			data_to_send -= ret;
+		ret = gnutls_record_send(session, buf, ret);
+		if (ret < 0) {
+			goto end;
 		}
-		send += ret;
-	}
-	if (offset != NULL){
-		*offset += send;
-		lseek(fd, -(*offset), SEEK_CUR);
+		if (INT_ADD_OVERFLOW(sent, ret)) {
+			gnutls_assert();
+			ret = GNUTLS_E_RECORD_OVERFLOW;
+			goto end;
+		}
+		sent += ret;
 	}
 
-	ret = send;
+	ret = sent;
 
   end:
-	free(buf);
+	if (offset != NULL){
+		if (likely(!INT_ADD_OVERFLOW(*offset, sent))) {
+			*offset += sent;
+		} else {
+			gnutls_assert();
+			ret = GNUTLS_E_RECORD_OVERFLOW;
+		}
+		lseek(fd, saved_offset, SEEK_SET);
+	}
+	gnutls_free(buf);
 	return ret;
 }
 
