@@ -779,7 +779,8 @@ gnutls_x509_privkey_import2(gnutls_x509_privkey_t key,
 								       data,
 								       password);
 
-				if (ret == GNUTLS_E_DECRYPTION_FAILED && password == NULL) {
+				if (ret == GNUTLS_E_DECRYPTION_FAILED && password == NULL &&
+						(key->pin.cb || _gnutls_pin_func)) {
 					/* use the callback if any */
 					memset(pin, 0, GNUTLS_PKCS11_MAX_PIN_LEN);
 					ret = _gnutls_retrieve_pin(&key->pin, "key:", "", 0, pin, sizeof(pin));
