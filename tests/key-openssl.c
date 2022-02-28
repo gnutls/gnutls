@@ -181,6 +181,21 @@ void doit(void)
 	}
 	gnutls_x509_privkey_deinit(pkey);
 
+	/* GNUTLS_E_DECRYPTION_FAILED with neither password nor pin */
+	ret = gnutls_x509_privkey_init(&pkey);
+	if (ret < 0)
+		fail("gnutls_x509_privkey_init: %d\n", ret);
+
+	key.data = (void *) key1;
+	key.size = sizeof(key1);
+	ret = gnutls_x509_privkey_import2(pkey, &key, GNUTLS_X509_FMT_PEM,
+					  NULL, 0);
+	if (ret != GNUTLS_E_DECRYPTION_FAILED) {
+		fail("gnutls_x509_privkey_import2 (expect decrypt fail): %s\n",
+		     gnutls_strerror(ret));
+	}
+	gnutls_x509_privkey_deinit(pkey);
+
 	/*
 	 * Pin callback passwords will only be used if the password supplied to
 	 * gnutls_x509_privkey_import2 in NULL.  Consider possible combinations
