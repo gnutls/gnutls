@@ -820,6 +820,12 @@ gnutls_session_t init_tls_session(const char *host)
 		}
 	}
 
+	if (HAVE_OPT(COMPRESS_CERT) && disable_extensions == 0) {
+		ret = compress_cert_set_methods(session, OPT_ARG(COMPRESS_CERT));
+		if (ret < 0)
+			exit(1);
+	}
+
 	if (HAVE_OPT(HEARTBEAT))
 		gnutls_heartbeat_enable(session,
 					GNUTLS_HB_PEER_ALLOWED_TO_SEND);

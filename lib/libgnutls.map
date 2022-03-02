@@ -1384,6 +1384,8 @@ GNUTLS_3_7_4
 {
  global:
 	gnutls_ciphersuite_get;
+	gnutls_compress_certificate_get_selected_method;
+	gnutls_compress_certificate_set_methods;
 	gnutls_record_send_file;
  local:
 	*;

@@ -425,7 +425,9 @@ typedef enum {
 	GNUTLS_COMP_UNKNOWN = 0,
 	GNUTLS_COMP_NULL = 1,
 	GNUTLS_COMP_DEFLATE = 2,
-	GNUTLS_COMP_ZLIB = GNUTLS_COMP_DEFLATE
+	GNUTLS_COMP_ZLIB = GNUTLS_COMP_DEFLATE,
+	GNUTLS_COMP_BROTLI = 3,
+	GNUTLS_COMP_ZSTD = 4
 } gnutls_compression_method_t;
 
 
@@ -640,6 +642,7 @@ typedef enum {
  * @GNUTLS_HANDSHAKE_FINISHED: Finished.
  * @GNUTLS_HANDSHAKE_CERTIFICATE_STATUS: Certificate status (OCSP).
  * @GNUTLS_HANDSHAKE_KEY_UPDATE: TLS1.3 key update message.
+ * @GNUTLS_HANDSHAKE_COMPRESSED_CERTIFICATE_PKT: Compressed certificate packet.
  * @GNUTLS_HANDSHAKE_SUPPLEMENTAL: Supplemental.
  * @GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC: Change Cipher Spec.
  * @GNUTLS_HANDSHAKE_CLIENT_HELLO_V2: SSLv2 Client Hello.
@@ -665,6 +668,7 @@ typedef enum {
 	GNUTLS_HANDSHAKE_CERTIFICATE_STATUS = 22,
 	GNUTLS_HANDSHAKE_SUPPLEMENTAL = 23,
 	GNUTLS_HANDSHAKE_KEY_UPDATE = 24,
+	GNUTLS_HANDSHAKE_COMPRESSED_CERTIFICATE_PKT = 25,
 	GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC = 254,
 	GNUTLS_HANDSHAKE_CLIENT_HELLO_V2 = 1024,
 	GNUTLS_HANDSHAKE_HELLO_RETRY_REQUEST = 1025,
@@ -1725,6 +1729,13 @@ int gnutls_srtp_get_keys(gnutls_session_t session,
 int gnutls_srtp_set_mki(gnutls_session_t session,
 			const gnutls_datum_t * mki);
 int gnutls_srtp_get_mki(gnutls_session_t session, gnutls_datum_t * mki);
+
+/* COMPRESS_CERTIFICATE extension, RFC8879 */
+gnutls_compression_method_t
+gnutls_compress_certificate_get_selected_method(gnutls_session_t session);
+int gnutls_compress_certificate_set_methods(gnutls_session_t session,
+					    const gnutls_compression_method_t * methods,
+					    size_t methods_len);
 
 /* ALPN TLS extension */
 

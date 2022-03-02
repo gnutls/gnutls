@@ -44,7 +44,8 @@ AM_CPPFLAGS = \
 	-I$(srcdir)/x509			\
 	$(LIBTASN1_CFLAGS)			\
 	$(P11_KIT_CFLAGS)			\
-	$(TPM2_CFLAGS)
+	$(TPM2_CFLAGS)				\
+	$(LIBZSTD_CFLAGS)
 
 if !HAVE_LIBUNISTRING
 SUBDIRS += unistring
@@ -121,7 +122,7 @@ if ENABLE_NETTLE
 SUBDIRS += nettle
 endif
 
-HFILES = abstract_int.h debug.h cipher.h	 \
+HFILES = abstract_int.h debug.h compress.h cipher.h	 \
 	buffers.h errors.h gnutls_int.h dtls.h	 \
 	handshake.h num.h algorithms.h		 \
 	dh.h kx.h hash_int.h cipher_int.h	 \
@@ -157,6 +158,14 @@ libgnutls_la_LIBADD = ../gl/libgnu.la x509/libgnutls_x509.la \
 	extras/libgnutls_extras.la
 thirdparty_libadd = $(LTLIBZ) $(LTLIBINTL) $(LIBSOCKET) $(LTLIBNSL) \
 	$(P11_KIT_LIBS) $(LIB_SELECT) $(TSS2_LIBS) $(GNUTLS_LIBS_PRIVATE)
+
+if HAVE_LIBBROTLI
+thirdparty_libadd += $(LIBBROTLIENC_LIBS) $(LIBBROTLIDEC_LIBS)
+endif
+
+if HAVE_LIBZSTD
+thirdparty_libadd += $(LIBZSTD_LIBS)
+endif
 
 if HAVE_LIBIDN2
 thirdparty_libadd += $(LIBIDN2_LIBS)

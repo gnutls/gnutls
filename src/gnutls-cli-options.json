@@ -329,6 +329,12 @@
         "max": "NOLIMIT"
       },
       {
+        "arg-type": "string",
+        "long-option": "compress-cert",
+        "desc": "Compress certificate",
+        "detail": "This option sets a list of supported compression methods for certificate compression. Use comma delimited list of compression methods such as \"zlib,brotli,zstd\"."
+      },
+      {
         "detail": "",
         "long-option": "heartbeat",
         "short-option": "b",
