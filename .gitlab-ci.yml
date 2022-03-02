@@ -311,7 +311,7 @@ fedora-minimal/build:
       --disable-heartbeat-support --disable-srp-authentication --disable-psk-authentication
       --disable-anon-authentication --disable-dhe --disable-ecdhe
       --disable-ocsp --disable-non-suiteb-curves --with-included-unistring
-      --disable-nls --disable-libdane --without-p11-kit --without-tpm
+      --disable-nls --disable-libdane --without-p11-kit --without-tpm --without-tpm2
       --disable-ssl3-support --disable-ssl2-support --disable-doc --enable-openssl-compatibility
       --disable-gcc-warnings --with-system-priority-file=""
       --disable-gost

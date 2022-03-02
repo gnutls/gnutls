@@ -44,7 +44,7 @@ AM_CPPFLAGS = \
 	-I$(srcdir)/x509			\
 	$(LIBTASN1_CFLAGS)			\
 	$(P11_KIT_CFLAGS)			\
-	$(TPM2_CFLAGS)				\
+	$(TSS2_CFLAGS)
 	$(LIBZSTD_CFLAGS)
 
 if !HAVE_LIBUNISTRING
@@ -157,7 +157,7 @@ libgnutls_la_LIBADD = ../gl/libgnu.la x509/libgnutls_x509.la \
 	auth/libgnutls_auth.la algorithms/libgnutls_alg.la \
 	extras/libgnutls_extras.la
 thirdparty_libadd = $(LTLIBZ) $(LTLIBINTL) $(LIBSOCKET) $(LTLIBNSL) \
-	$(P11_KIT_LIBS) $(LIB_SELECT) $(TSS2_LIBS) $(GNUTLS_LIBS_PRIVATE)
+	$(P11_KIT_LIBS) $(LIB_SELECT) $(GNUTLS_LIBS_PRIVATE)
 
 if HAVE_LIBBROTLI
 thirdparty_libadd += $(LIBBROTLIENC_LIBS) $(LIBBROTLIDEC_LIBS)
@@ -212,7 +212,7 @@ all-local: $(hmac_files)
 CLEANFILES = $(hmac_files)
 endif
 
-if ENABLE_TROUSERS
+if NEED_LTLIBDL
 thirdparty_libadd += $(LTLIBDL)
 endif
 

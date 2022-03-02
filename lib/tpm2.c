@@ -297,5 +297,5 @@ int _gnutls_load_tpm2_key(gnutls_privkey_t pkey, const gnutls_datum_t *fdata)
 
 void _gnutls_tpm2_deinit(void)
 {
-	tpm2_tcti_deinit();
+	tpm2_esys_deinit();
 }
