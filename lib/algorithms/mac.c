@@ -134,7 +134,6 @@ mac_entry_st hash_algorithms[] = {
 	 .key_size = 20,
 	 .block_size = 64
 	},
-#ifdef ENABLE_GOST
 	{.name = "GOSTR341194",
 	 .oid = HASH_OID_GOST_R_3411_94,
 	 .mac_oid = MAC_OID_GOST_R_3411_94,
@@ -158,7 +157,6 @@ mac_entry_st hash_algorithms[] = {
 	 .output_size = 64,
 	 .key_size = 64,
 	 .block_size = 64},
-#endif
 	{.name = "AES-CMAC-128",
 	 .id = GNUTLS_MAC_AES_CMAC_128,
 	 .output_size = 16,
@@ -182,14 +180,12 @@ mac_entry_st hash_algorithms[] = {
 	 .output_size = 16,
 	 .key_size = 32,
 	 .nonce_size = 12},
-#ifdef ENABLE_GOST
 	{.name = "GOST28147-TC26Z-IMIT",
 	 .id = GNUTLS_MAC_GOST28147_TC26Z_IMIT,
 	 .output_size = 4,
 	 .key_size = 32,
 	 .block_size = 8,
 	 .flags = GNUTLS_MAC_FLAG_CONTINUOUS_MAC},
-#endif
 	{.name = "SHAKE-128",
 	 .oid = HASH_OID_SHAKE_128,
 	 .id = GNUTLS_MAC_SHAKE_128,
@@ -198,7 +194,6 @@ mac_entry_st hash_algorithms[] = {
 	 .oid = HASH_OID_SHAKE_256,
 	 .id = GNUTLS_MAC_SHAKE_256,
 	 .block_size = 136},
-#ifdef ENABLE_GOST
 	{.name = "OMAC-MAGMA",
 	 .id = GNUTLS_MAC_MAGMA_OMAC,
 	 .output_size = 8,
@@ -209,7 +204,6 @@ mac_entry_st hash_algorithms[] = {
 	 .output_size = 16,
 	 .key_size = 32,
 	 .block_size = 16},
-#endif
 	{.name = "MAC-NULL",
 	 .id = GNUTLS_MAC_NULL},
 	{0, 0, 0, 0, 0, 0, 0, 0, 0}

@@ -24,6 +24,7 @@
 #include <algorithms.h>
 #include "errors.h"
 #include <x509/common.h>
+#include "pk.h"
 
 
 /* KX mappings to PK algorithms */
@@ -130,7 +131,6 @@ static const gnutls_pk_entry pk_algorithms[] = {
 	   .curve = GNUTLS_ECC_CURVE_INVALID },	/* some other broken certificates set RSA with SHA1 as an indicator of RSA */
 	{ .name = "DSA", .oid = PK_DSA_OID, .id = GNUTLS_PK_DSA,
 	   .curve = GNUTLS_ECC_CURVE_INVALID },
-#ifdef ENABLE_GOST
 	{ .name = "GOST R 34.10-2012-512", .oid = PK_GOST_R3410_2012_512_OID, .id = GNUTLS_PK_GOST_12_512,
 	   .curve = GNUTLS_ECC_CURVE_INVALID },
 	{ .name = "GOST R 34.10-2012-256", .oid = PK_GOST_R3410_2012_256_OID, .id = GNUTLS_PK_GOST_12_256,
@@ -139,7 +139,6 @@ static const gnutls_pk_entry pk_algorithms[] = {
 	   .curve = GNUTLS_ECC_CURVE_INVALID },
 	{ .name = "GOST R 34.10-94", .oid = PK_GOST_R3410_94_OID, .id = GNUTLS_PK_UNKNOWN,
 	   .curve = GNUTLS_ECC_CURVE_INVALID },
-#endif
 	{ .name = "EC/ECDSA", .oid = "1.2.840.10045.2.1", .id = GNUTLS_PK_ECDSA,
 	   .curve = GNUTLS_ECC_CURVE_INVALID },
 	{ .name = "EdDSA (Ed25519)", .oid = SIG_EDDSA_SHA512_OID, .id = GNUTLS_PK_EDDSA_ED25519, 
@@ -205,8 +204,11 @@ const gnutls_pk_algorithm_t *gnutls_pk_list(void)
 		int i = 0;
 
 		GNUTLS_PK_LOOP(
-			if (p->id != GNUTLS_PK_UNKNOWN && supported_pks[i > 0 ? (i - 1) : 0] != p->id)
-				supported_pks[i++] = p->id
+			if (p->id != GNUTLS_PK_UNKNOWN &&
+			    supported_pks[i > 0 ? (i - 1) : 0] != p->id &&
+			    _gnutls_pk_exists(p->id)) {
+				supported_pks[i++] = p->id;
+			}
 		);
 		supported_pks[i++] = 0;
 	}

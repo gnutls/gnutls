@@ -418,6 +418,8 @@ typedef struct gnutls_crypto_pk {
 		       unsigned int flags);
 
 	int (*curve_exists) (gnutls_ecc_curve_t);	/* true/false */
+	int (*pk_exists) (gnutls_pk_algorithm_t);	/* true/false */
+	int (*sign_exists) (gnutls_sign_algorithm_t);	/* true/false */
 } gnutls_crypto_pk_st;
 
 /* priority: infinity for backend algorithms, 90 for kernel

@@ -27,6 +27,7 @@
 #include <x509/common.h>
 #include <assert.h>
 #include "c-strcase.h"
+#include "pk.h"
 
 /* signature algorithms;
  */
@@ -359,7 +360,6 @@ gnutls_sign_entry_st sign_algorithms[] = {
 	 .pk = GNUTLS_PK_EC,
 	 .hash = GNUTLS_DIG_SHA224,
 	 .aid = TLS_SIGN_AID_UNKNOWN},
-#ifdef ENABLE_GOST
 	/* GOST R 34.10-2012-512 */
 	{.name = "GOSTR341012-512",
 	 .oid = SIG_GOST_R3410_2012_512_OID,
@@ -391,7 +391,6 @@ gnutls_sign_entry_st sign_algorithms[] = {
 	 .pk = 0,
 	 .hash = 0,
 	 .aid = TLS_SIGN_AID_UNKNOWN},
-#endif
 	{.name = "DSA-SHA384",
 	 .oid = SIG_DSA_SHA384_OID,
 	 .id = GNUTLS_SIGN_DSA_SHA384,
@@ -633,7 +632,8 @@ const gnutls_sign_algorithm_t *gnutls_sign_list(void)
 
 		GNUTLS_SIGN_LOOP(
 			/* list all algorithms, but not duplicates */
-			if (supported_sign[i] != p->id) {
+			if (supported_sign[i] != p->id &&
+			    _gnutls_pk_sign_exists(p->id)) {
 				assert(i+1 < MAX_ALGOS);
 				supported_sign[i++] = p->id;
 				supported_sign[i+1] = 0;
