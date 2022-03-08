@@ -421,6 +421,50 @@ static size_t hhasher(const void *entry, size_t n)
 	return hash_pjw_bare(e, strlen(e)) % n;
 }
 
+#ifdef STRICT_X509
+
+/* Check whether certificates serial number is RFC5280 compliant */
+static bool has_valid_serial(gnutls_x509_crt_t cert)
+{
+	int err, is_zero;
+	unsigned i;
+	unsigned char serial[128];
+	size_t serial_size = sizeof(serial);
+
+	err = gnutls_x509_crt_get_serial(cert, serial, &serial_size);
+	if (err < 0) {
+		_gnutls_debug_log("error: could not read serial number\n");
+		return false;
+	}
+
+	if (serial_size > 20) {
+		_gnutls_debug_log("error: serial number value is longer than 20 octets\n");
+		return false;
+	}
+
+	if (serial[0] & 0x80) {
+		_gnutls_debug_log("error: serial number is negative\n");
+		return false;
+	}
+
+	is_zero = 1;
+	for (i = 0; i < serial_size; ++i) {
+		if (serial[i]) {
+			is_zero = 0;
+			break;
+		}
+	}
+
+	if (is_zero) {
+		_gnutls_debug_log("error: serial number is zero\n");
+		return false;
+	}
+
+	return true;
+}
+
+#endif /* STRICT_X509 */
+
 int _gnutls_check_cert_sanity(gnutls_x509_crt_t cert)
 {
 	int ret = 0, version;
@@ -438,6 +482,14 @@ int _gnutls_check_cert_sanity(gnutls_x509_crt_t cert)
 
 	version = ret;
 
+#ifdef STRICT_X509
+	/* enforce upper bound on certificate version (RFC5280 compliant) */
+	if (version > 3) {
+		_gnutls_debug_log("error: invalid certificate version %d\n", version);
+		return gnutls_assert_val(GNUTLS_E_X509_CERTIFICATE_ERROR);
+	}
+#endif
+
 	if (version < 3) {
 		if (!cert->modified) {
 			ret = _gnutls_x509_get_raw_field2(cert->cert, &cert->der,
@@ -453,8 +505,7 @@ int _gnutls_check_cert_sanity(gnutls_x509_crt_t cert)
 			}
 		}
 	} else {
-		/* Version is >= 3; ensure no duplicate extensions are
-		 * present. */
+		/* Version is 3; ensure no duplicate extensions are present. */
 		unsigned i;
 		char oid[MAX_OID_SIZE];
 		size_t oid_size;
@@ -517,6 +568,13 @@ int _gnutls_check_cert_sanity(gnutls_x509_crt_t cert)
 			goto cleanup;
 		}
 	}
+
+#ifdef STRICT_X509
+	if (!has_valid_serial(cert)) {
+		ret = gnutls_assert_val(GNUTLS_E_X509_CERTIFICATE_ERROR);
+		goto cleanup;
+	}
+#endif
 
 	if (gnutls_x509_crt_get_expiration_time(cert) == -1 ||
 	    gnutls_x509_crt_get_activation_time(cert) == -1) {
