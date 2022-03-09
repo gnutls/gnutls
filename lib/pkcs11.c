@@ -351,7 +351,7 @@ int _gnutls_pkcs11_check_init(init_level_t req_level, void *priv, pkcs11_reinit_
 	ret = sret;
 
  cleanup:
-	gnutls_static_mutex_unlock(&pkcs11_mutex);
+	(void)gnutls_static_mutex_unlock(&pkcs11_mutex);
 
 	return ret;
 }
