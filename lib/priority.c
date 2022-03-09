@@ -2505,7 +2505,7 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 	}
 
  out:
-	gnutls_rwlock_unlock(&system_wide_config_rwlock);
+	(void)gnutls_rwlock_unlock(&system_wide_config_rwlock);
 	return ret;
 }
 

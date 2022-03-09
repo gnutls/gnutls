@@ -434,7 +434,7 @@ int store_pubkey(const char *db_name, const char *host,
 	if (fp != NULL)
 		fclose(fp);
 
-	gnutls_static_mutex_unlock(&file_mutex);
+	(void)gnutls_static_mutex_unlock(&file_mutex);
 	gnutls_free(b64key.data);
 
 	return ret;
