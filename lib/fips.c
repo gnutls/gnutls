@@ -88,7 +88,7 @@ unsigned _gnutls_fips_mode_enabled(void)
 	p = secure_getenv("GNUTLS_FORCE_FIPS_MODE");
 	if (p) {
 		if (p[0] == '1')
-			ret = 1;
+			ret = GNUTLS_FIPS140_STRICT;
 		else if (p[0] == '2')
 			ret = GNUTLS_FIPS140_SELFTESTS;
 		else if (p[0] == '3')
