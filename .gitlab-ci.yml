@@ -430,6 +430,7 @@ fedora-nettle-minigmp/test:
   script:
     # prolong timeout a bit as minigmp build is slow
     - PKG_CONFIG_PATH=${PWD}/nettle-git/$NETTLE_DIR/lib64/pkgconfig LD_LIBRARY_PATH=${PWD}/nettle-git/$NETTLE_DIR/lib64 GNUTLS_TEST_TIMEOUT=600000 make -j$CHECKJOBS check
+  timeout: 3h
 
 fedora-valgrind/build:
   extends:
@@ -544,6 +545,7 @@ fedora-static-analyzers/test:
     - mkdir -p cache/cppcheck
     - cppcheck --cppcheck-build-dir=cache/cppcheck --force -q -Ilib/includes -Igl/ -Ilib/ -I. --error-exitcode=1 lib/ -i lib/unistring -i lib/minitasn1 -i lib/nettle/backport -i lib/nettle/ecc -j2 $CPPCHECK_OPTIONS
     - cppcheck --cppcheck-build-dir=cache/cppcheck --force -q -Ilib/includes -Igl/ -Ilibdane/ -I. --error-exitcode=1 libdane/ -j2 $CPPCHECK_OPTIONS
+  timeout: 3h
 
 # TODO this does not work, so we keep using old job doc-dist.Fedora
 # Keeping it here until I figure it out.
@@ -782,6 +784,7 @@ debian-cross/aarch64-linux-gnu/test:
   script:
     # https://bugzilla.redhat.com/show_bug.cgi?id=2049401
     - mingw${arch_bits}-make -j$CHECKJOBS -C $PWD/tests check
+  timeout: 3h
 
 .mingw/archive:
   stage: archive
