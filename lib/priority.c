@@ -1244,9 +1244,9 @@ static int global_ini_handler(void *ctx, const char *section, const char *name, 
 	if (section != NULL && c_strcasecmp(section, GLOBAL_SECTION) == 0) {
 		if (c_strcasecmp(name, "override-mode") == 0) {
 			p = clear_spaces(value, str);
-			if (c_strcasecmp(value, "allowlist") == 0) {
+			if (c_strcasecmp(p, "allowlist") == 0) {
 				cfg->allowlisting = true;
-			} else if (c_strcasecmp(value, "blocklist") == 0) {
+			} else if (c_strcasecmp(p, "blocklist") == 0) {
 				cfg->allowlisting = false;
 			} else {
 				_gnutls_debug_log("cfg: unknown override mode %s\n",
