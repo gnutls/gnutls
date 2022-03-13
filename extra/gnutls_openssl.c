@@ -70,6 +70,9 @@ SSL_CTX *SSL_CTX_new(SSL_METHOD * method)
 	SSL_CTX *ctx;
 
 	ctx = (SSL_CTX *) calloc(1, sizeof(SSL_CTX));
+	if (!ctx)
+		return NULL;
+
 	ctx->method = method;
 
 	return ctx;
@@ -357,6 +360,9 @@ int SSL_connect(SSL * ssl)
 	}
 
 	store = (X509_STORE_CTX *) calloc(1, sizeof(X509_STORE_CTX));
+	if (!store)
+		return 0;
+
 	store->ssl = ssl;
 	store->cert_list = gnutls_certificate_get_peers(ssl->gnutls_state,
 							&cert_list_size);
@@ -406,6 +412,8 @@ int SSL_accept(SSL * ssl)
 	}
 
 	store = (X509_STORE_CTX *) calloc(1, sizeof(X509_STORE_CTX));
+	if (!store)
+		return 0;
 	store->ssl = ssl;
 	store->cert_list = gnutls_certificate_get_peers(ssl->gnutls_state,
 							&cert_list_size);
@@ -655,6 +663,8 @@ X509_NAME *X509_get_subject_name(const X509 * cert)
 {
 	gnutls_x509_dn *dn;
 	dn = (gnutls_x509_dn *) calloc(1, sizeof(gnutls_x509_dn));
+	if (!dn)
+		return (NULL);
 	if (gnutls_x509_extract_certificate_dn(cert, dn) < 0) {
 		free(dn);
 		return NULL;
@@ -666,6 +676,8 @@ X509_NAME *X509_get_issuer_name(const X509 * cert)
 {
 	gnutls_x509_dn *dn;
 	dn = (gnutls_x509_dn *) calloc(1, sizeof(gnutls_x509_dn));
+	if (!dn)
+		return (NULL);
 	if (gnutls_x509_extract_certificate_issuer_dn(cert, dn) < 0) {
 		free(dn);
 		return NULL;
