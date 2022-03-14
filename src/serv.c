@@ -518,7 +518,9 @@ gnutls_session_t initialize_session(int dtls)
 	}
 
 	if (HAVE_OPT(COMPRESS_CERT)) {
-		ret = compress_cert_set_methods(session, OPT_ARG(COMPRESS_CERT));
+		ret = compress_cert_set_methods(session,
+						OPTS_ARRAY(COMPRESS_CERT),
+						OPTS_COUNT(COMPRESS_CERT));
 		if (ret < 0)
 			exit(1);
 	}
