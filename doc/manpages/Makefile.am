@@ -43,10 +43,11 @@ endif
 EXTRA_DIST += $(TOOLS_MANS) $(SRP_MANS) $(DANE_MANS)
 MAINTAINERCLEANFILES += $(TOOLS_MANS) $(SRP_MANS) $(DANE_MANS)
 
-$(man_MANS): $(top_srcdir)/doc/scripts/gen-cmd-man.py
+$(man_MANS): $(top_srcdir)/python/cli-docgen.py
 
-GEN_CMD_MAN_OPTIONS = \
+CLIGEN_ARGS = \
 	--license=gpl3+ \
+	--package '$(PACKAGE)' \
 	--version='$(VERSION)' \
 	--authors='Nikos Mavrogiannopoulos, Simon Josefsson and others; see /usr/share/doc/gnutls/AUTHORS for a complete list.' \
 	--copyright-year=2020-2021 \
@@ -56,93 +57,93 @@ GEN_CMD_MAN_OPTIONS = \
 certtool.1: $(top_srcdir)/doc/certtool-see-also.texi $(top_srcdir)/doc/certtool-examples.texi $(top_srcdir)/doc/certtool-files.texi
 certtool.1: $(top_srcdir)/src/certtool-options.json
 	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(top_srcdir)/doc/scripts/gen-cmd-man.py \
-		--see-also $(top_srcdir)/doc/certtool-see-also.texi \
-		--examples $(top_srcdir)/doc/certtool-examples.texi \
-		--files $(top_srcdir)/doc/certtool-files.texi \
-		$(GEN_CMD_MAN_OPTIONS) \
+		$(PYTHON) $(top_srcdir)/python/cli-docgen.py \
+		--format man $(CLIGEN_ARGS) \
+		--include see-also=$(top_srcdir)/doc/certtool-see-also.texi \
+		--include examples=$(top_srcdir)/doc/certtool-examples.texi \
+		--include files=$(top_srcdir)/doc/certtool-files.texi \
 		$< $@
 
 ocsptool.1: $(top_srcdir)/doc/ocsptool-see-also.texi $(top_srcdir)/doc/ocsptool-examples.texi $(top_srcdir)/doc/ocsptool-description.texi
 ocsptool.1: $(top_srcdir)/src/ocsptool-options.json
 	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(top_srcdir)/doc/scripts/gen-cmd-man.py \
-		--see-also $(top_srcdir)/doc/ocsptool-see-also.texi \
-		--examples $(top_srcdir)/doc/ocsptool-examples.texi \
-		--description $(top_srcdir)/doc/ocsptool-description.texi \
-		$(GEN_CMD_MAN_OPTIONS) \
+		$(PYTHON) $(top_srcdir)/python/cli-docgen.py \
+		--format man $(CLIGEN_ARGS) \
+		--include see-also=$(top_srcdir)/doc/ocsptool-see-also.texi \
+		--include examples=$(top_srcdir)/doc/ocsptool-examples.texi \
+		--include description=$(top_srcdir)/doc/ocsptool-description.texi \
 		$< $@
 
 danetool.1: $(top_srcdir)/doc/danetool-see-also.texi $(top_srcdir)/doc/danetool-examples.texi
 danetool.1: $(top_srcdir)/src/danetool-options.json
 	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(top_srcdir)/doc/scripts/gen-cmd-man.py \
-		--see-also $(top_srcdir)/doc/danetool-see-also.texi \
-		--examples $(top_srcdir)/doc/danetool-examples.texi \
-		$(GEN_CMD_MAN_OPTIONS) \
+		$(PYTHON) $(top_srcdir)/python/cli-docgen.py \
+		--format man $(CLIGEN_ARGS) \
+		--include see-also=$(top_srcdir)/doc/danetool-see-also.texi \
+		--include examples=$(top_srcdir)/doc/danetool-examples.texi \
 		$< $@
 
 gnutls-cli.1: $(top_srcdir)/doc/gnutls-cli-see-also.texi $(top_srcdir)/doc/gnutls-cli-examples.texi
 gnutls-cli.1: $(top_srcdir)/src/gnutls-cli-options.json
 	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(top_srcdir)/doc/scripts/gen-cmd-man.py \
-		--see-also $(top_srcdir)/doc/gnutls-cli-see-also.texi \
-		--examples $(top_srcdir)/doc/gnutls-cli-examples.texi \
-		$(GEN_CMD_MAN_OPTIONS) \
+		$(PYTHON) $(top_srcdir)/python/cli-docgen.py \
+		--format man $(CLIGEN_ARGS) \
+		--include see-also=$(top_srcdir)/doc/gnutls-cli-see-also.texi \
+		--include examples=$(top_srcdir)/doc/gnutls-cli-examples.texi \
 		$< $@
 
 gnutls-serv.1: $(top_srcdir)/doc/gnutls-serv-see-also.texi $(top_srcdir)/doc/gnutls-serv-examples.texi
 gnutls-serv.1: $(top_srcdir)/src/gnutls-serv-options.json
 	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(top_srcdir)/doc/scripts/gen-cmd-man.py \
-		--see-also $(top_srcdir)/doc/gnutls-serv-see-also.texi \
-		--examples $(top_srcdir)/doc/gnutls-serv-examples.texi \
-		$(GEN_CMD_MAN_OPTIONS) \
+		$(PYTHON) $(top_srcdir)/python/cli-docgen.py \
+		--format man $(CLIGEN_ARGS) \
+		--include see-also=$(top_srcdir)/doc/gnutls-serv-see-also.texi \
+		--include examples=$(top_srcdir)/doc/gnutls-serv-examples.texi \
 		$< $@
 
 gnutls-cli-debug.1: $(top_srcdir)/doc/gnutls-cli-debug-see-also.texi $(top_srcdir)/doc/gnutls-cli-debug-examples.texi
 gnutls-cli-debug.1: $(top_srcdir)/src/gnutls-cli-debug-options.json
 	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(top_srcdir)/doc/scripts/gen-cmd-man.py \
-		--see-also $(top_srcdir)/doc/gnutls-cli-debug-see-also.texi \
-		--examples $(top_srcdir)/doc/gnutls-cli-debug-examples.texi \
-		$(GEN_CMD_MAN_OPTIONS) \
+		$(PYTHON) $(top_srcdir)/python/cli-docgen.py \
+		--format man $(CLIGEN_ARGS) \
+		--include see-also=$(top_srcdir)/doc/gnutls-cli-debug-see-also.texi \
+		--include examples=$(top_srcdir)/doc/gnutls-cli-debug-examples.texi \
 		$< $@
 
 srptool.1: $(top_srcdir)/doc/srptool-see-also.texi $(top_srcdir)/doc/srptool-examples.texi
 srptool.1: $(top_srcdir)/src/srptool-options.json
 	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(top_srcdir)/doc/scripts/gen-cmd-man.py \
-		--see-also $(top_srcdir)/doc/srptool-see-also.texi \
-		--examples $(top_srcdir)/doc/srptool-examples.texi \
-		$(GEN_CMD_MAN_OPTIONS) \
+		$(PYTHON) $(top_srcdir)/python/cli-docgen.py \
+		--format man $(CLIGEN_ARGS) \
+		--include see-also=$(top_srcdir)/doc/srptool-see-also.texi \
+		--include examples=$(top_srcdir)/doc/srptool-examples.texi \
 		$< $@
 
 p11tool.1: $(top_srcdir)/doc/p11tool-see-also.texi $(top_srcdir)/doc/p11tool-examples.texi
 p11tool.1: $(top_srcdir)/src/p11tool-options.json
 	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(top_srcdir)/doc/scripts/gen-cmd-man.py \
-		--see-also $(top_srcdir)/doc/p11tool-see-also.texi \
-		--examples $(top_srcdir)/doc/p11tool-examples.texi \
-		$(GEN_CMD_MAN_OPTIONS) \
+		$(PYTHON) $(top_srcdir)/python/cli-docgen.py \
+		--format man $(CLIGEN_ARGS) \
+		--include see-also=$(top_srcdir)/doc/p11tool-see-also.texi \
+		--include examples=$(top_srcdir)/doc/p11tool-examples.texi \
 		$< $@
 
 tpmtool.1: $(top_srcdir)/doc/tpmtool-see-also.texi $(top_srcdir)/doc/tpmtool-examples.texi
 tpmtool.1: $(top_srcdir)/src/tpmtool-options.json
 	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(top_srcdir)/doc/scripts/gen-cmd-man.py \
-		--see-also $(top_srcdir)/doc/tpmtool-see-also.texi \
-		--examples $(top_srcdir)/doc/tpmtool-examples.texi \
-		$(GEN_CMD_MAN_OPTIONS) \
+		$(PYTHON) $(top_srcdir)/python/cli-docgen.py \
+		--format man $(CLIGEN_ARGS) \
+		--include see-also=$(top_srcdir)/doc/tpmtool-see-also.texi \
+		--include examples=$(top_srcdir)/doc/tpmtool-examples.texi \
 		$< $@
 
 psktool.1: $(top_srcdir)/doc/psktool-see-also.texi $(top_srcdir)/doc/psktool-examples.texi
 psktool.1: $(top_srcdir)/src/psktool-options.json
 	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(top_srcdir)/doc/scripts/gen-cmd-man.py \
-		--see-also $(top_srcdir)/doc/psktool-see-also.texi \
-		--examples $(top_srcdir)/doc/psktool-examples.texi \
-		$(GEN_CMD_MAN_OPTIONS) \
+		$(PYTHON) $(top_srcdir)/python/cli-docgen.py \
+		--format man $(CLIGEN_ARGS) \
+		--include see-also=$(top_srcdir)/doc/psktool-see-also.texi \
+		--include examples=$(top_srcdir)/doc/psktool-examples.texi \
 		$< $@
 
 APIMANS =

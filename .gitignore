@@ -272,12 +272,16 @@ Makefile.user
 *.out
 *.plist
 python/__pycache__/
+python/cligen
+python/cli-*gen.py
 src/benchmark
 src/benchmark-cipher
 src/benchmark-tls
 src/certtool
 src/certtool-options.c
 src/certtool-options.h
+src/cli-cfg.c
+src/cli-cfg.h
 src/dumpcfg
 src/gnutls-cli-options.c
 src/gnutls-cli-options.h
