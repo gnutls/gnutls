@@ -129,8 +129,9 @@
         {
           "long-option": "compress-cert",
           "description": "Compress certificate",
-          "detail": "This option sets a list of supported compression methods for certificate compression. Use comma delimited list of compression methods such as \"zlib,brotli,zstd\".",
-          "argument-type": "string"
+          "detail": "This option sets a supported compression method for certificate compression.",
+          "argument-type": "string",
+          "multiple": true
         },
         {
           "long-option": "heartbeat",

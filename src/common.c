@@ -292,44 +292,38 @@ int cert_verify(gnutls_session_t session, const char *hostname, const char *purp
 }
 
 /* Parse input string and set certificate compression methods */
-int compress_cert_set_methods(gnutls_session_t session, const char *string)
+int compress_cert_set_methods(gnutls_session_t session,
+			      const char **strings,
+			      size_t n_strings)
 {
-	int ret = 0, i = 0;
-	char *s = NULL, *t = NULL, *str = NULL;
-	size_t methods_len = 0;
-	gnutls_compression_method_t *methods = NULL;
+	int ret = 0;
+	gnutls_compression_method_t *methods;
 
-	if (!string || !*string)
+	if (n_strings == 0) {
 		return 0;
-
-	str = strdup(string);
-	if (!str) {
-		ret = GNUTLS_E_MEMORY_ERROR;
-		fprintf(stderr, "Could not set certificate compression methods: %s\n",
-			gnutls_strerror(ret));
-		goto cleanup;
 	}
 
-	methods_len = 1;
-	for (s = str; *s; ++s)
-		if (*s == ',')
-			++methods_len;
-	
-	methods = gnutls_malloc(methods_len * sizeof(gnutls_compression_method_t));
+/* GCC analyzer in 11.2 mishandles reallocarray/free */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wanalyzer-mismatching-deallocation"
+
+	methods = reallocarray(NULL, n_strings, sizeof(*methods));
 	if (!methods) {
-		ret = GNUTLS_E_MEMORY_ERROR;
 		fprintf(stderr, "Could not set certificate compression methods: %s\n",
 			gnutls_strerror(ret));
-		goto cleanup;
+		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	for (s = str, i = 0; (t = strchr(s, ',')); s = t + 1, ++i) {
-		*t = '\0';
-		methods[i] = gnutls_compression_get_id(s);
+	for (size_t i = 0; i < n_strings; ++i) {
+		methods[i] = gnutls_compression_get_id(strings[i]);
+		if (methods[i] == GNUTLS_COMP_UNKNOWN) {
+			fprintf(stderr, "Unknown compression method: %s\n",
+				strings[i]);
+			goto cleanup;
+		}
 	}
-	methods[i] = gnutls_compression_get_id(s);
 
-	ret = gnutls_compress_certificate_set_methods(session, methods, methods_len);
+	ret = gnutls_compress_certificate_set_methods(session, methods, n_strings);
 	if (ret < 0) {
 		fprintf(stderr, "Could not set certificate compression methods: %s\n",
 			gnutls_strerror(ret));
@@ -337,8 +331,9 @@ int compress_cert_set_methods(gnutls_session_t session, const char *string)
 	}
 
 cleanup:
-	free(str);
 	free(methods);
+
+#pragma GCC diagnostic pop
 
 	return ret;
 }
