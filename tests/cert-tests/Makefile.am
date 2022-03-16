@@ -46,7 +46,7 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/name-constraints-ip2.pem data/chain-md5.pem data/pubkey-ecc256.pem \
 	templates/template-dates-after2038.tmpl data/template-dates-after2038.pem \
 	data/gost-cert.pem data/gost-cert-nogost.pem data/gost94-cert.pem \
-	templates/template-tlsfeature.tmpl data/userid.pem data/cert-with-crl.p12 \
+	templates/template-tlsfeature.tmpl data/cert-with-crl.p12 \
 	data/template-tlsfeature.pem data/template-tlsfeature.csr \
 	templates/template-tlsfeature-crq.tmpl templates/arb-extensions.tmpl data/arb-extensions.pem \
 	data/arb-extensions.csr data/pkcs1-pad-ok.pem data/pkcs1-pad-broken.pem \
@@ -106,7 +106,7 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 
 dist_check_SCRIPTS = pathlen.sh aki.sh invalid-sig.sh email.sh \
 	pkcs7.sh pkcs7-broken-sigs.sh privkey-import.sh name-constraints.sh certtool-long-cn.sh crl.sh provable-privkey.sh \
-	provable-dh.sh userid.sh sha2-test.sh sha2-dsa-test.sh provable-privkey-dsa2048.sh \
+	provable-dh.sh sha2-test.sh sha2-dsa-test.sh provable-privkey-dsa2048.sh \
 	provable-privkey-rsa2048.sh provable-privkey-gen-default.sh pkcs7-constraints.sh \
 	pkcs7-constraints2.sh certtool-long-oids.sh pkcs7-cat.sh cert-sanity.sh cert-critical.sh \
 	pkcs12.sh certtool-crl-decoding.sh pkcs12-encode.sh pkcs12-corner-cases.sh inhibit-anypolicy.sh \

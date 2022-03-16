@@ -36,11 +36,7 @@ DirectoryString ::= CHOICE {
       printableString           PrintableString (SIZE (1..MAX)),
       universalString           UniversalString (SIZE (1..MAX)),
       utf8String              UTF8String (SIZE (1..MAX)),
-      bmpString               BMPString (SIZE(1..MAX)),
-      -- IA5String is added here to handle old UID encoded as ia5String --
-      -- See tests/userid/ for more information.  It shouldn't be here, --
-      -- so if it causes problems, considering dropping it. --
-      ia5String               IA5String (SIZE(1..MAX)) }
+      bmpString               BMPString (SIZE(1..MAX)) }
 
 SubjectAltName ::= GeneralNames
 

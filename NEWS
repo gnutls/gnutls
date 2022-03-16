@@ -8,6 +8,10 @@ See the end for copying conditions.
 * Version 3.7.4 (unreleased)
 
 ** Added support for certificate compression as defined in RFC8879.
+** libgnutls: Added strict-x509 configure option to enforce stricter
+   certificate sanity checks.
+** libgnutls: Removed IA5String type from DirectoryString within issuer
+   and subject name to make DirectoryString RFC5280 compliant.
 
 ** API and ABI modifications:
 gnutls_compress_certificate_get_selected_method: Added

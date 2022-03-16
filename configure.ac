@@ -623,6 +623,13 @@ if [ test "$enable_fips" = "yes" ];then
   fi
 fi
 
+AC_ARG_ENABLE(strict-x509,
+  AS_HELP_STRING([--enable-strict-x509], [enable stricter sanity checks for x509 certificates]),
+    enable_strict_x509=$enableval, enable_strict_x509=no)
+if test "$enable_strict_x509" != "no"; then
+	AC_DEFINE([STRICT_X509], 1, [Enable stricter sanity checks for x509 certificates])
+fi
+
 AC_ARG_WITH([pkcs12-iter-count],
 	[AS_HELP_STRING([--with-pkcs12-iter-count],
 	  [specify iteration count for PKCS\#12 key derivation @<:@default=600000@:>@])],
