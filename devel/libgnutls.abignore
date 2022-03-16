@@ -70,22 +70,3 @@ name = drbg_aes_reseed
 
 # The following should be removed in the new release, after updating the
 # abi-dump repository:
-[suppress_function]
-name = gnutls_ciphersuite_get
-
-[suppress_function]
-name = gnutls_record_send_file
-
-[suppress_function]
-name = gnutls_compress_certificate_get_selected_method
-
-[suppress_function]
-name = gnutls_compress_certificate_set_methods
-
-[suppress_type]
-name = gnutls_compression_method_t
-changed_enumerators = GNUTLS_COMP_BROTLI, GNUTLS_COMP_ZSTD
-
-[suppress_type]
-name = gnutls_handshake_description_t
-changed_enumerators = GNUTLS_HANDSHAKE_COMPRESSED_CERTIFICATE_PKT

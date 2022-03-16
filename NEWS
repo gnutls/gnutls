@@ -5,15 +5,23 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.7.4 (unreleased)
+* Version 3.7.4 (released 2022-03-17)
 
-** Added support for certificate compression as defined in RFC8879.
-** libgnutls: Added strict-x509 configure option to enforce stricter
-   certificate sanity checks.
+** libgnutls: Added support for certificate compression as defined in RFC8879.
+** certtool: Added option --compress-cert that allows user to specify compression
+   methods for certificate compression.
+** libgnutls: GnuTLS can now be compiled with --enable-strict-x509 configure
+   option to enforce stricter certificate sanity checks that are compliant
+   with RFC5280.
 ** libgnutls: Removed IA5String type from DirectoryString within issuer
    and subject name to make DirectoryString RFC5280 compliant.
+** libgnutls: Added function to retrieve the name of current ciphersuite
+   from session (#1291).
+
 
 ** API and ABI modifications:
+GNUTLS_COMP_BROTLI: New gnutls_compression_method_t enum member
+GNUTLS_COMP_ZSTD: New gnutls_compression_method_t enum member
 gnutls_compress_certificate_get_selected_method: Added
 gnutls_compress_certificate_set_methods: Added
 
