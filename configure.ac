@@ -1040,7 +1040,7 @@ AC_MSG_CHECKING([whether to include zstd compression support])
 if test x$ac_zstd != xno; then
     AC_MSG_RESULT(yes)
     PKG_CHECK_MODULES(LIBZSTD, [libzstd >= 1.3.0], [with_libzstd=yes], [with_libzstd=no])
-    if test "${with_libzstd}" = "yes" && test "${has_zstd_h}" = "yes"; then
+    if test "${with_libzstd}" = "yes"; then
 	AC_DEFINE([HAVE_LIBZSTD], 1, [Define if ZSTD compression is enabled.])
 	if test "x$GNUTLS_REQUIRES_PRIVATE" = "x"; then
 	    GNUTLS_REQUIRES_PRIVATE="Requires.private: libzstd"

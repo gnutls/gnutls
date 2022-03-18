@@ -11,6 +11,8 @@ See the end for copying conditions.
    have changed to reflect the previous help text: they are now
    --with-brotli/--with-zstd respectively (#1342).
 
+** Detecting the Zstandard (zstd) library in configure has been
+   fixed (#1343).
 
 * Version 3.7.4 (released 2022-03-17)
 
