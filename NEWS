@@ -5,6 +5,13 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version ?.?.? (released ????-??-??)
+
+** The configure arguments for Brotli and Zstandard (zstd) support
+   have changed to reflect the previous help text: they are now
+   --with-brotli/--with-zstd respectively (#1342).
+
+
 * Version 3.7.4 (released 2022-03-17)
 
 ** libgnutls: Added support for certificate compression as defined in RFC8879.

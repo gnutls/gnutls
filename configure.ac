@@ -1010,7 +1010,7 @@ if test x$ac_zlib != xno; then
 fi
 AC_SUBST(LIBZ_PC)
 
-AC_ARG_WITH(libbrotli,
+AC_ARG_WITH(brotli,
 	    AS_HELP_STRING([--without-brotli], [disable brotli compression support]),
 	    ac_brotli=$withval, ac_brotli=yes)
 AC_MSG_CHECKING([whether to include brotli compression support])
@@ -1033,7 +1033,7 @@ else
 fi
 AM_CONDITIONAL(HAVE_LIBBROTLI, test "$with_libbrotlienc" != "no" && test "$with_libbrotlidec" != "no")
 
-AC_ARG_WITH(libzstd,
+AC_ARG_WITH(zstd,
 	    AS_HELP_STRING([--without-zstd], [disable zstd compression support]),
 	    ac_zstd=$withval, ac_zstd=yes)
 AC_MSG_CHECKING([whether to include zstd compression support])
