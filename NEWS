@@ -7,23 +7,39 @@ See the end for copying conditions.
 
 * Version 3.7.4 (released 2022-03-17)
 
-** libgnutls: Added support for certificate compression as defined in RFC8879.
-** certtool: Added option --compress-cert that allows user to specify compression
-   methods for certificate compression.
+** libgnutls: Added support for certificate compression as defined in RFC8879
+   (#1301). New API functions (gnutls_compress_certificate_get_selected_method
+   and gnutls_compress_certificate_set_methods) allow client and server to set
+   their preferences.
+
+** certtool: Added option --compress-cert that allows user to specify
+   compression methods for certificate compression.
+
 ** libgnutls: GnuTLS can now be compiled with --enable-strict-x509 configure
-   option to enforce stricter certificate sanity checks that are compliant
-   with RFC5280.
+   option to enforce stricter certificate sanity checks that are compliant with
+   RFC5280.
+
 ** libgnutls: Removed IA5String type from DirectoryString within issuer
    and subject name to make DirectoryString RFC5280 compliant.
-** libgnutls: Added function to retrieve the name of current ciphersuite
-   from session (#1291).
 
+** libgnutls: Added function (gnutls_record_send_file) to send file content from
+   open file descriptor (!1486). The implementation is optimized if KTLS (kernel
+   TLS) is enabled.
+
+** libgnutls: Added function (gnutls_ciphersuite_get) to retrieve the name of
+   current ciphersuite from TLS session (#1291).
+
+** libgnutls: The run-time dependency on tpm2-tss is now re-implemented using
+   dlopen, so GnuTLS does not indirectly link to other crypto libraries until
+   TPM2 functionality is utilized (!1544).
 
 ** API and ABI modifications:
 GNUTLS_COMP_BROTLI: New gnutls_compression_method_t enum member
 GNUTLS_COMP_ZSTD: New gnutls_compression_method_t enum member
 gnutls_compress_certificate_get_selected_method: Added
 gnutls_compress_certificate_set_methods: Added
+gnutls_ciphersuite_get: New function
+gnutls_record_send_file: New function
 
 * Version 3.7.3 (released 2022-01-17)
 
