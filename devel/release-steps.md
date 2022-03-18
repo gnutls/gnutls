@@ -13,12 +13,24 @@
    *.abi files under [devel/abi-dump](devel/abi-dump) submodule, run
    `make abi-dump-latest`, and push any changes to the [abi-dump
    repository]; then do `make abi-check`
-1. Create a tarball and detached GPG signature:
+1. Create a distribution tarball: note that this requires
+   the documentation (not only the library docs but also the Guile binding
+   docs) to be generated. See the `doc-dist.Fedora` job in
+   [.gitlab-ci.yml](.gitlab-ci.yml), which does the same thing in the CI:
 ```console
+# Install necesarry packages for documentation and Guile bindings, set
+# environment variables such as GUILE, GUILD, and guile_snarf, and then:
 make distcheck
+```
+1. Create a detached GPG signature:
+```console
+gpg --detach-sign --user your-key-id gnutls-$VERSION.tar.xz
+```
+1. Create a git tag and push it: use [git-evtag] if possible; at least use
+   GPG-signed tag:
+```console
 git tag -s $VERSION
-git push && git push $VERSION
-gpg --detach-sign gnutls-$VERSION.tar.xz
+git push --atomic origin $VERSION
 ```
 1. Upload the tarball and the signature to ftp.gnupg.org:
 ```console
@@ -38,3 +50,4 @@ scp gnutls-$VERSION.tar.xz* ftp.gnupg.org:/home/ftp/gcrypt/gnutls/v$(expr $VERSI
 [security advisory entry]: https://gitlab.com/gnutls/web-pages/-/tree/master/security-entries
 [web-pages repository]: https://gitlab.com/gnutls/web-pages/
 [gnutls web site]: https://gnutls.gitlab.io/web-pages/
+[git-evtag]: https://github.com/cgwalters/git-evtag
