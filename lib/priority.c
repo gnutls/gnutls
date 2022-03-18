@@ -1017,6 +1017,7 @@ static void dummy_func(gnutls_priority_t c)
 
 struct cfg {
 	bool allowlisting;
+	bool ktls_disabled;
 
 	name_val_array_t priority_strings;
 	char *priority_string;
@@ -1129,6 +1130,7 @@ cfg_steal(struct cfg *dst, struct cfg *src)
 	src->default_priority_string = NULL;
 
 	dst->allowlisting = src->allowlisting;
+	dst->ktls_disabled = src->ktls_disabled;
 	memcpy(dst->ciphers, src->ciphers, sizeof(src->ciphers));
 	memcpy(dst->macs, src->macs, sizeof(src->macs));
 	memcpy(dst->groups, src->groups, sizeof(src->groups));
@@ -1250,6 +1252,16 @@ static int global_ini_handler(void *ctx, const char *section, const char *name, 
 				cfg->allowlisting = false;
 			} else {
 				_gnutls_debug_log("cfg: unknown override mode %s\n",
+					p);
+				if (fail_on_invalid_config)
+					return 0;
+			}
+		} else if (c_strcasecmp(name, "ktls") == 0) {
+			p = clear_spaces(value, str);
+			if (c_strcasecmp(p, "false") == 0) {
+				cfg->ktls_disabled = true;
+			} else {
+				_gnutls_debug_log("cfg: unknown ktls mode %s\n",
 					p);
 				if (fail_on_invalid_config)
 					return 0;
@@ -3466,4 +3478,8 @@ gnutls_priority_string_list(unsigned iter, unsigned int flags)
 		return wordlist[iter].name;
 	}
 	return NULL;
+}
+
+bool _gnutls_config_is_ktls_disabled(void){
+	return system_wide_config.ktls_disabled;
 }

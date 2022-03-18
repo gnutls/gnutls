@@ -2813,8 +2813,10 @@ int gnutls_handshake(gnutls_session_t session)
 	const version_entry_st *vers = get_version(session);
 	int ret;
 
+	session->internals.ktls_enabled = 0;
 #ifdef ENABLE_KTLS
-	_gnutls_ktls_enable(session);
+	if (_gnutls_config_is_ktls_disabled() == false)
+		_gnutls_ktls_enable(session);
 #endif
 
 	if (unlikely(session->internals.initial_negotiation_completed)) {
@@ -2913,11 +2915,9 @@ int gnutls_handshake(gnutls_session_t session)
 	}
 
 #ifdef ENABLE_KTLS
-	if (IS_KTLS_ENABLED(session, GNUTLS_KTLS_RECV) || IS_KTLS_ENABLED(session, GNUTLS_KTLS_SEND)) {
+	if (IS_KTLS_ENABLED(session, GNUTLS_KTLS_DUPLEX)) {
 		_gnutls_ktls_set_keys(session);
 	}
-#else
-	session->internals.ktls_enabled = 0;
 #endif
 
 	return 0;
