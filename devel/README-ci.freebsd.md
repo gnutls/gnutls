@@ -1,7 +1,7 @@
 # Install a FreeBSD CI instance
 
 ```
-pkg install -y git gmake bash autoconf gettext libtool automake nettle p11-kit libunistring libtasn1 libidn2 gperf gawk bison softhsm2 openssl cmocka socat wget pkgconf ccache autogen
+pkg install -y git gmake bash autoconf gettext libtool automake nettle p11-kit libunistring libtasn1 libidn2 gperf gawk bison softhsm2 openssl cmocka socat wget pkgconf ccache
 bash
 pw group add -n gitlab-runner
 pw user add -n gitlab-runner -g gitlab-runner -s /usr/local/bin/bash
