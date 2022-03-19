@@ -12,7 +12,7 @@ jobs:
       - name: install dependencies
         run: |
           brew update
-          for pkg in openssl autoconf automake autogen libtool nettle p11-kit libtasn1 gettext bison; do
+          for pkg in openssl autoconf automake libtool nettle p11-kit libtasn1 gettext bison; do
             brew install $pkg || true
           done
           for pkg in nettle wget p11-kit libtasn1; do
