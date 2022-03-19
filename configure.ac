@@ -1010,7 +1010,7 @@ if test x$ac_zlib != xno; then
 fi
 AC_SUBST(LIBZ_PC)
 
-AC_ARG_WITH(libbrotli,
+AC_ARG_WITH(brotli,
 	    AS_HELP_STRING([--without-brotli], [disable brotli compression support]),
 	    ac_brotli=$withval, ac_brotli=yes)
 AC_MSG_CHECKING([whether to include brotli compression support])
@@ -1033,14 +1033,14 @@ else
 fi
 AM_CONDITIONAL(HAVE_LIBBROTLI, test "$with_libbrotlienc" != "no" && test "$with_libbrotlidec" != "no")
 
-AC_ARG_WITH(libzstd,
+AC_ARG_WITH(zstd,
 	    AS_HELP_STRING([--without-zstd], [disable zstd compression support]),
 	    ac_zstd=$withval, ac_zstd=yes)
 AC_MSG_CHECKING([whether to include zstd compression support])
 if test x$ac_zstd != xno; then
     AC_MSG_RESULT(yes)
     PKG_CHECK_MODULES(LIBZSTD, [libzstd >= 1.3.0], [with_libzstd=yes], [with_libzstd=no])
-    if test "${with_libzstd}" = "yes" && test "${has_zstd_h}" = "yes"; then
+    if test "${with_libzstd}" = "yes"; then
 	AC_DEFINE([HAVE_LIBZSTD], 1, [Define if ZSTD compression is enabled.])
 	if test "x$GNUTLS_REQUIRES_PRIVATE" = "x"; then
 	    GNUTLS_REQUIRES_PRIVATE="Requires.private: libzstd"
