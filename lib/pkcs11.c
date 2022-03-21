@@ -3105,7 +3105,7 @@ find_privkeys(struct pkcs11_session_info *sinfo,
 
 	pkcs11_find_objects_final(sinfo);
 
-	list->key_ids_size = current - 1;
+	list->key_ids_size = current;
 
 	return 0;
 }
