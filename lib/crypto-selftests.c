@@ -3112,6 +3112,17 @@ const struct pbkdf2_vectors_st pbkdf2_sha256_vectors[] = {
 		    "\x84\x1b\x51\xc9\xb3\x17\x6a\x27\x2b\xde\xbb\xa1\xd0\x78"
 		    "\x47\x8f\x62\xb3\x97\xf3\x3c\x8d"),
 	},
+	/* Test vector extracted from:
+	 * https://dev.gnupg.org/source/libgcrypt/browse/master/cipher/kdf.c */
+	{
+		STR(key, key_size, "passwordPASSWORDpassword"),
+		STR(salt, salt_size, "saltSALTsaltSALTsaltSALTsaltSALTsalt"),
+		.iter_count = 4096,
+		STR(output, output_size,
+		    "\x34\x8c\x89\xdb\xcb\xd3\x2b\x2f\x32\xd8\x14\xb8\x11\x6e"
+		    "\x84\xcf\x2b\x17\x34\x7e\xbc\x18\x00\x18\x1c\x4e\x2a\x1f"
+		    "\xb8\xdd\x53\xe1\xc6\x35\x51\x8c\x7d\xac\x47\xe9"),
+	},
 };
 
 static int test_pbkdf2(gnutls_mac_algorithm_t mac,
