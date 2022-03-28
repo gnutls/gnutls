@@ -148,6 +148,8 @@ ctests += tls13/no-psk-exts
 
 ctests += tls13/psk-dumbfw
 
+ctests += tls13/psk-ke-modes
+
 ctests += tls13-early-start
 
 ctests += tls13/no-auto-send-ticket
