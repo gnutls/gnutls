@@ -418,6 +418,8 @@ typedef enum {
  * @GNUTLS_COMP_NULL: The NULL compression method (no compression).
  * @GNUTLS_COMP_DEFLATE: The DEFLATE compression method from zlib.
  * @GNUTLS_COMP_ZLIB: Same as %GNUTLS_COMP_DEFLATE.
+ * @GNUTLS_COMP_BROTLI: Brotli compression method.
+ * @GNUTLS_COMP_ZSTD: Zstandard compression method.
  *
  * Enumeration of different TLS compression methods.
  */
