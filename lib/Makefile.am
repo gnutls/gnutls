@@ -202,12 +202,12 @@ noinst_PROGRAMS = fipshmac
 fipshmac_SOURCES = fipshmac.c
 fipshmac_LDADD = libgnutls.la
 
-hmac_files = .libs/.$(gnutls_so).hmac
+hmac_files = .libs/.gnutls.hmac
 
 all-local: $(hmac_files)
 
-.libs/.$(gnutls_so).hmac: libgnutls.la fipshmac
-	$(AM_V_GEN) $(builddir)/fipshmac .libs/$(gnutls_so) > $@-t && mv $@-t $@
+.libs/.gnutls.hmac: libgnutls.la fipshmac
+	$(AM_V_GEN) $(builddir)/fipshmac > $@-t && mv $@-t $@
 
 CLEANFILES = $(hmac_files)
 endif
