@@ -3081,7 +3081,8 @@ find_privkeys(struct pkcs11_session_info *sinfo,
 	current = 0;
 	while (pkcs11_find_objects
 	       (sinfo->module, sinfo->pks, &ctx, 1, &count) == CKR_OK
-	       && count == 1) {
+	       && count == 1
+	       && current < list->key_ids_size) {
 
 		a[0].type = CKA_ID;
 		a[0].value = certid_tmp;
@@ -3098,14 +3099,11 @@ find_privkeys(struct pkcs11_session_info *sinfo,
 				return gnutls_assert_val(ret);
 			current++;
 		}
-
-		if (current > list->key_ids_size)
-			break;
 	}
 
 	pkcs11_find_objects_final(sinfo);
 
-	list->key_ids_size = current - 1;
+	list->key_ids_size = current;
 
 	return 0;
 }
