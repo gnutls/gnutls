@@ -50,13 +50,13 @@ static int get_path(const char *lib, const char *symbol, char *path, size_t path
 		ret = gnutls_assert_val(GNUTLS_E_FILE_ERROR);
 		goto cleanup;
 	}
-	
+
 	ret = dladdr(sym, &info);
 	if (ret == 0) {
 		ret = gnutls_assert_val(GNUTLS_E_FILE_ERROR);
 		goto cleanup;
 	}
-	
+
 	ret = snprintf(path, path_size, "%s", info.dli_fname);
 	if ((size_t)ret >= path_size) {
 		ret = gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
