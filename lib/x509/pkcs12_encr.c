@@ -27,7 +27,7 @@
 #include <x509_int.h>
 #include <algorithms.h>
 
-#define MAX_PASS_LEN 256
+#define MAX_PASS_LEN 8192
 #define MAX_V_SIZE 128
 /* ID should be:
  * 3 for MAC
