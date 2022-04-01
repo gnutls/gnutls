@@ -28,6 +28,7 @@
 #include "gnutls_int.h"
 #include <constate.h>
 #include "errors.h"
+#include "fips.h"
 #include <kx.h>
 #include <algorithms.h>
 #include <num.h>
@@ -576,8 +577,15 @@ _gnutls_init_record_state(record_parameters_st * params,
 				       (ver->id == GNUTLS_SSL3) ? 1 : 0,
 #endif
 				       1 - read /*1==encrypt */ );
-	if (ret < 0 && params->cipher->id != GNUTLS_CIPHER_NULL)
+	if (ret < 0 && params->cipher->id != GNUTLS_CIPHER_NULL) {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 		return gnutls_assert_val(ret);
+	}
+	
+	if (is_cipher_algo_allowed(params->cipher->id))
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_APPROVED);
+	else
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_NOT_APPROVED);
 
 	return 0;
 }
@@ -1290,10 +1298,16 @@ _tls13_init_record_state(gnutls_cipher_algorithm_t algo, record_state_st *state)
 	key.data = state->key;
 	key.size = state->key_size;
 
-	ret = _gnutls_aead_cipher_init(&state->ctx.aead,
-				       algo, &key);
-	if (ret < 0)
+	ret = _gnutls_aead_cipher_init(&state->ctx.aead, algo, &key);
+	if (ret < 0) {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 		return gnutls_assert_val(ret);
+	}
+
+	if (is_cipher_algo_allowed(algo))
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_APPROVED);
+	else
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_NOT_APPROVED);
 
 	state->aead_tag_size = gnutls_cipher_get_tag_size(algo);
 	state->is_aead = 1;
