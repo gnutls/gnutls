@@ -9,10 +9,29 @@
 #include <gnutls/abstract.h>
 #include <gnutls/x509.h>
 
-void _gnutls_lib_simulate_error(void);
-
 /* This does check the FIPS140 support.
  */
+
+#define FIPS_PUSH_CONTEXT() do {				\
+	ret = gnutls_fips140_push_context(fips_context);	\
+	if (ret < 0) {						\
+		fail("gnutls_fips140_push_context failed\n");	\
+	}							\
+} while (0)
+
+#define FIPS_POP_CONTEXT(state) do {					\
+	ret = gnutls_fips140_pop_context();				\
+	if (ret < 0) {							\
+		fail("gnutls_fips140_context_pop failed\n");		\
+	}								\
+	fips_state = gnutls_fips140_get_operation_state(fips_context);	\
+	if (fips_state != GNUTLS_FIPS140_OP_ ## state) {		\
+		fail("operation state is not " # state " (%d)\n",	\
+		     fips_state);					\
+	}								\
+} while (0)
+
+void _gnutls_lib_simulate_error(void);
 
 static void tls_log_func(int level, const char *str)
 {
@@ -21,6 +40,10 @@ static void tls_log_func(int level, const char *str)
 
 static uint8_t key16[16];
 static uint8_t iv16[16];
+uint8_t key_data[64];
+uint8_t iv_data[16];
+gnutls_fips140_context_t fips_context;
+gnutls_fips140_operation_state_t fips_state;
 
 static const gnutls_datum_t data = { .data = (unsigned char *)"foo", 3 };
 static const uint8_t rsa2342_sha1_sig_data[] = {
@@ -109,6 +132,131 @@ rsa_import_keypair(gnutls_privkey_t *privkey, gnutls_pubkey_t *pubkey,
 
 }
 
+static void
+test_aead_cipher_approved(gnutls_cipher_algorithm_t cipher,
+			  unsigned key_size)
+{
+	int ret;
+	gnutls_aead_cipher_hd_t h;
+	gnutls_datum_t key = { key_data, key_size };
+	gnutls_memset(key_data, 0, key_size);
+
+	FIPS_PUSH_CONTEXT();
+	ret = gnutls_aead_cipher_init(&h, cipher, &key);
+	if (ret < 0) {
+		fail("gnutls_aead_cipher_init failed %s for %s\n",
+		     gnutls_strerror(ret),
+		     gnutls_cipher_get_name(cipher));
+	}
+	gnutls_aead_cipher_deinit(h);
+	FIPS_POP_CONTEXT(APPROVED);
+}
+
+static void
+test_cipher_approved(gnutls_cipher_algorithm_t cipher,
+		     unsigned key_size, unsigned iv_size)
+{
+	int ret;
+	gnutls_cipher_hd_t h;
+	gnutls_datum_t key = { key_data, key_size };
+	gnutls_datum_t iv = { iv_data, iv_size };
+	gnutls_memset(key_data, 0, key_size);
+	gnutls_memset(iv_data, 0, iv_size);
+
+	FIPS_PUSH_CONTEXT();
+	ret = gnutls_cipher_init(&h, cipher, &key, &iv);
+	if (ret < 0) {
+		fail("gnutls_cipher_init failed for %s\n",
+		     gnutls_cipher_get_name(cipher));
+	}
+	gnutls_cipher_deinit(h);
+	FIPS_POP_CONTEXT(APPROVED);
+}
+
+static void
+test_cipher_allowed(gnutls_cipher_algorithm_t cipher,
+		    unsigned key_size, unsigned iv_size)
+{
+	int ret;
+	gnutls_cipher_hd_t h;
+	gnutls_datum_t key = { key_data, key_size };
+	gnutls_datum_t iv = { iv_data, iv_size };
+	gnutls_memset(key_data, 0, key_size);
+	gnutls_memset(iv_data, 0, iv_size);
+
+	FIPS_PUSH_CONTEXT();
+	ret = gnutls_cipher_init(&h, cipher, &key, &iv);
+	if (ret < 0) {
+		fail("gnutls_cipher_init failed for %s\n",
+		     gnutls_cipher_get_name(cipher));
+	}
+	gnutls_cipher_deinit(h);
+	FIPS_POP_CONTEXT(NOT_APPROVED);
+}
+
+static void
+test_cipher_disallowed(gnutls_cipher_algorithm_t cipher,
+		       unsigned key_size, unsigned iv_size)
+{
+	int ret;
+	gnutls_cipher_hd_t h;
+	gnutls_datum_t key = { key_data, key_size };
+	gnutls_datum_t iv = { iv_data, iv_size };
+	gnutls_memset(key_data, 0, key_size);
+	gnutls_memset(iv_data, 0, iv_size);
+
+	FIPS_PUSH_CONTEXT();
+	ret = gnutls_cipher_init(&h, cipher, &key, &iv);
+	if (ret != GNUTLS_E_UNWANTED_ALGORITHM) {
+		if (ret == 0)
+			gnutls_cipher_deinit(h);
+		fail("gnutls_cipher_init should have failed with"
+		     "GNUTLS_E_UNWANTED_ALGORITHM for %s\n",
+		     gnutls_cipher_get_name(cipher));
+	}
+	FIPS_POP_CONTEXT(ERROR);
+}
+
+static inline void
+test_ciphers(void)
+{
+	test_cipher_approved(GNUTLS_CIPHER_AES_128_CBC, 16, 16);
+	test_cipher_approved(GNUTLS_CIPHER_AES_192_CBC, 24, 16);
+	test_cipher_approved(GNUTLS_CIPHER_AES_256_CBC, 32, 16);
+	test_aead_cipher_approved(GNUTLS_CIPHER_AES_128_CCM, 16);
+	test_aead_cipher_approved(GNUTLS_CIPHER_AES_256_CCM, 32);
+	test_aead_cipher_approved(GNUTLS_CIPHER_AES_128_CCM_8, 16);
+	test_aead_cipher_approved(GNUTLS_CIPHER_AES_256_CCM_8, 32);
+	test_cipher_approved(GNUTLS_CIPHER_AES_128_CFB8, 16, 16);
+	test_cipher_approved(GNUTLS_CIPHER_AES_192_CFB8, 24, 16);
+	test_cipher_approved(GNUTLS_CIPHER_AES_256_CFB8, 32, 16);
+	test_cipher_allowed(GNUTLS_CIPHER_AES_128_GCM, 16, 12);
+	test_cipher_allowed(GNUTLS_CIPHER_AES_192_GCM, 24, 12);
+	test_cipher_allowed(GNUTLS_CIPHER_AES_256_GCM, 32, 12);
+	test_cipher_disallowed(GNUTLS_CIPHER_ARCFOUR_128, 16, 0);
+	test_cipher_disallowed(GNUTLS_CIPHER_ESTREAM_SALSA20_256, 32, 0);
+	test_cipher_disallowed(GNUTLS_CIPHER_SALSA20_256, 32, 8);
+	test_cipher_disallowed(GNUTLS_CIPHER_CHACHA20_32, 32, 16);
+	test_cipher_disallowed(GNUTLS_CIPHER_CHACHA20_64, 32, 16);
+	test_cipher_disallowed(GNUTLS_CIPHER_CAMELLIA_192_CBC, 24, 16);
+	test_cipher_disallowed(GNUTLS_CIPHER_CAMELLIA_128_CBC, 16, 16);
+	test_cipher_disallowed(GNUTLS_CIPHER_CHACHA20_POLY1305, 32, 12);
+	test_cipher_disallowed(GNUTLS_CIPHER_CAMELLIA_128_GCM, 16, 0);
+	test_cipher_disallowed(GNUTLS_CIPHER_CAMELLIA_256_GCM, 32, 12);
+	test_cipher_disallowed(GNUTLS_CIPHER_GOST28147_CPA_CFB, 32, 8);
+	test_cipher_disallowed(GNUTLS_CIPHER_GOST28147_CPB_CFB, 32, 8);
+	test_cipher_disallowed(GNUTLS_CIPHER_GOST28147_CPC_CFB, 32, 8);
+	test_cipher_disallowed(GNUTLS_CIPHER_AES_128_SIV, 32, 16);
+	test_cipher_disallowed(GNUTLS_CIPHER_AES_256_SIV, 64, 16);
+	test_cipher_disallowed(GNUTLS_CIPHER_GOST28147_TC26Z_CNT, 32, 8);
+	test_cipher_disallowed(GNUTLS_CIPHER_MAGMA_CTR_ACPKM, 32, 8);
+	test_cipher_disallowed(GNUTLS_CIPHER_KUZNYECHIK_CTR_ACPKM, 32, 16);
+	test_cipher_disallowed(GNUTLS_CIPHER_3DES_CBC, 24, 8);
+	test_cipher_disallowed(GNUTLS_CIPHER_DES_CBC, 8, 8);
+	test_cipher_disallowed(GNUTLS_CIPHER_ARCFOUR_40, 5, 0);
+	test_cipher_disallowed(GNUTLS_CIPHER_RC2_40_CBC, 5, 8);
+}
+
 void doit(void)
 {
 	int ret;
@@ -121,8 +269,6 @@ void doit(void)
 	gnutls_privkey_t privkey;
 	gnutls_datum_t key = { key16, sizeof(key16) };
 	gnutls_datum_t iv = { iv16, sizeof(iv16) };
-	gnutls_fips140_context_t fips_context;
-	gnutls_fips140_operation_state_t fips_state;
 	gnutls_datum_t signature;
 	unsigned int bits;
 	uint8_t hmac[64];
@@ -158,38 +304,23 @@ void doit(void)
 		fail("gnutls_fips140_pop_context succeeded while not pushed\n");
 	}
 
-#define FIPS_PUSH_CONTEXT() do {				\
-	ret = gnutls_fips140_push_context(fips_context);	\
-	if (ret < 0) {						\
-		fail("gnutls_fips140_push_context failed\n");	\
-	}							\
-} while (0)
-
-#define FIPS_POP_CONTEXT(state) do {					\
-	ret = gnutls_fips140_pop_context();				\
-	if (ret < 0) {							\
-		fail("gnutls_fips140_context_pop failed\n");		\
-	}								\
-	fips_state = gnutls_fips140_get_operation_state(fips_context);	\
-	if (fips_state != GNUTLS_FIPS140_OP_ ## state) {		\
-		fail("operation state is not " # state " (%d)\n",	\
-		     fips_state);					\
-	}								\
-} while (0)
-
 	/* Try crypto.h functionality */
-	ret =
-	    gnutls_cipher_init(&ch, GNUTLS_CIPHER_AES_128_CBC, &key, &iv);
+	test_ciphers();
+
+	FIPS_PUSH_CONTEXT();
+	ret = gnutls_cipher_init(&ch, GNUTLS_CIPHER_AES_128_CBC, &key, &iv);
 	if (ret < 0) {
 		fail("gnutls_cipher_init failed\n");
 	}
 	gnutls_cipher_deinit(ch);
+	FIPS_POP_CONTEXT(APPROVED);
 
-	ret =
-	    gnutls_cipher_init(&ch, GNUTLS_CIPHER_ARCFOUR_128, &key, &iv);
+	FIPS_PUSH_CONTEXT();
+	ret = gnutls_cipher_init(&ch, GNUTLS_CIPHER_ARCFOUR_128, &key, &iv);
 	if (ret != GNUTLS_E_UNWANTED_ALGORITHM) {
 		fail("gnutls_cipher_init succeeded for arcfour\n");
 	}
+	FIPS_POP_CONTEXT(ERROR);
 
 	ret = gnutls_hmac_init(&mh, GNUTLS_MAC_SHA1, key.data, key.size);
 	if (ret < 0) {
@@ -341,6 +472,14 @@ void doit(void)
 	FIPS_POP_CONTEXT(NOT_APPROVED);
 	gnutls_pubkey_deinit(pubkey);
 	gnutls_privkey_deinit(privkey);
+
+        /* Test RND functions */
+	FIPS_PUSH_CONTEXT();
+	ret = gnutls_rnd(GNUTLS_RND_RANDOM, key16, sizeof(key16));
+	if (ret < 0) {
+		fail("gnutls_rnd failed\n");
+	}
+	FIPS_POP_CONTEXT(APPROVED);
 
 	/* Test when FIPS140 is set to error state */
 	_gnutls_lib_simulate_error();

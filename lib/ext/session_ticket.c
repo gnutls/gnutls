@@ -22,6 +22,7 @@
 
 #include "gnutls_int.h"
 #include "errors.h"
+#include <fips.h>
 #include <datum.h>
 #include <algorithms.h>
 #include <handshake.h>
@@ -238,9 +239,11 @@ _gnutls_decrypt_session_ticket(gnutls_session_t session,
 				cipher_to_entry(TICKET_CIPHER),
 				&stek_cipher_key, &IV, 0);
 	if (ret < 0) {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 		gnutls_assert();
 		goto cleanup;
 	}
+	_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_APPROVED);
 
 	ret = _gnutls_cipher_decrypt(&cipher_hd, ticket.encrypted_state,
 				     ticket.encrypted_state_len);
@@ -315,9 +318,11 @@ _gnutls_encrypt_session_ticket(gnutls_session_t session,
 				cipher_to_entry(TICKET_CIPHER),
 				&stek_cipher_key, &IV, 1);
 	if (ret < 0) {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 		gnutls_assert();
 		goto cleanup;
 	}
+	_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_APPROVED);
 
 	ret = _gnutls_cipher_encrypt(&cipher_hd, encrypted_state.data,
 				     encrypted_state.size);

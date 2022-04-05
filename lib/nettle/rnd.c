@@ -174,8 +174,10 @@ wrap_nettle_rnd(void *_ctx, int level, void *data, size_t datasize)
 		prng_ctx = &ctx->normal;
 	else if (level == GNUTLS_RND_NONCE)
 		prng_ctx = &ctx->nonce;
-	else
+	else {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 		return gnutls_assert_val(GNUTLS_E_RANDOM_FAILED);
+	}
 
 	/* Two reasons for this memset():
 	 *  1. avoid getting filled with valgrind warnings
@@ -207,12 +209,14 @@ wrap_nettle_rnd(void *_ctx, int level, void *data, size_t datasize)
 
 		if (ret < 0) {
 			gnutls_assert();
+			_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 			goto cleanup;
 		}
 
 		ret = single_prng_init(prng_ctx, new_key, sizeof(new_key), 0);
 		if (ret < 0) {
 			gnutls_assert();
+			_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 			goto cleanup;
 		}
 
@@ -227,17 +231,20 @@ wrap_nettle_rnd(void *_ctx, int level, void *data, size_t datasize)
 		ret = wrap_nettle_rnd(_ctx, GNUTLS_RND_RANDOM, new_key, sizeof(new_key));
 		if (ret < 0) {
 			gnutls_assert();
+			_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 			goto cleanup;
 		}
 
 		ret = single_prng_init(prng_ctx, new_key, sizeof(new_key), 0);
 		if (ret < 0) {
 			gnutls_assert();
+			_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 			goto cleanup;
 		}
 	}
 
 	ret = 0;
+	_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_NOT_APPROVED);
 
 cleanup:
 	return ret;
@@ -254,8 +261,6 @@ static void wrap_nettle_rnd_refresh(void *_ctx)
 
 	wrap_nettle_rnd(_ctx, GNUTLS_RND_NONCE, &tmp, 1);
 	wrap_nettle_rnd(_ctx, GNUTLS_RND_RANDOM, &tmp, 1);
-
-	return;
 }
 
 int crypto_rnd_prio = INT_MAX;
