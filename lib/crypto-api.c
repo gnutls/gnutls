@@ -1694,6 +1694,28 @@ void gnutls_aead_cipher_deinit(gnutls_aead_cipher_hd_t handle)
 
 extern gnutls_crypto_kdf_st _gnutls_kdf_ops;
 
+/* Same as @gnutls_hkdf_extract but without changing FIPS context */
+int
+_gnutls_hkdf_extract(gnutls_mac_algorithm_t mac,
+		    const gnutls_datum_t *key,
+		    const gnutls_datum_t *salt,
+		    void *output)
+{
+	/* MD5 is only allowed internally for TLS */
+	if (!is_mac_algo_allowed(mac)) {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
+		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
+	}
+
+	/* We don't check whether MAC is approved, because HKDF is
+	 * only approved in TLS, which is handled separately. */
+
+	return _gnutls_kdf_ops.hkdf_extract(mac, key->data, key->size,
+					    salt ? salt->data : NULL,
+					    salt ? salt->size : 0,
+					    output);
+}
+
 /**
  * gnutls_hkdf_extract:
  * @mac: the mac algorithm used internally
@@ -1716,6 +1738,22 @@ gnutls_hkdf_extract(gnutls_mac_algorithm_t mac,
 {
 	int ret;
 
+	ret = _gnutls_hkdf_extract(mac, key, salt, output);
+	if (ret < 0)
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
+	else
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_NOT_APPROVED);
+
+	return ret;
+}
+
+/* Same as @gnutls_hkdf_expand but without changing FIPS context */
+int
+_gnutls_hkdf_expand(gnutls_mac_algorithm_t mac,
+		   const gnutls_datum_t *key,
+		   const gnutls_datum_t *info,
+		   void *output, size_t length)
+{
 	/* MD5 is only allowed internally for TLS */
 	if (!is_mac_algo_allowed(mac)) {
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
@@ -1725,16 +1763,9 @@ gnutls_hkdf_extract(gnutls_mac_algorithm_t mac,
 	/* We don't check whether MAC is approved, because HKDF is
 	 * only approved in TLS, which is handled separately. */
 
-	ret = _gnutls_kdf_ops.hkdf_extract(mac, key->data, key->size,
-					   salt ? salt->data : NULL,
-					   salt ? salt->size : 0,
-					   output);
-	if (ret < 0) {
-		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
-	} else {
-		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_NOT_APPROVED);
-	}
-	return ret;
+	return _gnutls_kdf_ops.hkdf_expand(mac, key->data, key->size,
+					  info->data, info->size,
+					  output, length);
 }
 
 /**
@@ -1761,23 +1792,12 @@ gnutls_hkdf_expand(gnutls_mac_algorithm_t mac,
 {
 	int ret;
 
-	/* MD5 is only allowed internally for TLS */
-	if (!is_mac_algo_allowed(mac)) {
+	ret = _gnutls_hkdf_expand(mac, key, info, output, length);
+	if (ret < 0)
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
-		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
-	}
-
-	/* We don't check whether MAC is approved, because HKDF is
-	 * only approved in TLS, which is handled separately. */
-
-	ret = _gnutls_kdf_ops.hkdf_expand(mac, key->data, key->size,
-					  info->data, info->size,
-					  output, length);
-	if (ret < 0) {
-		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
-	} else {
+	else
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_NOT_APPROVED);
-	}
+
 	return ret;
 }
 

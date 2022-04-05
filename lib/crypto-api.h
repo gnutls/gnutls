@@ -50,4 +50,16 @@ void _gnutls_aead_cipher_deinit(gnutls_aead_cipher_hd_t handle)
 	_gnutls_cipher_deinit(&h->ctx_enc);
 }
 
+int
+_gnutls_hkdf_extract(gnutls_mac_algorithm_t mac,
+		     const gnutls_datum_t *key,
+		     const gnutls_datum_t *salt,
+		     void *output);
+
+int
+_gnutls_hkdf_expand(gnutls_mac_algorithm_t mac,
+		    const gnutls_datum_t *key,
+		    const gnutls_datum_t *info,
+		    void *output, size_t length);
+
 #endif /* GNUTLS_LIB_CRYPTO_API_H */

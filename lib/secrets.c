@@ -24,6 +24,8 @@
  */
 
 #include <config.h>
+#include "crypto-api.h"
+#include "fips.h"
 #include "gnutls_int.h"
 #include "secrets.h"
 
@@ -67,15 +69,22 @@ int _tls13_update_secret(gnutls_session_t session, const uint8_t *key, size_t ke
 {
 	gnutls_datum_t _key;
 	gnutls_datum_t salt;
+	int ret;
 
 	_key.data = (void *)key;
 	_key.size = key_size;
 	salt.data = (void *)session->key.proto.tls13.temp_secret;
 	salt.size = session->key.proto.tls13.temp_secret_size;
 
-	return gnutls_hkdf_extract(session->security_parameters.prf->id,
-				   &_key, &salt,
-				   session->key.proto.tls13.temp_secret);
+	ret = _gnutls_hkdf_extract(session->security_parameters.prf->id,
+			           &_key, &salt,
+			           session->key.proto.tls13.temp_secret);
+	if (ret < 0)
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
+	else
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_APPROVED);
+
+	return ret;
 }
 
 /* Derive-Secret(Secret, Label, Messages) */
@@ -161,10 +170,13 @@ int _tls13_expand_secret2(const mac_entry_st *prf,
 	info.data = str.data;
 	info.size = str.length;
 
-	ret = gnutls_hkdf_expand(prf->id, &key, &info, out, out_size);
+	ret = _gnutls_hkdf_expand(prf->id, &key, &info, out, out_size);
 	if (ret < 0) {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 		gnutls_assert();
 		goto cleanup;
+	} else {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_APPROVED);
 	}
 
 #if 0
