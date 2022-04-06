@@ -2715,7 +2715,7 @@ int gnutls_cipher_self_test(unsigned flags, gnutls_cipher_algorithm_t cipher)
 		CASE(GNUTLS_CIPHER_AES_256_CBC, test_cipher,
 		     aes256_cbc_vectors);
 		FALLTHROUGH;
-		CASE(GNUTLS_CIPHER_3DES_CBC, test_cipher,
+		NON_FIPS_CASE(GNUTLS_CIPHER_3DES_CBC, test_cipher,
 		     tdes_cbc_vectors);
 		FALLTHROUGH;
 		NON_FIPS_CASE(GNUTLS_CIPHER_ARCFOUR_128, test_cipher,

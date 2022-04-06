@@ -116,6 +116,9 @@ void doit(void)
 		int bag_encrypt_expected;
 	} tests[2];
 
+	if (gnutls_fips140_mode_enabled())
+		exit(77);
+
 	ret = global_init();
 	if (ret < 0) {
 		fprintf(stderr, "global_init %d", ret);

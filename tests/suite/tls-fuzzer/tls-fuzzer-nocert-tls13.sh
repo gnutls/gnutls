@@ -20,6 +20,11 @@
 
 : ${srcdir=.}
 
+if test "${GNUTLS_FORCE_FIPS_MODE}" = 1;then
+	echo "Cannot run in FIPS140-2 mode"
+	exit 77
+fi
+
 tls_fuzzer_prepare() {
 PRIORITY="NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:+VERS-TLS1.1:+AES-128-CCM:+AES-256-CCM:+AES-128-CCM-8"
 

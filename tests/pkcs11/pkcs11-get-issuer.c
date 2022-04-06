@@ -85,6 +85,9 @@ void doit(void)
 	gnutls_datum_t tmp;
 	int idx = -1;
 
+	if (gnutls_fips140_mode_enabled())
+		exit(77);
+
 	/* The overloading of time() seems to work in linux (ELF?)
 	 * systems only. Disable it on windows.
 	 */

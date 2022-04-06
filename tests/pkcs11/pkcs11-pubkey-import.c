@@ -75,6 +75,9 @@ static void try(int rsa)
 	gnutls_pubkey_t pubkey;
 	gnutls_pubkey_t pubkey2;
 
+	if (gnutls_fips140_mode_enabled())
+		exit(77);
+
 	bin = softhsm_bin();
 
 	lib = softhsm_lib();

@@ -35,6 +35,11 @@
 : ${CLI=../../src/gnutls-cli${EXEEXT}}
 unset RETCODE
 
+if test "${GNUTLS_FORCE_FIPS_MODE}" = 1;then
+	echo "Cannot run in FIPS140-2 mode"
+	exit 77
+fi
+
 if ! test -x "${CLI}"; then
 	exit 77
 fi

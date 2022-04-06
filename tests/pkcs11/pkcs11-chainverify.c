@@ -78,6 +78,9 @@ void doit(void)
 	gnutls_typed_vdata_st vdata[2];
 	char buf[128];
 
+	if (gnutls_fips140_mode_enabled())
+		exit(77);
+
 	/* The overloading of time() seems to work in linux (ELF?)
 	 * systems only. Disable it on windows.
 	 */

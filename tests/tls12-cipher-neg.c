@@ -173,6 +173,7 @@ test_case_st tests[] = {
 	{
 		.name = "server TLS 1.2: 3DES-CBC (server)",
 		.cipher = GNUTLS_CIPHER_3DES_CBC,
+		.not_on_fips = 1,
 		.server_prio = "NORMAL:-CIPHER-ALL:+3DES-CBC:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2:%SERVER_PRECEDENCE",
 		.client_prio = "NORMAL:+3DES-CBC",
 		.desc = "(TLS1.2)-(ECDHE-SECP256R1)-(ECDSA-SHA256)-(3DES-CBC)-(SHA1)"
@@ -180,6 +181,7 @@ test_case_st tests[] = {
 	{
 		.name = "both TLS 1.2: 3DES-CBC (server)",
 		.cipher = GNUTLS_CIPHER_3DES_CBC,
+		.not_on_fips = 1,
 		.server_prio = "NORMAL:-CIPHER-ALL:+3DES-CBC:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2:%SERVER_PRECEDENCE",
 		.client_prio = "NORMAL:+3DES-CBC:+VERS-TLS1.2",
 		.desc = "(TLS1.2)-(ECDHE-SECP256R1)-(ECDSA-SHA256)-(3DES-CBC)-(SHA1)"
@@ -187,6 +189,7 @@ test_case_st tests[] = {
 	{
 		.name = "client TLS 1.2: 3DES-CBC (client)",
 		.cipher = GNUTLS_CIPHER_3DES_CBC,
+		.not_on_fips = 1,
 		.server_prio = "NORMAL:+3DES-CBC",
 		.client_prio = "NORMAL:-CIPHER-ALL:+3DES-CBC:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2",
 		.desc = "(TLS1.2)-(ECDHE-SECP256R1)-(ECDSA-SHA256)-(3DES-CBC)-(SHA1)"
@@ -194,6 +197,7 @@ test_case_st tests[] = {
 	{
 		.name = "both TLS 1.2: 3DES-CBC (client)",
 		.cipher = GNUTLS_CIPHER_3DES_CBC,
+		.not_on_fips = 1,
 		.server_prio = "NORMAL:+3DES-CBC:+VERS-TLS1.2",
 		.client_prio = "NORMAL:-CIPHER-ALL:+3DES-CBC:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2",
 		.desc = "(TLS1.2)-(ECDHE-SECP256R1)-(ECDSA-SHA256)-(3DES-CBC)-(SHA1)"

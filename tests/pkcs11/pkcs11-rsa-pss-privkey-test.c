@@ -96,6 +96,9 @@ void doit(void)
 	gnutls_pubkey_t pubkey2;
 	unsigned i, sigalgo;
 
+	if (gnutls_fips140_mode_enabled())
+		exit(77);
+
 	bin = softhsm_bin();
 
 	lib = softhsm_lib();

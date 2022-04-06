@@ -145,6 +145,9 @@ int check_pkcs8_privkey2(void)
 
 void doit(void)
 {
+	if (gnutls_fips140_mode_enabled())
+		exit(77);
+
 #if NETTLE_VERSION_MAJOR < 3 || (NETTLE_VERSION_MAJOR == 3 && NETTLE_VERSION_MINOR <= 2)
 	/* These checks are enforced only on new versions of nettle */
 	exit(77);

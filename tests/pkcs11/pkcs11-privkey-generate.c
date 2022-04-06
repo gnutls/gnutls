@@ -85,6 +85,9 @@ void doit(void)
 	unsigned flags;
 	gnutls_pkcs11_obj_t obj;
 
+	if (gnutls_fips140_mode_enabled())
+		exit(77);
+
 	ret = global_init();
 	if (ret != 0) {
 		fail("%d: %s\n", ret, gnutls_strerror(ret));

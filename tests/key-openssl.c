@@ -115,6 +115,9 @@ void doit(void)
 	int ret;
 	gnutls_datum_t key;
 
+	if (gnutls_fips140_mode_enabled())
+		exit(77);
+
 	ret = global_init();
 	if (ret < 0)
 		fail("global_init: %d\n", ret);

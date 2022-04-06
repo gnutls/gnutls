@@ -422,6 +422,9 @@ void doit(void)
 	unsigned int i, have_eddsa;
 	int ret;
 
+	if (gnutls_fips140_mode_enabled())
+		exit(77);
+
 #ifdef _WIN32
 	exit(77);
 #endif

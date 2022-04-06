@@ -444,6 +444,9 @@ void doit(void)
 	const char *bin;
 	char buf[128];
 
+	if (gnutls_fips140_mode_enabled())
+		exit(77);
+
 	/* check if softhsm module is loadable */
 	(void) softhsm_lib();
 
