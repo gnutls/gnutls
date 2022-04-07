@@ -149,6 +149,9 @@ void doit(void)
 	unsigned int pcerts_size;
 	char file[TMPNAME_SIZE];
 
+	if (gnutls_fips140_mode_enabled())
+		exit(77);
+
 	track_temp_files();
 	bin = softhsm_bin();
 

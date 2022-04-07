@@ -475,8 +475,8 @@ void doit(void)
 	start("aes128-cbc", GNUTLS_CIPHER_AES_128_CBC, 0);
 	start("aes192-cbc", GNUTLS_CIPHER_AES_192_CBC, 0);
 	start("aes256-cbc", GNUTLS_CIPHER_AES_256_CBC, 0);
-	start("3des-cbc", GNUTLS_CIPHER_3DES_CBC, 0);
 	if (!gnutls_fips140_mode_enabled()) {
+		start("3des-cbc", GNUTLS_CIPHER_3DES_CBC, 0);
 		start("camellia128-gcm", GNUTLS_CIPHER_CAMELLIA_128_GCM, 1);
 		start("camellia256-gcm", GNUTLS_CIPHER_CAMELLIA_256_GCM, 1);
 		start("chacha20-poly1305", GNUTLS_CIPHER_CHACHA20_POLY1305, 1);

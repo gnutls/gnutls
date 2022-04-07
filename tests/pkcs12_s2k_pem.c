@@ -254,6 +254,9 @@ int main(void)
 	size_t i;
 	int ret;
 
+	if (gnutls_fips140_mode_enabled())
+		exit(77);
+
 	global_init();
 
 	for (i = 0; i < sizeof(keys) / sizeof(keys[0]); i++) {

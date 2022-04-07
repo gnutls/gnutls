@@ -65,24 +65,28 @@ test_case_st tests[] = {
 	{
 		.name = "server TLS 1.0: 3DES-CBC (server)",
 		.cipher = GNUTLS_CIPHER_3DES_CBC,
+		.not_on_fips = 1,
 		.server_prio = "NORMAL:-CIPHER-ALL:+3DES-CBC:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.0:%SERVER_PRECEDENCE",
 		.client_prio = "NORMAL:+3DES-CBC"
 	},
 	{
 		.name = "both TLS 1.0: 3DES-CBC (server)",
 		.cipher = GNUTLS_CIPHER_3DES_CBC,
+		.not_on_fips = 1,
 		.server_prio = "NORMAL:-CIPHER-ALL:+3DES-CBC:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.0:%SERVER_PRECEDENCE",
 		.client_prio = "NORMAL:+3DES-CBC:+VERS-TLS1.0"
 	},
 	{
 		.name = "client TLS 1.0: 3DES-CBC (client)",
 		.cipher = GNUTLS_CIPHER_3DES_CBC,
+		.not_on_fips = 1,
 		.server_prio = "NORMAL:+3DES-CBC",
 		.client_prio = "NORMAL:-CIPHER-ALL:+3DES-CBC:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.0"
 	},
 	{
 		.name = "both TLS 1.0: 3DES-CBC (client)",
 		.cipher = GNUTLS_CIPHER_3DES_CBC,
+		.not_on_fips = 1,
 		.server_prio = "NORMAL:+3DES-CBC:+VERS-TLS1.0",
 		.client_prio = "NORMAL:-CIPHER-ALL:+3DES-CBC:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.0"
 	},

@@ -217,6 +217,9 @@ void doit(void)
 	unsigned verify_status = 0;
 	gnutls_datum_t tmp;
 
+	if (gnutls_fips140_mode_enabled())
+		exit(77);
+
 	/* The overloading of time() seems to work in linux (ELF?)
 	 * systems only. Disable it on windows.
 	 */

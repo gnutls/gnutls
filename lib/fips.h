@@ -118,7 +118,6 @@ is_cipher_algo_approved_in_fips(gnutls_cipher_algorithm_t algo)
 	case GNUTLS_CIPHER_AES_192_CBC:
 	case GNUTLS_CIPHER_AES_128_CCM:
 	case GNUTLS_CIPHER_AES_256_CCM:
-	case GNUTLS_CIPHER_3DES_CBC:
 	case GNUTLS_CIPHER_AES_128_CCM_8:
 	case GNUTLS_CIPHER_AES_256_CCM_8:
 	case GNUTLS_CIPHER_AES_128_CFB8:

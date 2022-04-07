@@ -75,6 +75,9 @@ void doit(void)
 	gnutls_datum_t tmp, tmp2;
 	size_t buf_size;
 
+	if (gnutls_fips140_mode_enabled())
+		exit(77);
+
 	bin = softhsm_bin();
 
 	lib = softhsm_lib();

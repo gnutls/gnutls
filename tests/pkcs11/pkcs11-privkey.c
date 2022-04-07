@@ -129,6 +129,9 @@ void doit(void)
 	gnutls_certificate_credentials_t cred;
 	gnutls_datum_t tmp;
 
+	if (gnutls_fips140_mode_enabled())
+		exit(77);
+
 	/* The overloading of time() seems to work in linux (ELF?)
 	 * systems only. Disable it on windows.
 	 */

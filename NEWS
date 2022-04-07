@@ -7,6 +7,11 @@ See the end for copying conditions.
 
 * Version ?.?.? (released ????-??-??)
 
+** libgnutls: Removed 3DES from FIPS approved algorithms (#1353).
+   According to the section 2 of SP800-131A Rev.2, 3DES algorithm
+   will be disallowed for encryption after December 31, 2023:
+   https://csrc.nist.gov/publications/detail/sp/800-131a/rev-2/final
+
 ** The configure arguments for Brotli and Zstandard (zstd) support
    have changed to reflect the previous help text: they are now
    --with-brotli/--with-zstd respectively (#1342).

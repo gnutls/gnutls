@@ -83,6 +83,9 @@ void doit(void)
 	gnutls_privkey_t pkey;
 	char file[TMPNAME_SIZE];
 
+	if (gnutls_fips140_mode_enabled())
+		exit(77);
+
 	bin = softhsm_bin();
 
 	lib = softhsm_lib();

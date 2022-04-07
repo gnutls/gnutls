@@ -352,6 +352,9 @@ void doit(void)
 	gnutls_x509_crt_t intermediate, same_dn, same_issuer;
 	gnutls_datum_t tmp;
 
+	if (gnutls_fips140_mode_enabled())
+		exit(77);
+
 	/* The overloading of time() seems to work in linux (ELF?)
 	 * systems only. Disable it on windows.
 	 */
