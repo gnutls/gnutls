@@ -271,9 +271,6 @@ Makefile.user
 *.o
 *.out
 *.plist
-python/__pycache__/
-python/cligen
-python/cli-*gen.py
 src/benchmark
 src/benchmark-cipher
 src/benchmark-tls

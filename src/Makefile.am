@@ -236,7 +236,7 @@ dumpcfg_LDADD = ../gl/libgnu.la gl/libgnu_gpl.la
 
 SUFFIXES = .stamp .json
 
-OPTIONS_STAMP: $(top_srcdir)/python/cli-codegen.py
+OPTIONS_STAMP: $(top_srcdir)/cligen/cli-codegen.py
 
 CLIGEN_ARGS = \
 	--bug-email bugs@gnutls.org \
@@ -249,8 +249,8 @@ CLIGEN_ARGS = \
 .json.stamp:
 	$(AM_V_GEN) { \
 		b=`echo $@ | sed 's/.stamp$$//'`; \
-		PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(top_srcdir)/python/cli-codegen.py $(CLIGEN_ARGS) \
+		PYTHONPATH='$(top_srcdir)/cligen' \
+		$(PYTHON) $(top_srcdir)/cligen/cli-codegen.py $(CLIGEN_ARGS) \
 			$< $${b}.c $${b}.h; \
 		echo "#define optionProcess(a,b,c) process_options(b,c)" >> $${b}.h; \
 		echo "#define STACKCT_OPT OPTS_COUNT" >> $${b}.h; \
