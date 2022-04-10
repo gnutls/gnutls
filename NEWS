@@ -54,6 +54,7 @@ gnutls_compress_certificate_get_selected_method: Added
 gnutls_compress_certificate_set_methods: Added
 gnutls_ciphersuite_get: New function
 gnutls_record_send_file: New function
+libgnutlsxx: Soname bumped due to ABI breakage introduced in 3.7.1
 
 * Version 3.7.3 (released 2022-01-17)
 
