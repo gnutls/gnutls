@@ -161,8 +161,11 @@ _gnutls_decrypt_pbes1_des_md5_data(const char *password,
 	result =
 	    _gnutls_cipher_init(&ch, cipher_to_entry(GNUTLS_CIPHER_DES_CBC),
 				&dkey, &d_iv, 0);
-	if (result < 0)
+	if (result < 0) {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 		return gnutls_assert_val(result);
+	}
+	_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_NOT_APPROVED);
 
 	result = _gnutls_cipher_decrypt(&ch, encrypted_data->data, encrypted_data->size);
 	if (result < 0) {

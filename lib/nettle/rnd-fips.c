@@ -57,20 +57,27 @@ static int get_random(struct drbg_aes_ctx *ctx, struct fips_ctx *fctx,
 
 	if ( _gnutls_detect_fork(fctx->forkid) != 0) {
 		ret = _rngfips_ctx_reinit(fctx);
-		if (ret < 0)
+		if (ret < 0) {
+			_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 			return gnutls_assert_val(ret);
+		}
 	}
 
 	if (ctx->reseed_counter > DRBG_AES_RESEED_TIME) {
 		ret = drbg_reseed(fctx, ctx);
-		if (ret < 0)
+		if (ret < 0) {
+			_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 			return gnutls_assert_val(ret);
+		}
 	}
 
 	ret = drbg_aes_random(ctx, length, buffer);
-	if (ret == 0)
+	if (ret == 0) {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 		return gnutls_assert_val(GNUTLS_E_RANDOM_FAILED);
+	}
 
+	_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_APPROVED);
 	return 0;
 }
 
@@ -99,6 +106,7 @@ static int get_entropy(struct fips_ctx *fctx, uint8_t *buffer, size_t length)
 		sha256_digest(&ctx, sizeof(hash), hash);
 
 		if (memcmp(hash, fctx->entropy_hash, sizeof(hash)) == 0) {
+			_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 			_gnutls_switch_lib_state(LIB_STATE_ERROR);
 			return gnutls_assert_val(GNUTLS_E_RANDOM_FAILED);
 		}
@@ -110,6 +118,7 @@ static int get_entropy(struct fips_ctx *fctx, uint8_t *buffer, size_t length)
 	}
 	zeroize_key(block, sizeof(block));
 
+	_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_APPROVED);
 	return 0;
 }
 
@@ -121,15 +130,20 @@ static int drbg_init(struct fips_ctx *fctx, struct drbg_aes_ctx *ctx)
 	int ret;
 
 	ret = get_entropy(fctx, buffer, sizeof(buffer));
-	if (ret < 0)
+	if (ret < 0) {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 		return gnutls_assert_val(ret);
+	}
 
 	ret = drbg_aes_init(ctx, sizeof(buffer), buffer,
 			    PSTRING_SIZE, (void*)PSTRING);
 	zeroize_key(buffer, sizeof(buffer));
-	if (ret == 0)
+	if (ret == 0) {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 		return gnutls_assert_val(GNUTLS_E_RANDOM_FAILED);
+	}
 
+	_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_APPROVED);
 	return GNUTLS_E_SUCCESS;
 }
 
@@ -140,14 +154,19 @@ static int drbg_reseed(struct fips_ctx *fctx, struct drbg_aes_ctx *ctx)
 	int ret;
 
 	ret = get_entropy(fctx, buffer, sizeof(buffer));
-	if (ret < 0)
+	if (ret < 0) {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 		return gnutls_assert_val(ret);
+	}
 
 	ret = drbg_aes_reseed(ctx, sizeof(buffer), buffer, 0, NULL);
 	zeroize_key(buffer, sizeof(buffer));
-	if (ret == 0)
+	if (ret == 0) {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 		return gnutls_assert_val(GNUTLS_E_RANDOM_FAILED);
+	}
 
+	_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_APPROVED);
 	return GNUTLS_E_SUCCESS;
 }
 
