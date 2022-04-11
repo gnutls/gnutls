@@ -259,6 +259,7 @@ lib/x509/Makefile
 lib/x509/Makefile.in
 lib/x509/supported_exts.h
 lib/x509/x509-api.texi
+lib/*_asn1_tab.c
 *.lo
 *.log
 m4/*
