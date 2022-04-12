@@ -1666,7 +1666,7 @@ int gnutls_pubkey_import_ecc_raw(gnutls_pubkey_t key, gnutls_ecc_curve_t curve,
 	gnutls_pk_params_release(&key->params);
 	gnutls_pk_params_init(&key->params);
 
-	if (curve_is_eddsa(curve)) {
+	if (curve_is_eddsa(curve) || curve_is_modern_ecdh(curve)) {
 		unsigned size = gnutls_ecc_curve_get_size(curve);
 		if (x->size != size) {
 			ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -1685,6 +1685,12 @@ int gnutls_pubkey_import_ecc_raw(gnutls_pubkey_t key, gnutls_ecc_curve_t curve,
 			break;
 		case GNUTLS_ECC_CURVE_ED448:
 			key->params.algo = GNUTLS_PK_EDDSA_ED448;
+			break;
+		case GNUTLS_ECC_CURVE_X25519:
+			key->params.algo = GNUTLS_PK_ECDH_X25519;
+			break;
+		case GNUTLS_ECC_CURVE_X448:
+			key->params.algo = GNUTLS_PK_ECDH_X448;
 			break;
 		default:
 			break;
