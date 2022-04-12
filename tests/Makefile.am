@@ -235,7 +235,7 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 x509cert-dntypes id-on-xmppAddr tls13-compat-mode ciphersuite-name \
 	 x509-upnconstraint xts-key-check cipher-padding pkcs7-verify-double-free \
 	 fips-rsa-sizes tls12-rehandshake-ticket pathbuf tls-force-ems \
-	 psk-importer
+	 psk-importer privkey-derive dh-compute2 ecdh-compute2
 
 ctests += tls-channel-binding
 

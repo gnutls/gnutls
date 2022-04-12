@@ -367,6 +367,7 @@ tests/cve-2009-1416
 tests/dane
 tests/dane-strcodes
 tests/dh-compute
+tests/dh-compute2
 tests/dh-params
 tests/dhepskself
 tests/dhex509self
@@ -398,6 +399,7 @@ tests/duplicate-extensions
 tests/eagain
 tests/eagain-auto-auth
 tests/ecdh-compute
+tests/ecdh-compute2
 tests/empty_retrieve_function
 tests/fallback-scsv
 tests/finished
@@ -618,6 +620,7 @@ tests/priority-init2
 tests/priority-mix
 tests/priority-set
 tests/priority-set2
+tests/privkey-derive
 tests/privkey-keygen
 tests/privkey-verify-broken
 tests/protocol-set-allowlist

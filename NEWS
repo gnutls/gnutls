@@ -5,6 +5,22 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.8.2 (unreleased)
+
+** libgnutls: Add API functions to perform ECDH and DH key agreement
+   The functionality has been there for a long time though they were
+   not available as part of the public API.  This enables applications
+   to implement custom protocols leveraging non-interactive key
+   agreement with ECDH and DH.
+
+** API and ABI modifications:
+gnutls_pubkey_import_dh_raw: New function
+gnutls_privkey_import_dh_raw: New function
+gnutls_privkey_export_dh_raw: New function
+gnutls_x509_privkey_import_dh_raw: New function
+gnutls_privkey_derive_secret: New function
+GNUTLS_KEYGEN_DH: New enum member of gnutls_keygen_types_t
+
 * Version 3.8.1 (released 2023-08-03)
 
 ** libgnutls: ClientHello extensions are randomized by default

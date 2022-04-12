@@ -541,6 +541,10 @@ int gnutls_privkey_export_gost_raw2(gnutls_privkey_t key,
 				    gnutls_gost_paramset_t *paramset,
 				    gnutls_datum_t *x, gnutls_datum_t *y,
 				    gnutls_datum_t *k, unsigned flags);
+int gnutls_privkey_derive_secret(gnutls_privkey_t privkey,
+				 gnutls_pubkey_t pubkey,
+				 const gnutls_datum_t *nonce,
+				 gnutls_datum_t *secret, unsigned int flags);
 
 int gnutls_x509_crt_privkey_sign(gnutls_x509_crt_t crt,
 				 gnutls_x509_crt_t issuer,

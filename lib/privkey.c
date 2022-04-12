@@ -2003,3 +2003,40 @@ unsigned _gnutls_privkey_compatible_with_sig(gnutls_privkey_t privkey,
 
 	return 1;
 }
+
+/**
+ * gnutls_privkey_derive_secret:
+ * @privkey: a private key of type #gnutls_privkey_t
+ * @pubkey: a public key of type #gnutls_pubkey_t
+ * @nonce: an optional nonce value
+ * @secret: where shared secret will be stored
+ * @flags: must be zero
+ *
+ * This function will calculate a shared secret from our @privkey and
+ * peer's @pubkey. The result will be stored in @secret, whose data
+ * member should be freed after use using gnutls_free(). @privkey and
+ * @pubkey must be backed by the X.509 keys.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.8.2
+ **/
+int gnutls_privkey_derive_secret(gnutls_privkey_t privkey,
+				 gnutls_pubkey_t pubkey,
+				 const gnutls_datum_t *nonce,
+				 gnutls_datum_t *secret, unsigned int flags)
+{
+	if (unlikely(privkey == NULL || privkey->type != GNUTLS_PRIVKEY_X509)) {
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
+
+	if (unlikely(pubkey == NULL ||
+		     pubkey->params.algo != privkey->pk_algorithm)) {
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
+
+	return _gnutls_pk_derive_nonce(privkey->pk_algorithm, secret,
+				       &privkey->key.x509->params,
+				       &pubkey->params, nonce);
+}

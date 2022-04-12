@@ -81,3 +81,6 @@ name = gnutls_privkey_export_dh_raw
 
 [suppress_function]
 name = gnutls_x509_privkey_import_dh_raw
+
+[suppress_function]
+name = gnutls_privkey_derive_secret
