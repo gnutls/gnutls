@@ -64,7 +64,7 @@ void _gnutls_x509_privkey_reinit(gnutls_x509_privkey_t key)
 	gnutls_pk_params_clear(&key->params);
 	gnutls_pk_params_release(&key->params);
 	/* avoid re-use of fields which may have had some sensible value */
-	memset(&key->params, 0, sizeof(key->params));
+	zeroize_key(&key->params, sizeof(key->params));
 
 	if (key->key)
 		asn1_delete_structure2(&key->key, ASN1_DELETE_FLAG_ZEROIZE);
@@ -614,8 +614,10 @@ gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
 	}
 
  cleanup:
-	if (need_free)
+	if (need_free) {
+		zeroize_temp_key(_data.data, _data.size);
 		_gnutls_free_datum(&_data);
+	}
 
 	/* The key has now been decoded.
 	 */

@@ -276,7 +276,10 @@ wrap_aarch64_hmac_output(void *src_ctx, void *digest, size_t digestsize)
 
 static void wrap_aarch64_hmac_deinit(void *hd)
 {
-	gnutls_free(hd);
+	struct aarch64_hmac_ctx *ctx = hd;
+
+	zeroize_temp_key(ctx, sizeof(*ctx));
+	gnutls_free(ctx);
 }
 
 static int wrap_aarch64_hmac_fast(gnutls_mac_algorithm_t algo,

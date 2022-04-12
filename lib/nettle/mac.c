@@ -792,6 +792,7 @@ static int wrap_nettle_hash_fast(gnutls_digest_algorithm_t algo,
 		ctx.update(&ctx, text_size, text);
 	}
 	ctx.digest(&ctx, ctx.length, digest);
+	zeroize_temp_key(&ctx, sizeof(ctx));
 
 	return 0;
 }
@@ -872,6 +873,7 @@ wrap_nettle_hkdf_extract (gnutls_mac_algorithm_t mac,
 	hkdf_extract(&ctx.ctx, ctx.update, ctx.digest, ctx.length,
 		     keysize, key, output);
 
+	zeroize_temp_key(&ctx, sizeof(ctx));
 	return 0;
 }
 
@@ -891,6 +893,7 @@ wrap_nettle_hkdf_expand (gnutls_mac_algorithm_t mac,
 	ctx.set_key(&ctx, keysize, key);
 	hkdf_expand(&ctx.ctx, ctx.update, ctx.digest, ctx.length,
 		    infosize, info, length, output);
+	zeroize_temp_key(&ctx, sizeof(ctx));
 
 	return 0;
 }
@@ -912,6 +915,7 @@ wrap_nettle_pbkdf2 (gnutls_mac_algorithm_t mac,
 	ctx.set_key(&ctx, keysize, key);
 	pbkdf2(&ctx.ctx, ctx.update, ctx.digest, ctx.length,
 	       iter_count, saltsize, salt, length, output);
+	zeroize_temp_key(&ctx, sizeof(ctx));
 
 	return 0;
 }
