@@ -133,10 +133,10 @@ rsa_import_keypair(gnutls_privkey_t *privkey, gnutls_pubkey_t *pubkey,
 }
 
 static void
-test_aead_cipher_approved(gnutls_cipher_algorithm_t cipher,
-			  unsigned key_size)
+test_aead_cipher_approved(gnutls_cipher_algorithm_t cipher)
 {
 	int ret;
+	unsigned key_size = gnutls_cipher_get_key_size(cipher);
 	gnutls_aead_cipher_hd_t h;
 	gnutls_datum_t key = { key_data, key_size };
 	gnutls_memset(key_data, 0, key_size);
@@ -144,8 +144,7 @@ test_aead_cipher_approved(gnutls_cipher_algorithm_t cipher,
 	FIPS_PUSH_CONTEXT();
 	ret = gnutls_aead_cipher_init(&h, cipher, &key);
 	if (ret < 0) {
-		fail("gnutls_aead_cipher_init failed %s for %s\n",
-		     gnutls_strerror(ret),
+		fail("gnutls_aead_cipher_init failed for %s\n",
 		     gnutls_cipher_get_name(cipher));
 	}
 	gnutls_aead_cipher_deinit(h);
@@ -153,10 +152,11 @@ test_aead_cipher_approved(gnutls_cipher_algorithm_t cipher,
 }
 
 static void
-test_cipher_approved(gnutls_cipher_algorithm_t cipher,
-		     unsigned key_size, unsigned iv_size)
+test_cipher_approved(gnutls_cipher_algorithm_t cipher)
 {
 	int ret;
+	unsigned key_size = gnutls_cipher_get_key_size(cipher);
+	unsigned iv_size = gnutls_cipher_get_iv_size(cipher);
 	gnutls_cipher_hd_t h;
 	gnutls_datum_t key = { key_data, key_size };
 	gnutls_datum_t iv = { iv_data, iv_size };
@@ -174,10 +174,11 @@ test_cipher_approved(gnutls_cipher_algorithm_t cipher,
 }
 
 static void
-test_cipher_allowed(gnutls_cipher_algorithm_t cipher,
-		    unsigned key_size, unsigned iv_size)
+test_cipher_allowed(gnutls_cipher_algorithm_t cipher)
 {
 	int ret;
+	unsigned key_size = gnutls_cipher_get_key_size(cipher);
+	unsigned iv_size = gnutls_cipher_get_iv_size(cipher);
 	gnutls_cipher_hd_t h;
 	gnutls_datum_t key = { key_data, key_size };
 	gnutls_datum_t iv = { iv_data, iv_size };
@@ -195,10 +196,11 @@ test_cipher_allowed(gnutls_cipher_algorithm_t cipher,
 }
 
 static void
-test_cipher_disallowed(gnutls_cipher_algorithm_t cipher,
-		       unsigned key_size, unsigned iv_size)
+test_cipher_disallowed(gnutls_cipher_algorithm_t cipher)
 {
 	int ret;
+	unsigned key_size = gnutls_cipher_get_key_size(cipher);
+	unsigned iv_size = gnutls_cipher_get_iv_size(cipher);
 	gnutls_cipher_hd_t h;
 	gnutls_datum_t key = { key_data, key_size };
 	gnutls_datum_t iv = { iv_data, iv_size };
@@ -210,7 +212,7 @@ test_cipher_disallowed(gnutls_cipher_algorithm_t cipher,
 	if (ret != GNUTLS_E_UNWANTED_ALGORITHM) {
 		if (ret == 0)
 			gnutls_cipher_deinit(h);
-		fail("gnutls_cipher_init should have failed with"
+		fail("gnutls_cipher_init should have failed with "
 		     "GNUTLS_E_UNWANTED_ALGORITHM for %s\n",
 		     gnutls_cipher_get_name(cipher));
 	}
@@ -220,41 +222,41 @@ test_cipher_disallowed(gnutls_cipher_algorithm_t cipher,
 static inline void
 test_ciphers(void)
 {
-	test_cipher_approved(GNUTLS_CIPHER_AES_128_CBC, 16, 16);
-	test_cipher_approved(GNUTLS_CIPHER_AES_192_CBC, 24, 16);
-	test_cipher_approved(GNUTLS_CIPHER_AES_256_CBC, 32, 16);
-	test_aead_cipher_approved(GNUTLS_CIPHER_AES_128_CCM, 16);
-	test_aead_cipher_approved(GNUTLS_CIPHER_AES_256_CCM, 32);
-	test_aead_cipher_approved(GNUTLS_CIPHER_AES_128_CCM_8, 16);
-	test_aead_cipher_approved(GNUTLS_CIPHER_AES_256_CCM_8, 32);
-	test_cipher_approved(GNUTLS_CIPHER_AES_128_CFB8, 16, 16);
-	test_cipher_approved(GNUTLS_CIPHER_AES_192_CFB8, 24, 16);
-	test_cipher_approved(GNUTLS_CIPHER_AES_256_CFB8, 32, 16);
-	test_cipher_allowed(GNUTLS_CIPHER_AES_128_GCM, 16, 12);
-	test_cipher_allowed(GNUTLS_CIPHER_AES_192_GCM, 24, 12);
-	test_cipher_allowed(GNUTLS_CIPHER_AES_256_GCM, 32, 12);
-	test_cipher_disallowed(GNUTLS_CIPHER_ARCFOUR_128, 16, 0);
-	test_cipher_disallowed(GNUTLS_CIPHER_ESTREAM_SALSA20_256, 32, 0);
-	test_cipher_disallowed(GNUTLS_CIPHER_SALSA20_256, 32, 8);
-	test_cipher_disallowed(GNUTLS_CIPHER_CHACHA20_32, 32, 16);
-	test_cipher_disallowed(GNUTLS_CIPHER_CHACHA20_64, 32, 16);
-	test_cipher_disallowed(GNUTLS_CIPHER_CAMELLIA_192_CBC, 24, 16);
-	test_cipher_disallowed(GNUTLS_CIPHER_CAMELLIA_128_CBC, 16, 16);
-	test_cipher_disallowed(GNUTLS_CIPHER_CHACHA20_POLY1305, 32, 12);
-	test_cipher_disallowed(GNUTLS_CIPHER_CAMELLIA_128_GCM, 16, 0);
-	test_cipher_disallowed(GNUTLS_CIPHER_CAMELLIA_256_GCM, 32, 12);
-	test_cipher_disallowed(GNUTLS_CIPHER_GOST28147_CPA_CFB, 32, 8);
-	test_cipher_disallowed(GNUTLS_CIPHER_GOST28147_CPB_CFB, 32, 8);
-	test_cipher_disallowed(GNUTLS_CIPHER_GOST28147_CPC_CFB, 32, 8);
-	test_cipher_disallowed(GNUTLS_CIPHER_AES_128_SIV, 32, 16);
-	test_cipher_disallowed(GNUTLS_CIPHER_AES_256_SIV, 64, 16);
-	test_cipher_disallowed(GNUTLS_CIPHER_GOST28147_TC26Z_CNT, 32, 8);
-	test_cipher_disallowed(GNUTLS_CIPHER_MAGMA_CTR_ACPKM, 32, 8);
-	test_cipher_disallowed(GNUTLS_CIPHER_KUZNYECHIK_CTR_ACPKM, 32, 16);
-	test_cipher_disallowed(GNUTLS_CIPHER_3DES_CBC, 24, 8);
-	test_cipher_disallowed(GNUTLS_CIPHER_DES_CBC, 8, 8);
-	test_cipher_disallowed(GNUTLS_CIPHER_ARCFOUR_40, 5, 0);
-	test_cipher_disallowed(GNUTLS_CIPHER_RC2_40_CBC, 5, 8);
+	test_cipher_approved(GNUTLS_CIPHER_AES_128_CBC);
+	test_cipher_approved(GNUTLS_CIPHER_AES_192_CBC);
+	test_cipher_approved(GNUTLS_CIPHER_AES_256_CBC);
+	test_aead_cipher_approved(GNUTLS_CIPHER_AES_128_CCM);
+	test_aead_cipher_approved(GNUTLS_CIPHER_AES_256_CCM);
+	test_aead_cipher_approved(GNUTLS_CIPHER_AES_128_CCM_8);
+	test_aead_cipher_approved(GNUTLS_CIPHER_AES_256_CCM_8);
+	test_cipher_approved(GNUTLS_CIPHER_AES_128_CFB8);
+	test_cipher_approved(GNUTLS_CIPHER_AES_192_CFB8);
+	test_cipher_approved(GNUTLS_CIPHER_AES_256_CFB8);
+	test_cipher_allowed(GNUTLS_CIPHER_AES_128_GCM);
+	test_cipher_allowed(GNUTLS_CIPHER_AES_192_GCM);
+	test_cipher_allowed(GNUTLS_CIPHER_AES_256_GCM);
+	test_cipher_disallowed(GNUTLS_CIPHER_ARCFOUR_128);
+	test_cipher_disallowed(GNUTLS_CIPHER_ESTREAM_SALSA20_256);
+	test_cipher_disallowed(GNUTLS_CIPHER_SALSA20_256);
+	test_cipher_disallowed(GNUTLS_CIPHER_CHACHA20_32);
+	test_cipher_disallowed(GNUTLS_CIPHER_CHACHA20_64);
+	test_cipher_disallowed(GNUTLS_CIPHER_CAMELLIA_192_CBC);
+	test_cipher_disallowed(GNUTLS_CIPHER_CAMELLIA_128_CBC);
+	test_cipher_disallowed(GNUTLS_CIPHER_CHACHA20_POLY1305);
+	test_cipher_disallowed(GNUTLS_CIPHER_CAMELLIA_128_GCM);
+	test_cipher_disallowed(GNUTLS_CIPHER_CAMELLIA_256_GCM);
+	test_cipher_disallowed(GNUTLS_CIPHER_GOST28147_CPA_CFB);
+	test_cipher_disallowed(GNUTLS_CIPHER_GOST28147_CPB_CFB);
+	test_cipher_disallowed(GNUTLS_CIPHER_GOST28147_CPC_CFB);
+	test_cipher_disallowed(GNUTLS_CIPHER_AES_128_SIV);
+	test_cipher_disallowed(GNUTLS_CIPHER_AES_256_SIV);
+	test_cipher_disallowed(GNUTLS_CIPHER_GOST28147_TC26Z_CNT);
+	test_cipher_disallowed(GNUTLS_CIPHER_MAGMA_CTR_ACPKM);
+	test_cipher_disallowed(GNUTLS_CIPHER_KUZNYECHIK_CTR_ACPKM);
+	test_cipher_disallowed(GNUTLS_CIPHER_3DES_CBC);
+	test_cipher_disallowed(GNUTLS_CIPHER_DES_CBC);
+	test_cipher_disallowed(GNUTLS_CIPHER_ARCFOUR_40);
+	test_cipher_disallowed(GNUTLS_CIPHER_RC2_40_CBC);
 }
 
 void doit(void)
