@@ -1117,7 +1117,7 @@ int gnutls_x509_privkey_import_ecc_raw(gnutls_x509_privkey_t key,
 
 	key->params.curve = curve;
 
-	if (curve_is_eddsa(curve)) {
+	if (curve_is_eddsa(curve) || curve_is_modern_ecdh(curve)) {
 		unsigned size;
 		switch (curve) {
 		case GNUTLS_ECC_CURVE_ED25519:
@@ -1126,21 +1126,31 @@ int gnutls_x509_privkey_import_ecc_raw(gnutls_x509_privkey_t key,
 		case GNUTLS_ECC_CURVE_ED448:
 			key->params.algo = GNUTLS_PK_EDDSA_ED448;
 			break;
+		case GNUTLS_ECC_CURVE_X25519:
+			key->params.algo = GNUTLS_PK_ECDH_X25519;
+			break;
+		case GNUTLS_ECC_CURVE_X448:
+			key->params.algo = GNUTLS_PK_ECDH_X448;
+			break;
 		default:
 			ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 			goto cleanup;
 		}
 
-		size = gnutls_ecc_curve_get_size(curve);
-		if (x->size != size || k->size != size) {
-			ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-			goto cleanup;
-		}
+		if (curve_is_eddsa(curve)) {
+			size = gnutls_ecc_curve_get_size(curve);
+			if (x->size != size || k->size != size) {
+				ret = gnutls_assert_val(
+					GNUTLS_E_INVALID_REQUEST);
+				goto cleanup;
+			}
 
-		ret = _gnutls_set_datum(&key->params.raw_pub, x->data, x->size);
-		if (ret < 0) {
-			gnutls_assert();
-			goto cleanup;
+			ret = _gnutls_set_datum(&key->params.raw_pub, x->data,
+						x->size);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
 		}
 
 		ret = _gnutls_set_datum(&key->params.raw_priv, k->data,
