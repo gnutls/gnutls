@@ -57,7 +57,6 @@ gnutls_transport_is_ktls_enabled(gnutls_session_t session){
 void _gnutls_ktls_enable(gnutls_session_t session)
 {
 	int sockin, sockout;
-	session->internals.ktls_enabled = 0;
 	gnutls_transport_get_int2(session, &sockin, &sockout);
 
 	if (setsockopt(sockin, SOL_TCP, TCP_ULP, "tls", sizeof ("tls")) == 0)

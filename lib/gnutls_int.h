@@ -1643,4 +1643,6 @@ get_certificate_type(gnutls_session_t session,
 
 extern unsigned int _gnutls_global_version;
 
+bool _gnutls_config_is_ktls_disabled(void);
+
 #endif /* GNUTLS_LIB_GNUTLS_INT_H */
