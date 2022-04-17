@@ -43,7 +43,7 @@ endif
 EXTRA_DIST += $(TOOLS_MANS) $(SRP_MANS) $(DANE_MANS)
 MAINTAINERCLEANFILES += $(TOOLS_MANS) $(SRP_MANS) $(DANE_MANS)
 
-$(man_MANS): $(top_srcdir)/python/cli-docgen.py
+$(man_MANS): $(top_srcdir)/cligen/cli-docgen.py
 
 CLIGEN_ARGS = \
 	--license=gpl3+ \
@@ -56,8 +56,8 @@ CLIGEN_ARGS = \
 
 certtool.1: $(top_srcdir)/doc/certtool-see-also.texi $(top_srcdir)/doc/certtool-examples.texi $(top_srcdir)/doc/certtool-files.texi
 certtool.1: $(top_srcdir)/src/certtool-options.json
-	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(top_srcdir)/python/cli-docgen.py \
+	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/cligen' \
+		$(PYTHON) $(top_srcdir)/cligen/cli-docgen.py \
 		--format man $(CLIGEN_ARGS) \
 		--include see-also=$(top_srcdir)/doc/certtool-see-also.texi \
 		--include examples=$(top_srcdir)/doc/certtool-examples.texi \
@@ -66,8 +66,8 @@ certtool.1: $(top_srcdir)/src/certtool-options.json
 
 ocsptool.1: $(top_srcdir)/doc/ocsptool-see-also.texi $(top_srcdir)/doc/ocsptool-examples.texi $(top_srcdir)/doc/ocsptool-description.texi
 ocsptool.1: $(top_srcdir)/src/ocsptool-options.json
-	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(top_srcdir)/python/cli-docgen.py \
+	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/cligen' \
+		$(PYTHON) $(top_srcdir)/cligen/cli-docgen.py \
 		--format man $(CLIGEN_ARGS) \
 		--include see-also=$(top_srcdir)/doc/ocsptool-see-also.texi \
 		--include examples=$(top_srcdir)/doc/ocsptool-examples.texi \
@@ -76,8 +76,8 @@ ocsptool.1: $(top_srcdir)/src/ocsptool-options.json
 
 danetool.1: $(top_srcdir)/doc/danetool-see-also.texi $(top_srcdir)/doc/danetool-examples.texi
 danetool.1: $(top_srcdir)/src/danetool-options.json
-	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(top_srcdir)/python/cli-docgen.py \
+	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/cligen' \
+		$(PYTHON) $(top_srcdir)/cligen/cli-docgen.py \
 		--format man $(CLIGEN_ARGS) \
 		--include see-also=$(top_srcdir)/doc/danetool-see-also.texi \
 		--include examples=$(top_srcdir)/doc/danetool-examples.texi \
@@ -85,8 +85,8 @@ danetool.1: $(top_srcdir)/src/danetool-options.json
 
 gnutls-cli.1: $(top_srcdir)/doc/gnutls-cli-see-also.texi $(top_srcdir)/doc/gnutls-cli-examples.texi
 gnutls-cli.1: $(top_srcdir)/src/gnutls-cli-options.json
-	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(top_srcdir)/python/cli-docgen.py \
+	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/cligen' \
+		$(PYTHON) $(top_srcdir)/cligen/cli-docgen.py \
 		--format man $(CLIGEN_ARGS) \
 		--include see-also=$(top_srcdir)/doc/gnutls-cli-see-also.texi \
 		--include examples=$(top_srcdir)/doc/gnutls-cli-examples.texi \
@@ -94,8 +94,8 @@ gnutls-cli.1: $(top_srcdir)/src/gnutls-cli-options.json
 
 gnutls-serv.1: $(top_srcdir)/doc/gnutls-serv-see-also.texi $(top_srcdir)/doc/gnutls-serv-examples.texi
 gnutls-serv.1: $(top_srcdir)/src/gnutls-serv-options.json
-	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(top_srcdir)/python/cli-docgen.py \
+	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/cligen' \
+		$(PYTHON) $(top_srcdir)/cligen/cli-docgen.py \
 		--format man $(CLIGEN_ARGS) \
 		--include see-also=$(top_srcdir)/doc/gnutls-serv-see-also.texi \
 		--include examples=$(top_srcdir)/doc/gnutls-serv-examples.texi \
@@ -103,8 +103,8 @@ gnutls-serv.1: $(top_srcdir)/src/gnutls-serv-options.json
 
 gnutls-cli-debug.1: $(top_srcdir)/doc/gnutls-cli-debug-see-also.texi $(top_srcdir)/doc/gnutls-cli-debug-examples.texi
 gnutls-cli-debug.1: $(top_srcdir)/src/gnutls-cli-debug-options.json
-	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(top_srcdir)/python/cli-docgen.py \
+	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/cligen' \
+		$(PYTHON) $(top_srcdir)/cligen/cli-docgen.py \
 		--format man $(CLIGEN_ARGS) \
 		--include see-also=$(top_srcdir)/doc/gnutls-cli-debug-see-also.texi \
 		--include examples=$(top_srcdir)/doc/gnutls-cli-debug-examples.texi \
@@ -112,8 +112,8 @@ gnutls-cli-debug.1: $(top_srcdir)/src/gnutls-cli-debug-options.json
 
 srptool.1: $(top_srcdir)/doc/srptool-see-also.texi $(top_srcdir)/doc/srptool-examples.texi
 srptool.1: $(top_srcdir)/src/srptool-options.json
-	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(top_srcdir)/python/cli-docgen.py \
+	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/cligen' \
+		$(PYTHON) $(top_srcdir)/cligen/cli-docgen.py \
 		--format man $(CLIGEN_ARGS) \
 		--include see-also=$(top_srcdir)/doc/srptool-see-also.texi \
 		--include examples=$(top_srcdir)/doc/srptool-examples.texi \
@@ -121,8 +121,8 @@ srptool.1: $(top_srcdir)/src/srptool-options.json
 
 p11tool.1: $(top_srcdir)/doc/p11tool-see-also.texi $(top_srcdir)/doc/p11tool-examples.texi
 p11tool.1: $(top_srcdir)/src/p11tool-options.json
-	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(top_srcdir)/python/cli-docgen.py \
+	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/cligen' \
+		$(PYTHON) $(top_srcdir)/cligen/cli-docgen.py \
 		--format man $(CLIGEN_ARGS) \
 		--include see-also=$(top_srcdir)/doc/p11tool-see-also.texi \
 		--include examples=$(top_srcdir)/doc/p11tool-examples.texi \
@@ -130,8 +130,8 @@ p11tool.1: $(top_srcdir)/src/p11tool-options.json
 
 tpmtool.1: $(top_srcdir)/doc/tpmtool-see-also.texi $(top_srcdir)/doc/tpmtool-examples.texi
 tpmtool.1: $(top_srcdir)/src/tpmtool-options.json
-	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(top_srcdir)/python/cli-docgen.py \
+	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/cligen' \
+		$(PYTHON) $(top_srcdir)/cligen/cli-docgen.py \
 		--format man $(CLIGEN_ARGS) \
 		--include see-also=$(top_srcdir)/doc/tpmtool-see-also.texi \
 		--include examples=$(top_srcdir)/doc/tpmtool-examples.texi \
@@ -139,8 +139,8 @@ tpmtool.1: $(top_srcdir)/src/tpmtool-options.json
 
 psktool.1: $(top_srcdir)/doc/psktool-see-also.texi $(top_srcdir)/doc/psktool-examples.texi
 psktool.1: $(top_srcdir)/src/psktool-options.json
-	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(top_srcdir)/python/cli-docgen.py \
+	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/cligen' \
+		$(PYTHON) $(top_srcdir)/cligen/cli-docgen.py \
 		--format man $(CLIGEN_ARGS) \
 		--include see-also=$(top_srcdir)/doc/psktool-see-also.texi \
 		--include examples=$(top_srcdir)/doc/psktool-examples.texi \

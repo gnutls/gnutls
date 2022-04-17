@@ -1366,7 +1366,6 @@ AC_CONFIG_FILES([
   tests/slow/Makefile
   tests/suite/Makefile
   fuzz/Makefile
-  python/Makefile
 ])
 
 AC_OUTPUT

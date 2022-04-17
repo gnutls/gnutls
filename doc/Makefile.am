@@ -52,8 +52,8 @@ INVOKE_GNUTLS_CLI_TEXI_DEPS = gnutls-cli-see-also.texi gnutls-cli-examples.texi
 EXTRA_DIST += $(INVOKE_GNUTLS_CLI_TEXI_DEPS)
 invoke-gnutls-cli.texi: $(INVOKE_GNUTLS_CLI_TEXI_DEPS)
 invoke-gnutls-cli.texi: $(top_srcdir)/src/gnutls-cli-options.json
-	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(top_srcdir)/python/cli-docgen.py \
+	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/cligen' \
+		$(PYTHON) $(top_srcdir)/cligen/cli-docgen.py \
 		--format texi $(CLIGEN_ARGS) \
 		--include see-also=$(srcdir)/gnutls-cli-see-also.texi \
 		--include examples=$(srcdir)/gnutls-cli-examples.texi \
@@ -63,8 +63,8 @@ INVOKE_GNUTLS_CLI_DEBUG_TEXI_DEPS = gnutls-cli-debug-see-also.texi gnutls-cli-de
 EXTRA_DIST += $(INVOKE_GNUTLS_CLI_DEBUG_TEXI_DEPS)
 invoke-gnutls-cli-debug.texi: $(INVOKE_GNUTLS_CLI_DEBUG_TEXI_DEPS)
 invoke-gnutls-cli-debug.texi: $(top_srcdir)/src/gnutls-cli-debug-options.json
-	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(top_srcdir)/python/cli-docgen.py \
+	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/cligen' \
+		$(PYTHON) $(top_srcdir)/cligen/cli-docgen.py \
 		--format texi $(CLIGEN_ARGS) \
 		--include see-also=$(srcdir)/gnutls-cli-debug-see-also.texi \
 		--include examples=$(srcdir)/gnutls-cli-debug-examples.texi \
@@ -74,8 +74,8 @@ INVOKE_GNUTLS_SERV_TEXI_DEPS = gnutls-serv-see-also.texi gnutls-serv-examples.te
 EXTRA_DIST += $(INVOKE_GNUTLS_SERV_TEXI_DEPS)
 invoke-gnutls-serv.texi: $(INVOKE_GNUTLS_SERV_TEXI_DEPS)
 invoke-gnutls-serv.texi: $(top_srcdir)/src/gnutls-serv-options.json
-	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(top_srcdir)/python/cli-docgen.py \
+	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/cligen' \
+		$(PYTHON) $(top_srcdir)/cligen/cli-docgen.py \
 		--format texi $(CLIGEN_ARGS) \
 		--include see-also=$(srcdir)/gnutls-serv-see-also.texi \
 		--include examples=$(srcdir)/gnutls-serv-examples.texi \
@@ -85,8 +85,8 @@ INVOKE_CERTTOOL_TEXI_DEPS = certtool-see-also.texi certtool-examples.texi certto
 EXTRA_DIST += $(INVOKE_CERTTOOL_TEXI_DEPS)
 invoke-certtool.texi: $(INVOKE_CERTTOOL_TEXI_DEPS)
 invoke-certtool.texi: $(top_srcdir)/src/certtool-options.json
-	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(top_srcdir)/python/cli-docgen.py \
+	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/cligen' \
+		$(PYTHON) $(top_srcdir)/cligen/cli-docgen.py \
 		--format texi $(CLIGEN_ARGS) \
 		--include see-also=$(srcdir)/certtool-see-also.texi \
 		--include examples=$(srcdir)/certtool-examples.texi \
@@ -99,8 +99,8 @@ INVOKE_OCSPTOOL_TEXI_DEPS = ocsptool-see-also.texi ocsptool-examples.texi ocspto
 EXTRA_DIST += $(INVOKE_OCSPTOOL_TEXI_DEPS)
 invoke-ocsptool.texi: $(INVOKE_OCSPTOOL_TEXI_DEPS)
 invoke-ocsptool.texi: $(top_srcdir)/src/ocsptool-options.json
-	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(top_srcdir)/python/cli-docgen.py \
+	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/cligen' \
+		$(PYTHON) $(top_srcdir)/cligen/cli-docgen.py \
 		--format texi $(CLIGEN_ARGS) \
 		--include see-also=$(srcdir)/ocsptool-see-also.texi \
 		--include examples=$(srcdir)/ocsptool-examples.texi \
@@ -113,8 +113,8 @@ INVOKE_DANETOOL_TEXI_DEPS = danetool-see-also.texi danetool-examples.texi
 EXTRA_DIST += $(INVOKE_DANETOOL_TEXI_DEPS)
 invoke-danetool.texi: $(INVOKE_DANETOOL_TEXI_DEPS)
 invoke-danetool.texi: $(top_srcdir)/src/danetool-options.json
-	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(top_srcdir)/python/cli-docgen.py \
+	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/cligen' \
+		$(PYTHON) $(top_srcdir)/cligen/cli-docgen.py \
 		--format texi $(CLIGEN_ARGS) \
 		--include see-also=$(srcdir)/danetool-see-also.texi \
 		--include examples=$(srcdir)/danetool-examples.texi \
@@ -126,8 +126,8 @@ INVOKE_SRPTOOL_TEXI_DEPS = srptool-see-also.texi srptool-examples.texi
 EXTRA_DIST += $(INVOKE_SRPTOOL_TEXI_DEPS)
 invoke-srptool.texi: $(INVOKE_SRPTOOL_TEXI_DEPS)
 invoke-srptool.texi: $(top_srcdir)/src/srptool-options.json
-	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(top_srcdir)/python/cli-docgen.py \
+	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/cligen' \
+		$(PYTHON) $(top_srcdir)/cligen/cli-docgen.py \
 		--format texi $(CLIGEN_ARGS) \
 		--include see-also=$(srcdir)/srptool-see-also.texi \
 		--include examples=$(srcdir)/srptool-examples.texi \
@@ -139,8 +139,8 @@ INVOKE_PSKTOOL_TEXI_DEPS = psktool-see-also.texi psktool-examples.texi
 EXTRA_DIST += $(INVOKE_PSKTOOL_TEXI_DEPS)
 invoke-psktool.texi: $(INVOKE_PSKTOOL_TEXI_DEPS)
 invoke-psktool.texi: $(top_srcdir)/src/psktool-options.json
-	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(top_srcdir)/python/cli-docgen.py \
+	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/cligen' \
+		$(PYTHON) $(top_srcdir)/cligen/cli-docgen.py \
 		--format texi $(CLIGEN_ARGS) \
 		--include see-also=$(srcdir)/psktool-see-also.texi \
 		--include examples=$(srcdir)/psktool-examples.texi \
@@ -152,8 +152,8 @@ INVOKE_P11TOOL_TEXI_DEPS = p11tool-see-also.texi p11tool-examples.texi
 EXTRA_DIST += $(INVOKE_P11TOOL_TEXI_DEPS)
 invoke-p11tool.texi: $(INVOKE_P11TOOL_TEXI_DEPS)
 invoke-p11tool.texi: $(top_srcdir)/src/p11tool-options.json
-	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(top_srcdir)/python/cli-docgen.py \
+	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/cligen' \
+		$(PYTHON) $(top_srcdir)/cligen/cli-docgen.py \
 		--format texi $(CLIGEN_ARGS) \
 		--include see-also=$(srcdir)/p11tool-see-also.texi \
 		--include examples=$(srcdir)/p11tool-examples.texi \
@@ -165,8 +165,8 @@ INVOKE_TPMTOOL_TEXI_DEPS = tpmtool-see-also.texi tpmtool-examples.texi
 EXTRA_DIST += $(INVOKE_TPMTOOL_TEXI_DEPS)
 invoke-tpmtool.texi: $(INVOKE_TPMTOOL_TEXI_DEPS)
 invoke-tpmtool.texi: $(top_srcdir)/src/tpmtool-options.json
-	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
-		$(PYTHON) $(top_srcdir)/python/cli-docgen.py \
+	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/cligen' \
+		$(PYTHON) $(top_srcdir)/cligen/cli-docgen.py \
 		--format texi $(CLIGEN_ARGS) \
 		--include see-also=$(srcdir)/tpmtool-see-also.texi \
 		--include examples=$(srcdir)/tpmtool-examples.texi \
@@ -190,7 +190,7 @@ AUTOGENED_DOC = invoke-gnutls-cli.texi invoke-gnutls-cli-debug.texi \
 	invoke-ocsptool.texi invoke-psktool.texi invoke-p11tool.texi \
 	invoke-tpmtool.texi invoke-danetool.texi
 
-$(AUTOGENED_DOC): $(top_srcdir)/python/cli-docgen.py
+$(AUTOGENED_DOC): $(top_srcdir)/cligen/cli-docgen.py
 
 gnutls_TEXINFOS += stamp_functions
 

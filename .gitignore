@@ -259,6 +259,7 @@ lib/x509/Makefile
 lib/x509/Makefile.in
 lib/x509/supported_exts.h
 lib/x509/x509-api.texi
+lib/*_asn1_tab.c
 *.lo
 *.log
 m4/*
@@ -271,9 +272,6 @@ Makefile.user
 *.o
 *.out
 *.plist
-python/__pycache__/
-python/cligen
-python/cli-*gen.py
 src/benchmark
 src/benchmark-cipher
 src/benchmark-tls

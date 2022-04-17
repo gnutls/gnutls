@@ -28,7 +28,7 @@ DISTCHECK_CONFIGURE_FLAGS = \
 	--with-guile-extension-dir='$$(libdir)/guile/$$(GUILE_EFFECTIVE_VERSION)/extensions' \
 	AUTOGEN=false
 
-SUBDIRS = gl lib extra python
+SUBDIRS = gl lib extra
 
 if ENABLE_DANE
 SUBDIRS += libdane
@@ -202,3 +202,6 @@ dist-hook:
 	touch -c $(distdir)/doc/*.html $(distdir)/doc/*.pdf $(distdir)/doc/*.info
 
 .PHONY: abi-check abi-dump-versioned abi-dump-latest pic-check symbol-check local-code-coverage-output files-update AUTHORS
+
+include $(top_srcdir)/cligen/cligen.mk
+noinst_PYTHON = $(cligen_sources)
