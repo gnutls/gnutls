@@ -1793,10 +1793,14 @@ _gnutls_parse_general_name2(asn1_node src, const char *src_name,
 		} else {
 			char oid[MAX_OID_SIZE];
 
-			if (src_name[0] != 0)
+			if (src_name[0] != 0 && seq != -1)
 				snprintf(nptr, sizeof(nptr),
 					 "%s.?%d.otherName.type-id",
 					 src_name, seq);
+			else if (src_name[0] != 0)
+				snprintf(nptr, sizeof(nptr),
+					 "%s.otherName.type-id",
+					 src_name);
 			else
 				snprintf(nptr, sizeof(nptr),
 					 "?%d.otherName.type-id", seq);
