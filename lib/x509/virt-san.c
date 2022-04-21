@@ -40,6 +40,9 @@ int san_othername_to_virtual(const char *oid, size_t size)
 		else if ((unsigned) size == (sizeof(KRB5_PRINCIPAL_OID)-1)
 		    && memcmp(oid, KRB5_PRINCIPAL_OID, sizeof(KRB5_PRINCIPAL_OID)-1) == 0)
 			return GNUTLS_SAN_OTHERNAME_KRB5PRINCIPAL;
+		else if ((unsigned) size == (sizeof(MSUSER_PRINCIPAL_NAME_OID)-1)
+		    && memcmp(oid, MSUSER_PRINCIPAL_NAME_OID, sizeof(MSUSER_PRINCIPAL_NAME_OID)-1) == 0)
+			return GNUTLS_SAN_OTHERNAME_MSUSERPRINCIPAL;
 	}
 
 	return GNUTLS_SAN_OTHERNAME;
@@ -53,6 +56,8 @@ const char * virtual_to_othername_oid(unsigned type)
 			return XMPP_OID;
 		case GNUTLS_SAN_OTHERNAME_KRB5PRINCIPAL:
 			return KRB5_PRINCIPAL_OID;
+		case GNUTLS_SAN_OTHERNAME_MSUSERPRINCIPAL:
+			return MSUSER_PRINCIPAL_NAME_OID;
 		default:
 			return NULL;
 	}
@@ -166,6 +171,15 @@ int gnutls_x509_othername_to_virtual(const char *oid,
 			return 0;
 		case GNUTLS_SAN_OTHERNAME_KRB5PRINCIPAL:
 			ret = _gnutls_krb5_der_to_principal(othername, virt);
+			if (ret < 0) {
+				gnutls_assert();
+				return ret;
+			}
+			return 0;
+		case GNUTLS_SAN_OTHERNAME_MSUSERPRINCIPAL:
+			ret = _gnutls_x509_decode_string
+				    (ASN1_ETYPE_UTF8_STRING, othername->data,
+				     othername->size, virt, 0);
 			if (ret < 0) {
 				gnutls_assert();
 				return ret;

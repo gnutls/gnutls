@@ -108,6 +108,7 @@ print_name(gnutls_buffer_st *str, const char *prefix, unsigned type, gnutls_datu
 
 	if ((type == GNUTLS_SAN_DNSNAME || type == GNUTLS_SAN_OTHERNAME_XMPP
 	     || type == GNUTLS_SAN_OTHERNAME_KRB5PRINCIPAL
+	     || type == GNUTLS_SAN_OTHERNAME_MSUSERPRINCIPAL
 	     || type == GNUTLS_SAN_RFC822NAME
 	     || type == GNUTLS_SAN_URI) && sname != NULL && strlen(sname) != name->size) {
 		adds(str,
@@ -154,6 +155,10 @@ print_name(gnutls_buffer_st *str, const char *prefix, unsigned type, gnutls_datu
 
 	case GNUTLS_SAN_OTHERNAME_KRB5PRINCIPAL:
 		addf(str,  _("%sKRB5Principal: %.*s\n"), prefix, name->size, NON_NULL(name->data));
+		break;
+
+	case GNUTLS_SAN_OTHERNAME_MSUSERPRINCIPAL:
+		addf(str, _("%sUser Principal Name: %.*s\n"), prefix, name->size, NON_NULL(name->data));
 		break;
 
 	default:
@@ -761,6 +766,8 @@ print_key_purpose(gnutls_buffer_st * str, const char *prefix, gnutls_datum_t *de
 			addf(str, _("%s\t\t\tOCSP signing.\n"), prefix);
 		else if (strcmp(p, GNUTLS_KP_IPSEC_IKE) == 0)
 			addf(str, _("%s\t\t\tIpsec IKE.\n"), prefix);
+		else if (strcmp(p, GNUTLS_KP_MS_SMART_CARD_LOGON) == 0)
+			addf(str, _("%s\t\t\tSmart Card Logon.\n"), prefix);
 		else if (strcmp(p, GNUTLS_KP_ANY) == 0)
 			addf(str, _("%s\t\t\tAny purpose.\n"), prefix);
 		else
