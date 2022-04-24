@@ -403,6 +403,8 @@ int _mbuffer_linearize_align16(mbuffer_head_st * buf, unsigned align_pos)
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
+	bufel->type = _mbuffer_head_get_first(buf, NULL)->type;
+
 	for (cur = _mbuffer_head_get_first(buf, &msg);
 	     msg.data != NULL; cur = _mbuffer_head_get_next(cur, &msg)) {
 		memcpy(&bufel->msg.data[pos], msg.data, msg.size);
@@ -432,6 +434,8 @@ int _mbuffer_linearize(mbuffer_head_st * buf)
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
+
+	bufel->type = _mbuffer_head_get_first(buf, NULL)->type;
 
 	for (cur = _mbuffer_head_get_first(buf, &msg);
 	     msg.data != NULL; cur = _mbuffer_head_get_next(cur, &msg)) {
