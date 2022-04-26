@@ -1,0 +1,33 @@
+# See the documentation for more information:
+# https://packit.dev/docs/configuration/
+
+specfile_path: gnutls.spec
+
+files_to_sync:
+  - .packit.yaml
+  - gnutls.spec
+
+upstream_project_url: https://gitlab.com/gnutls/gnutls
+upstream_package_name: gnutls
+downstream_package_name: gnutls
+
+actions:
+  post-upstream-clone:
+    - "wget https://src.fedoraproject.org/rpms/gnutls/raw/main/f/gnutls.spec"
+    - "wget https://src.fedoraproject.org/rpms/gnutls/raw/main/f/gnutls-3.2.7-rpath.patch"
+    - "wget https://src.fedoraproject.org/rpms/gnutls/raw/main/f/gnutls-3.6.7-no-now-guile.patch"
+  get-current-version:
+    - "git describe --abbrev=0"
+  create-archive:
+    - |
+      bash -c "wget https://www.gnupg.org/ftp/gcrypt/gnutls/v$(expr $PACKIT_PROJECT_VERSION : '^\([0-9]*\.[0-9]*\)')/gnutls-${PACKIT_PROJECT_VERSION}.tar.xz"
+    - |
+      bash -c "wget https://www.gnupg.org/ftp/gcrypt/gnutls/v$(expr $PACKIT_PROJECT_VERSION : '^\([0-9]*\.[0-9]*\)')/gnutls-${PACKIT_PROJECT_VERSION}.tar.xz.sig"
+    - bash -c "echo gnutls-${PACKIT_PROJECT_VERSION}.tar.xz"
+    - bash -c "echo gnutls-${PACKIT_PROJECT_VERSION}.tar.xz.sig"
+
+jobs:
+  - job: propose_downstream
+    trigger: release
+    metadata:
+      dist_git_branches: fedora-all
