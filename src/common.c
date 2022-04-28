@@ -603,7 +603,7 @@ int print_info(gnutls_session_t session, int verbose, int flags)
 		gnutls_datum_t cb;
 
 		rc = gnutls_session_channel_binding(session,
-						    GNUTLS_CB_TLS_UNIQUE,
+						    GNUTLS_CB_TLS_EXPORTER,
 						    &cb);
 		if (rc)
 			fprintf(stderr, "Channel binding error: %s\n",
@@ -611,7 +611,7 @@ int print_info(gnutls_session_t session, int verbose, int flags)
 		else {
 			size_t i;
 
-			log_msg(stdout, "- Channel binding 'tls-unique': ");
+			log_msg(stdout, "- Channel binding 'tls-exporter': ");
 			for (i = 0; i < cb.size; i++)
 				log_msg(stdout, "%02x", cb.data[i]);
 			log_msg(stdout, "\n");
