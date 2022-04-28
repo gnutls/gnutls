@@ -7,6 +7,10 @@ See the end for copying conditions.
 
 * Version ?.?.? (released ????-??-??)
 
+** gnutls-cli, gnutls-serv: Channel binding for printing information
+   has been changed from tls-unique to tls-exporter as tls-unique is
+   not supported in TLS 1.3.
+
 ** libgnutls: Removed 3DES from FIPS approved algorithms (#1353).
    According to the section 2 of SP800-131A Rev.2, 3DES algorithm
    will be disallowed for encryption after December 31, 2023:
