@@ -34,7 +34,7 @@ AM_CPPFLAGS += -I$(srcdir)/../../minitasn1
 endif
 
 #ensure that we have all aarch64 instruction sets enabled for the assembler
-AM_CCASFLAGS = -Wa,-march=all
+AM_CCASFLAGS = $(AARCH64_CCASFLAGS)
 
 EXTRA_DIST = README
 

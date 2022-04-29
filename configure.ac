@@ -203,6 +203,20 @@ case $host_cpu in
   ;;
 esac
 
+# Check if the assembler supports -march=all
+if test "$hw_accel" = aarch64; then
+  AARCH64_CCASFLAGS="-Wa,-march=all"
+  AC_MSG_CHECKING([whether the compiler supports -Wa,-march=all])
+  : > conftest.s
+  if "$CCAS" "$AARCH64_CCASFLAGS" -c conftest.s >/dev/null 2>&1; then
+    AC_MSG_RESULT(yes)
+  else
+    AC_MSG_RESULT(no)
+    AARCH64_CCASFLAGS=
+  fi
+  AC_SUBST(AARCH64_CCASFLAGS)
+fi
+
 # check for gcc's __get_cpuid_count functionality
 AC_MSG_CHECKING([for __get_cpuid_count])
 AC_LINK_IFELSE(
