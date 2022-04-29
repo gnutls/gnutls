@@ -156,6 +156,20 @@ static int append_elements(asn1_node asn1_struct, const char *asn1_rdn_name, gnu
 		STR_APPEND(ldap_desc);
 		STR_APPEND("=");
 
+		/* DirectoryString by definition in RFC 5280 cannot be empty.
+		 * If asn_node.value_len = 0 the parser correctly rejects such DirectoryString.
+		 * However, if asn_node.value contains ASN.1 TLV triplet with length = 0,
+		 * such DirectoryString is not rejected by the parser as the node itself is not empty.
+		 * Explicitly reject DirectoryString in such case.
+		 */
+		const char *asn_desc = _gnutls_oid_get_asn_desc(oid);
+		if (asn_desc && !strcmp(asn_desc, "PKIX1.DirectoryString") && tvd.data[1] == 0) {
+			gnutls_assert();
+			result = GNUTLS_E_ASN1_VALUE_NOT_VALID;
+			_gnutls_debug_log("Empty DirectoryString\n");
+			goto cleanup;
+		}
+
 		result =
 		    _gnutls_x509_dn_to_string(oid, tvd.data,
 					      tvd.size, &td);

@@ -130,6 +130,8 @@ struct oid_to_string {
 
 const struct oid_to_string *_gnutls_oid_get_entry(const struct oid_to_string *ots, const char *oid);
 
+const char *_gnutls_oid_get_asn_desc(const char *oid);
+
 int _gnutls_x509_set_time(asn1_node c2, const char *where, time_t tim,
 			  int force_general);
 int
