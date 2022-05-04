@@ -7,6 +7,14 @@ See the end for copying conditions.
 
 * Version ?.?.? (released ????-??-??)
 
+** libgnutls: The GNUTLS_NO_TICKETS_TLS12 flag and %NO_TICKETS_TLS12 priority
+   modifier have been added to disable session ticket usage in TLS 1.2 because
+   it does not provide forward secrecy (#477).  On the other hand, since session
+   tickets in TLS 1.3 do provide forward secrecy, the PFS priority string now
+   only disables session tickets in TLS 1.2.  Future backward incompatibility:
+   in the next major release of GnuTLS, we plan to remove those flag and
+   modifier, and make GNUTLS_NO_TICKETS and %NO_TICKETS only affect TLS 1.2.
+
 ** gnutls-cli, gnutls-serv: Channel binding for printing information
    has been changed from tls-unique to tls-exporter as tls-unique is
    not supported in TLS 1.3.
@@ -22,6 +30,9 @@ See the end for copying conditions.
 
 ** Detecting the Zstandard (zstd) library in configure has been
    fixed (#1343).
+
+** API and ABI modifications:
+GNUTLS_NO_TICKETS_TLS12: New flag
 
 * Version 3.7.4 (released 2022-03-17)
 

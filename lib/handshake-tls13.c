@@ -489,9 +489,11 @@ int _gnutls13_handshake_server(gnutls_session_t session)
 			_gnutls_set_resumed_parameters(session);
 
 		if (session->internals.hsk_flags & HSK_EARLY_START_USED) {
-			if (!(session->internals.flags & GNUTLS_NO_AUTO_SEND_TICKET))
+			if (!(session->internals.flags & GNUTLS_NO_AUTO_SEND_TICKET) &&
+			    _gnutls13_can_send_session_ticket(session)) {
 				ret = _gnutls13_send_session_ticket(session, TLS13_TICKETS_TO_SEND,
 								    AGAIN(STATE109));
+			}
 
 			STATE = STATE109;
 			IMED_RET("send session ticket", ret, 0);
@@ -546,7 +548,8 @@ int _gnutls13_handshake_server(gnutls_session_t session)
 		FALLTHROUGH;
 	case STATE115:
 		if (!(session->internals.hsk_flags & (HSK_TLS13_TICKET_SENT|HSK_EARLY_START_USED)) &&
-		    !(session->internals.flags & GNUTLS_NO_AUTO_SEND_TICKET)) {
+		    !(session->internals.flags & GNUTLS_NO_AUTO_SEND_TICKET) &&
+		    _gnutls13_can_send_session_ticket(session)) {
 			ret = _gnutls13_send_session_ticket(session, TLS13_TICKETS_TO_SEND,
 							    AGAIN(STATE115));
 			STATE = STATE115;

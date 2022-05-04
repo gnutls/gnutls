@@ -683,8 +683,12 @@ gnutls_priority_set(gnutls_session_t session, gnutls_priority_t priority)
 	session->internals.priorities = priority;
 
 	if (priority->no_tickets != 0) {
-		/* when PFS is explicitly requested, disable session tickets */
 		session->internals.flags |= GNUTLS_NO_TICKETS;
+	}
+
+	if (priority->no_tickets_tls12 != 0) {
+		/* when PFS is explicitly requested, disable session tickets for TLS 1.2 */
+		session->internals.flags |= GNUTLS_NO_TICKETS_TLS12;
 	}
 
 	ADD_PROFILE_VFLAGS(session, priority->additional_verify_flags);
@@ -729,6 +733,7 @@ struct priority_groups_st {
 	unsigned profile;
 	int sec_param;
 	bool no_tickets;
+	bool no_tickets_tls12;
 };
 
 static const struct priority_groups_st pgroups[] =
@@ -750,7 +755,7 @@ static const struct priority_groups_st pgroups[] =
 	 .group_list = &supported_groups_normal,
 	 .profile = GNUTLS_PROFILE_LOW,
 	 .sec_param = GNUTLS_SEC_PARAM_WEAK,
-	 .no_tickets = 1
+	 .no_tickets_tls12 = 1
 	},
 	{.name = LEVEL_SECURE128,
 	 .alias = "SECURE",
@@ -862,6 +867,7 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 			}
 			SET_LEVEL(pgroups[i].sec_param); /* set DH params level */
 			priority_cache->no_tickets = pgroups[i].no_tickets;
+			priority_cache->no_tickets_tls12 = pgroups[i].no_tickets_tls12;
 			if (priority_cache->have_cbc == 0) {
 				for (j=0;(*pgroups[i].cipher_list)[j]!=0;j++) {
 					centry = cipher_to_entry((*pgroups[i].cipher_list)[j]);
@@ -911,6 +917,10 @@ static void enable_force_etm(gnutls_priority_t c)
 static void enable_no_tickets(gnutls_priority_t c)
 {
 	c->no_tickets = 1;
+}
+static void enable_no_tickets_tls12(gnutls_priority_t c)
+{
+	c->no_tickets_tls12 = 1;
 }
 static void disable_wildcards(gnutls_priority_t c)
 {

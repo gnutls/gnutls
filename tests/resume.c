@@ -67,11 +67,17 @@ static int wrap_db_delete(void *dbf, gnutls_datum_t key);
 
 #define TLS_SESSION_CACHE 50
 
+enum session_ticket_enablement {
+	ST_NONE = 0,
+	ST_ALL,
+	ST_TLS13_ONLY
+};
+
 struct params_res {
 	const char *desc;
 	int enable_db;
-	int enable_session_ticket_server;
-	int enable_session_ticket_client;
+	enum session_ticket_enablement enable_session_ticket_server;
+	enum session_ticket_enablement enable_session_ticket_client;
 	int expect_resume;
 	int call_post_client_hello;
 	int client_cert;
@@ -93,38 +99,38 @@ struct params_res resume_tests[] = {
 #ifndef TLS13
 	{.desc = "try to resume from db",
 	 .enable_db = 1,
-	 .enable_session_ticket_server = 0,
-	 .enable_session_ticket_client = 0,
+	 .enable_session_ticket_server = ST_NONE,
+	 .enable_session_ticket_client = ST_NONE,
 	 .expect_resume = 1},
 	{.desc = "try to resume from db with post_client_hello",
 	 .enable_db = 1,
-	 .enable_session_ticket_server = 0,
-	 .enable_session_ticket_client = 0,
+	 .enable_session_ticket_server = ST_NONE,
+	 .enable_session_ticket_client = ST_NONE,
 	 .call_post_client_hello = 1,
 	 .expect_resume = 1},
 	{.desc = "try to resume from db using resumed session's data",
 	 .enable_db = 1,
-	 .enable_session_ticket_server = 0,
-	 .enable_session_ticket_client = 0,
+	 .enable_session_ticket_server = ST_NONE,
+	 .enable_session_ticket_client = ST_NONE,
 	 .try_resumed_data = 1,
 	 .expect_resume = 1},
 	{.desc = "try to resume from db and check ALPN",
 	 .enable_db = 1,
-	 .enable_session_ticket_server = 0,
-	 .enable_session_ticket_client = 0,
+	 .enable_session_ticket_server = ST_NONE,
+	 .enable_session_ticket_client = ST_NONE,
 	 .try_alpn = 1,
 	 .expect_resume = 1},
 	{.desc = "try to resume from db (ext master secret -> none)",
 	 .enable_db = 1,
-	 .enable_session_ticket_server = 0,
-	 .enable_session_ticket_client = 0,
+	 .enable_session_ticket_server = ST_NONE,
+	 .enable_session_ticket_client = ST_NONE,
 	 .expect_resume = 0,
 	 .first_no_ext_master = 0,
 	 .second_no_ext_master = 1},
 	{.desc = "try to resume from db (none -> ext master secret)",
 	 .enable_db = 1,
-	 .enable_session_ticket_server = 0,
-	 .enable_session_ticket_client = 0,
+	 .enable_session_ticket_server = ST_NONE,
+	 .enable_session_ticket_client = ST_NONE,
 	 .expect_resume = 0,
 	 .first_no_ext_master = 1,
 	 .second_no_ext_master = 0},
@@ -134,22 +140,22 @@ struct params_res resume_tests[] = {
 	 * handshake with different parameters */
 	{.desc = "try to resume from session ticket (different cipher order)",
 	 .enable_db = 0,
-	 .enable_session_ticket_server = 1,
-	 .enable_session_ticket_client = 1,
+	 .enable_session_ticket_server = ST_ALL,
+	 .enable_session_ticket_client = ST_ALL,
 	 .change_ciphersuite = 1,
 	 .expect_resume = 1},
 	{.desc = "try to resume from session ticket with post_client_hello",
 	 .enable_db = 0,
-	 .enable_session_ticket_server = 1,
-	 .enable_session_ticket_client = 1,
+	 .enable_session_ticket_server = ST_ALL,
+	 .enable_session_ticket_client = ST_ALL,
 	 .call_post_client_hello = 1,
 	 .expect_resume = 1},
 #endif
 #if defined(TLS13) && !defined(USE_PSK)
 	{.desc = "try to resume from session ticket (early start)",
 	 .enable_db = 0,
-	 .enable_session_ticket_server = 1,
-	 .enable_session_ticket_client = 1,
+	 .enable_session_ticket_server = ST_ALL,
+	 .enable_session_ticket_client = ST_ALL,
 	 .early_start = 1,
 	 .expect_resume = 1},
 #endif
@@ -157,63 +163,76 @@ struct params_res resume_tests[] = {
 	/* early start should no happen on PSK. */
 	{.desc = "try to resume from session ticket (early start)",
 	 .enable_db = 0,
-	 .enable_session_ticket_server = 1,
-	 .enable_session_ticket_client = 1,
+	 .enable_session_ticket_server = ST_ALL,
+	 .enable_session_ticket_client = ST_ALL,
 	 .no_early_start = 1,
 	 .expect_resume = 1},
 #endif
 	{.desc = "try to resume from session ticket",
 	 .enable_db = 0,
-	 .enable_session_ticket_server = 1,
-	 .enable_session_ticket_client = 1,
+	 .enable_session_ticket_server = ST_ALL,
+	 .enable_session_ticket_client = ST_ALL,
 	 .expect_resume = 1},
+#ifdef TLS13
+	{.desc = "try to resume from session ticket (session ticket disabled for TLS 1.2)",
+	 .enable_db = 0,
+	 .enable_session_ticket_server = ST_TLS13_ONLY,
+	 .enable_session_ticket_client = ST_TLS13_ONLY,
+	 .expect_resume = 1},
+#else
+	{.desc = "try to resume from session ticket (session ticket disabled for TLS 1.2)",
+	 .enable_db = 0,
+	 .enable_session_ticket_server = ST_TLS13_ONLY,
+	 .enable_session_ticket_client = ST_TLS13_ONLY,
+	 .expect_resume = 0},
+#endif
 	{.desc = "try to resume from session ticket (client cert)",
 	 .enable_db = 0,
 	 .client_cert = 1,
-	 .enable_session_ticket_server = 1,
-	 .enable_session_ticket_client = 1,
+	 .enable_session_ticket_server = ST_ALL,
+	 .enable_session_ticket_client = ST_ALL,
 	 .expect_resume = 1},
 	{.desc = "try to resume from session ticket (expired)",
 	 .enable_db = 0,
-	 .enable_session_ticket_server = 1,
-	 .enable_session_ticket_client = 1,
+	 .enable_session_ticket_server = ST_ALL,
+	 .enable_session_ticket_client = ST_ALL,
 	 .expire_ticket = 1,
 	 .expect_resume = 0},
 	{.desc = "try to resume from session ticket using resumed session's data",
 	 .enable_db = 0,
-	 .enable_session_ticket_server = 1,
-	 .enable_session_ticket_client = 1,
+	 .enable_session_ticket_server = ST_ALL,
+	 .enable_session_ticket_client = ST_ALL,
 	 .try_resumed_data = 1,
 	 .expect_resume = 1},
 #ifndef TLS13
 	{.desc = "try to resume from session ticket (ext master secret -> none)",
 	 .enable_db = 0,
-	 .enable_session_ticket_server = 1,
-	 .enable_session_ticket_client = 1,
+	 .enable_session_ticket_server = ST_ALL,
+	 .enable_session_ticket_client = ST_ALL,
 	 .expect_resume = 0,
 	 .first_no_ext_master = 0,
 	 .second_no_ext_master = 1},
 	{.desc = "try to resume from session ticket (none -> ext master secret)",
 	 .enable_db = 0,
-	 .enable_session_ticket_server = 1,
-	 .enable_session_ticket_client = 1,
+	 .enable_session_ticket_server = ST_ALL,
+	 .enable_session_ticket_client = ST_ALL,
 	 .expect_resume = 0,
 	 .first_no_ext_master = 1,
 	 .second_no_ext_master = 0},
 	{.desc = "try to resume from session ticket (server only)",
 	  .enable_db = 0,
-	  .enable_session_ticket_server = 1,
-	  .enable_session_ticket_client = 0,
+	  .enable_session_ticket_server = ST_ALL,
+	  .enable_session_ticket_client = ST_NONE,
 	  .expect_resume = 0},
 	{.desc = "try to resume from session ticket (client only)",
 	 .enable_db = 0,
-	 .enable_session_ticket_server = 0,
-	 .enable_session_ticket_client = 1,
+	 .enable_session_ticket_server = ST_NONE,
+	 .enable_session_ticket_client = ST_ALL,
 	 .expect_resume = 0},
 	{.desc = "try to resume from db and ticket",
 	 .enable_db = 1,
-	 .enable_session_ticket_server = 1,
-	 .enable_session_ticket_client = 1,
+	 .enable_session_ticket_server = ST_ALL,
+	 .enable_session_ticket_client = ST_ALL,
 	 .expect_resume = 1},
 	{.desc = "try to resume from db and different SNI",
 	 .enable_db = 1,
@@ -221,8 +240,8 @@ struct params_res resume_tests[] = {
 	 .try_diff_sni = 1,
 	 .expect_resume = 0},
 	{.desc = "try to resume with ticket and different SNI",
-	 .enable_session_ticket_server = 1,
-	 .enable_session_ticket_client = 1,
+	 .enable_session_ticket_server = ST_ALL,
+	 .enable_session_ticket_client = ST_ALL,
 	 .try_sni = 1,
 	 .try_diff_sni = 1,
 	 .expect_resume = 0},
@@ -232,8 +251,8 @@ struct params_res resume_tests[] = {
 	 .expect_resume = 1},
 #endif
 	{.desc = "try to resume with ticket and same SNI",
-	 .enable_session_ticket_server = 1,
-	 .enable_session_ticket_client = 1,
+	 .enable_session_ticket_server = ST_ALL,
+	 .enable_session_ticket_client = ST_ALL,
 	 .try_sni = 1,
 	 .expect_resume = 1},
 	{NULL, -1}
@@ -502,8 +521,15 @@ static void client(int sds[], struct params_res *params)
 		snprintf(prio_str, sizeof(prio_str), "%s", PRIO_STR);
 
 		/* Use default priorities */
-		if (params->enable_session_ticket_client == 0) {
+		switch (params->enable_session_ticket_client) {
+		case ST_NONE:
 			strcat(prio_str, ":%NO_TICKETS");
+			break;
+		case ST_TLS13_ONLY:
+			strcat(prio_str, ":%NO_TICKETS_TLS12");
+			break;
+		default:
+			break;
 		}
 
 		if (params->first_no_ext_master && t == 0) {

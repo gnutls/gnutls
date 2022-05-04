@@ -1538,6 +1538,9 @@ is set no versions later than TLS1.2 can be negotiated.
 
 @item %NO_TICKETS @tab
 will prevent the advertizing of the TLS session ticket extension.
+
+@item %NO_TICKETS_TLS12 @tab
+will prevent the advertizing of the TLS session ticket extension in TLS 1.2.
 This is implied by the PFS keyword.
 
 @item %NO_SESSION_HASH @tab

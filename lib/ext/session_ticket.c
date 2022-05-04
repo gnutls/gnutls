@@ -20,6 +20,12 @@
  *
  */
 
+/* This file implements the TLS session ticket extension.
+ *
+ * Note that the extension is only used in TLS 1.2.  For TLS 1.3, session
+ * tickets are sent as part of pre_shared_key extension (see pre_shared_key.c).
+ */
+
 #include "gnutls_int.h"
 #include "errors.h"
 #include <fips.h>
@@ -190,9 +196,6 @@ _gnutls_decrypt_session_ticket(gnutls_session_t session,
 	struct ticket_st ticket;
 	int ret;
 
-	/* callers must have that checked */
-	assert(!(session->internals.flags & GNUTLS_NO_TICKETS));
-
 	/* Retrieve ticket decryption keys */
 	if (_gnutls_get_session_ticket_decryption_key(session,
 						      ticket_data,
@@ -276,22 +279,21 @@ _gnutls_encrypt_session_ticket(gnutls_session_t session,
 {
 	cipher_hd_st cipher_hd;
 	gnutls_datum_t IV;
-	gnutls_datum_t encrypted_state = {NULL,0};
+	gnutls_datum_t encrypted_state;
+	gnutls_datum_t result = { NULL, 0 };
 	uint8_t iv[TICKET_IV_SIZE];
 	gnutls_datum_t stek_cipher_key, stek_mac_key, stek_key_name;
 	struct ticket_st ticket;
 	int ret;
 
 	encrypted_state.size = ((state->size + TICKET_BLOCK_SIZE - 1) / TICKET_BLOCK_SIZE) * TICKET_BLOCK_SIZE;
-	ticket_data->size = TICKET_KEY_NAME_SIZE + TICKET_IV_SIZE + 2 +
+	result.size = TICKET_KEY_NAME_SIZE + TICKET_IV_SIZE + 2 +
 	    encrypted_state.size + TICKET_MAC_SIZE;
-	ticket_data->data = gnutls_calloc(1, ticket_data->size);
-	if (!ticket_data->data) {
-		gnutls_assert();
-		ret = GNUTLS_E_MEMORY_ERROR;
-		goto cleanup;
+	result.data = gnutls_calloc(1, result.size);
+	if (!result.data) {
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 	}
-	encrypted_state.data = ticket_data->data + TICKET_KEY_NAME_SIZE + TICKET_IV_SIZE + 2;
+	encrypted_state.data = result.data + TICKET_KEY_NAME_SIZE + TICKET_IV_SIZE + 2;
 	memcpy(encrypted_state.data, state->data, state->size);
 
 	/* Retrieve ticket encryption keys */
@@ -344,17 +346,16 @@ _gnutls_encrypt_session_ticket(gnutls_session_t session,
 		goto cleanup2;
 	}
 
-	encrypted_state.data = NULL;
-
-	pack_ticket(&ticket, ticket_data);
-
-	ret = 0;
+	pack_ticket(&ticket, &result);
+	ticket_data->data = result.data;
+	ticket_data->size = result.size;
+	result.data = NULL;
 
 cleanup2:
 	_gnutls_cipher_deinit(&cipher_hd);
 
 cleanup:
-	_gnutls_free_datum(&encrypted_state);
+	_gnutls_free_datum(&result);
 
 	return ret;
 }
@@ -387,7 +388,7 @@ session_ticket_recv_params(gnutls_session_t session,
 	gnutls_datum_t state;
 	int ret;
 
-	if (session->internals.flags & GNUTLS_NO_TICKETS)
+	if (session->internals.flags & (GNUTLS_NO_TICKETS | GNUTLS_NO_TICKETS_TLS12))
 		return 0;
 
 	if (session->security_parameters.entity == GNUTLS_SERVER) {
@@ -431,7 +432,7 @@ session_ticket_send_params(gnutls_session_t session,
 	gnutls_ext_priv_data_t epriv;
 	int ret;
 
-	if (session->internals.flags & GNUTLS_NO_TICKETS)
+	if (session->internals.flags & (GNUTLS_NO_TICKETS | GNUTLS_NO_TICKETS_TLS12))
 		return 0;
 
 	if (session->security_parameters.entity == GNUTLS_SERVER) {
@@ -637,10 +638,16 @@ int _gnutls_send_new_session_ticket(gnutls_session_t session, int again)
 	gnutls_datum_t ticket_data;
 
 	if (again == 0) {
-		if (session->internals.flags & GNUTLS_NO_TICKETS)
+		if (session->internals.flags & (GNUTLS_NO_TICKETS |
+						GNUTLS_NO_TICKETS_TLS12)) {
 			return 0;
-		if (!session->internals.session_ticket_renew)
+		}
+		if (!session->key.stek_initialized) {
 			return 0;
+		}
+		if (!session->internals.session_ticket_renew) {
+			return 0;
+		}
 
 		_gnutls_handshake_log
 		    ("HSK[%p]: sending session ticket\n", session);
@@ -735,7 +742,8 @@ int _gnutls_recv_new_session_ticket(gnutls_session_t session)
 	session_ticket_ext_st *priv = NULL;
 	gnutls_ext_priv_data_t epriv;
 
-	if (session->internals.flags & GNUTLS_NO_TICKETS)
+	if (session->internals.flags & (GNUTLS_NO_TICKETS |
+					GNUTLS_NO_TICKETS_TLS12))
 		return 0;
 	if (!session->internals.session_ticket_renew)
 		return 0;
