@@ -150,9 +150,10 @@ BAG #1
 
 EOF
 
-sed -n '/^\(MAC\|BAG\)/,/^$/p' ${TMPFILE_PEM} | \
+sed -n -e '/^MAC/,/^$/p' -e '/^BAG/,/^$/p' ${TMPFILE_PEM} | \
 sed -e '/^[ 	]*Salt:/d' \
-    -e '/^BAG #[0-9]*/,$ { /^[ 	]*Salt size:/d }' > ${INFO_OUT}
+    -e '/^BAG #[0-9]*/,$ { /^[ 	]*Salt size:/d
+}' > ${INFO_OUT}
 
 diff ${INFO_EXP} ${INFO_OUT}
 
