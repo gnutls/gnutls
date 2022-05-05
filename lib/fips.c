@@ -215,7 +215,7 @@ static int get_hmac(uint8_t *dest, const char *value)
 	gnutls_datum_t data;
 
 	data.size = strlen(value);
-	data.data = value;
+	data.data = (unsigned char *)value;
 
 	hmac_size = HMAC_SIZE;
 	ret = gnutls_hex_decode(&data, dest, &hmac_size);
