@@ -200,7 +200,7 @@ thirdparty_libadd += $(FIPS140_LIBS) $(LTLIBDL)
 
 noinst_PROGRAMS = fipshmac
 fipshmac_SOURCES = fipshmac.c
-fipshmac_LDADD = libgnutls.la
+fipshmac_LDADD = libgnutls.la ../gl/libgnu.la
 
 hmac_files = .libs/.gnutls.hmac
 
