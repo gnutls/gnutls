@@ -1120,7 +1120,7 @@ int gnutls_x509_ext_import_key_usage(const gnutls_datum_t * ext,
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		asn1_delete_structure(&c2);
-		return 0;
+		return _gnutls_asn2err(result);
 	}
 
 	*key_usage = str[0] | (str[1] << 8);

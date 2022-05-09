@@ -463,6 +463,94 @@ static bool has_valid_serial(gnutls_x509_crt_t cert)
 	return true;
 }
 
+/* Check if extension can be successfully parsed */
+static bool is_valid_extension(const char *oid, gnutls_datum_t *der)
+{
+	int err = 0, i;
+	unsigned u;
+	size_t sz;
+	time_t t1, t2;
+	char *s1 = NULL, *s2 = NULL;
+	gnutls_datum_t datum = {NULL, 0};
+
+	if (!strcmp(oid, GNUTLS_X509EXT_OID_BASIC_CONSTRAINTS)) {
+		err = gnutls_x509_ext_import_basic_constraints(der, &u, &i);
+	} else if (!strcmp(oid, GNUTLS_X509EXT_OID_SUBJECT_KEY_ID)) {
+		err = gnutls_x509_ext_import_subject_key_id(der, &datum);
+	} else if (!strcmp(oid, GNUTLS_X509EXT_OID_CRT_POLICY)) {
+		gnutls_x509_policies_t policies;
+		if (gnutls_x509_policies_init(&policies) < 0)
+			return false;
+		err = gnutls_x509_ext_import_policies(der, policies, 0);
+		gnutls_x509_policies_deinit(policies);
+	} else if (!strcmp(oid, GNUTLS_X509_OID_POLICY_ANY)) {
+		err = gnutls_x509_ext_import_inhibit_anypolicy(der, &u);
+	} else if (!strcmp(oid, GNUTLS_X509EXT_OID_AUTHORITY_KEY_ID)) {
+		gnutls_x509_aki_t aki;
+		if (gnutls_x509_aki_init(&aki) < 0)
+			return false;
+		err = gnutls_x509_ext_import_authority_key_id(der, aki, 0);
+		gnutls_x509_aki_deinit(aki);
+	} else if (!strcmp(oid, GNUTLS_X509EXT_OID_KEY_USAGE)) {
+		err = gnutls_x509_ext_import_key_usage(der, &u);
+	} else if (!strcmp(oid, GNUTLS_X509EXT_OID_PRIVATE_KEY_USAGE_PERIOD)) {
+		err = gnutls_x509_ext_import_private_key_usage_period(der, &t1, &t2);
+	} else if (!strcmp(oid, GNUTLS_X509EXT_OID_EXTENDED_KEY_USAGE)) {
+		gnutls_x509_key_purposes_t purposes;
+		if (gnutls_x509_key_purpose_init(&purposes) < 0)
+			return false;
+		err = gnutls_x509_ext_import_key_purposes(der, purposes, 0);
+		gnutls_x509_key_purpose_deinit(purposes);
+	} else if (!strcmp(oid, GNUTLS_X509EXT_OID_SAN) ||
+		   !strcmp(oid, GNUTLS_X509EXT_OID_IAN)) {
+		gnutls_subject_alt_names_t names;
+		if (gnutls_subject_alt_names_init(&names) < 0)
+			return false;
+		err = gnutls_x509_ext_import_subject_alt_names(der, names, 0);
+		gnutls_subject_alt_names_deinit(names);
+	} else if (!strcmp(oid, GNUTLS_X509EXT_OID_CRL_DIST_POINTS)) {
+		gnutls_x509_crl_dist_points_t dp;
+		if (gnutls_x509_crl_dist_points_init(&dp) < 0)
+			return false;
+		err = gnutls_x509_ext_import_crl_dist_points(der, dp, 0);
+		gnutls_x509_crl_dist_points_deinit(dp);
+	} else if (!strcmp(oid, GNUTLS_X509EXT_OID_PROXY_CRT_INFO)) {
+		err = gnutls_x509_ext_import_proxy(der, &i, &s1, &s2, &sz);
+	} else if (!strcmp(oid, GNUTLS_X509EXT_OID_AUTHORITY_INFO_ACCESS)) {
+		gnutls_x509_aia_t aia;
+		if (gnutls_x509_aia_init(&aia) < 0)
+			return false;
+		err = gnutls_x509_ext_import_aia(der, aia, 0);
+		gnutls_x509_aia_deinit(aia);
+	} else if (!strcmp(oid, GNUTLS_X509EXT_OID_CT_SCT_V1)) {
+		gnutls_x509_ct_scts_t scts;
+		if (gnutls_x509_ext_ct_scts_init(&scts) < 0)
+			return false;
+		err = gnutls_x509_ext_ct_import_scts(der, scts, 0);
+		gnutls_x509_ext_ct_scts_deinit(scts);
+	} else if (!strcmp(oid, GNUTLS_X509EXT_OID_NAME_CONSTRAINTS)) {
+		gnutls_x509_name_constraints_t nc;
+		if (gnutls_x509_name_constraints_init(&nc) < 0)
+			return false;
+		err = gnutls_x509_ext_import_name_constraints(der, nc, 0);
+		gnutls_x509_name_constraints_deinit(nc);
+	} else if (!strcmp(oid, GNUTLS_X509EXT_OID_TLSFEATURES)) {
+		gnutls_x509_tlsfeatures_t features;
+		if (gnutls_x509_tlsfeatures_init(&features) < 0)
+			return false;
+		err = gnutls_x509_ext_import_tlsfeatures(der, features, 0);
+		gnutls_x509_tlsfeatures_deinit(features);
+	} else {
+		return true;
+	}
+
+	gnutls_free(s1);
+	gnutls_free(s2);
+	_gnutls_free_datum(&datum);
+
+	return err == 0;
+}
+
 #endif /* STRICT_X509 */
 
 int _gnutls_check_cert_sanity(gnutls_x509_crt_t cert)
@@ -506,7 +594,7 @@ int _gnutls_check_cert_sanity(gnutls_x509_crt_t cert)
 		}
 	} else {
 		/* Version is 3; ensure no duplicate extensions are present. */
-		unsigned i;
+		unsigned i, critical;
 		char oid[MAX_OID_SIZE];
 		size_t oid_size;
 		char *o;
@@ -517,7 +605,7 @@ int _gnutls_check_cert_sanity(gnutls_x509_crt_t cert)
 
 		for (i=0;;i++) {
 			oid_size = sizeof(oid);
-			ret = gnutls_x509_crt_get_extension_info(cert, i, oid, &oid_size, NULL);
+			ret = gnutls_x509_crt_get_extension_info(cert, i, oid, &oid_size, &critical);
 			if (ret < 0) {
 				if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 					break;
@@ -542,6 +630,19 @@ int _gnutls_check_cert_sanity(gnutls_x509_crt_t cert)
 				ret = gnutls_assert_val(GNUTLS_E_X509_DUPLICATE_EXTENSION);
 				goto cleanup;
 			}
+
+#ifdef STRICT_X509
+			gnutls_datum_t der = { NULL, 0 };
+			ret = gnutls_x509_crt_get_extension_data2(cert, i, &der);
+			if (ret < 0)
+				continue;
+			if (critical && !is_valid_extension(oid, &der)) {
+				_gnutls_free_datum(&der);
+				_gnutls_debug_log("error: could not parse extension (%s)\n");
+				return gnutls_assert_val(GNUTLS_E_X509_CERTIFICATE_ERROR);
+			}
+			_gnutls_free_datum(&der);
+#endif
 		}
 
 		hash_free(htable);

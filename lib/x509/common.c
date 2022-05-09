@@ -150,6 +150,12 @@ const struct oid_to_string *_gnutls_oid_get_entry(const struct oid_to_string *ot
 	return NULL;
 }
 
+const char *_gnutls_oid_get_asn_desc(const char *oid)
+{
+	const struct oid_to_string *entry = _gnutls_oid_get_entry(_oid2str, oid);
+	return entry ? entry->asn_desc : NULL;
+}
+
 const char *_gnutls_ldap_string_to_oid(const char *str, unsigned str_len)
 {
 	unsigned int i = 0;

@@ -19,6 +19,16 @@ See the end for copying conditions.
    has been changed from tls-unique to tls-exporter as tls-unique is
    not supported in TLS 1.3.
 
+** libgnutls: Certificate sanity checks has been enhanced to make
+   gnutls more RFC 5280 compliant (!1583).
+   Following changes were included:
+   - critical extensions are parsed when loading x509
+     certificate to prohibit any random octet strings.
+     Requires strict-x509 configure option to be enabled
+   - garbage bits in Key Usage extension are prohibited
+   - empty DirectoryStrings in Distinguished name structures
+     of Issuer and Subject name are prohibited
+
 ** libgnutls: Removed 3DES from FIPS approved algorithms (#1353).
    According to the section 2 of SP800-131A Rev.2, 3DES algorithm
    will be disallowed for encryption after December 31, 2023:
