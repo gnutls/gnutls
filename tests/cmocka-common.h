@@ -1,6 +1,7 @@
 #ifndef GNUTLS_TESTS_CMOCKA_COMMON_H
 #define GNUTLS_TESTS_CMOCKA_COMMON_H
 
+#include <stdarg.h>
 #include <stddef.h>
 #include <setjmp.h>
 #include <cmocka.h>
