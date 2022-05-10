@@ -623,6 +623,7 @@ typedef struct record_parameters_st record_parameters_st;
 #define GNUTLS_CIPHER_FLAG_ONLY_AEAD	(1 << 0) /* When set, this cipher is only available through the new AEAD API */
 #define GNUTLS_CIPHER_FLAG_XOR_NONCE	(1 << 1) /* In this TLS AEAD cipher xor the implicit_iv with the nonce */
 #define GNUTLS_CIPHER_FLAG_NO_REKEY	(1 << 2) /* whether this tls1.3 cipher doesn't need to rekey after 2^24 messages */
+#define GNUTLS_CIPHER_FLAG_TAG_PREFIXED (1 << 3) /* When set, this cipher prefixes authentication tag */
 
 /* cipher and mac parameters */
 typedef struct cipher_entry_st {

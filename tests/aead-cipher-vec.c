@@ -122,8 +122,10 @@ doit(void)
 	start("aes-192-gcm", GNUTLS_CIPHER_AES_192_GCM);
 	start("aes-256-gcm", GNUTLS_CIPHER_AES_256_GCM);
 	start("aes-128-ccm", GNUTLS_CIPHER_AES_128_CCM);
-	if (!gnutls_fips140_mode_enabled())
+	if (!gnutls_fips140_mode_enabled()) {
+		start("aes-128-siv", GNUTLS_CIPHER_AES_128_SIV);
 		start("chacha20-poly1305", GNUTLS_CIPHER_CHACHA20_POLY1305);
+	}
 
 	gnutls_global_deinit();
 }

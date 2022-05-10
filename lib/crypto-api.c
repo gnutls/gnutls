@@ -32,6 +32,7 @@
 #include <fips.h>
 #include "crypto-api.h"
 #include "iov.h"
+#include "intprops.h"
 
 typedef struct api_cipher_hd_st {
 	cipher_hd_st ctx_enc;
@@ -989,6 +990,38 @@ int gnutls_aead_cipher_init(gnutls_aead_cipher_hd_t *handle,
 }
 
 /**
+ * gnutls_aead_cipher_set_key:
+ * @handle: is a #gnutls_aead_cipher_hd_t type.
+ * @key: The key to be used for encryption
+ *
+ * This function will set a new key without re-initializing the
+ * context.
+ *
+ * Returns: Zero or a negative error code on error.
+ *
+ * Since: 3.7.5
+ **/
+int gnutls_aead_cipher_set_key(gnutls_aead_cipher_hd_t handle,
+			       const gnutls_datum_t *key)
+{
+	const cipher_entry_st* e;
+	int ret;
+
+	e = cipher_to_entry(handle->ctx_enc.e->id);
+	if (e == NULL || e->type != CIPHER_AEAD) {
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
+
+	ret = handle->ctx_enc.setkey(handle->ctx_enc.handle,
+				     key->data, key->size);
+	if (ret < 0) {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
+	}
+
+	return ret;
+}
+
+/**
  * gnutls_aead_cipher_decrypt:
  * @handle: is a #gnutls_aead_cipher_hd_t type.
  * @nonce: the nonce to set
@@ -1120,7 +1153,8 @@ gnutls_aead_cipher_encrypt(gnutls_aead_cipher_hd_t handle,
 
 struct iov_store_st {
 	void *data;
-	size_t size;
+	size_t length;
+	size_t capacity;
 };
 
 static void iov_store_free(struct iov_store_st *s)
@@ -1130,58 +1164,66 @@ static void iov_store_free(struct iov_store_st *s)
 
 static int iov_store_grow(struct iov_store_st *s, size_t length)
 {
-	void *data;
+	void *new_data;
+	size_t new_capacity = s->capacity;
 
-	s->size += length;
-	data = gnutls_realloc(s->data, s->size);
-	if (data == NULL)
+	if (INT_ADD_OVERFLOW(new_capacity, length)) {
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
+	new_capacity += length;
+	new_data = gnutls_realloc(s->data, new_capacity);
+	if (!new_data) {
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-
-	s->data = data;
+	}
+	s->data = new_data;
+	s->capacity = new_capacity;
 	return 0;
 }
 
 static int
-copy_from_iov(struct iov_store_st *dst, const giovec_t *iov, int iovcnt)
+append_from_iov(struct iov_store_st *dst, const giovec_t *iov, int iovcnt)
 {
-	memset(dst, 0, sizeof(*dst));
-	if (iovcnt == 0) {
-		return 0;
-	} else {
+	if (iovcnt > 0) {
 		int i;
 		uint8_t *p;
+		void *new_data;
+		size_t new_capacity = dst->capacity;
 
-		dst->size = 0;
-		for (i=0;i<iovcnt;i++)
-			dst->size += iov[i].iov_len;
-		dst->data = gnutls_malloc(dst->size);
-		if (dst->data == NULL)
-			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-
-		p = dst->data;
-		for (i=0;i<iovcnt;i++) {
-			if (iov[i].iov_len > 0)
-				memcpy(p, iov[i].iov_base, iov[i].iov_len);
-			p += iov[i].iov_len;
+		for (i = 0; i < iovcnt; i++) {
+			if (INT_ADD_OVERFLOW(new_capacity, iov[i].iov_len)) {
+				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			}
+			new_capacity += iov[i].iov_len;
 		}
+		new_data = gnutls_realloc(dst->data, new_capacity);
+		if (!new_data) {
+			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		}
+		dst->data = new_data;
+		dst->capacity = new_capacity;
 
-		return 0;
+		p = (uint8_t *) dst->data + dst->length;
+		for (i = 0; i < iovcnt; i++) {
+			if (iov[i].iov_len > 0) {
+				memcpy(p, iov[i].iov_base, iov[i].iov_len);
+			}
+			p += iov[i].iov_len;
+			dst->length += iov[i].iov_len;
+		}
 	}
+	return 0;
 }
 
 static int
-copy_to_iov(struct iov_store_st *src, size_t size,
+copy_to_iov(const uint8_t *data, size_t size,
 	    const giovec_t *iov, int iovcnt)
 {
 	size_t offset = 0;
 	int i;
 
-	if (unlikely(src->size < size))
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-
 	for (i = 0; i < iovcnt && size > 0; i++) {
 		size_t to_copy = MIN(size, iov[i].iov_len);
-		memcpy(iov[i].iov_base, (uint8_t *) src->data + offset, to_copy);
+		memcpy(iov[i].iov_base, (uint8_t *) data + offset, to_copy);
 		offset += to_copy;
 		size -= to_copy;
 	}
@@ -1190,38 +1232,61 @@ copy_to_iov(struct iov_store_st *src, size_t size,
 	return 0;
 }
 
+#define IOV_STORE_INIT { NULL, 0, 0 }
 
-/**
- * gnutls_aead_cipher_encryptv:
- * @handle: is a #gnutls_aead_cipher_hd_t type.
- * @nonce: the nonce to set
- * @nonce_len: The length of the nonce
- * @auth_iov: additional data to be authenticated
- * @auth_iovcnt: The number of buffers in @auth_iov
- * @tag_size: The size of the tag to use (use zero for the default)
- * @iov: the data to be encrypted
- * @iovcnt: The number of buffers in @iov
- * @ctext: the encrypted data including authentication tag
- * @ctext_len: the length of encrypted data (initially must hold the maximum available size, including space for tag)
- *
- * This function will encrypt the provided data buffers using the algorithm
- * specified by the context. The output data will contain the
- * authentication tag.
- *
- * Returns: Zero or a negative error code on error.
- *
- * Since: 3.6.3
- **/
-int
-gnutls_aead_cipher_encryptv(gnutls_aead_cipher_hd_t handle,
-			    const void *nonce, size_t nonce_len,
-			    const giovec_t *auth_iov, int auth_iovcnt,
-			    size_t tag_size,
-			    const giovec_t *iov, int iovcnt,
-			    void *ctext, size_t *ctext_len)
+static int
+aead_cipher_encryptv_fallback(gnutls_aead_cipher_hd_t handle,
+			      const void *nonce, size_t nonce_len,
+			      const giovec_t *auth_iov, int auth_iovcnt,
+			      size_t tag_size,
+			      const giovec_t *iov, int iovcnt,
+			      void *ctext, size_t *ctext_len)
 {
-	api_aead_cipher_hd_st *h = handle;
-	ssize_t ret;
+	struct iov_store_st auth = IOV_STORE_INIT;
+	struct iov_store_st ptext = IOV_STORE_INIT;
+	int ret;
+
+	if (tag_size == 0)
+		tag_size = _gnutls_cipher_get_tag_size(handle->ctx_enc.e);
+	else if (tag_size > (unsigned)_gnutls_cipher_get_tag_size(handle->ctx_enc.e)) {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
+
+	ret = append_from_iov(&auth, auth_iov, auth_iovcnt);
+	if (ret < 0) {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
+		return gnutls_assert_val(ret);
+	}
+
+	ret = append_from_iov(&ptext, iov, iovcnt);
+	if (ret < 0) {
+		iov_store_free(&auth);
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
+		return gnutls_assert_val(ret);
+	}
+
+	ret = gnutls_aead_cipher_encrypt(handle, nonce, nonce_len,
+					 auth.data, auth.length,
+					 tag_size,
+					 ptext.data, ptext.length,
+					 ctext, ctext_len);
+	iov_store_free(&auth);
+	iov_store_free(&ptext);
+
+	/* FIPS operation state is set by gnutls_aead_cipher_encrypt */
+	return ret;
+}
+
+static int
+aead_cipher_encryptv(gnutls_aead_cipher_hd_t handle,
+		     const void *nonce, size_t nonce_len,
+		     const giovec_t *auth_iov, int auth_iovcnt,
+		     size_t tag_size,
+		     const giovec_t *iov, int iovcnt,
+		     void *ctext, size_t *ctext_len)
+{
+	int ret;
 	uint8_t *dst;
 	size_t dst_size, total = 0;
 	uint8_t *p;
@@ -1229,46 +1294,11 @@ gnutls_aead_cipher_encryptv(gnutls_aead_cipher_hd_t handle,
 	size_t blocksize = handle->ctx_enc.e->blocksize;
 	struct iov_iter_st iter;
 
-	/* Limitation: this function provides an optimization under the internally registered
-	 * AEAD ciphers. When an AEAD cipher is used registered with gnutls_crypto_register_aead_cipher(),
-	 * then this becomes a convenience function as it missed the lower-level primitives
-	 * necessary for piecemeal encryption. */
-
 	if (tag_size == 0)
-		tag_size = _gnutls_cipher_get_tag_size(h->ctx_enc.e);
-	else if (tag_size > (unsigned)_gnutls_cipher_get_tag_size(h->ctx_enc.e)) {
+		tag_size = _gnutls_cipher_get_tag_size(handle->ctx_enc.e);
+	else if (tag_size > (unsigned)_gnutls_cipher_get_tag_size(handle->ctx_enc.e)) {
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-	}
-
-	if ((handle->ctx_enc.e->flags & GNUTLS_CIPHER_FLAG_ONLY_AEAD) || handle->ctx_enc.encrypt == NULL) {
-		/* ciphertext cannot be produced in a piecemeal approach */
-		struct iov_store_st auth;
-		struct iov_store_st ptext;
-
-		ret = copy_from_iov(&auth, auth_iov, auth_iovcnt);
-		if (ret < 0) {
-			_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
-			return gnutls_assert_val(ret);
-		}
-
-		ret = copy_from_iov(&ptext, iov, iovcnt);
-		if (ret < 0) {
-			iov_store_free(&auth);
-			_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
-			return gnutls_assert_val(ret);
-		}
-
-		ret = gnutls_aead_cipher_encrypt(handle, nonce, nonce_len,
-						 auth.data, auth.size,
-						 tag_size,
-						 ptext.data, ptext.size,
-						 ctext, ctext_len);
-		iov_store_free(&auth);
-		iov_store_free(&ptext);
-
-		/* FIPS operation state is set by gnutls_aead_cipher_encrypt */
-		return ret;
 	}
 
 	ret = _gnutls_cipher_setiv(&handle->ctx_enc, nonce, nonce_len);
@@ -1342,36 +1372,185 @@ gnutls_aead_cipher_encryptv(gnutls_aead_cipher_hd_t handle,
 }
 
 /**
- * gnutls_aead_cipher_encryptv2:
+ * gnutls_aead_cipher_encryptv:
  * @handle: is a #gnutls_aead_cipher_hd_t type.
  * @nonce: the nonce to set
  * @nonce_len: The length of the nonce
  * @auth_iov: additional data to be authenticated
  * @auth_iovcnt: The number of buffers in @auth_iov
+ * @tag_size: The size of the tag to use (use zero for the default)
  * @iov: the data to be encrypted
  * @iovcnt: The number of buffers in @iov
- * @tag: The authentication tag
- * @tag_size: The size of the tag to use (use zero for the default)
+ * @ctext: the encrypted data including authentication tag
+ * @ctext_len: the length of encrypted data (initially must hold the maximum available size, including space for tag)
  *
- * This is similar to gnutls_aead_cipher_encrypt(), but it performs
- * in-place encryption on the provided data buffers.
+ * This function will encrypt the provided data buffers using the algorithm
+ * specified by the context. The output data will contain the
+ * authentication tag.
  *
  * Returns: Zero or a negative error code on error.
  *
- * Since: 3.6.10
+ * Since: 3.6.3
  **/
 int
-gnutls_aead_cipher_encryptv2(gnutls_aead_cipher_hd_t handle,
-			     const void *nonce, size_t nonce_len,
-			     const giovec_t *auth_iov, int auth_iovcnt,
-			     const giovec_t *iov, int iovcnt,
-			     void *tag, size_t *tag_size)
+gnutls_aead_cipher_encryptv(gnutls_aead_cipher_hd_t handle,
+			    const void *nonce, size_t nonce_len,
+			    const giovec_t *auth_iov, int auth_iovcnt,
+			    size_t tag_size,
+			    const giovec_t *iov, int iovcnt,
+			    void *ctext, size_t *ctext_len)
+{
+	/* Limitation: this function provides an optimization under the internally registered
+	 * AEAD ciphers. When an AEAD cipher is used registered with gnutls_crypto_register_aead_cipher(),
+	 * then this becomes a convenience function as it missed the lower-level primitives
+	 * necessary for piecemeal encryption. */
+	if ((handle->ctx_enc.e->flags & GNUTLS_CIPHER_FLAG_ONLY_AEAD) ||
+	    handle->ctx_enc.encrypt == NULL) {
+		return aead_cipher_encryptv_fallback(handle,
+						     nonce, nonce_len,
+						     auth_iov, auth_iovcnt,
+						     tag_size,
+						     iov, iovcnt,
+						     ctext, ctext_len);
+	} else {
+		return aead_cipher_encryptv(handle,
+					    nonce, nonce_len,
+					    auth_iov, auth_iovcnt,
+					    tag_size,
+					    iov, iovcnt,
+					    ctext, ctext_len);
+	}
+}
+
+static int
+aead_cipher_encryptv2_fallback(gnutls_aead_cipher_hd_t handle,
+			       const void *nonce, size_t nonce_len,
+			       const giovec_t *auth_iov, int auth_iovcnt,
+			       const giovec_t *iov, int iovcnt,
+			       void *tag, size_t *tag_size)
+{
+	struct iov_store_st auth = IOV_STORE_INIT;
+	struct iov_store_st ptext = IOV_STORE_INIT;
+	uint8_t *ptext_data;
+	size_t ptext_size;
+	uint8_t *ctext_data;
+	size_t ctext_size;
+	uint8_t *_tag;
+	size_t _tag_size;
+	int ret;
+
+	if (tag_size == NULL || *tag_size == 0)
+		_tag_size = _gnutls_cipher_get_tag_size(handle->ctx_enc.e);
+	else
+		_tag_size = *tag_size;
+
+	if (_tag_size > (unsigned)_gnutls_cipher_get_tag_size(handle->ctx_enc.e)) {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
+
+	ret = append_from_iov(&auth, auth_iov, auth_iovcnt);
+	if (ret < 0) {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
+		return gnutls_assert_val(ret);
+	}
+
+	if (handle->ctx_enc.e->flags & GNUTLS_CIPHER_FLAG_TAG_PREFIXED) {
+		/* prepend space for tag */
+		ret = iov_store_grow(&ptext, _tag_size);
+		if (ret < 0) {
+			gnutls_assert();
+			goto error;
+		}
+		ptext.length = _tag_size;
+
+		ret = append_from_iov(&ptext, iov, iovcnt);
+		if (ret < 0) {
+			gnutls_assert();
+			goto error;
+		}
+
+		/* We must set ptext_data after the above
+		 * grow/append opereations, otherwise it will point to an invalid pointer after realloc.
+		 */
+		ptext_data = (uint8_t *) ptext.data + _tag_size;
+		ptext_size = ptext.length - _tag_size;
+	} else {
+		ret = append_from_iov(&ptext, iov, iovcnt);
+		if (ret < 0) {
+			gnutls_assert();
+			goto error;
+		}
+
+		/* append space for tag */
+		ret = iov_store_grow(&ptext, _tag_size);
+		if (ret < 0) {
+			gnutls_assert();
+			goto error;
+		}
+
+		/* We must set ptext_data after the above
+		 * grow/append opereations, otherwise it will point to an invalid pointer after realloc.
+		 */
+		ptext_data = ptext.data;
+		ptext_size = ptext.length;
+	}
+
+	ctext_size = ptext.capacity;
+	ret = gnutls_aead_cipher_encrypt(handle, nonce, nonce_len,
+					 auth.data, auth.length,
+					 _tag_size,
+					 ptext_data, ptext_size,
+					 ptext.data, &ctext_size);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+	if (handle->ctx_enc.e->flags & GNUTLS_CIPHER_FLAG_TAG_PREFIXED) {
+		ctext_data = (uint8_t *)ptext.data + _tag_size;
+		_tag = ptext.data;
+	} else {
+		ctext_data = ptext.data;
+		_tag = (uint8_t *)ptext.data + ptext_size;
+	}
+
+	ret = copy_to_iov(ctext_data, ptext_size, iov, iovcnt);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+	if (tag != NULL) {
+		memcpy(tag, _tag, _tag_size);
+	}
+	if (tag_size != NULL) {
+		*tag_size = _tag_size;
+	}
+
+ error:
+	iov_store_free(&auth);
+	iov_store_free(&ptext);
+
+	if (ret < 0) {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
+	}
+	/* FIPS operation state is set by gnutls_aead_cipher_encrypt */
+	return ret;
+}
+
+static int
+aead_cipher_encryptv2(gnutls_aead_cipher_hd_t handle,
+		      const void *nonce, size_t nonce_len,
+		      const giovec_t *auth_iov, int auth_iovcnt,
+		      const giovec_t *iov, int iovcnt,
+		      void *tag, size_t *tag_size)
 {
 	api_aead_cipher_hd_st *h = handle;
-	ssize_t ret;
+	int ret;
 	uint8_t *p;
 	size_t len;
-	ssize_t blocksize = handle->ctx_enc.e->blocksize;
+	size_t blocksize = handle->ctx_enc.e->blocksize;
 	struct iov_iter_st iter;
 	size_t _tag_size;
 
@@ -1383,71 +1562,6 @@ gnutls_aead_cipher_encryptv2(gnutls_aead_cipher_hd_t handle,
 	if (_tag_size > (unsigned)_gnutls_cipher_get_tag_size(h->ctx_enc.e)) {
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-	}
-
-	/* Limitation: this function provides an optimization under the internally registered
-	 * AEAD ciphers. When an AEAD cipher is used registered with gnutls_crypto_register_aead_cipher(),
-	 * then this becomes a convenience function as it missed the lower-level primitives
-	 * necessary for piecemeal encryption. */
-	if ((handle->ctx_enc.e->flags & GNUTLS_CIPHER_FLAG_ONLY_AEAD) || handle->ctx_enc.encrypt == NULL) {
-		/* ciphertext cannot be produced in a piecemeal approach */
-		struct iov_store_st auth;
-		struct iov_store_st ptext;
-		size_t ptext_size;
-
-		ret = copy_from_iov(&auth, auth_iov, auth_iovcnt);
-		if (ret < 0) {
-			_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
-			return gnutls_assert_val(ret);
-		}
-
-		ret = copy_from_iov(&ptext, iov, iovcnt);
-		if (ret < 0) {
-			gnutls_assert();
-			goto fallback_fail;
-		}
-
-		ptext_size = ptext.size;
-
-		/* append space for tag */
-		ret = iov_store_grow(&ptext, _tag_size);
-		if (ret < 0) {
-			gnutls_assert();
-			goto fallback_fail;
-		}
-
-		ret = gnutls_aead_cipher_encrypt(handle, nonce, nonce_len,
-						 auth.data, auth.size,
-						 _tag_size,
-						 ptext.data, ptext_size,
-						 ptext.data, &ptext.size);
-		if (ret < 0) {
-			gnutls_assert();
-			goto fallback_fail;
-		}
-
-		ret = copy_to_iov(&ptext, ptext_size, iov, iovcnt);
-		if (ret < 0) {
-			gnutls_assert();
-			goto fallback_fail;
-		}
-
-		if (tag != NULL)
-			memcpy(tag,
-			       (uint8_t *) ptext.data + ptext_size,
-			       _tag_size);
-		if (tag_size != NULL)
-			*tag_size = _tag_size;
-
-	fallback_fail:
-		iov_store_free(&auth);
-		iov_store_free(&ptext);
-
-		if (ret < 0) {
-			_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
-		}
-		/* FIPS operation state is set by gnutls_aead_cipher_encrypt */
-		return ret;
 	}
 
 	ret = _gnutls_cipher_setiv(&handle->ctx_enc, nonce, nonce_len);
@@ -1512,18 +1626,18 @@ gnutls_aead_cipher_encryptv2(gnutls_aead_cipher_hd_t handle,
 }
 
 /**
- * gnutls_aead_cipher_decryptv2:
+ * gnutls_aead_cipher_encryptv2:
  * @handle: is a #gnutls_aead_cipher_hd_t type.
  * @nonce: the nonce to set
  * @nonce_len: The length of the nonce
  * @auth_iov: additional data to be authenticated
  * @auth_iovcnt: The number of buffers in @auth_iov
- * @iov: the data to decrypt
+ * @iov: the data to be encrypted
  * @iovcnt: The number of buffers in @iov
  * @tag: The authentication tag
  * @tag_size: The size of the tag to use (use zero for the default)
  *
- * This is similar to gnutls_aead_cipher_decrypt(), but it performs
+ * This is similar to gnutls_aead_cipher_encrypt(), but it performs
  * in-place encryption on the provided data buffers.
  *
  * Returns: Zero or a negative error code on error.
@@ -1531,14 +1645,136 @@ gnutls_aead_cipher_encryptv2(gnutls_aead_cipher_hd_t handle,
  * Since: 3.6.10
  **/
 int
-gnutls_aead_cipher_decryptv2(gnutls_aead_cipher_hd_t handle,
+gnutls_aead_cipher_encryptv2(gnutls_aead_cipher_hd_t handle,
 			     const void *nonce, size_t nonce_len,
 			     const giovec_t *auth_iov, int auth_iovcnt,
 			     const giovec_t *iov, int iovcnt,
-			     void *tag, size_t tag_size)
+			     void *tag, size_t *tag_size)
 {
-	api_aead_cipher_hd_st *h = handle;
-	ssize_t ret;
+	/* Limitation: this function provides an optimization under the internally registered
+	 * AEAD ciphers. When an AEAD cipher is used registered with gnutls_crypto_register_aead_cipher(),
+	 * then this becomes a convenience function as it missed the lower-level primitives
+	 * necessary for piecemeal encryption. */
+	if ((handle->ctx_enc.e->flags & GNUTLS_CIPHER_FLAG_ONLY_AEAD) ||
+	    handle->ctx_enc.encrypt == NULL) {
+		return aead_cipher_encryptv2_fallback(handle,
+						      nonce, nonce_len,
+						      auth_iov, auth_iovcnt,
+						      iov, iovcnt,
+						      tag, tag_size);
+	} else {
+		return aead_cipher_encryptv2(handle,
+					     nonce, nonce_len,
+					     auth_iov, auth_iovcnt,
+					     iov, iovcnt,
+					     tag, tag_size);
+	}
+}
+
+static int
+aead_cipher_decryptv2_fallback(gnutls_aead_cipher_hd_t handle,
+			       const void *nonce, size_t nonce_len,
+			       const giovec_t *auth_iov, int auth_iovcnt,
+			       const giovec_t *iov, int iovcnt,
+			       void *tag, size_t tag_size)
+{
+	struct iov_store_st auth = IOV_STORE_INIT;
+	struct iov_store_st ctext = IOV_STORE_INIT;
+	uint8_t *ctext_data;
+	size_t ptext_size;
+	int ret;
+
+	if (tag_size == 0)
+		tag_size = _gnutls_cipher_get_tag_size(handle->ctx_enc.e);
+	else if (tag_size > (unsigned)_gnutls_cipher_get_tag_size(handle->ctx_enc.e)) {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
+
+	ret = append_from_iov(&auth, auth_iov, auth_iovcnt);
+	if (ret < 0) {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
+		return gnutls_assert_val(ret);
+	}
+
+	if (handle->ctx_enc.e->flags & GNUTLS_CIPHER_FLAG_TAG_PREFIXED) {
+		/* prepend tag */
+		ret = iov_store_grow(&ctext, tag_size);
+		if (ret < 0) {
+			gnutls_assert();
+			goto error;
+		}
+		memcpy(ctext.data, tag, tag_size);
+		ctext.length += tag_size;
+
+		ret = append_from_iov(&ctext, iov, iovcnt);
+		if (ret < 0) {
+			gnutls_assert();
+			goto error;
+		}
+
+		/* We must set ctext_data after the above
+		 * grow/append opereations, otherwise it will point to an invalid pointer after realloc.
+		 */
+		ctext_data = (uint8_t *) ctext.data + tag_size;
+	} else {
+		ret = append_from_iov(&ctext, iov, iovcnt);
+		if (ret < 0) {
+			gnutls_assert();
+			goto error;
+		}
+
+		/* append tag */
+		ret = iov_store_grow(&ctext, tag_size);
+		if (ret < 0) {
+			gnutls_assert();
+			goto error;
+		}
+		memcpy((uint8_t *) ctext.data + ctext.length, tag, tag_size);
+		ctext.length += tag_size;
+
+		/* We must set ctext_data after the above
+		 * grow/append opereations, otherwise it will point to an invalid pointer after realloc.
+		 */
+		ctext_data = ctext.data;
+	}
+
+	ptext_size = ctext.capacity;
+	ret = gnutls_aead_cipher_decrypt(handle, nonce, nonce_len,
+					 auth.data, auth.length,
+					 tag_size,
+					 ctext.data, ctext.length,
+					 ctext_data, &ptext_size);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+	ret = copy_to_iov(ctext.data, ptext_size, iov, iovcnt);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+ error:
+	iov_store_free(&auth);
+	iov_store_free(&ctext);
+
+	if (ret < 0) {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
+	}
+	/* FIPS operation state is set by gnutls_aead_cipher_decrypt */
+	return ret;
+}
+
+static int
+aead_cipher_decryptv2(gnutls_aead_cipher_hd_t handle,
+		      const void *nonce, size_t nonce_len,
+		      const giovec_t *auth_iov, int auth_iovcnt,
+		      const giovec_t *iov, int iovcnt,
+		      void *tag, size_t tag_size)
+{
+	int ret;
 	uint8_t *p;
 	size_t len;
 	ssize_t blocksize = handle->ctx_enc.e->blocksize;
@@ -1546,69 +1782,10 @@ gnutls_aead_cipher_decryptv2(gnutls_aead_cipher_hd_t handle,
 	uint8_t _tag[MAX_HASH_SIZE];
 
 	if (tag_size == 0)
-		tag_size = _gnutls_cipher_get_tag_size(h->ctx_enc.e);
-	else if (tag_size > (unsigned)_gnutls_cipher_get_tag_size(h->ctx_enc.e)) {
+		tag_size = _gnutls_cipher_get_tag_size(handle->ctx_enc.e);
+	else if (tag_size > (unsigned)_gnutls_cipher_get_tag_size(handle->ctx_enc.e)) {
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-	}
-
-	/* Limitation: this function provides an optimization under the internally registered
-	 * AEAD ciphers. When an AEAD cipher is used registered with gnutls_crypto_register_aead_cipher(),
-	 * then this becomes a convenience function as it missed the lower-level primitives
-	 * necessary for piecemeal encryption. */
-	if ((handle->ctx_enc.e->flags & GNUTLS_CIPHER_FLAG_ONLY_AEAD) || handle->ctx_enc.encrypt == NULL) {
-		/* ciphertext cannot be produced in a piecemeal approach */
-		struct iov_store_st auth;
-		struct iov_store_st ctext;
-		size_t ctext_size;
-
-		ret = copy_from_iov(&auth, auth_iov, auth_iovcnt);
-		if (ret < 0) {
-			_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
-			return gnutls_assert_val(ret);
-		}
-
-		ret = copy_from_iov(&ctext, iov, iovcnt);
-		if (ret < 0) {
-			gnutls_assert();
-			goto fallback_fail;
-		}
-
-		ctext_size = ctext.size;
-
-		/* append tag */
-		ret = iov_store_grow(&ctext, tag_size);
-		if (ret < 0) {
-			gnutls_assert();
-			goto fallback_fail;
-		}
-		memcpy((uint8_t *) ctext.data + ctext_size, tag, tag_size);
-
-		ret = gnutls_aead_cipher_decrypt(handle, nonce, nonce_len,
-						 auth.data, auth.size,
-						 tag_size,
-						 ctext.data, ctext.size,
-						 ctext.data, &ctext_size);
-		if (ret < 0) {
-			gnutls_assert();
-			goto fallback_fail;
-		}
-
-		ret = copy_to_iov(&ctext, ctext_size, iov, iovcnt);
-		if (ret < 0) {
-			gnutls_assert();
-			goto fallback_fail;
-		}
-
-	fallback_fail:
-		iov_store_free(&auth);
-		iov_store_free(&ctext);
-
-		if (ret < 0) {
-			_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
-		}
-		/* FIPS operation state is set by gnutls_aead_cipher_decrypt */
-		return ret;
 	}
 
 	ret = _gnutls_cipher_setiv(&handle->ctx_enc, nonce, nonce_len);
@@ -1675,6 +1852,52 @@ gnutls_aead_cipher_decryptv2(gnutls_aead_cipher_hd_t handle,
 
 	_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_APPROVED);
 	return 0;
+}
+
+/**
+ * gnutls_aead_cipher_decryptv2:
+ * @handle: is a #gnutls_aead_cipher_hd_t type.
+ * @nonce: the nonce to set
+ * @nonce_len: The length of the nonce
+ * @auth_iov: additional data to be authenticated
+ * @auth_iovcnt: The number of buffers in @auth_iov
+ * @iov: the data to decrypt
+ * @iovcnt: The number of buffers in @iov
+ * @tag: The authentication tag
+ * @tag_size: The size of the tag to use (use zero for the default)
+ *
+ * This is similar to gnutls_aead_cipher_decrypt(), but it performs
+ * in-place encryption on the provided data buffers.
+ *
+ * Returns: Zero or a negative error code on error.
+ *
+ * Since: 3.6.10
+ **/
+int
+gnutls_aead_cipher_decryptv2(gnutls_aead_cipher_hd_t handle,
+			     const void *nonce, size_t nonce_len,
+			     const giovec_t *auth_iov, int auth_iovcnt,
+			     const giovec_t *iov, int iovcnt,
+			     void *tag, size_t tag_size)
+{
+	/* Limitation: this function provides an optimization under the internally registered
+	 * AEAD ciphers. When an AEAD cipher is used registered with gnutls_crypto_register_aead_cipher(),
+	 * then this becomes a convenience function as it missed the lower-level primitives
+	 * necessary for piecemeal encryption. */
+	if ((handle->ctx_enc.e->flags & GNUTLS_CIPHER_FLAG_ONLY_AEAD) ||
+	    handle->ctx_enc.encrypt == NULL) {
+		return aead_cipher_decryptv2_fallback(handle,
+						      nonce, nonce_len,
+						      auth_iov, auth_iovcnt,
+						      iov, iovcnt,
+						      tag, tag_size);
+	} else {
+		return aead_cipher_decryptv2(handle,
+					     nonce, nonce_len,
+					     auth_iov, auth_iovcnt,
+					     iov, iovcnt,
+					     tag, tag_size);
+	}
 }
 
 /**
