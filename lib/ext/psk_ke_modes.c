@@ -172,14 +172,14 @@ psk_ke_modes_recv_params(gnutls_session_t session,
 	}
 
 	if (session->internals.priorities->server_precedence) {
-		if (dhpsk_pos != MAX_POS && cli_dhpsk_pos != MAX_POS && dhpsk_pos < psk_pos)
+		if (dhpsk_pos != MAX_POS && cli_dhpsk_pos != MAX_POS && (dhpsk_pos < psk_pos || cli_psk_pos == MAX_POS))
 			session->internals.hsk_flags |= HSK_PSK_KE_MODE_DHE_PSK;
-		else if (psk_pos != MAX_POS && cli_psk_pos != MAX_POS && psk_pos < dhpsk_pos)
+		else if (psk_pos != MAX_POS && cli_psk_pos != MAX_POS && (psk_pos < dhpsk_pos || cli_dhpsk_pos == MAX_POS))
 			session->internals.hsk_flags |= HSK_PSK_KE_MODE_PSK;
 	} else {
-		if (dhpsk_pos != MAX_POS && cli_dhpsk_pos != MAX_POS && cli_dhpsk_pos < cli_psk_pos)
+		if (dhpsk_pos != MAX_POS && cli_dhpsk_pos != MAX_POS && (cli_dhpsk_pos < cli_psk_pos || psk_pos == MAX_POS))
 			session->internals.hsk_flags |= HSK_PSK_KE_MODE_DHE_PSK;
-		else if (psk_pos != MAX_POS && cli_psk_pos != MAX_POS && cli_psk_pos < cli_dhpsk_pos)
+		else if (psk_pos != MAX_POS && cli_psk_pos != MAX_POS && (cli_psk_pos < cli_dhpsk_pos || dhpsk_pos == MAX_POS))
 			session->internals.hsk_flags |= HSK_PSK_KE_MODE_PSK;
 	}
 
