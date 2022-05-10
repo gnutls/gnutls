@@ -10,6 +10,9 @@ See the end for copying conditions.
 ** libgnutls: gnutls_hkdf_expand now only accepts LENGTH argument less than or
    equal to 255 times hash digest size, to comply with RFC 5869 2.3.
 
+** libgnutls: Length limit for TLS PSK usernames has been increased
+   from 128 to 65535 characters (#1323).
+
 ** API and ABI modifications:
 gnutls_fips140_run_self_tests: New function
 

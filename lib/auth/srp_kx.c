@@ -119,10 +119,9 @@ _gnutls_gen_srp_server_kx(gnutls_session_t session,
 			  gnutls_buffer_st * data)
 {
 	int ret;
-	char *username;
 	SRP_PWD_ENTRY *pwd_entry;
 	srp_server_auth_info_t info;
-	size_t tmp_size;
+	size_t tmp_size, username_length;
 	gnutls_ext_priv_data_t epriv;
 	srp_ext_st *priv;
 	unsigned init_pos;
@@ -148,12 +147,16 @@ _gnutls_gen_srp_server_kx(gnutls_session_t session,
 	if (info == NULL)
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-	username = info->username;
+	username_length = strlen(priv->username);
+	if (username_length > MAX_USERNAME_SIZE)
+		return gnutls_assert_val(GNUTLS_E_ILLEGAL_SRP_USERNAME);
 
-	_gnutls_str_cpy(username, MAX_USERNAME_SIZE, priv->username);
+	gnutls_free(info->username);
+	info->username = gnutls_strdup(priv->username);
+	if (info->username == NULL)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-	ret = _gnutls_srp_pwd_read_entry(session, username, &pwd_entry);
-
+	ret = _gnutls_srp_pwd_read_entry(session, priv->username, &pwd_entry);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;

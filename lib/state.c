@@ -691,6 +691,7 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 	(*session)->internals.pull_func = system_read;
 	(*session)->internals.errno_func = system_errno;
 
+	(*session)->internals.saved_username = NULL;
 	(*session)->internals.saved_username_size = -1;
 
 	/* heartbeat timeouts */
@@ -782,6 +783,7 @@ void gnutls_deinit(gnutls_session_t session)
 	gnutls_free(session->internals.rexts);
 	gnutls_free(session->internals.post_handshake_cr_context.data);
 
+	gnutls_free(session->internals.saved_username);
 	gnutls_free(session->internals.rsup);
 
 	gnutls_credentials_clear(session);

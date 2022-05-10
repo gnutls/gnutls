@@ -544,13 +544,7 @@ const char *gnutls_psk_client_get_hint(gnutls_session_t session)
 	CHECK_AUTH_TYPE(GNUTLS_CRD_PSK, NULL);
 
 	info = _gnutls_get_auth_info(session, GNUTLS_CRD_PSK);
-	if (info == NULL)
-		return NULL;
-
-	if (info->hint[0] != 0)
-		return info->hint;
-
-	return NULL;
+	return info ? info->hint : NULL;
 }
 
 /**

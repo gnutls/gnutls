@@ -392,7 +392,12 @@ client_send_params(gnutls_session_t session,
 		info = _gnutls_get_auth_info(session, GNUTLS_CRD_PSK);
 		assert(info != NULL);
 
-		_gnutls_copy_psk_username(info, &username);
+		ret = _gnutls_copy_psk_username(info, username);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
 
 		if ((ret = _gnutls_buffer_append_data_prefix(extdata, 16,
 							     username.data,
@@ -674,7 +679,7 @@ static int server_recv_params(gnutls_session_t session,
 	/* save the username in psk_auth_info to make it available
 	 * using gnutls_psk_server_get_username() */
 	if (!resuming) {
-		assert(psk.identity.size < sizeof(info->username));
+		assert(psk.identity.size <= MAX_USERNAME_SIZE);
 
 		ret = _gnutls_auth_info_init(session, GNUTLS_CRD_PSK, sizeof(psk_auth_info_st), 1);
 		if (ret < 0) {
@@ -685,7 +690,12 @@ static int server_recv_params(gnutls_session_t session,
 		info = _gnutls_get_auth_info(session, GNUTLS_CRD_PSK);
 		assert(info != NULL);
 
-		_gnutls_copy_psk_username(info, &psk.identity);
+		ret = _gnutls_copy_psk_username(info, psk.identity);
+		if (ret < 0) {
+			gnutls_assert();
+			goto fail;
+		}
+
 		_gnutls_handshake_log("EXT[%p]: selected PSK identity: %s (%d)\n", session, info->username, psk_index);
 
 		/* We currently only support early data in resuming connection,

@@ -108,7 +108,10 @@ typedef int ssize_t;
 
 #define MAX_CIPHER_IV_SIZE 16
 
-#define MAX_USERNAME_SIZE 128
+/* Maximum size of 2^16-1 has been chosen so that usernames can hold
+ * PSK identities as defined in RFC 4279 section 2 and RFC 8446 section 4.2.11
+ */
+#define MAX_USERNAME_SIZE 65535
 #define MAX_SERVER_NAME_SIZE 256
 
 #define AEAD_EXPLICIT_DATA_SIZE 8
@@ -1446,7 +1449,10 @@ typedef struct {
 	bool cert_hash_set;
 
 	/* The saved username from PSK or SRP auth */
-	char saved_username[MAX_USERNAME_SIZE+1];
+	char *saved_username;
+	/* Length of the saved username without the NULL terminating byte.
+	 * Must be set to -1 when saved username is NULL
+	 */
 	int saved_username_size;
 
 	/* Needed for TCP Fast Open (TFO), set by gnutls_transport_set_fastopen() */

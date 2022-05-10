@@ -75,17 +75,27 @@ int _gnutls_check_id_for_change(gnutls_session_t session)
 		if (username == NULL)
 			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-		if (session->internals.saved_username_size != -1) {
+		if (session->internals.saved_username &&
+		    session->internals.saved_username_size != -1) {
 			if (session->internals.saved_username_size == username_length &&
-			    strncmp(session->internals.saved_username, username, username_length) != 0) {
+			    strncmp(session->internals.saved_username, username, username_length)) {
 				_gnutls_debug_log("Session's PSK username changed during rehandshake; aborting!\n");
 				return gnutls_assert_val(GNUTLS_E_SESSION_USER_ID_CHANGED);
 			}
-		} else {
-			memcpy(session->internals.saved_username, username, username_length);
-			session->internals.saved_username[username_length] = 0;
+		} else if (session->internals.saved_username == NULL &&
+			   session->internals.saved_username_size == -1) {
+			if (username_length > MAX_USERNAME_SIZE)
+				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+			char *tmp = gnutls_malloc(username_length + 1);
+			if (tmp == NULL)
+				return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+			memcpy(tmp, username, username_length);
+			tmp[username_length] = '\0';
+			session->internals.saved_username = tmp;
 			session->internals.saved_username_size = username_length;
-		}
+		} else
+			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
 	}
 
 	return 0;

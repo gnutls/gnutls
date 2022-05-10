@@ -73,11 +73,6 @@ _gnutls_srp_recv_params(gnutls_session_t session, const uint8_t * data,
 			len = data[0];
 			DECR_LEN(data_size, len);
 
-			if (MAX_USERNAME_SIZE < len) {
-				gnutls_assert();
-				return GNUTLS_E_ILLEGAL_SRP_USERNAME;
-			}
-
 			priv = gnutls_calloc(1, sizeof(*priv));
 			if (priv == NULL) {
 				gnutls_assert();

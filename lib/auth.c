@@ -28,6 +28,7 @@
 #include "algorithms.h"
 #include <auth/cert.h>
 #include <auth/psk.h>
+#include <auth/srp_kx.h>
 #include <auth/anon.h>
 #include <datum.h>
 
@@ -327,6 +328,16 @@ void _gnutls_free_auth_info(gnutls_session_t session)
 
 	switch (session->key.auth_info_type) {
 	case GNUTLS_CRD_SRP:
+		{
+			srp_server_auth_info_t info =
+			    _gnutls_get_auth_info(session, GNUTLS_CRD_SRP);
+
+			if (info == NULL)
+				break;
+
+			gnutls_free(info->username);
+			info->username = NULL;
+		}
 		break;
 #ifdef ENABLE_ANON
 	case GNUTLS_CRD_ANON:
@@ -349,6 +360,14 @@ void _gnutls_free_auth_info(gnutls_session_t session)
 
 			if (info == NULL)
 				break;
+
+			gnutls_free(info->username);
+			info->username = NULL;
+			info->username_len = 0;
+
+			gnutls_free(info->hint);
+			info->hint = NULL;
+			info->hint_len = 0;
 
 #ifdef ENABLE_DHE
 			dh_info = &info->dh;
