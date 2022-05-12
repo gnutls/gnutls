@@ -5,7 +5,7 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version ?.?.? (released ????-??-??)
+* Version 3.7.5 (released 2022-05-15)
 
 ** libgnutls: The GNUTLS_NO_TICKETS_TLS12 flag and %NO_TICKETS_TLS12 priority
    modifier have been added to disable session ticket usage in TLS 1.2 because
@@ -39,6 +39,9 @@ See the end for copying conditions.
    (gnutls_aead_cipher_encryptv2) has been extended to support AES-SIV-CMAC.
    For further optimization, new function (gnutls_aead_cipher_set_key) has been
    added to set key on the existing AEAD handle without re-allocation.
+
+** libgnutls: HKDF and AES-GCM algorithms are now approved in FIPS-140 mode
+   when used in TLS (#1311).
 
 ** The configure arguments for Brotli and Zstandard (zstd) support
    have changed to reflect the previous help text: they are now
