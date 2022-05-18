@@ -23,20 +23,22 @@
                          "-e", "check if server accepts minimal size in TLS 1.0",
                          "-e", "check if server accepts minimal size in TLS 1.1",
                          "-e", "check if server accepts minimal size in TLS 1.2",
-                         "-e", "check interaction with sha256 prf",
-                         "-e", "check interaction with sha384 prf",
+                         "-x", "check interaction with sha256 prf",
+                         "-X", "Unexpected message from peer: Alert(fatal, handshake_failure)",
                          "-e", "check server sent size in TLS 1.0",
                          "-e", "check server sent size in TLS 1.1",
                          "-e", "check server sent size in TLS 1.2",
                          "-e", "drop extension in TLS 1.2 resumption",
-                         "-e", "modified extension in 2nd CH in HRR handshake",
-                         "-e", "renegotiation with changed limit",
+                         "-x", "modified extension in 2nd CH in HRR handshake",
+                         "-X", "Unexpected message from peer: Handshake(server_hello)",
                          "-e", "renegotiation with dropped extension",
-                         "-e", "added extension in 2nd CH in HRR handshake",
+                         "-x", "added extension in 2nd CH in HRR handshake",
+                         "-X", "Unexpected message from peer: Handshake(server_hello)",
                          "-e", "check server sent size in TLS 1.0 with max_fragment_length",
                          "-e", "check server sent size in TLS 1.1 with max_fragment_length",
                          "-e", "check server sent size in TLS 1.2 with max_fragment_length",
-                         "-e", "removed extension in 2nd CH in HRR handshake"] }
+                         "-x", "removed extension in 2nd CH in HRR handshake",
+                         "-X", "Unexpected message from peer: Handshake(server_hello)"] }
      ]
     }
 ]

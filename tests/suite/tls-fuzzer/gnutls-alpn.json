@@ -12,12 +12,17 @@
      "server_port": @PORT@,
      "tests" : [
 	 {"name" : "test-alpn-negotiation.py",
-          "comment" : "we do not not fail when ALPN name changes on resumption",
-          "comment" : "we do not not parse all objects when a match is found",
-          "arguments" : ["-e", "overflow length of last item",
-          "-e", "resumption with alpn change",
-          "-e", "underflow length of protocol_name_list",
-          "-p", "@PORT@"]}
+          "comment1" : "we do not not fail when ALPN name changes on resumption",
+          "comment2" : "we do not not parse all objects when a match is found",
+          "arguments" : [
+              "-x", "overflow length of last item",
+              "-X", "Unexpected message from peer: Handshake(server_hello)",
+              "-x", "resumption with alpn change",
+              "-X", "Unexpected message from peer: Alert(fatal, no_application_protocol)",
+              "-x", "underflow length of protocol_name_list",
+              "-X", "Unexpected message from peer: Handshake(server_hello)",
+              "-p", "@PORT@"
+          ]}
      ]
     }
 ]
