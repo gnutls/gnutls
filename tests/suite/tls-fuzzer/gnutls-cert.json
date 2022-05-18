@@ -15,7 +15,6 @@
           "comment" : "tlsfuzzer doesn't like our set of algorithms (e.g., ed25519)",
           "arguments" : ["-k", "tests/clientX509Key.pem",
                          "-c", "tests/clientX509Cert.pem",
-                         "-n", "10",
                          "-e", "check sigalgs in cert request",
 	                 "-p", "@PORT@"]},
 	 {"name" : "test-tls13-ecdsa-in-certificate-verify.py",
@@ -24,7 +23,6 @@
           "comment" : "tlsfuzzer doesn't like our set of algorithms (e.g., ed25519)",
           "arguments" : ["-k", "tests/serverECKey.pem",
                          "-c", "tests/serverECCert.pem",
-                         "-n", "10",
                          "-e", "check sigalgs in cert request",
 	                 "-p", "@PORT@"]},
          {"name": "test-rsa-sigs-on-certificate-verify.py",
@@ -73,7 +71,6 @@
                          "-c", "tests/clientX509Cert.pem",
                          "-e", "check CertificateRequest sigalgs",
                          "--illegpar",
-                         "-n", "100",
                          "-p", "@PORT@"]
           },
          {"name" : "test-rsa-pss-sigs-on-certificate-verify.py",
@@ -82,7 +79,6 @@
                          "-c", "tests/clientRSAPSSCert.pem",
                          "-e", "check CertificateRequest sigalgs",
                          "--illegpar",
-                         "-n", "100",
                          "-p", "@PORT@"]
           },
          {"name": "test-certificate-malformed.py",
