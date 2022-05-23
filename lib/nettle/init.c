@@ -94,42 +94,32 @@ static void gnutls_free_zero(void *data, size_t size)
  -*/
 static void *gnutls_realloc_zero(void *data, size_t old_size, size_t new_size)
 {
-	void *newptr = NULL;
+	void *p;
 
-	/* mini-gmp always passes old_size of 0 */
-	if (old_size == 0) {
-		newptr = realloc(data, new_size);
-		if (newptr == NULL)
+	if (data == NULL || old_size == 0) {
+		p = realloc(data, new_size);
+		if (p == NULL)
 			abort();
-		return newptr;
+		return p;
 	}
 
-	if (data == NULL) {
-		newptr = malloc(new_size);
-		if (newptr == NULL)
-			abort();
-		return newptr;
+	if (new_size == 0) {
+		explicit_bzero(data, old_size);
+		free(data);
+		return NULL;
 	}
 
-	if (new_size == 0)
-		goto done;
+	if (old_size == new_size)
+		return data;
 
-	if (new_size <= old_size) {
-		size_t d = old_size - new_size;
-		/* Don't bother reallocating */
-		if (d < old_size / 2) {
-			explicit_bzero((char *)data + new_size, d);
-			return data;
-		}
-	}
-
-	newptr = malloc(new_size);
-	if (newptr == NULL)
+	p = malloc(new_size);
+	if (p == NULL) {
+		explicit_bzero(data, old_size);
 		abort();
-
-	memcpy(newptr, data, old_size);
- done:
+	}
+	memcpy(p, data, MIN(old_size, new_size));
 	explicit_bzero(data, old_size);
 	free(data);
-	return newptr;
+
+	return p;
 }
