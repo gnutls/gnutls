@@ -17,25 +17,30 @@
    the documentation (not only the library docs but also the Guile binding
    docs) to be generated. See the `doc-dist.Fedora` job in
    [.gitlab-ci.yml](.gitlab-ci.yml), which does the same thing in the CI:
-```console
-# Install necesarry packages for documentation and Guile bindings, set
-# environment variables such as GUILE, GUILD, and guile_snarf, and then:
-make distcheck
-```
+   ```console
+   # Install necesarry packages for documentation and Guile bindings, set
+   # environment variables such as GUILE, GUILD, and guile_snarf, and then:
+   make distcheck
+   ```
 1. Create a detached GPG signature:
-```console
-gpg --detach-sign --user your-key-id gnutls-$VERSION.tar.xz
-```
+   ```console
+   gpg --detach-sign --user your-key-id gnutls-$VERSION.tar.xz
+   ```
 1. Create a git tag and push it: use [git-evtag] if possible; at least use
    GPG-signed tag:
-```console
-git tag -s $VERSION
-git push --atomic origin $VERSION
-```
+   ```console
+   git tag -s $VERSION
+   git push --atomic origin $VERSION
+   ```
 1. Upload the tarball and the signature to ftp.gnupg.org:
-```console
-scp gnutls-$VERSION.tar.xz* ftp.gnupg.org:/home/ftp/gcrypt/gnutls/v$(expr $VERSION : '\([0-9]*\.[0-9]*\)')/
-```
+   ```console
+   scp gnutls-$VERSION.tar.xz* ftp.gnupg.org:/home/ftp/gcrypt/gnutls/v$(expr $VERSION : '\([0-9]*\.[0-9]*\)')/
+   ```
+1. Download `mingw32/archive` artifact for new release from [CI/CD jobs].
+   Rename downloaded zip file to `gnutls-$VERSION-w32.zip`.
+   Create a detached GPG signature.
+   Upload zip and signature files to ftp.gnupg.org.
+   Do the same analogically for `mingw64/archive`.
 1. Create and send announcement email based on previously sent email
    to the list and [NEWS](NEWS) file.
 1. Create a [NEWS entry] and/or a [security advisory entry] at
@@ -51,3 +56,4 @@ scp gnutls-$VERSION.tar.xz* ftp.gnupg.org:/home/ftp/gcrypt/gnutls/v$(expr $VERSI
 [web-pages repository]: https://gitlab.com/gnutls/web-pages/
 [gnutls web site]: https://gnutls.gitlab.io/web-pages/
 [git-evtag]: https://github.com/cgwalters/git-evtag
+[CI/CD jobs]: https://gitlab.com/gnutls/gnutls/-/jobs
