@@ -60,7 +60,7 @@ DISTCLEANFILES = $(pkgconfig_DATA)
 if HAVE_LD_OUTPUT_DEF
 libgnutls_dane_la_LDFLAGS += \
 	-Wl,--output-def,libgnutls-dane-$(DLL_VERSION).def
-libgnutls_dane-$(DLL_VERSION).def: libgnutls-dane.la
+libgnutls-dane-$(DLL_VERSION).def: libgnutls-dane.la
 
 defexecdir = $(bindir)
 defexec_DATA = libgnutls-dane-$(DLL_VERSION).def
