@@ -5,6 +5,16 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.7.6 (released 2022-05-27)
+
+** libgnutls: Fixed invalid write when gnutls_realloc_zero()
+   is called with new_size < old_size. This bug caused heap
+   corruption when gnutls_realloc_zero() has been set as gmp
+   reallocfunc (!1592, #1367, #1368, #1369).
+
+** API and ABI modifications:
+No changes since last version.
+
 * Version 3.7.5 (released 2022-05-15)
 
 ** libgnutls: The GNUTLS_NO_TICKETS_TLS12 flag and %NO_TICKETS_TLS12 priority
