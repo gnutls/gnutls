@@ -594,12 +594,7 @@ noinst_PROGRAMS = datefudge-check
 endif
 
 check_PROGRAMS = $(cpptests) $(ctests) $(indirect_tests)
-TESTS = $(cpptests) $(ctests)
-
-# Temporary solution, avoid script execution on windows
-if !WINDOWS
-TESTS += $(dist_check_SCRIPTS)
-endif
+TESTS = $(cpptests) $(ctests) $(dist_check_SCRIPTS)
 
 TESTS_ENVIRONMENT +=						\
 	CC="$(CC)"						\

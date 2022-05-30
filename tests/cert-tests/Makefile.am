@@ -146,10 +146,7 @@ endif
 
 dist_check_SCRIPTS += certtool-rsa-pss.sh certtool-eddsa.sh
 
-# temporary solution, avoid script execution on windows
-if !WINDOWS
 TESTS = $(dist_check_SCRIPTS)
-endif
 
 # Set detect_leaks=0 to ASAN. It seems it is detecting many leaks in tools
 # which are not trivial, and makes no point to address.
