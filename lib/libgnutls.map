@@ -1399,6 +1399,14 @@ GNUTLS_3_7_5
 	*;
 } GNUTLS_3_7_4;
 
+GNUTLS_3_7_7
+{
+ global:
+	gnutls_fips140_run_self_tests;
+ local:
+	*;
+} GNUTLS_3_7_5;
+
 GNUTLS_FIPS140_3_4 {
   global:
 	gnutls_cipher_self_test;

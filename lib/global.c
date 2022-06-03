@@ -336,9 +336,12 @@ static int _gnutls_global_init(unsigned constructor)
 
 		/* first round of self checks, these are done on the
 		 * nettle algorithms which are used internally */
+		_gnutls_switch_lib_state(LIB_STATE_SELFTEST);
 		ret = _gnutls_fips_perform_self_checks1();
-		if (res != 2) {
-			if (ret < 0) {
+		if (ret < 0) {
+			_gnutls_switch_lib_state(LIB_STATE_ERROR);
+			_gnutls_audit_log(NULL, "FIPS140-2 self testing part1 failed\n");
+			if (res != 2) {
 				gnutls_assert();
 				goto out;
 			}
@@ -355,9 +358,12 @@ static int _gnutls_global_init(unsigned constructor)
 	 * (e.g., AESNI overridden AES). They are after _gnutls_register_accel_crypto()
 	 * intentionally */
 	if (res != 0) {
+		_gnutls_switch_lib_state(LIB_STATE_SELFTEST);
 		ret = _gnutls_fips_perform_self_checks2();
-		if (res != 2) {
-			if (ret < 0) {
+		if (ret < 0) {
+			_gnutls_switch_lib_state(LIB_STATE_ERROR);
+			_gnutls_audit_log(NULL, "FIPS140-2 self testing part 2 failed\n");
+			if (res != 2) {
 				gnutls_assert();
 				goto out;
 			}

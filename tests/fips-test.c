@@ -525,6 +525,13 @@ void doit(void)
 	}
 
 	gnutls_fips140_context_deinit(fips_context);
+
+	/* run self-tests manually */
+	ret = gnutls_fips140_run_self_tests();
+	if (ret < 0) {
+		fail("gnutls_fips140_run_self_tests failed\n");
+	}
+
 	gnutls_global_deinit();
 	return;
 }
