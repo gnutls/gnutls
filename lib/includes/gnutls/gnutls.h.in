@@ -3416,6 +3416,8 @@ gnutls_fips140_get_operation_state(gnutls_fips140_context_t context);
 int gnutls_fips140_push_context(gnutls_fips140_context_t context);
 int gnutls_fips140_pop_context(void);
 
+int gnutls_fips140_run_self_tests(void);
+
   /* Gnutls error codes. The mapping to a TLS alert is also shown in
    * comments.
    */

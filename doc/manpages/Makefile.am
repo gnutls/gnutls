@@ -380,6 +380,7 @@ APIMANS += gnutls_fips140_get_operation_state.3
 APIMANS += gnutls_fips140_mode_enabled.3
 APIMANS += gnutls_fips140_pop_context.3
 APIMANS += gnutls_fips140_push_context.3
+APIMANS += gnutls_fips140_run_self_tests.3
 APIMANS += gnutls_fips140_set_mode.3
 APIMANS += gnutls_get_library_config.3
 APIMANS += gnutls_get_system_config_file.3
