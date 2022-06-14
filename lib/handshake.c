@@ -2815,7 +2815,7 @@ int gnutls_handshake(gnutls_session_t session)
 
 	session->internals.ktls_enabled = 0;
 #ifdef ENABLE_KTLS
-	if (_gnutls_config_is_ktls_disabled() == false)
+	if (_gnutls_config_is_ktls_enabled() == true)
 		_gnutls_ktls_enable(session);
 #endif
 

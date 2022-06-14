@@ -26,7 +26,7 @@ used can be queried using @funcref{gnutls_get_system_config_file}.
 * Querying for disabled algorithms and protocols::
 * Overriding the parameter verification profile::
 * Overriding the default priority string::
-* Disabling system/acceleration protocols::
+* Enabling/Disabling system/acceleration protocols::
 @end menu
 
 @node Application-specific priority strings
@@ -253,16 +253,14 @@ default-priority-string = SECURE128:-VERS-TLS-ALL:+VERS-TLS1.3
 @end example
 
 
-@node Disabling system/acceleration protocols
-@section Disabling system/acceleration protocols
-When system/acceleration protocol is enabled during build, it is usually
-enabled by default. The following options can overwrite this behavior
-system-wide.
+@node Enabling/Disabling system/acceleration protocols
+@section Enabling/Disabling system/acceleration protocols
+The following options can overwrite default behavior of protocols system-wide.
 @example
 [global]
-ktls = false
+ktls = true
 
 @end example
-@subsection Disabling KTLS
-When GnuTLS is build with -–enable-ktls configuration, it uses KTLS by default.
-This can be overwritten by setting @code{ktls = false} in @code{[global]} section.
+@subsection Enabling KTLS
+When GnuTLS is build with -–enable-ktls configuration, KTLS is disabled by default.
+This can be enabled by setting @code{ktls = true} in @code{[global]} section.
