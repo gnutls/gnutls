@@ -1027,7 +1027,7 @@ static void dummy_func(gnutls_priority_t c)
 
 struct cfg {
 	bool allowlisting;
-	bool ktls_disabled;
+	bool ktls_enabled;
 
 	name_val_array_t priority_strings;
 	char *priority_string;
@@ -1140,7 +1140,7 @@ cfg_steal(struct cfg *dst, struct cfg *src)
 	src->default_priority_string = NULL;
 
 	dst->allowlisting = src->allowlisting;
-	dst->ktls_disabled = src->ktls_disabled;
+	dst->ktls_enabled = src->ktls_enabled;
 	memcpy(dst->ciphers, src->ciphers, sizeof(src->ciphers));
 	memcpy(dst->macs, src->macs, sizeof(src->macs));
 	memcpy(dst->groups, src->groups, sizeof(src->groups));
@@ -1268,8 +1268,8 @@ static int global_ini_handler(void *ctx, const char *section, const char *name, 
 			}
 		} else if (c_strcasecmp(name, "ktls") == 0) {
 			p = clear_spaces(value, str);
-			if (c_strcasecmp(p, "false") == 0) {
-				cfg->ktls_disabled = true;
+			if (c_strcasecmp(p, "true") == 0) {
+				cfg->ktls_enabled = true;
 			} else {
 				_gnutls_debug_log("cfg: unknown ktls mode %s\n",
 					p);
@@ -3490,6 +3490,6 @@ gnutls_priority_string_list(unsigned iter, unsigned int flags)
 	return NULL;
 }
 
-bool _gnutls_config_is_ktls_disabled(void){
-	return system_wide_config.ktls_disabled;
+bool _gnutls_config_is_ktls_enabled(void){
+	return system_wide_config.ktls_enabled;
 }
