@@ -60,7 +60,7 @@ Debian/Ubuntu:
 ```
 apt-get install -y dash git-core autoconf libtool gettext autopoint
 apt-get install -y automake python3 nettle-dev libp11-kit-dev libtspi-dev libunistring-dev
-apt-get install -y guile-2.2-dev libtasn1-6-dev libidn2-0-dev gawk gperf
+apt-get install -y guile-2.2-dev libtasn1-bin libtasn1-6-dev libidn2-0-dev gawk gperf
 apt-get install -y libtss2-dev libunbound-dev dns-root-data bison gtk-doc-tools
 apt-get install -y texinfo texlive texlive-generic-recommended texlive-extra-utils
 ```
