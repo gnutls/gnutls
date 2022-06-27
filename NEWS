@@ -7,6 +7,9 @@ See the end for copying conditions.
 
 * Version 3.7.7 (unreleased)
 
+** libgnutls: gnutls_hkdf_expand now only accepts LENGTH argument less than or
+   equal to 255 times hash digest size, to comply with RFC 5869 2.3.
+
 ** API and ABI modifications:
 gnutls_fips140_run_self_tests: New function
 

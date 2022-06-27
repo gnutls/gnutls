@@ -109,8 +109,15 @@ test_hkdf(gnutls_mac_algorithm_t mac,
 	assert(gnutls_hex_decode2(&hex, &info) >= 0);
 
 	FIPS_PUSH_CONTEXT();
+	assert(gnutls_hkdf_expand(mac, &prk, &info, buf,
+				  gnutls_hmac_get_len(mac) * 256) ==
+	       GNUTLS_E_INVALID_REQUEST);
+	FIPS_POP_CONTEXT(ERROR);
+
+	FIPS_PUSH_CONTEXT();
 	assert(gnutls_hkdf_expand(mac, &prk, &info, buf, length) >= 0);
 	FIPS_POP_CONTEXT(NOT_APPROVED);
+
 	gnutls_free(info.data);
 
 	okm.data = buf;
