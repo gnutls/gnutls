@@ -21,6 +21,7 @@
  */
 
 #include <config.h>
+#include <limits.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -47,6 +48,11 @@ int main(int argc, char **argv)
 #include <unistd.h>
 #include <assert.h>
 #include <utils.h>
+
+#define AES_GCM_ENCRYPT_PLAINTEXT_MAX ((1ULL << 36) - 32)
+#if SIZE_MAX >= AES_GCM_ENCRYPT_PLAINTEXT_MAX
+#define TEST_AES_GCM_ENCRYPT_PLAINTEXT_SIZE 1
+#endif
 
 static void tls_log_func(int level, const char *str)
 {
@@ -401,6 +407,74 @@ static void test_aead_invalid_short_decrypt(int algo)
 	return;
 }
 
+#ifdef TEST_AES_GCM_ENCRYPT_PLAINTEXT_SIZE
+/* Test whether an invalid call to gnutls_cipher_encrypt() with too
+ * long message is caught */
+static void test_aead_invalid_too_long_encrypt(int algo)
+{
+	int ret;
+	gnutls_cipher_hd_t ch;
+	uint8_t key16[64];
+	uint8_t iv16[32];
+	uint8_t data[128];
+	gnutls_datum_t key, iv;
+
+	if (algo != GNUTLS_CIPHER_AES_128_GCM &&
+	    algo != GNUTLS_CIPHER_AES_192_GCM &&
+	    algo != GNUTLS_CIPHER_AES_256_GCM) {
+		return;
+	}
+
+	key.data = key16;
+	key.size = gnutls_cipher_get_key_size(algo);
+	assert(key.size <= sizeof(key16));
+
+	iv.data = iv16;
+	iv.size = gnutls_cipher_get_iv_size(algo);
+	assert(iv.size <= sizeof(iv16));
+
+	memset(iv.data, 0xff, iv.size);
+	memset(key.data, 0xfe, key.size);
+	memset(data, 0xfa, sizeof(data));
+
+	gnutls_global_set_log_function(tls_log_func);
+	if (debug)
+		gnutls_global_set_log_level(4711);
+
+	ret = global_init();
+	if (ret < 0) {
+		fail("Cannot initialize library\n"); /*errcode 1 */
+	}
+
+	ret = gnutls_cipher_init(&ch, algo, &key, &iv);
+	if (ret < 0)
+		fail("gnutls_cipher_init failed\n"); /*errcode 1 */
+
+	/* Test exceeding AES-GCM plaintext limit */
+	ret = gnutls_cipher_encrypt(ch, data, sizeof(data));
+	if (ret < 0)
+		fail("could not encrypt data\n");
+
+	/* A few blocks larger than AES_GCM_ENCRYPT_PLAINTEXT_MAX combined with
+	 * the previous call.  Use NULL for PLAINTEXT so the access to the first
+	 * block always results in page fault (in case the limit is not
+	 * enforced).
+	 */
+	ret = gnutls_cipher_encrypt(ch, NULL, AES_GCM_ENCRYPT_PLAINTEXT_MAX);
+	if (ret >= 0)
+		fail("succeeded in encrypting too long data\n");
+	if (ret != GNUTLS_E_INVALID_REQUEST)
+		fail("wrong kind of error on encrypting too long data,"
+		     "%s instead of GNUTLS_E_INVALID_REQUEST\n",
+		     gnutls_strerror_name(ret));
+
+	gnutls_cipher_deinit(ch);
+
+	gnutls_global_deinit();
+	return;
+}
+#endif
+
 static void check_status(int status)
 {
 	if (WEXITSTATUS(status) != 0 ||
@@ -464,6 +538,11 @@ void start(const char *name, int algo, unsigned aead)
 
 		success("trying %s: test_aead_invalid_short_decrypt\n", name);
 		fork_subtest(test_aead_invalid_short_decrypt, algo);
+
+#if TEST_AES_GCM_ENCRYPT_PLAINTEXT_SIZE
+		success("trying %s: test_aead_invalid_too_long_encrypt\n", name);
+		fork_subtest(test_aead_invalid_too_long_encrypt, algo);
+#endif
 	}
 }
 
