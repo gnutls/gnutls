@@ -411,6 +411,35 @@ fedora-FIPS140-2/test:
   script:
     - GNUTLS_FORCE_FIPS_MODE=1 make -j$CHECKJOBS check
 
+fedora-ktls/build:
+  extends:
+    - .build
+    - .fedora
+  needs:
+    - fedora/bootstrap
+  script:
+    - dash ./configure --disable-gcc-warnings --cache-file $CCACHE_FILE --disable-non-suiteb-curves --enable-ktls --disable-doc --disable-full-test-suite --disable-guile --with-pkcs12-iter-count=10000
+    - make -j$BUILDJOBS
+    # build tests, but don't execute them
+    - make -j$BUILDJOBS check TESTS=""
+
+fedora-ktls/test:
+  extends:
+    - .test
+    - .fedora
+  dependencies:
+    - fedora-ktls/build
+  needs:
+    - fedora-ktls/build
+  script:
+    - |
+      cat > /etc/crypto-policies/local.d/gnutls-ktls.config <<EOF
+      [global]
+      ktls = true
+      EOF
+      update-crypto-policies
+    - make -j$CHECKJOBS check
+
 .fedora-nettle/build:
   extends:
     - .build
