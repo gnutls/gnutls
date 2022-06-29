@@ -743,6 +743,9 @@ gnutls_fips140_get_operation_state(gnutls_fips140_context_t context)
  * The operation state of @context will be reset to
  * %GNUTLS_FIPS140_OP_INITIAL.
  *
+ * This function is no-op if FIPS140 is not compiled in nor enabled
+ * at run-time.
+ *
  * Returns: 0 upon success, a negative error code otherwise
  *
  * Since: 3.7.3
@@ -751,10 +754,12 @@ int
 gnutls_fips140_push_context(gnutls_fips140_context_t context)
 {
 #ifdef ENABLE_FIPS140
-	context->next = _tfips_context;
-	_tfips_context = context;
+	if (_gnutls_fips_mode_enabled() != GNUTLS_FIPS140_DISABLED) {
+		context->next = _tfips_context;
+		_tfips_context = context;
 
-	context->state = GNUTLS_FIPS140_OP_INITIAL;
+		context->state = GNUTLS_FIPS140_OP_INITIAL;
+	}
 	return 0;
 #else
 	return GNUTLS_E_INVALID_REQUEST;
@@ -771,6 +776,9 @@ gnutls_fips140_push_context(gnutls_fips140_context_t context)
  * gnutls_aead_cipher_deinit() is not yet called, it returns an error
  * %GNUTLS_E_INVALID_REQUEST.
  *
+ * This function is no-op if FIPS140 is not compiled in nor enabled
+ * at run-time.
+ *
  * Returns: 0 upon success, a negative error code otherwise
  *
  * Since: 3.7.3
@@ -779,16 +787,20 @@ int
 gnutls_fips140_pop_context(void)
 {
 #ifdef ENABLE_FIPS140
-	if (!_tfips_context) {
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-	}
+	if (_gnutls_fips_mode_enabled() != GNUTLS_FIPS140_DISABLED) {
+		if (!_tfips_context) {
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		}
 
-	_tfips_context = _tfips_context->next;
+		_tfips_context = _tfips_context->next;
+	}
 	return 0;
 #else
 	return GNUTLS_E_INVALID_REQUEST;
 #endif
 }
+
+#ifdef ENABLE_FIPS140
 
 static inline const char *
 operation_state_to_string(gnutls_fips140_operation_state_t state)
@@ -809,49 +821,63 @@ operation_state_to_string(gnutls_fips140_operation_state_t state)
 	}
 }
 
-gnutls_fips140_operation_state_t
-_gnutls_transit_fips_state(gnutls_fips140_operation_state_t current,
-			   gnutls_fips140_operation_state_t next)
-{
-	switch (current) {
-	case GNUTLS_FIPS140_OP_INITIAL:
-		/* initial can be transitioned to any state */
-		_gnutls_debug_log("FIPS140-2 operation mode switched from initial to %s\n",
-				  operation_state_to_string(next));
-		return next;
-	case GNUTLS_FIPS140_OP_APPROVED:
-		/* approved can only be transitioned to not-approved */
-		if (next == GNUTLS_FIPS140_OP_NOT_APPROVED) {
-			_gnutls_debug_log("FIPS140-2 operation mode switched from approved to %s\n",
-					  operation_state_to_string(next));
-			return next;
-		}
-		FALLTHROUGH;
-	default:
-		/* other transitions are prohibited */
-		if (next != current) {
-			_gnutls_debug_log("FIPS140-2 operation mode cannot be switched from %s to %s\n",
-					  operation_state_to_string(current),
-					  operation_state_to_string(next));
-		}
-		return current;
-	}
-}
-
 void
 _gnutls_switch_fips_state(gnutls_fips140_operation_state_t state)
 {
-#ifdef ENABLE_FIPS140
+	gnutls_fips_mode_t mode = _gnutls_fips_mode_enabled();
+	if (mode == GNUTLS_FIPS140_DISABLED) {
+		return;
+	}
+
 	if (!_tfips_context) {
 		_gnutls_debug_log("FIPS140-2 context is not set\n");
 		return;
 	}
-	_tfips_context->state =
-		_gnutls_transit_fips_state(_tfips_context->state, state);
-#else
-	(void)state;
-#endif
+
+	if (_tfips_context->state == state) {
+		return;
+	}
+
+	switch (_tfips_context->state) {
+	case GNUTLS_FIPS140_OP_INITIAL:
+		/* initial can be transitioned to any state */
+		if (mode != GNUTLS_FIPS140_LAX) {
+			_gnutls_audit_log(NULL, "FIPS140-2 operation mode switched from initial to %s\n",
+					  operation_state_to_string(state));
+		}
+		_tfips_context->state = state;
+		break;
+	case GNUTLS_FIPS140_OP_APPROVED:
+		/* approved can only be transitioned to not-approved */
+		if (likely(state == GNUTLS_FIPS140_OP_NOT_APPROVED)) {
+			if (mode != GNUTLS_FIPS140_LAX) {
+				_gnutls_audit_log(NULL, "FIPS140-2 operation mode switched from approved to %s\n",
+						  operation_state_to_string(state));
+			}
+			_tfips_context->state = state;
+			return;
+		}
+		FALLTHROUGH;
+	default:
+		/* other transitions are prohibited */
+		if (mode != GNUTLS_FIPS140_LAX) {
+			_gnutls_audit_log(NULL, "FIPS140-2 operation mode cannot be switched from %s to %s\n",
+					  operation_state_to_string(_tfips_context->state),
+					  operation_state_to_string(state));
+		}
+		break;
+	}
 }
+
+#else
+
+void
+_gnutls_switch_fips_state(gnutls_fips140_operation_state_t state)
+{
+	(void)state;
+}
+
+#endif
 
 /**
  * gnutls_fips140_run_self_tests:

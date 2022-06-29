@@ -41,10 +41,6 @@ typedef enum {
 extern unsigned int _gnutls_lib_state;
 extern gnutls_crypto_rnd_st _gnutls_fips_rnd_ops;
 
-gnutls_fips140_operation_state_t
-_gnutls_transit_fips_state(gnutls_fips140_operation_state_t current,
-			   gnutls_fips140_operation_state_t next);
-
 void _gnutls_switch_fips_state(gnutls_fips140_operation_state_t state);
 
 inline static 
