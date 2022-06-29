@@ -890,6 +890,11 @@ wrap_nettle_hkdf_expand (gnutls_mac_algorithm_t mac,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
+	/* RFC 5869 2.3: L must be <= 255 * HashLen */
+	if (length > ctx.length * 255) {
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
+
 	ctx.set_key(&ctx, keysize, key);
 	hkdf_expand(&ctx.ctx, ctx.update, ctx.digest, ctx.length,
 		    infosize, info, length, output);
