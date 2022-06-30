@@ -84,7 +84,7 @@ static void client(int fd, const char *prio)
 
 	ret = gnutls_transport_is_ktls_enabled(session);
 	if (!(ret & GNUTLS_KTLS_RECV)){
-		fail("client: KTLS was not properly inicialized\n");
+		fail("client: KTLS was not properly initialized\n");
 		goto end;
 	}
 
@@ -208,7 +208,7 @@ static void server(int fd, const char *prio)
 
 	ret = gnutls_transport_is_ktls_enabled(session);
 	if (!(ret & GNUTLS_KTLS_SEND)){
-		fail("server: KTLS was not properly inicialized\n");
+		fail("server: KTLS was not properly initialized\n");
 		goto end;
 	}
 	do {

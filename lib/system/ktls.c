@@ -47,7 +47,7 @@
 gnutls_transport_ktls_enable_flags_t
 gnutls_transport_is_ktls_enabled(gnutls_session_t session){
 	if (unlikely(!session->internals.initial_negotiation_completed)){
-		_gnutls_debug_log("Initial negotiation is not yet complete");
+		_gnutls_debug_log("Initial negotiation is not yet complete\n");
 		return 0;
 	}
 
@@ -57,16 +57,27 @@ gnutls_transport_is_ktls_enabled(gnutls_session_t session){
 void _gnutls_ktls_enable(gnutls_session_t session)
 {
 	int sockin, sockout;
+
 	gnutls_transport_get_int2(session, &sockin, &sockout);
 
-	if (setsockopt(sockin, SOL_TCP, TCP_ULP, "tls", sizeof ("tls")) == 0)
+	if (setsockopt(sockin, SOL_TCP, TCP_ULP, "tls", sizeof ("tls")) == 0) {
 		session->internals.ktls_enabled |= GNUTLS_KTLS_RECV;
+		if (sockin == sockout) {
+			session->internals.ktls_enabled |= GNUTLS_KTLS_SEND;
+		}
+	} else {
+		_gnutls_record_log("Unable to set TCP_ULP for read socket: %d\n",
+				   errno);
+	}
 
 	if (sockin != sockout) {
-		if (setsockopt(sockout, SOL_TCP, TCP_ULP, "tls", sizeof ("tls")) == 0)
+		if (setsockopt(sockout, SOL_TCP, TCP_ULP, "tls", sizeof ("tls")) == 0) {
 			session->internals.ktls_enabled |= GNUTLS_KTLS_SEND;
-	} else
-		session->internals.ktls_enabled |= GNUTLS_KTLS_SEND;
+		} else {
+			_gnutls_record_log("Unable to set TCP_ULP for write socket: %d\n",
+					   errno);
+		}
+	}
 }
 
 int _gnutls_ktls_set_keys(gnutls_session_t session)
