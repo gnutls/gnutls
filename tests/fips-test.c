@@ -427,34 +427,43 @@ void doit(void)
 	rsa_import_keypair(&privkey, &pubkey, "rsa-2432.pem");
 	FIPS_POP_CONTEXT(INITIAL);
 
-	/* Create a signature with SHA256; approved */
+	/* Create a signature with 2432-bit RSA and SHA256; approved */
 	FIPS_PUSH_CONTEXT();
 	ret = gnutls_privkey_sign_data(privkey, GNUTLS_DIG_SHA256, 0,
 				       &data, &signature);
 	if (ret < 0) {
 		fail("gnutls_privkey_sign_data failed\n");
 	}
-	gnutls_free(signature.data);
 	FIPS_POP_CONTEXT(APPROVED);
 
-	/* Create a signature with SHA-1; not approved */
+	/* Verify a signature with 2432-bit RSA and SHA256; approved */
+	FIPS_PUSH_CONTEXT();
+	ret = gnutls_pubkey_verify_data2(pubkey, GNUTLS_SIGN_RSA_SHA256, 0,
+	                                 &data, &signature);
+	if (ret < 0) {
+		fail("gnutls_pubkey_verify_data2 failed\n");
+	}
+	FIPS_POP_CONTEXT(APPROVED);
+	gnutls_free(signature.data);
+
+	/* Create a signature with 2432-bit RSA and SHA-1; not approved */
 	FIPS_PUSH_CONTEXT();
 	ret = gnutls_privkey_sign_data(privkey, GNUTLS_DIG_SHA1, 0,
 				       &data, &signature);
 	if (ret < 0) {
 		fail("gnutls_privkey_sign_data failed\n");
 	}
-	gnutls_free(signature.data);
 	FIPS_POP_CONTEXT(NOT_APPROVED);
 
-	/* Verify a signature created with SHA-1; approved */
+	/* Verify a signature created with 2432-bit RSA and SHA-1; approved */
 	FIPS_PUSH_CONTEXT();
-	ret = gnutls_pubkey_verify_data2(pubkey, GNUTLS_SIGN_RSA_SHA1, 0, &data,
-					 &rsa2342_sha1_sig);
+	ret = gnutls_pubkey_verify_data2(pubkey, GNUTLS_SIGN_RSA_SHA1, 0,
+	                                 &data, &rsa2342_sha1_sig);
 	if (ret < 0) {
 		fail("gnutls_pubkey_verify_data2 failed\n");
 	}
 	FIPS_POP_CONTEXT(APPROVED);
+	gnutls_free(signature.data);
 	gnutls_pubkey_deinit(pubkey);
 	gnutls_privkey_deinit(privkey);
 
@@ -463,15 +472,24 @@ void doit(void)
 	rsa_import_keypair(&privkey, &pubkey, "rsa-512.pem");
 	FIPS_POP_CONTEXT(INITIAL);
 
-	/* Create a signature; not approved */
+	/* Create a signature with 512-bit RSA and SHA256; not approved */
 	FIPS_PUSH_CONTEXT();
 	ret = gnutls_privkey_sign_data(privkey, GNUTLS_DIG_SHA256, 0,
 				       &data, &signature);
 	if (ret < 0) {
 		fail("gnutls_privkey_sign_data failed\n");
 	}
-	gnutls_free(signature.data);
 	FIPS_POP_CONTEXT(NOT_APPROVED);
+
+	/* Verify a signature with 512-bit RSA and SHA256; not approved */
+	FIPS_PUSH_CONTEXT();
+	ret = gnutls_pubkey_verify_data2(pubkey, GNUTLS_SIGN_RSA_SHA256, 0,
+	                                 &data, &signature);
+	if (ret < 0) {
+		fail("gnutls_pubkey_verify_data2 failed\n");
+	}
+	FIPS_POP_CONTEXT(NOT_APPROVED);
+	gnutls_free(signature.data);
 	gnutls_pubkey_deinit(pubkey);
 	gnutls_privkey_deinit(privkey);
 
