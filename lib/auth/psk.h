@@ -26,6 +26,12 @@
 #include <auth.h>
 #include <auth/dh_common.h>
 
+#define _gnutls_copy_psk_username(info, datum) \
+	_gnutls_copy_psk_string(&(info)->username, &(info)->username_len, (datum))
+
+#define _gnutls_copy_psk_hint(info, datum) \
+	_gnutls_copy_psk_string(&(info)->hint, &(info)->hint_len, (datum))
+
 typedef struct gnutls_psk_client_credentials_st {
 	gnutls_datum_t username;
 	gnutls_datum_t key;
@@ -58,23 +64,34 @@ typedef struct gnutls_psk_server_credentials_st {
 	const mac_entry_st *binder_algo;
 } psk_server_cred_st;
 
-/* these structures should not use allocated data */
 typedef struct psk_auth_info_st {
-	char username[MAX_USERNAME_SIZE + 1];
+	char *username;
 	uint16_t username_len;
 	dh_info_st dh;
-	char hint[MAX_USERNAME_SIZE + 1];
+	char *hint;
+	uint16_t hint_len;
 } *psk_auth_info_t;
 
 typedef struct psk_auth_info_st psk_auth_info_st;
 
-inline static
-void _gnutls_copy_psk_username(psk_auth_info_t info, const gnutls_datum_t *username)
+inline static int
+_gnutls_copy_psk_string(char **dest, uint16_t *dest_len, const gnutls_datum_t str)
 {
-	assert(sizeof(info->username) > username->size);
-	memcpy(info->username, username->data, username->size);
-	info->username[username->size] = 0;
-	info->username_len = username->size;
+	char *_tmp;
+
+	assert(MAX_USERNAME_SIZE >= str.size);
+	
+	_tmp = gnutls_malloc(str.size + 1);
+	if (_tmp == NULL)
+		return GNUTLS_E_MEMORY_ERROR;
+	memcpy(_tmp, str.data, str.size);
+	_tmp[str.size] = '\0';
+	
+	gnutls_free(*dest);
+	*dest = _tmp;
+	*dest_len = str.size;
+	
+	return GNUTLS_E_SUCCESS;
 }
 
 #ifdef ENABLE_PSK

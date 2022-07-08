@@ -310,7 +310,9 @@ _gnutls_proc_rsa_psk_client_kx(gnutls_session_t session, uint8_t * data,
 		return GNUTLS_E_ILLEGAL_SRP_USERNAME;
 	}
 
-	_gnutls_copy_psk_username(info, &username);
+	ret = _gnutls_copy_psk_username(info, username);
+	if (ret < 0)
+		gnutls_assert_val(ret);
 
 	/* Adjust data so it points to EncryptedPreMasterSecret */
 	data += username.size + 2;

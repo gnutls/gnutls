@@ -46,9 +46,8 @@ typedef struct gnutls_srp_server_credentials_st {
 	unsigned int fake_salt_length;
 } srp_server_cred_st;
 
-/* these structures should not use allocated data */
 typedef struct srp_server_auth_info_st {
-	char username[MAX_USERNAME_SIZE + 1];
+	char *username;
 } *srp_server_auth_info_t;
 
 #ifdef ENABLE_SRP
