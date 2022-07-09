@@ -457,8 +457,9 @@ void doit(void)
 
 	/* Verify a signature created with 2432-bit RSA and SHA-1; approved */
 	FIPS_PUSH_CONTEXT();
-	ret = gnutls_pubkey_verify_data2(pubkey, GNUTLS_SIGN_RSA_SHA1, 0,
-	                                 &data, &rsa2342_sha1_sig);
+	ret = gnutls_pubkey_verify_data2(pubkey, GNUTLS_SIGN_RSA_SHA1,
+					 GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1, &data,
+					 &rsa2342_sha1_sig);
 	if (ret < 0) {
 		fail("gnutls_pubkey_verify_data2 failed\n");
 	}
@@ -498,6 +499,15 @@ void doit(void)
 	ret = gnutls_rnd(GNUTLS_RND_RANDOM, key16, sizeof(key16));
 	if (ret < 0) {
 		fail("gnutls_rnd failed\n");
+	}
+	FIPS_POP_CONTEXT(APPROVED);
+
+        /* run self-tests manually */
+	FIPS_PUSH_CONTEXT();
+	ret = gnutls_rnd(GNUTLS_RND_RANDOM, key16, sizeof(key16));
+	ret = gnutls_fips140_run_self_tests();
+	if (ret < 0) {
+		fail("gnutls_fips140_run_self_tests failed\n");
 	}
 	FIPS_POP_CONTEXT(APPROVED);
 
@@ -543,12 +553,6 @@ void doit(void)
 	}
 
 	gnutls_fips140_context_deinit(fips_context);
-
-	/* run self-tests manually */
-	ret = gnutls_fips140_run_self_tests();
-	if (ret < 0) {
-		fail("gnutls_fips140_run_self_tests failed\n");
-	}
 
 	gnutls_global_deinit();
 	return;
