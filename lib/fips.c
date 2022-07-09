@@ -902,6 +902,16 @@ gnutls_fips140_run_self_tests(void)
 #ifdef ENABLE_FIPS140
 	int ret;
 	unsigned prev_lib_state;
+	gnutls_fips140_context_t fips_context = NULL;
+
+	/* Save the FIPS context, because self tests change it */
+	if (gnutls_fips140_mode_enabled() != GNUTLS_FIPS140_DISABLED) {
+		if (gnutls_fips140_context_init(&fips_context) < 0 ||
+		    gnutls_fips140_push_context(fips_context) < 0) {
+			gnutls_fips140_context_deinit(fips_context);
+			fips_context = NULL;
+		}
+	}
 
 	/* Temporarily switch to LIB_STATE_SELFTEST as some of the
 	 * algorithms are implemented using special constructs in
@@ -917,6 +927,15 @@ gnutls_fips140_run_self_tests(void)
 	} else {
 		/* Restore the previous library state */
 		_gnutls_switch_lib_state(prev_lib_state);
+	}
+
+	/* Restore the previous FIPS context */
+	if (gnutls_fips140_mode_enabled() != GNUTLS_FIPS140_DISABLED && fips_context) {
+		if (gnutls_fips140_pop_context() < 0) {
+			_gnutls_switch_lib_state(LIB_STATE_ERROR);
+			_gnutls_audit_log(NULL, "FIPS140-2 context restoration failed\n");
+		}
+		gnutls_fips140_context_deinit(fips_context);
 	}
 	return ret;
 #else
