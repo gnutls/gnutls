@@ -1,5 +1,5 @@
 ;;; GnuTLS --- Guile bindings for GnuTLS.
-;;; Copyright (C) 2007-2012, 2014, 2015, 2016, 2019, 2021 Free Software
+;;; Copyright (C) 2007-2012, 2014, 2015, 2016, 2019, 2021-2022 Free Software
 ;;; Foundation, Inc.
 ;;;
 ;;; GnuTLS is free software; you can redistribute it and/or
@@ -513,12 +513,6 @@
            openpgp-certificate-format/raw
            openpgp-certificate-format/base64))
 
-(cond-expand
-  ((not guile-2)                                  ;silly 1.8
-   (define-macro (eval-when foo a b)
-     `(begin ,a ,b)))
-  (else #t))
-
 (eval-when (expand load eval)
   (define %libdir
     (or (getenv "GNUTLS_GUILE_EXTENSION_DIR")
@@ -533,39 +527,34 @@
                         "guile-gnutls-v-2")
                     "scm_init_gnutls")))
 
-(cond-expand
-  ((not guile-2)
-   (define-macro (define-deprecated new)
-     `(define ,new ,(symbol-append '% new))))
-  (else
-   (define-syntax define-deprecated
-     (lambda (s)
-       "Define a deprecated variable or procedure, along these lines:
+(define-syntax define-deprecated
+  (lambda (s)
+    "Define a deprecated variable or procedure, along these lines:
 
   (define-deprecated variable alias)
 
 This defines 'variable' as an alias for 'alias', and emits a warning when
 'variable' is used."
-       (syntax-case s ()
-         ((_ variable)
-          (with-syntax ((alias (datum->syntax
-                                #'variable
-                                (symbol-append
-                                 '% (syntax->datum #'variable)))))
-            #'(define-deprecated variable alias)))
-         ((_ variable alias)
-          (identifier? #'variable)
-          #`(define-syntax variable
-              (lambda (s)
-                (issue-deprecation-warning
-                 (format #f "GnuTLS variable '~a' is deprecated"
-                         (syntax->datum #'variable)))
-                (syntax-case s ()
-                  ((_ args (... ...))
-                   #'(alias args (... ...)))
-                  (id
-                   (identifier? #'id)
-                   #'alias))))))))))
+    (syntax-case s ()
+      ((_ variable)
+       (with-syntax ((alias (datum->syntax
+                             #'variable
+                             (symbol-append
+                              '% (syntax->datum #'variable)))))
+         #'(define-deprecated variable alias)))
+      ((_ variable alias)
+       (identifier? #'variable)
+       #`(define-syntax variable
+           (lambda (s)
+             (issue-deprecation-warning
+              (format #f "GnuTLS variable '~a' is deprecated"
+                      (syntax->datum #'variable)))
+             (syntax-case s ()
+               ((_ args (... ...))
+                #'(alias args (... ...)))
+               (id
+                (identifier? #'id)
+                #'alias))))))))
 
 
 ;; Renaming.

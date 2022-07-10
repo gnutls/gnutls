@@ -848,49 +848,6 @@ static scm_t_port_type *session_record_port_type;
 #define SCM_GNUTLS_SESSION_RECORD_PORT_BUFFER_SIZE 4096
 
 
-#if SCM_MAJOR_VERSION == 1 && SCM_MINOR_VERSION <= 8
-
-/* Mark the session associated with PORT.  */
-static SCM
-mark_session_record_port (SCM port)
-{
-  return (SCM_GNUTLS_SESSION_RECORD_PORT_SESSION (port));
-}
-
-static size_t
-free_session_record_port (SCM port)
-#define FUNC_NAME "free_session_record_port"
-{
-  SCM session;
-  scm_t_port *c_port;
-
-  session = SCM_GNUTLS_SESSION_RECORD_PORT_SESSION (port);
-
-  /* SESSION _can_ be invalid at this point: it can be freed in the same GC
-     cycle as PORT, just before PORT.  Thus, we need to check whether SESSION
-     still points to a session SMOB.  */
-  if (SCM_SMOB_PREDICATE (scm_tc16_gnutls_session, session))
-    {
-      /* SESSION is still valid.  Disassociate PORT from SESSION.  */
-      gnutls_session_t c_session;
-
-      c_session = scm_to_gnutls_session (session, 1, FUNC_NAME);
-      SCM_GNUTLS_SET_SESSION_RECORD_PORT (c_session, SCM_BOOL_F);
-    }
-
-  /* Free the input buffer of PORT.  */
-  c_port = SCM_PTAB_ENTRY (port);
-  scm_gc_free (c_port->read_buf, c_port->read_buf_size,
-               session_record_port_gc_hint);
-
-  return 0;
-}
-
-#undef FUNC_NAME
-
-#endif /* SCM_MAJOR_VERSION == 1 && SCM_MINOR_VERSION <= 8 */
-
-
 #if USING_GUILE_BEFORE_2_2
 
 /* Data passed to `do_fill_port ()'.  */
@@ -1179,14 +1136,6 @@ scm_init_gnutls_session_record_port_type (void)
 #if !USING_GUILE_BEFORE_2_2
   scm_set_port_read_wait_fd (session_record_port_type,
 			     session_record_port_fd);
-#endif
-
-  /* Guile >= 1.9.3 doesn't need a custom mark procedure, and doesn't need a
-     finalizer (since memory associated with the port is automatically
-     reclaimed.)  */
-#if SCM_MAJOR_VERSION == 1 && SCM_MINOR_VERSION <= 8
-  scm_set_port_mark (session_record_port_type, mark_session_record_port);
-  scm_set_port_free (session_record_port_type, free_session_record_port);
 #endif
 }
 
