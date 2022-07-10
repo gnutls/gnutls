@@ -1,6 +1,6 @@
 ## Autoconf macros for working with Guile.
 ##
-##   Copyright (C) 1998,2001, 2006, 2010, 2012, 2013, 2014 Free Software Foundation, Inc.
+##   Copyright (C) 1998,2001, 2006, 2010, 2012, 2013, 2014, 2020 Free Software Foundation, Inc.
 ##
 ## This library is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU Lesser General Public License
@@ -17,7 +17,7 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 ## 02110-1301 USA
 
-# serial 10
+# serial 11
 
 ## Index
 ## -----
@@ -47,8 +47,8 @@
 # for an available version of Guile.
 #
 # By default, this macro will search for the latest stable version of
-# Guile (e.g. 2.2), falling back to the previous stable version
-# (e.g. 2.0) if it is available.  If no guile-@var{VERSION}.pc file is
+# Guile (e.g. 3.0), falling back to the previous stable version
+# (e.g. 2.2) if it is available.  If no guile-@var{VERSION}.pc file is
 # found, an error is signalled.  The found version is stored in
 # @var{GUILE_EFFECTIVE_VERSION}.
 #
@@ -60,8 +60,11 @@
 # @code{AC_SUBST}.
 #
 AC_DEFUN([GUILE_PKG],
- [PKG_PROG_PKG_CONFIG
-  _guile_versions_to_search="m4_default([$1], [2.2 2.0 1.8])"
+ [AC_REQUIRE([PKG_PROG_PKG_CONFIG])
+  if test "x$PKG_CONFIG" = x; then
+    AC_MSG_ERROR([pkg-config is missing, please install it])
+  fi
+  _guile_versions_to_search="m4_default([$1], [3.0 2.2 2.0])"
   if test -n "$GUILE_EFFECTIVE_VERSION"; then
     _guile_tmp=""
     for v in $_guile_versions_to_search; do
@@ -221,7 +224,7 @@ AC_DEFUN([GUILE_SITE_DIR],
 # as well.
 #
 # By default, this macro will search for the latest stable version of
-# Guile (e.g. 2.2). x.y or x.y.z versions can be specified. If an older
+# Guile (e.g. 3.0). x.y or x.y.z versions can be specified. If an older
 # version is found, the macro will signal an error.
 #
 # The effective version of the found @code{guile} is set to
@@ -237,7 +240,7 @@ AC_DEFUN([GUILE_SITE_DIR],
 AC_DEFUN([GUILE_PROGS],
  [_guile_required_version="m4_default([$1], [$GUILE_EFFECTIVE_VERSION])"
   if test -z "$_guile_required_version"; then
-    _guile_required_version=2.2
+    _guile_required_version=3.0
   fi
 
   _guile_candidates=guile
