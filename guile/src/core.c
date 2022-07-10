@@ -925,7 +925,7 @@ do_fill_port (void *data)
       c_port->read_end = c_port->read_buf + result;
       chr = (int) *c_port->read_buf;
     }
-  else if (result == 0)
+  else if (result == 0 || result == GNUTLS_E_PREMATURE_TERMINATION)
     chr = EOF;
   else
     scm_gnutls_error (result, "fill_session_record_port_input");
@@ -1066,8 +1066,11 @@ read_from_session_record_port (SCM port, SCM dst, size_t start, size_t count)
     /* Tell Guile that reading would block.  */
     return (size_t) -1;
 
-  if (EXPECT_FALSE (result < 0))
-    /* FIXME: Silently swallowed! */
+  if (result == GNUTLS_E_PREMATURE_TERMINATION)
+    /* Treat premature termination as EOF instead of throwing an exception
+       that users of the port may not be prepared to handle.  */
+    result = 0;
+  else if (EXPECT_FALSE (result < 0))
     scm_gnutls_error (result, FUNC_NAME);
 
   return result;

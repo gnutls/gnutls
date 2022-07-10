@@ -16,6 +16,18 @@ See the end for copying conditions.
 ** API and ABI modifications:
 gnutls_fips140_run_self_tests: New function
 
+** guile: Session record port treats premature termination as EOF
+
+Previously, a ‘gnutls-error’ exception with the
+‘error/premature-termination’ value would be thrown while reading from a
+session record port when the underlying session was terminated
+prematurely.  This was inconvenient since users of the port may not be
+prepared to handle such an exception.
+
+Reading from the session record port now returns the end-of-file object
+instead of throwing an exception, just like it would for a proper
+session termination.
+
 * Version 3.7.6 (released 2022-05-27)
 
 ** libgnutls: Fixed invalid write when gnutls_realloc_zero()
