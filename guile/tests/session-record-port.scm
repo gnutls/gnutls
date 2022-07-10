@@ -1,5 +1,5 @@
 ;;; GnuTLS --- Guile bindings for GnuTLS.
-;;; Copyright (C) 2007-2012, 2014, 2016 Free Software Foundation, Inc.
+;;; Copyright (C) 2007-2012, 2014, 2016, 2022 Free Software Foundation, Inc.
 ;;;
 ;;; GnuTLS is free software; you can redistribute it and/or
 ;;; modify it under the terms of the GNU Lesser General Public
@@ -60,7 +60,7 @@
      (for-each session-record-port sessions)
      (gc)(gc)(gc))
 
-   ;; Stress the GC.  The session associated to each port in PORTS should
+   ;; Stress the GC.  The session associated with each port in PORTS should
    ;; remain reachable.
    (let ((ports (map session-record-port
                      (map (lambda (i)
@@ -104,7 +104,18 @@
                 (= amount (u8vector-length %message))
                 (equal? buf %message)
                 (eof-object?
-                 (read-char (session-record-port server))))))
+                 (read-char (session-record-port server)))
+
+                ;; Close the port and make sure its 'close' procedure is
+                ;; called.
+                (let* ((closed? #f)
+                       (port  (session-record-port server))
+                       (close (lambda (p)
+                                (format #t "closing port ~s~%" p)
+                                (set! closed? (eq? p port)))))
+                  (set-session-record-port-close! port close)
+                  (close-port port)
+                  closed?))))
 
        ;; client-side (child process)
        (let ((client (make-session connection-end/client)))
