@@ -13,6 +13,9 @@ See the end for copying conditions.
 ** libgnutls: Length limit for TLS PSK usernames has been increased
    from 128 to 65535 characters (#1323).
 
+** libgnutls: AES-GCM encryption function now limits plaintext
+   length to 2^39-256 bits, according to SP800-38D 5.2.1.1.
+
 ** API and ABI modifications:
 gnutls_fips140_run_self_tests: New function
 

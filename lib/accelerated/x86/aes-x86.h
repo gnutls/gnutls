@@ -22,6 +22,21 @@ typedef struct {
 	if (s != 16 && s != 24 && s != 32) \
 		return GNUTLS_E_INVALID_REQUEST
 
+#include <intprops.h>
+#define AES_GCM_ENCRYPT_MAX_BYTES ((1ULL << 36) - 32)
+static inline int
+record_aes_gcm_encrypt_size(size_t *counter, size_t size) {
+	size_t sum;
+
+	if (!INT_ADD_OK(*counter, size, &sum) ||
+	    sum > AES_GCM_ENCRYPT_MAX_BYTES) {
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
+	*counter = sum;
+
+	return 0;
+}
+
 void aesni_ecb_encrypt(const unsigned char *in, unsigned char *out,
 		       size_t len, const AES_KEY * key, int enc);
 
