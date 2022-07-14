@@ -413,6 +413,166 @@ gnutls_cipher_decrypt2(gnutls_cipher_hd_t handle, const void *ctext,
 }
 
 /**
+ * gnutls_cipher_encrypt3:
+ * @handle: is a #gnutls_cipher_hd_t type
+ * @ptext: the data to encrypt
+ * @ptext_len: the length of data to encrypt
+ * @ctext: the encrypted data
+ * @ctext_len: the length of encrypted data (initially must hold the maximum available size)
+ * @flags: flags for padding
+ *
+ * This function will encrypt the given data using the algorithm
+ * specified by the context. For block ciphers, @ptext_len is
+ * typically a multiple of the block size. If not, the caller can
+ * instruct the function to pad the last block according to @flags.
+ * Currently, the only available padding scheme is
+ * %GNUTLS_CIPHER_PADDING_PKCS7.
+ *
+ * If @ctext is not %NULL, it must hold enough space to store
+ * resulting cipher text. To check the required size, this function
+ * can be called with @ctext set to %NULL. Then @ctext_len will be
+ * updated without performing actual encryption.
+ *
+ * Returns: Zero or a negative error code on error.
+ *
+ * Since: 3.7.7
+ **/
+int
+gnutls_cipher_encrypt3(gnutls_cipher_hd_t handle,
+		       const void *ptext, size_t ptext_len,
+		       void *ctext, size_t *ctext_len,
+		       unsigned flags)
+{
+	api_cipher_hd_st *h = handle;
+	const cipher_entry_st *e = h->ctx_enc.e;
+	int block_size = _gnutls_cipher_get_block_size(e);
+	int ret = 0;
+
+	if (unlikely(ctext_len == NULL)) {
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
+
+	if (_gnutls_cipher_type(e) == CIPHER_BLOCK &&
+	    (flags & GNUTLS_CIPHER_PADDING_PKCS7)) {
+		size_t n, r;
+		uint8_t last_block[MAX_CIPHER_BLOCK_SIZE];
+		const uint8_t *p = ptext;
+		uint8_t *c = ctext;
+
+		if (!INT_ADD_OK(ptext_len, block_size, &n)) {
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		}
+
+		n = (n / block_size) * block_size;
+
+		if (!ctext) {
+			*ctext_len = n;
+			return 0;
+		}
+
+		if (*ctext_len < n) {
+			return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+		}
+
+		/* Encrypt up to the last complete block */
+		r = ptext_len % block_size;
+
+		ret = _gnutls_cipher_encrypt2(&h->ctx_enc,
+					      ptext, ptext_len - r,
+					      ctext, ptext_len - r);
+		if (ret < 0) {
+			goto error;
+		}
+
+		/* Encrypt the last block with padding */
+		gnutls_memset(last_block, block_size - r, sizeof(last_block));
+		if (r > 0) {
+			memcpy(last_block, &p[ptext_len - r], r);
+		}
+		ret = _gnutls_cipher_encrypt2(&h->ctx_enc,
+					      last_block, block_size,
+					      &c[ptext_len - r], block_size);
+		if (ret < 0) {
+			goto error;
+		}
+		*ctext_len = n;
+	} else {
+		if (!ctext) {
+			*ctext_len = ptext_len;
+			return 0;
+		}
+
+		ret = _gnutls_cipher_encrypt2(&h->ctx_enc, ptext, ptext_len,
+					      ctext, *ctext_len);
+		if (ret < 0) {
+			goto error;
+		}
+		*ctext_len = ptext_len;
+	}
+
+ error:
+	if (ret < 0) {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
+	} else {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_APPROVED);
+	}
+	return ret;
+}
+
+/**
+ * gnutls_cipher_decrypt3:
+ * @handle: is a #gnutls_cipher_hd_t type
+ * @ctext: the data to decrypt
+ * @ctext_len: the length of data to decrypt
+ * @ptext: the decrypted data
+ * @ptext_len: the available length for decrypted data
+ * @flags: flags for padding
+ *
+ * This function will decrypt the given data using the algorithm
+ * specified by the context. If @flags is specified, padding for the
+ * decrypted data will be removed accordingly and @ptext_len will be
+ * updated.
+ *
+ * Returns: Zero or a negative error code on error.
+ *
+ * Since: 3.7.7
+ **/
+int
+gnutls_cipher_decrypt3(gnutls_cipher_hd_t handle,
+		       const void *ctext, size_t ctext_len,
+		       void *ptext, size_t *ptext_len,
+		       unsigned flags)
+{
+	api_cipher_hd_st *h = handle;
+	int ret;
+
+	ret = gnutls_cipher_decrypt2(handle,
+				     ctext, ctext_len,
+				     ptext, *ptext_len);
+	if (ret < 0) {
+		return ret;
+	}
+
+	if (_gnutls_cipher_type(h->ctx_enc.e) == CIPHER_BLOCK &&
+	    (flags & GNUTLS_CIPHER_PADDING_PKCS7)) {
+		uint8_t *p = ptext;
+		uint8_t padding = p[*ptext_len - 1];
+		if (!padding || padding > _gnutls_cipher_get_block_size(h->ctx_enc.e)) {
+			return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
+		}
+		/* Check that the prior bytes are all PADDING */
+		for (size_t i = *ptext_len - padding; i < *ptext_len; i++) {
+			if (padding != p[*ptext_len - 1]) {
+				return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
+			}
+		}
+		*ptext_len -= padding;
+	}
+
+	return 0;
+}
+
+/**
  * gnutls_cipher_deinit:
  * @handle: is a #gnutls_cipher_hd_t type
  *

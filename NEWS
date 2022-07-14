@@ -16,8 +16,17 @@ See the end for copying conditions.
 ** libgnutls: AES-GCM encryption function now limits plaintext
    length to 2^39-256 bits, according to SP800-38D 5.2.1.1.
 
+** libgnutls: New block cipher functions have been added to transparently
+   handle padding.  gnutls_cipher_encrypt3 and gnutls_cipher_decrypt3 can be
+   used in combination of GNUTLS_CIPHER_PADDING_PKCS7 flag to automatically
+   add/remove padding if the length of the original plaintext is not a multiple
+   of the block size.
+
 ** API and ABI modifications:
 gnutls_fips140_run_self_tests: New function
+gnutls_cipher_encrypt3: New function
+gnutls_cipher_decrypt3: New function
+gnutls_cipher_padding_flags_t: New enum
 
 ** guile: Session record port treats premature termination as EOF
 

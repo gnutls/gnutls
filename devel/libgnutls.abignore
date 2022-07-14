@@ -72,3 +72,9 @@ name = drbg_aes_reseed
 # abi-dump repository:
 [suppress_function]
 name = gnutls_fips140_run_self_tests
+
+[suppress_function]
+name = gnutls_cipher_encrypt3
+
+[suppress_function]
+name = gnutls_cipher_decrypt3
