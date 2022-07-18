@@ -31,6 +31,8 @@ Reading from the session record port now returns the end-of-file object
 instead of throwing an exception, just like it would for a proper
 session termination.
 
+** guile: Guile 1.8 is no longer supported
+
 * Version 3.7.6 (released 2022-05-27)
 
 ** libgnutls: Fixed invalid write when gnutls_realloc_zero()

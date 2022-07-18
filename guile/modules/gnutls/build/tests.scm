@@ -1,5 +1,5 @@
 ;;; GnuTLS --- Guile bindings for GnuTLS.
-;;; Copyright (C) 2011-2012, 2016, 2021 Free Software Foundation, Inc.
+;;; Copyright (C) 2011-2012, 2016, 2021-2022 Free Software Foundation, Inc.
 ;;;
 ;;; GnuTLS is free software; you can redistribute it and/or
 ;;; modify it under the terms of the GNU Lesser General Public
@@ -18,6 +18,9 @@
 ;;; Written by Ludovic Courtès <ludo@gnu.org>.
 
 (define-module (gnutls build tests)
+  #:use-module (rnrs io ports)
+  #:use-module (rnrs bytevectors)
+  #:use-module (ice-9 match)
   #:export (run-test
             with-child-process))
 
@@ -56,44 +59,26 @@ process exits upon failure."
             (primitive-exit 2)))
         (parent pid))))
 
-(cond-expand
-  ((not guile-2)                                  ;1.8, yay!
-   (use-modules (ice-9 syncase))
+(define-syntax-rule (define-replacement (name args ...) body ...)
+  ;; Define a compatibility replacement for NAME, if needed.
+  (define-public name
+    (if (module-defined? the-scm-module 'name)
+        (module-ref the-scm-module 'name)
+        (lambda (args ...)
+          body ...))))
 
-   (define-syntax define-syntax-rule
-     (syntax-rules ()
-       ((_ (name args ...) docstring body)
-        (define-syntax name
-          (syntax-rules ()
-            ((_ args ...) body))))))
+;; 'uniform-vector-read!' and 'uniform-vector-write' are deprecated in 2.0
+;; and absent in 2.2.
+;; TODO: Switch to the R6RS bytevector and I/O interface.
 
-   (export define-syntax-rule))
+(define-replacement (uniform-vector-read! buf port)
+  (match (get-bytevector-n! port buf
+                            0 (bytevector-length buf))
+    ((? eof-object?) 0)
+    ((? integer? n)  n)))
 
-  (else                                           ;2.0 and 2.2
-   (use-modules (rnrs io ports)
-                (rnrs bytevectors)
-                (ice-9 match))
-
-   (define-syntax-rule (define-replacement (name args ...) body ...)
-     ;; Define a compatibility replacement for NAME, if needed.
-     (define-public name
-       (if (module-defined? the-scm-module 'name)
-           (module-ref the-scm-module 'name)
-           (lambda (args ...)
-             body ...))))
-
-   ;; 'uniform-vector-read!' and 'uniform-vector-write' are deprecated in 2.0
-   ;; and absent in 2.2.
-
-   (define-replacement (uniform-vector-read! buf port)
-     (match (get-bytevector-n! port buf
-                               0 (bytevector-length buf))
-       ((? eof-object?) 0)
-       ((? integer? n)  n)))
-
-   (define-replacement (uniform-vector-write buf port)
-     (put-bytevector port buf))))
-
+(define-replacement (uniform-vector-write buf port)
+  (put-bytevector port buf))
 
 (define-syntax-rule (with-child-process pid parent child)
   "Fork and evaluate expression PARENT in the current process, with PID bound
