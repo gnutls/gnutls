@@ -96,6 +96,7 @@
            ;; record layer
            record-send record-receive!
            session-record-port
+           set-session-record-port-close!
 
            ;; debugging
            set-log-procedure! set-log-level!

@@ -33,6 +33,15 @@ session termination.
 
 ** guile: Guile 1.8 is no longer supported
 
+** guile: Session record ports can have a ‘close’ procedure.
+
+   The ‘session-record-port’ procedure now takes an optional second
+   parameter, and a new ‘set-session-record-port-close!’ procedure is
+   provided to specify a ‘close’ procedure for a session record port.
+   This ‘close’ procedure lets users specify cleanup operations for when
+   the port is closed, such as closing the file descriptor or port that
+   backs the underlying session.
+
 * Version 3.7.6 (released 2022-05-27)
 
 ** libgnutls: Fixed invalid write when gnutls_realloc_zero()
