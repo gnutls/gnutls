@@ -1591,6 +1591,7 @@ test_code_t test_chain_order(gnutls_session_t session)
 	p_size = 0;
 	pos = NULL;
 	for (i=0;i<cert_list_size;i++) {
+		char *new_p;
 		t.data = NULL;
 		ret = gnutls_pem_base64_encode_alloc("CERTIFICATE", &cert_list[i], &t);
 		if (ret < 0) {
@@ -1598,7 +1599,12 @@ test_code_t test_chain_order(gnutls_session_t session)
 			return TEST_FAILED;
 		}
 
-		p = realloc(p, p_size+t.size+1);
+		new_p = realloc(p, p_size+t.size+1);
+		if (!new_p) {
+			free(p);
+			return TEST_FAILED;
+		}
+		p = new_p;
 		pos = p + p_size;
 
 		memcpy(pos, t.data, t.size);
