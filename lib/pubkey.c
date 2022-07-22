@@ -505,7 +505,7 @@ gnutls_pubkey_parse_ecc_ecdh_params(const gnutls_datum_t *parameters,
                                     gnutls_ecc_curve_t *outcurve)
 {
 	gnutls_ecc_curve_t curve = GNUTLS_ECC_CURVE_INVALID;
-	ASN1_TYPE asn1 = ASN1_TYPE_EMPTY;
+	asn1_node asn1 = NULL;
 	unsigned int etype = ASN1_ETYPE_INVALID;
 	char str[MAX_OID_SIZE];
 	int str_size;

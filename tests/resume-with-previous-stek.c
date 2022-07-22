@@ -100,7 +100,7 @@ static int client_handshake(gnutls_session_t session, gnutls_datum_t *session_da
 static void client(int fd, int *resume, unsigned rounds, const char *prio)
 {
 	gnutls_session_t session;
-	gnutls_datum_t session_data;
+	gnutls_datum_t session_data = { NULL, 0 };
 	gnutls_certificate_credentials_t clientx509cred = NULL;
 
 	for (unsigned i = 0; i < rounds; i++) {

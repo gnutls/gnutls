@@ -75,11 +75,11 @@ extern const char *pkcs3_3072;
     _fail("%s:%d: "format, __func__, __LINE__, ##__VA_ARGS__)
 
 extern void _fail(const char *format, ...)
-    __attribute__ ((format(printf, 1, 2)));
+	__attribute__ ((format(printf, 1, 2))) __attribute__((__noreturn__));
 extern void fail_ignore(const char *format, ...)
-    __attribute__ ((format(printf, 1, 2)));
+	__attribute__ ((format(printf, 1, 2))) __attribute__((__noreturn__));
 extern void success(const char *format, ...)
-    __attribute__ ((format(printf, 1, 2)));
+	__attribute__ ((format(printf, 1, 2)));
 
 /* assumes test_name is defined */
 #define test_fail(fmt, ...) \

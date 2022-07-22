@@ -39,7 +39,9 @@ fi
 echo ""
 echo "*** Testing good HTTPS hosts ***"
 # www.vulcano.cl dane.nox.su www.kumari.net
-HOSTS="good.dane.verisignlabs.com www.freebsd.org torproject.org fedoraproject.org"
+# used to work: good.dane.verisignlabs.com
+# used to work: fedoraproject.org
+HOSTS="www.freebsd.org torproject.org"
 #HOSTS="${HOSTS} nohats.ca"
 for host in ${HOSTS}; do
 
@@ -84,8 +86,10 @@ echo ""
 echo "*** Testing bad HTTPS hosts ***"
 # Not ok
 # used to work: dane-broken.rd.nic.fr
-HOSTS="bad-hash.dane.verisignlabs.com bad-params.dane.verisignlabs.com"
-HOSTS="${HOSTS} bad-sig.dane.verisignlabs.com"
+# used to work: bad-hash.dane.verisignlabs.com
+# used to work: bad-params.dane.verisignlabs.com
+# used to work: bad-sig.dane.verisignlabs.com
+HOSTS=""
 for host in ${HOSTS}; do
 
 	nc -w 5 "${host}" 443 >/dev/null <<_EOF

@@ -1139,7 +1139,7 @@ _decode_pkcs8_eddsa_key(asn1_node pkcs8_asn, gnutls_x509_privkey_t pkey, const c
 }
 
 static int
-_decode_pkcs8_modern_ecdh_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey, const char *oid)
+_decode_pkcs8_modern_ecdh_key(asn1_node pkcs8_asn, gnutls_x509_privkey_t pkey, const char *oid)
 {
 	int ret;
 	gnutls_datum_t tmp;
