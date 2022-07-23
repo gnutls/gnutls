@@ -358,7 +358,7 @@ tests/certuniqueid
 tests/chainverify
 tests/chainverify-unsorted
 tests/cipher-alignment
-tests/cipher-test
+tests/cipher-padding
 tests/ciphersuite-name
 tests/client
 tests/client-fastopen

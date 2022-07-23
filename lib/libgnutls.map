@@ -1403,6 +1403,8 @@ GNUTLS_3_7_7
 {
  global:
 	gnutls_fips140_run_self_tests;
+	gnutls_cipher_encrypt3;
+	gnutls_cipher_decrypt3;
  local:
 	*;
 } GNUTLS_3_7_5;

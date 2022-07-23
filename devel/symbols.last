@@ -135,9 +135,11 @@ gnutls_certificate_verify_peers@GNUTLS_3_4
 gnutls_check_version@GNUTLS_3_4
 gnutls_cipher_add_auth@GNUTLS_3_4
 gnutls_cipher_decrypt2@GNUTLS_3_4
+gnutls_cipher_decrypt3@GNUTLS_3_7_7
 gnutls_cipher_decrypt@GNUTLS_3_4
 gnutls_cipher_deinit@GNUTLS_3_4
 gnutls_cipher_encrypt2@GNUTLS_3_4
+gnutls_cipher_encrypt3@GNUTLS_3_7_7
 gnutls_cipher_encrypt@GNUTLS_3_4
 gnutls_cipher_get@GNUTLS_3_4
 gnutls_cipher_get_block_size@GNUTLS_3_4
