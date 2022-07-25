@@ -143,6 +143,8 @@ static int _decode_pkcs7_signed_data(gnutls_pkcs7_t pkcs7)
 		}
 	}
 
+	if (pkcs7->signed_data)
+		asn1_delete_structure(&pkcs7->signed_data);
 	pkcs7->signed_data = c2;
 	gnutls_free(tmp.data);
 
@@ -229,7 +231,9 @@ void gnutls_pkcs7_deinit(gnutls_pkcs7_t pkcs7)
  *
  * This function will convert the given DER or PEM encoded PKCS7 to
  * the native #gnutls_pkcs7_t format.  The output will be stored in
- * @pkcs7.
+ * @pkcs7. Any signed data that may be present inside the @pkcs7
+ * structure, like certificates set by gnutls_pkcs7_set_crt(), will
+ * be freed and overwritten by this function.
  *
  * If the PKCS7 is PEM encoded it should have a header of "PKCS7".
  *
