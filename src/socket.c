@@ -586,16 +586,16 @@ socket_open2(socket_st * hd, const char *hostname, const char *service,
 				gnutls_session_set_data(hd->session, hd->rdata.data, hd->rdata.size);
 			}
 
-			if (server_trace)
+			if (client_trace || server_trace) {
 				hd->server_trace = server_trace;
-
-			if (client_trace)
 				hd->client_trace = client_trace;
-
-			gnutls_transport_set_push_function(hd->session, wrap_push);
-			gnutls_transport_set_pull_function(hd->session, wrap_pull);
-			gnutls_transport_set_pull_timeout_function(hd->session, wrap_pull_timeout_func);
-			gnutls_transport_set_ptr(hd->session, hd);
+				gnutls_transport_set_push_function(hd->session, wrap_push);
+				gnutls_transport_set_pull_function(hd->session, wrap_pull);
+				gnutls_transport_set_pull_timeout_function(hd->session, wrap_pull_timeout_func);
+				gnutls_transport_set_ptr(hd->session, hd);
+			} else {
+				gnutls_transport_set_int(hd->session, hd->fd);
+			}
 		}
 
 		if (!(flags & SOCKET_FLAG_RAW) && !(flags & SOCKET_FLAG_SKIP_INIT)) {
