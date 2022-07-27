@@ -18,9 +18,6 @@
 ;;; Written by Ludovic Courtès <ludo@gnu.org>.
 
 (define-module (gnutls build tests)
-  #:use-module (rnrs io ports)
-  #:use-module (rnrs bytevectors)
-  #:use-module (ice-9 match)
   #:export (run-test
             with-child-process))
 
@@ -58,6 +55,10 @@ process exits upon failure."
           (lambda ()
             (primitive-exit 2)))
         (parent pid))))
+
+(use-modules (rnrs io ports)
+             (rnrs bytevectors)
+             (ice-9 match))
 
 (define-syntax-rule (define-replacement (name args ...) body ...)
   ;; Define a compatibility replacement for NAME, if needed.
