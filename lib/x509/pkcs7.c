@@ -1322,7 +1322,8 @@ gnutls_x509_crt_t find_signer(gnutls_pkcs7_t pkcs7, gnutls_x509_trust_list_t tl,
 				issuer = find_verified_issuer_of(pkcs7, issuer, purpose, vflags);
 
 				if (issuer != NULL && gnutls_x509_crt_check_issuer(issuer, issuer)) {
-					if (prev) gnutls_x509_crt_deinit(prev);
+					if (prev && prev != signer)
+						gnutls_x509_crt_deinit(prev);
 					prev = issuer;
 					break;
 				}

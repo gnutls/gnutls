@@ -7,6 +7,10 @@ See the end for copying conditions.
 
 * Version 3.7.7 (unreleased)
 
+** libgnutls: Fixed double free during verification of pkcs7 signatures.
+   Reported by Jaak Ristioja (#1383). [GNUTLS-SA-2022-07-07, CVSS: medium]
+   [CVE-2022-2509]
+
 ** libgnutls: gnutls_hkdf_expand now only accepts LENGTH argument less than or
    equal to 255 times hash digest size, to comply with RFC 5869 2.3.
 

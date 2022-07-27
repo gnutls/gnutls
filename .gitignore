@@ -614,6 +614,7 @@ tests/pkcs12_simple
 tests/pkcs7
 tests/pkcs7-cat-parse
 tests/pkcs7-gen
+tests/pkcs7-verify-double-free
 tests/pkcs8-decode/Makefile
 tests/pkcs8-decode/Makefile.in
 tests/pkcs8-key-decode
