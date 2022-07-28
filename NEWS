@@ -5,7 +5,7 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.7.7 (unreleased)
+* Version 3.7.7 (released 2022-07-28)
 
 ** libgnutls: Fixed double free during verification of pkcs7 signatures.
    Reported by Jaak Ristioja (#1383). [GNUTLS-SA-2022-07-07, CVSS: medium]
@@ -26,28 +26,27 @@ See the end for copying conditions.
    add/remove padding if the length of the original plaintext is not a multiple
    of the block size.
 
+** libgnutls: New function for manual FIPS self-testing.
+
 ** API and ABI modifications:
 gnutls_fips140_run_self_tests: New function
 gnutls_cipher_encrypt3: New function
 gnutls_cipher_decrypt3: New function
 gnutls_cipher_padding_flags_t: New enum
 
-** guile: Session record port treats premature termination as EOF
-
-Previously, a ‘gnutls-error’ exception with the
-‘error/premature-termination’ value would be thrown while reading from a
-session record port when the underlying session was terminated
-prematurely.  This was inconvenient since users of the port may not be
-prepared to handle such an exception.
-
-Reading from the session record port now returns the end-of-file object
-instead of throwing an exception, just like it would for a proper
-session termination.
-
 ** guile: Guile 1.8 is no longer supported
 
-** guile: Session record ports can have a ‘close’ procedure.
+** guile: Session record port treats premature termination as EOF
+   Previously, a ‘gnutls-error’ exception with the
+   ‘error/premature-termination’ value would be thrown while reading from a
+   session record port when the underlying session was terminated
+   prematurely.  This was inconvenient since users of the port may not be
+   prepared to handle such an exception.
+   Reading from the session record port now returns the end-of-file object
+   instead of throwing an exception, just like it would for a proper
+   session termination.
 
+** guile: Session record ports can have a ‘close’ procedure.
    The ‘session-record-port’ procedure now takes an optional second
    parameter, and a new ‘set-session-record-port-close!’ procedure is
    provided to specify a ‘close’ procedure for a session record port.
