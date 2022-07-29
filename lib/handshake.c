@@ -2861,7 +2861,8 @@ int gnutls_handshake(gnutls_session_t session)
 
 #ifdef ENABLE_KTLS
 		if (_gnutls_config_is_ktls_enabled()) {
-			if (session->internals.pull_func ||
+			if ((session->internals.pull_func &&
+				session->internals.pull_func != system_read) ||
 			    session->internals.push_func) {
 				_gnutls_audit_log(session,
 						  "Not enabling KTLS with "
