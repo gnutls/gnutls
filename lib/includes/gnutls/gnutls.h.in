@@ -1169,7 +1169,7 @@ typedef enum {
  * gnutls_channel_binding_t:
  * @GNUTLS_CB_TLS_UNIQUE: "tls-unique" (RFC 5929) channel binding
  * @GNUTLS_CB_TLS_SERVER_END_POINT: "tls-server-end-point" (RFC 5929) channel binding
- * @GNUTLS_CB_TLS_EXPORTER: "tls-exporter" (draft-ietf-kitten-tls-channel-bindings-for-tls13-03)
+ * @GNUTLS_CB_TLS_EXPORTER: "tls-exporter" (RFC 9266) channel binding
  *
  * Enumeration of supported channel binding types.
  */
