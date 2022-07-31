@@ -24,7 +24,7 @@
 
 . "$srcdir/scripts/common.sh"
 
-if ! grep '^tls ' /proc/modules 2>1 >& /dev/null; then
+if ! grep '^tls ' /proc/modules 2>&1 /dev/null; then
     exit 77
 fi
 
