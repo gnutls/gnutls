@@ -80,7 +80,7 @@ void _gnutls_ktls_enable(gnutls_session_t session)
 	}
 }
 
-int _gnutls_ktls_set_keys(gnutls_session_t session)
+int _gnutls_ktls_set_keys(gnutls_session_t session, gnutls_transport_ktls_enable_flags_t in)
 {
 	gnutls_cipher_algorithm_t cipher = gnutls_cipher_get(session);
 	gnutls_datum_t mac_key;
@@ -107,7 +107,9 @@ int _gnutls_ktls_set_keys(gnutls_session_t session)
 		return ret;
 	}
 
-	if(session->internals.ktls_enabled & GNUTLS_KTLS_RECV){
+	in &= session->internals.ktls_enabled;
+
+	if(in & GNUTLS_KTLS_RECV){
 		switch (cipher) {
 			case GNUTLS_CIPHER_AES_128_GCM:
 			{
@@ -191,7 +193,7 @@ int _gnutls_ktls_set_keys(gnutls_session_t session)
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 	}
 
-	if(session->internals.ktls_enabled & GNUTLS_KTLS_SEND){
+	if(in & GNUTLS_KTLS_SEND){
 		switch (cipher) {
 			case GNUTLS_CIPHER_AES_128_GCM:
 			{
@@ -269,7 +271,7 @@ int _gnutls_ktls_set_keys(gnutls_session_t session)
 		}
 	}
 
-	return 0;
+	return in;
 }
 
 ssize_t _gnutls_ktls_send_file(gnutls_session_t session, int fd,
@@ -465,7 +467,7 @@ gnutls_transport_is_ktls_enabled(gnutls_session_t session) {
 void _gnutls_ktls_enable(gnutls_session_t session) {
 }
 
-int _gnutls_ktls_set_keys(gnutls_session_t session) {
+int _gnutls_ktls_set_keys(gnutls_session_t sessioni, gnutls_transport_ktls_enable_flags_t in) {
 	return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 }
 
