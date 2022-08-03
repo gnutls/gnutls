@@ -10,6 +10,11 @@ int _gnutls_ktls_set_keys(gnutls_session_t session, gnutls_transport_ktls_enable
 ssize_t _gnutls_ktls_send_file(gnutls_session_t session, int fd,
 		off_t *offset, size_t count);
 
+int _gnutls_ktls_send_handshake_msg(gnutls_session_t session,
+				    gnutls_record_encryption_level_t level,
+				    gnutls_handshake_description_t htype,
+				    const void *data, size_t data_size);
+
 int _gnutls_ktls_send_control_msg(gnutls_session_t session, unsigned char record_type,
 		const void *data, size_t data_size);
 #define _gnutls_ktls_send(x, y, z) _gnutls_ktls_send_control_msg(x, GNUTLS_APPLICATION_DATA, y, z);
