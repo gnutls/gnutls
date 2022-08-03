@@ -5,6 +5,13 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.7.8 (unreleased)
+
+** libgnutls: In FIPS140 mode, RSA signature verification is an approved
+   operation if the key has modulus with known sizes (1024, 1280,
+   1536, and 1792 bits), in addition to any modulus sizes larger than
+   2048 bits, according to SP800-131A rev2.
+
 * Version 3.7.7 (released 2022-07-28)
 
 ** libgnutls: Fixed double free during verification of pkcs7 signatures.
