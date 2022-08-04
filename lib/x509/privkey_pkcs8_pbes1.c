@@ -140,7 +140,7 @@ _gnutls_decrypt_pbes1_des_md5_data(const char *password,
 {
 	int result;
 	gnutls_datum_t dkey, d_iv;
-	cipher_hd_st ch;
+	gnutls_cipher_hd_t ch;
 	uint8_t key[16];
 	const unsigned block_size = 8;
 
@@ -158,16 +158,14 @@ _gnutls_decrypt_pbes1_des_md5_data(const char *password,
 	dkey.size = 8;
 	d_iv.data = &key[8];
 	d_iv.size = 8;
-	result =
-	    _gnutls_cipher_init(&ch, cipher_to_entry(GNUTLS_CIPHER_DES_CBC),
-				&dkey, &d_iv, 0);
+	result = gnutls_cipher_init(&ch, GNUTLS_CIPHER_DES_CBC, &dkey, &d_iv);
 	if (result < 0) {
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 		return gnutls_assert_val(result);
 	}
 	_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_NOT_APPROVED);
 
-	result = _gnutls_cipher_decrypt(&ch, encrypted_data->data, encrypted_data->size);
+	result = gnutls_cipher_decrypt(ch, encrypted_data->data, encrypted_data->size);
 	if (result < 0) {
 		gnutls_assert();
 		goto error;
@@ -184,7 +182,7 @@ _gnutls_decrypt_pbes1_des_md5_data(const char *password,
 
 	result = 0;
  error:
-	_gnutls_cipher_deinit(&ch);
+	gnutls_cipher_deinit(ch);
 
 	return result;
 }
