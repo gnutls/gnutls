@@ -182,15 +182,10 @@ gnutls_alert_send(gnutls_session_t session, gnutls_alert_level_t level,
 		return ret;
 	}
 
-	if (IS_KTLS_ENABLED(session, GNUTLS_KTLS_SEND)) {
-		ret =
-			_gnutls_ktls_send_control_msg(session, GNUTLS_ALERT, data, 2);
-	} else {
-		ret =
-			_gnutls_send_int(session, GNUTLS_ALERT, -1,
-				EPOCH_WRITE_CURRENT, data, 2,
-				MBUFFER_FLUSH);
-	}
+	ret = _gnutls_send_int(session, GNUTLS_ALERT, -1,
+			      EPOCH_WRITE_CURRENT, data, 2,
+			      MBUFFER_FLUSH);
+
 	return (ret < 0) ? ret : 0;
 }
 

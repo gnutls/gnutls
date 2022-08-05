@@ -269,9 +269,13 @@ int _gnutls_ktls_set_keys(gnutls_session_t session, gnutls_transport_ktls_enable
 			default:
 				assert(0);
 		}
+
 		// set callback for sending handshake messages
 		gnutls_handshake_set_read_function(session,
 						   _gnutls_ktls_send_handshake_msg);
+
+		// set callback for sending alert messages
+		gnutls_alert_set_read_function(session, _gnutls_ktls_send_alert_msg);
 	}
 
 	return in;
@@ -365,6 +369,17 @@ int _gnutls_ktls_send_handshake_msg(gnutls_session_t session,
 {
 	return _gnutls_ktls_send_control_msg(session, GNUTLS_HANDSHAKE,
 					     data, data_size);
+}
+
+int _gnutls_ktls_send_alert_msg(gnutls_session_t session,
+				gnutls_record_encryption_level_t level,
+				gnutls_alert_level_t alert_level,
+				gnutls_alert_description_t alert_desc)
+{
+	uint8_t data[2];
+	data[0] = (uint8_t) alert_level;
+	data[1] = (uint8_t) alert_desc;
+	return _gnutls_ktls_send_control_msg(session, GNUTLS_ALERT, data, 2);
 }
 
 int _gnutls_ktls_recv_control_msg(gnutls_session_t session,

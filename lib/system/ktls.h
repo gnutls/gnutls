@@ -15,6 +15,11 @@ int _gnutls_ktls_send_handshake_msg(gnutls_session_t session,
 				    gnutls_handshake_description_t htype,
 				    const void *data, size_t data_size);
 
+int _gnutls_ktls_send_alert_msg(gnutls_session_t session,
+				gnutls_record_encryption_level_t level,
+				gnutls_alert_level_t alert_level,
+				gnutls_alert_description_t alert_desc);
+
 int _gnutls_ktls_send_control_msg(gnutls_session_t session, unsigned char record_type,
 		const void *data, size_t data_size);
 #define _gnutls_ktls_send(x, y, z) _gnutls_ktls_send_control_msg(x, GNUTLS_APPLICATION_DATA, y, z);
