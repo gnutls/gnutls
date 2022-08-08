@@ -29,7 +29,7 @@ variables:
   CHECKJOBS: 16
 
 cache:
-  key: "$CI_JOB_NAME-ver25"
+  key: "$CI_JOB_NAME-ver26"
   paths:
     - cache/
 
@@ -391,8 +391,7 @@ fedora-interop/test:
           #- rsapss
   allow_failure: true
   script:
-    - git clone --depth=1 https://gitlab.com/redhat-crypto/tests/interop.git
-    - cd interop/
+    - cd tests/suite/tls-interoperability/
     - echo "Tests to run:"
     - tmt run plans -n interop tests -f "tag:interop-gnutls" -f "tag:interop-$TYPE" -f "tag:interop-$COMPONENT"  discover -v
     - echo "Run the tests:"
