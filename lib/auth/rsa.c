@@ -155,7 +155,6 @@ static int
 proc_rsa_client_kx(gnutls_session_t session, uint8_t * data,
 		   size_t _data_size)
 {
-	const char attack_error[] = "auth_rsa: Possible PKCS #1 attack\n";
 	gnutls_datum_t ciphertext;
 	int ret, dsize;
 	ssize_t data_size = _data_size;
@@ -234,15 +233,6 @@ proc_rsa_client_kx(gnutls_session_t session, uint8_t * data,
 	/* if check_ver_min then session->key.key.data[1] must equal ver_min */
 	ok &= CONSTCHECK_NOT_EQUAL(check_ver_min, 0) &
 	        CONSTCHECK_EQUAL(session->key.key.data[1], ver_min);
-
-	if (ok) {
-		/* call logging function unconditionally so all branches are
-		 * indistinguishable for timing and cache access when debug
-		 * logging is disabled */
-		_gnutls_no_log("%s", attack_error);
-	} else {
-		_gnutls_debug_log("%s", attack_error);
-	}
 
 	/* This is here to avoid the version check attack
 	 * discussed above.
