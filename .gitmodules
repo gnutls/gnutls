@@ -25,3 +25,6 @@
 [submodule "devel/cligen"]
 	path = cligen
 	url = https://gitlab.com/gnutls/cligen.git
+[submodule "tests/suite/tls-interoperability"]
+	path = tests/suite/tls-interoperability
+	url = https://gitlab.com/redhat-crypto/tests/interop.git
