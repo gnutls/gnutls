@@ -932,6 +932,7 @@ tests/x509signself
 tests/xts-key-check
 tests/gnutls_ktls
 tests/record-sendfile
+tests/ktls_keyupdate
 *.tmp
 tmp-*
 *.trs
