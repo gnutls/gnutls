@@ -1247,18 +1247,18 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 
 			_rsa_params_to_privkey(pk_params, &priv);
 
-			/* RSA key size should be 2048-bit or larger in FIPS
-			 * 140-3.  In addition to this, only SHA-2 is allowed
-			 * for SigGen; it is checked in pk_prepare_hash lib/pk.c
-			 */
-			if (unlikely(priv.size < 256)) {
-				not_approved = true;
-			}
-
 			ret = _rsa_params_to_pubkey(pk_params, &pub);
 			if (ret < 0) {
 				gnutls_assert();
 				goto cleanup;
+			}
+
+			/* RSA modulus size should be 2048-bit or larger in FIPS
+			 * 140-3.  In addition to this, only SHA-2 is allowed
+			 * for SigGen; it is checked in pk_prepare_hash lib/pk.c
+			 */
+			if (unlikely(mpz_sizeinbase(pub.n, 2) < 2048)) {
+				not_approved = true;
 			}
 
 			mpz_init(s);
@@ -1298,20 +1298,20 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 
 			_rsa_params_to_privkey(pk_params, &priv);
 
-			/* RSA key size should be 2048-bit or larger in FIPS
+			ret = _rsa_params_to_pubkey(pk_params, &pub);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+
+			/* RSA modulus size should be 2048-bit or larger in FIPS
 			 * 140-3.  In addition to this, only SHA-2 is allowed
 			 * for SigGen; however, Nettle only support SHA256,
 			 * SHA384, and SHA512 for RSA-PSS (see
 			 * _rsa_pss_sign_digest_tr in this file for details).
 			 */
-			if (unlikely(priv.size < 256)) {
+			if (unlikely(mpz_sizeinbase(pub.n, 2) < 2048)) {
 				not_approved = true;
-			}
-
-			ret = _rsa_params_to_pubkey(pk_params, &pub);
-			if (ret < 0) {
-				gnutls_assert();
-				goto cleanup;
 			}
 
 			mpz_init(s);
@@ -1643,6 +1643,7 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 	case GNUTLS_PK_RSA:
 		{
 			struct rsa_public_key pub;
+			size_t bits;
 
 			ret = _rsa_params_to_pubkey(pk_params, &pub);
 			if (ret < 0) {
@@ -1650,12 +1651,19 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 				goto cleanup;
 			}
 
-			/* RSA key size should be 2048-bit or larger in FIPS
-			 * 140-3.  In addition to this, only SHA-1 and SHA-2 are
-			 * allowed for SigVer; it is checked in
-			 * _pkcs1_rsa_verify_sig in lib/pubkey.c
+			bits = mpz_sizeinbase(pub.n, 2);
+
+			/* In FIPS 140-3, RSA key size should be larger than
+			 * 2048-bit or one of the known lengths (1024, 1280,
+			 * 1536, 1792; i.e., multiple of 256-bits).
+			 *
+			 * In addition to this, only SHA-1 and SHA-2 are allowed
+			 * for SigVer; it is checked in _pkcs1_rsa_verify_sig in
+			 * lib/pubkey.c.
 			 */
-			if (unlikely(pub.size < 256)) {
+			if (unlikely(bits < 2048 &&
+				     bits != 1024 && bits != 1280 &&
+				     bits != 1536 && bits != 1792)) {
 				not_approved = true;
 			}
 
@@ -1701,13 +1709,13 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 				goto cleanup;
 			}
 
-			/* RSA key size should be 2048-bit or larger in FIPS
+			/* RSA modulus size should be 2048-bit or larger in FIPS
 			 * 140-3.  In addition to this, only SHA-1 and SHA-2 are
 			 * allowed for SigVer, while Nettle only supports
 			 * SHA256, SHA384, and SHA512 for RSA-PSS (see
 			 * _rsa_pss_verify_digest in this file for the details).
 			 */
-			if (unlikely(pub.size < 256)) {
+			if (unlikely(mpz_sizeinbase(pub.n, 2) < 2048)) {
 				not_approved = true;
 			}
 
