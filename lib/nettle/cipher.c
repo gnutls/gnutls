@@ -1096,7 +1096,7 @@ wrap_nettle_cipher_init(gnutls_cipher_algorithm_t algo, void **_ctx,
 			int enc)
 {
 	struct nettle_cipher_ctx *ctx;
-	ptrdiff_t cur_alignment;
+	uintptr_t cur_alignment;
 	int idx = -1;
 	unsigned i;
 	uint8_t *ctx_ptr;
@@ -1120,7 +1120,7 @@ wrap_nettle_cipher_init(gnutls_cipher_algorithm_t algo, void **_ctx,
 	ctx->enc = enc;
 	ctx_ptr = ((uint8_t*)ctx) + sizeof(*ctx);
 
-	cur_alignment = ((ptrdiff_t)ctx_ptr) % 16;
+	cur_alignment = ((uintptr_t)ctx_ptr) % 16;
 	if (cur_alignment > 0)
 		ctx_ptr += 16 - cur_alignment;
 
