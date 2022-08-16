@@ -254,7 +254,7 @@ int capi_sign(gnutls_privkey_t key, void *userdata,
 {
 	priv_st *priv = (priv_st *) userdata;
 	ALG_ID Algid;
-	HCRYPTHASH hHash = NULL;
+	HCRYPTHASH hHash = 0;
 	uint8_t digest[MAX_HASH_SIZE];
 	unsigned int digest_size;
 	gnutls_digest_algorithm_t algo;
@@ -441,7 +441,7 @@ static
 int privkey_import_capi(gnutls_privkey_t pkey, const char *url, 
 		priv_st *priv, CRYPT_KEY_PROV_INFO *kpi)
 {
-	HCRYPTPROV hCryptProv = NULL;
+	HCRYPTPROV hCryptProv = 0;
 	int ret, enc_too = 0;
 	DWORD i, dwErrCode = 0;
 
@@ -702,7 +702,7 @@ int privkey_import_ncrypt(gnutls_privkey_t pkey, const char *url,
 		priv_st *priv, CRYPT_KEY_PROV_INFO *kpi, NCRYPT_PROV_HANDLE *sctx)
 {
 	SECURITY_STATUS r;
-	NCRYPT_KEY_HANDLE nc = NULL;
+	NCRYPT_KEY_HANDLE nc = 0;
 	int ret, enc_too = 0;
 	WCHAR algo_str[64];
 	DWORD algo_str_size = 0;
@@ -786,7 +786,7 @@ int _gnutls_privkey_import_system_url(gnutls_privkey_t pkey, const char *url)
 	const CERT_CONTEXT *cert = NULL;
 	CRYPT_HASH_BLOB blob;
 	CRYPT_KEY_PROV_INFO *kpi = NULL;
-	NCRYPT_PROV_HANDLE sctx = NULL;
+	NCRYPT_PROV_HANDLE sctx = 0;
 	DWORD kpi_size;
 	SECURITY_STATUS r;
 	int ret;
