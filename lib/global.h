@@ -48,5 +48,6 @@ extern void _gnutls_nss_keylog_deinit(void);
 
 extern void _gnutls_prepare_to_load_system_priorities(void);
 extern void _gnutls_unload_system_priorities(void);
+extern bool _gnutls_allowlisting_mode(void);
 
 #endif /* GNUTLS_LIB_GLOBAL_H */

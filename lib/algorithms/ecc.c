@@ -379,26 +379,8 @@ void _gnutls_ecc_curve_mark_disabled_all(void)
 	}
 }
 
-/**
- * gnutls_ecc_curve_set_enabled:
- * @curve: is an ECC curve
- * @enabled: whether to enable the curve
- *
- * Modify the previous system wide setting that marked @curve as
- * enabled or disabled.  This only has effect when the curve is
- * enabled through the allowlisting mode in the configuration file, or
- * when the setting is modified with a prior call to this function.
- *
- * This function must be called prior to any session priority setting functions;
- * otherwise the behavior is undefined.
- *
- * Returns: 0 on success or negative error code otherwise.
- *
- * Since: 3.7.3
- */
 int
-gnutls_ecc_curve_set_enabled(gnutls_ecc_curve_t curve,
-			     unsigned int enabled)
+_gnutls_ecc_curve_set_enabled(gnutls_ecc_curve_t curve, unsigned int enabled)
 {
 	gnutls_ecc_curve_entry_st *p;
 

@@ -1040,6 +1040,10 @@ struct cfg {
 	gnutls_kx_algorithm_t kxs[MAX_ALGOS+1];
 	gnutls_sign_algorithm_t sigs[MAX_ALGOS+1];
 	gnutls_protocol_t versions[MAX_ALGOS+1];
+
+	gnutls_digest_algorithm_t hashes[MAX_ALGOS+1];
+	gnutls_ecc_curve_t ecc_curves[MAX_ALGOS+1];
+	gnutls_sign_algorithm_t sigs_for_cert[MAX_ALGOS+1];
 };
 
 static inline void
@@ -1065,6 +1069,11 @@ static unsigned system_priority_file_loaded = 0;
 #define CUSTOM_PRIORITY_SECTION "priorities"
 #define OVERRIDES_SECTION "overrides"
 #define MAX_ALGO_NAME 2048
+
+bool _gnutls_allowlisting_mode(void)
+{
+	return system_wide_config.allowlisting;
+}
 
 static void _clear_default_system_priority(void)
 {
@@ -1145,12 +1154,296 @@ cfg_steal(struct cfg *dst, struct cfg *src)
 	memcpy(dst->macs, src->macs, sizeof(src->macs));
 	memcpy(dst->groups, src->groups, sizeof(src->groups));
 	memcpy(dst->kxs, src->kxs, sizeof(src->kxs));
+	memcpy(dst->hashes, src->hashes, sizeof(src->hashes));
+	memcpy(dst->ecc_curves, src->ecc_curves, sizeof(src->ecc_curves));
+	memcpy(dst->sigs, src->sigs, sizeof(src->sigs));
+	memcpy(dst->sigs_for_cert, src->sigs_for_cert,
+	       sizeof(src->sigs_for_cert));
+}
+
+/*
+ * synchronizing changes from struct cfg to global `lib/algorithms` arrays
+ */
+
+/* global side-effect! modifies `flags` in `hash_algorithms[]` */
+static inline int /* allowlisting-only */
+_cfg_hashes_remark(struct cfg* cfg)
+{
+	size_t i;
+	_gnutls_digest_mark_insecure_all();
+	for (i = 0; cfg->hashes[i] != 0; i++) {
+		int ret = _gnutls_digest_set_secure(cfg->hashes[i], 1);
+		if (unlikely(ret < 0)) {
+			return gnutls_assert_val(ret);
+		}
+	}
+	return 0;
+}
+
+/* global side-effect! modifies `flags` in `sign_algorithms[]` */
+static inline int /* allowlisting-only */
+_cfg_sigs_remark(struct cfg* cfg)
+{
+	size_t i;
+	_gnutls_sign_mark_insecure_all(_INSECURE);
+	for (i = 0; cfg->sigs[i] != 0; i++) {
+		int ret = _gnutls_sign_set_secure(cfg->sigs[i],
+		                                  _INSECURE_FOR_CERTS);
+		if (unlikely(ret < 0)) {
+			return gnutls_assert_val(ret);
+		}
+	}
+	for (i = 0; cfg->sigs_for_cert[i] != 0; i++) {
+		int ret = _gnutls_sign_set_secure(cfg->sigs_for_cert[i],
+		                                  _SECURE);
+		if (unlikely(ret < 0)) {
+			return gnutls_assert_val(ret);
+		}
+	}
+	return 0;
+}
+
+/* global side-effect! modifies `supported` in `sup_versions[]` */
+static inline int /* allowlisting-only */
+_cfg_versions_remark(struct cfg* cfg)
+{
+	size_t i;
+	_gnutls_version_mark_disabled_all();
+	for (i = 0; cfg->versions[i] != 0; i++) {
+		int ret = _gnutls_protocol_set_enabled(cfg->versions[i], 1);
+		if (unlikely(ret < 0)) {
+			return gnutls_assert_val(ret);
+		}
+	}
+	return 0;
+}
+
+/* global side-effect! modifies `supported` in `ecc_curves[]` */
+static inline int /* allowlisting-only */
+_cfg_ecc_curves_remark(struct cfg* cfg)
+{
+	size_t i;
+	_gnutls_ecc_curve_mark_disabled_all();
+	for (i = 0; cfg->ecc_curves[i] != 0; i++) {
+		int ret = _gnutls_ecc_curve_set_enabled(cfg->ecc_curves[i], 1);
+		if (unlikely(ret < 0)) {
+			return gnutls_assert_val(ret);
+		}
+	}
+	return 0;
+}
+
+/*
+ * setting arrays of struct cfg: from other arrays
+ */
+
+static inline int /* allowlisting-only */
+cfg_hashes_set_array(struct cfg* cfg,
+		     gnutls_digest_algorithm_t* src, size_t len)
+{
+	if (unlikely(len >= MAX_ALGOS)) {
+		return gnutls_assert_val(GNUTLS_A_INTERNAL_ERROR);
+	}
+	if (len) {
+		memcpy(cfg->hashes,
+		       src, sizeof(gnutls_digest_algorithm_t) * len);
+	}
+	cfg->hashes[len] = 0;
+	return _cfg_hashes_remark(cfg);
+}
+
+static inline int /* allowlisting-only */
+cfg_sigs_set_arrays(struct cfg* cfg,
+		    gnutls_sign_algorithm_t* src, size_t len,
+		    gnutls_sign_algorithm_t* src_for_cert, size_t len_for_cert)
+{
+	if (unlikely(len >= MAX_ALGOS)) {
+		return gnutls_assert_val(GNUTLS_A_INTERNAL_ERROR);
+	}
+	if (unlikely(len_for_cert >= MAX_ALGOS)) {
+		return gnutls_assert_val(GNUTLS_A_INTERNAL_ERROR);
+	}
+	if (len) {
+		memcpy(cfg->sigs, src, sizeof(gnutls_sign_algorithm_t) * len);
+	}
+	if (len_for_cert) {
+		memcpy(cfg->sigs_for_cert, src_for_cert,
+		       sizeof(gnutls_sign_algorithm_t) * len_for_cert);
+	}
+	cfg->sigs[len] = 0;
+	cfg->sigs_for_cert[len_for_cert] = 0;
+	return _cfg_sigs_remark(cfg);
+}
+
+static inline int /* allowlisting-only */
+cfg_versions_set_array(struct cfg* cfg, gnutls_protocol_t* src, size_t len)
+{
+	if (unlikely(len >= MAX_ALGOS)) {
+		return gnutls_assert_val(GNUTLS_A_INTERNAL_ERROR);
+	}
+	if (len) {
+		memcpy(cfg->versions, src, sizeof(gnutls_protocol_t) * len);
+	}
+	cfg->versions[len] = 0;
+	return _cfg_versions_remark(cfg);
+}
+
+static inline int /* allowlisting-only */
+cfg_ecc_curves_set_array(struct cfg* cfg, gnutls_ecc_curve_t* src, size_t len)
+{
+	if (unlikely(len >= MAX_ALGOS)) {
+		return gnutls_assert_val(GNUTLS_A_INTERNAL_ERROR);
+	}
+	if (len) {
+		memcpy(cfg->ecc_curves, src, sizeof(gnutls_ecc_curve_t) * len);
+	}
+	cfg->ecc_curves[len] = 0;
+	return _cfg_ecc_curves_remark(cfg);
+}
+
+/*
+ * appending to arrays of struct cfg
+ */
+
+/* polymorphic way to DRY this operation. other possible approaches:
+ * 1. just unmacro (long)
+ * 2. cast to ints and write a function operating on ints
+ *    (hacky, every call is +4 lines, needs a portable static assert)
+ * 3. macro whole functions, not just this operation (harder to find/read)
+ */
+#define APPEND_TO_NULL_TERMINATED_ARRAY(dst, element) \
+	do { \
+		size_t i; \
+		for (i = 0; dst[i] != 0; i++) { \
+			if (dst[i] == element) { \
+				return 0; \
+			} \
+		} \
+		if (unlikely(i >= MAX_ALGOS)) { \
+			return gnutls_assert_val(GNUTLS_A_INTERNAL_ERROR); \
+		} \
+		dst[i] = element; \
+		dst[i + 1] = 0; \
+	} while (0)
+
+static inline int /* allowlisting-only */
+cfg_hashes_add(struct cfg *cfg, gnutls_digest_algorithm_t dig)
+{
+	_gnutls_debug_log("cfg: enabling digest algorithm %s\n",
+	                  gnutls_digest_get_name(dig));
+	APPEND_TO_NULL_TERMINATED_ARRAY(cfg->hashes, dig);
+	return _cfg_hashes_remark(cfg);
+}
+
+static inline int /* allowlisting-only */
+cfg_sigs_add(struct cfg *cfg, gnutls_sign_algorithm_t sig)
+{
+	_gnutls_debug_log("cfg: enabling signature algorithm "
+	                  "(for non-certificate usage) "
+	                  "%s\n", gnutls_sign_get_name(sig));
+	APPEND_TO_NULL_TERMINATED_ARRAY(cfg->sigs, sig);
+	return _cfg_sigs_remark(cfg);
+}
+
+static inline int /* allowlisting-only */
+cfg_sigs_for_cert_add(struct cfg *cfg, gnutls_sign_algorithm_t sig)
+{
+	_gnutls_debug_log("cfg: enabling signature algorithm"
+	                  "(for certificate usage) "
+	                  "%s\n", gnutls_sign_get_name(sig));
+	APPEND_TO_NULL_TERMINATED_ARRAY(cfg->sigs_for_cert, sig);
+	return _cfg_sigs_remark(cfg);
+}
+
+static inline int /* allowlisting-only */
+cfg_versions_add(struct cfg *cfg, gnutls_protocol_t prot)
+{
+	_gnutls_debug_log("cfg: enabling version %s\n",
+	                  gnutls_protocol_get_name(prot));
+	APPEND_TO_NULL_TERMINATED_ARRAY(cfg->versions, prot);
+	return _cfg_versions_remark(cfg);
+}
+
+static inline int /* allowlisting-only */
+cfg_ecc_curves_add(struct cfg *cfg, gnutls_ecc_curve_t curve)
+{
+	_gnutls_debug_log("cfg: enabling curve %s\n",
+	                  gnutls_ecc_curve_get_name(curve));
+	APPEND_TO_NULL_TERMINATED_ARRAY(cfg->ecc_curves, curve);
+	return _cfg_ecc_curves_remark(cfg);
+}
+
+#undef APPEND_TO_NULL_TERMINATED_ARRAY
+
+/*
+ * removing from arrays of struct cfg
+ */
+
+/* polymorphic way to DRY this removal, see APPEND_TO_NULL_TERMINATED_ARRAY */
+#define REMOVE_FROM_NULL_TERMINATED_ARRAY(dst, element) \
+	do { \
+		size_t i, j; \
+		for (i = 0; dst[i] != 0; i++) { \
+			if (dst[i] == element) { \
+				for (j = i; dst[j] != 0; j++) { \
+					dst[j] = dst[j + 1]; \
+				} \
+			} \
+		} \
+	} while (0)
+
+static inline int /* allowlisting-only */
+cfg_hashes_remove(struct cfg *cfg, gnutls_digest_algorithm_t dig)
+{
+	_gnutls_debug_log("cfg: disabling digest algorithm %s\n",
+	                  gnutls_digest_get_name(dig));
+	REMOVE_FROM_NULL_TERMINATED_ARRAY(cfg->hashes, dig);
+	return _cfg_hashes_remark(cfg);
+}
+
+static inline int /* allowlisting-only */
+cfg_sigs_remove(struct cfg *cfg, gnutls_sign_algorithm_t sig)
+{
+	_gnutls_debug_log("cfg: disabling signature algorithm "
+	                  "(for non-certificate usage) "
+	                  "%s\n", gnutls_sign_get_name(sig));
+	REMOVE_FROM_NULL_TERMINATED_ARRAY(cfg->sigs, sig);
+	return _cfg_sigs_remark(cfg);
+}
+
+static inline int /* allowlisting-only */
+cfg_sigs_for_cert_remove(struct cfg *cfg, gnutls_sign_algorithm_t sig)
+{
+	_gnutls_debug_log("cfg: disabling signature algorithm"
+	                  "(for certificate usage) "
+	                  "%s\n", gnutls_sign_get_name(sig));
+	REMOVE_FROM_NULL_TERMINATED_ARRAY(cfg->sigs_for_cert, sig);
+	return _cfg_sigs_remark(cfg);
+}
+
+static inline int /* allowlisting-only */
+cfg_versions_remove(struct cfg *cfg, gnutls_protocol_t prot)
+{
+	_gnutls_debug_log("cfg: disabling version %s\n",
+	                  gnutls_protocol_get_name(prot));
+	REMOVE_FROM_NULL_TERMINATED_ARRAY(cfg->versions, prot);
+	return _cfg_versions_remark(cfg);
+}
+
+static inline int /* allowlisting-only */
+cfg_ecc_curves_remove(struct cfg *cfg, gnutls_ecc_curve_t curve)
+{
+	_gnutls_debug_log("cfg: disabling curve %s\n",
+	                  gnutls_ecc_curve_get_name(curve));
+	REMOVE_FROM_NULL_TERMINATED_ARRAY(cfg->ecc_curves, curve);
+	return _cfg_ecc_curves_remark(cfg);
 }
 
 static inline int
 cfg_apply(struct cfg *cfg, struct ini_ctx *ctx)
 {
 	size_t i;
+	int ret;
 
 	cfg_steal(cfg, &ctx->cfg);
 
@@ -1159,83 +1452,61 @@ cfg_apply(struct cfg *cfg, struct ini_ctx *ctx)
 	}
 
 	if (cfg->allowlisting) {
-		unsigned tls_sig_sem = 0;
-		size_t j;
-
-		_gnutls_digest_mark_insecure_all();
-		for (i = 0; i < ctx->hashes_size; i++) {
-			int ret = gnutls_digest_set_secure(ctx->hashes[i], 1);
-			if (unlikely(ret < 0)) {
-				return ret;
-			}
+		/* also updates `flags` of global `hash_algorithms[]` */
+		ret = cfg_hashes_set_array(cfg, ctx->hashes, ctx->hashes_size);
+		if (unlikely(ret < 0)) {
+			return gnutls_assert_val(ret);
 		}
-		_gnutls_sign_mark_insecure_all(_INSECURE);
-		for (i = 0; i < ctx->sigs_size; i++) {
-			int ret = gnutls_sign_set_secure(ctx->sigs[i], 1);
-			if (unlikely(ret < 0)) {
-				return ret;
-			}
+		/* also updates `flags` of global `sign_algorithms[]` */
+		ret = cfg_sigs_set_arrays(cfg, ctx->sigs, ctx->sigs_size,
+					  ctx->sigs_for_cert,
+					  ctx->sigs_for_cert_size);
+		if (unlikely(ret < 0)) {
+			return gnutls_assert_val(ret);
 		}
-		for (i = 0; i < ctx->sigs_for_cert_size; i++) {
-			int ret = gnutls_sign_set_secure_for_certs(ctx->sigs_for_cert[i],
-								   1);
-			if (unlikely(ret < 0)) {
-				return ret;
-			}
+		/* also updates `supported` field of global `sup_versions[]` */
+		ret = cfg_versions_set_array(cfg,
+					     ctx->versions, ctx->versions_size);
+		if (unlikely(ret < 0)) {
+			return gnutls_assert_val(ret);
 		}
-		_gnutls_version_mark_revertible_all();
-		for (i = 0, j = 0; i < ctx->versions_size; i++) {
-			const version_entry_st *vers;
-			vers = version_to_entry(ctx->versions[i]);
-			if (vers && vers->supported) {
-				tls_sig_sem |= vers->tls_sig_sem;
-				cfg->versions[j++] = vers->id;
-			}
-		}
-		_gnutls_ecc_curve_mark_disabled_all();
-		for (i = 0; i < ctx->curves_size; i++) {
-			int ret = gnutls_ecc_curve_set_enabled(ctx->curves[i], 1);
-			if (unlikely(ret < 0)) {
-				return ret;
-			}
-		}
-		for (i = 0, j = 0; i < ctx->sigs_size; i++) {
-			const gnutls_sign_entry_st *se;
-
-			se = _gnutls_sign_to_entry(ctx->sigs[i]);
-			if (se != NULL && se->aid.tls_sem & tls_sig_sem &&
-			    _gnutls_sign_is_secure2(se, 0)) {
-				cfg->sigs[j++] = se->id;
-			}
+		/* also updates `supported` field of global `ecc_curves[]` */
+		ret = cfg_ecc_curves_set_array(cfg,
+					       ctx->curves, ctx->curves_size);
+		if (unlikely(ret < 0)) {
+			return gnutls_assert_val(ret);
 		}
 	} else {
+		/* updates same global arrays as above, but doesn't store
+		 * the algorithms into the `struct cfg` as allowlisting does.
+		 * blocklisting doesn't allow relaxing the restrictions */
 		for (i = 0; i < ctx->hashes_size; i++) {
-			int ret = _gnutls_digest_mark_insecure(ctx->hashes[i]);
+			ret = _gnutls_digest_mark_insecure(ctx->hashes[i]);
 			if (unlikely(ret < 0)) {
 				return ret;
 			}
 		}
 		for (i = 0; i < ctx->sigs_size; i++) {
-			int ret = _gnutls_sign_mark_insecure(ctx->sigs[i],
+			ret = _gnutls_sign_mark_insecure(ctx->sigs[i],
 							     _INSECURE);
 			if (unlikely(ret < 0)) {
 				return ret;
 			}
 		}
 		for (i = 0; i < ctx->sigs_for_cert_size; i++) {
-			int ret = _gnutls_sign_mark_insecure(ctx->sigs_for_cert[i], _INSECURE_FOR_CERTS);
+			ret = _gnutls_sign_mark_insecure(ctx->sigs_for_cert[i], _INSECURE_FOR_CERTS);
 			if (unlikely(ret < 0)) {
 				return ret;
 			}
 		}
 		for (i = 0; i < ctx->versions_size; i++) {
-			int ret = _gnutls_version_mark_disabled(ctx->versions[i]);
+			ret = _gnutls_version_mark_disabled(ctx->versions[i]);
 			if (unlikely(ret < 0)) {
 				return ret;
 			}
 		}
 		for (i = 0; i < ctx->curves_size; i++) {
-			int ret = _gnutls_ecc_curve_mark_disabled(ctx->curves[i]);
+			ret = _gnutls_ecc_curve_mark_disabled(ctx->curves[i]);
 			if (unlikely(ret < 0)) {
 				return ret;
 			}
@@ -2311,7 +2582,9 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 	/* disable TLS versions which are added but are unsupported */
 	for (i = j = 0; i < priority_cache->protocol.num_priorities; i++) {
 		vers = version_to_entry(priority_cache->protocol.priorities[i]);
-		if (!vers || vers->supported)
+		if (!vers || vers->supported ||
+				(system_wide_config.allowlisting && \
+				 vers->supported_revertible))
 			priority_cache->protocol.priorities[j++] = priority_cache->protocol.priorities[i];
 	}
 	priority_cache->protocol.num_priorities = j;
@@ -3492,4 +3765,289 @@ gnutls_priority_string_list(unsigned iter, unsigned int flags)
 
 bool _gnutls_config_is_ktls_enabled(void){
 	return system_wide_config.ktls_enabled;
+}
+
+/*
+ * high-level interface for overriding configuration files
+ */
+
+static inline bool /* not locking system_wide_config */
+system_wide_config_is_malleable(void) {
+	if (!system_wide_config.allowlisting) {
+		_gnutls_audit_log(NULL, "allowlisting is not enabled!\n");
+		return false;
+	}
+	if (system_wide_config.priority_string) {
+		_gnutls_audit_log(NULL, "priority strings have already been "
+				"initialized!\n");
+		return false;
+	}
+	return true;
+}
+
+/**
+ * gnutls_digest_set_secure:
+ * @dig: is a digest algorithm
+ * @secure: whether to mark the digest algorithm secure
+ *
+ * Modify the previous system wide setting that marked @dig as secure
+ * or insecure. This only has effect when the algorithm is enabled
+ * through the allowlisting mode in the configuration file, or when
+ * the setting is modified with a prior call to this function.
+ *
+ * Since: 3.7.3
+ */
+int
+gnutls_digest_set_secure(gnutls_digest_algorithm_t dig, unsigned int secure)
+{
+#ifndef DISABLE_SYSTEM_CONFIG
+	int ret;
+	ret = gnutls_rwlock_wrlock(&system_wide_config_rwlock);
+	if (ret < 0) {
+		(void)gnutls_rwlock_unlock(&system_wide_config_rwlock);
+		return gnutls_assert_val(ret);
+	}
+	if (!system_wide_config_is_malleable()) {
+		(void)gnutls_rwlock_unlock(&system_wide_config_rwlock);
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
+
+	if (secure) {
+		ret = cfg_hashes_add(&system_wide_config, dig);
+	} else {
+		ret = cfg_hashes_remove(&system_wide_config, dig);
+	}
+
+	(void)gnutls_rwlock_unlock(&system_wide_config_rwlock);
+	return ret;
+#else
+	return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+#endif
+}
+
+/**
+ * gnutls_sign_set_secure:
+ * @sign: the sign algorithm
+ * @secure: whether to mark the sign algorithm secure
+ *
+ * Modify the previous system wide setting that marked @sign as secure
+ * or insecure.  Calling this function is allowed
+ * only if allowlisting mode is set in the configuration file,
+ * and only if the system-wide TLS priority string
+ * has not been initialized yet.
+ * The intended usage is to provide applications with a way
+ * to expressly deviate from the distribution or site defaults
+ * inherited from the configuration file.
+ * The modification is composable with further modifications
+ * performed through the priority string mechanism.
+ *
+ * This function is not thread-safe and is intended to be called
+ * in the main thread at the beginning of the process execution.
+ *
+ * Even when @secure is true, @sign is not marked as secure for the
+ * use in certificates.  Use gnutls_sign_set_secure_for_certs() to
+ * mark it secure as well for certificates.
+ *
+ * Returns: 0 on success or negative error code otherwise.
+ *
+ * Since: 3.7.3
+ */
+int
+gnutls_sign_set_secure(gnutls_sign_algorithm_t sign, unsigned int secure)
+{
+#ifndef DISABLE_SYSTEM_CONFIG
+	int ret;
+	ret = gnutls_rwlock_wrlock(&system_wide_config_rwlock);
+	if (ret < 0) {
+		(void)gnutls_rwlock_unlock(&system_wide_config_rwlock);
+		return gnutls_assert_val(ret);
+	}
+	if (!system_wide_config_is_malleable()) {
+		(void)gnutls_rwlock_unlock(&system_wide_config_rwlock);
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
+
+	if (secure) {
+		ret = cfg_sigs_add(&system_wide_config, sign);
+	} else {
+		ret = cfg_sigs_remove(&system_wide_config, sign);
+		if (ret < 0) {
+			(void)gnutls_rwlock_unlock(&system_wide_config_rwlock);
+			return ret;
+		}
+		/* irregularity, distrusting also means distrusting for certs */
+		ret = cfg_sigs_for_cert_remove(&system_wide_config, sign);
+	}
+
+	(void)gnutls_rwlock_unlock(&system_wide_config_rwlock);
+	return ret;
+#else
+	return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+#endif
+}
+
+
+/**
+ * gnutls_sign_set_secure_for_certs:
+ * @sign: the sign algorithm
+ * @secure: whether to mark the sign algorithm secure for certificates
+ *
+ * Modify the previous system wide setting that marked @sign as secure
+ * or insecure for the use in certificates.  Calling this fuction is allowed
+ * only if allowlisting mode is set in the configuration file,
+ * and only if the system-wide TLS priority string
+ * has not been initialized yet.
+ * The intended usage is to provide applications with a way
+ * to expressly deviate from the distribution or site defaults
+ * inherited from the configuration file.
+ * The modification is composable with further modifications
+ * performed through the priority string mechanism.
+ *
+ * This function is not thread-safe and is intended to be called
+ * in the main thread at the beginning of the process execution.
+
+ * When @secure is true, @sign is marked as secure for any use unlike
+ * gnutls_sign_set_secure().  Otherwise, it is marked as insecure only
+ * for the use in certificates.  Use gnutls_sign_set_secure() to mark
+ * it insecure for any uses.
+ *
+ * Returns: 0 on success or negative error code otherwise.
+ *
+ * Since: 3.7.3
+ */
+int
+gnutls_sign_set_secure_for_certs(gnutls_sign_algorithm_t sign,
+				 unsigned int secure)
+{
+#ifndef DISABLE_SYSTEM_CONFIG
+	int ret;
+	ret = gnutls_rwlock_wrlock(&system_wide_config_rwlock);
+	if (ret < 0) {
+		(void)gnutls_rwlock_unlock(&system_wide_config_rwlock);
+		return gnutls_assert_val(ret);
+	}
+	if (!system_wide_config_is_malleable()) {
+		(void)gnutls_rwlock_unlock(&system_wide_config_rwlock);
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
+
+	if (secure) {
+		/* irregularity, trusting for certs means trusting in general */
+		ret = cfg_sigs_add(&system_wide_config, sign);
+		if (ret < 0) {
+			(void)gnutls_rwlock_unlock(&system_wide_config_rwlock);
+			return ret;
+		}
+		ret = cfg_sigs_for_cert_add(&system_wide_config, sign);
+	} else {
+		ret = cfg_sigs_for_cert_remove(&system_wide_config, sign);
+	}
+
+	(void)gnutls_rwlock_unlock(&system_wide_config_rwlock);
+	return ret;
+#else
+	return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+#endif
+}
+
+/**
+ * gnutls_protocol_set_enabled:
+ * @version: is a (gnutls) version number
+ * @enabled: whether to enable the protocol
+ *
+ * Control the previous system-wide setting that marked @version as
+ * enabled or disabled.  Calling this fuction is allowed
+ * only if allowlisting mode is set in the configuration file,
+ * and only if the system-wide TLS priority string
+ * has not been initialized yet.
+ * The intended usage is to provide applications with a way
+ * to expressly deviate from the distribution or site defaults
+ * inherited from the configuration file.
+ * The modification is composable with further modifications
+ * performed through the priority string mechanism.
+ *
+ * This function is not thread-safe and is intended to be called
+ * in the main thread at the beginning of the process execution.
+ *
+ * Returns: 0 on success or negative error code otherwise.
+ *
+ * Since: 3.7.3
+ */
+int /* allowlisting-only */ /* not thread-safe */
+gnutls_protocol_set_enabled(gnutls_protocol_t version, unsigned int enabled)
+{
+#ifndef DISABLE_SYSTEM_CONFIG
+	int ret;
+	ret = gnutls_rwlock_wrlock(&system_wide_config_rwlock);
+	if (ret < 0) {
+		(void)gnutls_rwlock_unlock(&system_wide_config_rwlock);
+		return gnutls_assert_val(ret);
+	}
+	if (!system_wide_config_is_malleable()) {
+		(void)gnutls_rwlock_unlock(&system_wide_config_rwlock);
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
+
+	if (enabled) {
+		ret = cfg_versions_add(&system_wide_config, version);
+	} else {
+		ret = cfg_versions_remove(&system_wide_config, version);
+	}
+
+	(void)gnutls_rwlock_unlock(&system_wide_config_rwlock);
+	return ret;
+#else
+	return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+#endif
+}
+
+/**
+ * gnutls_ecc_curve_set_enabled:
+ * @curve: is an ECC curve
+ * @enabled: whether to enable the curve
+ *
+ * Modify the previous system wide setting that marked @curve as
+ * enabled or disabled.  Calling this fuction is allowed
+ * only if allowlisting mode is set in the configuration file,
+ * and only if the system-wide TLS priority string
+ * has not been initialized yet.
+ * The intended usage is to provide applications with a way
+ * to expressly deviate from the distribution or site defaults
+ * inherited from the configuration file.
+ * The modification is composable with further modifications
+ * performed through the priority string mechanism.
+ *
+ * This function is not thread-safe and is intended to be called
+ * in the main thread at the beginning of the process execution.
+ *
+ * Returns: 0 on success or negative error code otherwise.
+ *
+ * Since: 3.7.3
+ */
+int
+gnutls_ecc_curve_set_enabled(gnutls_ecc_curve_t curve, unsigned int enabled)
+{
+#ifndef DISABLE_SYSTEM_CONFIG
+	int ret;
+	ret = gnutls_rwlock_wrlock(&system_wide_config_rwlock);
+	if (ret < 0) {
+		(void)gnutls_rwlock_unlock(&system_wide_config_rwlock);
+		return gnutls_assert_val(ret);
+	}
+	if (!system_wide_config_is_malleable()) {
+		(void)gnutls_rwlock_unlock(&system_wide_config_rwlock);
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
+
+	if (enabled) {
+		ret = cfg_ecc_curves_add(&system_wide_config, curve);
+	} else {
+		ret = cfg_ecc_curves_remove(&system_wide_config, curve);
+	}
+
+	(void)gnutls_rwlock_unlock(&system_wide_config_rwlock);
+	return ret;
+#else
+	return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+#endif
 }
