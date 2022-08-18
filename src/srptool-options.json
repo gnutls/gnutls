@@ -25,7 +25,8 @@
           "long-option": "index",
           "short-option": "i",
           "description": "specify the index of the group parameters in tpasswd.conf to use",
-          "argument-type": "number"
+          "argument-type": "number",
+          "argument-default": 3
         },
         {
           "long-option": "username",
