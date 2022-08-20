@@ -275,4 +275,8 @@ Computer Science No. 1465 (Rafael Hirschfeld, ed.), February 1998),
 pages 178--183, available from
 @url{https://people.csail.mit.edu/rivest/Rivest-CanWeEliminateCertificateRevocationLists.pdf}.
 
+@item @anchor{RFC9266}[RFC9266]
+S. Whited, "Channel Bindings for TLS 1.3",
+July 2022, available from @url{https://www.ietf.org/rfc/rfc9266.txt}.
+
 @end table

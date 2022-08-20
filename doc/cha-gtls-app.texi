@@ -2201,9 +2201,12 @@ background and discussion see @xcite{RFC5056}.
 
 In @acronym{GnuTLS} you can extract a channel binding using the
 @funcref{gnutls_session_channel_binding} function.  Currently only the
-type @code{GNUTLS_CB_TLS_UNIQUE} is supported, which corresponds to
-the @code{tls-unique} channel binding for TLS defined in
-@xcite{RFC5929}.
+following types are supported:
+
+@itemize
+@item @code{GNUTLS_CB_TLS_UNIQUE}: corresponds to the @code{tls-unique} channel binding for TLS defined in @xcite{RFC5929}
+@item @code{GNUTLS_CB_TLS_EXPORTER}: corresponds to the @code{tls-exporter} channel binding for TLS defined in @xcite{RFC9266}
+@end itemize
 
 The following example describes how to print the channel binding data.
 Note that it must be run after a successful TLS handshake.
