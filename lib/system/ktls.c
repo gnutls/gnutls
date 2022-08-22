@@ -452,7 +452,13 @@ int _gnutls_ktls_recv_int(gnutls_session_t session, content_type_t type,
 				ret = 0;
 				break;
 			case GNUTLS_HANDSHAKE:
-				// ignore post-handshake messages
+				ret = gnutls_handshake_write(session,
+						GNUTLS_ENCRYPTION_LEVEL_APPLICATION,
+						data, ret);
+
+				if (ret < 0)
+					return gnutls_assert_val(ret);
+
 				if (type != record_type)
 					return GNUTLS_E_AGAIN;
 				break;
