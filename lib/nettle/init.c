@@ -30,14 +30,15 @@
 static void gnutls_free_zero(void *data, size_t size);
 static void *gnutls_realloc_zero(void *data, size_t old_size, size_t new_size);
 
+static void *(*allocfunc) (size_t);
+static void *(*reallocfunc) (void *, size_t, size_t);
+static void (*freefunc) (void *, size_t);
+
 /* Functions that refer to the initialization of the nettle library.
  */
 
 int gnutls_crypto_init(void)
 {
-	void *(*allocfunc) (size_t);
-	void *(*reallocfunc) (void *, size_t, size_t);
-	void (*freefunc) (void *, size_t);
 	void *(*defallocfunc) (size_t);
 	void *(*defreallocfunc) (void *, size_t, size_t);
 	void (*deffreefunc) (void *, size_t);
@@ -65,6 +66,7 @@ int gnutls_crypto_init(void)
 
 void gnutls_crypto_deinit(void)
 {
+	mp_set_memory_functions(allocfunc, reallocfunc, freefunc);
 }
 
 /*-
