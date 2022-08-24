@@ -81,16 +81,32 @@ unsigned int _gnutls_x86_cpuid_s[4];
 # define bit_AVX 0x10000000
 #endif
 
+#ifndef bit_AVX2
+# define bit_AVX2 0x00000020
+#endif
+
+#ifndef bit_AVX512F
+# define bit_AVX512F 0x00010000
+#endif
+
+#ifndef bit_AVX512IFMA
+# define bit_AVX512IFMA 0x00200000
+#endif
+
+#ifndef bit_AVX512BW
+# define bit_AVX512BW 0x40000000
+#endif
+
+#ifndef bit_AVX512VL
+# define bit_AVX512VL 0x80000000
+#endif
+
 #ifndef bit_OSXSAVE
 # define bit_OSXSAVE 0x8000000
 #endif
 
 #ifndef bit_MOVBE
 # define bit_MOVBE 0x00400000
-#endif
-
-#ifndef OSXSAVE_MASK
-# define OSXSAVE_MASK (bit_OSXSAVE|bit_MOVBE)
 #endif
 
 #define bit_PADLOCK (0x3 << 6)
@@ -148,7 +164,7 @@ static unsigned check_4th_gen_intel_features(unsigned ecx)
 {
 	uint32_t xcr0;
 
-	if ((ecx & OSXSAVE_MASK) != OSXSAVE_MASK)
+	if ((ecx & bit_OSXSAVE) != bit_OSXSAVE)
 		return 0;
 
 #if defined(_MSC_VER) && !defined(__clang__)
@@ -190,8 +206,9 @@ static void capabilities_to_intel_cpuid(unsigned capabilities)
 	}
 
 	if (capabilities & INTEL_AVX) {
-		if ((a[1] & bit_AVX) && check_4th_gen_intel_features(a[1])) {
-			_gnutls_x86_cpuid_s[1] |= bit_AVX|OSXSAVE_MASK;
+		if ((a[1] & bit_AVX) && (a[1] & bit_MOVBE) &&
+		    check_4th_gen_intel_features(a[1])) {
+			_gnutls_x86_cpuid_s[1] |= bit_AVX|bit_MOVBE;
 		} else {
 			_gnutls_debug_log
 			    ("AVX acceleration requested but not available\n");
@@ -236,10 +253,7 @@ static unsigned check_sha(void)
 #ifdef ASM_X86_64
 static unsigned check_avx_movbe(void)
 {
-	if (check_4th_gen_intel_features(_gnutls_x86_cpuid_s[1]) == 0)
-		return 0;
-
-	return ((_gnutls_x86_cpuid_s[1] & bit_AVX));
+	return (_gnutls_x86_cpuid_s[1] & (bit_AVX|bit_MOVBE)) == (bit_AVX|bit_MOVBE);
 }
 
 static unsigned check_pclmul(void)
@@ -884,6 +898,19 @@ void register_x86_intel_crypto(unsigned capabilities)
 	if (capabilities == 0) {
 		if (!read_cpuid_vals(_gnutls_x86_cpuid_s))
 			return;
+		if (!check_4th_gen_intel_features(_gnutls_x86_cpuid_s[1])) {
+			_gnutls_x86_cpuid_s[1] &= ~bit_AVX;
+
+			/* Clear AVX2 bits as well, according to what
+			 * OpenSSL does.  Should we clear
+			 * bit_AVX512DQ, bit_AVX512PF, bit_AVX512ER,
+			 * and bit_AVX512CD? */
+			_gnutls_x86_cpuid_s[2] &= ~(bit_AVX2|
+						    bit_AVX512F|
+						    bit_AVX512IFMA|
+						    bit_AVX512BW|
+						    bit_AVX512BW);
+		}
 	} else {
 		capabilities_to_intel_cpuid(capabilities);
 	}
