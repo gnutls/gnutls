@@ -1369,7 +1369,7 @@ gnutls_session_channel_binding(gnutls_session_t session,
 	if (cbtype == GNUTLS_CB_TLS_UNIQUE) {
 		const version_entry_st *ver = get_version(session);
 		if (unlikely(ver == NULL || ver->tls13_sem))
-			return GNUTLS_E_INVALID_REQUEST;
+			return GNUTLS_E_CHANNEL_BINDING_NOT_AVAILABLE;
 
 		cb->size = session->internals.cb_tls_unique_len;
 		cb->data = gnutls_malloc(cb->size);
@@ -1460,6 +1460,21 @@ gnutls_session_channel_binding(gnutls_session_t session,
 #define RFC5705_LABEL_LEN 24
 #define EXPORTER_CTX_DATA ""
 #define EXPORTER_CTX_LEN 0
+
+		const version_entry_st *ver = get_version(session);
+		if (unlikely(ver == NULL)) {
+			return GNUTLS_E_CHANNEL_BINDING_NOT_AVAILABLE;
+		}
+
+		/* "tls-exporter" channel binding is defined only when
+		 * the TLS handshake results in unique master secrets,
+		 * i.e., either TLS 1.3, or TLS 1.2 with extended
+		 * master secret negotiated.
+		 */
+		if (!ver->tls13_sem &&
+		    gnutls_session_ext_master_secret_status(session) == 0) {
+			return GNUTLS_E_CHANNEL_BINDING_NOT_AVAILABLE;
+		}
 
 		cb->size = 32;
 		cb->data = gnutls_malloc(cb->size);

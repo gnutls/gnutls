@@ -12,6 +12,13 @@ See the end for copying conditions.
    1536, and 1792 bits), in addition to any modulus sizes larger than
    2048 bits, according to SP800-131A rev2.
 
+** libgnutls: gnutls_session_channel_binding performs additional checks when
+   GNUTLS_CB_TLS_EXPORTER is requested. According to RFC9622 4.2, the
+   "tls-exporter" channel binding is only usable when the handshake is
+   bound to a unique master secret (i.e., either TLS 1.3 or extended
+   master secret extension is negotiated). Otherwise the function now
+   returns error.
+
 * Version 3.7.7 (released 2022-07-28)
 
 ** libgnutls: Fixed double free during verification of pkcs7 signatures.
