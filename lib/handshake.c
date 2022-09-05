@@ -2924,7 +2924,12 @@ int gnutls_handshake(gnutls_session_t session)
 
 #ifdef ENABLE_KTLS
 	if (IS_KTLS_ENABLED(session, GNUTLS_KTLS_DUPLEX)) {
-		_gnutls_ktls_set_keys(session, GNUTLS_KTLS_DUPLEX);
+		ret = _gnutls_ktls_set_keys(session, GNUTLS_KTLS_DUPLEX);
+		if (ret < 0) {
+			session->internals.ktls_enabled = 0;
+			_gnutls_audit_log(session,
+					  "disabling KTLS: failed to set keys\n");
+		}
 	}
 #endif
 
