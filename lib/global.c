@@ -551,6 +551,7 @@ static const struct gnutls_library_config_st _gnutls_library_config[] = {
 	{ "libgmp-soname", GMP_LIBRARY_SONAME },
 	{ "hardware-features", HW_FEATURES },
 	{ "tls-features", TLS_FEATURES },
+	{ "default-system-config", SYSTEM_PRIORITY_FILE },
 	{ NULL, NULL }
 };
 
