@@ -662,10 +662,10 @@ via @funcref{gnutls_handshake_set_timeout}.
 
 Note however, that the API ensures that the early return will not happen
 if the false start requirements are not satisfied. That is, on ciphersuites which are not
-whitelisted for false start or on insufficient key sizes, the handshake
+enabled for false start or on insufficient key sizes, the handshake
 process will complete properly (i.e., no early return). To verify that false start was used you
 may use @funcref{gnutls_session_get_flags} and check for the @acronym{GNUTLS_SFLAGS_FALSE_START}
-flag. For GnuTLS the false start is whitelisted for the following
+flag. For GnuTLS the false start is enabled for the following
 key exchange methods (see @xcite{RFC7918} for rationale)
 @itemize
 @item DHE

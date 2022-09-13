@@ -1119,9 +1119,14 @@ AC_ARG_WITH([default-crl-file],
   [AS_HELP_STRING([--with-default-crl-file=FILE],
     [use the given CRL file as default])])
 
+AC_ARG_WITH([default-blocklist-file],
+  [AS_HELP_STRING([--with-default-blocklist-file=FILE],
+    [use the given certificate blocklist file as default])])
+
 AC_ARG_WITH([default-blacklist-file],
   [AS_HELP_STRING([--with-default-blacklist-file=FILE],
-    [use the given certificate blacklist file as default])])
+    [use --with-default-blocklist-file instead])],
+  [AC_MSG_ERROR([use --with-default-blocklist-file instead])])
 
 if test "x$with_default_trust_store_file" != x; then
   AC_DEFINE_UNQUOTED([DEFAULT_TRUST_STORE_FILE],
@@ -1133,9 +1138,9 @@ if test "x$with_default_crl_file" != x; then
     ["$with_default_crl_file"], [use the given CRL file])
 fi
 
-if test "x$with_default_blacklist_file" != x; then
-  AC_DEFINE_UNQUOTED([DEFAULT_BLACKLIST_FILE],
-    ["$with_default_blacklist_file"], [use the given certificate blacklist file])
+if test "x$with_default_blocklist_file" != x; then
+  AC_DEFINE_UNQUOTED([DEFAULT_BLOCKLIST_FILE],
+    ["$with_default_blocklist_file"], [use the given certificate blocklist file])
 fi
 
 dnl Guile bindings.
@@ -1462,7 +1467,7 @@ AC_MSG_NOTICE([System files:
   Trust store pkcs11:   $with_default_trust_store_pkcs11
   Trust store dir:      $with_default_trust_store_dir
   Trust store file:     $with_default_trust_store_file
-  Blacklist file:       $with_default_blacklist_file
+  Blocklist file:       $with_default_blocklist_file
   CRL file:             $with_default_crl_file
   Configuration file:   $system_config_file
   DNSSEC root key file: $unbound_root_key_file
