@@ -1654,6 +1654,7 @@ static void cmd_parser(int argc, char **argv)
 		for (p = gnutls_get_library_config(); p->name; p++) {
 			log_msg(stdout, "%s: %s\n", p->name, p->value);
 		}
+		log_msg(stdout, "system-config: %s\n", gnutls_get_system_config_file());
 		exit(0);
 	}
 
