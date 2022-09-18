@@ -968,7 +968,7 @@ gcm_ghash_clmul:
 	jz	.Lodd_tail
 
 	movdqu	16(%rsi),%xmm6
-	movl	_gnutls_x86_cpuid_s+4(%rip),%eax
+	movl	GNUTLS_x86_cpuid_s+4(%rip),%eax
 	cmpq	$0x30,%rcx
 	jb	.Lskip4x
 

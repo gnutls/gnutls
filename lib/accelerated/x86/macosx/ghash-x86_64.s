@@ -956,7 +956,7 @@ L$_ghash_clmul:
 	jz	L$odd_tail
 
 	movdqu	16(%rsi),%xmm6
-	movl	__gnutls_x86_cpuid_s+4(%rip),%eax
+	movl	_GNUTLS_x86_cpuid_s+4(%rip),%eax
 	cmpq	$0x30,%rcx
 	jb	L$skip4x
 

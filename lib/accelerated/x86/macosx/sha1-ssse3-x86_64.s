@@ -45,9 +45,9 @@
 .p2align	4
 _sha1_block_data_order:
 
-	movl	__gnutls_x86_cpuid_s+0(%rip),%r9d
-	movl	__gnutls_x86_cpuid_s+4(%rip),%r8d
-	movl	__gnutls_x86_cpuid_s+8(%rip),%r10d
+	movl	_GNUTLS_x86_cpuid_s+0(%rip),%r9d
+	movl	_GNUTLS_x86_cpuid_s+4(%rip),%r8d
+	movl	_GNUTLS_x86_cpuid_s+8(%rip),%r10d
 	testl	$512,%r8d
 	jz	L$ialu
 	testl	$536870912,%r10d

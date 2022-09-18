@@ -53,7 +53,7 @@ __attribute__((visibility("hidden")))
 #elif defined(__SUNPRO_C)
 __hidden
 #endif
-unsigned int _gnutls_x86_cpuid_s[4];
+unsigned int GNUTLS_x86_cpuid_s[4];
 
 #ifndef bit_SHA
 # define bit_SHA (1<<29)
@@ -189,7 +189,7 @@ static void capabilities_to_intel_cpuid(unsigned capabilities)
 
 	if (capabilities & INTEL_AES_NI) {
 		if (a[1] & bit_AES) {
-			_gnutls_x86_cpuid_s[1] |= bit_AES;
+			GNUTLS_x86_cpuid_s[1] |= bit_AES;
 		} else {
 			_gnutls_debug_log
 			    ("AESNI acceleration requested but not available\n");
@@ -198,7 +198,7 @@ static void capabilities_to_intel_cpuid(unsigned capabilities)
 
 	if (capabilities & INTEL_SSSE3) {
 		if (a[1] & bit_SSSE3) {
-			_gnutls_x86_cpuid_s[1] |= bit_SSSE3;
+			GNUTLS_x86_cpuid_s[1] |= bit_SSSE3;
 		} else {
 			_gnutls_debug_log
 			    ("SSSE3 acceleration requested but not available\n");
@@ -208,7 +208,7 @@ static void capabilities_to_intel_cpuid(unsigned capabilities)
 	if (capabilities & INTEL_AVX) {
 		if ((a[1] & bit_AVX) && (a[1] & bit_MOVBE) &&
 		    check_4th_gen_intel_features(a[1])) {
-			_gnutls_x86_cpuid_s[1] |= bit_AVX|bit_MOVBE;
+			GNUTLS_x86_cpuid_s[1] |= bit_AVX|bit_MOVBE;
 		} else {
 			_gnutls_debug_log
 			    ("AVX acceleration requested but not available\n");
@@ -217,7 +217,7 @@ static void capabilities_to_intel_cpuid(unsigned capabilities)
 
 	if (capabilities & INTEL_PCLMUL) {
 		if (a[1] & bit_PCLMUL) {
-			_gnutls_x86_cpuid_s[1] |= bit_PCLMUL;
+			GNUTLS_x86_cpuid_s[1] |= bit_PCLMUL;
 		} else {
 			_gnutls_debug_log
 			    ("PCLMUL acceleration requested but not available\n");
@@ -226,7 +226,7 @@ static void capabilities_to_intel_cpuid(unsigned capabilities)
 
 	if (capabilities & INTEL_SHA) {
 		if (a[2] & bit_SHA) {
-			_gnutls_x86_cpuid_s[2] |= bit_SHA;
+			GNUTLS_x86_cpuid_s[2] |= bit_SHA;
 		} else {
 			_gnutls_debug_log
 			    ("SHA acceleration requested but not available\n");
@@ -237,28 +237,28 @@ static void capabilities_to_intel_cpuid(unsigned capabilities)
 
 static unsigned check_optimized_aes(void)
 {
-	return (_gnutls_x86_cpuid_s[1] & bit_AES);
+	return (GNUTLS_x86_cpuid_s[1] & bit_AES);
 }
 
 static unsigned check_ssse3(void)
 {
-	return (_gnutls_x86_cpuid_s[1] & bit_SSSE3);
+	return (GNUTLS_x86_cpuid_s[1] & bit_SSSE3);
 }
 
 static unsigned check_sha(void)
 {
-	return (_gnutls_x86_cpuid_s[2] & bit_SHA);
+	return (GNUTLS_x86_cpuid_s[2] & bit_SHA);
 }
 
 #ifdef ASM_X86_64
 static unsigned check_avx_movbe(void)
 {
-	return (_gnutls_x86_cpuid_s[1] & (bit_AVX|bit_MOVBE)) == (bit_AVX|bit_MOVBE);
+	return (GNUTLS_x86_cpuid_s[1] & (bit_AVX|bit_MOVBE)) == (bit_AVX|bit_MOVBE);
 }
 
 static unsigned check_pclmul(void)
 {
-	return (_gnutls_x86_cpuid_s[1] & bit_PCLMUL);
+	return (GNUTLS_x86_cpuid_s[1] & bit_PCLMUL);
 }
 #endif
 
@@ -275,7 +275,7 @@ static unsigned capabilities_to_zhaoxin_edx(unsigned capabilities)
 		return 0;
 	if (capabilities & PADLOCK) {
 		if (c & bit_PADLOCK) {
-			_gnutls_x86_cpuid_s[2] |= bit_PADLOCK;
+			GNUTLS_x86_cpuid_s[2] |= bit_PADLOCK;
 		} else {
 			_gnutls_debug_log
 			    ("Padlock acceleration requested but not available\n");
@@ -284,7 +284,7 @@ static unsigned capabilities_to_zhaoxin_edx(unsigned capabilities)
 
 	if (capabilities & PADLOCK_PHE) {
 		if (c & bit_PADLOCK_PHE) {
-			_gnutls_x86_cpuid_s[2] |= bit_PADLOCK_PHE;
+			GNUTLS_x86_cpuid_s[2] |= bit_PADLOCK_PHE;
 		} else {
 			_gnutls_debug_log
 			    ("Padlock-PHE acceleration requested but not available\n");
@@ -293,14 +293,14 @@ static unsigned capabilities_to_zhaoxin_edx(unsigned capabilities)
 
 	if (capabilities & PADLOCK_PHE_SHA512) {
 		if (c & bit_PADLOCK_PHE_SHA512) {
-			_gnutls_x86_cpuid_s[2] |= bit_PADLOCK_PHE_SHA512;
+			GNUTLS_x86_cpuid_s[2] |= bit_PADLOCK_PHE_SHA512;
 		} else {
 			_gnutls_debug_log
 			    ("Padlock-PHE-SHA512 acceleration requested but not available\n");
 		}
 	}
 
-	return _gnutls_x86_cpuid_s[2];
+	return GNUTLS_x86_cpuid_s[2];
 }
 
 static int check_padlock(unsigned edx)
@@ -388,10 +388,10 @@ void register_x86_padlock_crypto(unsigned capabilities)
 	if (check_zhaoxin() == 0)
 		return;
 
-	memset(_gnutls_x86_cpuid_s, 0, sizeof(_gnutls_x86_cpuid_s));
+	memset(GNUTLS_x86_cpuid_s, 0, sizeof(GNUTLS_x86_cpuid_s));
 
 	if (capabilities == 0){
-		if(!read_cpuid_vals(_gnutls_x86_cpuid_s))
+		if(!read_cpuid_vals(GNUTLS_x86_cpuid_s))
 			return;
 		edx = padlock_capability();
 	} else{
@@ -888,7 +888,7 @@ void register_x86_intel_crypto(unsigned capabilities)
 	int ret;
 	enum x86_cpu_vendor vendor;
 
-	memset(_gnutls_x86_cpuid_s, 0, sizeof(_gnutls_x86_cpuid_s));
+	memset(GNUTLS_x86_cpuid_s, 0, sizeof(GNUTLS_x86_cpuid_s));
 
 	vendor = check_x86_cpu_vendor();
 	if (vendor == X86_CPU_VENDOR_OTHER) {
@@ -896,16 +896,16 @@ void register_x86_intel_crypto(unsigned capabilities)
 	}
 
 	if (capabilities == 0) {
-		if (!read_cpuid_vals(_gnutls_x86_cpuid_s))
+		if (!read_cpuid_vals(GNUTLS_x86_cpuid_s))
 			return;
-		if (!check_4th_gen_intel_features(_gnutls_x86_cpuid_s[1])) {
-			_gnutls_x86_cpuid_s[1] &= ~bit_AVX;
+		if (!check_4th_gen_intel_features(GNUTLS_x86_cpuid_s[1])) {
+			GNUTLS_x86_cpuid_s[1] &= ~bit_AVX;
 
 			/* Clear AVX2 bits as well, according to what
 			 * OpenSSL does.  Should we clear
 			 * bit_AVX512DQ, bit_AVX512PF, bit_AVX512ER,
 			 * and bit_AVX512CD? */
-			_gnutls_x86_cpuid_s[2] &= ~(bit_AVX2|
+			GNUTLS_x86_cpuid_s[2] &= ~(bit_AVX2|
 						    bit_AVX512F|
 						    bit_AVX512IFMA|
 						    bit_AVX512BW|
@@ -917,9 +917,9 @@ void register_x86_intel_crypto(unsigned capabilities)
 
 	/* CRYPTOGAMS uses the (1 << 30) bit as an indicator of Intel CPUs */
 	if (vendor == X86_CPU_VENDOR_INTEL) {
-		_gnutls_x86_cpuid_s[0] |= 1 << 30;
+		GNUTLS_x86_cpuid_s[0] |= 1 << 30;
 	} else {
-		_gnutls_x86_cpuid_s[0] &= ~(1 << 30);
+		GNUTLS_x86_cpuid_s[0] &= ~(1 << 30);
 	}
 
 	if (check_ssse3()) {

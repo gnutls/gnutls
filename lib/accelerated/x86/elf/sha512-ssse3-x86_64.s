@@ -45,7 +45,7 @@
 .align	16
 sha512_block_data_order:
 .cfi_startproc	
-	leaq	_gnutls_x86_cpuid_s(%rip),%r11
+	leaq	GNUTLS_x86_cpuid_s(%rip),%r11
 	movl	0(%r11),%r9d
 	movl	4(%r11),%r10d
 	movl	8(%r11),%r11d

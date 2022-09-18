@@ -45,7 +45,7 @@
 .p2align	4
 _sha256_block_data_order:
 
-	leaq	__gnutls_x86_cpuid_s(%rip),%r11
+	leaq	_GNUTLS_x86_cpuid_s(%rip),%r11
 	movl	0(%r11),%r9d
 	movl	4(%r11),%r10d
 	movl	8(%r11),%r11d
