@@ -25,6 +25,7 @@
 #include "extv.h"
 #include "handshake.h"
 #include "tls13/certificate_request.h"
+#include "ext/compress_certificate.h"
 #include "ext/signature.h"
 #include "ext/status_request.h"
 #include "mbuffers.h"
@@ -128,6 +129,13 @@ int parse_cert_extension(void *_ctx, unsigned tls_id, const uint8_t *data, unsig
 
 		ctx->rdn = data+2;
 		ctx->rdn_size = v;
+	} else if (tls_id == ext_mod_compress_certificate.tls_id) {
+		ret = _gnutls_compress_certificate_recv_params(session,
+							       data,
+							       data_size);
+		if (ret < 0) {
+			return gnutls_assert_val(ret);
+		}
 	}
 
 	return 0;
@@ -356,6 +364,13 @@ int _gnutls13_send_certificate_request(gnutls_session_t session, unsigned again)
 		}
 		session->internals.hsk_flags |= HSK_CLIENT_OCSP_REQUESTED;
 #endif
+
+		ret = _gnutls_extv_append(&buf, ext_mod_compress_certificate.tls_id, session,
+					  (extv_append_func)_gnutls_compress_certificate_send_params);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
 
 		ret = _gnutls_extv_append_final(&buf, init_pos, 0);
 		if (ret < 0) {

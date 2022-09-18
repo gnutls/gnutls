@@ -38,4 +38,12 @@ extern const hello_ext_entry_st ext_mod_compress_certificate;
 gnutls_compression_method_t _gnutls_compress_certificate_num2method(uint16_t num);
 int _gnutls_compress_certificate_method2num(gnutls_compression_method_t method);
 
+int
+_gnutls_compress_certificate_recv_params(gnutls_session_t session,
+					 const uint8_t * data,
+					 size_t data_size);
+int
+_gnutls_compress_certificate_send_params(gnutls_session_t session,
+					 gnutls_buffer_st * data);
+
 #endif /* GNUTLS_LIB_EXT_COMPRESS_CERTIFICATE_H */

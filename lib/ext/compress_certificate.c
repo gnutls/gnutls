@@ -161,7 +161,7 @@ gnutls_compress_certificate_set_methods(gnutls_session_t session,
 	return 0;
 }
 
-static int
+int
 _gnutls_compress_certificate_recv_params(gnutls_session_t session,
 					 const uint8_t * data,
 					 size_t data_size)
@@ -209,7 +209,7 @@ endloop:
 	return 0;
 }
 
-static int
+int
 _gnutls_compress_certificate_send_params(gnutls_session_t session,
 					 gnutls_buffer_st * data)
 {
@@ -245,7 +245,7 @@ const hello_ext_entry_st ext_mod_compress_certificate = {
 	.client_parse_point = GNUTLS_EXT_TLS,
 	.server_parse_point = GNUTLS_EXT_TLS,
 	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_DTLS | 
-		    GNUTLS_EXT_FLAG_CLIENT_HELLO | GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO,
+		    GNUTLS_EXT_FLAG_CLIENT_HELLO,
 	.recv_func = _gnutls_compress_certificate_recv_params,
 	.send_func = _gnutls_compress_certificate_send_params,
 	.deinit_func = _gnutls_hello_ext_default_deinit
