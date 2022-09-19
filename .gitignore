@@ -864,6 +864,7 @@ tests/tls13-without-timeout-func
 tests/tls13/anti_replay
 tests/tls13/change_cipher_spec
 tests/tls13/compress-cert
+tests/tls13/compress-cert-cli
 tests/tls13/compress-cert-neg
 tests/tls13/compress-cert-neg2
 tests/tls13/cookie
