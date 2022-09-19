@@ -272,6 +272,7 @@ void doit(void)
 	uint8_t hash[64];
 	gnutls_datum_t hashed_data;
 	uint8_t pbkdf2[64];
+	gnutls_datum_t temp_key = { NULL, 0 };
 
 	fprintf(stderr,
 		"Please note that if in FIPS140 mode, you need to assure the library's integrity prior to running this test\n");
@@ -402,6 +403,24 @@ void doit(void)
 	if (ret < 0) {
 		fail("gnutls_rnd failed\n");
 	}
+
+	/* Symmetric key generation equal to or longer than 112 bits: approved */
+	FIPS_PUSH_CONTEXT();
+	ret = gnutls_key_generate(&temp_key, 14);
+	if (ret < 0) {
+		fail("gnutls_key_generate failed\n");
+	}
+	gnutls_free(temp_key.data);
+	FIPS_POP_CONTEXT(APPROVED);
+
+	/* Symmetric key generation shorter than 112 bits: not approved */
+	FIPS_PUSH_CONTEXT();
+	ret = gnutls_key_generate(&temp_key, 13);
+	if (ret < 0) {
+		fail("gnutls_key_generate failed\n");
+	}
+	gnutls_free(temp_key.data);
+	FIPS_POP_CONTEXT(NOT_APPROVED);
 
 	ret = gnutls_pubkey_init(&pubkey);
 	if (ret < 0) {
