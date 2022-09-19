@@ -2218,6 +2218,11 @@ gnutls_pbkdf2(gnutls_mac_algorithm_t mac,
 		not_approved = true;
 	}
 
+	/* Key lengths and output sizes of less than 112 bits are not approved */
+	if (key->size < 14 || length < 14) {
+		not_approved = true;
+	}
+
 	ret = _gnutls_kdf_ops.pbkdf2(mac, key->data, key->size,
 				     salt->data, salt->size, iter_count,
 				     output, length);

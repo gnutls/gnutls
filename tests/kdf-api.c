@@ -65,6 +65,7 @@ test_hkdf(gnutls_mac_algorithm_t mac,
 
 	FIPS_PUSH_CONTEXT();
 	assert(gnutls_hkdf_extract(mac, &ikm, &salt, buf) >= 0);
+	/* HKDF outside of TLS usage is not approved */
 	FIPS_POP_CONTEXT(NOT_APPROVED);
 	gnutls_free(ikm.data);
 	gnutls_free(salt.data);
@@ -92,6 +93,7 @@ test_hkdf(gnutls_mac_algorithm_t mac,
 
 	FIPS_PUSH_CONTEXT();
 	assert(gnutls_hkdf_expand(mac, &prk, &info, buf, length) >= 0);
+	/* HKDF outside of TLS usage is not approved */
 	FIPS_POP_CONTEXT(NOT_APPROVED);
 
 	gnutls_free(info.data);
@@ -113,7 +115,8 @@ test_pbkdf2(gnutls_mac_algorithm_t mac,
 	    const char *salt_hex,
 	    unsigned iter_count,
 	    size_t length,
-	    const char *okm_hex)
+	    const char *okm_hex,
+	    gnutls_fips140_operation_state_t expected_state)
 {
 	gnutls_datum_t hex;
 	gnutls_datum_t ikm;
@@ -131,9 +134,9 @@ test_pbkdf2(gnutls_mac_algorithm_t mac,
 	hex.size = strlen(salt_hex);
 	assert(gnutls_hex_decode2(&hex, &salt) >= 0);
 
-	FIPS_PUSH_CONTEXT();
+	fips_push_context(fips_context);
 	assert(gnutls_pbkdf2(mac, &ikm, &salt, iter_count, buf, length) >= 0);
-	FIPS_POP_CONTEXT(APPROVED);
+	fips_pop_context(fips_context, expected_state);
 	gnutls_free(ikm.data);
 	gnutls_free(salt.data);
 
@@ -174,7 +177,9 @@ doit(void)
 		    "73616c74",		/* "salt" */
 		    4096,
 		    20,
-		    "4b007901b765489abead49d926f721d065a429c1");
+		    "4b007901b765489abead49d926f721d065a429c1",
+		    /* Key sizes and output sizes less than 112-bit are not approved.  */
+		    GNUTLS_FIPS140_OP_NOT_APPROVED);
 
 	gnutls_fips140_context_deinit(fips_context);
 }

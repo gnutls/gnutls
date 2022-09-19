@@ -271,6 +271,7 @@ void doit(void)
 	uint8_t hmac[64];
 	uint8_t hash[64];
 	gnutls_datum_t hashed_data;
+	uint8_t pbkdf2[64];
 
 	fprintf(stderr,
 		"Please note that if in FIPS140 mode, you need to assure the library's integrity prior to running this test\n");
@@ -365,6 +366,35 @@ void doit(void)
 			       data.data, data.size, hmac);
 	if (ret < 0) {
 		fail("gnutls_hmac_fast failed\n");
+	}
+	FIPS_POP_CONTEXT(NOT_APPROVED);
+
+	/* PBKDF2 with key equal to or longer than 112 bits: approved */
+	FIPS_PUSH_CONTEXT();
+	ret = gnutls_pbkdf2(GNUTLS_MAC_SHA256, &key, &iv, 100,
+			    &pbkdf2, sizeof(pbkdf2));
+	if (ret < 0) {
+		fail("gnutls_pbkdf2 failed\n");
+	}
+	FIPS_POP_CONTEXT(APPROVED);
+
+	/* PBKDF2 with key shorter than 112 bits: not approved */
+	FIPS_PUSH_CONTEXT();
+	key.size = 13;
+	ret = gnutls_pbkdf2(GNUTLS_MAC_SHA256, &key, &iv, 100,
+			    &pbkdf2, sizeof(pbkdf2));
+	if (ret < 0) {
+		fail("gnutls_pbkdf2 failed\n");
+	}
+	key.size = sizeof(key16);
+	FIPS_POP_CONTEXT(NOT_APPROVED);
+
+	/* PBKDF2 with output shorter than 112 bits: not approved */
+	FIPS_PUSH_CONTEXT();
+	ret = gnutls_pbkdf2(GNUTLS_MAC_SHA256, &key, &iv, 100,
+			    &pbkdf2, 13);
+	if (ret < 0) {
+		fail("gnutls_pbkdf2 failed\n");
 	}
 	FIPS_POP_CONTEXT(NOT_APPROVED);
 
