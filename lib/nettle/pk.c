@@ -1104,8 +1104,16 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 			me = _gnutls_dsa_q_to_hash(pk_params,
 						   &hash_len);
 
+			if (hash_len > vdata->size) {
+				gnutls_assert();
+				_gnutls_debug_log
+				    ("Security level of algorithm requires hash %s(%d) or better\n",
+				     _gnutls_mac_get_name(me), hash_len);
+				hash_len = vdata->size;
+			}
+
 			/* Only SHA-2 is allowed in FIPS 140-3 */
-			switch (me->id) {
+			switch (DIG_TO_MAC(sign_params->dsa_dig)) {
 			case GNUTLS_MAC_SHA256:
 			case GNUTLS_MAC_SHA384:
 			case GNUTLS_MAC_SHA512:
@@ -1113,14 +1121,6 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 				break;
 			default:
 				not_approved = true;
-			}
-
-			if (hash_len > vdata->size) {
-				gnutls_assert();
-				_gnutls_debug_log
-				    ("Security level of algorithm requires hash %s(%d) or better\n",
-				     _gnutls_mac_get_name(me), hash_len);
-				hash_len = vdata->size;
 			}
 
 			mpz_init(k);
@@ -1545,7 +1545,6 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 			struct dsa_signature sig;
 			int curve_id = pk_params->curve;
 			const struct ecc_curve *curve;
-			const mac_entry_st *me;
 
 			curve = get_supported_nist_curve(curve_id);
 			if (curve == NULL) {
@@ -1571,11 +1570,14 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 			memcpy(sig.r, tmp[0], SIZEOF_MPZT);
 			memcpy(sig.s, tmp[1], SIZEOF_MPZT);
 
-			me = _gnutls_dsa_q_to_hash(pk_params, &hash_len);
+			(void)_gnutls_dsa_q_to_hash(pk_params, &hash_len);
+
+			if (hash_len > vdata->size)
+				hash_len = vdata->size;
 
 			/* SHA-1 is allowed for SigVer in FIPS 140-3 in legacy
 			 * mode */
-			switch (me->id) {
+			switch (DIG_TO_MAC(sign_params->dsa_dig)) {
 			case GNUTLS_MAC_SHA1:
 			case GNUTLS_MAC_SHA256:
 			case GNUTLS_MAC_SHA384:
@@ -1585,9 +1587,6 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 			default:
 				not_approved = true;
 			}
-
-			if (hash_len > vdata->size)
-				hash_len = vdata->size;
 
 			ret =
 			    ecdsa_verify(&pub, hash_len, vdata->data,
@@ -2390,8 +2389,10 @@ static int pct_test(gnutls_pk_algorithm_t algo, const gnutls_pk_params_st* param
 
 	if (algo == GNUTLS_PK_DSA || algo == GNUTLS_PK_EC) {
 		unsigned hash_len;
+		const mac_entry_st *me;
 
-		_gnutls_dsa_q_to_hash(params, &hash_len);
+		me = _gnutls_dsa_q_to_hash(params, &hash_len);
+		spki.dsa_dig = MAC_TO_DIG(me->id);
 		gen_data = gnutls_malloc(hash_len);
 		gnutls_rnd(GNUTLS_RND_NONCE, gen_data, hash_len);
 
