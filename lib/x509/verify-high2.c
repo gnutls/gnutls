@@ -393,7 +393,7 @@ int load_dir_certs(const char *dirname,
 {
 	int ret;
 	int r = 0;
-	char path[GNUTLS_PATH_MAX];
+	struct gnutls_pathbuf_st pathbuf;
 
 #if !defined(_WIN32) || !defined(_UNICODE)
 	DIR *dirp;
@@ -401,29 +401,44 @@ int load_dir_certs(const char *dirname,
 
 	dirp = opendir(dirname);
 	if (dirp != NULL) {
+		size_t base_len;
+
+		ret = _gnutls_pathbuf_init(&pathbuf, dirname);
+		if (ret < 0) {
+			return r;
+		}
+
+		base_len = pathbuf.len;
 		while ((d = readdir(dirp)) != NULL) {
 #ifdef _DIRENT_HAVE_D_TYPE
-				if (d->d_type == DT_REG || d->d_type == DT_LNK || d->d_type == DT_UNKNOWN)
-#endif
-			{
-				snprintf(path, sizeof(path), "%s/%s",
-					 dirname, d->d_name);
-
-				if (crl != 0) {
-					ret =
-					    gnutls_x509_trust_list_add_trust_file
-					    (list, NULL, path, type, tl_flags,
-					     tl_vflags);
-				} else {
-					ret =
-					    gnutls_x509_trust_list_add_trust_file
-					    (list, path, NULL, type, tl_flags,
-					     tl_vflags);
-				}
-				if (ret >= 0)
-					r += ret;
+			switch (d->d_type) {
+			case DT_REG:
+			case DT_LNK:
+			case DT_UNKNOWN:
+				break;
+			default:
+				continue;
 			}
+#endif
+			ret = _gnutls_pathbuf_append(&pathbuf, d->d_name);
+			if (ret < 0) {
+				continue;
+			}
+			if (crl != 0) {
+				ret = gnutls_x509_trust_list_add_trust_file
+					(list, NULL, pathbuf.ptr, type, tl_flags,
+					 tl_vflags);
+			} else {
+				ret = gnutls_x509_trust_list_add_trust_file
+					(list, pathbuf.ptr, NULL, type, tl_flags,
+					 tl_vflags);
+			}
+			if (ret >= 0) {
+				r += ret;
+			}
+			(void)_gnutls_pathbuf_truncate(&pathbuf, base_len);
 		}
+		_gnutls_pathbuf_deinit(&pathbuf);
 		closedir(dirp);
 	}
 #else /* _WIN32 */
@@ -432,41 +447,70 @@ int load_dir_certs(const char *dirname,
 	struct _tdirent *d;
 	gnutls_datum_t utf16 = {NULL, 0};
 
+#undef UCS2_ENDIAN
 #ifdef WORDS_BIGENDIAN
-	r = _gnutls_utf8_to_ucs2(dirname, strlen(dirname), &utf16, 1);
+#define UCS2_ENDIAN 1
 #else
-	r = _gnutls_utf8_to_ucs2(dirname, strlen(dirname), &utf16, 0);
+#define UCS2_ENDIAN 0
 #endif
-	if (r < 0)
-		return gnutls_assert_val(r);
+
+	ret = _gnutls_utf8_to_ucs2(dirname, strlen(dirname), &utf16, UCS2_ENDIAN);
+	if (ret < 0) {
+		return gnutls_assert_val(ret);
+	}
 	dirp = _topendir((_TCHAR*)utf16.data);
 	gnutls_free(utf16.data);
 	if (dirp != NULL) {
-		while ((d = _treaddir(dirp)) != NULL) {
-#ifdef _DIRENT_HAVE_D_TYPE
-			if (d->d_type == DT_REG || d->d_type == DT_LNK || d->d_type == DT_UNKNOWN)
-#endif
-			{
-				snprintf(path, sizeof(path), "%s/%ls",
-					dirname, d->d_name);
+		size_t base_len;
 
-				if (crl != 0) {
-					ret =
-					    gnutls_x509_trust_list_add_trust_file
-					    (list, NULL, path, type, tl_flags,
-					     tl_vflags);
-				} else {
-					ret =
-					    gnutls_x509_trust_list_add_trust_file
-					    (list, path, NULL, type, tl_flags,
-					     tl_vflags);
-				}
-				if (ret >= 0)
-					r += ret;
-			}
+		ret = _gnutls_pathbuf_init(&pathbuf, dirname);
+		if (ret < 0) {
+			return r;
 		}
+
+		base_len = pathbuf.len;
+		while ((d = _treaddir(dirp)) != NULL) {
+			gnutls_datum_t utf8 = {NULL, 0};
+#ifdef _DIRENT_HAVE_D_TYPE
+			switch (d->d_type) {
+			case DT_REG:
+			case DT_LNK:
+			case DT_UNKNOWN:
+				break;
+			default:
+				continue;
+			}
+#endif
+			ret = _gnutls_ucs2_to_utf8(d->d_name,
+						   d->d_namlen * sizeof(d->d_name[0]),
+						   &utf8,
+						   UCS2_ENDIAN);
+			if (ret < 0) {
+				continue;
+			}
+			ret = _gnutls_pathbuf_append(&pathbuf, utf8.data);
+			gnutls_free(utf8.data);
+			if (ret < 0) {
+				continue;
+			}
+
+			if (crl != 0) {
+				ret = gnutls_x509_trust_list_add_trust_file
+					(list, NULL, pathbuf.ptr, type, tl_flags,
+					 tl_vflags);
+			} else {
+				ret = gnutls_x509_trust_list_add_trust_file
+					(list, pathbuf.ptr, NULL, type, tl_flags,
+					 tl_vflags);
+			}
+			if (ret >= 0)
+				r += ret;
+			(void)_gnutls_pathbuf_truncate(&pathbuf, base_len);
+		}
+		_gnutls_pathbuf_deinit(&pathbuf);
 		_tclosedir(dirp);
 	}
+#undef UCS2_ENDIAN
 #endif /* _WIN32 */
 	return r;
 }

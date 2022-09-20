@@ -1514,4 +1514,9 @@ GNUTLS_PRIVATE_3_4 {
 	_gnutls_crypto_register_cipher;
 	# needed by tests/tls12-rehandshake-cert-ticket
 	_gnutls_session_ticket_disable_server;
+	# needed by tests/pathbuf
+	_gnutls_pathbuf_init;
+	_gnutls_pathbuf_append;
+	_gnutls_pathbuf_truncate;
+	_gnutls_pathbuf_deinit;
 } GNUTLS_3_4;
