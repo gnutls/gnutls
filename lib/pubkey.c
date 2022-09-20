@@ -1985,7 +1985,7 @@ gnutls_pubkey_import_dsa_raw(gnutls_pubkey_t key,
  * parameters (if any) with the signature algorithm */
 static
 int fixup_spki_params(const gnutls_pk_params_st *key_params, const gnutls_sign_entry_st *se,
-		       const mac_entry_st *me, gnutls_x509_spki_st *params)
+		      const mac_entry_st *me, gnutls_x509_spki_st *params)
 {
 	unsigned bits;
 
@@ -2018,6 +2018,9 @@ int fixup_spki_params(const gnutls_pk_params_st *key_params, const gnutls_sign_e
 
 		if (params->rsa_pss_dig != se->hash)
 			return gnutls_assert_val(GNUTLS_E_CONSTRAINT_ERROR);
+	} else if (params->pk == GNUTLS_PK_DSA ||
+		   params->pk == GNUTLS_PK_ECDSA) {
+		params->dsa_dig = se->hash;
 	}
 
 	return 0;
