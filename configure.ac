@@ -63,6 +63,7 @@ AM_MAINTAINER_MODE([enable])
 
 AM_MISSING_PROG([GPERF], [gperf])
 AM_MISSING_PROG([ASN1PARSER], [asn1Parser])
+AM_MISSING_PROG([PERL], [perl])
 
 AC_ARG_ENABLE(bash-tests,
   AS_HELP_STRING([--disable-bash-tests], [skip some tests that badly need bash]),
