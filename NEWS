@@ -19,6 +19,16 @@ See the end for copying conditions.
    master secret extension is negotiated). Otherwise the function now
    returns error.
 
+** libgnutls: usage the following functions, designed to loosen restrictions
+   imposed by allowlisting mode of configuration,
+   has been additionally restricted;
+   invoking them is now only allowed if system-wide TLS priority string
+   has not been initialized yet:
+gnutls_digest_set_secure
+gnutls_sign_set_secure
+gnutls_sign_set_secure_for_certs
+gnutls_protocol_set_enabled
+
 * Version 3.7.7 (released 2022-07-28)
 
 ** libgnutls: Fixed double free during verification of pkcs7 signatures.
