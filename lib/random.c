@@ -20,7 +20,7 @@
  *
  */
 
-/* This file handles all the internal functions that cope with random data.
+/* This file handles all the internal functions that cope with random data
  */
 
 #include "gnutls_int.h"
@@ -29,70 +29,76 @@
 #include "locks.h"
 #include <fips.h>
 
+#include "gl_linkedhash_list.h"
+#include "gl_list.h"
+#include "glthread/tls.h"
 #include "gthreads.h"
 
 #if defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)
 extern gnutls_crypto_rnd_st _gnutls_fuzz_rnd_ops;
 #endif
 
-/* Per thread context of random generator, and a flag to indicate initialization */
-static _Thread_local void *gnutls_rnd_ctx;
+/* A global list of all allocated contexts.
+ * A safety measure in case thread specific
+ * context cannot be freed on thread exit
+ */
+GNUTLS_STATIC_MUTEX(gnutls_rnd_list_mutex);
+static gl_list_t list;
+
+/* Key used to locate and manage thread specific random generator context
+ */
+static gl_tls_key_t ctx_key;
+
+/* Flag to indicate initialization
+ */
 static _Thread_local unsigned rnd_initialized = 0;
 
-struct rnd_ctx_list_st {
-	void *ctx;
-	struct rnd_ctx_list_st *next;
-};
-
-/* A global list of all allocated contexts - to be
- * used during deinitialization. */
-GNUTLS_STATIC_MUTEX(gnutls_rnd_ctx_list_mutex);
-static struct rnd_ctx_list_st *head = NULL;
-
-static int append(void *ctx)
+static void free_ctx(const void *ctx)
 {
-	struct rnd_ctx_list_st *e = gnutls_malloc(sizeof(*e));
-
-	if (e == NULL)
-		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-
-	e->ctx = ctx;
-	e->next = head;
-
-	head = e;
-
-	return 0;
+	if (ctx && _gnutls_rnd_ops.deinit)
+		_gnutls_rnd_ops.deinit((void *)ctx);
 }
 
-inline static int _gnutls_rnd_init(void)
+static void delete_ctx(void *ctx)
 {
-	if (unlikely(!rnd_initialized)) {
-		int ret;
+	(void)gnutls_static_mutex_lock(&gnutls_rnd_list_mutex);
+	gl_list_remove(list, ctx);
+	gnutls_static_mutex_unlock(&gnutls_rnd_list_mutex);
+}
 
-		if (_gnutls_rnd_ops.init == NULL) {
-			rnd_initialized = 1;
-			return 0;
-		}
+static inline int _gnutls_rnd_init(void)
+{
+	int ret;
+	void *ctx;
+	gl_list_node_t node;
 
-		if (_gnutls_rnd_ops.init(&gnutls_rnd_ctx) < 0) {
-			gnutls_assert();
-			return GNUTLS_E_RANDOM_FAILED;
-		}
+	if (likely(rnd_initialized))
+		return 0;
 
-		ret = gnutls_static_mutex_lock(&gnutls_rnd_ctx_list_mutex);
-		if (ret < 0) {
-			return gnutls_assert_val(ret);
-		}
-		ret = append(gnutls_rnd_ctx);
-		(void)gnutls_static_mutex_unlock(&gnutls_rnd_ctx_list_mutex);
-		if (ret < 0) {
-			gnutls_assert();
-			_gnutls_rnd_ops.deinit(gnutls_rnd_ctx);
-			return ret;
-		}
-
+	if (_gnutls_rnd_ops.init == NULL) {
 		rnd_initialized = 1;
+		return 0;
 	}
+
+	if (_gnutls_rnd_ops.init(&ctx) < 0)
+		return gnutls_assert_val(GNUTLS_E_RANDOM_FAILED);
+
+	if (glthread_tls_set(&ctx_key, ctx)) {
+		_gnutls_rnd_ops.deinit(ctx);
+		return gnutls_assert_val(GNUTLS_E_RANDOM_FAILED);
+	}
+
+	ret = gnutls_static_mutex_lock(&gnutls_rnd_list_mutex);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+	node = gl_list_nx_add_last(list, ctx);
+	gnutls_static_mutex_unlock(&gnutls_rnd_list_mutex);
+	if (node == NULL) {
+		_gnutls_rnd_ops.deinit(ctx);
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+	}
+
+	rnd_initialized = 1;
 	return 0;
 }
 
@@ -110,7 +116,7 @@ int _gnutls_rnd_preinit(void)
 	/* The FIPS140 random generator is only enabled when we are compiled
 	 * with FIPS support, _and_ the system is in FIPS installed state.
 	 */
-	if (_gnutls_fips_mode_enabled() != 0) {
+	if (_gnutls_fips_mode_enabled()) {
 		ret = gnutls_crypto_rnd_register(100, &_gnutls_fips_rnd_ops);
 		if (ret < 0)
 			return ret;
@@ -118,32 +124,26 @@ int _gnutls_rnd_preinit(void)
 #endif
 
 	ret = _rnd_system_entropy_init();
-	if (ret < 0) {
-		gnutls_assert();
-		return GNUTLS_E_RANDOM_FAILED;
-	}
+	if (ret < 0)
+		return gnutls_assert_val(GNUTLS_E_RANDOM_FAILED);
+
+	ret = glthread_tls_key_init(&ctx_key, delete_ctx);
+	if (ret)
+		return gnutls_assert_val(GNUTLS_E_RANDOM_FAILED);
+
+	list = gl_list_nx_create_empty(GL_LINKEDHASH_LIST, NULL, NULL, free_ctx, false);
+	if (list == NULL)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
 	return 0;
 }
 
 void _gnutls_rnd_deinit(void)
 {
-	if (_gnutls_rnd_ops.deinit != NULL) {
-		struct rnd_ctx_list_st *e = head, *next;
-
-		while(e != NULL) {
-			next = e->next;
-			_gnutls_rnd_ops.deinit(e->ctx);
-			gnutls_free(e);
-			e = next;
-		}
-		head = NULL;
-	}
-
+	gl_list_free(list);
+	glthread_tls_key_destroy(&ctx_key);
 	rnd_initialized = 0;
 	_rnd_system_entropy_deinit();
-
-	return;
 }
 
 /**
@@ -168,13 +168,13 @@ int gnutls_rnd(gnutls_rnd_level_t level, void *data, size_t len)
 	int ret;
 	FAIL_IF_LIB_ERROR;
 
-	if (unlikely((ret=_gnutls_rnd_init()) < 0))
+	ret = _gnutls_rnd_init();
+	if (unlikely(ret < 0))
 		return gnutls_assert_val(ret);
 
-	if (likely(len > 0)) {
-		return _gnutls_rnd_ops.rnd(gnutls_rnd_ctx, level, data,
-					   len);
-	}
+	if (likely(len > 0))
+		return _gnutls_rnd_ops.rnd(gl_tls_get(ctx_key), level, data, len);
+
 	return 0;
 }
 
@@ -192,5 +192,5 @@ int gnutls_rnd(gnutls_rnd_level_t level, void *data, size_t len)
 void gnutls_rnd_refresh(void)
 {
 	if (rnd_initialized && _gnutls_rnd_ops.rnd_refresh)
-		_gnutls_rnd_ops.rnd_refresh(gnutls_rnd_ctx);
+		_gnutls_rnd_ops.rnd_refresh(gl_tls_get(ctx_key));
 }
