@@ -5,7 +5,7 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.7.8 (unreleased)
+* Version 3.7.8 (released 2022-09-27)
 
 ** libgnutls: In FIPS140 mode, RSA signature verification is an approved
    operation if the key has modulus with known sizes (1024, 1280,
@@ -18,6 +18,18 @@ See the end for copying conditions.
    bound to a unique master secret (i.e., either TLS 1.3 or extended
    master secret extension is negotiated). Otherwise the function now
    returns error.
+
+** libgnutls: usage of the following functions, which are designed to
+   loosen restrictions imposed by allowlisting mode of configuration,
+   has been additionally restricted. Invoking them is now only allowed
+   if system-wide TLS priority string has not been initialized yet:
+gnutls_digest_set_secure
+gnutls_sign_set_secure
+gnutls_sign_set_secure_for_certs
+gnutls_protocol_set_enabled
+
+** API and ABI modifications:
+No changes since last version.
 
 * Version 3.7.7 (released 2022-07-28)
 
