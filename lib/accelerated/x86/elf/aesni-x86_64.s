@@ -1151,7 +1151,7 @@ aesni_ctr32_encrypt_blocks:
 	leaq	7(%r8),%r9
 	movl	%r10d,96+12(%rsp)
 	bswapl	%r9d
-	movl	_gnutls_x86_cpuid_s+4(%rip),%r10d
+	movl	GNUTLS_x86_cpuid_s+4(%rip),%r10d
 	xorl	%ebp,%r9d
 	andl	$71303168,%r10d
 	movl	%r9d,112+12(%rsp)
@@ -3600,7 +3600,7 @@ aesni_cbc_encrypt:
 	movdqa	%xmm5,%xmm14
 	movdqu	80(%rdi),%xmm7
 	movdqa	%xmm6,%xmm15
-	movl	_gnutls_x86_cpuid_s+4(%rip),%r9d
+	movl	GNUTLS_x86_cpuid_s+4(%rip),%r9d
 	cmpq	$0x70,%rdx
 	jbe	.Lcbc_dec_six_or_seven
 
@@ -4131,7 +4131,7 @@ __aesni_set_encrypt_key:
 	movl	$268437504,%r10d
 	movups	(%rdi),%xmm0
 	xorps	%xmm4,%xmm4
-	andl	_gnutls_x86_cpuid_s+4(%rip),%r10d
+	andl	GNUTLS_x86_cpuid_s+4(%rip),%r10d
 	leaq	16(%rdx),%rax
 	cmpl	$256,%esi
 	je	.L14rounds

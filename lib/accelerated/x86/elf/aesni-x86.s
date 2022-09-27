@@ -2892,7 +2892,7 @@ _aesni_set_encrypt_key:
 .L112pic:
 	popl	%ebx
 	leal	.Lkey_const-.L112pic(%ebx),%ebx
-	leal	_gnutls_x86_cpuid_s-.Lkey_const(%ebx),%ebp
+	leal	GNUTLS_x86_cpuid_s-.Lkey_const(%ebx),%ebp
 	movups	(%eax),%xmm0
 	xorps	%xmm4,%xmm4
 	movl	4(%ebp),%ebp
@@ -3273,6 +3273,6 @@ aesni_set_decrypt_key:
 .byte	83,45,78,73,44,32,67,82,89,80,84,79,71,65,77,83
 .byte	32,98,121,32,60,97,112,112,114,111,64,111,112,101,110,115
 .byte	115,108,46,111,114,103,62,0
-.comm	_gnutls_x86_cpuid_s,16,4
+.comm	GNUTLS_x86_cpuid_s,16,4
 
 .section .note.GNU-stack,"",%progbits

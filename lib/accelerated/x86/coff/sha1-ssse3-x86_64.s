@@ -53,9 +53,9 @@ sha1_block_data_order:
 	movq	%r8,%rdx
 
 
-	movl	_gnutls_x86_cpuid_s+0(%rip),%r9d
-	movl	_gnutls_x86_cpuid_s+4(%rip),%r8d
-	movl	_gnutls_x86_cpuid_s+8(%rip),%r10d
+	movl	GNUTLS_x86_cpuid_s+0(%rip),%r9d
+	movl	GNUTLS_x86_cpuid_s+4(%rip),%r8d
+	movl	GNUTLS_x86_cpuid_s+8(%rip),%r10d
 	testl	$512,%r8d
 	jz	.Lialu
 	testl	$536870912,%r10d

@@ -212,7 +212,7 @@ lib/accelerated/x86/elf/%.s: devel/perlasm/%.pl .submodule.stamp
 	cat $<.license $@.tmp > $@ && rm -f $@.tmp
 	echo "" >> $@
 	echo ".section .note.GNU-stack,\"\",%progbits" >> $@
-	sed -i 's/OPENSSL_ia32cap_P/_gnutls_x86_cpuid_s/g' $@
+	sed -i 's/OPENSSL_ia32cap_P/GNUTLS_x86_cpuid_s/g' $@
 
 lib/accelerated/x86/coff/%-x86.s: devel/perlasm/%-x86.pl .submodule.stamp 
 	CC=gcc perl $< coff \
@@ -220,7 +220,7 @@ lib/accelerated/x86/coff/%-x86.s: devel/perlasm/%-x86.pl .submodule.stamp
 		$@.tmp
 	cat $<.license $@.tmp > $@ && rm -f $@.tmp
 	echo "" >> $@
-	sed -i 's/OPENSSL_ia32cap_P/_gnutls_x86_cpuid_s/g' $@
+	sed -i 's/OPENSSL_ia32cap_P/GNUTLS_x86_cpuid_s/g' $@
 
 lib/accelerated/x86/coff/%-x86_64.s: devel/perlasm/%-x86_64.pl .submodule.stamp 
 	CC=gcc perl $< mingw64 \
@@ -228,7 +228,7 @@ lib/accelerated/x86/coff/%-x86_64.s: devel/perlasm/%-x86_64.pl .submodule.stamp
 		$@.tmp
 	cat $<.license $@.tmp > $@ && rm -f $@.tmp
 	echo "" >> $@
-	sed -i 's/OPENSSL_ia32cap_P/_gnutls_x86_cpuid_s/g' $@
+	sed -i 's/OPENSSL_ia32cap_P/GNUTLS_x86_cpuid_s/g' $@
 
 lib/accelerated/x86/macosx/%.s: devel/perlasm/%.pl .submodule.stamp 
 	CC=gcc perl $< macosx \
@@ -236,7 +236,7 @@ lib/accelerated/x86/macosx/%.s: devel/perlasm/%.pl .submodule.stamp
 		$@.tmp
 	cat $<.license $@.tmp > $@ && rm -f $@.tmp
 	echo "" >> $@
-	sed -i 's/OPENSSL_ia32cap_P/_gnutls_x86_cpuid_s/g' $@
+	sed -i 's/OPENSSL_ia32cap_P/GNUTLS_x86_cpuid_s/g' $@
 
 lib/accelerated/aarch64/elf/%.s: devel/perlasm/%.pl .submodule.stamp 
 	rm -f $@tmp

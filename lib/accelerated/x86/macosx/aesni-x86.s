@@ -2853,7 +2853,7 @@ __aesni_set_encrypt_key:
 L112pic:
 	popl	%ebx
 	leal	Lkey_const-L112pic(%ebx),%ebx
-	movl	L__gnutls_x86_cpuid_s$non_lazy_ptr-Lkey_const(%ebx),%ebp
+	movl	L_GNUTLS_x86_cpuid_s$non_lazy_ptr-Lkey_const(%ebx),%ebp
 	movups	(%eax),%xmm0
 	xorps	%xmm4,%xmm4
 	movl	4(%ebp),%ebp
@@ -3230,8 +3230,8 @@ Lkey_const:
 .byte	32,98,121,32,60,97,112,112,114,111,64,111,112,101,110,115
 .byte	115,108,46,111,114,103,62,0
 .section __IMPORT,__pointers,non_lazy_symbol_pointers
-L__gnutls_x86_cpuid_s$non_lazy_ptr:
-.indirect_symbol	__gnutls_x86_cpuid_s
+L_GNUTLS_x86_cpuid_s$non_lazy_ptr:
+.indirect_symbol	_GNUTLS_x86_cpuid_s
 .long	0
-.comm	__gnutls_x86_cpuid_s,16,2
+.comm	_GNUTLS_x86_cpuid_s,16,2
 
