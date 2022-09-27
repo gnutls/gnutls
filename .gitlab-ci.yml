@@ -13,7 +13,7 @@ variables:
   DEBIAN_BUILD: buildenv-debian-testing
   DEBIAN_CROSS_BUILD: buildenv-debian-cross-testing
   DEBIAN_X86_CROSS_BUILD: buildenv-debian-x86-cross
-  FEDORA_BUILD: buildenv-fedora35
+  FEDORA_BUILD: buildenv-fedora36
   MINGW_BUILD: buildenv-mingw-fedora36
   ALPINE_BASE_BUILD: buildenv-alpine-base
   COMPILER: gcc
