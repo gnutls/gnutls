@@ -4690,7 +4690,7 @@ _gnutls_pkcs11_crt_is_known(const char *url, gnutls_x509_crt_t cert,
  * in the specified token. This is useful in combination with 
  * %GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED or
  * %GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_DISTRUSTED,
- * to check whether a CA is present or a certificate is blacklisted in
+ * to check whether a CA is present or a certificate is distrusted in
  * a trust PKCS #11 module.
  *
  * This function can be used with a @url of "pkcs11:", and in that case all modules

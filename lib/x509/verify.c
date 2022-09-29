@@ -1236,7 +1236,7 @@ _gnutls_pkcs11_verify_crt_status(gnutls_x509_trust_list_t tlist,
 		return status;
 	}
 
-	/* check for blacklists */
+	/* check for blocklists */
 	for (i = 0; i < clist_size; i++) {
 		if (gnutls_pkcs11_crt_is_known (url, certificate_list[i], 
 			GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE|
@@ -1295,8 +1295,8 @@ _gnutls_pkcs11_verify_crt_status(gnutls_x509_trust_list_t tlist,
 		goto cleanup;
 	}
 
-	/* check if the raw issuer is blacklisted (it can happen if
-	 * the issuer is both in the trusted list and the blacklisted)
+	/* check if the raw issuer is distrusted (it can happen if
+	 * the issuer is both in the trusted list and the distrusted)
 	 */
 	if (gnutls_pkcs11_crt_is_known (url, issuer,
 		GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE|

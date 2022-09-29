@@ -255,7 +255,7 @@
         },
         {
           "long-option": "mark-distrusted",
-          "description": "When retrieving objects, it requires the objects to be distrusted (blacklisted)",
+          "description": "When retrieving objects, it requires the objects to be distrusted",
           "detail": "Ensures that the objects retrieved have the CKA_X_TRUST flag.\nThis is p11-kit trust module extension, thus this flag is only valid with\np11-kit registered trust modules.",
           "conflicts": [
             "mark-trusted"

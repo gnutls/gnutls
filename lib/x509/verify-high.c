@@ -209,10 +209,10 @@ gnutls_x509_trust_list_deinit(gnutls_x509_trust_list_t list,
 	if (!list)
 		return;
 
-	for (j = 0; j < list->blacklisted_size; j++) {
-		gnutls_x509_crt_deinit(list->blacklisted[j]);
+	for (j = 0; j < list->distrusted_size; j++) {
+		gnutls_x509_crt_deinit(list->distrusted[j]);
 	}
-	gnutls_free(list->blacklisted);
+	gnutls_free(list->distrusted);
 
 	for (j = 0; j < list->keep_certs_size; j++) {
 		gnutls_x509_crt_deinit(list->keep_certs[j]);
@@ -635,7 +635,7 @@ int ret;
  *
  * Note that this function can accept certificates and authorities
  * not yet known. In that case they will be kept in a separate
- * black list that will be used during certificate verification.
+ * block list that will be used during certificate verification.
  * Unlike gnutls_x509_trust_list_add_cas() there is no deinitialization
  * restriction for  certificate list provided in this function.
  *
@@ -677,24 +677,24 @@ gnutls_x509_trust_list_remove_cas(gnutls_x509_trust_list_t list,
 			}
 		}
 
-		if (unlikely(INT_ADD_OVERFLOW(list->blacklisted_size, 1))) {
+		if (unlikely(INT_ADD_OVERFLOW(list->distrusted_size, 1))) {
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 		}
 
-		/* Add the CA (or plain) certificate to the black list as well.
+		/* Add the CA (or plain) certificate to the block list as well.
 		 * This will prevent a subordinate CA from being valid, and
 		 * ensure that a server certificate will also get rejected.
 		 */
-		list->blacklisted =
-			_gnutls_reallocarray_fast(list->blacklisted,
-						  list->blacklisted_size + 1,
-						  sizeof(list->blacklisted[0]));
-		if (list->blacklisted == NULL)
+		list->distrusted =
+			_gnutls_reallocarray_fast(list->distrusted,
+						  list->distrusted_size + 1,
+						  sizeof(list->distrusted[0]));
+		if (list->distrusted == NULL)
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-		list->blacklisted[list->blacklisted_size] = crt_cpy(clist[i]);
-		if (list->blacklisted[list->blacklisted_size] != NULL)
-			list->blacklisted_size++;
+		list->distrusted[list->distrusted_size] = crt_cpy(clist[i]);
+		if (list->distrusted[list->distrusted_size] != NULL)
+			list->distrusted_size++;
 	}
 
 	return r;
@@ -1297,17 +1297,17 @@ int gnutls_x509_trust_list_get_issuer_by_subject_key_id(gnutls_x509_trust_list_t
 }
 
 static
-int check_if_in_blacklist(gnutls_x509_crt_t * cert_list, unsigned int cert_list_size,
-	gnutls_x509_crt_t * blacklist, unsigned int blacklist_size)
+int check_if_in_blocklist(gnutls_x509_crt_t * cert_list, unsigned int cert_list_size,
+	gnutls_x509_crt_t * blocklist, unsigned int blocklist_size)
 {
 unsigned i, j;
 
-	if (blacklist_size == 0)
+	if (blocklist_size == 0)
 		return 0;
 
 	for (i=0;i<cert_list_size;i++) {
-		for (j=0;j<blacklist_size;j++) {
-			if (gnutls_x509_crt_equals(cert_list[i], blacklist[j]) != 0) {
+		for (j=0;j<blocklist_size;j++) {
+			if (gnutls_x509_crt_equals(cert_list[i], blocklist[j]) != 0) {
 				return 1;
 			}
 		}
@@ -1573,8 +1573,8 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 				    1]->raw_issuer_dn.size);
 	hash %= list->size;
 
-	ret = check_if_in_blacklist(cert_list, cert_list_size,
-		list->blacklisted, list->blacklisted_size);
+	ret = check_if_in_blocklist(cert_list, cert_list_size,
+		list->distrusted, list->distrusted_size);
 	if (ret != 0) {
 		*voutput = 0;
 		*voutput |= GNUTLS_CERT_REVOKED;
@@ -1767,8 +1767,8 @@ gnutls_x509_trust_list_verify_named_crt(gnutls_x509_trust_list_t list,
 			  cert->raw_issuer_dn.size);
 	hash %= list->size;
 
-	ret = check_if_in_blacklist(&cert, 1,
-		list->blacklisted, list->blacklisted_size);
+	ret = check_if_in_blocklist(&cert, 1,
+		list->distrusted, list->distrusted_size);
 	if (ret != 0) {
 		*voutput = 0;
 		*voutput |= GNUTLS_CERT_REVOKED;

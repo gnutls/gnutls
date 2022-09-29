@@ -985,7 +985,7 @@ _gnutls_proc_srp_server_kx(gnutls_session_t session, uint8_t * data,
 	 */
 	if ((ret = check_g_n(data_g, _n_g, data_n, _n_n)) < 0) {
 		_gnutls_audit_log(session,
-				  "SRP group parameters are not in the white list; rejecting.\n");
+				  "Unknown SRP group parameters; rejecting.\n");
 		return gnutls_assert_val(ret);
 	}
 

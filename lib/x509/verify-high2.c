@@ -136,7 +136,7 @@ gnutls_x509_trust_list_add_trust_mem(gnutls_x509_trust_list_t list,
  * @type: The format of the certificates
  *
  * This function will remove the provided certificate authorities
- * from the trusted list, and add them into a black list when needed. 
+ * from the trusted list, and add them into a block list when needed. 
  *
  * See also gnutls_x509_trust_list_remove_cas().
  *
@@ -524,7 +524,7 @@ gnutls_x509_trust_list_add_trust_dir(gnutls_x509_trust_list_t list,
  * @type: The format of the certificates
  *
  * This function will remove the given certificate authorities
- * from the trusted list, and add them into a black list when needed. 
+ * from the trusted list, and add them into a block list when needed. 
  * PKCS 11 URLs are also accepted, instead
  * of files, by this function.
  *
