@@ -929,6 +929,7 @@ tests/x509sign-verify-gost
 tests/x509sign-verify-rsa
 tests/x509sign-verify2
 tests/x509signself
+tests/xts-key-check
 tests/gnutls_ktls
 tests/record-sendfile
 *.tmp

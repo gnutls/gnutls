@@ -448,12 +448,14 @@ _gcm_decrypt(struct nettle_cipher_ctx *ctx, size_t length, uint8_t * dst,
 		    length, dst, src);
 }
 
-static void _des_set_key(struct des_ctx *ctx, const uint8_t *key)
+static void
+_des_set_key(struct des_ctx *ctx, const uint8_t *key)
 {
 	des_set_key(ctx, key);
 }
 
-static void _des3_set_key(struct des3_ctx *ctx, const uint8_t *key)
+static void
+_des3_set_key(struct des3_ctx *ctx, const uint8_t *key)
 {
 	des3_set_key(ctx, key);
 }
@@ -474,50 +476,6 @@ _cfb8_decrypt(struct nettle_cipher_ctx *ctx, size_t length, uint8_t * dst,
 	cfb8_decrypt(ctx->ctx_ptr, ctx->cipher->encrypt_block,
 		     ctx->iv_size, ctx->iv,
 		     length, dst, src);
-}
-
-static void
-_xts_aes128_set_encrypt_key(struct xts_aes128_key *xts_key,
-			    const uint8_t *key)
-{
-	if (_gnutls_fips_mode_enabled() &&
-	    gnutls_memcmp(key, key + AES128_KEY_SIZE, AES128_KEY_SIZE) == 0)
-		_gnutls_switch_lib_state(LIB_STATE_ERROR);
-
-	xts_aes128_set_encrypt_key(xts_key, key);
-}
-
-static void
-_xts_aes128_set_decrypt_key(struct xts_aes128_key *xts_key,
-			    const uint8_t *key)
-{
-	if (_gnutls_fips_mode_enabled() &&
-	    gnutls_memcmp(key, key + AES128_KEY_SIZE, AES128_KEY_SIZE) == 0)
-		_gnutls_switch_lib_state(LIB_STATE_ERROR);
-
-	xts_aes128_set_decrypt_key(xts_key, key);
-}
-
-static void
-_xts_aes256_set_encrypt_key(struct xts_aes256_key *xts_key,
-			    const uint8_t *key)
-{
-	if (_gnutls_fips_mode_enabled() &&
-	    gnutls_memcmp(key, key + AES256_KEY_SIZE, AES256_KEY_SIZE) == 0)
-		_gnutls_switch_lib_state(LIB_STATE_ERROR);
-
-	xts_aes256_set_encrypt_key(xts_key, key);
-}
-
-static void
-_xts_aes256_set_decrypt_key(struct xts_aes256_key *xts_key,
-			    const uint8_t *key)
-{
-	if (_gnutls_fips_mode_enabled() &&
-	    gnutls_memcmp(key, key + AES256_KEY_SIZE, AES256_KEY_SIZE) == 0)
-		_gnutls_switch_lib_state(LIB_STATE_ERROR);
-
-	xts_aes256_set_decrypt_key(xts_key, key);
 }
 
 static void
@@ -1041,8 +999,8 @@ static const struct nettle_cipher_st builtin_ciphers[] = {
 	   .ctx_size = sizeof(struct xts_aes128_key),
 	   .encrypt = _xts_aes128_encrypt,
 	   .decrypt = _xts_aes128_decrypt,
-	   .set_encrypt_key = (nettle_set_key_func*)_xts_aes128_set_encrypt_key,
-	   .set_decrypt_key = (nettle_set_key_func*)_xts_aes128_set_decrypt_key,
+	   .set_encrypt_key = (nettle_set_key_func*)xts_aes128_set_encrypt_key,
+	   .set_decrypt_key = (nettle_set_key_func*)xts_aes128_set_decrypt_key,
 	   .max_iv_size = AES_BLOCK_SIZE,
 	},
 	{  .algo = GNUTLS_CIPHER_AES_256_XTS,
@@ -1052,8 +1010,8 @@ static const struct nettle_cipher_st builtin_ciphers[] = {
 	   .ctx_size = sizeof(struct xts_aes256_key),
 	   .encrypt = _xts_aes256_encrypt,
 	   .decrypt = _xts_aes256_decrypt,
-	   .set_encrypt_key = (nettle_set_key_func*)_xts_aes256_set_encrypt_key,
-	   .set_decrypt_key = (nettle_set_key_func*)_xts_aes256_set_decrypt_key,
+	   .set_encrypt_key = (nettle_set_key_func*)xts_aes256_set_encrypt_key,
+	   .set_decrypt_key = (nettle_set_key_func*)xts_aes256_set_decrypt_key,
 	   .max_iv_size = AES_BLOCK_SIZE,
 	},
 	{  .algo = GNUTLS_CIPHER_AES_128_SIV,
@@ -1142,6 +1100,21 @@ wrap_nettle_cipher_setkey(void *_ctx, const void *key, size_t keysize)
 	} else if (ctx->cipher->key_size == 0) {
 		ctx->cipher->gen_set_key(ctx->ctx_ptr, keysize, key);
 		return 0;
+	}
+
+	switch (ctx->cipher->algo) {
+	case GNUTLS_CIPHER_AES_128_XTS:
+		if (_gnutls_fips_mode_enabled() &&
+		    gnutls_memcmp(key, (char *)key + AES128_KEY_SIZE, AES128_KEY_SIZE) == 0)
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		break;
+	case GNUTLS_CIPHER_AES_256_XTS:
+		if (_gnutls_fips_mode_enabled() &&
+		    gnutls_memcmp(key, (char *)key + AES256_KEY_SIZE, AES256_KEY_SIZE) == 0)
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		break;
+	default:
+		break;
 	}
 
 	if (ctx->enc)
