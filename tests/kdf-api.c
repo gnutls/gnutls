@@ -26,6 +26,7 @@
 #include <gnutls/crypto.h>
 
 #include <assert.h>
+#include <stdbool.h>
 #include <stdint.h>
 
 #include "utils.h"
@@ -109,6 +110,25 @@ test_hkdf(gnutls_mac_algorithm_t mac,
 	gnutls_free(hex.data);
 }
 
+inline static bool
+is_mac_algo_hmac_approved_in_fips(gnutls_mac_algorithm_t algo)
+{
+	switch (algo) {
+	case GNUTLS_MAC_SHA1:
+	case GNUTLS_MAC_SHA256:
+	case GNUTLS_MAC_SHA384:
+	case GNUTLS_MAC_SHA512:
+	case GNUTLS_MAC_SHA224:
+	case GNUTLS_MAC_SHA3_224:
+	case GNUTLS_MAC_SHA3_256:
+	case GNUTLS_MAC_SHA3_384:
+	case GNUTLS_MAC_SHA3_512:
+		return true;
+	default:
+		return false;
+	}
+}
+
 static void
 test_pbkdf2(gnutls_mac_algorithm_t mac,
 	    const char *ikm_hex,
@@ -179,6 +199,15 @@ doit(void)
 		    20,
 		    "4b007901b765489abead49d926f721d065a429c1",
 		    /* Key sizes and output sizes less than 112-bit are not approved.  */
+		    GNUTLS_FIPS140_OP_NOT_APPROVED);
+
+	test_pbkdf2(GNUTLS_MAC_AES_CMAC_128,
+		    "70617373776f726470617373776f7264", /* "passwordpassword" */
+		    "73616c74",		/* "salt" */
+		    4096,
+		    20,
+		    "c4c112c6e1e3b8757640603dec78825ff87605a7",
+		    /* Use of AES-CMAC in PBKDF2 is not supported in ACVP.  */
 		    GNUTLS_FIPS140_OP_NOT_APPROVED);
 
 	gnutls_fips140_context_deinit(fips_context);

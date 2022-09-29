@@ -2229,7 +2229,10 @@ gnutls_pbkdf2(gnutls_mac_algorithm_t mac,
 	if (!is_mac_algo_allowed(mac)) {
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
-	} else if (!is_mac_algo_approved_in_fips(mac)) {
+	} else if (!is_mac_algo_hmac_approved_in_fips(mac)) {
+		/* ACVP only allows HMAC used with PBKDF2:
+		 * https://pages.nist.gov/ACVP/draft-celi-acvp-pbkdf.html
+		 */
 		not_approved = true;
 	}
 

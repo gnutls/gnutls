@@ -76,7 +76,7 @@ void _gnutls_lib_simulate_error(void);
 void _gnutls_lib_force_operational(void);
 
 inline static bool
-is_mac_algo_approved_in_fips(gnutls_mac_algorithm_t algo)
+is_mac_algo_hmac_approved_in_fips(gnutls_mac_algorithm_t algo)
 {
 	switch (algo) {
 	case GNUTLS_MAC_SHA1:
@@ -88,6 +88,20 @@ is_mac_algo_approved_in_fips(gnutls_mac_algorithm_t algo)
 	case GNUTLS_MAC_SHA3_256:
 	case GNUTLS_MAC_SHA3_384:
 	case GNUTLS_MAC_SHA3_512:
+		return true;
+	default:
+		return false;
+	}
+}
+
+inline static bool
+is_mac_algo_approved_in_fips(gnutls_mac_algorithm_t algo)
+{
+	if (is_mac_algo_hmac_approved_in_fips(algo)) {
+		return true;
+	}
+
+	switch (algo) {
 	case GNUTLS_MAC_AES_CMAC_128:
 	case GNUTLS_MAC_AES_CMAC_256:
 	case GNUTLS_MAC_AES_GMAC_128:
