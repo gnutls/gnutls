@@ -378,26 +378,23 @@ fedora-interop/test:
     - fedora-minimal/build
   parallel:
     matrix:
-      - COMPONENT:
-          - openssl
-          #- nss # currently fails on Fedora due to NSS bug
-        TYPE:
-          - 2way
-          #- 3way # these tests take too long, plan is to split them
-          #- 4way
-          #- 5way
-          #- p256
-          #- p384
-          #- p521
-          #- rsae
-          #- rsapss
+      - COMPONENT: openssl
+        TYPE: 2way
+        SLICEID: 0
+        SLICES: 1
+      - COMPONENT: nss
+        TYPE: 2way
+        SLICEID: [0, 1]
+        SLICES: 2
+  timeout: 45 minutes
   allow_failure: true
   script:
     - cd tests/suite/tls-interoperability/
     - echo "Tests to run:"
     - tmt run plans -n interop tests -f "tag:interop-gnutls" -f "tag:interop-$TYPE" -f "tag:interop-$COMPONENT"  discover -v
+    - echo "Slicing SLICE_TOTAL=$SLICES SLICE_ID=$SLICEID"
     - echo "Run the tests:"
-    - tmt run -a plans -n interop tests -f "tag:interop-gnutls" -f "tag:interop-$TYPE" -f "tag:interop-$COMPONENT" provision -h local execute -h tmt --interactive
+    - tmt run -a -e "SLICE_TOTAL=$SLICES" -e "SLICE_ID=$SLICEID" plans -n interop tests -f "tag:interop-gnutls" -f "tag:interop-$TYPE" -f "tag:interop-$COMPONENT" provision -h local execute -h tmt --interactive
 
 fedora-SSL-3.0/build:
   extends:
