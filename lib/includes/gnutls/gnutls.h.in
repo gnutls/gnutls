@@ -486,6 +486,8 @@ typedef enum {
  * @GNUTLS_NO_AUTO_SEND_TICKET: Under TLS1.3 disable auto-sending of
  *    session tickets during the handshake.
  * @GNUTLS_NO_END_OF_EARLY_DATA: Under TLS1.3 suppress sending EndOfEarlyData message. Since 3.7.2.
+ * @GNUTLS_NO_STATUS_REQUEST: Prevents client from including the "status_request" TLS extension
+ *    in the client hello, thus disabling the receival of certificate status information. Since 3.8.0.
  *
  * Enumeration of different flags for gnutls_init() function. All the flags
  * can be combined except @GNUTLS_SERVER and @GNUTLS_CLIENT which are mutually
@@ -519,7 +521,8 @@ typedef enum {
 	GNUTLS_ENABLE_EARLY_DATA = (1<<20),
 	GNUTLS_NO_AUTO_SEND_TICKET = (1<<21),
 	GNUTLS_NO_END_OF_EARLY_DATA = (1<<22),
-	GNUTLS_NO_TICKETS_TLS12 = (1<<23)
+	GNUTLS_NO_TICKETS_TLS12 = (1<<23),
+	GNUTLS_NO_STATUS_REQUEST = (1<<24)
 } gnutls_init_flags_t;
 
 /* compatibility defines (previous versions of gnutls

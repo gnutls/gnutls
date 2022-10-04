@@ -543,6 +543,7 @@ tests/name-constraints-merge
 tests/netconf-psk
 tests/no-extensions
 tests/no-signal
+tests/no-status-request
 tests/nul-in-x509-names
 tests/null_retrieve_function
 tests/ocsp

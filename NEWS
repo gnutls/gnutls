@@ -5,6 +5,15 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.8.0 (unreleased ????-??-??)
+
+** libgnutls: GNUTLS_NO_STATUS_REQUEST flag and %NO_STATUS_REQUEST
+   priority modifier have been added to allow disabling of the
+   status_request TLS extension in the client side.
+
+** API and ABI modifications:
+GNUTLS_NO_STATUS_REQUEST: New flag
+
 * Version 3.7.8 (released 2022-09-27)
 
 ** libgnutls: In FIPS140 mode, RSA signature verification is an approved
