@@ -247,11 +247,13 @@ typedef enum {
 	GNUTLS_PK_FLAG_RSA_PSS_FIXED_SALT_LENGTH = 4
 } gnutls_pk_flag_t;
 
-#define FIX_SIGN_PARAMS(params, flags, dig) do {		\
-	if ((flags) & GNUTLS_PRIVKEY_FLAG_REPRODUCIBLE) {	\
-		(params).flags |= GNUTLS_PK_FLAG_REPRODUCIBLE;	\
-		(params).dsa_dig = (dig);			\
-	}							\
+#define FIX_SIGN_PARAMS(params, flags, dig) do {			\
+	if ((flags) & GNUTLS_PRIVKEY_FLAG_REPRODUCIBLE) {		\
+		(params).flags |= GNUTLS_PK_FLAG_REPRODUCIBLE;		\
+	}								\
+	if ((params).pk == GNUTLS_PK_DSA || (params).pk == GNUTLS_PK_ECDSA) { \
+		(params).dsa_dig = (dig);				\
+	}								\
 } while (0)
 
 void gnutls_pk_params_release(gnutls_pk_params_st * p);

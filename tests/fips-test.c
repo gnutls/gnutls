@@ -80,8 +80,22 @@ static const gnutls_datum_t rsa2342_sha1_sig = {
 	.size = sizeof(rsa2342_sha1_sig_data),
 };
 
+static const uint8_t ecc256_sha1_sig_data[] = {
+	0x30, 0x45, 0x02, 0x21, 0x00, 0x9a, 0x28, 0xc9, 0xbf, 0xc8, 0x70, 0x4f, 
+	0x27, 0x2d, 0xe1, 0x66, 0xc4, 0xa5, 0xc6, 0xf2, 0xdc, 0x33, 0xb9, 0x41, 
+	0xdf, 0x78, 0x98, 0x8a, 0x22, 0x4d, 0x29, 0x37, 0xa0, 0x0f, 0x6f, 0xd4, 
+	0xed, 0x02, 0x20, 0x0b, 0x15, 0xca, 0x30, 0x09, 0x2d, 0x55, 0x44, 0xb4, 
+	0x1d, 0x3f, 0x48, 0x7a, 0xc3, 0xd1, 0x2a, 0xc1, 0x0e, 0x47, 0xfa, 0xe6, 
+	0xe9, 0x0f, 0x03, 0xe2, 0x01, 0x4e, 0xe4, 0x73, 0x37, 0xa7, 0x90, 
+};
+
+static const gnutls_datum_t ecc256_sha1_sig = {
+	.data = (unsigned char *)ecc256_sha1_sig_data,
+	.size = sizeof(ecc256_sha1_sig_data),
+};
+
 static void
-rsa_import_keypair(gnutls_privkey_t *privkey, gnutls_pubkey_t *pubkey,
+import_keypair(gnutls_privkey_t *privkey, gnutls_pubkey_t *pubkey,
 		   const char *filename)
 {
 	const char *srcdir;
@@ -274,6 +288,8 @@ void doit(void)
 	gnutls_datum_t signature;
 	unsigned int bits;
 	uint8_t hmac[64];
+	uint8_t hash[64];
+	gnutls_datum_t hashed_data;
 
 	fprintf(stderr,
 		"Please note that if in FIPS140 mode, you need to assure the library's integrity prior to running this test\n");
@@ -424,7 +440,7 @@ void doit(void)
 
 	/* Import 2432-bit RSA key; not a security function */
 	FIPS_PUSH_CONTEXT();
-	rsa_import_keypair(&privkey, &pubkey, "rsa-2432.pem");
+	import_keypair(&privkey, &pubkey, "rsa-2432.pem");
 	FIPS_POP_CONTEXT(INITIAL);
 
 	/* Create a signature with 2432-bit RSA and SHA256; approved */
@@ -470,7 +486,7 @@ void doit(void)
 
 	/* Import 512-bit RSA key; not a security function */
 	FIPS_PUSH_CONTEXT();
-	rsa_import_keypair(&privkey, &pubkey, "rsa-512.pem");
+	import_keypair(&privkey, &pubkey, "rsa-512.pem");
 	FIPS_POP_CONTEXT(INITIAL);
 
 	/* Create a signature with 512-bit RSA and SHA256; not approved */
@@ -491,6 +507,134 @@ void doit(void)
 	}
 	FIPS_POP_CONTEXT(NOT_APPROVED);
 	gnutls_free(signature.data);
+	gnutls_pubkey_deinit(pubkey);
+	gnutls_privkey_deinit(privkey);
+
+	/* Import ECDSA key; not a security function */
+	FIPS_PUSH_CONTEXT();
+	import_keypair(&privkey, &pubkey, "ecc256.pem");
+	FIPS_POP_CONTEXT(INITIAL);
+
+	/* Create a signature with ECDSA and SHA256; approved */
+	FIPS_PUSH_CONTEXT();
+	ret = gnutls_privkey_sign_data2(privkey, GNUTLS_SIGN_ECDSA_SHA256, 0,
+					&data, &signature);
+	if (ret < 0) {
+		fail("gnutls_privkey_sign_data2 failed\n");
+	}
+	FIPS_POP_CONTEXT(APPROVED);
+
+	/* Verify a signature with ECDSA and SHA256; approved */
+	FIPS_PUSH_CONTEXT();
+	ret = gnutls_pubkey_verify_data2(pubkey, GNUTLS_SIGN_ECDSA_SHA256, 0,
+					 &data, &signature);
+	if (ret < 0) {
+		fail("gnutls_pubkey_verify_data2 failed\n");
+	}
+	FIPS_POP_CONTEXT(APPROVED);
+	gnutls_free(signature.data);
+
+	/* Create a signature with ECDSA and SHA256 (old API); approved */
+	FIPS_PUSH_CONTEXT();
+	ret = gnutls_privkey_sign_data(privkey, GNUTLS_DIG_SHA256, 0,
+				       &data, &signature);
+	if (ret < 0) {
+		fail("gnutls_privkey_sign_data failed\n");
+	}
+	FIPS_POP_CONTEXT(APPROVED);
+
+	/* Create a SHA256 hashed data for 2-pass signature API; not a
+	 * crypto operation */
+	FIPS_PUSH_CONTEXT();
+	ret = gnutls_hash_fast(GNUTLS_DIG_SHA256, data.data, data.size, hash);
+	if (ret < 0) {
+		fail("gnutls_hash_fast failed\n");
+	}
+	hashed_data.data = hash;
+	hashed_data.size = 32;
+	FIPS_POP_CONTEXT(INITIAL);
+
+	/* Create a signature with ECDSA and SHA256 (2-pass API); not-approved */
+	FIPS_PUSH_CONTEXT();
+	ret = gnutls_privkey_sign_hash2(privkey, GNUTLS_SIGN_ECDSA_SHA256, 0,
+					&hashed_data, &signature);
+	if (ret < 0) {
+		fail("gnutls_privkey_sign_hash2 failed\n");
+	}
+	FIPS_POP_CONTEXT(NOT_APPROVED);
+	gnutls_free(signature.data);
+
+	/* Create a signature with ECDSA and SHA256 (2-pass old API); not-approved */
+	FIPS_PUSH_CONTEXT();
+	ret = gnutls_privkey_sign_hash(privkey, GNUTLS_DIG_SHA256, 0,
+					&hashed_data, &signature);
+	if (ret < 0) {
+		fail("gnutls_privkey_sign_hash failed\n");
+	}
+	FIPS_POP_CONTEXT(NOT_APPROVED);
+	gnutls_free(signature.data);
+
+	/* Create a signature with ECDSA and SHA-1; not approved */
+	FIPS_PUSH_CONTEXT();
+	ret = gnutls_privkey_sign_data2(privkey, GNUTLS_SIGN_ECDSA_SHA1, 0,
+					&data, &signature);
+	if (ret < 0) {
+		fail("gnutls_privkey_sign_data2 failed\n");
+	}
+	FIPS_POP_CONTEXT(NOT_APPROVED);
+
+	/* Verify a signature created with ECDSA and SHA-1; approved */
+	FIPS_PUSH_CONTEXT();
+	ret = gnutls_pubkey_verify_data2(pubkey, GNUTLS_SIGN_ECDSA_SHA1,
+					 GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1, &data,
+					 &ecc256_sha1_sig);
+	if (ret < 0) {
+		fail("gnutls_pubkey_verify_data2 failed\n");
+	}
+	FIPS_POP_CONTEXT(APPROVED);
+	gnutls_free(signature.data);
+
+	/* Create a signature with ECDSA and SHA-1 (old API); not approved */
+	FIPS_PUSH_CONTEXT();
+	ret = gnutls_privkey_sign_data(privkey, GNUTLS_DIG_SHA1, 0,
+					&data, &signature);
+	if (ret < 0) {
+		fail("gnutls_privkey_sign_data failed\n");
+	}
+	FIPS_POP_CONTEXT(NOT_APPROVED);
+	gnutls_free(signature.data);
+
+	/* Create a SHA1 hashed data for 2-pass signature API; not a
+	 * crypto operation */
+	FIPS_PUSH_CONTEXT();
+	ret = gnutls_hash_fast(GNUTLS_DIG_SHA1, data.data, data.size, hash);
+	if (ret < 0) {
+		fail("gnutls_hash_fast failed\n");
+	}
+	hashed_data.data = hash;
+	hashed_data.size = 20;
+	FIPS_POP_CONTEXT(INITIAL);
+
+	/* Create a signature with ECDSA and SHA1 (2-pass API); not-approved */
+	FIPS_PUSH_CONTEXT();
+	ret = gnutls_privkey_sign_hash2(privkey, GNUTLS_SIGN_ECDSA_SHA1, 0,
+					&hashed_data, &signature);
+	if (ret < 0) {
+		fail("gnutls_privkey_sign_hash2 failed\n");
+	}
+	FIPS_POP_CONTEXT(NOT_APPROVED);
+	gnutls_free(signature.data);
+
+	/* Create a signature with ECDSA and SHA1 (2-pass old API); not-approved */
+	FIPS_PUSH_CONTEXT();
+	ret = gnutls_privkey_sign_hash(privkey, GNUTLS_DIG_SHA1, 0,
+					&hashed_data, &signature);
+	if (ret < 0) {
+		fail("gnutls_privkey_sign_hash failed\n");
+	}
+	FIPS_POP_CONTEXT(NOT_APPROVED);
+	gnutls_free(signature.data);
+
 	gnutls_pubkey_deinit(pubkey);
 	gnutls_privkey_deinit(privkey);
 
