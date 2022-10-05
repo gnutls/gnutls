@@ -27,9 +27,24 @@
 #include "mem.h"
 #include "mbuffers.h"
 #include "secrets.h"
+#include "system/ktls.h"
 
 #define KEY_UPDATES_WINDOW 1000
 #define KEY_UPDATES_PER_WINDOW 8
+
+/*
+ * Sets kTLS keys if enabled.
+ * If this operation fails with GNUTLS_E_INTERNAL_ERROR, KTLS is disabled
+ * because KTLS most likely doesn't support key update.
+ */
+#define SET_KTLS_KEYS(session, interface)\
+{\
+	if(_gnutls_ktls_set_keys(session, interface) < 0) {\
+		session->internals.ktls_enabled = 0;\
+		_gnutls_audit_log(session, \
+			  "disabling KTLS: couldn't update keys\n");\
+	}\
+}
 
 static int update_keys(gnutls_session_t session, hs_stage_t stage)
 {
@@ -49,8 +64,17 @@ static int update_keys(gnutls_session_t session, hs_stage_t stage)
 	 * write keys */
 	if (session->internals.recv_state == RECV_STATE_EARLY_START) {
 		ret = _tls13_write_connection_state_init(session, stage);
+		if (IS_KTLS_ENABLED(session, GNUTLS_KTLS_SEND))
+			SET_KTLS_KEYS(session,  GNUTLS_KTLS_SEND)
 	} else {
 		ret = _tls13_connection_state_init(session, stage);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		if (IS_KTLS_ENABLED(session, GNUTLS_KTLS_SEND) && stage == STAGE_UPD_OURS)
+			SET_KTLS_KEYS(session, GNUTLS_KTLS_SEND)
+		else if (IS_KTLS_ENABLED(session, GNUTLS_KTLS_RECV) && stage == STAGE_UPD_PEERS)
+			SET_KTLS_KEYS(session, GNUTLS_KTLS_RECV)
 	}
 	if (ret < 0)
 		return gnutls_assert_val(ret);

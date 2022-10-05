@@ -500,6 +500,8 @@ endif
 if ENABLE_KTLS
 indirect_tests += gnutls_ktls
 dist_check_SCRIPTS += ktls.sh
+indirect_tests += ktls_keyupdate
+dist_check_SCRIPTS += ktls_keyupdate.sh
 endif
 
 if !WINDOWS

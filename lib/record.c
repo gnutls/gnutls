@@ -2065,11 +2065,17 @@ gnutls_record_send2(gnutls_session_t session, const void *data,
 			session->internals.rsend_state = RECORD_SEND_KEY_UPDATE_3;
 			FALLTHROUGH;
 		case RECORD_SEND_KEY_UPDATE_3:
-			ret = _gnutls_send_int(session, GNUTLS_APPLICATION_DATA,
-						-1, EPOCH_WRITE_CURRENT,
-						session->internals.record_key_update_buffer.data,
-						session->internals.record_key_update_buffer.length,
-						MBUFFER_FLUSH);
+			if (IS_KTLS_ENABLED(session, GNUTLS_KTLS_SEND)) {
+				return _gnutls_ktls_send(session,
+							 session->internals.record_key_update_buffer.data,
+							 session->internals.record_key_update_buffer.length);
+			} else {
+				ret = _gnutls_send_int(session, GNUTLS_APPLICATION_DATA,
+							-1, EPOCH_WRITE_CURRENT,
+							session->internals.record_key_update_buffer.data,
+							session->internals.record_key_update_buffer.length,
+							MBUFFER_FLUSH);
+			}
 			_gnutls_buffer_clear(&session->internals.record_key_update_buffer);
 			session->internals.rsend_state = RECORD_SEND_NORMAL;
 			if (ret < 0)
@@ -2494,8 +2500,11 @@ gnutls_handshake_write(gnutls_session_t session,
 		return gnutls_assert_val(0);
 
 	/* When using this, the outgoing handshake messages should
-	 * also be handled manually */
-	if (!session->internals.h_read_func)
+	 * also be handled manually unless KTLS is enabled exclusively
+	 * in GNUTLS_KTLS_RECV mode in which case the outgoing messages
+	 * are handled by GnuTLS.
+	 */
+	if (!session->internals.h_read_func && !IS_KTLS_ENABLED(session, GNUTLS_KTLS_RECV))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	if (session->internals.initial_negotiation_completed) {
