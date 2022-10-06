@@ -263,15 +263,15 @@ static void tpm_generate(FILE * out, unsigned int key_type,
 	gnutls_datum_t privkey, pubkey;
 
 	if (!srk_well_known) {
-		srk_pass = getpass("Enter SRK password: ");
-		if (srk_pass != NULL)
-			srk_pass = strdup(srk_pass);
+		char *pass = getpass("Enter SRK password: ");
+		if (pass != NULL)
+			srk_pass = strdup(pass);
 	}
 
 	if (!(flags & GNUTLS_TPM_REGISTER_KEY)) {
-		key_pass = getpass("Enter key password: ");
-		if (key_pass != NULL)
-			key_pass = strdup(key_pass);
+		char *pass = getpass("Enter key password: ");
+		if (pass != NULL)
+			key_pass = strdup(pass);
 	}
 
 	ret =

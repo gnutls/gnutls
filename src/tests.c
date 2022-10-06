@@ -1613,7 +1613,9 @@ test_code_t test_chain_order(gnutls_session_t session)
 
 		gnutls_free(t.data);
 	}
-	*pos = 0;
+	if (pos) {
+		*pos = 0;
+	}
 
 	t.size = p_size;
 	t.data = (void*)p;
