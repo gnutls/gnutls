@@ -419,7 +419,7 @@ tests/fallback-scsv
 tests/finished
 tests/fips-mode-pthread
 tests/fips-override-test
-tests/fips-rsa-key-sizes
+tests/fips-rsa-sizes
 tests/fips-test
 tests/gc
 tests/global-init
