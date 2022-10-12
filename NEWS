@@ -7,6 +7,10 @@ See the end for copying conditions.
 
 * Version 3.8.0 (unreleased ????-??-??)
 
+** guile: Guile-bindings removed.
+They have been extracted into a separate project to reduce complexity
+and to simplify maintenance, see <https://gitlab.com/gnutls/guile/>.
+
 ** libgnutls: GNUTLS_NO_STATUS_REQUEST flag and %NO_STATUS_REQUEST
    priority modifier have been added to allow disabling of the
    status_request TLS extension in the client side.

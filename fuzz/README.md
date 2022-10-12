@@ -38,7 +38,7 @@ export CC=clang
 export CXX=clang++
 export CFLAGS="-O1 -g -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=undefined,integer,nullability,bool,alignment,null,enum,address,leak,nonnull-attribute -fno-sanitize-recover=all -fsanitize-recover=unsigned-integer-overflow -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link"
 export CXXFLAGS="$CFLAGS"
-./configure --disable-guile --enable-fuzzer-target --enable-static --disable-doc --disable-gcc-warnings --disable-hardware-acceleration
+./configure --enable-fuzzer-target --enable-static --disable-doc --disable-gcc-warnings --disable-hardware-acceleration
 make clean
 make
 cd fuzz
@@ -55,7 +55,7 @@ export ASAN_SYMBOLIZER_PATH=/usr/bin/llvm-symbolizer
 Use the following commands on top dir:
 
 ```
-$ CC=afl-clang-fast ./configure --disable-doc --enable-fuzzer-target --disable-guile
+$ CC=afl-clang-fast ./configure --disable-doc --enable-fuzzer-target
 $ make -j$(nproc) clean all
 $ cd fuzz
 $ ./run-afl.sh gnutls_base64_decoder_fuzzer
@@ -66,7 +66,7 @@ $ ./run-afl.sh gnutls_base64_decoder_fuzzer
 Use the following commands on top dir:
 
 ```
-$ CC=afl-gcc ./configure --disable-doc --enable-fuzzer-target --disable-guile
+$ CC=afl-gcc ./configure --disable-doc --enable-fuzzer-target
 $ make -j$(nproc) clean all
 $ cd fuzz
 $ ./run-afl.sh gnutls_base64_decoder_fuzzer

@@ -33,7 +33,6 @@ We require several tools to check out and build the software, including:
 * [Git](https://git-scm.com/)
 * [Perl](https://www.cpan.org/)
 * [Nettle](https://www.lysator.liu.se/~nisse/nettle/)
-* [Guile](https://www.gnu.org/software/guile/)
 * [p11-kit](https://p11-glue.github.io/p11-glue/p11-kit.html)
 * [gperf](https://www.gnu.org/software/gperf/)
 * [libtasn1](https://www.gnu.org/software/libtasn1/) (optional)
@@ -60,7 +59,7 @@ Debian/Ubuntu:
 ```
 apt-get install -y dash git-core autoconf libtool gettext autopoint
 apt-get install -y automake python3 nettle-dev libp11-kit-dev libtspi-dev libunistring-dev
-apt-get install -y guile-2.2-dev libtasn1-bin libtasn1-6-dev libidn2-0-dev gawk gperf
+apt-get install -y libtasn1-bin libtasn1-6-dev libidn2-0-dev gawk gperf
 apt-get install -y libtss2-dev libunbound-dev dns-root-data bison gtk-doc-tools
 apt-get install -y texinfo texlive texlive-generic-recommended texlive-extra-utils
 ```
@@ -72,7 +71,7 @@ Fedora/RHEL:
 ```
 yum install -y dash git autoconf libtool gettext-devel automake patch
 yum install -y nettle-devel p11-kit-devel libunistring-devel
-yum install -y tpm2-tss-devel trousers-devel guile22-devel libtasn1-devel libidn2-devel gawk gperf
+yum install -y tpm2-tss-devel trousers-devel libtasn1-devel libidn2-devel gawk gperf
 yum install -y libtasn1-tools unbound-devel bison gtk-doc texinfo texlive
 ```
 

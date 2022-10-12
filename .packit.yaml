@@ -15,7 +15,6 @@ actions:
   post-upstream-clone:
     - "wget https://src.fedoraproject.org/rpms/gnutls/raw/main/f/gnutls.spec"
     - "wget https://src.fedoraproject.org/rpms/gnutls/raw/main/f/gnutls-3.2.7-rpath.patch"
-    - "wget https://src.fedoraproject.org/rpms/gnutls/raw/main/f/gnutls-3.6.7-no-now-guile.patch"
   get-current-version:
     - "git describe --abbrev=0"
   create-archive:

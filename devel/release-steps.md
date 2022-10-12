@@ -14,12 +14,10 @@
    `make abi-dump-latest`, and push any changes to the [abi-dump
    repository]; then do `make abi-check`
 1. Create a distribution tarball: note that this requires
-   the documentation (not only the library docs but also the Guile binding
-   docs) to be generated. See the `doc-dist.Fedora` job in
+   the documentation to be generated. See the `doc-dist.Fedora` job in
    [.gitlab-ci.yml](.gitlab-ci.yml), which does the same thing in the CI:
    ```console
-   # Install necesarry packages for documentation and Guile bindings, set
-   # environment variables such as GUILE, GUILD, and guile_snarf, and then:
+   # Install necesarry packages for documentation, and then:
    make distcheck
    ```
 1. Create a detached GPG signature:
