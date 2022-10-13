@@ -3901,7 +3901,7 @@ gnutls_sign_set_secure(gnutls_sign_algorithm_t sign, unsigned int secure)
  * @secure: whether to mark the sign algorithm secure for certificates
  *
  * Modify the previous system wide setting that marked @sign as secure
- * or insecure for the use in certificates.  Calling this fuction is allowed
+ * or insecure for the use in certificates.  Calling this function is allowed
  * only if allowlisting mode is set in the configuration file,
  * and only if the system-wide TLS priority string
  * has not been initialized yet.
@@ -3964,7 +3964,7 @@ gnutls_sign_set_secure_for_certs(gnutls_sign_algorithm_t sign,
  * @enabled: whether to enable the protocol
  *
  * Control the previous system-wide setting that marked @version as
- * enabled or disabled.  Calling this fuction is allowed
+ * enabled or disabled.  Calling this function is allowed
  * only if allowlisting mode is set in the configuration file,
  * and only if the system-wide TLS priority string
  * has not been initialized yet.
@@ -4015,7 +4015,7 @@ gnutls_protocol_set_enabled(gnutls_protocol_t version, unsigned int enabled)
  * @enabled: whether to enable the curve
  *
  * Modify the previous system wide setting that marked @curve as
- * enabled or disabled.  Calling this fuction is allowed
+ * enabled or disabled.  Calling this function is allowed
  * only if allowlisting mode is set in the configuration file,
  * and only if the system-wide TLS priority string
  * has not been initialized yet.
