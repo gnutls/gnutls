@@ -128,6 +128,7 @@ int gnutls_pubkey_get_key_usage(gnutls_pubkey_t key, unsigned int *usage)
  **/
 int gnutls_pubkey_init(gnutls_pubkey_t * key)
 {
+	*key = NULL;
 	FAIL_IF_LIB_ERROR;
 
 	*key = gnutls_calloc(1, sizeof(struct gnutls_pubkey_st));

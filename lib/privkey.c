@@ -420,6 +420,7 @@ _gnutls_privkey_update_spki_params(gnutls_privkey_t key,
  **/
 int gnutls_privkey_init(gnutls_privkey_t * key)
 {
+	*key = NULL;
 	FAIL_IF_LIB_ERROR;
 
 	*key = gnutls_calloc(1, sizeof(struct gnutls_privkey_st));

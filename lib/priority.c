@@ -2921,6 +2921,7 @@ gnutls_priority_init2(gnutls_priority_t * priority_cache,
 	const char *ep;
 	int ret;
 
+	*priority_cache = NULL;
 	if (flags & GNUTLS_PRIORITY_INIT_DEF_APPEND) {
 		if (priorities == NULL)
 			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);

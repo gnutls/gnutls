@@ -70,6 +70,7 @@ int gnutls_ocsp_req_init(gnutls_ocsp_req_t * req)
 	    gnutls_calloc(1, sizeof(gnutls_ocsp_req_int));
 	int ret;
 
+	*req = NULL;
 	if (!tmp)
 		return GNUTLS_E_MEMORY_ERROR;
 
@@ -119,6 +120,7 @@ int gnutls_ocsp_resp_init(gnutls_ocsp_resp_t * resp)
 	    gnutls_calloc(1, sizeof(gnutls_ocsp_resp_int));
 	int ret;
 
+	*resp = NULL;
 	if (!tmp)
 		return GNUTLS_E_MEMORY_ERROR;
 
