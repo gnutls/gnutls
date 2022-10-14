@@ -142,7 +142,7 @@ gnutls_x509_privkey_import_openssl(gnutls_x509_privkey_t key,
 	gnutls_cipher_hd_t handle;
 	gnutls_cipher_algorithm_t cipher = GNUTLS_CIPHER_UNKNOWN;
 	gnutls_datum_t b64_data;
-	gnutls_datum_t salt, enc_key;
+	gnutls_datum_t salt, enc_key, hex_data;
 	unsigned char *key_data;
 	size_t key_data_size;
 	const char *pem_header = (void *) data->data;
@@ -150,6 +150,7 @@ gnutls_x509_privkey_import_openssl(gnutls_x509_privkey_t key,
 	ssize_t pem_header_size;
 	int ret;
 	unsigned int i, iv_size, l;
+	size_t salt_size;
 
 	pem_header_size = data->size;
 
@@ -196,27 +197,21 @@ gnutls_x509_privkey_import_openssl(gnutls_x509_privkey_t key,
 	if (!salt.data)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-	for (i = 0; i < salt.size * 2; i++) {
-		unsigned char x;
-		const char *c = &pem_header[i];
+	hex_data.data = (unsigned char *)pem_header;
+	hex_data.size = salt.size * 2;
+	salt_size = salt.size;
 
-		if (*c >= '0' && *c <= '9')
-			x = (*c) - '0';
-		else if (*c >= 'A' && *c <= 'F')
-			x = (*c) - 'A' + 10;
-		else {
-			gnutls_assert();
+	ret = gnutls_hex_decode(&hex_data, salt.data, &salt_size);
+	if (ret < 0) {
+		gnutls_assert();
+		if (ret == GNUTLS_E_PARSING_ERROR) {
 			/* Invalid salt in encrypted PEM file */
 			ret = GNUTLS_E_INVALID_REQUEST;
-			goto out_salt;
 		}
-		if (i & 1)
-			salt.data[i / 2] |= x;
-		else
-			salt.data[i / 2] = x << 4;
+		goto out_salt;
 	}
 
-	pem_header += salt.size * 2;
+	pem_header += hex_data.size;
 	if (*pem_header != '\r' && *pem_header != '\n') {
 		gnutls_assert();
 		ret = GNUTLS_E_INVALID_REQUEST;
