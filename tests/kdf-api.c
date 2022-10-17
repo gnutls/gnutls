@@ -33,30 +33,7 @@
 #define MAX_BUF 1024
 
 static gnutls_fips140_context_t fips_context;
-static gnutls_fips140_operation_state_t fips_state;
 
-#define FIPS_PUSH_CONTEXT() do {					\
-	if (gnutls_fips140_mode_enabled()) {				\
-		ret = gnutls_fips140_push_context(fips_context);	\
-		if (ret < 0) {						\
-			fail("gnutls_fips140_push_context failed\n");	\
-		}							\
-	}								\
-} while (0)
-
-#define FIPS_POP_CONTEXT(state) do {					\
-	if (gnutls_fips140_mode_enabled()) {				\
-		ret = gnutls_fips140_pop_context();			\
-		if (ret < 0) {						\
-			fail("gnutls_fips140_context_pop failed\n");	\
-		}							\
-		fips_state = gnutls_fips140_get_operation_state(fips_context); \
-		if (fips_state != GNUTLS_FIPS140_OP_ ## state) {	\
-			fail("operation state is not " # state " (%d)\n", \
-			     fips_state);				\
-		}							\
-	}								\
-} while (0)
 
 static void
 test_hkdf(gnutls_mac_algorithm_t mac,
@@ -74,7 +51,6 @@ test_hkdf(gnutls_mac_algorithm_t mac,
 	gnutls_datum_t prk;
 	gnutls_datum_t okm;
 	uint8_t buf[MAX_BUF];
-	int ret;
 
 	success("HKDF test with %s\n", gnutls_mac_get_name(mac));
 
@@ -144,7 +120,6 @@ test_pbkdf2(gnutls_mac_algorithm_t mac,
 	gnutls_datum_t salt;
 	gnutls_datum_t okm;
 	uint8_t buf[MAX_BUF];
-	int ret;
 
 	success("PBKDF2 test with %s\n", gnutls_mac_get_name(mac));
 

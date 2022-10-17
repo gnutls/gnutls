@@ -70,29 +70,6 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "|<%d>| %s", level, str);
 }
 
-#define FIPS_PUSH_CONTEXT() do {					\
-	if (gnutls_fips140_mode_enabled()) {				\
-		ret = gnutls_fips140_push_context(fips_context);	\
-		if (ret < 0) {						\
-			fail("gnutls_fips140_push_context failed\n");	\
-		}							\
-	}								\
-} while (0)
-
-#define FIPS_POP_CONTEXT(state) do {					\
-	if (gnutls_fips140_mode_enabled()) {				\
-		ret = gnutls_fips140_pop_context();			\
-		if (ret < 0) {						\
-			fail("gnutls_fips140_context_pop failed\n");	\
-		}							\
-		fips_state = gnutls_fips140_get_operation_state(fips_context); \
-		if (fips_state != GNUTLS_FIPS140_OP_ ## state) {	\
-			fail("operation state is not " # state " (%d)\n", \
-			     fips_state);				\
-		}							\
-	}								\
-} while (0)
-
 void doit(void)
 {
 	gnutls_pkcs12_t pkcs12;
@@ -106,7 +83,6 @@ void doit(void)
 	size_t size;
 	unsigned i;
 	gnutls_fips140_context_t fips_context;
-	gnutls_fips140_operation_state_t fips_state;
 	size_t n_tests = 0;
 	struct tests {
 		const char *name;

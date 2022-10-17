@@ -12,25 +12,6 @@
 /* This does check the FIPS140 support.
  */
 
-#define FIPS_PUSH_CONTEXT() do {				\
-	ret = gnutls_fips140_push_context(fips_context);	\
-	if (ret < 0) {						\
-		fail("gnutls_fips140_push_context failed\n");	\
-	}							\
-} while (0)
-
-#define FIPS_POP_CONTEXT(state) do {					\
-	ret = gnutls_fips140_pop_context();				\
-	if (ret < 0) {							\
-		fail("gnutls_fips140_context_pop failed\n");		\
-	}								\
-	fips_state = gnutls_fips140_get_operation_state(fips_context);	\
-	if (fips_state != GNUTLS_FIPS140_OP_ ## state) {		\
-		fail("operation state is not " # state " (%d)\n",	\
-		     fips_state);					\
-	}								\
-} while (0)
-
 void _gnutls_lib_simulate_error(void);
 
 static void tls_log_func(int level, const char *str)
@@ -40,10 +21,9 @@ static void tls_log_func(int level, const char *str)
 
 static uint8_t key16[16];
 static uint8_t iv16[16];
-uint8_t key_data[64];
-uint8_t iv_data[16];
-gnutls_fips140_context_t fips_context;
-gnutls_fips140_operation_state_t fips_state;
+static uint8_t key_data[64];
+static uint8_t iv_data[16];
+static gnutls_fips140_context_t fips_context;
 
 static const gnutls_datum_t data = { .data = (unsigned char *)"foo", 3 };
 static const uint8_t rsa2342_sha1_sig_data[] = {
@@ -276,6 +256,7 @@ test_ciphers(void)
 void doit(void)
 {
 	int ret;
+	gnutls_fips140_operation_state_t fips_state;
 	unsigned int mode;
 	gnutls_cipher_hd_t ch;
 	gnutls_hmac_hd_t mh;

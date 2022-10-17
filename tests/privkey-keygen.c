@@ -119,30 +119,6 @@ void doit(void)
 	gnutls_x509_privkey_t pkey, dst;
 	int ret, algorithm, i;
 	gnutls_fips140_context_t fips_context;
-	gnutls_fips140_operation_state_t fips_state;
-
-#define FIPS_PUSH_CONTEXT() do {					\
-	if (gnutls_fips140_mode_enabled()) {				\
-		ret = gnutls_fips140_push_context(fips_context);	\
-		if (ret < 0) {						\
-			fail("gnutls_fips140_push_context failed\n");	\
-		}							\
-	}								\
-} while (0)
-
-#define FIPS_POP_CONTEXT(state) do {					\
-	if (gnutls_fips140_mode_enabled()) {				\
-		ret = gnutls_fips140_pop_context();			\
-		if (ret < 0) {						\
-			fail("gnutls_fips140_context_pop failed\n");	\
-		}							\
-		fips_state = gnutls_fips140_get_operation_state(fips_context); \
-		if (fips_state != GNUTLS_FIPS140_OP_ ## state) {	\
-			fail("operation state is not " # state " (%d)\n", \
-			     fips_state);				\
-		}							\
-	}								\
-} while (0)
 
 	ret = global_init();
 	if (ret < 0)
