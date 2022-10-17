@@ -35,6 +35,8 @@
 #include <gnutls/x509-ext.h>
 #include "verify-high.h"
 #include "intprops.h"
+#include "gl_linkedhash_list.h"
+#include "gl_list.h"
 
 struct named_cert_st {
 	gnutls_x509_crt_t cert;
@@ -68,82 +70,19 @@ struct gnutls_x509_trust_list_iter {
 
 #define DEFAULT_SIZE 127
 
-struct cert_set_node_st {
-	gnutls_x509_crt_t *certs;
-	unsigned int size;
-};
-
-struct cert_set_st {
-	struct cert_set_node_st *node;
-	unsigned int size;
-};
-
-static int
-cert_set_init(struct cert_set_st *set, unsigned int size)
-{
-	memset(set, 0, sizeof(*set));
-
-	set->size = size;
-	set->node = gnutls_calloc(size, sizeof(*set->node));
-	if (!set->node) {
-		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-	}
-
-	return 0;
-}
-
-static void
-cert_set_deinit(struct cert_set_st *set)
-{
-	size_t i;
-
-	for (i = 0; i < set->size; i++) {
-		gnutls_free(set->node[i].certs);
-	}
-
-	gnutls_free(set->node);
-}
-
 static bool
-cert_set_contains(struct cert_set_st *set, const gnutls_x509_crt_t cert)
+cert_eq(const void *cert1, const void *cert2)
 {
-	size_t hash, i;
-
-	hash = hash_pjw_bare(cert->raw_dn.data, cert->raw_dn.size);
-	hash %= set->size;
-
-	for (i = 0; i < set->node[hash].size; i++) {
-		if (unlikely(gnutls_x509_crt_equals(set->node[hash].certs[i], cert))) {
-			return true;
-		}
-	}
-
-	return false;
+	const gnutls_x509_crt_t c1 = (const gnutls_x509_crt_t)cert1;
+	const gnutls_x509_crt_t c2 = (const gnutls_x509_crt_t)cert2;
+	return gnutls_x509_crt_equals(c1, c2);
 }
 
-static int
-cert_set_add(struct cert_set_st *set, const gnutls_x509_crt_t cert)
+static size_t
+cert_hashcode(const void *cert)
 {
-	size_t hash;
-
-	hash = hash_pjw_bare(cert->raw_dn.data, cert->raw_dn.size);
-	hash %= set->size;
-
-	if (unlikely(INT_ADD_OVERFLOW(set->node[hash].size, 1))) {
-		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-	}
-
-	set->node[hash].certs =
-		_gnutls_reallocarray_fast(set->node[hash].certs,
-					  set->node[hash].size + 1,
-					  sizeof(*set->node[hash].certs));
-	if (!set->node[hash].certs) {
-		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-	}
-	set->node[hash].certs[set->node[hash].size] = cert;
-	set->node[hash].size++;
-
-	return 0;
+	const gnutls_x509_crt_t c = (const gnutls_x509_crt_t)cert;
+	return hash_pjw_bare(c->raw_dn.data, c->raw_dn.size) % DEFAULT_MAX_VERIFY_DEPTH;
 }
 
 /**
@@ -1426,7 +1365,7 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 	unsigned have_set_name = 0;
 	unsigned saved_output;
 	gnutls_datum_t ip = {NULL, 0};
-	struct cert_set_st cert_set = { NULL, 0 };
+	gl_list_t records;
 
 	if (cert_list == NULL || cert_list_size < 1)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -1475,10 +1414,9 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 	memcpy(sorted, cert_list, cert_list_size * sizeof(gnutls_x509_crt_t));
 	cert_list = sorted;
 
-	ret = cert_set_init(&cert_set, DEFAULT_MAX_VERIFY_DEPTH);
-	if (ret < 0) {
-		return ret;
-	}
+	records = gl_list_nx_create_empty(GL_LINKEDHASH_LIST, cert_eq, cert_hashcode, NULL, false);
+	if (records == NULL)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
 	for (i = 0; i < cert_list_size &&
 		     cert_list_size <= DEFAULT_MAX_VERIFY_DEPTH; ) {
@@ -1493,8 +1431,8 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 
 		/* Remove duplicates. Start with index 1, as the first element
 		 * may be re-checked after issuer retrieval. */
-		for (j = 1; j < sorted_size; j++) {
-			if (cert_set_contains(&cert_set, cert_list[i + j])) {
+		for (j = 0; j < sorted_size; j++) {
+			if (gl_list_search(records, cert_list[i + j])) {
 				if (i + j < cert_list_size - 1) {
 					memmove(&cert_list[i + j],
 						&cert_list[i + j + 1],
@@ -1511,8 +1449,8 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 
 		/* Record the certificates seen. */
 		for (j = 0; j < sorted_size; j++, i++) {
-			ret = cert_set_add(&cert_set, cert_list[i]);
-			if (ret < 0) {
+			if (!gl_list_nx_add_last(records, cert_list[i])) {
+				ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 				goto cleanup;
 			}
 		}
@@ -1559,6 +1497,7 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 
 			/* Start again from the end of the previous segment. */
 			i--;
+			gl_list_remove(records, cert_list[i]);
 		}
 	}
 
@@ -1718,7 +1657,7 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 	for (i = 0; i < retrieved_size; i++) {
 		gnutls_x509_crt_deinit(retrieved[i]);
 	}
-	cert_set_deinit(&cert_set);
+	gl_list_free(records);
 	return ret;
 }
 
