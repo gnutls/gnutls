@@ -210,4 +210,62 @@ inline static unsigned int get_dtls_retransmit_timeout(void) {
 	return (unsigned int) ul;
 }
 
+static inline const char *
+fips_operation_state_to_string(gnutls_fips140_operation_state_t state)
+{
+	switch (state) {
+	case GNUTLS_FIPS140_OP_INITIAL:
+		return "INITIAL";
+	case GNUTLS_FIPS140_OP_APPROVED:
+		return "APPROVED";
+	case GNUTLS_FIPS140_OP_NOT_APPROVED:
+		return "NOT_APPROVED";
+	case GNUTLS_FIPS140_OP_ERROR:
+		return "ERROR";
+	default:
+		/*NOTREACHED*/
+		assert(0);
+		return NULL;
+	}
+}
+
+static inline void
+fips_push_context(gnutls_fips140_context_t context)
+{
+	if (gnutls_fips140_mode_enabled()) {
+		int ret;
+
+		ret = gnutls_fips140_push_context(context);
+		if (ret < 0) {
+			fail("gnutls_fips140_push_context failed\n");
+		}
+	}
+}
+
+static inline void
+fips_pop_context(gnutls_fips140_context_t context,
+		 gnutls_fips140_operation_state_t expected_state)
+{
+	gnutls_fips140_operation_state_t state;
+
+	if (gnutls_fips140_mode_enabled()) {
+		int ret;
+
+		ret = gnutls_fips140_pop_context();
+		if (ret < 0) {
+			fail("gnutls_fips140_context_pop failed\n");
+		}
+		state = gnutls_fips140_get_operation_state(context);
+		if (state != expected_state) {
+			fail("operation state is not %s (%s)\n",
+			     fips_operation_state_to_string(expected_state),
+			     fips_operation_state_to_string(state));
+		}
+	}
+}
+
+/* To use those convenient macros, define fips_context variable. */
+#define FIPS_PUSH_CONTEXT() fips_push_context(fips_context)
+#define FIPS_POP_CONTEXT(state) fips_pop_context(fips_context, GNUTLS_FIPS140_OP_ ## state)
+
 #endif /* GNUTLS_TESTS_UTILS_H */

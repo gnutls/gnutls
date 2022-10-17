@@ -1056,6 +1056,7 @@ gnutls_hash_hd_t gnutls_hash_copy(gnutls_hash_hd_t handle)
 int gnutls_key_generate(gnutls_datum_t * key, unsigned int key_size)
 {
 	int ret;
+	bool not_approved = false;
 
 	FAIL_IF_LIB_ERROR;
 
@@ -1072,17 +1073,31 @@ int gnutls_key_generate(gnutls_datum_t * key, unsigned int key_size)
 	key->data = gnutls_malloc(key->size);
 	if (!key->data) {
 		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
+		ret = GNUTLS_E_MEMORY_ERROR;
+		goto error;
+	}
+
+	/* Key lengths of less than 112 bits are not approved */
+	if (key_size < 14) {
+		not_approved = true;
 	}
 
 	ret = gnutls_rnd(GNUTLS_RND_RANDOM, key->data, key->size);
 	if (ret < 0) {
 		gnutls_assert();
 		_gnutls_free_datum(key);
-		return ret;
+		goto error;
 	}
 
-	return 0;
+ error:
+	if (ret < 0) {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
+	} else if (not_approved) {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_NOT_APPROVED);
+	} else {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_APPROVED);
+	}
+	return ret;
 }
 
 /* AEAD API */
@@ -2214,7 +2229,15 @@ gnutls_pbkdf2(gnutls_mac_algorithm_t mac,
 	if (!is_mac_algo_allowed(mac)) {
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
-	} else if (!is_mac_algo_approved_in_fips(mac)) {
+	} else if (!is_mac_algo_hmac_approved_in_fips(mac)) {
+		/* ACVP only allows HMAC used with PBKDF2:
+		 * https://pages.nist.gov/ACVP/draft-celi-acvp-pbkdf.html
+		 */
+		not_approved = true;
+	}
+
+	/* Key lengths and output sizes of less than 112 bits are not approved */
+	if (key->size < 14 || length < 14) {
 		not_approved = true;
 	}
 

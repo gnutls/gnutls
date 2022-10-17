@@ -12,25 +12,6 @@
 /* This does check the FIPS140 support.
  */
 
-#define FIPS_PUSH_CONTEXT() do {				\
-	ret = gnutls_fips140_push_context(fips_context);	\
-	if (ret < 0) {						\
-		fail("gnutls_fips140_push_context failed\n");	\
-	}							\
-} while (0)
-
-#define FIPS_POP_CONTEXT(state) do {					\
-	ret = gnutls_fips140_pop_context();				\
-	if (ret < 0) {							\
-		fail("gnutls_fips140_context_pop failed\n");		\
-	}								\
-	fips_state = gnutls_fips140_get_operation_state(fips_context);	\
-	if (fips_state != GNUTLS_FIPS140_OP_ ## state) {		\
-		fail("operation state is not " # state " (%d)\n",	\
-		     fips_state);					\
-	}								\
-} while (0)
-
 void _gnutls_lib_simulate_error(void);
 
 static void tls_log_func(int level, const char *str)
@@ -40,10 +21,9 @@ static void tls_log_func(int level, const char *str)
 
 static uint8_t key16[16];
 static uint8_t iv16[16];
-uint8_t key_data[64];
-uint8_t iv_data[16];
-gnutls_fips140_context_t fips_context;
-gnutls_fips140_operation_state_t fips_state;
+static uint8_t key_data[64];
+static uint8_t iv_data[16];
+static gnutls_fips140_context_t fips_context;
 
 static const gnutls_datum_t data = { .data = (unsigned char *)"foo", 3 };
 static const uint8_t rsa2342_sha1_sig_data[] = {
@@ -276,6 +256,7 @@ test_ciphers(void)
 void doit(void)
 {
 	int ret;
+	gnutls_fips140_operation_state_t fips_state;
 	unsigned int mode;
 	gnutls_cipher_hd_t ch;
 	gnutls_hmac_hd_t mh;
@@ -290,6 +271,8 @@ void doit(void)
 	uint8_t hmac[64];
 	uint8_t hash[64];
 	gnutls_datum_t hashed_data;
+	uint8_t pbkdf2[64];
+	gnutls_datum_t temp_key = { NULL, 0 };
 
 	fprintf(stderr,
 		"Please note that if in FIPS140 mode, you need to assure the library's integrity prior to running this test\n");
@@ -387,10 +370,57 @@ void doit(void)
 	}
 	FIPS_POP_CONTEXT(NOT_APPROVED);
 
+	/* PBKDF2 with key equal to or longer than 112 bits: approved */
+	FIPS_PUSH_CONTEXT();
+	ret = gnutls_pbkdf2(GNUTLS_MAC_SHA256, &key, &iv, 100,
+			    &pbkdf2, sizeof(pbkdf2));
+	if (ret < 0) {
+		fail("gnutls_pbkdf2 failed\n");
+	}
+	FIPS_POP_CONTEXT(APPROVED);
+
+	/* PBKDF2 with key shorter than 112 bits: not approved */
+	FIPS_PUSH_CONTEXT();
+	key.size = 13;
+	ret = gnutls_pbkdf2(GNUTLS_MAC_SHA256, &key, &iv, 100,
+			    &pbkdf2, sizeof(pbkdf2));
+	if (ret < 0) {
+		fail("gnutls_pbkdf2 failed\n");
+	}
+	key.size = sizeof(key16);
+	FIPS_POP_CONTEXT(NOT_APPROVED);
+
+	/* PBKDF2 with output shorter than 112 bits: not approved */
+	FIPS_PUSH_CONTEXT();
+	ret = gnutls_pbkdf2(GNUTLS_MAC_SHA256, &key, &iv, 100,
+			    &pbkdf2, 13);
+	if (ret < 0) {
+		fail("gnutls_pbkdf2 failed\n");
+	}
+	FIPS_POP_CONTEXT(NOT_APPROVED);
+
 	ret = gnutls_rnd(GNUTLS_RND_NONCE, key16, sizeof(key16));
 	if (ret < 0) {
 		fail("gnutls_rnd failed\n");
 	}
+
+	/* Symmetric key generation equal to or longer than 112 bits: approved */
+	FIPS_PUSH_CONTEXT();
+	ret = gnutls_key_generate(&temp_key, 14);
+	if (ret < 0) {
+		fail("gnutls_key_generate failed\n");
+	}
+	gnutls_free(temp_key.data);
+	FIPS_POP_CONTEXT(APPROVED);
+
+	/* Symmetric key generation shorter than 112 bits: not approved */
+	FIPS_PUSH_CONTEXT();
+	ret = gnutls_key_generate(&temp_key, 13);
+	if (ret < 0) {
+		fail("gnutls_key_generate failed\n");
+	}
+	gnutls_free(temp_key.data);
+	FIPS_POP_CONTEXT(NOT_APPROVED);
 
 	ret = gnutls_pubkey_init(&pubkey);
 	if (ret < 0) {

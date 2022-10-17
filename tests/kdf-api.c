@@ -26,6 +26,7 @@
 #include <gnutls/crypto.h>
 
 #include <assert.h>
+#include <stdbool.h>
 #include <stdint.h>
 
 #include "utils.h"
@@ -33,30 +34,7 @@
 #define MAX_BUF 1024
 
 static gnutls_fips140_context_t fips_context;
-static gnutls_fips140_operation_state_t fips_state;
 
-#define FIPS_PUSH_CONTEXT() do {					\
-	if (gnutls_fips140_mode_enabled()) {				\
-		ret = gnutls_fips140_push_context(fips_context);	\
-		if (ret < 0) {						\
-			fail("gnutls_fips140_push_context failed\n");	\
-		}							\
-	}								\
-} while (0)
-
-#define FIPS_POP_CONTEXT(state) do {					\
-	if (gnutls_fips140_mode_enabled()) {				\
-		ret = gnutls_fips140_pop_context();			\
-		if (ret < 0) {						\
-			fail("gnutls_fips140_context_pop failed\n");	\
-		}							\
-		fips_state = gnutls_fips140_get_operation_state(fips_context); \
-		if (fips_state != GNUTLS_FIPS140_OP_ ## state) {	\
-			fail("operation state is not " # state " (%d)\n", \
-			     fips_state);				\
-		}							\
-	}								\
-} while (0)
 
 static void
 test_hkdf(gnutls_mac_algorithm_t mac,
@@ -74,7 +52,6 @@ test_hkdf(gnutls_mac_algorithm_t mac,
 	gnutls_datum_t prk;
 	gnutls_datum_t okm;
 	uint8_t buf[MAX_BUF];
-	int ret;
 
 	success("HKDF test with %s\n", gnutls_mac_get_name(mac));
 
@@ -89,6 +66,7 @@ test_hkdf(gnutls_mac_algorithm_t mac,
 
 	FIPS_PUSH_CONTEXT();
 	assert(gnutls_hkdf_extract(mac, &ikm, &salt, buf) >= 0);
+	/* HKDF outside of TLS usage is not approved */
 	FIPS_POP_CONTEXT(NOT_APPROVED);
 	gnutls_free(ikm.data);
 	gnutls_free(salt.data);
@@ -116,6 +94,7 @@ test_hkdf(gnutls_mac_algorithm_t mac,
 
 	FIPS_PUSH_CONTEXT();
 	assert(gnutls_hkdf_expand(mac, &prk, &info, buf, length) >= 0);
+	/* HKDF outside of TLS usage is not approved */
 	FIPS_POP_CONTEXT(NOT_APPROVED);
 
 	gnutls_free(info.data);
@@ -131,20 +110,39 @@ test_hkdf(gnutls_mac_algorithm_t mac,
 	gnutls_free(hex.data);
 }
 
+inline static bool
+is_mac_algo_hmac_approved_in_fips(gnutls_mac_algorithm_t algo)
+{
+	switch (algo) {
+	case GNUTLS_MAC_SHA1:
+	case GNUTLS_MAC_SHA256:
+	case GNUTLS_MAC_SHA384:
+	case GNUTLS_MAC_SHA512:
+	case GNUTLS_MAC_SHA224:
+	case GNUTLS_MAC_SHA3_224:
+	case GNUTLS_MAC_SHA3_256:
+	case GNUTLS_MAC_SHA3_384:
+	case GNUTLS_MAC_SHA3_512:
+		return true;
+	default:
+		return false;
+	}
+}
+
 static void
 test_pbkdf2(gnutls_mac_algorithm_t mac,
 	    const char *ikm_hex,
 	    const char *salt_hex,
 	    unsigned iter_count,
 	    size_t length,
-	    const char *okm_hex)
+	    const char *okm_hex,
+	    gnutls_fips140_operation_state_t expected_state)
 {
 	gnutls_datum_t hex;
 	gnutls_datum_t ikm;
 	gnutls_datum_t salt;
 	gnutls_datum_t okm;
 	uint8_t buf[MAX_BUF];
-	int ret;
 
 	success("PBKDF2 test with %s\n", gnutls_mac_get_name(mac));
 
@@ -156,9 +154,9 @@ test_pbkdf2(gnutls_mac_algorithm_t mac,
 	hex.size = strlen(salt_hex);
 	assert(gnutls_hex_decode2(&hex, &salt) >= 0);
 
-	FIPS_PUSH_CONTEXT();
+	fips_push_context(fips_context);
 	assert(gnutls_pbkdf2(mac, &ikm, &salt, iter_count, buf, length) >= 0);
-	FIPS_POP_CONTEXT(APPROVED);
+	fips_pop_context(fips_context, expected_state);
 	gnutls_free(ikm.data);
 	gnutls_free(salt.data);
 
@@ -199,7 +197,18 @@ doit(void)
 		    "73616c74",		/* "salt" */
 		    4096,
 		    20,
-		    "4b007901b765489abead49d926f721d065a429c1");
+		    "4b007901b765489abead49d926f721d065a429c1",
+		    /* Key sizes and output sizes less than 112-bit are not approved.  */
+		    GNUTLS_FIPS140_OP_NOT_APPROVED);
+
+	test_pbkdf2(GNUTLS_MAC_AES_CMAC_128,
+		    "70617373776f726470617373776f7264", /* "passwordpassword" */
+		    "73616c74",		/* "salt" */
+		    4096,
+		    20,
+		    "c4c112c6e1e3b8757640603dec78825ff87605a7",
+		    /* Use of AES-CMAC in PBKDF2 is not supported in ACVP.  */
+		    GNUTLS_FIPS140_OP_NOT_APPROVED);
 
 	gnutls_fips140_context_deinit(fips_context);
 }

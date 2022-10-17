@@ -27,25 +27,6 @@
 #include <gnutls/abstract.h>
 #include <gnutls/x509.h>
 
-#define FIPS_PUSH_CONTEXT() do {				\
-	ret = gnutls_fips140_push_context(fips_context);	\
-	if (ret < 0) {						\
-		fail("gnutls_fips140_push_context failed\n");	\
-	}							\
-} while (0)
-
-#define FIPS_POP_CONTEXT(state) do {					\
-	ret = gnutls_fips140_pop_context();				\
-	if (ret < 0) {							\
-		fail("gnutls_fips140_context_pop failed\n");		\
-	}								\
-	fips_state = gnutls_fips140_get_operation_state(fips_context);	\
-	if (fips_state != GNUTLS_FIPS140_OP_ ## state) {		\
-		fail("operation state is not " # state " (%d)\n",	\
-		     fips_state);					\
-	}								\
-} while (0)
-
 
 void generate_successfully(gnutls_privkey_t* privkey, gnutls_pubkey_t* pubkey,
                            unsigned int size);
@@ -63,7 +44,6 @@ void generate_successfully(gnutls_privkey_t* privkey, gnutls_pubkey_t* pubkey,
 	int ret;
 	gnutls_x509_privkey_t xprivkey;
 	gnutls_fips140_context_t fips_context;
-	gnutls_fips140_operation_state_t fips_state;
 	assert(gnutls_fips140_context_init(&fips_context) == 0);
 
 	fprintf(stderr, "%d-bit\n", size);
@@ -102,7 +82,6 @@ void generate_unsuccessfully(gnutls_privkey_t* privkey, gnutls_pubkey_t* pubkey,
 	int ret;
 	gnutls_x509_privkey_t xprivkey;
 	gnutls_fips140_context_t fips_context;
-	gnutls_fips140_operation_state_t fips_state;
 	assert(gnutls_fips140_context_init(&fips_context) == 0);
 
 	fprintf(stderr, "%d-bit\n", size);
@@ -156,7 +135,6 @@ void generate_unsuccessfully(gnutls_privkey_t* privkey, gnutls_pubkey_t* pubkey,
 void sign_verify_successfully(gnutls_privkey_t privkey, gnutls_pubkey_t pubkey) {
 	int ret;
 	gnutls_fips140_context_t fips_context;
-	gnutls_fips140_operation_state_t fips_state;
 
 	gnutls_datum_t signature;
 	gnutls_datum_t plaintext = {
@@ -190,7 +168,6 @@ void sign_verify_unsuccessfully(gnutls_privkey_t privkey,
                                 gnutls_pubkey_t pubkey) {
 	int ret;
 	gnutls_fips140_context_t fips_context;
-	gnutls_fips140_operation_state_t fips_state;
 
 	gnutls_datum_t signature;
 	gnutls_datum_t plaintext = {
@@ -225,7 +202,6 @@ void sign_verify_unsuccessfully(gnutls_privkey_t privkey,
 void nosign_verify(gnutls_privkey_t privkey, gnutls_pubkey_t pubkey) {
 	int ret;
 	gnutls_fips140_context_t fips_context;
-	gnutls_fips140_operation_state_t fips_state;
 
 	gnutls_datum_t signature;
 	gnutls_datum_t plaintext = {
