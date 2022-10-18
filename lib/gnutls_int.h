@@ -961,6 +961,7 @@ struct gnutls_priority_st {
 	bool min_record_version;
 	bool server_precedence;
 	bool allow_server_key_usage_violation; /* for test suite purposes only */
+	bool no_status_request;
 	bool no_tickets;
 	bool no_tickets_tls12;
 	bool have_cbc;

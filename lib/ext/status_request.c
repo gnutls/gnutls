@@ -233,6 +233,9 @@ _gnutls_status_request_send_params(gnutls_session_t session,
 		return 0;
 
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
+		if (session->internals.flags & GNUTLS_NO_STATUS_REQUEST)
+			return 0;
+
 		ret = _gnutls_hello_ext_get_priv(session,
 						 GNUTLS_EXTENSION_STATUS_REQUEST,
 						 &epriv);
@@ -316,6 +319,10 @@ gnutls_ocsp_status_request_enable_client(gnutls_session_t session,
 	_gnutls_hello_ext_set_priv(session,
 				     GNUTLS_EXTENSION_STATUS_REQUEST,
 				     epriv);
+
+	session->internals.flags &= ~GNUTLS_NO_STATUS_REQUEST;
+	if (session->internals.priorities)
+		session->internals.priorities->no_status_request = 0;
 
 	return 0;
 }

@@ -691,6 +691,9 @@ gnutls_priority_set(gnutls_session_t session, gnutls_priority_t priority)
 		session->internals.flags |= GNUTLS_NO_TICKETS_TLS12;
 	}
 
+	if (priority->no_status_request)
+		session->internals.flags |= GNUTLS_NO_STATUS_REQUEST;
+
 	ADD_PROFILE_VFLAGS(session, priority->additional_verify_flags);
 
 	/* mirror variables */
@@ -901,6 +904,10 @@ static void enable_dumbfw(gnutls_priority_t c)
 static void enable_no_extensions(gnutls_priority_t c)
 {
 	c->no_extensions = 1;
+}
+static void enable_no_status_request(gnutls_priority_t c)
+{
+	c->no_status_request = 1;
 }
 static void enable_no_ext_master_secret(gnutls_priority_t c)
 {
