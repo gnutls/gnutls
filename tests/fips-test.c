@@ -1,4 +1,5 @@
 #include <config.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -213,14 +214,96 @@ test_cipher_disallowed(gnutls_cipher_algorithm_t cipher)
 	FIPS_POP_CONTEXT(ERROR);
 }
 
+static void
+test_ccm_cipher(gnutls_cipher_algorithm_t cipher, size_t tag_length,
+		bool expect_encryption_fail,
+		gnutls_fips140_operation_state_t expected_state)
+{
+	int ret;
+	unsigned key_size = gnutls_cipher_get_key_size(cipher);
+	gnutls_aead_cipher_hd_t h;
+	gnutls_datum_t key = { key_data, key_size };
+	unsigned char buffer[256];
+	size_t length;
+	gnutls_memset(key_data, 0, key_size);
+
+	FIPS_PUSH_CONTEXT();
+	ret = gnutls_aead_cipher_init(&h, cipher, &key);
+	if (ret < 0) {
+		fail("gnutls_aead_cipher_init failed for %s\n",
+		     gnutls_cipher_get_name(cipher));
+	}
+	FIPS_POP_CONTEXT(APPROVED);
+
+	fips_push_context(fips_context);
+	memset(buffer, 0, sizeof(buffer));
+	length = sizeof(buffer);
+	ret = gnutls_aead_cipher_encrypt(h, iv_data,
+					 gnutls_cipher_get_iv_size(cipher),
+					 NULL, 0, tag_length,
+					 buffer, length - tag_length,
+					 buffer, &length);
+	if (expect_encryption_fail) {
+		if (ret != GNUTLS_E_INVALID_REQUEST) {
+			fail("gnutls_aead_cipher_encrypt(%s) returned %d "
+			     "while %d is expected\n",
+			     gnutls_cipher_get_name(cipher),
+			     ret, GNUTLS_E_INVALID_REQUEST);
+		}
+	} else if (ret < 0) {
+		fail("gnutls_aead_cipher_encrypt failed for %s\n",
+		     gnutls_cipher_get_name(cipher));
+	}
+	fips_pop_context(fips_context, expected_state);
+
+	fips_push_context(fips_context);
+	length = sizeof(buffer);
+	ret = gnutls_aead_cipher_decrypt(h, iv_data,
+					 gnutls_cipher_get_iv_size(cipher),
+					 NULL, 0, tag_length,
+					 buffer, length,
+					 buffer, &length);
+	if (expect_encryption_fail) {
+		if (ret != GNUTLS_E_INVALID_REQUEST) {
+			fail("gnutls_aead_cipher_decrypt(%s) returned %d "
+			     "while %d is expected\n",
+			     gnutls_cipher_get_name(cipher),
+			     ret, GNUTLS_E_INVALID_REQUEST);
+		}
+	} else if (ret < 0) {
+		fail("gnutls_aead_cipher_decrypt failed for %s\n",
+		     gnutls_cipher_get_name(cipher));
+	}
+	fips_pop_context(fips_context, expected_state);
+
+	gnutls_aead_cipher_deinit(h);
+}
+
 static inline void
 test_ciphers(void)
 {
+	size_t i;
+
 	test_cipher_approved(GNUTLS_CIPHER_AES_128_CBC);
 	test_cipher_approved(GNUTLS_CIPHER_AES_192_CBC);
 	test_cipher_approved(GNUTLS_CIPHER_AES_256_CBC);
-	test_aead_cipher_approved(GNUTLS_CIPHER_AES_128_CCM);
-	test_aead_cipher_approved(GNUTLS_CIPHER_AES_256_CCM);
+
+	/* Check for all allowed Tlen */
+	for (i = 4; i <= 16; i += 2) {
+		test_ccm_cipher(GNUTLS_CIPHER_AES_128_CCM, i,
+				false, GNUTLS_FIPS140_OP_APPROVED);
+		test_ccm_cipher(GNUTLS_CIPHER_AES_256_CCM, i,
+				false, GNUTLS_FIPS140_OP_APPROVED);
+	}
+	test_ccm_cipher(GNUTLS_CIPHER_AES_128_CCM, 3,
+			true, GNUTLS_FIPS140_OP_ERROR);
+	test_ccm_cipher(GNUTLS_CIPHER_AES_256_CCM, 3,
+			true, GNUTLS_FIPS140_OP_ERROR);
+	test_ccm_cipher(GNUTLS_CIPHER_AES_128_CCM, 5,
+			true, GNUTLS_FIPS140_OP_ERROR);
+	test_ccm_cipher(GNUTLS_CIPHER_AES_256_CCM, 5,
+			true, GNUTLS_FIPS140_OP_ERROR);
+
 	test_aead_cipher_approved(GNUTLS_CIPHER_AES_128_CCM_8);
 	test_aead_cipher_approved(GNUTLS_CIPHER_AES_256_CCM_8);
 	test_cipher_approved(GNUTLS_CIPHER_AES_128_CFB8);

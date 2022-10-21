@@ -1253,6 +1253,34 @@ wrap_nettle_cipher_aead_encrypt(void *_ctx,
 		ctx->cipher->tag(ctx->ctx_ptr, tag_size, ((uint8_t*)encr) + plain_size);
 	} else {
 		/* CCM-style cipher */
+
+		switch (ctx->cipher->algo) {
+		case GNUTLS_CIPHER_AES_128_CCM:
+		case GNUTLS_CIPHER_AES_256_CCM:
+			/* SP800-38C A.1 says Tlen must be a multiple of 16
+			 * between 32 and 128.
+			 */
+			switch (tag_size) {
+			case 4: case 6:
+				/* SP800-38C B.2 says Tlen smaller than 64
+				 * should not be used under sufficient
+				 * restriction. We simply allow those for now.
+				 */
+				FALLTHROUGH;
+			case 8: case 10: case 12: case 14: case 16:
+				break;
+			default:
+				if (_gnutls_fips_mode_enabled()) {
+					_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
+					return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+				}
+				break;
+			}
+			break;
+		default:
+			break;
+		}
+
 		ctx->cipher->aead_encrypt(ctx,
 					  nonce_size, nonce,
 					  auth_size, auth,
@@ -1301,6 +1329,33 @@ wrap_nettle_cipher_aead_decrypt(void *_ctx,
 
 		if (unlikely(plain_size < encr_size))
 			return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+
+		switch (ctx->cipher->algo) {
+		case GNUTLS_CIPHER_AES_128_CCM:
+		case GNUTLS_CIPHER_AES_256_CCM:
+			/* SP800-38C A.1 says Tlen must be a multiple of 16
+			 * between 32 and 128.
+			 */
+			switch (tag_size) {
+			case 4: case 6:
+				/* SP800-38C B.2 says Tlen smaller than 64
+				 * should not be used under sufficient
+				 * restriction. We simply allow those for now.
+				 */
+				FALLTHROUGH;
+			case 8: case 10: case 12: case 14: case 16:
+				break;
+			default:
+				if (_gnutls_fips_mode_enabled()) {
+					_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
+					return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+				}
+				break;
+			}
+			break;
+		default:
+			break;
+		}
 
 		ret = ctx->cipher->aead_decrypt(ctx,
 						nonce_size, nonce,

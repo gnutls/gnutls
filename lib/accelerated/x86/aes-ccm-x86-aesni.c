@@ -37,6 +37,7 @@
 #include <byteswap.h>
 #include <nettle/ccm.h>
 #include <aes-x86.h>
+#include <fips.h>
 
 typedef struct ccm_x86_aes_ctx {
 	AES_KEY key;
@@ -95,6 +96,25 @@ aes_ccm_aead_encrypt(void *_ctx,
 	if (unlikely(encr_size < plain_size + tag_size))
 		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
 
+	/* SP800-38C A.1 says Tlen must be a multiple of 16 between 32
+	 * and 128.
+	 */
+	switch (tag_size) {
+	case 4: case 6:
+		/* SP800-38C B.2 says Tlen smaller than 64 should not be used
+		 * under sufficient restriction. We simply allow those for now.
+		 */
+		FALLTHROUGH;
+	case 8: case 10: case 12: case 14: case 16:
+		break;
+	default:
+		if (_gnutls_fips_mode_enabled()) {
+			_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		}
+		break;
+	}
+
 	ccm_encrypt_message(&ctx->key, x86_aes_encrypt,
 			    nonce_size, nonce,
 			    auth_size, auth,
@@ -120,6 +140,25 @@ aes_ccm_aead_decrypt(void *_ctx,
 
 	if (unlikely(plain_size < encr_size - tag_size))
 		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+
+	/* SP800-38C A.1 says Tlen must be a multiple of 16 between 32
+	 * and 128.
+	 */
+	switch (tag_size) {
+	case 4: case 6:
+		/* SP800-38C B.2 says Tlen smaller than 64 should not be used
+		 * under sufficient restriction. We simply allow those for now.
+		 */
+		FALLTHROUGH;
+	case 8: case 10: case 12: case 14: case 16:
+		break;
+	default:
+		if (_gnutls_fips_mode_enabled()) {
+			_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		}
+		break;
+	}
 
 	ret = ccm_decrypt_message(&ctx->key, x86_aes_encrypt,
 				  nonce_size, nonce,
