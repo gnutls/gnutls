@@ -172,7 +172,7 @@ _gnutls_compress_certificate_recv_params(gnutls_session_t session,
 	uint8_t bytes_len;
 	size_t methods_len;
 	gnutls_compression_method_t methods[MAX_COMPRESS_CERTIFICATE_METHODS];
-	gnutls_compression_method_t method = GNUTLS_COMP_UNKNOWN;
+	gnutls_compression_method_t method;
 	compress_certificate_ext_st *priv;
 	gnutls_ext_priv_data_t epriv;
 
@@ -188,15 +188,16 @@ _gnutls_compress_certificate_recv_params(gnutls_session_t session,
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 	DECR_LEN(data_size, bytes_len);
-	methods_len = bytes_len / 2;
 
-	for (i = 0; i < methods_len; ++i) {
+	methods_len = 0;
+	for (i = 0; i < bytes_len / 2; ++i) {
 		num = _gnutls_read_uint16(data + i + i + 1);
-		methods[i] = _gnutls_compress_certificate_num2method(num);
-		if (methods[i] == GNUTLS_COMP_UNKNOWN)
-			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+		method = _gnutls_compress_certificate_num2method(num);
+		if (method != GNUTLS_COMP_UNKNOWN)
+			methods[methods_len++] = method;
 	}
 
+	method = GNUTLS_COMP_UNKNOWN;
 	for (i = 0; i < methods_len; ++i)
 		for (j = 0; j < priv->methods_len; ++j)
 			if (methods[i] == priv->methods[j]) {
