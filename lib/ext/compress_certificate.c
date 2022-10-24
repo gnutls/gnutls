@@ -185,7 +185,7 @@ _gnutls_compress_certificate_recv_params(gnutls_session_t session,
 	bytes_len = *data;
 	
 	if (bytes_len < 2 || bytes_len > 254 || bytes_len % 2 == 1)
-		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
 	DECR_LEN(data_size, bytes_len);
 
