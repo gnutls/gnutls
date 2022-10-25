@@ -83,7 +83,8 @@ COBJECTS = range.c record.c compress.c debug.c cipher.c gthreads.h handshake-tls
 	cert-session.c handshake-checks.c dtls-sw.c dh-primes.c openpgp_compat.c \
 	crypto-selftests.c crypto-selftests-pk.c secrets.c extv.c extv.h \
 	hello_ext_lib.c hello_ext_lib.h ocsp-api.c stek.c cert-cred-rawpk.c \
-	iov.c iov.h system/ktls.c system/ktls.h pathbuf.c pathbuf.h
+	iov.c iov.h system/ktls.c system/ktls.h pathbuf.c pathbuf.h \
+	audit.c
 
 if ENABLE_GOST
 COBJECTS += vko.c
@@ -135,7 +136,8 @@ HFILES = abstract_int.h debug.h compress.h cipher.h	 \
 	srp.h auth/srp_kx.h auth/srp_passwd.h	\
 	file.h supplemental.h crypto.h random.h system.h\
 	locks.h mbuffers.h ecc.h pin.h fips.h \
-	priority_options.h secrets.h stek.h cert-cred.h
+	priority_options.h secrets.h stek.h cert-cred.h \
+	audit.h audit_int.h
 
 if ENABLE_PKCS11
 HFILES += pkcs11_int.h pkcs11x.h
