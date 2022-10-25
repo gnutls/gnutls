@@ -385,6 +385,22 @@ LIBTASN1_MINIMUM=4.9
   fi
   AM_CONDITIONAL(ENABLE_OCSP, test "$ac_enable_ocsp" != "no")
 
+  # For crypto-auditing trace
+  AC_MSG_CHECKING([whether to disable crypto-auditing trace support])
+  AC_ARG_ENABLE([crypto-auditing],
+    [AS_HELP_STRING([--disable-crypto-auditing],
+                   [disable crypto-auditing trace support])],
+    [enable_crypto_auditing=$enableval], [enable_crypto_auditing=auto])
+  AC_MSG_RESULT([$enable_crypto_auditing])
+  AS_IF([test "$enable_crypto_auditing" != "no"],
+    [AC_CHECK_HEADERS([sys/sdt.h], [enable_crypto_auditing=yes],
+      [AS_CASE([$enable_crypto_auditing],
+        [yes], [AC_MSG_ERROR([<sys/sdt.h> not found])],
+        [*], [enable_crypto_auditing=no])])])
+  AS_IF([test "$enable_crypto_auditing" = "yes"],
+        [AC_DEFINE([ENABLE_CRYPTO_AUDITING], [1], [enable crypto-auditing trace])])
+  AM_CONDITIONAL([ENABLE_CRYPTO_AUDITING], [test "$enable_crypto_auditing" = "yes"])
+
   # For storing integers in pointers without warnings
   # https://developer.gnome.org/doc/API/2.0/glib/glib-Type-Conversion-Macros.html#desc
   AC_CHECK_SIZEOF(void *)

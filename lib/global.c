@@ -49,6 +49,10 @@
 #include "pkcs11/p11_provider.h"
 #endif
 
+#define CRAU_IMPLEMENTATION 1
+#define CRAU_CONTEXT_STACK_DEPTH 8
+#include "crau/crau.h"
+
 /* Minimum library versions we accept. */
 #define GNUTLS_MIN_LIBTASN1_VERSION "0.3.4"
 
@@ -426,6 +430,7 @@ static int _gnutls_global_init(unsigned constructor)
 #endif
 
 	_gnutls_switch_lib_state(LIB_STATE_OPERATIONAL);
+
 	ret = 0;
 
 out:
