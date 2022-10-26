@@ -1972,6 +1972,9 @@ unsigned _gnutls_privkey_compatible_with_sig(gnutls_privkey_t privkey,
 {
 	const gnutls_sign_entry_st *se;
 
+	if (unlikely(privkey == NULL))
+		return gnutls_assert_val(0);
+
 	se = _gnutls_sign_to_entry(sign);
 	if (unlikely(se == NULL))
 		return gnutls_assert_val(0);

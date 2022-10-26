@@ -1640,6 +1640,9 @@ _gnutls_select_server_cert(gnutls_session_t session, const gnutls_cipher_suite_e
 					  gnutls_pk_get_name(session->internals.selected_cert_list[0].pubkey->params.algo));
 		}
 
+		if (session->internals.selected_key == NULL)
+			return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
+
 		ret = cert_select_sign_algorithm(session,
 						 &session->internals.selected_cert_list[0],
 						 session->internals.selected_key,
