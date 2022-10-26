@@ -11,6 +11,8 @@ See the end for copying conditions.
    priority modifier have been added to allow disabling of the
    status_request TLS extension in the client side.
 
+** minitasn1: Upgraded to libtasn1 version 4.19.
+
 ** API and ABI modifications:
 GNUTLS_NO_STATUS_REQUEST: New flag
 
