@@ -38,8 +38,8 @@ const hello_ext_entry_st ext_mod_early_data = {
 	.name = "Early Data",
 	.tls_id = 42,
 	.gid = GNUTLS_EXTENSION_EARLY_DATA,
-	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_CLIENT_HELLO |
-		    GNUTLS_EXT_FLAG_EE,
+	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_DTLS |
+		    GNUTLS_EXT_FLAG_CLIENT_HELLO | GNUTLS_EXT_FLAG_EE,
 	.client_parse_point =
 		GNUTLS_EXT_MANDATORY, /* force parsing prior to EXT_TLS extensions */
 	.server_parse_point =
