@@ -1971,9 +1971,13 @@ static int read_server_hello(gnutls_session_t session, uint8_t *data,
 	if (unlikely(vers == NULL))
 		return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
 	if (vers->tls13_sem) {
-		if (major != 0x03 || minor != 0x03)
-			return gnutls_assert_val(
-				GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
+		if (vers->transport == GNUTLS_STREAM) {
+			if (major != 0x03 || minor != 0x03) //TLS 1.2
+				return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
+		} else {
+			if (major != 0xfe || minor != 0xfd) //DTLS 1.2
+				return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
+		}
 	}
 
 	if (_gnutls_nversion_is_supported(session, vers->major, vers->minor) ==

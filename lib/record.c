@@ -373,8 +373,13 @@ inline static int copy_record_version(gnutls_session_t session,
 			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 		if (lver->tls13_sem) {
-			version[0] = 0x03;
-			version[1] = 0x03;
+			if (lver->transport == GNUTLS_STREAM) {
+				version[0] = 0x03;
+				version[1] = 0x03;
+			} else {
+				version[0] = 0xfe;
+				version[1] = 0xfd;
+			}
 		} else {
 			version[0] = lver->major;
 			version[1] = lver->minor;
