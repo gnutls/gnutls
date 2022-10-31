@@ -545,6 +545,7 @@ void _gnutls_handshake_internal_state_clear(gnutls_session_t session)
 	session->internals.tfo.connect_addrlen = 0;
 	session->internals.tfo.connect_only = 0;
 	session->internals.early_data_received = 0;
+	session->internals.session_ticket_renew = 0;
 }
 
 /**

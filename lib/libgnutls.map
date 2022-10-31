@@ -1512,4 +1512,6 @@ GNUTLS_PRIVATE_3_4 {
 	_gnutls_buffer_clear;
 	# needed by tests/cipher-alignment
 	_gnutls_crypto_register_cipher;
+	# needed by tests/tls12-rehandshake-cert-ticket
+	_gnutls_session_ticket_disable_server;
 } GNUTLS_3_4;

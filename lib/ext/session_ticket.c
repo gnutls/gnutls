@@ -624,6 +624,12 @@ gnutls_session_ticket_enable_server(gnutls_session_t session,
 	return 0;
 }
 
+void
+_gnutls_session_ticket_disable_server(gnutls_session_t session)
+{
+	session->internals.flags |= GNUTLS_NO_TICKETS;
+}
+
 /*
  * Return zero if session tickets haven't been enabled.
  */

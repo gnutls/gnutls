@@ -36,5 +36,6 @@ int _gnutls_encrypt_session_ticket(gnutls_session_t session,
 int _gnutls_decrypt_session_ticket(gnutls_session_t session,
 				   const gnutls_datum_t *ticket_data,
 				   gnutls_datum_t *state);
+void _gnutls_session_ticket_disable_server(gnutls_session_t session);
 
 #endif /* GNUTLS_LIB_EXT_SESSION_TICKET_H */

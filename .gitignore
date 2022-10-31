@@ -845,6 +845,7 @@ tests/tls12-rehandshake-cert-2
 tests/tls12-rehandshake-cert-3
 tests/tls12-rehandshake-cert-auto
 tests/tls12-rehandshake-set-prio
+tests/tls12-rehandshake-ticket
 tests/tls12-resume-anon
 tests/tls12-resume-psk
 tests/tls12-resume-x509
