@@ -46,7 +46,7 @@ VC_LIST_ALWAYS_EXCLUDE_REGEX = ^maint.mk|gtk-doc.make|m4/pkg|doc/fdl-1.3.texi|sr
 
 # Explicit syntax-check exceptions.
 exclude_file_name_regexp--sc_copyright_check = ^./gnulib/.*$$
-exclude_file_name_regexp--sc_error_message_uppercase = ^doc/examples/ex-cxx.cpp|guile/src/core.c|src/certtool.c|src/ocsptool.c|src/crywrap/crywrap.c|tests/pkcs12_encode.c$$
+exclude_file_name_regexp--sc_error_message_uppercase = ^doc/examples/ex-cxx.cpp|src/certtool.c|src/ocsptool.c|src/crywrap/crywrap.c|tests/pkcs12_encode.c$$
 exclude_file_name_regexp--sc_file_system = ^doc/doxygen/Doxyfile
 exclude_file_name_regexp--sc_prohibit_cvs_keyword = ^lib/nettle/.*$$
 exclude_file_name_regexp--sc_prohibit_undesirable_word_seq = ^tests/nist-pkits/gnutls-nist-tests.html$$
@@ -126,9 +126,6 @@ web:
 	sed 's/\@VERSION\@/$(VERSION)/g' -i $(htmldir)/manual/html_node/*.html $(htmldir)/manual/gnutls.html
 	-cd doc && $(MAKE) gnutls.epub && cp gnutls.epub ../$(htmldir)/manual/
 	cd doc/latex && $(MAKE) gnutls.pdf && cp gnutls.pdf ../../$(htmldir)/manual/
-	$(MAKE) -C doc gnutls-guile.html gnutls-guile.pdf
-	cd doc && makeinfo --html --split=node -o ../$(htmldir)/manual/gnutls-guile/ --css-include=./texinfo.css gnutls-guile.texi
-	cd doc && cp gnutls-guile.pdf gnutls-guile.html ../$(htmldir)/manual/
 	-cp -v doc/reference/html/*.html doc/reference/html/*.png doc/reference/html/*.devhelp* doc/reference/html/*.css $(htmldir)/reference/
 
 ASM_SOURCES_XXX := \

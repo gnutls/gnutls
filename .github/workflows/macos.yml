@@ -26,7 +26,7 @@ jobs:
         run: ./bootstrap
       - name: configure
         run: |
-          CC=clang ./configure --disable-full-test-suite --disable-valgrind-tests --disable-doc --disable-guile --disable-dependency-tracking
+          CC=clang ./configure --disable-full-test-suite --disable-valgrind-tests --disable-doc --disable-dependency-tracking
       - name: make
         run: |
           make -j$(sysctl -n hw.ncpu) || make -j$(sysctl -n hw.ncpu) V=1

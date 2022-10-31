@@ -23,9 +23,6 @@ DISTCHECK_CONFIGURE_FLAGS = \
 	--enable-doc \
 	--enable-gtk-doc \
 	--disable-valgrind-tests \
-	--with-guile-site-dir='$$(datarootdir)/guile/site/$$(GUILE_EFFECTIVE_VERSION)' \
-	--with-guile-site-ccache-dir='$$(libdir)/guile/$$(GUILE_EFFECTIVE_VERSION)/site-ccache' \
-	--with-guile-extension-dir='$$(libdir)/guile/$$(GUILE_EFFECTIVE_VERSION)/extensions' \
 	AUTOGEN=false
 
 SUBDIRS = gl lib extra
@@ -43,10 +40,6 @@ endif
 
 if ENABLE_TESTS
 SUBDIRS += tests fuzz
-endif
-
-if HAVE_GUILE
-SUBDIRS += guile
 endif
 
 if ENABLE_MANPAGES
@@ -189,7 +182,6 @@ files-update:
 	@echo "******************************************************************************************"
 
 dist-hook:
-	$(PKG_CONFIG) --atleast-version=2.2.0 guile-2.2
 	if test -d "$(top_srcdir)/devel";then \
 		$(MAKE) -C $(top_srcdir) symbol-check && \
 		$(MAKE) -C $(top_srcdir) abi-check-latest; \

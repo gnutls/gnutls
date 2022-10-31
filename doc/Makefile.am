@@ -21,7 +21,7 @@
 
 EXTRA_DIST = TODO certtool.cfg gnutls.html	\
 	doxygen/Doxyfile.in doxygen/Doxyfile.orig texinfo.css \
-	gnutls-guile.html stamp_enums stamp_functions \
+	stamp_enums stamp_functions \
 	doc.mk COPYING COPYING.LESSER
 
 IMAGES = \
@@ -175,7 +175,7 @@ invoke-tpmtool.texi: $(top_srcdir)/src/tpmtool-options.json
 		$< $@
 
 
-info_TEXINFOS = gnutls.texi gnutls-guile.texi
+info_TEXINFOS = gnutls.texi
 gnutls_TEXINFOS = gnutls.texi fdl-1.3.texi				\
 	cha-bib.texi cha-cert-auth.texi	cha-cert-auth2.texi		\
 	cha-ciphersuites.texi cha-copying.texi cha-functions.texi	\
@@ -510,40 +510,6 @@ compare-makefile: enums.texi
 	rm -f tmp-$@
 
 .PHONY: compare-makefile compare-exported
-
-# Guile texinfos.
-
-guile_texi = core.c.texi
-BUILT_SOURCES        = $(guile_texi)
-MAINTAINERCLEANFILES += $(guile_texi)
-EXTRA_DIST           += $(guile_texi) extract-guile-c-doc.scm
-guile_TEXINFOS       = gnutls-guile.texi $(guile_texi)
-
-if HAVE_GUILE
-
-GUILE_FOR_BUILD =				\
-  GUILE_AUTO_COMPILE=0				\
-  $(GUILE) -q -L $(top_srcdir)/guile/modules
-
-SNARF_CPPFLAGS = -I$(top_srcdir) -I$(top_builddir)			\
-	 -I$(top_srcdir)/lib/includes -I$(top_builddir)/lib/includes	\
-	 -I$(top_srcdir)/extra/includes				\
-         -I$(top_srcdir)/guile/src -I$(top_builddir)/guile/src		\
-	 $(GUILE_CFLAGS)
-
-core.c.texi: $(top_srcdir)/guile/src/core.c
-	$(MAKE) -C ../guile/src built-sources &&			\
-	$(GUILE_FOR_BUILD) -l "$(srcdir)/extract-guile-c-doc.scm"	\
-	   -e '(apply main (cdr (command-line)))'			\
-	   -- "$^" "$(CPP)" "$(SNARF_CPPFLAGS) $(CPPFLAGS)"		\
-	   > "$@"
-
-else !HAVE_GUILE
-
-core.c.texi:
-	echo "(Guile not available, documentation not generated.)" > $@
-
-endif !HAVE_GUILE
 
 gnutls.xml: epub.texi
 	makeinfo --docbook $<
