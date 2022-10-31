@@ -39,11 +39,14 @@
  */
 #define SET_KTLS_KEYS(session, interface)\
 {\
-	if(_gnutls_ktls_set_keys(session, interface) < 0) {\
+if(_gnutls_ktls_set_keys(session, interface) < 0) {\
 		session->internals.ktls_enabled = 0;\
-		_gnutls_audit_log(session, \
-			  "disabling KTLS: couldn't update keys\n");\
-	}\
+		session->internals.invalid_connection = true;\
+		session->internals.resumable = false;\
+		_gnutls_audit_log(session,\
+			"invalidating session: KTLS - couldn't update keys\n");\
+		ret = GNUTLS_E_INTERNAL_ERROR;\
+}\
 }
 
 static int update_keys(gnutls_session_t session, hs_stage_t stage)
@@ -64,6 +67,9 @@ static int update_keys(gnutls_session_t session, hs_stage_t stage)
 	 * write keys */
 	if (session->internals.recv_state == RECV_STATE_EARLY_START) {
 		ret = _tls13_write_connection_state_init(session, stage);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
 		if (IS_KTLS_ENABLED(session, GNUTLS_KTLS_SEND))
 			SET_KTLS_KEYS(session,  GNUTLS_KTLS_SEND)
 	} else {
