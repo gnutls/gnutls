@@ -95,6 +95,20 @@ const char key2[] =
     "F3bDyqlxSOm7uxF/K3YzI44v8/D8GGnLBTpN+ANBdiY=\n"
     "-----END RSA PRIVATE KEY-----\n";
 
+const char key_lowercase_iv[] =
+    "-----BEGIN RSA PRIVATE KEY-----\n"
+    "Proc-Type: 4,ENCRYPTED\n"
+    "DEK-Info: AES-256-CBC,c1967f64f92d5c4ef302537b7b50b98f\n"
+    "\n"
+    "iRHj/BbuyHodcEt/cPduzhxOUCwe+o77j7DOepAb7rasr7uRDjFcB2DeB4yvog5q\n"
+    "M46pB5NVqegJCTcFht/90OKXprt2m04ntsCEXXfJ/NQIYP3NsLM+aNiWUL1cxPiZ\n"
+    "6fWp6uaR165F+T5vBRmo6dS3wowHeiHZMiSGuM6CbW+AO5R31og9cUuP2e02GPbq\n"
+    "ZCGyU8RnA6c1caCql/T/5WOIjyaFpJhigBnQc6EoVi3C6XULBQ1Ut9A8gw3gVWda\n"
+    "NBF8sHfwXyKuPhWLZwOM7ZewIOvnesezwW7Tpf2LfMBIe1YQixdsBgM1RvhEN2bl\n"
+    "mYR1L1zfr94z/fWDztq1MYtCBPUJcgrjNLb80xv1qq5hZorTM9gjAeLfT4x9I6/m\n"
+    "57ohSPIR3bXgRZuefjxBhQYthUPcZ+qktrbURcvHNLs=\n"
+    "-----END RSA PRIVATE KEY-----\n";
+
 static int good_pwd_cb(void* userdata, int attempt, const char* token_url,
 		       const char* token_label, unsigned int flags,
 		       char* pin, size_t pin_max) {
@@ -195,6 +209,22 @@ void doit(void)
 					  NULL, 0);
 	if (ret != GNUTLS_E_DECRYPTION_FAILED) {
 		fail("gnutls_x509_privkey_import2 (expect decrypt fail): %s\n",
+		     gnutls_strerror(ret));
+	}
+	gnutls_x509_privkey_deinit(pkey);
+
+	/* import a key with lowercase hex digits in the iv part of DEK-Info */
+	ret = gnutls_x509_privkey_init(&pkey);
+	if (ret < 0)
+		fail("gnutls_x509_privkey_init: %d\n", ret);
+
+	key.data = (void *) key_lowercase_iv;
+	key.size = sizeof(key_lowercase_iv);
+	ret =
+	    gnutls_x509_privkey_import2(pkey, &key, GNUTLS_X509_FMT_PEM,
+					"123456", 0);
+	if (ret < 0) {
+		fail("gnutls_x509_privkey_import2: %s\n",
 		     gnutls_strerror(ret));
 	}
 	gnutls_x509_privkey_deinit(pkey);
