@@ -515,6 +515,7 @@ gnutls_pkcs11_privkey_import_url(gnutls_pkcs11_privkey_t pkey,
 	struct ck_attribute a[4];
 	ck_key_type_t key_type;
 	ck_bool_t reauth = 0;
+	ck_bool_t tval;
 
 	PKCS11_CHECK_INIT;
 
@@ -578,8 +579,7 @@ gnutls_pkcs11_privkey_import_url(gnutls_pkcs11_privkey_t pkey,
 
 
 	if (pkey->pk_algorithm == GNUTLS_PK_RSA) { /* determine whether it can do rsa-pss */
-		ck_bool_t tval = 0;
-
+		tval = 0;
 		a[0].type = CKA_MODULUS;
 		a[0].value = NULL;
 		a[0].value_len = 0;
