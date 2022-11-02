@@ -615,6 +615,7 @@ gnutls_privkey_export_pkcs11(gnutls_privkey_t pkey,
 {
 	int ret;
 
+	*key = NULL;
 	if (pkey->type != GNUTLS_PRIVKEY_PKCS11) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
@@ -978,6 +979,7 @@ gnutls_privkey_export_x509(gnutls_privkey_t pkey,
 {
 	int ret;
 
+	*key = NULL;
 	if (pkey->type != GNUTLS_PRIVKEY_X509) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
