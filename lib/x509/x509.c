@@ -201,6 +201,7 @@ int gnutls_x509_crt_init(gnutls_x509_crt_t * cert)
 	gnutls_x509_crt_t tmp;
 	int result;
 
+	*cert = NULL;
 	FAIL_IF_LIB_ERROR;
 
 	tmp =

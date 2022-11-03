@@ -103,6 +103,7 @@ gnutls_x509_trust_list_init(gnutls_x509_trust_list_t * list,
 {
 	gnutls_x509_trust_list_t tmp;
 
+	*list = NULL;
 	FAIL_IF_LIB_ERROR;
 
 	tmp =

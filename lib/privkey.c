@@ -420,6 +420,7 @@ _gnutls_privkey_update_spki_params(gnutls_privkey_t key,
  **/
 int gnutls_privkey_init(gnutls_privkey_t * key)
 {
+	*key = NULL;
 	FAIL_IF_LIB_ERROR;
 
 	*key = gnutls_calloc(1, sizeof(struct gnutls_privkey_st));
@@ -614,6 +615,7 @@ gnutls_privkey_export_pkcs11(gnutls_privkey_t pkey,
 {
 	int ret;
 
+	*key = NULL;
 	if (pkey->type != GNUTLS_PRIVKEY_PKCS11) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
@@ -977,6 +979,7 @@ gnutls_privkey_export_x509(gnutls_privkey_t pkey,
 {
 	int ret;
 
+	*key = NULL;
 	if (pkey->type != GNUTLS_PRIVKEY_X509) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;

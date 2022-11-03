@@ -78,6 +78,7 @@
 int gnutls_pkcs11_privkey_init(gnutls_pkcs11_privkey_t * key)
 {
 	int ret;
+	*key = NULL;
 	FAIL_IF_LIB_ERROR;
 
 	*key = gnutls_calloc(1, sizeof(struct gnutls_pkcs11_privkey_st));
@@ -88,7 +89,7 @@ int gnutls_pkcs11_privkey_init(gnutls_pkcs11_privkey_t * key)
 
 	(*key)->uinfo = p11_kit_uri_new();
 	if ((*key)->uinfo == NULL) {
-		free(*key);
+		gnutls_free(*key);
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
@@ -97,7 +98,7 @@ int gnutls_pkcs11_privkey_init(gnutls_pkcs11_privkey_t * key)
 	if (ret < 0) {
 		gnutls_assert();
 		p11_kit_uri_free((*key)->uinfo);
-		free(*key);
+		gnutls_free(*key);
 		return GNUTLS_E_LOCKING_ERROR;
 	}
 
@@ -515,6 +516,7 @@ gnutls_pkcs11_privkey_import_url(gnutls_pkcs11_privkey_t pkey,
 	struct ck_attribute a[4];
 	ck_key_type_t key_type;
 	ck_bool_t reauth = 0;
+	ck_bool_t tval;
 
 	PKCS11_CHECK_INIT;
 
@@ -578,8 +580,7 @@ gnutls_pkcs11_privkey_import_url(gnutls_pkcs11_privkey_t pkey,
 
 
 	if (pkey->pk_algorithm == GNUTLS_PK_RSA) { /* determine whether it can do rsa-pss */
-		ck_bool_t tval = 0;
-
+		tval = 0;
 		a[0].type = CKA_MODULUS;
 		a[0].value = NULL;
 		a[0].value_len = 0;

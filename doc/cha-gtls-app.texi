@@ -100,6 +100,22 @@ that future extensions of the API can be extended to provide
 additional information via positive returned values (see for example
 @funcref{gnutls_certificate_set_x509_key_file}).
 
+In @acronym{GnuTLS}, many objects are represented as opaque types that
+are initialized by passing an address to storage of that type to a
+pointer parameter of a function name @code{gnutls_@var{obj}_init}, and
+which have a counterpart function @code{gnutls_@var{obj}_deinit}.  It
+is safe, but not mandatory, to pre-initialize the opaque storage to
+contain all zeroes (such as by using @code{calloc()} or
+@code{memset()}).  If the initializer succeeds, the storage must be
+passed to the counterpart deinitializer when the object is no longer
+in use to avoid memory leaks.  As of version 3.8.0, if the initializer
+function fails, it is safe, but not mandatory, to call the counterpart
+deinitializer, regardless of whether the storage was pre-initialized.
+However, this was not guaranteed in earlier versions; for maximum
+portability to older library versions, callers should either
+pre-initialize the storage to zero before initialization or refrain
+from calling the deinitializer if the initializer fails.
+
 For certain operations such as TLS handshake and TLS packet receive
 there is the notion of fatal and non-fatal error codes.
 Fatal errors terminate the TLS session immediately and further sends

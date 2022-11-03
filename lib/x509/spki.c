@@ -45,6 +45,7 @@ gnutls_x509_spki_init(gnutls_x509_spki_t *spki)
 {
 	gnutls_x509_spki_t tmp;
 
+	*spki = NULL;
 	FAIL_IF_LIB_ERROR;
 
 	tmp =

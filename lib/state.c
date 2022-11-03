@@ -552,9 +552,9 @@ void _gnutls_handshake_internal_state_clear(gnutls_session_t session)
  * @session: is a pointer to a #gnutls_session_t type.
  * @flags: indicate if this session is to be used for server or client.
  *
- * This function initializes the provided session. Every
- * session must be initialized before use, and must be deinitialized
- * after used by calling gnutls_deinit().
+ * This function initializes the provided session. Every session must
+ * be initialized before use, and after successful initialization and
+ * use must be deinitialized by calling gnutls_deinit().
  *
  * @flags can be any combination of flags from %gnutls_init_flags_t.
  *
@@ -563,12 +563,22 @@ void _gnutls_handshake_internal_state_clear(gnutls_session_t session)
  * request in client side by default. To prevent that use the %GNUTLS_NO_EXTENSIONS
  * flag.
  *
+ * Note that it is never mandatory to use gnutls_deinit() after this
+ * function fails.  Since gnutls 3.8.0, it is safe to unconditionally
+ * use gnutls_deinit() even after failure regardless of whether the
+ * memory was initialized prior to gnutls_init(); however, clients
+ * wanting to be portable to older versions of the library should
+ * either skip deinitialization on failure, or pre-initialize the
+ * memory passed in to gnutls_init() to all zeroes via memset() or
+ * similar.
+ *
  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
  **/
 int gnutls_init(gnutls_session_t * session, unsigned int flags)
 {
 	int ret;
 
+	*session = NULL;
 	FAIL_IF_LIB_ERROR;
 
 	*session = gnutls_calloc(1, sizeof(struct gnutls_session_int));

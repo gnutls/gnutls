@@ -53,7 +53,8 @@
 int gnutls_x509_crq_init(gnutls_x509_crq_t * crq)
 {
 	int result;
-	
+
+	*crq = NULL;
 	FAIL_IF_LIB_ERROR;
 
 	*crq = gnutls_calloc(1, sizeof(gnutls_x509_crq_int));
