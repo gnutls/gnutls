@@ -1075,6 +1075,8 @@ typedef struct tfo_st {
 	socklen_t connect_addrlen;
 } tfo_st;
 
+# include "audit_int.h"
+
 typedef struct {
 	/* holds all the parsed data received by the record layer */
 	mbuffer_head_st record_buffer;
@@ -1505,6 +1507,8 @@ typedef struct {
 
 	/* Compression method for certificate compression */
 	gnutls_compression_method_t compress_certificate_method;
+
+	struct gnutls_audit_context_stack_st audit_context_stack;
 
 	/* If you add anything here, check _gnutls_handshake_internal_state_clear().
 	 */

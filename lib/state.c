@@ -832,6 +832,8 @@ void gnutls_deinit(gnutls_session_t session)
 	gnutls_mutex_deinit(&session->internals.post_negotiation_lock);
 	gnutls_mutex_deinit(&session->internals.epoch_lock);
 
+	_gnutls_audit_clear_context(&session->internals.audit_context_stack);
+
 	gnutls_free(session);
 }
 
