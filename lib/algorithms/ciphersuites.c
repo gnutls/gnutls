@@ -51,11 +51,13 @@
 			mac_algorithm, min_version, GNUTLS_TLS1_2,          \
 			dtls_version, GNUTLS_DTLS1_2, prf                   \
 	}
-#define ENTRY_TLS13(name, canonical_name, block_algorithm, min_version, prf) \
-	{                                                                    \
-#name, name, canonical_name, block_algorithm, 0,             \
-			GNUTLS_MAC_AEAD, min_version, GNUTLS_TLS1_3,         \
-			GNUTLS_VERSION_UNKNOWN, GNUTLS_VERSION_UNKNOWN, prf  \
+#define ENTRY_TLS13(name, canonical_name, block_algorithm, min_version,	    \
+			dtls_version, prf)                                  \
+	{                                                                   \
+#name, name, canonical_name, block_algorithm, 0,                            \
+			GNUTLS_MAC_AEAD, min_version, GNUTLS_TLS1_3,        \
+			GNUTLS_VERSION_UNKNOWN, GNUTLS_VERSION_UNKNOWN,     \
+			dtls_version, GNUTLS_DTLS1_3, prf                   \
 	}
 
 /* TLS 1.3 ciphersuites */
@@ -924,24 +926,24 @@ static const gnutls_cipher_suite_entry_st cs_algorithms[] = {
 	/* TLS 1.3 */
 	ENTRY_TLS13(GNUTLS_AES_128_GCM_SHA256, "TLS_AES_128_GCM_SHA256",
 		    GNUTLS_CIPHER_AES_128_GCM, GNUTLS_TLS1_3,
-		    GNUTLS_MAC_SHA256),
+		    GNUTLS_DTLS1_3, GNUTLS_MAC_SHA256),
 
 	ENTRY_TLS13(GNUTLS_AES_256_GCM_SHA384, "TLS_AES_256_GCM_SHA384",
 		    GNUTLS_CIPHER_AES_256_GCM, GNUTLS_TLS1_3,
-		    GNUTLS_MAC_SHA384),
+		    GNUTLS_DTLS1_3, GNUTLS_MAC_SHA384),
 
 	ENTRY_TLS13(GNUTLS_CHACHA20_POLY1305_SHA256,
 		    "TLS_CHACHA20_POLY1305_SHA256",
 		    GNUTLS_CIPHER_CHACHA20_POLY1305, GNUTLS_TLS1_3,
-		    GNUTLS_MAC_SHA256),
+		    GNUTLS_DTLS1_3, GNUTLS_MAC_SHA256),
 
 	ENTRY_TLS13(GNUTLS_AES_128_CCM_SHA256, "TLS_AES_128_CCM_SHA256",
 		    GNUTLS_CIPHER_AES_128_CCM, GNUTLS_TLS1_3,
-		    GNUTLS_MAC_SHA256),
+		    GNUTLS_DTLS1_3, GNUTLS_MAC_SHA256),
 
 	ENTRY_TLS13(GNUTLS_AES_128_CCM_8_SHA256, "TLS_AES_128_CCM_8_SHA256",
 		    GNUTLS_CIPHER_AES_128_CCM_8, GNUTLS_TLS1_3,
-		    GNUTLS_MAC_SHA256),
+		    GNUTLS_DTLS1_3, GNUTLS_MAC_SHA256),
 
 	/* RSA-NULL */
 	ENTRY(GNUTLS_RSA_NULL_MD5, "TLS_RSA_WITH_NULL_MD5", GNUTLS_CIPHER_NULL,
