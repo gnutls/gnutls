@@ -85,7 +85,8 @@ int _gnutls13_handshake_client(gnutls_session_t session)
 	case STATE99:
 	case STATE100:
 #ifdef TLS13_APPENDIX_D4
-		if (session->internals.priorities->tls13_compat_mode &&
+		if (!IS_DTLS(session) &&
+		    session->internals.priorities->tls13_compat_mode &&
 		    /* Key change is indicated by sending an EndOfEarlyData below */
 		    !(session->internals.hsk_flags &
 		      HSK_EARLY_DATA_IN_FLIGHT)) {

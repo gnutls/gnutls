@@ -2256,7 +2256,7 @@ static int send_client_hello(gnutls_session_t session, int again)
 		}
 
 #ifdef TLS13_APPENDIX_D4
-		if (max_ver->tls13_sem &&
+		if (max_ver->tls13_sem && max_ver->transport == GNUTLS_STREAM &&
 		    session->internals.priorities->tls13_compat_mode &&
 		    !resuming) {
 			if (!(session->internals.hsk_flags &
