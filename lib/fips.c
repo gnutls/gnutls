@@ -352,11 +352,6 @@ static int check_lib_hmac(struct hmac_entry *entry,
 		return gnutls_assert_val(ret);
 	}
 
-	if (strncmp(entry->path, path, GNUTLS_PATH_MAX)) {
-		_gnutls_debug_log("Library path for %s does not match with HMAC file\n", lib);
-		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
-	}
-
 	_gnutls_debug_log("Loading: %s\n", path);
 	ret = gnutls_load_file(path, &data);
 	if (ret < 0) {
