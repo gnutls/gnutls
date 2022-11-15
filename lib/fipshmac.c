@@ -102,20 +102,30 @@ static int get_hmac(const char *path, char *hmac, size_t hmac_size)
 static int print_lib_path(const char *path)
 {
 	int ret;
+	char *real_path = NULL;
 	char hmac[HMAC_STR_SIZE];
 
-	ret = get_hmac(path, hmac, sizeof(hmac));
+	real_path = canonicalize_file_name(path);
+	if (real_path == NULL) {
+		fprintf(stderr, "Could not get realpath from %s\n", path);
+		ret = GNUTLS_E_FILE_ERROR;
+		goto cleanup;
+	}
+
+	ret = get_hmac(real_path, hmac, sizeof(hmac));
 	if (ret < 0) {
 		fprintf(stderr, "Could not calculate HMAC for %s: %s\n",
-                        last_component(path), gnutls_strerror(ret));
-		return ret;
+                        last_component(real_path), gnutls_strerror(ret));
+		goto cleanup;
 	}
 
 	printf("[%s]\n", last_component(path));
-	printf("path = %s\n", path);
+	printf("path = %s\n", real_path);
 	printf("hmac = %s\n", hmac);
 
-	return 0;
+cleanup:
+	free(real_path);
+	return ret;
 }
 
 static int print_lib_dl(const char *lib, const char *sym)
