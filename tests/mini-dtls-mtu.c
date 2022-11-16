@@ -284,6 +284,8 @@ void doit(void)
 	int fd[2];
 	int err;
 
+	signal(SIGPIPE, SIG_IGN);
+
 	err = socketpair(AF_UNIX, SOCK_DGRAM, 0, fd);
 	if (err == -1) {
 		perror("socketpair");
