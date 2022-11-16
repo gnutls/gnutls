@@ -1316,6 +1316,15 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 
 			mpz_init(s);
 
+			me = hash_to_entry(sign_params->rsa_pss_dig);
+
+			/* According to FIPS 186-5 5.4, the salt length must be
+			 * in the range between 0 and the hash length inclusive.
+			 */
+			if (sign_params->salt_size > _gnutls_mac_get_algo_len(me)) {
+				not_approved = true;
+			}
+
 			ret =
 			    _rsa_pss_sign_digest_tr(sign_params->rsa_pss_dig,
 						    &pub, &priv,
