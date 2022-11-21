@@ -46,6 +46,8 @@ const gnutls_datum_t raw_data = {
 	11
 };
 
+static gnutls_fips140_context_t fips_context;
+
 static void inv_sign_check(unsigned sigalgo,
 			   gnutls_privkey_t privkey, int exp_error)
 {
@@ -86,13 +88,16 @@ static void inv_encryption_check(gnutls_pk_algorithm_t algorithm,
 
 static void sign_verify_data(unsigned sigalgo, gnutls_privkey_t privkey,
 			     unsigned int sign_flags, unsigned int verify_flags,
-			     int sign_exp_error, int verify_exp_error)
+			     int sign_exp_error, int verify_exp_error,
+			     gnutls_fips140_operation_state_t sign_exp_state)
 {
 	int ret;
 	gnutls_datum_t signature = { NULL, 0 };
 
+	fips_push_context(fips_context);
 	ret = gnutls_privkey_sign_data2(privkey, sigalgo, sign_flags,
 					&raw_data, &signature);
+	fips_pop_context(fips_context, sign_exp_state);
 	if (ret != sign_exp_error)
 		fail("gnutls_x509_privkey_sign_data returned unexpected error: %s\n",
 		     gnutls_strerror(ret));
@@ -180,11 +185,16 @@ void doit(void)
 	if (debug)
 		gnutls_global_set_log_level(4711);
 
+	assert(gnutls_fips140_context_init(&fips_context) >= 0);
+
 	prepare_keys(&pkey_rsa_pss, &pkey_rsa, GNUTLS_DIG_SHA256, 32);
 
-	sign_verify_data(GNUTLS_SIGN_RSA_PSS_SHA256, pkey_rsa_pss, 0, 0, 0, 0);
-	sign_verify_data(GNUTLS_SIGN_RSA_PSS_RSAE_SHA256, pkey_rsa, 0, 0, 0, 0);
-	sign_verify_data(GNUTLS_SIGN_RSA_PSS_SHA256, pkey_rsa, 0, 0, 0, 0);
+	sign_verify_data(GNUTLS_SIGN_RSA_PSS_SHA256, pkey_rsa_pss, 0, 0, 0, 0,
+			 GNUTLS_FIPS140_OP_APPROVED);
+	sign_verify_data(GNUTLS_SIGN_RSA_PSS_RSAE_SHA256, pkey_rsa, 0, 0, 0, 0,
+			 GNUTLS_FIPS140_OP_APPROVED);
+	sign_verify_data(GNUTLS_SIGN_RSA_PSS_SHA256, pkey_rsa, 0, 0, 0, 0,
+			 GNUTLS_FIPS140_OP_APPROVED);
 
 	if (debug)
 		success("success signing with RSA-PSS-SHA256\n");
@@ -213,41 +223,65 @@ void doit(void)
 	gnutls_privkey_deinit(pkey_rsa_pss);
 	gnutls_privkey_deinit(pkey_rsa);
 
+	/* Restrict key to use salt length larger than hash output
+	 * length (not approved in FIPS).
+	 */
+	prepare_keys(&pkey_rsa_pss, &pkey_rsa, GNUTLS_DIG_SHA256, 33);
+
+	sign_verify_data(GNUTLS_SIGN_RSA_PSS_SHA256, pkey_rsa_pss, 0, 0, 0, 0,
+			 GNUTLS_FIPS140_OP_NOT_APPROVED);
+
+	gnutls_privkey_deinit(pkey_rsa_pss);
+	gnutls_privkey_deinit(pkey_rsa);
+
 	/* Use the mismatched salt length with the digest length */
 	prepare_keys(&pkey_rsa_pss, &pkey_rsa, GNUTLS_DIG_SHA256, 48);
 
 	sign_verify_data(GNUTLS_SIGN_RSA_PSS_RSAE_SHA256, pkey_rsa_pss,
-			 0, 0, 0, 0);
+			 0, 0, 0, 0, GNUTLS_FIPS140_OP_NOT_APPROVED);
 	sign_verify_data(GNUTLS_SIGN_RSA_PSS_SHA256, pkey_rsa_pss,
 			 GNUTLS_PRIVKEY_FLAG_RSA_PSS_FIXED_SALT_LENGTH,
 			 0,
 			 GNUTLS_E_CONSTRAINT_ERROR,
-			 0);
+			 0,
+			 /* The error is caught before calling the actual
+			  * signing operation.
+			  */
+			 GNUTLS_FIPS140_OP_INITIAL);
 	sign_verify_data(GNUTLS_SIGN_RSA_PSS_SHA256, pkey_rsa_pss,
 			 0,
 			 GNUTLS_VERIFY_RSA_PSS_FIXED_SALT_LENGTH,
 			 0,
-			 GNUTLS_E_PK_SIG_VERIFY_FAILED);
+			 GNUTLS_E_PK_SIG_VERIFY_FAILED,
+			 GNUTLS_FIPS140_OP_NOT_APPROVED);
 
 	assert(gnutls_x509_spki_init(&spki)>=0);
 	gnutls_x509_spki_set_rsa_pss_params(spki, GNUTLS_DIG_SHA256, 48);
 	assert(gnutls_privkey_set_spki(pkey_rsa, spki, 0)>=0);
 
-	sign_verify_data(GNUTLS_SIGN_RSA_PSS_RSAE_SHA256, pkey_rsa, 0, 0, 0, 0);
+	sign_verify_data(GNUTLS_SIGN_RSA_PSS_RSAE_SHA256, pkey_rsa, 0, 0, 0, 0,
+			 GNUTLS_FIPS140_OP_NOT_APPROVED);
 	sign_verify_data(GNUTLS_SIGN_RSA_PSS_RSAE_SHA256, pkey_rsa,
 			 GNUTLS_PRIVKEY_FLAG_RSA_PSS_FIXED_SALT_LENGTH,
 			 0,
 			 GNUTLS_E_CONSTRAINT_ERROR,
-			 0);
+			 0,
+			 /* The error is caught before calling the actual
+			  * signing operation.
+			  */
+			 GNUTLS_FIPS140_OP_INITIAL);
 	sign_verify_data(GNUTLS_SIGN_RSA_PSS_RSAE_SHA256, pkey_rsa,
 			 0,
 			 GNUTLS_VERIFY_RSA_PSS_FIXED_SALT_LENGTH,
 			 0,
-			 GNUTLS_E_PK_SIG_VERIFY_FAILED);
+			 GNUTLS_E_PK_SIG_VERIFY_FAILED,
+			 GNUTLS_FIPS140_OP_NOT_APPROVED);
 
 	gnutls_privkey_deinit(pkey_rsa_pss);
 	gnutls_privkey_deinit(pkey_rsa);
 	gnutls_x509_spki_deinit(spki);
+
+	gnutls_fips140_context_deinit(fips_context);
 
 	gnutls_global_deinit();
 }
