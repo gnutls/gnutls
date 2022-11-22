@@ -33,7 +33,7 @@ for hash in $commits; do
     echo "Missing Signed-off-by"
     exit 1
   fi
-  if ! echo $signed | grep -q "Signed-off-by:.*<${author}>"; then
+  if ! echo $signed | grep "Signed-off-by:.*<${author}>" >/dev/null; then
     echo "Author '${author}' doesn't match"
     exit 1
   fi

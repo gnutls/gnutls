@@ -76,7 +76,7 @@ if ! test -s ${TMPFILE2};then
 	echo "Stdout should not be empty!"
 	exit 1
 fi
-if grep -q "Handshake was completed" ${TMPFILE2};then
+if grep "Handshake was completed" ${TMPFILE2} >/dev/null; then
 	echo "Find the expected output!"
 else
 	echo "Cannot find the expected output!"
@@ -104,7 +104,7 @@ if test -s ${TMPFILE2};then
 	exit 1
 fi
 
-if grep -q "Handshake was completed" ${TMPFILE1}; then
+if grep "Handshake was completed" ${TMPFILE1} >/dev/null; then
 	echo "Found the expected output!"
 else
 	echo "Cannot find the expected output!"
@@ -131,7 +131,7 @@ if ! test -s ${TMPFILE2};then
         echo "Stdout should not be empty!"
         exit 1
 fi
-if grep -q "Handshake was completed" ${TMPFILE2};then
+if grep "Handshake was completed" ${TMPFILE2} >/dev/null; then
         echo "Find the expected output!"
 else
         echo "Cannot find the expected output!"
@@ -158,7 +158,7 @@ if test -s ${TMPFILE2};then
        exit 1
 fi
 
-if grep -q "Handshake was completed" ${TMPFILE1}; then
+if grep "Handshake was completed" ${TMPFILE1} >/dev/null; then
        echo "Found the expected output!"
 else
        echo "Cannot find the expected output!"
