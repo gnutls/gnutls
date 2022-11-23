@@ -910,8 +910,7 @@ static int parse_handshake_header(gnutls_session_t session, mbuffer_st *bufel,
 
 		/* TLS1.3: distinguish server hello versus hello retry request.
 		 * The epitome of slick protocol design. */
-		if (hsk->htype == GNUTLS_HANDSHAKE_SERVER_HELLO &&
-		    hsk->start_offset == 0 && !IS_DTLS(session)) {
+		if (hsk->htype == GNUTLS_HANDSHAKE_SERVER_HELLO && hsk->start_offset == 0) {
 			if (_mbuffer_get_udata_size(bufel) >
 				    handshake_header_size + 2 +
 					    GNUTLS_RANDOM_SIZE &&

@@ -3061,7 +3061,8 @@ reset:
 		IMED_RET("send hello", ret, 1);
 		FALLTHROUGH;
 	case STATE2:
-		if (IS_DTLS(session)) {
+		ver = _gnutls_version_max(session);
+		if (IS_DTLS(session) && !ver->tls13_sem) {
 			ret = _gnutls_recv_handshake(
 				session, GNUTLS_HANDSHAKE_HELLO_VERIFY_REQUEST,
 				1, NULL);

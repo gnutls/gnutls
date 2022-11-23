@@ -766,8 +766,8 @@ static int key_share_send_params(gnutls_session_t session,
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		if (session->internals.hsk_flags &
-		    HSK_HRR_RECEIVED) { /* we know the group */
+		if (session->internals.hsk_flags & HSK_HRR_RECEIVED && 
+		    ver->id != GNUTLS_DTLS1_3) { /* we know the group */
 			group = get_group(session);
 			if (unlikely(group == NULL))
 				return gnutls_assert_val(

@@ -113,10 +113,6 @@ int _gnutls13_recv_hello_retry_request(gnutls_session_t session,
 	gnutls_datum_t session_id;
 	uint8_t random[GNUTLS_RANDOM_SIZE];
 
-	/* only under TLS 1.3 */
-	if (IS_DTLS(session))
-		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
-
 	if (session->internals.hsk_flags & HSK_HRR_RECEIVED)
 		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
 
@@ -127,7 +123,8 @@ int _gnutls13_recv_hello_retry_request(gnutls_session_t session,
 	if (ret < 0)
 		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
-	if (unlikely(tmp[0] != 0x03 || tmp[1] != 0x03))
+	if (unlikely(!(tmp[0] == 0x03 && tmp[1] == 0x03) &&
+		     !(tmp[0] == 0xfe && tmp[1] == 0xfd)))
 		return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
 
 	ret = _gnutls_buffer_pop_data(buf, random, GNUTLS_RANDOM_SIZE);
