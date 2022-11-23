@@ -484,7 +484,7 @@ fedora-ktls/test:
     - make -j$BUILDJOBS
     - make -j$BUILDJOBS install
     - popd
-    - PKG_CONFIG_PATH=${PWD}/nettle-git/$NETTLE_DIR/lib64/pkgconfig dash ./configure --disable-gcc-warnings --disable-doc --with-pkcs12-iter-count=10000
+    - PKG_CONFIG_PATH=${PWD}/nettle-git/$NETTLE_DIR/lib64/pkgconfig dash ./configure --disable-gcc-warnings --disable-full-test-suite --disable-doc --with-pkcs12-iter-count=10000
     - make -j$BUILDJOBS
     - make -j$BUILDJOBS check TESTS=""
 
