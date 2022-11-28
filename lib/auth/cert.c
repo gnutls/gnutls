@@ -1636,6 +1636,10 @@ _gnutls_select_server_cert(gnutls_session_t session, const gnutls_cipher_suite_e
 			if (session->internals.selected_cert_list_length == 0)
 				return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
 
+			if (unlikely(session->internals.selected_cert_list == NULL)) {
+				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+			}
+
 			_gnutls_debug_log("Selected (%s) cert\n",
 					  gnutls_pk_get_name(session->internals.selected_cert_list[0].pubkey->params.algo));
 		}

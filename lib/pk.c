@@ -93,6 +93,7 @@ _gnutls_encode_ber_rs_raw(gnutls_datum_t * sig_value,
 	}
 
 	if (r->data[0] >= 0x80) {
+		assert(tmp);
 		tmp[0] = 0;
 		memcpy(&tmp[1], r->data, r->size);
 		result = asn1_write_value(sig, "r", tmp, 1+r->size);
@@ -108,6 +109,7 @@ _gnutls_encode_ber_rs_raw(gnutls_datum_t * sig_value,
 
 
 	if (s->data[0] >= 0x80) {
+		assert(tmp);
 		tmp[0] = 0;
 		memcpy(&tmp[1], s->data, s->size);
 		result = asn1_write_value(sig, "s", tmp, 1+s->size);
@@ -597,6 +599,10 @@ encode_ber_digest_info(const mac_entry_st * e,
 	const char *algo;
 	uint8_t *tmp_output;
 	int tmp_output_size;
+
+	if (unlikely(e == NULL)) {
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
 
 	/* prevent asn1_write_value() treating input as string */
 	if (digest->size == 0)

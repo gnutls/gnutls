@@ -50,6 +50,15 @@ if [ -z "$(which base64 2>/dev/null)" ]; then
 	exit 77
 fi
 
+: ${OPENSSL=openssl}
+
+case `"$OPENSSL" version` in
+    *OpenSSL\ 3*)
+	echo "This test is not yet compatible with OpenSSL 3."
+	exit 77
+	;;
+esac
+
 if [ -z "$(which tpm2tss-genkey 2>/dev/null)" ]; then
 	echo "Need tpm2tss-genkey from tpm2-tss-engine package to run this test."
 	exit 77

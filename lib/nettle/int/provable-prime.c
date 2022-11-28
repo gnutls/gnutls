@@ -1173,7 +1173,7 @@ st_provable_prime(mpz_t p,
 	if (iterations > 0) {
 		storage_length = iterations * DIGEST_SIZE;
 
-		storage = malloc(storage_length);
+		storage = gnutls_malloc(storage_length);
 		if (storage == NULL)
 			goto fail;
 
@@ -1307,7 +1307,7 @@ st_provable_prime(mpz_t p,
 	mpz_clear(t);
 	mpz_clear(tmp);
 	mpz_clear(c);
-	free(pseed);
-	free(storage);
+	gnutls_free(pseed);
+	gnutls_free(storage);
 	return ret;
 }

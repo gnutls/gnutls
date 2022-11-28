@@ -1211,6 +1211,10 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, asn1_node pkcs8_asn,
 	}
 
 	ce = cipher_to_entry(enc_params->cipher);
+	if (unlikely(ce == NULL)) {
+		ret = gnutls_assert_val(GNUTLS_E_UNKNOWN_CIPHER_TYPE);
+		goto error;
+	}
 	block_size = _gnutls_cipher_get_block_size(ce);
 
 	if (ce->type == CIPHER_BLOCK) {
