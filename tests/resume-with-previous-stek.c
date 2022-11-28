@@ -127,6 +127,8 @@ static void client(int fd, int *resume, unsigned rounds, const char *prio)
 
 		gnutls_deinit(session);
 	}
+
+	gnutls_free(session_data.data);
 }
 
 typedef void (* gnutls_stek_rotation_callback_t) (const gnutls_datum_t *prev_key,
