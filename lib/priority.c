@@ -1548,6 +1548,8 @@ static int global_ini_handler(void *ctx, const char *section, const char *name, 
 			p = clear_spaces(value, str);
 			if (c_strcasecmp(p, "true") == 0) {
 				cfg->ktls_enabled = true;
+			} else if (c_strcasecmp(p, "false") == 0) {
+				cfg->ktls_enabled = false;
 			} else {
 				_gnutls_debug_log("cfg: unknown ktls mode %s\n",
 					p);

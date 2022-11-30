@@ -498,6 +498,7 @@ int print_info(gnutls_session_t session, int verbose, int flags)
 	gnutls_datum_t p;
 	char *desc;
 	gnutls_protocol_t version;
+	gnutls_transport_ktls_enable_flags_t ktls_flags;
 	int rc;
 
 	desc = gnutls_session_get_desc(session);
@@ -645,6 +646,15 @@ int print_info(gnutls_session_t session, int verbose, int flags)
 #endif
 
 	print_channel_bindings(session, verbose);
+
+	ktls_flags = gnutls_transport_is_ktls_enabled(session);
+	if (ktls_flags != 0) {
+		log_msg(stdout, "- KTLS: %s\n",
+			(ktls_flags & GNUTLS_KTLS_DUPLEX) == GNUTLS_KTLS_DUPLEX ? "send, recv" :
+			(ktls_flags & GNUTLS_KTLS_SEND) == GNUTLS_KTLS_SEND ? "send" :
+			(ktls_flags & GNUTLS_KTLS_RECV) == GNUTLS_KTLS_RECV ? "recv" :
+			"unknown");
+	}
 
 	fflush(stdout);
 
