@@ -153,7 +153,6 @@ void _gnutls_fips_mode_reset_zombie(void)
 
 #define HMAC_SIZE 32
 #define HMAC_ALGO GNUTLS_MAC_SHA256
-#define HMAC_FILE_NAME ".gnutls.hmac"
 #define HMAC_FORMAT_VERSION 1
 
 struct hmac_entry
@@ -280,11 +279,13 @@ static int get_hmac_path(char *mac_file, size_t mac_file_size)
 
 	p = strrchr(file, '/');
 
-	if (p == NULL)
-		ret = snprintf(mac_file, mac_file_size, HMAC_FILE_NAME);
-	else
-		ret = snprintf(mac_file, mac_file_size,
-			       "%.*s/"HMAC_FILE_NAME, (int)(p - file), file);
+	if (p == NULL) {
+		ret = snprintf(mac_file, mac_file_size, ".%s.hmac",
+			       file);
+	} else {
+		ret = snprintf(mac_file, mac_file_size, "%.*s/.%s.hmac",
+			       (int)(p - file), file, p + 1);
+	}
 	if ((size_t)ret >= mac_file_size)
 		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
 
@@ -292,11 +293,13 @@ static int get_hmac_path(char *mac_file, size_t mac_file_size)
 	if (ret == 0)
 		return GNUTLS_E_SUCCESS;
 
-	if (p == NULL)
-		ret = snprintf(mac_file, mac_file_size, "fipscheck/"HMAC_FILE_NAME);
-	else
-		ret = snprintf(mac_file, mac_file_size,
-			       "%.*s/fipscheck/"HMAC_FILE_NAME, (int)(p - file), file);
+	if (p == NULL) {
+		ret = snprintf(mac_file, mac_file_size, "fipscheck/.%s.hmac",
+			       file);
+	} else {
+		ret = snprintf(mac_file, mac_file_size, "%.*s/fipscheck/.%s.hmac",
+			       (int)(p - file), file, p + 1);
+	}
 	if ((size_t)ret >= mac_file_size)
 		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
 
