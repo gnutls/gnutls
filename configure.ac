@@ -619,6 +619,8 @@ if [ test "$enable_fips" = "yes" ];then
     if test "x$fips_module_version" != xnone; then
        AC_DEFINE_UNQUOTED([FIPS_MODULE_VERSION], ["$fips_module_version"], [The FIPS140 module version])
     fi
+
+    AC_CHECK_FUNCS(dl_iterate_phdr)
   else
     enable_fips=no
     AC_MSG_WARN([[
