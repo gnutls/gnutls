@@ -2926,6 +2926,7 @@ int gnutls_handshake(gnutls_session_t session)
 	if (IS_KTLS_ENABLED(session, GNUTLS_KTLS_DUPLEX)) {
 		ret = _gnutls_ktls_set_keys(session, GNUTLS_KTLS_DUPLEX);
 		if (ret < 0) {
+			/* no need to invalidate the session as keys were not set */
 			session->internals.ktls_enabled = 0;
 			_gnutls_audit_log(session,
 					  "disabling KTLS: failed to set keys\n");
