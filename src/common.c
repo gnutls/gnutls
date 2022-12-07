@@ -222,7 +222,7 @@ print_rawpk_info(gnutls_session_t session, FILE *out, int flag, int print_cert, 
 		if (ret < 0) {
 			fprintf(stderr, "Encoding error: %s\n",
 				gnutls_strerror(ret));
-			return;
+			goto cleanup;
 		}
 
 		log_msg(out, "\n%s\n", (char*)pem.data);
@@ -230,6 +230,8 @@ print_rawpk_info(gnutls_session_t session, FILE *out, int flag, int print_cert, 
 		gnutls_free(pem.data);
 	}
 
+ cleanup:
+	gnutls_pcert_deinit(&pk_cert);
 }
 
 /* returns false (0) if not verified, or true (1) otherwise 
