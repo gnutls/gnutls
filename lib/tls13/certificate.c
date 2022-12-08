@@ -60,7 +60,7 @@ int _gnutls13_recv_certificate(gnutls_session_t session)
 	if (ret == GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET) {
 		/* check if we received compressed certificate */
 		err = _gnutls_recv_handshake(session, GNUTLS_HANDSHAKE_COMPRESSED_CERTIFICATE_PKT, 0, &buf);
-		if (err >= 0) {
+		if (err >= 0 && (session->internals.hsk_flags & HSK_COMP_CRT_REQ_SENT)) {
 			decompress_cert = 1;
 			ret = err;
 		}

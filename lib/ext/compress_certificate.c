@@ -263,6 +263,8 @@ _gnutls_compress_certificate_send_params(gnutls_session_t session,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
+	session->internals.hsk_flags |= HSK_COMP_CRT_REQ_SENT;
+
 	return bytes_len + 1;
 }
 
