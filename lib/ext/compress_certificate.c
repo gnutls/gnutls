@@ -26,7 +26,8 @@
 #include "num.h"
 #include <ext/compress_certificate.h>
 
-/* Check whether certificate compression method is valid, ie. supported by gnutls */
+/* Check whether certificate compression method is valid, ie. supported by gnutls
+ */
 static inline int
 is_valid_method(gnutls_compression_method_t method)
 {
@@ -48,7 +49,8 @@ is_valid_method(gnutls_compression_method_t method)
 	}
 }
 
-/* Converts compression algorithm number established in RFC8879 to internal compression method type */
+/* Converts compression algorithm number established in RFC8879 to internal compression method type
+ */
 gnutls_compression_method_t 
 _gnutls_compress_certificate_num2method(uint16_t num)
 {
@@ -64,7 +66,8 @@ _gnutls_compress_certificate_num2method(uint16_t num)
 	 }
 }
 
-/* Converts compression method type to compression algorithm number established in RFC8879 */
+/* Converts compression method type to compression algorithm number established in RFC8879
+ */
 int 
 _gnutls_compress_certificate_method2num(gnutls_compression_method_t method)
 {
