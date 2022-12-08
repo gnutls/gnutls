@@ -41,6 +41,10 @@ _gnutls_compress_certificate_num2method(uint16_t num);
 int
 _gnutls_compress_certificate_method2num(gnutls_compression_method_t method);
 
+bool
+_gnutls_compress_certificate_is_method_enabled(gnutls_session_t session,
+					       gnutls_compression_method_t method);
+
 int
 _gnutls_compress_certificate_recv_params(gnutls_session_t session,
 					 const uint8_t * data,

@@ -35,7 +35,7 @@ static int parse_cert_extension(void *ctx, unsigned tls_id, const uint8_t *data,
 static int parse_cert_list(gnutls_session_t session, uint8_t * data, size_t data_size);
 static int compress_certificate(gnutls_buffer_st * buf, unsigned cert_pos_mark,
 			        gnutls_compression_method_t comp_method);
-static int decompress_certificate(gnutls_buffer_st * buf);
+static int decompress_certificate(gnutls_session_t session, gnutls_buffer_st * buf);
 
 int _gnutls13_recv_certificate(gnutls_session_t session)
 {
@@ -79,7 +79,7 @@ int _gnutls13_recv_certificate(gnutls_session_t session)
 	}
 
 	if (decompress_cert) {
-		ret = decompress_certificate(&buf);
+		ret = decompress_certificate(session, &buf);
 		if (ret < 0) {
 			gnutls_assert();
 			gnutls_alert_send(session, GNUTLS_AL_FATAL, GNUTLS_A_BAD_CERTIFICATE);
@@ -613,7 +613,7 @@ cleanup:
 }
 
 static int
-decompress_certificate(gnutls_buffer_st * buf)
+decompress_certificate(gnutls_session_t session, gnutls_buffer_st * buf)
 {
 	int ret;
 	size_t method_num, plain_exp_len;
@@ -624,6 +624,9 @@ decompress_certificate(gnutls_buffer_st * buf)
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 	comp_method = _gnutls_compress_certificate_num2method(method_num);
+
+	if (!_gnutls_compress_certificate_is_method_enabled(session, comp_method))
+		return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
 
 	ret = _gnutls_buffer_pop_prefix24(buf, &plain_exp_len, 0);
 	if (ret < 0)
