@@ -132,7 +132,7 @@ _gnutls_set_keys(gnutls_session_t session, record_parameters_st * params,
 						 buf, sizeof(buf), NULL));
 
 		_gnutls_hard_log("INT: SERVER MAC KEY [%d]: %s\n",
-				 key_size,
+				 server_write->mac_key_size,
 				 _gnutls_bin2hex(server_write->mac_key,
 						 hash_size,
 						 buf, sizeof(buf), NULL));
