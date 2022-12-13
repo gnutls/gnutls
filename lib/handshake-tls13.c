@@ -340,6 +340,9 @@ static int generate_hs_traffic_keys(gnutls_session_t session)
 		}
 	}
 
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
 	if (null_key) {
 		uint8_t digest[MAX_HASH_SIZE];
 		unsigned digest_size;
@@ -368,6 +371,9 @@ static int generate_hs_traffic_keys(gnutls_session_t session)
 			return ret;
 		}
 	}
+
+	_gnutls_epoch_bump(session);
+	ret = _gnutls_epoch_dup(session, 1);
 
 	return 0;
 }

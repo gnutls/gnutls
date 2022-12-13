@@ -958,6 +958,8 @@ struct record_state_st {
 	unsigned is_aead;
 	uint64_t sequence_number;
 	gnutls_record_encryption_level_t level;
+	uint8_t sn_key[MAX_CIPHER_KEY_SIZE];
+	unsigned sn_key_size;
 };
 
 /* These are used to resolve relative epochs. These values are just

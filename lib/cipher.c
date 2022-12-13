@@ -39,6 +39,7 @@
 #include "record.h"
 #include "constate.h"
 #include "mbuffers.h"
+#include "dtls13.h"
 #include <state.h>
 #include <random.h>
 
@@ -100,12 +101,25 @@ int _gnutls_encrypt(gnutls_session_t session, const uint8_t *data,
 			return gnutls_assert_val(ret);
 	}
 
-	if (IS_DTLS(session))
-		_gnutls_write_uint16(
-			ret, ((uint8_t *)_mbuffer_get_uhead_ptr(bufel)) + 11);
-	else
-		_gnutls_write_uint16(
-			ret, ((uint8_t *)_mbuffer_get_uhead_ptr(bufel)) + 3);
+	uint8_t *header = _mbuffer_get_uhead_ptr(bufel);
+	if (IS_DTLS(session)) {
+		if ((vers->id == GNUTLS_DTLS1_3 && params->cipher->id != GNUTLS_CIPHER_NULL)) {
+			/* DLTS1.3 encrypt sequence number, seq_num sizse 16 bit*/
+			uint16_t seq_num = (uint16_t)params->write.sequence_number;
+
+			int rn = _dtls13_encrypt_seq_num(&seq_num, 1,
+							  _mbuffer_get_udata_ptr(bufel), ret,
+							  params, 0);
+			if (rn < 0)
+				return gnutls_assert_val(rn);
+
+			_gnutls_write_uint16(seq_num, header+1);
+		} else {
+			_gnutls_write_uint16(ret, header+11);
+		}
+	} else {
+		_gnutls_write_uint16(ret, header+3);
+	}
 
 	_mbuffer_set_udata_size(bufel, ret);
 	_mbuffer_set_uhead_size(bufel, 0);

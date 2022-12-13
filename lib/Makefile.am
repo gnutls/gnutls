@@ -83,7 +83,7 @@ COBJECTS = range.c record.c compress.c debug.c cipher.c gthreads.h handshake-tls
 	cert-session.c handshake-checks.c dtls-sw.c dh-primes.c openpgp_compat.c \
 	crypto-selftests.c crypto-selftests-pk.c secrets.c extv.c extv.h \
 	hello_ext_lib.c hello_ext_lib.h ocsp-api.c stek.c cert-cred-rawpk.c \
-	iov.c iov.h system/ktls.c system/ktls.h pathbuf.c pathbuf.h
+	iov.c iov.h system/ktls.c system/ktls.h pathbuf.c pathbuf.hd dtls13.c dtls13.h
 
 if ENABLE_GOST
 COBJECTS += vko.c

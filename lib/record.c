@@ -50,6 +50,7 @@
 #include <ext/heartbeat.h>
 #include <state.h>
 #include <dtls.h>
+#include <dtls13.h>
 #include <dh.h>
 #include <random.h>
 #include <xsize.h>
@@ -61,6 +62,7 @@ struct tls_record_st {
 	uint16_t header_size;
 	uint8_t version[2];
 	uint64_t sequence; /* DTLS */
+	uint8_t dtls13_header_tags; /* first byte ofi DTLS1.3 unified header */
 	uint16_t length;
 	uint16_t packet_size; /* header_size + length */
 	content_type_t type;
@@ -698,7 +700,8 @@ inline static int record_check_version(gnutls_session_t session,
 
 	if (vers->tls13_sem) {
 		/* TLS 1.3 requires version to be 0x0303 */
-		if (version[0] != 0x03 || version[1] != 0x03)
+		if ((version[0] != 0x03 || version[1] != 0x03) &&
+		    (version[0] != 0xfe || version[1] != 0xfc))
 			diff = 1;
 	} else {
 		if (vers->major != version[0] || vers->minor != version[1])
@@ -1125,14 +1128,48 @@ static void record_read_headers(gnutls_session_t session,
 #endif
 
 		record->type = headers[0];
-		record->version[0] = headers[1];
-		record->version[1] = headers[2];
 
 		if (IS_DTLS(session)) {
-			record->sequence = _gnutls_read_uint64(&headers[3]);
-			record->length = _gnutls_read_uint16(&headers[11]);
-			record->epoch = record->sequence >> 48;
+			if (record->type & 0x20) { // DTLS1.3 Ciphertext RFC9147 4.1
+				record->dtls13_header_tags = headers[0];
+				uint8_t *p = &headers[1];
+
+				record->version[0] = 0xfe;
+				record->version[1] = 0xfc;
+
+				record->epoch = //TODO: handle invalid epoch
+					_dtls13_resolve_epoch(session, record->type & 0x03);
+
+				//TODO: if (record->type & 0x10)	 // Conection ID present
+
+				if (record->type & 0x08) { // sequence size 16/8 bit
+					record->sequence = _gnutls_read_uint16(p);
+					p += 2;
+				} else {
+					record->sequence = *p;
+					p++;
+				}
+
+				if (record->type & 0x04) { // length is present
+					record->length = _gnutls_read_uint16(p);
+					p += 2;
+				}
+
+				record->type = 0x17; // application data
+				record->header_size = record->packet_size =
+					p - headers; //dynamic header size
+
+			} else {
+				record->version[0] = headers[1];
+				record->version[1] = headers[2];
+				record->sequence = _gnutls_read_uint64(&headers[3]);
+				record->length = _gnutls_read_uint16(&headers[11]);
+				record->epoch = record->sequence >> 48;
+			}
+			
 		} else {
+			record->version[0] = headers[1];
+			record->version[1] = headers[2];
 			memset(&record->sequence, 0, sizeof(record->sequence));
 			record->length = _gnutls_read_uint16(&headers[3]);
 			record->epoch = session->security_parameters.epoch_read;
@@ -1298,11 +1335,6 @@ begin:
 		goto recv_error;
 	}
 
-	if (IS_DTLS(session))
-		packet_sequence = record.sequence;
-	else
-		packet_sequence = record_state->sequence_number;
-
 	/* Read the packet data and insert it to record_recv_buffer.
 	 */
 	ret = _gnutls_io_read_buffered(
@@ -1359,12 +1391,29 @@ begin:
 		(uint8_t *)_mbuffer_get_udata_ptr(bufel) + record.header_size;
 	ciphertext.size = record.length;
 
+	/* resolve sequence number */
+	if (IS_DTLS(session)) {
+		if (vers->tls13_sem && record.epoch > 1) {
+			ret = _dtls13_resolve_seq_num(session, &record.sequence,
+						      record.dtls13_header_tags & 0x08,
+						      ciphertext.data,
+						      record.length);
+			if (ret < 0) {
+				gnutls_assert();
+				_gnutls_record_log("REC[%p] unable to resolve seq num\n",
+						   session);
+			}
+		}
+		packet_sequence = record.sequence;
+	} else
+		packet_sequence = record_state->sequence_number;
+
 	/* decrypt the data we got.
 	 */
 	t.data = _mbuffer_get_udata_ptr(decrypted);
 	t.size = _mbuffer_get_udata_size(decrypted);
 	ret = _gnutls_decrypt(session, &ciphertext, &t, &record.type,
-			      record_params, packet_sequence);
+			      record_params, packet_sequence, record.dtls13_header_tags);
 	if (ret >= 0)
 		_mbuffer_set_udata_size(decrypted, ret);
 
@@ -1480,8 +1529,8 @@ begin:
 		 * messing with our windows. */
 		if (likely(!(session->internals.flags &
 			     GNUTLS_NO_REPLAY_PROTECTION))) {
-			ret = _dtls_record_check(record_params,
-						 packet_sequence);
+			ret = _dtls_record_check(record_params, packet_sequence,
+						 record.epoch, vers);
 			if (ret < 0) {
 				_gnutls_record_log(
 					"REC[%p]: Discarded duplicate message[%u.%lu]: %s\n",

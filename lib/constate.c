@@ -527,6 +527,31 @@ static int _tls13_set_keys(gnutls_session_t session, hs_stage_t stage,
 						 sizeof(buf), NULL));
 	}
 
+	/* Derive DTLS 1.3 sequence number encryption keys */
+	server_write->sn_key_size = key_size;
+	ret = _tls13_expand_secret(session, "sn", 2, NULL, 0, skey,
+				   server_write->sn_key_size,
+				   server_write->sn_key);
+	if (ret < 0) {
+		return gnutls_assert_val(ret);
+	}
+	_gnutls_hard_log("INT: dtls13: SN server key: %s\n",
+			 _gnutls_bin2hex(server_write->sn_key,
+					 server_write->sn_key_size,
+					 buf, sizeof(buf), NULL));
+
+	client_write->sn_key_size = key_size;
+	ret = _tls13_expand_secret(session, "sn", 2, NULL, 0, ckey,
+				   client_write->sn_key_size,
+				   client_write->sn_key);
+	if (ret < 0) {
+		return gnutls_assert_val(ret);
+	}
+	_gnutls_hard_log("INT: dtls13: SN client key: %s\n",
+			 _gnutls_bin2hex(client_write->sn_key,
+					 client_write->sn_key_size,
+					 buf, sizeof(buf), NULL));
+
 	client_write->level = server_write->level =
 		stage == STAGE_HS ? GNUTLS_ENCRYPTION_LEVEL_HANDSHAKE :
 				    GNUTLS_ENCRYPTION_LEVEL_APPLICATION;
