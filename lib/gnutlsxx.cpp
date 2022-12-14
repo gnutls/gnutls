@@ -526,25 +526,6 @@ namespace gnutls
     RETWRAP (gnutls_dh_get_pubkey (s, &raw_key));
   }
 
-#ifdef ENABLE_RSA_EXPORT
-  void session::get_rsa_export_pubkey (gnutls_datum_t & exponent,
-				       gnutls_datum_t & modulus) const
-  {
-    RETWRAP (gnutls_rsa_export_get_pubkey (s, &exponent, &modulus));
-  }
-
-  unsigned int session::get_rsa_export_modulus_bits () const
-  {
-    return RETWRAP (gnutls_rsa_export_get_modulus_bits (s));
-  }
-
-  void certificate_credentials::
-    set_rsa_export_params (const rsa_params & params)
-  {
-    gnutls_certificate_set_rsa_export_params (cred, params.get_params_t ());
-  }
-#endif
-
   void server_session::
     set_certificate_request (gnutls_certificate_request_t req)
   {
@@ -945,81 +926,4 @@ psk_server_credentials::psk_server_credentials ():credentials
 
     return *this;
   }
-
-// RSA
-
-#ifdef ENABLE_RSA_EXPORT
-  rsa_params::rsa_params ()
-  {
-    RETWRAP (gnutls_rsa_params_init (&params));
-  }
-
-  rsa_params::~rsa_params ()
-  {
-    gnutls_rsa_params_deinit (params);
-  }
-
-  void rsa_params::import_pkcs1 (const gnutls_datum_t & pkcs1_params,
-				 gnutls_x509_crt_fmt_t format)
-  {
-    RETWRAP (gnutls_rsa_params_import_pkcs1 (params, &pkcs1_params, format));
-  }
-
-  void rsa_params::generate (unsigned int bits)
-  {
-    RETWRAP (gnutls_rsa_params_generate2 (params, bits));
-  }
-
-  void rsa_params::export_pkcs1 (gnutls_x509_crt_fmt_t format,
-				 unsigned char *params_data,
-				 size_t * params_data_size)
-  {
-    RETWRAP (gnutls_rsa_params_export_pkcs1
-	     (params, format, params_data, params_data_size));
-  }
-
-  gnutls_rsa_params_t rsa_params::get_params_t () const
-  {
-    return params;
-  }
-
-  rsa_params & rsa_params::operator= (const rsa_params & src)
-  {
-    rsa_params *dst = new rsa_params;
-    int ret;
-
-    ret = gnutls_rsa_params_cpy (dst->params, src.params);
-
-    if (ret < 0)
-      {
-	delete dst;
-        throw (exception (ret));
-      }
-
-    std::swap (this->params, dst->params);
-    delete dst;
-
-    return *this;
-  }
-
-  void rsa_params::import_raw (const gnutls_datum_t & m,
-			       const gnutls_datum_t & e,
-			       const gnutls_datum_t & d,
-			       const gnutls_datum_t & p,
-			       const gnutls_datum_t & q,
-			       const gnutls_datum_t & u)
-  {
-
-    RETWRAP (gnutls_rsa_params_import_raw (params, &m, &e, &d, &p, &q, &u));
-  }
-
-
-  void rsa_params::export_raw (gnutls_datum_t & m, gnutls_datum_t & e,
-			       gnutls_datum_t & d, gnutls_datum_t & p,
-			       gnutls_datum_t & q, gnutls_datum_t & u)
-  {
-    RETWRAP (gnutls_rsa_params_export_raw
-	     (params, &m, &e, &d, &p, &q, &u, NULL));
-  }
-#endif
 }				// namespace gnutls
