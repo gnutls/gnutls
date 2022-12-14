@@ -492,9 +492,7 @@ namespace gnutls
 
   void session::send_openpgp_cert (gnutls_openpgp_crt_status_t status)
   {
-#ifdef ENABLE_OPENPGP
     gnutls_openpgp_send_cert (s, status);
-#endif
   }
 
   void session::set_dh_prime_bits (unsigned int bits)
