@@ -379,7 +379,7 @@ fedora-interop/test:
   parallel:
     matrix:
       - COMPONENT: openssl
-        TYPE: 2way
+        TYPE: [2way, basic, other]
         SLICEID: 0
         SLICES: 1
       - COMPONENT: nss
