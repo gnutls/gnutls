@@ -423,11 +423,7 @@ namespace gnutls
 
   const char *server_session::get_srp_username () const
   {
-#ifdef ENABLE_SRP
     return gnutls_srp_server_get_username (s);
-#else
-    return NULL;
-#endif
   }
 
   const char *server_session::get_psk_username () const
@@ -740,8 +736,6 @@ namespace gnutls
 
 // SRP
 
-#ifdef ENABLE_SRP
-
   srp_server_credentials::srp_server_credentials ():credentials
     (GNUTLS_CRD_SRP)
   {
@@ -791,8 +785,6 @@ namespace gnutls
   {
     gnutls_srp_set_client_credentials_function (cred, func);
   }
-
-#endif /* ENABLE_SRP */
 
 // PSK
 

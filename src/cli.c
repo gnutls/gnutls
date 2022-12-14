@@ -1876,6 +1876,7 @@ int do_handshake(socket_st * socket)
 	return ret;
 }
 
+#ifdef ENABLE_SRP
 static int
 srp_username_callback(gnutls_session_t session,
 		      char **username, char **password)
@@ -1889,6 +1890,7 @@ srp_username_callback(gnutls_session_t session,
 
 	return 0;
 }
+#endif
 
 static int
 psk_callback(gnutls_session_t session, char **username,

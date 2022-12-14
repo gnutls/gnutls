@@ -584,6 +584,10 @@ int print_info(gnutls_session_t session, int verbose, int flags)
 		else if (kx == GNUTLS_KX_ECDHE_RSA
 			 || kx == GNUTLS_KX_ECDHE_ECDSA)
 			print_ecdh_info(session, "Ephemeral ", verbose);
+		break;
+	default:
+		log_msg(stdout, "- Unknown credential type %d\n", cred);
+		break;
 	}
 
 
