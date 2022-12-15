@@ -193,8 +193,10 @@ int _gnutls_proc_ecdh_common_client_kx(gnutls_session_t session,
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 	}
 
-	if (data_size != 0)
-		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+	if (data_size != 0) {
+		ret = gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+		goto cleanup;
+	}
 
 	/* generate pre-shared key */
 	ret = calc_ecdh_key(session, psk_key, ecurve);
@@ -202,8 +204,10 @@ int _gnutls_proc_ecdh_common_client_kx(gnutls_session_t session,
 		gnutls_assert();
 		goto cleanup;
 	}
-
  cleanup:
+	_gnutls_mpi_release(&session->key.proto.tls12.ecdh.x);
+	_gnutls_mpi_release(&session->key.proto.tls12.ecdh.y);
+	_gnutls_free_datum(&session->key.proto.tls12.ecdh.raw);
 	gnutls_pk_params_clear(&session->key.proto.tls12.ecdh.params);
 	return ret;
 }
