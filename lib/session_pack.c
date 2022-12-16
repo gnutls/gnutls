@@ -51,10 +51,12 @@ static int pack_certificate_auth_info(gnutls_session_t,
 static int unpack_certificate_auth_info(gnutls_session_t,
 					gnutls_buffer_st * packed_session);
 
+#ifdef ENABLE_SRP
 static int unpack_srp_auth_info(gnutls_session_t session,
 				gnutls_buffer_st * packed_session);
 static int pack_srp_auth_info(gnutls_session_t session,
 			      gnutls_buffer_st * packed_session);
+#endif
 
 static int unpack_psk_auth_info(gnutls_session_t session,
 				gnutls_buffer_st * packed_session);

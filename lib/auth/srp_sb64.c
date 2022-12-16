@@ -24,6 +24,7 @@
 #include "errors.h"
 #include <datum.h>
 #include <auth/srp_passwd.h>
+#include "attribute.h"
 
 #ifdef ENABLE_SRP
 
@@ -448,6 +449,38 @@ gnutls_srp_base64_decode2(const gnutls_datum_t * b64_data,
 	}
 
 	return 0;
+}
+
+#else
+
+int
+gnutls_srp_base64_encode(const gnutls_datum_t *data MAYBE_UNUSED,
+			 char *result MAYBE_UNUSED,
+			 size_t *result_size MAYBE_UNUSED)
+{
+	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+}
+
+int
+gnutls_srp_base64_encode2(const gnutls_datum_t *data MAYBE_UNUSED,
+			  gnutls_datum_t *result MAYBE_UNUSED)
+{
+	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+}
+
+int
+gnutls_srp_base64_decode(const gnutls_datum_t *b64_data MAYBE_UNUSED,
+			 char *result MAYBE_UNUSED,
+			 size_t *result_size MAYBE_UNUSED)
+{
+	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+}
+
+int
+gnutls_srp_base64_decode2(const gnutls_datum_t *b64_data MAYBE_UNUSED,
+			  gnutls_datum_t *result MAYBE_UNUSED)
+{
+	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }
 
 #endif				/* ENABLE_SRP */

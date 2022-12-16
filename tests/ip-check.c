@@ -27,9 +27,6 @@
 #include <string.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
-#ifdef ENABLE_OPENPGP
-#include <gnutls/openpgp.h>
-#endif
 
 #include "utils.h"
 

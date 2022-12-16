@@ -412,7 +412,7 @@ _gnutls_proc_srp_client_kx(gnutls_session_t session, uint8_t * data,
 	return 0;
 }
 
-
+#endif				/* ENABLE_SRP */
 
 /* Static parameters according to draft-ietf-tls-srp-07
  * Note that if more parameters are added check_g_n()
@@ -810,6 +810,8 @@ const gnutls_datum_t gnutls_srp_8192_group_prime = {
 const gnutls_datum_t gnutls_srp_8192_group_generator = {
 	(void *) &srp8192_generator, sizeof(srp8192_generator)
 };
+
+#ifdef ENABLE_SRP
 
 /* Check if G and N are parameters from the SRP draft.
  */

@@ -27,9 +27,6 @@
 #include <string.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
-#ifdef ENABLE_OPENPGP
-#include <gnutls/openpgp.h>
-#endif
 
 #include "utils.h"
 
@@ -623,40 +620,6 @@ char pem_too_many[] = "\n"
     "sDdnQiVER9ee/KxO6IgCTGh+nCBTSSYgLX2E/m789quPvzyi9Hf/go28he6E3dSK\n"
     "q7/LRSxaZenB/Q==\n" "-----END CERTIFICATE-----\n";
 
-#ifdef ENABLE_OPENPGP
-/* Check basic OpenPGP comparison too.
-   <http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3812>. */
-char pem11[] =
-    "-----BEGIN PGP PUBLIC KEY BLOCK-----\n"
-    "Version: GnuPG v1.4.6 (GNU/Linux)\n"
-    "\n"
-    "mQGiBEXInlgRBAD0teb6ohIlchkHcFlmmvtVW1KXexlDfXExf8T+fOz5z354GPOX\n"
-    "sDq98ztCEE3hnPEOFj4NT0X3nEtrvLkhmZqrDHSbuJACB4qxeHwEbGFx7OIDW8+u\n"
-    "4sKxpaza1GVf1NQ7VIaQiXaGHy8Esn9SW7oNhK6z5l4TIRlm3OBt3cxU3wCgjnnO\n"
-    "jpGJeeo0OnZzSH+xsNLJQEcEAOmUc+7N9OhpT/gqddIgzYRr/FD0Ad6HBfABol6Q\n"
-    "wWCapzIxggnZJ9i+lHujpcA8idtrBU/DGhkGtW95QaHwQ8d5SvetM7Wc/xoHEP3o\n"
-    "HGvSGoXtfqlofastcC7eso39EBD10cpIB+gUmhe1MpaXm7A6m+KJO+2CkqE1vMkc\n"
-    "tmKHBACzDRrWgkV+AtGWKl3ge9RkYHKxAPc0FBrpzDrvmvvNMaIme2u/+WP/xa4T\n"
-    "nTjgys+pfeplHVfCO/n6nKWrVepMPE0+ZeNWzY6CsfhL7VjSN99vm7qzNHswBiJS\n"
-    "gCSwJXRmQcJcS9hxqLciUyVEB32zPqX24QHnsyPYaSCzEBgOnLQPdGVzdC5nbnV0\n"
-    "bHMub3JniF8EExECACAFAkXInlgCGwMGCwkIBwMCBBUCCAMEFgIDAQIeAQIXgAAK\n"
-    "CRCuX60+XR0U2FcfAJ9eZDmhk5a9k4K/zu+a5xFwb9SWsgCXTkDnOIQmueZPHg5U\n"
-    "VgKnazckK7kCDQRFyJ51EAgAozi9Vk9R5I2AtRcqV4jLfpzh3eiBYSUt4U3ZLxff\n"
-    "LAyvGMUXA7OATGGhuKphNQLux17AGpRN4nugnIWMLE9akyrxXqg/165UFKbwwVsl\n"
-    "po7KzPvEXHmOYDgVEqS0sZNWmkJeMPdCVsD2wifPkocufUu2Ux8CmrvT1nEgoiVu\n"
-    "kUjplJOralQBdsPkIEk8LMVtF3IW2aHCEET0yrJ2Y2q0i/u1K4bxSUi5ESrN0UNa\n"
-    "WT7wtCegdwWlObwJEgwcu/8YtjMnfBI855gXVdJiRLdOJvkU+65I/jnPQG5QEIQM\n"
-    "weLty/+GHkXVN2xw5OGUIryIPUHi8+EDGOGqoxqNUMTzvwADBQf/bTPc0z3oHp+X\n"
-    "hsj3JP/AMCSQV87peKqFYEnRIubsN4Y4tTwVjEkRA3s5u+qTNvdypE1tvAEmdspa\n"
-    "CL/EKfMCEltcW3WUwqUIULQ2Z0t9tBuVfMEH1Z1jjb68IOVwTJYz+iBtmbq5Wxoq\n"
-    "lc5woOCDVL9qaKR6hOuAukTl6L3wQL+5zGBE4k5UfLf8UVJEa4ZTqsoMi3iyQAFO\n"
-    "/h7WzqUATH3aQSz9tpilJ760wadDhc+Sdt2a0W6cC+SBmJaU/ym9seTd26nyWHG+\n"
-    "03G+ynCHf5pBAXHhfCNhA0lMv5h3eJECNElcCh0sYGmo19jOzbnlRSGKRqrflOtO\n"
-    "YwhQXK9y/ohJBBgRAgAJBQJFyJ51AhsMAAoJEK5frT5dHRTYDDgAn2bLaS5n3Xy8\n"
-    "Z/V2Me1st/9pqPfZAJ4+9YBnyjCq/0vosIoZabi+s92m7g==\n"
-    "=NkXV\n" "-----END PGP PUBLIC KEY BLOCK-----\n";
-#endif
-
 char pem_ips[] = "\n"
 	"X.509 Certificate Information:\n"
 	"	Version: 3\n"
@@ -835,9 +798,6 @@ char txt_ip_in_cn[] =
 void doit(void)
 {
 	gnutls_x509_crt_t x509;
-#ifdef ENABLE_OPENPGP
-	gnutls_openpgp_crt_t pgp;
-#endif
 	gnutls_datum_t data;
 	int ret;
 
@@ -849,11 +809,6 @@ void doit(void)
 	if (ret < 0)
 		fail("gnutls_x509_crt_init: %d\n", ret);
 
-#ifdef ENABLE_OPENPGP
-	ret = gnutls_openpgp_crt_init(&pgp);
-	if (ret < 0)
-		fail("gnutls_openpgp_crt_init: %d\n", ret);
-#endif
 	if (debug)
 		success("Testing wildcards...\n");
 	data.data = (unsigned char *) wildcards;
@@ -1196,24 +1151,6 @@ void doit(void)
 	if (ret)
 		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
 
-#ifdef ENABLE_OPENPGP
-	if (debug)
-		success("Testing pem11...\n");
-	data.data = (unsigned char *) pem11;
-	data.size = strlen(pem11);
-
-	ret =
-	    gnutls_openpgp_crt_import(pgp, &data,
-				      GNUTLS_OPENPGP_FMT_BASE64);
-	if (ret < 0)
-		fail("%d: gnutls_openpgp_crt_import: %d\n", __LINE__, ret);
-
-	ret = gnutls_openpgp_crt_check_hostname(pgp, "test.gnutls.org");
-	if (!ret)
-		fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
-
-	gnutls_openpgp_crt_deinit(pgp);
-#endif
 	gnutls_x509_crt_deinit(x509);
 
 	gnutls_global_deinit();

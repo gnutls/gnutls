@@ -37,7 +37,7 @@
 #include <random.h>
 
 #include "debug.h"
-
+#include "attribute.h"
 
 /* Here functions for SRP (like g^x mod n) are defined 
  */
@@ -847,6 +847,87 @@ gnutls_srp_set_server_fake_salt_seed(gnutls_srp_server_credentials_t cred,
 	const size_t mac_len = me->output_size;
 
 	cred->fake_salt_length = (salt_length < mac_len ? salt_length : mac_len);
+}
+
+#else
+
+void gnutls_srp_free_client_credentials(gnutls_srp_client_credentials_t sc MAYBE_UNUSED)
+{
+}
+
+int
+gnutls_srp_allocate_client_credentials(gnutls_srp_client_credentials_t *sc MAYBE_UNUSED)
+{
+	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+}
+
+int
+gnutls_srp_set_client_credentials(gnutls_srp_client_credentials_t res MAYBE_UNUSED,
+				  const char *username MAYBE_UNUSED,
+				  const char *password MAYBE_UNUSED)
+{
+	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+}
+
+void
+gnutls_srp_free_server_credentials(gnutls_srp_server_credentials_t sc MAYBE_UNUSED)
+{
+}
+
+int
+gnutls_srp_allocate_server_credentials(gnutls_srp_server_credentials_t *sc MAYBE_UNUSED)
+{
+	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+}
+
+int
+gnutls_srp_set_server_credentials_file(gnutls_srp_server_credentials_t res MAYBE_UNUSED,
+				       const char *password_file MAYBE_UNUSED,
+				       const char *password_conf_file MAYBE_UNUSED)
+{
+	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+}
+
+void
+gnutls_srp_set_server_credentials_function(gnutls_srp_server_credentials_t cred MAYBE_UNUSED,
+					   gnutls_srp_server_credentials_function *func MAYBE_UNUSED)
+{
+}
+
+void
+gnutls_srp_set_client_credentials_function(gnutls_srp_client_credentials_t cred MAYBE_UNUSED,
+					   gnutls_srp_client_credentials_function *func MAYBE_UNUSED)
+{
+}
+
+const char *
+gnutls_srp_server_get_username(gnutls_session_t session MAYBE_UNUSED)
+{
+	return NULL;
+}
+
+int
+gnutls_srp_verifier(const char *username MAYBE_UNUSED,
+		    const char *password MAYBE_UNUSED,
+		    const gnutls_datum_t *salt MAYBE_UNUSED,
+		    const gnutls_datum_t *generator MAYBE_UNUSED,
+		    const gnutls_datum_t *prime MAYBE_UNUSED,
+		    gnutls_datum_t *res MAYBE_UNUSED)
+{
+	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+}
+
+void
+gnutls_srp_set_prime_bits(gnutls_session_t session MAYBE_UNUSED,
+			  unsigned int bits MAYBE_UNUSED)
+{
+}
+
+void
+gnutls_srp_set_server_fake_salt_seed(gnutls_srp_server_credentials_t cred MAYBE_UNUSED,
+				     const gnutls_datum_t *seed MAYBE_UNUSED,
+				     unsigned int salt_length MAYBE_UNUSED)
+{
 }
 
 #endif				/* ENABLE_SRP */
