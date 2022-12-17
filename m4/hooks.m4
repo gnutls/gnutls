@@ -232,11 +232,11 @@ LIBTASN1_MINIMUM=4.9
   fi
   AM_CONDITIONAL(ENABLE_ALPN, test "$ac_enable_alpn" != "no")
 
-  ac_enable_heartbeat=yes
+  ac_enable_heartbeat=no
   AC_MSG_CHECKING([whether to enable TLS heartbeat support])
   AC_ARG_ENABLE(heartbeat-support,
-    AS_HELP_STRING([--disable-heartbeat-support],
-                   [disable support for the heartbeat extension]),
+    AS_HELP_STRING([--enable-heartbeat-support],
+                   [enable support for the heartbeat extension]),
     ac_enable_heartbeat=$enableval)
   if test x$ac_enable_heartbeat != xno; then
    AC_MSG_RESULT(yes)
