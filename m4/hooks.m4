@@ -246,11 +246,11 @@ LIBTASN1_MINIMUM=4.9
   fi
   AM_CONDITIONAL(ENABLE_HEARTBEAT, test "$ac_enable_heartbeat" != "no")
 
-  ac_enable_srp=yes
-  AC_MSG_CHECKING([whether to disable SRP authentication support])
+  ac_enable_srp=no
+  AC_MSG_CHECKING([whether to enable SRP authentication support])
   AC_ARG_ENABLE(srp-authentication,
-    AS_HELP_STRING([--disable-srp-authentication],
-                   [disable the SRP authentication support]),
+    AS_HELP_STRING([--enable-srp-authentication],
+                   [enable the SRP authentication support]),
     ac_enable_srp=$enableval)
   if test x$ac_enable_srp != xno; then
    AC_MSG_RESULT(no)

@@ -21,6 +21,12 @@ and to simplify maintenance, see <https://gitlab.com/gnutls/guile/>.
    support for it, supply --enable-heartbeat-support to configure
    script.
 
+** libgnutls: SRP authentication is now disabled by default.
+   It is disabled because the SRP authentication in TLS is not up to
+   date with the latest TLS standards and its ciphersuites are based
+   on the CBC mode and SHA-1.  To enable it back, supply
+   --enable-srp-authentication option to configure script.
+
 ** minitasn1: Upgraded to libtasn1 version 4.19.
 
 ** API and ABI modifications:
