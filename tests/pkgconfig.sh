@@ -60,7 +60,7 @@ set -e
 cat >$TMPFILE <<__EOF__
 #include <gnutls/gnutls.h>
 
-int main()
+int main(void)
 {
 gnutls_global_init();
 }
