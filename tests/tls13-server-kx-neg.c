@@ -150,6 +150,7 @@ test_case_st tests[] = {
 		.client_prio = "NORMAL:-KX-ALL:+RSA-PSK:"PVERSION,
 		.exp_version = GNUTLS_TLS1_2,
 	},
+#ifdef ENABLE_SRP
 	{
 		.name = "TLS 1.3 SRP-RSA without cert cred",
 		.client_ret = GNUTLS_E_AGAIN,
@@ -224,6 +225,8 @@ test_case_st tests[] = {
 		.client_prio = "NORMAL:-KX-ALL:+SRP:"PVERSION,
 		.exp_version = GNUTLS_TLS1_2,
 	},
+#endif
+
 #ifdef ENABLE_GOST
 	{
 		.name = "TLS 1.3 server, TLS 1.2 client VKO-GOST-12 with cred and GOST-256 cert",

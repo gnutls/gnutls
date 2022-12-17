@@ -24,22 +24,23 @@
 #include <config.h>
 #endif
 
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <errno.h>
-#include <gnutls/gnutls.h>
-#include "utils.h"
-#include "eagain-common.h"
 
 #ifndef ENABLE_SRP
 
-void doit(void)
+int main(void)
 {
 	exit(77);
 }
 
 #else
+
+#include <stdio.h>
+#include <string.h>
+#include <errno.h>
+#include <gnutls/gnutls.h>
+#include "utils.h"
+#include "eagain-common.h"
 
 /* This test checks whether the server switching certificates is detected
  * by the client */

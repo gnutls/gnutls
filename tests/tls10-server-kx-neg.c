@@ -350,6 +350,7 @@ test_case_st tests[] = {
 		.server_prio = "NORMAL:-KX-ALL:+RSA-PSK:-VERS-ALL:+VERS-TLS1.0",
 		.client_prio = "NORMAL:-KX-ALL:+RSA-PSK:-VERS-ALL:+VERS-TLS1.0"
 	},
+#ifdef ENABLE_SRP
 	{
 		.name = "TLS 1.0 SRP-RSA without cert cred",
 		.client_ret = GNUTLS_E_AGAIN,
@@ -417,6 +418,7 @@ test_case_st tests[] = {
 		.server_prio = "NORMAL:-KX-ALL:+SRP:-VERS-ALL:+VERS-TLS1.0",
 		.client_prio = "NORMAL:-KX-ALL:+SRP:-VERS-ALL:+VERS-TLS1.0"
 	}
+#endif
 };
 
 void doit(void)
