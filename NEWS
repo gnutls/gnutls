@@ -15,6 +15,12 @@ and to simplify maintenance, see <https://gitlab.com/gnutls/guile/>.
    priority modifier have been added to allow disabling of the
    status_request TLS extension in the client side.
 
+** libgnutls: TLS heartbeat is disabled by default.
+   The heartbeat extension in TLS (RFC 6520) is not widely used given
+   other implementations dropped support for it. To enable back
+   support for it, supply --enable-heartbeat-support to configure
+   script.
+
 ** minitasn1: Upgraded to libtasn1 version 4.19.
 
 ** API and ABI modifications:
