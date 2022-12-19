@@ -258,8 +258,7 @@ AM_CXXFLAGS = \
 
 lib_LTLIBRARIES += libgnutlsxx.la
 
-# avoid default by defining empty (per automake manual)
-libgnutlsxx_la_SOURCES =
+libgnutlsxx_la_SOURCES = gnutlsxx.cpp
 
 libgnutlsxx_la_LDFLAGS = -no-undefined \
 	-version-info $(CXX_LT_CURRENT):$(CXX_LT_REVISION):$(CXX_LT_AGE)
