@@ -29,7 +29,7 @@
 
 #if defined(_WIN32) || !defined(ENABLE_SRP)
 
-int main()
+int main(void)
 {
 	exit(77);
 }

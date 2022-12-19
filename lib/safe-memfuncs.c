@@ -67,7 +67,7 @@ int gnutls_memcmp(const void *s1, const void *s2, size_t n)
 }
 
 #ifdef TEST_SAFE_MEMSET
-int main()
+int main(void)
 {
 	char x[64];
 

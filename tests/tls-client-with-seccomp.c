@@ -29,7 +29,7 @@
 
 #if defined(_WIN32) || !defined(HAVE_LIBSECCOMP)
 
-int main()
+int main(void)
 {
 	exit(77);
 }

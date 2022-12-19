@@ -1079,7 +1079,7 @@ handshake_hook_func(gnutls_session_t session, unsigned int htype,
     return ret;
 @}
 
-int main()
+int main(void)
 @{
   ...
   /* Initialize anti-replay measure, which can be shared
@@ -1871,7 +1871,7 @@ handshake_hook_func(gnutls_session_t session, unsigned int htype,
     return ret;
 @}
 
-int main()
+int main(void)
 @{
   ...
 

@@ -454,8 +454,14 @@ static gnutls_pcert_st *alloc_and_load_x509_certs(gnutls_x509_crt_t *
 	int ret = 0;
 	unsigned i, j;
 
-	if (certs == NULL)
+	if (ncerts == 0) {
 		return NULL;
+	}
+
+	if (unlikely(certs == NULL)) {
+		gnutls_assert();
+		return NULL;
+	}
 
 	local_certs = _gnutls_reallocarray(NULL, ncerts,
 					   sizeof(gnutls_pcert_st));
