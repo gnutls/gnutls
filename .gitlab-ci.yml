@@ -338,6 +338,7 @@ fedora-minimal/build:
     - fedora/bootstrap
   script:
     - dnf remove -y libunistring-devel libtasn1-devel libidn-devel
+    - dnf install -y libtasn1-tools
     - dash ./configure --cache-file $CCACHE_FILE --with-included-libtasn1
       --disable-doc --disable-dtls-srtp-support --disable-alpn-support --disable-tests
       --disable-heartbeat-support --disable-srp-authentication --disable-psk-authentication
