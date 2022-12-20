@@ -88,6 +88,7 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "%s|<%d>| %s", side, level, str);
 }
 
+#ifdef ENABLE_SRP
 static int
 serv_srp_func(gnutls_session_t session, const char *username,
 	      gnutls_datum_t *salt, gnutls_datum_t *verifier, gnutls_datum_t *generator,
@@ -120,6 +121,7 @@ serv_srp_func(gnutls_session_t session, const char *username,
 
 	return 0;
 }
+#endif
 
 static void try(test_case_st *test)
 {
@@ -130,8 +132,10 @@ static void try(test_case_st *test)
 	gnutls_psk_server_credentials_t s_psk_cred;
 	gnutls_certificate_credentials_t s_cert_cred;
 	gnutls_certificate_credentials_t c_cert_cred;
+#ifdef ENABLE_SRP
 	gnutls_srp_server_credentials_t s_srp_cred;
 	gnutls_srp_client_credentials_t c_srp_cred;
+#endif
 	const gnutls_datum_t p3_2048 =
 	    { (void *)pkcs3_2048, strlen(pkcs3_2048) };
 	gnutls_dh_params_t dh_params = NULL;
@@ -155,8 +159,10 @@ static void try(test_case_st *test)
 	assert(gnutls_anon_allocate_server_credentials(&s_anon_cred) >= 0);
 	assert(gnutls_psk_allocate_client_credentials(&c_psk_cred) >= 0);
 	assert(gnutls_psk_allocate_server_credentials(&s_psk_cred) >= 0);
+#ifdef ENABLE_SRP
 	assert(gnutls_srp_allocate_client_credentials(&c_srp_cred) >= 0);
 	assert(gnutls_srp_allocate_server_credentials(&s_srp_cred) >= 0);
+#endif
 	assert(gnutls_certificate_allocate_credentials(&s_cert_cred) >= 0);
 	assert(gnutls_certificate_allocate_credentials(&c_cert_cred) >= 0);
 	assert(gnutls_dh_params_init(&dh_params) >= 0);
@@ -202,11 +208,13 @@ static void try(test_case_st *test)
 		gnutls_psk_set_server_credentials_function(s_psk_cred, serv_psk_func);
 	}
 
+#ifdef ENABLE_SRP
 	if (test->have_srp_cred) {
 		gnutls_credentials_set(server, GNUTLS_CRD_SRP, s_srp_cred);
 
 		gnutls_srp_set_server_credentials_function(s_srp_cred, serv_srp_func);
 	}
+#endif
 
 	if (test->have_rsa_decrypt_cert) {
 		assert(gnutls_certificate_set_x509_key_mem(s_cert_cred, &server_ca3_localhost_rsa_decrypt_cert, &server_ca3_key, GNUTLS_X509_FMT_PEM) >= 0);
@@ -236,11 +244,15 @@ static void try(test_case_st *test)
 	gnutls_credentials_set(client, GNUTLS_CRD_ANON, c_anon_cred);
 	gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE, c_cert_cred);
 	gnutls_credentials_set(client, GNUTLS_CRD_PSK, c_psk_cred);
+#ifdef ENABLE_SRP
 	gnutls_credentials_set(client, GNUTLS_CRD_SRP, c_srp_cred);
+#endif
 
 	assert(gnutls_psk_set_client_credentials(c_psk_cred, "psk", &pskkey, GNUTLS_PSK_KEY_HEX) >= 0);
 
+#ifdef ENABLE_SRP
 	assert(gnutls_srp_set_client_credentials(c_srp_cred, "test1", "test") >= 0);
+#endif
 
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
@@ -267,8 +279,10 @@ static void try(test_case_st *test)
 	gnutls_anon_free_server_credentials(s_anon_cred);
 	gnutls_psk_free_client_credentials(c_psk_cred);
 	gnutls_psk_free_server_credentials(s_psk_cred);
+#ifdef ENABLE_SRP
 	gnutls_srp_free_client_credentials(c_srp_cred);
 	gnutls_srp_free_server_credentials(s_srp_cred);
+#endif
 	gnutls_certificate_free_credentials(s_cert_cred);
 	gnutls_certificate_free_credentials(c_cert_cred);
 	if (dh_params)

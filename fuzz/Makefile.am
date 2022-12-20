@@ -27,8 +27,6 @@ FUZZERS = \
  gnutls_reverse_idna_parser_fuzzer$(EXEEXT) \
  gnutls_server_fuzzer$(EXEEXT) \
  gnutls_server_rawpk_fuzzer$(EXEEXT) \
- gnutls_srp_client_fuzzer$(EXEEXT) \
- gnutls_srp_server_fuzzer$(EXEEXT) \
  gnutls_set_trust_file_fuzzer$(EXEEXT) \
  gnutls_x509_crl_parser_fuzzer$(EXEEXT) \
  gnutls_x509_crq_parser_fuzzer$(EXEEXT) \
@@ -36,6 +34,12 @@ FUZZERS = \
  gnutls_ext_raw_parse_fuzzer$(EXEEXT) \
  gnutls_handshake_client_fuzzer$(EXEEXT) \
  gnutls_handshake_server_fuzzer$(EXEEXT)
+
+if ENABLE_SRP
+FUZZERS += \
+ gnutls_srp_client_fuzzer$(EXEEXT) \
+ gnutls_srp_server_fuzzer$(EXEEXT)
+endif
 
 check_PROGRAMS = $(FUZZERS)
 
