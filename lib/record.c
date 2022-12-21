@@ -854,6 +854,16 @@ record_add_to_buffers(gnutls_session_t session,
 			goto unexpected_packet;
 		}
 
+		/* if the CCS has value other than 1 abort the connection,
+		 * unless old DTLS is negotiated, where CCS includes a sequence
+		 * number */
+		if (type == GNUTLS_CHANGE_CIPHER_SPEC &&
+		    !(ver && ver->id == GNUTLS_DTLS0_9) &&
+		    (bufel->msg.size != 1 || bufel->msg.data[0] != 1)) {
+			ret = gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
+			goto unexpected_packet;
+		}
+
 		_gnutls_record_buffer_put(session, type, seq, bufel);
 
 		/* if we received application data as expected then we
@@ -917,6 +927,15 @@ record_add_to_buffers(gnutls_session_t session,
 			if (!(IS_DTLS(session))) {
 				ret = gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
 				goto cleanup;
+			}
+
+			/* if the CCS has value other than 1 abort the
+			 * connection, unless old DTLS is negotiated, where CCS
+			 * includes a sequence number */
+			if (!(ver && ver->id == GNUTLS_DTLS0_9) &&
+			    (bufel->msg.size != 1 || bufel->msg.data[0] != 1)) {
+				ret = gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
+				goto unexpected_packet;
 			}
 
 			_gnutls_record_buffer_put(session, recv->type, seq,
@@ -1351,15 +1370,13 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 	if (bufel == NULL)
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-	if (vers && vers->tls13_sem && record.type == GNUTLS_CHANGE_CIPHER_SPEC) {
-		/* if the CCS has value other than 0x01, or arrives
-		 * after Finished, abort the connection */
-		if (record.length != 1 ||
-		    *((uint8_t *) _mbuffer_get_udata_ptr(bufel) +
-		      record.header_size) != 0x01 ||
-		    !session->internals.handshake_in_progress)
+	/* ignore CCS if TLS 1.3 is negotiated */
+	if (record.type == GNUTLS_CHANGE_CIPHER_SPEC && vers && vers->tls13_sem) {
+		/* if the CCS has arrived after Finished, abort the
+		 * connection */
+		if (!session->internals.handshake_in_progress) {
 			return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
-
+		}
 		_gnutls_read_log("discarding change cipher spec in TLS1.3\n");
 		/* we use the same mechanism to retry as when
 		 * receiving multiple empty TLS packets */
