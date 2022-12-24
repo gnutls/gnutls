@@ -494,7 +494,7 @@ _gnutls_send_tlen_int(gnutls_session_t session, content_type_t type,
 			return GNUTLS_E_INVALID_SESSION;
 		}
 
-	max_send_size = max_record_send_size(session, record_params);
+	max_send_size = max_record_send_size(session);
 
 	if (data_size > max_send_size) {
 		if (IS_DTLS(session))
@@ -522,7 +522,8 @@ _gnutls_send_tlen_int(gnutls_session_t session, content_type_t type,
 
 		/* now proceed to packet encryption
 		 */
-		cipher_size = MAX_RECORD_SEND_SIZE(session);
+		cipher_size = max_record_send_size(session) +
+			MAX_RECORD_SEND_OVERHEAD(session);
 
 		bufel = _mbuffer_alloc_align16(cipher_size + CIPHER_SLACK_SIZE,
 			get_total_headers2(session, record_params));
@@ -2202,7 +2203,7 @@ ssize_t gnutls_record_send_file(gnutls_session_t session, int fd,
 		}
 	}
 
-	buf_len = MIN(count, MAX(max_record_send_size(session, NULL), 512));
+	buf_len = MIN(count, MAX(max_record_send_size(session), 512));
 
 	buf = gnutls_malloc(buf_len);
 	if (buf == NULL) {
