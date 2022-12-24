@@ -31,6 +31,8 @@ and to simplify maintenance, see <https://gitlab.com/gnutls/guile/>.
 
 ** API and ABI modifications:
 GNUTLS_NO_STATUS_REQUEST: New flag
+GNUTLS_SRTP_AEAD_AES_128_GCM: New gnutls_srtp_profile_t enum member
+GNUTLS_SRTP_AEAD_AES_256_GCM: New gnutls_srtp_profile_t enum member
 
 * Version 3.7.8 (released 2022-09-27)
 
