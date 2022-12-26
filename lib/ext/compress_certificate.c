@@ -110,7 +110,7 @@ gnutls_compress_certificate_get_selected_method(gnutls_session_t session)
  * for a) requesting the compression of peer's certificate and b) selecting the
  * method to compress the local certificate before sending it to the peer.
  * The order of compression methods inside the list does matter as the method
- * that appears earlier in the list will be preffered before the later ones.
+ * that appears earlier in the list will be preferred before the later ones.
  * Note that even if you set the list of supported compression methods, the
  * compression might not be used if the peer does not support any of your chosen
  * compression methods.

@@ -548,7 +548,7 @@ const struct cipher_vectors_st gost28147_tc26z_cnt_vectors[] = {
 };
 
 /* Manually calculated to overcome section size differences between TLS cipher
- * and test vectors defined in recommendation for standarization
+ * and test vectors defined in recommendation for standardization
  * R 1323565.1.017-2018. TLS uses 1024 byte sections, we need more to have at
  * least one rekeying. */
 const struct cipher_vectors_st magma_ctr_acpkm_vectors[] = {
@@ -697,7 +697,7 @@ const struct cipher_vectors_st magma_ctr_acpkm_vectors[] = {
 };
 
 /* Manually calculated to overcome section size differences between TLS cipher
- * and test vectors defined in recommendation for standarization
+ * and test vectors defined in recommendation for standardization
  * R 1323565.1.017-2018. TLS uses 4096 byte sections, we need more to have at
  * least one rekeying. */
 const struct cipher_vectors_st kuznyechik_ctr_acpkm_vectors[] = {
