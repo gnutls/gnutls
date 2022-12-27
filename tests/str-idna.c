@@ -16,8 +16,7 @@
  * General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with GnuTLS; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
+ * along with GnuTLS.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include <config.h>
@@ -68,7 +67,7 @@ MATCH_FUNC(fname, str, normalized)
 	return; }
 
 /* some vectors taken from:
- * http://www.unicode.org/Public/idna/9.0.0/IdnaTest.txt
+ * https://www.unicode.org/Public/idna/9.0.0/IdnaTest.txt
  */
 
 MATCH_FUNC_TWO_WAY(test_ascii, "localhost", "localhost");

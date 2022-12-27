@@ -16,8 +16,7 @@
  * General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with GnuTLS; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
+ * along with GnuTLS.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #ifdef HAVE_CONFIG_H
@@ -33,7 +32,7 @@
 /*
   A self-test of the RFC 2818 hostname matching algorithm.  Used to
   detect regressions of the bug reported in:
-  http://lists.gnupg.org/pipermail/gnutls-dev/2007-February/001385.html
+  https://lists.gnupg.org/pipermail/gnutls-dev/2007-February/001385.html
 */
 
 /* CN="*.com"

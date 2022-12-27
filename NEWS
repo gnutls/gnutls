@@ -2967,7 +2967,7 @@ certificate status extension in verification.
 functions.
 
 ** libgnutls: Fixed the receipt of session tickets during session resumption.
-Reported by danblack at http://savannah.gnu.org/support/?108146
+Reported by danblack at https://savannah.gnu.org/support/?108146
 
 ** libgnutls: Added functions to export structures in an allocated buffer.
 
@@ -3486,7 +3486,7 @@ generate OCSP requests and to verify OCSP responses.  See the manual
 for more information.  Run ./configure with --disable-ocsp to build
 GnuTLS without OCSP support.
 
-This work was sponsored by Smoothwall <http://smoothwall.net/>.
+This work was sponsored by Smoothwall <https://smoothwall.net/>.
 
 ** ocsptool: Added new command line tool.
 The tool can parse OCSP request/responses, generate OCSP requests and
@@ -3772,7 +3772,7 @@ Reported by J. Cameijo Cerdeira.
 
 ** libgnutls: Allow CA importing of 0 certificates to succeed.
 Reported by Jonathan Nieder <jrnieder@gmail.com> in
-<http://bugs.debian.org/640639>.
+<https://bugs.debian.org/640639>.
 
 ** libgnutls: Added support for VIA padlock AES optimizations.
 (disabled by default)
@@ -3930,7 +3930,7 @@ list of certificates in the trusted list that will be associated
 with a name (e.g. server name) and will not be used as CAs.
 
 ** libgnutls: PKCS #11 back-end rewritten to use p11-kit
-http://p11-glue.freedesktop.org/p11-kit.html. Rewrite by
+https://p11-glue.freedesktop.org/p11-kit.html. Rewrite by
 Stef Walter.
 
 ** libgnutls: Added ECDHE-PSK ciphersuites for TLS (RFC 5489).
@@ -3966,7 +3966,7 @@ enabled by default. Requires priority strings:
 +ANON-ECDHE: to add anonymous ECDH
 
 ** libgnutls: PKCS #11 URLs conform to the latest draft
-being http://tools.ietf.org/html/draft-pechanec-pkcs11uri-04.
+being https://tools.ietf.org/html/draft-pechanec-pkcs11uri-04.
 
 ** certtool: Can now load private keys and public keys from PKCS #11 tokens
 via URLs.
@@ -4636,8 +4636,8 @@ GNUTLS_OID_X520_POSTALCODE and GNUTLS_OID_X520_NAME.
 
 ** libgnutls: Added Steve Dispensa's patch for safe renegotiation (RFC 5746)
 Solves the issue discussed in:
-<http://www.ietf.org/mail-archive/web/tls/current/msg03928.html> and
-<http://www.ietf.org/mail-archive/web/tls/current/msg03948.html>.
+<https://www.ietf.org/mail-archive/web/tls/current/msg03928.html> and
+<https://www.ietf.org/mail-archive/web/tls/current/msg03948.html>.
 Note that to allow connecting to unpatched servers the full protection
 is only enabled if the priority string %SAFE_RENEGOTIATION is
 specified. You can check whether protection is in place by querying
@@ -4928,7 +4928,7 @@ Before we required that the runtime library used the same (or more
 recent) libgcrypt/libtasn1 as it was compiled with.  Now we just check
 that the runtime usage is above the minimum required.  Reported by
 Marco d'Itri <md@linux.it> via Andreas Metzler
-<ametzler@downhill.at.eu.org> in <http://bugs.debian.org/540449>.
+<ametzler@downhill.at.eu.org> in <https://bugs.debian.org/540449>.
 
 ** tests: Added new self-test pkcs12_s2k_pem to detect MPI bit length error.
 
@@ -4945,7 +4945,7 @@ No changes since last version.
 
 ** libgnutls: Fix crash in gnutls_global_init after earlier init/deinit cycle.
 Forwarded by Martin von Gagern <Martin.vGagern@gmx.net> from
-<http://bugs.gentoo.org/272388>.
+<https://bugs.gentoo.org/272388>.
 
 ** tests: Added new self-tests init_roundtrip.c to detect previous problem.
 
@@ -5106,7 +5106,7 @@ Before we required that the runtime library used the same (or more
 recent) libgcrypt/libtasn1 as it was compiled with.  Now we just check
 that the runtime usage is above the minimum required.  Reported by
 Marco d'Itri <md@linux.it> via Andreas Metzler
-<ametzler@downhill.at.eu.org> in <http://bugs.debian.org/540449>.
+<ametzler@downhill.at.eu.org> in <https://bugs.debian.org/540449>.
 
 ** minitasn1: Internal copy updated to libtasn1 v2.3.
 
@@ -5119,7 +5119,7 @@ No changes since last version.
 
 ** libgnutls: Fix crash in gnutls_global_init after earlier init/deinit cycle.
 Forwarded by Martin von Gagern <Martin.vGagern@gmx.net> from
-<http://bugs.gentoo.org/272388>.
+<https://bugs.gentoo.org/272388>.
 
 ** libgnutls: Fix PKCS#12 decryption from password.
 The encryption key derived from the password was incorrect for (on
@@ -5616,7 +5616,7 @@ gnutls_x509_crq_get_key_id: ADDED.
 
 ** libgnutls: Fix chain verification for chains that ends with RSA-MD2 CAs.
 Reported by Michael Kiefer <Michael-Kiefer@web.de> in
-<http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=507633> forwarded by
+<https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=507633> forwarded by
 Andreas Metzler <ametzler@downhill.at.eu.org> in
 <http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3309>.
 
@@ -5892,7 +5892,7 @@ No changes since last version.
 
 ** libgnutls: Fix chain verification for chains that ends with RSA-MD2 CAs.
 Reported by Michael Kiefer <Michael-Kiefer@web.de> in
-<http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=507633> forwarded by
+<https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=507633> forwarded by
 Andreas Metzler <ametzler@downhill.at.eu.org> in
 <http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3309>.
 
@@ -5916,7 +5916,7 @@ No changes since last version.
 The patch to fix the security problem GNUTLS-SA-2008-3 introduced a
 problem for certificate chains that contained just one self-signed
 certificate.  Reported by Michael Meskes <meskes@debian.org> in
-<http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=505279>.
+<https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=505279>.
 
 ** API and ABI modifications:
 No changes since last version.
@@ -6330,7 +6330,7 @@ Gillmor <dkg@fifthhorseman.net>.
 
 ** libgnutls: Fix chain verification for chains that ends with RSA-MD2 CAs.
 Reported by Michael Kiefer <Michael-Kiefer@web.de> in
-<http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=507633> forwarded by
+<https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=507633> forwarded by
 Andreas Metzler <ametzler@downhill.at.eu.org> in
 <http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3309>.
 
@@ -6338,7 +6338,7 @@ Andreas Metzler <ametzler@downhill.at.eu.org> in
 The patch to fix the security problem GNUTLS-SA-2008-3 introduced a
 problem for certificate chains that contained just one self-signed
 certificate.  Reported by Michael Meskes <meskes@debian.org> in
-<http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=505279>.
+<https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=505279>.
 
 ** libgnutls: Fix X.509 certificate chain validation error. [GNUTLS-SA-2008-3]
 The flaw makes it possible for man in the middle attackers (i.e.,
@@ -6720,7 +6720,7 @@ cause gnutls to read memory beyond the end of the received record.
 
 ** libgnutlsxx: Updated API according to patches from Eduardo
 Villanueva Che (discussion at
-<http://lists.gnu.org/archive/html/gnutls-devel/2007-02/msg00017.html>)
+<https://lists.gnu.org/archive/html/gnutls-devel/2007-02/msg00017.html>)
 
 ** Use umask to restrict permissions to owner before creating a file.
 
@@ -6743,12 +6743,12 @@ Also improve manual to give example for gnutls-cli PSK authentication.
 Before './certtool -k -8' would merely ask for a password once.
 Reported by Daniel 'NebuchadnezzaR' Dehennin
 <nebuchadnezzar@asgardr.info> see
-<http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=364287>.
+<https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=364287>.
 
 ** certtool: When writing private keys to files, change permissions of file.
 Now the file which the private key is saved to is chmod'ed 0600.
 Reported by martin f krafft <madduck@debian.org> see
-<http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=373169>.
+<https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=373169>.
 
 ** guile: Fix -fgnu89-inline test.
 
@@ -6809,7 +6809,7 @@ GNUTLS_E_HANDSHAKE_TOO_LARGE: ADDED.
 
 ** gnutls-cli: Fix crash on TLS handshake failures.
 Reported by "Marc F. Clemente" <marc@mclemente.net> in Debian BTS #466477.
-This is similar to <http://bugs.debian.org/429183>.
+This is similar to <https://bugs.debian.org/429183>.
 
 ** certtool: with --generate-request and newly generated keys, print the key.
 
@@ -6877,7 +6877,7 @@ Thanks to Daniel Kahn Gillmor.
 
 ** Fix fopen file descriptor leak in PSK server code.
 Thanks to Laurence Withers <l@lwithers.me.uk>, see
-<http://lists.gnu.org/archive/html/gnutls-devel/2008-04/msg00002.html>.
+<https://lists.gnu.org/archive/html/gnutls-devel/2008-04/msg00002.html>.
 
 ** Translations files not stored directly in git to avoid merge conflicts.
 
@@ -6937,7 +6937,7 @@ from O(2*n^2) to O(n).  When adding 206 files containing 408
 certificates, using gnutls_certificate_set_x509_trust_file, the time
 dropped from 40 seconds to 0.3 seconds.  Thanks to Edgar Fuß for code
 to trigger the problem.  See also
-<http://blog.josefsson.org/2008/02/27/real-world-performance-tuning-with-callgrind/>.
+<https://blog.josefsson.org/2008/02/27/real-world-performance-tuning-with-callgrind/>.
 
 ** Clarify documentation for gnutls_x509_crt_set_subject_alternative_name
 ** to be explicit that it takes zero terminated data.
@@ -6967,7 +6967,7 @@ gnutls_hex2bin: MODIFIED, uses size_t instead of int for string length,
 ** Added gnutls_x509_dn_export(). Patch by Joe Orton.
 
 ** Renamed gnutls_certificate_export_x509_cas and friends.
-See <http://lists.gnu.org/archive/html/gnutls-devel/2008-02/msg00043.html>.
+See <https://lists.gnu.org/archive/html/gnutls-devel/2008-02/msg00043.html>.
 
 ** Internal header files cleanup.
 
@@ -7150,7 +7150,7 @@ Reported by Tim Mooney, see
 
 ** Fix fopen file descriptor leak in PSK server code.
 Thanks to Laurence Withers <l@lwithers.me.uk>, see
-<http://lists.gnu.org/archive/html/gnutls-devel/2008-04/msg00002.html>.
+<https://lists.gnu.org/archive/html/gnutls-devel/2008-04/msg00002.html>.
 
 ** Build Guile code with -fgnu89-inline only when supported.
 Reported by Kris Karas <ktk@enterprise.bidmc.harvard.edu> in
@@ -7185,7 +7185,7 @@ No changes since last version.
 
 ** Prevent linking libextra against previously installed libgnutls.
 Tiny patch from "Alon Bar-Lev" <alon.barlev@gmail.com>, see
-<http://bugs.gentoo.org/show_bug.cgi?id=202269>.
+<https://bugs.gentoo.org/show_bug.cgi?id=202269>.
 
 ** Fixes the post_client_hello_function(). The extensions are now parsed
 in a callback friendly way.
@@ -7695,7 +7695,7 @@ No changes since last version.
 
 ** Fix gnutls_error_is_fatal so that positive "errors" are non-critical.
 This solves connection problems in mutt, see
-<http://bugs.debian.org/439640>.
+<https://bugs.debian.org/439640>.
 
 ** Update gnulib files.
 In particular, the getpass module -- with its dependencies on getline,
@@ -7841,7 +7841,7 @@ Patch from Ludovic Courtès <ludovic.courtes@laas.fr>.
 ** Fix crash in gnutls-cli when TLS handshake fails.
 Reported by Marc Haber <mh+debian-bugs@zugschlus.de> and Andreas
 Metzler <ametzler@downhill.at.eu.org> via Debian BTS #429183, see
-<http://bugs.debian.org/429183>.
+<https://bugs.debian.org/429183>.
 
 ** Minor OpenPGP fixes in stream_to_datum.
 Patch from Timo Schulz <twoaday@freakmail.de> and Ludovic Courtès
@@ -7880,16 +7880,16 @@ new chapter 'Guile Bindings' in the manual.
 
 ** Have PKCS8 parser return better error codes.
 Reported by Nate Nielsen <nielsen-list@memberwebs.com>, see
-<http://lists.gnupg.org/pipermail/gnutls-dev/2007-May/001653.html> and
-<http://lists.gnupg.org/pipermail/gnutls-dev/2007-May/001654.html>.
+<https://lists.gnupg.org/pipermail/gnutls-dev/2007-May/001653.html> and
+<https://lists.gnupg.org/pipermail/gnutls-dev/2007-May/001654.html>.
 
 ** Fix mem leak for sessions with client authentication via certificates.
 Reported by Andrew W. Nosenko <andrew.w.nosenko@gmail.com>, see
-<http://lists.gnupg.org/pipermail/gnutls-dev/2007-April/001539.html>.
+<https://lists.gnupg.org/pipermail/gnutls-dev/2007-April/001539.html>.
 
 ** Fix mem leaks.
 Reported by Dennis Vshivkov <walrus@amur.ru>, see
-<http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=333050>.  Added
+<https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=333050>.  Added
 self-test tests/parse_ca.c to test regressions.
 
 ** Fix build failures related to missing images in manual.
@@ -8329,16 +8329,16 @@ Reported by "Michael C. Vergallen" <mvergall@telenet.be>.
 ** New API functions to extract DER encoded X.509 Subject/Issuer DN.
 Suggested by Nate Nielsen <nielsen-list@memberwebs.com>.  Backported
 from the 1.7.x branch, see
-<http://lists.gnu.org/archive/html/help-gnutls/2007-05/msg00029.html>.
+<https://lists.gnu.org/archive/html/help-gnutls/2007-05/msg00029.html>.
 
 ** Have PKCS8 parser return better error codes.
 Reported by Nate Nielsen <nielsen-list@memberwebs.com>, see
-<http://lists.gnupg.org/pipermail/gnutls-dev/2007-May/001653.html> and
-<http://lists.gnupg.org/pipermail/gnutls-dev/2007-May/001654.html>.
+<https://lists.gnupg.org/pipermail/gnutls-dev/2007-May/001653.html> and
+<https://lists.gnupg.org/pipermail/gnutls-dev/2007-May/001654.html>.
 
 ** Fix mem leak for sessions with client authentication via certificates.
 Reported by Andrew W. Nosenko <andrew.w.nosenko@gmail.com>, see
-<http://lists.gnupg.org/pipermail/gnutls-dev/2007-April/001539.html>.
+<https://lists.gnupg.org/pipermail/gnutls-dev/2007-April/001539.html>.
 
 ** Fix building of 'tlsia' self test.
 Earlier some gcc are known to build tlsia linking to
@@ -8492,7 +8492,7 @@ gnutls_transport_set_global_errno: ADD
 Note that we already, since GnuTLS 1.2.9, reject RSA-MD5 signatures
 when verifying X.509 chains.  The code is in tests/rsa-md5-collision/
 and is based on the work by Marc Stevens et al, see
-<http://www.win.tue.nl/hashclash/TargetCollidingCertificates/>.
+<https://www.win.tue.nl/hashclash/TargetCollidingCertificates/>.
 
 ** Re-factor self tests.
 
@@ -8548,7 +8548,7 @@ used to alter the numeric properties of the signature.  See
 not exactly the same as the problem we fix here).  Reported by Yutaka
 OIWA <y.oiwa@aist.go.jp>.
 
-See GNUTLS-SA-2006-4 on http://www.gnutls.org/security.html for more
+See GNUTLS-SA-2006-4 on https://www.gnutls.org/security.html for more
 up to date information.
 
 ** Add self test to test for above flaw.
@@ -8658,14 +8658,14 @@ alter the numeric properties of the signature.  See
 not exactly the same as the problem we fix here).  Reported by Yutaka
 OIWA <y.oiwa@aist.go.jp>.
 
-See GNUTLS-SA-2006-4 on http://www.gnutls.org/security.html for more
+See GNUTLS-SA-2006-4 on https://www.gnutls.org/security.html for more
 up to date information.
 
 ** Fix PKCS#1 decryption to avoid Bleichenbacher's Crypto 98 attack.
 See <http://www.bell-labs.com/user/bleichen/papers/pkcs.ps.gz>.
 Reported by Werner Koch <wk@gnupg.org>.
 
-See GNUTLS-SA-2006-3 on http://www.gnutls.org/security.html for more
+See GNUTLS-SA-2006-3 on https://www.gnutls.org/security.html for more
 up to date information.
 
 ** Fix crash in gnutls_x509_crt_sign2 if passed a NULL issuer_key.

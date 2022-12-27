@@ -119,7 +119,7 @@ static void tcp_server(const char *name, int port);
 #define HTTP_BEGIN HTTP_OK \
 		"\n" \
 		"<HTML><BODY>\n" \
-		"<CENTER><H1>This is <a href=\"http://www.gnu.org/software/gnutls\">" \
+		"<CENTER><H1>This is <a href=\"https://www.gnu.org/software/gnutls\">" \
 		"GnuTLS</a></H1></CENTER>\n\n"
 
 /* These are global */
