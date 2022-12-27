@@ -16,9 +16,7 @@ dnl Process this file with autoconf to produce a configure script.
 # General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301
-# USA
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 AC_PREREQ(2.64)
 

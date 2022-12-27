@@ -14,7 +14,6 @@
 # General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this file; if not, write to the Free Software Foundation,
-# Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+# along with this file.  If not, see <https://www.gnu.org/licenses/>.
 
 EXTRA_DIST = gdoc sort2.pl split-texi.pl getfuncs.pl getfuncs-map.pl
