@@ -33,7 +33,7 @@
 /*
   A self-test of the RFC 2818 hostname matching algorithm.  Used to
   detect regressions of the bug reported in:
-  http://lists.gnupg.org/pipermail/gnutls-dev/2007-February/001385.html
+  https://lists.gnupg.org/pipermail/gnutls-dev/2007-February/001385.html
 */
 
 /* CN="*.com"

@@ -68,7 +68,7 @@ MATCH_FUNC(fname, str, normalized)
 	return; }
 
 /* some vectors taken from:
- * http://www.unicode.org/Public/idna/9.0.0/IdnaTest.txt
+ * https://www.unicode.org/Public/idna/9.0.0/IdnaTest.txt
  */
 
 MATCH_FUNC_TWO_WAY(test_ascii, "localhost", "localhost");

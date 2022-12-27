@@ -28,7 +28,7 @@
 
 #include "utils.h"
 
-/* See <http://bugs.gentoo.org/272388>. */
+/* See <https://bugs.gentoo.org/272388>. */
 
 void doit(void)
 {
