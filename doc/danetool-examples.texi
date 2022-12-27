@@ -1,7 +1,7 @@
 @subheading DANE TLSA RR generation
 
 To create a DANE TLSA resource record for a certificate (or public key) 
-that was issued localy and may or may not be signed by a CA use the following command.
+that was issued locally and may or may not be signed by a CA use the following command.
 @example
 $ danetool --tlsa-rr --host www.example.com --load-certificate cert.pem
 @end example

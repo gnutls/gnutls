@@ -259,7 +259,7 @@ void doit(void)
 	gnutls_x509_name_constraints_deinit(name_constraints);
 	gnutls_x509_crt_deinit(issuingca);
 
-	success("UPN constraints tests completed succesfully\n");
+	success("UPN constraints tests completed successfully\n");
 }
 
 /* The following cert is the root CA that signed the intermediate CA used in

@@ -170,7 +170,7 @@ void doit(void)
 #ifndef _WIN32
 	setenv("HOME", getcwd(path, sizeof(path)), 1);
 
-	/* verify whether the stored hash verification succeeeds */
+	/* verify whether the stored hash verification succeeds */
 	ret = gnutls_store_commitment(NULL, NULL, "localhost", "https",
 				      GNUTLS_DIG_SHA1, &hash, 0, GNUTLS_SCOMMIT_FLAG_ALLOW_BROKEN);
 	if (ret != 0) {

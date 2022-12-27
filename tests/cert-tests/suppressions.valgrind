@@ -1,4 +1,4 @@
-# suppressions -- Valgrind suppresion file for libgcrypt
+# suppressions -- Valgrind suppression file for libgcrypt
 
 # Copyright (C) 2015 Red Hat, Inc.
 

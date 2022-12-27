@@ -846,7 +846,7 @@ dane_verify_crt_raw(dane_state_t s,
  * Due to the many possible options of DANE, there is no single threat
  * model countered. When notifying the user about DANE verification results
  * it may be better to mention: DANE verification did not reject the certificate,
- * rather than mentioning a successful DANE verication.
+ * rather than mentioning a successful DANE verification.
  *
  * Note that this function is designed to be run in addition to
  * PKIX - certificate chain - verification. To be run independently

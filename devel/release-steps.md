@@ -17,7 +17,7 @@
    the documentation to be generated. See the `doc-dist.Fedora` job in
    [.gitlab-ci.yml](.gitlab-ci.yml), which does the same thing in the CI:
    ```console
-   # Install necesarry packages for documentation, and then:
+   # Install necessary packages for documentation, and then:
    make distcheck
    ```
 1. Create a detached GPG signature:
