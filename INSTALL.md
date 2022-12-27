@@ -12,7 +12,7 @@ README
 This README is targeted for users of the library who build from
 sources but do not necessarily develop.  If you are interested
 in developing and contributing to the GnuTLS project, please
-see README-alpha and visit
+see README.md and visit
 https://www.gnutls.org/manual/html_node/Contributing.html.
 
 
@@ -99,7 +99,7 @@ MAILING LISTS
 =============
 
 The GnuTLS project maintains mailing lists for users, developers, and
-commits.  Please see https://www.gnutls.org/lists.html.
+commits.  Please see https://lists.gnutls.org/.
 
 
 LICENSING
@@ -125,17 +125,17 @@ tool being used, a stack trace if available ('bt full' if under gdb or
 valgrind output), and perhaps a network trace.  Vague queries or piecemeal 
 messages are difficult to act upon and don't help the development effort.
 
-Additional information can be found at the project's manual.
+Additional information can be found in the GnuTLS manual.
 
 
 PATCHES
 =======
 
-Patches are welcome and encouraged. Patches can be submitted through the 
+Patches are welcome and encouraged.  Patches can be submitted through the
 bug tracking system or the mailing list.  When submitting patches, please 
 be sure to use sources from the git repository, and preferably from the 
 master branch.  To create a patch for the project from a local git repository, 
-please use the following commands. 'gnutls' should be the local directory 
+please use the following commands.  'gnutls' should be the local directory
 of a previous git clone.
 
 ```
