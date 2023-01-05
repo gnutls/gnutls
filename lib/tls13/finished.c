@@ -28,7 +28,8 @@
 #include "mbuffers.h"
 #include "secrets.h"
 
-int _gnutls13_compute_finished(const mac_entry_st *prf, const uint8_t *base_key,
+int _gnutls13_compute_finished(const mac_entry_st *prf, transport_t type,
+			       const uint8_t *base_key,
 			       gnutls_buffer_st *handshake_hash_buffer,
 			       void *out)
 {
@@ -36,8 +37,8 @@ int _gnutls13_compute_finished(const mac_entry_st *prf, const uint8_t *base_key,
 	uint8_t fkey[MAX_HASH_SIZE];
 	uint8_t ts_hash[MAX_HASH_SIZE];
 
-	ret = _tls13_expand_secret2(prf, "finished", 8, NULL, 0, base_key,
-				    prf->output_size, fkey);
+	ret = _tls13_expand_secret2(prf, type, "finished", 8, NULL, 0,
+				    base_key, prf->output_size, fkey);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -80,8 +81,8 @@ int _gnutls13_recv_finished(gnutls_session_t session)
 	}
 
 	ret = _gnutls13_compute_finished(
-		session->security_parameters.prf, base_key,
-		&session->internals.handshake_hash_buffer, verifier);
+		session->security_parameters.prf, session->internals.transport,
+		base_key, &session->internals.handshake_hash_buffer, verifier);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -145,7 +146,8 @@ int _gnutls13_send_finished(gnutls_session_t session, unsigned again)
 		}
 
 		ret = _gnutls13_compute_finished(
-			session->security_parameters.prf, base_key,
+			session->security_parameters.prf,
+			session->internals.transport, base_key,
 			&session->internals.handshake_hash_buffer, verifier);
 		if (ret < 0) {
 			gnutls_assert();

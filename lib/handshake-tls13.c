@@ -220,6 +220,7 @@ static int generate_non_auth_rms_keys(gnutls_session_t session)
 
 	ret = _gnutls13_compute_finished(
 		session->security_parameters.prf,
+		session->internals.transport,
 		session->key.proto.tls13.hs_ckey,
 		&session->internals.handshake_hash_buffer,
 		finished + TLS_HANDSHAKE_HEADER_SIZE);

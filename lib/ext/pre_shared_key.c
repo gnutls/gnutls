@@ -44,7 +44,7 @@ have_psk_credentials(const gnutls_psk_client_credentials_t cred,
 }
 
 static int compute_psk_from_ticket(const tls13_ticket_st *ticket,
-				   gnutls_datum_t *key)
+				   gnutls_datum_t *key, transport_t type)
 {
 	int ret;
 
@@ -58,11 +58,11 @@ static int compute_psk_from_ticket(const tls13_ticket_st *ticket,
 	}
 	key->size = ticket->prf->output_size;
 
-	ret = _tls13_expand_secret2(ticket->prf, RESUMPTION_LABEL,
-				    sizeof(RESUMPTION_LABEL) - 1, ticket->nonce,
-				    ticket->nonce_size,
-				    ticket->resumption_master_secret, key->size,
-				    key->data);
+	ret = _tls13_expand_secret2(ticket->prf, type,
+				    RESUMPTION_LABEL, sizeof(RESUMPTION_LABEL) - 1,
+				    ticket->nonce, ticket->nonce_size,
+				    ticket->resumption_master_secret,
+				    key->size, key->data);
 	if (ret < 0)
 		gnutls_assert();
 
@@ -102,8 +102,9 @@ static const char *get_binder_label(enum binder_type type, size_t *size)
 	return label;
 }
 
-static int compute_binder_key(const mac_entry_st *prf, const uint8_t *key,
-			      size_t keylen, enum binder_type type, void *out)
+static int compute_binder_key(const mac_entry_st *prf, transport_t type,
+			      const uint8_t *key, size_t keylen,
+			      enum binder_type type, void *out)
 {
 	int ret;
 	size_t label_len;
@@ -116,8 +117,7 @@ static int compute_binder_key(const mac_entry_st *prf, const uint8_t *key,
 		return ret;
 
 	/* Compute Derive-Secret(secret, label, transcript_hash) */
-	ret = _tls13_derive_secret2(prf, label, label_len, NULL, 0, tmp_key,
-				    out);
+	ret = _tls13_derive_secret2(prf, type, label, label_len, NULL, 0, tmp_key, out);
 	if (ret < 0)
 		return ret;
 
@@ -213,13 +213,15 @@ static int compute_psk_binder(gnutls_session_t session, const mac_entry_st *prf,
 		}
 	}
 
-	ret = compute_binder_key(prf, psk->data, psk->size, type, binder_key);
+	ret = compute_binder_key(prf, session->internals.transport,
+				 psk->data, psk->size, type, binder_key);
 	if (ret < 0) {
 		gnutls_assert();
 		goto error;
 	}
 
-	ret = _gnutls13_compute_finished(prf, binder_key, &handshake_buf, out);
+	ret = _gnutls13_compute_finished(prf, session->internals.transport,
+					 binder_key, &handshake_buf, out);
 	if (ret < 0) {
 		gnutls_assert();
 		goto error;
@@ -237,7 +239,9 @@ static int generate_early_secrets(gnutls_session_t session,
 	int ret;
 
 	ret = _tls13_derive_secret2(
-		prf, EARLY_TRAFFIC_LABEL, sizeof(EARLY_TRAFFIC_LABEL) - 1,
+		prf, session->internals.transport,
+		EARLY_TRAFFIC_LABEL,
+		sizeof(EARLY_TRAFFIC_LABEL) - 1,
 		session->internals.handshake_hash_buffer.data,
 		session->internals.handshake_hash_buffer_client_hello_len,
 		session->key.proto.tls13.temp_secret,
@@ -252,7 +256,8 @@ static int generate_early_secrets(gnutls_session_t session,
 		return gnutls_assert_val(ret);
 
 	ret = _tls13_derive_secret2(
-		prf, EARLY_EXPORTER_MASTER_LABEL,
+		prf, session->internals.transport,
+		EARLY_EXPORTER_MASTER_LABEL,
 		sizeof(EARLY_EXPORTER_MASTER_LABEL) - 1,
 		session->internals.handshake_hash_buffer.data,
 		session->internals.handshake_hash_buffer_client_hello_len,
@@ -528,7 +533,7 @@ static int client_send_params(gnutls_session_t session, gnutls_buffer_t extdata,
 			goto ignore_ticket;
 		}
 
-		ret = compute_psk_from_ticket(ticket, &rkey);
+		ret = compute_psk_from_ticket(ticket, &rkey, session->internals.transport);
 		if (ret < 0) {
 			tls13_ticket_deinit(ticket);
 			goto ignore_ticket;
@@ -863,7 +868,7 @@ static int server_recv_params(gnutls_session_t session,
 				continue;
 			}
 
-			ret = compute_psk_from_ticket(&ticket_data, &key);
+			ret = compute_psk_from_ticket(&ticket_data, &key, session->internals.transport);
 			if (ret < 0) {
 				gnutls_assert();
 				tls13_ticket_deinit(&ticket_data);

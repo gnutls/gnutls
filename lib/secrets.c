@@ -86,9 +86,10 @@ int _tls13_update_secret(gnutls_session_t session, const uint8_t *key,
 }
 
 /* Derive-Secret(Secret, Label, Messages) */
-int _tls13_derive_secret2(const mac_entry_st *prf, const char *label,
-			  unsigned label_size, const uint8_t *tbh,
-			  size_t tbh_size, const uint8_t secret[MAX_HASH_SIZE],
+int _tls13_derive_secret2(const mac_entry_st *prf, transport_t type,
+			  const char *label, unsigned label_size,
+			  const uint8_t *tbh, size_t tbh_size,
+			  const uint8_t secret[MAX_HASH_SIZE],
 			  void *out)
 {
 	uint8_t digest[MAX_HASH_SIZE];
@@ -106,7 +107,7 @@ int _tls13_derive_secret2(const mac_entry_st *prf, const char *label,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	return _tls13_expand_secret2(prf, label, label_size, digest,
+	return _tls13_expand_secret2(prf, type, label, label_size, digest,
 				     digest_size, secret, digest_size, out);
 }
 
@@ -119,21 +120,27 @@ int _tls13_derive_secret(gnutls_session_t session, const char *label,
 	if (unlikely(session->security_parameters.prf == NULL))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-	return _tls13_derive_secret2(session->security_parameters.prf, label,
-				     label_size, tbh, tbh_size, secret, out);
+	return _tls13_derive_secret2(session->security_parameters.prf, session->internals.transport,
+				     label, label_size, tbh, tbh_size, secret, out);
 }
 
 /* HKDF-Expand-Label(Secret, Label, HashValue, Length) */
-int _tls13_expand_secret2(const mac_entry_st *prf, const char *label,
-			  unsigned label_size, const uint8_t *msg,
-			  size_t msg_size, const uint8_t secret[MAX_HASH_SIZE],
+int _tls13_expand_secret2(const mac_entry_st *prf, transport_t type,
+			  const char *label, unsigned label_size,
+			  const uint8_t *msg, size_t msg_size,
+			  const uint8_t secret[MAX_HASH_SIZE],
 			  unsigned out_size, void *out)
 {
-	uint8_t tmp[256] = "tls13 ";
+	uint8_t tmp[256];
 	gnutls_buffer_st str;
 	gnutls_datum_t key;
 	gnutls_datum_t info;
 	int ret;
+
+	if (type == GNUTLS_STREAM)
+		memcpy(tmp, "tls13 ", 6);
+	else
+		memcpy(tmp, "dtls13", 6);
 
 	if (unlikely(label_size >= sizeof(tmp) - 6))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -198,7 +205,8 @@ int _tls13_expand_secret(gnutls_session_t session, const char *label,
 	if (unlikely(session->security_parameters.prf == NULL))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-	return _tls13_expand_secret2(session->security_parameters.prf, label,
-				     label_size, msg, msg_size, secret,
-				     out_size, out);
+	return _tls13_expand_secret2(session->security_parameters.prf,
+				     session->internals.transport,
+				     label, label_size, msg, msg_size,
+				     secret, out_size, out);
 }

@@ -344,14 +344,16 @@ static int _tls13_set_early_keys(gnutls_session_t session,
 	}
 
 	ret = _tls13_expand_secret2(
-		session->internals.resumed_security_parameters.prf, "key", 3,
-		NULL, 0, session->key.proto.tls13.e_ckey, key_size, key_block);
+		session->internals.resumed_security_parameters.prf,
+		session->internals.transport,"key", 3, NULL, 0,
+		session->key.proto.tls13.e_ckey, key_size, key_block);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
 	ret = _tls13_expand_secret2(
-		session->internals.resumed_security_parameters.prf, "iv", 2,
-		NULL, 0, session->key.proto.tls13.e_ckey, iv_size, iv_block);
+		session->internals.resumed_security_parameters.prf,
+		session->internals.transport, "iv", 2, NULL, 0,
+		session->key.proto.tls13.e_ckey, iv_size, iv_block);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
