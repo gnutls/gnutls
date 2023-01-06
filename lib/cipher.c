@@ -460,7 +460,8 @@ encrypt_packet_tls13(gnutls_session_t session,
 	_gnutls_write_uint64(params->write.sequence_number, &nonce[iv_size-8]);
 	memxor(nonce, params->write.iv, iv_size);
 
-	max = MAX_RECORD_SEND_SIZE(session);
+	max = max_record_send_size(session) +
+		MAX_RECORD_SEND_OVERHEAD(session);
 
 	/* make TLS 1.3 form of data */
 	total = plain->size + 1 + pad_size;

@@ -197,9 +197,6 @@ typedef enum record_send_state_t {
  * store more data than allowed.
  */
 #define MAX_RECORD_SEND_OVERHEAD(session) (MAX_CIPHER_BLOCK_SIZE/*iv*/+MAX_PAD_SIZE+MAX_HASH_SIZE/*MAC*/)
-#define MAX_RECORD_SEND_SIZE(session) (IS_DTLS(session)? \
-	(MIN((size_t)gnutls_dtls_get_mtu(session), (size_t)session->security_parameters.max_record_send_size+MAX_RECORD_SEND_OVERHEAD(session))): \
-	((size_t)session->security_parameters.max_record_send_size+MAX_RECORD_SEND_OVERHEAD(session)))
 #define MAX_PAD_SIZE 255
 #define EXTRA_COMP_SIZE 2048
 
@@ -1600,9 +1597,7 @@ inline static int _gnutls_set_current_version(gnutls_session_t s, unsigned v)
 /* Returns the maximum amount of the plaintext to be sent, considering
  * both user-specified/negotiated maximum values.
  */
-inline static size_t max_record_send_size(gnutls_session_t session,
-					  record_parameters_st *
-					  record_params)
+inline static size_t max_record_send_size(gnutls_session_t session)
 {
 	size_t max;
 
