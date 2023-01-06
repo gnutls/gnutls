@@ -815,8 +815,13 @@ static int decrypt_packet_tls13(gnutls_session_t session,
 	}
 
 	aad[0] = GNUTLS_APPLICATION_DATA;
-	aad[1] = 0x03;
-	aad[2] = 0x03;
+	if (session->internals.transport == GNUTLS_STREAM) {
+		aad[1] = 0x03;
+		aad[2] = 0x03;
+	} else {
+		aad[1] = 0xfe;
+		aad[2] = 0xfc;
+	}
 	_gnutls_write_uint16(ciphertext->size, &aad[3]);
 
 	ret = gnutls_aead_cipher_decrypt(&params->read.ctx.aead, nonce, iv_size,

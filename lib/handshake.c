@@ -1466,6 +1466,7 @@ static int handshake_hash_add_recvd(gnutls_session_t session,
 {
 	int ret;
 	const version_entry_st *vers = get_version(session);
+	const version_entry_st *max = _gnutls_version_max(session);
 
 	if (unlikely(vers == NULL))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
@@ -1481,6 +1482,30 @@ static int handshake_hash_add_recvd(gnutls_session_t session,
 		session->internals.handshake_hash_buffer.length;
 
 	if (vers->id != GNUTLS_DTLS0_9) {
+		if (max->id >= GNUTLS_DTLS1_3) {
+			/* DTLS 1.3 doesn't include message_seq, fragment_offset, and
+			 * fragment_length.
+			 */
+			if (header_size < 4) {
+				gnutls_assert();
+				return GNUTLS_E_INTERNAL_ERROR;
+			}
+			ret = _gnutls_buffer_append_data(&session->internals.
+							 handshake_hash_buffer,
+							 header, 4);
+			if (ret < 0) {
+				return gnutls_assert_val(ret);
+			}
+			header_size -= 4;
+			header += 4;
+
+			if (header_size < 8) {
+				gnutls_assert();
+				return GNUTLS_E_INTERNAL_ERROR;
+			}
+			header_size -= 8;
+			header += 8;
+		}
 		ret = _gnutls_buffer_append_data(
 			&session->internals.handshake_hash_buffer, header,
 			header_size);
@@ -1524,6 +1549,7 @@ static int handshake_hash_add_sent(gnutls_session_t session,
 {
 	int ret;
 	const version_entry_st *vers = get_version(session);
+	const version_entry_st *max = _gnutls_version_max(session);
 
 	if (unlikely(vers == NULL))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
@@ -1544,6 +1570,34 @@ static int handshake_hash_add_sent(gnutls_session_t session,
 
 		if (datalen == 0)
 			return 0;
+	} else if (max->id >= GNUTLS_DTLS1_3) {
+		/* DTLS 1.3 doesn't include message_seq, fragment_offset, and
+		 * fragment_length.
+		 */
+		if (datalen < 4) {
+			gnutls_assert();
+			return GNUTLS_E_INTERNAL_ERROR;
+		}
+
+		ret = _gnutls_buffer_append_data(&session->internals.
+						 handshake_hash_buffer,
+						 dataptr, 4);
+		if (ret < 0) {
+			return gnutls_assert_val(ret);
+		}
+		dataptr += 4;
+		datalen -= 4;
+
+		if (datalen < 8) {
+			gnutls_assert();
+			return GNUTLS_E_INTERNAL_ERROR;
+		}
+		dataptr += 8;
+		datalen -= 8;
+
+		if (datalen == 0) {
+			return 0;
+		}
 	}
 
 	ret = _gnutls_buffer_append_data(
