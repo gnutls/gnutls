@@ -49,11 +49,15 @@ void _dtls_reset_window(struct record_parameters_st *rp)
  * packet is detected it returns a negative value (but no sensible error code).
  * Otherwise zero.
  */
-int _dtls_record_check(struct record_parameters_st *rp, uint64_t seq_num)
+int _dtls_record_check(struct record_parameters_st *rp, uint64_t seq_num,
+		       uint16_t epoch, const version_entry_st *ver)
 {
-	if ((seq_num >> DTLS_EPOCH_SHIFT) != rp->epoch) {
-		return gnutls_assert_val(-1);
+	if (!ver->tls13_sem) {
+		epoch = seq_num >> DTLS_EPOCH_SHIFT;
 	}
+
+	if (epoch != rp->epoch)
+		return gnutls_assert_val(-1);
 
 	seq_num &= DTLS_SEQ_NUM_MASK;
 

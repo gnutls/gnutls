@@ -30,7 +30,8 @@
 #include <constate.h>
 
 int _dtls_transmit(gnutls_session_t session);
-int _dtls_record_check(struct record_parameters_st *rp, uint64_t seq_num);
+int _dtls_record_check(struct record_parameters_st *rp, uint64_t seq_num,
+		       uint16_t epoch, const version_entry_st *ver);
 void _dtls_reset_hsk_state(gnutls_session_t session);
 void _dtls_reset_window(struct record_parameters_st *rp);
 

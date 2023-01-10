@@ -58,7 +58,7 @@ static int decrypt_packet_tls13(gnutls_session_t session,
 				gnutls_datum_t *ciphertext,
 				gnutls_datum_t *plain, content_type_t *type,
 				record_parameters_st *params,
-				uint64_t sequence);
+				uint64_t sequence, uint8_t dtls13_header);
 
 static int encrypt_packet_tls13(gnutls_session_t session, uint8_t *cipher_data,
 				size_t cipher_size, gnutls_datum_t *plain,
@@ -134,7 +134,8 @@ int _gnutls_encrypt(gnutls_session_t session, const uint8_t *data,
  */
 int _gnutls_decrypt(gnutls_session_t session, gnutls_datum_t *ciphertext,
 		    gnutls_datum_t *output, content_type_t *type,
-		    record_parameters_st *params, uint64_t sequence)
+		    record_parameters_st *params, uint64_t sequence,
+		    uint8_t dtls13_header)
 {
 	int ret;
 	const version_entry_st *vers = get_version(session);
@@ -144,7 +145,7 @@ int _gnutls_decrypt(gnutls_session_t session, gnutls_datum_t *ciphertext,
 
 	if (vers && vers->tls13_sem)
 		ret = decrypt_packet_tls13(session, ciphertext, output, type,
-					   params, sequence);
+					   params, sequence, dtls13_header);
 	else
 		ret = decrypt_packet(session, ciphertext, output, *type, params,
 				     sequence);
@@ -761,7 +762,8 @@ static int decrypt_packet(gnutls_session_t session, gnutls_datum_t *ciphertext,
 static int decrypt_packet_tls13(gnutls_session_t session,
 				gnutls_datum_t *ciphertext,
 				gnutls_datum_t *plain, content_type_t *type,
-				record_parameters_st *params, uint64_t sequence)
+				record_parameters_st *params, uint64_t sequence,
+				uint8_t dtls13_header)
 {
 	uint8_t nonce[MAX_CIPHER_IV_SIZE];
 	size_t length, length_to_decrypt;
@@ -772,6 +774,7 @@ static int decrypt_packet_tls13(gnutls_session_t session,
 	unsigned j;
 	volatile unsigned length_set;
 	uint8_t aad[5];
+	ssize_t aad_size;
 
 	if (unlikely(ver == NULL))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
@@ -814,15 +817,32 @@ static int decrypt_packet_tls13(gnutls_session_t session,
 		return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 	}
 
-	aad[0] = GNUTLS_APPLICATION_DATA;
 	if (session->internals.transport == GNUTLS_STREAM) {
+		aad[0] = GNUTLS_APPLICATION_DATA;
 		aad[1] = 0x03;
 		aad[2] = 0x03;
+		_gnutls_write_uint16(ciphertext->size, &aad[3]);
+		aad_size = 5;
 	} else {
-		aad[1] = 0xfe;
-		aad[2] = 0xfc;
+		/* Deserialize the DTLS1.3 Header */
+		aad[0] = dtls13_header;
+		aad_size = 1;
+
+		// Connection Id will be resolved here
+
+		if (dtls13_header & 0x08) {
+			_gnutls_write_uint16(sequence, &aad[aad_size]);
+			aad_size += 2;
+		} else {
+			aad[aad_size] = sequence;
+			aad_size++;
+		}
+
+		if(dtls13_header & 0x04) {
+			_gnutls_write_uint16(length_to_decrypt, &aad[aad_size]);
+			aad_size += 2;
+		}
 	}
-	_gnutls_write_uint16(ciphertext->size, &aad[3]);
 
 	ret = gnutls_aead_cipher_decrypt(&params->read.ctx.aead, nonce, iv_size,
 					 aad, sizeof(aad), tag_size,

@@ -29,7 +29,8 @@ int _gnutls_encrypt(gnutls_session_t session, const uint8_t *data,
 
 int _gnutls_decrypt(gnutls_session_t session, gnutls_datum_t *ciphertext,
 		    gnutls_datum_t *output, content_type_t *type,
-		    record_parameters_st *params, uint64_t sequence);
+		    record_parameters_st *params, uint64_t sequence,
+		    uint8_t dtls13_header);
 
 #define MAX_PREAMBLE_SIZE 16
 
