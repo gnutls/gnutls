@@ -1354,6 +1354,7 @@ typedef struct {
 #define HSK_HRR_SENT (1<<3)
 #define HSK_HRR_RECEIVED (1<<4)
 #define HSK_CRT_REQ_SENT (1<<5)
+#define HSK_COMP_CRT_REQ_SENT (1<<6) /* whether certificate compression has been requested */
 #define HSK_KEY_UPDATE_ASKED (1<<7) /* flag is not used during handshake */
 #define HSK_FALSE_START_USED (1<<8) /* TLS1.2 only */
 #define HSK_HAVE_FFDHE (1<<9) /* whether the peer has advertized at least an FFDHE group */

@@ -26,7 +26,8 @@
 #include "num.h"
 #include <ext/compress_certificate.h>
 
-/* Check whether certificate compression method is valid, ie. supported by gnutls */
+/* Check whether certificate compression method is valid, ie. supported by gnutls
+ */
 static inline int
 is_valid_method(gnutls_compression_method_t method)
 {
@@ -48,7 +49,8 @@ is_valid_method(gnutls_compression_method_t method)
 	}
 }
 
-/* Converts compression algorithm number established in RFC8879 to internal compression method type */
+/* Converts compression algorithm number established in RFC8879 to internal compression method type
+ */
 gnutls_compression_method_t 
 _gnutls_compress_certificate_num2method(uint16_t num)
 {
@@ -64,7 +66,8 @@ _gnutls_compress_certificate_num2method(uint16_t num)
 	 }
 }
 
-/* Converts compression method type to compression algorithm number established in RFC8879 */
+/* Converts compression method type to compression algorithm number established in RFC8879
+ */
 int 
 _gnutls_compress_certificate_method2num(gnutls_compression_method_t method)
 {
@@ -78,6 +81,30 @@ _gnutls_compress_certificate_method2num(gnutls_compression_method_t method)
 	default:
 		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 	}
+}
+
+/* Returns 1 if the method is set as supported compression method for the session,
+ * returns 0 otherwise
+ */
+bool
+_gnutls_compress_certificate_is_method_enabled(gnutls_session_t session,
+					       gnutls_compression_method_t method)
+{
+	int ret;
+	unsigned i;
+	compress_certificate_ext_st *priv;
+	gnutls_ext_priv_data_t epriv;
+
+	ret = _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_COMPRESS_CERTIFICATE, &epriv);
+	if (ret < 0)
+		return false;
+	priv = epriv;
+
+	for (i = 0; i < priv->methods_len; ++i)
+		if (priv->methods[i] == method)
+			return true;
+
+	return false;
 }
 
 /**
@@ -235,6 +262,8 @@ _gnutls_compress_certificate_send_params(gnutls_session_t session,
 	ret = _gnutls_buffer_append_data_prefix(data, 8, bytes, bytes_len);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
+
+	session->internals.hsk_flags |= HSK_COMP_CRT_REQ_SENT;
 
 	return bytes_len + 1;
 }
