@@ -1339,6 +1339,7 @@ static int _tls13_init_record_state(gnutls_cipher_algorithm_t algo,
 
 	state->aead_tag_size = gnutls_cipher_get_tag_size(algo);
 	state->is_aead = 1;
+	state->sequence_number = 0;
 
 	return 0;
 }

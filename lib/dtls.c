@@ -568,8 +568,10 @@ size_t gnutls_est_record_overhead_size(gnutls_protocol_t version,
 
 	if (v->transport == GNUTLS_STREAM)
 		total = TLS_RECORD_HEADER_SIZE;
-	else
+	else if (cipher == GNUTLS_CIPHER_NULL)
 		total = DTLS_RECORD_HEADER_SIZE;
+	else
+		total = DTLS13_RECORD_HEADER_SIZE;
 
 	total += _gnutls_record_overhead(v, c, m, 1);
 
@@ -613,14 +615,8 @@ static int record_overhead_rt(gnutls_session_t session)
  **/
 size_t gnutls_record_overhead_size(gnutls_session_t session)
 {
-	const version_entry_st *v = get_version(session);
 	int ret;
-	size_t total;
-
-	if (v->transport == GNUTLS_STREAM)
-		total = TLS_RECORD_HEADER_SIZE;
-	else
-		total = DTLS_RECORD_HEADER_SIZE;
+	size_t total = RECORD_HEADER_SIZE(session);
 
 	ret = record_overhead_rt(session);
 	if (ret >= 0)
@@ -649,12 +645,19 @@ unsigned int gnutls_dtls_get_data_mtu(gnutls_session_t session)
 
 	mtu -= RECORD_HEADER_SIZE(session);
 
-	if (session->internals.initial_negotiation_completed == 0)
-		return mtu;
-
 	ret = _gnutls_epoch_get(session, EPOCH_WRITE_CURRENT, &params);
 	if (ret < 0)
 		return mtu;
+
+	if (session->internals.initial_negotiation_completed == 0) {
+		if (session->security_parameters.pversion->tls13_sem)
+			return (mtu - params->write.aead_tag_size - 1); //Tag + content_type
+		return mtu;
+	}
+
+	if (session->security_parameters.pversion->tls13_sem &&
+	    params->cipher->id != GNUTLS_CIPHER_NULL)
+		mtu -= params->write.aead_tag_size + 1; //Tag + content_type
 
 	if (params->cipher->type == CIPHER_AEAD ||
 	    params->cipher->type == CIPHER_STREAM)

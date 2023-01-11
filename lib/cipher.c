@@ -60,8 +60,9 @@ static int decrypt_packet_tls13(gnutls_session_t session,
 				record_parameters_st *params,
 				uint64_t sequence, uint8_t dtls13_header);
 
-static int encrypt_packet_tls13(gnutls_session_t session, uint8_t *cipher_data,
-				size_t cipher_size, gnutls_datum_t *plain,
+static int encrypt_packet_tls13(gnutls_session_t session,
+				mbuffer_st *bufel,
+				gnutls_datum_t *plain,
 				size_t pad_size, uint8_t type,
 				record_parameters_st *params);
 
@@ -87,10 +88,8 @@ int _gnutls_encrypt(gnutls_session_t session, const uint8_t *data,
 	if (vers && vers->tls13_sem) {
 		/* it fills the header, as it is included in the authenticated
 		 * data of the AEAD cipher. */
-		ret = encrypt_packet_tls13(session,
-					   _mbuffer_get_udata_ptr(bufel),
-					   _mbuffer_get_udata_size(bufel),
-					   &plaintext, min_pad, type, params);
+		ret = encrypt_packet_tls13(session, bufel, &plaintext,
+					   min_pad, type, params);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 	} else {
@@ -393,12 +392,15 @@ static int encrypt_packet(gnutls_session_t session, uint8_t *cipher_data,
 	return length;
 }
 
-static int encrypt_packet_tls13(gnutls_session_t session, uint8_t *cipher_data,
-				size_t cipher_size, gnutls_datum_t *plain,
+static int encrypt_packet_tls13(gnutls_session_t session,
+				mbuffer_st *bufel,
+				gnutls_datum_t *plain,
 				size_t pad_size, uint8_t type,
 				record_parameters_st *params)
 {
 	int ret;
+	uint8_t *cipher_data = _mbuffer_get_udata_ptr(bufel);
+	size_t cipher_size = _mbuffer_get_udata_size(bufel);
 	unsigned int tag_size = params->write.aead_tag_size;
 	const version_entry_st *ver = get_version(session);
 	uint8_t nonce[MAX_CIPHER_IV_SIZE];
@@ -448,10 +450,17 @@ static int encrypt_packet_tls13(gnutls_session_t session, uint8_t *cipher_data,
 	}
 
 	/* create authenticated data header */
-	aad[0] = GNUTLS_APPLICATION_DATA;
-	aad[1] = 0x03;
-	aad[2] = 0x03;
-	_gnutls_write_uint16(total + tag_size, &aad[3]);
+	if (session->internals.transport == GNUTLS_STREAM) {
+		aad[0] = GNUTLS_APPLICATION_DATA;
+		aad[1] = 0x03;
+		aad[2] = 0x03;
+		_gnutls_write_uint16(total+tag_size, &aad[3]);
+	} else {
+		/* DTLS1.3 uses header as as (AE)AD */
+		uint8_t *header = _mbuffer_get_uhead_ptr(bufel);
+		_gnutls_write_uint16(total+tag_size, &header[3]); // Set length
+		memcpy(aad, header, 5);
+	}
 
 	auth_iov[0].iov_base = aad;
 	auth_iov[0].iov_len = sizeof(aad);

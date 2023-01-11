@@ -525,22 +525,29 @@ ssize_t _gnutls_send_tlen_int(gnutls_session_t session, content_type_t type,
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
 		headers = _mbuffer_get_uhead_ptr(bufel);
-		if (vers->tls13_sem &&
-		    record_params->cipher->id != GNUTLS_CIPHER_NULL)
-			headers[0] = GNUTLS_APPLICATION_DATA;
-		else
-			headers[0] = type;
+		if (vers->id == GNUTLS_DTLS1_3 &&
+		    record_params->cipher->id != GNUTLS_CIPHER_NULL) {
+			/* Currently constant will change for dynamic length and CID */
+			headers[0] = 0x2c | (record_params->epoch & 0x0003);
+			_gnutls_write_uint16(record_state->sequence_number, &headers[1]);
+			//size is determined in encrypt_packet_tls13()
+		} else {
+			if (vers->tls13_sem &&
+			    record_params->cipher->id != GNUTLS_CIPHER_NULL)
+				headers[0] = GNUTLS_APPLICATION_DATA;
+			else
+				headers[0] = type;
 
-		/* Use the default record version, if it is
-		 * set. */
-		ret = copy_record_version(session, htype, &headers[1]);
-		if (ret < 0)
-			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+			/* Use the default record version, if it is
+			 * set. */
+			ret = copy_record_version(session, htype, &headers[1]);
+			if (ret < 0)
+				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-		/* Adjust header length and add sequence for DTLS */
-		if (IS_DTLS(session))
-			_gnutls_write_uint64(record_state->sequence_number,
-					     &headers[3]);
+			/* Adjust header length and add sequence for DTLS */
+			if (IS_DTLS(session))
+				_gnutls_write_uint64(record_state->sequence_number, &headers[3]);
+		}
 
 		_gnutls_record_log(
 			"REC[%p]: Preparing Packet %s(%d) with length: %d and min pad: %d\n",

@@ -192,10 +192,17 @@ typedef enum record_send_state_t {
 #define DEFAULT_MAX_RECORD_SIZE 16384
 #define DEFAULT_MAX_EARLY_DATA_SIZE 16384
 #define TLS_RECORD_HEADER_SIZE 5
+#define DTLS13_RECORD_HEADER_SIZE 5 // Will be made dynamic
 #define DTLS_RECORD_HEADER_SIZE (TLS_RECORD_HEADER_SIZE + 8)
-#define RECORD_HEADER_SIZE(session) \
-	(IS_DTLS(session) ? DTLS_RECORD_HEADER_SIZE : TLS_RECORD_HEADER_SIZE)
-#define MAX_RECORD_HEADER_SIZE DTLS_RECORD_HEADER_SIZE
+#define DTLS_RESOLVE_RECORD_HEADER_SIZE(session)                                    \
+	((session->security_parameters.pversion->tls13_sem &&                       \
+	  session->security_parameters.epoch_write>1) ? DTLS13_RECORD_HEADER_SIZE : \
+							DTLS_RECORD_HEADER_SIZE)
+	
+#define RECORD_HEADER_SIZE(session)                                    \
+	(IS_DTLS(session) ? DTLS_RESOLVE_RECORD_HEADER_SIZE(session) : \
+			    TLS_RECORD_HEADER_SIZE)
+#define MAX_RECORD_HEADER_SIZE (TLS_RECORD_HEADER_SIZE + 8)
 
 #define MIN_RECORD_SIZE 512
 #define MIN_RECORD_SIZE_SMALL 64
