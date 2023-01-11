@@ -559,22 +559,25 @@ fedora-static-analyzers/build:
     - scan-build --status-bugs -o scan-build-lib make -j$BUILDJOBS -C src
   #TODO originally, after_script was set to "/bin/true".. is there a reason not to create the cache?
 
-fedora-static-analyzers/test:
-  extends:
-    - .test
-    - .fedora
-  dependencies:
-    - fedora-static-analyzers/build
-  needs:
-    - fedora-static-analyzers/build
-  cache:
-    paths:
-      - cache/cppcheck
-  script:
-    - mkdir -p cache/cppcheck
-    - cppcheck --cppcheck-build-dir=cache/cppcheck --force -q -Ilib/includes -Igl/ -Ilib/ -I. --error-exitcode=1 lib/ -i lib/unistring -i lib/minitasn1 -i lib/nettle/backport -i lib/nettle/ecc -j2 $CPPCHECK_OPTIONS
-    - cppcheck --cppcheck-build-dir=cache/cppcheck --force -q -Ilib/includes -Igl/ -Ilibdane/ -I. --error-exitcode=1 libdane/ -j2 $CPPCHECK_OPTIONS
-  timeout: 3h
+# FIXME: we disable this, as cppcheck currently hangs at the usage of
+# Gnulib's <intprops.h>: <https://trac.cppcheck.net/ticket/10192>.
+#
+# fedora-static-analyzers/test:
+#   extends:
+#     - .test
+#     - .fedora
+#   dependencies:
+#     - fedora-static-analyzers/build
+#   needs:
+#     - fedora-static-analyzers/build
+#   cache:
+#     paths:
+#       - cache/cppcheck
+#   script:
+#     - mkdir -p cache/cppcheck
+#     - cppcheck --cppcheck-build-dir=cache/cppcheck --force -q -Ilib/includes -Igl/ -Ilib/ -I. --error-exitcode=1 lib/ -i lib/unistring -i lib/minitasn1 -i lib/nettle/backport -i lib/nettle/ecc -j2 $CPPCHECK_OPTIONS
+#     - cppcheck --cppcheck-build-dir=cache/cppcheck --force -q -Ilib/includes -Igl/ -Ilibdane/ -I. --error-exitcode=1 libdane/ -j2 $CPPCHECK_OPTIONS
+#   timeout: 3h
 
 # TODO this does not work, so we keep using old job doc-dist.Fedora
 # Keeping it here until I figure it out.
