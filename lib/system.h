@@ -44,11 +44,7 @@ extern CertEnumCRLsInStoreFunc pCertEnumCRLsInStore;
 #include <sys/uio.h>		/* for writev */
 #endif
 
-#ifdef _POSIX_PATH_MAX
-# define GNUTLS_PATH_MAX _POSIX_PATH_MAX
-#else
-# define GNUTLS_PATH_MAX 256
-#endif
+#include "pathbuf.h"
 
 int system_errno(gnutls_transport_ptr_t);
 

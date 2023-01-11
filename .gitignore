@@ -414,6 +414,7 @@ tests/gnutls-strcodes
 tests/gnutls_ext_raw_parse
 tests/gnutls_ext_raw_parse_dtls
 tests/gnutls_hmac_fast
+tests/gnutls_ktls
 tests/gnutls_ocsp_resp_list_import2
 tests/gnutls_record_overhead
 tests/gnutls_session_set_id
@@ -452,6 +453,7 @@ tests/key-usage-rsa
 tests/keygen
 tests/keylog-env
 tests/keylog-func
+tests/ktls_keyupdate
 tests/libpkcs11mock1.la
 tests/libpkcs11mock2.la
 tests/libutils.la
@@ -545,6 +547,7 @@ tests/openpgp-keyring
 tests/openpgpself
 tests/openssl
 tests/parse_ca
+tests/pathbuf
 tests/pathlen/Makefile
 tests/pathlen/Makefile.in
 tests/pcert-list
@@ -625,6 +628,7 @@ tests/random-art
 tests/rawpk-api
 tests/record-pad
 tests/record-retvals
+tests/record-sendfile
 tests/record-sizes
 tests/record-sizes-range
 tests/record-timeouts
@@ -918,9 +922,6 @@ tests/x509sign-verify-rsa
 tests/x509sign-verify2
 tests/x509signself
 tests/xts-key-check
-tests/gnutls_ktls
-tests/record-sendfile
-tests/ktls_keyupdate
 *.tmp
 tmp-*
 *.trs

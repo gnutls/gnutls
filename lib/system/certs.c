@@ -217,31 +217,42 @@ int add_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flags,
 # if defined(ANDROID) || defined(__ANDROID__)
 #  define DEFAULT_TRUST_STORE_DIR "/system/etc/security/cacerts/"
 
+#  define DEFAULT_REVOCATION_DIR "/data/misc/keychain/cacerts-removed"
+
 static int load_revoked_certs(gnutls_x509_trust_list_t list, unsigned type)
 {
 	DIR *dirp;
 	struct dirent *d;
 	int ret;
 	int r = 0;
-	char path[GNUTLS_PATH_MAX];
+	struct gnutls_pathbuf_st pathbuf;
 
-	dirp = opendir("/data/misc/keychain/cacerts-removed/");
+	dirp = opendir(DEFAULT_REVOCATION_DIR);
 	if (dirp != NULL) {
-		do {
-			d = readdir(dirp);
-			if (d != NULL && d->d_type == DT_REG) {
-				snprintf(path, sizeof(path),
-					 "/data/misc/keychain/cacerts-removed/%s",
-					 d->d_name);
+		size_t base_len;
 
-				ret =
-				    gnutls_x509_trust_list_remove_trust_file
-				    (list, path, type);
-				if (ret >= 0)
-					r += ret;
-			}
+		ret = _gnutls_pathbuf_init(&pathbuf, DEFAULT_REVOCATION_DIR);
+		if (ret < 0) {
+			return 0;
 		}
-		while (d != NULL);
+
+		base_len = pathbuf.len;
+		while ((d = readdir(dirp)) != NULL) {
+		       if (d->d_type != DT_REG) {
+			       continue;
+		       }
+		       ret = _gnutls_pathbuf_append(&pathbuf, d->d_name);
+		       if (ret < 0) {
+			       continue;
+		       }
+		       ret = gnutls_x509_trust_list_remove_trust_file
+			       (list, pathbuf.ptr, type);
+		       if (ret >= 0) {
+			       r += ret;
+		       }
+		       (void)_gnutls_pathbuf_truncate(&pathbuf, base_len);
+		}
+		_gnutls_pathbuf_deinit(&pathbuf);
 		closedir(dirp);
 	}
 
