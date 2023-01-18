@@ -617,10 +617,15 @@ fedora-abicoverage/test:
     - make abi-check
     - make pic-check
     - make -j$CHECKJOBS check
-    - make local-code-coverage-output || true
+    - gcovr --xml-pretty --exclude-unreachable-branches --print-summary -o coverage.xml --root ${CI_PROJECT_DIR}
     - if objdump -R lib/.libs/libgnutls.so | grep INTERNAL ; then false ; fi
+  coverage: /^\s*lines:\s*\d+.\d+\%/
   artifacts:
     expire_in: 1 week
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
     when: on_failure
     paths:
       - ./*.xml
