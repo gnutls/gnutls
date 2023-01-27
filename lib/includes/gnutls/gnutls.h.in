@@ -2428,7 +2428,9 @@ int gnutls_dh_params_cpy(gnutls_dh_params_t dst, gnutls_dh_params_t src);
 
 /* Session stuff
  */
+/* *INDENT-OFF* */
 @DEFINE_IOVEC_T@
+/* *INDENT-ON* */
 
 typedef ssize_t(*gnutls_pull_func) (gnutls_transport_ptr_t, void *,
 				    size_t);

@@ -37,16 +37,17 @@
  * If this operation fails with GNUTLS_E_INTERNAL_ERROR, KTLS is disabled
  * because KTLS most likely doesn't support key update.
  */
-#define SET_KTLS_KEYS(session, interface)\
-{\
-if(_gnutls_ktls_set_keys(session, interface) < 0) {\
-		session->internals.ktls_enabled = 0;\
-		session->internals.invalid_connection = true;\
-		session->internals.resumable = false;\
-		_gnutls_audit_log(session,\
-			"invalidating session: KTLS - couldn't update keys\n");\
-		ret = GNUTLS_E_INTERNAL_ERROR;\
-}\
+static inline int set_ktls_keys(gnutls_session_t session,
+				 gnutls_transport_ktls_enable_flags_t iface)
+{
+	if (_gnutls_ktls_set_keys(session, iface) < 0) {
+		session->internals.ktls_enabled = 0;
+		session->internals.invalid_connection = true;
+		session->internals.resumable = false;
+		_gnutls_audit_log(session, "invalidating session: KTLS - couldn't update keys\n");
+		return GNUTLS_E_INTERNAL_ERROR;
+	}
+	return 0;
 }
 
 static int update_keys(gnutls_session_t session, hs_stage_t stage)
@@ -71,16 +72,16 @@ static int update_keys(gnutls_session_t session, hs_stage_t stage)
 			return gnutls_assert_val(ret);
 
 		if (IS_KTLS_ENABLED(session, GNUTLS_KTLS_SEND))
-			SET_KTLS_KEYS(session,  GNUTLS_KTLS_SEND)
+			ret = set_ktls_keys(session,  GNUTLS_KTLS_SEND);
 	} else {
 		ret = _tls13_connection_state_init(session, stage);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
 		if (IS_KTLS_ENABLED(session, GNUTLS_KTLS_SEND) && stage == STAGE_UPD_OURS)
-			SET_KTLS_KEYS(session, GNUTLS_KTLS_SEND)
+			ret = set_ktls_keys(session, GNUTLS_KTLS_SEND);
 		else if (IS_KTLS_ENABLED(session, GNUTLS_KTLS_RECV) && stage == STAGE_UPD_PEERS)
-			SET_KTLS_KEYS(session, GNUTLS_KTLS_RECV)
+			ret = set_ktls_keys(session, GNUTLS_KTLS_RECV);
 	}
 	if (ret < 0)
 		return gnutls_assert_val(ret);

@@ -434,13 +434,6 @@ decode_dsa_key(const gnutls_datum_t * raw_key, gnutls_x509_privkey_t pkey)
 
 #define MAX_PEM_HEADER_SIZE 25
 
-#define IF_CHECK_FOR(pemstr, _algo, cptr, bptr, size, key) \
-		if (left > sizeof(pemstr) && memcmp(cptr, pemstr, sizeof(pemstr)-1) == 0) { \
-			result = _gnutls_fbase64_decode(pemstr, bptr, size, &_data); \
-			if (result >= 0) \
-				key->params.algo = _algo; \
-		}
-
 /**
  * gnutls_x509_privkey_import:
  * @key: The data to store the parsed key
@@ -505,9 +498,19 @@ gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
 
 				ptr += sizeof("-----BEGIN ")-1;
 
-				IF_CHECK_FOR(PEM_KEY_RSA, GNUTLS_PK_RSA, ptr, begin_ptr, left, key)
-				else IF_CHECK_FOR(PEM_KEY_ECC, GNUTLS_PK_EC, ptr, begin_ptr, left, key)
-				else IF_CHECK_FOR(PEM_KEY_DSA, GNUTLS_PK_DSA, ptr, begin_ptr, left, key)
+				if (left > sizeof(PEM_KEY_RSA) && memcmp(ptr, PEM_KEY_RSA, sizeof(PEM_KEY_RSA)-1) == 0) {
+					result = _gnutls_fbase64_decode(PEM_KEY_RSA, begin_ptr, left, &_data);
+					if (result >= 0)
+						key->params.algo = GNUTLS_PK_RSA;
+				} else if (left > sizeof(PEM_KEY_ECC) && memcmp(ptr, PEM_KEY_ECC, sizeof(PEM_KEY_ECC)-1) == 0) {
+					result = _gnutls_fbase64_decode(PEM_KEY_ECC, begin_ptr, left, &_data);
+					if (result >= 0)
+						key->params.algo = GNUTLS_PK_EC;
+				} else if (left > sizeof(PEM_KEY_DSA) && memcmp(ptr, PEM_KEY_DSA, sizeof(PEM_KEY_DSA)-1) == 0) {
+					result = _gnutls_fbase64_decode(PEM_KEY_DSA, begin_ptr, left, &_data);
+					if (result >= 0)
+						key->params.algo = GNUTLS_PK_DSA;
+				}
 
 				if (key->params.algo == GNUTLS_PK_UNKNOWN && left >= sizeof(PEM_KEY_PKCS8)) {
 					if (memcmp(ptr, PEM_KEY_PKCS8, sizeof(PEM_KEY_PKCS8)-1) == 0) {
