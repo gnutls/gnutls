@@ -107,7 +107,7 @@
 
 // {{{ types
 
-#define log(fmt, ...) \
+# define log(fmt, ...) \
 	if (debug) fprintf(stdout, "%i %s| "fmt, run_id, role_name, ##__VA_ARGS__)
 
 typedef struct {
@@ -121,10 +121,10 @@ typedef struct {
 	int count;
 } filter_permute_state_t;
 
-typedef void (*filter_fn) (gnutls_transport_ptr_t, const unsigned char *,
-			   size_t);
+typedef void (*filter_fn)(gnutls_transport_ptr_t, const unsigned char *,
+			  size_t);
 
-typedef int (*match_fn) (const unsigned char *, size_t);
+typedef int (*match_fn)(const unsigned char *, size_t);
 
 enum role { SERVER, CLIENT };
 
@@ -144,7 +144,7 @@ static int permutations3[6][3]
 static const char *permutation_names3[]
 = { "012", "021", "102", "120", "201", "210", 0 };
 
-static int permutations5[120][5] = { 
+static int permutations5[120][5] = {
 	{0, 1, 2, 3, 4}, {0, 2, 1, 3, 4}, {1, 0, 2, 3, 4}, {1, 2, 0, 3, 4},
 	{2, 0, 1, 3, 4}, {2, 1, 0, 3, 4}, {0, 1, 3, 2, 4}, {0, 2, 3, 1, 4},
 	{1, 0, 3, 2, 4}, {1, 2, 3, 0, 4}, {2, 0, 3, 1, 4}, {2, 1, 3, 0, 4},
@@ -232,7 +232,7 @@ static const char *filter_names_full[12]
 	"SFinished"
 };
 
-#include "cert-common.h"
+# include "cert-common.h"
 
 // }}}
 
@@ -240,7 +240,7 @@ static const char *filter_names_full[12]
 
 enum role role;
 
-#define role_name (role == SERVER ? "server" : "client")
+# define role_name (role == SERVER ? "server" : "client")
 
 int debug;
 int nonblock;
@@ -293,8 +293,8 @@ static int _process_error(int loc, int code, int die)
 	return code;
 }
 
-#define die_on_error(code) _process_error(__LINE__, code, 1)
-#define process_error(code) _process_error(__LINE__, code, 0)
+# define die_on_error(code) _process_error(__LINE__, code, 1)
+# define process_error(code) _process_error(__LINE__, code, 0)
 
 static void _process_error_or_timeout(int loc, int err, time_t tdiff)
 {
@@ -308,7 +308,7 @@ static void _process_error_or_timeout(int loc, int err, time_t tdiff)
 	}
 }
 
-#define process_error_or_timeout(code, tdiff) _process_error_or_timeout(__LINE__, code, tdiff)
+# define process_error_or_timeout(code, tdiff) _process_error_or_timeout(__LINE__, code, tdiff)
 
 static void rperror(const char *name)
 {
@@ -532,8 +532,8 @@ static int match_ServerFinished(const unsigned char *buffer, size_t len)
 
 // {{{ packet drop filters
 
-#define FILTER_DROP_COUNT 3
-#define DECLARE_FILTER(packet) \
+# define FILTER_DROP_COUNT 3
+# define DECLARE_FILTER(packet) \
 	static void filter_packet_##packet(gnutls_transport_ptr_t fd, \
 			const unsigned char* buffer, size_t len) \
 	{ \
@@ -567,7 +567,8 @@ static void filter_permute_state_run(filter_permute_state_t * state,
 	int packet = state->order[state->count];
 
 	if (debug > 2)
-		log("running permutation for %s/%d/%d\n", state->name, packetCount, state->count);
+		log("running permutation for %s/%d/%d\n", state->name,
+		    packetCount, state->count);
 
 	data = malloc(len);
 	assert(data);
@@ -586,7 +587,7 @@ static void filter_permute_state_run(filter_permute_state_t * state,
 	}
 }
 
-#define DECLARE_PERMUTE(flight) \
+# define DECLARE_PERMUTE(flight) \
 	static void filter_permute_##flight(gnutls_transport_ptr_t fd, \
 			const unsigned char* buffer, size_t len) \
 	{ \
@@ -689,10 +690,10 @@ static void await(int fd, int timeout)
 
 static void cred_init(void)
 {
-	assert(gnutls_certificate_allocate_credentials(&cred)>=0);
+	assert(gnutls_certificate_allocate_credentials(&cred) >= 0);
 
 	gnutls_certificate_set_x509_key_mem(cred, &cli_ca3_cert, &cli_ca3_key,
-					       GNUTLS_X509_FMT_PEM);
+					    GNUTLS_X509_FMT_PEM);
 }
 
 static void session_init(int sock, int server)
@@ -700,9 +701,7 @@ static void session_init(int sock, int server)
 	gnutls_init(&session,
 		    GNUTLS_DATAGRAM | (server ? GNUTLS_SERVER : GNUTLS_CLIENT)
 		    | GNUTLS_NONBLOCK * nonblock);
-	gnutls_priority_set_direct(session,
-				   "NORMAL:+ECDHE-RSA:+ANON-ECDH",
-				   0);
+	gnutls_priority_set_direct(session, "NORMAL:+ECDHE-RSA:+ANON-ECDH", 0);
 	gnutls_transport_set_int(session, sock);
 
 	if (full) {
@@ -713,11 +712,11 @@ static void session_init(int sock, int server)
 		}
 	} else if (server) {
 		gnutls_anon_server_credentials_t acred;
-		assert(gnutls_anon_allocate_server_credentials(&acred)>=0);
+		assert(gnutls_anon_allocate_server_credentials(&acred) >= 0);
 		gnutls_credentials_set(session, GNUTLS_CRD_ANON, acred);
 	} else {
 		gnutls_anon_client_credentials_t acred;
-		assert(gnutls_anon_allocate_client_credentials(&acred)>=0);
+		assert(gnutls_anon_allocate_client_credentials(&acred) >= 0);
 		gnutls_credentials_set(session, GNUTLS_CRD_ANON, acred);
 	}
 
@@ -733,7 +732,7 @@ static void client(int sock)
 	const char *line = "foobar!";
 	char buffer[8192];
 	int len, ret;
-	gnutls_datum_t data = {NULL, 0};
+	gnutls_datum_t data = { NULL, 0 };
 
 	session_init(sock, 0);
 
@@ -761,7 +760,8 @@ static void client(int sock)
 		data.data = NULL;
 
 		if (debug) {
-			fprintf(stdout, "%i %s| initial handshake complete\n", run_id, role_name);
+			fprintf(stdout, "%i %s| initial handshake complete\n",
+				run_id, role_name);
 		}
 	}
 
@@ -778,7 +778,8 @@ static void client(int sock)
 	process_error_or_timeout(err, time(0) - started);
 
 	if (debug) {
-		fprintf(stdout, "%i %s| handshake complete\n", run_id, role_name);
+		fprintf(stdout, "%i %s| handshake complete\n", run_id,
+			role_name);
 	}
 
 	if (resume) {
@@ -808,7 +809,7 @@ static void client(int sock)
 			await(sock, -1);
 			len =
 			    process_error(gnutls_record_recv
-				  (session, buffer, sizeof(buffer)));
+					  (session, buffer, sizeof(buffer)));
 		} while (len < 0);
 
 		log("received data\n");
@@ -822,11 +823,11 @@ static void client(int sock)
 
 }
 
-static gnutls_datum_t saved_data = {NULL, 0};
+static gnutls_datum_t saved_data = { NULL, 0 };
 
 static gnutls_datum_t db_fetch(void *dbf, gnutls_datum_t key)
 {
-	gnutls_datum_t t = {NULL, 0};
+	gnutls_datum_t t = { NULL, 0 };
 	t.data = malloc(saved_data.size);
 	if (t.data == NULL)
 		return t;
@@ -888,7 +889,8 @@ static void server(int sock)
 		gnutls_db_set_ptr(session, NULL);
 
 		if (debug) {
-			fprintf(stdout, "%i %s| initial handshake complete\n", run_id, role_name);
+			fprintf(stdout, "%i %s| initial handshake complete\n",
+				run_id, role_name);
 		}
 	}
 
@@ -923,7 +925,7 @@ static void server(int sock)
 			await(sock, -1);
 			len =
 			    process_error(gnutls_record_recv
-				  (session, buffer, sizeof(buffer)));
+					  (session, buffer, sizeof(buffer)));
 		} while (len < 0);
 
 		log("received data\n");
@@ -957,7 +959,7 @@ static void server(int sock)
 
 // {{{ test running/handling itself
 
-#if 0
+# if 0
 static void udp_sockpair(int *socks)
 {
 	struct sockaddr_in6 sa =
@@ -974,7 +976,7 @@ static void udp_sockpair(int *socks)
 	connect(socks[1], (struct sockaddr *)&sa, sizeof(sa));
 	connect(socks[0], (struct sockaddr *)&sb, sizeof(sb));
 }
-#endif
+# endif
 
 static int run_test(void)
 {
@@ -1014,7 +1016,7 @@ static int run_test(void)
 	close(fds[1]);
 
 	if (!WIFSIGNALED(status2) && WEXITSTATUS(status2) != 3) {
-		return ! !WEXITSTATUS(status2);
+		return !!WEXITSTATUS(status2);
 	} else {
 		return 3;
 	}
@@ -1069,21 +1071,22 @@ static int run_one_test(int dropMode, int serverFinishedPermute,
 	if (full) {
 		local_filters = filters_full;
 		local_filter_names = filter_names_full;
-		filter_count = sizeof(filters_full)/sizeof(filters_full[0]);
+		filter_count = sizeof(filters_full) / sizeof(filters_full[0]);
 		client_finished_permutation_names = permutation_names5;
 		server_finished_permutation_names = permutation_names2;
 		server_hello_permutation_names = permutation_names5;
 	} else if (resume) {
 		local_filters = filters_resume;
 		local_filter_names = filter_names_resume;
-		filter_count = sizeof(filters_resume)/sizeof(filters_resume[0]);
+		filter_count =
+		    sizeof(filters_resume) / sizeof(filters_resume[0]);
 		client_finished_permutation_names = permutation_names2;
 		server_finished_permutation_names = permutation_names3;
 		server_hello_permutation_names = NULL;
 	} else {
 		local_filters = filters;
 		local_filter_names = filter_names;
-		filter_count = sizeof(filters)/sizeof(filters[0]);
+		filter_count = sizeof(filters) / sizeof(filters[0]);
 		client_finished_permutation_names = permutation_names3;
 		server_finished_permutation_names = permutation_names2;
 		server_hello_permutation_names = permutation_names3;
@@ -1157,7 +1160,8 @@ static int run_one_test(int dropMode, int serverFinishedPermute,
 	}
 
 	if (!resume)
-		fprintf(stdout, "SHello(%s), ", server_hello_permutation_names[serverHelloPermute]);
+		fprintf(stdout, "SHello(%s), ",
+			server_hello_permutation_names[serverHelloPermute]);
 	fprintf(stdout, "SFinished(%s), ",
 		server_finished_permutation_names[serverFinishedPermute]);
 	fprintf(stdout, "CFinished(%s) :- ",
@@ -1362,14 +1366,14 @@ int main(int argc, const char *argv[])
 	run_to_end = 1;
 	job_limit = 1;
 
-#define NEXT_ARG(name) \
+# define NEXT_ARG(name) \
 	do { \
 		if (++arg >= argc) { \
 			fprintf(stderr, "No argument for -" #name "\n"); \
 			exit(8); \
 		} \
 	} while (0);
-#define FAIL_ARG(name) \
+# define FAIL_ARG(name) \
 	do { \
 		fprintf(stderr, "Invalid argument for -" #name "\n"); \
 		exit(8); \
@@ -1384,7 +1388,7 @@ int main(int argc, const char *argv[])
 			char *end;
 			int level;
 
-			if (arg+1 < argc) {
+			if (arg + 1 < argc) {
 				level = strtol(argv[arg + 1], &end, 10);
 				if (*end == '\0') {
 					debug = level;
@@ -1433,21 +1437,24 @@ int main(int argc, const char *argv[])
 			}
 		} else if (strcmp("-full", argv[arg]) == 0) {
 			if (resume) {
-				fprintf(stderr, "You cannot combine full with resume\n");
+				fprintf(stderr,
+					"You cannot combine full with resume\n");
 				exit(1);
 			}
 
 			full = 1;
 		} else if (strcmp("-resume", argv[arg]) == 0) {
 			if (full) {
-				fprintf(stderr, "You cannot combine full with resume\n");
+				fprintf(stderr,
+					"You cannot combine full with resume\n");
 				exit(1);
 			}
 
 			resume = 1;
 		} else if (strcmp("-shello", argv[arg]) == 0) {
 			if (resume) {
-				fprintf(stderr, "Please use -sfinished instead of -shello\n");
+				fprintf(stderr,
+					"Please use -sfinished instead of -shello\n");
 				exit(1);
 			}
 
@@ -1462,23 +1469,26 @@ int main(int argc, const char *argv[])
 		} else if (strcmp("-sfinished", argv[arg]) == 0) {
 			const char **pname;
 			NEXT_ARG(cfinished);
-			if (resume) pname = permutation_names3;
-			else pname = permutation_names2;
+			if (resume)
+				pname = permutation_names3;
+			else
+				pname = permutation_names2;
 			if (!parse_permutation
-			    (argv[arg], pname,
-			     &serverFinishedPermute)) {
+			    (argv[arg], pname, &serverFinishedPermute)) {
 				FAIL_ARG(cfinished);
 			}
 			single++;
 		} else if (strcmp("-cfinished", argv[arg]) == 0) {
 			const char **pname;
 			NEXT_ARG(cfinished);
-			if (full) pname = permutation_names5;
-			else if (resume) pname = permutation_names2;
-			else pname = permutation_names3;
+			if (full)
+				pname = permutation_names5;
+			else if (resume)
+				pname = permutation_names2;
+			else
+				pname = permutation_names3;
 			if (!parse_permutation
-			    (argv[arg], pname,
-			     &clientFinishedPermute)) {
+			    (argv[arg], pname, &clientFinishedPermute)) {
 				FAIL_ARG(cfinished);
 			}
 			single++;
@@ -1489,13 +1499,18 @@ int main(int argc, const char *argv[])
 
 			if (full) {
 				local_filter_names = filter_names_full;
-				filter_count = sizeof(filters_full)/sizeof(filters_full[0]);
+				filter_count =
+				    sizeof(filters_full) /
+				    sizeof(filters_full[0]);
 			} else if (resume) {
 				local_filter_names = filter_names_resume;
-				filter_count = sizeof(filters_resume)/sizeof(filters_resume[0]);
+				filter_count =
+				    sizeof(filters_resume) /
+				    sizeof(filters_resume[0]);
 			} else {
 				local_filter_names = filter_names;
-				filter_count = sizeof(filters)/sizeof(filters[0]);
+				filter_count =
+				    sizeof(filters) / sizeof(filters[0]);
 			}
 
 			for (drop = 0; drop < filter_count; drop++) {
@@ -1532,7 +1547,8 @@ int main(int argc, const char *argv[])
 			fprintf(stderr, "multi test mode\n");
 
 		if (resume) {
-			fprintf(stderr, "full run not implemented yet for resumed runs\n");
+			fprintf(stderr,
+				"full run not implemented yet for resumed runs\n");
 			exit(5);
 		}
 

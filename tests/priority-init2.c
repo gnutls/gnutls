@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -82,32 +82,35 @@ static void start(struct test_st *test)
 	if (debug)
 		gnutls_global_set_log_level(6);
 
-	assert(gnutls_certificate_allocate_credentials(&serverx509cred)>=0);
+	assert(gnutls_certificate_allocate_credentials(&serverx509cred) >= 0);
 	assert(gnutls_certificate_set_x509_key_mem(serverx509cred,
-					    &server_cert, &server_key,
-					    GNUTLS_X509_FMT_PEM)>=0);
+						   &server_cert, &server_key,
+						   GNUTLS_X509_FMT_PEM) >= 0);
 
 	assert(gnutls_init(&server, GNUTLS_SERVER) >= 0);
-	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-				serverx509cred);
+	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, serverx509cred);
 	if (test == NULL) {
 		ret = gnutls_priority_init(&cache, NULL, NULL);
 		if (ret < 0)
 			fail("error: %s\n", gnutls_strerror(ret));
 	} else {
-		ret = gnutls_priority_init2(&cache, test->add_prio, &ep, GNUTLS_PRIORITY_INIT_DEF_APPEND);
+		ret =
+		    gnutls_priority_init2(&cache, test->add_prio, &ep,
+					  GNUTLS_PRIORITY_INIT_DEF_APPEND);
 		if (ret < 0) {
 			if (test->exp_err == ret) {
-				if (strchr(_gnutls_default_priority_string, '@') != 0) {
+				if (strchr(_gnutls_default_priority_string, '@')
+				    != 0) {
 					if (ep != test->add_prio) {
-						fail("error expected error on start of string[%d]: %s\n",
-							test->err_pos, test->add_prio);
+						fail("error expected error on start of string[%d]: %s\n", test->err_pos, test->add_prio);
 					}
 				} else {
-					if (ep-test->add_prio != test->err_pos) {
-						fprintf(stderr, "diff: %d\n", (int)(ep-test->add_prio));
-						fail("error expected error on different position[%d]: %s\n",
-							test->err_pos, test->add_prio);
+					if (ep - test->add_prio !=
+					    test->err_pos) {
+						fprintf(stderr, "diff: %d\n",
+							(int)(ep -
+							      test->add_prio));
+						fail("error expected error on different position[%d]: %s\n", test->err_pos, test->add_prio);
 					}
 				}
 				goto cleanup;
@@ -126,7 +129,9 @@ static void start(struct test_st *test)
 	if (ret < 0)
 		exit(1);
 
-	ret = gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca_cert, GNUTLS_X509_FMT_PEM);
+	ret =
+	    gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca_cert,
+						  GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);
 
@@ -135,7 +140,7 @@ static void start(struct test_st *test)
 		exit(1);
 
 	ret = gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-				clientx509cred);
+				     clientx509cred);
 	if (ret < 0)
 		exit(1);
 
@@ -164,7 +169,8 @@ static void start(struct test_st *test)
 		if (test->exp_vers != gnutls_protocol_get_version(server)) {
 			fail("expected version %s, got %s\n",
 			     gnutls_protocol_get_name(test->exp_vers),
-			     gnutls_protocol_get_name(gnutls_protocol_get_version(server)));
+			     gnutls_protocol_get_name
+			     (gnutls_protocol_get_version(server)));
 		}
 	}
 
@@ -177,20 +183,22 @@ static void start(struct test_st *test)
 		memset(data, 0, sizeof(data));
 
 		data[0].type = GNUTLS_DT_DNS_HOSTNAME;
-		data[0].data = (void*)"localhost1";
+		data[0].data = (void *)"localhost1";
 
 		data[1].type = GNUTLS_DT_KEY_PURPOSE_OID;
-		data[1].data = (void*)GNUTLS_KP_TLS_WWW_SERVER;
+		data[1].data = (void *)GNUTLS_KP_TLS_WWW_SERVER;
 
 		gnutls_certificate_get_peers(client, &cert_list_size);
 		if (cert_list_size < 2) {
-			fprintf(stderr, "received a certificate list of %d!\n", cert_list_size);
+			fprintf(stderr, "received a certificate list of %d!\n",
+				cert_list_size);
 			exit(1);
 		}
 
 		ret = gnutls_certificate_verify_peers(client, data, 2, &status);
 		if (ret < 0) {
-			fprintf(stderr, "could not verify certificate: %s\n", gnutls_strerror(ret));
+			fprintf(stderr, "could not verify certificate: %s\n",
+				gnutls_strerror(ret));
 			exit(1);
 		}
 
@@ -200,16 +208,18 @@ static void start(struct test_st *test)
 		}
 
 		data[0].type = GNUTLS_DT_DNS_HOSTNAME;
-		data[0].data = (void*)"localhost";
+		data[0].data = (void *)"localhost";
 
 		ret = gnutls_certificate_verify_peers(client, data, 2, &status);
 		if (ret < 0) {
-			fprintf(stderr, "could not verify certificate: %s\n", gnutls_strerror(ret));
+			fprintf(stderr, "could not verify certificate: %s\n",
+				gnutls_strerror(ret));
 			exit(1);
 		}
 
 		if (status != 0) {
-			fprintf(stderr, "could not verify certificate: %.4x\n", status);
+			fprintf(stderr, "could not verify certificate: %.4x\n",
+				status);
 			exit(1);
 		}
 	}
@@ -217,13 +227,17 @@ static void start(struct test_st *test)
 	if (test && test->exp_etm) {
 		ret = gnutls_session_ext_master_secret_status(client);
 		if (ret != 1) {
-			fprintf(stderr, "Extended master secret wasn't negotiated by default (client ret: %d)\n", ret);
+			fprintf(stderr,
+				"Extended master secret wasn't negotiated by default (client ret: %d)\n",
+				ret);
 			exit(1);
 		}
 
 		ret = gnutls_session_ext_master_secret_status(server);
 		if (ret != 1) {
-			fprintf(stderr, "Extended master secret wasn't negotiated by default (server ret: %d)\n", ret);
+			fprintf(stderr,
+				"Extended master secret wasn't negotiated by default (server ret: %d)\n",
+				ret);
 			exit(1);
 		}
 	}
@@ -245,54 +259,47 @@ static void start(struct test_st *test)
 
 struct test_st tests[] = {
 	{
-		.name = "additional flag",
-		.def_prio = "NORMAL",
-		.add_prio = "%FORCE_ETM",
-		.exp_err = 0
-	},
+	 .name = "additional flag",
+	 .def_prio = "NORMAL",
+	 .add_prio = "%FORCE_ETM",
+	 .exp_err = 0},
 	{
-		.name = "additional flag typo1",
-		.def_prio = "NORMAL",
-		.add_prio = ":%FORCE_ETM",
-		.exp_err = GNUTLS_E_INVALID_REQUEST,
-		.err_pos = 0
-	},
+	 .name = "additional flag typo1",
+	 .def_prio = "NORMAL",
+	 .add_prio = ":%FORCE_ETM",
+	 .exp_err = GNUTLS_E_INVALID_REQUEST,
+	 .err_pos = 0},
 	{
-		.name = "additional flag typo2",
-		.def_prio = "NORMAL",
-		.add_prio = "%FORCE_ETM::%NO_TICKETS",
-		.exp_err = GNUTLS_E_INVALID_REQUEST,
-		.err_pos = 11
-	},
+	 .name = "additional flag typo2",
+	 .def_prio = "NORMAL",
+	 .add_prio = "%FORCE_ETM::%NO_TICKETS",
+	 .exp_err = GNUTLS_E_INVALID_REQUEST,
+	 .err_pos = 11},
 	{
-		.name = "additional flag typo3",
-		.def_prio = "NORMAL",
-		.add_prio = "%FORCE_ETM:%%NO_TICKETS",
-		.exp_err = GNUTLS_E_INVALID_REQUEST,
-		.err_pos = 11
-	},
+	 .name = "additional flag typo3",
+	 .def_prio = "NORMAL",
+	 .add_prio = "%FORCE_ETM:%%NO_TICKETS",
+	 .exp_err = GNUTLS_E_INVALID_REQUEST,
+	 .err_pos = 11},
 	{
-		.name = "additional flag typo3 (with resolved def prio)",
-		.def_prio = "@HELLO",
-		.add_prio = "%FORCE_ETM:%%NO_TICKETS",
-		.exp_err = GNUTLS_E_INVALID_REQUEST,
-		.err_pos = 0
-	},
+	 .name = "additional flag typo3 (with resolved def prio)",
+	 .def_prio = "@HELLO",
+	 .add_prio = "%FORCE_ETM:%%NO_TICKETS",
+	 .exp_err = GNUTLS_E_INVALID_REQUEST,
+	 .err_pos = 0},
 	{
-		.name = "additional flag for version (functional)",
-		.def_prio = "NORMAL",
-		.add_prio = "-VERS-ALL:+VERS-TLS1.1",
-		.exp_etm = 1,
-		.exp_err = 0,
-		.exp_vers = GNUTLS_TLS1_1
-	}
+	 .name = "additional flag for version (functional)",
+	 .def_prio = "NORMAL",
+	 .add_prio = "-VERS-ALL:+VERS-TLS1.1",
+	 .exp_etm = 1,
+	 .exp_err = 0,
+	 .exp_vers = GNUTLS_TLS1_1}
 };
-
 
 void doit(void)
 {
 	start(NULL);
-	for (unsigned i=0;i<sizeof(tests)/sizeof(tests[0]);i++) {
+	for (unsigned i = 0; i < sizeof(tests) / sizeof(tests[0]); i++) {
 		start(&tests[i]);
 	}
 }

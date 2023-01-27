@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -79,7 +79,10 @@ static void test_rehandshake(void **glob_state, unsigned appdata)
 				     serverx509cred);
 	assert_return_code(ret, 0);
 
-	ret = gnutls_priority_set_direct(server, "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.1:+VERS-TLS1.2", NULL);
+	ret =
+	    gnutls_priority_set_direct(server,
+				       "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.1:+VERS-TLS1.2",
+				       NULL);
 	assert_return_code(ret, 0);
 
 	gnutls_transport_set_push_function(server, server_push);
@@ -97,7 +100,10 @@ static void test_rehandshake(void **glob_state, unsigned appdata)
 				     clientx509cred);
 	assert_return_code(ret, 0);
 
-	ret = gnutls_priority_set_direct(client, "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.1:+VERS-TLS1.2", NULL);
+	ret =
+	    gnutls_priority_set_direct(client,
+				       "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.1:+VERS-TLS1.2",
+				       NULL);
 	assert_return_code(ret, 0);
 
 	gnutls_transport_set_push_function(client, client_push);
@@ -117,7 +123,7 @@ static void test_rehandshake(void **glob_state, unsigned appdata)
 
 		do {
 			n = gnutls_record_recv(client, b, 1);
-		} while(n == GNUTLS_E_AGAIN);
+		} while (n == GNUTLS_E_AGAIN);
 
 		assert_int_equal(n, GNUTLS_E_REHANDSHAKE);
 
@@ -133,14 +139,14 @@ static void test_rehandshake(void **glob_state, unsigned appdata)
 
 		do {
 			n = gnutls_record_recv(server, buffer, sizeof(buffer));
-		} while(n == GNUTLS_E_AGAIN);
+		} while (n == GNUTLS_E_AGAIN);
 
 		HANDSHAKE(client, server);
 	} else {
 		ssize_t n;
 		char b[1];
 
-		for (i=0;i<MAX_REHANDSHAKES;i++) {
+		for (i = 0; i < MAX_REHANDSHAKES; i++) {
 			sret = gnutls_rehandshake(server);
 
 			n = gnutls_record_recv(client, b, 1);

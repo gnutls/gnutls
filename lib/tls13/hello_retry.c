@@ -35,11 +35,12 @@ int _gnutls13_send_hello_retry_request(gnutls_session_t session, unsigned again)
 	mbuffer_st *bufel = NULL;
 	gnutls_buffer_st buf;
 	const version_entry_st *ver;
-	const uint8_t vbuf[2] = {0x03, 0x03};
+	const uint8_t vbuf[2] = { 0x03, 0x03 };
 
 	if (again == 0) {
 		ver = get_version(session);
-		if (unlikely(ver == NULL || session->security_parameters.cs == NULL))
+		if (unlikely
+		    (ver == NULL || session->security_parameters.cs == NULL))
 			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 		ret = _gnutls_buffer_init_handshake_mbuffer(&buf);
@@ -66,7 +67,10 @@ int _gnutls13_send_hello_retry_request(gnutls_session_t session, unsigned again)
 			goto cleanup;
 		}
 
-		ret = _gnutls_buffer_append_data(&buf, session->security_parameters.cs->id, 2);
+		ret =
+		    _gnutls_buffer_append_data(&buf,
+					       session->security_parameters.
+					       cs->id, 2);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -95,7 +99,8 @@ int _gnutls13_send_hello_retry_request(gnutls_session_t session, unsigned again)
 		bufel = _gnutls_buffer_to_mbuffer(&buf);
 	}
 
-	return _gnutls_send_handshake(session, bufel, GNUTLS_HANDSHAKE_HELLO_RETRY_REQUEST);
+	return _gnutls_send_handshake(session, bufel,
+				      GNUTLS_HANDSHAKE_HELLO_RETRY_REQUEST);
 
  cleanup:
 	_gnutls_buffer_clear(&buf);
@@ -104,7 +109,7 @@ int _gnutls13_send_hello_retry_request(gnutls_session_t session, unsigned again)
 
 int
 _gnutls13_recv_hello_retry_request(gnutls_session_t session,
-				   gnutls_buffer_st *buf)
+				   gnutls_buffer_st * buf)
 {
 	int ret;
 	uint8_t tmp[2];
@@ -151,7 +156,8 @@ _gnutls13_recv_hello_retry_request(gnutls_session_t session,
 	if (unlikely(cs == NULL))
 		return gnutls_assert_val(GNUTLS_E_UNKNOWN_CIPHER_SUITE);
 
-	_gnutls_handshake_log("EXT[%p]: Hello Retry Request with %s\n", session, cs->name);
+	_gnutls_handshake_log("EXT[%p]: Hello Retry Request with %s\n", session,
+			      cs->name);
 	memcpy(session->internals.hrr_cs, cs->id, 2);
 
 	prf = mac_to_entry(cs->prf);
@@ -184,8 +190,10 @@ _gnutls13_recv_hello_retry_request(gnutls_session_t session,
 		return gnutls_assert_val(ret);
 
 	/* parse the rest of extensions */
-	ret = _gnutls_parse_hello_extensions(session, GNUTLS_EXT_FLAG_HRR, GNUTLS_EXT_ANY,
-					     buf->data, buf->length);
+	ret =
+	    _gnutls_parse_hello_extensions(session, GNUTLS_EXT_FLAG_HRR,
+					   GNUTLS_EXT_ANY, buf->data,
+					   buf->length);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 

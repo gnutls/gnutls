@@ -34,8 +34,8 @@
 
 #ifdef ENABLE_OCSP
 
-#include <gnutls/ocsp.h>
-#include "x509/ocsp.h"
+# include <gnutls/ocsp.h>
+# include "x509/ocsp.h"
 
 /**
  * gnutls_ocsp_status_request_get:
@@ -83,20 +83,19 @@ gnutls_ocsp_status_request_get(gnutls_session_t session,
  **/
 int
 gnutls_ocsp_status_request_get2(gnutls_session_t session,
-			        unsigned idx,
-			        gnutls_datum_t * response)
+				unsigned idx, gnutls_datum_t * response)
 {
 	const version_entry_st *ver = get_version(session);
-	cert_auth_info_t info = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
+	cert_auth_info_t info =
+	    _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
 
-	if (!ver->tls13_sem && session->security_parameters.entity == GNUTLS_SERVER)
+	if (!ver->tls13_sem
+	    && session->security_parameters.entity == GNUTLS_SERVER)
 		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
 	if (info == NULL || info->raw_ocsp_list == NULL ||
 	    info->nocsp <= idx || info->raw_ocsp_list[idx].size == 0)
-		return
-		    gnutls_assert_val
-		    (GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
 	response->data = info->raw_ocsp_list[idx].data;
 	response->size = info->raw_ocsp_list[idx].size;
@@ -131,10 +130,9 @@ gnutls_ocsp_status_request_get2(gnutls_session_t session,
  * Since: 3.1.3
  **/
 void
-gnutls_certificate_set_ocsp_status_request_function
-(gnutls_certificate_credentials_t sc,
-gnutls_status_request_ocsp_func ocsp_func, void *ptr)
-{
+ gnutls_certificate_set_ocsp_status_request_function
+    (gnutls_certificate_credentials_t sc,
+     gnutls_status_request_ocsp_func ocsp_func, void *ptr) {
 
 	sc->glob_ocsp_func = ocsp_func;
 	sc->glob_ocsp_func_ptr = ptr;
@@ -176,9 +174,9 @@ gnutls_status_request_ocsp_func ocsp_func, void *ptr)
  * Since: 3.5.5
  **/
 int
-gnutls_certificate_set_ocsp_status_request_function2
-(gnutls_certificate_credentials_t sc, unsigned idx, gnutls_status_request_ocsp_func ocsp_func, void *ptr)
-{
+ gnutls_certificate_set_ocsp_status_request_function2
+    (gnutls_certificate_credentials_t sc, unsigned idx,
+     gnutls_status_request_ocsp_func ocsp_func, void *ptr) {
 	if (idx >= sc->ncerts)
 		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
@@ -189,7 +187,8 @@ gnutls_certificate_set_ocsp_status_request_function2
 }
 
 static
-unsigned resp_matches_pcert(gnutls_ocsp_resp_t resp, const gnutls_pcert_st *cert)
+unsigned resp_matches_pcert(gnutls_ocsp_resp_t resp,
+			    const gnutls_pcert_st * cert)
 {
 	gnutls_x509_crt_t crt;
 	int ret;
@@ -252,14 +251,16 @@ unsigned resp_matches_pcert(gnutls_ocsp_resp_t resp, const gnutls_pcert_st *cert
  * Since: 3.1.3
  **/
 int
-gnutls_certificate_set_ocsp_status_request_file(gnutls_certificate_credentials_t sc,
-						const char *response_file,
+gnutls_certificate_set_ocsp_status_request_file(gnutls_certificate_credentials_t
+						sc, const char *response_file,
 						unsigned idx)
 {
 	int ret;
 
-	ret = gnutls_certificate_set_ocsp_status_request_file2(sc, response_file,
-							       idx, GNUTLS_X509_FMT_DER);
+	ret =
+	    gnutls_certificate_set_ocsp_status_request_file2(sc, response_file,
+							     idx,
+							     GNUTLS_X509_FMT_DER);
 	if (ret >= 0)
 		return 0;
 	else
@@ -267,7 +268,7 @@ gnutls_certificate_set_ocsp_status_request_file(gnutls_certificate_credentials_t
 }
 
 static int append_response(gnutls_certificate_credentials_t sc, unsigned idx,
-			   gnutls_ocsp_resp_t resp, const gnutls_datum_t *der)
+			   gnutls_ocsp_resp_t resp, const gnutls_datum_t * der)
 {
 	int ret;
 	unsigned i, found = 0;
@@ -279,8 +280,11 @@ static int append_response(gnutls_certificate_credentials_t sc, unsigned idx,
 	/* iterate through all certificates in chain, and add the response
 	 * to the certificate that it matches with.
 	 */
-	for (i=0;i<MIN(sc->certs[idx].cert_list_length, MAX_OCSP_RESPONSES);i++) {
-		if (!try_already_set && sc->certs[idx].ocsp_data[i].response.data)
+	for (i = 0;
+	     i < MIN(sc->certs[idx].cert_list_length, MAX_OCSP_RESPONSES);
+	     i++) {
+		if (!try_already_set
+		    && sc->certs[idx].ocsp_data[i].response.data)
 			continue;
 
 		if (!resp_matches_pcert(resp, &sc->certs[idx].cert_list[i]))
@@ -288,11 +292,15 @@ static int append_response(gnutls_certificate_credentials_t sc, unsigned idx,
 
 		t = _gnutls_ocsp_get_validity(resp);
 		/* if already invalid */
-		if (t == (time_t)-1) {
-			_gnutls_debug_log("the OCSP response associated with chain %d on pos %d, is invalid/expired\n", idx, i);
+		if (t == (time_t) - 1) {
+			_gnutls_debug_log
+			    ("the OCSP response associated with chain %d on pos %d, is invalid/expired\n",
+			     idx, i);
 			return GNUTLS_E_EXPIRED;
-		} else if (t == (time_t)-2) {
-			_gnutls_debug_log("the OCSP response associated with chain %d on pos %d, is too old (ignoring)\n", idx, i);
+		} else if (t == (time_t) - 2) {
+			_gnutls_debug_log
+			    ("the OCSP response associated with chain %d on pos %d, is too old (ignoring)\n",
+			     idx, i);
 			return 0;
 		}
 
@@ -301,13 +309,14 @@ static int append_response(gnutls_certificate_credentials_t sc, unsigned idx,
 		else
 			sc->certs[idx].ocsp_data[i].exptime = 0;
 
-		_gnutls_debug_log("associating OCSP response with chain %d on pos %d\n", idx, i);
+		_gnutls_debug_log
+		    ("associating OCSP response with chain %d on pos %d\n", idx,
+		     i);
 
 		gnutls_free(sc->certs[idx].ocsp_data[i].response.data);
 
 		ret = _gnutls_set_datum(&sc->certs[idx].ocsp_data[i].response,
-					der->data,
-					der->size);
+					der->data, der->size);
 		if (ret < 0) {
 			gnutls_assert();
 			sc->certs[idx].ocsp_data[i].response.data = NULL;
@@ -316,7 +325,7 @@ static int append_response(gnutls_certificate_credentials_t sc, unsigned idx,
 		}
 
 		if (sc->certs[idx].ocsp_data_length <= i)
-			sc->certs[idx].ocsp_data_length = i+1;
+			sc->certs[idx].ocsp_data_length = i + 1;
 
 		found = 1;
 		break;
@@ -366,13 +375,10 @@ static int append_response(gnutls_certificate_credentials_t sc, unsigned idx,
  *
  * Since: 3.1.3
  **/
-int
-gnutls_certificate_set_ocsp_status_request_file2(gnutls_certificate_credentials_t sc,
-						const char *response_file,
-						unsigned idx,
-						gnutls_x509_crt_fmt_t fmt)
-{
-	gnutls_datum_t raw = {NULL, 0};
+int gnutls_certificate_set_ocsp_status_request_file2
+    (gnutls_certificate_credentials_t sc, const char *response_file,
+     unsigned idx, gnutls_x509_crt_fmt_t fmt) {
+	gnutls_datum_t raw = { NULL, 0 };
 	int ret;
 
 	if (idx >= sc->ncerts)
@@ -382,13 +388,14 @@ gnutls_certificate_set_ocsp_status_request_file2(gnutls_certificate_credentials_
 	if (ret < 0)
 		return gnutls_assert_val(GNUTLS_E_FILE_ERROR);
 
-	ret = gnutls_certificate_set_ocsp_status_request_mem(sc, &raw, idx, fmt);
+	ret =
+	    gnutls_certificate_set_ocsp_status_request_mem(sc, &raw, idx, fmt);
 	gnutls_free(raw.data);
 	return ret;
 }
 
-#define PEM_OCSP_RESPONSE "OCSP RESPONSE"
-#define FULL_PEM_OCSP_RESPONSE "-----BEGIN OCSP RESPONSE"
+# define PEM_OCSP_RESPONSE "OCSP RESPONSE"
+# define FULL_PEM_OCSP_RESPONSE "-----BEGIN OCSP RESPONSE"
 
 /**
  * gnutls_certificate_set_ocsp_status_request_mem:
@@ -424,13 +431,13 @@ gnutls_certificate_set_ocsp_status_request_file2(gnutls_certificate_credentials_
  * Since: 3.6.3
  **/
 int
-gnutls_certificate_set_ocsp_status_request_mem(gnutls_certificate_credentials_t sc,
-					       const gnutls_datum_t *resp_data,
+gnutls_certificate_set_ocsp_status_request_mem(gnutls_certificate_credentials_t
+					       sc,
+					       const gnutls_datum_t * resp_data,
 					       unsigned idx,
 					       gnutls_x509_crt_fmt_t fmt)
-
 {
-	gnutls_datum_t der = {NULL, 0};
+	gnutls_datum_t der = { NULL, 0 };
 	gnutls_ocsp_resp_t resp = NULL;
 	int ret;
 	unsigned int nresp = 0;
@@ -442,30 +449,39 @@ gnutls_certificate_set_ocsp_status_request_mem(gnutls_certificate_credentials_t 
 
 	if (fmt == GNUTLS_X509_FMT_PEM) {
 		/* load multiple responses */
-		gnutls_datum_t p = {resp_data->data, resp_data->size};
+		gnutls_datum_t p = { resp_data->data, resp_data->size };
 
 		p.data = memmem(p.data, p.size, FULL_PEM_OCSP_RESPONSE,
-				sizeof(FULL_PEM_OCSP_RESPONSE)-1);
+				sizeof(FULL_PEM_OCSP_RESPONSE) - 1);
 		if (p.data == NULL) {
-			ret = gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+			ret =
+			    gnutls_assert_val
+			    (GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 			goto cleanup;
 		}
 
 		p.size -= p.data - resp_data->data;
 		if (p.size <= 0) {
-			ret = gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+			ret =
+			    gnutls_assert_val
+			    (GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 			goto cleanup;
 		}
 
 		do {
-			ret = gnutls_pem_base64_decode2(PEM_OCSP_RESPONSE, &p, &der);
+			ret =
+			    gnutls_pem_base64_decode2(PEM_OCSP_RESPONSE, &p,
+						      &der);
 			if (ret < 0) {
 				gnutls_assert();
 				goto cleanup;
 			}
 
-			ret = gnutls_certificate_set_ocsp_status_request_mem(sc, &der, idx,
-									     GNUTLS_X509_FMT_DER);
+			ret =
+			    gnutls_certificate_set_ocsp_status_request_mem(sc,
+									   &der,
+									   idx,
+									   GNUTLS_X509_FMT_DER);
 			if (ret < 0) {
 				gnutls_assert();
 				goto cleanup;
@@ -478,19 +494,22 @@ gnutls_certificate_set_ocsp_status_request_mem(gnutls_certificate_credentials_t 
 			p.size--;
 
 			p.data = memmem(p.data, p.size, FULL_PEM_OCSP_RESPONSE,
-					sizeof(FULL_PEM_OCSP_RESPONSE)-1);
+					sizeof(FULL_PEM_OCSP_RESPONSE) - 1);
 			if (p.data == NULL)
 				break;
 			p.size = resp_data->size - (p.data - resp_data->data);
-		} while(p.size > 0);
+		} while (p.size > 0);
 
 		ret = nresp;
 	} else {
 		/* DER: load a single response */
 		if (sc->flags & GNUTLS_CERTIFICATE_SKIP_OCSP_RESPONSE_CHECK) {
-			ret = gnutls_ocsp_resp_import2(resp, resp_data, GNUTLS_X509_FMT_DER);
+			ret =
+			    gnutls_ocsp_resp_import2(resp, resp_data,
+						     GNUTLS_X509_FMT_DER);
 			if (ret >= 0) {
-				sc->certs[idx].ocsp_data[0].exptime = _gnutls_ocsp_get_validity(resp);
+				sc->certs[idx].ocsp_data[0].exptime =
+				    _gnutls_ocsp_get_validity(resp);
 				if (sc->certs[idx].ocsp_data[0].exptime <= 0)
 					sc->certs[idx].ocsp_data[0].exptime = 0;
 			}
@@ -498,9 +517,10 @@ gnutls_certificate_set_ocsp_status_request_mem(gnutls_certificate_credentials_t 
 			/* quick load of first response */
 			gnutls_free(sc->certs[idx].ocsp_data[0].response.data);
 
-			ret = _gnutls_set_datum(&sc->certs[idx].ocsp_data[0].response,
-						resp_data->data,
-						resp_data->size);
+			ret =
+			    _gnutls_set_datum(&sc->certs[idx].
+					      ocsp_data[0].response,
+					      resp_data->data, resp_data->size);
 			if (ret < 0) {
 				gnutls_assert();
 				goto cleanup;
@@ -510,7 +530,9 @@ gnutls_certificate_set_ocsp_status_request_mem(gnutls_certificate_credentials_t 
 			goto cleanup;
 		}
 
-		ret = gnutls_ocsp_resp_import2(resp, resp_data, GNUTLS_X509_FMT_DER);
+		ret =
+		    gnutls_ocsp_resp_import2(resp, resp_data,
+					     GNUTLS_X509_FMT_DER);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -524,7 +546,7 @@ gnutls_certificate_set_ocsp_status_request_mem(gnutls_certificate_credentials_t 
 
 		ret = 1;
 	}
-  cleanup:
+ cleanup:
 	gnutls_free(der.data);
 	if (resp)
 		gnutls_ocsp_resp_deinit(resp);
@@ -558,34 +580,34 @@ gnutls_certificate_set_ocsp_status_request_mem(gnutls_certificate_credentials_t 
  **/
 time_t
 gnutls_certificate_get_ocsp_expiration(gnutls_certificate_credentials_t sc,
-				       unsigned idx,
-				       int oidx,
-				       unsigned flags)
+				       unsigned idx, int oidx, unsigned flags)
 {
 	unsigned j;
 
 	if (idx >= sc->ncerts)
-		return (time_t)-2;
+		return (time_t) - 2;
 
 	if (oidx == -1) {
 		time_t min = 0;
 
-		for (j=0;j<MIN(sc->certs[idx].cert_list_length, MAX_OCSP_RESPONSES);j++) {
+		for (j = 0;
+		     j < MIN(sc->certs[idx].cert_list_length,
+			     MAX_OCSP_RESPONSES); j++) {
 			if (min <= 0)
 				min = sc->certs[idx].ocsp_data[j].exptime;
-			else
-				if (sc->certs[idx].ocsp_data[j].exptime > 0 &&
-				    min >= sc->certs[idx].ocsp_data[j].exptime)
-					min = sc->certs[idx].ocsp_data[j].exptime;
+			else if (sc->certs[idx].ocsp_data[j].exptime > 0 &&
+				 min >= sc->certs[idx].ocsp_data[j].exptime)
+				min = sc->certs[idx].ocsp_data[j].exptime;
 		}
 		return min;
 	}
 
-	if (oidx >= MAX_OCSP_RESPONSES || (unsigned)oidx >= sc->certs[idx].cert_list_length)
-		return (time_t)-2;
+	if (oidx >= MAX_OCSP_RESPONSES
+	    || (unsigned)oidx >= sc->certs[idx].cert_list_length)
+		return (time_t) - 2;
 
 	if (sc->certs[idx].ocsp_data[oidx].response.data == NULL)
-		return (time_t)-1;
+		return (time_t) - 1;
 
 	return sc->certs[idx].ocsp_data[oidx].exptime;
 }

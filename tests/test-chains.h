@@ -21,7 +21,7 @@
  */
 
 #ifndef GNUTLS_TESTS_TEST_CHAINS_H
-#define GNUTLS_TESTS_TEST_CHAINS_H
+# define GNUTLS_TESTS_TEST_CHAINS_H
 
 /* *INDENT-OFF* */
 
@@ -4451,4 +4451,4 @@ static struct
 
 /* *INDENT-ON* */
 
-#endif /* GNUTLS_TESTS_TEST_CHAINS_H */
+#endif				/* GNUTLS_TESTS_TEST_CHAINS_H */

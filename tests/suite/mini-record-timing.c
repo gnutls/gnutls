@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,29 +35,29 @@ int main(void)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <gnutls/gnutls.h>
-#include <signal.h>
-#include <assert.h>
-#include <errno.h>
+# include <string.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <gnutls/gnutls.h>
+# include <signal.h>
+# include <assert.h>
+# include <errno.h>
 
 //#define USE_RDTSC
 //#define TEST_ETM
 
-#include <time.h>
-#include <sys/time.h>
-#include <sys/resource.h>
-#ifdef USE_RDTSC
-#include <x86intrin.h>
-#endif
+# include <time.h>
+# include <sys/time.h>
+# include <sys/resource.h>
+# ifdef USE_RDTSC
+#  include <x86intrin.h>
+# endif
 
-#ifdef DEBUG
+# ifdef DEBUG
 static void server_log_func(int level, const char *str)
 {
 	fprintf(stderr, "server|<%d>| %s", level, str);
@@ -67,24 +67,22 @@ static void client_log_func(int level, const char *str)
 {
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
-#endif
+# endif
 
+# ifndef _POSIX_TIMERS
+#  error need posix timers
+# endif
 
-
-#ifndef _POSIX_TIMERS
-#error need posix timers
-#endif
-
-#define CLOCK_TO_USE CLOCK_MONOTONIC
+# define CLOCK_TO_USE CLOCK_MONOTONIC
 //#define CLOCK_TO_USE CLOCK_MONOTONIC_RAW
 //#define CLOCK_TO_USE CLOCK_PROCESS_CPUTIME_ID
 
 /* This program tests the robustness of record
  * decoding.
  */
-#define MAX_PER_POINT (8*1024)
-#define WARM_UP (2)
-#define MAX_BUF 1024
+# define MAX_PER_POINT (8*1024)
+# define WARM_UP (2)
+# define MAX_BUF 1024
 
 struct point_st {
 	unsigned char byte1;
@@ -108,10 +106,9 @@ struct point_st *prev_point_ptr = NULL;
 unsigned int point_idx = 0;
 static gnutls_session_t cli_session = NULL;
 
-static ssize_t
-push(gnutls_transport_ptr_t tr, const void *_data, size_t len)
+static ssize_t push(gnutls_transport_ptr_t tr, const void *_data, size_t len)
 {
-	int fd = (long int) tr;
+	int fd = (long int)tr;
 
 	return send(fd, _data, len, 0);
 }
@@ -119,8 +116,8 @@ push(gnutls_transport_ptr_t tr, const void *_data, size_t len)
 static ssize_t
 push_crippled(gnutls_transport_ptr_t tr, const void *_data, size_t len)
 {
-	int fd = (long int) tr;
-	unsigned char *data = (void *) _data;
+	int fd = (long int)tr;
+	unsigned char *data = (void *)_data;
 	struct point_st *p;
 	unsigned p_size;
 	struct test_st *test = gnutls_session_get_ptr(cli_session);
@@ -132,7 +129,6 @@ push_crippled(gnutls_transport_ptr_t tr, const void *_data, size_t len)
 
 	p = &test->points[point_idx];
 
-
 	if (test->fill != 0xff) {
 		/* original lucky13 attack */
 		memmove(&data[len - 32], data + 5, 32);
@@ -140,27 +136,24 @@ push_crippled(gnutls_transport_ptr_t tr, const void *_data, size_t len)
 		data[len - 18] ^= p->byte2;
 	} else {
 		/* a revised attack which depends on chosen-plaintext */
-		assert(len>512);
-		memmove(data+len-256-32, data+5, 256+32);
+		assert(len > 512);
+		memmove(data + len - 256 - 32, data + 5, 256 + 32);
 		data[len - 257] ^= p->byte1;
 	}
 
 	return send(fd, data, len, 0);
 }
 
-
-#ifndef USE_RDTSC
-static unsigned long timespec_sub_ns(struct timespec *a,
-				     struct timespec *b)
+# ifndef USE_RDTSC
+static unsigned long timespec_sub_ns(struct timespec *a, struct timespec *b)
 {
 	return (a->tv_sec - b->tv_sec) * 1000 * 1000 * 1000 + a->tv_nsec -
-		b->tv_nsec;
+	    b->tv_nsec;
 }
-#endif
+# endif
 
 static void
-client(int fd, const char *prio, unsigned int text_size,
-       struct test_st *test)
+client(int fd, const char *prio, unsigned int text_size, struct test_st *test)
 {
 	int ret;
 	char buffer[MAX_BUF + 1];
@@ -168,7 +161,7 @@ client(int fd, const char *prio, unsigned int text_size,
 	gnutls_psk_client_credentials_t pskcred;
 	gnutls_session_t session;
 	static unsigned long measurement;
-	const gnutls_datum_t key = { (void *) "DEADBEEF", 8 };
+	const gnutls_datum_t key = { (void *)"DEADBEEF", 8 };
 	const char *err;
 	unsigned j;
 
@@ -181,10 +174,10 @@ client(int fd, const char *prio, unsigned int text_size,
 
 	memset(text, test->fill, text_size);
 
-#ifdef DEBUG
+# ifdef DEBUG
 	gnutls_global_set_log_function(client_log_func);
 	gnutls_global_set_log_level(6);
-#endif
+# endif
 
 	gnutls_psk_allocate_client_credentials(&pskcred);
 	gnutls_psk_set_client_credentials(pskcred, "test", &key,
@@ -216,7 +209,8 @@ client(int fd, const char *prio, unsigned int text_size,
 	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret < 0) {
-		fprintf(stderr, "client: Handshake failed: %s\n", gnutls_strerror(ret));
+		fprintf(stderr, "client: Handshake failed: %s\n",
+			gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -238,8 +232,7 @@ client(int fd, const char *prio, unsigned int text_size,
 	do {
 		ret = gnutls_record_recv(session, buffer, sizeof(buffer));
 	} while (ret < 0
-		 && (ret == GNUTLS_E_AGAIN
-		     || ret == GNUTLS_E_INTERRUPTED));
+		 && (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED));
 
 	if (ret > 0) {
 		struct point_st *point_ptr = NULL;
@@ -250,10 +243,12 @@ client(int fd, const char *prio, unsigned int text_size,
 		point_ptr->taken++;
 
 		if (point_idx == 0) {
-			printf("%s: measurement: %u / %d\r", test->name, (unsigned)point_ptr->taken+1, MAX_PER_POINT+WARM_UP);
+			printf("%s: measurement: %u / %d\r", test->name,
+			       (unsigned)point_ptr->taken + 1,
+			       MAX_PER_POINT + WARM_UP);
 		}
 
-		if (point_idx == 0 && point_ptr->midx+1 >= MAX_PER_POINT) {
+		if (point_idx == 0 && point_ptr->midx + 1 >= MAX_PER_POINT) {
 			goto finish;
 		}
 
@@ -275,7 +270,7 @@ client(int fd, const char *prio, unsigned int text_size,
 		abort();
 	}
 
-finish:
+ finish:
 	fprintf(stderr, "\ntest completed\n");
 
 	gnutls_transport_set_push_function(session, push);
@@ -291,15 +286,17 @@ finish:
 
 		fprintf(fp, "Delta,");
 		for (j = 0; j < MAX_PER_POINT; j++) {
-			fprintf(fp, "measurement-%u%s", j, j!=(MAX_PER_POINT-1)?",":"");
+			fprintf(fp, "measurement-%u%s", j,
+				j != (MAX_PER_POINT - 1) ? "," : "");
 		}
 		fprintf(fp, "\n");
 		for (i = 0; i < test->npoints; i++) {
 			fprintf(fp, "%u,", (unsigned)test->points[i].byte1);
 			for (j = 0; j < MAX_PER_POINT; j++) {
 				fprintf(fp, "%u%s",
-					(unsigned) test->points[i].smeasurements[j],
-					(j!=MAX_PER_POINT-1)?",":"");
+					(unsigned)test->
+					points[i].smeasurements[j],
+					(j != MAX_PER_POINT - 1) ? "," : "");
 
 			}
 			fprintf(fp, "\n");
@@ -323,8 +320,7 @@ finish:
 }
 
 static int
-pskfunc(gnutls_session_t session, const char *username,
-	gnutls_datum_t * key)
+pskfunc(gnutls_session_t session, const char *username, gnutls_datum_t * key)
 {
 	key->data = gnutls_malloc(4);
 	key->data[0] = 0xDE;
@@ -342,12 +338,12 @@ static void server(int fd, const char *prio)
 	gnutls_session_t session;
 	gnutls_psk_server_credentials_t server_pskcred;
 	const char *err;
-#ifndef USE_RDTSC
+# ifndef USE_RDTSC
 	struct timespec start, stop;
-#else
+# else
 	uint64_t c1, c2;
 	unsigned int i1;
-#endif
+# endif
 	static unsigned long measurement;
 
 	setpriority(PRIO_PROCESS, getpid(), -15);
@@ -355,14 +351,13 @@ static void server(int fd, const char *prio)
 	gnutls_global_init();
 	memset(buffer, 0, sizeof(buffer));
 
-#ifdef DEBUG
+# ifdef DEBUG
 	gnutls_global_set_log_function(server_log_func);
 	gnutls_global_set_log_level(6);
-#endif
-	assert(gnutls_psk_allocate_server_credentials(&server_pskcred)>=0);
-	gnutls_psk_set_server_credentials_function(server_pskcred,
-						   pskfunc);
-	assert(gnutls_init(&session, GNUTLS_SERVER)>=0);
+# endif
+	assert(gnutls_psk_allocate_server_credentials(&server_pskcred) >= 0);
+	gnutls_psk_set_server_credentials_function(server_pskcred, pskfunc);
+	assert(gnutls_init(&session, GNUTLS_SERVER) >= 0);
 
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
@@ -381,12 +376,12 @@ static void server(int fd, const char *prio)
 	}
 	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 	if (ret < 0) {
-#ifdef GNUTLS_E_PREMATURE_TERMINATION
+# ifdef GNUTLS_E_PREMATURE_TERMINATION
 		if (ret != GNUTLS_E_PREMATURE_TERMINATION
 		    && ret != GNUTLS_E_UNEXPECTED_PACKET_LENGTH)
-#else
+# else
 		if (ret != GNUTLS_E_UNEXPECTED_PACKET_LENGTH)
-#endif
+# endif
 		{
 			fprintf(stderr,
 				"server: Handshake has failed (%s)\n\n",
@@ -395,34 +390,34 @@ static void server(int fd, const char *prio)
 		}
 		goto finish;
 	}
-#ifdef TEST_ETM
-	assert(gnutls_session_etm_status(session)!=0);
-#else
-	assert(gnutls_session_etm_status(session)==0);
-#endif
+# ifdef TEST_ETM
+	assert(gnutls_session_etm_status(session) != 0);
+# else
+	assert(gnutls_session_etm_status(session) == 0);
+# endif
 
  restart:
 	do {
 		ret = recv(fd, buffer, 1, MSG_PEEK);
 	} while (ret == -1 && errno == EAGAIN);
 
-#ifdef USE_RDTSC
+# ifdef USE_RDTSC
 	c1 = __rdtscp(&i1);
-#else
+# else
 	clock_gettime(CLOCK_TO_USE, &start);
-#endif
+# endif
 
 	do {
 		ret = gnutls_record_recv(session, buffer, sizeof(buffer));
 	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
-#ifdef USE_RDTSC
+# ifdef USE_RDTSC
 	c2 = __rdtscp(&i1);
 	measurement = c2 - c1;
-#else
+# else
 	clock_gettime(CLOCK_TO_USE, &stop);
 	measurement = timespec_sub_ns(&stop, &start);
-#endif
+# endif
 
 	if (ret == GNUTLS_E_DECRYPTION_FAILED) {
 		gnutls_session_force_valid(session);
@@ -431,8 +426,7 @@ static void server(int fd, const char *prio)
 			    gnutls_record_send(session, &measurement,
 					       sizeof(measurement));
 			/* GNUTLS_AL_FATAL, GNUTLS_A_BAD_RECORD_MAC); */
-		} while (ret == GNUTLS_E_AGAIN
-			 || ret == GNUTLS_E_INTERRUPTED);
+		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 		if (ret >= 0) {
 			goto restart;
@@ -447,7 +441,7 @@ static void server(int fd, const char *prio)
 	 */
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
-      finish:
+ finish:
 	close(fd);
 	gnutls_deinit(session);
 
@@ -456,8 +450,7 @@ static void server(int fd, const char *prio)
 	gnutls_global_deinit();
 }
 
-static void start(const char *prio, unsigned int text_size,
-		  struct test_st *p)
+static void start(const char *prio, unsigned int text_size, struct test_st *p)
 {
 	int fd[2];
 	int ret;
@@ -497,7 +490,8 @@ static void ch_handler(int sig)
 		/* This code must be async-signal-safe. */
 		if (WIFSIGNALED(status)) {
 			const char msg[] = "Child died with sigsegv\n";
-			write(STDERR_FILENO, "Child died with sigsegv\n", sizeof(msg));
+			write(STDERR_FILENO, "Child died with sigsegv\n",
+			      sizeof(msg));
 		} else {
 			char buf[64] = { 0 };
 			char *p;
@@ -522,7 +516,7 @@ static void ch_handler(int sig)
 	return;
 }
 
-#define NPOINTS 256
+# define NPOINTS 256
 static struct point_st all_points[NPOINTS];
 static struct point_st all_points_one[NPOINTS];
 
@@ -691,18 +685,16 @@ int main(int argc, char **argv)
 	for (i = 0; i < 256; i++) {
 		all_points_one[i].byte1 = i;
 		all_points_one[i].byte2 = 1;
-		all_points_one[i].smeasurements =
-		    all_points[i].smeasurements;
+		all_points_one[i].smeasurements = all_points[i].smeasurements;
 	}
-
 
 	remove(test->file);
 	snprintf(prio, sizeof(prio),
-#ifdef TEST_ETM
+# ifdef TEST_ETM
 		 "NONE:+COMP-NULL:+AES-128-CBC:+AES-256-CBC:+%s:+PSK:+VERS-TLS1.2:+VERS-TLS1.1:+SIGN-ALL:+CURVE-ALL",
-#else
+# else
 		 "NONE:+COMP-NULL:+AES-128-CBC:+AES-256-CBC:+%s:+PSK:%%NO_ETM:+VERS-TLS1.2:+VERS-TLS1.1:+SIGN-ALL:+CURVE-ALL",
-#endif
+# endif
 		 hash);
 
 	printf("\nAES-%s (calculating different padding timings)\n", hash);

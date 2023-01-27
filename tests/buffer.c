@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -31,17 +31,15 @@
 void doit(void)
 {
 	static const struct test_data {
-		const char *
-			input;
-		const char *
-			output;
+		const char *input;
+		const char *output;
 	} test_data[] = {
-		{ "%20%20", "  ", },
-		{ "%20", " ", },
-		{ "%2z", "%2z", },
-		{ "%2", "%2", },
-		{ "%", "%", },
-		{ "", "", },
+		{"%20%20", "  ",},
+		{"%20", " ",},
+		{"%2z", "%2z",},
+		{"%2", "%2",},
+		{"%", "%",},
+		{"", "",},
 	};
 
 	for (unsigned it = 0; it < countof(test_data); it++) {
@@ -51,27 +49,32 @@ void doit(void)
 
 		_gnutls_buffer_init(&str);
 
-		ret = _gnutls_buffer_append_data(&str, t->input, strlen(t->input));
+		ret =
+		    _gnutls_buffer_append_data(&str, t->input,
+					       strlen(t->input));
 		if (ret < 0)
-			fail("_gnutls_buffer_append_str: %s\n", gnutls_strerror(ret));
+			fail("_gnutls_buffer_append_str: %s\n",
+			     gnutls_strerror(ret));
 
 		ret = _gnutls_buffer_unescape(&str);
 		if (ret < 0)
-			fail("_gnutls_buffer_unescape: %s\n", gnutls_strerror(ret));
+			fail("_gnutls_buffer_unescape: %s\n",
+			     gnutls_strerror(ret));
 
 		ret = _gnutls_buffer_append_data(&str, "", 1);
 		if (ret < 0)
-			fail("_gnutls_buffer_append_data: %s\n", gnutls_strerror(ret));
+			fail("_gnutls_buffer_append_data: %s\n",
+			     gnutls_strerror(ret));
 
 		/* using malloc() instead of stack memory for better buffer overflow detection */
 		gnutls_datum output;
 
 		_gnutls_buffer_pop_datum(&str, &output, strlen(t->output) + 1);
 
-		if (strcmp(t->output, (char *) output.data))
-			fail("output differs [%d]: expected '%s', seen '%s'\n", it, t->output, (char *) output.data);
+		if (strcmp(t->output, (char *)output.data))
+			fail("output differs [%d]: expected '%s', seen '%s'\n",
+			     it, t->output, (char *)output.data);
 
 		_gnutls_buffer_clear(&str);
 	}
 }
-

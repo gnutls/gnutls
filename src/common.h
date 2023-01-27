@@ -19,57 +19,59 @@
  */
 
 #ifndef GNUTLS_SRC_COMMON_H
-#define GNUTLS_SRC_COMMON_H
+# define GNUTLS_SRC_COMMON_H
 
-#define SERVER "127.0.0.1"
+# define SERVER "127.0.0.1"
 
-#include <config.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/pkcs11.h>
-#include <certtool-common.h>
-#include <c-ctype.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <unistd.h>
-#ifndef _WIN32
-#include <netinet/in.h>
-#endif
+# include <config.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/pkcs11.h>
+# include <certtool-common.h>
+# include <c-ctype.h>
+# include <string.h>
+# include <sys/socket.h>
+# include <netdb.h>
+# include <unistd.h>
+# ifndef _WIN32
+#  include <netinet/in.h>
+# endif
 
-#include <signal.h>
-#ifdef _WIN32
-#include <io.h>
-#include <winbase.h>
-#include <sys/select.h>
-#include "socket.h"
-#undef OCSP_RESPONSE
-#endif
+# include <signal.h>
+# ifdef _WIN32
+#  include <io.h>
+#  include <winbase.h>
+#  include <sys/select.h>
+#  include "socket.h"
+#  undef OCSP_RESPONSE
+# endif
 
-#ifndef __attribute__
-#if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 5)
-#define __attribute__(Spec)	/* empty */
-#endif
-#endif
+# ifndef __attribute__
+#  if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 5)
+#   define __attribute__(Spec)	/* empty */
+#  endif
+# endif
 
 /* the number of elements in the priority structures.
  */
-#define PRI_MAX 16
+# define PRI_MAX 16
 
 extern const char str_unknown[];
 
-#define P_PRINT_CERT 1
-#define P_WAIT_FOR_CERT (1<<1)
+# define P_PRINT_CERT 1
+# define P_WAIT_FOR_CERT (1<<1)
 int print_info(gnutls_session_t state, int verbose, int flags);
 void print_cert_info(gnutls_session_t, int flag, int print_cert);
 void print_key_material(gnutls_session_t, const char *label, size_t size);
 
-int log_msg(FILE *file, const char *message, ...) __attribute__((format(printf, 2, 3)));
-void log_set(FILE *file);
+int log_msg(FILE * file, const char *message, ...)
+    __attribute__((format(printf, 2, 3)));
+void log_set(FILE * file);
 
-void print_cert_info2(gnutls_session_t, int flag, FILE *fp, int print_cert);
+void print_cert_info2(gnutls_session_t, int flag, FILE * fp, int print_cert);
 
 void print_list(const char *priorities, int verbose);
-int cert_verify(gnutls_session_t session, const char *hostname, const char *purpose);
+int cert_verify(gnutls_session_t session, const char *hostname,
+		const char *purpose);
 
 int compress_cert_set_methods(gnutls_session_t session, const char **strings,
 			      size_t n_strings);
@@ -77,9 +79,10 @@ int compress_cert_set_methods(gnutls_session_t session, const char **strings,
 const char *raw_to_string(const unsigned char *raw, size_t raw_size);
 const char *raw_to_hex(const unsigned char *raw, size_t raw_size);
 const char *raw_to_base64(const unsigned char *raw, size_t raw_size);
-int check_command(gnutls_session_t session, const char *str, unsigned no_cli_cert);
+int check_command(gnutls_session_t session, const char *str,
+		  unsigned no_cli_cert);
 
-#define MAX_PIN_LEN GNUTLS_PKCS11_MAX_PIN_LEN
+# define MAX_PIN_LEN GNUTLS_PKCS11_MAX_PIN_LEN
 void getenv_copy(char *str, size_t max_str_size, const char *envvar);
 void getpass_copy(char *pass, size_t max_pass_size, const char *prompt);
 
@@ -88,22 +91,23 @@ pin_callback(void *user, int attempt, const char *token_url,
 	     const char *token_label, unsigned int flags, char *pin,
 	     size_t pin_max);
 
-void pkcs11_common(common_info_st *c);
+void pkcs11_common(common_info_st * c);
 
 inline static int is_ip(const char *hostname)
 {
-int len = strlen(hostname);
+	int len = strlen(hostname);
 
 	if (strchr(hostname, ':') != 0)
 		return 1;
-	else if (len > 2 && c_isdigit(hostname[0]) && c_isdigit(hostname[len-1]))
+	else if (len > 2 && c_isdigit(hostname[0])
+		 && c_isdigit(hostname[len - 1]))
 		return 1;
 	return 0;
 }
 
 void sockets_init(void);
 
-#ifdef _WIN32
+# ifdef _WIN32
 static int system_recv_timeout(gnutls_transport_ptr_t ptr, unsigned int ms)
 {
 	fd_set rfds;
@@ -141,13 +145,14 @@ void set_read_funcs(gnutls_session_t session)
 {
 	gnutls_transport_set_push_function(session, system_write);
 	gnutls_transport_set_pull_function(session, system_read);
-	gnutls_transport_set_pull_timeout_function(session, system_recv_timeout);
+	gnutls_transport_set_pull_timeout_function(session,
+						   system_recv_timeout);
 }
-#else
-# define set_read_funcs(x)
-#endif
+# else
+#  define set_read_funcs(x)
+# endif
 
-#define SIMPLE_CTIME_BUF_SIZE 64
-char *simple_ctime(const time_t *t, char buf[SIMPLE_CTIME_BUF_SIZE]);
+# define SIMPLE_CTIME_BUF_SIZE 64
+char *simple_ctime(const time_t * t, char buf[SIMPLE_CTIME_BUF_SIZE]);
 
-#endif /* GNUTLS_SRC_COMMON_H */
+#endif				/* GNUTLS_SRC_COMMON_H */

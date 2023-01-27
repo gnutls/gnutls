@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -30,7 +30,7 @@
 #include <sys/types.h>
 #include <assert.h>
 #if !defined(_WIN32)
-#include <sys/wait.h>
+# include <sys/wait.h>
 #endif
 
 #include "utils.h"
@@ -47,7 +47,7 @@ static void dump(const char *name, unsigned char *buf, int buf_size)
 	printf("\n");
 }
 
-#define FILENAME "./rng-test"
+# define FILENAME "./rng-test"
 
 void doit(void)
 {

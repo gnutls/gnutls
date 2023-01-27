@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -42,14 +42,13 @@
 
 #if defined(HAVE___REGISTER_ATFORK)
 
-#define PIN "1234"
-#ifdef _WIN32
-# define P11LIB "libpkcs11mock1.dll"
-#else
-# include <dlfcn.h>
-# define P11LIB "libpkcs11mock1.so"
-#endif
-
+# define PIN "1234"
+# ifdef _WIN32
+#  define P11LIB "libpkcs11mock1.dll"
+# else
+#  include <dlfcn.h>
+#  define P11LIB "libpkcs11mock1.so"
+# endif
 
 static void tls_log_func(int level, const char *str)
 {
@@ -57,8 +56,8 @@ static void tls_log_func(int level, const char *str)
 }
 
 static
-int pin_func(void* userdata, int attempt, const char* url, const char *label,
-		unsigned flags, char *pin, size_t pin_max)
+int pin_func(void *userdata, int attempt, const char *url, const char *label,
+	     unsigned flags, char *pin, size_t pin_max)
 {
 	if (attempt == 0) {
 		strcpy(pin, PIN);
@@ -72,10 +71,11 @@ void doit(void)
 	int ret;
 	const char *lib;
 	gnutls_privkey_t key;
-	gnutls_datum_t sig = {NULL, 0}, data;
+	gnutls_datum_t sig = { NULL, 0 }, data;
 	pid_t pid;
 
-	data.data = (void*)"\x38\x17\x0c\x08\xcb\x45\x8f\xd4\x87\x9c\x34\xb6\xf6\x08\x29\x4c\x50\x31\x2b\xbb";
+	data.data = (void *)
+	    "\x38\x17\x0c\x08\xcb\x45\x8f\xd4\x87\x9c\x34\xb6\xf6\x08\x29\x4c\x50\x31\x2b\xbb";
 	data.size = 20;
 
 	ret = global_init();
@@ -105,11 +105,13 @@ void doit(void)
 	}
 
 	ret = gnutls_privkey_init(&key);
-	assert(ret>=0);
+	assert(ret >= 0);
 
 	gnutls_privkey_set_pin_function(key, pin_func, NULL);
 
-	ret = gnutls_privkey_import_url(key, "pkcs11:object=test", GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
+	ret =
+	    gnutls_privkey_import_url(key, "pkcs11:object=test",
+				      GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
 	if (ret < 0) {
 		fail("%d: %s\n", ret, gnutls_strerror(ret));
 		exit(1);
@@ -129,21 +131,24 @@ void doit(void)
 		assert(waitpid(pid, &status, 0) >= 0);
 
 		if (WEXITSTATUS(status) != 0) {
-			fail("child return status was unexpected: %d\n", WEXITSTATUS(status));
+			fail("child return status was unexpected: %d\n",
+			     WEXITSTATUS(status));
 			exit(1);
 		}
-	} else { /* child */
+	} else {		/* child */
 
 		ret = gnutls_pkcs11_reinit();
 		assert(ret == 0);
 
-		ret = gnutls_privkey_sign_hash(key, GNUTLS_DIG_SHA1, 0, &data, &sig);
+		ret =
+		    gnutls_privkey_sign_hash(key, GNUTLS_DIG_SHA1, 0, &data,
+					     &sig);
 		if (ret < 0) {
 			fail("%d: %s\n", ret, gnutls_strerror(ret));
 			exit(1);
 		}
 
-		gnutls_free(sig.data);		
+		gnutls_free(sig.data);
 		gnutls_privkey_deinit(key);
 		gnutls_pkcs11_deinit();
 		gnutls_global_deinit();

@@ -35,7 +35,7 @@
 # include <windows.h>
 # include <wincrypt.h>
 
-#else /* !_WIN32 */
+#else				/* !_WIN32 */
 
 # include <poll.h>
 
@@ -73,7 +73,8 @@ int _gnutls_find_config_path(char *path, size_t max_size)
 		const char *home_path = getenv("HOMEPATH");
 
 		if (home_drive != NULL && home_path != NULL) {
-			snprintf(path, max_size, "%s%s\\" CONFIG_PATH, home_drive, home_path);
+			snprintf(path, max_size, "%s%s\\" CONFIG_PATH,
+				 home_drive, home_path);
 		} else {
 			path[0] = 0;
 		}
@@ -87,14 +88,15 @@ int _gnutls_find_config_path(char *path, size_t max_size)
 
 		ret = getpwuid_r(getuid(), &_pwd, tmp, sizeof(tmp), &pwd);
 		if (ret == 0 && pwd != NULL) {
-			snprintf(path, max_size, "%s/" CONFIG_PATH, pwd->pw_dir);
+			snprintf(path, max_size, "%s/" CONFIG_PATH,
+				 pwd->pw_dir);
 		} else {
 			path[0] = 0;
 		}
 	}
 #else
 	if (home_dir == NULL || home_dir[0] == '\0') {
-			path[0] = 0;
+		path[0] = 0;
 	}
 #endif
 
@@ -109,13 +111,13 @@ add_system_trust(gnutls_x509_trust_list_t list,
 {
 	int ret, r = 0;
 	const char *crl_file =
-#ifdef DEFAULT_CRL_FILE
+# ifdef DEFAULT_CRL_FILE
 	    DEFAULT_CRL_FILE;
-#else
+# else
 	    NULL;
-#endif
+# endif
 
-#if defined(ENABLE_PKCS11) && defined(DEFAULT_TRUST_STORE_PKCS11)
+# if defined(ENABLE_PKCS11) && defined(DEFAULT_TRUST_STORE_PKCS11)
 	ret =
 	    gnutls_x509_trust_list_add_trust_file(list,
 						  DEFAULT_TRUST_STORE_PKCS11,
@@ -124,9 +126,9 @@ add_system_trust(gnutls_x509_trust_list_t list,
 						  tl_flags, tl_vflags);
 	if (ret > 0)
 		r += ret;
-#endif
+# endif
 
-#ifdef DEFAULT_TRUST_STORE_FILE
+# ifdef DEFAULT_TRUST_STORE_FILE
 	ret =
 	    gnutls_x509_trust_list_add_trust_file(list,
 						  DEFAULT_TRUST_STORE_FILE,
@@ -135,14 +137,18 @@ add_system_trust(gnutls_x509_trust_list_t list,
 						  tl_flags, tl_vflags);
 	if (ret > 0)
 		r += ret;
-#endif
+# endif
 
-#ifdef DEFAULT_BLOCKLIST_FILE
-	ret = gnutls_x509_trust_list_remove_trust_file(list, DEFAULT_BLOCKLIST_FILE, GNUTLS_X509_FMT_PEM);
+# ifdef DEFAULT_BLOCKLIST_FILE
+	ret =
+	    gnutls_x509_trust_list_remove_trust_file(list,
+						     DEFAULT_BLOCKLIST_FILE,
+						     GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
-		_gnutls_debug_log("Could not load blocklist file '%s'\n", DEFAULT_BLOCKLIST_FILE);
+		_gnutls_debug_log("Could not load blocklist file '%s'\n",
+				  DEFAULT_BLOCKLIST_FILE);
 	}
-#endif
+# endif
 
 	return r;
 }
@@ -161,9 +167,15 @@ int add_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flags,
 		gnutls_datum_t data;
 
 		if (i == 0)
-			store = CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, 0, CERT_SYSTEM_STORE_CURRENT_USER , L"ROOT");
+			store =
+			    CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, 0,
+					  CERT_SYSTEM_STORE_CURRENT_USER,
+					  L"ROOT");
 		else
-			store = CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, 0, CERT_SYSTEM_STORE_CURRENT_USER, L"CA");
+			store =
+			    CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, 0,
+					  CERT_SYSTEM_STORE_CURRENT_USER,
+					  L"CA");
 
 		if (store == NULL)
 			return GNUTLS_E_FILE_ERROR;
@@ -200,12 +212,16 @@ int add_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flags,
 		CertCloseStore(store, 0);
 	}
 
-#ifdef DEFAULT_BLOCKLIST_FILE
-	ret = gnutls_x509_trust_list_remove_trust_file(list, DEFAULT_BLOCKLIST_FILE, GNUTLS_X509_FMT_PEM);
+# ifdef DEFAULT_BLOCKLIST_FILE
+	ret =
+	    gnutls_x509_trust_list_remove_trust_file(list,
+						     DEFAULT_BLOCKLIST_FILE,
+						     GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
-		_gnutls_debug_log("Could not load blocklist file '%s'\n", DEFAULT_BLOCKLIST_FILE);
+		_gnutls_debug_log("Could not load blocklist file '%s'\n",
+				  DEFAULT_BLOCKLIST_FILE);
 	}
-#endif
+# endif
 
 	return r;
 }
@@ -238,19 +254,19 @@ static int load_revoked_certs(gnutls_x509_trust_list_t list, unsigned type)
 
 		base_len = pathbuf.len;
 		while ((d = readdir(dirp)) != NULL) {
-		       if (d->d_type != DT_REG) {
-			       continue;
-		       }
-		       ret = _gnutls_pathbuf_append(&pathbuf, d->d_name);
-		       if (ret < 0) {
-			       continue;
-		       }
-		       ret = gnutls_x509_trust_list_remove_trust_file
-			       (list, pathbuf.ptr, type);
-		       if (ret >= 0) {
-			       r += ret;
-		       }
-		       (void)_gnutls_pathbuf_truncate(&pathbuf, base_len);
+			if (d->d_type != DT_REG) {
+				continue;
+			}
+			ret = _gnutls_pathbuf_append(&pathbuf, d->d_name);
+			if (ret < 0) {
+				continue;
+			}
+			ret = gnutls_x509_trust_list_remove_trust_file
+			    (list, pathbuf.ptr, type);
+			if (ret >= 0) {
+				r += ret;
+			}
+			(void)_gnutls_pathbuf_truncate(&pathbuf, base_len);
 		}
 		_gnutls_pathbuf_deinit(&pathbuf);
 		closedir(dirp);
@@ -260,7 +276,6 @@ static int load_revoked_certs(gnutls_x509_trust_list_t list, unsigned type)
 }
 # endif
 
-
 /* This works on android 4.x 
  */
 static
@@ -269,8 +284,10 @@ int add_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flags,
 {
 	int r = 0, ret;
 
-	ret = gnutls_x509_trust_list_add_trust_dir(list, DEFAULT_TRUST_STORE_DIR,
-		NULL, GNUTLS_X509_FMT_PEM, tl_flags, tl_vflags);
+	ret =
+	    gnutls_x509_trust_list_add_trust_dir(list, DEFAULT_TRUST_STORE_DIR,
+						 NULL, GNUTLS_X509_FMT_PEM,
+						 tl_flags, tl_vflags);
 	if (ret >= 0)
 		r += ret;
 
@@ -279,8 +296,11 @@ int add_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flags,
 	if (ret >= 0)
 		r -= ret;
 
-	ret = gnutls_x509_trust_list_add_trust_dir(list, "/data/misc/keychain/cacerts-added/",
-		NULL, GNUTLS_X509_FMT_DER, tl_flags, tl_vflags);
+	ret =
+	    gnutls_x509_trust_list_add_trust_dir(list,
+						 "/data/misc/keychain/cacerts-added/",
+						 NULL, GNUTLS_X509_FMT_DER,
+						 tl_flags, tl_vflags);
 	if (ret >= 0)
 		r += ret;
 # endif
@@ -293,7 +313,8 @@ int osstatus_error(status)
 {
 	CFStringRef err_str = SecCopyErrorMessageString(status, NULL);
 	_gnutls_debug_log("Error loading system root certificates: %s\n",
-			  CFStringGetCStringPtr(err_str, kCFStringEncodingUTF8));
+			  CFStringGetCStringPtr(err_str,
+						kCFStringEncodingUTF8));
 	CFRelease(err_str);
 	return GNUTLS_E_FILE_ERROR;
 }
@@ -302,12 +323,13 @@ static
 int add_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flags,
 		     unsigned int tl_vflags)
 {
-	int r=0;
+	int r = 0;
 
 	SecTrustSettingsDomain domain[] = { kSecTrustSettingsDomainUser,
-					    kSecTrustSettingsDomainAdmin,
-					    kSecTrustSettingsDomainSystem };
-	for (size_t d=0; d<sizeof(domain)/sizeof(*domain); d++) {
+		kSecTrustSettingsDomainAdmin,
+		kSecTrustSettingsDomainSystem
+	};
+	for (size_t d = 0; d < sizeof(domain) / sizeof(*domain); d++) {
 		CFArrayRef certs = NULL;
 		OSStatus status = SecTrustSettingsCopyCertificates(domain[d],
 								   &certs);
@@ -317,9 +339,9 @@ int add_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flags,
 			return osstatus_error(status);
 
 		int cert_count = CFArrayGetCount(certs);
-		for (int i=0; i<cert_count; i++) {
+		for (int i = 0; i < cert_count; i++) {
 			SecCertificateRef cert =
-				(void*)CFArrayGetValueAtIndex(certs, i);
+			    (void *)CFArrayGetValueAtIndex(certs, i);
 			CFDataRef der;
 			status = SecItemExport(cert, kSecFormatX509Cert, 0,
 					       NULL, &der);
@@ -330,32 +352,34 @@ int add_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flags,
 			}
 
 			if (gnutls_x509_trust_list_add_trust_mem(list,
-								 &(gnutls_datum_t) {
-									.data = (void*)CFDataGetBytePtr(der),
-									.size = CFDataGetLength(der),
-								 },
-								 NULL,
-			                                         GNUTLS_X509_FMT_DER,
-								 tl_flags,
-								 tl_vflags) > 0)
+								 &
+								 (gnutls_datum_t)
+								 {
+								 .data =
+								 (void *)
+								 CFDataGetBytePtr(der),.size = CFDataGetLength(der),}, NULL, GNUTLS_X509_FMT_DER, tl_flags, tl_vflags) > 0)
 				r++;
 			CFRelease(der);
 		}
 		CFRelease(certs);
 	}
 
-#ifdef DEFAULT_BLOCKLIST_FILE
-	ret = gnutls_x509_trust_list_remove_trust_file(list, DEFAULT_BLOCKLIST_FILE, GNUTLS_X509_FMT_PEM);
+# ifdef DEFAULT_BLOCKLIST_FILE
+	ret =
+	    gnutls_x509_trust_list_remove_trust_file(list,
+						     DEFAULT_BLOCKLIST_FILE,
+						     GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
-		_gnutls_debug_log("Could not load blocklist file '%s'\n", DEFAULT_BLOCKLIST_FILE);
+		_gnutls_debug_log("Could not load blocklist file '%s'\n",
+				  DEFAULT_BLOCKLIST_FILE);
 	}
-#endif
+# endif
 
 	return r;
 }
 #else
 
-#define add_system_trust(x,y,z) GNUTLS_E_UNIMPLEMENTED_FEATURE
+# define add_system_trust(x,y,z) GNUTLS_E_UNIMPLEMENTED_FEATURE
 
 #endif
 
@@ -380,6 +404,6 @@ gnutls_x509_trust_list_add_system_trust(gnutls_x509_trust_list_t list,
 					unsigned int tl_flags,
 					unsigned int tl_vflags)
 {
-	return add_system_trust(list, tl_flags|GNUTLS_TL_NO_DUPLICATES, tl_vflags);
+	return add_system_trust(list, tl_flags | GNUTLS_TL_NO_DUPLICATES,
+				tl_vflags);
 }
-

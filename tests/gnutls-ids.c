@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdlib.h>
@@ -34,11 +34,18 @@
 
 void doit(void)
 {
-	assert(gnutls_certificate_verification_profile_get_id("very weak") == GNUTLS_PROFILE_VERY_WEAK);
-	assert(gnutls_certificate_verification_profile_get_id("low") == GNUTLS_PROFILE_LOW);
-	assert(gnutls_certificate_verification_profile_get_id("legacy") == GNUTLS_PROFILE_LEGACY);
-	assert(gnutls_certificate_verification_profile_get_id("MedIum") == GNUTLS_PROFILE_MEDIUM);
-	assert(gnutls_certificate_verification_profile_get_id("ultra") == GNUTLS_PROFILE_ULTRA);
-	assert(gnutls_certificate_verification_profile_get_id("future") == GNUTLS_PROFILE_FUTURE);
-	assert(gnutls_certificate_verification_profile_get_id("xxx") == GNUTLS_PROFILE_UNKNOWN);
+	assert(gnutls_certificate_verification_profile_get_id("very weak") ==
+	       GNUTLS_PROFILE_VERY_WEAK);
+	assert(gnutls_certificate_verification_profile_get_id("low") ==
+	       GNUTLS_PROFILE_LOW);
+	assert(gnutls_certificate_verification_profile_get_id("legacy") ==
+	       GNUTLS_PROFILE_LEGACY);
+	assert(gnutls_certificate_verification_profile_get_id("MedIum") ==
+	       GNUTLS_PROFILE_MEDIUM);
+	assert(gnutls_certificate_verification_profile_get_id("ultra") ==
+	       GNUTLS_PROFILE_ULTRA);
+	assert(gnutls_certificate_verification_profile_get_id("future") ==
+	       GNUTLS_PROFILE_FUTURE);
+	assert(gnutls_certificate_verification_profile_get_id("xxx") ==
+	       GNUTLS_PROFILE_UNKNOWN);
 }

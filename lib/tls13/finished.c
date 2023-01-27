@@ -28,34 +28,30 @@
 #include "mbuffers.h"
 #include "secrets.h"
 
-int _gnutls13_compute_finished(const mac_entry_st *prf,
-		const uint8_t *base_key,
-		gnutls_buffer_st *handshake_hash_buffer,
-		void *out)
+int _gnutls13_compute_finished(const mac_entry_st * prf,
+			       const uint8_t * base_key,
+			       gnutls_buffer_st * handshake_hash_buffer,
+			       void *out)
 {
 	int ret;
 	uint8_t fkey[MAX_HASH_SIZE];
 	uint8_t ts_hash[MAX_HASH_SIZE];
 
 	ret = _tls13_expand_secret2(prf,
-			"finished", 8,
-			NULL, 0,
-			base_key,
-			prf->output_size, fkey);
+				    "finished", 8,
+				    NULL, 0, base_key, prf->output_size, fkey);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
 	ret = gnutls_hash_fast(MAC_TO_DIG(prf->id),
 			       handshake_hash_buffer->data,
-			       handshake_hash_buffer->length,
-			       ts_hash);
+			       handshake_hash_buffer->length, ts_hash);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
 	ret = gnutls_hmac_fast(prf->id,
 			       fkey, prf->output_size,
-			       ts_hash, prf->output_size,
-			       out);
+			       ts_hash, prf->output_size, out);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -88,15 +84,17 @@ int _gnutls13_recv_finished(gnutls_session_t session)
 	}
 
 	ret = _gnutls13_compute_finished(session->security_parameters.prf,
-			base_key,
-			&session->internals.handshake_hash_buffer,
-			verifier);
+					 base_key,
+					 &session->
+					 internals.handshake_hash_buffer,
+					 verifier);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	ret = _gnutls_recv_handshake(session, GNUTLS_HANDSHAKE_FINISHED, 0, &buf);
+	ret =
+	    _gnutls_recv_handshake(session, GNUTLS_HANDSHAKE_FINISHED, 0, &buf);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -107,8 +105,6 @@ int _gnutls13_recv_finished(gnutls_session_t session)
 		ret = GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 		goto cleanup;
 	}
-
-
 #if defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)
 # warning This is unsafe for production builds
 #else
@@ -120,8 +116,8 @@ int _gnutls13_recv_finished(gnutls_session_t session)
 #endif
 
 	ret = 0;
-cleanup:
-	
+ cleanup:
+
 	_gnutls_buffer_clear(&buf);
 	return ret;
 }
@@ -141,21 +137,25 @@ int _gnutls13_send_finished(gnutls_session_t session, unsigned again)
 		hash_size = session->security_parameters.prf->output_size;
 
 		if (!session->internals.initial_negotiation_completed) {
-			if (session->security_parameters.entity == GNUTLS_CLIENT)
+			if (session->security_parameters.entity ==
+			    GNUTLS_CLIENT)
 				base_key = session->key.proto.tls13.hs_ckey;
 			else
 				base_key = session->key.proto.tls13.hs_skey;
 		} else {
-			if (session->security_parameters.entity == GNUTLS_CLIENT)
+			if (session->security_parameters.entity ==
+			    GNUTLS_CLIENT)
 				base_key = session->key.proto.tls13.ap_ckey;
 			else
 				base_key = session->key.proto.tls13.ap_skey;
 		}
 
-		ret = _gnutls13_compute_finished(session->security_parameters.prf,
-				base_key,
-				&session->internals.handshake_hash_buffer,
-				verifier);
+		ret =
+		    _gnutls13_compute_finished(session->security_parameters.prf,
+					       base_key,
+					       &session->
+					       internals.handshake_hash_buffer,
+					       verifier);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -175,9 +175,10 @@ int _gnutls13_send_finished(gnutls_session_t session, unsigned again)
 		}
 	}
 
-	return _gnutls_send_handshake(session, bufel, GNUTLS_HANDSHAKE_FINISHED);
+	return _gnutls_send_handshake(session, bufel,
+				      GNUTLS_HANDSHAKE_FINISHED);
 
-cleanup:
+ cleanup:
 	_mbuffer_xfree(&bufel);
 	return ret;
 }

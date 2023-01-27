@@ -33,7 +33,7 @@
  * undefine it to avoid the conflict with openssl.h.
  */
 #ifdef X509_NAME
-#undef X509_NAME
+# undef X509_NAME
 #endif
 #include <gnutls/openssl.h>
 
@@ -62,7 +62,6 @@ void OpenSSL_add_all_algorithms(void)
 {
 }
 
-
 /* SSL_CTX structure handling */
 
 SSL_CTX *SSL_CTX_new(SSL_METHOD * method)
@@ -89,10 +88,9 @@ int SSL_CTX_set_default_verify_paths(SSL_CTX * ctx)
 	return 0;
 }
 
-int
-SSL_CTX_use_certificate_file(SSL_CTX * ctx, const char *certfile, int type)
+int SSL_CTX_use_certificate_file(SSL_CTX * ctx, const char *certfile, int type)
 {
-	ctx->certfile = (char *) calloc(1, strlen(certfile) + 1);
+	ctx->certfile = (char *)calloc(1, strlen(certfile) + 1);
 	if (!ctx->certfile)
 		return -1;
 	memcpy(ctx->certfile, certfile, strlen(certfile));
@@ -102,10 +100,9 @@ SSL_CTX_use_certificate_file(SSL_CTX * ctx, const char *certfile, int type)
 	return 1;
 }
 
-int
-SSL_CTX_use_PrivateKey_file(SSL_CTX * ctx, const char *keyfile, int type)
+int SSL_CTX_use_PrivateKey_file(SSL_CTX * ctx, const char *keyfile, int type)
 {
-	ctx->keyfile = (char *) calloc(1, strlen(keyfile) + 1);
+	ctx->keyfile = (char *)calloc(1, strlen(keyfile) + 1);
 	if (!ctx->keyfile)
 		return -1;
 	memcpy(ctx->keyfile, keyfile, strlen(keyfile));
@@ -118,7 +115,7 @@ SSL_CTX_use_PrivateKey_file(SSL_CTX * ctx, const char *keyfile, int type)
 
 void
 SSL_CTX_set_verify(SSL_CTX * ctx, int verify_mode,
-		   int (*verify_callback) (int, X509_STORE_CTX *))
+		   int (*verify_callback)(int, X509_STORE_CTX *))
 {
 	ctx->verify_mode = verify_mode;
 	ctx->verify_callback = verify_callback;
@@ -144,7 +141,6 @@ int SSL_CTX_set_cipher_list(SSL_CTX * ctx, const char *list)
 
 	return 1;
 }
-
 
 /* SSL_CTX statistics */
 
@@ -197,8 +193,6 @@ long SSL_CTX_sess_timeouts(SSL_CTX * ctx)
 {
 	return 0;
 }
-
-
 
 /* SSL structure handling */
 
@@ -267,8 +261,7 @@ int SSL_get_error(SSL * ssl, int ret)
 
 int SSL_set_fd(SSL * ssl, int fd)
 {
-	gnutls_transport_set_ptr(ssl->gnutls_state,
-				 GNUTLS_INT_TO_POINTER(fd));
+	gnutls_transport_set_ptr(ssl->gnutls_state, GNUTLS_INT_TO_POINTER(fd));
 	return 1;
 }
 
@@ -311,7 +304,7 @@ int SSL_pending(SSL * ssl)
 
 void
 SSL_set_verify(SSL * ssl, int verify_mode,
-	       int (*verify_callback) (int, X509_STORE_CTX *))
+	       int (*verify_callback)(int, X509_STORE_CTX *))
 {
 	ssl->verify_mode = verify_mode;
 	ssl->verify_callback = verify_callback;
@@ -480,7 +473,6 @@ int SSL_want(SSL * ssl)
 	return SSL_NOTHING;
 }
 
-
 /* SSL_METHOD functions */
 
 SSL_METHOD *SSLv23_client_method(void)
@@ -490,8 +482,7 @@ SSL_METHOD *SSLv23_client_method(void)
 	if (!m)
 		return NULL;
 
-	strcpy(m->priority_string,
-	       "NORMAL");
+	strcpy(m->priority_string, "NORMAL");
 
 	m->connend = GNUTLS_CLIENT;
 
@@ -505,8 +496,7 @@ SSL_METHOD *SSLv23_server_method(void)
 	if (!m)
 		return NULL;
 
-	strcpy(m->priority_string,
-	       "NORMAL");
+	strcpy(m->priority_string, "NORMAL");
 	m->connend = GNUTLS_SERVER;
 
 	return m;
@@ -568,7 +558,6 @@ SSL_METHOD *TLSv1_server_method(void)
 	return m;
 }
 
-
 /* SSL_CIPHER functions */
 
 SSL_CIPHER *SSL_get_current_cipher(SSL * ssl)
@@ -583,8 +572,7 @@ SSL_CIPHER *SSL_get_current_cipher(SSL * ssl)
 	ssl->ciphersuite.mac = gnutls_mac_get(ssl->gnutls_state);
 	ssl->ciphersuite.compression =
 	    gnutls_compression_get(ssl->gnutls_state);
-	ssl->ciphersuite.cert =
-	    gnutls_certificate_type_get(ssl->gnutls_state);
+	ssl->ciphersuite.cert = gnutls_certificate_type_get(ssl->gnutls_state);
 
 	return &(ssl->ciphersuite);
 }
@@ -638,7 +626,7 @@ char *SSL_CIPHER_description(SSL_CIPHER * cipher, char *buf, int size)
 		tmpsize = size;
 		local_alloc = 0;
 	} else {
-		tmpbuf = (char *) malloc(128);
+		tmpbuf = (char *)malloc(128);
 		tmpsize = 128;
 		local_alloc = 1;
 	}
@@ -650,12 +638,11 @@ char *SSL_CIPHER_description(SSL_CIPHER * cipher, char *buf, int size)
 		     gnutls_mac_get_name(cipher->mac)) == -1) {
 		if (local_alloc)
 			free(tmpbuf);
-		return (char *) "Buffer too small";
+		return (char *)"Buffer too small";
 	}
 
 	return tmpbuf;
 }
-
 
 /* X509 functions */
 
@@ -706,13 +693,11 @@ void X509_free(const X509 * cert)
 	/* only get certificates as const items */
 }
 
-
 /* BIO functions */
 
 void BIO_get_fd(gnutls_session_t gnutls_state, int *fd)
 {
-	gnutls_transport_ptr_t tmp =
-	    gnutls_transport_get_ptr(gnutls_state);
+	gnutls_transport_ptr_t tmp = gnutls_transport_get_ptr(gnutls_state);
 	*fd = GNUTLS_POINTER_TO_INT(tmp);
 }
 
@@ -728,7 +713,6 @@ BIO *BIO_new_socket(int sock, int close_flag)
 
 	return bio;
 }
-
 
 /* error handling */
 
@@ -746,7 +730,6 @@ const char *ERR_error_string(unsigned long e, char *buf)
 {
 	return gnutls_strerror(-1 * e);
 }
-
 
 /* RAND functions */
 
@@ -792,13 +775,12 @@ int RAND_egd_bytes(const char *path, int bytes)
 	return bytes;
 }
 
-
 /* message digest functions */
 
 void MD5_Init(MD5_CTX * ctx)
 {
 	int ret;
-	ret = gnutls_hash_init((void *) &ctx->handle, GNUTLS_DIG_MD5);
+	ret = gnutls_hash_init((void *)&ctx->handle, GNUTLS_DIG_MD5);
 	if (ret < 0)
 		abort();
 }
@@ -827,7 +809,7 @@ unsigned char *MD5(const unsigned char *buf, unsigned long len,
 void RIPEMD160_Init(RIPEMD160_CTX * ctx)
 {
 	int ret;
-	ret = gnutls_hash_init((void *) &ctx->handle, GNUTLS_DIG_RMD160);
+	ret = gnutls_hash_init((void *)&ctx->handle, GNUTLS_DIG_RMD160);
 	if (ret < 0)
 		abort();
 }

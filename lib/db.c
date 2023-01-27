@@ -160,8 +160,7 @@ unsigned gnutls_db_get_default_cache_expiration(void)
  * Deprecated: This function is deprecated.
  **/
 int
-gnutls_db_check_entry(gnutls_session_t session,
-		      gnutls_datum_t session_entry)
+gnutls_db_check_entry(gnutls_session_t session, gnutls_datum_t session_entry)
 {
 	return 0;
 }
@@ -204,7 +203,7 @@ time_t gnutls_db_check_entry_time(gnutls_datum_t * entry)
  *
  * Since: 3.6.5
  **/
-time_t gnutls_db_check_entry_expire_time(gnutls_datum_t *entry)
+time_t gnutls_db_check_entry_expire_time(gnutls_datum_t * entry)
 {
 	uint32_t t;
 	uint32_t e;
@@ -311,7 +310,8 @@ int _gnutls_check_resumed_params(gnutls_session_t session)
 	 */
 	vers = get_version(session);
 	if (!vers || !vers->tls13_sem) {
-		if (session->internals.resumed_security_parameters.ext_master_secret !=
+		if (session->internals.
+		    resumed_security_parameters.ext_master_secret !=
 		    session->security_parameters.ext_master_secret)
 			return gnutls_assert_val(GNUTLS_E_INVALID_SESSION);
 
@@ -355,8 +355,7 @@ _gnutls_server_restore_session(gnutls_session_t session,
 	}
 
 	data =
-	    session->internals.db_retrieve_func(session->internals.db_ptr,
-						key);
+	    session->internals.db_retrieve_func(session->internals.db_ptr, key);
 
 	if (data.data == NULL) {
 		gnutls_assert();

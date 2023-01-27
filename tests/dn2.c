@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+# include "config.h"
 #endif
 
 #include <stdio.h>
@@ -67,7 +67,7 @@ static const char *info =
 
 void doit(void)
 {
-	gnutls_datum_t pem_cert = { (void *) pem, sizeof(pem) };
+	gnutls_datum_t pem_cert = { (void *)pem, sizeof(pem) };
 	gnutls_x509_crt_t cert;
 	gnutls_datum_t out;
 	int ret;
@@ -90,11 +90,10 @@ void doit(void)
 
 /* When allowing SHA1, the output is different: no broken! string */
 #ifndef ALLOW_SHA1
-	if (out.size != strlen(info) ||
-	    strcasecmp((char *) out.data, info) != 0) {
-		fprintf(stderr, "comparison fail (%d/%d)\nexpected: %s\n\n   got: %.*s\n\n",
-		     out.size, (int) strlen(info), info, out.size,
-		     out.data);
+	if (out.size != strlen(info) || strcasecmp((char *)out.data, info) != 0) {
+		fprintf(stderr,
+			"comparison fail (%d/%d)\nexpected: %s\n\n   got: %.*s\n\n",
+			out.size, (int)strlen(info), info, out.size, out.data);
 		fail("comparison failed\n");
 	}
 #endif

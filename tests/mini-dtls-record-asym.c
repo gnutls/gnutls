@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -43,12 +43,12 @@ void doit(void)
 
 #else
 
-#include <limits.h>
-#include <netinet/in.h>
-#include <poll.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
+# include <limits.h>
+# include <netinet/in.h>
+# include <poll.h>
+# include <sys/types.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
 
 /* Tests whether packing multiple DTLS records in a single UDP packet
  * will be handled correctly, as well as an asymmetry in MTU sizes
@@ -89,7 +89,8 @@ static ssize_t push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 
 			if (debug)
 				fprintf(stderr, "caching: %s (buffer: %d)\n",
-					gnutls_handshake_description_get_name(d[13]),
+					gnutls_handshake_description_get_name(d
+									      [13]),
 					buffer_size);
 			return len;
 		} else if (debug) {
@@ -111,31 +112,29 @@ static ssize_t push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 }
 
 static unsigned char server_cert_pem[] =
-  "-----BEGIN CERTIFICATE-----\n"
-  "MIICHzCCAaWgAwIBAgIBCTAKBggqhkjOPQQDAjA+MQswCQYDVQQGEwJOTDERMA8G\n"
-  "A1UEChMIUG9sYXJTU0wxHDAaBgNVBAMTE1BvbGFyc3NsIFRlc3QgRUMgQ0EwHhcN\n"
-  "MTMwOTI0MTU1MjA0WhcNMjMwOTIyMTU1MjA0WjA0MQswCQYDVQQGEwJOTDERMA8G\n"
-  "A1UEChMIUG9sYXJTU0wxEjAQBgNVBAMTCWxvY2FsaG9zdDBZMBMGByqGSM49AgEG\n"
-  "CCqGSM49AwEHA0IABDfMVtl2CR5acj7HWS3/IG7ufPkGkXTQrRS192giWWKSTuUA\n"
-  "2CMR/+ov0jRdXRa9iojCa3cNVc2KKg76Aci07f+jgZ0wgZowCQYDVR0TBAIwADAd\n"
-  "BgNVHQ4EFgQUUGGlj9QH2deCAQzlZX+MY0anE74wbgYDVR0jBGcwZYAUnW0gJEkB\n"
-  "PyvLeLUZvH4kydv7NnyhQqRAMD4xCzAJBgNVBAYTAk5MMREwDwYDVQQKEwhQb2xh\n"
-  "clNTTDEcMBoGA1UEAxMTUG9sYXJzc2wgVGVzdCBFQyBDQYIJAMFD4n5iQ8zoMAoG\n"
-  "CCqGSM49BAMCA2gAMGUCMQCaLFzXptui5WQN8LlO3ddh1hMxx6tzgLvT03MTVK2S\n"
-  "C12r0Lz3ri/moSEpNZWqPjkCMCE2f53GXcYLqyfyJR078c/xNSUU5+Xxl7VZ414V\n"
-  "fGa5kHvHARBPc8YAIVIqDvHH1Q==\n"
-  "-----END CERTIFICATE-----\n";
+    "-----BEGIN CERTIFICATE-----\n"
+    "MIICHzCCAaWgAwIBAgIBCTAKBggqhkjOPQQDAjA+MQswCQYDVQQGEwJOTDERMA8G\n"
+    "A1UEChMIUG9sYXJTU0wxHDAaBgNVBAMTE1BvbGFyc3NsIFRlc3QgRUMgQ0EwHhcN\n"
+    "MTMwOTI0MTU1MjA0WhcNMjMwOTIyMTU1MjA0WjA0MQswCQYDVQQGEwJOTDERMA8G\n"
+    "A1UEChMIUG9sYXJTU0wxEjAQBgNVBAMTCWxvY2FsaG9zdDBZMBMGByqGSM49AgEG\n"
+    "CCqGSM49AwEHA0IABDfMVtl2CR5acj7HWS3/IG7ufPkGkXTQrRS192giWWKSTuUA\n"
+    "2CMR/+ov0jRdXRa9iojCa3cNVc2KKg76Aci07f+jgZ0wgZowCQYDVR0TBAIwADAd\n"
+    "BgNVHQ4EFgQUUGGlj9QH2deCAQzlZX+MY0anE74wbgYDVR0jBGcwZYAUnW0gJEkB\n"
+    "PyvLeLUZvH4kydv7NnyhQqRAMD4xCzAJBgNVBAYTAk5MMREwDwYDVQQKEwhQb2xh\n"
+    "clNTTDEcMBoGA1UEAxMTUG9sYXJzc2wgVGVzdCBFQyBDQYIJAMFD4n5iQ8zoMAoG\n"
+    "CCqGSM49BAMCA2gAMGUCMQCaLFzXptui5WQN8LlO3ddh1hMxx6tzgLvT03MTVK2S\n"
+    "C12r0Lz3ri/moSEpNZWqPjkCMCE2f53GXcYLqyfyJR078c/xNSUU5+Xxl7VZ414V\n"
+    "fGa5kHvHARBPc8YAIVIqDvHH1Q==\n" "-----END CERTIFICATE-----\n";
 
 const gnutls_datum_t server_cert = { server_cert_pem,
 	sizeof(server_cert_pem)
 };
 
 static unsigned char server_key_pem[] =
-  "-----BEGIN EC PRIVATE KEY-----\n"
-  "MHcCAQEEIPEqEyB2AnCoPL/9U/YDHvdqXYbIogTywwyp6/UfDw6noAoGCCqGSM49\n"
-  "AwEHoUQDQgAEN8xW2XYJHlpyPsdZLf8gbu58+QaRdNCtFLX3aCJZYpJO5QDYIxH/\n"
-  "6i/SNF1dFr2KiMJrdw1VzYoqDvoByLTt/w==\n"
-  "-----END EC PRIVATE KEY-----\n";
+    "-----BEGIN EC PRIVATE KEY-----\n"
+    "MHcCAQEEIPEqEyB2AnCoPL/9U/YDHvdqXYbIogTywwyp6/UfDw6noAoGCCqGSM49\n"
+    "AwEHoUQDQgAEN8xW2XYJHlpyPsdZLf8gbu58+QaRdNCtFLX3aCJZYpJO5QDYIxH/\n"
+    "6i/SNF1dFr2KiMJrdw1VzYoqDvoByLTt/w==\n" "-----END EC PRIVATE KEY-----\n";
 
 const gnutls_datum_t server_key = { server_key_pem,
 	sizeof(server_key_pem)
@@ -164,7 +163,8 @@ static void client(int fd, unsigned cache)
 	 */
 	gnutls_init(&session, GNUTLS_CLIENT | GNUTLS_DATAGRAM);
 	gnutls_dtls_set_mtu(session, 1500);
-	gnutls_dtls_set_timeouts(session, get_dtls_retransmit_timeout(), get_timeout());
+	gnutls_dtls_set_timeouts(session, get_dtls_retransmit_timeout(),
+				 get_timeout());
 	//gnutls_transport_set_push_function(session, push);
 
 	/* Use default priorities */
@@ -189,7 +189,8 @@ static void client(int fd, unsigned cache)
 
 		ret = gnutls_handshake(session);
 
-		if (ret == GNUTLS_E_AGAIN && gnutls_record_get_direction(session) == 0) {
+		if (ret == GNUTLS_E_AGAIN
+		    && gnutls_record_get_direction(session) == 0) {
 			int rv;
 			pfd.fd = fd;
 			pfd.events = POLLIN;
@@ -202,7 +203,8 @@ static void client(int fd, unsigned cache)
 			if (rv == -1)
 				perror("poll()");
 			else if (!rv)
-				fail("test %d: No data were received.\n", cache);
+				fail("test %d: No data were received.\n",
+				     cache);
 		}
 	}
 	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
@@ -254,21 +256,21 @@ static void server(int fd, unsigned cache)
 	 */
 	global_init();
 
-#if 0
+# if 0
 	if (debug) {
 		side = "server";
 		gnutls_global_set_log_function(tls_log_func);
 		gnutls_global_set_log_level(4711);
 	}
-#endif
+# endif
 
 	gnutls_certificate_allocate_credentials(&x509_cred);
 	gnutls_certificate_set_x509_key_mem(x509_cred, &server_cert,
-					    &server_key,
-					    GNUTLS_X509_FMT_PEM);
+					    &server_key, GNUTLS_X509_FMT_PEM);
 
 	gnutls_init(&session, GNUTLS_SERVER | GNUTLS_DATAGRAM);
-	gnutls_dtls_set_timeouts(session, get_dtls_retransmit_timeout(), get_timeout());
+	gnutls_dtls_set_timeouts(session, get_dtls_retransmit_timeout(),
+				 get_timeout());
 	gnutls_dtls_set_mtu(session, 400);
 	if (cache != 0)
 		gnutls_transport_set_push_function(session, push);

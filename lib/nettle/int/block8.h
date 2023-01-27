@@ -30,32 +30,30 @@
 */
 
 #ifndef GNUTLS_LIB_NETTLE_BLOCK8_H
-#define GNUTLS_LIB_NETTLE_BLOCK8_H
+# define GNUTLS_LIB_NETTLE_BLOCK8_H
 
-#include "config.h"
+# include "config.h"
 
-#ifndef HAVE_UNION_NETTLE_BLOCK8
+# ifndef HAVE_UNION_NETTLE_BLOCK8
 
 /* An aligned 16-byte block. */
-union gnutls_nettle_backport_nettle_block16
-{
-  uint8_t b[16];
-  unsigned long w[16 / sizeof(unsigned long)];
-  uint64_t u64[2];
+union gnutls_nettle_backport_nettle_block16 {
+	uint8_t b[16];
+	unsigned long w[16 / sizeof(unsigned long)];
+	uint64_t u64[2];
 };
 
-union gnutls_nettle_backport_nettle_block8
-{
-  uint8_t b[8];
-  uint64_t u64;
+union gnutls_nettle_backport_nettle_block8 {
+	uint8_t b[8];
+	uint64_t u64;
 };
 
-#undef nettle_block16
-#undef nettle_block8
+#  undef nettle_block16
+#  undef nettle_block8
 
-#define nettle_block16 gnutls_nettle_backport_nettle_block16
-#define nettle_block8 gnutls_nettle_backport_nettle_block8
+#  define nettle_block16 gnutls_nettle_backport_nettle_block16
+#  define nettle_block8 gnutls_nettle_backport_nettle_block8
 
-#endif
+# endif
 
-#endif /* GNUTLS_LIB_NETTLE_BLOCK8_H */
+#endif				/* GNUTLS_LIB_NETTLE_BLOCK8_H */

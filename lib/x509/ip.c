@@ -38,28 +38,43 @@
 int _gnutls_mask_to_prefix(const unsigned char *mask, unsigned mask_size)
 {
 	unsigned i, prefix_length = 0;
-	for (i=0; i<mask_size; i++) {
+	for (i = 0; i < mask_size; i++) {
 		if (mask[i] == 0xFF) {
 			prefix_length += 8;
 		} else {
-			switch(mask[i]) {
-				case 0xFE: prefix_length += 7; break;
-				case 0xFC: prefix_length += 6; break;
-				case 0xF8: prefix_length += 5; break;
-				case 0xF0: prefix_length += 4; break;
-				case 0xE0: prefix_length += 3; break;
-				case 0xC0: prefix_length += 2; break;
-				case 0x80: prefix_length += 1; break;
-				case 0x00: break;
-				default:
-					return -1;
+			switch (mask[i]) {
+			case 0xFE:
+				prefix_length += 7;
+				break;
+			case 0xFC:
+				prefix_length += 6;
+				break;
+			case 0xF8:
+				prefix_length += 5;
+				break;
+			case 0xF0:
+				prefix_length += 4;
+				break;
+			case 0xE0:
+				prefix_length += 3;
+				break;
+			case 0xC0:
+				prefix_length += 2;
+				break;
+			case 0x80:
+				prefix_length += 1;
+				break;
+			case 0x00:
+				break;
+			default:
+				return -1;
 			}
 			break;
 		}
 	}
 	i++;
 	// mask is invalid, if there follows something else than 0x00
-	for ( ; i<mask_size; i++) {
+	for (; i < mask_size; i++) {
 		if (mask[i] != 0)
 			return -1;
 	}
@@ -79,7 +94,8 @@ int _gnutls_mask_to_prefix(const unsigned char *mask, unsigned mask_size)
  *
  * Returns: Address of result string.
  -*/
-const char *_gnutls_ip_to_string(const void *_ip, unsigned int ip_size, char *out, unsigned int out_size)
+const char *_gnutls_ip_to_string(const void *_ip, unsigned int ip_size,
+				 char *out, unsigned int out_size)
 {
 
 	if (ip_size != 4 && ip_size != 16) {
@@ -118,7 +134,8 @@ const char *_gnutls_ip_to_string(const void *_ip, unsigned int ip_size, char *ou
  *
  * Returns: Address of result string.
  -*/
-const char *_gnutls_cidr_to_string(const void *_ip, unsigned int ip_size, char *out, unsigned int out_size)
+const char *_gnutls_cidr_to_string(const void *_ip, unsigned int ip_size,
+				   char *out, unsigned int out_size)
 {
 	const unsigned char *ip = _ip;
 	char tmp[64];
@@ -133,12 +150,14 @@ const char *_gnutls_cidr_to_string(const void *_ip, unsigned int ip_size, char *
 		p = inet_ntop(AF_INET, ip, tmp, sizeof(tmp));
 
 		if (p)
-			snprintf(out, out_size, "%s/%d", tmp, _gnutls_mask_to_prefix(ip+4, 4));
+			snprintf(out, out_size, "%s/%d", tmp,
+				 _gnutls_mask_to_prefix(ip + 4, 4));
 	} else {
 		p = inet_ntop(AF_INET6, ip, tmp, sizeof(tmp));
 
 		if (p)
-			snprintf(out, out_size, "%s/%d", tmp, _gnutls_mask_to_prefix(ip+16, 16));
+			snprintf(out, out_size, "%s/%d", tmp,
+				 _gnutls_mask_to_prefix(ip + 16, 16));
 	}
 
 	if (p == NULL)
@@ -147,7 +166,8 @@ const char *_gnutls_cidr_to_string(const void *_ip, unsigned int ip_size, char *
 	return out;
 }
 
-static void prefix_to_mask(unsigned prefix, unsigned char *mask, size_t mask_size)
+static void prefix_to_mask(unsigned prefix, unsigned char *mask,
+			   size_t mask_size)
 {
 	int i;
 	unsigned j;
@@ -172,7 +192,8 @@ static void prefix_to_mask(unsigned prefix, unsigned char *mask, size_t mask_siz
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a negative error value.
  -*/
-int _gnutls_mask_ip(unsigned char *ip, const unsigned char *mask, unsigned ipsize)
+int _gnutls_mask_ip(unsigned char *ip, const unsigned char *mask,
+		    unsigned ipsize)
 {
 	unsigned i;
 
@@ -202,7 +223,7 @@ int _gnutls_mask_ip(unsigned char *ip, const unsigned char *mask, unsigned ipsiz
  *
  * Since: 3.5.4
  */
-int gnutls_x509_cidr_to_rfc5280(const char *cidr, gnutls_datum_t *cidr_rfc5280)
+int gnutls_x509_cidr_to_rfc5280(const char *cidr, gnutls_datum_t * cidr_rfc5280)
 {
 	unsigned iplength, prefix;
 	int ret;
@@ -212,34 +233,36 @@ int gnutls_x509_cidr_to_rfc5280(const char *cidr, gnutls_datum_t *cidr_rfc5280)
 
 	p = strchr(cidr, '/');
 	if (p != NULL) {
-		prefix = strtol(p+1, &p_end, 10);
-		if (prefix == 0 && p_end == p+1) {
-			_gnutls_debug_log("Cannot parse prefix given in CIDR %s\n", cidr);
+		prefix = strtol(p + 1, &p_end, 10);
+		if (prefix == 0 && p_end == p + 1) {
+			_gnutls_debug_log
+			    ("Cannot parse prefix given in CIDR %s\n", cidr);
 			gnutls_assert();
 			return GNUTLS_E_MALFORMED_CIDR;
 		}
-		unsigned length = p-cidr+1;
+		unsigned length = p - cidr + 1;
 		cidr_tmp = gnutls_malloc(length);
 		if (cidr_tmp == NULL) {
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 		}
 		memcpy(cidr_tmp, cidr, length);
-		cidr_tmp[length-1] = 0;
+		cidr_tmp[length - 1] = 0;
 	} else {
 		_gnutls_debug_log("No prefix given in CIDR %s\n", cidr);
 		gnutls_assert();
 		return GNUTLS_E_MALFORMED_CIDR;
 	}
 
-	if (strchr(cidr, ':') != 0) { /* IPv6 */
+	if (strchr(cidr, ':') != 0) {	/* IPv6 */
 		iplength = 16;
-	} else { /* IPv4 */
+	} else {		/* IPv4 */
 		iplength = 4;
 	}
-	cidr_rfc5280->size = 2*iplength;
+	cidr_rfc5280->size = 2 * iplength;
 
-	if (prefix > iplength*8) {
-		_gnutls_debug_log("Invalid prefix given in CIDR %s (%d)\n", cidr, prefix);
+	if (prefix > iplength * 8) {
+		_gnutls_debug_log("Invalid prefix given in CIDR %s (%d)\n",
+				  cidr, prefix);
 		ret = gnutls_assert_val(GNUTLS_E_MALFORMED_CIDR);
 		goto cleanup;
 	}
@@ -250,7 +273,9 @@ int gnutls_x509_cidr_to_rfc5280(const char *cidr, gnutls_datum_t *cidr_rfc5280)
 		goto cleanup;
 	}
 
-	ret = inet_pton(iplength == 4 ? AF_INET : AF_INET6, cidr_tmp, cidr_rfc5280->data);
+	ret =
+	    inet_pton(iplength == 4 ? AF_INET : AF_INET6, cidr_tmp,
+		      cidr_rfc5280->data);
 	if (ret == 0) {
 		_gnutls_debug_log("Cannot parse IP from CIDR %s\n", cidr_tmp);
 		ret = gnutls_assert_val(GNUTLS_E_MALFORMED_CIDR);
@@ -258,11 +283,12 @@ int gnutls_x509_cidr_to_rfc5280(const char *cidr, gnutls_datum_t *cidr_rfc5280)
 	}
 
 	prefix_to_mask(prefix, &cidr_rfc5280->data[iplength], iplength);
-	_gnutls_mask_ip(cidr_rfc5280->data, &cidr_rfc5280->data[iplength], iplength);
+	_gnutls_mask_ip(cidr_rfc5280->data, &cidr_rfc5280->data[iplength],
+			iplength);
 
 	ret = GNUTLS_E_SUCCESS;
 
-cleanup:
+ cleanup:
 	gnutls_free(cidr_tmp);
 	return ret;
 }

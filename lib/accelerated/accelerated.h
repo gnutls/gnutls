@@ -3,4 +3,4 @@
 
 void _gnutls_register_accel_crypto(void);
 
-#endif /* GNUTLS_LIB_ACCELERATED_ACCELERATED_H */
+#endif				/* GNUTLS_LIB_ACCELERATED_ACCELERATED_H */

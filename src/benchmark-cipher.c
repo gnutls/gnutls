@@ -115,7 +115,7 @@ static void cipher_mac_bench(int algo, int mac_algo, int size)
 
 	stop_benchmark(&st, NULL, 1);
 
-      leave:
+ leave:
 	FREE(input);
 	FREE(output);
 	free(_key);
@@ -125,12 +125,12 @@ static void cipher_mac_bench(int algo, int mac_algo, int size)
 static void force_memcpy(void *dest, const void *src, size_t n)
 {
 	volatile unsigned volatile_zero = 0;
-	volatile char *vdest = (volatile char*)dest;
+	volatile char *vdest = (volatile char *)dest;
 
 	if (n > 0) {
 		do {
 			memcpy(dest, src, n);
-		} while(vdest[volatile_zero] != ((char*)src)[volatile_zero]);
+		} while (vdest[volatile_zero] != ((char *)src)[volatile_zero]);
 	}
 }
 
@@ -155,8 +155,8 @@ static void cipher_bench(int algo, int size, int aead)
 
 	/* For AES-XTS, the block and tweak key must be different */
 	if (algo == GNUTLS_CIPHER_AES_128_XTS ||
-		algo == GNUTLS_CIPHER_AES_256_XTS) {
-		memset((uint8_t *)_key + (keysize / 2), 0x0f, (keysize / 2));
+	    algo == GNUTLS_CIPHER_AES_256_XTS) {
+		memset((uint8_t *) _key + (keysize / 2), 0x0f, (keysize / 2));
 	}
 
 	_iv = malloc(ivsize);
@@ -177,7 +177,7 @@ static void cipher_bench(int algo, int size, int aead)
 	assert(gnutls_rnd(GNUTLS_RND_NONCE, &c, 1) >= 0);
 
 	ALLOCM(input, MAX_MEM);
-	ALLOCM(output, step+64);
+	ALLOCM(output, step + 64);
 	i = input;
 
 	start_benchmark(&st);
@@ -200,9 +200,10 @@ static void cipher_bench(int algo, int size, int aead)
 		}
 
 		do {
-			out_size = step+tag_size;
-			assert(gnutls_aead_cipher_encrypt(actx, iv.data, iv.size, NULL, 0, tag_size,
-				i, step, output, &out_size) >= 0);
+			out_size = step + tag_size;
+			assert(gnutls_aead_cipher_encrypt
+			       (actx, iv.data, iv.size, NULL, 0, tag_size, i,
+				step, output, &out_size) >= 0);
 			st.size += step;
 			INC(input, i, step);
 		}
@@ -229,7 +230,7 @@ static void cipher_bench(int algo, int size, int aead)
 
 	FREE(input);
 	FREE(output);
-      leave:
+ leave:
 	free(_key);
 	free(_iv);
 }
@@ -286,14 +287,14 @@ void benchmark_cipher(int debug_level)
 	cipher_bench(GNUTLS_CIPHER_AES_128_CCM, size, 1);
 	cipher_bench(GNUTLS_CIPHER_CHACHA20_POLY1305, size, 1);
 
-	printf("\nChecking cipher-MAC combinations, payload size: %u\n", size * 1024);
+	printf("\nChecking cipher-MAC combinations, payload size: %u\n",
+	       size * 1024);
 	cipher_mac_bench(GNUTLS_CIPHER_SALSA20_256, GNUTLS_MAC_SHA1, size);
 	cipher_mac_bench(GNUTLS_CIPHER_AES_128_CBC, GNUTLS_MAC_SHA1, size);
-	cipher_mac_bench(GNUTLS_CIPHER_AES_128_CBC, GNUTLS_MAC_SHA256,
-			 size);
+	cipher_mac_bench(GNUTLS_CIPHER_AES_128_CBC, GNUTLS_MAC_SHA256, size);
 #ifdef ENABLE_GOST
-	cipher_mac_bench(GNUTLS_CIPHER_GOST28147_TC26Z_CNT, GNUTLS_MAC_GOST28147_TC26Z_IMIT,
-			 size);
+	cipher_mac_bench(GNUTLS_CIPHER_GOST28147_TC26Z_CNT,
+			 GNUTLS_MAC_GOST28147_TC26Z_IMIT, size);
 #endif
 
 	printf("\nChecking MAC algorithms, payload size: %u\n", size * 1024);

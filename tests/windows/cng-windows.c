@@ -25,12 +25,12 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #ifndef _WIN32
 
-#include <stdlib.h>
+# include <stdlib.h>
 
 void doit(void)
 {
@@ -39,21 +39,21 @@ void doit(void)
 
 #else
 
-#include <windows.h>
-#include <wincrypt.h>
-#include <winbase.h>
-#include <ncrypt.h>
-#include <string.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/x509.h>
-#include <gnutls/abstract.h>
-#include <gnutls/system-keys.h>
-#include <gnutls/crypto.h>
-#include <stdio.h>
-#include <assert.h>
-#include <utils.h>
-#include "../cert-common.h"
-#include "ncrypt-int.h"
+# include <windows.h>
+# include <wincrypt.h>
+# include <winbase.h>
+# include <ncrypt.h>
+# include <string.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/x509.h>
+# include <gnutls/abstract.h>
+# include <gnutls/system-keys.h>
+# include <gnutls/crypto.h>
+# include <stdio.h>
+# include <assert.h>
+# include <utils.h>
+# include "../cert-common.h"
+# include "ncrypt-int.h"
 
 static void tls_log_func(int level, const char *str)
 {
@@ -65,8 +65,7 @@ const gnutls_datum_t sha256_hash_data = {
 	(void *)
 	    "\x2c\xf2\x4d\xba\x5f\xb0\xa3\x0e\x26\xe8"
 	    "\x3b\x2a\xc5\xb9\xe2\x9e\x1b\x16\x1e\x5c"
-	    "\x1f\xa7\x42\x5e\x73\x04\x33\x62\x93\x8b"
-	    "\x98\x24",
+	    "\x1f\xa7\x42\x5e\x73\x04\x33\x62\x93\x8b" "\x98\x24",
 	32
 };
 
@@ -102,14 +101,15 @@ void test_sig(void)
 
 	assert_int_nequal(gnutls_privkey_init(&privkey), 0);
 
-	assert_int_nequal(gnutls_privkey_import_url(privkey, "system:win:id=123456", 0), 0);
+	assert_int_nequal(gnutls_privkey_import_url
+			  (privkey, "system:win:id=123456", 0), 0);
 
-	assert_int_nequal(gnutls_pubkey_import_x509_raw(pubkey, &cert_dat, GNUTLS_X509_FMT_PEM, 0), 0);
+	assert_int_nequal(gnutls_pubkey_import_x509_raw
+			  (pubkey, &cert_dat, GNUTLS_X509_FMT_PEM, 0), 0);
 
 	assert_int_nequal(gnutls_privkey_sign_hash(privkey, GNUTLS_DIG_SHA256,
-				     0, &sha256_hash_data,
-				     &signature), 0);
-
+						   0, &sha256_hash_data,
+						   &signature), 0);
 
 	ret =
 	    gnutls_pubkey_verify_hash2(pubkey,
@@ -121,52 +121,49 @@ void test_sig(void)
 	ret =
 	    gnutls_pubkey_verify_hash2(pubkey,
 				       sign_algo, 0,
-				       &invalid_hash_data,
-				       &signature);
+				       &invalid_hash_data, &signature);
 	assert(ret == GNUTLS_E_PK_SIG_VERIFY_FAILED);
 
 	gnutls_free(signature.data);
 	signature.data = NULL;
- /* test the raw interface (MD5+SHA1)
-  */
+	/* test the raw interface (MD5+SHA1)
+	 */
 	ret =
 	    gnutls_privkey_sign_hash(privkey,
 				     0,
 				     GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA,
-				     &md5sha1_hash_data,
-				     &signature);
+				     &md5sha1_hash_data, &signature);
 	assert(ret >= 0);
 
 	ret =
 	    gnutls_pubkey_verify_hash2(pubkey,
 				       0,
 				       GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA,
-				       &md5sha1_hash_data,
-				       &signature);
+				       &md5sha1_hash_data, &signature);
 	assert(ret >= 0);
 
 	gnutls_free(signature.data);
 	signature.data = NULL;
 
- /* test the raw interface DigestInfo
-  */
-	ret = gnutls_encode_ber_digest_info(GNUTLS_DIG_SHA256, &sha256_hash_data, &digest_info);
+	/* test the raw interface DigestInfo
+	 */
+	ret =
+	    gnutls_encode_ber_digest_info(GNUTLS_DIG_SHA256, &sha256_hash_data,
+					  &digest_info);
 	assert(ret >= 0);
 
 	ret =
 	    gnutls_privkey_sign_hash(privkey,
 				     0,
 				     GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA,
-				     &digest_info,
-				     &signature);
+				     &digest_info, &signature);
 	assert(ret >= 0);
 
 	ret =
 	    gnutls_pubkey_verify_hash2(pubkey,
 				       0,
 				       GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA,
-				       &digest_info,
-				       &signature);
+				       &digest_info, &signature);
 	assert(ret >= 0);
 
 	gnutls_free(signature.data);

@@ -47,7 +47,8 @@
 static char buffer[MAX_BUF + 1];
 
 /* returns the host part of a URL */
-static const char *host_from_url(const char *url, unsigned int *port, const char **path)
+static const char *host_from_url(const char *url, unsigned int *port,
+				 const char **path)
 {
 	static char hostname[512];
 	char *p;
@@ -60,7 +61,7 @@ static const char *host_from_url(const char *url, unsigned int *port, const char
 		p = strchr(hostname, '/');
 		if (p != NULL) {
 			*p = 0;
-			*path = p+1;
+			*path = p + 1;
 		}
 
 		p = strchr(hostname, ':');
@@ -77,7 +78,7 @@ static const char *host_from_url(const char *url, unsigned int *port, const char
 
 void
 _generate_request(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
-		  gnutls_datum_t * rdata, gnutls_datum_t *nonce)
+		  gnutls_datum_t * rdata, gnutls_datum_t * nonce)
 {
 	gnutls_ocsp_req_t req;
 	int ret;
@@ -90,8 +91,7 @@ _generate_request(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
 
 	ret = gnutls_ocsp_req_add_cert(req, GNUTLS_DIG_SHA1, issuer, cert);
 	if (ret < 0) {
-		fprintf(stderr, "ocsp_req_add_cert: %s",
-			gnutls_strerror(ret));
+		fprintf(stderr, "ocsp_req_add_cert: %s", gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -106,8 +106,7 @@ _generate_request(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
 
 	ret = gnutls_ocsp_req_export(req, rdata);
 	if (ret != 0) {
-		fprintf(stderr, "ocsp_req_export: %s",
-			gnutls_strerror(ret));
+		fprintf(stderr, "ocsp_req_export: %s", gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -115,8 +114,7 @@ _generate_request(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
 	return;
 }
 
-static size_t get_data(void *buf, size_t size, size_t nmemb,
-		       void *userp)
+static size_t get_data(void *buf, size_t size, size_t nmemb, void *userp)
 {
 	gnutls_datum_t *ud = userp;
 
@@ -137,12 +135,12 @@ static size_t get_data(void *buf, size_t size, size_t nmemb,
 /* Returns 0 on ok, and -1 on error */
 int send_ocsp_request(const char *server,
 		      gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
-		      gnutls_datum_t * resp_data, gnutls_datum_t *nonce)
+		      gnutls_datum_t * resp_data, gnutls_datum_t * nonce)
 {
 	gnutls_datum_t ud;
 	int ret;
 	gnutls_datum_t req;
-	char *url = (void *) server;
+	char *url = (void *)server;
 	char headers[1024];
 	char service[16];
 	unsigned char *p;
@@ -160,19 +158,21 @@ int send_ocsp_request(const char *server,
 
 		i = 0;
 		do {
-			ret = gnutls_x509_crt_get_authority_info_access(cert, i++,
-									GNUTLS_IA_OCSP_URI,
-									&data,
-									NULL);
-		} while(ret == GNUTLS_E_UNKNOWN_ALGORITHM);
+			ret =
+			    gnutls_x509_crt_get_authority_info_access(cert, i++,
+								      GNUTLS_IA_OCSP_URI,
+								      &data,
+								      NULL);
+		} while (ret == GNUTLS_E_UNKNOWN_ALGORITHM);
 
 		if (ret < 0) {
 			i = 0;
 			do {
 				ret =
 				    gnutls_x509_crt_get_authority_info_access
-				    (issuer, i++, GNUTLS_IA_OCSP_URI, &data, NULL);
-			} while(ret == GNUTLS_E_UNKNOWN_ALGORITHM);
+				    (issuer, i++, GNUTLS_IA_OCSP_URI, &data,
+				     NULL);
+			} while (ret == GNUTLS_E_UNKNOWN_ALGORITHM);
 		}
 
 		if (ret < 0) {
@@ -184,7 +184,7 @@ int send_ocsp_request(const char *server,
 
 		url = malloc(data.size + 1);
 		if (url == NULL) {
-		    return -1;
+			return -1;
 		}
 		memcpy(url, data.data, data.size);
 		url[data.size] = 0;
@@ -205,10 +205,11 @@ int send_ocsp_request(const char *server,
 	_generate_request(cert, issuer, &req, nonce);
 
 	snprintf(headers, sizeof(headers), HEADER_PATTERN, path, hostname,
-		 (unsigned int) req.size);
+		 (unsigned int)req.size);
 	headers_size = strlen(headers);
 
-	socket_open(&hd, hostname, service, NULL, SOCKET_FLAG_RAW|SOCKET_FLAG_SKIP_INIT, CONNECT_MSG, NULL);
+	socket_open(&hd, hostname, service, NULL,
+		    SOCKET_FLAG_RAW | SOCKET_FLAG_SKIP_INIT, CONNECT_MSG, NULL);
 
 	socket_send(&hd, headers, headers_size);
 	socket_send(&hd, req.data, req.size);
@@ -314,7 +315,7 @@ void print_ocsp_verify_res(unsigned int output)
 		if (comma)
 			printf(", ");
 		printf("Signer cert expired");
-		/*comma = 1;*/
+		/*comma = 1; */
 	}
 }
 
@@ -342,15 +343,13 @@ check_ocsp_response(gnutls_x509_crt_t cert,
 
 	ret = gnutls_ocsp_resp_init(&resp);
 	if (ret < 0) {
-		fprintf(stderr, "ocsp_resp_init: %s",
-			gnutls_strerror(ret));
+		fprintf(stderr, "ocsp_resp_init: %s", gnutls_strerror(ret));
 		exit(1);
 	}
 
 	ret = gnutls_ocsp_resp_import(resp, data);
 	if (ret < 0) {
-		fprintf(stderr, "importing response: %s",
-			gnutls_strerror(ret));
+		fprintf(stderr, "importing response: %s", gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -386,18 +385,17 @@ check_ocsp_response(gnutls_x509_crt_t cert,
 		goto cleanup;
 	}
 
-
 	ret = gnutls_ocsp_resp_get_single(resp, 0, NULL, NULL, NULL, NULL,
 					  &cert_status, &vtime, &ntime,
 					  &rtime, NULL);
 	if (ret < 0) {
-		fprintf(stderr, "reading response: %s\n",
-			gnutls_strerror(ret));
+		fprintf(stderr, "reading response: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
 	if (cert_status == GNUTLS_OCSP_CERT_REVOKED) {
-		printf("*** Certificate was revoked at %s\n", simple_ctime(&rtime, timebuf1));
+		printf("*** Certificate was revoked at %s\n",
+		       simple_ctime(&rtime, timebuf1));
 		ret = 0;
 		goto cleanup;
 	}
@@ -413,8 +411,10 @@ check_ocsp_response(gnutls_x509_crt_t cert,
 	} else {
 		/* there is a newer OCSP answer, don't trust this one */
 		if (ntime < now) {
-			printf("*** The OCSP response was issued at: %s but there is a newer issue at %s\n",
-				simple_ctime(&vtime, timebuf1), simple_ctime(&ntime, timebuf2));
+			printf
+			    ("*** The OCSP response was issued at: %s but there is a newer issue at %s\n",
+			     simple_ctime(&vtime, timebuf1),
+			     simple_ctime(&ntime, timebuf2));
 			ret = -1;
 			goto cleanup;
 		}
@@ -426,7 +426,8 @@ check_ocsp_response(gnutls_x509_crt_t cert,
 		ret = gnutls_ocsp_resp_get_nonce(resp, NULL, &rnonce);
 		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
 			if (verbose)
-				fprintf(stderr, "*** The OCSP reply did not include the requested nonce.\n");
+				fprintf(stderr,
+					"*** The OCSP reply did not include the requested nonce.\n");
 			goto finish_ok;
 		}
 
@@ -436,9 +437,10 @@ check_ocsp_response(gnutls_x509_crt_t cert,
 			exit(1);
 		}
 
-		if (rnonce.size != nonce->size || memcmp(nonce->data, rnonce.data,
-			nonce->size) != 0) {
-			fprintf(stderr, "nonce in the response doesn't match\n");
+		if (rnonce.size != nonce->size
+		    || memcmp(nonce->data, rnonce.data, nonce->size) != 0) {
+			fprintf(stderr,
+				"nonce in the response doesn't match\n");
 			exit(1);
 		}
 

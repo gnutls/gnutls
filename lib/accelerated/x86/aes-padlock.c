@@ -42,7 +42,7 @@ aes_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx, int enc)
 	/* we use key size to distinguish */
 	if (algorithm != GNUTLS_CIPHER_AES_128_CBC
 	    && algorithm != GNUTLS_CIPHER_AES_256_CBC
-		&& algorithm != GNUTLS_CIPHER_AES_192_CBC)
+	    && algorithm != GNUTLS_CIPHER_AES_192_CBC)
 		return GNUTLS_E_INVALID_REQUEST;
 
 	*_ctx = gnutls_calloc(1, sizeof(struct padlock_ctx));
@@ -51,12 +51,11 @@ aes_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx, int enc)
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	((struct padlock_ctx *) (*_ctx))->enc = enc;
+	((struct padlock_ctx *)(*_ctx))->enc = enc;
 	return 0;
 }
 
-int
-padlock_aes_cipher_setkey(void *_ctx, const void *userkey, size_t keysize)
+int padlock_aes_cipher_setkey(void *_ctx, const void *userkey, size_t keysize)
 {
 	struct padlock_ctx *ctx = _ctx;
 	struct padlock_cipher_data *pce;
@@ -80,7 +79,7 @@ padlock_aes_cipher_setkey(void *_ctx, const void *userkey, size_t keysize)
 		pce->cword.b.ksize = 1;
 		pce->cword.b.rounds = 12;
 		if (ctx->enc)
-				aes192_set_encrypt_key(&nc192, userkey);
+			aes192_set_encrypt_key(&nc192, userkey);
 		else
 			aes192_set_decrypt_key(&nc192, userkey);
 		memcpy(pce->ks.rd_key, nc192.keys, sizeof(nc192.keys));
@@ -145,7 +144,6 @@ padlock_aes_cbc_encrypt(void *_ctx, const void *src, size_t src_size,
 	return ret ? 0 : GNUTLS_E_ENCRYPTION_FAILED;
 }
 
-
 static int
 padlock_aes_cbc_decrypt(void *_ctx, const void *src, size_t src_size,
 			void *dst, size_t dst_size)
@@ -168,7 +166,7 @@ padlock_aes_cbc_decrypt(void *_ctx, const void *src, size_t src_size,
 static void aes_deinit(void *_ctx)
 {
 	struct padlock_ctx *ctx = _ctx;
-	
+
 	zeroize_temp_key(ctx, sizeof(*ctx));
 	gnutls_free(ctx);
 }
@@ -181,4 +179,3 @@ const gnutls_crypto_cipher_st _gnutls_aes_padlock = {
 	.decrypt = padlock_aes_cbc_decrypt,
 	.deinit = aes_deinit,
 };
-

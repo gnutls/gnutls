@@ -63,7 +63,6 @@ static int _tcp_connect_eagain(void)
 	setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, (const void *)&curstate,
 		   sizeof(curstate));
 
-
 	memset(&sa, '\0', sizeof(sa));
 	sa.sin_family = AF_INET;
 	sa.sin_port = htons(atoi(PORT));
@@ -77,8 +76,9 @@ static int _tcp_connect_eagain(void)
 	}
 
 	/* lower the send buffers to force EAGAIN */
-	assert(setsockopt(sd, IPPROTO_TCP, TCP_NODELAY, (char *)&flag, sizeof(int)) >= 0);
-	assert(fcntl(sd, F_SETFL, O_NONBLOCK)>=0);
+	assert(setsockopt
+	       (sd, IPPROTO_TCP, TCP_NODELAY, (char *)&flag, sizeof(int)) >= 0);
+	assert(fcntl(sd, F_SETFL, O_NONBLOCK) >= 0);
 
 	return sd;
 }
@@ -106,8 +106,7 @@ _client_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 	return send((unsigned long)tr, data, len, 0);
 }
 
-static ssize_t
-_client_pull(gnutls_transport_ptr_t tr, void *data, size_t len)
+static ssize_t _client_pull(gnutls_transport_ptr_t tr, void *data, size_t len)
 {
 	struct timeval tv;
 
@@ -121,8 +120,7 @@ _client_pull(gnutls_transport_ptr_t tr, void *data, size_t len)
 	return recv((unsigned long)tr, data, len, 0);
 }
 
-static int _client_pull_timeout(gnutls_transport_ptr_t ptr,
-				unsigned int ms)
+static int _client_pull_timeout(gnutls_transport_ptr_t ptr, unsigned int ms)
 {
 	return gnutls_system_recv_timeout(ptr, ms);
 }
@@ -133,7 +131,7 @@ static void _process_data(EV_P_ ev_io * w, int revents)
 	static unsigned int count = 0;
 	static int prev_direction;
 
-	if (!done && (revents & (EV_WRITE|EV_READ))) {
+	if (!done && (revents & (EV_WRITE | EV_READ))) {
 		if (lastret == GNUTLS_E_AGAIN) {
 			if (revents & EV_WRITE) {
 				assert(prev_direction == 1);
@@ -148,14 +146,16 @@ static void _process_data(EV_P_ ev_io * w, int revents)
 		count++;
 
 		if (gnutls_record_get_direction(session)) {
-			ev_io_stop(EV_A_ &remote_w);
-			ev_io_set(&remote_w, gnutls_transport_get_int(session), EV_WRITE);
-			ev_io_start(EV_A_ &remote_w);
+			ev_io_stop(EV_A_ & remote_w);
+			ev_io_set(&remote_w, gnutls_transport_get_int(session),
+				  EV_WRITE);
+			ev_io_start(EV_A_ & remote_w);
 			prev_direction = 1;
 		} else {
-			ev_io_stop(EV_A_ &remote_w);
-			ev_io_set(&remote_w, gnutls_transport_get_int(session), EV_READ);
-			ev_io_start(EV_A_ &remote_w);
+			ev_io_stop(EV_A_ & remote_w);
+			ev_io_set(&remote_w, gnutls_transport_get_int(session),
+				  EV_READ);
+			ev_io_start(EV_A_ & remote_w);
 			prev_direction = 0;
 		}
 		/* avoid printing messages infinity times */
@@ -166,14 +166,14 @@ static void _process_data(EV_P_ ev_io * w, int revents)
 			if ((ret == GNUTLS_E_WARNING_ALERT_RECEIVED)
 			    || (ret == GNUTLS_E_FATAL_ALERT_RECEIVED))
 				fprintf(stderr, "Also received alert: %s\n",
-				       gnutls_alert_get_name
-				       (gnutls_alert_get(session)));
+					gnutls_alert_get_name
+					(gnutls_alert_get(session)));
 			fprintf(stderr, "last out: %s\n",
-			       SSL_GNUTLS_PRINT_HANDSHAKE_STATUS
-			       (gnutls_handshake_get_last_out(session)));
+				SSL_GNUTLS_PRINT_HANDSHAKE_STATUS
+				(gnutls_handshake_get_last_out(session)));
 			fprintf(stderr, "last in: %s\n",
-			       SSL_GNUTLS_PRINT_HANDSHAKE_STATUS
-			       (gnutls_handshake_get_last_in(session)));
+				SSL_GNUTLS_PRINT_HANDSHAKE_STATUS
+				(gnutls_handshake_get_last_in(session)));
 		}
 
 		if (gnutls_error_is_fatal(ret)) {
@@ -212,7 +212,8 @@ static void try(const char *name, const char *prio)
 		assert(gnutls_init(&session, GNUTLS_CLIENT) >= 0);
 		gnutls_transport_set_push_function(session, _client_push);
 		gnutls_transport_set_pull_function(session, _client_pull);
-		gnutls_transport_set_pull_timeout_function(session, _client_pull_timeout);
+		gnutls_transport_set_pull_timeout_function(session,
+							   _client_pull_timeout);
 		gnutls_handshake_set_timeout(session,
 					     GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT);
 
@@ -252,7 +253,8 @@ static void try(const char *name, const char *prio)
 
 int main(void)
 {
-	try("tls 1.2 (dhe)", "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2:-KX-ALL:+DHE-RSA");
+	try("tls 1.2 (dhe)",
+	    "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2:-KX-ALL:+DHE-RSA");
 	try("tls 1.2 (rsa)", "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2:-KX-ALL:+RSA");
 	try("tls 1.3", "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3");
 	try("default", "NORMAL");

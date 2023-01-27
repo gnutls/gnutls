@@ -62,7 +62,7 @@ gnutls_cipher_init(gnutls_cipher_hd_t * handle,
 {
 	api_cipher_hd_st *h;
 	int ret;
-	const cipher_entry_st* e;
+	const cipher_entry_st *e;
 	bool not_approved = false;
 
 	if (!is_cipher_algo_allowed(cipher)) {
@@ -85,9 +85,7 @@ gnutls_cipher_init(gnutls_cipher_hd_t * handle,
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	ret =
-	    _gnutls_cipher_init(&h->ctx_enc, e, key,
-				iv, 1);
+	ret = _gnutls_cipher_init(&h->ctx_enc, e, key, iv, 1);
 	if (ret < 0) {
 		gnutls_free(h);
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
@@ -95,8 +93,7 @@ gnutls_cipher_init(gnutls_cipher_hd_t * handle,
 	}
 
 	if (_gnutls_cipher_type(e) == CIPHER_BLOCK) {
-		ret =
-		    _gnutls_cipher_init(&h->ctx_dec, e, key, iv, 0);
+		ret = _gnutls_cipher_init(&h->ctx_dec, e, key, iv, 0);
 		if (ret < 0) {
 			gnutls_free(h);
 			_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
@@ -129,8 +126,7 @@ gnutls_cipher_init(gnutls_cipher_hd_t * handle,
  *
  * Since: 3.0
  **/
-int
-gnutls_cipher_tag(gnutls_cipher_hd_t handle, void *tag, size_t tag_size)
+int gnutls_cipher_tag(gnutls_cipher_hd_t handle, void *tag, size_t tag_size)
 {
 	api_cipher_hd_st *h = handle;
 
@@ -187,8 +183,7 @@ gnutls_cipher_add_auth(gnutls_cipher_hd_t handle, const void *ptext,
  *
  * Since: 3.0
  **/
-void
-gnutls_cipher_set_iv(gnutls_cipher_hd_t handle, void *iv, size_t ivlen)
+void gnutls_cipher_set_iv(gnutls_cipher_hd_t handle, void *iv, size_t ivlen)
 {
 	api_cipher_hd_st *h = handle;
 
@@ -225,8 +220,7 @@ gnutls_cipher_set_iv(gnutls_cipher_hd_t handle, void *iv, size_t ivlen)
  *
  * Since: 3.6.8
  -*/
-int
-_gnutls_cipher_get_iv(gnutls_cipher_hd_t handle, void *iv, size_t ivlen)
+int _gnutls_cipher_get_iv(gnutls_cipher_hd_t handle, void *iv, size_t ivlen)
 {
 	api_cipher_hd_st *h = handle;
 
@@ -250,8 +244,7 @@ _gnutls_cipher_get_iv(gnutls_cipher_hd_t handle, void *iv, size_t ivlen)
  *
  * Since: 3.6.14
  -*/
-int
-_gnutls_cipher_set_key(gnutls_cipher_hd_t handle, void *key, size_t keylen)
+int _gnutls_cipher_set_key(gnutls_cipher_hd_t handle, void *key, size_t keylen)
 {
 	api_cipher_hd_st *h = handle;
 	int ret;
@@ -278,8 +271,7 @@ _gnutls_cipher_set_key(gnutls_cipher_hd_t handle, void *key, size_t keylen)
  * Since: 2.10.0
  **/
 int
-gnutls_cipher_encrypt(gnutls_cipher_hd_t handle, void *ptext,
-		      size_t ptext_len)
+gnutls_cipher_encrypt(gnutls_cipher_hd_t handle, void *ptext, size_t ptext_len)
 {
 	api_cipher_hd_st *h = handle;
 	int ret;
@@ -310,18 +302,15 @@ gnutls_cipher_encrypt(gnutls_cipher_hd_t handle, void *ptext,
  * Since: 2.10.0
  **/
 int
-gnutls_cipher_decrypt(gnutls_cipher_hd_t handle, void *ctext,
-		      size_t ctext_len)
+gnutls_cipher_decrypt(gnutls_cipher_hd_t handle, void *ctext, size_t ctext_len)
 {
 	api_cipher_hd_st *h = handle;
 	int ret;
 
 	if (_gnutls_cipher_type(h->ctx_enc.e) != CIPHER_BLOCK) {
-		ret = _gnutls_cipher_decrypt(&h->ctx_enc, ctext,
-					     ctext_len);
+		ret = _gnutls_cipher_decrypt(&h->ctx_enc, ctext, ctext_len);
 	} else {
-		ret = _gnutls_cipher_decrypt(&h->ctx_dec, ctext,
-					     ctext_len);
+		ret = _gnutls_cipher_decrypt(&h->ctx_dec, ctext, ctext_len);
 	}
 
 	if (ret < 0) {
@@ -351,8 +340,7 @@ gnutls_cipher_decrypt(gnutls_cipher_hd_t handle, void *ctext,
  **/
 int
 gnutls_cipher_encrypt2(gnutls_cipher_hd_t handle, const void *ptext,
-		       size_t ptext_len, void *ctext,
-		       size_t ctext_len)
+		       size_t ptext_len, void *ctext, size_t ctext_len)
 {
 	api_cipher_hd_st *h = handle;
 	int ret;
@@ -396,12 +384,10 @@ gnutls_cipher_decrypt2(gnutls_cipher_hd_t handle, const void *ctext,
 
 	if (_gnutls_cipher_type(h->ctx_enc.e) != CIPHER_BLOCK) {
 		ret = _gnutls_cipher_decrypt2(&h->ctx_enc, ctext,
-					      ctext_len, ptext,
-					      ptext_len);
+					      ctext_len, ptext, ptext_len);
 	} else {
 		ret = _gnutls_cipher_decrypt2(&h->ctx_dec, ctext,
-					      ctext_len, ptext,
-					      ptext_len);
+					      ctext_len, ptext, ptext_len);
 	}
 
 	if (ret < 0) {
@@ -440,8 +426,7 @@ gnutls_cipher_decrypt2(gnutls_cipher_hd_t handle, const void *ctext,
 int
 gnutls_cipher_encrypt3(gnutls_cipher_hd_t handle,
 		       const void *ptext, size_t ptext_len,
-		       void *ctext, size_t *ctext_len,
-		       unsigned flags)
+		       void *ctext, size_t *ctext_len, unsigned flags)
 {
 	api_cipher_hd_st *h = handle;
 	const cipher_entry_st *e = h->ctx_enc.e;
@@ -540,15 +525,13 @@ gnutls_cipher_encrypt3(gnutls_cipher_hd_t handle,
 int
 gnutls_cipher_decrypt3(gnutls_cipher_hd_t handle,
 		       const void *ctext, size_t ctext_len,
-		       void *ptext, size_t *ptext_len,
-		       unsigned flags)
+		       void *ptext, size_t *ptext_len, unsigned flags)
 {
 	api_cipher_hd_st *h = handle;
 	int ret;
 
 	ret = gnutls_cipher_decrypt2(handle,
-				     ctext, ctext_len,
-				     ptext, *ptext_len);
+				     ctext, ctext_len, ptext, *ptext_len);
 	if (ret < 0) {
 		return ret;
 	}
@@ -557,13 +540,16 @@ gnutls_cipher_decrypt3(gnutls_cipher_hd_t handle,
 	    (flags & GNUTLS_CIPHER_PADDING_PKCS7)) {
 		uint8_t *p = ptext;
 		uint8_t padding = p[*ptext_len - 1];
-		if (!padding || padding > _gnutls_cipher_get_block_size(h->ctx_enc.e)) {
+		if (!padding
+		    || padding > _gnutls_cipher_get_block_size(h->ctx_enc.e)) {
 			return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 		}
 		/* Check that the prior bytes are all PADDING */
 		for (size_t i = *ptext_len - padding; i < *ptext_len; i++) {
 			if (padding != p[*ptext_len - 1]) {
-				return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
+				return
+				    gnutls_assert_val
+				    (GNUTLS_E_DECRYPTION_FAILED);
 			}
 		}
 		*ptext_len -= padding;
@@ -591,9 +577,7 @@ void gnutls_cipher_deinit(gnutls_cipher_hd_t handle)
 	gnutls_free(handle);
 }
 
-
 /* HMAC */
-
 
 /**
  * gnutls_hmac_init:
@@ -836,7 +820,8 @@ gnutls_hmac_hd_t gnutls_hmac_copy(gnutls_hmac_hd_t handle)
 		return NULL;
 	}
 
-	if (_gnutls_mac_copy((const mac_hd_st *) handle, (mac_hd_st *)dig) != GNUTLS_E_SUCCESS) {
+	if (_gnutls_mac_copy((const mac_hd_st *)handle, (mac_hd_st *) dig) !=
+	    GNUTLS_E_SUCCESS) {
 		gnutls_assert();
 		gnutls_free(dig);
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
@@ -863,8 +848,7 @@ gnutls_hmac_hd_t gnutls_hmac_copy(gnutls_hmac_hd_t handle)
  * Since: 2.10.0
  **/
 int
-gnutls_hash_init(gnutls_hash_hd_t * dig,
-		 gnutls_digest_algorithm_t algorithm)
+gnutls_hash_init(gnutls_hash_hd_t * dig, gnutls_digest_algorithm_t algorithm)
 {
 	int ret;
 	bool not_approved = false;
@@ -1000,7 +984,7 @@ gnutls_hash_fast(gnutls_digest_algorithm_t algorithm,
 	} else if (not_approved) {
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_NOT_APPROVED);
 	}
-		
+
 	return ret;
 }
 
@@ -1030,7 +1014,9 @@ gnutls_hash_hd_t gnutls_hash_copy(gnutls_hash_hd_t handle)
 		return NULL;
 	}
 
-	if (_gnutls_hash_copy((const digest_hd_st *) handle, (digest_hd_st *)dig) != GNUTLS_E_SUCCESS) {
+	if (_gnutls_hash_copy
+	    ((const digest_hd_st *)handle,
+	     (digest_hd_st *) dig) != GNUTLS_E_SUCCESS) {
 		gnutls_assert();
 		gnutls_free(dig);
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
@@ -1064,8 +1050,7 @@ int gnutls_key_generate(gnutls_datum_t * key, unsigned int key_size)
 	/* The FIPS140 approved RNGs are not allowed to be used
 	 * to extract key sizes longer than their original seed.
 	 */
-	if (_gnutls_fips_mode_enabled() != 0 &&
-	    key_size > FIPS140_RND_KEY_SIZE)
+	if (_gnutls_fips_mode_enabled() != 0 && key_size > FIPS140_RND_KEY_SIZE)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 #endif
 
@@ -1117,9 +1102,9 @@ int gnutls_key_generate(gnutls_datum_t * key, unsigned int key_size)
  *
  * Since: 3.4.0
  **/
-int gnutls_aead_cipher_init(gnutls_aead_cipher_hd_t *handle,
+int gnutls_aead_cipher_init(gnutls_aead_cipher_hd_t * handle,
 			    gnutls_cipher_algorithm_t cipher,
-			    const gnutls_datum_t *key)
+			    const gnutls_datum_t * key)
 {
 	api_aead_cipher_hd_st *h;
 	const cipher_entry_st *e;
@@ -1177,9 +1162,9 @@ int gnutls_aead_cipher_init(gnutls_aead_cipher_hd_t *handle,
  * Since: 3.7.5
  **/
 int gnutls_aead_cipher_set_key(gnutls_aead_cipher_hd_t handle,
-			       const gnutls_datum_t *key)
+			       const gnutls_datum_t * key)
 {
-	const cipher_entry_st* e;
+	const cipher_entry_st *e;
 	int ret;
 
 	e = cipher_to_entry(handle->ctx_enc.e->id);
@@ -1247,8 +1232,7 @@ gnutls_aead_cipher_decrypt(gnutls_aead_cipher_hd_t handle,
 					  nonce, nonce_len,
 					  auth, auth_len,
 					  tag_size,
-					  ctext, ctext_len,
-					  ptext, *ptext_len);
+					  ctext, ctext_len, ptext, *ptext_len);
 	if (unlikely(ret < 0)) {
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 		return gnutls_assert_val(ret);
@@ -1261,7 +1245,6 @@ gnutls_aead_cipher_decrypt(gnutls_aead_cipher_hd_t handle,
 
 	return 0;
 }
-
 
 /**
  * gnutls_aead_cipher_encrypt:
@@ -1311,8 +1294,7 @@ gnutls_aead_cipher_encrypt(gnutls_aead_cipher_hd_t handle,
 					  nonce, nonce_len,
 					  auth, auth_len,
 					  tag_size,
-					  ptext, ptext_len,
-					  ctext, *ctext_len);
+					  ptext, ptext_len, ctext, *ctext_len);
 	if (unlikely(ret < 0)) {
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 		return gnutls_assert_val(ret);
@@ -1356,7 +1338,7 @@ static int iov_store_grow(struct iov_store_st *s, size_t length)
 }
 
 static int
-append_from_iov(struct iov_store_st *dst, const giovec_t *iov, int iovcnt)
+append_from_iov(struct iov_store_st *dst, const giovec_t * iov, int iovcnt)
 {
 	if (iovcnt > 0) {
 		int i;
@@ -1366,7 +1348,8 @@ append_from_iov(struct iov_store_st *dst, const giovec_t *iov, int iovcnt)
 
 		for (i = 0; i < iovcnt; i++) {
 			if (INT_ADD_OVERFLOW(new_capacity, iov[i].iov_len)) {
-				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+				return
+				    gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 			}
 			new_capacity += iov[i].iov_len;
 		}
@@ -1390,8 +1373,7 @@ append_from_iov(struct iov_store_st *dst, const giovec_t *iov, int iovcnt)
 }
 
 static int
-copy_to_iov(const uint8_t *data, size_t size,
-	    const giovec_t *iov, int iovcnt)
+copy_to_iov(const uint8_t * data, size_t size, const giovec_t * iov, int iovcnt)
 {
 	size_t offset = 0;
 	int i;
@@ -1412,9 +1394,9 @@ copy_to_iov(const uint8_t *data, size_t size,
 static int
 aead_cipher_encryptv_fallback(gnutls_aead_cipher_hd_t handle,
 			      const void *nonce, size_t nonce_len,
-			      const giovec_t *auth_iov, int auth_iovcnt,
+			      const giovec_t * auth_iov, int auth_iovcnt,
 			      size_t tag_size,
-			      const giovec_t *iov, int iovcnt,
+			      const giovec_t * iov, int iovcnt,
 			      void *ctext, size_t *ctext_len)
 {
 	struct iov_store_st auth = IOV_STORE_INIT;
@@ -1423,7 +1405,8 @@ aead_cipher_encryptv_fallback(gnutls_aead_cipher_hd_t handle,
 
 	if (tag_size == 0)
 		tag_size = _gnutls_cipher_get_tag_size(handle->ctx_enc.e);
-	else if (tag_size > (unsigned)_gnutls_cipher_get_tag_size(handle->ctx_enc.e)) {
+	else if (tag_size >
+		 (unsigned)_gnutls_cipher_get_tag_size(handle->ctx_enc.e)) {
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
@@ -1456,9 +1439,9 @@ aead_cipher_encryptv_fallback(gnutls_aead_cipher_hd_t handle,
 static int
 aead_cipher_encryptv(gnutls_aead_cipher_hd_t handle,
 		     const void *nonce, size_t nonce_len,
-		     const giovec_t *auth_iov, int auth_iovcnt,
+		     const giovec_t * auth_iov, int auth_iovcnt,
 		     size_t tag_size,
-		     const giovec_t *iov, int iovcnt,
+		     const giovec_t * iov, int iovcnt,
 		     void *ctext, size_t *ctext_len)
 {
 	int ret;
@@ -1471,7 +1454,8 @@ aead_cipher_encryptv(gnutls_aead_cipher_hd_t handle,
 
 	if (tag_size == 0)
 		tag_size = _gnutls_cipher_get_tag_size(handle->ctx_enc.e);
-	else if (tag_size > (unsigned)_gnutls_cipher_get_tag_size(handle->ctx_enc.e)) {
+	else if (tag_size >
+		 (unsigned)_gnutls_cipher_get_tag_size(handle->ctx_enc.e)) {
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
@@ -1520,8 +1504,7 @@ aead_cipher_encryptv(gnutls_aead_cipher_hd_t handle,
 			break;
 		len = ret;
 		ret = _gnutls_cipher_encrypt2(&handle->ctx_enc,
-					      p, len,
-					      dst, dst_size);
+					      p, len, dst, dst_size);
 		if (unlikely(ret < 0)) {
 			_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 			return gnutls_assert_val(ret);
@@ -1570,9 +1553,9 @@ aead_cipher_encryptv(gnutls_aead_cipher_hd_t handle,
 int
 gnutls_aead_cipher_encryptv(gnutls_aead_cipher_hd_t handle,
 			    const void *nonce, size_t nonce_len,
-			    const giovec_t *auth_iov, int auth_iovcnt,
+			    const giovec_t * auth_iov, int auth_iovcnt,
 			    size_t tag_size,
-			    const giovec_t *iov, int iovcnt,
+			    const giovec_t * iov, int iovcnt,
 			    void *ctext, size_t *ctext_len)
 {
 	/* Limitation: this function provides an optimization under the internally registered
@@ -1592,16 +1575,15 @@ gnutls_aead_cipher_encryptv(gnutls_aead_cipher_hd_t handle,
 					    nonce, nonce_len,
 					    auth_iov, auth_iovcnt,
 					    tag_size,
-					    iov, iovcnt,
-					    ctext, ctext_len);
+					    iov, iovcnt, ctext, ctext_len);
 	}
 }
 
 static int
 aead_cipher_encryptv2_fallback(gnutls_aead_cipher_hd_t handle,
 			       const void *nonce, size_t nonce_len,
-			       const giovec_t *auth_iov, int auth_iovcnt,
-			       const giovec_t *iov, int iovcnt,
+			       const giovec_t * auth_iov, int auth_iovcnt,
+			       const giovec_t * iov, int iovcnt,
 			       void *tag, size_t *tag_size)
 {
 	struct iov_store_st auth = IOV_STORE_INIT;
@@ -1619,7 +1601,8 @@ aead_cipher_encryptv2_fallback(gnutls_aead_cipher_hd_t handle,
 	else
 		_tag_size = *tag_size;
 
-	if (_tag_size > (unsigned)_gnutls_cipher_get_tag_size(handle->ctx_enc.e)) {
+	if (_tag_size >
+	    (unsigned)_gnutls_cipher_get_tag_size(handle->ctx_enc.e)) {
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
@@ -1683,11 +1666,11 @@ aead_cipher_encryptv2_fallback(gnutls_aead_cipher_hd_t handle,
 	}
 
 	if (handle->ctx_enc.e->flags & GNUTLS_CIPHER_FLAG_TAG_PREFIXED) {
-		ctext_data = (uint8_t *)ptext.data + _tag_size;
+		ctext_data = (uint8_t *) ptext.data + _tag_size;
 		_tag = ptext.data;
 	} else {
 		ctext_data = ptext.data;
-		_tag = (uint8_t *)ptext.data + ptext_size;
+		_tag = (uint8_t *) ptext.data + ptext_size;
 	}
 
 	ret = copy_to_iov(ctext_data, ptext_size, iov, iovcnt);
@@ -1717,8 +1700,8 @@ aead_cipher_encryptv2_fallback(gnutls_aead_cipher_hd_t handle,
 static int
 aead_cipher_encryptv2(gnutls_aead_cipher_hd_t handle,
 		      const void *nonce, size_t nonce_len,
-		      const giovec_t *auth_iov, int auth_iovcnt,
-		      const giovec_t *iov, int iovcnt,
+		      const giovec_t * auth_iov, int auth_iovcnt,
+		      const giovec_t * iov, int iovcnt,
 		      void *tag, size_t *tag_size)
 {
 	api_aead_cipher_hd_st *h = handle;
@@ -1822,8 +1805,8 @@ aead_cipher_encryptv2(gnutls_aead_cipher_hd_t handle,
 int
 gnutls_aead_cipher_encryptv2(gnutls_aead_cipher_hd_t handle,
 			     const void *nonce, size_t nonce_len,
-			     const giovec_t *auth_iov, int auth_iovcnt,
-			     const giovec_t *iov, int iovcnt,
+			     const giovec_t * auth_iov, int auth_iovcnt,
+			     const giovec_t * iov, int iovcnt,
 			     void *tag, size_t *tag_size)
 {
 	/* Limitation: this function provides an optimization under the internally registered
@@ -1841,16 +1824,15 @@ gnutls_aead_cipher_encryptv2(gnutls_aead_cipher_hd_t handle,
 		return aead_cipher_encryptv2(handle,
 					     nonce, nonce_len,
 					     auth_iov, auth_iovcnt,
-					     iov, iovcnt,
-					     tag, tag_size);
+					     iov, iovcnt, tag, tag_size);
 	}
 }
 
 static int
 aead_cipher_decryptv2_fallback(gnutls_aead_cipher_hd_t handle,
 			       const void *nonce, size_t nonce_len,
-			       const giovec_t *auth_iov, int auth_iovcnt,
-			       const giovec_t *iov, int iovcnt,
+			       const giovec_t * auth_iov, int auth_iovcnt,
+			       const giovec_t * iov, int iovcnt,
 			       void *tag, size_t tag_size)
 {
 	struct iov_store_st auth = IOV_STORE_INIT;
@@ -1861,7 +1843,8 @@ aead_cipher_decryptv2_fallback(gnutls_aead_cipher_hd_t handle,
 
 	if (tag_size == 0)
 		tag_size = _gnutls_cipher_get_tag_size(handle->ctx_enc.e);
-	else if (tag_size > (unsigned)_gnutls_cipher_get_tag_size(handle->ctx_enc.e)) {
+	else if (tag_size >
+		 (unsigned)_gnutls_cipher_get_tag_size(handle->ctx_enc.e)) {
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
@@ -1945,8 +1928,8 @@ aead_cipher_decryptv2_fallback(gnutls_aead_cipher_hd_t handle,
 static int
 aead_cipher_decryptv2(gnutls_aead_cipher_hd_t handle,
 		      const void *nonce, size_t nonce_len,
-		      const giovec_t *auth_iov, int auth_iovcnt,
-		      const giovec_t *iov, int iovcnt,
+		      const giovec_t * auth_iov, int auth_iovcnt,
+		      const giovec_t * iov, int iovcnt,
 		      void *tag, size_t tag_size)
 {
 	int ret;
@@ -1958,7 +1941,8 @@ aead_cipher_decryptv2(gnutls_aead_cipher_hd_t handle,
 
 	if (tag_size == 0)
 		tag_size = _gnutls_cipher_get_tag_size(handle->ctx_enc.e);
-	else if (tag_size > (unsigned)_gnutls_cipher_get_tag_size(handle->ctx_enc.e)) {
+	else if (tag_size >
+		 (unsigned)_gnutls_cipher_get_tag_size(handle->ctx_enc.e)) {
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
@@ -2051,8 +2035,8 @@ aead_cipher_decryptv2(gnutls_aead_cipher_hd_t handle,
 int
 gnutls_aead_cipher_decryptv2(gnutls_aead_cipher_hd_t handle,
 			     const void *nonce, size_t nonce_len,
-			     const giovec_t *auth_iov, int auth_iovcnt,
-			     const giovec_t *iov, int iovcnt,
+			     const giovec_t * auth_iov, int auth_iovcnt,
+			     const giovec_t * iov, int iovcnt,
 			     void *tag, size_t tag_size)
 {
 	/* Limitation: this function provides an optimization under the internally registered
@@ -2070,8 +2054,7 @@ gnutls_aead_cipher_decryptv2(gnutls_aead_cipher_hd_t handle,
 		return aead_cipher_decryptv2(handle,
 					     nonce, nonce_len,
 					     auth_iov, auth_iovcnt,
-					     iov, iovcnt,
-					     tag, tag_size);
+					     iov, iovcnt, tag, tag_size);
 	}
 }
 
@@ -2095,9 +2078,8 @@ extern gnutls_crypto_kdf_st _gnutls_kdf_ops;
 /* Same as @gnutls_hkdf_extract but without changing FIPS context */
 int
 _gnutls_hkdf_extract(gnutls_mac_algorithm_t mac,
-		    const gnutls_datum_t *key,
-		    const gnutls_datum_t *salt,
-		    void *output)
+		     const gnutls_datum_t * key,
+		     const gnutls_datum_t * salt, void *output)
 {
 	/* MD5 is only allowed internally for TLS */
 	if (!is_mac_algo_allowed(mac)) {
@@ -2110,8 +2092,7 @@ _gnutls_hkdf_extract(gnutls_mac_algorithm_t mac,
 
 	return _gnutls_kdf_ops.hkdf_extract(mac, key->data, key->size,
 					    salt ? salt->data : NULL,
-					    salt ? salt->size : 0,
-					    output);
+					    salt ? salt->size : 0, output);
 }
 
 /**
@@ -2130,9 +2111,8 @@ _gnutls_hkdf_extract(gnutls_mac_algorithm_t mac,
  */
 int
 gnutls_hkdf_extract(gnutls_mac_algorithm_t mac,
-		    const gnutls_datum_t *key,
-		    const gnutls_datum_t *salt,
-		    void *output)
+		    const gnutls_datum_t * key,
+		    const gnutls_datum_t * salt, void *output)
 {
 	int ret;
 
@@ -2148,9 +2128,8 @@ gnutls_hkdf_extract(gnutls_mac_algorithm_t mac,
 /* Same as @gnutls_hkdf_expand but without changing FIPS context */
 int
 _gnutls_hkdf_expand(gnutls_mac_algorithm_t mac,
-		   const gnutls_datum_t *key,
-		   const gnutls_datum_t *info,
-		   void *output, size_t length)
+		    const gnutls_datum_t * key,
+		    const gnutls_datum_t * info, void *output, size_t length)
 {
 	/* MD5 is only allowed internally for TLS */
 	if (!is_mac_algo_allowed(mac)) {
@@ -2162,8 +2141,8 @@ _gnutls_hkdf_expand(gnutls_mac_algorithm_t mac,
 	 * only approved in TLS, which is handled separately. */
 
 	return _gnutls_kdf_ops.hkdf_expand(mac, key->data, key->size,
-					  info->data, info->size,
-					  output, length);
+					   info->data, info->size,
+					   output, length);
 }
 
 /**
@@ -2184,9 +2163,8 @@ _gnutls_hkdf_expand(gnutls_mac_algorithm_t mac,
  */
 int
 gnutls_hkdf_expand(gnutls_mac_algorithm_t mac,
-		   const gnutls_datum_t *key,
-		   const gnutls_datum_t *info,
-		   void *output, size_t length)
+		   const gnutls_datum_t * key,
+		   const gnutls_datum_t * info, void *output, size_t length)
 {
 	int ret;
 
@@ -2217,10 +2195,9 @@ gnutls_hkdf_expand(gnutls_mac_algorithm_t mac,
  */
 int
 gnutls_pbkdf2(gnutls_mac_algorithm_t mac,
-	      const gnutls_datum_t *key,
-	      const gnutls_datum_t *salt,
-	      unsigned iter_count,
-	      void *output, size_t length)
+	      const gnutls_datum_t * key,
+	      const gnutls_datum_t * salt,
+	      unsigned iter_count, void *output, size_t length)
 {
 	int ret;
 	bool not_approved = false;

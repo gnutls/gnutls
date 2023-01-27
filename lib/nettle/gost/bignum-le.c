@@ -42,37 +42,31 @@
 #include <nettle/bignum.h>
 #include "bignum-le.h"
 
-void
-nettle_mpz_get_str_256_u_le(size_t length, uint8_t *s, const mpz_t x)
+void nettle_mpz_get_str_256_u_le(size_t length, uint8_t * s, const mpz_t x)
 {
-  if (!length)
-    {
-      /* x must be zero */
-      assert(!mpz_sgn(x));
-      return;
-    }
+	if (!length) {
+		/* x must be zero */
+		assert(!mpz_sgn(x));
+		return;
+	}
 
-  size_t count;
+	size_t count;
 
-  assert(nettle_mpz_sizeinbase_256_u(x) <= length);
-  mpz_export(s, &count, -1, 1, 0, 0, x);
-  memset(s + count, 0, length - count);
+	assert(nettle_mpz_sizeinbase_256_u(x) <= length);
+	mpz_export(s, &count, -1, 1, 0, 0, x);
+	memset(s + count, 0, length - count);
 }
 
 #define nettle_mpz_from_octets_le(x, length, s) \
    mpz_import((x), (length), -1, 1, 0, 0, (s))
 
-void
-nettle_mpz_set_str_256_u_le(mpz_t x,
-			    size_t length, const uint8_t *s)
+void nettle_mpz_set_str_256_u_le(mpz_t x, size_t length, const uint8_t * s)
 {
-  nettle_mpz_from_octets_le(x, length, s);
+	nettle_mpz_from_octets_le(x, length, s);
 }
 
-void
-nettle_mpz_init_set_str_256_u_le(mpz_t x,
-				 size_t length, const uint8_t *s)
+void nettle_mpz_init_set_str_256_u_le(mpz_t x, size_t length, const uint8_t * s)
 {
-  mpz_init(x);
-  nettle_mpz_from_octets_le(x, length, s);
+	mpz_init(x);
+	nettle_mpz_from_octets_le(x, length, s);
 }

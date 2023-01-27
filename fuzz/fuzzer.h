@@ -15,21 +15,19 @@
  * along with gnutls.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <stddef.h> // size_t
-#include <stdint.h> // uint8_t
+#include <stddef.h>		// size_t
+#include <stdint.h>		// uint8_t
 #include <gnutls/gnutls.h>
 
 #if defined __clang__ || __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5)
-  #pragma GCC diagnostic ignored "-Wvla-larger-than="
+# pragma GCC diagnostic ignored "-Wvla-larger-than="
 #endif
 
 #ifdef __cplusplus
 extern "C"
 #endif
-
 #define VERS_STR "-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:+VERS-TLS1.1:+VERS-TLS1.0:+VERS-SSL3.0"
-
-int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size);
+int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size);
 
 static void __attribute__((constructor)) init(void)
 {

@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -49,7 +49,7 @@ void doit(void)
 {
 	/* Server stuff. */
 	gnutls_anon_server_credentials_t s_anoncred;
-	const gnutls_datum_t p3 = { (void *) pkcs3, strlen(pkcs3) };
+	const gnutls_datum_t p3 = { (void *)pkcs3, strlen(pkcs3) };
 	static gnutls_dh_params_t dh_params;
 	gnutls_session_t server;
 	int sret, cret;
@@ -71,12 +71,11 @@ void doit(void)
 	gnutls_dh_params_init(&dh_params);
 	gnutls_dh_params_import_pkcs3(dh_params, &p3, GNUTLS_X509_FMT_PEM);
 	gnutls_anon_set_server_dh_params(s_anoncred, dh_params);
-	gnutls_init(&server,
-		    GNUTLS_SERVER | GNUTLS_DATAGRAM | GNUTLS_NONBLOCK);
+	gnutls_init(&server, GNUTLS_SERVER | GNUTLS_DATAGRAM | GNUTLS_NONBLOCK);
 	ret =
 	    gnutls_priority_set_direct(server,
-					"NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH",
-					NULL);
+				       "NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH",
+				       NULL);
 	if (ret < 0)
 		exit(1);
 	gnutls_credentials_set(server, GNUTLS_CRD_ANON, s_anoncred);
@@ -88,12 +87,11 @@ void doit(void)
 
 	/* Init client */
 	gnutls_anon_allocate_client_credentials(&c_anoncred);
-	gnutls_init(&client,
-		    GNUTLS_CLIENT | GNUTLS_DATAGRAM | GNUTLS_NONBLOCK);
+	gnutls_init(&client, GNUTLS_CLIENT | GNUTLS_DATAGRAM | GNUTLS_NONBLOCK);
 	cret =
 	    gnutls_priority_set_direct(client,
-					"NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH",
-					NULL);
+				       "NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH",
+				       NULL);
 	if (cret < 0)
 		exit(1);
 	gnutls_credentials_set(client, GNUTLS_CRD_ANON, c_anoncred);

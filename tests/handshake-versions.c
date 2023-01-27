@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -36,8 +36,8 @@
  * hello TLS versions */
 
 void _gnutls_hello_set_default_version(gnutls_session_t session,
-					unsigned char major,
-					unsigned char minor);
+				       unsigned char major,
+				       unsigned char minor);
 
 const char *side;
 
@@ -70,12 +70,9 @@ static void try(unsigned char major, unsigned char minor, int ret1, int ret2)
 					    GNUTLS_X509_FMT_PEM);
 
 	gnutls_init(&server, GNUTLS_SERVER);
-	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-				serverx509cred);
+	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, serverx509cred);
 
-	gnutls_priority_set_direct(server,
-				   "NORMAL:+VERS-TLS-ALL",
-				   NULL);
+	gnutls_priority_set_direct(server, "NORMAL:+VERS-TLS-ALL", NULL);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
@@ -86,7 +83,9 @@ static void try(unsigned char major, unsigned char minor, int ret1, int ret2)
 	if (ret < 0)
 		exit(1);
 
-	ret = gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca_cert, GNUTLS_X509_FMT_PEM);
+	ret =
+	    gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca_cert,
+						  GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);
 
@@ -95,7 +94,7 @@ static void try(unsigned char major, unsigned char minor, int ret1, int ret2)
 		exit(1);
 
 	ret = gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-				clientx509cred);
+				     clientx509cred);
 	if (ret < 0)
 		exit(1);
 
@@ -124,18 +123,18 @@ void doit(void)
 {
 	global_init();
 
-	try(1,1, GNUTLS_E_AGAIN, GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
+	try(1, 1, GNUTLS_E_AGAIN, GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
 	reset_buffers();
-	try(2,1, GNUTLS_E_AGAIN, GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
+	try(2, 1, GNUTLS_E_AGAIN, GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
 	reset_buffers();
 	/* check SSL 3.0 which is disabled by default */
-	try(3,0, GNUTLS_E_AGAIN, GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
+	try(3, 0, GNUTLS_E_AGAIN, GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
 	reset_buffers();
-	try(3,2, 0, 0);
+	try(3, 2, 0, 0);
 	reset_buffers();
-	try(3,23, 0, 0);
+	try(3, 23, 0, 0);
 	reset_buffers();
-	try(4,0, 0, 0);
+	try(4, 0, 0, 0);
 	reset_buffers();
 	gnutls_global_deinit();
 }

@@ -23,7 +23,7 @@
  * by the gnutls client. */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -39,19 +39,19 @@ int main(int argc, char **argv)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#if !defined(_WIN32)
-#include <sys/wait.h>
-#include <signal.h>
-#endif
-#include <unistd.h>
-#include <gnutls/gnutls.h>
-#include <assert.h>
+# include <string.h>
+# include <sys/types.h>
+# include <sys/socket.h>
+# if !defined(_WIN32)
+#  include <sys/wait.h>
+#  include <signal.h>
+# endif
+# include <unistd.h>
+# include <gnutls/gnutls.h>
+# include <assert.h>
 
-#include "utils.h"
-#include "cert-common.h"
+# include "utils.h"
+# include "cert-common.h"
 
 const char *side = "";
 
@@ -60,11 +60,10 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "%s|<%d>| %s", side, level, str);
 }
 
-static int TLSEXT_TYPE_server_sent		= 0;
-static int TLSEXT_TYPE_server_received		= 0;
+static int TLSEXT_TYPE_server_sent = 0;
+static int TLSEXT_TYPE_server_received = 0;
 
-static const unsigned char ext_data[] =
-{
+static const unsigned char ext_data[] = {
 	0x00,
 	0x03,
 	0xFE,
@@ -72,7 +71,8 @@ static const unsigned char ext_data[] =
 	0xFF
 };
 
-static int ext_recv_server_cookie(gnutls_session_t session, const unsigned char *buf, size_t buflen)
+static int ext_recv_server_cookie(gnutls_session_t session,
+				  const unsigned char *buf, size_t buflen)
 {
 	if (buflen != sizeof(ext_data))
 		fail("ext_recv_server_params: Invalid input buffer length\n");
@@ -82,10 +82,11 @@ static int ext_recv_server_cookie(gnutls_session_t session, const unsigned char 
 
 	TLSEXT_TYPE_server_received = 1;
 
-	return 0; //Success
+	return 0;		//Success
 }
 
-static int ext_send_server_cookie(gnutls_session_t session, gnutls_buffer_t extdata)
+static int ext_send_server_cookie(gnutls_session_t session,
+				  gnutls_buffer_t extdata)
 {
 	if (gnutls_ext_get_current_msg(session) == GNUTLS_EXT_FLAG_HRR) {
 		TLSEXT_TYPE_server_sent = 1;
@@ -116,13 +117,12 @@ static void client(int sd)
 	gnutls_init(&session, GNUTLS_CLIENT);
 
 	/* Use default priorities */
-	assert(gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-TLS1.3",
-				   NULL)>=0);
+	assert(gnutls_priority_set_direct
+	       (session, "NORMAL:-VERS-ALL:+VERS-TLS1.3", NULL) >= 0);
 
 	/* put the anonymous credentials to the current session
 	 */
-	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
-				clientx509cred);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, clientx509cred);
 
 	gnutls_transport_set_int(session, sd);
 	gnutls_handshake_set_timeout(session, get_timeout());
@@ -141,7 +141,7 @@ static void client(int sd)
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
-end:
+ end:
 	close(sd);
 
 	gnutls_deinit(session);
@@ -173,20 +173,24 @@ static void server(int sd)
 
 	gnutls_init(&session, GNUTLS_SERVER);
 
-
 	/* force a hello retry request by disabling all the groups that are
 	 * enabled by default. */
 	assert(gnutls_priority_set_direct(session,
 					  "NORMAL:-VERS-ALL:+VERS-TLS1.3:"
 					  "-GROUP-SECP256R1:-GROUP-X25519:-GROUP-FFDHE2048",
-					  NULL)>=0);
+					  NULL) >= 0);
 
-	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
-				serverx509cred);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, serverx509cred);
 
-	ret = gnutls_session_ext_register(session, "cookie_server", 44, GNUTLS_EXT_TLS, ext_recv_server_cookie, ext_send_server_cookie,
-					  NULL, NULL, NULL,
-					  GNUTLS_EXT_FLAG_CLIENT_HELLO|GNUTLS_EXT_FLAG_HRR|GNUTLS_EXT_FLAG_OVERRIDE_INTERNAL|GNUTLS_EXT_FLAG_IGNORE_CLIENT_REQUEST);
+	ret =
+	    gnutls_session_ext_register(session, "cookie_server", 44,
+					GNUTLS_EXT_TLS, ext_recv_server_cookie,
+					ext_send_server_cookie, NULL, NULL,
+					NULL,
+					GNUTLS_EXT_FLAG_CLIENT_HELLO |
+					GNUTLS_EXT_FLAG_HRR |
+					GNUTLS_EXT_FLAG_OVERRIDE_INTERNAL |
+					GNUTLS_EXT_FLAG_IGNORE_CLIENT_REQUEST);
 	if (ret != 0)
 		fail("server: cannot register: %s", gnutls_strerror(ret));
 
@@ -212,7 +216,7 @@ static void server(int sd)
 	 */
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
-end:
+ end:
 	close(sd);
 	gnutls_deinit(session);
 
@@ -239,7 +243,7 @@ void doit(void)
 		return;
 	}
 
-	TLSEXT_TYPE_server_sent	= 0;
+	TLSEXT_TYPE_server_sent = 0;
 	TLSEXT_TYPE_server_received = 0;
 
 	child = fork();

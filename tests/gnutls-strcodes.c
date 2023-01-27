@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdlib.h>
@@ -52,9 +52,9 @@ void _check_unique_non_null(int line, int i, const char *val)
 	if (val == NULL)
 		fail("issue in line %d, item %d\n", line, i);
 
-	if (strcmp(val, previous_val)==0) {
+	if (strcmp(val, previous_val) == 0) {
 		fail("issue in line %d, item %d: %s\n", line, i, val);
-	} 
+	}
 
 	snprintf(previous_val, sizeof(previous_val), "%s", val);
 }
@@ -69,7 +69,7 @@ void _check_unique(int line, int i, const char *val)
 		return;
 	}
 
-	if (strcmp(val, previous_val)==0)
+	if (strcmp(val, previous_val) == 0)
 		fail("issue in line %d, item %d: %s\n", line, i, val);
 
 	snprintf(previous_val, sizeof(previous_val), "%s", val);
@@ -90,46 +90,53 @@ void doit(void)
 		exit(1);
 	}
 
-	for (i=GNUTLS_E_UNIMPLEMENTED_FEATURE;i<=0;i++) {
+	for (i = GNUTLS_E_UNIMPLEMENTED_FEATURE; i <= 0; i++) {
 		check_unique(gnutls_strerror(i));
 		check_unique(gnutls_strerror_name(i));
 	}
 
-	for (i=0;i<GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC;i++)
+	for (i = 0; i < GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC; i++)
 		check_non_null(gnutls_handshake_description_get_name(i));
 
-	for (i=GNUTLS_PK_UNKNOWN+1;i<=GNUTLS_PK_MAX;i++)
+	for (i = GNUTLS_PK_UNKNOWN + 1; i <= GNUTLS_PK_MAX; i++)
 		check_unique_non_null(gnutls_pk_algorithm_get_name(i));
 
-	for (i=GNUTLS_SIGN_UNKNOWN+1;i<=GNUTLS_SIGN_MAX;i++) {
-		if (i==19) continue;
+	for (i = GNUTLS_SIGN_UNKNOWN + 1; i <= GNUTLS_SIGN_MAX; i++) {
+		if (i == 19)
+			continue;
 		check_unique_non_null(gnutls_sign_algorithm_get_name(i));
 	}
 
-	for (i=GNUTLS_A_CLOSE_NOTIFY;i<=GNUTLS_A_MAX;i++) {
+	for (i = GNUTLS_A_CLOSE_NOTIFY; i <= GNUTLS_A_MAX; i++) {
 		check_unique(gnutls_alert_get_strname(i));
 	}
 
-	for (i=GNUTLS_SEC_PARAM_INSECURE;i<=GNUTLS_SEC_PARAM_MAX;i++) {
+	for (i = GNUTLS_SEC_PARAM_INSECURE; i <= GNUTLS_SEC_PARAM_MAX; i++) {
 		check_non_null(gnutls_sec_param_get_name(i));
 	}
 
-	check_non_null(gnutls_certificate_verification_profile_get_name(GNUTLS_PROFILE_VERY_WEAK));
-	check_non_null(gnutls_certificate_verification_profile_get_name(GNUTLS_PROFILE_LOW));
-	check_non_null(gnutls_certificate_verification_profile_get_name(GNUTLS_PROFILE_LEGACY));
-	check_non_null(gnutls_certificate_verification_profile_get_name(GNUTLS_PROFILE_MEDIUM));
-	check_non_null(gnutls_certificate_verification_profile_get_name(GNUTLS_PROFILE_HIGH));
-	check_non_null(gnutls_certificate_verification_profile_get_name(GNUTLS_PROFILE_ULTRA));
+	check_non_null(gnutls_certificate_verification_profile_get_name
+		       (GNUTLS_PROFILE_VERY_WEAK));
+	check_non_null(gnutls_certificate_verification_profile_get_name
+		       (GNUTLS_PROFILE_LOW));
+	check_non_null(gnutls_certificate_verification_profile_get_name
+		       (GNUTLS_PROFILE_LEGACY));
+	check_non_null(gnutls_certificate_verification_profile_get_name
+		       (GNUTLS_PROFILE_MEDIUM));
+	check_non_null(gnutls_certificate_verification_profile_get_name
+		       (GNUTLS_PROFILE_HIGH));
+	check_non_null(gnutls_certificate_verification_profile_get_name
+		       (GNUTLS_PROFILE_ULTRA));
 
-	for (i=GNUTLS_ECC_CURVE_INVALID+1;i<=GNUTLS_ECC_CURVE_MAX;i++) {
+	for (i = GNUTLS_ECC_CURVE_INVALID + 1; i <= GNUTLS_ECC_CURVE_MAX; i++) {
 		if (_gnutls_ecc_curve_is_supported(i) == 0)
 			continue;
 
 		check_unique_non_null(gnutls_ecc_curve_get_name(i));
 		if (i == GNUTLS_ECC_CURVE_X25519)
-			continue; /* no oid yet */
+			continue;	/* no oid yet */
 		if (i == GNUTLS_ECC_CURVE_X448)
-			continue; /* no oid yet */
+			continue;	/* no oid yet */
 		check_unique_non_null(gnutls_ecc_curve_get_oid(i));
 	}
 

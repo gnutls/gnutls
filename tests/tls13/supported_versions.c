@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,19 +35,19 @@ int main(void)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/dtls.h>
-#include <signal.h>
+# include <string.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/dtls.h>
+# include <signal.h>
 
-#include "cert-common.h"
-#include "utils.h"
+# include "cert-common.h"
+# include "utils.h"
 
 /* This program tests the ProtocolVersion of Client Hello
  * and whether the supported_versions extension is present and
@@ -64,9 +64,7 @@ static void client_log_func(int level, const char *str)
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
 
-
-
-#define MAX_BUF 1024
+# define MAX_BUF 1024
 
 static void client(int fd)
 {
@@ -89,7 +87,10 @@ static void client(int fd)
 
 	gnutls_handshake_set_timeout(session, get_timeout());
 
-	ret = gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:+VERS-TLS1.0", NULL);
+	ret =
+	    gnutls_priority_set_direct(session,
+				       "NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:+VERS-TLS1.0",
+				       NULL);
 	if (ret < 0)
 		fail("cannot set TLS 1.3 priorities\n");
 
@@ -118,10 +119,10 @@ static void client(int fd)
 static unsigned client_hello_ok = 0;
 static unsigned server_hello_ok = 0;
 
-#define HANDSHAKE_SESSION_ID_POS 34
-#define TLS_EXT_SUPPORTED_VERSIONS 43
+# define HANDSHAKE_SESSION_ID_POS 34
+# define TLS_EXT_SUPPORTED_VERSIONS 43
 
-#define SKIP16(pos, total) { \
+# define SKIP16(pos, total) { \
 	uint16_t _s; \
 	if (pos+2 > total) fail("error\n"); \
 	_s = (msg->data[pos] << 8) | msg->data[pos+1]; \
@@ -129,7 +130,7 @@ static unsigned server_hello_ok = 0;
 	pos += 2+_s; \
 	}
 
-#define SKIP8(pos, total) { \
+# define SKIP8(pos, total) { \
 	uint8_t _s; \
 	if (pos+1 > total) fail("error\n"); \
 	_s = msg->data[pos]; \
@@ -138,7 +139,8 @@ static unsigned server_hello_ok = 0;
 	}
 
 static int client_hello_callback(gnutls_session_t session, unsigned int htype,
-	unsigned post, unsigned int incoming, const gnutls_datum_t *msg)
+				 unsigned post, unsigned int incoming,
+				 const gnutls_datum_t * msg)
 {
 	ssize_t pos;
 
@@ -150,10 +152,10 @@ static int client_hello_callback(gnutls_session_t session, unsigned int htype,
 		}
 
 		success("server hello:\n\t%d.%d\n",
-			(int)msg->data[pos], (int)msg->data[pos+1]);
+			(int)msg->data[pos], (int)msg->data[pos + 1]);
 
-		if (msg->data[pos] != 0x03 || msg->data[pos+1] != 0x03) {
-			fail("fail expected TLS 1.2 in server hello, got %d.%d\n", (int)msg->data[pos], (int)msg->data[pos+1]);
+		if (msg->data[pos] != 0x03 || msg->data[pos + 1] != 0x03) {
+			fail("fail expected TLS 1.2 in server hello, got %d.%d\n", (int)msg->data[pos], (int)msg->data[pos + 1]);
 		}
 
 		server_hello_ok = 1;
@@ -169,7 +171,8 @@ static int client_hello_callback(gnutls_session_t session, unsigned int htype,
 	/* we expect the legacy version to be present */
 	/* ProtocolVersion legacy_version = 0x0303 */
 	if (msg->data[0] != 0x03 || msg->data[1] != 0x03) {
-		fail("ProtocolVersion contains %d.%d\n", (int)msg->data[0], (int)msg->data[1]);
+		fail("ProtocolVersion contains %d.%d\n", (int)msg->data[0],
+		     (int)msg->data[1]);
 	}
 
 	pos = HANDSHAKE_SESSION_ID_POS;
@@ -187,23 +190,24 @@ static int client_hello_callback(gnutls_session_t session, unsigned int htype,
 	while (pos < msg->size) {
 		uint16_t type;
 
-		if (pos+4 > msg->size)
+		if (pos + 4 > msg->size)
 			fail("invalid client hello\n");
 
-		type = (msg->data[pos] << 8) | msg->data[pos+1];
-		pos+=2;
+		type = (msg->data[pos] << 8) | msg->data[pos + 1];
+		pos += 2;
 
 		success("Found extension %d\n", (int)type);
 
 		if (type != TLS_EXT_SUPPORTED_VERSIONS) {
 			SKIP16(pos, msg->size);
-		} else { /* found */
-			ssize_t size = (msg->data[pos] << 8) | msg->data[pos+1];
-			pos+=2;
+		} else {	/* found */
+			ssize_t size =
+			    (msg->data[pos] << 8) | msg->data[pos + 1];
+			pos += 2;
 
 			size = msg->data[pos];
 
-			if (size > msg->size+pos) {
+			if (size > msg->size + pos) {
 				fail("error in extension length\n");
 			}
 
@@ -212,29 +216,41 @@ static int client_hello_callback(gnutls_session_t session, unsigned int htype,
 			}
 
 			if (size != 6) {
-				fail("expected three versions only (%d)!\n", (int)size);
+				fail("expected three versions only (%d)!\n",
+				     (int)size);
 			}
 			pos++;
 
 			success("client hello:\n\t%d.%d\n\t%d.%d\n\t%d.%d\n",
-				(int)msg->data[pos], (int)msg->data[pos+1], 
-				(int)msg->data[pos+2], (int)msg->data[pos+3], 
-				(int)msg->data[pos+4], (int)msg->data[pos+5]);
+				(int)msg->data[pos], (int)msg->data[pos + 1],
+				(int)msg->data[pos + 2],
+				(int)msg->data[pos + 3],
+				(int)msg->data[pos + 4],
+				(int)msg->data[pos + 5]);
 
-			if (msg->data[pos] != 0x03 || msg->data[pos+1] != 0x04) {
-				fail("fail expected TLS 1.3, got %d.%d\n", (int)msg->data[pos], (int)msg->data[pos+1]);
+			if (msg->data[pos] != 0x03
+			    || msg->data[pos + 1] != 0x04) {
+				fail("fail expected TLS 1.3, got %d.%d\n",
+				     (int)msg->data[pos],
+				     (int)msg->data[pos + 1]);
 			}
-			pos+=2;
+			pos += 2;
 
-			if (msg->data[pos] != 0x03 || msg->data[pos+1] != 0x03) {
-				fail("fail expected TLS 1.2, got %d.%d\n", (int)msg->data[pos], (int)msg->data[pos+1]);
+			if (msg->data[pos] != 0x03
+			    || msg->data[pos + 1] != 0x03) {
+				fail("fail expected TLS 1.2, got %d.%d\n",
+				     (int)msg->data[pos],
+				     (int)msg->data[pos + 1]);
 			}
-			pos+=2;
+			pos += 2;
 
-			if (msg->data[pos] != 0x03 || msg->data[pos+1] != 0x01) {
-				fail("fail expected TLS 1.0, got %d.%d\n", (int)msg->data[pos], (int)msg->data[pos+1]);
+			if (msg->data[pos] != 0x03
+			    || msg->data[pos + 1] != 0x01) {
+				fail("fail expected TLS 1.0, got %d.%d\n",
+				     (int)msg->data[pos],
+				     (int)msg->data[pos + 1]);
 			}
-			pos+=2;
+			pos += 2;
 			client_hello_ok = 1;
 			break;
 		}
@@ -262,8 +278,7 @@ static void server(int fd)
 
 	gnutls_certificate_allocate_credentials(&x509_cred);
 	gnutls_certificate_set_x509_key_mem(x509_cred, &server_cert,
-					    &server_key,
-					    GNUTLS_X509_FMT_PEM);
+					    &server_key, GNUTLS_X509_FMT_PEM);
 
 	gnutls_init(&session, GNUTLS_SERVER);
 
@@ -283,11 +298,10 @@ static void server(int fd)
 
 	do {
 		ret = gnutls_handshake(session);
-		if (ret == GNUTLS_E_INTERRUPTED) { /* expected */
+		if (ret == GNUTLS_E_INTERRUPTED) {	/* expected */
 			break;
 		}
 	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
-
 
 	if (client_hello_ok == 0) {
 		fail("server: did not verify the client hello\n");

@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,20 +35,20 @@ int main(void)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/dtls.h>
-#include <signal.h>
-#include <assert.h>
+# include <string.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/dtls.h>
+# include <signal.h>
+# include <assert.h>
 
-#include "cert-common.h"
-#include "utils.h"
+# include "cert-common.h"
+# include "utils.h"
 
 /* This program checks whether a TLS 1.3 client will detect
  * a TLS 1.2 rollback attempt via the server random value.
@@ -64,24 +64,25 @@ static void client_log_func(int level, const char *str)
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
 
-#ifdef TLS12
-# define name "TLS1.2"
-# define RND tls12_rnd
-# define PRIO "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2"
-#elif TLS11
-# define name "TLS1.1"
-# define RND tls11_rnd
-# define PRIO "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.1:+VERS-TLS1.0"
-#else
-# error unknown version to test
-#endif
+# ifdef TLS12
+#  define name "TLS1.2"
+#  define RND tls12_rnd
+#  define PRIO "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2"
+# elif TLS11
+#  define name "TLS1.1"
+#  define RND tls11_rnd
+#  define PRIO "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.1:+VERS-TLS1.0"
+# else
+#  error unknown version to test
+# endif
 
-gnutls_datum_t tls12_rnd = {(void*)"\x44\x4F\x57\x4E\x47\x52\x44\x01",
-			      8};
+gnutls_datum_t tls12_rnd = { (void *)"\x44\x4F\x57\x4E\x47\x52\x44\x01",
+	8
+};
 
-gnutls_datum_t tls11_rnd = {(void*)"\x44\x4F\x57\x4E\x47\x52\x44\x00",
-			      8};
-
+gnutls_datum_t tls11_rnd = { (void *)"\x44\x4F\x57\x4E\x47\x52\x44\x00",
+	8
+};
 
 static void client(int fd)
 {
@@ -101,8 +102,7 @@ static void client(int fd)
 
 	gnutls_certificate_allocate_credentials(&x509_cred);
 	gnutls_certificate_set_x509_key_mem(x509_cred, &cli_ca3_cert,
-					    &cli_ca3_key,
-					    GNUTLS_X509_FMT_PEM);
+					    &cli_ca3_key, GNUTLS_X509_FMT_PEM);
 
  retry:
 	/* Initialize TLS session
@@ -116,7 +116,8 @@ static void client(int fd)
 		fail("cannot set TLS priorities\n");
 
 	if (try > 0)
-		gnutls_session_set_data(session, session_data.data, session_data.size);
+		gnutls_session_set_data(session, session_data.data,
+					session_data.size);
 
 	/* put the anonymous credentials to the current session
 	 */
@@ -143,15 +144,15 @@ static void client(int fd)
 	if (srandom.size != 32)
 		fail("unexpected random size\n");
 
-	if (memcmp(&srandom.data[32-8], RND.data, 8) != 0) {
+	if (memcmp(&srandom.data[32 - 8], RND.data, 8) != 0) {
 		unsigned i;
 		printf("expected: ");
-		for (i=0;i<8;i++)
+		for (i = 0; i < 8; i++)
 			printf("%.2x", (unsigned)RND.data[i]);
 		printf("\n");
 		printf("got:      ");
-		for (i=0;i<8;i++)
-			printf("%.2x", (unsigned)srandom.data[32-8+i]);
+		for (i = 0; i < 8; i++)
+			printf("%.2x", (unsigned)srandom.data[32 - 8 + i]);
 		printf("\n");
 		fail("unexpected random data for %s\n", name);
 	}
@@ -183,7 +184,6 @@ static void client(int fd)
 	gnutls_global_deinit();
 }
 
-
 static void server(int fd)
 {
 	int ret;
@@ -204,8 +204,7 @@ static void server(int fd)
 
 	gnutls_certificate_allocate_credentials(&x509_cred);
 	gnutls_certificate_set_x509_key_mem(x509_cred, &server_cert,
-					    &server_key,
-					    GNUTLS_X509_FMT_PEM);
+					    &server_key, GNUTLS_X509_FMT_PEM);
 
 	assert(gnutls_session_ticket_key_generate(&skey) >= 0);
 
@@ -214,7 +213,10 @@ static void server(int fd)
 
 	gnutls_handshake_set_timeout(session, get_timeout());
 
-	assert(gnutls_priority_set_direct(session, "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:+VERS-TLS1.1:+VERS-TLS1.0", NULL)>=0);
+	assert(gnutls_priority_set_direct
+	       (session,
+		"NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:+VERS-TLS1.1:+VERS-TLS1.0",
+		NULL) >= 0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
@@ -224,7 +226,7 @@ static void server(int fd)
 
 	do {
 		ret = gnutls_handshake(session);
-		if (ret == GNUTLS_E_INTERRUPTED) { /* expected */
+		if (ret == GNUTLS_E_INTERRUPTED) {	/* expected */
 			break;
 		}
 	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
@@ -240,7 +242,8 @@ static void server(int fd)
 	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 	if (ret < 0)
-		fail("server: recv did not succeed as expected: %s\n", gnutls_strerror(ret));
+		fail("server: recv did not succeed as expected: %s\n",
+		     gnutls_strerror(ret));
 
 	gnutls_deinit(session);
 

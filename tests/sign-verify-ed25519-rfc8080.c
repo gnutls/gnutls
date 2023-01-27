@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -28,9 +28,9 @@
 #include <string.h>
 #include <sys/types.h>
 #ifndef _WIN32
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <arpa/inet.h>
 #endif
 #include <unistd.h>
 #include <gnutls/gnutls.h>
@@ -124,7 +124,9 @@ void doit(void)
 	if (ret < 0)
 		fail("gnutls_privkey_init\n");
 
-	ret = gnutls_pubkey_import_ecc_raw(pubkey, GNUTLS_ECC_CURVE_ED25519, &_ed25519_x, NULL);
+	ret =
+	    gnutls_pubkey_import_ecc_raw(pubkey, GNUTLS_ECC_CURVE_ED25519,
+					 &_ed25519_x, NULL);
 	if (ret < 0)
 		fail("gnutls_x509_pubkey_import_ecc_raw\n");
 

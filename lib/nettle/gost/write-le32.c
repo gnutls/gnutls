@@ -39,31 +39,27 @@
 
 #include <nettle/macros.h>
 
-void
-_nettle_write_le32(size_t length, uint8_t *dst,
-		   const uint32_t *src)
+void _nettle_write_le32(size_t length, uint8_t * dst, const uint32_t * src)
 {
-  size_t i;
-  size_t words;
-  unsigned leftover;
-  
-  words = length / 4;
-  leftover = length % 4;
+	size_t i;
+	size_t words;
+	unsigned leftover;
 
-  for (i = 0; i < words; i++, dst += 4)
-    LE_WRITE_UINT32(dst, src[i]);
+	words = length / 4;
+	leftover = length % 4;
 
-  if (leftover)
-    {
-      uint32_t word;
-      
-      word = src[i];
+	for (i = 0; i < words; i++, dst += 4)
+		LE_WRITE_UINT32(dst, src[i]);
 
-      do
-	{
-	  *dst++ = word & 0xff;
-	  word >>= 8;
+	if (leftover) {
+		uint32_t word;
+
+		word = src[i];
+
+		do {
+			*dst++ = word & 0xff;
+			word >>= 8;
+		}
+		while (--leftover);
 	}
-      while (--leftover);
-    }
 }

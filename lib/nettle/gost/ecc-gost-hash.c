@@ -51,16 +51,15 @@
 */
 
 void
-gost_hash (const struct ecc_modulo *m,
-	   mp_limb_t *hp,
-	   size_t length, const uint8_t *digest)
+gost_hash(const struct ecc_modulo *m,
+	  mp_limb_t * hp, size_t length, const uint8_t * digest)
 {
-  if (length > ((size_t) m->bit_size + 7) / 8)
-    length = (m->bit_size + 7) / 8;
+	if (length > ((size_t)m->bit_size + 7) / 8)
+		length = (m->bit_size + 7) / 8;
 
-  mpn_set_base256_le (hp, m->size + 1, digest, length);
+	mpn_set_base256_le(hp, m->size + 1, digest, length);
 
-  if (8 * length > m->bit_size)
-    /* We got a few extra bits, at the low end. Discard them. */
-    mpn_rshift (hp, hp, m->size + 1, 8*length - m->bit_size);
+	if (8 * length > m->bit_size)
+		/* We got a few extra bits, at the low end. Discard them. */
+		mpn_rshift(hp, hp, m->size + 1, 8 * length - m->bit_size);
 }

@@ -104,7 +104,7 @@ int drbg_aes_random(struct drbg_aes_ctx *ctx, unsigned length, uint8_t * dst)
 	uint8_t *p = dst;
 	int ret;
 
-	while(left > 0) {
+	while (left > 0) {
 		p_len = MIN(MAX_DRBG_AES_GENERATE_SIZE, left);
 		ret = drbg_aes_generate(ctx, p_len, p, 0, 0);
 		if (ret == 0)
@@ -119,7 +119,7 @@ int drbg_aes_random(struct drbg_aes_ctx *ctx, unsigned length, uint8_t * dst)
 
 /* we don't use additional input */
 int drbg_aes_generate(struct drbg_aes_ctx *ctx, unsigned length, uint8_t * dst,
-			unsigned add_size, const uint8_t *add)
+		      unsigned add_size, const uint8_t * add)
 {
 	uint8_t tmp[AES_BLOCK_SIZE];
 	uint8_t seed[DRBG_AES_SEED_SIZE];
@@ -136,7 +136,8 @@ int drbg_aes_generate(struct drbg_aes_ctx *ctx, unsigned length, uint8_t * dst,
 			return gnutls_assert_val(0);
 		memcpy(seed, add, add_size);
 		if (add_size != DRBG_AES_SEED_SIZE)
-			memset(&seed[add_size], 0, DRBG_AES_SEED_SIZE - add_size);
+			memset(&seed[add_size], 0,
+			       DRBG_AES_SEED_SIZE - add_size);
 
 		drbg_aes_update(ctx, seed);
 	} else {

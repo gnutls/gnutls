@@ -36,9 +36,9 @@
 
 #ifdef HAVE_LIBNETTLE
 
-typedef void (*update_func) (void *, size_t, const uint8_t *);
-typedef void (*digest_func) (void *, size_t, uint8_t *);
-typedef void (*set_key_func) (void *, size_t, const uint8_t *);
+typedef void (*update_func)(void *, size_t, const uint8_t *);
+typedef void (*digest_func)(void *, size_t, uint8_t *);
+typedef void (*set_key_func)(void *, size_t, const uint8_t *);
 
 struct aarch64_hmac_ctx {
 	union {
@@ -195,7 +195,6 @@ _hmac_ctx_init(gnutls_mac_algorithm_t algo, struct aarch64_hmac_ctx *ctx)
 	return 0;
 }
 
-
 static int wrap_aarch64_hmac_init(gnutls_mac_algorithm_t algo, void **_ctx)
 {
 	struct aarch64_hmac_ctx *ctx;
@@ -218,12 +217,11 @@ static int wrap_aarch64_hmac_init(gnutls_mac_algorithm_t algo, void **_ctx)
 	return 0;
 }
 
-static void *
-wrap_aarch64_hmac_copy(const void *_ctx)
+static void *wrap_aarch64_hmac_copy(const void *_ctx)
 {
 	struct aarch64_hmac_ctx *new_ctx;
-	const struct aarch64_hmac_ctx *ctx=_ctx;
-	ptrdiff_t off = (uint8_t *)ctx->ctx_ptr - (uint8_t *)(&ctx->ctx);
+	const struct aarch64_hmac_ctx *ctx = _ctx;
+	ptrdiff_t off = (uint8_t *) ctx->ctx_ptr - (uint8_t *) (&ctx->ctx);
 
 	new_ctx = gnutls_malloc(sizeof(struct aarch64_hmac_ctx));
 	if (new_ctx == NULL) {
@@ -232,14 +230,12 @@ wrap_aarch64_hmac_copy(const void *_ctx)
 	}
 
 	memcpy(new_ctx, ctx, sizeof(*new_ctx));
-	new_ctx->ctx_ptr = (uint8_t *)&new_ctx->ctx + off;
+	new_ctx->ctx_ptr = (uint8_t *) & new_ctx->ctx + off;
 
 	return new_ctx;
 }
 
-
-static int
-wrap_aarch64_hmac_setkey(void *_ctx, const void *key, size_t keylen)
+static int wrap_aarch64_hmac_setkey(void *_ctx, const void *key, size_t keylen)
 {
 	struct aarch64_hmac_ctx *ctx = _ctx;
 
@@ -283,10 +279,10 @@ static void wrap_aarch64_hmac_deinit(void *hd)
 }
 
 static int wrap_aarch64_hmac_fast(gnutls_mac_algorithm_t algo,
-				const void *nonce, size_t nonce_size,
-				const void *key, size_t key_size,
-				const void *text, size_t text_size,
-				void *digest)
+				  const void *nonce, size_t nonce_size,
+				  const void *key, size_t key_size,
+				  const void *text, size_t text_size,
+				  void *digest)
 {
 	struct aarch64_hmac_ctx ctx;
 	int ret;

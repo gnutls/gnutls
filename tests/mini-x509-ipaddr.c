@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -79,18 +79,18 @@ void doit(void)
 	gnutls_global_set_time_function(mytime);
 
 	/* Init server */
-	assert(gnutls_certificate_allocate_credentials(&serverx509cred)>=0);
+	assert(gnutls_certificate_allocate_credentials(&serverx509cred) >= 0);
 	ret = gnutls_certificate_set_x509_key_mem(serverx509cred,
-					    &server_ca3_ipaddr_cert, &server_ca3_key,
-					    GNUTLS_X509_FMT_PEM);
+						  &server_ca3_ipaddr_cert,
+						  &server_ca3_key,
+						  GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
 		fail("could not import cert: %s\n", gnutls_strerror(ret));
 	}
 
-	assert(gnutls_init(&server, GNUTLS_SERVER)>=0);
-	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-				serverx509cred);
-	assert(gnutls_set_default_priority(server)>=0);
+	assert(gnutls_init(&server, GNUTLS_SERVER) >= 0);
+	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, serverx509cred);
+	assert(gnutls_set_default_priority(server) >= 0);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
@@ -100,7 +100,9 @@ void doit(void)
 	if (ret < 0)
 		exit(1);
 
-	ret = gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca3_cert, GNUTLS_X509_FMT_PEM);
+	ret =
+	    gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca3_cert,
+						  GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);
 
@@ -109,7 +111,7 @@ void doit(void)
 		exit(1);
 
 	ret = gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-				clientx509cred);
+				     clientx509cred);
 	if (ret < 0)
 		exit(1);
 
@@ -127,14 +129,15 @@ void doit(void)
 		memset(data, 0, sizeof(data));
 
 		data[0].type = GNUTLS_DT_DNS_HOSTNAME;
-		data[0].data = (void*)"localhost1";
+		data[0].data = (void *)"localhost1";
 
 		data[1].type = GNUTLS_DT_KEY_PURPOSE_OID;
-		data[1].data = (void*)GNUTLS_KP_TLS_WWW_SERVER;
+		data[1].data = (void *)GNUTLS_KP_TLS_WWW_SERVER;
 
 		ret = gnutls_certificate_verify_peers(client, data, 2, &status);
 		if (ret < 0) {
-			fail("could not verify certificate: %s\n", gnutls_strerror(ret));
+			fail("could not verify certificate: %s\n",
+			     gnutls_strerror(ret));
 			exit(1);
 		}
 
@@ -147,15 +150,16 @@ void doit(void)
 		memset(data, 0, sizeof(data));
 
 		data[0].type = GNUTLS_DT_IP_ADDRESS;
-		data[0].data = (void*)"\x01\x00\x01\x02";
+		data[0].data = (void *)"\x01\x00\x01\x02";
 		data[0].size = 4;
 
 		data[1].type = GNUTLS_DT_KEY_PURPOSE_OID;
-		data[1].data = (void*)GNUTLS_KP_TLS_WWW_SERVER;
+		data[1].data = (void *)GNUTLS_KP_TLS_WWW_SERVER;
 
 		ret = gnutls_certificate_verify_peers(client, data, 2, &status);
 		if (ret < 0) {
-			fail("could not verify certificate: %s\n", gnutls_strerror(ret));
+			fail("could not verify certificate: %s\n",
+			     gnutls_strerror(ret));
 			exit(1);
 		}
 
@@ -168,44 +172,54 @@ void doit(void)
 		memset(data, 0, sizeof(data));
 
 		data[0].type = GNUTLS_DT_IP_ADDRESS;
-		data[0].data = (void*)"\x7f\x00\x00\x01";
+		data[0].data = (void *)"\x7f\x00\x00\x01";
 		data[0].size = 4;
 
 		data[1].type = GNUTLS_DT_KEY_PURPOSE_OID;
-		data[1].data = (void*)GNUTLS_KP_TLS_WWW_SERVER;
+		data[1].data = (void *)GNUTLS_KP_TLS_WWW_SERVER;
 
 		ret = gnutls_certificate_verify_peers(client, data, 2, &status);
 		if (ret < 0) {
-			fail("could not verify certificate: %s\n", gnutls_strerror(ret));
+			fail("could not verify certificate: %s\n",
+			     gnutls_strerror(ret));
 			exit(1);
 		}
 
 		if (status != 0) {
-			assert(gnutls_certificate_verification_status_print(status, GNUTLS_CRT_X509, &t, 0)>=0);
+			assert(gnutls_certificate_verification_status_print
+			       (status, GNUTLS_CRT_X509, &t, 0) >= 0);
 			fail("could not verify: %s/%.4x!\n", t.data, status);
 		}
 
 		/* try the other verification functions */
-		ret = gnutls_certificate_verify_peers3(client, "127.0.0.1", &status);
+		ret =
+		    gnutls_certificate_verify_peers3(client, "127.0.0.1",
+						     &status);
 		if (ret < 0) {
-			fail("could not verify certificate: %s\n", gnutls_strerror(ret));
+			fail("could not verify certificate: %s\n",
+			     gnutls_strerror(ret));
 			exit(1);
 		}
 
 		if (status != 0) {
-			assert(gnutls_certificate_verification_status_print(status, GNUTLS_CRT_X509, &t, 0)>=0);
+			assert(gnutls_certificate_verification_status_print
+			       (status, GNUTLS_CRT_X509, &t, 0) >= 0);
 			fail("could not verify: %s/%.4x!\n", t.data, status);
 		}
 	}
 
 	{
 		/* change the flags */
-		gnutls_certificate_set_verify_flags(clientx509cred, GNUTLS_VERIFY_DO_NOT_ALLOW_IP_MATCHES);
+		gnutls_certificate_set_verify_flags(clientx509cred,
+						    GNUTLS_VERIFY_DO_NOT_ALLOW_IP_MATCHES);
 
 		/* now the compatibility option should fail */
-		ret = gnutls_certificate_verify_peers3(client, "127.0.0.1", &status);
+		ret =
+		    gnutls_certificate_verify_peers3(client, "127.0.0.1",
+						     &status);
 		if (ret < 0) {
-			fail("could not verify certificate: %s\n", gnutls_strerror(ret));
+			fail("could not verify certificate: %s\n",
+			     gnutls_strerror(ret));
 			exit(1);
 		}
 
@@ -217,14 +231,15 @@ void doit(void)
 		memset(data, 0, sizeof(data));
 
 		data[0].type = GNUTLS_DT_DNS_HOSTNAME;
-		data[0].data = (void*)"127.0.0.1";
+		data[0].data = (void *)"127.0.0.1";
 
 		data[1].type = GNUTLS_DT_KEY_PURPOSE_OID;
-		data[1].data = (void*)GNUTLS_KP_TLS_WWW_SERVER;
+		data[1].data = (void *)GNUTLS_KP_TLS_WWW_SERVER;
 
 		ret = gnutls_certificate_verify_peers(client, data, 2, &status);
 		if (ret < 0) {
-			fail("could not verify certificate: %s\n", gnutls_strerror(ret));
+			fail("could not verify certificate: %s\n",
+			     gnutls_strerror(ret));
 			exit(1);
 		}
 
@@ -237,20 +252,22 @@ void doit(void)
 		memset(data, 0, sizeof(data));
 
 		data[0].type = GNUTLS_DT_IP_ADDRESS;
-		data[0].data = (void*)"\x7f\x00\x00\x01";
+		data[0].data = (void *)"\x7f\x00\x00\x01";
 		data[0].size = 4;
 
 		data[1].type = GNUTLS_DT_KEY_PURPOSE_OID;
-		data[1].data = (void*)GNUTLS_KP_TLS_WWW_SERVER;
+		data[1].data = (void *)GNUTLS_KP_TLS_WWW_SERVER;
 
 		ret = gnutls_certificate_verify_peers(client, data, 2, &status);
 		if (ret < 0) {
-			fail("could not verify certificate: %s\n", gnutls_strerror(ret));
+			fail("could not verify certificate: %s\n",
+			     gnutls_strerror(ret));
 			exit(1);
 		}
 
 		if (status != 0) {
-			assert(gnutls_certificate_verification_status_print(status, GNUTLS_CRT_X509, &t, 0)>=0);
+			assert(gnutls_certificate_verification_status_print
+			       (status, GNUTLS_CRT_X509, &t, 0) >= 0);
 			fail("could not verify: %s/%.4x!\n", t.data, status);
 		}
 	}

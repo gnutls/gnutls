@@ -46,7 +46,6 @@
  *    of record boundaries.
  */
 
-
 /* Initialize a buffer head.
  *
  * Cost: O(1)
@@ -170,8 +169,7 @@ mbuffer_st *_mbuffer_head_pop_first(mbuffer_head_st * buf)
  *
  * Cost: O(1)
  */
-mbuffer_st *_mbuffer_head_get_first(mbuffer_head_st * buf,
-				    gnutls_datum_t * msg)
+mbuffer_st *_mbuffer_head_get_first(mbuffer_head_st * buf, gnutls_datum_t * msg)
 {
 	mbuffer_st *bufel = buf->head;
 
@@ -294,7 +292,6 @@ mbuffer_st *_mbuffer_alloc(size_t maximum_size)
 	return st;
 }
 
-
 /* Copy data into a segment. The segment must not be part of a buffer
  * head when using this function.
  *
@@ -305,9 +302,7 @@ mbuffer_st *_mbuffer_alloc(size_t maximum_size)
  * Cost: O(n)
  * n: number of bytes to copy
  */
-int
-_mbuffer_append_data(mbuffer_st * bufel, void *newdata,
-		     size_t newdata_size)
+int _mbuffer_append_data(mbuffer_st * bufel, void *newdata, size_t newdata_size)
 {
 	if (bufel->msg.size + newdata_size <= bufel->maximum_size) {
 		memcpy(&bufel->msg.data[bufel->msg.size], newdata,
@@ -353,8 +348,8 @@ mbuffer_st *_mbuffer_alloc_align16(size_t maximum_size, unsigned align_pos)
 
 	/* payload points after the mbuffer_st structure */
 	st->msg.data = (uint8_t *) st + sizeof(mbuffer_st);
-	
-	cur_alignment = ((size_t)(st->msg.data+align_pos)) % ALIGN_SIZE;
+
+	cur_alignment = ((size_t)(st->msg.data + align_pos)) % ALIGN_SIZE;
 	if (cur_alignment > 0)
 		st->msg.data += ALIGN_SIZE - cur_alignment;
 
@@ -366,9 +361,9 @@ mbuffer_st *_mbuffer_alloc_align16(size_t maximum_size, unsigned align_pos)
 
 static unsigned is_aligned16(mbuffer_st * bufel, unsigned align_pos)
 {
-	uint8_t * ptr = _mbuffer_get_udata_ptr(bufel);
+	uint8_t *ptr = _mbuffer_get_udata_ptr(bufel);
 
-	if (((size_t)(ptr+align_pos)) % ALIGN_SIZE == 0)
+	if (((size_t)(ptr + align_pos)) % ALIGN_SIZE == 0)
 		return 1;
 	else
 		return 0;
@@ -392,7 +387,7 @@ int _mbuffer_linearize_align16(mbuffer_head_st * buf, unsigned align_pos)
 		/* Nothing to do */
 		return 0;
 	}
-	
+
 	bufel = _mbuffer_head_get_first(buf, NULL);
 	if (buf->length == 1 && is_aligned16(bufel, align_pos))
 		return 0;
@@ -428,7 +423,7 @@ int _mbuffer_linearize(mbuffer_head_st * buf)
 		/* Nothing to do */
 		return 0;
 	}
-	
+
 	bufel = _mbuffer_alloc(buf->byte_length);
 	if (!bufel) {
 		gnutls_assert();

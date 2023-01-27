@@ -35,8 +35,7 @@
  * Returns: a string that contains the name of the specified
  *   certificate type, or %NULL in case of unknown types.
  **/
-const char *gnutls_certificate_type_get_name(gnutls_certificate_type_t
-					     type)
+const char *gnutls_certificate_type_get_name(gnutls_certificate_type_t type)
 {
 	const char *ret = NULL;
 
@@ -61,8 +60,7 @@ gnutls_certificate_type_t gnutls_certificate_type_get_id(const char *name)
 {
 	gnutls_certificate_type_t ret = GNUTLS_CRT_UNKNOWN;
 
-	if (c_strcasecmp(name, "X.509") == 0
-	    || c_strcasecmp(name, "X509") == 0)
+	if (c_strcasecmp(name, "X.509") == 0 || c_strcasecmp(name, "X509") == 0)
 		return GNUTLS_CRT_X509;
 	if (c_strcasecmp(name, "RAWPK") == 0)
 		return GNUTLS_CRT_RAWPK;

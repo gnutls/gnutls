@@ -31,7 +31,7 @@
 #include <gnutls/gnutls.h>
 #include <cmocka.h>
 
-# define GLOBAL_FLAGS 0
+#define GLOBAL_FLAGS 0
 
 #define MATCH_FUNC(fname, str, normalized) \
 static void fname(void **glob_state) \
@@ -73,21 +73,23 @@ MATCH_FUNC(fname, str, normalized)
 MATCH_FUNC_TWO_WAY(test_ascii, "localhost", "localhost");
 MATCH_FUNC_TWO_WAY(test_ascii_caps, "LOCALHOST", "LOCALHOST");
 MATCH_FUNC_TWO_WAY(test_greek1, "βόλοσ.com", "xn--nxasmq6b.com");
-MATCH_FUNC_TWO_WAY(test_mix, "简体中文.εξτρα.com", "xn--fiqu1az03c18t.xn--mxah1amo.com");
+MATCH_FUNC_TWO_WAY(test_mix, "简体中文.εξτρα.com",
+		   "xn--fiqu1az03c18t.xn--mxah1amo.com");
 MATCH_FUNC_TWO_WAY(test_german4, "bücher.de", "xn--bcher-kva.de");
 MATCH_FUNC_TWO_WAY(test_u1, "夡夞夜夙", "xn--bssffl");
 MATCH_FUNC_TWO_WAY(test_jp2, "日本語.jp", "xn--wgv71a119e.jp");
 /* invalid (✌️) symbol in IDNA2008 but valid in IDNA2003. Browsers
  * fallback to IDNA2003, and we do too, so that should work */
 #if IDN2_VERSION_NUMBER >= 0x02000002
-MATCH_FUNC_TWO_WAY(test_valid_idna2003, "\xe2\x9c\x8c\xef\xb8\x8f.com", "xn--7bi.com");
+MATCH_FUNC_TWO_WAY(test_valid_idna2003, "\xe2\x9c\x8c\xef\xb8\x8f.com",
+		   "xn--7bi.com");
 #else
 EMPTY_FUNC(test_valid_idna2003);
 #endif
 
 MATCH_FUNC_TWO_WAY(test_greek2, "βόλος.com", "xn--nxasmm1c.com");
 MATCH_FUNC_TWO_WAY(test_german1, "faß.de", "xn--fa-hia.de");
-# if IDN2_VERSION_NUMBER >= 0x00140000
+#if IDN2_VERSION_NUMBER >= 0x00140000
 MATCH_FUNC(test_caps_greek, "ΒΌΛΟΣ.com", "xn--nxasmq6b.com");
 MATCH_FUNC(test_caps_german1, "Ü.ü", "xn--tda.xn--tda");
 MATCH_FUNC(test_caps_german2, "Bücher.de", "xn--bcher-kva.de");
@@ -96,14 +98,14 @@ MATCH_FUNC(test_dots, "a.b.c。d。", "a.b.c.d.");
 
 /* without STD3 ASCII rules, the result is: evil.ca/c..example.com */
 MATCH_FUNC(test_evil, "evil.c\u2100.example.com", "evil.c.example.com");
-# else
+#else
 EMPTY_FUNC(test_caps_german1);
 EMPTY_FUNC(test_caps_german2);
 EMPTY_FUNC(test_caps_german3);
 EMPTY_FUNC(test_caps_greek);
 EMPTY_FUNC(test_dots);
 EMPTY_FUNC(test_evil);
-# endif
+#endif
 
 int main(void)
 {

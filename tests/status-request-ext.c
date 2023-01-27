@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,18 +35,18 @@ int main(void)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/dtls.h>
-#include <signal.h>
-#include "cert-common.h"
-#include "utils.h"
+# include <string.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/dtls.h>
+# include <signal.h>
+# include "cert-common.h"
+# include "utils.h"
 
 /* This program tests that the server does not send the
  * status request extension if no status response exists. That
@@ -64,7 +64,7 @@ static void client_log_func(int level, const char *str)
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
 
-#define SKIP16(pos, total) { \
+# define SKIP16(pos, total) { \
 	uint16_t _s; \
 	if (pos+2 > total) fail("error\n"); \
 	_s = (msg->data[pos] << 8) | msg->data[pos+1]; \
@@ -72,7 +72,7 @@ static void client_log_func(int level, const char *str)
 	pos += 2+_s; \
 	}
 
-#define SKIP8(pos, total) { \
+# define SKIP8(pos, total) { \
 	uint8_t _s; \
 	if (pos+1 > total) fail("error\n"); \
 	_s = msg->data[pos]; \
@@ -80,8 +80,8 @@ static void client_log_func(int level, const char *str)
 	pos += 1+_s; \
 	}
 
-#define TLS_EXT_STATUS_REQUEST 5
-#define HANDSHAKE_SESSION_ID_POS 34
+# define TLS_EXT_STATUS_REQUEST 5
+# define HANDSHAKE_SESSION_ID_POS 34
 
 /* This returns either the application-specific ID extension contents,
  * or the session ID contents. The former is used on the new protocol,
@@ -105,12 +105,13 @@ static void client_log_func(int level, const char *str)
  *      } ServerHello;
  */
 static int handshake_callback(gnutls_session_t session, unsigned int htype,
-	unsigned post, unsigned int incoming, const gnutls_datum_t *msg)
+			      unsigned post, unsigned int incoming,
+			      const gnutls_datum_t * msg)
 {
 	size_t pos = 0;
 	/* A client hello packet. We can get the session ID and figure
 	 * the associated connection. */
-	if (msg->size < HANDSHAKE_SESSION_ID_POS+GNUTLS_MAX_SESSION_ID+2) {
+	if (msg->size < HANDSHAKE_SESSION_ID_POS + GNUTLS_MAX_SESSION_ID + 2) {
 		fail("invalid client hello\n");
 	}
 
@@ -121,27 +122,27 @@ static int handshake_callback(gnutls_session_t session, unsigned int htype,
 	SKIP8(pos, msg->size);
 
 	/* CipherSuite */
-	pos+=2;
+	pos += 2;
 
 	/* CompressionMethod */
 	SKIP8(pos, msg->size);
 
-	if (pos+2 > msg->size)
+	if (pos + 2 > msg->size)
 		fail("invalid client hello\n");
-	pos+=2;
+	pos += 2;
 
 	/* Extension(s) */
 	while (pos < msg->size) {
 		uint16_t type;
 
-		if (pos+4 > msg->size)
+		if (pos + 4 > msg->size)
 			fail("invalid client hello\n");
 
-		type = (msg->data[pos] << 8) | msg->data[pos+1];
-		pos+=2;
+		type = (msg->data[pos] << 8) | msg->data[pos + 1];
+		pos += 2;
 		if (type != TLS_EXT_STATUS_REQUEST) {
 			SKIP16(pos, msg->size);
-		} else { /* found */
+		} else {	/* found */
 			fail("found extension, although no status response\n");
 			break;
 		}
@@ -150,9 +151,7 @@ static int handshake_callback(gnutls_session_t session, unsigned int htype,
 	return 0;
 }
 
-	
-
-#define MAX_BUF 1024
+# define MAX_BUF 1024
 
 static void client(int fd, const char *prio)
 {
@@ -209,7 +208,7 @@ static void client(int fd, const char *prio)
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
-      end:
+ end:
 
 	close(fd);
 
@@ -219,7 +218,6 @@ static void client(int fd, const char *prio)
 
 	gnutls_global_deinit();
 }
-
 
 static void server(int fd, const char *prio)
 {
@@ -240,12 +238,12 @@ static void server(int fd, const char *prio)
 
 	gnutls_certificate_allocate_credentials(&x509_cred);
 	gnutls_certificate_set_x509_key_mem(x509_cred, &server_cert,
-					    &server_key,
-					    GNUTLS_X509_FMT_PEM);
+					    &server_key, GNUTLS_X509_FMT_PEM);
 
 	gnutls_init(&session, GNUTLS_SERVER);
 
-	gnutls_handshake_set_hook_function(session, GNUTLS_HANDSHAKE_SERVER_HELLO,
+	gnutls_handshake_set_hook_function(session,
+					   GNUTLS_HANDSHAKE_SERVER_HELLO,
 					   GNUTLS_HOOK_POST,
 					   handshake_callback);
 

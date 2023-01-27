@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdlib.h>
@@ -102,24 +102,28 @@ static void do_crt_with_exts(unsigned version)
 	if (ret != 0)
 		fail("gnutls_x509_crt_set_key\n");
 
-	ret = gnutls_x509_crt_set_basic_constraints(crt, 0, -1); /* invalid for V1 */
+	ret = gnutls_x509_crt_set_basic_constraints(crt, 0, -1);	/* invalid for V1 */
 	if (ret < 0) {
 		fail("error\n");
 	}
 
-	ret = gnutls_x509_crt_set_key_usage(crt, GNUTLS_KEY_DIGITAL_SIGNATURE); /* inv for V1 */
+	ret = gnutls_x509_crt_set_key_usage(crt, GNUTLS_KEY_DIGITAL_SIGNATURE);	/* inv for V1 */
 	if (ret != 0)
 		fail("gnutls_x509_crt_set_key_usage %d\n", ret);
 
-	ret = gnutls_x509_crt_set_dn(crt, "o = none to\\, mention,cn = nikos", &err);
+	ret =
+	    gnutls_x509_crt_set_dn(crt, "o = none to\\, mention,cn = nikos",
+				   &err);
 	if (ret < 0) {
-		fail("gnutls_x509_crt_set_dn: %s, %s\n", gnutls_strerror(ret), err);
+		fail("gnutls_x509_crt_set_dn: %s, %s\n", gnutls_strerror(ret),
+		     err);
 	}
 
 	ret = gnutls_x509_crt_sign2(crt, crt, pkey, GNUTLS_DIG_SHA256, 0);
 	if (ret != GNUTLS_E_X509_CERTIFICATE_ERROR) {
 		gnutls_datum_t out;
-		assert(gnutls_x509_crt_export2(crt, GNUTLS_X509_FMT_PEM, &out) >= 0);
+		assert(gnutls_x509_crt_export2(crt, GNUTLS_X509_FMT_PEM, &out)
+		       >= 0);
 		printf("%s\n\n", out.data);
 
 		fail("gnutls_x509_crt_sign2: %s\n", gnutls_strerror(ret));
@@ -187,15 +191,19 @@ static void do_v1_invalid_crt(void)
 		fail("error\n");
 	}
 
-	ret = gnutls_x509_crt_set_dn(crt, "o = none to\\, mention,cn = nikos", &err);
+	ret =
+	    gnutls_x509_crt_set_dn(crt, "o = none to\\, mention,cn = nikos",
+				   &err);
 	if (ret < 0) {
-		fail("gnutls_x509_crt_set_dn: %s, %s\n", gnutls_strerror(ret), err);
+		fail("gnutls_x509_crt_set_dn: %s, %s\n", gnutls_strerror(ret),
+		     err);
 	}
 
 	ret = gnutls_x509_crt_sign2(crt, crt, pkey, GNUTLS_DIG_SHA256, 0);
 	if (ret != GNUTLS_E_X509_CERTIFICATE_ERROR) {
 		gnutls_datum_t out;
-		assert(gnutls_x509_crt_export2(crt, GNUTLS_X509_FMT_PEM, &out) >= 0);
+		assert(gnutls_x509_crt_export2(crt, GNUTLS_X509_FMT_PEM, &out)
+		       >= 0);
 		printf("%s\n\n", out.data);
 
 		fail("gnutls_x509_crt_sign2: %s\n", gnutls_strerror(ret));

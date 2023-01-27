@@ -39,11 +39,11 @@
 
 get_entropy_func _rnd_get_system_entropy = NULL;
 
-static int _rnd_get_system_entropy_sysctl(void* _rnd, size_t size)
+static int _rnd_get_system_entropy_sysctl(void *_rnd, size_t size)
 {
-	static int name[] = {CTL_KERN, KERN_ARND};
+	static int name[] = { CTL_KERN, KERN_ARND };
 	size_t count, req;
-	unsigned char* p;
+	unsigned char *p;
 
 	p = _rnd;
 	while (size) {
@@ -55,7 +55,7 @@ static int _rnd_get_system_entropy_sysctl(void* _rnd, size_t size)
 		}
 
 		if (count != req) {
-			return GNUTLS_E_RANDOM_DEVICE_ERROR; /* Can't happen. */
+			return GNUTLS_E_RANDOM_DEVICE_ERROR;	/* Can't happen. */
 		}
 
 		p += count;
@@ -75,4 +75,3 @@ void _rnd_system_entropy_deinit(void)
 {
 	return;
 }
-

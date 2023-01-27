@@ -104,7 +104,6 @@ int _gnutls_x509_read_der_uint(uint8_t * der, int dersize, unsigned int *out)
 
 }
 
-
 /* Extracts DSA and RSA parameters from a certificate.
  */
 int
@@ -131,16 +130,18 @@ _gnutls_get_asn_mpis(asn1_node asn, const char *root,
 
 	/* Read the algorithm's parameters
 	 */
-	_asnstr_append_name(name, sizeof(name), root,
-			    ".algorithm.parameters");
+	_asnstr_append_name(name, sizeof(name), root, ".algorithm.parameters");
 
 	if (pk_algorithm != GNUTLS_PK_RSA &&
-	    pk_algorithm != GNUTLS_PK_EDDSA_ED25519 && pk_algorithm != GNUTLS_PK_ECDH_X25519 &&
-	    pk_algorithm != GNUTLS_PK_EDDSA_ED448 && pk_algorithm != GNUTLS_PK_ECDH_X448) {
+	    pk_algorithm != GNUTLS_PK_EDDSA_ED25519
+	    && pk_algorithm != GNUTLS_PK_ECDH_X25519
+	    && pk_algorithm != GNUTLS_PK_EDDSA_ED448
+	    && pk_algorithm != GNUTLS_PK_ECDH_X448) {
 		/* RSA and EdDSA do not use parameters */
 		result = _gnutls_x509_read_value(asn, name, &tmp);
-		if (pk_algorithm == GNUTLS_PK_RSA_PSS && 
-		    (result == GNUTLS_E_ASN1_VALUE_NOT_FOUND || result == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND)) {
+		if (pk_algorithm == GNUTLS_PK_RSA_PSS &&
+		    (result == GNUTLS_E_ASN1_VALUE_NOT_FOUND
+		     || result == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND)) {
 			goto skip_params;
 		}
 		if (result < 0) {
@@ -149,9 +150,8 @@ _gnutls_get_asn_mpis(asn1_node asn, const char *root,
 		}
 
 		result =
-		     _gnutls_x509_read_pubkey_params(pk_algorithm,
-						     tmp.data, tmp.size,
-						     params);
+		    _gnutls_x509_read_pubkey_params(pk_algorithm,
+						    tmp.data, tmp.size, params);
 		if (result < 0) {
 			gnutls_assert();
 			goto error;
@@ -195,8 +195,7 @@ _gnutls_get_asn_mpis(asn1_node asn, const char *root,
 /* Extracts DSA and RSA parameters from a certificate.
  */
 int
-_gnutls_x509_crt_get_mpis(gnutls_x509_crt_t cert,
-			  gnutls_pk_params_st * params)
+_gnutls_x509_crt_get_mpis(gnutls_x509_crt_t cert, gnutls_pk_params_st * params)
 {
 	/* Read the algorithm's OID
 	 */
@@ -208,8 +207,7 @@ _gnutls_x509_crt_get_mpis(gnutls_x509_crt_t cert,
 /* Extracts DSA and RSA parameters from a certificate.
  */
 int
-_gnutls_x509_crq_get_mpis(gnutls_x509_crq_t cert,
-			  gnutls_pk_params_st * params)
+_gnutls_x509_crq_get_mpis(gnutls_x509_crq_t cert, gnutls_pk_params_st * params)
 {
 	/* Read the algorithm's OID
 	 */
@@ -224,7 +222,7 @@ _gnutls_x509_crq_get_mpis(gnutls_x509_crq_t cert,
  */
 int
 _gnutls_x509_read_pkalgo_params(asn1_node src, const char *src_name,
-			      gnutls_x509_spki_st *spki, unsigned is_sig)
+				gnutls_x509_spki_st * spki, unsigned is_sig)
 {
 	int result;
 	char name[128];
@@ -244,7 +242,7 @@ _gnutls_x509_read_pkalgo_params(asn1_node src, const char *src_name,
 		return _gnutls_asn2err(result);
 	}
 
-	if (strcmp (oid, PK_PKIX1_RSA_PSS_OID) == 0) {
+	if (strcmp(oid, PK_PKIX1_RSA_PSS_OID) == 0) {
 		gnutls_datum_t tmp = { NULL, 0 };
 
 		_gnutls_str_cpy(name, sizeof(name), src_name);
@@ -277,7 +275,8 @@ _gnutls_x509_read_pkalgo_params(asn1_node src, const char *src_name,
 	return 0;
 }
 
-static int write_oid_and_params(asn1_node dst, const char *dst_name, const char *oid, gnutls_x509_spki_st *params)
+static int write_oid_and_params(asn1_node dst, const char *dst_name,
+				const char *oid, gnutls_x509_spki_st * params)
 {
 	int result;
 	char name[128];
@@ -302,8 +301,7 @@ static int write_oid_and_params(asn1_node dst, const char *dst_name, const char 
 	_gnutls_str_cat(name, sizeof(name), ".parameters");
 
 	if (params->pk == GNUTLS_PK_RSA)
-		result =
-		    asn1_write_value(dst, name, ASN1_NULL, ASN1_NULL_SIZE);
+		result = asn1_write_value(dst, name, ASN1_NULL, ASN1_NULL_SIZE);
 	else if (params->pk == GNUTLS_PK_RSA_PSS) {
 		gnutls_datum_t tmp = { NULL, 0 };
 
@@ -329,7 +327,7 @@ static int write_oid_and_params(asn1_node dst, const char *dst_name, const char 
 
 int
 _gnutls_x509_write_spki_params(asn1_node dst, const char *dst_name,
-			       gnutls_x509_spki_st *params)
+			       gnutls_x509_spki_st * params)
 {
 	const char *oid;
 
@@ -353,7 +351,8 @@ _gnutls_x509_write_spki_params(asn1_node dst, const char *dst_name,
 
 int
 _gnutls_x509_write_sign_params(asn1_node dst, const char *dst_name,
-			       const gnutls_sign_entry_st *se, gnutls_x509_spki_st *params)
+			       const gnutls_sign_entry_st * se,
+			       gnutls_x509_spki_st * params)
 {
 	const char *oid;
 
@@ -367,8 +366,7 @@ _gnutls_x509_write_sign_params(asn1_node dst, const char *dst_name,
 	if (oid == NULL) {
 		gnutls_assert();
 		_gnutls_debug_log
-		    ("Cannot find OID for sign algorithm %s\n",
-		     se->name);
+		    ("Cannot find OID for sign algorithm %s\n", se->name);
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
@@ -379,9 +377,7 @@ _gnutls_x509_write_sign_params(asn1_node dst, const char *dst_name,
  * from asn1 structs. Combines the read and the conversion
  * steps.
  */
-int
-_gnutls_x509_read_uint(asn1_node node, const char *value,
-		       unsigned int *ret)
+int _gnutls_x509_read_uint(asn1_node node, const char *value, unsigned int *ret)
 {
 	int len, result;
 	uint8_t *tmpstr;
@@ -427,19 +423,18 @@ _gnutls_x509_read_uint(asn1_node node, const char *value,
 
 /* Writes the specified integer into the specified node.
  */
-int
-_gnutls_x509_write_uint32(asn1_node node, const char *value, uint32_t num)
+int _gnutls_x509_write_uint32(asn1_node node, const char *value, uint32_t num)
 {
 	uint8_t tmpstr[5];
 	int result;
 
 	tmpstr[0] = 0;
-	_gnutls_write_uint32(num, tmpstr+1);
+	_gnutls_write_uint32(num, tmpstr + 1);
 
 	if (tmpstr[1] > SCHAR_MAX) {
 		result = asn1_write_value(node, value, tmpstr, 5);
 	} else {
-		result = asn1_write_value(node, value, tmpstr+1, 4);
+		result = asn1_write_value(node, value, tmpstr + 1, 4);
 	}
 
 	if (result != ASN1_SUCCESS) {

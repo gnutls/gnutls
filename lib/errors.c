@@ -23,7 +23,7 @@
 #include "gnutls_int.h"
 #include "errors.h"
 #ifdef STDC_HEADERS
-#include <stdarg.h>
+# include <stdarg.h>
 #endif
 #include "str.h"
 
@@ -47,8 +47,7 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_UNKNOWN_CIPHER_TYPE),
 	ERROR_ENTRY(N_("The certificate and the given key do not match."),
 		    GNUTLS_E_CERTIFICATE_KEY_MISMATCH),
-	ERROR_ENTRY(N_
-		    ("Could not negotiate a supported compression method."),
+	ERROR_ENTRY(N_("Could not negotiate a supported compression method."),
 		    GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM),
 	ERROR_ENTRY(N_("An unknown public key algorithm was encountered."),
 		    GNUTLS_E_UNKNOWN_PK_ALGORITHM),
@@ -61,11 +60,9 @@ static const gnutls_error_entry error_entries[] = {
 	ERROR_ENTRY(N_
 		    ("The Diffie-Hellman prime sent by the server is not acceptable (not long enough)."),
 		    GNUTLS_E_DH_PRIME_UNACCEPTABLE),
-	ERROR_ENTRY(N_
-		    ("Error decoding the received TLS packet."),
+	ERROR_ENTRY(N_("Error decoding the received TLS packet."),
 		    GNUTLS_E_UNEXPECTED_PACKET_LENGTH),
-	ERROR_ENTRY(N_
-		    ("A TLS record packet with invalid length was received."),
+	ERROR_ENTRY(N_("A TLS record packet with invalid length was received."),
 		    GNUTLS_E_RECORD_OVERFLOW),
 	ERROR_ENTRY(N_("The TLS connection was non-properly terminated."),
 		    GNUTLS_E_PREMATURE_TERMINATION),
@@ -74,8 +71,8 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_INVALID_SESSION),
 
 	ERROR_ENTRY(N_("GnuTLS internal error."), GNUTLS_E_INTERNAL_ERROR),
-	ERROR_ENTRY(N_(
-		    "A connection with inappropriate fallback was attempted."),
+	ERROR_ENTRY(N_
+		    ("A connection with inappropriate fallback was attempted."),
 		    GNUTLS_E_INAPPROPRIATE_FALLBACK),
 	ERROR_ENTRY(N_("An illegal TLS extension was received."),
 		    GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION),
@@ -123,8 +120,7 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_PK_SIGN_FAILED),
 	ERROR_ENTRY(N_("Public key signature verification has failed."),
 		    GNUTLS_E_PK_SIG_VERIFY_FAILED),
-	ERROR_ENTRY(N_
-		    ("Decompression of the TLS record packet has failed."),
+	ERROR_ENTRY(N_("Decompression of the TLS record packet has failed."),
 		    GNUTLS_E_DECOMPRESSION_FAILED),
 	ERROR_ENTRY(N_("Compression of the TLS record packet has failed."),
 		    GNUTLS_E_COMPRESSION_FAILED),
@@ -169,7 +165,8 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_CERTIFICATE_VERIFICATION_ERROR),
 	ERROR_ENTRY(N_("Error in the CRL verification."),
 		    GNUTLS_E_CRL_VERIFICATION_ERROR),
-	ERROR_ENTRY(N_("Error in the private key verification; seed doesn't match."),
+	ERROR_ENTRY(N_
+		    ("Error in the private key verification; seed doesn't match."),
 		    GNUTLS_E_PRIVKEY_VERIFICATION_ERROR),
 	ERROR_ENTRY(N_("Could not authenticate peer."),
 		    GNUTLS_E_AUTH_ERROR),
@@ -177,25 +174,24 @@ static const gnutls_error_entry error_entries[] = {
 		    ("Unknown Subject Alternative name in X.509 certificate."),
 		    GNUTLS_E_X509_UNKNOWN_SAN),
 	ERROR_ENTRY(N_
-			("CIDR name constraint is malformed in size or structure."),
-			GNUTLS_E_MALFORMED_CIDR),
+		    ("CIDR name constraint is malformed in size or structure."),
+		    GNUTLS_E_MALFORMED_CIDR),
 
-	ERROR_ENTRY(N_
-		    ("Unsupported critical extension in X.509 certificate."),
+	ERROR_ENTRY(N_("Unsupported critical extension in X.509 certificate."),
 		    GNUTLS_E_X509_UNSUPPORTED_CRITICAL_EXTENSION),
 	ERROR_ENTRY(N_("Unsupported extension in X.509 certificate."),
 		    GNUTLS_E_X509_UNSUPPORTED_EXTENSION),
 	ERROR_ENTRY(N_("Duplicate extension in X.509 certificate."),
 		    GNUTLS_E_X509_DUPLICATE_EXTENSION),
-	ERROR_ENTRY(N_
-		    ("Key usage violation in certificate has been detected."),
+	ERROR_ENTRY(N_("Key usage violation in certificate has been detected."),
 		    GNUTLS_E_KEY_USAGE_VIOLATION),
 	ERROR_ENTRY(N_("Function was interrupted."), GNUTLS_E_INTERRUPTED),
 	ERROR_ENTRY(N_
 		    ("TLS Application data were received, while expecting handshake data."),
 		    GNUTLS_E_GOT_APPLICATION_DATA),
 	ERROR_ENTRY(N_("Error in Database backend."), GNUTLS_E_DB_ERROR),
-	ERROR_ENTRY(N_("The Database entry already exists."), GNUTLS_E_DB_ENTRY_EXISTS),
+	ERROR_ENTRY(N_("The Database entry already exists."),
+		    GNUTLS_E_DB_ENTRY_EXISTS),
 	ERROR_ENTRY(N_("The certificate type is not supported."),
 		    GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE),
 	ERROR_ENTRY(N_
@@ -235,8 +231,7 @@ static const gnutls_error_entry error_entries[] = {
 	ERROR_ENTRY(N_("ASN1 parser: Overflow in DER parsing."),
 		    GNUTLS_E_ASN1_DER_OVERFLOW),
 
-	ERROR_ENTRY(N_
-		    ("Too many empty record packets have been received."),
+	ERROR_ENTRY(N_("Too many empty record packets have been received."),
 		    GNUTLS_E_TOO_MANY_EMPTY_PACKETS),
 	ERROR_ENTRY(N_("Too many handshake packets have been received."),
 		    GNUTLS_E_TOO_MANY_HANDSHAKE_PACKETS),
@@ -255,8 +250,7 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_OPENPGP_KEYRING_ERROR),
 	ERROR_ENTRY(N_("The initialization of crypto backend has failed."),
 		    GNUTLS_E_CRYPTO_INIT_FAILED),
-	ERROR_ENTRY(N_
-		    ("No supported compression algorithms have been found."),
+	ERROR_ENTRY(N_("No supported compression algorithms have been found."),
 		    GNUTLS_E_NO_COMPRESSION_ALGORITHMS),
 	ERROR_ENTRY(N_("No supported cipher suites have been found."),
 		    GNUTLS_E_NO_CIPHER_SUITES),
@@ -292,12 +286,12 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_INVALID_PASSWORD),
 	ERROR_ENTRY(N_("The given string contains invalid UTF-8 characters."),
 		    GNUTLS_E_INVALID_UTF8_STRING),
-	ERROR_ENTRY(N_("The given email string contains non-ASCII characters before '@'."),
+	ERROR_ENTRY(N_
+		    ("The given email string contains non-ASCII characters before '@'."),
 		    GNUTLS_E_INVALID_UTF8_EMAIL),
 	ERROR_ENTRY(N_("The given password contains invalid characters."),
 		    GNUTLS_E_INVALID_PASSWORD_STRING),
-	ERROR_ENTRY(N_
-		    ("The Message Authentication Code verification failed."),
+	ERROR_ENTRY(N_("The Message Authentication Code verification failed."),
 		    GNUTLS_E_MAC_VERIFY_FAILED),
 	ERROR_ENTRY(N_("Some constraint limits were reached."),
 		    GNUTLS_E_CONSTRAINT_ERROR),
@@ -386,20 +380,21 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_CERTIFICATE_LIST_UNSORTED),
 	ERROR_ENTRY(N_("The OCSP response is invalid"),
 		    GNUTLS_E_OCSP_RESPONSE_ERROR),
-	ERROR_ENTRY(N_("The OCSP response provided doesn't match the available certificates"),
+	ERROR_ENTRY(N_
+		    ("The OCSP response provided doesn't match the available certificates"),
 		    GNUTLS_E_OCSP_MISMATCH_WITH_CERTS),
 	ERROR_ENTRY(N_("There is no certificate status (OCSP)."),
 		    GNUTLS_E_NO_CERTIFICATE_STATUS),
 	ERROR_ENTRY(N_("Error in the system's randomness device."),
 		    GNUTLS_E_RANDOM_DEVICE_ERROR),
-	ERROR_ENTRY(N_
-		    ("No common application protocol could be negotiated."),
+	ERROR_ENTRY(N_("No common application protocol could be negotiated."),
 		    GNUTLS_E_NO_APPLICATION_PROTOCOL),
 	ERROR_ENTRY(N_("Error while performing self checks."),
 		    GNUTLS_E_SELF_TEST_ERROR),
 	ERROR_ENTRY(N_("There is no self test for this algorithm."),
 		    GNUTLS_E_NO_SELF_TEST),
-	ERROR_ENTRY(N_("An error has been detected in the library and cannot continue operations."),
+	ERROR_ENTRY(N_
+		    ("An error has been detected in the library and cannot continue operations."),
 		    GNUTLS_E_LIB_IN_ERROR_STATE),
 	ERROR_ENTRY(N_("Error in sockets initialization."),
 		    GNUTLS_E_SOCKETS_INIT_ERROR),
@@ -407,7 +402,8 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_PK_GENERATION_ERROR),
 	ERROR_ENTRY(N_("Invalid TLS extensions length field."),
 		    GNUTLS_E_UNEXPECTED_EXTENSIONS_LENGTH),
-	ERROR_ENTRY(N_("Peer's certificate or username has changed during a rehandshake."),
+	ERROR_ENTRY(N_
+		    ("Peer's certificate or username has changed during a rehandshake."),
 		    GNUTLS_E_SESSION_USER_ID_CHANGED),
 	ERROR_ENTRY(N_("The provided string has an embedded null."),
 		    GNUTLS_E_ASN1_EMBEDDED_NULL_IN_STRING),
@@ -417,7 +413,8 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_UNRECOGNIZED_NAME),
 	ERROR_ENTRY(N_("There was an issue converting to or from UTF8."),
 		    GNUTLS_E_IDNA_ERROR),
-	ERROR_ENTRY(N_("Cannot perform this action while handshake is in progress."),
+	ERROR_ENTRY(N_
+		    ("Cannot perform this action while handshake is in progress."),
 		    GNUTLS_E_UNAVAILABLE_DURING_HANDSHAKE),
 	ERROR_ENTRY(N_("The public key is invalid."),
 		    GNUTLS_E_PK_INVALID_PUBKEY),
@@ -431,7 +428,8 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_ASN1_TIME_ERROR),
 	ERROR_ENTRY(N_("The signature is incompatible with the public key."),
 		    GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY),
-	ERROR_ENTRY(N_("One of the involved algorithms has insufficient security level."),
+	ERROR_ENTRY(N_
+		    ("One of the involved algorithms has insufficient security level."),
 		    GNUTLS_E_INSUFFICIENT_SECURITY),
 	ERROR_ENTRY(N_("No common key share with peer."),
 		    GNUTLS_E_NO_COMMON_KEY_SHARE),
@@ -510,7 +508,6 @@ void gnutls_perror(int error)
 {
 	fprintf(stderr, "GnuTLS error: %s\n", gnutls_strerror(error));
 }
-
 
 /**
  * gnutls_strerror:
@@ -604,14 +601,14 @@ void _gnutls_mpi_log(const char *prefix, bigint_t a)
 	if (res < 0 && res != GNUTLS_E_SHORT_MEMORY_BUFFER) {
 		gnutls_assert();
 		_gnutls_hard_log("MPI: %s can't print value (%d/%d)\n",
-				 prefix, res, (int) binlen);
+				 prefix, res, (int)binlen);
 		return;
 	}
 
 	if (binlen > 1024 * 1024) {
 		gnutls_assert();
 		_gnutls_hard_log("MPI: %s too large mpi (%d)\n", prefix,
-				 (int) binlen);
+				 (int)binlen);
 		return;
 	}
 
@@ -619,7 +616,7 @@ void _gnutls_mpi_log(const char *prefix, bigint_t a)
 	if (!binbuf) {
 		gnutls_assert();
 		_gnutls_hard_log("MPI: %s out of memory (%d)\n", prefix,
-				 (int) binlen);
+				 (int)binlen);
 		return;
 	}
 
@@ -627,7 +624,7 @@ void _gnutls_mpi_log(const char *prefix, bigint_t a)
 	if (res != 0) {
 		gnutls_assert();
 		_gnutls_hard_log("MPI: %s can't print value (%d/%d)\n",
-				 prefix, res, (int) binlen);
+				 prefix, res, (int)binlen);
 		gnutls_free(binbuf);
 		return;
 	}
@@ -638,14 +635,14 @@ void _gnutls_mpi_log(const char *prefix, bigint_t a)
 	if (!hexbuf) {
 		gnutls_assert();
 		_gnutls_hard_log("MPI: %s out of memory (hex %d)\n",
-				 prefix, (int) hexlen);
+				 prefix, (int)hexlen);
 		gnutls_free(binbuf);
 		return;
 	}
 
 	_gnutls_bin2hex(binbuf, binlen, hexbuf, hexlen, NULL);
 
-	_gnutls_hard_log("MPI: length: %d\n\t%s%s\n", (int) binlen, prefix,
+	_gnutls_hard_log("MPI: length: %d\n\t%s%s\n", (int)binlen, prefix,
 			 hexbuf);
 
 	gnutls_free(hexbuf);
@@ -697,7 +694,7 @@ void _gnutls_audit_log(gnutls_session_t session, const char *fmt, ...)
 }
 
 #ifndef DEBUG
-#ifndef C99_MACROS
+# ifndef C99_MACROS
 
 /* Without C99 macros these functions have to
  * be called. This may affect performance.
@@ -707,5 +704,5 @@ void _gnutls_null_log(void *x, ...)
 	return;
 }
 
-#endif				/* C99_MACROS */
+# endif				/* C99_MACROS */
 #endif				/* DEBUG */

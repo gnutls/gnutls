@@ -67,14 +67,14 @@
  **/
 void gnutls_dh_set_prime_bits(gnutls_session_t session, unsigned int bits)
 {
-	if (bits < gnutls_sec_param_to_pk_bits(GNUTLS_PK_DH, GNUTLS_SEC_PARAM_WEAK)
-		&& bits != 0)
+	if (bits <
+	    gnutls_sec_param_to_pk_bits(GNUTLS_PK_DH, GNUTLS_SEC_PARAM_WEAK)
+	    && bits != 0)
 		_gnutls_audit_log(session,
 				  "Note that the security level of the Diffie-Hellman key exchange has been lowered to %u bits and this may allow decryption of the session data\n",
 				  bits);
 	session->internals.dh_prime_bits = bits;
 }
-
 
 /**
  * gnutls_dh_get_group:
@@ -118,7 +118,8 @@ gnutls_dh_get_group(gnutls_session_t session,
 		dh = &psk_info->dh;
 		break;
 	case GNUTLS_CRD_CERTIFICATE:
-		cert_info = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
+		cert_info =
+		    _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
 		if (cert_info == NULL)
 			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 		dh = &cert_info->dh;
@@ -135,8 +136,7 @@ gnutls_dh_get_group(gnutls_session_t session,
 	}
 
 	ret =
-	    _gnutls_set_datum(raw_gen, dh->generator.data,
-			      dh->generator.size);
+	    _gnutls_set_datum(raw_gen, dh->generator.data, dh->generator.size);
 	if (ret < 0) {
 		gnutls_assert();
 		_gnutls_free_datum(raw_prime);
@@ -162,8 +162,7 @@ gnutls_dh_get_group(gnutls_session_t session,
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
  **/
-int
-gnutls_dh_get_pubkey(gnutls_session_t session, gnutls_datum_t * raw_key)
+int gnutls_dh_get_pubkey(gnutls_session_t session, gnutls_datum_t * raw_key)
 {
 	dh_info_st *dh;
 	anon_auth_info_t anon_info;
@@ -173,26 +172,33 @@ gnutls_dh_get_pubkey(gnutls_session_t session, gnutls_datum_t * raw_key)
 	switch (gnutls_auth_get_type(session)) {
 	case GNUTLS_CRD_ANON:
 		{
-			anon_info = _gnutls_get_auth_info(session, GNUTLS_CRD_ANON);
+			anon_info =
+			    _gnutls_get_auth_info(session, GNUTLS_CRD_ANON);
 			if (anon_info == NULL)
-				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+				return
+				    gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 			dh = &anon_info->dh;
 			break;
 		}
 	case GNUTLS_CRD_PSK:
 		{
-			psk_info = _gnutls_get_auth_info(session, GNUTLS_CRD_PSK);
+			psk_info =
+			    _gnutls_get_auth_info(session, GNUTLS_CRD_PSK);
 			if (psk_info == NULL)
-				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+				return
+				    gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 			dh = &psk_info->dh;
 			break;
 		}
 	case GNUTLS_CRD_CERTIFICATE:
 		{
 
-			cert_info = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
+			cert_info =
+			    _gnutls_get_auth_info(session,
+						  GNUTLS_CRD_CERTIFICATE);
 			if (cert_info == NULL)
-				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+				return
+				    gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 			dh = &cert_info->dh;
 			break;
 		}
@@ -225,7 +231,8 @@ int gnutls_dh_get_secret_bits(gnutls_session_t session)
 
 			info = _gnutls_get_auth_info(session, GNUTLS_CRD_ANON);
 			if (info == NULL)
-				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+				return
+				    gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 			return info->dh.secret_bits;
 		}
 	case GNUTLS_CRD_PSK:
@@ -234,16 +241,20 @@ int gnutls_dh_get_secret_bits(gnutls_session_t session)
 
 			info = _gnutls_get_auth_info(session, GNUTLS_CRD_PSK);
 			if (info == NULL)
-				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+				return
+				    gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 			return info->dh.secret_bits;
 		}
 	case GNUTLS_CRD_CERTIFICATE:
 		{
 			cert_auth_info_t info;
 
-			info = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
+			info =
+			    _gnutls_get_auth_info(session,
+						  GNUTLS_CRD_CERTIFICATE);
 			if (info == NULL)
-				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+				return
+				    gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 			return info->dh.secret_bits;
 		}
@@ -252,7 +263,6 @@ int gnutls_dh_get_secret_bits(gnutls_session_t session)
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 }
-
 
 static int mpi_buf2bits(gnutls_datum_t * mpi_buf)
 {
@@ -296,7 +306,8 @@ int gnutls_dh_get_prime_bits(gnutls_session_t session)
 
 			info = _gnutls_get_auth_info(session, GNUTLS_CRD_ANON);
 			if (info == NULL)
-				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+				return
+				    gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 			dh = &info->dh;
 			break;
 		}
@@ -306,7 +317,8 @@ int gnutls_dh_get_prime_bits(gnutls_session_t session)
 
 			info = _gnutls_get_auth_info(session, GNUTLS_CRD_PSK);
 			if (info == NULL)
-				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+				return
+				    gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 			dh = &info->dh;
 			break;
 		}
@@ -314,9 +326,12 @@ int gnutls_dh_get_prime_bits(gnutls_session_t session)
 		{
 			cert_auth_info_t info;
 
-			info = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
+			info =
+			    _gnutls_get_auth_info(session,
+						  GNUTLS_CRD_CERTIFICATE);
 			if (info == NULL)
-				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+				return
+				    gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 			dh = &info->dh;
 			break;
@@ -326,12 +341,11 @@ int gnutls_dh_get_prime_bits(gnutls_session_t session)
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	if(dh->prime.size == 0)
+	if (dh->prime.size == 0)
 		return 0;
 
 	return mpi_buf2bits(&dh->prime);
 }
-
 
 /**
  * gnutls_dh_get_peers_public_bits:
@@ -354,7 +368,8 @@ int gnutls_dh_get_peers_public_bits(gnutls_session_t session)
 
 			info = _gnutls_get_auth_info(session, GNUTLS_CRD_ANON);
 			if (info == NULL)
-				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+				return
+				    gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 			dh = &info->dh;
 			break;
@@ -365,7 +380,8 @@ int gnutls_dh_get_peers_public_bits(gnutls_session_t session)
 
 			info = _gnutls_get_auth_info(session, GNUTLS_CRD_PSK);
 			if (info == NULL)
-				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+				return
+				    gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 			dh = &info->dh;
 			break;
@@ -374,9 +390,12 @@ int gnutls_dh_get_peers_public_bits(gnutls_session_t session)
 		{
 			cert_auth_info_t info;
 
-			info = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
+			info =
+			    _gnutls_get_auth_info(session,
+						  GNUTLS_CRD_CERTIFICATE);
 			if (info == NULL)
-				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+				return
+				    gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 			dh = &info->dh;
 			break;
@@ -390,4 +409,3 @@ int gnutls_dh_get_peers_public_bits(gnutls_session_t session)
 }
 
 #endif				/* DH */
-

@@ -22,20 +22,20 @@
 #ifndef GNUTLS_LIB_ACCELERATED_X86_X86_COMMON_H
 # define GNUTLS_LIB_ACCELERATED_X86_X86_COMMON_H
 
-#include <config.h>
+# include <config.h>
 
-#if defined(ASM_X86)
+# if defined(ASM_X86)
 
 void gnutls_cpuid(unsigned int func, unsigned int *ax, unsigned int *bx,
 		  unsigned int *cx, unsigned int *dx);
 
-#endif
+# endif
 
-#define CHECK_AES_KEYSIZE(s) \
+# define CHECK_AES_KEYSIZE(s) \
 	if (s != 16 && s != 24 && s != 32) \
 		return GNUTLS_E_INVALID_REQUEST
 
-#define NN_HASH(name, update_func, digest_func, NAME) {	\
+# define NN_HASH(name, update_func, digest_func, NAME) {	\
  #name,						\
  sizeof(struct name##_ctx),			\
  NAME##_DIGEST_SIZE,				\
@@ -43,6 +43,6 @@ void gnutls_cpuid(unsigned int func, unsigned int *ax, unsigned int *bx,
  (nettle_hash_init_func *) name##_init,		\
  (nettle_hash_update_func *) update_func,	\
  (nettle_hash_digest_func *) digest_func	\
-} 
+}
 
 #endif

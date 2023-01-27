@@ -173,9 +173,8 @@ gnutls_alert_send(gnutls_session_t session, gnutls_alert_level_t level,
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 		ret = session->internals.alert_read_func(session,
-						     params->write.level,
-						     level,
-						     desc);
+							 params->write.level,
+							 level, desc);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
@@ -183,8 +182,7 @@ gnutls_alert_send(gnutls_session_t session, gnutls_alert_level_t level,
 	}
 
 	ret = _gnutls_send_int(session, GNUTLS_ALERT, -1,
-			      EPOCH_WRITE_CURRENT, data, 2,
-			      MBUFFER_FLUSH);
+			       EPOCH_WRITE_CURRENT, data, 2, MBUFFER_FLUSH);
 
 	return (ret < 0) ? ret : 0;
 }
@@ -387,12 +385,13 @@ int gnutls_alert_send_appropriate(gnutls_session_t session, int err)
 	int level;
 
 	if (err != GNUTLS_E_REHANDSHAKE && (!gnutls_error_is_fatal(err) ||
-	    err == GNUTLS_E_FATAL_ALERT_RECEIVED))
+					    err ==
+					    GNUTLS_E_FATAL_ALERT_RECEIVED))
 		return gnutls_assert_val(0);
 
 	alert = gnutls_error_to_alert(err, &level);
 
-	return gnutls_alert_send(session, (gnutls_alert_level_t)level, alert);
+	return gnutls_alert_send(session, (gnutls_alert_level_t) level, alert);
 }
 
 /**
@@ -410,5 +409,5 @@ int gnutls_alert_send_appropriate(gnutls_session_t session, int err)
  **/
 gnutls_alert_description_t gnutls_alert_get(gnutls_session_t session)
 {
-	return (gnutls_alert_description_t)session->internals.last_alert;
+	return (gnutls_alert_description_t) session->internals.last_alert;
 }

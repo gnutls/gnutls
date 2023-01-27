@@ -37,8 +37,12 @@ static int auto_verify_cb(gnutls_session_t session)
 	if (session->internals.vc_elements == 0) {
 		ret = gnutls_certificate_verify_peers2(session, &status);
 	} else {
-		ret = gnutls_certificate_verify_peers(session, session->internals.vc_data,
-						      session->internals.vc_elements, &status);
+		ret =
+		    gnutls_certificate_verify_peers(session,
+						    session->internals.vc_data,
+						    session->
+						    internals.vc_elements,
+						    &status);
 	}
 	if (ret < 0) {
 		return gnutls_assert_val(GNUTLS_E_CERTIFICATE_ERROR);
@@ -47,7 +51,8 @@ static int auto_verify_cb(gnutls_session_t session)
 	session->internals.vc_status = status;
 
 	if (status != 0)	/* Certificate is not trusted */
-		return gnutls_assert_val(GNUTLS_E_CERTIFICATE_VERIFICATION_ERROR);
+		return
+		    gnutls_assert_val(GNUTLS_E_CERTIFICATE_VERIFICATION_ERROR);
 
 	/* notify gnutls to continue handshake normally */
 	return 0;
@@ -79,11 +84,11 @@ static int auto_verify_cb(gnutls_session_t session)
  * Since: 3.4.6
  **/
 void gnutls_session_set_verify_cert(gnutls_session_t session,
-				     const char *hostname, unsigned flags)
+				    const char *hostname, unsigned flags)
 {
 	if (hostname) {
 		session->internals.vc_sdata.type = GNUTLS_DT_DNS_HOSTNAME;
-		session->internals.vc_sdata.data = (void*)hostname;
+		session->internals.vc_sdata.data = (void *)hostname;
 		session->internals.vc_sdata.size = 0;
 		session->internals.vc_elements = 1;
 		session->internals.vc_data = &session->internals.vc_sdata;
@@ -121,8 +126,7 @@ void gnutls_session_set_verify_cert(gnutls_session_t session,
  **/
 void gnutls_session_set_verify_cert2(gnutls_session_t session,
 				     gnutls_typed_vdata_st * data,
-				     unsigned elements,
-				     unsigned flags)
+				     unsigned elements, unsigned flags)
 {
 	session->internals.vc_data = data;
 	session->internals.vc_elements = elements;

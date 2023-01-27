@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,18 +35,18 @@ int main(void)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/dtls.h>
-#include <signal.h>
+# include <string.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/dtls.h>
+# include <signal.h>
 
-#include "utils.h"
+# include "utils.h"
 
 /* This program tests whether the import functions sort the 
  * chain.
@@ -58,7 +58,7 @@ static void client_log_func(int level, const char *str)
 }
 
 static unsigned char server_cert_pem[] =
-/* 0 */    "-----BEGIN CERTIFICATE-----\n"
+/* 0 */ "-----BEGIN CERTIFICATE-----\n"
     "MIIDIzCCAgugAwIBAgIMVHc8lDcqr/T62g5oMA0GCSqGSIb3DQEBCwUAMA8xDTAL\n"
     "BgNVBAMTBENBLTIwIhgPMjAxNDExMjcxNTAwMzZaGA85OTk5MTIzMTIzNTk1OVow\n"
     "EzERMA8GA1UEAxMIc2VydmVyLTMwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK\n"
@@ -77,7 +77,7 @@ static unsigned char server_cert_pem[] =
     "kmspW97ROmNr1jfQNyBVWjd1EER80zZCngXq4+JnP1tppJNcYFhHeqSGQCqASehY\n"
     "CC7ITbKAK8IdwU4gVk7R92rOKyrFPimc1UwObNpxbL5jizZqemW7\n"
     "-----END CERTIFICATE-----\n"
-/* 3 */    "-----BEGIN CERTIFICATE-----\n"
+/* 3 */ "-----BEGIN CERTIFICATE-----\n"
     "MIIC9TCCAd2gAwIBAgIBADANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDEwRDQS0w\n"
     "MCIYDzIwMTQxMTI3MTUwMDM2WhgPOTk5OTEyMzEyMzU5NTlaMA8xDTALBgNVBAMT\n"
     "BENBLTAwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC16A/jNGbd6oP3\n"
@@ -95,7 +95,7 @@ static unsigned char server_cert_pem[] =
     "W3QXdf/khr1T3JEJ55t1WxcC1cWV4FnecUU4wlKs1mBghV+/8cgbYjoIdUAsYsdv\n"
     "SjySP3B65XXw9G3MmHOjNoRpF7Oeea8tN+zxw3xFx/a9Uq19BdOlrHE=\n"
     "-----END CERTIFICATE-----\n"
-/* 1 */    "-----BEGIN CERTIFICATE-----\n"
+/* 1 */ "-----BEGIN CERTIFICATE-----\n"
     "MIIDFjCCAf6gAwIBAgIBAjANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDEwRDQS0x\n"
     "MCIYDzIwMTQxMTI3MTUwMDM2WhgPOTk5OTEyMzEyMzU5NTlaMA8xDTALBgNVBAMT\n"
     "BENBLTIwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDOnFo6ntaysv14\n"
@@ -112,9 +112,8 @@ static unsigned char server_cert_pem[] =
     "/cB5PA7BFKvVrpYGefFQtrgkFhHSoUwDtpJAdYJPWgUMiqpvDuQdD/d6FQ18rb7w\n"
     "QuIIvUeHaawm8HLrJ5JZoy7BnryY4SEFqGSTeNWp4CyeTeQPAcCdZ3NlnSDV1RM2\n"
     "QelcD8S6GAp8l8LcF1zqiaoqWVYdeVnO6Doabx/IP7ZxctcdaEAdUQYjJ/dG3A2p\n"
-    "wpf3tVoOBKFByhdBrz7uda09sq57+AmvQdk=\n"
-    "-----END CERTIFICATE-----\n"
-/* 2 */    "-----BEGIN CERTIFICATE-----\n"
+    "wpf3tVoOBKFByhdBrz7uda09sq57+AmvQdk=\n" "-----END CERTIFICATE-----\n"
+/* 2 */ "-----BEGIN CERTIFICATE-----\n"
     "MIIDFjCCAf6gAwIBAgIBATANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDEwRDQS0w\n"
     "MCIYDzIwMTQxMTI3MTUwMDM2WhgPOTk5OTEyMzEyMzU5NTlaMA8xDTALBgNVBAMT\n"
     "BENBLTEwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDft9fjnipXU+WO\n"
@@ -131,11 +130,9 @@ static unsigned char server_cert_pem[] =
     "kxbxL0ZWezMbC/U8R3tFSDZOCb/bM+wCKg1hX5My0+utKAmhbwlYQY9fKyhZCUdv\n"
     "GnO3f5JInJDH2FmG80RouZ8Av6CjOwfChz+SPTgrMsbTugYWX9SVQ8oRF+N7cudC\n"
     "7XlvScNQKlbzmMl2zLQOrL78djCLVdU70bZcpq1o7L/R59YNAB+4fGH8rTWZMYQB\n"
-    "rSoCPlyNAYAqMPXPsUFV/ngeYNSbpTz3SGA=\n"
-    "-----END CERTIFICATE-----\n"
-    "\n";
+    "rSoCPlyNAYAqMPXPsUFV/ngeYNSbpTz3SGA=\n" "-----END CERTIFICATE-----\n" "\n";
 
-const gnutls_datum_t server_cert = { 
+const gnutls_datum_t server_cert = {
 	server_cert_pem,
 	sizeof(server_cert_pem)
 };
@@ -173,11 +170,10 @@ const gnutls_datum_t server_key = { server_key_pem,
 	sizeof(server_key_pem)
 };
 
-
 /* A very basic TLS client, with anonymous authentication.
  */
 
-#define MAX_BUF 1024
+# define MAX_BUF 1024
 
 static void client(int fd)
 {
@@ -203,8 +199,8 @@ static void client(int fd)
 	/* Use default priorities */
 	ret =
 	    gnutls_priority_set_direct(session,
-					"NONE:+VERS-TLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA",
-					&p);
+				       "NONE:+VERS-TLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA",
+				       &p);
 	if (ret < 0) {
 		fail("error in setting priority: %s\n", p);
 		exit(1);
@@ -248,7 +244,6 @@ static void client(int fd)
 	gnutls_global_deinit();
 }
 
-
 /* These are global */
 pid_t child;
 
@@ -279,10 +274,11 @@ static void server(int fd)
 
 	gnutls_certificate_allocate_credentials(&x509_cred);
 	ret = gnutls_certificate_set_x509_key_mem(x509_cred, &server_cert,
-					    &server_key,
-					    GNUTLS_X509_FMT_PEM);
+						  &server_key,
+						  GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
-		fail("server: gnutls_certificate_set_x509_key_mem: %s\n", gnutls_strerror(ret));
+		fail("server: gnutls_certificate_set_x509_key_mem: %s\n",
+		     gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -294,7 +290,6 @@ static void server(int fd)
 		ret = gnutls_handshake(session);
 	}
 	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
-
 
 	if (debug)
 		success("server: Handshake was completed\n");

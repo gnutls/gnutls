@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -36,19 +36,19 @@ int main(void)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/dtls.h>
-#include <signal.h>
+# include <string.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/dtls.h>
+# include <signal.h>
 
-#include "utils.h"
-#include "cert-common.h"
+# include "utils.h"
+# include "cert-common.h"
 
 static void terminate(void);
 
@@ -67,8 +67,8 @@ static void client_log_func(int level, const char *str)
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
 
-#define MAX_BUF 1024
-#define MAX_REHANDSHAKES 16
+# define MAX_BUF 1024
+# define MAX_REHANDSHAKES 16
 
 static void client(int fd)
 {
@@ -96,7 +96,9 @@ static void client(int fd)
 	gnutls_handshake_set_timeout(session, get_timeout());
 
 	/* Use default priorities */
-	gnutls_priority_set_direct(session, "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2:+VERS-TLS1.1", NULL);
+	gnutls_priority_set_direct(session,
+				   "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2:+VERS-TLS1.1",
+				   NULL);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
@@ -123,10 +125,10 @@ static void client(int fd)
 			gnutls_protocol_get_name
 			(gnutls_protocol_get_version(session)));
 
-	for (i=0;i<MAX_REHANDSHAKES;i++) {
+	for (i = 0; i < MAX_REHANDSHAKES; i++) {
 		do {
 			ret = gnutls_handshake(session);
-		} while(ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
+		} while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
 		if (ret != 0) {
 			fail("client: error in code after rehandshake: %s\n",
 			     gnutls_strerror(ret));
@@ -137,16 +139,12 @@ static void client(int fd)
 
 	do {
 		do {
-			ret =
-			    gnutls_record_recv(session, buffer,
-					       MAX_BUF);
-		} while (ret == GNUTLS_E_AGAIN
-			 || ret == GNUTLS_E_INTERRUPTED);
+			ret = gnutls_record_recv(session, buffer, MAX_BUF);
+		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 	} while (ret > 0);
 
 	if (ret != 0) {
-		fail("client: Error receiving: %s\n",
-		     gnutls_strerror(ret));
+		fail("client: Error receiving: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -199,7 +197,9 @@ static void server(int fd)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_priority_set_direct(session, "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2:+VERS-TLS1.1", NULL);
+	gnutls_priority_set_direct(session,
+				   "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2:+VERS-TLS1.1",
+				   NULL);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 	gnutls_certificate_server_set_request(session, GNUTLS_CERT_REQUIRE);
@@ -234,7 +234,7 @@ static void server(int fd)
 			do {
 				ret =
 				    gnutls_record_recv(session, buffer,
-							MAX_BUF);
+						       MAX_BUF);
 			} while (ret == GNUTLS_E_AGAIN
 				 || ret == GNUTLS_E_INTERRUPTED);
 		} while (ret > 0);
@@ -252,21 +252,21 @@ static void server(int fd)
 
 		ret = gnutls_handshake(session);
 		if (ret != 0) {
-			fail("server: unexpected error: %s\n", gnutls_strerror(ret));
+			fail("server: unexpected error: %s\n",
+			     gnutls_strerror(ret));
 			terminate();
 		}
 
 		if (debug)
 			success("server: handshake %d\n", tries);
-	} while(tries < MAX_REHANDSHAKES);
+	} while (tries < MAX_REHANDSHAKES);
 
 	if (tries < MAX_REHANDSHAKES)
 		fail("server: only did %d rehandshakes\n", tries);
 
 	ret = gnutls_record_send(session, "hello", 4);
 	if (ret < 0) {
-		fail("Error sending data: %s\n",
-		     gnutls_strerror(ret));
+		fail("Error sending data: %s\n", gnutls_strerror(ret));
 		terminate();
 	}
 

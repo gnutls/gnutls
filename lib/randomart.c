@@ -49,14 +49,12 @@ int gnutls_random_art(gnutls_random_art_t type,
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	art->data =
-	    (void *) _gnutls_key_fingerprint_randomart(fpr, fpr_size,
-						       key_type, key_size,
-						       NULL);
+	    (void *)_gnutls_key_fingerprint_randomart(fpr, fpr_size,
+						      key_type, key_size, NULL);
 	if (art->data == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-	art->size = strlen((char *) art->data);
+	art->size = strlen((char *)art->data);
 
 	return 0;
 }
-

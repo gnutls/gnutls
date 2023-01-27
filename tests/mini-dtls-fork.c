@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -74,38 +74,36 @@ static void tls_log_func(int level, const char *str)
 }
 
 static unsigned char server_cert_pem[] =
-  "-----BEGIN CERTIFICATE-----\n"
-  "MIICHzCCAaWgAwIBAgIBCTAKBggqhkjOPQQDAjA+MQswCQYDVQQGEwJOTDERMA8G\n"
-  "A1UEChMIUG9sYXJTU0wxHDAaBgNVBAMTE1BvbGFyc3NsIFRlc3QgRUMgQ0EwHhcN\n"
-  "MTMwOTI0MTU1MjA0WhcNMjMwOTIyMTU1MjA0WjA0MQswCQYDVQQGEwJOTDERMA8G\n"
-  "A1UEChMIUG9sYXJTU0wxEjAQBgNVBAMTCWxvY2FsaG9zdDBZMBMGByqGSM49AgEG\n"
-  "CCqGSM49AwEHA0IABDfMVtl2CR5acj7HWS3/IG7ufPkGkXTQrRS192giWWKSTuUA\n"
-  "2CMR/+ov0jRdXRa9iojCa3cNVc2KKg76Aci07f+jgZ0wgZowCQYDVR0TBAIwADAd\n"
-  "BgNVHQ4EFgQUUGGlj9QH2deCAQzlZX+MY0anE74wbgYDVR0jBGcwZYAUnW0gJEkB\n"
-  "PyvLeLUZvH4kydv7NnyhQqRAMD4xCzAJBgNVBAYTAk5MMREwDwYDVQQKEwhQb2xh\n"
-  "clNTTDEcMBoGA1UEAxMTUG9sYXJzc2wgVGVzdCBFQyBDQYIJAMFD4n5iQ8zoMAoG\n"
-  "CCqGSM49BAMCA2gAMGUCMQCaLFzXptui5WQN8LlO3ddh1hMxx6tzgLvT03MTVK2S\n"
-  "C12r0Lz3ri/moSEpNZWqPjkCMCE2f53GXcYLqyfyJR078c/xNSUU5+Xxl7VZ414V\n"
-  "fGa5kHvHARBPc8YAIVIqDvHH1Q==\n"
-  "-----END CERTIFICATE-----\n";
+    "-----BEGIN CERTIFICATE-----\n"
+    "MIICHzCCAaWgAwIBAgIBCTAKBggqhkjOPQQDAjA+MQswCQYDVQQGEwJOTDERMA8G\n"
+    "A1UEChMIUG9sYXJTU0wxHDAaBgNVBAMTE1BvbGFyc3NsIFRlc3QgRUMgQ0EwHhcN\n"
+    "MTMwOTI0MTU1MjA0WhcNMjMwOTIyMTU1MjA0WjA0MQswCQYDVQQGEwJOTDERMA8G\n"
+    "A1UEChMIUG9sYXJTU0wxEjAQBgNVBAMTCWxvY2FsaG9zdDBZMBMGByqGSM49AgEG\n"
+    "CCqGSM49AwEHA0IABDfMVtl2CR5acj7HWS3/IG7ufPkGkXTQrRS192giWWKSTuUA\n"
+    "2CMR/+ov0jRdXRa9iojCa3cNVc2KKg76Aci07f+jgZ0wgZowCQYDVR0TBAIwADAd\n"
+    "BgNVHQ4EFgQUUGGlj9QH2deCAQzlZX+MY0anE74wbgYDVR0jBGcwZYAUnW0gJEkB\n"
+    "PyvLeLUZvH4kydv7NnyhQqRAMD4xCzAJBgNVBAYTAk5MMREwDwYDVQQKEwhQb2xh\n"
+    "clNTTDEcMBoGA1UEAxMTUG9sYXJzc2wgVGVzdCBFQyBDQYIJAMFD4n5iQ8zoMAoG\n"
+    "CCqGSM49BAMCA2gAMGUCMQCaLFzXptui5WQN8LlO3ddh1hMxx6tzgLvT03MTVK2S\n"
+    "C12r0Lz3ri/moSEpNZWqPjkCMCE2f53GXcYLqyfyJR078c/xNSUU5+Xxl7VZ414V\n"
+    "fGa5kHvHARBPc8YAIVIqDvHH1Q==\n" "-----END CERTIFICATE-----\n";
 
 const gnutls_datum_t server_cert = { server_cert_pem,
 	sizeof(server_cert_pem)
 };
 
 static unsigned char server_key_pem[] =
-  "-----BEGIN EC PRIVATE KEY-----\n"
-  "MHcCAQEEIPEqEyB2AnCoPL/9U/YDHvdqXYbIogTywwyp6/UfDw6noAoGCCqGSM49\n"
-  "AwEHoUQDQgAEN8xW2XYJHlpyPsdZLf8gbu58+QaRdNCtFLX3aCJZYpJO5QDYIxH/\n"
-  "6i/SNF1dFr2KiMJrdw1VzYoqDvoByLTt/w==\n"
-  "-----END EC PRIVATE KEY-----\n";
+    "-----BEGIN EC PRIVATE KEY-----\n"
+    "MHcCAQEEIPEqEyB2AnCoPL/9U/YDHvdqXYbIogTywwyp6/UfDw6noAoGCCqGSM49\n"
+    "AwEHoUQDQgAEN8xW2XYJHlpyPsdZLf8gbu58+QaRdNCtFLX3aCJZYpJO5QDYIxH/\n"
+    "6i/SNF1dFr2KiMJrdw1VzYoqDvoByLTt/w==\n" "-----END EC PRIVATE KEY-----\n";
 
 const gnutls_datum_t server_key = { server_key_pem,
 	sizeof(server_key_pem)
 };
 
-#define MSG "hello1111"
-#define MSG2 "xxxxxxxxxxxx"
+# define MSG "hello1111"
+# define MSG2 "xxxxxxxxxxxx"
 
 static
 void do_fork_stuff(gnutls_session_t session)
@@ -126,7 +124,8 @@ void do_fork_stuff(gnutls_session_t session)
 		sec_sleep(1);
 		/* the server should reflect our messages */
 		ret = gnutls_record_recv(session, buf, sizeof(buf));
-		if (ret != sizeof(MSG)-1 || memcmp(buf, MSG, sizeof(MSG)-1) != 0) {
+		if (ret != sizeof(MSG) - 1
+		    || memcmp(buf, MSG, sizeof(MSG) - 1) != 0) {
 			fail("client: recv failed: %s\n", gnutls_strerror(ret));
 			exit(1);
 		}
@@ -136,8 +135,10 @@ void do_fork_stuff(gnutls_session_t session)
 		}
 
 		ret = gnutls_record_recv(session, buf, sizeof(buf));
-		if (ret != sizeof(MSG2)-1 || memcmp(buf, MSG2, sizeof(MSG2)-1) != 0) {
-			fail("client: recv2 failed: %s\n", gnutls_strerror(ret));
+		if (ret != sizeof(MSG2) - 1
+		    || memcmp(buf, MSG2, sizeof(MSG2) - 1) != 0) {
+			fail("client: recv2 failed: %s\n",
+			     gnutls_strerror(ret));
 			exit(1);
 		}
 
@@ -147,19 +148,21 @@ void do_fork_stuff(gnutls_session_t session)
 
 		ret = gnutls_record_recv(session, buf, sizeof(buf));
 		if (ret != 0) {
-			fail("client: recv3 failed: %s\n", gnutls_strerror(ret));
+			fail("client: recv3 failed: %s\n",
+			     gnutls_strerror(ret));
 			exit(1);
 		}
-	} else if (pid == 0) { /* child */
-		ret = gnutls_record_send(session, MSG, sizeof(MSG)-1);
-		if (ret != sizeof(MSG)-1) {
+	} else if (pid == 0) {	/* child */
+		ret = gnutls_record_send(session, MSG, sizeof(MSG) - 1);
+		if (ret != sizeof(MSG) - 1) {
 			fail("client: send failed: %s\n", gnutls_strerror(ret));
 			exit(1);
 		}
 
-		ret = gnutls_record_send(session, MSG2, sizeof(MSG2)-1);
-		if (ret != sizeof(MSG2)-1) {
-			fail("client: send2 failed: %s\n", gnutls_strerror(ret));
+		ret = gnutls_record_send(session, MSG2, sizeof(MSG2) - 1);
+		if (ret != sizeof(MSG2) - 1) {
+			fail("client: send2 failed: %s\n",
+			     gnutls_strerror(ret));
 			exit(1);
 		}
 		sec_sleep(2);
@@ -185,7 +188,8 @@ static void do_reflect_stuff(gnutls_session_t session)
 
 		buf_size = ret;
 		if (debug) {
-			fprintf(stderr, "server received: %.*s\n", buf_size, buf);
+			fprintf(stderr, "server received: %.*s\n", buf_size,
+				buf);
 		}
 
 		ret = gnutls_record_send(session, buf, buf_size);
@@ -193,7 +197,7 @@ static void do_reflect_stuff(gnutls_session_t session)
 			fail("server: send failed: %s\n", gnutls_strerror(ret));
 			terminate();
 		}
-	} while(1);
+	} while (1);
 
 	/* do not wait for the peer to close the connection.
 	 */
@@ -221,7 +225,8 @@ static void client(int fd, unsigned do_fork)
 	 */
 	gnutls_init(&session, GNUTLS_CLIENT | GNUTLS_DATAGRAM);
 	gnutls_dtls_set_mtu(session, 1500);
-	gnutls_dtls_set_timeouts(session, get_dtls_retransmit_timeout(), get_timeout());
+	gnutls_dtls_set_timeouts(session, get_dtls_retransmit_timeout(),
+				 get_timeout());
 	//gnutls_transport_set_push_function(session, push);
 
 	/* Use default priorities */
@@ -266,7 +271,6 @@ static void client(int fd, unsigned do_fork)
 	exit(0);
 }
 
-
 static void server(int fd, unsigned do_fork)
 {
 	int ret;
@@ -277,21 +281,21 @@ static void server(int fd, unsigned do_fork)
 	 */
 	global_init();
 
-#if 0
+# if 0
 	if (debug) {
 		side = "server";
 		gnutls_global_set_log_function(tls_log_func);
 		gnutls_global_set_log_level(4711);
 	}
-#endif
+# endif
 
 	gnutls_certificate_allocate_credentials(&x509_cred);
 	gnutls_certificate_set_x509_key_mem(x509_cred, &server_cert,
-					    &server_key,
-					    GNUTLS_X509_FMT_PEM);
+					    &server_key, GNUTLS_X509_FMT_PEM);
 
 	gnutls_init(&session, GNUTLS_SERVER | GNUTLS_DATAGRAM);
-	gnutls_dtls_set_timeouts(session, get_dtls_retransmit_timeout(), get_timeout());
+	gnutls_dtls_set_timeouts(session, get_dtls_retransmit_timeout(),
+				 get_timeout());
 	gnutls_dtls_set_mtu(session, 400);
 
 	/* avoid calling all the priority functions, since the defaults
@@ -327,7 +331,6 @@ static void server(int fd, unsigned do_fork)
 		do_fork_stuff(session);
 	else
 		do_reflect_stuff(session);
-
 
 	close(fd);
 	gnutls_deinit(session);
@@ -369,7 +372,7 @@ void run(unsigned do_fork)
 		check_wait_status(status);
 	} else {
 		close(fd[0]);
-		server(fd[1], 1-do_fork);
+		server(fd[1], 1 - do_fork);
 		exit(0);
 	}
 }

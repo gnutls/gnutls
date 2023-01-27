@@ -22,7 +22,7 @@
 /* Parts copied from GnuTLS example programs. */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -54,7 +54,7 @@ void doit(void)
 	if (ret < 0) {
 		fail("Could not initialize: %d\n", __LINE__);
 	}
-	
+
 	/* the rest shouldn't cause a leak */
 	ret = gnutls_global_init();
 	if (ret < 0) {
@@ -77,6 +77,6 @@ void doit(void)
 	if (ret < 0) {
 		fail("Could not initialize: %d\n", __LINE__);
 	}
-	
+
 	gnutls_global_deinit();
 }

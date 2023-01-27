@@ -25,11 +25,11 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #ifndef _WIN32
-#error "This test shouldn't have been included"
+# error "This test shouldn't have been included"
 #endif
 
 #include <windows.h>
@@ -38,32 +38,33 @@
 
 void doit(void)
 {
-    HCERTSTORE hStore = CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, 0, CERT_SYSTEM_STORE_CURRENT_USER , L"ROOT");
-    assert(hStore != NULL);
-    HCERTSTORE hSystemStore = CertOpenSystemStore(0, "ROOT");
-    assert(hSystemStore != NULL);
-    
-    PCCERT_CONTEXT prevCtx = NULL;
-    PCCERT_CONTEXT ctx = NULL;
-    PCCERT_CONTEXT sysPrevCtx = NULL;
-    PCCERT_CONTEXT sysCtx = NULL;
+	HCERTSTORE hStore = CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, 0,
+					  CERT_SYSTEM_STORE_CURRENT_USER,
+					  L"ROOT");
+	assert(hStore != NULL);
+	HCERTSTORE hSystemStore = CertOpenSystemStore(0, "ROOT");
+	assert(hSystemStore != NULL);
 
-    while (1)
-    {
-        ctx = CertEnumCertificatesInStore(hStore, prevCtx);
-        sysCtx = CertEnumCertificatesInStore(hSystemStore, sysPrevCtx);
-        if (ctx == NULL || sysCtx == NULL)
-            break;
-        if (CertCompareIntegerBlob(&ctx->pCertInfo->SerialNumber,
-                                   &sysCtx->pCertInfo->SerialNumber) != TRUE)
-            assert(0);
+	PCCERT_CONTEXT prevCtx = NULL;
+	PCCERT_CONTEXT ctx = NULL;
+	PCCERT_CONTEXT sysPrevCtx = NULL;
+	PCCERT_CONTEXT sysCtx = NULL;
 
-        prevCtx = ctx;
-        sysPrevCtx = sysCtx;
-    }
-    assert(ctx == NULL && sysCtx == NULL);
+	while (1) {
+		ctx = CertEnumCertificatesInStore(hStore, prevCtx);
+		sysCtx = CertEnumCertificatesInStore(hSystemStore, sysPrevCtx);
+		if (ctx == NULL || sysCtx == NULL)
+			break;
+		if (CertCompareIntegerBlob(&ctx->pCertInfo->SerialNumber,
+					   &sysCtx->pCertInfo->SerialNumber) !=
+		    TRUE)
+			assert(0);
 
-    CertCloseStore(hStore, 0);
-    CertCloseStore(hSystemStore, 0);
+		prevCtx = ctx;
+		sysPrevCtx = sysCtx;
+	}
+	assert(ctx == NULL && sysCtx == NULL);
+
+	CertCloseStore(hStore, 0);
+	CertCloseStore(hSystemStore, 0);
 }
-

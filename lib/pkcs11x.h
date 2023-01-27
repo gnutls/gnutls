@@ -19,8 +19,8 @@
  */
 
 #ifndef GNUTLS_LIB_PKCS11X_H
-#define GNUTLS_LIB_PKCS11X_H
+# define GNUTLS_LIB_PKCS11X_H
 
-#include <p11-kit/pkcs11x.h>
+# include <p11-kit/pkcs11x.h>
 
-#endif /* GNUTLS_LIB_PKCS11X_H */
+#endif				/* GNUTLS_LIB_PKCS11X_H */

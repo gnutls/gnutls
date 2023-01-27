@@ -28,8 +28,7 @@
 
 /* Check whether certificate compression method is valid, ie. supported by gnutls
  */
-static inline int
-is_valid_method(gnutls_compression_method_t method)
+static inline int is_valid_method(gnutls_compression_method_t method)
 {
 	switch (method) {
 #ifdef HAVE_LIBZ
@@ -51,10 +50,10 @@ is_valid_method(gnutls_compression_method_t method)
 
 /* Converts compression algorithm number established in RFC8879 to internal compression method type
  */
-gnutls_compression_method_t 
+gnutls_compression_method_t
 _gnutls_compress_certificate_num2method(uint16_t num)
 {
-	switch (num)  {
+	switch (num) {
 	case 1:
 		return GNUTLS_COMP_ZLIB;
 	case 2:
@@ -63,13 +62,12 @@ _gnutls_compress_certificate_num2method(uint16_t num)
 		return GNUTLS_COMP_ZSTD;
 	default:
 		return GNUTLS_COMP_UNKNOWN;
-	 }
+	}
 }
 
 /* Converts compression method type to compression algorithm number established in RFC8879
  */
-int 
-_gnutls_compress_certificate_method2num(gnutls_compression_method_t method)
+int _gnutls_compress_certificate_method2num(gnutls_compression_method_t method)
 {
 	switch (method) {
 	case GNUTLS_COMP_ZLIB:
@@ -88,14 +86,18 @@ _gnutls_compress_certificate_method2num(gnutls_compression_method_t method)
  */
 bool
 _gnutls_compress_certificate_is_method_enabled(gnutls_session_t session,
-					       gnutls_compression_method_t method)
+					       gnutls_compression_method_t
+					       method)
 {
 	int ret;
 	unsigned i;
 	compress_certificate_ext_st *priv;
 	gnutls_ext_priv_data_t epriv;
 
-	ret = _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_COMPRESS_CERTIFICATE, &epriv);
+	ret =
+	    _gnutls_hello_ext_get_priv(session,
+				       GNUTLS_EXTENSION_COMPRESS_CERTIFICATE,
+				       &epriv);
 	if (ret < 0)
 		return false;
 	priv = epriv;
@@ -159,14 +161,15 @@ gnutls_compress_certificate_get_selected_method(gnutls_session_t session)
  **/
 int
 gnutls_compress_certificate_set_methods(gnutls_session_t session,
-					const gnutls_compression_method_t * methods,
-					size_t methods_len)
+					const gnutls_compression_method_t *
+					methods, size_t methods_len)
 {
 	unsigned i;
 	compress_certificate_ext_st *priv;
 
 	if (methods == NULL || methods_len == 0) {
-		_gnutls_hello_ext_unset_priv(session, GNUTLS_EXTENSION_COMPRESS_CERTIFICATE);
+		_gnutls_hello_ext_unset_priv(session,
+					     GNUTLS_EXTENSION_COMPRESS_CERTIFICATE);
 		return 0;
 	}
 
@@ -183,15 +186,15 @@ gnutls_compress_certificate_set_methods(gnutls_session_t session,
 
 	priv->methods_len = methods_len;
 	memcpy(priv->methods, methods, methods_len * sizeof(*methods));
-	_gnutls_hello_ext_set_priv(session, GNUTLS_EXTENSION_COMPRESS_CERTIFICATE, priv);
+	_gnutls_hello_ext_set_priv(session,
+				   GNUTLS_EXTENSION_COMPRESS_CERTIFICATE, priv);
 
 	return 0;
 }
 
 int
 _gnutls_compress_certificate_recv_params(gnutls_session_t session,
-					 const uint8_t * data,
-					 size_t data_size)
+					 const uint8_t * data, size_t data_size)
 {
 	int ret;
 	unsigned i, j;
@@ -203,14 +206,17 @@ _gnutls_compress_certificate_recv_params(gnutls_session_t session,
 	compress_certificate_ext_st *priv;
 	gnutls_ext_priv_data_t epriv;
 
-	ret = _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_COMPRESS_CERTIFICATE, &epriv);
+	ret =
+	    _gnutls_hello_ext_get_priv(session,
+				       GNUTLS_EXTENSION_COMPRESS_CERTIFICATE,
+				       &epriv);
 	if (ret < 0)
 		return 0;
 	priv = epriv;
 
 	DECR_LEN(data_size, 1);
 	bytes_len = *data;
-	
+
 	if (bytes_len < 2 || bytes_len > 254 || bytes_len % 2 == 1)
 		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
@@ -231,7 +237,7 @@ _gnutls_compress_certificate_recv_params(gnutls_session_t session,
 				method = methods[i];
 				goto endloop;
 			}
-endloop:
+ endloop:
 	session->internals.compress_certificate_method = method;
 
 	return 0;
@@ -248,7 +254,10 @@ _gnutls_compress_certificate_send_params(gnutls_session_t session,
 	compress_certificate_ext_st *priv;
 	gnutls_ext_priv_data_t epriv;
 
-	ret = _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_COMPRESS_CERTIFICATE, &epriv);
+	ret =
+	    _gnutls_hello_ext_get_priv(session,
+				       GNUTLS_EXTENSION_COMPRESS_CERTIFICATE,
+				       &epriv);
 	if (ret < 0)
 		return 0;
 	priv = epriv;
@@ -274,8 +283,8 @@ const hello_ext_entry_st ext_mod_compress_certificate = {
 	.gid = GNUTLS_EXTENSION_COMPRESS_CERTIFICATE,
 	.client_parse_point = GNUTLS_EXT_TLS,
 	.server_parse_point = GNUTLS_EXT_TLS,
-	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_DTLS | 
-		    GNUTLS_EXT_FLAG_CLIENT_HELLO,
+	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_DTLS |
+	    GNUTLS_EXT_FLAG_CLIENT_HELLO,
 	.recv_func = _gnutls_compress_certificate_recv_params,
 	.send_func = _gnutls_compress_certificate_send_params,
 	.deinit_func = _gnutls_hello_ext_default_deinit

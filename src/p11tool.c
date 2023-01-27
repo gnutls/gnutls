@@ -69,7 +69,6 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "|<%d>| %s", level, str);
 }
 
-
 int main(int argc, char **argv)
 {
 	cmd_parser(argc, argv);
@@ -78,10 +77,10 @@ int main(int argc, char **argv)
 }
 
 static
-unsigned opt_to_flags(common_info_st *cinfo, unsigned *key_usage)
+unsigned opt_to_flags(common_info_st * cinfo, unsigned *key_usage)
 {
 	unsigned flags = 0;
-	
+
 	*key_usage = 0;
 
 	if (HAVE_OPT(MARK_PRIVATE)) {
@@ -90,7 +89,7 @@ unsigned opt_to_flags(common_info_st *cinfo, unsigned *key_usage)
 		} else {
 			flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_PRIVATE;
 		}
-	} else { /* if not given mark as private the private objects, and public the public ones */
+	} else {		/* if not given mark as private the private objects, and public the public ones */
 		if (cinfo->privkey)
 			flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE;
 		else if (cinfo->pubkey || cinfo->cert)
@@ -103,12 +102,10 @@ unsigned opt_to_flags(common_info_st *cinfo, unsigned *key_usage)
 	}
 
 	if (HAVE_OPT(MARK_DISTRUSTED)) {
-		flags |=
-		    GNUTLS_PKCS11_OBJ_FLAG_MARK_DISTRUSTED;
+		flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_DISTRUSTED;
 	} else {
 		if (ENABLED_OPT(MARK_TRUSTED))
-			flags |=
-			    GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED;
+			flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED;
 	}
 
 	if (ENABLED_OPT(MARK_SIGN))
@@ -118,8 +115,7 @@ unsigned opt_to_flags(common_info_st *cinfo, unsigned *key_usage)
 		*key_usage |= GNUTLS_KEY_DECIPHER_ONLY;
 
 	if (ENABLED_OPT(MARK_CA))
-		flags |=
-		    GNUTLS_PKCS11_OBJ_FLAG_MARK_CA;
+		flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_CA;
 
 	if (ENABLED_OPT(MARK_WRAP))
 		flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_KEY_WRAP;
@@ -321,12 +317,14 @@ static void cmd_parser(int argc, char **argv)
 	} else if (HAVE_OPT(EXPORT)) {
 		pkcs11_export(outfile, url, flags, &cinfo);
 	} else if (HAVE_OPT(EXPORT_STAPLED)) {
-		pkcs11_export(outfile, url, flags|GNUTLS_PKCS11_OBJ_FLAG_OVERWRITE_TRUSTMOD_EXT, &cinfo);
+		pkcs11_export(outfile, url,
+			      flags |
+			      GNUTLS_PKCS11_OBJ_FLAG_OVERWRITE_TRUSTMOD_EXT,
+			      &cinfo);
 	} else if (HAVE_OPT(EXPORT_CHAIN)) {
 		pkcs11_export_chain(outfile, url, flags, &cinfo);
 	} else if (HAVE_OPT(WRITE)) {
-		pkcs11_write(outfile, url, label, id,
-			     flags, &cinfo);
+		pkcs11_write(outfile, url, label, id, flags, &cinfo);
 	} else if (HAVE_OPT(TEST_SIGN)) {
 		pkcs11_test_sign(outfile, url, flags, &cinfo);
 	} else if (HAVE_OPT(INITIALIZE)) {
@@ -343,32 +341,30 @@ static void cmd_parser(int argc, char **argv)
 			app_exit(1);
 		pkcs11_generate(outfile, url, key_type,
 				get_bits(key_type, bits, sec_param, 0),
-				label, id, detailed_url,
-				flags, &cinfo);
+				label, id, detailed_url, flags, &cinfo);
 	} else if (HAVE_OPT(GENERATE_ECC)) {
 		key_type = GNUTLS_PK_EC;
 		pkcs11_generate(outfile, url, key_type,
 				get_bits(key_type, bits, sec_param, 0),
-				label, id, detailed_url,
-				flags, &cinfo);
+				label, id, detailed_url, flags, &cinfo);
 	} else if (HAVE_OPT(GENERATE_RSA)) {
 		key_type = GNUTLS_PK_RSA;
 		pkcs11_generate(outfile, url, key_type,
 				get_bits(key_type, bits, sec_param, 0),
-				label, id, detailed_url,
-				flags, &cinfo);
+				label, id, detailed_url, flags, &cinfo);
 	} else if (HAVE_OPT(GENERATE_DSA)) {
 		key_type = GNUTLS_PK_DSA;
 		pkcs11_generate(outfile, url, key_type,
 				get_bits(key_type, bits, sec_param, 0),
-				label, id, detailed_url,
-				flags, &cinfo);
+				label, id, detailed_url, flags, &cinfo);
 	} else if (HAVE_OPT(EXPORT_PUBKEY)) {
 		pkcs11_export_pubkey(outfile, url, detailed_url, flags, &cinfo);
 	} else if (HAVE_OPT(SET_ID)) {
-		pkcs11_set_id(outfile, url, detailed_url, flags, &cinfo, OPT_ARG(SET_ID));
+		pkcs11_set_id(outfile, url, detailed_url, flags, &cinfo,
+			      OPT_ARG(SET_ID));
 	} else if (HAVE_OPT(SET_LABEL)) {
-		pkcs11_set_label(outfile, url, detailed_url, flags, &cinfo, OPT_ARG(SET_LABEL));
+		pkcs11_set_label(outfile, url, detailed_url, flags, &cinfo,
+				 OPT_ARG(SET_LABEL));
 	} else {
 		USAGE(1);
 	}

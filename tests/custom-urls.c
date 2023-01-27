@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,21 +35,21 @@ int main(void)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/abstract.h>
-#include <gnutls/urls.h>
-#include <signal.h>
-#include <assert.h>
+# include <string.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/abstract.h>
+# include <gnutls/urls.h>
+# include <signal.h>
+# include <assert.h>
 
-#include "cert-common.h"
-#include "utils.h"
+# include "cert-common.h"
+# include "utils.h"
 
 static void terminate(void);
 
@@ -61,16 +61,19 @@ static void server_log_func(int level, const char *str)
 	fprintf(stderr, "server|<%d>| %s", level, str);
 }
 
-static int url_import_key(gnutls_privkey_t pkey, const char *url, unsigned flags)
+static int url_import_key(gnutls_privkey_t pkey, const char *url,
+			  unsigned flags)
 {
 	if (strcmp(url, "myurl:key") != 0) {
 		fail("unexpected key url: %s\n", url);
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
-	return gnutls_privkey_import_x509_raw(pkey, &server_key, GNUTLS_X509_FMT_PEM, NULL, 0);
+	return gnutls_privkey_import_x509_raw(pkey, &server_key,
+					      GNUTLS_X509_FMT_PEM, NULL, 0);
 }
 
-static int url_import_crt(gnutls_x509_crt_t crt, const char *url, unsigned flags)
+static int url_import_crt(gnutls_x509_crt_t crt, const char *url,
+			  unsigned flags)
 {
 	if (strcmp(url, "myurl:cert") != 0) {
 		abort();
@@ -93,7 +96,8 @@ static void client(int fd)
 	gnutls_init(&session, GNUTLS_CLIENT);
 
 	/* Use default priorities */
-	assert(gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-TLS1.2", NULL)>=0);
+	assert(gnutls_priority_set_direct
+	       (session, "NORMAL:-VERS-ALL:+VERS-TLS1.2", NULL) >= 0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
@@ -150,16 +154,19 @@ static void server(int fd)
 	/* this must be called once in the program
 	 */
 	gnutls_certificate_allocate_credentials(&x509_cred);
-	ret = gnutls_certificate_set_x509_key_file(x509_cred, "nomyurl:cert", "nomyurl:key",
-						   GNUTLS_X509_FMT_PEM);
+	ret =
+	    gnutls_certificate_set_x509_key_file(x509_cred, "nomyurl:cert",
+						 "nomyurl:key",
+						 GNUTLS_X509_FMT_PEM);
 	if (ret != GNUTLS_E_FILE_ERROR) {
-		fail("server: gnutls_certificate_set_x509_key_file unexpected error (%s)\n\n",
-		     gnutls_strerror(ret));
+		fail("server: gnutls_certificate_set_x509_key_file unexpected error (%s)\n\n", gnutls_strerror(ret));
 		terminate();
 	}
 
-	ret = gnutls_certificate_set_x509_key_file(x509_cred, "myurl:cert", "myurl:key",
-						   GNUTLS_X509_FMT_PEM);
+	ret =
+	    gnutls_certificate_set_x509_key_file(x509_cred, "myurl:cert",
+						 "myurl:key",
+						 GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
 		fail("server: gnutls_certificate_set_x509_key_file (%s)\n\n",
 		     gnutls_strerror(ret));
@@ -171,7 +178,8 @@ static void server(int fd)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	assert(gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-TLS1.2", NULL)>=0);
+	assert(gnutls_priority_set_direct
+	       (session, "NORMAL:-VERS-ALL:+VERS-TLS1.2", NULL) >= 0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
@@ -213,7 +221,7 @@ static void server(int fd)
 
 const gnutls_custom_url_st custom_url_st = {
 	.name = "myurl:",
-	.name_size = sizeof("myurl:")-1,
+	.name_size = sizeof("myurl:") - 1,
 	.import_key = url_import_key,
 	.import_crt = url_import_crt
 };

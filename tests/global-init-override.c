@@ -22,7 +22,7 @@
 /* Parts copied from GnuTLS example programs. */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -49,7 +49,7 @@ struct gnutls_subject_alt_names_st {
 /* gnutls_subject_alt_names_init() is called by gnutls_x509_crt_init().
  * We override it here to test if weak symbols work at all.
  */
-__attribute__ ((visibility ("protected")))
+__attribute__((visibility("protected")))
 int gnutls_subject_alt_names_init(gnutls_subject_alt_names_t * sans)
 {
 	weak_symbol_works = 1;
@@ -62,9 +62,7 @@ int gnutls_subject_alt_names_init(gnutls_subject_alt_names_t * sans)
 	return 0;
 }
 
-GNUTLS_SKIP_GLOBAL_INIT
-
-void doit(void)
+GNUTLS_SKIP_GLOBAL_INIT void doit(void)
 {
 
 	int ret;

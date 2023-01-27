@@ -48,15 +48,14 @@ _gnutls_dsa_compute_k(mpz_t k,
 		      const mpz_t q,
 		      const mpz_t x,
 		      gnutls_mac_algorithm_t mac,
-		      const uint8_t *digest,
-		      size_t length)
+		      const uint8_t * digest, size_t length)
 {
 	uint8_t V[MAX_HASH_SIZE];
 	uint8_t K[MAX_HASH_SIZE];
 	uint8_t xp[MAX_Q_SIZE];
 	uint8_t tp[MAX_Q_SIZE];
 	mp_limb_t h[MAX(MAX_Q_LIMBS, MAX_HASH_LIMBS)];
-	mp_bitcnt_t q_bits = mpz_sizeinbase (q, 2);
+	mp_bitcnt_t q_bits = mpz_sizeinbase(q, 2);
 	mp_size_t qn = mpz_size(q);
 	mp_bitcnt_t h_bits = length * 8;
 	mp_size_t hn = BITS_TO_LIMBS(h_bits);
@@ -169,17 +168,16 @@ _gnutls_dsa_compute_k(mpz_t k,
 			ret = gnutls_hmac_fast(mac, K, length, V, length, V);
 			if (ret < 0)
 				goto out;
-			memcpy (&tp[tlen], V, remaining);
+			memcpy(&tp[tlen], V, remaining);
 			tlen += remaining;
 		}
 
 		/* Step 3 */
-		mpn_set_base256 (h, qn, tp, tlen);
+		mpn_set_base256(h, qn, tp, tlen);
 		if (tlen * 8 > q_bits)
-			mpn_rshift (h, h, qn, tlen * 8 - q_bits);
+			mpn_rshift(h, h, qn, tlen * 8 - q_bits);
 		/* Check if k is in [1,q-1] */
-		if (!mpn_zero_p (h, qn) &&
-		    mpn_cmp (h, mpz_limbs_read(q), qn) < 0) {
+		if (!mpn_zero_p(h, qn) && mpn_cmp(h, mpz_limbs_read(q), qn) < 0) {
 			mpn_copyi(mpz_limbs_write(k, qn), h, qn);
 			mpz_limbs_finish(k, qn);
 			break;

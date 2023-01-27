@@ -21,9 +21,9 @@
 #include <config.h>
 
 #if HAVE_SYS_SOCKET_H
-#include <sys/socket.h>
+# include <sys/socket.h>
 #elif HAVE_WS2TCPIP_H
-#include <ws2tcpip.h>
+# include <ws2tcpip.h>
 #endif
 #include <netdb.h>
 #include <string.h>
@@ -49,8 +49,7 @@
 /* Functions to manipulate sockets
  */
 
-ssize_t
-socket_recv(const socket_st * socket, void *buffer, int buffer_size)
+ssize_t socket_recv(const socket_st * socket, void *buffer, int buffer_size)
 {
 	int ret;
 
@@ -75,7 +74,8 @@ socket_recv(const socket_st * socket, void *buffer, int buffer_size)
 }
 
 ssize_t
-socket_recv_timeout(const socket_st * socket, void *buffer, int buffer_size, unsigned ms)
+socket_recv_timeout(const socket_st * socket, void *buffer, int buffer_size,
+		    unsigned ms)
 {
 	int ret;
 
@@ -95,7 +95,6 @@ socket_send(const socket_st * socket, const void *buffer, int buffer_size)
 	return socket_send_range(socket, buffer, buffer_size, NULL);
 }
 
-
 ssize_t
 socket_send_range(const socket_st * socket, const void *buffer,
 		  int buffer_size, gnutls_range_st * range)
@@ -107,18 +106,15 @@ socket_send_range(const socket_st * socket, const void *buffer,
 			if (range == NULL)
 				ret =
 				    gnutls_record_send(socket->session,
-						       buffer,
-						       buffer_size);
+						       buffer, buffer_size);
 			else
 				ret =
-				    gnutls_record_send_range(socket->
-							     session,
+				    gnutls_record_send_range(socket->session,
 							     buffer,
 							     buffer_size,
 							     range);
 		}
-		while (ret == GNUTLS_E_AGAIN
-		       || ret == GNUTLS_E_INTERRUPTED);
+		while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 	else
 		do {
 			ret = send(socket->fd, buffer, buffer_size, 0);
@@ -166,10 +162,11 @@ ssize_t wait_for_text(socket_st * socket, const char *txt, unsigned txt_size)
 		abort();
 
 	if (socket->verbose && txt != NULL)
-		fprintf(stderr, "starttls: waiting for: \"%.*s\"\n", txt_size, txt);
+		fprintf(stderr, "starttls: waiting for: \"%.*s\"\n", txt_size,
+			txt);
 
 	pbuf = buf;
-	left = sizeof(buf)-1;
+	left = sizeof(buf) - 1;
 	got = 0;
 
 	do {
@@ -181,7 +178,8 @@ ssize_t wait_for_text(socket_st * socket, const char *txt, unsigned txt_size)
 		if (ret > 0)
 			ret = recv(socket->fd, pbuf, left, 0);
 		if (ret == -1) {
-			fprintf(stderr, "error receiving '%s': %s\n", txt, strerror(errno));
+			fprintf(stderr, "error receiving '%s': %s\n", txt,
+				strerror(errno));
 			exit(2);
 		} else if (ret == 0) {
 			fprintf(stderr, "error receiving '%s': Timeout\n", txt);
@@ -199,33 +197,33 @@ ssize_t wait_for_text(socket_st * socket, const char *txt, unsigned txt_size)
 		left -= ret;
 		got += ret;
 
-
 		/* check for text after a newline in buffer */
 		if (got > txt_size) {
 			p = memmem(buf, got, txt, txt_size);
 			if (p != NULL && p != buf) {
 				p--;
-				if (*p == '\n' || *p == '\r' || (*txt == '<' && *p == '>')) // XMPP is not line oriented, uses XML format
+				if (*p == '\n' || *p == '\r' || (*txt == '<' && *p == '>'))	// XMPP is not line oriented, uses XML format
 					break;
 			}
 		}
-	} while(got < txt_size || strncmp(buf, txt, txt_size) != 0);
+	} while (got < txt_size || strncmp(buf, txt, txt_size) != 0);
 
 	return got;
 }
 
-static void
-socket_starttls(socket_st * socket)
+static void socket_starttls(socket_st * socket)
 {
 	char buf[512];
 
 	if (socket->secure)
 		return;
 
-	if (socket->app_proto == NULL || strcasecmp(socket->app_proto, "https") == 0)
+	if (socket->app_proto == NULL
+	    || strcasecmp(socket->app_proto, "https") == 0)
 		return;
 
-	if (strcasecmp(socket->app_proto, "smtp") == 0 || strcasecmp(socket->app_proto, "submission") == 0) {
+	if (strcasecmp(socket->app_proto, "smtp") == 0
+	    || strcasecmp(socket->app_proto, "submission") == 0) {
 		if (socket->verbose)
 			log_msg(stdout, "Negotiating SMTP STARTTLS\n");
 
@@ -235,7 +233,8 @@ socket_starttls(socket_st * socket)
 		wait_for_text(socket, "250 ", 4);
 		send_line(socket, "STARTTLS\r\n");
 		wait_for_text(socket, "220 ", 4);
-	} else if (strcasecmp(socket->app_proto, "imap") == 0 || strcasecmp(socket->app_proto, "imap2") == 0) {
+	} else if (strcasecmp(socket->app_proto, "imap") == 0
+		   || strcasecmp(socket->app_proto, "imap2") == 0) {
 		if (socket->verbose)
 			log_msg(stdout, "Negotiating IMAP STARTTLS\n");
 
@@ -247,18 +246,22 @@ socket_starttls(socket_st * socket)
 		if (socket->verbose)
 			log_msg(stdout, "Negotiating XMPP STARTTLS\n");
 
-		snprintf(buf, sizeof(buf), "<stream:stream xmlns:stream='http://etherx.jabber.org/streams' xmlns='jabber:client' to='%s' version='1.0'>\n", socket->hostname);
+		snprintf(buf, sizeof(buf),
+			 "<stream:stream xmlns:stream='http://etherx.jabber.org/streams' xmlns='jabber:client' to='%s' version='1.0'>\n",
+			 socket->hostname);
 		send_line(socket, buf);
 		wait_for_text(socket, "<?", 2);
-		send_line(socket, "<starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>");
+		send_line(socket,
+			  "<starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>");
 		wait_for_text(socket, "<proceed", 8);
 	} else if (strcasecmp(socket->app_proto, "ldap") == 0) {
 		if (socket->verbose)
 			log_msg(stdout, "Negotiating LDAP STARTTLS\n");
 #define LDAP_STR "\x30\x1d\x02\x01\x01\x77\x18\x80\x16\x31\x2e\x33\x2e\x36\x2e\x31\x2e\x34\x2e\x31\x2e\x31\x34\x36\x36\x2e\x32\x30\x30\x33\x37"
-		send(socket->fd, LDAP_STR, sizeof(LDAP_STR)-1, 0);
+		send(socket->fd, LDAP_STR, sizeof(LDAP_STR) - 1, 0);
 		wait_for_text(socket, NULL, 0);
-	} else if (strcasecmp(socket->app_proto, "ftp") == 0 || strcasecmp(socket->app_proto, "ftps") == 0) {
+	} else if (strcasecmp(socket->app_proto, "ftp") == 0
+		   || strcasecmp(socket->app_proto, "ftps") == 0) {
 		if (socket->verbose)
 			log_msg(stdout, "Negotiating FTP STARTTLS\n");
 
@@ -297,18 +300,20 @@ socket_starttls(socket_st * socket)
 		wait_for_text(socket, "OK ", 3);
 		send_line(socket, "STARTTLS\r\n");
 		wait_for_text(socket, "OK ", 3);
-	} else if (strcasecmp(socket->app_proto, "postgres") == 0 || strcasecmp(socket->app_proto, "postgresql") == 0) {
+	} else if (strcasecmp(socket->app_proto, "postgres") == 0
+		   || strcasecmp(socket->app_proto, "postgresql") == 0) {
 		if (socket->verbose)
 			log_msg(stdout, "Negotiating PostgreSQL STARTTLS\n");
 
 #define POSTGRES_STR "\x00\x00\x00\x08\x04\xD2\x16\x2F"
-		send(socket->fd, POSTGRES_STR, sizeof(POSTGRES_STR)-1, 0);
+		send(socket->fd, POSTGRES_STR, sizeof(POSTGRES_STR) - 1, 0);
 		wait_for_text(socket, NULL, 0);
 	} else {
 		if (!c_isdigit(socket->app_proto[0])) {
 			static int warned = 0;
 			if (warned == 0) {
-				fprintf(stderr, "unknown protocol '%s'\n", socket->app_proto);
+				fprintf(stderr, "unknown protocol '%s'\n",
+					socket->app_proto);
 				warned = 1;
 			}
 		}
@@ -321,8 +326,7 @@ socket_starttls(socket_st * socket)
 	if (strcasecmp(app_proto, "xmpp") == 0) \
 		app_proto = "xmpp-server"; \
 
-int
-starttls_proto_to_port(const char *app_proto)
+int starttls_proto_to_port(const char *app_proto)
 {
 	struct servent *s;
 
@@ -360,7 +364,8 @@ void socket_bye(socket_st * socket, unsigned polite)
 	if (socket->secure && socket->session) {
 		if (polite) {
 			do
-				ret = gnutls_bye(socket->session, GNUTLS_SHUT_WR);
+				ret =
+				    gnutls_bye(socket->session, GNUTLS_SHUT_WR);
 			while (ret == GNUTLS_E_INTERRUPTED
 			       || ret == GNUTLS_E_AGAIN);
 			if (socket->verbose && ret < 0)
@@ -412,16 +417,15 @@ void canonicalize_host(char *hostname, char *service, unsigned service_size)
 		*p = 0;
 
 		if (service && service_size)
-			snprintf(service, service_size, "%s", p+1);
+			snprintf(service, service_size, "%s", p + 1);
 	} else
 		p = hostname + strlen(hostname);
 
 	if (p > hostname && p[-1] == '.')
-		p[-1] = 0; // remove trailing dot on FQDN
+		p[-1] = 0;	// remove trailing dot on FQDN
 }
 
-static ssize_t
-wrap_pull(gnutls_transport_ptr_t ptr, void *data, size_t len)
+static ssize_t wrap_pull(gnutls_transport_ptr_t ptr, void *data, size_t len)
 {
 	socket_st *hd = ptr;
 	ssize_t r;
@@ -447,18 +451,19 @@ wrap_push(gnutls_transport_ptr_t ptr, const void *data, size_t len)
 
 /* inline is used to avoid a gcc warning if used in mini-eagain */
 inline static int wrap_pull_timeout_func(gnutls_transport_ptr_t ptr,
-					   unsigned int ms)
+					 unsigned int ms)
 {
 	socket_st *hd = ptr;
 
-	return gnutls_system_recv_timeout((gnutls_transport_ptr_t)(long)hd->fd, ms);
+	return gnutls_system_recv_timeout((gnutls_transport_ptr_t) (long)hd->fd,
+					  ms);
 }
-
 
 void
 socket_open2(socket_st * hd, const char *hostname, const char *service,
-	    const char *app_proto, int flags, const char *msg, gnutls_datum_t *rdata, gnutls_datum_t *edata,
-	    FILE *server_trace, FILE *client_trace)
+	     const char *app_proto, int flags, const char *msg,
+	     gnutls_datum_t * rdata, gnutls_datum_t * edata,
+	     FILE * server_trace, FILE * client_trace)
 {
 	struct addrinfo hints, *res, *ptr;
 	int sd, err = 0;
@@ -487,12 +492,13 @@ socket_open2(socket_st * hd, const char *hostname, const char *service,
 
 	ret = gnutls_idna_map(hostname, strlen(hostname), &idna, 0);
 	if (ret < 0) {
-		fprintf(stderr, "Cannot convert %s to IDNA: %s\n", hostname, gnutls_strerror(ret));
+		fprintf(stderr, "Cannot convert %s to IDNA: %s\n", hostname,
+			gnutls_strerror(ret));
 		exit(1);
 	}
 
 	hd->hostname = strdup(hostname);
-	a_hostname = (char*)idna.data;
+	a_hostname = (char *)idna.data;
 
 	if (msg != NULL)
 		log_msg(stdout, "Resolving '%s:%s'...\n", a_hostname, service);
@@ -508,8 +514,7 @@ socket_open2(socket_st * hd, const char *hostname, const char *service,
 
 	sd = -1;
 	for (ptr = res; ptr != NULL; ptr = ptr->ai_next) {
-		sd = socket(ptr->ai_family, ptr->ai_socktype,
-			    ptr->ai_protocol);
+		sd = socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
 		if (sd == -1)
 			continue;
 
@@ -527,31 +532,34 @@ socket_open2(socket_st * hd, const char *hostname, const char *service,
 #if defined(IP_DONTFRAG)
 			int yes = 1;
 			if (setsockopt(sd, IPPROTO_IP, IP_DONTFRAG,
-				       (const void *) &yes,
-				       sizeof(yes)) < 0)
+				       (const void *)&yes, sizeof(yes)) < 0)
 				perror("setsockopt(IP_DF) failed");
 #elif defined(IP_MTU_DISCOVER)
 			int yes = IP_PMTUDISC_DO;
 			if (setsockopt(sd, IPPROTO_IP, IP_MTU_DISCOVER,
-				       (const void *) &yes,
-				       sizeof(yes)) < 0)
+				       (const void *)&yes, sizeof(yes)) < 0)
 				perror("setsockopt(IP_DF) failed");
 #endif
 		}
 
 		if (fastopen && ptr->ai_socktype == SOCK_STREAM
-		    && (ptr->ai_family == AF_INET || ptr->ai_family == AF_INET6)) {
-			memcpy(&hd->connect_addr, ptr->ai_addr, ptr->ai_addrlen);
+		    && (ptr->ai_family == AF_INET
+			|| ptr->ai_family == AF_INET6)) {
+			memcpy(&hd->connect_addr, ptr->ai_addr,
+			       ptr->ai_addrlen);
 			hd->connect_addrlen = ptr->ai_addrlen;
 
 			if (msg)
-				log_msg(stdout, "%s '%s:%s' (TFO)...\n", msg, buffer, portname);
+				log_msg(stdout, "%s '%s:%s' (TFO)...\n", msg,
+					buffer, portname);
 
 		} else {
 			if (msg)
-				log_msg(stdout, "%s '%s:%s'...\n", msg, buffer, portname);
+				log_msg(stdout, "%s '%s:%s'...\n", msg, buffer,
+					portname);
 
-			if ((err = connect(sd, ptr->ai_addr, ptr->ai_addrlen)) < 0) {
+			if ((err =
+			     connect(sd, ptr->ai_addr, ptr->ai_addrlen)) < 0) {
 				close(sd);
 				continue;
 			}
@@ -575,40 +583,53 @@ socket_open2(socket_st * hd, const char *hostname, const char *service,
 
 		if (hd->session) {
 			if (hd->edata.data) {
-				ret = gnutls_record_send_early_data(hd->session, hd->edata.data, hd->edata.size);
+				ret =
+				    gnutls_record_send_early_data(hd->session,
+								  hd->
+								  edata.data,
+								  hd->
+								  edata.size);
 				if (ret < 0) {
-					fprintf(stderr, "error sending early data\n");
+					fprintf(stderr,
+						"error sending early data\n");
 					close(sd);
 					exit(1);
 				}
 			}
 			if (hd->rdata.data) {
-				gnutls_session_set_data(hd->session, hd->rdata.data, hd->rdata.size);
+				gnutls_session_set_data(hd->session,
+							hd->rdata.data,
+							hd->rdata.size);
 			}
 
 			if (client_trace || server_trace) {
 				hd->server_trace = server_trace;
 				hd->client_trace = client_trace;
-				gnutls_transport_set_push_function(hd->session, wrap_push);
-				gnutls_transport_set_pull_function(hd->session, wrap_pull);
-				gnutls_transport_set_pull_timeout_function(hd->session, wrap_pull_timeout_func);
+				gnutls_transport_set_push_function(hd->session,
+								   wrap_push);
+				gnutls_transport_set_pull_function(hd->session,
+								   wrap_pull);
+				gnutls_transport_set_pull_timeout_function
+				    (hd->session, wrap_pull_timeout_func);
 				gnutls_transport_set_ptr(hd->session, hd);
 			} else {
 				gnutls_transport_set_int(hd->session, hd->fd);
 			}
 		}
 
-		if (!(flags & SOCKET_FLAG_RAW) && !(flags & SOCKET_FLAG_SKIP_INIT)) {
+		if (!(flags & SOCKET_FLAG_RAW)
+		    && !(flags & SOCKET_FLAG_SKIP_INIT)) {
 			err = do_handshake(hd);
-			if (err == GNUTLS_E_PUSH_ERROR) { /* failed connecting */
+			if (err == GNUTLS_E_PUSH_ERROR) {	/* failed connecting */
 				gnutls_deinit(hd->session);
 				hd->session = NULL;
 				close(sd);
 				continue;
-			}
-			else if (err < 0) {
+			} else if (err < 0) {
 				if (!(flags & SOCKET_FLAG_DONT_PRINT_ERRORS))
-					fprintf(stderr, "*** handshake has failed: %s\n", gnutls_strerror(err));
+					fprintf(stderr,
+						"*** handshake has failed: %s\n",
+						gnutls_strerror(err));
 				close(sd);
 				exit(1);
 			}
@@ -620,7 +641,7 @@ socket_open2(socket_st * hd, const char *hostname, const char *service,
 	if (err != 0) {
 		int e = errno;
 		fprintf(stderr, "Could not connect to %s:%s: %s\n",
-				buffer, portname, strerror(e));
+			buffer, portname, strerror(e));
 		exit(1);
 	}
 
@@ -667,7 +688,8 @@ const char *port_to_service(const char *sport, const char *proto)
 	sr = getservbyport(port, proto);
 	if (sr == NULL) {
 		fprintf(stderr,
-			"Warning: getservbyport(%s) failed. Using port number as service.\n", sport);
+			"Warning: getservbyport(%s) failed. Using port number as service.\n",
+			sport);
 		return sport;
 	}
 
@@ -685,7 +707,9 @@ int service_to_port(const char *service, const char *proto)
 
 	sr = getservbyname(service, proto);
 	if (sr == NULL) {
-		fprintf(stderr, "Warning: getservbyname() failed for '%s/%s'.\n", service, proto);
+		fprintf(stderr,
+			"Warning: getservbyname() failed for '%s/%s'.\n",
+			service, proto);
 		exit(1);
 	}
 

@@ -21,11 +21,11 @@
  */
 
 #ifndef GNUTLS_SRC_CERTTOOL_CFG_H
-#define GNUTLS_SRC_CERTTOOL_CFG_H
+# define GNUTLS_SRC_CERTTOOL_CFG_H
 
-#include <stdbool.h>
-#include <stdint.h>
-#include <gnutls/x509.h>
+# include <stdbool.h>
+# include <stdint.h>
+# include <gnutls/x509.h>
 
 void cfg_init(void);
 int template_parse(const char *template);
@@ -35,7 +35,7 @@ void read_crt_set(gnutls_x509_crt_t crt, const char *input_str,
 void read_crq_set(gnutls_x509_crq_t crq, const char *input_str,
 		  const char *oid);
 int64_t read_int(const char *input_str);
-int serial_decode(const char *input, gnutls_datum_t *output);
+int serial_decode(const char *input, gnutls_datum_t * output);
 const char *read_str(const char *input_str);
 int read_yesno(const char *input_str, int def);
 
@@ -56,11 +56,11 @@ void get_uid_crt_set(gnutls_x509_crt_t crt);
 void get_pkcs9_email_crt_set(gnutls_x509_crt_t crt);
 void get_oid_crt_set(gnutls_x509_crt_t crt);
 void get_key_purpose_set(int type, void *crt);
-void get_serial(unsigned char* serial, size_t* serial_size);
+void get_serial(unsigned char *serial, size_t *serial_size);
 time_t get_expiration_date(void);
 time_t get_activation_date(void);
 int get_ca_status(void);
-void get_crl_number(unsigned char* serial, size_t* serial_size);
+void get_crl_number(unsigned char *serial, size_t *serial_size);
 int get_path_len(void);
 int get_crq_extensions_status(void);
 const char *get_pkcs12_key_name(void);
@@ -103,8 +103,8 @@ void get_unit_crq_set(gnutls_x509_crq_t crq);
 void get_organization_crq_set(gnutls_x509_crq_t crq);
 void get_country_crq_set(gnutls_x509_crq_t crq);
 void get_oid_crq_set(gnutls_x509_crq_t crq);
-const char *get_proxy_policy(char **policy, size_t * policylen);
+const char *get_proxy_policy(char **policy, size_t *policylen);
 
 void crq_extensions_set(gnutls_x509_crt_t crt, gnutls_x509_crq_t crq);
 
-#endif /* GNUTLS_SRC_CERTTOOL_CFG_H */
+#endif				/* GNUTLS_SRC_CERTTOOL_CFG_H */

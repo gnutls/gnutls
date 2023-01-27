@@ -22,7 +22,7 @@
 /* Parts copied from GnuTLS example programs. */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -192,7 +192,8 @@ static void check_stored_algos(gnutls_x509_crt_t server_crt)
 	oid_size = sizeof(oid);
 	ret = gnutls_x509_crt_get_signature_oid(server_crt, oid, &oid_size);
 	if (ret < 0) {
-		fail("cannot get signature algorithm: %s\n", gnutls_strerror(ret));
+		fail("cannot get signature algorithm: %s\n",
+		     gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -203,7 +204,8 @@ static void check_stored_algos(gnutls_x509_crt_t server_crt)
 
 	ret = gnutls_x509_crt_get_signature_algorithm(server_crt);
 	if (ret != GNUTLS_SIGN_RSA_SHA1) {
-		fail("detected wrong algorithm: %s\n", gnutls_sign_get_name(ret));
+		fail("detected wrong algorithm: %s\n",
+		     gnutls_sign_get_name(ret));
 		exit(1);
 	}
 
@@ -222,7 +224,8 @@ static void check_stored_algos(gnutls_x509_crt_t server_crt)
 
 	ret = gnutls_x509_crt_get_pk_algorithm(server_crt, NULL);
 	if (ret != GNUTLS_PK_RSA) {
-		fail("detected wrong PK algorithm: %s\n", gnutls_pk_get_name(ret));
+		fail("detected wrong PK algorithm: %s\n",
+		     gnutls_pk_get_name(ret));
 		exit(1);
 	}
 
@@ -261,14 +264,15 @@ void doit(void)
 	if (!path)
 		path = "./x509cert-dir";
 
-	ret =
-	    gnutls_x509_crt_import(server_crt, &cert, GNUTLS_X509_FMT_PEM);
+	ret = gnutls_x509_crt_import(server_crt, &cert, GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		fail("gnutls_x509_crt_import");
 
 	check_stored_algos(server_crt);
 
-	ret = gnutls_x509_crt_get_preferred_hash_algorithm(server_crt, &hash, &mand);
+	ret =
+	    gnutls_x509_crt_get_preferred_hash_algorithm(server_crt, &hash,
+							 &mand);
 	if (ret < 0) {
 		fail("error in gnutls_x509_crt_get_preferred_hash_algorithm: %s\n", gnutls_strerror(ret));
 		exit(1);
@@ -294,65 +298,64 @@ void doit(void)
 						    NAME_SIZE, 0, &status,
 						    NULL);
 	if (ret < 0 || status != 0)
-		fail("gnutls_x509_trust_list_verify_named_crt: %d\n",
-		     __LINE__);
+		fail("gnutls_x509_trust_list_verify_named_crt: %d\n", __LINE__);
 
 	ret =
 	    gnutls_x509_trust_list_verify_named_crt(tl, server_crt, NAME,
 						    NAME_SIZE - 1, 0,
 						    &status, NULL);
 	if (ret < 0 || status == 0)
-		fail("gnutls_x509_trust_list_verify_named_crt: %d\n",
-		     __LINE__);
+		fail("gnutls_x509_trust_list_verify_named_crt: %d\n", __LINE__);
 
 	ret =
 	    gnutls_x509_trust_list_verify_named_crt(tl, server_crt,
 						    "other", 5, 0, &status,
 						    NULL);
 	if (ret < 0 || status == 0)
-		fail("gnutls_x509_trust_list_verify_named_crt: %d\n",
-		     __LINE__);
+		fail("gnutls_x509_trust_list_verify_named_crt: %d\n", __LINE__);
 
 	/* check whether the name-only verification works */
 	vdata.type = GNUTLS_DT_DNS_HOSTNAME;
-	vdata.data = (void*)NAME;
+	vdata.data = (void *)NAME;
 	vdata.size = NAME_SIZE;
 	ret =
 	    gnutls_x509_trust_list_verify_crt2(tl, &server_crt, 1, &vdata, 1,
-						GNUTLS_VERIFY_ALLOW_BROKEN, &status, NULL);
+					       GNUTLS_VERIFY_ALLOW_BROKEN,
+					       &status, NULL);
 	if (ret < 0 || status != 0)
-		fail("gnutls_x509_trust_list_verify_crt2 - 1: status: %x\n", status);
+		fail("gnutls_x509_trust_list_verify_crt2 - 1: status: %x\n",
+		     status);
 
 	vdata.type = GNUTLS_DT_DNS_HOSTNAME;
-	vdata.data = (void*)NAME;
-	vdata.size = NAME_SIZE-2;
+	vdata.data = (void *)NAME;
+	vdata.size = NAME_SIZE - 2;
 	ret =
 	    gnutls_x509_trust_list_verify_crt2(tl, &server_crt, 1, &vdata, 1,
-						0, &status, NULL);
+					       0, &status, NULL);
 	if (ret < 0 || status == 0)
-		fail("gnutls_x509_trust_list_verify_crt2 - 2: status: %x\n", status);
-
+		fail("gnutls_x509_trust_list_verify_crt2 - 2: status: %x\n",
+		     status);
 
 	/* check whether the key verification works */
-	ret = gnutls_x509_trust_list_add_trust_dir(tl, path, NULL, GNUTLS_X509_FMT_PEM, 0, 0);
+	ret =
+	    gnutls_x509_trust_list_add_trust_dir(tl, path, NULL,
+						 GNUTLS_X509_FMT_PEM, 0, 0);
 	if (ret != 1)
 		fail("gnutls_x509_trust_list_add_trust_dir: %d\n", ret);
 
 	ret =
-	    gnutls_x509_trust_list_verify_crt(tl, &server_crt, 1, GNUTLS_VERIFY_ALLOW_BROKEN,
+	    gnutls_x509_trust_list_verify_crt(tl, &server_crt, 1,
+					      GNUTLS_VERIFY_ALLOW_BROKEN,
 					      &status, NULL);
 	if (ret < 0 || status != 0)
 		fail("gnutls_x509_trust_list_verify_crt\n");
 
-
-
 	/* test convenience functions in verify-high2.c */
 	data.data = cert_pem;
-	data.size = strlen((char *) cert_pem);
+	data.size = strlen((char *)cert_pem);
 	ret =
 	    gnutls_x509_trust_list_add_trust_mem(tl, &data, NULL,
-						 GNUTLS_X509_FMT_PEM, 0,
-						 0);
+						 GNUTLS_X509_FMT_PEM, 0, 0);
 	if (ret < 1)
 		fail("gnutls_x509_trust_list_add_trust_mem: %d (%s)\n",
 		     __LINE__, gnutls_strerror(ret));
@@ -368,8 +371,7 @@ void doit(void)
 	data.size = sizeof(cert_der);
 	ret =
 	    gnutls_x509_trust_list_add_trust_mem(tl, &data, NULL,
-						 GNUTLS_X509_FMT_DER, 0,
-						 0);
+						 GNUTLS_X509_FMT_DER, 0, 0);
 	if (ret < 1)
 		fail("gnutls_x509_trust_list_add_trust_mem: %d (%s)\n",
 		     __LINE__, gnutls_strerror(ret));

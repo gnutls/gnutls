@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+# include "config.h"
 #endif
 
 #include <stdio.h>
@@ -29,26 +29,26 @@
 #include <gnutls/x509-ext.h>
 #include "utils.h"
 
-static char invalid_cert[] = /* v1 certificate with extensions */
-"-----BEGIN CERTIFICATE-----\n"
-"MIIDHjCCAgYCDFQ7zlUDsihSxVF4mDANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQD\n"
-"EwRDQS0wMCIYDzIwMTQxMDEzMTMwNjI5WhgPOTk5OTEyMzEyMzU5NTlaMBMxETAP\n"
-"BgNVBAMTCHNlcnZlci0xMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA\n"
-"zoG3/1YtwGHh/5u3ex6xAmwO0/H4gdIy/yiYLxqWcy+HzyMBBZHNXuV7W0z7x+Qo\n"
-"qCGtenWkzIQSgeYKyzdcpPDscZIYOgwHWUFczxgVGdLsBKPSczgqMHpSCLgMgnDM\n"
-"RaN6SNQeTQdftkLt5wdBSzNaxhhPYsCEbopSeZ8250FCLS3gRpoMtYCBiy7cjSJB\n"
-"zv6zmZStXNgTYr8pLwI0nyxPyRdB+TZyqAC6r9W154y51vsqUCGmC0I9hn1A5kkD\n"
-"5057x+Ho1kDwPxOfObdOR+AJSAw/FeGuStzViJY0I68B90sEo/HD+h7mB+CwJ2Yf\n"
-"64/xVdh+D8L65eYkM9z88wIDAQABo3cwdTAMBgNVHRMBAf8EAjAAMBQGA1UdEQQN\n"
-"MAuCCWxvY2FsaG9zdDAPBgNVHQ8BAf8EBQMDB6AAMB0GA1UdDgQWBBT7Gk/u95zI\n"
-"JTM89CXJ70IxxqhegDAfBgNVHSMEGDAWgBQ9X77/zddjG9ob2zrR/WuGmxwFGDAN\n"
-"BgkqhkiG9w0BAQsFAAOCAQEAaTrAcTkQ7yqf6afoTkFXZuZ+jJXYNGkubxs8Jo/z\n"
-"srJk/WWVGAKuxiBDumk88Gjm+WXGyIDA7Hq9fhGaklJV2PGRfNVx9No51HXeAToT\n"
-"sHs2XKhk9SdKKR4UJkuX3U2malMlCpmFMtm3EieDVZLxeukhODJQtRa3vGg8QWoz\n"
-"ODlewHSmQiXhnqq52fLCbdVUaBnaRGOIwNZ0FcBWv9n0ZCuhjg9908rUVH9/OjI3\n"
-"AGVZcbN9Jac2ZO8NTxP5vS1hrG2wT9+sVRh1sD5ISZSM4gWdq9sK8d7j+SwOPBWY\n"
-"3dcxQlfvWw2Dt876XYoyUZuKirmASVlMw+hkm1WXM7Svsw==\n"
-"-----END CERTIFICATE-----\n";
+static char invalid_cert[] =	/* v1 certificate with extensions */
+    "-----BEGIN CERTIFICATE-----\n"
+    "MIIDHjCCAgYCDFQ7zlUDsihSxVF4mDANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQD\n"
+    "EwRDQS0wMCIYDzIwMTQxMDEzMTMwNjI5WhgPOTk5OTEyMzEyMzU5NTlaMBMxETAP\n"
+    "BgNVBAMTCHNlcnZlci0xMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA\n"
+    "zoG3/1YtwGHh/5u3ex6xAmwO0/H4gdIy/yiYLxqWcy+HzyMBBZHNXuV7W0z7x+Qo\n"
+    "qCGtenWkzIQSgeYKyzdcpPDscZIYOgwHWUFczxgVGdLsBKPSczgqMHpSCLgMgnDM\n"
+    "RaN6SNQeTQdftkLt5wdBSzNaxhhPYsCEbopSeZ8250FCLS3gRpoMtYCBiy7cjSJB\n"
+    "zv6zmZStXNgTYr8pLwI0nyxPyRdB+TZyqAC6r9W154y51vsqUCGmC0I9hn1A5kkD\n"
+    "5057x+Ho1kDwPxOfObdOR+AJSAw/FeGuStzViJY0I68B90sEo/HD+h7mB+CwJ2Yf\n"
+    "64/xVdh+D8L65eYkM9z88wIDAQABo3cwdTAMBgNVHRMBAf8EAjAAMBQGA1UdEQQN\n"
+    "MAuCCWxvY2FsaG9zdDAPBgNVHQ8BAf8EBQMDB6AAMB0GA1UdDgQWBBT7Gk/u95zI\n"
+    "JTM89CXJ70IxxqhegDAfBgNVHSMEGDAWgBQ9X77/zddjG9ob2zrR/WuGmxwFGDAN\n"
+    "BgkqhkiG9w0BAQsFAAOCAQEAaTrAcTkQ7yqf6afoTkFXZuZ+jJXYNGkubxs8Jo/z\n"
+    "srJk/WWVGAKuxiBDumk88Gjm+WXGyIDA7Hq9fhGaklJV2PGRfNVx9No51HXeAToT\n"
+    "sHs2XKhk9SdKKR4UJkuX3U2malMlCpmFMtm3EieDVZLxeukhODJQtRa3vGg8QWoz\n"
+    "ODlewHSmQiXhnqq52fLCbdVUaBnaRGOIwNZ0FcBWv9n0ZCuhjg9908rUVH9/OjI3\n"
+    "AGVZcbN9Jac2ZO8NTxP5vS1hrG2wT9+sVRh1sD5ISZSM4gWdq9sK8d7j+SwOPBWY\n"
+    "3dcxQlfvWw2Dt876XYoyUZuKirmASVlMw+hkm1WXM7Svsw==\n"
+    "-----END CERTIFICATE-----\n";
 
 static char pem[] =
     "-----BEGIN CERTIFICATE-----"
@@ -85,7 +85,7 @@ static char pem[] =
 
 #define MAX_DATA_SIZE 1024
 
-typedef int (*ext_parse_func) (const gnutls_datum_t * der);
+typedef int (*ext_parse_func)(const gnutls_datum_t * der);
 
 struct ext_handler_st {
 	const char *oid;
@@ -690,8 +690,9 @@ struct ext_handler_st handlers[] = {
 void doit(void)
 {
 	int ret;
-	gnutls_datum_t derCert = { (void *)pem, sizeof(pem)-1 };
-	gnutls_datum_t v1Cert = { (void *)invalid_cert, sizeof(invalid_cert)-1 };
+	gnutls_datum_t derCert = { (void *)pem, sizeof(pem) - 1 };
+	gnutls_datum_t v1Cert =
+	    { (void *)invalid_cert, sizeof(invalid_cert) - 1 };
 	gnutls_x509_crt_t cert;
 	size_t oid_len = MAX_DATA_SIZE;
 	gnutls_datum_t ext;
@@ -724,7 +725,7 @@ void doit(void)
 		oid_len = sizeof(oid);
 		ret =
 		    gnutls_x509_crt_get_extension_info(cert, i, oid, &oid_len,
-							&critical);
+						       &critical);
 		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
 			if (i != 9) {
 				fail("unexpected number of extensions: %d\n",

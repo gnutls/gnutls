@@ -30,18 +30,19 @@
 #include "secrets.h"
 
 /* HKDF-Extract(0,0) or HKDF-Extract(0, PSK) */
-int _tls13_init_secret(gnutls_session_t session, const uint8_t *psk, size_t psk_size)
+int _tls13_init_secret(gnutls_session_t session, const uint8_t * psk,
+		       size_t psk_size)
 {
-	session->key.proto.tls13.temp_secret_size = session->security_parameters.prf->output_size;
+	session->key.proto.tls13.temp_secret_size =
+	    session->security_parameters.prf->output_size;
 
 	return _tls13_init_secret2(session->security_parameters.prf,
 				   psk, psk_size,
 				   session->key.proto.tls13.temp_secret);
 }
 
-int _tls13_init_secret2(const mac_entry_st *prf,
-			const uint8_t *psk, size_t psk_size,
-			void *out)
+int _tls13_init_secret2(const mac_entry_st * prf,
+			const uint8_t * psk, size_t psk_size, void *out)
 {
 	char buf[128];
 
@@ -55,17 +56,15 @@ int _tls13_init_secret2(const mac_entry_st *prf,
 			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 		memset(buf, 0, psk_size);
-		psk = (uint8_t*) buf;
+		psk = (uint8_t *) buf;
 	}
 
-	return gnutls_hmac_fast(prf->id,
-				"", 0,
-				psk, psk_size,
-				out);
+	return gnutls_hmac_fast(prf->id, "", 0, psk, psk_size, out);
 }
 
 /* HKDF-Extract(Prev-Secret, key) */
-int _tls13_update_secret(gnutls_session_t session, const uint8_t *key, size_t key_size)
+int _tls13_update_secret(gnutls_session_t session, const uint8_t * key,
+			 size_t key_size)
 {
 	gnutls_datum_t _key;
 	gnutls_datum_t salt;
@@ -77,8 +76,8 @@ int _tls13_update_secret(gnutls_session_t session, const uint8_t *key, size_t ke
 	salt.size = session->key.proto.tls13.temp_secret_size;
 
 	ret = _gnutls_hkdf_extract(session->security_parameters.prf->id,
-			           &_key, &salt,
-			           session->key.proto.tls13.temp_secret);
+				   &_key, &salt,
+				   session->key.proto.tls13.temp_secret);
 	if (ret < 0)
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 	else
@@ -88,11 +87,10 @@ int _tls13_update_secret(gnutls_session_t session, const uint8_t *key, size_t ke
 }
 
 /* Derive-Secret(Secret, Label, Messages) */
-int _tls13_derive_secret2(const mac_entry_st *prf,
-			 const char *label, unsigned label_size,
-			 const uint8_t *tbh, size_t tbh_size,
-			 const uint8_t secret[MAX_HASH_SIZE],
-			 void *out)
+int _tls13_derive_secret2(const mac_entry_st * prf,
+			  const char *label, unsigned label_size,
+			  const uint8_t * tbh, size_t tbh_size,
+			  const uint8_t secret[MAX_HASH_SIZE], void *out)
 {
 	uint8_t digest[MAX_HASH_SIZE];
 	int ret;
@@ -105,35 +103,33 @@ int _tls13_derive_secret2(const mac_entry_st *prf,
 
 	digest_size = prf->output_size;
 	ret = gnutls_hash_fast((gnutls_digest_algorithm_t) prf->id,
-				tbh, tbh_size, digest);
+			       tbh, tbh_size, digest);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	return _tls13_expand_secret2(prf, label, label_size, digest, digest_size, secret, digest_size, out);
+	return _tls13_expand_secret2(prf, label, label_size, digest,
+				     digest_size, secret, digest_size, out);
 }
 
 /* Derive-Secret(Secret, Label, Messages) */
 int _tls13_derive_secret(gnutls_session_t session,
 			 const char *label, unsigned label_size,
-			 const uint8_t *tbh, size_t tbh_size,
-			 const uint8_t secret[MAX_HASH_SIZE],
-			 void *out)
+			 const uint8_t * tbh, size_t tbh_size,
+			 const uint8_t secret[MAX_HASH_SIZE], void *out)
 {
 	if (unlikely(session->security_parameters.prf == NULL))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-	return _tls13_derive_secret2(session->security_parameters.prf, label, label_size, tbh, tbh_size,
-				         secret,
-				         out);
+	return _tls13_derive_secret2(session->security_parameters.prf, label,
+				     label_size, tbh, tbh_size, secret, out);
 }
 
 /* HKDF-Expand-Label(Secret, Label, HashValue, Length) */
-int _tls13_expand_secret2(const mac_entry_st *prf,
-			 const char *label, unsigned label_size,
-			 const uint8_t *msg, size_t msg_size,
-			 const uint8_t secret[MAX_HASH_SIZE],
-			 unsigned out_size,
-			 void *out)
+int _tls13_expand_secret2(const mac_entry_st * prf,
+			  const char *label, unsigned label_size,
+			  const uint8_t * msg, size_t msg_size,
+			  const uint8_t secret[MAX_HASH_SIZE],
+			  unsigned out_size, void *out)
 {
 	uint8_t tmp[256] = "tls13 ";
 	gnutls_buffer_st str;
@@ -141,7 +137,7 @@ int _tls13_expand_secret2(const mac_entry_st *prf,
 	gnutls_datum_t info;
 	int ret;
 
-	if (unlikely(label_size >= sizeof(tmp)-6))
+	if (unlikely(label_size >= sizeof(tmp) - 6))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	_gnutls_buffer_init(&str);
@@ -153,7 +149,7 @@ int _tls13_expand_secret2(const mac_entry_st *prf,
 	}
 
 	memcpy(&tmp[6], label, label_size);
-	ret = _gnutls_buffer_append_data_prefix(&str, 8, tmp, label_size+6);
+	ret = _gnutls_buffer_append_data_prefix(&str, 8, tmp, label_size + 6);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -166,7 +162,7 @@ int _tls13_expand_secret2(const mac_entry_st *prf,
 	}
 
 	key.data = (void *)secret;
-	key.size =_gnutls_mac_get_algo_len(mac_to_entry(prf->id));
+	key.size = _gnutls_mac_get_algo_len(mac_to_entry(prf->id));
 	info.data = str.data;
 	info.size = str.length;
 
@@ -180,14 +176,14 @@ int _tls13_expand_secret2(const mac_entry_st *prf,
 	}
 
 #if 0
-        _gnutls_hard_log("INT: hkdf label: %d,%s\n",
-                         out_size,
-                         _gnutls_bin2hex(str.data, str.length,
-                                         (char*)tmp, sizeof(tmp), NULL));
-        _gnutls_hard_log("INT: secret expanded for '%.*s': %d,%s\n", 
-                         (int)label_size, label, out_size,
-                         _gnutls_bin2hex(out, out_size,
-                                         (char*)tmp, sizeof(tmp), NULL));
+	_gnutls_hard_log("INT: hkdf label: %d,%s\n",
+			 out_size,
+			 _gnutls_bin2hex(str.data, str.length,
+					 (char *)tmp, sizeof(tmp), NULL));
+	_gnutls_hard_log("INT: secret expanded for '%.*s': %d,%s\n",
+			 (int)label_size, label, out_size,
+			 _gnutls_bin2hex(out, out_size,
+					 (char *)tmp, sizeof(tmp), NULL));
 #endif
 
 	ret = 0;
@@ -197,18 +193,15 @@ int _tls13_expand_secret2(const mac_entry_st *prf,
 }
 
 int _tls13_expand_secret(gnutls_session_t session,
-		const char *label, unsigned label_size,
-		const uint8_t *msg, size_t msg_size,
-		const uint8_t secret[MAX_HASH_SIZE],
-		unsigned out_size,
-		void *out)
+			 const char *label, unsigned label_size,
+			 const uint8_t * msg, size_t msg_size,
+			 const uint8_t secret[MAX_HASH_SIZE],
+			 unsigned out_size, void *out)
 {
 	if (unlikely(session->security_parameters.prf == NULL))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 	return _tls13_expand_secret2(session->security_parameters.prf,
-			label, label_size,
-			msg, msg_size, secret,
-			out_size, out);
+				     label, label_size,
+				     msg, msg_size, secret, out_size, out);
 }
-

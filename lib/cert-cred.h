@@ -21,38 +21,36 @@
  */
 
 #ifndef GNUTLS_LIB_CERT_CRED_H
-#define GNUTLS_LIB_CERT_CRED_H
+# define GNUTLS_LIB_CERT_CRED_H
 
-#include <gnutls/abstract.h>
-#include "str_array.h"
-
+# include <gnutls/abstract.h>
+# include "str_array.h"
 
 int
-_gnutls_certificate_credential_append_keypair(gnutls_certificate_credentials_t res,
-				       gnutls_privkey_t key,
-				       gnutls_str_array_t names,
-				       gnutls_pcert_st * crt, int nr);
+_gnutls_certificate_credential_append_keypair(gnutls_certificate_credentials_t
+					      res, gnutls_privkey_t key,
+					      gnutls_str_array_t names,
+					      gnutls_pcert_st * crt, int nr);
 
 int
 _gnutls_read_key_mem(gnutls_certificate_credentials_t res,
-	     const void *key, int key_size, gnutls_x509_crt_fmt_t type,
-	     const char *pass, unsigned int flags,
-	     gnutls_privkey_t *rkey);
+		     const void *key, int key_size, gnutls_x509_crt_fmt_t type,
+		     const char *pass, unsigned int flags,
+		     gnutls_privkey_t * rkey);
 
 int
 _gnutls_read_key_file(gnutls_certificate_credentials_t res,
-	      const char *keyfile, gnutls_x509_crt_fmt_t type,
-	      const char *pass, unsigned int flags,
-	      gnutls_privkey_t *rkey);
+		      const char *keyfile, gnutls_x509_crt_fmt_t type,
+		      const char *pass, unsigned int flags,
+		      gnutls_privkey_t * rkey);
 
-int
-_gnutls_get_x509_name(gnutls_x509_crt_t crt, gnutls_str_array_t * names);
+int _gnutls_get_x509_name(gnutls_x509_crt_t crt, gnutls_str_array_t * names);
 
-#define CRED_RET_SUCCESS(cred) \
+# define CRED_RET_SUCCESS(cred) \
 	if (cred->flags & GNUTLS_CERTIFICATE_API_V2) { \
 		return cred->ncerts-1; \
 	} else { \
 		return 0; \
 	}
 
-#endif /* GNUTLS_LIB_CERT_CRED_H */
+#endif				/* GNUTLS_LIB_CERT_CRED_H */

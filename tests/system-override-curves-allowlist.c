@@ -49,33 +49,41 @@
 	_fail("Assertion `" #cond "` failed: " format "\n", ##__VA_ARGS__)
 #define _check(cond) if (!(cond)) _fail("Assertion `" #cond "` failed.\n")
 
-gnutls_ecc_curve_t unlocked_ecc_curve_get_id(const char* curve);
-gnutls_pk_algorithm_t curve_name_to_pk(const char* curve);
-void assert_unblocked(const char* curve);
-void assert_blocked(const char* curve);
-char* envvarcpy(const char* envvar);
+gnutls_ecc_curve_t unlocked_ecc_curve_get_id(const char *curve);
+gnutls_pk_algorithm_t curve_name_to_pk(const char *curve);
+void assert_unblocked(const char *curve);
+void assert_blocked(const char *curve);
+char *envvarcpy(const char *envvar);
 
-
-gnutls_ecc_curve_t unlocked_ecc_curve_get_id(const char* curve) {
-	if (!strcasecmp(curve, "SECP192R1")) return GNUTLS_ECC_CURVE_SECP192R1;
-	if (!strcasecmp(curve, "SECP256R1")) return GNUTLS_ECC_CURVE_SECP256R1;
-	if (!strcasecmp(curve, "SECP384R1")) return GNUTLS_ECC_CURVE_SECP384R1;
-	if (!strcasecmp(curve, "SECP521R1")) return GNUTLS_ECC_CURVE_SECP521R1;
-	if (!strcasecmp(curve, "X448")) return GNUTLS_ECC_CURVE_X448;
-	if (!strcasecmp(curve, "X25519")) return GNUTLS_ECC_CURVE_X25519;
+gnutls_ecc_curve_t unlocked_ecc_curve_get_id(const char *curve)
+{
+	if (!strcasecmp(curve, "SECP192R1"))
+		return GNUTLS_ECC_CURVE_SECP192R1;
+	if (!strcasecmp(curve, "SECP256R1"))
+		return GNUTLS_ECC_CURVE_SECP256R1;
+	if (!strcasecmp(curve, "SECP384R1"))
+		return GNUTLS_ECC_CURVE_SECP384R1;
+	if (!strcasecmp(curve, "SECP521R1"))
+		return GNUTLS_ECC_CURVE_SECP521R1;
+	if (!strcasecmp(curve, "X448"))
+		return GNUTLS_ECC_CURVE_X448;
+	if (!strcasecmp(curve, "X25519"))
+		return GNUTLS_ECC_CURVE_X25519;
 	fprintf(stderr, "unknown curve %s\n", curve);
 	return GNUTLS_ECC_CURVE_INVALID;
 }
 
-
-gnutls_pk_algorithm_t curve_name_to_pk(const char* curve) {
-	if (!strcasecmp(curve, "X448")) return GNUTLS_PK_ECDH_X448;
-	if (!strcasecmp(curve, "X25519")) return GNUTLS_PK_ECDH_X25519;
+gnutls_pk_algorithm_t curve_name_to_pk(const char *curve)
+{
+	if (!strcasecmp(curve, "X448"))
+		return GNUTLS_PK_ECDH_X448;
+	if (!strcasecmp(curve, "X25519"))
+		return GNUTLS_PK_ECDH_X25519;
 	return GNUTLS_PK_ECDSA;
 }
 
-
-void assert_unblocked(const char* curve_name) {
+void assert_unblocked(const char *curve_name)
+{
 	gnutls_privkey_t priv;
 	gnutls_ecc_curve_t curve;
 	gnutls_pk_algorithm_t pk;
@@ -83,7 +91,7 @@ void assert_unblocked(const char* curve_name) {
 	unsigned int bits;
 
 	fprintf(stderr, "generating a key using non-blocked %s curve...\n",
-			curve_name);
+		curve_name);
 	_check(curve = gnutls_ecc_curve_get_id(curve_name));
 	_check(curve == unlocked_ecc_curve_get_id(curve_name));
 	_check(gnutls_privkey_init(&priv) == GNUTLS_E_SUCCESS);
@@ -94,18 +102,18 @@ void assert_unblocked(const char* curve_name) {
 	fprintf(stderr, "%s succeeds as expected\n", curve_name);
 }
 
-
-void assert_blocked(const char* curve_name) {
+void assert_blocked(const char *curve_name)
+{
 	gnutls_privkey_t priv;
 	gnutls_ecc_curve_t curve;
 	unsigned int bits;
 	gnutls_pk_algorithm_t pk;
 
 	fprintf(stderr, "generating a key using blocked %s curve...\n",
-			curve_name);
+		curve_name);
 	_check(gnutls_ecc_curve_get_id(curve_name) == GNUTLS_ECC_CURVE_INVALID);
 	_check((curve = unlocked_ecc_curve_get_id(curve_name)) !=
-			GNUTLS_ECC_CURVE_INVALID);
+	       GNUTLS_ECC_CURVE_INVALID);
 	_check(!strcasecmp(curve_name, gnutls_ecc_curve_get_name(curve)));
 	_check(gnutls_privkey_init(&priv) == GNUTLS_E_SUCCESS);
 	bits = GNUTLS_CURVE_TO_BITS(curve);
@@ -115,17 +123,17 @@ void assert_blocked(const char* curve_name) {
 	fprintf(stderr, "%s is blocked as expected\n", curve_name);
 }
 
-
-char* envvarcpy(const char* envvar) {
-	char* s;
+char *envvarcpy(const char *envvar)
+{
+	char *s;
 	_assert(s = getenv(envvar), "variable %s is not set", envvar);
 	return gnutls_strdup(s);
 }
 
-
-void doit(void) {
-	char* curves;
-	const char* curve;
+void doit(void)
+{
+	char *curves;
+	const char *curve;
 	gnutls_ecc_curve_t curve_id;
 
 	curves = envvarcpy("INITIALLY_ENABLED_CURVES");

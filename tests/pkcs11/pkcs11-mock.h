@@ -35,7 +35,7 @@
 #include <p11-kit/pkcs11x.h>
 
 #ifndef NULL_PTR
-#define NULL_PTR 0
+# define NULL_PTR 0
 #endif
 
 #define IGNORE(P) (void)(P)
@@ -66,8 +66,7 @@
 #define PKCS11_MOCK_CK_OBJECT_HANDLE_CERTIFICATE_EXTENSION 5
 #define PKCS11_MOCK_CK_OBJECT_HANDLE_CERTIFICATE 6
 
-typedef enum
-{
+typedef enum {
 	PKCS11_MOCK_CK_OPERATION_NONE,
 	PKCS11_MOCK_CK_OPERATION_FIND,
 	PKCS11_MOCK_CK_OPERATION_ENCRYPT,
@@ -81,8 +80,7 @@ typedef enum
 	PKCS11_MOCK_CK_OPERATION_DECRYPT_DIGEST,
 	PKCS11_MOCK_CK_OPERATION_SIGN_ENCRYPT,
 	PKCS11_MOCK_CK_OPERATION_DECRYPT_VERIFY
-}
-PKCS11_MOCK_CK_OPERATION;
+} PKCS11_MOCK_CK_OPERATION;
 
 struct find_ptr_st {
 	int remaining_data;
@@ -96,4 +94,3 @@ typedef struct session_ptr_st {
 
 	struct find_ptr_st find_op;
 } session_ptr_st;
-

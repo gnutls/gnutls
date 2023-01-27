@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -84,22 +84,29 @@ void doit(void)
 		gnutls_global_set_log_level(6);
 
 	for (i = 0; i < sizeof(tests) / sizeof(tests[0]); i++) {
-		if (tests[i].pk == GNUTLS_PK_DSA || tests[i].pk == GNUTLS_PK_EDDSA_ED25519)
+		if (tests[i].pk == GNUTLS_PK_DSA
+		    || tests[i].pk == GNUTLS_PK_EDDSA_ED25519)
 			continue;
 
-		success("testing: %s - %s\n", tests[i].name, gnutls_sign_algorithm_get_name(tests[i].sigalgo));
+		success("testing: %s - %s\n", tests[i].name,
+			gnutls_sign_algorithm_get_name(tests[i].sigalgo));
 
 		ret = gnutls_x509_privkey_init(&privkey);
 		if (ret < 0)
 			testfail("gnutls_pubkey_init\n");
 
-		ret = gnutls_x509_privkey_import(privkey, &tests[i].key, GNUTLS_X509_FMT_PEM);
+		ret =
+		    gnutls_x509_privkey_import(privkey, &tests[i].key,
+					       GNUTLS_X509_FMT_PEM);
 		if (ret < 0)
 			testfail("gnutls_privkey_import_x509\n");
 
 		signature_size = sizeof(signature_data);
-		ret = gnutls_x509_privkey_sign_data(privkey, tests[i].digest, tests[i].sign_flags,
-						&raw_data, signature_data, &signature_size);
+		ret =
+		    gnutls_x509_privkey_sign_data(privkey, tests[i].digest,
+						  tests[i].sign_flags,
+						  &raw_data, signature_data,
+						  &signature_size);
 		if (ret < 0)
 			testfail("gnutls_x509_privkey_sign_data\n");
 
@@ -113,39 +120,40 @@ void doit(void)
 		if (ret < 0)
 			testfail("gnutls_x509_crt_import\n");
 
-		signature.data = (unsigned char*)signature_data;
+		signature.data = (unsigned char *)signature_data;
 		signature.size = signature_size;
 
 		ret =
-		    gnutls_x509_crt_verify_data2(crt, tests[i].sigalgo, 0, &raw_data,
-					      &signature);
+		    gnutls_x509_crt_verify_data2(crt, tests[i].sigalgo, 0,
+						 &raw_data, &signature);
 		if (ret < 0)
 			testfail("gnutls_x509_crt_verify_data2\n");
 
 		/* should fail */
 		ret =
 		    gnutls_x509_crt_verify_data2(crt, tests[i].sigalgo, 0,
-					      &invalid_raw_data,
-					      &signature);
+						 &invalid_raw_data, &signature);
 		if (ret != GNUTLS_E_PK_SIG_VERIFY_FAILED)
-			testfail("gnutls_x509_crt_verify_data2-2 (hashed data)\n");
+			testfail
+			    ("gnutls_x509_crt_verify_data2-2 (hashed data)\n");
 
 		sign_algo =
 		    gnutls_pk_to_sign(gnutls_x509_crt_get_pk_algorithm
 				      (crt, NULL), tests[i].digest);
 		ret =
 		    gnutls_x509_crt_verify_data2(crt, sign_algo, 0,
-						&raw_data, &signature);
+						 &raw_data, &signature);
 		if (ret < 0)
-			testfail("gnutls_x509_crt_verify_data2-1 (hashed data)\n");
+			testfail
+			    ("gnutls_x509_crt_verify_data2-1 (hashed data)\n");
 
 		/* should fail */
 		ret =
 		    gnutls_x509_crt_verify_data2(crt, sign_algo, 0,
-						&invalid_raw_data,
-						&signature);
+						 &invalid_raw_data, &signature);
 		if (ret != GNUTLS_E_PK_SIG_VERIFY_FAILED)
-			testfail("gnutls_x509_crt_verify_data2-2 (hashed data)\n");
+			testfail
+			    ("gnutls_x509_crt_verify_data2-2 (hashed data)\n");
 
 		gnutls_x509_crt_deinit(crt);
 		gnutls_x509_privkey_deinit(privkey);

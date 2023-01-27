@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -57,12 +57,12 @@ static void try_send(gnutls_session_t client, gnutls_session_t server,
 	ret = gnutls_record_send_range(client, b1, b1_size, range);
 	if (ret < 0) {
 		fprintf(stderr, "Error sending %d bytes: %s\n",
-			(int) b1_size, gnutls_strerror(ret));
+			(int)b1_size, gnutls_strerror(ret));
 		exit(1);
 	}
 
 	if (ret != b1_size) {
-		fprintf(stderr, "Couldn't send %d bytes\n", (int) b1_size);
+		fprintf(stderr, "Couldn't send %d bytes\n", (int)b1_size);
 		exit(1);
 	}
 
@@ -71,7 +71,7 @@ static void try_send(gnutls_session_t client, gnutls_session_t server,
 		ret = gnutls_record_recv(server, b2, b2_size);
 		if (ret < 0) {
 			fprintf(stderr, "Error receiving %d bytes: %s\n",
-				(int) b2_size, gnutls_strerror(ret));
+				(int)b2_size, gnutls_strerror(ret));
 			exit(1);
 		}
 		recvd += ret;
@@ -80,7 +80,7 @@ static void try_send(gnutls_session_t client, gnutls_session_t server,
 
 	if (recvd != b1_size) {
 		fprintf(stderr, "Couldn't receive %d bytes, received %d\n",
-			(int) b1_size, recvd);
+			(int)b1_size, recvd);
 		exit(1);
 	}
 
@@ -90,8 +90,7 @@ void doit(void)
 {
 	/* Server stuff. */
 	gnutls_anon_server_credentials_t s_anoncred;
-	const gnutls_datum_t p3 =
-	    { (unsigned char *) pkcs3, strlen(pkcs3) };
+	const gnutls_datum_t p3 = { (unsigned char *)pkcs3, strlen(pkcs3) };
 	static gnutls_dh_params_t dh_params;
 	gnutls_session_t server;
 	int sret = GNUTLS_E_AGAIN;
@@ -144,16 +143,13 @@ void doit(void)
 	range.low = 1024;
 	range.high = MAX_SEND;
 
-
 	try_send(client, server, buffer1, MAX_SEND, buffer, MAX_BUF, &range);
 	try_send(client, server, buffer1, 1024, buffer, MAX_BUF, &range);
 	try_send(client, server, buffer1, 4096, buffer, MAX_BUF, &range);
 	/*try_send(client, server, buffer1, 128, buffer, MAX_BUF, &range) */ ;
 
-
 	if (debug)
 		fputs("\n", stdout);
-
 
 	gnutls_bye(client, GNUTLS_SHUT_RDWR);
 	gnutls_bye(server, GNUTLS_SHUT_RDWR);

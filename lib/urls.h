@@ -19,17 +19,17 @@
  */
 
 #ifndef GNUTLS_LIB_URLS_H
-#define GNUTLS_LIB_URLS_H
+# define GNUTLS_LIB_URLS_H
 
-#define PKCS11_URL "pkcs11:"
-#define SYSTEM_URL "system:"
-#define TPMKEY_URL "tpmkey:"
+# define PKCS11_URL "pkcs11:"
+# define SYSTEM_URL "system:"
+# define TPMKEY_URL "tpmkey:"
 
-#define PKCS11_URL_SIZE (sizeof(PKCS11_URL)-1)
-#define SYSTEM_URL_SIZE (sizeof(SYSTEM_URL)-1)
-#define TPMKEY_URL_SIZE (sizeof(TPMKEY_URL)-1)
+# define PKCS11_URL_SIZE (sizeof(PKCS11_URL)-1)
+# define SYSTEM_URL_SIZE (sizeof(SYSTEM_URL)-1)
+# define TPMKEY_URL_SIZE (sizeof(TPMKEY_URL)-1)
 
-#include <gnutls/urls.h>
+# include <gnutls/urls.h>
 
 extern gnutls_custom_url_st _gnutls_custom_urls[];
 extern unsigned _gnutls_custom_urls_size;
@@ -37,7 +37,6 @@ extern unsigned _gnutls_custom_urls_size;
 int _gnutls_url_is_known(const char *url);
 
 int _gnutls_get_raw_issuer(const char *url, gnutls_x509_crt_t cert,
-				 gnutls_datum_t * issuer,
-				 unsigned int flags);
+			   gnutls_datum_t * issuer, unsigned int flags);
 
-#endif /* GNUTLS_LIB_URLS_H */
+#endif				/* GNUTLS_LIB_URLS_H */

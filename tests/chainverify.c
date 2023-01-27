@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -126,7 +126,7 @@ void doit(void)
 					      GNUTLS_CRT_PRINT_ONELINE, &tmp);
 			if (debug)
 				printf("\tCertificate %d: %.*s\n", (int)j,
-					tmp.size, tmp.data);
+				       tmp.size, tmp.data);
 			gnutls_free(tmp.data);
 		}
 
@@ -221,11 +221,11 @@ void doit(void)
 
 			ret =
 			    gnutls_x509_trust_list_verify_crt2(tl, certs, j,
-								vdata, 1,
-								chains
-								[i].verify_flags,
-								&verify_status1,
-								NULL);
+							       vdata, 1,
+							       chains
+							       [i].verify_flags,
+							       &verify_status1,
+							       NULL);
 		} else {
 			ret =
 			    gnutls_x509_trust_list_verify_crt(tl, certs, j,
@@ -258,7 +258,8 @@ void doit(void)
 				gnutls_certificate_verification_status_print
 				    (verify_status1, GNUTLS_CRT_X509, &out1, 0);
 				gnutls_certificate_verification_status_print
-				    (chains[i].expected_verify_result, GNUTLS_CRT_X509, &out2, 0);
+				    (chains[i].expected_verify_result,
+				     GNUTLS_CRT_X509, &out2, 0);
 				fail("chain[%s]:\nverify_status: %d: %s\nexpected: %d: %s\n", chains[i].name, verify_status1, out1.data, chains[i].expected_verify_result, out2.data);
 				gnutls_free(out1.data);
 				gnutls_free(out2.data);

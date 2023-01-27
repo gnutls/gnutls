@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdlib.h>
@@ -67,7 +67,7 @@ static char cert_with_aia_data[] =
     "SnQ2+Q==\n" "-----END CERTIFICATE-----\n";
 
 const gnutls_datum_t cert_with_aia = {
-	(void *) cert_with_aia_data, sizeof(cert_with_aia_data)
+	(void *)cert_with_aia_data, sizeof(cert_with_aia_data)
 };
 
 void doit(void)
@@ -89,27 +89,21 @@ void doit(void)
 		exit(1);
 	}
 
-	ret =
-	    gnutls_x509_crt_import(crt, &cert_with_aia,
-				   GNUTLS_X509_FMT_PEM);
+	ret = gnutls_x509_crt_import(crt, &cert_with_aia, GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
 		fail("gnutls_x509_crt_import\n");
 		exit(1);
 	}
 
 	/* test null input */
-	ret =
-	    gnutls_x509_crt_get_authority_info_access(NULL, 0, 0, NULL,
-						      NULL);
+	ret = gnutls_x509_crt_get_authority_info_access(NULL, 0, 0, NULL, NULL);
 	if (ret != GNUTLS_E_INVALID_REQUEST) {
 		fail("gnutls_x509_crt_get_authority_info_access null input\n");
 		exit(1);
 	}
 
 	/* test unused enum */
-	ret =
-	    gnutls_x509_crt_get_authority_info_access(crt, 0, 44, NULL,
-						      NULL);
+	ret = gnutls_x509_crt_get_authority_info_access(crt, 0, 44, NULL, NULL);
 	if (ret != GNUTLS_E_INVALID_REQUEST) {
 		fail("gnutls_x509_crt_get_authority_info_access insane input\n");
 		exit(1);
@@ -142,8 +136,7 @@ void doit(void)
 
 	/* basic query of another type */
 	ret = gnutls_x509_crt_get_authority_info_access
-	    (crt, 0, GNUTLS_IA_ACCESSLOCATION_GENERALNAME_TYPE, NULL,
-	     NULL);
+	    (crt, 0, GNUTLS_IA_ACCESSLOCATION_GENERALNAME_TYPE, NULL, NULL);
 	if (ret < 0) {
 		fail("gnutls_x509_crt_get_authority_info_access "
 		     "GNUTLS_IA_ACCESSLOCATION_GENERALNAME_TYPE null output\n");
@@ -152,8 +145,7 @@ void doit(void)
 
 	/* basic query of another type, with out-of-bound sequence */
 	ret = gnutls_x509_crt_get_authority_info_access
-	    (crt, 1, GNUTLS_IA_ACCESSLOCATION_GENERALNAME_TYPE, NULL,
-	     NULL);
+	    (crt, 1, GNUTLS_IA_ACCESSLOCATION_GENERALNAME_TYPE, NULL, NULL);
 	if (ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
 		fail("gnutls_x509_crt_get_authority_info_access "
 		     "GNUTLS_IA_ACCESSLOCATION_GENERALNAME_TYPE out-of-bounds\n");
@@ -177,8 +169,7 @@ void doit(void)
 
 	/* basic query of another type and check output value */
 	ret = gnutls_x509_crt_get_authority_info_access
-	    (crt, 0, GNUTLS_IA_ACCESSLOCATION_GENERALNAME_TYPE, &data,
-	     NULL);
+	    (crt, 0, GNUTLS_IA_ACCESSLOCATION_GENERALNAME_TYPE, &data, NULL);
 	if (ret < 0) {
 		fail("gnutls_x509_crt_get_authority_info_access "
 		     "GNUTLS_IA_ACCESSLOCATION_GENERALNAME_TYPE\n");
@@ -200,8 +191,7 @@ void doit(void)
 	}
 
 	if (memcmp
-	    ("https://ocsp.quovadisoffshore.com", data.data,
-	     data.size) != 0) {
+	    ("https://ocsp.quovadisoffshore.com", data.data, data.size) != 0) {
 		fail("memcmp URI value failed\n");
 		exit(1);
 	}
@@ -216,8 +206,7 @@ void doit(void)
 	}
 
 	if (memcmp
-	    ("https://ocsp.quovadisoffshore.com", data.data,
-	     data.size) != 0) {
+	    ("https://ocsp.quovadisoffshore.com", data.data, data.size) != 0) {
 		fail("memcmp URI value failed\n");
 		exit(1);
 	}

@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -42,30 +42,33 @@ try_prio(const char *prio, unsigned group_size, const unsigned int *group_list,
 
 	ret = gnutls_priority_init(&p, prio, &err);
 	if (ret < 0) {
-		fprintf(stderr, "error: %s: %s\n", gnutls_strerror(ret),
-			err);
+		fprintf(stderr, "error: %s: %s\n", gnutls_strerror(ret), err);
 		exit(1);
 	}
 
 	ret = gnutls_priority_group_list(p, &list);
 	if ((unsigned)ret != group_size) {
-		fail("%s: group size (%d) doesn't match expected (%d)\n", prio, ret, group_size);
+		fail("%s: group size (%d) doesn't match expected (%d)\n", prio,
+		     ret, group_size);
 	}
 
-	for (i=0;i<group_size;i++) {
+	for (i = 0; i < group_size; i++) {
 		if (group_list[i] != list[i]) {
-			fail("%s: group listing %d differs to expected\n", prio, i);
+			fail("%s: group listing %d differs to expected\n", prio,
+			     i);
 		}
 	}
 
 	ret = gnutls_priority_ecc_curve_list(p, &list);
 	if ((unsigned)ret != curve_size) {
-		fail("%s: EC curve size (%d) doesn't match expected (%d)\n", prio, ret, curve_size);
+		fail("%s: EC curve size (%d) doesn't match expected (%d)\n",
+		     prio, ret, curve_size);
 	}
 
-	for (i=0;i<curve_size;i++) {
+	for (i = 0; i < curve_size; i++) {
 		if (curve_list[i] != list[i]) {
-			fail("%s: curve listing %d differs to expected\n", prio, i);
+			fail("%s: curve listing %d differs to expected\n", prio,
+			     i);
 		}
 	}
 
@@ -76,7 +79,6 @@ try_prio(const char *prio, unsigned group_size, const unsigned int *group_list,
 	if (debug)
 		success("finished: %s\n", prio);
 }
-
 
 void doit(void)
 {
@@ -99,7 +101,9 @@ void doit(void)
 	list1[2] = GNUTLS_GROUP_FFDHE2048;
 	list2[0] = GNUTLS_ECC_CURVE_SECP256R1;
 	list2[1] = GNUTLS_ECC_CURVE_SECP384R1;
-	try_prio("NORMAL:-GROUP-ALL:+GROUP-SECP256R1:+GROUP-SECP384R1:+GROUP-FFDHE2048", 3, list1, 2, list2);
+	try_prio
+	    ("NORMAL:-GROUP-ALL:+GROUP-SECP256R1:+GROUP-SECP384R1:+GROUP-FFDHE2048",
+	     3, list1, 2, list2);
 
 	memset(list1, 0, sizeof(list1));
 	memset(list2, 0, sizeof(list2));
@@ -109,6 +113,7 @@ void doit(void)
 	list1[3] = GNUTLS_GROUP_FFDHE3072;
 	list2[0] = GNUTLS_ECC_CURVE_SECP521R1;
 	list2[1] = GNUTLS_ECC_CURVE_SECP384R1;
-	try_prio("NORMAL:-CURVE-ALL:+CURVE-SECP521R1:+GROUP-SECP384R1:+GROUP-FFDHE2048:+GROUP-FFDHE3072", 4, list1, 2, list2);
+	try_prio
+	    ("NORMAL:-CURVE-ALL:+CURVE-SECP521R1:+GROUP-SECP384R1:+GROUP-FFDHE2048:+GROUP-FFDHE3072",
+	     4, list1, 2, list2);
 }
-

@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,18 +35,18 @@ int main(void)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <signal.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/dtls.h>
+# include <string.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <signal.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/dtls.h>
 
-#include "utils.h"
+# include "utils.h"
 
 static void terminate(void);
 
@@ -66,20 +66,20 @@ static void client_log_func(int level, const char *str)
 /* A very basic DTLS client handling DTLS 0.9 which sets premaster secret.
  */
 
-#define MAX_BUF 1024
+# define MAX_BUF 1024
 
-static ssize_t
-push(gnutls_transport_ptr_t tr, const void *data, size_t len)
+static ssize_t push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 {
-	int fd = (long int) tr;
+	int fd = (long int)tr;
 
 	return send(fd, data, len, 0);
 }
 
-static gnutls_datum_t master =
-    { (void*)"\x44\x66\x44\xa9\xb6\x29\xed\x6e\xd6\x93\x15\xdb\xf0\x7d\x4b\x2e\x18\xb1\x9d\xed\xff\x6a\x86\x76\xc9\x0e\x16\xab\xc2\x10\xbb\x17\x99\x24\xb1\xd9\xb9\x95\xe7\xea\xea\xea\xea\xea\xff\xaa\xac", 48};
-static gnutls_datum_t sess_id =
-    { (void*)"\xd9\xb9\x95\xe7\xea", 5};
+static gnutls_datum_t master = { (void *)
+	    "\x44\x66\x44\xa9\xb6\x29\xed\x6e\xd6\x93\x15\xdb\xf0\x7d\x4b\x2e\x18\xb1\x9d\xed\xff\x6a\x86\x76\xc9\x0e\x16\xab\xc2\x10\xbb\x17\x99\x24\xb1\xd9\xb9\x95\xe7\xea\xea\xea\xea\xea\xff\xaa\xac",
+	48
+};
+static gnutls_datum_t sess_id = { (void *)"\xd9\xb9\x95\xe7\xea", 5 };
 
 static void client(int fd, int proto, int cipher, int mac)
 {
@@ -109,11 +109,12 @@ static void client(int fd, int proto, int cipher, int mac)
 				   NULL);
 
 	ret = gnutls_session_set_premaster(session, GNUTLS_CLIENT,
-		proto, GNUTLS_KX_RSA,
-		cipher, mac,
-		GNUTLS_COMP_NULL, &master, &sess_id);
+					   proto, GNUTLS_KX_RSA,
+					   cipher, mac,
+					   GNUTLS_COMP_NULL, &master, &sess_id);
 	if (ret < 0) {
-		fail("client: gnutls_session_set_premaster failed: %s\n", gnutls_strerror(ret));
+		fail("client: gnutls_session_set_premaster failed: %s\n",
+		     gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -144,13 +145,12 @@ static void client(int fd, int proto, int cipher, int mac)
 			(gnutls_protocol_get_version(session)));
 
 	do {
-		ret = gnutls_record_recv(session, buffer, sizeof(buffer)-1);
+		ret = gnutls_record_recv(session, buffer, sizeof(buffer) - 1);
 	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 	if (ret == 0) {
 		if (debug)
-			success
-			    ("client: Peer has closed the TLS connection\n");
+			success("client: Peer has closed the TLS connection\n");
 		goto end;
 	} else if (ret < 0) {
 		fail("client: Error: %s\n", gnutls_strerror(ret));
@@ -159,7 +159,7 @@ static void client(int fd, int proto, int cipher, int mac)
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
-      end:
+ end:
 
 	close(fd);
 
@@ -169,7 +169,6 @@ static void client(int fd, int proto, int cipher, int mac)
 
 	gnutls_global_deinit();
 }
-
 
 /* These are global */
 pid_t child;
@@ -194,7 +193,8 @@ static void server(int fd, int proto, int cipher, int mac)
 	 */
 	global_init();
 
-	success("testing for %s-%s\n", gnutls_cipher_get_name(cipher), gnutls_mac_get_name(mac));
+	success("testing for %s-%s\n", gnutls_cipher_get_name(cipher),
+		gnutls_mac_get_name(mac));
 
 	if (debug) {
 		gnutls_global_set_log_function(server_log_func);
@@ -215,11 +215,12 @@ static void server(int fd, int proto, int cipher, int mac)
 				   NULL);
 
 	ret = gnutls_session_set_premaster(session, GNUTLS_SERVER,
-		proto, GNUTLS_KX_RSA,
-		cipher, mac,
-		GNUTLS_COMP_NULL, &master, &sess_id);
+					   proto, GNUTLS_KX_RSA,
+					   cipher, mac,
+					   GNUTLS_COMP_NULL, &master, &sess_id);
 	if (ret < 0) {
-		fail("server: gnutls_session_set_premaster failed: %s\n", gnutls_strerror(ret));
+		fail("server: gnutls_session_set_premaster failed: %s\n",
+		     gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -252,7 +253,7 @@ static void server(int fd, int proto, int cipher, int mac)
 
 	memset(buffer, 1, sizeof(buffer));
 	do {
-		ret = gnutls_record_send(session, buffer, sizeof(buffer)-1);
+		ret = gnutls_record_send(session, buffer, sizeof(buffer) - 1);
 	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 	if (ret < 0) {
@@ -262,7 +263,6 @@ static void server(int fd, int proto, int cipher, int mac)
 		     gnutls_strerror(ret));
 		terminate();
 	}
-
 
 	/* do not wait for the peer to close the connection.
 	 */

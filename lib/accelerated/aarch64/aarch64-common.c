@@ -30,7 +30,7 @@
 #include <gnutls/crypto.h>
 #include "errors.h"
 #ifdef HAVE_LIBNETTLE
-# include <nettle/aes.h>		/* for key generation in 192 and 256 bits */
+# include <nettle/aes.h>	/* for key generation in 192 and 256 bits */
 # include "sha-aarch64.h"
 # include "aes-aarch64.h"
 #endif
@@ -54,7 +54,6 @@ __hidden
 #endif
 unsigned int _gnutls_arm_cpuid_s = 0;
 
-
 /* Our internal bit-string for cpu capabilities. Should be set
  * in GNUTLS_CPUID_OVERRIDE */
 #define EMPTY_SET 1
@@ -71,13 +70,13 @@ static void capabilities_to_cpuid(unsigned capabilities)
 
 /* Correspond to asm/hwcap.h for aarch64 */
 #ifdef USE_AUXVAL
-#define HWCAP_ASIMD  (1 << 1)
-#define HWCAP_AES    (1 << 3)
-#define HWCAP_PMULL  (1 << 4)
-#define HWCAP_SHA1   (1 << 5)
-#define HWCAP_SHA2   (1 << 6)
-#define HWCAP_SHA3   (1 << 17)
-#define HWCAP_SHA512 (1 << 21)
+# define HWCAP_ASIMD  (1 << 1)
+# define HWCAP_AES    (1 << 3)
+# define HWCAP_PMULL  (1 << 4)
+# define HWCAP_SHA1   (1 << 5)
+# define HWCAP_SHA2   (1 << 6)
+# define HWCAP_SHA3   (1 << 17)
+# define HWCAP_SHA512 (1 << 21)
 #endif
 
 static void discover_caps(unsigned int *caps)
@@ -136,7 +135,8 @@ void _register_aarch64_crypto(unsigned capabilities)
 		ret =
 		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA1,
 							 80,
-							 &_gnutls_sha_aarch64, 0);
+							 &_gnutls_sha_aarch64,
+							 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
@@ -155,7 +155,8 @@ void _register_aarch64_crypto(unsigned capabilities)
 		ret =
 		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA224,
 							 80,
-							 &_gnutls_sha_aarch64, 0);
+							 &_gnutls_sha_aarch64,
+							 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
@@ -170,7 +171,8 @@ void _register_aarch64_crypto(unsigned capabilities)
 		ret =
 		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA256,
 							 80,
-							 &_gnutls_sha_aarch64, 0);
+							 &_gnutls_sha_aarch64,
+							 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
@@ -185,7 +187,8 @@ void _register_aarch64_crypto(unsigned capabilities)
 		ret =
 		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA384,
 							 80,
-							 &_gnutls_sha_aarch64, 0);
+							 &_gnutls_sha_aarch64,
+							 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
@@ -200,7 +203,8 @@ void _register_aarch64_crypto(unsigned capabilities)
 		ret =
 		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA512,
 							 80,
-							 &_gnutls_sha_aarch64, 0);
+							 &_gnutls_sha_aarch64,
+							 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
@@ -224,16 +228,16 @@ void _register_aarch64_crypto(unsigned capabilities)
 			    (GNUTLS_CIPHER_AES_128_GCM, 90,
 			     &_gnutls_aes_gcm_aarch64, 0);
 			if (ret < 0) {
-					gnutls_assert();
-				}
+				gnutls_assert();
+			}
 
 			ret =
 			    gnutls_crypto_single_cipher_register
 			    (GNUTLS_CIPHER_AES_192_GCM, 90,
 			     &_gnutls_aes_gcm_aarch64, 0);
 			if (ret < 0) {
-					gnutls_assert();
-				}
+				gnutls_assert();
+			}
 
 			ret =
 			    gnutls_crypto_single_cipher_register
@@ -246,28 +250,32 @@ void _register_aarch64_crypto(unsigned capabilities)
 
 		ret =
 		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_128_CBC, 90, &_gnutls_aes_cbc_aarch64, 0);
+		    (GNUTLS_CIPHER_AES_128_CBC, 90, &_gnutls_aes_cbc_aarch64,
+		     0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
 		ret =
 		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_256_CBC, 90, &_gnutls_aes_cbc_aarch64, 0);
+		    (GNUTLS_CIPHER_AES_256_CBC, 90, &_gnutls_aes_cbc_aarch64,
+		     0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
 		ret =
 		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_128_CCM, 90, &_gnutls_aes_ccm_aarch64, 0);
+		    (GNUTLS_CIPHER_AES_128_CCM, 90, &_gnutls_aes_ccm_aarch64,
+		     0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
 		ret =
 		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_256_CCM, 90, &_gnutls_aes_ccm_aarch64, 0);
+		    (GNUTLS_CIPHER_AES_256_CCM, 90, &_gnutls_aes_ccm_aarch64,
+		     0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
@@ -275,7 +283,6 @@ void _register_aarch64_crypto(unsigned capabilities)
 
 	return;
 }
-
 
 void register_aarch64_crypto(void)
 {
@@ -288,4 +295,3 @@ void register_aarch64_crypto(void)
 
 	_register_aarch64_crypto(capabilities);
 }
-

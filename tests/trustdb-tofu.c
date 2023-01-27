@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -31,7 +31,6 @@
 #include <unistd.h>
 #include "utils.h"
 #include "cert-common.h"
-
 
 /* This will test whether the default public key storage backend
  * is operating properly */
@@ -75,8 +74,7 @@ static char client_pem[] =
     "jpfc/3X7sLUsMvumcDE01ls/cG5mIatmiyEU9qI3jbgUf82z23ON/acwJf875D3/\n"
     "U7jyOsBJ44SEQITbin2yUeJMIm1tievvdNXBDfW95AM507ShzP12sfiJkJfjjdhy\n"
     "dc8Siq5JojruiMizAf0pA7in\n" "-----END CERTIFICATE-----\n";
-const gnutls_datum_t client_cert =
-    { (void *) client_pem, sizeof(client_pem) };
+const gnutls_datum_t client_cert = { (void *)client_pem, sizeof(client_pem) };
 
 #define TMP_FILE "mini-tdb.tmp"
 #define HOSTS_DIR ".gnutls/"
@@ -93,7 +91,7 @@ void doit(void)
 	char path[512];
 
 	/* the sha1 hash of the server's pubkey */
-	hash.data = (void *) SHA1_HASH;
+	hash.data = (void *)SHA1_HASH;
 	hash.size = sizeof(SHA1_HASH) - 1;
 
 	/* General init. */
@@ -118,7 +116,6 @@ void doit(void)
 		fail("base64 decoding\n");
 		goto fail;
 	}
-
 	// Raw public keys
 	ret =
 	    gnutls_pem_base64_decode_alloc("PUBLIC KEY", &rawpk_public_key1,
@@ -141,7 +138,8 @@ void doit(void)
 
 	/* verify whether the stored hash verification succeeds */
 	ret = gnutls_store_commitment(TMP_FILE, NULL, "localhost", "https",
-				      GNUTLS_DIG_SHA1, &hash, 0, GNUTLS_SCOMMIT_FLAG_ALLOW_BROKEN);
+				      GNUTLS_DIG_SHA1, &hash, 0,
+				      GNUTLS_SCOMMIT_FLAG_ALLOW_BROKEN);
 	if (ret != 0) {
 		fail("commitment storage: %s\n", gnutls_strerror(ret));
 		goto fail;
@@ -152,13 +150,11 @@ void doit(void)
 
 	ret =
 	    gnutls_verify_stored_pubkey(TMP_FILE, NULL, "localhost",
-					"https", GNUTLS_CRT_X509,
-					&der_cert, 0);
+					"https", GNUTLS_CRT_X509, &der_cert, 0);
 	remove(TMP_FILE);
 
 	if (ret != 0) {
-		fail("commitment verification: %s\n",
-		     gnutls_strerror(ret));
+		fail("commitment verification: %s\n", gnutls_strerror(ret));
 		goto fail;
 	}
 
@@ -171,7 +167,8 @@ void doit(void)
 
 	/* verify whether the stored hash verification succeeds */
 	ret = gnutls_store_commitment(NULL, NULL, "localhost", "https",
-				      GNUTLS_DIG_SHA1, &hash, 0, GNUTLS_SCOMMIT_FLAG_ALLOW_BROKEN);
+				      GNUTLS_DIG_SHA1, &hash, 0,
+				      GNUTLS_SCOMMIT_FLAG_ALLOW_BROKEN);
 	if (ret != 0) {
 		fail("commitment storage: %s\n", gnutls_strerror(ret));
 		goto fail;
@@ -182,12 +179,10 @@ void doit(void)
 
 	ret =
 	    gnutls_verify_stored_pubkey(NULL, NULL, "localhost",
-					"https", GNUTLS_CRT_X509,
-					&der_cert, 0);
+					"https", GNUTLS_CRT_X509, &der_cert, 0);
 
 	if (ret != 0) {
-		fail("commitment verification: %s\n",
-		     gnutls_strerror(ret));
+		fail("commitment verification: %s\n", gnutls_strerror(ret));
 		goto fail;
 	}
 
@@ -209,10 +204,10 @@ void doit(void)
 
 	ret =
 	    gnutls_verify_stored_pubkey(TMP_FILE, NULL, "localhost",
-					"https", GNUTLS_CRT_X509,
-					&der_cert, 0);
+					"https", GNUTLS_CRT_X509, &der_cert, 0);
 	if (ret != 0) {
-		fail("pubkey verification (from cert): %s\n", gnutls_strerror(ret));
+		fail("pubkey verification (from cert): %s\n",
+		     gnutls_strerror(ret));
 		goto fail;
 	}
 
@@ -225,8 +220,7 @@ void doit(void)
 		goto fail;
 	}
 	if (ret != GNUTLS_E_CERTIFICATE_KEY_MISMATCH) {
-		fail("Wrong error code returned: %s!\n",
-		     gnutls_strerror(ret));
+		fail("Wrong error code returned: %s!\n", gnutls_strerror(ret));
 		goto fail;
 	}
 
@@ -249,7 +243,8 @@ void doit(void)
 					"https", GNUTLS_CRT_RAWPK,
 					&der_rawpk, 0);
 	if (ret != 0) {
-		fail("pubkey verification (from raw pk): %s\n", gnutls_strerror(ret));
+		fail("pubkey verification (from raw pk): %s\n",
+		     gnutls_strerror(ret));
 		goto fail;
 	}
 
@@ -262,8 +257,7 @@ void doit(void)
 		goto fail;
 	}
 	if (ret != GNUTLS_E_CERTIFICATE_KEY_MISMATCH) {
-		fail("Wrong error code returned: %s!\n",
-		     gnutls_strerror(ret));
+		fail("Wrong error code returned: %s!\n", gnutls_strerror(ret));
 		goto fail;
 	}
 
@@ -281,7 +275,7 @@ void doit(void)
 	gnutls_free(der_rawpk2.data);
 
 	return;
-      fail:
+ fail:
 	remove(HOSTS_FILE);
 	remove(TMP_FILE);
 	rmdir(HOSTS_DIR);

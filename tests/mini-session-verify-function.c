@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -55,14 +55,14 @@ static int server_callback(gnutls_session_t session)
 		if (gnutls_handshake_get_last_in(session) !=
 		    GNUTLS_HANDSHAKE_CERTIFICATE_PKT) {
 			fail("client's last input message was unexpected: %s\n",
-			     gnutls_handshake_description_get_name(gnutls_handshake_get_last_in(session)));
+			     gnutls_handshake_description_get_name
+			     (gnutls_handshake_get_last_in(session)));
 			exit(1);
 		}
 
 		if (gnutls_handshake_get_last_out(session) !=
 		    GNUTLS_HANDSHAKE_SERVER_HELLO_DONE) {
-			fail("client's last output message was unexpected: %s\n",
-			     gnutls_handshake_description_get_name(gnutls_handshake_get_last_out(session)));
+			fail("client's last output message was unexpected: %s\n", gnutls_handshake_description_get_name(gnutls_handshake_get_last_out(session)));
 			exit(1);
 		}
 	}
@@ -140,9 +140,8 @@ void test_success1(const char *prio)
 					    &server_cert, &server_key,
 					    GNUTLS_X509_FMT_PEM);
 	gnutls_init(&server, GNUTLS_SERVER);
-	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-				serverx509cred);
-	assert(gnutls_priority_set_direct(server, prio, NULL)>=0);
+	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, serverx509cred);
+	assert(gnutls_priority_set_direct(server, prio, NULL) >= 0);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
@@ -152,14 +151,12 @@ void test_success1(const char *prio)
 	/* Init client */
 	gnutls_certificate_allocate_credentials(&clientx509cred);
 	gnutls_init(&client, GNUTLS_CLIENT);
-	gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-				clientx509cred);
+	gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE, clientx509cred);
 	gnutls_priority_set_direct(client, prio, NULL);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
-	gnutls_session_set_verify_function(client,
-						client_callback);
+	gnutls_session_set_verify_function(client, client_callback);
 
 	HANDSHAKE(client, server);
 
@@ -206,9 +203,8 @@ void test_failure_client(const char *prio)
 					    &server_cert, &server_key,
 					    GNUTLS_X509_FMT_PEM);
 	gnutls_init(&server, GNUTLS_SERVER);
-	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-				serverx509cred);
-	assert(gnutls_priority_set_direct(server, prio, NULL)>=0);
+	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, serverx509cred);
+	assert(gnutls_priority_set_direct(server, prio, NULL) >= 0);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
@@ -218,16 +214,15 @@ void test_failure_client(const char *prio)
 	/* Init client */
 	gnutls_certificate_allocate_credentials(&clientx509cred);
 	gnutls_init(&client, GNUTLS_CLIENT);
-	gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-				clientx509cred);
+	gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE, clientx509cred);
 	gnutls_priority_set_direct(client, prio, NULL);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
-	gnutls_session_set_verify_function(client,
-						client_callback);
+	gnutls_session_set_verify_function(client, client_callback);
 
-	HANDSHAKE_EXPECT(client, server, GNUTLS_E_CERTIFICATE_ERROR, GNUTLS_E_AGAIN);
+	HANDSHAKE_EXPECT(client, server, GNUTLS_E_CERTIFICATE_ERROR,
+			 GNUTLS_E_AGAIN);
 
 	gnutls_deinit(client);
 	gnutls_deinit(server);
@@ -236,7 +231,8 @@ void test_failure_client(const char *prio)
 	gnutls_certificate_free_credentials(clientx509cred);
 
 	if (client_ok == 0)
-		fail("%s: certificate verify callback wasn't called\n", __func__);
+		fail("%s: certificate verify callback wasn't called\n",
+		     __func__);
 }
 
 static
@@ -266,9 +262,8 @@ void test_failure_server(const char *prio)
 					    &server_cert, &server_key,
 					    GNUTLS_X509_FMT_PEM);
 	gnutls_init(&server, GNUTLS_SERVER);
-	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-				serverx509cred);
-	assert(gnutls_priority_set_direct(server, prio, NULL)>=0);
+	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, serverx509cred);
+	assert(gnutls_priority_set_direct(server, prio, NULL) >= 0);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
@@ -278,8 +273,7 @@ void test_failure_server(const char *prio)
 	/* Init client */
 	gnutls_certificate_allocate_credentials(&clientx509cred);
 	gnutls_init(&client, GNUTLS_CLIENT);
-	gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-				clientx509cred);
+	gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE, clientx509cred);
 	gnutls_priority_set_direct(client, prio, NULL);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
@@ -295,7 +289,8 @@ void test_failure_server(const char *prio)
 	gnutls_certificate_free_credentials(clientx509cred);
 
 	if (server_ok == 0)
-		fail("%s: certificate verify callback wasn't called\n", __func__);
+		fail("%s: certificate verify callback wasn't called\n",
+		     __func__);
 }
 
 static void start(const char *prio)

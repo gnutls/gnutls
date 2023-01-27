@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -60,8 +60,7 @@ static void try(const char *prio, unsigned expect, unsigned ca_type)
 	/* Server stuff. */
 	gnutls_certificate_credentials_t serverx509cred;
 	gnutls_dh_params_t dh_params;
-	const gnutls_datum_t p3 =
-	    { (unsigned char *) pkcs3, strlen(pkcs3) };
+	const gnutls_datum_t p3 = { (unsigned char *)pkcs3, strlen(pkcs3) };
 	gnutls_session_t server;
 	int sret = GNUTLS_E_AGAIN;
 	/* Client stuff. */
@@ -78,7 +77,8 @@ static void try(const char *prio, unsigned expect, unsigned ca_type)
 	/* Init server */
 	gnutls_certificate_allocate_credentials(&serverx509cred);
 	gnutls_certificate_set_x509_key_mem(serverx509cred,
-					    &server_ca3_cert_chain, &server_ca3_key,
+					    &server_ca3_cert_chain,
+					    &server_ca3_key,
 					    GNUTLS_X509_FMT_PEM);
 
 	gnutls_dh_params_init(&dh_params);
@@ -89,21 +89,25 @@ static void try(const char *prio, unsigned expect, unsigned ca_type)
 	gnutls_certificate_server_set_request(server, GNUTLS_CERT_REQUEST);
 
 	if (ca_type == CORRECT_CA) {
-		ret = gnutls_certificate_set_x509_trust_mem(serverx509cred, &ca3_cert, GNUTLS_X509_FMT_PEM);
+		ret =
+		    gnutls_certificate_set_x509_trust_mem(serverx509cred,
+							  &ca3_cert,
+							  GNUTLS_X509_FMT_PEM);
 	} else if (ca_type == INCORRECT_CA || ca_type == INCORRECT_CA_FORCE) {
-		ret = gnutls_certificate_set_x509_trust_mem(serverx509cred, &unknown_ca_cert, GNUTLS_X509_FMT_PEM);
+		ret =
+		    gnutls_certificate_set_x509_trust_mem(serverx509cred,
+							  &unknown_ca_cert,
+							  GNUTLS_X509_FMT_PEM);
 	} else if (ca_type == NO_CA) {
 		ret = 0;
 	} else {
 		abort();
 	}
-		ret = 0;
+	ret = 0;
 	if (ret < 0)
 		exit(1);
 
-
-	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-				serverx509cred);
+	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, serverx509cred);
 
 	assert(gnutls_priority_set_direct(server, prio, NULL) >= 0);
 	gnutls_transport_set_push_function(server, server_push);
@@ -117,13 +121,15 @@ static void try(const char *prio, unsigned expect, unsigned ca_type)
 		exit(1);
 
 	ret = gnutls_certificate_set_x509_key_mem(clientx509cred,
-						  &cli_ca3_cert_chain, &cli_ca3_key,
+						  &cli_ca3_cert_chain,
+						  &cli_ca3_key,
 						  GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);
 
-
-	ret = gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca3_cert, GNUTLS_X509_FMT_PEM);
+	ret =
+	    gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca3_cert,
+						  GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);
 
@@ -131,12 +137,12 @@ static void try(const char *prio, unsigned expect, unsigned ca_type)
 		flags |= GNUTLS_FORCE_CLIENT_CERT;
 	}
 
-	ret = gnutls_init(&client, GNUTLS_CLIENT|flags);
+	ret = gnutls_init(&client, GNUTLS_CLIENT | flags);
 	if (ret < 0)
 		exit(1);
 
 	ret = gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-				clientx509cred);
+				     clientx509cred);
 	if (ret < 0)
 		exit(1);
 
@@ -148,13 +154,15 @@ static void try(const char *prio, unsigned expect, unsigned ca_type)
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
 
-	success("Testing CA type %d, expecting %s\n", ca_type, expect==SENT?"sent":"not sent");
+	success("Testing CA type %d, expecting %s\n", ca_type,
+		expect == SENT ? "sent" : "not sent");
 
 	HANDSHAKE(client, server);
 
 	if (expect == SENT) {
 		if (gnutls_certificate_get_ours(client) == NULL) {
-			fail("Test %d: client didn't send any certificate\n", ca_type);
+			fail("Test %d: client didn't send any certificate\n",
+			     ca_type);
 			exit(1);
 		}
 	} else {

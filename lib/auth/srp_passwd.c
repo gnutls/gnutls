@@ -26,23 +26,23 @@
 
 #ifdef ENABLE_SRP
 
-#include "x509_b64.h"
-#include "errors.h"
-#include <auth/srp_passwd.h>
-#include <auth/srp_kx.h>
-#include "auth.h"
-#include "srp.h"
-#include "dh.h"
-#include "debug.h"
-#include <str.h>
-#include <datum.h>
-#include <num.h>
-#include <random.h>
-#include <algorithms.h>
+# include "x509_b64.h"
+# include "errors.h"
+# include <auth/srp_passwd.h>
+# include <auth/srp_kx.h>
+# include "auth.h"
+# include "srp.h"
+# include "dh.h"
+# include "debug.h"
+# include <str.h>
+# include <datum.h>
+# include <num.h>
+# include <random.h>
+# include <algorithms.h>
 
 static int _randomize_pwd_entry(SRP_PWD_ENTRY * entry,
 				gnutls_srp_server_credentials_t cred,
-				const char * username);
+				const char *username);
 
 /* this function parses tpasswd.conf file. Format is:
  * string(username):base64(v):base64(salt):int(index)
@@ -82,8 +82,7 @@ static int parse_tpasswd_values(SRP_PWD_ENTRY * entry, char *str)
 
 	len = strlen(p);
 
-	entry->salt.size =
-	    _gnutls_sbase64_decode(p, len, &entry->salt.data);
+	entry->salt.size = _gnutls_sbase64_decode(p, len, &entry->salt.data);
 
 	if (entry->salt.size <= 0) {
 		gnutls_assert();
@@ -125,7 +124,6 @@ static int parse_tpasswd_values(SRP_PWD_ENTRY * entry, char *str)
 
 	return indx;
 }
-
 
 /* this function parses tpasswd.conf file. Format is:
  * int(index):base64(n):int(g)
@@ -186,12 +184,10 @@ static int parse_tpasswd_conf_values(SRP_PWD_ENTRY * entry, char *str)
 	return 0;
 }
 
-
 /* this function opens the tpasswd.conf file and reads the g and n
  * values. They are put in the entry.
  */
-static int
-pwd_read_conf(const char *pconf_file, SRP_PWD_ENTRY * entry, int idx)
+static int pwd_read_conf(const char *pconf_file, SRP_PWD_ENTRY * entry, int idx)
 {
 	FILE *fp;
 	char *line = NULL;
@@ -200,7 +196,7 @@ pwd_read_conf(const char *pconf_file, SRP_PWD_ENTRY * entry, int idx)
 	char indexstr[10];
 	int ret;
 
-	snprintf(indexstr, sizeof(indexstr), "%u", (unsigned int) idx);
+	snprintf(indexstr, sizeof(indexstr), "%u", (unsigned int)idx);
 
 	fp = fopen(pconf_file, "re");
 	if (fp == NULL) {
@@ -229,7 +225,7 @@ pwd_read_conf(const char *pconf_file, SRP_PWD_ENTRY * entry, int idx)
 	}
 	ret = GNUTLS_E_SRP_PWD_ERROR;
 
-cleanup:
+ cleanup:
 	zeroize_key(line, line_size);
 	free(line);
 	fclose(fp);
@@ -274,7 +270,8 @@ _gnutls_srp_pwd_read_entry(gnutls_session_t state, char *username,
 
 		if (ret == 1) {	/* the user does not exist */
 			if (entry->g.size != 0 && entry->n.size != 0) {
-				ret = _randomize_pwd_entry(entry, cred, username);
+				ret =
+				    _randomize_pwd_entry(entry, cred, username);
 				if (ret < 0) {
 					gnutls_assert();
 					goto cleanup;
@@ -361,11 +358,11 @@ _gnutls_srp_pwd_read_entry(gnutls_session_t state, char *username,
 
 	ret = GNUTLS_E_SRP_PWD_ERROR;
 
-cleanup:
+ cleanup:
 	gnutls_assert();
 	_gnutls_srp_entry_free(entry);
 
-found:
+ found:
 	if (line) {
 		zeroize_key(line, line_size);
 		free(line);
@@ -381,7 +378,7 @@ found:
  */
 static int _randomize_pwd_entry(SRP_PWD_ENTRY * entry,
 				gnutls_srp_server_credentials_t sc,
-				const char * username)
+				const char *username)
 {
 	int ret;
 	const mac_entry_st *me = mac_to_entry(SRP_FAKE_SALT_MAC);

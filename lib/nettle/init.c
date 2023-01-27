@@ -25,23 +25,23 @@
 #include "errors.h"
 #include <num.h>
 #include <mpi.h>
-#include <nettle/bignum.h> /* includes gmp.h */
+#include <nettle/bignum.h>	/* includes gmp.h */
 
 static void gnutls_free_zero(void *data, size_t size);
 static void *gnutls_realloc_zero(void *data, size_t old_size, size_t new_size);
 
-static void *(*allocfunc) (size_t);
-static void *(*reallocfunc) (void *, size_t, size_t);
-static void (*freefunc) (void *, size_t);
+static void *(*allocfunc)(size_t);
+static void *(*reallocfunc)(void *, size_t, size_t);
+static void (*freefunc)(void *, size_t);
 
 /* Functions that refer to the initialization of the nettle library.
  */
 
 int gnutls_crypto_init(void)
 {
-	void *(*defallocfunc) (size_t);
-	void *(*defreallocfunc) (void *, size_t, size_t);
-	void (*deffreefunc) (void *, size_t);
+	void *(*defallocfunc)(size_t);
+	void *(*defreallocfunc)(void *, size_t, size_t);
+	void (*deffreefunc)(void *, size_t);
 
 	/* Check if non-default allocators are being used.
 	 * Some applications like guile override GMP allocators

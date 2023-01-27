@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -37,17 +37,17 @@ int main(void)
 
 #else
 
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/dtls.h>
-#include <signal.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/dtls.h>
+# include <signal.h>
 
-#include "utils.h"
+# include "utils.h"
 
 /* This program tests whether the handshake timeout value is enforced.
  */
@@ -83,7 +83,9 @@ static void client(int fd, int tmo_ms)
 	gnutls_handshake_set_timeout(session, tmo_ms);
 
 	/* Use default priorities */
-	gnutls_priority_set_direct(session, "NORMAL:+ANON-ECDH:-VERS-ALL:+VERS-TLS1.2", NULL);
+	gnutls_priority_set_direct(session,
+				   "NORMAL:+ANON-ECDH:-VERS-ALL:+VERS-TLS1.2",
+				   NULL);
 
 	/* put the anonymous credentials to the current session
 	 */
@@ -145,7 +147,9 @@ static void server(int fd, int tmo_ms)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_priority_set_direct(session, "NORMAL:+ANON-ECDH:-VERS-ALL:+VERS-TLS1.2", NULL);
+	gnutls_priority_set_direct(session,
+				   "NORMAL:+ANON-ECDH:-VERS-ALL:+VERS-TLS1.2",
+				   NULL);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
 
@@ -155,8 +159,7 @@ static void server(int fd, int tmo_ms)
 		char buf[32];
 
 		// read until client closes connection
-		while (read(fd, buf, sizeof(buf)) > 0)
-			;
+		while (read(fd, buf, sizeof(buf)) > 0) ;
 	} else {
 		do {
 			ret = gnutls_handshake(session);

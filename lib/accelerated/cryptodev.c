@@ -28,18 +28,18 @@
 
 #ifdef ENABLE_CRYPTODEV
 
-#include <assert.h>
-#include <fcntl.h>
-#include <sys/ioctl.h>
-#include <crypto/cryptodev.h>
+# include <assert.h>
+# include <fcntl.h>
+# include <sys/ioctl.h>
+# include <crypto/cryptodev.h>
 
-#ifndef CRYPTO_CIPHER_MAX_KEY_LEN
-#define CRYPTO_CIPHER_MAX_KEY_LEN 64
-#endif
+# ifndef CRYPTO_CIPHER_MAX_KEY_LEN
+#  define CRYPTO_CIPHER_MAX_KEY_LEN 64
+# endif
 
-#ifndef EALG_MAX_BLOCK_LEN
-#define EALG_MAX_BLOCK_LEN 16
-#endif
+# ifndef EALG_MAX_BLOCK_LEN
+#  define EALG_MAX_BLOCK_LEN 16
+# endif
 
 int _gnutls_cryptodev_fd = -1;
 
@@ -65,8 +65,7 @@ static const int gnutls_cipher_map[] = {
 };
 
 static int
-cryptodev_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx,
-		      int enc)
+cryptodev_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx, int enc)
 {
 	struct cryptodev_ctx *ctx;
 	int cipher = gnutls_cipher_map[algorithm];
@@ -86,15 +85,14 @@ cryptodev_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx,
 	return 0;
 }
 
-static int
-cryptodev_cipher_setkey(void *_ctx, const void *key, size_t keysize)
+static int cryptodev_cipher_setkey(void *_ctx, const void *key, size_t keysize)
 {
 	struct cryptodev_ctx *ctx = _ctx;
 
 	CHECK_AES_KEYSIZE(keysize);
 
 	ctx->sess.keylen = keysize;
-	ctx->sess.key = (void *) key;
+	ctx->sess.key = (void *)key;
 
 	if (ioctl(ctx->cfd, CIOCGSESSION, &ctx->sess)) {
 		gnutls_assert();
@@ -123,7 +121,7 @@ cryptodev_encrypt(void *_ctx, const void *src, size_t src_size,
 {
 	struct cryptodev_ctx *ctx = _ctx;
 	ctx->cryp.len = src_size;
-	ctx->cryp.src = (void *) src;
+	ctx->cryp.src = (void *)src;
 	ctx->cryp.dst = dst;
 	ctx->cryp.op = COP_ENCRYPT;
 	ctx->cryp.flags = COP_FLAG_WRITE_IV;
@@ -148,7 +146,7 @@ cryptodev_decrypt(void *_ctx, const void *src, size_t src_size,
 	struct cryptodev_ctx *ctx = _ctx;
 
 	ctx->cryp.len = src_size;
-	ctx->cryp.src = (void *) src;
+	ctx->cryp.src = (void *)src;
 	ctx->cryp.dst = dst;
 	ctx->cryp.op = COP_DECRYPT;
 	ctx->cryp.flags = COP_FLAG_WRITE_IV;
@@ -189,9 +187,9 @@ static int register_crypto(int cfd)
 	uint8_t fake_key[CRYPTO_CIPHER_MAX_KEY_LEN];
 	unsigned int i;
 	int ret;
-#ifdef CIOCGSESSINFO
+# ifdef CIOCGSESSINFO
 	struct session_info_op siop;
-#endif
+# endif
 
 	memset(&sess, 0, sizeof(sess));
 
@@ -209,7 +207,7 @@ static int register_crypto(int cfd)
 		if (ioctl(cfd, CIOCGSESSION, &sess)) {
 			continue;
 		}
-#ifdef CIOCGSESSINFO
+# ifdef CIOCGSESSINFO
 		memset(&siop, 0, sizeof(siop));
 
 		siop.ses = sess.ses;	/* do not register ciphers that are not hw accelerated */
@@ -219,7 +217,7 @@ static int register_crypto(int cfd)
 				continue;
 			}
 		}
-#endif
+# endif
 
 		ioctl(cfd, CIOCFSESSION, &sess.ses);
 
@@ -235,11 +233,11 @@ static int register_crypto(int cfd)
 
 	}
 
-#ifdef CIOCAUTHCRYPT
+# ifdef CIOCAUTHCRYPT
 	return _cryptodev_register_gcm_crypto(cfd);
-#else
+# else
 	return 0;
-#endif
+# endif
 }
 
 int _gnutls_cryptodev_init(void)
@@ -252,7 +250,7 @@ int _gnutls_cryptodev_init(void)
 		gnutls_assert();
 		return GNUTLS_E_CRYPTODEV_DEVICE_ERROR;
 	}
-#ifndef CRIOGET_NOT_NEEDED
+# ifndef CRIOGET_NOT_NEEDED
 	{
 		int cfd = -1;
 		/* Clone file descriptor */
@@ -270,7 +268,7 @@ int _gnutls_cryptodev_init(void)
 		close(_gnutls_cryptodev_fd);
 		_gnutls_cryptodev_fd = cfd;
 	}
-#endif
+# endif
 
 	ret = register_crypto(_gnutls_cryptodev_fd);
 	if (ret < 0)
@@ -300,7 +298,7 @@ void _gnutls_cryptodev_deinit(void)
 
 /* if we are using linux /dev/crypto
  */
-#if defined(COP_FLAG_UPDATE) && defined(COP_FLAG_RESET)
+# if defined(COP_FLAG_UPDATE) && defined(COP_FLAG_RESET)
 
 static const int gnutls_mac_map[] = {
 	[GNUTLS_MAC_MD5] = CRYPTO_MD5_HMAC,
@@ -326,7 +324,7 @@ cryptodev_mac_fast(gnutls_mac_algorithm_t algo,
 	ctx.sess.mac = gnutls_mac_map[algo];
 
 	ctx.sess.mackeylen = key_size;
-	ctx.sess.mackey = (void *) key;
+	ctx.sess.mackey = (void *)key;
 
 	if (ioctl(ctx.cfd, CIOCGSESSION, &ctx.sess))
 		return gnutls_assert_val(GNUTLS_E_CRYPTODEV_IOCTL_ERROR);
@@ -334,7 +332,7 @@ cryptodev_mac_fast(gnutls_mac_algorithm_t algo,
 	ctx.cryp.ses = ctx.sess.ses;
 
 	ctx.cryp.len = text_size;
-	ctx.cryp.src = (void *) text;
+	ctx.cryp.src = (void *)text;
 	ctx.cryp.dst = NULL;
 	ctx.cryp.op = COP_ENCRYPT;
 	ctx.cryp.mac = digest;
@@ -348,7 +346,7 @@ cryptodev_mac_fast(gnutls_mac_algorithm_t algo,
 	return 0;
 }
 
-#define cryptodev_mac_deinit cryptodev_deinit
+#  define cryptodev_mac_deinit cryptodev_deinit
 
 static const gnutls_crypto_mac_st mac_struct = {
 	.init = NULL,
@@ -387,7 +385,7 @@ cryptodev_digest_fast(gnutls_digest_algorithm_t algo,
 	ctx.cryp.ses = ctx.sess.ses;
 
 	ctx.cryp.len = text_size;
-	ctx.cryp.src = (void *) text;
+	ctx.cryp.src = (void *)text;
 	ctx.cryp.dst = NULL;
 	ctx.cryp.op = COP_ENCRYPT;
 	ctx.cryp.mac = digest;
@@ -415,13 +413,12 @@ static int register_mac_digest(int cfd)
 	uint8_t fake_key[CRYPTO_CIPHER_MAX_KEY_LEN];
 	unsigned int i;
 	int ret;
-#ifdef CIOCGSESSINFO
+#  ifdef CIOCGSESSINFO
 	struct session_info_op siop;
-#endif
+#  endif
 
 	memset(&sess, 0, sizeof(sess));
-	for (i = 0; i < sizeof(gnutls_mac_map) / sizeof(gnutls_mac_map[0]);
-	     i++) {
+	for (i = 0; i < sizeof(gnutls_mac_map) / sizeof(gnutls_mac_map[0]); i++) {
 		if (gnutls_mac_map[i] == 0)
 			continue;
 
@@ -432,7 +429,7 @@ static int register_mac_digest(int cfd)
 		if (ioctl(cfd, CIOCGSESSION, &sess)) {
 			continue;
 		}
-#ifdef CIOCGSESSINFO
+#  ifdef CIOCGSESSINFO
 		memset(&siop, 0, sizeof(siop));
 
 		siop.ses = sess.ses;	/* do not register ciphers that are not hw accelerated */
@@ -442,14 +439,13 @@ static int register_mac_digest(int cfd)
 				continue;
 			}
 		}
-#endif
+#  endif
 		_gnutls_debug_log("/dev/crypto: registering: HMAC-%s\n",
 				  gnutls_mac_get_name(i));
 
 		ioctl(cfd, CIOCFSESSION, &sess.ses);
 
-		ret =
-		    gnutls_crypto_single_mac_register(i, 90, &mac_struct, 0);
+		ret = gnutls_crypto_single_mac_register(i, 90, &mac_struct, 0);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
@@ -468,7 +464,7 @@ static int register_mac_digest(int cfd)
 		if (ioctl(cfd, CIOCGSESSION, &sess)) {
 			continue;
 		}
-#ifdef CIOCGSESSINFO
+#  ifdef CIOCGSESSINFO
 		memset(&siop, 0, sizeof(siop));
 
 		siop.ses = sess.ses;
@@ -478,7 +474,7 @@ static int register_mac_digest(int cfd)
 				continue;
 			}
 		}
-#endif
+#  endif
 
 		ioctl(cfd, CIOCFSESSION, &sess.ses);
 
@@ -496,13 +492,13 @@ static int register_mac_digest(int cfd)
 	return 0;
 }
 
-#else
+# else
 static int register_mac_digest(int cfd)
 {
 	return 0;
 }
 
-#endif				/* defined(COP_FLAG_UPDATE) */
+# endif				/* defined(COP_FLAG_UPDATE) */
 
 #else				/* ENABLE_CRYPTODEV */
 int _gnutls_cryptodev_init(void)

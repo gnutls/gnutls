@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -36,17 +36,17 @@ int main(void)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <assert.h>
-#include <gnutls/gnutls.h>
+# include <string.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <assert.h>
+# include <gnutls/gnutls.h>
 
-#include "utils.h"
+# include "utils.h"
 
 static void terminate(void);
 
@@ -104,8 +104,8 @@ const gnutls_datum_t server_key = { server_key_pem,
 	sizeof(server_key_pem)
 };
 
-
-static void client(int fd, const char *prio, const char *user, const char *pass, int exp_err)
+static void client(int fd, const char *prio, const char *user, const char *pass,
+		   int exp_err)
 {
 	int ret;
 	gnutls_session_t session;
@@ -130,7 +130,7 @@ static void client(int fd, const char *prio, const char *user, const char *pass,
 	gnutls_init(&session, GNUTLS_CLIENT);
 
 	/* Use default priorities */
-	assert(gnutls_priority_set_direct(session, prio, NULL)>=0);
+	assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);
 	gnutls_handshake_set_timeout(session, get_timeout());
 
 	/* put the anonymous credentials to the current session
@@ -179,7 +179,6 @@ static void client(int fd, const char *prio, const char *user, const char *pass,
 	gnutls_global_deinit();
 }
 
-
 /* These are global */
 pid_t child;
 
@@ -210,23 +209,22 @@ static void server(int fd, const char *prio)
 
 	gnutls_srp_allocate_server_credentials(&s_srp_cred);
 	gnutls_srp_set_server_credentials_file(s_srp_cred, "tpasswd",
-						"tpasswd.conf");
+					       "tpasswd.conf");
 
 	gnutls_certificate_allocate_credentials(&s_x509_cred);
 	gnutls_certificate_set_x509_key_mem(s_x509_cred,
 					    &server_cert, &server_key,
 					    GNUTLS_X509_FMT_PEM);
 
-	assert(gnutls_init(&session, GNUTLS_SERVER)>=0);
+	assert(gnutls_init(&session, GNUTLS_SERVER) >= 0);
 
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	assert(gnutls_priority_set_direct(session, prio, NULL)>=0);
+	assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_SRP, s_srp_cred);
-	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
-				s_x509_cred);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, s_x509_cred);
 
 	gnutls_transport_set_int(session, fd);
 	gnutls_handshake_set_timeout(session, get_timeout());
@@ -253,7 +251,8 @@ static void server(int fd, const char *prio)
 	kx = gnutls_kx_get(session);
 	if (kx != GNUTLS_KX_SRP && kx != GNUTLS_KX_SRP_RSA &&
 	    kx != GNUTLS_KX_SRP_DSS)
-		fail("server: unexpected key exchange: %s\n", gnutls_kx_get_name(kx));
+		fail("server: unexpected key exchange: %s\n",
+		     gnutls_kx_get_name(kx));
 
 	/* do not wait for the peer to close the connection.
 	 */
@@ -271,7 +270,8 @@ static void server(int fd, const char *prio)
 		success("server: finished\n");
 }
 
-static void start(const char *name, const char *prio, const char *user, const char *pass, int exp_err)
+static void start(const char *name, const char *prio, const char *user,
+		  const char *pass, int exp_err)
 {
 	int fd[2];
 	int ret;
@@ -345,18 +345,29 @@ void doit(void)
 	fwrite(tpasswd_file, 1, strlen(tpasswd_file), fp);
 	fclose(fp);
 
-	start("tls1.2 srp-1024", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP", "test", "test", 0);
-	start("tls1.2 srp-1536", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP", "test2", "test2", 0);
-	start("tls1.2 srp-2048", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP", "test3", "test3", 0);
-	start("tls1.2 srp-3072", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP", "test4", "test4", 0);
-	start("tls1.2 srp-4096", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP", "test5", "test5", 0);
-	start("tls1.2 srp-8192", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP", "test7", "test7", 0);
-	start("tls1.2 srp-other", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP", "test9", "test9", GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+	start("tls1.2 srp-1024", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP",
+	      "test", "test", 0);
+	start("tls1.2 srp-1536", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP",
+	      "test2", "test2", 0);
+	start("tls1.2 srp-2048", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP",
+	      "test3", "test3", 0);
+	start("tls1.2 srp-3072", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP",
+	      "test4", "test4", 0);
+	start("tls1.2 srp-4096", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP",
+	      "test5", "test5", 0);
+	start("tls1.2 srp-8192", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP",
+	      "test7", "test7", 0);
+	start("tls1.2 srp-other", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP",
+	      "test9", "test9", GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
-	start("tls1.2 srp-rsa", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP-RSA", "test", "test", 0);
+	start("tls1.2 srp-rsa",
+	      "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP-RSA", "test", "test",
+	      0);
 
 	/* check whether SRP works with TLS1.3 being prioritized */
-	start("tls1.3 and srp-1024", "NORMAL:-KX-ALL:+SRP:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:+VERS-TLS1.1", "test", "test", 0);
+	start("tls1.3 and srp-1024",
+	      "NORMAL:-KX-ALL:+SRP:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:+VERS-TLS1.1",
+	      "test", "test", 0);
 
 	/* check whether SRP works with the default protocol set */
 	start("default srp-1024", "NORMAL:-KX-ALL:+SRP", "test", "test", 0);

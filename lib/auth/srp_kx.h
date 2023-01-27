@@ -21,11 +21,11 @@
  */
 
 #ifndef GNUTLS_LIB_AUTH_SRP_KX_H
-#define GNUTLS_LIB_AUTH_SRP_KX_H
+# define GNUTLS_LIB_AUTH_SRP_KX_H
 
-#include <auth.h>
+# include <auth.h>
 
-#define MAX_FAKE_SALT_SEED_SIZE 64
+# define MAX_FAKE_SALT_SEED_SIZE 64
 
 typedef struct gnutls_srp_client_credentials_st {
 	char *username;
@@ -50,7 +50,7 @@ typedef struct srp_server_auth_info_st {
 	char *username;
 } *srp_server_auth_info_t;
 
-#ifdef ENABLE_SRP
+# ifdef ENABLE_SRP
 
 int _gnutls_proc_srp_server_hello(gnutls_session_t state,
 				  const uint8_t * data, size_t data_size);
@@ -67,8 +67,8 @@ typedef struct srp_server_auth_info_st srp_server_auth_info_st;
 
 /* MAC algorithm used to generate fake salts for unknown usernames
  */
-#define SRP_FAKE_SALT_MAC GNUTLS_MAC_SHA1
+#  define SRP_FAKE_SALT_MAC GNUTLS_MAC_SHA1
 
-#endif				/* ENABLE_SRP */
+# endif				/* ENABLE_SRP */
 
-#endif /* GNUTLS_LIB_AUTH_SRP_KX_H */
+#endif				/* GNUTLS_LIB_AUTH_SRP_KX_H */

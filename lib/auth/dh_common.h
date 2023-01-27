@@ -21,9 +21,9 @@
  */
 
 #ifndef GNUTLS_LIB_AUTH_DH_COMMON_H
-#define GNUTLS_LIB_AUTH_DH_COMMON_H
+# define GNUTLS_LIB_AUTH_DH_COMMON_H
 
-#include <auth.h>
+# include <auth.h>
 
 typedef struct {
 	int secret_bits;
@@ -42,9 +42,9 @@ int _gnutls_gen_dh_common_client_kx(gnutls_session_t, gnutls_buffer_st *);
 int _gnutls_proc_dh_common_client_kx(gnutls_session_t session,
 				     uint8_t * data, size_t _data_size,
 				     gnutls_datum_t * psk_key);
-int _gnutls_dh_common_print_server_kx(gnutls_session_t, 
+int _gnutls_dh_common_print_server_kx(gnutls_session_t,
 				      gnutls_buffer_st * data);
 int _gnutls_proc_dh_common_server_kx(gnutls_session_t session,
 				     uint8_t * data, size_t _data_size);
 
-#endif /* GNUTLS_LIB_AUTH_DH_COMMON_H */
+#endif				/* GNUTLS_LIB_AUTH_DH_COMMON_H */

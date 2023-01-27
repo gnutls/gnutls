@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,22 +35,22 @@ int main(void)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/dtls.h>
-#include <signal.h>
-#include <assert.h>
+# include <string.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/dtls.h>
+# include <signal.h>
+# include <assert.h>
 
-#include "cert-common.h"
-#include "tls13/ext-parse.h"
-#include "pkcs11/softhsm.h"
-#include "utils.h"
+# include "cert-common.h"
+# include "tls13/ext-parse.h"
+# include "pkcs11/softhsm.h"
+# include "utils.h"
 
 /* This program tests whether the Post Handshake Auth extension is
  * present in the client hello, and whether it is missing from server
@@ -68,14 +68,14 @@ static void client_log_func(int level, const char *str)
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
 
-#define MAX_BUF 1024
+# define MAX_BUF 1024
 
-#define P11LIB "libpkcs11mock2.so"
+# define P11LIB "libpkcs11mock2.so"
 
-#define PIN "1234"
+# define PIN "1234"
 
-#define CONFIG_NAME "softhsm-post-handshake-with-cert-pkcs11"
-#define CONFIG CONFIG_NAME".config"
+# define CONFIG_NAME "softhsm-post-handshake-with-cert-pkcs11"
+# define CONFIG CONFIG_NAME".config"
 
 static
 int pin_func(void *userdata, int attempt, const char *url, const char *label,
@@ -155,7 +155,8 @@ static void client(int fd, int err)
 		exit(1);
 	}
 
-	ret = gnutls_x509_privkey_import(key, &cli_ca3_key, GNUTLS_X509_FMT_PEM);
+	ret =
+	    gnutls_x509_privkey_import(key, &cli_ca3_key, GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
 		fprintf(stderr,
 			"gnutls_x509_privkey_import: %s\n",
@@ -203,18 +204,23 @@ static void client(int fd, int err)
 	gnutls_x509_crt_deinit(crt);
 	gnutls_x509_privkey_deinit(key);
 
-	assert(gnutls_certificate_allocate_credentials(&x509_cred)>=0);
+	assert(gnutls_certificate_allocate_credentials(&x509_cred) >= 0);
 
 	/* Initialize TLS session
 	 */
-	assert(gnutls_init(&session, GNUTLS_CLIENT|GNUTLS_POST_HANDSHAKE_AUTH|GNUTLS_AUTO_REAUTH)>=0);
+	assert(gnutls_init
+	       (&session,
+		GNUTLS_CLIENT | GNUTLS_POST_HANDSHAKE_AUTH | GNUTLS_AUTO_REAUTH)
+	       >= 0);
 
 	gnutls_handshake_set_timeout(session, get_timeout());
 
-	ret = gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-TLS1.3:-SIGN-RSA-SHA256", NULL);
+	ret =
+	    gnutls_priority_set_direct(session,
+				       "NORMAL:-VERS-ALL:+VERS-TLS1.3:-SIGN-RSA-SHA256",
+				       NULL);
 	if (ret < 0)
 		fail("cannot set TLS 1.3 priorities\n");
-
 
 	assert(gnutls_certificate_set_x509_key_file(x509_cred,
 						    SOFTHSM_URL
@@ -222,7 +228,7 @@ static void client(int fd, int err)
 						    SOFTHSM_URL
 						    ";object=cert;object-type=private;pin-value="
 						    PIN,
-						    GNUTLS_X509_FMT_DER)>=0);
+						    GNUTLS_X509_FMT_DER) >= 0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
@@ -252,8 +258,8 @@ static void client(int fd, int err)
 
 	if (err) {
 		if (ret != err)
-			fail("client: expected error %s, got: %s\n", gnutls_strerror(err),
-			     gnutls_strerror(ret));
+			fail("client: expected error %s, got: %s\n",
+			     gnutls_strerror(err), gnutls_strerror(ret));
 	} else if (ret < 0)
 		fail("client: gnutls_record_recv did not succeed as expected: %s\n", gnutls_strerror(ret));
 
@@ -273,9 +279,9 @@ static void client(int fd, int err)
 static unsigned client_hello_ok = 0;
 static unsigned server_hello_ok = 0;
 
-#define TLS_EXT_POST_HANDSHAKE 49
+# define TLS_EXT_POST_HANDSHAKE 49
 
-static void parse_ext(void *priv, gnutls_datum_t *msg)
+static void parse_ext(void *priv, gnutls_datum_t * msg)
 {
 	if (msg->size != 0) {
 		fail("error in extension length: %d\n", (int)msg->size);
@@ -283,10 +289,12 @@ static void parse_ext(void *priv, gnutls_datum_t *msg)
 }
 
 static int hellos_callback(gnutls_session_t session, unsigned int htype,
-	unsigned post, unsigned int incoming, const gnutls_datum_t *msg)
+			   unsigned post, unsigned int incoming,
+			   const gnutls_datum_t * msg)
 {
 	if (htype == GNUTLS_HANDSHAKE_SERVER_HELLO && post == GNUTLS_HOOK_POST) {
-		if (find_server_extension(msg, TLS_EXT_POST_HANDSHAKE, NULL, NULL)) {
+		if (find_server_extension
+		    (msg, TLS_EXT_POST_HANDSHAKE, NULL, NULL)) {
 			fail("Post handshake extension seen in server hello!\n");
 		}
 		server_hello_ok = 1;
@@ -324,20 +332,19 @@ static void server(int fd, int err, int type)
 
 	gnutls_certificate_allocate_credentials(&x509_cred);
 	gnutls_certificate_set_x509_key_mem(x509_cred, &server_cert,
-					    &server_key,
-					    GNUTLS_X509_FMT_PEM);
+					    &server_key, GNUTLS_X509_FMT_PEM);
 
-	gnutls_init(&session, GNUTLS_SERVER|GNUTLS_POST_HANDSHAKE_AUTH);
+	gnutls_init(&session, GNUTLS_SERVER | GNUTLS_POST_HANDSHAKE_AUTH);
 
 	gnutls_handshake_set_timeout(session, get_timeout());
 	gnutls_handshake_set_hook_function(session, GNUTLS_HANDSHAKE_ANY,
-					   GNUTLS_HOOK_BOTH,
-					   hellos_callback);
+					   GNUTLS_HOOK_BOTH, hellos_callback);
 
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-TLS1.3", NULL);
+	gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-TLS1.3",
+				   NULL);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
@@ -350,10 +357,11 @@ static void server(int fd, int err, int type)
 	if (ret != 0)
 		fail("handshake failed: %s\n", gnutls_strerror(ret));
 
-	if (!(gnutls_session_get_flags(session) & GNUTLS_SFLAGS_POST_HANDSHAKE_AUTH)) {
+	if (!
+	    (gnutls_session_get_flags(session) &
+	     GNUTLS_SFLAGS_POST_HANDSHAKE_AUTH)) {
 		fail("server: session flags did not contain GNUTLS_SFLAGS_POST_HANDSHAKE_AUTH\n");
 	}
-
 
 	if (client_hello_ok == 0) {
 		fail("server: did not verify the client hello\n");
@@ -375,10 +383,11 @@ static void server(int fd, int err, int type)
 
 	if (err) {
 		if (ret != err)
-			fail("server: expected error %s, got: %s\n", gnutls_strerror(err),
-			     gnutls_strerror(ret));
+			fail("server: expected error %s, got: %s\n",
+			     gnutls_strerror(err), gnutls_strerror(ret));
 	} else if (ret != 0)
-		fail("server: gnutls_reauth did not succeed as expected: %s\n", gnutls_strerror(ret));
+		fail("server: gnutls_reauth did not succeed as expected: %s\n",
+		     gnutls_strerror(ret));
 
 	do {
 		ret = gnutls_bye(session, GNUTLS_SHUT_RDWR);
@@ -448,7 +457,7 @@ void doit(void)
 		exit(77);
 
 	/* check if softhsm module is loadable */
-	(void) softhsm_lib();
+	(void)softhsm_lib();
 
 	/* initialize SoftHSM token that libpkcs11mock2.so internally uses */
 	bin = softhsm_bin();
@@ -459,7 +468,8 @@ void doit(void)
 		 PIN, bin);
 	system(buf);
 
-	start("reauth-require", GNUTLS_E_CERTIFICATE_REQUIRED, GNUTLS_E_SUCCESS, GNUTLS_CERT_REQUIRE);
+	start("reauth-require", GNUTLS_E_CERTIFICATE_REQUIRED, GNUTLS_E_SUCCESS,
+	      GNUTLS_CERT_REQUIRE);
 	start("reauth-request", 0, GNUTLS_E_SUCCESS, GNUTLS_CERT_REQUEST);
 }
 #endif				/* _WIN32 */

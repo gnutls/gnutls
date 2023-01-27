@@ -35,7 +35,7 @@ int
 _gnutls_prf_raw(gnutls_mac_algorithm_t mac,
 		size_t master_size, const void *master,
 		size_t label_size, const char *label,
-		size_t seed_size, const uint8_t *seed, size_t outsize,
+		size_t seed_size, const uint8_t * seed, size_t outsize,
 		char *out);
 
 #define MATCH_FUNC(fname, dsecret, dseed, dlabel, doutput) \
@@ -57,17 +57,25 @@ static void fname(void **glob_state) \
 	gnutls_free(output.data); \
 }
 
-
-MATCH_FUNC(test1, SHEX("263bdbbb6f6d4c664e058d0aa9d321be"), SHEX("b920573b199601024f04d6dc61966e65"),
-	SDATA("test label"), SHEX("6617993765fa6ca703d19ec70dd5dd160ffcc07725fafb714a9f815a2a30bfb7e3bbfb7eee574b3b613eb7fe80eec9691d8c1b0e2d9b3c8b4b02b6b6d6db88e2094623ef6240607eda7abe3c846e82a3"));
-MATCH_FUNC(test2, SHEX("bf31fe6c78ebf0ff9ce8bb5dd9d1f83d"), SHEX("7fc4583d19871d962760f358a18696c8"),
-	SDATA("test label"), SHEX("8318f382c49fd5af7d6fdb4cbb31dfef"));
-MATCH_FUNC(test3, SHEX("0addfc84435b9ac1ef523ef44791a784bf55757dea17837c1a72beec1bdb1850"),
-	SHEX("74e849d11ad8a98d9bc2291dbceec26ff9"),
-	SDATA("test label"), SHEX("3c221520c48bcb3a0eb3734a"));
-MATCH_FUNC(test4, SHEX("4074939b440a08a285bc7208485c531f0bbd4c101d71bdba33ec066791e4678c"),
-	SHEX("8aff0c770c1d60455ee48f220c9adb471e5fee27c88c1f33"),
-	SDATA("test label"), SHEX("3a9aee040bbf3cf7009210e64bbdad1775ccf1b46b3a965d5f15168e9ddaa7cc6a7c0c117848"));
+MATCH_FUNC(test1, SHEX("263bdbbb6f6d4c664e058d0aa9d321be"),
+	   SHEX("b920573b199601024f04d6dc61966e65"), SDATA("test label"),
+	   SHEX
+	   ("6617993765fa6ca703d19ec70dd5dd160ffcc07725fafb714a9f815a2a30bfb7e3bbfb7eee574b3b613eb7fe80eec9691d8c1b0e2d9b3c8b4b02b6b6d6db88e2094623ef6240607eda7abe3c846e82a3"));
+MATCH_FUNC(test2, SHEX("bf31fe6c78ebf0ff9ce8bb5dd9d1f83d"),
+	   SHEX("7fc4583d19871d962760f358a18696c8"), SDATA("test label"),
+	   SHEX("8318f382c49fd5af7d6fdb4cbb31dfef"));
+MATCH_FUNC(test3,
+	   SHEX
+	   ("0addfc84435b9ac1ef523ef44791a784bf55757dea17837c1a72beec1bdb1850"),
+	   SHEX("74e849d11ad8a98d9bc2291dbceec26ff9"), SDATA("test label"),
+	   SHEX("3c221520c48bcb3a0eb3734a"));
+MATCH_FUNC(test4,
+	   SHEX
+	   ("4074939b440a08a285bc7208485c531f0bbd4c101d71bdba33ec066791e4678c"),
+	   SHEX("8aff0c770c1d60455ee48f220c9adb471e5fee27c88c1f33"),
+	   SDATA("test label"),
+	   SHEX
+	   ("3a9aee040bbf3cf7009210e64bbdad1775ccf1b46b3a965d5f15168e9ddaa7cc6a7c0c117848"));
 
 int main(void)
 {

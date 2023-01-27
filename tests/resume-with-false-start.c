@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -79,8 +79,7 @@ void doit(void)
 					    GNUTLS_X509_FMT_PEM);
 
 	gnutls_init(&server, GNUTLS_SERVER);
-	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-				serverx509cred);
+	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, serverx509cred);
 	gnutls_set_default_priority(server);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
@@ -91,20 +90,23 @@ void doit(void)
 	if (ret < 0)
 		exit(1);
 
-	ret = gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca_cert, GNUTLS_X509_FMT_PEM);
+	ret =
+	    gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca_cert,
+						  GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);
 
-	ret = gnutls_init(&client, GNUTLS_CLIENT|GNUTLS_ENABLE_FALSE_START);
+	ret = gnutls_init(&client, GNUTLS_CLIENT | GNUTLS_ENABLE_FALSE_START);
 	if (ret < 0)
 		exit(1);
 
 	ret = gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-				clientx509cred);
+				     clientx509cred);
 	if (ret < 0)
 		exit(1);
 
-	assert(gnutls_priority_set_direct(client, "NORMAL:-VERS-ALL:+VERS-TLS1.2", NULL)>=0);
+	assert(gnutls_priority_set_direct
+	       (client, "NORMAL:-VERS-ALL:+VERS-TLS1.2", NULL) >= 0);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);

@@ -46,11 +46,12 @@ static const gnutls_profile_entry profiles[] = {
 	{NULL, 0, 0}
 };
 
-gnutls_sec_param_t _gnutls_profile_to_sec_level(gnutls_certificate_verification_profiles_t profile)
+gnutls_sec_param_t
+_gnutls_profile_to_sec_level(gnutls_certificate_verification_profiles_t profile)
 {
 	const gnutls_profile_entry *p;
 
-	for(p = profiles; p->name != NULL; p++) {
+	for (p = profiles; p->name != NULL; p++) {
 		if (profile == p->profile)
 			return p->sec_param;
 	}
@@ -68,7 +69,8 @@ gnutls_sec_param_t _gnutls_profile_to_sec_level(gnutls_certificate_verification_
  * Returns: a #gnutls_certificate_verification_profiles_t id of the specified profile,
  *   or %GNUTLS_PROFILE_UNKNOWN on failure.
  **/
-gnutls_certificate_verification_profiles_t gnutls_certificate_verification_profile_get_id(const char *name)
+gnutls_certificate_verification_profiles_t
+gnutls_certificate_verification_profile_get_id(const char *name)
 {
 	const gnutls_profile_entry *p;
 
@@ -91,9 +93,9 @@ gnutls_certificate_verification_profiles_t gnutls_certificate_verification_profi
  *
  * Returns: a string that contains the name of the specified profile or %NULL.
  **/
-const char *
-gnutls_certificate_verification_profile_get_name(gnutls_certificate_verification_profiles_t id)
-{
+const char
+*gnutls_certificate_verification_profile_get_name
+    (gnutls_certificate_verification_profiles_t id) {
 	const gnutls_profile_entry *p;
 
 	for (p = profiles; p->name != NULL; p++) {

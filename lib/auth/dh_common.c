@@ -60,9 +60,9 @@ _gnutls_proc_dh_common_client_kx(gnutls_session_t session,
 	size_t _n_Y;
 	int ret;
 	ssize_t data_size = _data_size;
-	gnutls_datum_t tmp_dh_key = {NULL, 0};
+	gnutls_datum_t tmp_dh_key = { NULL, 0 };
 	gnutls_pk_params_st peer_pub;
-	
+
 	gnutls_pk_params_init(&peer_pub);
 
 	DECR_LEN(data_size, 2);
@@ -74,17 +74,21 @@ _gnutls_proc_dh_common_client_kx(gnutls_session_t session,
 	if (data_size != 0)
 		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
-	if (_gnutls_mpi_init_scan_nz(&session->key.proto.tls12.dh.client_Y, &data[2], _n_Y)) {
+	if (_gnutls_mpi_init_scan_nz
+	    (&session->key.proto.tls12.dh.client_Y, &data[2], _n_Y)) {
 		gnutls_assert();
-		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER; /* most likely zero or illegal size */
+		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;	/* most likely zero or illegal size */
 	}
 
-	_gnutls_dh_set_peer_public(session, session->key.proto.tls12.dh.client_Y);
+	_gnutls_dh_set_peer_public(session,
+				   session->key.proto.tls12.dh.client_Y);
 
 	peer_pub.params[DH_Y] = session->key.proto.tls12.dh.client_Y;
 
 	/* calculate the key after calculating the message */
-	ret = _gnutls_pk_derive(GNUTLS_PK_DH, &tmp_dh_key, &session->key.proto.tls12.dh.params, &peer_pub);
+	ret =
+	    _gnutls_pk_derive(GNUTLS_PK_DH, &tmp_dh_key,
+			      &session->key.proto.tls12.dh.params, &peer_pub);
 	if (ret < 0) {
 		gnutls_assert();
 		goto error;
@@ -95,11 +99,10 @@ _gnutls_proc_dh_common_client_kx(gnutls_session_t session,
 		session->key.key.size = tmp_dh_key.size;
 	} else {		/* In DHE_PSK the key is set differently */
 		ret =
-		    _gnutls_set_psk_session_key(session, psk_key,
-						&tmp_dh_key);
+		    _gnutls_set_psk_session_key(session, psk_key, &tmp_dh_key);
 		_gnutls_free_temp_key_datum(&tmp_dh_key);
 	}
-	
+
 	if (ret < 0) {
 		gnutls_assert();
 		goto error;
@@ -126,9 +129,9 @@ _gnutls_gen_dh_common_client_kx_int(gnutls_session_t session,
 {
 	int ret;
 	gnutls_pk_params_st peer_pub;
-	gnutls_datum_t tmp_dh_key = {NULL, 0};
+	gnutls_datum_t tmp_dh_key = { NULL, 0 };
 	unsigned init_pos = data->length;
-	
+
 	gnutls_pk_params_init(&peer_pub);
 
 	ret =
@@ -137,18 +140,26 @@ _gnutls_gen_dh_common_client_kx_int(gnutls_session_t session,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	_gnutls_dh_set_secret_bits(session, _gnutls_mpi_get_nbits(session->key.proto.tls12.dh.params.params[DH_X]));
+	_gnutls_dh_set_secret_bits(session,
+				   _gnutls_mpi_get_nbits(session->key.
+							 proto.tls12.dh.
+							 params.params[DH_X]));
 
-	ret = _gnutls_buffer_append_mpi(data, 16, session->key.proto.tls12.dh.params.params[DH_Y], 0);
+	ret =
+	    _gnutls_buffer_append_mpi(data, 16,
+				      session->key.proto.tls12.dh.
+				      params.params[DH_Y], 0);
 	if (ret < 0) {
 		gnutls_assert();
 		goto error;
 	}
-	
+
 	peer_pub.params[DH_Y] = session->key.proto.tls12.dh.client_Y;
 
 	/* calculate the key after calculating the message */
-	ret = _gnutls_pk_derive(GNUTLS_PK_DH, &tmp_dh_key, &session->key.proto.tls12.dh.params, &peer_pub);
+	ret =
+	    _gnutls_pk_derive(GNUTLS_PK_DH, &tmp_dh_key,
+			      &session->key.proto.tls12.dh.params, &peer_pub);
 	if (ret < 0) {
 		gnutls_assert();
 		goto error;
@@ -158,9 +169,7 @@ _gnutls_gen_dh_common_client_kx_int(gnutls_session_t session,
 		session->key.key.data = tmp_dh_key.data;
 		session->key.key.size = tmp_dh_key.size;
 	} else {		/* In DHE_PSK the key is set differently */
-		ret =
-		    _gnutls_set_psk_session_key(session, pskkey,
-						&tmp_dh_key);
+		ret = _gnutls_set_psk_session_key(session, pskkey, &tmp_dh_key);
 		_gnutls_free_temp_key_datum(&tmp_dh_key);
 	}
 
@@ -225,7 +234,8 @@ _gnutls_proc_dh_common_server_kx(gnutls_session_t session,
 	_n_g = n_g;
 	_n_p = n_p;
 
-	if (_gnutls_mpi_init_scan_nz(&session->key.proto.tls12.dh.client_Y, data_Y, _n_Y) != 0) {
+	if (_gnutls_mpi_init_scan_nz
+	    (&session->key.proto.tls12.dh.client_Y, data_Y, _n_Y) != 0) {
 		gnutls_assert();
 		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 	}
@@ -234,56 +244,77 @@ _gnutls_proc_dh_common_server_kx(gnutls_session_t session,
 	if (session->internals.priorities->groups.have_ffdhe != 0) {
 		/* verify whether the received parameters match the advertised, otherwise
 		 * log that. */
-		for (j=0;j<session->internals.priorities->groups.size;j++) {
-			if (session->internals.priorities->groups.entry[j]->generator &&
-			    session->internals.priorities->groups.entry[j]->generator->size == n_g &&
-			    session->internals.priorities->groups.entry[j]->prime->size == n_p &&
-			    memcmp(session->internals.priorities->groups.entry[j]->generator->data,
-				   data_g, n_g) == 0 &&
-			    memcmp(session->internals.priorities->groups.entry[j]->prime->data,
-				   data_p, n_p) == 0) {
+		for (j = 0; j < session->internals.priorities->groups.size; j++) {
+			if (session->internals.priorities->groups.
+			    entry[j]->generator
+			    && session->internals.priorities->groups.
+			    entry[j]->generator->size == n_g
+			    && session->internals.priorities->groups.
+			    entry[j]->prime->size == n_p
+			    && memcmp(session->internals.priorities->
+				      groups.entry[j]->generator->data, data_g,
+				      n_g) == 0
+			    && memcmp(session->internals.priorities->
+				      groups.entry[j]->prime->data, data_p,
+				      n_p) == 0) {
 
 				session->internals.hsk_flags |= HSK_USED_FFDHE;
-				_gnutls_session_group_set(session, session->internals.priorities->groups.entry[j]);
-				session->key.proto.tls12.dh.params.qbits = *session->internals.priorities->groups.entry[j]->q_bits;
-				data_q = session->internals.priorities->groups.entry[j]->q->data;
-				_n_q = session->internals.priorities->groups.entry[j]->q->size;
+				_gnutls_session_group_set(session,
+							  session->
+							  internals.priorities->
+							  groups.entry[j]);
+				session->key.proto.tls12.dh.params.qbits =
+				    *session->internals.priorities->
+				    groups.entry[j]->q_bits;
+				data_q =
+				    session->internals.priorities->
+				    groups.entry[j]->q->data;
+				_n_q =
+				    session->internals.priorities->
+				    groups.entry[j]->q->size;
 				break;
 			}
 		}
 
 		if (!(session->internals.hsk_flags & HSK_USED_FFDHE)) {
-			_gnutls_audit_log(session, "FFDHE groups advertised, but server didn't support it; falling back to server's choice\n");
+			_gnutls_audit_log(session,
+					  "FFDHE groups advertised, but server didn't support it; falling back to server's choice\n");
 		}
 	}
-
-#ifdef ENABLE_FIPS140
+# ifdef ENABLE_FIPS140
 	if (gnutls_fips140_mode_enabled() &&
-	    !_gnutls_dh_prime_match_fips_approved(data_p, n_p, data_g, n_g, NULL, NULL)) {
+	    !_gnutls_dh_prime_match_fips_approved(data_p, n_p, data_g, n_g,
+						  NULL, NULL)) {
 		gnutls_assert();
 		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 	}
-#endif
+# endif
 
-	if (_gnutls_mpi_init_scan_nz(&session->key.proto.tls12.dh.params.params[DH_G], data_g, _n_g) != 0) {
+	if (_gnutls_mpi_init_scan_nz
+	    (&session->key.proto.tls12.dh.params.params[DH_G], data_g,
+	     _n_g) != 0) {
 		gnutls_assert();
 		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 	}
 
-	if (_gnutls_mpi_init_scan_nz(&session->key.proto.tls12.dh.params.params[DH_P], data_p, _n_p) != 0) {
+	if (_gnutls_mpi_init_scan_nz
+	    (&session->key.proto.tls12.dh.params.params[DH_P], data_p,
+	     _n_p) != 0) {
 		gnutls_assert();
 		/* we release now because session->key.proto.tls12.dh.params.params_nr is not yet set */
-		_gnutls_mpi_release(&session->key.proto.tls12.dh.params.params[DH_G]);
+		_gnutls_mpi_release(&session->key.proto.tls12.dh.
+				    params.params[DH_G]);
 		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 	}
-	if (data_q && _gnutls_mpi_init_scan_nz(
-			    &session->key.proto.tls12.dh.params.params[DH_Q],
-			    data_q, _n_q) != 0) {
+	if (data_q
+	    && _gnutls_mpi_init_scan_nz(&session->key.proto.tls12.dh.
+					params.params[DH_Q], data_q,
+					_n_q) != 0) {
 		/* we release now because params_nr is not yet set */
-		_gnutls_mpi_release(
-			&session->key.proto.tls12.dh.params.params[DH_P]);
-		_gnutls_mpi_release(
-			&session->key.proto.tls12.dh.params.params[DH_G]);
+		_gnutls_mpi_release(&session->key.proto.tls12.dh.
+				    params.params[DH_P]);
+		_gnutls_mpi_release(&session->key.proto.tls12.dh.
+				    params.params[DH_G]);
 		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 	}
 
@@ -298,15 +329,20 @@ _gnutls_proc_dh_common_server_kx(gnutls_session_t session,
 			return bits;
 		}
 
-		p_bits = _gnutls_mpi_get_nbits(session->key.proto.tls12.dh.params.params[DH_P]);
+		p_bits =
+		    _gnutls_mpi_get_nbits(session->key.proto.tls12.dh.
+					  params.params[DH_P]);
 		if (p_bits < bits) {
 			/* the prime used by the peer is not acceptable
 			 */
 			gnutls_assert();
 			_gnutls_debug_log
 			    ("Received a prime of %u bits, limit is %u\n",
-			     (unsigned) _gnutls_mpi_get_nbits(session->key.proto.tls12.dh.params.params[DH_P]),
-			     (unsigned) bits);
+			     (unsigned)_gnutls_mpi_get_nbits(session->key.
+							     proto.tls12.dh.
+							     params.params
+							     [DH_P]),
+			     (unsigned)bits);
 			return GNUTLS_E_DH_PRIME_UNACCEPTABLE;
 		}
 
@@ -314,15 +350,17 @@ _gnutls_proc_dh_common_server_kx(gnutls_session_t session,
 			gnutls_assert();
 			_gnutls_debug_log
 			    ("Received a prime of %u bits, limit is %u\n",
-			     (unsigned) p_bits,
-			     (unsigned) DEFAULT_MAX_VERIFY_BITS);
+			     (unsigned)p_bits,
+			     (unsigned)DEFAULT_MAX_VERIFY_BITS);
 			return GNUTLS_E_DH_PRIME_UNACCEPTABLE;
 		}
 	}
 
-	_gnutls_dh_save_group(session, session->key.proto.tls12.dh.params.params[DH_G],
-			     session->key.proto.tls12.dh.params.params[DH_P]);
-	_gnutls_dh_set_peer_public(session, session->key.proto.tls12.dh.client_Y);
+	_gnutls_dh_save_group(session,
+			      session->key.proto.tls12.dh.params.params[DH_G],
+			      session->key.proto.tls12.dh.params.params[DH_P]);
+	_gnutls_dh_set_peer_public(session,
+				   session->key.proto.tls12.dh.client_Y);
 
 	ret = n_Y + n_p + n_g + 6;
 
@@ -339,8 +377,9 @@ _gnutls_dh_common_print_server_kx(gnutls_session_t session,
 
 	if (q_bits < 192 && q_bits != 0) {
 		gnutls_assert();
-		_gnutls_debug_log("too small q_bits value for DH: %u\n", q_bits);
-		q_bits = 0; /* auto-detect */
+		_gnutls_debug_log("too small q_bits value for DH: %u\n",
+				  q_bits);
+		q_bits = 0;	/* auto-detect */
 	}
 
 	/* Y=g^x mod p */
@@ -350,21 +389,33 @@ _gnutls_dh_common_print_server_kx(gnutls_session_t session,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	_gnutls_dh_set_secret_bits(session, _gnutls_mpi_get_nbits(session->key.proto.tls12.dh.params.params[DH_X]));
+	_gnutls_dh_set_secret_bits(session,
+				   _gnutls_mpi_get_nbits(session->key.
+							 proto.tls12.dh.
+							 params.params[DH_X]));
 
-	ret = _gnutls_buffer_append_mpi(data, 16, session->key.proto.tls12.dh.params.params[DH_P], 0);
+	ret =
+	    _gnutls_buffer_append_mpi(data, 16,
+				      session->key.proto.tls12.dh.
+				      params.params[DH_P], 0);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	ret = _gnutls_buffer_append_mpi(data, 16, session->key.proto.tls12.dh.params.params[DH_G], 0);
+	ret =
+	    _gnutls_buffer_append_mpi(data, 16,
+				      session->key.proto.tls12.dh.
+				      params.params[DH_G], 0);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	ret = _gnutls_buffer_append_mpi(data, 16, session->key.proto.tls12.dh.params.params[DH_Y], 0);
+	ret =
+	    _gnutls_buffer_append_mpi(data, 16,
+				      session->key.proto.tls12.dh.
+				      params.params[DH_Y], 0);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -372,7 +423,7 @@ _gnutls_dh_common_print_server_kx(gnutls_session_t session,
 
 	ret = data->length - init_pos;
 
-cleanup:
+ cleanup:
 	return ret;
 }
 

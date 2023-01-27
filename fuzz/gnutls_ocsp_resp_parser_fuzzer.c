@@ -24,7 +24,7 @@
 
 #include "fuzzer.h"
 
-int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
+int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 {
 	gnutls_datum_t raw;
 	gnutls_datum_t out;
@@ -39,7 +39,8 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 
 	ret = gnutls_ocsp_resp_import(resp, &raw);
 	if (ret >= 0) {
-		ret = gnutls_ocsp_resp_print(resp, GNUTLS_OCSP_PRINT_FULL, &out);
+		ret =
+		    gnutls_ocsp_resp_print(resp, GNUTLS_OCSP_PRINT_FULL, &out);
 		assert(ret >= 0);
 		gnutls_free(out.data);
 	}

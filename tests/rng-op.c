@@ -22,7 +22,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -30,7 +30,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #if !defined(_WIN32)
-#include <sys/wait.h>
+# include <sys/wait.h>
 #endif
 
 #include "utils.h"
@@ -54,7 +54,8 @@ static void try(int rnd)
 	for (i = 0; i <= 65539; i++) {
 		ret = gnutls_rnd(rnd, buf1, sizeof(buf1));
 		if (ret < 0) {
-			fail("Error iterating RNG-%d more than %u times\n", rnd, i);
+			fail("Error iterating RNG-%d more than %u times\n", rnd,
+			     i);
 			exit(1);
 		}
 	}

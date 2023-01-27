@@ -22,7 +22,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -40,26 +40,26 @@ int main(int argc, char **argv)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#if !defined(_WIN32)
-#include <sys/wait.h>
-#endif
-#include <unistd.h>
-#include <assert.h>
-#include <gnutls/gnutls.h>
+# include <string.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# if !defined(_WIN32)
+#  include <sys/wait.h>
+# endif
+# include <unistd.h>
+# include <assert.h>
+# include <gnutls/gnutls.h>
 
-#include "utils.h"
+# include "utils.h"
 
 static void tls_log_func(int level, const char *str)
 {
 	fprintf(stderr, "|<%d>| %s", level, str);
 }
 
-#define MSG "Hello TLS"
-#define MAX_BUF 1024
+# define MSG "Hello TLS"
+# define MAX_BUF 1024
 
 static void client(int sd, const char *prio)
 {
@@ -82,9 +82,7 @@ static void client(int sd, const char *prio)
 	gnutls_init(&session, GNUTLS_CLIENT);
 
 	/* Use default priorities */
-	assert(gnutls_priority_set_direct(session,
-					  prio,
-					  NULL) >= 0);
+	assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);
 
 	/* put the anonymous credentials to the current session
 	 */
@@ -113,8 +111,8 @@ static void client(int sd, const char *prio)
 			gnutls_protocol_get_name
 			(gnutls_protocol_get_version(session)));
 
-	ret = gnutls_record_send(session, MSG, sizeof(MSG)-1);
-	if (ret != sizeof(MSG)-1) {
+	ret = gnutls_record_send(session, MSG, sizeof(MSG) - 1);
+	if (ret != sizeof(MSG) - 1) {
 		fail("return value of gnutls_record_send() is bogus\n");
 		exit(1);
 	}
@@ -122,17 +120,15 @@ static void client(int sd, const char *prio)
 	ret = gnutls_record_recv(session, buffer, MAX_BUF);
 	if (ret == 0) {
 		if (debug)
-			success
-			    ("client: Peer has closed the TLS connection\n");
+			success("client: Peer has closed the TLS connection\n");
 		goto end;
 	} else if (ret < 0) {
 		fail("client: Error: %s\n", gnutls_strerror(ret));
 		goto end;
 	}
 
-	if (ret != sizeof(MSG)-1 || memcmp(buffer, MSG, ret) != 0) {
-		fail("client: received data of different size! (expected: %d, have: %d)\n", 
-			(int)strlen(MSG), ret);
+	if (ret != sizeof(MSG) - 1 || memcmp(buffer, MSG, ret) != 0) {
+		fail("client: received data of different size! (expected: %d, have: %d)\n", (int)strlen(MSG), ret);
 		goto end;
 	}
 
@@ -146,7 +142,7 @@ static void client(int sd, const char *prio)
 
 	gnutls_bye(session, GNUTLS_SHUT_RDWR);
 
-      end:
+ end:
 
 	close(sd);
 
@@ -157,11 +153,11 @@ static void client(int sd, const char *prio)
 	gnutls_global_deinit();
 }
 
-#define DH_BITS 1024
+# define DH_BITS 1024
 
 static void server(int sd, const char *prio)
 {
-	const gnutls_datum_t p3 = { (void *) pkcs3, strlen(pkcs3) };
+	const gnutls_datum_t p3 = { (void *)pkcs3, strlen(pkcs3) };
 	gnutls_anon_server_credentials_t anoncred;
 	gnutls_dh_params_t dh_params;
 	int ret;
@@ -181,13 +177,13 @@ static void server(int sd, const char *prio)
 	if (debug)
 		success("Launched, generating DH parameters...\n");
 
-	assert(gnutls_dh_params_init(&dh_params)>=0);
+	assert(gnutls_dh_params_init(&dh_params) >= 0);
 	assert(gnutls_dh_params_import_pkcs3(dh_params, &p3,
-					     GNUTLS_X509_FMT_PEM)>=0);
+					     GNUTLS_X509_FMT_PEM) >= 0);
 
 	gnutls_anon_set_server_dh_params(anoncred, dh_params);
 
-	assert(gnutls_init(&session, GNUTLS_SERVER)>=0);
+	assert(gnutls_init(&session, GNUTLS_SERVER) >= 0);
 
 	assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);
 
@@ -234,8 +230,7 @@ static void server(int sd, const char *prio)
 			gnutls_packet_get(packet, &pdata, NULL);
 			/* echo data back to the client
 			 */
-			gnutls_record_send(session, pdata.data,
-					   pdata.size);
+			gnutls_record_send(session, pdata.data, pdata.size);
 			gnutls_packet_deinit(packet);
 		}
 	}
@@ -291,10 +286,14 @@ void start(const char *name, const char *prio)
 
 void doit(void)
 {
-	start("tls1.2 anon-dh", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ANON-DH");
-	start("tls1.2 anon-ecdh", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ANON-ECDH");
-	start("tls1.3 anon-dh", "NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:-KX-ALL:+ANON-DH");
-	start("tls1.3 anon-ecdh", "NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:-KX-ALL:+ANON-ECDH");
+	start("tls1.2 anon-dh",
+	      "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ANON-DH");
+	start("tls1.2 anon-ecdh",
+	      "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ANON-ECDH");
+	start("tls1.3 anon-dh",
+	      "NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:-KX-ALL:+ANON-DH");
+	start("tls1.3 anon-ecdh",
+	      "NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:-KX-ALL:+ANON-ECDH");
 	start("default anon-dh", "NORMAL:-KX-ALL:+ANON-DH");
 	start("default anon-ecdh", "NORMAL:-KX-ALL:+ANON-ECDH");
 }

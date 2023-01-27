@@ -37,42 +37,41 @@ static const gnutls_group_entry_st supported_groups[] = {
 	 .curve = GNUTLS_ECC_CURVE_SECP192R1,
 	 .tls_id = 19,
 	 .pk = GNUTLS_PK_ECDSA,
-	},
+	 },
 	{
 	 .name = "SECP224R1",
 	 .id = GNUTLS_GROUP_SECP224R1,
 	 .curve = GNUTLS_ECC_CURVE_SECP224R1,
 	 .tls_id = 21,
 	 .pk = GNUTLS_PK_ECDSA,
-	},
+	 },
 	{
 	 .name = "SECP256R1",
 	 .id = GNUTLS_GROUP_SECP256R1,
 	 .curve = GNUTLS_ECC_CURVE_SECP256R1,
 	 .tls_id = 23,
 	 .pk = GNUTLS_PK_ECDSA,
-	},
+	 },
 	{
 	 .name = "SECP384R1",
 	 .id = GNUTLS_GROUP_SECP384R1,
 	 .curve = GNUTLS_ECC_CURVE_SECP384R1,
 	 .tls_id = 24,
 	 .pk = GNUTLS_PK_ECDSA,
-	},
+	 },
 	{
 	 .name = "SECP521R1",
 	 .id = GNUTLS_GROUP_SECP521R1,
 	 .curve = GNUTLS_ECC_CURVE_SECP521R1,
 	 .tls_id = 25,
 	 .pk = GNUTLS_PK_ECDSA,
-	},
+	 },
 	{
 	 .name = "X25519",
 	 .id = GNUTLS_GROUP_X25519,
 	 .curve = GNUTLS_ECC_CURVE_X25519,
 	 .tls_id = 29,
-	 .pk = GNUTLS_PK_ECDH_X25519
-	},
+	 .pk = GNUTLS_PK_ECDH_X25519},
 #ifdef ENABLE_GOST
 	/* draft-smyshlyaev-tls12-gost-suites-06, Section 6 */
 	{
@@ -81,57 +80,56 @@ static const gnutls_group_entry_st supported_groups[] = {
 	 .curve = GNUTLS_ECC_CURVE_GOST256A,
 	 .pk = GNUTLS_PK_GOST_12_256,
 	 .tls_id = 34,
-	},
+	 },
 	{
 	 .name = "GC256B",
 	 .id = GNUTLS_GROUP_GC256B,
 	 .curve = GNUTLS_ECC_CURVE_GOST256B,
 	 .pk = GNUTLS_PK_GOST_12_256,
 	 .tls_id = 35,
-	},
+	 },
 	{
 	 .name = "GC256C",
 	 .id = GNUTLS_GROUP_GC256C,
 	 .curve = GNUTLS_ECC_CURVE_GOST256C,
 	 .pk = GNUTLS_PK_GOST_12_256,
 	 .tls_id = 36,
-	},
+	 },
 	{
 	 .name = "GC256D",
 	 .id = GNUTLS_GROUP_GC256D,
 	 .curve = GNUTLS_ECC_CURVE_GOST256D,
 	 .pk = GNUTLS_PK_GOST_12_256,
 	 .tls_id = 37,
-	},
+	 },
 	{
 	 .name = "GC512A",
 	 .id = GNUTLS_GROUP_GC512A,
 	 .curve = GNUTLS_ECC_CURVE_GOST512A,
 	 .pk = GNUTLS_PK_GOST_12_512,
 	 .tls_id = 38,
-	},
+	 },
 	{
 	 .name = "GC512B",
 	 .id = GNUTLS_GROUP_GC512B,
 	 .curve = GNUTLS_ECC_CURVE_GOST512B,
 	 .pk = GNUTLS_PK_GOST_12_512,
 	 .tls_id = 39,
-	},
+	 },
 	{
 	 .name = "GC512C",
 	 .id = GNUTLS_GROUP_GC512C,
 	 .curve = GNUTLS_ECC_CURVE_GOST512C,
 	 .pk = GNUTLS_PK_GOST_12_512,
 	 .tls_id = 40,
-	},
+	 },
 #endif
 	{
 	 .name = "X448",
 	 .id = GNUTLS_GROUP_X448,
 	 .curve = GNUTLS_ECC_CURVE_X448,
 	 .tls_id = 30,
-	 .pk = GNUTLS_PK_ECDH_X448
-	},
+	 .pk = GNUTLS_PK_ECDH_X448},
 #ifdef ENABLE_DHE
 	{
 	 .name = "FFDHE2048",
@@ -141,8 +139,7 @@ static const gnutls_group_entry_st supported_groups[] = {
 	 .q = &gnutls_ffdhe_2048_group_q,
 	 .q_bits = &gnutls_ffdhe_2048_key_bits,
 	 .pk = GNUTLS_PK_DH,
-	 .tls_id = 0x100
-	},
+	 .tls_id = 0x100},
 	{
 	 .name = "FFDHE3072",
 	 .id = GNUTLS_GROUP_FFDHE3072,
@@ -151,8 +148,7 @@ static const gnutls_group_entry_st supported_groups[] = {
 	 .q = &gnutls_ffdhe_3072_group_q,
 	 .q_bits = &gnutls_ffdhe_3072_key_bits,
 	 .pk = GNUTLS_PK_DH,
-	 .tls_id = 0x101
-	},
+	 .tls_id = 0x101},
 	{
 	 .name = "FFDHE4096",
 	 .id = GNUTLS_GROUP_FFDHE4096,
@@ -161,8 +157,7 @@ static const gnutls_group_entry_st supported_groups[] = {
 	 .q = &gnutls_ffdhe_4096_group_q,
 	 .q_bits = &gnutls_ffdhe_4096_key_bits,
 	 .pk = GNUTLS_PK_DH,
-	 .tls_id = 0x102
-	},
+	 .tls_id = 0x102},
 	{
 	 .name = "FFDHE6144",
 	 .id = GNUTLS_GROUP_FFDHE6144,
@@ -171,8 +166,7 @@ static const gnutls_group_entry_st supported_groups[] = {
 	 .q = &gnutls_ffdhe_6144_group_q,
 	 .q_bits = &gnutls_ffdhe_6144_key_bits,
 	 .pk = GNUTLS_PK_DH,
-	 .tls_id = 0x103
-	},
+	 .tls_id = 0x103},
 	{
 	 .name = "FFDHE8192",
 	 .id = GNUTLS_GROUP_FFDHE8192,
@@ -181,8 +175,7 @@ static const gnutls_group_entry_st supported_groups[] = {
 	 .q = &gnutls_ffdhe_8192_group_q,
 	 .q_bits = &gnutls_ffdhe_8192_key_bits,
 	 .pk = GNUTLS_PK_DH,
-	 .tls_id = 0x104
-	},
+	 .tls_id = 0x104},
 #endif
 	{0, 0, 0}
 };
@@ -191,32 +184,29 @@ static const gnutls_group_entry_st supported_groups[] = {
 	{ const gnutls_group_entry_st *p; \
 		for(p = supported_groups; p->name != NULL; p++) { b ; } }
 
-
 /* Returns the TLS id of the given curve
  */
-const gnutls_group_entry_st * _gnutls_tls_id_to_group(unsigned num)
+const gnutls_group_entry_st *_gnutls_tls_id_to_group(unsigned num)
 {
-	GNUTLS_GROUP_LOOP(
-		if (p->tls_id == num &&
-		    (p->curve == 0 || _gnutls_ecc_curve_is_supported(p->curve))) {
-			return p;
-		}
-	);
+	GNUTLS_GROUP_LOOP(if (p->tls_id == num &&
+			      (p->curve == 0
+			       || _gnutls_ecc_curve_is_supported(p->curve))) {
+			  return p;}
+	) ;
 
 	return NULL;
 }
 
-const gnutls_group_entry_st * _gnutls_id_to_group(unsigned id)
+const gnutls_group_entry_st *_gnutls_id_to_group(unsigned id)
 {
 	if (id == 0)
 		return NULL;
 
-	GNUTLS_GROUP_LOOP(
-		if (p->id == id &&
-		    (p->curve == 0 || _gnutls_ecc_curve_is_supported(p->curve))) {
-			return p;
-		}
-	);
+	GNUTLS_GROUP_LOOP(if (p->id == id &&
+			      (p->curve == 0
+			       || _gnutls_ecc_curve_is_supported(p->curve))) {
+			  return p;}
+	) ;
 
 	return NULL;
 }
@@ -240,10 +230,10 @@ const gnutls_group_t *gnutls_group_list(void)
 	if (groups[0] == 0) {
 		int i = 0;
 
-		GNUTLS_GROUP_LOOP(
-			if (p->curve == 0 || _gnutls_ecc_curve_is_supported(p->curve))
-				groups[i++] = p->id;
-		);
+		GNUTLS_GROUP_LOOP(if
+				  (p->curve == 0
+				   || _gnutls_ecc_curve_is_supported(p->curve))
+				  groups[i++] = p->id;) ;
 		groups[i++] = 0;
 	}
 
@@ -265,17 +255,15 @@ gnutls_group_t gnutls_group_get_id(const char *name)
 {
 	gnutls_group_t ret = GNUTLS_GROUP_INVALID;
 
-	GNUTLS_GROUP_LOOP(
-		if (c_strcasecmp(p->name, name) == 0 && (
-		    p->curve == 0 ||_gnutls_ecc_curve_is_supported(p->curve))) {
-			ret = p->id;
-			break;
-		}
-	);
+	GNUTLS_GROUP_LOOP(if
+			  (c_strcasecmp(p->name, name) == 0
+			   && (p->curve == 0
+			       || _gnutls_ecc_curve_is_supported(p->curve))) {
+			  ret = p->id; break;}
+	) ;
 
 	return ret;
 }
-
 
 /* Similar to gnutls_group_get_id, except that it does not check if
  * the curve is supported.
@@ -284,12 +272,9 @@ gnutls_group_t _gnutls_group_get_id(const char *name)
 {
 	gnutls_group_t ret = GNUTLS_GROUP_INVALID;
 
-	GNUTLS_GROUP_LOOP(
-		if (c_strcasecmp(p->name, name) == 0) {
-			ret = p->id;
-			break;
-		}
-	);
+	GNUTLS_GROUP_LOOP(if (c_strcasecmp(p->name, name) == 0) {
+			  ret = p->id; break;}
+	) ;
 
 	return ret;
 }
@@ -307,11 +292,9 @@ gnutls_group_t _gnutls_group_get_id(const char *name)
  **/
 const char *gnutls_group_get_name(gnutls_group_t group)
 {
-	GNUTLS_GROUP_LOOP(
-		if (p->id == group) {
-			return p->name;
-		}
-	);
+	GNUTLS_GROUP_LOOP(if (p->id == group) {
+			  return p->name;}
+	) ;
 
 	return NULL;
 }

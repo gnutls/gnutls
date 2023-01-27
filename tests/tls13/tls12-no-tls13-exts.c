@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,20 +35,20 @@ int main(void)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/dtls.h>
-#include <signal.h>
+# include <string.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/dtls.h>
+# include <signal.h>
 
-#include "cert-common.h"
-#include "tls13/ext-parse.h"
-#include "utils.h"
+# include "cert-common.h"
+# include "tls13/ext-parse.h"
+# include "utils.h"
 
 /* This program checks whether any TLS 1.3 extensions are
  * present when TLS 1.2 is the only protocol supported by
@@ -65,8 +65,6 @@ static void client_log_func(int level, const char *str)
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
 
-
-
 static void client(int fd)
 {
 	int ret;
@@ -82,8 +80,7 @@ static void client(int fd)
 
 	gnutls_certificate_allocate_credentials(&x509_cred);
 	gnutls_certificate_set_x509_key_mem(x509_cred, &cli_ca3_cert,
-					    &cli_ca3_key,
-					    GNUTLS_X509_FMT_PEM);
+					    &cli_ca3_key, GNUTLS_X509_FMT_PEM);
 
 	/* Initialize TLS session
 	 */
@@ -91,7 +88,10 @@ static void client(int fd)
 
 	gnutls_handshake_set_timeout(session, get_timeout());
 
-	ret = gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-TLS1.2:+VERS-TLS1.0", NULL);
+	ret =
+	    gnutls_priority_set_direct(session,
+				       "NORMAL:-VERS-ALL:+VERS-TLS1.2:+VERS-TLS1.0",
+				       NULL);
 	if (ret < 0)
 		fail("cannot set TLS 1.2 priorities\n");
 
@@ -120,7 +120,8 @@ static void client(int fd)
 static unsigned client_hello_ok = 0;
 
 static int client_hello_callback(gnutls_session_t session, unsigned int htype,
-	unsigned post, unsigned int incoming, const gnutls_datum_t *msg)
+				 unsigned post, unsigned int incoming,
+				 const gnutls_datum_t * msg)
 {
 	if (htype != GNUTLS_HANDSHAKE_CLIENT_HELLO || post != GNUTLS_HOOK_PRE)
 		return 0;
@@ -155,8 +156,7 @@ static void server(int fd)
 
 	gnutls_certificate_allocate_credentials(&x509_cred);
 	gnutls_certificate_set_x509_key_mem(x509_cred, &server_cert,
-					    &server_key,
-					    GNUTLS_X509_FMT_PEM);
+					    &server_key, GNUTLS_X509_FMT_PEM);
 
 	gnutls_init(&session, GNUTLS_SERVER);
 
@@ -176,11 +176,10 @@ static void server(int fd)
 
 	do {
 		ret = gnutls_handshake(session);
-		if (ret == GNUTLS_E_INTERRUPTED) { /* expected */
+		if (ret == GNUTLS_E_INTERRUPTED) {	/* expected */
 			break;
 		}
 	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
-
 
 	if (client_hello_ok == 0) {
 		fail("server: did not verify the client hello\n");

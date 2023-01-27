@@ -23,7 +23,7 @@
 /* Parts copied from GnuTLS example programs. */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -39,16 +39,16 @@ int main(int argc, char **argv)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#if !defined(_WIN32)
-#include <sys/wait.h>
-#endif
-#include <unistd.h>
-#include <gnutls/gnutls.h>
+# include <string.h>
+# include <sys/types.h>
+# include <sys/socket.h>
+# if !defined(_WIN32)
+#  include <sys/wait.h>
+# endif
+# include <unistd.h>
+# include <gnutls/gnutls.h>
 
-#include "utils.h"
+# include "utils.h"
 
 /* A very basic TLS client, with PSK authentication.
  */
@@ -60,8 +60,8 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "%s|<%d>| %s", side, level, str);
 }
 
-#define MAX_BUF 1024
-#define MSG "Hello TLS"
+# define MAX_BUF 1024
+# define MSG "Hello TLS"
 
 static void client(int sd, const char *prio, unsigned exp_hint)
 {
@@ -70,7 +70,7 @@ static void client(int sd, const char *prio, unsigned exp_hint)
 	char buffer[MAX_BUF + 1];
 	gnutls_psk_client_credentials_t pskcred;
 	/* Need to enable anonymous KX specifically. */
-	const gnutls_datum_t key = { (void *) "DEADBEEF", 8 };
+	const gnutls_datum_t key = { (void *)"DEADBEEF", 8 };
 	const char *hint;
 
 	global_init();
@@ -114,7 +114,8 @@ static void client(int sd, const char *prio, unsigned exp_hint)
 	if (exp_hint) {
 		hint = gnutls_psk_client_get_hint(session);
 		if (hint == NULL || strcmp(hint, "hint") != 0) {
-			fail("client: hint is not the expected: %s\n", gnutls_psk_client_get_hint(session));
+			fail("client: hint is not the expected: %s\n",
+			     gnutls_psk_client_get_hint(session));
 			goto end;
 		}
 	}
@@ -124,8 +125,7 @@ static void client(int sd, const char *prio, unsigned exp_hint)
 	ret = gnutls_record_recv(session, buffer, MAX_BUF);
 	if (ret == 0) {
 		if (debug)
-			success
-			    ("client: Peer has closed the TLS connection\n");
+			success("client: Peer has closed the TLS connection\n");
 		goto end;
 	} else if (ret < 0) {
 		fail("client: Error: %s\n", gnutls_strerror(ret));
@@ -142,7 +142,7 @@ static void client(int sd, const char *prio, unsigned exp_hint)
 
 	gnutls_bye(session, GNUTLS_SHUT_RDWR);
 
-      end:
+ end:
 
 	close(sd);
 
@@ -156,13 +156,12 @@ static void client(int sd, const char *prio, unsigned exp_hint)
 /* This is a sample TLS 1.0 echo server, for PSK authentication.
  */
 
-#define MAX_BUF 1024
+# define MAX_BUF 1024
 
 /* These are global */
 
 static int
-pskfunc(gnutls_session_t session, const char *username,
-	gnutls_datum_t * key)
+pskfunc(gnutls_session_t session, const char *username, gnutls_datum_t * key)
 {
 	if (debug)
 		printf("psk: username %s\n", username);
@@ -179,7 +178,7 @@ static gnutls_dh_params_t dh_params;
 
 static int generate_dh_params(void)
 {
-	const gnutls_datum_t p3 = { (void *) pkcs3, strlen(pkcs3) };
+	const gnutls_datum_t p3 = { (void *)pkcs3, strlen(pkcs3) };
 	/* Generate Diffie-Hellman parameters - for use with DHE
 	 * kx algorithms. These should be discarded and regenerated
 	 * once a day, once a week or once a month. Depending on the
@@ -190,13 +189,12 @@ static int generate_dh_params(void)
 					     GNUTLS_X509_FMT_PEM);
 }
 
-
 static void server(int sd, const char *prio)
 {
-gnutls_psk_server_credentials_t server_pskcred;
-int ret;
-gnutls_session_t session;
-char buffer[MAX_BUF + 1];
+	gnutls_psk_server_credentials_t server_pskcred;
+	int ret;
+	gnutls_session_t session;
+	char buffer[MAX_BUF + 1];
 
 	/* this must be called once in the program
 	 */
@@ -207,11 +205,9 @@ char buffer[MAX_BUF + 1];
 
 	side = "server";
 
-
 	gnutls_psk_allocate_server_credentials(&server_pskcred);
 	gnutls_psk_set_server_credentials_hint(server_pskcred, "hint");
-	gnutls_psk_set_server_credentials_function(server_pskcred,
-						   pskfunc);
+	gnutls_psk_set_server_credentials_function(server_pskcred, pskfunc);
 
 	gnutls_psk_set_server_dh_params(server_pskcred, dh_params);
 
@@ -255,8 +251,7 @@ char buffer[MAX_BUF + 1];
 		} else if (ret > 0) {
 			/* echo data back to the client
 			 */
-			gnutls_record_send(session, buffer,
-					   strlen(buffer));
+			gnutls_record_send(session, buffer, strlen(buffer));
 		}
 	}
 	/* do not wait for the peer to close the connection.
@@ -320,8 +315,12 @@ void doit(void)
 	run_test("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+DHE-PSK", 1);
 
 	run_test("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK", 0);
-	run_test("NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-FFDHE2048:+DHE-PSK", 0);
-	run_test("NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-SECP256R1:+ECDHE-PSK", 0);
+	run_test
+	    ("NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-FFDHE2048:+DHE-PSK",
+	     0);
+	run_test
+	    ("NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-SECP256R1:+ECDHE-PSK",
+	     0);
 	/* the following should work once we support PSK without DH */
 	run_test("NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+PSK", 0);
 

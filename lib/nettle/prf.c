@@ -24,7 +24,7 @@
 #include "int/tls1-prf.h"
 #include <nettle/hmac.h>
 #if ENABLE_GOST
-#include "gost/hmac-gost.h"
+# include "gost/hmac-gost.h"
 #endif
 
 /*-
@@ -48,84 +48,84 @@ int
 _gnutls_prf_raw(gnutls_mac_algorithm_t mac,
 		size_t master_size, const void *master,
 		size_t label_size, const char *label,
-		size_t seed_size, const uint8_t *seed, size_t outsize, char *out)
+		size_t seed_size, const uint8_t * seed, size_t outsize,
+		char *out)
 {
 	int ret;
 
 	switch (mac) {
 	case GNUTLS_MAC_MD5_SHA1:
-		tls10_prf(master_size, (uint8_t*)master, label_size, label,
-			  seed_size, seed, outsize, (uint8_t*)out);
+		tls10_prf(master_size, (uint8_t *) master, label_size, label,
+			  seed_size, seed, outsize, (uint8_t *) out);
 		return 0;
 	case GNUTLS_MAC_SHA256:{
-		struct hmac_sha256_ctx ctx;
-		hmac_sha256_set_key(&ctx, master_size, (uint8_t*)master);
+			struct hmac_sha256_ctx ctx;
+			hmac_sha256_set_key(&ctx, master_size,
+					    (uint8_t *) master);
 
-		ret = tls12_prf(&ctx,
-			  (nettle_hash_update_func *)
-			  hmac_sha256_update,
-			  (nettle_hash_digest_func *)
-			  hmac_sha256_digest, SHA256_DIGEST_SIZE,
-			  label_size, label, seed_size,
-			  seed, outsize,
-			  (uint8_t*)out);
+			ret = tls12_prf(&ctx, (nettle_hash_update_func *)
+					hmac_sha256_update,
+					(nettle_hash_digest_func *)
+					hmac_sha256_digest, SHA256_DIGEST_SIZE,
+					label_size, label, seed_size,
+					seed, outsize, (uint8_t *) out);
 
-		if (unlikely(ret != 1))
-			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
-		break;
-	}
+			if (unlikely(ret != 1))
+				return
+				    gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+			break;
+		}
 	case GNUTLS_MAC_SHA384:{
-		struct hmac_sha384_ctx ctx;
-		hmac_sha384_set_key(&ctx, master_size, master);
+			struct hmac_sha384_ctx ctx;
+			hmac_sha384_set_key(&ctx, master_size, master);
 
-		ret = tls12_prf(&ctx,
-			  (nettle_hash_update_func *)
-			  hmac_sha384_update,
-			  (nettle_hash_digest_func *)
-			  hmac_sha384_digest, SHA384_DIGEST_SIZE,
-			  label_size, label, seed_size,
-			  seed, outsize,
-			  (uint8_t*)out);
+			ret = tls12_prf(&ctx, (nettle_hash_update_func *)
+					hmac_sha384_update,
+					(nettle_hash_digest_func *)
+					hmac_sha384_digest, SHA384_DIGEST_SIZE,
+					label_size, label, seed_size,
+					seed, outsize, (uint8_t *) out);
 
-		if (unlikely(ret != 1))
-			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
-		break;
-	}
+			if (unlikely(ret != 1))
+				return
+				    gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+			break;
+		}
 #if ENABLE_GOST
 	case GNUTLS_MAC_STREEBOG_256:{
-		struct hmac_streebog256_ctx ctx;
-		hmac_streebog256_set_key(&ctx, master_size, master);
+			struct hmac_streebog256_ctx ctx;
+			hmac_streebog256_set_key(&ctx, master_size, master);
 
-		ret = tls12_prf(&ctx,
-			  (nettle_hash_update_func *)
-			  hmac_streebog256_update,
-			  (nettle_hash_digest_func *)
-			  hmac_streebog256_digest, STREEBOG256_DIGEST_SIZE,
-			  label_size, label, seed_size,
-			  seed, outsize,
-			  (uint8_t*)out);
+			ret = tls12_prf(&ctx, (nettle_hash_update_func *)
+					hmac_streebog256_update,
+					(nettle_hash_digest_func *)
+					hmac_streebog256_digest,
+					STREEBOG256_DIGEST_SIZE, label_size,
+					label, seed_size, seed, outsize,
+					(uint8_t *) out);
 
-		if (unlikely(ret != 1))
-			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
-		break;
-	}
+			if (unlikely(ret != 1))
+				return
+				    gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+			break;
+		}
 	case GNUTLS_MAC_STREEBOG_512:{
-		struct hmac_streebog512_ctx ctx;
-		hmac_streebog512_set_key(&ctx, master_size, master);
+			struct hmac_streebog512_ctx ctx;
+			hmac_streebog512_set_key(&ctx, master_size, master);
 
-		ret = tls12_prf(&ctx,
-			  (nettle_hash_update_func *)
-			  hmac_streebog512_update,
-			  (nettle_hash_digest_func *)
-			  hmac_streebog512_digest, STREEBOG512_DIGEST_SIZE,
-			  label_size, label, seed_size,
-			  seed, outsize,
-			  (uint8_t*)out);
+			ret = tls12_prf(&ctx, (nettle_hash_update_func *)
+					hmac_streebog512_update,
+					(nettle_hash_digest_func *)
+					hmac_streebog512_digest,
+					STREEBOG512_DIGEST_SIZE, label_size,
+					label, seed_size, seed, outsize,
+					(uint8_t *) out);
 
-		if (unlikely(ret != 1))
-			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
-		break;
-	}
+			if (unlikely(ret != 1))
+				return
+				    gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+			break;
+		}
 #endif
 	default:
 		gnutls_assert();

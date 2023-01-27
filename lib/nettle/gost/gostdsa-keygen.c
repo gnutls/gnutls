@@ -44,20 +44,20 @@
 #include "nettle-alloca.h"
 
 void
-gostdsa_generate_keypair (struct ecc_point *pub,
-			  struct ecc_scalar *key,
-			  void *random_ctx, nettle_random_func *random)
+gostdsa_generate_keypair(struct ecc_point *pub,
+			 struct ecc_scalar *key,
+			 void *random_ctx, nettle_random_func * random)
 {
-  TMP_DECL(p, mp_limb_t, 3*ECC_MAX_SIZE + ECC_MUL_G_ITCH (ECC_MAX_SIZE));
-  const struct ecc_curve *ecc = pub->ecc;
-  mp_size_t itch = 3*ecc->p.size + ecc->mul_g_itch;
+	TMP_DECL(p, mp_limb_t, 3 * ECC_MAX_SIZE + ECC_MUL_G_ITCH(ECC_MAX_SIZE));
+	const struct ecc_curve *ecc = pub->ecc;
+	mp_size_t itch = 3 * ecc->p.size + ecc->mul_g_itch;
 
-  assert (key->ecc == ecc);
-  assert (ecc->h_to_a_itch <= ecc->mul_g_itch);
+	assert(key->ecc == ecc);
+	assert(ecc->h_to_a_itch <= ecc->mul_g_itch);
 
-  TMP_ALLOC (p, itch);
+	TMP_ALLOC(p, itch);
 
-  ecc_mod_random (&ecc->q, key->p, random_ctx, random, p);
-  ecc->mul_g (ecc, p, key->p, p + 3*ecc->p.size);
-  ecc->h_to_a (ecc, 0, pub->p, p, p + 3*ecc->p.size);
+	ecc_mod_random(&ecc->q, key->p, random_ctx, random, p);
+	ecc->mul_g(ecc, p, key->p, p + 3 * ecc->p.size);
+	ecc->h_to_a(ecc, 0, pub->p, p, p + 3 * ecc->p.size);
 }

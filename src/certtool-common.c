@@ -51,7 +51,7 @@
 unsigned char *lbuffer = NULL;
 unsigned long lbuffer_size = 0;
 
-static unsigned long file_size(FILE *fp)
+static unsigned long file_size(FILE * fp)
 {
 	unsigned long size;
 	long cur = ftell(fp);
@@ -74,12 +74,12 @@ void fix_lbuffer(unsigned long size)
 {
 	if (lbuffer_size == 0 || lbuffer == NULL) {
 		if (size == 0)
-			lbuffer_size = 64*1024;
+			lbuffer_size = 64 * 1024;
 		else
-			lbuffer_size = MAX(64*1024,size+1);
+			lbuffer_size = MAX(64 * 1024, size + 1);
 		lbuffer = malloc(lbuffer_size);
 	} else if (size > lbuffer_size) {
-		lbuffer_size = MAX(64*1024,size+1);
+		lbuffer_size = MAX(64 * 1024, size + 1);
 		lbuffer = realloc(lbuffer, lbuffer_size);
 	}
 
@@ -126,7 +126,7 @@ gnutls_datum_t *load_secret_key(int mand, common_info_st * info)
 			return NULL;
 	}
 
-	hex_key.data = (void *) info->secret_key;
+	hex_key.data = (void *)info->secret_key;
 	hex_key.size = strlen(info->secret_key);
 
 	ret = gnutls_hex_decode(&hex_key, raw_key, &raw_key_size);
@@ -135,7 +135,7 @@ gnutls_datum_t *load_secret_key(int mand, common_info_st * info)
 		app_exit(1);
 	}
 
-	key.data = (void *) raw_key;
+	key.data = (void *)raw_key;
 	key.size = raw_key_size;
 
 	return &key;
@@ -198,7 +198,8 @@ static gnutls_privkey_t _load_privkey(gnutls_datum_t * dat,
 	}
 
 	if (ret < 0) {
-		fprintf(stderr, "error loading file at --load-privkey: %s: %s\n",
+		fprintf(stderr,
+			"error loading file at --load-privkey: %s: %s\n",
 			info->privkey, gnutls_strerror(ret));
 		app_exit(1);
 	}
@@ -270,7 +271,7 @@ gnutls_privkey_t load_private_key(int mand, common_info_st * info)
 	if (gnutls_url_is_supported(info->privkey) != 0)
 		return _load_url_privkey(info->privkey);
 
-	dat.data = (void *) read_file(info->privkey, RF_BINARY, &size);
+	dat.data = (void *)read_file(info->privkey, RF_BINARY, &size);
 	dat.size = size;
 
 	if (!dat.data) {
@@ -289,8 +290,7 @@ gnutls_privkey_t load_private_key(int mand, common_info_st * info)
 /* Load the private key.
  * @mand should be non zero if it is required to read a private key.
  */
-gnutls_x509_privkey_t
-load_x509_private_key(int mand, common_info_st * info)
+gnutls_x509_privkey_t load_x509_private_key(int mand, common_info_st * info)
 {
 	gnutls_x509_privkey_t key;
 	int ret;
@@ -313,7 +313,7 @@ load_x509_private_key(int mand, common_info_st * info)
 		app_exit(1);
 	}
 
-	dat.data = (void *) read_file(info->privkey, RF_BINARY, &size);
+	dat.data = (void *)read_file(info->privkey, RF_BINARY, &size);
 	dat.size = size;
 
 	if (!dat.data) {
@@ -331,14 +331,12 @@ load_x509_private_key(int mand, common_info_st * info)
 	} else {
 		ret =
 		    gnutls_x509_privkey_import2(key, &dat,
-						info->incert_format, NULL,
-						0);
+						info->incert_format, NULL, 0);
 		if (ret == GNUTLS_E_DECRYPTION_FAILED) {
 			pass = get_password(info, &flags, 0);
 			ret =
 			    gnutls_x509_privkey_import2(key, &dat,
-							info->
-							incert_format,
+							info->incert_format,
 							pass, flags);
 		}
 	}
@@ -361,7 +359,6 @@ load_x509_private_key(int mand, common_info_st * info)
 	return key;
 }
 
-
 /* Loads the certificate
  * If mand is non zero then a certificate is mandatory. Otherwise
  * null will be returned if the certificate loading fails.
@@ -375,7 +372,7 @@ gnutls_x509_crt_t load_cert(int mand, common_info_st * info)
 	crt = load_cert_list(mand, &size, info);
 	if (crt) {
 		ret_crt = crt[0];
-		for (i=1;i<size;i++)
+		for (i = 1; i < size; i++)
 			gnutls_x509_crt_deinit(crt[i]);
 		gnutls_free(crt);
 		return ret_crt;
@@ -386,7 +383,7 @@ gnutls_x509_crt_t load_cert(int mand, common_info_st * info)
 
 /* Loads a certificate list
  */
-gnutls_x509_crt_t *load_cert_list(int mand, size_t * crt_size,
+gnutls_x509_crt_t *load_cert_list(int mand, size_t *crt_size,
 				  common_info_st * info)
 {
 	FILE *fp;
@@ -422,31 +419,33 @@ gnutls_x509_crt_t *load_cert_list(int mand, size_t * crt_size,
 
 	fclose(fp);
 
-	dat.data = (void *) lbuffer;
+	dat.data = (void *)lbuffer;
 	dat.size = size;
 
 	if (info->sort_chain)
 		flags |= GNUTLS_X509_CRT_LIST_SORT;
 
-	ret = gnutls_x509_crt_list_import2(&crt, &crt_max, &dat, GNUTLS_X509_FMT_PEM, flags);
+	ret =
+	    gnutls_x509_crt_list_import2(&crt, &crt_max, &dat,
+					 GNUTLS_X509_FMT_PEM, flags);
 	if (ret < 0) {
-		fprintf(stderr, "Error loading certificates: %s\n", gnutls_strerror(ret));
+		fprintf(stderr, "Error loading certificates: %s\n",
+			gnutls_strerror(ret));
 		app_exit(1);
 	}
 
 	*crt_size = crt_max;
 
 	if (info->verbose)
-		fprintf(stderr, "Loaded %d certificates.\n",
-			(int) crt_max);
+		fprintf(stderr, "Loaded %d certificates.\n", (int)crt_max);
 
 	return crt;
 }
 
 /* Loads a CRL list
  */
-gnutls_x509_crl_t *load_crl_list(int mand, size_t * crl_size,
-				  common_info_st * info)
+gnutls_x509_crl_t *load_crl_list(int mand, size_t *crl_size,
+				 common_info_st * info)
 {
 	FILE *fp;
 	static gnutls_x509_crl_t *crl;
@@ -480,23 +479,27 @@ gnutls_x509_crl_t *load_crl_list(int mand, size_t * crl_size,
 
 	fclose(fp);
 
-	dat.data = (void *) lbuffer;
+	dat.data = (void *)lbuffer;
 	dat.size = size;
 
-	ret = gnutls_x509_crl_list_import2(&crl, &crl_max, &dat, GNUTLS_X509_FMT_PEM, 0);
+	ret =
+	    gnutls_x509_crl_list_import2(&crl, &crl_max, &dat,
+					 GNUTLS_X509_FMT_PEM, 0);
 	if (ret == GNUTLS_E_BASE64_DECODING_ERROR) {
-		ret = gnutls_x509_crl_list_import2(&crl, &crl_max, &dat, GNUTLS_X509_FMT_DER, 0);
+		ret =
+		    gnutls_x509_crl_list_import2(&crl, &crl_max, &dat,
+						 GNUTLS_X509_FMT_DER, 0);
 	}
 	if (ret < 0) {
-		fprintf(stderr, "Error loading CRLs: %s\n", gnutls_strerror(ret));
+		fprintf(stderr, "Error loading CRLs: %s\n",
+			gnutls_strerror(ret));
 		app_exit(1);
 	}
 
 	*crl_size = crl_max;
 
 	if (info->verbose)
-		fprintf(stderr, "Loaded %d CRLs.\n",
-			(int) *crl_size);
+		fprintf(stderr, "Loaded %d CRLs.\n", (int)*crl_size);
 
 	return crl;
 }
@@ -519,7 +522,7 @@ gnutls_x509_crq_t load_request(common_info_st * info)
 		app_exit(1);
 	}
 
-	dat.data = (void *) read_file(info->request, RF_BINARY, &size);
+	dat.data = (void *)read_file(info->request, RF_BINARY, &size);
 	dat.size = size;
 
 	if (!dat.data) {
@@ -560,7 +563,7 @@ gnutls_privkey_t load_ca_private_key(common_info_st * info)
 	if (gnutls_url_is_supported(info->ca_privkey) != 0)
 		return _load_url_privkey(info->ca_privkey);
 
-	dat.data = (void *) read_file(info->ca_privkey, RF_BINARY, &size);
+	dat.data = (void *)read_file(info->ca_privkey, RF_BINARY, &size);
 	dat.size = size;
 
 	if (!dat.data) {
@@ -603,18 +606,20 @@ gnutls_x509_crt_t load_ca_cert(unsigned mand, common_info_st * info)
 	if (gnutls_url_is_supported(info->ca) != 0) {
 		ret = gnutls_x509_crt_import_url(crt, info->ca, 0);
 		if (ret < 0) {
-			fprintf(stderr, "error importing CA certificate: %s: %s\n",
+			fprintf(stderr,
+				"error importing CA certificate: %s: %s\n",
 				info->ca, gnutls_strerror(ret));
 			app_exit(1);
 		}
 		return crt;
 	}
 
-	dat.data = (void *) read_file(info->ca, RF_BINARY, &size);
+	dat.data = (void *)read_file(info->ca, RF_BINARY, &size);
 	dat.size = size;
 
 	if (!dat.data) {
-		fprintf(stderr, "error reading file at --load-ca-certificate: %s\n",
+		fprintf(stderr,
+			"error reading file at --load-ca-certificate: %s\n",
 			info->ca);
 		app_exit(1);
 	}
@@ -657,17 +662,20 @@ gnutls_pubkey_t load_pubkey(int mand, common_info_st * info)
 		app_exit(1);
 	}
 
-	dat.data = (void *) read_file(info->pubkey, RF_BINARY, &size);
+	dat.data = (void *)read_file(info->pubkey, RF_BINARY, &size);
 	dat.size = size;
 
 	if (!dat.data) {
-		fprintf(stderr, "error reading file at --load-pubkey: %s\n", info->pubkey);
+		fprintf(stderr, "error reading file at --load-pubkey: %s\n",
+			info->pubkey);
 		app_exit(1);
 	}
 
 	ret = gnutls_pubkey_import(key, &dat, info->incert_format);
 	if (ret == GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR) {
-		ret = gnutls_pubkey_import_x509_raw(key, &dat, info->incert_format, 0);
+		ret =
+		    gnutls_pubkey_import_x509_raw(key, &dat,
+						  info->incert_format, 0);
 		if (ret < 0) {
 			fprintf(stderr,
 				"import error: could not find a valid PEM header; "
@@ -702,7 +710,8 @@ gnutls_pubkey_t load_public_key_or_import(int mand,
 		gnutls_pubkey_deinit(pubkey);
 		pubkey = load_pubkey(0, info);
 		if (pubkey == NULL && mand) {
-			fprintf(stderr, "Could not determine the public key for the operation.\nYou must specify --load-privkey or --load-pubkey if missing.\n");
+			fprintf(stderr,
+				"Could not determine the public key for the operation.\nYou must specify --load-privkey or --load-pubkey if missing.\n");
 			app_exit(1);
 		}
 	}
@@ -729,7 +738,8 @@ get_bits(gnutls_pk_algorithm_t key_type, int info_bits,
 	if (info_bits != 0) {
 		static int warned = 0;
 
-		if (warned == 0 && warn != 0 && GNUTLS_BITS_ARE_CURVE(info_bits)==0) {
+		if (warned == 0 && warn != 0
+		    && GNUTLS_BITS_ARE_CURVE(info_bits) == 0) {
 			warned = 1;
 			fprintf(stderr,
 				"** Note: You may use '--sec-param %s' instead of '--bits %d'\n",
@@ -756,7 +766,8 @@ gnutls_sec_param_t str_to_sec_param(const char *str)
 		return GNUTLS_SEC_PARAM_LOW;
 	} else if (strcasecmp(str, "legacy") == 0) {
 		return GNUTLS_SEC_PARAM_LEGACY;
-	} else if (strcasecmp(str, "normal") == 0 || strcasecmp(str, "medium") == 0) {
+	} else if (strcasecmp(str, "normal") == 0
+		   || strcasecmp(str, "medium") == 0) {
 		return GNUTLS_SEC_PARAM_MEDIUM;
 	} else if (strcasecmp(str, "high") == 0) {
 		return GNUTLS_SEC_PARAM_HIGH;
@@ -765,16 +776,14 @@ gnutls_sec_param_t str_to_sec_param(const char *str)
 	} else if (strcasecmp(str, "future") == 0) {
 		return GNUTLS_SEC_PARAM_FUTURE;
 	} else {
-		fprintf(stderr, "Unknown security parameter string: %s\n",
-			str);
+		fprintf(stderr, "Unknown security parameter string: %s\n", str);
 		app_exit(1);
 	}
 
 }
 
 #define SPACE "\t"
-static void
-print_hex_datum(FILE * outfile, gnutls_datum_t * dat, int cprint)
+static void print_hex_datum(FILE * outfile, gnutls_datum_t * dat, int cprint)
 {
 	unsigned int j;
 
@@ -782,7 +791,7 @@ print_hex_datum(FILE * outfile, gnutls_datum_t * dat, int cprint)
 		fprintf(outfile, "\n" SPACE "\"");
 		for (j = 0; j < dat->size; j++) {
 			fprintf(outfile, "\\x%.2x",
-				(unsigned char) dat->data[j]);
+				(unsigned char)dat->data[j]);
 			if ((j + 1) % 16 == 0) {
 				fprintf(outfile, "\"\n" SPACE "\"");
 			}
@@ -795,10 +804,10 @@ print_hex_datum(FILE * outfile, gnutls_datum_t * dat, int cprint)
 	fprintf(outfile, "\n" SPACE);
 	for (j = 0; j < dat->size; j++) {
 		if ((j + 1) % 16 == 0) {
-			fprintf(outfile, "%.2x", (unsigned char) dat->data[j]);
+			fprintf(outfile, "%.2x", (unsigned char)dat->data[j]);
 			fprintf(outfile, "\n" SPACE);
 		} else {
-			fprintf(outfile, "%.2x:", (unsigned char) dat->data[j]);
+			fprintf(outfile, "%.2x:", (unsigned char)dat->data[j]);
 		}
 	}
 	fprintf(outfile, "\n\n");
@@ -860,13 +869,13 @@ print_dsa_pkey(FILE * outfile, gnutls_datum_t * x, gnutls_datum_t * y,
 
 gnutls_ecc_curve_t str_to_curve(const char *str)
 {
-unsigned num = 0;
-const gnutls_ecc_curve_t *list, *p;
+	unsigned num = 0;
+	const gnutls_ecc_curve_t *list, *p;
 
 	list = gnutls_ecc_curve_list();
 
 	p = list;
-	while(*p != 0) {
+	while (*p != 0) {
 		if (strcasecmp(str, gnutls_ecc_curve_get_name(*p)) == 0)
 			return *p;
 		p++;
@@ -877,9 +886,8 @@ const gnutls_ecc_curve_t *list, *p;
 	if (num == 0)
 		printf("none\n");
 	p = list;
-	while(*p != 0) {
-		fprintf(stderr, "\t- %s\n",
-		       gnutls_ecc_curve_get_name(*p));
+	while (*p != 0) {
+		fprintf(stderr, "\t- %s\n", gnutls_ecc_curve_get_name(*p));
 		p++;
 	}
 	app_exit(1);
@@ -913,7 +921,7 @@ print_ecc_pkey(FILE * outfile, gnutls_ecc_curve_t curve,
 	}
 }
 
-static void reverse_datum(gnutls_datum_t *d)
+static void reverse_datum(gnutls_datum_t * d)
 {
 	unsigned int i;
 	unsigned char c;
@@ -927,9 +935,9 @@ static void reverse_datum(gnutls_datum_t *d)
 
 void
 print_gost_pkey(FILE * outfile, gnutls_ecc_curve_t curve,
-	       gnutls_digest_algorithm_t digest, gnutls_gost_paramset_t paramset,
-	       gnutls_datum_t * k, gnutls_datum_t * x, gnutls_datum_t * y,
-	       int cprint)
+		gnutls_digest_algorithm_t digest,
+		gnutls_gost_paramset_t paramset, gnutls_datum_t * k,
+		gnutls_datum_t * x, gnutls_datum_t * y, int cprint)
 {
 	if (cprint != 0)
 		fprintf(outfile, "/* curve: %s */\n",
@@ -994,7 +1002,7 @@ print_rsa_pkey(FILE * outfile, gnutls_datum_t * m, gnutls_datum_t * e,
 }
 
 void print_pubkey_info(gnutls_pubkey_t pubkey,
-		       FILE *outfile,
+		       FILE * outfile,
 		       gnutls_certificate_print_formats_t format,
 		       gnutls_x509_crt_fmt_t outcert_format,
 		       unsigned int outtext)
@@ -1018,9 +1026,7 @@ void print_pubkey_info(gnutls_pubkey_t pubkey,
 	fix_lbuffer(0);
 
 	size = lbuffer_size;
-	ret =
-	    gnutls_pubkey_export(pubkey, outcert_format, lbuffer,
-				 &size);
+	ret = gnutls_pubkey_export(pubkey, outcert_format, lbuffer, &size);
 	if (ret < 0) {
 		fprintf(stderr, "export error: %s\n", gnutls_strerror(ret));
 		app_exit(1);
@@ -1050,11 +1056,11 @@ print_dh_info(FILE * outfile, gnutls_datum_t * p, gnutls_datum_t * g,
 	print_head(outfile, "prime", p->size, cprint);
 	print_hex_datum(outfile, p, cprint);
 
-
 }
 
 static
-int import_dsa_dh(gnutls_dh_params_t dh_params, gnutls_datum_t *params, gnutls_x509_crt_fmt_t format)
+int import_dsa_dh(gnutls_dh_params_t dh_params, gnutls_datum_t * params,
+		  gnutls_x509_crt_fmt_t format)
 {
 	gnutls_x509_privkey_t pkey;
 	int ret;
@@ -1090,7 +1096,7 @@ void dh_info(FILE * infile, FILE * outfile, common_info_st * ci)
 		app_exit(1);
 	}
 
-	params.data = (void *) fread_file(infile, 0, &size);
+	params.data = (void *)fread_file(infile, 0, &size);
 	params.size = size;
 
 	if (params.data == NULL) {
@@ -1136,8 +1142,7 @@ void dh_info(FILE * infile, FILE * outfile, common_info_st * ci)
 				fwrite(lbuffer, 1, len, outfile);
 			}
 		} else {
-			fprintf(stderr, "Error: %s\n",
-				gnutls_strerror(ret));
+			fprintf(stderr, "Error: %s\n", gnutls_strerror(ret));
 		}
 	}
 
@@ -1182,7 +1187,7 @@ int cipher_to_flags(const char *cipher)
 	app_exit(1);
 }
 
-static void privkey_info_int(FILE *outfile, common_info_st * cinfo,
+static void privkey_info_int(FILE * outfile, common_info_st * cinfo,
 			     gnutls_x509_privkey_t key)
 {
 	int ret, key_type;
@@ -1220,7 +1225,8 @@ static void privkey_info_int(FILE *outfile, common_info_st * cinfo,
 			goto spki_skip;
 		}
 
-		ret = gnutls_x509_spki_get_rsa_pss_params(spki, &dig, &salt_size);
+		ret =
+		    gnutls_x509_spki_get_rsa_pss_params(spki, &dig, &salt_size);
 		if (ret < 0) {
 			fprintf(stderr, "spki_get_rsa_pss_params: %s\n",
 				gnutls_strerror(ret));
@@ -1267,8 +1273,7 @@ static void privkey_info_int(FILE *outfile, common_info_st * cinfo,
 		gnutls_datum_t p, q, g, y, x;
 
 		ret =
-		    gnutls_x509_privkey_export_dsa_raw(key, &p, &q, &g, &y,
-						       &x);
+		    gnutls_x509_privkey_export_dsa_raw(key, &p, &q, &g, &y, &x);
 		if (ret < 0)
 			fprintf(stderr,
 				"Error in key DSA data export: %s\n",
@@ -1292,8 +1297,7 @@ static void privkey_info_int(FILE *outfile, common_info_st * cinfo,
 		gnutls_ecc_curve_t curve;
 
 		ret =
-		    gnutls_x509_privkey_export_ecc_raw(key, &curve, &x, &y,
-						       &k);
+		    gnutls_x509_privkey_export_ecc_raw(key, &curve, &x, &y, &k);
 		if (ret < 0)
 			fprintf(stderr,
 				"Error in key ECC data export: %s\n",
@@ -1317,16 +1321,14 @@ static void privkey_info_int(FILE *outfile, common_info_st * cinfo,
 		ret =
 		    gnutls_x509_privkey_export_gost_raw(key, &curve,
 							&digest,
-							&paramset,
-							&x, &y, &k);
+							&paramset, &x, &y, &k);
 		if (ret < 0)
 			fprintf(stderr,
 				"Error in key GOST data export: %s\n",
 				gnutls_strerror(ret));
 		else {
 			print_gost_pkey(outfile, curve, digest, paramset,
-					&k, &x, &y,
-					cinfo->cprint);
+					&k, &x, &y, cinfo->cprint);
 
 			gnutls_free(x.data);
 			gnutls_free(y.data);
@@ -1338,17 +1340,16 @@ static void privkey_info_int(FILE *outfile, common_info_st * cinfo,
 	ret = gnutls_x509_privkey_get_seed(key, &dig, lbuffer, &size);
 	if (ret >= 0) {
 		fprintf(outfile, "Validation parameters:\n");
-		fprintf(outfile, "\tHash: %s\n",
-			gnutls_digest_get_name(dig));
-		fprintf(outfile, "\tSeed: %s\n",
-			raw_to_hex(lbuffer, size));
+		fprintf(outfile, "\tHash: %s\n", gnutls_digest_get_name(dig));
+		fprintf(outfile, "\tSeed: %s\n", raw_to_hex(lbuffer, size));
 	}
 
 	fprintf(outfile, "\n");
 
 	size = lbuffer_size;
 	ret =
-	     gnutls_x509_privkey_get_key_id(key, GNUTLS_KEYID_USE_SHA256, lbuffer, &size);
+	    gnutls_x509_privkey_get_key_id(key, GNUTLS_KEYID_USE_SHA256,
+					   lbuffer, &size);
 	if (ret < 0) {
 		fprintf(stderr, "Error in key id calculation: %s\n",
 			gnutls_strerror(ret));
@@ -1361,7 +1362,8 @@ static void privkey_info_int(FILE *outfile, common_info_st * cinfo,
 
 		size = lbuffer_size;
 		ret =
-		     gnutls_x509_privkey_get_key_id(key, GNUTLS_KEYID_USE_SHA1, lbuffer, &size);
+		    gnutls_x509_privkey_get_key_id(key, GNUTLS_KEYID_USE_SHA1,
+						   lbuffer, &size);
 		if (ret >= 0) {
 			fprintf(outfile, "\tsha1:%s\n",
 				raw_to_hex(lbuffer, size));
@@ -1372,7 +1374,8 @@ static void privkey_info_int(FILE *outfile, common_info_st * cinfo,
 }
 
 void
-print_private_key(FILE *outfile, common_info_st * cinfo, gnutls_x509_privkey_t key)
+print_private_key(FILE * outfile, common_info_st * cinfo,
+		  gnutls_x509_privkey_t key)
 {
 	int ret;
 	size_t size;
@@ -1382,7 +1385,8 @@ print_private_key(FILE *outfile, common_info_st * cinfo, gnutls_x509_privkey_t k
 
 	/* Only print private key parameters when an unencrypted
 	 * format is used */
-	switch_to_pkcs8_when_needed(cinfo, key, gnutls_x509_privkey_get_pk_algorithm(key));
+	switch_to_pkcs8_when_needed(cinfo, key,
+				    gnutls_x509_privkey_get_pk_algorithm(key));
 
 	if (!cinfo->pkcs8) {
 
@@ -1459,17 +1463,28 @@ int generate_prime(FILE * outfile, int how, common_info_st * info)
 				gnutls_keygen_data_st data;
 
 				if (info->seed_size < 32) {
-					fprintf(stderr, "For DH parameter generation a 32-byte seed value or larger is expected (have: %d); use -d 2 for more information.\n", (int)info->seed_size);
+					fprintf(stderr,
+						"For DH parameter generation a 32-byte seed value or larger is expected (have: %d); use -d 2 for more information.\n",
+						(int)info->seed_size);
 					app_exit(1);
 				}
 
 				data.type = GNUTLS_KEYGEN_SEED;
-				data.data = (void*)info->seed;
+				data.data = (void *)info->seed;
 				data.size = info->seed_size;
 
-				ret = gnutls_x509_privkey_generate2(pkey, GNUTLS_PK_DSA, bits, GNUTLS_PRIVKEY_FLAG_PROVABLE, &data, 1);
+				ret =
+				    gnutls_x509_privkey_generate2(pkey,
+								  GNUTLS_PK_DSA,
+								  bits,
+								  GNUTLS_PRIVKEY_FLAG_PROVABLE,
+								  &data, 1);
 			} else {
-				ret = gnutls_x509_privkey_generate(pkey, GNUTLS_PK_DSA, bits, GNUTLS_PRIVKEY_FLAG_PROVABLE);
+				ret =
+				    gnutls_x509_privkey_generate(pkey,
+								 GNUTLS_PK_DSA,
+								 bits,
+								 GNUTLS_PRIVKEY_FLAG_PROVABLE);
 			}
 
 			if (ret < 0) {
@@ -1502,9 +1517,7 @@ int generate_prime(FILE * outfile, int how, common_info_st * info)
 			}
 		}
 
-		ret =
-		    gnutls_dh_params_export_raw(dh_params, &p, &g,
-						&q_bits);
+		ret = gnutls_dh_params_export_raw(dh_params, &p, &g, &q_bits);
 		if (ret < 0) {
 			fprintf(stderr, "Error exporting parameters: %s\n",
 				gnutls_strerror(ret));
@@ -1512,7 +1525,8 @@ int generate_prime(FILE * outfile, int how, common_info_st * info)
 		}
 	} else {
 		if (info->provable != 0) {
-			fprintf(stderr, "The DH parameters obtained via this option are not provable\n");
+			fprintf(stderr,
+				"The DH parameters obtained via this option are not provable\n");
 			app_exit(1);
 		}
 #if defined(ENABLE_DHE) || defined(ENABLE_ANON)
@@ -1569,8 +1583,7 @@ int generate_prime(FILE * outfile, int how, common_info_st * info)
 			app_exit(1);
 		}
 #else
-		fprintf(stderr,
-			"Parameters unavailable as SRP is disabled.\n");
+		fprintf(stderr, "Parameters unavailable as SRP is disabled.\n");
 		app_exit(1);
 #endif
 	}
@@ -1593,8 +1606,7 @@ int generate_prime(FILE * outfile, int how, common_info_st * info)
 				fwrite(lbuffer, 1, len, outfile);
 
 		} else {
-			fprintf(stderr, "Error: %s\n",
-				gnutls_strerror(ret));
+			fprintf(stderr, "Error: %s\n", gnutls_strerror(ret));
 		}
 
 	}
@@ -1609,7 +1621,7 @@ int generate_prime(FILE * outfile, int how, common_info_st * info)
 	return 0;
 }
 
-void decode_seed(gnutls_datum_t *seed, const char *hex, unsigned hex_size)
+void decode_seed(gnutls_datum_t * seed, const char *hex, unsigned hex_size)
 {
 	int ret;
 	size_t seed_size;
@@ -1625,7 +1637,8 @@ void decode_seed(gnutls_datum_t *seed, const char *hex, unsigned hex_size)
 	seed_size = hex_size;
 	ret = gnutls_hex2bin(hex, hex_size, seed->data, &seed_size);
 	if (ret < 0) {
-		fprintf(stderr, "Could not hex decode data: %s\n", gnutls_strerror(ret));
+		fprintf(stderr, "Could not hex decode data: %s\n",
+			gnutls_strerror(ret));
 		app_exit(1);
 	}
 	seed->size = seed_size;
@@ -1639,7 +1652,8 @@ gnutls_pk_algorithm_t figure_key_type(const char *key_type)
 		return GNUTLS_PK_RSA;
 	else if (strcasecmp(key_type, "rsa-pss") == 0)
 		return GNUTLS_PK_RSA_PSS;
-	else if (strcasecmp(key_type, "ed25519") == 0 || strcasecmp(key_type, "eddsa") == 0)
+	else if (strcasecmp(key_type, "ed25519") == 0
+		 || strcasecmp(key_type, "eddsa") == 0)
 		return GNUTLS_PK_EDDSA_ED25519;
 	else if (strcasecmp(key_type, "ed448") == 0)
 		return GNUTLS_PK_EDDSA_ED448;
@@ -1649,7 +1663,8 @@ gnutls_pk_algorithm_t figure_key_type(const char *key_type)
 		return GNUTLS_PK_ECDH_X448;
 	else if (strcasecmp(key_type, "dsa") == 0)
 		return GNUTLS_PK_DSA;
-	else if (strcasecmp(key_type, "ecdsa") == 0 || strcasecmp(key_type, "ecc") == 0)
+	else if (strcasecmp(key_type, "ecdsa") == 0
+		 || strcasecmp(key_type, "ecc") == 0)
 		return GNUTLS_PK_ECDSA;
 	else if (strcasecmp(key_type, "gost01") == 0)
 		return GNUTLS_PK_GOST_01;
@@ -1694,7 +1709,7 @@ gnutls_digest_algorithm_t hash_to_id(const char *hash)
 	}
 }
 
-void sign_params_to_flags(common_info_st *cinfo, const char *params)
+void sign_params_to_flags(common_info_st * cinfo, const char *params)
 {
 	char *p, *sp;
 
@@ -1706,15 +1721,15 @@ void sign_params_to_flags(common_info_st *cinfo, const char *params)
 
 	p = strtok(sp, ",");
 
-	while(p != NULL) {
-		if (strcasecmp(p, "rsa-pss")==0) {
+	while (p != NULL) {
+		if (strcasecmp(p, "rsa-pss") == 0) {
 			cinfo->rsa_pss_sign = 1;
 		} else {
 			fprintf(stderr, "Unknown signature parameter: %s\n", p);
 			app_exit(1);
 		}
 
-		p=strtok(NULL, ",");
+		p = strtok(NULL, ",");
 	}
 
 	free(sp);

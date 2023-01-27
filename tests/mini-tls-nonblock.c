@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,19 +35,19 @@ int main(void)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/dtls.h>
-#include <signal.h>
+# include <string.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <fcntl.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/dtls.h>
+# include <signal.h>
 
-#include "utils.h"
+# include "utils.h"
 
 static void terminate(void);
 
@@ -106,27 +106,23 @@ const gnutls_datum_t server_key = { server_key_pem,
 	sizeof(server_key_pem)
 };
 
-
 /* A very basic TLS client, with anonymous authentication.
  */
 
-#define MAX_BUF 1024
+# define MAX_BUF 1024
 static const char *g_msg = "";
 
-static ssize_t
-my_pull(gnutls_transport_ptr_t tr, void *data, size_t len)
+static ssize_t my_pull(gnutls_transport_ptr_t tr, void *data, size_t len)
 {
 	return recv((long)tr, data, len, 0);
 }
 
-static ssize_t
-my_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
+static ssize_t my_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 {
 	return send((long)tr, data, len, 0);
 }
 
-static int
-my_pull_timeout(gnutls_transport_ptr_t tr, unsigned ms)
+static int my_pull_timeout(gnutls_transport_ptr_t tr, unsigned ms)
 {
 	if (ms != 0) {
 		fail("pull timeout was called: %s!\n", g_msg);
@@ -160,7 +156,7 @@ static void client(int fd, const char *msg, const char *prio, unsigned expl)
 
 	/* Initialize TLS session
 	 */
-	gnutls_init(&session, GNUTLS_CLIENT|expl);
+	gnutls_init(&session, GNUTLS_CLIENT | expl);
 
 	/* Use default priorities */
 	ret = gnutls_priority_set_direct(session, prio, NULL);
@@ -210,10 +206,8 @@ static void client(int fd, const char *msg, const char *prio, unsigned expl)
 	gnutls_global_deinit();
 }
 
-
 /* These are global */
 pid_t child;
-
 
 static void terminate(void)
 {
@@ -242,13 +236,12 @@ static void server(int fd, const char *prio, unsigned expl)
 
 	gnutls_certificate_allocate_credentials(&x509_cred);
 	gnutls_certificate_set_x509_key_mem(x509_cred, &server_cert,
-					    &server_key,
-					    GNUTLS_X509_FMT_PEM);
+					    &server_key, GNUTLS_X509_FMT_PEM);
 
 	gnutls_anon_allocate_server_credentials(&anoncred);
 
 	if (expl & GNUTLS_DATAGRAM)
-		gnutls_init(&session, GNUTLS_SERVER|GNUTLS_DATAGRAM);
+		gnutls_init(&session, GNUTLS_SERVER | GNUTLS_DATAGRAM);
 	else
 		gnutls_init(&session, GNUTLS_SERVER);
 
@@ -334,19 +327,23 @@ static void ch_handler(int sig)
 	return;
 }
 
-#ifndef GNUTLS_NONBLOCK
-# error GNUTLS_NONBLOCK should have been defined
-#endif
+# ifndef GNUTLS_NONBLOCK
+#  error GNUTLS_NONBLOCK should have been defined
+# endif
 
 void doit(void)
 {
 	signal(SIGCHLD, ch_handler);
 
-	start("TLS1.2-explicit flag", "NORMAL:-VERS-ALL:+VERS-TLS1.2", GNUTLS_NONBLOCK);
-	start("TLS1.2-explicit flag", "NORMAL:-VERS-ALL:+VERS-TLS1.3", GNUTLS_NONBLOCK);
+	start("TLS1.2-explicit flag", "NORMAL:-VERS-ALL:+VERS-TLS1.2",
+	      GNUTLS_NONBLOCK);
+	start("TLS1.2-explicit flag", "NORMAL:-VERS-ALL:+VERS-TLS1.3",
+	      GNUTLS_NONBLOCK);
 	start("TLS-explicit flag", "NORMAL", GNUTLS_NONBLOCK);
-	start("DTLS1.2-explicit flag", "NORMAL:-VERS-ALL:+VERS-DTLS1.2", GNUTLS_NONBLOCK|GNUTLS_DATAGRAM);
-	start("DTLS-explicit flag", "NORMAL", GNUTLS_NONBLOCK|GNUTLS_DATAGRAM);
+	start("DTLS1.2-explicit flag", "NORMAL:-VERS-ALL:+VERS-DTLS1.2",
+	      GNUTLS_NONBLOCK | GNUTLS_DATAGRAM);
+	start("DTLS-explicit flag", "NORMAL",
+	      GNUTLS_NONBLOCK | GNUTLS_DATAGRAM);
 	start("TLS1.2-no flag", "NORMAL:-VERS-ALL:+VERS-TLS1.2", 0);
 	start("TLS1.3-no flag", "NORMAL:-VERS-ALL:+VERS-TLS1.3", 0);
 	start("TLS-no flag", "NORMAL", 0);

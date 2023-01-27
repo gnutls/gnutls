@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -36,23 +36,23 @@ int main(void)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/dtls.h>
-#include <assert.h>
+# include <string.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/dtls.h>
+# include <assert.h>
 
-#include "cert-common.h"
-#include "utils.h"
+# include "cert-common.h"
+# include "utils.h"
 
-#define MTU 1500
-#define MAX_BUF 4096
-#define MSG "Hello TLS"
+# define MTU 1500
+# define MAX_BUF 4096
+# define MSG "Hello TLS"
 
 static int server_fd = -1;
 static char pkt_buf[MAX_BUF];
@@ -125,16 +125,15 @@ static void client(int fd, const char *prio)
 	gnutls_dtls_set_mtu(session, MTU);
 
 	snprintf(buffer, sizeof(buffer), "%s:+ANON-ECDH", prio);
-	assert(gnutls_priority_set_direct(session,
-					  buffer,
-					  NULL) >= 0);
+	assert(gnutls_priority_set_direct(session, buffer, NULL) >= 0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, clientx509cred);
 
 	gnutls_transport_set_int(session, fd);
 	gnutls_transport_set_push_function(session, push);
-	gnutls_dtls_set_timeouts(session, get_dtls_retransmit_timeout(), get_timeout());
+	gnutls_dtls_set_timeouts(session, get_dtls_retransmit_timeout(),
+				 get_timeout());
 
 	/* Perform the TLS handshake
 	 */
@@ -159,9 +158,7 @@ static void client(int fd, const char *prio)
 
 	/* update priorities to allow cert auth */
 	snprintf(buffer, sizeof(buffer), "%s:+ECDHE-RSA", prio);
-	assert(gnutls_priority_set_direct(session,
-					  buffer,
-					  NULL) >= 0);
+	assert(gnutls_priority_set_direct(session, buffer, NULL) >= 0);
 
 	do {
 		ret = gnutls_record_recv(session, buffer, MAX_BUF);
@@ -246,9 +243,7 @@ static void server(int fd, const char *prio)
 	 * are adequate.
 	 */
 	snprintf(buffer, sizeof(buffer), "%s:+ECDHE-RSA:+ANON-ECDH", prio);
-	assert(gnutls_priority_set_direct(session,
-					  buffer,
-					  NULL) >= 0);
+	assert(gnutls_priority_set_direct(session, buffer, NULL) >= 0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, serverx509cred);
@@ -324,7 +319,7 @@ static void server(int fd, const char *prio)
 			do {
 				ret =
 				    gnutls_record_send(session, buffer,
-							strlen(buffer));
+						       strlen(buffer));
 			} while (ret == GNUTLS_E_AGAIN
 				 || ret == GNUTLS_E_INTERRUPTED);
 		}
@@ -385,7 +380,8 @@ static void start(const char *prio)
 
 void doit(void)
 {
-	start("NONE:+VERS-DTLS1.2:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+CURVE-ALL");
+	start
+	    ("NONE:+VERS-DTLS1.2:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+CURVE-ALL");
 }
 
 #endif				/* _WIN32 */

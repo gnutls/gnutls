@@ -30,80 +30,74 @@
    the GNU Lesser General Public License along with this program.  If
    not, see https://www.gnu.org/licenses/.
 */
- 
+
 #ifndef GNUTLS_LIB_NETTLE_GOST_STREEBOG_H
-#define GNUTLS_LIB_NETTLE_GOST_STREEBOG_H
+# define GNUTLS_LIB_NETTLE_GOST_STREEBOG_H
 
-#include "config.h"
+# include "config.h"
 
-#include <nettle/nettle-types.h>
-#include <nettle/nettle-meta.h>
+# include <nettle/nettle-types.h>
+# include <nettle/nettle-meta.h>
 
-#ifdef __cplusplus
+# ifdef __cplusplus
 extern "C" {
-#endif
+# endif
 
-#ifndef HAVE_NETTLE_STREEBOG512_UPDATE
+# ifndef HAVE_NETTLE_STREEBOG512_UPDATE
 /* Name mangling */
-#define streebog256_init _gnutls_streebog256_init
-#define streebog256_digest _gnutls_streebog256_digest
-#define streebog512_init _gnutls_streebog512_init
-#define streebog512_update _gnutls_streebog512_update
-#define streebog512_digest _gnutls_streebog512_digest
+#  define streebog256_init _gnutls_streebog256_init
+#  define streebog256_digest _gnutls_streebog256_digest
+#  define streebog512_init _gnutls_streebog512_init
+#  define streebog512_update _gnutls_streebog512_update
+#  define streebog512_digest _gnutls_streebog512_digest
 
 /* STREEBOG512 */
 
-#define STREEBOG512_DIGEST_SIZE 64
-#define STREEBOG512_BLOCK_SIZE 64
+#  define STREEBOG512_DIGEST_SIZE 64
+#  define STREEBOG512_BLOCK_SIZE 64
 
 /* Digest is kept internally as 8 64-bit words. */
-#define _STREEBOG512_DIGEST_LENGTH 8
+#  define _STREEBOG512_DIGEST_LENGTH 8
 
-struct streebog512_ctx
-{
-  uint64_t state[_STREEBOG512_DIGEST_LENGTH];    /* State variables */
-  uint64_t count[_STREEBOG512_DIGEST_LENGTH];
-  uint64_t sigma[_STREEBOG512_DIGEST_LENGTH];
-  uint8_t block[STREEBOG512_BLOCK_SIZE];          /* STREEBOG512 data buffer */
-  unsigned int index;                       /* index into buffer */
-};
+	struct streebog512_ctx {
+		uint64_t state[_STREEBOG512_DIGEST_LENGTH];	/* State variables */
+		uint64_t count[_STREEBOG512_DIGEST_LENGTH];
+		uint64_t sigma[_STREEBOG512_DIGEST_LENGTH];
+		uint8_t block[STREEBOG512_BLOCK_SIZE];	/* STREEBOG512 data buffer */
+		unsigned int index;	/* index into buffer */
+	};
 
-void
-streebog512_init(struct streebog512_ctx *ctx);
+	void
+	 streebog512_init(struct streebog512_ctx *ctx);
 
-void
-streebog512_update(struct streebog512_ctx *ctx,
-	      size_t length,
-	      const uint8_t *data);
+	void
+	 streebog512_update(struct streebog512_ctx *ctx,
+			    size_t length, const uint8_t * data);
 
-void
-streebog512_digest(struct streebog512_ctx *ctx,
-	      size_t length,
-	      uint8_t *digest);
+	void
+	 streebog512_digest(struct streebog512_ctx *ctx,
+			    size_t length, uint8_t * digest);
 
+#  define STREEBOG256_DIGEST_SIZE 32
+#  define STREEBOG256_BLOCK_SIZE STREEBOG512_BLOCK_SIZE
+#  define streebog256_ctx streebog512_ctx
 
-#define STREEBOG256_DIGEST_SIZE 32
-#define STREEBOG256_BLOCK_SIZE STREEBOG512_BLOCK_SIZE
-#define streebog256_ctx streebog512_ctx
+	void
+	 streebog256_init(struct streebog256_ctx *ctx);
 
-void
-streebog256_init(struct streebog256_ctx *ctx);
+#  define streebog256_update _gnutls_streebog512_update
 
-#define streebog256_update _gnutls_streebog512_update
+	void
+	 streebog256_digest(struct streebog256_ctx *ctx,
+			    size_t length, uint8_t * digest);
 
-void
-streebog256_digest(struct streebog256_ctx *ctx,
-		  size_t length,
-		  uint8_t *digest);
+#  define nettle_streebog256 _gnutls_streebog256
+#  define nettle_streebog512 _gnutls_streebog512
+	extern const struct nettle_hash _gnutls_streebog256;
+	extern const struct nettle_hash _gnutls_streebog512;
+# endif
 
-#define nettle_streebog256 _gnutls_streebog256
-#define nettle_streebog512 _gnutls_streebog512
-extern const struct nettle_hash _gnutls_streebog256;
-extern const struct nettle_hash _gnutls_streebog512;
-#endif
-
-#ifdef __cplusplus
+# ifdef __cplusplus
 }
-#endif
-
-#endif /* GNUTLS_LIB_NETTLE_GOST_STREEBOG_H */
+# endif
+#endif				/* GNUTLS_LIB_NETTLE_GOST_STREEBOG_H */

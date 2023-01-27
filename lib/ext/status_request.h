@@ -21,21 +21,18 @@
  */
 
 #ifndef GNUTLS_LIB_EXT_STATUS_REQUEST_H
-#define GNUTLS_LIB_EXT_STATUS_REQUEST_H
+# define GNUTLS_LIB_EXT_STATUS_REQUEST_H
 
-#include <hello_ext.h>
+# include <hello_ext.h>
 
-#define STATUS_REQUEST_TLS_ID 5
+# define STATUS_REQUEST_TLS_ID 5
 
 extern const hello_ext_entry_st ext_mod_status_request;
 
-int
-_gnutls_send_server_certificate_status(gnutls_session_t session,
-				       int again);
+int _gnutls_send_server_certificate_status(gnutls_session_t session, int again);
 int _gnutls_recv_server_certificate_status(gnutls_session_t session);
 
-int _gnutls_parse_ocsp_response(gnutls_session_t session, const uint8_t *data,
-				ssize_t data_size,
-				gnutls_datum_t *resp);
+int _gnutls_parse_ocsp_response(gnutls_session_t session, const uint8_t * data,
+				ssize_t data_size, gnutls_datum_t * resp);
 
-#endif /* GNUTLS_LIB_EXT_STATUS_REQUEST_H */
+#endif				/* GNUTLS_LIB_EXT_STATUS_REQUEST_H */

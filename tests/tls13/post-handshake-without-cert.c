@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,21 +35,21 @@ int main(void)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/dtls.h>
-#include <signal.h>
-#include <assert.h>
+# include <string.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/dtls.h>
+# include <signal.h>
+# include <assert.h>
 
-#include "cert-common.h"
-#include "tls13/ext-parse.h"
-#include "utils.h"
+# include "cert-common.h"
+# include "tls13/ext-parse.h"
+# include "utils.h"
 
 /* This program tests whether the Post Handshake Auth extension is missing
  * from both hellos, when not enabled by client.
@@ -65,7 +65,7 @@ static void client_log_func(int level, const char *str)
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
 
-#define MAX_BUF 1024
+# define MAX_BUF 1024
 
 static void client(int fd)
 {
@@ -92,7 +92,10 @@ static void client(int fd)
 
 	gnutls_handshake_set_timeout(session, get_timeout());
 
-	ret = gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:+VERS-TLS1.0", NULL);
+	ret =
+	    gnutls_priority_set_direct(session,
+				       "NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:+VERS-TLS1.0",
+				       NULL);
 	if (ret < 0)
 		fail("cannot set TLS 1.3 priorities\n");
 
@@ -112,7 +115,8 @@ static void client(int fd)
 	/* try if gnutls_reauth() would fail as expected */
 	ret = gnutls_reauth(session, 0);
 	if (ret != GNUTLS_E_INVALID_REQUEST)
-		fail("server: gnutls_reauth did not fail as expected: %s", gnutls_strerror(ret));
+		fail("server: gnutls_reauth did not fail as expected: %s",
+		     gnutls_strerror(ret));
 
 	close(fd);
 
@@ -125,13 +129,15 @@ static void client(int fd)
 
 static unsigned server_hello_ok = 0;
 
-#define TLS_EXT_POST_HANDSHAKE 49
+# define TLS_EXT_POST_HANDSHAKE 49
 
 static int hellos_callback(gnutls_session_t session, unsigned int htype,
-	unsigned post, unsigned int incoming, const gnutls_datum_t *msg)
+			   unsigned post, unsigned int incoming,
+			   const gnutls_datum_t * msg)
 {
 	if (htype == GNUTLS_HANDSHAKE_SERVER_HELLO && post == GNUTLS_HOOK_POST) {
-		if (find_server_extension(msg, TLS_EXT_POST_HANDSHAKE, NULL, NULL)) {
+		if (find_server_extension
+		    (msg, TLS_EXT_POST_HANDSHAKE, NULL, NULL)) {
 			fail("Post handshake extension seen in server hello!\n");
 		}
 		server_hello_ok = 1;
@@ -167,15 +173,13 @@ static void server(int fd)
 
 	gnutls_certificate_allocate_credentials(&x509_cred);
 	gnutls_certificate_set_x509_key_mem(x509_cred, &server_cert,
-					    &server_key,
-					    GNUTLS_X509_FMT_PEM);
+					    &server_key, GNUTLS_X509_FMT_PEM);
 
 	gnutls_init(&session, GNUTLS_SERVER);
 
 	gnutls_handshake_set_timeout(session, get_timeout());
 	gnutls_handshake_set_hook_function(session, GNUTLS_HANDSHAKE_ANY,
-					   GNUTLS_HOOK_BOTH,
-					   hellos_callback);
+					   GNUTLS_HOOK_BOTH, hellos_callback);
 
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
@@ -188,12 +192,13 @@ static void server(int fd)
 
 	do {
 		ret = gnutls_handshake(session);
-		if (ret == GNUTLS_E_INTERRUPTED) { /* expected */
+		if (ret == GNUTLS_E_INTERRUPTED) {	/* expected */
 			break;
 		}
 	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
-	if ((gnutls_session_get_flags(session) & GNUTLS_SFLAGS_POST_HANDSHAKE_AUTH)) {
+	if ((gnutls_session_get_flags(session) &
+	     GNUTLS_SFLAGS_POST_HANDSHAKE_AUTH)) {
 		fail("server: session flags did contain GNUTLS_SFLAGS_POST_HANDSHAKE_AUTH\n");
 	}
 
@@ -204,7 +209,8 @@ static void server(int fd)
 	/* try if gnutls_reauth() would fail as expected */
 	ret = gnutls_reauth(session, 0);
 	if (ret != GNUTLS_E_INVALID_REQUEST)
-		fail("server: gnutls_reauth did not fail as expected: %s", gnutls_strerror(ret));
+		fail("server: gnutls_reauth did not fail as expected: %s",
+		     gnutls_strerror(ret));
 
 	close(fd);
 	gnutls_deinit(session);

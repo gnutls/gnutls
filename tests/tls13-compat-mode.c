@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <gnutls/gnutls.h>
@@ -47,7 +47,7 @@ struct data {
 static int
 handshake_callback(gnutls_session_t session, unsigned int htype,
 		   unsigned post, unsigned int incoming,
-		   const gnutls_datum_t *msg)
+		   const gnutls_datum_t * msg)
 {
 	unsigned pos;
 	struct data *data;
@@ -72,8 +72,7 @@ handshake_callback(gnutls_session_t session, unsigned int htype,
 	return 0;
 }
 
-static void
-test(const char *name, bool client_compat, bool server_compat)
+static void test(const char *name, bool client_compat, bool server_compat)
 {
 	/* Server stuff. */
 	gnutls_certificate_credentials_t serverx509cred;
@@ -94,11 +93,11 @@ test(const char *name, bool client_compat, bool server_compat)
 					    GNUTLS_X509_FMT_PEM);
 
 	assert(gnutls_init(&server, GNUTLS_SERVER) >= 0);
-	assert(gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, serverx509cred) >= 0);
-	assert(gnutls_priority_set_direct(server,
-					  server_compat ?
-					  COMPAT_PRIO : NO_COMPAT_PRIO,
-					  NULL) >= 0);
+	assert(gnutls_credentials_set
+	       (server, GNUTLS_CRD_CERTIFICATE, serverx509cred) >= 0);
+	assert(gnutls_priority_set_direct
+	       (server, server_compat ? COMPAT_PRIO : NO_COMPAT_PRIO,
+		NULL) >= 0);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
@@ -118,7 +117,8 @@ test(const char *name, bool client_compat, bool server_compat)
 	gnutls_transport_set_ptr(client, client);
 	data.compat = client_compat;
 	gnutls_session_set_ptr(client, &data);
-	gnutls_handshake_set_hook_function(client, GNUTLS_HANDSHAKE_CLIENT_HELLO,
+	gnutls_handshake_set_hook_function(client,
+					   GNUTLS_HANDSHAKE_CLIENT_HELLO,
 					   GNUTLS_HOOK_POST,
 					   handshake_callback);
 

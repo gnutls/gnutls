@@ -22,7 +22,7 @@
 /* This tests TLS negotiation using the gnutls_privkey_import_ext2() APIs */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -64,16 +64,20 @@ static unsigned verify_eddsa_presence(void)
 
 	i = 0;
 	do {
-		ret = gnutls_pkcs11_token_get_mechanism("pkcs11:", i++, &mechanism);
-		if (ret >= 0 && mechanism == 0x1057 /* CKM_EDDSA */)
+		ret =
+		    gnutls_pkcs11_token_get_mechanism("pkcs11:", i++,
+						      &mechanism);
+		if (ret >= 0 && mechanism == 0x1057 /* CKM_EDDSA */ )
 			return 1;
-	} while(ret>=0);
+	} while (ret >= 0);
 
 	return 0;
 }
 
-static gnutls_privkey_t load_virt_privkey(const char *name, const gnutls_datum_t *txtkey,
-					  int exp_key_err, unsigned needs_decryption)
+static gnutls_privkey_t load_virt_privkey(const char *name,
+					  const gnutls_datum_t * txtkey,
+					  int exp_key_err,
+					  unsigned needs_decryption)
 {
 	unsigned flags;
 	gnutls_privkey_t privkey;
@@ -94,22 +98,25 @@ static gnutls_privkey_t load_virt_privkey(const char *name, const gnutls_datum_t
 		flags = GNUTLS_KEY_DIGITAL_SIGNATURE;
 
 	ret = gnutls_pkcs11_copy_x509_privkey(SOFTHSM_URL, tmp, "key", flags,
-					      GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE|GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE|GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
+					      GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE
+					      |
+					      GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE
+					      | GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
 	gnutls_x509_privkey_deinit(tmp);
 
 	if (ret < 0) {
 		if (ret == exp_key_err) {
 			return NULL;
 		}
-		fail("gnutls_pkcs11_copy_x509_privkey: %s\n", gnutls_strerror(ret));
+		fail("gnutls_pkcs11_copy_x509_privkey: %s\n",
+		     gnutls_strerror(ret));
 	}
 
 	ret = gnutls_privkey_init(&privkey);
 	if (ret < 0)
 		testfail("gnutls_privkey_init\n");
 
-	ret =
-	    gnutls_privkey_import_url(privkey, SOFTHSM_URL";object=key", 0);
+	ret = gnutls_privkey_import_url(privkey, SOFTHSM_URL ";object=key", 0);
 	if (ret < 0) {
 		if (ret == exp_key_err) {
 			gnutls_privkey_deinit(privkey);
@@ -127,12 +134,11 @@ static gnutls_privkey_t load_virt_privkey(const char *name, const gnutls_datum_t
 
 static
 void try_with_key(const char *name, const char *client_prio,
-		 gnutls_kx_algorithm_t client_kx,
-		 gnutls_sign_algorithm_t server_sign_algo,
-		 gnutls_sign_algorithm_t client_sign_algo,
-		 const gnutls_datum_t *serv_cert,
-		 gnutls_privkey_t key,
-		 int exp_serv_err)
+		  gnutls_kx_algorithm_t client_kx,
+		  gnutls_sign_algorithm_t server_sign_algo,
+		  gnutls_sign_algorithm_t client_sign_algo,
+		  const gnutls_datum_t * serv_cert,
+		  gnutls_privkey_t key, int exp_serv_err)
 {
 	int ret;
 	gnutls_pcert_st pcert_list[4];
@@ -156,22 +162,23 @@ void try_with_key(const char *name, const char *client_prio,
 	/* Init server */
 	gnutls_certificate_allocate_credentials(&s_xcred);
 
-	pcert_list_size = sizeof(pcert_list)/sizeof(pcert_list[0]);
+	pcert_list_size = sizeof(pcert_list) / sizeof(pcert_list[0]);
 	ret = gnutls_pcert_list_import_x509_raw(pcert_list, &pcert_list_size,
-		serv_cert, GNUTLS_X509_FMT_PEM, 0);
+						serv_cert, GNUTLS_X509_FMT_PEM,
+						0);
 	if (ret < 0) {
-		testfail("error in gnutls_pcert_list_import_x509_raw: %s\n", gnutls_strerror(ret));
+		testfail("error in gnutls_pcert_list_import_x509_raw: %s\n",
+			 gnutls_strerror(ret));
 	}
 
 	ret = gnutls_certificate_set_key(s_xcred, NULL, 0, pcert_list,
-				pcert_list_size, key);
+					 pcert_list_size, key);
 	if (ret < 0) {
 		testfail("Could not set key/cert: %s\n", gnutls_strerror(ret));
 	}
 
 	gnutls_init(&server, GNUTLS_SERVER);
-	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-				s_xcred);
+	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, s_xcred);
 
 	assert(gnutls_priority_set_direct(server,
 					  "NORMAL:+VERS-SSL3.0:+ANON-ECDH:+ANON-DH:+ECDHE-RSA:+DHE-RSA:+RSA:+ECDHE-ECDSA:+CURVE-X25519:+SIGN-EDDSA-ED25519",
@@ -190,8 +197,7 @@ void try_with_key(const char *name, const char *client_prio,
 	if (ret < 0)
 		exit(1);
 
-	ret = gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-				c_xcred);
+	ret = gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE, c_xcred);
 	if (ret < 0)
 		exit(1);
 
@@ -213,8 +219,10 @@ void try_with_key(const char *name, const char *client_prio,
 	}
 
 	if (gnutls_kx_get(client) != client_kx) {
-		testfail("%s: got unexpected key exchange algorithm: %s (expected %s)\n", name, gnutls_kx_get_name(gnutls_kx_get(client)),
-			gnutls_kx_get_name(client_kx));
+		testfail
+		    ("%s: got unexpected key exchange algorithm: %s (expected %s)\n",
+		     name, gnutls_kx_get_name(gnutls_kx_get(client)),
+		     gnutls_kx_get_name(client_kx));
 		exit(1);
 	}
 
@@ -223,25 +231,33 @@ void try_with_key(const char *name, const char *client_prio,
 	if (version >= GNUTLS_TLS1_2) {
 		ret = gnutls_sign_algorithm_get(server);
 		if (ret != (int)server_sign_algo && server_sign_algo != 0) {
-			testfail("%s: got unexpected server signature algorithm: %d/%s\n", name, ret, gnutls_sign_get_name(ret));
+			testfail
+			    ("%s: got unexpected server signature algorithm: %d/%s\n",
+			     name, ret, gnutls_sign_get_name(ret));
 			exit(1);
 		}
 
 		ret = gnutls_sign_algorithm_get_client(server);
 		if (ret != (int)client_sign_algo && client_sign_algo != 0) {
-			testfail("%s: got unexpected client signature algorithm: %d/%s\n", name, ret, gnutls_sign_get_name(ret));
+			testfail
+			    ("%s: got unexpected client signature algorithm: %d/%s\n",
+			     name, ret, gnutls_sign_get_name(ret));
 			exit(1);
 		}
 
 		ret = gnutls_sign_algorithm_get(client);
 		if (ret != (int)server_sign_algo && server_sign_algo != 0) {
-			testfail("%s: cl: got unexpected server signature algorithm: %d/%s\n", name, ret, gnutls_sign_get_name(ret));
+			testfail
+			    ("%s: cl: got unexpected server signature algorithm: %d/%s\n",
+			     name, ret, gnutls_sign_get_name(ret));
 			exit(1);
 		}
 
 		ret = gnutls_sign_algorithm_get_client(client);
 		if (ret != (int)client_sign_algo && client_sign_algo != 0) {
-			testfail("%s: cl: got unexpected client signature algorithm: %d/%s\n", name, ret, gnutls_sign_get_name(ret));
+			testfail
+			    ("%s: cl: got unexpected client signature algorithm: %d/%s\n",
+			     name, ret, gnutls_sign_get_name(ret));
 			exit(1);
 		}
 	}
@@ -279,37 +295,35 @@ static const test_st tests[] = {
 	 .cert = &server_ca3_localhost_rsa_decrypt_cert,
 	 .key = &server_ca3_key,
 	 .exp_kx = GNUTLS_KX_RSA,
-	 .needs_decryption = 1
-	},
+	 .needs_decryption = 1},
 	{.name = "tls1.2: rsa-decryption key, signatures prioritized",
 	 .pk = GNUTLS_PK_RSA,
-	 .prio = "NORMAL:-KX-ALL:+ECDHE-RSA:+RSA:-VERS-TLS-ALL:+VERS-TLS1.2:-SIGN-ALL:+SIGN-RSA-PSS-RSAE-SHA256",
+	 .prio =
+	 "NORMAL:-KX-ALL:+ECDHE-RSA:+RSA:-VERS-TLS-ALL:+VERS-TLS1.2:-SIGN-ALL:+SIGN-RSA-PSS-RSAE-SHA256",
 	 .cert = &server_ca3_localhost_cert,
 	 .key = &server_ca3_key,
 	 .exp_kx = GNUTLS_KX_RSA,
-	 .needs_decryption = 1
-	},
+	 .needs_decryption = 1},
 	{.name = "tls1.2: ecc key",
 	 .pk = GNUTLS_PK_ECDSA,
-	 .prio = "NORMAL:-KX-ALL:+ECDHE-RSA:+ECDHE-ECDSA:-VERS-TLS-ALL:+VERS-TLS1.2",
+	 .prio =
+	 "NORMAL:-KX-ALL:+ECDHE-RSA:+ECDHE-ECDSA:-VERS-TLS-ALL:+VERS-TLS1.2",
 	 .cert = &server_ca3_localhost_ecc_cert,
 	 .key = &server_ca3_ecc_key,
-	 .exp_kx = GNUTLS_KX_ECDHE_ECDSA
-	},
+	 .exp_kx = GNUTLS_KX_ECDHE_ECDSA},
 	{.name = "tls1.2: rsa-sign key",
 	 .pk = GNUTLS_PK_RSA,
 	 .prio = "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA:-VERS-TLS-ALL:+VERS-TLS1.2",
 	 .cert = &server_ca3_localhost_cert,
 	 .key = &server_ca3_key,
-	 .exp_kx = GNUTLS_KX_ECDHE_RSA
-	},
+	 .exp_kx = GNUTLS_KX_ECDHE_RSA},
 	{.name = "tls1.2: rsa-sign key with rsa-pss sigs prioritized",
 	 .pk = GNUTLS_PK_RSA,
-	 .prio = "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA:-SIGN-ALL:+SIGN-RSA-PSS-SHA256:+SIGN-RSA-PSS-SHA384:+SIGN-RSA-PSS-SHA512:+SIGN-RSA-SHA256:+SIGN-RSA-SHA384:+SIGN-RSA-SHA512:-VERS-TLS-ALL:+VERS-TLS1.2",
+	 .prio =
+	 "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA:-SIGN-ALL:+SIGN-RSA-PSS-SHA256:+SIGN-RSA-PSS-SHA384:+SIGN-RSA-PSS-SHA512:+SIGN-RSA-SHA256:+SIGN-RSA-SHA384:+SIGN-RSA-SHA512:-VERS-TLS-ALL:+VERS-TLS1.2",
 	 .cert = &server_ca3_localhost_cert,
 	 .key = &server_ca3_key,
-	 .exp_kx = GNUTLS_KX_ECDHE_RSA
-	},
+	 .exp_kx = GNUTLS_KX_ECDHE_RSA},
 	{.name = "tls1.2: rsa-pss-sign key",
 	 .pk = GNUTLS_PK_RSA_PSS,
 	 .prio = "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA:-VERS-TLS-ALL:+VERS-TLS1.2",
@@ -317,7 +331,7 @@ static const test_st tests[] = {
 	 .key = &server_ca3_rsa_pss2_key,
 	 .exp_kx = GNUTLS_KX_ECDHE_RSA,
 	 .requires_pkcs11_pss = 1,
-	},
+	 },
 	{.name = "tls1.2: rsa-pss cert, rsa-sign key",
 	 .pk = GNUTLS_PK_RSA,
 	 .prio = "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA:-VERS-TLS-ALL:+VERS-TLS1.2",
@@ -325,15 +339,15 @@ static const test_st tests[] = {
 	 .key = &server_ca3_rsa_pss_key,
 	 .exp_kx = GNUTLS_KX_ECDHE_RSA,
 	 .requires_pkcs11_pss = 1,
-	},
+	 },
 	{.name = "tls1.2: rsa-pss cert, rsa-sign key no PSS signatures",
 	 .pk = GNUTLS_PK_RSA,
-	 .prio = "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA:-VERS-TLS-ALL:+VERS-TLS1.2:-SIGN-RSA-PSS-SHA256:-SIGN-RSA-PSS-SHA384:-SIGN-RSA-PSS-SHA512:-SIGN-RSA-PSS-RSAE-SHA256:-SIGN-RSA-PSS-RSAE-SHA384:-SIGN-RSA-PSS-RSAE-SHA512",
+	 .prio =
+	 "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA:-VERS-TLS-ALL:+VERS-TLS1.2:-SIGN-RSA-PSS-SHA256:-SIGN-RSA-PSS-SHA384:-SIGN-RSA-PSS-SHA512:-SIGN-RSA-PSS-RSAE-SHA256:-SIGN-RSA-PSS-RSAE-SHA384:-SIGN-RSA-PSS-RSAE-SHA512",
 	 .cert = &server_ca3_rsa_pss_cert,
 	 .key = &server_ca3_rsa_pss_key,
 	 .exp_kx = GNUTLS_KX_ECDHE_RSA,
-	 .exp_serv_err = GNUTLS_E_NO_CIPHER_SUITES
-	},
+	 .exp_serv_err = GNUTLS_E_NO_CIPHER_SUITES},
 	{.name = "tls1.2: ed25519 cert, ed25519 key",
 	 .pk = GNUTLS_PK_EDDSA_ED25519,
 	 .needs_eddsa = 1,
@@ -341,29 +355,27 @@ static const test_st tests[] = {
 	 .cert = &server_ca3_eddsa_cert,
 	 .key = &server_ca3_eddsa_key,
 	 .exp_kx = GNUTLS_KX_ECDHE_RSA,
-	 .nofips = 1
-	},
+	 .nofips = 1},
 	{.name = "tls1.3: ecc key",
 	 .pk = GNUTLS_PK_ECDSA,
-	 .prio = "NORMAL:-KX-ALL:+ECDHE-RSA:+ECDHE-ECDSA:-VERS-TLS-ALL:+VERS-TLS1.3",
+	 .prio =
+	 "NORMAL:-KX-ALL:+ECDHE-RSA:+ECDHE-ECDSA:-VERS-TLS-ALL:+VERS-TLS1.3",
 	 .cert = &server_ca3_localhost_ecc_cert,
 	 .key = &server_ca3_ecc_key,
-	 .exp_kx = GNUTLS_KX_ECDHE_RSA
-	},
+	 .exp_kx = GNUTLS_KX_ECDHE_RSA},
 	{.name = "tls1.3: rsa-sign key",
 	 .pk = GNUTLS_PK_RSA,
 	 .prio = "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA:-VERS-TLS-ALL:+VERS-TLS1.3",
 	 .cert = &server_ca3_localhost_cert,
 	 .key = &server_ca3_key,
-	 .exp_kx = GNUTLS_KX_ECDHE_RSA
-	},
+	 .exp_kx = GNUTLS_KX_ECDHE_RSA},
 	{.name = "tls1.3: rsa-sign key with rsa-pss sigs prioritized",
 	 .pk = GNUTLS_PK_RSA,
-	 .prio = "NORMAL:-SIGN-ALL:+SIGN-RSA-PSS-SHA256:+SIGN-RSA-PSS-SHA384:+SIGN-RSA-PSS-SHA512:+SIGN-RSA-PSS-RSAE-SHA256:+SIGN-RSA-PSS-RSAE-SHA384:+SIGN-RSA-PSS-RSAE-SHA512:-VERS-TLS-ALL:+VERS-TLS1.3",
+	 .prio =
+	 "NORMAL:-SIGN-ALL:+SIGN-RSA-PSS-SHA256:+SIGN-RSA-PSS-SHA384:+SIGN-RSA-PSS-SHA512:+SIGN-RSA-PSS-RSAE-SHA256:+SIGN-RSA-PSS-RSAE-SHA384:+SIGN-RSA-PSS-RSAE-SHA512:-VERS-TLS-ALL:+VERS-TLS1.3",
 	 .cert = &server_ca3_localhost_cert,
 	 .key = &server_ca3_key,
-	 .exp_kx = GNUTLS_KX_ECDHE_RSA
-	},
+	 .exp_kx = GNUTLS_KX_ECDHE_RSA},
 	{.name = "tls1.3: rsa-pss-sign key",
 	 .pk = GNUTLS_PK_RSA_PSS,
 	 .prio = "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA:-VERS-TLS-ALL:+VERS-TLS1.3",
@@ -371,7 +383,7 @@ static const test_st tests[] = {
 	 .key = &server_ca3_rsa_pss2_key,
 	 .exp_kx = GNUTLS_KX_ECDHE_RSA,
 	 .requires_pkcs11_pss = 1,
-	},
+	 },
 	{.name = "tls1.3: rsa-pss cert, rsa-sign key",
 	 .pk = GNUTLS_PK_RSA,
 	 .prio = "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA:-VERS-TLS-ALL:+VERS-TLS1.3",
@@ -379,15 +391,15 @@ static const test_st tests[] = {
 	 .key = &server_ca3_rsa_pss_key,
 	 .exp_kx = GNUTLS_KX_ECDHE_RSA,
 	 .requires_pkcs11_pss = 1,
-	},
+	 },
 	{.name = "tls1.3: rsa-pss cert, rsa-sign key no PSS signatures",
 	 .pk = GNUTLS_PK_RSA,
-	 .prio = "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA:-VERS-TLS-ALL:+VERS-TLS1.3:-SIGN-RSA-PSS-SHA256:-SIGN-RSA-PSS-SHA384:-SIGN-RSA-PSS-SHA512:-SIGN-RSA-PSS-RSAE-SHA256:-SIGN-RSA-PSS-RSAE-SHA384:-SIGN-RSA-PSS-RSAE-SHA512",
+	 .prio =
+	 "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA:-VERS-TLS-ALL:+VERS-TLS1.3:-SIGN-RSA-PSS-SHA256:-SIGN-RSA-PSS-SHA384:-SIGN-RSA-PSS-SHA512:-SIGN-RSA-PSS-RSAE-SHA256:-SIGN-RSA-PSS-RSAE-SHA384:-SIGN-RSA-PSS-RSAE-SHA512",
 	 .cert = &server_ca3_rsa_pss_cert,
 	 .key = &server_ca3_rsa_pss_key,
 	 .exp_kx = GNUTLS_KX_ECDHE_RSA,
-	 .exp_serv_err = GNUTLS_E_NO_CIPHER_SUITES
-	},
+	 .exp_serv_err = GNUTLS_E_NO_CIPHER_SUITES},
 	{.name = "tls1.3: ed25519 cert, ed25519 key",
 	 .needs_eddsa = 1,
 	 .pk = GNUTLS_PK_EDDSA_ED25519,
@@ -395,13 +407,12 @@ static const test_st tests[] = {
 	 .cert = &server_ca3_eddsa_cert,
 	 .key = &server_ca3_eddsa_key,
 	 .exp_kx = GNUTLS_KX_ECDHE_RSA,
-	 .nofips = 1
-	}
+	 .nofips = 1}
 };
 
 static
-int pin_func(void* userdata, int attempt, const char* url, const char *label,
-		unsigned flags, char *pin, size_t pin_max)
+int pin_func(void *userdata, int attempt, const char *url, const char *label,
+	     unsigned flags, char *pin, size_t pin_max)
 {
 	if (attempt == 0) {
 		strcpy(pin, PIN);
@@ -438,22 +449,22 @@ void doit(void)
 	if (debug)
 		gnutls_global_set_log_level(6);
 
-
 	/* initialize token */
 	gnutls_pkcs11_set_pin_function(pin_func, NULL);
 	set_softhsm_conf(CONFIG);
-	snprintf(buf, sizeof(buf), "%s --init-token --slot 0 --label test --so-pin "PIN" --pin "PIN, bin);
+	snprintf(buf, sizeof(buf),
+		 "%s --init-token --slot 0 --label test --so-pin " PIN " --pin "
+		 PIN, bin);
 	system(buf);
 
 	ret = gnutls_pkcs11_add_provider(lib, NULL);
 	if (ret < 0) {
-		fail("gnutls_pkcs11_add_provider: %s\n",
-			gnutls_strerror(ret));
+		fail("gnutls_pkcs11_add_provider: %s\n", gnutls_strerror(ret));
 	}
 
 	have_eddsa = verify_eddsa_presence();
 
-	for (i=0;i<sizeof(tests)/sizeof(tests[0]);i++) {
+	for (i = 0; i < sizeof(tests) / sizeof(tests[0]); i++) {
 		if (tests[i].nofips && gnutls_fips140_mode_enabled())
 			continue;
 
@@ -463,24 +474,31 @@ void doit(void)
 		success("checking: %s\n", tests[i].name);
 
 		if (tests[i].requires_pkcs11_pss) {
-			ret = gnutls_pkcs11_token_check_mechanism("pkcs11:", CKM_RSA_PKCS_PSS, NULL, 0, 0);
+			ret =
+			    gnutls_pkcs11_token_check_mechanism("pkcs11:",
+								CKM_RSA_PKCS_PSS,
+								NULL, 0, 0);
 			if (ret == 0) {
-				fprintf(stderr, "softhsm2 doesn't support CKM_RSA_PKCS_PSS; skipping test\n");
+				fprintf(stderr,
+					"softhsm2 doesn't support CKM_RSA_PKCS_PSS; skipping test\n");
 				continue;
 			}
 		}
 
-		privkey = load_virt_privkey(tests[i].name, tests[i].key, tests[i].exp_key_err, tests[i].needs_decryption);
+		privkey =
+		    load_virt_privkey(tests[i].name, tests[i].key,
+				      tests[i].exp_key_err,
+				      tests[i].needs_decryption);
 		if (privkey == NULL && tests[i].exp_key_err < 0)
 			continue;
 		assert(privkey != 0);
 
 		try_with_key(tests[i].name, tests[i].prio,
 			     tests[i].exp_kx, 0, 0,
-			     tests[i].cert, privkey,
-			     tests[i].exp_serv_err);
+			     tests[i].cert, privkey, tests[i].exp_serv_err);
 
-		gnutls_pkcs11_delete_url(SOFTHSM_URL";object=key", GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
+		gnutls_pkcs11_delete_url(SOFTHSM_URL ";object=key",
+					 GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
 		remove(CONFIG);
 	}
 

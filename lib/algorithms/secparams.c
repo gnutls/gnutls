@@ -48,7 +48,7 @@ static const gnutls_sec_params_entry sec_params[] = {
 	{"Medium", GNUTLS_SEC_PARAM_MEDIUM, 112, 2048, 2048, 224, 224},
 	{"High", GNUTLS_SEC_PARAM_HIGH, 128, 3072, 3072, 256, 256},
 #else
-	{"Low", GNUTLS_SEC_PARAM_LOW, 80, 1024, 1024, 160, 160}, /* ENISA-LEGACY */
+	{"Low", GNUTLS_SEC_PARAM_LOW, 80, 1024, 1024, 160, 160},	/* ENISA-LEGACY */
 	{"Legacy", GNUTLS_SEC_PARAM_LEGACY, 96, 1776, 2048, 192, 192},
 	{"Medium", GNUTLS_SEC_PARAM_MEDIUM, 112, 2048, 2048, 256, 224},
 	{"High", GNUTLS_SEC_PARAM_HIGH, 128, 3072, 3072, 256, 256},
@@ -108,8 +108,7 @@ gnutls_sec_param_to_pk_bits(gnutls_pk_algorithm_t algo,
  *
  * Since: 3.3.0
  **/
-unsigned int
-gnutls_sec_param_to_symmetric_bits(gnutls_sec_param_t param)
+unsigned int gnutls_sec_param_to_symmetric_bits(gnutls_sec_param_t param)
 {
 	unsigned int ret = 0;
 	const gnutls_sec_params_entry *p;
@@ -220,7 +219,7 @@ gnutls_pk_bits_to_sec_param(gnutls_pk_algorithm_t algo, unsigned int bits)
 	} else {
 		for (p = sec_params; p->name; p++) {
 			if (p->pk_bits > bits)
-			      break;
+				break;
 			ret = p->sec_param;
 		}
 	}

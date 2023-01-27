@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -41,20 +41,20 @@ int main(void)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <sys/select.h>
-#include <errno.h>
-#include <signal.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/dtls.h>
+# include <string.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <sys/select.h>
+# include <errno.h>
+# include <signal.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/dtls.h>
 
-#include "utils.h"
+# include "utils.h"
 
 static void server_log_func(int level, const char *str)
 {
@@ -66,12 +66,11 @@ static void client_log_func(int level, const char *str)
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
 
-#define MAX_BUF 1024
+# define MAX_BUF 1024
 
-static ssize_t
-push(gnutls_transport_ptr_t tr, const void *data, size_t len)
+static ssize_t push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 {
-	int fd = (long int) tr;
+	int fd = (long int)tr;
 
 	return send(fd, data, len, 0);
 }
@@ -134,19 +133,19 @@ static void client(int fd)
 	gnutls_global_deinit();
 }
 
-
 /* These are global */
 pid_t child;
 
-#define CLI_ADDR (void*)"test"
-#define CLI_ADDR_LEN 4
+# define CLI_ADDR (void*)"test"
+# define CLI_ADDR_LEN 4
 
 static
-ssize_t recv_timeout(int sockfd, void *buf, size_t len, unsigned flags, unsigned sec)
+ssize_t recv_timeout(int sockfd, void *buf, size_t len, unsigned flags,
+		     unsigned sec)
 {
-int ret;
-struct timeval tv;
-fd_set set;
+	int ret;
+	struct timeval tv;
+	fd_set set;
 
 	tv.tv_sec = sec;
 	tv.tv_usec = 0;
@@ -166,7 +165,7 @@ fd_set set;
 	return recv(sockfd, buf, len, flags);
 }
 
-#define SERV_TIMEOUT 30
+# define SERV_TIMEOUT 30
 
 static void server(int fd)
 {
@@ -212,7 +211,9 @@ static void server(int fd)
 	gnutls_transport_set_push_function(session, push);
 
 	for (;;) {
-		ret = recv_timeout(fd, buffer, sizeof(buffer), MSG_PEEK, SERV_TIMEOUT);
+		ret =
+		    recv_timeout(fd, buffer, sizeof(buffer), MSG_PEEK,
+				 SERV_TIMEOUT);
 		if (ret < 0) {
 			if (try != 0) {
 				success("Server was terminated as expected!\n");
@@ -240,14 +241,15 @@ static void server(int fd)
 						    CLI_ADDR_LEN,
 						    &prestate,
 						    (gnutls_transport_ptr_t)
-						    (long) fd, push);
+						    (long)fd, push);
 			if (ret < 0) {
 				fail("Cannot send data\n");
 				exit(1);
 			}
 
 			/* discard peeked data */
-			recv_timeout(fd, buffer, sizeof(buffer), 0, SERV_TIMEOUT);
+			recv_timeout(fd, buffer, sizeof(buffer), 0,
+				     SERV_TIMEOUT);
 			csend++;
 
 			if (csend > 2) {

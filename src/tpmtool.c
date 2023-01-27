@@ -82,7 +82,6 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "|<%d>| %s", level, str);
 }
 
-
 int main(int argc, char **argv)
 {
 	cmd_parser(argc, argv);
@@ -163,11 +162,11 @@ static void cmd_parser(int argc, char **argv)
 	if (HAVE_OPT(BITS))
 		bits = OPT_VALUE_BITS;
 
-
 	if (HAVE_OPT(GENERATE_RSA)) {
 		key_type = GNUTLS_PK_RSA;
 		bits = get_bits(key_type, bits, sec_param, 0);
-		tpm_generate(outfile, key_type, bits, genflags, HAVE_OPT(SRK_WELL_KNOWN));
+		tpm_generate(outfile, key_type, bits, genflags,
+			     HAVE_OPT(SRK_WELL_KNOWN));
 	} else if (HAVE_OPT(PUBKEY)) {
 		tpm_pubkey(OPT_ARG(PUBKEY), outfile, HAVE_OPT(SRK_WELL_KNOWN));
 	} else if (HAVE_OPT(DELETE)) {
@@ -187,19 +186,18 @@ static void cmd_parser(int argc, char **argv)
 
 #define TEST_DATA "Test data to sign"
 
-static void
-tpm_test_sign(const char *url, FILE * out)
+static void tpm_test_sign(const char *url, FILE * out)
 {
 	gnutls_privkey_t privkey;
 	gnutls_pubkey_t pubkey;
 	int ret;
-	gnutls_datum_t data, sig = {NULL, 0};
+	gnutls_datum_t data, sig = { NULL, 0 };
 	int pk;
 
 	pkcs11_common(NULL);
 
-	data.data = (void*)TEST_DATA;
-	data.size = sizeof(TEST_DATA)-1;
+	data.data = (void *)TEST_DATA;
+	data.size = sizeof(TEST_DATA) - 1;
 
 	ret = gnutls_privkey_init(&privkey);
 	if (ret < 0) {
@@ -229,18 +227,20 @@ tpm_test_sign(const char *url, FILE * out)
 		exit(1);
 	}
 
-	ret = gnutls_privkey_sign_data(privkey, GNUTLS_DIG_SHA1, 0, &data, &sig);
+	ret =
+	    gnutls_privkey_sign_data(privkey, GNUTLS_DIG_SHA1, 0, &data, &sig);
 	if (ret < 0) {
-		fprintf(stderr, "Cannot sign data: %s\n",
-			gnutls_strerror(ret));
+		fprintf(stderr, "Cannot sign data: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
 	pk = gnutls_pubkey_get_pk_algorithm(pubkey, NULL);
 
 	fprintf(stderr, "Verifying against private key parameters... ");
-	ret = gnutls_pubkey_verify_data2(pubkey, gnutls_pk_to_sign(pk, GNUTLS_DIG_SHA1),
-		0, &data, &sig);
+	ret =
+	    gnutls_pubkey_verify_data2(pubkey,
+				       gnutls_pk_to_sign(pk, GNUTLS_DIG_SHA1),
+				       0, &data, &sig);
 	if (ret < 0) {
 		fprintf(stderr, "Cannot verify signed data: %s\n",
 			gnutls_strerror(ret));
@@ -288,7 +288,6 @@ static void tpm_generate(FILE * out, unsigned int key_type,
 		exit(1);
 	}
 
-
 	fwrite(privkey.data, 1, privkey.size, out);
 	fputs("\n", out);
 
@@ -296,8 +295,7 @@ static void tpm_generate(FILE * out, unsigned int key_type,
 	gnutls_free(pubkey.data);
 }
 
-static void tpm_delete(const char *url, FILE * out,
-		       unsigned int srk_well_known)
+static void tpm_delete(const char *url, FILE * out, unsigned int srk_well_known)
 {
 	int ret;
 	char *srk_pass = NULL;
@@ -373,7 +371,8 @@ static void tpm_pubkey(const char *url, FILE * out, unsigned int srk_well_known)
 		exit(1);
 	}
 
-	print_pubkey_info(pubkey, out, GNUTLS_CRT_PRINT_FULL, GNUTLS_X509_FMT_PEM, 1);
+	print_pubkey_info(pubkey, out, GNUTLS_CRT_PRINT_FULL,
+			  GNUTLS_X509_FMT_PEM, 1);
 
 	gnutls_pubkey_deinit(pubkey);
 }

@@ -25,14 +25,14 @@
 
 #ifdef ENABLE_KTLS
 
-#include <linux/tls.h>
-#include <record.h>
-#include <sys/socket.h>
-#include <netinet/tcp.h>
-#include <unistd.h>
-#include <errno.h>
-#include "ext/session_ticket.h"
-#include <sys/sendfile.h>
+# include <linux/tls.h>
+# include <record.h>
+# include <sys/socket.h>
+# include <netinet/tcp.h>
+# include <unistd.h>
+# include <errno.h>
+# include "ext/session_ticket.h"
+# include <sys/sendfile.h>
 
 /**
  * gnutls_transport_is_ktls_enabled:
@@ -45,8 +45,9 @@
  * Since: 3.7.3
  **/
 gnutls_transport_ktls_enable_flags_t
-gnutls_transport_is_ktls_enabled(gnutls_session_t session){
-	if (unlikely(!session->internals.initial_negotiation_completed)){
+gnutls_transport_is_ktls_enabled(gnutls_session_t session)
+{
+	if (unlikely(!session->internals.initial_negotiation_completed)) {
 		_gnutls_debug_log("Initial negotiation is not yet complete\n");
 		return 0;
 	}
@@ -60,27 +61,30 @@ void _gnutls_ktls_enable(gnutls_session_t session)
 
 	gnutls_transport_get_int2(session, &sockin, &sockout);
 
-	if (setsockopt(sockin, SOL_TCP, TCP_ULP, "tls", sizeof ("tls")) == 0) {
+	if (setsockopt(sockin, SOL_TCP, TCP_ULP, "tls", sizeof("tls")) == 0) {
 		session->internals.ktls_enabled |= GNUTLS_KTLS_RECV;
 		if (sockin == sockout) {
 			session->internals.ktls_enabled |= GNUTLS_KTLS_SEND;
 		}
 	} else {
-		_gnutls_record_log("Unable to set TCP_ULP for read socket: %d\n",
-				   errno);
+		_gnutls_record_log
+		    ("Unable to set TCP_ULP for read socket: %d\n", errno);
 	}
 
 	if (sockin != sockout) {
-		if (setsockopt(sockout, SOL_TCP, TCP_ULP, "tls", sizeof ("tls")) == 0) {
+		if (setsockopt(sockout, SOL_TCP, TCP_ULP, "tls", sizeof("tls"))
+		    == 0) {
 			session->internals.ktls_enabled |= GNUTLS_KTLS_SEND;
 		} else {
-			_gnutls_record_log("Unable to set TCP_ULP for write socket: %d\n",
-					   errno);
+			_gnutls_record_log
+			    ("Unable to set TCP_ULP for write socket: %d\n",
+			     errno);
 		}
 	}
 }
 
-int _gnutls_ktls_set_keys(gnutls_session_t session, gnutls_transport_ktls_enable_flags_t in)
+int _gnutls_ktls_set_keys(gnutls_session_t session,
+			  gnutls_transport_ktls_enable_flags_t in)
 {
 	gnutls_cipher_algorithm_t cipher = gnutls_cipher_get(session);
 	gnutls_datum_t mac_key;
@@ -96,340 +100,445 @@ int _gnutls_ktls_set_keys(gnutls_session_t session, gnutls_transport_ktls_enable
 	 */
 	int version = gnutls_protocol_get_version(session);
 	if ((version != GNUTLS_TLS1_3 && version != GNUTLS_TLS1_2) ||
-		(gnutls_cipher_get(session) != GNUTLS_CIPHER_AES_128_GCM &&
-		gnutls_cipher_get(session) != GNUTLS_CIPHER_AES_256_GCM &&
-		gnutls_cipher_get(session) != GNUTLS_CIPHER_AES_128_CCM &&
-		gnutls_cipher_get(session) != GNUTLS_CIPHER_CHACHA20_POLY1305)) {
-		return  GNUTLS_E_UNIMPLEMENTED_FEATURE;
+	    (gnutls_cipher_get(session) != GNUTLS_CIPHER_AES_128_GCM &&
+	     gnutls_cipher_get(session) != GNUTLS_CIPHER_AES_256_GCM &&
+	     gnutls_cipher_get(session) != GNUTLS_CIPHER_AES_128_CCM &&
+	     gnutls_cipher_get(session) != GNUTLS_CIPHER_CHACHA20_POLY1305)) {
+		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 	}
 
 	ret = gnutls_record_get_state(session, 1, &mac_key, &iv, &cipher_key,
-								   seq_number);
+				      seq_number);
 	if (ret < 0) {
 		return ret;
 	}
 
 	in &= session->internals.ktls_enabled;
 
-	if(in & GNUTLS_KTLS_RECV){
+	if (in & GNUTLS_KTLS_RECV) {
 		switch (cipher) {
-			case GNUTLS_CIPHER_AES_128_GCM:
+		case GNUTLS_CIPHER_AES_128_GCM:
 			{
-				struct tls12_crypto_info_aes_gcm_128 crypto_info;
-				memset(&crypto_info, 0, sizeof (crypto_info));
+				struct tls12_crypto_info_aes_gcm_128
+				    crypto_info;
+				memset(&crypto_info, 0, sizeof(crypto_info));
 
-				crypto_info.info.cipher_type = TLS_CIPHER_AES_GCM_128;
-				assert(cipher_key.size == TLS_CIPHER_AES_GCM_128_KEY_SIZE);
+				crypto_info.info.cipher_type =
+				    TLS_CIPHER_AES_GCM_128;
+				assert(cipher_key.size ==
+				       TLS_CIPHER_AES_GCM_128_KEY_SIZE);
 
 				/* for TLS 1.2 IV is generated in kernel */
 				if (version == GNUTLS_TLS1_2) {
-					crypto_info.info.version = TLS_1_2_VERSION;
-					memcpy(crypto_info.iv, seq_number, TLS_CIPHER_AES_GCM_128_IV_SIZE);
+					crypto_info.info.version =
+					    TLS_1_2_VERSION;
+					memcpy(crypto_info.iv, seq_number,
+					       TLS_CIPHER_AES_GCM_128_IV_SIZE);
 				} else {
-					crypto_info.info.version = TLS_1_3_VERSION;
-					assert(iv.size == TLS_CIPHER_AES_GCM_128_SALT_SIZE
-							+ TLS_CIPHER_AES_GCM_128_IV_SIZE);
+					crypto_info.info.version =
+					    TLS_1_3_VERSION;
+					assert(iv.size ==
+					       TLS_CIPHER_AES_GCM_128_SALT_SIZE
+					       +
+					       TLS_CIPHER_AES_GCM_128_IV_SIZE);
 
 					memcpy(crypto_info.iv, iv.data +
-						TLS_CIPHER_AES_GCM_128_SALT_SIZE,
-						TLS_CIPHER_AES_GCM_128_IV_SIZE);
+					       TLS_CIPHER_AES_GCM_128_SALT_SIZE,
+					       TLS_CIPHER_AES_GCM_128_IV_SIZE);
 				}
 
 				memcpy(crypto_info.salt, iv.data,
-				TLS_CIPHER_AES_GCM_128_SALT_SIZE);
+				       TLS_CIPHER_AES_GCM_128_SALT_SIZE);
 				memcpy(crypto_info.rec_seq, seq_number,
-				TLS_CIPHER_AES_GCM_128_REC_SEQ_SIZE);
+				       TLS_CIPHER_AES_GCM_128_REC_SEQ_SIZE);
 				memcpy(crypto_info.key, cipher_key.data,
-				TLS_CIPHER_AES_GCM_128_KEY_SIZE);
+				       TLS_CIPHER_AES_GCM_128_KEY_SIZE);
 
-				if (setsockopt (sockin, SOL_TLS, TLS_RX,
-						&crypto_info, sizeof (crypto_info))) {
-					session->internals.ktls_enabled &= ~GNUTLS_KTLS_RECV;
-					return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+				if (setsockopt(sockin, SOL_TLS, TLS_RX,
+					       &crypto_info,
+					       sizeof(crypto_info))) {
+					session->internals.ktls_enabled &=
+					    ~GNUTLS_KTLS_RECV;
+					return
+					    gnutls_assert_val
+					    (GNUTLS_E_INTERNAL_ERROR);
 				}
 			}
 			break;
-			case GNUTLS_CIPHER_AES_256_GCM:
+		case GNUTLS_CIPHER_AES_256_GCM:
 			{
-				struct tls12_crypto_info_aes_gcm_256 crypto_info;
-				memset(&crypto_info, 0, sizeof (crypto_info));
+				struct tls12_crypto_info_aes_gcm_256
+				    crypto_info;
+				memset(&crypto_info, 0, sizeof(crypto_info));
 
-				crypto_info.info.cipher_type = TLS_CIPHER_AES_GCM_256;
-				assert (cipher_key.size == TLS_CIPHER_AES_GCM_256_KEY_SIZE);
+				crypto_info.info.cipher_type =
+				    TLS_CIPHER_AES_GCM_256;
+				assert(cipher_key.size ==
+				       TLS_CIPHER_AES_GCM_256_KEY_SIZE);
 
 				/* for TLS 1.2 IV is generated in kernel */
 				if (version == GNUTLS_TLS1_2) {
-					crypto_info.info.version = TLS_1_2_VERSION;
-					memcpy(crypto_info.iv, seq_number, TLS_CIPHER_AES_GCM_256_IV_SIZE);
+					crypto_info.info.version =
+					    TLS_1_2_VERSION;
+					memcpy(crypto_info.iv, seq_number,
+					       TLS_CIPHER_AES_GCM_256_IV_SIZE);
 				} else {
-					crypto_info.info.version = TLS_1_3_VERSION;
-					assert (iv.size == TLS_CIPHER_AES_GCM_256_SALT_SIZE
-							+ TLS_CIPHER_AES_GCM_256_IV_SIZE);
+					crypto_info.info.version =
+					    TLS_1_3_VERSION;
+					assert(iv.size ==
+					       TLS_CIPHER_AES_GCM_256_SALT_SIZE
+					       +
+					       TLS_CIPHER_AES_GCM_256_IV_SIZE);
 
-					memcpy(crypto_info.iv, iv.data + TLS_CIPHER_AES_GCM_256_SALT_SIZE,
-					TLS_CIPHER_AES_GCM_256_IV_SIZE);
-				}
-
-				memcpy (crypto_info.salt, iv.data,
-				TLS_CIPHER_AES_GCM_256_SALT_SIZE);
-				memcpy (crypto_info.rec_seq, seq_number,
-				TLS_CIPHER_AES_GCM_256_REC_SEQ_SIZE);
-				memcpy (crypto_info.key, cipher_key.data,
-				TLS_CIPHER_AES_GCM_256_KEY_SIZE);
-
-				if (setsockopt (sockin, SOL_TLS, TLS_RX,
-						&crypto_info, sizeof (crypto_info))) {
-					session->internals.ktls_enabled &= ~GNUTLS_KTLS_RECV;
-					return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
-				}
-			}
-			break;
-			case GNUTLS_CIPHER_AES_128_CCM:
-			{
-				struct tls12_crypto_info_aes_ccm_128 crypto_info;
-				memset(&crypto_info, 0, sizeof (crypto_info));
-
-				crypto_info.info.cipher_type = TLS_CIPHER_AES_CCM_128;
-				assert(cipher_key.size == TLS_CIPHER_AES_CCM_128_KEY_SIZE);
-
-				/* for TLS 1.2 IV is generated in kernel */
-				if (version == GNUTLS_TLS1_2) {
-					crypto_info.info.version = TLS_1_2_VERSION;
-					memcpy(crypto_info.iv, seq_number, TLS_CIPHER_AES_CCM_128_IV_SIZE);
-				} else {
-					crypto_info.info.version = TLS_1_3_VERSION;
-					assert(iv.size == TLS_CIPHER_AES_CCM_128_SALT_SIZE
-							+ TLS_CIPHER_AES_CCM_128_IV_SIZE);
-
-					memcpy(crypto_info.iv, iv.data +
-						TLS_CIPHER_AES_CCM_128_SALT_SIZE,
-						TLS_CIPHER_AES_CCM_128_IV_SIZE);
+					memcpy(crypto_info.iv,
+					       iv.data +
+					       TLS_CIPHER_AES_GCM_256_SALT_SIZE,
+					       TLS_CIPHER_AES_GCM_256_IV_SIZE);
 				}
 
 				memcpy(crypto_info.salt, iv.data,
-				TLS_CIPHER_AES_CCM_128_SALT_SIZE);
+				       TLS_CIPHER_AES_GCM_256_SALT_SIZE);
 				memcpy(crypto_info.rec_seq, seq_number,
-				TLS_CIPHER_AES_CCM_128_REC_SEQ_SIZE);
+				       TLS_CIPHER_AES_GCM_256_REC_SEQ_SIZE);
 				memcpy(crypto_info.key, cipher_key.data,
-				TLS_CIPHER_AES_CCM_128_KEY_SIZE);
+				       TLS_CIPHER_AES_GCM_256_KEY_SIZE);
 
-				if (setsockopt (sockin, SOL_TLS, TLS_RX,
-						&crypto_info, sizeof (crypto_info))) {
-					session->internals.ktls_enabled &= ~GNUTLS_KTLS_RECV;
-					return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+				if (setsockopt(sockin, SOL_TLS, TLS_RX,
+					       &crypto_info,
+					       sizeof(crypto_info))) {
+					session->internals.ktls_enabled &=
+					    ~GNUTLS_KTLS_RECV;
+					return
+					    gnutls_assert_val
+					    (GNUTLS_E_INTERNAL_ERROR);
 				}
 			}
 			break;
-			case GNUTLS_CIPHER_CHACHA20_POLY1305:
+		case GNUTLS_CIPHER_AES_128_CCM:
 			{
-				struct tls12_crypto_info_chacha20_poly1305 crypto_info;
-				memset(&crypto_info, 0, sizeof (crypto_info));
+				struct tls12_crypto_info_aes_ccm_128
+				    crypto_info;
+				memset(&crypto_info, 0, sizeof(crypto_info));
 
-				crypto_info.info.cipher_type = TLS_CIPHER_CHACHA20_POLY1305;
-				assert(cipher_key.size == TLS_CIPHER_CHACHA20_POLY1305_KEY_SIZE);
+				crypto_info.info.cipher_type =
+				    TLS_CIPHER_AES_CCM_128;
+				assert(cipher_key.size ==
+				       TLS_CIPHER_AES_CCM_128_KEY_SIZE);
 
 				/* for TLS 1.2 IV is generated in kernel */
 				if (version == GNUTLS_TLS1_2) {
-					crypto_info.info.version = TLS_1_2_VERSION;
-					memcpy(crypto_info.iv, seq_number, TLS_CIPHER_CHACHA20_POLY1305_IV_SIZE);
+					crypto_info.info.version =
+					    TLS_1_2_VERSION;
+					memcpy(crypto_info.iv, seq_number,
+					       TLS_CIPHER_AES_CCM_128_IV_SIZE);
 				} else {
-					crypto_info.info.version = TLS_1_3_VERSION;
-					assert(iv.size == TLS_CIPHER_CHACHA20_POLY1305_SALT_SIZE
-							+ TLS_CIPHER_CHACHA20_POLY1305_IV_SIZE);
+					crypto_info.info.version =
+					    TLS_1_3_VERSION;
+					assert(iv.size ==
+					       TLS_CIPHER_AES_CCM_128_SALT_SIZE
+					       +
+					       TLS_CIPHER_AES_CCM_128_IV_SIZE);
 
 					memcpy(crypto_info.iv, iv.data +
-						TLS_CIPHER_CHACHA20_POLY1305_SALT_SIZE,
-						TLS_CIPHER_CHACHA20_POLY1305_IV_SIZE);
+					       TLS_CIPHER_AES_CCM_128_SALT_SIZE,
+					       TLS_CIPHER_AES_CCM_128_IV_SIZE);
 				}
 
 				memcpy(crypto_info.salt, iv.data,
-				TLS_CIPHER_CHACHA20_POLY1305_SALT_SIZE);
+				       TLS_CIPHER_AES_CCM_128_SALT_SIZE);
 				memcpy(crypto_info.rec_seq, seq_number,
-				TLS_CIPHER_CHACHA20_POLY1305_REC_SEQ_SIZE);
+				       TLS_CIPHER_AES_CCM_128_REC_SEQ_SIZE);
 				memcpy(crypto_info.key, cipher_key.data,
-				TLS_CIPHER_CHACHA20_POLY1305_KEY_SIZE);
+				       TLS_CIPHER_AES_CCM_128_KEY_SIZE);
 
-				if (setsockopt (sockin, SOL_TLS, TLS_RX,
-						&crypto_info, sizeof (crypto_info))) {
-					session->internals.ktls_enabled &= ~GNUTLS_KTLS_RECV;
-					return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+				if (setsockopt(sockin, SOL_TLS, TLS_RX,
+					       &crypto_info,
+					       sizeof(crypto_info))) {
+					session->internals.ktls_enabled &=
+					    ~GNUTLS_KTLS_RECV;
+					return
+					    gnutls_assert_val
+					    (GNUTLS_E_INTERNAL_ERROR);
 				}
 			}
 			break;
-			default:
-				assert(0);
+		case GNUTLS_CIPHER_CHACHA20_POLY1305:
+			{
+				struct tls12_crypto_info_chacha20_poly1305
+				    crypto_info;
+				memset(&crypto_info, 0, sizeof(crypto_info));
+
+				crypto_info.info.cipher_type =
+				    TLS_CIPHER_CHACHA20_POLY1305;
+				assert(cipher_key.size ==
+				       TLS_CIPHER_CHACHA20_POLY1305_KEY_SIZE);
+
+				/* for TLS 1.2 IV is generated in kernel */
+				if (version == GNUTLS_TLS1_2) {
+					crypto_info.info.version =
+					    TLS_1_2_VERSION;
+					memcpy(crypto_info.iv, seq_number,
+					       TLS_CIPHER_CHACHA20_POLY1305_IV_SIZE);
+				} else {
+					crypto_info.info.version =
+					    TLS_1_3_VERSION;
+					assert(iv.size ==
+					       TLS_CIPHER_CHACHA20_POLY1305_SALT_SIZE
+					       +
+					       TLS_CIPHER_CHACHA20_POLY1305_IV_SIZE);
+
+					memcpy(crypto_info.iv, iv.data +
+					       TLS_CIPHER_CHACHA20_POLY1305_SALT_SIZE,
+					       TLS_CIPHER_CHACHA20_POLY1305_IV_SIZE);
+				}
+
+				memcpy(crypto_info.salt, iv.data,
+				       TLS_CIPHER_CHACHA20_POLY1305_SALT_SIZE);
+				memcpy(crypto_info.rec_seq, seq_number,
+				       TLS_CIPHER_CHACHA20_POLY1305_REC_SEQ_SIZE);
+				memcpy(crypto_info.key, cipher_key.data,
+				       TLS_CIPHER_CHACHA20_POLY1305_KEY_SIZE);
+
+				if (setsockopt(sockin, SOL_TLS, TLS_RX,
+					       &crypto_info,
+					       sizeof(crypto_info))) {
+					session->internals.ktls_enabled &=
+					    ~GNUTLS_KTLS_RECV;
+					return
+					    gnutls_assert_val
+					    (GNUTLS_E_INTERNAL_ERROR);
+				}
+			}
+			break;
+		default:
+			assert(0);
 		}
-
 
 	}
 
-	ret = gnutls_record_get_state (session, 0, &mac_key, &iv, &cipher_key,
-								   seq_number);
+	ret = gnutls_record_get_state(session, 0, &mac_key, &iv, &cipher_key,
+				      seq_number);
 	if (ret < 0) {
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 	}
 
-	if(in & GNUTLS_KTLS_SEND){
+	if (in & GNUTLS_KTLS_SEND) {
 		switch (cipher) {
-			case GNUTLS_CIPHER_AES_128_GCM:
+		case GNUTLS_CIPHER_AES_128_GCM:
 			{
-				struct tls12_crypto_info_aes_gcm_128 crypto_info;
-				memset(&crypto_info, 0, sizeof (crypto_info));
+				struct tls12_crypto_info_aes_gcm_128
+				    crypto_info;
+				memset(&crypto_info, 0, sizeof(crypto_info));
 
-				crypto_info.info.cipher_type = TLS_CIPHER_AES_GCM_128;
+				crypto_info.info.cipher_type =
+				    TLS_CIPHER_AES_GCM_128;
 
-				assert (cipher_key.size == TLS_CIPHER_AES_GCM_128_KEY_SIZE);
+				assert(cipher_key.size ==
+				       TLS_CIPHER_AES_GCM_128_KEY_SIZE);
 
 				/* for TLS 1.2 IV is generated in kernel */
 				if (version == GNUTLS_TLS1_2) {
-					crypto_info.info.version = TLS_1_2_VERSION;
-					memcpy(crypto_info.iv, seq_number, TLS_CIPHER_AES_GCM_128_IV_SIZE);
+					crypto_info.info.version =
+					    TLS_1_2_VERSION;
+					memcpy(crypto_info.iv, seq_number,
+					       TLS_CIPHER_AES_GCM_128_IV_SIZE);
 				} else {
-					crypto_info.info.version = TLS_1_3_VERSION;
-					assert (iv.size == TLS_CIPHER_AES_GCM_128_SALT_SIZE
-							+ TLS_CIPHER_AES_GCM_128_IV_SIZE);
+					crypto_info.info.version =
+					    TLS_1_3_VERSION;
+					assert(iv.size ==
+					       TLS_CIPHER_AES_GCM_128_SALT_SIZE
+					       +
+					       TLS_CIPHER_AES_GCM_128_IV_SIZE);
 
-					memcpy (crypto_info.iv, iv.data + TLS_CIPHER_AES_GCM_128_SALT_SIZE,
-					TLS_CIPHER_AES_GCM_128_IV_SIZE);
+					memcpy(crypto_info.iv,
+					       iv.data +
+					       TLS_CIPHER_AES_GCM_128_SALT_SIZE,
+					       TLS_CIPHER_AES_GCM_128_IV_SIZE);
 				}
 
-				memcpy (crypto_info.salt, iv.data,
-				TLS_CIPHER_AES_GCM_128_SALT_SIZE);
-				memcpy (crypto_info.rec_seq, seq_number,
-				TLS_CIPHER_AES_GCM_128_REC_SEQ_SIZE);
-				memcpy (crypto_info.key, cipher_key.data,
-				TLS_CIPHER_AES_GCM_128_KEY_SIZE);
+				memcpy(crypto_info.salt, iv.data,
+				       TLS_CIPHER_AES_GCM_128_SALT_SIZE);
+				memcpy(crypto_info.rec_seq, seq_number,
+				       TLS_CIPHER_AES_GCM_128_REC_SEQ_SIZE);
+				memcpy(crypto_info.key, cipher_key.data,
+				       TLS_CIPHER_AES_GCM_128_KEY_SIZE);
 
-				if (setsockopt (sockout, SOL_TLS, TLS_TX,
-						&crypto_info, sizeof (crypto_info))) {
-					session->internals.ktls_enabled &= ~GNUTLS_KTLS_SEND;
-					return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+				if (setsockopt(sockout, SOL_TLS, TLS_TX,
+					       &crypto_info,
+					       sizeof(crypto_info))) {
+					session->internals.ktls_enabled &=
+					    ~GNUTLS_KTLS_SEND;
+					return
+					    gnutls_assert_val
+					    (GNUTLS_E_INTERNAL_ERROR);
 				}
 			}
 			break;
-			case GNUTLS_CIPHER_AES_256_GCM:
+		case GNUTLS_CIPHER_AES_256_GCM:
 			{
-				struct tls12_crypto_info_aes_gcm_256 crypto_info;
-				memset(&crypto_info, 0, sizeof (crypto_info));
+				struct tls12_crypto_info_aes_gcm_256
+				    crypto_info;
+				memset(&crypto_info, 0, sizeof(crypto_info));
 
-				crypto_info.info.cipher_type = TLS_CIPHER_AES_GCM_256;
-				assert (cipher_key.size == TLS_CIPHER_AES_GCM_256_KEY_SIZE);
+				crypto_info.info.cipher_type =
+				    TLS_CIPHER_AES_GCM_256;
+				assert(cipher_key.size ==
+				       TLS_CIPHER_AES_GCM_256_KEY_SIZE);
 
 				/* for TLS 1.2 IV is generated in kernel */
 				if (version == GNUTLS_TLS1_2) {
-					crypto_info.info.version = TLS_1_2_VERSION;
-					memcpy(crypto_info.iv, seq_number, TLS_CIPHER_AES_GCM_256_IV_SIZE);
+					crypto_info.info.version =
+					    TLS_1_2_VERSION;
+					memcpy(crypto_info.iv, seq_number,
+					       TLS_CIPHER_AES_GCM_256_IV_SIZE);
 				} else {
-					crypto_info.info.version = TLS_1_3_VERSION;
-					assert (iv.size == TLS_CIPHER_AES_GCM_256_SALT_SIZE +
-							TLS_CIPHER_AES_GCM_256_IV_SIZE);
+					crypto_info.info.version =
+					    TLS_1_3_VERSION;
+					assert(iv.size ==
+					       TLS_CIPHER_AES_GCM_256_SALT_SIZE
+					       +
+					       TLS_CIPHER_AES_GCM_256_IV_SIZE);
 
-					memcpy (crypto_info.iv, iv.data + TLS_CIPHER_AES_GCM_256_SALT_SIZE,
-					TLS_CIPHER_AES_GCM_256_IV_SIZE);
+					memcpy(crypto_info.iv,
+					       iv.data +
+					       TLS_CIPHER_AES_GCM_256_SALT_SIZE,
+					       TLS_CIPHER_AES_GCM_256_IV_SIZE);
 				}
 
-				memcpy (crypto_info.salt, iv.data,
-				TLS_CIPHER_AES_GCM_256_SALT_SIZE);
-				memcpy (crypto_info.rec_seq, seq_number,
-				TLS_CIPHER_AES_GCM_256_REC_SEQ_SIZE);
-				memcpy (crypto_info.key, cipher_key.data,
-				TLS_CIPHER_AES_GCM_256_KEY_SIZE);
+				memcpy(crypto_info.salt, iv.data,
+				       TLS_CIPHER_AES_GCM_256_SALT_SIZE);
+				memcpy(crypto_info.rec_seq, seq_number,
+				       TLS_CIPHER_AES_GCM_256_REC_SEQ_SIZE);
+				memcpy(crypto_info.key, cipher_key.data,
+				       TLS_CIPHER_AES_GCM_256_KEY_SIZE);
 
-				if (setsockopt (sockout, SOL_TLS, TLS_TX,
-						&crypto_info, sizeof (crypto_info))) {
-					session->internals.ktls_enabled &= ~GNUTLS_KTLS_SEND;
-					return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+				if (setsockopt(sockout, SOL_TLS, TLS_TX,
+					       &crypto_info,
+					       sizeof(crypto_info))) {
+					session->internals.ktls_enabled &=
+					    ~GNUTLS_KTLS_SEND;
+					return
+					    gnutls_assert_val
+					    (GNUTLS_E_INTERNAL_ERROR);
 				}
 			}
 			break;
-			case GNUTLS_CIPHER_AES_128_CCM:
+		case GNUTLS_CIPHER_AES_128_CCM:
 			{
-				struct tls12_crypto_info_aes_ccm_128 crypto_info;
-				memset(&crypto_info, 0, sizeof (crypto_info));
+				struct tls12_crypto_info_aes_ccm_128
+				    crypto_info;
+				memset(&crypto_info, 0, sizeof(crypto_info));
 
-				crypto_info.info.cipher_type = TLS_CIPHER_AES_CCM_128;
-				assert (cipher_key.size == TLS_CIPHER_AES_CCM_128_KEY_SIZE);
+				crypto_info.info.cipher_type =
+				    TLS_CIPHER_AES_CCM_128;
+				assert(cipher_key.size ==
+				       TLS_CIPHER_AES_CCM_128_KEY_SIZE);
 
 				/* for TLS 1.2 IV is generated in kernel */
 				if (version == GNUTLS_TLS1_2) {
-					crypto_info.info.version = TLS_1_2_VERSION;
-					memcpy(crypto_info.iv, seq_number, TLS_CIPHER_AES_CCM_128_IV_SIZE);
+					crypto_info.info.version =
+					    TLS_1_2_VERSION;
+					memcpy(crypto_info.iv, seq_number,
+					       TLS_CIPHER_AES_CCM_128_IV_SIZE);
 				} else {
-					crypto_info.info.version = TLS_1_3_VERSION;
-					assert (iv.size == TLS_CIPHER_AES_CCM_128_SALT_SIZE +
-							TLS_CIPHER_AES_CCM_128_IV_SIZE);
+					crypto_info.info.version =
+					    TLS_1_3_VERSION;
+					assert(iv.size ==
+					       TLS_CIPHER_AES_CCM_128_SALT_SIZE
+					       +
+					       TLS_CIPHER_AES_CCM_128_IV_SIZE);
 
-					memcpy (crypto_info.iv, iv.data + TLS_CIPHER_AES_CCM_128_SALT_SIZE,
-					TLS_CIPHER_AES_CCM_128_IV_SIZE);
+					memcpy(crypto_info.iv,
+					       iv.data +
+					       TLS_CIPHER_AES_CCM_128_SALT_SIZE,
+					       TLS_CIPHER_AES_CCM_128_IV_SIZE);
 				}
 
-				memcpy (crypto_info.salt, iv.data,
-				TLS_CIPHER_AES_CCM_128_SALT_SIZE);
-				memcpy (crypto_info.rec_seq, seq_number,
-				TLS_CIPHER_AES_CCM_128_REC_SEQ_SIZE);
-				memcpy (crypto_info.key, cipher_key.data,
-				TLS_CIPHER_AES_CCM_128_KEY_SIZE);
+				memcpy(crypto_info.salt, iv.data,
+				       TLS_CIPHER_AES_CCM_128_SALT_SIZE);
+				memcpy(crypto_info.rec_seq, seq_number,
+				       TLS_CIPHER_AES_CCM_128_REC_SEQ_SIZE);
+				memcpy(crypto_info.key, cipher_key.data,
+				       TLS_CIPHER_AES_CCM_128_KEY_SIZE);
 
-				if (setsockopt (sockout, SOL_TLS, TLS_TX,
-						&crypto_info, sizeof (crypto_info))) {
-					session->internals.ktls_enabled &= ~GNUTLS_KTLS_SEND;
-					return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+				if (setsockopt(sockout, SOL_TLS, TLS_TX,
+					       &crypto_info,
+					       sizeof(crypto_info))) {
+					session->internals.ktls_enabled &=
+					    ~GNUTLS_KTLS_SEND;
+					return
+					    gnutls_assert_val
+					    (GNUTLS_E_INTERNAL_ERROR);
 				}
 			}
 			break;
-			case GNUTLS_CIPHER_CHACHA20_POLY1305:
+		case GNUTLS_CIPHER_CHACHA20_POLY1305:
 			{
-				struct tls12_crypto_info_chacha20_poly1305 crypto_info;
-				memset(&crypto_info, 0, sizeof (crypto_info));
+				struct tls12_crypto_info_chacha20_poly1305
+				    crypto_info;
+				memset(&crypto_info, 0, sizeof(crypto_info));
 
-				crypto_info.info.cipher_type = TLS_CIPHER_CHACHA20_POLY1305;
-				assert (cipher_key.size == TLS_CIPHER_CHACHA20_POLY1305_KEY_SIZE);
+				crypto_info.info.cipher_type =
+				    TLS_CIPHER_CHACHA20_POLY1305;
+				assert(cipher_key.size ==
+				       TLS_CIPHER_CHACHA20_POLY1305_KEY_SIZE);
 
 				/* for TLS 1.2 IV is generated in kernel */
 				if (version == GNUTLS_TLS1_2) {
-					crypto_info.info.version = TLS_1_2_VERSION;
-					memcpy(crypto_info.iv, seq_number, TLS_CIPHER_CHACHA20_POLY1305_IV_SIZE);
+					crypto_info.info.version =
+					    TLS_1_2_VERSION;
+					memcpy(crypto_info.iv, seq_number,
+					       TLS_CIPHER_CHACHA20_POLY1305_IV_SIZE);
 				} else {
-					crypto_info.info.version = TLS_1_3_VERSION;
-					assert (iv.size == TLS_CIPHER_CHACHA20_POLY1305_SALT_SIZE +
-							TLS_CIPHER_CHACHA20_POLY1305_IV_SIZE);
+					crypto_info.info.version =
+					    TLS_1_3_VERSION;
+					assert(iv.size ==
+					       TLS_CIPHER_CHACHA20_POLY1305_SALT_SIZE
+					       +
+					       TLS_CIPHER_CHACHA20_POLY1305_IV_SIZE);
 
-					memcpy (crypto_info.iv, iv.data + TLS_CIPHER_CHACHA20_POLY1305_SALT_SIZE,
-					TLS_CIPHER_CHACHA20_POLY1305_IV_SIZE);
+					memcpy(crypto_info.iv,
+					       iv.data +
+					       TLS_CIPHER_CHACHA20_POLY1305_SALT_SIZE,
+					       TLS_CIPHER_CHACHA20_POLY1305_IV_SIZE);
 				}
 
-				memcpy (crypto_info.salt, iv.data,
-				TLS_CIPHER_CHACHA20_POLY1305_SALT_SIZE);
-				memcpy (crypto_info.rec_seq, seq_number,
-				TLS_CIPHER_CHACHA20_POLY1305_REC_SEQ_SIZE);
-				memcpy (crypto_info.key, cipher_key.data,
-				TLS_CIPHER_CHACHA20_POLY1305_KEY_SIZE);
+				memcpy(crypto_info.salt, iv.data,
+				       TLS_CIPHER_CHACHA20_POLY1305_SALT_SIZE);
+				memcpy(crypto_info.rec_seq, seq_number,
+				       TLS_CIPHER_CHACHA20_POLY1305_REC_SEQ_SIZE);
+				memcpy(crypto_info.key, cipher_key.data,
+				       TLS_CIPHER_CHACHA20_POLY1305_KEY_SIZE);
 
-				if (setsockopt (sockout, SOL_TLS, TLS_TX,
-						&crypto_info, sizeof (crypto_info))) {
-					session->internals.ktls_enabled &= ~GNUTLS_KTLS_SEND;
-					return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+				if (setsockopt(sockout, SOL_TLS, TLS_TX,
+					       &crypto_info,
+					       sizeof(crypto_info))) {
+					session->internals.ktls_enabled &=
+					    ~GNUTLS_KTLS_SEND;
+					return
+					    gnutls_assert_val
+					    (GNUTLS_E_INTERNAL_ERROR);
 				}
 			}
 			break;
-			default:
-				assert(0);
+		default:
+			assert(0);
 		}
-
 
 		// set callback for sending handshake messages
 		gnutls_handshake_set_read_function(session,
 						   _gnutls_ktls_send_handshake_msg);
 
 		// set callback for sending alert messages
-		gnutls_alert_set_read_function(session, _gnutls_ktls_send_alert_msg);
+		gnutls_alert_set_read_function(session,
+					       _gnutls_ktls_send_alert_msg);
 	}
 
 	return in;
 }
 
 ssize_t _gnutls_ktls_send_file(gnutls_session_t session, int fd,
-		off_t *offset, size_t count)
+			       off_t * offset, size_t count)
 {
 	ssize_t ret;
 	int sockin, sockout;
@@ -439,14 +548,14 @@ ssize_t _gnutls_ktls_send_file(gnutls_session_t session, int fd,
 	gnutls_transport_get_int2(session, &sockin, &sockout);
 
 	ret = sendfile(sockout, fd, offset, count);
-	if (ret == -1){
-		switch(errno) {
-			case EINTR:
-				return GNUTLS_E_INTERRUPTED;
-			case EAGAIN:
-				return GNUTLS_E_AGAIN;
-			default:
-				return GNUTLS_E_PUSH_ERROR;
+	if (ret == -1) {
+		switch (errno) {
+		case EINTR:
+			return GNUTLS_E_INTERRUPTED;
+		case EAGAIN:
+			return GNUTLS_E_AGAIN;
+		default:
+			return GNUTLS_E_PUSH_ERROR;
 		}
 	}
 
@@ -454,21 +563,22 @@ ssize_t _gnutls_ktls_send_file(gnutls_session_t session, int fd,
 }
 
 int _gnutls_ktls_send_control_msg(gnutls_session_t session,
-		unsigned char record_type, const void *data, size_t data_size)
+				  unsigned char record_type, const void *data,
+				  size_t data_size)
 {
 	const char *buf = data;
 	ssize_t ret;
 	int sockin, sockout;
 	size_t data_to_send = data_size;
 
-	assert (session != NULL);
+	assert(session != NULL);
 
 	gnutls_transport_get_int2(session, &sockin, &sockout);
 
 	while (data_to_send > 0) {
-		char cmsg[CMSG_SPACE(sizeof (unsigned char))];
+		char cmsg[CMSG_SPACE(sizeof(unsigned char))];
 		struct msghdr msg = { 0 };
-		struct iovec msg_iov;   /* Vector of data to send/receive into. */
+		struct iovec msg_iov;	/* Vector of data to send/receive into. */
 		struct cmsghdr *hdr;
 
 		msg.msg_control = cmsg;
@@ -477,7 +587,7 @@ int _gnutls_ktls_send_control_msg(gnutls_session_t session,
 		hdr = CMSG_FIRSTHDR(&msg);
 		hdr->cmsg_level = SOL_TLS;
 		hdr->cmsg_type = TLS_SET_RECORD_TYPE;
-		hdr->cmsg_len = CMSG_LEN(sizeof (unsigned char));
+		hdr->cmsg_len = CMSG_LEN(sizeof(unsigned char));
 
 		// construct record header
 		*CMSG_DATA(hdr) = record_type;
@@ -493,12 +603,12 @@ int _gnutls_ktls_send_control_msg(gnutls_session_t session,
 
 		if (ret == -1) {
 			switch (errno) {
-				case EINTR:
-					return GNUTLS_E_INTERRUPTED;
-				case EAGAIN:
-					return GNUTLS_E_AGAIN;
-				default:
-					return GNUTLS_E_PUSH_ERROR;
+			case EINTR:
+				return GNUTLS_E_INTERRUPTED;
+			case EAGAIN:
+				return GNUTLS_E_AGAIN;
+			default:
+				return GNUTLS_E_PUSH_ERROR;
 			}
 		}
 
@@ -530,25 +640,26 @@ int _gnutls_ktls_send_alert_msg(gnutls_session_t session,
 }
 
 int _gnutls_ktls_recv_control_msg(gnutls_session_t session,
-			unsigned char *record_type, void *data, size_t data_size)
+				  unsigned char *record_type, void *data,
+				  size_t data_size)
 {
 	char *buf = data;
 	ssize_t ret;
 	int sockin, sockout;
 
-	char cmsg[CMSG_SPACE(sizeof (unsigned char))];
+	char cmsg[CMSG_SPACE(sizeof(unsigned char))];
 	struct msghdr msg = { 0 };
 	struct iovec msg_iov;
 	struct cmsghdr *hdr;
 
-	assert (session != NULL);
+	assert(session != NULL);
 
 	gnutls_transport_get_int2(session, &sockin, &sockout);
 
 	if (session->internals.read_eof != 0) {
 		return 0;
 	} else if (session->internals.invalid_connection != 0 ||
-			session->internals.may_not_read != 0)
+		   session->internals.may_not_read != 0)
 		return GNUTLS_E_INVALID_SESSION;
 
 	/* receive message */
@@ -563,18 +674,18 @@ int _gnutls_ktls_recv_control_msg(gnutls_session_t session,
 
 	ret = recvmsg(sockin, &msg, MSG_DONTWAIT);
 
-	if (ret == -1){
-		switch(errno){
-			case EAGAIN:
-				return GNUTLS_E_AGAIN;
-			case EINVAL:
-				return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
-			case EMSGSIZE:
-				return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-			case EBADMSG:
-				return GNUTLS_E_DECRYPTION_FAILED;
-			default:
-				return GNUTLS_E_PULL_ERROR;
+	if (ret == -1) {
+		switch (errno) {
+		case EAGAIN:
+			return GNUTLS_E_AGAIN;
+		case EINVAL:
+			return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
+		case EMSGSIZE:
+			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+		case EBADMSG:
+			return GNUTLS_E_DECRYPTION_FAILED;
+		default:
+			return GNUTLS_E_PULL_ERROR;
 		}
 	}
 
@@ -584,7 +695,7 @@ int _gnutls_ktls_recv_control_msg(gnutls_session_t session,
 
 	/* get record type from header */
 	hdr = CMSG_FIRSTHDR(&msg);
-	if (hdr == NULL){
+	if (hdr == NULL) {
 		return GNUTLS_E_PULL_ERROR;
 	}
 	if (hdr->cmsg_level == SOL_TLS && hdr->cmsg_type == TLS_GET_RECORD_TYPE)
@@ -596,68 +707,76 @@ int _gnutls_ktls_recv_control_msg(gnutls_session_t session,
 }
 
 int _gnutls_ktls_recv_int(gnutls_session_t session, content_type_t type,
-		void *data, size_t data_size)
+			  void *data, size_t data_size)
 {
 	unsigned char record_type;
 	int ret;
 
 	ret = _gnutls_ktls_recv_control_msg(session,
-			&record_type, data, data_size);
+					    &record_type, data, data_size);
 
 	if (ret > 0) {
-		switch (record_type){
-			case GNUTLS_CHANGE_CIPHER_SPEC:
-				return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
-				break;
-			case GNUTLS_ALERT:
-				session_invalidate(session);
-				ret = 0;
-				break;
-			case GNUTLS_HANDSHAKE:
-				ret = gnutls_handshake_write(session,
-						GNUTLS_ENCRYPTION_LEVEL_APPLICATION,
-						data, ret);
+		switch (record_type) {
+		case GNUTLS_CHANGE_CIPHER_SPEC:
+			return
+			    gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
+			break;
+		case GNUTLS_ALERT:
+			session_invalidate(session);
+			ret = 0;
+			break;
+		case GNUTLS_HANDSHAKE:
+			ret = gnutls_handshake_write(session,
+						     GNUTLS_ENCRYPTION_LEVEL_APPLICATION,
+						     data, ret);
 
-				if (ret < 0)
-					return gnutls_assert_val(ret);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
 
-				if (type != record_type)
-					return GNUTLS_E_AGAIN;
-				break;
-			case GNUTLS_APPLICATION_DATA:
-				if (type != record_type)
-					ret = GNUTLS_E_GOT_APPLICATION_DATA;
-				break;
-			case GNUTLS_HEARTBEAT:
-				break;
-			default:
-				gnutls_assert();
-				return GNUTLS_E_UNEXPECTED_PACKET;
+			if (type != record_type)
+				return GNUTLS_E_AGAIN;
+			break;
+		case GNUTLS_APPLICATION_DATA:
+			if (type != record_type)
+				ret = GNUTLS_E_GOT_APPLICATION_DATA;
+			break;
+		case GNUTLS_HEARTBEAT:
+			break;
+		default:
+			gnutls_assert();
+			return GNUTLS_E_UNEXPECTED_PACKET;
 		}
 	}
 	return ret;
 }
 
-#else //ENABLE_KTLS
+#else				//ENABLE_KTLS
 gnutls_transport_ktls_enable_flags_t
-gnutls_transport_is_ktls_enabled(gnutls_session_t session) {
+gnutls_transport_is_ktls_enabled(gnutls_session_t session)
+{
 	return 0;
 }
 
-void _gnutls_ktls_enable(gnutls_session_t session) {
+void _gnutls_ktls_enable(gnutls_session_t session)
+{
 }
 
-int _gnutls_ktls_set_keys(gnutls_session_t sessioni, gnutls_transport_ktls_enable_flags_t in) {
+int _gnutls_ktls_set_keys(gnutls_session_t sessioni,
+			  gnutls_transport_ktls_enable_flags_t in)
+{
 	return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 }
 
 ssize_t _gnutls_ktls_send_file(gnutls_session_t session, int fd,
-		off_t *offset, size_t count) {
+			       off_t * offset, size_t count)
+{
 	return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 }
 
 int _gnutls_ktls_send_control_msg(gnutls_session_t session,
-		unsigned char record_type, const void *data, size_t data_size) {
+				  unsigned char record_type, const void *data,
+				  size_t data_size)
+{
 	return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 }
 
@@ -671,8 +790,9 @@ int _gnutls_ktls_send_handshake_msg(gnutls_session_t session,
 }
 
 int _gnutls_ktls_recv_int(gnutls_session_t session, content_type_t type,
-		void *data, size_t data_size) {
+			  void *data, size_t data_size)
+{
 	return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 }
 
-#endif //ENABLE_KTLS
+#endif				//ENABLE_KTLS

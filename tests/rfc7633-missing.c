@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,19 +35,19 @@ int main(void)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <time.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/dtls.h>
-#include <signal.h>
+# include <string.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <time.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/dtls.h>
+# include <signal.h>
 
-#include "utils.h"
+# include "utils.h"
 
 /* This program tests that handshakes fail if the server does not include the
  * requested certificate status with the server certificate having
@@ -78,20 +78,19 @@ static void client_log_func(int level, const char *str)
 }
 
 static unsigned char server_cert_pem[] =
-		"-----BEGIN CERTIFICATE-----\n"
-		"MIICBzCCAXCgAwIBAgIMVpjt8TL5Io/frpvkMA0GCSqGSIb3DQEBCwUAMCIxIDAe\n"
-		"BgNVBAMTF0dudVRMUyB0ZXN0IGNlcnRpZmljYXRlMB4XDTE2MDExNTEzMDI0MVoX\n"
-		"DTMyMDYxOTEzMDI0MVowIjEgMB4GA1UEAxMXR251VExTIHRlc3QgY2VydGlmaWNh\n"
-		"dGUwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBANe6XK+jDPAuqSdWqlOOqOt/\n"
-		"gXVMa5i+Suq3HvhLw2rE2g0AuOpMEx82FpPecu/GpF6ybrbKCohVdZCW7aZXvAw7\n"
-		"dg2XHr3p7H/Tqez7hWSga6BIznd+c5wxE/89yK6lYG7Ztoxamm+2vp9qvafwoDMn\n"
-		"9bcdkuWWnHNS1p/WyI6xAgMBAAGjQjBAMBEGCCsGAQUFBwEYBAUwAwIBBTAMBgNV\n"
-		"HRMBAf8EAjAAMB0GA1UdDgQWBBRTSzvcXshETAIgvzlIb0z+zSVSEDANBgkqhkiG\n"
-		"9w0BAQsFAAOBgQB+VcJuLPL2PMog0HZ8RRbqVvLU5d209ROg3s1oXUBFW8+AV+71\n"
-		"CsHg9Xx7vqKVwyKGI9ghds1B44lNPxGH2Sk1v2czjKbzwujo9+kLnDS6i0jyrDdn\n"
-		"um4ivpkwmlUFSQVXvENLwe9gTlIgN4+0I9WLcMTCDtHWkcxMRwCm2BMsXw==\n"
-		"-----END CERTIFICATE-----\n";
-
+    "-----BEGIN CERTIFICATE-----\n"
+    "MIICBzCCAXCgAwIBAgIMVpjt8TL5Io/frpvkMA0GCSqGSIb3DQEBCwUAMCIxIDAe\n"
+    "BgNVBAMTF0dudVRMUyB0ZXN0IGNlcnRpZmljYXRlMB4XDTE2MDExNTEzMDI0MVoX\n"
+    "DTMyMDYxOTEzMDI0MVowIjEgMB4GA1UEAxMXR251VExTIHRlc3QgY2VydGlmaWNh\n"
+    "dGUwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBANe6XK+jDPAuqSdWqlOOqOt/\n"
+    "gXVMa5i+Suq3HvhLw2rE2g0AuOpMEx82FpPecu/GpF6ybrbKCohVdZCW7aZXvAw7\n"
+    "dg2XHr3p7H/Tqez7hWSga6BIznd+c5wxE/89yK6lYG7Ztoxamm+2vp9qvafwoDMn\n"
+    "9bcdkuWWnHNS1p/WyI6xAgMBAAGjQjBAMBEGCCsGAQUFBwEYBAUwAwIBBTAMBgNV\n"
+    "HRMBAf8EAjAAMB0GA1UdDgQWBBRTSzvcXshETAIgvzlIb0z+zSVSEDANBgkqhkiG\n"
+    "9w0BAQsFAAOBgQB+VcJuLPL2PMog0HZ8RRbqVvLU5d209ROg3s1oXUBFW8+AV+71\n"
+    "CsHg9Xx7vqKVwyKGI9ghds1B44lNPxGH2Sk1v2czjKbzwujo9+kLnDS6i0jyrDdn\n"
+    "um4ivpkwmlUFSQVXvENLwe9gTlIgN4+0I9WLcMTCDtHWkcxMRwCm2BMsXw==\n"
+    "-----END CERTIFICATE-----\n";
 
 const gnutls_datum_t server_cert = { server_cert_pem,
 	sizeof(server_cert_pem)
@@ -121,14 +120,15 @@ const gnutls_datum_t server_key = { server_key_pem,
 static int received = 0;
 
 static int handshake_callback(gnutls_session_t session, unsigned int htype,
-	unsigned post, unsigned int incoming, const gnutls_datum_t *msg)
+			      unsigned post, unsigned int incoming,
+			      const gnutls_datum_t * msg)
 {
 	fail("received status request\n");
 	received = 1;
 	return 0;
 }
 
-#define MAX_BUF 1024
+# define MAX_BUF 1024
 
 static void client(int fd, const char *prio)
 {
@@ -155,7 +155,8 @@ static void client(int fd, const char *prio)
 	/* Use default priorities */
 	gnutls_priority_set_direct(session, prio, NULL);
 
-	gnutls_handshake_set_hook_function(session, GNUTLS_HANDSHAKE_CERTIFICATE_STATUS,
+	gnutls_handshake_set_hook_function(session,
+					   GNUTLS_HANDSHAKE_CERTIFICATE_STATUS,
 					   GNUTLS_HOOK_POST,
 					   handshake_callback);
 
@@ -195,20 +196,20 @@ static void client(int fd, const char *prio)
 
 	ret = gnutls_certificate_verify_peers2(session, &status);
 	if (ret != GNUTLS_E_SUCCESS) {
-		fail("client: Peer certificate validation failed: %s\n", gnutls_strerror(ret));
-	}
-	else {
+		fail("client: Peer certificate validation failed: %s\n",
+		     gnutls_strerror(ret));
+	} else {
 		if (status & GNUTLS_CERT_MISSING_OCSP_STATUS) {
-			success("client: Validation failed with GNUTLS_CERT_MISSING_OCSP_STATUS\n");
-		}
-		else {
+			success
+			    ("client: Validation failed with GNUTLS_CERT_MISSING_OCSP_STATUS\n");
+		} else {
 			fail("client: Validation status does not include GNUTLS_CERT_MISSING_OCSP_STATUS. Status is %d\n", status);
 		}
 	}
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
-      end:
+ end:
 
 	close(fd);
 
@@ -218,7 +219,6 @@ static void client(int fd, const char *prio)
 
 	gnutls_global_deinit();
 }
-
 
 static void server(int fd, const char *prio)
 {
@@ -239,8 +239,7 @@ static void server(int fd, const char *prio)
 
 	gnutls_certificate_allocate_credentials(&x509_cred);
 	gnutls_certificate_set_x509_key_mem(x509_cred, &server_cert,
-					    &server_key,
-					    GNUTLS_X509_FMT_PEM);
+					    &server_key, GNUTLS_X509_FMT_PEM);
 
 	gnutls_init(&session, GNUTLS_SERVER);
 

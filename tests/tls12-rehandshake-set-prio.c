@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -62,37 +62,41 @@ static void test_rehandshake(void)
 	unsigned i;
 
 	reset_buffers();
-	assert(gnutls_global_init()>=0);
+	assert(gnutls_global_init() >= 0);
 
 	gnutls_global_set_log_function(tls_log_func);
 
 	/* Init server */
-	assert(gnutls_certificate_allocate_credentials(&serverx509cred)>=0);
+	assert(gnutls_certificate_allocate_credentials(&serverx509cred) >= 0);
 
 	assert(gnutls_certificate_set_x509_key_mem(serverx509cred,
-						  &server_cert, &server_key,
-						  GNUTLS_X509_FMT_PEM)>=0);
+						   &server_cert, &server_key,
+						   GNUTLS_X509_FMT_PEM) >= 0);
 
-	assert(gnutls_init(&server, GNUTLS_SERVER)>=0);
+	assert(gnutls_init(&server, GNUTLS_SERVER) >= 0);
 
 	assert(gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-				     serverx509cred)>=0);
+				      serverx509cred) >= 0);
 
-	assert(gnutls_priority_set_direct(server, "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.1:+VERS-TLS1.2", NULL)>=0);
+	assert(gnutls_priority_set_direct
+	       (server, "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.1:+VERS-TLS1.2",
+		NULL) >= 0);
 
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
 
 	/* Init client */
-	assert(gnutls_certificate_allocate_credentials(&clientx509cred)>=0);
+	assert(gnutls_certificate_allocate_credentials(&clientx509cred) >= 0);
 
-	assert(gnutls_init(&client, GNUTLS_CLIENT)>=0);
+	assert(gnutls_init(&client, GNUTLS_CLIENT) >= 0);
 
 	assert(gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-				     clientx509cred)>=0);
+				      clientx509cred) >= 0);
 
-	assert(gnutls_priority_set_direct(client, "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.1:+VERS-TLS1.2", NULL)>=0);
+	assert(gnutls_priority_set_direct
+	       (client, "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.1:+VERS-TLS1.2",
+		NULL) >= 0);
 
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
@@ -104,14 +108,15 @@ static void test_rehandshake(void)
 		ssize_t n;
 		char b[1];
 
-		for (i=0;i<MAX_REHANDSHAKES;i++) {
+		for (i = 0; i < MAX_REHANDSHAKES; i++) {
 			sret = gnutls_rehandshake(server);
 
 			n = gnutls_record_recv(client, b, 1);
 			assert(n == GNUTLS_E_REHANDSHAKE);
 
 			/* includes TLS1.3 */
-			assert(gnutls_priority_set_direct(client, "NORMAL", NULL)>=0);
+			assert(gnutls_priority_set_direct
+			       (client, "NORMAL", NULL) >= 0);
 
 			HANDSHAKE(client, server);
 		}

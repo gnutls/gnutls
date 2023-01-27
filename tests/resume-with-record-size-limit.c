@@ -24,7 +24,7 @@
 /* Parts copied from GnuTLS example programs. */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -40,26 +40,26 @@ int main(int argc, char **argv)
 
 #else
 
-#ifndef _GNU_SOURCE
-# define _GNU_SOURCE
-#endif
-#include <string.h>
-#include <stdint.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#if !defined(_WIN32)
-#include <sys/wait.h>
-#endif
-#include <unistd.h>
-#include <gnutls/gnutls.h>
-#include <sys/wait.h>
-#include <signal.h>
-#include <assert.h>
-#include "utils.h"
-#include "cert-common.h"
-#include "virt-time.h"
+# ifndef _GNU_SOURCE
+#  define _GNU_SOURCE
+# endif
+# include <string.h>
+# include <stdint.h>
+# include <sys/types.h>
+# include <sys/socket.h>
+# if !defined(_WIN32)
+#  include <sys/wait.h>
+# endif
+# include <unistd.h>
+# include <gnutls/gnutls.h>
+# include <sys/wait.h>
+# include <signal.h>
+# include <assert.h>
+# include "utils.h"
+# include "cert-common.h"
+# include "virt-time.h"
 
-#define SKIP8(pos, total) { \
+# define SKIP8(pos, total) { \
 	uint8_t _s; \
 	if (pos+1 > total) fail("error\n"); \
 	_s = msg->data[pos]; \
@@ -72,14 +72,14 @@ pid_t child;
 /* A very basic TLS client, with anonymous authentication.
  */
 
-#define SESSIONS 2
-#define MAX_BUF 5*1024
-#define MSG "Hello TLS"
+# define SESSIONS 2
+# define MAX_BUF 5*1024
+# define MSG "Hello TLS"
 
 /* 2^13, which is not supported by max_fragment_length */
-#define MAX_DATA_SIZE 8192
+# define MAX_DATA_SIZE 8192
 
-#define HANDSHAKE_SESSION_ID_POS (2+32)
+# define HANDSHAKE_SESSION_ID_POS (2+32)
 
 static void tls_log_func(int level, const char *str)
 {
@@ -87,9 +87,10 @@ static void tls_log_func(int level, const char *str)
 		str);
 }
 
-static int ext_callback(void *ctx, unsigned tls_id, const unsigned char *data, unsigned size)
+static int ext_callback(void *ctx, unsigned tls_id, const unsigned char *data,
+			unsigned size)
 {
-	if (tls_id == 28) { /* record size limit */
+	if (tls_id == 28) {	/* record size limit */
 		uint16_t max_data_size;
 
 		assert(size == 2);
@@ -102,7 +103,8 @@ static int ext_callback(void *ctx, unsigned tls_id, const unsigned char *data, u
 }
 
 static int handshake_callback(gnutls_session_t session, unsigned int htype,
-	unsigned post, unsigned int incoming, const gnutls_datum_t *msg)
+			      unsigned post, unsigned int incoming,
+			      const gnutls_datum_t * msg)
 {
 	int ret;
 	unsigned pos;
@@ -143,7 +145,7 @@ static void client(int sds[], const char *prio)
 	/* variables used in session resuming
 	 */
 	int t;
-	gnutls_datum_t session_data = {NULL, 0};
+	gnutls_datum_t session_data = { NULL, 0 };
 
 	if (debug) {
 		gnutls_global_set_log_function(tls_log_func);
@@ -159,19 +161,22 @@ static void client(int sds[], const char *prio)
 	for (t = 0; t < SESSIONS; t++) {
 		int sd = sds[t];
 
-		assert(gnutls_init(&session, GNUTLS_CLIENT)>=0);
+		assert(gnutls_init(&session, GNUTLS_CLIENT) >= 0);
 
 		ret = gnutls_priority_set_direct(session, prio, NULL);
 		if (ret < 0) {
 			fail("prio: %s\n", gnutls_strerror(ret));
 		}
 
-		gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, clientx509cred);
+		gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
+				       clientx509cred);
 
 		if (t == 0) {
-			ret = gnutls_record_set_max_size(session, MAX_DATA_SIZE);
+			ret =
+			    gnutls_record_set_max_size(session, MAX_DATA_SIZE);
 			if (ret < 0)
-				fail("gnutls_set_max_size: %s\n", gnutls_strerror(ret));
+				fail("gnutls_set_max_size: %s\n",
+				     gnutls_strerror(ret));
 		}
 
 		if (t > 0) {
@@ -200,15 +205,12 @@ static void client(int sds[], const char *prio)
 			break;
 		} else {
 			if (debug)
-				success
-				    ("client: Handshake was completed\n");
+				success("client: Handshake was completed\n");
 		}
 
 		if (t == 0) {
 			/* get the session data size */
-			ret =
-			    gnutls_session_get_data2(session,
-						     &session_data);
+			ret = gnutls_session_get_data2(session, &session_data);
 			if (ret < 0)
 				fail("Getting resume data failed\n");
 
@@ -255,7 +257,6 @@ static void client(int sds[], const char *prio)
 /* These are global */
 static gnutls_datum_t session_ticket_key = { NULL, 0 };
 
-
 gnutls_certificate_credentials_t serverx509cred;
 
 static void global_stop(void)
@@ -285,7 +286,8 @@ static void server(int sds[], const char *prio)
 
 	gnutls_certificate_allocate_credentials(&serverx509cred);
 	assert(gnutls_certificate_set_x509_key_mem(serverx509cred,
-		&server_cert, &server_key, GNUTLS_X509_FMT_PEM) >= 0);
+						   &server_cert, &server_key,
+						   GNUTLS_X509_FMT_PEM) >= 0);
 
 	gnutls_session_ticket_key_generate(&session_ticket_key);
 
@@ -299,11 +301,11 @@ static void server(int sds[], const char *prio)
 		 */
 		assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);
 
-
 		gnutls_session_ticket_enable_server(session,
 						    &session_ticket_key);
 
-		gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, serverx509cred);
+		gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
+				       serverx509cred);
 		gnutls_transport_set_int(session, sd);
 		gnutls_handshake_set_timeout(session, get_timeout());
 
@@ -324,7 +326,8 @@ static void server(int sds[], const char *prio)
 		if (t > 0) {
 			ret = gnutls_session_is_resumed(session);
 			if (ret == 0) {
-				fail("server: session_is_resumed error (%d)\n", t);
+				fail("server: session_is_resumed error (%d)\n",
+				     t);
 			}
 		}
 

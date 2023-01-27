@@ -33,7 +33,7 @@
 /* This function encodes a seed value and a hash algorithm OID to the format
  * described in RFC8479. The output is the DER encoded form.
  */
-int _x509_encode_provable_seed(gnutls_x509_privkey_t pkey, gnutls_datum_t *der)
+int _x509_encode_provable_seed(gnutls_x509_privkey_t pkey, gnutls_datum_t * der)
 {
 
 	asn1_node c2;
@@ -46,13 +46,14 @@ int _x509_encode_provable_seed(gnutls_x509_privkey_t pkey, gnutls_datum_t *der)
 
 	if ((result =
 	     asn1_create_element(_gnutls_get_gnutls_asn(),
-				 "GNUTLS.ProvableSeed",
-				 &c2)) != ASN1_SUCCESS) {
+				 "GNUTLS.ProvableSeed", &c2)) != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
 
-	result = asn1_write_value(c2, "seed", pkey->params.seed, pkey->params.seed_size);
+	result =
+	    asn1_write_value(c2, "seed", pkey->params.seed,
+			     pkey->params.seed_size);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		ret = _gnutls_asn2err(result);
@@ -82,19 +83,19 @@ int _x509_encode_provable_seed(gnutls_x509_privkey_t pkey, gnutls_datum_t *der)
 /* This function decodes a DER encoded form of seed and a hash algorithm, as in
  * RFC8479.
  */
-int _x509_decode_provable_seed(gnutls_x509_privkey_t pkey, const gnutls_datum_t *der)
+int _x509_decode_provable_seed(gnutls_x509_privkey_t pkey,
+			       const gnutls_datum_t * der)
 {
 
 	asn1_node c2;
 	int ret, result;
 	char oid[MAX_OID_SIZE];
 	int oid_size;
-	gnutls_datum_t seed = {NULL, 0};
+	gnutls_datum_t seed = { NULL, 0 };
 
 	if ((result =
 	     asn1_create_element(_gnutls_get_gnutls_asn(),
-				 "GNUTLS.ProvableSeed",
-				 &c2)) != ASN1_SUCCESS) {
+				 "GNUTLS.ProvableSeed", &c2)) != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
@@ -116,8 +117,10 @@ int _x509_decode_provable_seed(gnutls_x509_privkey_t pkey, const gnutls_datum_t 
 		memcpy(pkey->params.seed, seed.data, seed.size);
 		pkey->params.seed_size = seed.size;
 	} else {
-		ret = 0; /* ignore struct */
-		_gnutls_debug_log("%s: ignoring ProvableSeed due to very long params\n", __func__);
+		ret = 0;	/* ignore struct */
+		_gnutls_debug_log
+		    ("%s: ignoring ProvableSeed due to very long params\n",
+		     __func__);
 		goto cleanup;
 	}
 

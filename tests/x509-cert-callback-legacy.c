@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -48,8 +48,7 @@ static int
 cert_callback(gnutls_session_t session,
 	      const gnutls_datum_t * req_ca_rdn, int nreqs,
 	      const gnutls_pk_algorithm_t * pk_algos,
-	      int pk_algos_length,
-	      gnutls_retr2_st *st)
+	      int pk_algos_length, gnutls_retr2_st * st)
 {
 	int ret;
 	gnutls_x509_crt_t *crts;
@@ -63,8 +62,10 @@ cert_callback(gnutls_session_t session,
 
 	st->cert_type = GNUTLS_CRT_X509;
 
-	ret = gnutls_x509_crt_list_import2(&crts, &crts_size, &cli_ca3_cert_chain, GNUTLS_X509_FMT_PEM,
-		GNUTLS_X509_CRT_LIST_FAIL_IF_UNSORTED);
+	ret =
+	    gnutls_x509_crt_list_import2(&crts, &crts_size, &cli_ca3_cert_chain,
+					 GNUTLS_X509_FMT_PEM,
+					 GNUTLS_X509_CRT_LIST_FAIL_IF_UNSORTED);
 	if (ret < 0) {
 		fail("error: %s\n", gnutls_strerror(ret));
 		exit(1);
@@ -76,7 +77,8 @@ cert_callback(gnutls_session_t session,
 		exit(1);
 	}
 
-	ret = gnutls_x509_privkey_import(pkey, &cli_ca3_key, GNUTLS_X509_FMT_PEM);
+	ret =
+	    gnutls_x509_privkey_import(pkey, &cli_ca3_key, GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
 		fail("error: %s\n", gnutls_strerror(ret));
 		exit(1);
@@ -93,10 +95,9 @@ cert_callback(gnutls_session_t session,
 
 static int
 server_cert_callback(gnutls_session_t session,
-	      const gnutls_datum_t * req_ca_rdn, int nreqs,
-	      const gnutls_pk_algorithm_t * pk_algos,
-	      int pk_algos_length,
-	      gnutls_retr2_st *st)
+		     const gnutls_datum_t * req_ca_rdn, int nreqs,
+		     const gnutls_pk_algorithm_t * pk_algos,
+		     int pk_algos_length, gnutls_retr2_st * st)
 {
 	int ret;
 	gnutls_x509_crt_t *crts;
@@ -105,8 +106,11 @@ server_cert_callback(gnutls_session_t session,
 
 	st->cert_type = GNUTLS_CRT_X509;
 
-	ret = gnutls_x509_crt_list_import2(&crts, &crts_size, &server_ca3_cert_chain, GNUTLS_X509_FMT_PEM,
-		GNUTLS_X509_CRT_LIST_FAIL_IF_UNSORTED);
+	ret =
+	    gnutls_x509_crt_list_import2(&crts, &crts_size,
+					 &server_ca3_cert_chain,
+					 GNUTLS_X509_FMT_PEM,
+					 GNUTLS_X509_CRT_LIST_FAIL_IF_UNSORTED);
 	if (ret < 0) {
 		fail("error: %s\n", gnutls_strerror(ret));
 		exit(1);
@@ -118,7 +122,9 @@ server_cert_callback(gnutls_session_t session,
 		exit(1);
 	}
 
-	ret = gnutls_x509_privkey_import(pkey, &server_ca3_key, GNUTLS_X509_FMT_PEM);
+	ret =
+	    gnutls_x509_privkey_import(pkey, &server_ca3_key,
+				       GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
 		fail("error: %s\n", gnutls_strerror(ret));
 		exit(1);
@@ -179,8 +185,7 @@ static void start(const char *prio)
 	if (ret < 0)
 		exit(1);
 
-	gnutls_certificate_set_retrieve_function(clientx509cred,
-						 cert_callback);
+	gnutls_certificate_set_retrieve_function(clientx509cred, cert_callback);
 
 	ret = gnutls_init(&client, GNUTLS_CLIENT);
 	if (ret < 0)
@@ -217,7 +222,8 @@ static void start(const char *prio)
 
 		gnutls_x509_crt_init(&crt);
 		ret =
-		    gnutls_x509_crt_import(crt, &server_ca3_localhost_cert_chain,
+		    gnutls_x509_crt_import(crt,
+					   &server_ca3_localhost_cert_chain,
 					   GNUTLS_X509_FMT_PEM);
 		if (ret < 0) {
 			fail("gnutls_x509_crt_import: %s\n",

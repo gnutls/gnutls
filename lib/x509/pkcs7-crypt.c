@@ -848,28 +848,27 @@ write_pkcs12_kdf_params(asn1_node pasn, const struct pbkdf2_params *kdf_params)
 }
 
 static int
-read_pbes2_gost_oid(uint8_t *der, size_t len, char *oid, int oid_size)
+read_pbes2_gost_oid(uint8_t * der, size_t len, char *oid, int oid_size)
 {
 	int result;
 	asn1_node pbe_asn = NULL;
 
 	if ((result =
 	     asn1_create_element(_gnutls_get_pkix(),
-				 "PKIX1.Gost28147-89-Parameters", &pbe_asn)) != ASN1_SUCCESS) {
+				 "PKIX1.Gost28147-89-Parameters",
+				 &pbe_asn)) != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
 
-	result =
-	    _asn1_strict_der_decode(&pbe_asn, der, len, NULL);
+	result = _asn1_strict_der_decode(&pbe_asn, der, len, NULL);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
 		goto error;
 	}
 
-	result = asn1_read_value(pbe_asn, "encryptionParamSet",
-				 oid, &oid_size);
+	result = asn1_read_value(pbe_asn, "encryptionParamSet", oid, &oid_size);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
@@ -897,7 +896,9 @@ read_pbes2_enc_params(asn1_node pasn,
 	/* Check the encryption algorithm
 	 */
 	len = sizeof(params->pbes2_oid);
-	result = asn1_read_value(pasn, "encryptionScheme.algorithm", params->pbes2_oid, &len);
+	result =
+	    asn1_read_value(pasn, "encryptionScheme.algorithm",
+			    params->pbes2_oid, &len);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
@@ -918,14 +919,17 @@ read_pbes2_enc_params(asn1_node pasn,
 	if (!strcmp(params->pbes2_oid, GOST28147_89_OID)) {
 		len = sizeof(params->pbes2_oid);
 		result = read_pbes2_gost_oid(&der->data[params_start],
-					     params_len, params->pbes2_oid, len);
+					     params_len, params->pbes2_oid,
+					     len);
 		if (result < 0) {
 			gnutls_assert();
 			return result;
 		}
 	}
 
-	if ((result = pbes2_cipher_oid_to_algo(params->pbes2_oid, &params->cipher)) < 0) {
+	if ((result =
+	     pbes2_cipher_oid_to_algo(params->pbes2_oid,
+				      &params->cipher)) < 0) {
 		gnutls_assert();
 		return result;
 	}
@@ -957,8 +961,7 @@ read_pbes2_enc_params(asn1_node pasn,
 	/* read the IV */
 	params->iv_size = sizeof(params->iv);
 	result = asn1_read_value(pbe_asn,
-			p->iv_name,
-			params->iv, &params->iv_size);
+				 p->iv_name, params->iv, &params->iv_size);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
@@ -1106,7 +1109,7 @@ _gnutls_read_pkcs_schema_params(schema_id * schema, const char *password,
 static int
 _gnutls_pbes2_string_to_key(unsigned int pass_len, const char *password,
 			    const struct pbkdf2_params *kdf_params,
-			    int key_size, uint8_t *key)
+			    int key_size, uint8_t * key)
 {
 	gnutls_datum_t _key;
 	gnutls_datum_t salt;
@@ -1140,11 +1143,14 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, asn1_node pkcs8_asn,
 
 	if (_password) {
 		gnutls_datum_t pout;
-		ret = _gnutls_utf8_password_normalize(_password, strlen(_password), &pout, 1);
+		ret =
+		    _gnutls_utf8_password_normalize(_password,
+						    strlen(_password), &pout,
+						    1);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		password = (char*)pout.data;
+		password = (char *)pout.data;
 		pass_len = pout.size;
 	} else {
 		password = NULL;
@@ -1160,9 +1166,9 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, asn1_node pkcs8_asn,
 
 	if (schema == PBES1_DES_MD5) {
 		ret = _gnutls_decrypt_pbes1_des_md5_data(password, pass_len,
-							  kdf_params,
-							  enc_params, &enc,
-							  decrypted_data);
+							 kdf_params,
+							 enc_params, &enc,
+							 decrypted_data);
 		if (ret < 0)
 			goto error;
 		goto cleanup;
@@ -1185,8 +1191,7 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, asn1_node pkcs8_asn,
 	p = _gnutls_pkcs_schema_get(schema);
 	if (p != NULL && p->pbes2 != 0) {	/* PBES2 */
 		ret = _gnutls_pbes2_string_to_key(pass_len, password,
-						     kdf_params,
-						     key_size, key);
+						  kdf_params, key_size, key);
 		if (ret < 0) {
 			gnutls_assert();
 			goto error;
@@ -1218,7 +1223,8 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, asn1_node pkcs8_asn,
 	block_size = _gnutls_cipher_get_block_size(ce);
 
 	if (ce->type == CIPHER_BLOCK) {
-		if (enc.size % block_size != 0 || (unsigned)enc_params->iv_size != block_size) {
+		if (enc.size % block_size != 0
+		    || (unsigned)enc_params->iv_size != block_size) {
 			gnutls_assert();
 			ret = GNUTLS_E_DECRYPTION_FAILED;
 			goto error;
@@ -1260,10 +1266,10 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, asn1_node pkcs8_asn,
 	decrypted_data->data = enc.data;
 
 	if (ce->type == CIPHER_BLOCK && block_size != 1) {
-		unsigned pslen = (uint8_t)enc.data[enc.size - 1];
+		unsigned pslen = (uint8_t) enc.data[enc.size - 1];
 		unsigned i;
 
-		if (pslen > block_size || pslen >= enc.size  || pslen == 0) {
+		if (pslen > block_size || pslen >= enc.size || pslen == 0) {
 			gnutls_assert();
 			ret = GNUTLS_E_DECRYPTION_FAILED;
 			goto error;
@@ -1271,8 +1277,8 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, asn1_node pkcs8_asn,
 
 		/* verify padding according to rfc2898 */
 		decrypted_data->size = enc.size - pslen;
-		for (i=0;i<pslen;i++) {
-			if (enc.data[enc.size-1-i] != pslen) {
+		for (i = 0; i < pslen; i++) {
+			if (enc.data[enc.size - 1 - i] != pslen) {
 				gnutls_assert();
 				ret = GNUTLS_E_DECRYPTION_FAILED;
 				goto error;
@@ -1469,9 +1475,7 @@ write_pbes2_enc_params(asn1_node pasn, const struct pbe_enc_params *params)
 	}
 
 	result =
-	    asn1_write_value(pasn, "encryptionScheme.algorithm",
-			     cipher_oid,
-			     1);
+	    asn1_write_value(pasn, "encryptionScheme.algorithm", cipher_oid, 1);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		goto error;
@@ -1525,11 +1529,14 @@ _gnutls_pkcs_generate_key(schema_id schema,
 
 	if (_password) {
 		gnutls_datum_t pout;
-		ret = _gnutls_utf8_password_normalize(_password, strlen(_password), &pout, 0);
+		ret =
+		    _gnutls_utf8_password_normalize(_password,
+						    strlen(_password), &pout,
+						    0);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		password = (char*)pout.data;
+		password = (char *)pout.data;
 		pass_len = pout.size;
 	} else {
 		password = NULL;
@@ -1560,7 +1567,7 @@ _gnutls_pkcs_generate_key(schema_id schema,
 	}
 
 	ret = gnutls_rnd(GNUTLS_RND_RANDOM, kdf_params->salt,
-			  kdf_params->salt_size);
+			 kdf_params->salt_size);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -1602,7 +1609,7 @@ _gnutls_pkcs_generate_key(schema_id schema,
 
 		if (enc_params->iv_size) {
 			ret = gnutls_rnd(GNUTLS_RND_NONCE,
-					  enc_params->iv, enc_params->iv_size);
+					 enc_params->iv, enc_params->iv_size);
 			if (ret < 0) {
 				gnutls_assert();
 				goto cleanup;
@@ -1733,7 +1740,8 @@ _gnutls_pkcs_write_schema_params(schema_id schema, asn1_node pkcs8_asn,
 int
 _gnutls_pkcs_raw_encrypt_data(const gnutls_datum_t * plain,
 			      const struct pbe_enc_params *enc_params,
-			      const gnutls_datum_t * key, gnutls_datum_t * encrypted)
+			      const gnutls_datum_t * key,
+			      gnutls_datum_t * encrypted)
 {
 	int result;
 	int data_size;

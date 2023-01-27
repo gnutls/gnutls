@@ -55,7 +55,7 @@ aes_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx, int enc)
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	((struct aes_ctx *) (*_ctx))->enc = enc;
+	((struct aes_ctx *)(*_ctx))->enc = enc;
 
 	return 0;
 }
@@ -85,7 +85,7 @@ aes_ssse3_cipher_setkey(void *_ctx, const void *userkey, size_t keysize)
 
 static int
 aes_ssse3_encrypt(void *_ctx, const void *src, size_t src_size,
-	    void *dst, size_t dst_size)
+		  void *dst, size_t dst_size)
 {
 	struct aes_ctx *ctx = _ctx;
 
@@ -102,7 +102,7 @@ aes_ssse3_encrypt(void *_ctx, const void *src, size_t src_size,
 
 static int
 aes_ssse3_decrypt(void *_ctx, const void *src, size_t src_size,
-	    void *dst, size_t dst_size)
+		  void *dst, size_t dst_size)
 {
 	struct aes_ctx *ctx = _ctx;
 
@@ -132,11 +132,10 @@ static int aes_setiv(void *_ctx, const void *iv, size_t iv_size)
 static void aes_deinit(void *_ctx)
 {
 	struct aes_ctx *ctx = _ctx;
-	
+
 	zeroize_temp_key(ctx, sizeof(*ctx));
 	gnutls_free(ctx);
 }
-
 
 const gnutls_crypto_cipher_st _gnutls_aes_ssse3 = {
 	.init = aes_cipher_init,
@@ -146,4 +145,3 @@ const gnutls_crypto_cipher_st _gnutls_aes_ssse3 = {
 	.decrypt = aes_ssse3_decrypt,
 	.deinit = aes_deinit,
 };
-

@@ -22,7 +22,6 @@
  *
  */
 
-
 /***
  * This fuzzer tests the behavior of the GnuTLS library in client mode,
  * specifically dealing with raw public keys during the handshake.
@@ -65,21 +64,27 @@ int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 
 	res = gnutls_certificate_allocate_credentials(&rawpk_cred);
 	assert(res >= 0);
-	
+
 	res =
-		gnutls_certificate_set_rawpk_key_mem(rawpk_cred,
-		                                     &rawpk_public_key1,
-		                                     &rawpk_private_key1,
-		                                     GNUTLS_X509_FMT_PEM,
-		                                     NULL, 0, NULL, 0, 0);
-	assert(res >= 0);
-	
-	gnutls_certificate_set_known_dh_params(rawpk_cred, GNUTLS_SEC_PARAM_MEDIUM);
-	
-	res = gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, rawpk_cred);
+	    gnutls_certificate_set_rawpk_key_mem(rawpk_cred,
+						 &rawpk_public_key1,
+						 &rawpk_private_key1,
+						 GNUTLS_X509_FMT_PEM,
+						 NULL, 0, NULL, 0, 0);
 	assert(res >= 0);
 
-	res = gnutls_priority_set_direct(session, "NORMAL:"VERS_STR":-CTYPE-ALL:+CTYPE-CLI-RAWPK:+CTYPE-SRV-RAWPK", NULL);
+	gnutls_certificate_set_known_dh_params(rawpk_cred,
+					       GNUTLS_SEC_PARAM_MEDIUM);
+
+	res =
+	    gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, rawpk_cred);
+	assert(res >= 0);
+
+	res =
+	    gnutls_priority_set_direct(session,
+				       "NORMAL:" VERS_STR
+				       ":-CTYPE-ALL:+CTYPE-CLI-RAWPK:+CTYPE-SRV-RAWPK",
+				       NULL);
 	assert(res >= 0);
 
 	memdata.data = data;

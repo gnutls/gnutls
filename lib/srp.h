@@ -21,11 +21,11 @@
  */
 
 #ifndef GNUTLS_LIB_SRP_H
-#define GNUTLS_LIB_SRP_H
+# define GNUTLS_LIB_SRP_H
 
-#include <config.h>
+# include <config.h>
 
-#ifdef ENABLE_SRP
+# ifdef ENABLE_SRP
 
 bigint_t _gnutls_calc_srp_B(bigint_t * ret_b, bigint_t g, bigint_t n,
 			    bigint_t v);
@@ -36,12 +36,12 @@ bigint_t _gnutls_calc_srp_A(bigint_t * a, bigint_t g, bigint_t n);
 bigint_t _gnutls_calc_srp_S2(bigint_t B, bigint_t g, bigint_t x,
 			     bigint_t a, bigint_t u, bigint_t n);
 int _gnutls_calc_srp_x(char *username, char *password, uint8_t * salt,
-		       size_t salt_size, size_t * size, void *digest);
+		       size_t salt_size, size_t *size, void *digest);
 int _gnutls_srp_gn(uint8_t ** ret_g, uint8_t ** ret_n, int bits);
 
 /* g is defined to be 2 */
-#define SRP_MAX_HASH_SIZE 24
+#  define SRP_MAX_HASH_SIZE 24
 
-#endif
+# endif
 
-#endif /* GNUTLS_LIB_SRP_H */
+#endif				/* GNUTLS_LIB_SRP_H */

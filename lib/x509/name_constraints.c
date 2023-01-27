@@ -41,7 +41,8 @@
 // for documentation see the implementation
 static int name_constraints_intersect_nodes(name_constraints_node_st * nc1,
 					    name_constraints_node_st * nc2,
-					    name_constraints_node_st ** intersection);
+					    name_constraints_node_st **
+					    intersection);
 
 /*-
  * is_nc_empty:
@@ -53,7 +54,8 @@ static int name_constraints_intersect_nodes(name_constraints_node_st * nc1,
  *
  * Returns: 0 if @nc contains constraints of type @type, 1 otherwise
  -*/
-static unsigned is_nc_empty(struct gnutls_name_constraints_st* nc, unsigned type)
+static unsigned is_nc_empty(struct gnutls_name_constraints_st *nc,
+			    unsigned type)
 {
 	name_constraints_node_st *t;
 
@@ -92,19 +94,20 @@ static unsigned is_nc_empty(struct gnutls_name_constraints_st* nc, unsigned type
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a negative error value.
  -*/
 static int validate_name_constraints_node(gnutls_x509_subject_alt_name_t type,
-					  const gnutls_datum_t* name)
+					  const gnutls_datum_t * name)
 {
 	if (type != GNUTLS_SAN_DNSNAME && type != GNUTLS_SAN_RFC822NAME &&
-		type != GNUTLS_SAN_DN && type != GNUTLS_SAN_URI &&
-		type != GNUTLS_SAN_IPADDRESS && 
-		type != GNUTLS_SAN_OTHERNAME_MSUSERPRINCIPAL) {
+	    type != GNUTLS_SAN_DN && type != GNUTLS_SAN_URI &&
+	    type != GNUTLS_SAN_IPADDRESS &&
+	    type != GNUTLS_SAN_OTHERNAME_MSUSERPRINCIPAL) {
 		return gnutls_assert_val(GNUTLS_E_X509_UNKNOWN_SAN);
 	}
 
 	if (type == GNUTLS_SAN_IPADDRESS) {
 		if (name->size != 8 && name->size != 32)
 			return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
-		int prefix = _gnutls_mask_to_prefix(name->data + name->size/2, name->size/2);
+		int prefix = _gnutls_mask_to_prefix(name->data + name->size / 2,
+						    name->size / 2);
 		if (prefix < 0)
 			return gnutls_assert_val(GNUTLS_E_MALFORMED_CIDR);
 	}
@@ -113,7 +116,7 @@ static int validate_name_constraints_node(gnutls_x509_subject_alt_name_t type,
 }
 
 int _gnutls_extract_name_constraints(asn1_node c2, const char *vstr,
-									 name_constraints_node_st ** _nc)
+				     name_constraints_node_st ** _nc)
 {
 	int ret;
 	char tmpstr[128];
@@ -124,11 +127,11 @@ int _gnutls_extract_name_constraints(asn1_node c2, const char *vstr,
 
 	prev = *_nc;
 	if (prev != NULL) {
-		while(prev->next != NULL)
+		while (prev->next != NULL)
 			prev = prev->next;
 	}
 
-	for (indx=1;;indx++) {
+	for (indx = 1;; indx++) {
 		snprintf(tmpstr, sizeof(tmpstr), "%s.?%u.base", vstr, indx);
 
 		ret =
@@ -141,24 +144,28 @@ int _gnutls_extract_name_constraints(asn1_node c2, const char *vstr,
 
 		if (type == GNUTLS_SAN_OTHERNAME) {
 			gnutls_datum_t oid = { NULL, 0 };
-                        gnutls_datum_t parsed_othername = { NULL, 0 };
-                        ret = _gnutls_parse_general_name2(c2, tmpstr, -1, &oid, &type, 1);
-                        if(ret < 0) {
-                                gnutls_assert();
-                                goto cleanup;
-                        }
+			gnutls_datum_t parsed_othername = { NULL, 0 };
+			ret =
+			    _gnutls_parse_general_name2(c2, tmpstr, -1, &oid,
+							&type, 1);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
 
-                        ret = gnutls_x509_othername_to_virtual((char*)oid.data, &tmp, &type,
-                                &parsed_othername);
-                        if(ret < 0) {
-                                gnutls_assert();
-                                goto cleanup;
-                        }
+			ret =
+			    gnutls_x509_othername_to_virtual((char *)oid.data,
+							     &tmp, &type,
+							     &parsed_othername);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
 
 			gnutls_free(oid.data);
 			gnutls_free(tmp.data);
 
-                        memcpy(&tmp, &parsed_othername, sizeof(gnutls_datum_t));
+			memcpy(&tmp, &parsed_othername, sizeof(gnutls_datum_t));
 		}
 
 		ret = validate_name_constraints_node(type, &tmp);
@@ -206,7 +213,7 @@ int _gnutls_extract_name_constraints(asn1_node c2, const char *vstr,
  *
  * Deallocate a list of name constraints nodes starting at the given node.
  -*/
-void _gnutls_name_constraints_node_free(name_constraints_node_st *node)
+void _gnutls_name_constraints_node_free(name_constraints_node_st * node)
 {
 	name_constraints_node_st *next, *t;
 
@@ -231,11 +238,12 @@ void _gnutls_name_constraints_node_free(name_constraints_node_st *node)
  *
  * Returns: Pointer to newly allocated node or NULL in case of memory error.
  -*/
-static name_constraints_node_st* name_constraints_node_new(unsigned type,
+static name_constraints_node_st *name_constraints_node_new(unsigned type,
 							   unsigned char *data,
 							   unsigned int size)
 {
-	name_constraints_node_st *tmp = gnutls_malloc(sizeof(struct name_constraints_node_st));
+	name_constraints_node_st *tmp =
+	    gnutls_malloc(sizeof(struct name_constraints_node_st));
 	if (tmp == NULL)
 		return NULL;
 	tmp->type = type;
@@ -276,14 +284,16 @@ int _gnutls_name_constraints_intersect(name_constraints_node_st ** _nc,
 				       name_constraints_node_st * _nc2,
 				       name_constraints_node_st ** _nc_excluded)
 {
-	name_constraints_node_st *nc, *nc2, *t, *tmp, *dest = NULL, *prev = NULL;
+	name_constraints_node_st *nc, *nc2, *t, *tmp, *dest = NULL, *prev =
+	    NULL;
 	int ret, type, used;
 
 	/* temporary array to see, if we need to add universal excluded constraints
 	 * (see phase 3 for details)
 	 * indexed directly by (gnutls_x509_subject_alt_name_t enum - 1) */
 	unsigned char types_with_empty_intersection[GNUTLS_SAN_MAX];
-	memset(types_with_empty_intersection, 0, sizeof(types_with_empty_intersection));
+	memset(types_with_empty_intersection, 0,
+	       sizeof(types_with_empty_intersection));
 
 	if (*_nc == NULL || _nc2 == NULL)
 		return 0;
@@ -300,7 +310,9 @@ int _gnutls_name_constraints_intersect(name_constraints_node_st ** _nc,
 			if (t->type == nc2->type) {
 				// check bounds (we will use 't->type' as index)
 				if (t->type > GNUTLS_SAN_MAX || t->type == 0)
-					return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+					return
+					    gnutls_assert_val
+					    (GNUTLS_E_INTERNAL_ERROR);
 				// note the possibility of empty intersection for this type
 				// if we add something to the intersection in phase 2,
 				// we will reset this flag back to 0 then
@@ -310,10 +322,10 @@ int _gnutls_name_constraints_intersect(name_constraints_node_st ** _nc,
 			nc2 = nc2->next;
 		}
 		if (nc2 == NULL ||
-			(t->type != GNUTLS_SAN_DNSNAME &&
-			 t->type != GNUTLS_SAN_RFC822NAME &&
-			 t->type != GNUTLS_SAN_IPADDRESS)
-		   ) {
+		    (t->type != GNUTLS_SAN_DNSNAME &&
+		     t->type != GNUTLS_SAN_RFC822NAME &&
+		     t->type != GNUTLS_SAN_IPADDRESS)
+		    ) {
 			/* move node from NC to DEST */
 			if (prev != NULL)
 				prev->next = next;
@@ -339,17 +351,22 @@ int _gnutls_name_constraints_intersect(name_constraints_node_st ** _nc,
 		while (t != NULL) {
 			// save intersection of name constraints into tmp
 			ret = name_constraints_intersect_nodes(t, nc2, &tmp);
-			if (ret < 0) return gnutls_assert_val(ret);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
 			used = 1;
 			// if intersection is not empty
-			if (tmp != NULL) { // intersection for this type is not empty
+			if (tmp != NULL) {	// intersection for this type is not empty
 				// check bounds
-				if (tmp->type > GNUTLS_SAN_MAX || tmp->type == 0) {
+				if (tmp->type > GNUTLS_SAN_MAX
+				    || tmp->type == 0) {
 					gnutls_free(tmp);
-					return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+					return
+					    gnutls_assert_val
+					    (GNUTLS_E_INTERNAL_ERROR);
 				}
 				// we will not add universal excluded constraint for this type
-				types_with_empty_intersection[tmp->type - 1] = 0;
+				types_with_empty_intersection[tmp->type - 1] =
+				    0;
 				// add intersection node to DEST
 				tmp->next = dest;
 				dest = tmp;
@@ -358,9 +375,11 @@ int _gnutls_name_constraints_intersect(name_constraints_node_st ** _nc,
 		}
 		// if the node from nc2 was not used for intersection, copy it to DEST
 		// Beware: also copies nodes other than DNS, email, IP,
-		//	 since their counterpart may have been moved in phase 1.
+		//       since their counterpart may have been moved in phase 1.
 		if (!used) {
-			tmp = name_constraints_node_new(nc2->type, nc2->name.data, nc2->name.size);
+			tmp =
+			    name_constraints_node_new(nc2->type, nc2->name.data,
+						      nc2->name.size);
 			if (tmp == NULL) {
 				_gnutls_name_constraints_node_free(dest);
 				return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
@@ -381,47 +400,53 @@ int _gnutls_name_constraints_intersect(name_constraints_node_st ** _nc,
 	 * excluded constraint with universal wildcard
 	 * (since the intersection of permitted is now empty). */
 	for (type = 1; type <= GNUTLS_SAN_MAX; type++) {
-		if (types_with_empty_intersection[type-1] == 0)
+		if (types_with_empty_intersection[type - 1] == 0)
 			continue;
-		_gnutls_hard_log("Adding universal excluded name constraint for type %d.\n", type);
+		_gnutls_hard_log
+		    ("Adding universal excluded name constraint for type %d.\n",
+		     type);
 		switch (type) {
-			case GNUTLS_SAN_IPADDRESS:
-				// add universal restricted range for IPv4
-				tmp = name_constraints_node_new(GNUTLS_SAN_IPADDRESS, NULL, 8);
-				if (tmp == NULL) {
-					_gnutls_name_constraints_node_free(dest);
-					return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-				}
-				tmp->next = *_nc_excluded;
-				*_nc_excluded = tmp;
-				// add universal restricted range for IPv6
-				tmp = name_constraints_node_new(GNUTLS_SAN_IPADDRESS, NULL, 32);
-				if (tmp == NULL) {
-					_gnutls_name_constraints_node_free(dest);
-					return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-				}
-				tmp->next = *_nc_excluded;
-				*_nc_excluded = tmp;
-				break;
-			case GNUTLS_SAN_DNSNAME:
-			case GNUTLS_SAN_RFC822NAME:
-				tmp = name_constraints_node_new(type, NULL, 0);
-				if (tmp == NULL) {
-					_gnutls_name_constraints_node_free(dest);
-					return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-				}
-				tmp->next = *_nc_excluded;
-				*_nc_excluded = tmp;
-				break;
-			default: // do nothing, at least one node was already moved in phase 1
-				break;
+		case GNUTLS_SAN_IPADDRESS:
+			// add universal restricted range for IPv4
+			tmp =
+			    name_constraints_node_new(GNUTLS_SAN_IPADDRESS,
+						      NULL, 8);
+			if (tmp == NULL) {
+				_gnutls_name_constraints_node_free(dest);
+				return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+			}
+			tmp->next = *_nc_excluded;
+			*_nc_excluded = tmp;
+			// add universal restricted range for IPv6
+			tmp =
+			    name_constraints_node_new(GNUTLS_SAN_IPADDRESS,
+						      NULL, 32);
+			if (tmp == NULL) {
+				_gnutls_name_constraints_node_free(dest);
+				return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+			}
+			tmp->next = *_nc_excluded;
+			*_nc_excluded = tmp;
+			break;
+		case GNUTLS_SAN_DNSNAME:
+		case GNUTLS_SAN_RFC822NAME:
+			tmp = name_constraints_node_new(type, NULL, 0);
+			if (tmp == NULL) {
+				_gnutls_name_constraints_node_free(dest);
+				return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+			}
+			tmp->next = *_nc_excluded;
+			*_nc_excluded = tmp;
+			break;
+		default:	// do nothing, at least one node was already moved in phase 1
+			break;
 		}
 	}
 	return GNUTLS_E_SUCCESS;
 }
 
-static int _gnutls_name_constraints_append(name_constraints_node_st **_nc,
-										   name_constraints_node_st *_nc2)
+static int _gnutls_name_constraints_append(name_constraints_node_st ** _nc,
+					   name_constraints_node_st * _nc2)
 {
 	name_constraints_node_st *nc, *nc2;
 	struct name_constraints_node_st *tmp;
@@ -433,7 +458,9 @@ static int _gnutls_name_constraints_append(name_constraints_node_st **_nc,
 	while (nc2) {
 		nc = *_nc;
 
-		tmp = name_constraints_node_new(nc2->type, nc2->name.data, nc2->name.size);
+		tmp =
+		    name_constraints_node_new(nc2->type, nc2->name.data,
+					      nc2->name.size);
 		if (tmp == NULL)
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
@@ -487,8 +514,7 @@ int gnutls_x509_crt_get_name_constraints(gnutls_x509_crt_t crt,
 	}
 
 	ret =
-	    _gnutls_x509_crt_get_extension(crt, "2.5.29.30", 0, &der,
-					   critical);
+	    _gnutls_x509_crt_get_extension(crt, "2.5.29.30", 0, &der, critical);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -536,7 +562,7 @@ void gnutls_x509_name_constraints_deinit(gnutls_x509_name_constraints_t nc)
  *
  * Since: 3.3.0
  **/
-int gnutls_x509_name_constraints_init(gnutls_x509_name_constraints_t *nc)
+int gnutls_x509_name_constraints_init(gnutls_x509_name_constraints_t * nc)
 {
 	*nc = gnutls_calloc(1, sizeof(struct gnutls_name_constraints_st));
 	if (*nc == NULL) {
@@ -550,10 +576,9 @@ int gnutls_x509_name_constraints_init(gnutls_x509_name_constraints_t *nc)
 static
 int name_constraints_add(gnutls_x509_name_constraints_t nc,
 			 gnutls_x509_subject_alt_name_t type,
-			 const gnutls_datum_t * name,
-			 unsigned permitted)
+			 const gnutls_datum_t * name, unsigned permitted)
 {
-	struct name_constraints_node_st * tmp, *prev = NULL;
+	struct name_constraints_node_st *tmp, *prev = NULL;
 	int ret;
 
 	ret = validate_name_constraints_node(type, name);
@@ -565,7 +590,7 @@ int name_constraints_add(gnutls_x509_name_constraints_t nc,
 	else
 		prev = tmp = nc->excluded;
 
-	while(tmp != NULL) {
+	while (tmp != NULL) {
 		tmp = tmp->next;
 		if (tmp != NULL)
 			prev = tmp;
@@ -610,15 +635,13 @@ int _gnutls_x509_name_constraints_merge(gnutls_x509_name_constraints_t nc,
 
 	ret =
 	    _gnutls_name_constraints_intersect(&nc->permitted,
-						   nc2->permitted, &nc->excluded);
+					       nc2->permitted, &nc->excluded);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
 	}
 
-	ret =
-	    _gnutls_name_constraints_append(&nc->excluded,
-					    nc2->excluded);
+	ret = _gnutls_name_constraints_append(&nc->excluded, nc2->excluded);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -643,8 +666,10 @@ int _gnutls_x509_name_constraints_merge(gnutls_x509_name_constraints_t nc,
  *
  * Since: 3.3.0
  **/
-int gnutls_x509_name_constraints_add_permitted(gnutls_x509_name_constraints_t nc,
-					       gnutls_x509_subject_alt_name_t type,
+int gnutls_x509_name_constraints_add_permitted(gnutls_x509_name_constraints_t
+					       nc,
+					       gnutls_x509_subject_alt_name_t
+					       type,
 					       const gnutls_datum_t * name)
 {
 	return name_constraints_add(nc, type, name, 1);
@@ -668,8 +693,8 @@ int gnutls_x509_name_constraints_add_permitted(gnutls_x509_name_constraints_t nc
  * Since: 3.3.0
  **/
 int gnutls_x509_name_constraints_add_excluded(gnutls_x509_name_constraints_t nc,
-					      gnutls_x509_subject_alt_name_t type,
-					      const gnutls_datum_t * name)
+					      gnutls_x509_subject_alt_name_t
+					      type, const gnutls_datum_t * name)
 {
 	return name_constraints_add(nc, type, name, 0);
 }
@@ -688,19 +713,18 @@ int gnutls_x509_name_constraints_add_excluded(gnutls_x509_name_constraints_t nc,
  *
  * Since: 3.3.0
  **/
-int gnutls_x509_crt_set_name_constraints(gnutls_x509_crt_t crt, 
+int gnutls_x509_crt_set_name_constraints(gnutls_x509_crt_t crt,
 					 gnutls_x509_name_constraints_t nc,
 					 unsigned int critical)
 {
-int ret;
-gnutls_datum_t der;
+	int ret;
+	gnutls_datum_t der;
 
 	ret = gnutls_x509_ext_export_name_constraints(nc, &der);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret =
-	    _gnutls_x509_crt_set_extension(crt, "2.5.29.30", &der, critical);
+	ret = _gnutls_x509_crt_set_extension(crt, "2.5.29.30", &der, critical);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -709,7 +733,7 @@ gnutls_datum_t der;
 	ret = 0;
 	crt->use_extensions = 1;
 
-cleanup:
+ cleanup:
 	_gnutls_free_datum(&der);
 	return ret;
 }
@@ -725,55 +749,64 @@ unsigned ends_with(const gnutls_datum_t * str, const gnutls_datum_t * suffix)
 
 	tree = suffix->data;
 	treelen = suffix->size;
-	if((treelen > 0) && (tree[0] == '.')) {
+	if ((treelen > 0) && (tree[0] == '.')) {
 		tree++;
 		treelen--;
 	}
 
 	if (memcmp(str->data + str->size - treelen, tree, treelen) == 0 &&
-		str->data[str->size - treelen -1] == '.')
-		return 1; /* match */
+	    str->data[str->size - treelen - 1] == '.')
+		return 1;	/* match */
 
 	return 0;
 }
 
 static
-unsigned email_ends_with(const gnutls_datum_t * str, const gnutls_datum_t * suffix)
+unsigned email_ends_with(const gnutls_datum_t * str,
+			 const gnutls_datum_t * suffix)
 {
 	if (suffix->size >= str->size)
 		return 0;
 
 	if (suffix->size > 1 && suffix->data[0] == '.') {
 		/* .domain.com */
-		if (memcmp(str->data + str->size - suffix->size, suffix->data, suffix->size) == 0)
-			return 1; /* match */
+		if (memcmp
+		    (str->data + str->size - suffix->size, suffix->data,
+		     suffix->size) == 0)
+			return 1;	/* match */
 	} else {
-		if (memcmp(str->data + str->size - suffix->size, suffix->data, suffix->size) == 0 &&
-			str->data[str->size - suffix->size -1] == '@')
-			return 1; /* match */
+		if (memcmp
+		    (str->data + str->size - suffix->size, suffix->data,
+		     suffix->size) == 0
+		    && str->data[str->size - suffix->size - 1] == '@')
+			return 1;	/* match */
 	}
 
 	return 0;
 }
 
-static unsigned dnsname_matches(const gnutls_datum_t *name, const gnutls_datum_t *suffix)
+static unsigned dnsname_matches(const gnutls_datum_t * name,
+				const gnutls_datum_t * suffix)
 {
-	_gnutls_hard_log("matching %.*s with DNS constraint %.*s\n", name->size, name->data,
-		suffix->size, suffix->data);
+	_gnutls_hard_log("matching %.*s with DNS constraint %.*s\n", name->size,
+			 name->data, suffix->size, suffix->data);
 
-	if (suffix->size == name->size && memcmp(suffix->data, name->data, suffix->size) == 0)
-		return 1; /* match */
+	if (suffix->size == name->size
+	    && memcmp(suffix->data, name->data, suffix->size) == 0)
+		return 1;	/* match */
 
 	return ends_with(name, suffix);
 }
 
-static unsigned email_matches(const gnutls_datum_t *name, const gnutls_datum_t *suffix)
+static unsigned email_matches(const gnutls_datum_t * name,
+			      const gnutls_datum_t * suffix)
 {
-	_gnutls_hard_log("matching %.*s with e-mail constraint %.*s\n", name->size, name->data,
-		suffix->size, suffix->data);
+	_gnutls_hard_log("matching %.*s with e-mail constraint %.*s\n",
+			 name->size, name->data, suffix->size, suffix->data);
 
-	if (suffix->size == name->size && memcmp(suffix->data, name->data, suffix->size) == 0)
-		return 1; /* match */
+	if (suffix->size == name->size
+	    && memcmp(suffix->data, name->data, suffix->size) == 0)
+		return 1;	/* match */
 
 	return email_ends_with(name, suffix);
 }
@@ -820,12 +853,12 @@ name_constraints_intersect_nodes(name_constraints_node_st * nc1,
 	case GNUTLS_SAN_IPADDRESS:
 		if (nc1->name.size != nc2->name.size)
 			return GNUTLS_E_SUCCESS;
-		iplength = nc1->name.size/2;
+		iplength = nc1->name.size / 2;
 		for (byte = 0; byte < iplength; byte++) {
-			if (((nc1->name.data[byte]^nc2->name.data[byte]) // XOR of addresses
-				 & nc1->name.data[byte+iplength]  // AND mask from nc1
-				 & nc2->name.data[byte+iplength]) // AND mask from nc2
-				 != 0) {
+			if (((nc1->name.data[byte] ^ nc2->name.data[byte])	// XOR of addresses
+			     & nc1->name.data[byte + iplength]	// AND mask from nc1
+			     & nc2->name.data[byte + iplength])	// AND mask from nc2
+			    != 0) {
 				// CIDRS do not intersect
 				return GNUTLS_E_SUCCESS;
 			}
@@ -839,7 +872,9 @@ name_constraints_intersect_nodes(name_constraints_node_st * nc1,
 
 	// copy existing node if applicable
 	if (to_copy != NULL) {
-		*_intersection = name_constraints_node_new(to_copy->type, to_copy->name.data, to_copy->name.size);
+		*_intersection =
+		    name_constraints_node_new(to_copy->type, to_copy->name.data,
+					      to_copy->name.size);
 		if (*_intersection == NULL)
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 		intersection = *_intersection;
@@ -848,11 +883,15 @@ name_constraints_intersect_nodes(name_constraints_node_st * nc1,
 
 		if (intersection->type == GNUTLS_SAN_IPADDRESS) {
 			// make sure both IP addresses are correctly masked
-			_gnutls_mask_ip(intersection->name.data, intersection->name.data+iplength, iplength);
-			_gnutls_mask_ip(nc1->name.data, nc1->name.data+iplength, iplength);
+			_gnutls_mask_ip(intersection->name.data,
+					intersection->name.data + iplength,
+					iplength);
+			_gnutls_mask_ip(nc1->name.data,
+					nc1->name.data + iplength, iplength);
 			// update intersection, if necessary (we already know one is subset of other)
 			for (byte = 0; byte < 2 * iplength; byte++) {
-				intersection->name.data[byte] |= nc1->name.data[byte];
+				intersection->name.data[byte] |=
+				    nc1->name.data[byte];
 			}
 		}
 	}
@@ -865,19 +904,21 @@ name_constraints_intersect_nodes(name_constraints_node_st * nc1,
  */
 static
 unsigned check_unsupported_constraint(gnutls_x509_name_constraints_t nc,
-									  gnutls_x509_subject_alt_name_t type)
+				      gnutls_x509_subject_alt_name_t type)
 {
-unsigned i;
-int ret;
-unsigned rtype;
-gnutls_datum_t rname;
+	unsigned i;
+	int ret;
+	unsigned rtype;
+	gnutls_datum_t rname;
 
 	/* check if there is a restrictions with that type, if
 	 * yes, then reject the name.
 	 */
 	i = 0;
 	do {
-		ret = gnutls_x509_name_constraints_get_excluded(nc, i++, &rtype, &rname);
+		ret =
+		    gnutls_x509_name_constraints_get_excluded(nc, i++, &rtype,
+							      &rname);
 		if (ret >= 0) {
 			if (rtype != type)
 				continue;
@@ -885,118 +926,14 @@ gnutls_datum_t rname;
 				return gnutls_assert_val(0);
 		}
 
-	} while(ret == 0);
+	} while (ret == 0);
 
 	return 1;
 }
 
 static
 unsigned check_dns_constraints(gnutls_x509_name_constraints_t nc,
-							   const gnutls_datum_t * name)
-{
-unsigned i;
-int ret;
-unsigned rtype;
-unsigned allowed_found = 0;
-gnutls_datum_t rname;
-
-	/* check restrictions */
-	i = 0;
-	do {
-		ret = gnutls_x509_name_constraints_get_excluded(nc, i++, &rtype, &rname);
-		if (ret >= 0) {
-			if (rtype != GNUTLS_SAN_DNSNAME)
-				continue;
-
-			/* a name of value 0 means that the CA shouldn't have issued
-			 * a certificate with a DNSNAME. */
-			if (rname.size == 0)
-				return gnutls_assert_val(0);
-
-			if (dnsname_matches(name, &rname) != 0)
-				return gnutls_assert_val(0); /* rejected */
-		}
-	} while(ret == 0);
-
-	/* check allowed */
-	i = 0;
-	do {
-		ret = gnutls_x509_name_constraints_get_permitted(nc, i++, &rtype, &rname);
-		if (ret >= 0) {
-			if (rtype != GNUTLS_SAN_DNSNAME)
-				continue;
-
-			if (rname.size == 0)
-				continue;
-
-			allowed_found = 1;
-
-			if (dnsname_matches(name, &rname) != 0)
-				return 1; /* accepted */
-		}
-	} while(ret == 0);
-
-	if (allowed_found != 0) /* there are allowed directives but this host wasn't found */
-		return gnutls_assert_val(0);
-
-	return 1;
-}
-
-static
-unsigned check_email_constraints(gnutls_x509_name_constraints_t nc,
-								 const gnutls_datum_t * name)
-{
-unsigned i;
-int ret;
-unsigned rtype;
-unsigned allowed_found = 0;
-gnutls_datum_t rname;
-
-	/* check restrictions */
-	i = 0;
-	do {
-		ret = gnutls_x509_name_constraints_get_excluded(nc, i++, &rtype, &rname);
-		if (ret >= 0) {
-			if (rtype != GNUTLS_SAN_RFC822NAME)
-				continue;
-
-			/* a name of value 0 means that the CA shouldn't have issued
-			 * a certificate with an e-mail. */
-			if (rname.size == 0)
-				return gnutls_assert_val(0);
-
-			if (email_matches(name, &rname) != 0)
-				return gnutls_assert_val(0); /* rejected */
-		}
-	} while(ret == 0);
-
-	/* check allowed */
-	i = 0;
-	do {
-		ret = gnutls_x509_name_constraints_get_permitted(nc, i++, &rtype, &rname);
-		if (ret >= 0) {
-			if (rtype != GNUTLS_SAN_RFC822NAME)
-				continue;
-
-			if (rname.size == 0)
-				continue;
-
-			allowed_found = 1;
-
-			if (email_matches(name, &rname) != 0)
-				return 1; /* accepted */
-		}
-	} while(ret == 0);
-
-	if (allowed_found != 0) /* there are allowed directives but this host wasn't found */
-		return gnutls_assert_val(0);
-
-	return 1;
-}
-
-static
-unsigned check_ip_constraints(gnutls_x509_name_constraints_t nc,
-							  const gnutls_datum_t * name)
+			       const gnutls_datum_t * name)
 {
 	unsigned i;
 	int ret;
@@ -1007,7 +944,121 @@ unsigned check_ip_constraints(gnutls_x509_name_constraints_t nc,
 	/* check restrictions */
 	i = 0;
 	do {
-		ret = gnutls_x509_name_constraints_get_excluded(nc, i++, &rtype, &rname);
+		ret =
+		    gnutls_x509_name_constraints_get_excluded(nc, i++, &rtype,
+							      &rname);
+		if (ret >= 0) {
+			if (rtype != GNUTLS_SAN_DNSNAME)
+				continue;
+
+			/* a name of value 0 means that the CA shouldn't have issued
+			 * a certificate with a DNSNAME. */
+			if (rname.size == 0)
+				return gnutls_assert_val(0);
+
+			if (dnsname_matches(name, &rname) != 0)
+				return gnutls_assert_val(0);	/* rejected */
+		}
+	} while (ret == 0);
+
+	/* check allowed */
+	i = 0;
+	do {
+		ret =
+		    gnutls_x509_name_constraints_get_permitted(nc, i++, &rtype,
+							       &rname);
+		if (ret >= 0) {
+			if (rtype != GNUTLS_SAN_DNSNAME)
+				continue;
+
+			if (rname.size == 0)
+				continue;
+
+			allowed_found = 1;
+
+			if (dnsname_matches(name, &rname) != 0)
+				return 1;	/* accepted */
+		}
+	} while (ret == 0);
+
+	if (allowed_found != 0)	/* there are allowed directives but this host wasn't found */
+		return gnutls_assert_val(0);
+
+	return 1;
+}
+
+static
+unsigned check_email_constraints(gnutls_x509_name_constraints_t nc,
+				 const gnutls_datum_t * name)
+{
+	unsigned i;
+	int ret;
+	unsigned rtype;
+	unsigned allowed_found = 0;
+	gnutls_datum_t rname;
+
+	/* check restrictions */
+	i = 0;
+	do {
+		ret =
+		    gnutls_x509_name_constraints_get_excluded(nc, i++, &rtype,
+							      &rname);
+		if (ret >= 0) {
+			if (rtype != GNUTLS_SAN_RFC822NAME)
+				continue;
+
+			/* a name of value 0 means that the CA shouldn't have issued
+			 * a certificate with an e-mail. */
+			if (rname.size == 0)
+				return gnutls_assert_val(0);
+
+			if (email_matches(name, &rname) != 0)
+				return gnutls_assert_val(0);	/* rejected */
+		}
+	} while (ret == 0);
+
+	/* check allowed */
+	i = 0;
+	do {
+		ret =
+		    gnutls_x509_name_constraints_get_permitted(nc, i++, &rtype,
+							       &rname);
+		if (ret >= 0) {
+			if (rtype != GNUTLS_SAN_RFC822NAME)
+				continue;
+
+			if (rname.size == 0)
+				continue;
+
+			allowed_found = 1;
+
+			if (email_matches(name, &rname) != 0)
+				return 1;	/* accepted */
+		}
+	} while (ret == 0);
+
+	if (allowed_found != 0)	/* there are allowed directives but this host wasn't found */
+		return gnutls_assert_val(0);
+
+	return 1;
+}
+
+static
+unsigned check_ip_constraints(gnutls_x509_name_constraints_t nc,
+			      const gnutls_datum_t * name)
+{
+	unsigned i;
+	int ret;
+	unsigned rtype;
+	unsigned allowed_found = 0;
+	gnutls_datum_t rname;
+
+	/* check restrictions */
+	i = 0;
+	do {
+		ret =
+		    gnutls_x509_name_constraints_get_excluded(nc, i++, &rtype,
+							      &rname);
 		if (ret >= 0) {
 			if (rtype != GNUTLS_SAN_IPADDRESS)
 				continue;
@@ -1017,14 +1068,16 @@ unsigned check_ip_constraints(gnutls_x509_name_constraints_t nc,
 				continue;
 
 			if (ip_in_cidr(name, &rname) != 0)
-				return gnutls_assert_val(0); /* rejected */
+				return gnutls_assert_val(0);	/* rejected */
 		}
-	} while(ret == 0);
+	} while (ret == 0);
 
 	/* check allowed */
 	i = 0;
 	do {
-		ret = gnutls_x509_name_constraints_get_permitted(nc, i++, &rtype, &rname);
+		ret =
+		    gnutls_x509_name_constraints_get_permitted(nc, i++, &rtype,
+							       &rname);
 		if (ret >= 0) {
 			if (rtype != GNUTLS_SAN_IPADDRESS)
 				continue;
@@ -1036,11 +1089,11 @@ unsigned check_ip_constraints(gnutls_x509_name_constraints_t nc,
 			allowed_found = 1;
 
 			if (ip_in_cidr(name, &rname) != 0)
-				return 1; /* accepted */
+				return 1;	/* accepted */
 		}
-	} while(ret == 0);
+	} while (ret == 0);
 
-	if (allowed_found != 0) /* there are allowed directives but this host wasn't found */
+	if (allowed_found != 0)	/* there are allowed directives but this host wasn't found */
 		return gnutls_assert_val(0);
 
 	return 1;
@@ -1084,9 +1137,10 @@ unsigned gnutls_x509_name_constraints_check(gnutls_x509_name_constraints_t nc,
  *
  * Returns: true if the certification is acceptable, and false otherwise
  */
-static unsigned check_unsupported_constraint2(gnutls_x509_crt_t cert, 
+static unsigned check_unsupported_constraint2(gnutls_x509_crt_t cert,
 					      gnutls_x509_name_constraints_t nc,
-					      gnutls_x509_subject_alt_name_t type)
+					      gnutls_x509_subject_alt_name_t
+					      type)
 {
 	unsigned idx, found_one;
 	char name[MAX_CN];
@@ -1096,10 +1150,12 @@ static unsigned check_unsupported_constraint2(gnutls_x509_crt_t cert,
 
 	found_one = 0;
 
-	for (idx=0;;idx++) {
+	for (idx = 0;; idx++) {
 		name_size = sizeof(name);
 		ret = gnutls_x509_crt_get_subject_alt_name2(cert,
-			idx, name, &name_size, &san_type, NULL);
+							    idx, name,
+							    &name_size,
+							    &san_type, NULL);
 		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 			break;
 		else if (ret < 0)
@@ -1136,26 +1192,30 @@ static unsigned check_unsupported_constraint2(gnutls_x509_crt_t cert,
  *
  * Since: 3.3.0
  **/
-unsigned gnutls_x509_name_constraints_check_crt(gnutls_x509_name_constraints_t nc,
-						gnutls_x509_subject_alt_name_t type,
-						gnutls_x509_crt_t cert)
+unsigned gnutls_x509_name_constraints_check_crt(gnutls_x509_name_constraints_t
+						nc,
+						gnutls_x509_subject_alt_name_t
+						type, gnutls_x509_crt_t cert)
 {
-char name[MAX_CN];
-size_t name_size;
-int ret;
-unsigned idx, t, san_type;
-gnutls_datum_t n;
-unsigned found_one;
+	char name[MAX_CN];
+	size_t name_size;
+	int ret;
+	unsigned idx, t, san_type;
+	gnutls_datum_t n;
+	unsigned found_one;
 
 	if (is_nc_empty(nc, type) != 0)
-		return 1; /* shortcut; no constraints to check */
+		return 1;	/* shortcut; no constraints to check */
 
 	if (type == GNUTLS_SAN_RFC822NAME) {
 		found_one = 0;
-		for (idx=0;;idx++) {
+		for (idx = 0;; idx++) {
 			name_size = sizeof(name);
 			ret = gnutls_x509_crt_get_subject_alt_name2(cert,
-				idx, name, &name_size, &san_type, NULL);
+								    idx, name,
+								    &name_size,
+								    &san_type,
+								    NULL);
 			if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 				break;
 			else if (ret < 0)
@@ -1165,10 +1225,11 @@ unsigned found_one;
 				continue;
 
 			found_one = 1;
-			n.data = (void*)name;
+			n.data = (void *)name;
 			n.size = name_size;
-			t = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_RFC822NAME,
-				&n);
+			t = gnutls_x509_name_constraints_check(nc,
+							       GNUTLS_SAN_RFC822NAME,
+							       &n);
 			if (t == 0)
 				return gnutls_assert_val(t);
 		}
@@ -1181,26 +1242,34 @@ unsigned found_one;
 		do {
 			/* ensure there is only a single EMAIL, similarly to CN handling (rfc6125) */
 			name_size = sizeof(name);
-			ret = gnutls_x509_crt_get_dn_by_oid(cert, GNUTLS_OID_PKCS9_EMAIL,
-							    1, 0, name, &name_size);
+			ret =
+			    gnutls_x509_crt_get_dn_by_oid(cert,
+							  GNUTLS_OID_PKCS9_EMAIL,
+							  1, 0, name,
+							  &name_size);
 			if (ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 				return gnutls_assert_val(0);
 
 			name_size = sizeof(name);
-			ret = gnutls_x509_crt_get_dn_by_oid(cert, GNUTLS_OID_PKCS9_EMAIL,
-							    0, 0, name, &name_size);
+			ret =
+			    gnutls_x509_crt_get_dn_by_oid(cert,
+							  GNUTLS_OID_PKCS9_EMAIL,
+							  0, 0, name,
+							  &name_size);
 			if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 				break;
 			else if (ret < 0)
 				return gnutls_assert_val(0);
 
 			found_one = 1;
-			n.data = (void*)name;
+			n.data = (void *)name;
 			n.size = name_size;
-			t = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_RFC822NAME, &n);
+			t = gnutls_x509_name_constraints_check(nc,
+							       GNUTLS_SAN_RFC822NAME,
+							       &n);
 			if (t == 0)
 				return gnutls_assert_val(t);
-		} while(0);
+		} while (0);
 
 		/* passed */
 		if (found_one != 0)
@@ -1213,10 +1282,13 @@ unsigned found_one;
 		}
 	} else if (type == GNUTLS_SAN_DNSNAME) {
 		found_one = 0;
-		for (idx=0;;idx++) {
+		for (idx = 0;; idx++) {
 			name_size = sizeof(name);
 			ret = gnutls_x509_crt_get_subject_alt_name2(cert,
-				idx, name, &name_size, &san_type, NULL);
+								    idx, name,
+								    &name_size,
+								    &san_type,
+								    NULL);
 			if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 				break;
 			else if (ret < 0)
@@ -1226,10 +1298,11 @@ unsigned found_one;
 				continue;
 
 			found_one = 1;
-			n.data = (void*)name;
+			n.data = (void *)name;
 			n.size = name_size;
-			t = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DNSNAME,
-				&n);
+			t = gnutls_x509_name_constraints_check(nc,
+							       GNUTLS_SAN_DNSNAME,
+							       &n);
 			if (t == 0)
 				return gnutls_assert_val(t);
 		}
@@ -1242,31 +1315,41 @@ unsigned found_one;
 		/* verify the name constraints against the CN, if the certificate is
 		 * not a CA. We do this check only on certificates marked as WWW server,
 		 * because that's where the CN check is only performed. */
-		if (_gnutls_check_key_purpose(cert, GNUTLS_KP_TLS_WWW_SERVER, 0) != 0)
-		do {
-			/* ensure there is only a single CN, according to rfc6125 */
-			name_size = sizeof(name);
-			ret = gnutls_x509_crt_get_dn_by_oid(cert, GNUTLS_OID_X520_COMMON_NAME,
-							    1, 0, name, &name_size);
-			if (ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
-				return gnutls_assert_val(0);
+		if (_gnutls_check_key_purpose(cert, GNUTLS_KP_TLS_WWW_SERVER, 0)
+		    != 0)
+			do {
+				/* ensure there is only a single CN, according to rfc6125 */
+				name_size = sizeof(name);
+				ret =
+				    gnutls_x509_crt_get_dn_by_oid(cert,
+								  GNUTLS_OID_X520_COMMON_NAME,
+								  1, 0, name,
+								  &name_size);
+				if (ret !=
+				    GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+					return gnutls_assert_val(0);
 
-			name_size = sizeof(name);
-			ret = gnutls_x509_crt_get_dn_by_oid(cert, GNUTLS_OID_X520_COMMON_NAME,
-							    0, 0, name, &name_size);
-			if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
-				break;
-			else if (ret < 0)
-				return gnutls_assert_val(0);
+				name_size = sizeof(name);
+				ret =
+				    gnutls_x509_crt_get_dn_by_oid(cert,
+								  GNUTLS_OID_X520_COMMON_NAME,
+								  0, 0, name,
+								  &name_size);
+				if (ret ==
+				    GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+					break;
+				else if (ret < 0)
+					return gnutls_assert_val(0);
 
-			found_one = 1;
-			n.data = (void*)name;
-			n.size = name_size;
-			t = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DNSNAME,
-				&n);
-			if (t == 0)
-				return gnutls_assert_val(t);
-		} while(0);
+				found_one = 1;
+				n.data = (void *)name;
+				n.size = name_size;
+				t = gnutls_x509_name_constraints_check(nc,
+								       GNUTLS_SAN_DNSNAME,
+								       &n);
+				if (t == 0)
+					return gnutls_assert_val(t);
+			} while (0);
 
 		/* passed */
 		if (found_one != 0)
@@ -1278,37 +1361,42 @@ unsigned found_one;
 			return gnutls_assert_val(1);
 		}
 	} else if (type == GNUTLS_SAN_IPADDRESS) {
-			found_one = 0;
-			for (idx=0;;idx++) {
-				name_size = sizeof(name);
-				ret = gnutls_x509_crt_get_subject_alt_name2(cert,
-					idx, name, &name_size, &san_type, NULL);
-				if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
-					break;
-				else if (ret < 0)
-					return gnutls_assert_val(0);
+		found_one = 0;
+		for (idx = 0;; idx++) {
+			name_size = sizeof(name);
+			ret = gnutls_x509_crt_get_subject_alt_name2(cert,
+								    idx, name,
+								    &name_size,
+								    &san_type,
+								    NULL);
+			if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+				break;
+			else if (ret < 0)
+				return gnutls_assert_val(0);
 
-				if (san_type != GNUTLS_SAN_IPADDRESS)
-					continue;
+			if (san_type != GNUTLS_SAN_IPADDRESS)
+				continue;
 
-				found_one = 1;
-				n.data = (void*)name;
-				n.size = name_size;
-				t = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_IPADDRESS, &n);
-				if (t == 0)
-					return gnutls_assert_val(t);
-			}
+			found_one = 1;
+			n.data = (void *)name;
+			n.size = name_size;
+			t = gnutls_x509_name_constraints_check(nc,
+							       GNUTLS_SAN_IPADDRESS,
+							       &n);
+			if (t == 0)
+				return gnutls_assert_val(t);
+		}
 
-			/* there is at least a single IP address. */
+		/* there is at least a single IP address. */
 
-			if (found_one != 0) {
-				return 1;
-			} else {
-				/* no name was found. According to RFC5280:
-				 * If no name of the type is in the certificate, the certificate is acceptable.
-				 */
-				return gnutls_assert_val(1);
-			}
+		if (found_one != 0) {
+			return 1;
+		} else {
+			/* no name was found. According to RFC5280:
+			 * If no name of the type is in the certificate, the certificate is acceptable.
+			 */
+			return gnutls_assert_val(1);
+		}
 	} else if (type == GNUTLS_SAN_URI) {
 		return check_unsupported_constraint2(cert, nc, type);
 	} else
@@ -1334,12 +1422,12 @@ unsigned found_one;
  *
  * Since: 3.3.0
  **/
-int gnutls_x509_name_constraints_get_permitted(gnutls_x509_name_constraints_t nc,
-					       unsigned idx,
-					       unsigned *type, gnutls_datum_t * name)
+int gnutls_x509_name_constraints_get_permitted(gnutls_x509_name_constraints_t
+					       nc, unsigned idx, unsigned *type,
+					       gnutls_datum_t * name)
 {
 	unsigned int i;
-	struct name_constraints_node_st * tmp = nc->permitted;
+	struct name_constraints_node_st *tmp = nc->permitted;
 
 	for (i = 0; i < idx; i++) {
 		if (tmp == NULL)
@@ -1380,10 +1468,11 @@ int gnutls_x509_name_constraints_get_permitted(gnutls_x509_name_constraints_t nc
  **/
 int gnutls_x509_name_constraints_get_excluded(gnutls_x509_name_constraints_t nc,
 					      unsigned idx,
-					      unsigned *type, gnutls_datum_t * name)
+					      unsigned *type,
+					      gnutls_datum_t * name)
 {
 	unsigned int i;
-	struct name_constraints_node_st * tmp = nc->excluded;
+	struct name_constraints_node_st *tmp = nc->excluded;
 
 	for (i = 0; i < idx; i++) {
 		if (tmp == NULL)

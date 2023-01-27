@@ -22,17 +22,17 @@
  */
 
 #ifndef GNUTLS_LIB_AUTH_CERT_H
-#define GNUTLS_LIB_AUTH_CERT_H
+# define GNUTLS_LIB_AUTH_CERT_H
 
-#include "auth.h"
-#include <auth/dh_common.h>
-#include <x509/x509_int.h>
-#include <gnutls/abstract.h>
-#include <gnutls/compat.h>
-#include <str_array.h>
-#include "abstract_int.h"
+# include "auth.h"
+# include <auth/dh_common.h>
+# include <x509/x509_int.h>
+# include <gnutls/abstract.h>
+# include <gnutls/compat.h>
+# include <str_array.h>
+# include "abstract_int.h"
 
-#define MAX_OCSP_RESPONSES 8
+# define MAX_OCSP_RESPONSES 8
 
 /* We use the structure below to hold a certificate chain
  * with corresponding public/private key pair. This structure will
@@ -46,7 +46,7 @@ typedef struct {
 	gnutls_str_array_t names;	/* the names in the first certificate */
 
 	gnutls_status_request_ocsp_func ocsp_func;
-	void *ocsp_func_ptr; /* corresponding OCSP response function + ptr */
+	void *ocsp_func_ptr;	/* corresponding OCSP response function + ptr */
 
 	gnutls_ocsp_data_st ocsp_data[MAX_OCSP_RESPONSES];
 	unsigned int ocsp_data_length;
@@ -60,8 +60,8 @@ typedef struct {
  */
 typedef struct gnutls_certificate_credentials_st {
 	gnutls_dh_params_t dh_params;
-	unsigned deinit_dh_params; /* if the internal values are set */
-	gnutls_sec_param_t dh_sec_param; /* used in RFC7919 negotiation */
+	unsigned deinit_dh_params;	/* if the internal values are set */
+	gnutls_sec_param_t dh_sec_param;	/* used in RFC7919 negotiation */
 
 	/* this callback is used to retrieve the DH or RSA
 	 * parameters.
@@ -80,7 +80,7 @@ typedef struct gnutls_certificate_credentials_st {
 
 	/* X509 specific stuff */
 	gnutls_x509_trust_list_t tlist;
-	unsigned flags; /* gnutls_certificate_flags */
+	unsigned flags;		/* gnutls_certificate_flags */
 	unsigned int verify_flags;	/* flags to be used at
 					 * certificate verification.
 					 */
@@ -89,7 +89,7 @@ typedef struct gnutls_certificate_credentials_st {
 
 	/* It's a mess here. However we need to keep the old 3 functions
 	 * for compatibility */
-	gnutls_certificate_retrieve_function *legacy_cert_cb1; /* deprecated */
+	gnutls_certificate_retrieve_function *legacy_cert_cb1;	/* deprecated */
 	gnutls_certificate_retrieve_function2 *legacy_cert_cb2;
 	gnutls_certificate_retrieve_function3 *get_cert_callback3;
 
@@ -101,7 +101,7 @@ typedef struct gnutls_certificate_credentials_st {
 
 	/* OCSP */
 	gnutls_status_request_ocsp_func glob_ocsp_func;
-	void *glob_ocsp_func_ptr; /* corresponding OCSP response function */
+	void *glob_ocsp_func_ptr;	/* corresponding OCSP response function */
 
 	/* This is only used by server to indicate whether this
 	 * credentials can be used for signing in TLS 1.3. */
@@ -148,12 +148,15 @@ int _gnutls_get_selected_cert(gnutls_session_t session,
 int
 _gnutls_select_client_cert(gnutls_session_t session,
 			   const uint8_t * _data, size_t _data_size,
-			   gnutls_pk_algorithm_t * pk_algos, int pk_algos_length);
+			   gnutls_pk_algorithm_t * pk_algos,
+			   int pk_algos_length);
 
-int _gnutls_pcert_to_auth_info(cert_auth_info_t info, gnutls_pcert_st * certs, size_t ncerts);
+int _gnutls_pcert_to_auth_info(cert_auth_info_t info, gnutls_pcert_st * certs,
+			       size_t ncerts);
 
 int
-_gnutls_select_server_cert(gnutls_session_t session, const gnutls_cipher_suite_entry_st *cs);
+_gnutls_select_server_cert(gnutls_session_t session,
+			   const gnutls_cipher_suite_entry_st * cs);
 void _gnutls_selected_certs_deinit(gnutls_session_t session);
 
 int _gnutls_get_auth_info_pcert(gnutls_pcert_st * gcert,
@@ -170,20 +173,21 @@ int _gnutls_gen_dhe_signature(gnutls_session_t session,
 			      gnutls_buffer_st * data, uint8_t * plain,
 			      unsigned plain_size);
 int _gnutls_proc_dhe_signature(gnutls_session_t session, uint8_t * data,
-			       size_t _data_size,
-			       gnutls_datum_t * vparams);
+			       size_t _data_size, gnutls_datum_t * vparams);
 
-int _gnutls_gen_rawpk_crt(gnutls_session_t session, gnutls_buffer_st* data);
+int _gnutls_gen_rawpk_crt(gnutls_session_t session, gnutls_buffer_st * data);
 int _gnutls_proc_rawpk_crt(gnutls_session_t session,
-				uint8_t * data, size_t data_size);
+			   uint8_t * data, size_t data_size);
 
-inline static unsigned get_key_usage(gnutls_session_t session, gnutls_pubkey_t pubkey)
+inline static unsigned get_key_usage(gnutls_session_t session,
+				     gnutls_pubkey_t pubkey)
 {
 	if (unlikely(session->internals.priorities &&
-	    session->internals.priorities->allow_server_key_usage_violation))
+		     session->internals.
+		     priorities->allow_server_key_usage_violation))
 		return 0;
 	else
 		return pubkey->key_usage;
 }
 
-#endif /* GNUTLS_LIB_AUTH_CERT_H */
+#endif				/* GNUTLS_LIB_AUTH_CERT_H */

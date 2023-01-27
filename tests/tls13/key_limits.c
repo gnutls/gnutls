@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -36,20 +36,20 @@ int main(void)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/dtls.h>
-#include <assert.h>
-#include <signal.h>
+# include <string.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/dtls.h>
+# include <assert.h>
+# include <signal.h>
 
-#include "utils.h"
-#include "cert-common.h"
+# include "utils.h"
+# include "cert-common.h"
 
 static void terminate(void);
 
@@ -67,7 +67,7 @@ static void client_log_func(int level, const char *str)
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
 
-#define MAX_BUF 1024
+# define MAX_BUF 1024
 
 static void client(int fd, const char *prio, unsigned expect_update)
 {
@@ -94,7 +94,8 @@ static void client(int fd, const char *prio, unsigned expect_update)
 	/* Use default priorities */
 	ret = gnutls_priority_set_direct(session, prio, NULL);
 	if (ret < 0) {
-		fail("error in priority '%s': %s\n", prio, gnutls_strerror(ret));
+		fail("error in priority '%s': %s\n", prio,
+		     gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -127,13 +128,15 @@ static void client(int fd, const char *prio, unsigned expect_update)
 	gnutls_record_set_timeout(session, 10000);
 
 	assert(gnutls_record_get_state(session, 1, NULL, NULL, NULL, seq) >= 0);
-	assert(gnutls_record_set_state(session, 1, (void*)"\x00\x00\x00\x00\x00\xff\xff\xfa") >= 0);
+	assert(gnutls_record_set_state
+	       (session, 1, (void *)"\x00\x00\x00\x00\x00\xff\xff\xfa") >= 0);
 
 	do {
 		do {
-			ret = gnutls_record_recv_seq(session, buffer, MAX_BUF, seq);
-		} while (ret == GNUTLS_E_AGAIN
-			 || ret == GNUTLS_E_INTERRUPTED);
+			ret =
+			    gnutls_record_recv_seq(session, buffer, MAX_BUF,
+						   seq);
+		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 		if (memcmp(seq, "\x00\x00\x00\x00\x00\x00\x00\x01", 8) == 0) {
 			update_happened = 1;
@@ -142,8 +145,7 @@ static void client(int fd, const char *prio, unsigned expect_update)
 
 	if (ret == 0 || ret == GNUTLS_E_TIMEDOUT) {
 		if (debug)
-			success
-			    ("client: Peer has closed the TLS connection\n");
+			success("client: Peer has closed the TLS connection\n");
 		goto end;
 	} else if (ret < 0) {
 		if (ret != 0) {
@@ -154,7 +156,7 @@ static void client(int fd, const char *prio, unsigned expect_update)
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
-      end:
+ end:
 
 	close(fd);
 
@@ -175,7 +177,6 @@ static void client(int fd, const char *prio, unsigned expect_update)
 			success("detected update!\n");
 	}
 }
-
 
 /* These are global */
 pid_t child;
@@ -208,8 +209,7 @@ static void server(int fd, const char *prio)
 
 	gnutls_certificate_allocate_credentials(&x509_cred);
 	gnutls_certificate_set_x509_key_mem(x509_cred, &server_cert,
-					    &server_key,
-					    GNUTLS_X509_FMT_PEM);
+					    &server_key, GNUTLS_X509_FMT_PEM);
 
 	gnutls_init(&session, GNUTLS_SERVER);
 
@@ -218,7 +218,8 @@ static void server(int fd, const char *prio)
 	 */
 	ret = gnutls_priority_set_direct(session, prio, NULL);
 	if (ret < 0) {
-		fail("error in priority '%s': %s\n", prio, gnutls_strerror(ret));
+		fail("error in priority '%s': %s\n", prio,
+		     gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -246,31 +247,29 @@ static void server(int fd, const char *prio)
 			(gnutls_protocol_get_version(session)));
 
 	assert(gnutls_record_get_state(session, 0, NULL, NULL, NULL, seq) >= 0);
-	assert(gnutls_record_set_state(session, 0, (void*)"\x00\x00\x00\x00\x00\xff\xff\xfa") >= 0);
+	assert(gnutls_record_set_state
+	       (session, 0, (void *)"\x00\x00\x00\x00\x00\xff\xff\xfa") >= 0);
 
 	memset(buffer, 1, sizeof(buffer));
-	for (i = 0; i<32; i++) {
-		usleep(10000); /* some systems like FreeBSD have their buffers full during this send */
+	for (i = 0; i < 32; i++) {
+		usleep(10000);	/* some systems like FreeBSD have their buffers full during this send */
 		do {
 			ret =
-			    gnutls_record_send(session, buffer,
-						sizeof(buffer));
-		} while (ret == GNUTLS_E_AGAIN
-			 || ret == GNUTLS_E_INTERRUPTED);
+			    gnutls_record_send(session, buffer, sizeof(buffer));
+		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 		if (ret < 0) {
-			fail("Error sending %d byte packet: %s\n", (int)sizeof(buffer),
-			     gnutls_strerror(ret));
+			fail("Error sending %d byte packet: %s\n",
+			     (int)sizeof(buffer), gnutls_strerror(ret));
 			terminate();
 		}
 
 		if (ret != sizeof(buffer)) {
-			fail("Error sending %d byte packet: sent: %d\n", (int)sizeof(buffer),
-			     ret);
+			fail("Error sending %d byte packet: sent: %d\n",
+			     (int)sizeof(buffer), ret);
 			terminate();
 		}
 	}
-
 
 	/* wait for the peer to close the connection.
 	 */
@@ -319,8 +318,8 @@ static void start(const char *name, const char *prio, unsigned exp_update)
 	}
 }
 
-#define AES_GCM "NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM"
-#define CHACHA_POLY1305 "NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+CHACHA20-POLY1305"
+# define AES_GCM "NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM"
+# define CHACHA_POLY1305 "NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+CHACHA20-POLY1305"
 
 static void ch_handler(int sig)
 {

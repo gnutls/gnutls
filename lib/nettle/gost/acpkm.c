@@ -37,47 +37,43 @@
 
 #include "acpkm.h"
 
-static uint8_t acpkm_mesh_data[ACPKM_KEY_SIZE] =
-{
-  0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87,
-  0x88, 0x89, 0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f,
-  0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97,
-  0x98, 0x99, 0x9a, 0x9b, 0x9c, 0x9d, 0x9e, 0x9f,
+static uint8_t acpkm_mesh_data[ACPKM_KEY_SIZE] = {
+	0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87,
+	0x88, 0x89, 0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f,
+	0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97,
+	0x98, 0x99, 0x9a, 0x9b, 0x9c, 0x9d, 0x9e, 0x9f,
 };
 
 void acpkm_crypt(struct acpkm_ctx *ctx,
 		 void *cipher,
-		 nettle_cipher_func *encrypt,
-		 nettle_set_key_func *set_key,
-		 size_t length, uint8_t *dst,
-		 const uint8_t *src)
+		 nettle_cipher_func * encrypt,
+		 nettle_set_key_func * set_key,
+		 size_t length, uint8_t * dst, const uint8_t * src)
 {
-  size_t N = ctx->N;
-  size_t part;
-  uint8_t new_key[ACPKM_KEY_SIZE];
+	size_t N = ctx->N;
+	size_t part;
+	uint8_t new_key[ACPKM_KEY_SIZE];
 
-  /* Less than a block, no rekeying */
-  if (ctx->pos + length < N)
-    {
-      encrypt(cipher, length, dst, src);
-      ctx->pos += length;
-      return;
-    }
+	/* Less than a block, no rekeying */
+	if (ctx->pos + length < N) {
+		encrypt(cipher, length, dst, src);
+		ctx->pos += length;
+		return;
+	}
 
-  for (part = N - ctx->pos; length >= part; part = N)
-    {
-      encrypt(cipher, part, dst, src);
-      src += part;
-      dst += part;
-      length -= part;
+	for (part = N - ctx->pos; length >= part; part = N) {
+		encrypt(cipher, part, dst, src);
+		src += part;
+		dst += part;
+		length -= part;
 
-      /* Rekey */
-      encrypt(cipher, ACPKM_KEY_SIZE, new_key, acpkm_mesh_data);
-      set_key(cipher, new_key);
-    }
+		/* Rekey */
+		encrypt(cipher, ACPKM_KEY_SIZE, new_key, acpkm_mesh_data);
+		set_key(cipher, new_key);
+	}
 
-  if (length != 0)
-      encrypt(cipher, length, dst, src);
+	if (length != 0)
+		encrypt(cipher, length, dst, src);
 
-  ctx->pos = length;
+	ctx->pos = length;
 }

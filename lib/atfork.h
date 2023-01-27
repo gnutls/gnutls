@@ -21,23 +21,23 @@
  */
 
 #ifndef GNUTLS_LIB_ATFORK_H
-#define GNUTLS_LIB_ATFORK_H
+# define GNUTLS_LIB_ATFORK_H
 
-#include <config.h>
-#include "gnutls_int.h"
+# include <config.h>
+# include "gnutls_int.h"
 
 extern unsigned int _gnutls_forkid;
 
-#if defined(HAVE___REGISTER_ATFORK)
-# define HAVE_ATFORK
-#endif
+# if defined(HAVE___REGISTER_ATFORK)
+#  define HAVE_ATFORK
+# endif
 
-#ifndef _WIN32
+# ifndef _WIN32
 
 /* API */
-int _gnutls_register_fork_handler(void); /* global init */
+int _gnutls_register_fork_handler(void);	/* global init */
 
-# if defined(HAVE_ATFORK)
+#  if defined(HAVE_ATFORK)
 inline static int _gnutls_detect_fork(unsigned int forkid)
 {
 	if (forkid == _gnutls_forkid)
@@ -49,16 +49,16 @@ inline static unsigned int _gnutls_get_forkid(void)
 {
 	return _gnutls_forkid;
 }
-# else
+#  else
 int _gnutls_detect_fork(unsigned int forkid);
 unsigned int _gnutls_get_forkid(void);
+#  endif
+
+# else
+
+#  define _gnutls_detect_fork(x) 0
+#  define _gnutls_get_forkid() 0
+
 # endif
 
-#else
-
-# define _gnutls_detect_fork(x) 0
-# define _gnutls_get_forkid() 0
-
-#endif
-
-#endif /* GNUTLS_LIB_ATFORK_H */
+#endif				/* GNUTLS_LIB_ATFORK_H */

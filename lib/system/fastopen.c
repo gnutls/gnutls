@@ -26,7 +26,7 @@
 #include "errors.h"
 
 #include <sys/socket.h>
-#include <netinet/in.h> /* IPPROTO_TCP */
+#include <netinet/in.h>		/* IPPROTO_TCP */
 #include <errno.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -63,8 +63,8 @@ tfo_writev(gnutls_transport_ptr_t ptr, const giovec_t * iovec, int iovec_cnt)
 	if (unlikely(p->connect_addrlen != 0)) {
 		int ret;
 
-		ret = connect(fd, (struct sockaddr*)&p->connect_addr,
-				p->connect_addrlen);
+		ret = connect(fd, (struct sockaddr *)&p->connect_addr,
+			      p->connect_addrlen);
 		if (ret == -1 && (errno == EINPROGRESS)) {
 			gnutls_assert();
 			errno = EAGAIN;
@@ -80,7 +80,7 @@ tfo_writev(gnutls_transport_ptr_t ptr, const giovec_t * iovec, int iovec_cnt)
 
 	return system_writev(GNUTLS_INT_TO_POINTER(fd), iovec, iovec_cnt);
 }
-#else /* sendmsg */
+#else				/* sendmsg */
 static ssize_t
 tfo_writev(gnutls_transport_ptr_t ptr, const giovec_t * iovec, int iovec_cnt)
 {
@@ -100,8 +100,10 @@ tfo_writev(gnutls_transport_ptr_t ptr, const giovec_t * iovec, int iovec_cnt)
 	if (!p->connect_only) {
 		int on = 1;
 
-		if (setsockopt(fd, IPPROTO_TCP, TCP_FASTOPEN, &on, sizeof(on)) == -1)
-			_gnutls_debug_log("Failed to set socket option FASTOPEN\n");
+		if (setsockopt(fd, IPPROTO_TCP, TCP_FASTOPEN, &on, sizeof(on))
+		    == -1)
+			_gnutls_debug_log
+			    ("Failed to set socket option FASTOPEN\n");
 
 		hdr.msg_name = &p->connect_addr;
 		hdr.msg_namelen = p->connect_addrlen;
@@ -111,17 +113,20 @@ tfo_writev(gnutls_transport_ptr_t ptr, const giovec_t * iovec, int iovec_cnt)
 		if (ret < 0) {
 			if (errno == EINPROGRESS) {
 				gnutls_assert();
-				errno = EAGAIN; // GnuTLS does not handle EINPROGRESS
+				errno = EAGAIN;	// GnuTLS does not handle EINPROGRESS
 			} else if (errno == EOPNOTSUPP) {
 				// fallback from fastopen, e.g. when fastopen is disabled in system
-				_gnutls_debug_log("Fallback from TCP Fast Open... TFO is not enabled at system level\n");
+				_gnutls_debug_log
+				    ("Fallback from TCP Fast Open... TFO is not enabled at system level\n");
 				p->connect_only = 1;
 				goto connect_only;
 			}
 		}
 	} else {
  connect_only:
-		ret = connect(fd, (struct sockaddr*)&p->connect_addr, p->connect_addrlen);
+		ret =
+		    connect(fd, (struct sockaddr *)&p->connect_addr,
+			    p->connect_addrlen);
 		if (errno == ENOTCONN || errno == EINPROGRESS) {
 			gnutls_assert();
 			errno = EAGAIN;
@@ -132,14 +137,23 @@ tfo_writev(gnutls_transport_ptr_t ptr, const giovec_t * iovec, int iovec_cnt)
 	}
 # elif defined(TCP_FASTOPEN_OSX)
 	{
-		if(__builtin_available(macOS 10.11, iOS 9.0, tvOS 9.0, watchOS 2.0, *)) {
-			sa_endpoints_t endpoints = { .sae_dstaddr = (struct sockaddr*)&p->connect_addr, .sae_dstaddrlen = p->connect_addrlen };
+		if (__builtin_available
+		    (macOS 10.11, iOS 9.0, tvOS 9.0, watchOS 2.0, *)) {
+			sa_endpoints_t endpoints = {.sae_dstaddr =
+				    (struct sockaddr *)&p->
+				    connect_addr,.sae_dstaddrlen =
+				    p->connect_addrlen
+			};
 
-			ret = connectx(fd, &endpoints, SAE_ASSOCID_ANY, CONNECT_RESUME_ON_READ_WRITE | CONNECT_DATA_IDEMPOTENT, NULL, 0, NULL, NULL);
-		}
-		else
-		{
-			ret = connect(fd, (struct sockaddr*)&p->connect_addr, p->connect_addrlen);
+			ret =
+			    connectx(fd, &endpoints, SAE_ASSOCID_ANY,
+				     CONNECT_RESUME_ON_READ_WRITE |
+				     CONNECT_DATA_IDEMPOTENT, NULL, 0, NULL,
+				     NULL);
+		} else {
+			ret =
+			    connect(fd, (struct sockaddr *)&p->connect_addr,
+				    p->connect_addrlen);
 		}
 		if (errno == ENOTCONN || errno == EINPROGRESS) {
 			gnutls_assert();
@@ -147,7 +161,9 @@ tfo_writev(gnutls_transport_ptr_t ptr, const giovec_t * iovec, int iovec_cnt)
 		}
 	}
 # else
-	ret = connect(fd, (struct sockaddr*)&p->connect_addr, p->connect_addrlen);
+	ret =
+	    connect(fd, (struct sockaddr *)&p->connect_addr,
+		    p->connect_addrlen);
 	if (errno == ENOTCONN || errno == EINPROGRESS) {
 		gnutls_assert();
 		errno = EAGAIN;
@@ -161,14 +177,15 @@ tfo_writev(gnutls_transport_ptr_t ptr, const giovec_t * iovec, int iovec_cnt)
 
 	return ret;
 }
-#endif /* sendmsg */
+#endif				/* sendmsg */
 
 static
 int tfo_recv_timeout(gnutls_transport_ptr_t ptr, unsigned int ms)
 {
 	tfo_st *p = ptr;
 
-	return gnutls_system_recv_timeout((gnutls_transport_ptr_t)(long)p->fd, ms);
+	return gnutls_system_recv_timeout((gnutls_transport_ptr_t) (long)p->fd,
+					  ms);
 }
 
 static ssize_t
@@ -213,10 +230,11 @@ tfo_read(gnutls_transport_ptr_t ptr, void *data, size_t data_size)
  **/
 void
 gnutls_transport_set_fastopen(gnutls_session_t session,
-			      int fd, struct sockaddr *connect_addr, socklen_t connect_addrlen,
-			      unsigned int flags)
+			      int fd, struct sockaddr *connect_addr,
+			      socklen_t connect_addrlen, unsigned int flags)
 {
-	if (connect_addrlen > (socklen_t)sizeof(session->internals.tfo.connect_addr)) {
+	if (connect_addrlen >
+	    (socklen_t) sizeof(session->internals.tfo.connect_addr)) {
 		gnutls_assert();
 		return;
 	}
@@ -226,7 +244,8 @@ gnutls_transport_set_fastopen(gnutls_session_t session,
 		return;
 	}
 
-	memcpy(&session->internals.tfo.connect_addr, connect_addr, connect_addrlen);
+	memcpy(&session->internals.tfo.connect_addr, connect_addr,
+	       connect_addrlen);
 	session->internals.tfo.connect_addrlen = connect_addrlen;
 	session->internals.tfo.fd = fd;
 
@@ -242,4 +261,3 @@ gnutls_transport_set_fastopen(gnutls_session_t session,
 
 	gnutls_transport_set_vec_push_function(session, tfo_writev);
 }
-

@@ -78,24 +78,37 @@ int _gnutls13_reauth_client(gnutls_session_t session)
 
 		/* restore handshake transcript */
 		_gnutls_buffer_reset(&session->internals.handshake_hash_buffer);
-		ret = gnutls_buffer_append_data(&session->internals.handshake_hash_buffer,
-						session->internals.post_handshake_hash_buffer.data,
-						session->internals.post_handshake_hash_buffer.length);
+		ret =
+		    gnutls_buffer_append_data(&session->
+					      internals.handshake_hash_buffer,
+					      session->
+					      internals.post_handshake_hash_buffer.
+					      data,
+					      session->
+					      internals.post_handshake_hash_buffer.length);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
 		/* append the previously received certificate request message, to the
 		 * transcript. */
-		ret = gnutls_buffer_append_data(&session->internals.handshake_hash_buffer,
-						session->internals.reauth_buffer.data,
-						session->internals.reauth_buffer.length);
+		ret =
+		    gnutls_buffer_append_data(&session->
+					      internals.handshake_hash_buffer,
+					      session->internals.
+					      reauth_buffer.data,
+					      session->internals.
+					      reauth_buffer.length);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		session->internals.handshake_hash_buffer_prev_len = session->internals.handshake_hash_buffer.length;
+		session->internals.handshake_hash_buffer_prev_len =
+		    session->internals.handshake_hash_buffer.length;
 
 		/* skip the reauth buffer handshake message headers */
-		ret = _gnutls_buffer_pop_prefix32(&session->internals.reauth_buffer, &tmp, 0);
+		ret =
+		    _gnutls_buffer_pop_prefix32(&session->
+						internals.reauth_buffer, &tmp,
+						0);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
@@ -112,7 +125,9 @@ int _gnutls13_reauth_client(gnutls_session_t session)
 		IMED_RET("send certificate", ret, 0);
 		FALLTHROUGH;
 	case REAUTH_STATE3:
-		ret = _gnutls13_send_certificate_verify(session, AGAIN(REAUTH_STATE3));
+		ret =
+		    _gnutls13_send_certificate_verify(session,
+						      AGAIN(REAUTH_STATE3));
 		REAUTH_STATE = REAUTH_STATE3;
 		IMED_RET("send certificate verify", ret, 0);
 		FALLTHROUGH;
@@ -146,7 +161,8 @@ int _gnutls13_reauth_server(gnutls_session_t session)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	if (session->internals.send_cert_req == 0) {
-		_gnutls_debug_log("You need to call gnutls_certificate_server_set_request to enable post handshake auth\n");
+		_gnutls_debug_log
+		    ("You need to call gnutls_certificate_server_set_request to enable post handshake auth\n");
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
 
@@ -154,17 +170,25 @@ int _gnutls13_reauth_server(gnutls_session_t session)
 	case REAUTH_STATE0:
 		/* restore handshake transcript */
 		_gnutls_buffer_reset(&session->internals.handshake_hash_buffer);
-		ret = gnutls_buffer_append_data(&session->internals.handshake_hash_buffer,
-						session->internals.post_handshake_hash_buffer.data,
-						session->internals.post_handshake_hash_buffer.length);
+		ret =
+		    gnutls_buffer_append_data(&session->
+					      internals.handshake_hash_buffer,
+					      session->
+					      internals.post_handshake_hash_buffer.
+					      data,
+					      session->
+					      internals.post_handshake_hash_buffer.length);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		session->internals.handshake_hash_buffer_prev_len = session->internals.handshake_hash_buffer.length;
+		session->internals.handshake_hash_buffer_prev_len =
+		    session->internals.handshake_hash_buffer.length;
 
 		FALLTHROUGH;
 	case REAUTH_STATE1:
-		ret = _gnutls13_send_certificate_request(session, AGAIN(REAUTH_STATE1));
+		ret =
+		    _gnutls13_send_certificate_request(session,
+						       AGAIN(REAUTH_STATE1));
 		REAUTH_STATE = REAUTH_STATE1;
 		IMED_RET("send certificate request", ret, 0);
 		FALLTHROUGH;

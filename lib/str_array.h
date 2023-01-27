@@ -21,10 +21,10 @@
  */
 
 #ifndef GNUTLS_LIB_STR_ARRAY_H
-#define GNUTLS_LIB_STR_ARRAY_H
+# define GNUTLS_LIB_STR_ARRAY_H
 
-#include "gnutls_int.h"
-#include "errors.h"
+# include "gnutls_int.h"
+# include "errors.h"
 
 /* Functionality to allow an array of strings. Strings
  * are allowed to be added to the list and matched against it.
@@ -67,10 +67,9 @@ inline static int _gnutls_str_array_match(gnutls_str_array_t head,
 	return 0;
 }
 
-inline static void append(gnutls_str_array_t array, const char *str,
-			  int len)
+inline static void append(gnutls_str_array_t array, const char *str, int len)
 {
-	array->str = ((char *) array) + sizeof(struct gnutls_str_array_st);
+	array->str = ((char *)array) + sizeof(struct gnutls_str_array_st);
 	memcpy(array->str, str, len);
 	array->str[len] = 0;
 	array->len = len;
@@ -83,8 +82,7 @@ inline static int _gnutls_str_array_append(gnutls_str_array_t * head,
 	gnutls_str_array_t prev, array;
 	if (*head == NULL) {
 		*head =
-		    gnutls_malloc(len + 1 +
-				  sizeof(struct gnutls_str_array_st));
+		    gnutls_malloc(len + 1 + sizeof(struct gnutls_str_array_st));
 		if (*head == NULL)
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
@@ -98,8 +96,7 @@ inline static int _gnutls_str_array_append(gnutls_str_array_t * head,
 			array = prev->next;
 		}
 		prev->next =
-		    gnutls_malloc(len + 1 +
-				  sizeof(struct gnutls_str_array_st));
+		    gnutls_malloc(len + 1 + sizeof(struct gnutls_str_array_st));
 
 		array = prev->next;
 
@@ -113,7 +110,7 @@ inline static int _gnutls_str_array_append(gnutls_str_array_t * head,
 }
 
 inline static int _gnutls_str_array_append_idna(gnutls_str_array_t * head,
-			const char *name, size_t size)
+						const char *name, size_t size)
 {
 	int ret;
 	gnutls_datum_t ahost;
@@ -121,15 +118,16 @@ inline static int _gnutls_str_array_append_idna(gnutls_str_array_t * head,
 	/* convert the provided hostname to ACE-Labels domain. */
 	ret = gnutls_idna_map(name, size, &ahost, 0);
 	if (ret < 0) {
-		_gnutls_debug_log("unable to convert hostname %s to IDNA format\n", name);
+		_gnutls_debug_log
+		    ("unable to convert hostname %s to IDNA format\n", name);
 		/* insert the raw name */
 		return _gnutls_str_array_append(head, name, size);
 	}
 
-	ret = _gnutls_str_array_append(head, (char*)ahost.data, ahost.size);
+	ret = _gnutls_str_array_append(head, (char *)ahost.data, ahost.size);
 	gnutls_free(ahost.data);
 
 	return ret;
 }
 
-#endif /* GNUTLS_LIB_STR_ARRAY_H */
+#endif				/* GNUTLS_LIB_STR_ARRAY_H */

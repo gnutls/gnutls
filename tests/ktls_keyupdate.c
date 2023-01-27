@@ -18,7 +18,7 @@
 // along with GnuTLS.  If not, see <https://www.gnu.org/licenses/>.
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -50,11 +50,10 @@ int main(void)
 
 #else
 
+# define MAX_BUF 1024
+# define MSG "Hello world!"
 
-#define MAX_BUF 1024
-#define MSG "Hello world!"
-
-#define HANDSHAKE(session, name, ret)\
+# define HANDSHAKE(session, name, ret)\
 {\
 	do {\
 		ret = gnutls_handshake(session);\
@@ -66,7 +65,7 @@ int main(void)
 	}\
 }
 
-#define SEND_MSG(session, name, ret)\
+# define SEND_MSG(session, name, ret)\
 {\
 	do {\
 		ret = gnutls_record_send(session, MSG, strlen(MSG)+1);\
@@ -78,7 +77,7 @@ int main(void)
 	}\
 }
 
-#define RECV_MSG(session, name, buffer, buffer_len, ret)\
+# define RECV_MSG(session, name, buffer, buffer_len, ret)\
 {\
 	memset(buffer, 0, sizeof(buffer));\
 	do{\
@@ -98,7 +97,7 @@ int main(void)
 	}\
 }
 
-#define KEY_UPDATE(session, name, peer_req, ret)\
+# define KEY_UPDATE(session, name, peer_req, ret)\
 {\
 	do {\
 		ret = gnutls_session_key_update(session, peer_req);\
@@ -110,7 +109,7 @@ int main(void)
 	}\
 }
 
-#define CHECK_KTLS_ENABLED(session, ret)\
+# define CHECK_KTLS_ENABLED(session, ret)\
 {\
 	ret = gnutls_transport_is_ktls_enabled(session);\
 	if (!(ret & GNUTLS_KTLS_RECV)){\
@@ -128,7 +127,6 @@ static void client_log_func(int level, const char *str)
 {
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
-
 
 static void client(int fd, const char *prio, int pipe)
 {
@@ -160,30 +158,24 @@ static void client(int fd, const char *prio, int pipe)
 	HANDSHAKE(session, name, ret);
 
 	CHECK_KTLS_ENABLED(session, ret)
-
-	// Test 0: Try sending/receiving data
-	RECV_MSG(session, name, buffer, MAX_BUF+1, ret)
-	SEND_MSG(session, name, ret)
-
-	CHECK_KTLS_ENABLED(session, ret)
-
-	// Test 1: Servers does key update
-	read(pipe, &foo, 1);
-	RECV_MSG(session, name, buffer, MAX_BUF+1, ret)
-	SEND_MSG(session, name, ret)
-
-	CHECK_KTLS_ENABLED(session, ret)
-
-	// Test 2: Does key update witch request
-	read(pipe, &foo, 1);
-	RECV_MSG(session, name, buffer, MAX_BUF+1, ret)
-	SEND_MSG(session, name, ret)
-	
-	CHECK_KTLS_ENABLED(session, ret)
-	
-	ret = gnutls_bye(session, GNUTLS_SHUT_RDWR);
+	    // Test 0: Try sending/receiving data
+	    RECV_MSG(session, name, buffer, MAX_BUF + 1, ret)
+	    SEND_MSG(session, name, ret)
+	    CHECK_KTLS_ENABLED(session, ret)
+	    // Test 1: Servers does key update
+	    read(pipe, &foo, 1);
+	RECV_MSG(session, name, buffer, MAX_BUF + 1, ret)
+	    SEND_MSG(session, name, ret)
+	    CHECK_KTLS_ENABLED(session, ret)
+	    // Test 2: Does key update witch request
+	    read(pipe, &foo, 1);
+	RECV_MSG(session, name, buffer, MAX_BUF + 1, ret)
+	    SEND_MSG(session, name, ret)
+	    CHECK_KTLS_ENABLED(session, ret)
+	    ret = gnutls_bye(session, GNUTLS_SHUT_RDWR);
 	if (ret < 0) {
-		fail("client: error in closing session: %s\n", gnutls_strerror(ret));
+		fail("client: error in closing session: %s\n",
+		     gnutls_strerror(ret));
 	}
 
 	ret = 0;
@@ -227,53 +219,46 @@ static void server(int fd, const char *prio, int pipe)
 
 	gnutls_certificate_allocate_credentials(&x509_cred);
 	ret = gnutls_certificate_set_x509_key_mem(x509_cred, &server_cert,
-					    &server_key,
-					    GNUTLS_X509_FMT_PEM);
+						  &server_key,
+						  GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);
 
 	gnutls_init(&session, GNUTLS_SERVER);
 	gnutls_handshake_set_timeout(session, 0);
 
-	assert(gnutls_priority_set_direct(session, prio, NULL)>=0);
+	assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
 	gnutls_transport_set_int(session, fd);
 
 	HANDSHAKE(session, name, ret)
-
-	CHECK_KTLS_ENABLED(session, ret)
-
-	success("Test 0: sending/receiving data\n");
+	    CHECK_KTLS_ENABLED(session, ret)
+	    success("Test 0: sending/receiving data\n");
 	SEND_MSG(session, name, ret)
-	RECV_MSG(session, name, buffer, MAX_BUF+1, ret)
-
-	CHECK_KTLS_ENABLED(session, ret)
-
-	success("Test 1: server key update without request\n");
+	    RECV_MSG(session, name, buffer, MAX_BUF + 1, ret)
+	    CHECK_KTLS_ENABLED(session, ret)
+	    success("Test 1: server key update without request\n");
 	KEY_UPDATE(session, name, 0, ret)
-	write(pipe, &bar, 1);
+	    write(pipe, &bar, 1);
 	SEND_MSG(session, name, ret)
-	RECV_MSG(session, name, buffer, MAX_BUF+1, ret)
-
-	CHECK_KTLS_ENABLED(session, ret)
-
-	success("Test 2: server key update with request\n");
+	    RECV_MSG(session, name, buffer, MAX_BUF + 1, ret)
+	    CHECK_KTLS_ENABLED(session, ret)
+	    success("Test 2: server key update with request\n");
 	KEY_UPDATE(session, name, GNUTLS_KU_PEER, ret)
-	write(pipe, &bar, 1);
+	    write(pipe, &bar, 1);
 	SEND_MSG(session, name, ret)
-	RECV_MSG(session, name, buffer, MAX_BUF+1, ret)
-
-	CHECK_KTLS_ENABLED(session, ret)
-
-	ret = gnutls_bye(session, GNUTLS_SHUT_RDWR);
+	    RECV_MSG(session, name, buffer, MAX_BUF + 1, ret)
+	    CHECK_KTLS_ENABLED(session, ret)
+	    ret = gnutls_bye(session, GNUTLS_SHUT_RDWR);
 	if (ret < 0) {
-		fail("server: error in closing session: %s\n", gnutls_strerror(ret));
+		fail("server: error in closing session: %s\n",
+		     gnutls_strerror(ret));
 	}
 
 	ret = 0;
-end:
+ end:
 	close(fd);
 	gnutls_deinit(session);
 
@@ -281,7 +266,7 @@ end:
 
 	gnutls_global_deinit();
 
-	if (ret){
+	if (ret) {
 		terminate();
 	}
 
@@ -302,7 +287,7 @@ static void run(const char *prio)
 	int listener;
 	int fd;
 
-	int sync_pipe[2]; //used for synchronization
+	int sync_pipe[2];	//used for synchronization
 	pipe(sync_pipe);
 
 	success("running ktls test with %s\n", prio);
@@ -311,7 +296,7 @@ static void run(const char *prio)
 	signal(SIGPIPE, SIG_IGN);
 
 	listener = socket(AF_INET, SOCK_STREAM, 0);
-	if (listener == -1){
+	if (listener == -1) {
 		fail("error in listener(): %s\n", strerror(errno));
 	}
 
@@ -320,14 +305,14 @@ static void run(const char *prio)
 	saddr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 	saddr.sin_port = 0;
 
-	ret = bind(listener, (struct sockaddr*)&saddr, sizeof(saddr));
-	if (ret == -1){
+	ret = bind(listener, (struct sockaddr *)&saddr, sizeof(saddr));
+	if (ret == -1) {
 		fail("error in bind(): %s\n", strerror(errno));
 	}
 
 	addrlen = sizeof(saddr);
-	ret = getsockname(listener, (struct sockaddr*)&saddr, &addrlen);
-	if (ret == -1){
+	ret = getsockname(listener, (struct sockaddr *)&saddr, &addrlen);
+	if (ret == -1) {
 		fail("error in getsockname(): %s\n", strerror(errno));
 	}
 
@@ -357,13 +342,13 @@ static void run(const char *prio)
 		check_wait_status(status);
 	} else {
 		fd = socket(AF_INET, SOCK_STREAM, 0);
-		if (fd == -1){
+		if (fd == -1) {
 			fail("error in socket(): %s\n", strerror(errno));
 			exit(1);
 		}
 
 		usleep(1000000);
-		connect(fd, (struct sockaddr*)&saddr, addrlen);
+		connect(fd, (struct sockaddr *)&saddr, addrlen);
 
 		close(sync_pipe[1]);
 		client(fd, prio, sync_pipe[0]);

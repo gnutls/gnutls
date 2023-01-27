@@ -45,7 +45,7 @@ static int _gnutls_x509_read_ecdh_pubkey(gnutls_ecc_curve_t curve,
 					 uint8_t * der, int dersize,
 					 gnutls_pk_params_st * params);
 static int _gnutls_x509_read_gost_pubkey(uint8_t * der, int dersize,
-					gnutls_pk_params_st * params);
+					 gnutls_pk_params_st * params);
 
 static int
 _gnutls_x509_read_dsa_params(uint8_t * der, int dersize,
@@ -78,9 +78,7 @@ _gnutls_x509_read_rsa_pubkey(uint8_t * der, int dersize,
 		return _gnutls_asn2err(result);
 	}
 
-
-	if (_gnutls_x509_read_int(spk, "modulus",
-				  &params->params[0]) < 0) {
+	if (_gnutls_x509_read_int(spk, "modulus", &params->params[0]) < 0) {
 		gnutls_assert();
 		asn1_delete_structure(&spk);
 		return GNUTLS_E_ASN1_GENERIC_ERROR;
@@ -143,7 +141,7 @@ int _gnutls_x509_read_ecdh_pubkey(gnutls_ecc_curve_t curve,
  * encoded into OCTET STRING. */
 static int
 _gnutls_x509_read_gost_pubkey(uint8_t * der, int dersize,
-			     gnutls_pk_params_st * params)
+			      gnutls_pk_params_st * params)
 {
 	int ret;
 	int len;
@@ -192,8 +190,7 @@ _gnutls_x509_read_dsa_params(uint8_t * der, int dersize,
 	asn1_node spk = NULL;
 
 	if ((result = asn1_create_element
-	     (_gnutls_get_pkix(), "PKIX1.Dss-Parms",
-	      &spk)) != ASN1_SUCCESS) {
+	     (_gnutls_get_pkix(), "PKIX1.Dss-Parms", &spk)) != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
@@ -240,7 +237,7 @@ _gnutls_x509_read_dsa_params(uint8_t * der, int dersize,
 
 	asn1_delete_structure(&spk);
 
-	params->params_nr = 3; /* public key is missing */
+	params->params_nr = 3;	/* public key is missing */
 	params->algo = GNUTLS_PK_DSA;
 
 	return 0;
@@ -251,8 +248,7 @@ _gnutls_x509_read_dsa_params(uint8_t * der, int dersize,
  * params[0-4]. It does NOT set params_nr.
  */
 int
-_gnutls_x509_read_ecc_params(uint8_t * der, int dersize,
-			     unsigned int * curve)
+_gnutls_x509_read_ecc_params(uint8_t * der, int dersize, unsigned int *curve)
 {
 	int ret;
 	asn1_node spk = NULL;
@@ -293,7 +289,7 @@ _gnutls_x509_read_ecc_params(uint8_t * der, int dersize,
 
 	ret = 0;
 
-      cleanup:
+ cleanup:
 
 	asn1_delete_structure(&spk);
 
@@ -367,7 +363,9 @@ _gnutls_x509_read_rsa_pss_params(uint8_t * der, int dersize,
 
 		/* Check if maskGenAlgorithm.parameters does exist and
 		 * is identical to hashAlgorithm */
-		result = _gnutls_x509_read_value(spk, "maskGenAlgorithm.parameters", &value);
+		result =
+		    _gnutls_x509_read_value(spk, "maskGenAlgorithm.parameters",
+					    &value);
 		if (result < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -381,7 +379,8 @@ _gnutls_x509_read_rsa_pss_params(uint8_t * der, int dersize,
 			goto cleanup;
 		}
 
-		result = _asn1_strict_der_decode(&c2, value.data, value.size, NULL);
+		result =
+		    _asn1_strict_der_decode(&c2, value.data, value.size, NULL);
 		if (result != ASN1_SUCCESS) {
 			gnutls_assert();
 			result = _gnutls_asn2err(result);
@@ -499,8 +498,7 @@ _gnutls_x509_read_gost_params(uint8_t * der, int dersize,
 	/* Read the digest */
 	oid_size = sizeof(oid);
 	ret = asn1_read_value(spk, "digestParamSet", oid, &oid_size);
-	if (ret != ASN1_SUCCESS &&
-	    ret != ASN1_ELEMENT_NOT_FOUND) {
+	if (ret != ASN1_SUCCESS && ret != ASN1_ELEMENT_NOT_FOUND) {
 		gnutls_assert();
 		ret = _gnutls_asn2err(ret);
 		goto cleanup;
@@ -509,8 +507,7 @@ _gnutls_x509_read_gost_params(uint8_t * der, int dersize,
 
 	oid_size = sizeof(oid);
 	ret = asn1_read_value(spk, "encryptionParamSet", oid, &oid_size);
-	if (ret != ASN1_SUCCESS &&
-	    ret != ASN1_ELEMENT_NOT_FOUND) {
+	if (ret != ASN1_SUCCESS && ret != ASN1_ELEMENT_NOT_FOUND) {
 		gnutls_assert();
 		ret = _gnutls_asn2err(ret);
 		goto cleanup;
@@ -531,7 +528,7 @@ _gnutls_x509_read_gost_params(uint8_t * der, int dersize,
 	params->gost_params = param;
 	ret = 0;
 
-      cleanup:
+ cleanup:
 
 	asn1_delete_structure(&spk);
 
@@ -556,7 +553,7 @@ int _gnutls_x509_read_pubkey(gnutls_pk_algorithm_t algo, uint8_t * der,
 		}
 		break;
 	case GNUTLS_PK_DSA:
-		if (params->params_nr != 3) /* _gnutls_x509_read_pubkey_params must have been called */
+		if (params->params_nr != 3)	/* _gnutls_x509_read_pubkey_params must have been called */
 			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 		ret = _gnutls_x509_read_dsa_pubkey(der, dersize, params);
@@ -573,16 +570,24 @@ int _gnutls_x509_read_pubkey(gnutls_pk_algorithm_t algo, uint8_t * der,
 		}
 		break;
 	case GNUTLS_PK_EDDSA_ED25519:
-		ret = _gnutls_x509_read_eddsa_pubkey(GNUTLS_ECC_CURVE_ED25519, der, dersize, params);
+		ret =
+		    _gnutls_x509_read_eddsa_pubkey(GNUTLS_ECC_CURVE_ED25519,
+						   der, dersize, params);
 		break;
 	case GNUTLS_PK_EDDSA_ED448:
-		ret = _gnutls_x509_read_eddsa_pubkey(GNUTLS_ECC_CURVE_ED448, der, dersize, params);
+		ret =
+		    _gnutls_x509_read_eddsa_pubkey(GNUTLS_ECC_CURVE_ED448, der,
+						   dersize, params);
 		break;
 	case GNUTLS_PK_ECDH_X25519:
-		ret = _gnutls_x509_read_ecdh_pubkey(GNUTLS_ECC_CURVE_X25519, der, dersize, params);
+		ret =
+		    _gnutls_x509_read_ecdh_pubkey(GNUTLS_ECC_CURVE_X25519, der,
+						  dersize, params);
 		break;
 	case GNUTLS_PK_ECDH_X448:
-		ret = _gnutls_x509_read_ecdh_pubkey(GNUTLS_ECC_CURVE_X448, der, dersize, params);
+		ret =
+		    _gnutls_x509_read_ecdh_pubkey(GNUTLS_ECC_CURVE_X448, der,
+						  dersize, params);
 		break;
 	case GNUTLS_PK_GOST_01:
 	case GNUTLS_PK_GOST_12_256:
@@ -612,15 +617,18 @@ int _gnutls_x509_read_pubkey_params(gnutls_pk_algorithm_t algo,
 	case GNUTLS_PK_EDDSA_ED448:
 		return 0;
 	case GNUTLS_PK_RSA_PSS:
-		return _gnutls_x509_read_rsa_pss_params(der, dersize, &params->spki);
+		return _gnutls_x509_read_rsa_pss_params(der, dersize,
+							&params->spki);
 	case GNUTLS_PK_DSA:
 		return _gnutls_x509_read_dsa_params(der, dersize, params);
 	case GNUTLS_PK_EC:
-		return _gnutls_x509_read_ecc_params(der, dersize, &params->curve);
+		return _gnutls_x509_read_ecc_params(der, dersize,
+						    &params->curve);
 	case GNUTLS_PK_GOST_01:
 	case GNUTLS_PK_GOST_12_256:
 	case GNUTLS_PK_GOST_12_512:
-		return _gnutls_x509_read_gost_params(der, dersize, params, algo);
+		return _gnutls_x509_read_gost_params(der, dersize, params,
+						     algo);
 	default:
 		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 	}
@@ -631,25 +639,30 @@ int _gnutls_x509_read_pubkey_params(gnutls_pk_algorithm_t algo,
 int _gnutls_x509_check_pubkey_params(gnutls_pk_params_st * params)
 {
 	switch (params->algo) {
-	case GNUTLS_PK_RSA_PSS: {
-		unsigned bits;
-		const mac_entry_st *me;
-		size_t hash_size;
+	case GNUTLS_PK_RSA_PSS:{
+			unsigned bits;
+			const mac_entry_st *me;
+			size_t hash_size;
 
-		if (params->spki.pk == GNUTLS_PK_UNKNOWN) /* no params present */
+			if (params->spki.pk == GNUTLS_PK_UNKNOWN)	/* no params present */
+				return 0;
+
+			bits = pubkey_to_bits(params);
+
+			me = hash_to_entry(params->spki.rsa_pss_dig);
+			if (unlikely(me == NULL))
+				return
+				    gnutls_assert_val
+				    (GNUTLS_E_PK_INVALID_PUBKEY_PARAMS);
+
+			hash_size = _gnutls_hash_get_algo_len(me);
+			if (hash_size + params->spki.salt_size + 2 >
+			    (bits + 7) / 8)
+				return
+				    gnutls_assert_val
+				    (GNUTLS_E_PK_INVALID_PUBKEY_PARAMS);
 			return 0;
-
-		bits = pubkey_to_bits(params);
-
-		me = hash_to_entry(params->spki.rsa_pss_dig);
-		if (unlikely(me == NULL))
-			return gnutls_assert_val(GNUTLS_E_PK_INVALID_PUBKEY_PARAMS);
-
-		hash_size = _gnutls_hash_get_algo_len(me);
-		if (hash_size + params->spki.salt_size + 2 > (bits + 7) / 8)
-			return gnutls_assert_val(GNUTLS_E_PK_INVALID_PUBKEY_PARAMS);
-		return 0;
-	}
+		}
 	case GNUTLS_PK_RSA:
 	case GNUTLS_PK_DSA:
 	case GNUTLS_PK_ECDSA:

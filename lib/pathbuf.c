@@ -28,8 +28,7 @@
 #include <limits.h>
 #include "intprops.h"
 
-static int
-pathbuf_reserve(struct gnutls_pathbuf_st *buffer, size_t to_add)
+static int pathbuf_reserve(struct gnutls_pathbuf_st *buffer, size_t to_add)
 {
 	size_t len;
 	char *ptr;
@@ -70,8 +69,7 @@ pathbuf_reserve(struct gnutls_pathbuf_st *buffer, size_t to_add)
 	return 0;
 }
 
-int
-_gnutls_pathbuf_init(struct gnutls_pathbuf_st *buffer, const char *base)
+int _gnutls_pathbuf_init(struct gnutls_pathbuf_st *buffer, const char *base)
 {
 	size_t len;
 	int ret;
@@ -124,8 +122,7 @@ _gnutls_pathbuf_append(struct gnutls_pathbuf_st *buffer, const char *component)
 	return 0;
 }
 
-int
-_gnutls_pathbuf_truncate(struct gnutls_pathbuf_st *buffer, size_t len)
+int _gnutls_pathbuf_truncate(struct gnutls_pathbuf_st *buffer, size_t len)
 {
 	if (len > buffer->len) {
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -135,12 +132,10 @@ _gnutls_pathbuf_truncate(struct gnutls_pathbuf_st *buffer, size_t len)
 	return 0;
 }
 
-void
-_gnutls_pathbuf_deinit(struct gnutls_pathbuf_st *buffer)
+void _gnutls_pathbuf_deinit(struct gnutls_pathbuf_st *buffer)
 {
 	if (buffer->ptr != buffer->base) {
 		gnutls_free(buffer->ptr);
 	}
 	memset(buffer, 0, sizeof(*buffer));
 }
-

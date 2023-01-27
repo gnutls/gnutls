@@ -21,14 +21,13 @@
  */
 
 #ifndef GNUTLS_LIB_CRYPTO_H
-#define GNUTLS_LIB_CRYPTO_H
+# define GNUTLS_LIB_CRYPTO_H
 
 const gnutls_crypto_cipher_st
     * _gnutls_get_crypto_cipher(gnutls_cipher_algorithm_t algo);
 const gnutls_crypto_digest_st
     * _gnutls_get_crypto_digest(gnutls_digest_algorithm_t algo);
-const gnutls_crypto_mac_st *_gnutls_get_crypto_mac(gnutls_mac_algorithm_t
-						   algo);
+const gnutls_crypto_mac_st *_gnutls_get_crypto_mac(gnutls_mac_algorithm_t algo);
 void _gnutls_crypto_deregister(void);
 int _gnutls_crypto_register_cipher(gnutls_cipher_algorithm_t algorithm,
 				   int priority,
@@ -39,4 +38,4 @@ int _gnutls_crypto_register_cipher(gnutls_cipher_algorithm_t algorithm,
 				   gnutls_cipher_decrypt_func decrypt,
 				   gnutls_cipher_deinit_func deinit);
 
-#endif /* GNUTLS_LIB_CRYPTO_H */
+#endif				/* GNUTLS_LIB_CRYPTO_H */

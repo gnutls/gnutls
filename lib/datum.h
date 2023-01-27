@@ -21,7 +21,7 @@
  */
 
 #ifndef GNUTLS_LIB_DATUM_H
-#define GNUTLS_LIB_DATUM_H
+# define GNUTLS_LIB_DATUM_H
 
 # include "gnutls_int.h"
 
@@ -29,15 +29,13 @@
  * NULL or zero-size @dat will be NULL as well.
  */
 NODISCARD ATTRIBUTE_NONNULL((1))
-int _gnutls_set_datum(gnutls_datum_t * dat, const void *data,
-		      size_t data_size);
+int _gnutls_set_datum(gnutls_datum_t * dat, const void *data, size_t data_size);
 
 /* This will always return a non-NULL, and zero-terminated string in @dat.
  */
 NODISCARD ATTRIBUTE_NONNULL((1))
 int _gnutls_set_strdatum(gnutls_datum_t * dat, const void *data,
 			 size_t data_size);
-
 
 inline static
 void _gnutls_free_datum(gnutls_datum_t * dat)
@@ -70,4 +68,4 @@ void _gnutls_free_key_datum(gnutls_datum_t * dat)
 	dat->size = 0;
 }
 
-#endif /* GNUTLS_LIB_DATUM_H */
+#endif				/* GNUTLS_LIB_DATUM_H */

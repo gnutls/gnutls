@@ -34,15 +34,15 @@
 #endif
 
 #ifndef HAVE_NETTLE_STREEBOG512_UPDATE
-#include <gnutls_int.h>
+# include <gnutls_int.h>
 
-#include <nettle/nettle-meta.h>
+# include <nettle/nettle-meta.h>
 
-#include "streebog.h"
+# include "streebog.h"
 
 const struct nettle_hash nettle_streebog512
-= _NETTLE_HASH(streebog512, STREEBOG512);
+    = _NETTLE_HASH(streebog512, STREEBOG512);
 
 const struct nettle_hash nettle_streebog256
-= _NETTLE_HASH(streebog256, STREEBOG256);
+    = _NETTLE_HASH(streebog256, STREEBOG256);
 #endif

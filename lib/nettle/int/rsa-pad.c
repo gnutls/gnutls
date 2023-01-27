@@ -37,7 +37,7 @@
 
 int
 _gnutls_rsa_pkcs1_sign_pad(size_t key_bits,
-			   const gnutls_datum_t *data,
+			   const gnutls_datum_t * data,
 			   unsigned char *buffer, size_t buffer_size)
 {
 	size_t key_size = (key_bits + 7) / 8;
@@ -64,9 +64,9 @@ _gnutls_rsa_pkcs1_sign_pad(size_t key_bits,
 }
 
 int
-_gnutls_rsa_pss_sign_pad(gnutls_x509_spki_st *params,
+_gnutls_rsa_pss_sign_pad(gnutls_x509_spki_st * params,
 			 size_t key_bits,
-			 const gnutls_datum_t *data,
+			 const gnutls_datum_t * data,
 			 unsigned char *buffer, size_t buffer_size)
 {
 	mpz_t m;

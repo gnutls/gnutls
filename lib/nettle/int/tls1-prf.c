@@ -38,19 +38,16 @@
 #include <nettle/sha1.h>
 #include <nettle/md5.h>
 
-
 /* The RFC2246 P_hash() function. The mac_ctx is expected to
  * be initialized and key set to be the secret key.
  */
 static void
-P_hash( void *mac_ctx,
-	nettle_hash_update_func *update,
-	nettle_hash_digest_func *digest,
-	size_t digest_size,
-	size_t seed_size, const uint8_t *seed,
-	size_t label_size, const char *label,
-	size_t dst_length,
-	uint8_t *dst)
+P_hash(void *mac_ctx,
+       nettle_hash_update_func * update,
+       nettle_hash_digest_func * digest,
+       size_t digest_size,
+       size_t seed_size, const uint8_t * seed,
+       size_t label_size, const char *label, size_t dst_length, uint8_t * dst)
 {
 	uint8_t Atmp[MAX_HASH_SIZE];
 	ssize_t left;
@@ -59,21 +56,21 @@ P_hash( void *mac_ctx,
 	/* round up */
 	left = dst_length;
 
-	while(left > 0) {
-		if (started == 0) { /* A(0) */
-		        update(mac_ctx, label_size, (const uint8_t *)label); /* hash label */
+	while (left > 0) {
+		if (started == 0) {	/* A(0) */
+			update(mac_ctx, label_size, (const uint8_t *)label);	/* hash label */
 			update(mac_ctx, seed_size, seed);
 			started = 1;
 		} else {
 			update(mac_ctx, digest_size, Atmp);
 		}
-		digest(mac_ctx, digest_size, Atmp); /* store A(i) */
+		digest(mac_ctx, digest_size, Atmp);	/* store A(i) */
 
-		update(mac_ctx, digest_size, Atmp); /* hash A(i) */
-		update(mac_ctx, label_size, (const uint8_t *)label); /* hash label */
-		update(mac_ctx, seed_size, seed); /* hash seed */
+		update(mac_ctx, digest_size, Atmp);	/* hash A(i) */
+		update(mac_ctx, label_size, (const uint8_t *)label);	/* hash label */
+		update(mac_ctx, seed_size, seed);	/* hash seed */
 
-		if (left < (ssize_t)digest_size)
+		if (left < (ssize_t) digest_size)
 			digest_size = left;
 
 		digest(mac_ctx, digest_size, dst);
@@ -86,10 +83,9 @@ P_hash( void *mac_ctx,
 }
 
 int
-tls10_prf(size_t secret_size, const uint8_t *secret,
+tls10_prf(size_t secret_size, const uint8_t * secret,
 	  size_t label_size, const char *label,
-	  size_t seed_size, const uint8_t *seed,
-	  size_t length, uint8_t *dst)
+	  size_t seed_size, const uint8_t * seed, size_t length, uint8_t * dst)
 {
 	int l_s;
 	const uint8_t *s1, *s2;
@@ -109,17 +105,16 @@ tls10_prf(size_t secret_size, const uint8_t *secret,
 
 	hmac_md5_set_key(&md5_ctx, l_s, s1);
 
-	P_hash(&md5_ctx, (nettle_hash_update_func*)hmac_md5_update,
-		(nettle_hash_digest_func*)hmac_md5_digest,
-		MD5_DIGEST_SIZE,
-		seed_size, seed, label_size, label, length, o1);
+	P_hash(&md5_ctx, (nettle_hash_update_func *) hmac_md5_update,
+	       (nettle_hash_digest_func *) hmac_md5_digest,
+	       MD5_DIGEST_SIZE, seed_size, seed, label_size, label, length, o1);
 
 	hmac_sha1_set_key(&sha1_ctx, l_s, s2);
 
-	P_hash(&sha1_ctx, (nettle_hash_update_func*)hmac_sha1_update,
-		(nettle_hash_digest_func*)hmac_sha1_digest,
-		SHA1_DIGEST_SIZE,
-		seed_size, seed, label_size, label, length, dst);
+	P_hash(&sha1_ctx, (nettle_hash_update_func *) hmac_sha1_update,
+	       (nettle_hash_digest_func *) hmac_sha1_digest,
+	       SHA1_DIGEST_SIZE,
+	       seed_size, seed, label_size, label, length, dst);
 
 	memxor(dst, o1, length);
 
@@ -145,15 +140,14 @@ tls10_prf(size_t secret_size, const uint8_t *secret,
  -*/
 int
 tls12_prf(void *mac_ctx,
-	  nettle_hash_update_func *update,
-	  nettle_hash_digest_func *digest,
+	  nettle_hash_update_func * update,
+	  nettle_hash_digest_func * digest,
 	  size_t digest_size,
 	  size_t label_size, const char *label,
-	  size_t seed_size, const uint8_t *seed,
-	  size_t length, uint8_t *dst)
+	  size_t seed_size, const uint8_t * seed, size_t length, uint8_t * dst)
 {
 	P_hash(mac_ctx, update, digest, digest_size,
-		seed_size, seed, label_size, label, length, dst);
+	       seed_size, seed, label_size, label, length, dst);
 
 	return 1;
 }

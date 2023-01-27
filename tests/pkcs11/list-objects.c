@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -49,7 +49,7 @@ static void tls_log_func(int level, const char *str)
 static const char *opt_pin;
 
 static
-int pin_func(void* userdata, int attempt, const char* url, const char *label,
+int pin_func(void *userdata, int attempt, const char *url, const char *label,
 	     unsigned flags, char *pin, size_t pin_max)
 {
 	if (attempt == 0) {
@@ -74,32 +74,35 @@ int main(int argc, char **argv)
 
 	ret = gnutls_global_init();
 	if (ret != 0) {
-		fprintf(stderr, "error at %d: %s\n", __LINE__, gnutls_strerror(ret));
+		fprintf(stderr, "error at %d: %s\n", __LINE__,
+			gnutls_strerror(ret));
 		exit(1);
 	}
 
 	gnutls_global_set_log_function(tls_log_func);
 
-	while((opt = getopt(argc, argv, "o:t:")) != -1) {
-		switch(opt) {
-			case 'o':
-				mod = strdup(optarg);
-				p11_kit_override_system_files(NULL, NULL, mod, mod, NULL);
-				break;
-			case 't':
-				/* specify the object type to list */
-				if (strcmp(optarg, "all") == 0)
-					attrs = GNUTLS_PKCS11_OBJ_ATTR_ALL;
-				else if (strcmp(optarg, "privkey") == 0)
-					attrs = GNUTLS_PKCS11_OBJ_ATTR_PRIVKEY;
-				else {
-					fprintf(stderr, "Unknown object type %s\n", optarg);
-					exit(1);
-				}
-				break;
-			default:
-				fprintf(stderr, "Unknown option %c\n", (char)opt);
+	while ((opt = getopt(argc, argv, "o:t:")) != -1) {
+		switch (opt) {
+		case 'o':
+			mod = strdup(optarg);
+			p11_kit_override_system_files(NULL, NULL, mod, mod,
+						      NULL);
+			break;
+		case 't':
+			/* specify the object type to list */
+			if (strcmp(optarg, "all") == 0)
+				attrs = GNUTLS_PKCS11_OBJ_ATTR_ALL;
+			else if (strcmp(optarg, "privkey") == 0)
+				attrs = GNUTLS_PKCS11_OBJ_ATTR_PRIVKEY;
+			else {
+				fprintf(stderr, "Unknown object type %s\n",
+					optarg);
 				exit(1);
+			}
+			break;
+		default:
+			fprintf(stderr, "Unknown option %c\n", (char)opt);
+			exit(1);
 		}
 	}
 
@@ -125,18 +128,18 @@ int main(int argc, char **argv)
 	    gnutls_pkcs11_obj_list_import_url2(&crt_list, &crt_list_size,
 					       url, attrs, obj_flags);
 	if (ret != 0) {
-		fprintf(stderr, "error at %d: %s\n", __LINE__, gnutls_strerror(ret));
+		fprintf(stderr, "error at %d: %s\n", __LINE__,
+			gnutls_strerror(ret));
 		exit(1);
 	}
 
 	for (i = 0; i < crt_list_size; i++) {
 		char *output;
 
-		ret =
-		    gnutls_pkcs11_obj_export_url(crt_list[i], 0,
-						 &output);
+		ret = gnutls_pkcs11_obj_export_url(crt_list[i], 0, &output);
 		if (ret != 0) {
-			fprintf(stderr, "error at %d: %s\n", __LINE__, gnutls_strerror(ret));
+			fprintf(stderr, "error at %d: %s\n", __LINE__,
+				gnutls_strerror(ret));
 			exit(1);
 		}
 

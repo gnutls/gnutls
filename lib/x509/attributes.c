@@ -55,7 +55,6 @@ overwrite_attribute(asn1_node asn, const char *root, unsigned indx,
 		return result;
 	}
 
-
 	return 0;
 }
 
@@ -71,8 +70,8 @@ overwrite_attribute(asn1_node asn, const char *root, unsigned indx,
  */
 int
 _x509_parse_attribute(asn1_node asn1_struct,
-		const char *attr_name, const char *given_oid, unsigned indx,
-		int raw, gnutls_datum_t * out)
+		      const char *attr_name, const char *given_oid,
+		      unsigned indx, int raw, gnutls_datum_t * out)
 {
 	int k1, result;
 	char tmpbuffer1[MAX_NAME_SIZE];
@@ -92,12 +91,10 @@ _x509_parse_attribute(asn1_node asn1_struct,
 			snprintf(tmpbuffer1, sizeof(tmpbuffer1), "%s.?%d",
 				 attr_name, k1);
 		else
-			snprintf(tmpbuffer1, sizeof(tmpbuffer1), "?%d",
-				 k1);
+			snprintf(tmpbuffer1, sizeof(tmpbuffer1), "?%d", k1);
 
 		len = sizeof(value) - 1;
-		result =
-		    asn1_read_value(asn1_struct, tmpbuffer1, value, &len);
+		result = asn1_read_value(asn1_struct, tmpbuffer1, value, &len);
 
 		if (result == ASN1_ELEMENT_NOT_FOUND) {
 			gnutls_assert();
@@ -114,13 +111,11 @@ _x509_parse_attribute(asn1_node asn1_struct,
 		 */
 		/* Read the OID
 		 */
-		_gnutls_str_cpy(tmpbuffer3, sizeof(tmpbuffer3),
-				tmpbuffer1);
+		_gnutls_str_cpy(tmpbuffer3, sizeof(tmpbuffer3), tmpbuffer1);
 		_gnutls_str_cat(tmpbuffer3, sizeof(tmpbuffer3), ".type");
 
 		len = sizeof(oid) - 1;
-		result =
-		    asn1_read_value(asn1_struct, tmpbuffer3, oid, &len);
+		result = asn1_read_value(asn1_struct, tmpbuffer3, oid, &len);
 
 		if (result == ASN1_ELEMENT_NOT_FOUND)
 			break;
@@ -175,7 +170,7 @@ _x509_parse_attribute(asn1_node asn1_struct,
 
 	result = GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 
-      cleanup:
+ cleanup:
 	return result;
 }
 
@@ -228,10 +223,9 @@ add_attribute(asn1_node asn, const char *root, const char *attribute_id,
 	return 0;
 }
 
-
 int
 _x509_set_attribute(asn1_node asn, const char *root,
-	      const char *ext_id, const gnutls_datum_t * ext_data)
+		    const char *ext_id, const gnutls_datum_t * ext_data)
 {
 	int result;
 	int k, len;
@@ -281,7 +275,6 @@ _x509_set_attribute(asn1_node asn, const char *root,
 							   ext_data);
 			}
 
-
 		}
 		while (0);
 	}
@@ -293,7 +286,6 @@ _x509_set_attribute(asn1_node asn, const char *root,
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
-
 
 	return 0;
 }

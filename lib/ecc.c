@@ -59,9 +59,7 @@ _gnutls_ecc_ansi_x962_export(gnutls_ecc_curve_t curve, bigint_t x,
 	}
 
 	size = out->size - (1 + (numlen - byte_size));
-	ret =
-	    _gnutls_mpi_print(x, &out->data[1 + (numlen - byte_size)],
-			      &size);
+	ret = _gnutls_mpi_print(x, &out->data[1 + (numlen - byte_size)], &size);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -90,12 +88,9 @@ _gnutls_ecc_ansi_x962_export(gnutls_ecc_curve_t curve, bigint_t x,
 	return ret;
 }
 
-
-
 int
 _gnutls_ecc_ansi_x962_import(const uint8_t * in,
-			     unsigned long inlen, bigint_t * x,
-			     bigint_t * y)
+			     unsigned long inlen, bigint_t * x, bigint_t * y)
 {
 	int ret;
 
@@ -116,7 +111,7 @@ _gnutls_ecc_ansi_x962_import(const uint8_t * in,
 
 	ret =
 	    _gnutls_mpi_init_scan(y, in + 1 + ((inlen - 1) >> 1),
-			     (inlen - 1) >> 1);
+				  (inlen - 1) >> 1);
 	if (ret < 0) {
 		_gnutls_mpi_release(x);
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
@@ -124,4 +119,3 @@ _gnutls_ecc_ansi_x962_import(const uint8_t * in,
 
 	return 0;
 }
-

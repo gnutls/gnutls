@@ -28,9 +28,9 @@
 #include <gnutls/gnutls.h>
 #include <sys/time.h>
 #if HAVE_SYS_SOCKET_H
-#include <sys/socket.h>
+# include <sys/socket.h>
 #elif HAVE_WS2TCPIP_H
-#include <ws2tcpip.h>
+# include <ws2tcpip.h>
 #endif
 #include <tests.h>
 #include <common.h>
@@ -88,7 +88,8 @@ static const TLS_TEST tls_tests[] = {
 	/* The following test will disable extensions if the server
 	 * does support SSL 3.0, but only incompletely and without
 	 * extensions. */
-	{"for SSL 3.0 with extensions", test_ssl3_with_extensions, "yes", "no", "dunno"},
+	{"for SSL 3.0 with extensions", test_ssl3_with_extensions, "yes", "no",
+	 "dunno"},
 	{"for SSL 3.0 with cipher suites not in SSL 3.0 spec",
 	 test_ssl3_unknown_ciphersuites, "yes", "no", "dunno"},
 #endif
@@ -107,30 +108,39 @@ static const TLS_TEST tls_tests[] = {
 	{"whether %COMPAT is required", test_record_padding, "no", "yes",
 	 "dunno"},
 	{"for TLS 1.0 (RFC2246) support", test_tls1, "yes", "no", "dunno"},
-	{"for TLS 1.0 (RFC2246) support with TLS 1.0 record version", test_tls1_nossl3, "yes", "no", "dunno"},
+	{"for TLS 1.0 (RFC2246) support with TLS 1.0 record version",
+	 test_tls1_nossl3, "yes", "no", "dunno"},
 	{"for TLS 1.1 (RFC4346) support", test_tls1_1, "yes", "no", "dunno"},
 	{"fallback from TLS 1.1 to", test_tls1_1_fallback, "TLS 1.0",
 	 "failed",
 	 "SSL 3.0"},
 	{"for TLS 1.2 (RFC5246) support", test_tls1_2, "yes", "no", "dunno"},
 	{"for TLS 1.3 (RFC8446) support", test_tls1_3, "yes", "no", "dunno"},
-	{"for known TLS or SSL protocols support", test_known_protocols, "yes", "no", "dunno", 0, 1},
+	{"for known TLS or SSL protocols support", test_known_protocols, "yes",
+	 "no", "dunno", 0, 1},
 
 	{"TLS1.2 neg fallback from TLS 1.6 to", test_tls1_6_fallback, NULL,
 	 "failed (server requires fallback dance)", "dunno"},
-	{"for inappropriate fallback (RFC7507) support", test_rfc7507, "yes", "no", "dunno"},
-	{"for HTTPS server name", test_server, NULL, "failed", "not checked", 1},
+	{"for inappropriate fallback (RFC7507) support", test_rfc7507, "yes",
+	 "no", "dunno"},
+	{"for HTTPS server name", test_server, NULL, "failed", "not checked",
+	 1},
 	{"for certificate information", test_certificate, NULL, "", ""},
-	{"for certificate chain order", test_chain_order, "sorted", "unsorted", "unknown"},
+	{"for certificate chain order", test_chain_order, "sorted", "unsorted",
+	 "unknown"},
 	{"for trusted CAs", test_server_cas, NULL, "", ""},
-	{"for safe renegotiation (RFC5746) support", test_safe_renegotiation, "yes",
+	{"for safe renegotiation (RFC5746) support", test_safe_renegotiation,
+	 "yes",
 	 "no", "dunno"},
 	{"for Safe renegotiation support (SCSV)",
 	 test_safe_renegotiation_scsv,
 	 "yes", "no", "dunno"},
-	{"for encrypt-then-MAC (RFC7366) support", test_etm, "yes", "no", "dunno"},
-	{"for ext master secret (RFC7627) support", test_ext_master_secret, "yes", "no", "dunno"},
-	{"for heartbeat (RFC6520) support", test_heartbeat_extension, "yes", "no", "dunno"},
+	{"for encrypt-then-MAC (RFC7366) support", test_etm, "yes", "no",
+	 "dunno"},
+	{"for ext master secret (RFC7627) support", test_ext_master_secret,
+	 "yes", "no", "dunno"},
+	{"for heartbeat (RFC6520) support", test_heartbeat_extension, "yes",
+	 "no", "dunno"},
 	{"for version rollback bug in RSA PMS", test_rsa_pms, "no", "yes",
 	 "dunno"},
 	{"for version rollback bug in Client Hello", test_version_rollback,
@@ -141,7 +151,8 @@ static const TLS_TEST tls_tests[] = {
 	 test_small_records, "yes", "no", "dunno"},
 	{"whether cipher suites not in SSL 3.0 spec are accepted",
 	 test_unknown_ciphersuites, "yes", "no", "dunno"},
-	{"whether a bogus TLS record version in the client hello is accepted", test_version_oob, "yes", "no", "dunno"},
+	{"whether a bogus TLS record version in the client hello is accepted",
+	 test_version_oob, "yes", "no", "dunno"},
 	{"whether the server understands TLS closure alerts", test_bye,
 	 "yes", "no", "partially"},
 	/* the fact that is after the closure alert test does matter.
@@ -168,11 +179,15 @@ static const TLS_TEST tls_tests[] = {
 	 "no",
 	 "dunno"},
 #ifdef ENABLE_GOST
-	{"for VKO GOST-2012 (draft-smyshlyaev-tls12-gost-suites) support", test_vko_gost_12, "yes", "no", "dunno"},
+	{"for VKO GOST-2012 (draft-smyshlyaev-tls12-gost-suites) support",
+	 test_vko_gost_12, "yes", "no", "dunno"},
 #endif
-	{"for curve SECP256r1 (RFC4492)", test_ecdhe_secp256r1, "yes", "no", "dunno"},
-	{"for curve SECP384r1 (RFC4492)", test_ecdhe_secp384r1, "yes", "no", "dunno"},
-	{"for curve SECP521r1 (RFC4492)", test_ecdhe_secp521r1, "yes", "no", "dunno"},
+	{"for curve SECP256r1 (RFC4492)", test_ecdhe_secp256r1, "yes", "no",
+	 "dunno"},
+	{"for curve SECP384r1 (RFC4492)", test_ecdhe_secp384r1, "yes", "no",
+	 "dunno"},
+	{"for curve SECP521r1 (RFC4492)", test_ecdhe_secp521r1, "yes", "no",
+	 "dunno"},
 	{"for curve X25519 (RFC8422)", test_ecdhe_x25519, "yes", "no", "dunno"},
 	{"for AES-GCM cipher (RFC5288) support", test_aes_gcm, "yes", "no",
 	 "dunno"},
@@ -182,14 +197,18 @@ static const TLS_TEST tls_tests[] = {
 	 "dunno"},
 	{"for AES-CBC cipher (RFC3268) support", test_aes, "yes", "no",
 	 "dunno"},
-	{"for CAMELLIA-GCM cipher (RFC6367) support", test_camellia_gcm, "yes", "no",
+	{"for CAMELLIA-GCM cipher (RFC6367) support", test_camellia_gcm, "yes",
+	 "no",
 	 "dunno"},
-	{"for CAMELLIA-CBC cipher (RFC5932) support", test_camellia_cbc, "yes", "no",
+	{"for CAMELLIA-CBC cipher (RFC5932) support", test_camellia_cbc, "yes",
+	 "no",
 	 "dunno"},
-	{"for 3DES-CBC cipher (RFC2246) support", test_3des, "yes", "no", "dunno"},
+	{"for 3DES-CBC cipher (RFC2246) support", test_3des, "yes", "no",
+	 "dunno"},
 	{"for ARCFOUR 128 cipher (RFC2246) support", test_arcfour, "yes", "no",
 	 "dunno"},
-	{"for CHACHA20-POLY1305 cipher (RFC7905) support", test_chacha20, "yes", "no",
+	{"for CHACHA20-POLY1305 cipher (RFC7905) support", test_chacha20, "yes",
+	 "no",
 	 "dunno"},
 #ifdef ENABLE_GOST
 	{"for GOST28147-CNT cipher (draft-smyshlyaev-tls12-gost-suites) support", test_gost_cnt, "yes", "no",
@@ -199,7 +218,8 @@ static const TLS_TEST tls_tests[] = {
 	{"for SHA1 MAC support", test_sha, "yes", "no", "dunno"},
 	{"for SHA256 MAC support", test_sha256, "yes", "no", "dunno"},
 #ifdef ENABLE_GOST
-	{"for GOST28147-IMIT MAC (draft-smyshlyaev-tls12-gost-suites) support", test_gost_imit, "yes", "no", "dunno"},
+	{"for GOST28147-IMIT MAC (draft-smyshlyaev-tls12-gost-suites) support",
+	 test_gost_imit, "yes", "no", "dunno"},
 #endif
 	{"for max record size (RFC6066) support", test_max_record_size, "yes",
 	 "no", "dunno"},
@@ -227,7 +247,7 @@ gnutls_session_t init_tls_session(const char *host)
 
 int do_handshake(socket_st * socket)
 {
-	return 0; /* we do it locally */
+	return 0;		/* we do it locally */
 }
 
 int main(int argc, char **argv)
@@ -281,11 +301,13 @@ int main(int argc, char **argv)
 #endif
 
 	if (HAVE_OPT(STARTTLS_PROTO)) {
-		snprintf(app_proto, sizeof(app_proto), "%s", OPT_ARG(STARTTLS_PROTO));
+		snprintf(app_proto, sizeof(app_proto), "%s",
+			 OPT_ARG(STARTTLS_PROTO));
 	}
 
 	if (app_proto[0] == 0) {
-		snprintf(app_proto, sizeof(app_proto), "%s", port_to_service(portname, "tcp"));
+		snprintf(app_proto, sizeof(app_proto), "%s",
+			 port_to_service(portname, "tcp"));
 	}
 
 	sockets_init();
@@ -295,16 +317,17 @@ int main(int argc, char **argv)
 	canonicalize_host(hostname, portname, sizeof(portname));
 	printf("Checking %s:%s\n", hostname, portname);
 
-	for (i = 0;
-	     tls_tests[i].test_name != NULL;
-	     i++) {
+	for (i = 0; tls_tests[i].test_name != NULL; i++) {
 
-		if (strcmp(app_proto, "https") != 0 && tls_tests[i].https_only != 0) {
+		if (strcmp(app_proto, "https") != 0
+		    && tls_tests[i].https_only != 0) {
 			continue;
 		}
 
 		if (!socket_opened) {
-			socket_open(&hd, hostname, portname, app_proto, SOCKET_FLAG_STARTTLS|SOCKET_FLAG_RAW, NULL, NULL);
+			socket_open(&hd, hostname, portname, app_proto,
+				    SOCKET_FLAG_STARTTLS | SOCKET_FLAG_RAW,
+				    NULL, NULL);
 			hd.verbose = verbose;
 			socket_opened = true;
 		}

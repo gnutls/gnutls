@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -33,9 +33,9 @@
 #include "cert-common.h"
 #include "utils.h"
 
-static void compare(const gnutls_datum_t *der, const void *ipem)
+static void compare(const gnutls_datum_t * der, const void *ipem)
 {
-	gnutls_datum_t pem = {(void*)ipem, strlen((char*)ipem)};
+	gnutls_datum_t pem = { (void *)ipem, strlen((char *)ipem) };
 	gnutls_datum_t new_der;
 	int ret;
 
@@ -44,7 +44,8 @@ static void compare(const gnutls_datum_t *der, const void *ipem)
 		fail("error: %s\n", gnutls_strerror(ret));
 	}
 
-	if (der->size != new_der.size || memcmp(der->data, new_der.data, der->size) != 0) {
+	if (der->size != new_der.size
+	    || memcmp(der->data, new_der.data, der->size) != 0) {
 		fail("error in %d: %s\n", __LINE__, "cert don't match");
 		exit(1);
 	}
@@ -54,7 +55,7 @@ static void compare(const gnutls_datum_t *der, const void *ipem)
 
 static void write_der(const char *file, const char *header, const char *ipem)
 {
-	gnutls_datum_t pem = {(void*)ipem, strlen((char*)ipem)};
+	gnutls_datum_t pem = { (void *)ipem, strlen((char *)ipem) };
 	gnutls_datum_t der;
 	FILE *fp;
 	int ret;
@@ -68,7 +69,7 @@ static void write_der(const char *file, const char *header, const char *ipem)
 	if (fp == NULL)
 		fail("error in fopen\n");
 
-	assert(fwrite(der.data, 1, der.size, fp)>0);
+	assert(fwrite(der.data, 1, der.size, fp) > 0);
 	fclose(fp);
 	gnutls_free(der.data);
 }
@@ -90,18 +91,21 @@ void doit(void)
 
 	assert(gnutls_certificate_allocate_credentials(&clicred) >= 0);
 
-	ret = gnutls_certificate_set_x509_trust_mem(clicred, &ca2_cert, GNUTLS_X509_FMT_PEM);
+	ret =
+	    gnutls_certificate_set_x509_trust_mem(clicred, &ca2_cert,
+						  GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		fail("set_x509_trust_file failed: %s\n", gnutls_strerror(ret));
 
-	assert(get_tmpname(certfile)!=NULL);
-	assert(get_tmpname(keyfile)!=NULL);
+	assert(get_tmpname(certfile) != NULL);
+	assert(get_tmpname(keyfile) != NULL);
 
-	write_der(certfile, "CERTIFICATE", (char*)server2_cert_pem);
-	write_der(keyfile, "RSA PRIVATE KEY", (char*)server2_key_pem);
+	write_der(certfile, "CERTIFICATE", (char *)server2_cert_pem);
+	write_der(keyfile, "RSA PRIVATE KEY", (char *)server2_key_pem);
 
 	ret = gnutls_certificate_set_x509_key_file2(xcred, certfile, keyfile,
-						    GNUTLS_X509_FMT_DER, NULL, 0);
+						    GNUTLS_X509_FMT_DER, NULL,
+						    0);
 	if (ret < 0)
 		fail("set_x509_key_file failed: %s\n", gnutls_strerror(ret));
 
@@ -117,10 +121,9 @@ void doit(void)
 	remove(certfile);
 	remove(keyfile);
 
-	test_cli_serv(xcred, clicred, "NORMAL", "localhost", NULL, NULL, NULL); /* the DNS name of the first cert */
+	test_cli_serv(xcred, clicred, "NORMAL", "localhost", NULL, NULL, NULL);	/* the DNS name of the first cert */
 
 	gnutls_certificate_free_credentials(xcred);
 	gnutls_certificate_free_credentials(clicred);
 	gnutls_global_deinit();
 }
-

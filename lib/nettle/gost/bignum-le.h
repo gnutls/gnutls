@@ -30,42 +30,39 @@
    the GNU Lesser General Public License along with this program.  If
    not, see https://www.gnu.org/licenses/.
 */
- 
+
 #ifndef GNUTLS_LIB_NETTLE_GOST_BIGNUM_LE_H
-#define GNUTLS_LIB_NETTLE_GOST_BIGNUM_LE_H
+# define GNUTLS_LIB_NETTLE_GOST_BIGNUM_LE_H
 
-#include <nettle/nettle-meta.h>
+# include <nettle/nettle-meta.h>
 
-#include <nettle/nettle-types.h>
+# include <nettle/nettle-types.h>
 
-#include <nettle/bignum.h>
+# include <nettle/bignum.h>
 
-#ifdef __cplusplus
+# ifdef __cplusplus
 extern "C" {
-#endif
+# endif
 
-#define nettle_mpz_sizeinbase_256_u_le nettle_mpz_sizeinbase_256_u
+# define nettle_mpz_sizeinbase_256_u_le nettle_mpz_sizeinbase_256_u
 
-#define nettle_mpz_get_str_256_u_le _gnutls_mpz_get_str_256_u_le
-#define nettle_mpz_set_str_256_u_le _gnutls_mpz_set_str_256_u_le
-#define nettle_mpz_init_set_str_256_u_le _gnutls_mpz_init_set_str_256_u_le
+# define nettle_mpz_get_str_256_u_le _gnutls_mpz_get_str_256_u_le
+# define nettle_mpz_set_str_256_u_le _gnutls_mpz_set_str_256_u_le
+# define nettle_mpz_init_set_str_256_u_le _gnutls_mpz_init_set_str_256_u_le
 
 /* Writes an integer as length octets, using big endian byte order,
  * and unsigned number format. */
-void
-nettle_mpz_get_str_256_u_le(size_t length, uint8_t *s, const mpz_t x);
+	void
+	 nettle_mpz_get_str_256_u_le(size_t length, uint8_t * s, const mpz_t x);
 
+	void
+	 nettle_mpz_set_str_256_u_le(mpz_t x, size_t length, const uint8_t * s);
 
-void
-nettle_mpz_set_str_256_u_le(mpz_t x,
-			    size_t length, const uint8_t *s);
+	void
+	 nettle_mpz_init_set_str_256_u_le(mpz_t x,
+					  size_t length, const uint8_t * s);
 
-void
-nettle_mpz_init_set_str_256_u_le(mpz_t x,
-				 size_t length, const uint8_t *s);
-
-#ifdef __cplusplus
+# ifdef __cplusplus
 }
-#endif
-
-#endif /* GNUTLS_LIB_NETTLE_GOST_BIGNUM_LE_H */
+# endif
+#endif				/* GNUTLS_LIB_NETTLE_GOST_BIGNUM_LE_H */

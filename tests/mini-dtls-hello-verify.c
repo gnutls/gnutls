@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,18 +35,18 @@ int main(void)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/dtls.h>
-#include <signal.h>
+# include <string.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/dtls.h>
+# include <signal.h>
 
-#include "utils.h"
+# include "utils.h"
 
 static void terminate(void);
 
@@ -66,12 +66,11 @@ static void client_log_func(int level, const char *str)
 /* A very basic TLS client, with anonymous authentication.
  */
 
-#define MAX_BUF 1024
+# define MAX_BUF 1024
 
-static ssize_t
-push(gnutls_transport_ptr_t tr, const void *data, size_t len)
+static ssize_t push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 {
-	int fd = (long int) tr;
+	int fd = (long int)tr;
 
 	return send(fd, data, len, 0);
 }
@@ -138,8 +137,7 @@ static void client(int fd)
 
 	if (ret == 0) {
 		if (debug)
-			success
-			    ("client: Peer has closed the TLS connection\n");
+			success("client: Peer has closed the TLS connection\n");
 		goto end;
 	} else if (ret < 0) {
 		fail("client: Error: %s\n", gnutls_strerror(ret));
@@ -148,7 +146,7 @@ static void client(int fd)
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
-      end:
+ end:
 
 	close(fd);
 
@@ -158,7 +156,6 @@ static void client(int fd)
 
 	gnutls_global_deinit();
 }
-
 
 /* These are global */
 pid_t child;
@@ -172,8 +169,8 @@ static void terminate(void)
 	exit(1);
 }
 
-#define CLI_ADDR (void*)"test"
-#define CLI_ADDR_LEN 4
+# define CLI_ADDR (void*)"test"
+# define CLI_ADDR_LEN 4
 
 static void server(int fd)
 {
@@ -238,7 +235,7 @@ static void server(int fd)
 						    CLI_ADDR_LEN,
 						    &prestate,
 						    (gnutls_transport_ptr_t)
-						    (long) fd, push);
+						    (long)fd, push);
 			if (ret < 0) {
 				fail("Cannot send data\n");
 				terminate();
@@ -295,7 +292,6 @@ static void server(int fd)
 		     gnutls_strerror(ret));
 		terminate();
 	}
-
 
 	/* do not wait for the peer to close the connection.
 	 */

@@ -25,12 +25,12 @@
 
 #include "fuzzer.h"
 
-int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
+int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 {
 	gnutls_datum_t out;
 
-	if (gnutls_idna_map((const char *) data, size, &out, 0) >= 0) {
-		assert(out.size == strlen((char *) out.data));
+	if (gnutls_idna_map((const char *)data, size, &out, 0) >= 0) {
+		assert(out.size == strlen((char *)out.data));
 		gnutls_free(out.data);
 	}
 

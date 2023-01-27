@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -53,7 +53,7 @@ int main(void)
 
 # else
 
-# include "utils.h"
+#  include "utils.h"
 
 static
 void sigpipe(int sig)
@@ -61,7 +61,7 @@ void sigpipe(int sig)
 	_exit(2);
 }
 
-#define BUF_SIZE 64
+#  define BUF_SIZE 64
 
 static void client(int fd)
 {
@@ -101,7 +101,8 @@ static void client(int fd)
 	do {
 		ret = gnutls_handshake(session);
 	}
-	while (ret < 0 && (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED));
+	while (ret < 0
+	       && (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED));
 
 	ret = gnutls_record_recv(session, buf, sizeof(buf));
 	if (ret < 0 || ret != sizeof(buf)) {
@@ -123,13 +124,13 @@ static void client(int fd)
 	gnutls_global_deinit();
 
 	if (ret < 0) {
-		fail("client: Handshake failed with unexpected reason: %s\n", gnutls_strerror(ret));
+		fail("client: Handshake failed with unexpected reason: %s\n",
+		     gnutls_strerror(ret));
 	} else {
 		if (debug)
 			success("client: Handshake was completed\n");
 	}
 }
-
 
 /* These are global */
 pid_t child;
@@ -151,7 +152,7 @@ static void server(int fd)
 
 	gnutls_anon_allocate_server_credentials(&anoncred);
 
-	gnutls_init(&session, GNUTLS_SERVER|GNUTLS_NO_SIGNAL);
+	gnutls_init(&session, GNUTLS_SERVER | GNUTLS_NO_SIGNAL);
 
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
@@ -167,7 +168,8 @@ static void server(int fd)
 	do {
 		ret = gnutls_handshake(session);
 	}
-	while (ret < 0 && (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED));
+	while (ret < 0
+	       && (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED));
 
 	if (ret < 0) {
 		fail("error in handshake: %s\n", gnutls_strerror(ret));
@@ -175,7 +177,7 @@ static void server(int fd)
 	}
 
 	memset(buf, 0, sizeof(buf));
-	for (i=0;i<5;i++) {
+	for (i = 0; i < 5; i++) {
 		sleep(3);
 		ret = gnutls_record_send(session, buf, sizeof(buf));
 		if (ret < 0)
@@ -239,5 +241,5 @@ void doit(void)
 	start();
 }
 
-# endif /* MSG_NOSIGNAL */
+# endif				/* MSG_NOSIGNAL */
 #endif				/* _WIN32 */

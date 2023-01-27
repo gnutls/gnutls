@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 /* This program tests support for early start in TLS1.3 handshake */
@@ -52,11 +52,10 @@ static void tls_log_func(int level, const char *str)
 
 static
 void try_with_key_fail(const char *name, const char *client_prio,
-			const gnutls_datum_t *serv_cert,
-			const gnutls_datum_t *serv_key,
-			const gnutls_datum_t *cli_cert,
-			const gnutls_datum_t *cli_key,
-			unsigned init_flags)
+		       const gnutls_datum_t * serv_cert,
+		       const gnutls_datum_t * serv_key,
+		       const gnutls_datum_t * cli_cert,
+		       const gnutls_datum_t * cli_key, unsigned init_flags)
 {
 	int ret;
 	char buffer[256];
@@ -83,9 +82,8 @@ void try_with_key_fail(const char *name, const char *client_prio,
 	if (ret < 0)
 		fail("Could not set key/cert: %s\n", gnutls_strerror(ret));
 
-	assert(gnutls_init(&server, GNUTLS_SERVER|init_flags)>=0);
-	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-			       serverx509cred);
+	assert(gnutls_init(&server, GNUTLS_SERVER | init_flags) >= 0);
+	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, serverx509cred);
 
 	assert(gnutls_priority_set_direct(server, client_prio, NULL) >= 0);
 
@@ -102,7 +100,8 @@ void try_with_key_fail(const char *name, const char *client_prio,
 		gnutls_certificate_set_x509_key_mem(clientx509cred,
 						    cli_cert, cli_key,
 						    GNUTLS_X509_FMT_PEM);
-		gnutls_certificate_server_set_request(server, GNUTLS_CERT_REQUIRE);
+		gnutls_certificate_server_set_request(server,
+						      GNUTLS_CERT_REQUIRE);
 	}
 
 	ret = gnutls_init(&client, GNUTLS_CLIENT);
@@ -110,7 +109,7 @@ void try_with_key_fail(const char *name, const char *client_prio,
 		exit(1);
 
 	ret = gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-				clientx509cred);
+				     clientx509cred);
 	if (ret < 0)
 		exit(1);
 
@@ -135,7 +134,7 @@ void try_with_key_fail(const char *name, const char *client_prio,
 	assert(version == GNUTLS_TLS1_3);
 
 	memset(buffer, 0, sizeof(buffer));
-	assert(gnutls_record_send(server, MSG, strlen(MSG))>=0);
+	assert(gnutls_record_send(server, MSG, strlen(MSG)) >= 0);
 
 	ret = gnutls_record_recv(client, buffer, sizeof(buffer));
 	if (ret == 0) {
@@ -147,12 +146,13 @@ void try_with_key_fail(const char *name, const char *client_prio,
 	}
 
 	if (ret != strlen(MSG) || memcmp(MSG, buffer, ret) != 0) {
-		fail("client: Error in data received. Expected %d, got %d\n", (int)strlen(MSG), ret);
+		fail("client: Error in data received. Expected %d, got %d\n",
+		     (int)strlen(MSG), ret);
 		exit(1);
 	}
 
 	memset(buffer, 0, sizeof(buffer));
-	assert(gnutls_record_send(client, MSG, strlen(MSG))>=0);
+	assert(gnutls_record_send(client, MSG, strlen(MSG)) >= 0);
 
 	ret = gnutls_record_recv(server, buffer, sizeof(buffer));
 	if (ret == 0) {
@@ -162,7 +162,8 @@ void try_with_key_fail(const char *name, const char *client_prio,
 	}
 
 	if (ret != strlen(MSG) || memcmp(MSG, buffer, ret) != 0) {
-		fail("client: Error in data received. Expected %d, got %d\n", (int)strlen(MSG), ret);
+		fail("client: Error in data received. Expected %d, got %d\n",
+		     (int)strlen(MSG), ret);
 		exit(1);
 	}
 
@@ -175,12 +176,11 @@ void try_with_key_fail(const char *name, const char *client_prio,
 
 static
 void try_with_key_ks(const char *name, const char *client_prio,
-		const gnutls_datum_t *serv_cert,
-		const gnutls_datum_t *serv_key,
-		const gnutls_datum_t *client_cert,
-		const gnutls_datum_t *client_key,
-		unsigned cert_flags,
-		unsigned init_flags)
+		     const gnutls_datum_t * serv_cert,
+		     const gnutls_datum_t * serv_key,
+		     const gnutls_datum_t * client_cert,
+		     const gnutls_datum_t * client_key,
+		     unsigned cert_flags, unsigned init_flags)
 {
 	int ret;
 	char buffer[256];
@@ -204,20 +204,18 @@ void try_with_key_ks(const char *name, const char *client_prio,
 	gnutls_certificate_allocate_credentials(&serverx509cred);
 
 	ret = gnutls_certificate_set_x509_key_mem(serverx509cred,
-					    serv_cert, serv_key,
-					    GNUTLS_X509_FMT_PEM);
+						  serv_cert, serv_key,
+						  GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
 		fail("Could not set key/cert: %s\n", gnutls_strerror(ret));
 	}
 
-	assert(gnutls_init(&server, GNUTLS_SERVER|init_flags)>=0);
-	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-				serverx509cred);
-
+	assert(gnutls_init(&server, GNUTLS_SERVER | init_flags) >= 0);
+	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, serverx509cred);
 
 	assert(gnutls_priority_set_direct(server,
-				   "NORMAL:-VERS-ALL:+VERS-TLS1.3",
-				   NULL)>=0);
+					  "NORMAL:-VERS-ALL:+VERS-TLS1.3",
+					  NULL) >= 0);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
@@ -232,18 +230,19 @@ void try_with_key_ks(const char *name, const char *client_prio,
 		gnutls_certificate_set_x509_key_mem(clientx509cred,
 						    client_cert, client_key,
 						    GNUTLS_X509_FMT_PEM);
-		gnutls_certificate_server_set_request(server, GNUTLS_CERT_REQUIRE);
+		gnutls_certificate_server_set_request(server,
+						      GNUTLS_CERT_REQUIRE);
 	} else if (cert_flags == ASK_CERT) {
-		gnutls_certificate_server_set_request(server, GNUTLS_CERT_REQUEST);
+		gnutls_certificate_server_set_request(server,
+						      GNUTLS_CERT_REQUEST);
 	}
 
 	ret = gnutls_init(&client, GNUTLS_CLIENT);
 	if (ret < 0)
 		exit(1);
 
-
 	ret = gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-				clientx509cred);
+				     clientx509cred);
 	if (ret < 0)
 		exit(1);
 
@@ -267,7 +266,7 @@ void try_with_key_ks(const char *name, const char *client_prio,
 	assert(version == GNUTLS_TLS1_3);
 
 	memset(buffer, 0, sizeof(buffer));
-	assert(gnutls_record_send(server, MSG, strlen(MSG))>=0);
+	assert(gnutls_record_send(server, MSG, strlen(MSG)) >= 0);
 
 	ret = gnutls_record_recv(client, buffer, sizeof(buffer));
 	if (ret == 0) {
@@ -279,12 +278,13 @@ void try_with_key_ks(const char *name, const char *client_prio,
 	}
 
 	if (ret != strlen(MSG) || memcmp(MSG, buffer, ret) != 0) {
-		fail("client: Error in data received. Expected %d, got %d\n", (int)strlen(MSG), ret);
+		fail("client: Error in data received. Expected %d, got %d\n",
+		     (int)strlen(MSG), ret);
 		exit(1);
 	}
 
 	memset(buffer, 0, sizeof(buffer));
-	assert(gnutls_record_send(client, MSG, strlen(MSG))>=0);
+	assert(gnutls_record_send(client, MSG, strlen(MSG)) >= 0);
 
 	ret = gnutls_record_recv(server, buffer, sizeof(buffer));
 	if (ret == 0) {
@@ -294,7 +294,8 @@ void try_with_key_ks(const char *name, const char *client_prio,
 	}
 
 	if (ret != strlen(MSG) || memcmp(MSG, buffer, ret) != 0) {
-		fail("client: Error in data received. Expected %d, got %d\n", (int)strlen(MSG), ret);
+		fail("client: Error in data received. Expected %d, got %d\n",
+		     (int)strlen(MSG), ret);
 		exit(1);
 	}
 
@@ -310,14 +311,14 @@ void try_with_key_ks(const char *name, const char *client_prio,
 
 static
 void try_with_key(const char *name, const char *client_prio,
-		const gnutls_datum_t *serv_cert,
-		const gnutls_datum_t *serv_key,
-		const gnutls_datum_t *cli_cert,
-		const gnutls_datum_t *cli_key,
-		unsigned cert_flags)
+		  const gnutls_datum_t * serv_cert,
+		  const gnutls_datum_t * serv_key,
+		  const gnutls_datum_t * cli_cert,
+		  const gnutls_datum_t * cli_key, unsigned cert_flags)
 {
 	return try_with_key_ks(name, client_prio,
-			       serv_cert, serv_key, cli_cert, cli_key, cert_flags, GNUTLS_ENABLE_EARLY_START);
+			       serv_cert, serv_key, cli_cert, cli_key,
+			       cert_flags, GNUTLS_ENABLE_EARLY_START);
 }
 
 #include "cert-common.h"
@@ -325,22 +326,38 @@ void try_with_key(const char *name, const char *client_prio,
 void doit(void)
 {
 	/* TLS 1.3 no client cert: early start expected */
-	try_ok("TLS 1.3 with ffdhe2048 rsa no-cli-cert", "NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-FFDHE2048");
-	try_ok("TLS 1.3 with secp256r1 rsa no-cli-cert", "NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-SECP256R1");
-	try_ok("TLS 1.3 with x25519 rsa no-cli-cert", "NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-X25519");
+	try_ok("TLS 1.3 with ffdhe2048 rsa no-cli-cert",
+	       "NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-FFDHE2048");
+	try_ok("TLS 1.3 with secp256r1 rsa no-cli-cert",
+	       "NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-SECP256R1");
+	try_ok("TLS 1.3 with x25519 rsa no-cli-cert",
+	       "NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-X25519");
 
-	try_with_key_ks("TLS 1.3 with secp256r1 ecdsa no-cli-cert", "NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-SECP256R1",
-		&server_ca3_localhost_ecc_cert, &server_ca3_ecc_key, NULL, NULL, 0, GNUTLS_ENABLE_EARLY_START);
+	try_with_key_ks("TLS 1.3 with secp256r1 ecdsa no-cli-cert",
+			"NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-SECP256R1",
+			&server_ca3_localhost_ecc_cert, &server_ca3_ecc_key,
+			NULL, NULL, 0, GNUTLS_ENABLE_EARLY_START);
 
 	/* client authentication: no early start possible */
-	try_with_key_fail("TLS 1.3 with rsa-pss cli-cert", "NORMAL:-VERS-ALL:+VERS-TLS1.3:-KX-ALL:+ECDHE-RSA",
-		&server_ca3_localhost_ecc_cert, &server_ca3_ecc_key, &cli_ca3_rsa_pss_cert, &cli_ca3_rsa_pss_key, GNUTLS_ENABLE_EARLY_START);
-	try_with_key_fail("TLS 1.3 with rsa cli-cert", "NORMAL:-VERS-ALL:+VERS-TLS1.3:-KX-ALL:+ECDHE-RSA",
-		&server_ca3_localhost_ecc_cert, &server_ca3_ecc_key, &cli_ca3_cert, &cli_ca3_key, GNUTLS_ENABLE_EARLY_START);
-	try_with_key_fail("TLS 1.3 with ecdsa cli-cert", "NORMAL:-VERS-ALL:+VERS-TLS1.3:-KX-ALL:+ECDHE-RSA",
-		&server_ca3_localhost_ecc_cert, &server_ca3_ecc_key, &server_ca3_localhost_ecc_cert, &server_ca3_ecc_key, GNUTLS_ENABLE_EARLY_START);
+	try_with_key_fail("TLS 1.3 with rsa-pss cli-cert",
+			  "NORMAL:-VERS-ALL:+VERS-TLS1.3:-KX-ALL:+ECDHE-RSA",
+			  &server_ca3_localhost_ecc_cert, &server_ca3_ecc_key,
+			  &cli_ca3_rsa_pss_cert, &cli_ca3_rsa_pss_key,
+			  GNUTLS_ENABLE_EARLY_START);
+	try_with_key_fail("TLS 1.3 with rsa cli-cert",
+			  "NORMAL:-VERS-ALL:+VERS-TLS1.3:-KX-ALL:+ECDHE-RSA",
+			  &server_ca3_localhost_ecc_cert, &server_ca3_ecc_key,
+			  &cli_ca3_cert, &cli_ca3_key,
+			  GNUTLS_ENABLE_EARLY_START);
+	try_with_key_fail("TLS 1.3 with ecdsa cli-cert",
+			  "NORMAL:-VERS-ALL:+VERS-TLS1.3:-KX-ALL:+ECDHE-RSA",
+			  &server_ca3_localhost_ecc_cert, &server_ca3_ecc_key,
+			  &server_ca3_localhost_ecc_cert, &server_ca3_ecc_key,
+			  GNUTLS_ENABLE_EARLY_START);
 
 	/* TLS 1.3 no client cert: no early start flag specified */
-	try_with_key_fail("TLS 1.3 with rsa-pss cli-cert", "NORMAL:-VERS-ALL:+VERS-TLS1.3:-KX-ALL:+ECDHE-RSA",
-		&server_ca3_localhost_ecc_cert, &server_ca3_ecc_key, NULL, NULL, 0);
+	try_with_key_fail("TLS 1.3 with rsa-pss cli-cert",
+			  "NORMAL:-VERS-ALL:+VERS-TLS1.3:-KX-ALL:+ECDHE-RSA",
+			  &server_ca3_localhost_ecc_cert, &server_ca3_ecc_key,
+			  NULL, NULL, 0);
 }

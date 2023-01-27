@@ -36,17 +36,16 @@ void _gnutls_dump_mpi(const char *prefix, bigint_t a)
 
 	if (_gnutls_mpi_print(a, buf, &n))
 		strcpy(buf, "[can't print value]");	/* Flawfinder: ignore */
-	_gnutls_debug_log("MPI: length: %d\n\t%s%s\n", (int) n, prefix,
+	_gnutls_debug_log("MPI: length: %d\n\t%s%s\n", (int)n, prefix,
 			  _gnutls_bin2hex(buf, n, buf_hex, sizeof(buf_hex),
 					  NULL));
 }
 
-void
-_gnutls_dump_vector(const char *prefix, const uint8_t * a, size_t a_size)
+void _gnutls_dump_vector(const char *prefix, const uint8_t * a, size_t a_size)
 {
 	char buf_hex[2 * a_size + 1];
 
-	_gnutls_debug_log("Vector: length: %d\n\t%s%s\n", (int) a_size,
+	_gnutls_debug_log("Vector: length: %d\n\t%s%s\n", (int)a_size,
 			  prefix, _gnutls_bin2hex(a, a_size, buf_hex,
 						  sizeof(buf_hex), NULL));
 }
@@ -80,8 +79,7 @@ const char *_gnutls_packet2str(content_type_t packet)
  *   message or %NULL.
  **/
 const char
-    *gnutls_handshake_description_get_name(gnutls_handshake_description_t
-					   type)
+*gnutls_handshake_description_get_name(gnutls_handshake_description_t type)
 {
 	switch (type) {
 	case GNUTLS_HANDSHAKE_END_OF_EARLY_DATA:

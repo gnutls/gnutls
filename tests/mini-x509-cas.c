@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -83,10 +83,9 @@ void start(const char *prio)
 	}
 
 	gnutls_init(&server, GNUTLS_SERVER);
-	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-				serverx509cred);
+	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, serverx509cred);
 	gnutls_certificate_server_set_request(server, GNUTLS_CERT_REQUEST);
-	assert(gnutls_priority_set_direct(server, prio, NULL)>=0);
+	assert(gnutls_priority_set_direct(server, prio, NULL) >= 0);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
@@ -94,9 +93,8 @@ void start(const char *prio)
 	/* Init client */
 	gnutls_certificate_allocate_credentials(&clientx509cred);
 	gnutls_init(&client, GNUTLS_CLIENT);
-	gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-				clientx509cred);
-	assert(gnutls_priority_set_direct(client, prio, NULL)>=0);
+	gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE, clientx509cred);
+	assert(gnutls_priority_set_direct(client, prio, NULL) >= 0);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);

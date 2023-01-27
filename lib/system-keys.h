@@ -19,22 +19,19 @@
  */
 
 #ifndef GNUTLS_LIB_SYSTEM_KEYS_H
-#define GNUTLS_LIB_SYSTEM_KEYS_H
+# define GNUTLS_LIB_SYSTEM_KEYS_H
 
-#ifdef _WIN32
-# define _gnutls_system_url_is_supported(x) 1
-#else
-# define _gnutls_system_url_is_supported(x) 0
-#endif
+# ifdef _WIN32
+#  define _gnutls_system_url_is_supported(x) 1
+# else
+#  define _gnutls_system_url_is_supported(x) 0
+# endif
 
-int
-_gnutls_x509_crt_import_system_url(gnutls_x509_crt_t crt, const char *url);
+int _gnutls_x509_crt_import_system_url(gnutls_x509_crt_t crt, const char *url);
 
-int
-_gnutls_privkey_import_system_url(gnutls_privkey_t pkey,
-				  const char *url);
+int _gnutls_privkey_import_system_url(gnutls_privkey_t pkey, const char *url);
 
 void _gnutls_system_key_deinit(void);
 int _gnutls_system_key_init(void);
 
-#endif /* GNUTLS_LIB_SYSTEM_KEYS_H */
+#endif				/* GNUTLS_LIB_SYSTEM_KEYS_H */

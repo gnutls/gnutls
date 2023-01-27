@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -45,15 +45,14 @@
 # define P11LIB "libpkcs11mock1.so"
 #endif
 
-
 static void tls_log_func(int level, const char *str)
 {
 	fprintf(stderr, "|<%d>| %s", level, str);
 }
 
 static
-int pin_func(void* userdata, int attempt, const char* url, const char *label,
-		unsigned flags, char *pin, size_t pin_max)
+int pin_func(void *userdata, int attempt, const char *url, const char *label,
+	     unsigned flags, char *pin, size_t pin_max)
 {
 	if (attempt == 0) {
 		strcpy(pin, PIN);
@@ -98,13 +97,15 @@ void doit(void)
 	}
 
 	ret = gnutls_privkey_init(&key);
-	assert(ret>=0);
+	assert(ret >= 0);
 	ret = gnutls_pubkey_init(&pub);
-	assert(ret>=0);
+	assert(ret >= 0);
 
 	gnutls_privkey_set_pin_function(key, pin_func, NULL);
 
-	ret = gnutls_privkey_import_url(key, "pkcs11:object=test", GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
+	ret =
+	    gnutls_privkey_import_url(key, "pkcs11:object=test",
+				      GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
 	if (ret < 0) {
 		fail("%d: %s\n", ret, gnutls_strerror(ret));
 		exit(1);
@@ -125,11 +126,12 @@ void doit(void)
 	gnutls_pubkey_deinit(pub);
 	gnutls_privkey_deinit(key);
 
-	/* try again using gnutls_pubkey_import_url */	
+	/* try again using gnutls_pubkey_import_url */
 	ret = gnutls_pubkey_init(&pub);
-	assert(ret>=0);
+	assert(ret >= 0);
 
-	ret = gnutls_pubkey_import_url(pub, "pkcs11:object=test;type=public", 0);
+	ret =
+	    gnutls_pubkey_import_url(pub, "pkcs11:object=test;type=public", 0);
 	if (ret < 0) {
 		fail("%d: %s\n", ret, gnutls_strerror(ret));
 		exit(1);
@@ -143,8 +145,8 @@ void doit(void)
 
 	assert(m1.size == m2.size);
 	assert(e1.size == e2.size);
-	assert(memcmp(e1.data, e2.data, e2.size)==0);
-	assert(memcmp(m1.data, m2.data, m2.size)==0);
+	assert(memcmp(e1.data, e2.data, e2.size) == 0);
+	assert(memcmp(m1.data, m2.data, m2.size) == 0);
 
 	gnutls_pubkey_deinit(pub);
 	gnutls_free(m1.data);

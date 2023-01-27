@@ -54,7 +54,10 @@ int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 	res = gnutls_credentials_set(session, GNUTLS_CRD_SRP, pcred);
 	assert(res >= 0);
 
-	res = gnutls_priority_set_direct(session, "NORMAL:-KX-ALL:+SRP:+SRP-RSA:+SRP-DSS", NULL);
+	res =
+	    gnutls_priority_set_direct(session,
+				       "NORMAL:-KX-ALL:+SRP:+SRP-RSA:+SRP-DSS",
+				       NULL);
 	assert(res >= 0);
 
 	memdata.data = data;
@@ -62,8 +65,7 @@ int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 
 	gnutls_transport_set_push_function(session, mem_push);
 	gnutls_transport_set_pull_function(session, mem_pull);
-	gnutls_transport_set_pull_timeout_function(session,
-		mem_pull_timeout);
+	gnutls_transport_set_pull_timeout_function(session, mem_pull_timeout);
 	gnutls_transport_set_ptr(session, &memdata);
 	gnutls_srp_set_prime_bits(session, 1024);
 

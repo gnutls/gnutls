@@ -21,23 +21,22 @@
  */
 
 #ifndef GNUTLS_LIB_DTLS_H
-#define GNUTLS_LIB_DTLS_H
+# define GNUTLS_LIB_DTLS_H
 
-#include <config.h>
-#include "gnutls_int.h"
-#include <buffers.h>
-#include <mbuffers.h>
-#include <constate.h>
+# include <config.h>
+# include "gnutls_int.h"
+# include <buffers.h>
+# include <mbuffers.h>
+# include <constate.h>
 
 int _dtls_transmit(gnutls_session_t session);
 int _dtls_record_check(struct record_parameters_st *rp, uint64_t seq_num);
 void _dtls_reset_hsk_state(gnutls_session_t session);
 void _dtls_reset_window(struct record_parameters_st *rp);
 
-#define MAX_DTLS_TIMEOUT 60000
+# define MAX_DTLS_TIMEOUT 60000
 
-
-#define RETURN_DTLS_EAGAIN_OR_TIMEOUT(session, r) { \
+# define RETURN_DTLS_EAGAIN_OR_TIMEOUT(session, r) { \
   struct timespec _now; \
   unsigned int _diff; \
   gnutls_gettime(&_now); \
@@ -58,7 +57,6 @@ void _dtls_reset_window(struct record_parameters_st *rp);
       return gnutls_assert_val(_rr); \
     } \
   }
-
 
 int _dtls_wait_and_retransmit(gnutls_session_t session);
 
@@ -111,10 +109,9 @@ inline static void _dtls_async_timer_check(gnutls_session_t session)
 	}
 }
 
-unsigned _gnutls_record_overhead(const version_entry_st *ver,
-				 const cipher_entry_st *cipher,
-				 const mac_entry_st *mac,
-				 unsigned max);
+unsigned _gnutls_record_overhead(const version_entry_st * ver,
+				 const cipher_entry_st * cipher,
+				 const mac_entry_st * mac, unsigned max);
 
 /* Returns non-zero if the async timer is active */
 inline static int _dtls_async_timer_active(gnutls_session_t session)
@@ -135,4 +132,4 @@ inline static int _dtls_retransmit(gnutls_session_t session)
 	return _dtls_transmit(session);
 }
 
-#endif /* GNUTLS_LIB_DTLS_H */
+#endif				/* GNUTLS_LIB_DTLS_H */

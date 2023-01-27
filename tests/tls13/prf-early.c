@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <assert.h>
@@ -34,25 +34,25 @@ int main(int argc, char **argv)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/crypto.h>
+# include <string.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/crypto.h>
 
-#include "cert-common.h"
-#include "utils.h"
-#include "virt-time.h"
+# include "cert-common.h"
+# include "utils.h"
+# include "virt-time.h"
 
 static void terminate(void);
 
-#define SESSIONS 2
-#define MAX_BUF 5*1024
-#define MSG "Hello TLS"
+# define SESSIONS 2
+# define MAX_BUF 5*1024
+# define MSG "Hello TLS"
 
 extern unsigned int _gnutls_global_version;
 
@@ -74,14 +74,21 @@ static void client_log_func(int level, const char *str)
 static pid_t child;
 
 static const
-gnutls_datum_t hrnd = {(void*)"\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 32};
+gnutls_datum_t hrnd = { (void *)
+	    "\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+	32
+};
+
 static const
-gnutls_datum_t hsrnd = {(void*)"\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 32};
+gnutls_datum_t hsrnd = { (void *)
+	    "\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+	32
+};
 
 static int gnutls_rnd_works;
 
-int __attribute__ ((visibility ("protected")))
-gnutls_rnd(gnutls_rnd_level_t level, void *data, size_t len)
+int __attribute__((visibility("protected")))
+    gnutls_rnd(gnutls_rnd_level_t level, void *data, size_t len)
 {
 	gnutls_rnd_works = 1;
 
@@ -96,17 +103,17 @@ gnutls_rnd(gnutls_rnd_level_t level, void *data, size_t len)
 
 static gnutls_datum_t session_ticket_key = { NULL, 0 };
 
-static void dump(const char *name, const uint8_t *data, unsigned data_size)
+static void dump(const char *name, const uint8_t * data, unsigned data_size)
 {
 	unsigned i;
 
 	fprintf(stderr, "%s", name);
-	for (i=0;i<data_size;i++)
+	for (i = 0; i < data_size; i++)
 		fprintf(stderr, "\\x%.2x", (unsigned)data[i]);
 	fprintf(stderr, "\n");
 }
 
-#define TRY(label_size, label, extra_size, extra, size, exp) \
+# define TRY(label_size, label, extra_size, extra, size, exp) \
 	{ \
 	ret = gnutls_prf_early(session, label_size, label, extra_size, extra, size, \
 			 (void*)key_material); \
@@ -123,15 +130,16 @@ static void dump(const char *name, const uint8_t *data, unsigned data_size)
 	} \
 	}
 
-#define KEY_EXP_VALUE "\xec\xc2\x4a\x6b\x07\x89\xd9\x19\xd9\x73\x6d\xd0\x00\x73\xc9\x7a\xd7\x92\xef\x56\x91\x61\xb4\xff\x5f\xef\x81\xc1\x98\x68\x4e\xdf\xd7\x7e"
-#define HELLO_VALUE "\x4f\x85\x33\x64\x48\xff\x0d\x8b\xd5\x50\x0f\x97\x91\x5b\x7d\x8d\xc9\x05\x91\x45\x4f\xb9\x4b\x4b\xbc\xbf\x58\x84\x1a\x46\xe3"
-#define CONTEXT_VALUE "\x11\x8d\x85\xa8\x91\xe5\x50\x75\x44\x88\x69\xaf\x95\x9a\xb0\x29\xd4\xae\xcd\x11\xcb\x1d\x29\x7c\xe6\x24\xd4\x7c\x95\xdb\x5c"
-#define NULL_CONTEXT_VALUE "\x56\x99\x41\x73\x5e\x73\x34\x7f\x3d\x69\x9f\xc0\x3b\x8b\x86\x33\xc6\xc3\x97\x46\x61\x62\x3f\x55\xab\x39\x60\xa5\xeb\xfe\x37"
+# define KEY_EXP_VALUE "\xec\xc2\x4a\x6b\x07\x89\xd9\x19\xd9\x73\x6d\xd0\x00\x73\xc9\x7a\xd7\x92\xef\x56\x91\x61\xb4\xff\x5f\xef\x81\xc1\x98\x68\x4e\xdf\xd7\x7e"
+# define HELLO_VALUE "\x4f\x85\x33\x64\x48\xff\x0d\x8b\xd5\x50\x0f\x97\x91\x5b\x7d\x8d\xc9\x05\x91\x45\x4f\xb9\x4b\x4b\xbc\xbf\x58\x84\x1a\x46\xe3"
+# define CONTEXT_VALUE "\x11\x8d\x85\xa8\x91\xe5\x50\x75\x44\x88\x69\xaf\x95\x9a\xb0\x29\xd4\xae\xcd\x11\xcb\x1d\x29\x7c\xe6\x24\xd4\x7c\x95\xdb\x5c"
+# define NULL_CONTEXT_VALUE "\x56\x99\x41\x73\x5e\x73\x34\x7f\x3d\x69\x9f\xc0\x3b\x8b\x86\x33\xc6\xc3\x97\x46\x61\x62\x3f\x55\xab\x39\x60\xa5\xeb\xfe\x37"
 
 static int handshake_callback_called;
 
 static int handshake_callback(gnutls_session_t session, unsigned int htype,
-			      unsigned post, unsigned int incoming, const gnutls_datum_t *msg)
+			      unsigned post, unsigned int incoming,
+			      const gnutls_datum_t * msg)
 {
 	unsigned char key_material[512];
 	int ret;
@@ -140,10 +148,10 @@ static int handshake_callback(gnutls_session_t session, unsigned int htype,
 
 	handshake_callback_called++;
 
-	TRY(13, "key expansion", 0, NULL, 34, (uint8_t*)KEY_EXP_VALUE);
-	TRY(6, "hello", 0, NULL, 31, (uint8_t*)HELLO_VALUE);
-	TRY(7, "context", 5, "abcd\xfa", 31, (uint8_t*)CONTEXT_VALUE);
-	TRY(12, "null-context", 0, "", 31, (uint8_t*)NULL_CONTEXT_VALUE);
+	TRY(13, "key expansion", 0, NULL, 34, (uint8_t *) KEY_EXP_VALUE);
+	TRY(6, "hello", 0, NULL, 31, (uint8_t *) HELLO_VALUE);
+	TRY(7, "context", 5, "abcd\xfa", 31, (uint8_t *) CONTEXT_VALUE);
+	TRY(12, "null-context", 0, "", 31, (uint8_t *) NULL_CONTEXT_VALUE);
 
 	return 0;
 }
@@ -155,7 +163,7 @@ static void client(int sds[])
 	gnutls_certificate_credentials_t clientx509cred;
 	const char *err;
 	int t;
-	gnutls_datum_t session_data = {NULL, 0};
+	gnutls_datum_t session_data = { NULL, 0 };
 	char buffer[MAX_BUF + 1];
 
 	global_init();
@@ -196,7 +204,8 @@ static void client(int sds[])
 		if (t > 0) {
 			gnutls_session_set_data(session, session_data.data,
 						session_data.size);
-			gnutls_handshake_set_hook_function(session, GNUTLS_HANDSHAKE_CLIENT_HELLO,
+			gnutls_handshake_set_hook_function(session,
+							   GNUTLS_HANDSHAKE_CLIENT_HELLO,
 							   GNUTLS_HOOK_POST,
 							   handshake_callback);
 		}
@@ -223,21 +232,21 @@ static void client(int sds[])
 
 		ret = gnutls_cipher_get(session);
 		if (ret != GNUTLS_CIPHER_AES_256_GCM) {
-			fprintf(stderr, "negotiated unexpected cipher: %s\n", gnutls_cipher_get_name(ret));
+			fprintf(stderr, "negotiated unexpected cipher: %s\n",
+				gnutls_cipher_get_name(ret));
 			exit(1);
 		}
 
 		ret = gnutls_mac_get(session);
 		if (ret != GNUTLS_MAC_AEAD) {
-			fprintf(stderr, "negotiated unexpected mac: %s\n", gnutls_mac_get_name(ret));
+			fprintf(stderr, "negotiated unexpected mac: %s\n",
+				gnutls_mac_get_name(ret));
 			exit(1);
 		}
 
 		if (t == 0) {
 			/* get the session data size */
-			ret =
-			    gnutls_session_get_data2(session,
-						     &session_data);
+			ret = gnutls_session_get_data2(session, &session_data);
 			if (ret < 0)
 				fail("Getting resume data failed\n");
 
@@ -327,7 +336,8 @@ static void server(int sds[])
 		 * are adequate.
 		 */
 		ret = gnutls_priority_set_direct(session,
-						 "NORMAL:-VERS-ALL:+VERS-TLS1.3:-KX-ALL:-SIGN-ALL:+SIGN-RSA-PSS-RSAE-SHA384:-GROUP-ALL:+GROUP-SECP256R1", NULL);
+						 "NORMAL:-VERS-ALL:+VERS-TLS1.3:-KX-ALL:-SIGN-ALL:+SIGN-RSA-PSS-RSAE-SHA384:-GROUP-ALL:+GROUP-SECP256R1",
+						 NULL);
 		if (ret < 0) {
 			fail("server: priority set failed (%s)\n\n",
 			     gnutls_strerror(ret));
@@ -345,10 +355,12 @@ static void server(int sds[])
 
 		if (t > 0) {
 			if (!gnutls_rnd_works) {
-				fprintf(stderr, "gnutls_rnd() could not be overridden, skipping prf checks see #584\n");
+				fprintf(stderr,
+					"gnutls_rnd() could not be overridden, skipping prf checks see #584\n");
 				exit(77);
 			} else {
-				gnutls_handshake_set_hook_function(session, GNUTLS_HANDSHAKE_CLIENT_HELLO,
+				gnutls_handshake_set_hook_function(session,
+								   GNUTLS_HANDSHAKE_CLIENT_HELLO,
 								   GNUTLS_HOOK_POST,
 								   handshake_callback);
 			}

@@ -39,11 +39,11 @@
 
 int
 _gnutls13_handshake_verify_data(gnutls_session_t session,
-			      unsigned verify_flags,
-			      gnutls_pcert_st *cert,
-			      const gnutls_datum_t *context,
-			      const gnutls_datum_t *signature,
-			      const gnutls_sign_entry_st *se)
+				unsigned verify_flags,
+				gnutls_pcert_st * cert,
+				const gnutls_datum_t * context,
+				const gnutls_datum_t * signature,
+				const gnutls_sign_entry_st * se)
 {
 	int ret;
 	const version_entry_st *ver = get_version(session);
@@ -58,23 +58,25 @@ _gnutls13_handshake_verify_data(gnutls_session_t session,
 
 	ret =
 	    _gnutls_pubkey_compatible_with_sig(session,
-					       cert->pubkey, ver,
-					       se->id);
+					       cert->pubkey, ver, se->id);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	if (unlikely(sign_supports_cert_pk_algorithm(se, cert->pubkey->params.algo) == 0)) {
-		_gnutls_handshake_log("HSK[%p]: certificate of %s cannot be combined with %s sig\n",
-				      session, gnutls_pk_get_name(cert->pubkey->params.algo), se->name);
+	if (unlikely
+	    (sign_supports_cert_pk_algorithm(se, cert->pubkey->params.algo) ==
+	     0)) {
+		_gnutls_handshake_log
+		    ("HSK[%p]: certificate of %s cannot be combined with %s sig\n",
+		     session, gnutls_pk_get_name(cert->pubkey->params.algo),
+		     se->name);
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 	}
 
-	ret =
-	    _gnutls_session_sign_algo_enabled(session, se->id);
+	ret = _gnutls_session_sign_algo_enabled(session, se->id);
 	if (ret < 0)
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
-	if ((se->flags & GNUTLS_SIGN_FLAG_TLS13_OK) == 0) /* explicitly prohibited */
+	if ((se->flags & GNUTLS_SIGN_FLAG_TLS13_OK) == 0)	/* explicitly prohibited */
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 	gnutls_pubkey_get_key_usage(cert->pubkey, &key_usage);
@@ -106,14 +108,18 @@ _gnutls13_handshake_verify_data(gnutls_session_t session,
 
 	ret = gnutls_hash_fast(MAC_TO_DIG(session->security_parameters.prf->id),
 			       session->internals.handshake_hash_buffer.data,
-			       session->internals.handshake_hash_buffer_prev_len,
+			       session->
+			       internals.handshake_hash_buffer_prev_len,
 			       prefix);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	ret = _gnutls_buffer_append_data(&buf, prefix, session->security_parameters.prf->output_size);
+	ret =
+	    _gnutls_buffer_append_data(&buf, prefix,
+				       session->security_parameters.
+				       prf->output_size);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -140,25 +146,27 @@ _gnutls13_handshake_verify_data(gnutls_session_t session,
 int
 _gnutls13_handshake_sign_data(gnutls_session_t session,
 			      gnutls_pcert_st * cert, gnutls_privkey_t pkey,
-			      const gnutls_datum_t *context,
+			      const gnutls_datum_t * context,
 			      gnutls_datum_t * signature,
-			      const gnutls_sign_entry_st *se)
+			      const gnutls_sign_entry_st * se)
 {
 	gnutls_datum_t p;
 	int ret;
 	gnutls_buffer_st buf;
 	uint8_t tmp[MAX_HASH_SIZE];
 
-	if (unlikely(se == NULL || (se->flags & GNUTLS_SIGN_FLAG_TLS13_OK) == 0))
+	if (unlikely
+	    (se == NULL || (se->flags & GNUTLS_SIGN_FLAG_TLS13_OK) == 0))
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
-	if (unlikely(sign_supports_priv_pk_algorithm(se, pkey->pk_algorithm) == 0))
+	if (unlikely
+	    (sign_supports_priv_pk_algorithm(se, pkey->pk_algorithm) == 0))
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 	/* when we reach here we know we have a signing certificate */
 	_gnutls_handshake_log
-	    ("HSK[%p]: signing TLS 1.3 handshake data: using %s and PRF: %s\n", session, se->name,
-	     session->security_parameters.prf->name);
+	    ("HSK[%p]: signing TLS 1.3 handshake data: using %s and PRF: %s\n",
+	     session, se->name, session->security_parameters.prf->name);
 
 	_gnutls_buffer_init(&buf);
 
@@ -192,7 +200,10 @@ _gnutls13_handshake_sign_data(gnutls_session_t session,
 		goto cleanup;
 	}
 
-	ret = _gnutls_buffer_append_data(&buf, tmp, session->security_parameters.prf->output_size);
+	ret =
+	    _gnutls_buffer_append_data(&buf, tmp,
+				       session->security_parameters.
+				       prf->output_size);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;

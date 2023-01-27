@@ -22,12 +22,12 @@
  */
 
 #ifndef GNUTLS_LIB_EXT_SERVER_NAME_H
-#define GNUTLS_LIB_EXT_SERVER_NAME_H
+# define GNUTLS_LIB_EXT_SERVER_NAME_H
 
-#include <hello_ext.h>
+# include <hello_ext.h>
 
 extern const hello_ext_entry_st ext_mod_server_name;
 
 unsigned _gnutls_server_name_matches_resumed(gnutls_session_t);
 
-#endif /* GNUTLS_LIB_EXT_SERVER_NAME_H */
+#endif				/* GNUTLS_LIB_EXT_SERVER_NAME_H */

@@ -21,11 +21,11 @@
  */
 
 #ifndef GNUTLS_LIB_BUFFERS_H
-#define GNUTLS_LIB_BUFFERS_H
+# define GNUTLS_LIB_BUFFERS_H
 
-#include "mbuffers.h"
+# include "mbuffers.h"
 
-#define MBUFFER_FLUSH 1
+# define MBUFFER_FLUSH 1
 
 void
 _gnutls_record_buffer_put(gnutls_session_t session,
@@ -37,7 +37,7 @@ inline static int _gnutls_record_buffer_get_size(gnutls_session_t session)
 	return session->internals.record_buffer.byte_length;
 }
 
-#define NO_TIMEOUT_FUNC_SET(session) unlikely(session->internals.pull_timeout_func == gnutls_system_recv_timeout \
+# define NO_TIMEOUT_FUNC_SET(session) unlikely(session->internals.pull_timeout_func == gnutls_system_recv_timeout \
 	     && session->internals.pull_func != system_read)
 
 /*-
@@ -60,7 +60,7 @@ int _gnutls_record_buffer_get(content_type_t type,
 			      size_t length, uint8_t seq[8]);
 int _gnutls_record_buffer_get_packet(content_type_t type,
 				     gnutls_session_t session,
-				     gnutls_packet_t *packet);
+				     gnutls_packet_t * packet);
 ssize_t _gnutls_io_read_buffered(gnutls_session_t, size_t n,
 				 content_type_t, unsigned int *ms);
 int _gnutls_io_clear_peeked_data(gnutls_session_t session);
@@ -75,15 +75,13 @@ int _gnutls_handshake_io_cache_int(gnutls_session_t,
 ssize_t
 _gnutls_handshake_io_recv_int(gnutls_session_t session,
 			      gnutls_handshake_description_t htype,
-			      handshake_buffer_st * hsk,
-			      unsigned int optional);
+			      handshake_buffer_st * hsk, unsigned int optional);
 
 ssize_t _gnutls_io_write_flush(gnutls_session_t session);
 int _gnutls_io_check_recv(gnutls_session_t session, unsigned int ms);
 ssize_t _gnutls_handshake_io_write_flush(gnutls_session_t session);
 
-inline static void _gnutls_handshake_buffer_clear(handshake_buffer_st *
-						  hsk)
+inline static void _gnutls_handshake_buffer_clear(handshake_buffer_st * hsk)
 {
 	_gnutls_buffer_clear(&hsk->data);
 	hsk->htype = -1;
@@ -96,8 +94,7 @@ inline static void _gnutls_handshake_buffer_init(handshake_buffer_st * hsk)
 	hsk->htype = -1;
 }
 
-inline static void _gnutls_handshake_recv_buffer_clear(gnutls_session_t
-						       session)
+inline static void _gnutls_handshake_recv_buffer_clear(gnutls_session_t session)
 {
 	int i;
 	for (i = 0; i < session->internals.handshake_recv_buffer_size; i++)
@@ -107,8 +104,7 @@ inline static void _gnutls_handshake_recv_buffer_clear(gnutls_session_t
 	_mbuffer_head_clear(&session->internals.handshake_header_recv_buffer);
 }
 
-inline static void _gnutls_handshake_recv_buffer_init(gnutls_session_t
-						      session)
+inline static void _gnutls_handshake_recv_buffer_init(gnutls_session_t session)
 {
 	int i;
 	for (i = 0; i < MAX_HANDSHAKE_MSGS; i++) {
@@ -123,11 +119,10 @@ int _gnutls_parse_record_buffered_msgs(gnutls_session_t session);
 
 ssize_t
 _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
-			gnutls_handshake_description_t htype,
-			unsigned int ms);
+			gnutls_handshake_description_t htype, unsigned int ms);
 
-#define _gnutls_handshake_io_buffer_clear( session) \
+# define _gnutls_handshake_io_buffer_clear( session) \
 	_mbuffer_head_clear( &session->internals.handshake_send_buffer); \
 	_gnutls_handshake_recv_buffer_clear( session);
 
-#endif /* GNUTLS_LIB_BUFFERS_H */
+#endif				/* GNUTLS_LIB_BUFFERS_H */

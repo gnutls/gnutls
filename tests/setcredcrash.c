@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -38,7 +38,8 @@ int main(int argc, char *argv[])
 
 	gnutls_anon_allocate_client_credentials(&c_anoncred);
 	gnutls_init(&client, GNUTLS_CLIENT);
-	gnutls_priority_set_direct(client, "NORMAL:-VERS-ALL:+VERS-TLS1.2", NULL);
+	gnutls_priority_set_direct(client, "NORMAL:-VERS-ALL:+VERS-TLS1.2",
+				   NULL);
 
 	/* Test setting the same credential type twice.  Earlier GnuTLS had
 	   a bug that crashed when this happened. */

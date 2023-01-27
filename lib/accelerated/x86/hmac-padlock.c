@@ -37,13 +37,13 @@
 
 #ifdef HAVE_LIBNETTLE
 
-#define IPAD 0x36
-#define OPAD 0x5c
-#define MAX_SHA_DIGEST_SIZE (512/8)
+# define IPAD 0x36
+# define OPAD 0x5c
+# define MAX_SHA_DIGEST_SIZE (512/8)
 
-typedef void (*update_func) (void *, size_t, const uint8_t *);
-typedef void (*digest_func) (void *, size_t, uint8_t *);
-typedef void (*set_key_func) (void *, size_t, const uint8_t *);
+typedef void (*update_func)(void *, size_t, const uint8_t *);
+typedef void (*digest_func)(void *, size_t, uint8_t *);
+typedef void (*set_key_func)(void *, size_t, const uint8_t *);
 
 struct padlock_hmac_ctx {
 	union {
@@ -200,7 +200,6 @@ _hmac_ctx_init(gnutls_mac_algorithm_t algo, struct padlock_hmac_ctx *ctx)
 	return 0;
 }
 
-
 static int wrap_padlock_hmac_init(gnutls_mac_algorithm_t algo, void **_ctx)
 {
 	struct padlock_hmac_ctx *ctx;
@@ -223,12 +222,11 @@ static int wrap_padlock_hmac_init(gnutls_mac_algorithm_t algo, void **_ctx)
 	return 0;
 }
 
-static void *
-wrap_padlock_hmac_copy(const void *_ctx)
+static void *wrap_padlock_hmac_copy(const void *_ctx)
 {
 	struct padlock_hmac_ctx *new_ctx;
-	const struct padlock_hmac_ctx *ctx=_ctx;
-	ptrdiff_t off = (uint8_t *)ctx->ctx_ptr - (uint8_t *)(&ctx->ctx);
+	const struct padlock_hmac_ctx *ctx = _ctx;
+	ptrdiff_t off = (uint8_t *) ctx->ctx_ptr - (uint8_t *) (&ctx->ctx);
 
 	new_ctx = gnutls_malloc(sizeof(struct padlock_hmac_ctx));
 	if (new_ctx == NULL) {
@@ -237,13 +235,12 @@ wrap_padlock_hmac_copy(const void *_ctx)
 	}
 
 	memcpy(new_ctx, ctx, sizeof(*new_ctx));
-	new_ctx->ctx_ptr = (uint8_t *)&new_ctx->ctx + off;
+	new_ctx->ctx_ptr = (uint8_t *) & new_ctx->ctx + off;
 
 	return new_ctx;
 }
 
-static int
-wrap_padlock_hmac_setkey(void *_ctx, const void *key, size_t keylen)
+static int wrap_padlock_hmac_setkey(void *_ctx, const void *key, size_t keylen)
 {
 	struct padlock_hmac_ctx *ctx = _ctx;
 

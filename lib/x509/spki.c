@@ -40,16 +40,14 @@
  * Since: 3.6.0
  *
  **/
-int
-gnutls_x509_spki_init(gnutls_x509_spki_t *spki)
+int gnutls_x509_spki_init(gnutls_x509_spki_t * spki)
 {
 	gnutls_x509_spki_t tmp;
 
 	*spki = NULL;
 	FAIL_IF_LIB_ERROR;
 
-	tmp =
-	    gnutls_calloc(1, sizeof(gnutls_x509_spki_st));
+	tmp = gnutls_calloc(1, sizeof(gnutls_x509_spki_st));
 
 	if (!tmp)
 		return GNUTLS_E_MEMORY_ERROR;
@@ -68,8 +66,7 @@ gnutls_x509_spki_init(gnutls_x509_spki_t *spki)
  * Since: 3.6.0
  *
  **/
-void
-gnutls_x509_spki_deinit(gnutls_x509_spki_t spki)
+void gnutls_x509_spki_deinit(gnutls_x509_spki_t spki)
 {
 	gnutls_free(spki);
 }
@@ -113,7 +110,7 @@ gnutls_x509_spki_set_rsa_pss_params(gnutls_x509_spki_t spki,
  **/
 int
 gnutls_x509_spki_get_rsa_pss_params(gnutls_x509_spki_t spki,
-				    gnutls_digest_algorithm_t *dig,
+				    gnutls_digest_algorithm_t * dig,
 				    unsigned int *salt_size)
 {
 	if (spki->pk == 0)

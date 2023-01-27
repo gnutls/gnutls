@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -65,12 +65,13 @@ cert_callback(gnutls_session_t session,
 		fail("cert_callback: found only %d RDNs\n", nreqs);
 	}
 
-	for (i = 0;i < TOTAL_CAS;i++) {
+	for (i = 0; i < TOTAL_CAS; i++) {
 		if (req_ca_rdn[i].size != ca_dn[i].size) {
 			fail("CA[%d] size mismatch\n", i);
 		}
 
-		if (memcmp(req_ca_rdn[i].data, ca_dn[i].data, ca_dn[i].size) != 0) {
+		if (memcmp(req_ca_rdn[i].data, ca_dn[i].data, ca_dn[i].size) !=
+		    0) {
 			fail("CA[%d] data mismatch\n", i);
 		}
 	}
@@ -107,15 +108,18 @@ static void start(const char *prio)
 	/* Init server */
 	gnutls_certificate_allocate_credentials(&serverx509cred);
 
-	assert(gnutls_certificate_set_x509_key_mem(serverx509cred, &server_cert, &server_key, GNUTLS_X509_FMT_PEM) >= 0);
+	assert(gnutls_certificate_set_x509_key_mem
+	       (serverx509cred, &server_cert, &server_key,
+		GNUTLS_X509_FMT_PEM) >= 0);
 
-	assert(gnutls_certificate_set_x509_trust_mem(serverx509cred, CA1_PTR, GNUTLS_X509_FMT_PEM) >= 0);
-	assert(gnutls_certificate_set_x509_trust_mem(serverx509cred, CA2_PTR, GNUTLS_X509_FMT_PEM) >= 0);
+	assert(gnutls_certificate_set_x509_trust_mem
+	       (serverx509cred, CA1_PTR, GNUTLS_X509_FMT_PEM) >= 0);
+	assert(gnutls_certificate_set_x509_trust_mem
+	       (serverx509cred, CA2_PTR, GNUTLS_X509_FMT_PEM) >= 0);
 
 	gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, serverx509cred);
-	assert(gnutls_priority_set_direct(server,
-				   prio, NULL) >= 0);
+	assert(gnutls_priority_set_direct(server, prio, NULL) >= 0);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
@@ -145,7 +149,7 @@ static void start(const char *prio)
 	if (ret < 0)
 		exit(1);
 
-	assert(gnutls_priority_set_direct(client, prio, NULL)>=0);
+	assert(gnutls_priority_set_direct(client, prio, NULL) >= 0);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
@@ -166,11 +170,11 @@ static void start(const char *prio)
 	reset_buffers();
 }
 
-static void find_dn(const gnutls_datum_t *cert, gnutls_datum_t *dn)
+static void find_dn(const gnutls_datum_t * cert, gnutls_datum_t * dn)
 {
 	gnutls_x509_crt_t crt;
 
-	assert(gnutls_x509_crt_init(&crt)>=0);
+	assert(gnutls_x509_crt_init(&crt) >= 0);
 	assert(gnutls_x509_crt_import(crt, cert, GNUTLS_X509_FMT_PEM) >= 0);
 	assert(gnutls_x509_crt_get_raw_dn(crt, dn) >= 0);
 	gnutls_x509_crt_deinit(crt);
