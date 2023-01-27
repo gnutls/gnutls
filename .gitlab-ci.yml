@@ -172,8 +172,10 @@ commit-check:
   cache: {}
   script:
     # we want $ALPINE_BASE_BUILD without git, so we are adding it here
-    - apk add git bash
+    - apk add git bash grep indent
     - devel/check_if_signed
+    - devel/indent-gnutls
+    - git diff --exit-code # nothing should change version controlled files
   retry: 0
 
 doc-dist.Fedora:
