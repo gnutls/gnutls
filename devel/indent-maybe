@@ -1,0 +1,52 @@
+#!/bin/sh
+
+# NAME
+#   indent-maybe(3)
+#
+# SYNOPSIS
+#   indent-maybe [options] [single-input-file]
+#
+# DESCRIPTION
+#   Run 'indent' on a file in an idempotent fashion, showing any
+#   modifications performed using diff(3).
+#
+#   There are two concerns with using 'indent' directly that this
+#   script solves:
+#
+#     1) 'indent' modifies files even when no modifications are
+#        necessary, which causes churn to rebuild dependent files, and
+#        it is thus not safe to run 'indent' frequently even for a
+#        file that needs no re-indentation.
+#
+#     2) Running 'indent' on a file once is not guaranteed to return
+#        output that will look the same as running 'indent' on the file
+#        again.  However, running 'indent' twice has this property.
+#
+#   Only GNU indent is supported.
+#
+# ENVIRONMENT
+#   The behaviour of 'indent-maybe' is affected by the INDENT variable which
+#   can be used to override the 'indent' tool that is used.  It may also
+#   include command line parameters, since it is expanded before use.
+#
+# EXAMPLES
+#   indent-maybe lib/kx.h
+#   INDENT="indent -ppi1 -linux" indent-maybe lib/kx.h
+#
+# COPYRIGHT
+#   Copyright (c) 2022 Simon Josefsson
+#   License: GPLv3+ <http://gnu.org/licenses/gpl.html>
+
+: ${INDENT=indent}
+ME="$0"
+
+if ! $INDENT --version 2> /dev/null | grep 'GNU indent' > /dev/null; then
+    echo 1>&2 "$ME: GNU indent is missing, consider INDENT=..."
+    exit 77
+fi
+
+for f in "$@"; do
+    $INDENT -st "$f" | $INDENT -st - | diff -u "$f" - || ($INDENT "$f" && $INDENT "$f")
+done
+
+exit $?
