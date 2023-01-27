@@ -1,5 +1,6 @@
 # List of source files which contain translatable strings.
 lib/alert.c
+lib/cert-cred.c
 lib/errors.c
 lib/x509/ocsp.c
 lib/x509/ocsp_output.c
