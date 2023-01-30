@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -50,8 +50,7 @@ static void try(void)
 	gnutls_certificate_credentials_t serverx509cred;
 	gnutls_certificate_credentials_t serverx509cred2;
 	gnutls_dh_params_t dh_params;
-	const gnutls_datum_t p3 =
-	    { (unsigned char *) pkcs3, strlen(pkcs3) };
+	const gnutls_datum_t p3 = { (unsigned char *)pkcs3, strlen(pkcs3) };
 	gnutls_session_t server;
 	int sret = GNUTLS_E_AGAIN;
 	/* Client stuff. */
@@ -79,12 +78,10 @@ static void try(void)
 	gnutls_certificate_set_dh_params(serverx509cred, dh_params);
 
 	gnutls_init(&server, GNUTLS_SERVER);
-	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-				serverx509cred);
+	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, serverx509cred);
 
 	gnutls_priority_set_direct(server,
-				   "NORMAL:-VERS-ALL:+VERS-TLS1.2",
-				   NULL);
+				   "NORMAL:-VERS-ALL:+VERS-TLS1.2", NULL);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
@@ -95,20 +92,25 @@ static void try(void)
 	if (ret < 0)
 		exit(1);
 
-	ret = gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca_cert, GNUTLS_X509_FMT_PEM);
+	ret =
+	    gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca_cert,
+						  GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);
 
-	ret = gnutls_init(&client, GNUTLS_CLIENT|GNUTLS_ALLOW_ID_CHANGE);
+	ret = gnutls_init(&client, GNUTLS_CLIENT | GNUTLS_ALLOW_ID_CHANGE);
 	if (ret < 0)
 		exit(1);
 
 	ret = gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-				clientx509cred);
+				     clientx509cred);
 	if (ret < 0)
 		exit(1);
 
-	ret = gnutls_priority_set_direct(client, "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+RSA", NULL);
+	ret =
+	    gnutls_priority_set_direct(client,
+				       "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+RSA",
+				       NULL);
 	if (ret < 0)
 		exit(1);
 
@@ -124,8 +126,7 @@ static void try(void)
 	}
 
 	/* switch server's certificate and rehandshake */
-	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-				serverx509cred2);
+	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, serverx509cred2);
 
 	HANDSHAKE(client, server);
 

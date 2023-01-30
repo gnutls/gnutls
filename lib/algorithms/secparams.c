@@ -48,7 +48,7 @@ static const gnutls_sec_params_entry sec_params[] = {
 	{"Medium", GNUTLS_SEC_PARAM_MEDIUM, 112, 2048, 2048, 224, 224},
 	{"High", GNUTLS_SEC_PARAM_HIGH, 128, 3072, 3072, 256, 256},
 #else
-	{"Low", GNUTLS_SEC_PARAM_LOW, 80, 1024, 1024, 160, 160}, /* ENISA-LEGACY */
+	{"Low", GNUTLS_SEC_PARAM_LOW, 80, 1024, 1024, 160, 160},	/* ENISA-LEGACY */
 	{"Legacy", GNUTLS_SEC_PARAM_LEGACY, 96, 1776, 2048, 192, 192},
 	{"Medium", GNUTLS_SEC_PARAM_MEDIUM, 112, 2048, 2048, 256, 224},
 	{"High", GNUTLS_SEC_PARAM_HIGH, 128, 3072, 3072, 256, 256},
@@ -57,10 +57,6 @@ static const gnutls_sec_params_entry sec_params[] = {
 	{"Future", GNUTLS_SEC_PARAM_FUTURE, 256, 15360, 15360, 512, 512},
 	{NULL, 0, 0, 0, 0, 0}
 };
-
-#define GNUTLS_SEC_PARAM_LOOP(b) \
-	{ const gnutls_sec_params_entry *p; \
-		for(p = sec_params; p->name != NULL; p++) { b ; } }
 
 /**
  * gnutls_sec_param_to_pk_bits:
@@ -82,19 +78,21 @@ gnutls_sec_param_to_pk_bits(gnutls_pk_algorithm_t algo,
 			    gnutls_sec_param_t param)
 {
 	unsigned int ret = 0;
+	const gnutls_sec_params_entry *p;
 
 	/* handle DSA differently */
-	GNUTLS_SEC_PARAM_LOOP(
-	if (p->sec_param == param) {
-		if (algo == GNUTLS_PK_DSA)
-			ret = p->dsa_bits;
-		else if (IS_EC(algo)||IS_GOSTEC(algo))
-			ret = p->ecc_bits;
-		else
-			ret = p->pk_bits;
-		break;
+	for (p = sec_params; p->name; p++) {
+		if (p->sec_param == param) {
+			if (algo == GNUTLS_PK_DSA)
+				ret = p->dsa_bits;
+			else if (IS_EC(algo) || IS_GOSTEC(algo))
+				ret = p->ecc_bits;
+			else
+				ret = p->pk_bits;
+			break;
+		}
 	}
-	);
+
 	return ret;
 }
 
@@ -110,17 +108,19 @@ gnutls_sec_param_to_pk_bits(gnutls_pk_algorithm_t algo,
  *
  * Since: 3.3.0
  **/
-unsigned int
-gnutls_sec_param_to_symmetric_bits(gnutls_sec_param_t param)
+unsigned int gnutls_sec_param_to_symmetric_bits(gnutls_sec_param_t param)
 {
 	unsigned int ret = 0;
+	const gnutls_sec_params_entry *p;
 
 	/* handle DSA differently */
-	GNUTLS_SEC_PARAM_LOOP(
-	if (p->sec_param == param) {
-		ret = p->bits; break;
+	for (p = sec_params; p->name; p++) {
+		if (p->sec_param == param) {
+			ret = p->bits;
+			break;
+		}
 	}
-	);
+
 	return ret;
 }
 
@@ -130,12 +130,14 @@ gnutls_sec_param_to_symmetric_bits(gnutls_sec_param_t param)
 unsigned int _gnutls_pk_bits_to_subgroup_bits(unsigned int pk_bits)
 {
 	unsigned int ret = 0;
+	const gnutls_sec_params_entry *p;
 
-	GNUTLS_SEC_PARAM_LOOP(
+	for (p = sec_params; p->name; p++) {
 		ret = p->subgroup_bits;
 		if (p->pk_bits >= pk_bits)
 			break;
-	);
+	}
+
 	return ret;
 }
 
@@ -144,7 +146,9 @@ unsigned int _gnutls_pk_bits_to_subgroup_bits(unsigned int pk_bits)
  */
 gnutls_digest_algorithm_t _gnutls_pk_bits_to_sha_hash(unsigned int pk_bits)
 {
-	GNUTLS_SEC_PARAM_LOOP(
+	const gnutls_sec_params_entry *p;
+
+	for (p = sec_params; p->name; p++) {
 		if (p->pk_bits >= pk_bits) {
 			if (p->bits <= 128)
 				return GNUTLS_DIG_SHA256;
@@ -153,7 +157,8 @@ gnutls_digest_algorithm_t _gnutls_pk_bits_to_sha_hash(unsigned int pk_bits)
 			else
 				return GNUTLS_DIG_SHA512;
 		}
-	);
+	}
+
 	return GNUTLS_DIG_SHA256;
 }
 
@@ -171,13 +176,14 @@ gnutls_digest_algorithm_t _gnutls_pk_bits_to_sha_hash(unsigned int pk_bits)
 const char *gnutls_sec_param_get_name(gnutls_sec_param_t param)
 {
 	const char *ret = "Unknown";
+	const gnutls_sec_params_entry *p;
 
-	GNUTLS_SEC_PARAM_LOOP(
+	for (p = sec_params; p->name; p++) {
 		if (p->sec_param == param) {
 			ret = p->name;
 			break;
 		}
-	);
+	}
 
 	return ret;
 }
@@ -199,24 +205,23 @@ gnutls_sec_param_t
 gnutls_pk_bits_to_sec_param(gnutls_pk_algorithm_t algo, unsigned int bits)
 {
 	gnutls_sec_param_t ret = GNUTLS_SEC_PARAM_INSECURE;
+	const gnutls_sec_params_entry *p;
 
 	if (bits == 0)
 		return GNUTLS_SEC_PARAM_UNKNOWN;
 
-	if (IS_EC(algo)||IS_GOSTEC(algo)) {
-		GNUTLS_SEC_PARAM_LOOP(
-			if (p->ecc_bits > bits) {
+	if (IS_EC(algo) || IS_GOSTEC(algo)) {
+		for (p = sec_params; p->name; p++) {
+			if (p->ecc_bits > bits)
 				break;
-			}
 			ret = p->sec_param;
-		);
+		}
 	} else {
-		GNUTLS_SEC_PARAM_LOOP(
-			if (p->pk_bits > bits) {
-			      break;
-			}
+		for (p = sec_params; p->name; p++) {
+			if (p->pk_bits > bits)
+				break;
 			ret = p->sec_param;
-		);
+		}
 	}
 
 	return ret;

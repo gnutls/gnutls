@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,17 +35,17 @@ int main(void)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/dtls.h>
+# include <string.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/dtls.h>
 
-#include "utils.h"
+# include "utils.h"
 
 static void terminate(void);
 
@@ -65,13 +65,12 @@ static void client_log_func(int level, const char *str)
 /* A very basic TLS client, with anonymous authentication.
  */
 
-#define MAX_BUF 1024
-#define MSG "Hello TLS"
+# define MAX_BUF 1024
+# define MSG "Hello TLS"
 
-static ssize_t
-push(gnutls_transport_ptr_t tr, const void *data, size_t len)
+static ssize_t push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 {
-	int fd = (long int) tr;
+	int fd = (long int)tr;
 
 	return send(fd, data, len, 0);
 }
@@ -149,14 +148,12 @@ static void client(int fd, int server_init)
 	} else {
 		do {
 			ret = gnutls_record_recv(session, buffer, MAX_BUF);
-		} while (ret == GNUTLS_E_AGAIN
-			 || ret == GNUTLS_E_INTERRUPTED);
+		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 	}
 
 	if (ret == 0) {
 		if (debug)
-			success
-			    ("client: Peer has closed the TLS connection\n");
+			success("client: Peer has closed the TLS connection\n");
 		goto end;
 	} else if (ret < 0) {
 		if (server_init && ret == GNUTLS_E_REHANDSHAKE) {
@@ -180,7 +177,7 @@ static void client(int fd, int server_init)
 	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
-      end:
+ end:
 
 	close(fd);
 
@@ -191,10 +188,8 @@ static void client(int fd, int server_init)
 	gnutls_global_deinit();
 }
 
-
 /* These are global */
 pid_t child;
-
 
 static void terminate(void)
 {
@@ -264,8 +259,7 @@ static void server(int fd, int server_init)
 			success("server: Sending dummy packet\n");
 		ret = gnutls_rehandshake(session);
 		if (ret < 0) {
-			fail("gnutls_rehandshake: %s\n",
-			     gnutls_strerror(ret));
+			fail("gnutls_rehandshake: %s\n", gnutls_strerror(ret));
 			terminate();
 		}
 
@@ -288,8 +282,7 @@ static void server(int fd, int server_init)
 
 		do {
 			ret = gnutls_record_recv(session, buffer, MAX_BUF);
-		} while (ret == GNUTLS_E_AGAIN
-			 || ret == GNUTLS_E_INTERRUPTED);
+		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 		if (ret == 0) {
 			if (debug)
@@ -305,7 +298,7 @@ static void server(int fd, int server_init)
 					ret = gnutls_handshake(session);
 				}
 				while (ret < 0
-					&& gnutls_error_is_fatal(ret) == 0);
+				       && gnutls_error_is_fatal(ret) == 0);
 				if (ret == 0)
 					break;
 			}
@@ -318,12 +311,11 @@ static void server(int fd, int server_init)
 			do {
 				ret =
 				    gnutls_record_send(session, buffer,
-							strlen(buffer));
+						       strlen(buffer));
 			} while (ret == GNUTLS_E_AGAIN
 				 || ret == GNUTLS_E_INTERRUPTED);
 		}
 	}
-
 
 	/* do not wait for the peer to close the connection.
 	 */

@@ -22,7 +22,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -76,7 +76,7 @@ const gnutls_datum_t sha1_invalid_hash_data = {
 };
 
 const gnutls_datum_t raw_data = {
-	(void *) "hello",
+	(void *)"hello",
 	5
 };
 
@@ -108,7 +108,8 @@ void doit(void)
 		if (tests[i].pk == GNUTLS_PK_EDDSA_ED25519)
 			continue;
 
-		success("testing: %s - %s\n", tests[i].name, gnutls_sign_algorithm_get_name(tests[i].sigalgo));
+		success("testing: %s - %s\n", tests[i].name,
+			gnutls_sign_algorithm_get_name(tests[i].sigalgo));
 
 		if (tests[i].digest == GNUTLS_DIG_SHA1) {
 			hash_data = &sha1_hash_data;
@@ -124,7 +125,7 @@ void doit(void)
 
 		ret =
 		    gnutls_x509_privkey_import(key, &tests[i].key,
-						GNUTLS_X509_FMT_PEM);
+					       GNUTLS_X509_FMT_PEM);
 		if (ret < 0)
 			testfail("gnutls_x509_privkey_import\n");
 
@@ -165,50 +166,58 @@ void doit(void)
 			testfail("gnutls_x509_pubkey_import\n");
 
 		ret =
-		    gnutls_pubkey_verify_hash2(pubkey, tests[i].sigalgo, GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1, hash_data,
-					      &signature);
+		    gnutls_pubkey_verify_hash2(pubkey, tests[i].sigalgo,
+					       GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1,
+					       hash_data, &signature);
 		if (ret < 0)
 			testfail("gnutls_x509_pubkey_verify_hash2\n");
 
 		/* Test functionality of GNUTLS_VERIFY_DISABLE_CA_SIGN (see issue #754) */
 		ret =
-		    gnutls_pubkey_verify_hash2(pubkey, tests[i].sigalgo, GNUTLS_VERIFY_DISABLE_CA_SIGN, hash_data,
-					      &signature);
+		    gnutls_pubkey_verify_hash2(pubkey, tests[i].sigalgo,
+					       GNUTLS_VERIFY_DISABLE_CA_SIGN,
+					       hash_data, &signature);
 		if (ret < 0)
-			testfail("gnutls_x509_pubkey_verify_hash2 with GNUTLS_VERIFY_DISABLE_CA_SIGN\n");
+			testfail
+			    ("gnutls_x509_pubkey_verify_hash2 with GNUTLS_VERIFY_DISABLE_CA_SIGN\n");
 
 		ret =
-		    gnutls_pubkey_verify_hash2(pubkey, tests[i].sigalgo, GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1, hash_data,
-					      &signature2);
+		    gnutls_pubkey_verify_hash2(pubkey, tests[i].sigalgo,
+					       GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1,
+					       hash_data, &signature2);
 		if (ret < 0)
-			testfail("gnutls_x509_pubkey_verify_hash-1 (hashed data)\n");
+			testfail
+			    ("gnutls_x509_pubkey_verify_hash-1 (hashed data)\n");
 
 		/* should fail */
 		ret =
 		    gnutls_pubkey_verify_hash2(pubkey, tests[i].sigalgo,
 					       GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1,
-					       invalid_hash_data,
-					       &signature2);
+					       invalid_hash_data, &signature2);
 		if (ret != GNUTLS_E_PK_SIG_VERIFY_FAILED)
-			testfail("gnutls_x509_pubkey_verify_hash-2 (hashed data)\n");
+			testfail
+			    ("gnutls_x509_pubkey_verify_hash-2 (hashed data)\n");
 
 		sign_algo =
 		    gnutls_pk_to_sign(gnutls_pubkey_get_pk_algorithm
 				      (pubkey, NULL), tests[i].digest);
 
 		ret =
-		    gnutls_pubkey_verify_hash2(pubkey, sign_algo, GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1,
-						hash_data, &signature2);
+		    gnutls_pubkey_verify_hash2(pubkey, sign_algo,
+					       GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1,
+					       hash_data, &signature2);
 		if (ret < 0)
-			testfail("gnutls_x509_pubkey_verify_hash2-1 (hashed data)\n");
+			testfail
+			    ("gnutls_x509_pubkey_verify_hash2-1 (hashed data)\n");
 
 		/* should fail */
 		ret =
-		    gnutls_pubkey_verify_hash2(pubkey, sign_algo, GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1,
-						invalid_hash_data,
-						&signature2);
+		    gnutls_pubkey_verify_hash2(pubkey, sign_algo,
+					       GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1,
+					       invalid_hash_data, &signature2);
 		if (ret != GNUTLS_E_PK_SIG_VERIFY_FAILED)
-			testfail("gnutls_x509_pubkey_verify_hash2-2 (hashed data)\n");
+			testfail
+			    ("gnutls_x509_pubkey_verify_hash2-2 (hashed data)\n");
 
 		/* test the raw interface */
 		gnutls_free(signature.data);
@@ -219,38 +228,36 @@ void doit(void)
 
 			ret =
 			    gnutls_privkey_sign_hash2(privkey,
-						     tests[i].sigalgo,
-						     GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA,
-						     hash_data,
-						     &signature);
+						      tests[i].sigalgo,
+						      GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA,
+						      hash_data, &signature);
 			if (ret < 0)
 				testfail("gnutls_privkey_sign_hash: %s\n",
-				     gnutls_strerror(ret));
+					 gnutls_strerror(ret));
 
 			ret =
 			    gnutls_pubkey_verify_hash2(pubkey, tests[i].sigalgo,
-							GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA,
-							hash_data,
-							&signature);
+						       GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA,
+						       hash_data, &signature);
 			if (ret < 0)
-				testfail("gnutls_pubkey_verify_hash-3 (raw hashed data)\n");
+				testfail
+				    ("gnutls_pubkey_verify_hash-3 (raw hashed data)\n");
 			gnutls_free(signature.data);
 			/* test the legacy API */
 			ret =
 			    gnutls_privkey_sign_raw_data(privkey, 0,
-							 hash_data,
-							 &signature);
+							 hash_data, &signature);
 			if (ret < 0)
 				testfail("gnutls_privkey_sign_raw_data: %s\n",
-				     gnutls_strerror(ret));
+					 gnutls_strerror(ret));
 
 			ret =
 			    gnutls_pubkey_verify_hash2(pubkey, sign_algo,
-							GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA,
-							hash_data,
-							&signature);
+						       GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA,
+						       hash_data, &signature);
 			if (ret < 0)
-				testfail("gnutls_pubkey_verify_hash-4 (legacy raw hashed data)\n");
+				testfail
+				    ("gnutls_pubkey_verify_hash-4 (legacy raw hashed data)\n");
 		}
 		gnutls_free(signature.data);
 		gnutls_free(signature2.data);

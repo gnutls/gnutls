@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+# include "config.h"
 #endif
 
 #include <stdio.h>
@@ -63,7 +63,7 @@ static char pem[] =
 void doit(void)
 {
 	int ret;
-	gnutls_datum_t derCert = { (void *) pem, sizeof(pem) };
+	gnutls_datum_t derCert = { (void *)pem, sizeof(pem) };
 	gnutls_x509_crt_t cert;
 	size_t data_len = MAX_DATA_SIZE;
 	char data[MAX_DATA_SIZE];
@@ -97,7 +97,8 @@ void doit(void)
 		// TODO: print out / check results
 		if (GNUTLS_SAN_URI == ret) {
 			if (strcmp(data, "http://ca.su.se") != 0) {
-				fail("unexpected issuer GNUTLS_SAN_URI: %s\n", data);
+				fail("unexpected issuer GNUTLS_SAN_URI: %s\n",
+				     data);
 			}
 		} else if (GNUTLS_SAN_RFC822NAME == ret) {
 			if (strcmp(data, "ca@su.se") != 0) {
@@ -110,8 +111,7 @@ void doit(void)
 	}
 
 	if (alt_name_count != 2) {
-		fail("unexpected number of alt names: %i\n",
-		     alt_name_count);
+		fail("unexpected number of alt names: %i\n", alt_name_count);
 	}
 
 	if (debug)

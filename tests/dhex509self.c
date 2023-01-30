@@ -23,7 +23,7 @@
 /* Parts copied from GnuTLS example programs. */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -40,19 +40,19 @@ int main(int argc, char **argv)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#if !defined(_WIN32)
-#include <sys/wait.h>
-#endif
-#include <unistd.h>
-#include <gnutls/gnutls.h>
+# include <string.h>
+# include <sys/types.h>
+# include <sys/socket.h>
+# if !defined(_WIN32)
+#  include <sys/wait.h>
+# endif
+# include <unistd.h>
+# include <gnutls/gnutls.h>
 
-#include "utils.h"
+# include "utils.h"
 
-#include "ex-session-info.c"
-#include "ex-x509-info.c"
+# include "ex-session-info.c"
+# include "ex-x509-info.c"
 
 pid_t child;
 
@@ -65,10 +65,8 @@ static void tls_log_func(int level, const char *str)
 /* A very basic TLS client, with anonymous authentication.
  */
 
-
-#define MAX_BUF 1024
-#define MSG "Hello TLS"
-
+# define MAX_BUF 1024
+# define MSG "Hello TLS"
 
 static void client(int sd)
 {
@@ -98,7 +96,9 @@ static void client(int sd)
 	gnutls_init(&session, GNUTLS_CLIENT);
 
 	/* Use default priorities */
-	gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+DHE-RSA", NULL);
+	gnutls_priority_set_direct(session,
+				   "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+DHE-RSA",
+				   NULL);
 
 	/* put the x509 credentials to the current session
 	 */
@@ -129,9 +129,12 @@ static void client(int sd)
 
 	print_dh_params_info(session);
 
-	ret = gnutls_credentials_get(session, GNUTLS_CRD_CERTIFICATE, (void**)&tst_cred);
+	ret =
+	    gnutls_credentials_get(session, GNUTLS_CRD_CERTIFICATE,
+				   (void **)&tst_cred);
 	if (ret < 0) {
-		fail("client: gnutls_credentials_get failed: %s\n", gnutls_strerror(ret));
+		fail("client: gnutls_credentials_get failed: %s\n",
+		     gnutls_strerror(ret));
 	}
 	if (tst_cred != xcred) {
 		fail("client: gnutls_credentials_get returned invalid value\n");
@@ -169,8 +172,7 @@ static void client(int sd)
 
 	if (ret == 0) {
 		if (debug)
-			success
-			    ("client: Peer has closed the TLS connection\n");
+			success("client: Peer has closed the TLS connection\n");
 		goto end;
 	} else if (ret < 0) {
 		fail("client: Error: %s\n", gnutls_strerror(ret));
@@ -187,7 +189,7 @@ static void client(int sd)
 
 	gnutls_bye(session, GNUTLS_SHUT_RDWR);
 
-      end:
+ end:
 
 	close(sd);
 
@@ -201,8 +203,8 @@ static void client(int sd)
 /* This is a sample TLS 1.0 echo server, using X.509 authentication.
  */
 
-#define MAX_BUF 1024
-#define DH_BITS 1024
+# define MAX_BUF 1024
+# define DH_BITS 1024
 
 /* These are global */
 gnutls_certificate_credentials_t x509_cred;
@@ -216,7 +218,9 @@ static gnutls_session_t initialize_tls_session(void)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+DHE-RSA", NULL);
+	gnutls_priority_set_direct(session,
+				   "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+DHE-RSA",
+				   NULL);
 	gnutls_handshake_set_timeout(session, get_timeout());
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
@@ -235,7 +239,7 @@ static gnutls_dh_params_t dh_params;
 
 static int generate_dh_params(void)
 {
-	const gnutls_datum_t p3 = { (void *) pkcs3, strlen(pkcs3) };
+	const gnutls_datum_t p3 = { (void *)pkcs3, strlen(pkcs3) };
 	gnutls_dh_params_init(&dh_params);
 	return gnutls_dh_params_import_pkcs3(dh_params, &p3,
 					     GNUTLS_X509_FMT_PEM);
@@ -247,12 +251,11 @@ gnutls_session_t session;
 char buffer[MAX_BUF + 1];
 int optval = 1;
 
-
 static void server(int sd)
 {
 	/* this must be called once in the program
 	 */
-	
+
 	global_init();
 
 	gnutls_global_set_log_function(tls_log_func);
@@ -338,8 +341,7 @@ static void server(int sd)
 
 			/* echo data back to the client
 			 */
-			gnutls_record_send(session, buffer,
-					   strlen(buffer));
+			gnutls_record_send(session, buffer, strlen(buffer));
 		}
 	}
 
@@ -359,7 +361,6 @@ static void server(int sd)
 	if (debug)
 		success("server: finished\n");
 }
-
 
 void doit(void)
 {

@@ -56,14 +56,12 @@ void _dtls_async_timer_delete(gnutls_session_t session)
  * be reused (should be set to NULL initially).
  */
 static inline int
-transmit_message(gnutls_session_t session,
-		 mbuffer_st * bufel, uint8_t ** buf)
+transmit_message(gnutls_session_t session, mbuffer_st * bufel, uint8_t ** buf)
 {
 	uint8_t *data, *mtu_data;
 	int ret = 0;
 	unsigned int offset, frag_len, data_size;
-	unsigned int mtu =
-	    gnutls_dtls_get_data_mtu(session);
+	unsigned int mtu = gnutls_dtls_get_data_mtu(session);
 
 	if (session->security_parameters.max_record_send_size < mtu)
 		mtu = session->security_parameters.max_record_send_size;
@@ -164,7 +162,6 @@ static int drop_usage_count(gnutls_session_t session,
 	return 0;
 }
 
-
 /* Checks whether the received packet contains a handshake
  * packet with sequence higher that the previously received.
  * It must be called only when an actual packet has been
@@ -190,19 +187,15 @@ static int is_next_hpacket_expected(gnutls_session_t session)
 	if (session->internals.handshake_recv_buffer_size > 0)
 		return 0;
 	else
-		return
-		    gnutls_assert_val
-		    (GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET);
+		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET);
 }
 
 void _dtls_reset_hsk_state(gnutls_session_t session)
 {
 	session->internals.dtls.flight_init = 0;
-	drop_usage_count(session,
-			 &session->internals.handshake_send_buffer);
+	drop_usage_count(session, &session->internals.handshake_send_buffer);
 	_mbuffer_head_clear(&session->internals.handshake_send_buffer);
 }
-
 
 #define UPDATE_TIMER { \
       session->internals.dtls.actual_retrans_timeout_ms *= 2; \
@@ -258,17 +251,15 @@ int _dtls_transmit(gnutls_session_t session)
 				 */
 				if (timespec_sub_ms
 				    (&now,
-				     &session->internals.dtls.
-				     last_retransmit) < TIMER_WINDOW) {
+				     &session->internals.dtls.last_retransmit) <
+				    TIMER_WINDOW) {
 					gnutls_assert();
 					goto nb_timeout;
 				}
 			} else {	/* received something */
 
 				if (ret == 0) {
-					ret =
-					    is_next_hpacket_expected
-					    (session);
+					ret = is_next_hpacket_expected(session);
 					if (ret == GNUTLS_E_AGAIN
 					    || ret == GNUTLS_E_INTERRUPTED)
 						goto nb_timeout;
@@ -302,8 +293,7 @@ int _dtls_transmit(gnutls_session_t session)
 
 		diff =
 		    timespec_sub_ms(&now,
-				    &session->internals.dtls.
-				    last_retransmit);
+				    &session->internals.dtls.last_retransmit);
 		if (session->internals.dtls.flight_init == 0
 		    || diff >= TIMER_WINDOW) {
 			_gnutls_dtls_log
@@ -321,7 +311,8 @@ int _dtls_transmit(gnutls_session_t session)
 
 				last_type = cur->htype;
 			}
-			gnutls_gettime(&session->internals.dtls.last_retransmit);
+			gnutls_gettime(&session->internals.
+				       dtls.last_retransmit);
 
 			if (session->internals.dtls.flight_init == 0) {
 				session->internals.dtls.flight_init = 1;
@@ -333,11 +324,9 @@ int _dtls_transmit(gnutls_session_t session)
 					 * from here. _dtls_wait_and_retransmit() is being called
 					 * by handshake.
 					 */
-					session->internals.dtls.
-					    last_flight = 1;
+					session->internals.dtls.last_flight = 1;
 				} else
-					session->internals.dtls.
-					    last_flight = 0;
+					session->internals.dtls.last_flight = 0;
 			} else {
 				UPDATE_TIMER;
 			}
@@ -361,9 +350,7 @@ int _dtls_transmit(gnutls_session_t session)
 		} else {	/* all other messages -> implicit ack (receive of next flight) */
 
 			if (!(session->internals.flags & GNUTLS_NONBLOCK))
-				ret =
-				    _gnutls_io_check_recv(session,
-							  timeout);
+				ret = _gnutls_io_check_recv(session, timeout);
 			else {
 				ret = _gnutls_io_check_recv(session, 0);
 				if (ret == GNUTLS_E_TIMEDOUT) {
@@ -377,8 +364,7 @@ int _dtls_transmit(gnutls_session_t session)
 				    || ret == GNUTLS_E_INTERRUPTED)
 					goto nb_timeout;
 
-				if (ret ==
-				    GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET) {
+				if (ret == GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET) {
 					ret = GNUTLS_E_TIMEDOUT;
 					goto keep_up;
 				}
@@ -390,7 +376,7 @@ int _dtls_transmit(gnutls_session_t session)
 			}
 		}
 
-	      keep_up:
+ keep_up:
 		gnutls_gettime(&now);
 	} while (ret == GNUTLS_E_TIMEDOUT);
 
@@ -401,19 +387,18 @@ int _dtls_transmit(gnutls_session_t session)
 
 	ret = 0;
 
-      end_flight:
-	_gnutls_dtls_log("DTLS[%p]: End of flight transmission.\n",
-			 session);
+ end_flight:
+	_gnutls_dtls_log("DTLS[%p]: End of flight transmission.\n", session);
 	_dtls_reset_hsk_state(session);
 
-      cleanup:
+ cleanup:
 	if (buf != NULL)
 		gnutls_free(buf);
 
 	/* SENDING -> WAITING state transition */
 	return ret;
 
-      nb_timeout:
+ nb_timeout:
 	if (buf != NULL)
 		gnutls_free(buf);
 
@@ -496,10 +481,9 @@ void gnutls_dtls_set_mtu(gnutls_session_t session, unsigned int mtu)
 /* when max is non-zero this function will return the maximum
  * overhead that this ciphersuite may introduce, e.g., the maximum
  * amount of padding required */
-unsigned _gnutls_record_overhead(const version_entry_st *ver,
-				 const cipher_entry_st *cipher,
-				 const mac_entry_st *mac,
-				 unsigned max)
+unsigned _gnutls_record_overhead(const version_entry_st * ver,
+				 const cipher_entry_st * cipher,
+				 const mac_entry_st * mac, unsigned max)
 {
 	int total = 0;
 	int ret;
@@ -534,7 +518,7 @@ unsigned _gnutls_record_overhead(const version_entry_st *ver,
 		exp_iv = _gnutls_cipher_get_explicit_iv_size(cipher);
 
 		if (max)
-			total += 2*exp_iv; /* block == iv size */
+			total += 2 * exp_iv;	/* block == iv size */
 		else
 			total += exp_iv + 1;
 	}
@@ -613,7 +597,8 @@ static int record_overhead_rt(gnutls_session_t session)
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	return _gnutls_record_overhead(get_version(session), params->cipher, params->mac, 1);
+	return _gnutls_record_overhead(get_version(session), params->cipher,
+				       params->mac, 1);
 }
 
 /**
@@ -645,8 +630,6 @@ size_t gnutls_record_overhead_size(gnutls_session_t session)
 	return total;
 }
 
-
-
 /**
  * gnutls_dtls_get_data_mtu:
  * @session: is a #gnutls_session_t type.
@@ -674,8 +657,11 @@ unsigned int gnutls_dtls_get_data_mtu(gnutls_session_t session)
 	if (ret < 0)
 		return mtu;
 
-	if (params->cipher->type == CIPHER_AEAD || params->cipher->type == CIPHER_STREAM)
-		return mtu-_gnutls_record_overhead(get_version(session), params->cipher, params->mac, 0);
+	if (params->cipher->type == CIPHER_AEAD
+	    || params->cipher->type == CIPHER_STREAM)
+		return mtu - _gnutls_record_overhead(get_version(session),
+						     params->cipher,
+						     params->mac, 0);
 
 	/* CIPHER_BLOCK: in CBC ciphers guess the data MTU as it depends on residues
 	 */
@@ -687,15 +673,15 @@ unsigned int gnutls_dtls_get_data_mtu(gnutls_session_t session)
 		/* the maximum data mtu satisfies:
 		 * data mtu (mod block) = block-1
 		 * or data mtu = (k+1)*(block) - 1
-	         *
+		 *
 		 * and data mtu + block + hash size + 1 = link_mtu
 		 *     (k+2) * (block) + hash size = link_mtu
 		 *
 		 *     We try to find k, and thus data mtu
 		 */
-		k = ((mtu-hash_size)/block) - 2;
+		k = ((mtu - hash_size) / block) - 2;
 
-		return (k+1)*block - 1;
+		return (k + 1) * block - 1;
 	} else {
 		/* the maximum data mtu satisfies:
 		 * data mtu + hash size (mod block) = block-1
@@ -706,9 +692,9 @@ unsigned int gnutls_dtls_get_data_mtu(gnutls_session_t session)
 		 *
 		 *     We try to find k, and thus data mtu
 		 */
-		k = ((mtu)/block) - 2;
+		k = ((mtu) / block) - 2;
 
-		return (k+1)*block - hash_size - 1;
+		return (k + 1) * block - hash_size - 1;
 	}
 }
 
@@ -791,9 +777,7 @@ unsigned int gnutls_dtls_get_timeout(gnutls_session_t session)
 
 	gnutls_gettime(&now);
 
-	diff =
-	    timespec_sub_ms(&now,
-			    &session->internals.dtls.last_retransmit);
+	diff = timespec_sub_ms(&now, &session->internals.dtls.last_retransmit);
 	if (diff >= TIMER_WINDOW)
 		return 0;
 	else
@@ -969,28 +953,25 @@ int gnutls_dtls_cookie_verify(gnutls_datum_t * key,
 	pos = 34 + DTLS_RECORD_HEADER_SIZE + DTLS_HANDSHAKE_HEADER_SIZE;
 
 	if (msg_size < pos + 1)
-		return
-		    gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
 	sid_size = msg[pos++];
 
 	if (sid_size > 32 || msg_size < pos + sid_size + 1)
-		return
-		    gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
 	pos += sid_size;
 	cookie.size = msg[pos++];
 
 	if (msg_size < pos + cookie.size + 1)
-		return
-		    gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
 	cookie.data = &msg[pos];
 	if (cookie.size != COOKIE_SIZE) {
 		if (cookie.size > 0)
 			_gnutls_audit_log(NULL,
 					  "Received cookie with illegal size %d. Expected %d\n",
-					  (int) cookie.size, COOKIE_SIZE);
+					  (int)cookie.size, COOKIE_SIZE);
 		return gnutls_assert_val(GNUTLS_E_BAD_COOKIE);
 	}
 
@@ -1043,8 +1024,7 @@ void gnutls_dtls_prestate_set(gnutls_session_t session,
 	params->write.sequence_number = prestate->record_seq;
 
 	session->internals.dtls.hsk_read_seq = prestate->hsk_read_seq;
-	session->internals.dtls.hsk_write_seq =
-	    prestate->hsk_write_seq + 1;
+	session->internals.dtls.hsk_write_seq = prestate->hsk_write_seq + 1;
 }
 
 /**

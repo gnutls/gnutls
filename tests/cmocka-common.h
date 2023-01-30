@@ -1,13 +1,13 @@
 #ifndef GNUTLS_TESTS_CMOCKA_COMMON_H
-#define GNUTLS_TESTS_CMOCKA_COMMON_H
+# define GNUTLS_TESTS_CMOCKA_COMMON_H
 
-#include <stdarg.h>
-#include <stddef.h>
-#include <setjmp.h>
-#include <cmocka.h>
-#include <errno.h>
+# include <stdarg.h>
+# include <stddef.h>
+# include <setjmp.h>
+# include <cmocka.h>
+# include <errno.h>
 
-#define USE_CMOCKA
-#include "eagain-common.h"
+# define USE_CMOCKA
+# include "eagain-common.h"
 
-#endif /* GNUTLS_TESTS_CMOCKA_COMMON_H */
+#endif				/* GNUTLS_TESTS_CMOCKA_COMMON_H */

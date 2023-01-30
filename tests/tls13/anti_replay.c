@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <assert.h>
@@ -40,7 +40,8 @@ struct storage_st {
 };
 
 static int
-storage_add(void *ptr, time_t expires, const gnutls_datum_t *key, const gnutls_datum_t *value)
+storage_add(void *ptr, time_t expires, const gnutls_datum_t * key,
+	    const gnutls_datum_t * value)
 {
 	struct storage_st *storage = ptr;
 	gnutls_datum_t *datum;
@@ -48,7 +49,8 @@ storage_add(void *ptr, time_t expires, const gnutls_datum_t *key, const gnutls_d
 
 	for (i = 0; i < storage->num_entries; i++) {
 		if (key->size == storage->entries[i].size &&
-		    memcmp(storage->entries[i].data, key->data, key->size) == 0) {
+		    memcmp(storage->entries[i].data, key->data,
+			   key->size) == 0) {
 			return GNUTLS_E_DB_ENTRY_EXISTS;
 		}
 	}
@@ -71,8 +73,7 @@ storage_add(void *ptr, time_t expires, const gnutls_datum_t *key, const gnutls_d
 	return 0;
 }
 
-static void
-storage_clear(struct storage_st *storage)
+static void storage_clear(struct storage_st *storage)
 {
 	size_t i;
 
@@ -84,7 +85,7 @@ storage_clear(struct storage_st *storage)
 void doit(void)
 {
 	gnutls_anti_replay_t anti_replay;
-	gnutls_datum_t key = { (unsigned char *) "\xFF\xFF\xFF\xFF", 4 };
+	gnutls_datum_t key = { (unsigned char *)"\xFF\xFF\xFF\xFF", 4 };
 	struct timespec creation_time;
 	struct storage_st storage;
 	int ret;
@@ -99,7 +100,8 @@ void doit(void)
 	gnutls_anti_replay_set_add_function(anti_replay, storage_add);
 	gnutls_anti_replay_set_ptr(anti_replay, &storage);
 	mygettime(&creation_time);
-	ret = _gnutls_anti_replay_check(anti_replay, 10000, &creation_time, &key);
+	ret =
+	    _gnutls_anti_replay_check(anti_replay, 10000, &creation_time, &key);
 	if (ret != GNUTLS_E_ILLEGAL_PARAMETER)
 		fail("error is not returned, while server_ticket_age < client_ticket_age\n");
 	gnutls_anti_replay_deinit(anti_replay);
@@ -113,7 +115,8 @@ void doit(void)
 	gnutls_anti_replay_set_window(anti_replay, 10000);
 	mygettime(&creation_time);
 	virt_sec_sleep(30);
-	ret = _gnutls_anti_replay_check(anti_replay, 10000, &creation_time, &key);
+	ret =
+	    _gnutls_anti_replay_check(anti_replay, 10000, &creation_time, &key);
 	if (ret != GNUTLS_E_EARLY_DATA_REJECTED)
 		fail("early data is NOT rejected, while freshness check fails\n");
 	gnutls_anti_replay_deinit(anti_replay);
@@ -127,10 +130,12 @@ void doit(void)
 	gnutls_anti_replay_set_window(anti_replay, 10000);
 	mygettime(&creation_time);
 	virt_sec_sleep(15);
-	ret = _gnutls_anti_replay_check(anti_replay, 10000, &creation_time, &key);
+	ret =
+	    _gnutls_anti_replay_check(anti_replay, 10000, &creation_time, &key);
 	if (ret != 0)
 		fail("early data is rejected, while freshness check succeeds\n");
-	ret = _gnutls_anti_replay_check(anti_replay, 10000, &creation_time, &key);
+	ret =
+	    _gnutls_anti_replay_check(anti_replay, 10000, &creation_time, &key);
 	if (ret != GNUTLS_E_EARLY_DATA_REJECTED)
 		fail("early data is NOT rejected for a duplicate key\n");
 	gnutls_anti_replay_deinit(anti_replay);

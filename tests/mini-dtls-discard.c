@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,26 +35,26 @@ int main(void)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <errno.h>
-#include <signal.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/dtls.h>
-#include <assert.h>
+# include <string.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <errno.h>
+# include <signal.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/dtls.h>
+# include <assert.h>
 
-#include "utils.h"
+# include "utils.h"
 
-#define TXT1 "hello there"
-#define TXT1_SIZE (sizeof(TXT1)-1)
+# define TXT1 "hello there"
+# define TXT1_SIZE (sizeof(TXT1)-1)
 
-#define TXT2 "2hello there"
-#define TXT2_SIZE (sizeof(TXT2)-1)
+# define TXT2 "2hello there"
+# define TXT2_SIZE (sizeof(TXT2)-1)
 
 static void terminate(void);
 
@@ -68,12 +68,11 @@ static void client_log_func(int level, const char *str)
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
 
-#define MAX_BUF 1024
+# define MAX_BUF 1024
 
-static ssize_t
-push(gnutls_transport_ptr_t tr, const void *data, size_t len)
+static ssize_t push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 {
-	int fd = (long int) tr;
+	int fd = (long int)tr;
 	static int counter = 0;
 
 	if (counter % 2 == 0) {
@@ -140,10 +139,11 @@ static void client(int fd, const char *prio)
 	do {
 		ret = gnutls_record_send(session, TXT1, TXT1_SIZE);
 		if (ret == GNUTLS_E_AGAIN) {
-			if (debug) success("discarding\n");
+			if (debug)
+				success("discarding\n");
 			gnutls_record_discard_queued(session);
 		}
-			
+
 	} while (ret == GNUTLS_E_INTERRUPTED);
 
 	do {
@@ -160,7 +160,6 @@ static void client(int fd, const char *prio)
 
 	gnutls_global_deinit();
 }
-
 
 /* These are global */
 pid_t child;
@@ -244,7 +243,6 @@ static void server(int fd, const char *prio)
 		terminate();
 	}
 
-
 	/* do not wait for the peer to close the connection.
 	 */
 	gnutls_bye(session, GNUTLS_SHUT_WR);
@@ -297,8 +295,10 @@ void start(const char *prio)
 
 void doit(void)
 {
-	start("NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL");
-	start("NONE:+VERS-DTLS1.2:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL");
+	start
+	    ("NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL");
+	start
+	    ("NONE:+VERS-DTLS1.2:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL");
 }
 
 #endif				/* _WIN32 */

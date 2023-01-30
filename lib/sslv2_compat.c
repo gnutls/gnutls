@@ -81,7 +81,6 @@ _gnutls_handshake_select_v2_suite(gnutls_session_t session,
 
 }
 
-
 /* Read a v2 client hello. Some browsers still use that beast!
  * However they set their version to 3.0 or 3.1.
  */
@@ -176,8 +175,7 @@ _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 	/* check if the credentials (username, public key etc.) are ok
 	 */
 	if (_gnutls_get_kx_cred
-	    (session,
-	     session->security_parameters.cs->kx_algorithm) == NULL) {
+	    (session, session->security_parameters.cs->kx_algorithm) == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
@@ -188,7 +186,7 @@ _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 	 */
 	session->internals.auth_struct =
 	    _gnutls_kx_auth_struct(session->security_parameters.
-				    cs->kx_algorithm);
+				   cs->kx_algorithm);
 	if (session->internals.auth_struct == NULL) {
 
 		_gnutls_handshake_log
@@ -207,8 +205,7 @@ _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 	DECR_LEN(len, challenge);
 	memset(rnd, 0, GNUTLS_RANDOM_SIZE);
 
-	memcpy(&rnd[GNUTLS_RANDOM_SIZE - challenge], &data[pos],
-	       challenge);
+	memcpy(&rnd[GNUTLS_RANDOM_SIZE - challenge], &data[pos], challenge);
 
 	_gnutls_set_client_random(session, rnd);
 
@@ -219,13 +216,11 @@ _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 
 	session->security_parameters.timestamp = gnutls_time(NULL);
 
-
 	/* RESUME SESSION */
 
 	DECR_LEN(len, session_id_len);
 	ret =
-	    _gnutls_server_restore_session(session, session_id,
-					   session_id_len);
+	    _gnutls_server_restore_session(session, session_id, session_id_len);
 
 	if (ret == 0) {		/* resumed! */
 		/* get the new random values */
@@ -241,9 +236,11 @@ _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 		session->internals.resumed = true;
 		return 0;
 	} else {
-		ret = _gnutls_generate_session_id(
-			session->security_parameters.session_id,
-			&session->security_parameters.session_id_size);
+		ret =
+		    _gnutls_generate_session_id(session->
+						security_parameters.session_id,
+						&session->
+						security_parameters.session_id_size);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 

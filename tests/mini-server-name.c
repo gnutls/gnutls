@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -37,20 +37,20 @@ int main(void)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/dtls.h>
-#include <signal.h>
+# include <string.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/dtls.h>
+# include <signal.h>
 
-#include "utils.h"
+# include "utils.h"
 
-#define MAX_BUF 1024
+# define MAX_BUF 1024
 static void terminate(void);
 
 /* This program tests gnutls_server_name_set() and gnutls_server_name_get().
@@ -71,7 +71,9 @@ int _gnutls_server_name_set_raw(gnutls_session_t session,
 				gnutls_server_name_type_t type,
 				const void *name, size_t name_length);
 
-static void client(const char *test_name, const char *prio, int fd, unsigned raw, const char *name, unsigned name_len, int server_err)
+static void client(const char *test_name, const char *prio, int fd,
+		   unsigned raw, const char *name, unsigned name_len,
+		   int server_err)
 {
 	int ret;
 	gnutls_anon_client_credentials_t anoncred;
@@ -103,9 +105,11 @@ static void client(const char *test_name, const char *prio, int fd, unsigned raw
 
 	gnutls_transport_set_int(session, fd);
 	if (raw)
-		_gnutls_server_name_set_raw(session, GNUTLS_NAME_DNS, name, name_len);
+		_gnutls_server_name_set_raw(session, GNUTLS_NAME_DNS, name,
+					    name_len);
 	else
-		gnutls_server_name_set(session, GNUTLS_NAME_DNS, name, name_len);
+		gnutls_server_name_set(session, GNUTLS_NAME_DNS, name,
+				       name_len);
 
 	/* Perform the TLS handshake
 	 */
@@ -126,8 +130,8 @@ static void client(const char *test_name, const char *prio, int fd, unsigned raw
 
 	if (debug)
 		test_success("TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			     gnutls_protocol_get_name
+			     (gnutls_protocol_get_version(session)));
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
@@ -142,7 +146,6 @@ static void client(const char *test_name, const char *prio, int fd, unsigned raw
 	gnutls_global_deinit();
 }
 
-
 /* These are global */
 pid_t child;
 
@@ -153,7 +156,8 @@ static void terminate(void)
 	exit(1);
 }
 
-static void server(const char *test_name, const char *prio, int fd, const char *name, unsigned name_len, int exp_err)
+static void server(const char *test_name, const char *prio, int fd,
+		   const char *name, unsigned name_len, int exp_err)
 {
 	int ret;
 	char buffer[MAX_BUF + 1];
@@ -175,8 +179,7 @@ static void server(const char *test_name, const char *prio, int fd, const char *
 
 	gnutls_certificate_allocate_credentials(&x509_cred);
 	gnutls_certificate_set_x509_key_mem(x509_cred, &server_cert,
-					    &server_key,
-					    GNUTLS_X509_FMT_PEM);
+					    &server_key, GNUTLS_X509_FMT_PEM);
 
 	gnutls_anon_allocate_server_credentials(&anoncred);
 
@@ -202,7 +205,7 @@ static void server(const char *test_name, const char *prio, int fd, const char *
 		close(fd);
 		gnutls_deinit(session);
 		test_fail("Handshake has failed (%s)\n\n",
-		     gnutls_strerror(ret));
+			  gnutls_strerror(ret));
 		terminate();
 	}
 	if (debug)
@@ -210,13 +213,15 @@ static void server(const char *test_name, const char *prio, int fd, const char *
 
 	if (debug)
 		test_success("TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			     gnutls_protocol_get_name
+			     (gnutls_protocol_get_version(session)));
 
 	buffer_size = sizeof(buffer);
 	ret = gnutls_server_name_get(session, buffer, &buffer_size, &type, 0);
 
-	if ((name == NULL || name[0] == 0) && (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE || ret == GNUTLS_E_IDNA_ERROR)) {
+	if ((name == NULL || name[0] == 0)
+	    && (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
+		|| ret == GNUTLS_E_IDNA_ERROR)) {
 		/* expected */
 		if (debug)
 			test_success("empty name matches\n");
@@ -224,21 +229,27 @@ static void server(const char *test_name, const char *prio, int fd, const char *
 		test_fail("server_name: %s/%d\n", gnutls_strerror(ret), ret);
 	} else {
 		if (name == NULL || name[0] == 0) {
-			test_fail("did not receive the expected name: got: %s\n", buffer);
+			test_fail
+			    ("did not receive the expected name: got: %s\n",
+			     buffer);
 			exit(1);
 		}
 		if (buffer_size != strlen(buffer)) {
-			test_fail("received name '%s/%d/%d', with embedded null\n", buffer, (int)buffer_size, (int)strlen(buffer));
+			test_fail
+			    ("received name '%s/%d/%d', with embedded null\n",
+			     buffer, (int)buffer_size, (int)strlen(buffer));
 			exit(1);
 		}
-		if (name_len != buffer_size || memcmp(name, buffer, name_len) != 0) {
-			test_fail("received name '%s/%d', expected '%s/%d'\n", buffer, (int)buffer_size, name, (int)name_len);
+		if (name_len != buffer_size
+		    || memcmp(name, buffer, name_len) != 0) {
+			test_fail("received name '%s/%d', expected '%s/%d'\n",
+				  buffer, (int)buffer_size, name,
+				  (int)name_len);
 			exit(1);
 		}
 		if (debug)
 			test_success("name matches (%s/%s)\n", buffer, name);
 	}
-
 
 	/* do not wait for the peer to close the connection.
 	 */
@@ -259,7 +270,9 @@ static void server(const char *test_name, const char *prio, int fd, const char *
 /* name: the name sent by client
  * server_exp: the name which should be expected by the server to see
  */
-static void start(const char *test_name, const char *prio, unsigned raw, const char *name, unsigned len, const char *server_exp, unsigned server_exp_len, int server_error)
+static void start(const char *test_name, const char *prio, unsigned raw,
+		  const char *name, unsigned len, const char *server_exp,
+		  unsigned server_exp_len, int server_error)
 {
 	int fd[2];
 	int ret;
@@ -280,7 +293,8 @@ static void start(const char *test_name, const char *prio, unsigned raw, const c
 	if (child) {
 		/* parent */
 		close(fd[1]);
-		server(test_name, prio, fd[0], server_exp, server_exp_len, server_error);
+		server(test_name, prio, fd[0], server_exp, server_exp_len,
+		       server_error);
 		kill(child, SIGTERM);
 	} else {
 		close(fd[0]);
@@ -297,9 +311,9 @@ static void ch_handler(int sig)
 	return;
 }
 
-#define PRIO_TLS12 "NORMAL:-VERS-ALL:+VERS-TLS1.2"
-#define PRIO_TLS13 "NORMAL:-VERS-ALL:+VERS-TLS1.3"
-#define PRIO_NORMAL "NORMAL"
+# define PRIO_TLS12 "NORMAL:-VERS-ALL:+VERS-TLS1.2"
+# define PRIO_TLS13 "NORMAL:-VERS-ALL:+VERS-TLS1.3"
+# define PRIO_NORMAL "NORMAL"
 
 void doit(void)
 {
@@ -308,24 +322,42 @@ void doit(void)
 
 	start("tls1.2 NULL", PRIO_TLS12, 0, NULL, 0, NULL, 0, 0);
 	start("tls1.2 empty", PRIO_TLS12, 0, "", 0, "", 0, 0);
-	start("tls1.2 test.example.com", PRIO_TLS12, 0, "test.example.com", strlen("test.example.com"), "test.example.com", strlen("test.example.com"), 0);
-	start("tls1.2 longtest.example.com", PRIO_TLS12, 0, "longtest.example.com.", strlen("longtest.example.com"), "longtest.example.com.", strlen("longtest.example.com"), 0);
+	start("tls1.2 test.example.com", PRIO_TLS12, 0, "test.example.com",
+	      strlen("test.example.com"), "test.example.com",
+	      strlen("test.example.com"), 0);
+	start("tls1.2 longtest.example.com", PRIO_TLS12, 0,
+	      "longtest.example.com.", strlen("longtest.example.com"),
+	      "longtest.example.com.", strlen("longtest.example.com"), 0);
 	/* test embedded NULL */
-	start("tls1.2 embedded-NULL", PRIO_TLS12, 1, "invalid\x00.example.com.", sizeof("invalid\x00.example.com")-1, NULL, 0, GNUTLS_E_RECEIVED_DISALLOWED_NAME);
+	start("tls1.2 embedded-NULL", PRIO_TLS12, 1, "invalid\x00.example.com.",
+	      sizeof("invalid\x00.example.com") - 1, NULL, 0,
+	      GNUTLS_E_RECEIVED_DISALLOWED_NAME);
 
 	start("tls1.3 NULL", PRIO_TLS13, 0, NULL, 0, NULL, 0, 0);
 	start("tls1.3 empty", PRIO_TLS13, 0, "", 0, "", 0, 0);
-	start("tls1.3 test.example.com", PRIO_TLS13, 0, "test.example.com", strlen("test.example.com"), "test.example.com", strlen("test.example.com"), 0);
-	start("tls1.3 longtest.example.com", PRIO_TLS13, 0, "longtest.example.com.", strlen("longtest.example.com"), "longtest.example.com.", strlen("longtest.example.com"), 0);
+	start("tls1.3 test.example.com", PRIO_TLS13, 0, "test.example.com",
+	      strlen("test.example.com"), "test.example.com",
+	      strlen("test.example.com"), 0);
+	start("tls1.3 longtest.example.com", PRIO_TLS13, 0,
+	      "longtest.example.com.", strlen("longtest.example.com"),
+	      "longtest.example.com.", strlen("longtest.example.com"), 0);
 	/* test embedded NULL */
-	start("tls1.3 embedded-NULL", PRIO_TLS13, 1, "invalid\x00.example.com.", sizeof("invalid\x00.example.com")-1, NULL, 0, GNUTLS_E_RECEIVED_DISALLOWED_NAME);
+	start("tls1.3 embedded-NULL", PRIO_TLS13, 1, "invalid\x00.example.com.",
+	      sizeof("invalid\x00.example.com") - 1, NULL, 0,
+	      GNUTLS_E_RECEIVED_DISALLOWED_NAME);
 
 	start("NULL", PRIO_NORMAL, 0, NULL, 0, NULL, 0, 0);
 	start("empty", PRIO_NORMAL, 0, "", 0, "", 0, 0);
-	start("test.example.com", PRIO_NORMAL, 0, "test.example.com", strlen("test.example.com"), "test.example.com", strlen("test.example.com"), 0);
-	start("longtest.example.com", PRIO_NORMAL, 0, "longtest.example.com.", strlen("longtest.example.com"), "longtest.example.com.", strlen("longtest.example.com"), 0);
+	start("test.example.com", PRIO_NORMAL, 0, "test.example.com",
+	      strlen("test.example.com"), "test.example.com",
+	      strlen("test.example.com"), 0);
+	start("longtest.example.com", PRIO_NORMAL, 0, "longtest.example.com.",
+	      strlen("longtest.example.com"), "longtest.example.com.",
+	      strlen("longtest.example.com"), 0);
 	/* test embedded NULL */
-	start("embedded-NULL", PRIO_NORMAL, 1, "invalid\x00.example.com.", sizeof("invalid\x00.example.com")-1, NULL, 0, GNUTLS_E_RECEIVED_DISALLOWED_NAME);
+	start("embedded-NULL", PRIO_NORMAL, 1, "invalid\x00.example.com.",
+	      sizeof("invalid\x00.example.com") - 1, NULL, 0,
+	      GNUTLS_E_RECEIVED_DISALLOWED_NAME);
 }
 
 #endif				/* _WIN32 */

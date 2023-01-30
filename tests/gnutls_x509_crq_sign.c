@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdlib.h>
@@ -34,37 +34,36 @@
 #include "utils.h"
 
 static unsigned char saved_crq_pem[] =
-	"-----BEGIN NEW CERTIFICATE REQUEST-----\n"
-	"MIIBgzCB7QIBADAAMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC7ZkP18sXX\n"
-	"tozMxd/1iDuxyUtqDqGtIFBACIChT1yj0Phsz+Y89+wEdhMXi2SJIlvA3VN8O+18\n"
-	"BLuAuSi+jpvGjqClEsv1Vx6i57u3M0mf47tKrmpNaP/JEeIyjc49gAuNde/YAIGP\n"
-	"KAQDoCKNYQQH+rY3fSEHSdIJYWmYkKNYqQIDAQABoEQwQgYJKoZIhvcNAQkOMTUw\n"
-	"MzAPBgNVHRMBAf8EBTADAgEAMA0GA1UdDwEB/wQDAwEAMBEGA1UdEQEB/wQHMAWC\n"
-	"A2ZvbzANBgkqhkiG9w0BAQsFAAOBgQBKFQhbmY8RJBPiXm80PmYnZH7WaMeaOLJZ\n"
-	"JBVjsmdjFtDbgHaY9Vizrbh9jFM8iyvw01y+FZqCt2kSzvaPRoQad06NCV00oN6W\n"
-	"mG2iRKBSwVEX7JleigliK3M3Y5dlHV77CC1Or9BGC9Rbx9n9mV6z/NAWW5LyPHb5\n"
-	"gf4oXM6OPw==\n"
-	"-----END NEW CERTIFICATE REQUEST-----\n";
+    "-----BEGIN NEW CERTIFICATE REQUEST-----\n"
+    "MIIBgzCB7QIBADAAMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC7ZkP18sXX\n"
+    "tozMxd/1iDuxyUtqDqGtIFBACIChT1yj0Phsz+Y89+wEdhMXi2SJIlvA3VN8O+18\n"
+    "BLuAuSi+jpvGjqClEsv1Vx6i57u3M0mf47tKrmpNaP/JEeIyjc49gAuNde/YAIGP\n"
+    "KAQDoCKNYQQH+rY3fSEHSdIJYWmYkKNYqQIDAQABoEQwQgYJKoZIhvcNAQkOMTUw\n"
+    "MzAPBgNVHRMBAf8EBTADAgEAMA0GA1UdDwEB/wQDAwEAMBEGA1UdEQEB/wQHMAWC\n"
+    "A2ZvbzANBgkqhkiG9w0BAQsFAAOBgQBKFQhbmY8RJBPiXm80PmYnZH7WaMeaOLJZ\n"
+    "JBVjsmdjFtDbgHaY9Vizrbh9jFM8iyvw01y+FZqCt2kSzvaPRoQad06NCV00oN6W\n"
+    "mG2iRKBSwVEX7JleigliK3M3Y5dlHV77CC1Or9BGC9Rbx9n9mV6z/NAWW5LyPHb5\n"
+    "gf4oXM6OPw==\n" "-----END NEW CERTIFICATE REQUEST-----\n";
 
-const gnutls_datum_t saved_crq = { saved_crq_pem, sizeof(saved_crq_pem)-1 };
+const gnutls_datum_t saved_crq = { saved_crq_pem, sizeof(saved_crq_pem) - 1 };
 
 static unsigned char key_pem[] =
-	"-----BEGIN RSA PRIVATE KEY-----\n"
-	"MIICXAIBAAKBgQC7ZkP18sXXtozMxd/1iDuxyUtqDqGtIFBACIChT1yj0Phsz+Y8\n"
-	"9+wEdhMXi2SJIlvA3VN8O+18BLuAuSi+jpvGjqClEsv1Vx6i57u3M0mf47tKrmpN\n"
-	"aP/JEeIyjc49gAuNde/YAIGPKAQDoCKNYQQH+rY3fSEHSdIJYWmYkKNYqQIDAQAB\n"
-	"AoGADpmARG5CQxS+AesNkGmpauepiCz1JBF/JwnyiX6vEzUh0Ypd39SZztwrDxvF\n"
-	"PJjQaKVljml1zkJpIDVsqvHdyVdse8M+Qn6hw4x2p5rogdvhhIL1mdWo7jWeVJTF\n"
-	"RKB7zLdMPs3ySdtcIQaF9nUAQ2KJEvldkO3m/bRJFEp54k0CQQDYy+RlTmwRD6hy\n"
-	"7UtMjR0H3CSZJeQ8svMCxHLmOluG9H1UKk55ZBYfRTsXniqUkJBZ5wuV1L+pR9EK\n"
-	"ca89a+1VAkEA3UmBelwEv2u9cAU1QjKjmwju1JgXbrjEohK+3B5y0ESEXPAwNQT9\n"
-	"TrDM1m9AyxYTWLxX93dI5QwNFJtmbtjeBQJARSCWXhsoaDRG8QZrCSjBxfzTCqZD\n"
-	"ZXtl807ymCipgJm60LiAt0JLr4LiucAsMZz6+j+quQbSakbFCACB8SLV1QJBAKZQ\n"
-	"YKf+EPNtnmta/rRKKvySsi3GQZZN+Dt3q0r094XgeTsAqrqujVNfPhTMeP4qEVBX\n"
-	"/iVX2cmMTSh3w3z8MaECQEp0XJWDVKOwcTW6Ajp9SowtmiZ3YDYo1LF9igb4iaLv\n"
-	"sWZGfbnU3ryjvkb6YuFjgtzbZDZHWQCo8/cOtOBmPdk=\n"
-	"-----END RSA PRIVATE KEY-----\n";
-const gnutls_datum_t key = { key_pem, sizeof(key_pem)-1 };
+    "-----BEGIN RSA PRIVATE KEY-----\n"
+    "MIICXAIBAAKBgQC7ZkP18sXXtozMxd/1iDuxyUtqDqGtIFBACIChT1yj0Phsz+Y8\n"
+    "9+wEdhMXi2SJIlvA3VN8O+18BLuAuSi+jpvGjqClEsv1Vx6i57u3M0mf47tKrmpN\n"
+    "aP/JEeIyjc49gAuNde/YAIGPKAQDoCKNYQQH+rY3fSEHSdIJYWmYkKNYqQIDAQAB\n"
+    "AoGADpmARG5CQxS+AesNkGmpauepiCz1JBF/JwnyiX6vEzUh0Ypd39SZztwrDxvF\n"
+    "PJjQaKVljml1zkJpIDVsqvHdyVdse8M+Qn6hw4x2p5rogdvhhIL1mdWo7jWeVJTF\n"
+    "RKB7zLdMPs3ySdtcIQaF9nUAQ2KJEvldkO3m/bRJFEp54k0CQQDYy+RlTmwRD6hy\n"
+    "7UtMjR0H3CSZJeQ8svMCxHLmOluG9H1UKk55ZBYfRTsXniqUkJBZ5wuV1L+pR9EK\n"
+    "ca89a+1VAkEA3UmBelwEv2u9cAU1QjKjmwju1JgXbrjEohK+3B5y0ESEXPAwNQT9\n"
+    "TrDM1m9AyxYTWLxX93dI5QwNFJtmbtjeBQJARSCWXhsoaDRG8QZrCSjBxfzTCqZD\n"
+    "ZXtl807ymCipgJm60LiAt0JLr4LiucAsMZz6+j+quQbSakbFCACB8SLV1QJBAKZQ\n"
+    "YKf+EPNtnmta/rRKKvySsi3GQZZN+Dt3q0r094XgeTsAqrqujVNfPhTMeP4qEVBX\n"
+    "/iVX2cmMTSh3w3z8MaECQEp0XJWDVKOwcTW6Ajp9SowtmiZ3YDYo1LF9igb4iaLv\n"
+    "sWZGfbnU3ryjvkb6YuFjgtzbZDZHWQCo8/cOtOBmPdk=\n"
+    "-----END RSA PRIVATE KEY-----\n";
+const gnutls_datum_t key = { key_pem, sizeof(key_pem) - 1 };
 
 static time_t mytime(time_t * t)
 {
@@ -130,12 +129,12 @@ static gnutls_x509_crq_t generate_crq(void)
 	return crq;
 }
 
-static void verify_crq(const gnutls_datum_t *pem)
+static void verify_crq(const gnutls_datum_t * pem)
 {
 	gnutls_x509_crq_t crq;
 
 	assert(gnutls_x509_crq_init(&crq) >= 0);
-	assert(gnutls_x509_crq_import(crq, pem, GNUTLS_X509_FMT_PEM)>=0);
+	assert(gnutls_x509_crq_import(crq, pem, GNUTLS_X509_FMT_PEM) >= 0);
 	assert(gnutls_x509_crq_verify(crq, 0) >= 0);
 	gnutls_x509_crq_deinit(crq);
 }
@@ -155,7 +154,7 @@ void doit(void)
 		printf("%s\n", out.data);
 
 	assert(out.size == saved_crq.size);
-	assert(memcmp(out.data, saved_crq.data, out.size)==0);
+	assert(memcmp(out.data, saved_crq.data, out.size) == 0);
 
 	verify_crq(&out);
 

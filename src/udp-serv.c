@@ -21,13 +21,13 @@
 
 #include <stdio.h>
 #if HAVE_SYS_SOCKET_H
-#include <sys/socket.h>
+# include <sys/socket.h>
 #elif HAVE_WS2TCPIP_H
-#include <ws2tcpip.h>
+# include <ws2tcpip.h>
 #endif
 #include <arpa/inet.h>
 #ifndef _WIN32
-#include <netinet/in.h>
+# include <netinet/in.h>
 #endif
 #include <sys/select.h>
 #include <stdlib.h>
@@ -50,8 +50,7 @@ typedef struct {
 static int pull_timeout_func(gnutls_transport_ptr_t ptr, unsigned int ms);
 static ssize_t push_func(gnutls_transport_ptr_t p, const void *data,
 			 size_t size);
-static ssize_t pull_func(gnutls_transport_ptr_t p, void *data,
-			 size_t size);
+static ssize_t pull_func(gnutls_transport_ptr_t p, void *data, size_t size);
 
 #define MAX_BUFFER 255		/* Longest string to echo */
 
@@ -96,14 +95,14 @@ void udp_server(const char *name, int port, int mtu)
 
 		cli_addr_size = sizeof(cli_addr);
 		ret =
-		    recvfrom(sock, buffer, sizeof(buffer)-1, MSG_PEEK,
-			     (struct sockaddr *) &cli_addr,
-			     &cli_addr_size);
+		    recvfrom(sock, buffer, sizeof(buffer) - 1, MSG_PEEK,
+			     (struct sockaddr *)&cli_addr, &cli_addr_size);
 
 		/* only accept a valid client hello */
 		if (ret > HANDSHAKE_TYPE_POS &&
 		    buffer[RECORD_CONTENT_POS] == HANDSHAKE_CONTENT_TYPE &&
-		    buffer[HANDSHAKE_TYPE_POS] == GNUTLS_HANDSHAKE_CLIENT_HELLO) {
+		    buffer[HANDSHAKE_TYPE_POS] ==
+		    GNUTLS_HANDSHAKE_CLIENT_HELLO) {
 			if (!HAVE_OPT(NOCOOKIE)) {
 				memset(&prestate, 0, sizeof(prestate));
 				ret =
@@ -117,7 +116,7 @@ void udp_server(const char *name, int port, int mtu)
 
 					memset(&s, 0, sizeof(s));
 					s.fd = sock;
-					s.cli_addr = (void *) &cli_addr;
+					s.cli_addr = (void *)&cli_addr;
 					s.cli_addr_size = cli_addr_size;
 
 					printf
@@ -125,17 +124,18 @@ void udp_server(const char *name, int port, int mtu)
 					     human_addr((struct sockaddr *)
 							&cli_addr,
 							cli_addr_size, buffer,
-							sizeof(buffer)-1));
+							sizeof(buffer) - 1));
 					gnutls_dtls_cookie_send(&cookie_key,
 								&cli_addr,
 								cli_addr_size,
 								&prestate,
 								(gnutls_transport_ptr_t)
-								&s, push_func);
+								& s, push_func);
 
 					/* discard peeked data */
-					recvfrom(sock, buffer, sizeof(buffer)-1, 0,
-						 (struct sockaddr *) &cli_addr,
+					recvfrom(sock, buffer,
+						 sizeof(buffer) - 1, 0,
+						 (struct sockaddr *)&cli_addr,
 						 &cli_addr_size);
 					continue;
 				}
@@ -143,7 +143,7 @@ void udp_server(const char *name, int port, int mtu)
 			printf("Accepted connection from %s\n",
 			       human_addr((struct sockaddr *)
 					  &cli_addr, sizeof(cli_addr),
-					  buffer, sizeof(buffer)-1));
+					  buffer, sizeof(buffer) - 1));
 		} else
 			continue;
 
@@ -168,8 +168,7 @@ void udp_server(const char *name, int port, int mtu)
 		do {
 			ret = gnutls_handshake(session);
 		}
-		while (ret == GNUTLS_E_AGAIN
-		       || ret == GNUTLS_E_INTERRUPTED);
+		while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 		if (ret < 0) {
 			fprintf(stderr, "Error in handshake(): %s\n",
@@ -182,10 +181,9 @@ void udp_server(const char *name, int port, int mtu)
 			do {
 				ret =
 				    gnutls_record_recv_seq(session, buffer,
-							   sizeof(buffer)-1,
+							   sizeof(buffer) - 1,
 							   sequence);
-				if (ret ==
-				    GNUTLS_E_HEARTBEAT_PING_RECEIVED)
+				if (ret == GNUTLS_E_HEARTBEAT_PING_RECEIVED)
 					gnutls_heartbeat_pong(session, 0);
 			}
 			while (ret == GNUTLS_E_INTERRUPTED
@@ -193,8 +191,7 @@ void udp_server(const char *name, int port, int mtu)
 			       || ret == GNUTLS_E_HEARTBEAT_PING_RECEIVED);
 
 			if (ret == GNUTLS_E_REHANDSHAKE) {
-				fprintf(stderr,
-					"*** Received hello message\n");
+				fprintf(stderr, "*** Received hello message\n");
 				do {
 					ret = gnutls_handshake(session);
 				}
@@ -221,11 +218,10 @@ void udp_server(const char *name, int port, int mtu)
 			     sequence[3], sequence[4], sequence[5],
 			     sequence[6], sequence[7], buffer);
 
-			if (check_command(session, buffer, disable_client_cert) == 0) {
+			if (check_command(session, buffer, disable_client_cert)
+			    == 0) {
 				/* reply back */
-				ret =
-				    gnutls_record_send(session, buffer,
-						       ret);
+				ret = gnutls_record_send(session, buffer, ret);
 				if (ret < 0) {
 					fprintf(stderr,
 						"Error in send(): %s\n",
@@ -267,11 +263,10 @@ static int pull_timeout_func(gnutls_transport_ptr_t ptr, unsigned int ms)
 	cli_addr_size = sizeof(cli_addr);
 	ret =
 	    recvfrom(priv->fd, &c, 1, MSG_PEEK,
-		     (struct sockaddr *) &cli_addr, &cli_addr_size);
+		     (struct sockaddr *)&cli_addr, &cli_addr_size);
 	if (ret > 0) {
 		if (cli_addr_size == priv->cli_addr_size
-		    && memcmp(&cli_addr, priv->cli_addr,
-			      sizeof(cli_addr)) == 0)
+		    && memcmp(&cli_addr, priv->cli_addr, sizeof(cli_addr)) == 0)
 			return 1;
 	}
 
@@ -283,8 +278,8 @@ static ssize_t push_func(gnutls_transport_ptr_t p, const void *data,
 {
 	priv_data_st *priv = p;
 
-	return sendto(priv->fd, data, size, 0, (struct sockaddr*)priv->cli_addr,
-		      priv->cli_addr_size);
+	return sendto(priv->fd, data, size, 0,
+		      (struct sockaddr *)priv->cli_addr, priv->cli_addr_size);
 }
 
 static ssize_t pull_func(gnutls_transport_ptr_t p, void *data, size_t size)
@@ -298,7 +293,7 @@ static ssize_t pull_func(gnutls_transport_ptr_t p, void *data, size_t size)
 	cli_addr_size = sizeof(cli_addr);
 	ret =
 	    recvfrom(priv->fd, data, size, 0,
-		     (struct sockaddr *) &cli_addr, &cli_addr_size);
+		     (struct sockaddr *)&cli_addr, &cli_addr_size);
 	if (ret == -1)
 		return ret;
 
@@ -306,10 +301,11 @@ static ssize_t pull_func(gnutls_transport_ptr_t p, void *data, size_t size)
 	    && memcmp(&cli_addr, priv->cli_addr, sizeof(cli_addr)) == 0)
 		return ret;
 
-	printf("Denied connection from %s\n",
-	       human_addr((struct sockaddr *)
-			  &cli_addr, sizeof(cli_addr), buffer,
-			  sizeof(buffer)));
+	printf("Denied connection from %s\n", human_addr((struct sockaddr *)
+							 &cli_addr,
+							 sizeof(cli_addr),
+							 buffer,
+							 sizeof(buffer)));
 
 	gnutls_transport_set_errno(priv->session, EAGAIN);
 	return -1;

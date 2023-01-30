@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# Copyright (c) 2022 Simon Josefsson
+# License: GPLv3+ <http://gnu.org/licenses/gpl.html>
+
+if ! indent --version 2> /dev/null | grep 'GNU indent' > /dev/null; then
+    echo 1>&2 "$0: GNU indent is missing"
+    exit 77
+fi
+
+INDENT="indent -ppi1 -linux"; export INDENT
+
+git ls-files -z | grep -z '\.[ch]\(.in\)\?$' | grep -z -v '^./devel/' | xargs -0 -n1 `dirname "$0"`/indent-maybe
+
+exit $?

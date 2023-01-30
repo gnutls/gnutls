@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+# include "config.h"
 #endif
 
 #include <stdio.h>
@@ -86,7 +86,7 @@ static void print_dn(gnutls_x509_dn_t dn)
 void doit(void)
 {
 	int ret;
-	gnutls_datum_t pem_cert = { (unsigned char *) pem, sizeof(pem) };
+	gnutls_datum_t pem_cert = { (unsigned char *)pem, sizeof(pem) };
 	gnutls_x509_crt_t cert;
 	gnutls_datum_t strdn;
 	gnutls_x509_dn_t xdn;
@@ -121,7 +121,9 @@ void doit(void)
 	if (ret < 0)
 		fail("gnutls_x509_dn_get_str %d\n", ret);
 
-	if (strdn.size != 44 || strcmp((char*)strdn.data, "CN=CAcert WoT User,EMAIL=simon@josefsson.org") != 0) {
+	if (strdn.size != 44
+	    || strcmp((char *)strdn.data,
+		      "CN=CAcert WoT User,EMAIL=simon@josefsson.org") != 0) {
 		fail("gnutls_x509_dn_get_str string comparison failed: '%s'/%d\n", strdn.data, strdn.size);
 	}
 	gnutls_free(strdn.data);
@@ -130,7 +132,9 @@ void doit(void)
 	ret = gnutls_x509_dn_get_str2(xdn, &strdn, 0);
 	if (ret < 0)
 		fail("gnutls_x509_dn_get_str2 %d\n", ret);
-	if (strdn.size != 44 || strcmp((char*)strdn.data, "EMAIL=simon@josefsson.org,CN=CAcert WoT User") != 0) {
+	if (strdn.size != 44
+	    || strcmp((char *)strdn.data,
+		      "EMAIL=simon@josefsson.org,CN=CAcert WoT User") != 0) {
 		fail("gnutls_x509_dn_get_str2 string comparison failed: '%s'/%d\n", strdn.data, strdn.size);
 	}
 	gnutls_free(strdn.data);
@@ -139,7 +143,9 @@ void doit(void)
 	ret = gnutls_x509_dn_get_str2(xdn, &strdn, GNUTLS_X509_DN_FLAG_COMPAT);
 	if (ret < 0)
 		fail("gnutls_x509_dn_get_str2 %d\n", ret);
-	if (strdn.size != 44 || strcmp((char*)strdn.data, "CN=CAcert WoT User,EMAIL=simon@josefsson.org") != 0) {
+	if (strdn.size != 44
+	    || strcmp((char *)strdn.data,
+		      "CN=CAcert WoT User,EMAIL=simon@josefsson.org") != 0) {
 		fail("gnutls_x509_dn_get_str2 string comparison failed: '%s'/%d\n", strdn.data, strdn.size);
 	}
 	gnutls_free(strdn.data);

@@ -27,8 +27,7 @@
 #include "record.h"
 
 static void
-_gnutls_set_range(gnutls_range_st * dst, const size_t low,
-		  const size_t high)
+_gnutls_set_range(gnutls_range_st * dst, const size_t low, const size_t high)
 {
 	dst->low = low;
 	dst->high = high;
@@ -55,14 +54,12 @@ _gnutls_range_max_lh_pad(gnutls_session_t session, ssize_t data_length,
 	if (unlikely(vers == NULL))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-	ret =
-	    _gnutls_epoch_get(session, EPOCH_WRITE_CURRENT,
-			      &record_params);
+	ret = _gnutls_epoch_get(session, EPOCH_WRITE_CURRENT, &record_params);
 	if (ret < 0) {
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
 
-	if (!vers->tls13_sem && record_params->write.is_aead) /* not yet ready */
+	if (!vers->tls13_sem && record_params->write.is_aead)	/* not yet ready */
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 	if (vers->tls13_sem) {
@@ -76,9 +73,7 @@ _gnutls_range_max_lh_pad(gnutls_session_t session, ssize_t data_length,
 	this_pad = MIN(max_pad, max_frag - data_length);
 
 	block_size = _gnutls_cipher_get_block_size(record_params->cipher);
-	tag_size =
-	    _gnutls_auth_cipher_tag_len(&record_params->write.
-					ctx.tls12);
+	tag_size = _gnutls_auth_cipher_tag_len(&record_params->write.ctx.tls12);
 	switch (_gnutls_cipher_type(record_params->cipher)) {
 	case CIPHER_AEAD:
 	case CIPHER_STREAM:
@@ -130,9 +125,7 @@ unsigned gnutls_record_can_use_length_hiding(gnutls_session_t session)
 		return 0;
 #endif
 
-	ret =
-	    _gnutls_epoch_get(session, EPOCH_WRITE_CURRENT,
-			      &record_params);
+	ret = _gnutls_epoch_get(session, EPOCH_WRITE_CURRENT, &record_params);
 	if (ret < 0) {
 		return 0;
 	}
@@ -176,9 +169,7 @@ gnutls_range_split(gnutls_session_t session,
 	ssize_t orig_high = (ssize_t) orig->high;
 	record_parameters_st *record_params;
 
-	ret =
-	    _gnutls_epoch_get(session, EPOCH_WRITE_CURRENT,
-			      &record_params);
+	ret = _gnutls_epoch_get(session, EPOCH_WRITE_CURRENT, &record_params);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -205,11 +196,9 @@ gnutls_range_split(gnutls_session_t session,
 
 			ssize_t this_pad = MIN(ret, orig_high - orig_low);
 
-			_gnutls_set_range(next, orig_low,
-					  orig_low + this_pad);
+			_gnutls_set_range(next, orig_low, orig_low + this_pad);
 			_gnutls_set_range(remainder, 0,
-					  orig_high - (orig_low +
-						       this_pad));
+					  orig_high - (orig_low + this_pad));
 		}
 
 		return 0;
@@ -267,7 +256,7 @@ gnutls_record_send_range(gnutls_session_t session, const void *data,
 
 	_gnutls_record_log
 	    ("RANGE: Preparing message with size %d, range (%d,%d)\n",
-	     (int) data_size, (int) range->low, (int) range->high);
+	     (int)data_size, (int)range->low, (int)range->high);
 
 	while (cur_range.high != 0) {
 		ret =
@@ -278,32 +267,28 @@ gnutls_record_send_range(gnutls_session_t session, const void *data,
 		}
 
 		next_fragment_length =
-		    _gnutls_range_fragment(data_size, cur_range,
-					   next_range);
+		    _gnutls_range_fragment(data_size, cur_range, next_range);
 
 		_gnutls_record_log
 		    ("RANGE: Next fragment size: %d (%d,%d); remaining range: (%d,%d)\n",
-		     (int) next_fragment_length, (int) cur_range.low,
-		     (int) cur_range.high, (int) next_range.low,
-		     (int) next_range.high);
+		     (int)next_fragment_length, (int)cur_range.low,
+		     (int)cur_range.high, (int)next_range.low,
+		     (int)next_range.high);
 
 		ret =
 		    _gnutls_send_tlen_int(session, GNUTLS_APPLICATION_DATA,
 					  -1, EPOCH_WRITE_CURRENT,
-					  &(((char *) data)[sent]),
+					  &(((char *)data)[sent]),
 					  next_fragment_length,
 					  cur_range.high -
-					  next_fragment_length,
-					  MBUFFER_FLUSH);
+					  next_fragment_length, MBUFFER_FLUSH);
 
-		while (ret == GNUTLS_E_AGAIN
-		       || ret == GNUTLS_E_INTERRUPTED) {
+		while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED) {
 			ret =
 			    _gnutls_send_tlen_int(session,
 						  GNUTLS_APPLICATION_DATA,
 						  -1, EPOCH_WRITE_CURRENT,
-						  NULL, 0, 0,
-						  MBUFFER_FLUSH);
+						  NULL, 0, 0, MBUFFER_FLUSH);
 		}
 
 		if (ret < 0) {
@@ -312,13 +297,12 @@ gnutls_record_send_range(gnutls_session_t session, const void *data,
 		if (ret != (ssize_t) next_fragment_length) {
 			_gnutls_record_log
 			    ("RANGE: ERROR: ret = %d; next_fragment_length = %d\n",
-			     (int) ret, (int) next_fragment_length);
+			     (int)ret, (int)next_fragment_length);
 			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 		}
 		sent += next_fragment_length;
 		data_size -= next_fragment_length;
-		_gnutls_set_range(&cur_range, next_range.low,
-				  next_range.high);
+		_gnutls_set_range(&cur_range, next_range.low, next_range.high);
 	}
 
 	return sent;

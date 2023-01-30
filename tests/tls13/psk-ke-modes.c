@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdbool.h>
@@ -62,10 +62,9 @@ static void tls_log_func(int level, const char *str)
 static int
 new_session_ticket_callback(gnutls_session_t session, unsigned int htype,
 			    unsigned post, unsigned int incoming,
-			    const gnutls_datum_t *msg)
+			    const gnutls_datum_t * msg)
 {
-	bool *new_session_ticket_sent =
-		gnutls_session_get_ptr(session);
+	bool *new_session_ticket_sent = gnutls_session_get_ptr(session);
 	*new_session_ticket_sent = true;
 	return 0;
 }
@@ -108,7 +107,7 @@ static void start(const char *name, const char *prio, const char *sprio)
 
 	gnutls_priority_set_direct(server, sprio, NULL);
 
-	assert(gnutls_session_ticket_key_generate(&skey)>=0);
+	assert(gnutls_session_ticket_key_generate(&skey) >= 0);
 	assert(gnutls_session_ticket_enable_server(server, &skey) >= 0);
 
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, scred);

@@ -25,11 +25,11 @@
  */
 
 #ifndef DTLS_SW_NO_INCLUDES
-#include "gnutls_int.h"
-#include "errors.h"
-#include "debug.h"
-#include "dtls.h"
-#include "record.h"
+# include "gnutls_int.h"
+# include "errors.h"
+# include "debug.h"
+# include "dtls.h"
+# include "record.h"
 #endif
 
 /*
@@ -128,7 +128,8 @@ int _dtls_record_check(struct record_parameters_st *rp, uint64_t seq_num)
 			return gnutls_assert_val(-3);
 		} else {
 			/* Within the sliding window, so we remember whether we've seen it or not */
-			uint64_t mask = 1ULL << (rp->dtls_sw_next - seq_num - 2);
+			uint64_t mask =
+			    1ULL << (rp->dtls_sw_next - seq_num - 2);
 
 			if (!(rp->dtls_sw_bits & mask))
 				return gnutls_assert_val(-3);

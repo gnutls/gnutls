@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,17 +35,17 @@ void doit(void)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/dtls.h>
-#include <signal.h>
-#include "utils.h"
+# include <string.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/dtls.h>
+# include <signal.h>
+# include "utils.h"
 
 /* This program tests the robustness of record
  * decoding.
@@ -97,7 +97,6 @@ const gnutls_datum_t server_key = { server_key_pem,
 	sizeof(server_key_pem)
 };
 
-
 /* A very basic TLS client, with anonymous authentication.
  */
 
@@ -143,10 +142,13 @@ static void client(int fd, const char *prio)
 	}
 
 	if (ret == GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER) {
-		fprintf(stderr, "client: Handshake failed (expected): %s\n", gnutls_strerror(ret));
+		fprintf(stderr, "client: Handshake failed (expected): %s\n",
+			gnutls_strerror(ret));
 		goto cleanup;
 	} else {
-		fprintf(stderr, "client: Handshake was completed or failed with unknown error code(%d): %s\n", ret, gnutls_strerror(ret));
+		fprintf(stderr,
+			"client: Handshake was completed or failed with unknown error code(%d): %s\n",
+			ret, gnutls_strerror(ret));
 		kill(getpid(), SIGSEGV);
 	}
 
@@ -160,7 +162,6 @@ static void client(int fd, const char *prio)
 	gnutls_global_deinit();
 }
 
-
 /* These are global */
 pid_t child;
 
@@ -168,11 +169,10 @@ static void server(int fd, const char *prio)
 {
 	int ret;
 	uint8_t id[255];
-	uint8_t buffer[] = "\x16\x03\x01\x01\x25"
-		"\x02\x00\x01\x21"
-		"\x03\x01"/*Server Version */
-		/*Random*/"\x00\x00\x00\x00\x01\x00\x00\x00\x00\x01\x00\x00\x00\x00\x01\x00\x00\x00\x00\x01\x00\x00\x00\x00\x01\x00\x00\x00\x00\x01\x00\x00"
-		/*SessionID*/"\xfe";
+	uint8_t buffer[] = "\x16\x03\x01\x01\x25" "\x02\x00\x01\x21" "\x03\x01"	/*Server Version */
+	    /*Random */
+	    "\x00\x00\x00\x00\x01\x00\x00\x00\x00\x01\x00\x00\x00\x00\x01\x00\x00\x00\x00\x01\x00\x00\x00\x00\x01\x00\x00\x00\x00\x01\x00\x00"
+	    /*SessionID */ "\xfe";
 
 	ret = read(fd, id, sizeof(id));
 	if (ret < 0) {

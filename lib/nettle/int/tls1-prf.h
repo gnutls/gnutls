@@ -21,29 +21,27 @@
  */
 
 #ifndef GNUTLS_LIB_NETTLE_INT_TLS1_PRF_H
-#define GNUTLS_LIB_NETTLE_INT_TLS1_PRF_H
+# define GNUTLS_LIB_NETTLE_INT_TLS1_PRF_H
 
-#include <nettle/nettle-meta.h>
+# include <nettle/nettle-meta.h>
 
-#define MAX_PRF_BYTES 200
+# define MAX_PRF_BYTES 200
 
 /* Namespace mangling */
-#define tls10_prf nettle_tls10_prf
-#define tls12_prf nettle_tls12_prf
+# define tls10_prf nettle_tls10_prf
+# define tls12_prf nettle_tls12_prf
 
 int
-tls10_prf(size_t secret_size, const uint8_t *secret,
+tls10_prf(size_t secret_size, const uint8_t * secret,
 	  size_t label_size, const char *label,
-	  size_t seed_size, const uint8_t *seed,
-	  size_t length, uint8_t *dst);
+	  size_t seed_size, const uint8_t * seed, size_t length, uint8_t * dst);
 
 int
 tls12_prf(void *mac_ctx,
-	  nettle_hash_update_func *update,
-	  nettle_hash_digest_func *digest,
+	  nettle_hash_update_func * update,
+	  nettle_hash_digest_func * digest,
 	  size_t digest_size,
 	  size_t label_size, const char *label,
-	  size_t seed_size, const uint8_t *seed,
-	  size_t length, uint8_t *dst);
+	  size_t seed_size, const uint8_t * seed, size_t length, uint8_t * dst);
 
-#endif /* GNUTLS_LIB_NETTLE_INT_TLS1_PRF_H */
+#endif				/* GNUTLS_LIB_NETTLE_INT_TLS1_PRF_H */

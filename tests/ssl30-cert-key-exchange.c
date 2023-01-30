@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 /* This program tests the various certificate key exchange methods supported
@@ -39,15 +39,33 @@ void doit(void)
 {
 #ifdef ENABLE_SSL3
 	global_init();
-	try_x509("SSL 3.0 with anon-dh", "NORMAL:-VERS-ALL:+VERS-SSL3.0:-KX-ALL:+ANON-DH", GNUTLS_KX_ANON_DH, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_UNKNOWN);
-	try_x509("SSL 3.0 with dhe-rsa no cert", "NORMAL:-VERS-ALL:+VERS-SSL3.0:-KX-ALL:+DHE-RSA", GNUTLS_KX_DHE_RSA, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_UNKNOWN);
+	try_x509("SSL 3.0 with anon-dh",
+		 "NORMAL:-VERS-ALL:+VERS-SSL3.0:-KX-ALL:+ANON-DH",
+		 GNUTLS_KX_ANON_DH, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_UNKNOWN);
+	try_x509("SSL 3.0 with dhe-rsa no cert",
+		 "NORMAL:-VERS-ALL:+VERS-SSL3.0:-KX-ALL:+DHE-RSA",
+		 GNUTLS_KX_DHE_RSA, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_UNKNOWN);
 
-	try_x509("SSL 3.0 with rsa no cert", "NORMAL:-VERS-ALL:+VERS-SSL3.0:-KX-ALL:+RSA", GNUTLS_KX_RSA, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_UNKNOWN);
-	try_x509_cli("SSL 3.0 with dhe-rsa cert", "NORMAL:-VERS-ALL:+VERS-SSL3.0:-KX-ALL:+DHE-RSA", GNUTLS_KX_DHE_RSA, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_UNKNOWN, USE_CERT);
-	try_x509_cli("SSL 3.0 with rsa cert", "NORMAL:-VERS-ALL:+VERS-SSL3.0:-KX-ALL:+RSA", GNUTLS_KX_RSA, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_UNKNOWN, USE_CERT);
+	try_x509("SSL 3.0 with rsa no cert",
+		 "NORMAL:-VERS-ALL:+VERS-SSL3.0:-KX-ALL:+RSA", GNUTLS_KX_RSA,
+		 GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_UNKNOWN);
+	try_x509_cli("SSL 3.0 with dhe-rsa cert",
+		     "NORMAL:-VERS-ALL:+VERS-SSL3.0:-KX-ALL:+DHE-RSA",
+		     GNUTLS_KX_DHE_RSA, GNUTLS_SIGN_UNKNOWN,
+		     GNUTLS_SIGN_UNKNOWN, USE_CERT);
+	try_x509_cli("SSL 3.0 with rsa cert",
+		     "NORMAL:-VERS-ALL:+VERS-SSL3.0:-KX-ALL:+RSA",
+		     GNUTLS_KX_RSA, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_UNKNOWN,
+		     USE_CERT);
 
-	try_x509_cli("SSL 3.0 with dhe-rsa ask cert", "NORMAL:-VERS-ALL:+VERS-SSL3.0:-KX-ALL:+DHE-RSA", GNUTLS_KX_DHE_RSA, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_UNKNOWN, ASK_CERT);
-	try_x509_cli("SSL 3.0 with rsa ask cert", "NORMAL:-VERS-ALL:+VERS-SSL3.0:-KX-ALL:+RSA", GNUTLS_KX_RSA, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_UNKNOWN, ASK_CERT);
+	try_x509_cli("SSL 3.0 with dhe-rsa ask cert",
+		     "NORMAL:-VERS-ALL:+VERS-SSL3.0:-KX-ALL:+DHE-RSA",
+		     GNUTLS_KX_DHE_RSA, GNUTLS_SIGN_UNKNOWN,
+		     GNUTLS_SIGN_UNKNOWN, ASK_CERT);
+	try_x509_cli("SSL 3.0 with rsa ask cert",
+		     "NORMAL:-VERS-ALL:+VERS-SSL3.0:-KX-ALL:+RSA",
+		     GNUTLS_KX_RSA, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_UNKNOWN,
+		     ASK_CERT);
 	gnutls_global_deinit();
 #else
 	exit(77);

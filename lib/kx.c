@@ -106,12 +106,10 @@ gnutls_session_set_keylog_function(gnutls_session_t session,
 
 int
 _gnutls_call_keylog_func(gnutls_session_t session,
-			 const char *label,
-			 const uint8_t *data,
-			 unsigned size)
+			 const char *label, const uint8_t * data, unsigned size)
 {
 	if (session->internals.keylog_func) {
-		gnutls_datum_t secret = {(void*)data, size};
+		gnutls_datum_t secret = { (void *)data, size };
 		return session->internals.keylog_func(session, label, &secret);
 	}
 	return 0;
@@ -119,8 +117,7 @@ _gnutls_call_keylog_func(gnutls_session_t session,
 
 int
 _gnutls_nss_keylog_func(gnutls_session_t session,
-			const char *label,
-			const gnutls_datum_t *secret)
+			const char *label, const gnutls_datum_t * secret)
 {
 	/* ignore subsequent traffic secrets that are calculated from
 	 * the previous traffic secret
@@ -138,8 +135,7 @@ _gnutls_nss_keylog_func(gnutls_session_t session,
 
 GNUTLS_ONCE(keylog_once);
 
-static void
-keylog_once_init(void)
+static void keylog_once_init(void)
 {
 	const char *keylogfile;
 
@@ -153,13 +149,13 @@ keylog_once_init(void)
 
 void _gnutls_nss_keylog_write(gnutls_session_t session,
 			      const char *label,
-			      const uint8_t *secret, size_t secret_size)
+			      const uint8_t * secret, size_t secret_size)
 {
 	(void)gnutls_once(&keylog_once, keylog_once_init);
 
 	if (keylog) {
-		char client_random_hex[2*GNUTLS_RANDOM_SIZE+1];
-		char secret_hex[2*MAX_HASH_SIZE+1];
+		char client_random_hex[2 * GNUTLS_RANDOM_SIZE + 1];
+		char secret_hex[2 * MAX_HASH_SIZE + 1];
 
 		if (gnutls_static_mutex_lock(&keylog_mutex) < 0) {
 			return;
@@ -170,8 +166,8 @@ void _gnutls_nss_keylog_write(gnutls_session_t session,
 					client_random, GNUTLS_RANDOM_SIZE,
 					client_random_hex,
 					sizeof(client_random_hex), NULL),
-			_gnutls_bin2hex(secret, secret_size,
-					secret_hex, sizeof(secret_hex), NULL));
+			_gnutls_bin2hex(secret, secret_size, secret_hex,
+					sizeof(secret_hex), NULL));
 		fflush(keylog);
 		(void)gnutls_static_mutex_unlock(&keylog_mutex);
 	}
@@ -203,12 +199,12 @@ generate_normal_master(gnutls_session_t session,
 							  NULL));
 	_gnutls_hard_log("INT: CLIENT RANDOM[%d]: %s\n", 32,
 			 _gnutls_bin2hex(session->security_parameters.
-					 client_random, 32, buf,
-					 sizeof(buf), NULL));
+					 client_random, 32, buf, sizeof(buf),
+					 NULL));
 	_gnutls_hard_log("INT: SERVER RANDOM[%d]: %s\n", 32,
 			 _gnutls_bin2hex(session->security_parameters.
-					 server_random, 32, buf,
-					 sizeof(buf), NULL));
+					 server_random, 32, buf, sizeof(buf),
+					 NULL));
 
 	if (session->security_parameters.ext_master_secret == 0) {
 		uint8_t rnd[2 * GNUTLS_RANDOM_SIZE + 1];
@@ -218,7 +214,8 @@ generate_normal_master(gnutls_session_t session,
 		       session->security_parameters.server_random,
 		       GNUTLS_RANDOM_SIZE);
 
-		_gnutls_memory_mark_defined(session->security_parameters.master_secret,
+		_gnutls_memory_mark_defined(session->
+					    security_parameters.master_secret,
 					    GNUTLS_MASTER_SIZE);
 #ifdef ENABLE_SSL3
 		if (get_num_version(session) == GNUTLS_SSL3) {
@@ -232,17 +229,19 @@ generate_normal_master(gnutls_session_t session,
 		} else
 #endif
 			ret =
-			    _gnutls_PRF(session, premaster->data, premaster->size,
-					MASTER_SECRET, MASTER_SECRET_SIZE,
-					rnd, 2 * GNUTLS_RANDOM_SIZE,
+			    _gnutls_PRF(session, premaster->data,
+					premaster->size, MASTER_SECRET,
+					MASTER_SECRET_SIZE, rnd,
+					2 * GNUTLS_RANDOM_SIZE,
 					GNUTLS_MASTER_SIZE,
 					session->security_parameters.
 					master_secret);
 		if (ret < 0)
-			_gnutls_memory_mark_undefined(session->security_parameters.master_secret,
-						      GNUTLS_MASTER_SIZE);
+			_gnutls_memory_mark_undefined
+			    (session->security_parameters.master_secret,
+			     GNUTLS_MASTER_SIZE);
 	} else {
-		gnutls_datum_t shash = {NULL, 0};
+		gnutls_datum_t shash = { NULL, 0 };
 
 		/* draft-ietf-tls-session-hash-02 */
 		ret = _gnutls_handshake_get_session_hash(session, &shash);
@@ -253,18 +252,18 @@ generate_normal_master(gnutls_session_t session,
 			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 #endif
 
-		_gnutls_memory_mark_defined(session->security_parameters.master_secret,
+		_gnutls_memory_mark_defined(session->
+					    security_parameters.master_secret,
 					    GNUTLS_MASTER_SIZE);
 		ret =
 		    _gnutls_PRF(session, premaster->data, premaster->size,
 				EXT_MASTER_SECRET, EXT_MASTER_SECRET_SIZE,
-				shash.data, shash.size,
-				GNUTLS_MASTER_SIZE,
-				session->security_parameters.
-				master_secret);
+				shash.data, shash.size, GNUTLS_MASTER_SIZE,
+				session->security_parameters.master_secret);
 		if (ret < 0)
-			_gnutls_memory_mark_undefined(session->security_parameters.master_secret,
-						      GNUTLS_MASTER_SIZE);
+			_gnutls_memory_mark_undefined
+			    (session->security_parameters.master_secret,
+			     GNUTLS_MASTER_SIZE);
 
 		gnutls_free(shash.data);
 	}
@@ -276,7 +275,8 @@ generate_normal_master(gnutls_session_t session,
 		return ret;
 
 	ret = _gnutls_call_keylog_func(session, "CLIENT_RANDOM",
-				       session->security_parameters.master_secret,
+				       session->
+				       security_parameters.master_secret,
 				       GNUTLS_MASTER_SIZE);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
@@ -284,8 +284,8 @@ generate_normal_master(gnutls_session_t session,
 	_gnutls_hard_log("INT: MASTER SECRET[%d]: %s\n",
 			 GNUTLS_MASTER_SIZE,
 			 _gnutls_bin2hex(session->security_parameters.
-					 master_secret, GNUTLS_MASTER_SIZE,
-					 buf, sizeof(buf), NULL));
+					 master_secret, GNUTLS_MASTER_SIZE, buf,
+					 sizeof(buf), NULL));
 
 	return ret;
 }
@@ -300,10 +300,8 @@ int _gnutls_send_server_kx_message(gnutls_session_t session, int again)
 	int ret = 0;
 	mbuffer_st *bufel = NULL;
 
-	if (session->internals.auth_struct->gnutls_generate_server_kx ==
-	    NULL)
+	if (session->internals.auth_struct->gnutls_generate_server_kx == NULL)
 		return 0;
-
 
 	if (again == 0) {
 		ret = _gnutls_buffer_init_handshake_mbuffer(&buf);
@@ -328,7 +326,8 @@ int _gnutls_send_server_kx_message(gnutls_session_t session, int again)
 		bufel = _gnutls_buffer_to_mbuffer(&buf);
 	}
 
-	return _gnutls_send_handshake(session, bufel, GNUTLS_HANDSHAKE_SERVER_KEY_EXCHANGE);
+	return _gnutls_send_handshake(session, bufel,
+				      GNUTLS_HANDSHAKE_SERVER_KEY_EXCHANGE);
 
  cleanup:
 	_gnutls_buffer_clear(&buf);
@@ -351,7 +350,6 @@ int _gnutls_send_server_crt_request(gnutls_session_t session, int again)
 	if (session->internals.send_cert_req <= 0)
 		return 0;
 
-
 	if (again == 0) {
 		ret = _gnutls_buffer_init_handshake_mbuffer(&buf);
 		if (ret < 0)
@@ -369,13 +367,13 @@ int _gnutls_send_server_crt_request(gnutls_session_t session, int again)
 		bufel = _gnutls_buffer_to_mbuffer(&buf);
 	}
 
-	return _gnutls_send_handshake(session, bufel, GNUTLS_HANDSHAKE_CERTIFICATE_REQUEST);
+	return _gnutls_send_handshake(session, bufel,
+				      GNUTLS_HANDSHAKE_CERTIFICATE_REQUEST);
 
  cleanup:
 	_gnutls_buffer_clear(&buf);
 	return ret;
 }
-
 
 /* This is the function for the client to send the key
  * exchange message 
@@ -386,8 +384,7 @@ int _gnutls_send_client_kx_message(gnutls_session_t session, int again)
 	int ret = 0;
 	mbuffer_st *bufel = NULL;
 
-	if (session->internals.auth_struct->gnutls_generate_client_kx ==
-	    NULL)
+	if (session->internals.auth_struct->gnutls_generate_client_kx == NULL)
 		return 0;
 
 	if (again == 0) {
@@ -406,19 +403,18 @@ int _gnutls_send_client_kx_message(gnutls_session_t session, int again)
 		bufel = _gnutls_buffer_to_mbuffer(&buf);
 	}
 
-	return _gnutls_send_handshake(session, bufel, GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE);
+	return _gnutls_send_handshake(session, bufel,
+				      GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE);
 
  cleanup:
 	_gnutls_buffer_clear(&buf);
 	return ret;
 }
 
-
 /* This is the function for the client to send the certificate
  * verify message
  */
-int
-_gnutls_send_client_certificate_verify(gnutls_session_t session, int again)
+int _gnutls_send_client_certificate_verify(gnutls_session_t session, int again)
 {
 	gnutls_buffer_st buf;
 	int ret = 0;
@@ -434,9 +430,8 @@ _gnutls_send_client_certificate_verify(gnutls_session_t session, int again)
 	if (!(session->internals.hsk_flags & HSK_CRT_ASKED))
 		return 0;
 
-
-	if (session->internals.auth_struct->
-	    gnutls_generate_client_crt_vrfy == NULL) {
+	if (session->internals.auth_struct->gnutls_generate_client_crt_vrfy ==
+	    NULL) {
 		gnutls_assert();
 		return 0;	/* this algorithm does not support cli_crt_vrfy 
 				 */
@@ -458,11 +453,11 @@ _gnutls_send_client_certificate_verify(gnutls_session_t session, int again)
 		if (ret == 0)
 			goto cleanup;
 
-
 		bufel = _gnutls_buffer_to_mbuffer(&buf);
 	}
 
-	return _gnutls_send_handshake(session, bufel, GNUTLS_HANDSHAKE_CERTIFICATE_VERIFY);
+	return _gnutls_send_handshake(session, bufel,
+				      GNUTLS_HANDSHAKE_CERTIFICATE_VERIFY);
 
  cleanup:
 	_gnutls_buffer_clear(&buf);
@@ -498,8 +493,7 @@ int _gnutls_send_client_certificate(gnutls_session_t session, int again)
 			 */
 			ret =
 			    session->internals.auth_struct->
-			    gnutls_generate_client_certificate(session,
-							       &buf);
+			    gnutls_generate_client_certificate(session, &buf);
 
 			if (ret < 0) {
 				gnutls_assert();
@@ -509,7 +503,6 @@ int _gnutls_send_client_certificate(gnutls_session_t session, int again)
 
 		bufel = _gnutls_buffer_to_mbuffer(&buf);
 	}
-
 #ifdef ENABLE_SSL3
 	/* In the SSL 3.0 protocol we need to send a
 	 * no certificate alert instead of an
@@ -522,16 +515,16 @@ int _gnutls_send_client_certificate(gnutls_session_t session, int again)
 		    gnutls_alert_send(session, GNUTLS_AL_WARNING,
 				      GNUTLS_A_SSL3_NO_CERTIFICATE);
 
-	} else		/* TLS 1.0 or SSL 3.0 with a valid certificate 
-			 */
+	} else			/* TLS 1.0 or SSL 3.0 with a valid certificate 
+				 */
 #endif
-		return _gnutls_send_handshake(session, bufel, GNUTLS_HANDSHAKE_CERTIFICATE_PKT);
+		return _gnutls_send_handshake(session, bufel,
+					      GNUTLS_HANDSHAKE_CERTIFICATE_PKT);
 
  cleanup:
 	_gnutls_buffer_clear(&buf);
 	return ret;
 }
-
 
 /* This is called when we want send our certificate
  */
@@ -562,13 +555,13 @@ int _gnutls_send_server_certificate(gnutls_session_t session, int again)
 		bufel = _gnutls_buffer_to_mbuffer(&buf);
 	}
 
-	return _gnutls_send_handshake(session, bufel, GNUTLS_HANDSHAKE_CERTIFICATE_PKT);
+	return _gnutls_send_handshake(session, bufel,
+				      GNUTLS_HANDSHAKE_CERTIFICATE_PKT);
 
  cleanup:
 	_gnutls_buffer_clear(&buf);
 	return ret;
 }
-
 
 int _gnutls_recv_server_kx_message(gnutls_session_t session)
 {
@@ -576,8 +569,7 @@ int _gnutls_recv_server_kx_message(gnutls_session_t session)
 	int ret = 0;
 	unsigned int optflag = 0;
 
-	if (session->internals.auth_struct->gnutls_process_server_kx !=
-	    NULL) {
+	if (session->internals.auth_struct->gnutls_process_server_kx != NULL) {
 		/* Server key exchange packet is optional for PSK. */
 		if (_gnutls_session_is_psk(session))
 			optflag = 1;
@@ -593,8 +585,7 @@ int _gnutls_recv_server_kx_message(gnutls_session_t session)
 
 		ret =
 		    session->internals.auth_struct->
-		    gnutls_process_server_kx(session, buf.data,
-					     buf.length);
+		    gnutls_process_server_kx(session, buf.data, buf.length);
 		_gnutls_buffer_clear(&buf);
 
 		if (ret < 0) {
@@ -611,8 +602,8 @@ int _gnutls_recv_server_crt_request(gnutls_session_t session)
 	gnutls_buffer_st buf;
 	int ret = 0;
 
-	if (session->internals.auth_struct->
-	    gnutls_process_server_crt_request != NULL) {
+	if (session->internals.auth_struct->gnutls_process_server_crt_request !=
+	    NULL) {
 
 		ret =
 		    _gnutls_recv_handshake(session,
@@ -643,10 +634,8 @@ int _gnutls_recv_client_kx_message(gnutls_session_t session)
 	gnutls_buffer_st buf;
 	int ret = 0;
 
-
 	/* Do key exchange only if the algorithm permits it */
-	if (session->internals.auth_struct->gnutls_process_client_kx !=
-	    NULL) {
+	if (session->internals.auth_struct->gnutls_process_client_kx != NULL) {
 
 		ret =
 		    _gnutls_recv_handshake(session,
@@ -657,8 +646,7 @@ int _gnutls_recv_client_kx_message(gnutls_session_t session)
 
 		ret =
 		    session->internals.auth_struct->
-		    gnutls_process_client_kx(session, buf.data,
-					     buf.length);
+		    gnutls_process_client_kx(session, buf.data, buf.length);
 		_gnutls_buffer_clear(&buf);
 		if (ret < 0)
 			return ret;
@@ -668,15 +656,14 @@ int _gnutls_recv_client_kx_message(gnutls_session_t session)
 	return ret;
 }
 
-
 int _gnutls_recv_client_certificate(gnutls_session_t session)
 {
 	gnutls_buffer_st buf;
 	int ret = 0;
 	int optional;
 
-	if (session->internals.auth_struct->
-	    gnutls_process_client_certificate == NULL)
+	if (session->internals.auth_struct->gnutls_process_client_certificate ==
+	    NULL)
 		return 0;
 
 	/* if we have not requested a certificate then just return
@@ -704,8 +691,7 @@ int _gnutls_recv_client_certificate(gnutls_session_t session)
 		if (optional != 0 &&
 		    ret == GNUTLS_E_WARNING_ALERT_RECEIVED &&
 		    get_num_version(session) == GNUTLS_SSL3 &&
-		    gnutls_alert_get(session) ==
-		    GNUTLS_A_SSL3_NO_CERTIFICATE) {
+		    gnutls_alert_get(session) == GNUTLS_A_SSL3_NO_CERTIFICATE) {
 
 			/* SSL3 does not send an empty certificate,
 			 * but this alert. So we just ignore it.
@@ -738,8 +724,7 @@ int _gnutls_recv_client_certificate(gnutls_session_t session)
 	}
 	ret =
 	    session->internals.auth_struct->
-	    gnutls_process_client_certificate(session, buf.data,
-					      buf.length);
+	    gnutls_process_client_certificate(session, buf.data, buf.length);
 
 	if (ret < 0 && ret != GNUTLS_E_NO_CERTIFICATE_FOUND) {
 		gnutls_assert();
@@ -753,7 +738,7 @@ int _gnutls_recv_client_certificate(gnutls_session_t session)
 	else
 		session->internals.hsk_flags |= HSK_CRT_VRFY_EXPECTED;
 
-      cleanup:
+ cleanup:
 	_gnutls_buffer_clear(&buf);
 	return ret;
 }
@@ -763,8 +748,8 @@ int _gnutls_recv_server_certificate(gnutls_session_t session)
 	gnutls_buffer_st buf;
 	int ret = 0;
 
-	if (session->internals.auth_struct->
-	    gnutls_process_server_certificate != NULL) {
+	if (session->internals.auth_struct->gnutls_process_server_certificate !=
+	    NULL) {
 
 		ret =
 		    _gnutls_recv_handshake(session,
@@ -789,19 +774,16 @@ int _gnutls_recv_server_certificate(gnutls_session_t session)
 	return ret;
 }
 
-
 /* Recv the client certificate verify. This packet may not
  * arrive if the peer did not send us a certificate.
  */
-int
-_gnutls_recv_client_certificate_verify_message(gnutls_session_t session)
+int _gnutls_recv_client_certificate_verify_message(gnutls_session_t session)
 {
 	gnutls_buffer_st buf;
 	int ret = 0;
 
-
-	if (session->internals.auth_struct->
-	    gnutls_process_client_crt_vrfy == NULL)
+	if (session->internals.auth_struct->gnutls_process_client_crt_vrfy ==
+	    NULL)
 		return 0;
 
 	if (session->internals.send_cert_req == 0 ||
@@ -828,7 +810,7 @@ _gnutls_recv_client_certificate_verify_message(gnutls_session_t session)
 	    session->internals.auth_struct->
 	    gnutls_process_client_crt_vrfy(session, buf.data, buf.length);
 
-      cleanup:
+ cleanup:
 	_gnutls_buffer_clear(&buf);
 	return ret;
 }

@@ -60,7 +60,7 @@ gnutls_pkcs11_copy_secret_key(const char *token_url, gnutls_datum_t * key,
 	int a_val;
 	uint8_t id[16];
 	struct pkcs11_session_info sinfo;
-	
+
 	PKCS11_CHECK_INIT;
 
 	memset(&sinfo, 0, sizeof(sinfo));
@@ -80,8 +80,7 @@ gnutls_pkcs11_copy_secret_key(const char *token_url, gnutls_datum_t * key,
 
 	ret =
 	    pkcs11_open_session(&sinfo, NULL, info,
-				SESSION_WRITE |
-				pkcs11_obj_flags_to_int(flags));
+				SESSION_WRITE | pkcs11_obj_flags_to_int(flags));
 	p11_kit_uri_free(info);
 
 	if (ret < 0) {
@@ -114,7 +113,7 @@ gnutls_pkcs11_copy_secret_key(const char *token_url, gnutls_datum_t * key,
 
 	if (label) {
 		a[a_val].type = CKA_LABEL;
-		a[a_val].value = (void *) label;
+		a[a_val].value = (void *)label;
 		a[a_val].value_len = strlen(label);
 		a_val++;
 	}
@@ -142,7 +141,7 @@ gnutls_pkcs11_copy_secret_key(const char *token_url, gnutls_datum_t * key,
 
 	ret = 0;
 
-      cleanup:
+ cleanup:
 	pkcs11_close_session(&sinfo);
 
 	return ret;

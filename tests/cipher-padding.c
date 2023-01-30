@@ -74,8 +74,7 @@ start(gnutls_cipher_algorithm_t algo, size_t plaintext_size, unsigned int flags)
 	if (flags & GNUTLS_CIPHER_PADDING_PKCS7) {
 		ret = gnutls_cipher_encrypt3(ch,
 					     plaintext, SIZE_MAX,
-					     NULL, &size,
-					     flags);
+					     NULL, &size, flags);
 		if (ret != GNUTLS_E_INVALID_REQUEST) {
 			fail("gnutls_cipher_encrypt3 succeeded\n");
 		}
@@ -84,8 +83,7 @@ start(gnutls_cipher_algorithm_t algo, size_t plaintext_size, unsigned int flags)
 	/* Get the ciphertext size */
 	ret = gnutls_cipher_encrypt3(ch,
 				     plaintext, plaintext_size,
-				     NULL, &size,
-				     flags);
+				     NULL, &size, flags);
 	if (ret < 0) {
 		fail("gnutls_cipher_encrypt3 failed\n");
 	}
@@ -108,8 +106,7 @@ start(gnutls_cipher_algorithm_t algo, size_t plaintext_size, unsigned int flags)
 	/* Encrypt with padding */
 	ret = gnutls_cipher_encrypt3(ch,
 				     plaintext, plaintext_size,
-				     ciphertext, &size,
-				     flags);
+				     ciphertext, &size, flags);
 	if (ret < 0) {
 		fail("gnutls_cipher_encrypt3 failed\n");
 	}
@@ -117,8 +114,7 @@ start(gnutls_cipher_algorithm_t algo, size_t plaintext_size, unsigned int flags)
 	/* Decrypt with padding */
 	ret = gnutls_cipher_decrypt3(ch,
 				     ciphertext, size,
-				     ciphertext, &size,
-				     flags);
+				     ciphertext, &size, flags);
 	if (ret < 0) {
 		fail("gnutls_cipher_encrypt3 failed\n");
 	}
@@ -135,7 +131,8 @@ start(gnutls_cipher_algorithm_t algo, size_t plaintext_size, unsigned int flags)
 	gnutls_cipher_deinit(ch);
 }
 
-void doit(void) {
+void doit(void)
+{
 	int ret;
 
 	gnutls_global_set_log_function(tls_log_func);

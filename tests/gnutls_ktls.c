@@ -1,5 +1,5 @@
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -14,23 +14,23 @@ int main(void)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/crypto.h>
-#include <gnutls/dtls.h>
-#include <gnutls/socket.h>
-#include <signal.h>
-#include <assert.h>
-#include <errno.h>
+# include <string.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/crypto.h>
+# include <gnutls/dtls.h>
+# include <gnutls/socket.h>
+# include <signal.h>
+# include <assert.h>
+# include <errno.h>
 
-#include "cert-common.h"
-#include "utils.h"
+# include "cert-common.h"
+# include "utils.h"
 
 static void server_log_func(int level, const char *str)
 {
@@ -42,8 +42,8 @@ static void client_log_func(int level, const char *str)
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
 
-#define MAX_BUF 1024
-#define MSG "Hello world!"
+# define MAX_BUF 1024
+# define MSG "Hello world!"
 
 static void client(int fd, const char *prio)
 {
@@ -83,62 +83,61 @@ static void client(int fd, const char *prio)
 		success("client: Handshake was completed\n");
 
 	ret = gnutls_transport_is_ktls_enabled(session);
-	if (!(ret & GNUTLS_KTLS_RECV)){
+	if (!(ret & GNUTLS_KTLS_RECV)) {
 		fail("client: KTLS was not properly initialized\n");
 		goto end;
 	}
 
 	/* server send message via gnutls_record_send */
 	memset(buffer, 0, sizeof(buffer));
-	do{
+	do {
 		ret = gnutls_record_recv(session, buffer, sizeof(buffer));
 	}
-	while(ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+	while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 	if (ret == 0) {
-			success
-			    ("client: Peer has closed the TLS connection\n");
+		success("client: Peer has closed the TLS connection\n");
 		goto end;
 	} else if (ret < 0) {
 		fail("client: Error: %s\n", gnutls_strerror(ret));
 		goto end;
 	}
 
-	if(strncmp(buffer, MSG, ret)){
+	if (strncmp(buffer, MSG, ret)) {
 		fail("client: Message doesn't match\n");
 		goto end;
 	}
 
 	if (debug)
-		success ("client: messages received\n");
+		success("client: messages received\n");
 
 	/* server send message via gnutls_record_sendfile */
 	memset(buffer, 0, sizeof(buffer));
-	do{
+	do {
 		ret = gnutls_record_recv(session, buffer, sizeof(buffer));
 	}
-	while(ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+	while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 	if (ret == 0) {
-			success
-			    ("client: Peer has closed the TLS connection\n");
+		success("client: Peer has closed the TLS connection\n");
 		goto end;
 	} else if (ret < 0) {
 		fail("client: Error: %s\n", gnutls_strerror(ret));
 		goto end;
 	}
 
-	if(strncmp(buffer, MSG, ret)){
+	if (strncmp(buffer, MSG, ret)) {
 		fail("client: Message doesn't match\n");
 		goto end;
 	}
 
 	if (debug)
-		success ("client: messages received\n");
+		success("client: messages received\n");
 
 	ret = gnutls_bye(session, GNUTLS_SHUT_RDWR);
 	if (ret < 0) {
-		fail("client: error in closing session: %s\n", gnutls_strerror(ret));
+		fail("client: error in closing session: %s\n",
+		     gnutls_strerror(ret));
 	}
 
 	ret = 0;
@@ -179,15 +178,15 @@ static void server(int fd, const char *prio)
 
 	gnutls_certificate_allocate_credentials(&x509_cred);
 	ret = gnutls_certificate_set_x509_key_mem(x509_cred, &server_cert,
-					    &server_key,
-					    GNUTLS_X509_FMT_PEM);
+						  &server_key,
+						  GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);
 
 	gnutls_init(&session, GNUTLS_SERVER);
 	gnutls_handshake_set_timeout(session, 0);
 
-	assert(gnutls_priority_set_direct(session, prio, NULL)>=0);
+	assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
@@ -207,28 +206,29 @@ static void server(int fd, const char *prio)
 		success("server: Handshake was completed\n");
 
 	ret = gnutls_transport_is_ktls_enabled(session);
-	if (!(ret & GNUTLS_KTLS_SEND)){
+	if (!(ret & GNUTLS_KTLS_SEND)) {
 		fail("server: KTLS was not properly initialized\n");
 		goto end;
 	}
 	do {
-		ret = gnutls_record_send(session, MSG, strlen(MSG)+1);
+		ret = gnutls_record_send(session, MSG, strlen(MSG) + 1);
 	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 	if (ret < 0) {
 		fail("server: data sending has failed (%s)\n\n",
 		     gnutls_strerror(ret));
-			 goto end;
+		goto end;
 	}
 
 	/* send file
 	 */
 	FILE *fp = tmpfile();
-	if (fp == NULL){
+	if (fp == NULL) {
 		fail("temporary file for testing couldn't be created");
 		ret = gnutls_bye(session, GNUTLS_SHUT_RDWR);
 		if (ret < 0)
-			fail("server: error in closing session: %s\n", gnutls_strerror(ret));
+			fail("server: error in closing session: %s\n",
+			     gnutls_strerror(ret));
 		goto end;
 	}
 
@@ -242,21 +242,23 @@ static void server(int fd, const char *prio)
 	}
 
 	do {
-		ret = gnutls_record_send_file(session, fileno(fp), &offset, 512);
+		ret =
+		    gnutls_record_send_file(session, fileno(fp), &offset, 512);
 	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 	if (ret < 0) {
 		fail("server: data sending has failed (%s)\n\n",
 		     gnutls_strerror(ret));
-			 goto end;
+		goto end;
 	}
 
 	ret = gnutls_bye(session, GNUTLS_SHUT_RDWR);
 	if (ret < 0)
-		fail("server: error in closing session: %s\n", gnutls_strerror(ret));
+		fail("server: error in closing session: %s\n",
+		     gnutls_strerror(ret));
 
 	ret = 0;
-end:
+ end:
 	close(fd);
 	gnutls_deinit(session);
 
@@ -264,7 +266,7 @@ end:
 
 	gnutls_global_deinit();
 
-	if (ret){
+	if (ret) {
 		terminate();
 	}
 
@@ -291,7 +293,7 @@ static void run(const char *prio)
 	signal(SIGPIPE, SIG_IGN);
 
 	listener = socket(AF_INET, SOCK_STREAM, 0);
-	if (listener == -1){
+	if (listener == -1) {
 		fail("error in listener(): %s\n", strerror(errno));
 	}
 
@@ -300,14 +302,14 @@ static void run(const char *prio)
 	saddr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 	saddr.sin_port = 0;
 
-	ret = bind(listener, (struct sockaddr*)&saddr, sizeof(saddr));
-	if (ret == -1){
+	ret = bind(listener, (struct sockaddr *)&saddr, sizeof(saddr));
+	if (ret == -1) {
 		fail("error in bind(): %s\n", strerror(errno));
 	}
 
 	addrlen = sizeof(saddr);
-	ret = getsockname(listener, (struct sockaddr*)&saddr, &addrlen);
-	if (ret == -1){
+	ret = getsockname(listener, (struct sockaddr *)&saddr, &addrlen);
+	if (ret == -1) {
 		fail("error in getsockname(): %s\n", strerror(errno));
 	}
 
@@ -335,12 +337,12 @@ static void run(const char *prio)
 		check_wait_status(status);
 	} else {
 		fd = socket(AF_INET, SOCK_STREAM, 0);
-		if (fd == -1){
+		if (fd == -1) {
 			fail("error in socket(): %s\n", strerror(errno));
 			exit(1);
 		}
 		usleep(1000000);
-		connect(fd, (struct sockaddr*)&saddr, addrlen);
+		connect(fd, (struct sockaddr *)&saddr, addrlen);
 		client(fd, prio);
 		exit(0);
 	}

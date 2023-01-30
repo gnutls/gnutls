@@ -24,15 +24,15 @@
 
 #ifdef ENABLE_SRP
 
-#include "errors.h"
-#include <auth/srp_passwd.h>
-#include "auth.h"
-#include "srp.h"
-#include "num.h"
-#include <auth/srp_kx.h>
-#include <str.h>
-#include <datum.h>
-#include <ext/srp.h>
+# include "errors.h"
+# include <auth/srp_passwd.h>
+# include "auth.h"
+# include "srp.h"
+# include "num.h"
+# include <auth/srp_kx.h>
+# include <str.h>
+# include <datum.h>
+# include <ext/srp.h>
 
 const mod_auth_st srp_auth_struct = {
 	"SRP",
@@ -51,15 +51,14 @@ const mod_auth_st srp_auth_struct = {
 	NULL
 };
 
-
-#define _b session->key.proto.tls12.srp.b
-#define B session->key.proto.tls12.srp.B
-#define _a session->key.proto.tls12.srp.a
-#define A session->key.proto.tls12.srp.A
-#define N session->key.proto.tls12.srp.srp_p
-#define G session->key.proto.tls12.srp.srp_g
-#define V session->key.proto.tls12.srp.x
-#define S session->key.proto.tls12.srp.srp_key
+# define _b session->key.proto.tls12.srp.b
+# define B session->key.proto.tls12.srp.B
+# define _a session->key.proto.tls12.srp.a
+# define A session->key.proto.tls12.srp.A
+# define N session->key.proto.tls12.srp.srp_p
+# define G session->key.proto.tls12.srp.srp_g
+# define V session->key.proto.tls12.srp.x
+# define S session->key.proto.tls12.srp.srp_key
 
 /* Checks if a%n==0,+1,-1%n which is a fatal srp error.
  * Returns a proper error code in that case, and 0 when
@@ -94,7 +93,7 @@ inline static int check_param_mod_n(bigint_t a, bigint_t n, int is_a)
 			_gnutls_mpi_release(&r);
 			return gnutls_assert_val(ret);
 		}
-		
+
 		ret = _gnutls_mpi_cmp(r, n);
 		if (ret == 0)
 			err = 1;
@@ -110,13 +109,10 @@ inline static int check_param_mod_n(bigint_t a, bigint_t n, int is_a)
 	return 0;
 }
 
-
 /* Send the first key exchange message ( g, n, s) and append the verifier algorithm number 
  * Data is allocated by the caller, and should have data_size size.
  */
-int
-_gnutls_gen_srp_server_kx(gnutls_session_t session,
-			  gnutls_buffer_st * data)
+int _gnutls_gen_srp_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 {
 	int ret;
 	SRP_PWD_ENTRY *pwd_entry;
@@ -126,9 +122,7 @@ _gnutls_gen_srp_server_kx(gnutls_session_t session,
 	srp_ext_st *priv;
 	unsigned init_pos;
 
-	ret =
-	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_SRP,
-					 &epriv);
+	ret = _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_SRP, &epriv);
 	if (ret < 0) {		/* peer didn't send a username */
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_SRP_USERNAME;
@@ -137,8 +131,7 @@ _gnutls_gen_srp_server_kx(gnutls_session_t session,
 
 	if ((ret =
 	     _gnutls_auth_info_init(session, GNUTLS_CRD_SRP,
-				   sizeof(srp_server_auth_info_st),
-				   1)) < 0) {
+				    sizeof(srp_server_auth_info_st), 1)) < 0) {
 		gnutls_assert();
 		return ret;
 	}
@@ -239,15 +232,13 @@ _gnutls_gen_srp_server_kx(gnutls_session_t session,
 
 	ret = data->length - init_pos;
 
-      cleanup:
+ cleanup:
 	_gnutls_srp_entry_free(pwd_entry);
 	return ret;
 }
 
 /* return A = g^a % N */
-int
-_gnutls_gen_srp_client_kx(gnutls_session_t session,
-			  gnutls_buffer_st * data)
+int _gnutls_gen_srp_client_kx(gnutls_session_t session, gnutls_buffer_st * data)
 {
 	int ret;
 	char *username, *password;
@@ -255,9 +246,7 @@ _gnutls_gen_srp_client_kx(gnutls_session_t session,
 	gnutls_ext_priv_data_t epriv;
 	srp_ext_st *priv;
 
-	ret =
-	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_SRP,
-					 &epriv);
+	ret = _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_SRP, &epriv);
 	if (ret < 0) {		/* peer didn't send a username */
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_SRP_USERNAME;
@@ -312,8 +301,8 @@ _gnutls_gen_srp_client_kx(gnutls_session_t session,
 	_gnutls_mpi_log("SRP U: ", session->key.proto.tls12.srp.u);
 
 	/* S = (B - g^x) ^ (a + u * x) % N */
-	S = _gnutls_calc_srp_S2(B, G, session->key.proto.tls12.srp.x, _a, session->key.proto.tls12.srp.u,
-				N);
+	S = _gnutls_calc_srp_S2(B, G, session->key.proto.tls12.srp.x, _a,
+				session->key.proto.tls12.srp.u, N);
 	if (S == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
@@ -326,7 +315,9 @@ _gnutls_gen_srp_client_kx(gnutls_session_t session,
 	zrelease_temp_mpi_key(&session->key.proto.tls12.srp.u);
 	zrelease_temp_mpi_key(&B);
 
-	ret = _gnutls_mpi_dprint(session->key.proto.tls12.srp.srp_key, &session->key.key);
+	ret =
+	    _gnutls_mpi_dprint(session->key.proto.tls12.srp.srp_key,
+			       &session->key.key);
 	zrelease_temp_mpi_key(&S);
 
 	if (ret < 0) {
@@ -344,7 +335,6 @@ _gnutls_gen_srp_client_kx(gnutls_session_t session,
 
 	return data->length;
 }
-
 
 /* just read A and put it to session */
 int
@@ -401,7 +391,9 @@ _gnutls_proc_srp_client_kx(gnutls_session_t session, uint8_t * data,
 	zrelease_temp_mpi_key(&session->key.proto.tls12.srp.u);
 	zrelease_temp_mpi_key(&B);
 
-	ret = _gnutls_mpi_dprint(session->key.proto.tls12.srp.srp_key, &session->key.key);
+	ret =
+	    _gnutls_mpi_dprint(session->key.proto.tls12.srp.srp_key,
+			       &session->key.key);
 	zrelease_temp_mpi_key(&S);
 
 	if (ret < 0) {
@@ -442,11 +434,11 @@ static const unsigned char srp3072_generator = 0x05;
 static const unsigned char srp8192_generator = 19;
 
 const gnutls_datum_t gnutls_srp_1024_group_prime = {
-	(void *) srp_params_1024, sizeof(srp_params_1024)
+	(void *)srp_params_1024, sizeof(srp_params_1024)
 };
 
 const gnutls_datum_t gnutls_srp_1024_group_generator = {
-	(void *) &srp_generator, sizeof(srp_generator)
+	(void *)&srp_generator, sizeof(srp_generator)
 };
 
 static const unsigned char srp_params_1536[] = {
@@ -475,11 +467,11 @@ static const unsigned char srp_params_1536[] = {
 };
 
 const gnutls_datum_t gnutls_srp_1536_group_prime = {
-	(void *) srp_params_1536, sizeof(srp_params_1536)
+	(void *)srp_params_1536, sizeof(srp_params_1536)
 };
 
 const gnutls_datum_t gnutls_srp_1536_group_generator = {
-	(void *) &srp_generator, sizeof(srp_generator)
+	(void *)&srp_generator, sizeof(srp_generator)
 };
 
 static const unsigned char srp_params_2048[] = {
@@ -515,11 +507,11 @@ static const unsigned char srp_params_2048[] = {
 };
 
 const gnutls_datum_t gnutls_srp_2048_group_prime = {
-	(void *) srp_params_2048, sizeof(srp_params_2048)
+	(void *)srp_params_2048, sizeof(srp_params_2048)
 };
 
 const gnutls_datum_t gnutls_srp_2048_group_generator = {
-	(void *) &srp_generator, sizeof(srp_generator)
+	(void *)&srp_generator, sizeof(srp_generator)
 };
 
 static const unsigned char srp_params_3072[] = {
@@ -569,107 +561,107 @@ static const unsigned char srp_params_3072[] = {
 };
 
 const gnutls_datum_t gnutls_srp_3072_group_generator = {
-	(void *) &srp3072_generator, sizeof(srp3072_generator)
+	(void *)&srp3072_generator, sizeof(srp3072_generator)
 };
 
 const gnutls_datum_t gnutls_srp_3072_group_prime = {
-	(void *) srp_params_3072, sizeof(srp_params_3072)
+	(void *)srp_params_3072, sizeof(srp_params_3072)
 };
 
 static const unsigned char srp_params_4096[] = {
 	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC9, 0x0F, 0xDA,
-	    0xA2,
+	0xA2,
 	0x21, 0x68, 0xC2, 0x34, 0xC4, 0xC6, 0x62, 0x8B, 0x80, 0xDC, 0x1C,
-	    0xD1,
+	0xD1,
 	0x29, 0x02, 0x4E, 0x08, 0x8A, 0x67, 0xCC, 0x74, 0x02, 0x0B, 0xBE,
-	    0xA6,
+	0xA6,
 	0x3B, 0x13, 0x9B, 0x22, 0x51, 0x4A, 0x08, 0x79, 0x8E, 0x34, 0x04,
-	    0xDD,
+	0xDD,
 	0xEF, 0x95, 0x19, 0xB3, 0xCD, 0x3A, 0x43, 0x1B, 0x30, 0x2B, 0x0A,
-	    0x6D,
+	0x6D,
 	0xF2, 0x5F, 0x14, 0x37, 0x4F, 0xE1, 0x35, 0x6D, 0x6D, 0x51, 0xC2,
-	    0x45,
+	0x45,
 	0xE4, 0x85, 0xB5, 0x76, 0x62, 0x5E, 0x7E, 0xC6, 0xF4, 0x4C, 0x42,
-	    0xE9,
+	0xE9,
 	0xA6, 0x37, 0xED, 0x6B, 0x0B, 0xFF, 0x5C, 0xB6, 0xF4, 0x06, 0xB7,
-	    0xED,
+	0xED,
 	0xEE, 0x38, 0x6B, 0xFB, 0x5A, 0x89, 0x9F, 0xA5, 0xAE, 0x9F, 0x24,
-	    0x11,
+	0x11,
 	0x7C, 0x4B, 0x1F, 0xE6, 0x49, 0x28, 0x66, 0x51, 0xEC, 0xE4, 0x5B,
-	    0x3D,
+	0x3D,
 	0xC2, 0x00, 0x7C, 0xB8, 0xA1, 0x63, 0xBF, 0x05, 0x98, 0xDA, 0x48,
-	    0x36,
+	0x36,
 	0x1C, 0x55, 0xD3, 0x9A, 0x69, 0x16, 0x3F, 0xA8, 0xFD, 0x24, 0xCF,
-	    0x5F,
+	0x5F,
 	0x83, 0x65, 0x5D, 0x23, 0xDC, 0xA3, 0xAD, 0x96, 0x1C, 0x62, 0xF3,
-	    0x56,
+	0x56,
 	0x20, 0x85, 0x52, 0xBB, 0x9E, 0xD5, 0x29, 0x07, 0x70, 0x96, 0x96,
-	    0x6D,
+	0x6D,
 	0x67, 0x0C, 0x35, 0x4E, 0x4A, 0xBC, 0x98, 0x04, 0xF1, 0x74, 0x6C,
-	    0x08,
+	0x08,
 	0xCA, 0x18, 0x21, 0x7C, 0x32, 0x90, 0x5E, 0x46, 0x2E, 0x36, 0xCE,
-	    0x3B,
+	0x3B,
 	0xE3, 0x9E, 0x77, 0x2C, 0x18, 0x0E, 0x86, 0x03, 0x9B, 0x27, 0x83,
-	    0xA2,
+	0xA2,
 	0xEC, 0x07, 0xA2, 0x8F, 0xB5, 0xC5, 0x5D, 0xF0, 0x6F, 0x4C, 0x52,
-	    0xC9,
+	0xC9,
 	0xDE, 0x2B, 0xCB, 0xF6, 0x95, 0x58, 0x17, 0x18, 0x39, 0x95, 0x49,
-	    0x7C,
+	0x7C,
 	0xEA, 0x95, 0x6A, 0xE5, 0x15, 0xD2, 0x26, 0x18, 0x98, 0xFA, 0x05,
-	    0x10,
+	0x10,
 	0x15, 0x72, 0x8E, 0x5A, 0x8A, 0xAA, 0xC4, 0x2D, 0xAD, 0x33, 0x17,
-	    0x0D,
+	0x0D,
 	0x04, 0x50, 0x7A, 0x33, 0xA8, 0x55, 0x21, 0xAB, 0xDF, 0x1C, 0xBA,
-	    0x64,
+	0x64,
 	0xEC, 0xFB, 0x85, 0x04, 0x58, 0xDB, 0xEF, 0x0A, 0x8A, 0xEA, 0x71,
-	    0x57,
+	0x57,
 	0x5D, 0x06, 0x0C, 0x7D, 0xB3, 0x97, 0x0F, 0x85, 0xA6, 0xE1, 0xE4,
-	    0xC7,
+	0xC7,
 	0xAB, 0xF5, 0xAE, 0x8C, 0xDB, 0x09, 0x33, 0xD7, 0x1E, 0x8C, 0x94,
-	    0xE0,
+	0xE0,
 	0x4A, 0x25, 0x61, 0x9D, 0xCE, 0xE3, 0xD2, 0x26, 0x1A, 0xD2, 0xEE,
-	    0x6B,
+	0x6B,
 	0xF1, 0x2F, 0xFA, 0x06, 0xD9, 0x8A, 0x08, 0x64, 0xD8, 0x76, 0x02,
-	    0x73,
+	0x73,
 	0x3E, 0xC8, 0x6A, 0x64, 0x52, 0x1F, 0x2B, 0x18, 0x17, 0x7B, 0x20,
-	    0x0C,
+	0x0C,
 	0xBB, 0xE1, 0x17, 0x57, 0x7A, 0x61, 0x5D, 0x6C, 0x77, 0x09, 0x88,
-	    0xC0,
+	0xC0,
 	0xBA, 0xD9, 0x46, 0xE2, 0x08, 0xE2, 0x4F, 0xA0, 0x74, 0xE5, 0xAB,
-	    0x31,
+	0x31,
 	0x43, 0xDB, 0x5B, 0xFC, 0xE0, 0xFD, 0x10, 0x8E, 0x4B, 0x82, 0xD1,
-	    0x20,
+	0x20,
 	0xA9, 0x21, 0x08, 0x01, 0x1A, 0x72, 0x3C, 0x12, 0xA7, 0x87, 0xE6,
-	    0xD7,
+	0xD7,
 	0x88, 0x71, 0x9A, 0x10, 0xBD, 0xBA, 0x5B, 0x26, 0x99, 0xC3, 0x27,
-	    0x18,
+	0x18,
 	0x6A, 0xF4, 0xE2, 0x3C, 0x1A, 0x94, 0x68, 0x34, 0xB6, 0x15, 0x0B,
-	    0xDA,
+	0xDA,
 	0x25, 0x83, 0xE9, 0xCA, 0x2A, 0xD4, 0x4C, 0xE8, 0xDB, 0xBB, 0xC2,
-	    0xDB,
+	0xDB,
 	0x04, 0xDE, 0x8E, 0xF9, 0x2E, 0x8E, 0xFC, 0x14, 0x1F, 0xBE, 0xCA,
-	    0xA6,
+	0xA6,
 	0x28, 0x7C, 0x59, 0x47, 0x4E, 0x6B, 0xC0, 0x5D, 0x99, 0xB2, 0x96,
-	    0x4F,
+	0x4F,
 	0xA0, 0x90, 0xC3, 0xA2, 0x23, 0x3B, 0xA1, 0x86, 0x51, 0x5B, 0xE7,
-	    0xED,
+	0xED,
 	0x1F, 0x61, 0x29, 0x70, 0xCE, 0xE2, 0xD7, 0xAF, 0xB8, 0x1B, 0xDD,
-	    0x76,
+	0x76,
 	0x21, 0x70, 0x48, 0x1C, 0xD0, 0x06, 0x91, 0x27, 0xD5, 0xB0, 0x5A,
-	    0xA9,
+	0xA9,
 	0x93, 0xB4, 0xEA, 0x98, 0x8D, 0x8F, 0xDD, 0xC1, 0x86, 0xFF, 0xB7,
-	    0xDC,
+	0xDC,
 	0x90, 0xA6, 0xC0, 0x8F, 0x4D, 0xF4, 0x35, 0xC9, 0x34, 0x06, 0x31,
-	    0x99,
+	0x99,
 	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
 };
 
 const gnutls_datum_t gnutls_srp_4096_group_generator = {
-	(void *) &srp3072_generator, sizeof(srp3072_generator)
+	(void *)&srp3072_generator, sizeof(srp3072_generator)
 };
 
 const gnutls_datum_t gnutls_srp_4096_group_prime = {
-	(void *) srp_params_4096, sizeof(srp_params_4096)
+	(void *)srp_params_4096, sizeof(srp_params_4096)
 };
 
 static const unsigned char srp_params_8192[] = {
@@ -804,11 +796,11 @@ static const unsigned char srp_params_8192[] = {
 };
 
 const gnutls_datum_t gnutls_srp_8192_group_prime = {
-	(void *) srp_params_8192, sizeof(srp_params_8192)
+	(void *)srp_params_8192, sizeof(srp_params_8192)
 };
 
 const gnutls_datum_t gnutls_srp_8192_group_generator = {
-	(void *) &srp8192_generator, sizeof(srp8192_generator)
+	(void *)&srp8192_generator, sizeof(srp8192_generator)
 };
 
 #ifdef ENABLE_SRP
@@ -823,24 +815,21 @@ check_g_n(const uint8_t * g, size_t n_g, const uint8_t * n, size_t n_n)
 		if (memcmp(srp_params_8192, n, n_n) == 0 &&
 		    n_g == 1 && g[0] == srp8192_generator)
 			return 0;
-		return
-		    gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 	}
 
 	if (n_n == sizeof(srp_params_4096)) {
 		if (memcmp(srp_params_4096, n, n_n) == 0 &&
 		    n_g == 1 && g[0] == srp3072_generator)
 			return 0;
-		return
-		    gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 	}
 
 	if (n_n == sizeof(srp_params_3072)) {
 		if (memcmp(srp_params_3072, n, n_n) == 0 &&
 		    n_g == 1 && g[0] == srp3072_generator)
 			return 0;
-		return
-		    gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 	}
 
 	/* 2048, 1536 and 1024 */
@@ -889,9 +878,7 @@ _gnutls_proc_srp_server_kx(gnutls_session_t session, uint8_t * data,
 	gnutls_ext_priv_data_t epriv;
 	srp_ext_st *priv;
 
-	ret =
-	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_SRP,
-					 &epriv);
+	ret = _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_SRP, &epriv);
 	if (ret < 0) {
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_SRP_USERNAME;
@@ -980,7 +967,6 @@ _gnutls_proc_srp_server_kx(gnutls_session_t session, uint8_t * data,
 		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 	}
 
-
 	/* Check if the g and n are from the SRP
 	 * draft. Otherwise check if N is a prime and G
 	 * a generator.
@@ -998,7 +984,6 @@ _gnutls_proc_srp_server_kx(gnutls_session_t session, uint8_t * data,
 		return ret;
 	}
 
-
 	/* generate x = SHA(s | SHA(U | ":" | p))
 	 * (or the equivalent using bcrypt)
 	 */
@@ -1009,11 +994,11 @@ _gnutls_proc_srp_server_kx(gnutls_session_t session, uint8_t * data,
 		return ret;
 	}
 
-	if (_gnutls_mpi_init_scan_nz(&session->key.proto.tls12.srp.x, hd, _n_g) != 0) {
+	if (_gnutls_mpi_init_scan_nz(&session->key.proto.tls12.srp.x, hd, _n_g)
+	    != 0) {
 		gnutls_assert();
 		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 	}
-
 
 	return i;		/* return the processed data
 				 * needed in auth_srp_rsa.

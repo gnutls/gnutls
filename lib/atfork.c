@@ -43,7 +43,8 @@ static void fork_handler(void)
 # endif
 
 # if defined(HAVE___REGISTER_ATFORK)
-extern int __register_atfork(void (*)(void), void(*)(void), void (*)(void), void *);
+extern int __register_atfork(void (*)(void), void(*)(void), void (*)(void),
+			     void *);
 extern void *__dso_handle;
 
 int _gnutls_register_fork_handler(void)
@@ -76,4 +77,4 @@ int _gnutls_register_fork_handler(void)
 
 # endif
 
-#endif /* !_WIN32 */
+#endif				/* !_WIN32 */

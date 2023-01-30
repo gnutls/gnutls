@@ -22,7 +22,7 @@
  */
 
 #if HAVE_CONFIG_H
-#include "config.h"
+# include "config.h"
 #endif
 
 #include <stdlib.h>
@@ -49,17 +49,20 @@ dsa_validate_dss_pqg(struct dsa_params *pub,
 		     struct dss_params_validation_seeds *cert, unsigned index)
 {
 	int ret;
-	uint8_t domain_seed[MAX_PVP_SEED_SIZE*3];
+	uint8_t domain_seed[MAX_PVP_SEED_SIZE * 3];
 	unsigned domain_seed_size = 0;
 
 	ret = _dsa_validate_dss_pq(pub, cert);
 	if (ret == 0)
 		return 0;
 
-	domain_seed_size = cert->seed_length + cert->qseed_length + cert->pseed_length;
+	domain_seed_size =
+	    cert->seed_length + cert->qseed_length + cert->pseed_length;
 	memcpy(domain_seed, cert->seed, cert->seed_length);
-	memcpy(&domain_seed[cert->seed_length], cert->pseed, cert->pseed_length);
-	memcpy(&domain_seed[cert->seed_length+cert->pseed_length], cert->qseed, cert->qseed_length);
+	memcpy(&domain_seed[cert->seed_length], cert->pseed,
+	       cert->pseed_length);
+	memcpy(&domain_seed[cert->seed_length + cert->pseed_length],
+	       cert->qseed, cert->qseed_length);
 
 	ret = _dsa_validate_dss_g(pub, domain_seed_size, domain_seed, index);
 	if (ret == 0)
@@ -70,7 +73,8 @@ dsa_validate_dss_pqg(struct dsa_params *pub,
 
 int
 _dsa_validate_dss_g(struct dsa_params *pub,
-		    unsigned domain_seed_size, const uint8_t *domain_seed, unsigned index)
+		    unsigned domain_seed_size, const uint8_t * domain_seed,
+		    unsigned index)
 {
 	int ret;
 	unsigned p_bits, q_bits;

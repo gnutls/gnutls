@@ -30,12 +30,12 @@
 
 #ifdef ENABLE_PSK
 
-#include <auth/psk_passwd.h>
-#include <num.h>
-#include <file.h>
-#include <datum.h>
-#include "debug.h"
-#include "dh.h"
+# include <auth/psk_passwd.h>
+# include <num.h>
+# include <file.h>
+# include <datum.h>
+# include "debug.h"
+# include "dh.h"
 
 /**
  * gnutls_psk_free_client_credentials:
@@ -59,9 +59,7 @@ void gnutls_psk_free_client_credentials(gnutls_psk_client_credentials_t sc)
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
  **/
-int
-gnutls_psk_allocate_client_credentials(gnutls_psk_client_credentials_t *
-				       sc)
+int gnutls_psk_allocate_client_credentials(gnutls_psk_client_credentials_t * sc)
 {
 	*sc = gnutls_calloc(1, sizeof(psk_client_credentials_st));
 
@@ -102,7 +100,7 @@ gnutls_psk_set_client_credentials(gnutls_psk_client_credentials_t res,
 	if (username == NULL)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	dat.data = (unsigned char *) username;
+	dat.data = (unsigned char *)username;
 	dat.size = strlen(username);
 
 	return gnutls_psk_set_client_credentials2(res, &dat, key, flags);
@@ -124,19 +122,19 @@ gnutls_psk_set_client_credentials(gnutls_psk_client_credentials_t res,
  */
 int
 gnutls_psk_set_client_credentials2(gnutls_psk_client_credentials_t res,
-				   const gnutls_datum_t *username,
-				   const gnutls_datum_t *key,
+				   const gnutls_datum_t * username,
+				   const gnutls_datum_t * key,
 				   gnutls_psk_key_flags flags)
 {
 	int ret;
 
-	if (username == NULL || username->data == NULL || key == NULL || key->data == NULL) {
+	if (username == NULL || username->data == NULL || key == NULL
+	    || key->data == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	ret =
-	    _gnutls_set_datum(&res->username, username->data, username->size);
+	ret = _gnutls_set_datum(&res->username, username->data, username->size);
 	if (ret < 0)
 		return ret;
 
@@ -156,11 +154,10 @@ gnutls_psk_set_client_credentials2(gnutls_psk_client_credentials_t res,
 			goto error;
 		}
 
-		ret =
-		    gnutls_hex_decode(key, (char *) res->key.data, &size);
-		res->key.size = (unsigned int) size;
+		ret = gnutls_hex_decode(key, (char *)res->key.data, &size);
+		res->key.size = (unsigned int)size;
 		if (ret < 0) {
-			
+
 			gnutls_assert();
 			goto error;
 		}
@@ -174,7 +171,7 @@ gnutls_psk_set_client_credentials2(gnutls_psk_client_credentials_t res,
 
 	return 0;
 
-      error:
+ error:
 	_gnutls_free_datum(&res->username);
 	_gnutls_free_datum(&res->key);
 
@@ -207,9 +204,7 @@ void gnutls_psk_free_server_credentials(gnutls_psk_server_credentials_t sc)
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
  **/
-int
-gnutls_psk_allocate_server_credentials(gnutls_psk_server_credentials_t *
-				       sc)
+int gnutls_psk_allocate_server_credentials(gnutls_psk_server_credentials_t * sc)
 {
 	*sc = gnutls_calloc(1, sizeof(psk_server_cred_st));
 
@@ -220,7 +215,6 @@ gnutls_psk_allocate_server_credentials(gnutls_psk_server_credentials_t *
 	(*sc)->binder_algo = _gnutls_mac_to_entry(GNUTLS_MAC_SHA256);
 	return 0;
 }
-
 
 /**
  * gnutls_psk_set_server_credentials_file:
@@ -293,16 +287,16 @@ gnutls_psk_set_server_credentials_hint(gnutls_psk_server_credentials_t res,
 }
 
 static int call_server_callback_legacy(gnutls_session_t session,
-				       const gnutls_datum_t *username,
-				       gnutls_datum_t *key)
+				       const gnutls_datum_t * username,
+				       gnutls_datum_t * key)
 {
-	gnutls_psk_server_credentials_t cred =
-			(gnutls_psk_server_credentials_t)
-				_gnutls_get_cred(session, GNUTLS_CRD_PSK);
+	gnutls_psk_server_credentials_t cred = (gnutls_psk_server_credentials_t)
+	    _gnutls_get_cred(session, GNUTLS_CRD_PSK);
 	if (unlikely(cred == NULL))
-	  return gnutls_assert_val(-1);
+		return gnutls_assert_val(-1);
 
-	return cred->pwd_callback_legacy(session, (const char *) username->data, key);
+	return cred->pwd_callback_legacy(session, (const char *)username->data,
+					 key);
 }
 
 /**
@@ -359,25 +353,25 @@ gnutls_psk_set_server_credentials_function(gnutls_psk_server_credentials_t
  * an error.
  **/
 void
-gnutls_psk_set_server_credentials_function2(gnutls_psk_server_credentials_t cred,
-					    gnutls_psk_server_credentials_function2 func)
+gnutls_psk_set_server_credentials_function2(gnutls_psk_server_credentials_t
+					    cred,
+					    gnutls_psk_server_credentials_function2
+					    func)
 {
 	cred->pwd_callback = func;
 	cred->pwd_callback_legacy = NULL;
 }
 
 static int call_client_callback_legacy(gnutls_session_t session,
-				       gnutls_datum_t *username,
-				       gnutls_datum_t *key)
+				       gnutls_datum_t * username,
+				       gnutls_datum_t * key)
 {
 	int ret;
 	char *user_p;
-	gnutls_psk_client_credentials_t cred =
-			(gnutls_psk_client_credentials_t)
-				_gnutls_get_cred(session, GNUTLS_CRD_PSK);
+	gnutls_psk_client_credentials_t cred = (gnutls_psk_client_credentials_t)
+	    _gnutls_get_cred(session, GNUTLS_CRD_PSK);
 	if (unlikely(cred == NULL))
-	  return gnutls_assert_val(-1);
-
+		return gnutls_assert_val(-1);
 
 	ret = cred->get_function_legacy(session, &user_p, key);
 
@@ -387,7 +381,7 @@ static int call_client_callback_legacy(gnutls_session_t session,
 	username->data = (uint8_t *) user_p;
 	username->size = strlen(user_p);
 
-end:
+ end:
 	return ret;
 }
 
@@ -447,13 +441,14 @@ gnutls_psk_set_client_credentials_function(gnutls_psk_client_credentials_t
  * -1 indicates an error.
  **/
 void
-gnutls_psk_set_client_credentials_function2(gnutls_psk_client_credentials_t cred,
-					    gnutls_psk_client_credentials_function2 *func)
+gnutls_psk_set_client_credentials_function2(gnutls_psk_client_credentials_t
+					    cred,
+					    gnutls_psk_client_credentials_function2
+					    * func)
 {
 	cred->get_function = func;
 	cred->get_function_legacy = NULL;
 }
-
 
 /**
  * gnutls_psk_server_get_username:
@@ -481,7 +476,8 @@ const char *gnutls_psk_server_get_username(gnutls_session_t session)
 	if (info == NULL)
 		return NULL;
 
-	if (info->username[0] != 0 && !_gnutls_has_embedded_null(info->username, info->username_len))
+	if (info->username[0] != 0
+	    && !_gnutls_has_embedded_null(info->username, info->username_len))
 		return info->username;
 
 	return NULL;
@@ -503,7 +499,8 @@ const char *gnutls_psk_server_get_username(gnutls_session_t session)
  *
  * Returns: %GNUTLS_E_SUCCESS, or a negative value in case of an error.
  **/
-int gnutls_psk_server_get_username2(gnutls_session_t session, gnutls_datum_t *username)
+int gnutls_psk_server_get_username2(gnutls_session_t session,
+				    gnutls_datum_t * username)
 {
 	psk_auth_info_t info;
 
@@ -514,7 +511,7 @@ int gnutls_psk_server_get_username2(gnutls_session_t session, gnutls_datum_t *us
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 
 	if (info->username_len > 0) {
-		username->data = (unsigned char *) info->username;
+		username->data = (unsigned char *)info->username;
 		username->size = info->username_len;
 		return 0;
 	}
@@ -572,7 +569,10 @@ gnutls_psk_set_server_dh_params(gnutls_psk_server_credentials_t res,
 	}
 
 	res->dh_params = dh_params;
-	res->dh_sec_param = gnutls_pk_bits_to_sec_param(GNUTLS_PK_DH, _gnutls_mpi_get_nbits(dh_params->params[0]));
+	res->dh_sec_param =
+	    gnutls_pk_bits_to_sec_param(GNUTLS_PK_DH,
+					_gnutls_mpi_get_nbits(dh_params->params
+							      [0]));
 }
 
 /**
@@ -596,7 +596,7 @@ gnutls_psk_set_server_dh_params(gnutls_psk_server_credentials_t res,
  **/
 int
 gnutls_psk_set_server_known_dh_params(gnutls_psk_server_credentials_t res,
-				       gnutls_sec_param_t sec_param)
+				      gnutls_sec_param_t sec_param)
 {
 	res->dh_sec_param = sec_param;
 

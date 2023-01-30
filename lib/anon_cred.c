@@ -24,12 +24,12 @@
 
 #ifdef ENABLE_ANON
 
-#include "errors.h"
-#include <auth/anon.h>
-#include "auth.h"
-#include "dh.h"
-#include "num.h"
-#include "mpi.h"
+# include "errors.h"
+# include <auth/anon.h>
+# include "auth.h"
+# include "dh.h"
+# include "num.h"
+# include "mpi.h"
 
 /**
  * gnutls_anon_free_server_credentials:
@@ -37,8 +37,7 @@
  *
  * Free a gnutls_anon_server_credentials_t structure.
  **/
-void
-gnutls_anon_free_server_credentials(gnutls_anon_server_credentials_t sc)
+void gnutls_anon_free_server_credentials(gnutls_anon_server_credentials_t sc)
 {
 	if (sc->deinit_dh_params) {
 		gnutls_dh_params_deinit(sc->dh_params);
@@ -55,8 +54,7 @@ gnutls_anon_free_server_credentials(gnutls_anon_server_credentials_t sc)
  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
  **/
 int
-gnutls_anon_allocate_server_credentials(gnutls_anon_server_credentials_t *
-					sc)
+gnutls_anon_allocate_server_credentials(gnutls_anon_server_credentials_t * sc)
 {
 
 	*sc = gnutls_calloc(1, sizeof(anon_server_credentials_st));
@@ -64,21 +62,18 @@ gnutls_anon_allocate_server_credentials(gnutls_anon_server_credentials_t *
 	return 0;
 }
 
-
 /**
  * gnutls_anon_free_client_credentials:
  * @sc: is a #gnutls_anon_client_credentials_t type.
  *
  * Free a gnutls_anon_client_credentials_t structure.
  **/
-void
-gnutls_anon_free_client_credentials(gnutls_anon_client_credentials_t sc)
+void gnutls_anon_free_client_credentials(gnutls_anon_client_credentials_t sc)
 {
 }
 
 static struct gnutls_anon_client_credentials_st anon_dummy_struct;
-static const gnutls_anon_client_credentials_t anon_dummy =
-    &anon_dummy_struct;
+static const gnutls_anon_client_credentials_t anon_dummy = &anon_dummy_struct;
 
 /**
  * gnutls_anon_allocate_client_credentials:
@@ -89,8 +84,7 @@ static const gnutls_anon_client_credentials_t anon_dummy =
  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
  **/
 int
-gnutls_anon_allocate_client_credentials(gnutls_anon_client_credentials_t *
-					sc)
+gnutls_anon_allocate_client_credentials(gnutls_anon_client_credentials_t * sc)
 {
 	/* anon_dummy is only there for *sc not to be null.
 	 * it is not used at all;
@@ -124,7 +118,10 @@ gnutls_anon_set_server_dh_params(gnutls_anon_server_credentials_t res,
 	}
 
 	res->dh_params = dh_params;
-	res->dh_sec_param = gnutls_pk_bits_to_sec_param(GNUTLS_PK_DH, _gnutls_mpi_get_nbits(dh_params->params[0]));
+	res->dh_sec_param =
+	    gnutls_pk_bits_to_sec_param(GNUTLS_PK_DH,
+					_gnutls_mpi_get_nbits(dh_params->params
+							      [0]));
 }
 
 /**
@@ -148,7 +145,7 @@ gnutls_anon_set_server_dh_params(gnutls_anon_server_credentials_t res,
  **/
 int
 gnutls_anon_set_server_known_dh_params(gnutls_anon_server_credentials_t res,
-					gnutls_sec_param_t sec_param)
+				       gnutls_sec_param_t sec_param)
 {
 	res->dh_sec_param = sec_param;
 

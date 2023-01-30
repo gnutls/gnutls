@@ -1,8 +1,8 @@
 #ifndef GNUTLS_LIB_ACCELERATED_X86_AES_PADLOCK_H
-#define GNUTLS_LIB_ACCELERATED_X86_AES_PADLOCK_H
+# define GNUTLS_LIB_ACCELERATED_X86_AES_PADLOCK_H
 
-#include "gnutls_int.h"
-#include <aes-x86.h>
+# include "gnutls_int.h"
+# include <aes-x86.h>
 
 struct padlock_cipher_data {
 	unsigned char iv[16];	/* Initialization vector */
@@ -33,8 +33,7 @@ extern const gnutls_crypto_cipher_st _gnutls_aes_gcm_padlock;
 extern const gnutls_crypto_mac_st _gnutls_hmac_sha_padlock_oneshot;
 extern const gnutls_crypto_digest_st _gnutls_sha_padlock_oneshot;
 
-int padlock_aes_cipher_setkey(void *_ctx, const void *userkey,
-			      size_t keysize);
+int padlock_aes_cipher_setkey(void *_ctx, const void *userkey, size_t keysize);
 
 /* asm */
 unsigned int padlock_capability(void);
@@ -43,4 +42,4 @@ int padlock_ecb_encrypt(void *out, const void *inp,
 			struct padlock_cipher_data *ctx, size_t len);
 int padlock_cbc_encrypt(void *out, const void *inp,
 			struct padlock_cipher_data *ctx, size_t len);
-#endif /* GNUTLS_LIB_ACCELERATED_X86_AES_PADLOCK_H */
+#endif				/* GNUTLS_LIB_ACCELERATED_X86_AES_PADLOCK_H */

@@ -30,10 +30,10 @@
 #include <sys/stat.h>
 
 #ifndef _WIN32
-#include <pwd.h>
-#include <unistd.h>
+# include <pwd.h>
+# include <unistd.h>
 #else
-#include <windows.h>
+# include <windows.h>
 #endif
 
 /* Gnulib portability files. */
@@ -48,8 +48,7 @@
 
 int crypt_int(const char *username, const char *passwd, int salt,
 	      const char *tpasswd_conf, const char *tpasswd, int uindex);
-static int read_conf_values(gnutls_datum_t * g, gnutls_datum_t * n,
-			    char *str);
+static int read_conf_values(gnutls_datum_t * g, gnutls_datum_t * n, char *str);
 static int _verify_passwd_int(const char *username, const char *passwd,
 			      char *verifier, const char *salt,
 			      const gnutls_datum_t * g,
@@ -175,7 +174,7 @@ _verify_passwd_int(const char *username, const char *passwd,
 		*pos = 0;
 
 	/* convert salt to binary. */
-	tmp.data = (void *) _salt;
+	tmp.data = (void *)_salt;
 	tmp.size = strlen(_salt);
 
 	if (gnutls_srp_base64_decode_alloc(&tmp, &raw_salt) < 0) {
@@ -295,8 +294,7 @@ verify_passwd(const char *conffile, const char *tpasswd,
 
 	iindex = find_strchr(username, tpasswd);
 	if (iindex == -1) {
-		fprintf(stderr, "Cannot find '%s' in %s\n", username,
-			tpasswd);
+		fprintf(stderr, "Cannot find '%s' in %s\n", username, tpasswd);
 		return -1;
 	}
 
@@ -412,12 +410,12 @@ int main(int argc, char **argv)
 	if (HAVE_OPT(PASSWD))
 		fpasswd = OPT_ARG(PASSWD);
 	else
-		fpasswd = (char *) KPASSWD;
+		fpasswd = (char *)KPASSWD;
 
 	if (HAVE_OPT(PASSWD_CONF))
 		fpasswd_conf = OPT_ARG(PASSWD_CONF);
 	else
-		fpasswd_conf = (char *) KPASSWD_CONF;
+		fpasswd_conf = (char *)KPASSWD_CONF;
 
 	if (HAVE_OPT(USERNAME))
 		username = OPT_ARG(USERNAME);
@@ -445,12 +443,10 @@ int main(int argc, char **argv)
 		return -1;
 	}
 
-/* not ready yet */
+	/* not ready yet */
 	if (HAVE_OPT(VERIFY)) {
-		return verify_passwd(fpasswd_conf, fpasswd,
-				     username, passwd);
+		return verify_passwd(fpasswd_conf, fpasswd, username, passwd);
 	}
-
 
 	return crypt_int(username, passwd, salt_size,
 			 fpasswd_conf, fpasswd, OPT_VALUE_INDEX);
@@ -466,7 +462,7 @@ static char *_srp_crypt(const char *username, const char *passwd,
 	gnutls_datum_t dat_salt, txt_salt;
 	gnutls_datum_t verifier, txt_verifier;
 
-	if ((unsigned) salt_size > sizeof(salt))
+	if ((unsigned)salt_size > sizeof(salt))
 		return NULL;
 
 	/* generate the salt
@@ -507,7 +503,6 @@ static char *_srp_crypt(const char *username, const char *passwd,
 
 }
 
-
 int
 crypt_int(const char *username, const char *passwd, int salt_size,
 	  const char *tpasswd_conf, const char *tpasswd, int uindex)
@@ -539,8 +534,7 @@ crypt_int(const char *username, const char *passwd, int salt_size,
 	line[sizeof(line) - 1] = 0;
 
 	if ((iindex = read_conf_values(&g, &n, line)) < 0) {
-		fprintf(stderr, "Cannot parse conf file '%s'\n",
-			tpasswd_conf);
+		fprintf(stderr, "Cannot parse conf file '%s'\n", tpasswd_conf);
 		return -1;
 	}
 
@@ -555,8 +549,7 @@ crypt_int(const char *username, const char *passwd, int salt_size,
 		int put;
 
 		if (strlen(tpasswd) + 5 > sizeof(tmpname)) {
-			fprintf(stderr, "file '%s' is tooooo long\n",
-				tpasswd);
+			fprintf(stderr, "file '%s' is tooooo long\n", tpasswd);
 			return -1;
 		}
 
@@ -583,8 +576,7 @@ crypt_int(const char *username, const char *passwd, int salt_size,
 
 		fp2 = fopen(tmpname, "r");
 		if (fp2 == NULL) {
-			fprintf(stderr, "Cannot open '%s' for read\n",
-				tmpname);
+			fprintf(stderr, "Cannot open '%s' for read\n", tmpname);
 			(void)remove(tmpname);
 			fclose(fp);
 			return -1;
@@ -602,10 +594,9 @@ crypt_int(const char *username, const char *passwd, int salt_size,
 
 			if (strncmp(p, username,
 				    MAX(strlen(username),
-					(unsigned int) (pp - p))) == 0) {
+					(unsigned int)(pp - p))) == 0) {
 				put = 1;
-				fprintf(fp, "%s:%s:%u\n", username, cr,
-					iindex);
+				fprintf(fp, "%s:%s:%u\n", username, cr, iindex);
 			} else {
 				fputs(line, fp);
 			}
@@ -623,17 +614,13 @@ crypt_int(const char *username, const char *passwd, int salt_size,
 
 	}
 
-
 	return 0;
 }
-
-
 
 /* this function parses tpasswd.conf file. Format is:
  * int(index):base64(n):base64(g)
  */
-static int
-read_conf_values(gnutls_datum_t * g, gnutls_datum_t * n, char *str)
+static int read_conf_values(gnutls_datum_t * g, gnutls_datum_t * n, char *str)
 {
 	char *p;
 	int len;
@@ -655,7 +642,7 @@ read_conf_values(gnutls_datum_t * g, gnutls_datum_t * n, char *str)
 	if (p[len - 1] == '\n')
 		len--;
 
-	dat.data = (void *) p;
+	dat.data = (void *)p;
 	dat.size = len;
 	ret = gnutls_srp_base64_decode_alloc(&dat, g);
 
@@ -673,7 +660,7 @@ read_conf_values(gnutls_datum_t * g, gnutls_datum_t * n, char *str)
 	*p = '\0';
 	p++;
 
-	dat.data = (void *) p;
+	dat.data = (void *)p;
 	dat.size = strlen(p);
 
 	ret = gnutls_srp_base64_decode_alloc(&dat, n);

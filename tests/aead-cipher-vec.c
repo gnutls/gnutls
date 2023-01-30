@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <gnutls/crypto.h>
@@ -43,7 +43,7 @@ static void start(const char *name, int algo)
 	uint8_t key16[64];
 	uint8_t iv16[32];
 	uint8_t auth[128];
-	uint8_t data[64+56+36];
+	uint8_t data[64 + 56 + 36];
 	gnutls_datum_t key, iv;
 	giovec_t iov[3];
 	giovec_t auth_iov[2];
@@ -78,8 +78,7 @@ static void start(const char *name, int algo)
 
 	success("trying %s\n", name);
 
-	ret =
-	    gnutls_aead_cipher_init(&ch, algo, &key);
+	ret = gnutls_aead_cipher_init(&ch, algo, &key);
 	if (ret < 0)
 		fail("gnutls_cipher_init: %s\n", gnutls_strerror(ret));
 
@@ -87,25 +86,24 @@ static void start(const char *name, int algo)
 		ret = gnutls_aead_cipher_encryptv2(ch,
 						   iv.data, iv.size,
 						   auth_iov, 2,
-						   iov, i + 1,
-						   tag, &tag_size);
+						   iov, i + 1, tag, &tag_size);
 		if (ret < 0)
-			fail("could not encrypt data: %s\n", gnutls_strerror(ret));
+			fail("could not encrypt data: %s\n",
+			     gnutls_strerror(ret));
 
 		ret = gnutls_aead_cipher_decryptv2(ch,
 						   iv.data, iv.size,
 						   auth_iov, 2,
-						   iov, i + 1,
-						   tag, tag_size);
+						   iov, i + 1, tag, tag_size);
 		if (ret < 0)
-			fail("could not decrypt data: %s\n", gnutls_strerror(ret));
+			fail("could not decrypt data: %s\n",
+			     gnutls_strerror(ret));
 	}
 
 	gnutls_aead_cipher_deinit(ch);
 }
 
-void
-doit(void)
+void doit(void)
 {
 	int ret;
 
@@ -115,7 +113,7 @@ doit(void)
 
 	ret = global_init();
 	if (ret < 0) {
-		fail("Cannot initialize library\n"); /*errcode 1 */
+		fail("Cannot initialize library\n");	/*errcode 1 */
 	}
 
 	start("aes-128-gcm", GNUTLS_CIPHER_AES_128_GCM);

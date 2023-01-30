@@ -29,9 +29,9 @@
 #include <sys/time.h>
 #include <sys/stat.h>
 #if HAVE_SYS_SOCKET_H
-#include <sys/socket.h>
+# include <sys/socket.h>
 #elif HAVE_WS2TCPIP_H
-#include <ws2tcpip.h>
+# include <ws2tcpip.h>
 #endif
 #include <sys/select.h>
 #include <unistd.h>
@@ -44,7 +44,7 @@
 
 /* Get TCP_FASTOPEN */
 #ifdef HAVE_NETINET_TCP_H
-#include <netinet/tcp.h>
+# include <netinet/tcp.h>
 #endif
 
 #include <gnutls/gnutls.h>
@@ -65,7 +65,7 @@
 #include "inline_cmds.h"
 
 #ifdef HAVE_DANE
-#include <gnutls/dane.h>
+# include <gnutls/dane.h>
 #endif
 
 #include <common.h>
@@ -86,7 +86,7 @@ int resume, starttls, insecure, ranges, rehandshake, udp, mtu,
     inline_commands, waitresumption;
 unsigned int global_vflags = 0;
 char *hostname = NULL;
-char service[32]="";
+char service[32] = "";
 int record_max_size;
 int crlf;
 int fastopen;
@@ -123,11 +123,12 @@ static gnutls_certificate_credentials_t xcred;
 static void check_server_cmd(socket_st * socket, int ret);
 static void init_global_tls_stuff(void);
 static int cert_verify_ocsp(gnutls_session_t session);
-static const char *host_from_url(const char *url, unsigned int *port, const char **path);
+static const char *host_from_url(const char *url, unsigned int *port,
+				 const char **path);
 static size_t get_data(void *buf, size_t size, size_t nmemb, void *userp);
 static int getissuer_callback(const gnutls_x509_trust_list_t tlist,
 			      const gnutls_x509_crt_t cert,
-			      gnutls_x509_crt_t **issuers,
+			      gnutls_x509_crt_t ** issuers,
 			      unsigned int *issuers_size);
 
 #define MAX_CRT 6
@@ -137,10 +138,9 @@ static gnutls_privkey_t x509_key = NULL;
 static gnutls_pcert_st rawpk;
 static gnutls_privkey_t rawpk_key = NULL;
 
-
 /* Load a PKCS #8, PKCS #12 private key or PKCS #11 URL
  */
-static void load_priv_key(gnutls_privkey_t* privkey, const char* key_source)
+static void load_priv_key(gnutls_privkey_t * privkey, const char *key_source)
 {
 	int ret;
 	gnutls_datum_t data = { NULL, 0 };
@@ -153,8 +153,7 @@ static void load_priv_key(gnutls_privkey_t* privkey, const char* key_source)
 		exit(1);
 	}
 
-	gnutls_privkey_set_pin_function(*privkey, pin_callback,
-					NULL);
+	gnutls_privkey_set_pin_function(*privkey, pin_callback, NULL);
 
 	if (gnutls_url_is_supported(key_source) != 0) {
 		ret = gnutls_privkey_import_url(*privkey, key_source, 0);
@@ -167,13 +166,12 @@ static void load_priv_key(gnutls_privkey_t* privkey, const char* key_source)
 	} else {
 		ret = gnutls_load_file(key_source, &data);
 		if (ret < 0) {
-			fprintf(stderr,
-				"*** Error loading key file.\n");
+			fprintf(stderr, "*** Error loading key file.\n");
 			exit(1);
 		}
 
 		ret = gnutls_privkey_import_x509_raw(*privkey, &data,
-		                                     x509ctype, NULL, 0);
+						     x509ctype, NULL, 0);
 		if (ret < 0) {
 			fprintf(stderr,
 				"*** Error importing key: %s\n",
@@ -205,13 +203,11 @@ static void load_x509_keys(void)
 				exit(1);
 			}
 			gnutls_x509_crt_set_pin_function(crt_list[0],
-							 pin_callback,
-							 NULL);
+							 pin_callback, NULL);
 
 			ret =
 			    gnutls_x509_crt_import_pkcs11_url(crt_list[0],
-							      x509_certfile,
-							      0);
+							      x509_certfile, 0);
 
 			if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 				ret =
@@ -291,16 +287,17 @@ static void load_rawpk_keys(void)
 		// First we load the raw public key
 		ret = gnutls_load_file(rawpk_file, &data);
 		if (ret < 0) {
-			fprintf(stderr,
-				"*** Error loading cert file.\n");
+			fprintf(stderr, "*** Error loading cert file.\n");
 			exit(1);
 		}
 
-		ret = gnutls_pcert_import_rawpk_raw(&rawpk, &data, x509ctype, 0, 0);
+		ret =
+		    gnutls_pcert_import_rawpk_raw(&rawpk, &data, x509ctype, 0,
+						  0);
 		if (ret < 0) {
 			fprintf(stderr,
-			        "*** Error importing rawpk to pcert: %s\n",
-			        gnutls_strerror(ret));
+				"*** Error importing rawpk to pcert: %s\n",
+				gnutls_strerror(ret));
 			exit(1);
 		}
 
@@ -310,7 +307,7 @@ static void load_rawpk_keys(void)
 		load_priv_key(&rawpk_key, rawpk_keyfile);
 
 		log_msg(stdout,
-			"Processed %d client raw public key pair...\n",	1);
+			"Processed %d client raw public key pair...\n", 1);
 	}
 }
 
@@ -353,8 +350,10 @@ static void try_save_cert(gnutls_session_t session)
 		exit(1);
 	}
 
-	for (i=0;i<cert_list_size;i++) {
-		ret = gnutls_pem_base64_encode_alloc("CERTIFICATE", &cert_list[i], &t);
+	for (i = 0; i < cert_list_size; i++) {
+		ret =
+		    gnutls_pem_base64_encode_alloc("CERTIFICATE", &cert_list[i],
+						   &t);
 		if (ret < 0) {
 			fprintf(stderr, "error[%d]: %s\n", __LINE__,
 				gnutls_strerror(ret));
@@ -374,7 +373,8 @@ static void try_save_ocsp_status(gnutls_session_t session)
 	unsigned int cert_num = 0;
 	gnutls_certificate_get_peers(session, &cert_num);
 	if (cert_num == 0) {
-		fprintf(stderr, "no certificates sent by server, so can't get OCSP status!\n");
+		fprintf(stderr,
+			"no certificates sent by server, so can't get OCSP status!\n");
 		return;
 	}
 
@@ -384,8 +384,7 @@ static void try_save_ocsp_status(gnutls_session_t session)
 
 	/* This function is called if exactly one of SAVE_OCSP and
 	 * SAVE_OCSP_MULTI is set. */
-	if (HAVE_OPT(SAVE_OCSP))
-	{
+	if (HAVE_OPT(SAVE_OCSP)) {
 		path = OPT_ARG(SAVE_OCSP);
 		type = GNUTLS_X509_FMT_DER;
 		max_out = 1;
@@ -405,11 +404,12 @@ static void try_save_ocsp_status(gnutls_session_t session)
 		gnutls_datum_t oresp;
 		int ret = gnutls_ocsp_status_request_get2(session, i, &oresp);
 		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
-			fprintf(stderr, "no OCSP response for certificate %u\n", i);
+			fprintf(stderr, "no OCSP response for certificate %u\n",
+				i);
 			continue;
 		} else if (ret < 0) {
 			fprintf(stderr, "error getting OCSP response %u: %s\n",
-			        i, gnutls_strerror(ret));
+				i, gnutls_strerror(ret));
 			exit(1);
 		}
 
@@ -425,10 +425,11 @@ static void try_save_ocsp_status(gnutls_session_t session)
 
 		gnutls_datum_t t;
 		ret = gnutls_pem_base64_encode_alloc("OCSP RESPONSE",
-		                                     &oresp, &t);
+						     &oresp, &t);
 		if (ret < 0) {
-			fprintf(stderr, "error allocating PEM OCSP response: %s\n",
-			        gnutls_strerror(ret));
+			fprintf(stderr,
+				"error allocating PEM OCSP response: %s\n",
+				gnutls_strerror(ret));
 			exit(1);
 		}
 
@@ -468,7 +469,7 @@ static int cert_verify_callback(gnutls_session_t session)
 
 	if (HAVE_OPT(VERIFY_HOSTNAME)) {
 		host = OPT_ARG(VERIFY_HOSTNAME);
-		canonicalize_host((char *) host, NULL, 0);
+		canonicalize_host((char *)host, NULL, 0);
 	} else
 		host = hostname;
 
@@ -493,7 +494,8 @@ static int cert_verify_callback(gnutls_session_t session)
 		rc = cert_verify(session, host, GNUTLS_KP_TLS_WWW_SERVER);
 		if (rc == 0) {
 			log_msg
-			    (stdout, "*** PKI verification of server certificate failed...\n");
+			    (stdout,
+			     "*** PKI verification of server certificate failed...\n");
 			if (!insecure && !ssh)
 				return -1;
 		}
@@ -502,13 +504,17 @@ static int cert_verify_callback(gnutls_session_t session)
 			rc = cert_verify_ocsp(session);
 			if (rc == -1) {
 				log_msg
-				    (stdout, "*** Verifying (with OCSP) server certificate chain failed...\n");
+				    (stdout,
+				     "*** Verifying (with OCSP) server certificate chain failed...\n");
 				if (!insecure && !ssh)
 					return -1;
 			} else if (rc == 0)
-				log_msg(stdout, "*** OCSP: nothing to check.\n");
+				log_msg(stdout,
+					"*** OCSP: nothing to check.\n");
 			else
-				log_msg(stdout, "*** OCSP: verified %d certificate(s).\n", rc);
+				log_msg(stdout,
+					"*** OCSP: verified %d certificate(s).\n",
+					rc);
 		}
 #endif
 	}
@@ -518,15 +524,14 @@ static int cert_verify_callback(gnutls_session_t session)
 		int port;
 		unsigned vflags = 0;
 		unsigned int sflags =
-		    ENABLED_OPT(LOCAL_DNS) ? 0 :
-		    DANE_F_IGNORE_LOCAL_RESOLVER;
+		    ENABLED_OPT(LOCAL_DNS) ? 0 : DANE_F_IGNORE_LOCAL_RESOLVER;
 
 		/* if we didn't verify the chain it only makes sense
 		 * to check the end certificate using dane. */
 		if (ca_verify == 0)
 			vflags |= DANE_VFLAG_ONLY_CHECK_EE_USAGE;
 
-		port = service_to_port(service, udp?"udp":"tcp");
+		port = service_to_port(service, udp ? "udp" : "tcp");
 		rc = dane_verify_session_crt(NULL, session, host,
 					     udp ? "udp" : "tcp", port,
 					     sflags, vflags, &status);
@@ -539,8 +544,7 @@ static int cert_verify_callback(gnutls_session_t session)
 		} else {
 			gnutls_datum_t out;
 
-			rc = dane_verification_status_print(status, &out,
-							    0);
+			rc = dane_verification_status_print(status, &out, 0);
 			if (rc < 0) {
 				fprintf(stderr, "*** DANE error: %s\n",
 					dane_strerror(rc));
@@ -553,7 +557,8 @@ static int cert_verify_callback(gnutls_session_t session)
 				return -1;
 		}
 #else
-		fprintf(stderr, "*** DANE error: GnuTLS is not compiled with DANE support.\n");
+		fprintf(stderr,
+			"*** DANE error: GnuTLS is not compiled with DANE support.\n");
 		if (!insecure && !ssh)
 			return -1;
 #endif
@@ -565,12 +570,11 @@ static int cert_verify_callback(gnutls_session_t session)
 
 		cert = gnutls_certificate_get_peers(session, &list_size);
 		if (cert == NULL) {
-			fprintf(stderr,
-				"Cannot obtain peer's certificate!\n");
+			fprintf(stderr, "Cannot obtain peer's certificate!\n");
 			return -1;
 		}
 
-		txt_service = port_to_service(service, udp?"udp":"tcp");
+		txt_service = port_to_service(service, udp ? "udp" : "tcp");
 
 		rc = gnutls_verify_stored_pubkey(NULL, NULL, host,
 						 txt_service,
@@ -606,7 +610,7 @@ static int cert_verify_callback(gnutls_session_t session)
 				return -1;
 
 			rc = read_yesno
-				("Do you trust the received key? (y/N): ");
+			    ("Do you trust the received key? (y/N): ");
 			if (rc == 0)
 				return -1;
 		} else if (rc < 0) {
@@ -619,8 +623,7 @@ static int cert_verify_callback(gnutls_session_t session)
 		if (rc != 0) {
 			rc = gnutls_store_pubkey(NULL, NULL, host,
 						 txt_service,
-						 GNUTLS_CRT_X509, cert, 0,
-						 0);
+						 GNUTLS_CRT_X509, cert, 0, 0);
 			if (rc < 0)
 				fprintf(stderr,
 					"Could not store key: %s\n",
@@ -653,7 +656,8 @@ cert_callback(gnutls_session_t session,
 			log_msg(stdout, "- Server's trusted authorities:\n");
 		else
 			log_msg
-			    (stdout, "- Server did not send us any trusted authorities names.\n");
+			    (stdout,
+			     "- Server did not send us any trusted authorities names.\n");
 
 		/* print the names (if any) */
 		for (i = 0; i < nreqs; i++) {
@@ -678,39 +682,42 @@ cert_callback(gnutls_session_t session,
 	*pcert_length = 0;
 
 	switch (cert_type) {
-		case GNUTLS_CRT_X509:
-			if (x509_crt_size > 0) {
-				if (x509_key != NULL) {
-					*pkey = x509_key;
-				} else {
-					log_msg
-					      (stdout, "- Could not find a suitable key to send to server\n");
-					return -1;
-				}
-
-				*pcert_length = x509_crt_size;
-				*pcert = x509_crt;
-			}
-			break;
-		case GNUTLS_CRT_RAWPK:
-			if (rawpk_key == NULL || rawpk.type != GNUTLS_CRT_RAWPK) {
+	case GNUTLS_CRT_X509:
+		if (x509_crt_size > 0) {
+			if (x509_key != NULL) {
+				*pkey = x509_key;
+			} else {
 				log_msg
-				      (stdout, "- Could not find a suitable key to send to server\n");
+				    (stdout,
+				     "- Could not find a suitable key to send to server\n");
 				return -1;
 			}
 
-			*pkey = rawpk_key;
-			*pcert = &rawpk;
-			*pcert_length = 1;
-			break;
-		default:
-			log_msg(stdout, "- Could not retrieve unsupported certificate type %s.\n",
-	       gnutls_certificate_type_get_name(cert_type));
-	    return -1;
+			*pcert_length = x509_crt_size;
+			*pcert = x509_crt;
+		}
+		break;
+	case GNUTLS_CRT_RAWPK:
+		if (rawpk_key == NULL || rawpk.type != GNUTLS_CRT_RAWPK) {
+			log_msg
+			    (stdout,
+			     "- Could not find a suitable key to send to server\n");
+			return -1;
+		}
+
+		*pkey = rawpk_key;
+		*pcert = &rawpk;
+		*pcert_length = 1;
+		break;
+	default:
+		log_msg(stdout,
+			"- Could not retrieve unsupported certificate type %s.\n",
+			gnutls_certificate_type_get_name(cert_type));
+		return -1;
 	}
 
 	log_msg(stdout, "- Successfully sent %u certificate(s) to server.\n",
-	       *pcert_length);
+		*pcert_length);
 	return 0;
 
 }
@@ -735,7 +742,7 @@ gnutls_session_t init_tls_session(const char *host)
 		ret = gnutls_set_default_priority(session);
 		if (ret < 0) {
 			fprintf(stderr, "Error in setting priorities: %s\n",
-					gnutls_strerror(ret));
+				gnutls_strerror(ret));
 			exit(1);
 		}
 	} else {
@@ -756,8 +763,9 @@ gnutls_session_t init_tls_session(const char *host)
 		if (HAVE_OPT(SNI_HOSTNAME)) {
 			const char *sni_host = OPT_ARG(SNI_HOSTNAME);
 
-			canonicalize_host((char *) sni_host, NULL, 0);
-			gnutls_server_name_set(session, GNUTLS_NAME_DNS, sni_host, strlen(sni_host));
+			canonicalize_host((char *)sni_host, NULL, 0);
+			gnutls_server_name_set(session, GNUTLS_NAME_DNS,
+					       sni_host, strlen(sni_host));
 		} else if (host != NULL && is_ip(host) == 0)
 			gnutls_server_name_set(session, GNUTLS_NAME_DNS,
 					       host, strlen(host));
@@ -772,24 +780,24 @@ gnutls_session_t init_tls_session(const char *host)
 #endif
 	}
 
-
 	if (HAVE_OPT(ALPN)) {
 #ifndef ENABLE_ALPN
 		fprintf(stderr, "ALPN is not supported\n");
 		exit(1);
 #else
 		unsigned proto_n = STACKCT_OPT(ALPN);
-		char **protos = (void *) STACKLST_OPT(ALPN);
+		char **protos = (void *)STACKLST_OPT(ALPN);
 
 		if (proto_n > 1024) {
-			fprintf(stderr, "Number of ALPN protocols too large (%d)\n",
-					proto_n);
+			fprintf(stderr,
+				"Number of ALPN protocols too large (%d)\n",
+				proto_n);
 			exit(1);
 		}
 
 		gnutls_datum_t p[1024];
 		for (i = 0; i < proto_n; i++) {
-			p[i].data = (void *) protos[i];
+			p[i].data = (void *)protos[i];
 			p[i].size = strlen(protos[i]);
 		}
 		gnutls_alpn_set_protocols(session, p, proto_n, 0);
@@ -804,13 +812,11 @@ gnutls_session_t init_tls_session(const char *host)
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
 	gnutls_certificate_set_retrieve_function2(xcred, cert_callback);
-	gnutls_certificate_set_verify_function(xcred,
-					       cert_verify_callback);
+	gnutls_certificate_set_verify_function(xcred, cert_verify_callback);
 
 	/* use the max record size extension */
 	if (record_max_size > 0 && disable_extensions == 0) {
-		if (gnutls_record_set_max_size(session, record_max_size) <
-		    0) {
+		if (gnutls_record_set_max_size(session, record_max_size) < 0) {
 			fprintf(stderr,
 				"Cannot set the maximum record size to %d.\n",
 				record_max_size);
@@ -843,13 +849,14 @@ gnutls_session_t init_tls_session(const char *host)
 		else if (ret != 0)
 			fprintf(stderr, "Error in profiles: %s\n",
 				gnutls_strerror(ret));
-		else fprintf(stderr,"DTLS profile set to %s\n",
-			     OPT_ARG(SRTP_PROFILES));
+		else
+			fprintf(stderr, "DTLS profile set to %s\n",
+				OPT_ARG(SRTP_PROFILES));
 
-		if (ret != 0) exit(1);
+		if (ret != 0)
+			exit(1);
 	}
 #endif
-
 
 	return session;
 }
@@ -863,8 +870,7 @@ static int handle_error(socket_st * hd, int err)
 	int alert, ret;
 	const char *err_type, *str;
 
-	if (err >= 0 || err == GNUTLS_E_AGAIN
-	    || err == GNUTLS_E_INTERRUPTED)
+	if (err >= 0 || err == GNUTLS_E_AGAIN || err == GNUTLS_E_INTERRUPTED)
 		return 0;
 
 	if (gnutls_error_is_fatal(err) == 0) {
@@ -992,11 +998,14 @@ static int try_rekey(socket_st * hd, unsigned peer)
 	int ret;
 
 	do {
-		ret = gnutls_session_key_update(hd->session, peer?GNUTLS_KU_PEER:0);
-	} while(ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+		ret =
+		    gnutls_session_key_update(hd->session,
+					      peer ? GNUTLS_KU_PEER : 0);
+	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 	if (ret < 0) {
-		fprintf(stderr, "*** Rekey has failed: %s\n", gnutls_strerror(ret));
+		fprintf(stderr, "*** Rekey has failed: %s\n",
+			gnutls_strerror(ret));
 		return ret;
 	} else {
 		log_msg(stdout, "- Rekey was completed\n");
@@ -1007,8 +1016,8 @@ static int try_rekey(socket_st * hd, unsigned peer)
 static int try_resume(socket_st * hd)
 {
 	int ret, socket_flags = SOCKET_FLAG_DONT_PRINT_ERRORS;
-	gnutls_datum_t rdata = {NULL, 0};
-	gnutls_datum_t edata = {NULL, 0};
+	gnutls_datum_t rdata = { NULL, 0 };
+	gnutls_datum_t edata = { NULL, 0 };
 
 	if (gnutls_session_is_resumed(hd->session) == 0) {
 		do {
@@ -1018,9 +1027,11 @@ static int try_resume(socket_st * hd)
 				rdata.data = NULL;
 			}
 
-			if ((gnutls_protocol_get_version(hd->session) != GNUTLS_TLS1_3) ||
-					((gnutls_session_get_flags(hd->session) &
-					 GNUTLS_SFLAGS_SESSION_TICKET))) {
+			if ((gnutls_protocol_get_version(hd->session) !=
+			     GNUTLS_TLS1_3)
+			    ||
+			    ((gnutls_session_get_flags(hd->session) &
+			      GNUTLS_SFLAGS_SESSION_TICKET))) {
 				break;
 			}
 		} while (waitresumption);
@@ -1037,7 +1048,8 @@ static int try_resume(socket_st * hd)
 	canonicalize_host(hostname, service, sizeof(service));
 
 	log_msg
-	    (stdout, "\n\n- Connecting again- trying to resume previous session\n");
+	    (stdout,
+	     "\n\n- Connecting again- trying to resume previous session\n");
 	if (HAVE_OPT(STARTTLS_PROTO))
 		socket_flags |= SOCKET_FLAG_STARTTLS;
 	else if (fastopen)
@@ -1052,10 +1064,11 @@ static int try_resume(socket_st * hd)
 
 		fp = fopen(OPT_ARG(EARLYDATA), "r");
 		if (fp == NULL) {
-			fprintf(stderr, "could not open %s\n", OPT_ARG(EARLYDATA));
+			fprintf(stderr, "could not open %s\n",
+				OPT_ARG(EARLYDATA));
 			exit(1);
 		}
-		edata.data = (void *) fread_file(fp, 0, &size);
+		edata.data = (void *)fread_file(fp, 0, &size);
 		edata.size = size;
 		fclose(fp);
 	}
@@ -1085,14 +1098,12 @@ bool parse_for_inline_commands_in_buffer(char *buffer, size_t bytes,
 
 	if (inline_cmds->bytes_copied) {
 		local_buffer_ptr =
-		    &inline_cmds->inline_cmd_buffer[inline_cmds->
-						    bytes_copied];
+		    &inline_cmds->inline_cmd_buffer[inline_cmds->bytes_copied];
 
 		local_bytes =
 		    ((inline_cmds->bytes_copied + bytes) <=
 		     MAX_INLINE_COMMAND_BYTES) ? (ssize_t) bytes
-		    : (MAX_INLINE_COMMAND_BYTES -
-		       inline_cmds->bytes_copied);
+		    : (MAX_INLINE_COMMAND_BYTES - inline_cmds->bytes_copied);
 
 		memcpy(local_buffer_ptr, buffer, local_bytes);
 		prev_bytes_copied = inline_cmds->bytes_copied;
@@ -1119,8 +1130,7 @@ bool parse_for_inline_commands_in_buffer(char *buffer, size_t bytes,
 				       inline_commands_def[jj].string);
 				inline_command_string[strlen
 						      (inline_commands_def
-						       [jj].string)] =
-				    '\0';
+						       [jj].string)] = '\0';
 				inline_command_string[0] =
 				    inline_commands_prefix[0];
 				/* Inline commands are delimited by the inline_commands_prefix[0] (default is ^).
@@ -1135,20 +1145,17 @@ bool parse_for_inline_commands_in_buffer(char *buffer, size_t bytes,
 
 			l = strlen(ptr);
 			match_bytes = (local_bytes <= l) ? local_bytes : l;
-			if (strncmp(ptr, local_buffer_ptr, match_bytes) ==
-			    0) {
+			if (strncmp(ptr, local_buffer_ptr, match_bytes) == 0) {
 				if (match_bytes == (ssize_t) strlen(ptr)) {
 					inline_cmds->new_buffer_ptr =
 					    buffer + match_bytes -
 					    prev_bytes_copied;
 					inline_cmds->cmd_found =
-					    inline_commands_def[jj].
-					    command;
+					    inline_commands_def[jj].command;
 					inline_cmds->bytes_copied = 0;	/* reset it */
 				} else {
 					/* partial command */
-					memcpy(&inline_cmds->
-					       inline_cmd_buffer
+					memcpy(&inline_cmds->inline_cmd_buffer
 					       [inline_cmds->bytes_copied],
 					       buffer, bytes);
 					inline_cmds->bytes_copied += bytes;
@@ -1200,21 +1207,19 @@ int run_inline_command(inline_cmds_st * cmd, socket_st * hd)
 
 static
 int do_inline_command_processing(char *buffer_ptr, size_t curr_bytes,
-				 socket_st * hd,
-				 inline_cmds_st * inline_cmds)
+				 socket_st * hd, inline_cmds_st * inline_cmds)
 {
 	int skip_bytes, bytes;
 	bool inline_cmd_start_found;
 
 	bytes = curr_bytes;
 
-      continue_inline_processing:
+ continue_inline_processing:
 	/* parse_for_inline_commands_in_buffer hunts for start of an inline command
 	 * sequence. The function maintains state information in inline_cmds.
 	 */
 	inline_cmd_start_found =
-	    parse_for_inline_commands_in_buffer(buffer_ptr, bytes,
-						inline_cmds);
+	    parse_for_inline_commands_in_buffer(buffer_ptr, bytes, inline_cmds);
 	if (!inline_cmd_start_found)
 		return bytes;
 
@@ -1246,15 +1251,14 @@ int do_inline_command_processing(char *buffer_ptr, size_t curr_bytes,
 	}
 }
 
-static void
-print_other_info(gnutls_session_t session)
+static void print_other_info(gnutls_session_t session)
 {
 #ifdef ENABLE_OCSP
 	int ret;
 	unsigned i;
 	unsigned int list_size;
 	gnutls_datum_t oresp;
-	const gnutls_datum_t * peers;
+	const gnutls_datum_t *peers;
 
 	peers = gnutls_certificate_get_peers(session, &list_size);
 
@@ -1291,11 +1295,10 @@ print_other_info(gnutls_session_t session)
 			flag = GNUTLS_OCSP_PRINT_FULL;
 		else
 			flag = GNUTLS_OCSP_PRINT_COMPACT;
-		ret =
-		    gnutls_ocsp_resp_print(r, flag, &p);
+		ret = gnutls_ocsp_resp_print(r, flag, &p);
 		gnutls_ocsp_resp_deinit(r);
-		if (ret>=0) {
-			log_msg(stdout, "%s", (char*) p.data);
+		if (ret >= 0) {
+			log_msg(stdout, "%s", (char *)p.data);
 			gnutls_free(p.data);
 		}
 	}
@@ -1325,7 +1328,8 @@ int main(int argc, char **argv)
 	if (HAVE_OPT(LOGFILE)) {
 		logfile = fopen(OPT_ARG(LOGFILE), "w+");
 		if (!logfile) {
-			log_msg(stderr, "Unable to open '%s'!\n", OPT_ARG(LOGFILE));
+			log_msg(stderr, "Unable to open '%s'!\n",
+				OPT_ARG(LOGFILE));
 			exit(1);
 		}
 		log_set(logfile);
@@ -1427,8 +1431,7 @@ int main(int argc, char **argv)
 			fprintf(stderr, "*** Starting TLS handshake\n");
 			ret = do_handshake(&hd);
 			if (ret < 0) {
-				fprintf(stderr,
-					"*** Handshake has failed\n");
+				fprintf(stderr, "*** Handshake has failed\n");
 				retval = 1;
 				break;
 			}
@@ -1442,9 +1445,11 @@ int main(int argc, char **argv)
 			memset(buffer, 0, MAX_BUF + 1);
 			ret = socket_recv(&hd, buffer, MAX_BUF);
 
-			if (ret == 0 || (ret == GNUTLS_E_PREMATURE_TERMINATION && user_term)) {
-				log_msg
-				    (stdout, "- Peer has closed the GnuTLS connection\n");
+			if (ret == 0
+			    || (ret == GNUTLS_E_PREMATURE_TERMINATION
+				&& user_term)) {
+				log_msg(stdout,
+					"- Peer has closed the GnuTLS connection\n");
 				break;
 			} else if (handle_error(&hd, ret) < 0) {
 				fprintf(stderr,
@@ -1453,7 +1458,8 @@ int main(int argc, char **argv)
 				break;
 			} else if (ret > 0) {
 				if (verbose != 0)
-					log_msg(stdout, "- Received[%d]: ", ret);
+					log_msg(stdout, "- Received[%d]: ",
+						ret);
 				for (ii = 0; ii < ret; ii++) {
 					fputc(buffer[ii], stdout);
 				}
@@ -1463,8 +1469,7 @@ int main(int argc, char **argv)
 
 		if (inp == IN_KEYBOARD && user_term == 0) {
 			if ((bytes =
-			    read(fileno(stdin), buffer,
-			    MAX_BUF - 1)) <= 0) {
+			     read(fileno(stdin), buffer, MAX_BUF - 1)) <= 0) {
 				if (hd.secure == 0) {
 					/* Warning!  Do not touch this text string, it is
 					   used by external programs to search for when
@@ -1481,9 +1486,11 @@ int main(int argc, char **argv)
 					}
 				} else {
 					do {
-						ret = gnutls_bye(hd.session, GNUTLS_SHUT_WR);
-					} while (ret == GNUTLS_E_INTERRUPTED ||
-					         ret == GNUTLS_E_AGAIN);
+						ret =
+						    gnutls_bye(hd.session,
+							       GNUTLS_SHUT_WR);
+					} while (ret == GNUTLS_E_INTERRUPTED
+						 || ret == GNUTLS_E_AGAIN);
 
 					user_term = 1;
 				}
@@ -1502,7 +1509,7 @@ int main(int argc, char **argv)
 			keyboard_bytes = bytes;
 			keyboard_buffer_ptr = buffer;
 
-		      inline_command_processing:
+ inline_command_processing:
 
 			if (inline_commands) {
 				keyboard_bytes =
@@ -1524,8 +1531,7 @@ int main(int argc, char **argv)
 			}
 
 			if (ranges
-			    && gnutls_record_can_use_length_hiding(hd.
-								   session))
+			    && gnutls_record_can_use_length_hiding(hd.session))
 			{
 				gnutls_range_st range;
 				range.low = 0;
@@ -1533,8 +1539,7 @@ int main(int argc, char **argv)
 				ret =
 				    socket_send_range(&hd,
 						      keyboard_buffer_ptr,
-						      keyboard_bytes,
-						      &range);
+						      keyboard_bytes, &range);
 			} else {
 				ret =
 				    socket_send(&hd, keyboard_buffer_ptr,
@@ -1543,13 +1548,13 @@ int main(int argc, char **argv)
 
 			if (ret > 0) {
 				if (verbose != 0)
-					log_msg(stdout, "- Sent: %d bytes\n", ret);
+					log_msg(stdout, "- Sent: %d bytes\n",
+						ret);
 			} else
 				handle_error(&hd, ret);
 
 			if (inline_commands &&
-			    inline_cmds.new_buffer_ptr < (buffer + bytes))
-			{
+			    inline_cmds.new_buffer_ptr < (buffer + bytes)) {
 				keyboard_buffer_ptr =
 				    inline_cmds.new_buffer_ptr;
 				keyboard_bytes =
@@ -1593,11 +1598,14 @@ void print_priority_list(void)
 	const char *str;
 	unsigned int lineb = 0;
 
-	log_msg(stdout, "Priority strings in GnuTLS %s:\n", gnutls_check_version(NULL));
+	log_msg(stdout, "Priority strings in GnuTLS %s:\n",
+		gnutls_check_version(NULL));
 
 	fputs("\t", stdout);
-	for (idx=0;;idx++) {
-		str = gnutls_priority_string_list(idx, GNUTLS_PRIORITY_LIST_INIT_KEYWORDS);
+	for (idx = 0;; idx++) {
+		str =
+		    gnutls_priority_string_list(idx,
+						GNUTLS_PRIORITY_LIST_INIT_KEYWORDS);
 		if (str == NULL)
 			break;
 		lineb += log_msg(stdout, "%s ", str);
@@ -1610,8 +1618,10 @@ void print_priority_list(void)
 	log_msg(stdout, "\n\nSpecial strings:\n");
 	lineb = 0;
 	fputs("\t", stdout);
-	for (idx=0;;idx++) {
-		str = gnutls_priority_string_list(idx, GNUTLS_PRIORITY_LIST_SPECIAL);
+	for (idx = 0;; idx++) {
+		str =
+		    gnutls_priority_string_list(idx,
+						GNUTLS_PRIORITY_LIST_SPECIAL);
 		if (str == NULL)
 			break;
 		if (str[0] == 0)
@@ -1638,7 +1648,6 @@ static void cmd_parser(int argc, char **argv)
 	if (rest == NULL && argc > 0)
 		rest = argv[0];
 
-
 	if (HAVE_OPT(FIPS140_MODE)) {
 		if (gnutls_fips140_mode_enabled() != 0) {
 			fprintf(stderr, "library is in FIPS140-2 mode\n");
@@ -1654,7 +1663,8 @@ static void cmd_parser(int argc, char **argv)
 		for (p = gnutls_get_library_config(); p->name; p++) {
 			log_msg(stdout, "%s: %s\n", p->name, p->value);
 		}
-		log_msg(stdout, "system-config: %s\n", gnutls_get_system_config_file());
+		log_msg(stdout, "system-config: %s\n",
+			gnutls_get_system_config_file());
 		exit(0);
 	}
 
@@ -1711,7 +1721,7 @@ static void cmd_parser(int argc, char **argv)
 			exit(1);
 		}
 		inline_commands_prefix =
-		    (char *) OPT_ARG(INLINE_COMMANDS_PREFIX);
+		    (char *)OPT_ARG(INLINE_COMMANDS_PREFIX);
 		if (!isascii(inline_commands_prefix[0])) {
 			fprintf(stderr,
 				"inline-commands-prefix value is a single US-ASCII character (octets 0 - 127)\n");
@@ -1738,7 +1748,9 @@ static void cmd_parser(int argc, char **argv)
 		snprintf(service, sizeof(service), "%s", OPT_ARG(PORT));
 	} else {
 		if (HAVE_OPT(STARTTLS_PROTO))
-			snprintf(service, sizeof(service), "%s", starttls_proto_to_service(OPT_ARG(STARTTLS_PROTO)));
+			snprintf(service, sizeof(service), "%s",
+				 starttls_proto_to_service(OPT_ARG
+							   (STARTTLS_PROTO)));
 		else
 			strcpy(service, "443");
 	}
@@ -1778,7 +1790,7 @@ static void cmd_parser(int argc, char **argv)
 		psk_username = OPT_ARG(PSKUSERNAME);
 
 	if (HAVE_OPT(PSKKEY)) {
-		psk_key.data = (unsigned char *) OPT_ARG(PSKKEY);
+		psk_key.data = (unsigned char *)OPT_ARG(PSKKEY);
 		psk_key.size = strlen(OPT_ARG(PSKKEY));
 	} else
 		psk_key.size = 0;
@@ -1789,7 +1801,8 @@ static void cmd_parser(int argc, char **argv)
 	fastopen = HAVE_OPT(FASTOPEN);
 #else
 	if (HAVE_OPT(FASTOPEN)) {
-		fprintf(stderr, "Warning: TCP Fast Open not supported on this OS\n");
+		fprintf(stderr,
+			"Warning: TCP Fast Open not supported on this OS\n");
 	}
 #endif
 
@@ -1817,9 +1830,11 @@ static void check_server_cmd(socket_st * socket, int ret)
 			ret = do_handshake(socket);
 
 			if (ret == 0) {
-				log_msg(stdout, "*** Rehandshake was performed.\n");
+				log_msg(stdout,
+					"*** Rehandshake was performed.\n");
 			} else {
-				log_msg(stdout, "*** Rehandshake Failed: %s\n", gnutls_strerror(ret));
+				log_msg(stdout, "*** Rehandshake Failed: %s\n",
+					gnutls_strerror(ret));
 			}
 		} else if (ret == GNUTLS_E_REAUTH_REQUEST) {
 			do {
@@ -1829,12 +1844,12 @@ static void check_server_cmd(socket_st * socket, int ret)
 			if (ret == 0) {
 				log_msg(stdout, "*** Re-auth was performed.\n");
 			} else {
-				log_msg(stdout, "*** Re-auth failed: %s\n", gnutls_strerror(ret));
+				log_msg(stdout, "*** Re-auth failed: %s\n",
+					gnutls_strerror(ret));
 			}
 		}
 	}
 }
-
 
 int do_handshake(socket_st * socket)
 {
@@ -1842,7 +1857,8 @@ int do_handshake(socket_st * socket)
 
 	if (fastopen && socket->connect_addrlen) {
 		gnutls_transport_set_fastopen(socket->session, socket->fd,
-					      (struct sockaddr*)&socket->connect_addr,
+					      (struct sockaddr *)
+					      &socket->connect_addr,
 					      socket->connect_addrlen, 0);
 		socket->connect_addrlen = 0;
 	} else {
@@ -1862,7 +1878,8 @@ int do_handshake(socket_st * socket)
 
 	if (ret == 0) {
 		/* print some information */
-		print_info(socket->session, verbose, HAVE_OPT(X509CERTFILE)?P_WAIT_FOR_CERT:0);
+		print_info(socket->session, verbose,
+			   HAVE_OPT(X509CERTFILE) ? P_WAIT_FOR_CERT : 0);
 		if (HAVE_OPT(KEYMATEXPORT))
 			print_key_material(socket->session,
 					   OPT_ARG(KEYMATEXPORT),
@@ -1893,8 +1910,7 @@ srp_username_callback(gnutls_session_t session,
 #endif
 
 static int
-psk_callback(gnutls_session_t session, char **username,
-	     gnutls_datum_t * key)
+psk_callback(gnutls_session_t session, char **username, gnutls_datum_t * key)
 {
 	const char *hint = gnutls_psk_client_get_hint(session);
 	char *rawkey;
@@ -1920,8 +1936,7 @@ psk_callback(gnutls_session_t session, char **username,
 		ret = getline(&p, &n, stdin);
 
 		if (ret == -1 || p == NULL) {
-			fprintf(stderr,
-				"No username given, aborting...\n");
+			fprintf(stderr, "No username given, aborting...\n");
 			return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 		}
 
@@ -1942,7 +1957,7 @@ psk_callback(gnutls_session_t session, char **username,
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
-	tmp.data = (void *) passwd;
+	tmp.data = (void *)passwd;
 	tmp.size = strlen(passwd);
 
 	res_size = tmp.size / 2 + 1;
@@ -1959,7 +1974,7 @@ psk_callback(gnutls_session_t session, char **username,
 		return ret;
 	}
 
-	key->data = (void *) rawkey;
+	key->data = (void *)rawkey;
 	key->size = res_size;
 
 	if (HAVE_OPT(DEBUG)) {
@@ -1967,7 +1982,8 @@ psk_callback(gnutls_session_t session, char **username,
 		res_size = sizeof(hexkey);
 		ret = gnutls_hex_encode(key, hexkey, &res_size);
 		if (ret < 0) {
-			fprintf(stderr, "Error in hex encoding: %s\n", gnutls_strerror(ret));
+			fprintf(stderr, "Error in hex encoding: %s\n",
+				gnutls_strerror(ret));
 			exit(1);
 		}
 		fprintf(stderr, "PSK username: %s\n", *username);
@@ -1991,8 +2007,7 @@ static void init_global_tls_stuff(void)
 				gnutls_strerror(ret));
 		else {
 			ret =
-			    gnutls_pkcs11_add_provider(OPT_ARG(PROVIDER),
-						       NULL);
+			    gnutls_pkcs11_add_provider(OPT_ARG(PROVIDER), NULL);
 			if (ret < 0) {
 				fprintf(stderr, "pkcs11_add_provider: %s",
 					gnutls_strerror(ret));
@@ -2020,18 +2035,19 @@ static void init_global_tls_stuff(void)
 
 	if (x509_cafile != NULL) {
 		ret = gnutls_x509_trust_list_add_trust_file(tlist,
-                                                            x509_cafile,
-                                                            NULL,
-                                                            x509ctype,
-                                                            GNUTLS_TL_USE_IN_TLS,
-                                                            0);
+							    x509_cafile,
+							    NULL,
+							    x509ctype,
+							    GNUTLS_TL_USE_IN_TLS,
+							    0);
 	} else {
 		if (insecure == 0) {
 			ret = gnutls_x509_trust_list_add_system_trust(tlist,
-                                                                      GNUTLS_TL_USE_IN_TLS,
-                                                                      0);
+								      GNUTLS_TL_USE_IN_TLS,
+								      0);
 			if (ret == GNUTLS_E_UNIMPLEMENTED_FEATURE) {
-				fprintf(stderr, "Warning: this system doesn't support a default trust store\n");
+				fprintf(stderr,
+					"Warning: this system doesn't support a default trust store\n");
 				ret = 0;
 			}
 		} else {
@@ -2039,14 +2055,16 @@ static void init_global_tls_stuff(void)
 		}
 	}
 	if (ret < 0) {
-		fprintf(stderr, "Error setting the x509 trust file: %s\n", gnutls_strerror(ret));
+		fprintf(stderr, "Error setting the x509 trust file: %s\n",
+			gnutls_strerror(ret));
 		exit(1);
 	} else {
 		log_msg(stdout, "Processed %d CA certificate(s).\n", ret);
 	}
 
 	if (ENABLED_OPT(CA_AUTO_RETRIEVE))
-		gnutls_x509_trust_list_set_getissuer_function(tlist, getissuer_callback);
+		gnutls_x509_trust_list_set_getissuer_function(tlist,
+							      getissuer_callback);
 
 	if (x509_crlfile != NULL) {
 		ret =
@@ -2055,7 +2073,8 @@ static void init_global_tls_stuff(void)
 							 x509ctype);
 		if (ret < 0) {
 			fprintf(stderr,
-				"Error setting the x509 CRL file: %s\n", gnutls_strerror(ret));
+				"Error setting the x509 CRL file: %s\n",
+				gnutls_strerror(ret));
 			exit(1);
 		} else {
 			log_msg(stdout, "Processed %d CRL(s).\n", ret);
@@ -2139,14 +2158,18 @@ static int cert_verify_ocsp(gnutls_session_t session)
 
 		ret = gnutls_x509_crt_init(&cert);
 		if (ret < 0) {
-			fprintf(stderr, "Memory error: %s\n", gnutls_strerror(ret));
+			fprintf(stderr, "Memory error: %s\n",
+				gnutls_strerror(ret));
 			goto cleanup;
 		}
 
 		deinit_cert = 1;
-		ret = gnutls_x509_crt_import(cert, &cert_list[it], GNUTLS_X509_FMT_DER);
+		ret =
+		    gnutls_x509_crt_import(cert, &cert_list[it],
+					   GNUTLS_X509_FMT_DER);
 		if (ret < 0) {
-			fprintf(stderr, "Decoding error: %s\n", gnutls_strerror(ret));
+			fprintf(stderr, "Decoding error: %s\n",
+				gnutls_strerror(ret));
 			goto cleanup;
 		}
 
@@ -2159,18 +2182,23 @@ static int cert_verify_ocsp(gnutls_session_t session)
 		if (ret < 0 && cert_list_size - it > 1) {
 			ret = gnutls_x509_crt_init(&issuer);
 			if (ret < 0) {
-				fprintf(stderr, "Memory error: %s\n", gnutls_strerror(ret));
+				fprintf(stderr, "Memory error: %s\n",
+					gnutls_strerror(ret));
 				goto cleanup;
 			}
 			deinit_issuer = 1;
-			ret = gnutls_x509_crt_import(issuer, &cert_list[it + 1], GNUTLS_X509_FMT_DER);
+			ret =
+			    gnutls_x509_crt_import(issuer, &cert_list[it + 1],
+						   GNUTLS_X509_FMT_DER);
 			if (ret < 0) {
-				fprintf(stderr, "Decoding error: %s\n", gnutls_strerror(ret));
+				fprintf(stderr, "Decoding error: %s\n",
+					gnutls_strerror(ret));
 				goto cleanup;
 			}
 		} else if (ret < 0) {
 			if (it == 0)
-				fprintf(stderr, "Cannot find issuer: %s\n", gnutls_strerror(ret));
+				fprintf(stderr, "Cannot find issuer: %s\n",
+					gnutls_strerror(ret));
 			goto cleanup;
 		}
 
@@ -2200,7 +2228,7 @@ static int cert_verify_ocsp(gnutls_session_t session)
 		}
 	}
 
-cleanup:
+ cleanup:
 	if (deinit_issuer)
 		gnutls_x509_crt_deinit(issuer);
 	if (deinit_cert)
@@ -2208,12 +2236,13 @@ cleanup:
 
 	if (failed > 0)
 		return -1;
-	return ok >= 1 ? (int) ok : -1;
+	return ok >= 1 ? (int)ok : -1;
 }
 #endif
 
 /* returns the host part of a URL */
-static const char *host_from_url(const char *url, unsigned int *port, const char **path)
+static const char *host_from_url(const char *url, unsigned int *port,
+				 const char **path)
 {
 	static char buffer[512];
 	char *p;
@@ -2226,7 +2255,7 @@ static const char *host_from_url(const char *url, unsigned int *port, const char
 		p = strchr(buffer, '/');
 		if (p != NULL) {
 			*p = 0;
-			*path = p+1;
+			*path = p + 1;
 		}
 
 		p = strchr(buffer, ':');
@@ -2263,8 +2292,7 @@ static size_t get_data(void *buf, size_t size, size_t nmemb, void *userp)
 static int
 getissuer_callback(const gnutls_x509_trust_list_t tlist,
 		   const gnutls_x509_crt_t cert,
-		   gnutls_x509_crt_t **issuers,
-		   unsigned int *issuers_size)
+		   gnutls_x509_crt_t ** issuers, unsigned int *issuers_size)
 {
 	gnutls_datum_t ud;
 	int ret;
@@ -2287,15 +2315,14 @@ getissuer_callback(const gnutls_x509_trust_list_t tlist,
 	i = 0;
 	do {
 		ret = gnutls_x509_crt_get_authority_info_access(cert, i++,
-				GNUTLS_IA_CAISSUERS_URI,
-				&data,
-				NULL);
+								GNUTLS_IA_CAISSUERS_URI,
+								&data, NULL);
 	} while (ret == GNUTLS_E_UNKNOWN_ALGORITHM);
 
 	if (ret < 0) {
 		fprintf(stderr,
-				"*** Cannot find caIssuer URI in certificate: %s\n",
-				gnutls_strerror(ret));
+			"*** Cannot find caIssuer URI in certificate: %s\n",
+			gnutls_strerror(ret));
 		return 0;
 	}
 
@@ -2321,7 +2348,8 @@ getissuer_callback(const gnutls_x509_trust_list_t tlist,
 	snprintf(headers, sizeof(headers), HEADER_PATTERN, path, _hostname);
 	headers_size = strlen(headers);
 
-	socket_open(&hd, _hostname, _service, NULL, SOCKET_FLAG_RAW|SOCKET_FLAG_SKIP_INIT, CONNECT_MSG, NULL);
+	socket_open(&hd, _hostname, _service, NULL,
+		    SOCKET_FLAG_RAW | SOCKET_FLAG_SKIP_INIT, CONNECT_MSG, NULL);
 	socket_send(&hd, headers, headers_size);
 
 	do {
@@ -2365,7 +2393,7 @@ getissuer_callback(const gnutls_x509_trust_list_t tlist,
 
 	ret = 0;
 
-cleanup:
+ cleanup:
 	gnutls_free(data.data);
 	free(ud.data);
 	free(url);

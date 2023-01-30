@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,22 +35,22 @@ int main(void)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/dtls.h>
-#include <signal.h>
-#include <assert.h>
+# include <string.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/dtls.h>
+# include <signal.h>
+# include <assert.h>
 
-#include "cert-common.h"
-#include "tls13/ext-parse.h"
-#include "pkcs11/softhsm.h"
-#include "utils.h"
+# include "cert-common.h"
+# include "tls13/ext-parse.h"
+# include "pkcs11/softhsm.h"
+# include "utils.h"
 
 /* This program tests that TLS 1.3 is disabled as expected.
  */
@@ -65,12 +65,12 @@ static void client_log_func(int level, const char *str)
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
 
-#define P11LIB "libpkcs11mock2.so"
+# define P11LIB "libpkcs11mock2.so"
 
-#define PIN "1234"
+# define PIN "1234"
 
-#define CONFIG_NAME "softhsm-neg-no-key"
-#define CONFIG CONFIG_NAME".config"
+# define CONFIG_NAME "softhsm-neg-no-key"
+# define CONFIG CONFIG_NAME".config"
 
 static
 int pin_func(void *userdata, int attempt, const char *url, const char *label,
@@ -100,24 +100,29 @@ static void client(int fd)
 	if (ret < 0)
 		exit(1);
 
-	ret = gnutls_certificate_set_x509_trust_mem(x509_cred, &ca_cert, GNUTLS_X509_FMT_PEM);
+	ret =
+	    gnutls_certificate_set_x509_trust_mem(x509_cred, &ca_cert,
+						  GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);
 
 	/* Initialize TLS session
 	 */
-	assert(gnutls_init(&session, GNUTLS_CLIENT)>=0);
+	assert(gnutls_init(&session, GNUTLS_CLIENT) >= 0);
 
 	gnutls_handshake_set_timeout(session, get_timeout());
 
-	ret = gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
+	ret =
+	    gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 	if (ret < 0)
 		fail("cannot set credentials\n");
 
-	ret = gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2", NULL);
+	ret =
+	    gnutls_priority_set_direct(session,
+				       "NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2",
+				       NULL);
 	if (ret < 0)
 		fail("cannot set priorities\n");
-
 
 	gnutls_transport_set_int(session, fd);
 
@@ -198,7 +203,8 @@ static void server(int fd)
 		exit(1);
 	}
 
-	ret = gnutls_x509_crt_import(crt, &server_ca3_cert, GNUTLS_X509_FMT_PEM);
+	ret =
+	    gnutls_x509_crt_import(crt, &server_ca3_cert, GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
 		fprintf(stderr,
 			"gnutls_x509_crt_import: %s\n", gnutls_strerror(ret));
@@ -219,7 +225,9 @@ static void server(int fd)
 		exit(1);
 	}
 
-	ret = gnutls_x509_privkey_import(key, &server_ca3_key, GNUTLS_X509_FMT_PEM);
+	ret =
+	    gnutls_x509_privkey_import(key, &server_ca3_key,
+				       GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
 		fprintf(stderr,
 			"gnutls_x509_privkey_import: %s\n",
@@ -267,7 +275,7 @@ static void server(int fd)
 	gnutls_x509_crt_deinit(crt);
 	gnutls_x509_privkey_deinit(key);
 
-	assert(gnutls_certificate_allocate_credentials(&x509_cred)>=0);
+	assert(gnutls_certificate_allocate_credentials(&x509_cred) >= 0);
 
 	gnutls_init(&session, GNUTLS_SERVER);
 
@@ -279,14 +287,16 @@ static void server(int fd)
 						    SOFTHSM_URL
 						    ";object=cert;object-type=private;pin-value="
 						    PIN,
-						    GNUTLS_X509_FMT_DER)>=0);
+						    GNUTLS_X509_FMT_DER) >= 0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2", NULL);
+	gnutls_priority_set_direct(session,
+				   "NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2",
+				   NULL);
 
 	gnutls_transport_set_int(session, fd);
 
@@ -334,7 +344,7 @@ void doit(void)
 		exit(77);
 
 	/* check if softhsm module is loadable */
-	(void) softhsm_lib();
+	(void)softhsm_lib();
 
 	/* initialize SoftHSM token that libpkcs11mock2.so internally uses */
 	bin = softhsm_bin();

@@ -21,37 +21,35 @@
  */
 
 #ifndef GNUTLS_GNUTLSXX_H
-#define GNUTLS_GNUTLSXX_H
+# define GNUTLS_GNUTLSXX_H
 
-#include <exception>
-#include <vector>
-#include <gnutls/gnutls.h>
+# include <exception>
+# include <vector>
+# include <gnutls/gnutls.h>
 
 namespace gnutls {
 
 	class noncopyable {
-	      protected:
+ protected:
 		noncopyable() {
 		} ~noncopyable() {
-	      } private:
+ } private:
 		// These are non-implemented.
 		 noncopyable(const noncopyable &);
 		noncopyable & operator=(const noncopyable &);
 	};
 
-
 	class exception:public std::exception {
-	      public:
+ public:
 		explicit exception(int x);
 		const char *what() const throw();
 		int get_code();
-	      protected:
+ protected:
 		int retcode;
 	};
 
-
 	class dh_params:private noncopyable {
-	      public:
+ public:
 		dh_params();
 		~dh_params();
 		void import_raw(const gnutls_datum_t & prime,
@@ -62,19 +60,18 @@ namespace gnutls {
 
 		void export_pkcs3(gnutls_x509_crt_fmt_t format,
 				  unsigned char *params_data,
-				  size_t * params_data_size);
+				  size_t *params_data_size);
 		void export_raw(gnutls_datum_t & prime,
 				gnutls_datum_t & generator);
 
 		gnutls_dh_params_t get_params_t() const;
 		 dh_params & operator=(const dh_params & src);
-	      protected:
+ protected:
 		 gnutls_dh_params_t params;
 	};
 
-
 	class rsa_params:private noncopyable {
-	      public:
+ public:
 		rsa_params();
 		~rsa_params();
 		void import_raw(const gnutls_datum_t & m,
@@ -89,21 +86,21 @@ namespace gnutls {
 
 		void export_pkcs1(gnutls_x509_crt_fmt_t format,
 				  unsigned char *params_data,
-				  size_t * params_data_size);
+				  size_t *params_data_size);
 		void export_raw(gnutls_datum_t & m, gnutls_datum_t & e,
 				gnutls_datum_t & d, gnutls_datum_t & p,
 				gnutls_datum_t & q, gnutls_datum_t & u);
 		gnutls_rsa_params_t get_params_t() const;
 		 rsa_params & operator=(const rsa_params & src);
 
-	      protected:
+ protected:
 		 gnutls_rsa_params_t params;
 	};
 
 	class session:private noncopyable {
-	      protected:
+ protected:
 		gnutls_session_t s;
-	      public:
+ public:
 		explicit session(unsigned int);
 		 virtual ~ session();
 
@@ -162,11 +159,10 @@ namespace gnutls {
 		void set_data(const void *session_data,
 			      size_t session_data_size);
 		void get_data(void *session_data,
-			      size_t * session_data_size) const;
+			      size_t *session_data_size) const;
 		void get_data(gnutls_session_t session,
 			      gnutls_datum_t & data) const;
-		void get_id(void *session_id,
-			    size_t * session_id_size) const;
+		void get_id(void *session_id, size_t *session_id_size) const;
 
 		bool is_resumed() const;
 
@@ -184,13 +180,12 @@ namespace gnutls {
 		    const;
 
 		void set_transport_lowat(size_t num);
-		void set_transport_push_function(gnutls_push_func
-						 push_func);
+		void set_transport_push_function(gnutls_push_func push_func);
 		void set_transport_vec_push_function(gnutls_vec_push_func
 						     vec_push_func);
-		void set_transport_pull_function(gnutls_pull_func
-						 pull_func);
-		void set_transport_pull_timeout_function (gnutls_pull_timeout_func pull_timeout_func);
+		void set_transport_pull_function(gnutls_pull_func pull_func);
+		void set_transport_pull_timeout_function
+		    (gnutls_pull_timeout_func pull_timeout_func);
 
 		void set_user_ptr(void *ptr);
 		void *get_user_ptr() const;
@@ -227,7 +222,7 @@ namespace gnutls {
 
 // interface for databases
 	class DB:private noncopyable {
-	      public:
+ public:
 		virtual ~ DB() = 0;
 		virtual bool store(const gnutls_datum_t & key,
 				   const gnutls_datum_t & data) = 0;
@@ -237,7 +232,7 @@ namespace gnutls {
 	};
 
 	class server_session:public session {
-	      public:
+ public:
 		server_session();
 		explicit server_session(int flags);
 		~server_session();
@@ -253,7 +248,7 @@ namespace gnutls {
 		const char *get_srp_username() const;
 		const char *get_psk_username() const;
 
-		void get_server_name(void *data, size_t * data_length,
+		void get_server_name(void *data, size_t *data_length,
 				     unsigned int *type,
 				     unsigned int indx) const;
 
@@ -262,7 +257,7 @@ namespace gnutls {
 	};
 
 	class client_session:public session {
-	      public:
+ public:
 		client_session();
 		explicit client_session(int flags);
 		~client_session();
@@ -274,23 +269,22 @@ namespace gnutls {
 		bool get_request_status();
 	};
 
-
 	class credentials:private noncopyable {
-	      public:
+ public:
 		virtual ~ credentials() {
 		} gnutls_credentials_type_t get_type() const;
-	      protected:
+ protected:
 		friend class session;
 		explicit credentials(gnutls_credentials_type_t t);
 		void *ptr() const;
 		void set_ptr(void *ptr);
 		gnutls_credentials_type_t type;
-	      private:
+ private:
 		void *cred;
 	};
 
 	class certificate_credentials:public credentials {
-	      public:
+ public:
 		~certificate_credentials();
 		certificate_credentials();
 
@@ -331,7 +325,6 @@ namespace gnutls {
 				  int cert_list_size,
 				  gnutls_x509_privkey_t key);
 
-
 		void set_simple_pkcs12_file(const char *pkcs12file,
 					    gnutls_x509_crt_fmt_t type,
 					    const char *password);
@@ -339,68 +332,63 @@ namespace gnutls {
 		void set_retrieve_function
 		    (gnutls_certificate_retrieve_function * func);
 
-	      protected:
+ protected:
 		 gnutls_certificate_credentials_t cred;
 	};
 
 	class certificate_server_credentials:public certificate_credentials {
-	      public:
+ public:
 		void set_params_function(gnutls_params_function * func);
 	};
 
 	class certificate_client_credentials:public certificate_credentials {
-	      public:
+ public:
 	};
 
-
-
-
 	class anon_server_credentials:public credentials {
-	      public:
+ public:
 		anon_server_credentials();
 		~anon_server_credentials();
 		void set_dh_params(const dh_params & params);
 		void set_params_function(gnutls_params_function * func);
-	      protected:
+ protected:
 		 gnutls_anon_server_credentials_t cred;
 	};
 
 	class anon_client_credentials:public credentials {
-	      public:
+ public:
 		anon_client_credentials();
 		~anon_client_credentials();
-	      protected:
+ protected:
 		gnutls_anon_client_credentials_t cred;
 	};
 
-
 	class srp_server_credentials:public credentials {
-	      public:
+ public:
 		srp_server_credentials();
 		~srp_server_credentials();
 		void set_credentials_file(const char *password_file,
 					  const char *password_conf_file);
 		void set_credentials_function
 		    (gnutls_srp_server_credentials_function * func);
-	      protected:
+ protected:
 		 gnutls_srp_server_credentials_t cred;
 	};
 
 	class srp_client_credentials:public credentials {
-	      public:
+ public:
 		srp_client_credentials();
 		~srp_client_credentials();
 		void set_credentials(const char *username,
 				     const char *password);
 		void set_credentials_function
 		    (gnutls_srp_client_credentials_function * func);
-	      protected:
+ protected:
 		 gnutls_srp_client_credentials_t cred;
 	};
 
-
 	class psk_server_credentials:public credentials {
-	      public:
+ public:
 		psk_server_credentials();
 		~psk_server_credentials();
 		void set_credentials_file(const char *password_file);
@@ -408,12 +396,12 @@ namespace gnutls {
 		    (gnutls_psk_server_credentials_function * func);
 		void set_dh_params(const dh_params & params);
 		void set_params_function(gnutls_params_function * func);
-	      protected:
+ protected:
 		 gnutls_psk_server_credentials_t cred;
 	};
 
 	class psk_client_credentials:public credentials {
-	      public:
+ public:
 		psk_client_credentials();
 		~psk_client_credentials();
 		void set_credentials(const char *username,
@@ -421,11 +409,10 @@ namespace gnutls {
 				     gnutls_psk_key_flags flags);
 		void set_credentials_function
 		    (gnutls_psk_client_credentials_function * func);
-	      protected:
+ protected:
 		 gnutls_psk_client_credentials_t cred;
 	};
 
-
 }				/* namespace */
 
-#endif /* GNUTLS_GNUTLSXX_H */
+#endif				/* GNUTLS_GNUTLSXX_H */

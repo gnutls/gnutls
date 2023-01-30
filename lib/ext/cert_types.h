@@ -24,7 +24,7 @@
  */
 
 #ifndef GNUTLS_LIB_EXT_CERT_TYPES_H
-#define GNUTLS_LIB_EXT_CERT_TYPES_H
+# define GNUTLS_LIB_EXT_CERT_TYPES_H
 
 /* Maps IANA TLS Certificate Types identifiers to internal
  * certificate type representation.
@@ -32,12 +32,12 @@
 static inline gnutls_certificate_type_t IANA2cert_type(int num)
 {
 	switch (num) {
-		case 0:
-			return GNUTLS_CRT_X509;
-		case 2:
-			return GNUTLS_CRT_RAWPK;
-		default:
-			return GNUTLS_CRT_UNKNOWN;
+	case 0:
+		return GNUTLS_CRT_X509;
+	case 2:
+		return GNUTLS_CRT_RAWPK;
+	default:
+		return GNUTLS_CRT_UNKNOWN;
 	}
 }
 
@@ -47,28 +47,29 @@ static inline gnutls_certificate_type_t IANA2cert_type(int num)
 static inline int cert_type2IANA(gnutls_certificate_type_t cert_type)
 {
 	switch (cert_type) {
-		case GNUTLS_CRT_X509:
-			return 0;
-		case GNUTLS_CRT_RAWPK:
-			return 2;
-		default:
-			return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
+	case GNUTLS_CRT_X509:
+		return 0;
+	case GNUTLS_CRT_RAWPK:
+		return 2;
+	default:
+		return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
 	}
 }
 
 /* Checks whether the given cert type is enabled in the application
  */
-static inline bool is_cert_type_enabled(gnutls_session_t session, gnutls_certificate_type_t cert_type)
+static inline bool is_cert_type_enabled(gnutls_session_t session,
+					gnutls_certificate_type_t cert_type)
 {
-	switch(cert_type) {
-		case GNUTLS_CRT_X509:
-			// Default cert type, always enabled
-			return true;
-		case GNUTLS_CRT_RAWPK:
-			return session->internals.flags & GNUTLS_ENABLE_RAWPK;
-		default:
-			// When not explicitly supported here disable it
-			return false;
+	switch (cert_type) {
+	case GNUTLS_CRT_X509:
+		// Default cert type, always enabled
+		return true;
+	case GNUTLS_CRT_RAWPK:
+		return session->internals.flags & GNUTLS_ENABLE_RAWPK;
+	default:
+		// When not explicitly supported here disable it
+		return false;
 	}
 }
 
@@ -78,11 +79,11 @@ static inline bool is_cert_type_enabled(gnutls_session_t session, gnutls_certifi
 static inline bool are_alternative_cert_types_allowed(gnutls_session_t session)
 {
 	// OR-ed list of defined cert type init flags
-	#define CERT_TYPES_FLAGS GNUTLS_ENABLE_RAWPK
+# define CERT_TYPES_FLAGS GNUTLS_ENABLE_RAWPK
 
 	return session->internals.flags & CERT_TYPES_FLAGS;
 
-	#undef CERT_TYPES_FLAGS
+# undef CERT_TYPES_FLAGS
 }
 
-#endif /* GNUTLS_LIB_EXT_CERT_TYPES_H */
+#endif				/* GNUTLS_LIB_EXT_CERT_TYPES_H */

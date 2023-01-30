@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -47,23 +47,23 @@ void doit(void)
 	if (debug) {
 		printf("GnuTLS header version %s.\n", GNUTLS_VERSION);
 		printf("GnuTLS library version %s.\n",
-			gnutls_check_version(NULL));
+		       gnutls_check_version(NULL));
 	}
 
-	if (!gnutls_check_version_numeric(GNUTLS_VERSION_MAJOR, GNUTLS_VERSION_MINOR, GNUTLS_VERSION_PATCH)) {
+	if (!gnutls_check_version_numeric
+	    (GNUTLS_VERSION_MAJOR, GNUTLS_VERSION_MINOR,
+	     GNUTLS_VERSION_PATCH)) {
 		fail("error in gnutls_check_version_numeric 1\n");
 		exit(1);
 	}
 
 	CHECK_FAIL(99, 9, 9)
-	CHECK_FAIL(90, 1, 0)
-	CHECK_FAIL(90, 0, 0)
-
-	CHECK_OK(2, 0, 0)
-	CHECK_OK(2, 99, 99)
-	CHECK_OK(3, 0, 0)
-
-	if (!gnutls_check_version(GNUTLS_VERSION))
+	    CHECK_FAIL(90, 1, 0)
+	    CHECK_FAIL(90, 0, 0)
+	    CHECK_OK(2, 0, 0)
+	    CHECK_OK(2, 99, 99)
+	    CHECK_OK(3, 0, 0)
+	    if (!gnutls_check_version(GNUTLS_VERSION))
 		fail("gnutls_check_version ERROR\n");
 
 	{
@@ -78,12 +78,11 @@ void doit(void)
 		for (i = 0; algs[i]; i++) {
 			if (debug)
 				printf("pk_list[%d] = %d = %s = %d\n",
-					(int) i, algs[i],
-					gnutls_pk_algorithm_get_name(algs
+				       (int)i, algs[i],
+				       gnutls_pk_algorithm_get_name(algs
 								    [i]),
-					gnutls_pk_get_id
-					(gnutls_pk_algorithm_get_name
-					(algs[i])));
+				       gnutls_pk_get_id
+				       (gnutls_pk_algorithm_get_name(algs[i])));
 			if (gnutls_pk_get_id
 			    (gnutls_pk_algorithm_get_name(algs[i]))
 			    != algs[i])
@@ -112,11 +111,11 @@ void doit(void)
 
 			if (debug)
 				printf("sign_list[%d] = %d = %s = %d\n",
-					(int) i, algs[i],
-					gnutls_sign_algorithm_get_name(algs
+				       (int)i, algs[i],
+				       gnutls_sign_algorithm_get_name(algs
 								      [i]),
-					gnutls_sign_get_id
-					(gnutls_sign_algorithm_get_name
+				       gnutls_sign_get_id
+				       (gnutls_sign_algorithm_get_name
 					(algs[i])));
 			if (gnutls_sign_get_id
 			    (gnutls_sign_algorithm_get_name(algs[i])) !=
@@ -127,15 +126,15 @@ void doit(void)
 			hash = gnutls_sign_get_hash_algorithm(algs[i]);
 			if (hash != GNUTLS_DIG_UNKNOWN) {
 				const char *name = gnutls_digest_get_name(hash);
-				gnutls_digest_algorithm_t hash2 = gnutls_digest_get_id(name);
+				gnutls_digest_algorithm_t hash2 =
+				    gnutls_digest_get_id(name);
 				/* gnutls_digest_get_id returns
 				 * GNUTLS_DIG_UNKNOWN if the algorithm is not
 				 * compiled in.
 				 */
-				if (hash2 != GNUTLS_DIG_UNKNOWN && hash2 != hash)
-					fail("gnutls_digest id for %s doesn't match %s\n",
-					     gnutls_sign_algorithm_get_name(algs[i]),
-					     name);
+				if (hash2 != GNUTLS_DIG_UNKNOWN
+				    && hash2 != hash)
+					fail("gnutls_digest id for %s doesn't match %s\n", gnutls_sign_algorithm_get_name(algs[i]), name);
 			}
 		}
 

@@ -22,7 +22,7 @@
 /* Parts copied from GnuTLS example programs. */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -61,7 +61,7 @@ const gnutls_datum_t invalid_hash_data = {
 };
 
 const gnutls_datum_t raw_data = {
-	(void *) "hello",
+	(void *)"hello",
 	5
 };
 
@@ -133,15 +133,15 @@ static char pem2_key[] =
     "AoNBXjeBjgCGMei2m8E=\n" "-----END DSA PRIVATE KEY-----\n";
 
 const gnutls_datum_t cert_dat[] = {
-	{(void *) pem1_cert, sizeof(pem1_cert)}
+	{(void *)pem1_cert, sizeof(pem1_cert)}
 	,
-	{(void *) pem2_cert, sizeof(pem2_cert)}
+	{(void *)pem2_cert, sizeof(pem2_cert)}
 };
 
 const gnutls_datum_t key_dat[] = {
-	{(void *) pem1_key, sizeof(pem1_key)}
+	{(void *)pem1_key, sizeof(pem1_key)}
 	,
-	{(void *) pem2_key, sizeof(pem2_key)}
+	{(void *)pem2_key, sizeof(pem2_key)}
 };
 
 void _gnutls_lib_simulate_error(void);
@@ -162,7 +162,7 @@ void doit(void)
 
 	for (i = 0; i < sizeof(key_dat) / sizeof(key_dat[0]); i++) {
 		if (debug)
-			success("loop %d\n", (int) i);
+			success("loop %d\n", (int)i);
 
 		ret = gnutls_privkey_init(&privkey);
 		if (ret < 0)
@@ -170,12 +170,13 @@ void doit(void)
 
 		ret =
 		    gnutls_privkey_import_x509_raw(privkey, &key_dat[i],
-						GNUTLS_X509_FMT_PEM, NULL, 0);
+						   GNUTLS_X509_FMT_PEM, NULL,
+						   0);
 		if (ret < 0)
 			fail("gnutls_privkey_import\n");
 
 		ret = gnutls_privkey_sign_hash(privkey, GNUTLS_DIG_SHA1, 0,
-						&hash_data, &signature2);
+					       &hash_data, &signature2);
 		if (ret < 0)
 			fail("gnutls_privkey_sign_hash\n");
 
@@ -183,7 +184,7 @@ void doit(void)
 
 		_gnutls_lib_simulate_error();
 		ret = gnutls_privkey_sign_hash(privkey, GNUTLS_DIG_SHA1, 0,
-						&hash_data, &signature2);
+					       &hash_data, &signature2);
 		if (ret != GNUTLS_E_LIB_IN_ERROR_STATE)
 			fail("gnutls_privkey_sign_hash\n");
 

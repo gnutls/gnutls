@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -43,9 +43,10 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "%s|<%d>| %s", side, level, str);
 }
 
-static int server_handshake_callback(gnutls_session_t session, unsigned int htype,
-				     unsigned post, unsigned int incoming,
-				     const gnutls_datum_t *msg)
+static int server_handshake_callback(gnutls_session_t session,
+				     unsigned int htype, unsigned post,
+				     unsigned int incoming,
+				     const gnutls_datum_t * msg)
 {
 	unsigned pos;
 	gnutls_datum_t mmsg;
@@ -57,13 +58,14 @@ static int server_handshake_callback(gnutls_session_t session, unsigned int htyp
 		assert(msg->size >= HANDSHAKE_SESSION_ID_POS);
 		pos = HANDSHAKE_SESSION_ID_POS;
 		SKIP8(pos, msg->size);
-		pos += 3; /* ciphersuite + compression */
+		pos += 3;	/* ciphersuite + compression */
 
 		mmsg.data = &msg->data[pos];
 		mmsg.size = msg->size - pos;
 		if (pos != msg->size) {
-			if (pos < msg->size-1) {
-				fprintf(stderr, "additional bytes: %.2x%.2x\n", mmsg.data[0], mmsg.data[1]);
+			if (pos < msg->size - 1) {
+				fprintf(stderr, "additional bytes: %.2x%.2x\n",
+					mmsg.data[0], mmsg.data[1]);
 			}
 			fail("the server hello contains additional bytes\n");
 		}
@@ -72,9 +74,10 @@ static int server_handshake_callback(gnutls_session_t session, unsigned int htyp
 	return 0;
 }
 
-static int client_handshake_callback(gnutls_session_t session, unsigned int htype,
-				     unsigned post, unsigned int incoming,
-				     const gnutls_datum_t *msg)
+static int client_handshake_callback(gnutls_session_t session,
+				     unsigned int htype, unsigned post,
+				     unsigned int incoming,
+				     const gnutls_datum_t * msg)
 {
 	unsigned pos;
 	gnutls_datum_t mmsg;
@@ -93,8 +96,9 @@ static int client_handshake_callback(gnutls_session_t session, unsigned int htyp
 		mmsg.size = msg->size - pos;
 
 		if (pos != msg->size) {
-			if (pos < msg->size-1) {
-				fprintf(stderr, "additional bytes: %.2x%.2x\n", mmsg.data[0], mmsg.data[1]);
+			if (pos < msg->size - 1) {
+				fprintf(stderr, "additional bytes: %.2x%.2x\n",
+					mmsg.data[0], mmsg.data[1]);
 			}
 			fail("the client hello contains additional bytes\n");
 		}
@@ -131,9 +135,8 @@ void start(const char *prio, gnutls_protocol_t exp_version)
 					    GNUTLS_X509_FMT_PEM);
 
 	gnutls_init(&server, GNUTLS_SERVER);
-	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-				serverx509cred);
-	assert(gnutls_priority_set_direct(server, prio, NULL)>=0);
+	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, serverx509cred);
+	assert(gnutls_priority_set_direct(server, prio, NULL) >= 0);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
@@ -148,7 +151,9 @@ void start(const char *prio, gnutls_protocol_t exp_version)
 	if (ret < 0)
 		exit(1);
 
-	ret = gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca_cert, GNUTLS_X509_FMT_PEM);
+	ret =
+	    gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca_cert,
+						  GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);
 
@@ -157,7 +162,7 @@ void start(const char *prio, gnutls_protocol_t exp_version)
 		exit(1);
 
 	ret = gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-				clientx509cred);
+				     clientx509cred);
 	if (ret < 0)
 		exit(1);
 
@@ -186,8 +191,8 @@ void start(const char *prio, gnutls_protocol_t exp_version)
 
 	assert(gnutls_protocol_get_version(server) == exp_version);
 
-	assert(gnutls_certificate_type_get(server)==GNUTLS_CRT_X509);
-	assert(gnutls_certificate_type_get(client)==GNUTLS_CRT_X509);
+	assert(gnutls_certificate_type_get(server) == GNUTLS_CRT_X509);
+	assert(gnutls_certificate_type_get(client) == GNUTLS_CRT_X509);
 
 	gnutls_bye(client, GNUTLS_SHUT_RDWR);
 	gnutls_bye(server, GNUTLS_SHUT_RDWR);
@@ -208,5 +213,6 @@ void doit(void)
 	start("NORMAL:-VERS-ALL:+VERS-TLS1.0:%NO_EXTENSIONS", GNUTLS_TLS1_0);
 	start("NORMAL:-VERS-ALL:+VERS-TLS1.1:%NO_EXTENSIONS", GNUTLS_TLS1_1);
 	start("NORMAL:-VERS-ALL:+VERS-TLS1.2:%NO_EXTENSIONS", GNUTLS_TLS1_2);
-	start("NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:%NO_EXTENSIONS", GNUTLS_TLS1_2);
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:%NO_EXTENSIONS",
+	      GNUTLS_TLS1_2);
 }

@@ -34,7 +34,8 @@
 #include <uninorm.h>
 #include "num.h"
 
-static void change_u16_endianness(uint8_t *dst, const uint8_t *src, unsigned size, unsigned be)
+static void change_u16_endianness(uint8_t * dst, const uint8_t * src,
+				  unsigned size, unsigned be)
 {
 	unsigned convert = 0;
 	unsigned i;
@@ -70,14 +71,15 @@ int _gnutls_ucs2_to_utf8(const void *data, size_t size,
 	uint8_t *tmp_dst = NULL;
 	uint8_t *dst = NULL;
 
-	if (size > 2 && ((uint8_t *) data)[size-1] == 0 && ((uint8_t *) data)[size-2] == 0) {
+	if (size > 2 && ((uint8_t *) data)[size - 1] == 0
+	    && ((uint8_t *) data)[size - 2] == 0) {
 		size -= 2;
 	}
 
 	if (size == 0)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	src = gnutls_malloc(size+2);
+	src = gnutls_malloc(size + 2);
 	if (src == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
@@ -85,13 +87,13 @@ int _gnutls_ucs2_to_utf8(const void *data, size_t size,
 	change_u16_endianness(src, data, size, be);
 
 	dstlen = 0;
-	tmp_dst = u16_to_u8((uint16_t*)src, size/2, NULL, &dstlen);
+	tmp_dst = u16_to_u8((uint16_t *) src, size / 2, NULL, &dstlen);
 	if (tmp_dst == NULL) {
 		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 		goto fail;
 	}
 
-	dst = gnutls_malloc(dstlen+1);
+	dst = gnutls_malloc(dstlen + 1);
 	if (dst == NULL) {
 		gnutls_assert();
 		ret = GNUTLS_E_MEMORY_ERROR;
@@ -101,7 +103,7 @@ int _gnutls_ucs2_to_utf8(const void *data, size_t size,
 	memcpy(dst, tmp_dst, dstlen);
 	dst[dstlen] = 0;
 
-	output->data = (void *) dst;
+	output->data = (void *)dst;
 	output->size = dstlen;
 
 	ret = 0;
@@ -133,15 +135,16 @@ int _gnutls_utf8_to_ucs2(const void *data, size_t size,
 	if (tmp_dst == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-	nrm_dst = u16_normalize(UNINORM_NFC, tmp_dst, tmp_size, NULL, &nrm_size);
+	nrm_dst =
+	    u16_normalize(UNINORM_NFC, tmp_dst, tmp_size, NULL, &nrm_size);
 	if (nrm_dst == NULL) {
 		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 		goto fail;
 	}
 
-	dstlen = nrm_size * 2; /* convert to bytes */
+	dstlen = nrm_size * 2;	/* convert to bytes */
 
-	dst = gnutls_malloc(dstlen+2);
+	dst = gnutls_malloc(dstlen + 2);
 	if (dst == NULL) {
 		gnutls_assert();
 		ret = GNUTLS_E_MEMORY_ERROR;
@@ -149,11 +152,11 @@ int _gnutls_utf8_to_ucs2(const void *data, size_t size,
 	}
 
 	/* convert to BE */
-	change_u16_endianness(dst, (uint8_t*)tmp_dst, dstlen, be);
+	change_u16_endianness(dst, (uint8_t *) tmp_dst, dstlen, be);
 	dst[dstlen] = 0;
-	dst[dstlen+1] = 0;
+	dst[dstlen + 1] = 0;
 
-	output->data = (void *) dst;
+	output->data = (void *)dst;
 	output->size = dstlen;
 
 	ret = 0;
@@ -168,4 +171,3 @@ int _gnutls_utf8_to_ucs2(const void *data, size_t size,
 
 	return ret;
 }
-

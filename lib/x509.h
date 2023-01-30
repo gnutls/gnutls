@@ -21,26 +21,23 @@
  */
 
 #ifndef GNUTLS_LIB_X509_H
-#define GNUTLS_LIB_X509_H
+# define GNUTLS_LIB_X509_H
 
-#include <libtasn1.h>
-
+# include <libtasn1.h>
 
 int _gnutls_x509_cert_verify_peers(gnutls_session_t session,
 				   gnutls_typed_vdata_st * data,
-				   unsigned int elements,
-				   unsigned int *status);
+				   unsigned int elements, unsigned int *status);
 
-#define PEM_CERT_SEP2 "-----BEGIN X509 CERTIFICATE"
-#define PEM_CERT_SEP "-----BEGIN CERTIFICATE"
-#define PEM_OCSP_RESPONSE "-----BEGIN OCSP RESPONSE"
-#define BARE_PEM_OCSP_RESPONSE "OCSP RESPONSE"
+# define PEM_CERT_SEP2 "-----BEGIN X509 CERTIFICATE"
+# define PEM_CERT_SEP "-----BEGIN CERTIFICATE"
+# define PEM_OCSP_RESPONSE "-----BEGIN OCSP RESPONSE"
+# define BARE_PEM_OCSP_RESPONSE "OCSP RESPONSE"
 
-#define PEM_CRL_SEP "-----BEGIN X509 CRL"
-
+# define PEM_CRL_SEP "-----BEGIN X509 CRL"
 
 int _gnutls_x509_raw_privkey_to_gkey(gnutls_privkey_t * privkey,
 				     const gnutls_datum_t * raw_key,
 				     gnutls_x509_crt_fmt_t type);
 
-#endif /* GNUTLS_LIB_X509_H */
+#endif				/* GNUTLS_LIB_X509_H */

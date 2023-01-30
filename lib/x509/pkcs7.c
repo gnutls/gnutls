@@ -50,10 +50,12 @@ static int _decode_pkcs7_signed_data(gnutls_pkcs7_t pkcs7)
 {
 	asn1_node c2;
 	int len, result;
-	gnutls_datum_t tmp = {NULL, 0};
+	gnutls_datum_t tmp = { NULL, 0 };
 
 	len = MAX_OID_SIZE - 1;
-	result = asn1_read_value(pkcs7->pkcs7, "contentType", pkcs7->encap_data_oid, &len);
+	result =
+	    asn1_read_value(pkcs7->pkcs7, "contentType", pkcs7->encap_data_oid,
+			    &len);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
@@ -61,7 +63,8 @@ static int _decode_pkcs7_signed_data(gnutls_pkcs7_t pkcs7)
 
 	if (strcmp(pkcs7->encap_data_oid, SIGNED_DATA_OID) != 0) {
 		gnutls_assert();
-		_gnutls_debug_log("Unknown PKCS7 Content OID '%s'\n", pkcs7->encap_data_oid);
+		_gnutls_debug_log("Unknown PKCS7 Content OID '%s'\n",
+				  pkcs7->encap_data_oid);
 		return GNUTLS_E_UNKNOWN_PKCS_CONTENT_TYPE;
 	}
 
@@ -94,7 +97,8 @@ static int _decode_pkcs7_signed_data(gnutls_pkcs7_t pkcs7)
 	/* read the encapsulated content */
 	len = MAX_OID_SIZE - 1;
 	result =
-	    asn1_read_value(c2, "encapContentInfo.eContentType", pkcs7->encap_data_oid, &len);
+	    asn1_read_value(c2, "encapContentInfo.eContentType",
+			    pkcs7->encap_data_oid, &len);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
@@ -111,9 +115,14 @@ static int _decode_pkcs7_signed_data(gnutls_pkcs7_t pkcs7)
 
 	/* Try reading as octet string according to rfc5652. If that fails, attempt
 	 * a raw read according to rfc2315 */
-	result = _gnutls_x509_read_string(c2, "encapContentInfo.eContent", &pkcs7->der_signed_data, ASN1_ETYPE_OCTET_STRING, 1);
+	result =
+	    _gnutls_x509_read_string(c2, "encapContentInfo.eContent",
+				     &pkcs7->der_signed_data,
+				     ASN1_ETYPE_OCTET_STRING, 1);
 	if (result < 0) {
-		result = _gnutls_x509_read_value(c2, "encapContentInfo.eContent", &pkcs7->der_signed_data);
+		result =
+		    _gnutls_x509_read_value(c2, "encapContentInfo.eContent",
+					    &pkcs7->der_signed_data);
 		if (result < 0) {
 			pkcs7->der_signed_data.data = NULL;
 			pkcs7->der_signed_data.size = 0;
@@ -123,14 +132,21 @@ static int _decode_pkcs7_signed_data(gnutls_pkcs7_t pkcs7)
 			unsigned long tag;
 
 			/* we skip the embedded element's tag and length - uncharted territorry - used by MICROSOFT_CERT_TRUST_LIST */
-			result = asn1_get_tag_der(pkcs7->der_signed_data.data, pkcs7->der_signed_data.size, &cls, &tag_len, &tag);
+			result =
+			    asn1_get_tag_der(pkcs7->der_signed_data.data,
+					     pkcs7->der_signed_data.size, &cls,
+					     &tag_len, &tag);
 			if (result != ASN1_SUCCESS) {
 				gnutls_assert();
 				result = _gnutls_asn2err(result);
 				goto cleanup;
 			}
 
-			result = asn1_get_length_ber(pkcs7->der_signed_data.data+tag_len, pkcs7->der_signed_data.size-tag_len, &len_len);
+			result =
+			    asn1_get_length_ber(pkcs7->der_signed_data.data +
+						tag_len,
+						pkcs7->der_signed_data.size -
+						tag_len, &len_len);
 			if (result < 0) {
 				gnutls_assert();
 				result = GNUTLS_E_ASN1_DER_ERROR;
@@ -138,8 +154,10 @@ static int _decode_pkcs7_signed_data(gnutls_pkcs7_t pkcs7)
 			}
 
 			tag_len += len_len;
-			memmove(pkcs7->der_signed_data.data, &pkcs7->der_signed_data.data[tag_len], pkcs7->der_signed_data.size-tag_len);
-			pkcs7->der_signed_data.size-=tag_len;
+			memmove(pkcs7->der_signed_data.data,
+				&pkcs7->der_signed_data.data[tag_len],
+				pkcs7->der_signed_data.size - tag_len);
+			pkcs7->der_signed_data.size -= tag_len;
 		}
 	}
 
@@ -405,7 +423,7 @@ gnutls_pkcs7_get_crt_raw2(gnutls_pkcs7_t pkcs7,
 int
 gnutls_pkcs7_get_crt_raw(gnutls_pkcs7_t pkcs7,
 			 unsigned indx, void *certificate,
-			 size_t * certificate_size)
+			 size_t *certificate_size)
 {
 	int ret;
 	gnutls_datum_t tmp = { NULL, 0 };
@@ -753,7 +771,7 @@ int gnutls_pkcs7_get_signature_info(gnutls_pkcs7_t pkcs7, unsigned idx,
  * and matches our calculated hash */
 static int verify_hash_attr(gnutls_pkcs7_t pkcs7, const char *root,
 			    gnutls_sign_algorithm_t algo,
-			    const gnutls_datum_t *data)
+			    const gnutls_datum_t * data)
 {
 	unsigned hash;
 	gnutls_datum_t tmp = { NULL, 0 };
@@ -886,7 +904,8 @@ static int figure_pkcs7_sigdata(gnutls_pkcs7_t pkcs7, const char *root,
 
 	/* We have no signedAttrs. Use the provided data, or the encapsulated */
 	if (data == NULL || data->data == NULL) {
-		return _gnutls_set_datum(sigdata, pkcs7->der_signed_data.data, pkcs7->der_signed_data.size);
+		return _gnutls_set_datum(sigdata, pkcs7->der_signed_data.data,
+					 pkcs7->der_signed_data.size);
 	}
 
 	return _gnutls_set_datum(sigdata, data->data, data->size);
@@ -916,7 +935,7 @@ static int figure_pkcs7_sigdata(gnutls_pkcs7_t pkcs7, const char *root,
  **/
 int
 gnutls_pkcs7_get_embedded_data(gnutls_pkcs7_t pkcs7, unsigned flags,
-			       gnutls_datum_t *data)
+			       gnutls_datum_t * data)
 {
 	if (pkcs7 == NULL)
 		return GNUTLS_E_INVALID_REQUEST;
@@ -926,11 +945,16 @@ gnutls_pkcs7_get_embedded_data(gnutls_pkcs7_t pkcs7, unsigned flags,
 
 	if (flags & GNUTLS_PKCS7_EDATA_GET_RAW) {
 		if (pkcs7->signed_data == NULL)
-			return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+			return
+			    gnutls_assert_val
+			    (GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
-		return _gnutls_x509_read_value(pkcs7->signed_data, "encapContentInfo.eContent", data);
+		return _gnutls_x509_read_value(pkcs7->signed_data,
+					       "encapContentInfo.eContent",
+					       data);
 	} else {
-		return _gnutls_set_datum(data, pkcs7->der_signed_data.data, pkcs7->der_signed_data.size);
+		return _gnutls_set_datum(data, pkcs7->der_signed_data.data,
+					 pkcs7->der_signed_data.size);
 	}
 }
 
@@ -947,8 +971,7 @@ gnutls_pkcs7_get_embedded_data(gnutls_pkcs7_t pkcs7, unsigned flags,
  *
  * Since: 3.5.5
  **/
-const char *
-gnutls_pkcs7_get_embedded_data_oid(gnutls_pkcs7_t pkcs7)
+const char *gnutls_pkcs7_get_embedded_data_oid(gnutls_pkcs7_t pkcs7)
 {
 	if (pkcs7 == NULL || pkcs7->encap_data_oid[0] == 0)
 		return NULL;
@@ -987,7 +1010,7 @@ gnutls_pkcs7_get_embedded_data_oid(gnutls_pkcs7_t pkcs7)
 int gnutls_pkcs7_verify_direct(gnutls_pkcs7_t pkcs7,
 			       gnutls_x509_crt_t signer,
 			       unsigned idx,
-			       const gnutls_datum_t *data, unsigned flags)
+			       const gnutls_datum_t * data, unsigned flags)
 {
 	int count, ret;
 	gnutls_datum_t tmpdata = { NULL, 0 };
@@ -1038,9 +1061,9 @@ int gnutls_pkcs7_verify_direct(gnutls_pkcs7_t pkcs7,
 /* Finds the issuer of the given certificate (@cert) in the
  * included in PKCS#7 list of certificates */
 static gnutls_x509_crt_t find_verified_issuer_of(gnutls_pkcs7_t pkcs7,
-					gnutls_x509_crt_t cert,
-					const char *purpose,
-					unsigned vflags)
+						 gnutls_x509_crt_t cert,
+						 const char *purpose,
+						 unsigned vflags)
 {
 	gnutls_x509_crt_t issuer = NULL;
 	int ret, count;
@@ -1078,9 +1101,14 @@ static gnutls_x509_crt_t find_verified_issuer_of(gnutls_pkcs7_t pkcs7,
 			goto skip;
 		}
 
-		ret = gnutls_x509_crt_verify(cert, &issuer, 1, vflags|GNUTLS_VERIFY_DO_NOT_ALLOW_SAME, &vtmp);
-		if (ret < 0 || vtmp != 0 ||
-		    (purpose != NULL && !_gnutls_check_key_purpose(issuer, purpose, 0))) {
+		ret =
+		    gnutls_x509_crt_verify(cert, &issuer, 1,
+					   vflags |
+					   GNUTLS_VERIFY_DO_NOT_ALLOW_SAME,
+					   &vtmp);
+		if (ret < 0 || vtmp != 0
+		    || (purpose != NULL
+			&& !_gnutls_check_key_purpose(issuer, purpose, 0))) {
 			gnutls_assert();	/* maybe next one is trusted */
 			_gnutls_cert_log("failed verification with", issuer);
  skip:
@@ -1120,7 +1148,8 @@ static gnutls_x509_crt_t find_verified_issuer_of(gnutls_pkcs7_t pkcs7,
 static gnutls_x509_crt_t find_child_of_with_serial(gnutls_pkcs7_t pkcs7,
 						   gnutls_x509_crt_t issuer,
 						   const char *purpose,
-						   gnutls_pkcs7_signature_info_st *info)
+						   gnutls_pkcs7_signature_info_st
+						   * info)
 {
 	gnutls_x509_crt_t crt = NULL;
 	int ret, count;
@@ -1149,7 +1178,8 @@ static gnutls_x509_crt_t find_child_of_with_serial(gnutls_pkcs7_t pkcs7,
 			goto fail;
 		}
 
-		ret = gnutls_x509_crt_import(crt, &tmpdata, GNUTLS_X509_FMT_DER);
+		ret =
+		    gnutls_x509_crt_import(crt, &tmpdata, GNUTLS_X509_FMT_DER);
 		if (ret < 0) {
 			gnutls_assert();
 			goto fail;
@@ -1163,10 +1193,10 @@ static gnutls_x509_crt_t find_child_of_with_serial(gnutls_pkcs7_t pkcs7,
 		}
 
 		if (purpose) {
-			ret =
-			    _gnutls_check_key_purpose(crt, purpose, 0);
+			ret = _gnutls_check_key_purpose(crt, purpose, 0);
 			if (ret == 0) {
-				_gnutls_cert_log("key purpose unacceptable", crt);
+				_gnutls_cert_log("key purpose unacceptable",
+						 crt);
 				goto skip;
 			}
 		}
@@ -1188,7 +1218,9 @@ static gnutls_x509_crt_t find_child_of_with_serial(gnutls_pkcs7_t pkcs7,
 			}
 		} else if (info->issuer_keyid.size > 0) {
 			tmp_size = sizeof(tmp);
-			ret = gnutls_x509_crt_get_subject_key_id(crt, tmp, &tmp_size, NULL);
+			ret =
+			    gnutls_x509_crt_get_subject_key_id(crt, tmp,
+							       &tmp_size, NULL);
 			if (ret < 0) {
 				gnutls_assert();
 				goto skip;
@@ -1285,7 +1317,9 @@ gnutls_x509_crt_t find_signer(gnutls_pkcs7_t pkcs7, gnutls_x509_trust_list_t tl,
 		if (issuer) {
 			/* try to find the actual signer in the list of
 			 * certificates */
-			signer = find_child_of_with_serial(pkcs7, issuer, purpose, info);
+			signer =
+			    find_child_of_with_serial(pkcs7, issuer, purpose,
+						      info);
 			if (signer == NULL) {
 				gnutls_assert();
 				goto fail;
@@ -1307,7 +1341,10 @@ gnutls_x509_crt_t find_signer(gnutls_pkcs7_t pkcs7, gnutls_x509_trust_list_t tl,
 
 		/* if the signer cannot be verified from our trust list, make a chain of certificates
 		 * starting from the identified signer, to a root we know. */
-		ret = gnutls_x509_trust_list_verify_crt2(tl, &signer, 1, vdata, vdata_size, vflags, &vtmp, NULL);
+		ret =
+		    gnutls_x509_trust_list_verify_crt2(tl, &signer, 1, vdata,
+						       vdata_size, vflags,
+						       &vtmp, NULL);
 		if (ret < 0 || vtmp != 0) {
 			gnutls_x509_crt_t prev = NULL;
 
@@ -1319,37 +1356,52 @@ gnutls_x509_crt_t find_signer(gnutls_pkcs7_t pkcs7, gnutls_x509_trust_list_t tl,
 				}
 				prev = issuer;
 
-				issuer = find_verified_issuer_of(pkcs7, issuer, purpose, vflags);
+				issuer =
+				    find_verified_issuer_of(pkcs7, issuer,
+							    purpose, vflags);
 
-				if (issuer != NULL && gnutls_x509_crt_check_issuer(issuer, issuer)) {
+				if (issuer != NULL
+				    && gnutls_x509_crt_check_issuer(issuer,
+								    issuer)) {
 					if (prev && prev != signer)
 						gnutls_x509_crt_deinit(prev);
 					prev = issuer;
 					break;
 				}
-			} while(issuer != NULL);
+			} while (issuer != NULL);
 
-			issuer = prev; /* the last we have seen */
+			issuer = prev;	/* the last we have seen */
 
 			if (issuer == NULL) {
 				gnutls_assert();
 				goto fail;
 			}
 
-			ret = gnutls_x509_trust_list_verify_crt2(tl, &issuer, 1, vdata, vdata_size, vflags, &vtmp, NULL);
+			ret =
+			    gnutls_x509_trust_list_verify_crt2(tl, &issuer, 1,
+							       vdata,
+							       vdata_size,
+							       vflags, &vtmp,
+							       NULL);
 			if (ret < 0 || vtmp != 0) {
 				/* could not construct a valid chain */
-				_gnutls_reason_log("signer's chain failed trust list verification", vtmp);
+				_gnutls_reason_log
+				    ("signer's chain failed trust list verification",
+				     vtmp);
 				gnutls_assert();
 				goto fail;
 			}
 		}
 	} else {
 		/* verify that the signer we got is trusted */
-		ret = gnutls_x509_trust_list_verify_crt2(tl, &signer, 1, vdata, vdata_size, vflags, &vtmp, NULL);
+		ret =
+		    gnutls_x509_trust_list_verify_crt2(tl, &signer, 1, vdata,
+						       vdata_size, vflags,
+						       &vtmp, NULL);
 		if (ret < 0 || vtmp != 0) {
 			/* could not construct a valid chain */
-			_gnutls_reason_log("signer failed trust list verification", vtmp);
+			_gnutls_reason_log
+			    ("signer failed trust list verification", vtmp);
 			gnutls_assert();
 			goto fail;
 		}
@@ -1404,10 +1456,10 @@ gnutls_x509_crt_t find_signer(gnutls_pkcs7_t pkcs7, gnutls_x509_trust_list_t tl,
  **/
 int gnutls_pkcs7_verify(gnutls_pkcs7_t pkcs7,
 			gnutls_x509_trust_list_t tl,
-			gnutls_typed_vdata_st *vdata,
+			gnutls_typed_vdata_st * vdata,
 			unsigned int vdata_size,
 			unsigned idx,
-			const gnutls_datum_t *data, unsigned flags)
+			const gnutls_datum_t * data, unsigned flags)
 {
 	int count, ret;
 	gnutls_datum_t tmpdata = { NULL, 0 };
@@ -1445,10 +1497,12 @@ int gnutls_pkcs7_verify(gnutls_pkcs7_t pkcs7,
 	signer = find_signer(pkcs7, tl, vdata, vdata_size, flags, &info);
 	if (signer) {
 		ret =
-		    gnutls_x509_crt_verify_data3(signer, info.algo, vdata, vdata_size,
-						 &sigdata, &info.sig, flags);
+		    gnutls_x509_crt_verify_data3(signer, info.algo, vdata,
+						 vdata_size, &sigdata,
+						 &info.sig, flags);
 		if (ret < 0) {
-			_gnutls_cert_log("failed struct verification with", signer);
+			_gnutls_cert_log("failed struct verification with",
+					 signer);
 			gnutls_assert();
 		}
 		gnutls_x509_crt_deinit(signer);
@@ -1479,7 +1533,8 @@ static void disable_opt_fields(gnutls_pkcs7_t pkcs7)
 	result =
 	    asn1_number_of_elements(pkcs7->signed_data, "certificates", &count);
 	if (result != ASN1_SUCCESS || count == 0) {
-		(void)asn1_write_value(pkcs7->signed_data, "certificates", NULL, 0);
+		(void)asn1_write_value(pkcs7->signed_data, "certificates", NULL,
+				       0);
 	}
 
 	return;
@@ -1538,7 +1593,7 @@ static int reencode(gnutls_pkcs7_t pkcs7)
 int
 gnutls_pkcs7_export(gnutls_pkcs7_t pkcs7,
 		    gnutls_x509_crt_fmt_t format, void *output_data,
-		    size_t * output_data_size)
+		    size_t *output_data_size)
 {
 	int ret;
 	if (pkcs7 == NULL)
@@ -1867,7 +1922,7 @@ gnutls_pkcs7_get_crl_raw2(gnutls_pkcs7_t pkcs7,
  **/
 int
 gnutls_pkcs7_get_crl_raw(gnutls_pkcs7_t pkcs7,
-			 unsigned indx, void *crl, size_t * crl_size)
+			 unsigned indx, void *crl, size_t *crl_size)
 {
 	int ret;
 	gnutls_datum_t tmp = { NULL, 0 };
@@ -2282,7 +2337,9 @@ static int write_attributes(asn1_node c2, const char *root,
 		/* If we add any attribute we should add them all */
 		/* Add hash */
 		digest_size = _gnutls_hash_get_algo_len(me);
-		ret = gnutls_hash_fast(MAC_TO_DIG(me->id), data->data, data->size, digest);
+		ret =
+		    gnutls_hash_fast(MAC_TO_DIG(me->id), data->data, data->size,
+				     digest);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
@@ -2337,7 +2394,7 @@ static int write_attributes(asn1_node c2, const char *root,
 int gnutls_pkcs7_sign(gnutls_pkcs7_t pkcs7,
 		      gnutls_x509_crt_t signer,
 		      gnutls_privkey_t signer_key,
-		      const gnutls_datum_t *data,
+		      const gnutls_datum_t * data,
 		      gnutls_pkcs7_attrs_t signed_attrs,
 		      gnutls_pkcs7_attrs_t unsigned_attrs,
 		      gnutls_digest_algorithm_t dig, unsigned flags)
@@ -2366,7 +2423,8 @@ int gnutls_pkcs7_sign(gnutls_pkcs7_t pkcs7,
 
 		if (!(flags & GNUTLS_PKCS7_EMBED_DATA)) {
 			(void)asn1_write_value(pkcs7->signed_data,
-					 "encapContentInfo.eContent", NULL, 0);
+					       "encapContentInfo.eContent",
+					       NULL, 0);
 		}
 	}
 
@@ -2378,8 +2436,7 @@ int gnutls_pkcs7_sign(gnutls_pkcs7_t pkcs7,
 
 	result =
 	    asn1_write_value(pkcs7->signed_data,
-			     "encapContentInfo.eContentType", DATA_OID,
-			     0);
+			     "encapContentInfo.eContentType", DATA_OID, 0);
 	if (result != ASN1_SUCCESS) {
 		ret = _gnutls_asn2err(result);
 		goto cleanup;
@@ -2388,8 +2445,8 @@ int gnutls_pkcs7_sign(gnutls_pkcs7_t pkcs7,
 	if ((flags & GNUTLS_PKCS7_EMBED_DATA) && data->data) {	/* embed data */
 		ret =
 		    _gnutls_x509_write_string(pkcs7->signed_data,
-				     "encapContentInfo.eContent", data,
-				     ASN1_ETYPE_OCTET_STRING);
+					      "encapContentInfo.eContent", data,
+					      ASN1_ETYPE_OCTET_STRING);
 		if (ret < 0) {
 			goto cleanup;
 		}
@@ -2423,7 +2480,7 @@ int gnutls_pkcs7_sign(gnutls_pkcs7_t pkcs7,
 	}
 
 	(void)asn1_write_value(pkcs7->signed_data,
-			 "digestAlgorithms.?LAST.parameters", NULL, 0);
+			       "digestAlgorithms.?LAST.parameters", NULL, 0);
 
 	/* append signer's info */
 	result = asn1_write_value(pkcs7->signed_data, "signerInfos", "NEW", 1);
@@ -2453,8 +2510,8 @@ int gnutls_pkcs7_sign(gnutls_pkcs7_t pkcs7,
 	}
 
 	(void)asn1_write_value(pkcs7->signed_data,
-			 "signerInfos.?LAST.digestAlgorithm.parameters", NULL,
-			 0);
+			       "signerInfos.?LAST.digestAlgorithm.parameters",
+			       NULL, 0);
 
 	ret =
 	    write_signer_id(pkcs7->signed_data, "signerInfos.?LAST", signer,
@@ -2499,7 +2556,7 @@ int gnutls_pkcs7_sign(gnutls_pkcs7_t pkcs7,
 	}
 
 	ret = _gnutls_privkey_update_spki_params(signer_key, pk, dig, 0,
-						  &params);
+						 &params);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -2507,7 +2564,8 @@ int gnutls_pkcs7_sign(gnutls_pkcs7_t pkcs7,
 
 	se = _gnutls_pk_to_sign_entry(params.pk, dig);
 	if (se == NULL) {
-		ret = gnutls_assert_val(GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM);
+		ret =
+		    gnutls_assert_val(GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM);
 		goto cleanup;
 	}
 

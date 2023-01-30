@@ -23,13 +23,13 @@
 
 #ifdef ENABLE_AFALG
 
-#include "errors.h"
-#include "gnutls_int.h"
+# include "errors.h"
+# include "gnutls_int.h"
 
-#include <gnutls/crypto.h>
-#include <kcapi.h>
-#include <limits.h>
-#include "malloca.h"
+# include <gnutls/crypto.h>
+# include <kcapi.h>
+# include <limits.h>
+# include "malloca.h"
 
 /************************ Symmetric cipher algorithms ************************/
 
@@ -38,7 +38,6 @@ struct kcapi_ctx {
 	int enc;
 	uint8_t iv[MAX_CIPHER_IV_SIZE];
 };
-
 
 static const char *gnutls_cipher_map[] = {
 	[GNUTLS_CIPHER_AES_128_CBC] = "cbc(aes)",
@@ -103,12 +102,14 @@ static int afalg_cipher_setiv(void *_ctx, const void *iv, size_t iv_size)
 
 	memcpy(ctx->iv, iv, iv_size);
 	if (ctx->enc) {
-		if (kcapi_cipher_stream_init_enc(ctx->handle, ctx->iv, NULL, 0) < 0) {
+		if (kcapi_cipher_stream_init_enc(ctx->handle, ctx->iv, NULL, 0)
+		    < 0) {
 			gnutls_assert();
 			return GNUTLS_E_ENCRYPTION_FAILED;
 		}
 	} else {
-		if (kcapi_cipher_stream_init_dec(ctx->handle, ctx->iv, NULL, 0) < 0) {
+		if (kcapi_cipher_stream_init_dec(ctx->handle, ctx->iv, NULL, 0)
+		    < 0) {
 			gnutls_assert();
 			return GNUTLS_E_ENCRYPTION_FAILED;
 		}
@@ -272,13 +273,13 @@ afalg_aead_init(gnutls_cipher_algorithm_t algorithm, void **_ctx, int enc)
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	switch(algorithm) {
-		case GNUTLS_CIPHER_AES_128_CCM:
-		case GNUTLS_CIPHER_AES_256_CCM:
-			ctx->ccm = 1;
-			break;
-		default:
-			ctx->ccm = 0;
+	switch (algorithm) {
+	case GNUTLS_CIPHER_AES_128_CCM:
+	case GNUTLS_CIPHER_AES_256_CCM:
+		ctx->ccm = 1;
+		break;
+	default:
+		ctx->ccm = 0;
 	}
 	ctx->handle = handle;
 	*_ctx = ctx;
@@ -343,13 +344,13 @@ static int afalg_aead_decrypt(void *_ctx,
 		uint32_t ccm_iv_len;
 
 		if (kcapi_aead_ccm_nonce_to_iv(nonce, nonce_size, &ccm_iv,
-						   &ccm_iv_len)) {
+					       &ccm_iv_len)) {
 			gnutls_assert();
 			ret = GNUTLS_E_DECRYPTION_FAILED;
 			goto end;
 		}
 		if (kcapi_aead_stream_init_dec(ctx->handle, ccm_iv, NULL, 0)
-			< 0) {
+		    < 0) {
 			free(ccm_iv);
 			gnutls_assert();
 			ret = GNUTLS_E_DECRYPTION_FAILED;
@@ -358,7 +359,7 @@ static int afalg_aead_decrypt(void *_ctx,
 		free(ccm_iv);
 	} else {
 		if (kcapi_aead_stream_init_dec(ctx->handle, nonce, NULL, 0)
-			< 0) {
+		    < 0) {
 			gnutls_assert();
 			ret = GNUTLS_E_DECRYPTION_FAILED;
 			goto end;
@@ -369,7 +370,7 @@ static int afalg_aead_decrypt(void *_ctx,
 	 * Set AAD: IOVECs do not support const, this buffer is guaranteed to be
 	 * read-only
 	 */
-	iov[0].iov_base = (void*)auth;
+	iov[0].iov_base = (void *)auth;
 	iov[0].iov_len = auth_size;
 
 	/*
@@ -390,8 +391,9 @@ static int afalg_aead_decrypt(void *_ctx,
 
 	/* Set PT buffer to be filled by kernel */
 	uint32_t outbuflen = kcapi_aead_outbuflen_dec(ctx->handle,
-						encr_size - tag_size,
-						auth_size, tag_size)-auth_size;
+						      encr_size - tag_size,
+						      auth_size,
+						      tag_size) - auth_size;
 	iov[1].iov_base = (void *)plain;
 	iov[1].iov_len = (plain_size > outbuflen) ? outbuflen : plain_size;
 
@@ -401,10 +403,11 @@ static int afalg_aead_decrypt(void *_ctx,
 		goto end;
 	}
 
-end:
+ end:
 	freea(authtmp);
 	return ret;
 }
+
 static int afalg_aead_encrypt(void *_ctx, const void *nonce, size_t nonce_size,
 			      const void *auth, size_t auth_size,
 			      size_t tag_size,
@@ -452,13 +455,13 @@ static int afalg_aead_encrypt(void *_ctx, const void *nonce, size_t nonce_size,
 		uint32_t ccm_iv_len;
 
 		if (kcapi_aead_ccm_nonce_to_iv(nonce, nonce_size, &ccm_iv,
-						   &ccm_iv_len)) {
+					       &ccm_iv_len)) {
 			gnutls_assert();
 			ret = GNUTLS_E_ENCRYPTION_FAILED;
 			goto end;
 		}
 		if (kcapi_aead_stream_init_enc(ctx->handle, ccm_iv, NULL, 0)
-			< 0) {
+		    < 0) {
 			free(ccm_iv);
 			gnutls_assert();
 			ret = GNUTLS_E_ENCRYPTION_FAILED;
@@ -467,7 +470,7 @@ static int afalg_aead_encrypt(void *_ctx, const void *nonce, size_t nonce_size,
 		free(ccm_iv);
 	} else {
 		if (kcapi_aead_stream_init_enc(ctx->handle, nonce, NULL, 0)
-			< 0) {
+		    < 0) {
 			gnutls_assert();
 			ret = GNUTLS_E_ENCRYPTION_FAILED;
 			goto end;
@@ -478,7 +481,7 @@ static int afalg_aead_encrypt(void *_ctx, const void *nonce, size_t nonce_size,
 	 * Set AAD: IOVECs do not support const, this buffer is guaranteed to be
 	 * read-only
 	 */
-	iov[0].iov_base = (void*)auth;
+	iov[0].iov_base = (void *)auth;
 	iov[0].iov_len = auth_size;
 
 	/*
@@ -523,7 +526,7 @@ static int afalg_aead_encrypt(void *_ctx, const void *nonce, size_t nonce_size,
 		goto end;
 	}
 
-end:
+ end:
 	freea(authtmp);
 	return ret;
 }
@@ -542,8 +545,7 @@ static int afalg_aead_register(void)
 	int ret = 0;
 
 	for (i = 0;
-	     i < sizeof(gnutls_aead_map) / sizeof(gnutls_aead_map[0]);
-	     i++) {
+	     i < sizeof(gnutls_aead_map) / sizeof(gnutls_aead_map[0]); i++) {
 		struct kcapi_handle *handle;
 
 		if (gnutls_aead_map[i] == 0)
@@ -610,14 +612,16 @@ static int afalg_mac_hash(void *ctx, const void *_text, size_t textsize)
 	const uint8_t *text = _text;
 	size_t offset;
 
-	for (offset = 0; offset < textsize - textsize % INT_MAX; offset += INT_MAX) {
+	for (offset = 0; offset < textsize - textsize % INT_MAX;
+	     offset += INT_MAX) {
 		if (kcapi_md_update(handle, text + offset, INT_MAX) < 0) {
 			return gnutls_assert_val(GNUTLS_E_ENCRYPTION_FAILED);
 		}
 	}
 
 	if (offset < textsize) {
-		if (kcapi_md_update(handle, text + offset, textsize - offset) < 0) {
+		if (kcapi_md_update(handle, text + offset, textsize - offset) <
+		    0) {
 			return gnutls_assert_val(GNUTLS_E_ENCRYPTION_FAILED);
 		}
 	}
@@ -682,7 +686,7 @@ static int afalg_mac_fast(gnutls_mac_algorithm_t algorithm, const void *nonce,
 
 	ret = 0;
 
-out:
+ out:
 	kcapi_md_destroy(handle);
 
 	return ret;
@@ -703,9 +707,7 @@ static int afalg_mac_register(void)
 	unsigned int i;
 	int ret = 0;
 
-	for (i = 0;
-	     i < sizeof(gnutls_mac_map) / sizeof(gnutls_mac_map[0]);
-	     i++) {
+	for (i = 0; i < sizeof(gnutls_mac_map) / sizeof(gnutls_mac_map[0]); i++) {
 		struct kcapi_handle *handle;
 
 		if (gnutls_mac_map[i] == 0)
@@ -729,7 +731,6 @@ static int afalg_mac_register(void)
 
 	return ret;
 }
-
 
 /***************************** Digest algorithms *****************************/
 
@@ -786,7 +787,7 @@ static int afalg_digest_fast(gnutls_digest_algorithm_t algorithm,
 
 	ret = 0;
 
-out:
+ out:
 	kcapi_md_destroy(handle);
 
 	return ret;
@@ -857,7 +858,7 @@ void _gnutls_afalg_deinit(void)
 	return;
 }
 
-#else /* ENABLE_AFALG */
+#else				/* ENABLE_AFALG */
 
 int _gnutls_afalg_init(void)
 {
@@ -869,4 +870,4 @@ void _gnutls_afalg_deinit(void)
 	return;
 }
 
-#endif /* ENABLE_AFALG */
+#endif				/* ENABLE_AFALG */

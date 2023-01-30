@@ -19,26 +19,26 @@
  */
 
 #ifndef GNUTLS_LIB_PKCS11_INT_H
-#define GNUTLS_LIB_PKCS11_INT_H
+# define GNUTLS_LIB_PKCS11_INT_H
 
-#ifdef ENABLE_PKCS11
+# ifdef ENABLE_PKCS11
 
-#define CRYPTOKI_GNU
-#include <p11-kit/pkcs11.h>
-#include <gnutls/pkcs11.h>
-#include <x509/x509_int.h>
+#  define CRYPTOKI_GNU
+#  include <p11-kit/pkcs11.h>
+#  include <gnutls/pkcs11.h>
+#  include <x509/x509_int.h>
 
 /* Part of PKCS#11 3.0 interface, which was added in p11-kit 0.23.14 */
-#ifdef CKM_EDDSA
-#define HAVE_CKM_EDDSA
-#endif
+#  ifdef CKM_EDDSA
+#   define HAVE_CKM_EDDSA
+#  endif
 
-#define PKCS11_ID_SIZE 128
-#define PKCS11_LABEL_SIZE 128
+#  define PKCS11_ID_SIZE 128
+#  define PKCS11_LABEL_SIZE 128
 
-#include <p11-kit/p11-kit.h>
-#include <p11-kit/pin.h>
-#include <p11-kit/uri.h>
+#  include <p11-kit/p11-kit.h>
+#  include <p11-kit/pin.h>
+#  include <p11-kit/uri.h>
 typedef unsigned char ck_bool_t;
 
 struct pkcs11_session_info {
@@ -48,7 +48,7 @@ struct pkcs11_session_info {
 	ck_session_handle_t pks;
 	ck_slot_id_t sid;
 	unsigned int init;
-	unsigned int trusted; /* whether module is marked as trusted */
+	unsigned int trusted;	/* whether module is marked as trusted */
 };
 
 struct gnutls_pkcs11_obj_st {
@@ -70,7 +70,7 @@ struct gnutls_pkcs11_obj_st {
 
 struct gnutls_pkcs11_privkey_st {
 	gnutls_pk_algorithm_t pk_algorithm;
-	unsigned int rsa_pss_ok; /* if it is an RSA key, it can do RSA-PSS */
+	unsigned int rsa_pss_ok;	/* if it is an RSA key, it can do RSA-PSS */
 	unsigned int bits;
 
 	unsigned int flags;
@@ -79,9 +79,9 @@ struct gnutls_pkcs11_privkey_st {
 
 	struct pkcs11_session_info sinfo;
 	ck_object_handle_t ref;	/* the key in the session */
-	unsigned reauth; /* whether we need to login on each operation */
+	unsigned reauth;	/* whether we need to login on each operation */
 
-	void *mutex; /* lock for operations requiring co-ordination */
+	void *mutex;		/* lock for operations requiring co-ordination */
 
 	struct pin_info_st pin;
 };
@@ -102,9 +102,10 @@ typedef enum init_level_t {
 /* See _gnutls_pkcs11_check_init() for possible Transitions.
  */
 
-int _gnutls_pkcs11_check_init(init_level_t req_level, void *priv, pkcs11_reinit_function cb);
+int _gnutls_pkcs11_check_init(init_level_t req_level, void *priv,
+			      pkcs11_reinit_function cb);
 
-#define FIX_KEY_USAGE(pk, usage) \
+#  define FIX_KEY_USAGE(pk, usage) \
 	if (usage == 0) { \
 		if (pk == GNUTLS_PK_RSA) \
 			usage = GNUTLS_KEY_DECIPHER_ONLY|GNUTLS_KEY_DIGITAL_SIGNATURE; \
@@ -112,51 +113,52 @@ int _gnutls_pkcs11_check_init(init_level_t req_level, void *priv, pkcs11_reinit_
 			usage = GNUTLS_KEY_DIGITAL_SIGNATURE; \
 	}
 
-#define PKCS11_CHECK_INIT \
+#  define PKCS11_CHECK_INIT \
 	ret = _gnutls_pkcs11_check_init(PROV_INIT_ALL, NULL, NULL); \
 	if (ret < 0) \
 		return gnutls_assert_val(ret)
 
-#define PKCS11_CHECK_INIT_RET(x) \
+#  define PKCS11_CHECK_INIT_RET(x) \
 	ret = _gnutls_pkcs11_check_init(PROV_INIT_ALL, NULL, NULL); \
 	if (ret < 0) \
 		return gnutls_assert_val(x)
 
-#define PKCS11_CHECK_INIT_FLAGS(f) \
+#  define PKCS11_CHECK_INIT_FLAGS(f) \
 	ret = _gnutls_pkcs11_check_init((f & GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE)?PROV_INIT_TRUSTED:PROV_INIT_ALL, NULL, NULL); \
 	if (ret < 0) \
 		return gnutls_assert_val(ret)
 
-#define PKCS11_CHECK_INIT_FLAGS_RET(f, x) \
+#  define PKCS11_CHECK_INIT_FLAGS_RET(f, x) \
 	ret = _gnutls_pkcs11_check_init((f & GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE)?PROV_INIT_TRUSTED:PROV_INIT_ALL, NULL, NULL); \
 	if (ret < 0) \
 		return gnutls_assert_val(x)
-
 
 /* thus function is called for every token in the traverse_tokens
  * function. Once everything is traversed it is called with NULL tinfo.
  * It should return 0 if found what it was looking for.
  */
-typedef int (*find_func_t) (struct ck_function_list *, struct pkcs11_session_info *,
-			    struct ck_token_info * tinfo, struct ck_info *,
-			    void *input);
+typedef int (*find_func_t)(struct ck_function_list *,
+			   struct pkcs11_session_info *,
+			   struct ck_token_info * tinfo, struct ck_info *,
+			   void *input);
 
 int pkcs11_rv_to_err(ck_rv_t rv);
-int pkcs11_url_to_info(const char *url, struct p11_kit_uri **info, unsigned flags);
-int
-pkcs11_find_slot(struct ck_function_list **module, ck_slot_id_t * slot,
-		 struct p11_kit_uri *info, struct ck_token_info *_tinfo,
-		 struct ck_slot_info *_slot_info, unsigned int *trusted);
+int pkcs11_url_to_info(const char *url, struct p11_kit_uri **info,
+		       unsigned flags);
+int pkcs11_find_slot(struct ck_function_list **module, ck_slot_id_t * slot,
+		     struct p11_kit_uri *info, struct ck_token_info *_tinfo,
+		     struct ck_slot_info *_slot_info, unsigned int *trusted);
 
 int pkcs11_read_pubkey(struct ck_function_list *module,
 		       ck_session_handle_t pks, ck_object_handle_t obj,
 		       ck_key_type_t key_type, gnutls_pkcs11_obj_t pobj);
 
-int pkcs11_override_cert_exts(struct pkcs11_session_info *sinfo, gnutls_datum_t *spki, gnutls_datum_t *der);
+int pkcs11_override_cert_exts(struct pkcs11_session_info *sinfo,
+			      gnutls_datum_t * spki, gnutls_datum_t * der);
 
 int pkcs11_get_info(struct p11_kit_uri *info,
 		    gnutls_pkcs11_obj_info_t itype, void *output,
-		    size_t * output_size);
+		    size_t *output_size);
 int pkcs11_login(struct pkcs11_session_info *sinfo,
 		 struct pin_info_st *pin_info,
 		 struct p11_kit_uri *info, unsigned flags);
@@ -172,32 +174,32 @@ int pkcs11_info_to_url(struct p11_kit_uri *info,
 
 int
 _gnutls_x509_crt_import_pkcs11_url(gnutls_x509_crt_t crt,
-				  const char *url, unsigned int flags);
+				   const char *url, unsigned int flags);
 
-#define SESSION_WRITE (1<<0)
-#define SESSION_LOGIN (1<<1)
-#define SESSION_SO (1<<2)	/* security officer session */
-#define SESSION_TRUSTED (1<<3) /* session on a marked as trusted (p11-kit) module */
-#define SESSION_FORCE_LOGIN (1<<4) /* force login even when CFK_LOGIN_REQUIRED is not set */
-#define SESSION_CONTEXT_SPECIFIC (1<<5)
-#define SESSION_NO_CLOSE (1<<6) /* don't close session on success */
+#  define SESSION_WRITE (1<<0)
+#  define SESSION_LOGIN (1<<1)
+#  define SESSION_SO (1<<2)	/* security officer session */
+#  define SESSION_TRUSTED (1<<3)/* session on a marked as trusted (p11-kit) module */
+#  define SESSION_FORCE_LOGIN (1<<4)	/* force login even when CFK_LOGIN_REQUIRED is not set */
+#  define SESSION_CONTEXT_SPECIFIC (1<<5)
+#  define SESSION_NO_CLOSE (1<<6)
+				/* don't close session on success */
 
 int pkcs11_open_session(struct pkcs11_session_info *sinfo,
 			struct pin_info_st *pin_info,
 			struct p11_kit_uri *info, unsigned int flags);
 int _pkcs11_traverse_tokens(find_func_t find_func, void *input,
 			    struct p11_kit_uri *info,
-			    struct pin_info_st *pin_info,
-			    unsigned int flags);
+			    struct pin_info_st *pin_info, unsigned int flags);
 ck_object_class_t pkcs11_strtype_to_class(const char *type);
 
 /* Additional internal flags for gnutls_pkcs11_obj_flags */
 /* @GNUTLS_PKCS11_OBJ_FLAG_EXPECT_CERT: When importing an object, provide a hint on the type, to allow incomplete URLs
  * @GNUTLS_PKCS11_OBJ_FLAG_EXPECT_PRIVKEY: Hint for private key */
-#define GNUTLS_PKCS11_OBJ_FLAG_FIRST_CLOSE_MATCH ((unsigned int)1<<28)
-#define GNUTLS_PKCS11_OBJ_FLAG_EXPECT_CERT (1<<29)
-#define GNUTLS_PKCS11_OBJ_FLAG_EXPECT_PRIVKEY (1<<30)
-#define GNUTLS_PKCS11_OBJ_FLAG_EXPECT_PUBKEY ((unsigned int)1<<31)
+#  define GNUTLS_PKCS11_OBJ_FLAG_FIRST_CLOSE_MATCH ((unsigned int)1<<28)
+#  define GNUTLS_PKCS11_OBJ_FLAG_EXPECT_CERT (1<<29)
+#  define GNUTLS_PKCS11_OBJ_FLAG_EXPECT_PRIVKEY (1<<30)
+#  define GNUTLS_PKCS11_OBJ_FLAG_EXPECT_PUBKEY ((unsigned int)1<<31)
 
 int pkcs11_token_matches_info(struct p11_kit_uri *info,
 			      struct ck_token_info *tinfo,
@@ -207,10 +209,10 @@ unsigned int pkcs11_obj_flags_to_int(unsigned int flags);
 
 int
 _gnutls_pkcs11_privkey_sign(gnutls_pkcs11_privkey_t key,
-			    const gnutls_sign_entry_st *se,
+			    const gnutls_sign_entry_st * se,
 			    const gnutls_datum_t * hash,
 			    gnutls_datum_t * signature,
-			    gnutls_x509_spki_st *spki_params);
+			    gnutls_x509_spki_st * spki_params);
 
 int
 _gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
@@ -222,11 +224,12 @@ int
 _gnutls_pkcs11_privkey_decrypt_data2(gnutls_pkcs11_privkey_t key,
 				     unsigned int flags,
 				     const gnutls_datum_t * ciphertext,
-			             unsigned char * plaintext,
-			             size_t plaintext_size);
+				     unsigned char *plaintext,
+				     size_t plaintext_size);
 
 int
-_pkcs11_privkey_get_pubkey (gnutls_pkcs11_privkey_t pkey, gnutls_pubkey_t *pub, unsigned flags);
+_pkcs11_privkey_get_pubkey(gnutls_pkcs11_privkey_t pkey, gnutls_pubkey_t * pub,
+			   unsigned flags);
 
 static inline int pk_to_mech(gnutls_pk_algorithm_t pk)
 {
@@ -238,10 +241,10 @@ static inline int pk_to_mech(gnutls_pk_algorithm_t pk)
 		return CKM_RSA_PKCS;
 	else if (pk == GNUTLS_PK_RSA_PSS)
 		return CKM_RSA_PKCS_PSS;
-#ifdef HAVE_CKM_EDDSA
-        else if (pk == GNUTLS_PK_EDDSA_ED25519)
-                return CKM_EDDSA;
-#endif
+#  ifdef HAVE_CKM_EDDSA
+	else if (pk == GNUTLS_PK_EDDSA_ED25519)
+		return CKM_EDDSA;
+#  endif
 	else
 		return -1;
 }
@@ -254,10 +257,10 @@ static inline int pk_to_key_type(gnutls_pk_algorithm_t pk)
 		return CKK_ECDSA;
 	else if (pk == GNUTLS_PK_RSA_PSS || pk == GNUTLS_PK_RSA)
 		return CKK_RSA;
-#ifdef HAVE_CKM_EDDSA
-        else if (pk == GNUTLS_PK_EDDSA_ED25519)
-                return CKK_EC_EDWARDS;
-#endif
+#  ifdef HAVE_CKM_EDDSA
+	else if (pk == GNUTLS_PK_EDDSA_ED25519)
+		return CKK_EC_EDWARDS;
+#  endif
 	else
 		return -1;
 }
@@ -270,15 +273,15 @@ static inline gnutls_pk_algorithm_t key_type_to_pk(ck_key_type_t m)
 		return GNUTLS_PK_DSA;
 	else if (m == CKK_ECDSA)
 		return GNUTLS_PK_EC;
-#ifdef HAVE_CKM_EDDSA
-        else if (m == CKK_EC_EDWARDS)
-                return GNUTLS_PK_EDDSA_ED25519;
-#endif
+#  ifdef HAVE_CKM_EDDSA
+	else if (m == CKK_EC_EDWARDS)
+		return GNUTLS_PK_EDDSA_ED25519;
+#  endif
 	else
 		return GNUTLS_PK_UNKNOWN;
 }
 
-static inline int pk_to_genmech(gnutls_pk_algorithm_t pk, ck_key_type_t *type)
+static inline int pk_to_genmech(gnutls_pk_algorithm_t pk, ck_key_type_t * type)
 {
 	if (pk == GNUTLS_PK_DSA) {
 		*type = CKK_DSA;
@@ -289,11 +292,11 @@ static inline int pk_to_genmech(gnutls_pk_algorithm_t pk, ck_key_type_t *type)
 	} else if (pk == GNUTLS_PK_RSA_PSS || pk == GNUTLS_PK_RSA) {
 		*type = CKK_RSA;
 		return CKM_RSA_PKCS_KEY_PAIR_GEN;
-#ifdef HAVE_CKM_EDDSA
-        } else if (pk == GNUTLS_PK_EDDSA_ED25519) {
-                *type = CKK_EC_EDWARDS;
-                return CKM_EDDSA;
-#endif
+#  ifdef HAVE_CKM_EDDSA
+	} else if (pk == GNUTLS_PK_EDDSA_ED25519) {
+		*type = CKK_EC_EDWARDS;
+		return CKM_EDDSA;
+#  endif
 	} else {
 		*type = -1;
 		return -1;
@@ -308,23 +311,21 @@ pkcs11_retrieve_pin(struct pin_info_st *pin_info, struct p11_kit_uri *info,
 ck_object_class_t pkcs11_type_to_class(gnutls_pkcs11_obj_type_t type);
 
 ck_rv_t
-pkcs11_generate_key(struct ck_function_list * module,
+pkcs11_generate_key(struct ck_function_list *module,
 		    ck_session_handle_t sess,
-		    struct ck_mechanism * mechanism,
-		    struct ck_attribute * templ,
-		    unsigned long count,
-		    ck_object_handle_t * key);
+		    struct ck_mechanism *mechanism,
+		    struct ck_attribute *templ,
+		    unsigned long count, ck_object_handle_t * key);
 
 ck_rv_t
-pkcs11_generate_key_pair(struct ck_function_list * module,
+pkcs11_generate_key_pair(struct ck_function_list *module,
 			 ck_session_handle_t sess,
-			 struct ck_mechanism * mechanism,
-			 struct ck_attribute * pub_templ,
+			 struct ck_mechanism *mechanism,
+			 struct ck_attribute *pub_templ,
 			 unsigned long pub_templ_count,
-			 struct ck_attribute * priv_templ,
+			 struct ck_attribute *priv_templ,
 			 unsigned long priv_templ_count,
-			 ck_object_handle_t * pub,
-			 ck_object_handle_t * priv);
+			 ck_object_handle_t * pub, ck_object_handle_t * priv);
 
 ck_rv_t
 pkcs11_get_slot_list(struct ck_function_list *module,
@@ -332,8 +333,7 @@ pkcs11_get_slot_list(struct ck_function_list *module,
 		     ck_slot_id_t * slot_list, unsigned long *count);
 
 ck_rv_t
-pkcs11_get_module_info(struct ck_function_list *module,
-		       struct ck_info *info);
+pkcs11_get_module_info(struct ck_function_list *module, struct ck_info *info);
 
 ck_rv_t
 pkcs11_get_slot_info(struct ck_function_list *module,
@@ -360,25 +360,22 @@ ck_rv_t pkcs11_find_objects_final(struct pkcs11_session_info *);
 ck_rv_t pkcs11_close_session(struct pkcs11_session_info *);
 
 ck_rv_t
-pkcs11_set_attribute_value(struct ck_function_list * module,
+pkcs11_set_attribute_value(struct ck_function_list *module,
 			   ck_session_handle_t sess,
 			   ck_object_handle_t object,
-			   struct ck_attribute * templ,
-			   unsigned long count);
+			   struct ck_attribute *templ, unsigned long count);
 
 ck_rv_t
 pkcs11_get_attribute_value(struct ck_function_list *module,
 			   ck_session_handle_t sess,
 			   ck_object_handle_t object,
-			   struct ck_attribute *templ,
-			   unsigned long count);
+			   struct ck_attribute *templ, unsigned long count);
 
 ck_rv_t
-pkcs11_get_attribute_avalue(struct ck_function_list * module,
-			   ck_session_handle_t sess,
-			   ck_object_handle_t object,
-			   ck_attribute_type_t type,
-			   gnutls_datum_t *res);
+pkcs11_get_attribute_avalue(struct ck_function_list *module,
+			    ck_session_handle_t sess,
+			    ck_object_handle_t object,
+			    ck_attribute_type_t type, gnutls_datum_t * res);
 
 ck_rv_t
 pkcs11_get_mechanism_list(struct ck_function_list *module,
@@ -407,8 +404,7 @@ pkcs11_sign(struct ck_function_list *module,
 ck_rv_t
 pkcs11_decrypt_init(struct ck_function_list *module,
 		    ck_session_handle_t sess,
-		    struct ck_mechanism *mechanism,
-		    ck_object_handle_t key);
+		    struct ck_mechanism *mechanism, ck_object_handle_t key);
 
 ck_rv_t
 pkcs11_decrypt(struct ck_function_list *module,
@@ -446,8 +442,7 @@ pkcs11_set_pin(struct ck_function_list *module,
 
 ck_rv_t
 _gnutls_pkcs11_get_random(struct ck_function_list *module,
-		  ck_session_handle_t sess, void *data, size_t len);
-
+			  ck_session_handle_t sess, void *data, size_t len);
 
 const char *pkcs11_strerror(ck_rv_t rv);
 
@@ -463,8 +458,8 @@ inline static bool is_pkcs11_url_object(const char *url)
 unsigned
 _gnutls_pkcs11_crt_is_known(const char *url, gnutls_x509_crt_t cert,
 			    unsigned int flags,
-			    gnutls_x509_crt_t *trusted_cert);
+			    gnutls_x509_crt_t * trusted_cert);
 
-#endif				/* ENABLE_PKCS11 */
+# endif				/* ENABLE_PKCS11 */
 
-#endif /* GNUTLS_LIB_PKCS11_INT_H */
+#endif				/* GNUTLS_LIB_PKCS11_INT_H */

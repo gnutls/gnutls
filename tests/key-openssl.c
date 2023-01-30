@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdlib.h>
@@ -38,33 +38,33 @@ static void tls_log_func(int level, const char *str)
 }
 
 static char plain_key[] =
-"-----BEGIN RSA PRIVATE KEY-----\n"
-"MIIEpQIBAAKCAQEA2d3Qs4fYDkzojm9nbaz7vdX2GIAv3stAAmI0MWq7uxWcJ7lz\n"
-"4UCvSh7CFWESMqOPcIymXXZB3rdrG6RQAHhE2YfFFFi0W/5rqcmkiTMnGmAjYy2Q\n"
-"lCU87b18SQgjX27YLygvlbtZrveCgT2rbJYL57Gph+wIi+cJsEUanR/2fd12hL7k\n"
-"RumZNEofamTHQm6Bn47ZhhCdVfs+QkfiMh+LHJM3fFiVusAUhMIJYhml53O+cSrR\n"
-"VgWVdp4za/FdUzmDnSxG4heMHblRMS+UyqtssDZEaVHytiNQXFkuQ/U3v0E+2knR\n"
-"NPKy+s7ZmSISC0qzDn6C5yeJc17Kc91y5RLoZwIDAQABAoIBAQCRXAu5HPOsZufq\n"
-"0K2DYZz9BdqSckR+M8HbVUZZiksDAeIUJwoHyi6qF2eK+B86JiK4Bz+gsBw2ys3t\n"
-"vW2bQqM9N/boIl8D2fZfbCgZWkXGtUonC+mgzk+el4Rq/cEMFVqr6/YDwuKNeJpc\n"
-"PJc5dcsvpTvlcjgpj9bJAvJEz2SYiIUpvtG4WNMGGapVZZPDvWn4/isY+75T5oDf\n"
-"1X5jG0lN9uoUjcuGuThN7gxjwlRkcvEOPHjXc6rxfrWIDdiz/91V46PwpqVDpRrg\n"
-"ig6U7+ckS0Oy2v32x0DaDhwAfDJ2RNc9az6Z+11lmY3LPkjG/p8Klcmgvt4/lwkD\n"
-"OYRC5QGRAoGBAPFdud6nmVt9h1DL0o4R6snm6P3K81Ds765VWVmpzJkK3+bwe4PQ\n"
-"GQQ0I0zN4hXkDMwHETS+EVWllqkK/d4dsE3volYtyTti8zthIATlgSEJ81x/ChAQ\n"
-"vvXxgx+zPUnb1mUwy+X+6urTHe4bxN2ypg6ROIUmT+Hx1ITG40LRRiPTAoGBAOcT\n"
-"WR8DTrj42xbxAUpz9vxJ15ZMwuIpk3ShE6+CWqvaXHF22Ju4WFwRNlW2zVLH6UMt\n"
-"nNfOzyDoryoiu0+0mg0wSmgdJbtCSHoI2GeiAnjGn5i8flQlPQ8bdwwmU6g6I/EU\n"
-"QRbGK/2XLmlrGN52gVy9UX0NsAA5fEOsAJiFj1CdAoGBAN9i3nbq6O2bNVSa/8mL\n"
-"XaD1vGe/oQgh8gaIaYSpuXlfbjCAG+C4BZ81XgJkfj3CbfGbDNqimsqI0fKsAJ/F\n"
-"HHpVMgrOn3L+Np2bW5YMj0Fzwy+1SCvsQ8C+gJwjOLMV6syGp/+6udMSB55rRv3k\n"
-"rPnIf+YDumUke4tTw9wAcgkPAoGASHMkiji7QfuklbjSsslRMyDj21gN8mMevH6U\n"
-"cX7pduBsA5dDqu9NpPAwnQdHsSDE3i868d8BykuqQAfLut3hPylY6vPYlLHfj4Oe\n"
-"dj+xjrSX7YeMBE34qvfth32s1R4FjtzO25keyc/Q2XSew4FcZftlxVO5Txi3AXC4\n"
-"bxnRKXECgYEAva+og7/rK+ZjboJVNxhFrwHp9bXhz4tzrUaWNvJD2vKJ5ZcThHcX\n"
-"zCig8W7eXHLPLDhi9aWZ3kUZ1RLhrFc/6dujtVtU9z2w1tmn1I+4Zi6D6L4DzKdg\n"
-"nMRLFoXufs/qoaJTqa8sQvKa+ceJAF04+gGtw617cuaZdZ3SYRLR2dk=\n"
-"-----END RSA PRIVATE KEY-----\n";
+    "-----BEGIN RSA PRIVATE KEY-----\n"
+    "MIIEpQIBAAKCAQEA2d3Qs4fYDkzojm9nbaz7vdX2GIAv3stAAmI0MWq7uxWcJ7lz\n"
+    "4UCvSh7CFWESMqOPcIymXXZB3rdrG6RQAHhE2YfFFFi0W/5rqcmkiTMnGmAjYy2Q\n"
+    "lCU87b18SQgjX27YLygvlbtZrveCgT2rbJYL57Gph+wIi+cJsEUanR/2fd12hL7k\n"
+    "RumZNEofamTHQm6Bn47ZhhCdVfs+QkfiMh+LHJM3fFiVusAUhMIJYhml53O+cSrR\n"
+    "VgWVdp4za/FdUzmDnSxG4heMHblRMS+UyqtssDZEaVHytiNQXFkuQ/U3v0E+2knR\n"
+    "NPKy+s7ZmSISC0qzDn6C5yeJc17Kc91y5RLoZwIDAQABAoIBAQCRXAu5HPOsZufq\n"
+    "0K2DYZz9BdqSckR+M8HbVUZZiksDAeIUJwoHyi6qF2eK+B86JiK4Bz+gsBw2ys3t\n"
+    "vW2bQqM9N/boIl8D2fZfbCgZWkXGtUonC+mgzk+el4Rq/cEMFVqr6/YDwuKNeJpc\n"
+    "PJc5dcsvpTvlcjgpj9bJAvJEz2SYiIUpvtG4WNMGGapVZZPDvWn4/isY+75T5oDf\n"
+    "1X5jG0lN9uoUjcuGuThN7gxjwlRkcvEOPHjXc6rxfrWIDdiz/91V46PwpqVDpRrg\n"
+    "ig6U7+ckS0Oy2v32x0DaDhwAfDJ2RNc9az6Z+11lmY3LPkjG/p8Klcmgvt4/lwkD\n"
+    "OYRC5QGRAoGBAPFdud6nmVt9h1DL0o4R6snm6P3K81Ds765VWVmpzJkK3+bwe4PQ\n"
+    "GQQ0I0zN4hXkDMwHETS+EVWllqkK/d4dsE3volYtyTti8zthIATlgSEJ81x/ChAQ\n"
+    "vvXxgx+zPUnb1mUwy+X+6urTHe4bxN2ypg6ROIUmT+Hx1ITG40LRRiPTAoGBAOcT\n"
+    "WR8DTrj42xbxAUpz9vxJ15ZMwuIpk3ShE6+CWqvaXHF22Ju4WFwRNlW2zVLH6UMt\n"
+    "nNfOzyDoryoiu0+0mg0wSmgdJbtCSHoI2GeiAnjGn5i8flQlPQ8bdwwmU6g6I/EU\n"
+    "QRbGK/2XLmlrGN52gVy9UX0NsAA5fEOsAJiFj1CdAoGBAN9i3nbq6O2bNVSa/8mL\n"
+    "XaD1vGe/oQgh8gaIaYSpuXlfbjCAG+C4BZ81XgJkfj3CbfGbDNqimsqI0fKsAJ/F\n"
+    "HHpVMgrOn3L+Np2bW5YMj0Fzwy+1SCvsQ8C+gJwjOLMV6syGp/+6udMSB55rRv3k\n"
+    "rPnIf+YDumUke4tTw9wAcgkPAoGASHMkiji7QfuklbjSsslRMyDj21gN8mMevH6U\n"
+    "cX7pduBsA5dDqu9NpPAwnQdHsSDE3i868d8BykuqQAfLut3hPylY6vPYlLHfj4Oe\n"
+    "dj+xjrSX7YeMBE34qvfth32s1R4FjtzO25keyc/Q2XSew4FcZftlxVO5Txi3AXC4\n"
+    "bxnRKXECgYEAva+og7/rK+ZjboJVNxhFrwHp9bXhz4tzrUaWNvJD2vKJ5ZcThHcX\n"
+    "zCig8W7eXHLPLDhi9aWZ3kUZ1RLhrFc/6dujtVtU9z2w1tmn1I+4Zi6D6L4DzKdg\n"
+    "nMRLFoXufs/qoaJTqa8sQvKa+ceJAF04+gGtw617cuaZdZ3SYRLR2dk=\n"
+    "-----END RSA PRIVATE KEY-----\n";
 
 const char key1[] =
     "-----BEGIN RSA PRIVATE KEY-----\n"
@@ -108,16 +108,18 @@ const char key_lowercase_iv[] =
     "57ohSPIR3bXgRZuefjxBhQYthUPcZ+qktrbURcvHNLs=\n"
     "-----END RSA PRIVATE KEY-----\n";
 
-static int good_pwd_cb(void* userdata, int attempt, const char* token_url,
-		       const char* token_label, unsigned int flags,
-		       char* pin, size_t pin_max) {
+static int good_pwd_cb(void *userdata, int attempt, const char *token_url,
+		       const char *token_label, unsigned int flags,
+		       char *pin, size_t pin_max)
+{
 	snprintf(pin, pin_max, "%s", "123456");
 	return 0;
 }
 
-static int bad_pwd_cb(void* userdata, int attempt, const char* token_url,
-		      const char* token_label, unsigned int flags,
-		      char* pin, size_t pin_max) {
+static int bad_pwd_cb(void *userdata, int attempt, const char *token_url,
+		      const char *token_label, unsigned int flags,
+		      char *pin, size_t pin_max)
+{
 	snprintf(pin, pin_max, "%s", "bad");
 	return 0;
 }
@@ -143,7 +145,7 @@ void doit(void)
 	if (ret < 0)
 		fail("gnutls_x509_privkey_init: %d\n", ret);
 
-	key.data = (void *) key1;
+	key.data = (void *)key1;
 	key.size = sizeof(key1);
 	ret = gnutls_x509_privkey_import_openssl(pkey, &key, "123456");
 	if (ret < 0) {
@@ -156,7 +158,7 @@ void doit(void)
 	if (ret < 0)
 		fail("gnutls_x509_privkey_init: %d\n", ret);
 
-	key.data = (void *) key2;
+	key.data = (void *)key2;
 	key.size = sizeof(key2);
 	ret = gnutls_x509_privkey_import_openssl(pkey, &key, "a123456");
 	if (ret < 0) {
@@ -170,14 +172,13 @@ void doit(void)
 	if (ret < 0)
 		fail("gnutls_x509_privkey_init: %d\n", ret);
 
-	key.data = (void *) key1;
+	key.data = (void *)key1;
 	key.size = sizeof(key1);
 	ret =
 	    gnutls_x509_privkey_import2(pkey, &key, GNUTLS_X509_FMT_PEM,
 					"123456", 0);
 	if (ret < 0) {
-		fail("gnutls_x509_privkey_import2: %s\n",
-		     gnutls_strerror(ret));
+		fail("gnutls_x509_privkey_import2: %s\n", gnutls_strerror(ret));
 	}
 	gnutls_x509_privkey_deinit(pkey);
 
@@ -186,14 +187,13 @@ void doit(void)
 	if (ret < 0)
 		fail("gnutls_x509_privkey_init: %d\n", ret);
 
-	key.data = (void *) plain_key;
+	key.data = (void *)plain_key;
 	key.size = sizeof(plain_key);
 	ret =
 	    gnutls_x509_privkey_import2(pkey, &key, GNUTLS_X509_FMT_PEM,
 					"123456", 0);
 	if (ret < 0) {
-		fail("gnutls_x509_privkey_import2: %s\n",
-		     gnutls_strerror(ret));
+		fail("gnutls_x509_privkey_import2: %s\n", gnutls_strerror(ret));
 	}
 	gnutls_x509_privkey_deinit(pkey);
 
@@ -202,7 +202,7 @@ void doit(void)
 	if (ret < 0)
 		fail("gnutls_x509_privkey_init: %d\n", ret);
 
-	key.data = (void *) key1;
+	key.data = (void *)key1;
 	key.size = sizeof(key1);
 	ret = gnutls_x509_privkey_import2(pkey, &key, GNUTLS_X509_FMT_PEM,
 					  NULL, 0);
@@ -217,14 +217,13 @@ void doit(void)
 	if (ret < 0)
 		fail("gnutls_x509_privkey_init: %d\n", ret);
 
-	key.data = (void *) key_lowercase_iv;
+	key.data = (void *)key_lowercase_iv;
 	key.size = sizeof(key_lowercase_iv);
 	ret =
 	    gnutls_x509_privkey_import2(pkey, &key, GNUTLS_X509_FMT_PEM,
 					"123456", 0);
 	if (ret < 0) {
-		fail("gnutls_x509_privkey_import2: %s\n",
-		     gnutls_strerror(ret));
+		fail("gnutls_x509_privkey_import2: %s\n", gnutls_strerror(ret));
 	}
 	gnutls_x509_privkey_deinit(pkey);
 
@@ -243,7 +242,7 @@ void doit(void)
 		fail("gnutls_x509_privkey_init: %d\n", ret);
 
 	gnutls_x509_privkey_set_pin_function(pkey, bad_pwd_cb, NULL);
-	key.data = (void *) key1;
+	key.data = (void *)key1;
 	key.size = sizeof(key1);
 	ret = gnutls_x509_privkey_import2(pkey, &key, GNUTLS_X509_FMT_PEM,
 					  "123456", 0);
@@ -259,7 +258,7 @@ void doit(void)
 		fail("gnutls_x509_privkey_init: %d\n", ret);
 
 	gnutls_x509_privkey_set_pin_function(pkey, good_pwd_cb, NULL);
-	key.data = (void *) key1;
+	key.data = (void *)key1;
 	key.size = sizeof(key1);
 	ret = gnutls_x509_privkey_import2(pkey, &key, GNUTLS_X509_FMT_PEM,
 					  NULL, 0);
@@ -275,7 +274,7 @@ void doit(void)
 		fail("gnutls_x509_privkey_init: %d\n", ret);
 
 	gnutls_x509_privkey_set_pin_function(pkey, bad_pwd_cb, NULL);
-	key.data = (void *) key1;
+	key.data = (void *)key1;
 	key.size = sizeof(key1);
 	ret = gnutls_x509_privkey_import2(pkey, &key, GNUTLS_X509_FMT_PEM,
 					  NULL, 0);

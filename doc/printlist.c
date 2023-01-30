@@ -55,8 +55,7 @@ static void main_texinfo(void)
 
 		printf("@heading Ciphersuites\n");
 		printf("@multitable @columnfractions .60 .20 .20\n");
-		printf
-		    ("@headitem Ciphersuite name @tab TLS ID @tab Since\n");
+		printf("@headitem Ciphersuite name @tab TLS ID @tab Since\n");
 		for (i = 0;
 		     (name =
 		      gnutls_cipher_suite_info(i, id, &kx, &cipher, &mac,
@@ -64,8 +63,8 @@ static void main_texinfo(void)
 			printf("@item %s\n@tab 0x%02X 0x%02X\n@tab %s\n",
 			       escape_texi_string(name, buffer,
 						  sizeof(buffer)),
-			       (unsigned char) id[0],
-			       (unsigned char) id[1],
+			       (unsigned char)id[0],
+			       (unsigned char)id[1],
 			       gnutls_protocol_get_name(version));
 		}
 		printf("@end multitable\n");
@@ -151,8 +150,7 @@ static void main_texinfo(void)
 
 		printf("\n@heading Groups\n@table @code\n");
 		for (; *p; p++) {
-			printf("@item %s\n",
-			       gnutls_group_get_name(*p));
+			printf("@item %s\n", gnutls_group_get_name(*p));
 		}
 		printf("@end table\n");
 	}
@@ -170,8 +168,7 @@ static const char headers[] = "\\tablefirsthead{%\n"
     "\\multicolumn{3}{|r|}{\\small\\sl continued on next page}\\\\\n"
     "\\hline}\n"
 #endif
-    "\\tablelasttail{\\hline}\n"
-    "\\bottomcaption{The ciphersuites table}\n\n";
+    "\\tablelasttail{\\hline}\n" "\\bottomcaption{The ciphersuites table}\n\n";
 
 static void main_latex(void)
 {
@@ -198,7 +195,7 @@ static void main_latex(void)
 			printf
 			    ("{\\small{%s}} & \\code{0x%02X 0x%02X} & %s",
 			     escape_string(name, buffer, sizeof(buffer)),
-			     (unsigned char) id[0], (unsigned char) id[1],
+			     (unsigned char)id[0], (unsigned char)id[1],
 			     gnutls_protocol_get_name(version));
 			printf("\\\\\n");
 		}

@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdlib.h>
@@ -45,38 +45,37 @@ static time_t mytime(time_t * t)
 }
 
 static unsigned char saved_crl_pem[] =
-	"-----BEGIN X509 CRL-----\n"
-	"MIICXzCByAIBADANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDEwRDQS0zFw0wODAz\n"
-	"MzEyMjAwMDBaFw0wODAzMzEyMjAyMDBaMFQwFAIDAQIDFw0wODAzMzEyMjAwMDBa\n"
-	"MB0CDFejHTI2Wi75obBaUhcNMDgwMzMxMjIwMDAwWjAdAgxXox0yNbNP0Ln15zwX\n"
-	"DTA4MDMzMTIyMDAwMFqgLzAtMB8GA1UdIwQYMBaAFPmohhljtqQUE2B2DwGaNTbv\n"
-	"8bSvMAoGA1UdFAQDAgEBMA0GCSqGSIb3DQEBCwUAA4IBgQAFpyifa5AJclRpJfjh\n"
-	"QOcSoiCJz5QsrGaK5I/UYHcY958hhFjnE2c9g3wYEEt13M2gkgOTXapImPbLXHv+\n"
-	"cHWGoTqX6+crs7xcC6mFc6JfY7q9O2eP1x386dzCxhsXMti5ml0iOeBpNrMO46Pr\n"
-	"PuvNaY7OE1UgN0Ha3YjmhP8HtWJSQCMmqIo6vP1/HBSzaXP/cjS7f0WBZemj0eE7\n"
-	"wwA1GUoUx9wHipvNkCSKy/eQz4fpOJExrvHeb1/N3po9hfZaZJAqR+rsC0j9J+wd\n"
-	"ZGAdVFKCJUZs0IgsWQqagg0tXGJ8ejdt4yE8zvhhcpf4pcGoYUqtoUPT+Fjnsw7C\n"
-	"P1GCVZQ2ciGxixljTJFdifhqPshgC1Ytd75MkDYH2RRir/JwypQK9CcqIAOjBzTl\n"
-	"uk4SkKL2xAIduw6Dz5kAC7G2EM94uODoI/RO5b6eN6Kb/592JrKAfB96jh2wwqW+\n"
-	"swaA4JPFqNQaiMWW1IXM3VJwXBt8DRSRo46JV5OktvvFRwI=\n"
-	"-----END X509 CRL-----\n";
+    "-----BEGIN X509 CRL-----\n"
+    "MIICXzCByAIBADANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDEwRDQS0zFw0wODAz\n"
+    "MzEyMjAwMDBaFw0wODAzMzEyMjAyMDBaMFQwFAIDAQIDFw0wODAzMzEyMjAwMDBa\n"
+    "MB0CDFejHTI2Wi75obBaUhcNMDgwMzMxMjIwMDAwWjAdAgxXox0yNbNP0Ln15zwX\n"
+    "DTA4MDMzMTIyMDAwMFqgLzAtMB8GA1UdIwQYMBaAFPmohhljtqQUE2B2DwGaNTbv\n"
+    "8bSvMAoGA1UdFAQDAgEBMA0GCSqGSIb3DQEBCwUAA4IBgQAFpyifa5AJclRpJfjh\n"
+    "QOcSoiCJz5QsrGaK5I/UYHcY958hhFjnE2c9g3wYEEt13M2gkgOTXapImPbLXHv+\n"
+    "cHWGoTqX6+crs7xcC6mFc6JfY7q9O2eP1x386dzCxhsXMti5ml0iOeBpNrMO46Pr\n"
+    "PuvNaY7OE1UgN0Ha3YjmhP8HtWJSQCMmqIo6vP1/HBSzaXP/cjS7f0WBZemj0eE7\n"
+    "wwA1GUoUx9wHipvNkCSKy/eQz4fpOJExrvHeb1/N3po9hfZaZJAqR+rsC0j9J+wd\n"
+    "ZGAdVFKCJUZs0IgsWQqagg0tXGJ8ejdt4yE8zvhhcpf4pcGoYUqtoUPT+Fjnsw7C\n"
+    "P1GCVZQ2ciGxixljTJFdifhqPshgC1Ytd75MkDYH2RRir/JwypQK9CcqIAOjBzTl\n"
+    "uk4SkKL2xAIduw6Dz5kAC7G2EM94uODoI/RO5b6eN6Kb/592JrKAfB96jh2wwqW+\n"
+    "swaA4JPFqNQaiMWW1IXM3VJwXBt8DRSRo46JV5OktvvFRwI=\n"
+    "-----END X509 CRL-----\n";
 
 static unsigned char saved_min_crl_pem[] =
-	"-----BEGIN X509 CRL-----\n"
-	"MIICUDCBuQIBADANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDEwRDQS0zFw0wODAz\n"
-	"MzEyMjAwMTBaMFQwFAIDAQIDFw0wODAzMzEyMjAwMTBaMB0CDFejHTI2Wi75obBa\n"
-	"UhcNMDgwMzMxMjIwMDEwWjAdAgxXox0yNbNP0Ln15zwXDTA4MDMzMTIyMDAxMFqg\n"
-	"LzAtMB8GA1UdIwQYMBaAFPmohhljtqQUE2B2DwGaNTbv8bSvMAoGA1UdFAQDAgEB\n"
-	"MA0GCSqGSIb3DQEBCwUAA4IBgQB/Y7MxKf7HpYBoi7N5lNCe7nSd0epQiNPOford\n"
-	"hGb1ZirZk9m67zg146Cwc0W4ipPzW/OjwgUoVQTm21I7oZj/GPItAABlILd6eRQe\n"
-	"jYJap0fxiXV7aMRfu2o3qCRGAITQf306H5zJmpdeNxbxzlr3t6IAHBDbLI1WYXiC\n"
-	"pTHo3wlpwFJEPw5NQ0j6rCAzSH81FHTrEiIOar17uRqeMjbGN6Eo4zjezEx2+ewg\n"
-	"unsdzx4OWx3KgzsQnyV9EoU6l9jREe519mICx7La6DZkhO4dSPJv6R5jEFitWDNB\n"
-	"lxZMA5ePrYXuE/3b+Li89R53O+xZxShLQYwBRSHDue44xUv6hh6YNIKDgt4ycIs8\n"
-	"9JAWsOYJDYUEbAUo+S4sWCU6LzloEvmg7EdJtvJWsScUKK4qbwkDfkBTKjbeBdFj\n"
-	"w6naZIjzbjMPEe8/T+hmu/txFj3fGj/GzOM1GaJNZ4vMWA4Y6LhB+H1Zf3xK+hV0\n"
-	"sc0eYw7RpIzEyc9PPz/uM+XabsI=\n"
-	"-----END X509 CRL-----\n";
+    "-----BEGIN X509 CRL-----\n"
+    "MIICUDCBuQIBADANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDEwRDQS0zFw0wODAz\n"
+    "MzEyMjAwMTBaMFQwFAIDAQIDFw0wODAzMzEyMjAwMTBaMB0CDFejHTI2Wi75obBa\n"
+    "UhcNMDgwMzMxMjIwMDEwWjAdAgxXox0yNbNP0Ln15zwXDTA4MDMzMTIyMDAxMFqg\n"
+    "LzAtMB8GA1UdIwQYMBaAFPmohhljtqQUE2B2DwGaNTbv8bSvMAoGA1UdFAQDAgEB\n"
+    "MA0GCSqGSIb3DQEBCwUAA4IBgQB/Y7MxKf7HpYBoi7N5lNCe7nSd0epQiNPOford\n"
+    "hGb1ZirZk9m67zg146Cwc0W4ipPzW/OjwgUoVQTm21I7oZj/GPItAABlILd6eRQe\n"
+    "jYJap0fxiXV7aMRfu2o3qCRGAITQf306H5zJmpdeNxbxzlr3t6IAHBDbLI1WYXiC\n"
+    "pTHo3wlpwFJEPw5NQ0j6rCAzSH81FHTrEiIOar17uRqeMjbGN6Eo4zjezEx2+ewg\n"
+    "unsdzx4OWx3KgzsQnyV9EoU6l9jREe519mICx7La6DZkhO4dSPJv6R5jEFitWDNB\n"
+    "lxZMA5ePrYXuE/3b+Li89R53O+xZxShLQYwBRSHDue44xUv6hh6YNIKDgt4ycIs8\n"
+    "9JAWsOYJDYUEbAUo+S4sWCU6LzloEvmg7EdJtvJWsScUKK4qbwkDfkBTKjbeBdFj\n"
+    "w6naZIjzbjMPEe8/T+hmu/txFj3fGj/GzOM1GaJNZ4vMWA4Y6LhB+H1Zf3xK+hV0\n"
+    "sc0eYw7RpIzEyc9PPz/uM+XabsI=\n" "-----END X509 CRL-----\n";
 
 const gnutls_datum_t saved_crl = { saved_crl_pem, sizeof(saved_crl_pem) - 1 };
 const gnutls_datum_t saved_min_crl =
@@ -158,7 +157,7 @@ static void sign_crl(gnutls_x509_crl_t crl, const gnutls_datum_t * cert,
 	if (ret != 0)
 		fail("gnutls_x509_crl_sign: %s\n", gnutls_strerror(ret));
 
-	then+=10;
+	then += 10;
 
 	verify_crl(crl, crt);
 

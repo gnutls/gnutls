@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -78,10 +78,12 @@ void doit(void)
 		exit(1);
 	}
 
-	assert(gnutls_pkcs11_obj_init(&obj)>=0);
+	assert(gnutls_pkcs11_obj_init(&obj) >= 0);
 
 	/* check extensions */
-	ret = gnutls_pkcs11_obj_import_url(obj, "pkcs11:type=cert;object=cert1", 0);
+	ret =
+	    gnutls_pkcs11_obj_import_url(obj, "pkcs11:type=cert;object=cert1",
+					 0);
 	if (ret < 0) {
 		fail("%d: %s\n", ret, gnutls_strerror(ret));
 		exit(1);
@@ -94,7 +96,8 @@ void doit(void)
 	}
 
 	if (exts_size != 2) {
-		fail("the expected extensions were not found (found %d)!\n", exts_size);
+		fail("the expected extensions were not found (found %d)!\n",
+		     exts_size);
 		exit(1);
 	}
 
@@ -105,7 +108,9 @@ void doit(void)
 	{
 		unsigned ca;
 		int pathlen;
-		ret = gnutls_x509_ext_import_basic_constraints(&exts[0].data, &ca, &pathlen);
+		ret =
+		    gnutls_x509_ext_import_basic_constraints(&exts[0].data, &ca,
+							     &pathlen);
 		if (ret < 0) {
 			fail("%d: %s\n", ret, gnutls_strerror(ret));
 			exit(1);
@@ -124,7 +129,8 @@ void doit(void)
 
 	{
 		unsigned keyusage;
-		ret = gnutls_x509_ext_import_key_usage(&exts[1].data, &keyusage);
+		ret =
+		    gnutls_x509_ext_import_key_usage(&exts[1].data, &keyusage);
 		if (ret < 0) {
 			fail("%d: %s\n", ret, gnutls_strerror(ret));
 			exit(1);
@@ -132,12 +138,14 @@ void doit(void)
 
 		if (debug)
 			success("usage: %x\n", keyusage);
-		if (keyusage != (GNUTLS_KEY_KEY_ENCIPHERMENT|GNUTLS_KEY_ENCIPHER_ONLY|GNUTLS_KEY_KEY_CERT_SIGN)) {
+		if (keyusage !=
+		    (GNUTLS_KEY_KEY_ENCIPHERMENT | GNUTLS_KEY_ENCIPHER_ONLY |
+		     GNUTLS_KEY_KEY_CERT_SIGN)) {
 			fail("Extension does not have the expected key usage!\n");
 		}
 	}
 
-	for (i=0;i<exts_size;i++)
+	for (i = 0; i < exts_size; i++)
 		gnutls_x509_ext_deinit(&exts[i]);
 	gnutls_free(exts);
 

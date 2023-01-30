@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -92,46 +92,53 @@ void doit(void)
 		exit(1);
 	}
 
-	assert(gnutls_x509_crt_init(&crt)>=0);
-	assert(gnutls_x509_crt_init(&ocrt)>=0);
+	assert(gnutls_x509_crt_init(&crt) >= 0);
+	assert(gnutls_x509_crt_init(&ocrt) >= 0);
 
 	/* check low level certificate import functions */
-	ret = gnutls_pkcs11_obj_list_import_url4(&plist, &plist_size, "pkcs11:type=cert;object=cert1", 0);
+	ret =
+	    gnutls_pkcs11_obj_list_import_url4(&plist, &plist_size,
+					       "pkcs11:type=cert;object=cert1",
+					       0);
 	if (ret < 0) {
 		fail("%d: %s\n", ret, gnutls_strerror(ret));
 		exit(1);
 	}
 
-	ret = gnutls_pkcs11_obj_list_import_url4(&plist2, &plist2_size, "pkcs11:type=cert;object=cert1", GNUTLS_PKCS11_OBJ_FLAG_OVERWRITE_TRUSTMOD_EXT);
+	ret =
+	    gnutls_pkcs11_obj_list_import_url4(&plist2, &plist2_size,
+					       "pkcs11:type=cert;object=cert1",
+					       GNUTLS_PKCS11_OBJ_FLAG_OVERWRITE_TRUSTMOD_EXT);
 	if (ret < 0) {
 		fail("%d: %s\n", ret, gnutls_strerror(ret));
 		exit(1);
 	}
 
 	if (plist2_size != 1 || plist_size != 1) {
-	    fail("could not import certs %d, %d\n", plist_size, plist2_size);
+		fail("could not import certs %d, %d\n", plist_size,
+		     plist2_size);
 	}
 
 	ret = gnutls_x509_crt_import_pkcs11(crt, plist[0]);
 	if (ret != 0) {
-	    fail("could not import cert!\n");
+		fail("could not import cert!\n");
 	}
 
 	ret = gnutls_x509_crt_import_pkcs11(ocrt, plist2[0]);
 	if (ret != 0) {
-	    fail("could not import cert!\n");
+		fail("could not import cert!\n");
 	}
 
-	for (i=0;i<plist_size;i++)
+	for (i = 0; i < plist_size; i++)
 		gnutls_pkcs11_obj_deinit(plist[i]);
-	for (i=0;i<plist2_size;i++)
+	for (i = 0; i < plist2_size; i++)
 		gnutls_pkcs11_obj_deinit(plist2[i]);
 	gnutls_free(plist);
 	gnutls_free(plist2);
 
 	ret = gnutls_x509_crt_equals(crt, ocrt);
 	if (ret != 0) {
-	    fail("exported certificates are equal!\n");
+		fail("exported certificates are equal!\n");
 	}
 
 	ret = gnutls_x509_crt_get_ca_status(ocrt, NULL);
@@ -151,7 +158,9 @@ void doit(void)
 		exit(1);
 	}
 
-	if (keyusage != (GNUTLS_KEY_KEY_ENCIPHERMENT|GNUTLS_KEY_ENCIPHER_ONLY|GNUTLS_KEY_KEY_CERT_SIGN)) {
+	if (keyusage !=
+	    (GNUTLS_KEY_KEY_ENCIPHERMENT | GNUTLS_KEY_ENCIPHER_ONLY |
+	     GNUTLS_KEY_KEY_CERT_SIGN)) {
 		fail("Extension does not have the expected key usage!\n");
 	}
 

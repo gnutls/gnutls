@@ -36,8 +36,7 @@
 #define MAC_OID_STREEBOG_256 "1.2.643.7.1.1.4.1"
 #define MAC_OID_STREEBOG_512 "1.2.643.7.1.1.4.2"
 
-static SYSTEM_CONFIG_OR_CONST
-mac_entry_st hash_algorithms[] = {
+static SYSTEM_CONFIG_OR_CONST mac_entry_st hash_algorithms[] = {
 	{.name = "SHA1",
 	 .oid = HASH_OID_SHA1,
 	 .mac_oid = MAC_OID_SHA1,
@@ -132,8 +131,7 @@ mac_entry_st hash_algorithms[] = {
 	 .id = GNUTLS_MAC_RMD160,
 	 .output_size = 20,
 	 .key_size = 20,
-	 .block_size = 64
-	},
+	 .block_size = 64},
 	{.name = "GOSTR341194",
 	 .oid = HASH_OID_GOST_R_3411_94,
 	 .mac_oid = MAC_OID_GOST_R_3411_94,
@@ -141,8 +139,7 @@ mac_entry_st hash_algorithms[] = {
 	 .output_size = 32,
 	 .key_size = 32,
 	 .block_size = 32,
-	 .flags = GNUTLS_MAC_FLAG_PREIMAGE_INSECURE
-	},
+	 .flags = GNUTLS_MAC_FLAG_PREIMAGE_INSECURE},
 	{.name = "STREEBOG-256",
 	 .oid = HASH_OID_STREEBOG_256,
 	 .mac_oid = MAC_OID_STREEBOG_256,
@@ -209,7 +206,6 @@ mac_entry_st hash_algorithms[] = {
 	{0, 0, 0, 0, 0, 0, 0, 0, 0}
 };
 
-
 #define GNUTLS_HASH_LOOP(b) \
 	const mac_entry_st *p; \
 		for(p = hash_algorithms; p->name != NULL; p++) { b ; }
@@ -219,7 +215,7 @@ mac_entry_st hash_algorithms[] = {
 
 const mac_entry_st *_gnutls_mac_to_entry(gnutls_mac_algorithm_t c)
 {
-	GNUTLS_HASH_LOOP(if (c == p->id) return p);
+	GNUTLS_HASH_LOOP(if (c == p->id) return p) ;
 
 	return NULL;
 }
@@ -256,12 +252,9 @@ const char *gnutls_digest_get_name(gnutls_digest_algorithm_t algorithm)
 {
 	const char *ret = NULL;
 
-	GNUTLS_HASH_LOOP(
-		if (algorithm == (unsigned) p->id && p->oid != NULL) {
-			ret = p->name;
-			break;
-		}
-	);
+	GNUTLS_HASH_LOOP(if (algorithm == (unsigned)p->id && p->oid != NULL) {
+			 ret = p->name; break;}
+	) ;
 
 	return ret;
 }
@@ -280,13 +273,11 @@ gnutls_digest_algorithm_t gnutls_digest_get_id(const char *name)
 {
 	gnutls_digest_algorithm_t ret = GNUTLS_DIG_UNKNOWN;
 
-	GNUTLS_HASH_LOOP(
-		if (p->oid != NULL && c_strcasecmp(p->name, name) == 0) {
-			if (_gnutls_digest_exists((gnutls_digest_algorithm_t)p->id))
-				ret = (gnutls_digest_algorithm_t)p->id;
-			break;
-		}
-	);
+	GNUTLS_HASH_LOOP(if (p->oid != NULL && c_strcasecmp(p->name, name) == 0) {
+			 if (_gnutls_digest_exists
+			     ((gnutls_digest_algorithm_t) p->id))
+			 ret = (gnutls_digest_algorithm_t) p->id; break;}
+	) ;
 
 	return ret;
 }
@@ -297,8 +288,8 @@ int _gnutls_digest_mark_insecure(gnutls_digest_algorithm_t dig)
 #ifndef DISABLE_SYSTEM_CONFIG
 	mac_entry_st *p;
 
-	for(p = hash_algorithms; p->name != NULL; p++) {
-		if (p->oid != NULL && p->id == (gnutls_mac_algorithm_t)dig) {
+	for (p = hash_algorithms; p->name != NULL; p++) {
+		if (p->oid != NULL && p->id == (gnutls_mac_algorithm_t) dig) {
 			p->flags |= GNUTLS_MAC_FLAG_PREIMAGE_INSECURE;
 			return 0;
 		}
@@ -314,9 +305,9 @@ void _gnutls_digest_mark_insecure_all(void)
 #ifndef DISABLE_SYSTEM_CONFIG
 	mac_entry_st *p;
 
-	for(p = hash_algorithms; p->name != NULL; p++) {
+	for (p = hash_algorithms; p->name != NULL; p++) {
 		p->flags |= GNUTLS_MAC_FLAG_PREIMAGE_INSECURE_REVERTIBLE |
-			GNUTLS_MAC_FLAG_PREIMAGE_INSECURE;
+		    GNUTLS_MAC_FLAG_PREIMAGE_INSECURE;
 	}
 
 #endif
@@ -328,10 +319,13 @@ _gnutls_digest_set_secure(gnutls_digest_algorithm_t dig, unsigned int secure)
 #ifndef DISABLE_SYSTEM_CONFIG
 	mac_entry_st *p;
 
-	for(p = hash_algorithms; p->name != NULL; p++) {
-		if (p->oid != NULL && p->id == (gnutls_mac_algorithm_t)dig) {
-			if (!(p->flags & GNUTLS_MAC_FLAG_PREIMAGE_INSECURE_REVERTIBLE)) {
-				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	for (p = hash_algorithms; p->name != NULL; p++) {
+		if (p->oid != NULL && p->id == (gnutls_mac_algorithm_t) dig) {
+			if (!
+			    (p->flags &
+			     GNUTLS_MAC_FLAG_PREIMAGE_INSECURE_REVERTIBLE)) {
+				return
+				    gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 			}
 			if (secure) {
 				p->flags &= ~GNUTLS_MAC_FLAG_PREIMAGE_INSECURE;
@@ -350,8 +344,8 @@ unsigned _gnutls_digest_is_insecure(gnutls_digest_algorithm_t dig)
 {
 	const mac_entry_st *p;
 
-	for(p = hash_algorithms; p->name != NULL; p++) {
-		if (p->oid != NULL && p->id == (gnutls_mac_algorithm_t)dig) {
+	for (p = hash_algorithms; p->name != NULL; p++) {
+		if (p->oid != NULL && p->id == (gnutls_mac_algorithm_t) dig) {
 			return p->flags & GNUTLS_MAC_FLAG_PREIMAGE_INSECURE;
 		}
 	}
@@ -359,15 +353,17 @@ unsigned _gnutls_digest_is_insecure(gnutls_digest_algorithm_t dig)
 	return 1;
 }
 
-bool _gnutls_digest_is_insecure2(gnutls_digest_algorithm_t dig,	unsigned flags)
+bool _gnutls_digest_is_insecure2(gnutls_digest_algorithm_t dig, unsigned flags)
 {
 	const mac_entry_st *p;
 
-	for(p = hash_algorithms; p->name != NULL; p++) {
-		if (p->oid != NULL && p->id == (gnutls_mac_algorithm_t)dig) {
+	for (p = hash_algorithms; p->name != NULL; p++) {
+		if (p->oid != NULL && p->id == (gnutls_mac_algorithm_t) dig) {
 			return (p->flags & GNUTLS_MAC_FLAG_PREIMAGE_INSECURE &&
-				!(flags & GNUTLS_MAC_FLAG_ALLOW_INSECURE_REVERTIBLE &&
-				  p->flags & GNUTLS_MAC_FLAG_PREIMAGE_INSECURE_REVERTIBLE));
+				!(flags &
+				  GNUTLS_MAC_FLAG_ALLOW_INSECURE_REVERTIBLE
+				  && p->flags &
+				  GNUTLS_MAC_FLAG_PREIMAGE_INSECURE_REVERTIBLE));
 		}
 	}
 
@@ -388,13 +384,10 @@ gnutls_mac_algorithm_t gnutls_mac_get_id(const char *name)
 {
 	gnutls_mac_algorithm_t ret = GNUTLS_MAC_UNKNOWN;
 
-	GNUTLS_HASH_LOOP(
-		if (c_strcasecmp(p->name, name) == 0) {
-			if (p->placeholder != 0 || _gnutls_mac_exists(p->id))
-				ret = p->id;
-			break;
-		}
-	);
+	GNUTLS_HASH_LOOP(if (c_strcasecmp(p->name, name) == 0) {
+			 if (p->placeholder != 0 || _gnutls_mac_exists(p->id))
+			 ret = p->id; break;}
+	) ;
 
 	return ret;
 }
@@ -455,10 +448,10 @@ const gnutls_mac_algorithm_t *gnutls_mac_list(void)
 	if (supported_macs[0] == 0) {
 		int i = 0;
 
-		GNUTLS_HASH_LOOP(
-			if (p->placeholder != 0 || _gnutls_mac_exists(p->id))
-				 supported_macs[i++] = p->id;
-		);
+		GNUTLS_HASH_LOOP(if
+				 (p->placeholder != 0
+				  || _gnutls_mac_exists(p->id))
+				 supported_macs[i++] = p->id;) ;
 		supported_macs[i++] = 0;
 	}
 
@@ -477,19 +470,18 @@ const gnutls_mac_algorithm_t *gnutls_mac_list(void)
  **/
 const gnutls_digest_algorithm_t *gnutls_digest_list(void)
 {
-	static gnutls_digest_algorithm_t supported_digests[MAX_ALGOS] =
-	    { 0 };
+	static gnutls_digest_algorithm_t supported_digests[MAX_ALGOS] = { 0 };
 
 	if (supported_digests[0] == 0) {
 		int i = 0;
 
-		GNUTLS_HASH_LOOP(
-			if (p->oid != NULL && (p->placeholder != 0 ||
-				_gnutls_mac_exists(p->id))) {
+		GNUTLS_HASH_LOOP(if (p->oid != NULL && (p->placeholder != 0 ||
+							_gnutls_mac_exists
+							(p->id))) {
 
-				supported_digests[i++] = (gnutls_digest_algorithm_t)p->id;
-			}
-		);
+				 supported_digests[i++] =
+				 (gnutls_digest_algorithm_t) p->id;}
+		) ;
 		supported_digests[i++] = 0;
 	}
 
@@ -509,14 +501,12 @@ const gnutls_digest_algorithm_t *gnutls_digest_list(void)
  **/
 gnutls_digest_algorithm_t gnutls_oid_to_digest(const char *oid)
 {
-	GNUTLS_HASH_LOOP(
-		if (p->oid && strcmp(oid, p->oid) == 0) {
-			if (_gnutls_digest_exists((gnutls_digest_algorithm_t)p->id)) {
-				return (gnutls_digest_algorithm_t) p->id;
-			}
-			break;
-		}
-	);
+	GNUTLS_HASH_LOOP(if (p->oid && strcmp(oid, p->oid) == 0) {
+			 if (_gnutls_digest_exists
+			     ((gnutls_digest_algorithm_t) p->id)) {
+			 return (gnutls_digest_algorithm_t) p->id;}
+			 break;}
+	) ;
 
 	return GNUTLS_DIG_UNKNOWN;
 }
@@ -534,14 +524,11 @@ gnutls_digest_algorithm_t gnutls_oid_to_digest(const char *oid)
  **/
 gnutls_mac_algorithm_t gnutls_oid_to_mac(const char *oid)
 {
-	GNUTLS_HASH_LOOP(
-		if (p->mac_oid && strcmp(oid, p->mac_oid) == 0) {
-			if (_gnutls_mac_exists(p->id)) {
-				return p->id;
-			}
-			break;
-		}
-	);
+	GNUTLS_HASH_LOOP(if (p->mac_oid && strcmp(oid, p->mac_oid) == 0) {
+			 if (_gnutls_mac_exists(p->id)) {
+			 return p->id;}
+			 break;}
+	) ;
 
 	return GNUTLS_MAC_UNKNOWN;
 }
@@ -559,11 +546,9 @@ gnutls_mac_algorithm_t gnutls_oid_to_mac(const char *oid)
  **/
 const char *gnutls_digest_get_oid(gnutls_digest_algorithm_t algorithm)
 {
-	GNUTLS_HASH_LOOP(
-		if (algorithm == (unsigned) p->id && p->oid != NULL) {
-			return p->oid;
-		}
-	);
+	GNUTLS_HASH_LOOP(if (algorithm == (unsigned)p->id && p->oid != NULL) {
+			 return p->oid;}
+	) ;
 
 	return NULL;
 }

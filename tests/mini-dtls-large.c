@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -33,17 +33,17 @@ int main(void)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/dtls.h>
+# include <string.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/dtls.h>
 
-#include "utils.h"
+# include "utils.h"
 
 static void terminate(void);
 
@@ -66,8 +66,8 @@ static pid_t child;
 /* A very basic DTLS client, with anonymous authentication, that exchanges heartbeats.
  */
 
-#define MAX_BUF 24*1024
-#define MAX_MTU 20*1024
+# define MAX_BUF 24*1024
+# define MAX_MTU 20*1024
 
 static void client(int fd)
 {
@@ -209,7 +209,7 @@ static void server(int fd)
 
 	ret =
 	    gnutls_record_send(session, buffer,
-				gnutls_dtls_get_data_mtu(session) + 12);
+			       gnutls_dtls_get_data_mtu(session) + 12);
 	if (ret != GNUTLS_E_LARGE_PACKET) {
 		terminate();
 		fail("send[%d]: %s\n", __LINE__, gnutls_strerror(ret));
@@ -217,7 +217,7 @@ static void server(int fd)
 
 	ret =
 	    gnutls_record_send(session, buffer,
-				gnutls_dtls_get_data_mtu(session) + 5048);
+			       gnutls_dtls_get_data_mtu(session) + 5048);
 	if (ret != GNUTLS_E_LARGE_PACKET) {
 		terminate();
 		fail("send[%d]: %s\n", __LINE__, gnutls_strerror(ret));
@@ -225,7 +225,7 @@ static void server(int fd)
 
 	ret =
 	    gnutls_record_send(session, buffer,
-				gnutls_dtls_get_data_mtu(session));
+			       gnutls_dtls_get_data_mtu(session));
 	if (ret < 0) {
 		terminate();
 		fail("send[%d]: %s\n", __LINE__, gnutls_strerror(ret));
@@ -234,7 +234,7 @@ static void server(int fd)
 	gnutls_dtls_set_mtu(session, MAX_MTU);
 	ret =
 	    gnutls_record_send(session, buffer,
-				gnutls_dtls_get_data_mtu(session) + 12);
+			       gnutls_dtls_get_data_mtu(session) + 12);
 	if (ret != GNUTLS_E_LARGE_PACKET) {
 		terminate();
 		fail("send[%d]: %s\n", __LINE__, gnutls_strerror(ret));
@@ -242,7 +242,7 @@ static void server(int fd)
 
 	ret =
 	    gnutls_record_send(session, buffer,
-				gnutls_dtls_get_data_mtu(session) + 5048);
+			       gnutls_dtls_get_data_mtu(session) + 5048);
 	if (ret != GNUTLS_E_LARGE_PACKET) {
 		terminate();
 		fail("send[%d]: %s\n", __LINE__, gnutls_strerror(ret));
@@ -250,7 +250,7 @@ static void server(int fd)
 
 	ret =
 	    gnutls_record_send(session, buffer,
-				gnutls_dtls_get_data_mtu(session));
+			       gnutls_dtls_get_data_mtu(session));
 	if (ret > 16384 || ret < 0) {
 		terminate();
 		fail("send[%d]: %s\n", __LINE__, gnutls_strerror(ret));
@@ -261,7 +261,7 @@ static void server(int fd)
 
 	ret =
 	    gnutls_record_send(session, buffer,
-				gnutls_dtls_get_data_mtu(session));
+			       gnutls_dtls_get_data_mtu(session));
 	if (ret < 0) {
 		terminate();
 		fail("send[%d]: %s\n", __LINE__, gnutls_strerror(ret));
@@ -277,7 +277,7 @@ static void server(int fd)
 
 	ret =
 	    gnutls_record_send(session, buffer,
-				gnutls_dtls_get_data_mtu(session) - 16);
+			       gnutls_dtls_get_data_mtu(session) - 16);
 	if (ret < 0) {
 		terminate();
 		fail("send[%d]: %s\n", __LINE__, gnutls_strerror(ret));
@@ -285,7 +285,7 @@ static void server(int fd)
 
 	ret =
 	    gnutls_record_send(session, buffer,
-				gnutls_dtls_get_data_mtu(session));
+			       gnutls_dtls_get_data_mtu(session));
 	if (ret != GNUTLS_E_LARGE_PACKET) {
 		terminate();
 		fail("send[%d]: %s\n", __LINE__, gnutls_strerror(ret));

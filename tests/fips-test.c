@@ -26,7 +26,8 @@ static uint8_t key_data[64];
 static uint8_t iv_data[16];
 static gnutls_fips140_context_t fips_context;
 
-static const gnutls_datum_t data = { .data = (unsigned char *)"foo", 3 };
+static const gnutls_datum_t data = {.data = (unsigned char *)"foo", 3 };
+
 static const uint8_t rsa2342_sha1_sig_data[] = {
 	0x9b, 0x3e, 0x15, 0x36, 0xec, 0x9d, 0x51, 0xd7, 0xa2, 0xb1, 0x3a, 0x15,
 	0x1a, 0xfe, 0x4e, 0x12, 0x43, 0x3c, 0xa8, 0x58, 0x4c, 0x2a, 0x82, 0xc1,
@@ -62,12 +63,12 @@ static const gnutls_datum_t rsa2342_sha1_sig = {
 };
 
 static const uint8_t ecc256_sha1_sig_data[] = {
-	0x30, 0x45, 0x02, 0x21, 0x00, 0x9a, 0x28, 0xc9, 0xbf, 0xc8, 0x70, 0x4f, 
-	0x27, 0x2d, 0xe1, 0x66, 0xc4, 0xa5, 0xc6, 0xf2, 0xdc, 0x33, 0xb9, 0x41, 
-	0xdf, 0x78, 0x98, 0x8a, 0x22, 0x4d, 0x29, 0x37, 0xa0, 0x0f, 0x6f, 0xd4, 
-	0xed, 0x02, 0x20, 0x0b, 0x15, 0xca, 0x30, 0x09, 0x2d, 0x55, 0x44, 0xb4, 
-	0x1d, 0x3f, 0x48, 0x7a, 0xc3, 0xd1, 0x2a, 0xc1, 0x0e, 0x47, 0xfa, 0xe6, 
-	0xe9, 0x0f, 0x03, 0xe2, 0x01, 0x4e, 0xe4, 0x73, 0x37, 0xa7, 0x90, 
+	0x30, 0x45, 0x02, 0x21, 0x00, 0x9a, 0x28, 0xc9, 0xbf, 0xc8, 0x70, 0x4f,
+	0x27, 0x2d, 0xe1, 0x66, 0xc4, 0xa5, 0xc6, 0xf2, 0xdc, 0x33, 0xb9, 0x41,
+	0xdf, 0x78, 0x98, 0x8a, 0x22, 0x4d, 0x29, 0x37, 0xa0, 0x0f, 0x6f, 0xd4,
+	0xed, 0x02, 0x20, 0x0b, 0x15, 0xca, 0x30, 0x09, 0x2d, 0x55, 0x44, 0xb4,
+	0x1d, 0x3f, 0x48, 0x7a, 0xc3, 0xd1, 0x2a, 0xc1, 0x0e, 0x47, 0xfa, 0xe6,
+	0xe9, 0x0f, 0x03, 0xe2, 0x01, 0x4e, 0xe4, 0x73, 0x37, 0xa7, 0x90,
 };
 
 static const gnutls_datum_t ecc256_sha1_sig = {
@@ -76,8 +77,8 @@ static const gnutls_datum_t ecc256_sha1_sig = {
 };
 
 static void
-import_keypair(gnutls_privkey_t *privkey, gnutls_pubkey_t *pubkey,
-		   const char *filename)
+import_keypair(gnutls_privkey_t * privkey, gnutls_pubkey_t * pubkey,
+	       const char *filename)
 {
 	const char *srcdir;
 	char path[256];
@@ -127,8 +128,7 @@ import_keypair(gnutls_privkey_t *privkey, gnutls_pubkey_t *pubkey,
 
 }
 
-static void
-test_aead_cipher_approved(gnutls_cipher_algorithm_t cipher)
+static void test_aead_cipher_approved(gnutls_cipher_algorithm_t cipher)
 {
 	int ret;
 	unsigned key_size = gnutls_cipher_get_key_size(cipher);
@@ -146,8 +146,7 @@ test_aead_cipher_approved(gnutls_cipher_algorithm_t cipher)
 	FIPS_POP_CONTEXT(APPROVED);
 }
 
-static void
-test_cipher_approved(gnutls_cipher_algorithm_t cipher)
+static void test_cipher_approved(gnutls_cipher_algorithm_t cipher)
 {
 	int ret;
 	unsigned key_size = gnutls_cipher_get_key_size(cipher);
@@ -168,8 +167,7 @@ test_cipher_approved(gnutls_cipher_algorithm_t cipher)
 	FIPS_POP_CONTEXT(APPROVED);
 }
 
-static void
-test_cipher_allowed(gnutls_cipher_algorithm_t cipher)
+static void test_cipher_allowed(gnutls_cipher_algorithm_t cipher)
 {
 	int ret;
 	unsigned key_size = gnutls_cipher_get_key_size(cipher);
@@ -190,8 +188,7 @@ test_cipher_allowed(gnutls_cipher_algorithm_t cipher)
 	FIPS_POP_CONTEXT(NOT_APPROVED);
 }
 
-static void
-test_cipher_disallowed(gnutls_cipher_algorithm_t cipher)
+static void test_cipher_disallowed(gnutls_cipher_algorithm_t cipher)
 {
 	int ret;
 	unsigned key_size = gnutls_cipher_get_key_size(cipher);
@@ -261,8 +258,7 @@ test_ccm_cipher(gnutls_cipher_algorithm_t cipher, size_t tag_length,
 	ret = gnutls_aead_cipher_decrypt(h, iv_data,
 					 gnutls_cipher_get_iv_size(cipher),
 					 NULL, 0, tag_length,
-					 buffer, length,
-					 buffer, &length);
+					 buffer, length, buffer, &length);
 	if (expect_encryption_fail) {
 		if (ret != GNUTLS_E_INVALID_REQUEST) {
 			fail("gnutls_aead_cipher_decrypt(%s) returned %d "
@@ -279,8 +275,7 @@ test_ccm_cipher(gnutls_cipher_algorithm_t cipher, size_t tag_length,
 	gnutls_aead_cipher_deinit(h);
 }
 
-static inline void
-test_ciphers(void)
+static inline void test_ciphers(void)
 {
 	size_t i;
 
@@ -475,8 +470,7 @@ void doit(void)
 
 	/* PBKDF2 with output shorter than 112 bits: not approved */
 	FIPS_PUSH_CONTEXT();
-	ret = gnutls_pbkdf2(GNUTLS_MAC_SHA256, &key, &iv, 100,
-			    &pbkdf2, 13);
+	ret = gnutls_pbkdf2(GNUTLS_MAC_SHA256, &key, &iv, 100, &pbkdf2, 13);
 	if (ret < 0) {
 		fail("gnutls_pbkdf2 failed\n");
 	}
@@ -529,11 +523,11 @@ void doit(void)
 	if (ret < 0) {
 		fail("gnutls_privkey_init failed\n");
 	}
-	bits = gnutls_sec_param_to_pk_bits(GNUTLS_PK_RSA, GNUTLS_SEC_PARAM_MEDIUM);
+	bits =
+	    gnutls_sec_param_to_pk_bits(GNUTLS_PK_RSA, GNUTLS_SEC_PARAM_MEDIUM);
 	ret = gnutls_x509_privkey_generate(xprivkey, GNUTLS_PK_RSA, bits, 0);
 	if (ret < 0) {
-		fail("gnutls_x509_privkey_generate failed (%d) for %u-bit key\n",
-		     ret, bits);
+		fail("gnutls_x509_privkey_generate failed (%d) for %u-bit key\n", ret, bits);
 	}
 	gnutls_x509_privkey_deinit(xprivkey);
 	FIPS_POP_CONTEXT(APPROVED);
@@ -568,7 +562,7 @@ void doit(void)
 	/* Verify a signature with 2432-bit RSA and SHA256; approved */
 	FIPS_PUSH_CONTEXT();
 	ret = gnutls_pubkey_verify_data2(pubkey, GNUTLS_SIGN_RSA_SHA256, 0,
-	                                 &data, &signature);
+					 &data, &signature);
 	if (ret < 0) {
 		fail("gnutls_pubkey_verify_data2 failed\n");
 	}
@@ -587,8 +581,8 @@ void doit(void)
 	/* Verify a signature created with 2432-bit RSA and SHA-1; approved */
 	FIPS_PUSH_CONTEXT();
 	ret = gnutls_pubkey_verify_data2(pubkey, GNUTLS_SIGN_RSA_SHA1,
-					 GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1, &data,
-					 &rsa2342_sha1_sig);
+					 GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1,
+					 &data, &rsa2342_sha1_sig);
 	if (ret < 0) {
 		fail("gnutls_pubkey_verify_data2 failed\n");
 	}
@@ -614,7 +608,7 @@ void doit(void)
 	/* Verify a signature with 512-bit RSA and SHA256; not approved */
 	FIPS_PUSH_CONTEXT();
 	ret = gnutls_pubkey_verify_data2(pubkey, GNUTLS_SIGN_RSA_SHA256, 0,
-	                                 &data, &signature);
+					 &data, &signature);
 	if (ret < 0) {
 		fail("gnutls_pubkey_verify_data2 failed\n");
 	}
@@ -680,7 +674,7 @@ void doit(void)
 	/* Create a signature with ECDSA and SHA256 (2-pass old API); not-approved */
 	FIPS_PUSH_CONTEXT();
 	ret = gnutls_privkey_sign_hash(privkey, GNUTLS_DIG_SHA256, 0,
-					&hashed_data, &signature);
+				       &hashed_data, &signature);
 	if (ret < 0) {
 		fail("gnutls_privkey_sign_hash failed\n");
 	}
@@ -699,8 +693,8 @@ void doit(void)
 	/* Verify a signature created with ECDSA and SHA-1; approved */
 	FIPS_PUSH_CONTEXT();
 	ret = gnutls_pubkey_verify_data2(pubkey, GNUTLS_SIGN_ECDSA_SHA1,
-					 GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1, &data,
-					 &ecc256_sha1_sig);
+					 GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1,
+					 &data, &ecc256_sha1_sig);
 	if (ret < 0) {
 		fail("gnutls_pubkey_verify_data2 failed\n");
 	}
@@ -710,7 +704,7 @@ void doit(void)
 	/* Create a signature with ECDSA and SHA-1 (old API); not approved */
 	FIPS_PUSH_CONTEXT();
 	ret = gnutls_privkey_sign_data(privkey, GNUTLS_DIG_SHA1, 0,
-					&data, &signature);
+				       &data, &signature);
 	if (ret < 0) {
 		fail("gnutls_privkey_sign_data failed\n");
 	}
@@ -741,7 +735,7 @@ void doit(void)
 	/* Create a signature with ECDSA and SHA1 (2-pass old API); not-approved */
 	FIPS_PUSH_CONTEXT();
 	ret = gnutls_privkey_sign_hash(privkey, GNUTLS_DIG_SHA1, 0,
-					&hashed_data, &signature);
+				       &hashed_data, &signature);
 	if (ret < 0) {
 		fail("gnutls_privkey_sign_hash failed\n");
 	}
@@ -751,7 +745,7 @@ void doit(void)
 	gnutls_pubkey_deinit(pubkey);
 	gnutls_privkey_deinit(privkey);
 
-        /* Test RND functions */
+	/* Test RND functions */
 	FIPS_PUSH_CONTEXT();
 	ret = gnutls_rnd(GNUTLS_RND_RANDOM, key16, sizeof(key16));
 	if (ret < 0) {
@@ -759,7 +753,7 @@ void doit(void)
 	}
 	FIPS_POP_CONTEXT(APPROVED);
 
-        /* run self-tests manually */
+	/* run self-tests manually */
 	FIPS_PUSH_CONTEXT();
 	ret = gnutls_rnd(GNUTLS_RND_RANDOM, key16, sizeof(key16));
 	ret = gnutls_fips140_run_self_tests();
@@ -771,10 +765,8 @@ void doit(void)
 	/* Test when FIPS140 is set to error state */
 	_gnutls_lib_simulate_error();
 
-
 	/* Try crypto.h functionality */
-	ret =
-	    gnutls_cipher_init(&ch, GNUTLS_CIPHER_AES_128_CBC, &key, &iv);
+	ret = gnutls_cipher_init(&ch, GNUTLS_CIPHER_AES_128_CBC, &key, &iv);
 	if (ret >= 0) {
 		fail("gnutls_cipher_init succeeded when in FIPS140 error state\n");
 	}

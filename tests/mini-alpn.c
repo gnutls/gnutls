@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -33,18 +33,18 @@ int main(int argc, char **argv)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <signal.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/dtls.h>
+# include <string.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <signal.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/dtls.h>
 
-#include "utils.h"
+# include "utils.h"
 
 static void terminate(void);
 
@@ -67,7 +67,8 @@ static pid_t child;
 /* A very basic DTLS client, with anonymous authentication, that negotiates SRTP
  */
 
-static void client(int fd, const char *protocol0, const char *protocol2, const char *protocol1)
+static void client(int fd, const char *protocol0, const char *protocol2,
+		   const char *protocol1)
 {
 	gnutls_session_t session;
 	int ret;
@@ -94,11 +95,11 @@ static void client(int fd, const char *protocol0, const char *protocol2, const c
 				   NULL);
 	if (protocol1) {
 		gnutls_datum_t t[3];
-		t[0].data = (void *) protocol0;
+		t[0].data = (void *)protocol0;
 		t[0].size = strlen(protocol0);
-		t[1].data = (void *) protocol1;
+		t[1].data = (void *)protocol1;
 		t[1].size = strlen(protocol1);
-		t[2].data = (void *) protocol2;
+		t[2].data = (void *)protocol2;
 		t[2].size = strlen(protocol2);
 
 		ret = gnutls_alpn_set_protocols(session, t, 3, 0);
@@ -143,9 +144,8 @@ static void client(int fd, const char *protocol0, const char *protocol2, const c
 
 	if (debug) {
 		fprintf(stderr, "selected protocol: %.*s\n",
-			(int) proto.size, proto.data);
+			(int)proto.size, proto.data);
 	}
-
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
@@ -195,9 +195,9 @@ static void server(int fd, const char *protocol1, const char *protocol2)
 				   "NONE:+VERS-TLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL",
 				   NULL);
 
-	t[0].data = (void *) protocol1;
+	t[0].data = (void *)protocol1;
 	t[0].size = strlen(protocol1);
-	t[1].data = (void *) protocol2;
+	t[1].data = (void *)protocol2;
 	t[1].size = strlen(protocol2);
 
 	ret = gnutls_alpn_set_protocols(session, t, 2, 0);
@@ -236,10 +236,11 @@ static void server(int fd, const char *protocol1, const char *protocol2)
 	}
 
 	if (debug) {
-		success("Protocol: %.*s\n", (int) selected.size, selected.data);
+		success("Protocol: %.*s\n", (int)selected.size, selected.data);
 	}
 
-	if (selected.size != strlen(protocol1) || memcmp(selected.data, protocol1, selected.size) != 0) {
+	if (selected.size != strlen(protocol1)
+	    || memcmp(selected.data, protocol1, selected.size) != 0) {
 		fail("did not select the expected protocol (selected %.*s, expected %s)\n", selected.size, selected.data, protocol1);
 		exit(1);
 	}

@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,18 +35,18 @@ int main(int argc, char **argv)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <signal.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/dtls.h>
+# include <string.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <signal.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/dtls.h>
 
-#include "utils.h"
+# include "utils.h"
 
 static void terminate(void);
 
@@ -66,7 +66,7 @@ static void client_log_func(int level, const char *str)
 /* These are global */
 static pid_t child;
 
-#define MAX_KEY_MATERIAL 64*4
+# define MAX_KEY_MATERIAL 64*4
 /* A very basic DTLS client, with anonymous authentication, that negotiates SRTP
  */
 
@@ -113,7 +113,6 @@ static void client(int fd, int profile)
 		gnutls_perror(ret);
 		exit(1);
 	}
-
 
 	/* put the anonymous credentials to the current session
 	 */
@@ -167,7 +166,6 @@ static void client(int fd, int profile)
 		gnutls_hex_encode(&server_salt, buf, &size);
 		success("Server salt: %s\n", buf);
 	}
-
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 

@@ -24,7 +24,7 @@
 
 #ifndef ENABLE_PSK
 
-#include <stdio.h>
+# include <stdio.h>
 
 int main(int argc, char **argv)
 {
@@ -34,43 +34,43 @@ int main(int argc, char **argv)
 
 #else
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <gnutls/gnutls.h>
-#include "psktool-options.h"
+# include <stdio.h>
+# include <string.h>
+# include <stdlib.h>
+# include <errno.h>
+# include <gnutls/gnutls.h>
+# include "psktool-options.h"
 
-#include <gnutls/crypto.h>	/* for random */
+# include <gnutls/crypto.h>	/* for random */
 
-#include <stdbool.h>
-#include <sys/types.h>
-#include <sys/stat.h>
+# include <stdbool.h>
+# include <sys/types.h>
+# include <sys/stat.h>
 
-#ifndef _WIN32
-#include <pwd.h>
-#include <unistd.h>
-#else
-#include <windows.h>
-#endif
+# ifndef _WIN32
+#  include <pwd.h>
+#  include <unistd.h>
+# else
+#  include <windows.h>
+# endif
 
 /* Gnulib portability files. */
-#include <minmax.h>
-#include "close-stream.h"
-#include "getpass.h"
-#include "xsize.h"
+# include <minmax.h>
+# include "close-stream.h"
+# include "getpass.h"
+# include "xsize.h"
 
 static int write_key(const char *username,
 		     const unsigned char *key, size_t key_size,
 		     const char *passwd_file);
 
-#define MAX_KEY_SIZE 512
+# define MAX_KEY_SIZE 512
 int main(int argc, char **argv)
 {
 	int ret;
-#ifndef _WIN32
+# ifndef _WIN32
 	struct passwd *pwd;
-#endif
+# endif
 	unsigned char key[MAX_KEY_SIZE];
 	size_t key_size;
 	const char *passwd, *username;
@@ -91,7 +91,7 @@ int main(int argc, char **argv)
 		passwd = OPT_ARG(PSKFILE);
 
 	if (!HAVE_OPT(USERNAME)) {
-#ifndef _WIN32
+# ifndef _WIN32
 		pwd = getpwuid(getuid());
 
 		if (pwd == NULL) {
@@ -100,10 +100,10 @@ int main(int argc, char **argv)
 		}
 
 		username = pwd->pw_name;
-#else
+# else
 		fprintf(stderr, "Please specify a user\n");
 		return -1;
-#endif
+# endif
 	} else
 		username = OPT_ARG(USERNAME);
 
@@ -119,7 +119,7 @@ int main(int argc, char **argv)
 
 	printf("Generating a random key for user '%s'\n", username);
 
-	ret = gnutls_rnd(GNUTLS_RND_RANDOM, (char *) key, key_size);
+	ret = gnutls_rnd(GNUTLS_RND_RANDOM, (char *)key, key_size);
 	if (ret < 0) {
 		fprintf(stderr, "Not enough randomness\n");
 		exit(1);
@@ -201,8 +201,7 @@ write_key(const char *username, const unsigned char *key, size_t key_size,
 
 	fp = fopen(passwd_file, "w");
 	if (fp == NULL) {
-		fprintf(stderr, "Cannot open '%s' for write\n",
-			passwd_file);
+		fprintf(stderr, "Cannot open '%s' for write\n", passwd_file);
 		(void)remove(tmpname);
 		return -1;
 	}
@@ -276,9 +275,8 @@ write_key(const char *username, const unsigned char *key, size_t key_size,
 		if (pp == NULL)
 			continue;
 
-		if (strncmp(p, (const char *) _username.data,
-			    MAX(_username.size,
-				(unsigned int) (pp - p))) == 0) {
+		if (strncmp(p, (const char *)_username.data,
+			    MAX(_username.size, (unsigned int)(pp - p))) == 0) {
 			put = true;
 			fprintf(fp, "%s:%s\n", _username.data, _key.data);
 		} else {

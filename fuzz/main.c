@@ -35,13 +35,13 @@
 
 #ifdef TEST_RUN
 
-#include <dirent.h>
+# include <dirent.h>
 
-#ifdef _WIN32
+# ifdef _WIN32
 #  define SLASH '\\'
-#else
+# else
 #  define SLASH '/'
-#endif
+# endif
 
 static int test_single_file(const char *fname)
 {
@@ -63,13 +63,16 @@ static int test_single_file(const char *fname)
 
 	data = malloc(st.st_size);
 	if ((n = read(fd, data, st.st_size)) == st.st_size) {
-		printf("testing %llu bytes from '%s'\n", (unsigned long long) st.st_size, fname);
+		printf("testing %llu bytes from '%s'\n",
+		       (unsigned long long)st.st_size, fname);
 		fflush(stdout);
 		LLVMFuzzerTestOneInput(data, st.st_size);
 		fflush(stderr);
 		ret = 0;
 	} else {
-		fprintf(stderr, "Failed to read %llu bytes from %s (%d), got %zd\n", (unsigned long long) st.st_size, fname, errno, n);
+		fprintf(stderr,
+			"Failed to read %llu bytes from %s (%d), got %zd\n",
+			(unsigned long long)st.st_size, fname, errno, n);
 		ret = -1;
 	}
 
@@ -85,10 +88,12 @@ static int test_all_from(const char *dirname)
 
 	if ((dirp = opendir(dirname))) {
 		while ((dp = readdir(dirp))) {
-			if (*dp->d_name == '.') continue;
+			if (*dp->d_name == '.')
+				continue;
 
 			char fname[strlen(dirname) + strlen(dp->d_name) + 2];
-			snprintf(fname, sizeof(fname), "%s/%s", dirname, dp->d_name);
+			snprintf(fname, sizeof(fname), "%s/%s", dirname,
+				 dp->d_name);
 
 			if (test_single_file(fname) < 0)
 				continue;
@@ -116,22 +121,24 @@ int main(int argc, char **argv)
 
 	target_len = strlen(target);
 
-#ifdef _WIN32
-	target_len -= 4; // ignore .exe
-#endif
+# ifdef _WIN32
+	target_len -= 4;	// ignore .exe
+# endif
 
-	if (argc > 1) { /* test a single file */
+	if (argc > 1) {		/* test a single file */
 		test_single_file(argv[1]);
-	} else { /* test the target directory */
+	} else {		/* test the target directory */
 		int rc;
 		char corporadir[sizeof(SRCDIR) + 1 + target_len + 8];
-		snprintf(corporadir, sizeof(corporadir), SRCDIR "/%.*s.in", (int) target_len, target);
+		snprintf(corporadir, sizeof(corporadir), SRCDIR "/%.*s.in",
+			 (int)target_len, target);
 
 		rc = test_all_from(corporadir);
 		if (rc)
 			fprintf(stderr, "Failed to find %s\n", corporadir);
 
-		snprintf(corporadir, sizeof(corporadir), SRCDIR "/%.*s.repro", (int) target_len, target);
+		snprintf(corporadir, sizeof(corporadir), SRCDIR "/%.*s.repro",
+			 (int)target_len, target);
 
 		if (test_all_from(corporadir) && rc)
 			return 77;
@@ -142,7 +149,7 @@ int main(int argc, char **argv)
 
 #else
 
-#ifndef __AFL_LOOP
+# ifndef __AFL_LOOP
 static int __AFL_LOOP(int n)
 {
 	static int first = 1;
@@ -154,14 +161,14 @@ static int __AFL_LOOP(int n)
 
 	return 0;
 }
-#endif
+# endif
 
 int main(int argc, char **argv)
 {
 	int ret;
 	unsigned char buf[64 * 1024];
 
-	while (__AFL_LOOP(10000)) { // only works with afl-clang-fast
+	while (__AFL_LOOP(10000)) {	// only works with afl-clang-fast
 		ret = fread(buf, 1, sizeof(buf), stdin);
 		if (ret < 0)
 			return 0;
@@ -172,4 +179,4 @@ int main(int argc, char **argv)
 	return 0;
 }
 
-#endif /* TEST_RUN */
+#endif				/* TEST_RUN */

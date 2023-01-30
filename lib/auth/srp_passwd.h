@@ -21,9 +21,9 @@
  */
 
 #ifndef GNUTLS_LIB_AUTH_SRP_PASSWD_H
-#define GNUTLS_LIB_AUTH_SRP_PASSWD_H
+# define GNUTLS_LIB_AUTH_SRP_PASSWD_H
 
-#ifdef ENABLE_SRP
+# ifdef ENABLE_SRP
 
 typedef struct {
 	char *username;
@@ -38,9 +38,8 @@ typedef struct {
 int _gnutls_srp_pwd_read_entry(gnutls_session_t state, char *username,
 			       SRP_PWD_ENTRY **);
 void _gnutls_srp_entry_free(SRP_PWD_ENTRY * entry);
-int _gnutls_sbase64_decode(char *data, size_t data_size,
-			   uint8_t ** result);
+int _gnutls_sbase64_decode(char *data, size_t data_size, uint8_t ** result);
 
-#endif				/* ENABLE_SRP */
+# endif				/* ENABLE_SRP */
 
-#endif /* GNUTLS_LIB_AUTH_SRP_PASSWD_H */
+#endif				/* GNUTLS_LIB_AUTH_SRP_PASSWD_H */

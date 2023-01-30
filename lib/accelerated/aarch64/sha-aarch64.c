@@ -35,10 +35,10 @@ void sha1_block_data_order(void *c, const void *p, size_t len);
 void sha256_block_data_order(void *c, const void *p, size_t len);
 void sha512_block_data_order(void *c, const void *p, size_t len);
 
-typedef void (*update_func) (void *, size_t, const uint8_t *);
-typedef void (*digest_func) (void *, size_t, uint8_t *);
-typedef void (*set_key_func) (void *, size_t, const uint8_t *);
-typedef void (*init_func) (void *);
+typedef void (*update_func)(void *, size_t, const uint8_t *);
+typedef void (*digest_func)(void *, size_t, uint8_t *);
+typedef void (*set_key_func)(void *, size_t, const uint8_t *);
+typedef void (*init_func)(void *);
 
 struct aarch64_hash_ctx {
 	union {
@@ -72,7 +72,7 @@ static void wrap_aarch64_hash_deinit(void *hd)
 }
 
 void aarch64_sha1_update(struct sha1_ctx *ctx, size_t length,
-		     const uint8_t * data)
+			 const uint8_t * data)
 {
 	struct {
 		uint32_t h0, h1, h2, h3, h4;
@@ -110,7 +110,7 @@ void aarch64_sha1_update(struct sha1_ctx *ctx, size_t length,
 
 		sha1_block_data_order(&octx, data, t2);
 
-		for (i=0;i<t2;i++)
+		for (i = 0; i < t2; i++)
 			ctx->count++;
 		data += length;
 	}
@@ -131,7 +131,7 @@ void aarch64_sha1_update(struct sha1_ctx *ctx, size_t length,
 }
 
 void aarch64_sha256_update(struct sha256_ctx *ctx, size_t length,
-		     const uint8_t * data)
+			   const uint8_t * data)
 {
 	struct {
 		uint32_t h[8];
@@ -162,8 +162,8 @@ void aarch64_sha256_update(struct sha256_ctx *ctx, size_t length,
 	if (length > 0) {
 		t2 = length / SHA1_DATA_SIZE;
 		sha256_block_data_order(&octx, data, t2);
-		
-		for (i=0;i<t2;i++)
+
+		for (i = 0; i < t2; i++)
 			ctx->count++;
 		data += length;
 	}
@@ -179,14 +179,14 @@ void aarch64_sha256_update(struct sha256_ctx *ctx, size_t length,
 }
 
 void aarch64_sha512_update(struct sha512_ctx *ctx, size_t length,
-		     const uint8_t * data)
+			   const uint8_t * data)
 {
 	struct {
 		uint64_t h[8];
 		uint64_t Nl, Nh;
 		union {
 			uint64_t d[16];
-			uint8_t p[16*8];
+			uint8_t p[16 * 8];
 		} u;
 		unsigned int num;
 		unsigned md_len;
@@ -213,8 +213,8 @@ void aarch64_sha512_update(struct sha512_ctx *ctx, size_t length,
 	if (length > 0) {
 		t2 = length / SHA512_DATA_SIZE;
 		sha512_block_data_order(&octx, data, t2);
-		
-		for (i=0;i<t2;i++)
+
+		for (i = 0; i < t2; i++)
 			MD_INCR(ctx);
 		data += length;
 	}
@@ -281,7 +281,6 @@ static int _ctx_init(gnutls_digest_algorithm_t algo,
 	return 0;
 }
 
-
 static int wrap_aarch64_hash_init(gnutls_digest_algorithm_t algo, void **_ctx)
 {
 	struct aarch64_hash_ctx *ctx;
@@ -305,12 +304,11 @@ static int wrap_aarch64_hash_init(gnutls_digest_algorithm_t algo, void **_ctx)
 	return 0;
 }
 
-static void *
-wrap_aarch64_hash_copy(const void *_ctx)
+static void *wrap_aarch64_hash_copy(const void *_ctx)
 {
 	struct aarch64_hash_ctx *new_ctx;
-	const struct aarch64_hash_ctx *ctx=_ctx;
-	ptrdiff_t off = (uint8_t *)ctx->ctx_ptr - (uint8_t *)(&ctx->ctx);
+	const struct aarch64_hash_ctx *ctx = _ctx;
+	ptrdiff_t off = (uint8_t *) ctx->ctx_ptr - (uint8_t *) (&ctx->ctx);
 
 	new_ctx = gnutls_malloc(sizeof(struct aarch64_hash_ctx));
 	if (new_ctx == NULL) {
@@ -319,7 +317,7 @@ wrap_aarch64_hash_copy(const void *_ctx)
 	}
 
 	memcpy(new_ctx, ctx, sizeof(*new_ctx));
-	new_ctx->ctx_ptr = (uint8_t *)&new_ctx->ctx + off;
+	new_ctx->ctx_ptr = (uint8_t *) & new_ctx->ctx + off;
 
 	return new_ctx;
 }
@@ -339,8 +337,8 @@ wrap_aarch64_hash_output(void *src_ctx, void *digest, size_t digestsize)
 }
 
 static int wrap_aarch64_hash_fast(gnutls_digest_algorithm_t algo,
-				 const void *text, size_t text_size,
-				 void *digest)
+				  const void *text, size_t text_size,
+				  void *digest)
 {
 	struct aarch64_hash_ctx ctx;
 	int ret;

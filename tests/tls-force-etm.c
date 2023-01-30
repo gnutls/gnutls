@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,20 +35,20 @@ int main(void)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/dtls.h>
-#include <signal.h>
-#include <assert.h>
+# include <string.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/dtls.h>
+# include <signal.h>
+# include <assert.h>
 
-#include "utils.h"
-#include "cert-common.h"
+# include "utils.h"
+# include "cert-common.h"
 
 /* This program tests whether forced EtM is negotiated as expected.
  */
@@ -63,7 +63,7 @@ static void client_log_func(int level, const char *str)
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
 
-#define MAX_BUF 1024
+# define MAX_BUF 1024
 
 static void client(int fd, const char *prio, unsigned etm, int eret)
 {
@@ -84,11 +84,11 @@ static void client(int fd, const char *prio, unsigned etm, int eret)
 	gnutls_anon_allocate_client_credentials(&anoncred);
 	gnutls_certificate_allocate_credentials(&x509_cred);
 
-	assert(gnutls_init(&session, GNUTLS_CLIENT)>=0);
+	assert(gnutls_init(&session, GNUTLS_CLIENT) >= 0);
 	gnutls_handshake_set_timeout(session, get_timeout());
 
 	/* Use default priorities */
-	assert(gnutls_priority_set_direct(session, prio, NULL)>=0);
+	assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);
 
 	/* put the anonymous credentials to the current session
 	 */
@@ -131,10 +131,13 @@ static void client(int fd, const char *prio, unsigned etm, int eret)
 		exit(1);
 	}
 
-	if (etm != 0 && ((gnutls_session_get_flags(session) & GNUTLS_SFLAGS_ETM) == 0)) {
+	if (etm != 0
+	    && ((gnutls_session_get_flags(session) & GNUTLS_SFLAGS_ETM) == 0)) {
 		fail("client: EtM was not negotiated with %s!\n", prio);
 		exit(1);
-	} else if (etm == 0 && ((gnutls_session_get_flags(session) & GNUTLS_SFLAGS_ETM) != 0)) {
+	} else if (etm == 0
+		   && ((gnutls_session_get_flags(session) & GNUTLS_SFLAGS_ETM)
+		       != 0)) {
 		fail("client: EtM was negotiated with %s!\n", prio);
 		exit(1);
 	}
@@ -142,14 +145,12 @@ static void client(int fd, const char *prio, unsigned etm, int eret)
 	do {
 		do {
 			ret = gnutls_record_recv(session, buffer, MAX_BUF);
-		} while (ret == GNUTLS_E_AGAIN
-			 || ret == GNUTLS_E_INTERRUPTED);
+		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 	} while (ret > 0);
 
 	if (ret == 0) {
 		if (debug)
-			success
-			    ("client: Peer has closed the TLS connection\n");
+			success("client: Peer has closed the TLS connection\n");
 		goto end;
 	} else if (ret < 0) {
 		if (ret != 0) {
@@ -160,7 +161,7 @@ static void client(int fd, const char *prio, unsigned etm, int eret)
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
-      end:
+ end:
 
 	close(fd);
 
@@ -172,7 +173,6 @@ static void client(int fd, const char *prio, unsigned etm, int eret)
 	gnutls_global_deinit();
 }
 
-
 static void server(int fd, const char *prio, unsigned etm, int eret)
 {
 	int ret;
@@ -180,7 +180,7 @@ static void server(int fd, const char *prio, unsigned etm, int eret)
 	gnutls_session_t session;
 	gnutls_anon_server_credentials_t anoncred;
 	gnutls_certificate_credentials_t x509_cred;
-	unsigned to_send = sizeof(buffer)/4;
+	unsigned to_send = sizeof(buffer) / 4;
 
 	/* this must be called once in the program
 	 */
@@ -194,12 +194,11 @@ static void server(int fd, const char *prio, unsigned etm, int eret)
 
 	gnutls_certificate_allocate_credentials(&x509_cred);
 	gnutls_certificate_set_x509_key_mem(x509_cred, &server_cert,
-					    &server_key,
-					    GNUTLS_X509_FMT_PEM);
+					    &server_key, GNUTLS_X509_FMT_PEM);
 
 	gnutls_anon_allocate_server_credentials(&anoncred);
 
-	assert(gnutls_init(&session, GNUTLS_SERVER)>=0);
+	assert(gnutls_init(&session, GNUTLS_SERVER) >= 0);
 	gnutls_handshake_set_timeout(session, get_timeout());
 
 	/* avoid calling all the priority functions, since the defaults
@@ -238,10 +237,13 @@ static void server(int fd, const char *prio, unsigned etm, int eret)
 		exit(1);
 	}
 
-	if (etm != 0 && ((gnutls_session_get_flags(session) & GNUTLS_SFLAGS_ETM) == 0)) {
+	if (etm != 0
+	    && ((gnutls_session_get_flags(session) & GNUTLS_SFLAGS_ETM) == 0)) {
 		fail("server: EtM was not negotiated with %s!\n", prio);
 		exit(1);
-	} else if (etm == 0 && ((gnutls_session_get_flags(session) & GNUTLS_SFLAGS_ETM) != 0)) {
+	} else if (etm == 0
+		   && ((gnutls_session_get_flags(session) & GNUTLS_SFLAGS_ETM)
+		       != 0)) {
 		fail("server: EtM was negotiated with %s!\n", prio);
 		exit(1);
 	}
@@ -257,10 +259,8 @@ static void server(int fd, const char *prio, unsigned etm, int eret)
 	do {
 		do {
 			ret =
-			    gnutls_record_send(session, buffer,
-						sizeof(buffer));
-		} while (ret == GNUTLS_E_AGAIN
-			 || ret == GNUTLS_E_INTERRUPTED);
+			    gnutls_record_send(session, buffer, sizeof(buffer));
+		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 		if (ret < 0) {
 			fail("Error sending %d byte packet: %s\n", to_send,
@@ -302,7 +302,6 @@ static void start(struct test_st *test)
 	int ret, status;
 	pid_t child;
 
-
 	success("trying: %s\n", test->name);
 	ret = socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
 	if (ret < 0) {
@@ -330,11 +329,11 @@ static void start(struct test_st *test)
 	}
 }
 
-#define AES_CBC "NONE:+VERS-TLS1.0:-CIPHER-ALL:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
-#define AES_CBC_SHA256 "NONE:+VERS-TLS1.2:-CIPHER-ALL:+RSA:+AES-128-CBC:+AES-256-CBC:+SHA256:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
-#define AES_GCM "NONE:+VERS-TLS1.2:-CIPHER-ALL:+RSA:+AES-128-GCM:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
+# define AES_CBC "NONE:+VERS-TLS1.0:-CIPHER-ALL:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
+# define AES_CBC_SHA256 "NONE:+VERS-TLS1.2:-CIPHER-ALL:+RSA:+AES-128-CBC:+AES-256-CBC:+SHA256:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
+# define AES_GCM "NONE:+VERS-TLS1.2:-CIPHER-ALL:+RSA:+AES-128-GCM:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
 
-#define AES_CBC_TLS12 "NONE:+VERS-TLS1.2:-CIPHER-ALL:+RSA:+AES-128-CBC:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
+# define AES_CBC_TLS12 "NONE:+VERS-TLS1.2:-CIPHER-ALL:+RSA:+AES-128-CBC:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
 
 static void ch_handler(int sig)
 {
@@ -343,45 +342,39 @@ static void ch_handler(int sig)
 
 static struct test_st tests[] = {
 	{
-		.name = "aes-cbc-hmac-sha1 with force etm",
-		.server_prio = AES_CBC":%FORCE_ETM",
-		.client_prio = AES_CBC":%FORCE_ETM",
-		.etm = 1
-	},
+	 .name = "aes-cbc-hmac-sha1 with force etm",
+	 .server_prio = AES_CBC ":%FORCE_ETM",
+	 .client_prio = AES_CBC ":%FORCE_ETM",
+	 .etm = 1},
 	{
-		.name = "aes-cbc-hmac-sha256 with force etm",
-		.server_prio = AES_CBC_SHA256":%FORCE_ETM",
-		.client_prio = AES_CBC_SHA256":%FORCE_ETM",
-		.etm = 1
-	},
+	 .name = "aes-cbc-hmac-sha256 with force etm",
+	 .server_prio = AES_CBC_SHA256 ":%FORCE_ETM",
+	 .client_prio = AES_CBC_SHA256 ":%FORCE_ETM",
+	 .etm = 1},
 	{
-		.name = "server aes-cbc-hmac-sha1 with force etm, gcm fallback",
-		.server_prio = AES_CBC_TLS12":+AES-128-GCM:%FORCE_ETM",
-		.client_prio = AES_CBC_TLS12":+AES-128-GCM:%NO_ETM",
-		.etm = 0
-	},
+	 .name = "server aes-cbc-hmac-sha1 with force etm, gcm fallback",
+	 .server_prio = AES_CBC_TLS12 ":+AES-128-GCM:%FORCE_ETM",
+	 .client_prio = AES_CBC_TLS12 ":+AES-128-GCM:%NO_ETM",
+	 .etm = 0},
 	{
-		.name = "aes-gcm with force etm",
-		.server_prio = AES_GCM":%FORCE_ETM",
-		.client_prio = AES_GCM":%FORCE_ETM",
-		.etm = 0
-	},
+	 .name = "aes-gcm with force etm",
+	 .server_prio = AES_GCM ":%FORCE_ETM",
+	 .client_prio = AES_GCM ":%FORCE_ETM",
+	 .etm = 0},
 	{
-		.name = "server aes-cbc-hmac-sha1 with force etm failure",
-		.server_prio = AES_CBC":%FORCE_ETM",
-		.client_prio = AES_CBC":%NO_ETM",
-		.etm = 0,
-		.client_err = GNUTLS_E_PREMATURE_TERMINATION,
-		.server_err = GNUTLS_E_NO_CIPHER_SUITES
-	},
+	 .name = "server aes-cbc-hmac-sha1 with force etm failure",
+	 .server_prio = AES_CBC ":%FORCE_ETM",
+	 .client_prio = AES_CBC ":%NO_ETM",
+	 .etm = 0,
+	 .client_err = GNUTLS_E_PREMATURE_TERMINATION,
+	 .server_err = GNUTLS_E_NO_CIPHER_SUITES},
 	{
-		.name = "client aes-cbc-hmac-sha1 with force etm failure",
-		.server_prio = AES_CBC":%NO_ETM",
-		.client_prio = AES_CBC":%FORCE_ETM",
-		.etm = 0,
-		.client_err = GNUTLS_E_UNWANTED_ALGORITHM,
-		.server_err = -1
-	}
+	 .name = "client aes-cbc-hmac-sha1 with force etm failure",
+	 .server_prio = AES_CBC ":%NO_ETM",
+	 .client_prio = AES_CBC ":%FORCE_ETM",
+	 .etm = 0,
+	 .client_err = GNUTLS_E_UNWANTED_ALGORITHM,
+	 .server_err = -1}
 };
 
 void doit(void)
@@ -389,7 +382,7 @@ void doit(void)
 	unsigned i;
 	signal(SIGCHLD, ch_handler);
 
-	for (i=0;i<sizeof(tests)/sizeof(tests[0]);i++) {
+	for (i = 0; i < sizeof(tests) / sizeof(tests[0]); i++) {
 		start(&tests[i]);
 	}
 }

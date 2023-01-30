@@ -25,7 +25,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -107,9 +107,9 @@ void doit(void)
 					    &server_cert, &server_key,
 					    GNUTLS_X509_FMT_PEM);
 	gnutls_init(&server, GNUTLS_SERVER);
-	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-			       serverx509cred);
-	gnutls_priority_set_direct(server, "NORMAL:-VERS-ALL:+VERS-TLS1.2", NULL);
+	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, serverx509cred);
+	gnutls_priority_set_direct(server, "NORMAL:-VERS-ALL:+VERS-TLS1.2",
+				   NULL);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
@@ -117,9 +117,9 @@ void doit(void)
 	/* Init client */
 	gnutls_certificate_allocate_credentials(&clientx509cred);
 	gnutls_init(&client, GNUTLS_CLIENT);
-	gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-			       clientx509cred);
-	gnutls_priority_set_direct(client, "NORMAL:-VERS-ALL:+VERS-TLS1.2", NULL);
+	gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE, clientx509cred);
+	gnutls_priority_set_direct(client, "NORMAL:-VERS-ALL:+VERS-TLS1.2",
+				   NULL);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
@@ -131,8 +131,10 @@ void doit(void)
 		abort();
 	}
 
-	if ((gnutls_session_get_flags(client) & GNUTLS_SFLAGS_SAFE_RENEGOTIATION) ||
-	    (gnutls_session_get_flags(server) & GNUTLS_SFLAGS_SAFE_RENEGOTIATION)) {
+	if ((gnutls_session_get_flags(client) &
+	     GNUTLS_SFLAGS_SAFE_RENEGOTIATION)
+	    || (gnutls_session_get_flags(server) &
+		GNUTLS_SFLAGS_SAFE_RENEGOTIATION)) {
 		puts("Client or server using extension before handshake?");
 		abort();
 	}
@@ -146,8 +148,10 @@ void doit(void)
 		abort();
 	}
 
-	if (!(gnutls_session_get_flags(client) & GNUTLS_SFLAGS_SAFE_RENEGOTIATION) ||
-	    !(gnutls_session_get_flags(server) & GNUTLS_SFLAGS_SAFE_RENEGOTIATION)) {
+	if (!
+	    (gnutls_session_get_flags(client) &
+	     GNUTLS_SFLAGS_SAFE_RENEGOTIATION)
+|| !(gnutls_session_get_flags(server) & GNUTLS_SFLAGS_SAFE_RENEGOTIATION)) {
 		puts("Client or server not using safe renegotiation extension?");
 		abort();
 	}
@@ -176,8 +180,10 @@ void doit(void)
 		abort();
 	}
 
-	if (!(gnutls_session_get_flags(client) & GNUTLS_SFLAGS_SAFE_RENEGOTIATION) ||
-	    !(gnutls_session_get_flags(server) & GNUTLS_SFLAGS_SAFE_RENEGOTIATION)) {
+	if (!
+	    (gnutls_session_get_flags(client) &
+	     GNUTLS_SFLAGS_SAFE_RENEGOTIATION)
+|| !(gnutls_session_get_flags(server) & GNUTLS_SFLAGS_SAFE_RENEGOTIATION)) {
 		puts("Client or server not using safe renegotiation extension?");
 		abort();
 	}

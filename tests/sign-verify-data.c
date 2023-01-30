@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -86,7 +86,8 @@ void doit(void)
 		if (tests[i].pk == GNUTLS_PK_DSA)
 			continue;
 
-		success("testing: %s - %s\n", tests[i].name, gnutls_sign_algorithm_get_name(tests[i].sigalgo));
+		success("testing: %s - %s\n", tests[i].name,
+			gnutls_sign_algorithm_get_name(tests[i].sigalgo));
 
 		ret = gnutls_pubkey_init(&pubkey);
 		if (ret < 0)
@@ -96,12 +97,17 @@ void doit(void)
 		if (ret < 0)
 			testfail("gnutls_pubkey_init\n");
 
-		ret = gnutls_privkey_import_x509_raw(privkey, &tests[i].key, GNUTLS_X509_FMT_PEM, NULL, 0);
+		ret =
+		    gnutls_privkey_import_x509_raw(privkey, &tests[i].key,
+						   GNUTLS_X509_FMT_PEM, NULL,
+						   0);
 		if (ret < 0)
 			testfail("gnutls_privkey_import_x509\n");
 
-		ret = gnutls_privkey_sign_data(privkey, tests[i].digest, tests[i].sign_flags,
-						&raw_data, &signature);
+		ret =
+		    gnutls_privkey_sign_data(privkey, tests[i].digest,
+					     tests[i].sign_flags, &raw_data,
+					     &signature);
 		if (ret < 0)
 			testfail("gnutls_x509_privkey_sign_hash\n");
 
@@ -120,35 +126,36 @@ void doit(void)
 			testfail("gnutls_x509_pubkey_import\n");
 
 		ret =
-		    gnutls_pubkey_verify_data2(pubkey, tests[i].sigalgo, 0, &raw_data,
-					      &signature);
+		    gnutls_pubkey_verify_data2(pubkey, tests[i].sigalgo, 0,
+					       &raw_data, &signature);
 		if (ret < 0)
 			testfail("gnutls_x509_pubkey_verify_data2\n");
 
 		/* should fail */
 		ret =
 		    gnutls_pubkey_verify_data2(pubkey, tests[i].sigalgo, 0,
-					      &invalid_raw_data,
-					      &signature);
+					       &invalid_raw_data, &signature);
 		if (ret != GNUTLS_E_PK_SIG_VERIFY_FAILED)
-			testfail("gnutls_x509_pubkey_verify_data2-2 (hashed data)\n");
+			testfail
+			    ("gnutls_x509_pubkey_verify_data2-2 (hashed data)\n");
 
 		sign_algo =
 		    gnutls_pk_to_sign(gnutls_pubkey_get_pk_algorithm
 				      (pubkey, NULL), tests[i].digest);
 		ret =
 		    gnutls_pubkey_verify_data2(pubkey, sign_algo, 0,
-						&raw_data, &signature);
+					       &raw_data, &signature);
 		if (ret < 0)
-			testfail("gnutls_x509_pubkey_verify_data2-1 (hashed data)\n");
+			testfail
+			    ("gnutls_x509_pubkey_verify_data2-1 (hashed data)\n");
 
 		/* should fail */
 		ret =
 		    gnutls_pubkey_verify_data2(pubkey, sign_algo, 0,
-						&invalid_raw_data,
-						&signature);
+					       &invalid_raw_data, &signature);
 		if (ret != GNUTLS_E_PK_SIG_VERIFY_FAILED)
-			testfail("gnutls_x509_pubkey_verify_data2-2 (hashed data)\n");
+			testfail
+			    ("gnutls_x509_pubkey_verify_data2-2 (hashed data)\n");
 
 		/* test the raw interface */
 		gnutls_free(signature.data);

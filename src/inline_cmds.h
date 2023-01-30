@@ -18,7 +18,7 @@
  */
 
 #ifndef GNUTLS_SRC_INLINE_CMDS_H
-#define GNUTLS_SRC_INLINE_CMDS_H
+# define GNUTLS_SRC_INLINE_CMDS_H
 
 /* 
  * The inline commands is a facility that can be used optionally
@@ -48,7 +48,7 @@ typedef enum INLINE_COMMAND { INLINE_COMMAND_NONE,
 	INLINE_COMMAND_REKEY_BOTH
 } inline_command_t;
 
-#define MAX_INLINE_COMMAND_BYTES 20
+# define MAX_INLINE_COMMAND_BYTES 20
 
 typedef struct inline_cmds {
 	char *current_ptr;	/* points to the start of the current buffer being processed */
@@ -60,7 +60,6 @@ typedef struct inline_cmds {
 	ssize_t bytes_copied;
 	char inline_cmd_buffer[MAX_INLINE_COMMAND_BYTES];
 } inline_cmds_st;
-
 
 struct inline_command_definitions {
 	int command;
@@ -75,6 +74,6 @@ struct inline_command_definitions inline_commands_def[] = {
 	{INLINE_COMMAND_RENEGOTIATE, "^renegotiate^\n"},
 };
 
-#define NUM_INLINE_COMMANDS ((unsigned)(sizeof(inline_commands_def)/sizeof(inline_commands_def[0])))
+# define NUM_INLINE_COMMANDS ((unsigned)(sizeof(inline_commands_def)/sizeof(inline_commands_def[0])))
 
-#endif /* GNUTLS_SRC_INLINE_CMDS_H */
+#endif				/* GNUTLS_SRC_INLINE_CMDS_H */

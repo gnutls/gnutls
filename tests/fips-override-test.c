@@ -26,7 +26,6 @@ static void audit_log_func(gnutls_session_t session, const char *str)
 	audit_called = 1;
 }
 
-
 static void try_crypto(void)
 {
 	static uint8_t key16[16];
@@ -38,15 +37,13 @@ static void try_crypto(void)
 	int ret;
 	gnutls_x509_privkey_t privkey;
 
-	ret =
-	    gnutls_cipher_init(&ch, GNUTLS_CIPHER_ARCFOUR_128, &key, &iv);
+	ret = gnutls_cipher_init(&ch, GNUTLS_CIPHER_ARCFOUR_128, &key, &iv);
 	if (ret < 0) {
 		fail("gnutls_cipher_init failed\n");
 	}
 	gnutls_cipher_deinit(ch);
 
-	ret =
-	    gnutls_cipher_init(&ch, GNUTLS_CIPHER_AES_128_CBC, &key, &iv);
+	ret = gnutls_cipher_init(&ch, GNUTLS_CIPHER_AES_128_CBC, &key, &iv);
 	if (ret < 0) {
 		fail("gnutls_cipher_init failed\n");
 	}

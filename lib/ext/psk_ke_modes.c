@@ -29,8 +29,7 @@
 #define PSK_DHE_KE 1
 
 static int
-psk_ke_modes_send_params(gnutls_session_t session,
-			 gnutls_buffer_t extdata)
+psk_ke_modes_send_params(gnutls_session_t session, gnutls_buffer_t extdata)
 {
 	int ret;
 	const version_entry_st *vers;
@@ -59,14 +58,18 @@ psk_ke_modes_send_params(gnutls_session_t session,
 	 * prioritization when negotiating PSK or DHE-PSK. Receiving servers would
 	 * very likely respect our prioritization if they parse the message serially. */
 	pos = 0;
-	for (i=0;i<session->internals.priorities->_kx.num_priorities;i++) {
-		if (session->internals.priorities->_kx.priorities[i] == GNUTLS_KX_PSK && !have_psk) {
+	for (i = 0; i < session->internals.priorities->_kx.num_priorities; i++) {
+		if (session->internals.priorities->_kx.priorities[i] ==
+		    GNUTLS_KX_PSK && !have_psk) {
 			assert(pos <= 1);
 			data[pos++] = PSK_KE;
 			session->internals.hsk_flags |= HSK_PSK_KE_MODE_PSK;
 			have_psk = 1;
-		} else if ((session->internals.priorities->_kx.priorities[i] == GNUTLS_KX_DHE_PSK ||
-			    session->internals.priorities->_kx.priorities[i] == GNUTLS_KX_ECDHE_PSK) && !have_dhpsk) {
+		} else
+		    if ((session->internals.priorities->_kx.priorities[i] ==
+			 GNUTLS_KX_DHE_PSK
+			 || session->internals.priorities->_kx.priorities[i] ==
+			 GNUTLS_KX_ECDHE_PSK) && !have_dhpsk) {
 			assert(pos <= 1);
 			data[pos++] = PSK_DHE_KE;
 			session->internals.hsk_flags |= HSK_PSK_KE_MODE_DHE_PSK;
@@ -129,7 +132,9 @@ psk_ke_modes_recv_params(gnutls_session_t session,
 		return gnutls_assert_val(0);
 	}
 
-	cred = (gnutls_psk_server_credentials_t)_gnutls_get_cred(session, GNUTLS_CRD_PSK);
+	cred =
+	    (gnutls_psk_server_credentials_t) _gnutls_get_cred(session,
+							       GNUTLS_CRD_PSK);
 	if (cred == NULL && (session->internals.flags & GNUTLS_NO_TICKETS)) {
 		session->internals.hsk_flags |= HSK_PSK_KE_MODE_INVALID;
 		return gnutls_assert_val(0);
@@ -138,12 +143,15 @@ psk_ke_modes_recv_params(gnutls_session_t session,
 	DECR_LEN(len, 1);
 	ke_modes_len = *(data++);
 
-	for (i=0;i<session->internals.priorities->_kx.num_priorities;i++) {
-		if (session->internals.priorities->_kx.priorities[i] == GNUTLS_KX_PSK && psk_pos == MAX_POS) {
+	for (i = 0; i < session->internals.priorities->_kx.num_priorities; i++) {
+		if (session->internals.priorities->_kx.priorities[i] ==
+		    GNUTLS_KX_PSK && psk_pos == MAX_POS) {
 			psk_pos = i;
-		} else if ((session->internals.priorities->_kx.priorities[i] == GNUTLS_KX_DHE_PSK ||
-			    session->internals.priorities->_kx.priorities[i] == GNUTLS_KX_ECDHE_PSK) &&
-			    dhpsk_pos == MAX_POS) {
+		} else
+		    if ((session->internals.priorities->_kx.priorities[i] ==
+			 GNUTLS_KX_DHE_PSK
+			 || session->internals.priorities->_kx.priorities[i] ==
+			 GNUTLS_KX_ECDHE_PSK) && dhpsk_pos == MAX_POS) {
 			dhpsk_pos = i;
 		}
 
@@ -158,7 +166,7 @@ psk_ke_modes_recv_params(gnutls_session_t session,
 			return gnutls_assert_val(0);
 	}
 
-	for (i=0;i<ke_modes_len;i++) {
+	for (i = 0; i < ke_modes_len; i++) {
 		DECR_LEN(len, 1);
 		if (data[i] == PSK_DHE_KE)
 			cli_dhpsk_pos = i;
@@ -172,14 +180,19 @@ psk_ke_modes_recv_params(gnutls_session_t session,
 	}
 
 	if (session->internals.priorities->server_precedence) {
-		if (dhpsk_pos != MAX_POS && cli_dhpsk_pos != MAX_POS && (dhpsk_pos < psk_pos || cli_psk_pos == MAX_POS))
+		if (dhpsk_pos != MAX_POS && cli_dhpsk_pos != MAX_POS
+		    && (dhpsk_pos < psk_pos || cli_psk_pos == MAX_POS))
 			session->internals.hsk_flags |= HSK_PSK_KE_MODE_DHE_PSK;
-		else if (psk_pos != MAX_POS && cli_psk_pos != MAX_POS && (psk_pos < dhpsk_pos || cli_dhpsk_pos == MAX_POS))
+		else if (psk_pos != MAX_POS && cli_psk_pos != MAX_POS
+			 && (psk_pos < dhpsk_pos || cli_dhpsk_pos == MAX_POS))
 			session->internals.hsk_flags |= HSK_PSK_KE_MODE_PSK;
 	} else {
-		if (dhpsk_pos != MAX_POS && cli_dhpsk_pos != MAX_POS && (cli_dhpsk_pos < cli_psk_pos || psk_pos == MAX_POS))
+		if (dhpsk_pos != MAX_POS && cli_dhpsk_pos != MAX_POS
+		    && (cli_dhpsk_pos < cli_psk_pos || psk_pos == MAX_POS))
 			session->internals.hsk_flags |= HSK_PSK_KE_MODE_DHE_PSK;
-		else if (psk_pos != MAX_POS && cli_psk_pos != MAX_POS && (cli_psk_pos < cli_dhpsk_pos || dhpsk_pos == MAX_POS))
+		else if (psk_pos != MAX_POS && cli_psk_pos != MAX_POS
+			 && (cli_psk_pos < cli_dhpsk_pos
+			     || dhpsk_pos == MAX_POS))
 			session->internals.hsk_flags |= HSK_PSK_KE_MODE_PSK;
 	}
 
@@ -199,7 +212,9 @@ const hello_ext_entry_st ext_mod_psk_ke_modes = {
 	.gid = GNUTLS_EXTENSION_PSK_KE_MODES,
 	.client_parse_point = GNUTLS_EXT_TLS,
 	.server_parse_point = GNUTLS_EXT_TLS,
-	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_CLIENT_HELLO | GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO,
+	.validity =
+	    GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_CLIENT_HELLO |
+	    GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO,
 	.send_func = psk_ke_modes_send_params,
 	.recv_func = psk_ke_modes_recv_params
 };

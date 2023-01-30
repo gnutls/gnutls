@@ -49,46 +49,43 @@
 
 /* Key comes in form .... M_2 M_1 K_0,
   unmask is K_i = K_i-1 * M_i mod Q */
-int
-gostdsa_unmask_key (const struct ecc_curve *ecc,
-		    mpz_t key)
+int gostdsa_unmask_key(const struct ecc_curve *ecc, mpz_t key)
 {
- unsigned bits = ecc_bit_size (ecc);
- unsigned keybits = mpz_sizeinbase (key, 2);
- mpz_t unmasked, temp, temp2, q;
+	unsigned bits = ecc_bit_size(ecc);
+	unsigned keybits = mpz_sizeinbase(key, 2);
+	mpz_t unmasked, temp, temp2, q;
 
- if (keybits <= bits)
-  return 0;
+	if (keybits <= bits)
+		return 0;
 
- mpz_init (unmasked);
- mpz_init (temp);
- mpz_init (temp2);
+	mpz_init(unmasked);
+	mpz_init(temp);
+	mpz_init(temp2);
 
- if (ecc == nettle_get_gost_gc256b ())
-   mpz_init_set_str (q, GOST_GC256B_Q, 16);
- else if (ecc == nettle_get_gost_gc512a ())
-   mpz_init_set_str (q, GOST_GC512A_Q, 16);
- else
-   abort ();
+	if (ecc == nettle_get_gost_gc256b())
+		mpz_init_set_str(q, GOST_GC256B_Q, 16);
+	else if (ecc == nettle_get_gost_gc512a())
+		mpz_init_set_str(q, GOST_GC512A_Q, 16);
+	else
+		abort();
 
- mpz_tdiv_r_2exp (unmasked, key, bits);
- mpz_tdiv_q_2exp (key, key, bits);
- keybits -= bits;
- while (keybits > bits)
-  {
-   mpz_tdiv_r_2exp (temp2, key, bits);
-   mpz_tdiv_q_2exp (key, key, bits);
-   keybits -= bits;
-   mpz_mul (temp, unmasked, temp2);
-   mpz_mod (unmasked, temp, q);
-  }
- mpz_mul (temp, unmasked, key);
- mpz_mod (key, temp, q);
+	mpz_tdiv_r_2exp(unmasked, key, bits);
+	mpz_tdiv_q_2exp(key, key, bits);
+	keybits -= bits;
+	while (keybits > bits) {
+		mpz_tdiv_r_2exp(temp2, key, bits);
+		mpz_tdiv_q_2exp(key, key, bits);
+		keybits -= bits;
+		mpz_mul(temp, unmasked, temp2);
+		mpz_mod(unmasked, temp, q);
+	}
+	mpz_mul(temp, unmasked, key);
+	mpz_mod(key, temp, q);
 
- mpz_clear (q);
- mpz_clear (temp2);
- mpz_clear (temp);
- mpz_clear (unmasked);
+	mpz_clear(q);
+	mpz_clear(temp2);
+	mpz_clear(temp);
+	mpz_clear(unmasked);
 
- return 0;
+	return 0;
 }

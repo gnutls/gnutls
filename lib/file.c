@@ -59,7 +59,7 @@ int gnutls_load_file(const char *filename, gnutls_datum_t * data)
 {
 	size_t len;
 
-	data->data = (void *) read_file(filename, RF_BINARY, &len);
+	data->data = (void *)read_file(filename, RF_BINARY, &len);
 	if (data->data == NULL)
 		return GNUTLS_E_FILE_ERROR;
 
@@ -75,4 +75,3 @@ int gnutls_load_file(const char *filename, gnutls_datum_t * data)
 
 	return 0;
 }
-

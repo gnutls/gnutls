@@ -50,15 +50,19 @@ int set_dh_pk_params(gnutls_session_t session, bigint_t g, bigint_t p,
 
 	session->key.proto.tls12.dh.params.params[DH_P] = _gnutls_mpi_copy(p);
 	if (session->key.proto.tls12.dh.params.params[DH_P] == NULL) {
-		_gnutls_mpi_release(&session->key.proto.tls12.dh.params.params[DH_G]);
+		_gnutls_mpi_release(&session->key.proto.tls12.dh.
+				    params.params[DH_G]);
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 	}
 
 	if (q) {
-		session->key.proto.tls12.dh.params.params[DH_Q] = _gnutls_mpi_copy(q);
+		session->key.proto.tls12.dh.params.params[DH_Q] =
+		    _gnutls_mpi_copy(q);
 		if (session->key.proto.tls12.dh.params.params[DH_Q] == NULL) {
-			_gnutls_mpi_release(&session->key.proto.tls12.dh.params.params[DH_P]);
-			_gnutls_mpi_release(&session->key.proto.tls12.dh.params.params[DH_G]);
+			_gnutls_mpi_release(&session->key.proto.tls12.dh.
+					    params.params[DH_P]);
+			_gnutls_mpi_release(&session->key.proto.tls12.dh.
+					    params.params[DH_G]);
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 		}
 	}
@@ -76,7 +80,8 @@ int set_dh_pk_params(gnutls_session_t session, bigint_t g, bigint_t p,
  */
 int
 _gnutls_figure_dh_params(gnutls_session_t session, gnutls_dh_params_t dh_params,
-		      gnutls_params_function * func, gnutls_sec_param_t sec_param)
+			 gnutls_params_function * func,
+			 gnutls_sec_param_t sec_param)
 {
 	gnutls_params_st params;
 	bigint_t p, g, q = NULL;
@@ -91,34 +96,54 @@ _gnutls_figure_dh_params(gnutls_session_t session, gnutls_dh_params_t dh_params,
 
 	/* if we negotiated RFC7919 FFDHE */
 	if (group && group->pk == GNUTLS_PK_DH) {
-		for (i=0;i<session->internals.priorities->groups.size;i++) {
-			if (session->internals.priorities->groups.entry[i] == group) {
-				ret = _gnutls_mpi_init_scan_nz(&p,
-						session->internals.priorities->groups.entry[i]->prime->data,
-						session->internals.priorities->groups.entry[i]->prime->size);
+		for (i = 0; i < session->internals.priorities->groups.size; i++) {
+			if (session->internals.priorities->groups.entry[i] ==
+			    group) {
+				ret =
+				    _gnutls_mpi_init_scan_nz(&p,
+							     session->
+							     internals.priorities->
+							     groups.entry[i]->
+							     prime->data,
+							     session->
+							     internals.priorities->
+							     groups.entry[i]->
+							     prime->size);
 				if (ret < 0)
 					return gnutls_assert_val(ret);
 
 				free_pg = 1;
 
 				ret = _gnutls_mpi_init_scan_nz(&g,
-						session->internals.priorities->groups.entry[i]->generator->data,
-						session->internals.priorities->groups.entry[i]->generator->size);
+							       session->internals.priorities->groups.
+							       entry
+							       [i]->generator->
+							       data,
+							       session->internals.priorities->groups.
+							       entry
+							       [i]->generator->
+							       size);
 				if (ret < 0) {
 					gnutls_assert();
 					goto cleanup;
 				}
 
 				ret = _gnutls_mpi_init_scan_nz(&q,
-						session->internals.priorities->groups.entry[i]->q->data,
-						session->internals.priorities->groups.entry[i]->q->size);
+							       session->internals.priorities->groups.
+							       entry[i]->q->
+							       data,
+							       session->internals.priorities->groups.
+							       entry[i]->q->
+							       size);
 				if (ret < 0) {
 					gnutls_assert();
 					goto cleanup;
 				}
 
 				session->internals.hsk_flags |= HSK_USED_FFDHE;
-				q_bits = *session->internals.priorities->groups.entry[i]->q_bits;
+				q_bits =
+				    *session->internals.priorities->
+				    groups.entry[i]->q_bits;
 				goto finished;
 			}
 		}
@@ -127,30 +152,49 @@ _gnutls_figure_dh_params(gnutls_session_t session, gnutls_dh_params_t dh_params,
 		 * as we received that extension */
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 	} else if (sec_param) {
-		unsigned bits = gnutls_sec_param_to_pk_bits(GNUTLS_PK_DH, sec_param)/8;
+		unsigned bits =
+		    gnutls_sec_param_to_pk_bits(GNUTLS_PK_DH, sec_param) / 8;
 
-		for (i=0;i<session->internals.priorities->groups.size;i++) {
-			if (!session->internals.priorities->groups.entry[i]->prime)
+		for (i = 0; i < session->internals.priorities->groups.size; i++) {
+			if (!session->internals.priorities->groups.
+			    entry[i]->prime)
 				continue;
 
-			if (bits <= session->internals.priorities->groups.entry[i]->prime->size) {
-				ret = _gnutls_mpi_init_scan_nz(&p,
-						session->internals.priorities->groups.entry[i]->prime->data,
-						session->internals.priorities->groups.entry[i]->prime->size);
+			if (bits <=
+			    session->internals.priorities->groups.
+			    entry[i]->prime->size) {
+				ret =
+				    _gnutls_mpi_init_scan_nz(&p,
+							     session->
+							     internals.priorities->
+							     groups.entry[i]->
+							     prime->data,
+							     session->
+							     internals.priorities->
+							     groups.entry[i]->
+							     prime->size);
 				if (ret < 0)
 					return gnutls_assert_val(ret);
 
 				free_pg = 1;
 
 				ret = _gnutls_mpi_init_scan_nz(&g,
-						session->internals.priorities->groups.entry[i]->generator->data,
-						session->internals.priorities->groups.entry[i]->generator->size);
+							       session->internals.priorities->groups.
+							       entry
+							       [i]->generator->
+							       data,
+							       session->internals.priorities->groups.
+							       entry
+							       [i]->generator->
+							       size);
 				if (ret < 0) {
 					gnutls_assert();
 					goto cleanup;
 				}
 
-				q_bits = *session->internals.priorities->groups.entry[i]->q_bits;
+				q_bits =
+				    *session->internals.priorities->
+				    groups.entry[i]->q_bits;
 				goto finished;
 			}
 		}
@@ -168,7 +212,8 @@ _gnutls_figure_dh_params(gnutls_session_t session, gnutls_dh_params_t dh_params,
 			g = params.params.dh->params[1];
 			q_bits = params.params.dh->q_bits;
 		} else
-			return gnutls_assert_val(GNUTLS_E_NO_TEMPORARY_DH_PARAMS);
+			return
+			    gnutls_assert_val(GNUTLS_E_NO_TEMPORARY_DH_PARAMS);
 	} else
 		return gnutls_assert_val(GNUTLS_E_NO_TEMPORARY_DH_PARAMS);
 
@@ -205,7 +250,6 @@ const bigint_t *_gnutls_dh_params_to_mpi(gnutls_dh_params_t dh_primes)
 	return dh_primes->params;
 }
 
-
 /**
  * gnutls_dh_params_import_raw:
  * @dh_params: The parameters
@@ -239,7 +283,8 @@ gnutls_dh_params_import_raw(gnutls_dh_params_t dh_params,
  *   otherwise a negative error code is returned.
  **/
 int
-gnutls_dh_params_import_dsa(gnutls_dh_params_t dh_params, gnutls_x509_privkey_t key)
+gnutls_dh_params_import_dsa(gnutls_dh_params_t dh_params,
+			    gnutls_x509_privkey_t key)
 {
 	gnutls_datum_t p, g, q;
 	int ret;
@@ -329,8 +374,7 @@ gnutls_dh_params_import_raw3(gnutls_dh_params_t dh_params,
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	if (_gnutls_mpi_init_scan_nz(&tmp_g, generator->data,
-				     generator->size)) {
+	if (_gnutls_mpi_init_scan_nz(&tmp_g, generator->data, generator->size)) {
 		_gnutls_mpi_release(&tmp_p);
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
@@ -429,7 +473,6 @@ int gnutls_dh_params_cpy(gnutls_dh_params_t dst, gnutls_dh_params_t src)
 	return 0;
 }
 
-
 /**
  * gnutls_dh_params_generate2:
  * @dparams: The parameters
@@ -457,8 +500,7 @@ int gnutls_dh_params_cpy(gnutls_dh_params_t dst, gnutls_dh_params_t src)
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.
  **/
-int
-gnutls_dh_params_generate2(gnutls_dh_params_t dparams, unsigned int bits)
+int gnutls_dh_params_generate2(gnutls_dh_params_t dparams, unsigned int bits)
 {
 	int ret;
 	gnutls_pk_params_st params;
@@ -507,8 +549,7 @@ gnutls_dh_params_import_pkcs3(gnutls_dh_params_t params,
 
 		result = _gnutls_fbase64_decode("DH PARAMETERS",
 						pkcs3_params->data,
-						pkcs3_params->size,
-						&_params);
+						pkcs3_params->size, &_params);
 
 		if (result < 0) {
 			gnutls_assert();
@@ -615,16 +656,16 @@ int
 gnutls_dh_params_export_pkcs3(gnutls_dh_params_t params,
 			      gnutls_x509_crt_fmt_t format,
 			      unsigned char *params_data,
-			      size_t * params_data_size)
+			      size_t *params_data_size)
 {
-	gnutls_datum_t out = {NULL, 0};
+	gnutls_datum_t out = { NULL, 0 };
 	int ret;
 
 	ret = gnutls_dh_params_export2_pkcs3(params, format, &out);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	if (*params_data_size < (unsigned) out.size + 1) {
+	if (*params_data_size < (unsigned)out.size + 1) {
 		gnutls_assert();
 		gnutls_free(out.data);
 		*params_data_size = out.size + 1;
@@ -687,7 +728,6 @@ gnutls_dh_params_export2_pkcs3(gnutls_dh_params_t params,
 	g_data = &all_data[p_size];
 	_gnutls_mpi_print_lz(params->params[1], g_data, &g_size);
 
-
 	/* Ok. Now we have the data. Create the asn1 structures
 	 */
 
@@ -714,8 +754,7 @@ gnutls_dh_params_export2_pkcs3(gnutls_dh_params_t params,
 		    _gnutls_x509_write_uint32(c2, "privateValueLength",
 					      params->q_bits);
 	else
-		result =
-		    asn1_write_value(c2, "privateValueLength", NULL, 0);
+		result = asn1_write_value(c2, "privateValueLength", NULL, 0);
 
 	if (result < 0) {
 		gnutls_assert();
@@ -735,7 +774,6 @@ gnutls_dh_params_export2_pkcs3(gnutls_dh_params_t params,
 	}
 
 	gnutls_free(all_data);
-
 
 	if (format == GNUTLS_X509_FMT_DER) {
 		result = _gnutls_x509_der_encode(c2, "", out, 0);

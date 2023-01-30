@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,19 +35,19 @@ int main(void)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <signal.h>
-#include <assert.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/dtls.h>
+# include <string.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <signal.h>
+# include <assert.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/dtls.h>
 
-#include "utils.h"
+# include "utils.h"
 
 static void server_log_func(int level, const char *str)
 {
@@ -62,22 +62,23 @@ static void client_log_func(int level, const char *str)
 /* A DTLS client handling DTLS 1.2 resumption under AnyConnect protocol which sets premaster secret.
  */
 
-#define MAX_BUF 1024
+# define MAX_BUF 1024
 
-static ssize_t
-push(gnutls_transport_ptr_t tr, const void *data, size_t len)
+static ssize_t push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 {
-	int fd = (long int) tr;
+	int fd = (long int)tr;
 
 	return send(fd, data, len, 0);
 }
 
-static gnutls_datum_t master =
-    { (void*)"\x44\x66\x44\xa9\xb6\x29\xed\x6e\xd6\x93\x15\xdb\xf0\x7d\x4b\x2e\x18\xb1\x9d\xed\xff\x6a\x86\x76\xc9\x0e\x16\xab\xc2\x10\xbb\x17\x99\x24\xb1\xd9\xb9\x95\xe7\xea\xea\xea\xea\xea\xff\xaa\xac", 48};
-static gnutls_datum_t sess_id =
-    { (void*)"\xd9\xb9\x95\xe7\xea", 5};
+static gnutls_datum_t master = { (void *)
+	    "\x44\x66\x44\xa9\xb6\x29\xed\x6e\xd6\x93\x15\xdb\xf0\x7d\x4b\x2e\x18\xb1\x9d\xed\xff\x6a\x86\x76\xc9\x0e\x16\xab\xc2\x10\xbb\x17\x99\x24\xb1\xd9\xb9\x95\xe7\xea\xea\xea\xea\xea\xff\xaa\xac",
+	48
+};
+static gnutls_datum_t sess_id = { (void *)"\xd9\xb9\x95\xe7\xea", 5 };
 
-static void client(int fd, const char *prio, int proto, int cipher, int kx, int mac, const char *exp_desc)
+static void client(int fd, const char *prio, int proto, int cipher, int kx,
+		   int mac, const char *exp_desc)
 {
 	int ret;
 	char buffer[MAX_BUF + 1];
@@ -98,15 +99,14 @@ static void client(int fd, const char *prio, int proto, int cipher, int kx, int 
 	gnutls_dtls_set_mtu(session, 1500);
 	gnutls_handshake_set_timeout(session, get_timeout());
 
-	assert(gnutls_priority_set_direct(session,
-					  prio,
-					  NULL) >= 0);
+	assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);
 
 	ret = gnutls_session_set_premaster(session, GNUTLS_CLIENT,
-		proto, kx, cipher, mac,
-		GNUTLS_COMP_NULL, &master, &sess_id);
+					   proto, kx, cipher, mac,
+					   GNUTLS_COMP_NULL, &master, &sess_id);
 	if (ret < 0) {
-		fail("client: gnutls_session_set_premaster failed: %s\n", gnutls_strerror(ret));
+		fail("client: gnutls_session_set_premaster failed: %s\n",
+		     gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -136,7 +136,8 @@ static void client(int fd, const char *prio, int proto, int cipher, int kx, int 
 		fail("client: gnutls_session_get_desc: NULL\n");
 
 	if (strcmp(desc, exp_desc) != 0)
-		fail("client: gnutls_session_get_desc: found null str: %s\n", desc);
+		fail("client: gnutls_session_get_desc: found null str: %s\n",
+		     desc);
 
 	success(" - connected with: %s\n", desc);
 	gnutls_free(desc);
@@ -147,13 +148,12 @@ static void client(int fd, const char *prio, int proto, int cipher, int kx, int 
 			(gnutls_protocol_get_version(session)));
 
 	do {
-		ret = gnutls_record_recv(session, buffer, sizeof(buffer)-1);
+		ret = gnutls_record_recv(session, buffer, sizeof(buffer) - 1);
 	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 	if (ret == 0) {
 		if (debug)
-			success
-			    ("client: Peer has closed the TLS connection\n");
+			success("client: Peer has closed the TLS connection\n");
 		goto end;
 	} else if (ret < 0) {
 		fail("client: Error: %s\n", gnutls_strerror(ret));
@@ -162,7 +162,7 @@ static void client(int fd, const char *prio, int proto, int cipher, int kx, int 
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
-      end:
+ end:
 
 	close(fd);
 
@@ -173,8 +173,8 @@ static void client(int fd, const char *prio, int proto, int cipher, int kx, int 
 	gnutls_global_deinit();
 }
 
-
-static void server(int fd, const char *prio, int proto, int cipher, int kx, int mac)
+static void server(int fd, const char *prio, int proto, int cipher, int kx,
+		   int mac)
 {
 	int ret;
 	gnutls_certificate_credentials_t xcred;
@@ -199,15 +199,14 @@ static void server(int fd, const char *prio, int proto, int cipher, int kx, int 
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	assert(gnutls_priority_set_direct(session,
-					  prio,
-					  NULL) >= 0);
+	assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);
 
 	ret = gnutls_session_set_premaster(session, GNUTLS_SERVER,
-		proto, kx, cipher, mac,
-		GNUTLS_COMP_NULL, &master, &sess_id);
+					   proto, kx, cipher, mac,
+					   GNUTLS_COMP_NULL, &master, &sess_id);
 	if (ret < 0) {
-		fail("server: gnutls_session_set_premaster failed: %s\n", gnutls_strerror(ret));
+		fail("server: gnutls_session_set_premaster failed: %s\n",
+		     gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -239,7 +238,7 @@ static void server(int fd, const char *prio, int proto, int cipher, int kx, int 
 
 	memset(buffer, 1, sizeof(buffer));
 	do {
-		ret = gnutls_record_send(session, buffer, sizeof(buffer)-1);
+		ret = gnutls_record_send(session, buffer, sizeof(buffer) - 1);
 	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 	if (ret < 0) {
@@ -248,7 +247,6 @@ static void server(int fd, const char *prio, int proto, int cipher, int kx, int 
 		fail("server: data sending has failed (%s)\n\n",
 		     gnutls_strerror(ret));
 	}
-
 
 	/* do not wait for the peer to close the connection.
 	 */
@@ -265,7 +263,8 @@ static void server(int fd, const char *prio, int proto, int cipher, int kx, int 
 		success("server: finished\n");
 }
 
-static void run(const char *name, const char *prio, int proto, int cipher, int kx, int mac, const char *exp_desc)
+static void run(const char *name, const char *prio, int proto, int cipher,
+		int kx, int mac, const char *exp_desc)
 {
 	int fd[2];
 	int ret;
@@ -307,14 +306,22 @@ void doit(void)
 {
 	signal(SIGPIPE, SIG_IGN);
 
-	run("dtls1.2-aes128-ecdhe", "NONE:+VERS-DTLS1.2:+COMP-NULL:+AES-128-GCM:+AEAD:+ECDHE-RSA:+SIGN-ALL:%COMPAT",
-	    GNUTLS_DTLS1_2, GNUTLS_CIPHER_AES_128_GCM, GNUTLS_KX_ECDHE_RSA, GNUTLS_MAC_AEAD, "(DTLS1.2)-(ECDHE-RSA)-(AES-128-GCM)");
-	run("dtls1.2-aes256-ecdhe", "NONE:+VERS-DTLS1.2:+COMP-NULL:+AES-256-GCM:+AEAD:+ECDHE-RSA:+SIGN-ALL:%COMPAT",
-	    GNUTLS_DTLS1_2, GNUTLS_CIPHER_AES_256_GCM, GNUTLS_KX_ECDHE_RSA, GNUTLS_MAC_AEAD, "(DTLS1.2)-(ECDHE-RSA)-(AES-256-GCM)");
-	run("dtls1.2-aes128-rsa", "NONE:+VERS-DTLS1.2:+COMP-NULL:+AES-128-GCM:+AEAD:+RSA:+SIGN-ALL:%COMPAT",
-	    GNUTLS_DTLS1_2, GNUTLS_CIPHER_AES_128_GCM, GNUTLS_KX_RSA, GNUTLS_MAC_AEAD, "(DTLS1.2)-(RSA)-(AES-128-GCM)");
-	run("dtls1.2-aes256-rsa", "NONE:+VERS-DTLS1.2:+COMP-NULL:+AES-256-GCM:+AEAD:+RSA:+SIGN-ALL:%COMPAT",
-	    GNUTLS_DTLS1_2, GNUTLS_CIPHER_AES_256_GCM, GNUTLS_KX_RSA, GNUTLS_MAC_AEAD, "(DTLS1.2)-(RSA)-(AES-256-GCM)");
+	run("dtls1.2-aes128-ecdhe",
+	    "NONE:+VERS-DTLS1.2:+COMP-NULL:+AES-128-GCM:+AEAD:+ECDHE-RSA:+SIGN-ALL:%COMPAT",
+	    GNUTLS_DTLS1_2, GNUTLS_CIPHER_AES_128_GCM, GNUTLS_KX_ECDHE_RSA,
+	    GNUTLS_MAC_AEAD, "(DTLS1.2)-(ECDHE-RSA)-(AES-128-GCM)");
+	run("dtls1.2-aes256-ecdhe",
+	    "NONE:+VERS-DTLS1.2:+COMP-NULL:+AES-256-GCM:+AEAD:+ECDHE-RSA:+SIGN-ALL:%COMPAT",
+	    GNUTLS_DTLS1_2, GNUTLS_CIPHER_AES_256_GCM, GNUTLS_KX_ECDHE_RSA,
+	    GNUTLS_MAC_AEAD, "(DTLS1.2)-(ECDHE-RSA)-(AES-256-GCM)");
+	run("dtls1.2-aes128-rsa",
+	    "NONE:+VERS-DTLS1.2:+COMP-NULL:+AES-128-GCM:+AEAD:+RSA:+SIGN-ALL:%COMPAT",
+	    GNUTLS_DTLS1_2, GNUTLS_CIPHER_AES_128_GCM, GNUTLS_KX_RSA,
+	    GNUTLS_MAC_AEAD, "(DTLS1.2)-(RSA)-(AES-128-GCM)");
+	run("dtls1.2-aes256-rsa",
+	    "NONE:+VERS-DTLS1.2:+COMP-NULL:+AES-256-GCM:+AEAD:+RSA:+SIGN-ALL:%COMPAT",
+	    GNUTLS_DTLS1_2, GNUTLS_CIPHER_AES_256_GCM, GNUTLS_KX_RSA,
+	    GNUTLS_MAC_AEAD, "(DTLS1.2)-(RSA)-(AES-256-GCM)");
 }
 
 #endif				/* _WIN32 */

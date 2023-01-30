@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+# include "config.h"
 #endif
 
 #include <stdio.h>
@@ -30,19 +30,19 @@
 #include "utils.h"
 
 static unsigned char server_cert_pem[] =
-		"-----BEGIN CERTIFICATE-----\n"
-		"MIICBzCCAXCgAwIBAgIMVpjt8TL5Io/frpvkMA0GCSqGSIb3DQEBCwUAMCIxIDAe\n"
-		"BgNVBAMTF0dudVRMUyB0ZXN0IGNlcnRpZmljYXRlMB4XDTE2MDExNTEzMDI0MVoX\n"
-		"DTMyMDYxOTEzMDI0MVowIjEgMB4GA1UEAxMXR251VExTIHRlc3QgY2VydGlmaWNh\n"
-		"dGUwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBANe6XK+jDPAuqSdWqlOOqOt/\n"
-		"gXVMa5i+Suq3HvhLw2rE2g0AuOpMEx82FpPecu/GpF6ybrbKCohVdZCW7aZXvAw7\n"
-		"dg2XHr3p7H/Tqez7hWSga6BIznd+c5wxE/89yK6lYG7Ztoxamm+2vp9qvafwoDMn\n"
-		"9bcdkuWWnHNS1p/WyI6xAgMBAAGjQjBAMBEGCCsGAQUFBwEYBAUwAwIBBTAMBgNV\n"
-		"HRMBAf8EAjAAMB0GA1UdDgQWBBRTSzvcXshETAIgvzlIb0z+zSVSEDANBgkqhkiG\n"
-		"9w0BAQsFAAOBgQB+VcJuLPL2PMog0HZ8RRbqVvLU5d209ROg3s1oXUBFW8+AV+71\n"
-		"CsHg9Xx7vqKVwyKGI9ghds1B44lNPxGH2Sk1v2czjKbzwujo9+kLnDS6i0jyrDdn\n"
-		"um4ivpkwmlUFSQVXvENLwe9gTlIgN4+0I9WLcMTCDtHWkcxMRwCm2BMsXw==\n"
-		"-----END CERTIFICATE-----\n";
+    "-----BEGIN CERTIFICATE-----\n"
+    "MIICBzCCAXCgAwIBAgIMVpjt8TL5Io/frpvkMA0GCSqGSIb3DQEBCwUAMCIxIDAe\n"
+    "BgNVBAMTF0dudVRMUyB0ZXN0IGNlcnRpZmljYXRlMB4XDTE2MDExNTEzMDI0MVoX\n"
+    "DTMyMDYxOTEzMDI0MVowIjEgMB4GA1UEAxMXR251VExTIHRlc3QgY2VydGlmaWNh\n"
+    "dGUwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBANe6XK+jDPAuqSdWqlOOqOt/\n"
+    "gXVMa5i+Suq3HvhLw2rE2g0AuOpMEx82FpPecu/GpF6ybrbKCohVdZCW7aZXvAw7\n"
+    "dg2XHr3p7H/Tqez7hWSga6BIznd+c5wxE/89yK6lYG7Ztoxamm+2vp9qvafwoDMn\n"
+    "9bcdkuWWnHNS1p/WyI6xAgMBAAGjQjBAMBEGCCsGAQUFBwEYBAUwAwIBBTAMBgNV\n"
+    "HRMBAf8EAjAAMB0GA1UdDgQWBBRTSzvcXshETAIgvzlIb0z+zSVSEDANBgkqhkiG\n"
+    "9w0BAQsFAAOBgQB+VcJuLPL2PMog0HZ8RRbqVvLU5d209ROg3s1oXUBFW8+AV+71\n"
+    "CsHg9Xx7vqKVwyKGI9ghds1B44lNPxGH2Sk1v2czjKbzwujo9+kLnDS6i0jyrDdn\n"
+    "um4ivpkwmlUFSQVXvENLwe9gTlIgN4+0I9WLcMTCDtHWkcxMRwCm2BMsXw==\n"
+    "-----END CERTIFICATE-----\n";
 
 const gnutls_datum_t server_cert = { server_cert_pem,
 	sizeof(server_cert_pem)
@@ -63,8 +63,8 @@ void doit(void)
 	assert(gnutls_x509_tlsfeatures_init(&feat) >= 0);
 	assert(gnutls_x509_crt_init(&crt) >= 0);
 
-	assert(gnutls_x509_crt_import(crt, &server_cert, GNUTLS_X509_FMT_PEM) >= 0);
-
+	assert(gnutls_x509_crt_import(crt, &server_cert, GNUTLS_X509_FMT_PEM) >=
+	       0);
 
 	assert(gnutls_x509_crt_get_tlsfeatures(crt, feat, 0, &critical) >= 0);
 	assert(critical == 0);
@@ -72,7 +72,8 @@ void doit(void)
 	assert(gnutls_x509_tlsfeatures_get(feat, 0, &out) >= 0);
 	assert(out == 5);
 
-	assert(gnutls_x509_tlsfeatures_get(feat, 1, &out) == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+	assert(gnutls_x509_tlsfeatures_get(feat, 1, &out) ==
+	       GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
 	assert(gnutls_x509_tlsfeatures_check_crt(feat, crt) != 0);
 
@@ -95,4 +96,3 @@ void doit(void)
 	gnutls_x509_crt_deinit(crt);
 	gnutls_global_deinit();
 }
-

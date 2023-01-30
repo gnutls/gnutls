@@ -37,8 +37,7 @@ void *_gnutls_pin_data;
  *
  * Since: 2.12.0
  **/
-void
-gnutls_pkcs11_set_pin_function(gnutls_pin_callback_t fn, void *userdata)
+void gnutls_pkcs11_set_pin_function(gnutls_pin_callback_t fn, void *userdata)
 {
 	_gnutls_pin_func = fn;
 	_gnutls_pin_data = userdata;
@@ -65,22 +64,20 @@ gnutls_pin_callback_t gnutls_pkcs11_get_pin_function(void **userdata)
 }
 
 int
-_gnutls_retrieve_pin(struct pin_info_st *pin_info, const char *url, const char *label,
-		     unsigned flags,
-		     char *pin, unsigned pin_size)
+_gnutls_retrieve_pin(struct pin_info_st *pin_info, const char *url,
+		     const char *label, unsigned flags, char *pin,
+		     unsigned pin_size)
 {
 	int ret;
 
 	if (pin_info && pin_info->cb)
 		ret =
 		    pin_info->cb(pin_info->data, 0,
-				 (char *) url, label, flags,
-				 pin, pin_size);
+				 (char *)url, label, flags, pin, pin_size);
 	else if (_gnutls_pin_func)
 		ret =
 		    _gnutls_pin_func(_gnutls_pin_data, 0,
-				     (char *) url, label, flags,
-				     pin, pin_size);
+				     (char *)url, label, flags, pin, pin_size);
 	else
 		ret = gnutls_assert_val(GNUTLS_E_PKCS11_PIN_ERROR);
 

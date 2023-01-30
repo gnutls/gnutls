@@ -28,16 +28,16 @@
 
 #ifdef ENABLE_SRP
 
-#include "srp.h"
-#include <auth/srp_passwd.h>
-#include <mpi.h>
-#include <num.h>
-#include <file.h>
-#include <algorithms.h>
-#include <random.h>
+# include "srp.h"
+# include <auth/srp_passwd.h>
+# include <mpi.h>
+# include <num.h>
+# include <file.h>
+# include <algorithms.h>
+# include <random.h>
 
-#include "debug.h"
-#include "attribute.h"
+# include "debug.h"
+# include "attribute.h"
 
 /* Here functions for SRP (like g^x mod n) are defined 
  */
@@ -82,14 +82,13 @@ _gnutls_srp_gx(uint8_t * text, size_t textsize, uint8_t ** result,
 		ret = GNUTLS_E_MPI_PRINT_FAILED;
 	}
 
-cleanup:
+ cleanup:
 	_gnutls_mpi_release(&e);
 	_gnutls_mpi_release(&x);
 
 	return ret;
 
 }
-
 
 /****************
  * Choose a random value b and calculate B = (k* v + g^b) % N.
@@ -146,7 +145,7 @@ _gnutls_calc_srp_B(bigint_t * ret_b, bigint_t g, bigint_t n, bigint_t v)
 
 	return B;
 
-      error:
+ error:
 	_gnutls_mpi_release(&b);
 	_gnutls_mpi_release(&B);
 	_gnutls_mpi_release(&k);
@@ -212,8 +211,7 @@ bigint_t _gnutls_calc_srp_u(bigint_t A, bigint_t B, bigint_t n)
  * this is our shared key (server premaster secret)
  */
 bigint_t
-_gnutls_calc_srp_S1(bigint_t A, bigint_t b, bigint_t u, bigint_t v,
-		    bigint_t n)
+_gnutls_calc_srp_S1(bigint_t A, bigint_t b, bigint_t u, bigint_t v, bigint_t n)
 {
 	bigint_t tmp1 = NULL, tmp2 = NULL;
 	bigint_t S = NULL;
@@ -242,7 +240,7 @@ _gnutls_calc_srp_S1(bigint_t A, bigint_t b, bigint_t u, bigint_t v,
 
 	return S;
 
-error:
+ error:
 	_gnutls_mpi_release(&S);
 	_gnutls_mpi_release(&tmp1);
 	_gnutls_mpi_release(&tmp2);
@@ -276,7 +274,7 @@ bigint_t _gnutls_calc_srp_A(bigint_t * a, bigint_t g, bigint_t n)
 		_gnutls_mpi_release(&tmpa);
 
 	return A;
-error:
+ error:
 	_gnutls_mpi_release(&tmpa);
 	_gnutls_mpi_release(&A);
 	return NULL;
@@ -287,7 +285,7 @@ error:
  */
 static int
 _gnutls_calc_srp_sha(const char *username, const char *_password,
-		     uint8_t * salt, int salt_size, size_t * size,
+		     uint8_t * salt, int salt_size, size_t *size,
 		     void *digest, unsigned allow_invalid_pass)
 {
 	digest_hd_st td;
@@ -299,10 +297,12 @@ _gnutls_calc_srp_sha(const char *username, const char *_password,
 
 	*size = 20;
 
-	ret = _gnutls_utf8_password_normalize(_password, strlen(_password), &pout, allow_invalid_pass);
+	ret =
+	    _gnutls_utf8_password_normalize(_password, strlen(_password), &pout,
+					    allow_invalid_pass);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
-	password = (char*)pout.data;
+	password = (char *)pout.data;
 
 	ret = _gnutls_hash_init(&td, me);
 	if (ret < 0) {
@@ -334,13 +334,12 @@ _gnutls_calc_srp_sha(const char *username, const char *_password,
 
 int
 _gnutls_calc_srp_x(char *username, char *password, uint8_t * salt,
-		   size_t salt_size, size_t * size, void *digest)
+		   size_t salt_size, size_t *size, void *digest)
 {
 
 	return _gnutls_calc_srp_sha(username, password, salt,
 				    salt_size, size, digest, 1);
 }
-
 
 /* S = (B - k*g^x) ^ (a + u * x) % N
  * this is our shared key (client premaster secret)
@@ -407,7 +406,7 @@ _gnutls_calc_srp_S2(bigint_t B, bigint_t g, bigint_t x, bigint_t a,
 
 	return S;
 
-      freeall:
+ freeall:
 	_gnutls_mpi_release(&k);
 	_gnutls_mpi_release(&tmp1);
 	_gnutls_mpi_release(&tmp2);
@@ -439,9 +438,7 @@ void gnutls_srp_free_client_credentials(gnutls_srp_client_credentials_t sc)
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, or an
  *   error code.
  **/
-int
-gnutls_srp_allocate_client_credentials(gnutls_srp_client_credentials_t *
-				       sc)
+int gnutls_srp_allocate_client_credentials(gnutls_srp_client_credentials_t * sc)
 {
 	*sc = gnutls_calloc(1, sizeof(srp_client_credentials_st));
 
@@ -469,8 +466,7 @@ gnutls_srp_allocate_client_credentials(gnutls_srp_client_credentials_t *
  **/
 int
 gnutls_srp_set_client_credentials(gnutls_srp_client_credentials_t res,
-				  const char *username,
-				  const char *password)
+				  const char *username, const char *password)
 {
 
 	if (username == NULL || password == NULL) {
@@ -509,13 +505,13 @@ void gnutls_srp_free_server_credentials(gnutls_srp_server_credentials_t sc)
  * gnutls_srp_set_server_fake_salt_seed() is not called to set
  * a seed.
  */
-#define DEFAULT_FAKE_SALT_SEED_SIZE 20
+# define DEFAULT_FAKE_SALT_SEED_SIZE 20
 
 /* Size of the fake salts generated if
  * gnutls_srp_set_server_fake_salt_seed() is not called to set
  * another size.
  */
-#define DEFAULT_FAKE_SALT_SIZE 16
+# define DEFAULT_FAKE_SALT_SIZE 16
 
 /**
  * gnutls_srp_allocate_server_credentials:
@@ -526,9 +522,7 @@ void gnutls_srp_free_server_credentials(gnutls_srp_server_credentials_t sc)
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, or an
  *   error code.
  **/
-int
-gnutls_srp_allocate_server_credentials(gnutls_srp_server_credentials_t *
-				       sc)
+int gnutls_srp_allocate_server_credentials(gnutls_srp_server_credentials_t * sc)
 {
 	int ret;
 	*sc = gnutls_calloc(1, sizeof(srp_server_cred_st));
@@ -548,7 +542,7 @@ gnutls_srp_allocate_server_credentials(gnutls_srp_server_credentials_t *
 	(*sc)->fake_salt_length = DEFAULT_FAKE_SALT_SIZE;
 	return 0;
 
-cleanup:
+ cleanup:
 	gnutls_free(*sc);
 	return ret;
 }
@@ -605,7 +599,6 @@ gnutls_srp_set_server_credentials_file(gnutls_srp_server_credentials_t res,
 	return 0;
 }
 
-
 /**
  * gnutls_srp_set_server_credentials_function:
  * @cred: is a #gnutls_srp_server_credentials_t type.
@@ -644,7 +637,7 @@ void
 gnutls_srp_set_server_credentials_function(gnutls_srp_server_credentials_t
 					   cred,
 					   gnutls_srp_server_credentials_function
-					   *func)
+					   * func)
 {
 	cred->pwd_callback = func;
 }
@@ -685,7 +678,6 @@ gnutls_srp_set_client_credentials_function(gnutls_srp_client_credentials_t
 {
 	cred->get_function = func;
 }
-
 
 /**
  * gnutls_srp_server_get_username:
@@ -843,26 +835,30 @@ gnutls_srp_set_server_fake_salt_seed(gnutls_srp_server_credentials_t cred,
 	/* Cap the salt length at the output size of the MAC algorithm
 	 * we are using to generate the fake salts.
 	 */
-	const mac_entry_st * me = mac_to_entry(SRP_FAKE_SALT_MAC);
+	const mac_entry_st *me = mac_to_entry(SRP_FAKE_SALT_MAC);
 	const size_t mac_len = me->output_size;
 
-	cred->fake_salt_length = (salt_length < mac_len ? salt_length : mac_len);
+	cred->fake_salt_length =
+	    (salt_length < mac_len ? salt_length : mac_len);
 }
 
 #else
 
-void gnutls_srp_free_client_credentials(gnutls_srp_client_credentials_t sc MAYBE_UNUSED)
+void gnutls_srp_free_client_credentials(gnutls_srp_client_credentials_t sc
+					MAYBE_UNUSED)
 {
 }
 
 int
-gnutls_srp_allocate_client_credentials(gnutls_srp_client_credentials_t *sc MAYBE_UNUSED)
+gnutls_srp_allocate_client_credentials(gnutls_srp_client_credentials_t *
+				       sc MAYBE_UNUSED)
 {
 	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }
 
 int
-gnutls_srp_set_client_credentials(gnutls_srp_client_credentials_t res MAYBE_UNUSED,
+gnutls_srp_set_client_credentials(gnutls_srp_client_credentials_t res
+				  MAYBE_UNUSED,
 				  const char *username MAYBE_UNUSED,
 				  const char *password MAYBE_UNUSED)
 {
@@ -870,38 +866,46 @@ gnutls_srp_set_client_credentials(gnutls_srp_client_credentials_t res MAYBE_UNUS
 }
 
 void
-gnutls_srp_free_server_credentials(gnutls_srp_server_credentials_t sc MAYBE_UNUSED)
+gnutls_srp_free_server_credentials(gnutls_srp_server_credentials_t sc
+				   MAYBE_UNUSED)
 {
 }
 
 int
-gnutls_srp_allocate_server_credentials(gnutls_srp_server_credentials_t *sc MAYBE_UNUSED)
+gnutls_srp_allocate_server_credentials(gnutls_srp_server_credentials_t *
+				       sc MAYBE_UNUSED)
 {
 	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }
 
 int
-gnutls_srp_set_server_credentials_file(gnutls_srp_server_credentials_t res MAYBE_UNUSED,
+gnutls_srp_set_server_credentials_file(gnutls_srp_server_credentials_t res
+				       MAYBE_UNUSED,
 				       const char *password_file MAYBE_UNUSED,
-				       const char *password_conf_file MAYBE_UNUSED)
+				       const char *password_conf_file
+				       MAYBE_UNUSED)
 {
 	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }
 
 void
-gnutls_srp_set_server_credentials_function(gnutls_srp_server_credentials_t cred MAYBE_UNUSED,
-					   gnutls_srp_server_credentials_function *func MAYBE_UNUSED)
+gnutls_srp_set_server_credentials_function(gnutls_srp_server_credentials_t cred
+					   MAYBE_UNUSED,
+					   gnutls_srp_server_credentials_function
+					   * func MAYBE_UNUSED)
 {
 }
 
 void
-gnutls_srp_set_client_credentials_function(gnutls_srp_client_credentials_t cred MAYBE_UNUSED,
-					   gnutls_srp_client_credentials_function *func MAYBE_UNUSED)
+gnutls_srp_set_client_credentials_function(gnutls_srp_client_credentials_t cred
+					   MAYBE_UNUSED,
+					   gnutls_srp_client_credentials_function
+					   * func MAYBE_UNUSED)
 {
 }
 
-const char *
-gnutls_srp_server_get_username(gnutls_session_t session MAYBE_UNUSED)
+const char *gnutls_srp_server_get_username(gnutls_session_t session
+					   MAYBE_UNUSED)
 {
 	return NULL;
 }
@@ -909,10 +913,10 @@ gnutls_srp_server_get_username(gnutls_session_t session MAYBE_UNUSED)
 int
 gnutls_srp_verifier(const char *username MAYBE_UNUSED,
 		    const char *password MAYBE_UNUSED,
-		    const gnutls_datum_t *salt MAYBE_UNUSED,
-		    const gnutls_datum_t *generator MAYBE_UNUSED,
-		    const gnutls_datum_t *prime MAYBE_UNUSED,
-		    gnutls_datum_t *res MAYBE_UNUSED)
+		    const gnutls_datum_t * salt MAYBE_UNUSED,
+		    const gnutls_datum_t * generator MAYBE_UNUSED,
+		    const gnutls_datum_t * prime MAYBE_UNUSED,
+		    gnutls_datum_t * res MAYBE_UNUSED)
 {
 	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }
@@ -924,8 +928,9 @@ gnutls_srp_set_prime_bits(gnutls_session_t session MAYBE_UNUSED,
 }
 
 void
-gnutls_srp_set_server_fake_salt_seed(gnutls_srp_server_credentials_t cred MAYBE_UNUSED,
-				     const gnutls_datum_t *seed MAYBE_UNUSED,
+gnutls_srp_set_server_fake_salt_seed(gnutls_srp_server_credentials_t cred
+				     MAYBE_UNUSED,
+				     const gnutls_datum_t * seed MAYBE_UNUSED,
 				     unsigned int salt_length MAYBE_UNUSED)
 {
 }

@@ -26,13 +26,11 @@
 #include <ext/alpn.h>
 
 static int _gnutls_alpn_recv_params(gnutls_session_t session,
-				    const uint8_t * data,
-				    size_t data_size);
+				    const uint8_t * data, size_t data_size);
 static int _gnutls_alpn_send_params(gnutls_session_t session,
 				    gnutls_buffer_st * extdata);
 
 static void _gnutls_alpn_deinit_data(gnutls_ext_priv_data_t priv);
-
 
 const hello_ext_entry_st ext_mod_alpn = {
 	.name = "ALPN",
@@ -42,8 +40,8 @@ const hello_ext_entry_st ext_mod_alpn = {
 	.client_parse_point = GNUTLS_EXT_MANDATORY,
 	.server_parse_point = GNUTLS_EXT_MANDATORY,
 	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_DTLS |
-		    GNUTLS_EXT_FLAG_CLIENT_HELLO | GNUTLS_EXT_FLAG_EE |
-		    GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
+	    GNUTLS_EXT_FLAG_CLIENT_HELLO | GNUTLS_EXT_FLAG_EE |
+	    GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
 	.recv_func = _gnutls_alpn_recv_params,
 	.send_func = _gnutls_alpn_send_params,
 	.deinit_func = _gnutls_alpn_deinit_data,
@@ -63,8 +61,7 @@ _gnutls_alpn_recv_params(gnutls_session_t session,
 	int selected_protocol_index;
 
 	ret =
-	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_ALPN,
-					 &epriv);
+	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_ALPN, &epriv);
 	if (ret < 0)
 		return 0;
 
@@ -75,33 +72,42 @@ _gnutls_alpn_recv_params(gnutls_session_t session,
 	p += 2;
 
 	if (len == 0 || len > (size_t)data_size)
-		return
-		    gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
 	if (session->security_parameters.entity == GNUTLS_SERVER) {
-		selected_protocol_index = MAX_ALPN_PROTOCOLS+1;
+		selected_protocol_index = MAX_ALPN_PROTOCOLS + 1;
 
 		while (data_size > 0) {
-			DECR_LENGTH_RET(data_size, 1, GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+			DECR_LENGTH_RET(data_size, 1,
+					GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 			len1 = *p;
 			p += 1;
-			DECR_LENGTH_RET(data_size, len1, GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+			DECR_LENGTH_RET(data_size, len1,
+					GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
 			if (len1 == 0)
-				return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+				return
+				    gnutls_assert_val
+				    (GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
 			for (i = 0; i < priv->size; i++) {
 				if (priv->protocol_size[i] == len1
 				    && memcmp(p, priv->protocols[i],
 					      len1) == 0) {
 
-					if (priv->flags & GNUTLS_ALPN_SERVER_PRECEDENCE) {
-						if (selected_protocol_index > (int)i) {
-							selected_protocol_index = i;
-							priv->selected_protocol =
+					if (priv->flags &
+					    GNUTLS_ALPN_SERVER_PRECEDENCE) {
+						if (selected_protocol_index >
+						    (int)i) {
+							selected_protocol_index
+							    = i;
+							priv->selected_protocol
+							    =
 							    priv->protocols[i];
-							priv->selected_protocol_size =
-							    priv->protocol_size[i];
+							priv->selected_protocol_size
+							    =
+							    priv->protocol_size
+							    [i];
 							break;
 						}
 					} else {
@@ -116,34 +122,33 @@ _gnutls_alpn_recv_params(gnutls_session_t session,
 			p += len1;
 		}
 	} else {
-		DECR_LENGTH_RET(data_size, 1, GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+		DECR_LENGTH_RET(data_size, 1,
+				GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 		len1 = *p;
 		p += 1;
-		DECR_LENGTH_RET(data_size, len1, GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+		DECR_LENGTH_RET(data_size, len1,
+				GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
 		for (i = 0; i < priv->size; i++) {
 			if (priv->protocol_size[i] == len1
 			    && memcmp(p, priv->protocols[i], len1) == 0) {
-				priv->selected_protocol =
-				    priv->protocols[i];
+				priv->selected_protocol = priv->protocols[i];
 				priv->selected_protocol_size =
 				    priv->protocol_size[i];
 				break;
 			}
 		}
-		/*p += len1;*/
+		/*p += len1; */
 	}
 
-	if (priv->selected_protocol == NULL
-	    && (priv->flags & GNUTLS_ALPN_MAND))
+	if (priv->selected_protocol == NULL && (priv->flags & GNUTLS_ALPN_MAND))
 		return gnutls_assert_val(GNUTLS_E_NO_APPLICATION_PROTOCOL);
 
 	return 0;
 }
 
 static int
-_gnutls_alpn_send_params(gnutls_session_t session,
-			 gnutls_buffer_st * extdata)
+_gnutls_alpn_send_params(gnutls_session_t session, gnutls_buffer_st * extdata)
 {
 	unsigned i;
 	int total_size = 0, ret;
@@ -151,8 +156,7 @@ _gnutls_alpn_send_params(gnutls_session_t session,
 	gnutls_ext_priv_data_t epriv;
 
 	ret =
-	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_ALPN,
-					 &epriv);
+	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_ALPN, &epriv);
 	if (ret < 0)
 		return 0;
 
@@ -167,8 +171,7 @@ _gnutls_alpn_send_params(gnutls_session_t session,
 
 		ret =
 		    _gnutls_buffer_append_prefix(extdata, 16,
-						 priv->
-						 selected_protocol_size +
+						 priv->selected_protocol_size +
 						 1);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
@@ -177,8 +180,7 @@ _gnutls_alpn_send_params(gnutls_session_t session,
 
 		ret =
 		    _gnutls_buffer_append_data_prefix(extdata, 8,
-						      priv->
-						      selected_protocol,
+						      priv->selected_protocol,
 						      priv->
 						      selected_protocol_size);
 		if (ret < 0)
@@ -199,11 +201,10 @@ _gnutls_alpn_send_params(gnutls_session_t session,
 		for (i = 0; i < priv->size; i++) {
 			ret =
 			    _gnutls_buffer_append_data_prefix(extdata, 8,
+							      priv->protocols
+							      [i],
 							      priv->
-							      protocols[i],
-							      priv->
-							      protocol_size
-							      [i]);
+							      protocol_size[i]);
 			if (ret < 0)
 				return gnutls_assert_val(ret);
 
@@ -240,8 +241,7 @@ gnutls_alpn_get_selected_protocol(gnutls_session_t session,
 	gnutls_ext_priv_data_t epriv;
 
 	ret =
-	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_ALPN,
-					 &epriv);
+	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_ALPN, &epriv);
 	if (ret < 0) {
 		gnutls_assert();
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
@@ -250,9 +250,7 @@ gnutls_alpn_get_selected_protocol(gnutls_session_t session,
 	priv = epriv;
 
 	if (priv->selected_protocol_size == 0)
-		return
-		    gnutls_assert_val
-		    (GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
 	protocol->data = priv->selected_protocol;
 	protocol->size = priv->selected_protocol_size;
@@ -289,8 +287,7 @@ gnutls_alpn_set_protocols(gnutls_session_t session,
 	unsigned i;
 
 	ret =
-	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_ALPN,
-					 &epriv);
+	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_ALPN, &epriv);
 	if (ret < 0) {
 		priv = gnutls_calloc(1, sizeof(*priv));
 		if (priv == NULL) {
@@ -299,7 +296,7 @@ gnutls_alpn_set_protocols(gnutls_session_t session,
 		}
 		epriv = priv;
 		_gnutls_hello_ext_set_priv(session,
-					     GNUTLS_EXTENSION_ALPN, epriv);
+					   GNUTLS_EXTENSION_ALPN, epriv);
 	} else
 		priv = epriv;
 
@@ -319,7 +316,6 @@ gnutls_alpn_set_protocols(gnutls_session_t session,
 
 	return 0;
 }
-
 
 static void _gnutls_alpn_deinit_data(gnutls_ext_priv_data_t priv)
 {

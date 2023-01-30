@@ -23,7 +23,7 @@
 /* Parts copied from GnuTLS example programs. */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -40,22 +40,22 @@ int main(int argc, char **argv)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#if !defined(_WIN32)
-#include <sys/wait.h>
-#endif
-#include <unistd.h>
-#include <signal.h>
-#include <assert.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/abstract.h>
+# include <string.h>
+# include <sys/types.h>
+# include <sys/socket.h>
+# if !defined(_WIN32)
+#  include <sys/wait.h>
+# endif
+# include <unistd.h>
+# include <signal.h>
+# include <assert.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/abstract.h>
 
-#include "utils.h"
+# include "utils.h"
 
-#include "ex-session-info.c"
-#include "ex-x509-info.c"
+# include "ex-session-info.c"
+# include "ex-x509-info.c"
 
 pid_t child;
 
@@ -65,10 +65,10 @@ static void tls_log_func(int level, const char *str)
 		str);
 }
 
-#define MAX_BUF 1024
-#define MSG "Hello TLS"
+# define MAX_BUF 1024
+# define MSG "Hello TLS"
 
-#define EXPECT_RDN0 "CA-3"
+# define EXPECT_RDN0 "CA-3"
 
 static int
 cert_callback(gnutls_session_t session,
@@ -81,8 +81,7 @@ cert_callback(gnutls_session_t session,
 	gnutls_x509_dn_t dn;
 
 	if (nreqs != 1) {
-		fail("client: invoked to provide client cert, but %d CAs are requested by server.\n",
-		     nreqs);
+		fail("client: invoked to provide client cert, but %d CAs are requested by server.\n", nreqs);
 		return -1;
 	}
 
@@ -107,11 +106,10 @@ cert_callback(gnutls_session_t session,
 				success("client: got RDN 0.\n");
 
 			if (val.value.size == strlen(EXPECT_RDN0)
-			    && strncmp((char *) val.value.data,
-					EXPECT_RDN0, val.value.size) == 0) {
+			    && strncmp((char *)val.value.data,
+				       EXPECT_RDN0, val.value.size) == 0) {
 				if (debug)
-					success
-					    ("client: RND 0 correct.\n");
+					success("client: RND 0 correct.\n");
 			} else {
 				fail("client: RND 0 bad: %.*s\n",
 				     val.value.size, val.value.data);
@@ -131,7 +129,6 @@ cert_callback(gnutls_session_t session,
 	return 0;
 }
 
-
 static void client(int sd, const char *prio)
 {
 	int ret, ii;
@@ -150,7 +147,7 @@ static void client(int sd, const char *prio)
 	/* sets the trusted cas file
 	 */
 	ret = gnutls_certificate_set_x509_trust_mem(xcred, &ca3_cert,
-					      GNUTLS_X509_FMT_PEM);
+						    GNUTLS_X509_FMT_PEM);
 	if (ret <= 0) {
 		fail("client: no CAs loaded!\n");
 		goto end;
@@ -162,7 +159,7 @@ static void client(int sd, const char *prio)
 	 */
 	gnutls_init(&session, GNUTLS_CLIENT);
 
-	assert(gnutls_priority_set_direct(session, prio, NULL)>=0);
+	assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);
 
 	/* put the x509 credentials to the current session
 	 */
@@ -197,8 +194,7 @@ static void client(int sd, const char *prio)
 	ret = gnutls_record_recv(session, buffer, MAX_BUF);
 	if (ret == 0) {
 		if (debug)
-			success
-			    ("client: Peer has closed the TLS connection\n");
+			success("client: Peer has closed the TLS connection\n");
 		goto end;
 	} else if (ret < 0) {
 		fail("client: Error: %s\n", gnutls_strerror(ret));
@@ -215,7 +211,7 @@ static void client(int sd, const char *prio)
 
 	gnutls_bye(session, GNUTLS_SHUT_RDWR);
 
-      end:
+ end:
 
 	close(sd);
 
@@ -229,7 +225,7 @@ static void client(int sd, const char *prio)
 /* This is a sample TLS 1.0 echo server, using X.509 authentication.
  */
 
-#define MAX_BUF 1024
+# define MAX_BUF 1024
 
 static void server(int sd, const char *prio)
 {
@@ -247,7 +243,7 @@ static void server(int sd, const char *prio)
 
 	gnutls_certificate_allocate_credentials(&x509_cred);
 	ret = gnutls_certificate_set_x509_trust_mem(x509_cred, &ca3_cert,
-					      GNUTLS_X509_FMT_PEM);
+						    GNUTLS_X509_FMT_PEM);
 	if (ret == 0) {
 		fail("server: no CAs loaded\n");
 	}
@@ -259,14 +255,13 @@ static void server(int sd, const char *prio)
 
 	gnutls_init(&session, GNUTLS_SERVER);
 
-	assert(gnutls_priority_set_direct(session, prio, NULL)>=0);
+	assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
 	/* request client certificate if any.
 	 */
-	gnutls_certificate_server_set_request(session,
-					      GNUTLS_CERT_REQUEST);
+	gnutls_certificate_server_set_request(session, GNUTLS_CERT_REQUEST);
 
 	gnutls_transport_set_int(session, sd);
 	gnutls_handshake_set_timeout(session, get_timeout());
@@ -306,8 +301,7 @@ static void server(int sd, const char *prio)
 		} else if (ret > 0) {
 			/* echo data back to the client
 			 */
-			gnutls_record_send(session, buffer,
-					   strlen(buffer));
+			gnutls_record_send(session, buffer, strlen(buffer));
 		}
 	}
 	/* do not wait for the peer to close the connection.

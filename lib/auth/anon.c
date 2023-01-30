@@ -30,14 +30,14 @@
 
 #if defined(ENABLE_ANON) && defined(ENABLE_DHE)
 
-#include "auth.h"
-#include "errors.h"
-#include "dh.h"
-#include "auth/anon.h"
-#include "num.h"
-#include "mpi.h"
-#include <state.h>
-#include <auth/dh_common.h>
+# include "auth.h"
+# include "errors.h"
+# include "dh.h"
+# include "auth/anon.h"
+# include "num.h"
+# include "mpi.h"
+# include <state.h>
+# include <auth/dh_common.h>
 
 static int gen_anon_server_kx(gnutls_session_t, gnutls_buffer_st *);
 static int proc_anon_client_kx(gnutls_session_t, uint8_t *, size_t);
@@ -60,8 +60,7 @@ const mod_auth_st anon_auth_struct = {
 	NULL
 };
 
-static int
-gen_anon_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
+static int gen_anon_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 {
 	int ret;
 	gnutls_anon_server_credentials_t cred;
@@ -75,18 +74,19 @@ gen_anon_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 
 	if ((ret =
 	     _gnutls_auth_info_init(session, GNUTLS_CRD_ANON,
-				   sizeof(anon_auth_info_st), 1)) < 0) {
+				    sizeof(anon_auth_info_st), 1)) < 0) {
 		gnutls_assert();
 		return ret;
 	}
 
-	ret = _gnutls_figure_dh_params(session, cred->dh_params, cred->params_func, cred->dh_sec_param);
+	ret =
+	    _gnutls_figure_dh_params(session, cred->dh_params,
+				     cred->params_func, cred->dh_sec_param);
 	if (ret < 0) {
 		return gnutls_assert_val(ret);
 	}
 
-	ret =
-	    _gnutls_dh_common_print_server_kx(session, data);
+	ret = _gnutls_dh_common_print_server_kx(session, data);
 	if (ret < 0) {
 		gnutls_assert();
 	}
@@ -94,10 +94,8 @@ gen_anon_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 	return ret;
 }
 
-
 static int
-proc_anon_client_kx(gnutls_session_t session, uint8_t * data,
-		    size_t _data_size)
+proc_anon_client_kx(gnutls_session_t session, uint8_t * data, size_t _data_size)
 {
 	return
 	    _gnutls_proc_dh_common_client_kx(session, data, _data_size, NULL);
@@ -105,8 +103,7 @@ proc_anon_client_kx(gnutls_session_t session, uint8_t * data,
 }
 
 int
-proc_anon_server_kx(gnutls_session_t session, uint8_t * data,
-		    size_t _data_size)
+proc_anon_server_kx(gnutls_session_t session, uint8_t * data, size_t _data_size)
 {
 
 	int ret;
@@ -114,7 +111,7 @@ proc_anon_server_kx(gnutls_session_t session, uint8_t * data,
 	/* set auth_info */
 	if ((ret =
 	     _gnutls_auth_info_init(session, GNUTLS_CRD_ANON,
-				   sizeof(anon_auth_info_st), 1)) < 0) {
+				    sizeof(anon_auth_info_st), 1)) < 0) {
 		gnutls_assert();
 		return ret;
 	}

@@ -41,15 +41,16 @@ static int _gnutls_max_record_send_params(gnutls_session_t session,
 static int _gnutls_mre_num2record(int num);
 static int _gnutls_mre_record2num(uint16_t record_size);
 
-
 const hello_ext_entry_st ext_mod_max_record_size = {
 	.name = "Maximum Record Size",
 	.tls_id = 1,
 	.gid = GNUTLS_EXTENSION_MAX_RECORD_SIZE,
 	.client_parse_point = GNUTLS_EXT_TLS,
 	.server_parse_point = GNUTLS_EXT_TLS,
-	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_DTLS | GNUTLS_EXT_FLAG_CLIENT_HELLO |
-		    GNUTLS_EXT_FLAG_EE | GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
+	.validity =
+	    GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_DTLS |
+	    GNUTLS_EXT_FLAG_CLIENT_HELLO | GNUTLS_EXT_FLAG_EE |
+	    GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
 	.recv_func = _gnutls_max_record_recv_params,
 	.send_func = _gnutls_max_record_send_params
 };
@@ -104,7 +105,8 @@ _gnutls_max_record_recv_params(gnutls_session_t session,
 				return new_size;
 			}
 
-			if (new_size != session->security_parameters.
+			if (new_size !=
+			    session->security_parameters.
 			    max_user_record_send_size) {
 				gnutls_assert();
 				return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
@@ -116,7 +118,6 @@ _gnutls_max_record_recv_params(gnutls_session_t session,
 			}
 
 		}
-
 
 	}
 
@@ -144,8 +145,8 @@ _gnutls_max_record_send_params(gnutls_session_t session,
 		if (session->security_parameters.max_user_record_send_size !=
 		    DEFAULT_MAX_RECORD_SIZE) {
 			ret = _gnutls_mre_record2num
-			      (session->security_parameters.
-			       max_user_record_send_size);
+			    (session->security_parameters.
+			     max_user_record_send_size);
 
 			/* it's not an error, as long as we send the
 			 * record_size_limit extension with that value */
@@ -168,8 +169,7 @@ _gnutls_max_record_send_params(gnutls_session_t session,
 		if (session->security_parameters.max_record_recv_size !=
 		    DEFAULT_MAX_RECORD_SIZE) {
 			ret = _gnutls_mre_record2num
-			      (session->security_parameters.
-			       max_record_recv_size);
+			    (session->security_parameters.max_record_recv_size);
 			if (ret < 0)
 				return gnutls_assert_val(ret);
 
@@ -184,7 +184,6 @@ _gnutls_max_record_send_params(gnutls_session_t session,
 
 	return 0;
 }
-
 
 /* Maps numbers to record sizes according to the
  * extensions draft.
@@ -241,7 +240,6 @@ size_t gnutls_record_get_max_size(gnutls_session_t session)
 	 */
 	return session->security_parameters.max_record_recv_size;
 }
-
 
 /**
  * gnutls_record_set_max_size:

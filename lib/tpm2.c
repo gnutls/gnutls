@@ -66,8 +66,9 @@ static int rsa_key_info(gnutls_privkey_t key, unsigned int flags, void *_info)
 			return 1;
 
 		default:
-			_gnutls_debug_log("tpm2: unsupported RSA sign algo %s\n",
-					  gnutls_sign_get_name(algo));
+			_gnutls_debug_log
+			    ("tpm2: unsupported RSA sign algo %s\n",
+			     gnutls_sign_get_name(algo));
 			return 0;
 		}
 	}
@@ -96,13 +97,13 @@ static int ec_key_info(gnutls_privkey_t key, unsigned int flags, void *_info)
 			return 1;
 
 		case GNUTLS_SIGN_ECDSA_SECP256R1_SHA256:
-			return tpm2_curve == 0x0003; /* TPM2_ECC_NIST_P256 */
+			return tpm2_curve == 0x0003;	/* TPM2_ECC_NIST_P256 */
 
 		case GNUTLS_SIGN_ECDSA_SECP384R1_SHA384:
-			return tpm2_curve == 0x0004; /* TPM2_ECC_NIST_P384 */
+			return tpm2_curve == 0x0004;	/* TPM2_ECC_NIST_P384 */
 
 		case GNUTLS_SIGN_ECDSA_SECP521R1_SHA512:
-			return tpm2_curve == 0x0005; /* TPM2_ECC_NIST_P521 */
+			return tpm2_curve == 0x0005;	/* TPM2_ECC_NIST_P521 */
 
 		default:
 			_gnutls_debug_log("tpm2: unsupported EC sign algo %s\n",
@@ -118,7 +119,7 @@ static int ec_key_info(gnutls_privkey_t key, unsigned int flags, void *_info)
 	return -1;
 }
 
-static int decode_data(asn1_node n, gnutls_datum_t *r)
+static int decode_data(asn1_node n, gnutls_datum_t * r)
 {
 	asn1_data_node_st d;
 	int lenlen;
@@ -144,7 +145,7 @@ static int decode_data(asn1_node n, gnutls_datum_t *r)
 	return 0;
 }
 
-int _gnutls_load_tpm2_key(gnutls_privkey_t pkey, const gnutls_datum_t *fdata)
+int _gnutls_load_tpm2_key(gnutls_privkey_t pkey, const gnutls_datum_t * fdata)
 {
 	gnutls_datum_t asn1, pubdata, privdata;
 	asn1_node tpmkey = NULL;
@@ -205,7 +206,7 @@ int _gnutls_load_tpm2_key(gnutls_privkey_t pkey, const gnutls_datum_t *fdata)
 	value_buflen = 5;
 	err = asn1_read_value(tpmkey, "parent", value_buf, &value_buflen);
 	if (err == ASN1_ELEMENT_NOT_FOUND) {
-		parent = 0x40000001; /* RH_OWNER */
+		parent = 0x40000001;	/* RH_OWNER */
 	} else if (err != ASN1_SUCCESS) {
 		_gnutls_debug_log("tpm2: failed to parse TPM2 key parent: %s\n",
 				  asn1_strerror(err));
@@ -218,14 +219,15 @@ int _gnutls_load_tpm2_key(gnutls_privkey_t pkey, const gnutls_datum_t *fdata)
 		if (value_buflen == 5) {
 			if (value_buf[0]) {
 				gnutls_assert();
-				_gnutls_debug_log("tpm2: failed to parse parent key\n");
+				_gnutls_debug_log
+				    ("tpm2: failed to parse parent key\n");
 				ret = GNUTLS_E_TPM_ERROR;
 				goto out_tpmkey;
 			}
 			/* Skip the leading zero */
 			i++;
 		}
-		for ( ; i < value_buflen; i++) {
+		for (; i < value_buflen; i++) {
 			parent <<= 8;
 			parent |= value_buf[i];
 		}
@@ -285,7 +287,7 @@ int _gnutls_load_tpm2_key(gnutls_privkey_t pkey, const gnutls_datum_t *fdata)
 	}
 
 	ret = 0;
-	info = NULL; /* part of pkey now */
+	info = NULL;		/* part of pkey now */
 
  out_tpmkey:
 	asn1_delete_structure(&tpmkey);

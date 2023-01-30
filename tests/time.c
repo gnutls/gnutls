@@ -24,7 +24,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -45,50 +45,50 @@ struct time_tests_st {
 
 struct time_tests_st general_time_tests[] = {
 	{
-		.time_str = "20190520133237Z",
-		.utime = 1558359157
-	},
+	 .time_str = "20190520133237Z",
+	 .utime = 1558359157},
 	{
-		.time_str = "20170101000000Z",
-		.utime = 1483228800
-	},
+	 .time_str = "20170101000000Z",
+	 .utime = 1483228800},
 	{
-		.time_str = "19700101000000Z",
-		.utime = 0
-	},
+	 .time_str = "19700101000000Z",
+	 .utime = 0},
 };
 
 struct time_tests_st utc_time_tests[] = {
 	{
-		.time_str = "190520133237",
-		.utime = 1558359157
-	},
+	 .time_str = "190520133237",
+	 .utime = 1558359157},
 	{
-		.time_str = "170101000000Z",
-		.utime = 1483228800
-	},
+	 .time_str = "170101000000Z",
+	 .utime = 1483228800},
 };
-
 
 void doit(void)
 {
 	time_t t;
 	unsigned i;
 
-	for (i=0;i<sizeof(general_time_tests)/sizeof(general_time_tests[0]);i++) {
-		t = _gnutls_x509_generalTime2gtime(general_time_tests[i].time_str);
+	for (i = 0;
+	     i < sizeof(general_time_tests) / sizeof(general_time_tests[0]);
+	     i++) {
+		t = _gnutls_x509_generalTime2gtime(general_time_tests
+						   [i].time_str);
 		if (t != general_time_tests[i].utime) {
-			fprintf(stderr, "%s: Error in GeneralTime conversion\n", general_time_tests[i].time_str);
-			fprintf(stderr, "got: %lu, expected: %lu\n", (unsigned long)t, general_time_tests[i].utime);
+			fprintf(stderr, "%s: Error in GeneralTime conversion\n",
+				general_time_tests[i].time_str);
+			fprintf(stderr, "got: %lu, expected: %lu\n",
+				(unsigned long)t, general_time_tests[i].utime);
 		}
 	}
 
-	for (i=0;i<sizeof(utc_time_tests)/sizeof(utc_time_tests[0]);i++) {
+	for (i = 0; i < sizeof(utc_time_tests) / sizeof(utc_time_tests[0]); i++) {
 		t = _gnutls_utcTime2gtime(utc_time_tests[i].time_str);
 		if (t != utc_time_tests[i].utime) {
-			fprintf(stderr, "%s: Error in utcTime conversion\n", utc_time_tests[i].time_str);
-			fprintf(stderr, "got: %lu, expected: %lu\n", (unsigned long)t, utc_time_tests[i].utime);
+			fprintf(stderr, "%s: Error in utcTime conversion\n",
+				utc_time_tests[i].time_str);
+			fprintf(stderr, "got: %lu, expected: %lu\n",
+				(unsigned long)t, utc_time_tests[i].utime);
 		}
 	}
 }
-

@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdlib.h>
@@ -34,12 +34,12 @@ int main(void)
 
 #else
 
-#include <stdio.h>
-#include <string.h>
-#include <errno.h>
-#include <gnutls/gnutls.h>
-#include "utils.h"
-#include "eagain-common.h"
+# include <stdio.h>
+# include <string.h>
+# include <errno.h>
+# include <gnutls/gnutls.h>
+# include "utils.h"
+# include "eagain-common.h"
 
 /* This test checks whether the server switching certificates is detected
  * by the client */
@@ -51,49 +51,44 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "%s|<%d>| %s", side, level, str);
 }
 
-#include "cert-common.h"
+# include "cert-common.h"
 
+# define VERIF_TEST1 "CEqjUZBlkQCocfOR0E4AsPZKOFYPGjKFMHW7KDcnpE4sH4.iGMbkygb/bViRNjskF9/TQdD46Mvlt6pLs5MZoTn8mO3G.RGyXdWuIrhnVn29p41Cpc5RhTLaeUm3asW6LF60VTKnGERC0eB37xZUsaTpzmaTNdD4mOoYCN3bD9Y"
+# define VERIF_TEST2 "EEbMk8afwXz/0oV5Yo9To7V6c6xkYid8meqEByxM33XjM4xeKUjeN7Ft2.xvjo4S6Js7mEs9Ov.uZtBp3ugCAbvl6G7bdfYF6z.tAD4mNYhH7iI7SwQy.ntmbJ3uJ1qB5MHW7ajSdWvA7l3SSsyyAVMe9HVQcxZKJRf4mzwm06s"
 
-#define VERIF_TEST1 "CEqjUZBlkQCocfOR0E4AsPZKOFYPGjKFMHW7KDcnpE4sH4.iGMbkygb/bViRNjskF9/TQdD46Mvlt6pLs5MZoTn8mO3G.RGyXdWuIrhnVn29p41Cpc5RhTLaeUm3asW6LF60VTKnGERC0eB37xZUsaTpzmaTNdD4mOoYCN3bD9Y"
-#define VERIF_TEST2 "EEbMk8afwXz/0oV5Yo9To7V6c6xkYid8meqEByxM33XjM4xeKUjeN7Ft2.xvjo4S6Js7mEs9Ov.uZtBp3ugCAbvl6G7bdfYF6z.tAD4mNYhH7iI7SwQy.ntmbJ3uJ1qB5MHW7ajSdWvA7l3SSsyyAVMe9HVQcxZKJRf4mzwm06s"
+# define SALT_TEST1 "3a3xX3Myzb9YJn5X0R7sbx"
+# define SALT_TEST2 "25J9FArvl1ZDrTSFsvZ4Jb"
 
-#define SALT_TEST1 "3a3xX3Myzb9YJn5X0R7sbx"
-#define SALT_TEST2 "25J9FArvl1ZDrTSFsvZ4Jb"
-
-#define PRIME "Ewl2hcjiutMd3Fu2lgFnUXWSc67TVyy2vwYCKoS9MLsrdJVT9RgWTCuEqWJrfB6uE3LsE9GkOlaZabS7M29sj5TnzUqOLJMjiwEzArfiLr9WbMRANlF68N5AVLcPWvNx6Zjl3m5Scp0BzJBz9TkgfhzKJZ.WtP3Mv/67I/0wmRZ"
-gnutls_datum_t tprime = 
-{
-	.data = (void*)PRIME,
-	.size = sizeof(PRIME)-1
+# define PRIME "Ewl2hcjiutMd3Fu2lgFnUXWSc67TVyy2vwYCKoS9MLsrdJVT9RgWTCuEqWJrfB6uE3LsE9GkOlaZabS7M29sj5TnzUqOLJMjiwEzArfiLr9WbMRANlF68N5AVLcPWvNx6Zjl3m5Scp0BzJBz9TkgfhzKJZ.WtP3Mv/67I/0wmRZ"
+gnutls_datum_t tprime = {
+	.data = (void *)PRIME,
+	.size = sizeof(PRIME) - 1
 };
 
-gnutls_datum_t test1_verif = 
-{
-	.data = (void*)VERIF_TEST1,
-	.size = sizeof(VERIF_TEST1)-1
+gnutls_datum_t test1_verif = {
+	.data = (void *)VERIF_TEST1,
+	.size = sizeof(VERIF_TEST1) - 1
 };
 
-gnutls_datum_t test2_verif = 
-{
-	.data = (void*)VERIF_TEST2,
-	.size = sizeof(VERIF_TEST2)-1
+gnutls_datum_t test2_verif = {
+	.data = (void *)VERIF_TEST2,
+	.size = sizeof(VERIF_TEST2) - 1
 };
 
-gnutls_datum_t test1_salt = 
-{
-	.data = (void*)SALT_TEST1,
-	.size = sizeof(SALT_TEST1)-1
+gnutls_datum_t test1_salt = {
+	.data = (void *)SALT_TEST1,
+	.size = sizeof(SALT_TEST1) - 1
 };
 
-gnutls_datum_t test2_salt = 
-{
-	.data = (void*)SALT_TEST2,
-	.size = sizeof(SALT_TEST2)-1
+gnutls_datum_t test2_salt = {
+	.data = (void *)SALT_TEST2,
+	.size = sizeof(SALT_TEST2) - 1
 };
 
 static int
 srpfunc(gnutls_session_t session, const char *username,
-	gnutls_datum_t *salt, gnutls_datum_t *verifier, gnutls_datum_t *generator, gnutls_datum_t *prime)
+	gnutls_datum_t * salt, gnutls_datum_t * verifier,
+	gnutls_datum_t * generator, gnutls_datum_t * prime)
 {
 	int ret;
 	if (debug)
@@ -111,7 +106,6 @@ srpfunc(gnutls_session_t session, const char *username,
 		ret = gnutls_srp_base64_decode2(&test1_verif, verifier);
 		if (ret < 0)
 			fail("error in gnutls_srp_base64_decode2 -verif\n");
-
 
 		ret = gnutls_srp_base64_decode2(&test1_salt, salt);
 		if (ret < 0)
@@ -131,15 +125,15 @@ srpfunc(gnutls_session_t session, const char *username,
 	return 0;
 }
 
-static void try(const char *prio, gnutls_kx_algorithm_t kx, unsigned allow_change)
+static void try(const char *prio, gnutls_kx_algorithm_t kx,
+		unsigned allow_change)
 {
 	int ret;
 	/* Server stuff. */
 	gnutls_srp_server_credentials_t server_srp_cred;
 	gnutls_certificate_credentials_t server_x509_cred;
 	gnutls_dh_params_t dh_params;
-	const gnutls_datum_t p3 =
-	    { (unsigned char *) pkcs3, strlen(pkcs3) };
+	const gnutls_datum_t p3 = { (unsigned char *)pkcs3, strlen(pkcs3) };
 	gnutls_session_t server;
 	int sret = GNUTLS_E_AGAIN;
 	/* Client stuff. */
@@ -169,17 +163,14 @@ static void try(const char *prio, gnutls_kx_algorithm_t kx, unsigned allow_chang
 	gnutls_srp_set_server_credentials_function(server_srp_cred, srpfunc);
 
 	if (allow_change)
-		gnutls_init(&server, GNUTLS_SERVER|GNUTLS_ALLOW_ID_CHANGE);
+		gnutls_init(&server, GNUTLS_SERVER | GNUTLS_ALLOW_ID_CHANGE);
 	else
 		gnutls_init(&server, GNUTLS_SERVER);
-	gnutls_credentials_set(server, GNUTLS_CRD_SRP,
-				server_srp_cred);
+	gnutls_credentials_set(server, GNUTLS_CRD_SRP, server_srp_cred);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-				server_x509_cred);
+			       server_x509_cred);
 
-	gnutls_priority_set_direct(server,
-				   prio,
-				   NULL);
+	gnutls_priority_set_direct(server, prio, NULL);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
@@ -204,12 +195,14 @@ static void try(const char *prio, gnutls_kx_algorithm_t kx, unsigned allow_chang
 	if (ret < 0)
 		exit(1);
 
-	ret = gnutls_certificate_set_x509_trust_mem(client_x509_cred, &ca_cert, GNUTLS_X509_FMT_PEM);
+	ret =
+	    gnutls_certificate_set_x509_trust_mem(client_x509_cred, &ca_cert,
+						  GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);
 
 	ret = gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-				client_x509_cred);
+				     client_x509_cred);
 	if (ret < 0)
 		exit(1);
 
@@ -224,9 +217,7 @@ static void try(const char *prio, gnutls_kx_algorithm_t kx, unsigned allow_chang
 	HANDSHAKE(client, server);
 
 	if (gnutls_kx_get(client) != kx) {
-		fail("got unexpected key exchange algorithm: %s (expected %s)\n",
-			gnutls_kx_get_name(gnutls_kx_get(client)),
-			gnutls_kx_get_name(kx));
+		fail("got unexpected key exchange algorithm: %s (expected %s)\n", gnutls_kx_get_name(gnutls_kx_get(client)), gnutls_kx_get_name(kx));
 		exit(1);
 	}
 
@@ -238,7 +229,8 @@ static void try(const char *prio, gnutls_kx_algorithm_t kx, unsigned allow_chang
 	if (allow_change) {
 		HANDSHAKE(client, server);
 	} else {
-		HANDSHAKE_EXPECT(client, server, GNUTLS_E_AGAIN, GNUTLS_E_SESSION_USER_ID_CHANGED);
+		HANDSHAKE_EXPECT(client, server, GNUTLS_E_AGAIN,
+				 GNUTLS_E_SESSION_USER_ID_CHANGED);
 	}
 
 	gnutls_deinit(client);
@@ -259,13 +251,15 @@ void doit(void)
 	/* Allow change of ID */
 	try("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP", GNUTLS_KX_SRP, 0);
 	reset_buffers();
-	try("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP-RSA", GNUTLS_KX_SRP_RSA, 0);
+	try("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP-RSA", GNUTLS_KX_SRP_RSA,
+	    0);
 	reset_buffers();
 
 	/* Prohibit (default) change of ID */
 	try("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP", GNUTLS_KX_SRP, 1);
 	reset_buffers();
-	try("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP-RSA", GNUTLS_KX_SRP_RSA, 1);
+	try("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP-RSA", GNUTLS_KX_SRP_RSA,
+	    1);
 	reset_buffers();
 	gnutls_global_deinit();
 }

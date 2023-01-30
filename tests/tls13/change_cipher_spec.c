@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,21 +35,21 @@ int main(void)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/dtls.h>
-#include <signal.h>
-#include <assert.h>
-#include <errno.h>
+# include <string.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/dtls.h>
+# include <signal.h>
+# include <assert.h>
+# include <errno.h>
 
-#include "cert-common.h"
-#include "utils.h"
+# include "cert-common.h"
+# include "utils.h"
 
 /* This program tests whether the ChangeCipherSpec message
  * is ignored during handshake.
@@ -69,7 +69,8 @@ static unsigned client_sent_ccs = 0;
 static unsigned server_sent_ccs = 0;
 
 static int cli_hsk_callback(gnutls_session_t session, unsigned int htype,
-	unsigned post, unsigned int incoming, const gnutls_datum_t *msg);
+			    unsigned post, unsigned int incoming,
+			    const gnutls_datum_t * msg);
 
 static void client(int fd, unsigned ccs_check)
 {
@@ -91,24 +92,26 @@ static void client(int fd, unsigned ccs_check)
 
 	/* Initialize TLS session
 	 */
-	gnutls_init(&session, GNUTLS_CLIENT|GNUTLS_POST_HANDSHAKE_AUTH);
+	gnutls_init(&session, GNUTLS_CLIENT | GNUTLS_POST_HANDSHAKE_AUTH);
 
 	gnutls_session_set_ptr(session, &ccs_check);
 	gnutls_handshake_set_timeout(session, get_timeout());
 	if (ccs_check) {
-		gnutls_handshake_set_hook_function(session, GNUTLS_HANDSHAKE_ANY,
+		gnutls_handshake_set_hook_function(session,
+						   GNUTLS_HANDSHAKE_ANY,
 						   GNUTLS_HOOK_PRE,
 						   cli_hsk_callback);
 	}
 
-	ret = gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:+VERS-TLS1.0", NULL);
+	ret =
+	    gnutls_priority_set_direct(session,
+				       "NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:+VERS-TLS1.0",
+				       NULL);
 	if (ret < 0)
 		fail("cannot set TLS 1.3 priorities\n");
 
-
 	gnutls_certificate_set_x509_key_mem(x509_cred, &cli_ca3_cert,
-					    &cli_ca3_key,
-					    GNUTLS_X509_FMT_PEM);
+					    &cli_ca3_key, GNUTLS_X509_FMT_PEM);
 
 	/* put the anonymous credentials to the current session
 	 */
@@ -132,12 +135,13 @@ static void client(int fd, unsigned ccs_check)
 	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 	if (ret < 0)
-		fail("client: recv did not succeed as expected: %s\n", gnutls_strerror(ret));
+		fail("client: recv did not succeed as expected: %s\n",
+		     gnutls_strerror(ret));
 
 	/* send change cipher spec, this should fail in the server */
 	do {
 		ret = send(fd, "\x14\x03\x03\x00\x01\x01", 6, 0);
-	} while(ret == -1 && (errno == EINTR || errno == EAGAIN));
+	} while (ret == -1 && (errno == EINTR || errno == EAGAIN));
 
 	close(fd);
 
@@ -155,7 +159,8 @@ static void client(int fd, unsigned ccs_check)
 }
 
 static int cli_hsk_callback(gnutls_session_t session, unsigned int htype,
-	unsigned post, unsigned int incoming, const gnutls_datum_t *msg)
+			    unsigned post, unsigned int incoming,
+			    const gnutls_datum_t * msg)
 {
 	unsigned *p;
 	unsigned ccs_check;
@@ -170,22 +175,24 @@ static int cli_hsk_callback(gnutls_session_t session, unsigned int htype,
 	if (htype == GNUTLS_HANDSHAKE_CLIENT_HELLO && !incoming) {
 		hello_received = 1;
 
-		gnutls_handshake_set_hook_function(session, GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC,
+		gnutls_handshake_set_hook_function(session,
+						   GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC,
 						   GNUTLS_HOOK_PRE,
 						   cli_hsk_callback);
 	}
 
-	if (htype == GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC && !incoming && hello_received) {
+	if (htype == GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC && !incoming
+	    && hello_received) {
 		client_sent_ccs++;
 		assert(msg->size == 1 && msg->data[0] == 0x01);
 	}
-
 
 	return 0;
 }
 
 static int hsk_callback(gnutls_session_t session, unsigned int htype,
-	unsigned post, unsigned int incoming, const gnutls_datum_t *msg)
+			unsigned post, unsigned int incoming,
+			const gnutls_datum_t * msg)
 {
 	int ret;
 	int fd;
@@ -207,8 +214,8 @@ static int hsk_callback(gnutls_session_t session, unsigned int htype,
 		/* send change cipher spec */
 		do {
 			ret = send(fd, "\x14\x03\x03\x00\x01\x01", 6, 0);
-		} while(ret == -1 && (errno == EINTR || errno == EAGAIN));
-	} else { /* checking whether server received it */
+		} while (ret == -1 && (errno == EINTR || errno == EAGAIN));
+	} else {		/* checking whether server received it */
 		if (htype == GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC && !incoming) {
 			server_sent_ccs++;
 			assert(msg->size == 1 && msg->data[0] == 0x01);
@@ -238,26 +245,28 @@ static void server(int fd, unsigned ccs_check)
 
 	gnutls_certificate_allocate_credentials(&x509_cred);
 	gnutls_certificate_set_x509_key_mem(x509_cred, &server_cert,
-					    &server_key,
-					    GNUTLS_X509_FMT_PEM);
+					    &server_key, GNUTLS_X509_FMT_PEM);
 
 	gnutls_init(&session, GNUTLS_SERVER);
 
 	gnutls_handshake_set_timeout(session, get_timeout());
 
 	if (ccs_check)
-		gnutls_handshake_set_hook_function(session, GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC,
+		gnutls_handshake_set_hook_function(session,
+						   GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC,
 						   GNUTLS_HOOK_PRE,
 						   hsk_callback);
 	else
-		gnutls_handshake_set_hook_function(session, GNUTLS_HANDSHAKE_ANY,
+		gnutls_handshake_set_hook_function(session,
+						   GNUTLS_HANDSHAKE_ANY,
 						   GNUTLS_HOOK_PRE,
 						   hsk_callback);
 
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	assert(gnutls_priority_set_direct(session, "NORMAL:+VERS-TLS1.3", NULL) >= 0);
+	assert(gnutls_priority_set_direct(session, "NORMAL:+VERS-TLS1.3", NULL)
+	       >= 0);
 	gnutls_session_set_ptr(session, &ccs_check);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);

@@ -36,7 +36,6 @@
 #include <num.h>
 #include <random.h>
 
-
 /* this function parses passwd.psk file. Format is:
  * string(username):hex(passwd)
  */
@@ -64,7 +63,7 @@ static int pwd_put_values(gnutls_datum_t * psk, char *str)
 	if (p[len - 1] == '\n' || p[len - 1] == ' ')
 		len--;
 
-	tmp.data = (void*)p;
+	tmp.data = (void *)p;
 	tmp.size = len;
 	ret = gnutls_hex_decode2(&tmp, psk);
 	if (ret < 0) {
@@ -75,7 +74,7 @@ static int pwd_put_values(gnutls_datum_t * psk, char *str)
 	return 0;
 }
 
-static bool username_matches(const gnutls_datum_t *username,
+static bool username_matches(const gnutls_datum_t * username,
 			     const char *line, size_t line_size)
 {
 	int retval;
@@ -102,25 +101,28 @@ static bool username_matches(const gnutls_datum_t *username,
 
 	/* if format is in hex, e.g. #FAFAFA */
 	if (line[0] == '#' && line_size > 1) {
-		hexline.data = (void *) &line[1];
+		hexline.data = (void *)&line[1];
 		hexline.size = i - 1;
 
 		if (gnutls_hex_decode2(&hexline, &hex_username) < 0)
 			return gnutls_assert_val(0);
 
 		if (hex_username.size == username->size)
-			retval = memcmp(username->data, hex_username.data, username->size);
+			retval =
+			    memcmp(username->data, hex_username.data,
+				   username->size);
 		else
 			retval = -1;
 
 		_gnutls_free_datum(&hex_username);
 	} else {
-		retval = strncmp((const char *) username->data, line, MAX(i, username->size));
+		retval =
+		    strncmp((const char *)username->data, line,
+			    MAX(i, username->size));
 	}
 
 	return (retval == 0);
 }
-
 
 /* Randomizes the given password entry. It actually sets a random password. 
  * Returns 0 on success.
@@ -137,7 +139,7 @@ static int _randomize_psk(gnutls_datum_t * psk)
 
 	psk->size = 16;
 
-	ret = gnutls_rnd(GNUTLS_RND_NONCE, (char *) psk->data, 16);
+	ret = gnutls_rnd(GNUTLS_RND_NONCE, (char *)psk->data, 16);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -160,7 +162,7 @@ _gnutls_psk_pwd_find_entry(gnutls_session_t session,
 	size_t line_size = 0;
 	int ret;
 	gnutls_datum_t username_datum = {
-		.data = (unsigned char *) username,
+		.data = (unsigned char *)username,
 		.size = username_len
 	};
 
@@ -230,7 +232,7 @@ _gnutls_psk_pwd_find_entry(gnutls_session_t session,
 	}
 
 	ret = 0;
-cleanup:
+ cleanup:
 	if (fp != NULL)
 		fclose(fp);
 
@@ -266,8 +268,7 @@ int _gnutls_find_psk_key(gnutls_session_t session,
 
 		*free = 1;
 	} else
-		return
-		    gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
+		return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
 
 	return 0;
 }

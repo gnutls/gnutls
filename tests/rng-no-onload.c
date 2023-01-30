@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -46,8 +46,8 @@ static int _rnd_called = 0;
  * Normally it shouldn't be called to prevent any blocking due to getrandom()
  * calls.
  */
-int __attribute__ ((visibility ("protected")))
-gnutls_rnd(gnutls_rnd_level_t level, void *data, size_t len)
+int __attribute__((visibility("protected")))
+    gnutls_rnd(gnutls_rnd_level_t level, void *data, size_t len)
 {
 	_rnd_called = 1;
 

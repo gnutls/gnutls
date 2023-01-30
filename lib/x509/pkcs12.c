@@ -39,7 +39,6 @@
 #include <random.h>
 #include "intprops.h"
 
-
 /* Decodes the PKCS #12 auth_safe, and returns the allocated raw data,
  * which holds them. Returns an asn1_node of authenticatedSafe.
  */
@@ -54,8 +53,7 @@ _decode_pkcs12_auth_safe(asn1_node pkcs12, asn1_node * authen_safe,
 	char error_str[ASN1_MAX_ERROR_DESCRIPTION_SIZE];
 
 	len = sizeof(oid) - 1;
-	result =
-	    asn1_read_value(pkcs12, "authSafe.contentType", oid, &len);
+	result = asn1_read_value(pkcs12, "authSafe.contentType", oid, &len);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
@@ -63,8 +61,7 @@ _decode_pkcs12_auth_safe(asn1_node pkcs12, asn1_node * authen_safe,
 
 	if (strcmp(oid, DATA_OID) != 0) {
 		gnutls_assert();
-		_gnutls_debug_log("Unknown PKCS12 Content OID '%s'\n",
-				  oid);
+		_gnutls_debug_log("Unknown PKCS12 Content OID '%s'\n", oid);
 		return GNUTLS_E_UNKNOWN_PKCS_CONTENT_TYPE;
 	}
 
@@ -91,8 +88,7 @@ _decode_pkcs12_auth_safe(asn1_node pkcs12, asn1_node * authen_safe,
 	}
 
 	result =
-	    asn1_der_decoding(&c2, auth_safe.data, auth_safe.size,
-			      error_str);
+	    asn1_der_decoding(&c2, auth_safe.data, auth_safe.size, error_str);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		_gnutls_debug_log("DER error: %s\n", error_str);
@@ -114,7 +110,7 @@ _decode_pkcs12_auth_safe(asn1_node pkcs12, asn1_node * authen_safe,
 
 	return 0;
 
-      cleanup:
+ cleanup:
 	if (c2)
 		asn1_delete_structure(&c2);
 	_gnutls_free_datum(&auth_safe);
@@ -123,14 +119,13 @@ _decode_pkcs12_auth_safe(asn1_node pkcs12, asn1_node * authen_safe,
 
 static int pkcs12_reinit(gnutls_pkcs12_t pkcs12)
 {
-int result;
+	int result;
 
 	if (pkcs12->pkcs12)
 		asn1_delete_structure(&pkcs12->pkcs12);
 
 	result = asn1_create_element(_gnutls_get_pkix(),
-					 "PKIX1.pkcs-12-PFX",
-					 &pkcs12->pkcs12);
+				     "PKIX1.pkcs-12-PFX", &pkcs12->pkcs12);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
@@ -254,12 +249,11 @@ gnutls_pkcs12_import(gnutls_pkcs12_t pkcs12,
 
 	return 0;
 
-      cleanup:
+ cleanup:
 	if (need_free)
 		_gnutls_free_datum(&_data);
 	return result;
 }
-
 
 /**
  * gnutls_pkcs12_export:
@@ -284,7 +278,7 @@ gnutls_pkcs12_import(gnutls_pkcs12_t pkcs12,
 int
 gnutls_pkcs12_export(gnutls_pkcs12_t pkcs12,
 		     gnutls_x509_crt_fmt_t format, void *output_data,
-		     size_t * output_data_size)
+		     size_t *output_data_size)
 {
 	int ret;
 
@@ -337,8 +331,7 @@ gnutls_pkcs12_export2(gnutls_pkcs12_t pkcs12,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	ret = _gnutls_x509_export_int2(pkcs12->pkcs12, format, PEM_PKCS12,
-				       out);
+	ret = _gnutls_x509_export_int2(pkcs12->pkcs12, format, PEM_PKCS12, out);
 	if (ret < 0) {
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 	} else {
@@ -411,8 +404,7 @@ _pkcs12_decode_safe_contents(const gnutls_datum_t * content,
 		goto cleanup;
 	}
 
-	result =
-	    asn1_der_decoding(&c2, content->data, content->size, NULL);
+	result = asn1_der_decoding(&c2, content->data, content->size, NULL);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
@@ -457,8 +449,7 @@ _pkcs12_decode_safe_contents(const gnutls_datum_t * content,
 		snprintf(root, sizeof(root), "?%u.bagValue", i + 1);
 
 		result =
-		    _gnutls_x509_read_value(c2, root,
-					    &bag->element[i].data);
+		    _gnutls_x509_read_value(c2, root, &bag->element[i].data);
 		if (result < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -486,8 +477,7 @@ _pkcs12_decode_safe_contents(const gnutls_datum_t * content,
 		snprintf(root, sizeof(root), "?%u.bagAttributes", i + 1);
 
 		result = asn1_number_of_elements(c2, root, &attributes);
-		if (result != ASN1_SUCCESS
-		    && result != ASN1_ELEMENT_NOT_FOUND) {
+		if (result != ASN1_SUCCESS && result != ASN1_ELEMENT_NOT_FOUND) {
 			gnutls_assert();
 			result = _gnutls_asn2err(result);
 			goto cleanup;
@@ -500,8 +490,7 @@ _pkcs12_decode_safe_contents(const gnutls_datum_t * content,
 			for (j = 0; j < attributes; j++) {
 
 				snprintf(root, sizeof(root),
-					 "?%u.bagAttributes.?%d", i + 1,
-					 j + 1);
+					 "?%u.bagAttributes.?%d", i + 1, j + 1);
 
 				result =
 				    _gnutls_x509_decode_and_read_attribute
@@ -529,15 +518,20 @@ _pkcs12_decode_safe_contents(const gnutls_datum_t * content,
 						continue;
 					}
 
-					_gnutls_free_datum(&bag->element[i].local_key_id);
-					bag->element[i].local_key_id.data = t.data;
-					bag->element[i].local_key_id.size = t.size;
-				} else if (strcmp(oid, FRIENDLY_NAME_OID) == 0 && bag->element[i].friendly_name == NULL) {
+					_gnutls_free_datum(&bag->element
+							   [i].local_key_id);
+					bag->element[i].local_key_id.data =
+					    t.data;
+					bag->element[i].local_key_id.size =
+					    t.size;
+				} else if (strcmp(oid, FRIENDLY_NAME_OID) == 0
+					   && bag->element[i].friendly_name ==
+					   NULL) {
 					result =
 					    _gnutls_x509_decode_string
 					    (ASN1_ETYPE_BMP_STRING,
-					     attr_val.data, attr_val.size,
-					     &t, 1);
+					     attr_val.data, attr_val.size, &t,
+					     1);
 
 					_gnutls_free_datum(&attr_val);
 					if (result < 0) {
@@ -548,8 +542,10 @@ _pkcs12_decode_safe_contents(const gnutls_datum_t * content,
 						continue;
 					}
 
-					gnutls_free(bag->element[i].friendly_name);
-					bag->element[i].friendly_name = (char *) t.data;
+					gnutls_free(bag->
+						    element[i].friendly_name);
+					bag->element[i].friendly_name =
+					    (char *)t.data;
 				} else {
 					_gnutls_free_datum(&attr_val);
 					_gnutls_debug_log
@@ -558,24 +554,21 @@ _pkcs12_decode_safe_contents(const gnutls_datum_t * content,
 				}
 			}
 
-
 		bag->element[i].type = bag_type;
 
 	}
 
 	result = 0;
 
-      cleanup:
+ cleanup:
 	if (c2)
 		asn1_delete_structure(&c2);
 	return result;
 
 }
 
-
 static int
-_parse_safe_contents(asn1_node sc, const char *sc_name,
-		     gnutls_pkcs12_bag_t bag)
+_parse_safe_contents(asn1_node sc, const char *sc_name, gnutls_pkcs12_bag_t bag)
 {
 	gnutls_datum_t content = { NULL, 0 };
 	int result;
@@ -601,11 +594,10 @@ _parse_safe_contents(asn1_node sc, const char *sc_name,
 
 	return 0;
 
-      cleanup:
+ cleanup:
 	_gnutls_free_datum(&content);
 	return result;
 }
-
 
 /**
  * gnutls_pkcs12_get_bag:
@@ -622,8 +614,7 @@ _parse_safe_contents(asn1_node sc, const char *sc_name,
  *   negative error value.
  **/
 int
-gnutls_pkcs12_get_bag(gnutls_pkcs12_t pkcs12,
-		      int indx, gnutls_pkcs12_bag_t bag)
+gnutls_pkcs12_get_bag(gnutls_pkcs12_t pkcs12, int indx, gnutls_pkcs12_bag_t bag)
 {
 	asn1_node c2 = NULL;
 	int result, len;
@@ -685,7 +676,7 @@ gnutls_pkcs12_get_bag(gnutls_pkcs12_t pkcs12,
 
 	result = 0;
 
-      cleanup:
+ cleanup:
 	if (c2)
 		asn1_delete_structure(&c2);
 	return result;
@@ -710,8 +701,7 @@ static int create_empty_pfx(asn1_node pkcs12)
 
 	/* Write the content type of the data
 	 */
-	result =
-	    asn1_write_value(pkcs12, "authSafe.contentType", DATA_OID, 1);
+	result = asn1_write_value(pkcs12, "authSafe.contentType", DATA_OID, 1);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
@@ -741,7 +731,7 @@ static int create_empty_pfx(asn1_node pkcs12)
 
 	return 0;
 
-      cleanup:
+ cleanup:
 	asn1_delete_structure(&c2);
 	return result;
 
@@ -774,8 +764,7 @@ int gnutls_pkcs12_set_bag(gnutls_pkcs12_t pkcs12, gnutls_pkcs12_bag_t bag)
 	 * case generate an empty PFX.
 	 */
 	result =
-	    asn1_read_value(pkcs12->pkcs12, "authSafe.content", &null,
-			    &dum);
+	    asn1_read_value(pkcs12->pkcs12, "authSafe.content", &null, &dum);
 	if (result == ASN1_VALUE_NOT_FOUND) {
 		result = create_empty_pfx(pkcs12->pkcs12);
 		if (result < 0) {
@@ -813,11 +802,9 @@ int gnutls_pkcs12_set_bag(gnutls_pkcs12_t pkcs12, gnutls_pkcs12_bag_t bag)
 
 	if (enc)
 		result =
-		    asn1_write_value(c2, "?LAST.contentType", ENC_DATA_OID,
-				     1);
+		    asn1_write_value(c2, "?LAST.contentType", ENC_DATA_OID, 1);
 	else
-		result =
-		    asn1_write_value(c2, "?LAST.contentType", DATA_OID, 1);
+		result = asn1_write_value(c2, "?LAST.contentType", DATA_OID, 1);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
@@ -848,7 +835,6 @@ int gnutls_pkcs12_set_bag(gnutls_pkcs12_t pkcs12, gnutls_pkcs12_bag_t bag)
 
 	asn1_delete_structure(&safe_cont);
 
-
 	/* Step 5. Re-encode and copy the AuthenticatedSafe into the pkcs12
 	 * structure.
 	 */
@@ -864,7 +850,7 @@ int gnutls_pkcs12_set_bag(gnutls_pkcs12_t pkcs12, gnutls_pkcs12_bag_t bag)
 
 	return 0;
 
-      cleanup:
+ cleanup:
 	asn1_delete_structure(&c2);
 	asn1_delete_structure(&safe_cont);
 	return result;
@@ -921,7 +907,8 @@ _gnutls_pkcs12_gost_string_to_key(gnutls_mac_algorithm_t algo,
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
-int gnutls_pkcs12_generate_mac2(gnutls_pkcs12_t pkcs12, gnutls_mac_algorithm_t mac, const char *pass)
+int gnutls_pkcs12_generate_mac2(gnutls_pkcs12_t pkcs12,
+				gnutls_mac_algorithm_t mac, const char *pass)
 {
 	uint8_t salt[8], key[MAX_HASH_SIZE];
 	int result;
@@ -984,9 +971,7 @@ int gnutls_pkcs12_generate_mac2(gnutls_pkcs12_t pkcs12, gnutls_mac_algorithm_t m
 							   salt,
 							   sizeof(salt),
 							   iter,
-							   pass,
-							   key_len,
-							   key);
+							   pass, key_len, key);
 	} else
 #endif
 		result = _gnutls_pkcs12_string_to_key(me, 3 /*MAC*/,
@@ -1008,8 +993,7 @@ int gnutls_pkcs12_generate_mac2(gnutls_pkcs12_t pkcs12, gnutls_mac_algorithm_t m
 
 	/* MAC the data
 	 */
-	result = _gnutls_mac_init(&td1, me,
-				  key, key_len);
+	result = _gnutls_mac_init(&td1, me, key, key_len);
 	if (result < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -1019,7 +1003,6 @@ int gnutls_pkcs12_generate_mac2(gnutls_pkcs12_t pkcs12, gnutls_mac_algorithm_t m
 	_gnutls_free_datum(&tmp);
 
 	_gnutls_mac_deinit(&td1, mac_out);
-
 
 	result =
 	    asn1_write_value(pkcs12->pkcs12, "macData.mac.digest", mac_out,
@@ -1032,8 +1015,7 @@ int gnutls_pkcs12_generate_mac2(gnutls_pkcs12_t pkcs12, gnutls_mac_algorithm_t m
 
 	result =
 	    asn1_write_value(pkcs12->pkcs12,
-			     "macData.mac.digestAlgorithm.parameters",
-			     NULL, 0);
+			     "macData.mac.digestAlgorithm.parameters", NULL, 0);
 	if (result != ASN1_SUCCESS && result != ASN1_ELEMENT_NOT_FOUND) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
@@ -1054,7 +1036,7 @@ int gnutls_pkcs12_generate_mac2(gnutls_pkcs12_t pkcs12, gnutls_mac_algorithm_t m
 	_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_NOT_APPROVED);
 	return 0;
 
-      cleanup:
+ cleanup:
 	_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 	_gnutls_free_datum(&tmp);
 	return result;
@@ -1094,7 +1076,8 @@ int gnutls_pkcs12_verify_mac(gnutls_pkcs12_t pkcs12, const char *pass)
 	int len;
 	mac_hd_st td1;
 	gnutls_datum_t tmp = { NULL, 0 }, salt = {
-	NULL, 0};
+		NULL, 0
+	};
 	uint8_t mac_output[MAX_HASH_SIZE];
 	uint8_t mac_output_orig[MAX_HASH_SIZE];
 	gnutls_mac_algorithm_t algo;
@@ -1112,16 +1095,15 @@ int gnutls_pkcs12_verify_mac(gnutls_pkcs12_t pkcs12, const char *pass)
 	/* read the iterations
 	 */
 	result =
-	    _gnutls_x509_read_uint(pkcs12->pkcs12, "macData.iterations",
-				   &iter);
+	    _gnutls_x509_read_uint(pkcs12->pkcs12, "macData.iterations", &iter);
 	if (result < 0) {
 		iter = 1;	/* the default */
 	}
 
 	len = sizeof(oid);
 	result =
-	    asn1_read_value(pkcs12->pkcs12, "macData.mac.digestAlgorithm.algorithm",
-			    oid, &len);
+	    asn1_read_value(pkcs12->pkcs12,
+			    "macData.mac.digestAlgorithm.algorithm", oid, &len);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
@@ -1145,7 +1127,7 @@ int gnutls_pkcs12_verify_mac(gnutls_pkcs12_t pkcs12, const char *pass)
 	 */
 	result =
 	    _gnutls_x509_read_null_value(pkcs12->pkcs12, "macData.macSalt",
-				    &salt);
+					 &salt);
 	if (result < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -1155,8 +1137,7 @@ int gnutls_pkcs12_verify_mac(gnutls_pkcs12_t pkcs12, const char *pass)
 	 */
 	result = _gnutls_pkcs12_string_to_key(entry, 3 /*MAC*/,
 					      salt.data, salt.size,
-					      iter, pass,
-					      key_len, key);
+					      iter, pass, key_len, key);
 	if (result < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -1169,11 +1150,10 @@ int gnutls_pkcs12_verify_mac(gnutls_pkcs12_t pkcs12, const char *pass)
 		gnutls_assert();
 		goto cleanup;
 	}
-
 #if ENABLE_GOST
 	/* GOST PKCS#12 files use either PKCS#12 scheme or proprietary
 	 * HMAC-based scheme to generate MAC key. */
-pkcs12_try_gost:
+ pkcs12_try_gost:
 #endif
 
 	/* MAC the data
@@ -1241,7 +1221,6 @@ pkcs12_try_gost:
 	return result;
 }
 
-
 static int
 write_attributes(gnutls_pkcs12_bag_t bag, int elem,
 		 asn1_node c2, const char *where)
@@ -1284,8 +1263,7 @@ write_attributes(gnutls_pkcs12_bag_t bag, int elem,
 							    bag->element
 							    [elem].
 							    local_key_id.data,
-							    bag->element
-							    [elem].
+							    bag->element[elem].
 							    local_key_id.size,
 							    1);
 		if (result < 0) {
@@ -1342,7 +1320,6 @@ write_attributes(gnutls_pkcs12_bag_t bag, int elem,
 	return 0;
 }
 
-
 /* Encodes the bag into a SafeContents structure, and puts the output in
  * the given datum. Enc is set to non-zero if the data are encrypted;
  */
@@ -1398,13 +1375,11 @@ _pkcs12_encode_safe_contents(gnutls_pkcs12_bag_t bag, asn1_node * contents,
 
 		/* Set empty attributes
 		 */
-		result =
-		    write_attributes(bag, i, c2, "?LAST.bagAttributes");
+		result = write_attributes(bag, i, c2, "?LAST.bagAttributes");
 		if (result < 0) {
 			gnutls_assert();
 			goto cleanup;
 		}
-
 
 		/* Copy the Bag Value
 		 */
@@ -1420,8 +1395,7 @@ _pkcs12_encode_safe_contents(gnutls_pkcs12_bag_t bag, asn1_node * contents,
 
 			result =
 			    _pkcs12_encode_crt_bag(bag->element[i].type,
-						   &bag->element[i].data,
-						   &tmp);
+						   &bag->element[i].data, &tmp);
 
 			if (result < 0) {
 				gnutls_assert();
@@ -1438,8 +1412,7 @@ _pkcs12_encode_safe_contents(gnutls_pkcs12_bag_t bag, asn1_node * contents,
 
 			result =
 			    _gnutls_x509_write_value(c2, "?LAST.bagValue",
-						     &bag->element[i].
-						     data);
+						     &bag->element[i].data);
 		}
 
 		if (result < 0) {
@@ -1455,7 +1428,7 @@ _pkcs12_encode_safe_contents(gnutls_pkcs12_bag_t bag, asn1_node * contents,
 
 	return 0;
 
-      cleanup:
+ cleanup:
 	if (c2)
 		asn1_delete_structure(&c2);
 	return result;
@@ -1508,7 +1481,7 @@ static int make_chain(gnutls_x509_crt_t ** chain, unsigned int *chain_len,
 			continue;
 		}
 
-	      skip:
+ skip:
 		i++;
 	}
 	return 0;
@@ -1813,24 +1786,26 @@ gnutls_pkcs12_simple_parse(gnutls_pkcs12_t p12,
 				}
 
 				if (memcmp(cert_id, key_id, cert_id_size) != 0) {	/* they don't match - skip the certificate */
-					if (unlikely(INT_ADD_OVERFLOW(_extra_certs_len, 1))) {
-						ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+					if (unlikely
+					    (INT_ADD_OVERFLOW
+					     (_extra_certs_len, 1))) {
+						ret =
+						    gnutls_assert_val
+						    (GNUTLS_E_MEMORY_ERROR);
 						goto done;
 					}
 
 					_extra_certs =
-						_gnutls_reallocarray_fast(_extra_certs,
-									  ++_extra_certs_len,
-									  sizeof(_extra_certs[0]));
+					    _gnutls_reallocarray_fast
+					    (_extra_certs, ++_extra_certs_len,
+					     sizeof(_extra_certs[0]));
 					if (!_extra_certs) {
 						gnutls_assert();
-						ret =
-							GNUTLS_E_MEMORY_ERROR;
+						ret = GNUTLS_E_MEMORY_ERROR;
 						goto done;
 					}
 					_extra_certs
-						[_extra_certs_len -
-						 1] = this_cert;
+					    [_extra_certs_len - 1] = this_cert;
 					this_cert = NULL;
 				} else {
 					if (chain && _chain_len == 0) {
@@ -1910,7 +1885,7 @@ gnutls_pkcs12_simple_parse(gnutls_pkcs12_t p12,
 
 	ret = 0;
 
-      done:
+ done:
 	if (bag)
 		gnutls_pkcs12_bag_deinit(bag);
 
@@ -1958,7 +1933,6 @@ gnutls_pkcs12_simple_parse(gnutls_pkcs12_t p12,
 	return ret;
 }
 
-
 /**
  * gnutls_pkcs12_mac_info:
  * @pkcs12: A pkcs12 type
@@ -1981,11 +1955,13 @@ gnutls_pkcs12_simple_parse(gnutls_pkcs12_t p12,
  **/
 int
 gnutls_pkcs12_mac_info(gnutls_pkcs12_t pkcs12, unsigned int *mac,
-	void *salt, unsigned int *salt_size, unsigned int *iter_count, char **oid)
+		       void *salt, unsigned int *salt_size,
+		       unsigned int *iter_count, char **oid)
 {
 	int ret;
 	gnutls_datum_t tmp = { NULL, 0 }, dsalt = {
-	NULL, 0};
+		NULL, 0
+	};
 	gnutls_mac_algorithm_t algo;
 
 	if (oid)
@@ -1997,7 +1973,8 @@ gnutls_pkcs12_mac_info(gnutls_pkcs12_t pkcs12, unsigned int *mac,
 	}
 
 	ret =
-	    _gnutls_x509_read_value(pkcs12->pkcs12, "macData.mac.digestAlgorithm.algorithm",
+	    _gnutls_x509_read_value(pkcs12->pkcs12,
+				    "macData.mac.digestAlgorithm.algorithm",
 				    &tmp);
 	if (ret < 0) {
 		gnutls_assert();
@@ -2005,10 +1982,10 @@ gnutls_pkcs12_mac_info(gnutls_pkcs12_t pkcs12, unsigned int *mac,
 	}
 
 	if (oid) {
-		*oid = (char*)tmp.data;
+		*oid = (char *)tmp.data;
 	}
 
-	algo = DIG_TO_MAC(gnutls_oid_to_digest((char*)tmp.data));
+	algo = DIG_TO_MAC(gnutls_oid_to_digest((char *)tmp.data));
 	if (algo == GNUTLS_MAC_UNKNOWN || mac_to_entry(algo) == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_HASH_ALGORITHM;
@@ -2025,7 +2002,7 @@ gnutls_pkcs12_mac_info(gnutls_pkcs12_t pkcs12, unsigned int *mac,
 	if (iter_count) {
 		ret =
 		    _gnutls_x509_read_uint(pkcs12->pkcs12, "macData.iterations",
-				   iter_count);
+					   iter_count);
 		if (ret < 0) {
 			*iter_count = 1;	/* the default */
 		}
@@ -2035,8 +2012,8 @@ gnutls_pkcs12_mac_info(gnutls_pkcs12_t pkcs12, unsigned int *mac,
 		/* Read the salt from the structure.
 		 */
 		ret =
-		    _gnutls_x509_read_null_value(pkcs12->pkcs12, "macData.macSalt",
-					    &dsalt);
+		    _gnutls_x509_read_null_value(pkcs12->pkcs12,
+						 "macData.macSalt", &dsalt);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -2060,4 +2037,3 @@ gnutls_pkcs12_mac_info(gnutls_pkcs12_t pkcs12, unsigned int *mac,
 	return ret;
 
 }
-

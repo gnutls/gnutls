@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -41,7 +41,9 @@ int main(int argc, char **argv)
 	gnutls_global_init();
 
 	if (argc != 4) {
-		fprintf(stderr, "args %d\nusage: %s [nonce|key] [nbytes] [outfile]\n", argc, argv[0]);
+		fprintf(stderr,
+			"args %d\nusage: %s [nonce|key] [nbytes] [outfile]\n",
+			argc, argv[0]);
 		exit(1);
 	}
 
@@ -51,7 +53,8 @@ int main(int argc, char **argv)
 		level = GNUTLS_RND_KEY;
 	} else {
 		fprintf(stderr, "don't know %s\n", argv[1]);
-		fprintf(stderr, "usage: %s [nonce|key] [nbytes] [outfile]\n", argv[0]);
+		fprintf(stderr, "usage: %s [nonce|key] [nbytes] [outfile]\n",
+			argv[0]);
 		exit(1);
 	}
 
@@ -63,7 +66,7 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
-	for (i = 0; i < nbytes; i+=sizeof(buf)) {
+	for (i = 0; i < nbytes; i += sizeof(buf)) {
 		if (gnutls_rnd(level, buf, sizeof(buf)) < 0)
 			exit(2);
 

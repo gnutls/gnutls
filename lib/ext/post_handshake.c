@@ -31,10 +31,10 @@
 #include "auth/cert.h"
 
 static int _gnutls_post_handshake_recv_params(gnutls_session_t session,
-					  const uint8_t * data,
-					  size_t data_size);
+					      const uint8_t * data,
+					      size_t data_size);
 static int _gnutls_post_handshake_send_params(gnutls_session_t session,
-					  gnutls_buffer_st * extdata);
+					      gnutls_buffer_st * extdata);
 
 const hello_ext_entry_st ext_mod_post_handshake = {
 	.name = "Post Handshake Auth",
@@ -53,7 +53,7 @@ const hello_ext_entry_st ext_mod_post_handshake = {
 
 static int
 _gnutls_post_handshake_recv_params(gnutls_session_t session,
-			       const uint8_t * data, size_t _data_size)
+				   const uint8_t * data, size_t _data_size)
 {
 	const version_entry_st *vers;
 
@@ -74,7 +74,7 @@ _gnutls_post_handshake_recv_params(gnutls_session_t session,
  */
 static int
 _gnutls_post_handshake_send_params(gnutls_session_t session,
-			       gnutls_buffer_st * extdata)
+				   gnutls_buffer_st * extdata)
 {
 	gnutls_certificate_credentials_t cred;
 	const version_entry_st *max;

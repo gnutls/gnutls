@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -83,21 +83,20 @@ static void async_handshake(void **glob_state, const char *prio, unsigned rehsk)
 	gnutls_global_set_log_function(tls_log_func);
 
 	/* Init server */
-	assert_return_code(gnutls_certificate_allocate_credentials(&serverx509cred), 0);
-	assert_return_code(gnutls_certificate_set_x509_key_mem(serverx509cred,
-					    &server_cert, &server_key,
-					    GNUTLS_X509_FMT_PEM), 0);
-	ret = gnutls_init(&server, GNUTLS_SERVER|GNUTLS_POST_HANDSHAKE_AUTH);
+	assert_return_code(gnutls_certificate_allocate_credentials
+			   (&serverx509cred), 0);
+	assert_return_code(gnutls_certificate_set_x509_key_mem
+			   (serverx509cred, &server_cert, &server_key,
+			    GNUTLS_X509_FMT_PEM), 0);
+	ret = gnutls_init(&server, GNUTLS_SERVER | GNUTLS_POST_HANDSHAKE_AUTH);
+	assert_return_code(ret, 0);
+
+	ret = gnutls_priority_set_direct(server, prio, NULL);
 	assert_return_code(ret, 0);
 
 	ret =
-	    gnutls_priority_set_direct(server,
-					prio,
-					NULL);
-	assert_return_code(ret, 0);
-
-
-	ret = gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, serverx509cred);
+	    gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
+				   serverx509cred);
 	assert_return_code(ret, 0);
 
 	gnutls_transport_set_push_function(server, server_push);
@@ -109,16 +108,19 @@ static void async_handshake(void **glob_state, const char *prio, unsigned rehsk)
 	ret = gnutls_certificate_allocate_credentials(&clientx509cred);
 	assert_return_code(ret, 0);
 
-	gnutls_certificate_set_retrieve_function2(clientx509cred, cert_callback);
+	gnutls_certificate_set_retrieve_function2(clientx509cred,
+						  cert_callback);
 
-	ret = gnutls_init(&client, GNUTLS_CLIENT|GNUTLS_AUTO_REAUTH|GNUTLS_POST_HANDSHAKE_AUTH);
 	ret =
-	    gnutls_priority_set_direct(client,
-					prio,
-					NULL);
+	    gnutls_init(&client,
+			GNUTLS_CLIENT | GNUTLS_AUTO_REAUTH |
+			GNUTLS_POST_HANDSHAKE_AUTH);
+	ret = gnutls_priority_set_direct(client, prio, NULL);
 	assert_return_code(ret, 0);
 
-	ret = gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE, clientx509cred);
+	ret =
+	    gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
+				   clientx509cred);
 	assert_return_code(ret, 0);
 
 	gnutls_transport_set_push_function(client, client_push);
@@ -133,15 +135,17 @@ static void async_handshake(void **glob_state, const char *prio, unsigned rehsk)
 
 		do {
 			sret = gnutls_rehandshake(server);
-		} while (sret == GNUTLS_E_AGAIN || sret == GNUTLS_E_INTERRUPTED);
+		} while (sret == GNUTLS_E_AGAIN
+			 || sret == GNUTLS_E_INTERRUPTED);
 		assert_true(sret == 0);
-		assert_true(gnutls_record_get_direction(server)==1);
+		assert_true(gnutls_record_get_direction(server) == 1);
 
 		sret = cret = GNUTLS_E_AGAIN;
 		do {
 			if (!hstarted) {
 				sret = gnutls_record_recv(server, b, 1);
-				if (sret == GNUTLS_E_INTERRUPTED) sret = GNUTLS_E_AGAIN;
+				if (sret == GNUTLS_E_INTERRUPTED)
+					sret = GNUTLS_E_AGAIN;
 
 				if (sret == GNUTLS_E_REHANDSHAKE) {
 					hstarted = 1;
@@ -151,18 +155,22 @@ static void async_handshake(void **glob_state, const char *prio, unsigned rehsk)
 			}
 
 			if (sret == GNUTLS_E_AGAIN && hstarted) {
-				sret = gnutls_handshake (server);
-				if (sret == GNUTLS_E_INTERRUPTED) sret = GNUTLS_E_AGAIN;
-				assert_true(sret == GNUTLS_E_AGAIN || sret == 0);
+				sret = gnutls_handshake(server);
+				if (sret == GNUTLS_E_INTERRUPTED)
+					sret = GNUTLS_E_AGAIN;
+				assert_true(sret == GNUTLS_E_AGAIN
+					    || sret == 0);
 			}
 
 			/* we are done in client side */
-			if (hstarted && gnutls_record_get_direction(client) == 0 && to_client_len == 0)
+			if (hstarted && gnutls_record_get_direction(client) == 0
+			    && to_client_len == 0)
 				cret = 0;
 
 			if (cret == GNUTLS_E_AGAIN) {
 				cret = gnutls_record_recv(client, b, 1);
-				if (cret == GNUTLS_E_INTERRUPTED) cret = GNUTLS_E_AGAIN;
+				if (cret == GNUTLS_E_INTERRUPTED)
+					cret = GNUTLS_E_AGAIN;
 			}
 			assert_true(cret == GNUTLS_E_AGAIN || cret >= 0);
 
@@ -171,7 +179,8 @@ static void async_handshake(void **glob_state, const char *prio, unsigned rehsk)
 	} else {
 		char b[1];
 
-		gnutls_certificate_server_set_request(server, GNUTLS_CERT_REQUEST);
+		gnutls_certificate_server_set_request(server,
+						      GNUTLS_CERT_REQUEST);
 
 		do {
 			sret = gnutls_reauth(server, 0);
@@ -183,16 +192,19 @@ static void async_handshake(void **glob_state, const char *prio, unsigned rehsk)
 		do {
 			if (cret == GNUTLS_E_AGAIN) {
 				cret = gnutls_record_recv(client, b, 1);
-				if (cret == GNUTLS_E_INTERRUPTED) cret = GNUTLS_E_AGAIN;
+				if (cret == GNUTLS_E_INTERRUPTED)
+					cret = GNUTLS_E_AGAIN;
 			}
 
 			if (sret == GNUTLS_E_AGAIN) {
 				sret = gnutls_reauth(server, 0);
-				if (sret == GNUTLS_E_INTERRUPTED) sret = GNUTLS_E_AGAIN;
+				if (sret == GNUTLS_E_INTERRUPTED)
+					sret = GNUTLS_E_AGAIN;
 			}
 
 			/* we are done in client side */
-			if (gnutls_record_get_direction(client) == 0 && to_client_len == 0)
+			if (gnutls_record_get_direction(client) == 0
+			    && to_client_len == 0)
 				cret = 0;
 		} while (cret == GNUTLS_E_AGAIN || sret == GNUTLS_E_AGAIN);
 	}
@@ -203,8 +215,8 @@ static void async_handshake(void **glob_state, const char *prio, unsigned rehsk)
 	msglen = strlen(MSG);
 	TRANSFER(client, server, MSG, msglen, buffer, MAX_BUF);
 
-	assert_true(gnutls_bye(client, GNUTLS_SHUT_WR)>=0);
-	assert_true(gnutls_bye(server, GNUTLS_SHUT_WR)>=0);
+	assert_true(gnutls_bye(client, GNUTLS_SHUT_WR) >= 0);
+	assert_true(gnutls_bye(server, GNUTLS_SHUT_WR) >= 0);
 
 	gnutls_deinit(client);
 	gnutls_deinit(server);

@@ -22,11 +22,11 @@
  */
 
 #ifndef GNUTLS_LIB_HELLO_EXT_H
-#define GNUTLS_LIB_HELLO_EXT_H
+# define GNUTLS_LIB_HELLO_EXT_H
 
-#include "gnutls_int.h"
-#include <gnutls/gnutls.h>
-#include "str.h"
+# include "gnutls_int.h"
+# include <gnutls/gnutls.h>
+# include "str.h"
 
 /* Functions for hello extension parsing.
  */
@@ -45,22 +45,21 @@ void _gnutls_hello_ext_priv_deinit(gnutls_session_t session);
 
 /* functions to be used by extensions internally
  */
-void _gnutls_hello_ext_unset_priv(gnutls_session_t session,
-				    extensions_t ext);
+void _gnutls_hello_ext_unset_priv(gnutls_session_t session, extensions_t ext);
 void _gnutls_hello_ext_set_priv(gnutls_session_t session, extensions_t ext,
-				  gnutls_ext_priv_data_t);
+				gnutls_ext_priv_data_t);
 int _gnutls_hello_ext_get_priv(gnutls_session_t session, extensions_t ext,
-				 gnutls_ext_priv_data_t *);
+			       gnutls_ext_priv_data_t *);
 int _gnutls_hello_ext_get_resumed_priv(gnutls_session_t session,
-					 extensions_t ext,
-					 gnutls_ext_priv_data_t * data);
+				       extensions_t ext,
+				       gnutls_ext_priv_data_t * data);
 
-#define GNUTLS_EXT_FLAG_MSG_MASK (GNUTLS_EXT_FLAG_CLIENT_HELLO | GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO| \
+# define GNUTLS_EXT_FLAG_MSG_MASK (GNUTLS_EXT_FLAG_CLIENT_HELLO | GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO| \
 		 GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO | GNUTLS_EXT_FLAG_EE | GNUTLS_EXT_FLAG_HRR)
 
 /* these flags can only be set in the extensions, but cannot be requested;
  * they are handled internally by the hello parsing/generating functions. */
-#define GNUTLS_EXT_FLAG_SET_ONLY_FLAGS_MASK ~(GNUTLS_EXT_FLAG_DTLS | GNUTLS_EXT_FLAG_TLS)
+# define GNUTLS_EXT_FLAG_SET_ONLY_FLAGS_MASK ~(GNUTLS_EXT_FLAG_DTLS | GNUTLS_EXT_FLAG_TLS)
 
 /* obtain the message this extension was received at */
 inline static gnutls_ext_flags_t _gnutls_ext_get_msg(gnutls_session_t session)
@@ -68,13 +67,14 @@ inline static gnutls_ext_flags_t _gnutls_ext_get_msg(gnutls_session_t session)
 	return session->internals.ext_msg & GNUTLS_EXT_FLAG_MSG_MASK;
 }
 
-inline static void _gnutls_ext_set_msg(gnutls_session_t session, gnutls_ext_flags_t msg)
+inline static void _gnutls_ext_set_msg(gnutls_session_t session,
+				       gnutls_ext_flags_t msg)
 {
 	session->internals.ext_msg = msg;
 }
 
 inline static void _gnutls_ext_set_extensions_offset(gnutls_session_t session,
-		int offset)
+						     int offset)
 {
 	session->internals.extensions_offset = offset;
 }
@@ -85,45 +85,45 @@ inline static int _gnutls_ext_get_extensions_offset(gnutls_session_t session)
 }
 
 int _gnutls_ext_set_full_client_hello(gnutls_session_t session,
-				      handshake_buffer_st *recv_buf);
+				      handshake_buffer_st * recv_buf);
 unsigned _gnutls_ext_get_full_client_hello(gnutls_session_t session,
-					   gnutls_datum_t *datum);
+					   gnutls_datum_t * datum);
 
 /* for session packing */
 int _gnutls_hello_ext_pack(gnutls_session_t session, gnutls_buffer_st * packed);
 int _gnutls_hello_ext_unpack(gnutls_session_t session,
-		       gnutls_buffer_st * packed);
+			     gnutls_buffer_st * packed);
 
 inline static const char *ext_msg_validity_to_str(gnutls_ext_flags_t msg)
 {
 	msg &= GNUTLS_EXT_FLAG_MSG_MASK;
 
-	switch(msg) {
-		case GNUTLS_EXT_FLAG_CLIENT_HELLO:
-			return "client hello";
-		case GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO:
-			return "TLS 1.2 server hello";
-		case GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO:
-			return "TLS 1.3 server hello";
-		case GNUTLS_EXT_FLAG_EE:
-			return "encrypted extensions";
-		case GNUTLS_EXT_FLAG_HRR:
-			return "hello retry request";
-		default:
-			return "(unknown)";
+	switch (msg) {
+	case GNUTLS_EXT_FLAG_CLIENT_HELLO:
+		return "client hello";
+	case GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO:
+		return "TLS 1.2 server hello";
+	case GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO:
+		return "TLS 1.3 server hello";
+	case GNUTLS_EXT_FLAG_EE:
+		return "encrypted extensions";
+	case GNUTLS_EXT_FLAG_HRR:
+		return "hello retry request";
+	default:
+		return "(unknown)";
 	}
 }
 
 typedef struct hello_ext_entry_st {
-	const char *name; /* const overridden when free_struct is set */
+	const char *name;	/* const overridden when free_struct is set */
 	unsigned free_struct;
 
 	uint16_t tls_id;
-	unsigned gid; /* gnutls internal ID */
+	unsigned gid;		/* gnutls internal ID */
 
 	gnutls_ext_parse_type_t client_parse_point;
 	gnutls_ext_parse_type_t server_parse_point;
-	unsigned validity; /* multiple items of gnutls_ext_flags_t */
+	unsigned validity;	/* multiple items of gnutls_ext_flags_t */
 
 	/* this function must return 0 when Not Applicable
 	 * size of extension data if ok
@@ -160,7 +160,7 @@ typedef struct hello_ext_entry_st {
 inline static unsigned
 _gnutls_hello_ext_is_present(gnutls_session_t session, extensions_t id)
 {
-	if (session->internals.used_exts & ((ext_track_t)1 << id))
+	if (session->internals.used_exts & ((ext_track_t) 1 << id))
 		return 1;
 
 	return 0;
@@ -177,14 +177,13 @@ _gnutls_hello_ext_is_present(gnutls_session_t session, extensions_t id)
  */
 inline static
 unsigned _gnutls_hello_ext_save(gnutls_session_t session,
-				extensions_t id,
-				unsigned check_dup)
+				extensions_t id, unsigned check_dup)
 {
 	if (check_dup && _gnutls_hello_ext_is_present(session, id)) {
-			return 0;
+		return 0;
 	}
 
-	session->internals.used_exts |= ((ext_track_t)1 << id);
+	session->internals.used_exts |= ((ext_track_t) 1 << id);
 
 	return 1;
 }
@@ -195,4 +194,4 @@ void _gnutls_hello_ext_save_sr(gnutls_session_t session)
 	_gnutls_hello_ext_save(session, GNUTLS_EXTENSION_SAFE_RENEGOTIATION, 1);
 }
 
-#endif /* GNUTLS_LIB_HELLO_EXT_H */
+#endif				/* GNUTLS_LIB_HELLO_EXT_H */

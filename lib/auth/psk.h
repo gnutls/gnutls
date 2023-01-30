@@ -21,15 +21,15 @@
  */
 
 #ifndef GNUTLS_LIB_AUTH_PSK_H
-#define GNUTLS_LIB_AUTH_PSK_H
+# define GNUTLS_LIB_AUTH_PSK_H
 
-#include <auth.h>
-#include <auth/dh_common.h>
+# include <auth.h>
+# include <auth/dh_common.h>
 
-#define _gnutls_copy_psk_username(info, datum) \
+# define _gnutls_copy_psk_username(info, datum) \
 	_gnutls_copy_psk_string(&(info)->username, &(info)->username_len, (datum))
 
-#define _gnutls_copy_psk_hint(info, datum) \
+# define _gnutls_copy_psk_hint(info, datum) \
 	_gnutls_copy_psk_string(&(info)->hint, &(info)->hint_len, (datum))
 
 typedef struct gnutls_psk_client_credentials_st {
@@ -75,26 +75,27 @@ typedef struct psk_auth_info_st {
 typedef struct psk_auth_info_st psk_auth_info_st;
 
 inline static int
-_gnutls_copy_psk_string(char **dest, uint16_t *dest_len, const gnutls_datum_t str)
+_gnutls_copy_psk_string(char **dest, uint16_t * dest_len,
+			const gnutls_datum_t str)
 {
 	char *_tmp;
 
 	assert(MAX_USERNAME_SIZE >= str.size);
-	
+
 	_tmp = gnutls_malloc(str.size + 1);
 	if (_tmp == NULL)
 		return GNUTLS_E_MEMORY_ERROR;
 	memcpy(_tmp, str.data, str.size);
 	_tmp[str.size] = '\0';
-	
+
 	gnutls_free(*dest);
 	*dest = _tmp;
 	*dest_len = str.size;
-	
+
 	return GNUTLS_E_SUCCESS;
 }
 
-#ifdef ENABLE_PSK
+# ifdef ENABLE_PSK
 
 int
 _gnutls_set_psk_session_key(gnutls_session_t session, gnutls_datum_t * key,
@@ -103,8 +104,8 @@ int _gnutls_gen_psk_server_kx(gnutls_session_t session,
 			      gnutls_buffer_st * data);
 int _gnutls_gen_psk_client_kx(gnutls_session_t, gnutls_buffer_st *);
 
-#else
-#define _gnutls_set_psk_session_key(x,y,z) GNUTLS_E_UNIMPLEMENTED_FEATURE
-#endif				/* ENABLE_PSK */
+# else
+#  define _gnutls_set_psk_session_key(x,y,z) GNUTLS_E_UNIMPLEMENTED_FEATURE
+# endif				/* ENABLE_PSK */
 
-#endif /* GNUTLS_LIB_AUTH_PSK_H */
+#endif				/* GNUTLS_LIB_AUTH_PSK_H */

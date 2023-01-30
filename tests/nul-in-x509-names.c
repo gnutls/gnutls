@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdlib.h>
@@ -58,7 +58,7 @@ static char badguy_nul_cn_data[] =
     "CQ==\n" "-----END CERTIFICATE-----\n";
 
 const gnutls_datum_t badguy_nul_cn = {
-	(void *) badguy_nul_cn_data, sizeof(badguy_nul_cn_data)
+	(void *)badguy_nul_cn_data, sizeof(badguy_nul_cn_data)
 };
 
 static char badguy_nul_san_data[] =
@@ -86,7 +86,7 @@ static char badguy_nul_san_data[] =
     "-----END CERTIFICATE-----\n";
 
 const gnutls_datum_t badguy_nul_san = {
-	(void *) badguy_nul_san_data, sizeof(badguy_nul_san_data)
+	(void *)badguy_nul_san_data, sizeof(badguy_nul_san_data)
 };
 
 void doit(void)
@@ -106,9 +106,7 @@ void doit(void)
 		exit(1);
 	}
 
-	ret =
-	    gnutls_x509_crt_import(crt, &badguy_nul_cn,
-				   GNUTLS_X509_FMT_PEM);
+	ret = gnutls_x509_crt_import(crt, &badguy_nul_cn, GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
 		fail("gnutls_x509_crt_import");
 		exit(1);
@@ -123,9 +121,7 @@ void doit(void)
 		fail("gnutls_x509_crt_check_hostname BROKEN (NUL-IN-CN)");
 	}
 
-	ret =
-	    gnutls_x509_crt_import(crt, &badguy_nul_san,
-				   GNUTLS_X509_FMT_PEM);
+	ret = gnutls_x509_crt_import(crt, &badguy_nul_san, GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
 		fail("gnutls_x509_crt_import");
 		exit(1);

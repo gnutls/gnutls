@@ -24,7 +24,7 @@
 #ifndef HANDSHAKE_H
 # define HANDSHAKE_H
 
-#define HANDSHAKE_MAX_RETRY_COUNT 10
+# define HANDSHAKE_MAX_RETRY_COUNT 10
 
 typedef struct mem_st {
 	const uint8_t *data;
@@ -37,8 +37,7 @@ error_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 	return -1;
 }
 
-static ssize_t
-error_pull(gnutls_transport_ptr_t tr, void *data, size_t len)
+static ssize_t error_pull(gnutls_transport_ptr_t tr, void *data, size_t len)
 {
 	return -1;
 }
@@ -52,8 +51,7 @@ handshake_discard(gnutls_session_t session,
 	return 0;
 }
 
-static int
-handshake_pull(gnutls_session_t session, mem_st *data)
+static int handshake_pull(gnutls_session_t session, mem_st * data)
 {
 	uint32_t level, size;
 	int ret;
@@ -63,7 +61,7 @@ handshake_pull(gnutls_session_t session, mem_st *data)
 	}
 
 	level = ((unsigned)data->data[0] << 24) | (data->data[1] << 16) |
-		(data->data[2] << 8) | data->data[3];
+	    (data->data[2] << 8) | data->data[3];
 
 	data->size -= 4;
 	data->data += 4;
@@ -73,7 +71,7 @@ handshake_pull(gnutls_session_t session, mem_st *data)
 	}
 
 	size = ((unsigned)data->data[0] << 24) | (data->data[1] << 16) |
-		(data->data[2] << 8) | data->data[3];
+	    (data->data[2] << 8) | data->data[3];
 
 	data->size -= 4;
 	data->data += 4;
@@ -83,9 +81,8 @@ handshake_pull(gnutls_session_t session, mem_st *data)
 	}
 
 	ret = gnutls_handshake_write(session,
-				     (gnutls_record_encryption_level_t)level,
-				     data->data,
-				     size);
+				     (gnutls_record_encryption_level_t) level,
+				     data->data, size);
 	data->size -= size;
 	data->data += size;
 

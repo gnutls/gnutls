@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -32,36 +32,40 @@
 
 int main(int argc, char *argv[])
 {
-int ret;
-gnutls_sec_param_t p;
+	int ret;
+	gnutls_sec_param_t p;
 
 	ret = global_init();
 	if (ret != 0) {
 		printf("%d: %s\n", ret, gnutls_strerror(ret));
 		return EXIT_FAILURE;
 	}
-	
+
 	p = gnutls_pk_bits_to_sec_param(GNUTLS_PK_EC, 160);
 	if (p != GNUTLS_SEC_PARAM_LOW) {
-		fprintf(stderr, "%d: error in sec param, p:%u\n", __LINE__, (unsigned)p);
+		fprintf(stderr, "%d: error in sec param, p:%u\n", __LINE__,
+			(unsigned)p);
 		return 1;
 	}
 
 	p = gnutls_pk_bits_to_sec_param(GNUTLS_PK_EC, 192);
 	if (p != GNUTLS_SEC_PARAM_LEGACY) {
-		fprintf(stderr, "%d: error in sec param, p:%u\n", __LINE__, (unsigned)p);
+		fprintf(stderr, "%d: error in sec param, p:%u\n", __LINE__,
+			(unsigned)p);
 		return 1;
 	}
 
 	p = gnutls_pk_bits_to_sec_param(GNUTLS_PK_EC, 256);
 	if (p != GNUTLS_SEC_PARAM_HIGH) {
-		fprintf(stderr, "%d: error in sec param, p:%u\n", __LINE__, (unsigned)p);
+		fprintf(stderr, "%d: error in sec param, p:%u\n", __LINE__,
+			(unsigned)p);
 		return 1;
 	}
 
 	p = gnutls_pk_bits_to_sec_param(GNUTLS_PK_EC, 384);
 	if (p != GNUTLS_SEC_PARAM_ULTRA) {
-		fprintf(stderr, "%d: error in sec param, p:%u\n", __LINE__, (unsigned)p);
+		fprintf(stderr, "%d: error in sec param, p:%u\n", __LINE__,
+			(unsigned)p);
 		return 1;
 	}
 
@@ -71,19 +75,22 @@ gnutls_sec_param_t p;
 #else
 	if (p != GNUTLS_SEC_PARAM_LOW) {
 #endif
-		fprintf(stderr, "%d: error in sec param, p:%u\n", __LINE__, (unsigned)p);
+		fprintf(stderr, "%d: error in sec param, p:%u\n", __LINE__,
+			(unsigned)p);
 		return 1;
 	}
 
 	p = gnutls_pk_bits_to_sec_param(GNUTLS_PK_RSA, 2048);
 	if (p != GNUTLS_SEC_PARAM_MEDIUM) {
-		fprintf(stderr, "%d: error in sec param, p:%u\n", __LINE__, (unsigned)p);
+		fprintf(stderr, "%d: error in sec param, p:%u\n", __LINE__,
+			(unsigned)p);
 		return 1;
 	}
 
 	p = gnutls_pk_bits_to_sec_param(GNUTLS_PK_RSA, 3072);
 	if (p != GNUTLS_SEC_PARAM_HIGH) {
-		fprintf(stderr, "%d: error in sec param, p:%u\n", __LINE__, (unsigned)p);
+		fprintf(stderr, "%d: error in sec param, p:%u\n", __LINE__,
+			(unsigned)p);
 		return 1;
 	}
 
@@ -93,13 +100,15 @@ gnutls_sec_param_t p;
 #else
 	if (p != GNUTLS_SEC_PARAM_LOW) {
 #endif
-		fprintf(stderr, "%d: error in sec param, p:%u\n", __LINE__, (unsigned)p);
+		fprintf(stderr, "%d: error in sec param, p:%u\n", __LINE__,
+			(unsigned)p);
 		return 1;
 	}
 
 	p = gnutls_pk_bits_to_sec_param(GNUTLS_PK_DH, 2048);
 	if (p != GNUTLS_SEC_PARAM_MEDIUM) {
-		fprintf(stderr, "%d: error in sec param, p:%u\n", __LINE__, (unsigned)p);
+		fprintf(stderr, "%d: error in sec param, p:%u\n", __LINE__,
+			(unsigned)p);
 		return 1;
 	}
 

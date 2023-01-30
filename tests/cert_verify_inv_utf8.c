@@ -22,7 +22,7 @@
 /* Parts copied from GnuTLS example programs. */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -30,10 +30,10 @@
 #include <string.h>
 #include <sys/types.h>
 #if !defined(_WIN32)
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
 #endif
 #include <unistd.h>
 #include <assert.h>
@@ -83,60 +83,75 @@ static void auto_parse(void)
 	if (debug)
 		gnutls_global_set_log_level(6);
 
-	assert(gnutls_certificate_allocate_credentials(&x509_cred)>=0);
-	assert(gnutls_privkey_init(&key)>=0);
+	assert(gnutls_certificate_allocate_credentials(&x509_cred) >= 0);
+	assert(gnutls_privkey_init(&key) >= 0);
 
 	assert(gnutls_certificate_allocate_credentials(&clicred) >= 0);
 
-	ret = gnutls_certificate_set_x509_trust_mem(clicred, &ca3_cert, GNUTLS_X509_FMT_PEM);
+	ret =
+	    gnutls_certificate_set_x509_trust_mem(clicred, &ca3_cert,
+						  GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		fail("set_x509_trust_file failed: %s\n", gnutls_strerror(ret));
 
-	pcert_list_size = sizeof(pcert_list)/sizeof(pcert_list[0]);
+	pcert_list_size = sizeof(pcert_list) / sizeof(pcert_list[0]);
 	ret = gnutls_pcert_list_import_x509_raw(pcert_list, &pcert_list_size,
-		&server_ca3_localhost_cert_chain, GNUTLS_X509_FMT_PEM, 0);
+						&server_ca3_localhost_cert_chain,
+						GNUTLS_X509_FMT_PEM, 0);
 	if (ret < 0) {
-		fail("error in gnutls_pcert_list_import_x509_raw: %s\n", gnutls_strerror(ret));
+		fail("error in gnutls_pcert_list_import_x509_raw: %s\n",
+		     gnutls_strerror(ret));
 	}
 
-	ret = gnutls_privkey_import_x509_raw(key, &server_ca3_key, GNUTLS_X509_FMT_PEM, NULL, 0);
+	ret =
+	    gnutls_privkey_import_x509_raw(key, &server_ca3_key,
+					   GNUTLS_X509_FMT_PEM, NULL, 0);
 	if (ret < 0) {
 		fail("error in key import: %s\n", gnutls_strerror(ret));
 	}
 
 	ret = gnutls_certificate_set_key(x509_cred, NULL, 0, pcert_list,
-				pcert_list_size, key);
+					 pcert_list_size, key);
 	if (ret < 0) {
-		fail("error in gnutls_certificate_set_key: %s\n", gnutls_strerror(ret));
+		fail("error in gnutls_certificate_set_key: %s\n",
+		     gnutls_strerror(ret));
 		exit(1);
 	}
 
 	/* set the key with UTF8 names */
-	assert(gnutls_privkey_init(&second_key)>=0);
+	assert(gnutls_privkey_init(&second_key) >= 0);
 
 	pcert_list_size = 2;
 	ret = gnutls_pcert_list_import_x509_raw(second_pcert, &pcert_list_size,
-		&server_ca3_localhost_inv_utf8_cert, GNUTLS_X509_FMT_PEM, 0);
+						&server_ca3_localhost_inv_utf8_cert,
+						GNUTLS_X509_FMT_PEM, 0);
 	if (ret < 0) {
-		fail("error in gnutls_pcert_list_import_x509_raw: %s\n", gnutls_strerror(ret));
+		fail("error in gnutls_pcert_list_import_x509_raw: %s\n",
+		     gnutls_strerror(ret));
 	}
 
-	ret = gnutls_privkey_import_x509_raw(second_key, &server_ca3_key, GNUTLS_X509_FMT_PEM, NULL, 0);
+	ret =
+	    gnutls_privkey_import_x509_raw(second_key, &server_ca3_key,
+					   GNUTLS_X509_FMT_PEM, NULL, 0);
 	if (ret < 0) {
 		fail("error in key import: %s\n", gnutls_strerror(ret));
 	}
 
 	ret = gnutls_certificate_set_key(x509_cred, NULL, 0, second_pcert,
-				1, second_key);
+					 1, second_key);
 	if (ret < 0) {
-		fail("error in gnutls_certificate_set_key: %s\n", gnutls_strerror(ret));
+		fail("error in gnutls_certificate_set_key: %s\n",
+		     gnutls_strerror(ret));
 		exit(1);
 	}
 
-	test_cli_serv_expect(x509_cred, clicred, "NORMAL", "NORMAL", "localhost", 0, 0);
+	test_cli_serv_expect(x509_cred, clicred, "NORMAL", "NORMAL",
+			     "localhost", 0, 0);
 	test_cli_serv_vf(x509_cred, clicred, "NORMAL", "www.νίκοσ.com");
 	test_cli_serv_vf(x509_cred, clicred, "NORMAL", "www.νίκος.com");
-	test_cli_serv_expect(x509_cred, clicred, "NORMAL", "NORMAL", "raw:www.νίκος.com", GNUTLS_E_RECEIVED_DISALLOWED_NAME, GNUTLS_E_AGAIN);
+	test_cli_serv_expect(x509_cred, clicred, "NORMAL", "NORMAL",
+			     "raw:www.νίκος.com",
+			     GNUTLS_E_RECEIVED_DISALLOWED_NAME, GNUTLS_E_AGAIN);
 
 	gnutls_certificate_free_credentials(x509_cred);
 	gnutls_certificate_free_credentials(clicred);

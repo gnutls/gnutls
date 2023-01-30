@@ -20,7 +20,7 @@
  */
 
 #if HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <assert.h>
@@ -1012,7 +1012,7 @@ static int st_provable_prime_small(mpz_t p,
 {
 	unsigned gen_counter = 0;
 	unsigned tseed_length;
-	uint8_t tseed[MAX_PVP_SEED_SIZE+1];
+	uint8_t tseed[MAX_PVP_SEED_SIZE + 1];
 	uint8_t h1[DIGEST_SIZE];
 	uint8_t h2[DIGEST_SIZE];
 	uint32_t c;
@@ -1124,7 +1124,7 @@ st_provable_prime(mpz_t p,
 {
 	unsigned gen_counter;
 	unsigned tseed_length;
-	uint8_t tseed[MAX_PVP_SEED_SIZE+1];
+	uint8_t tseed[MAX_PVP_SEED_SIZE + 1];
 	int ret;
 	unsigned pseed_length, iterations;
 	uint8_t *pseed;
@@ -1156,7 +1156,7 @@ st_provable_prime(mpz_t p,
 		goto fail;
 
 	ret = st_provable_prime(c0, &pseed_length, pseed, &gen_counter,
-				1+div_ceil(bits, 2), seed_length, seed,
+				1 + div_ceil(bits, 2), seed_length, seed,
 				progress_ctx, progress);
 	if (ret == 0)
 		goto fail;
@@ -1176,7 +1176,8 @@ st_provable_prime(mpz_t p,
 			goto fail;
 
 		for (i = 0; i < iterations; i++) {
-			tseed_length = mpz_seed_sizeinbase_256_u(s, pseed_length);
+			tseed_length =
+			    mpz_seed_sizeinbase_256_u(s, pseed_length);
 			if (tseed_length > sizeof(tseed))
 				goto fail;
 			nettle_mpz_get_str_256(tseed_length, tseed, s);
@@ -1215,7 +1216,7 @@ st_provable_prime(mpz_t p,
 	if (mpz_cmp(c, r) > 0) {
 		/* t = 2^(bits-1)/2c0 */
 
-		mpz_fdiv_q_2exp(r, r, 1); /* r = 2^(bits-1) */
+		mpz_fdiv_q_2exp(r, r, 1);	/* r = 2^(bits-1) */
 		mpz_cdiv_q(t, r, dc0);
 
 		/* c = t* 2c0 + 1 */
@@ -1225,10 +1226,11 @@ st_provable_prime(mpz_t p,
 
 	gen_counter++;
 
-	mpz_set_ui(r, 0); /* a = 0 */
+	mpz_set_ui(r, 0);	/* a = 0 */
 	if (iterations > 0) {
 		for (i = 0; i < iterations; i++) {
-			tseed_length = mpz_seed_sizeinbase_256_u(s, pseed_length);
+			tseed_length =
+			    mpz_seed_sizeinbase_256_u(s, pseed_length);
 			if (tseed_length > sizeof(tseed))
 				goto fail;
 
@@ -1250,7 +1252,7 @@ st_provable_prime(mpz_t p,
 	mpz_add_ui(r, r, 2);
 
 	/* z = a^(2t) mod c */
-	mpz_mul_2exp(tmp, t, 1); /* tmp = 2t */
+	mpz_mul_2exp(tmp, t, 1);	/* tmp = 2t */
 	mpz_powm(z, r, tmp, c);
 
 	mpz_sub_ui(tmp, z, 1);
@@ -1263,7 +1265,8 @@ st_provable_prime(mpz_t p,
 			mpz_set(p, c);
 
 			if (prime_seed != NULL) {
-				tseed_length = mpz_seed_sizeinbase_256_u(s, pseed_length);
+				tseed_length =
+				    mpz_seed_sizeinbase_256_u(s, pseed_length);
 				if (*prime_seed_length < tseed_length)
 					goto fail;
 

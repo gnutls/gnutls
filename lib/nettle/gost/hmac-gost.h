@@ -32,60 +32,59 @@
 */
 
 #ifndef GNUTLS_LIB_NETTLE_GOST_HMAC_GOST_H
-#define GNUTLS_LIB_NETTLE_GOST_HMAC_GOST_H
+# define GNUTLS_LIB_NETTLE_GOST_HMAC_GOST_H
 
-#include "config.h"
+# include "config.h"
 
-#include <nettle/hmac.h>
+# include <nettle/hmac.h>
 
-#ifndef HAVE_NETTLE_STREEBOG512_UPDATE
-#include "streebog.h"
-#endif
+# ifndef HAVE_NETTLE_STREEBOG512_UPDATE
+#  include "streebog.h"
+# endif
 
-#ifdef __cplusplus
+# ifdef __cplusplus
 extern "C" {
-#endif
+# endif
 
 /* Namespace mangling */
-#ifndef HAVE_NETTLE_STREEBOG512_UPDATE
-#define hmac_streebog256_set_key _gnutls_hmac_streebog256_set_key
-#define hmac_streebog256_digest _gnutls_hmac_streebog256_digest
-#define hmac_streebog512_set_key _gnutls_hmac_streebog512_set_key
-#define hmac_streebog512_update _gnutls_hmac_streebog512_update
-#define hmac_streebog512_digest _gnutls_hmac_streebog512_digest
-#endif
+# ifndef HAVE_NETTLE_STREEBOG512_UPDATE
+#  define hmac_streebog256_set_key _gnutls_hmac_streebog256_set_key
+#  define hmac_streebog256_digest _gnutls_hmac_streebog256_digest
+#  define hmac_streebog512_set_key _gnutls_hmac_streebog512_set_key
+#  define hmac_streebog512_update _gnutls_hmac_streebog512_update
+#  define hmac_streebog512_digest _gnutls_hmac_streebog512_digest
+# endif
 
 /* hmac-streebog */
-#ifndef HAVE_NETTLE_STREEBOG512_UPDATE
-struct hmac_streebog512_ctx HMAC_CTX(struct streebog512_ctx);
+# ifndef HAVE_NETTLE_STREEBOG512_UPDATE
+	struct hmac_streebog512_ctx HMAC_CTX(struct streebog512_ctx);
 
-void
-hmac_streebog512_set_key(struct hmac_streebog512_ctx *ctx,
-		    size_t key_length, const uint8_t *key);
+	void
+	 hmac_streebog512_set_key(struct hmac_streebog512_ctx *ctx,
+				  size_t key_length, const uint8_t * key);
 
-void
-hmac_streebog512_update(struct hmac_streebog512_ctx *ctx,
-		   size_t length, const uint8_t *data);
+	void
+	 hmac_streebog512_update(struct hmac_streebog512_ctx *ctx,
+				 size_t length, const uint8_t * data);
 
-void
-hmac_streebog512_digest(struct hmac_streebog512_ctx *ctx,
-		   size_t length, uint8_t *digest);
+	void
+	 hmac_streebog512_digest(struct hmac_streebog512_ctx *ctx,
+				 size_t length, uint8_t * digest);
 
-#define hmac_streebog256_ctx hmac_streebog512_ctx
+#  define hmac_streebog256_ctx hmac_streebog512_ctx
 
-void
-hmac_streebog256_set_key(struct hmac_streebog256_ctx *ctx,
-		    size_t key_length, const uint8_t *key);
+	void
+	 hmac_streebog256_set_key(struct hmac_streebog256_ctx *ctx,
+				  size_t key_length, const uint8_t * key);
 
-#define hmac_streebog256_update hmac_streebog512_update
+#  define hmac_streebog256_update hmac_streebog512_update
 
-void
-hmac_streebog256_digest(struct hmac_streebog256_ctx *ctx,
-		   size_t length, uint8_t *digest);
-#endif
+	void
+	 hmac_streebog256_digest(struct hmac_streebog256_ctx *ctx,
+				 size_t length, uint8_t * digest);
+# endif
 
-#ifdef __cplusplus
+# ifdef __cplusplus
 }
-#endif
-
-#endif /* GNUTLS_LIB_NETTLE_GOST_HMAC_GOST_H */
+# endif
+#endif				/* GNUTLS_LIB_NETTLE_GOST_HMAC_GOST_H */

@@ -29,13 +29,14 @@
 #include "state.h"
 #include <gnutls/gnutls.h>
 
-
-static int _gnutls_supported_ec_point_formats_recv_params(gnutls_session_t session,
-						const uint8_t * data,
-						size_t data_size);
-static int _gnutls_supported_ec_point_formats_send_params(gnutls_session_t session,
-						gnutls_buffer_st * extdata);
-
+static int _gnutls_supported_ec_point_formats_recv_params(gnutls_session_t
+							  session,
+							  const uint8_t * data,
+							  size_t data_size);
+static int _gnutls_supported_ec_point_formats_send_params(gnutls_session_t
+							  session,
+							  gnutls_buffer_st *
+							  extdata);
 
 const hello_ext_entry_st ext_mod_supported_ec_point_formats = {
 	.name = "Supported EC Point Formats",
@@ -44,7 +45,7 @@ const hello_ext_entry_st ext_mod_supported_ec_point_formats = {
 	.client_parse_point = GNUTLS_EXT_TLS,
 	.server_parse_point = GNUTLS_EXT_TLS,
 	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_DTLS |
-		    GNUTLS_EXT_FLAG_CLIENT_HELLO | GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
+	    GNUTLS_EXT_FLAG_CLIENT_HELLO | GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
 	.recv_func = _gnutls_supported_ec_point_formats_recv_params,
 	.send_func = _gnutls_supported_ec_point_formats_send_params,
 	.pack_func = NULL,
@@ -52,13 +53,12 @@ const hello_ext_entry_st ext_mod_supported_ec_point_formats = {
 	.deinit_func = NULL
 };
 
-
 /* Receive point formats
  */
 static int
 _gnutls_supported_ec_point_formats_recv_params(gnutls_session_t session,
-				     const uint8_t * data,
-				     size_t data_size)
+					       const uint8_t * data,
+					       size_t data_size)
 {
 	size_t len, i;
 	int uncompressed = 0;
@@ -84,9 +84,7 @@ _gnutls_supported_ec_point_formats_recv_params(gnutls_session_t session,
 			}
 
 		if (uncompressed == 0)
-			return
-			    gnutls_assert_val
-			    (GNUTLS_E_UNKNOWN_PK_ALGORITHM);
+			return gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
 	} else {
 		/* only sanity check here. We only support uncompressed points
 		 * and a client must support it thus nothing to check.
@@ -104,7 +102,7 @@ _gnutls_supported_ec_point_formats_recv_params(gnutls_session_t session,
  */
 static int
 _gnutls_supported_ec_point_formats_send_params(gnutls_session_t session,
-				     gnutls_buffer_st * extdata)
+					       gnutls_buffer_st * extdata)
 {
 	const uint8_t p[2] = { 0x01, 0x00 };	/* only support uncompressed point format */
 	int ret;

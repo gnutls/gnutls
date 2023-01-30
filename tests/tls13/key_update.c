@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -50,7 +50,8 @@ static unsigned key_update_msg_inc = 0;
 static unsigned key_update_msg_out = 0;
 
 static int hsk_callback(gnutls_session_t session, unsigned int htype,
-			unsigned post, unsigned int incoming, const gnutls_datum_t *msg)
+			unsigned post, unsigned int incoming,
+			const gnutls_datum_t * msg)
 {
 	assert(post == GNUTLS_HOOK_PRE);
 
@@ -124,7 +125,6 @@ static void run(const char *name, unsigned test)
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
-
 
 	HANDSHAKE(client, server);
 	if (debug)
@@ -231,8 +231,10 @@ static void run(const char *name, unsigned test)
 
 		success("%s: callbacks are called\n", name);
 
-		gnutls_handshake_set_hook_function(client, -1, GNUTLS_HOOK_PRE, hsk_callback);
-		gnutls_handshake_set_hook_function(server, -1, GNUTLS_HOOK_PRE, hsk_callback);
+		gnutls_handshake_set_hook_function(client, -1, GNUTLS_HOOK_PRE,
+						   hsk_callback);
+		gnutls_handshake_set_hook_function(server, -1, GNUTLS_HOOK_PRE,
+						   hsk_callback);
 
 		do {
 			ret = gnutls_session_key_update(client, GNUTLS_KU_PEER);
@@ -249,7 +251,6 @@ static void run(const char *name, unsigned test)
 		assert(key_update_msg_out == 2);
 		break;
 	}
-
 
 	gnutls_bye(client, GNUTLS_SHUT_WR);
 	gnutls_bye(server, GNUTLS_SHUT_WR);
@@ -272,5 +273,5 @@ void doit(void)
 	run("single", 4);
 	run("single", 5);
 	run("single", 6);
-	run("all", 0);			/* all one after each other */
+	run("all", 0);		/* all one after each other */
 }

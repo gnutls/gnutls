@@ -131,7 +131,9 @@ int _gnutls_rnd_preinit(void)
 	if (ret)
 		return gnutls_assert_val(GNUTLS_E_RANDOM_FAILED);
 
-	list = gl_list_nx_create_empty(GL_LINKEDHASH_LIST, NULL, NULL, free_ctx, false);
+	list =
+	    gl_list_nx_create_empty(GL_LINKEDHASH_LIST, NULL, NULL, free_ctx,
+				    false);
 	if (list == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
@@ -173,7 +175,8 @@ int gnutls_rnd(gnutls_rnd_level_t level, void *data, size_t len)
 		return gnutls_assert_val(ret);
 
 	if (likely(len > 0))
-		return _gnutls_rnd_ops.rnd(gl_tls_get(ctx_key), level, data, len);
+		return _gnutls_rnd_ops.rnd(gl_tls_get(ctx_key), level, data,
+					   len);
 
 	return 0;
 }

@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+# include "config.h"
 #endif
 
 #include <stdio.h>
@@ -38,11 +38,10 @@ typedef struct {
 	int error_index;
 } error_name;
 
-
 static int compar(const void *_n1, const void *_n2)
 {
-	const error_name *n1 = (const error_name *) _n1,
-	    *n2 = (const error_name *) _n2;
+	const error_name *n1 = (const error_name *)_n1,
+	    *n2 = (const error_name *)_n2;
 	return strcmp(n1->name, n2->name);
 }
 
@@ -61,8 +60,7 @@ static const char headers[] = "\\tablefirsthead{%\n"
     "\\multicolumn{3}{|r|}{\\small\\sl continued on next page}\\\\\n"
     "\\hline}\n"
 #endif
-    "\\tablelasttail{\\hline}\n"
-    "\\bottomcaption{The error codes table}\n\n";
+    "\\tablelasttail{\\hline}\n" "\\bottomcaption{The error codes table}\n\n";
 
 int main(int argc, char *argv[])
 {
@@ -94,8 +92,7 @@ static int main_texinfo(void)
 		desc = gnutls_strerror(i);
 
 		printf("@item %d @tab %s @tab %s\n", i,
-		       escape_texi_string(_name, buffer, sizeof(buffer)),
-		       desc);
+		       escape_texi_string(_name, buffer, sizeof(buffer)), desc);
 
 		strcpy(names_to_sort[j].name, _name);
 		names_to_sort[j].error_index = i;

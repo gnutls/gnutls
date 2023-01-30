@@ -36,36 +36,37 @@
 	"zta5XzXb5TRkBsVU8tAPADP+wS/vBCS05ne1wmhdD6c6\n" \
 	"-----END ENCRYPTED PRIVATE KEY-----\n"
 
-
 static int test_decode(void)
 {
-  gnutls_x509_privkey_t key;
-  const gnutls_datum_t data = {
-    (unsigned char *)PRIVATE_KEY,
-    strlen(PRIVATE_KEY)
-  };
-  int err;
+	gnutls_x509_privkey_t key;
+	const gnutls_datum_t data = {
+		(unsigned char *)PRIVATE_KEY,
+		strlen(PRIVATE_KEY)
+	};
+	int err;
 
-  if ((err = gnutls_x509_privkey_init(&key)) < 0) {
-    fail("Failed to init key %s\n", gnutls_strerror(err));
-  }
+	if ((err = gnutls_x509_privkey_init(&key)) < 0) {
+		fail("Failed to init key %s\n", gnutls_strerror(err));
+	}
 
-  err = gnutls_x509_privkey_import_pkcs8(key, &data,
-					GNUTLS_X509_FMT_PEM, "", 0);
-  if (err != GNUTLS_E_DECRYPTION_FAILED) {
-    fail("Unexpected error code: %s/%d\n", gnutls_strerror(err), err);
-  }
+	err = gnutls_x509_privkey_import_pkcs8(key, &data,
+					       GNUTLS_X509_FMT_PEM, "", 0);
+	if (err != GNUTLS_E_DECRYPTION_FAILED) {
+		fail("Unexpected error code: %s/%d\n", gnutls_strerror(err),
+		     err);
+	}
 
-  err = gnutls_x509_privkey_import_pkcs8(key, &data,
-					GNUTLS_X509_FMT_PEM, "password", 0);
-  if (err != 0) {
-    fail("Unexpected error code: %s\n", gnutls_strerror(err));
-  }
+	err = gnutls_x509_privkey_import_pkcs8(key, &data,
+					       GNUTLS_X509_FMT_PEM, "password",
+					       0);
+	if (err != 0) {
+		fail("Unexpected error code: %s\n", gnutls_strerror(err));
+	}
 
-  success("Loaded key\n%s", PRIVATE_KEY);
+	success("Loaded key\n%s", PRIVATE_KEY);
 
-  gnutls_x509_privkey_deinit(key);
-  return 0;
+	gnutls_x509_privkey_deinit(key);
+	return 0;
 }
 
 void doit(void)

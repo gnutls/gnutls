@@ -49,8 +49,7 @@ static void disable_optional_stuff(gnutls_x509_crl_t crl);
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
-int
-gnutls_x509_crl_set_version(gnutls_x509_crl_t crl, unsigned int version)
+int gnutls_x509_crl_set_version(gnutls_x509_crl_t crl, unsigned int version)
 {
 	int result;
 	uint8_t null = version & 0xFF;
@@ -63,8 +62,7 @@ gnutls_x509_crl_set_version(gnutls_x509_crl_t crl, unsigned int version)
 	if (null > 0)
 		null -= 1;
 
-	result =
-	    asn1_write_value(crl->crl, "tbsCertList.version", &null, 1);
+	result = asn1_write_value(crl->crl, "tbsCertList.version", &null, 1);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
@@ -123,8 +121,7 @@ gnutls_x509_crl_sign2(gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer,
 		goto fail;
 	}
 
-	result =
-	    gnutls_x509_crl_privkey_sign(crl, issuer, privkey, dig, flags);
+	result = gnutls_x509_crl_privkey_sign(crl, issuer, privkey, dig, flags);
 	if (result < 0) {
 		gnutls_assert();
 		goto fail;
@@ -132,7 +129,7 @@ gnutls_x509_crl_sign2(gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer,
 
 	result = 0;
 
-      fail:
+ fail:
 	gnutls_privkey_deinit(privkey);
 
 	return result;
@@ -156,8 +153,7 @@ int
 gnutls_x509_crl_sign(gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer,
 		     gnutls_x509_privkey_t issuer_key)
 {
-	return gnutls_x509_crl_sign2(crl, issuer, issuer_key,
-				     0, 0);
+	return gnutls_x509_crl_sign2(crl, issuer, issuer_key, 0, 0);
 }
 
 /**
@@ -310,7 +306,6 @@ gnutls_x509_crl_set_crt(gnutls_x509_crl_t crl, gnutls_x509_crt_t crt,
 	return 0;
 }
 
-
 /* If OPTIONAL fields have not been initialized then
  * disable them.
  */
@@ -319,13 +314,14 @@ static void disable_optional_stuff(gnutls_x509_crl_t crl)
 	time_t t;
 
 	t = _gnutls_x509_get_time(crl->crl, "tbsCertList.nextUpdate", 0);
-	if (t == (time_t)-1) {
-		(void)asn1_write_value(crl->crl, "tbsCertList.nextUpdate", NULL, 0);
+	if (t == (time_t) - 1) {
+		(void)asn1_write_value(crl->crl, "tbsCertList.nextUpdate", NULL,
+				       0);
 	}
 
 	if (crl->use_extensions == 0) {
 		(void)asn1_write_value(crl->crl, "tbsCertList.crlExtensions",
-				 NULL, 0);
+				       NULL, 0);
 	}
 
 	return;
@@ -381,8 +377,7 @@ gnutls_x509_crl_set_authority_key_id(gnutls_x509_crl_t crl,
 		return result;
 	}
 
-	result =
-	    _gnutls_x509_crl_set_extension(crl, "2.5.29.35", &der_data, 0);
+	result = _gnutls_x509_crl_set_extension(crl, "2.5.29.35", &der_data, 0);
 
 	_gnutls_free_datum(&der_data);
 
@@ -445,8 +440,7 @@ gnutls_x509_crl_set_number(gnutls_x509_crl_t crl,
 		return result;
 	}
 
-	result =
-	    _gnutls_x509_crl_set_extension(crl, "2.5.29.20", &der_data, 0);
+	result = _gnutls_x509_crl_set_extension(crl, "2.5.29.20", &der_data, 0);
 
 	_gnutls_free_datum(&der_data);
 
@@ -490,8 +484,7 @@ int
 gnutls_x509_crl_privkey_sign(gnutls_x509_crl_t crl,
 			     gnutls_x509_crt_t issuer,
 			     gnutls_privkey_t issuer_key,
-			     gnutls_digest_algorithm_t dig,
-			     unsigned int flags)
+			     gnutls_digest_algorithm_t dig, unsigned int flags)
 {
 	int result;
 
@@ -501,7 +494,9 @@ gnutls_x509_crl_privkey_sign(gnutls_x509_crl_t crl,
 	}
 
 	if (dig == 0) {
-		result = gnutls_x509_crt_get_preferred_hash_algorithm(issuer, &dig, NULL);
+		result =
+		    gnutls_x509_crt_get_preferred_hash_algorithm(issuer, &dig,
+								 NULL);
 		if (result < 0)
 			return gnutls_assert_val(result);
 	}

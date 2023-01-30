@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdbool.h>
@@ -51,7 +51,8 @@ struct handshake_cb_data_st {
 	bool found_certificate;
 };
 
-static int ext_callback(void *ctx, unsigned tls_id, const unsigned char *data, unsigned size)
+static int ext_callback(void *ctx, unsigned tls_id, const unsigned char *data,
+			unsigned size)
 {
 	struct handshake_cb_data_st *cb_data = ctx;
 	if (tls_id == 27) {	/* compress_certificate */
@@ -71,15 +72,14 @@ static int ext_callback(void *ctx, unsigned tls_id, const unsigned char *data, u
 static int
 handshake_callback(gnutls_session_t session, unsigned int htype,
 		   unsigned post, unsigned int incoming,
-		   const gnutls_datum_t *msg)
+		   const gnutls_datum_t * msg)
 {
 	struct handshake_cb_data_st *data = gnutls_session_get_ptr(session);
 	unsigned pos = 0;
 	gnutls_datum_t mmsg;
 	int ret;
 
-	if ((data->is_server && incoming) ||
-	    (!data->is_server && !incoming)) {
+	if ((data->is_server && incoming) || (!data->is_server && !incoming)) {
 		return 0;
 	}
 
@@ -151,7 +151,10 @@ static void run(void)
 	if (ret < 0)
 		exit(1);
 
-	ret = gnutls_compress_certificate_set_methods(server, smethods, sizeof(smethods)/sizeof(*smethods));
+	ret =
+	    gnutls_compress_certificate_set_methods(server, smethods,
+						    sizeof(smethods) /
+						    sizeof(*smethods));
 	if (ret < 0) {
 		fail("server: setting compression method failed (%s)\n",
 		     gnutls_strerror(ret));
@@ -170,7 +173,8 @@ static void run(void)
 	/* Init client */
 	assert(gnutls_certificate_allocate_credentials(&ccred) >= 0);
 	assert(gnutls_certificate_set_x509_key_mem
-	       (ccred, &cli_ca3_cert_chain, &cli_ca3_key, GNUTLS_X509_FMT_PEM) >= 0);
+	       (ccred, &cli_ca3_cert_chain, &cli_ca3_key,
+		GNUTLS_X509_FMT_PEM) >= 0);
 	assert(gnutls_certificate_set_x509_trust_mem
 	       (ccred, &ca3_cert, GNUTLS_X509_FMT_PEM) >= 0);
 
@@ -185,7 +189,10 @@ static void run(void)
 	if (ret < 0)
 		exit(1);
 
-	ret = gnutls_compress_certificate_set_methods(client, cmethods, sizeof(cmethods)/sizeof(*cmethods));
+	ret =
+	    gnutls_compress_certificate_set_methods(client, cmethods,
+						    sizeof(cmethods) /
+						    sizeof(*cmethods));
 	if (ret < 0) {
 		fail("client: setting compression method failed (%s)\n",
 		     gnutls_strerror(ret));
@@ -199,7 +206,6 @@ static void run(void)
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
-
 
 	HANDSHAKE(client, server);
 	if (debug)

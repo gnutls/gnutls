@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -37,18 +37,18 @@ int main(int argc, char **argv)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/crypto.h>
+# include <string.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/crypto.h>
 
-#include "cert-common.h"
-#include "utils.h"
+# include "cert-common.h"
+# include "utils.h"
 
 /* This program tests whether a keylog function is called.
  */
@@ -69,13 +69,12 @@ const char *side = "";
 
 /* These are global */
 static pid_t child;
-#define MAX_BUF 1024
-#define MSG "Hello TLS"
+# define MAX_BUF 1024
+# define MSG "Hello TLS"
 
 static int
 keylog_func(gnutls_session_t session,
-	    const char *label,
-	    const gnutls_datum_t *secret)
+	    const char *label, const gnutls_datum_t * secret)
 {
 	unsigned int *call_count = gnutls_session_get_ptr(session);
 	static const char *exp_labels[] = {
@@ -86,16 +85,13 @@ keylog_func(gnutls_session_t session,
 		"SERVER_TRAFFIC_SECRET_0"
 	};
 
-	if (*call_count >= sizeof(exp_labels)/sizeof(exp_labels[0]))
-		fail("unexpected secret at call count %u\n",
-		     *call_count);
+	if (*call_count >= sizeof(exp_labels) / sizeof(exp_labels[0]))
+		fail("unexpected secret at call count %u\n", *call_count);
 
 	if (strcmp(label, exp_labels[*call_count]) != 0)
-		fail("unexpected %s at call count %u\n",
-		     label, *call_count);
+		fail("unexpected %s at call count %u\n", label, *call_count);
 	else if (debug)
-		success("received %s at call count %u\n",
-			label, *call_count);
+		success("received %s at call count %u\n", label, *call_count);
 
 	(*call_count)++;
 	return 0;
@@ -135,7 +131,7 @@ static void client(int fd, const char *prio, unsigned int exp_call_count)
 	}
 
 	ret = gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
-				clientx509cred);
+				     clientx509cred);
 	if (ret < 0)
 		exit(1);
 
@@ -170,8 +166,7 @@ static void client(int fd, const char *prio, unsigned int exp_call_count)
 	} while (ret == GNUTLS_E_AGAIN);
 	if (ret == 0) {
 		if (debug)
-			success
-				("client: Peer has closed the TLS connection\n");
+			success("client: Peer has closed the TLS connection\n");
 	} else if (ret < 0) {
 		fail("client: Error: %s\n", gnutls_strerror(ret));
 	}
@@ -226,7 +221,8 @@ static void server(int fd, const char *prio, unsigned int exp_call_count)
 	 * are adequate.
 	 */
 	ret = gnutls_priority_set_direct(session,
-					 "NORMAL:-VERS-ALL:+VERS-TLS1.3:-KX-ALL:-SIGN-ALL:+SIGN-RSA-PSS-RSAE-SHA384:-GROUP-ALL:+GROUP-SECP256R1", NULL);
+					 "NORMAL:-VERS-ALL:+VERS-TLS1.3:-KX-ALL:-SIGN-ALL:+SIGN-RSA-PSS-RSAE-SHA384:-GROUP-ALL:+GROUP-SECP256R1",
+					 NULL);
 	if (ret < 0) {
 		fail("server: priority set failed (%s)\n\n",
 		     gnutls_strerror(ret));
@@ -236,8 +232,7 @@ static void server(int fd, const char *prio, unsigned int exp_call_count)
 	gnutls_certificate_set_x509_key_mem(serverx509cred,
 					    &server_cert, &server_key,
 					    GNUTLS_X509_FMT_PEM);
-	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
-				serverx509cred);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, serverx509cred);
 
 	gnutls_transport_set_int(session, fd);
 
@@ -270,14 +265,14 @@ static void server(int fd, const char *prio, unsigned int exp_call_count)
 
 	if (ret == 0) {
 		if (debug)
-			success("server: Peer has closed the GnuTLS connection\n");
+			success
+			    ("server: Peer has closed the GnuTLS connection\n");
 	} else if (ret < 0) {
 		fail("server: Received corrupted data(%d). Closing...\n", ret);
 	} else if (ret > 0) {
 		/* echo data back to the client
 		 */
-		gnutls_record_send(session, buffer,
-				   strlen(buffer));
+		gnutls_record_send(session, buffer, strlen(buffer));
 	}
 
 	if (call_count != exp_call_count)
@@ -310,8 +305,7 @@ static void terminate(void)
 	exit(1);
 }
 
-static void
-run(const char *prio, unsigned int exp_call_count)
+static void run(const char *prio, unsigned int exp_call_count)
 {
 	int fd[2];
 	int ret;

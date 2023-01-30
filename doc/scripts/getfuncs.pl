@@ -85,7 +85,7 @@ while ($line=<STDIN>) {
       next if ($line =~ m/\}/);
       $state = 4;
       next;
-    } elsif ($line =~ m/^\s*#define/) {
+    } elsif ($line =~ m/^\s*#\s*define/) {
       next if ($line !~ m/\\$/);
       $state = 5;
       next;

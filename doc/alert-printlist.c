@@ -62,7 +62,7 @@ static void main_texinfo(void)
 			       escape_texi_string(gnutls_alert_get_strname
 						  (i), buffer,
 						  sizeof(buffer)),
-			       (unsigned int) i, gnutls_alert_get_name(i));
+			       (unsigned int)i, gnutls_alert_get_name(i));
 		}
 		printf("@end multitable\n");
 
@@ -81,8 +81,7 @@ static const char headers[] = "\\tablefirsthead{%\n"
     "\\multicolumn{3}{|r|}{\\small\\sl continued on next page}\\\\\n"
     "\\hline}\n"
 #endif
-    "\\tablelasttail{\\hline}\n"
-    "\\bottomcaption{The TLS alert table}\n\n";
+    "\\tablelasttail{\\hline}\n" "\\bottomcaption{The TLS alert table}\n\n";
 
 static void main_latex(void)
 {
@@ -109,7 +108,7 @@ static void main_latex(void)
 			printf("{\\small{%s}} & \\code{%d} & %s",
 			       escape_string(gnutls_alert_get_strname(i),
 					     buffer, sizeof(buffer)),
-			       (unsigned int) i, gnutls_alert_get_name(i));
+			       (unsigned int)i, gnutls_alert_get_name(i));
 			printf("\\\\\n");
 		}
 

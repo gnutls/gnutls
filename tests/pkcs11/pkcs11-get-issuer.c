@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -60,8 +60,8 @@ static void tls_log_func(int level, const char *str)
 }
 
 static
-int pin_func(void* userdata, int attempt, const char* url, const char *label,
-		unsigned flags, char *pin, size_t pin_max)
+int pin_func(void *userdata, int attempt, const char *url, const char *label,
+	     unsigned flags, char *pin, size_t pin_max)
 {
 	if (attempt == 0) {
 		strcpy(pin, PIN);
@@ -93,7 +93,7 @@ void doit(void)
 #ifdef _WIN32
 	exit(77);
 #endif
-	for (j=0;;j++) {
+	for (j = 0;; j++) {
 		if (chains[j].name == NULL)
 			break;
 		if (strcmp(chains[j].name, "verisign.com v1 ok") == 0) {
@@ -126,7 +126,9 @@ void doit(void)
 	/* write softhsm.config */
 
 	set_softhsm_conf(CONFIG);
-	snprintf(buf, sizeof(buf), "%s --init-token --slot 0 --label test --so-pin "PIN" --pin "PIN, bin);
+	snprintf(buf, sizeof(buf),
+		 "%s --init-token --slot 0 --label test --so-pin " PIN " --pin "
+		 PIN, bin);
 	system(buf);
 
 	ret = gnutls_pkcs11_add_provider(lib, "trusted");
@@ -138,39 +140,33 @@ void doit(void)
 
 	for (j = 0; chains[idx].chain[j]; j++) {
 		if (debug > 2)
-			printf("\tAdding certificate %d...",
-			       (int) j);
+			printf("\tAdding certificate %d...", (int)j);
 
 		ret = gnutls_x509_crt_init(&certs[j]);
 		if (ret < 0) {
 			fprintf(stderr,
 				"gnutls_x509_crt_init[%d,%d]: %s\n",
-				(int) 3, (int) j,
-				gnutls_strerror(ret));
+				(int)3, (int)j, gnutls_strerror(ret));
 			exit(1);
 		}
 
-		tmp.data = (unsigned char *) chains[idx].chain[j];
+		tmp.data = (unsigned char *)chains[idx].chain[j];
 		tmp.size = strlen(chains[idx].chain[j]);
 
 		ret =
-		    gnutls_x509_crt_import(certs[j], &tmp,
-					   GNUTLS_X509_FMT_PEM);
+		    gnutls_x509_crt_import(certs[j], &tmp, GNUTLS_X509_FMT_PEM);
 		if (debug > 2)
 			printf("done\n");
 		if (ret < 0) {
 			fprintf(stderr,
 				"gnutls_x509_crt_import[%s,%d]: %s\n",
-				chains[idx].name, (int) j,
-				gnutls_strerror(ret));
+				chains[idx].name, (int)j, gnutls_strerror(ret));
 			exit(1);
 		}
 
-		gnutls_x509_crt_print(certs[j],
-				      GNUTLS_CRT_PRINT_ONELINE,
-				      &tmp);
+		gnutls_x509_crt_print(certs[j], GNUTLS_CRT_PRINT_ONELINE, &tmp);
 		if (debug)
-			printf("\tCertificate %d: %.*s\n", (int) j,
+			printf("\tCertificate %d: %.*s\n", (int)j,
 			       tmp.size, tmp.data);
 		gnutls_free(tmp.data);
 	}
@@ -185,11 +181,10 @@ void doit(void)
 		exit(1);
 	}
 
-	tmp.data = (unsigned char *) *chains[idx].ca;
+	tmp.data = (unsigned char *)*chains[idx].ca;
 	tmp.size = strlen(*chains[idx].ca);
 
-	ret =
-	    gnutls_x509_crt_import(ca, &tmp, GNUTLS_X509_FMT_PEM);
+	ret = gnutls_x509_crt_import(ca, &tmp, GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
 		fprintf(stderr, "gnutls_x509_crt_import: %s\n",
 			gnutls_strerror(ret));
@@ -201,8 +196,7 @@ void doit(void)
 
 	gnutls_x509_crt_print(ca, GNUTLS_CRT_PRINT_ONELINE, &tmp);
 	if (debug)
-		printf("\tCA Certificate: %.*s\n", tmp.size,
-		       tmp.data);
+		printf("\tCA Certificate: %.*s\n", tmp.size, tmp.data);
 	gnutls_free(tmp.data);
 
 	if (debug)
@@ -216,7 +210,10 @@ void doit(void)
 	}
 
 	/* write CA certificate to softhsm */
-	ret = gnutls_pkcs11_copy_x509_crt(SOFTHSM_URL, ca, "test-ca", GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED|GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO);
+	ret =
+	    gnutls_pkcs11_copy_x509_crt(SOFTHSM_URL, ca, "test-ca",
+					GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED |
+					GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO);
 	if (ret < 0) {
 		fail("gnutls_pkcs11_copy_x509_crt: %s\n", gnutls_strerror(ret));
 		exit(1);
@@ -224,7 +221,9 @@ void doit(void)
 
 	gnutls_x509_trust_list_init(&tl, 0);
 
-	ret = gnutls_x509_trust_list_add_trust_file(tl, SOFTHSM_URL, NULL, 0, 0, 0);
+	ret =
+	    gnutls_x509_trust_list_add_trust_file(tl, SOFTHSM_URL, NULL, 0, 0,
+						  0);
 	if (ret < 0) {
 		fail("gnutls_x509_trust_list_add_trust_file\n");
 		exit(1);
@@ -232,7 +231,9 @@ void doit(void)
 
 	/* extract the issuer of the certificate */
 	issuer = NULL;
-	ret = gnutls_x509_trust_list_get_issuer(tl, certs[2], &issuer, GNUTLS_TL_GET_COPY);
+	ret =
+	    gnutls_x509_trust_list_get_issuer(tl, certs[2], &issuer,
+					      GNUTLS_TL_GET_COPY);
 	if (ret < 0) {
 		fail("error in gnutls_x509_trust_list_get_issuer\n");
 		exit(1);
@@ -265,10 +266,11 @@ void doit(void)
 	/* Check gnutls_x509_trust_list_get_raw_issuer_by_dn */
 	ret = gnutls_x509_crt_get_raw_issuer_dn(certs[2], &tmp);
 	if (ret < 0) {
-		fail("error in gnutls_x509_crt_get_raw_issuer_dn: %s\n", gnutls_strerror(ret));
+		fail("error in gnutls_x509_crt_get_raw_issuer_dn: %s\n",
+		     gnutls_strerror(ret));
 		exit(1);
 	}
-	
+
 	ret = gnutls_x509_trust_list_get_issuer_by_dn(tl, &tmp, &issuer, 0);
 	gnutls_free(tmp.data);
 	if (ret < 0) {

@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -81,11 +81,12 @@ static unsigned char inconsistent2_pem[] =
     "nL+quIR29t8nb7j+n8l1+2WxCUoxEO0wv37t3MQxjXUxzGfo5NDcXqH1364UBzdM\n"
     "rOBPX50B4LUyV5gNdWMIGVSMX3fTE+j3b+60w6NALXDzGoSGLQH48hpi/Mxzqctt\n"
     "gl58/RqS+nTNQ7c6QMhTj+dgaCE/DUGJJf0354dYp7p43nabr+ZtaMPUaGUQ/1UC\n"
-    "C5/QFweC23w=\n"
-    "-----END CERTIFICATE-----\n";
+    "C5/QFweC23w=\n" "-----END CERTIFICATE-----\n";
 
-const gnutls_datum_t inconsistent = { inconsistent_pem, sizeof(inconsistent_pem)-1 };
-const gnutls_datum_t inconsistent2 = { inconsistent2_pem, sizeof(inconsistent2_pem)-1 };
+const gnutls_datum_t inconsistent =
+    { inconsistent_pem, sizeof(inconsistent_pem) - 1 };
+const gnutls_datum_t inconsistent2 =
+    { inconsistent2_pem, sizeof(inconsistent2_pem) - 1 };
 
 static time_t mytime(time_t * t)
 {
@@ -113,8 +114,7 @@ void doit(void)
 
 	gnutls_x509_crt_init(&crt);
 
-	ret =
-	    gnutls_x509_crt_import(crt, &inconsistent, GNUTLS_X509_FMT_PEM);
+	ret = gnutls_x509_crt_import(crt, &inconsistent, GNUTLS_X509_FMT_PEM);
 	if (ret >= 0)
 		fail("1: gnutls_x509_crt_import");
 
@@ -122,8 +122,7 @@ void doit(void)
 
 	gnutls_x509_crt_init(&crt);
 
-	ret =
-	    gnutls_x509_crt_import(crt, &inconsistent2, GNUTLS_X509_FMT_PEM);
+	ret = gnutls_x509_crt_import(crt, &inconsistent2, GNUTLS_X509_FMT_PEM);
 	if (ret >= 0)
 		fail("2: gnutls_x509_crt_import");
 

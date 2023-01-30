@@ -31,7 +31,7 @@
 volatile int benchmark_must_finish = 0;
 
 #if defined(_WIN32)
-#include <windows.h>
+# include <windows.h>
 static DWORD WINAPI alarm_handler(LPVOID lpParameter)
 {
 	HANDLE wtimer = *((HANDLE *) lpParameter);
@@ -51,22 +51,22 @@ value2human(uint64_t bytes, double time, double *data, double *speed,
 	    char *metric)
 {
 	if (bytes > 1000 && bytes < 1000 * 1000) {
-		*data = ((double) bytes) / 1000;
+		*data = ((double)bytes) / 1000;
 		*speed = *data / time;
 		strcpy(metric, "KB");
 		return;
 	} else if (bytes >= 1000 * 1000 && bytes < 1000 * 1000 * 1000) {
-		*data = ((double) bytes) / (1000 * 1000);
+		*data = ((double)bytes) / (1000 * 1000);
 		*speed = *data / time;
 		strcpy(metric, "MB");
 		return;
 	} else if (bytes >= 1000 * 1000 * 1000) {
-		*data = ((double) bytes) / (1000 * 1000 * 1000);
+		*data = ((double)bytes) / (1000 * 1000 * 1000);
 		*speed = *data / time;
 		strcpy(metric, "GB");
 		return;
 	} else {
-		*data = (double) bytes;
+		*data = (double)bytes;
 		*speed = *data / time;
 		strcpy(metric, "bytes");
 		return;
@@ -92,15 +92,13 @@ void start_benchmark(struct benchmark_st *st)
 	st->wthread =
 	    CreateThread(NULL, 0, alarm_handler, &st->wtimer, 0, NULL);
 	if (st->wthread == NULL) {
-		fprintf(stderr, "error: CreateThread %u\n",
-			GetLastError());
+		fprintf(stderr, "error: CreateThread %u\n", GetLastError());
 		exit(1);
 	}
 	st->alarm_timeout.QuadPart = (BSECS) * 10000000;
 	if (SetWaitableTimer
 	    (st->wtimer, &st->alarm_timeout, 0, NULL, NULL, FALSE) == 0) {
-		fprintf(stderr, "error: SetWaitableTimer %u\n",
-			GetLastError());
+		fprintf(stderr, "error: SetWaitableTimer %u\n", GetLastError());
 		exit(1);
 	}
 #else
@@ -110,8 +108,7 @@ void start_benchmark(struct benchmark_st *st)
 }
 
 /* returns the elapsed time */
-double stop_benchmark(struct benchmark_st *st, const char *metric,
-		      int quiet)
+double stop_benchmark(struct benchmark_st *st, const char *metric, int quiet)
 {
 	double secs;
 	unsigned long lsecs;
@@ -141,7 +138,7 @@ double stop_benchmark(struct benchmark_st *st, const char *metric,
 			       imetric, secs);
 		printf("%.2f %s/sec\n", dspeed, imetric);
 	} else {
-		ddata = (double) st->size;
+		ddata = (double)st->size;
 		dspeed = ddata / secs;
 		if (quiet == 0)
 			printf("  Processed %.2f %s in %.2f secs: ", ddata,

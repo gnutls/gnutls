@@ -24,7 +24,7 @@
 /* Tests whether memory input to ciphers are properly aligned */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -40,24 +40,24 @@ int main(int argc, char **argv)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#if !defined(_WIN32)
-#include <sys/wait.h>
-#endif
-#include <unistd.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/crypto.h>
-#include <nettle/aes.h>
-#include <nettle/cbc.h>
-#include <nettle/gcm.h>
-#include <assert.h>
+# include <string.h>
+# include <sys/types.h>
+# include <sys/socket.h>
+# if !defined(_WIN32)
+#  include <sys/wait.h>
+# endif
+# include <unistd.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/crypto.h>
+# include <nettle/aes.h>
+# include <nettle/cbc.h>
+# include <nettle/gcm.h>
+# include <assert.h>
 
-#include "utils.h"
+# include "utils.h"
 
-#include "ex-session-info.c"
-#include "ex-x509-info.c"
+# include "ex-session-info.c"
+# include "ex-x509-info.c"
 
 static pid_t child;
 
@@ -67,8 +67,8 @@ static void tls_log_func(int level, const char *str)
 		str);
 }
 
-#define MAX_BUF 1024
-#define MSG "Hello TLS"
+# define MAX_BUF 1024
+# define MSG "Hello TLS"
 
 static unsigned char ca_pem[] =
     "-----BEGIN CERTIFICATE-----\n"
@@ -137,8 +137,7 @@ _gnutls_crypto_register_cipher(gnutls_cipher_algorithm_t algorithm,
 			       gnutls_cipher_decrypt_func decrypt,
 			       gnutls_cipher_deinit_func deinit);
 
-static int
-myaes_init(gnutls_cipher_algorithm_t algorithm, void **_ctx, int enc)
+static int myaes_init(gnutls_cipher_algorithm_t algorithm, void **_ctx, int enc)
 {
 	if (algorithm != GNUTLS_CIPHER_AES_128_CBC)
 		return GNUTLS_E_INVALID_REQUEST;
@@ -148,14 +147,13 @@ myaes_init(gnutls_cipher_algorithm_t algorithm, void **_ctx, int enc)
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	((struct myaes_ctx *) (*_ctx))->enc = enc;
+	((struct myaes_ctx *)(*_ctx))->enc = enc;
 	aes_init = 1;
 
 	return 0;
 }
 
-static int
-myaes_setkey(void *_ctx, const void *userkey, size_t keysize)
+static int myaes_setkey(void *_ctx, const void *userkey, size_t keysize)
 {
 	struct myaes_ctx *ctx = _ctx;
 
@@ -179,41 +177,47 @@ static int myaes_setiv(void *_ctx, const void *iv, size_t iv_size)
 
 static int
 myaes_encrypt(void *_ctx, const void *src, size_t src_size,
-	    void *dst, size_t dst_size)
+	      void *dst, size_t dst_size)
 {
 	struct myaes_ctx *ctx = _ctx;
 
-#if 0 /* this is under the control of the caller */
-	if (((unsigned long)src)%16 != 0) {
-		fail("encrypt: source is not 16-byte aligned: %lu\n", ((unsigned long)src)%16);
+# if 0				/* this is under the control of the caller */
+	if (((unsigned long)src) % 16 != 0) {
+		fail("encrypt: source is not 16-byte aligned: %lu\n",
+		     ((unsigned long)src) % 16);
 	}
-#endif
+# endif
 
-	if (((unsigned long)dst)%16 != 0) {
-		fail("encrypt: dest is not 16-byte aligned: %lu\n", ((unsigned long)dst)%16);
+	if (((unsigned long)dst) % 16 != 0) {
+		fail("encrypt: dest is not 16-byte aligned: %lu\n",
+		     ((unsigned long)dst) % 16);
 	}
 
-	cbc_encrypt(&ctx->aes, (nettle_cipher_func*)aes128_encrypt, 16, ctx->iv, src_size, dst, src);
+	cbc_encrypt(&ctx->aes, (nettle_cipher_func *) aes128_encrypt, 16,
+		    ctx->iv, src_size, dst, src);
 	return 0;
 }
 
 static int
 myaes_decrypt(void *_ctx, const void *src, size_t src_size,
-	    void *dst, size_t dst_size)
+	      void *dst, size_t dst_size)
 {
 	struct myaes_ctx *ctx = _ctx;
 
-	if (((unsigned long)src)%16 != 0) {
-		fail("decrypt: source is not 16-byte aligned: %lu\n", ((unsigned long)src)%16);
+	if (((unsigned long)src) % 16 != 0) {
+		fail("decrypt: source is not 16-byte aligned: %lu\n",
+		     ((unsigned long)src) % 16);
 	}
 
-#if 0 /* this is under the control of the caller */
-	if (((unsigned long)dst)%16 != 0) {
-		fail("decrypt: dest is not 16-byte aligned: %lu\n", ((unsigned long)dst)%16);
+# if 0				/* this is under the control of the caller */
+	if (((unsigned long)dst) % 16 != 0) {
+		fail("decrypt: dest is not 16-byte aligned: %lu\n",
+		     ((unsigned long)dst) % 16);
 	}
-#endif
+# endif
 
-	cbc_decrypt(&ctx->aes, (nettle_cipher_func*)aes128_decrypt, 16, ctx->iv, src_size, dst, src);
+	cbc_decrypt(&ctx->aes, (nettle_cipher_func *) aes128_decrypt, 16,
+		    ctx->iv, src_size, dst, src);
 
 	return 0;
 }
@@ -238,8 +242,7 @@ static void client(int sd, const char *prio)
 
 	/* sets the trusted cas file
 	 */
-	gnutls_certificate_set_x509_trust_mem(xcred, &ca,
-					      GNUTLS_X509_FMT_PEM);
+	gnutls_certificate_set_x509_trust_mem(xcred, &ca, GNUTLS_X509_FMT_PEM);
 	gnutls_certificate_set_x509_key_mem(xcred, &cert, &key,
 					    GNUTLS_X509_FMT_PEM);
 
@@ -247,7 +250,7 @@ static void client(int sd, const char *prio)
 	 */
 	gnutls_init(&session, GNUTLS_CLIENT);
 
-	assert(gnutls_priority_set_direct(session, prio, NULL)>=0);
+	assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);
 
 	/* put the x509 credentials to the current session
 	 */
@@ -308,8 +311,7 @@ static void client(int sd, const char *prio)
 
 	if (ret == 0) {
 		if (debug)
-			success
-			    ("client: Peer has closed the TLS connection\n");
+			success("client: Peer has closed the TLS connection\n");
 		goto end;
 	} else if (ret < 0) {
 		fail("client: Error: %s\n", gnutls_strerror(ret));
@@ -326,7 +328,7 @@ static void client(int sd, const char *prio)
 
 	gnutls_bye(session, GNUTLS_SHUT_RDWR);
 
-      end:
+ end:
 
 	close(sd);
 
@@ -338,11 +340,9 @@ static void client(int sd, const char *prio)
 /* This is a sample TLS 1.0 echo server, using X.509 authentication.
  */
 
-#define MAX_BUF 1024
+# define MAX_BUF 1024
 
 /* These are global */
-
-
 
 static unsigned char server_cert_pem[] =
     "-----BEGIN CERTIFICATE-----\n"
@@ -403,8 +403,7 @@ static void server(int sd, const char *prio)
 					      GNUTLS_X509_FMT_PEM);
 
 	gnutls_certificate_set_x509_key_mem(x509_cred, &server_cert,
-					    &server_key,
-					    GNUTLS_X509_FMT_PEM);
+					    &server_key, GNUTLS_X509_FMT_PEM);
 
 	if (debug)
 		success("Launched, generating DH parameters...\n");
@@ -414,7 +413,7 @@ static void server(int sd, const char *prio)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	assert(gnutls_priority_set_direct(session, prio, NULL)>=0);
+	assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
@@ -453,8 +452,7 @@ static void server(int sd, const char *prio)
 		} else if (ret > 0) {
 			/* echo data back to the client
 			 */
-			gnutls_record_send(session, buffer,
-					   strlen(buffer));
+			gnutls_record_send(session, buffer, strlen(buffer));
 		}
 	}
 	/* do not wait for the peer to close the connection.
@@ -509,16 +507,14 @@ void doit(void)
 	global_init();
 
 	ret = _gnutls_crypto_register_cipher(GNUTLS_CIPHER_AES_128_CBC, 1,
-		myaes_init,
-		myaes_setkey,
-		myaes_setiv,
-		myaes_encrypt,
-		myaes_decrypt,
-		myaes_deinit);
+					     myaes_init,
+					     myaes_setkey,
+					     myaes_setiv,
+					     myaes_encrypt,
+					     myaes_decrypt, myaes_deinit);
 	if (ret < 0) {
 		fail("%d: cannot register cipher\n", __LINE__);
 	}
-
 
 	start("NORMAL:-CIPHER-ALL:+AES-128-CBC:-VERS-ALL:+VERS-TLS1.1");
 	start("NORMAL:-CIPHER-ALL:+AES-128-CBC:-VERS-ALL:+VERS-TLS1.2");

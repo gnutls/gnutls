@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -36,19 +36,19 @@ int main(void)
 
 #else
 
-#include <string.h>
-#include <errno.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <signal.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/dtls.h>
+# include <string.h>
+# include <errno.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <signal.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/dtls.h>
 
-#include "utils.h"
+# include "utils.h"
 
 static int test_finished = 0;
 static void terminate(void);
@@ -82,9 +82,9 @@ static pid_t child;
 /* A test client/server app for DTLS duplicate packet detection.
  */
 
-#define MAX_BUF 1024
+# define MAX_BUF 1024
 
-#define MAX_SEQ 128
+# define MAX_SEQ 128
 
 static int msg_seq[] =
     { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 16, 5, 32, 11, 11, 11, 11, 12,
@@ -124,7 +124,8 @@ static ssize_t odd_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 								 [i]],
 						 stored_sizes[msg_seq[i]], 0);
 				}
-				while (ret == -1 && (errno == EAGAIN || errno == EINTR));
+				while (ret == -1
+				       && (errno == EAGAIN || errno == EINTR));
 				pos++;
 			} else
 				break;
@@ -166,7 +167,7 @@ static ssize_t n_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 static int recv_msg_seq[] =
     { 1, 2, 3, 4, 5, 6, 12, 28, 7, 8, 9, 10, 11, 13, 15, 16, 14, 18, 20,
 	19, 21, 22, 23, 25, 24, 26, 27, 29, 30, 31, 33, 32, 34, 35, 38, 36, 37,
-	    -1
+	-1
 };
 
 static void client(int fd)
@@ -195,7 +196,8 @@ static void client(int fd)
 	/* Initialize TLS session
 	 */
 	gnutls_init(&session, GNUTLS_CLIENT | GNUTLS_DATAGRAM);
-	gnutls_dtls_set_timeouts(session, get_dtls_retransmit_timeout(), get_timeout());
+	gnutls_dtls_set_timeouts(session, get_dtls_retransmit_timeout(),
+				 get_timeout());
 	gnutls_heartbeat_enable(session, GNUTLS_HB_PEER_ALLOWED_TO_SEND);
 	gnutls_dtls_set_mtu(session, 1500);
 
@@ -249,9 +251,8 @@ static void client(int fd)
 				fail("received message sequence differs\n");
 				exit(1);
 			}
-			if (((uint32_t)recv_msg_seq[current]) != useq) {
-				fail("received message sequence differs (current: %u, got: %u, expected: %u)\n",
-				     (unsigned)current, (unsigned)useq, (unsigned)recv_msg_seq[current]);
+			if (((uint32_t) recv_msg_seq[current]) != useq) {
+				fail("received message sequence differs (current: %u, got: %u, expected: %u)\n", (unsigned)current, (unsigned)useq, (unsigned)recv_msg_seq[current]);
 				exit(1);
 			}
 
@@ -298,7 +299,8 @@ static void server(int fd)
 	gnutls_anon_allocate_server_credentials(&anoncred);
 
 	gnutls_init(&session, GNUTLS_SERVER | GNUTLS_DATAGRAM);
-	gnutls_dtls_set_timeouts(session, get_dtls_retransmit_timeout(), get_timeout());
+	gnutls_dtls_set_timeouts(session, get_dtls_retransmit_timeout(),
+				 get_timeout());
 	gnutls_transport_set_push_function(session, odd_push);
 	gnutls_heartbeat_enable(session, GNUTLS_HB_PEER_ALLOWED_TO_SEND);
 	gnutls_dtls_set_mtu(session, 1500);

@@ -39,23 +39,20 @@ struct options_st {
 	size_t capacity;
 };
 
-struct parser_st
-{
+struct parser_st {
 	FILE *fp;
 	char pushback[2];
 	size_t pushback_length;
 };
 
-static inline void
-clear_option(struct cfg_option_st *option)
+static inline void clear_option(struct cfg_option_st *option)
 {
 	free(option->name);
 	free(option->value);
 	memset(option, 0, sizeof(*option));
 }
 
-void
-cfg_free(cfg_option_t options)
+void cfg_free(cfg_option_t options)
 {
 	for (size_t i = 0; options[i].name; i++) {
 		clear_option(&options[i]);
@@ -76,8 +73,7 @@ struct buffer_st {
 	size_t capacity;
 };
 
-static int
-buffer_append(struct buffer_st *buffer, int c)
+static int buffer_append(struct buffer_st *buffer, int c)
 {
 	size_t new_length = xsum(buffer->length, 1);
 	if (size_overflow_p(new_length)) {
@@ -103,8 +99,7 @@ buffer_append(struct buffer_st *buffer, int c)
 	return 0;
 }
 
-static int
-parser_getc(struct parser_st *parser)
+static int parser_getc(struct parser_st *parser)
 {
 	if (parser->pushback_length > 0) {
 		return parser->pushback[--parser->pushback_length];
@@ -113,15 +108,13 @@ parser_getc(struct parser_st *parser)
 	return c;
 }
 
-static void
-parser_ungetc(struct parser_st *parser, int c)
+static void parser_ungetc(struct parser_st *parser, int c)
 {
 	assert(parser->pushback_length < SIZEOF(parser->pushback));
 	parser->pushback[parser->pushback_length++] = c;
 }
 
-static void
-skip_comment(struct parser_st *parser)
+static void skip_comment(struct parser_st *parser)
 {
 	int c;
 
@@ -144,8 +137,7 @@ skip_comment(struct parser_st *parser)
 	parser_ungetc(parser, c);
 }
 
-static void
-skip_chars(struct parser_st *parser, const char *chars)
+static void skip_chars(struct parser_st *parser, const char *chars)
 {
 	int c;
 
@@ -161,8 +153,7 @@ skip_chars(struct parser_st *parser, const char *chars)
 	parser_ungetc(parser, c);
 }
 
-static void
-skip_comments_and_whitespaces(struct parser_st *parser)
+static void skip_comments_and_whitespaces(struct parser_st *parser)
 {
 	int c;
 
@@ -183,8 +174,7 @@ skip_comments_and_whitespaces(struct parser_st *parser)
 }
 
 /* Read the name part of an option.  Returns NULL if it fails.  */
-static char *
-read_name(struct parser_st *parser)
+static char *read_name(struct parser_st *parser)
 {
 	struct buffer_st buffer;
 	int c;
@@ -227,8 +217,7 @@ read_name(struct parser_st *parser)
 	return buffer.data;
 }
 
-static char *
-read_quoted_value(struct parser_st *parser)
+static char *read_quoted_value(struct parser_st *parser)
 {
 	struct buffer_st buffer;
 	int c, quote_char;
@@ -278,8 +267,7 @@ read_quoted_value(struct parser_st *parser)
 }
 
 /* Read the value part of an option.  Returns NULL if it fails.  */
-static char *
-read_value(struct parser_st *parser)
+static char *read_value(struct parser_st *parser)
 {
 	struct buffer_st buffer;
 	int c;
@@ -308,7 +296,7 @@ read_value(struct parser_st *parser)
 	}
 
 	if (c == '\n') {
-		return strdup(""); /* empty value */
+		return strdup("");	/* empty value */
 	} else if (c == '"' || c == '\'') {
 		parser_ungetc(parser, c);
 		return read_quoted_value(parser);
@@ -342,8 +330,7 @@ read_value(struct parser_st *parser)
 }
 
 /* Append OPTION to OPTIONS.  Take ownership of the fields of OPTION.  */
-static int
-take_option(struct options_st *options, struct cfg_option_st *option)
+static int take_option(struct options_st *options, struct cfg_option_st *option)
 {
 	size_t new_length = xsum(options->length, 1);
 	if (size_overflow_p(new_length)) {
@@ -379,16 +366,14 @@ take_option(struct options_st *options, struct cfg_option_st *option)
 	return 0;
 }
 
-static void
-clear_options(struct options_st *options)
+static void clear_options(struct options_st *options)
 {
 	for (size_t i = 0; options->length; i++) {
 		clear_option(&options->data[i]);
 	}
 }
 
-cfg_option_t
-cfg_load(const char *filename)
+cfg_option_t cfg_load(const char *filename)
 {
 	struct parser_st parser;
 	struct options_st options;
@@ -428,14 +413,13 @@ cfg_load(const char *filename)
 	take_option(&options, &null_option);
 	return options.data;
 
-error:
+ error:
 	clear_options(&options);
 	fclose(parser.fp);
 	return NULL;
 }
 
-cfg_option_t
-cfg_next(const cfg_option_t options, const char *name)
+cfg_option_t cfg_next(const cfg_option_t options, const char *name)
 {
 	for (size_t i = 0; options[i].name; i++) {
 		if (strcmp(options[i].name, name) == 0) {
@@ -446,8 +430,7 @@ cfg_next(const cfg_option_t options, const char *name)
 }
 
 #ifdef TEST
-int
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
 	cfg_option_t opts;
 

@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -44,8 +44,7 @@ static void tls_log_func(int level, const char *str)
 #include "cert-common.h"
 
 static int
-pskfunc(gnutls_session_t session, const char *username,
-	gnutls_datum_t * key)
+pskfunc(gnutls_session_t session, const char *username, gnutls_datum_t * key)
 {
 	if (debug)
 		printf("psk: username %s\n", username);
@@ -58,21 +57,21 @@ pskfunc(gnutls_session_t session, const char *username,
 	return 0;
 }
 
-static void try(const char *prio, gnutls_kx_algorithm_t kx, unsigned allow_change)
+static void try(const char *prio, gnutls_kx_algorithm_t kx,
+		unsigned allow_change)
 {
 	int ret;
 	/* Server stuff. */
 	gnutls_psk_server_credentials_t serverpskcred;
 	gnutls_dh_params_t dh_params;
-	const gnutls_datum_t p3 =
-	    { (unsigned char *) pkcs3, strlen(pkcs3) };
+	const gnutls_datum_t p3 = { (unsigned char *)pkcs3, strlen(pkcs3) };
 	gnutls_session_t server;
 	int sret = GNUTLS_E_AGAIN;
 	/* Client stuff. */
 	gnutls_psk_client_credentials_t clientpskcred;
 	gnutls_psk_client_credentials_t clientpskcred2;
 	gnutls_session_t client;
-	const gnutls_datum_t key = { (void *) "DEADBEEF", 8 };
+	const gnutls_datum_t key = { (void *)"DEADBEEF", 8 };
 	int cret = GNUTLS_E_AGAIN;
 
 	/* General init. */
@@ -83,23 +82,19 @@ static void try(const char *prio, gnutls_kx_algorithm_t kx, unsigned allow_chang
 	/* Init server */
 	gnutls_psk_allocate_server_credentials(&serverpskcred);
 
-	gnutls_psk_set_server_credentials_function(serverpskcred,
-						   pskfunc);
+	gnutls_psk_set_server_credentials_function(serverpskcred, pskfunc);
 
 	gnutls_dh_params_init(&dh_params);
 	gnutls_dh_params_import_pkcs3(dh_params, &p3, GNUTLS_X509_FMT_PEM);
 	gnutls_psk_set_server_dh_params(serverpskcred, dh_params);
 
 	if (allow_change)
-		gnutls_init(&server, GNUTLS_SERVER|GNUTLS_ALLOW_ID_CHANGE);
+		gnutls_init(&server, GNUTLS_SERVER | GNUTLS_ALLOW_ID_CHANGE);
 	else
 		gnutls_init(&server, GNUTLS_SERVER);
-	gnutls_credentials_set(server, GNUTLS_CRD_PSK,
-				serverpskcred);
+	gnutls_credentials_set(server, GNUTLS_CRD_PSK, serverpskcred);
 
-	gnutls_priority_set_direct(server,
-				   prio,
-				   NULL);
+	gnutls_priority_set_direct(server, prio, NULL);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
@@ -124,8 +119,7 @@ static void try(const char *prio, gnutls_kx_algorithm_t kx, unsigned allow_chang
 	if (ret < 0)
 		exit(1);
 
-	ret = gnutls_credentials_set(client, GNUTLS_CRD_PSK,
-				clientpskcred);
+	ret = gnutls_credentials_set(client, GNUTLS_CRD_PSK, clientpskcred);
 	if (ret < 0)
 		exit(1);
 
@@ -140,22 +134,20 @@ static void try(const char *prio, gnutls_kx_algorithm_t kx, unsigned allow_chang
 	HANDSHAKE(client, server);
 
 	if (gnutls_kx_get(client) != kx) {
-		fail("got unexpected key exchange algorithm: %s (expected %s)\n",
-			gnutls_kx_get_name(gnutls_kx_get(client)),
-			gnutls_kx_get_name(kx));
+		fail("got unexpected key exchange algorithm: %s (expected %s)\n", gnutls_kx_get_name(gnutls_kx_get(client)), gnutls_kx_get_name(kx));
 		exit(1);
 	}
 
 	/* switch client's username and rehandshake */
-	ret = gnutls_credentials_set(client, GNUTLS_CRD_PSK,
-				clientpskcred2);
+	ret = gnutls_credentials_set(client, GNUTLS_CRD_PSK, clientpskcred2);
 	if (ret < 0)
 		exit(1);
 
 	if (allow_change) {
 		HANDSHAKE(client, server);
 	} else {
-		HANDSHAKE_EXPECT(client, server, GNUTLS_E_AGAIN, GNUTLS_E_SESSION_USER_ID_CHANGED);
+		HANDSHAKE_EXPECT(client, server, GNUTLS_E_AGAIN,
+				 GNUTLS_E_SESSION_USER_ID_CHANGED);
 	}
 
 	gnutls_deinit(client);
@@ -174,17 +166,21 @@ void doit(void)
 	/* Allow change of ID */
 	try("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+PSK", GNUTLS_KX_PSK, 0);
 	reset_buffers();
-	try("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+DHE-PSK", GNUTLS_KX_DHE_PSK, 0);
+	try("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+DHE-PSK", GNUTLS_KX_DHE_PSK,
+	    0);
 	reset_buffers();
-	try("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ECDHE-PSK", GNUTLS_KX_ECDHE_PSK, 0);
+	try("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ECDHE-PSK",
+	    GNUTLS_KX_ECDHE_PSK, 0);
 	reset_buffers();
 
 	/* Prohibit (default) change of ID */
 	try("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+PSK", GNUTLS_KX_PSK, 1);
 	reset_buffers();
-	try("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+DHE-PSK", GNUTLS_KX_DHE_PSK, 1);
+	try("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+DHE-PSK", GNUTLS_KX_DHE_PSK,
+	    1);
 	reset_buffers();
-	try("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ECDHE-PSK", GNUTLS_KX_ECDHE_PSK, 1);
+	try("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ECDHE-PSK",
+	    GNUTLS_KX_ECDHE_PSK, 1);
 	reset_buffers();
 	gnutls_global_deinit();
 }

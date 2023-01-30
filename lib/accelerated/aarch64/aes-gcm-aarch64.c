@@ -67,7 +67,7 @@ struct aes_gcm_ctx {
 
 void gcm_init_v8(u128 Htable[16], const uint64_t Xi[2]);
 void gcm_ghash_v8(uint64_t Xi[2], const u128 Htable[16],
-		     const uint8_t * inp, size_t len);
+		  const uint8_t * inp, size_t len);
 void gcm_gmult_v8(uint64_t Xi[2], const u128 Htable[16]);
 
 static void aes_gcm_deinit(void *_ctx)
@@ -79,8 +79,7 @@ static void aes_gcm_deinit(void *_ctx)
 }
 
 static int
-aes_gcm_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx,
-		    int enc)
+aes_gcm_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx, int enc)
 {
 	/* we use key size to distinguish */
 	if (algorithm != GNUTLS_CIPHER_AES_128_GCM &&
@@ -107,7 +106,7 @@ aes_gcm_cipher_setkey(void *_ctx, const void *userkey, size_t keysize)
 
 	ret =
 	    aes_v8_set_encrypt_key(userkey, keysize * 8,
-				  ALIGN16(&ctx->expanded_key));
+				   ALIGN16(&ctx->expanded_key));
 	if (ret != 0)
 		return gnutls_assert_val(GNUTLS_E_ENCRYPTION_FAILED);
 
@@ -139,7 +138,7 @@ static int aes_gcm_setiv(void *_ctx, const void *iv, size_t iv_size)
 	ctx->gcm.Yi.c[GCM_BLOCK_SIZE - 1] = 1;
 
 	aes_v8_encrypt(ctx->gcm.Yi.c, ctx->gcm.EK0.c,
-			ALIGN16(&ctx->expanded_key));
+		       ALIGN16(&ctx->expanded_key));
 	ctx->gcm.Yi.c[GCM_BLOCK_SIZE - 1] = 2;
 	ctx->finished = 0;
 	ctx->auth_finished = 0;
@@ -154,8 +153,7 @@ gcm_ghash(struct aes_gcm_ctx *ctx, const uint8_t * src, size_t src_size)
 	size_t aligned_size = src_size - rest;
 
 	if (aligned_size > 0)
-		gcm_ghash_v8(ctx->gcm.Xi.u, ctx->gcm.Htable, src,
-				aligned_size);
+		gcm_ghash_v8(ctx->gcm.Xi.u, ctx->gcm.Htable, src, aligned_size);
 
 	if (rest > 0) {
 		memxor(ctx->gcm.Xi.c, src + aligned_size, rest);
@@ -165,7 +163,7 @@ gcm_ghash(struct aes_gcm_ctx *ctx, const uint8_t * src, size_t src_size)
 
 static void
 ctr32_encrypt_blocks_inplace(const unsigned char *in, unsigned char *out,
-			     size_t blocks, const AES_KEY *key,
+			     size_t blocks, const AES_KEY * key,
 			     const unsigned char ivec[16])
 {
 	unsigned i;
@@ -174,7 +172,7 @@ ctr32_encrypt_blocks_inplace(const unsigned char *in, unsigned char *out,
 
 	memcpy(ctr, ivec, 16);
 
-	for (i=0;i<blocks;i++) {
+	for (i = 0; i < blocks; i++) {
 		aes_v8_encrypt(ctr, tmp, key);
 		memxor3(out, tmp, in, 16);
 
@@ -186,7 +184,7 @@ ctr32_encrypt_blocks_inplace(const unsigned char *in, unsigned char *out,
 
 static void
 ctr32_encrypt_blocks(const unsigned char *in, unsigned char *out,
-		     size_t blocks, const AES_KEY *key,
+		     size_t blocks, const AES_KEY * key,
 		     const unsigned char ivec[16])
 {
 	unsigned i;
@@ -197,7 +195,7 @@ ctr32_encrypt_blocks(const unsigned char *in, unsigned char *out,
 
 	memcpy(ctr, ivec, 16);
 
-	for (i=0;i<blocks;i++) {
+	for (i = 0; i < blocks; i++) {
 		aes_v8_encrypt(ctr, out, key);
 		memxor(out, in, 16);
 
@@ -216,8 +214,7 @@ ctr_encrypt_last(struct aes_gcm_ctx *ctx, const uint8_t * src,
 
 	memcpy(tmp, &src[pos], length);
 	ctr32_encrypt_blocks(tmp, out, 1,
-			     ALIGN16(&ctx->expanded_key),
-			     ctx->gcm.Yi.c);
+			     ALIGN16(&ctx->expanded_key), ctx->gcm.Yi.c);
 
 	memcpy(&dst[pos], out, length);
 
@@ -256,7 +253,7 @@ aes_gcm_encrypt(void *_ctx, const void *src, size_t src_size,
 		_gnutls_write_uint32(counter, ctx->gcm.Yi.c + 12);
 	}
 
-	if (rest > 0) {	/* last incomplete block */
+	if (rest > 0) {		/* last incomplete block */
 		ctr_encrypt_last(ctx, src, dst, exp_blocks, rest);
 		ctx->finished = 1;
 	}
@@ -297,7 +294,7 @@ aes_gcm_decrypt(void *_ctx, const void *src, size_t src_size,
 		_gnutls_write_uint32(counter, ctx->gcm.Yi.c + 12);
 	}
 
-	if (rest > 0) { /* last incomplete block */
+	if (rest > 0) {		/* last incomplete block */
 		ctr_encrypt_last(ctx, src, dst, exp_blocks, rest);
 		ctx->finished = 1;
 	}
@@ -321,7 +318,6 @@ static int aes_gcm_auth(void *_ctx, const void *src, size_t src_size)
 	return 0;
 }
 
-
 static void aes_gcm_tag(void *_ctx, void *tag, size_t tagsize)
 {
 	struct aes_gcm_ctx *ctx = _ctx;
@@ -334,8 +330,7 @@ static void aes_gcm_tag(void *_ctx, void *tag, size_t tagsize)
 	_gnutls_write_uint64(alen, buffer);
 	_gnutls_write_uint64(clen, &buffer[8]);
 
-	gcm_ghash_v8(ctx->gcm.Xi.u, ctx->gcm.Htable, buffer,
-			GCM_BLOCK_SIZE);
+	gcm_ghash_v8(ctx->gcm.Xi.u, ctx->gcm.Htable, buffer, GCM_BLOCK_SIZE);
 
 	ctx->gcm.Xi.u[0] ^= ctx->gcm.EK0.u[0];
 	ctx->gcm.Xi.u[1] ^= ctx->gcm.EK0.u[1];

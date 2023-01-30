@@ -44,12 +44,11 @@ typedef struct test_case_st {
 	bool request_cli_crt;
 	bool cli_srv_may_diverge;
 	// only needed when may_diverge is true
-	gnutls_certificate_type_t expected_cli_cli_ctype; // negotiated cli ctype on the client
-	gnutls_certificate_type_t expected_srv_cli_ctype; // negotiated cli ctype on the server
-	gnutls_certificate_type_t expected_cli_srv_ctype; // negotiated srv ctype on the client
-	gnutls_certificate_type_t expected_srv_srv_ctype; // negotiated srv ctype on the server
+	gnutls_certificate_type_t expected_cli_cli_ctype;	// negotiated cli ctype on the client
+	gnutls_certificate_type_t expected_srv_cli_ctype;	// negotiated cli ctype on the server
+	gnutls_certificate_type_t expected_cli_srv_ctype;	// negotiated srv ctype on the client
+	gnutls_certificate_type_t expected_srv_srv_ctype;	// negotiated srv ctype on the server
 } test_case_st;
-
 
 static void try(test_case_st * test)
 {
@@ -71,14 +70,16 @@ static void try(test_case_st * test)
 	success("Running %s...\n", test->name);
 
 	// Init client/server
-	if(test->init_flags_cli) {
-		assert(gnutls_init(&client, GNUTLS_CLIENT | test->init_flags_cli) >= 0);
+	if (test->init_flags_cli) {
+		assert(gnutls_init
+		       (&client, GNUTLS_CLIENT | test->init_flags_cli) >= 0);
 	} else {
 		assert(gnutls_init(&client, GNUTLS_CLIENT) >= 0);
 	}
 
 	if (test->init_flags_srv) {
-		assert(gnutls_init(&server, GNUTLS_SERVER | test->init_flags_srv) >= 0);
+		assert(gnutls_init
+		       (&server, GNUTLS_SERVER | test->init_flags_srv) >= 0);
 	} else {
 		assert(gnutls_init(&server, GNUTLS_SERVER) >= 0);
 	}
@@ -86,57 +87,62 @@ static void try(test_case_st * test)
 	/* Set up our credentials for this handshake */
 	// Test for using empty cli credentials
 	if (test->set_cli_creds == CRED_EMPTY) {
-		gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE, client_creds);
+		gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
+				       client_creds);
 	} else {
 		// Test for using X509 cli credentials
 		if (test->set_cli_creds & CRED_X509) {
 			assert(gnutls_certificate_set_x509_key_mem
-						 (client_creds, &cli_ca3_cert,	&cli_ca3_key, GNUTLS_X509_FMT_PEM) >= 0);
+			       (client_creds, &cli_ca3_cert, &cli_ca3_key,
+				GNUTLS_X509_FMT_PEM) >= 0);
 		}
-
 		// Test for using RawPubKey cli credentials
 		if (test->set_cli_creds & CRED_RAWPK) {
-			assert(gnutls_certificate_set_rawpk_key_mem(client_creds,
-				&rawpk_public_key1, &rawpk_private_key1, GNUTLS_X509_FMT_PEM,
-				NULL, 0, NULL, 0, 0) >= 0);
+			assert(gnutls_certificate_set_rawpk_key_mem
+			       (client_creds, &rawpk_public_key1,
+				&rawpk_private_key1, GNUTLS_X509_FMT_PEM, NULL,
+				0, NULL, 0, 0) >= 0);
 		}
-
 		// -- Add extra ctype creds here in the future --
 
 		// Finally set the credentials
-		gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE, client_creds);
+		gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
+				       client_creds);
 	}
 
 	// Test for using empty srv credentials
 	if (test->set_srv_creds == CRED_EMPTY) {
-		gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, server_creds);
+		gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
+				       server_creds);
 	} else {
 		// Test for using X509 srv credentials
 		if (test->set_srv_creds & CRED_X509) {
 			assert(gnutls_certificate_set_x509_key_mem
-						 (server_creds, &server_ca3_localhost_rsa_decrypt_cert,
+			       (server_creds,
+				&server_ca3_localhost_rsa_decrypt_cert,
 				&server_ca3_key, GNUTLS_X509_FMT_PEM) >= 0);
 			assert(gnutls_certificate_set_x509_key_mem
-						 (server_creds, &server_ca3_localhost_ecc_cert,
+			       (server_creds, &server_ca3_localhost_ecc_cert,
 				&server_ca3_ecc_key, GNUTLS_X509_FMT_PEM) >= 0);
 			assert(gnutls_certificate_set_x509_key_mem
-						 (server_creds, &server_ca3_localhost_rsa_sign_cert,
+			       (server_creds,
+				&server_ca3_localhost_rsa_sign_cert,
 				&server_ca3_key, GNUTLS_X509_FMT_PEM) >= 0);
 			gnutls_certificate_set_known_dh_params(server_creds,
-										 GNUTLS_SEC_PARAM_MEDIUM);
+							       GNUTLS_SEC_PARAM_MEDIUM);
 		}
-
 		// Test for using RawPubKey srv credentials
 		if (test->set_srv_creds & CRED_RAWPK) {
-			assert(gnutls_certificate_set_rawpk_key_mem(server_creds,
-				&rawpk_public_key2, &rawpk_private_key2, GNUTLS_X509_FMT_PEM,
-				NULL, 0, NULL, 0, 0) >= 0);
+			assert(gnutls_certificate_set_rawpk_key_mem
+			       (server_creds, &rawpk_public_key2,
+				&rawpk_private_key2, GNUTLS_X509_FMT_PEM, NULL,
+				0, NULL, 0, 0) >= 0);
 		}
-
 		// -- Add extra ctype creds here in the future --
 
 		// Finally set the credentials
-		gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, server_creds);
+		gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
+				       server_creds);
 	}
 
 	// Server settings
@@ -146,7 +152,8 @@ static void try(test_case_st * test)
 	assert(gnutls_priority_set_direct(server, test->server_prio, 0) >= 0);
 
 	if (test->request_cli_crt)
-		gnutls_certificate_server_set_request(server, GNUTLS_CERT_REQUEST);
+		gnutls_certificate_server_set_request(server,
+						      GNUTLS_CERT_REQUEST);
 
 	// Client settings
 	gnutls_transport_set_push_function(client, client_push);
@@ -158,7 +165,8 @@ static void try(test_case_st * test)
 	if (test->client_err && test->server_err) {
 		/* We expect errors during the handshake and don't check
 		 * any negotiated certificate types */
-		HANDSHAKE_EXPECT(client, server, test->client_err, test->server_err);
+		HANDSHAKE_EXPECT(client, server, test->client_err,
+				 test->server_err);
 	} else {
 		/* We expect a handshake without errors and check the negotiated
 		 * certificate types */
@@ -166,20 +174,28 @@ static void try(test_case_st * test)
 
 		/* Get the negotiated certificate types */
 		srv_srv_ctype =
-				gnutls_certificate_type_get2(server, GNUTLS_CTYPE_SERVER);
+		    gnutls_certificate_type_get2(server, GNUTLS_CTYPE_SERVER);
 		srv_cli_ctype =
-				gnutls_certificate_type_get2(server, GNUTLS_CTYPE_CLIENT);
+		    gnutls_certificate_type_get2(server, GNUTLS_CTYPE_CLIENT);
 		cli_srv_ctype =
-				gnutls_certificate_type_get2(client, GNUTLS_CTYPE_SERVER);
+		    gnutls_certificate_type_get2(client, GNUTLS_CTYPE_SERVER);
 		cli_cli_ctype =
-				gnutls_certificate_type_get2(client, GNUTLS_CTYPE_CLIENT);
+		    gnutls_certificate_type_get2(client, GNUTLS_CTYPE_CLIENT);
 
 		// For debugging
 		if (debug) {
-				success("Srv srv ctype: %s\n", gnutls_certificate_type_get_name(srv_srv_ctype));
-				success("Srv cli ctype: %s\n", gnutls_certificate_type_get_name(srv_cli_ctype));
-				success("Cli srv ctype: %s\n", gnutls_certificate_type_get_name(cli_srv_ctype));
-				success("Cli srv ctype: %s\n", gnutls_certificate_type_get_name(cli_cli_ctype));
+			success("Srv srv ctype: %s\n",
+				gnutls_certificate_type_get_name
+				(srv_srv_ctype));
+			success("Srv cli ctype: %s\n",
+				gnutls_certificate_type_get_name
+				(srv_cli_ctype));
+			success("Cli srv ctype: %s\n",
+				gnutls_certificate_type_get_name
+				(cli_srv_ctype));
+			success("Cli srv ctype: %s\n",
+				gnutls_certificate_type_get_name
+				(cli_cli_ctype));
 		}
 
 		/* Check whether the negotiated certificate types match the expected results */
@@ -219,10 +235,18 @@ static void try(test_case_st * test)
 			}
 
 			/* Check whether the API functions return the correct cert types for OURS and PEERS */
-			assert(srv_srv_ctype == gnutls_certificate_type_get2(server, GNUTLS_CTYPE_OURS));
-			assert(srv_srv_ctype == gnutls_certificate_type_get2(client, GNUTLS_CTYPE_PEERS));
-			assert(cli_cli_ctype == gnutls_certificate_type_get2(server, GNUTLS_CTYPE_PEERS));
-			assert(cli_cli_ctype == gnutls_certificate_type_get2(client, GNUTLS_CTYPE_OURS));
+			assert(srv_srv_ctype ==
+			       gnutls_certificate_type_get2(server,
+							    GNUTLS_CTYPE_OURS));
+			assert(srv_srv_ctype ==
+			       gnutls_certificate_type_get2(client,
+							    GNUTLS_CTYPE_PEERS));
+			assert(cli_cli_ctype ==
+			       gnutls_certificate_type_get2(server,
+							    GNUTLS_CTYPE_PEERS));
+			assert(cli_cli_ctype ==
+			       gnutls_certificate_type_get2(client,
+							    GNUTLS_CTYPE_OURS));
 		}
 	}
 

@@ -22,7 +22,7 @@
 /* Parts copied from GnuTLS example programs. */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -50,7 +50,7 @@ static const char cert_pem[] =
     "jpfc/3X7sLUsMvumcDE01ls/cG5mIatmiyEU9qI3jbgUf82z23ON/acwJf875D3/\n"
     "U7jyOsBJ44SEQITbin2yUeJMIm1tievvdNXBDfW95AM507ShzP12sfiJkJfjjdhy\n"
     "dc8Siq5JojruiMizAf0pA7in\n" "-----END CERTIFICATE-----\n";
-static const gnutls_datum_t cert_datum = { (unsigned char *) cert_pem,
+static const gnutls_datum_t cert_datum = { (unsigned char *)cert_pem,
 	sizeof(cert_pem)
 };
 
@@ -91,8 +91,7 @@ void doit(void)
 		fail("FAIL: re-import subject DN.\n");
 
 	buf2len = sizeof buf2;
-	rv = gnutls_x509_dn_export(dn2, GNUTLS_X509_FMT_DER, buf2,
-				   &buf2len);
+	rv = gnutls_x509_dn_export(dn2, GNUTLS_X509_FMT_DER, buf2, &buf2len);
 	if (rv != 0)
 		fail("FAIL: could not export subject DN: %s\n",
 		     gnutls_strerror(rv));

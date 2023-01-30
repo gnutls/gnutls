@@ -77,7 +77,7 @@ int gnutls_system_global_init(void)
 
 	pCertEnumCRLsInStore =
 	    (CertEnumCRLsInStoreFunc) GetProcAddress(crypto,
-						      "CertEnumCRLsInStore");
+						     "CertEnumCRLsInStore");
 	if (pCertEnumCRLsInStore == NULL) {
 		FreeLibrary(crypto);
 		return GNUTLS_E_CRYPTO_INIT_FAILED;
@@ -98,5 +98,3 @@ void gnutls_system_global_deinit(void)
 	gnutls_time = time;
 	gnutls_gettime = _gnutls_gettime;
 }
-
-

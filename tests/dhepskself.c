@@ -23,7 +23,7 @@
 /* Parts copied from GnuTLS example programs. */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -39,22 +39,22 @@ int main(int argc, char **argv)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#if !defined(_WIN32)
-#include <sys/wait.h>
-#endif
-#include <unistd.h>
-#include <gnutls/gnutls.h>
+# include <string.h>
+# include <sys/types.h>
+# include <sys/socket.h>
+# if !defined(_WIN32)
+#  include <sys/wait.h>
+# endif
+# include <unistd.h>
+# include <gnutls/gnutls.h>
 
-#include "utils.h"
+# include "utils.h"
 
 /* A very basic TLS client, with PSK authentication.
  */
 
-#define MAX_BUF 1024
-#define MSG "Hello TLS"
+# define MAX_BUF 1024
+# define MSG "Hello TLS"
 
 static void tls_log_func(int level, const char *str)
 {
@@ -67,7 +67,7 @@ static void client(int sd)
 	gnutls_session_t session;
 	char buffer[MAX_BUF + 1];
 	gnutls_psk_client_credentials_t pskcred;
-	const gnutls_datum_t key = { (void *) "DEADBEEF", 8 };
+	const gnutls_datum_t key = { (void *)"DEADBEEF", 8 };
 
 	global_init();
 
@@ -84,7 +84,9 @@ static void client(int sd)
 	gnutls_init(&session, GNUTLS_CLIENT);
 
 	/* Use default priorities */
-	gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-TLS1.2:+DHE-PSK", NULL);
+	gnutls_priority_set_direct(session,
+				   "NORMAL:-VERS-ALL:+VERS-TLS1.2:+DHE-PSK",
+				   NULL);
 
 	/* put the anonymous credentials to the current session
 	 */
@@ -112,8 +114,7 @@ static void client(int sd)
 	ret = gnutls_record_recv(session, buffer, MAX_BUF);
 	if (ret == 0) {
 		if (debug)
-			success
-			    ("client: Peer has closed the TLS connection\n");
+			success("client: Peer has closed the TLS connection\n");
 		goto end;
 	} else if (ret < 0) {
 		fail("client: Error: %s\n", gnutls_strerror(ret));
@@ -129,7 +130,7 @@ static void client(int sd)
 
 	gnutls_bye(session, GNUTLS_SHUT_RDWR);
 
-      end:
+ end:
 
 	close(sd);
 
@@ -143,7 +144,7 @@ static void client(int sd)
 /* This is a sample TLS 1.0 echo server, for PSK authentication.
  */
 
-#define MAX_BUF 1024
+# define MAX_BUF 1024
 
 /* These are global */
 gnutls_psk_server_credentials_t server_pskcred;
@@ -157,7 +158,9 @@ static gnutls_session_t initialize_tls_session(void)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-TLS1.2:+DHE-PSK", NULL);
+	gnutls_priority_set_direct(session,
+				   "NORMAL:-VERS-ALL:+VERS-TLS1.2:+DHE-PSK",
+				   NULL);
 
 	gnutls_handshake_set_timeout(session, get_timeout());
 	gnutls_credentials_set(session, GNUTLS_CRD_PSK, server_pskcred);
@@ -169,7 +172,7 @@ static gnutls_dh_params_t dh_params;
 
 static int generate_dh_params(void)
 {
-	const gnutls_datum_t p3 = { (void *) pkcs3, strlen(pkcs3) };
+	const gnutls_datum_t p3 = { (void *)pkcs3, strlen(pkcs3) };
 	/* Generate Diffie-Hellman parameters - for use with DHE
 	 * kx algorithms. These should be discarded and regenerated
 	 * once a day, once a week or once a month. Depending on the
@@ -181,8 +184,7 @@ static int generate_dh_params(void)
 }
 
 static int
-pskfunc(gnutls_session_t session, const char *username,
-	gnutls_datum_t * key)
+pskfunc(gnutls_session_t session, const char *username, gnutls_datum_t * key)
 {
 	if (debug)
 		printf("psk callback to get %s's password\n", username);
@@ -214,8 +216,7 @@ static void server(int sd)
 	generate_dh_params();
 
 	gnutls_psk_allocate_server_credentials(&server_pskcred);
-	gnutls_psk_set_server_credentials_function(server_pskcred,
-						   pskfunc);
+	gnutls_psk_set_server_credentials_function(server_pskcred, pskfunc);
 	gnutls_psk_set_server_dh_params(server_pskcred, dh_params);
 
 	session = initialize_tls_session();
@@ -252,8 +253,7 @@ static void server(int sd)
 		} else if (ret > 0) {
 			/* echo data back to the client
 			 */
-			gnutls_record_send(session, buffer,
-					   strlen(buffer));
+			gnutls_record_send(session, buffer, strlen(buffer));
 		}
 	}
 	/* do not wait for the peer to close the connection.

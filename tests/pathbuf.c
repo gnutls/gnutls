@@ -29,8 +29,7 @@
 
 static char long_path[GNUTLS_PATH_MAX + 2];
 
-void
-doit(void)
+void doit(void)
 {
 	struct gnutls_pathbuf_st pathbuf;
 	int i;
@@ -58,9 +57,12 @@ doit(void)
 
 		ret = _gnutls_pathbuf_append(&pathbuf, "cert.pem");
 		assert(ret == 0);
-		assert(memcmp(pathbuf.ptr, long_path, GNUTLS_PATH_MAX + i) == 0);
-		assert(strcmp(&pathbuf.ptr[GNUTLS_PATH_MAX + i], "/cert.pem") == 0);
-		assert(pathbuf.len == GNUTLS_PATH_MAX + i + sizeof("/cert.pem") - 1);
+		assert(memcmp(pathbuf.ptr, long_path, GNUTLS_PATH_MAX + i) ==
+		       0);
+		assert(strcmp(&pathbuf.ptr[GNUTLS_PATH_MAX + i], "/cert.pem") ==
+		       0);
+		assert(pathbuf.len ==
+		       GNUTLS_PATH_MAX + i + sizeof("/cert.pem") - 1);
 		_gnutls_pathbuf_deinit(&pathbuf);
 	}
 }

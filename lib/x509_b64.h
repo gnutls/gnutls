@@ -21,7 +21,7 @@
  */
 
 #ifndef GNUTLS_LIB_X509_B64_H
-#define GNUTLS_LIB_X509_B64_H
+# define GNUTLS_LIB_X509_B64_H
 
 int _gnutls_fbase64_encode(const char *msg, const uint8_t * data,
 			   size_t data_size, gnutls_datum_t * result);
@@ -32,13 +32,13 @@ int
 _gnutls_base64_decode(const uint8_t * data, size_t data_size,
 		      gnutls_datum_t * result);
 
-#define B64SIZE( data_size) ((data_size%3==0)?((data_size*4)/3):(4+((data_size/3)*4)))
+# define B64SIZE( data_size) ((data_size%3==0)?((data_size*4)/3):(4+((data_size/3)*4)))
 
 /* The size for B64 encoding + newlines plus header
  */
 
-#define B64FSIZE( hsize, dsize) \
+# define B64FSIZE( hsize, dsize) \
 	(B64SIZE(dsize) + (hsize) + /*newlines*/ \
 	B64SIZE(dsize)/64 + (((B64SIZE(dsize) % 64) > 0) ? 1 : 0))
 
-#endif /* GNUTLS_LIB_X509_B64_H */
+#endif				/* GNUTLS_LIB_X509_B64_H */

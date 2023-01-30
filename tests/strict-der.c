@@ -22,7 +22,7 @@
 /* Parts copied from GnuTLS example programs. */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -30,10 +30,10 @@
 #include <string.h>
 #include <sys/types.h>
 #if !defined(_WIN32)
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
 #endif
 #include <unistd.h>
 #include <gnutls/gnutls.h>
@@ -79,10 +79,9 @@ static unsigned char cert_pem[] =
     "yTsdDM5dFmVWme3l958NZI/I0qCtH+Z/O0cyivOTMARbBJ+92dqQ78U3He9gRNE9VCS3FNgObhwC\n"
     "cr5tkKTlgSESpSRyBwnLucY4+ci5xjvYndHIzoxII/X9TKOIc2sC+b0H5KP8RcQLAO9G5Nra7+eJ\n"
     "IC74ZgFvgejqTd2f8QeJljTsNxvG4P7vqQi73fCkTuVfCk5YDtTU2joGAujgBd1EjTIbjWYeoebV\n"
-    "gN5gPKxa/GbGsoQ=\n"
-    "-----END CERTIFICATE-----\n";
+    "gN5gPKxa/GbGsoQ=\n" "-----END CERTIFICATE-----\n";
 
-const gnutls_datum_t cert = { cert_pem, sizeof(cert_pem) - 1};
+const gnutls_datum_t cert = { cert_pem, sizeof(cert_pem) - 1 };
 
 void doit(void)
 {
@@ -99,8 +98,7 @@ void doit(void)
 
 	gnutls_x509_crt_init(&crt);
 
-	ret =
-	    gnutls_x509_crt_import(crt, &cert, GNUTLS_X509_FMT_PEM);
+	ret = gnutls_x509_crt_import(crt, &cert, GNUTLS_X509_FMT_PEM);
 	if (ret >= 0) {
 		fail("gnutls_x509_crt_import allowed loading a cert with invalid DER\n");
 		exit(1);

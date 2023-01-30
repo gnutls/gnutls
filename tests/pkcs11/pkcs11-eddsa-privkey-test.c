@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -75,10 +75,12 @@ static unsigned verify_eddsa_presence(void)
 
 	i = 0;
 	do {
-		ret = gnutls_pkcs11_token_get_mechanism("pkcs11:", i++, &mechanism);
-		if (ret >= 0 && mechanism == 0x1057 /* CKM_EDDSA */)
+		ret =
+		    gnutls_pkcs11_token_get_mechanism("pkcs11:", i++,
+						      &mechanism);
+		if (ret >= 0 && mechanism == 0x1057 /* CKM_EDDSA */ )
 			return 1;
-	} while(ret>=0);
+	} while (ret >= 0);
 
 	return 0;
 }
@@ -129,7 +131,8 @@ void doit(void)
 	}
 
 	if (verify_eddsa_presence() == 0) {
-		fprintf(stderr, "Skipping test as no EDDSA mech is supported\n");
+		fprintf(stderr,
+			"Skipping test as no EDDSA mech is supported\n");
 		exit(77);
 	}
 
@@ -203,8 +206,7 @@ void doit(void)
 					GNUTLS_KEY_DIGITAL_SIGNATURE |
 					GNUTLS_KEY_KEY_ENCIPHERMENT, 0);
 	if (ret < 0) {
-		fail("gnutls_pkcs11_copy_pubkey: %s\n",
-		     gnutls_strerror(ret));
+		fail("gnutls_pkcs11_copy_pubkey: %s\n", gnutls_strerror(ret));
 	}
 
 	gnutls_x509_crt_deinit(crt);
@@ -220,12 +222,12 @@ void doit(void)
 					     ";object=cert;object-type=private;pin-value="
 					     PIN);
 	if (ret < 0) {
-		fail("error in gnutls_privkey_import_pkcs11_url: %s\n", gnutls_strerror(ret));
+		fail("error in gnutls_privkey_import_pkcs11_url: %s\n",
+		     gnutls_strerror(ret));
 	}
 
 	/* Try to read the public key with public key URI */
 	assert(gnutls_pubkey_init(&pubkey3) == 0);
-
 
 	ret =
 	    gnutls_pubkey_import_pkcs11_url(pubkey3,
@@ -233,7 +235,8 @@ void doit(void)
 					    ";object=cert;object-type=public;pin-value="
 					    PIN, 0);
 	if (ret < 0) {
-		fail("error in gnutls_pubkey_import_pkcs11_url: %s\n", gnutls_strerror(ret));
+		fail("error in gnutls_pubkey_import_pkcs11_url: %s\n",
+		     gnutls_strerror(ret));
 	}
 
 	/* Try to read the public key with certificate URI */
@@ -245,7 +248,8 @@ void doit(void)
 					    ";object=cert;object-type=cert;pin-value="
 					    PIN, 0);
 	if (ret < 0) {
-		fail("error in gnutls_pubkey_import_pkcs11_url: %s\n", gnutls_strerror(ret));
+		fail("error in gnutls_pubkey_import_pkcs11_url: %s\n",
+		     gnutls_strerror(ret));
 	}
 
 	assert(gnutls_pubkey_init(&pubkey) == 0);

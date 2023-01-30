@@ -22,18 +22,18 @@
  */
 
 #ifndef GNUTLS_LIB_HANDSHAKE_H
-#define GNUTLS_LIB_HANDSHAKE_H
+# define GNUTLS_LIB_HANDSHAKE_H
 
-#include "errors.h"
-#include "record.h"
-#include <assert.h>
+# include "errors.h"
+# include "record.h"
+# include <assert.h>
 
 /* The following two macros are used in the handshake state machines; the first
  * (IMED_RET) accounts for non-fatal errors and re-entry to current state, while
  * the latter invalidates the handshake on any error (to be used by functions
  * that are not expected to return non-fatal errors).
  */
-#define IMED_RET( str, ret, allow_alert) do { \
+# define IMED_RET( str, ret, allow_alert) do { \
 	if (ret < 0) { \
 		/* EAGAIN and INTERRUPTED are always non-fatal */ \
 		if (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED) \
@@ -59,7 +59,7 @@
 		return ret; \
 	} } while (0)
 
-#define IMED_RET_FATAL( str, ret, allow_alert) do { \
+# define IMED_RET_FATAL( str, ret, allow_alert) do { \
 	if (ret < 0) { \
 		gnutls_assert(); \
 		if (gnutls_error_is_fatal(ret) == 0) \
@@ -77,7 +77,8 @@ int _gnutls_recv_handshake(gnutls_session_t session,
 
 int
 _gnutls_send_handshake2(gnutls_session_t session, mbuffer_st * bufel,
-		        gnutls_handshake_description_t type, unsigned queue_only);
+			gnutls_handshake_description_t type,
+			unsigned queue_only);
 
 int _gnutls_generate_session_id(uint8_t * session_id, uint8_t * len);
 int _gnutls_gen_server_random(gnutls_session_t session, int version);
@@ -100,17 +101,17 @@ int _gnutls_user_hello_func(gnutls_session_t session,
 void _gnutls_handshake_hash_buffers_clear(gnutls_session_t session);
 
 int _gnutls13_handshake_hash_buffers_synth(gnutls_session_t session,
-					   const mac_entry_st *prf,
+					   const mac_entry_st * prf,
 					   unsigned client);
 
-#define STATE session->internals.handshake_state
-#define FINAL_STATE session->internals.handshake_final_state
+# define STATE session->internals.handshake_state
+# define FINAL_STATE session->internals.handshake_final_state
 /* This returns true if we have got there
  * before (and not finished due to an interrupt).
  */
-#define AGAIN(target) (STATE==target?1:0)
-#define FAGAIN(target) (FINAL_STATE==target?1:0)
-#define AGAIN2(state, target) (state==target?1:0)
+# define AGAIN(target) (STATE==target?1:0)
+# define FAGAIN(target) (FINAL_STATE==target?1:0)
+# define AGAIN2(state, target) (state==target?1:0)
 
 /* return the remaining time in ms */
 inline static int handshake_remaining_time(gnutls_session_t session)
@@ -122,10 +123,11 @@ inline static int handshake_remaining_time(gnutls_session_t session)
 		gnutls_gettime(&now);
 
 		if (now.tv_sec < end->tv_sec ||
-		   (now.tv_sec == end->tv_sec && now.tv_nsec < end->tv_nsec))
-		{
-			long long now_ms = now.tv_sec * 1000LL + now.tv_nsec / 1000000;
-			long long end_ms = end->tv_sec * 1000LL + end->tv_nsec / 1000000;
+		    (now.tv_sec == end->tv_sec && now.tv_nsec < end->tv_nsec)) {
+			long long now_ms =
+			    now.tv_sec * 1000LL + now.tv_nsec / 1000000;
+			long long end_ms =
+			    end->tv_sec * 1000LL + end->tv_nsec / 1000000;
 
 			return end_ms - now_ms;
 		} else
@@ -148,17 +150,19 @@ inline static unsigned have_creds_for_tls13(gnutls_session_t session)
 	return 0;
 }
 
-int _gnutls_handshake_get_session_hash(gnutls_session_t session, gnutls_datum_t *shash);
+int _gnutls_handshake_get_session_hash(gnutls_session_t session,
+				       gnutls_datum_t * shash);
 
 int _gnutls_check_id_for_change(gnutls_session_t session);
-int _gnutls_check_if_cert_hash_is_same(gnutls_session_t session, gnutls_certificate_credentials_t cred);
+int _gnutls_check_if_cert_hash_is_same(gnutls_session_t session,
+				       gnutls_certificate_credentials_t cred);
 
-#include "handshake-defs.h"
+# include "handshake-defs.h"
 
 int _gnutls_call_hook_func(gnutls_session_t session,
 			   gnutls_handshake_description_t type,
 			   int post, unsigned incoming,
-			   const uint8_t *data, unsigned data_size);
+			   const uint8_t * data, unsigned data_size);
 
 int _gnutls_run_verify_callback(gnutls_session_t session, unsigned int side);
 int _gnutls_recv_finished(gnutls_session_t session);
@@ -169,9 +173,8 @@ int _gnutls13_handshake_server(gnutls_session_t session);
 
 int
 _gnutls13_recv_hello_retry_request(gnutls_session_t session,
-				   gnutls_buffer_st *buf);
+				   gnutls_buffer_st * buf);
 
-int
-_gnutls13_recv_async_handshake(gnutls_session_t session);
+int _gnutls13_recv_async_handshake(gnutls_session_t session);
 
-#endif /* GNUTLS_LIB_HANDSHAKE_H */
+#endif				/* GNUTLS_LIB_HANDSHAKE_H */

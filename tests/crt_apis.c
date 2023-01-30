@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdlib.h>
@@ -37,23 +37,22 @@
 #include "cert-common.h"
 
 static unsigned char saved_crt_pem[] =
-	"-----BEGIN CERTIFICATE-----\n"
-	"MIICWTCCAcKgAwIBAgIDChEAMA0GCSqGSIb3DQEBCwUAMCsxDjAMBgNVBAMTBW5p\n"
-	"a29zMRkwFwYDVQQKExBub25lIHRvLCBtZW50aW9uMCAXDTA4MDMzMTIyMDAwMFoY\n"
-	"Dzk5OTkxMjMxMjM1OTU5WjArMQ4wDAYDVQQDEwVuaWtvczEZMBcGA1UEChMQbm9u\n"
-	"ZSB0bywgbWVudGlvbjCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAu2ZD9fLF\n"
-	"17aMzMXf9Yg7sclLag6hrSBQQAiAoU9co9D4bM/mPPfsBHYTF4tkiSJbwN1TfDvt\n"
-	"fAS7gLkovo6bxo6gpRLL9Vceoue7tzNJn+O7Sq5qTWj/yRHiMo3OPYALjXXv2ACB\n"
-	"jygEA6AijWEEB/q2N30hB0nSCWFpmJCjWKkCAwEAAYEFAAABAgOCBQAEAwIBo3sw\n"
-	"eTAMBgNVHRMBAf8EAjAAMA4GA1UdDwEB/wQEAwIHgDA3BgNVHREEMDAuiAQqAwQF\n"
-	"ghF4bi0tbXhhYTRhczZkLmNvbYETdGVzdEB4bi0ta3hhd2hrLm9yZzAgBgNVHSUB\n"
-	"Af8EFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwDQYJKoZIhvcNAQELBQADgYEAXE4Y\n"
-	"kO1M8RrC5qT7rs9zYoMVELPtirENuuGW8d4RFppvMDg8kpqWOo0ASkAa1ZeYSukE\n"
-	"m5KCEEyQ1UT00Vbr0Addn17y52RKMUzFhMmmu706MAvyutk51GmRgLusdbuEjgkn\n"
-	"jv3WmT8StaS7bFMw99hWCKDBPV9EE9M7zRHP0Js=\n"
-	"-----END CERTIFICATE-----\n";
+    "-----BEGIN CERTIFICATE-----\n"
+    "MIICWTCCAcKgAwIBAgIDChEAMA0GCSqGSIb3DQEBCwUAMCsxDjAMBgNVBAMTBW5p\n"
+    "a29zMRkwFwYDVQQKExBub25lIHRvLCBtZW50aW9uMCAXDTA4MDMzMTIyMDAwMFoY\n"
+    "Dzk5OTkxMjMxMjM1OTU5WjArMQ4wDAYDVQQDEwVuaWtvczEZMBcGA1UEChMQbm9u\n"
+    "ZSB0bywgbWVudGlvbjCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAu2ZD9fLF\n"
+    "17aMzMXf9Yg7sclLag6hrSBQQAiAoU9co9D4bM/mPPfsBHYTF4tkiSJbwN1TfDvt\n"
+    "fAS7gLkovo6bxo6gpRLL9Vceoue7tzNJn+O7Sq5qTWj/yRHiMo3OPYALjXXv2ACB\n"
+    "jygEA6AijWEEB/q2N30hB0nSCWFpmJCjWKkCAwEAAYEFAAABAgOCBQAEAwIBo3sw\n"
+    "eTAMBgNVHRMBAf8EAjAAMA4GA1UdDwEB/wQEAwIHgDA3BgNVHREEMDAuiAQqAwQF\n"
+    "ghF4bi0tbXhhYTRhczZkLmNvbYETdGVzdEB4bi0ta3hhd2hrLm9yZzAgBgNVHSUB\n"
+    "Af8EFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwDQYJKoZIhvcNAQELBQADgYEAXE4Y\n"
+    "kO1M8RrC5qT7rs9zYoMVELPtirENuuGW8d4RFppvMDg8kpqWOo0ASkAa1ZeYSukE\n"
+    "m5KCEEyQ1UT00Vbr0Addn17y52RKMUzFhMmmu706MAvyutk51GmRgLusdbuEjgkn\n"
+    "jv3WmT8StaS7bFMw99hWCKDBPV9EE9M7zRHP0Js=\n" "-----END CERTIFICATE-----\n";
 
-const gnutls_datum_t saved_crt = { saved_crt_pem, sizeof(saved_crt_pem)-1 };
+const gnutls_datum_t saved_crt = { saved_crt_pem, sizeof(saved_crt_pem) - 1 };
 
 static void tls_log_func(int level, const char *str)
 {
@@ -79,7 +78,7 @@ void doit(void)
 	gnutls_x509_crt_t crt2;
 	const char *err = NULL;
 	unsigned char buf[64];
-	unsigned char large_buf[5*1024];
+	unsigned char large_buf[5 * 1024];
 	unsigned int status, san_type;
 	gnutls_datum_t out;
 	size_t s = 0, i;
@@ -102,7 +101,8 @@ void doit(void)
 	if (ret != 0)
 		fail("gnutls_x509_crt_init\n");
 
-	ret = gnutls_x509_crt_import(crt2, &server_ecc_cert, GNUTLS_X509_FMT_PEM);
+	ret =
+	    gnutls_x509_crt_import(crt2, &server_ecc_cert, GNUTLS_X509_FMT_PEM);
 	if (ret != 0)
 		fail("gnutls_x509_crt_import\n");
 
@@ -145,11 +145,13 @@ void doit(void)
 	if (ret != 0)
 		fail("gnutls_x509_crt_set_key_usage %d\n", ret);
 
-	ret = gnutls_x509_crt_set_dn(crt, "o = none to\\, mention,cn = nikos", &err);
+	ret =
+	    gnutls_x509_crt_set_dn(crt, "o = none to\\, mention,cn = nikos",
+				   &err);
 	if (ret < 0) {
-		fail("gnutls_x509_crt_set_dn: %s, %s\n", gnutls_strerror(ret), err);
+		fail("gnutls_x509_crt_set_dn: %s, %s\n", gnutls_strerror(ret),
+		     err);
 	}
-
 
 	ret = gnutls_x509_crt_set_subject_alt_name(crt, GNUTLS_SAN_DNSNAME,
 						   "foo", 3, 1);
@@ -157,15 +159,18 @@ void doit(void)
 		fail("gnutls_x509_crt_set_subject_alt_name\n");
 
 	ret = gnutls_x509_crt_set_subject_alt_name(crt, GNUTLS_SAN_RFC822NAME,
-						   "foo@bar.org", strlen("foo@bar.org"), 1);
+						   "foo@bar.org",
+						   strlen("foo@bar.org"), 1);
 	if (ret != 0)
 		fail("gnutls_x509_crt_set_subject_alt_name\n");
 
 	ret = gnutls_x509_crt_set_subject_alt_name(crt, GNUTLS_SAN_RFC822NAME,
-						   "ινβάλιντ@bar.org", strlen("ινβάλιντ@bar.org"), 1);
+						   "ινβάλιντ@bar.org",
+						   strlen
+						   ("ινβάλιντ@bar.org"),
+						   1);
 	if (ret != GNUTLS_E_INVALID_UTF8_EMAIL)
 		fail("gnutls_x509_crt_set_subject_alt_name\n");
-
 
 	ret = gnutls_x509_crt_set_subject_alt_name(crt, GNUTLS_SAN_IPADDRESS,
 						   "\xc1\x5c\x96\x3", 4, 1);
@@ -173,7 +178,8 @@ void doit(void)
 		fail("gnutls_x509_crt_set_subject_alt_name\n");
 
 	ret = gnutls_x509_crt_set_subject_alt_name(crt, GNUTLS_SAN_IPADDRESS,
-						   "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01", 16, 1);
+						   "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01",
+						   16, 1);
 	if (ret != 0)
 		fail("gnutls_x509_crt_set_subject_alt_name\n");
 
@@ -182,24 +188,31 @@ void doit(void)
 	if (ret != 0)
 		fail("gnutls_x509_crt_set_subject_alt_name\n");
 
-	ret = gnutls_x509_crt_set_subject_alt_name(crt, GNUTLS_SAN_REGISTERED_ID,
-						   REGISTERED_OID, strlen(REGISTERED_OID), 0);
+	ret =
+	    gnutls_x509_crt_set_subject_alt_name(crt, GNUTLS_SAN_REGISTERED_ID,
+						 REGISTERED_OID,
+						 strlen(REGISTERED_OID), 0);
 	if (ret != 0)
 		fail("gnutls_x509_crt_set_subject_alt_name\n");
 
 	ret = gnutls_x509_crt_set_subject_alt_name(crt, GNUTLS_SAN_DNSNAME,
-						   "απαλό.com", strlen("απαλό.com"), 1);
+						   "απαλό.com",
+						   strlen("απαλό.com"), 1);
 #if defined(HAVE_LIBIDN2) || defined(HAVE_LIBIDN)
 	if (ret != 0)
-		fail("gnutls_x509_crt_set_subject_alt_name: %s\n", gnutls_strerror(ret));
+		fail("gnutls_x509_crt_set_subject_alt_name: %s\n",
+		     gnutls_strerror(ret));
 
 	ret = gnutls_x509_crt_set_subject_alt_name(crt, GNUTLS_SAN_RFC822NAME,
-						   "test@νίκο.org", strlen("test@νίκο.org"), 1);
+						   "test@νίκο.org",
+						   strlen("test@νίκο.org"),
+						   1);
 	if (ret != 0)
 		fail("gnutls_x509_crt_set_subject_alt_name\n");
 #else
 	if (ret != GNUTLS_E_UNIMPLEMENTED_FEATURE)
-		fail("gnutls_x509_crt_set_subject_alt_name: %s\n", gnutls_strerror(ret));
+		fail("gnutls_x509_crt_set_subject_alt_name: %s\n",
+		     gnutls_strerror(ret));
 #endif
 
 	s = 0;
@@ -210,8 +223,7 @@ void doit(void)
 	s = 0;
 	ret =
 	    gnutls_x509_crt_set_key_purpose_oid(crt,
-						GNUTLS_KP_TLS_WWW_SERVER,
-						0);
+						GNUTLS_KP_TLS_WWW_SERVER, 0);
 	if (ret != 0)
 		fail("gnutls_x509_crt_set_key_purpose_oid %d\n", ret);
 
@@ -223,25 +235,31 @@ void doit(void)
 	s = 0;
 	ret =
 	    gnutls_x509_crt_set_key_purpose_oid(crt,
-						GNUTLS_KP_TLS_WWW_CLIENT,
-						1);
+						GNUTLS_KP_TLS_WWW_CLIENT, 1);
 	if (ret != 0)
 		fail("gnutls_x509_crt_set_key_purpose_oid2 %d\n", ret);
 
 	/* in the end this will be ignored as the issuer will be set
 	 * by gnutls_x509_crt_sign2() */
-	ret = gnutls_x509_crt_set_issuer_dn(crt, "cn = my CA, o = big\\, and one", &err);
+	ret =
+	    gnutls_x509_crt_set_issuer_dn(crt, "cn = my CA, o = big\\, and one",
+					  &err);
 	if (ret < 0) {
-		fail("gnutls_x509_crt_set_issuer_dn: %s, %s\n", gnutls_strerror(ret), err);
+		fail("gnutls_x509_crt_set_issuer_dn: %s, %s\n",
+		     gnutls_strerror(ret), err);
 	}
-
 #define ISSUER_UNIQUE_ID "\x00\x01\x02\x03"
 #define SUBJECT_UNIQUE_ID "\x04\x03\x02\x01"
-	ret = gnutls_x509_crt_set_issuer_unique_id(crt, ISSUER_UNIQUE_ID, sizeof(ISSUER_UNIQUE_ID)-1);
+	ret =
+	    gnutls_x509_crt_set_issuer_unique_id(crt, ISSUER_UNIQUE_ID,
+						 sizeof(ISSUER_UNIQUE_ID) - 1);
 	if (ret < 0)
 		fail("error: %s\n", gnutls_strerror(ret));
 
-	ret = gnutls_x509_crt_set_subject_unique_id(crt, SUBJECT_UNIQUE_ID, sizeof(SUBJECT_UNIQUE_ID)-1);
+	ret =
+	    gnutls_x509_crt_set_subject_unique_id(crt, SUBJECT_UNIQUE_ID,
+						  sizeof(SUBJECT_UNIQUE_ID) -
+						  1);
 	if (ret < 0)
 		fail("error: %s\n", gnutls_strerror(ret));
 
@@ -249,7 +267,6 @@ void doit(void)
 	ret = gnutls_x509_crt_sign2(crt, crt, pkey, GNUTLS_DIG_SHA256, 0);
 	if (ret < 0)
 		fail("gnutls_x509_crt_sign2: %s\n", gnutls_strerror(ret));
-
 
 	ret = gnutls_x509_crt_print(crt, GNUTLS_CRT_PRINT_FULL, &out);
 	if (ret != 0)
@@ -262,7 +279,8 @@ void doit(void)
 	s = 0;
 	ret = gnutls_x509_crt_get_extension_info(crt, 0, NULL, &s, NULL);
 	if (ret != GNUTLS_E_SHORT_MEMORY_BUFFER)
-		fail("gnutls_x509_crt_get_extension_info2: %s\n", strerror(ret));
+		fail("gnutls_x509_crt_get_extension_info2: %s\n",
+		     strerror(ret));
 
 	s = 0;
 	ret = gnutls_x509_crt_get_extension_data(crt, 0, NULL, &s);
@@ -271,32 +289,35 @@ void doit(void)
 
 	ret = gnutls_x509_crt_get_raw_issuer_dn(crt, &out);
 	if (ret < 0 || out.size == 0)
-		fail("gnutls_x509_crt_get_raw_issuer_dn: %s\n", gnutls_strerror(ret));
+		fail("gnutls_x509_crt_get_raw_issuer_dn: %s\n",
+		     gnutls_strerror(ret));
 
 	if (out.size != 45 ||
-	    memcmp(out.data, "\x30\x2b\x31\x0e\x30\x0c\x06\x03\x55\x04\x03\x13\x05\x6e\x69\x6b\x6f\x73\x31\x19\x30\x17\x06\x03\x55\x04\x0a\x13\x10\x6e\x6f\x6e\x65\x20\x74\x6f\x2c\x20\x6d\x65\x6e\x74\x69\x6f\x6e", 45) != 0) {
+	    memcmp(out.data,
+		   "\x30\x2b\x31\x0e\x30\x0c\x06\x03\x55\x04\x03\x13\x05\x6e\x69\x6b\x6f\x73\x31\x19\x30\x17\x06\x03\x55\x04\x0a\x13\x10\x6e\x6f\x6e\x65\x20\x74\x6f\x2c\x20\x6d\x65\x6e\x74\x69\x6f\x6e",
+		   45) != 0) {
 		hexprint(out.data, out.size);
 		fail("issuer DN comparison failed\n");
 	}
 	gnutls_free(out.data);
 
 	s = sizeof(buf);
-	ret = gnutls_x509_crt_get_issuer_unique_id(crt, (void*)buf, &s);
+	ret = gnutls_x509_crt_get_issuer_unique_id(crt, (void *)buf, &s);
 	if (ret < 0)
 		fail("error: %s\n", gnutls_strerror(ret));
 
-	if (s != sizeof(ISSUER_UNIQUE_ID)-1 ||
-		memcmp(buf, ISSUER_UNIQUE_ID, s) != 0) {
+	if (s != sizeof(ISSUER_UNIQUE_ID) - 1 ||
+	    memcmp(buf, ISSUER_UNIQUE_ID, s) != 0) {
 		fail("issuer unique id comparison failed\n");
 	}
 
 	s = sizeof(buf);
-	ret = gnutls_x509_crt_get_subject_unique_id(crt, (void*)buf, &s);
+	ret = gnutls_x509_crt_get_subject_unique_id(crt, (void *)buf, &s);
 	if (ret < 0)
 		fail("error: %s\n", gnutls_strerror(ret));
 
-	if (s != sizeof(SUBJECT_UNIQUE_ID)-1 ||
-		memcmp(buf, SUBJECT_UNIQUE_ID, s) != 0) {
+	if (s != sizeof(SUBJECT_UNIQUE_ID) - 1 ||
+	    memcmp(buf, SUBJECT_UNIQUE_ID, s) != 0) {
 		fail("subject unique id comparison failed\n");
 	}
 
@@ -305,7 +326,9 @@ void doit(void)
 		fail("gnutls_x509_crt_get_raw_dn: %s\n", gnutls_strerror(ret));
 
 	if (out.size != 45 ||
-	    memcmp(out.data, "\x30\x2b\x31\x0e\x30\x0c\x06\x03\x55\x04\x03\x13\x05\x6e\x69\x6b\x6f\x73\x31\x19\x30\x17\x06\x03\x55\x04\x0a\x13\x10\x6e\x6f\x6e\x65\x20\x74\x6f\x2c\x20\x6d\x65\x6e\x74\x69\x6f\x6e", 45) != 0) {
+	    memcmp(out.data,
+		   "\x30\x2b\x31\x0e\x30\x0c\x06\x03\x55\x04\x03\x13\x05\x6e\x69\x6b\x6f\x73\x31\x19\x30\x17\x06\x03\x55\x04\x0a\x13\x10\x6e\x6f\x6e\x65\x20\x74\x6f\x2c\x20\x6d\x65\x6e\x74\x69\x6f\x6e",
+		   45) != 0) {
 		fail("DN comparison failed\n");
 	}
 	gnutls_free(out.data);
@@ -335,27 +358,31 @@ void doit(void)
 		fprintf(stderr, "%s\n", out.data);
 #if defined(HAVE_LIBIDN2)
 	assert(out.size == saved_crt.size);
-	assert(memcmp(out.data, saved_crt.data, out.size)==0);
+	assert(memcmp(out.data, saved_crt.data, out.size) == 0);
 #endif
 
 	/* test behavior of gnutls_x509_crt_export on varios corner cases */
 	s = 0;
-	assert(gnutls_x509_crt_export(crt, GNUTLS_X509_FMT_PEM, NULL, &s) == GNUTLS_E_SHORT_MEMORY_BUFFER);
-	assert(s == out.size+1);
+	assert(gnutls_x509_crt_export(crt, GNUTLS_X509_FMT_PEM, NULL, &s) ==
+	       GNUTLS_E_SHORT_MEMORY_BUFFER);
+	assert(s == out.size + 1);
 	s = sizeof(buf);
-	assert(gnutls_x509_crt_export(crt, GNUTLS_X509_FMT_PEM, buf, &s) == GNUTLS_E_SHORT_MEMORY_BUFFER);
-	assert(s == out.size+1);
+	assert(gnutls_x509_crt_export(crt, GNUTLS_X509_FMT_PEM, buf, &s) ==
+	       GNUTLS_E_SHORT_MEMORY_BUFFER);
+	assert(s == out.size + 1);
 
 	/* check whether the PEM output matches gnutls_x509_crt_export2 */
 	s = sizeof(large_buf);
-	assert(gnutls_x509_crt_export(crt, GNUTLS_X509_FMT_PEM, large_buf, &s) == 0);
+	assert(gnutls_x509_crt_export(crt, GNUTLS_X509_FMT_PEM, large_buf, &s)
+	       == 0);
 	assert(s == out.size);
 	assert(memcmp(large_buf, out.data, out.size) == 0);
 	gnutls_free(out.data);
 
 	/* check whether the der out length differs */
 	s = sizeof(large_buf);
-	assert(gnutls_x509_crt_export(crt, GNUTLS_X509_FMT_DER, large_buf, &s) == 0);
+	assert(gnutls_x509_crt_export(crt, GNUTLS_X509_FMT_DER, large_buf, &s)
+	       == 0);
 	assert(gnutls_x509_crt_export2(crt, GNUTLS_X509_FMT_DER, &out) >= 0);
 
 	assert(s == out.size);
@@ -374,9 +401,12 @@ void doit(void)
 	i = 0;
 	do {
 		s = sizeof(buf);
-		ret = gnutls_x509_crt_get_subject_alt_name2(crt2, i++, buf, &s, &san_type, NULL);
+		ret =
+		    gnutls_x509_crt_get_subject_alt_name2(crt2, i++, buf, &s,
+							  &san_type, NULL);
 		if (ret < 0)
-			fail("gnutls_x509_crt_get_subject_alt_name2: %s\n", gnutls_strerror(ret));
+			fail("gnutls_x509_crt_get_subject_alt_name2: %s\n",
+			     gnutls_strerror(ret));
 	} while (san_type != GNUTLS_SAN_REGISTERED_ID);
 
 	assert(san_type == GNUTLS_SAN_REGISTERED_ID);

@@ -44,9 +44,10 @@ int _gnutls_hash_init(digest_hd_st * dig, const mac_entry_st * e)
 
 	/* check if a digest has been registered 
 	 */
-	cc = _gnutls_get_crypto_digest((gnutls_digest_algorithm_t)e->id);
+	cc = _gnutls_get_crypto_digest((gnutls_digest_algorithm_t) e->id);
 	if (cc != NULL && cc->init) {
-		if (cc->init((gnutls_digest_algorithm_t)e->id, &dig->handle) < 0) {
+		if (cc->init((gnutls_digest_algorithm_t) e->id, &dig->handle) <
+		    0) {
 			gnutls_assert();
 			return GNUTLS_E_HASH_FAILED;
 		}
@@ -59,7 +60,9 @@ int _gnutls_hash_init(digest_hd_st * dig, const mac_entry_st * e)
 		return 0;
 	}
 
-	result = _gnutls_digest_ops.init((gnutls_digest_algorithm_t)e->id, &dig->handle);
+	result =
+	    _gnutls_digest_ops.init((gnutls_digest_algorithm_t) e->id,
+				    &dig->handle);
 	if (result < 0) {
 		gnutls_assert();
 		return result;
@@ -95,7 +98,7 @@ int _gnutls_hash_copy(const digest_hd_st * handle, digest_hd_st * dst)
 	if (handle->copy == NULL)
 		return gnutls_assert_val(GNUTLS_E_HASH_FAILED);
 
-	*dst = *handle; /* copy data */
+	*dst = *handle;		/* copy data */
 	dst->handle = handle->copy(handle->handle);
 
 	if (dst->handle == NULL)
@@ -123,7 +126,7 @@ _gnutls_hash_fast(gnutls_digest_algorithm_t algorithm,
 {
 	int ret;
 	const gnutls_crypto_digest_st *cc = NULL;
-	
+
 	FAIL_IF_LIB_ERROR;
 
 	/* check if a digest has been registered 
@@ -147,13 +150,11 @@ _gnutls_hash_fast(gnutls_digest_algorithm_t algorithm,
 	return 0;
 }
 
-
 /* HMAC interface */
 
 int
 _gnutls_mac_fast(gnutls_mac_algorithm_t algorithm, const void *key,
-		 int keylen, const void *text, size_t textlen,
-		 void *digest)
+		 int keylen, const void *text, size_t textlen, void *digest)
 {
 	int ret;
 	const gnutls_crypto_mac_st *cc = NULL;
@@ -164,9 +165,8 @@ _gnutls_mac_fast(gnutls_mac_algorithm_t algorithm, const void *key,
 	 */
 	cc = _gnutls_get_crypto_mac(algorithm);
 	if (cc != NULL) {
-		if (cc->
-		    fast(algorithm, NULL, 0, key, keylen, text, textlen,
-			 digest) < 0) {
+		if (cc->fast(algorithm, NULL, 0, key, keylen, text, textlen,
+			     digest) < 0) {
 			gnutls_assert();
 			return GNUTLS_E_HASH_FAILED;
 		}
@@ -274,7 +274,7 @@ int _gnutls_mac_copy(const mac_hd_st * handle, mac_hd_st * dst)
 	if (handle->copy == NULL)
 		return gnutls_assert_val(GNUTLS_E_HASH_FAILED);
 
-	*dst = *handle; /* copy data */
+	*dst = *handle;		/* copy data */
 	dst->handle = handle->copy(handle->handle);
 
 	if (dst->handle == NULL)
@@ -443,7 +443,7 @@ _gnutls_mac_deinit_ssl3_handshake(digest_hd_st * handle,
 
 	return 0;
 
-      cleanup:
+ cleanup:
 	_gnutls_hash_deinit(handle, NULL);
 	return rc;
 }
@@ -475,8 +475,8 @@ ssl3_sha(int i, uint8_t * secret, int secret_len,
 	return 0;
 }
 
-#define SHA1_DIGEST_OUTPUT 20
-#define MD5_DIGEST_OUTPUT 16
+# define SHA1_DIGEST_OUTPUT 20
+# define MD5_DIGEST_OUTPUT 16
 
 static int
 ssl3_md5(int i, uint8_t * secret, int secret_len,
@@ -527,8 +527,7 @@ _gnutls_ssl3_generate_random(void *secret, int secret_len,
 
 	for (i = 0; i < times; i++) {
 
-		result =
-		    ssl3_md5(i, secret, secret_len, rnd, rnd_len, digest);
+		result = ssl3_md5(i, secret, secret_len, rnd, rnd_len, digest);
 		if (result < 0) {
 			gnutls_assert();
 			return result;

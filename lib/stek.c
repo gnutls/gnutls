@@ -27,9 +27,9 @@
 #define MAC_SECRET_POS (TICKET_KEY_NAME_SIZE+TICKET_CIPHER_KEY_SIZE)
 
 static int totp_sha3(gnutls_session_t session,
-		uint64_t t,
-		const gnutls_datum_t *secret,
-		uint8_t out[TICKET_MASTER_KEY_SIZE])
+		     uint64_t t,
+		     const gnutls_datum_t * secret,
+		     uint8_t out[TICKET_MASTER_KEY_SIZE])
 {
 	int retval;
 	uint8_t t_be[8];
@@ -40,7 +40,7 @@ static int totp_sha3(gnutls_session_t session,
 	 */
 	const gnutls_digest_algorithm_t algo = GNUTLS_DIG_SHA3_512;
 #if TICKET_MASTER_KEY_SIZE != 64
-#error "TICKET_MASTER_KEY_SIZE must be 64 bytes"
+# error "TICKET_MASTER_KEY_SIZE must be 64 bytes"
 #endif
 
 	if (unlikely(secret == NULL))
@@ -63,7 +63,8 @@ static int totp_sha3(gnutls_session_t session,
 static uint64_t T(gnutls_session_t session, time_t t)
 {
 	uint64_t numeral = t;
-	unsigned int x = session->internals.expire_time * STEK_ROTATION_PERIOD_PRODUCT;
+	unsigned int x =
+	    session->internals.expire_time * STEK_ROTATION_PERIOD_PRODUCT;
 
 	if (numeral <= 0)
 		return 0;
@@ -77,7 +78,7 @@ static int64_t totp_next(gnutls_session_t session)
 	uint64_t result;
 
 	t = gnutls_time(NULL);
-	if (unlikely(t == (time_t) -1))
+	if (unlikely(t == (time_t) - 1))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 	result = T(session, t);
@@ -107,7 +108,8 @@ static int64_t totp_previous(gnutls_session_t session)
 }
 
 static void call_rotation_callback(gnutls_session_t session,
-		uint8_t key[TICKET_MASTER_KEY_SIZE], uint64_t t)
+				   uint8_t key[TICKET_MASTER_KEY_SIZE],
+				   uint64_t t)
 {
 	gnutls_datum_t prev_key, new_key;
 
@@ -196,9 +198,9 @@ static int rotate_back_and_peek(gnutls_session_t session,
  * before returning it to the caller.
  */
 int _gnutls_get_session_ticket_encryption_key(gnutls_session_t session,
-					      gnutls_datum_t *key_name,
-					      gnutls_datum_t *mac_key,
-					      gnutls_datum_t *enc_key)
+					      gnutls_datum_t * key_name,
+					      gnutls_datum_t * mac_key,
+					      gnutls_datum_t * enc_key)
 {
 	int retval;
 
@@ -220,7 +222,8 @@ int _gnutls_get_session_ticket_encryption_key(gnutls_session_t session,
 		key_name->size = TICKET_KEY_NAME_SIZE;
 	}
 	if (mac_key) {
-		mac_key->data = &session->key.session_ticket_key[MAC_SECRET_POS];
+		mac_key->data =
+		    &session->key.session_ticket_key[MAC_SECRET_POS];
 		mac_key->size = TICKET_MAC_SECRET_SIZE;
 	}
 	if (enc_key) {
@@ -249,15 +252,18 @@ int _gnutls_get_session_ticket_encryption_key(gnutls_session_t session,
  * %GNUTLS_E_REQUSTED_DATA_NOT_AVAILABLE if no key could be found for the supplied ticket.
  */
 int _gnutls_get_session_ticket_decryption_key(gnutls_session_t session,
-					      const gnutls_datum_t *ticket_data,
-					      gnutls_datum_t *key_name,
-					      gnutls_datum_t *mac_key,
-					      gnutls_datum_t *enc_key)
+					      const gnutls_datum_t *
+					      ticket_data,
+					      gnutls_datum_t * key_name,
+					      gnutls_datum_t * mac_key,
+					      gnutls_datum_t * enc_key)
 {
 	int retval;
 	uint8_t *key_data;
 
-	if (unlikely(session == NULL || ticket_data == NULL || ticket_data->data == NULL))
+	if (unlikely
+	    (session == NULL || ticket_data == NULL
+	     || ticket_data->data == NULL))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 	if (ticket_data->size < TICKET_KEY_NAME_SIZE)
@@ -285,9 +291,13 @@ int _gnutls_get_session_ticket_decryption_key(gnutls_session_t session,
 	 * Current key is not valid.
 	 * Compute previous key and see if that matches.
 	 */
-	_gnutls_memory_mark_defined(session->key.previous_ticket_key, TICKET_MASTER_KEY_SIZE);
-	if ((retval = rotate_back_and_peek(session, session->key.previous_ticket_key)) < 0) {
-		_gnutls_memory_mark_undefined(session->key.previous_ticket_key, TICKET_MASTER_KEY_SIZE);
+	_gnutls_memory_mark_defined(session->key.previous_ticket_key,
+				    TICKET_MASTER_KEY_SIZE);
+	if ((retval =
+	     rotate_back_and_peek(session,
+				  session->key.previous_ticket_key)) < 0) {
+		_gnutls_memory_mark_undefined(session->key.previous_ticket_key,
+					      TICKET_MASTER_KEY_SIZE);
 		return gnutls_assert_val(retval);
 	}
 
@@ -300,7 +310,7 @@ int _gnutls_get_session_ticket_decryption_key(gnutls_session_t session,
 
 	return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 
-key_found:
+ key_found:
 	if (key_name) {
 		key_name->data = &key_data[NAME_POS];
 		key_name->size = TICKET_KEY_NAME_SIZE;
@@ -329,7 +339,8 @@ key_found:
  *
  * Returns: %GNUTLS_E_SUCCESS (0) on success, or %GNUTLS_E_INVALID_REQUEST on error.
  */
-int _gnutls_initialize_session_ticket_key_rotation(gnutls_session_t session, const gnutls_datum_t *key)
+int _gnutls_initialize_session_ticket_key_rotation(gnutls_session_t session,
+						   const gnutls_datum_t * key)
 {
 	if (unlikely(session == NULL || key == NULL))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
@@ -357,7 +368,9 @@ int _gnutls_initialize_session_ticket_key_rotation(gnutls_session_t session, con
  * step value that caused the key to rotate.
  *
  */
-void _gnutls_set_session_ticket_key_rotation_callback(gnutls_session_t session, gnutls_stek_rotation_callback_t cb)
+void _gnutls_set_session_ticket_key_rotation_callback(gnutls_session_t session,
+						      gnutls_stek_rotation_callback_t
+						      cb)
 {
 	if (session)
 		session->key.totp.cb = cb;

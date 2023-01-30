@@ -21,10 +21,10 @@
  */
 
 #ifndef GNUTLS_LIB_EXTV_H
-#define GNUTLS_LIB_EXTV_H
+# define GNUTLS_LIB_EXTV_H
 
-#include <gnutls/gnutls.h>
-#include "str.h"
+# include <gnutls/gnutls.h>
+# include "str.h"
 
 /* Iterates through all TLS-type extensions in data, and
  * calls the callback function for each of them. The ctx, flags
@@ -34,7 +34,7 @@ int _gnutls_extv_parse(void *ctx,
 		       const uint8_t * data, int data_size);
 
 inline static
-int _gnutls_extv_append_init(gnutls_buffer_st *buf)
+int _gnutls_extv_append_init(gnutls_buffer_st * buf)
 {
 	unsigned pos;
 	int ret;
@@ -52,11 +52,12 @@ int _gnutls_extv_append_init(gnutls_buffer_st *buf)
  * @is_hello: should be true for client and server hello messages.
  */
 inline static
-int _gnutls_extv_append_final(gnutls_buffer_st *buf, unsigned init, unsigned is_hello)
+int _gnutls_extv_append_final(gnutls_buffer_st * buf, unsigned init,
+			      unsigned is_hello)
 {
 	unsigned size = buf->length - init - 2;
 
-	if (size > UINT16_MAX) /* sent too many extensions */
+	if (size > UINT16_MAX)	/* sent too many extensions */
 		return gnutls_assert_val(GNUTLS_E_HANDSHAKE_TOO_LARGE);
 
 	if (size > 0)
@@ -70,12 +71,9 @@ int _gnutls_extv_append_final(gnutls_buffer_st *buf, unsigned init, unsigned is_
 	return 0;
 }
 
-typedef int (*extv_append_func)(void *ctx, gnutls_buffer_st *buf);
+typedef int (*extv_append_func)(void *ctx, gnutls_buffer_st * buf);
 
-int _gnutls_extv_append(gnutls_buffer_st *buf,
-			uint16_t tls_id,
-		        void *ctx,
-		        extv_append_func cb);
+int _gnutls_extv_append(gnutls_buffer_st * buf,
+			uint16_t tls_id, void *ctx, extv_append_func cb);
 
-
-#endif /* GNUTLS_LIB_EXTV_H */
+#endif				/* GNUTLS_LIB_EXTV_H */

@@ -27,12 +27,13 @@
 #include "fuzzer.h"
 
 static
-int cb(void *ctx, unsigned tls_id, const unsigned char *data, unsigned data_size)
+int cb(void *ctx, unsigned tls_id, const unsigned char *data,
+       unsigned data_size)
 {
 	return 0;
 }
 
-int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
+int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 {
 	gnutls_datum_t raw;
 
@@ -41,9 +42,11 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 
 	gnutls_ext_raw_parse(NULL, cb, &raw, 0);
 
-	gnutls_ext_raw_parse(NULL, cb, &raw, GNUTLS_EXT_RAW_FLAG_TLS_CLIENT_HELLO);
+	gnutls_ext_raw_parse(NULL, cb, &raw,
+			     GNUTLS_EXT_RAW_FLAG_TLS_CLIENT_HELLO);
 
-	gnutls_ext_raw_parse(NULL, cb, &raw, GNUTLS_EXT_RAW_FLAG_DTLS_CLIENT_HELLO);
+	gnutls_ext_raw_parse(NULL, cb, &raw,
+			     GNUTLS_EXT_RAW_FLAG_DTLS_CLIENT_HELLO);
 
 	return 0;
 }

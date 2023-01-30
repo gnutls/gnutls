@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+# include "config.h"
 #endif
 
 #include <gnutls/gnutls.h>
@@ -56,9 +56,11 @@ void doit(void)
 
 	should_succeed(gnutls_x509_crt_init(&cert));
 	should_succeed(gnutls_load_file(path, &data));
-	should_succeed(gnutls_x509_crt_import(cert, &data, GNUTLS_X509_FMT_PEM));
-	ret = gnutls_x509_crt_get_subject_alt_name(cert, 0, name, &name_len,
-						   NULL);
+	should_succeed(gnutls_x509_crt_import
+		       (cert, &data, GNUTLS_X509_FMT_PEM));
+	ret =
+	    gnutls_x509_crt_get_subject_alt_name(cert, 0, name, &name_len,
+						 NULL);
 	if (ret != GNUTLS_SAN_OTHERNAME_XMPP)
 		fail("did not recognize GNUTLS_SAN_OTHERNAME_XMPP");
 

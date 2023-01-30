@@ -54,238 +54,211 @@ static const char *defaultport = "12345";
 
 static volatile sig_atomic_t rxsigquit = 0;
 
-static int
-bindtoaddress (char *addrport)
+static int bindtoaddress(char *addrport)
 {
-  struct addrinfo hints;
-  struct addrinfo *result, *rp;
-  int fd, s;
-  char addr[128];
+	struct addrinfo hints;
+	struct addrinfo *result, *rp;
+	int fd, s;
+	char addr[128];
 
-  snprintf(addr, sizeof(addr), "%s", addrport);
+	snprintf(addr, sizeof(addr), "%s", addrport);
 
-  memset (&hints, 0, sizeof (struct addrinfo));
-  hints.ai_flags = AI_PASSIVE;	/* For wildcard IP address */
-  hints.ai_family = AF_UNSPEC;	/* Allow IPv4 or IPv6 */
-  hints.ai_socktype = SOCK_STREAM;	/* Stream socket */
-  hints.ai_protocol = 0;	/* any protocol */
+	memset(&hints, 0, sizeof(struct addrinfo));
+	hints.ai_flags = AI_PASSIVE;	/* For wildcard IP address */
+	hints.ai_family = AF_UNSPEC;	/* Allow IPv4 or IPv6 */
+	hints.ai_socktype = SOCK_STREAM;	/* Stream socket */
+	hints.ai_protocol = 0;	/* any protocol */
 
-  char *colon = strrchr (addr, ':');
-  const char *port = defaultport;
-  if (colon)
-    {
-      *colon = 0;
-      port = colon + 1;
-    }
-
-  s = getaddrinfo (addr, port, &hints, &result);
-  if (s != 0)
-    {
-      fprintf (stderr, "Error in address %s: %s\n", addr, gai_strerror (s));
-      return -1;
-    }
-
-  /* attempt to bind to each address */
-
-  for (rp = result; rp != NULL; rp = rp->ai_next)
-    {
-      fd = socket (rp->ai_family, rp->ai_socktype, rp->ai_protocol);
-
-      if (fd >= 0)
-	{
-	  int one = 1;
-	  if (setsockopt (fd, SOL_SOCKET, SO_REUSEADDR, &one, sizeof (one)) <
-	      0)
-	    {
-	      close (fd);
-	      continue;
-	    }
-	  if (bind (fd, rp->ai_addr, rp->ai_addrlen) == 0)
-	    break;
-	  close (fd);
+	char *colon = strrchr(addr, ':');
+	const char *port = defaultport;
+	if (colon) {
+		*colon = 0;
+		port = colon + 1;
 	}
-    }
 
-  if (!rp)
-    {
-      fprintf (stderr, "Error binding to %s:%s: %m\n", addr, port);
-      freeaddrinfo (result);
-      return -1;
-    }
-
-  freeaddrinfo (result);	/* No longer needed */
-
-  if (listen (fd, 5) < 0)
-    {
-      close (fd);
-      return -1;
-    }
-
-  return fd;
-}
-
-static int
-connecttoaddress (char *addrport)
-{
-  struct addrinfo hints;
-  struct addrinfo *result, *rp;
-  int fd, s;
-  char addr[128];
-
-  snprintf(addr, sizeof(addr), "%s", addrport);
-
-  memset (&hints, 0, sizeof (struct addrinfo));
-  hints.ai_flags = AI_PASSIVE;	/* For wildcard IP address */
-  hints.ai_family = AF_UNSPEC;	/* Allow IPv4 or IPv6 */
-  hints.ai_socktype = SOCK_STREAM;	/* Stream socket */
-  hints.ai_protocol = 0;	/* any protocol */
-
-  char *colon = strrchr (addr, ':');
-  const char *port = defaultport;
-  if (colon)
-    {
-      *colon = 0;
-      port = colon + 1;
-    }
-
-  if (!hostname && !server)
-    hostname = strdup (addr);
-
-  s = getaddrinfo (addr, port, &hints, &result);
-  if (s != 0)
-    {
-      fprintf (stderr, "Error in address %s: %s\n", addr, gai_strerror (s));
-      return -1;
-    }
-
-  /* attempt to connect to each address */
-  for (rp = result; rp != NULL; rp = rp->ai_next)
-    {
-      fd = socket (rp->ai_family, rp->ai_socktype, rp->ai_protocol);
-      if (fd >= 0)
-	{
-	  if (connect (fd, rp->ai_addr, rp->ai_addrlen) == 0)
-	    break;
-	  close (fd);
+	s = getaddrinfo(addr, port, &hints, &result);
+	if (s != 0) {
+		fprintf(stderr, "Error in address %s: %s\n", addr,
+			gai_strerror(s));
+		return -1;
 	}
-    }
 
-  if (!rp)
-    {
-      fprintf (stderr, "Error connecting to %s:%s: %m\n", addr, port);
-      freeaddrinfo (result);
-      return -1;
-    }
+	/* attempt to bind to each address */
 
-  freeaddrinfo (result);	/* No longer needed */
+	for (rp = result; rp != NULL; rp = rp->ai_next) {
+		fd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
 
-  return fd;
-}
-
-static int
-quitfn (void *opaque)
-{
-  return rxsigquit;
-}
-
-static int
-runproxy (int acceptfd)
-{
-  int connectfd;
-  if ((connectfd = connecttoaddress (connectaddr)) < 0)
-    {
-      fprintf (stderr, "Could not connect\n");
-      close (acceptfd);
-      return -1;
-    }
-
-  tlssession_t *session =
-    tlssession_new (server, keyfile, certfile, cacertfile, hostname, insecure,
-		    debug, quitfn, NULL, NULL);
-  if (!session)
-    {
-      fprintf (stderr, "Could create TLS session\n");
-      close (connectfd);
-      close (acceptfd);
-      return -1;
-    }
-
-  int ret;
-  if (server)
-    ret = tlssession_mainloop (acceptfd, connectfd, session);
-  else
-    ret = tlssession_mainloop (connectfd, acceptfd, session);
-
-  tlssession_close (session);
-  close (connectfd);
-  close (acceptfd);
-
-  if (ret < 0)
-    {
-      fprintf (stderr, "TLS proxy exited with an error\n");
-      return -1;
-    }
-  return 0;
-}
-
-static int
-runlistener (void)
-{
-  int listenfd;
-  if ((listenfd = bindtoaddress (listenaddr)) < 0)
-    {
-      fprintf (stderr, "Could not bind listener\n");
-      return -1;
-    }
-
-  /*
-     if (!nofork)
-     daemon (FALSE, FALSE);
-   */
-
-  int fd;
-  while (!rxsigquit)
-    {
-      do
-	{
-	  if ((fd = accept (listenfd, NULL, NULL)) < 0)
-	    {
-	      if (errno != EINTR)
-		{
-		  fprintf (stderr, "Accept failed\n");
-		  return -1;
+		if (fd >= 0) {
+			int one = 1;
+			if (setsockopt
+			    (fd, SOL_SOCKET, SO_REUSEADDR, &one,
+			     sizeof(one)) < 0) {
+				close(fd);
+				continue;
+			}
+			if (bind(fd, rp->ai_addr, rp->ai_addrlen) == 0)
+				break;
+			close(fd);
 		}
-	    }
 	}
-      while (fd < 0 && !rxsigquit);
-      if (rxsigquit)
-	break;
-      if (nofork < 2)
-	{
-	  int ret = runproxy (fd);
-	  if (ret < 0)
-	    return -1;
+
+	if (!rp) {
+		fprintf(stderr, "Error binding to %s:%s: %m\n", addr, port);
+		freeaddrinfo(result);
+		return -1;
 	}
-      else
-	{
-	  int cpid = fork ();
-	  if (cpid == 0)
-	    {
-	      /* we're the child */
-	      runproxy (fd);
-	      exit (0);
-	    }
-	  else
-	    close (fd);
+
+	freeaddrinfo(result);	/* No longer needed */
+
+	if (listen(fd, 5) < 0) {
+		close(fd);
+		return -1;
 	}
-    }
-  return 0;
+
+	return fd;
 }
 
-static void
-usage (void)
+static int connecttoaddress(char *addrport)
 {
-  fprintf (stderr, "tlsproxy\n\n\
+	struct addrinfo hints;
+	struct addrinfo *result, *rp;
+	int fd, s;
+	char addr[128];
+
+	snprintf(addr, sizeof(addr), "%s", addrport);
+
+	memset(&hints, 0, sizeof(struct addrinfo));
+	hints.ai_flags = AI_PASSIVE;	/* For wildcard IP address */
+	hints.ai_family = AF_UNSPEC;	/* Allow IPv4 or IPv6 */
+	hints.ai_socktype = SOCK_STREAM;	/* Stream socket */
+	hints.ai_protocol = 0;	/* any protocol */
+
+	char *colon = strrchr(addr, ':');
+	const char *port = defaultport;
+	if (colon) {
+		*colon = 0;
+		port = colon + 1;
+	}
+
+	if (!hostname && !server)
+		hostname = strdup(addr);
+
+	s = getaddrinfo(addr, port, &hints, &result);
+	if (s != 0) {
+		fprintf(stderr, "Error in address %s: %s\n", addr,
+			gai_strerror(s));
+		return -1;
+	}
+
+	/* attempt to connect to each address */
+	for (rp = result; rp != NULL; rp = rp->ai_next) {
+		fd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
+		if (fd >= 0) {
+			if (connect(fd, rp->ai_addr, rp->ai_addrlen) == 0)
+				break;
+			close(fd);
+		}
+	}
+
+	if (!rp) {
+		fprintf(stderr, "Error connecting to %s:%s: %m\n", addr, port);
+		freeaddrinfo(result);
+		return -1;
+	}
+
+	freeaddrinfo(result);	/* No longer needed */
+
+	return fd;
+}
+
+static int quitfn(void *opaque)
+{
+	return rxsigquit;
+}
+
+static int runproxy(int acceptfd)
+{
+	int connectfd;
+	if ((connectfd = connecttoaddress(connectaddr)) < 0) {
+		fprintf(stderr, "Could not connect\n");
+		close(acceptfd);
+		return -1;
+	}
+
+	tlssession_t *session =
+	    tlssession_new(server, keyfile, certfile, cacertfile, hostname,
+			   insecure,
+			   debug, quitfn, NULL, NULL);
+	if (!session) {
+		fprintf(stderr, "Could create TLS session\n");
+		close(connectfd);
+		close(acceptfd);
+		return -1;
+	}
+
+	int ret;
+	if (server)
+		ret = tlssession_mainloop(acceptfd, connectfd, session);
+	else
+		ret = tlssession_mainloop(connectfd, acceptfd, session);
+
+	tlssession_close(session);
+	close(connectfd);
+	close(acceptfd);
+
+	if (ret < 0) {
+		fprintf(stderr, "TLS proxy exited with an error\n");
+		return -1;
+	}
+	return 0;
+}
+
+static int runlistener(void)
+{
+	int listenfd;
+	if ((listenfd = bindtoaddress(listenaddr)) < 0) {
+		fprintf(stderr, "Could not bind listener\n");
+		return -1;
+	}
+
+	/*
+	   if (!nofork)
+	   daemon (FALSE, FALSE);
+	 */
+
+	int fd;
+	while (!rxsigquit) {
+		do {
+			if ((fd = accept(listenfd, NULL, NULL)) < 0) {
+				if (errno != EINTR) {
+					fprintf(stderr, "Accept failed\n");
+					return -1;
+				}
+			}
+		}
+		while (fd < 0 && !rxsigquit);
+		if (rxsigquit)
+			break;
+		if (nofork < 2) {
+			int ret = runproxy(fd);
+			if (ret < 0)
+				return -1;
+		} else {
+			int cpid = fork();
+			if (cpid == 0) {
+				/* we're the child */
+				runproxy(fd);
+				exit(0);
+			} else
+				close(fd);
+		}
+	}
+	return 0;
+}
+
+static void usage(void)
+{
+	fprintf(stderr, "tlsproxy\n\n\
 Usage:\n\
      tlsproxy [OPTIONS]\n\
 \n\
@@ -310,155 +283,147 @@ Options:\n\
 \n");
 }
 
-static void
-processoptions (int argc, char **argv)
+static void processoptions(int argc, char **argv)
 {
-  while (1)
-    {
-      static const struct option longopts[] = {
-	{"connect", required_argument, 0, 'c'},
-	{"listen", required_argument, 0, 'l'},
-	{"key", required_argument, 0, 'K'},
-	{"cert", required_argument, 0, 'C'},
-	{"cacert", required_argument, 0, 'A'},
-	{"hostname", required_argument, 0, 'H'},
-	{"server", no_argument, 0, 's'},
-	{"insecure", no_argument, 0, 'i'},
-	{"nofork", no_argument, 0, 'n'},
-	{"debug", no_argument, 0, 'd'},
-	{"help", no_argument, 0, 'h'},
-	{0, 0, 0, 0}
-      };
+	while (1) {
+		static const struct option longopts[] = {
+			{"connect", required_argument, 0, 'c'},
+			{"listen", required_argument, 0, 'l'},
+			{"key", required_argument, 0, 'K'},
+			{"cert", required_argument, 0, 'C'},
+			{"cacert", required_argument, 0, 'A'},
+			{"hostname", required_argument, 0, 'H'},
+			{"server", no_argument, 0, 's'},
+			{"insecure", no_argument, 0, 'i'},
+			{"nofork", no_argument, 0, 'n'},
+			{"debug", no_argument, 0, 'd'},
+			{"help", no_argument, 0, 'h'},
+			{0, 0, 0, 0}
+		};
 
-      int optidx = 0;
+		int optidx = 0;
 
-      int c =
-	getopt_long (argc, argv, "c:l:K:C:A:H:sindh", longopts, &optidx);
-      if (c == -1)
-	break;
+		int c = getopt_long(argc, argv, "c:l:K:C:A:H:sindh", longopts,
+				    &optidx);
+		if (c == -1)
+			break;
 
-      switch (c)
-	{
-	case 0:		/* set a flag, nothing else to do */
-	  break;
+		switch (c) {
+		case 0:	/* set a flag, nothing else to do */
+			break;
 
-	case 'c':
-	  free (connectaddr);
-	  connectaddr = strdup (optarg);
-	  break;
+		case 'c':
+			free(connectaddr);
+			connectaddr = strdup(optarg);
+			break;
 
-	case 'l':
-	  free (listenaddr);
-	  listenaddr = strdup (optarg);
-	  break;
+		case 'l':
+			free(listenaddr);
+			listenaddr = strdup(optarg);
+			break;
 
-	case 'K':
-	  free (keyfile);
-	  keyfile = strdup (optarg);
-	  break;
+		case 'K':
+			free(keyfile);
+			keyfile = strdup(optarg);
+			break;
 
-	case 'C':
-	  free (certfile);
-	  certfile = strdup (optarg);
-	  break;
+		case 'C':
+			free(certfile);
+			certfile = strdup(optarg);
+			break;
 
-	case 'A':
-	  free (cacertfile);
-	  cacertfile = strdup (optarg);
-	  break;
+		case 'A':
+			free(cacertfile);
+			cacertfile = strdup(optarg);
+			break;
 
-	case 'H':
-	  free (hostname);
-	  hostname = strdup (optarg);
-	  break;
+		case 'H':
+			free(hostname);
+			hostname = strdup(optarg);
+			break;
 
-	case 's':
-	  server = 1;
-	  break;
+		case 's':
+			server = 1;
+			break;
 
-	case 'i':
-	  insecure = 1;
-	  break;
+		case 'i':
+			insecure = 1;
+			break;
 
-	case 'n':
-	  nofork++;
-	  break;
+		case 'n':
+			nofork++;
+			break;
 
-	case 'd':
-	  debug++;
-	  break;
+		case 'd':
+			debug++;
+			break;
 
-	case 'h':
-	  usage ();
-	  exit (0);
-	  break;
+		case 'h':
+			usage();
+			exit(0);
+			break;
 
-	default:
-	  usage ();
-	  exit (1);
+		default:
+			usage();
+			exit(1);
+		}
 	}
-    }
 
-  if (optind != argc || !connectaddr || !listenaddr)
-    {
-      usage ();
-      exit (1);
-    }
+	if (optind != argc || !connectaddr || !listenaddr) {
+		usage();
+		exit(1);
+	}
 
-  if (!certfile && keyfile)
-    certfile = strdup (keyfile);
+	if (!certfile && keyfile)
+		certfile = strdup(keyfile);
 }
 
-static void
-handlesignal (int sig)
+static void handlesignal(int sig)
 {
-  switch (sig)
-    {
-    case SIGINT:
-    case SIGTERM:
-      rxsigquit++;
-      break;
-    default:
-      break;
-    }
+	switch (sig) {
+	case SIGINT:
+	case SIGTERM:
+		rxsigquit++;
+		break;
+	default:
+		break;
+	}
 }
 
-static void
-setsignalmasks (void)
+static void setsignalmasks(void)
 {
-  struct sigaction sa;
-  /* Set up the structure to specify the new action. */
-  memset (&sa, 0, sizeof (struct sigaction));
-  sa.sa_handler = handlesignal;
-  sigemptyset (&sa.sa_mask);
-  sa.sa_flags = 0;
-  sigaction (SIGINT, &sa, NULL);
-  sigaction (SIGTERM, &sa, NULL);
+	struct sigaction sa;
+	/* Set up the structure to specify the new action. */
+	memset(&sa, 0, sizeof(struct sigaction));
+	sa.sa_handler = handlesignal;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = 0;
+	sigaction(SIGINT, &sa, NULL);
+	sigaction(SIGTERM, &sa, NULL);
 
-  memset (&sa, 0, sizeof (struct sigaction));
-  sa.sa_handler = SIG_IGN;
-  sa.sa_flags = SA_RESTART;
-  sigaction (SIGPIPE, &sa, NULL);
+	memset(&sa, 0, sizeof(struct sigaction));
+	sa.sa_handler = SIG_IGN;
+	sa.sa_flags = SA_RESTART;
+	sigaction(SIGPIPE, &sa, NULL);
 }
 
-int
-main (int argc, char **argv)
+int main(int argc, char **argv)
 {
-  processoptions (argc, argv);
+	processoptions(argc, argv);
 
-  setsignalmasks ();
+	setsignalmasks();
 
-  if (tlssession_init ())
-    exit (1);
+	if (tlssession_init())
+		exit(1);
 
-  runlistener ();
+	runlistener();
 
-  free (connectaddr);
-  free (listenaddr);
-  free (keyfile);
-  free (certfile);
-  free (cacertfile);
-  free (hostname);
+	free(connectaddr);
+	free(listenaddr);
+	free(keyfile);
+	free(certfile);
+	free(cacertfile);
+	free(hostname);
 
-  exit (0);
+	exit(0);
 }

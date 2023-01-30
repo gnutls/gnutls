@@ -27,7 +27,7 @@
 /* Returns GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE when no identities
  * are present, or 0, on success.
  */
-int _gnutls13_psk_ext_parser_init(psk_ext_parser_st *p,
+int _gnutls13_psk_ext_parser_init(psk_ext_parser_st * p,
 				  const unsigned char *data, size_t len)
 {
 	if (!p || !data || !len)
@@ -42,7 +42,7 @@ int _gnutls13_psk_ext_parser_init(psk_ext_parser_st *p,
 	if (p->identities_len == 0)
 		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
-	p->identities_data = (unsigned char *) data;
+	p->identities_data = (unsigned char *)data;
 
 	DECR_LEN(len, p->identities_len);
 	data += p->identities_len;
@@ -62,7 +62,7 @@ int _gnutls13_psk_ext_parser_init(psk_ext_parser_st *p,
  * Returns GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE when no more identities
  * are present, or 0, on success.
  */
-int _gnutls13_psk_ext_iter_next_identity(psk_ext_iter_st *iter,
+int _gnutls13_psk_ext_iter_next_identity(psk_ext_iter_st * iter,
 					 struct psk_st *psk)
 {
 	if (iter->identities_len == 0)
@@ -74,7 +74,7 @@ int _gnutls13_psk_ext_iter_next_identity(psk_ext_iter_st *iter,
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 	iter->identities_data += 2;
-	psk->identity.data = (void*)iter->identities_data;
+	psk->identity.data = (void *)iter->identities_data;
 
 	DECR_LEN(iter->identities_len, psk->identity.size);
 	iter->identities_data += psk->identity.size;
@@ -91,8 +91,8 @@ int _gnutls13_psk_ext_iter_next_identity(psk_ext_iter_st *iter,
  * Returns GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE when no more identities
  * are present, or 0, on success.
  */
-int _gnutls13_psk_ext_iter_next_binder(psk_ext_iter_st *iter,
-				       gnutls_datum_t *binder)
+int _gnutls13_psk_ext_iter_next_binder(psk_ext_iter_st * iter,
+				       gnutls_datum_t * binder)
 {
 	if (iter->binders_len == 0)
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
@@ -103,7 +103,7 @@ int _gnutls13_psk_ext_iter_next_binder(psk_ext_iter_st *iter,
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 	iter->binders_data++;
-	binder->data = (uint8_t *)iter->binders_data;
+	binder->data = (uint8_t *) iter->binders_data;
 	DECR_LEN(iter->binders_len, binder->size);
 	iter->binders_data += binder->size;
 

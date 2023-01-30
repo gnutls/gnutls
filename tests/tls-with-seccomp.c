@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,20 +35,20 @@ int main(void)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <signal.h>
-#include <assert.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/dtls.h>
+# include <string.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <signal.h>
+# include <assert.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/dtls.h>
 
-#include "cert-common.h"
-#include "utils.h"
+# include "cert-common.h"
+# include "utils.h"
 
 static void terminate(void);
 
@@ -62,7 +62,7 @@ static void client_log_func(int level, const char *str)
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
 
-#define MAX_BUF 1024
+# define MAX_BUF 1024
 
 static void client(int fd, const char *prio)
 {
@@ -113,13 +113,12 @@ static void client(int fd, const char *prio)
 			(gnutls_protocol_get_version(session)));
 
 	do {
-		ret = gnutls_record_recv(session, buffer, sizeof(buffer)-1);
+		ret = gnutls_record_recv(session, buffer, sizeof(buffer) - 1);
 	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 	if (ret == 0) {
 		if (debug)
-			success
-			    ("client: Peer has closed the TLS connection\n");
+			success("client: Peer has closed the TLS connection\n");
 		goto end;
 	} else if (ret < 0) {
 		fail("client: Error: %s\n", gnutls_strerror(ret));
@@ -128,10 +127,11 @@ static void client(int fd, const char *prio)
 
 	ret = gnutls_bye(session, GNUTLS_SHUT_RDWR);
 	if (ret < 0) {
-		fail("server: error in closing session: %s\n", gnutls_strerror(ret));
+		fail("server: error in closing session: %s\n",
+		     gnutls_strerror(ret));
 	}
 
-      end:
+ end:
 
 	close(fd);
 
@@ -141,7 +141,6 @@ static void client(int fd, const char *prio)
 
 	gnutls_global_deinit();
 }
-
 
 /* These are global */
 pid_t child;
@@ -174,8 +173,8 @@ static void server(int fd, const char *prio)
 	gnutls_certificate_allocate_credentials(&xcred);
 
 	ret = gnutls_certificate_set_x509_key_mem(xcred,
-					    &server_cert, &server_key,
-					    GNUTLS_X509_FMT_PEM);
+						  &server_cert, &server_key,
+						  GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);
 
@@ -218,7 +217,7 @@ static void server(int fd, const char *prio)
 
 	memset(buffer, 1, sizeof(buffer));
 	do {
-		ret = gnutls_record_send(session, buffer, sizeof(buffer)-1);
+		ret = gnutls_record_send(session, buffer, sizeof(buffer) - 1);
 	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 	if (ret < 0) {
@@ -231,7 +230,8 @@ static void server(int fd, const char *prio)
 
 	ret = gnutls_bye(session, GNUTLS_SHUT_RDWR);
 	if (ret < 0) {
-		fail("server: error in closing session: %s\n", gnutls_strerror(ret));
+		fail("server: error in closing session: %s\n",
+		     gnutls_strerror(ret));
 	}
 
 	close(fd);
@@ -245,7 +245,7 @@ static void server(int fd, const char *prio)
 		success("server: finished\n");
 }
 
-static 
+static
 void run(const char *name, const char *prio)
 {
 	int fd[2];

@@ -69,9 +69,9 @@ static void print_dn(gnutls_buffer_st * str, const char *prefix,
 #define ENTRY2(oid, name) {oid, sizeof(oid)-1, name, sizeof(name)-1, NULL, ASN1_ETYPE_INVALID}
 
 static const struct oid_to_string pkcs7_attrs[] = {
-	ENTRY ("1.2.840.113549.1.9.3", "contentType", ASN1_ETYPE_OBJECT_ID),
-	ENTRY ("1.2.840.113549.1.9.4", "messageDigest", ASN1_ETYPE_OCTET_STRING),
-	ENTRY ("1.2.840.113549.1.9.5", "signingTime", ASN1_ETYPE_INVALID),
+	ENTRY("1.2.840.113549.1.9.3", "contentType", ASN1_ETYPE_OBJECT_ID),
+	ENTRY("1.2.840.113549.1.9.4", "messageDigest", ASN1_ETYPE_OCTET_STRING),
+	ENTRY("1.2.840.113549.1.9.5", "signingTime", ASN1_ETYPE_INVALID),
 	ENTRY2("1.2.840.113549.1.9.6", "countersignature"),
 	ENTRY2("1.2.840.113549.1.9.15", "smimeCapabilities"),
 
@@ -119,7 +119,7 @@ static void print_pkcs7_info(gnutls_pkcs7_signature_info_st * info,
 	char s[42];
 	size_t max;
 	int ret;
-	const struct oid_to_string * entry;
+	const struct oid_to_string *entry;
 
 	if (info->issuer_dn.size > 0)
 		print_dn(str, "\tSigner's issuer DN", &info->issuer_dn);
@@ -158,7 +158,9 @@ static void print_pkcs7_info(gnutls_pkcs7_signature_info_st * info,
 
 				entry = _gnutls_oid_get_entry(pkcs7_attrs, oid);
 				snprintf(prefix, sizeof(prefix), "\t\t%s",
-						(entry && entry->name_desc) ? entry->name_desc : oid);
+					 (entry
+					  && entry->
+					  name_desc) ? entry->name_desc : oid);
 				print_raw(str, prefix, &data);
 				gnutls_free(data.data);
 			}
@@ -175,7 +177,9 @@ static void print_pkcs7_info(gnutls_pkcs7_signature_info_st * info,
 
 				entry = _gnutls_oid_get_entry(pkcs7_attrs, oid);
 				snprintf(prefix, sizeof(prefix), "\t\t%s",
-						(entry && entry->name_desc) ? entry->name_desc : oid);
+					 (entry
+					  && entry->
+					  name_desc) ? entry->name_desc : oid);
 				print_raw(str, prefix, &data);
 				gnutls_free(data.data);
 			}
@@ -271,8 +275,7 @@ int gnutls_pkcs7_print(gnutls_pkcs7_t pkcs7,
 		count = gnutls_pkcs7_get_crt_count(pkcs7);
 
 		if (count > 0) {
-			addf(&str, "Number of certificates: %u\n\n",
-			     count);
+			addf(&str, "Number of certificates: %u\n\n", count);
 
 			for (i = 0; i < count; i++) {
 				ret =
@@ -292,7 +295,7 @@ int gnutls_pkcs7_print(gnutls_pkcs7_t pkcs7,
 					continue;
 				}
 
-				adds(&str, (char*)b64.data);
+				adds(&str, (char *)b64.data);
 				adds(&str, "\n");
 				gnutls_free(b64.data);
 				gnutls_free(data.data);
@@ -321,7 +324,7 @@ int gnutls_pkcs7_print(gnutls_pkcs7_t pkcs7,
 					continue;
 				}
 
-				adds(&str, (char*)b64.data);
+				adds(&str, (char *)b64.data);
 				adds(&str, "\n");
 				gnutls_free(b64.data);
 				gnutls_free(data.data);

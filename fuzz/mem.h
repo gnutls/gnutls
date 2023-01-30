@@ -29,9 +29,8 @@ typedef struct mem_st {
 	size_t size;
 } mem_st;
 
-#define MIN(x,y) ((x)<(y)?(x):(y))
-static ssize_t
-mem_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
+# define MIN(x,y) ((x)<(y)?(x):(y))
+static ssize_t mem_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 {
 	return len;
 }

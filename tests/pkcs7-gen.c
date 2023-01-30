@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdlib.h>
@@ -64,8 +64,8 @@ static char pem1_key[] =
     "sWZGfbnU3ryjvkb6YuFjgtzbZDZHWQCo8/cOtOBmPdk=\n"
     "-----END RSA PRIVATE KEY-----\n";
 
-const gnutls_datum_t cert = {(void *) pem1_cert, sizeof(pem1_cert)-1};
-const gnutls_datum_t key = {(void *) pem1_key, sizeof(pem1_key)-1};
+const gnutls_datum_t cert = { (void *)pem1_cert, sizeof(pem1_cert) - 1 };
+const gnutls_datum_t key = { (void *)pem1_key, sizeof(pem1_key) - 1 };
 
 static time_t mytime(time_t * t)
 {
@@ -91,9 +91,9 @@ void doit(void)
 	gnutls_pkcs7_attrs_t list1 = NULL;
 	gnutls_pkcs7_attrs_t list2 = NULL;
 	gnutls_datum_t out;
-	gnutls_datum_t data1 = {(unsigned char*)"xxx", 3};
-	gnutls_datum_t data2 = {(unsigned char*)"yyyy", 4};
-	gnutls_datum_t data3 = {(unsigned char*)"aaaaa", 5};
+	gnutls_datum_t data1 = { (unsigned char *)"xxx", 3 };
+	gnutls_datum_t data2 = { (unsigned char *)"yyyy", 4 };
+	gnutls_datum_t data3 = { (unsigned char *)"aaaaa", 5 };
 	gnutls_pkcs7_signature_info_st info;
 	char *oid;
 	gnutls_datum_t data;
@@ -115,7 +115,9 @@ void doit(void)
 		exit(1);
 	}
 
-	ret = gnutls_privkey_import_x509_raw(pkey, &key, GNUTLS_X509_FMT_PEM, 0, 0);
+	ret =
+	    gnutls_privkey_import_x509_raw(pkey, &key, GNUTLS_X509_FMT_PEM, 0,
+					   0);
 	if (ret < 0) {
 		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
 		exit(1);
@@ -134,25 +136,33 @@ void doit(void)
 		exit(1);
 	}
 
-	ret = gnutls_pkcs7_add_attr(&list1, "1.2.3.4", &data1, GNUTLS_PKCS7_ATTR_ENCODE_OCTET_STRING);
+	ret =
+	    gnutls_pkcs7_add_attr(&list1, "1.2.3.4", &data1,
+				  GNUTLS_PKCS7_ATTR_ENCODE_OCTET_STRING);
 	if (ret < 0) {
 		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
 		exit(1);
 	}
 
-	ret = gnutls_pkcs7_add_attr(&list1, "2.3.4", &data2, GNUTLS_PKCS7_ATTR_ENCODE_OCTET_STRING);
+	ret =
+	    gnutls_pkcs7_add_attr(&list1, "2.3.4", &data2,
+				  GNUTLS_PKCS7_ATTR_ENCODE_OCTET_STRING);
 	if (ret < 0) {
 		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
 		exit(1);
 	}
 
-	ret = gnutls_pkcs7_add_attr(&list2, "2.3.4", &data3, GNUTLS_PKCS7_ATTR_ENCODE_OCTET_STRING);
+	ret =
+	    gnutls_pkcs7_add_attr(&list2, "2.3.4", &data3,
+				  GNUTLS_PKCS7_ATTR_ENCODE_OCTET_STRING);
 	if (ret < 0) {
 		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
 		exit(1);
 	}
 
-	ret = gnutls_pkcs7_sign(pkcs7, crt, pkey, &data3, list1, list2, GNUTLS_DIG_SHA256, 0);
+	ret =
+	    gnutls_pkcs7_sign(pkcs7, crt, pkey, &data3, list1, list2,
+			      GNUTLS_DIG_SHA256, 0);
 	if (ret < 0) {
 		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
 		exit(1);
@@ -197,37 +207,46 @@ void doit(void)
 	}
 	gnutls_free(data.data);
 
-	ret = gnutls_pkcs7_get_attr(info.signed_attrs, 2, &oid, &data, GNUTLS_PKCS7_ATTR_ENCODE_OCTET_STRING);
+	ret =
+	    gnutls_pkcs7_get_attr(info.signed_attrs, 2, &oid, &data,
+				  GNUTLS_PKCS7_ATTR_ENCODE_OCTET_STRING);
 	if (ret < 0) {
 		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
 		exit(1);
 	}
 
-	if (strcmp(oid, "1.2.3.4") != 0 || data.size != data1.size || memcmp(data.data, data1.data, data.size) != 0) {
+	if (strcmp(oid, "1.2.3.4") != 0 || data.size != data1.size
+	    || memcmp(data.data, data1.data, data.size) != 0) {
 		fail("error in %d: %s\n", __LINE__, oid);
 		exit(1);
 	}
 	gnutls_free(data.data);
 
-	ret = gnutls_pkcs7_get_attr(info.signed_attrs, 3, &oid, &data, GNUTLS_PKCS7_ATTR_ENCODE_OCTET_STRING);
+	ret =
+	    gnutls_pkcs7_get_attr(info.signed_attrs, 3, &oid, &data,
+				  GNUTLS_PKCS7_ATTR_ENCODE_OCTET_STRING);
 	if (ret < 0) {
 		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
 		exit(1);
 	}
 
-	if (strcmp(oid, "2.3.4") != 0 || data.size != data2.size || memcmp(data.data, data2.data, data.size) != 0) {
+	if (strcmp(oid, "2.3.4") != 0 || data.size != data2.size
+	    || memcmp(data.data, data2.data, data.size) != 0) {
 		fail("error in %d: %s\n", __LINE__, oid);
 		exit(1);
 	}
 	gnutls_free(data.data);
 
-	ret = gnutls_pkcs7_get_attr(info.unsigned_attrs, 0, &oid, &data, GNUTLS_PKCS7_ATTR_ENCODE_OCTET_STRING);
+	ret =
+	    gnutls_pkcs7_get_attr(info.unsigned_attrs, 0, &oid, &data,
+				  GNUTLS_PKCS7_ATTR_ENCODE_OCTET_STRING);
 	if (ret < 0) {
 		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
 		exit(1);
 	}
 
-	if (strcmp(oid, "2.3.4") != 0 || data.size != data3.size || memcmp(data.data, data3.data, data.size) != 0) {
+	if (strcmp(oid, "2.3.4") != 0 || data.size != data3.size
+	    || memcmp(data.data, data3.data, data.size) != 0) {
 		fail("error in %d: %s\n", __LINE__, oid);
 		exit(1);
 	}

@@ -21,7 +21,7 @@
  */
 
 #ifndef GNUTLS_TESTS_TEST_CHAINS_ISSUER_AIA_H
-#define GNUTLS_TESTS_TEST_CHAINS_ISSUER_AIA_H
+# define GNUTLS_TESTS_TEST_CHAINS_ISSUER_AIA_H
 
 /* *INDENT-OFF* */
 
@@ -134,4 +134,4 @@ static const char *missing_cert_aia_ca[] = {
 
 /* *INDENT-ON* */
 
-#endif /* GNUTLS_TESTS_TEST_CHAINS_ISSUER_AIA_H */
+#endif				/* GNUTLS_TESTS_TEST_CHAINS_ISSUER_AIA_H */

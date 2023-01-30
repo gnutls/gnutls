@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,18 +35,18 @@ int main(void)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <signal.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/dtls.h>
+# include <string.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <signal.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/dtls.h>
 
-#include "utils.h"
+# include "utils.h"
 
 static void terminate(void);
 
@@ -69,8 +69,7 @@ static pid_t child;
 /* A very basic DTLS client, with anonymous authentication, that exchanges heartbeats.
  */
 
-#define MAX_BUF 1024
-
+# define MAX_BUF 1024
 
 static void client(int fd, int server_init)
 {
@@ -130,8 +129,7 @@ static void client(int fd, int server_init)
 	if (!server_init) {
 		do {
 			ret =
-			    gnutls_record_recv(session, buffer,
-						sizeof(buffer));
+			    gnutls_record_recv(session, buffer, sizeof(buffer));
 
 			if (ret == GNUTLS_E_HEARTBEAT_PING_RECEIVED) {
 				if (debug)
@@ -146,7 +144,7 @@ static void client(int fd, int server_init)
 			}
 		}
 		while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED
-			|| ret == GNUTLS_E_HEARTBEAT_PING_RECEIVED);
+		       || ret == GNUTLS_E_HEARTBEAT_PING_RECEIVED);
 
 		if (ret < 0) {
 			fail("recv: %s\n", gnutls_strerror(ret));
@@ -161,8 +159,7 @@ static void client(int fd, int server_init)
 			if (debug)
 				success("Ping sent.\n");
 		}
-		while (ret == GNUTLS_E_AGAIN
-			|| ret == GNUTLS_E_INTERRUPTED);
+		while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 		if (ret < 0) {
 			fail("ping: %s\n", gnutls_strerror(ret));
@@ -180,8 +177,6 @@ static void client(int fd, int server_init)
 
 	gnutls_global_deinit();
 }
-
-
 
 static gnutls_session_t initialize_tls_session(void)
 {
@@ -257,8 +252,7 @@ static void server(int fd, int server_init)
 	if (server_init) {
 		do {
 			ret =
-			    gnutls_record_recv(session, buffer,
-						sizeof(buffer));
+			    gnutls_record_recv(session, buffer, sizeof(buffer));
 
 			if (ret == GNUTLS_E_HEARTBEAT_PING_RECEIVED) {
 				if (debug)
@@ -273,7 +267,7 @@ static void server(int fd, int server_init)
 			}
 		}
 		while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED
-			|| ret == GNUTLS_E_HEARTBEAT_PING_RECEIVED);
+		       || ret == GNUTLS_E_HEARTBEAT_PING_RECEIVED);
 	} else {
 		do {
 			ret =
@@ -283,8 +277,7 @@ static void server(int fd, int server_init)
 			if (debug)
 				success("Ping sent.\n");
 		}
-		while (ret == GNUTLS_E_AGAIN
-			|| ret == GNUTLS_E_INTERRUPTED);
+		while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 		if (ret < 0) {
 			fail("ping: %s\n", gnutls_strerror(ret));

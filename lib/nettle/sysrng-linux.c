@@ -59,19 +59,19 @@ get_entropy_func _rnd_get_system_entropy = NULL;
 #  else
 static ssize_t _getrandom0(void *buf, size_t buflen, unsigned int flags)
 {
-        errno = ENOSYS;
-        return -1;
+	errno = ENOSYS;
+	return -1;
 }
+
 #   define getrandom(dst,s,flags) _getrandom0(dst,s,flags)
 #  endif
 # endif
-
 
 static unsigned have_getrandom(void)
 {
 	char c;
 	int ret;
-	ret = getrandom(&c, 1, 1/*GRND_NONBLOCK*/);
+	ret = getrandom(&c, 1, 1 /*GRND_NONBLOCK */ );
 	if (ret == 1 || (ret == -1 && errno == EAGAIN))
 		return 1;
 	return 0;
@@ -100,28 +100,26 @@ static int force_getrandom(void *buf, size_t buflen, unsigned int flags)
 	return buflen;
 }
 
-static int _rnd_get_system_entropy_getrandom(void* _rnd, size_t size)
+static int _rnd_get_system_entropy_getrandom(void *_rnd, size_t size)
 {
 	int ret;
 	ret = force_getrandom(_rnd, size, 0);
 	if (ret == -1) {
 		int e = errno;
 		gnutls_assert();
-		_gnutls_debug_log
-			("Failed to use getrandom: %s\n",
-					 strerror(e));
+		_gnutls_debug_log("Failed to use getrandom: %s\n", strerror(e));
 		return GNUTLS_E_RANDOM_DEVICE_ERROR;
 	}
 
 	return 0;
 }
-#else /* not linux */
+#else				/* not linux */
 # define have_getrandom() 0
 #endif
 
-static int _rnd_get_system_entropy_urandom(void* _rnd, size_t size)
+static int _rnd_get_system_entropy_urandom(void *_rnd, size_t size)
 {
-	uint8_t* rnd = _rnd;
+	uint8_t *rnd = _rnd;
 	uint32_t done;
 	int urandom_fd;
 
@@ -141,11 +139,11 @@ static int _rnd_get_system_entropy_urandom(void* _rnd, size_t size)
 			int e = errno;
 			if (res < 0) {
 				_gnutls_debug_log
-					("Failed to read /dev/urandom: %s\n",
-					 strerror(e));
+				    ("Failed to read /dev/urandom: %s\n",
+				     strerror(e));
 			} else {
 				_gnutls_debug_log
-					("Failed to read /dev/urandom: end of file\n");
+				    ("Failed to read /dev/urandom: end of file\n");
 			}
 
 			close(urandom_fd);
@@ -179,7 +177,8 @@ int _rnd_system_entropy_init(void)
 	/* Check that we can open it */
 	urandom_fd = open("/dev/urandom", O_RDONLY);
 	if (urandom_fd < 0) {
-		_gnutls_debug_log("Cannot open /dev/urandom during initialization!\n");
+		_gnutls_debug_log
+		    ("Cannot open /dev/urandom during initialization!\n");
 		return gnutls_assert_val(GNUTLS_E_RANDOM_DEVICE_ERROR);
 	}
 	close(urandom_fd);
@@ -195,4 +194,3 @@ void _rnd_system_entropy_deinit(void)
 	/* A no-op now when we open and close /dev/urandom every time */
 	return;
 }
-

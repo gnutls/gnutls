@@ -25,12 +25,12 @@
 
 #ifdef ENABLE_SRP
 
-#include "auth.h"
-#include <auth/srp_kx.h>
-#include "errors.h"
-#include "algorithms.h"
-#include <num.h>
-#include <hello_ext.h>
+# include "auth.h"
+# include <auth/srp_kx.h>
+# include "errors.h"
+# include "algorithms.h"
+# include <num.h>
+# include <hello_ext.h>
 
 static int _gnutls_srp_unpack(gnutls_buffer_st * ps,
 			      gnutls_ext_priv_data_t * _priv);
@@ -48,7 +48,9 @@ const hello_ext_entry_st ext_mod_srp = {
 	.gid = GNUTLS_EXTENSION_SRP,
 	.client_parse_point = GNUTLS_EXT_TLS,
 	.server_parse_point = GNUTLS_EXT_TLS,
-	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_DTLS | GNUTLS_EXT_FLAG_CLIENT_HELLO,
+	.validity =
+	    GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_DTLS |
+	    GNUTLS_EXT_FLAG_CLIENT_HELLO,
 	.recv_func = _gnutls_srp_recv_params,
 	.send_func = _gnutls_srp_send_params,
 	.pack_func = _gnutls_srp_pack,
@@ -56,7 +58,6 @@ const hello_ext_entry_st ext_mod_srp = {
 	.deinit_func = _gnutls_srp_deinit_data,
 	.cannot_be_overriden = 1
 };
-
 
 static int
 _gnutls_srp_recv_params(gnutls_session_t session, const uint8_t * data,
@@ -88,8 +89,7 @@ _gnutls_srp_recv_params(gnutls_session_t session, const uint8_t * data,
 
 			epriv = priv;
 			_gnutls_hello_ext_set_priv(session,
-						     GNUTLS_EXTENSION_SRP,
-						     epriv);
+						   GNUTLS_EXTENSION_SRP, epriv);
 		}
 	}
 	return 0;
@@ -102,7 +102,8 @@ static unsigned have_srp_ciphersuites(gnutls_session_t session)
 
 	for (j = 0; j < session->internals.priorities->cs.size; j++) {
 		kx = session->internals.priorities->cs.entry[j]->kx_algorithm;
-		if (kx == GNUTLS_KX_SRP || kx == GNUTLS_KX_SRP_RSA || kx == GNUTLS_KX_SRP_DSS)
+		if (kx == GNUTLS_KX_SRP || kx == GNUTLS_KX_SRP_RSA
+		    || kx == GNUTLS_KX_SRP_DSS)
 			return 1;
 	}
 
@@ -113,17 +114,15 @@ static unsigned have_srp_ciphersuites(gnutls_session_t session)
  * data is allocated locally
  */
 static int
-_gnutls_srp_send_params(gnutls_session_t session,
-			gnutls_buffer_st * extdata)
+_gnutls_srp_send_params(gnutls_session_t session, gnutls_buffer_st * extdata)
 {
 	unsigned len;
 	int ret;
 	gnutls_ext_priv_data_t epriv;
 	srp_ext_st *priv = NULL;
 	char *username = NULL, *password = NULL;
-	gnutls_srp_client_credentials_t cred =
-		    (gnutls_srp_client_credentials_t)
-		    _gnutls_get_cred(session, GNUTLS_CRD_SRP);
+	gnutls_srp_client_credentials_t cred = (gnutls_srp_client_credentials_t)
+	    _gnutls_get_cred(session, GNUTLS_CRD_SRP);
 
 	if (session->security_parameters.entity != GNUTLS_CLIENT)
 		return 0;
@@ -145,9 +144,7 @@ _gnutls_srp_send_params(gnutls_session_t session,
 
 		ret =
 		    _gnutls_buffer_append_data_prefix(extdata, 8,
-						      cred->
-						      username,
-						      len);
+						      cred->username, len);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -167,16 +164,14 @@ _gnutls_srp_send_params(gnutls_session_t session,
 
 		epriv = priv;
 		_gnutls_hello_ext_set_priv(session,
-					     GNUTLS_EXTENSION_SRP,
-					     epriv);
+					   GNUTLS_EXTENSION_SRP, epriv);
 
 		return len + 1;
 	} else if (cred->get_function != NULL) {
 		/* Try the callback
 		 */
 
-		if (cred->
-		    get_function(session, &username, &password) < 0
+		if (cred->get_function(session, &username, &password) < 0
 		    || username == NULL || password == NULL) {
 			gnutls_assert();
 			return GNUTLS_E_ILLEGAL_SRP_USERNAME;
@@ -189,8 +184,7 @@ _gnutls_srp_send_params(gnutls_session_t session,
 
 		ret =
 		    _gnutls_buffer_append_data_prefix(extdata, 8,
-						      username,
-						      len);
+						      username, len);
 		if (ret < 0) {
 			ret = gnutls_assert_val(ret);
 			goto cleanup;
@@ -198,14 +192,13 @@ _gnutls_srp_send_params(gnutls_session_t session,
 
 		epriv = priv;
 		_gnutls_hello_ext_set_priv(session,
-					     GNUTLS_EXTENSION_SRP,
-					     epriv);
+					   GNUTLS_EXTENSION_SRP, epriv);
 
 		return len + 1;
 	}
 	return 0;
 
-      cleanup:
+ cleanup:
 	gnutls_free(username);
 	gnutls_free(password);
 	gnutls_free(priv);
@@ -222,8 +215,7 @@ static void _gnutls_srp_deinit_data(gnutls_ext_priv_data_t epriv)
 	gnutls_free(priv);
 }
 
-static int
-_gnutls_srp_pack(gnutls_ext_priv_data_t epriv, gnutls_buffer_st * ps)
+static int _gnutls_srp_pack(gnutls_ext_priv_data_t epriv, gnutls_buffer_st * ps)
 {
 	srp_ext_st *priv = epriv;
 	int ret;
@@ -259,19 +251,18 @@ _gnutls_srp_unpack(gnutls_buffer_st * ps, gnutls_ext_priv_data_t * _priv)
 	BUFFER_POP_DATUM(ps, &username);
 	BUFFER_POP_DATUM(ps, &password);
 
-	priv->username = (char *) username.data;
-	priv->password = (char *) password.data;
+	priv->username = (char *)username.data;
+	priv->password = (char *)password.data;
 
 	epriv = priv;
 	*_priv = epriv;
 
 	return 0;
 
-      error:
+ error:
 	_gnutls_free_datum(&username);
 	_gnutls_free_datum(&password);
 	return ret;
 }
-
 
 #endif				/* ENABLE_SRP */

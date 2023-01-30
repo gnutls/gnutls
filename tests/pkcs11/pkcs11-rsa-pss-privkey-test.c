@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -75,10 +75,12 @@ static unsigned verify_rsa_pss_presence(void)
 
 	i = 0;
 	do {
-		ret = gnutls_pkcs11_token_get_mechanism("pkcs11:", i++, &mechanism);
-		if (ret >= 0 && mechanism == 0xd /* CKM_RSA_PKCS_PSS*/)
+		ret =
+		    gnutls_pkcs11_token_get_mechanism("pkcs11:", i++,
+						      &mechanism);
+		if (ret >= 0 && mechanism == 0xd /* CKM_RSA_PKCS_PSS */ )
 			return 1;
-	} while(ret>=0);
+	} while (ret >= 0);
 
 	return 0;
 }
@@ -128,7 +130,8 @@ void doit(void)
 	}
 
 	if (verify_rsa_pss_presence() == 0) {
-		fprintf(stderr, "Skipping test as no RSA-PSS mech is supported\n");
+		fprintf(stderr,
+			"Skipping test as no RSA-PSS mech is supported\n");
 		exit(77);
 	}
 

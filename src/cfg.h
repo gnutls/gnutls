@@ -19,7 +19,7 @@
  */
 
 #ifndef CFG_H_
-#define CFG_H_ 1
+# define CFG_H_ 1
 
 typedef struct cfg_option_st {
 	char *name;
@@ -30,4 +30,4 @@ cfg_option_t cfg_load(const char *filename);
 void cfg_free(cfg_option_t options);
 cfg_option_t cfg_next(const cfg_option_t options, const char *name);
 
-#endif	/* CFG_H_ */
+#endif				/* CFG_H_ */

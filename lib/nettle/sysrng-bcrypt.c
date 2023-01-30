@@ -53,7 +53,7 @@ get_entropy_func _rnd_get_system_entropy = NULL;
 static BCRYPT_ALG_HANDLE device_fd = 0;
 
 static
-int _rnd_get_system_entropy_win32(void* rnd, size_t size)
+int _rnd_get_system_entropy_win32(void *rnd, size_t size)
 {
 	NTSTATUS err = BCryptGenRandom(device_fd, rnd, size, 0);
 	if (!BCRYPT_SUCCESS(err)) {

@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdbool.h>
@@ -59,7 +59,8 @@ static unsigned key_update_msg_inc = 0;
 static unsigned key_update_msg_out = 0;
 
 static int hsk_callback(gnutls_session_t session, unsigned int htype,
-			unsigned post, unsigned int incoming, const gnutls_datum_t *msg)
+			unsigned post, unsigned int incoming,
+			const gnutls_datum_t * msg)
 {
 	assert(post == GNUTLS_HOOK_PRE);
 
@@ -137,7 +138,6 @@ static void run(const char *name, bool exceed_limit)
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
 
-
 	HANDSHAKE(client, server);
 	if (debug)
 		success("Handshake established\n");
@@ -145,7 +145,8 @@ static void run(const char *name, bool exceed_limit)
 	key_update_msg_inc = 0;
 	key_update_msg_out = 0;
 
-	gnutls_handshake_set_hook_function(client, -1, GNUTLS_HOOK_PRE, hsk_callback);
+	gnutls_handshake_set_hook_function(client, -1, GNUTLS_HOOK_PRE,
+					   hsk_callback);
 
 	/* schedule multiple key updates */
 	for (i = 0; i < KEY_UPDATES_PER_WINDOW; i++) {
@@ -163,7 +164,7 @@ static void run(const char *name, bool exceed_limit)
 
 	if (key_update_msg_out != KEY_UPDATES_PER_WINDOW)
 		fail("unexpected number of key updates are sent: %d\n",
-			key_update_msg_out);
+		     key_update_msg_out);
 	else {
 		if (debug)
 			success("successfully sent %d key updates\n",
@@ -171,7 +172,7 @@ static void run(const char *name, bool exceed_limit)
 	}
 	if (key_update_msg_inc != 1)
 		fail("unexpected number of key updates received: %d\n",
-			key_update_msg_inc);
+		     key_update_msg_inc);
 	else {
 		if (debug)
 			success("successfully received 1 key update\n");
@@ -192,7 +193,8 @@ static void run(const char *name, bool exceed_limit)
 			fail("server didn't reject excessive number of key updates\n");
 		else {
 			if (debug)
-				success("server rejected excessive number of key updates\n");
+				success
+				    ("server rejected excessive number of key updates\n");
 		}
 	} else {
 		virt_sec_sleep(KEY_UPDATES_WINDOW / 1000 + 1);

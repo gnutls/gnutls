@@ -46,20 +46,22 @@ unsigned gnutls_url_is_supported(const char *url)
 {
 	unsigned i;
 
-	for (i=0;i<_gnutls_custom_urls_size;i++) {
-		if (c_strncasecmp(url, _gnutls_custom_urls[i].name, _gnutls_custom_urls[i].name_size) == 0)
+	for (i = 0; i < _gnutls_custom_urls_size; i++) {
+		if (c_strncasecmp
+		    (url, _gnutls_custom_urls[i].name,
+		     _gnutls_custom_urls[i].name_size) == 0)
 			return 1;
 	}
 
 #ifdef ENABLE_PKCS11
-	if (c_strncasecmp(url, PKCS11_URL, sizeof(PKCS11_URL)-1) == 0)
+	if (c_strncasecmp(url, PKCS11_URL, sizeof(PKCS11_URL) - 1) == 0)
 		return 1;
 #endif
 #ifdef HAVE_TROUSERS
-	if (c_strncasecmp(url, TPMKEY_URL, sizeof(TPMKEY_URL)-1) == 0)
+	if (c_strncasecmp(url, TPMKEY_URL, sizeof(TPMKEY_URL) - 1) == 0)
 		return 1;
 #endif
-	if (c_strncasecmp(url, SYSTEM_URL, sizeof(SYSTEM_URL)-1) == 0)
+	if (c_strncasecmp(url, SYSTEM_URL, sizeof(SYSTEM_URL) - 1) == 0)
 		return _gnutls_system_url_is_supported(url);
 
 	return 0;
@@ -69,15 +71,17 @@ int _gnutls_url_is_known(const char *url)
 {
 	unsigned i;
 
-	if (c_strncasecmp(url, PKCS11_URL, sizeof(PKCS11_URL)-1) == 0)
+	if (c_strncasecmp(url, PKCS11_URL, sizeof(PKCS11_URL) - 1) == 0)
 		return 1;
-	else if (c_strncasecmp(url, TPMKEY_URL, sizeof(TPMKEY_URL)-1) == 0)
+	else if (c_strncasecmp(url, TPMKEY_URL, sizeof(TPMKEY_URL) - 1) == 0)
 		return 1;
-	else if (c_strncasecmp(url, SYSTEM_URL, sizeof(SYSTEM_URL)-1) == 0)
+	else if (c_strncasecmp(url, SYSTEM_URL, sizeof(SYSTEM_URL) - 1) == 0)
 		return 1;
 	else {
-		for (i=0;i<_gnutls_custom_urls_size;i++) {
-			if (c_strncasecmp(url, _gnutls_custom_urls[i].name, _gnutls_custom_urls[i].name_size) == 0)
+		for (i = 0; i < _gnutls_custom_urls_size; i++) {
+			if (c_strncasecmp
+			    (url, _gnutls_custom_urls[i].name,
+			     _gnutls_custom_urls[i].name_size) == 0)
 				return 1;
 		}
 
@@ -106,19 +110,20 @@ int _gnutls_url_is_known(const char *url)
  *
  * Since: 3.4.0
  **/
-int gnutls_register_custom_url(const gnutls_custom_url_st *st)
+int gnutls_register_custom_url(const gnutls_custom_url_st * st)
 {
 	unsigned i;
 
-	for (i=0;i<_gnutls_custom_urls_size;i++) {
+	for (i = 0; i < _gnutls_custom_urls_size; i++) {
 		if (_gnutls_custom_urls[i].name_size == st->name_size &&
 		    strcmp(_gnutls_custom_urls[i].name, st->name) == 0) {
-		    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 		}
 	}
 
-	if (_gnutls_custom_urls_size < MAX_CUSTOM_URLS-1) {
-		memcpy(&_gnutls_custom_urls[_gnutls_custom_urls_size], st, sizeof(*st));
+	if (_gnutls_custom_urls_size < MAX_CUSTOM_URLS - 1) {
+		memcpy(&_gnutls_custom_urls[_gnutls_custom_urls_size], st,
+		       sizeof(*st));
 		_gnutls_custom_urls_size++;
 		return 0;
 	} else {
@@ -142,20 +147,25 @@ int gnutls_register_custom_url(const gnutls_custom_url_st *st)
  * Since: 3.4.0
  -*/
 int _gnutls_get_raw_issuer(const char *url, gnutls_x509_crt_t cert,
-				 gnutls_datum_t * issuer,
-				 unsigned int flags)
+			   gnutls_datum_t * issuer, unsigned int flags)
 {
 	unsigned i;
 
 #ifdef ENABLE_PKCS11
 	if (c_strncasecmp(url, PKCS11_URL, PKCS11_URL_SIZE) == 0) {
-		return gnutls_pkcs11_get_raw_issuer(url, cert, issuer, GNUTLS_X509_FMT_DER, flags);
+		return gnutls_pkcs11_get_raw_issuer(url, cert, issuer,
+						    GNUTLS_X509_FMT_DER, flags);
 	}
 #endif
-	for (i=0;i<_gnutls_custom_urls_size;i++) {
-		if (c_strncasecmp(url, _gnutls_custom_urls[i].name, _gnutls_custom_urls[i].name_size) == 0) {
+	for (i = 0; i < _gnutls_custom_urls_size; i++) {
+		if (c_strncasecmp
+		    (url, _gnutls_custom_urls[i].name,
+		     _gnutls_custom_urls[i].name_size) == 0) {
 			if (_gnutls_custom_urls[i].get_issuer) {
-				return _gnutls_custom_urls[i].get_issuer(url, cert, issuer, flags);
+				return _gnutls_custom_urls[i].get_issuer(url,
+									 cert,
+									 issuer,
+									 flags);
 			}
 			break;
 		}

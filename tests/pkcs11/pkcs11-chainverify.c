@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -58,8 +58,8 @@ static void tls_log_func(int level, const char *str)
 }
 
 static
-int pin_func(void* userdata, int attempt, const char* url, const char *label,
-		unsigned flags, char *pin, size_t pin_max)
+int pin_func(void *userdata, int attempt, const char *url, const char *label,
+	     unsigned flags, char *pin, size_t pin_max)
 {
 	if (attempt == 0) {
 		strcpy(pin, "1234");
@@ -104,7 +104,9 @@ void doit(void)
 		gnutls_global_set_log_level(4711);
 
 	set_softhsm_conf(CONFIG);
-	snprintf(buf, sizeof(buf), "%s --init-token --slot 0 --label test --so-pin 1234 --pin 1234", bin);
+	snprintf(buf, sizeof(buf),
+		 "%s --init-token --slot 0 --label test --so-pin 1234 --pin 1234",
+		 bin);
 	system(buf);
 
 	ret = gnutls_pkcs11_add_provider(lib, "trusted");
@@ -128,8 +130,7 @@ void doit(void)
 		gnutls_x509_crt_t get_ca_crt;
 
 		if (debug)
-			printf("Chain '%s' (%d)...\n", chains[i].name,
-			       (int) i);
+			printf("Chain '%s' (%d)...\n", chains[i].name, (int)i);
 
 		if (chains[i].notfips && gnutls_fips140_mode_enabled()) {
 			if (debug)
@@ -139,19 +140,17 @@ void doit(void)
 
 		for (j = 0; chains[i].chain[j]; j++) {
 			if (debug > 2)
-				printf("\tAdding certificate %d...",
-				       (int) j);
+				printf("\tAdding certificate %d...", (int)j);
 
 			ret = gnutls_x509_crt_init(&certs[j]);
 			if (ret < 0) {
 				fprintf(stderr,
 					"gnutls_x509_crt_init[%d,%d]: %s\n",
-					(int) i, (int) j,
-					gnutls_strerror(ret));
+					(int)i, (int)j, gnutls_strerror(ret));
 				exit(1);
 			}
 
-			tmp.data = (unsigned char *) chains[i].chain[j];
+			tmp.data = (unsigned char *)chains[i].chain[j];
 			tmp.size = strlen(chains[i].chain[j]);
 
 			ret =
@@ -162,16 +161,15 @@ void doit(void)
 			if (ret < 0) {
 				fprintf(stderr,
 					"gnutls_x509_crt_import[%s,%d]: %s\n",
-					chains[i].name, (int) j,
+					chains[i].name, (int)j,
 					gnutls_strerror(ret));
 				exit(1);
 			}
 
 			gnutls_x509_crt_print(certs[j],
-					      GNUTLS_CRT_PRINT_ONELINE,
-					      &tmp);
+					      GNUTLS_CRT_PRINT_ONELINE, &tmp);
 			if (debug)
-				printf("\tCertificate %d: %.*s\n", (int) j,
+				printf("\tCertificate %d: %.*s\n", (int)j,
 				       tmp.size, tmp.data);
 			gnutls_free(tmp.data);
 		}
@@ -186,11 +184,10 @@ void doit(void)
 			exit(1);
 		}
 
-		tmp.data = (unsigned char *) *chains[i].ca;
+		tmp.data = (unsigned char *)*chains[i].ca;
 		tmp.size = strlen(*chains[i].ca);
 
-		ret =
-		    gnutls_x509_crt_import(ca, &tmp, GNUTLS_X509_FMT_PEM);
+		ret = gnutls_x509_crt_import(ca, &tmp, GNUTLS_X509_FMT_PEM);
 		if (ret < 0) {
 			fprintf(stderr, "gnutls_x509_crt_import: %s\n",
 				gnutls_strerror(ret));
@@ -202,8 +199,7 @@ void doit(void)
 
 		gnutls_x509_crt_print(ca, GNUTLS_CRT_PRINT_ONELINE, &tmp);
 		if (debug)
-			printf("\tCA Certificate: %.*s\n", tmp.size,
-			       tmp.data);
+			printf("\tCA Certificate: %.*s\n", tmp.size, tmp.data);
 		gnutls_free(tmp.data);
 
 		if (debug)
@@ -217,18 +213,25 @@ void doit(void)
 		}
 
 		/* write CA certificate to softhsm */
-		ret = gnutls_pkcs11_copy_x509_crt(SOFTHSM_URL, ca, "test-ca", GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED|
-			GNUTLS_PKCS11_OBJ_FLAG_MARK_CA|
-			GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO);
+		ret =
+		    gnutls_pkcs11_copy_x509_crt(SOFTHSM_URL, ca, "test-ca",
+						GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED
+						| GNUTLS_PKCS11_OBJ_FLAG_MARK_CA
+						|
+						GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO);
 		if (ret < 0) {
-			fail("gnutls_pkcs11_copy_x509_crt: %s\n", gnutls_strerror(ret));
+			fail("gnutls_pkcs11_copy_x509_crt: %s\n",
+			     gnutls_strerror(ret));
 		}
 
 		gnutls_x509_trust_list_init(&tl, 0);
 
-		ret = gnutls_x509_trust_list_add_trust_file(tl, SOFTHSM_URL, NULL, 0, 0, 0);
+		ret =
+		    gnutls_x509_trust_list_add_trust_file(tl, SOFTHSM_URL, NULL,
+							  0, 0, 0);
 		if (ret < 0) {
-			fail("gnutls_x509_trust_list_add_trust_file: %s\n", gnutls_strerror(ret));
+			fail("gnutls_x509_trust_list_add_trust_file: %s\n",
+			     gnutls_strerror(ret));
 			exit(1);
 		}
 
@@ -239,21 +242,30 @@ void doit(void)
 
 		/* test trust list iteration */
 		get_ca_iter = NULL;
-		while (gnutls_x509_trust_list_iter_get_ca(tl, &get_ca_iter, &get_ca_crt) == 0) {
-			ret = gnutls_x509_crt_export2(get_ca_crt, GNUTLS_X509_FMT_PEM, &get_ca_datum_test);
+		while (gnutls_x509_trust_list_iter_get_ca
+		       (tl, &get_ca_iter, &get_ca_crt) == 0) {
+			ret =
+			    gnutls_x509_crt_export2(get_ca_crt,
+						    GNUTLS_X509_FMT_PEM,
+						    &get_ca_datum_test);
 			if (ret < 0) {
-				fail("gnutls_x509_crt_export2: %s\n", gnutls_strerror(ret));
+				fail("gnutls_x509_crt_export2: %s\n",
+				     gnutls_strerror(ret));
 				exit(1);
 			}
 
-			ret = gnutls_x509_crt_export2(ca, GNUTLS_X509_FMT_PEM, &get_ca_datum);
+			ret =
+			    gnutls_x509_crt_export2(ca, GNUTLS_X509_FMT_PEM,
+						    &get_ca_datum);
 			if (ret < 0) {
-				fail("gnutls_x509_crt_export2: %s\n", gnutls_strerror(ret));
+				fail("gnutls_x509_crt_export2: %s\n",
+				     gnutls_strerror(ret));
 				exit(1);
 			}
 
 			if (get_ca_datum_test.size != get_ca_datum.size ||
-			    memcmp(get_ca_datum_test.data, get_ca_datum.data, get_ca_datum.size) != 0) {
+			    memcmp(get_ca_datum_test.data, get_ca_datum.data,
+				   get_ca_datum.size) != 0) {
 				fail("gnutls_x509_trist_list_iter_get_ca: Unexpected certificate (%u != %u):\n\n%s\n\nvs.\n\n%s", get_ca_datum.size, get_ca_datum_test.size, get_ca_datum.data, get_ca_datum_test.data);
 				exit(1);
 			}
@@ -273,14 +285,15 @@ void doit(void)
 
 		/* make sure that the two functions don't diverge */
 		ret = gnutls_x509_trust_list_verify_crt2(tl, certs, j,
-						vdata,
-						chains[i].purpose==NULL?0:1,
-						chains[i].verify_flags,
-						&verify_status, NULL);
+							 vdata,
+							 chains[i].purpose ==
+							 NULL ? 0 : 1,
+							 chains[i].verify_flags,
+							 &verify_status, NULL);
 		if (ret < 0) {
 			fprintf(stderr,
 				"gnutls_x509_crt_list_verify[%d,%d]: %s\n",
-				(int) i, (int) j, gnutls_strerror(ret));
+				(int)i, (int)j, gnutls_strerror(ret));
 			exit(1);
 		}
 
@@ -292,8 +305,7 @@ void doit(void)
 								     [i].
 								     expected_verify_result,
 								     GNUTLS_CRT_X509,
-								     &out2,
-								     0);
+								     &out2, 0);
 			fail("chain[%s]:\nverify_status: %d: %s\nexpected: %d: %s\n", chains[i].name, verify_status, out1.data, chains[i].expected_verify_result, out2.data);
 			gnutls_free(out1.data);
 			gnutls_free(out2.data);
@@ -301,8 +313,7 @@ void doit(void)
 #if 0
 			j = 0;
 			do {
-				fprintf(stderr, "%s\n",
-					chains[i].chain[j]);
+				fprintf(stderr, "%s\n", chains[i].chain[j]);
 			}
 			while (chains[i].chain[++j] != NULL);
 #endif

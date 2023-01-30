@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -73,7 +73,8 @@ static void *test_set_per_thread(void *arg)
 		fail("%d: gnutls_fips140_mode_enabled: wrong mode returned (%d, exp: %d)\n", data->line, mode, data->mode);
 
 	if (data->set_mode)
-		gnutls_fips140_set_mode(data->set_mode, GNUTLS_FIPS140_SET_MODE_THREAD);
+		gnutls_fips140_set_mode(data->set_mode,
+					GNUTLS_FIPS140_SET_MODE_THREAD);
 
 	mode = gnutls_fips140_mode_enabled();
 	if (mode != data->set_mode) {
@@ -100,7 +101,7 @@ static void *test_set_per_thread(void *arg)
 	pthread_exit(0);
 }
 
-#define MAX_THREADS 48
+# define MAX_THREADS 48
 
 void doit(void)
 {
@@ -117,33 +118,35 @@ void doit(void)
 		exit(77);
 	}
 
-	data = calloc(1, sizeof(thread_data_st)*MAX_THREADS);
+	data = calloc(1, sizeof(thread_data_st) * MAX_THREADS);
 	if (data == NULL)
 		abort();
 
 	success("starting threads\n");
 	/* Test if changes per thread apply, and whether the global
 	 * setting will remain the same */
-	for (i=0;i<MAX_THREADS;i++) {
+	for (i = 0; i < MAX_THREADS; i++) {
 		data[i].line = __LINE__;
 		data[i].mode = mode;
 
-		j = i%3;
-		if (j==0)
+		j = i % 3;
+		if (j == 0)
 			data[i].set_mode = GNUTLS_FIPS140_LAX;
-		else if (j==1)
+		else if (j == 1)
 			data[i].set_mode = GNUTLS_FIPS140_LOG;
 		else
 			data[i].set_mode = GNUTLS_FIPS140_STRICT;
 
-		ret = pthread_create(&data[i].id, NULL, test_set_per_thread, &data[i]);
+		ret =
+		    pthread_create(&data[i].id, NULL, test_set_per_thread,
+				   &data[i]);
 		if (ret != 0) {
 			abort();
 		}
 	}
 
 	success("waiting for threads to finish\n");
-	for (i=0;i<MAX_THREADS;i++) {
+	for (i = 0; i < MAX_THREADS; i++) {
 		ret = pthread_join(data[i].id, NULL);
 		if (ret != 0)
 			abort();
@@ -160,17 +163,19 @@ void doit(void)
 	mode = GNUTLS_FIPS140_LOG;
 	gnutls_fips140_set_mode(mode, 0);
 
-	for (i=0;i<MAX_THREADS;i++) {
+	for (i = 0; i < MAX_THREADS; i++) {
 		data[i].line = __LINE__;
 		data[i].mode = mode;
 		data[i].set_mode = GNUTLS_FIPS140_LAX;
-		ret = pthread_create(&data[i].id, NULL, test_set_per_thread, &data[i]);
+		ret =
+		    pthread_create(&data[i].id, NULL, test_set_per_thread,
+				   &data[i]);
 		if (ret != 0)
 			abort();
 	}
 
 	success("waiting for threads to finish\n");
-	for (i=0;i<MAX_THREADS;i++) {
+	for (i = 0; i < MAX_THREADS; i++) {
 		ret = pthread_join(data[i].id, NULL);
 		if (ret != 0)
 			abort();

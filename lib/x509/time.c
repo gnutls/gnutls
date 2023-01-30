@@ -89,7 +89,8 @@ static time_t mktime_utc(const struct fake_tm *tm)
 		return (time_t) - 1;
 
 	/* Check for "obvious" mistakes in dates */
-	if (tm->tm_sec > 60 || tm->tm_min > 59 || tm->tm_mday > 31 || tm->tm_mday < 1 || tm->tm_hour > 23)
+	if (tm->tm_sec > 60 || tm->tm_min > 59 || tm->tm_mday > 31
+	    || tm->tm_mday < 1 || tm->tm_hour > 23)
 		return (time_t) - 1;
 
 /* Convert to a time_t.
@@ -105,7 +106,6 @@ static time_t mktime_utc(const struct fake_tm *tm)
 	result = 60 * result + tm->tm_sec;
 	return result;
 }
-
 
 /* this one will parse dates of the form:
  * month|day|hour|minute|sec* (2 chars each)
@@ -167,7 +167,6 @@ static time_t time2gtime(const char *ttime, int year)
 	return mktime_utc(&etime);
 }
 
-
 /* returns a time_t value that contains the given time.
  * The given time is expressed as:
  * YEAR(2)|MONTH(2)|DAY(2)|HOUR(2)|MIN(2)|SEC(2)*
@@ -184,13 +183,12 @@ time_t _gnutls_utcTime2gtime(const char *ttime)
 		gnutls_assert();
 		return (time_t) - 1;
 	}
-
 #ifdef STRICT_DER_TIME
 	/* Make sure everything else is digits. */
 	for (i = 0; i < len - 1; i++) {
 		if (c_isdigit(ttime[i]))
 			continue;
-		return gnutls_assert_val((time_t)-1);
+		return gnutls_assert_val((time_t) - 1);
 	}
 #endif
 	xx[2] = 0;
@@ -249,16 +247,17 @@ time_t _gnutls_x509_generalTime2gtime(const char *ttime)
 #pragma GCC diagnostic ignored "-Wformat-y2k"
 /* tag will contain ASN1_TAG_UTCTime or ASN1_TAG_GENERALIZEDTime */
 static int
-gtime_to_suitable_time(time_t gtime, char *str_time, size_t str_time_size, unsigned *tag)
+gtime_to_suitable_time(time_t gtime, char *str_time, size_t str_time_size,
+		       unsigned *tag)
 {
 	size_t ret;
 	struct tm _tm;
 
-	if (gtime == (time_t)-1
+	if (gtime == (time_t) - 1
 #if SIZEOF_LONG == 8
-		|| gtime >= 253402210800
+	    || gtime >= 253402210800
 #endif
-	 ) {
+	    ) {
 		if (tag)
 			*tag = ASN1_TAG_GENERALIZEDTime;
 		snprintf(str_time, str_time_size, "99991231235959Z");
@@ -287,6 +286,7 @@ gtime_to_suitable_time(time_t gtime, char *str_time, size_t str_time_size, unsig
 
 	return 0;
 }
+
 #pragma GCC diagnostic pop
 
 static int
@@ -295,11 +295,11 @@ gtime_to_generalTime(time_t gtime, char *str_time, size_t str_time_size)
 	size_t ret;
 	struct tm _tm;
 
-	if (gtime == (time_t)-1
+	if (gtime == (time_t) - 1
 #if SIZEOF_LONG == 8
-		|| gtime >= 253402210800
+	    || gtime >= 253402210800
 #endif
-	 ) {
+	    ) {
 		snprintf(str_time, str_time_size, "99991231235959Z");
 		return 0;
 	}
@@ -317,7 +317,6 @@ gtime_to_generalTime(time_t gtime, char *str_time, size_t str_time_size)
 
 	return 0;
 }
-
 
 /* Extracts the time in time_t from the asn1_node given. When should
  * be something like "tbsCertList.thisUpdate".
@@ -353,8 +352,7 @@ time_t _gnutls_x509_get_time(asn1_node c2, const char *where, int force_general)
 			len = sizeof(ttime) - 1;
 			result = asn1_read_value(c2, name, ttime, &len);
 			if (result == ASN1_SUCCESS)
-				c_time =
-				    _gnutls_x509_generalTime2gtime(ttime);
+				c_time = _gnutls_x509_generalTime2gtime(ttime);
 		} else {	/* UTCTIME */
 			if (name[0] == 0)
 				_gnutls_str_cpy(name, sizeof(name), "utcTime");
@@ -391,8 +389,7 @@ _gnutls_x509_set_time(asn1_node c2, const char *where, time_t tim,
 	unsigned tag;
 
 	if (force_general != 0) {
-		result =
-		    gtime_to_generalTime(tim, str_time, sizeof(str_time));
+		result = gtime_to_generalTime(tim, str_time, sizeof(str_time));
 		if (result < 0)
 			return gnutls_assert_val(result);
 		len = strlen(str_time);
@@ -417,7 +414,8 @@ _gnutls_x509_set_time(asn1_node c2, const char *where, time_t tim,
 		}
 		_gnutls_str_cat(name, sizeof(name), ".utcTime");
 	} else {
-		if ((result = asn1_write_value(c2, where, "generalTime", 1)) < 0) {
+		if ((result =
+		     asn1_write_value(c2, where, "generalTime", 1)) < 0) {
 			gnutls_assert();
 			return _gnutls_asn2err(result);
 		}
@@ -437,32 +435,29 @@ _gnutls_x509_set_time(asn1_node c2, const char *where, time_t tim,
 /* This will set a DER encoded Time element. To be used in fields
  * which are of the ANY.
  */
-int
-_gnutls_x509_set_raw_time(asn1_node c2, const char *where, time_t tim)
+int _gnutls_x509_set_raw_time(asn1_node c2, const char *where, time_t tim)
 {
 	char str_time[MAX_TIME];
 	uint8_t buf[128];
 	int result, len, der_len;
 	unsigned tag;
 
-	result =
-	    gtime_to_suitable_time(tim, str_time, sizeof(str_time), &tag);
+	result = gtime_to_suitable_time(tim, str_time, sizeof(str_time), &tag);
 	if (result < 0)
 		return gnutls_assert_val(result);
 	len = strlen(str_time);
 
 	buf[0] = tag;
-	asn1_length_der(len, buf+1, &der_len);
+	asn1_length_der(len, buf + 1, &der_len);
 
-	if ((unsigned)len > sizeof(buf)-der_len-1) {
+	if ((unsigned)len > sizeof(buf) - der_len - 1) {
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 	}
 
-	memcpy(buf+1+der_len, str_time, len);
+	memcpy(buf + 1 + der_len, str_time, len);
 
-	result = asn1_write_value(c2, where, buf, len+1+der_len);
+	result = asn1_write_value(c2, where, buf, len + 1 + der_len);
 	if (result != ASN1_SUCCESS)
 		return gnutls_assert_val(_gnutls_asn2err(result));
 	return 0;
 }
-

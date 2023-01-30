@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdlib.h>
@@ -115,7 +115,7 @@ const struct data_entry_st data_entries[] = {
 		     (char *)
 		     "\x03\x00\x01\x03\x32\xaa\x2d\x58\xb3\xe0\x54\x4b\x65\x65\x64\x38\x93\x70\x68\xba\x44\xce\x2f\x14\x46\x9c\x4f\x50\xc9\xcc\x69\x33\xc8\x08\xd3",
 		     NULL},
-	 .q_size = { 35, 35, 35, 0},
+	 .q_size = {35, 35, 35, 0},
 	 .expected_ret = 0,
 	 .no_queries = 3,
 	 .secure = 1,
@@ -157,7 +157,7 @@ const struct data_entry_st data_entries[] = {
 		     (char *)
 		     "\x03\x01\x01\x54\x4f\x28\x4d\x66\xaf\x2d\xe0\x8c\x17\xe7\x49\x6a\xed\xfa\x2e\x00\xaa\x1a\xc6\xbb\xf3\xaf\x5c\xa6\x2b\x55\xab\x7a\xc2\x69\xbe",
 		     NULL},
-	 .q_size = { 35, 0},
+	 .q_size = {35, 0},
 	 .expected_ret = 0,
 	 .no_queries = 1,
 	 .secure = 1,
@@ -199,7 +199,7 @@ const struct data_entry_st data_entries[] = {
 		     (char *)
 		     "\x00\x00\x01\x19\x40\x0b\xe5\xb7\xa3\x1f\xb7\x33\x91\x77\x00\x78\x9d\x2f\x0a\x24\x71\xc0\xc9\xd5\x06\xc0\xe5\x04\xc0\x6c\x16\xd7\xcb\x17\xc0",
 		     NULL},
-	 .q_size = { 35, 0},
+	 .q_size = {35, 0},
 	 .expected_ret = 0,
 	 .no_queries = 1,
 	 .secure = 1,
@@ -241,7 +241,7 @@ const struct data_entry_st data_entries[] = {
 		     (char *)
 		     "\x00\x00\x01\x19\x40\x0b\xe5\xb7\xa3\x1f\xb7\x33\x91\x77\x00\x78\x9d\x2f\x0a\x24\x71\xc0\xc9\xd5\x06\xc0\xe5\x04\xc0\x6c\x16\xd7\xcb\x17\xc0",
 		     NULL},
-	 .q_size = { 35, 0},
+	 .q_size = {35, 0},
 	 .expected_ret = 0,
 	 .no_queries = 1,
 	 .secure = 1,
@@ -317,7 +317,7 @@ const struct data_entry_st data_entries[] = {
 		     (char *)
 		     "\x00\x00\x01\x19\x40\x0b\xe5\xb7\xa3\x1f\xb7\x33\x92\x77\x00\x78\x9d\x2f\x0a\x24\x71\xc0\xc9\xd5\x06\xc0\xe5\x04\xc0\x6c\x16\xd7\xcb\x17\xc0",
 		     NULL},
-	 .q_size = { 35, 0},
+	 .q_size = {35, 0},
 	 .expected_ret = 0,
 	 .no_queries = 1,
 	 .secure = 1,
@@ -399,7 +399,7 @@ const struct data_entry_st data_entries[] = {
 		     (char *)
 		     "\x03\x00\x01\x03\x32\xaa\x2d\x58\xb3\xe0\x54\x4b\x65\x65\x64\x38\x93\x70\x68\xba\x44\xce\x2f\x14\x46\x9c\x4f\x50\xc9\xcc\x69\x33\xc8\x08\xd3",
 		     NULL},
-	 .q_size = { 35, 35, 35, 35, 0},
+	 .q_size = {35, 35, 35, 35, 0},
 	 .expected_ret = 0,
 	 .no_queries = 4,
 	 .secure = 1,

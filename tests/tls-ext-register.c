@@ -22,7 +22,7 @@
 /* Parts copied from GnuTLS example programs. */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -38,18 +38,18 @@ int main(int argc, char **argv)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#if !defined(_WIN32)
-#include <sys/wait.h>
-#include <signal.h>
-#endif
-#include <unistd.h>
-#include <gnutls/gnutls.h>
-#include <assert.h>
+# include <string.h>
+# include <sys/types.h>
+# include <sys/socket.h>
+# if !defined(_WIN32)
+#  include <sys/wait.h>
+#  include <signal.h>
+# endif
+# include <unistd.h>
+# include <gnutls/gnutls.h>
+# include <assert.h>
 
-#include "utils.h"
+# include "utils.h"
 
 /* A very basic TLS client, with extension
  */
@@ -61,20 +61,20 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "%s|<%d>| %s", side, level, str);
 }
 
-#define TLSEXT_TYPE_SAMPLE						0xF1
+# define TLSEXT_TYPE_SAMPLE						0xF1
 
-static int TLSEXT_TYPE_client_sent			= 0;
-static int TLSEXT_TYPE_client_received		= 0;
-static int TLSEXT_TYPE_server_sent			= 0;
-static int TLSEXT_TYPE_server_received		= 0;
+static int TLSEXT_TYPE_client_sent = 0;
+static int TLSEXT_TYPE_client_received = 0;
+static int TLSEXT_TYPE_server_sent = 0;
+static int TLSEXT_TYPE_server_received = 0;
 
-static const unsigned char ext_data[] =
-{
+static const unsigned char ext_data[] = {
 	0xFE,
 	0xED
 };
 
-static int ext_recv_client_params(gnutls_session_t session, const unsigned char *buf, size_t buflen)
+static int ext_recv_client_params(gnutls_session_t session,
+				  const unsigned char *buf, size_t buflen)
 {
 	if (buflen != sizeof(ext_data))
 		fail("ext_recv_client_params: Invalid input buffer length\n");
@@ -86,17 +86,19 @@ static int ext_recv_client_params(gnutls_session_t session, const unsigned char 
 
 	gnutls_ext_set_data(session, TLSEXT_TYPE_SAMPLE, session);
 
-	return 0; //Success
+	return 0;		//Success
 }
 
-static int ext_send_client_params(gnutls_session_t session, gnutls_buffer_t extdata)
+static int ext_send_client_params(gnutls_session_t session,
+				  gnutls_buffer_t extdata)
 {
 	TLSEXT_TYPE_client_sent = 1;
 	gnutls_buffer_append_data(extdata, ext_data, sizeof(ext_data));
 	return sizeof(ext_data);
 }
 
-static int ext_recv_server_params(gnutls_session_t session, const unsigned char *buf, size_t buflen)
+static int ext_recv_server_params(gnutls_session_t session,
+				  const unsigned char *buf, size_t buflen)
 {
 	if (buflen != sizeof(ext_data))
 		fail("ext_recv_server_params: Invalid input buffer length\n");
@@ -106,10 +108,11 @@ static int ext_recv_server_params(gnutls_session_t session, const unsigned char 
 
 	TLSEXT_TYPE_server_received = 1;
 
-	return 0; //Success
+	return 0;		//Success
 }
 
-static int ext_send_server_params(gnutls_session_t session, gnutls_buffer_t extdata)
+static int ext_send_server_params(gnutls_session_t session,
+				  gnutls_buffer_t extdata)
 {
 	TLSEXT_TYPE_server_sent = 1;
 	gnutls_buffer_append_data(extdata, ext_data, sizeof(ext_data));
@@ -130,7 +133,10 @@ static void client(int sd, const char *prio)
 	side = "client";
 
 	/* extensions are registered globally */
-	ret = gnutls_ext_register("ext_client", TLSEXT_TYPE_SAMPLE, GNUTLS_EXT_TLS, ext_recv_client_params, ext_send_client_params, NULL, NULL, NULL);
+	ret =
+	    gnutls_ext_register("ext_client", TLSEXT_TYPE_SAMPLE,
+				GNUTLS_EXT_TLS, ext_recv_client_params,
+				ext_send_client_params, NULL, NULL, NULL);
 	assert(ret >= 0);
 
 	gnutls_certificate_allocate_credentials(&clientx509cred);
@@ -143,8 +149,7 @@ static void client(int sd, const char *prio)
 
 	/* put the anonymous credentials to the current session
 	 */
-	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
-				clientx509cred);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, clientx509cred);
 
 	gnutls_transport_set_int(session, sd);
 	gnutls_handshake_set_timeout(session, get_timeout());
@@ -176,7 +181,7 @@ static void client(int sd, const char *prio)
 
 	gnutls_bye(session, GNUTLS_SHUT_RDWR);
 
-end:
+ end:
 	close(sd);
 
 	gnutls_deinit(session);
@@ -228,7 +233,6 @@ const gnutls_datum_t server_key = { server_key_pem,
 	sizeof(server_key_pem)
 };
 
-
 static void server(int sd, const char *prio)
 {
 	gnutls_certificate_credentials_t serverx509cred;
@@ -252,10 +256,12 @@ static void server(int sd, const char *prio)
 
 	assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);
 
-	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
-				serverx509cred);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, serverx509cred);
 
-	assert(gnutls_ext_register("ext_server", TLSEXT_TYPE_SAMPLE, GNUTLS_EXT_TLS, ext_recv_server_params, ext_send_server_params, NULL, NULL, NULL)>=0);
+	assert(gnutls_ext_register
+	       ("ext_server", TLSEXT_TYPE_SAMPLE, GNUTLS_EXT_TLS,
+		ext_recv_server_params, ext_send_server_params, NULL, NULL,
+		NULL) >= 0);
 
 	gnutls_transport_set_int(session, sd);
 	gnutls_handshake_set_timeout(session, get_timeout());
@@ -297,10 +303,10 @@ void start(const char *prio)
 	success("trying %s\n", prio);
 
 	signal(SIGPIPE, SIG_IGN);
-	TLSEXT_TYPE_client_sent			= 0;
-	TLSEXT_TYPE_client_received		= 0;
-	TLSEXT_TYPE_server_sent			= 0;
-	TLSEXT_TYPE_server_received		= 0;
+	TLSEXT_TYPE_client_sent = 0;
+	TLSEXT_TYPE_client_received = 0;
+	TLSEXT_TYPE_server_sent = 0;
+	TLSEXT_TYPE_server_received = 0;
 
 	err = socketpair(AF_UNIX, SOCK_STREAM, 0, sockets);
 	if (err == -1) {
@@ -353,10 +359,17 @@ void doit(void)
 	start("NORMAL");
 
 	/* check whether we can crash the library by adding many extensions */
-	for (i=0;i<64;i++) {
-		ret = gnutls_ext_register("ext_serverxx", TLSEXT_TYPE_SAMPLE+i+1, GNUTLS_EXT_TLS, ext_recv_server_params, ext_send_server_params, NULL, NULL, NULL);
+	for (i = 0; i < 64; i++) {
+		ret =
+		    gnutls_ext_register("ext_serverxx",
+					TLSEXT_TYPE_SAMPLE + i + 1,
+					GNUTLS_EXT_TLS, ext_recv_server_params,
+					ext_send_server_params, NULL, NULL,
+					NULL);
 		if (ret < 0) {
-			success("failed registering extension no %d (expected)\n", i+1);
+			success
+			    ("failed registering extension no %d (expected)\n",
+			     i + 1);
 			break;
 		}
 	}

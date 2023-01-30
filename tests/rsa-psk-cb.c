@@ -24,7 +24,7 @@
 /* Tests the RSA-PSK ciphersuites under TLS1.2 */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -40,15 +40,15 @@ int main(int argc, char **argv)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <unistd.h>
-#include <assert.h>
-#include <gnutls/gnutls.h>
-#include "cert-common.h"
-#include "utils.h"
+# include <string.h>
+# include <sys/types.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <unistd.h>
+# include <assert.h>
+# include <gnutls/gnutls.h>
+# include "cert-common.h"
+# include "utils.h"
 
 /* A very basic TLS client, with PSK authentication.
  */
@@ -61,7 +61,8 @@ static void tls_log_func(int level, const char *str)
 }
 
 static
-int psk_cli_func(gnutls_session_t session, char **username, gnutls_datum_t *key)
+int psk_cli_func(gnutls_session_t session, char **username,
+		 gnutls_datum_t * key)
 {
 	*username = gnutls_malloc(5);
 	assert(*username != NULL);
@@ -78,8 +79,8 @@ int psk_cli_func(gnutls_session_t session, char **username, gnutls_datum_t *key)
 	return 0;
 }
 
-#define MAX_BUF 1024
-#define MSG "Hello TLS"
+# define MAX_BUF 1024
+# define MSG "Hello TLS"
 
 static void client(int sd)
 {
@@ -107,14 +108,14 @@ static void client(int sd)
 	gnutls_init(&session, GNUTLS_CLIENT);
 
 	/* Use default priorities */
-	assert(gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+RSA-PSK",
-					  NULL)>=0);
+	assert(gnutls_priority_set_direct
+	       (session, "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+RSA-PSK",
+		NULL) >= 0);
 
 	/* put the anonymous credentials to the current session
 	 */
 	gnutls_credentials_set(session, GNUTLS_CRD_PSK, pskcred);
-	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
-				clientx509cred);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, clientx509cred);
 
 	gnutls_handshake_set_timeout(session, get_timeout());
 	gnutls_transport_set_int(session, sd);
@@ -137,8 +138,7 @@ static void client(int sd)
 	ret = gnutls_record_recv(session, buffer, MAX_BUF);
 	if (ret == 0) {
 		if (debug)
-			success
-			    ("client: Peer has closed the TLS connection\n");
+			success("client: Peer has closed the TLS connection\n");
 		goto end;
 	} else if (ret < 0) {
 		fail("client: Error: %s\n", gnutls_strerror(ret));
@@ -155,7 +155,7 @@ static void client(int sd)
 
 	gnutls_bye(session, GNUTLS_SHUT_RDWR);
 
-      end:
+ end:
 
 	close(sd);
 
@@ -170,11 +170,11 @@ static void client(int sd)
 /* This is a sample TLS 1.0 echo server, for PSK authentication.
  */
 
-#define MAX_BUF 1024
+# define MAX_BUF 1024
 
 static int
 psk_server_func(gnutls_session_t session, const char *username,
-	gnutls_datum_t * key)
+		gnutls_datum_t * key)
 {
 	if (debug)
 		printf("psk: username %s\n", username);
@@ -227,13 +227,12 @@ static void server(int sd)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	assert(gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+RSA-PSK",
-					  NULL)>=0);
-
+	assert(gnutls_priority_set_direct
+	       (session, "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+RSA-PSK",
+		NULL) >= 0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_PSK, server_pskcred);
-	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
-				serverx509cred);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, serverx509cred);
 
 	gnutls_handshake_set_timeout(session, get_timeout());
 	gnutls_transport_set_int(session, sd);
@@ -266,8 +265,7 @@ static void server(int sd)
 		} else if (ret > 0) {
 			/* echo data back to the client
 			 */
-			gnutls_record_send(session, buffer,
-					   strlen(buffer));
+			gnutls_record_send(session, buffer, strlen(buffer));
 		}
 	}
 	/* do not wait for the peer to close the connection.

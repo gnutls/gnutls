@@ -55,13 +55,12 @@ aes_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx, int enc)
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	((struct aes_ctx *) (*_ctx))->enc = enc;
+	((struct aes_ctx *)(*_ctx))->enc = enc;
 
 	return 0;
 }
 
-static int
-aes_cipher_setkey(void *_ctx, const void *userkey, size_t keysize)
+static int aes_cipher_setkey(void *_ctx, const void *userkey, size_t keysize)
 {
 	struct aes_ctx *ctx = _ctx;
 	int ret;
@@ -132,7 +131,7 @@ aes_decrypt(void *_ctx, const void *src, size_t src_size,
 static void aes_deinit(void *_ctx)
 {
 	struct aes_ctx *ctx = _ctx;
-	
+
 	zeroize_temp_key(ctx, sizeof(*ctx));
 	gnutls_free(ctx);
 }
@@ -145,4 +144,3 @@ const gnutls_crypto_cipher_st _gnutls_aesni_x86 = {
 	.decrypt = aes_decrypt,
 	.deinit = aes_deinit,
 };
-

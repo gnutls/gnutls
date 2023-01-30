@@ -21,20 +21,20 @@
  */
 
 #ifndef GNUTLS_LIB_ATOMIC_H
-#define GNUTLS_LIB_ATOMIC_H
+# define GNUTLS_LIB_ATOMIC_H
 
-#ifdef HAVE_STDATOMIC_H
-# include <stdatomic.h>
+# ifdef HAVE_STDATOMIC_H
+#  include <stdatomic.h>
 
-# define gnutls_atomic_uint_t atomic_uint
-# define DEF_ATOMIC_INT(x) atomic_uint x
-# define gnutls_atomic_increment(x) (*x)++
-# define gnutls_atomic_decrement(x) (*x)--
-# define gnutls_atomic_init(x) (*x)=(0)
-# define gnutls_atomic_deinit(x)
-# define gnutls_atomic_val(x) (*x)
-#else
-# include "locks.h"
+#  define gnutls_atomic_uint_t atomic_uint
+#  define DEF_ATOMIC_INT(x) atomic_uint x
+#  define gnutls_atomic_increment(x) (*x)++
+#  define gnutls_atomic_decrement(x) (*x)--
+#  define gnutls_atomic_init(x) (*x)=(0)
+#  define gnutls_atomic_deinit(x)
+#  define gnutls_atomic_val(x) (*x)
+# else
+#  include "locks.h"
 
 struct gnutls_atomic_uint_st {
 	void *lock;
@@ -42,7 +42,7 @@ struct gnutls_atomic_uint_st {
 };
 typedef struct gnutls_atomic_uint_st *gnutls_atomic_uint_t;
 
-# define DEF_ATOMIC_INT(x) struct gnutls_atomic_uint_st x
+#  define DEF_ATOMIC_INT(x) struct gnutls_atomic_uint_st x
 
 inline static unsigned gnutls_atomic_val(gnutls_atomic_uint_t x)
 {
@@ -72,10 +72,11 @@ inline static void gnutls_atomic_init(gnutls_atomic_uint_t x)
 	gnutls_mutex_init(&x->lock);
 	x->value = 0;
 }
+
 inline static void gnutls_atomic_deinit(gnutls_atomic_uint_t x)
 {
 	gnutls_mutex_deinit(&x->lock);
 }
-#endif
+# endif
 
-#endif /* GNUTLS_LIB_ATOMIC_H */
+#endif				/* GNUTLS_LIB_ATOMIC_H */

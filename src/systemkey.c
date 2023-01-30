@@ -72,7 +72,6 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "|<%d>| %s", level, str);
 }
 
-
 int main(int argc, char **argv)
 {
 	cmd_parser(argc, argv);
@@ -91,7 +90,7 @@ static void cmd_parser(int argc, char **argv)
 
 	if (HAVE_OPT(DEBUG)) {
 		gnutls_global_set_log_level(OPT_VALUE_DEBUG);
-		printf("Setting log level to %d\n", (int) OPT_VALUE_DEBUG);
+		printf("Setting log level to %d\n", (int)OPT_VALUE_DEBUG);
 	}
 
 	if (HAVE_OPT(OUTDER)) {
@@ -124,6 +123,7 @@ static void cmd_parser(int argc, char **argv)
 
 	gnutls_global_deinit();
 }
+
 static void systemkey_delete(const char *url, FILE * out)
 {
 	int ret;
@@ -145,15 +145,20 @@ static void systemkey_list(FILE * out)
 	char *cert_url, *key_url, *label;
 
 	do {
-		ret = gnutls_system_key_iter_get_info(&iter, GNUTLS_CRT_X509, &cert_url, &key_url, &label, NULL, 0);
+		ret =
+		    gnutls_system_key_iter_get_info(&iter, GNUTLS_CRT_X509,
+						    &cert_url, &key_url, &label,
+						    NULL, 0);
 		if (ret >= 0) {
-			fprintf(out, "Label:\t%s\nCert:\t%s\nKey:\t%s\n\n", label, cert_url, key_url);
+			fprintf(out, "Label:\t%s\nCert:\t%s\nKey:\t%s\n\n",
+				label, cert_url, key_url);
 		}
-	} while(ret >= 0);
+	} while (ret >= 0);
 
 	if (ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
 		if (ret == GNUTLS_E_UNIMPLEMENTED_FEATURE) {
-			fprintf(stderr, "Native key store is not supported, or not present on this system\n");
+			fprintf(stderr,
+				"Native key store is not supported, or not present on this system\n");
 		} else {
 			fprintf(stderr, "Error: %s\n", gnutls_strerror(ret));
 		}

@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -56,12 +56,15 @@ static void verify_alpn(gnutls_session_t session)
 
 	ret = gnutls_alpn_get_selected_protocol(session, &selected);
 	if (ret < 0) {
-		fail("gnutls_alpn_get_selected_protocol: %s\n", gnutls_strerror(ret));
+		fail("gnutls_alpn_get_selected_protocol: %s\n",
+		     gnutls_strerror(ret));
 		exit(1);
 	}
 
-	if (strlen(str) != selected.size || memcmp(str, selected.data, selected.size) != 0) {
-		fail("expected protocol %s, got %.*s\n", str, selected.size, selected.data);
+	if (strlen(str) != selected.size
+	    || memcmp(str, selected.data, selected.size) != 0) {
+		fail("expected protocol %s, got %.*s\n", str, selected.size,
+		     selected.data);
 		exit(1);
 	}
 
@@ -91,7 +94,8 @@ unsigned int msg_order[] = {
 };
 
 static int handshake_callback(gnutls_session_t session, unsigned int htype,
-			      unsigned post, unsigned int incoming, const gnutls_datum_t *rawmsg)
+			      unsigned post, unsigned int incoming,
+			      const gnutls_datum_t * rawmsg)
 {
 	static unsigned idx = 0;
 	unsigned int msg;
@@ -100,8 +104,7 @@ static int handshake_callback(gnutls_session_t session, unsigned int htype,
 		fail("%s: %s, expected %s\n",
 		     incoming != 0 ? "Received" : "Sent",
 		     gnutls_handshake_description_get_name(htype),
-		     gnutls_handshake_description_get_name(msg_order
-							   [idx]));
+		     gnutls_handshake_description_get_name(msg_order[idx]));
 		exit(1);
 	}
 	idx++;
@@ -198,7 +201,7 @@ static void append_alpn(gnutls_session_t session)
 
 	snprintf(str, sizeof(str), "myproto");
 
-	protocol.data = (void*)str;
+	protocol.data = (void *)str;
 	protocol.size = strlen(str);
 
 	ret = gnutls_alpn_set_protocols(session, &protocol, 1, 0);
@@ -238,14 +241,12 @@ void start(const char *prio, unsigned check_order)
 					    &server_cert, &server_key,
 					    GNUTLS_X509_FMT_PEM);
 	gnutls_init(&server, GNUTLS_SERVER);
-	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-				serverx509cred);
+	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, serverx509cred);
 	gnutls_priority_set_direct(server, prio, NULL);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
-	gnutls_certificate_set_verify_function(serverx509cred,
-						server_callback);
+	gnutls_certificate_set_verify_function(serverx509cred, server_callback);
 	gnutls_certificate_server_set_request(server, GNUTLS_CERT_REQUEST);
 	gnutls_handshake_set_post_client_hello_function(server,
 							post_client_hello_callback);
@@ -258,14 +259,12 @@ void start(const char *prio, unsigned check_order)
 	/* Init client */
 	gnutls_certificate_allocate_credentials(&clientx509cred);
 	gnutls_init(&client, GNUTLS_CLIENT);
-	gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-				clientx509cred);
+	gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE, clientx509cred);
 	gnutls_priority_set_direct(client, prio, NULL);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
-	gnutls_certificate_set_verify_function(clientx509cred,
-						client_callback);
+	gnutls_certificate_set_verify_function(clientx509cred, client_callback);
 	append_alpn(client);
 
 	HANDSHAKE(client, server);

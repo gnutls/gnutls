@@ -28,8 +28,7 @@
 
 /* TLS Versions */
 
-static SYSTEM_CONFIG_OR_CONST
-version_entry_st sup_versions[] = {
+static SYSTEM_CONFIG_OR_CONST version_entry_st sup_versions[] = {
 	{.name = "SSL3.0",
 	 .id = GNUTLS_SSL3,
 	 .age = 0,
@@ -46,8 +45,7 @@ version_entry_st sup_versions[] = {
 	 .obsolete = 1,
 	 .only_extension = 0,
 	 .tls_sig_sem = SIG_SEM_PRE_TLS12,
-	 .false_start = 0
-	},
+	 .false_start = 0},
 	{.name = "TLS1.0",
 	 .id = GNUTLS_TLS1,
 	 .age = 1,
@@ -62,8 +60,7 @@ version_entry_st sup_versions[] = {
 	 .obsolete = 0,
 	 .only_extension = 0,
 	 .tls_sig_sem = SIG_SEM_PRE_TLS12,
-	 .false_start = 0
-	},
+	 .false_start = 0},
 	{.name = "TLS1.1",
 	 .id = GNUTLS_TLS1_1,
 	 .age = 2,
@@ -78,8 +75,7 @@ version_entry_st sup_versions[] = {
 	 .obsolete = 0,
 	 .only_extension = 0,
 	 .tls_sig_sem = SIG_SEM_PRE_TLS12,
-	 .false_start = 0
-	},
+	 .false_start = 0},
 	{.name = "TLS1.2",
 	 .id = GNUTLS_TLS1_2,
 	 .age = 3,
@@ -94,8 +90,7 @@ version_entry_st sup_versions[] = {
 	 .obsolete = 0,
 	 .only_extension = 0,
 	 .tls_sig_sem = SIG_SEM_PRE_TLS12,
-	 .false_start = 1
-	},
+	 .false_start = 1},
 	{.name = "TLS1.3",
 	 .id = GNUTLS_TLS1_3,
 	 .age = 5,
@@ -113,10 +108,9 @@ version_entry_st sup_versions[] = {
 	 .post_handshake_auth = 1,
 	 .multi_ocsp = 1,
 	 .key_shares = 1,
-	 .false_start = 0, /* doesn't make sense */
-	 .tls_sig_sem = SIG_SEM_TLS13
-	},
-	{.name = "DTLS0.9", /* Cisco AnyConnect (based on about OpenSSL 0.9.8e) */
+	 .false_start = 0,	/* doesn't make sense */
+	 .tls_sig_sem = SIG_SEM_TLS13},
+	{.name = "DTLS0.9",	/* Cisco AnyConnect (based on about OpenSSL 0.9.8e) */
 	 .id = GNUTLS_DTLS0_9,
 	 .age = 200,
 	 .major = 1,
@@ -130,8 +124,7 @@ version_entry_st sup_versions[] = {
 	 .obsolete = 0,
 	 .only_extension = 0,
 	 .tls_sig_sem = SIG_SEM_PRE_TLS12,
-	 .false_start = 0
-	},
+	 .false_start = 0},
 	{.name = "DTLS1.0",
 	 .id = GNUTLS_DTLS1_0,
 	 .age = 201,
@@ -146,8 +139,7 @@ version_entry_st sup_versions[] = {
 	 .obsolete = 0,
 	 .only_extension = 0,
 	 .tls_sig_sem = SIG_SEM_PRE_TLS12,
-	 .false_start = 0
-	},
+	 .false_start = 0},
 	{.name = "DTLS1.2",
 	 .id = GNUTLS_DTLS1_2,
 	 .age = 202,
@@ -162,8 +154,7 @@ version_entry_st sup_versions[] = {
 	 .obsolete = 0,
 	 .only_extension = 0,
 	 .tls_sig_sem = SIG_SEM_PRE_TLS12,
-	 .false_start = 1
-	},
+	 .false_start = 1},
 	{0, 0, 0, 0, 0}
 };
 
@@ -183,16 +174,17 @@ const version_entry_st *nversion_to_entry(uint8_t major, uint8_t minor)
 
 	for (p = sup_versions; p->name != NULL; p++) {
 		if ((p->major == major) && (p->minor == minor))
-			    return p;
+			return p;
 	}
 	return NULL;
 }
 
 static int
 version_is_valid_for_session(gnutls_session_t session,
-			     const version_entry_st *v)
+			     const version_entry_st * v)
 {
-	if (!v->supported && !(v->supported_revertible && _gnutls_allowlisting_mode()))
+	if (!v->supported
+	    && !(v->supported_revertible && _gnutls_allowlisting_mode()))
 		return 0;
 	if (v->transport != session->internals.transport)
 		return 0;
@@ -210,7 +202,6 @@ int _gnutls_version_mark_disabled(gnutls_protocol_t version)
 			p->supported = false;
 			return 0;
 		}
-
 #endif
 	return GNUTLS_E_INVALID_REQUEST;
 }
@@ -229,8 +220,7 @@ void _gnutls_version_mark_disabled_all(void)
 }
 
 int
-_gnutls_protocol_set_enabled(gnutls_protocol_t version,
-			    unsigned int enabled)
+_gnutls_protocol_set_enabled(gnutls_protocol_t version, unsigned int enabled)
 {
 #ifndef DISABLE_SYSTEM_CONFIG
 	version_entry_st *p;
@@ -238,20 +228,19 @@ _gnutls_protocol_set_enabled(gnutls_protocol_t version,
 	for (p = sup_versions; p->name != NULL; p++)
 		if (p->id == version) {
 			if (!p->supported_revertible) {
-				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+				return
+				    gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 			}
 			p->supported = enabled;
 			return 0;
 		}
-
 #endif
 	return GNUTLS_E_INVALID_REQUEST;
 }
 
 /* Return the priority of the provided version number */
 int
-_gnutls_version_priority(gnutls_session_t session,
-			 gnutls_protocol_t version)
+_gnutls_version_priority(gnutls_session_t session, gnutls_protocol_t version)
 {
 	unsigned int i;
 
@@ -273,7 +262,8 @@ const version_entry_st *_gnutls_version_lowest(gnutls_session_t session)
 	const version_entry_st *v, *min_v = NULL;
 	const version_entry_st *backup = NULL;
 
-	for (i=0;i < session->internals.priorities->protocol.num_priorities;i++) {
+	for (i = 0; i < session->internals.priorities->protocol.num_priorities;
+	     i++) {
 		cur_prot =
 		    session->internals.priorities->protocol.priorities[i];
 		v = version_to_entry(cur_prot);
@@ -315,19 +305,24 @@ const version_entry_st *_gnutls_version_max(gnutls_session_t session)
 		    session->internals.priorities->protocol.priorities[i];
 
 		for (p = sup_versions; p->name != NULL; p++) {
-			if(p->id == cur_prot) {
+			if (p->id == cur_prot) {
 #ifndef ENABLE_SSL3
 				if (p->obsolete != 0)
 					break;
 #endif
-				if (!p->supported && !(p->supported_revertible && _gnutls_allowlisting_mode()))
+				if (!p->supported
+				    && !(p->supported_revertible
+					 && _gnutls_allowlisting_mode()))
 					break;
 
-				if (p->transport != session->internals.transport)
+				if (p->transport !=
+				    session->internals.transport)
 					break;
 
-				if (p->tls13_sem && (session->internals.flags & INT_FLAG_NO_TLS13))
-				    break;
+				if (p->tls13_sem
+				    && (session->
+					internals.flags & INT_FLAG_NO_TLS13))
+					break;
 
 				if (max == NULL || cur_prot > max->id) {
 					max = p;
@@ -361,7 +356,8 @@ const version_entry_st *_gnutls_legacy_version_max(gnutls_session_t session)
  * error code. It will return GNUTLS_E_UNSUPPORTED_VERSION_PACKET
  * if there is no version >= TLS 1.3.
  */
-int _gnutls_write_supported_versions(gnutls_session_t session, uint8_t *buffer, ssize_t buffer_size)
+int _gnutls_write_supported_versions(gnutls_session_t session, uint8_t * buffer,
+				     ssize_t buffer_size)
 {
 	gnutls_protocol_t cur_prot;
 	size_t written_bytes = 0;
@@ -369,26 +365,32 @@ int _gnutls_write_supported_versions(gnutls_session_t session, uint8_t *buffer, 
 	unsigned i;
 	const version_entry_st *p;
 
-	for (i = 0; i < session->internals.priorities->protocol.num_priorities; i++) {
+	for (i = 0; i < session->internals.priorities->protocol.num_priorities;
+	     i++) {
 		cur_prot =
 		    session->internals.priorities->protocol.priorities[i];
 
 		for (p = sup_versions; p->name != NULL; p++) {
-			if(p->id == cur_prot) {
+			if (p->id == cur_prot) {
 				if (p->obsolete != 0)
 					break;
 
-				if (!p->supported && !(p->supported_revertible && _gnutls_allowlisting_mode()))
+				if (!p->supported
+				    && !(p->supported_revertible
+					 && _gnutls_allowlisting_mode()))
 					break;
 
-				if (p->transport != session->internals.transport)
+				if (p->transport !=
+				    session->internals.transport)
 					break;
 
 				if (p->only_extension)
 					at_least_one_new = 1;
 
 				if (buffer_size > 2) {
-					_gnutls_debug_log("Advertizing version %d.%d\n", (int)p->major, (int)p->minor);
+					_gnutls_debug_log
+					    ("Advertizing version %d.%d\n",
+					     (int)p->major, (int)p->minor);
 					buffer[0] = p->major;
 					buffer[1] = p->minor;
 					written_bytes += 2;
@@ -417,12 +419,13 @@ int _gnutls_write_supported_versions(gnutls_session_t session, uint8_t *buffer, 
 
 /* Returns true (1) if the given version is higher than the highest supported
  * and (0) otherwise */
-unsigned _gnutls_version_is_too_high(gnutls_session_t session, uint8_t major, uint8_t minor)
+unsigned _gnutls_version_is_too_high(gnutls_session_t session, uint8_t major,
+				     uint8_t minor)
 {
 	const version_entry_st *e;
 
 	e = _gnutls_legacy_version_max(session);
-	if (e == NULL) /* we don't know; but that means something is unconfigured */
+	if (e == NULL)		/* we don't know; but that means something is unconfigured */
 		return 1;
 
 	if (e->transport == GNUTLS_DGRAM) {
@@ -557,14 +560,18 @@ _gnutls_nversion_is_supported(gnutls_session_t session,
 	int version = 0;
 
 	for (p = sup_versions; p->name != NULL; p++) {
-		if(p->major == major && p->minor == minor) {
+		if (p->major == major && p->minor == minor) {
 #ifndef ENABLE_SSL3
-			if (p->obsolete != 0) return 0;
+			if (p->obsolete != 0)
+				return 0;
 #endif
-			if (p->tls13_sem && (session->internals.flags & INT_FLAG_NO_TLS13))
+			if (p->tls13_sem
+			    && (session->internals.flags & INT_FLAG_NO_TLS13))
 				return 0;
 
-			if (!p->supported && !(p->supported_revertible && _gnutls_allowlisting_mode()))
+			if (!p->supported
+			    && !(p->supported_revertible
+				 && _gnutls_allowlisting_mode()))
 				return 0;
 
 			if (p->transport != session->internals.transport)

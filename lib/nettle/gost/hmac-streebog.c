@@ -36,43 +36,43 @@
 #endif
 
 #ifndef HAVE_NETTLE_STREEBOG512_UPDATE
-#include <gnutls_int.h>
+# include <gnutls_int.h>
 
-#include <nettle/hmac.h>
-#include "hmac-gost.h"
+# include <nettle/hmac.h>
+# include "hmac-gost.h"
 
 void
 hmac_streebog512_set_key(struct hmac_streebog512_ctx *ctx,
-		    size_t key_length, const uint8_t *key)
+			 size_t key_length, const uint8_t * key)
 {
-  HMAC_SET_KEY(ctx, &nettle_streebog512, key_length, key);
+	HMAC_SET_KEY(ctx, &nettle_streebog512, key_length, key);
 }
 
 void
 hmac_streebog512_update(struct hmac_streebog512_ctx *ctx,
-		   size_t length, const uint8_t *data)
+			size_t length, const uint8_t * data)
 {
-  streebog512_update(&ctx->state, length, data);
+	streebog512_update(&ctx->state, length, data);
 }
 
 void
 hmac_streebog512_digest(struct hmac_streebog512_ctx *ctx,
-		   size_t length, uint8_t *digest)
+			size_t length, uint8_t * digest)
 {
-  HMAC_DIGEST(ctx, &nettle_streebog512, length, digest);
+	HMAC_DIGEST(ctx, &nettle_streebog512, length, digest);
 }
 
 void
 hmac_streebog256_set_key(struct hmac_streebog256_ctx *ctx,
-		    size_t key_length, const uint8_t *key)
+			 size_t key_length, const uint8_t * key)
 {
-  HMAC_SET_KEY(ctx, &nettle_streebog256, key_length, key);
+	HMAC_SET_KEY(ctx, &nettle_streebog256, key_length, key);
 }
 
 void
 hmac_streebog256_digest(struct hmac_streebog256_ctx *ctx,
-		   size_t length, uint8_t *digest)
+			size_t length, uint8_t * digest)
 {
-  HMAC_DIGEST(ctx, &nettle_streebog256, length, digest);
+	HMAC_DIGEST(ctx, &nettle_streebog256, length, digest);
 }
 #endif

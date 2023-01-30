@@ -34,7 +34,7 @@
 #include <sha-x86.h>
 #include <x86-common.h>
 #ifdef HAVE_LIBNETTLE
-# include <nettle/aes.h>		/* for key generation in 192 and 256 bits */
+# include <nettle/aes.h>	/* for key generation in 192 and 256 bits */
 # include <sha-padlock.h>
 #endif
 #include <aes-padlock.h>
@@ -170,7 +170,7 @@ static unsigned check_4th_gen_intel_features(unsigned ecx)
 #if defined(_MSC_VER) && !defined(__clang__)
 	xcr0 = _xgetbv(0);
 #else
-	__asm__ ("xgetbv" : "=a" (xcr0) : "c" (0) : "%edx");
+ __asm__("xgetbv": "=a"(xcr0): "c"(0):"%edx");
 #endif
 	/* Check if xmm and ymm state are enabled in XCR0. */
 	return (xcr0 & 6) == 6;
@@ -208,7 +208,7 @@ static void capabilities_to_intel_cpuid(unsigned capabilities)
 	if (capabilities & INTEL_AVX) {
 		if ((a[1] & bit_AVX) && (a[1] & bit_MOVBE) &&
 		    check_4th_gen_intel_features(a[1])) {
-			GNUTLS_x86_cpuid_s[1] |= bit_AVX|bit_MOVBE;
+			GNUTLS_x86_cpuid_s[1] |= bit_AVX | bit_MOVBE;
 		} else {
 			_gnutls_debug_log
 			    ("AVX acceleration requested but not available\n");
@@ -234,7 +234,6 @@ static void capabilities_to_intel_cpuid(unsigned capabilities)
 	}
 }
 
-
 static unsigned check_optimized_aes(void)
 {
 	return (GNUTLS_x86_cpuid_s[1] & bit_AES);
@@ -253,7 +252,8 @@ static unsigned check_sha(void)
 #ifdef ASM_X86_64
 static unsigned check_avx_movbe(void)
 {
-	return (GNUTLS_x86_cpuid_s[1] & (bit_AVX|bit_MOVBE)) == (bit_AVX|bit_MOVBE);
+	return (GNUTLS_x86_cpuid_s[1] & (bit_AVX | bit_MOVBE)) ==
+	    (bit_AVX | bit_MOVBE);
 }
 
 static unsigned check_pclmul(void)
@@ -265,7 +265,7 @@ static unsigned check_pclmul(void)
 #ifdef ENABLE_PADLOCK
 static unsigned capabilities_to_zhaoxin_edx(unsigned capabilities)
 {
-	unsigned a,b,c,t;
+	unsigned a, b, c, t;
 
 	if (capabilities & EMPTY_SET) {
 		return 0;
@@ -322,8 +322,8 @@ static int check_phe_sha512(unsigned edx)
 /* On some of the Zhaoxin CPUs, pclmul has a faster acceleration effect */
 static int check_fast_pclmul(void)
 {
-	unsigned int a,b,c,d;
-	unsigned int family,model;
+	unsigned int a, b, c, d;
+	unsigned int family, model;
 
 	if (!__get_cpuid(1, &a, &b, &c, &d))
 		return 0;
@@ -341,8 +341,8 @@ static int check_fast_pclmul(void)
 static int check_phe_partial(void)
 {
 	const char text[64] =
-		"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-		"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+	    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+	    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 	uint32_t iv[5] = { 0x67452301UL, 0xEFCDAB89UL,
 		0x98BADCFEUL, 0x10325476UL, 0xC3D2E1F0UL
 	};
@@ -390,11 +390,11 @@ void register_x86_padlock_crypto(unsigned capabilities)
 
 	memset(GNUTLS_x86_cpuid_s, 0, sizeof(GNUTLS_x86_cpuid_s));
 
-	if (capabilities == 0){
-		if(!read_cpuid_vals(GNUTLS_x86_cpuid_s))
+	if (capabilities == 0) {
+		if (!read_cpuid_vals(GNUTLS_x86_cpuid_s))
 			return;
 		edx = padlock_capability();
-	} else{
+	} else {
 		capabilities_to_intel_cpuid(capabilities);
 		edx = capabilities_to_zhaoxin_edx(capabilities);
 	}
@@ -406,17 +406,17 @@ void register_x86_padlock_crypto(unsigned capabilities)
 		    gnutls_crypto_single_cipher_register
 		    (GNUTLS_CIPHER_AES_128_GCM, 90,
 		     &_gnutls_aes_gcm_x86_ssse3, 0);
-			if (ret < 0) {
-				gnutls_assert();
-			}
+		if (ret < 0) {
+			gnutls_assert();
+		}
 
 		ret =
 		    gnutls_crypto_single_cipher_register
 		    (GNUTLS_CIPHER_AES_192_GCM, 90,
 		     &_gnutls_aes_gcm_x86_ssse3, 0);
-			if (ret < 0) {
-				gnutls_assert();
-			}
+		if (ret < 0) {
+			gnutls_assert();
+		}
 
 		ret =
 		    gnutls_crypto_single_cipher_register
@@ -455,7 +455,8 @@ void register_x86_padlock_crypto(unsigned capabilities)
 		ret =
 		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA1,
 							 80,
-							 &_gnutls_sha_x86_ssse3, 0);
+							 &_gnutls_sha_x86_ssse3,
+							 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
@@ -463,7 +464,8 @@ void register_x86_padlock_crypto(unsigned capabilities)
 		ret =
 		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA224,
 							 80,
-							 &_gnutls_sha_x86_ssse3, 0);
+							 &_gnutls_sha_x86_ssse3,
+							 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
@@ -471,57 +473,64 @@ void register_x86_padlock_crypto(unsigned capabilities)
 		ret =
 		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA256,
 							 80,
-							 &_gnutls_sha_x86_ssse3, 0);
+							 &_gnutls_sha_x86_ssse3,
+							 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-
 		ret =
 		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA1,
-							 80,
-							 &_gnutls_hmac_sha_x86_ssse3, 0);
+						      80,
+						      &_gnutls_hmac_sha_x86_ssse3,
+						      0);
 		if (ret < 0)
 			gnutls_assert();
 
 		ret =
 		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA224,
-							 80,
-							 &_gnutls_hmac_sha_x86_ssse3, 0);
+						      80,
+						      &_gnutls_hmac_sha_x86_ssse3,
+						      0);
 		if (ret < 0)
 			gnutls_assert();
 
 		ret =
 		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA256,
-							 80,
-							 &_gnutls_hmac_sha_x86_ssse3, 0);
+						      80,
+						      &_gnutls_hmac_sha_x86_ssse3,
+						      0);
 		if (ret < 0)
 			gnutls_assert();
 
 		ret =
 		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA384,
 							 80,
-							 &_gnutls_sha_x86_ssse3, 0);
+							 &_gnutls_sha_x86_ssse3,
+							 0);
 		if (ret < 0)
 			gnutls_assert();
 
 		ret =
 		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA512,
 							 80,
-							 &_gnutls_sha_x86_ssse3, 0);
+							 &_gnutls_sha_x86_ssse3,
+							 0);
 		if (ret < 0)
 			gnutls_assert();
 		ret =
 		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA384,
-							 80,
-							 &_gnutls_hmac_sha_x86_ssse3, 0);
+						      80,
+						      &_gnutls_hmac_sha_x86_ssse3,
+						      0);
 		if (ret < 0)
 			gnutls_assert();
 
 		ret =
 		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA512,
-							 80,
-							 &_gnutls_hmac_sha_x86_ssse3, 0);
+						      80,
+						      &_gnutls_hmac_sha_x86_ssse3,
+						      0);
 		if (ret < 0)
 			gnutls_assert();
 	}
@@ -597,11 +606,11 @@ void register_x86_padlock_crypto(unsigned capabilities)
 			gnutls_assert();
 		}
 
-#ifdef ASM_X86_64
+# ifdef ASM_X86_64
 		if (check_pclmul()) {
 			/* register GCM ciphers */
 			_gnutls_debug_log
-				("Zhaoxin GCM accelerator was detected\n");
+			    ("Zhaoxin GCM accelerator was detected\n");
 			if (check_avx_movbe() && check_fast_pclmul()) {
 				_gnutls_debug_log
 				    ("Zhaoxin GCM accelerator (AVX) was detected\n");
@@ -630,31 +639,31 @@ void register_x86_padlock_crypto(unsigned capabilities)
 				}
 			} else {
 				ret =
-					gnutls_crypto_single_cipher_register
-					(GNUTLS_CIPHER_AES_128_GCM, 80,
-					&_gnutls_aes_gcm_pclmul, 0);
+				    gnutls_crypto_single_cipher_register
+				    (GNUTLS_CIPHER_AES_128_GCM, 80,
+				     &_gnutls_aes_gcm_pclmul, 0);
 				if (ret < 0) {
 					gnutls_assert();
 				}
 
 				ret =
-					gnutls_crypto_single_cipher_register
-					(GNUTLS_CIPHER_AES_192_GCM, 80,
-					&_gnutls_aes_gcm_pclmul, 0);
+				    gnutls_crypto_single_cipher_register
+				    (GNUTLS_CIPHER_AES_192_GCM, 80,
+				     &_gnutls_aes_gcm_pclmul, 0);
 				if (ret < 0) {
 					gnutls_assert();
 				}
 
 				ret =
-					gnutls_crypto_single_cipher_register
-					(GNUTLS_CIPHER_AES_256_GCM, 80,
-					&_gnutls_aes_gcm_pclmul, 0);
+				    gnutls_crypto_single_cipher_register
+				    (GNUTLS_CIPHER_AES_256_GCM, 80,
+				     &_gnutls_aes_gcm_pclmul, 0);
 				if (ret < 0) {
 					gnutls_assert();
 				}
 			}
 		} else
-#endif
+# endif
 		{
 			ret =
 			    gnutls_crypto_single_cipher_register
@@ -683,8 +692,7 @@ void register_x86_padlock_crypto(unsigned capabilities)
 	}
 
 	if (check_padlock(edx)) {
-		_gnutls_debug_log
-		    ("Padlock AES accelerator was detected\n");
+		_gnutls_debug_log("Padlock AES accelerator was detected\n");
 		ret =
 		    gnutls_crypto_single_cipher_register
 		    (GNUTLS_CIPHER_AES_128_CBC, 80, &_gnutls_aes_padlock, 0);
@@ -724,10 +732,10 @@ void register_x86_padlock_crypto(unsigned capabilities)
 		}
 	}
 
-	if(!check_optimized_aes() && !check_padlock(edx))
+	if (!check_optimized_aes() && !check_padlock(edx))
 		_gnutls_priority_update_non_aesni();
 
-#ifdef HAVE_LIBNETTLE
+# ifdef HAVE_LIBNETTLE
 	phe = check_phe(edx);
 
 	if (phe && check_phe_partial()) {
@@ -738,16 +746,14 @@ void register_x86_padlock_crypto(unsigned capabilities)
 			    ("Padlock SHA512 (partial) accelerator was detected\n");
 			ret =
 			    gnutls_crypto_single_digest_register
-			    (GNUTLS_DIG_SHA384, 80,
-			     &_gnutls_sha_padlock, 0);
+			    (GNUTLS_DIG_SHA384, 80, &_gnutls_sha_padlock, 0);
 			if (ret < 0) {
 				gnutls_assert();
 			}
 
 			ret =
 			    gnutls_crypto_single_digest_register
-			    (GNUTLS_DIG_SHA512, 80,
-			     &_gnutls_sha_padlock, 0);
+			    (GNUTLS_DIG_SHA512, 80, &_gnutls_sha_padlock, 0);
 			if (ret < 0) {
 				gnutls_assert();
 			}
@@ -772,7 +778,8 @@ void register_x86_padlock_crypto(unsigned capabilities)
 		ret =
 		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA1,
 							 90,
-							 &_gnutls_sha_padlock, 0);
+							 &_gnutls_sha_padlock,
+							 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
@@ -780,7 +787,8 @@ void register_x86_padlock_crypto(unsigned capabilities)
 		ret =
 		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA224,
 							 90,
-							 &_gnutls_sha_padlock, 0);
+							 &_gnutls_sha_padlock,
+							 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
@@ -788,7 +796,8 @@ void register_x86_padlock_crypto(unsigned capabilities)
 		ret =
 		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA256,
 							 90,
-							 &_gnutls_sha_padlock, 0);
+							 &_gnutls_sha_padlock,
+							 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
@@ -796,7 +805,8 @@ void register_x86_padlock_crypto(unsigned capabilities)
 		ret =
 		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA1,
 						      90,
-						      &_gnutls_hmac_sha_padlock, 0);
+						      &_gnutls_hmac_sha_padlock,
+						      0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
@@ -806,7 +816,8 @@ void register_x86_padlock_crypto(unsigned capabilities)
 		ret =
 		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA256,
 						      90,
-						      &_gnutls_hmac_sha_padlock, 0);
+						      &_gnutls_hmac_sha_padlock,
+						      0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
@@ -818,7 +829,8 @@ void register_x86_padlock_crypto(unsigned capabilities)
 		ret =
 		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA1,
 							 90,
-							 &_gnutls_sha_padlock_oneshot, 0);
+							 &_gnutls_sha_padlock_oneshot,
+							 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
@@ -826,7 +838,8 @@ void register_x86_padlock_crypto(unsigned capabilities)
 		ret =
 		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA256,
 							 90,
-							 &_gnutls_sha_padlock_oneshot, 0);
+							 &_gnutls_sha_padlock_oneshot,
+							 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
@@ -834,7 +847,8 @@ void register_x86_padlock_crypto(unsigned capabilities)
 		ret =
 		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA1,
 						      90,
-						      &_gnutls_hmac_sha_padlock_oneshot, 0);
+						      &_gnutls_hmac_sha_padlock_oneshot,
+						      0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
@@ -842,12 +856,13 @@ void register_x86_padlock_crypto(unsigned capabilities)
 		ret =
 		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA256,
 						      90,
-						      &_gnutls_hmac_sha_padlock_oneshot, 0);
+						      &_gnutls_hmac_sha_padlock_oneshot,
+						      0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 	}
-#endif
+# endif
 
 	return;
 }
@@ -868,14 +883,12 @@ static enum x86_cpu_vendor check_x86_cpu_vendor(void)
 	}
 
 	if (memcmp(&b, "Genu", 4) == 0 &&
-	    memcmp(&d, "ineI", 4) == 0 &&
-	    memcmp(&c, "ntel", 4) == 0) {
+	    memcmp(&d, "ineI", 4) == 0 && memcmp(&c, "ntel", 4) == 0) {
 		return X86_CPU_VENDOR_INTEL;
 	}
 
 	if (memcmp(&b, "Auth", 4) == 0 &&
-	    memcmp(&d, "enti", 4) == 0 &&
-	    memcmp(&c, "cAMD", 4) == 0) {
+	    memcmp(&d, "enti", 4) == 0 && memcmp(&c, "cAMD", 4) == 0) {
 		return X86_CPU_VENDOR_AMD;
 	}
 
@@ -905,11 +918,10 @@ void register_x86_intel_crypto(unsigned capabilities)
 			 * OpenSSL does.  Should we clear
 			 * bit_AVX512DQ, bit_AVX512PF, bit_AVX512ER,
 			 * and bit_AVX512CD? */
-			GNUTLS_x86_cpuid_s[2] &= ~(bit_AVX2|
-						    bit_AVX512F|
-						    bit_AVX512IFMA|
-						    bit_AVX512BW|
-						    bit_AVX512BW);
+			GNUTLS_x86_cpuid_s[2] &= ~(bit_AVX2 |
+						   bit_AVX512F |
+						   bit_AVX512IFMA |
+						   bit_AVX512BW | bit_AVX512BW);
 		}
 	} else {
 		capabilities_to_intel_cpuid(capabilities);
@@ -929,17 +941,17 @@ void register_x86_intel_crypto(unsigned capabilities)
 		    gnutls_crypto_single_cipher_register
 		    (GNUTLS_CIPHER_AES_128_GCM, 90,
 		     &_gnutls_aes_gcm_x86_ssse3, 0);
-			if (ret < 0) {
-				gnutls_assert();
-			}
+		if (ret < 0) {
+			gnutls_assert();
+		}
 
 		ret =
 		    gnutls_crypto_single_cipher_register
 		    (GNUTLS_CIPHER_AES_192_GCM, 90,
 		     &_gnutls_aes_gcm_x86_ssse3, 0);
-			if (ret < 0) {
-				gnutls_assert();
-			}
+		if (ret < 0) {
+			gnutls_assert();
+		}
 
 		ret =
 		    gnutls_crypto_single_cipher_register
@@ -978,7 +990,8 @@ void register_x86_intel_crypto(unsigned capabilities)
 		ret =
 		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA1,
 							 80,
-							 &_gnutls_sha_x86_ssse3, 0);
+							 &_gnutls_sha_x86_ssse3,
+							 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
@@ -986,7 +999,8 @@ void register_x86_intel_crypto(unsigned capabilities)
 		ret =
 		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA224,
 							 80,
-							 &_gnutls_sha_x86_ssse3, 0);
+							 &_gnutls_sha_x86_ssse3,
+							 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
@@ -994,57 +1008,64 @@ void register_x86_intel_crypto(unsigned capabilities)
 		ret =
 		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA256,
 							 80,
-							 &_gnutls_sha_x86_ssse3, 0);
+							 &_gnutls_sha_x86_ssse3,
+							 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-
 		ret =
 		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA1,
-							 80,
-							 &_gnutls_hmac_sha_x86_ssse3, 0);
+						      80,
+						      &_gnutls_hmac_sha_x86_ssse3,
+						      0);
 		if (ret < 0)
 			gnutls_assert();
 
 		ret =
 		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA224,
-							 80,
-							 &_gnutls_hmac_sha_x86_ssse3, 0);
+						      80,
+						      &_gnutls_hmac_sha_x86_ssse3,
+						      0);
 		if (ret < 0)
 			gnutls_assert();
 
 		ret =
 		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA256,
-							 80,
-							 &_gnutls_hmac_sha_x86_ssse3, 0);
+						      80,
+						      &_gnutls_hmac_sha_x86_ssse3,
+						      0);
 		if (ret < 0)
 			gnutls_assert();
 
 		ret =
 		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA384,
 							 80,
-							 &_gnutls_sha_x86_ssse3, 0);
+							 &_gnutls_sha_x86_ssse3,
+							 0);
 		if (ret < 0)
 			gnutls_assert();
 
 		ret =
 		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA512,
 							 80,
-							 &_gnutls_sha_x86_ssse3, 0);
+							 &_gnutls_sha_x86_ssse3,
+							 0);
 		if (ret < 0)
 			gnutls_assert();
 		ret =
 		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA384,
-							 80,
-							 &_gnutls_hmac_sha_x86_ssse3, 0);
+						      80,
+						      &_gnutls_hmac_sha_x86_ssse3,
+						      0);
 		if (ret < 0)
 			gnutls_assert();
 
 		ret =
 		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA512,
-							 80,
-							 &_gnutls_hmac_sha_x86_ssse3, 0);
+						      80,
+						      &_gnutls_hmac_sha_x86_ssse3,
+						      0);
 		if (ret < 0)
 			gnutls_assert();
 	}
@@ -1210,7 +1231,6 @@ void register_x86_intel_crypto(unsigned capabilities)
 	return;
 }
 
-
 void register_x86_crypto(void)
 {
 	unsigned capabilities = 0;
@@ -1225,4 +1245,3 @@ void register_x86_crypto(void)
 	register_x86_padlock_crypto(capabilities);
 #endif
 }
-

@@ -28,7 +28,6 @@
 
 #include <locks.h>
 
-
 /**
  * gnutls_global_set_mutex:
  * @init: mutex initialization function

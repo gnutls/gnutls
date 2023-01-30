@@ -31,8 +31,7 @@
 #include "errors.h"
 
 /* On error, @dat is not changed. */
-int
-_gnutls_set_datum(gnutls_datum_t * dat, const void *data, size_t data_size)
+int _gnutls_set_datum(gnutls_datum_t * dat, const void *data, size_t data_size)
 {
 	if (data_size == 0 || data == NULL) {
 		dat->data = NULL;
@@ -73,4 +72,3 @@ _gnutls_set_strdatum(gnutls_datum_t * dat, const void *data, size_t data_size)
 
 	return 0;
 }
-

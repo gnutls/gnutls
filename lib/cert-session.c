@@ -124,10 +124,9 @@ const gnutls_datum_t *gnutls_certificate_get_peers(gnutls_session_t
  * Returns: 0 if the peer (server) did not request client
  *   authentication or 1 otherwise.
  **/
-unsigned
-gnutls_certificate_client_get_request_status(gnutls_session_t session)
+unsigned gnutls_certificate_client_get_request_status(gnutls_session_t session)
 {
-	return (session->internals.hsk_flags & HSK_CRT_ASKED)?1:0;
+	return (session->internals.hsk_flags & HSK_CRT_ASKED) ? 1 : 0;
 }
 
 /**
@@ -227,7 +226,7 @@ gnutls_certificate_set_verify_limits(gnutls_certificate_credentials_t res,
 static int
 _gnutls_ocsp_verify_mandatory_stapling(gnutls_session_t session,
 				       gnutls_x509_crt_t cert,
-				       unsigned int * ocsp_status);
+				       unsigned int *ocsp_status);
 
 /* If the certificate is revoked status will be GNUTLS_CERT_REVOKED.
  * 
@@ -238,8 +237,9 @@ static int
 check_ocsp_response(gnutls_session_t session, gnutls_x509_crt_t cert,
 		    gnutls_x509_trust_list_t tl,
 		    unsigned verify_flags,
-		    gnutls_x509_crt_t *cand_issuers, unsigned cand_issuers_size,
-		    gnutls_datum_t * data, unsigned int *ostatus)
+		    gnutls_x509_crt_t * cand_issuers,
+		    unsigned cand_issuers_size, gnutls_datum_t * data,
+		    unsigned int *ostatus)
 {
 	gnutls_ocsp_resp_t resp;
 	int ret;
@@ -266,7 +266,9 @@ check_ocsp_response(gnutls_session_t session, gnutls_x509_crt_t cert,
 	}
 
 	if (gnutls_ocsp_resp_get_status(resp) != GNUTLS_OCSP_RESP_SUCCESSFUL) {
-		ret = _gnutls_ocsp_verify_mandatory_stapling(session, cert, ostatus);
+		ret =
+		    _gnutls_ocsp_verify_mandatory_stapling(session, cert,
+							   ostatus);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -297,15 +299,22 @@ check_ocsp_response(gnutls_session_t session, gnutls_x509_crt_t cert,
 	if ((ret < 0 || status != 0) && cand_issuers_size > 0) {
 		/* Attempt to verify against the certificate list provided by the server */
 
-		ret = gnutls_ocsp_resp_verify_direct(resp, cand_issuers[0], &status, verify_flags);
+		ret =
+		    gnutls_ocsp_resp_verify_direct(resp, cand_issuers[0],
+						   &status, verify_flags);
 		/* if verification fails attempt to find whether any of the other
 		 * bundled CAs is an issuer of the OCSP response */
 		if ((ret < 0 || status != 0) && cand_issuers_size > 1) {
 			int ret2;
 			unsigned status2, i;
 
-			for (i=1;i<cand_issuers_size;i++) {
-				ret2 = gnutls_ocsp_resp_verify_direct(resp, cand_issuers[i], &status2, verify_flags);
+			for (i = 1; i < cand_issuers_size; i++) {
+				ret2 =
+				    gnutls_ocsp_resp_verify_direct(resp,
+								   cand_issuers
+								   [i],
+								   &status2,
+								   verify_flags);
 				if (ret2 >= 0 && status2 == 0) {
 					status = status2;
 					ret = ret2;
@@ -329,7 +338,8 @@ check_ocsp_response(gnutls_session_t session, gnutls_x509_crt_t cert,
 		char buf[MAX_OCSP_MSG_SIZE];
 
 		_gnutls_debug_log("OCSP rejection reason: %s\n",
-				  _gnutls_ocsp_verify_status_to_str(status, buf));
+				  _gnutls_ocsp_verify_status_to_str(status,
+								    buf));
 
 		ret = gnutls_assert_val(0);
 		check_failed = 1;
@@ -388,7 +398,7 @@ check_ocsp_response(gnutls_session_t session, gnutls_x509_crt_t cert,
 	}
 
 	ret = 0;
-      cleanup:
+ cleanup:
 	if (check_failed == 0)
 		session->internals.ocsp_check_ok = 1;
 
@@ -400,7 +410,7 @@ check_ocsp_response(gnutls_session_t session, gnutls_x509_crt_t cert,
 static int
 _gnutls_ocsp_verify_mandatory_stapling(gnutls_session_t session,
 				       gnutls_x509_crt_t cert,
-				       unsigned int * ocsp_status)
+				       unsigned int *ocsp_status)
 {
 	gnutls_x509_tlsfeatures_t tlsfeatures;
 	int i, ret;
@@ -424,7 +434,9 @@ _gnutls_ocsp_verify_mandatory_stapling(gnutls_session_t session,
 	/* We have requested the status, now check whether the certificate mandates a response */
 	if (gnutls_x509_crt_get_tlsfeatures(cert, tlsfeatures, 0, NULL) == 0) {
 		for (i = 0;; ++i) {
-			ret = gnutls_x509_tlsfeatures_get(tlsfeatures, i, &feature);
+			ret =
+			    gnutls_x509_tlsfeatures_get(tlsfeatures, i,
+							&feature);
 			if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
 				break;
 			}
@@ -434,7 +446,7 @@ _gnutls_ocsp_verify_mandatory_stapling(gnutls_session_t session,
 				goto cleanup;
 			}
 
-			if (feature == 5 /* TLS ID for status request */) {
+			if (feature == 5 /* TLS ID for status request */ ) {
 				/* We sent a status request, the certificate mandates a reply, but we did not get any. */
 				*ocsp_status |= GNUTLS_CERT_INVALID;
 				*ocsp_status |= GNUTLS_CERT_MISSING_OCSP_STATUS;
@@ -468,8 +480,7 @@ _gnutls_ocsp_verify_mandatory_stapling(gnutls_session_t session,
 int
 _gnutls_x509_cert_verify_peers(gnutls_session_t session,
 			       gnutls_typed_vdata_st * data,
-			       unsigned int elements,
-			       unsigned int *status)
+			       unsigned int elements, unsigned int *status)
 {
 	cert_auth_info_t info;
 	gnutls_certificate_credentials_t cred;
@@ -545,10 +556,14 @@ _gnutls_x509_cert_verify_peers(gnutls_session_t session,
 	if (verify_flags & GNUTLS_VERIFY_DISABLE_CRL_CHECKS)
 		goto skip_ocsp;
 
-	for (i=0;i<peer_certificate_list_size;i++) {
+	for (i = 0; i < peer_certificate_list_size; i++) {
 		ret = gnutls_ocsp_status_request_get2(session, i, &resp);
 		if (ret < 0) {
-			ret = _gnutls_ocsp_verify_mandatory_stapling(session, peer_certificate_list[i], &ocsp_status);
+			ret =
+			    _gnutls_ocsp_verify_mandatory_stapling(session,
+								   peer_certificate_list
+								   [i],
+								   &ocsp_status);
 			if (ret < 0) {
 				gnutls_assert();
 				CLEAR_CERTS;
@@ -560,18 +575,17 @@ _gnutls_x509_cert_verify_peers(gnutls_session_t session,
 
 		cand_issuers = NULL;
 		cand_issuers_size = 0;
-		if (peer_certificate_list_size > i+1) {
-			cand_issuers = &peer_certificate_list[i+1];
-			cand_issuers_size = peer_certificate_list_size-i-1;
+		if (peer_certificate_list_size > i + 1) {
+			cand_issuers = &peer_certificate_list[i + 1];
+			cand_issuers_size = peer_certificate_list_size - i - 1;
 		}
 
 		ret =
-			check_ocsp_response(session,
-					    peer_certificate_list[i],
-					    cred->tlist,
-					    verify_flags, cand_issuers,
-					    cand_issuers_size,
-					    &resp, &ocsp_status);
+		    check_ocsp_response(session,
+					peer_certificate_list[i],
+					cred->tlist,
+					verify_flags, cand_issuers,
+					cand_issuers_size, &resp, &ocsp_status);
 
 		if (ret < 0) {
 			CLEAR_CERTS;
@@ -580,25 +594,28 @@ _gnutls_x509_cert_verify_peers(gnutls_session_t session,
 	}
 #endif
 
-      skip_ocsp:
+ skip_ocsp:
 	/* Verify certificate
 	 */
 	if (session->internals.cert_output_callback != NULL) {
-		_gnutls_debug_log("Print full certificate path validation to trust root.\n");
-	    ret =
-	        gnutls_x509_trust_list_verify_crt2(cred->tlist,
-					           peer_certificate_list,
-					           peer_certificate_list_size,
-					           data, elements,
-					           verify_flags, status,
-					           session->internals.cert_output_callback);
+		_gnutls_debug_log
+		    ("Print full certificate path validation to trust root.\n");
+		ret =
+		    gnutls_x509_trust_list_verify_crt2(cred->tlist,
+						       peer_certificate_list,
+						       peer_certificate_list_size,
+						       data, elements,
+						       verify_flags, status,
+						       session->
+						       internals.cert_output_callback);
 	} else {
-	    ret =
-	        gnutls_x509_trust_list_verify_crt2(cred->tlist,
-					           peer_certificate_list,
-					           peer_certificate_list_size,
-					           data, elements,
-					           verify_flags, status, NULL);
+		ret =
+		    gnutls_x509_trust_list_verify_crt2(cred->tlist,
+						       peer_certificate_list,
+						       peer_certificate_list_size,
+						       data, elements,
+						       verify_flags, status,
+						       NULL);
 	}
 
 	if (ret < 0) {
@@ -647,8 +664,7 @@ _gnutls_x509_cert_verify_peers(gnutls_session_t session,
  * A successful error code means that the @status parameter must be checked to obtain the validation status.
  **/
 int
-gnutls_certificate_verify_peers2(gnutls_session_t session,
-				 unsigned int *status)
+gnutls_certificate_verify_peers2(gnutls_session_t session, unsigned int *status)
 {
 	return gnutls_certificate_verify_peers(session, NULL, 0, status);
 }
@@ -695,14 +711,13 @@ gnutls_certificate_verify_peers2(gnutls_session_t session,
  **/
 int
 gnutls_certificate_verify_peers3(gnutls_session_t session,
-				 const char *hostname,
-				 unsigned int *status)
+				 const char *hostname, unsigned int *status)
 {
-gnutls_typed_vdata_st data;
+	gnutls_typed_vdata_st data;
 
 	data.type = GNUTLS_DT_DNS_HOSTNAME;
 	data.size = 0;
-	data.data = (void*)hostname;
+	data.data = (void *)hostname;
 
 	return gnutls_certificate_verify_peers(session, &data, 1, status);
 }
@@ -755,8 +770,7 @@ gnutls_typed_vdata_st data;
 int
 gnutls_certificate_verify_peers(gnutls_session_t session,
 				gnutls_typed_vdata_st * data,
-				unsigned int elements,
-				unsigned int *status)
+				unsigned int elements, unsigned int *status)
 {
 	cert_auth_info_t info;
 
@@ -770,13 +784,12 @@ gnutls_certificate_verify_peers(gnutls_session_t session,
 	if (info->raw_certificate_list == NULL || info->ncerts == 0)
 		return GNUTLS_E_NO_CERTIFICATE_FOUND;
 
-
 	switch (get_certificate_type(session, GNUTLS_CTYPE_PEERS)) {
-		case GNUTLS_CRT_X509:
-			return _gnutls_x509_cert_verify_peers(session, data, elements,
-										status);
-		default:
-			return GNUTLS_E_INVALID_REQUEST;
+	case GNUTLS_CRT_X509:
+		return _gnutls_x509_cert_verify_peers(session, data, elements,
+						      status);
+	default:
+		return GNUTLS_E_INVALID_REQUEST;
 	}
 }
 
@@ -873,12 +886,12 @@ time_t gnutls_certificate_expiration_time_peers(gnutls_session_t session)
 	}
 
 	switch (get_certificate_type(session, GNUTLS_CTYPE_PEERS)) {
-		case GNUTLS_CRT_X509:
-			return
-					_gnutls_x509_get_raw_crt_expiration_time(&info->
-										 raw_certificate_list[0]);
-		default:
-			return (time_t) - 1;
+	case GNUTLS_CRT_X509:
+		return
+		    _gnutls_x509_get_raw_crt_expiration_time
+		    (&info->raw_certificate_list[0]);
+	default:
+		return (time_t) - 1;
 	}
 }
 
@@ -909,11 +922,11 @@ time_t gnutls_certificate_activation_time_peers(gnutls_session_t session)
 	}
 
 	switch (get_certificate_type(session, GNUTLS_CTYPE_PEERS)) {
-		case GNUTLS_CRT_X509:
-			return
-					_gnutls_x509_get_raw_crt_activation_time(&info->
-										 raw_certificate_list[0]);
-		default:
-			return (time_t) - 1;
+	case GNUTLS_CRT_X509:
+		return
+		    _gnutls_x509_get_raw_crt_activation_time
+		    (&info->raw_certificate_list[0]);
+	default:
+		return (time_t) - 1;
 	}
 }

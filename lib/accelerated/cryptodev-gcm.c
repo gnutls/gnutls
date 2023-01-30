@@ -28,22 +28,21 @@
 
 #ifdef ENABLE_CRYPTODEV
 
-#include <fcntl.h>
-#include <sys/ioctl.h>
-#include <crypto/cryptodev.h>
+# include <fcntl.h>
+# include <sys/ioctl.h>
+# include <crypto/cryptodev.h>
 
-#ifndef CRYPTO_CIPHER_MAX_KEY_LEN
-#define CRYPTO_CIPHER_MAX_KEY_LEN 64
-#endif
+# ifndef CRYPTO_CIPHER_MAX_KEY_LEN
+#  define CRYPTO_CIPHER_MAX_KEY_LEN 64
+# endif
 
-#ifndef EALG_MAX_BLOCK_LEN
-#define EALG_MAX_BLOCK_LEN 16
-#endif
+# ifndef EALG_MAX_BLOCK_LEN
+#  define EALG_MAX_BLOCK_LEN 16
+# endif
 
+# ifdef CIOCAUTHCRYPT
 
-#ifdef CIOCAUTHCRYPT
-
-#define GCM_BLOCK_SIZE 16
+#  define GCM_BLOCK_SIZE 16
 
 struct cryptodev_gcm_ctx {
 	struct session_op sess;
@@ -74,8 +73,7 @@ static const int cipher_map[] = {
 };
 
 static int
-aes_gcm_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx,
-		    int enc)
+aes_gcm_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx, int enc)
 {
 	struct cryptodev_gcm_ctx *ctx;
 
@@ -84,7 +82,6 @@ aes_gcm_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx,
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-
 
 	ctx = *_ctx;
 
@@ -103,7 +100,7 @@ aes_gcm_cipher_setkey(void *_ctx, const void *userkey, size_t keysize)
 	CHECK_AES_KEYSIZE(keysize);
 
 	ctx->sess.keylen = keysize;
-	ctx->sess.key = (void *) userkey;
+	ctx->sess.key = (void *)userkey;
 
 	if (ioctl(ctx->cfd, CIOCGSESSION, &ctx->sess)) {
 		gnutls_assert();
@@ -123,7 +120,7 @@ static int aes_gcm_setiv(void *_ctx, const void *iv, size_t iv_size)
 
 	memcpy(ctx->iv, iv, GCM_BLOCK_SIZE - 4);
 
-	ctx->cryp.iv = (void *) ctx->iv;
+	ctx->cryp.iv = (void *)ctx->iv;
 
 	return 0;
 }
@@ -141,7 +138,7 @@ aes_gcm_encrypt(void *_ctx, const void *src, size_t src_size,
 		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
 
 	ctx->cryp.len = src_size;
-	ctx->cryp.src = (void *) src;
+	ctx->cryp.src = (void *)src;
 	ctx->cryp.dst = dst;
 	ctx->cryp.op = COP_ENCRYPT;
 
@@ -169,7 +166,7 @@ aes_gcm_decrypt(void *_ctx, const void *src, size_t src_size,
 	 * encrypted data.
 	 */
 	ctx->cryp.len = src_size + GCM_BLOCK_SIZE;
-	ctx->cryp.src = (void *) src;
+	ctx->cryp.src = (void *)src;
 	ctx->cryp.dst = dst;
 	ctx->cryp.op = COP_DECRYPT;
 
@@ -195,7 +192,7 @@ static int aes_gcm_auth(void *_ctx, const void *src, size_t src_size)
 	struct cryptodev_gcm_ctx *ctx = _ctx;
 
 	ctx->op = 0;
-	ctx->auth_data = (void *) src;
+	ctx->auth_data = (void *)src;
 	ctx->auth_data_size = src_size;
 
 	return 0;
@@ -224,7 +221,7 @@ static void aes_gcm_tag(void *_ctx, void *tag, size_t tagsize)
 	ctx->op = 0;
 }
 
-#include "x86/aes-gcm-aead.h"
+#  include "x86/aes-gcm-aead.h"
 
 static const gnutls_crypto_cipher_st cipher_struct = {
 	.init = aes_gcm_cipher_init,
@@ -245,11 +242,11 @@ int _cryptodev_register_gcm_crypto(int cfd)
 	uint8_t fake_key[CRYPTO_CIPHER_MAX_KEY_LEN];
 	unsigned int i;
 	int ret;
-#ifdef CIOCGSESSINFO
+#  ifdef CIOCGSESSINFO
 	struct session_info_op siop;
 
 	memset(&siop, 0, sizeof(siop));
-#endif
+#  endif
 
 	memset(&sess, 0, sizeof(sess));
 
@@ -265,7 +262,7 @@ int _cryptodev_register_gcm_crypto(int cfd)
 		if (ioctl(cfd, CIOCGSESSION, &sess)) {
 			continue;
 		}
-#ifdef CIOCGSESSINFO
+#  ifdef CIOCGSESSINFO
 		siop.ses = sess.ses;	/* do not register ciphers that are not hw accelerated */
 		if (ioctl(cfd, CIOCGSESSINFO, &siop) == 0) {
 			if (!(siop.flags & SIOP_FLAG_KERNEL_DRIVER_ONLY)) {
@@ -273,7 +270,7 @@ int _cryptodev_register_gcm_crypto(int cfd)
 				continue;
 			}
 		}
-#endif
+#  endif
 
 		ioctl(cfd, CIOCFSESSION, &sess.ses);
 
@@ -292,6 +289,6 @@ int _cryptodev_register_gcm_crypto(int cfd)
 	return 0;
 }
 
-#endif				/* CIOCAUTHCRYPT */
+# endif				/* CIOCAUTHCRYPT */
 
 #endif				/* ENABLE_CRYPTODEV */

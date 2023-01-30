@@ -20,7 +20,7 @@
 /* Parts copied from GnuTLS example programs. */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdbool.h>
@@ -29,10 +29,10 @@
 #include <string.h>
 #include <sys/types.h>
 #if !defined(_WIN32)
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
 #endif
 #include <fcntl.h>
 #include <unistd.h>
@@ -68,13 +68,14 @@ static const char *tls13_included_labels[] = {
 };
 static const char *tls13_excluded_labels[] = { "CLIENT_RANDOM", NULL };
 
-static void search_for_str(const char *filename, const char *label, bool excluded)
+static void search_for_str(const char *filename, const char *label,
+			   bool excluded)
 {
 	char line[512];
 	FILE *fp = fopen(filename, "r");
 	char *p;
 
-	while( (p = fgets(line, sizeof(line), fp)) != NULL) {
+	while ((p = fgets(line, sizeof(line), fp)) != NULL) {
 		success("%s", line);
 		if (strncmp(line, label, strlen(label)) == 0 &&
 		    line[strlen(label)] == ' ') {
@@ -113,21 +114,24 @@ static void run(const char *filename, const char *prio,
 	}
 
 	/* test gnutls_certificate_flags() */
-	assert(gnutls_certificate_allocate_credentials(&x509_cred)>=0);
+	assert(gnutls_certificate_allocate_credentials(&x509_cred) >= 0);
 	assert(gnutls_certificate_allocate_credentials(&clicred) >= 0);
 
-	ret = gnutls_certificate_set_x509_key_mem(x509_cred, &server_ca3_localhost_cert_chain,
-					    &server_ca3_key,
-					    GNUTLS_X509_FMT_PEM);
+	ret =
+	    gnutls_certificate_set_x509_key_mem(x509_cred,
+						&server_ca3_localhost_cert_chain,
+						&server_ca3_key,
+						GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
 		fail("error in error code\n");
 		exit(1);
 	}
 
-	ret = gnutls_certificate_set_x509_trust_mem(clicred, &ca3_cert, GNUTLS_X509_FMT_PEM);
+	ret =
+	    gnutls_certificate_set_x509_trust_mem(clicred, &ca3_cert,
+						  GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		fail("set_x509_trust_file failed: %s\n", gnutls_strerror(ret));
-
 
 	test_cli_serv(x509_cred, clicred, prio, "localhost", NULL, NULL, NULL);
 
@@ -152,7 +156,7 @@ void doit(void)
 {
 	char filename[TMPNAME_SIZE];
 
-	assert(get_tmpname(filename)!=NULL);
+	assert(get_tmpname(filename) != NULL);
 
 	remove(filename);
 	global_init();

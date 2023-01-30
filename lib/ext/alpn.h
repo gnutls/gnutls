@@ -19,12 +19,12 @@
  */
 
 #ifndef GNUTLS_LIB_EXT_ALPN_H
-#define GNUTLS_LIB_EXT_ALPN_H
+# define GNUTLS_LIB_EXT_ALPN_H
 
-#include <hello_ext.h>
+# include <hello_ext.h>
 
-#define MAX_ALPN_PROTOCOLS 8
-#define MAX_ALPN_PROTOCOL_NAME 32
+# define MAX_ALPN_PROTOCOLS 8
+# define MAX_ALPN_PROTOCOL_NAME 32
 
 typedef struct {
 	uint8_t protocols[MAX_ALPN_PROTOCOLS][MAX_ALPN_PROTOCOL_NAME];
@@ -37,4 +37,4 @@ typedef struct {
 
 extern const hello_ext_entry_st ext_mod_alpn;
 
-#endif /* GNUTLS_LIB_EXT_ALPN_H */
+#endif				/* GNUTLS_LIB_EXT_ALPN_H */

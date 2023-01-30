@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdlib.h>
@@ -40,11 +40,12 @@ static void tls_log_func(int level, const char *str)
 }
 
 const gnutls_datum_t raw_data = {
-	(void *) "hello there",
+	(void *)"hello there",
 	11
 };
 
-static int sign_verify_data(gnutls_x509_privkey_t pkey, gnutls_sign_algorithm_t algo, unsigned vflags)
+static int sign_verify_data(gnutls_x509_privkey_t pkey,
+			    gnutls_sign_algorithm_t algo, unsigned vflags)
 {
 	int ret;
 	gnutls_privkey_t privkey;
@@ -68,7 +69,7 @@ static int sign_verify_data(gnutls_x509_privkey_t pkey, gnutls_sign_algorithm_t 
 		fail("gnutls_pubkey_import_x509\n");
 
 	ret = gnutls_privkey_sign_data(privkey, dig, sflags,
-					&raw_data, &signature);
+				       &raw_data, &signature);
 	if (ret < 0) {
 		ret = -1;
 		goto cleanup;
@@ -82,7 +83,7 @@ static int sign_verify_data(gnutls_x509_privkey_t pkey, gnutls_sign_algorithm_t 
 		fail("gnutls_pubkey_import_privkey\n");
 
 	ret = gnutls_pubkey_verify_data2(pubkey, algo,
-				vflags, &raw_data, &signature);
+					 vflags, &raw_data, &signature);
 	if (ret < 0) {
 		ret = -1;
 		goto cleanup;
@@ -128,10 +129,13 @@ void doit(void)
 		fail("succeeded verification with MD5!\n");
 
 	if (!gnutls_fips140_mode_enabled()) {
-		if (sign_verify_data(pkey, GNUTLS_SIGN_RSA_MD5, GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5) < 0)
+		if (sign_verify_data
+		    (pkey, GNUTLS_SIGN_RSA_MD5,
+		     GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5) < 0)
 			fail("failed verification with MD5 and override flags!\n");
 
-		if (sign_verify_data(pkey, GNUTLS_SIGN_RSA_MD5, GNUTLS_VERIFY_ALLOW_BROKEN) < 0)
+		if (sign_verify_data
+		    (pkey, GNUTLS_SIGN_RSA_MD5, GNUTLS_VERIFY_ALLOW_BROKEN) < 0)
 			fail("failed verification with MD5 and override flags2!\n");
 	}
 

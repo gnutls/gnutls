@@ -27,6 +27,12 @@ and to simplify maintenance, see <https://gitlab.com/gnutls/guile/>.
    on the CBC mode and SHA-1.  To enable it back, supply
    --enable-srp-authentication option to configure script.
 
+** libgnutls: All code has been indented using "indent -ppi1 -linux".
+   CI/CD has been adjusted to catch regressions.  This is implemented
+   through devel/indent-gnutls, devel/indent-maybe and .gitlab-ci.yml’s
+   commit-check.  You may run devel/indent-gnutls to fix any
+   indentation issues if you make code modifications.
+
 ** minitasn1: Upgraded to libtasn1 version 4.19.
 
 ** API and ABI modifications:

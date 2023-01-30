@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -37,8 +37,8 @@
  * hello TLS versions */
 
 void _gnutls_hello_set_default_version(gnutls_session_t session,
-					unsigned char major,
-					unsigned char minor);
+				       unsigned char major,
+				       unsigned char minor);
 
 const char *side;
 
@@ -70,13 +70,10 @@ static void try(unsigned char major, unsigned char minor, int ret1, int ret2)
 					    &server_cert, &server_key,
 					    GNUTLS_X509_FMT_PEM);
 
-	gnutls_init(&server, GNUTLS_SERVER|GNUTLS_DATAGRAM | GNUTLS_NONBLOCK);
-	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-				serverx509cred);
+	gnutls_init(&server, GNUTLS_SERVER | GNUTLS_DATAGRAM | GNUTLS_NONBLOCK);
+	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, serverx509cred);
 
-	gnutls_priority_set_direct(server,
-				   "NORMAL",
-				   NULL);
+	gnutls_priority_set_direct(server, "NORMAL", NULL);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_pull_timeout_function(server,
@@ -89,16 +86,20 @@ static void try(unsigned char major, unsigned char minor, int ret1, int ret2)
 	if (ret < 0)
 		exit(1);
 
-	ret = gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca_cert, GNUTLS_X509_FMT_PEM);
+	ret =
+	    gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca_cert,
+						  GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);
 
-	ret = gnutls_init(&client, GNUTLS_CLIENT|GNUTLS_DATAGRAM | GNUTLS_NONBLOCK);
+	ret =
+	    gnutls_init(&client,
+			GNUTLS_CLIENT | GNUTLS_DATAGRAM | GNUTLS_NONBLOCK);
 	if (ret < 0)
 		exit(1);
 
 	ret = gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-				clientx509cred);
+				     clientx509cred);
 	if (ret < 0)
 		exit(1);
 

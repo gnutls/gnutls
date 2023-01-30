@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,27 +35,27 @@ int main(void)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <time.h>
-#include <gnutls/gnutls.h>
-#include <signal.h>
-#include <assert.h>
+# include <string.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <time.h>
+# include <gnutls/gnutls.h>
+# include <signal.h>
+# include <assert.h>
 
-#include "utils.h"
-#include "cert-common.h"
-#include "tls13/ext-parse.h"
+# include "utils.h"
+# include "cert-common.h"
+# include "tls13/ext-parse.h"
 
 /* This program tests gnutls_ext_raw_parse with GNUTLS_EXT_RAW_FLAG_TLS_CLIENT_HELLO
  * flag.
  */
 
-#define HOSTNAME "example.com"
+# define HOSTNAME "example.com"
 
 static void server_log_func(int level, const char *str)
 {
@@ -71,13 +71,14 @@ static unsigned found_server_name = 0;
 static unsigned found_status_req = 0;
 static unsigned bare_version = 0;
 
-static int ext_callback(void *ctx, unsigned tls_id, const unsigned char *data, unsigned size)
+static int ext_callback(void *ctx, unsigned tls_id, const unsigned char *data,
+			unsigned size)
 {
-	if (tls_id == 0) { /* server name */
+	if (tls_id == 0) {	/* server name */
 		/* very interesting extension, 4 bytes of sizes
 		 * and 1 byte of type. */
 		unsigned esize = (data[0] << 8) | data[1];
-		assert(esize == strlen(HOSTNAME)+3);
+		assert(esize == strlen(HOSTNAME) + 3);
 
 		size -= 2;
 		data += 2;
@@ -104,13 +105,16 @@ static int ext_callback(void *ctx, unsigned tls_id, const unsigned char *data, u
 }
 
 static int handshake_callback(gnutls_session_t session, unsigned int htype,
-	unsigned post, unsigned int incoming, const gnutls_datum_t *msg)
+			      unsigned post, unsigned int incoming,
+			      const gnutls_datum_t * msg)
 {
 	int ret;
 
 	if (htype == GNUTLS_HANDSHAKE_CLIENT_HELLO && post) {
 		if (bare_version) {
-			ret = gnutls_ext_raw_parse(NULL, ext_callback, msg, GNUTLS_EXT_RAW_FLAG_TLS_CLIENT_HELLO);
+			ret =
+			    gnutls_ext_raw_parse(NULL, ext_callback, msg,
+						 GNUTLS_EXT_RAW_FLAG_TLS_CLIENT_HELLO);
 		} else {
 			unsigned pos;
 			gnutls_datum_t mmsg;
@@ -122,7 +126,8 @@ static int handshake_callback(gnutls_session_t session, unsigned int htype,
 
 			mmsg.data = &msg->data[pos];
 			mmsg.size = msg->size - pos;
-			ret = gnutls_ext_raw_parse(NULL, ext_callback, &mmsg, 0);
+			ret =
+			    gnutls_ext_raw_parse(NULL, ext_callback, &mmsg, 0);
 		}
 		assert(ret >= 0);
 	}
@@ -150,12 +155,14 @@ static void client(int fd)
 	gnutls_handshake_set_timeout(session, get_timeout());
 
 	/* Use default priorities */
-	gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-TLS1.2", NULL);
+	gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-TLS1.2",
+				   NULL);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
 	gnutls_transport_set_int(session, fd);
-	assert(gnutls_server_name_set(session, GNUTLS_NAME_DNS, HOSTNAME, strlen(HOSTNAME))>=0);
+	assert(gnutls_server_name_set
+	       (session, GNUTLS_NAME_DNS, HOSTNAME, strlen(HOSTNAME)) >= 0);
 
 	/* Perform the TLS handshake
 	 */
@@ -183,7 +190,7 @@ static void client(int fd)
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
-      end:
+ end:
 
 	close(fd);
 
@@ -193,7 +200,6 @@ static void client(int fd)
 
 	gnutls_global_deinit();
 }
-
 
 static void server(int fd)
 {
@@ -212,20 +218,21 @@ static void server(int fd)
 
 	gnutls_certificate_allocate_credentials(&x509_cred);
 	gnutls_certificate_set_x509_key_mem(x509_cred, &server_cert,
-					    &server_key,
-					    GNUTLS_X509_FMT_PEM);
+					    &server_key, GNUTLS_X509_FMT_PEM);
 
 	gnutls_init(&session, GNUTLS_SERVER);
 	gnutls_handshake_set_timeout(session, get_timeout());
 
-	gnutls_handshake_set_hook_function(session, GNUTLS_HANDSHAKE_CLIENT_HELLO,
+	gnutls_handshake_set_hook_function(session,
+					   GNUTLS_HANDSHAKE_CLIENT_HELLO,
 					   GNUTLS_HOOK_POST,
 					   handshake_callback);
 
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-TLS1.2", NULL);
+	gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-TLS1.2",
+				   NULL);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 

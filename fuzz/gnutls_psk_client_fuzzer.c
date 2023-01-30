@@ -43,7 +43,7 @@ int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 	struct mem_st memdata;
 	gnutls_datum_t psk_key;
 
-	psk_key.data = (unsigned char*)psk_key16;
+	psk_key.data = (unsigned char *)psk_key16;
 	psk_key.size = 16;
 
 	res = gnutls_init(&session, GNUTLS_CLIENT);
@@ -52,13 +52,18 @@ int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 	res = gnutls_psk_allocate_client_credentials(&pcred);
 	assert(res >= 0);
 
-	res = gnutls_psk_set_client_credentials(pcred, "test", &psk_key, GNUTLS_PSK_KEY_RAW);
+	res =
+	    gnutls_psk_set_client_credentials(pcred, "test", &psk_key,
+					      GNUTLS_PSK_KEY_RAW);
 	assert(res >= 0);
 
 	res = gnutls_credentials_set(session, GNUTLS_CRD_PSK, pcred);
 	assert(res >= 0);
 
-	res = gnutls_priority_set_direct(session, "NORMAL:-KX-ALL:+ECDHE-PSK:+DHE-PSK:+PSK:"VERS_STR, NULL);
+	res =
+	    gnutls_priority_set_direct(session,
+				       "NORMAL:-KX-ALL:+ECDHE-PSK:+DHE-PSK:+PSK:"
+				       VERS_STR, NULL);
 	assert(res >= 0);
 
 	memdata.data = data;
@@ -66,8 +71,7 @@ int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 
 	gnutls_transport_set_push_function(session, mem_push);
 	gnutls_transport_set_pull_function(session, mem_pull);
-	gnutls_transport_set_pull_timeout_function(session,
-		mem_pull_timeout);
+	gnutls_transport_set_pull_timeout_function(session, mem_pull_timeout);
 	gnutls_transport_set_ptr(session, &memdata);
 
 	do {

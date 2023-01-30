@@ -59,7 +59,7 @@ int gnutls_memcmp(const void *s1, const void *s2, size_t n)
 	const uint8_t *_s1 = s1;
 	const uint8_t *_s2 = s2;
 
-	for (i=0;i<n;i++) {
+	for (i = 0; i < n; i++) {
 		status |= (_s1[i] ^ _s2[i]);
 	}
 

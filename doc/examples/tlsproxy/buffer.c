@@ -29,14 +29,13 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 #include "buffer.h"
 
-struct buffer
-{
-  char *buf;
-  ssize_t size;
-  ssize_t hwm;
-  ssize_t ridx;
-  ssize_t widx;
-  int empty;
+struct buffer {
+	char *buf;
+	ssize_t size;
+	ssize_t hwm;
+	ssize_t ridx;
+	ssize_t widx;
+	int empty;
 };
 
 /* the buffer is organised internally as follows:
@@ -76,153 +75,136 @@ struct buffer
  *
  */
 
-buffer_t *
-bufNew (ssize_t size, ssize_t hwm)
+buffer_t *bufNew(ssize_t size, ssize_t hwm)
 {
-  buffer_t *b = calloc (1, sizeof (buffer_t));
-  if (!b) return NULL;
+	buffer_t *b = calloc(1, sizeof(buffer_t));
+	if (!b)
+		return NULL;
 
-  b->buf = calloc (1, size);
-  b->size = size;
-  b->hwm = hwm;
-  b->empty = 1;
-  return b;
+	b->buf = calloc(1, size);
+	b->size = size;
+	b->hwm = hwm;
+	b->empty = 1;
+	return b;
 }
 
-
-void
-bufFree (buffer_t * b)
+void bufFree(buffer_t * b)
 {
-  free (b->buf);
-  free (b);
+	free(b->buf);
+	free(b);
 }
 
 /* get a maximal span to read. Returns 0 if buffer
  * is empty
  */
-ssize_t
-bufGetReadSpan (buffer_t * b, void **addr)
+ssize_t bufGetReadSpan(buffer_t * b, void **addr)
 {
-  if (b->empty)
-    {
-      *addr = NULL;
-      return 0;
-    }
-  *addr = &(b->buf[b->ridx]);
-  ssize_t len = b->widx - b->ridx;
-  if (len <= 0)
-    len = b->size - b->ridx;
-  return len;
+	if (b->empty) {
+		*addr = NULL;
+		return 0;
+	}
+	*addr = &(b->buf[b->ridx]);
+	ssize_t len = b->widx - b->ridx;
+	if (len <= 0)
+		len = b->size - b->ridx;
+	return len;
 }
 
 /* get a maximal span to write. Returns 0 id buffer is full
  */
-ssize_t
-bufGetWriteSpan (buffer_t * b, void **addr)
+ssize_t bufGetWriteSpan(buffer_t * b, void **addr)
 {
-  if (b->empty)
-    {
-      *addr = b->buf;
-      b->ridx = 0;
-      b->widx = 0;
-      return b->size;
-    }
-  if (b->ridx == b->widx)
-    {
-      *addr = NULL;
-      return 0;
-    }
-  *addr = &(b->buf[b->widx]);
-  ssize_t len = b->ridx - b->widx;
-  if (len <= 0)
-    len = b->size - b->widx;
-  return len;
+	if (b->empty) {
+		*addr = b->buf;
+		b->ridx = 0;
+		b->widx = 0;
+		return b->size;
+	}
+	if (b->ridx == b->widx) {
+		*addr = NULL;
+		return 0;
+	}
+	*addr = &(b->buf[b->widx]);
+	ssize_t len = b->ridx - b->widx;
+	if (len <= 0)
+		len = b->size - b->widx;
+	return len;
 }
 
 /* mark size bytes as read */
-void
-bufDoneRead (buffer_t * b, ssize_t size)
+void bufDoneRead(buffer_t * b, ssize_t size)
 {
-  while (!b->empty && (size > 0))
-    {
-      /* empty can't occur here, so equal pointers means full */
-      ssize_t len = b->widx - b->ridx;
-      if (len <= 0)
-	len = b->size - b->ridx;
+	while (!b->empty && (size > 0)) {
+		/* empty can't occur here, so equal pointers means full */
+		ssize_t len = b->widx - b->ridx;
+		if (len <= 0)
+			len = b->size - b->ridx;
 
-      /* len is the number of bytes in one read span */
-      if (len > size)
-	len = size;
+		/* len is the number of bytes in one read span */
+		if (len > size)
+			len = size;
 
-      b->ridx += len;
-      if (b->ridx >= b->size)
-	b->ridx = 0;
+		b->ridx += len;
+		if (b->ridx >= b->size)
+			b->ridx = 0;
 
-      if (b->ridx == b->widx)
-	{
-	  b->ridx = 0;
-	  b->widx = 0;
-	  b->empty = 1;
+		if (b->ridx == b->widx) {
+			b->ridx = 0;
+			b->widx = 0;
+			b->empty = 1;
+		}
+
+		size -= len;
 	}
-
-      size -= len;
-    }
 }
 
 /* mark size bytes as written */
-void
-bufDoneWrite (buffer_t * b, ssize_t size)
+void bufDoneWrite(buffer_t * b, ssize_t size)
 {
-  while ((b->empty || (b->ridx != b->widx)) && (size > 0))
-    {
-      /* full can't occur here, so equal pointers means empty */
-      ssize_t len = b->ridx - b->widx;
-      if (len <= 0)
-	len = b->size - b->widx;
+	while ((b->empty || (b->ridx != b->widx)) && (size > 0)) {
+		/* full can't occur here, so equal pointers means empty */
+		ssize_t len = b->ridx - b->widx;
+		if (len <= 0)
+			len = b->size - b->widx;
 
-      /* len is the number of bytes in one write span */
-      if (len > size)
-	len = size;
+		/* len is the number of bytes in one write span */
+		if (len > size)
+			len = size;
 
-      b->widx += len;
-      if (b->widx >= b->size)
-	b->widx = 0;
+		b->widx += len;
+		if (b->widx >= b->size)
+			b->widx = 0;
 
-      /* it can't be empty as we've written at least one byte */
-      b->empty = 0;
+		/* it can't be empty as we've written at least one byte */
+		b->empty = 0;
 
-      size -= len;
-    }
+		size -= len;
+	}
 }
 
-int
-bufIsEmpty (buffer_t * b)
+int bufIsEmpty(buffer_t * b)
 {
-  return b->empty;
+	return b->empty;
 }
 
-int
-bufIsFull (buffer_t * b)
+int bufIsFull(buffer_t * b)
 {
-  return !b->empty && (b->ridx == b->widx);
+	return !b->empty && (b->ridx == b->widx);
 }
 
-int
-bufIsOverHWM (buffer_t * b)
+int bufIsOverHWM(buffer_t * b)
 {
-  return bufGetCount (b) > b->hwm;
+	return bufGetCount(b) > b->hwm;
 }
 
-ssize_t
-bufGetFree (buffer_t * b)
+ssize_t bufGetFree(buffer_t * b)
 {
-  return b->size - bufGetCount (b);
+	return b->size - bufGetCount(b);
 }
 
-ssize_t
-bufGetCount (buffer_t * b)
+ssize_t bufGetCount(buffer_t * b)
 {
-  if (b->empty)
-    return 0;
-  return b->widx - b->ridx + ((b->ridx < b->widx) ? 0 : b->size);
+	if (b->empty)
+		return 0;
+	return b->widx - b->ridx + ((b->ridx < b->widx) ? 0 : b->size);
 }

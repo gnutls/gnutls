@@ -29,8 +29,8 @@
 #include "handshake.h"
 #include "fuzzer.h"
 
-int __attribute__ ((visibility ("protected")))
-gnutls_rnd(gnutls_rnd_level_t level, void *data, size_t len)
+int __attribute__((visibility("protected")))
+    gnutls_rnd(gnutls_rnd_level_t level, void *data, size_t len)
 {
 	memset(data, 0xff, len);
 
@@ -80,23 +80,24 @@ int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 	ed448_key.size = sizeof(kEd448PrivateKeyDER);
 
 	res =
-		gnutls_certificate_set_x509_key_mem(xcred, &rsa_cert, &rsa_key,
-		GNUTLS_X509_FMT_DER);
+	    gnutls_certificate_set_x509_key_mem(xcred, &rsa_cert, &rsa_key,
+						GNUTLS_X509_FMT_DER);
 	assert(res >= 0);
 
 	res =
-		gnutls_certificate_set_x509_key_mem(xcred, &ecdsa_cert, &ecdsa_key,
-		GNUTLS_X509_FMT_DER);
+	    gnutls_certificate_set_x509_key_mem(xcred, &ecdsa_cert, &ecdsa_key,
+						GNUTLS_X509_FMT_DER);
 	assert(res >= 0);
 
 	res =
-		gnutls_certificate_set_x509_key_mem(xcred, &ed25519_cert, &ed25519_key,
-		GNUTLS_X509_FMT_DER);
+	    gnutls_certificate_set_x509_key_mem(xcred, &ed25519_cert,
+						&ed25519_key,
+						GNUTLS_X509_FMT_DER);
 	assert(res >= 0);
 
 	res =
-		gnutls_certificate_set_x509_key_mem(xcred, &ed448_cert, &ed448_key,
-		GNUTLS_X509_FMT_DER);
+	    gnutls_certificate_set_x509_key_mem(xcred, &ed448_cert, &ed448_key,
+						GNUTLS_X509_FMT_DER);
 	assert(res >= 0);
 
 	gnutls_certificate_set_known_dh_params(xcred, GNUTLS_SEC_PARAM_MEDIUM);
@@ -104,8 +105,11 @@ int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 	res = gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 	assert(res >= 0);
 
-	/*res = gnutls_set_default_priority(session);*/
-	res = gnutls_priority_set_direct(session, "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3", NULL);
+	/*res = gnutls_set_default_priority(session); */
+	res =
+	    gnutls_priority_set_direct(session,
+				       "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3",
+				       NULL);
 	assert(res >= 0);
 
 	memdata.data = data;

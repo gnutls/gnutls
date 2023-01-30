@@ -38,11 +38,10 @@
 # define SHA1_SECURE_VAL _INSECURE_FOR_CERTS
 #endif
 
-static SYSTEM_CONFIG_OR_CONST
-gnutls_sign_entry_st sign_algorithms[] = {
-	 /* RSA-PKCS#1 1.5: must be before PSS,
-	  * so that gnutls_pk_to_sign() will return
-	  * these first for backwards compatibility. */
+static SYSTEM_CONFIG_OR_CONST gnutls_sign_entry_st sign_algorithms[] = {
+	/* RSA-PKCS#1 1.5: must be before PSS,
+	 * so that gnutls_pk_to_sign() will return
+	 * these first for backwards compatibility. */
 	{.name = "RSA-SHA256",
 	 .oid = SIG_RSA_SHA256_OID,
 	 .id = GNUTLS_SIGN_RSA_SHA256,
@@ -67,7 +66,7 @@ gnutls_sign_entry_st sign_algorithms[] = {
 	 .oid = PK_PKIX1_RSA_PSS_OID,
 	 .id = GNUTLS_SIGN_RSA_PSS_SHA256,
 	 .pk = GNUTLS_PK_RSA_PSS,
-	 .priv_pk = GNUTLS_PK_RSA, /* PKCS#11 doesn't separate RSA from RSA-PSS privkeys */
+	 .priv_pk = GNUTLS_PK_RSA,	/* PKCS#11 doesn't separate RSA from RSA-PSS privkeys */
 	 .hash = GNUTLS_DIG_SHA256,
 	 .flags = GNUTLS_SIGN_FLAG_TLS13_OK,
 	 .aid = {{8, 9}, SIG_SEM_DEFAULT}},
@@ -115,10 +114,10 @@ gnutls_sign_entry_st sign_algorithms[] = {
 	 .flags = GNUTLS_SIGN_FLAG_TLS13_OK,
 	 .aid = {{8, 6}, SIG_SEM_DEFAULT}},
 
-	 /* Ed25519: The hash algorithm here is set to be SHA512, although that is
-	  * an internal detail of Ed25519; we set it, because CMS/PKCS#7 requires
-	  * that mapping. */
-	 {.name = "EdDSA-Ed25519",
+	/* Ed25519: The hash algorithm here is set to be SHA512, although that is
+	 * an internal detail of Ed25519; we set it, because CMS/PKCS#7 requires
+	 * that mapping. */
+	{.name = "EdDSA-Ed25519",
 	 .oid = SIG_EDDSA_SHA512_OID,
 	 .id = GNUTLS_SIGN_EDDSA_ED25519,
 	 .pk = GNUTLS_PK_EDDSA_ED25519,
@@ -126,10 +125,10 @@ gnutls_sign_entry_st sign_algorithms[] = {
 	 .flags = GNUTLS_SIGN_FLAG_TLS13_OK,
 	 .aid = {{8, 7}, SIG_SEM_DEFAULT}},
 
-	 /* Ed448: The hash algorithm here is set to be SHAKE256, although that is
-	  * an internal detail of Ed448; we set it, because CMS/PKCS#7 requires
-	  * that mapping. */
-	 {.name = "EdDSA-Ed448",
+	/* Ed448: The hash algorithm here is set to be SHAKE256, although that is
+	 * an internal detail of Ed448; we set it, because CMS/PKCS#7 requires
+	 * that mapping. */
+	{.name = "EdDSA-Ed448",
 	 .oid = SIG_ED448_OID,
 	 .id = GNUTLS_SIGN_EDDSA_ED448,
 	 .pk = GNUTLS_PK_EDDSA_ED448,
@@ -138,16 +137,16 @@ gnutls_sign_entry_st sign_algorithms[] = {
 	 .aid = {{8, 8}, SIG_SEM_DEFAULT},
 	 .hash_output_size = 114},
 
-	 /* ECDSA */
-	 /* The following three signature algorithms
-	  * have different semantics when used under TLS 1.2
-	  * or TLS 1.3. Under the former they behave as the
-	  * as ECDSA signed by SHAXXX by any curve, but under the
-	  * latter they are restricted to a single curve.
-	  * For this reason the ECDSA-SHAXXX algorithms act
-	  * as an alias to them. */
-	 /* we have intentionally the ECDSA-SHAXXX algorithms first
-	  * so that gnutls_pk_to_sign() will return these. */
+	/* ECDSA */
+	/* The following three signature algorithms
+	 * have different semantics when used under TLS 1.2
+	 * or TLS 1.3. Under the former they behave as the
+	 * as ECDSA signed by SHAXXX by any curve, but under the
+	 * latter they are restricted to a single curve.
+	 * For this reason the ECDSA-SHAXXX algorithms act
+	 * as an alias to them. */
+	/* we have intentionally the ECDSA-SHAXXX algorithms first
+	 * so that gnutls_pk_to_sign() will return these. */
 	{.name = "ECDSA-SHA256",
 	 .oid = "1.2.840.10045.4.3.2",
 	 .id = GNUTLS_SIGN_ECDSA_SHA256,
@@ -189,7 +188,7 @@ gnutls_sign_entry_st sign_algorithms[] = {
 	 .flags = GNUTLS_SIGN_FLAG_TLS13_OK,
 	 .aid = {{6, 3}, SIG_SEM_TLS13}},
 
-	 /* ECDSA-SHA3 */
+	/* ECDSA-SHA3 */
 	{.name = "ECDSA-SHA3-224",
 	 .oid = SIG_ECDSA_SHA3_224_OID,
 	 .id = GNUTLS_SIGN_ECDSA_SHA3_224,
@@ -239,7 +238,7 @@ gnutls_sign_entry_st sign_algorithms[] = {
 	 .hash = GNUTLS_DIG_SHA3_512,
 	 .aid = TLS_SIGN_AID_UNKNOWN},
 
-	 /* DSA-SHA3 */
+	/* DSA-SHA3 */
 	{.name = "DSA-SHA3-224",
 	 .oid = SIG_DSA_SHA3_224_OID,
 	 .id = GNUTLS_SIGN_DSA_SHA3_224,
@@ -265,14 +264,13 @@ gnutls_sign_entry_st sign_algorithms[] = {
 	 .hash = GNUTLS_DIG_SHA3_512,
 	 .aid = TLS_SIGN_AID_UNKNOWN},
 
-	 /* legacy */
+	/* legacy */
 	{.name = "RSA-RAW",
 	 .oid = NULL,
 	 .id = GNUTLS_SIGN_RSA_RAW,
 	 .pk = GNUTLS_PK_RSA,
 	 .hash = GNUTLS_DIG_UNKNOWN,
-	 .aid = TLS_SIGN_AID_UNKNOWN
-	},
+	 .aid = TLS_SIGN_AID_UNKNOWN},
 	{.name = "RSA-SHA1",
 	 .oid = SIG_RSA_SHA1_OID,
 	 .id = GNUTLS_SIGN_RSA_SHA1,
@@ -452,25 +450,29 @@ unsigned gnutls_sign_is_secure(gnutls_sign_algorithm_t algorithm)
 	return gnutls_sign_is_secure2(algorithm, 0);
 }
 
-bool _gnutls_sign_is_secure2(const gnutls_sign_entry_st *se, unsigned int flags)
+bool _gnutls_sign_is_secure2(const gnutls_sign_entry_st * se,
+			     unsigned int flags)
 {
 	if (se->hash != GNUTLS_DIG_UNKNOWN &&
 	    _gnutls_digest_is_insecure2(se->hash,
-					flags & GNUTLS_SIGN_FLAG_ALLOW_INSECURE_REVERTIBLE ?
-					GNUTLS_MAC_FLAG_ALLOW_INSECURE_REVERTIBLE :
-					0)) {
+					flags &
+					GNUTLS_SIGN_FLAG_ALLOW_INSECURE_REVERTIBLE
+					?
+					GNUTLS_MAC_FLAG_ALLOW_INSECURE_REVERTIBLE
+					: 0)) {
 		return gnutls_assert_val(false);
 	}
 
 	return (flags & GNUTLS_SIGN_FLAG_SECURE_FOR_CERTS ?
 		se->slevel == _SECURE :
 		(se->slevel == _SECURE || se->slevel == _INSECURE_FOR_CERTS)) ||
-		(flags & GNUTLS_SIGN_FLAG_ALLOW_INSECURE_REVERTIBLE &&
-		 se->flags & GNUTLS_SIGN_FLAG_INSECURE_REVERTIBLE);
+	    (flags & GNUTLS_SIGN_FLAG_ALLOW_INSECURE_REVERTIBLE &&
+	     se->flags & GNUTLS_SIGN_FLAG_INSECURE_REVERTIBLE);
 }
 
 /* This is only called by cfg_apply in priority.c, in blocklisting mode. */
-int _gnutls_sign_mark_insecure(gnutls_sign_algorithm_t sign, hash_security_level_t level)
+int _gnutls_sign_mark_insecure(gnutls_sign_algorithm_t sign,
+			       hash_security_level_t level)
 {
 #ifndef DISABLE_SYSTEM_CONFIG
 	gnutls_sign_entry_st *p;
@@ -478,7 +480,7 @@ int _gnutls_sign_mark_insecure(gnutls_sign_algorithm_t sign, hash_security_level
 	if (unlikely(level == _SECURE))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	for(p = sign_algorithms; p->name != NULL; p++) {
+	for (p = sign_algorithms; p->name != NULL; p++) {
 		if (p->id && p->id == sign) {
 			if (p->slevel < level)
 				p->slevel = level;
@@ -495,7 +497,7 @@ void _gnutls_sign_mark_insecure_all(hash_security_level_t level)
 #ifndef DISABLE_SYSTEM_CONFIG
 	gnutls_sign_entry_st *p;
 
-	for(p = sign_algorithms; p->name != NULL; p++) {
+	for (p = sign_algorithms; p->name != NULL; p++) {
 		if (p->slevel < level)
 			p->slevel = level;
 		p->flags |= GNUTLS_SIGN_FLAG_INSECURE_REVERTIBLE;
@@ -510,10 +512,11 @@ _gnutls_sign_set_secure(gnutls_sign_algorithm_t sign,
 #ifndef DISABLE_SYSTEM_CONFIG
 	gnutls_sign_entry_st *p;
 
-	for(p = sign_algorithms; p->name != NULL; p++) {
+	for (p = sign_algorithms; p->name != NULL; p++) {
 		if (p->id && p->id == sign) {
 			if (!(p->flags & GNUTLS_SIGN_FLAG_INSECURE_REVERTIBLE)) {
-				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+				return
+				    gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 			}
 			p->slevel = slevel;
 			return 0;
@@ -530,7 +533,8 @@ _gnutls_sign_set_secure(gnutls_sign_algorithm_t sign,
  *
  * Returns: Non-zero if the provided signature algorithm is considered to be secure.
  **/
-unsigned gnutls_sign_is_secure2(gnutls_sign_algorithm_t algorithm, unsigned int flags)
+unsigned gnutls_sign_is_secure2(gnutls_sign_algorithm_t algorithm,
+				unsigned int flags)
 {
 	const gnutls_sign_entry_st *se;
 
@@ -553,20 +557,19 @@ unsigned gnutls_sign_is_secure2(gnutls_sign_algorithm_t algorithm, unsigned int 
  **/
 const gnutls_sign_algorithm_t *gnutls_sign_list(void)
 {
-	static gnutls_sign_algorithm_t supported_sign[MAX_ALGOS+1] = { 0 };
+	static gnutls_sign_algorithm_t supported_sign[MAX_ALGOS + 1] = { 0 };
 
 	if (supported_sign[0] == 0) {
 		int i = 0;
 
 		GNUTLS_SIGN_LOOP(
-			/* list all algorithms, but not duplicates */
-			if (supported_sign[i] != p->id &&
-			    _gnutls_pk_sign_exists(p->id)) {
-				assert(i+1 < MAX_ALGOS);
-				supported_sign[i++] = p->id;
-				supported_sign[i+1] = 0;
-			}
-		);
+					/* list all algorithms, but not duplicates */
+					if (supported_sign[i] != p->id &&
+					    _gnutls_pk_sign_exists(p->id)) {
+					assert(i + 1 < MAX_ALGOS);
+					supported_sign[i++] = p->id;
+					supported_sign[i + 1] = 0;}
+		) ;
 	}
 
 	return supported_sign;
@@ -585,12 +588,9 @@ gnutls_sign_algorithm_t gnutls_sign_get_id(const char *name)
 {
 	gnutls_sign_algorithm_t ret = GNUTLS_SIGN_UNKNOWN;
 
-	GNUTLS_SIGN_LOOP(
-		if (c_strcasecmp(p->name, name) == 0) {
-			ret = p->id;
-			break;
-		}
-	);
+	GNUTLS_SIGN_LOOP(if (c_strcasecmp(p->name, name) == 0) {
+			 ret = p->id; break;}
+	) ;
 
 	return ret;
 
@@ -598,11 +598,9 @@ gnutls_sign_algorithm_t gnutls_sign_get_id(const char *name)
 
 const gnutls_sign_entry_st *_gnutls_oid_to_sign_entry(const char *oid)
 {
-	GNUTLS_SIGN_LOOP(
-		if (p->oid && strcmp(oid, p->oid) == 0) {
-			return p;
-		}
-	);
+	GNUTLS_SIGN_LOOP(if (p->oid && strcmp(oid, p->oid) == 0) {
+			 return p;}
+	) ;
 	return NULL;
 }
 
@@ -629,13 +627,13 @@ gnutls_sign_algorithm_t gnutls_oid_to_sign(const char *oid)
 	return se->id;
 }
 
-const gnutls_sign_entry_st *_gnutls_pk_to_sign_entry(gnutls_pk_algorithm_t pk, gnutls_digest_algorithm_t hash)
+const gnutls_sign_entry_st *_gnutls_pk_to_sign_entry(gnutls_pk_algorithm_t pk,
+						     gnutls_digest_algorithm_t
+						     hash)
 {
-	GNUTLS_SIGN_LOOP(
-		if (pk == p->pk && hash == p->hash) {
-			return p;
-		}
-	);
+	GNUTLS_SIGN_LOOP(if (pk == p->pk && hash == p->hash) {
+			 return p;}
+	) ;
 
 	return NULL;
 }
@@ -715,8 +713,7 @@ gnutls_sign_get_hash_algorithm(gnutls_sign_algorithm_t sign)
  *
  * Returns: return a #gnutls_pk_algorithm_t value, or %GNUTLS_PK_UNKNOWN on error.
  **/
-gnutls_pk_algorithm_t
-gnutls_sign_get_pk_algorithm(gnutls_sign_algorithm_t sign)
+gnutls_pk_algorithm_t gnutls_sign_get_pk_algorithm(gnutls_sign_algorithm_t sign)
 {
 	gnutls_pk_algorithm_t ret = GNUTLS_PK_UNKNOWN;
 
@@ -739,12 +736,13 @@ gnutls_sign_get_pk_algorithm(gnutls_sign_algorithm_t sign)
  * Returns: return non-zero when the provided algorithms are compatible.
  **/
 unsigned
-gnutls_sign_supports_pk_algorithm(gnutls_sign_algorithm_t sign, gnutls_pk_algorithm_t pk)
+gnutls_sign_supports_pk_algorithm(gnutls_sign_algorithm_t sign,
+				  gnutls_pk_algorithm_t pk)
 {
 	const gnutls_sign_entry_st *p;
 	unsigned r;
 
-	for(p = sign_algorithms; p->name != NULL; p++) {
+	for (p = sign_algorithms; p->name != NULL; p++) {
 		if (p->id && p->id == sign) {
 			r = sign_supports_priv_pk_algorithm(p, pk);
 			if (r != 0)
@@ -756,30 +754,26 @@ gnutls_sign_supports_pk_algorithm(gnutls_sign_algorithm_t sign, gnutls_pk_algori
 }
 
 gnutls_sign_algorithm_t
-_gnutls_tls_aid_to_sign(uint8_t id0, uint8_t id1, const version_entry_st *ver)
+_gnutls_tls_aid_to_sign(uint8_t id0, uint8_t id1, const version_entry_st * ver)
 {
 	gnutls_sign_algorithm_t ret = GNUTLS_SIGN_UNKNOWN;
 
 	if (id0 == 255 && id1 == 255)
 		return ret;
 
-	GNUTLS_SIGN_LOOP(
-		if (p->aid.id[0] == id0 &&
-		     p->aid.id[1] == id1 &&
-		     ((p->aid.tls_sem & ver->tls_sig_sem) != 0)) {
+	GNUTLS_SIGN_LOOP(if (p->aid.id[0] == id0 &&
+			     p->aid.id[1] == id1 &&
+			     ((p->aid.tls_sem & ver->tls_sig_sem) != 0)) {
 
-			ret = p->id;
-			break;
-		}
-	);
+			 ret = p->id; break;}
+	) ;
 
 	return ret;
 }
 
 /* Returns NULL if a valid AID is not found
  */
-const sign_algorithm_st *_gnutls_sign_to_tls_aid(gnutls_sign_algorithm_t
-						 sign)
+const sign_algorithm_st *_gnutls_sign_to_tls_aid(gnutls_sign_algorithm_t sign)
 {
 	const sign_algorithm_st *ret = NULL;
 
@@ -800,39 +794,37 @@ const gnutls_sign_entry_st *_gnutls_sign_to_entry(gnutls_sign_algorithm_t sign)
 	return ret;
 }
 
-const gnutls_sign_entry_st *
-_gnutls_tls_aid_to_sign_entry(uint8_t id0, uint8_t id1, const version_entry_st *ver)
+const gnutls_sign_entry_st *_gnutls_tls_aid_to_sign_entry(uint8_t id0,
+							  uint8_t id1,
+							  const version_entry_st
+							  * ver)
 {
 	if (id0 == 255 && id1 == 255)
 		return NULL;
 
-	GNUTLS_SIGN_LOOP(
-		if (p->aid.id[0] == id0 &&
-		     p->aid.id[1] == id1 &&
-		     ((p->aid.tls_sem & ver->tls_sig_sem) != 0)) {
+	GNUTLS_SIGN_LOOP(if (p->aid.id[0] == id0 &&
+			     p->aid.id[1] == id1 &&
+			     ((p->aid.tls_sem & ver->tls_sig_sem) != 0)) {
 
-			return p;
-		}
-	);
+			 return p;}
+	) ;
 
 	return NULL;
 }
 
-const gnutls_sign_entry_st *
-_gnutls13_sign_get_compatible_with_privkey(gnutls_privkey_t privkey)
+const gnutls_sign_entry_st
+    * _gnutls13_sign_get_compatible_with_privkey(gnutls_privkey_t privkey)
 {
-	GNUTLS_SIGN_LOOP(
-		if ((p->flags & GNUTLS_SIGN_FLAG_TLS13_OK) &&
-		    _gnutls_privkey_compatible_with_sig(privkey, p->id)) {
-			return p;
-		}
-	);
+	GNUTLS_SIGN_LOOP(if ((p->flags & GNUTLS_SIGN_FLAG_TLS13_OK) &&
+			     _gnutls_privkey_compatible_with_sig(privkey,
+								 p->id)) {
+			 return p;}
+	) ;
 
 	return NULL;
 }
 
-unsigned
-_gnutls_sign_get_hash_strength(gnutls_sign_algorithm_t sign)
+unsigned _gnutls_sign_get_hash_strength(gnutls_sign_algorithm_t sign)
 {
 	const gnutls_sign_entry_st *se = _gnutls_sign_to_entry(sign);
 	const mac_entry_st *me;
@@ -851,9 +843,9 @@ _gnutls_sign_get_hash_strength(gnutls_sign_algorithm_t sign)
 		hash_output_size = _gnutls_mac_get_algo_len(me);
 
 	if (me->id == GNUTLS_MAC_SHAKE_128)
-		return MIN(hash_output_size*8/2, 128);
+		return MIN(hash_output_size * 8 / 2, 128);
 	else if (me->id == GNUTLS_MAC_SHAKE_256)
-		return MIN(hash_output_size*8/2, 256);
+		return MIN(hash_output_size * 8 / 2, 256);
 
-	return hash_output_size*8/2;
+	return hash_output_size * 8 / 2;
 }

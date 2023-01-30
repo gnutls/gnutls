@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -56,8 +56,7 @@ error_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 	return -1;
 }
 
-static ssize_t
-error_pull(gnutls_transport_ptr_t tr, void *data, size_t len)
+static ssize_t error_pull(gnutls_transport_ptr_t tr, void *data, size_t len)
 {
 	fail("pull_func called unexpectedly");
 	return -1;
@@ -119,7 +118,8 @@ static void run(const char *name, const char *prio)
 	gnutls_init(&client, GNUTLS_CLIENT);
 	assert(gnutls_priority_set_direct(client, prio, NULL) >= 0);
 
-	assert(gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE, ccred) >= 0);
+	assert(gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE, ccred) >=
+	       0);
 
 	gnutls_transport_set_push_function(client, error_push);
 	gnutls_transport_set_pull_function(client, error_pull);

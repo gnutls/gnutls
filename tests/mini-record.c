@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -36,19 +36,19 @@ int main(void)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/dtls.h>
-#include <signal.h>
+# include <string.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/dtls.h>
+# include <signal.h>
 
-#include "utils.h"
-#include "cert-common.h"
+# include "utils.h"
+# include "cert-common.h"
 
 static void terminate(void);
 
@@ -66,37 +66,35 @@ static void client_log_func(int level, const char *str)
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
 
-#define MAX_BUF 1024
+# define MAX_BUF 1024
 
 static int to_send = -1;
 static int mtu = 0;
 
-static ssize_t
-push(gnutls_transport_ptr_t tr, const void *data, size_t len)
+static ssize_t push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 {
-	int fd = (long int) tr;
+	int fd = (long int)tr;
 
 	return send(fd, data, len, 0);
 }
 
-#define RECORD_HEADER_SIZE (5+8)
+# define RECORD_HEADER_SIZE (5+8)
 
 static ssize_t
 push_crippled(gnutls_transport_ptr_t tr, const void *data, size_t len)
 {
-	int fd = (long int) tr;
+	int fd = (long int)tr;
 	int _len, ret;
-	uint8_t *_data = (void *) data;
+	uint8_t *_data = (void *)data;
 
 	if (to_send == -1)
 		return send(fd, data, len, 0);
 	else {
-#if 0
-		_len =
-		    ((uint8_t *) data)[11] << 8 | ((uint8_t *) data)[12];
-		fprintf(stderr, "mtu: %d, len: %d", mtu, (int) _len);
-		fprintf(stderr, " send: %d\n", (int) to_send);
-#endif
+# if 0
+		_len = ((uint8_t *) data)[11] << 8 | ((uint8_t *) data)[12];
+		fprintf(stderr, "mtu: %d, len: %d", mtu, (int)_len);
+		fprintf(stderr, " send: %d\n", (int)to_send);
+# endif
 
 		_len = to_send;
 		_data[11] = _len >> 8;
@@ -139,7 +137,8 @@ static void client(int fd, const char *prio)
 	/* Use default priorities */
 	ret = gnutls_priority_set_direct(session, prio, NULL);
 	if (ret < 0) {
-		fail("error in priority '%s': %s\n", prio, gnutls_strerror(ret));
+		fail("error in priority '%s': %s\n", prio,
+		     gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -178,14 +177,12 @@ static void client(int fd, const char *prio)
 	do {
 		do {
 			ret = gnutls_record_recv(session, buffer, MAX_BUF);
-		} while (ret == GNUTLS_E_AGAIN
-			 || ret == GNUTLS_E_INTERRUPTED);
+		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 	} while (ret > 0);
 
 	if (ret == 0 || ret == GNUTLS_E_TIMEDOUT) {
 		if (debug)
-			success
-			    ("client: Peer has closed the TLS connection\n");
+			success("client: Peer has closed the TLS connection\n");
 		goto end;
 	} else if (ret < 0) {
 		if (ret != 0) {
@@ -196,7 +193,7 @@ static void client(int fd, const char *prio)
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
-      end:
+ end:
 
 	close(fd);
 
@@ -207,7 +204,6 @@ static void client(int fd, const char *prio)
 
 	gnutls_global_deinit();
 }
-
 
 /* These are global */
 pid_t child;
@@ -239,8 +235,7 @@ static void server(int fd, const char *prio)
 
 	gnutls_certificate_allocate_credentials(&x509_cred);
 	gnutls_certificate_set_x509_key_mem(x509_cred, &server_cert,
-					    &server_key,
-					    GNUTLS_X509_FMT_PEM);
+					    &server_key, GNUTLS_X509_FMT_PEM);
 
 	gnutls_anon_allocate_server_credentials(&anoncred);
 
@@ -252,7 +247,8 @@ static void server(int fd, const char *prio)
 	 */
 	ret = gnutls_priority_set_direct(session, prio, NULL);
 	if (ret < 0) {
-		fail("error in priority '%s': %s\n", prio, gnutls_strerror(ret));
+		fail("error in priority '%s': %s\n", prio,
+		     gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -283,13 +279,11 @@ static void server(int fd, const char *prio)
 	mtu = gnutls_dtls_get_mtu(session);
 
 	do {
-		usleep(10000); /* some systems like FreeBSD have their buffers full during this send */
+		usleep(10000);	/* some systems like FreeBSD have their buffers full during this send */
 		do {
 			ret =
-			    gnutls_record_send(session, buffer,
-						sizeof(buffer));
-		} while (ret == GNUTLS_E_AGAIN
-			 || ret == GNUTLS_E_INTERRUPTED);
+			    gnutls_record_send(session, buffer, sizeof(buffer));
+		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 		if (ret < 0) {
 			fail("Error sending %d byte packet: %s\n", to_send,
@@ -350,12 +344,12 @@ static void start(const char *name, const char *prio)
 	}
 }
 
-#define AES_CBC "NONE:+VERS-DTLS1.0:-CIPHER-ALL:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
-#define AES_CBC_SHA256 "NONE:+VERS-DTLS1.2:-CIPHER-ALL:+RSA:+AES-128-CBC:+AES-256-CBC:+SHA256:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
-#define AES_GCM "NONE:+VERS-DTLS1.2:-CIPHER-ALL:+RSA:+AES-128-GCM:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
-#define AES_CCM "NONE:+VERS-DTLS1.2:-CIPHER-ALL:+RSA:+AES-128-CCM:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
-#define AES_CCM_8 "NONE:+VERS-DTLS1.2:-CIPHER-ALL:+RSA:+AES-128-CCM-8:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
-#define CHACHA_POLY1305 "NONE:+VERS-DTLS1.2:-CIPHER-ALL:+RSA:+CHACHA20-POLY1305:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ECDHE-RSA:+CURVE-ALL"
+# define AES_CBC "NONE:+VERS-DTLS1.0:-CIPHER-ALL:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
+# define AES_CBC_SHA256 "NONE:+VERS-DTLS1.2:-CIPHER-ALL:+RSA:+AES-128-CBC:+AES-256-CBC:+SHA256:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
+# define AES_GCM "NONE:+VERS-DTLS1.2:-CIPHER-ALL:+RSA:+AES-128-GCM:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
+# define AES_CCM "NONE:+VERS-DTLS1.2:-CIPHER-ALL:+RSA:+AES-128-CCM:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
+# define AES_CCM_8 "NONE:+VERS-DTLS1.2:-CIPHER-ALL:+RSA:+AES-128-CCM-8:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
+# define CHACHA_POLY1305 "NONE:+VERS-DTLS1.2:-CIPHER-ALL:+RSA:+CHACHA20-POLY1305:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ECDHE-RSA:+CURVE-ALL"
 
 static void ch_handler(int sig)
 {

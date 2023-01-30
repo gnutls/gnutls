@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -53,8 +53,8 @@ static void tls_log_func(int level, const char *str)
 }
 
 static
-int pin_func(void* userdata, int attempt, const char* url, const char *label,
-		unsigned flags, char *pin, size_t pin_max)
+int pin_func(void *userdata, int attempt, const char *url, const char *label,
+	     unsigned flags, char *pin, size_t pin_max)
 {
 	if (attempt == 0) {
 		strcpy(pin, PIN);
@@ -63,7 +63,7 @@ int pin_func(void* userdata, int attempt, const char* url, const char *label,
 	return -1;
 }
 
-static int comp_cert(gnutls_pcert_st *pcert, unsigned i)
+static int comp_cert(gnutls_pcert_st * pcert, unsigned i)
 {
 	int ret;
 	gnutls_datum_t data;
@@ -76,7 +76,7 @@ static int comp_cert(gnutls_pcert_st *pcert, unsigned i)
 	if (ret < 0)
 		return -1;
 
-	data.data = (void*)nc_good2[i];
+	data.data = (void *)nc_good2[i];
 	data.size = strlen(nc_good2[i]);
 	ret = gnutls_x509_crt_import(crt2, &data, GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
@@ -102,14 +102,17 @@ static void load_cert(const char *url, unsigned i)
 	if (ret < 0)
 		fail("error: %s\n", gnutls_strerror(ret));
 
-	data.data = (void*)nc_good2[i];
+	data.data = (void *)nc_good2[i];
 	data.size = strlen(nc_good2[i]);
 	ret = gnutls_x509_crt_import(crt, &data, GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		fail("error[%d]: %s\n", i, gnutls_strerror(ret));
 
 	snprintf(name, sizeof(name), "cert-%d", i);
-	ret = gnutls_pkcs11_copy_x509_crt(url, crt, name, GNUTLS_PKCS11_OBJ_FLAG_LOGIN|GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE);
+	ret =
+	    gnutls_pkcs11_copy_x509_crt(url, crt, name,
+					GNUTLS_PKCS11_OBJ_FLAG_LOGIN |
+					GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE);
 	if (ret < 0)
 		fail("error[%d]: %s\n", i, gnutls_strerror(ret));
 
@@ -169,13 +172,14 @@ void doit(void)
 		gnutls_global_set_log_level(4711);
 
 	set_softhsm_conf(CONFIG);
-	snprintf(buf, sizeof(buf), "%s --init-token --slot 0 --label test --so-pin "PIN" --pin "PIN, bin);
+	snprintf(buf, sizeof(buf),
+		 "%s --init-token --slot 0 --label test --so-pin " PIN " --pin "
+		 PIN, bin);
 	system(buf);
 
 	ret = gnutls_pkcs11_add_provider(lib, NULL);
 	if (ret < 0) {
-		fprintf(stderr, "add_provider: %s\n",
-			gnutls_strerror(ret));
+		fprintf(stderr, "add_provider: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -185,7 +189,9 @@ void doit(void)
 		fail("gnutls_pkcs11_token_init: %s\n", gnutls_strerror(ret));
 	}
 
-	ret = gnutls_pkcs11_token_set_pin(SOFTHSM_URL, NULL, PIN, GNUTLS_PIN_USER);
+	ret =
+	    gnutls_pkcs11_token_set_pin(SOFTHSM_URL, NULL, PIN,
+					GNUTLS_PIN_USER);
 	if (ret < 0) {
 		fail("gnutls_pkcs11_token_set_pin: %s\n", gnutls_strerror(ret));
 	}
@@ -195,22 +201,28 @@ void doit(void)
 
 	success("import from URI\n");
 	pcerts_size = 2;
-	ret = gnutls_pcert_list_import_x509_file(pcerts, &pcerts_size, SOFTHSM_URL";object=cert-0",
-						GNUTLS_X509_FMT_PEM, pin_func, NULL, 0);
+	ret =
+	    gnutls_pcert_list_import_x509_file(pcerts, &pcerts_size,
+					       SOFTHSM_URL ";object=cert-0",
+					       GNUTLS_X509_FMT_PEM, pin_func,
+					       NULL, 0);
 	assert(ret == GNUTLS_E_SHORT_MEMORY_BUFFER);
 
-	pcerts_size = sizeof(pcerts)/sizeof(pcerts[0]);
-	ret = gnutls_pcert_list_import_x509_file(pcerts, &pcerts_size, SOFTHSM_URL";object=cert-0",
-						GNUTLS_X509_FMT_PEM, pin_func, NULL, 0);
+	pcerts_size = sizeof(pcerts) / sizeof(pcerts[0]);
+	ret =
+	    gnutls_pcert_list_import_x509_file(pcerts, &pcerts_size,
+					       SOFTHSM_URL ";object=cert-0",
+					       GNUTLS_X509_FMT_PEM, pin_func,
+					       NULL, 0);
 	if (ret < 0)
 		fail("cannot load certs: %s\n", gnutls_strerror(ret));
 
 	assert(pcerts_size == 5);
 
-	for (i=0;i<pcerts_size;i++)
-		assert(comp_cert(&pcerts[i], i)>=0);
+	for (i = 0; i < pcerts_size; i++)
+		assert(comp_cert(&pcerts[i], i) >= 0);
 
-	for (i=0;i<pcerts_size;i++)
+	for (i = 0; i < pcerts_size; i++)
 		gnutls_pcert_deinit(&pcerts[i]);
 
 	/* Try testing importing from file
@@ -222,21 +234,23 @@ void doit(void)
 
 	pcerts_size = 2;
 	ret = gnutls_pcert_list_import_x509_file(pcerts, &pcerts_size, file,
-						GNUTLS_X509_FMT_PEM, pin_func, NULL, 0);
+						 GNUTLS_X509_FMT_PEM, pin_func,
+						 NULL, 0);
 	assert(ret == GNUTLS_E_SHORT_MEMORY_BUFFER);
 
-	pcerts_size = sizeof(pcerts)/sizeof(pcerts[0]);
+	pcerts_size = sizeof(pcerts) / sizeof(pcerts[0]);
 	ret = gnutls_pcert_list_import_x509_file(pcerts, &pcerts_size, file,
-						GNUTLS_X509_FMT_PEM, pin_func, NULL, 0);
+						 GNUTLS_X509_FMT_PEM, pin_func,
+						 NULL, 0);
 	if (ret < 0)
 		fail("cannot load certs: %s\n", gnutls_strerror(ret));
 
 	assert(pcerts_size == 5);
 
-	for (i=0;i<pcerts_size;i++)
-		assert(comp_cert(&pcerts[i], i)>=0);
+	for (i = 0; i < pcerts_size; i++)
+		assert(comp_cert(&pcerts[i], i) >= 0);
 
-	for (i=0;i<pcerts_size;i++)
+	for (i = 0; i < pcerts_size; i++)
 		gnutls_pcert_deinit(&pcerts[i]);
 
 	gnutls_global_deinit();
@@ -244,4 +258,3 @@ void doit(void)
 
 	remove(CONFIG);
 }
-

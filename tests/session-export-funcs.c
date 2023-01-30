@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -79,10 +79,9 @@ void start(const char *prio)
 					    GNUTLS_X509_FMT_PEM);
 
 	gnutls_init(&server, GNUTLS_SERVER);
-	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-				serverx509cred);
+	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, serverx509cred);
 
-	assert(gnutls_priority_set_direct(server, prio, NULL)>=0);
+	assert(gnutls_priority_set_direct(server, prio, NULL) >= 0);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_pull_timeout_function(server,
@@ -95,7 +94,9 @@ void start(const char *prio)
 	if (ret < 0)
 		exit(1);
 
-	ret = gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca2_cert, GNUTLS_X509_FMT_PEM);
+	ret =
+	    gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca2_cert,
+						  GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);
 
@@ -104,7 +105,7 @@ void start(const char *prio)
 		exit(1);
 
 	ret = gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-				clientx509cred);
+				     clientx509cred);
 	if (ret < 0)
 		exit(1);
 
@@ -118,11 +119,11 @@ void start(const char *prio)
 						   client_pull_timeout_func);
 	gnutls_transport_set_ptr(client, client);
 
-	v1.data = (void*)client_random;
+	v1.data = (void *)client_random;
 	v1.size = sizeof(client_random);
 	gnutls_handshake_set_random(client, &v1);
 
-	v1.data = (void*)server_random;
+	v1.data = (void *)server_random;
 	v1.size = sizeof(server_random);
 	gnutls_handshake_set_random(server, &v1);
 
@@ -167,11 +168,12 @@ void start(const char *prio)
 			fail("error in client's master secret\n");
 		}
 
-		if (v1.size != v2.size || memcmp(v1.data, v2.data, v1.size) != 0) {
+		if (v1.size != v2.size
+		    || memcmp(v1.data, v2.data, v1.size) != 0) {
 			fail("master secret don't match!\n");
 		}
 	}
-	
+
 	gnutls_bye(client, GNUTLS_SHUT_RDWR);
 	gnutls_bye(server, GNUTLS_SHUT_RDWR);
 

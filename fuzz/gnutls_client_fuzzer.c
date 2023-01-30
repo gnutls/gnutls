@@ -45,8 +45,11 @@ int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 	res = gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 	assert(res >= 0);
 
-	/*res = gnutls_set_default_priority(session);*/
-	res = gnutls_priority_set_direct(session, "NORMAL:+SIGN-EDDSA-ED448:"VERS_STR, NULL);
+	/*res = gnutls_set_default_priority(session); */
+	res =
+	    gnutls_priority_set_direct(session,
+				       "NORMAL:+SIGN-EDDSA-ED448:" VERS_STR,
+				       NULL);
 	assert(res >= 0);
 
 	memdata.data = data;

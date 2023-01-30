@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 /* This program tests the various certificate key exchange methods supported
@@ -49,11 +49,11 @@ static void tls_log_func(int level, const char *str)
 #define MSG "hello there ppl"
 
 void try_with_key_fail(const char *name, const char *client_prio,
-			int server_err, int client_err,
-			const gnutls_datum_t *serv_cert,
-			const gnutls_datum_t *serv_key,
-			const gnutls_datum_t *cli_cert,
-			const gnutls_datum_t *cli_key)
+		       int server_err, int client_err,
+		       const gnutls_datum_t * serv_cert,
+		       const gnutls_datum_t * serv_key,
+		       const gnutls_datum_t * cli_cert,
+		       const gnutls_datum_t * cli_key)
 {
 	int ret;
 	/* Server stuff. */
@@ -73,7 +73,7 @@ void try_with_key_fail(const char *name, const char *client_prio,
 
 	reset_buffers();
 	/* Init server */
-	assert(gnutls_certificate_allocate_credentials(&serverx509cred)>=0);
+	assert(gnutls_certificate_allocate_credentials(&serverx509cred) >= 0);
 
 	ret = gnutls_certificate_set_x509_key_mem(serverx509cred,
 						  serv_cert, serv_key,
@@ -81,14 +81,16 @@ void try_with_key_fail(const char *name, const char *client_prio,
 	if (ret < 0)
 		fail("Could not set key/cert: %s\n", gnutls_strerror(ret));
 
-	assert(gnutls_init(&server, GNUTLS_SERVER)>=0);
+	assert(gnutls_init(&server, GNUTLS_SERVER) >= 0);
 	if (server_priority)
-		assert(gnutls_priority_set_direct(server, server_priority, NULL) >= 0);
+		assert(gnutls_priority_set_direct(server, server_priority, NULL)
+		       >= 0);
 	else
-		assert(gnutls_priority_set_direct(server, client_prio, NULL) >= 0);
+		assert(gnutls_priority_set_direct(server, client_prio, NULL) >=
+		       0);
 
 	assert(gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-				      serverx509cred)>=0);
+				      serverx509cred) >= 0);
 
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
@@ -103,7 +105,8 @@ void try_with_key_fail(const char *name, const char *client_prio,
 		gnutls_certificate_set_x509_key_mem(clientx509cred,
 						    cli_cert, cli_key,
 						    GNUTLS_X509_FMT_PEM);
-		gnutls_certificate_server_set_request(server, GNUTLS_CERT_REQUIRE);
+		gnutls_certificate_server_set_request(server,
+						      GNUTLS_CERT_REQUIRE);
 	}
 
 	ret = gnutls_init(&client, GNUTLS_CLIENT);
@@ -122,7 +125,7 @@ void try_with_key_fail(const char *name, const char *client_prio,
 	}
 
 	ret = gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-				clientx509cred);
+				     clientx509cred);
 	if (ret < 0)
 		exit(1);
 
@@ -138,12 +141,11 @@ void try_with_key_fail(const char *name, const char *client_prio,
 
 void try_with_rawpk_key_fail(const char *name, const char *client_prio,
 			     int server_err, int client_err,
-			     const gnutls_datum_t *serv_cert,
-			     const gnutls_datum_t *serv_key,
+			     const gnutls_datum_t * serv_cert,
+			     const gnutls_datum_t * serv_key,
 			     unsigned server_ku,
-			     const gnutls_datum_t *cli_cert,
-			     const gnutls_datum_t *cli_key,
-			     unsigned client_ku)
+			     const gnutls_datum_t * cli_cert,
+			     const gnutls_datum_t * cli_key, unsigned client_ku)
 {
 	int ret;
 	/* Server stuff. */
@@ -166,19 +168,21 @@ void try_with_rawpk_key_fail(const char *name, const char *client_prio,
 	gnutls_certificate_allocate_credentials(&server_cred);
 
 	ret = gnutls_certificate_set_rawpk_key_mem(server_cred,
-						   serv_cert, serv_key, GNUTLS_X509_FMT_PEM, NULL, server_ku,
-						   NULL, 0, 0);
+						   serv_cert, serv_key,
+						   GNUTLS_X509_FMT_PEM, NULL,
+						   server_ku, NULL, 0, 0);
 	if (ret < 0)
 		fail("Could not set key/cert: %s\n", gnutls_strerror(ret));
 
 	assert(gnutls_init(&server, GNUTLS_SERVER | GNUTLS_ENABLE_RAWPK) >= 0);
 	if (server_priority)
-		assert(gnutls_priority_set_direct(server, server_priority, NULL) >= 0);
+		assert(gnutls_priority_set_direct(server, server_priority, NULL)
+		       >= 0);
 	else
-		assert(gnutls_priority_set_direct(server, client_prio, NULL) >= 0);
+		assert(gnutls_priority_set_direct(server, client_prio, NULL) >=
+		       0);
 
-	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-			       server_cred);
+	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, server_cred);
 
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
@@ -191,14 +195,18 @@ void try_with_rawpk_key_fail(const char *name, const char *client_prio,
 
 	if (cli_cert) {
 		ret = gnutls_certificate_set_rawpk_key_mem(client_cred,
-							   cli_cert, cli_key, GNUTLS_X509_FMT_PEM, NULL, client_ku,
+							   cli_cert, cli_key,
+							   GNUTLS_X509_FMT_PEM,
+							   NULL, client_ku,
 							   NULL, 0, 0);
 		if (ret < 0)
-			fail("Could not set key/cert: %s\n", gnutls_strerror(ret));
-		gnutls_certificate_server_set_request(server, GNUTLS_CERT_REQUIRE);
+			fail("Could not set key/cert: %s\n",
+			     gnutls_strerror(ret));
+		gnutls_certificate_server_set_request(server,
+						      GNUTLS_CERT_REQUIRE);
 	}
 
-	ret = gnutls_init(&client, GNUTLS_CLIENT|GNUTLS_ENABLE_RAWPK);
+	ret = gnutls_init(&client, GNUTLS_CLIENT | GNUTLS_ENABLE_RAWPK);
 	if (ret < 0)
 		exit(1);
 
@@ -214,7 +222,7 @@ void try_with_rawpk_key_fail(const char *name, const char *client_prio,
 	}
 
 	ret = gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-				client_cred);
+				     client_cred);
 	if (ret < 0)
 		exit(1);
 
@@ -228,17 +236,16 @@ void try_with_rawpk_key_fail(const char *name, const char *client_prio,
 	gnutls_certificate_free_credentials(client_cred);
 }
 
-void try_with_key_ks(const char *name, const char *client_prio, gnutls_kx_algorithm_t client_kx,
-		gnutls_sign_algorithm_t server_sign_algo,
-		gnutls_sign_algorithm_t client_sign_algo,
-		const gnutls_datum_t *serv_cert,
-		const gnutls_datum_t *serv_key,
-		const gnutls_datum_t *client_cert,
-		const gnutls_datum_t *client_key,
-		unsigned cert_flags,
-		unsigned exp_group,
-		gnutls_certificate_type_t server_ctype,
-		gnutls_certificate_type_t client_ctype)
+void try_with_key_ks(const char *name, const char *client_prio,
+		     gnutls_kx_algorithm_t client_kx,
+		     gnutls_sign_algorithm_t server_sign_algo,
+		     gnutls_sign_algorithm_t client_sign_algo,
+		     const gnutls_datum_t * serv_cert,
+		     const gnutls_datum_t * serv_key,
+		     const gnutls_datum_t * client_cert,
+		     const gnutls_datum_t * client_key, unsigned cert_flags,
+		     unsigned exp_group, gnutls_certificate_type_t server_ctype,
+		     gnutls_certificate_type_t client_ctype)
 {
 	int ret;
 	char buffer[256];
@@ -246,8 +253,7 @@ void try_with_key_ks(const char *name, const char *client_prio, gnutls_kx_algori
 	gnutls_certificate_credentials_t server_cred;
 	gnutls_anon_server_credentials_t s_anoncred;
 	gnutls_dh_params_t dh_params;
-	const gnutls_datum_t p3 =
-	    { (unsigned char *) pkcs3, strlen(pkcs3) };
+	const gnutls_datum_t p3 = { (unsigned char *)pkcs3, strlen(pkcs3) };
 	gnutls_session_t server;
 	int sret = GNUTLS_E_AGAIN;
 	/* Client stuff. */
@@ -264,23 +270,24 @@ void try_with_key_ks(const char *name, const char *client_prio, gnutls_kx_algori
 
 	reset_buffers();
 	/* Init server */
-	assert(gnutls_anon_allocate_server_credentials(&s_anoncred)>=0);
-	assert(gnutls_certificate_allocate_credentials(&server_cred)>=0);
+	assert(gnutls_anon_allocate_server_credentials(&s_anoncred) >= 0);
+	assert(gnutls_certificate_allocate_credentials(&server_cred) >= 0);
 
 	// Set server crt creds based on ctype
 	switch (server_ctype) {
-		case GNUTLS_CRT_X509:
-			ret = gnutls_certificate_set_x509_key_mem(server_cred,
-									serv_cert, serv_key,
-									GNUTLS_X509_FMT_PEM);
-			break;
-		case GNUTLS_CRT_RAWPK:
-			ret = gnutls_certificate_set_rawpk_key_mem(server_cred,
-									serv_cert, serv_key, GNUTLS_X509_FMT_PEM, NULL, 0,
-									NULL, 0, 0);
-			break;
-		default:
-			ret = GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
+	case GNUTLS_CRT_X509:
+		ret = gnutls_certificate_set_x509_key_mem(server_cred,
+							  serv_cert, serv_key,
+							  GNUTLS_X509_FMT_PEM);
+		break;
+	case GNUTLS_CRT_RAWPK:
+		ret = gnutls_certificate_set_rawpk_key_mem(server_cred,
+							   serv_cert, serv_key,
+							   GNUTLS_X509_FMT_PEM,
+							   NULL, 0, NULL, 0, 0);
+		break;
+	default:
+		ret = GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
 	}
 
 	if (ret < 0) {
@@ -292,17 +299,19 @@ void try_with_key_ks(const char *name, const char *client_prio, gnutls_kx_algori
 	gnutls_certificate_set_dh_params(server_cred, dh_params);
 	gnutls_anon_set_server_dh_params(s_anoncred, dh_params);
 
-	assert(gnutls_init(&server, GNUTLS_SERVER | GNUTLS_ENABLE_RAWPK)>=0);
+	assert(gnutls_init(&server, GNUTLS_SERVER | GNUTLS_ENABLE_RAWPK) >= 0);
 	assert(gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-				      server_cred)>=0);
-	assert(gnutls_credentials_set(server, GNUTLS_CRD_ANON, s_anoncred)>=0);
+				      server_cred) >= 0);
+	assert(gnutls_credentials_set(server, GNUTLS_CRD_ANON, s_anoncred) >=
+	       0);
 
 	if (server_priority)
-		assert(gnutls_priority_set_direct(server, server_priority, NULL) >= 0);
+		assert(gnutls_priority_set_direct(server, server_priority, NULL)
+		       >= 0);
 	else
 		assert(gnutls_priority_set_direct(server,
-				   "NORMAL:+VERS-SSL3.0:+ANON-ECDH:+ANON-DH:+ECDHE-RSA:+DHE-RSA:+RSA:+ECDHE-ECDSA:+CURVE-X25519:+SIGN-EDDSA-ED25519:+CTYPE-ALL",
-				   NULL)>=0);
+						  "NORMAL:+VERS-SSL3.0:+ANON-ECDH:+ANON-DH:+ECDHE-RSA:+DHE-RSA:+RSA:+ECDHE-ECDSA:+CURVE-X25519:+SIGN-EDDSA-ED25519:+CTYPE-ALL",
+						  NULL) >= 0);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
@@ -315,27 +324,34 @@ void try_with_key_ks(const char *name, const char *client_prio, gnutls_kx_algori
 	if (cert_flags == USE_CERT) {
 		// Set client crt creds based on ctype
 		switch (client_ctype) {
-			case GNUTLS_CRT_X509:
-				gnutls_certificate_set_x509_key_mem(client_cred,
-										client_cert, client_key,
-										GNUTLS_X509_FMT_PEM);
-				break;
-			case GNUTLS_CRT_RAWPK:
-				gnutls_certificate_set_rawpk_key_mem(client_cred,
-									client_cert, client_key, GNUTLS_X509_FMT_PEM, NULL, 0,
-									NULL, 0, 0);
-				break;
-			default:
-				fail("Illegal client certificate type given\n");
+		case GNUTLS_CRT_X509:
+			gnutls_certificate_set_x509_key_mem(client_cred,
+							    client_cert,
+							    client_key,
+							    GNUTLS_X509_FMT_PEM);
+			break;
+		case GNUTLS_CRT_RAWPK:
+			gnutls_certificate_set_rawpk_key_mem(client_cred,
+							     client_cert,
+							     client_key,
+							     GNUTLS_X509_FMT_PEM,
+							     NULL, 0, NULL, 0,
+							     0);
+			break;
+		default:
+			fail("Illegal client certificate type given\n");
 		}
 
-		gnutls_certificate_server_set_request(server, GNUTLS_CERT_REQUIRE);
+		gnutls_certificate_server_set_request(server,
+						      GNUTLS_CERT_REQUIRE);
 	} else if (cert_flags == ASK_CERT) {
-		gnutls_certificate_server_set_request(server, GNUTLS_CERT_REQUEST);
+		gnutls_certificate_server_set_request(server,
+						      GNUTLS_CERT_REQUEST);
 	}
-
 #if 0
-	ret = gnutls_certificate_set_x509_trust_mem(client_cred, &ca_cert, GNUTLS_X509_FMT_PEM);
+	ret =
+	    gnutls_certificate_set_x509_trust_mem(client_cred, &ca_cert,
+						  GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);
 #endif
@@ -343,11 +359,11 @@ void try_with_key_ks(const char *name, const char *client_prio, gnutls_kx_algori
 	if (ret < 0)
 		exit(1);
 
-
-	assert(gnutls_anon_allocate_client_credentials(&c_anoncred)>=0);
-	assert(gnutls_credentials_set(client, GNUTLS_CRD_ANON, c_anoncred)>=0);
-	ret = gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-				client_cred);
+	assert(gnutls_anon_allocate_client_credentials(&c_anoncred) >= 0);
+	assert(gnutls_credentials_set(client, GNUTLS_CRD_ANON, c_anoncred) >=
+	       0);
+	ret =
+	    gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE, client_cred);
 	if (ret < 0)
 		exit(1);
 
@@ -365,8 +381,7 @@ void try_with_key_ks(const char *name, const char *client_prio, gnutls_kx_algori
 	HANDSHAKE(client, server);
 
 	if (gnutls_kx_get(client) != client_kx) {
-		fail("%s: got unexpected key exchange algorithm: %s (expected %s)\n", name, gnutls_kx_get_name(gnutls_kx_get(client)),
-			gnutls_kx_get_name(client_kx));
+		fail("%s: got unexpected key exchange algorithm: %s (expected %s)\n", name, gnutls_kx_get_name(gnutls_kx_get(client)), gnutls_kx_get_name(client_kx));
 		exit(1);
 	}
 
@@ -401,12 +416,14 @@ void try_with_key_ks(const char *name, const char *client_prio, gnutls_kx_algori
 	if (exp_group != 0) {
 		ret = gnutls_group_get(server);
 		if (ret != (int)exp_group) {
-			fail("%s: got unexpected server group: %d/%s\n", name, ret, gnutls_group_get_name(ret));
+			fail("%s: got unexpected server group: %d/%s\n", name,
+			     ret, gnutls_group_get_name(ret));
 		}
 
 		ret = gnutls_group_get(client);
 		if (ret != (int)exp_group) {
-			fail("%s: got unexpected client group: %d/%s\n", name, ret, gnutls_group_get_name(ret));
+			fail("%s: got unexpected client group: %d/%s\n", name,
+			     ret, gnutls_group_get_name(ret));
 		}
 	}
 
@@ -422,7 +439,8 @@ void try_with_key_ks(const char *name, const char *client_prio, gnutls_kx_algori
 	}
 
 	if (ret != strlen(MSG) || memcmp(MSG, buffer, ret) != 0) {
-		fail("client: Error in data received. Expected %d, got %d\n", (int)strlen(MSG), ret);
+		fail("client: Error in data received. Expected %d, got %d\n",
+		     (int)strlen(MSG), ret);
 		exit(1);
 	}
 
@@ -439,15 +457,15 @@ void try_with_key_ks(const char *name, const char *client_prio, gnutls_kx_algori
 	gnutls_dh_params_deinit(dh_params);
 }
 
-void dtls_try_with_key_mtu(const char *name, const char *client_prio, gnutls_kx_algorithm_t client_kx,
-		gnutls_sign_algorithm_t server_sign_algo,
-		gnutls_sign_algorithm_t client_sign_algo,
-		const gnutls_datum_t *serv_cert,
-		const gnutls_datum_t *serv_key,
-		const gnutls_datum_t *client_cert,
-		const gnutls_datum_t *client_key,
-		unsigned cert_flags,
-		unsigned smtu)
+void dtls_try_with_key_mtu(const char *name, const char *client_prio,
+			   gnutls_kx_algorithm_t client_kx,
+			   gnutls_sign_algorithm_t server_sign_algo,
+			   gnutls_sign_algorithm_t client_sign_algo,
+			   const gnutls_datum_t * serv_cert,
+			   const gnutls_datum_t * serv_key,
+			   const gnutls_datum_t * client_cert,
+			   const gnutls_datum_t * client_key,
+			   unsigned cert_flags, unsigned smtu)
 {
 	int ret;
 	char buffer[256];
@@ -455,8 +473,7 @@ void dtls_try_with_key_mtu(const char *name, const char *client_prio, gnutls_kx_
 	gnutls_certificate_credentials_t serverx509cred;
 	gnutls_anon_server_credentials_t s_anoncred;
 	gnutls_dh_params_t dh_params;
-	const gnutls_datum_t p3 =
-	    { (unsigned char *) pkcs3, strlen(pkcs3) };
+	const gnutls_datum_t p3 = { (unsigned char *)pkcs3, strlen(pkcs3) };
 	gnutls_session_t server;
 	int sret = GNUTLS_E_AGAIN;
 	/* Client stuff. */
@@ -476,8 +493,8 @@ void dtls_try_with_key_mtu(const char *name, const char *client_prio, gnutls_kx_
 	gnutls_certificate_allocate_credentials(&serverx509cred);
 
 	ret = gnutls_certificate_set_x509_key_mem(serverx509cred,
-					    serv_cert, serv_key,
-					    GNUTLS_X509_FMT_PEM);
+						  serv_cert, serv_key,
+						  GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
 		fail("Could not set key/cert: %s\n", gnutls_strerror(ret));
 	}
@@ -487,20 +504,24 @@ void dtls_try_with_key_mtu(const char *name, const char *client_prio, gnutls_kx_
 	gnutls_certificate_set_dh_params(serverx509cred, dh_params);
 	gnutls_anon_set_server_dh_params(s_anoncred, dh_params);
 
-	assert(gnutls_init(&server, GNUTLS_SERVER|GNUTLS_DATAGRAM|GNUTLS_NONBLOCK)>=0);
-	assert(gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-				      serverx509cred)>=0);
-	assert(gnutls_credentials_set(server, GNUTLS_CRD_ANON, s_anoncred)>=0);
+	assert(gnutls_init
+	       (&server,
+		GNUTLS_SERVER | GNUTLS_DATAGRAM | GNUTLS_NONBLOCK) >= 0);
+	assert(gnutls_credentials_set
+	       (server, GNUTLS_CRD_CERTIFICATE, serverx509cred) >= 0);
+	assert(gnutls_credentials_set(server, GNUTLS_CRD_ANON, s_anoncred) >=
+	       0);
 
 	assert(gnutls_priority_set_direct(server,
 					  "NORMAL:+ANON-ECDH:+ANON-DH:+ECDHE-RSA:+DHE-RSA:+RSA:+ECDHE-ECDSA:+CURVE-X25519",
-					   NULL)>=0);
+					  NULL) >= 0);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
-	gnutls_transport_set_pull_timeout_function(server, server_pull_timeout_func);
+	gnutls_transport_set_pull_timeout_function(server,
+						   server_pull_timeout_func);
 	gnutls_transport_set_ptr(server, server);
 	if (smtu)
-		gnutls_dtls_set_mtu (server, smtu);
+		gnutls_dtls_set_mtu(server, smtu);
 
 	/* Init client */
 
@@ -510,40 +531,50 @@ void dtls_try_with_key_mtu(const char *name, const char *client_prio, gnutls_kx_
 
 	if (cert_flags == USE_CERT) {
 		ret = gnutls_certificate_set_x509_key_mem(clientx509cred,
-						    client_cert, client_key,
-						    GNUTLS_X509_FMT_PEM);
+							  client_cert,
+							  client_key,
+							  GNUTLS_X509_FMT_PEM);
 		if (ret < 0) {
-			fail("Could not set key/cert: %s\n", gnutls_strerror(ret));
+			fail("Could not set key/cert: %s\n",
+			     gnutls_strerror(ret));
 		}
-		gnutls_certificate_server_set_request(server, GNUTLS_CERT_REQUIRE);
+		gnutls_certificate_server_set_request(server,
+						      GNUTLS_CERT_REQUIRE);
 	} else if (cert_flags == ASK_CERT) {
-		gnutls_certificate_server_set_request(server, GNUTLS_CERT_REQUEST);
+		gnutls_certificate_server_set_request(server,
+						      GNUTLS_CERT_REQUEST);
 	}
-
 #if 0
-	ret = gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca_cert, GNUTLS_X509_FMT_PEM);
+	ret =
+	    gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca_cert,
+						  GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);
 #endif
 
-	ret = gnutls_init(&client, GNUTLS_CLIENT|GNUTLS_DATAGRAM|GNUTLS_NONBLOCK);
+	ret =
+	    gnutls_init(&client,
+			GNUTLS_CLIENT | GNUTLS_DATAGRAM | GNUTLS_NONBLOCK);
 	if (ret < 0)
 		exit(1);
 
-	assert(gnutls_anon_allocate_client_credentials(&c_anoncred)>=0);
-	assert(gnutls_credentials_set(client, GNUTLS_CRD_ANON, c_anoncred)>=0);
-	ret = gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-				clientx509cred);
+	assert(gnutls_anon_allocate_client_credentials(&c_anoncred) >= 0);
+	assert(gnutls_credentials_set(client, GNUTLS_CRD_ANON, c_anoncred) >=
+	       0);
+	ret =
+	    gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
+				   clientx509cred);
 	if (ret < 0)
 		exit(1);
 
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
-	gnutls_transport_set_pull_timeout_function(client, client_pull_timeout_func);
+	gnutls_transport_set_pull_timeout_function(client,
+						   client_pull_timeout_func);
 
 	gnutls_transport_set_ptr(client, client);
 	if (smtu)
-		gnutls_dtls_set_mtu (client, smtu);
+		gnutls_dtls_set_mtu(client, smtu);
 
 	ret = gnutls_priority_set_direct(client, client_prio, NULL);
 	if (ret < 0) {
@@ -553,11 +584,9 @@ void dtls_try_with_key_mtu(const char *name, const char *client_prio, gnutls_kx_
 	HANDSHAKE_DTLS(client, server);
 
 	if (gnutls_kx_get(client) != client_kx) {
-		fail("%s: got unexpected key exchange algorithm: %s (expected %s)\n", name, gnutls_kx_get_name(gnutls_kx_get(client)),
-			gnutls_kx_get_name(client_kx));
+		fail("%s: got unexpected key exchange algorithm: %s (expected %s)\n", name, gnutls_kx_get_name(gnutls_kx_get(client)), gnutls_kx_get_name(client_kx));
 		exit(1);
 	}
-
 
 	/* test signature algorithm match */
 	version = gnutls_protocol_get_version(client);
@@ -599,7 +628,8 @@ void dtls_try_with_key_mtu(const char *name, const char *client_prio, gnutls_kx_
 	}
 
 	if (ret != strlen(MSG) || memcmp(MSG, buffer, ret) != 0) {
-		fail("client: Error in data received. Expected %d, got %d\n", (int)strlen(MSG), ret);
+		fail("client: Error in data received. Expected %d, got %d\n",
+		     (int)strlen(MSG), ret);
 		exit(1);
 	}
 
@@ -615,4 +645,3 @@ void dtls_try_with_key_mtu(const char *name, const char *client_prio, gnutls_kx_
 	gnutls_anon_free_client_credentials(c_anoncred);
 	gnutls_dh_params_deinit(dh_params);
 }
-

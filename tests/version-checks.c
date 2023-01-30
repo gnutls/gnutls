@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -60,7 +60,8 @@ static void try(const char *client_prio, int expected)
 	unsigned dtls = 0;
 	const char *server_prio = "NORMAL:+VERS-TLS-ALL";
 
-	if (expected >= GNUTLS_DTLS_VERSION_MIN && expected <= GNUTLS_DTLS_VERSION_MAX) {
+	if (expected >= GNUTLS_DTLS_VERSION_MIN
+	    && expected <= GNUTLS_DTLS_VERSION_MAX) {
 		dtls = 1;
 		/* we do not really do negotiation in that version */
 		if (expected == GNUTLS_DTLS0_9)
@@ -81,16 +82,14 @@ static void try(const char *client_prio, int expected)
 	if (dtls)
 		flags |= (GNUTLS_DATAGRAM | GNUTLS_NONBLOCK);
 
-	gnutls_init(&server, GNUTLS_SERVER|flags);
-	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-				serverx509cred);
+	gnutls_init(&server, GNUTLS_SERVER | flags);
+	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, serverx509cred);
 
-	assert(gnutls_priority_set_direct(server,
-				   server_prio,
-				   NULL) >= 0);
+	assert(gnutls_priority_set_direct(server, server_prio, NULL) >= 0);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
-	gnutls_transport_set_pull_timeout_function(server, server_pull_timeout_func);
+	gnutls_transport_set_pull_timeout_function(server,
+						   server_pull_timeout_func);
 	gnutls_transport_set_ptr(server, server);
 
 	/* Init client */
@@ -99,22 +98,25 @@ static void try(const char *client_prio, int expected)
 	if (ret < 0)
 		exit(1);
 
-	ret = gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca_cert, GNUTLS_X509_FMT_PEM);
+	ret =
+	    gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca_cert,
+						  GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);
 
-	ret = gnutls_init(&client, GNUTLS_CLIENT|flags);
+	ret = gnutls_init(&client, GNUTLS_CLIENT | flags);
 	if (ret < 0)
 		exit(1);
 
 	ret = gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-				clientx509cred);
+				     clientx509cred);
 	if (ret < 0)
 		exit(1);
 
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
-	gnutls_transport_set_pull_timeout_function(client, client_pull_timeout_func);
+	gnutls_transport_set_pull_timeout_function(client,
+						   client_pull_timeout_func);
 	gnutls_transport_set_ptr(client, client);
 
 	ret = gnutls_priority_set_direct(client, client_prio, NULL);
@@ -133,12 +135,12 @@ static void try(const char *client_prio, int expected)
 
 		ret = gnutls_protocol_get_version(client);
 		if (ret != expected) {
-			fail("unexpected negotiated protocol %s (expected %s)\n", gnutls_protocol_get_name(ret),
-				gnutls_protocol_get_name(expected));
+			fail("unexpected negotiated protocol %s (expected %s)\n", gnutls_protocol_get_name(ret), gnutls_protocol_get_name(expected));
 			exit(1);
 		}
 	} else {
-		HANDSHAKE_EXPECT(client, server, GNUTLS_E_AGAIN, GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
+		HANDSHAKE_EXPECT(client, server, GNUTLS_E_AGAIN,
+				 GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
 	}
 
 	gnutls_bye(client, GNUTLS_SHUT_RDWR);
@@ -187,7 +189,8 @@ void doit(void)
 	reset_buffers();
 
 	/* special test for this legacy crap */
-	try("NONE:+VERS-DTLS0.9:+COMP-NULL:+AES-128-CBC:+SHA1:+RSA:%COMPAT", GNUTLS_DTLS0_9);
+	try("NONE:+VERS-DTLS0.9:+COMP-NULL:+AES-128-CBC:+SHA1:+RSA:%COMPAT",
+	    GNUTLS_DTLS0_9);
 	reset_buffers();
 	gnutls_global_deinit();
 }

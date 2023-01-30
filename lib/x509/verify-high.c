@@ -62,7 +62,7 @@ struct gnutls_x509_trust_list_iter {
 	unsigned int ca_index;
 
 #ifdef ENABLE_PKCS11
-	gnutls_pkcs11_obj_t* pkcs11_list;
+	gnutls_pkcs11_obj_t *pkcs11_list;
 	unsigned int pkcs11_index;
 	unsigned int pkcs11_size;
 #endif
@@ -70,19 +70,18 @@ struct gnutls_x509_trust_list_iter {
 
 #define DEFAULT_SIZE 127
 
-static bool
-cert_eq(const void *cert1, const void *cert2)
+static bool cert_eq(const void *cert1, const void *cert2)
 {
 	const gnutls_x509_crt_t c1 = (const gnutls_x509_crt_t)cert1;
 	const gnutls_x509_crt_t c2 = (const gnutls_x509_crt_t)cert2;
 	return gnutls_x509_crt_equals(c1, c2);
 }
 
-static size_t
-cert_hashcode(const void *cert)
+static size_t cert_hashcode(const void *cert)
 {
 	const gnutls_x509_crt_t c = (const gnutls_x509_crt_t)cert;
-	return hash_pjw_bare(c->raw_dn.data, c->raw_dn.size) % DEFAULT_MAX_VERIFY_DEPTH;
+	return hash_pjw_bare(c->raw_dn.data,
+			     c->raw_dn.size) % DEFAULT_MAX_VERIFY_DEPTH;
 }
 
 /**
@@ -98,16 +97,14 @@ cert_hashcode(const void *cert)
  * Since: 3.0.0
  **/
 int
-gnutls_x509_trust_list_init(gnutls_x509_trust_list_t * list,
-			    unsigned int size)
+gnutls_x509_trust_list_init(gnutls_x509_trust_list_t * list, unsigned int size)
 {
 	gnutls_x509_trust_list_t tmp;
 
 	*list = NULL;
 	FAIL_IF_LIB_ERROR;
 
-	tmp =
-	    gnutls_calloc(1, sizeof(struct gnutls_x509_trust_list_st));
+	tmp = gnutls_calloc(1, sizeof(struct gnutls_x509_trust_list_st));
 
 	if (!tmp)
 		return GNUTLS_E_MEMORY_ERROR;
@@ -141,8 +138,7 @@ gnutls_x509_trust_list_init(gnutls_x509_trust_list_t * list,
  * Since: 3.0.0
  **/
 void
-gnutls_x509_trust_list_deinit(gnutls_x509_trust_list_t list,
-			      unsigned int all)
+gnutls_x509_trust_list_deinit(gnutls_x509_trust_list_t list, unsigned int all)
 {
 	unsigned int i, j;
 
@@ -168,20 +164,17 @@ gnutls_x509_trust_list_deinit(gnutls_x509_trust_list_t list,
 		}
 		gnutls_free(list->node[i].trusted_cas);
 
-
 		if (all) {
 			for (j = 0; j < list->node[i].crl_size; j++) {
-				gnutls_x509_crl_deinit(list->node[i].
-						       crls[j]);
+				gnutls_x509_crl_deinit(list->node[i].crls[j]);
 			}
 		}
 		gnutls_free(list->node[i].crls);
 
 		if (all) {
 			for (j = 0; j < list->node[i].named_cert_size; j++) {
-				gnutls_x509_crt_deinit(list->node[i].
-						       named_certs[j].
-						       cert);
+				gnutls_x509_crt_deinit(list->node[i].named_certs
+						       [j].cert);
 			}
 		}
 		gnutls_free(list->node[i].named_certs);
@@ -194,8 +187,7 @@ gnutls_x509_trust_list_deinit(gnutls_x509_trust_list_t list,
 }
 
 static int
-add_new_ca_to_rdn_seq(gnutls_x509_trust_list_t list,
-		       gnutls_x509_crt_t ca)
+add_new_ca_to_rdn_seq(gnutls_x509_trust_list_t list, gnutls_x509_crt_t ca)
 {
 	gnutls_datum_t tmp;
 	size_t newsize;
@@ -214,9 +206,7 @@ add_new_ca_to_rdn_seq(gnutls_x509_trust_list_t list,
 		return GNUTLS_E_SHORT_MEMORY_BUFFER;
 	}
 
-	newdata =
-	    gnutls_realloc_fast(list->x509_rdn_sequence.data,
-				newsize);
+	newdata = gnutls_realloc_fast(list->x509_rdn_sequence.data, newsize);
 	if (newdata == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
@@ -239,17 +229,16 @@ add_new_ca_to_rdn_seq(gnutls_x509_trust_list_t list,
  * pkcs11 trust modules when the GNUTLS_TL_GET_COPY flag isn't
  * given. It is not thread safe. */
 static int
-trust_list_add_compat(gnutls_x509_trust_list_t list,
-			       gnutls_x509_crt_t cert)
+trust_list_add_compat(gnutls_x509_trust_list_t list, gnutls_x509_crt_t cert)
 {
 	if (unlikely(INT_ADD_OVERFLOW(list->keep_certs_size, 1))) {
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 	}
 
 	list->keep_certs =
-		_gnutls_reallocarray_fast(list->keep_certs,
-					  list->keep_certs_size + 1,
-					  sizeof(list->keep_certs[0]));
+	    _gnutls_reallocarray_fast(list->keep_certs,
+				      list->keep_certs_size + 1,
+				      sizeof(list->keep_certs[0]));
 	if (list->keep_certs == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
@@ -303,17 +292,26 @@ gnutls_x509_trust_list_add_cas(gnutls_x509_trust_list_t list,
 	for (i = 0; i < clist_size; i++) {
 		exists = 0;
 		hash =
-		    hash_pjw_bare(clist[i]->raw_dn.data,
-				  clist[i]->raw_dn.size);
+		    hash_pjw_bare(clist[i]->raw_dn.data, clist[i]->raw_dn.size);
 		hash %= list->size;
 
 		/* avoid duplicates */
-		if (flags & GNUTLS_TL_NO_DUPLICATES || flags & GNUTLS_TL_NO_DUPLICATE_KEY) {
-			for (j=0;j<list->node[hash].trusted_ca_size;j++) {
+		if (flags & GNUTLS_TL_NO_DUPLICATES
+		    || flags & GNUTLS_TL_NO_DUPLICATE_KEY) {
+			for (j = 0; j < list->node[hash].trusted_ca_size; j++) {
 				if (flags & GNUTLS_TL_NO_DUPLICATES)
-					ret = gnutls_x509_crt_equals(list->node[hash].trusted_cas[j], clist[i]);
+					ret =
+					    gnutls_x509_crt_equals(list->node
+								   [hash].trusted_cas
+								   [j],
+								   clist[i]);
 				else
-					ret = _gnutls_check_if_same_key(list->node[hash].trusted_cas[j], clist[i], 1);
+					ret =
+					    _gnutls_check_if_same_key(list->node
+								      [hash].trusted_cas
+								      [j],
+								      clist[i],
+								      1);
 				if (ret != 0) {
 					exists = 1;
 					break;
@@ -321,21 +319,27 @@ gnutls_x509_trust_list_add_cas(gnutls_x509_trust_list_t list,
 			}
 
 			if (exists != 0) {
-				gnutls_x509_crt_deinit(list->node[hash].trusted_cas[j]);
+				gnutls_x509_crt_deinit(list->
+						       node[hash].trusted_cas
+						       [j]);
 				list->node[hash].trusted_cas[j] = clist[i];
 				continue;
 			}
 		}
 
-		if (unlikely(INT_ADD_OVERFLOW(list->node[hash].trusted_ca_size, 1))) {
+		if (unlikely
+		    (INT_ADD_OVERFLOW(list->node[hash].trusted_ca_size, 1))) {
 			gnutls_assert();
 			return i;
 		}
 
 		list->node[hash].trusted_cas =
-			_gnutls_reallocarray_fast(list->node[hash].trusted_cas,
-						  list->node[hash].trusted_ca_size + 1,
-						  sizeof(list->node[hash].trusted_cas[0]));
+		    _gnutls_reallocarray_fast(list->node[hash].trusted_cas,
+					      list->node[hash].trusted_ca_size +
+					      1,
+					      sizeof(list->
+						     node[hash].trusted_cas
+						     [0]));
 		if (list->node[hash].trusted_cas == NULL) {
 			gnutls_assert();
 			return i;
@@ -347,21 +351,21 @@ gnutls_x509_trust_list_add_cas(gnutls_x509_trust_list_t list,
 			gnutls_assert();
 			if (gnutls_x509_crt_get_dn2(clist[i], &dn) >= 0) {
 				_gnutls_audit_log(NULL,
-					  "There was a non-CA certificate in the trusted list: %s.\n",
-					  dn.data);
+						  "There was a non-CA certificate in the trusted list: %s.\n",
+						  dn.data);
 				gnutls_free(dn.data);
 			}
 		}
 
-		list->node[hash].trusted_cas[list->node[hash].
-					     trusted_ca_size] = clist[i];
+		list->node[hash].trusted_cas[list->node[hash].trusted_ca_size] =
+		    clist[i];
 		list->node[hash].trusted_ca_size++;
 
 		if (flags & GNUTLS_TL_USE_IN_TLS) {
 			ret = add_new_ca_to_rdn_seq(list, clist[i]);
 			if (ret < 0) {
 				gnutls_assert();
-				return i+1;
+				return i + 1;
 			}
 		}
 	}
@@ -370,15 +374,15 @@ gnutls_x509_trust_list_add_cas(gnutls_x509_trust_list_t list,
 }
 
 static int
-advance_iter(gnutls_x509_trust_list_t list,
-	     gnutls_x509_trust_list_iter_t iter)
+advance_iter(gnutls_x509_trust_list_t list, gnutls_x509_trust_list_iter_t iter)
 {
 	if (iter->node_index < list->size) {
 		++iter->ca_index;
 
 		/* skip entries */
 		while (iter->node_index < list->size &&
-		       iter->ca_index >= list->node[iter->node_index].trusted_ca_size) {
+		       iter->ca_index >=
+		       list->node[iter->node_index].trusted_ca_size) {
 			++iter->node_index;
 			iter->ca_index = 0;
 		}
@@ -390,8 +394,18 @@ advance_iter(gnutls_x509_trust_list_t list,
 #ifdef ENABLE_PKCS11
 	if (list->pkcs11_token != NULL) {
 		if (iter->pkcs11_list == NULL) {
-			int ret = gnutls_pkcs11_obj_list_import_url2(&iter->pkcs11_list, &iter->pkcs11_size,
-			    list->pkcs11_token, (GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE|GNUTLS_PKCS11_OBJ_FLAG_CRT|GNUTLS_PKCS11_OBJ_FLAG_MARK_CA|GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED), 0);
+			int ret =
+			    gnutls_pkcs11_obj_list_import_url2
+			    (&iter->pkcs11_list,
+			     &iter->pkcs11_size,
+			     list->pkcs11_token,
+			     (GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE
+			      |
+			      GNUTLS_PKCS11_OBJ_FLAG_CRT
+			      |
+			      GNUTLS_PKCS11_OBJ_FLAG_MARK_CA
+			      | GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED),
+			     0);
 			if (ret < 0)
 				return gnutls_assert_val(ret);
 
@@ -434,14 +448,15 @@ advance_iter(gnutls_x509_trust_list_t list,
  **/
 int
 gnutls_x509_trust_list_iter_get_ca(gnutls_x509_trust_list_t list,
-				   gnutls_x509_trust_list_iter_t *iter,
-				   gnutls_x509_crt_t *crt)
+				   gnutls_x509_trust_list_iter_t * iter,
+				   gnutls_x509_crt_t * crt)
 {
 	int ret;
 
 	/* initialize iterator */
 	if (*iter == NULL) {
-		*iter = gnutls_malloc(sizeof (struct gnutls_x509_trust_list_iter));
+		*iter =
+		    gnutls_malloc(sizeof(struct gnutls_x509_trust_list_iter));
 		if (*iter == NULL)
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
@@ -473,19 +488,25 @@ gnutls_x509_trust_list_iter_get_ca(gnutls_x509_trust_list_t list,
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		ret = _gnutls_x509_crt_cpy(*crt, list->node[(*iter)->node_index].trusted_cas[(*iter)->ca_index]);
+		ret =
+		    _gnutls_x509_crt_cpy(*crt,
+					 list->node[(*iter)->
+						    node_index].trusted_cas[(*iter)->ca_index]);
 		if (ret < 0) {
 			gnutls_x509_crt_deinit(*crt);
 			return gnutls_assert_val(ret);
 		}
 	}
 #ifdef ENABLE_PKCS11
-	else if ( (*iter)->pkcs11_index < (*iter)->pkcs11_size) {
+	else if ((*iter)->pkcs11_index < (*iter)->pkcs11_size) {
 		ret = gnutls_x509_crt_init(crt);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		ret = gnutls_x509_crt_import_pkcs11(*crt, (*iter)->pkcs11_list[(*iter)->pkcs11_index]);
+		ret =
+		    gnutls_x509_crt_import_pkcs11(*crt,
+						  (*iter)->
+						  pkcs11_list[(*iter)->pkcs11_index]);
 		if (ret < 0) {
 			gnutls_x509_crt_deinit(*crt);
 			return gnutls_assert_val(ret);
@@ -508,7 +529,7 @@ gnutls_x509_trust_list_iter_get_ca(gnutls_x509_trust_list_t list,
 	 * certificate that we read and when this function is called again we
 	 * report GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE to our caller. */
 	ret = advance_iter(list, *iter);
-	if (ret	< 0 && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+	if (ret < 0 && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
 		gnutls_x509_crt_deinit(*crt);
 		*crt = NULL;
 
@@ -545,8 +566,8 @@ void gnutls_x509_trust_list_iter_deinit(gnutls_x509_trust_list_iter_t iter)
 
 static gnutls_x509_crt_t crt_cpy(gnutls_x509_crt_t src)
 {
-gnutls_x509_crt_t dst;
-int ret;
+	gnutls_x509_crt_t dst;
+	int ret;
 
 	ret = gnutls_x509_crt_init(&dst);
 	if (ret < 0) {
@@ -594,21 +615,18 @@ gnutls_x509_trust_list_remove_cas(gnutls_x509_trust_list_t list,
 
 	for (i = 0; i < clist_size; i++) {
 		hash =
-		    hash_pjw_bare(clist[i]->raw_dn.data,
-				  clist[i]->raw_dn.size);
+		    hash_pjw_bare(clist[i]->raw_dn.data, clist[i]->raw_dn.size);
 		hash %= list->size;
 
 		for (j = 0; j < list->node[hash].trusted_ca_size; j++) {
 			if (gnutls_x509_crt_equals
-			    (clist[i],
-			     list->node[hash].trusted_cas[j]) != 0) {
+			    (clist[i], list->node[hash].trusted_cas[j]) != 0) {
 
 				gnutls_x509_crt_deinit(list->node[hash].
 						       trusted_cas[j]);
 				list->node[hash].trusted_cas[j] =
 				    list->node[hash].trusted_cas[list->
-								 node
-								 [hash].
+								 node[hash].
 								 trusted_ca_size
 								 - 1];
 				list->node[hash].trusted_ca_size--;
@@ -626,9 +644,9 @@ gnutls_x509_trust_list_remove_cas(gnutls_x509_trust_list_t list,
 		 * ensure that a server certificate will also get rejected.
 		 */
 		list->distrusted =
-			_gnutls_reallocarray_fast(list->distrusted,
-						  list->distrusted_size + 1,
-						  sizeof(list->distrusted[0]));
+		    _gnutls_reallocarray_fast(list->distrusted,
+					      list->distrusted_size + 1,
+					      sizeof(list->distrusted[0]));
 		if (list->distrusted == NULL)
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
@@ -679,8 +697,7 @@ gnutls_x509_trust_list_add_named_crt(gnutls_x509_trust_list_t list,
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	hash =
-	    hash_pjw_bare(cert->raw_issuer_dn.data,
-			  cert->raw_issuer_dn.size);
+	    hash_pjw_bare(cert->raw_issuer_dn.data, cert->raw_issuer_dn.size);
 	hash %= list->size;
 
 	if (unlikely(INT_ADD_OVERFLOW(list->node[hash].named_cert_size, 1))) {
@@ -688,20 +705,19 @@ gnutls_x509_trust_list_add_named_crt(gnutls_x509_trust_list_t list,
 	}
 
 	list->node[hash].named_certs =
-		_gnutls_reallocarray_fast(list->node[hash].named_certs,
-					  list->node[hash].named_cert_size + 1,
-					  sizeof(list->node[hash].named_certs[0]));
+	    _gnutls_reallocarray_fast(list->node[hash].named_certs,
+				      list->node[hash].named_cert_size + 1,
+				      sizeof(list->node[hash].named_certs[0]));
 	if (list->node[hash].named_certs == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-	list->node[hash].named_certs[list->node[hash].named_cert_size].
-	    cert = cert;
+	list->node[hash].named_certs[list->node[hash].named_cert_size].cert =
+	    cert;
 	memcpy(list->node[hash].
 	       named_certs[list->node[hash].named_cert_size].name, name,
 	       name_size);
 	list->node[hash].named_certs[list->node[hash].
-				     named_cert_size].name_size =
-	    name_size;
+				     named_cert_size].name_size = name_size;
 
 	list->node[hash].named_cert_size++;
 
@@ -763,18 +779,19 @@ gnutls_x509_trust_list_add_crls(gnutls_x509_trust_list_t list,
 
 			ret =
 			    gnutls_x509_crl_verify(crl_list[i],
-						   list->node[hash].
-						   trusted_cas,
+						   list->node[hash].trusted_cas,
 						   list->node[hash].
 						   trusted_ca_size,
-						   verification_flags,
-						   &vret);
+						   verification_flags, &vret);
 			if (ret < 0 || vret != 0) {
-				_gnutls_debug_log("CRL verification failed, not adding it\n");
+				_gnutls_debug_log
+				    ("CRL verification failed, not adding it\n");
 				if (flags & GNUTLS_TL_NO_DUPLICATES)
 					gnutls_x509_crl_deinit(crl_list[i]);
 				if (flags & GNUTLS_TL_FAIL_ON_INVALID_CRL)
-					return gnutls_assert_val(GNUTLS_E_CRL_VERIFICATION_ERROR);
+					return
+					    gnutls_assert_val
+					    (GNUTLS_E_CRL_VERIFICATION_ERROR);
 				continue;
 			}
 		}
@@ -782,18 +799,28 @@ gnutls_x509_trust_list_add_crls(gnutls_x509_trust_list_t list,
 		/* If the CRL added overrides a previous one, then overwrite
 		 * the old one */
 		if (flags & GNUTLS_TL_NO_DUPLICATES) {
-			for (x=0;x<list->node[hash].crl_size;x++) {
-				if (crl_list[i]->raw_issuer_dn.size == list->node[hash].crls[x]->raw_issuer_dn.size &&
-				    memcmp(crl_list[i]->raw_issuer_dn.data, list->node[hash].crls[x]->raw_issuer_dn.data, crl_list[i]->raw_issuer_dn.size) == 0) {
-					if (gnutls_x509_crl_get_this_update(crl_list[i]) >=
-					    gnutls_x509_crl_get_this_update(list->node[hash].crls[x])) {
+			for (x = 0; x < list->node[hash].crl_size; x++) {
+				if (crl_list[i]->raw_issuer_dn.size ==
+				    list->node[hash].crls[x]->raw_issuer_dn.size
+				    && memcmp(crl_list[i]->raw_issuer_dn.data,
+					      list->node[hash].
+					      crls[x]->raw_issuer_dn.data,
+					      crl_list[i]->
+					      raw_issuer_dn.size) == 0) {
+					if (gnutls_x509_crl_get_this_update
+					    (crl_list[i]) >=
+					    gnutls_x509_crl_get_this_update
+					    (list->node[hash].crls[x])) {
 
-						gnutls_x509_crl_deinit(list->node[hash].crls[x]);
-						list->node[hash].crls[x] = crl_list[i];
+						gnutls_x509_crl_deinit
+						    (list->node[hash].crls[x]);
+						list->node[hash].crls[x] =
+						    crl_list[i];
 						goto next;
 					} else {
 						/* The new is older, discard it */
-						gnutls_x509_crl_deinit(crl_list[i]);
+						gnutls_x509_crl_deinit(crl_list
+								       [i]);
 						goto next;
 					}
 				}
@@ -814,9 +841,7 @@ gnutls_x509_trust_list_add_crls(gnutls_x509_trust_list_t list,
 		}
 		list->node[hash].crls = tmp;
 
-
-		list->node[hash].crls[list->node[hash].crl_size] =
-		    crl_list[i];
+		list->node[hash].crls[list->node[hash].crl_size] = crl_list[i];
 		list->node[hash].crl_size++;
 
  next:
@@ -896,7 +921,7 @@ static int shorten_clist(gnutls_x509_trust_list_t list,
 static int
 retrieve_issuers(gnutls_x509_trust_list_t list,
 		 gnutls_x509_crt_t subject,
-		 gnutls_x509_crt_t *certificate_list,
+		 gnutls_x509_crt_t * certificate_list,
 		 unsigned int clist_size_max)
 {
 	gnutls_x509_crt_t *issuers;
@@ -959,8 +984,7 @@ int _gnutls_trust_list_get_issuer(gnutls_x509_trust_list_t list,
 	size_t hash;
 
 	hash =
-	    hash_pjw_bare(cert->raw_issuer_dn.data,
-			  cert->raw_issuer_dn.size);
+	    hash_pjw_bare(cert->raw_issuer_dn.data, cert->raw_issuer_dn.size);
 	hash %= list->size;
 
 	for (i = 0; i < list->node[hash].trusted_ca_size; i++) {
@@ -970,7 +994,8 @@ int _gnutls_trust_list_get_issuer(gnutls_x509_trust_list_t list,
 						 trusted_cas[i]);
 		if (ret != 0) {
 			if (flags & GNUTLS_TL_GET_COPY) {
-				*issuer = crt_cpy(list->node[hash].trusted_cas[i]);
+				*issuer =
+				    crt_cpy(list->node[hash].trusted_cas[i]);
 			} else {
 				*issuer = list->node[hash].trusted_cas[i];
 			}
@@ -983,10 +1008,9 @@ int _gnutls_trust_list_get_issuer(gnutls_x509_trust_list_t list,
 
 static
 int trust_list_get_issuer_by_dn(gnutls_x509_trust_list_t list,
-				      const gnutls_datum_t *dn,
-				      const gnutls_datum_t *spki,
-				      gnutls_x509_crt_t * issuer,
-				      unsigned int flags)
+				const gnutls_datum_t * dn,
+				const gnutls_datum_t * spki,
+				gnutls_x509_crt_t * issuer, unsigned int flags)
 {
 	int ret;
 	unsigned int i, j;
@@ -995,24 +1019,32 @@ int trust_list_get_issuer_by_dn(gnutls_x509_trust_list_t list,
 	size_t tmp_size;
 
 	if (dn) {
-		hash =
-		    hash_pjw_bare(dn->data,
-				  dn->size);
+		hash = hash_pjw_bare(dn->data, dn->size);
 		hash %= list->size;
 
 		for (i = 0; i < list->node[hash].trusted_ca_size; i++) {
-			ret = _gnutls_x509_compare_raw_dn(dn, &list->node[hash].trusted_cas[i]->raw_dn);
+			ret =
+			    _gnutls_x509_compare_raw_dn(dn,
+							&list->
+							node[hash].trusted_cas
+							[i]->raw_dn);
 			if (ret != 0) {
 				if (spki && spki->size > 0) {
 					tmp_size = sizeof(tmp);
 
-					ret = gnutls_x509_crt_get_subject_key_id(list->node[hash].trusted_cas[i], tmp, &tmp_size, NULL);
+					ret =
+					    gnutls_x509_crt_get_subject_key_id
+					    (list->node[hash].trusted_cas[i],
+					     tmp, &tmp_size, NULL);
 					if (ret < 0)
 						continue;
-					if (spki->size != tmp_size || memcmp(spki->data, tmp, spki->size) != 0)
+					if (spki->size != tmp_size
+					    || memcmp(spki->data, tmp,
+						      spki->size) != 0)
 						continue;
 				}
-				*issuer = crt_cpy(list->node[hash].trusted_cas[i]);
+				*issuer =
+				    crt_cpy(list->node[hash].trusted_cas[i]);
 				return 0;
 			}
 		}
@@ -1022,11 +1054,15 @@ int trust_list_get_issuer_by_dn(gnutls_x509_trust_list_t list,
 			for (j = 0; j < list->node[i].trusted_ca_size; j++) {
 				tmp_size = sizeof(tmp);
 
-				ret = gnutls_x509_crt_get_subject_key_id(list->node[i].trusted_cas[j], tmp, &tmp_size, NULL);
+				ret =
+				    gnutls_x509_crt_get_subject_key_id
+				    (list->node[i].trusted_cas[j], tmp,
+				     &tmp_size, NULL);
 				if (ret < 0)
 					continue;
 
-				if (spki->size != tmp_size || memcmp(spki->data, tmp, spki->size) != 0)
+				if (spki->size != tmp_size
+				    || memcmp(spki->data, tmp, spki->size) != 0)
 					continue;
 
 				*issuer = crt_cpy(list->node[i].trusted_cas[j]);
@@ -1074,10 +1110,12 @@ int gnutls_x509_trust_list_get_issuer(gnutls_x509_trust_list_t list,
 #ifdef ENABLE_PKCS11
 	if (ret < 0 && list->pkcs11_token) {
 		gnutls_x509_crt_t crt;
-		gnutls_datum_t der = {NULL, 0};
+		gnutls_datum_t der = { NULL, 0 };
 		/* use the token for verification */
-		ret = gnutls_pkcs11_get_raw_issuer(list->pkcs11_token, cert, &der,
-			GNUTLS_X509_FMT_DER, GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE);
+		ret =
+		    gnutls_pkcs11_get_raw_issuer(list->pkcs11_token, cert, &der,
+						 GNUTLS_X509_FMT_DER,
+						 GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
@@ -1132,9 +1170,9 @@ int gnutls_x509_trust_list_get_issuer(gnutls_x509_trust_list_t list,
  * Since: 3.4.0
  **/
 int gnutls_x509_trust_list_get_issuer_by_dn(gnutls_x509_trust_list_t list,
-				      const gnutls_datum_t *dn,
-				      gnutls_x509_crt_t *issuer,
-				      unsigned int flags)
+					    const gnutls_datum_t * dn,
+					    gnutls_x509_crt_t * issuer,
+					    unsigned int flags)
 {
 	int ret;
 
@@ -1146,10 +1184,13 @@ int gnutls_x509_trust_list_get_issuer_by_dn(gnutls_x509_trust_list_t list,
 #ifdef ENABLE_PKCS11
 	if (ret < 0 && list->pkcs11_token) {
 		gnutls_x509_crt_t crt;
-		gnutls_datum_t der = {NULL, 0};
+		gnutls_datum_t der = { NULL, 0 };
 		/* use the token for verification */
-		ret = gnutls_pkcs11_get_raw_issuer_by_dn(list->pkcs11_token, dn, &der,
-			GNUTLS_X509_FMT_DER, GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE);
+		ret =
+		    gnutls_pkcs11_get_raw_issuer_by_dn(list->pkcs11_token, dn,
+						       &der,
+						       GNUTLS_X509_FMT_DER,
+						       GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
@@ -1191,11 +1232,15 @@ int gnutls_x509_trust_list_get_issuer_by_dn(gnutls_x509_trust_list_t list,
  *
  * Since: 3.4.2
  **/
-int gnutls_x509_trust_list_get_issuer_by_subject_key_id(gnutls_x509_trust_list_t list,
-				      const gnutls_datum_t *dn,
-				      const gnutls_datum_t *spki,
-				      gnutls_x509_crt_t *issuer,
-				      unsigned int flags)
+int gnutls_x509_trust_list_get_issuer_by_subject_key_id(gnutls_x509_trust_list_t
+							list,
+							const gnutls_datum_t *
+							dn,
+							const gnutls_datum_t *
+							spki,
+							gnutls_x509_crt_t *
+							issuer,
+							unsigned int flags)
 {
 	int ret;
 
@@ -1207,10 +1252,12 @@ int gnutls_x509_trust_list_get_issuer_by_subject_key_id(gnutls_x509_trust_list_t
 #ifdef ENABLE_PKCS11
 	if (ret < 0 && list->pkcs11_token) {
 		gnutls_x509_crt_t crt;
-		gnutls_datum_t der = {NULL, 0};
+		gnutls_datum_t der = { NULL, 0 };
 		/* use the token for verification */
-		ret = gnutls_pkcs11_get_raw_issuer_by_subject_key_id(list->pkcs11_token, dn, spki, &der,
-			GNUTLS_X509_FMT_DER, GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE);
+		ret =
+		    gnutls_pkcs11_get_raw_issuer_by_subject_key_id
+		    (list->pkcs11_token, dn, spki, &der, GNUTLS_X509_FMT_DER,
+		     GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
@@ -1237,17 +1284,20 @@ int gnutls_x509_trust_list_get_issuer_by_subject_key_id(gnutls_x509_trust_list_t
 }
 
 static
-int check_if_in_blocklist(gnutls_x509_crt_t * cert_list, unsigned int cert_list_size,
-	gnutls_x509_crt_t * blocklist, unsigned int blocklist_size)
+int check_if_in_blocklist(gnutls_x509_crt_t * cert_list,
+			  unsigned int cert_list_size,
+			  gnutls_x509_crt_t * blocklist,
+			  unsigned int blocklist_size)
 {
-unsigned i, j;
+	unsigned i, j;
 
 	if (blocklist_size == 0)
 		return 0;
 
-	for (i=0;i<cert_list_size;i++) {
-		for (j=0;j<blocklist_size;j++) {
-			if (gnutls_x509_crt_equals(cert_list[i], blocklist[j]) != 0) {
+	for (i = 0; i < cert_list_size; i++) {
+		for (j = 0; j < blocklist_size; j++) {
+			if (gnutls_x509_crt_equals(cert_list[i], blocklist[j])
+			    != 0) {
 				return 1;
 			}
 		}
@@ -1284,8 +1334,9 @@ gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
 				  unsigned int *voutput,
 				  gnutls_verify_output_function func)
 {
-	return gnutls_x509_trust_list_verify_crt2(list, cert_list, cert_list_size,
-						  NULL, 0, flags, voutput, func);
+	return gnutls_x509_trust_list_verify_crt2(list, cert_list,
+						  cert_list_size, NULL, 0,
+						  flags, voutput, func);
 }
 
 #define LAST_DN cert_list[cert_list_size-1]->raw_dn
@@ -1349,7 +1400,7 @@ int
 gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 				   gnutls_x509_crt_t * cert_list,
 				   unsigned int cert_list_size,
-				   gnutls_typed_vdata_st *data,
+				   gnutls_typed_vdata_st * data,
 				   unsigned int elements,
 				   unsigned int flags,
 				   unsigned int *voutput,
@@ -1365,20 +1416,22 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 	unsigned hostname_size = 0;
 	unsigned have_set_name = 0;
 	unsigned saved_output;
-	gnutls_datum_t ip = {NULL, 0};
+	gnutls_datum_t ip = { NULL, 0 };
 	gl_list_t records;
 
 	if (cert_list == NULL || cert_list_size < 1)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	for (i=0;i<elements;i++) {
+	for (i = 0; i < elements; i++) {
 		if (data[i].type == GNUTLS_DT_DNS_HOSTNAME) {
-			hostname = (void*)data[i].data;
+			hostname = (void *)data[i].data;
 			if (data[i].size > 0) {
 				hostname_size = data[i].size;
 			}
 
-			if (have_set_name != 0) return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			if (have_set_name != 0)
+				return
+				    gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 			have_set_name = 1;
 		} else if (data[i].type == GNUTLS_DT_IP_ADDRESS) {
 			if (data[i].size > 0) {
@@ -1386,26 +1439,33 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 				ip.size = data[i].size;
 			}
 
-			if (have_set_name != 0) return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			if (have_set_name != 0)
+				return
+				    gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 			have_set_name = 1;
 		} else if (data[i].type == GNUTLS_DT_RFC822NAME) {
-			email = (void*)data[i].data;
+			email = (void *)data[i].data;
 
-			if (have_set_name != 0) return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			if (have_set_name != 0)
+				return
+				    gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 			have_set_name = 1;
 		} else if (data[i].type == GNUTLS_DT_KEY_PURPOSE_OID) {
-			purpose = (void*)data[i].data;
+			purpose = (void *)data[i].data;
 		}
 	}
 
-	if (hostname) { /* shortcut using the named certs - if any */
+	if (hostname) {		/* shortcut using the named certs - if any */
 		unsigned vtmp = 0;
 		if (hostname_size == 0)
 			hostname_size = strlen(hostname);
 
 		ret = gnutls_x509_trust_list_verify_named_crt(list,
-					cert_list[0], hostname, hostname_size,
-					flags, &vtmp, func);
+							      cert_list[0],
+							      hostname,
+							      hostname_size,
+							      flags, &vtmp,
+							      func);
 		if (ret == 0 && vtmp == 0) {
 			*voutput = vtmp;
 			return 0;
@@ -1415,12 +1475,14 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 	memcpy(sorted, cert_list, cert_list_size * sizeof(gnutls_x509_crt_t));
 	cert_list = sorted;
 
-	records = gl_list_nx_create_empty(GL_LINKEDHASH_LIST, cert_eq, cert_hashcode, NULL, false);
+	records =
+	    gl_list_nx_create_empty(GL_LINKEDHASH_LIST, cert_eq, cert_hashcode,
+				    NULL, false);
 	if (records == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
 	for (i = 0; i < cert_list_size &&
-		     cert_list_size <= DEFAULT_MAX_VERIFY_DEPTH; ) {
+	     cert_list_size <= DEFAULT_MAX_VERIFY_DEPTH;) {
 		unsigned int sorted_size = 1;
 		unsigned int j;
 		gnutls_x509_crt_t issuer;
@@ -1461,7 +1523,8 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 		if (gnutls_x509_trust_list_get_issuer(list,
 						      cert_list[i - 1],
 						      &issuer,
-						      GNUTLS_TL_GET_COPY) == 0) {
+						      GNUTLS_TL_GET_COPY) ==
+		    0) {
 			gnutls_x509_crt_deinit(issuer);
 			cert_list_size = i;
 			break;
@@ -1479,8 +1542,7 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 				       cert_list[i - 1],
 				       &retrieved[retrieved_size],
 				       DEFAULT_MAX_VERIFY_DEPTH -
-				       MAX(retrieved_size,
-					   cert_list_size));
+				       MAX(retrieved_size, cert_list_size));
 		if (ret < 0) {
 			break;
 		} else if (ret > 0) {
@@ -1507,14 +1569,12 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 	hash =
-	    hash_pjw_bare(cert_list[cert_list_size - 1]->raw_issuer_dn.
-			  data,
-			  cert_list[cert_list_size -
-				    1]->raw_issuer_dn.size);
+	    hash_pjw_bare(cert_list[cert_list_size - 1]->raw_issuer_dn.data,
+			  cert_list[cert_list_size - 1]->raw_issuer_dn.size);
 	hash %= list->size;
 
 	ret = check_if_in_blocklist(cert_list, cert_list_size,
-		list->distrusted, list->distrusted_size);
+				    list->distrusted, list->distrusted_size);
 	if (ret != 0) {
 		*voutput = 0;
 		*voutput |= GNUTLS_CERT_REVOKED;
@@ -1531,18 +1591,19 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 	saved_output = *voutput;
 
 	if (SIGNER_OLD_OR_UNKNOWN(*voutput) &&
-		(LAST_DN.size != LAST_IDN.size ||
-		 memcmp(LAST_DN.data, LAST_IDN.data, LAST_IDN.size) != 0)) {
+	    (LAST_DN.size != LAST_IDN.size ||
+	     memcmp(LAST_DN.data, LAST_IDN.data, LAST_IDN.size) != 0)) {
 
 		/* if we couldn't find the issuer, try to see if the last
 		 * certificate is in the trusted list and try to verify against
 		 * (if it is not self signed) */
 		hash =
-		    hash_pjw_bare(cert_list[cert_list_size - 1]->raw_dn.
-			  data, cert_list[cert_list_size - 1]->raw_dn.size);
+		    hash_pjw_bare(cert_list[cert_list_size - 1]->raw_dn.data,
+				  cert_list[cert_list_size - 1]->raw_dn.size);
 		hash %= list->size;
 
-		 _gnutls_debug_log("issuer in verification was not found or insecure; trying against trust list\n");
+		_gnutls_debug_log
+		    ("issuer in verification was not found or insecure; trying against trust list\n");
 
 		*voutput =
 		    _gnutls_verify_crt_status(list, cert_list, cert_list_size,
@@ -1562,10 +1623,10 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 	if (SIGNER_OLD_OR_UNKNOWN(*voutput) && list->pkcs11_token) {
 		/* use the token for verification */
 
-		*voutput = _gnutls_pkcs11_verify_crt_status(list, list->pkcs11_token,
-							    cert_list, cert_list_size,
-							    purpose,
-							    flags, func);
+		*voutput =
+		    _gnutls_pkcs11_verify_crt_status(list, list->pkcs11_token,
+						     cert_list, cert_list_size,
+						     purpose, flags, func);
 		if (*voutput != 0) {
 			if (SIGNER_WAS_KNOWN(saved_output))
 				*voutput = saved_output;
@@ -1579,34 +1640,39 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 		ret = _gnutls_check_key_purpose(cert_list[0], purpose, 0);
 		if (ret != 1) {
 			gnutls_assert();
-			*voutput |= GNUTLS_CERT_PURPOSE_MISMATCH|GNUTLS_CERT_INVALID;
+			*voutput |=
+			    GNUTLS_CERT_PURPOSE_MISMATCH | GNUTLS_CERT_INVALID;
 		}
 	}
 
 	if (hostname) {
 		ret =
-		    gnutls_x509_crt_check_hostname2(cert_list[0], hostname, flags);
+		    gnutls_x509_crt_check_hostname2(cert_list[0], hostname,
+						    flags);
 		if (ret == 0) {
 			gnutls_assert();
-			*voutput |= GNUTLS_CERT_UNEXPECTED_OWNER|GNUTLS_CERT_INVALID;
+			*voutput |=
+			    GNUTLS_CERT_UNEXPECTED_OWNER | GNUTLS_CERT_INVALID;
 		}
 	}
 
 	if (ip.data) {
 		ret =
-		    gnutls_x509_crt_check_ip(cert_list[0], ip.data, ip.size, flags);
+		    gnutls_x509_crt_check_ip(cert_list[0], ip.data, ip.size,
+					     flags);
 		if (ret == 0) {
 			gnutls_assert();
-			*voutput |= GNUTLS_CERT_UNEXPECTED_OWNER|GNUTLS_CERT_INVALID;
+			*voutput |=
+			    GNUTLS_CERT_UNEXPECTED_OWNER | GNUTLS_CERT_INVALID;
 		}
 	}
 
 	if (email) {
-		ret =
-		    gnutls_x509_crt_check_email(cert_list[0], email, 0);
+		ret = gnutls_x509_crt_check_email(cert_list[0], email, 0);
 		if (ret == 0) {
 			gnutls_assert();
-			*voutput |= GNUTLS_CERT_UNEXPECTED_OWNER|GNUTLS_CERT_INVALID;
+			*voutput |=
+			    GNUTLS_CERT_UNEXPECTED_OWNER | GNUTLS_CERT_INVALID;
 		}
 	}
 
@@ -1624,8 +1690,7 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 	    _gnutls_x509_crt_check_revocation(cert_list
 					      [cert_list_size - 1],
 					      list->node[hash].crls,
-					      list->node[hash].crl_size,
-					      func);
+					      list->node[hash].crl_size, func);
 	if (ret == 1) {		/* revoked */
 		*voutput |= GNUTLS_CERT_REVOKED;
 		*voutput |= GNUTLS_CERT_INVALID;
@@ -1640,8 +1705,7 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 		hash %= list->size;
 
 		ret = _gnutls_x509_crt_check_revocation(cert_list[i],
-							list->node[hash].
-							crls,
+							list->node[hash].crls,
 							list->node[hash].
 							crl_size, func);
 		if (ret < 0) {
@@ -1701,14 +1765,12 @@ gnutls_x509_trust_list_verify_named_crt(gnutls_x509_trust_list_t list,
 	unsigned int i;
 	size_t hash;
 
-
 	hash =
-	    hash_pjw_bare(cert->raw_issuer_dn.data,
-			  cert->raw_issuer_dn.size);
+	    hash_pjw_bare(cert->raw_issuer_dn.data, cert->raw_issuer_dn.size);
 	hash %= list->size;
 
 	ret = check_if_in_blocklist(&cert, 1,
-		list->distrusted, list->distrusted_size);
+				    list->distrusted, list->distrusted_size);
 	if (ret != 0) {
 		*voutput = 0;
 		*voutput |= GNUTLS_CERT_REVOKED;
@@ -1751,8 +1813,7 @@ gnutls_x509_trust_list_verify_named_crt(gnutls_x509_trust_list_t list,
 
 /* return 1 if @cert is in @list, 0 if not */
 int
-_gnutls_trustlist_inlist(gnutls_x509_trust_list_t list,
-			 gnutls_x509_crt_t cert)
+_gnutls_trustlist_inlist(gnutls_x509_trust_list_t list, gnutls_x509_crt_t cert)
 {
 	int ret;
 	unsigned int i;
@@ -1764,8 +1825,7 @@ _gnutls_trustlist_inlist(gnutls_x509_trust_list_t list,
 	for (i = 0; i < list->node[hash].trusted_ca_size; i++) {
 		ret =
 		    gnutls_x509_crt_equals(cert,
-					       list->node[hash].
-					       trusted_cas[i]);
+					   list->node[hash].trusted_cas[i]);
 		if (ret != 0)
 			return 1;
 	}

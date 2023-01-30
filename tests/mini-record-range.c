@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,22 +35,22 @@ int main(void)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/dtls.h>
-#include <signal.h>
+# include <string.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/dtls.h>
+# include <signal.h>
 
-#include "cert-common.h"
-#include "utils.h"
+# include "cert-common.h"
+# include "utils.h"
 
-#define MAX_BUF 1024
-#define HIGH(x) (3*x)
+# define MAX_BUF 1024
+# define HIGH(x) (3*x)
 static void terminate(void);
 static int to_send;
 static size_t total;
@@ -68,16 +68,12 @@ static void client_log_func(int level, const char *str)
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
 
-
 /* A very basic TLS client, with anonymous authentication.
  */
 
-
-
-static ssize_t
-push(gnutls_transport_ptr_t tr, const void *data, size_t len)
+static ssize_t push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 {
-	int fd = (long int) tr;
+	int fd = (long int)tr;
 
 	if (to_send >= 0)
 		total += len;
@@ -141,14 +137,12 @@ static void client(int fd, const char *prio)
 	do {
 		do {
 			ret = gnutls_record_recv(session, buffer, MAX_BUF);
-		} while (ret == GNUTLS_E_AGAIN
-			 || ret == GNUTLS_E_INTERRUPTED);
+		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 	} while (ret > 0);
 
 	if (ret == 0) {
 		if (debug)
-			success
-			    ("client: Peer has closed the TLS connection\n");
+			success("client: Peer has closed the TLS connection\n");
 		goto end;
 	} else if (ret < 0) {
 		if (ret != 0) {
@@ -159,7 +153,7 @@ static void client(int fd, const char *prio)
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
-      end:
+ end:
 
 	close(fd);
 
@@ -170,7 +164,6 @@ static void client(int fd, const char *prio)
 
 	gnutls_global_deinit();
 }
-
 
 /* These are global */
 pid_t child;
@@ -208,8 +201,7 @@ static void server(int fd, const char *prio)
 
 	gnutls_certificate_allocate_credentials(&x509_cred);
 	gnutls_certificate_set_x509_key_mem(x509_cred, &server_cert,
-					    &server_key,
-					    GNUTLS_X509_FMT_PEM);
+					    &server_key, GNUTLS_X509_FMT_PEM);
 
 	gnutls_anon_allocate_server_credentials(&anoncred);
 
@@ -256,10 +248,8 @@ static void server(int fd, const char *prio)
 		do {
 			ret =
 			    gnutls_record_send_range(session, buffer,
-						     sizeof(buffer),
-						     &range);
-		} while (ret == GNUTLS_E_AGAIN
-			 || ret == GNUTLS_E_INTERRUPTED);
+						     sizeof(buffer), &range);
+		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 		if (ret < 0) {
 			fail("Error sending packet: %s\n",
@@ -268,7 +258,7 @@ static void server(int fd, const char *prio)
 		}
 		if (total < HIGH(MAX_BUF)) {
 			fail("Sent data (%u) are lower than expected (%u)\n",
-			     (unsigned) total, (unsigned) HIGH(MAX_BUF));
+			     (unsigned)total, (unsigned)HIGH(MAX_BUF));
 			terminate();
 		}
 
@@ -323,8 +313,8 @@ static void start(const char *prio)
 	}
 }
 
-#define AES_CBC "NONE:+VERS-TLS1.2:+AES-128-CBC:+MAC-ALL:+SIGN-ALL:+ANON-ECDH:+CURVE-ALL"
-#define AES_GCM "NONE:+VERS-TLS1.3:+AES-256-GCM:+AEAD:+SIGN-ALL:+GROUP-ALL"
+# define AES_CBC "NONE:+VERS-TLS1.2:+AES-128-CBC:+MAC-ALL:+SIGN-ALL:+ANON-ECDH:+CURVE-ALL"
+# define AES_GCM "NONE:+VERS-TLS1.3:+AES-256-GCM:+AEAD:+SIGN-ALL:+GROUP-ALL"
 
 static void ch_handler(int sig)
 {

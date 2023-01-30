@@ -27,8 +27,7 @@
 #include <ext/srtp.h>
 
 static int _gnutls_srtp_recv_params(gnutls_session_t session,
-				    const uint8_t * data,
-				    size_t data_size);
+				    const uint8_t * data, size_t data_size);
 static int _gnutls_srtp_send_params(gnutls_session_t session,
 				    gnutls_buffer_st * extdata);
 
@@ -38,13 +37,14 @@ static int _gnutls_srtp_pack(gnutls_ext_priv_data_t _priv,
 			     gnutls_buffer_st * ps);
 static void _gnutls_srtp_deinit_data(gnutls_ext_priv_data_t priv);
 
-
 const hello_ext_entry_st ext_mod_srtp = {
 	.name = "SRTP",
 	.tls_id = 14,
 	.gid = GNUTLS_EXTENSION_SRTP,
-	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_DTLS | GNUTLS_EXT_FLAG_CLIENT_HELLO |
-		    GNUTLS_EXT_FLAG_EE | GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
+	.validity =
+	    GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_DTLS |
+	    GNUTLS_EXT_FLAG_CLIENT_HELLO | GNUTLS_EXT_FLAG_EE |
+	    GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
 	.client_parse_point = GNUTLS_EXT_APPLICATION,
 	.server_parse_point = GNUTLS_EXT_APPLICATION,
 	.recv_func = _gnutls_srtp_recv_params,
@@ -64,35 +64,29 @@ typedef struct {
 
 static const srtp_profile_st profile_names[] = {
 	{
-		"SRTP_AES128_CM_HMAC_SHA1_80",
-		GNUTLS_SRTP_AES128_CM_HMAC_SHA1_80,
-		16, 14
-	},
+	 "SRTP_AES128_CM_HMAC_SHA1_80",
+	 GNUTLS_SRTP_AES128_CM_HMAC_SHA1_80,
+	 16, 14},
 	{
-		"SRTP_AES128_CM_HMAC_SHA1_32",
-		GNUTLS_SRTP_AES128_CM_HMAC_SHA1_32,
-		16, 14
-	},
+	 "SRTP_AES128_CM_HMAC_SHA1_32",
+	 GNUTLS_SRTP_AES128_CM_HMAC_SHA1_32,
+	 16, 14},
 	{
-		"SRTP_NULL_HMAC_SHA1_80",
-		GNUTLS_SRTP_NULL_HMAC_SHA1_80,
-		16, 14
-	},
+	 "SRTP_NULL_HMAC_SHA1_80",
+	 GNUTLS_SRTP_NULL_HMAC_SHA1_80,
+	 16, 14},
 	{
-		"SRTP_NULL_SHA1_32",
-		GNUTLS_SRTP_NULL_HMAC_SHA1_32,
-		16, 14
-	},
+	 "SRTP_NULL_SHA1_32",
+	 GNUTLS_SRTP_NULL_HMAC_SHA1_32,
+	 16, 14},
 	{
-		"SRTP_AEAD_AES_128_GCM",
-		GNUTLS_SRTP_AEAD_AES_128_GCM,
-		16, 12
-	},
+	 "SRTP_AEAD_AES_128_GCM",
+	 GNUTLS_SRTP_AEAD_AES_128_GCM,
+	 16, 12},
 	{
-		"SRTP_AEAD_AES_256_GCM",
-		GNUTLS_SRTP_AEAD_AES_256_GCM,
-		32, 12
-	},
+	 "SRTP_AEAD_AES_256_GCM",
+	 GNUTLS_SRTP_AEAD_AES_256_GCM,
+	 32, 12},
 	{
 	 NULL,
 	 0, 0, 0}
@@ -120,8 +114,7 @@ static gnutls_srtp_profile_t find_profile(const char *str, const char *end)
 	}
 
 	while (prof->name != NULL) {
-		if (strlen(prof->name) == len
-		    && !strncmp(str, prof->name, len)) {
+		if (strlen(prof->name) == len && !strncmp(str, prof->name, len)) {
 			return prof->id;
 		}
 		prof++;
@@ -188,8 +181,7 @@ _gnutls_srtp_recv_params(gnutls_session_t session,
 	uint16_t profile;
 
 	ret =
-	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_SRTP,
-					 &epriv);
+	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_SRTP, &epriv);
 	if (ret < 0)
 		return 0;
 
@@ -200,8 +192,7 @@ _gnutls_srtp_recv_params(gnutls_session_t session,
 	p += 2;
 
 	if (len + 1 > data_size)
-		return
-		    gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
 	if (session->security_parameters.entity == GNUTLS_SERVER) {
 		if (len > MAX_PROFILES_IN_SRTP_EXTENSION * 2)
@@ -245,8 +236,7 @@ _gnutls_srtp_recv_params(gnutls_session_t session,
 }
 
 static int
-_gnutls_srtp_send_params(gnutls_session_t session,
-			 gnutls_buffer_st * extdata)
+_gnutls_srtp_send_params(gnutls_session_t session, gnutls_buffer_st * extdata)
 {
 	unsigned i;
 	int total_size = 0, ret;
@@ -254,8 +244,7 @@ _gnutls_srtp_send_params(gnutls_session_t session,
 	gnutls_ext_priv_data_t epriv;
 
 	ret =
-	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_SRTP,
-					 &epriv);
+	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_SRTP, &epriv);
 	if (ret < 0)
 		return 0;
 
@@ -288,8 +277,7 @@ _gnutls_srtp_send_params(gnutls_session_t session,
 		for (i = 0; i < priv->profiles_size; i++) {
 			ret =
 			    _gnutls_buffer_append_prefix(extdata, 16,
-							 priv->
-							 profiles[i]);
+							 priv->profiles[i]);
 			if (ret < 0)
 				return gnutls_assert_val(ret);
 		}
@@ -328,8 +316,7 @@ gnutls_srtp_get_selected_profile(gnutls_session_t session,
 	gnutls_ext_priv_data_t epriv;
 
 	ret =
-	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_SRTP,
-					 &epriv);
+	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_SRTP, &epriv);
 	if (ret < 0) {
 		gnutls_assert();
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
@@ -367,19 +354,14 @@ int gnutls_srtp_get_mki(gnutls_session_t session, gnutls_datum_t * mki)
 	gnutls_ext_priv_data_t epriv;
 
 	ret =
-	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_SRTP,
-					 &epriv);
+	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_SRTP, &epriv);
 	if (ret < 0)
-		return
-		    gnutls_assert_val
-		    (GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
 	priv = epriv;
 
 	if (priv->mki_received == 0)
-		return
-		    gnutls_assert_val
-		    (GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
 	mki->data = priv->mki;
 	mki->size = priv->mki_size;
@@ -400,16 +382,14 @@ int gnutls_srtp_get_mki(gnutls_session_t session, gnutls_datum_t * mki)
  *
  * Since 3.1.4
  **/
-int
-gnutls_srtp_set_mki(gnutls_session_t session, const gnutls_datum_t * mki)
+int gnutls_srtp_set_mki(gnutls_session_t session, const gnutls_datum_t * mki)
 {
 	int ret;
 	srtp_ext_st *priv;
 	gnutls_ext_priv_data_t epriv;
 
 	ret =
-	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_SRTP,
-					 &epriv);
+	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_SRTP, &epriv);
 	if (ret < 0) {
 		priv = gnutls_calloc(1, sizeof(*priv));
 		if (priv == NULL) {
@@ -418,7 +398,7 @@ gnutls_srtp_set_mki(gnutls_session_t session, const gnutls_datum_t * mki)
 		}
 		epriv = priv;
 		_gnutls_hello_ext_set_priv(session,
-					     GNUTLS_EXTENSION_SRTP, epriv);
+					   GNUTLS_EXTENSION_SRTP, epriv);
 	} else
 		priv = epriv;
 
@@ -445,16 +425,14 @@ gnutls_srtp_set_mki(gnutls_session_t session, const gnutls_datum_t * mki)
  * Since 3.1.4
  **/
 int
-gnutls_srtp_set_profile(gnutls_session_t session,
-			gnutls_srtp_profile_t profile)
+gnutls_srtp_set_profile(gnutls_session_t session, gnutls_srtp_profile_t profile)
 {
 	int ret;
 	srtp_ext_st *priv;
 	gnutls_ext_priv_data_t epriv;
 
 	ret =
-	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_SRTP,
-					 &epriv);
+	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_SRTP, &epriv);
 	if (ret < 0) {
 		priv = gnutls_calloc(1, sizeof(*priv));
 		if (priv == NULL) {
@@ -463,7 +441,7 @@ gnutls_srtp_set_profile(gnutls_session_t session,
 		}
 		epriv = priv;
 		_gnutls_hello_ext_set_priv(session,
-					     GNUTLS_EXTENSION_SRTP, epriv);
+					   GNUTLS_EXTENSION_SRTP, epriv);
 	} else
 		priv = epriv;
 
@@ -501,8 +479,7 @@ gnutls_srtp_set_profile_direct(gnutls_session_t session,
 	gnutls_srtp_profile_t id;
 
 	ret =
-	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_SRTP,
-					 &epriv);
+	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_SRTP, &epriv);
 	if (ret < 0) {
 		set = 1;
 		priv = gnutls_calloc(1, sizeof(*priv));
@@ -536,7 +513,7 @@ gnutls_srtp_set_profile_direct(gnutls_session_t session,
 
 	if (set != 0)
 		_gnutls_hello_ext_set_priv(session,
-					     GNUTLS_EXTENSION_SRTP, epriv);
+					   GNUTLS_EXTENSION_SRTP, epriv);
 
 	return 0;
 }
@@ -569,8 +546,7 @@ gnutls_srtp_get_keys(gnutls_session_t session,
 		     unsigned int key_material_size,
 		     gnutls_datum_t * client_key,
 		     gnutls_datum_t * client_salt,
-		     gnutls_datum_t * server_key,
-		     gnutls_datum_t * server_salt)
+		     gnutls_datum_t * server_key, gnutls_datum_t * server_salt)
 {
 	int ret;
 	const srtp_profile_st *p;
@@ -595,8 +571,7 @@ gnutls_srtp_get_keys(gnutls_session_t session,
 
 	ret =
 	    gnutls_prf(session, sizeof("EXTRACTOR-dtls_srtp") - 1,
-		       "EXTRACTOR-dtls_srtp", 0, 0, NULL, msize,
-		       key_material);
+		       "EXTRACTOR-dtls_srtp", 0, 0, NULL, msize, key_material);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -616,8 +591,7 @@ gnutls_srtp_get_keys(gnutls_session_t session,
 	}
 
 	if (server_salt) {
-		server_salt->data =
-		    km + 2 * p->key_length + p->salt_length;
+		server_salt->data = km + 2 * p->key_length + p->salt_length;
 		server_salt->size = p->salt_length;
 	}
 
@@ -680,7 +654,7 @@ _gnutls_srtp_unpack(gnutls_buffer_st * ps, gnutls_ext_priv_data_t * _priv)
 
 	return 0;
 
-      error:
+ error:
 	gnutls_free(priv);
 	return ret;
 }

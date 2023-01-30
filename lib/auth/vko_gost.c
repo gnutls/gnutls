@@ -68,10 +68,9 @@ const mod_auth_st vko_gost_auth_struct = {
 	_gnutls_proc_cert_cert_req
 };
 
-#define VKO_GOST_UKM_LEN	8
+# define VKO_GOST_UKM_LEN	8
 
-static int
-calc_ukm(gnutls_session_t session, uint8_t *ukm)
+static int calc_ukm(gnutls_session_t session, uint8_t * ukm)
 {
 	gnutls_digest_algorithm_t digalg = GNUTLS_DIG_STREEBOG_256;
 	gnutls_hash_hd_t dig;
@@ -92,10 +91,10 @@ calc_ukm(gnutls_session_t session, uint8_t *ukm)
 	return gnutls_hash_get_len(digalg);
 }
 
-static int print_priv_key(gnutls_pk_params_st *params)
+static int print_priv_key(gnutls_pk_params_st * params)
 {
 	int ret;
-	uint8_t priv_buf[512/8];
+	uint8_t priv_buf[512 / 8];
 	char buf[512 / 4 + 1];
 	size_t bytes = sizeof(priv_buf);
 
@@ -103,23 +102,19 @@ static int print_priv_key(gnutls_pk_params_st *params)
 	if (likely(_gnutls_log_level < 9))
 		return GNUTLS_E_SUCCESS;
 
-	ret = _gnutls_mpi_print(params->params[GOST_K],
-				priv_buf, &bytes);
+	ret = _gnutls_mpi_print(params->params[GOST_K], priv_buf, &bytes);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
 	_gnutls_hard_log("INT: VKO PRIVATE KEY[%zd]: %s\n",
 			 bytes, _gnutls_bin2hex(priv_buf,
-						bytes,
-						buf, sizeof(buf),
-						NULL));
+						bytes, buf, sizeof(buf), NULL));
 	return 0;
 }
 
 static int
 vko_prepare_client_keys(gnutls_session_t session,
-			gnutls_pk_params_st *pub,
-			gnutls_pk_params_st *priv)
+			gnutls_pk_params_st * pub, gnutls_pk_params_st * priv)
 {
 	int ret;
 	gnutls_ecc_curve_t curve;
@@ -164,9 +159,7 @@ vko_prepare_client_keys(gnutls_session_t session,
 
 	_gnutls_session_group_set(session, group);
 
-	ret =  _gnutls_pk_generate_keys(pub->algo,
-					curve,
-					priv, 1);
+	ret = _gnutls_pk_generate_keys(pub->algo, curve, priv, 1);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -174,7 +167,7 @@ vko_prepare_client_keys(gnutls_session_t session,
 
 	print_priv_key(priv);
 
-	session->key.key.size = 32; /* GOST key size */
+	session->key.key.size = 32;	/* GOST key size */
 	session->key.key.data = gnutls_malloc(session->key.key.size);
 	if (session->key.key.data == NULL) {
 		gnutls_assert();
@@ -217,7 +210,7 @@ proc_vko_gost_client_kx(gnutls_session_t session,
 	ssize_t data_size = _data_size;
 	gnutls_privkey_t privkey = session->internals.selected_key;
 	uint8_t ukm_data[MAX_HASH_SIZE];
-	gnutls_datum_t ukm = {ukm_data, VKO_GOST_UKM_LEN};
+	gnutls_datum_t ukm = { ukm_data, VKO_GOST_UKM_LEN };
 	gnutls_datum_t cek;
 	int len;
 
@@ -244,7 +237,7 @@ proc_vko_gost_client_kx(gnutls_session_t session,
 	data += i;
 
 	/* Now do the tricky part: determine length of GostR3410-KeyTransport */
-	DECR_LEN(data_size, 1); /* tag */
+	DECR_LEN(data_size, 1);	/* tag */
 	ret = asn1_get_length_der(&data[1], data_size, &len);
 	DECR_LEN_FINAL(data_size, len + ret);
 
@@ -256,8 +249,7 @@ proc_vko_gost_client_kx(gnutls_session_t session,
 		return gnutls_assert_val(ret);
 
 	ret = _gnutls_gost_keytrans_decrypt(&privkey->key.x509->params,
-					    &cek, &ukm,
-					    &session->key.key);
+					    &cek, &ukm, &session->key.key);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -265,13 +257,12 @@ proc_vko_gost_client_kx(gnutls_session_t session,
 }
 
 static int
-gen_vko_gost_client_kx(gnutls_session_t session,
-		       gnutls_buffer_st * data)
+gen_vko_gost_client_kx(gnutls_session_t session, gnutls_buffer_st * data)
 {
 	int ret;
-	gnutls_datum_t out = {};
+	gnutls_datum_t out = { };
 	uint8_t ukm_data[MAX_HASH_SIZE];
-	gnutls_datum_t ukm = {ukm_data, VKO_GOST_UKM_LEN};
+	gnutls_datum_t ukm = { ukm_data, VKO_GOST_UKM_LEN };
 	gnutls_pk_params_st pub;
 	gnutls_pk_params_st priv;
 	uint8_t tl[1 + ASN1_MAX_LENGTH_SIZE];
@@ -289,8 +280,7 @@ gen_vko_gost_client_kx(gnutls_session_t session,
 
 	ret = _gnutls_gost_keytrans_encrypt(&pub,
 					    &priv,
-					    &session->key.key,
-					    &ukm, &out);
+					    &session->key.key, &ukm, &out);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;

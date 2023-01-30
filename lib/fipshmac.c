@@ -27,16 +27,16 @@
 
 #ifdef HAVE_DL_ITERATE_PHDR
 
-#include <gnutls/gnutls.h>
-#include <gnutls/crypto.h>
-#include <link.h>
-#include "dirname.h"
-#include "errors.h"
+# include <gnutls/gnutls.h>
+# include <gnutls/crypto.h>
+# include <link.h>
+# include "dirname.h"
+# include "errors.h"
 
-#define FORMAT_VERSION 1
-#define HMAC_SIZE 32
-#define HMAC_ALGO GNUTLS_MAC_SHA256
-#define HMAC_STR_SIZE (2 * HMAC_SIZE + 1)
+# define FORMAT_VERSION 1
+# define HMAC_SIZE 32
+# define HMAC_ALGO GNUTLS_MAC_SHA256
+# define HMAC_STR_SIZE (2 * HMAC_SIZE + 1)
 
 static int get_hmac(const char *path, char *hmac, size_t hmac_size)
 {
@@ -52,7 +52,7 @@ static int get_hmac(const char *path, char *hmac, size_t hmac_size)
 
 	GNUTLS_FIPS140_SET_LAX_MODE();
 	ret = gnutls_hmac_fast(HMAC_ALGO, FIPS_KEY, sizeof(FIPS_KEY) - 1,
-                               data.data, data.size, buffer);
+			       data.data, data.size, buffer);
 	GNUTLS_FIPS140_SET_STRICT_MODE();
 
 	gnutls_free(data.data);
@@ -83,7 +83,7 @@ static int print_lib(const char *path, const char *soname)
 	ret = get_hmac(real_path, hmac, sizeof(hmac));
 	if (ret < 0) {
 		fprintf(stderr, "Could not calculate HMAC for %s: %s\n",
-                        last_component(real_path), gnutls_strerror(ret));
+			last_component(real_path), gnutls_strerror(ret));
 		goto cleanup;
 	}
 
@@ -91,7 +91,7 @@ static int print_lib(const char *path, const char *soname)
 	printf("path = %s\n", real_path);
 	printf("hmac = %s\n", hmac);
 
-cleanup:
+ cleanup:
 	free(real_path);
 	return ret;
 }
@@ -109,13 +109,14 @@ static int callback(struct dl_phdr_info *info, size_t size, void *data)
 		return print_lib(path, soname);
 	if (!strcmp(soname, GMP_LIBRARY_SONAME))
 		return print_lib(path, soname);
-        return 0;
+	return 0;
 }
 
 int main(int argc, char **argv)
 {
 	if (argc != 1 && argc != 2) {
-		fprintf(stderr, "Usage: %s [gnutls_so_path]\n", last_component(argv[0]));
+		fprintf(stderr, "Usage: %s [gnutls_so_path]\n",
+			last_component(argv[0]));
 		return EXIT_FAILURE;
 	}
 
@@ -133,4 +134,4 @@ int main(void)
 	return EXIT_FAILURE;
 }
 
-#endif /* HAVE_DL_ITERATE_PHDR */
+#endif				/* HAVE_DL_ITERATE_PHDR */

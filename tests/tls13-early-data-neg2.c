@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,23 +35,23 @@ int main(void)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/crypto.h>
-#include <gnutls/dtls.h>
-#include <signal.h>
-#include <sys/wait.h>
-#include <assert.h>
+# include <string.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/crypto.h>
+# include <gnutls/dtls.h>
+# include <signal.h>
+# include <sys/wait.h>
+# include <assert.h>
 
-#include "cert-common.h"
-#include "utils.h"
-#include "virt-time.h"
+# include "cert-common.h"
+# include "utils.h"
+# include "virt-time.h"
 
 /* This program checks that early data is refused upon resumption failure.
  */
@@ -66,12 +66,11 @@ static void client_log_func(int level, const char *str)
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
 
-
-#define SESSIONS 2
-#define MAX_BUF 1024
-#define MSG "Hello TLS"
-#define EARLY_MSG "Hello TLS, it's early"
-#define PRIORITY "NORMAL:-VERS-ALL:+VERS-TLS1.3"
+# define SESSIONS 2
+# define MAX_BUF 1024
+# define MSG "Hello TLS"
+# define EARLY_MSG "Hello TLS, it's early"
+# define PRIORITY "NORMAL:-VERS-ALL:+VERS-TLS1.3"
 
 static void client(int sds[])
 {
@@ -80,7 +79,7 @@ static void client(int sds[])
 	gnutls_certificate_credentials_t x509_cred;
 	gnutls_session_t session;
 	int t;
-	gnutls_datum_t session_data = {NULL, 0};
+	gnutls_datum_t session_data = { NULL, 0 };
 
 	if (debug) {
 		gnutls_global_set_log_function(client_log_func);
@@ -97,16 +96,21 @@ static void client(int sds[])
 	for (t = 0; t < SESSIONS; t++) {
 		int sd = sds[t];
 
-		assert(gnutls_init(&session, GNUTLS_CLIENT)>=0);
-		assert(gnutls_priority_set_direct(session, PRIORITY, NULL)>=0);
+		assert(gnutls_init(&session, GNUTLS_CLIENT) >= 0);
+		assert(gnutls_priority_set_direct(session, PRIORITY, NULL) >=
+		       0);
 
-		gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
+		gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
+				       x509_cred);
 
 		gnutls_transport_set_int(session, sd);
 
 		if (t > 0) {
-			assert(gnutls_session_set_data(session, session_data.data, session_data.size) >= 0);
-			assert(gnutls_record_send_early_data(session, EARLY_MSG, sizeof(EARLY_MSG)) >= 0);
+			assert(gnutls_session_set_data
+			       (session, session_data.data,
+				session_data.size) >= 0);
+			assert(gnutls_record_send_early_data
+			       (session, EARLY_MSG, sizeof(EARLY_MSG)) >= 0);
 		}
 
 		/* Perform the TLS handshake
@@ -127,9 +131,7 @@ static void client(int sds[])
 
 		if (t == 0) {
 			/* get the session data size */
-			ret =
-			    gnutls_session_get_data2(session,
-						     &session_data);
+			ret = gnutls_session_get_data2(session, &session_data);
 			if (ret < 0)
 				fail("client: Getting resume data failed\n");
 		}
@@ -141,12 +143,13 @@ static void client(int sds[])
 		gnutls_record_send(session, MSG, strlen(MSG));
 
 		do {
-			ret = gnutls_record_recv(session, buffer, sizeof(buffer));
+			ret =
+			    gnutls_record_recv(session, buffer, sizeof(buffer));
 		} while (ret == GNUTLS_E_AGAIN);
 		if (ret == 0) {
 			if (debug)
 				success
-					("client: Peer has closed the TLS connection\n");
+				    ("client: Peer has closed the TLS connection\n");
 			goto end;
 		} else if (ret < 0) {
 			fail("client: Error: %s\n", gnutls_strerror(ret));
@@ -164,10 +167,9 @@ static void client(int sds[])
 	gnutls_certificate_free_credentials(x509_cred);
 }
 
-
 static pid_t child;
 
-#define MAX_CLIENT_HELLO_RECORDED 10
+# define MAX_CLIENT_HELLO_RECORDED 10
 
 struct storage_st {
 	gnutls_datum_t entries[MAX_CLIENT_HELLO_RECORDED];
@@ -175,7 +177,8 @@ struct storage_st {
 };
 
 static int
-storage_add(void *ptr, time_t expires, const gnutls_datum_t *key, const gnutls_datum_t *value)
+storage_add(void *ptr, time_t expires, const gnutls_datum_t * key,
+	    const gnutls_datum_t * value)
 {
 	struct storage_st *storage = ptr;
 	gnutls_datum_t *datum;
@@ -183,7 +186,8 @@ storage_add(void *ptr, time_t expires, const gnutls_datum_t *key, const gnutls_d
 
 	for (i = 0; i < storage->num_entries; i++) {
 		if (key->size == storage->entries[i].size &&
-		    memcmp(storage->entries[i].data, key->data, key->size) == 0) {
+		    memcmp(storage->entries[i].data, key->data,
+			   key->size) == 0) {
 			return GNUTLS_E_DB_ENTRY_EXISTS;
 		}
 	}
@@ -206,8 +210,7 @@ storage_add(void *ptr, time_t expires, const gnutls_datum_t *key, const gnutls_d
 	return 0;
 }
 
-static void
-storage_clear(struct storage_st *storage)
+static void storage_clear(struct storage_st *storage)
 {
 	size_t i;
 
@@ -240,8 +243,7 @@ static void server(int sds[])
 
 	gnutls_certificate_allocate_credentials(&x509_cred);
 	gnutls_certificate_set_x509_key_mem(x509_cred, &server_cert,
-					    &server_key,
-					    GNUTLS_X509_FMT_PEM);
+					    &server_key, GNUTLS_X509_FMT_PEM);
 
 	ret = gnutls_anti_replay_init(&anti_replay);
 	if (ret < 0)
@@ -254,11 +256,15 @@ static void server(int sds[])
 
 		success("=== session %d ===\n", t);
 
-		assert(gnutls_init(&session, GNUTLS_SERVER|GNUTLS_ENABLE_EARLY_DATA)>=0);
+		assert(gnutls_init
+		       (&session,
+			GNUTLS_SERVER | GNUTLS_ENABLE_EARLY_DATA) >= 0);
 
-		assert(gnutls_priority_set_direct(session, PRIORITY, NULL)>=0);
+		assert(gnutls_priority_set_direct(session, PRIORITY, NULL) >=
+		       0);
 
-		gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
+		gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
+				       x509_cred);
 
 		/* Intentionally overwrite the previous key to cause resumption
 		 * failure. */
@@ -287,8 +293,10 @@ static void server(int sds[])
 			fail("server: Session unexpectedly resumed (%d)\n", t);
 		}
 
-		if (gnutls_session_get_flags(session) & GNUTLS_SFLAGS_EARLY_DATA) {
-			fail("server: Unexpected early data received (%d)\n", t);
+		if (gnutls_session_get_flags(session) &
+		    GNUTLS_SFLAGS_EARLY_DATA) {
+			fail("server: Unexpected early data received (%d)\n",
+			     t);
 		}
 
 		for (;;) {

@@ -23,26 +23,25 @@
 
 #ifdef HAVE_LIBSECCOMP
 
-#include <seccomp.h>
-#include <errno.h>
-#include <string.h>
-#if defined(__linux__)
+# include <seccomp.h>
+# include <errno.h>
+# include <string.h>
+# if defined(__linux__)
 #  include <sys/syscall.h>
-#endif
+# endif
 
 int disable_system_calls(void)
 {
 	int ret;
 	scmp_filter_ctx ctx;
 
-	/*ctx = seccomp_init(SCMP_ACT_ERRNO(EPERM));*/
+	/*ctx = seccomp_init(SCMP_ACT_ERRNO(EPERM)); */
 	ctx = seccomp_init(SCMP_ACT_TRAP);
 	if (ctx == NULL) {
 		fprintf(stderr, "could not initialize seccomp");
 		return -1;
 	}
-
-#define ADD_SYSCALL(name, ...) \
+# define ADD_SYSCALL(name, ...) \
 	ret = seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(name), __VA_ARGS__); \
 	/* libseccomp returns EDOM for pseudo-syscalls due to a bug */ \
 	if (ret < 0 && ret != -EDOM) { \
@@ -56,9 +55,9 @@ int disable_system_calls(void)
 	ADD_SYSCALL(time, 0);
 	ADD_SYSCALL(getpid, 0);
 	ADD_SYSCALL(gettimeofday, 0);
-#if defined(HAVE_CLOCK_GETTIME)
+# if defined(HAVE_CLOCK_GETTIME)
 	ADD_SYSCALL(clock_gettime, 0);
-#endif
+# endif
 
 	ADD_SYSCALL(getrusage, 0);
 
@@ -74,9 +73,9 @@ int disable_system_calls(void)
 
 	/* to read from /dev/urandom */
 	ADD_SYSCALL(read, 0);
-#ifdef SYS_getrandom
+# ifdef SYS_getrandom
 	ADD_SYSCALL(getrandom, 0);
-#endif
+# endif
 
 	/* we use it in select */
 	ADD_SYSCALL(sigprocmask, 0);
@@ -107,10 +106,10 @@ int disable_system_calls(void)
 		ret = -1;
 		goto fail;
 	}
-	
+
 	ret = 0;
 
-fail:
+ fail:
 	seccomp_release(ctx);
 	return ret;
 }

@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,17 +35,16 @@
 
 const char *side;
 
-static gnutls_datum_t test_id = { (void*)"\xff\xff\xff\xff\xff\xff", 6 };
+static gnutls_datum_t test_id = { (void *)"\xff\xff\xff\xff\xff\xff", 6 };
 
 static void tls_log_func(int level, const char *str)
 {
 	fprintf(stderr, "%s|<%d>| %s", side, level, str);
 }
 
-static gnutls_datum_t dbdata = {NULL, 0};
+static gnutls_datum_t dbdata = { NULL, 0 };
 
-static int
-wrap_db_store(void *dbf, gnutls_datum_t key, gnutls_datum_t data)
+static int wrap_db_store(void *dbf, gnutls_datum_t key, gnutls_datum_t data)
 {
 	unsigned *try_resume = dbf;
 
@@ -65,9 +64,10 @@ wrap_db_store(void *dbf, gnutls_datum_t key, gnutls_datum_t data)
 static gnutls_datum_t wrap_db_fetch(void *dbf, gnutls_datum_t key)
 {
 	unsigned *try_resume = dbf;
-	gnutls_datum_t r = {NULL, 0};
+	gnutls_datum_t r = { NULL, 0 };
 
-	if (key.size != test_id.size || memcmp(test_id.data, key.data, test_id.size) != 0)
+	if (key.size != test_id.size
+	    || memcmp(test_id.data, key.data, test_id.size) != 0)
 		fail("received ID does not match the expected\n");
 
 	if (!(*try_resume))
@@ -106,14 +106,13 @@ static void start(const char *test, unsigned try_resume)
 	if (debug)
 		gnutls_global_set_log_level(6);
 
-	assert(gnutls_certificate_allocate_credentials(&serverx509cred)>=0);
+	assert(gnutls_certificate_allocate_credentials(&serverx509cred) >= 0);
 	assert(gnutls_certificate_set_x509_key_mem(serverx509cred,
-					    &server_cert, &server_key,
-					    GNUTLS_X509_FMT_PEM)>=0);
+						   &server_cert, &server_key,
+						   GNUTLS_X509_FMT_PEM) >= 0);
 
-	assert(gnutls_init(&server, GNUTLS_SERVER)>=0);
-	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-				serverx509cred);
+	assert(gnutls_init(&server, GNUTLS_SERVER) >= 0);
+	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, serverx509cred);
 	gnutls_set_default_priority(server);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
@@ -124,14 +123,16 @@ static void start(const char *test, unsigned try_resume)
 	gnutls_db_set_store_function(server, wrap_db_store);
 	gnutls_db_set_ptr(server, &try_resume);
 
-	assert(gnutls_certificate_allocate_credentials(&clientx509cred)>=0);
-	assert(gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca_cert, GNUTLS_X509_FMT_PEM)>=0);
+	assert(gnutls_certificate_allocate_credentials(&clientx509cred) >= 0);
+	assert(gnutls_certificate_set_x509_trust_mem
+	       (clientx509cred, &ca_cert, GNUTLS_X509_FMT_PEM) >= 0);
 
-	assert(gnutls_init(&client, GNUTLS_CLIENT)>=0);
+	assert(gnutls_init(&client, GNUTLS_CLIENT) >= 0);
 	assert(gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-				      clientx509cred)>=0);
+				      clientx509cred) >= 0);
 
-	assert(gnutls_priority_set_direct(client, "NORMAL:-VERS-ALL:+VERS-TLS1.2", NULL)>=0);
+	assert(gnutls_priority_set_direct
+	       (client, "NORMAL:-VERS-ALL:+VERS-TLS1.2", NULL) >= 0);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
@@ -152,9 +153,8 @@ static void start(const char *test, unsigned try_resume)
 	gnutls_deinit(client);
 	gnutls_deinit(server);
 
-	assert(gnutls_init(&server, GNUTLS_SERVER)>=0);
-	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-				serverx509cred);
+	assert(gnutls_init(&server, GNUTLS_SERVER) >= 0);
+	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, serverx509cred);
 	gnutls_set_default_priority(server);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
@@ -165,12 +165,13 @@ static void start(const char *test, unsigned try_resume)
 	gnutls_db_set_store_function(server, wrap_db_store);
 	gnutls_db_set_ptr(server, &try_resume);
 
-	assert(gnutls_init(&client, GNUTLS_CLIENT)>=0);
+	assert(gnutls_init(&client, GNUTLS_CLIENT) >= 0);
 
 	assert(gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-				      clientx509cred)>=0);
+				      clientx509cred) >= 0);
 
-	assert(gnutls_priority_set_direct(client, "NORMAL:-VERS-ALL:+VERS-TLS1.2", NULL)>=0);
+	assert(gnutls_priority_set_direct
+	       (client, "NORMAL:-VERS-ALL:+VERS-TLS1.2", NULL) >= 0);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
@@ -183,7 +184,8 @@ static void start(const char *test, unsigned try_resume)
 	gnutls_free(data.data);
 
 	if (try_resume) {
-		HANDSHAKE_EXPECT(client, server, GNUTLS_E_UNEXPECTED_PACKET, GNUTLS_E_AGAIN);
+		HANDSHAKE_EXPECT(client, server, GNUTLS_E_UNEXPECTED_PACKET,
+				 GNUTLS_E_AGAIN);
 	} else {
 		HANDSHAKE(client, server);
 	}

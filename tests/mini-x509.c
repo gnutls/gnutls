@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -80,9 +80,8 @@ void start(const char *prio, unsigned expect_max)
 					    GNUTLS_X509_FMT_PEM);
 
 	gnutls_init(&server, GNUTLS_SERVER);
-	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-				serverx509cred);
-	assert(gnutls_priority_set_direct(server, prio, NULL)>=0);
+	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, serverx509cred);
+	assert(gnutls_priority_set_direct(server, prio, NULL) >= 0);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
@@ -92,7 +91,9 @@ void start(const char *prio, unsigned expect_max)
 	if (ret < 0)
 		exit(1);
 
-	ret = gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca_cert, GNUTLS_X509_FMT_PEM);
+	ret =
+	    gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca_cert,
+						  GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);
 
@@ -101,7 +102,7 @@ void start(const char *prio, unsigned expect_max)
 		exit(1);
 
 	ret = gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-				clientx509cred);
+				     clientx509cred);
 	if (ret < 0)
 		exit(1);
 
@@ -112,8 +113,10 @@ void start(const char *prio, unsigned expect_max)
 
 	HANDSHAKE(client, server);
 
-	assert((gnutls_session_get_flags(server) & GNUTLS_SFLAGS_CLI_REQUESTED_OCSP) != 0);
-	assert((gnutls_session_get_flags(client) & GNUTLS_SFLAGS_CLI_REQUESTED_OCSP) != 0);
+	assert((gnutls_session_get_flags(server) &
+		GNUTLS_SFLAGS_CLI_REQUESTED_OCSP) != 0);
+	assert((gnutls_session_get_flags(client) &
+		GNUTLS_SFLAGS_CLI_REQUESTED_OCSP) != 0);
 
 	/* check gnutls_certificate_get_ours() - client side */
 	{
@@ -126,8 +129,8 @@ void start(const char *prio, unsigned expect_max)
 		}
 	}
 
-	assert(gnutls_certificate_type_get(server)==GNUTLS_CRT_X509);
-	assert(gnutls_certificate_type_get(client)==GNUTLS_CRT_X509);
+	assert(gnutls_certificate_type_get(server) == GNUTLS_CRT_X509);
+	assert(gnutls_certificate_type_get(client) == GNUTLS_CRT_X509);
 
 	/* check the number of certificates received and verify */
 	{
@@ -138,20 +141,22 @@ void start(const char *prio, unsigned expect_max)
 		memset(data, 0, sizeof(data));
 
 		data[0].type = GNUTLS_DT_DNS_HOSTNAME;
-		data[0].data = (void*)"localhost1";
+		data[0].data = (void *)"localhost1";
 
 		data[1].type = GNUTLS_DT_KEY_PURPOSE_OID;
-		data[1].data = (void*)GNUTLS_KP_TLS_WWW_SERVER;
+		data[1].data = (void *)GNUTLS_KP_TLS_WWW_SERVER;
 
 		gnutls_certificate_get_peers(client, &cert_list_size);
 		if (cert_list_size < 2) {
-			fail("received a certificate list of %d!\n", cert_list_size);
+			fail("received a certificate list of %d!\n",
+			     cert_list_size);
 			exit(1);
 		}
 
 		ret = gnutls_certificate_verify_peers(client, data, 2, &status);
 		if (ret < 0) {
-			fail("could not verify certificate: %s\n", gnutls_strerror(ret));
+			fail("could not verify certificate: %s\n",
+			     gnutls_strerror(ret));
 			exit(1);
 		}
 
@@ -161,11 +166,12 @@ void start(const char *prio, unsigned expect_max)
 		}
 
 		data[0].type = GNUTLS_DT_DNS_HOSTNAME;
-		data[0].data = (void*)"localhost";
+		data[0].data = (void *)"localhost";
 
 		ret = gnutls_certificate_verify_peers(client, data, 2, &status);
 		if (ret < 0) {
-			fail("could not verify certificate: %s\n", gnutls_strerror(ret));
+			fail("could not verify certificate: %s\n",
+			     gnutls_strerror(ret));
 			exit(1);
 		}
 
@@ -175,9 +181,12 @@ void start(const char *prio, unsigned expect_max)
 		}
 
 		/* check gnutls_certificate_verify_peers3 */
-		ret = gnutls_certificate_verify_peers3(client, "localhost1", &status);
+		ret =
+		    gnutls_certificate_verify_peers3(client, "localhost1",
+						     &status);
 		if (ret < 0) {
-			fail("could not verify certificate: %s\n", gnutls_strerror(ret));
+			fail("could not verify certificate: %s\n",
+			     gnutls_strerror(ret));
 			exit(1);
 		}
 
@@ -186,9 +195,12 @@ void start(const char *prio, unsigned expect_max)
 			exit(1);
 		}
 
-		ret = gnutls_certificate_verify_peers3(client, "localhost", &status);
+		ret =
+		    gnutls_certificate_verify_peers3(client, "localhost",
+						     &status);
 		if (ret < 0) {
-			fail("could not verify certificate: %s\n", gnutls_strerror(ret));
+			fail("could not verify certificate: %s\n",
+			     gnutls_strerror(ret));
 			exit(1);
 		}
 
@@ -200,7 +212,8 @@ void start(const char *prio, unsigned expect_max)
 		/* check gnutls_certificate_verify_peers2 */
 		ret = gnutls_certificate_verify_peers2(client, &status);
 		if (ret < 0) {
-			fail("could not verify certificate: %s\n", gnutls_strerror(ret));
+			fail("could not verify certificate: %s\n",
+			     gnutls_strerror(ret));
 			exit(1);
 		}
 
@@ -216,19 +229,22 @@ void start(const char *prio, unsigned expect_max)
 
 		t = gnutls_certificate_activation_time_peers(client);
 		if (t != 1396641545) {
-			fail("unexpected activation time: %lu\n", (long unsigned)t);
+			fail("unexpected activation time: %lu\n",
+			     (long unsigned)t);
 		}
 
 		if (sizeof(time_t) >= 8) {
 			t = gnutls_certificate_expiration_time_peers(client);
-			if (t != (time_t)253402300799UL) {
-				fail("unexpected expiration time: %lu\n", (long unsigned)t);
+			if (t != (time_t) 253402300799UL) {
+				fail("unexpected expiration time: %lu\n",
+				     (long unsigned)t);
 			}
 		}
 	}
 
 	if (expect_max) {
-		if (gnutls_protocol_get_version(client) != GNUTLS_TLS_VERSION_MAX) {
+		if (gnutls_protocol_get_version(client) !=
+		    GNUTLS_TLS_VERSION_MAX) {
 			fail("The negotiated TLS protocol is not the maximum supported\n");
 		}
 	}

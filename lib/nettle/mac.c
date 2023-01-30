@@ -36,21 +36,20 @@
 #include <nettle/pbkdf2.h>
 #include <nettle/cmac.h>
 #if ENABLE_GOST
-#include "gost/hmac-gost.h"
-#ifndef HAVE_NETTLE_GOST28147_SET_KEY
-#include "gost/gost28147.h"
-#endif
-#include "gost/cmac.h"
+# include "gost/hmac-gost.h"
+# ifndef HAVE_NETTLE_GOST28147_SET_KEY
+#  include "gost/gost28147.h"
+# endif
+# include "gost/cmac.h"
 #endif
 #include <nettle/gcm.h>
 
-typedef void (*update_func) (void *, size_t, const uint8_t *);
-typedef void (*digest_func) (void *, size_t, uint8_t *);
-typedef void (*set_key_func) (void *, size_t, const uint8_t *);
-typedef void (*set_nonce_func) (void *, size_t, const uint8_t *);
+typedef void (*update_func)(void *, size_t, const uint8_t *);
+typedef void (*digest_func)(void *, size_t, uint8_t *);
+typedef void (*set_key_func)(void *, size_t, const uint8_t *);
+typedef void (*set_nonce_func)(void *, size_t, const uint8_t *);
 
-static int wrap_nettle_hash_init(gnutls_digest_algorithm_t algo,
-				 void **_ctx);
+static int wrap_nettle_hash_init(gnutls_digest_algorithm_t algo, void **_ctx);
 
 struct md5_sha1_ctx {
 	struct md5_ctx md5;
@@ -115,8 +114,8 @@ struct nettle_mac_ctx {
 #endif
 		struct umac96_ctx umac96;
 		struct umac128_ctx umac128;
-                struct cmac_aes128_ctx cmac128;
-                struct cmac_aes256_ctx cmac256;
+		struct cmac_aes128_ctx cmac128;
+		struct cmac_aes256_ctx cmac256;
 		struct gmac_ctx gmac;
 	} ctx;
 
@@ -137,8 +136,7 @@ _wrap_gost28147_imit_set_key_tc26z(void *ctx, size_t len, const uint8_t * key)
 	gost28147_imit_set_key(ctx, len, key);
 }
 
-static void
-_wrap_cmac_magma_set_key(void *ctx, size_t len, const uint8_t * key)
+static void _wrap_cmac_magma_set_key(void *ctx, size_t len, const uint8_t * key)
 {
 	cmac_magma_set_key(ctx, key);
 }
@@ -150,32 +148,28 @@ _wrap_cmac_kuznyechik_set_key(void *ctx, size_t len, const uint8_t * key)
 }
 #endif
 
-static void
-_wrap_umac96_set_key(void *ctx, size_t len, const uint8_t * key)
+static void _wrap_umac96_set_key(void *ctx, size_t len, const uint8_t * key)
 {
 	if (unlikely(len != 16))
 		abort();
 	umac96_set_key(ctx, key);
 }
 
-static void
-_wrap_umac128_set_key(void *ctx, size_t len, const uint8_t * key)
+static void _wrap_umac128_set_key(void *ctx, size_t len, const uint8_t * key)
 {
 	if (unlikely(len != 16))
 		abort();
 	umac128_set_key(ctx, key);
 }
 
-static void
-_wrap_cmac128_set_key(void *ctx, size_t len, const uint8_t * key)
+static void _wrap_cmac128_set_key(void *ctx, size_t len, const uint8_t * key)
 {
 	if (unlikely(len != 16))
 		abort();
 	cmac_aes128_set_key(ctx, key);
 }
 
-static void
-_wrap_cmac256_set_key(void *ctx, size_t len, const uint8_t * key)
+static void _wrap_cmac256_set_key(void *ctx, size_t len, const uint8_t * key)
 {
 	if (unlikely(len != 32))
 		abort();
@@ -218,14 +212,15 @@ _wrap_gmac_aes256_set_key(void *_ctx, size_t len, const uint8_t * key)
 	ctx->pos = 0;
 }
 
-static void _wrap_gmac_set_nonce(void *_ctx, size_t nonce_length, const uint8_t *nonce)
+static void _wrap_gmac_set_nonce(void *_ctx, size_t nonce_length,
+				 const uint8_t * nonce)
 {
 	struct gmac_ctx *ctx = _ctx;
 
 	gcm_set_iv(&ctx->ctx, &ctx->key, nonce_length, nonce);
 }
 
-static void _wrap_gmac_update(void *_ctx, size_t length, const uint8_t *data)
+static void _wrap_gmac_update(void *_ctx, size_t length, const uint8_t * data)
 {
 	struct gmac_ctx *ctx = _ctx;
 
@@ -244,8 +239,7 @@ static void _wrap_gmac_update(void *_ctx, size_t length, const uint8_t *data)
 
 	if (length >= GCM_BLOCK_SIZE) {
 		gcm_update(&ctx->ctx, &ctx->key,
-			   length / GCM_BLOCK_SIZE * GCM_BLOCK_SIZE,
-			   data);
+			   length / GCM_BLOCK_SIZE * GCM_BLOCK_SIZE, data);
 		data += length / GCM_BLOCK_SIZE * GCM_BLOCK_SIZE;
 		length %= GCM_BLOCK_SIZE;
 	}
@@ -254,13 +248,14 @@ static void _wrap_gmac_update(void *_ctx, size_t length, const uint8_t *data)
 	ctx->pos = length;
 }
 
-static void _wrap_gmac_digest(void *_ctx, size_t length, uint8_t *digest)
+static void _wrap_gmac_digest(void *_ctx, size_t length, uint8_t * digest)
 {
 	struct gmac_ctx *ctx = _ctx;
 
 	if (ctx->pos)
 		gcm_update(&ctx->ctx, &ctx->key, ctx->pos, ctx->buffer);
-	gcm_digest(&ctx->ctx, &ctx->key, &ctx->cipher, ctx->encrypt, length, digest);
+	gcm_digest(&ctx->ctx, &ctx->key, &ctx->cipher, ctx->encrypt, length,
+		   digest);
 	ctx->pos = 0;
 }
 
@@ -395,7 +390,7 @@ static int _mac_ctx_init(gnutls_mac_algorithm_t algo,
 		ctx->digest = _wrap_gmac_digest;
 		ctx->ctx_ptr = &ctx->ctx.gmac;
 		ctx->length = GCM_DIGEST_SIZE;
-		ctx->ctx.gmac.encrypt = (nettle_cipher_func *)aes128_encrypt;
+		ctx->ctx.gmac.encrypt = (nettle_cipher_func *) aes128_encrypt;
 		break;
 	case GNUTLS_MAC_AES_GMAC_192:
 		ctx->set_key = _wrap_gmac_aes192_set_key;
@@ -404,7 +399,7 @@ static int _mac_ctx_init(gnutls_mac_algorithm_t algo,
 		ctx->digest = _wrap_gmac_digest;
 		ctx->ctx_ptr = &ctx->ctx.gmac;
 		ctx->length = GCM_DIGEST_SIZE;
-		ctx->ctx.gmac.encrypt = (nettle_cipher_func *)aes192_encrypt;
+		ctx->ctx.gmac.encrypt = (nettle_cipher_func *) aes192_encrypt;
 		break;
 	case GNUTLS_MAC_AES_GMAC_256:
 		ctx->set_key = _wrap_gmac_aes256_set_key;
@@ -413,7 +408,7 @@ static int _mac_ctx_init(gnutls_mac_algorithm_t algo,
 		ctx->digest = _wrap_gmac_digest;
 		ctx->ctx_ptr = &ctx->ctx.gmac;
 		ctx->length = GCM_DIGEST_SIZE;
-		ctx->ctx.gmac.encrypt = (nettle_cipher_func *)aes256_encrypt;
+		ctx->ctx.gmac.encrypt = (nettle_cipher_func *) aes256_encrypt;
 		break;
 	default:
 		gnutls_assert();
@@ -445,7 +440,7 @@ static int wrap_nettle_mac_fast(gnutls_mac_algorithm_t algo,
 	}
 	ctx.update(&ctx, text_size, text);
 	ctx.digest(&ctx, ctx.length, digest);
-	
+
 	zeroize_temp_key(&ctx, sizeof(ctx));
 
 	return 0;
@@ -509,20 +504,19 @@ static void *wrap_nettle_mac_copy(const void *_ctx)
 {
 	const struct nettle_mac_ctx *ctx = _ctx;
 	struct nettle_mac_ctx *new_ctx;
-	ptrdiff_t off = (uint8_t *)ctx->ctx_ptr - (uint8_t *)(&ctx->ctx);
+	ptrdiff_t off = (uint8_t *) ctx->ctx_ptr - (uint8_t *) (&ctx->ctx);
 
 	new_ctx = gnutls_calloc(1, sizeof(struct nettle_mac_ctx));
 	if (new_ctx == NULL)
 		return NULL;
 
 	memcpy(new_ctx, ctx, sizeof(*ctx));
-	new_ctx->ctx_ptr = (uint8_t *)&new_ctx->ctx + off;
+	new_ctx->ctx_ptr = (uint8_t *) & new_ctx->ctx + off;
 
 	return new_ctx;
 }
 
-static int
-wrap_nettle_mac_set_key(void *_ctx, const void *key, size_t keylen)
+static int wrap_nettle_mac_set_key(void *_ctx, const void *key, size_t keylen)
 {
 	struct nettle_mac_ctx *ctx = _ctx;
 
@@ -546,8 +540,7 @@ wrap_nettle_mac_set_nonce(void *_ctx, const void *nonce, size_t noncelen)
 	return GNUTLS_E_SUCCESS;
 }
 
-static int
-wrap_nettle_mac_update(void *_ctx, const void *text, size_t textsize)
+static int wrap_nettle_mac_update(void *_ctx, const void *text, size_t textsize)
 {
 	struct nettle_mac_ctx *ctx = _ctx;
 
@@ -575,7 +568,7 @@ wrap_nettle_mac_output(void *src_ctx, void *digest, size_t digestsize)
 static void wrap_nettle_mac_deinit(void *hd)
 {
 	struct nettle_mac_ctx *ctx = hd;
-	
+
 	zeroize_temp_key(ctx, sizeof(*ctx));
 	gnutls_free(ctx);
 }
@@ -633,7 +626,7 @@ static int wrap_nettle_hash_exists(gnutls_digest_algorithm_t algo)
 	}
 }
 
-static void _md5_sha1_update(void *_ctx, size_t len, const uint8_t *data)
+static void _md5_sha1_update(void *_ctx, size_t len, const uint8_t * data)
 {
 	struct md5_sha1_ctx *ctx = _ctx;
 
@@ -641,7 +634,7 @@ static void _md5_sha1_update(void *_ctx, size_t len, const uint8_t *data)
 	sha1_update(&ctx->sha1, len, data);
 }
 
-static void _md5_sha1_digest(void *_ctx, size_t len, uint8_t *digest)
+static void _md5_sha1_digest(void *_ctx, size_t len, uint8_t * digest)
 {
 	struct md5_sha1_ctx *ctx = _ctx;
 
@@ -797,8 +790,7 @@ static int wrap_nettle_hash_fast(gnutls_digest_algorithm_t algo,
 	return 0;
 }
 
-static int
-wrap_nettle_hash_init(gnutls_digest_algorithm_t algo, void **_ctx)
+static int wrap_nettle_hash_init(gnutls_digest_algorithm_t algo, void **_ctx)
 {
 	struct nettle_hash_ctx *ctx;
 	int ret;
@@ -826,14 +818,14 @@ static void *wrap_nettle_hash_copy(const void *_ctx)
 {
 	const struct nettle_hash_ctx *ctx = _ctx;
 	struct nettle_hash_ctx *new_ctx;
-	ptrdiff_t off = (uint8_t *)ctx->ctx_ptr - (uint8_t *)(&ctx->ctx);
+	ptrdiff_t off = (uint8_t *) ctx->ctx_ptr - (uint8_t *) (&ctx->ctx);
 
 	new_ctx = gnutls_calloc(1, sizeof(struct nettle_hash_ctx));
 	if (new_ctx == NULL)
 		return NULL;
 
 	memcpy(new_ctx, ctx, sizeof(*ctx));
-	new_ctx->ctx_ptr = (uint8_t *)&new_ctx->ctx + off;
+	new_ctx->ctx_ptr = (uint8_t *) & new_ctx->ctx + off;
 
 	return new_ctx;
 }
@@ -857,10 +849,9 @@ wrap_nettle_hash_output(void *src_ctx, void *digest, size_t digestsize)
 /* KDF functions based on MAC
  */
 static int
-wrap_nettle_hkdf_extract (gnutls_mac_algorithm_t mac,
-			  const void *key, size_t keysize,
-			  const void *salt, size_t saltsize,
-			  void *output)
+wrap_nettle_hkdf_extract(gnutls_mac_algorithm_t mac,
+			 const void *key, size_t keysize,
+			 const void *salt, size_t saltsize, void *output)
 {
 	struct nettle_mac_ctx ctx;
 	int ret;
@@ -878,10 +869,10 @@ wrap_nettle_hkdf_extract (gnutls_mac_algorithm_t mac,
 }
 
 static int
-wrap_nettle_hkdf_expand (gnutls_mac_algorithm_t mac,
-			 const void *key, size_t keysize,
-			 const void *info, size_t infosize,
-			 void *output, size_t length)
+wrap_nettle_hkdf_expand(gnutls_mac_algorithm_t mac,
+			const void *key, size_t keysize,
+			const void *info, size_t infosize,
+			void *output, size_t length)
 {
 	struct nettle_mac_ctx ctx;
 	int ret;
@@ -904,11 +895,10 @@ wrap_nettle_hkdf_expand (gnutls_mac_algorithm_t mac,
 }
 
 static int
-wrap_nettle_pbkdf2 (gnutls_mac_algorithm_t mac,
-		    const void *key, size_t keysize,
-		    const void *salt, size_t saltsize,
-		    unsigned iter_count,
-		    void *output, size_t length)
+wrap_nettle_pbkdf2(gnutls_mac_algorithm_t mac,
+		   const void *key, size_t keysize,
+		   const void *salt, size_t saltsize,
+		   unsigned iter_count, void *output, size_t length)
 {
 	struct nettle_mac_ctx ctx;
 	int ret;

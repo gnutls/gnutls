@@ -22,7 +22,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -37,18 +37,18 @@ int main(void)
 
 #else
 
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/dtls.h>
-#include <signal.h>
-#include "cert-common.h"
-#include "utils.h"
+# include <string.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/dtls.h>
+# include <signal.h>
+# include "cert-common.h"
+# include "utils.h"
 
 static void terminate(void);
 
@@ -77,23 +77,23 @@ client_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 	if (modify == 0)
 		return send(fd, data, len, 0);
 	else {
-		uint8_t *p = (void*)data;
+		uint8_t *p = (void *)data;
 		if (len < 30) {
 			fail("test error in packet sending\n");
 			exit(1);
 		}
-		p[len-30]++;
+		p[len - 30]++;
 		return send(fd, data, len, 0);
 	}
 }
 
-#define MAX_BUF 24*1024
+# define MAX_BUF 24*1024
 
 static void client(int fd, const char *prio, int ign)
 {
 	int ret;
 	char buffer[MAX_BUF + 1];
-	const char* err;
+	const char *err;
 	gnutls_anon_client_credentials_t anoncred;
 	gnutls_certificate_credentials_t x509_cred;
 	gnutls_session_t session;
@@ -157,7 +157,8 @@ static void client(int fd, const char *prio, int ign)
 	modify = 0;
 
 	if (ret < 0) {
-		fail("client[%s]: Error sending packet: %s\n", prio, gnutls_strerror(ret));
+		fail("client[%s]: Error sending packet: %s\n", prio,
+		     gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -173,7 +174,6 @@ static void client(int fd, const char *prio, int ign)
 	gnutls_global_deinit();
 }
 
-
 /* These are global */
 pid_t child;
 
@@ -187,7 +187,7 @@ static void terminate(void)
 static void server(int fd, const char *prio, int ign)
 {
 	int ret;
-	const char* err;
+	const char *err;
 	char buffer[MAX_BUF + 1];
 	gnutls_session_t session;
 	gnutls_anon_server_credentials_t anoncred;
@@ -205,8 +205,7 @@ static void server(int fd, const char *prio, int ign)
 
 	gnutls_certificate_allocate_credentials(&x509_cred);
 	gnutls_certificate_set_x509_key_mem(x509_cred, &server_cert,
-					    &server_key,
-					    GNUTLS_X509_FMT_PEM);
+					    &server_key, GNUTLS_X509_FMT_PEM);
 
 	gnutls_anon_allocate_server_credentials(&anoncred);
 
@@ -255,11 +254,11 @@ static void server(int fd, const char *prio, int ign)
 	/* Test receiving */
 	do {
 		ret = gnutls_record_recv(session, buffer, MAX_BUF);
-	} while (ret == GNUTLS_E_AGAIN
-			 || ret == GNUTLS_E_INTERRUPTED);
-	
+	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+
 	if (ret != GNUTLS_E_DECRYPTION_FAILED) {
-		fail("server: received modified packet with error code %d\n", ret);
+		fail("server: received modified packet with error code %d\n",
+		     ret);
 		exit(1);
 	}
 
@@ -305,22 +304,22 @@ static void start(const char *name, const char *prio, int ign)
 	}
 }
 
-#define AES_CBC "NONE:+VERS-TLS1.0:-CIPHER-ALL:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ANON-ECDH:+CURVE-ALL"
-#define AES_CBC_SHA256 "NONE:+VERS-TLS1.2:-CIPHER-ALL:+RSA:+AES-128-CBC:+AES-256-CBC:+SHA256:+SIGN-ALL:+COMP-NULL:+ANON-ECDH:+CURVE-ALL"
-#define AES_GCM "NONE:+VERS-TLS1.2:-CIPHER-ALL:+RSA:+AES-128-GCM:+MAC-ALL:+SIGN-ALL:+COMP-NULL:+ANON-ECDH:+CURVE-ALL"
-#define AES_CCM "NONE:+VERS-TLS1.2:-CIPHER-ALL:+RSA:+AES-128-CCM:+MAC-ALL:+SIGN-ALL:+COMP-NULL:+ANON-ECDH:+CURVE-ALL"
-#define AES_CCM_8 "NONE:+VERS-TLS1.2:-CIPHER-ALL:+RSA:+AES-128-CCM-8:+MAC-ALL:+SIGN-ALL:+COMP-NULL:+ANON-ECDH:+CURVE-ALL"
+# define AES_CBC "NONE:+VERS-TLS1.0:-CIPHER-ALL:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ANON-ECDH:+CURVE-ALL"
+# define AES_CBC_SHA256 "NONE:+VERS-TLS1.2:-CIPHER-ALL:+RSA:+AES-128-CBC:+AES-256-CBC:+SHA256:+SIGN-ALL:+COMP-NULL:+ANON-ECDH:+CURVE-ALL"
+# define AES_GCM "NONE:+VERS-TLS1.2:-CIPHER-ALL:+RSA:+AES-128-GCM:+MAC-ALL:+SIGN-ALL:+COMP-NULL:+ANON-ECDH:+CURVE-ALL"
+# define AES_CCM "NONE:+VERS-TLS1.2:-CIPHER-ALL:+RSA:+AES-128-CCM:+MAC-ALL:+SIGN-ALL:+COMP-NULL:+ANON-ECDH:+CURVE-ALL"
+# define AES_CCM_8 "NONE:+VERS-TLS1.2:-CIPHER-ALL:+RSA:+AES-128-CCM-8:+MAC-ALL:+SIGN-ALL:+COMP-NULL:+ANON-ECDH:+CURVE-ALL"
 
-#define ARCFOUR_SHA1 "NONE:+VERS-TLS1.0:-CIPHER-ALL:+ARCFOUR-128:+SHA1:+SIGN-ALL:+COMP-NULL:+ANON-ECDH:+CURVE-ALL"
-#define ARCFOUR_MD5 "NONE:+VERS-TLS1.0:-CIPHER-ALL:+ARCFOUR-128:+MD5:+SIGN-ALL:+COMP-NULL:+ANON-ECDH:+CURVE-ALL:+RSA"
+# define ARCFOUR_SHA1 "NONE:+VERS-TLS1.0:-CIPHER-ALL:+ARCFOUR-128:+SHA1:+SIGN-ALL:+COMP-NULL:+ANON-ECDH:+CURVE-ALL"
+# define ARCFOUR_MD5 "NONE:+VERS-TLS1.0:-CIPHER-ALL:+ARCFOUR-128:+MD5:+SIGN-ALL:+COMP-NULL:+ANON-ECDH:+CURVE-ALL:+RSA"
 
-#define NULL_SHA1 "NONE:+VERS-TLS1.0:-CIPHER-ALL:+NULL:+SHA1:+SIGN-ALL:+COMP-NULL:+ANON-ECDH:+RSA:+CURVE-ALL"
+# define NULL_SHA1 "NONE:+VERS-TLS1.0:-CIPHER-ALL:+NULL:+SHA1:+SIGN-ALL:+COMP-NULL:+ANON-ECDH:+RSA:+CURVE-ALL"
 
-#define NO_ETM ":%NO_ETM"
+# define NO_ETM ":%NO_ETM"
 
-#define TLS13_AES_GCM "NONE:+VERS-TLS1.3:-CIPHER-ALL:+RSA:+AES-128-GCM:+MAC-ALL:+SIGN-ALL:+COMP-NULL:+GROUP-ALL"
-#define TLS13_AES_CCM "NONE:+VERS-TLS1.3:-CIPHER-ALL:+RSA:+AES-128-CCM:+MAC-ALL:+SIGN-ALL:+COMP-NULL:+GROUP-ALL"
-#define TLS13_CHACHA_POLY1305 "NONE:+VERS-TLS1.3:-CIPHER-ALL:+RSA:+CHACHA20-POLY1305:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+GROUP-ALL"
+# define TLS13_AES_GCM "NONE:+VERS-TLS1.3:-CIPHER-ALL:+RSA:+AES-128-GCM:+MAC-ALL:+SIGN-ALL:+COMP-NULL:+GROUP-ALL"
+# define TLS13_AES_CCM "NONE:+VERS-TLS1.3:-CIPHER-ALL:+RSA:+AES-128-CCM:+MAC-ALL:+SIGN-ALL:+COMP-NULL:+GROUP-ALL"
+# define TLS13_CHACHA_POLY1305 "NONE:+VERS-TLS1.3:-CIPHER-ALL:+RSA:+CHACHA20-POLY1305:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+GROUP-ALL"
 
 static void ch_handler(int sig)
 {

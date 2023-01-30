@@ -68,8 +68,6 @@ static const cert_usage_entry dane_cert_usages[] = {
 	{NULL, 0}
 };
 
-
-
 /**
  * dane_cert_type_name:
  * @type: is a DANE match type

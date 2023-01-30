@@ -23,16 +23,16 @@
 #include "compress.h"
 
 #ifdef HAVE_LIBZ
-#include <zlib.h>
+# include <zlib.h>
 #endif
 
 #ifdef HAVE_LIBBROTLI
-#include <brotli/decode.h>
-#include <brotli/encode.h>
+# include <brotli/decode.h>
+# include <brotli/encode.h>
 #endif
 
 #ifdef HAVE_LIBZSTD
-#include <zstd.h>
+# include <zstd.h>
 #endif
 
 typedef struct {
@@ -41,17 +41,17 @@ typedef struct {
 } comp_entry;
 
 static const comp_entry comp_algs[] = {
-	{ GNUTLS_COMP_NULL, "NULL" },
+	{GNUTLS_COMP_NULL, "NULL"},
 #ifdef HAVE_LIBZ
-	{ GNUTLS_COMP_ZLIB, "ZLIB" },
+	{GNUTLS_COMP_ZLIB, "ZLIB"},
 #endif
 #ifdef HAVE_LIBBROTLI
-	{ GNUTLS_COMP_BROTLI, "BROTLI" },
+	{GNUTLS_COMP_BROTLI, "BROTLI"},
 #endif
 #ifdef HAVE_LIBZSTD
-	{ GNUTLS_COMP_ZSTD, "ZSTD" },
+	{GNUTLS_COMP_ZSTD, "ZSTD"},
 #endif
-	{ GNUTLS_COMP_UNKNOWN, NULL }
+	{GNUTLS_COMP_UNKNOWN, NULL}
 };
 
 static const gnutls_compression_method_t alg_list[] = {
@@ -77,8 +77,7 @@ static const gnutls_compression_method_t alg_list[] = {
  * Returns: a pointer to a string that contains the name of the
  *   specified compression algorithm, or %NULL.
  **/
-const char *
-gnutls_compression_get_name(gnutls_compression_method_t algorithm)
+const char *gnutls_compression_get_name(gnutls_compression_method_t algorithm)
 {
 	const comp_entry *p;
 
@@ -98,8 +97,7 @@ gnutls_compression_get_name(gnutls_compression_method_t algorithm)
  * Returns: an id of the specified in a string compression method, or
  *   %GNUTLS_COMP_UNKNOWN on error.
  **/
-gnutls_compression_method_t
-gnutls_compression_get_id(const char *name)
+gnutls_compression_method_t gnutls_compression_get_id(const char *name)
 {
 	const comp_entry *p;
 
@@ -118,20 +116,16 @@ gnutls_compression_get_id(const char *name)
  * Returns: a zero-terminated list of #gnutls_compression_method_t
  *   integers indicating the available compression methods.
  **/
-const gnutls_compression_method_t *
-gnutls_compression_list(void)
+const gnutls_compression_method_t *gnutls_compression_list(void)
 {
 	return alg_list;
 }
-
 
 /*************************/
 /* Compression functions */
 /*************************/
 
-
-size_t
-_gnutls_compress_bound(gnutls_compression_method_t alg, size_t src_len)
+size_t _gnutls_compress_bound(gnutls_compression_method_t alg, size_t src_len)
 {
 	switch (alg) {
 #ifdef HAVE_LIBZ
@@ -153,7 +147,7 @@ _gnutls_compress_bound(gnutls_compression_method_t alg, size_t src_len)
 }
 
 int
-_gnutls_compress(gnutls_compression_method_t alg, 
+_gnutls_compress(gnutls_compression_method_t alg,
 		 uint8_t * dst, size_t dst_len,
 		 const uint8_t * src, size_t src_len)
 {
@@ -168,7 +162,9 @@ _gnutls_compress(gnutls_compression_method_t alg,
 
 			err = compress(dst, &comp_len, src, src_len);
 			if (err != Z_OK)
-				return gnutls_assert_val(GNUTLS_E_COMPRESSION_FAILED);
+				return
+				    gnutls_assert_val
+				    (GNUTLS_E_COMPRESSION_FAILED);
 			ret = comp_len;
 		}
 		break;
@@ -177,14 +173,17 @@ _gnutls_compress(gnutls_compression_method_t alg,
 	case GNUTLS_COMP_BROTLI:
 		{
 			BROTLI_BOOL err;
-			size_t comp_len = dst_len; 
+			size_t comp_len = dst_len;
 
 			err = BrotliEncoderCompress(BROTLI_DEFAULT_QUALITY,
 						    BROTLI_DEFAULT_WINDOW,
 						    BROTLI_DEFAULT_MODE,
-						    src_len, src, &comp_len, dst);
+						    src_len, src, &comp_len,
+						    dst);
 			if (!err)
-				return gnutls_assert_val(GNUTLS_E_COMPRESSION_FAILED);
+				return
+				    gnutls_assert_val
+				    (GNUTLS_E_COMPRESSION_FAILED);
 			ret = comp_len;
 		}
 		break;
@@ -194,9 +193,13 @@ _gnutls_compress(gnutls_compression_method_t alg,
 		{
 			size_t comp_len;
 
-			comp_len = ZSTD_compress(dst, dst_len, src, src_len, ZSTD_CLEVEL_DEFAULT);
+			comp_len =
+			    ZSTD_compress(dst, dst_len, src, src_len,
+					  ZSTD_CLEVEL_DEFAULT);
 			if (ZSTD_isError(comp_len))
-				return gnutls_assert_val(GNUTLS_E_COMPRESSION_FAILED);
+				return
+				    gnutls_assert_val
+				    (GNUTLS_E_COMPRESSION_FAILED);
 			ret = comp_len;
 		}
 		break;
@@ -206,7 +209,8 @@ _gnutls_compress(gnutls_compression_method_t alg,
 	}
 
 #ifdef COMPRESSION_DEBUG
-	_gnutls_debug_log("Compression ratio: %f\n", (float)((float)ret / (float)src_len));
+	_gnutls_debug_log("Compression ratio: %f\n",
+			  (float)((float)ret / (float)src_len));
 #endif
 
 	return ret;
@@ -228,7 +232,9 @@ _gnutls_decompress(gnutls_compression_method_t alg,
 
 			err = uncompress(dst, &plain_len, src, src_len);
 			if (err != Z_OK)
-				return gnutls_assert_val(GNUTLS_E_DECOMPRESSION_FAILED);
+				return
+				    gnutls_assert_val
+				    (GNUTLS_E_DECOMPRESSION_FAILED);
 			ret = plain_len;
 		}
 		break;
@@ -239,9 +245,13 @@ _gnutls_decompress(gnutls_compression_method_t alg,
 			BrotliDecoderResult err;
 			size_t plain_len = dst_len;
 
-			err = BrotliDecoderDecompress(src_len, src, &plain_len, dst);
+			err =
+			    BrotliDecoderDecompress(src_len, src, &plain_len,
+						    dst);
 			if (err != BROTLI_DECODER_RESULT_SUCCESS)
-				return gnutls_assert_val(GNUTLS_E_DECOMPRESSION_FAILED);
+				return
+				    gnutls_assert_val
+				    (GNUTLS_E_DECOMPRESSION_FAILED);
 			ret = plain_len;
 		}
 		break;
@@ -253,7 +263,9 @@ _gnutls_decompress(gnutls_compression_method_t alg,
 
 			plain_len = ZSTD_decompress(dst, dst_len, src, src_len);
 			if (ZSTD_isError(plain_len))
-				return gnutls_assert_val(GNUTLS_E_DECOMPRESSION_FAILED);
+				return
+				    gnutls_assert_val
+				    (GNUTLS_E_DECOMPRESSION_FAILED);
 			ret = plain_len;
 		}
 		break;

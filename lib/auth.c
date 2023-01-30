@@ -148,15 +148,20 @@ gnutls_credentials_set(gnutls_session_t session,
 
 		if (c != NULL && c->ncerts != 0) {
 			for (i = 0; i < c->ncerts; i++) {
-				key_usage = get_key_usage(session, c->certs[i].cert_list[0].pubkey);
-				if (key_usage == 0 || (key_usage & GNUTLS_KEY_DIGITAL_SIGNATURE)) {
+				key_usage =
+				    get_key_usage(session,
+						  c->certs[i].
+						  cert_list[0].pubkey);
+				if (key_usage == 0
+				    || (key_usage &
+					GNUTLS_KEY_DIGITAL_SIGNATURE)) {
 					allow_tls13 = 1;
 					break;
 				}
 			}
 
-			if (session->security_parameters.entity == GNUTLS_SERVER &&
-			    !c->tls13_ok)
+			if (session->security_parameters.entity == GNUTLS_SERVER
+			    && !c->tls13_ok)
 				allow_tls13 = 0;
 
 			if (!allow_tls13) {
@@ -204,7 +209,7 @@ gnutls_credentials_get(gnutls_session_t session,
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	if (cred)
-		*cred = (void*)_cred;
+		*cred = (void *)_cred;
 
 	return 0;
 }
@@ -249,8 +254,7 @@ gnutls_credentials_type_t gnutls_auth_get_type(gnutls_session_t session)
  * Returns: The type of credentials for the server authentication
  *   schema, a #gnutls_credentials_type_t type.
  **/
-gnutls_credentials_type_t
-gnutls_auth_server_get_type(gnutls_session_t session)
+gnutls_credentials_type_t gnutls_auth_server_get_type(gnutls_session_t session)
 {
 	return session->security_parameters.server_auth_type;
 }
@@ -269,12 +273,10 @@ gnutls_auth_server_get_type(gnutls_session_t session)
  * Returns: The type of credentials for the client authentication
  *   schema, a #gnutls_credentials_type_t type.
  **/
-gnutls_credentials_type_t
-gnutls_auth_client_get_type(gnutls_session_t session)
+gnutls_credentials_type_t gnutls_auth_client_get_type(gnutls_session_t session)
 {
 	return session->security_parameters.client_auth_type;
 }
-
 
 /* 
  * This returns a pointer to the linked list. Don't
@@ -286,8 +288,7 @@ const void *_gnutls_get_kx_cred(gnutls_session_t session,
 	int server =
 	    session->security_parameters.entity == GNUTLS_SERVER ? 1 : 0;
 
-	return _gnutls_get_cred(session,
-				_gnutls_map_kx_get_cred(algo, server));
+	return _gnutls_get_cred(session, _gnutls_map_kx_get_cred(algo, server));
 }
 
 const void *_gnutls_get_cred(gnutls_session_t session,
@@ -378,15 +379,16 @@ void _gnutls_free_auth_info(gnutls_session_t session)
 	case GNUTLS_CRD_CERTIFICATE:
 		{
 			unsigned int i;
-			cert_auth_info_t info =
-			    _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
+			cert_auth_info_t info = _gnutls_get_auth_info(session,
+								      GNUTLS_CRD_CERTIFICATE);
 
 			if (info == NULL)
 				break;
 
 			dh_info = &info->dh;
 			for (i = 0; i < info->ncerts; i++) {
-				_gnutls_free_datum(&info->raw_certificate_list[i]);
+				_gnutls_free_datum(&info->raw_certificate_list
+						   [i]);
 			}
 
 			for (i = 0; i < info->nocsp; i++) {
@@ -402,7 +404,6 @@ void _gnutls_free_auth_info(gnutls_session_t session)
 			_gnutls_free_dh_info(dh_info);
 #endif
 		}
-
 
 		break;
 	default:
@@ -424,8 +425,8 @@ void _gnutls_free_auth_info(gnutls_session_t session)
  */
 int
 _gnutls_auth_info_init(gnutls_session_t session,
-		      gnutls_credentials_type_t type, int size,
-		      int allow_change)
+		       gnutls_credentials_type_t type, int size,
+		       int allow_change)
 {
 	if (session->key.auth_info == NULL) {
 		session->key.auth_info = gnutls_calloc(1, size);

@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,30 +35,30 @@ void doit(void)
 	exit(77);
 }
 
-#else /* working test */
+#else				/* working test */
 
 /* Test hashing on very large buffers >= 2^31 */
 
-#if !defined(_WIN32)
-# include <signal.h>
-# include <unistd.h>
+# if !defined(_WIN32)
+#  include <signal.h>
+#  include <unistd.h>
 
 static void exit_77(int signo)
 {
 	_exit(77);
 }
-#endif
+# endif
 
-#define MIN(x,y) ((x)<(y))?(x):(y)
+# define MIN(x,y) ((x)<(y))?(x):(y)
 
-#include <sys/mman.h>
+# include <sys/mman.h>
 
 static size_t _mmap_size;
 static void *get_mem(size_t size)
 {
 	void *p;
 	_mmap_size = size;
-	p = mmap(NULL, size, PROT_READ, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
+	p = mmap(NULL, size, PROT_READ, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	if (p == MAP_FAILED)
 		return NULL;
 	return p;
@@ -80,32 +80,30 @@ void doit(void)
 	if (sizeof(size) <= 4)
 		exit(77);
 
-#if !defined(_WIN32)
+# if !defined(_WIN32)
 	signal(SIGSEGV, exit_77);
 	signal(SIGBUS, exit_77);
-#endif
+# endif
 
 	global_init();
 
-	size = (ssize_t)UINT_MAX + (ssize_t)64*1024;
+	size = (ssize_t) UINT_MAX + (ssize_t) 64 *1024;
 	buf = get_mem(size);
 	if (buf == NULL)
 		exit(77);
 
-	if (size < (ssize_t)UINT_MAX)
+	if (size < (ssize_t) UINT_MAX)
 		exit(77);
 
-
-	err =
-	    gnutls_hash_fast(GNUTLS_DIG_SHA256, buf, size,
-			     digest);
+	err = gnutls_hash_fast(GNUTLS_DIG_SHA256, buf, size, digest);
 	if (err < 0)
 		fail("gnutls_hash_fast(SHA256) failed: %d\n", err);
 	else {
-#define SHA256_HASH "\x80\x92\xd9\xbe\x54\xa0\xe9\xd7\x7c\xb8\xe4\x2d\xd3\x7c\x19\xfe\x4e\x68\x84\x33\x71\xef\x1c\x81\xd6\x44\x36\x52\x06\xd8\x4b\x8a"
+# define SHA256_HASH "\x80\x92\xd9\xbe\x54\xa0\xe9\xd7\x7c\xb8\xe4\x2d\xd3\x7c\x19\xfe\x4e\x68\x84\x33\x71\xef\x1c\x81\xd6\x44\x36\x52\x06\xd8\x4b\x8a"
 		if (memcmp(digest, SHA256_HASH, 32) == 0) {
 			if (debug)
-				success("gnutls_hash_fast(SHA256) %lu OK\n", (unsigned long)size);
+				success("gnutls_hash_fast(SHA256) %lu OK\n",
+					(unsigned long)size);
 		} else {
 			hexprint(digest, 32);
 			fail("gnutls_hash_fast(SHA256) failure\n");
@@ -119,8 +117,8 @@ void doit(void)
 
 	size2 = size;
 	p = buf;
-	while(size2 > 0) {
-		left = MIN(64*1024, size2);
+	while (size2 > 0) {
+		left = MIN(64 * 1024, size2);
 		gnutls_hash(td, p, left);
 		size2 -= left;
 		p += left;
@@ -130,7 +128,8 @@ void doit(void)
 	gnutls_hash_deinit(td, NULL);
 	if (memcmp(digest, SHA256_HASH, 32) == 0) {
 		if (debug)
-			success("gnutls_hash_fast(SHA256) %lu OK\n", (unsigned long)size);
+			success("gnutls_hash_fast(SHA256) %lu OK\n",
+				(unsigned long)size);
 	} else {
 		hexprint(digest, 32);
 		fail("gnutls_hash(SHA256) failure\n");
@@ -138,13 +137,11 @@ void doit(void)
 
 	/* SHA1 */
 
-	err =
-	    gnutls_hash_fast(GNUTLS_DIG_SHA1, buf, size,
-			     digest);
+	err = gnutls_hash_fast(GNUTLS_DIG_SHA1, buf, size, digest);
 	if (err < 0)
 		fail("gnutls_hash_fast(SHA1) failed: %d\n", err);
 	else {
-#define SHA1_HASH "\x75\xd2\x67\x3f\xec\x73\xe4\x57\xb8\x40\xb3\xb5\xf1\xc7\xa8\x1a\x2d\x11\x7e\xd9"
+# define SHA1_HASH "\x75\xd2\x67\x3f\xec\x73\xe4\x57\xb8\x40\xb3\xb5\xf1\xc7\xa8\x1a\x2d\x11\x7e\xd9"
 		if (memcmp(digest, SHA1_HASH, 20) == 0) {
 			if (debug)
 				success("gnutls_hash_fast(SHA1) OK\n");
@@ -160,7 +157,7 @@ void doit(void)
 	if (err < 0)
 		fail("gnutls_hmac_fast(SHA1) failed: %d\n", err);
 	else {
-#define SHA1_MAC "\xe2\xe9\x84\x48\x53\xe3\x0b\xfe\x45\x04\xf6\x6b\x5b\x6d\x4d\x2c\xa3\x0f\xcf\x23"
+# define SHA1_MAC "\xe2\xe9\x84\x48\x53\xe3\x0b\xfe\x45\x04\xf6\x6b\x5b\x6d\x4d\x2c\xa3\x0f\xcf\x23"
 		if (memcmp(digest, SHA1_MAC, 20) == 0) {
 			if (debug)
 				success("gnutls_hmac_fast(SHA1) OK\n");
