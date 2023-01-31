@@ -37,8 +37,7 @@ LDADD = libexamples.la				\
 	../../src/gl/libgnu_gpl.la		\
 	$(LIBSOCKET) $(INET_NTOP_LIB) $(INET_PTON_LIB)
 
-CXX_LDADD = ../../lib/libgnutlsxx.la \
-	$(LDADD)
+CXX_LDADD = $(LDADD)
 
 EXTRA_DIST = tlsproxy/LICENSE tlsproxy/README.md
 
