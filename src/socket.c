@@ -613,7 +613,17 @@ socket_open2(socket_st * hd, const char *hostname, const char *service,
 				    (hd->session, wrap_pull_timeout_func);
 				gnutls_transport_set_ptr(hd->session, hd);
 			} else {
+#ifdef _WIN32
+				gnutls_transport_set_push_function(hd->session,
+								   wrap_push);
+				gnutls_transport_set_pull_function(hd->session,
+								   wrap_pull);
+				gnutls_transport_set_pull_timeout_function
+				    (hd->session, wrap_pull_timeout_func);
+				gnutls_transport_set_ptr(hd->session, hd);
+#else
 				gnutls_transport_set_int(hd->session, hd->fd);
+#endif
 			}
 		}
 
