@@ -808,6 +808,11 @@ debian-cross/aarch64-linux-gnu/test:
     - cp /usr/${arch_name}-w64-mingw32/sys-root/mingw/bin/libwinpthread*.dll win${arch_bits}-build/bin
     - cp /usr/${arch_name}-w64-mingw32/sys-root/mingw/bin/libidn2-*.dll win${arch_bits}-build/bin
     - cp /usr/${arch_name}-w64-mingw32/sys-root/mingw/bin/libffi-*.dll win${arch_bits}-build/bin
+    - cp /usr/${arch_name}-w64-mingw32/sys-root/mingw/bin/libbrotlicommon.dll win${arch_bits}-build/bin
+    - cp /usr/${arch_name}-w64-mingw32/sys-root/mingw/bin/libbrotlienc.dll win${arch_bits}-build/bin
+    - cp /usr/${arch_name}-w64-mingw32/sys-root/mingw/bin/libbrotlidec.dll win${arch_bits}-build/bin
+    - cp /usr/${arch_name}-w64-mingw32/sys-root/mingw/bin/zlib1.dll win${arch_bits}-build/bin
+    - cp /usr/${arch_name}-w64-mingw32/sys-root/mingw/bin/libzstd.dll win${arch_bits}-build/bin
     - cp lib/.libs/*.a lib/*.def lib/gnutls.pc win${arch_bits}-build/lib
     - cp lib/includes/gnutls/*.h win${arch_bits}-build/lib/includes
   artifacts:
