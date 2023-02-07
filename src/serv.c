@@ -810,6 +810,7 @@ static char *peer_print_data(gnutls_session_t session, int *ret_length)
 {
 	gnutls_datum_t data;
 	char *http_buffer;
+	char *ptr = NULL;
 	size_t len;
 	int ret;
 
@@ -836,10 +837,17 @@ static char *peer_print_data(gnutls_session_t session, int *ret_length)
 	if (ret < 0)
 		return NULL;
 	len = ret;
-	http_buffer = realloc(http_buffer, len + data.size);
-	memcpy(&http_buffer[len], data.data, data.size);
-	gnutls_free(data.data);
-	*ret_length = len + data.size;
+	ptr = realloc(http_buffer, len + data.size);
+	if (ptr != NULL) {
+		http_buffer = ptr;
+		memcpy(&http_buffer[len], data.data, data.size);
+		gnutls_free(data.data);
+		*ret_length = len + data.size;
+	} else {
+		gnutls_free(http_buffer);
+		gnutls_free(data.data);
+		*ret_length = 0;
+	}
 	return http_buffer;
 }
 
