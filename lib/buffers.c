@@ -766,7 +766,6 @@ ssize_t _gnutls_handshake_io_write_flush(gnutls_session_t session)
 	gnutls_datum_t msg;
 	int ret;
 	uint16_t epoch;
-	ssize_t total = 0;
 	mbuffer_st *cur;
 
 	_gnutls_write_log("HWRITE FLUSH: %d bytes in buffer.\n",
@@ -802,7 +801,6 @@ ssize_t _gnutls_handshake_io_write_flush(gnutls_session_t session)
 		}
 
 		if (ret >= 0) {
-			total += ret;
 
 			ret = _mbuffer_head_remove_bytes(send_buffer, ret);
 			/* for each queued message we send, ensure that
