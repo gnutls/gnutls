@@ -158,8 +158,6 @@ proc_rsa_client_kx(gnutls_session_t session, uint8_t * data, size_t _data_size)
 	int ret, dsize;
 	ssize_t data_size = _data_size;
 	volatile uint8_t ver_maj, ver_min;
-	volatile uint8_t check_ver_min;
-	volatile uint32_t ok;
 
 #ifdef ENABLE_SSL3
 	if (get_num_version(session) == GNUTLS_SSL3) {
@@ -185,7 +183,6 @@ proc_rsa_client_kx(gnutls_session_t session, uint8_t * data, size_t _data_size)
 
 	ver_maj = _gnutls_get_adv_version_major(session);
 	ver_min = _gnutls_get_adv_version_minor(session);
-	check_ver_min = (session->internals.allow_wrong_pms == 0);
 
 	session->key.key.data = gnutls_malloc(GNUTLS_MASTER_SIZE);
 	if (session->key.key.data == NULL) {
@@ -204,8 +201,7 @@ proc_rsa_client_kx(gnutls_session_t session, uint8_t * data, size_t _data_size)
 		return ret;
 	}
 
-	ret =
-	    gnutls_privkey_decrypt_data2(session->internals.selected_key,
+	gnutls_privkey_decrypt_data2(session->internals.selected_key,
 					 0, &ciphertext, session->key.key.data,
 					 session->key.key.size);
 	/* After this point, any conditional on failure that cause differences
@@ -222,16 +218,6 @@ proc_rsa_client_kx(gnutls_session_t session, uint8_t * data, size_t _data_size)
 	 * in the paper "Attacking RSA-based sessions in SSL/TLS" by
 	 * Vlastimil Klima, Ondej Pokorny and Tomas Rosa.
 	 */
-
-	/* ok is 0 in case of error and 1 in case of success. */
-
-	/* if ret < 0 */
-	ok = CONSTCHECK_EQUAL(ret, 0);
-	/* session->key.key.data[0] must equal ver_maj */
-	ok &= CONSTCHECK_EQUAL(session->key.key.data[0], ver_maj);
-	/* if check_ver_min then session->key.key.data[1] must equal ver_min */
-	ok &= CONSTCHECK_NOT_EQUAL(check_ver_min, 0) &
-	    CONSTCHECK_EQUAL(session->key.key.data[1], ver_min);
 
 	/* This is here to avoid the version check attack
 	 * discussed above.
