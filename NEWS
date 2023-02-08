@@ -7,6 +7,10 @@ See the end for copying conditions.
 
 * Version 3.8.0 (unreleased ????-??-??)
 
+** libgnutls: Fix a Bleichenbacher oracle in the TLS RSA key exchange.
+   Reported by Hubert Kario (#1050). Fix developed by Alexander Sosedkin.
+   [GNUTLS-SA-2020-07-14, CVSS: medium] [CVE-2023-0361]
+
 ** guile: Guile-bindings removed.
 They have been extracted into a separate project to reduce complexity
 and to simplify maintenance, see <https://gitlab.com/gnutls/guile/>.
