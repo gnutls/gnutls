@@ -5,15 +5,20 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.8.0 (unreleased ????-??-??)
+* Version 3.8.0 (unreleased 2023-02-09)
 
 ** libgnutls: Fix a Bleichenbacher oracle in the TLS RSA key exchange.
    Reported by Hubert Kario (#1050). Fix developed by Alexander Sosedkin.
    [GNUTLS-SA-2020-07-14, CVSS: medium] [CVE-2023-0361]
 
-** guile: Guile-bindings removed.
-They have been extracted into a separate project to reduce complexity
-and to simplify maintenance, see <https://gitlab.com/gnutls/guile/>.
+** libgnutls: C++ library is now header only. All definitions from
+   gnutlsxx.c have been moved into gnutlsxx.h. Users of the C++
+   interface have two options:
+   1. include gnutlsxx.h in their application and link against
+      the C library. (default)
+   2. include gnutlsxx.h in their application, compile with
+      GNUTLS_GNUTLSXX_NO_HEADERONLY macro defined and link
+      against the C++ library.
 
 ** libgnutls: GNUTLS_NO_STATUS_REQUEST flag and %NO_STATUS_REQUEST
    priority modifier have been added to allow disabling of the
@@ -36,6 +41,10 @@ and to simplify maintenance, see <https://gitlab.com/gnutls/guile/>.
    through devel/indent-gnutls, devel/indent-maybe and .gitlab-ci.yml’s
    commit-check.  You may run devel/indent-gnutls to fix any
    indentation issues if you make code modifications.
+
+** guile: Guile-bindings removed.
+   They have been extracted into a separate project to reduce complexity
+   and to simplify maintenance, see <https://gitlab.com/gnutls/guile/>.
 
 ** minitasn1: Upgraded to libtasn1 version 4.19.
 
