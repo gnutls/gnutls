@@ -70,6 +70,3 @@ name = drbg_aes_reseed
 
 # The following should be removed in the new release, after updating the
 # abi-dump repository:
-[suppress_type]
-name = gnutls_srtp_profile_t
-changed_enumerators = GNUTLS_SRTP_AEAD_AES_128_GCM, GNUTLS_SRTP_AEAD_AES_256_GCM
