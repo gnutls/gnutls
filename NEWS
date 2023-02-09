@@ -5,6 +5,15 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.7.9 (released 2023-02-09)
+
+** libgnutls: Fix a Bleichenbacher oracle in the TLS RSA key exchange.
+   Reported by Hubert Kario (#1050). Fix developed by Alexander Sosedkin.
+   [GNUTLS-SA-2020-07-14, CVSS: medium] [CVE-2023-0361]
+
+** API and ABI modifications:
+No changes since last version.
+
 * Version 3.7.8 (released 2022-09-27)
 
 ** libgnutls: In FIPS140 mode, RSA signature verification is an approved
