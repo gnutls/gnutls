@@ -32,7 +32,7 @@
    ```
 1. Upload the tarball and the signature to ftp.gnupg.org:
    ```console
-   scp gnutls-$VERSION.tar.xz* ftp.gnupg.org:/home/ftp/gcrypt/gnutls/v$(expr $VERSION : '\([0-9]*\.[0-9]*\)')/
+   scp -oHostKeyAlgorithms=+ssh-rsa gnutls-$VERSION.tar.xz* ftp.gnupg.org:/home/ftp/gcrypt/gnutls/v$(expr $VERSION : '\([0-9]*\.[0-9]*\)')/
    ```
 1. Download `mingw32/archive` artifact for new release from [CI/CD jobs].
    Rename downloaded zip file to `gnutls-$VERSION-w32.zip`.
