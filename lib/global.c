@@ -40,6 +40,7 @@
 #include <system-keys.h>
 #include "str.h"
 #include "global.h"
+#include "audit.h"
 
 /* Minimum library versions we accept. */
 #define GNUTLS_MIN_LIBTASN1_VERSION "0.3.4"
@@ -373,8 +374,12 @@ static int _gnutls_global_init(unsigned constructor)
 		_gnutls_fips_mode_reset_zombie();
 	}
 #endif
+
 	_gnutls_prepare_to_load_system_priorities();
 	_gnutls_switch_lib_state(LIB_STATE_OPERATIONAL);
+
+	_gnutls_audit_init();
+
 	ret = 0;
 
  out:

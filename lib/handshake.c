@@ -59,6 +59,7 @@
 #include "tls13/session_ticket.h"
 #include "locks.h"
 #include "system/ktls.h"
+#include "audit_int.h"
 
 static int check_if_null_comp_present(gnutls_session_t session,
 				      uint8_t * data, int datalen);
@@ -688,6 +689,18 @@ read_client_hello(gnutls_session_t session, uint8_t * data, int datalen)
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
+	ret =
+	    _gnutls_audit_push_context(&session->internals.audit_context_stack,
+				       (gnutls_audit_context_t)
+				       read_client_hello);
+	if (ret < 0) {
+		return gnutls_assert_val(ret);
+	}
+
+	CRYPTO_AUDITING_STRING_DATA(session->internals.
+				    audit_context_stack.head->context, "name",
+				    "tls::handshake_server");
+
 	session->security_parameters.timestamp = gnutls_time(NULL);
 
 	DECR_LEN(len, 1);
@@ -914,6 +927,10 @@ read_client_hello(gnutls_session_t session, uint8_t * data, int datalen)
 
 	_gnutls_handshake_log("HSK[%p]: Selected version %s\n", session,
 			      vers->name);
+
+	CRYPTO_AUDITING_WORD_DATA(session->internals.audit_context_stack.
+				  head->context, "tls::protocol_version",
+				  vers->major << 8 | vers->minor);
 
 	/* select appropriate compression method */
 	ret = check_if_null_comp_present(session, comp_ptr, comp_size);
@@ -1203,6 +1220,10 @@ _gnutls_server_select_suite(gnutls_session_t session, uint8_t * data,
 		gnutls_assert();
 		return ret;
 	}
+
+	CRYPTO_AUDITING_WORD_DATA(session->internals.audit_context_stack.
+				  head->context, "tls::ciphersuite",
+				  selected->id[0] << 8 | selected->id[1]);
 
 	if (!vers->tls13_sem) {
 		/* check if the credentials (username, public key etc.) are ok
@@ -1848,6 +1869,10 @@ static int set_client_ciphersuite(gnutls_session_t session, uint8_t suite[2])
 	_gnutls_handshake_log("HSK[%p]: Selected cipher suite: %s\n",
 			      session, selected->name);
 
+	CRYPTO_AUDITING_WORD_DATA(session->internals.audit_context_stack.
+				  head->context, "tls::ciphersuite",
+				  selected->id[0] << 8 | selected->id[1]);
+
 	/* check if the credentials (username, public key etc.) are ok.
 	 * Actually checks if they exist.
 	 */
@@ -2036,6 +2061,10 @@ read_server_hello(gnutls_session_t session, uint8_t * data, int datalen)
 	if (_gnutls_nversion_is_supported(session, vers->major, vers->minor) ==
 	    0)
 		return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
+
+	CRYPTO_AUDITING_WORD_DATA(session->internals.audit_context_stack.
+				  head->context, "tls::protocol_version",
+				  vers->major << 8 | vers->minor);
 
 	/* set server random - done after final version is selected */
 	ret = _gnutls_set_server_random(session, vers, srandom_pos);
@@ -2415,6 +2444,18 @@ static int send_client_hello(gnutls_session_t session, int again)
 
 		bufel = _gnutls_buffer_to_mbuffer(&extdata);
 	}
+
+	ret =
+	    _gnutls_audit_push_context(&session->internals.audit_context_stack,
+				       (gnutls_audit_context_t)
+				       send_client_hello);
+	if (ret < 0) {
+		return gnutls_assert_val(ret);
+	}
+
+	CRYPTO_AUDITING_STRING_DATA(session->internals.
+				    audit_context_stack.head->context, "name",
+				    "tls::handshake_client");
 
 	ret = _gnutls_send_handshake(session, bufel,
 				     GNUTLS_HANDSHAKE_CLIENT_HELLO);
@@ -2954,6 +2995,7 @@ int gnutls_handshake(gnutls_session_t session)
 	} else {
 		ret = handshake_server(session);
 	}
+	_gnutls_audit_pop_context(&session->internals.audit_context_stack);
 
 	if (ret < 0) {
 		return _gnutls_abort_handshake(session, ret);
