@@ -344,7 +344,11 @@ fedora-interop/test:
   parallel:
     matrix:
       - COMPONENT: openssl
-        TYPE: [2way, basic, other]
+        TYPE: [2way, 3way, basic, other]
+        SLICEID: 0
+        SLICES: 1
+      - COMPONENT: nss # a duplicate component to prevent slicing of incompatible tests
+        TYPE: other
         SLICEID: 0
         SLICES: 1
       - COMPONENT: nss
