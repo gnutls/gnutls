@@ -836,7 +836,7 @@ static char *peer_print_data(gnutls_session_t session, int *ret_length)
 	if (ret < 0)
 		return NULL;
 	len = ret;
-	http_buffer = realloc(http_buffer, len + data.size);
+	http_buffer = xrealloc(http_buffer, len + data.size);
 	memcpy(&http_buffer[len], data.data, data.size);
 	gnutls_free(data.data);
 	*ret_length = len + data.size;
