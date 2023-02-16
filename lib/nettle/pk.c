@@ -2642,6 +2642,35 @@ static int pct_test(gnutls_pk_algorithm_t algo,
 		}
 		break;
 	case GNUTLS_PK_DH:
+		{
+			mpz_t y;
+
+			/* Perform SP800 56A (rev 3) 5.6.2.1.4 Owner Assurance
+			 * of Pair-wise Consistency check, even if we only
+			 * support ephemeral DH, as it is required by FIPS
+			 * 140-3 IG 10.3.A.
+			 *
+			 * Use the private key, x, along with the generator g
+			 * and prime modulus p included in the domain
+			 * parameters associated with the key pair to compute
+			 * g^x mod p. Compare the result to the public key, y.
+			 */
+			mpz_init(y);
+			mpz_powm(y,
+				 TOMPZ(params->params[DSA_G]),
+				 TOMPZ(params->params[DSA_X]),
+				 TOMPZ(params->params[DSA_P]));
+			if (unlikely
+			    (mpz_cmp(y, TOMPZ(params->params[DSA_Y])) != 0)) {
+				ret =
+				    gnutls_assert_val
+				    (GNUTLS_E_PK_GENERATION_ERROR);
+				mpz_clear(y);
+				goto cleanup;
+			}
+			mpz_clear(y);
+			break;
+		}
 	case GNUTLS_PK_ECDH_X25519:
 	case GNUTLS_PK_ECDH_X448:
 		ret = 0;
