@@ -52,24 +52,30 @@ default:
 
   interruptible: true
 
+.submodule-paths: &submodule-paths
+  - ./cligen
+  - ./devel/abi-dump
+  - ./devel/libtasn1
+  - ./devel/nettle
+  - ./devel/openssl
+  - ./gnulib
+  - ./tests/suite/tls-fuzzer/python-ecdsa
+  - ./tests/suite/tls-fuzzer/tlsfuzzer
+  - ./tests/suite/tls-fuzzer/tlslite-ng
+  - ./tests/suite/tls-interoperability
+  
 .bootstrap:
   stage: bootstrap
   tags:
     - shared
     - linux
   script:
-    - SUBMODULE_NOFETCH=1 ./bootstrap
+    - SUBMODULE_NOFETCH=1 ./bootstrap --copy --skip-po
   artifacts:
     expire_in: 1 day
-    #when: on_failure
-    paths:
-      - ./
-    exclude:
-      - .git/ # passing forward .git causes warnings and possibly problems
-      - ./**/.git/ # passing forward .git causes warnings and possibly problems
-      - ./**/*.c
-      - ./**/*.h
-      - ./**/*.o
+    untracked: true
+    # submodules are not copied through artifacts:untracked
+    paths: *submodule-paths
 
 .build:
   stage: build
@@ -80,15 +86,9 @@ default:
     - tags # TODO
   artifacts:
     expire_in: 1 day
-    #when: on_failure
-    paths:
-      - ./
-    exclude:
-      - .git/ # passing forward .git causes warnings and possibly problems
-      - ./**/.git/ # passing forward .git causes warnings and possibly problems
-      - ./**/*.c
-      - ./**/*.h
-      - ./**/*.o
+    untracked: true
+    # submodules are not copied through artifacts:untracked
+    paths: *submodule-paths
 
 .test:
   stage: test
