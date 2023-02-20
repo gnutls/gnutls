@@ -632,6 +632,7 @@ inline static int check_recv_type(gnutls_session_t session,
 	case GNUTLS_HANDSHAKE:
 	case GNUTLS_HEARTBEAT:
 	case GNUTLS_APPLICATION_DATA:
+	case GNUTLS_ACK:
 		return 0;
 	default:
 		gnutls_assert();
@@ -649,7 +650,7 @@ static int get_data_from_buffers(gnutls_session_t session, content_type_t type,
 				 uint8_t *data, int data_size, void *seq)
 {
 	if ((type == GNUTLS_APPLICATION_DATA || type == GNUTLS_HANDSHAKE ||
-	     type == GNUTLS_CHANGE_CIPHER_SPEC) &&
+	     type == GNUTLS_ACK || type == GNUTLS_CHANGE_CIPHER_SPEC) &&
 	    _gnutls_record_buffer_get_size(session) > 0) {
 		int ret;
 		ret = _gnutls_record_buffer_get(type, session, data, data_size,
@@ -1055,6 +1056,11 @@ static int record_add_to_buffers(gnutls_session_t session,
 			ret = recv_hello_request(session, bufel->msg.data,
 						 bufel->msg.size);
 			goto unexpected_packet;
+		case GNUTLS_ACK:
+			// TODO
+			_gnutls_record_buffer_put(session, recv->type, seq, bufel);
+			break;
+
 		default:
 
 			_gnutls_record_log(

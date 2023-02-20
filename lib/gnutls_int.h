@@ -454,7 +454,8 @@ typedef enum content_type_t {
 	GNUTLS_ALERT,
 	GNUTLS_HANDSHAKE,
 	GNUTLS_APPLICATION_DATA,
-	GNUTLS_HEARTBEAT
+	GNUTLS_HEARTBEAT,
+	GNUTLS_ACK = 26
 } content_type_t;
 
 #define GNUTLS_PK_ANY (gnutls_pk_algorithm_t) - 1

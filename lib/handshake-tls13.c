@@ -57,6 +57,7 @@
 #include "tls13/key_update.h"
 #include "ext/pre_shared_key.h"
 #include "locks.h"
+#include "dtls13.h"
 
 static int generate_rms_keys(gnutls_session_t session);
 static int generate_hs_traffic_keys(gnutls_session_t session);
@@ -191,6 +192,19 @@ int _gnutls13_handshake_client(gnutls_session_t session)
 		/* set traffic keys */
 		ret = _tls13_connection_state_init(session, STAGE_APP);
 		IMED_RET_FATAL("set app keys", ret, 0);
+
+		if (!IS_DTLS(session)) {
+			STATE = STATE0;
+			break;
+		}
+		FALLTHROUGH;
+	case STATE113:
+		/* DTLS reveive ACK */
+		STATE = STATE113;
+
+		ret = gnutls_dtls13_recv_ack(session);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
 
 		STATE = STATE0;
 		break;

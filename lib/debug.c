@@ -64,6 +64,8 @@ const char *_gnutls_packet2str(content_type_t packet)
 		return "Application Data";
 	case GNUTLS_HEARTBEAT:
 		return "HeartBeat";
+	case GNUTLS_ACK:
+		return "ACK";
 	default:
 		return "Unknown Packet";
 	}
