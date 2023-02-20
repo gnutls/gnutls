@@ -45,6 +45,10 @@ cache:
 default:
   before_script:
     - *prepare-ccache
+    - |
+      if test -e stamp.pre-bootstrap; then
+        devel/preserve-timestamp --restore stamp.pre-bootstrap
+      fi
 
   after_script:
     # after_script is executed in separate shell
@@ -59,6 +63,7 @@ default:
     - shared
     - linux
   script:
+    - devel/preserve-timestamp stamp.pre-bootstrap
     - SUBMODULE_NOFETCH=1 ./bootstrap --copy --skip-po
   artifacts:
     expire_in: 1 day
@@ -120,6 +125,10 @@ default:
     WINEPATH: "/usr/${arch_name}-w64-mingw32/sys-root/mingw/bin"
   before_script:
     - *prepare-ccache
+    - |
+      if test -e stamp.pre-bootstrap; then
+        devel/preserve-timestamp --restore stamp.pre-bootstrap
+      fi
     - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
     - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
 
@@ -467,6 +476,7 @@ fedora-ktls/test:
   script:
     - git clone --depth 1 --branch master https://gitlab.com/gnutls/nettle.git nettle-git
     - pushd nettle-git
+    - rm -rf .git               # for artifacts:untracked to work
     - ./.bootstrap
     - ./configure --disable-documentation --prefix=${PWD}/$NETTLE_DIR $NETTLE_CONFIGURE_ARGS
     - make -j$BUILDJOBS
