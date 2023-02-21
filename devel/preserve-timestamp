@@ -1,0 +1,61 @@
+#!/bin/sh
+
+# Copyright (c) 2023 Daiki Ueno
+# License: GPLv3+ <http://gnu.org/licenses/gpl.html>
+
+progname=$0
+
+mode=save
+verbose=false
+
+while test $# -gt 0; do
+    case "$1" in
+	--save )
+            mode=save
+            shift ;;
+	--restore )
+            mode=restore
+            shift ;;
+	--help )
+	    echo "Usage: preserve-timestamp [--verbose] [--save|--restore] FILE"
+            exit ;;
+	--verbose )
+	    verbose=true
+	    shift ;;
+	-* )
+            echo "preserve-timestamp: unknown option $1" 1>&2
+            echo "Try 'preserve-timestamp --help' for more information." 1>&2
+            exit 1 ;;
+	* )
+            break ;;
+    esac
+done
+
+if test $# = 0; then
+    echo "$progname: *** missing FILE argument" 1>&2
+    echo "$progname: *** Stop." 1>&2
+    exit 1
+fi
+
+file=$1
+
+case $mode in
+    save )
+	: > "$file"
+	git ls-files --recurse-submodules | \
+	    while read f; do
+		if $verbose; then
+		    echo "$f"
+		fi
+		{ stat --printf="@%.Y " "$f"; echo "$f"; } >> "$file"
+	    done
+	;;
+    restore )
+	while read t f; do
+	    if $verbose; then
+		echo "$f"
+	    fi
+	    touch -d "$t" "$f"
+	done < "$file"
+	;;
+esac

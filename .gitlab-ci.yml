@@ -45,6 +45,10 @@ cache:
 default:
   before_script:
     - *prepare-ccache
+    - |
+      if test -e stamp.pre-bootstrap; then
+        devel/preserve-timestamp --restore stamp.pre-bootstrap
+      fi
 
   after_script:
     # after_script is executed in separate shell
@@ -59,7 +63,7 @@ default:
     - shared
     - linux
   script:
-    - date "+@%s.%N" > cache/bootstrap.timestamp
+    - devel/preserve-timestamp stamp.pre-bootstrap
     - SUBMODULE_NOFETCH=1 ./bootstrap --copy --skip-po
   artifacts:
     expire_in: 1 day
@@ -121,7 +125,10 @@ default:
     WINEPATH: "/usr/${arch_name}-w64-mingw32/sys-root/mingw/bin"
   before_script:
     - *prepare-ccache
-    - git ls-files -z | xargs -0 touch -d $(cat cache/bootstrap.timestamp)
+    - |
+      if test -e stamp.pre-bootstrap; then
+        devel/preserve-timestamp --restore stamp.pre-bootstrap
+      fi
     - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
     - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
 
@@ -172,7 +179,6 @@ doc-dist.Fedora:
   needs:
     - fedora/bootstrap
   script:
-    - git ls-files -z | xargs -0 touch -d $(cat cache/bootstrap.timestamp)
     - CFLAGS="-std=c99 -O2 -g" dash ./configure --disable-gcc-warnings --cache-file $CCACHE_FILE --prefix=/usr --libdir=/usr/lib64 --disable-cxx --disable-non-suiteb-curves --enable-gtk-doc --disable-maintainer-mode --with-pkcs12-iter-count=10000
     - make -j$BUILDJOBS -C doc stamp-vti
     - make -j$BUILDJOBS -C doc stamp_enums
@@ -193,7 +199,6 @@ UB+ASAN-Werror.Fedora.x86_64.gcc:
   needs:
     - fedora/bootstrap
   script:
-    - git ls-files -z | xargs -0 touch -d $(cat cache/bootstrap.timestamp)
     - export UBSAN_OPTIONS=print_stacktrace=1
     - export LSAN_OPTIONS=suppressions=$(pwd)/devel/lsan.supp
     - export CFLAGS="-std=c99 -O1 -g -Wno-cpp -Werror -fno-omit-frame-pointer -fsanitize=undefined,bool,alignment,null,enum,bounds-strict,address,leak,nonnull-attribute -fno-sanitize-recover=all -fsanitize-address-use-after-scope"
@@ -231,7 +236,6 @@ UB+ASAN-Werror-aggressive.Fedora.x86_64.gcc:
   needs:
     - fedora/bootstrap
   script:
-    - git ls-files -z | xargs -0 touch -d $(cat cache/bootstrap.timestamp)
     - export UBSAN_OPTIONS=print_stacktrace=1
     - export LSAN_OPTIONS=suppressions=$(pwd)/devel/lsan.supp
     - export CFLAGS="-std=c99 -O1 -g -Wno-cpp -Werror -fno-omit-frame-pointer -fsanitize=undefined,bool,alignment,null,enum,bounds-strict,address,leak,nonnull-attribute -fno-sanitize-recover=all -fsanitize-address-use-after-scope -DAGGRESSIVE_REALLOC"
@@ -277,7 +281,6 @@ fedora-notools/build:
   needs:
     - fedora/bootstrap
   script:
-    - git ls-files -z | xargs -0 touch -d $(cat cache/bootstrap.timestamp)
     - dash ./configure --cache-file $CCACHE_FILE --disable-gcc-warnings --disable-full-test-suite --disable-doc --disable-tools --enable-tests --with-pkcs12-iter-count=10000
     - make -j$BUILDJOBS
     # build tests, but don't execute them
@@ -301,7 +304,6 @@ fedora-minimal/build:
   script:
     - dnf remove -y libunistring-devel libtasn1-devel libidn-devel
     - dnf install -y libtasn1-tools
-    - git ls-files -z | xargs -0 touch -d $(cat cache/bootstrap.timestamp)
     - dash ./configure --cache-file $CCACHE_FILE --with-included-libtasn1
       --disable-doc --disable-dtls-srtp-support --disable-alpn-support --disable-tests
       --disable-heartbeat-support --disable-srp-authentication --disable-psk-authentication
@@ -365,7 +367,6 @@ fedora-SSL-3.0/build:
     - fedora/bootstrap
   script:
     - update-crypto-policies --set LEGACY
-    - git ls-files -z | xargs -0 touch -d $(cat cache/bootstrap.timestamp)
     - dash ./configure --disable-tls13-interop --disable-gcc-warnings --cache-file $CCACHE_FILE --enable-sha1-support --enable-ssl3-support --enable-seccomp-tests --disable-doc --disable-strict-der-time --with-pkcs12-iter-count=10000
     - make -j$BUILDJOBS
     # build tests, but don't execute them
@@ -387,7 +388,6 @@ fedora-FIPS140-2/build:
   needs:
     - fedora/bootstrap
   script:
-    - git ls-files -z | xargs -0 touch -d $(cat cache/bootstrap.timestamp)
     - dash ./configure --disable-gcc-warnings --cache-file $CCACHE_FILE --disable-non-suiteb-curves --enable-fips140-mode --disable-doc --disable-full-test-suite --with-pkcs12-iter-count=10000
     - make -j$BUILDJOBS
     # build tests, but don't execute them
@@ -411,7 +411,6 @@ fedora-ktls/build:
   needs:
     - fedora/bootstrap
   script:
-    - git ls-files -z | xargs -0 touch -d $(cat cache/bootstrap.timestamp)
     - dash ./configure --disable-gcc-warnings --cache-file $CCACHE_FILE --disable-non-suiteb-curves --enable-ktls --disable-doc --disable-full-test-suite --with-pkcs12-iter-count=10000
     - make -j$BUILDJOBS
     # build tests, but don't execute them
@@ -443,12 +442,12 @@ fedora-ktls/test:
   script:
     - git clone --depth 1 --branch master https://gitlab.com/gnutls/nettle.git nettle-git
     - pushd nettle-git
+    - rm -rf .git               # for artifacts:untracked to work
     - ./.bootstrap
     - ./configure --disable-documentation --prefix=${PWD}/$NETTLE_DIR $NETTLE_CONFIGURE_ARGS
     - make -j$BUILDJOBS
     - make -j$BUILDJOBS install
     - popd
-    - git ls-files -z | xargs -0 touch -d $(cat cache/bootstrap.timestamp)
     - PKG_CONFIG_PATH=${PWD}/nettle-git/$NETTLE_DIR/lib64/pkgconfig dash ./configure --disable-gcc-warnings --disable-full-test-suite --disable-doc --with-pkcs12-iter-count=10000
     - make -j$BUILDJOBS
     - make -j$BUILDJOBS check TESTS=""
@@ -499,7 +498,6 @@ fedora-threadsan/build:
   needs:
     - fedora/bootstrap
   script:
-    - git ls-files -z | xargs -0 touch -d $(cat cache/bootstrap.timestamp)
     - CFLAGS="-fsanitize=thread -g -O2" CXXFLAGS=$CFLAGS
       dash ./configure --disable-gcc-warnings --disable-doc --cache-file $CCACHE_FILE --disable-non-suiteb-curves --enable-fips140-mode --disable-full-test-suite --with-pkcs12-iter-count=10000
     - make -j$BUILDJOBS
@@ -524,7 +522,6 @@ fedora-static-analyzers/build:
     - fedora/bootstrap
   #TODO originally, before_script was set to "/bin/true".. is there a reason not to create the cache?
   script:
-    - git ls-files -z | xargs -0 touch -d $(cat cache/bootstrap.timestamp)
     - scan-build ./configure --cache-file $CCACHE_FILE --disable-doc --enable-fips140-mode --with-pkcs12-iter-count=10000
     - make -j$BUILDJOBS syntax-check gnulib_dir=$GNULIB_SRCDIR
     - make -j$BUILDJOBS -C gl
@@ -600,7 +597,6 @@ fedora-abicoverage/build:
   needs:
     - fedora/bootstrap
   script:
-    - git ls-files -z | xargs -0 touch -d $(cat cache/bootstrap.timestamp)
     - CFLAGS="-g -Og" dash ./configure --disable-gcc-warnings --cache-file $CCACHE_FILE  --prefix=/usr --libdir=/usr/lib64 --enable-code-coverage --disable-maintainer-mode --disable-doc --with-pkcs12-iter-count=10000
     - make -j$BUILDJOBS
     - make -j$BUILDJOBS check TESTS=""
@@ -655,7 +651,6 @@ debian/build:
   needs:
     - debian/bootstrap
   script:
-    - git ls-files -z | xargs -0 touch -d $(cat cache/bootstrap.timestamp)
     - dash ./configure --enable-oldgnutls-interop --disable-gcc-warnings --cache-file $CCACHE_FILE --disable-doc --with-pkcs12-iter-count=10000 LDFLAGS='-Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now'
     - make -j$BUILDJOBS
     - make -j$BUILDJOBS check TESTS=""
@@ -681,7 +676,6 @@ debian/test:
     # cross-compile mode even though --build is given
     - export CC_FOR_BUILD="ccache gcc"
     - export CC="ccache $host-gcc"
-    - git ls-files -z | xargs -0 touch -d $(cat cache/bootstrap.timestamp)
     # Debian's softhsm package is not multiarch yet. Missing softhsm libraries
     # for the target will cause the test suite to fail when p11-kit is enabled.
     - dash ./configure --build=$build --host=$host --disable-gcc-warnings
