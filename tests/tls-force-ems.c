@@ -102,11 +102,30 @@ void doit(void)
 	    AES_GCM ":%FORCE_SESSION_HASH", 0, 0);
 	try("both force EMS", AES_GCM ":%FORCE_SESSION_HASH",
 	    AES_GCM ":%FORCE_SESSION_HASH", 0, 0);
-	try("neither negotiates EMS", AES_GCM ":%NO_SESSION_HASH",
-	    AES_GCM ":%NO_SESSION_HASH", 0, 0);
-	try("server doesn't negotiate EMS, client forces EMS",
-	    AES_GCM ":%NO_SESSION_HASH", AES_GCM ":%FORCE_SESSION_HASH",
-	    GNUTLS_E_AGAIN, GNUTLS_E_INSUFFICIENT_SECURITY);
+	if (gnutls_fips140_mode_enabled()) {
+		try("neither negotiates EMS", AES_GCM ":%NO_SESSION_HASH",
+		    AES_GCM ":%NO_SESSION_HASH", GNUTLS_E_INSUFFICIENT_SECURITY,
+		    GNUTLS_E_AGAIN);
+	} else {
+		try("neither negotiates EMS", AES_GCM ":%NO_SESSION_HASH",
+		    AES_GCM ":%NO_SESSION_HASH", 0, 0);
+	}
+	/* Note that the error codes are swapped based on FIPS mode:
+	 * in FIPS mode, the server doesn't send the extension which
+	 * causes the client to not send the one either, and then the
+	 * server doesn't like the situation.  On the other hand, in
+	 * non-FIPS mode, it's the client to decide to abort the
+	 * connection.
+	 */
+	if (gnutls_fips140_mode_enabled()) {
+		try("server doesn't negotiate EMS, client forces EMS",
+		    AES_GCM ":%NO_SESSION_HASH", AES_GCM ":%FORCE_SESSION_HASH",
+		    GNUTLS_E_INSUFFICIENT_SECURITY, GNUTLS_E_AGAIN);
+	} else {
+		try("server doesn't negotiate EMS, client forces EMS",
+		    AES_GCM ":%NO_SESSION_HASH", AES_GCM ":%FORCE_SESSION_HASH",
+		    GNUTLS_E_AGAIN, GNUTLS_E_INSUFFICIENT_SECURITY);
+	}
 	try("server forces EMS, client doesn't negotiate EMS",
 	    AES_GCM ":%FORCE_SESSION_HASH", AES_GCM ":%NO_SESSION_HASH",
 	    GNUTLS_E_INSUFFICIENT_SECURITY, GNUTLS_E_AGAIN);

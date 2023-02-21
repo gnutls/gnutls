@@ -3234,6 +3234,10 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 	(*priority_cache)->min_record_version = 1;
 	gnutls_atomic_init(&(*priority_cache)->usage_cnt);
 
+	if (_gnutls_fips_mode_enabled()) {
+		(*priority_cache)->force_ext_master_secret = true;
+	}
+
 	if (system_wide_config.allowlisting && !priorities) {
 		priorities = "@" LEVEL_SYSTEM;
 	}
