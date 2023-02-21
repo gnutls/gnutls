@@ -1566,6 +1566,11 @@ This is implied by the PFS keyword.
 will prevent the advertizing the TLS extended master secret (session hash)
 extension.
 
+@item %FORCE_SESSION_HASH @tab
+negotiate the TLS extended master secret (session hash) extension.
+Specifying both %NO_SESSION_HASH and %FORCE_SESSION_HASH is not
+supported, and the behavior is undefined.
+
 @item %SERVER_PRECEDENCE @tab
 The ciphersuite will be selected according to server priorities
 and not the client's.

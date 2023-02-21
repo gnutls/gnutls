@@ -940,6 +940,11 @@ static void enable_no_ext_master_secret(gnutls_priority_t c)
 	c->_no_ext_master_secret = 1;
 }
 
+static void enable_force_ext_master_secret(gnutls_priority_t c)
+{
+	c->force_ext_master_secret = 1;
+}
+
 static void enable_no_etm(gnutls_priority_t c)
 {
 	c->_no_etm = 1;

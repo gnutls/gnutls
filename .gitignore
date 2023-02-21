@@ -793,6 +793,7 @@ tests/tls-crt_type-neg
 tests/tls-etm
 tests/tls-ext-not-in-dtls
 tests/tls-ext-register
+tests/tls-force-ems
 tests/tls-force-etm
 tests/tls-max-record
 tests/tls-neg-ext-key
