@@ -71,6 +71,9 @@
 static inline const struct ecc_curve *get_supported_nist_curve(int curve);
 static inline const struct ecc_curve *get_supported_gost_curve(int curve);
 
+static inline const char *get_supported_nist_curve_order(int curve);
+static inline const char *get_supported_nist_curve_modulus(int curve);
+
 /* When these callbacks are used for a nettle operation, the
  * caller must check the macro HAVE_LIB_ERROR() after the operation
  * is complete. If the macro is true, the operation is to be considered
@@ -406,6 +409,10 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 			struct ecc_scalar ecc_priv;
 			struct ecc_point ecc_pub;
 			const struct ecc_curve *curve;
+			struct ecc_scalar n;
+			struct ecc_scalar m;
+			struct ecc_point r;
+			mpz_t x, y, xx, yy, nn, mm;
 
 			out->data = NULL;
 
@@ -428,17 +435,28 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 				not_approved = true;
 			}
 
+			mpz_init(x);
+			mpz_init(y);
+			mpz_init(xx);
+			mpz_init(yy);
+			mpz_init(nn);
+			mpz_init(mm);
+
+			ecc_scalar_init(&n, curve);
+			ecc_scalar_init(&m, curve);
+			ecc_point_init(&r, curve);
+
 			ret = _ecc_params_to_pubkey(pub, &ecc_pub, curve);
 			if (ret < 0) {
 				gnutls_assert();
-				goto cleanup;
+				goto ecc_fail_cleanup;
 			}
 
 			ret = _ecc_params_to_privkey(priv, &ecc_priv, curve);
 			if (ret < 0) {
 				ecc_point_clear(&ecc_pub);
 				gnutls_assert();
-				goto cleanup;
+				goto ecc_fail_cleanup;
 			}
 
 			out->size = gnutls_ecc_curve_get_size(priv->curve);
@@ -449,14 +467,118 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 				goto ecc_cleanup;
 			}
 
+			/* Perform ECC Full Public-Key Validation Routine
+			 * according to SP800-56A (revision 3), 5.6.2.3.3.
+			 */
+
+			/* Step 1: verify that Q is not an identity
+			 * element (an infinity point). Note that this
+			 * cannot happen in the nettle implementation,
+			 * because it cannot represent an infinity point
+			 * on curves. */
 			ret = ecc_shared_secret(&ecc_priv, &ecc_pub, out->data,
 						out->size);
-			if (ret < 0)
+			if (ret < 0) {
 				gnutls_free(out->data);
+				goto ecc_cleanup;
+			}
+#ifdef ENABLE_FIPS140
+			if (_gnutls_fips_mode_enabled()) {
+				const char *order, *modulus;
+
+				ecc_point_mul(&r, &ecc_priv, &ecc_pub);
+				ecc_point_get(&r, x, y);
+
+				/* Step 2: verify that both coordinates of Q are
+				 * in the range [0, p - 1].
+				 *
+				 * Step 3: verify that Q lie on the curve
+				 *
+				 * Both checks are performed in nettle.  */
+				if (!ecc_point_set(&r, x, y)) {
+					ret =
+					    gnutls_assert_val
+					    (GNUTLS_E_ILLEGAL_PARAMETER);
+					goto ecc_cleanup;
+				}
+
+				/* Step 4: verify that n * Q, where n is the
+				 * curve order, result in an identity element
+				 *
+				 * Since nettle internally cannot represent an
+				 * identity element on curves, we validate this
+				 * instead:
+				 *
+				 *   (n - 1) * Q = -Q
+				 *
+				 * That effectively means: n * Q = -Q + Q = O
+				 */
+				order =
+				    get_supported_nist_curve_order(priv->curve);
+				if (unlikely(order == NULL)) {
+					ret =
+					    gnutls_assert_val
+					    (GNUTLS_E_INTERNAL_ERROR);
+					goto ecc_cleanup;
+				}
+
+				ret = mpz_set_str(nn, order, 16);
+				if (unlikely(ret < 0)) {
+					ret =
+					    gnutls_assert_val
+					    (GNUTLS_E_MPI_SCAN_FAILED);
+					goto ecc_cleanup;
+				}
+
+				modulus =
+				    get_supported_nist_curve_modulus
+				    (priv->curve);
+				if (unlikely(modulus == NULL)) {
+					ret =
+					    gnutls_assert_val
+					    (GNUTLS_E_INTERNAL_ERROR);
+					goto ecc_cleanup;
+				}
+
+				ret = mpz_set_str(mm, modulus, 16);
+				if (unlikely(ret < 0)) {
+					ret =
+					    gnutls_assert_val
+					    (GNUTLS_E_MPI_SCAN_FAILED);
+					goto ecc_cleanup;
+				}
+
+				/* (n - 1) * Q = -Q */
+				mpz_sub_ui(nn, nn, 1);
+				ecc_scalar_set(&n, nn);
+				ecc_point_mul(&r, &n, &r);
+				ecc_point_get(&r, xx, yy);
+				mpz_sub(mm, mm, y);
+
+				if (mpz_cmp(xx, x) != 0 || mpz_cmp(yy, mm) != 0) {
+					ret =
+					    gnutls_assert_val
+					    (GNUTLS_E_ILLEGAL_PARAMETER);
+					goto ecc_cleanup;
+				}
+			} else {
+				not_approved = true;
+			}
+#endif
 
  ecc_cleanup:
 			ecc_point_clear(&ecc_pub);
 			ecc_scalar_zclear(&ecc_priv);
+ ecc_fail_cleanup:
+			mpz_clear(x);
+			mpz_clear(y);
+			mpz_clear(xx);
+			mpz_clear(yy);
+			mpz_clear(nn);
+			mpz_clear(mm);
+			ecc_point_clear(&r);
+			ecc_scalar_clear(&n);
+			ecc_scalar_clear(&m);
 			if (ret < 0)
 				goto cleanup;
 			break;
