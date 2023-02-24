@@ -912,6 +912,7 @@ tests/x509-dn-decode-compat
 tests/x509-extensions
 tests/x509-server-verify
 tests/x509-upnconstraint
+tests/x509-verify-duplicate
 tests/x509-verify-with-crl
 tests/x509_altname
 tests/x509cert
