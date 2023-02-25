@@ -122,11 +122,11 @@ void doit(void)
 
 		ret = gnutls_pubkey_init(&pubkey);
 		if (ret < 0)
-			fail("gnutls_privkey_init\n");
+			fail("gnutls_pubkey_init\n");
 
 		ret = gnutls_privkey_init(&privkey);
 		if (ret < 0)
-			fail("gnutls_pubkey_init\n");
+			fail("gnutls_privkey_init\n");
 
 		ret = gnutls_privkey_import_x509(privkey, key, 0);
 		if (ret < 0)
