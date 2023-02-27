@@ -1548,6 +1548,7 @@ static void tcp_server(const char *name, int port)
 	struct sockaddr_storage client_address;
 	socklen_t calen;
 	struct timeval tv;
+	void *ptr = NULL;
 
 	s = listen_socket(name, port, SOCK_STREAM);
 	if (s < 0)
@@ -1739,11 +1740,12 @@ static void tcp_server(const char *name, int port)
 							}
 						}
 					} else {
-						j->http_request =
+						ptr =
 						    realloc(j->http_request,
 							    j->request_length
 							    + r + 1);
-						if (j->http_request != NULL) {
+						if (ptr != NULL) {
+							j->http_request = ptr;
 							memcpy(j->http_request
 							       +
 							       j->
@@ -2045,6 +2047,7 @@ static int wrap_db_store(void *dbf, gnutls_datum_t key, gnutls_datum_t data)
 {
 	int i;
 	time_t now = time(0);
+	void *ptr = NULL;
 
 	if (key.size > SESSION_ID_SIZE)
 		return GNUTLS_E_DB_ERROR;
@@ -2070,10 +2073,10 @@ static int wrap_db_store(void *dbf, gnutls_datum_t key, gnutls_datum_t data)
 				return GNUTLS_E_DB_ERROR;
 			}
 			cache_db_alloc = cache_db_alloc * 2 + 1;
-			cache_db = realloc(cache_db,
-					   cache_db_alloc * sizeof(CACHE));
-			if (!cache_db)
+			ptr = realloc(cache_db, cache_db_alloc * sizeof(CACHE));
+			if (!ptr)
 				return GNUTLS_E_MEMORY_ERROR;
+			cache_db = ptr;
 			memset(cache_db + cache_db_ptr, 0,
 			       (cache_db_alloc - cache_db_ptr) * sizeof(CACHE));
 			cache_db_ptr++;
@@ -2085,10 +2088,10 @@ static int wrap_db_store(void *dbf, gnutls_datum_t key, gnutls_datum_t data)
 
 	/* resize the data slot if needed */
 	if (cache_db[i].session_data.size < data.size) {
-		cache_db[i].session_data.data =
-		    realloc(cache_db[i].session_data.data, data.size);
-		if (!cache_db[i].session_data.data)
+		ptr = realloc(cache_db[i].session_data.data, data.size);
+		if (!ptr)
 			return GNUTLS_E_MEMORY_ERROR;
+		cache_db[i].session_data.data = ptr;
 	}
 	memcpy(cache_db[i].session_data.data, data.data, data.size);
 	cache_db[i].session_data.size = data.size;
