@@ -463,15 +463,14 @@ int _gnutls_negotiate_version(gnutls_session_t session, uint8_t major,
 	 * TLS 1.2 is handled separately because it is always advertized under TLS 1.3 or later */
 	if (aversion == NULL ||
 	    _gnutls_nversion_is_supported(session, major, minor) == 0) {
-		if (aversion && aversion->id == GNUTLS_TLS1_2) {
+		if (aversion && (aversion->id == GNUTLS_TLS1_2 || aversion->id == GNUTLS_DTLS1_2)) {
 			vers = _gnutls_version_max(session);
 			if (unlikely(vers == NULL))
 				return gnutls_assert_val(
 					GNUTLS_E_NO_CIPHER_SUITES);
 
-			if (vers->id >= GNUTLS_TLS1_2) {
-				session->security_parameters.pversion =
-					aversion;
+			if (vers->id >= GNUTLS_TLS1_2 || vers->id >= GNUTLS_DTLS1_2) {
+				session->security_parameters.pversion = aversion;
 				return 0;
 			}
 		}
@@ -2472,8 +2471,13 @@ int _gnutls_send_server_hello(gnutls_session_t session, int again)
 			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 		if (vers->tls13_sem) {
-			vbytes[0] = 0x03; /* TLS1.2 */
-			vbytes[1] = 0x03;
+			if (IS_DTLS(session)) {
+				vbytes[0] = 0xfe; /* DTLS1.2 */
+				vbytes[1] = 0xfd;
+			} else {
+				vbytes[0] = 0x03; /* TLS1.2 */
+				vbytes[1] = 0x03;
+			}
 			extflag |= GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO;
 		} else {
 			vbytes[0] = vers->major;
@@ -3551,7 +3555,8 @@ reset:
 			STATE = STATE1;
 		}
 
-		if (ret == GNUTLS_E_NO_COMMON_KEY_SHARE) {
+		ver = _gnutls_version_max(session);
+		if (ret == GNUTLS_E_NO_COMMON_KEY_SHARE || (ver->tls13_sem && IS_DTLS(session))) {
 			STATE = STATE90;
 			session->internals.hsk_flags |= HSK_HRR_SENT;
 			goto reset;

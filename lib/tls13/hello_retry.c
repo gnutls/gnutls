@@ -35,7 +35,14 @@ int _gnutls13_send_hello_retry_request(gnutls_session_t session, unsigned again)
 	mbuffer_st *bufel = NULL;
 	gnutls_buffer_st buf;
 	const version_entry_st *ver;
-	const uint8_t vbuf[2] = { 0x03, 0x03 };
+	uint8_t vbuf[2];
+	if (IS_DTLS(session)) {
+		vbuf[0] = 0xfe;
+		vbuf[1] = 0xfd;
+	} else {
+		vbuf[0] = 0x03;
+		vbuf[1] = 0x03;
+	}
 
 	if (again == 0) {
 		ver = get_version(session);
