@@ -43,7 +43,6 @@ void _gnutls_hello_set_default_version(gnutls_session_t session,
 				       unsigned char major,
 				       unsigned char minor);
 
-extern gnutls_srp_client_credentials_t srp_cred;
 extern gnutls_anon_client_credentials_t anon_cred;
 extern gnutls_certificate_credentials_t xcred;
 
@@ -1520,8 +1519,6 @@ test_code_t test_session_resume2(gnutls_session_t session)
 	else
 		return TEST_FAILED;
 }
-
-extern char *hostname;
 
 test_code_t test_certificate(gnutls_session_t session)
 {
