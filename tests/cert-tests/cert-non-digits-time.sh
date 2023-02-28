@@ -34,7 +34,7 @@ fi
 skip_if_no_datefudge
 
 # Check whether certificates with non-digits time fields are accepted
-datefudge -s "2019-12-19" \
+datefudge -s "2019-12-19 00:00:00" \
 ${VALGRIND}"${CERTTOOL}" --verify --load-ca-certificate "${srcdir}/data/cert-with-non-digits-time-ca.pem" --infile "${srcdir}/data/cert-with-non-digits-time.pem"
 rc=$?
 

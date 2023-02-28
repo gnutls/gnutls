@@ -51,7 +51,7 @@ fi
 FILE="signing-verify-no-purpose"
 echo ""
 echo "test: $FILE"
-datefudge -s "2015-1-10" \
+datefudge -s "2015-01-10 00:00:00" \
 ${VALGRIND} "${CERTTOOL}" --p7-verify --load-ca-certificate "${srcdir}/data/code-signing-ca.pem" <"${OUTFILE}"
 rc=$?
 
@@ -63,7 +63,7 @@ fi
 FILE="signing-verify-valid-purpose"
 echo ""
 echo "test: $FILE"
-datefudge -s "2015-1-10" \
+datefudge -s "2015-01-10 00:00:00" \
 ${VALGRIND} "${CERTTOOL}" --verify-purpose 1.3.6.1.5.5.7.3.3 --p7-verify --load-ca-certificate "${srcdir}/data/code-signing-ca.pem" <"${OUTFILE}"
 rc=$?
 
@@ -75,7 +75,7 @@ fi
 FILE="signing-verify-invalid-purpose"
 echo ""
 echo "test: $FILE"
-datefudge -s "2015-1-10" \
+datefudge -s "2015-01-10 00:00:00" \
 ${VALGRIND} "${CERTTOOL}" --verify-purpose 1.3.6.1.5.5.7.3.1 --p7-verify --load-ca-certificate "${srcdir}/data/code-signing-ca.pem" <"${OUTFILE}"
 rc=$?
 
@@ -87,7 +87,7 @@ fi
 FILE="signing-verify-invalid-date-1"
 echo ""
 echo "test: $FILE"
-datefudge -s "2011-1-10" \
+datefudge -s "2011-01-10 00:00:00" \
 ${VALGRIND} "${CERTTOOL}" --verify-purpose 1.3.6.1.5.5.7.3.3 --p7-verify --load-ca-certificate "${srcdir}/data/code-signing-ca.pem" <"${OUTFILE}"
 rc=$?
 
@@ -99,7 +99,7 @@ fi
 FILE="signing-verify-invalid-date-2"
 echo ""
 echo "test: $FILE"
-datefudge -s "2018-1-10" \
+datefudge -s "2018-01-10 00:00:00" \
 ${VALGRIND} "${CERTTOOL}" --verify-purpose 1.3.6.1.5.5.7.3.3 --p7-verify --load-ca-certificate "${srcdir}/data/code-signing-ca.pem" <"${OUTFILE}"
 rc=$?
 

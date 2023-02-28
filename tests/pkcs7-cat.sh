@@ -36,7 +36,7 @@ fi
 skip_if_no_datefudge
 
 #try verification
-datefudge -s "2010-10-10" \
+datefudge -s "2010-10-10 00:00:00" \
 ${VALGRIND} "${CERTTOOL}" --verify-allow-broken --inder --p7-verify --infile "${srcdir}/data/test1.cat" --load-certificate "${srcdir}/data/pkcs7-cat-ca.pem"
 rc=$?
 
@@ -45,7 +45,7 @@ if test "${rc}" = "0"; then
 	exit 1
 fi
 
-datefudge -s "2016-10-10" \
+datefudge -s "2016-10-10 00:00:00" \
 ${VALGRIND} "${CERTTOOL}" --verify-allow-broken --inder --p7-verify --infile "${srcdir}/data/test1.cat" --load-certificate "${srcdir}/data/pkcs7-cat-ca.pem"
 rc=$?
 

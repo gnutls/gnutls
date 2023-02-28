@@ -74,9 +74,9 @@ if ! ("$OPENSSL" version) > /dev/null 2>&1; then
     exit 77
 fi
 
-CERTDATE="2016-04-28"
-TESTDATE="2016-04-29"
-EXP_OCSP_DATE="2016-03-27"
+CERTDATE="2016-04-28 00:00:00"
+TESTDATE="2016-04-29 00:00:00"
+EXP_OCSP_DATE="2016-03-27 00:00:00"
 
 OCSP_PID=""
 TLS_SERVER_PID=""
@@ -307,7 +307,7 @@ rm -f "${OCSP_RESPONSE_FILE}"
 # Generate an OCSP response which expires in 2 days and use it after
 # a month. gnutls server doesn't send such a staple to clients.
 ${VALGRIND} ${OCSPTOOL} --generate-request --load-issuer "${srcdir}/ocsp-tests/certs/ocsp-server.pem" --load-cert "${SERVER_CERT_FILE}" --outfile "${OCSP_REQ_FILE}"
-datefudge -s ${EXP_OCSP_DATE} \
+datefudge -s "${EXP_OCSP_DATE}" \
 	${OPENSSL} ocsp -index "${INDEXFILE}" -rsigner "${srcdir}/ocsp-tests/certs/ocsp-server.pem" -rkey "${srcdir}/ocsp-tests/certs/ocsp-server.key" -CA "${srcdir}/ocsp-tests/certs/ca.pem" -reqin "${OCSP_REQ_FILE}" -respout "${OCSP_RESPONSE_FILE}" -ndays 2
 
 eval "${GETPORT}"
@@ -367,7 +367,7 @@ echo "=== Test 6: Server with valid certificate - old staple ==="
 rm -f "${OCSP_RESPONSE_FILE}"
 
 ${VALGRIND} ${OCSPTOOL} --generate-request --load-issuer "${srcdir}/ocsp-tests/certs/ocsp-server.pem" --load-cert "${SERVER_CERT_FILE}" --outfile "${OCSP_REQ_FILE}"
-datefudge -s ${EXP_OCSP_DATE} \
+datefudge -s "${EXP_OCSP_DATE}" \
 	${OPENSSL} ocsp -index ${INDEXFILE} -rsigner "${srcdir}/ocsp-tests/certs/ocsp-server.pem" -rkey "${srcdir}/ocsp-tests/certs/ocsp-server.key" -CA "${srcdir}/ocsp-tests/certs/ca.pem" -reqin "${OCSP_REQ_FILE}" -respout "${OCSP_RESPONSE_FILE}"
 
 eval "${GETPORT}"

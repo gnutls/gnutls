@@ -34,7 +34,7 @@ export TZ="UTC"
 
 skip_if_no_datefudge
 
-datefudge -s "2007-04-22" \
+datefudge -s "2007-04-22 00:00:00" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/simple-policy.tmpl" \

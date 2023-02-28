@@ -66,7 +66,7 @@ have_ed25519=0
 P11TOOL="${VALGRIND} ${P11TOOL} --batch"
 SERV="${SERV} -q"
 
-TESTDATE=2020-12-01
+TESTDATE="2020-12-01 00:00:00"
 
 . ${srcdir}/scripts/common.sh
 

@@ -31,7 +31,7 @@ export TZ="UTC"
 
 skip_if_no_datefudge
 
-date="2021-07-14 00:00"
+date="2021-07-14 00:00:00"
 sample_dir="${srcdir}/ocsp-tests/signer-verify"
 trusted="${sample_dir}/trust.pem"
 

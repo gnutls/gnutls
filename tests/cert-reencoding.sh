@@ -238,7 +238,7 @@ _EOF
 
 echo "=== Bringing TLS server up ==="
 
-TESTDATE="2018-03-01"
+TESTDATE="2018-03-01 00:00:00"
 
 # Start OpenSSL TLS server
 #

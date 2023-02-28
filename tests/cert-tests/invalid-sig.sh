@@ -86,7 +86,7 @@ fi
 
 if check_for_datefudge; then
 	#this was causing a double free; verify that we receive the expected error code
-	datefudge -s 2020-01-01 \
+	datefudge -s "2020-01-01 00:00:00" \
 	${VALGRIND} "${CERTTOOL}" --verify-chain --infile "${srcdir}/data/cve-2019-3829.pem"
 	rc=$?
 

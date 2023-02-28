@@ -74,8 +74,8 @@ if ! ("$OPENSSL" version) > /dev/null 2>&1; then
     exit 77
 fi
 
-CERTDATE="2016-04-28"
-TESTDATE="2016-04-29"
+CERTDATE="2016-04-28 00:00:00"
+TESTDATE="2016-04-29 00:00:00"
 
 OCSP_PID=""
 TLS_SERVER_PID=""

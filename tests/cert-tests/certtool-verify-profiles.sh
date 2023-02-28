@@ -38,7 +38,7 @@ OUTFILE=out-pkcs7.$$.tmp
 skip_if_no_datefudge
 
 echo "Checking chain with insecure leaf"
-datefudge -s "2019-12-19" \
+datefudge -s "2019-12-19 00:00:00" \
 ${VALGRIND} "${CERTTOOL}" --verify-chain --verify-profile=medium --infile "${srcdir}/data/chain-512-leaf.pem" >${OUTFILE}
 rc=$?
 
@@ -49,7 +49,7 @@ if test "${rc}" != "1"; then
 fi
 
 echo "Checking chain with insecure subca"
-datefudge -s "2019-12-19" \
+datefudge -s "2019-12-19 00:00:00" \
 ${VALGRIND} "${CERTTOOL}" --verify-chain --verify-profile=medium --infile "${srcdir}/data/chain-512-subca.pem" >${OUTFILE}
 rc=$?
 
@@ -61,7 +61,7 @@ fi
 
 
 echo "Checking chain with insecure ca"
-datefudge -s "2019-12-19" \
+datefudge -s "2019-12-19 00:00:00" \
 ${VALGRIND} "${CERTTOOL}" --verify-chain --verify-profile=medium --infile "${srcdir}/data/chain-512-ca.pem" >${OUTFILE}
 rc=$?
 
