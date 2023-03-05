@@ -96,7 +96,7 @@ chmod u+w "$TEMPLATE_FILE"
 echo "ocsp_uri=http://localhost:${OCSP_PORT}/ocsp/" >>"$TEMPLATE_FILE"
 
 # Generate certificates with the random port
-datefudge -s "${CERTDATE}" ${CERTTOOL} \
+gnutls_timewrapper_standalone static "${CERTDATE}" ${CERTTOOL} \
 	--generate-certificate --load-ca-privkey "${srcdir}/ocsp-tests/certs/ca.key" \
 	--load-ca-certificate "${srcdir}/ocsp-tests/certs/ca.pem" \
 	--load-privkey "${srcdir}/ocsp-tests/certs/server_good.key" \
@@ -160,7 +160,7 @@ wait_server $TLS_SERVER_PID
 wait_for_port "${TLS_SERVER_PORT}"
 
 echo "test 123456" | \
-    datefudge -s "${TESTDATE}" \
+    gnutls_timewrapper_standalone static "${TESTDATE}" \
 	      "${CLI}" --ocsp --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
 	      --port="${TLS_SERVER_PORT}" localhost
 rc=$?
@@ -182,7 +182,7 @@ cp "${srcdir}/ocsp-tests/certs/server_bad.template" "$TEMPLATE_FILE"
 echo "ocsp_uri=http://localhost:${OCSP_PORT}/ocsp/" >>"$TEMPLATE_FILE"
 
 # Generate certificates with the random port
-datefudge -s "${CERTDATE}" ${CERTTOOL} \
+gnutls_timewrapper_standalone static "${CERTDATE}" ${CERTTOOL} \
 	--generate-certificate --load-ca-privkey "${srcdir}/ocsp-tests/certs/ca.key" \
 	--load-ca-certificate "${srcdir}/ocsp-tests/certs/ca.pem" \
 	--load-privkey "${srcdir}/ocsp-tests/certs/server_bad.key" \
@@ -204,7 +204,7 @@ wait_server ${TLS_SERVER_PID}
 wait_for_port "${TLS_SERVER_PORT}"
 
 echo "test 123456" | \
-    datefudge -s "${TESTDATE}" \
+    gnutls_timewrapper_standalone static "${TESTDATE}" \
 	      "${CLI}" --ocsp --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
 	      --port="${TLS_SERVER_PORT}" localhost
 rc=$?

@@ -38,7 +38,7 @@ skip_if_no_datefudge
 #
 # Test certificate generation
 #
-datefudge -s "2007-04-22 00:00:00" \
+gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
 "${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-tlsfeature.tmpl" \
@@ -97,7 +97,7 @@ fi
 # Test certificate request generation
 #
 
-datefudge -s "2007-04-22 00:00:00" \
+gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
 "${CERTTOOL}" --generate-request \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-tlsfeature.tmpl" \
@@ -158,7 +158,7 @@ fi
 #
 # Test certificate generation after a request
 #
-datefudge -s "2007-04-22 00:00:00" \
+gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
 "${CERTTOOL}" --generate-certificate \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--load-ca-privkey "${srcdir}/data/template-test.key" \

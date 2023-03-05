@@ -37,7 +37,7 @@ skip_if_no_datefudge
 # time set using datefudge could have changed since the generation
 # (if example the system was busy)
 
-datefudge -s "2016-04-22 00:00:00" \
+gnutls_timewrapper_standalone static "2016-04-22 00:00:00" \
 	"${OCSPTOOL}" -e --load-signer "${srcdir}/ocsp-tests/certs/ca.pem" --infile "${srcdir}/ocsp-tests/response1.der"
 rc=$?
 
@@ -47,7 +47,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-datefudge -s "2016-04-22 00:00:00" \
+gnutls_timewrapper_standalone static "2016-04-22 00:00:00" \
 	"${OCSPTOOL}" -e --load-signer "${srcdir}/ocsp-tests/certs/ocsp-server.pem" --infile "${srcdir}/ocsp-tests/response2.der"
 rc=$?
 
@@ -57,7 +57,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-datefudge -s "2016-04-22 00:00:00" \
+gnutls_timewrapper_standalone static "2016-04-22 00:00:00" \
 	"${OCSPTOOL}" -e --load-signer "${srcdir}/ocsp-tests/certs/ca.pem" --infile "${srcdir}/ocsp-tests/response2.der" -d 4
 rc=$?
 

@@ -249,7 +249,7 @@ launch_bare_server \
 SERVER_PID="${!}"
 wait_server "${SERVER_PID}"
 
-datefudge -s "${TESTDATE}" \
+gnutls_timewrapper_standalone static "${TESTDATE}" \
       "${CLI}" --x509certfile ${CLIENT_CERT_FILE} \
       --x509keyfile ${CLIENT_KEY_FILE} --x509cafile=${CA_FILE} \
       --port="${PORT}" localhost </dev/null

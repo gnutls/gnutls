@@ -38,7 +38,7 @@ trusted="${sample_dir}/trust.pem"
 verify_response ()
 {
     echo "verifying ${sample_dir}/${1} using ${trusted}"
-    datefudge --static "${date}" \
+    gnutls_timewrapper_standalone static "${date}" \
               "${OCSPTOOL}" --infile="${sample_dir}/${1}" \
               --verify-response --load-trust="${trusted}"
     return $?

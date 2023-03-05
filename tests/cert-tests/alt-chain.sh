@@ -41,7 +41,7 @@ OLD_CA_FILE="${srcdir}/data/alt-chain-old-ca.pem"
 NEW_CA_FILE="${srcdir}/data/alt-chain-new-ca.pem"
 
 echo ""
-datefudge -s "2017-05-10 00:00:00" \
+gnutls_timewrapper_standalone static "2017-05-10 00:00:00" \
 ${VALGRIND} "${CERTTOOL}" --load-ca-certificate ${OLD_CA_FILE} --verify-hostname www.google.com --verify --infile "${srcdir}/data/alt-chain.pem" >${OUTFILE}
 rc=$?
 
@@ -52,7 +52,7 @@ if test "${rc}" != "1"; then
 fi
 
 echo ""
-datefudge -s "2017-05-10 00:00:00" \
+gnutls_timewrapper_standalone static "2017-05-10 00:00:00" \
 ${VALGRIND} "${CERTTOOL}" --load-ca-certificate ${NEW_CA_FILE} --verify-hostname www.google.com --verify --infile "${srcdir}/data/alt-chain.pem" >${OUTFILE}
 rc=$?
 

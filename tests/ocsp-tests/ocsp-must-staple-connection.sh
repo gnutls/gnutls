@@ -100,7 +100,7 @@ chmod u+w "$TEMPLATE_FILE"
 echo "ocsp_uri=http://localhost:${OCSP_PORT}/ocsp/" >>"$TEMPLATE_FILE"
 
 # Generate certificates with the random port
-datefudge -s "${CERTDATE}" ${CERTTOOL} \
+gnutls_timewrapper_standalone static "${CERTDATE}" ${CERTTOOL} \
 	--generate-certificate --load-ca-privkey "${srcdir}/ocsp-tests/certs/ca.key" \
 	--load-ca-certificate "${srcdir}/ocsp-tests/certs/ca.pem" \
 	--load-privkey "${srcdir}/ocsp-tests/certs/server_good.key" \
@@ -109,7 +109,7 @@ datefudge -s "${CERTDATE}" ${CERTTOOL} \
 # Generate certificates with the random port (with mandatory stapling extension)
 echo "tls_feature = 5" >>"$TEMPLATE_FILE"
 
-datefudge -s "${CERTDATE}" ${CERTTOOL} \
+gnutls_timewrapper_standalone static "${CERTDATE}" ${CERTTOOL} \
 	--generate-certificate --load-ca-privkey "${srcdir}/ocsp-tests/certs/ca.key" \
 	--load-ca-certificate "${srcdir}/ocsp-tests/certs/ca.pem" \
 	--load-privkey "${srcdir}/ocsp-tests/certs/server_good.key" \
@@ -181,7 +181,7 @@ wait_server $TLS_SERVER_PID
 wait_for_port "${TLS_SERVER_PORT}"
 
 echo "test 123456" | \
-    datefudge -s "${TESTDATE}" \
+    gnutls_timewrapper_standalone static "${TESTDATE}" \
 	      "${CLI}" --ocsp --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
 	      --port="${TLS_SERVER_PORT}" localhost
 rc=$?
@@ -214,7 +214,7 @@ wait_server $TLS_SERVER_PID
 wait_for_port "${TLS_SERVER_PORT}"
 
 echo "test 123456" | \
-    datefudge -s "${TESTDATE}" \
+    gnutls_timewrapper_standalone static "${TESTDATE}" \
 	      "${CLI}" --ocsp --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
 	      --port="${TLS_SERVER_PORT}" localhost
 rc=$?
@@ -249,7 +249,7 @@ wait_server $TLS_SERVER_PID
 wait_for_port "${TLS_SERVER_PORT}"
 
 echo "test 123456" | \
-    datefudge -s "${TESTDATE}" \
+    gnutls_timewrapper_standalone static "${TESTDATE}" \
 	      "${CLI}" --ocsp --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
 	      --port="${TLS_SERVER_PORT}" localhost
 rc=$?
@@ -285,7 +285,7 @@ wait_server $TLS_SERVER_PID
 wait_for_port "${TLS_SERVER_PORT}"
 
 echo "test 123456" | \
-    datefudge -s "${TESTDATE}" \
+    gnutls_timewrapper_standalone static "${TESTDATE}" \
 	      "${CLI}" --ocsp --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
 	      --port="${TLS_SERVER_PORT}" localhost
 rc=$?
@@ -307,7 +307,7 @@ rm -f "${OCSP_RESPONSE_FILE}"
 # Generate an OCSP response which expires in 2 days and use it after
 # a month. gnutls server doesn't send such a staple to clients.
 ${VALGRIND} ${OCSPTOOL} --generate-request --load-issuer "${srcdir}/ocsp-tests/certs/ocsp-server.pem" --load-cert "${SERVER_CERT_FILE}" --outfile "${OCSP_REQ_FILE}"
-datefudge -s "${EXP_OCSP_DATE}" \
+gnutls_timewrapper_standalone static "${EXP_OCSP_DATE}" \
 	${OPENSSL} ocsp -index "${INDEXFILE}" -rsigner "${srcdir}/ocsp-tests/certs/ocsp-server.pem" -rkey "${srcdir}/ocsp-tests/certs/ocsp-server.key" -CA "${srcdir}/ocsp-tests/certs/ca.pem" -reqin "${OCSP_REQ_FILE}" -respout "${OCSP_RESPONSE_FILE}" -ndays 2
 
 eval "${GETPORT}"
@@ -344,7 +344,7 @@ wait_server $TLS_SERVER_PID
 wait_for_port "${TLS_SERVER_PORT}"
 
 echo "test 123456" | \
-    datefudge -s "${TESTDATE}" \
+    gnutls_timewrapper_standalone static "${TESTDATE}" \
 	      "${CLI}" --ocsp --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
 	      --port="${TLS_SERVER_PORT}" localhost
 rc=$?
@@ -367,7 +367,7 @@ echo "=== Test 6: Server with valid certificate - old staple ==="
 rm -f "${OCSP_RESPONSE_FILE}"
 
 ${VALGRIND} ${OCSPTOOL} --generate-request --load-issuer "${srcdir}/ocsp-tests/certs/ocsp-server.pem" --load-cert "${SERVER_CERT_FILE}" --outfile "${OCSP_REQ_FILE}"
-datefudge -s "${EXP_OCSP_DATE}" \
+gnutls_timewrapper_standalone static "${EXP_OCSP_DATE}" \
 	${OPENSSL} ocsp -index ${INDEXFILE} -rsigner "${srcdir}/ocsp-tests/certs/ocsp-server.pem" -rkey "${srcdir}/ocsp-tests/certs/ocsp-server.key" -CA "${srcdir}/ocsp-tests/certs/ca.pem" -reqin "${OCSP_REQ_FILE}" -respout "${OCSP_RESPONSE_FILE}"
 
 eval "${GETPORT}"
@@ -387,7 +387,7 @@ wait_server $TLS_SERVER_PID
 wait_for_port "${TLS_SERVER_PORT}"
 
 echo "test 123456" | \
-    datefudge -s "${TESTDATE}" \
+    gnutls_timewrapper_standalone static "${TESTDATE}" \
 	      "${CLI}" --ocsp --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
 	      --port="${TLS_SERVER_PORT}" localhost
 rc=$?
@@ -422,7 +422,7 @@ if test "${GNUTLS_FORCE_FIPS_MODE}" != 1; then
     wait_for_port "${TLS_SERVER_PORT}"
 
     echo "test 123456" | \
-	datefudge -s "${TESTDATE}" \
+	gnutls_timewrapper_standalone static "${TESTDATE}" \
 		  "${CLI}" --priority "NORMAL:%NO_EXTENSIONS" --ocsp --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
 		  --port="${TLS_SERVER_PORT}" localhost
     rc=$?
@@ -457,7 +457,7 @@ wait_server $TLS_SERVER_PID
 wait_for_port "${TLS_SERVER_PORT}"
 
 echo "test 123456" | \
-    datefudge -s "${TESTDATE}" \
+    gnutls_timewrapper_standalone static "${TESTDATE}" \
 	      "${CLI}" --ocsp --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
 	      --port="${TLS_SERVER_PORT}" localhost
 rc=$?
@@ -490,7 +490,7 @@ wait_server $TLS_SERVER_PID
 wait_for_port "${TLS_SERVER_PORT}"
 
 echo "test 123456" | \
-    datefudge -s "${TESTDATE}" \
+    gnutls_timewrapper_standalone static "${TESTDATE}" \
 	      "${CLI}" --ocsp --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
 	      --port="${TLS_SERVER_PORT}" localhost
 rc=$?

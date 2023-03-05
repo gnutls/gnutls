@@ -46,7 +46,7 @@ if test "${rc}" != "0"; then
 fi
 
 
-datefudge -s "2017-04-06 00:00:00" \
+gnutls_timewrapper_standalone static "2017-04-06 00:00:00" \
 ${VALGRIND} "${CERTTOOL}" --p7-verify --load-certificate "${srcdir}/../../doc/credentials/x509/cert-rsa.pem" <"${OUTFILE}"
 rc=$?
 

@@ -44,7 +44,7 @@ fi
 # time set using datefudge could have changed since the generation
 # (if example the system was busy)
 
-datefudge -s "2007-04-22 00:00:00" \
+gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-krb5name.tmpl" \
@@ -70,7 +70,7 @@ fi
 cp "${srcdir}/templates/template-krb5name.tmpl" ${TMPLFILE}
 echo "krb5_principal = 'xxxxxxxxxxxxxx'" >>${TMPLFILE}
 
-datefudge -s "2007-04-22 00:00:00" \
+gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
 ${VALGRIND} "${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template ${TMPLFILE} \
@@ -87,7 +87,7 @@ fi
 cp "${srcdir}/templates/template-krb5name.tmpl" ${TMPLFILE}
 echo "krb5_principal = 'comp1/comp2/comp3/comp4/comp5/comp6/comp7/comp8/comp9/comp10@REALM.COM'" >>${TMPLFILE}
 
-datefudge -s "2007-04-22 00:00:00" \
+gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
 ${VALGRIND} "${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template ${TMPLFILE} \

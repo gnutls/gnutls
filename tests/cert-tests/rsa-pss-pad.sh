@@ -41,7 +41,7 @@ skip_if_no_datefudge
 # Test PSS signatures on certificate
 
 for i in sha256 sha384 sha512;do
-datefudge -s "2007-04-22 00:00:00" \
+gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
 "${CERTTOOL}" --generate-self-signed --key-type rsa-pss \
 		--load-privkey "${srcdir}/data/privkey1.pem" \
 		--template "${srcdir}/templates/template-test.tmpl" \
@@ -59,7 +59,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-datefudge -s "2007-04-25 00:00:00" \
+gnutls_timewrapper_standalone static "2007-04-25 00:00:00" \
 	"${CERTTOOL}" --load-ca-certificate "${TMPFILE}" --verify --infile "${TMPFILE}" >/dev/null 2>&1
 rc=$?
 if test "${rc}" != "0"; then

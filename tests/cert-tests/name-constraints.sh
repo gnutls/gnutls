@@ -37,7 +37,7 @@ TMPFILE=constraints.$$.pem.tmp
 
 skip_if_no_datefudge
 
-datefudge -s "2016-04-22 00:00:00" \
+gnutls_timewrapper_standalone static "2016-04-22 00:00:00" \
 	${VALGRIND} "${CERTTOOL}" --verify-allow-broken -e --infile "${srcdir}/data/name-constraints-ip.pem"
 rc=$?
 

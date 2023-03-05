@@ -561,7 +561,7 @@ write_certificate_test () {
 	pubkey="$5"
 
 	echo -n "* Generating client certificate... "
-	datefudge -s "$TESTDATE" \
+	gnutls_timewrapper_standalone static "$TESTDATE" \
 	"${CERTTOOL}" ${CERTTOOL_PARAM} ${ADDITIONAL_PARAM}  --generate-certificate --load-ca-privkey "${cakey}"  --load-ca-certificate "${cacert}"  \
 	--template ${srcdir}/testpkcs11-certs/client-tmpl --load-privkey "${token};object=gnutls-client;object-type=private" \
 	--load-pubkey "$pubkey" --outfile tmp-client.crt >>"${LOGFILE}" 2>&1
@@ -939,7 +939,7 @@ use_certificate_test () {
 	echo -n "* Using PKCS #11 with gnutls-cli (${txt})... "
 	# start server
 	eval "${GETPORT}"
-	launch_bare_server datefudge -s "$TESTDATE" \
+	launch_bare_server gnutls_timewrapper_standalone static "$TESTDATE" \
 	        $VALGRIND $SERV $DEBUG -p "$PORT" \
 		${ADDITIONAL_PARAM} --debug 10 --echo --priority NORMAL --x509certfile="${certfile}" \
 		--x509keyfile="$keyfile" --x509cafile="${cafile}" \
@@ -949,16 +949,16 @@ use_certificate_test () {
 	wait_server ${PID}
 
 	# connect to server using SC
-	datefudge -s "$TESTDATE" \
+	gnutls_timewrapper_standalone static "$TESTDATE" \
 	${VALGRIND} "${CLI}" ${ADDITIONAL_PARAM} -p "${PORT}" localhost --priority NORMAL --x509cafile="${cafile}" </dev/null >>"${LOGFILE}" 2>&1 && \
 		fail ${PID} "Connection should have failed!"
 
-	datefudge -s "$TESTDATE" \
+	gnutls_timewrapper_standalone static "$TESTDATE" \
 	${VALGRIND} "${CLI}" ${ADDITIONAL_PARAM} -p "${PORT}" localhost --priority NORMAL --x509certfile="${certfile}" \
 	--x509keyfile="$keyfile" --x509cafile="${cafile}" </dev/null >>"${LOGFILE}" 2>&1 || \
 		fail ${PID} "Connection (with files) should have succeeded!"
 
-	datefudge -s "$TESTDATE" \
+	gnutls_timewrapper_standalone static "$TESTDATE" \
 	${VALGRIND} "${CLI}" ${ADDITIONAL_PARAM} -p "${PORT}" localhost --priority NORMAL --x509certfile="${token};object=gnutls-client;object-type=cert" \
 		--x509keyfile="${token};object=gnutls-client;object-type=private" \
 		--x509cafile="${cafile}" </dev/null >>"${LOGFILE}" 2>&1 || \
