@@ -491,10 +491,12 @@ void start(const char *prio)
 	if (child) {
 		int status;
 
+		close(sockets[1]);
 		server(sockets[0], prio);
 		wait(&status);
 		check_wait_status(status);
 	} else {
+		close(sockets[0]);
 		client(sockets[1], prio);
 		exit(0);
 	}
