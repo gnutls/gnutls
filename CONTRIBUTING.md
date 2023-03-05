@@ -44,7 +44,7 @@ For testing functionality of gnutls we use two test unit testing frameworks:
 
 Certificates for testing purposes are available at [cert-common.h](tests/cert-common.h).
 Note that we do not regenerate test certificates when they expire, but
-we rather fix the test's time using datefudge or gnutls_global_set_time_function().
+we rather fix the test's time using faketime/datefudge or gnutls_global_set_time_function().
 For example, see [x509cert-tl.c](tests/x509cert-tl.c).
 
 
