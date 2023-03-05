@@ -243,7 +243,7 @@ TESTDATE="2018-03-01 00:00:00"
 # Start OpenSSL TLS server
 #
 launch_bare_server \
-	  datefudge "${TESTDATE}" \
+	  gnutls_timewrapper_standalone "${TESTDATE}" \
 	  "${OPENSSL}" s_server -cert ${SERVER_CERT_FILE} -key ${SERVER_KEY_FILE} \
 	  -CAfile ${CA_FILE} -port ${PORT} -Verify 1 -verify_return_error -www
 SERVER_PID="${!}"

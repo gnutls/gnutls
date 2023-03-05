@@ -129,7 +129,7 @@ cp "${srcdir}/ocsp-tests/certs/ocsp_index.txt.attr" ${ATTRFILE}
 # SO_REUSEADDR usage.
 PORT=${OCSP_PORT}
 launch_bare_server \
-	  datefudge "${TESTDATE}" \
+	  gnutls_timewrapper_standalone "${TESTDATE}" \
 	  "${OPENSSL}" ocsp -index "${INDEXFILE}" -text \
 	  -port "${OCSP_PORT}" \
 	  -rsigner "${srcdir}/ocsp-tests/certs/ocsp-server.pem" \
@@ -145,7 +145,7 @@ echo "=== Verifying OCSP server is up ==="
 t=0
 while test "${t}" -lt "${SERVER_START_TIMEOUT}"; do
     # Run a test request to make sure the server works
-    datefudge "${TESTDATE}" \
+    gnutls_timewrapper_standalone "${TESTDATE}" \
 	      ${VALGRIND} "${OCSPTOOL}" --ask \
 	      --load-cert "${SERVER_CERT_FILE}" \
 	      --load-issuer "${srcdir}/ocsp-tests/certs/ca.pem" \
@@ -170,7 +170,7 @@ echo "=== Test 1: Server with valid certificate - no staple ==="
 
 PORT=${TLS_SERVER_PORT}
 launch_bare_server \
-	  datefudge "${TESTDATE}" \
+	  gnutls_timewrapper_standalone "${TESTDATE}" \
 	  "${SERV}" --echo --disable-client-cert \
 	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
 	  --x509certfile="${SERVER_CERT_FILE}" \
@@ -202,7 +202,7 @@ eval "${GETPORT}"
 TLS_SERVER_PORT=$PORT
 PORT=${TLS_SERVER_PORT}
 launch_bare_server \
-	  datefudge "${TESTDATE}" \
+	  gnutls_timewrapper_standalone "${TESTDATE}" \
 	  "${SERV}" --echo --disable-client-cert \
 	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
 	  --x509certfile="${SERVER_CERT_FILE}" \
@@ -237,7 +237,7 @@ eval "${GETPORT}"
 TLS_SERVER_PORT=$PORT
 PORT=${TLS_SERVER_PORT}
 launch_bare_server \
-	  datefudge "${TESTDATE}" \
+	  gnutls_timewrapper_standalone "${TESTDATE}" \
 	  "${SERV}" --echo --disable-client-cert \
 	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
 	  --x509certfile="${SERVER_CERT_FILE}" \
@@ -273,7 +273,7 @@ eval "${GETPORT}"
 TLS_SERVER_PORT=$PORT
 PORT=${TLS_SERVER_PORT}
 launch_bare_server \
-	  datefudge "${TESTDATE}" \
+	  gnutls_timewrapper_standalone "${TESTDATE}" \
 	  "${SERV}" --echo --disable-client-cert \
 	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
 	  --x509certfile="${SERVER_CERT_FILE}" \
@@ -331,7 +331,7 @@ fi
 echo "=== Test 5.1: Server with valid certificate - expired staple (ignoring errors) ==="
 
 launch_bare_server \
-	  datefudge "${TESTDATE}" \
+	  gnutls_timewrapper_standalone "${TESTDATE}" \
 	  "${SERV}" --echo --disable-client-cert \
 	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
 	  --x509certfile="${SERVER_CERT_FILE}" \
@@ -375,7 +375,7 @@ eval "${GETPORT}"
 TLS_SERVER_PORT=$PORT
 PORT=${TLS_SERVER_PORT}
 launch_bare_server \
-	  datefudge "${TESTDATE}" \
+	  gnutls_timewrapper_standalone "${TESTDATE}" \
 	  "${SERV}" --echo --disable-client-cert \
 	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
 	  --x509certfile="${SERVER_CERT_FILE}" \
@@ -410,7 +410,7 @@ if test "${GNUTLS_FORCE_FIPS_MODE}" != 1; then
     TLS_SERVER_PORT=$PORT
     PORT=${TLS_SERVER_PORT}
     launch_bare_server \
-	datefudge "${TESTDATE}" \
+	gnutls_timewrapper_standalone "${TESTDATE}" \
 	"${SERV}" --echo --disable-client-cert \
 	--x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
 	--x509certfile="${SERVER_CERT_FILE}" \
@@ -445,7 +445,7 @@ eval "${GETPORT}"
 TLS_SERVER_PORT=$PORT
 PORT=${TLS_SERVER_PORT}
 launch_bare_server \
-	  datefudge "${TESTDATE}" \
+	  gnutls_timewrapper_standalone "${TESTDATE}" \
 	  "${SERV}" --echo --disable-client-cert \
 	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
 	  --x509certfile="${SERVER_CERT_NO_EXT_FILE}" \
@@ -478,7 +478,7 @@ eval "${GETPORT}"
 TLS_SERVER_PORT=$PORT
 PORT=${TLS_SERVER_PORT}
 launch_bare_server \
-	  datefudge "${TESTDATE}" \
+	  gnutls_timewrapper_standalone "${TESTDATE}" \
 	  "${SERV}" --echo --disable-client-cert \
 	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
 	  --x509certfile="${SERVER_CERT_FILE}" \

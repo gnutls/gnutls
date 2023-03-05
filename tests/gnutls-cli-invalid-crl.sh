@@ -168,7 +168,7 @@ launch_server --echo --x509keyfile ${TMPFILE} --x509certfile ${TMPFILE}
 PID=$!
 wait_server ${PID}
 
-datefudge "2018-9-19" \
+gnutls_timewrapper_standalone "2018-9-19" \
 ${VALGRIND} "${CLI}" -p "${PORT}" localhost --x509crlfile ${CRLFILE} --x509cafile ${CAFILE} >${TMPFILE} 2>&1 </dev/null && \
 	fail ${PID} "1. handshake should have failed!"
 
