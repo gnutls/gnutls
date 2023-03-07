@@ -195,6 +195,12 @@ void doit(void)
 		exit(1);
 	}
 
+	ret = gnutls_pkcs7_get_signature_count(pkcs7);
+	if (ret != 1) {
+		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+		exit(1);
+	}
+
 	ret = gnutls_pkcs7_get_attr(info.signed_attrs, 1, &oid, &data, 0);
 	if (ret < 0) {
 		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
