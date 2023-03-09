@@ -289,7 +289,13 @@ void start(const char *prio)
 
 void doit(void)
 {
-	start("NORMAL:-VERS-ALL:+VERS-TLS1.2");
+	/* This test does not work with TLS 1.2 under FIPS, as
+	 * extended master secret extension needs to be negotiated
+	 * through extensions.
+	 */
+	if (!gnutls_fips140_mode_enabled()) {
+		start("NORMAL:-VERS-ALL:+VERS-TLS1.2");
+	}
 	start("NORMAL:-VERS-ALL:+VERS-TLS1.3");
 	start("NORMAL");
 }

@@ -153,6 +153,14 @@ static void try(unsigned onclient)
 
 void doit(void)
 {
+	/* This test does not work with TLS 1.2 under FIPS, as
+	 * extended master secret extension needs to be negotiated
+	 * through extensions, while %NO_SESSION_HASH is set.
+	 */
+	if (gnutls_fips140_mode_enabled()) {
+		exit(77);
+	}
+
 	try(0);
 	reset_buffers();
 	try(1);

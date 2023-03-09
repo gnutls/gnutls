@@ -401,38 +401,42 @@ kill "${TLS_SERVER_PID}"
 wait "${TLS_SERVER_PID}"
 unset TLS_SERVER_PID
 
-echo "=== Test 7: OSCP response error - client doesn't send status_request ==="
+if test "${GNUTLS_FORCE_FIPS_MODE}" != 1; then
 
-eval "${GETPORT}"
-# Port for gnutls-serv
-TLS_SERVER_PORT=$PORT
-PORT=${TLS_SERVER_PORT}
-launch_bare_server \
-	  datefudge "${TESTDATE}" \
-	  "${SERV}" --echo --disable-client-cert \
-	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
-	  --x509certfile="${SERVER_CERT_FILE}" \
-	  --port="${TLS_SERVER_PORT}" \
-	  --ocsp-response="${srcdir}/ocsp-tests/response3.der" --ignore-ocsp-response-errors
-TLS_SERVER_PID="${!}"
-wait_server $TLS_SERVER_PID
+    echo "=== Test 7: OSCP response error - client doesn't send status_request ==="
 
-wait_for_port "${TLS_SERVER_PORT}"
+    eval "${GETPORT}"
+    # Port for gnutls-serv
+    TLS_SERVER_PORT=$PORT
+    PORT=${TLS_SERVER_PORT}
+    launch_bare_server \
+	datefudge "${TESTDATE}" \
+	"${SERV}" --echo --disable-client-cert \
+	--x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
+	--x509certfile="${SERVER_CERT_FILE}" \
+	--port="${TLS_SERVER_PORT}" \
+	--ocsp-response="${srcdir}/ocsp-tests/response3.der" --ignore-ocsp-response-errors
+    TLS_SERVER_PID="${!}"
+    wait_server $TLS_SERVER_PID
 
-echo "test 123456" | \
-    datefudge -s "${TESTDATE}" \
-	      "${CLI}" --priority "NORMAL:%NO_EXTENSIONS" --ocsp --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
-	      --port="${TLS_SERVER_PORT}" localhost
-rc=$?
+    wait_for_port "${TLS_SERVER_PORT}"
 
-if test "${rc}" != "0"; then
-    echo "Connecting to server with valid certificate and OCSP error response failed"
-    exit ${rc}
+    echo "test 123456" | \
+	datefudge -s "${TESTDATE}" \
+		  "${CLI}" --priority "NORMAL:%NO_EXTENSIONS" --ocsp --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
+		  --port="${TLS_SERVER_PORT}" localhost
+    rc=$?
+
+    if test "${rc}" != "0"; then
+	echo "Connecting to server with valid certificate and OCSP error response failed"
+	exit ${rc}
+    fi
+
+    kill "${TLS_SERVER_PID}"
+    wait "${TLS_SERVER_PID}"
+    unset TLS_SERVER_PID
+
 fi
-
-kill "${TLS_SERVER_PID}"
-wait "${TLS_SERVER_PID}"
-unset TLS_SERVER_PID
 
 echo "=== Test 8: OSCP response error - client sends status_request, no TLS feature extension ==="
 
