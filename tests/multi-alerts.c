@@ -197,6 +197,14 @@ void doit(void)
 	int sockets[2];
 	int err;
 
+	/* This test does not work under FIPS, as extended master
+	 * secret extension needs to be negotiated through extensions,
+	 * but the fixture does not contain the extension.
+	 */
+	if (gnutls_fips140_mode_enabled()) {
+		exit(77);
+	}
+
 	err = socketpair(AF_UNIX, SOCK_STREAM, 0, sockets);
 	if (err == -1) {
 		perror("socketpair");

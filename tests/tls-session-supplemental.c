@@ -291,10 +291,12 @@ void start(const char *prio, unsigned server_only)
 	if (child) {
 		int status;
 		/* parent */
+		close(sockets[1]);
 		server(sockets[0], prio, server_only);
 		wait(&status);
 		check_wait_status(status);
 	} else {
+		close(sockets[0]);
 		client(sockets[1], prio, server_only);
 		exit(0);
 	}

@@ -940,6 +940,11 @@ static void enable_no_ext_master_secret(gnutls_priority_t c)
 	c->_no_ext_master_secret = 1;
 }
 
+static void enable_force_ext_master_secret(gnutls_priority_t c)
+{
+	c->force_ext_master_secret = 1;
+}
+
 static void enable_no_etm(gnutls_priority_t c)
 {
 	c->_no_etm = 1;
@@ -3228,6 +3233,10 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 	(*priority_cache)->tls13_compat_mode = true;
 	(*priority_cache)->min_record_version = 1;
 	gnutls_atomic_init(&(*priority_cache)->usage_cnt);
+
+	if (_gnutls_fips_mode_enabled()) {
+		(*priority_cache)->force_ext_master_secret = true;
+	}
 
 	if (system_wide_config.allowlisting && !priorities) {
 		priorities = "@" LEVEL_SYSTEM;

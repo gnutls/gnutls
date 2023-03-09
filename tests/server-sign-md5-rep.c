@@ -239,10 +239,12 @@ void doit(void)
 	if (child) {
 		int status;
 
+		close(sockets[0]);
 		client(sockets[1]);
 		wait(&status);
 		check_wait_status(status);
 	} else {
+		close(sockets[1]);
 		server(sockets[0]);
 		_exit(0);
 	}

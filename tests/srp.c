@@ -293,6 +293,7 @@ static void start(const char *name, const char *prio, const char *user,
 	if (child) {
 		int status;
 		/* parent */
+		close(fd[0]);
 		client(fd[1], prio, user, pass, exp_err);
 		if (exp_err < 0) {
 			kill(child, SIGTERM);
@@ -302,6 +303,7 @@ static void start(const char *name, const char *prio, const char *user,
 			check_wait_status(status);
 		}
 	} else {
+		close(fd[1]);
 		server(fd[0], prio);
 		exit(0);
 	}

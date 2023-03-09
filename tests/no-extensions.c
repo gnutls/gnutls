@@ -210,6 +210,13 @@ void start(const char *prio, gnutls_protocol_t exp_version)
 
 void doit(void)
 {
+	/* This test does not work under FIPS, as extended master
+	 * secret extension needs to be negotiated through extensions.
+	 */
+	if (gnutls_fips140_mode_enabled()) {
+		exit(77);
+	}
+
 	start("NORMAL:-VERS-ALL:+VERS-TLS1.0:%NO_EXTENSIONS", GNUTLS_TLS1_0);
 	start("NORMAL:-VERS-ALL:+VERS-TLS1.1:%NO_EXTENSIONS", GNUTLS_TLS1_1);
 	start("NORMAL:-VERS-ALL:+VERS-TLS1.2:%NO_EXTENSIONS", GNUTLS_TLS1_2);

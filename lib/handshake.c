@@ -912,6 +912,14 @@ read_client_hello(gnutls_session_t session, uint8_t * data, int datalen)
 	if (_gnutls_version_priority(session, vers->id) < 0)
 		return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
 
+	/* check if EMS is required */
+	if (!vers->tls13_sem &&
+	    vers->id != GNUTLS_SSL3 && vers->id != GNUTLS_DTLS0_9 &&
+	    session->internals.priorities->force_ext_master_secret &&
+	    !session->security_parameters.ext_master_secret) {
+		return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_SECURITY);
+	}
+
 	_gnutls_handshake_log("HSK[%p]: Selected version %s\n", session,
 			      vers->name);
 
@@ -2112,14 +2120,26 @@ read_server_hello(gnutls_session_t session, uint8_t * data, int datalen)
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	/* check if EtM is required */
-	if (!vers->tls13_sem && session->internals.priorities->force_etm
-	    && !session->security_parameters.etm) {
-		const cipher_entry_st *cipher =
-		    cipher_to_entry(session->security_parameters.
-				    cs->block_algorithm);
-		if (_gnutls_cipher_type(cipher) == CIPHER_BLOCK)
-			return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
+	if (!vers->tls13_sem) {
+		/* check if EtM is required */
+		if (session->internals.priorities->force_etm &&
+		    !session->security_parameters.etm) {
+			const cipher_entry_st *cipher =
+			    cipher_to_entry(session->security_parameters.
+					    cs->block_algorithm);
+			if (_gnutls_cipher_type(cipher) == CIPHER_BLOCK)
+				return
+				    gnutls_assert_val
+				    (GNUTLS_E_UNWANTED_ALGORITHM);
+		}
+
+		/* check if EMS is required */
+		if (vers->id != GNUTLS_SSL3 && vers->id != GNUTLS_DTLS0_9 &&
+		    session->internals.priorities->force_ext_master_secret &&
+		    !session->security_parameters.ext_master_secret) {
+			return
+			    gnutls_assert_val(GNUTLS_E_INSUFFICIENT_SECURITY);
+		}
 	}
 
 	ret =
