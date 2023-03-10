@@ -604,9 +604,17 @@ int _gnutls_ktls_send_control_msg(gnutls_session_t session,
 		if (ret == -1) {
 			switch (errno) {
 			case EINTR:
-				return GNUTLS_E_INTERRUPTED;
+				if (data_to_send < data_size) {
+					return data_size - data_to_send;
+				} else {
+					return GNUTLS_E_INTERRUPTED;
+				}
 			case EAGAIN:
-				return GNUTLS_E_AGAIN;
+				if (data_to_send < data_size) {
+					return data_size - data_to_send;
+				} else {
+					return GNUTLS_E_AGAIN;
+				}
 			default:
 				return GNUTLS_E_PUSH_ERROR;
 			}
