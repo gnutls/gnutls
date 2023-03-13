@@ -209,6 +209,58 @@ static gnutls_x509_crl_t generate_crl(unsigned skip_optional)
 	return crl;
 }
 
+static void verify_issuer(gnutls_x509_crl_t crl,
+			  const gnutls_datum_t * issuer_cert)
+{
+#define DN_MAX_LEN (1024)
+	gnutls_x509_crt_t crt;
+	char *issuer = gnutls_calloc(DN_MAX_LEN, sizeof(char));
+	assert(issuer != NULL);
+	size_t issuer_size = DN_MAX_LEN;
+	assert(gnutls_x509_crt_init(&crt) >= 0);
+	assert(gnutls_x509_crt_import(crt, issuer_cert, GNUTLS_X509_FMT_PEM) >=
+	       0);
+	assert(gnutls_x509_crt_get_issuer_dn(crt, issuer, &issuer_size) >= 0);
+
+	/* issuer check */
+	char *crl_issuer = gnutls_calloc(DN_MAX_LEN, sizeof(char));
+	assert(crl_issuer != NULL);
+	size_t crl_issuer_size = DN_MAX_LEN;
+	assert(gnutls_x509_crl_get_issuer_dn(crl, crl_issuer, &crl_issuer_size)
+	       == GNUTLS_E_SUCCESS);
+	assert(crl_issuer_size == issuer_size
+	       && memcmp(crl_issuer, issuer, issuer_size) == 0);
+
+	gnutls_datum_t dn;
+	dn.data = NULL;
+	dn.size = 0;
+	assert(gnutls_x509_crl_get_issuer_dn2(crl, &dn) == GNUTLS_E_SUCCESS);
+	assert(dn.size == issuer_size
+	       && memcmp(dn.data, issuer, issuer_size) == 0);
+	gnutls_free(dn.data);
+	dn.data = NULL;
+	dn.size = 0;
+
+	assert(gnutls_x509_crl_get_issuer_dn3(crl, &dn, 0) == GNUTLS_E_SUCCESS);
+	assert(dn.size == issuer_size
+	       && memcmp(dn.data, issuer, issuer_size) == 0);
+	gnutls_free(dn.data);
+	dn.data = NULL;
+	dn.size = 0;
+
+	assert(gnutls_x509_crl_get_issuer_dn3
+	       (crl, &dn, GNUTLS_X509_DN_FLAG_COMPAT) == GNUTLS_E_SUCCESS);
+	assert(dn.size == issuer_size
+	       && memcmp(dn.data, issuer, issuer_size) == 0);
+	gnutls_free(dn.data);
+	dn.data = NULL;
+	dn.size = 0;
+
+	gnutls_free(issuer);
+	gnutls_free(crl_issuer);
+	gnutls_x509_crt_deinit(crt);
+}
+
 void doit(void)
 {
 	gnutls_datum_t out;
@@ -237,6 +289,9 @@ void doit(void)
 
 	assert(out.size == saved_min_crl.size);
 	assert(memcmp(out.data, saved_min_crl.data, out.size) == 0);
+
+	/* verify issuer */
+	verify_issuer(crl, &ca3_cert);
 
 	gnutls_free(out.data);
 	gnutls_x509_crl_deinit(crl);
