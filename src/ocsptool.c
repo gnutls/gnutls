@@ -37,10 +37,12 @@
 #include <read-file.h>
 #include <socket.h>
 #include <minmax.h>
+#include "parse-datetime.h"
 
 #include <ocsptool-common.h>
 #include "ocsptool-options.h"
 #include "certtool-common.h"
+#include "common.h"
 
 FILE *outfile;
 static unsigned int incert_format, outcert_format;
@@ -647,6 +649,18 @@ int main(int argc, char **argv)
 
 	gnutls_global_set_log_function(tls_log_func);
 	gnutls_global_set_log_level(OPT_VALUE_DEBUG);
+
+	if (ENABLED_OPT(ATTIME)) {
+		struct timespec r;
+
+		if (!parse_datetime(&r, OPT_ARG(ATTIME), NULL)) {
+			fprintf(stderr,
+				"%s option value %s is not a valid time\n",
+				"attime", OPT_ARG(ATTIME));
+			app_exit(1);
+		}
+		set_system_time(&r);
+	}
 
 	if (ENABLED_OPT(INDER))
 		incert_format = GNUTLS_X509_FMT_DER;

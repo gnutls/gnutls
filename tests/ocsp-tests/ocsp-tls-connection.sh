@@ -127,10 +127,9 @@ echo "=== Verifying OCSP server is up ==="
 t=0
 while test "${t}" -lt "${SERVER_START_TIMEOUT}"; do
     # Run a test request to make sure the server works
-    "$FAKETIME" "${TESTDATE}" \
-	      ${VALGRIND} "${OCSPTOOL}" --ask \
-	      --load-cert "${SERVER_CERT_FILE}" \
-	      --load-issuer "${srcdir}/ocsp-tests/certs/ca.pem"
+    ${VALGRIND} "${OCSPTOOL}" --attime "${TESTDATE}" --ask \
+		--load-cert "${SERVER_CERT_FILE}" \
+		--load-issuer "${srcdir}/ocsp-tests/certs/ca.pem"
     rc=$?
     if test "${rc}" = "0"; then
 	break
