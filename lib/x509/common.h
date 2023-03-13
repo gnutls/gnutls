@@ -256,6 +256,7 @@ unsigned _gnutls_check_key_purpose(gnutls_x509_crt_t cert, const char *purpose,
 				   unsigned no_any);
 
 time_t _gnutls_x509_generalTime2gtime(const char *ttime);
+time_t _gnutls_utcTime2gtime(const char *ttime);
 
 int _gnutls_get_extension(asn1_node asn, const char *root,
 			  const char *extension_id, int indx,

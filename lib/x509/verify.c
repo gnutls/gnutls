@@ -1230,6 +1230,7 @@ _gnutls_pkcs11_verify_crt_status(gnutls_x509_trust_list_t tlist,
 	gnutls_x509_crt_t issuer = NULL;
 	gnutls_datum_t raw_issuer = { NULL, 0 };
 	time_t now = gnutls_time(0);
+	time_t distrust_after;
 
 	if (clist_size > 1) {
 		/* Check if the last certificate in the path is self signed.
@@ -1370,6 +1371,25 @@ _gnutls_pkcs11_verify_crt_status(gnutls_x509_trust_list_t tlist,
 
 	ret = gnutls_x509_crt_import(issuer, &raw_issuer, GNUTLS_X509_FMT_DER);
 	if (ret < 0) {
+		gnutls_assert();
+		status |= GNUTLS_CERT_INVALID;
+		status |= GNUTLS_CERT_SIGNER_NOT_FOUND;
+		goto cleanup;
+	}
+
+	/* check if the raw issuer is assigned with a time-based
+	 * distrust and the certificate is issued after that period
+	 */
+	distrust_after =
+	    _gnutls_pkcs11_get_distrust_after(url, issuer,
+					      purpose == NULL ?
+					      GNUTLS_KP_TLS_WWW_SERVER :
+					      purpose,
+					      GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED);
+	if (distrust_after != (time_t) - 1
+	    && distrust_after <
+	    gnutls_x509_crt_get_activation_time(certificate_list
+						[clist_size - 1])) {
 		gnutls_assert();
 		status |= GNUTLS_CERT_INVALID;
 		status |= GNUTLS_CERT_SIGNER_NOT_FOUND;
