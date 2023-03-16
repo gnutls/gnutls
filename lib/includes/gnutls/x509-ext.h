@@ -28,11 +28,9 @@
 # include <gnutls/gnutls.h>
 # include <gnutls/x509.h>
 
-/* *INDENT-OFF* */
 #ifdef __cplusplus
 extern "C" {
 #endif
-/* *INDENT-ON* */
 
 typedef struct gnutls_subject_alt_names_st *gnutls_subject_alt_names_t;
 
@@ -215,10 +213,8 @@ int gnutls_x509_ct_sct_get(const gnutls_x509_ct_scts_t scts, unsigned idx,
 			   gnutls_sign_algorithm_t * sigalg,
 			   gnutls_datum_t * signature);
 
-/* *INDENT-OFF* */
 #ifdef __cplusplus
 }
 #endif
-/* *INDENT-ON* */
 
 #endif				/* GNUTLS_X509_EXT_H */

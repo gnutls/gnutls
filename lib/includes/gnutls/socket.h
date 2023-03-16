@@ -31,11 +31,9 @@
 /* Get socklen_t */
 # include <sys/socket.h>
 
-/* *INDENT-OFF* */
 #ifdef __cplusplus
 extern "C" {
 #endif
-/* *INDENT-ON* */
 
 void gnutls_transport_set_fastopen(gnutls_session_t session,
 				   int fd,
@@ -43,10 +41,8 @@ void gnutls_transport_set_fastopen(gnutls_session_t session,
 				   socklen_t connect_addrlen,
 				   unsigned int flags);
 
-/* *INDENT-OFF* */
 #ifdef __cplusplus
 }
 #endif
-/* *INDENT-ON* */
 
 #endif				/* GNUTLS_SOCKET_H */

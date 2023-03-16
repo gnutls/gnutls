@@ -29,11 +29,9 @@
 
 # include <gnutls/gnutls.h>
 
-/* *INDENT-OFF* */
 #ifdef __cplusplus
 extern "C" {
 #endif
-/* *INDENT-ON* */
 
 # define GNUTLS_COOKIE_KEY_SIZE 16
 
@@ -84,10 +82,8 @@ void gnutls_dtls_prestate_set(gnutls_session_t session,
 
 unsigned int gnutls_record_get_discarded(gnutls_session_t session);
 
-/* *INDENT-OFF* */
 #ifdef __cplusplus
 }
 #endif
-/* *INDENT-ON* */
 
 #endif				/* GNUTLS_DTLS_H */

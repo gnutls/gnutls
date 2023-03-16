@@ -29,11 +29,9 @@
 # include <gnutls/gnutls.h>
 # include <gnutls/x509.h>
 
-/* *INDENT-OFF* */
 #ifdef __cplusplus
 extern "C" {
 #endif
-/* *INDENT-ON* */
 
 # define GNUTLS_OCSP_NONCE "1.3.6.1.5.5.7.48.1.2"
 
@@ -269,10 +267,8 @@ gnutls_ocsp_resp_list_import2(gnutls_ocsp_resp_t ** ocsps,
 			      const gnutls_datum_t * resp_data,
 			      gnutls_x509_crt_fmt_t format, unsigned int flags);
 
-/* *INDENT-OFF* */
 #ifdef __cplusplus
 }
 #endif
-/* *INDENT-ON* */
 
 #endif				/* GNUTLS_OCSP_H */

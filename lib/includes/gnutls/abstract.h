@@ -30,11 +30,9 @@
 # include <gnutls/openpgp.h>
 # include <gnutls/tpm.h>
 
-/* *INDENT-OFF* */
 #ifdef __cplusplus
 extern "C" {
 #endif
-/* *INDENT-ON* */
 
 /* Public key operations */
 
@@ -748,10 +746,8 @@ gnutls_pubkey_print(gnutls_pubkey_t pubkey,
 		    gnutls_certificate_print_formats_t format,
 		    gnutls_datum_t * out);
 
-/* *INDENT-OFF* */
 #ifdef __cplusplus
 }
 #endif
-/* *INDENT-ON* */
 
 #endif				/* GNUTLS_ABSTRACT_H */

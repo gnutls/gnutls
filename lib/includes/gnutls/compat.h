@@ -25,11 +25,9 @@
 #ifndef GNUTLS_COMPAT_H
 # define GNUTLS_COMPAT_H
 
-/* *INDENT-OFF* */
 #ifdef __cplusplus
 extern "C" {
 #endif
-/* *INDENT-ON* */
 
 # ifdef __GNUC__
 
@@ -228,10 +226,8 @@ int gnutls_priority_compression_list(gnutls_priority_t pcache,
 				     const unsigned int **list)
     _GNUTLS_GCC_ATTR_DEPRECATED;
 
-/* *INDENT-OFF* */
 #ifdef __cplusplus
 }
 #endif
-/* *INDENT-ON* */
 
 #endif				/* GNUTLS_COMPAT_H */

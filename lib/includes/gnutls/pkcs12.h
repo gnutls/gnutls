@@ -25,11 +25,9 @@
 
 # include <gnutls/x509.h>
 
-/* *INDENT-OFF* */
 #ifdef __cplusplus
 extern "C" {
 #endif
-/* *INDENT-ON* */
 
 	/* PKCS12 structures handling
 	 */
@@ -138,10 +136,8 @@ int gnutls_pkcs12_bag_get_friendly_name(gnutls_pkcs12_bag_t bag,
 int gnutls_pkcs12_bag_set_friendly_name(gnutls_pkcs12_bag_t bag,
 					unsigned indx, const char *name);
 
-/* *INDENT-OFF* */
 #ifdef __cplusplus
 }
 #endif
-/* *INDENT-ON* */
 
 #endif				/* GNUTLS_PKCS12_H */

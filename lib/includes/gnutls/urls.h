@@ -31,11 +31,9 @@
  * keys and certificates.
  */
 
-/* *INDENT-OFF* */
 #ifdef __cplusplus
 extern "C" {
 #endif
-/* *INDENT-ON* */
 
 typedef int (*gnutls_privkey_import_url_func)(gnutls_privkey_t pkey,
 					      const char *url, unsigned flags);
@@ -71,10 +69,8 @@ typedef struct gnutls_custom_url_st {
 
 int gnutls_register_custom_url(const gnutls_custom_url_st * st);
 
-/* *INDENT-OFF* */
 #ifdef __cplusplus
 }
 #endif
-/* *INDENT-ON* */
 
 #endif				/* GNUTLS_URLS_H */

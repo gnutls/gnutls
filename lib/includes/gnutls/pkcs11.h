@@ -28,11 +28,9 @@
 # include <gnutls/gnutls.h>
 # include <gnutls/x509.h>
 
-/* *INDENT-OFF* */
 #ifdef __cplusplus
 extern "C" {
 #endif
-/* *INDENT-ON* */
 
 # define GNUTLS_PKCS11_MAX_PIN_LEN 256
 
@@ -491,10 +489,8 @@ gnutls_pkcs11_copy_attached_extension(const char *token_url,
 
 # define gnutls_x509_crt_import_pkcs11_url gnutls_x509_crt_import_url
 
-/* *INDENT-OFF* */
 #ifdef __cplusplus
 }
 #endif
-/* *INDENT-ON* */
 
 #endif				/* GNUTLS_PKCS11_H */

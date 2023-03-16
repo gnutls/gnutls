@@ -45,19 +45,19 @@
 /* Get time_t. */
 # include <time.h>
 
-/* *INDENT-OFF* */
 #ifdef __cplusplus
 extern "C" {
 #endif
-/* *INDENT-ON* */
 
 # define GNUTLS_VERSION "@VERSION@"
 
-# define GNUTLS_VERSION_MAJOR @MAJOR_VERSION@
-# define GNUTLS_VERSION_MINOR @MINOR_VERSION@
-# define GNUTLS_VERSION_PATCH @PATCH_VERSION@
+/* clang-format off */
+#define GNUTLS_VERSION_MAJOR @MAJOR_VERSION@
+#define GNUTLS_VERSION_MINOR @MINOR_VERSION@
+#define GNUTLS_VERSION_PATCH @PATCH_VERSION@
 
-# define GNUTLS_VERSION_NUMBER @NUMBER_VERSION@
+#define GNUTLS_VERSION_NUMBER @NUMBER_VERSION@
+/* clang-format on */
 
 # define GNUTLS_CIPHER_RIJNDAEL_128_CBC GNUTLS_CIPHER_AES_128_CBC
 # define GNUTLS_CIPHER_RIJNDAEL_256_CBC GNUTLS_CIPHER_AES_256_CBC
@@ -2365,9 +2365,9 @@ int gnutls_dh_params_cpy(gnutls_dh_params_t dst, gnutls_dh_params_t src);
 
 /* Session stuff
  */
-/* *INDENT-OFF* */
+/* clang-format off */
 @DEFINE_IOVEC_T@
-/* *INDENT-ON* */
+/* clang-format on */
 
 typedef ssize_t(*gnutls_pull_func) (gnutls_transport_ptr_t, void *, size_t);
 typedef ssize_t(*gnutls_push_func) (gnutls_transport_ptr_t, const void *,
@@ -3634,11 +3634,9 @@ gnutls_transport_is_ktls_enabled(gnutls_session_t session);
 # define GNUTLS_E_APPLICATION_ERROR_MAX -65000
 # define GNUTLS_E_APPLICATION_ERROR_MIN -65500
 
-/* *INDENT-OFF* */
 #ifdef __cplusplus
 }
 #endif
-/* *INDENT-ON* */
 
 # include <gnutls/compat.h>
 

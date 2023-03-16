@@ -31,11 +31,9 @@
  * they will be requested through the pin callbacks.
  */
 
-/* *INDENT-OFF* */
 #ifdef __cplusplus
 extern "C" {
 #endif
-/* *INDENT-ON* */
 
 struct system_key_iter_st;
 typedef struct system_key_iter_st *gnutls_system_key_iter_t;
@@ -54,10 +52,8 @@ int gnutls_system_key_add_x509(gnutls_x509_crt_t crt,
 			       gnutls_x509_privkey_t privkey, const char *label,
 			       char **cert_url, char **key_url);
 
-/* *INDENT-OFF* */
 #ifdef __cplusplus
 }
 #endif
-/* *INDENT-ON* */
 
 #endif				/* GNUTLS_SYSTEM_KEYS_H */

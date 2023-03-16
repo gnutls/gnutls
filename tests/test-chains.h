@@ -23,8 +23,6 @@
 #ifndef GNUTLS_TESTS_TEST_CHAINS_H
 # define GNUTLS_TESTS_TEST_CHAINS_H
 
-/* *INDENT-OFF* */
-
 #define MAX_CHAIN 10
 
 static const char *chain_with_no_subject_id_in_ca_ok[] = {
@@ -4448,7 +4446,5 @@ static struct
 #if defined __clang__ || __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5)
 #  pragma GCC diagnostic pop
 #endif
-
-/* *INDENT-ON* */
 
 #endif				/* GNUTLS_TESTS_TEST_CHAINS_H */

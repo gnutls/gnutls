@@ -30,11 +30,9 @@
 # include <gnutls/gnutls.h>
 # include <limits.h>
 
-/* *INDENT-OFF* */
 #ifdef __cplusplus
 extern "C" {
 #endif
-/* *INDENT-ON* */
 
 /* Openpgp certificate stuff
  */
@@ -424,10 +422,8 @@ int gnutls_certificate_set_openpgp_keyring_file
     (gnutls_certificate_credentials_t c, const char *file,
      gnutls_openpgp_crt_fmt_t format) _GNUTLS_GCC_ATTR_DEPRECATED;
 
-/* *INDENT-OFF* */
 #ifdef __cplusplus
 }
 #endif
-/* *INDENT-ON* */
 
 #endif				/* GNUTLS_OPENPGP_H */

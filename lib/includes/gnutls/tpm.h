@@ -26,11 +26,9 @@
 # include <gnutls/gnutls.h>
 # include <gnutls/x509.h>
 
-/* *INDENT-OFF* */
 #ifdef __cplusplus
 extern "C" {
 #endif
-/* *INDENT-ON* */
 
 struct tpm_key_list_st;
 typedef struct tpm_key_list_st *gnutls_tpm_key_list_t;
@@ -71,10 +69,8 @@ int gnutls_tpm_get_registered(gnutls_tpm_key_list_t * list);
 int gnutls_tpm_privkey_delete(const char *url, const char *srk_password);
 
 
-/* *INDENT-OFF* */
 #ifdef __cplusplus
 }
 #endif
-/* *INDENT-ON* */
 
 #endif				/* GNUTLS_TPM_H */

@@ -31,11 +31,9 @@
 # include <gnutls/gnutls.h>
 # include <gnutls/x509.h>
 
-/* *INDENT-OFF* */
 #ifdef __cplusplus
 extern "C" {
 #endif
-/* *INDENT-ON* */
 
 /* PKCS7 structures handling
  */
@@ -149,10 +147,8 @@ int gnutls_pkcs7_print_signature_info(gnutls_pkcs7_signature_info_st * info,
 				      gnutls_certificate_print_formats_t format,
 				      gnutls_datum_t * out);
 
-/* *INDENT-OFF* */
 #ifdef __cplusplus
 }
 #endif
-/* *INDENT-ON* */
 
 #endif				/* GNUTLS_PKCS7_H */
