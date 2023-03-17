@@ -46,6 +46,14 @@
 
 #define MAX_SLOTS 48
 
+#ifndef CKA_NSS_SERVER_DISTRUST_AFTER
+# define CKA_NSS_SERVER_DISTRUST_AFTER 0xce534373UL
+#endif
+
+#ifndef CKA_NSS_EMAIL_DISTRUST_AFTER
+# define CKA_NSS_EMAIL_DISTRUST_AFTER 0xce534374UL
+#endif
+
 GNUTLS_STATIC_MUTEX(pkcs11_mutex);
 
 struct gnutls_pkcs11_provider_st {
@@ -103,6 +111,12 @@ struct find_pkey_list_st {
 	size_t key_ids_size;
 };
 
+enum distrust_purpose {
+	PKCS11_DISTRUST_AFTER_NONE = 0,
+	PKCS11_DISTRUST_AFTER_SERVER = 1,
+	PKCS11_DISTRUST_AFTER_EMAIL = 2
+};
+
 struct find_cert_st {
 	gnutls_datum_t dn;
 	gnutls_datum_t issuer_dn;
@@ -112,6 +126,8 @@ struct find_cert_st {
 	unsigned need_import;
 	gnutls_pkcs11_obj_t obj;
 	gnutls_x509_crt_t crt;	/* used when compare flag is specified */
+	enum distrust_purpose distrust_purpose;
+	time_t distrust_after;
 	unsigned flags;
 };
 
@@ -4074,6 +4090,58 @@ static int get_data_and_attrs(struct pkcs11_session_info *sinfo,
 	return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 }
 
+static enum distrust_purpose distrust_purpose_from_oid(const char *oid)
+{
+	static const struct {
+		const char *oid;
+		enum distrust_purpose purpose;
+	} map[] = {
+		{GNUTLS_KP_TLS_WWW_SERVER, PKCS11_DISTRUST_AFTER_SERVER},
+		{GNUTLS_KP_EMAIL_PROTECTION, PKCS11_DISTRUST_AFTER_EMAIL},
+	};
+	size_t i;
+
+	for (i = 0; i < sizeof(map) / sizeof(map[0]); i++) {
+		if (strcmp(map[i].oid, oid) == 0) {
+			return map[i].purpose;
+		}
+	}
+
+	return PKCS11_DISTRUST_AFTER_NONE;
+}
+
+static time_t
+get_distrust_after(struct pkcs11_session_info *sinfo,
+		   ck_object_handle_t object, enum distrust_purpose purpose)
+{
+	/* the attribute is in a fixed format: utcTime with seconds */
+	char buf[14];
+	struct ck_attribute a[1];
+
+	switch (purpose) {
+	case PKCS11_DISTRUST_AFTER_SERVER:
+		a[0].type = CKA_NSS_SERVER_DISTRUST_AFTER;
+		break;
+	case PKCS11_DISTRUST_AFTER_EMAIL:
+		a[0].type = CKA_NSS_EMAIL_DISTRUST_AFTER;
+		break;
+	default:
+		gnutls_assert();
+		return (time_t) (-1);
+	}
+
+	a[0].value = buf;
+	a[0].value_len = sizeof(buf) - 1;
+
+	if (pkcs11_get_attribute_value(sinfo->module, sinfo->pks, object, a,
+				       1) != CKR_OK) {
+		return (time_t) (-1);
+	}
+
+	buf[a[0].value_len] = '\0';
+	return _gnutls_utcTime2gtime(buf);
+}
+
 static int
 find_cert_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
 	     struct ck_token_info *tinfo, struct ck_info *lib_info, void *input)
@@ -4268,6 +4336,16 @@ find_cert_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
 						goto cleanup;
 					}
 				}
+			}
+
+			if ((priv->flags &
+			     GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED)
+			    && priv->distrust_purpose !=
+			    PKCS11_DISTRUST_AFTER_NONE) {
+				priv->distrust_after =
+				    get_distrust_after(sinfo, ctx,
+						       priv->distrust_purpose);
+				continue;
 			}
 
 			if (priv->need_import != 0) {
@@ -4817,4 +4895,107 @@ char *gnutls_pkcs11_obj_flags_get_str(unsigned int flags)
  fail:
 	return NULL;
 
+}
+
+time_t
+_gnutls_pkcs11_get_distrust_after(const char *url, gnutls_x509_crt_t cert,
+				  const char *purpose, unsigned int flags)
+{
+	int ret;
+	struct find_cert_st priv;
+	uint8_t serial[128];
+	size_t serial_size;
+	struct p11_kit_uri *info = NULL;
+	enum distrust_purpose distrust_purpose;
+
+	distrust_purpose = distrust_purpose_from_oid(purpose);
+	if (distrust_purpose == PKCS11_DISTRUST_AFTER_NONE) {
+		return (time_t) (-1);
+	}
+
+	PKCS11_CHECK_INIT_FLAGS_RET(flags, 0);
+
+	memset(&priv, 0, sizeof(priv));
+
+	if (url == NULL || url[0] == 0) {
+		url = "pkcs11:";
+	}
+
+	ret = pkcs11_url_to_info(url, &info, 0);
+	if (ret < 0) {
+		gnutls_assert();
+		return (time_t) (-1);
+	}
+
+	/* Attempt searching using the issuer DN + serial number */
+	serial_size = sizeof(serial);
+	ret = gnutls_x509_crt_get_serial(cert, serial, &serial_size);
+	if (ret < 0) {
+		gnutls_assert();
+		ret = (time_t) (-1);
+		goto cleanup;
+	}
+
+	ret = _gnutls_x509_ext_gen_number(serial, serial_size, &priv.serial);
+	if (ret < 0) {
+		gnutls_assert();
+		ret = (time_t) (-1);
+		goto cleanup;
+	}
+
+	priv.crt = cert;
+
+	priv.issuer_dn.data = cert->raw_issuer_dn.data;
+	priv.issuer_dn.size = cert->raw_issuer_dn.size;
+
+	/* assume PKCS11_OBJ_FLAG_COMPARE everywhere but DISTRUST info */
+	if (!(flags & GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_DISTRUSTED)
+	    && !(flags & GNUTLS_PKCS11_OBJ_FLAG_COMPARE_KEY)) {
+		flags |= GNUTLS_PKCS11_OBJ_FLAG_COMPARE;
+	}
+
+	priv.flags = flags;
+	priv.distrust_purpose = distrust_purpose;
+
+	ret =
+	    _pkcs11_traverse_tokens(find_cert_cb, &priv, info,
+				    NULL, pkcs11_obj_flags_to_int(flags));
+	if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+		_gnutls_debug_log
+		    ("get_distrust_after: did not find cert, using issuer DN + serial, using DN only\n");
+		/* attempt searching with the subject DN only */
+		gnutls_assert();
+		if (priv.obj)
+			gnutls_pkcs11_obj_deinit(priv.obj);
+		gnutls_free(priv.serial.data);
+		memset(&priv, 0, sizeof(priv));
+		priv.crt = cert;
+		priv.flags = flags;
+		priv.distrust_purpose = distrust_purpose;
+
+		priv.dn.data = cert->raw_dn.data;
+		priv.dn.size = cert->raw_dn.size;
+		ret =
+		    _pkcs11_traverse_tokens(find_cert_cb, &priv, info,
+					    NULL,
+					    pkcs11_obj_flags_to_int(flags));
+	}
+	if (ret < 0) {
+		gnutls_assert();
+		_gnutls_debug_log
+		    ("get_distrust_after: did not find any cert\n");
+		ret = (time_t) (-1);
+		goto cleanup;
+	}
+
+	ret = priv.distrust_after;
+
+ cleanup:
+	if (priv.obj)
+		gnutls_pkcs11_obj_deinit(priv.obj);
+	if (info)
+		p11_kit_uri_free(info);
+	gnutls_free(priv.serial.data);
+
+	return ret;
 }

@@ -35,8 +35,6 @@
 #include <common.h>
 #include <c-ctype.h>
 
-time_t _gnutls_utcTime2gtime(const char *ttime);
-
 /* TIME functions
  * Conversions between generalized or UTC time to time_t
  *

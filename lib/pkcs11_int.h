@@ -460,6 +460,10 @@ _gnutls_pkcs11_crt_is_known(const char *url, gnutls_x509_crt_t cert,
 			    unsigned int flags,
 			    gnutls_x509_crt_t * trusted_cert);
 
+time_t
+_gnutls_pkcs11_get_distrust_after(const char *url, gnutls_x509_crt_t cert,
+				  const char *purpose, unsigned int flags);
+
 # endif				/* ENABLE_PKCS11 */
 
 #endif				/* GNUTLS_LIB_PKCS11_INT_H */
