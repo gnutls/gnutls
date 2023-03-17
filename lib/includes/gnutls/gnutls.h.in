@@ -1924,23 +1924,23 @@ int gnutls_db_check_entry(gnutls_session_t session,
 time_t gnutls_db_check_entry_time(gnutls_datum_t * entry);
 time_t gnutls_db_check_entry_expire_time(gnutls_datum_t * entry);
 
-  /**
-   * gnutls_handshake_hook_func:
-   * @session: the current session
-   * @htype: the type of the handshake message (%gnutls_handshake_description_t)
-   * @when: non zero if this is a post-process/generation call and zero otherwise
-   * @incoming: non zero if this is an incoming message and zero if this is an outgoing message
-   * @msg: the (const) data of the handshake message without the handshake headers.
-   *
-   * Function prototype for handshake hooks. It is set using
-   * gnutls_handshake_set_hook_function().
-   *
-   * Returns: Non zero on error.
-   */
 # define GNUTLS_HOOK_POST (1)
 # define GNUTLS_HOOK_PRE (0)
 # define GNUTLS_HOOK_BOTH (-1)
 
+/**
+ * gnutls_handshake_hook_func:
+ * @session: the current session
+ * @htype: the type of the handshake message (%gnutls_handshake_description_t)
+ * @when: non zero if this is a post-process/generation call and zero otherwise
+ * @incoming: non zero if this is an incoming message and zero if this is an outgoing message
+ * @msg: the (const) data of the handshake message without the handshake headers.
+ *
+ * Function prototype for handshake hooks. It is set using
+ * gnutls_handshake_set_hook_function().
+ *
+ * Returns: Non zero on error.
+ */
 typedef int (*gnutls_handshake_hook_func)(gnutls_session_t,
 					  unsigned int htype,
 					  unsigned when,
@@ -2258,15 +2258,15 @@ void gnutls_global_deinit(void);
 
 const gnutls_library_config_st *gnutls_get_library_config(void);
 
-  /**
-   * gnutls_time_func:
-   * @t: where to store time.
-   *
-   * Function prototype for time()-like function.  Set with
-   * gnutls_global_set_time_function().
-   *
-   * Returns: Number of seconds since the epoch, or (time_t)-1 on errors.
-   */
+/**
+ * gnutls_time_func:
+ * @t: where to store time.
+ *
+ * Function prototype for time()-like function.  Set with
+ * gnutls_global_set_time_function().
+ *
+ * Returns: Number of seconds since the epoch, or (time_t)-1 on errors.
+ */
 typedef time_t(*gnutls_time_func) (time_t * t);
 
 typedef int (*mutex_init_func)(void **mutex);
@@ -2310,18 +2310,18 @@ void gnutls_global_set_log_function(gnutls_log_func log_func);
 void gnutls_global_set_audit_log_function(gnutls_audit_log_func log_func);
 void gnutls_global_set_log_level(int level);
 
-  /**
-   * gnutls_keylog_func:
-   * @session: the current session
-   * @label: the keylog label
-   * @secret: the (const) data of the derived secret.
-   *
-   * Function prototype for keylog hooks. It is set using
-   * gnutls_session_set_keylog_function().
-   *
-   * Returns: Non zero on error.
-   * Since: 3.6.13
-   */
+/**
+ * gnutls_keylog_func:
+ * @session: the current session
+ * @label: the keylog label
+ * @secret: the (const) data of the derived secret.
+ *
+ * Function prototype for keylog hooks. It is set using
+ * gnutls_session_set_keylog_function().
+ *
+ * Returns: Non zero on error.
+ * Since: 3.6.13
+ */
 typedef int (*gnutls_keylog_func)(gnutls_session_t session,
 				  const char *label,
 				  const gnutls_datum_t * secret);
@@ -2433,12 +2433,12 @@ int gnutls_fingerprint(gnutls_digest_algorithm_t algo,
 		       const gnutls_datum_t * data, void *result,
 		       size_t *result_size);
 
-  /**
-   * gnutls_random_art_t:
-   * @GNUTLS_RANDOM_ART_OPENSSH: OpenSSH-style random art.
-   *
-   * Enumeration of different random art types.
-   */
+/**
+ * gnutls_random_art_t:
+ * @GNUTLS_RANDOM_ART_OPENSSH: OpenSSH-style random art.
+ *
+ * Enumeration of different random art types.
+ */
 typedef enum gnutls_random_art {
 	GNUTLS_RANDOM_ART_OPENSSH = 1
 } gnutls_random_art_t;
@@ -3203,20 +3203,20 @@ typedef enum {
 	GNUTLS_ENCRYPTION_LEVEL_APPLICATION
 } gnutls_record_encryption_level_t;
 
-  /**
-   * gnutls_handshake_read_func:
-   * @session: the current session
-   * @htype: the type of the handshake message (#gnutls_handshake_description_t)
-   * @level: #gnutls_record_encryption_level_t
-   * @data: the (const) data that was being sent
-   * @data_size: the size of data
-   *
-   * Function prototype for handshake intercepting hooks. It is set using
-   * gnutls_handshake_set_read_function().
-   *
-   * Returns: Non zero on error.
-   * Since: 3.7.0
-   */
+/**
+ * gnutls_handshake_read_func:
+ * @session: the current session
+ * @htype: the type of the handshake message (#gnutls_handshake_description_t)
+ * @level: #gnutls_record_encryption_level_t
+ * @data: the (const) data that was being sent
+ * @data_size: the size of data
+ *
+ * Function prototype for handshake intercepting hooks. It is set using
+ * gnutls_handshake_set_read_function().
+ *
+ * Returns: Non zero on error.
+ * Since: 3.7.0
+ */
 typedef int (*gnutls_handshake_read_func)(gnutls_session_t session,
 					  gnutls_record_encryption_level_t
 					  level,
@@ -3232,20 +3232,20 @@ gnutls_handshake_write(gnutls_session_t session,
 		       gnutls_record_encryption_level_t level,
 		       const void *data, size_t data_size);
 
-  /**
-   * gnutls_handshake_secret_func:
-   * @session: the current session
-   * @level: the encryption level
-   * @secret_read: the secret used for reading, can be %NULL if not set
-   * @secret_write: the secret used for writing, can be %NULL if not set
-   * @secret_size: the size of the secrets
-   *
-   * Function prototype for secret hooks. It is set using
-   * gnutls_handshake_set_secret_function().
-   *
-   * Returns: Non zero on error.
-   * Since: 3.7.0
-   */
+/**
+ * gnutls_handshake_secret_func:
+ * @session: the current session
+ * @level: the encryption level
+ * @secret_read: the secret used for reading, can be %NULL if not set
+ * @secret_write: the secret used for writing, can be %NULL if not set
+ * @secret_size: the size of the secrets
+ *
+ * Function prototype for secret hooks. It is set using
+ * gnutls_handshake_set_secret_function().
+ *
+ * Returns: Non zero on error.
+ * Since: 3.7.0
+ */
 typedef int (*gnutls_handshake_secret_func)(gnutls_session_t session,
 					    gnutls_record_encryption_level_t
 					    level, const void *secret_read,
@@ -3256,19 +3256,19 @@ void
 gnutls_handshake_set_secret_function(gnutls_session_t session,
 				     gnutls_handshake_secret_func func);
 
-  /**
-   * gnutls_alert_read_func:
-   * @session: the current session
-   * @level: #gnutls_record_encryption_level_t
-   * @alert_level: the level of the alert
-   * @alert_desc: the alert description
-   *
-   * Function prototype for alert intercepting hooks. It is set using
-   * gnutls_alert_set_read_function().
-   *
-   * Returns: Non zero on error.
-   * Since: 3.7.0
-   */
+/**
+ * gnutls_alert_read_func:
+ * @session: the current session
+ * @level: #gnutls_record_encryption_level_t
+ * @alert_level: the level of the alert
+ * @alert_desc: the alert description
+ *
+ * Function prototype for alert intercepting hooks. It is set using
+ * gnutls_alert_set_read_function().
+ *
+ * Returns: Non zero on error.
+ * Since: 3.7.0
+ */
 typedef int (*gnutls_alert_read_func)(gnutls_session_t session,
 				      gnutls_record_encryption_level_t level,
 				      gnutls_alert_level_t alert_level,
