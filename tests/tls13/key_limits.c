@@ -26,315 +26,163 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-#if defined(_WIN32)
+#include <gnutls/gnutls.h>
+#include <assert.h>
 
-int main(void)
-{
-	exit(77);
-}
-
-#else
-
-# include <string.h>
-# include <sys/types.h>
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
-# include <unistd.h>
-# include <gnutls/gnutls.h>
-# include <gnutls/dtls.h>
-# include <assert.h>
-# include <signal.h>
-
-# include "utils.h"
-# include "cert-common.h"
-
-static void terminate(void);
+#include "utils.h"
+#include "cert-common.h"
+#include "eagain-common.h"
 
 /* This program tests whether re-key occurs at the expected
  * time.
  */
 
-static void server_log_func(int level, const char *str)
+const char *testname = "";
+
+const char *side = "";
+
+static void tls_log_func(int level, const char *str)
 {
-	fprintf(stderr, "server|<%d>| %s", level, str);
+	fprintf(stderr, "%s|<%d>| %s", side, level, str);
 }
 
-static void client_log_func(int level, const char *str)
-{
-	fprintf(stderr, "client|<%d>| %s", level, str);
-}
+#define MAX_BUF 1024
 
-# define MAX_BUF 1024
-
-static void client(int fd, const char *prio, unsigned expect_update)
+static void start(const char *name, const char *prio, unsigned exp_update)
 {
-	int ret;
+	int sret, cret;
+	gnutls_certificate_credentials_t scred, ccred;
+	gnutls_session_t server, client;
+
 	char buffer[MAX_BUF + 1];
-	gnutls_certificate_credentials_t x509_cred;
-	gnutls_session_t session;
 	unsigned char seq[8];
 	unsigned update_happened = 0;
+	unsigned i;
+
+	testname = name;
+	success("== test %s ==\n", testname);
 
 	global_init();
-
-	if (debug) {
-		gnutls_global_set_log_function(client_log_func);
-		gnutls_global_set_log_level(7);
-	}
-
-	gnutls_certificate_allocate_credentials(&x509_cred);
-
-	/* Initialize TLS session
-	 */
-	gnutls_init(&session, GNUTLS_CLIENT);
-
-	/* Use default priorities */
-	ret = gnutls_priority_set_direct(session, prio, NULL);
-	if (ret < 0) {
-		fail("error in priority '%s': %s\n", prio,
-		     gnutls_strerror(ret));
-		exit(1);
-	}
-
-	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
-
-	gnutls_transport_set_int(session, fd);
-
-	/* Perform the TLS handshake
-	 */
-	do {
-		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
-
-	if (ret < 0) {
-		fail("client: Handshake failed\n");
-		gnutls_perror(ret);
-		exit(1);
-	} else {
-		if (debug)
-			success("client: Handshake was completed\n");
-	}
-
+	gnutls_global_set_log_function(tls_log_func);
 	if (debug)
-		success("client: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+		gnutls_global_set_log_level(9);
 
-	/* make sure we are not blocked forever */
-	gnutls_record_set_timeout(session, 10000);
+	/* Init Server */
+	assert(gnutls_certificate_allocate_credentials(&scred) >= 0);
+	assert(gnutls_certificate_set_x509_key_mem(scred,
+						   &server_cert,
+						   &server_key,
+						   GNUTLS_X509_FMT_PEM) >= 0);
 
-	assert(gnutls_record_get_state(session, 1, NULL, NULL, NULL, seq) >= 0);
+	gnutls_init(&server, GNUTLS_SERVER);
+
+	/* avoid calling all the priority functions, since the defaults
+	 * are adequate.
+	 */
+	sret = gnutls_priority_set_direct(server, prio, NULL);
+	if (sret < 0) {
+		fail("error in priority '%s': %s\n", prio,
+		     gnutls_strerror(sret));
+	}
+
+	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, scred);
+	gnutls_transport_set_push_function(server, server_push);
+	gnutls_transport_set_pull_function(server, server_pull);
+	gnutls_transport_set_ptr(server, server);
+
+	/* Init client */
+	gnutls_certificate_allocate_credentials(&ccred);
+	assert(gnutls_certificate_set_x509_trust_mem
+	       (ccred, &ca3_cert, GNUTLS_X509_FMT_PEM) >= 0);
+
+	gnutls_init(&client, GNUTLS_CLIENT);
+
+	cret = gnutls_priority_set_direct(client, prio, NULL);
+	if (cret < 0)
+		fail("cannot set TLS 1.3 priorities\n");
+
+	gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE, ccred);
+
+	gnutls_transport_set_push_function(client, client_push);
+	gnutls_transport_set_pull_function(client, client_pull);
+	gnutls_transport_set_ptr(client, client);
+
+	/* Perform handshake */
+	HANDSHAKE(client, server);
+	if (debug)
+		success("Handshake established\n");
+
+	assert(gnutls_record_get_state(server, 0, NULL, NULL, NULL, seq) >= 0);
 	assert(gnutls_record_set_state
-	       (session, 1, (void *)"\x00\x00\x00\x00\x00\xff\xff\xfa") >= 0);
+	       (server, 0, (void *)"\x00\x00\x00\x00\x00\xff\xff\xfa") >= 0);
 
-	do {
+	assert(gnutls_record_get_state(client, 1, NULL, NULL, NULL, seq) >= 0);
+	assert(gnutls_record_set_state
+	       (client, 1, (void *)"\x00\x00\x00\x00\x00\xff\xff\xfa") >= 0);
+
+	memset(buffer, 1, sizeof(buffer));
+
+	for (i = 0; i < 32; i++) {
+		usleep(10000);	/* some systems like FreeBSD have their buffers full during this send */
 		do {
-			ret =
-			    gnutls_record_recv_seq(session, buffer, MAX_BUF,
+			sret =
+			    gnutls_record_send(server, buffer, sizeof(buffer));
+		} while (sret == GNUTLS_E_AGAIN
+			 || sret == GNUTLS_E_INTERRUPTED);
+
+		if (sret < 0) {
+			fail("Error sending %d byte packet: %s\n",
+			     (int)sizeof(buffer), gnutls_strerror(sret));
+		}
+
+		if (sret != sizeof(buffer)) {
+			fail("Error sending %d byte packet: sent: %d\n",
+			     (int)sizeof(buffer), sret);
+		}
+		do {
+			cret =
+			    gnutls_record_recv_seq(client, buffer, MAX_BUF,
 						   seq);
-		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+		} while (cret == GNUTLS_E_AGAIN
+			 || cret == GNUTLS_E_INTERRUPTED);
 
 		if (memcmp(seq, "\x00\x00\x00\x00\x00\x00\x00\x01", 8) == 0) {
 			update_happened = 1;
 		}
-	} while (ret > 0);
-
-	if (ret == 0 || ret == GNUTLS_E_TIMEDOUT) {
-		if (debug)
-			success("client: Peer has closed the TLS connection\n");
-		goto end;
-	} else if (ret < 0) {
-		if (ret != 0) {
-			fail("client: Error: %s\n", gnutls_strerror(ret));
-			exit(1);
-		}
 	}
 
-	gnutls_bye(session, GNUTLS_SHUT_WR);
+	gnutls_bye(client, GNUTLS_SHUT_WR);
+	gnutls_bye(server, GNUTLS_SHUT_WR);
 
- end:
+	gnutls_deinit(client);
+	gnutls_deinit(server);
 
-	close(fd);
-
-	gnutls_deinit(session);
-
-	gnutls_certificate_free_credentials(x509_cred);
+	gnutls_certificate_free_credentials(scred);
+	gnutls_certificate_free_credentials(ccred);
 
 	gnutls_global_deinit();
+	reset_buffers();
 
-	if (expect_update && update_happened == 0) {
+	if (exp_update && update_happened == 0) {
 		fail("no update occurred!\n");
-		exit(1);
-	} else if (!expect_update && update_happened) {
+	} else if (!exp_update && update_happened) {
 		fail("update occurred unexpectedly!\n");
-		exit(1);
 	} else {
 		if (debug)
 			success("detected update!\n");
 	}
 }
 
-/* These are global */
-pid_t child;
-
-static void terminate(void)
-{
-	assert(child);
-	kill(child, SIGTERM);
-	exit(1);
-}
-
-static void server(int fd, const char *prio)
-{
-	int ret;
-	char buffer[MAX_BUF + 1];
-	gnutls_session_t session;
-	gnutls_certificate_credentials_t x509_cred;
-	unsigned i;
-	unsigned char seq[8];
-
-	/* this must be called once in the program
-	 */
-	global_init();
-	memset(buffer, 0, sizeof(buffer));
-
-	if (debug) {
-		gnutls_global_set_log_function(server_log_func);
-		gnutls_global_set_log_level(4711);
-	}
-
-	gnutls_certificate_allocate_credentials(&x509_cred);
-	gnutls_certificate_set_x509_key_mem(x509_cred, &server_cert,
-					    &server_key, GNUTLS_X509_FMT_PEM);
-
-	gnutls_init(&session, GNUTLS_SERVER);
-
-	/* avoid calling all the priority functions, since the defaults
-	 * are adequate.
-	 */
-	ret = gnutls_priority_set_direct(session, prio, NULL);
-	if (ret < 0) {
-		fail("error in priority '%s': %s\n", prio,
-		     gnutls_strerror(ret));
-		exit(1);
-	}
-
-	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
-
-	gnutls_transport_set_int(session, fd);
-
-	do {
-		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
-	if (ret < 0) {
-		close(fd);
-		gnutls_deinit(session);
-		fail("server: Handshake has failed (%s)\n\n",
-		     gnutls_strerror(ret));
-		terminate();
-	}
-	if (debug)
-		success("server: Handshake was completed\n");
-
-	if (debug)
-		success("server: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
-
-	assert(gnutls_record_get_state(session, 0, NULL, NULL, NULL, seq) >= 0);
-	assert(gnutls_record_set_state
-	       (session, 0, (void *)"\x00\x00\x00\x00\x00\xff\xff\xfa") >= 0);
-
-	memset(buffer, 1, sizeof(buffer));
-	for (i = 0; i < 32; i++) {
-		usleep(10000);	/* some systems like FreeBSD have their buffers full during this send */
-		do {
-			ret =
-			    gnutls_record_send(session, buffer, sizeof(buffer));
-		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
-
-		if (ret < 0) {
-			fail("Error sending %d byte packet: %s\n",
-			     (int)sizeof(buffer), gnutls_strerror(ret));
-			terminate();
-		}
-
-		if (ret != sizeof(buffer)) {
-			fail("Error sending %d byte packet: sent: %d\n",
-			     (int)sizeof(buffer), ret);
-			terminate();
-		}
-	}
-
-	/* wait for the peer to close the connection.
-	 */
-	gnutls_bye(session, GNUTLS_SHUT_WR);
-
-	close(fd);
-	gnutls_deinit(session);
-
-	gnutls_certificate_free_credentials(x509_cred);
-
-	gnutls_global_deinit();
-
-	if (debug)
-		success("server: finished\n");
-}
-
-static void start(const char *name, const char *prio, unsigned exp_update)
-{
-	int fd[2];
-	int ret, status = 0;
-
-	ret = socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
-	if (ret < 0) {
-		perror("socketpair");
-		exit(1);
-	}
-
-	child = fork();
-	if (child < 0) {
-		perror("fork");
-		fail("fork");
-		exit(1);
-	}
-
-	if (child) {
-		/* parent */
-		success("trying: %s\n", name);
-		close(fd[0]);
-		server(fd[1], prio);
-		wait(&status);
-		check_wait_status(status);
-	} else {
-		close(fd[1]);
-		client(fd[0], prio, exp_update);
-		exit(0);
-	}
-}
-
-# define AES_GCM "NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM"
-# define CHACHA_POLY1305 "NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+CHACHA20-POLY1305"
-
-static void ch_handler(int sig)
-{
-	return;
-}
+#define AES_GCM "NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM"
+#define CHACHA_POLY1305 "NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+CHACHA20-POLY1305"
 
 void doit(void)
 {
-	signal(SIGCHLD, ch_handler);
-	signal(SIGPIPE, SIG_IGN);
 
 	start("aes-gcm", AES_GCM, 1);
 	if (!gnutls_fips140_mode_enabled()) {
 		start("chacha20", CHACHA_POLY1305, 0);
 	}
 }
-
-#endif				/* _WIN32 */
