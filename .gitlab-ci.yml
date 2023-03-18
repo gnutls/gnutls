@@ -156,9 +156,10 @@ default:
 ##############################################################################
 
 commit-check:
-  stage: test
+  stage: .pre
+  variables:
+    GIT_SUBMODULE_STRATEGY: none
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$ALPINE_BASE_BUILD
-  needs: [] # can be run immediately
   before_script: []
   after_script: []
   except:
