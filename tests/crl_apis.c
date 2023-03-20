@@ -261,6 +261,32 @@ static void verify_issuer(gnutls_x509_crl_t crl,
 	gnutls_x509_crt_deinit(crt);
 }
 
+static void get_dn_by_oid(gnutls_x509_crl_t crl,
+			  const gnutls_datum_t * issuer_cert)
+{
+	gnutls_x509_crt_t crt;
+	assert(gnutls_x509_crt_init(&crt) >= 0);
+	assert(gnutls_x509_crt_import(crt, issuer_cert, GNUTLS_X509_FMT_PEM) >=
+	       0);
+
+	char *crt_buf = gnutls_calloc(DN_MAX_LEN, sizeof(char));
+	size_t crt_buf_size = DN_MAX_LEN;
+	gnutls_x509_crt_get_issuer_dn_by_oid(crt, "2.5.4.3", 0, 0, crt_buf,
+					     &crt_buf_size);
+
+	char *crl_buf = gnutls_calloc(DN_MAX_LEN, sizeof(char));
+	size_t crl_buf_size = DN_MAX_LEN;
+	gnutls_x509_crl_get_issuer_dn_by_oid(crl, "2.5.4.3", 0, 0, crl_buf,
+					     &crl_buf_size);
+
+	assert(crt_buf_size == crl_buf_size
+	       && memcmp(crt_buf, crl_buf, crl_buf_size) == 0);
+
+	gnutls_free(crt_buf);
+	gnutls_free(crl_buf);
+	gnutls_x509_crt_deinit(crt);
+}
+
 void doit(void)
 {
 	gnutls_datum_t out;
@@ -292,6 +318,9 @@ void doit(void)
 
 	/* verify issuer */
 	verify_issuer(crl, &ca3_cert);
+
+	/* get dn by oid */
+	get_dn_by_oid(crl, &ca3_cert);
 
 	gnutls_free(out.data);
 	gnutls_x509_crl_deinit(crl);
