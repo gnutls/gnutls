@@ -1233,11 +1233,11 @@ gnutls_x509_crl_get_extension_data(gnutls_x509_crl_t crl, unsigned indx,
  * gnutls_x509_crl_list_import2:
  * @crls: Will contain the parsed crl list.
  * @size: It will contain the size of the list.
- * @data: The PEM encoded CRL.
+ * @data: The CRL data.
  * @format: One of DER or PEM.
  * @flags: must be (0) or an OR'd sequence of gnutls_certificate_import_flags.
  *
- * This function will convert the given PEM encoded CRL list
+ * This function will convert the given CRL list
  * to the native gnutls_x509_crl_t format. The output will be stored
  * in @crls.  They will be automatically initialized.
  *
@@ -1294,11 +1294,11 @@ gnutls_x509_crl_list_import2(gnutls_x509_crl_t ** crls,
  * gnutls_x509_crl_list_import:
  * @crls: Indicates where the parsed CRLs will be copied to. Must not be initialized.
  * @crl_max: Initially must hold the maximum number of crls. It will be updated with the number of crls available.
- * @data: The PEM encoded CRLs
+ * @data: The CRL data
  * @format: One of DER or PEM.
  * @flags: must be (0) or an OR'd sequence of gnutls_certificate_import_flags.
  *
- * This function will convert the given PEM encoded CRL list
+ * This function will convert the given CRL list
  * to the native gnutls_x509_crl_t format. The output will be stored
  * in @crls.  They will be automatically initialized.
  *

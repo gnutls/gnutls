@@ -287,6 +287,20 @@ static void get_dn_by_oid(gnutls_x509_crl_t crl,
 	gnutls_x509_crt_deinit(crt);
 }
 
+static void import_der_crl_list(gnutls_x509_crl_t crl)
+{
+	gnutls_datum_t out;
+	assert(gnutls_x509_crl_export2(crl, GNUTLS_X509_FMT_DER, &out) >= 0);
+
+	gnutls_x509_crl_t crl_list;
+	unsigned int crl_list_max = 1;
+	assert(gnutls_x509_crl_list_import
+	       (&crl_list, &crl_list_max, &out, GNUTLS_X509_FMT_DER, 0) > 0);
+
+	gnutls_free(out.data);
+	gnutls_x509_crl_deinit(crl_list);
+}
+
 void doit(void)
 {
 	gnutls_datum_t out;
@@ -321,6 +335,9 @@ void doit(void)
 
 	/* get dn by oid */
 	get_dn_by_oid(crl, &ca3_cert);
+
+	/* import DER crl */
+	import_der_crl_list(crl);
 
 	gnutls_free(out.data);
 	gnutls_x509_crl_deinit(crl);
