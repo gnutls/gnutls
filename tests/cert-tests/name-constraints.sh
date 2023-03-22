@@ -35,10 +35,7 @@ TMPFILE=constraints.$$.pem.tmp
 
 . ${srcdir}/../scripts/common.sh
 
-skip_if_no_datefudge
-
-"$FAKETIME" "$FAKETIME_F_OPT" "2016-04-22 00:00:00" \
-	${VALGRIND} "${CERTTOOL}" --verify-allow-broken -e --infile "${srcdir}/data/name-constraints-ip.pem"
+${VALGRIND} "${CERTTOOL}" --attime "2016-04-22" --verify-allow-broken -e --infile "${srcdir}/data/name-constraints-ip.pem"
 rc=$?
 
 if test "${rc}" != "0"; then

@@ -100,7 +100,8 @@ chmod u+w "$TEMPLATE_FILE"
 echo "ocsp_uri=http://localhost:${OCSP_PORT}/ocsp/" >>"$TEMPLATE_FILE"
 
 # Generate certificates with the random port
-"$FAKETIME" "$FAKETIME_F_OPT" "${CERTDATE}" ${CERTTOOL} \
+${CERTTOOL} \
+        --attime "${CERTDATE}" \
 	--generate-certificate --load-ca-privkey "${srcdir}/ocsp-tests/certs/ca.key" \
 	--load-ca-certificate "${srcdir}/ocsp-tests/certs/ca.pem" \
 	--load-privkey "${srcdir}/ocsp-tests/certs/server_good.key" \
@@ -109,7 +110,8 @@ echo "ocsp_uri=http://localhost:${OCSP_PORT}/ocsp/" >>"$TEMPLATE_FILE"
 # Generate certificates with the random port (with mandatory stapling extension)
 echo "tls_feature = 5" >>"$TEMPLATE_FILE"
 
-"$FAKETIME" "$FAKETIME_F_OPT" "${CERTDATE}" ${CERTTOOL} \
+${CERTTOOL} \
+        --attime "${CERTDATE}" \
 	--generate-certificate --load-ca-privkey "${srcdir}/ocsp-tests/certs/ca.key" \
 	--load-ca-certificate "${srcdir}/ocsp-tests/certs/ca.pem" \
 	--load-privkey "${srcdir}/ocsp-tests/certs/server_good.key" \

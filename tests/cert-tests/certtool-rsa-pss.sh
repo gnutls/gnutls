@@ -209,10 +209,7 @@ export TZ="UTC"
 
 . ${srcdir}/../scripts/common.sh
 
-skip_if_no_datefudge
-
-"$FAKETIME" "2012-11-22" \
-${VALGRIND} "${CERTTOOL}" --verify --load-ca-certificate "${srcdir}/data/cert-rsa-pss.pem" --infile "${srcdir}/data/cert-rsa-pss.pem"
+${VALGRIND} "${CERTTOOL}" --attime "2012-11-22" --verify --load-ca-certificate "${srcdir}/data/cert-rsa-pss.pem" --infile "${srcdir}/data/cert-rsa-pss.pem"
 rc=$?
 
 if test "${rc}" != "0"; then

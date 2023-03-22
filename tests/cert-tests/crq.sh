@@ -39,8 +39,6 @@ OUTFILE2=out2.$$.tmp
 
 . ${srcdir}/../scripts/common.sh
 
-skip_if_no_datefudge
-
 ${VALGRIND} "${CERTTOOL}" --inder --crq-info --infile "${srcdir}/data/csr-invalid.der" >"${OUTFILE}" 2>&1
 rc=$?
 
@@ -59,11 +57,10 @@ fi
 rm -f "${OUTFILE}"
 
 # check whether the honor_crq_extension option works
-"$FAKETIME" "$FAKETIME_F_OPT" "2007-04-22 00:00:00" \
-	"${CERTTOOL}" --generate-request \
-		--load-privkey "${srcdir}/data/template-test.key" \
-		--template "${srcdir}/templates/template-tlsfeature.tmpl" \
-		--outfile $OUTFILE 2>/dev/null
+"${CERTTOOL}" --attime "2007-04-22" --generate-request \
+	--load-privkey "${srcdir}/data/template-test.key" \
+	--template "${srcdir}/templates/template-tlsfeature.tmpl" \
+	--outfile $OUTFILE 2>/dev/null
 
 ${CERTTOOL} --crq-info --no-text --infile ${OUTFILE} --outfile ${TMPFILE}
 rc=$?
@@ -78,13 +75,12 @@ if grep -v '^-----BEGIN [A-Z0-9 ]\+-----$' ${TMPFILE} | grep -v '^[A-Za-z0-9/+=]
 	exit 1
 fi
 
-"$FAKETIME" "$FAKETIME_F_OPT" "2007-04-22 00:00:00" \
-	"${CERTTOOL}" --generate-certificate \
-		--load-ca-privkey "${srcdir}/data/template-test.key" \
-		--load-ca-certificate "${srcdir}/data/template-tlsfeature.pem" \
-		--load-request="$OUTFILE" \
-		--template "${srcdir}/templates/template-crq.tmpl" \
-		--outfile "${OUTFILE2}" 2>/dev/null
+"${CERTTOOL}" --attime "2007-04-22" --generate-certificate \
+	--load-ca-privkey "${srcdir}/data/template-test.key" \
+	--load-ca-certificate "${srcdir}/data/template-tlsfeature.pem" \
+	--load-request="$OUTFILE" \
+	--template "${srcdir}/templates/template-crq.tmpl" \
+	--outfile "${OUTFILE2}" 2>/dev/null
 
 ${DIFF} "${srcdir}/data/template-crq.pem" "${OUTFILE2}" >/dev/null 2>&1
 rc=$?
@@ -130,11 +126,10 @@ N
 N
 __EOF__
 
-"$FAKETIME" "$FAKETIME_F_OPT" "2007-04-22 00:00:00" \
 setsid \
-	"${CERTTOOL}" -q \
-		--load-privkey "${srcdir}/data/template-test.key" \
-		--outfile "${OUTFILE}" <$TMPFILE 2>/dev/null
+"${CERTTOOL}" --attime "2007-04-22" -q \
+	--load-privkey "${srcdir}/data/template-test.key" \
+	--outfile "${OUTFILE}" <$TMPFILE 2>/dev/null
 
 ${DIFF} --ignore-matching-lines "Algorithm Security Level" "${srcdir}/data/template-long-dns-crq.pem" "${OUTFILE}" >/dev/null 2>&1
 rc=$?
@@ -147,11 +142,10 @@ if test "${rc}" != "0"; then
 fi
 
 # check whether the generation with extension works
-"$FAKETIME" "$FAKETIME_F_OPT" "2007-04-22 00:00:00" \
-	"${CERTTOOL}" --generate-request \
-		--load-privkey "${srcdir}/data/template-test.key" \
-		--template "${srcdir}/templates/arb-extensions.tmpl" \
-		--outfile $OUTFILE 2>/dev/null
+"${CERTTOOL}" --attime "2007-04-22" --generate-request \
+	--load-privkey "${srcdir}/data/template-test.key" \
+	--template "${srcdir}/templates/arb-extensions.tmpl" \
+	--outfile $OUTFILE 2>/dev/null
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -168,13 +162,12 @@ if test "${rc}" != "0"; then
 fi
 
 # Generate certificate from CRQ with no explicit extensions
-"$FAKETIME" "$FAKETIME_F_OPT" "2007-04-22 00:00:00" \
-	"${CERTTOOL}" --generate-certificate \
-		--load-ca-privkey "${srcdir}/../../doc/credentials/x509/ca-key.pem" \
-		--load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" \
-		--load-request "${srcdir}/data/arb-extensions.csr" \
-		--template "${srcdir}/templates/template-no-ca.tmpl" \
-		--outfile "${OUTFILE}" 2>/dev/null
+"${CERTTOOL}"  --attime "2007-04-22" --generate-certificate \
+	--load-ca-privkey "${srcdir}/../../doc/credentials/x509/ca-key.pem" \
+	--load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" \
+	--load-request "${srcdir}/data/arb-extensions.csr" \
+	--template "${srcdir}/templates/template-no-ca.tmpl" \
+	--outfile "${OUTFILE}" 2>/dev/null
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -191,13 +184,12 @@ if test "${rc}" != "0"; then
 fi
 
 # Generate certificate from CRQ with CRQ extensions
-"$FAKETIME" "$FAKETIME_F_OPT" "2007-04-22 00:00:00" \
-	"${CERTTOOL}" --generate-certificate \
-		--load-ca-privkey "${srcdir}/../../doc/credentials/x509/ca-key.pem" \
-		--load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" \
-		--load-request "${srcdir}/data/arb-extensions.csr" \
-		--template "${srcdir}/templates/template-no-ca-honor.tmpl" \
-		--outfile "${OUTFILE}" 2>/dev/null
+"${CERTTOOL}" --attime "2007-04-22" --generate-certificate \
+	--load-ca-privkey "${srcdir}/../../doc/credentials/x509/ca-key.pem" \
+	--load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" \
+	--load-request "${srcdir}/data/arb-extensions.csr" \
+	--template "${srcdir}/templates/template-no-ca-honor.tmpl" \
+	--outfile "${OUTFILE}" 2>/dev/null
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -214,13 +206,12 @@ if test "${rc}" != "0"; then
 fi
 
 # Generate certificate from CRQ with explicit extensions
-"$FAKETIME" "$FAKETIME_F_OPT" "2007-04-22 00:00:00" \
-	"${CERTTOOL}" --generate-certificate \
-		--load-ca-privkey "${srcdir}/../../doc/credentials/x509/ca-key.pem" \
-		--load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" \
-		--load-request "${srcdir}/data/arb-extensions.csr" \
-		--template "${srcdir}/templates/template-no-ca-explicit.tmpl" \
-		--outfile "${OUTFILE}" 2>/dev/null
+"${CERTTOOL}" --attime "2007-04-22" --generate-certificate \
+	--load-ca-privkey "${srcdir}/../../doc/credentials/x509/ca-key.pem" \
+	--load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" \
+	--load-request "${srcdir}/data/arb-extensions.csr" \
+	--template "${srcdir}/templates/template-no-ca-explicit.tmpl" \
+	--outfile "${OUTFILE}" 2>/dev/null
 rc=$?
 
 if test "${rc}" != "0"; then

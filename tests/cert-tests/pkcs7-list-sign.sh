@@ -36,7 +36,6 @@ OUTFILE2=out2-pkcs7.$$.tmp
 
 . ${srcdir}/../scripts/common.sh
 
-skip_if_no_datefudge
 # Test signing
 FILE="signing-with-cert-list"
 ${VALGRIND} "${CERTTOOL}" --p7-sign --load-certificate "${srcdir}/data/pkcs7-chain.pem" --load-privkey "${srcdir}/data/pkcs7-chain-endcert-key.pem" --infile "${srcdir}/data/pkcs7-detached.txt" >"${OUTFILE}"

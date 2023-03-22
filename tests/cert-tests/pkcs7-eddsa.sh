@@ -36,8 +36,6 @@ OUTFILE2=out2-pkcs7.$$.tmp
 
 . ${srcdir}/../scripts/common.sh
 
-skip_if_no_datefudge
-
 KEY="${srcdir}/../certs/ed25519.pem"
 CERT="${srcdir}/../certs/cert-ed25519.pem"
 

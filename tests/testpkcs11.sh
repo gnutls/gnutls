@@ -561,8 +561,7 @@ write_certificate_test () {
 	pubkey="$5"
 
 	echo -n "* Generating client certificate... "
-	"$FAKETIME" "$FAKETIME_F_OPT" "$TESTDATE" \
-	"${CERTTOOL}" ${CERTTOOL_PARAM} ${ADDITIONAL_PARAM}  --generate-certificate --load-ca-privkey "${cakey}"  --load-ca-certificate "${cacert}"  \
+	"${CERTTOOL}" ${CERTTOOL_PARAM} ${ADDITIONAL_PARAM}  --attime "$TESTDATE" --generate-certificate --load-ca-privkey "${cakey}"  --load-ca-certificate "${cacert}"  \
 	--template ${srcdir}/testpkcs11-certs/client-tmpl --load-privkey "${token};object=gnutls-client;object-type=private" \
 	--load-pubkey "$pubkey" --outfile tmp-client.crt >>"${LOGFILE}" 2>&1
 
