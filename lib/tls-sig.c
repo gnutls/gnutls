@@ -86,7 +86,6 @@ _gnutls_handshake_sign_data12(gnutls_session_t session,
 			      gnutls_sign_algorithm_t sign_algo)
 {
 	gnutls_datum_t dconcat;
-	const gnutls_sign_entry_st *se;
 	int ret;
 
 	_gnutls_handshake_log
@@ -97,17 +96,6 @@ _gnutls_handshake_sign_data12(gnutls_session_t session,
 	    (gnutls_sign_supports_pk_algorithm(sign_algo, pkey->pk_algorithm) ==
 	     0))
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
-
-	CRYPTO_AUDITING_STRING_DATA(session->internals.
-				    audit_context_stack.head->context, "name",
-				    "tls::certificate_sign");
-	se = _gnutls_sign_to_entry(sign_algo);
-	if (likely(se != NULL)) {
-		CRYPTO_AUDITING_WORD_DATA(session->
-					  internals.audit_context_stack.head->
-					  context, "tls::signature_algorithm",
-					  se->aid.id[0] << 8 | se->aid.id[1]);
-	}
 
 	dconcat.size = GNUTLS_RANDOM_SIZE * 2 + params->size;
 	dconcat.data = gnutls_malloc(dconcat.size);
@@ -144,7 +132,6 @@ _gnutls_handshake_sign_data10(gnutls_session_t session,
 	digest_hd_st td_sha;
 	uint8_t concat[MAX_SIG_SIZE];
 	const mac_entry_st *me;
-	const gnutls_sign_entry_st *se;
 	gnutls_pk_algorithm_t pk_algo;
 
 	pk_algo = gnutls_privkey_get_pk_algorithm(pkey, NULL);
@@ -166,17 +153,6 @@ _gnutls_handshake_sign_data10(gnutls_session_t session,
 	_gnutls_handshake_log
 	    ("HSK[%p]: signing handshake data: using %s\n", session,
 	     gnutls_sign_algorithm_get_name(sign_algo));
-
-	CRYPTO_AUDITING_STRING_DATA(session->internals.
-				    audit_context_stack.head->context, "name",
-				    "tls::certificate_sign");
-	se = _gnutls_sign_to_entry(sign_algo);
-	if (likely(se != NULL)) {
-		CRYPTO_AUDITING_WORD_DATA(session->
-					  internals.audit_context_stack.head->
-					  context, "tls::signature_algorithm",
-					  se->aid.id[0] << 8 | se->aid.id[1]);
-	}
 
 	ret = _gnutls_hash_init(&td_sha, me);
 	if (ret < 0) {
@@ -217,6 +193,7 @@ _gnutls_handshake_sign_data(gnutls_session_t session,
 			    gnutls_sign_algorithm_t * sign_algo)
 {
 	const version_entry_st *ver = get_version(session);
+	const gnutls_sign_entry_st *se;
 	unsigned key_usage = 0;
 	int ret;
 
@@ -238,6 +215,18 @@ _gnutls_handshake_sign_data(gnutls_session_t session,
 				       _gnutls_handshake_sign_data);
 	if (ret < 0) {
 		return ret;
+	}
+
+	CRYPTO_AUDITING_STRING_DATA(session->internals.
+				    audit_context_stack.head->context, "name",
+				    "tls::certificate_sign");
+
+	se = _gnutls_sign_to_entry(*sign_algo);
+	if (likely(se != NULL)) {
+		CRYPTO_AUDITING_WORD_DATA(session->
+					  internals.audit_context_stack.head->
+					  context, "tls::signature_algorithm",
+					  se->aid.id[0] << 8 | se->aid.id[1]);
 	}
 
 	if (_gnutls_version_has_selectable_sighash(ver)) {
@@ -270,19 +259,7 @@ _gnutls_handshake_verify_data10(gnutls_session_t session,
 	uint8_t concat[MAX_SIG_SIZE];
 	gnutls_digest_algorithm_t hash_algo;
 	const mac_entry_st *me;
-	const gnutls_sign_entry_st *se;
 	gnutls_pk_algorithm_t pk_algo;
-
-	CRYPTO_AUDITING_STRING_DATA(session->internals.
-				    audit_context_stack.head->context, "name",
-				    "tls::certificate_verify");
-	se = _gnutls_sign_to_entry(sign_algo);
-	if (likely(se != NULL)) {
-		CRYPTO_AUDITING_WORD_DATA(session->
-					  internals.audit_context_stack.head->
-					  context, "tls::signature_algorithm",
-					  se->aid.id[0] << 8 | se->aid.id[1]);
-	}
 
 	pk_algo = gnutls_pubkey_get_pk_algorithm(cert->pubkey, NULL);
 	if (pk_algo == GNUTLS_PK_RSA) {
@@ -340,13 +317,6 @@ _gnutls_handshake_verify_data12(gnutls_session_t session,
 	    ("HSK[%p]: verify TLS 1.2 handshake data: using %s\n", session,
 	     se->name);
 
-	CRYPTO_AUDITING_STRING_DATA(session->internals.
-				    audit_context_stack.head->context, "name",
-				    "tls::certificate_verify");
-	CRYPTO_AUDITING_WORD_DATA(session->internals.audit_context_stack.
-				  head->context, "tls::signature_algorithm",
-				  se->aid.id[0] << 8 | se->aid.id[1]);
-
 	ret =
 	    _gnutls_pubkey_compatible_with_sig(session,
 					       cert->pubkey, ver, sign_algo);
@@ -400,6 +370,7 @@ _gnutls_handshake_verify_data(gnutls_session_t session,
 	unsigned key_usage;
 	int ret;
 	const version_entry_st *ver = get_version(session);
+	const gnutls_sign_entry_st *se;
 
 	if (cert == NULL) {
 		gnutls_assert();
@@ -418,6 +389,18 @@ _gnutls_handshake_verify_data(gnutls_session_t session,
 				       _gnutls_handshake_verify_data);
 	if (ret < 0) {
 		return ret;
+	}
+
+	CRYPTO_AUDITING_STRING_DATA(session->internals.
+				    audit_context_stack.head->context, "name",
+				    "tls::certificate_verify");
+
+	se = _gnutls_sign_to_entry(sign_algo);
+	if (likely(se != NULL)) {
+		CRYPTO_AUDITING_WORD_DATA(session->
+					  internals.audit_context_stack.head->
+					  context, "tls::signature_algorithm",
+					  se->aid.id[0] << 8 | se->aid.id[1]);
 	}
 
 	gnutls_sign_algorithm_set_server(session, sign_algo);
@@ -689,6 +672,7 @@ _gnutls_handshake_verify_crt_vrfy(gnutls_session_t session,
 	CRYPTO_AUDITING_STRING_DATA(session->internals.
 				    audit_context_stack.head->context, "name",
 				    "tls::certificate_verify");
+
 	se = _gnutls_sign_to_entry(sign_algo);
 	if (likely(se != NULL)) {
 		CRYPTO_AUDITING_WORD_DATA(session->
@@ -797,6 +781,7 @@ _gnutls_handshake_sign_crt_vrfy3(gnutls_session_t session,
 	uint8_t concat[MAX_SIG_SIZE];
 	digest_hd_st td_sha;
 	gnutls_pk_algorithm_t pk = gnutls_privkey_get_pk_algorithm(pkey, NULL);
+	const gnutls_sign_entry_st *se;
 
 	/* ensure 1024 bit DSA keys are used */
 	ret =
@@ -855,6 +840,13 @@ _gnutls_handshake_sign_crt_vrfy3(gnutls_session_t session,
 
 	dconcat.size += 20;
 
+	se = _gnutls_pk_to_sign_entry(pk, GNUTLS_DIG_SHA1);
+	if (likely(se != NULL)) {
+		CRYPTO_AUDITING_WORD_DATA(session->internals.audit_context_stack.
+					  head->context, "tls::signature_algorithm",
+					  se->aid.id[0] << 8 | se->aid.id[1]);
+	}
+
 	ret = gnutls_privkey_sign_hash(pkey, GNUTLS_DIG_SHA1,
 				       GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA,
 				       &dconcat, signature);
@@ -878,6 +870,7 @@ _gnutls_handshake_sign_crt_vrfy10(gnutls_session_t session,
 	digest_hd_st td_sha;
 	gnutls_pk_algorithm_t pk = gnutls_privkey_get_pk_algorithm(pkey, NULL);
 	const mac_entry_st *me;
+	const gnutls_sign_entry_st *se;
 
 	/* ensure 1024 bit DSA keys are used */
 	ret =
@@ -905,6 +898,13 @@ _gnutls_handshake_sign_crt_vrfy10(gnutls_session_t session,
 
 	dconcat.data = concat;
 	dconcat.size = _gnutls_hash_get_algo_len(me);
+
+	se = _gnutls_pk_to_sign_entry(pk, MAC_TO_DIG(me->id));
+	if (likely(se != NULL)) {
+		CRYPTO_AUDITING_WORD_DATA(session->internals.audit_context_stack.
+					  head->context, "tls::signature_algorithm",
+					  se->aid.id[0] << 8 | se->aid.id[1]);
+	}
 
 	ret =
 	    gnutls_privkey_sign_hash(pkey, MAC_TO_DIG(me->id),
