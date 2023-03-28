@@ -113,4 +113,7 @@ _gnutls_PRF(gnutls_session_t session,
 
 # define DEFAULT_CERT_TYPE GNUTLS_CRT_X509
 
+/* Keep backward compatibility */
+# define GNUTLS_NO_EXTENSIONS GNUTLS_NO_DEFAULT_EXTENSIONS
+
 #endif				/* GNUTLS_LIB_STATE_H */
