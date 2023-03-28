@@ -107,8 +107,8 @@ static void client(int fd, const char *prio)
 
 	/* Initialize TLS session
 	 */
-	assert(gnutls_init(&session, GNUTLS_CLIENT | GNUTLS_NO_DEFAULT_EXTENSIONS) >=
-	       0);
+	assert(gnutls_init
+	       (&session, GNUTLS_CLIENT | GNUTLS_NO_DEFAULT_EXTENSIONS) >= 0);
 
 	assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);
 
