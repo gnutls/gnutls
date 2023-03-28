@@ -51,7 +51,7 @@ int main(void)
 # include "utils.h"
 
 /* This program tests that the client does not send the
- * status request extension if GNUTLS_NO_EXTENSIONS is set.
+ * status request extension if GNUTLS_NO_DEFAULT_EXTENSIONS is set.
  */
 
 static void server_log_func(int level, const char *str)
@@ -107,7 +107,7 @@ static void client(int fd, const char *prio)
 
 	/* Initialize TLS session
 	 */
-	assert(gnutls_init(&session, GNUTLS_CLIENT | GNUTLS_NO_EXTENSIONS) >=
+	assert(gnutls_init(&session, GNUTLS_CLIENT | GNUTLS_NO_DEFAULT_EXTENSIONS) >=
 	       0);
 
 	assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);

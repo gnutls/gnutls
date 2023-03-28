@@ -219,7 +219,7 @@ as in the example below. The detailed form is documented on `doc/scripts/gdoc`.
  *
  * Note that since version 3.1.2 this function enables some common
  * TLS extensions such as session tickets and OCSP certificate status
- * request in client side by default. To prevent that use the %GNUTLS_NO_EXTENSIONS
+ * request in client side by default. To prevent that use the %GNUTLS_NO_DEFAULT_EXTENSIONS
  * flag.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, or a negative error code.

@@ -556,7 +556,7 @@ void _gnutls_handshake_internal_state_clear(gnutls_session_t session)
  *
  * Note that since version 3.1.2 this function enables some common
  * TLS extensions such as session tickets and OCSP certificate status
- * request in client side by default. To prevent that use the %GNUTLS_NO_EXTENSIONS
+ * request in client side by default. To prevent that use the %GNUTLS_NO_DEFAULT_EXTENSIONS
  * flag.
  *
  * Note that it is never mandatory to use gnutls_deinit() after this
@@ -718,7 +718,7 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 	}
 
 	/* Enable useful extensions */
-	if ((flags & GNUTLS_CLIENT) && !(flags & GNUTLS_NO_EXTENSIONS)) {
+	if ((flags & GNUTLS_CLIENT) && !(flags & GNUTLS_NO_DEFAULT_EXTENSIONS)) {
 #ifdef ENABLE_OCSP
 		if (!(flags & GNUTLS_NO_STATUS_REQUEST))
 			gnutls_ocsp_status_request_enable_client(*session, NULL,

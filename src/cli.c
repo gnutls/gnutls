@@ -1705,7 +1705,7 @@ static void cmd_parser(int argc, char **argv)
 	disable_sni = HAVE_OPT(DISABLE_SNI);
 	disable_extensions = HAVE_OPT(DISABLE_EXTENSIONS);
 	if (disable_extensions)
-		init_flags |= GNUTLS_NO_EXTENSIONS;
+		init_flags |= GNUTLS_NO_DEFAULT_EXTENSIONS;
 
 	if (HAVE_OPT(SINGLE_KEY_SHARE))
 		init_flags |= GNUTLS_KEY_SHARE_TOP;

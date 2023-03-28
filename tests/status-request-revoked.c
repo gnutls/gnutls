@@ -51,7 +51,7 @@ int main(void)
 # include "utils.h"
 
 /* This program tests that the client does not send the
- * status request extension if GNUTLS_NO_EXTENSIONS is set.
+ * status request extension if GNUTLS_NO_DEFAULT_EXTENSIONS is set.
  */
 
 static void server_log_func(int level, const char *str)
