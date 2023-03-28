@@ -196,7 +196,7 @@ _gnutls13_handshake_sign_data(gnutls_session_t session,
 
 	CRYPTO_AUDITING_STRING_DATA(session->internals.
 				    audit_context_stack.head->context, "name",
-				    "tls::certificate_verify");
+				    "tls::certificate_sign");
 	CRYPTO_AUDITING_WORD_DATA(session->internals.audit_context_stack.
 				  head->context, "tls::signature_algorithm",
 				  se->aid.id[0] << 8 | se->aid.id[1]);

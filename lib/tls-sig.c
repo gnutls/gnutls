@@ -100,7 +100,7 @@ _gnutls_handshake_sign_data12(gnutls_session_t session,
 
 	CRYPTO_AUDITING_STRING_DATA(session->internals.
 				    audit_context_stack.head->context, "name",
-				    "tls::certificate_verify");
+				    "tls::certificate_sign");
 	se = _gnutls_sign_to_entry(sign_algo);
 	if (likely(se != NULL)) {
 		CRYPTO_AUDITING_WORD_DATA(session->
@@ -169,7 +169,7 @@ _gnutls_handshake_sign_data10(gnutls_session_t session,
 
 	CRYPTO_AUDITING_STRING_DATA(session->internals.
 				    audit_context_stack.head->context, "name",
-				    "tls::certificate_verify");
+				    "tls::certificate_sign");
 	se = _gnutls_sign_to_entry(sign_algo);
 	if (likely(se != NULL)) {
 		CRYPTO_AUDITING_WORD_DATA(session->
@@ -957,7 +957,7 @@ _gnutls_handshake_sign_crt_vrfy(gnutls_session_t session,
 
 	CRYPTO_AUDITING_STRING_DATA(session->internals.
 				    audit_context_stack.head->context, "name",
-				    "tls::certificate_verify");
+				    "tls::certificate_sign");
 	/* TLS 1.2 */
 	if (_gnutls_version_has_selectable_sighash(ver)) {
 		ret = _gnutls_handshake_sign_crt_vrfy12(session, cert,
