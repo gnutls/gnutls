@@ -28,6 +28,14 @@
 # include "audit.h"
 # include <stdint.h>
 
+typedef enum {
+	GNUTLS_AUDIT_KX_ECDHE = 0,
+	GNUTLS_AUDIT_KX_DHE = 1,
+	GNUTLS_AUDIT_KX_PSK = 2,
+	GNUTLS_AUDIT_KX_ECDHE_PSK = 3,
+	GNUTLS_AUDIT_KX_DHE_PSK = 4
+} gnutls_audit_key_exchange_algorithm_t;
+
 typedef uint64_t gnutls_audit_context_t;
 
 extern gnutls_audit_context_t _gnutls_audit_lib_context;

@@ -315,8 +315,28 @@ server_use_key_share(gnutls_session_t session,
 	const gnutls_ecc_curve_entry_st *curve;
 	int ret;
 
+	ret =
+	    _gnutls_audit_push_context(&session->internals.audit_context_stack,
+				       (gnutls_audit_context_t)
+				       server_use_key_share);
+	if (ret < 0) {
+		return ret;
+	}
+
+	CRYPTO_AUDITING_STRING_DATA(session->internals.
+				    audit_context_stack.head->context, "name",
+				    "tls::key_exchange");
+
+	CRYPTO_AUDITING_WORD_DATA(session->internals.audit_context_stack.
+				  head->context, "tls::group",
+				  group->tls_id);
+
 	if (group->pk == GNUTLS_PK_EC) {
 		gnutls_pk_params_st pub;
+
+		CRYPTO_AUDITING_WORD_DATA(session->internals.audit_context_stack.
+					  head->context, "tls::key_exchange_algorithm",
+					  GNUTLS_AUDIT_KX_ECDHE);
 
 		gnutls_pk_params_release(&session->key.kshare.ecdh_params);
 		gnutls_pk_params_init(&session->key.kshare.ecdh_params);
@@ -325,25 +345,31 @@ server_use_key_share(gnutls_session_t session,
 
 		gnutls_pk_params_init(&pub);
 
-		if (curve->size * 2 + 1 != data_size)
-			return
+		if (curve->size * 2 + 1 != data_size) {
+			ret =
 			    gnutls_assert_val
 			    (GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+			goto cleanup;
+		}
 
 		/* generate our key */
 		ret =
 		    _gnutls_pk_generate_keys(curve->pk, curve->id,
 					     &session->key.kshare.ecdh_params,
 					     1);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
 
 		/* read the public key */
 		ret = _gnutls_ecc_ansi_x962_import(data, data_size,
 						   &pub.params[ECC_X],
 						   &pub.params[ECC_Y]);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
 
 		pub.algo = group->pk;
 		pub.curve = curve->id;
@@ -356,7 +382,8 @@ server_use_key_share(gnutls_session_t session,
 					    &pub);
 		gnutls_pk_params_release(&pub);
 		if (ret < 0) {
-			return gnutls_assert_val(ret);
+			gnutls_assert();
+			goto cleanup;
 		}
 
 		ret = 0;
@@ -365,23 +392,31 @@ server_use_key_share(gnutls_session_t session,
 		   group->pk == GNUTLS_PK_ECDH_X448) {
 		gnutls_pk_params_st pub;
 
+		CRYPTO_AUDITING_WORD_DATA(session->internals.audit_context_stack.
+					  head->context, "tls::key_exchange_algorithm",
+					  GNUTLS_AUDIT_KX_ECDHE);
+
 		gnutls_pk_params_release(&session->key.kshare.ecdhx_params);
 		gnutls_pk_params_init(&session->key.kshare.ecdhx_params);
 
 		curve = _gnutls_ecc_curve_get_params(group->curve);
 
-		if (curve->size != data_size)
-			return
+		if (curve->size != data_size) {
+			ret =
 			    gnutls_assert_val
 			    (GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+			goto cleanup;
+		}
 
 		/* generate our key */
 		ret =
 		    _gnutls_pk_generate_keys(curve->pk, curve->id,
 					     &session->key.kshare.ecdhx_params,
 					     1);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
 
 		/* read the public key and generate shared */
 		gnutls_pk_params_init(&pub);
@@ -400,7 +435,8 @@ server_use_key_share(gnutls_session_t session,
 					    &session->key.kshare.ecdhx_params,
 					    &pub);
 		if (ret < 0) {
-			return gnutls_assert_val(ret);
+			gnutls_assert();
+			goto cleanup;
 		}
 
 		ret = 0;
@@ -408,14 +444,20 @@ server_use_key_share(gnutls_session_t session,
 	} else if (group->pk == GNUTLS_PK_DH) {
 		gnutls_pk_params_st pub;
 
+		CRYPTO_AUDITING_WORD_DATA(session->internals.audit_context_stack.
+					  head->context, "tls::key_exchange_algorithm",
+					  GNUTLS_AUDIT_KX_DHE);
+
 		/* we need to initialize the group parameters first */
 		gnutls_pk_params_release(&session->key.kshare.dh_params);
 		gnutls_pk_params_init(&session->key.kshare.dh_params);
 
-		if (data_size != group->prime->size)
-			return
+		if (data_size != group->prime->size) {
+			ret =
 			    gnutls_assert_val
 			    (GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+			goto cleanup;
+		}
 
 		/* set group params */
 		ret =
@@ -423,29 +465,35 @@ server_use_key_share(gnutls_session_t session,
 					     dh_params.params[DH_G],
 					     group->generator->data,
 					     group->generator->size);
-		if (ret < 0)
-			return
+		if (ret < 0) {
+			ret =
 			    gnutls_assert_val
 			    (GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+			goto cleanup;
+		}
 
 		ret =
 		    _gnutls_mpi_init_scan_nz(&session->key.kshare.
 					     dh_params.params[DH_P],
 					     group->prime->data,
 					     group->prime->size);
-		if (ret < 0)
-			return
+		if (ret < 0) {
+			ret =
 			    gnutls_assert_val
 			    (GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+			goto cleanup;
+		}
 
 		ret =
 		    _gnutls_mpi_init_scan_nz(&session->key.kshare.
 					     dh_params.params[DH_Q],
 					     group->q->data, group->q->size);
-		if (ret < 0)
-			return
+		if (ret < 0) {
+			ret =
 			    gnutls_assert_val
 			    (GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+			goto cleanup;
+		}
 
 		session->key.kshare.dh_params.algo = GNUTLS_PK_DH;
 		session->key.kshare.dh_params.qbits = *group->q_bits;
@@ -455,18 +503,22 @@ server_use_key_share(gnutls_session_t session,
 		ret =
 		    _gnutls_pk_generate_keys(group->pk, 0,
 					     &session->key.kshare.dh_params, 1);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
 
 		/* read the public key and generate shared */
 		gnutls_pk_params_init(&pub);
 
 		ret = _gnutls_mpi_init_scan_nz(&pub.params[DH_Y],
 					       data, data_size);
-		if (ret < 0)
-			return
+		if (ret < 0) {
+			ret =
 			    gnutls_assert_val
 			    (GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+			goto cleanup;
+		}
 
 		pub.algo = group->pk;
 
@@ -476,16 +528,22 @@ server_use_key_share(gnutls_session_t session,
 					    &session->key.kshare.dh_params,
 					    &pub);
 		_gnutls_mpi_release(&pub.params[DH_Y]);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
 
 		ret = 0;
 	} else {
-		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+		ret = gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+		goto cleanup;
 	}
 
 	_gnutls_debug_log("EXT[%p]: server generated %s shared key\n", session,
 			  group->name);
+
+ cleanup:
+	_gnutls_audit_pop_context(&session->internals.audit_context_stack);
 
 	return ret;
 }
@@ -500,30 +558,56 @@ client_use_key_share(gnutls_session_t session,
 	const gnutls_ecc_curve_entry_st *curve;
 	int ret;
 
+	ret =
+	    _gnutls_audit_push_context(&session->internals.audit_context_stack,
+				       (gnutls_audit_context_t)
+				       client_use_key_share);
+	if (ret < 0) {
+		return ret;
+	}
+
+	CRYPTO_AUDITING_STRING_DATA(session->internals.
+				    audit_context_stack.head->context, "name",
+				    "tls::key_exchange");
+
+	CRYPTO_AUDITING_WORD_DATA(session->internals.audit_context_stack.
+				  head->context, "tls::group",
+				  group->tls_id);
+
 	if (group->pk == GNUTLS_PK_EC) {
 		gnutls_pk_params_st pub;
+
+		CRYPTO_AUDITING_WORD_DATA(session->internals.audit_context_stack.
+					  head->context, "tls::key_exchange_algorithm",
+					  GNUTLS_AUDIT_KX_ECDHE);
 
 		curve = _gnutls_ecc_curve_get_params(group->curve);
 
 		gnutls_pk_params_init(&pub);
 
 		if (session->key.kshare.ecdh_params.algo != group->pk
-		    || session->key.kshare.ecdh_params.curve != curve->id)
-			return
+		    || session->key.kshare.ecdh_params.curve != curve->id) {
+			ret =
 			    gnutls_assert_val
 			    (GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+			goto cleanup;
+		}
 
-		if (curve->size * 2 + 1 != data_size)
-			return
+		if (curve->size * 2 + 1 != data_size) {
+			ret =
 			    gnutls_assert_val
 			    (GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+			goto cleanup;
+		}
 
 		/* read the server's public key */
 		ret = _gnutls_ecc_ansi_x962_import(data, data_size,
 						   &pub.params[ECC_X],
 						   &pub.params[ECC_Y]);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
 
 		pub.algo = group->pk;
 		pub.curve = curve->id;
@@ -536,7 +620,8 @@ client_use_key_share(gnutls_session_t session,
 					    &pub);
 		gnutls_pk_params_release(&pub);
 		if (ret < 0) {
-			return gnutls_assert_val(ret);
+			gnutls_assert();
+			goto cleanup;
 		}
 
 		ret = 0;
@@ -545,18 +630,26 @@ client_use_key_share(gnutls_session_t session,
 		   group->pk == GNUTLS_PK_ECDH_X448) {
 		gnutls_pk_params_st pub;
 
+		CRYPTO_AUDITING_WORD_DATA(session->internals.audit_context_stack.
+					  head->context, "tls::key_exchange_algorithm",
+					  GNUTLS_AUDIT_KX_ECDHE);
+
 		curve = _gnutls_ecc_curve_get_params(group->curve);
 
 		if (session->key.kshare.ecdhx_params.algo != group->pk
-		    || session->key.kshare.ecdhx_params.curve != curve->id)
-			return
+		    || session->key.kshare.ecdhx_params.curve != curve->id) {
+			ret =
 			    gnutls_assert_val
 			    (GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+			goto cleanup;
+		}
 
-		if (curve->size != data_size)
-			return
+		if (curve->size != data_size) {
+			ret =
 			    gnutls_assert_val
 			    (GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+			goto cleanup;
+		}
 
 		/* read the public key and generate shared */
 		gnutls_pk_params_init(&pub);
@@ -575,7 +668,8 @@ client_use_key_share(gnutls_session_t session,
 					    &session->key.kshare.ecdhx_params,
 					    &pub);
 		if (ret < 0) {
-			return gnutls_assert_val(ret);
+			gnutls_assert();
+			goto cleanup;
 		}
 
 		ret = 0;
@@ -583,26 +677,36 @@ client_use_key_share(gnutls_session_t session,
 	} else if (group->pk == GNUTLS_PK_DH) {
 		gnutls_pk_params_st pub;
 
-		if (session->key.kshare.dh_params.algo != group->pk
-		    || session->key.kshare.dh_params.dh_group != group->id)
-			return
-			    gnutls_assert_val
-			    (GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+		CRYPTO_AUDITING_WORD_DATA(session->internals.audit_context_stack.
+					  head->context, "tls::key_exchange_algorithm",
+					  GNUTLS_AUDIT_KX_DHE);
 
-		if (data_size != group->prime->size)
-			return
+		if (session->key.kshare.dh_params.algo != group->pk
+		    || session->key.kshare.dh_params.dh_group != group->id) {
+			ret =
 			    gnutls_assert_val
 			    (GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+			goto cleanup;
+		}
+
+		if (data_size != group->prime->size) {
+			ret =
+			    gnutls_assert_val
+			    (GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+			goto cleanup;
+		}
 
 		/* read the public key and generate shared */
 		gnutls_pk_params_init(&pub);
 
 		ret = _gnutls_mpi_init_scan_nz(&pub.params[DH_Y],
 					       data, data_size);
-		if (ret < 0)
-			return
+		if (ret < 0) {
+			ret =
 			    gnutls_assert_val
 			    (GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+			goto cleanup;
+		}
 
 		pub.algo = group->pk;
 
@@ -612,17 +716,22 @@ client_use_key_share(gnutls_session_t session,
 					    &session->key.kshare.dh_params,
 					    &pub);
 		_gnutls_mpi_release(&pub.params[DH_Y]);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
 
 		ret = 0;
 	} else {
-		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+		ret = gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+		goto cleanup;
 	}
 
 	_gnutls_debug_log("EXT[%p]: client generated %s shared key\n", session,
 			  group->name);
 
+ cleanup:
+	_gnutls_audit_pop_context(&session->internals.audit_context_stack);
 	return ret;
 }
 
