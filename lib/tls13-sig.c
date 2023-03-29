@@ -85,8 +85,6 @@ _gnutls13_handshake_verify_data(gnutls_session_t session,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	_gnutls_buffer_init(&buf);
-
 	ret =
 	    _gnutls_audit_push_context(&session->internals.audit_context_stack,
 				       (gnutls_audit_context_t)
@@ -101,6 +99,8 @@ _gnutls13_handshake_verify_data(gnutls_session_t session,
 	CRYPTO_AUDITING_WORD_DATA(session->internals.audit_context_stack.
 				  head->context, "tls::signature_algorithm",
 				  se->aid.id[0] << 8 | se->aid.id[1]);
+
+	_gnutls_buffer_init(&buf);
 
 	memset(prefix, 0x20, sizeof(prefix));
 	ret = _gnutls_buffer_append_data(&buf, prefix, sizeof(prefix));
@@ -184,8 +184,6 @@ _gnutls13_handshake_sign_data(gnutls_session_t session,
 	    ("HSK[%p]: signing TLS 1.3 handshake data: using %s and PRF: %s\n",
 	     session, se->name, session->security_parameters.prf->name);
 
-	_gnutls_buffer_init(&buf);
-
 	ret =
 	    _gnutls_audit_push_context(&session->internals.audit_context_stack,
 				       (gnutls_audit_context_t)
@@ -200,6 +198,8 @@ _gnutls13_handshake_sign_data(gnutls_session_t session,
 	CRYPTO_AUDITING_WORD_DATA(session->internals.audit_context_stack.
 				  head->context, "tls::signature_algorithm",
 				  se->aid.id[0] << 8 | se->aid.id[1]);
+
+	_gnutls_buffer_init(&buf);
 
 	ret = _gnutls_buffer_resize(&buf, PREFIX_SIZE);
 	if (ret < 0) {
