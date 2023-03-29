@@ -93,6 +93,29 @@ static int calc_ecdh_key(gnutls_session_t session,
 	gnutls_pk_params_st pub;
 	int ret;
 	gnutls_datum_t tmp_dh_key;
+	const gnutls_group_entry_st *group;
+
+	group = _gnutls_id_to_group(ecurve->group);
+
+	ret =
+	    _gnutls_audit_push_context(&session->internals.audit_context_stack,
+				       (gnutls_audit_context_t)
+				       calc_ecdh_key);
+	if (ret < 0) {
+		return ret;
+	}
+
+	CRYPTO_AUDITING_STRING_DATA(session->internals.
+				    audit_context_stack.head->context, "name",
+				    "tls::key_exchange");
+
+	CRYPTO_AUDITING_WORD_DATA(session->internals.audit_context_stack.
+				  head->context, "tls::group",
+				  group->tls_id);
+
+	CRYPTO_AUDITING_WORD_DATA(session->internals.audit_context_stack.
+				  head->context, "tls::key_exchange_algorithm",
+				  GNUTLS_AUDIT_KX_ECDHE);
 
 	gnutls_pk_params_init(&pub);
 	pub.params[ECC_X] = session->key.proto.tls12.ecdh.x;
@@ -131,6 +154,7 @@ static int calc_ecdh_key(gnutls_session_t session,
 	_gnutls_mpi_release(&session->key.proto.tls12.ecdh.y);
 	_gnutls_free_datum(&session->key.proto.tls12.ecdh.raw);
 	gnutls_pk_params_release(&session->key.proto.tls12.ecdh.params);
+	_gnutls_audit_pop_context(&session->internals.audit_context_stack);
 	return ret;
 }
 
