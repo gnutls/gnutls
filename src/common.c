@@ -545,12 +545,14 @@ int print_info(gnutls_session_t session, int verbose, int flags)
 		if (gnutls_psk_client_get_hint(session) != NULL)
 			log_msg(stdout, "- PSK authentication. PSK hint '%s'\n",
 				gnutls_psk_client_get_hint(session));
-		/* This returns NULL in client side.
+		/* This returns an error in client side.
 		 */
-		if (gnutls_psk_server_get_username(session) != NULL)
+		rc = gnutls_psk_server_get_username2(session, &p);
+		if (rc == 0) {
 			log_msg(stdout,
-				"- PSK authentication. Connected as '%s'\n",
-				gnutls_psk_server_get_username(session));
+				"- PSK authentication. Connected as '%.*s'\n",
+				p.size, p.data);
+		}
 		if (kx == GNUTLS_KX_DHE_PSK)
 			print_dh_info(session, "Ephemeral ", verbose);
 		if (kx == GNUTLS_KX_ECDHE_PSK)

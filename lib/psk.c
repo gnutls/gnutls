@@ -476,8 +476,7 @@ const char *gnutls_psk_server_get_username(gnutls_session_t session)
 	if (info == NULL)
 		return NULL;
 
-	if (info->username[0] != 0
-	    && !_gnutls_has_embedded_null(info->username, info->username_len))
+	if (info->username && !memchr(info->username, '\0', info->username_len))
 		return info->username;
 
 	return NULL;

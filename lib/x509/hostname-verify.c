@@ -220,7 +220,7 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 		if (ret == GNUTLS_SAN_DNSNAME) {
 			found_dnsname = 1;
 
-			if (_gnutls_has_embedded_null(dnsname, dnsnamesize)) {
+			if (memchr(dnsname, '\0', dnsnamesize)) {
 				_gnutls_debug_log
 				    ("certificate has %s with embedded null in name\n",
 				     dnsname);
@@ -274,7 +274,7 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 			goto cleanup;
 		}
 
-		if (_gnutls_has_embedded_null(dnsname, dnsnamesize)) {
+		if (memchr(dnsname, '\0', dnsnamesize)) {
 			_gnutls_debug_log
 			    ("certificate has CN %s with embedded null in name\n",
 			     dnsname);
