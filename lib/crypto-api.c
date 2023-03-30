@@ -2218,6 +2218,16 @@ gnutls_pbkdf2(gnutls_mac_algorithm_t mac,
 		not_approved = true;
 	}
 
+	/* Minimum salt length of 128 bits (SP 800-132 5.1) */
+	if (salt->size < 16) {
+		not_approved = true;
+	}
+
+	/* Minimum iterations bound (SP 800-132 5.2) */
+	if (iter_count < 1000) {
+		not_approved = true;
+	}
+
 	ret = _gnutls_kdf_ops.pbkdf2(mac, key->data, key->size,
 				     salt->data, salt->size, iter_count,
 				     output, length);
