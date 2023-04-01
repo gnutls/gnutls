@@ -408,6 +408,30 @@ int hello_ext_send(void *_ctx, gnutls_buffer_st * buf)
 	return 0;
 }
 
+static inline void swap_exts(extensions_t * exts1, extensions_t * exts2)
+{
+	extensions_t temp = *exts1;
+	*exts1 = *exts2;
+	*exts2 = temp;
+}
+
+static
+int shuffle_exts(extensions_t * exts, size_t size)
+{
+	/* generating random permutation of extensions */
+	extensions_t rnd_n;
+	for (size_t i = size - 1; i > 0; i--) {
+		int ret = gnutls_rnd(GNUTLS_RND_RANDOM, (void *)&rnd_n,
+				     sizeof(extensions_t));
+		if (ret < 0)
+			return ret;
+		extensions_t j = rnd_n % (i + 1);
+		swap_exts(&exts[i], &exts[j]);
+	}
+
+	return 0;
+}
+
 int
 _gnutls_gen_hello_extensions(gnutls_session_t session,
 			     gnutls_buffer_st * buf,
@@ -446,9 +470,32 @@ _gnutls_gen_hello_extensions(gnutls_session_t session,
 			     ret - 4);
 	}
 
+	/* To shuffle extension sending order */
+	extensions_t shuffled_exts[MAX_EXT_TYPES];
+
+	/* Initializing extensions array */
+	for (i = 0; i < MAX_EXT_TYPES; i++) {
+		shuffled_exts[i] = i;
+	}
+
+	/* ordering dumbfw and pre_shared_key as last extensions */
+	swap_exts(&shuffled_exts[MAX_EXT_TYPES - 2],
+		  &shuffled_exts[GNUTLS_EXTENSION_DUMBFW]);
+	swap_exts(&shuffled_exts[MAX_EXT_TYPES - 1],
+		  &shuffled_exts[GNUTLS_EXTENSION_PRE_SHARED_KEY]);
+
+	if (session->internals.priorities->no_exts_shuffle == 1)
+		goto next;
+
+	ret = shuffle_exts(shuffled_exts, MAX_EXT_TYPES - 2);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+ next:
 	/* hello_ext_send() ensures we don't send duplicates, in case
 	 * of overridden extensions */
-	for (i = 0; i < MAX_EXT_TYPES; i++) {
+	for (size_t r = 0; r < MAX_EXT_TYPES; r++) {
+		i = shuffled_exts[r];
 		if (!extfunc[i])
 			continue;
 
