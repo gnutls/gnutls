@@ -43,4 +43,4 @@ NEW_PADDING, dummy_func
 DEBUG_ALLOW_KEY_USAGE_VIOLATIONS, enable_server_key_usage_violations
 ALLOW_SMALL_RECORDS, enable_allow_small_records
 DISABLE_TLS13_COMPAT_MODE, disable_tls13_compat_mode
-NO_EXTS_SHUFFLE, enable_no_exts_shuffle
+NO_SHUFFLE_EXTENSIONS, enable_no_shuffle_extensions
