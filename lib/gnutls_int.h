@@ -948,6 +948,9 @@ struct gnutls_priority_st {
 	/* to disable record padding */
 	bool no_extensions;
 
+	/* to disable extensions shuffling */
+	bool no_exts_shuffle;
+
 	safe_renegotiation_t sr;
 	bool min_record_version;
 	bool server_precedence;

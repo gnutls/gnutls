@@ -183,9 +183,9 @@ static void client(int sds[])
 		 */
 		gnutls_init(&session, GNUTLS_CLIENT);
 
-		/* Use default priorities */
+		/* Use default priorities, sets %NO_EXTS_SHUFFLE */
 		ret = gnutls_priority_set_direct(session,
-						 "NONE:+VERS-TLS1.3:+AES-256-GCM:+AEAD:+SIGN-RSA-PSS-RSAE-SHA384:+GROUP-SECP256R1",
+						 "NONE:+VERS-TLS1.3:+AES-256-GCM:+AEAD:+SIGN-RSA-PSS-RSAE-SHA384:+GROUP-SECP256R1:%NO_EXTS_SHUFFLE",
 						 &err);
 		if (ret < 0) {
 			fail("client: priority set failed (%s): %s\n",
