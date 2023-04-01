@@ -5,6 +5,15 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.8.1 (unreleased)
+
+** libgnutls: ClientHello extensions are randomized by default
+   To make fingerprinting harder, TLS extensions in ClientHello
+   messages are shuffled. As this behavior may cause compatibility
+   issue with legacy applications that do not accept the last
+   extension without payload, the behavior can be reverted with the
+   %NO_SHUFFLE_EXTENSIONS priority keyword.
+
 * Version 3.8.0 (released 2023-02-09)
 
 ** libgnutls: Fix a Bleichenbacher oracle in the TLS RSA key exchange.

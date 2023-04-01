@@ -1552,6 +1552,10 @@ that TLS 1.2 requires extensions to be used, as well as safe
 renegotiation thus this option must be used with care. When this option
 is set no versions later than TLS1.2 can be negotiated.
 
+@item %NO_SHUFFLE_EXTENSIONS @tab
+will prevent randomizing the order of ClientHello extensions. By
+default, those extensions are randomized to make fingerprinting harder.
+
 @item %NO_STATUS_REQUEST @tab
 will prevent sending of the TLS status_request extension in client side.
 
