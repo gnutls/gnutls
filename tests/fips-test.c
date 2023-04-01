@@ -450,7 +450,7 @@ void doit(void)
 
 	/* PBKDF2 with key equal to or longer than 112 bits: approved */
 	FIPS_PUSH_CONTEXT();
-	ret = gnutls_pbkdf2(GNUTLS_MAC_SHA256, &key, &iv, 100,
+	ret = gnutls_pbkdf2(GNUTLS_MAC_SHA256, &key, &iv, 1000,
 			    &pbkdf2, sizeof(pbkdf2));
 	if (ret < 0) {
 		fail("gnutls_pbkdf2 failed\n");
@@ -460,7 +460,7 @@ void doit(void)
 	/* PBKDF2 with key shorter than 112 bits: not approved */
 	FIPS_PUSH_CONTEXT();
 	key.size = 13;
-	ret = gnutls_pbkdf2(GNUTLS_MAC_SHA256, &key, &iv, 100,
+	ret = gnutls_pbkdf2(GNUTLS_MAC_SHA256, &key, &iv, 1000,
 			    &pbkdf2, sizeof(pbkdf2));
 	if (ret < 0) {
 		fail("gnutls_pbkdf2 failed\n");
@@ -468,9 +468,29 @@ void doit(void)
 	key.size = sizeof(key16);
 	FIPS_POP_CONTEXT(NOT_APPROVED);
 
+	/* PBKDF2 with iteration count lower than 1000: not approved */
+	FIPS_PUSH_CONTEXT();
+	ret = gnutls_pbkdf2(GNUTLS_MAC_SHA256, &key, &iv, 999,
+			    &pbkdf2, sizeof(pbkdf2));
+	if (ret < 0) {
+		fail("gnutls_pbkdf2 failed\n");
+	}
+	FIPS_POP_CONTEXT(NOT_APPROVED);
+
+	/* PBKDF2 with salt shorter than 16 bytes: not approved */
+	FIPS_PUSH_CONTEXT();
+	iv.size = 13;
+	ret = gnutls_pbkdf2(GNUTLS_MAC_SHA256, &key, &iv, 1000,
+			    &pbkdf2, sizeof(pbkdf2));
+	if (ret < 0) {
+		fail("gnutls_pbkdf2 failed\n");
+	}
+	iv.size = sizeof(iv16);
+	FIPS_POP_CONTEXT(NOT_APPROVED);
+
 	/* PBKDF2 with output shorter than 112 bits: not approved */
 	FIPS_PUSH_CONTEXT();
-	ret = gnutls_pbkdf2(GNUTLS_MAC_SHA256, &key, &iv, 100, &pbkdf2, 13);
+	ret = gnutls_pbkdf2(GNUTLS_MAC_SHA256, &key, &iv, 1000, &pbkdf2, 13);
 	if (ret < 0) {
 		fail("gnutls_pbkdf2 failed\n");
 	}
