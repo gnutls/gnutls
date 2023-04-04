@@ -306,6 +306,11 @@
           "description": "The data used as HTTP response",
           "file-exists": true,
           "argument-type": "file"
+        },
+        {
+          "long-option": "timeout",
+          "description": "The timeout period for server",
+          "argument-type": "number"
         }
       ]
     }

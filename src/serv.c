@@ -98,7 +98,7 @@ gnutls_datum_t session_ticket_key;
 gnutls_anti_replay_t anti_replay;
 int record_max_size;
 const char *http_data_file = NULL;
-static void tcp_server(const char *name, int port);
+static void tcp_server(const char *name, int port, int timeout);
 
 /* end of globals */
 
@@ -1174,7 +1174,7 @@ static void tls_audit_log_func(gnutls_session_t session, const char *str)
 
 int main(int argc, char **argv)
 {
-	int ret, mtu, port;
+	int ret, mtu, port, timeout;
 	char name[256];
 	int cert_set = 0;
 	unsigned use_static_dh_params = 0;
@@ -1465,10 +1465,15 @@ int main(int argc, char **argv)
 	else
 		port = 5556;
 
+	if (HAVE_OPT(TIMEOUT))
+		timeout = OPT_VALUE_TIMEOUT;
+	else
+		timeout = 30;
+
 	if (HAVE_OPT(UDP))
 		udp_server(name, port, mtu);
 	else
-		tcp_server(name, port);
+		tcp_server(name, port, timeout);
 
 	return 0;
 }
@@ -1540,7 +1545,7 @@ static void try_rehandshake(listener_item * j)
 	}
 }
 
-static void tcp_server(const char *name, int port)
+static void tcp_server(const char *name, int port, int timeout)
 {
 	int n, s;
 	char topbuf[512];
@@ -1584,7 +1589,7 @@ static void tcp_server(const char *name, int port)
 				exit(1);
 			}
 #endif
-			if (j->start != 0 && now - j->start > 30) {
+			if (j->start != 0 && now - j->start > timeout) {
 				if (verbose != 0) {
 					fprintf(stderr,
 						"Scheduling inactive connection for close\n");
