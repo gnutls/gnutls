@@ -172,7 +172,7 @@ export TZ="UTC"
 
 skip_if_no_datefudge
 
-datefudge -s "2020-01-20 10:00:00" ${VALGRIND} \
+gnutls_timewrapper_standalone static "2020-01-20 10:00:00" ${VALGRIND} \
 	"${CERTTOOL}" --generate-crl --load-ca-privkey "${srcdir}/data/template-test.key" \
 	--load-ca-certificate "${srcdir}/data/template-test.pem" \
 	--load-certificate "${srcdir}/data/ca-certs.pem" --template \
@@ -194,7 +194,7 @@ fi
 
 if test "${ac_cv_sizeof_time_t}" = 8;then
 	# we should test that on systems which have 64-bit time_t
-	datefudge -s "2138-01-20 10:00:00" ${VALGRIND} \
+	gnutls_timewrapper_standalone static "2138-01-20 10:00:00" ${VALGRIND} \
 		"${CERTTOOL}" --generate-crl --load-ca-privkey "${srcdir}/data/template-test.key" \
 		--load-ca-certificate "${srcdir}/data/template-test.pem" \
 		--load-certificate "${srcdir}/data/ca-certs.pem" --template \

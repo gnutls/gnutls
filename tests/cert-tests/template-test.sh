@@ -38,10 +38,10 @@ skip_if_no_datefudge
 echo "Running test for ${ac_cv_sizeof_time_t}-byte time_t"
 
 # Note that in rare cases this test may fail because the
-# time set using datefudge could have changed since the generation
+# time set using faketime/datefudge could have changed since the generation
 # (if example the system was busy)
 
-datefudge -s "2007-04-22" \
+gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-test.tmpl" \
@@ -58,7 +58,7 @@ fi
 
 rm -f ${TMPFILE}
 
-datefudge -s "2007-04-22" \
+gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-utf8.tmpl" \
@@ -75,7 +75,7 @@ fi
 
 rm -f ${TMPFILE}
 
-datefudge -s "2007-04-22" \
+gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-dn.tmpl" \
@@ -94,7 +94,7 @@ rm -f ${TMPFILE}
 
 echo "Running test for certificate generation with --generate-self-signed"
 
-datefudge -s "2007-04-22" \
+gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
 	"${CERTTOOL}" --generate-certificate \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--load-ca-privkey "${srcdir}/../../doc/credentials/x509/ca-key.pem" \
@@ -113,7 +113,7 @@ fi
 
 rm -f ${TMPFILE}
 
-datefudge -s "2007-04-22" \
+gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-dn-err.tmpl" \
@@ -127,7 +127,7 @@ fi
 
 rm -f ${TMPFILE}
 
-datefudge -s "2007-04-22" \
+gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-overflow.tmpl" \
@@ -146,7 +146,7 @@ rm -f ${TMPFILE}
 
 # The following test works in 64-bit systems
 
-datefudge -s "2007-04-22" \
+gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-overflow2.tmpl" \
@@ -176,7 +176,7 @@ else
 fi
 rm -f ${TMPFILE}
 
-datefudge -s "2007-04-22" \
+gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-date.tmpl" \
@@ -193,7 +193,7 @@ fi
 
 rm -f ${TMPFILE}
 
-datefudge -s "2007-04-22" \
+gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-dates-after2038.tmpl" \
@@ -223,7 +223,7 @@ rm -f ${TMPFILE}
 
 # Test name constraints generation
 
-datefudge -s "2007-04-22" \
+gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-nc.tmpl" \
@@ -244,7 +244,7 @@ rm -f ${TMPFILE}
 # Test the GeneralizedTime support
 if test "${ac_cv_sizeof_time_t}" = 8;then
 	# we should test that on systems which have 64-bit time_t.
-	datefudge -s "2051-04-22" \
+	gnutls_timewrapper_standalone static "2051-04-22 00:00:00" \
 			"${CERTTOOL}" --generate-self-signed \
 				--load-privkey "${srcdir}/data/template-test.key" \
 				--template "${srcdir}/templates/template-generalized.tmpl" \
@@ -264,7 +264,7 @@ rm -f ${TMPFILE}
 
 # Test unique ID field generation
 
-datefudge -s "2007-04-22" \
+gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-unique.tmpl" \
@@ -283,7 +283,7 @@ rm -f ${TMPFILE}
 
 # Test generation with very long dns names
 
-datefudge -s "2007-04-22" \
+gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-long-dns.tmpl" \
@@ -302,7 +302,7 @@ rm -f ${TMPFILE}
 
 # Test generation with larger serial number
 
-datefudge -s "2007-04-22" \
+gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-long-serial.tmpl" \

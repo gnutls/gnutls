@@ -173,7 +173,7 @@ export TZ="UTC"
 
 skip_if_no_datefudge
 
-cat "${srcdir}/../certs/cert-ecc256.pem" "${srcdir}/../certs/ca-cert-ecc.pem"|datefudge "2012-11-22" \
+cat "${srcdir}/../certs/cert-ecc256.pem" "${srcdir}/../certs/ca-cert-ecc.pem"|gnutls_timewrapper_standalone "2012-11-22" \
 ${VALGRIND} "${CERTTOOL}" --verify-chain
 rc=$?
 

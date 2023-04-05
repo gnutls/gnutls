@@ -85,7 +85,8 @@ and mbedtls.
 
 * [Valgrind](https://valgrind.org/) (optional)
 * [Libasan](https://gcc.gnu.org//) (optional)
-* [datefudge](https://packages.debian.org/datefudge) (optional)
+* [faketime](https://github.com/wolfcw/libfaketime) (preferred) or
+  [datefudge](https://packages.debian.org/datefudge) (optional)
 * [nodejs](https://nodejs.org/) (needed for certain test cases)
 * [softhsm](https://www.opendnssec.org/softhsm/) (for testing smart card support)
 * [dieharder](https://www.phy.duke.edu/~rgb/General/dieharder.php) (for testing PRNG)
@@ -95,7 +96,7 @@ and mbedtls.
 
 Debian/Ubuntu:
 ```
-apt-get install -y valgrind nodejs softhsm2 datefudge lcov libssl-dev libcmocka-dev expect libev-dev
+apt-get install -y valgrind nodejs softhsm2 faketime lcov libssl-dev libcmocka-dev expect libev-dev
 apt-get install -y dieharder openssl abigail-tools socat net-tools ppp util-linux
 ```
 
@@ -107,7 +108,7 @@ apt-get install -y v libubsan0 libasan1
 
 Fedora/RHEL:
 ```
-yum install -y valgrind libasan libasan-static libubsan nodejs softhsm datefudge lcov openssl-devel expect libev-devel
+yum install -y valgrind libasan libasan-static libubsan nodejs softhsm faketime lcov openssl-devel expect libev-devel
 yum install -y dieharder mbedtls-utils openssl libabigail libcmocka-devel socat util-linux
 ```
 

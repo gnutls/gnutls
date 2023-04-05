@@ -35,13 +35,13 @@ export TZ="UTC"
 skip_if_no_datefudge
 
 # Note that in rare cases this test may fail because the
-# time set using datefudge could have changed since the generation
+# time set using faketime/datefudge could have changed since the generation
 # (if example the system was busy)
 
 # Test SHA3 signatures
 
 for i in sha3-224 sha3-256 sha3-384 sha3-512;do
-datefudge -s "2007-04-22" \
+gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
 "${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-test.tmpl" \
@@ -59,7 +59,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-datefudge -s "2007-04-25" \
+gnutls_timewrapper_standalone static "2007-04-25 00:00:00" \
 	"${CERTTOOL}" --load-ca-certificate "${TMPFILE}" --verify --infile "${TMPFILE}" >/dev/null 2>&1
 rc=$?
 if test "${rc}" != "0"; then
@@ -71,7 +71,7 @@ done
 # Test SHA3 signatures with ECDSA
 
 for i in sha3-224 sha3-256 sha3-384 sha3-512;do
-datefudge -s "2007-04-22" \
+gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
 "${CERTTOOL}" --generate-self-signed \
 	--load-privkey "${srcdir}/data/template-test-ecc.key" \
 	--template "${srcdir}/templates/template-test.tmpl" \
@@ -83,7 +83,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-datefudge -s "2007-04-25" \
+gnutls_timewrapper_standalone static "2007-04-25 00:00:00" \
 	"${CERTTOOL}" --load-ca-certificate "${TMPFILE}" --verify --infile "${TMPFILE}" >/dev/null 2>&1
 rc=$?
 if test "${rc}" != "0"; then

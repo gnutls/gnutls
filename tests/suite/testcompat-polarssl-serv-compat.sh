@@ -39,7 +39,7 @@ if test "${GNUTLS_FORCE_FIPS_MODE}" = 1;then
 	exit 77
 fi
 
-# Check for datefudge
+# Check for faketime/datefudge
 . "${srcdir}/../scripts/common.sh"
 
 skip_if_no_datefudge
@@ -50,7 +50,7 @@ if test $? = 0; then
 	exit 77
 fi
 
-timeout 1800 datefudge "2012-09-02" \
+gnutls_timewrapper_standalone "2012-09-02" timeout 1800 \
 "${srcdir}/testcompat-polarssl-serv-common.sh" ":%COMPAT"
 
 ret=$?

@@ -37,7 +37,7 @@ skip_if_no_datefudge
 
 # Test MD5 signatures
 
-datefudge -s "2016-04-15" \
+gnutls_timewrapper_standalone static "2016-04-15 00:00:00" \
 	"${CERTTOOL}" --verify-chain --infile "${srcdir}/data/chain-md5.pem" >/dev/null 2>&1
 rc=$?
 if test "${rc}" != "1"; then
@@ -45,7 +45,7 @@ if test "${rc}" != "1"; then
 	exit ${rc}
 fi
 
-datefudge -s "2016-04-15" \
+gnutls_timewrapper_standalone static "2016-04-15 00:00:00" \
 	"${CERTTOOL}" --verify-allow-broken --verify-chain --infile "${srcdir}/data/chain-md5.pem" >/dev/null 2>&1
 rc=$?
 if test "${rc}" != "0"; then

@@ -57,11 +57,11 @@ launch_server --echo --priority "NORMAL" --x509keyfile ${KEY1} --x509certfile ${
 PID=$!
 wait_server ${PID}
 
-timeout 1800 datefudge "2019-12-20" \
+gnutls_timewrapper_standalone "2019-12-20" timeout 1800 \
 "${CLI}" -d 4 -p "${PORT}" localhost --x509cafile ${CERT1} --priority NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2 </dev/null && \
 	fail ${PID} "1. handshake with RSA should have failed!"
 
-timeout 1800 datefudge "2019-12-20" \
+gnutls_timewrapper_standalone "2019-12-20" timeout 1800 \
 "${CLI}" -d 4 -p "${PORT}" localhost --x509cafile ${CERT1} --priority NORMAL </dev/null && \
 	fail ${PID} "2. handshake with RSA should have failed!"
 

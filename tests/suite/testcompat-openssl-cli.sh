@@ -51,12 +51,12 @@ fi
 
 export TZ="UTC"
 
-# Check for datefudge
+# Check for faketime/datefudge
 . "${srcdir}/../scripts/common.sh"
 
 skip_if_no_datefudge
 
-timeout 1800 datefudge "2012-09-02" \
+gnutls_timewrapper_standalone "2012-09-02" timeout 1800 \
 "${srcdir}/testcompat-openssl-cli-common.sh"
 
 ret=$?

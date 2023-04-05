@@ -80,7 +80,7 @@ fi
 
 for FILE in full.p7b openssl.p7b openssl-keyid.p7b; do
 # check validation with date prior to CA issuance
-datefudge -s "2011-1-10" \
+gnutls_timewrapper_standalone static "2011-01-10 00:00:00" \
 ${VALGRIND} "${CERTTOOL}" --inder --p7-verify --load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" --infile "${srcdir}/data/${FILE}" >"${OUTFILE}"
 rc=$?
 
@@ -90,7 +90,7 @@ if test "${rc}" = "0"; then
 fi
 
 # check validation with date prior to intermediate cert issuance
-datefudge -s "2011-5-28 08:38:00 UTC" \
+env TZ=UTC gnutls_timewrapper_standalone static "2011-05-28 08:38:00" \
 ${VALGRIND} "${CERTTOOL}" --inder --p7-verify --load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" --infile "${srcdir}/data/${FILE}" >"${OUTFILE}"
 rc=$?
 
@@ -100,7 +100,7 @@ if test "${rc}" = "0"; then
 fi
 
 # check validation with date after intermediate cert issuance
-datefudge -s "2038-10-13" \
+gnutls_timewrapper_standalone static "2038-10-13 00:00:00" \
 ${VALGRIND} "${CERTTOOL}" --inder --p7-verify --load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" --infile "${srcdir}/data/${FILE}" >"${OUTFILE}"
 rc=$?
 

@@ -37,7 +37,7 @@ SUBCAFILE=inhibit-subca.$$.tmp
 
 skip_if_no_datefudge
 
-datefudge -s "2017-04-22" \
+gnutls_timewrapper_standalone static "2017-04-22 00:00:00" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/key-ca.pem" \
 		--template "${srcdir}/templates/inhibit-anypolicy.tmpl" \
@@ -56,7 +56,7 @@ fi
 echo ca > $TEMPLFILE
 echo "cn = sub-CA" >> $TEMPLFILE
 
-datefudge -s "2017-04-23" \
+gnutls_timewrapper_standalone static "2017-04-23 00:00:00" \
 "${CERTTOOL}" -d 2 --generate-certificate --template $TEMPLFILE \
 	--load-ca-privkey "${srcdir}/data/key-ca.pem" \
 	--load-ca-certificate $CAFILE \
@@ -71,7 +71,7 @@ fi
 cat $SUBCAFILE $CAFILE > ${TMPFILE}
 
 # we do not support the inhibit any policy extension for verification
-datefudge -s "2017-04-25" "${CERTTOOL}" --verify-chain --infile ${TMPFILE}
+gnutls_timewrapper_standalone static "2017-04-25 00:00:00" "${CERTTOOL}" --verify-chain --infile ${TMPFILE}
 rc=$?
 if test "$rc" != "0"; then
 	echo "Verification failed unexpectedly ($rc)"

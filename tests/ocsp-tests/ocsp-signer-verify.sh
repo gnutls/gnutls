@@ -31,14 +31,14 @@ export TZ="UTC"
 
 skip_if_no_datefudge
 
-date="2021-07-14 00:00"
+date="2021-07-14 00:00:00"
 sample_dir="${srcdir}/ocsp-tests/signer-verify"
 trusted="${sample_dir}/trust.pem"
 
 verify_response ()
 {
     echo "verifying ${sample_dir}/${1} using ${trusted}"
-    datefudge --static "${date}" \
+    gnutls_timewrapper_standalone static "${date}" \
               "${OCSPTOOL}" --infile="${sample_dir}/${1}" \
               --verify-response --load-trust="${trusted}"
     return $?
