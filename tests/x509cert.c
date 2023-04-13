@@ -245,6 +245,50 @@ void doit(void)
 		gnutls_x509_crt_deinit(list[i]);
 	gnutls_certificate_free_credentials(x509_cred);
 
+	/* test for gnutls_certificate_set_x509_trust */
+	gnutls_certificate_allocate_credentials(&x509_cred);
+	list_size = LIST_SIZE;
+	ret =
+	    gnutls_x509_crt_list_import(list, &list_size, &ca3_cert,
+					GNUTLS_X509_FMT_PEM,
+					GNUTLS_X509_CRT_LIST_FAIL_IF_UNSORTED);
+	if (ret < 0 || (unsigned int)ret != list_size) {
+		fail("gnutls_x509_crt_list_import\n");
+	}
+
+	ret = gnutls_certificate_set_x509_trust(x509_cred, list, list_size);
+	if (ret < 0 || (unsigned int)ret != list_size) {
+		fail("gnutls_certificate_set_x509_trust\n");
+	}
+
+	gnutls_certificate_get_trust_list(x509_cred, &trust_list);
+	ret = gnutls_x509_trust_list_iter_get_ca(trust_list,
+						 &trust_iter, &get_ca_crt);
+	if (ret < 0) {
+		fail("gnutls_x509_trust_list_iter_get_ca\n");
+	}
+	gnutls_x509_trust_list_iter_deinit(trust_iter);
+
+	ret =
+	    gnutls_x509_crt_export2(get_ca_crt, GNUTLS_X509_FMT_PEM,
+				    &get_datum);
+	if (ret < 0) {
+		fail("gnutls_x509_crt_export2\n");
+	}
+	if (get_datum.size != ca3_cert.size ||
+	    memcmp(get_datum.data, ca3_cert.data, get_datum.size) != 0) {
+		fail("exported CA certificate %u vs. %u\n\n%s\n\nvs.\n\n%s\n",
+		     get_datum.size, ca3_cert.size, get_datum.data,
+		     ca3_cert.data);
+	}
+
+	gnutls_x509_crt_deinit(get_ca_crt);
+	gnutls_free(get_datum.data);
+
+	for (i = 0; i < list_size; i++) {
+		gnutls_x509_crt_deinit(list[i]);
+	}
+	gnutls_certificate_free_credentials(x509_cred);
 	gnutls_global_deinit();
 
 	if (debug)
