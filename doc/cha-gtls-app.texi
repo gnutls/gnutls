@@ -1612,8 +1612,8 @@ negotiate CBC ciphersuites only when both sides of the connection support
 encrypt-then-mac TLS extension (RFC7366).
 
 @item %DISABLE_SAFE_RENEGOTIATION @tab
-will completely disable safe renegotiation
-completely.  Do not use unless you know what you are doing.
+will completely disable safe renegotiation.  Do not use unless you
+know what you are doing.
 
 @item %UNSAFE_RENEGOTIATION @tab
 will allow handshakes and re-handshakes
