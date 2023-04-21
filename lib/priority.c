@@ -1081,9 +1081,9 @@ static void disable_tls13_compat_mode(gnutls_priority_t c)
 	c->tls13_compat_mode = false;
 }
 
-static void enable_no_exts_shuffle(gnutls_priority_t c)
+static void enable_no_shuffle_extensions(gnutls_priority_t c)
 {
-	c->no_exts_shuffle = 1;
+	c->no_shuffle_extensions = 1;
 }
 
 static void dummy_func(gnutls_priority_t c)

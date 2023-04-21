@@ -356,6 +356,11 @@ verify(GNUTLS_EXTENSION_MAX < MAX_EXT_TYPES);
  */
 verify(GNUTLS_EXTENSION_MAX_VALUE - GNUTLS_EXTENSION_MAX >= 16);
 
+/* MAX_EXT_TYPES + 1 must fit in a single byte, to generate random
+ * permutation at once.
+ */
+verify(MAX_EXT_TYPES <= UINT8_MAX);
+
 /* The 'verify' symbol from <verify.h> is used extensively in the
  * code; undef it to avoid clash
  */
@@ -949,7 +954,7 @@ struct gnutls_priority_st {
 	bool no_extensions;
 
 	/* to disable extensions shuffling */
-	bool no_exts_shuffle;
+	bool no_shuffle_extensions;
 
 	safe_renegotiation_t sr;
 	bool min_record_version;
