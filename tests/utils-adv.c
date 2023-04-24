@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -41,14 +41,13 @@ int _gnutls_server_name_set_raw(gnutls_session_t session,
 const char *side = NULL;
 
 /* if @host is NULL certificate check is skipped */
-int
-_test_cli_serv(gnutls_certificate_credentials_t server_cred,
-	       gnutls_certificate_credentials_t client_cred,
-	       const char *serv_prio, const char *cli_prio,
-	       const char *host,
-	       void *priv, callback_func * client_cb, callback_func * server_cb,
-	       unsigned expect_verification_failure,
-	       unsigned require_cert, int serv_err, int cli_err)
+int _test_cli_serv(gnutls_certificate_credentials_t server_cred,
+		   gnutls_certificate_credentials_t client_cred,
+		   const char *serv_prio, const char *cli_prio,
+		   const char *host, void *priv, callback_func *client_cb,
+		   callback_func *server_cb,
+		   unsigned expect_verification_failure, unsigned require_cert,
+		   int serv_err, int cli_err)
 {
 	int ret;
 	/* Server stuff. */
@@ -82,14 +81,13 @@ _test_cli_serv(gnutls_certificate_credentials_t server_cred,
 
 	if (host) {
 		if (strncmp(host, "raw:", 4) == 0) {
-			assert(_gnutls_server_name_set_raw
-			       (client, GNUTLS_NAME_DNS, host + 4,
-				strlen(host + 4)) >= 0);
+			assert(_gnutls_server_name_set_raw(
+				       client, GNUTLS_NAME_DNS, host + 4,
+				       strlen(host + 4)) >= 0);
 			host += 4;
 		} else {
-			assert(gnutls_server_name_set
-			       (client, GNUTLS_NAME_DNS, host,
-				strlen(host)) >= 0);
+			assert(gnutls_server_name_set(client, GNUTLS_NAME_DNS,
+						      host, strlen(host)) >= 0);
 		}
 	}
 
@@ -142,9 +140,10 @@ _test_cli_serv(gnutls_certificate_credentials_t server_cred,
 
 		if (status != 0) {
 			gnutls_datum_t t;
-			assert(gnutls_certificate_verification_status_print
-			       (status, GNUTLS_CRT_X509, &t, 0) >= 0);
-			fail("could not verify certificate for '%s': %.4x: %s\n", host, status, t.data);
+			assert(gnutls_certificate_verification_status_print(
+				       status, GNUTLS_CRT_X509, &t, 0) >= 0);
+			fail("could not verify certificate for '%s': %.4x: %s\n",
+			     host, status, t.data);
 			gnutls_free(t.data);
 			exit(1);
 		}
@@ -159,8 +158,8 @@ _test_cli_serv(gnutls_certificate_credentials_t server_cred,
 
 		if (status != 0) {
 			gnutls_datum_t t;
-			assert(gnutls_certificate_verification_status_print
-			       (status, GNUTLS_CRT_X509, &t, 0) >= 0);
+			assert(gnutls_certificate_verification_status_print(
+				       status, GNUTLS_CRT_X509, &t, 0) >= 0);
 			fail("could not verify certificate3: %.4x: %s\n",
 			     status, t.data);
 			gnutls_free(t.data);
@@ -174,7 +173,7 @@ _test_cli_serv(gnutls_certificate_credentials_t server_cred,
 		gnutls_bye(server, GNUTLS_SHUT_RDWR);
 
 	ret = 0;
- cleanup:
+cleanup:
 	if (client_cb)
 		client_cb(client, priv);
 	if (server_cb)
@@ -187,20 +186,18 @@ _test_cli_serv(gnutls_certificate_credentials_t server_cred,
 }
 
 /* An expected to succeed run */
-void
-test_cli_serv(gnutls_certificate_credentials_t server_cred,
-	      gnutls_certificate_credentials_t client_cred,
-	      const char *prio, const char *host,
-	      void *priv, callback_func * client_cb, callback_func * server_cb)
+void test_cli_serv(gnutls_certificate_credentials_t server_cred,
+		   gnutls_certificate_credentials_t client_cred,
+		   const char *prio, const char *host, void *priv,
+		   callback_func *client_cb, callback_func *server_cb)
 {
 	_test_cli_serv(server_cred, client_cred, prio, prio, host, priv,
 		       client_cb, server_cb, 0, 0, 0, 0);
 }
 
-int
-test_cli_serv_anon(gnutls_anon_server_credentials_t server_cred,
-		   gnutls_anon_client_credentials_t client_cred,
-		   const char *prio)
+int test_cli_serv_anon(gnutls_anon_server_credentials_t server_cred,
+		       gnutls_anon_client_credentials_t client_cred,
+		       const char *prio)
 {
 	int ret;
 	/* Server stuff. */
@@ -247,9 +244,9 @@ test_cli_serv_anon(gnutls_anon_server_credentials_t server_cred,
 	return ret;
 }
 
-int
-test_cli_serv_psk(gnutls_psk_server_credentials_t server_cred,
-		  gnutls_psk_client_credentials_t client_cred, const char *prio)
+int test_cli_serv_psk(gnutls_psk_server_credentials_t server_cred,
+		      gnutls_psk_client_credentials_t client_cred,
+		      const char *prio)
 {
 	int ret;
 	/* Server stuff. */
@@ -296,31 +293,28 @@ test_cli_serv_psk(gnutls_psk_server_credentials_t server_cred,
 	return ret;
 }
 
-void
-test_cli_serv_cert(gnutls_certificate_credentials_t server_cred,
-		   gnutls_certificate_credentials_t client_cred,
-		   const char *serv_prio, const char *cli_prio,
-		   const char *host)
+void test_cli_serv_cert(gnutls_certificate_credentials_t server_cred,
+			gnutls_certificate_credentials_t client_cred,
+			const char *serv_prio, const char *cli_prio,
+			const char *host)
 {
 	_test_cli_serv(server_cred, client_cred, serv_prio, cli_prio, host,
 		       NULL, NULL, NULL, 0, 1, 0, 0);
 }
 
-void
-test_cli_serv_expect(gnutls_certificate_credentials_t server_cred,
-		     gnutls_certificate_credentials_t client_cred,
-		     const char *serv_prio, const char *cli_prio,
-		     const char *host, int serv_err, int cli_err)
+void test_cli_serv_expect(gnutls_certificate_credentials_t server_cred,
+			  gnutls_certificate_credentials_t client_cred,
+			  const char *serv_prio, const char *cli_prio,
+			  const char *host, int serv_err, int cli_err)
 {
 	_test_cli_serv(server_cred, client_cred, serv_prio, cli_prio, host,
 		       NULL, NULL, NULL, 0, 0, serv_err, cli_err);
 }
 
 /* An expected to fail verification run. Returns verification status */
-unsigned
-test_cli_serv_vf(gnutls_certificate_credentials_t server_cred,
-		 gnutls_certificate_credentials_t client_cred,
-		 const char *prio, const char *host)
+unsigned test_cli_serv_vf(gnutls_certificate_credentials_t server_cred,
+			  gnutls_certificate_credentials_t client_cred,
+			  const char *prio, const char *host)
 {
 	return _test_cli_serv(server_cred, client_cred, prio, prio, host, NULL,
 			      NULL, NULL, 1, 0, 0, 0);

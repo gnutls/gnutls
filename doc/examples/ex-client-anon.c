@@ -1,7 +1,7 @@
 /* This example code is placed in the public domain. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -17,11 +17,11 @@
 /* A very basic TLS client, with anonymous authentication.
  */
 
-#define LOOP_CHECK(rval, cmd) \
-        do { \
-                rval = cmd; \
-        } while(rval == GNUTLS_E_AGAIN || rval == GNUTLS_E_INTERRUPTED); \
-        assert(rval >= 0)
+#define LOOP_CHECK(rval, cmd)                                             \
+	do {                                                              \
+		rval = cmd;                                               \
+	} while (rval == GNUTLS_E_AGAIN || rval == GNUTLS_E_INTERRUPTED); \
+	assert(rval >= 0)
 
 #define MAX_BUF 1024
 #define MSG "GET / HTTP/1.0\r\n\r\n"
@@ -46,8 +46,8 @@ int main(void)
 	gnutls_init(&session, GNUTLS_CLIENT);
 
 	/* Use default priorities */
-	gnutls_priority_set_direct(session,
-				   "PERFORMANCE:+ANON-ECDH:+ANON-DH", NULL);
+	gnutls_priority_set_direct(session, "PERFORMANCE:+ANON-ECDH:+ANON-DH",
+				   NULL);
 
 	/* put the anonymous credentials to the current session
 	 */
@@ -64,8 +64,7 @@ int main(void)
 	 */
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret < 0) {
 		fprintf(stderr, "*** Handshake failed\n");
@@ -102,7 +101,7 @@ int main(void)
 
 	LOOP_CHECK(ret, gnutls_bye(session, GNUTLS_SHUT_RDWR));
 
- end:
+end:
 
 	tcp_close(sd);
 

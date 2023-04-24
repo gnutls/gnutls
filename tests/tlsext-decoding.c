@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -39,18 +39,18 @@ int main(void)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
-# include <unistd.h>
-# include <signal.h>
-# include <assert.h>
-# include <gnutls/gnutls.h>
+#include <string.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <signal.h>
+#include <assert.h>
+#include <gnutls/gnutls.h>
 
-# include "utils.h"
+#include "utils.h"
 
 static void terminate(void);
 static unsigned reduce = 0;
@@ -68,8 +68,8 @@ static void client_log_func(int level, const char *str)
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
 
-# define RECORD_PAYLOAD_POS 5
-# define HANDSHAKE_ID_POS (38)
+#define RECORD_PAYLOAD_POS 5
+#define HANDSHAKE_ID_POS (38)
 static ssize_t odd_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 {
 	uint8_t *d = (void *)data;
@@ -85,19 +85,16 @@ static ssize_t odd_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 		isize += 1;
 
 		/* skip ciphersuites */
-		csize =
-		    d[RECORD_PAYLOAD_POS + HANDSHAKE_ID_POS + isize + 1] +
-		    (d[RECORD_PAYLOAD_POS + HANDSHAKE_ID_POS + isize] << 8);
+		csize = d[RECORD_PAYLOAD_POS + HANDSHAKE_ID_POS + isize + 1] +
+			(d[RECORD_PAYLOAD_POS + HANDSHAKE_ID_POS + isize] << 8);
 		csize += 2;
 
 		/* skip compression methods */
-		osize =
-		    d[RECORD_PAYLOAD_POS + HANDSHAKE_ID_POS + isize + csize];
+		osize = d[RECORD_PAYLOAD_POS + HANDSHAKE_ID_POS + isize + csize];
 		osize += 1;
 
-		pos =
-		    RECORD_PAYLOAD_POS + HANDSHAKE_ID_POS + isize + csize +
-		    osize;
+		pos = RECORD_PAYLOAD_POS + HANDSHAKE_ID_POS + isize + csize +
+		      osize;
 
 		if (reduce) {
 			if (d[pos + 1] != 0x00) {
@@ -113,7 +110,6 @@ static ssize_t odd_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 				d[pos] = d[pos] + 1;
 				d[pos + 1] = 0x00;
 			}
-
 		}
 	}
 
@@ -154,8 +150,7 @@ static void client(int fd, const char *prio)
 	 */
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret >= 0) {
 		fail("client: Handshake succeeded!\n");
@@ -200,9 +195,8 @@ static void server(int fd, const char *prio)
 
 	gnutls_certificate_allocate_credentials(&xcred);
 
-	ret = gnutls_certificate_set_x509_key_mem(xcred,
-						  &server_cert, &server_key,
-						  GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_key_mem(
+		xcred, &server_cert, &server_key, GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);
 
@@ -220,13 +214,13 @@ static void server(int fd, const char *prio)
 
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret != GNUTLS_E_UNEXPECTED_EXTENSIONS_LENGTH) {
 		close(fd);
 		gnutls_deinit(session);
-		fail("server: Handshake did not fail with GNUTLS_E_UNEXPECTED_EXTENSIONS_LENGTH (%s)\n\n", gnutls_strerror(ret));
+		fail("server: Handshake did not fail with GNUTLS_E_UNEXPECTED_EXTENSIONS_LENGTH (%s)\n\n",
+		     gnutls_strerror(ret));
 		terminate();
 	}
 
@@ -292,4 +286,4 @@ void doit(void)
 	start("NORMAL:-VERS-ALL:+VERS-TLS1.3");
 	start("NORMAL");
 }
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

@@ -56,9 +56,8 @@
  * Since: 3.6.0
  *
  **/
-int
-gnutls_encode_rs_value(gnutls_datum_t * sig_value,
-		       const gnutls_datum_t * r, const gnutls_datum_t * s)
+int gnutls_encode_rs_value(gnutls_datum_t *sig_value, const gnutls_datum_t *r,
+			   const gnutls_datum_t *s)
 {
 	return _gnutls_encode_ber_rs_raw(sig_value, r, s);
 }
@@ -66,18 +65,16 @@ gnutls_encode_rs_value(gnutls_datum_t * sig_value,
 /* same as gnutls_encode_rs_value(), but kept since it used
  * to be exported for FIPS140 CAVS testing.
  */
-int
-_gnutls_encode_ber_rs_raw(gnutls_datum_t * sig_value,
-			  const gnutls_datum_t * r, const gnutls_datum_t * s)
+int _gnutls_encode_ber_rs_raw(gnutls_datum_t *sig_value,
+			      const gnutls_datum_t *r, const gnutls_datum_t *s)
 {
 	asn1_node sig;
 	int result, ret;
 	uint8_t *tmp = NULL;
 
-	if ((result =
-	     asn1_create_element(_gnutls_get_gnutls_asn(),
-				 "GNUTLS.DSASignatureValue",
-				 &sig)) != ASN1_SUCCESS) {
+	if ((result = asn1_create_element(_gnutls_get_gnutls_asn(),
+					  "GNUTLS.DSASignatureValue", &sig)) !=
+	    ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
@@ -127,21 +124,20 @@ _gnutls_encode_ber_rs_raw(gnutls_datum_t * sig_value,
 	}
 
 	ret = 0;
- cleanup:
+cleanup:
 	gnutls_free(tmp);
 	asn1_delete_structure(&sig);
 	return ret;
 }
 
-int _gnutls_encode_ber_rs(gnutls_datum_t * sig_value, bigint_t r, bigint_t s)
+int _gnutls_encode_ber_rs(gnutls_datum_t *sig_value, bigint_t r, bigint_t s)
 {
 	asn1_node sig;
 	int result;
 
-	if ((result =
-	     asn1_create_element(_gnutls_get_gnutls_asn(),
-				 "GNUTLS.DSASignatureValue",
-				 &sig)) != ASN1_SUCCESS) {
+	if ((result = asn1_create_element(_gnutls_get_gnutls_asn(),
+					  "GNUTLS.DSASignatureValue", &sig)) !=
+	    ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
@@ -171,17 +167,15 @@ int _gnutls_encode_ber_rs(gnutls_datum_t * sig_value, bigint_t r, bigint_t s)
 
 /* decodes the Dss-Sig-Value structure
  */
-int
-_gnutls_decode_ber_rs(const gnutls_datum_t * sig_value, bigint_t * r,
-		      bigint_t * s)
+int _gnutls_decode_ber_rs(const gnutls_datum_t *sig_value, bigint_t *r,
+			  bigint_t *s)
 {
 	asn1_node sig;
 	int result;
 
-	if ((result =
-	     asn1_create_element(_gnutls_get_gnutls_asn(),
-				 "GNUTLS.DSASignatureValue",
-				 &sig)) != ASN1_SUCCESS) {
+	if ((result = asn1_create_element(_gnutls_get_gnutls_asn(),
+					  "GNUTLS.DSASignatureValue", &sig)) !=
+	    ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
@@ -189,7 +183,7 @@ _gnutls_decode_ber_rs(const gnutls_datum_t * sig_value, bigint_t * r,
 	/* rfc3279 doesn't specify whether Dss-Sig-Value is encoded
 	 * as DER or BER. As such we do not restrict to the DER subset. */
 	result =
-	    asn1_der_decoding(&sig, sig_value->data, sig_value->size, NULL);
+		asn1_der_decoding(&sig, sig_value->data, sig_value->size, NULL);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		asn1_delete_structure(&sig);
@@ -236,8 +230,8 @@ _gnutls_decode_ber_rs(const gnutls_datum_t * sig_value, bigint_t * r,
  * Since: 3.6.0
  *
  **/
-int gnutls_decode_rs_value(const gnutls_datum_t * sig_value, gnutls_datum_t * r,
-			   gnutls_datum_t * s)
+int gnutls_decode_rs_value(const gnutls_datum_t *sig_value, gnutls_datum_t *r,
+			   gnutls_datum_t *s)
 {
 	return _gnutls_decode_ber_rs_raw(sig_value, r, s);
 }
@@ -245,17 +239,15 @@ int gnutls_decode_rs_value(const gnutls_datum_t * sig_value, gnutls_datum_t * r,
 /* same as gnutls_decode_rs_value(), but kept since it used
  * to be exported for FIPS140 CAVS testing.
  */
-int
-_gnutls_decode_ber_rs_raw(const gnutls_datum_t * sig_value, gnutls_datum_t * r,
-			  gnutls_datum_t * s)
+int _gnutls_decode_ber_rs_raw(const gnutls_datum_t *sig_value,
+			      gnutls_datum_t *r, gnutls_datum_t *s)
 {
 	asn1_node sig;
 	int result;
 
-	if ((result =
-	     asn1_create_element(_gnutls_get_gnutls_asn(),
-				 "GNUTLS.DSASignatureValue",
-				 &sig)) != ASN1_SUCCESS) {
+	if ((result = asn1_create_element(_gnutls_get_gnutls_asn(),
+					  "GNUTLS.DSASignatureValue", &sig)) !=
+	    ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
@@ -263,7 +255,7 @@ _gnutls_decode_ber_rs_raw(const gnutls_datum_t * sig_value, gnutls_datum_t * r,
 	/* rfc3279 doesn't specify whether Dss-Sig-Value is encoded
 	 * as DER or BER. As such we do not restrict to the DER subset. */
 	result =
-	    asn1_der_decoding(&sig, sig_value->data, sig_value->size, NULL);
+		asn1_der_decoding(&sig, sig_value->data, sig_value->size, NULL);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		asn1_delete_structure(&sig);
@@ -290,9 +282,8 @@ _gnutls_decode_ber_rs_raw(const gnutls_datum_t * sig_value, gnutls_datum_t * r,
 	return 0;
 }
 
-int
-_gnutls_encode_gost_rs(gnutls_datum_t * sig_value, bigint_t r, bigint_t s,
-		       size_t intsize)
+int _gnutls_encode_gost_rs(gnutls_datum_t *sig_value, bigint_t r, bigint_t s,
+			   size_t intsize)
 {
 	uint8_t *data;
 	int result;
@@ -309,7 +300,8 @@ _gnutls_encode_gost_rs(gnutls_datum_t * sig_value, bigint_t r, bigint_t s,
 		return result;
 	}
 
-	if ((result = _gnutls_mpi_bprint_size(r, data + intsize, intsize)) < 0) {
+	if ((result = _gnutls_mpi_bprint_size(r, data + intsize, intsize)) <
+	    0) {
 		gnutls_assert();
 		gnutls_free(data);
 		return result;
@@ -321,9 +313,8 @@ _gnutls_encode_gost_rs(gnutls_datum_t * sig_value, bigint_t r, bigint_t s,
 	return 0;
 }
 
-int
-_gnutls_decode_gost_rs(const gnutls_datum_t * sig_value, bigint_t * r,
-		       bigint_t * s)
+int _gnutls_decode_gost_rs(const gnutls_datum_t *sig_value, bigint_t *r,
+			   bigint_t *s)
 {
 	int ret;
 	unsigned halfsize = sig_value->size >> 1;
@@ -362,9 +353,9 @@ _gnutls_decode_gost_rs(const gnutls_datum_t * sig_value, bigint_t * r,
  *
  * Since: 3.6.0
  */
-int gnutls_encode_gost_rs_value(gnutls_datum_t * sig_value,
-				const gnutls_datum_t * r,
-				const gnutls_datum_t * s)
+int gnutls_encode_gost_rs_value(gnutls_datum_t *sig_value,
+				const gnutls_datum_t *r,
+				const gnutls_datum_t *s)
 {
 	uint8_t *data;
 	size_t intsize = r->size;
@@ -407,8 +398,8 @@ int gnutls_encode_gost_rs_value(gnutls_datum_t * sig_value,
  *
  * Since: 3.6.0
  */
-int gnutls_decode_gost_rs_value(const gnutls_datum_t * sig_value,
-				gnutls_datum_t * r, gnutls_datum_t * s)
+int gnutls_decode_gost_rs_value(const gnutls_datum_t *sig_value,
+				gnutls_datum_t *r, gnutls_datum_t *s)
 {
 	int ret;
 	unsigned halfsize = sig_value->size >> 1;
@@ -469,8 +460,8 @@ gnutls_gost_paramset_t _gnutls_gost_paramset_default(gnutls_pk_algorithm_t pk)
 
 /* some generic pk functions */
 
-int _gnutls_pk_params_copy(gnutls_pk_params_st * dst,
-			   const gnutls_pk_params_st * src)
+int _gnutls_pk_params_copy(gnutls_pk_params_st *dst,
+			   const gnutls_pk_params_st *src)
 {
 	unsigned int i, j;
 	dst->params_nr = 0;
@@ -495,14 +486,14 @@ int _gnutls_pk_params_copy(gnutls_pk_params_st * dst,
 		dst->params_nr++;
 	}
 
-	if (_gnutls_set_datum
-	    (&dst->raw_priv, src->raw_priv.data, src->raw_priv.size) < 0) {
+	if (_gnutls_set_datum(&dst->raw_priv, src->raw_priv.data,
+			      src->raw_priv.size) < 0) {
 		gnutls_assert();
 		goto fail;
 	}
 
-	if (_gnutls_set_datum
-	    (&dst->raw_pub, src->raw_pub.data, src->raw_pub.size) < 0) {
+	if (_gnutls_set_datum(&dst->raw_pub, src->raw_pub.data,
+			      src->raw_pub.size) < 0) {
 		gnutls_assert();
 		goto fail;
 	}
@@ -517,18 +508,18 @@ int _gnutls_pk_params_copy(gnutls_pk_params_st * dst,
 
 	return 0;
 
- fail:
+fail:
 	for (j = 0; j < i; j++)
 		_gnutls_mpi_release(&dst->params[j]);
 	return GNUTLS_E_MEMORY_ERROR;
 }
 
-void gnutls_pk_params_init(gnutls_pk_params_st * p)
+void gnutls_pk_params_init(gnutls_pk_params_st *p)
 {
 	memset(p, 0, sizeof(gnutls_pk_params_st));
 }
 
-void gnutls_pk_params_release(gnutls_pk_params_st * p)
+void gnutls_pk_params_release(gnutls_pk_params_st *p)
 {
 	unsigned int i;
 	for (i = 0; i < p->params_nr; i++) {
@@ -540,7 +531,7 @@ void gnutls_pk_params_release(gnutls_pk_params_st * p)
 	p->params_nr = 0;
 }
 
-void gnutls_pk_params_clear(gnutls_pk_params_st * p)
+void gnutls_pk_params_clear(gnutls_pk_params_st *p)
 {
 	unsigned int i;
 	for (i = 0; i < p->params_nr; i++) {
@@ -555,9 +546,8 @@ void gnutls_pk_params_clear(gnutls_pk_params_st * p)
 	}
 }
 
-int
-_gnutls_find_rsa_pss_salt_size(unsigned bits, const mac_entry_st * me,
-			       unsigned salt_size)
+int _gnutls_find_rsa_pss_salt_size(unsigned bits, const mac_entry_st *me,
+				   unsigned salt_size)
 {
 	unsigned digest_size;
 	int max_salt_size;
@@ -586,9 +576,8 @@ _gnutls_find_rsa_pss_salt_size(unsigned bits, const mac_entry_st * me,
 /* Writes the digest information and the digest in a DER encoded
  * structure. The digest info is allocated and stored into the info structure.
  */
-int
-encode_ber_digest_info(const mac_entry_st * e,
-		       const gnutls_datum_t * digest, gnutls_datum_t * output)
+int encode_ber_digest_info(const mac_entry_st *e, const gnutls_datum_t *digest,
+			   gnutls_datum_t *output)
 {
 	asn1_node dinfo = NULL;
 	int result;
@@ -612,8 +601,8 @@ encode_ber_digest_info(const mac_entry_st * e,
 	}
 
 	if ((result = asn1_create_element(_gnutls_get_gnutls_asn(),
-					  "GNUTLS.DigestInfo",
-					  &dinfo)) != ASN1_SUCCESS) {
+					  "GNUTLS.DigestInfo", &dinfo)) !=
+	    ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
@@ -691,10 +680,9 @@ encode_ber_digest_info(const mac_entry_st * e,
  * Since: 3.5.0
  *
  **/
-int
-gnutls_encode_ber_digest_info(gnutls_digest_algorithm_t hash,
-			      const gnutls_datum_t * digest,
-			      gnutls_datum_t * output)
+int gnutls_encode_ber_digest_info(gnutls_digest_algorithm_t hash,
+				  const gnutls_datum_t *digest,
+				  gnutls_datum_t *output)
 {
 	const mac_entry_st *e = hash_to_entry(hash);
 	if (unlikely(e == NULL))
@@ -719,10 +707,10 @@ gnutls_encode_ber_digest_info(gnutls_digest_algorithm_t hash,
  * Since: 3.5.0
  *
  **/
-int
-gnutls_decode_ber_digest_info(const gnutls_datum_t * info,
-			      gnutls_digest_algorithm_t * hash,
-			      unsigned char *digest, unsigned int *digest_size)
+int gnutls_decode_ber_digest_info(const gnutls_datum_t *info,
+				  gnutls_digest_algorithm_t *hash,
+				  unsigned char *digest,
+				  unsigned int *digest_size)
 {
 	asn1_node dinfo = NULL;
 	int result;
@@ -730,8 +718,8 @@ gnutls_decode_ber_digest_info(const gnutls_datum_t * info,
 	int len;
 
 	if ((result = asn1_create_element(_gnutls_get_gnutls_asn(),
-					  "GNUTLS.DigestInfo",
-					  &dinfo)) != ASN1_SUCCESS) {
+					  "GNUTLS.DigestInfo", &dinfo)) !=
+	    ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
@@ -756,7 +744,6 @@ gnutls_decode_ber_digest_info(const gnutls_datum_t * info,
 	*hash = gnutls_oid_to_digest(str);
 
 	if (*hash == GNUTLS_DIG_UNKNOWN) {
-
 		_gnutls_debug_log("verify.c: HASH OID: %s\n", str);
 
 		gnutls_assert();
@@ -766,7 +753,7 @@ gnutls_decode_ber_digest_info(const gnutls_datum_t * info,
 
 	len = sizeof(str) - 1;
 	result =
-	    asn1_read_value(dinfo, "digestAlgorithm.parameters", str, &len);
+		asn1_read_value(dinfo, "digestAlgorithm.parameters", str, &len);
 	/* To avoid permitting garbage in the parameters field, either the
 	   parameters field is not present, or it contains 0x05 0x00. */
 	if (!(result == ASN1_ELEMENT_NOT_FOUND ||
@@ -793,13 +780,12 @@ gnutls_decode_ber_digest_info(const gnutls_datum_t * info,
 	return 0;
 }
 
-int
-_gnutls_params_get_rsa_raw(const gnutls_pk_params_st * params,
-			   gnutls_datum_t * m, gnutls_datum_t * e,
-			   gnutls_datum_t * d, gnutls_datum_t * p,
-			   gnutls_datum_t * q, gnutls_datum_t * u,
-			   gnutls_datum_t * e1,
-			   gnutls_datum_t * e2, unsigned int flags)
+int _gnutls_params_get_rsa_raw(const gnutls_pk_params_st *params,
+			       gnutls_datum_t *m, gnutls_datum_t *e,
+			       gnutls_datum_t *d, gnutls_datum_t *p,
+			       gnutls_datum_t *q, gnutls_datum_t *u,
+			       gnutls_datum_t *e1, gnutls_datum_t *e2,
+			       unsigned int flags)
 {
 	int ret;
 	mpi_dprint_func dprint = _gnutls_mpi_dprint_lz;
@@ -908,7 +894,7 @@ _gnutls_params_get_rsa_raw(const gnutls_pk_params_st * params,
 
 	return 0;
 
- error:
+error:
 	_gnutls_free_datum(m);
 	_gnutls_free_datum(d);
 	_gnutls_free_datum(e);
@@ -920,11 +906,10 @@ _gnutls_params_get_rsa_raw(const gnutls_pk_params_st * params,
 	return ret;
 }
 
-int
-_gnutls_params_get_dsa_raw(const gnutls_pk_params_st * params,
-			   gnutls_datum_t * p, gnutls_datum_t * q,
-			   gnutls_datum_t * g, gnutls_datum_t * y,
-			   gnutls_datum_t * x, unsigned int flags)
+int _gnutls_params_get_dsa_raw(const gnutls_pk_params_st *params,
+			       gnutls_datum_t *p, gnutls_datum_t *q,
+			       gnutls_datum_t *g, gnutls_datum_t *y,
+			       gnutls_datum_t *x, unsigned int flags)
 {
 	int ret;
 	mpi_dprint_func dprint = _gnutls_mpi_dprint_lz;
@@ -1000,11 +985,10 @@ _gnutls_params_get_dsa_raw(const gnutls_pk_params_st * params,
 	return 0;
 }
 
-int _gnutls_params_get_ecc_raw(const gnutls_pk_params_st * params,
-			       gnutls_ecc_curve_t * curve,
-			       gnutls_datum_t * x,
-			       gnutls_datum_t * y,
-			       gnutls_datum_t * k, unsigned int flags)
+int _gnutls_params_get_ecc_raw(const gnutls_pk_params_st *params,
+			       gnutls_ecc_curve_t *curve, gnutls_datum_t *x,
+			       gnutls_datum_t *y, gnutls_datum_t *k,
+			       unsigned int flags)
 {
 	int ret;
 	mpi_dprint_func dprint = _gnutls_mpi_dprint_lz;
@@ -1025,9 +1009,8 @@ int _gnutls_params_get_ecc_raw(const gnutls_pk_params_st * params,
 
 	if (_curve_is_eddsa(e) || _curve_is_modern_ecdh(e)) {
 		if (x) {
-			ret =
-			    _gnutls_set_datum(x, params->raw_pub.data,
-					      params->raw_pub.size);
+			ret = _gnutls_set_datum(x, params->raw_pub.data,
+						params->raw_pub.size);
 			if (ret < 0) {
 				return gnutls_assert_val(ret);
 			}
@@ -1039,9 +1022,8 @@ int _gnutls_params_get_ecc_raw(const gnutls_pk_params_st * params,
 		}
 
 		if (k) {
-			ret =
-			    _gnutls_set_datum(k, params->raw_priv.data,
-					      params->raw_priv.size);
+			ret = _gnutls_set_datum(k, params->raw_priv.data,
+						params->raw_priv.size);
 			if (ret < 0) {
 				_gnutls_free_datum(x);
 				return gnutls_assert_val(ret);
@@ -1085,16 +1067,14 @@ int _gnutls_params_get_ecc_raw(const gnutls_pk_params_st * params,
 	}
 
 	return 0;
-
 }
 
-int _gnutls_params_get_gost_raw(const gnutls_pk_params_st * params,
-				gnutls_ecc_curve_t * curve,
-				gnutls_digest_algorithm_t * digest,
-				gnutls_gost_paramset_t * paramset,
-				gnutls_datum_t * x,
-				gnutls_datum_t * y,
-				gnutls_datum_t * k, unsigned int flags)
+int _gnutls_params_get_gost_raw(const gnutls_pk_params_st *params,
+				gnutls_ecc_curve_t *curve,
+				gnutls_digest_algorithm_t *digest,
+				gnutls_gost_paramset_t *paramset,
+				gnutls_datum_t *x, gnutls_datum_t *y,
+				gnutls_datum_t *k, unsigned int flags)
 {
 	int ret;
 	mpi_dprint_func dprint = _gnutls_mpi_dprint_le;
@@ -1144,13 +1124,11 @@ int _gnutls_params_get_gost_raw(const gnutls_pk_params_st * params,
 	}
 
 	return 0;
-
 }
 
-int
-pk_hash_data(gnutls_pk_algorithm_t pk, const mac_entry_st * hash,
-	     gnutls_pk_params_st * params,
-	     const gnutls_datum_t * data, gnutls_datum_t * digest)
+int pk_hash_data(gnutls_pk_algorithm_t pk, const mac_entry_st *hash,
+		 gnutls_pk_params_st *params, const gnutls_datum_t *data,
+		 gnutls_datum_t *digest)
 {
 	int ret;
 
@@ -1161,9 +1139,8 @@ pk_hash_data(gnutls_pk_algorithm_t pk, const mac_entry_st * hash,
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	ret =
-	    _gnutls_hash_fast((gnutls_digest_algorithm_t) hash->id, data->data,
-			      data->size, digest->data);
+	ret = _gnutls_hash_fast((gnutls_digest_algorithm_t)hash->id, data->data,
+				data->size, digest->data);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -1171,7 +1148,7 @@ pk_hash_data(gnutls_pk_algorithm_t pk, const mac_entry_st * hash,
 
 	return 0;
 
- cleanup:
+cleanup:
 	gnutls_free(digest->data);
 	return ret;
 }
@@ -1181,9 +1158,8 @@ pk_hash_data(gnutls_pk_algorithm_t pk, const mac_entry_st * hash,
  * on the given digest. The given digest must be allocated
  * and will be freed if replacement is required.
  */
-int
-pk_prepare_hash(gnutls_pk_algorithm_t pk,
-		const mac_entry_st * hash, gnutls_datum_t * digest)
+int pk_prepare_hash(gnutls_pk_algorithm_t pk, const mac_entry_st *hash,
+		    gnutls_datum_t *digest)
 {
 	int ret;
 	gnutls_datum_t old_digest = { digest->data, digest->size };
@@ -1201,14 +1177,14 @@ pk_prepare_hash(gnutls_pk_algorithm_t pk,
 		case GNUTLS_MAC_SHA224:
 			break;
 		default:
-			_gnutls_switch_fips_state
-			    (GNUTLS_FIPS140_OP_NOT_APPROVED);
+			_gnutls_switch_fips_state(
+				GNUTLS_FIPS140_OP_NOT_APPROVED);
 		}
 
 		/* Encode the digest as a DigestInfo
 		 */
-		if ((ret =
-		     encode_ber_digest_info(hash, &old_digest, digest)) != 0) {
+		if ((ret = encode_ber_digest_info(hash, &old_digest, digest)) !=
+		    0) {
 			gnutls_assert();
 			return ret;
 		}

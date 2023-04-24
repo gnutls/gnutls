@@ -44,8 +44,9 @@ static inline int set_ktls_keys(gnutls_session_t session,
 		session->internals.ktls_enabled = 0;
 		session->internals.invalid_connection = true;
 		session->internals.resumable = false;
-		_gnutls_audit_log(session,
-				  "invalidating session: KTLS - couldn't update keys\n");
+		_gnutls_audit_log(
+			session,
+			"invalidating session: KTLS - couldn't update keys\n");
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
 	return 0;
@@ -55,9 +56,9 @@ static int update_keys(gnutls_session_t session, hs_stage_t stage)
 {
 	int ret;
 
-	ret =
-	    _tls13_update_secret(session, session->key.proto.tls13.temp_secret,
-				 session->key.proto.tls13.temp_secret_size);
+	ret = _tls13_update_secret(session,
+				   session->key.proto.tls13.temp_secret,
+				   session->key.proto.tls13.temp_secret_size);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -80,11 +81,11 @@ static int update_keys(gnutls_session_t session, hs_stage_t stage)
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		if (IS_KTLS_ENABLED(session, GNUTLS_KTLS_SEND)
-		    && stage == STAGE_UPD_OURS)
+		if (IS_KTLS_ENABLED(session, GNUTLS_KTLS_SEND) &&
+		    stage == STAGE_UPD_OURS)
 			ret = set_ktls_keys(session, GNUTLS_KTLS_SEND);
-		else if (IS_KTLS_ENABLED(session, GNUTLS_KTLS_RECV)
-			 && stage == STAGE_UPD_PEERS)
+		else if (IS_KTLS_ENABLED(session, GNUTLS_KTLS_RECV) &&
+			 stage == STAGE_UPD_PEERS)
 			ret = set_ktls_keys(session, GNUTLS_KTLS_RECV);
 	}
 	if (ret < 0)
@@ -93,7 +94,7 @@ static int update_keys(gnutls_session_t session, hs_stage_t stage)
 	return 0;
 }
 
-int _gnutls13_recv_key_update(gnutls_session_t session, gnutls_buffer_st * buf)
+int _gnutls13_recv_key_update(gnutls_session_t session, gnutls_buffer_st *buf)
 {
 	int ret;
 	struct timespec now;
@@ -106,16 +107,16 @@ int _gnutls13_recv_key_update(gnutls_session_t session, gnutls_buffer_st * buf)
 	/* Roll over the counter if the time window has elapsed */
 	if (session->internals.key_update_count == 0 ||
 	    timespec_sub_ms(&now, &session->internals.last_key_update) >
-	    KEY_UPDATES_WINDOW) {
+		    KEY_UPDATES_WINDOW) {
 		session->internals.last_key_update = now;
 		session->internals.key_update_count = 0;
 	}
 
 	if (unlikely(++session->internals.key_update_count >
 		     KEY_UPDATES_PER_WINDOW)) {
-		_gnutls_debug_log
-		    ("reached maximum number of key updates per %d milliseconds (%d)\n",
-		     KEY_UPDATES_WINDOW, KEY_UPDATES_PER_WINDOW);
+		_gnutls_debug_log(
+			"reached maximum number of key updates per %d milliseconds (%d)\n",
+			KEY_UPDATES_WINDOW, KEY_UPDATES_PER_WINDOW);
 		return gnutls_assert_val(GNUTLS_E_TOO_MANY_HANDSHAKE_PACKETS);
 	}
 
@@ -150,10 +151,10 @@ int _gnutls13_recv_key_update(gnutls_session_t session, gnutls_buffer_st * buf)
 		 */
 		if (session->internals.rsend_state == RECORD_SEND_NORMAL)
 			session->internals.rsend_state =
-			    RECORD_SEND_KEY_UPDATE_1;
+				RECORD_SEND_KEY_UPDATE_1;
 		else if (session->internals.rsend_state == RECORD_SEND_CORKED)
 			session->internals.rsend_state =
-			    RECORD_SEND_CORKED_TO_KU;
+				RECORD_SEND_CORKED_TO_KU;
 
 		break;
 	default:
@@ -166,7 +167,7 @@ int _gnutls13_recv_key_update(gnutls_session_t session, gnutls_buffer_st * buf)
 }
 
 int _gnutls13_send_key_update(gnutls_session_t session, unsigned again,
-			      unsigned flags /* GNUTLS_KU_* */ )
+			      unsigned flags /* GNUTLS_KU_* */)
 {
 	int ret;
 	mbuffer_st *bufel = NULL;
@@ -195,13 +196,12 @@ int _gnutls13_send_key_update(gnutls_session_t session, unsigned again,
 			gnutls_assert();
 			goto cleanup;
 		}
-
 	}
 
 	return _gnutls_send_handshake(session, bufel,
 				      GNUTLS_HANDSHAKE_KEY_UPDATE);
 
- cleanup:
+cleanup:
 	_mbuffer_xfree(&bufel);
 	return ret;
 }

@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -32,21 +32,21 @@
 
 #include "utils.h"
 
-#define SELF_TEST_SIG(x) \
-	ret = gnutls_oid_to_sign(gnutls_sign_get_oid(x)); \
-	if (ret != x) { \
+#define SELF_TEST_SIG(x)                                             \
+	ret = gnutls_oid_to_sign(gnutls_sign_get_oid(x));            \
+	if (ret != x) {                                              \
 		fail("error testing %s\n", gnutls_sign_get_name(x)); \
 	}
 
-#define SELF_TEST_PK(x) \
-	ret = gnutls_oid_to_pk(gnutls_pk_get_oid(x)); \
-	if (ret != x) { \
+#define SELF_TEST_PK(x)                                            \
+	ret = gnutls_oid_to_pk(gnutls_pk_get_oid(x));              \
+	if (ret != x) {                                            \
 		fail("error testing %s\n", gnutls_pk_get_name(x)); \
 	}
 
-#define SELF_TEST_DIG(x) \
-	ret = gnutls_oid_to_digest(gnutls_digest_get_oid(x)); \
-	if (ret != x) { \
+#define SELF_TEST_DIG(x)                                               \
+	ret = gnutls_oid_to_digest(gnutls_digest_get_oid(x));          \
+	if (ret != x) {                                                \
 		fail("error testing %s\n", gnutls_digest_get_name(x)); \
 	}
 

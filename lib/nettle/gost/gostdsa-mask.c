@@ -30,7 +30,7 @@
 */
 
 #if HAVE_CONFIG_H
-# include "config.h"
+#include "config.h"
 #endif
 
 #include <gnutls_int.h>
@@ -40,9 +40,11 @@
 #include <nettle/ecc-curve.h>
 #include "gostdsa2.h"
 
-#define GOST_GC256B_Q "ffffffffffffffffffffffffffffffff" \
+#define GOST_GC256B_Q                      \
+	"ffffffffffffffffffffffffffffffff" \
 	"6c611070995ad10045841b09b761b893"
-#define GOST_GC512A_Q "ffffffffffffffffffffffffffffffff" \
+#define GOST_GC512A_Q                      \
+	"ffffffffffffffffffffffffffffffff" \
 	"ffffffffffffffffffffffffffffffff" \
 	"27e69532f48d89116ff22b8d4e056060" \
 	"9b4b38abfad2b85dcacdb1411f10b275"

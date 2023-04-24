@@ -21,28 +21,27 @@
  */
 
 #ifndef GNUTLS_LIB_IOV_H
-# define GNUTLS_LIB_IOV_H
+#define GNUTLS_LIB_IOV_H
 
-# include "gnutls_int.h"
+#include "gnutls_int.h"
 
 struct iov_iter_st {
 	const giovec_t *iov;
-	size_t iov_count;	/* the number of iov */
-	size_t iov_index;	/* index of the current buffer */
-	size_t iov_offset;	/* byte offset in the current buffer */
+	size_t iov_count; /* the number of iov */
+	size_t iov_index; /* index of the current buffer */
+	size_t iov_offset; /* byte offset in the current buffer */
 
-	uint8_t block[MAX_CIPHER_BLOCK_SIZE];	/* incomplete block for reading */
-	size_t block_size;	/* actual block size of the cipher */
-	size_t block_offset;	/* offset in block */
+	uint8_t block[MAX_CIPHER_BLOCK_SIZE]; /* incomplete block for reading */
+	size_t block_size; /* actual block size of the cipher */
+	size_t block_offset; /* offset in block */
 };
 
-int _gnutls_iov_iter_init(struct iov_iter_st *iter,
-			  const giovec_t * iov, size_t iov_count,
-			  size_t block_size);
+int _gnutls_iov_iter_init(struct iov_iter_st *iter, const giovec_t *iov,
+			  size_t iov_count, size_t block_size);
 
-ssize_t _gnutls_iov_iter_next(struct iov_iter_st *iter, uint8_t ** data);
+ssize_t _gnutls_iov_iter_next(struct iov_iter_st *iter, uint8_t **data);
 
-int _gnutls_iov_iter_sync(struct iov_iter_st *iter, const uint8_t * data,
+int _gnutls_iov_iter_sync(struct iov_iter_st *iter, const uint8_t *data,
 			  size_t data_size);
 
-#endif				/* GNUTLS_LIB_IOV_H */
+#endif /* GNUTLS_LIB_IOV_H */

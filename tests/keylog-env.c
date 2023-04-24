@@ -20,7 +20,7 @@
 /* Parts copied from GnuTLS example programs. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdbool.h>
@@ -29,10 +29,10 @@
 #include <string.h>
 #include <sys/types.h>
 #if !defined(_WIN32)
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
 #endif
 #include <fcntl.h>
 #include <unistd.h>
@@ -90,8 +90,8 @@ static void search_for_str(const char *filename, const char *label,
 		fail("file should contain %s\n", label);
 }
 
-static void run(const char *filename, const char *prio,
-		const char **included, const char **excluded)
+static void run(const char *filename, const char *prio, const char **included,
+		const char **excluded)
 {
 	gnutls_certificate_credentials_t x509_cred;
 	gnutls_certificate_credentials_t clicred;
@@ -117,19 +117,16 @@ static void run(const char *filename, const char *prio,
 	assert(gnutls_certificate_allocate_credentials(&x509_cred) >= 0);
 	assert(gnutls_certificate_allocate_credentials(&clicred) >= 0);
 
-	ret =
-	    gnutls_certificate_set_x509_key_mem(x509_cred,
-						&server_ca3_localhost_cert_chain,
-						&server_ca3_key,
-						GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_key_mem(
+		x509_cred, &server_ca3_localhost_cert_chain, &server_ca3_key,
+		GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
 		fail("error in error code\n");
 		exit(1);
 	}
 
-	ret =
-	    gnutls_certificate_set_x509_trust_mem(clicred, &ca3_cert,
-						  GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_trust_mem(clicred, &ca3_cert,
+						    GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		fail("set_x509_trust_file failed: %s\n", gnutls_strerror(ret));
 

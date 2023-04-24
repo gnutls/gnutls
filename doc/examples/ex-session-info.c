@@ -1,7 +1,7 @@
 /* This example code is placed in the public domain. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -62,7 +62,7 @@ int print_info(gnutls_session_t session)
 			dhe = 1;
 		break;
 
-	case GNUTLS_CRD_ANON:	/* anonymous authentication */
+	case GNUTLS_CRD_ANON: /* anonymous authentication */
 
 		printf("- Anonymous authentication.\n");
 		if (kx == GNUTLS_KX_ANON_ECDH)
@@ -71,14 +71,14 @@ int print_info(gnutls_session_t session)
 			dhe = 1;
 		break;
 
-	case GNUTLS_CRD_CERTIFICATE:	/* certificate authentication */
+	case GNUTLS_CRD_CERTIFICATE: /* certificate authentication */
 
 		/* Check if we have been using ephemeral Diffie-Hellman.
 		 */
 		if (kx == GNUTLS_KX_DHE_RSA || kx == GNUTLS_KX_DHE_DSS)
 			dhe = 1;
-		else if (kx == GNUTLS_KX_ECDHE_RSA
-			 || kx == GNUTLS_KX_ECDHE_ECDSA)
+		else if (kx == GNUTLS_KX_ECDHE_RSA ||
+			 kx == GNUTLS_KX_ECDHE_ECDSA)
 			ecdh = 1;
 
 		/* if the certificate list is available, then
@@ -88,7 +88,7 @@ int print_info(gnutls_session_t session)
 		break;
 	default:
 		break;
-	}			/* switch */
+	} /* switch */
 
 	/* read the negotiated group - if any */
 	group = gnutls_group_get(session);
@@ -97,8 +97,8 @@ int print_info(gnutls_session_t session)
 	} else {
 		if (ecdh != 0)
 			printf("- Ephemeral ECDH using curve %s\n",
-			       gnutls_ecc_curve_get_name(gnutls_ecc_curve_get
-							 (session)));
+			       gnutls_ecc_curve_get_name(
+				       gnutls_ecc_curve_get(session)));
 		else if (dhe != 0)
 			printf("- Ephemeral DH using prime of %d bits\n",
 			       gnutls_dh_get_prime_bits(session));

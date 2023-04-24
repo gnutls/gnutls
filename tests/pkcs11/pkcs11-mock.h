@@ -28,14 +28,14 @@
 #define CK_PTR *
 #define CK_DEFINE_FUNCTION(returnType, name) returnType name
 #define CK_DECLARE_FUNCTION(returnType, name) returnType name
-#define CK_DECLARE_FUNCTION_POINTER(returnType, name) returnType (* name)
-#define CK_CALLBACK_FUNCTION(returnType, name) returnType (* name)
+#define CK_DECLARE_FUNCTION_POINTER(returnType, name) returnType(*name)
+#define CK_CALLBACK_FUNCTION(returnType, name) returnType(*name)
 
 #include <p11-kit/pkcs11.h>
 #include <p11-kit/pkcs11x.h>
 
 #ifndef NULL_PTR
-# define NULL_PTR 0
+#define NULL_PTR 0
 #endif
 
 #define IGNORE(P) (void)(P)

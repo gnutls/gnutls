@@ -36,7 +36,7 @@
 
 #include <errno.h>
 #ifdef _WIN32
-# include <windows.h>
+#include <windows.h>
 #endif
 
 /**
@@ -78,9 +78,8 @@ void gnutls_transport_set_errno(gnutls_session_t session, int err)
  * @gnutls_pull_func is of the form,
  * ssize_t (*gnutls_pull_func)(gnutls_transport_ptr_t, void*, size_t);
  **/
-void
-gnutls_transport_set_pull_function(gnutls_session_t session,
-				   gnutls_pull_func pull_func)
+void gnutls_transport_set_pull_function(gnutls_session_t session,
+					gnutls_pull_func pull_func)
 {
 	session->internals.pull_func = pull_func;
 }
@@ -119,9 +118,8 @@ gnutls_transport_set_pull_function(gnutls_session_t session,
  *
  * Since: 3.0
  **/
-void
-gnutls_transport_set_pull_timeout_function(gnutls_session_t session,
-					   gnutls_pull_timeout_func func)
+void gnutls_transport_set_pull_timeout_function(gnutls_session_t session,
+						gnutls_pull_timeout_func func)
 {
 	session->internals.pull_timeout_func = func;
 }
@@ -143,9 +141,8 @@ gnutls_transport_set_pull_timeout_function(gnutls_session_t session,
  * ssize_t (*gnutls_push_func)(gnutls_transport_ptr_t, const void*, size_t);
  *
  **/
-void
-gnutls_transport_set_push_function(gnutls_session_t session,
-				   gnutls_push_func push_func)
+void gnutls_transport_set_push_function(gnutls_session_t session,
+					gnutls_push_func push_func)
 {
 	session->internals.push_func = push_func;
 	session->internals.vec_push_func = NULL;
@@ -166,9 +163,8 @@ gnutls_transport_set_push_function(gnutls_session_t session,
  *
  * Since: 2.12.0
  **/
-void
-gnutls_transport_set_vec_push_function(gnutls_session_t session,
-				       gnutls_vec_push_func vec_func)
+void gnutls_transport_set_vec_push_function(gnutls_session_t session,
+					    gnutls_vec_push_func vec_func)
 {
 	session->internals.push_func = NULL;
 	session->internals.vec_push_func = vec_func;
@@ -188,9 +184,8 @@ gnutls_transport_set_vec_push_function(gnutls_session_t session,
  *
  * Since: 2.12.0
  **/
-void
-gnutls_transport_set_errno_function(gnutls_session_t session,
-				    gnutls_errno_func errno_func)
+void gnutls_transport_set_errno_function(gnutls_session_t session,
+					 gnutls_errno_func errno_func)
 {
 	session->internals.errno_func = errno_func;
 }

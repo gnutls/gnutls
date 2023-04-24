@@ -1,7 +1,7 @@
 /* This example code is placed in the public domain. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -18,34 +18,35 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <getpass.h>		/* for getpass() */
+#include <getpass.h> /* for getpass() */
 
 /* A TLS client that loads the certificate and key.
  */
 
-#define CHECK(x) assert((x)>=0)
+#define CHECK(x) assert((x) >= 0)
 
 #define MAX_BUF 1024
 #define MSG "GET / HTTP/1.0\r\n\r\n"
-#define MIN(x,y) (((x)<(y))?(x):(y))
+#define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
 #define CAFILE "/etc/ssl/certs/ca-certificates.crt"
 
 /* The URLs of the objects can be obtained
  * using p11tool --list-all --login
  */
-#define KEY_URL "pkcs11:manufacturer=SomeManufacturer;object=Private%20Key" \
-  ";objecttype=private;id=%db%5b%3e%b5%72%33"
-#define CERT_URL "pkcs11:manufacturer=SomeManufacturer;object=Certificate;" \
-  "objecttype=cert;id=db%5b%3e%b5%72%33"
+#define KEY_URL                                                     \
+	"pkcs11:manufacturer=SomeManufacturer;object=Private%20Key" \
+	";objecttype=private;id=%db%5b%3e%b5%72%33"
+#define CERT_URL                                                   \
+	"pkcs11:manufacturer=SomeManufacturer;object=Certificate;" \
+	"objecttype=cert;id=db%5b%3e%b5%72%33"
 
 extern int tcp_connect(void);
 extern void tcp_close(int sd);
 
-static int
-pin_callback(void *user, int attempt, const char *token_url,
-	     const char *token_label, unsigned int flags, char *pin,
-	     size_t pin_max)
+static int pin_callback(void *user, int attempt, const char *token_url,
+			const char *token_label, unsigned int flags, char *pin,
+			size_t pin_max)
 {
 	const char *password;
 	int len;
@@ -161,7 +162,7 @@ int main(void)
 
 	CHECK(gnutls_bye(session, GNUTLS_SHUT_RDWR));
 
- end:
+end:
 
 	tcp_close(sd);
 

@@ -26,7 +26,7 @@
 
 #include "gnutls_int.h"
 
-#include <string.h>		/* memset */
+#include <string.h> /* memset */
 #include <x509/x509_int.h>
 #include <libtasn1.h>
 #include <gnutls/x509.h>
@@ -42,9 +42,8 @@
  * peer is invalid, or in any other failure this function returns error.
  * Returns a negative error code in case of an error.
  -*/
-int
-gnutls_x509_extract_certificate_dn(const gnutls_datum_t * cert,
-				   gnutls_x509_dn * ret)
+int gnutls_x509_extract_certificate_dn(const gnutls_datum_t *cert,
+				       gnutls_x509_dn *ret)
 {
 	gnutls_x509_crt_t xcert;
 	int result;
@@ -61,13 +60,12 @@ gnutls_x509_extract_certificate_dn(const gnutls_datum_t * cert,
 	}
 
 	len = sizeof(ret->country);
-	gnutls_x509_crt_get_dn_by_oid(xcert, GNUTLS_OID_X520_COUNTRY_NAME,
-				      0, 0, ret->country, &len);
+	gnutls_x509_crt_get_dn_by_oid(xcert, GNUTLS_OID_X520_COUNTRY_NAME, 0, 0,
+				      ret->country, &len);
 
 	len = sizeof(ret->organization);
-	gnutls_x509_crt_get_dn_by_oid(xcert,
-				      GNUTLS_OID_X520_ORGANIZATION_NAME, 0,
-				      0, ret->organization, &len);
+	gnutls_x509_crt_get_dn_by_oid(xcert, GNUTLS_OID_X520_ORGANIZATION_NAME,
+				      0, 0, ret->organization, &len);
 
 	len = sizeof(ret->organizational_unit_name);
 	gnutls_x509_crt_get_dn_by_oid(xcert,
@@ -76,17 +74,17 @@ gnutls_x509_extract_certificate_dn(const gnutls_datum_t * cert,
 				      &len);
 
 	len = sizeof(ret->common_name);
-	gnutls_x509_crt_get_dn_by_oid(xcert, GNUTLS_OID_X520_COMMON_NAME,
-				      0, 0, ret->common_name, &len);
+	gnutls_x509_crt_get_dn_by_oid(xcert, GNUTLS_OID_X520_COMMON_NAME, 0, 0,
+				      ret->common_name, &len);
 
 	len = sizeof(ret->locality_name);
-	gnutls_x509_crt_get_dn_by_oid(xcert, GNUTLS_OID_X520_LOCALITY_NAME,
-				      0, 0, ret->locality_name, &len);
+	gnutls_x509_crt_get_dn_by_oid(xcert, GNUTLS_OID_X520_LOCALITY_NAME, 0,
+				      0, ret->locality_name, &len);
 
 	len = sizeof(ret->state_or_province_name);
 	gnutls_x509_crt_get_dn_by_oid(xcert,
-				      GNUTLS_OID_X520_STATE_OR_PROVINCE_NAME,
-				      0, 0, ret->state_or_province_name, &len);
+				      GNUTLS_OID_X520_STATE_OR_PROVINCE_NAME, 0,
+				      0, ret->state_or_province_name, &len);
 
 	len = sizeof(ret->email);
 	gnutls_x509_crt_get_dn_by_oid(xcert, GNUTLS_OID_PKCS9_EMAIL, 0, 0,
@@ -107,9 +105,8 @@ gnutls_x509_extract_certificate_dn(const gnutls_datum_t * cert,
  * peer is invalid, or in any other failure this function returns error.
  * Returns a negative error code in case of an error.
  -*/
-int
-gnutls_x509_extract_certificate_issuer_dn(const gnutls_datum_t * cert,
-					  gnutls_x509_dn * ret)
+int gnutls_x509_extract_certificate_issuer_dn(const gnutls_datum_t *cert,
+					      gnutls_x509_dn *ret)
 {
 	gnutls_x509_crt_t xcert;
 	int result;
@@ -126,9 +123,8 @@ gnutls_x509_extract_certificate_issuer_dn(const gnutls_datum_t * cert,
 	}
 
 	len = sizeof(ret->country);
-	gnutls_x509_crt_get_issuer_dn_by_oid(xcert,
-					     GNUTLS_OID_X520_COUNTRY_NAME,
-					     0, 0, ret->country, &len);
+	gnutls_x509_crt_get_issuer_dn_by_oid(
+		xcert, GNUTLS_OID_X520_COUNTRY_NAME, 0, 0, ret->country, &len);
 
 	len = sizeof(ret->organization);
 	gnutls_x509_crt_get_issuer_dn_by_oid(xcert,
@@ -136,31 +132,27 @@ gnutls_x509_extract_certificate_issuer_dn(const gnutls_datum_t * cert,
 					     0, 0, ret->organization, &len);
 
 	len = sizeof(ret->organizational_unit_name);
-	gnutls_x509_crt_get_issuer_dn_by_oid(xcert,
-					     GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME,
-					     0, 0,
-					     ret->organizational_unit_name,
-					     &len);
+	gnutls_x509_crt_get_issuer_dn_by_oid(
+		xcert, GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME, 0, 0,
+		ret->organizational_unit_name, &len);
 
 	len = sizeof(ret->common_name);
-	gnutls_x509_crt_get_issuer_dn_by_oid(xcert,
-					     GNUTLS_OID_X520_COMMON_NAME,
+	gnutls_x509_crt_get_issuer_dn_by_oid(xcert, GNUTLS_OID_X520_COMMON_NAME,
 					     0, 0, ret->common_name, &len);
 
 	len = sizeof(ret->locality_name);
 	gnutls_x509_crt_get_issuer_dn_by_oid(xcert,
-					     GNUTLS_OID_X520_LOCALITY_NAME,
-					     0, 0, ret->locality_name, &len);
+					     GNUTLS_OID_X520_LOCALITY_NAME, 0,
+					     0, ret->locality_name, &len);
 
 	len = sizeof(ret->state_or_province_name);
-	gnutls_x509_crt_get_issuer_dn_by_oid(xcert,
-					     GNUTLS_OID_X520_STATE_OR_PROVINCE_NAME,
-					     0, 0,
-					     ret->state_or_province_name, &len);
+	gnutls_x509_crt_get_issuer_dn_by_oid(
+		xcert, GNUTLS_OID_X520_STATE_OR_PROVINCE_NAME, 0, 0,
+		ret->state_or_province_name, &len);
 
 	len = sizeof(ret->email);
-	gnutls_x509_crt_get_issuer_dn_by_oid(xcert, GNUTLS_OID_PKCS9_EMAIL,
-					     0, 0, ret->email, &len);
+	gnutls_x509_crt_get_issuer_dn_by_oid(xcert, GNUTLS_OID_PKCS9_EMAIL, 0,
+					     0, ret->email, &len);
 
 	gnutls_x509_crt_deinit(xcert);
 

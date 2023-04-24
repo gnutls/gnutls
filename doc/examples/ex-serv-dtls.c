@@ -1,7 +1,7 @@
 /* This example code is placed in the public domain. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -28,9 +28,9 @@
  */
 
 #define LOOP_CHECK(rval, cmd) \
-        do { \
-                rval = cmd; \
-        } while(rval == GNUTLS_E_AGAIN || rval == GNUTLS_E_INTERRUPTED)
+	do {                  \
+		rval = cmd;   \
+	} while (rval == GNUTLS_E_AGAIN || rval == GNUTLS_E_INTERRUPTED)
 
 #define MAX_BUFFER 1024
 #define PORT 5557
@@ -81,9 +81,8 @@ int main(void)
 	gnutls_certificate_set_x509_crl_file(x509_cred, CRLFILE,
 					     GNUTLS_X509_FMT_PEM);
 
-	ret =
-	    gnutls_certificate_set_x509_key_file(x509_cred, CERTFILE,
-						 KEYFILE, GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_key_file(x509_cred, CERTFILE, KEYFILE,
+						   GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
 		printf("No certificate or key were found\n");
 		exit(1);
@@ -97,9 +96,8 @@ int main(void)
 	 *                      "NORMAL:-VERS-TLS-ALL:+VERS-DTLS1.0:%SERVER_PRECEDENCE",
 	 *                      NULL);
 	 */
-	gnutls_priority_init2(&priority_cache,
-			      "%SERVER_PRECEDENCE",
-			      NULL, GNUTLS_PRIORITY_INIT_DEF_APPEND);
+	gnutls_priority_init2(&priority_cache, "%SERVER_PRECEDENCE", NULL,
+			      GNUTLS_PRIORITY_INIT_DEF_APPEND);
 
 	gnutls_key_generate(&cookie_key, GNUTLS_COOKIE_KEY_SIZE);
 
@@ -112,7 +110,7 @@ int main(void)
 	sa_serv.sin_addr.s_addr = INADDR_ANY;
 	sa_serv.sin_port = htons(PORT);
 
-	{			/* DTLS requires the IP don't fragment (DF) bit to be set */
+	{ /* DTLS requires the IP don't fragment (DF) bit to be set */
 #if defined(IP_DONTFRAG)
 		int optval = 1;
 		setsockopt(listen_sd, IPPROTO_IP, IP_DONTFRAG,
@@ -139,12 +137,10 @@ int main(void)
 			       (struct sockaddr *)&cli_addr, &cli_addr_size);
 		if (ret > 0) {
 			memset(&prestate, 0, sizeof(prestate));
-			ret =
-			    gnutls_dtls_cookie_verify(&cookie_key,
-						      &cli_addr,
-						      sizeof(cli_addr),
-						      buffer, ret, &prestate);
-			if (ret < 0) {	/* cookie not valid */
+			ret = gnutls_dtls_cookie_verify(&cookie_key, &cli_addr,
+							sizeof(cli_addr),
+							buffer, ret, &prestate);
+			if (ret < 0) { /* cookie not valid */
 				priv_data_st s;
 
 				memset(&s, 0, sizeof(s));
@@ -152,19 +148,15 @@ int main(void)
 				s.cli_addr = (void *)&cli_addr;
 				s.cli_addr_size = sizeof(cli_addr);
 
-				printf
-				    ("Sending hello verify request to %s\n",
-				     human_addr((struct sockaddr *)
-						&cli_addr,
-						sizeof(cli_addr), buffer,
-						sizeof(buffer)));
+				printf("Sending hello verify request to %s\n",
+				       human_addr((struct sockaddr *)&cli_addr,
+						  sizeof(cli_addr), buffer,
+						  sizeof(buffer)));
 
-				gnutls_dtls_cookie_send(&cookie_key,
-							&cli_addr,
-							sizeof(cli_addr),
-							&prestate,
-							(gnutls_transport_ptr_t)
-							& s, push_func);
+				gnutls_dtls_cookie_send(
+					&cookie_key, &cli_addr,
+					sizeof(cli_addr), &prestate,
+					(gnutls_transport_ptr_t)&s, push_func);
 
 				/* discard peeked data */
 				recvfrom(sock, buffer, sizeof(buffer), 0,
@@ -174,9 +166,9 @@ int main(void)
 				continue;
 			}
 			printf("Accepted connection from %s\n",
-			       human_addr((struct sockaddr *)
-					  &cli_addr, sizeof(cli_addr),
-					  buffer, sizeof(buffer)));
+			       human_addr((struct sockaddr *)&cli_addr,
+					  sizeof(cli_addr), buffer,
+					  sizeof(buffer)));
 		} else
 			continue;
 
@@ -214,10 +206,9 @@ int main(void)
 		printf("- Handshake was completed\n");
 
 		for (;;) {
-			LOOP_CHECK(ret,
-				   gnutls_record_recv_seq(session, buffer,
-							  MAX_BUFFER,
-							  sequence));
+			LOOP_CHECK(ret, gnutls_record_recv_seq(session, buffer,
+							       MAX_BUFFER,
+							       sequence));
 
 			if (ret < 0 && gnutls_error_is_fatal(ret) == 0) {
 				fprintf(stderr, "*** Warning: %s\n",
@@ -235,11 +226,10 @@ int main(void)
 			}
 
 			buffer[ret] = 0;
-			printf
-			    ("received[%.2x%.2x%.2x%.2x%.2x%.2x%.2x%.2x]: %s\n",
-			     sequence[0], sequence[1], sequence[2],
-			     sequence[3], sequence[4], sequence[5],
-			     sequence[6], sequence[7], buffer);
+			printf("received[%.2x%.2x%.2x%.2x%.2x%.2x%.2x%.2x]: %s\n",
+			       sequence[0], sequence[1], sequence[2],
+			       sequence[3], sequence[4], sequence[5],
+			       sequence[6], sequence[7], buffer);
 
 			/* reply back */
 			LOOP_CHECK(ret,
@@ -253,7 +243,6 @@ int main(void)
 
 		LOOP_CHECK(ret, gnutls_bye(session, GNUTLS_SHUT_WR));
 		gnutls_deinit(session);
-
 	}
 	close(listen_sd);
 
@@ -263,7 +252,6 @@ int main(void)
 	gnutls_global_deinit();
 
 	return 0;
-
 }
 
 static int wait_for_connection(int fd)
@@ -315,20 +303,19 @@ static int pull_timeout_func(gnutls_transport_ptr_t ptr, unsigned int ms)
 	 * from 
 	 */
 	cli_addr_size = sizeof(cli_addr);
-	ret =
-	    recvfrom(priv->fd, &c, 1, MSG_PEEK,
-		     (struct sockaddr *)&cli_addr, &cli_addr_size);
+	ret = recvfrom(priv->fd, &c, 1, MSG_PEEK, (struct sockaddr *)&cli_addr,
+		       &cli_addr_size);
 	if (ret > 0) {
-		if (cli_addr_size == priv->cli_addr_size
-		    && memcmp(&cli_addr, priv->cli_addr, sizeof(cli_addr)) == 0)
+		if (cli_addr_size == priv->cli_addr_size &&
+		    memcmp(&cli_addr, priv->cli_addr, sizeof(cli_addr)) == 0)
 			return 1;
 	}
 
 	return 0;
 }
 
-static ssize_t
-push_func(gnutls_transport_ptr_t p, const void *data, size_t size)
+static ssize_t push_func(gnutls_transport_ptr_t p, const void *data,
+			 size_t size)
 {
 	priv_data_st *priv = p;
 
@@ -345,21 +332,18 @@ static ssize_t pull_func(gnutls_transport_ptr_t p, void *data, size_t size)
 	int ret;
 
 	cli_addr_size = sizeof(cli_addr);
-	ret =
-	    recvfrom(priv->fd, data, size, 0,
-		     (struct sockaddr *)&cli_addr, &cli_addr_size);
+	ret = recvfrom(priv->fd, data, size, 0, (struct sockaddr *)&cli_addr,
+		       &cli_addr_size);
 	if (ret == -1)
 		return ret;
 
-	if (cli_addr_size == priv->cli_addr_size
-	    && memcmp(&cli_addr, priv->cli_addr, sizeof(cli_addr)) == 0)
+	if (cli_addr_size == priv->cli_addr_size &&
+	    memcmp(&cli_addr, priv->cli_addr, sizeof(cli_addr)) == 0)
 		return ret;
 
-	printf("Denied connection from %s\n", human_addr((struct sockaddr *)
-							 &cli_addr,
-							 sizeof(cli_addr),
-							 buffer,
-							 sizeof(buffer)));
+	printf("Denied connection from %s\n",
+	       human_addr((struct sockaddr *)&cli_addr, sizeof(cli_addr),
+			  buffer, sizeof(buffer)));
 
 	gnutls_transport_set_errno(priv->session, EAGAIN);
 	return -1;

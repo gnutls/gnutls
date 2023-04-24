@@ -35,7 +35,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #ifdef __APPLE__
-# include <sys/random.h>
+#include <sys/random.h>
 #endif
 
 /* gnulib wants to claim strerror even if it cannot provide it. WTF */
@@ -57,8 +57,8 @@ static int _rnd_get_system_entropy_simple(void *_rnd, size_t size)
 	if (getentropy(_rnd, size) < 0) {
 		int e = errno;
 		gnutls_assert();
-		_gnutls_debug_log
-		    ("Failed to use getentropy: %s\n", strerror(e));
+		_gnutls_debug_log("Failed to use getentropy: %s\n",
+				  strerror(e));
 		return GNUTLS_E_RANDOM_DEVICE_ERROR;
 	}
 	return 0;

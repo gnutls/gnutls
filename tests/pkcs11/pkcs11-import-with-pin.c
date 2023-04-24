@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -40,7 +40,7 @@
  * pin-value or pin-source. */
 
 #define CONFIG_NAME "softhsm-import-with-pin"
-#define CONFIG CONFIG_NAME".config"
+#define CONFIG CONFIG_NAME ".config"
 
 #include "../cert-common.h"
 
@@ -53,9 +53,9 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "|<%d>| %s", level, str);
 }
 
-static
-int pin_func(void *userdata, int attempt, const char *url, const char *label,
-	     unsigned flags, char *pin, size_t pin_max)
+static int pin_func(void *userdata, int attempt, const char *url,
+		    const char *label, unsigned flags, char *pin,
+		    size_t pin_max)
 {
 	if (attempt == 0) {
 		strcpy(pin, PIN);
@@ -102,8 +102,9 @@ void doit(void)
 
 	set_softhsm_conf(CONFIG);
 	snprintf(buf, sizeof(buf),
-		 "%s --init-token --slot 0 --label test --so-pin " PIN " --pin "
-		 PIN, bin);
+		 "%s --init-token --slot 0 --label test --so-pin " PIN
+		 " --pin " PIN,
+		 bin);
 	system(buf);
 
 	ret = gnutls_pkcs11_add_provider(lib, "trusted");
@@ -114,15 +115,14 @@ void doit(void)
 
 	ret = gnutls_x509_privkey_init(&key);
 	if (ret < 0) {
-		fprintf(stderr,
-			"gnutls_x509_privkey_init: %s\n", gnutls_strerror(ret));
+		fprintf(stderr, "gnutls_x509_privkey_init: %s\n",
+			gnutls_strerror(ret));
 		exit(1);
 	}
 
 	ret = gnutls_x509_privkey_import(key, &server_key, GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
-		fprintf(stderr,
-			"gnutls_x509_privkey_import: %s\n",
+		fprintf(stderr, "gnutls_x509_privkey_import: %s\n",
 			gnutls_strerror(ret));
 		exit(1);
 	}
@@ -134,22 +134,19 @@ void doit(void)
 		exit(1);
 	}
 
-	ret =
-	    gnutls_pkcs11_token_set_pin(SOFTHSM_URL, NULL, PIN,
-					GNUTLS_PIN_USER);
+	ret = gnutls_pkcs11_token_set_pin(SOFTHSM_URL, NULL, PIN,
+					  GNUTLS_PIN_USER);
 	if (ret < 0) {
 		fail("gnutls_pkcs11_token_set_pin: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
-	ret =
-	    gnutls_pkcs11_copy_x509_privkey(SOFTHSM_URL, key, "cert",
-					    GNUTLS_KEY_DIGITAL_SIGNATURE |
-					    GNUTLS_KEY_KEY_ENCIPHERMENT,
-					    GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE
-					    |
-					    GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE
-					    | GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
+	ret = gnutls_pkcs11_copy_x509_privkey(
+		SOFTHSM_URL, key, "cert",
+		GNUTLS_KEY_DIGITAL_SIGNATURE | GNUTLS_KEY_KEY_ENCIPHERMENT,
+		GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE |
+			GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE |
+			GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
 	if (ret < 0) {
 		fail("gnutls_pkcs11_copy_x509_privkey: %s\n",
 		     gnutls_strerror(ret));
@@ -163,10 +160,9 @@ void doit(void)
 
 	/* Test 1
 	 * Try importing with wrong pin-value */
-	ret =
-	    gnutls_privkey_import_pkcs11_url(pkey,
-					     SOFTHSM_URL
-					     ";object=cert;object-type=private;pin-value=XXXX");
+	ret = gnutls_privkey_import_pkcs11_url(
+		pkey,
+		SOFTHSM_URL ";object=cert;object-type=private;pin-value=XXXX");
 	if (ret != GNUTLS_E_PKCS11_PIN_ERROR) {
 		fprintf(stderr, "unexpected error in %d: %s\n", __LINE__,
 			gnutls_strerror(ret));
@@ -177,11 +173,9 @@ void doit(void)
 
 	/* Test 2
 	 * Try importing with pin-value */
-	ret =
-	    gnutls_privkey_import_pkcs11_url(pkey,
-					     SOFTHSM_URL
-					     ";object=cert;object-type=private;pin-value="
-					     PIN);
+	ret = gnutls_privkey_import_pkcs11_url(
+		pkey,
+		SOFTHSM_URL ";object=cert;object-type=private;pin-value=" PIN);
 	if (ret < 0) {
 		fprintf(stderr, "error in %d: %s\n", __LINE__,
 			gnutls_strerror(ret));
@@ -189,8 +183,8 @@ void doit(void)
 	}
 
 	/* check whether privkey is operational by signing */
-	assert(gnutls_privkey_sign_data
-	       (pkey, GNUTLS_DIG_SHA256, 0, &testdata, &sig) == 0);
+	assert(gnutls_privkey_sign_data(pkey, GNUTLS_DIG_SHA256, 0, &testdata,
+					&sig) == 0);
 	gnutls_free(sig.data);
 	gnutls_privkey_deinit(pkey);
 
@@ -230,8 +224,8 @@ void doit(void)
 	}
 
 	/* check whether privkey is operational by signing */
-	assert(gnutls_privkey_sign_data
-	       (pkey, GNUTLS_DIG_SHA256, 0, &testdata, &sig) == 0);
+	assert(gnutls_privkey_sign_data(pkey, GNUTLS_DIG_SHA256, 0, &testdata,
+					&sig) == 0);
 	gnutls_free(sig.data);
 	gnutls_privkey_deinit(pkey);
 

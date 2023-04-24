@@ -22,10 +22,10 @@
  */
 
 #ifndef GNUTLS_NAME_VAL_ARRAY_H
-# define GNUTLS_NAME_VAL_ARRAY_H
+#define GNUTLS_NAME_VAL_ARRAY_H
 
-# include "gnutls_int.h"
-# include "errors.h"
+#include "gnutls_int.h"
+#include "errors.h"
 
 /* Functionality to allow an array of strings. Strings
  * are allowed to be added to the list and matched against it.
@@ -38,7 +38,7 @@ typedef struct name_val_array_st {
 	struct name_val_array_st *next;
 } *name_val_array_t;
 
-inline static void _name_val_array_clear(name_val_array_t * head)
+inline static void _name_val_array_clear(name_val_array_t *head)
 {
 	name_val_array_t prev, array = *head;
 
@@ -75,8 +75,8 @@ inline static void append(name_val_array_t array, const char *name,
 	array->name[name_len] = 0;
 	array->name_size = name_len;
 
-	array->val =
-	    ((char *)array) + name_len + 1 + sizeof(struct name_val_array_st);
+	array->val = ((char *)array) + name_len + 1 +
+		     sizeof(struct name_val_array_st);
 	if (val)
 		memcpy(array->val, val, val_len);
 	array->val[val_len] = 0;
@@ -84,7 +84,7 @@ inline static void append(name_val_array_t array, const char *name,
 	array->next = NULL;
 }
 
-inline static int _name_val_array_append(name_val_array_t * head,
+inline static int _name_val_array_append(name_val_array_t *head,
 					 const char *name, const char *val)
 {
 	name_val_array_t prev, array;
@@ -92,9 +92,8 @@ inline static int _name_val_array_append(name_val_array_t * head,
 	unsigned val_len = (val == NULL) ? 0 : strlen(val);
 
 	if (*head == NULL) {
-		*head =
-		    gnutls_malloc(val_len + name_len + 2 +
-				  sizeof(struct name_val_array_st));
+		*head = gnutls_malloc(val_len + name_len + 2 +
+				      sizeof(struct name_val_array_st));
 		if (*head == NULL)
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
@@ -108,9 +107,8 @@ inline static int _name_val_array_append(name_val_array_t * head,
 			prev = array;
 			array = prev->next;
 		}
-		prev->next =
-		    gnutls_malloc(name_len + val_len + 2 +
-				  sizeof(struct name_val_array_st));
+		prev->next = gnutls_malloc(name_len + val_len + 2 +
+					   sizeof(struct name_val_array_st));
 		array = prev->next;
 
 		if (array == NULL)

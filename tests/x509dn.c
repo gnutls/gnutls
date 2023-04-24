@@ -23,7 +23,7 @@
 /* Parts copied from GnuTLS example programs. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -40,22 +40,22 @@ int main(int argc, char **argv)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <sys/socket.h>
-# if !defined(_WIN32)
-#  include <sys/wait.h>
-# endif
-# include <unistd.h>
-# include <signal.h>
-# include <assert.h>
-# include <gnutls/gnutls.h>
-# include <gnutls/abstract.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#if !defined(_WIN32)
+#include <sys/wait.h>
+#endif
+#include <unistd.h>
+#include <signal.h>
+#include <assert.h>
+#include <gnutls/gnutls.h>
+#include <gnutls/abstract.h>
 
-# include "utils.h"
+#include "utils.h"
 
-# include "ex-session-info.c"
-# include "ex-x509-info.c"
+#include "ex-session-info.c"
+#include "ex-x509-info.c"
 
 pid_t child;
 
@@ -65,23 +65,23 @@ static void tls_log_func(int level, const char *str)
 		str);
 }
 
-# define MAX_BUF 1024
-# define MSG "Hello TLS"
+#define MAX_BUF 1024
+#define MSG "Hello TLS"
 
-# define EXPECT_RDN0 "CA-3"
+#define EXPECT_RDN0 "CA-3"
 
-static int
-cert_callback(gnutls_session_t session,
-	      const gnutls_datum_t * req_ca_rdn, int nreqs,
-	      const gnutls_pk_algorithm_t * sign_algos,
-	      int sign_algos_length, gnutls_pcert_st ** pcert,
-	      unsigned int *pcert_length, gnutls_privkey_t * pkey)
+static int cert_callback(gnutls_session_t session,
+			 const gnutls_datum_t *req_ca_rdn, int nreqs,
+			 const gnutls_pk_algorithm_t *sign_algos,
+			 int sign_algos_length, gnutls_pcert_st **pcert,
+			 unsigned int *pcert_length, gnutls_privkey_t *pkey)
 {
 	int result;
 	gnutls_x509_dn_t dn;
 
 	if (nreqs != 1) {
-		fail("client: invoked to provide client cert, but %d CAs are requested by server.\n", nreqs);
+		fail("client: invoked to provide client cert, but %d CAs are requested by server.\n",
+		     nreqs);
 		return -1;
 	}
 
@@ -105,9 +105,9 @@ cert_callback(gnutls_session_t session,
 			if (debug)
 				success("client: got RDN 0.\n");
 
-			if (val.value.size == strlen(EXPECT_RDN0)
-			    && strncmp((char *)val.value.data,
-				       EXPECT_RDN0, val.value.size) == 0) {
+			if (val.value.size == strlen(EXPECT_RDN0) &&
+			    strncmp((char *)val.value.data, EXPECT_RDN0,
+				    val.value.size) == 0) {
 				if (debug)
 					success("client: RND 0 correct.\n");
 			} else {
@@ -182,8 +182,8 @@ static void client(int sd, const char *prio)
 
 	if (debug)
 		success("client: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	/* see the Getting peer's information example */
 	if (debug)
@@ -211,7 +211,7 @@ static void client(int sd, const char *prio)
 
 	gnutls_bye(session, GNUTLS_SHUT_RDWR);
 
- end:
+end:
 
 	close(sd);
 
@@ -225,7 +225,7 @@ static void client(int sd, const char *prio)
 /* This is a sample TLS 1.0 echo server, using X.509 authentication.
  */
 
-# define MAX_BUF 1024
+#define MAX_BUF 1024
 
 static void server(int sd, const char *prio)
 {
@@ -279,8 +279,8 @@ static void server(int sd, const char *prio)
 
 	if (debug)
 		success("server: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	/* see the Getting peer's information example */
 	if (debug)
@@ -292,11 +292,11 @@ static void server(int sd, const char *prio)
 
 		if (ret == 0) {
 			if (debug)
-				success
-				    ("server: Peer has closed the GnuTLS connection\n");
+				success("server: Peer has closed the GnuTLS connection\n");
 			break;
 		} else if (ret < 0) {
-			fail("server: Received corrupted data(%d). Closing...\n", ret);
+			fail("server: Received corrupted data(%d). Closing...\n",
+			     ret);
 			break;
 		} else if (ret > 0) {
 			/* echo data back to the client
@@ -319,8 +319,7 @@ static void server(int sd, const char *prio)
 		success("server: finished\n");
 }
 
-static
-void start(const char *prio)
+static void start(const char *prio)
 {
 	int sockets[2];
 	int err;
@@ -364,4 +363,4 @@ void doit(void)
 	start("NORMAL");
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

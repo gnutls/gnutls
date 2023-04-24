@@ -44,12 +44,12 @@
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
-int gnutls_pkcs12_bag_init(gnutls_pkcs12_bag_t * bag)
+int gnutls_pkcs12_bag_init(gnutls_pkcs12_bag_t *bag)
 {
 	*bag = gnutls_calloc(1, sizeof(gnutls_pkcs12_bag_int));
 
 	if (*bag) {
-		return 0;	/* success */
+		return 0; /* success */
 	}
 	return GNUTLS_E_MEMORY_ERROR;
 }
@@ -64,7 +64,6 @@ static inline void _pkcs12_bag_free_data(gnutls_pkcs12_bag_t bag)
 		gnutls_free(bag->element[i].friendly_name);
 		bag->element[i].type = 0;
 	}
-
 }
 
 /**
@@ -136,9 +135,8 @@ int gnutls_pkcs12_bag_get_count(gnutls_pkcs12_bag_t bag)
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
-int
-gnutls_pkcs12_bag_get_data(gnutls_pkcs12_bag_t bag, unsigned indx,
-			   gnutls_datum_t * data)
+int gnutls_pkcs12_bag_get_data(gnutls_pkcs12_bag_t bag, unsigned indx,
+			       gnutls_datum_t *data)
 {
 	if (bag == NULL) {
 		gnutls_assert();
@@ -155,12 +153,11 @@ gnutls_pkcs12_bag_get_data(gnutls_pkcs12_bag_t bag, unsigned indx,
 }
 
 #define X509_CERT_OID "1.2.840.113549.1.9.22.1"
-#define X509_CRL_OID  "1.2.840.113549.1.9.23.1"
+#define X509_CRL_OID "1.2.840.113549.1.9.23.1"
 #define RANDOM_NONCE_OID "1.2.840.113549.1.9.25.3"
 
-int
-_pkcs12_decode_crt_bag(gnutls_pkcs12_bag_type_t type,
-		       const gnutls_datum_t * in, gnutls_datum_t * out)
+int _pkcs12_decode_crt_bag(gnutls_pkcs12_bag_type_t type,
+			   const gnutls_datum_t *in, gnutls_datum_t *out)
 {
 	int ret;
 	asn1_node c2 = NULL;
@@ -168,8 +165,8 @@ _pkcs12_decode_crt_bag(gnutls_pkcs12_bag_type_t type,
 	switch (type) {
 	case GNUTLS_BAG_CERTIFICATE:
 		if ((ret = asn1_create_element(_gnutls_get_pkix(),
-					       "PKIX1.pkcs-12-CertBag",
-					       &c2)) != ASN1_SUCCESS) {
+					       "PKIX1.pkcs-12-CertBag", &c2)) !=
+		    ASN1_SUCCESS) {
 			gnutls_assert();
 			ret = _gnutls_asn2err(ret);
 			goto cleanup;
@@ -182,9 +179,8 @@ _pkcs12_decode_crt_bag(gnutls_pkcs12_bag_type_t type,
 			goto cleanup;
 		}
 
-		ret =
-		    _gnutls_x509_read_string(c2, "certValue", out,
-					     ASN1_ETYPE_OCTET_STRING, 1);
+		ret = _gnutls_x509_read_string(c2, "certValue", out,
+					       ASN1_ETYPE_OCTET_STRING, 1);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -193,8 +189,8 @@ _pkcs12_decode_crt_bag(gnutls_pkcs12_bag_type_t type,
 
 	case GNUTLS_BAG_CRL:
 		if ((ret = asn1_create_element(_gnutls_get_pkix(),
-					       "PKIX1.pkcs-12-CRLBag",
-					       &c2)) != ASN1_SUCCESS) {
+					       "PKIX1.pkcs-12-CRLBag", &c2)) !=
+		    ASN1_SUCCESS) {
 			gnutls_assert();
 			ret = _gnutls_asn2err(ret);
 			goto cleanup;
@@ -207,9 +203,8 @@ _pkcs12_decode_crt_bag(gnutls_pkcs12_bag_type_t type,
 			goto cleanup;
 		}
 
-		ret =
-		    _gnutls_x509_read_string(c2, "crlValue", out,
-					     ASN1_ETYPE_OCTET_STRING, 1);
+		ret = _gnutls_x509_read_string(c2, "crlValue", out,
+					       ASN1_ETYPE_OCTET_STRING, 1);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -232,9 +227,8 @@ _pkcs12_decode_crt_bag(gnutls_pkcs12_bag_type_t type,
 			goto cleanup;
 		}
 
-		ret =
-		    _gnutls_x509_read_string(c2, "secretValue", out,
-					     ASN1_ETYPE_OCTET_STRING, 1);
+		ret = _gnutls_x509_read_string(c2, "secretValue", out,
+					       ASN1_ETYPE_OCTET_STRING, 1);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -251,15 +245,14 @@ _pkcs12_decode_crt_bag(gnutls_pkcs12_bag_type_t type,
 
 	return 0;
 
- cleanup:
+cleanup:
 
 	asn1_delete_structure(&c2);
 	return ret;
 }
 
-int
-_pkcs12_encode_crt_bag(gnutls_pkcs12_bag_type_t type,
-		       const gnutls_datum_t * raw, gnutls_datum_t * out)
+int _pkcs12_encode_crt_bag(gnutls_pkcs12_bag_type_t type,
+			   const gnutls_datum_t *raw, gnutls_datum_t *out)
 {
 	int ret;
 	asn1_node c2 = NULL;
@@ -267,8 +260,8 @@ _pkcs12_encode_crt_bag(gnutls_pkcs12_bag_type_t type,
 	switch (type) {
 	case GNUTLS_BAG_CERTIFICATE:
 		if ((ret = asn1_create_element(_gnutls_get_pkix(),
-					       "PKIX1.pkcs-12-CertBag",
-					       &c2)) != ASN1_SUCCESS) {
+					       "PKIX1.pkcs-12-CertBag", &c2)) !=
+		    ASN1_SUCCESS) {
 			gnutls_assert();
 			ret = _gnutls_asn2err(ret);
 			goto cleanup;
@@ -281,9 +274,8 @@ _pkcs12_encode_crt_bag(gnutls_pkcs12_bag_type_t type,
 			goto cleanup;
 		}
 
-		ret =
-		    _gnutls_x509_write_string(c2, "certValue", raw,
-					      ASN1_ETYPE_OCTET_STRING);
+		ret = _gnutls_x509_write_string(c2, "certValue", raw,
+						ASN1_ETYPE_OCTET_STRING);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -292,8 +284,8 @@ _pkcs12_encode_crt_bag(gnutls_pkcs12_bag_type_t type,
 
 	case GNUTLS_BAG_CRL:
 		if ((ret = asn1_create_element(_gnutls_get_pkix(),
-					       "PKIX1.pkcs-12-CRLBag",
-					       &c2)) != ASN1_SUCCESS) {
+					       "PKIX1.pkcs-12-CRLBag", &c2)) !=
+		    ASN1_SUCCESS) {
 			gnutls_assert();
 			ret = _gnutls_asn2err(ret);
 			goto cleanup;
@@ -306,9 +298,8 @@ _pkcs12_encode_crt_bag(gnutls_pkcs12_bag_type_t type,
 			goto cleanup;
 		}
 
-		ret =
-		    _gnutls_x509_write_string(c2, "crlValue", raw,
-					      ASN1_ETYPE_OCTET_STRING);
+		ret = _gnutls_x509_write_string(c2, "crlValue", raw,
+						ASN1_ETYPE_OCTET_STRING);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -331,9 +322,8 @@ _pkcs12_encode_crt_bag(gnutls_pkcs12_bag_type_t type,
 			goto cleanup;
 		}
 
-		ret =
-		    _gnutls_x509_write_string(c2, "secretValue", raw,
-					      ASN1_ETYPE_OCTET_STRING);
+		ret = _gnutls_x509_write_string(c2, "secretValue", raw,
+						ASN1_ETYPE_OCTET_STRING);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -357,7 +347,7 @@ _pkcs12_encode_crt_bag(gnutls_pkcs12_bag_type_t type,
 
 	return 0;
 
- cleanup:
+cleanup:
 
 	asn1_delete_structure(&c2);
 	return ret;
@@ -375,10 +365,9 @@ _pkcs12_encode_crt_bag(gnutls_pkcs12_bag_type_t type,
  * Returns: the index of the added bag on success, or a negative
  * value on error.
  **/
-int
-gnutls_pkcs12_bag_set_data(gnutls_pkcs12_bag_t bag,
-			   gnutls_pkcs12_bag_type_t type,
-			   const gnutls_datum_t * data)
+int gnutls_pkcs12_bag_set_data(gnutls_pkcs12_bag_t bag,
+			       gnutls_pkcs12_bag_type_t type,
+			       const gnutls_datum_t *data)
 {
 	int ret;
 	if (bag == NULL) {
@@ -398,16 +387,15 @@ gnutls_pkcs12_bag_set_data(gnutls_pkcs12_bag_t bag,
 		 */
 
 		if (bag->element[0].type == GNUTLS_BAG_PKCS8_KEY ||
-		    bag->element[0].type == GNUTLS_BAG_PKCS8_ENCRYPTED_KEY
-		    || bag->element[0].type == GNUTLS_BAG_ENCRYPTED) {
+		    bag->element[0].type == GNUTLS_BAG_PKCS8_ENCRYPTED_KEY ||
+		    bag->element[0].type == GNUTLS_BAG_ENCRYPTED) {
 			gnutls_assert();
 			return GNUTLS_E_INVALID_REQUEST;
 		}
 	}
 
-	ret =
-	    _gnutls_set_datum(&bag->element[bag->bag_elements].data,
-			      data->data, data->size);
+	ret = _gnutls_set_datum(&bag->element[bag->bag_elements].data,
+				data->data, data->size);
 
 	if (ret < 0) {
 		gnutls_assert();
@@ -503,9 +491,8 @@ int gnutls_pkcs12_bag_set_crl(gnutls_pkcs12_bag_t bag, gnutls_x509_crl_t crl)
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value. or a negative error code on error.
  **/
-int
-gnutls_pkcs12_bag_set_key_id(gnutls_pkcs12_bag_t bag, unsigned indx,
-			     const gnutls_datum_t * id)
+int gnutls_pkcs12_bag_set_key_id(gnutls_pkcs12_bag_t bag, unsigned indx,
+				 const gnutls_datum_t *id)
 {
 	int ret;
 
@@ -519,8 +506,8 @@ gnutls_pkcs12_bag_set_key_id(gnutls_pkcs12_bag_t bag, unsigned indx,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	ret = _gnutls_set_datum(&bag->element[indx].local_key_id,
-				id->data, id->size);
+	ret = _gnutls_set_datum(&bag->element[indx].local_key_id, id->data,
+				id->size);
 
 	if (ret < 0) {
 		gnutls_assert();
@@ -543,9 +530,8 @@ gnutls_pkcs12_bag_set_key_id(gnutls_pkcs12_bag_t bag, unsigned indx,
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value. or a negative error code on error.
  **/
-int
-gnutls_pkcs12_bag_get_key_id(gnutls_pkcs12_bag_t bag, unsigned indx,
-			     gnutls_datum_t * id)
+int gnutls_pkcs12_bag_get_key_id(gnutls_pkcs12_bag_t bag, unsigned indx,
+				 gnutls_datum_t *id)
 {
 	if (bag == NULL) {
 		gnutls_assert();
@@ -576,9 +562,8 @@ gnutls_pkcs12_bag_get_key_id(gnutls_pkcs12_bag_t bag, unsigned indx,
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value. or a negative error code on error.
  **/
-int
-gnutls_pkcs12_bag_get_friendly_name(gnutls_pkcs12_bag_t bag, unsigned indx,
-				    char **name)
+int gnutls_pkcs12_bag_get_friendly_name(gnutls_pkcs12_bag_t bag, unsigned indx,
+					char **name)
 {
 	if (bag == NULL) {
 		gnutls_assert();
@@ -609,9 +594,8 @@ gnutls_pkcs12_bag_get_friendly_name(gnutls_pkcs12_bag_t bag, unsigned indx,
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value. or a negative error code on error.
  **/
-int
-gnutls_pkcs12_bag_set_friendly_name(gnutls_pkcs12_bag_t bag, unsigned indx,
-				    const char *name)
+int gnutls_pkcs12_bag_set_friendly_name(gnutls_pkcs12_bag_t bag, unsigned indx,
+					const char *name)
 {
 	if (bag == NULL) {
 		gnutls_assert();
@@ -695,9 +679,8 @@ int gnutls_pkcs12_bag_decrypt(gnutls_pkcs12_bag_t bag, const char *pass)
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.
  **/
-int
-gnutls_pkcs12_bag_encrypt(gnutls_pkcs12_bag_t bag, const char *pass,
-			  unsigned int flags)
+int gnutls_pkcs12_bag_encrypt(gnutls_pkcs12_bag_t bag, const char *pass,
+			      unsigned int flags)
 {
 	int ret;
 	asn1_node safe_cont = NULL;
@@ -787,11 +770,10 @@ gnutls_pkcs12_bag_encrypt(gnutls_pkcs12_bag_t bag, const char *pass,
  *  %GNUTLS_E_UNKNOWN_CIPHER_TYPE if the structure's encryption isn't supported, or
  *  another negative error code in case of a failure. Zero on success.
  **/
-int
-gnutls_pkcs12_bag_enc_info(gnutls_pkcs12_bag_t bag, unsigned int *schema,
-			   unsigned int *cipher, void *salt,
-			   unsigned int *salt_size, unsigned int *iter_count,
-			   char **oid)
+int gnutls_pkcs12_bag_enc_info(gnutls_pkcs12_bag_t bag, unsigned int *schema,
+			       unsigned int *cipher, void *salt,
+			       unsigned int *salt_size,
+			       unsigned int *iter_count, char **oid)
 {
 	int ret;
 	struct pbkdf2_params kdf;
@@ -851,10 +833,9 @@ gnutls_pkcs12_bag_enc_info(gnutls_pkcs12_bag_t bag, unsigned int *schema,
  * Returns: the index of the added bag on success, or a negative
  * value on failure.
  **/
-int
-gnutls_pkcs12_bag_set_privkey(gnutls_pkcs12_bag_t bag,
-			      gnutls_x509_privkey_t privkey,
-			      const char *password, unsigned flags)
+int gnutls_pkcs12_bag_set_privkey(gnutls_pkcs12_bag_t bag,
+				  gnutls_x509_privkey_t privkey,
+				  const char *password, unsigned flags)
 {
 	int ret;
 	gnutls_datum_t data = { NULL, 0 };
@@ -870,25 +851,22 @@ gnutls_pkcs12_bag_set_privkey(gnutls_pkcs12_bag_t bag,
 		return gnutls_assert_val(ret);
 
 	if (password == NULL) {
-		ret =
-		    gnutls_pkcs12_bag_set_data(bag, GNUTLS_BAG_PKCS8_KEY,
-					       &data);
+		ret = gnutls_pkcs12_bag_set_data(bag, GNUTLS_BAG_PKCS8_KEY,
+						 &data);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
 		}
 	} else {
-		ret =
-		    gnutls_pkcs12_bag_set_data(bag,
-					       GNUTLS_BAG_PKCS8_ENCRYPTED_KEY,
-					       &data);
+		ret = gnutls_pkcs12_bag_set_data(
+			bag, GNUTLS_BAG_PKCS8_ENCRYPTED_KEY, &data);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
 		}
 	}
 
- cleanup:
+cleanup:
 	_gnutls_free_datum(&data);
 
 	return ret;

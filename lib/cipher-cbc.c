@@ -25,15 +25,15 @@
 #include "gnutls_int.h"
 #include "cipher.h"
 
-static void dummy_wait(record_parameters_st * params,
-		       const uint8_t * data, size_t data_size,
-		       unsigned int mac_data, unsigned int max_mac_data)
+static void dummy_wait(record_parameters_st *params, const uint8_t *data,
+		       size_t data_size, unsigned int mac_data,
+		       unsigned int max_mac_data)
 {
 	/* this hack is only needed on CBC ciphers when Encrypt-then-MAC mode
 	 * is not supported by the peer. */
 	unsigned v;
 	unsigned int tag_size =
-	    _gnutls_auth_cipher_tag_len(&params->read.ctx.tls12);
+		_gnutls_auth_cipher_tag_len(&params->read.ctx.tls12);
 	unsigned hash_block = _gnutls_mac_block_size(params->mac);
 
 	/* force additional hash compression function evaluations to prevent timing
@@ -43,14 +43,14 @@ static void dummy_wait(record_parameters_st * params,
 	if (params->mac && params->mac->id == GNUTLS_MAC_SHA384)
 		/* v = 1 for the hash function padding + 16 for message length */
 		v = 17;
-	else			/* v = 1 for the hash function padding + 8 for message length */
+	else /* v = 1 for the hash function padding + 8 for message length */
 		v = 9;
 
 	if (hash_block > 0) {
 		int max_blocks =
-		    (max_mac_data + v + hash_block - 1) / hash_block;
+			(max_mac_data + v + hash_block - 1) / hash_block;
 		int hashed_blocks =
-		    (mac_data + v + hash_block - 1) / hash_block;
+			(mac_data + v + hash_block - 1) / hash_block;
 		unsigned to_hash;
 
 		max_blocks -= hashed_blocks;
@@ -59,10 +59,10 @@ static void dummy_wait(record_parameters_st * params,
 
 		to_hash = max_blocks * hash_block;
 		if ((unsigned)to_hash + 1 + tag_size < data_size) {
-			_gnutls_auth_cipher_add_auth
-			    (&params->read.ctx.tls12,
-			     data + data_size - tag_size - to_hash - 1,
-			     to_hash);
+			_gnutls_auth_cipher_add_auth(
+				&params->read.ctx.tls12,
+				data + data_size - tag_size - to_hash - 1,
+				to_hash);
 		}
 	}
 }
@@ -71,11 +71,10 @@ static void dummy_wait(record_parameters_st * params,
  * any leaks which could make CBC ciphersuites without EtM usable as an
  * oracle to attacks.
  */
-int cbc_mac_verify(gnutls_session_t session, record_parameters_st * params,
-		   uint8_t preamble[MAX_PREAMBLE_SIZE],
-		   content_type_t type,
-		   uint64_t sequence,
-		   const uint8_t * data, size_t data_size, size_t tag_size)
+int cbc_mac_verify(gnutls_session_t session, record_parameters_st *params,
+		   uint8_t preamble[MAX_PREAMBLE_SIZE], content_type_t type,
+		   uint64_t sequence, const uint8_t *data, size_t data_size,
+		   size_t tag_size)
 {
 	int ret;
 	const version_entry_st *ver = get_version(session);
@@ -89,7 +88,7 @@ int cbc_mac_verify(gnutls_session_t session, record_parameters_st * params,
 	unsigned blocksize = _gnutls_cipher_get_block_size(params->cipher);
 #endif
 
-	pad = data[data_size - 1];	/* pad */
+	pad = data[data_size - 1]; /* pad */
 
 	/* Check the padding bytes (TLS 1.x).
 	 * Note that we access all 256 bytes of ciphertext for padding check
@@ -108,8 +107,8 @@ int cbc_mac_verify(gnutls_session_t session, record_parameters_st * params,
 		}
 	}
 
-	if (unlikely
-	    (pad_failed != 0 || (1 + pad > ((int)data_size - tag_size)))) {
+	if (unlikely(pad_failed != 0 ||
+		     (1 + pad > ((int)data_size - tag_size)))) {
 		/* We do not fail here. We check below for the
 		 * the pad_failed. If zero means success.
 		 */
@@ -124,16 +123,15 @@ int cbc_mac_verify(gnutls_session_t session, record_parameters_st * params,
 	 * MAC.
 	 */
 	preamble_size =
-	    _gnutls_make_preamble(sequence, type, length, ver, preamble);
+		_gnutls_make_preamble(sequence, type, length, ver, preamble);
 
-	ret =
-	    _gnutls_auth_cipher_add_auth(&params->read.ctx.tls12, preamble,
-					 preamble_size);
+	ret = _gnutls_auth_cipher_add_auth(&params->read.ctx.tls12, preamble,
+					   preamble_size);
 	if (unlikely(ret < 0))
 		return gnutls_assert_val(ret);
 
-	ret =
-	    _gnutls_auth_cipher_add_auth(&params->read.ctx.tls12, data, length);
+	ret = _gnutls_auth_cipher_add_auth(&params->read.ctx.tls12, data,
+					   length);
 	if (unlikely(ret < 0))
 		return gnutls_assert_val(ret);
 
@@ -141,11 +139,10 @@ int cbc_mac_verify(gnutls_session_t session, record_parameters_st * params,
 	if (unlikely(ret < 0))
 		return gnutls_assert_val(ret);
 
-	if (unlikely
-	    (gnutls_memcmp(tag, tag_ptr, tag_size) != 0 || pad_failed != 0)) {
+	if (unlikely(gnutls_memcmp(tag, tag_ptr, tag_size) != 0 ||
+		     pad_failed != 0)) {
 		/* HMAC was not the same. */
-		dummy_wait(params, data, data_size,
-			   length + preamble_size,
+		dummy_wait(params, data, data_size, length + preamble_size,
 			   preamble_size + data_size - tag_size - 1);
 
 		return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);

@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,18 +35,18 @@ int main(int argc, char **argv)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
-# include <unistd.h>
-# include <signal.h>
-# include <gnutls/gnutls.h>
-# include <gnutls/dtls.h>
+#include <string.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <signal.h>
+#include <gnutls/gnutls.h>
+#include <gnutls/dtls.h>
 
-# include "utils.h"
+#include "utils.h"
 
 static void terminate(void);
 
@@ -66,7 +66,7 @@ static void client_log_func(int level, const char *str)
 /* These are global */
 static pid_t child;
 
-# define MAX_KEY_MATERIAL 64*4
+#define MAX_KEY_MATERIAL 64 * 4
 /* A very basic DTLS client, with anonymous authentication, that negotiates SRTP
  */
 
@@ -96,19 +96,16 @@ static void client(int fd, int profile)
 	gnutls_dtls_set_mtu(session, 1500);
 
 	/* Use default priorities */
-	gnutls_priority_set_direct(session,
-				   "NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL",
-				   NULL);
+	gnutls_priority_set_direct(
+		session,
+		"NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL",
+		NULL);
 	if (profile)
-		ret =
-		    gnutls_srtp_set_profile_direct(session,
-						   "SRTP_AES128_CM_HMAC_SHA1_80",
-						   NULL);
+		ret = gnutls_srtp_set_profile_direct(
+			session, "SRTP_AES128_CM_HMAC_SHA1_80", NULL);
 	else
-		ret =
-		    gnutls_srtp_set_profile_direct(session,
-						   "SRTP_NULL_HMAC_SHA1_80",
-						   NULL);
+		ret = gnutls_srtp_set_profile_direct(
+			session, "SRTP_NULL_HMAC_SHA1_80", NULL);
 	if (ret < 0) {
 		gnutls_perror(ret);
 		exit(1);
@@ -124,8 +121,7 @@ static void client(int fd, int profile)
 	 */
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret < 0) {
 		fail("client: Handshake failed\n");
@@ -138,12 +134,11 @@ static void client(int fd, int profile)
 
 	if (debug)
 		success("client: DTLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
-	ret =
-	    gnutls_srtp_get_keys(session, km, sizeof(km), &cli_key,
-				 &cli_salt, &server_key, &server_salt);
+	ret = gnutls_srtp_get_keys(session, km, sizeof(km), &cli_key, &cli_salt,
+				   &server_key, &server_salt);
 	if (ret < 0) {
 		gnutls_perror(ret);
 		exit(1);
@@ -214,20 +209,17 @@ static void server(int fd, int profile)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_priority_set_direct(session,
-				   "NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL",
-				   NULL);
+	gnutls_priority_set_direct(
+		session,
+		"NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL",
+		NULL);
 
 	if (profile)
-		ret =
-		    gnutls_srtp_set_profile_direct(session,
-						   "SRTP_AES128_CM_HMAC_SHA1_80",
-						   NULL);
+		ret = gnutls_srtp_set_profile_direct(
+			session, "SRTP_AES128_CM_HMAC_SHA1_80", NULL);
 	else
-		ret =
-		    gnutls_srtp_set_profile_direct(session,
-						   "SRTP_NULL_HMAC_SHA1_80",
-						   NULL);
+		ret = gnutls_srtp_set_profile_direct(
+			session, "SRTP_NULL_HMAC_SHA1_80", NULL);
 	if (ret < 0) {
 		gnutls_perror(ret);
 		exit(1);
@@ -239,8 +231,7 @@ static void server(int fd, int profile)
 
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 	if (ret < 0) {
 		close(fd);
 		gnutls_deinit(session);
@@ -253,12 +244,11 @@ static void server(int fd, int profile)
 
 	if (debug)
 		success("server: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
-	ret =
-	    gnutls_srtp_get_keys(session, km, sizeof(km), &cli_key,
-				 &cli_salt, &server_key, &server_salt);
+	ret = gnutls_srtp_get_keys(session, km, sizeof(km), &cli_key, &cli_salt,
+				   &server_key, &server_salt);
 	if (ret < 0) {
 		gnutls_perror(ret);
 		exit(1);
@@ -337,4 +327,4 @@ void doit(void)
 	start(1);
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

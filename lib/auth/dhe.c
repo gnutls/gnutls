@@ -52,15 +52,15 @@ const mod_auth_st dhe_rsa_auth_struct = {
 	_gnutls_gen_cert_client_crt,
 	gen_dhe_server_kx,
 	_gnutls_gen_dh_common_client_kx,
-	_gnutls_gen_cert_client_crt_vrfy,	/* gen client cert vrfy */
-	_gnutls_gen_cert_server_cert_req,	/* server cert request */
+	_gnutls_gen_cert_client_crt_vrfy, /* gen client cert vrfy */
+	_gnutls_gen_cert_server_cert_req, /* server cert request */
 
 	_gnutls_proc_crt,
 	_gnutls_proc_crt,
 	proc_dhe_server_kx,
 	proc_dhe_client_kx,
-	_gnutls_proc_cert_client_crt_vrfy,	/* proc client cert vrfy */
-	_gnutls_proc_cert_cert_req	/* proc server cert request */
+	_gnutls_proc_cert_client_crt_vrfy, /* proc client cert vrfy */
+	_gnutls_proc_cert_cert_req /* proc server cert request */
 };
 
 const mod_auth_st dhe_dss_auth_struct = {
@@ -69,27 +69,27 @@ const mod_auth_st dhe_dss_auth_struct = {
 	_gnutls_gen_cert_client_crt,
 	gen_dhe_server_kx,
 	_gnutls_gen_dh_common_client_kx,
-	_gnutls_gen_cert_client_crt_vrfy,	/* gen client cert vrfy */
-	_gnutls_gen_cert_server_cert_req,	/* server cert request */
+	_gnutls_gen_cert_client_crt_vrfy, /* gen client cert vrfy */
+	_gnutls_gen_cert_server_cert_req, /* server cert request */
 
 	_gnutls_proc_crt,
 	_gnutls_proc_crt,
 	proc_dhe_server_kx,
 	proc_dhe_client_kx,
-	_gnutls_proc_cert_client_crt_vrfy,	/* proc client cert vrfy */
-	_gnutls_proc_cert_cert_req	/* proc server cert request */
+	_gnutls_proc_cert_client_crt_vrfy, /* proc client cert vrfy */
+	_gnutls_proc_cert_cert_req /* proc server cert request */
 };
 
 #endif
 
-static int gen_dhe_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
+static int gen_dhe_server_kx(gnutls_session_t session, gnutls_buffer_st *data)
 {
 	int ret = 0;
 	gnutls_certificate_credentials_t cred;
 	unsigned sig_pos;
 
-	cred = (gnutls_certificate_credentials_t)
-	    _gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE);
+	cred = (gnutls_certificate_credentials_t)_gnutls_get_cred(
+		session, GNUTLS_CRD_CERTIFICATE);
 	if (cred == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
@@ -101,9 +101,8 @@ static int gen_dhe_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 		return ret;
 	}
 
-	ret =
-	    _gnutls_figure_dh_params(session, cred->dh_params,
-				     cred->params_func, cred->dh_sec_param);
+	ret = _gnutls_figure_dh_params(session, cred->dh_params,
+				       cred->params_func, cred->dh_sec_param);
 	if (ret < 0) {
 		return gnutls_assert_val(ret);
 	}
@@ -121,8 +120,8 @@ static int gen_dhe_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 					 data->length - sig_pos);
 }
 
-static int
-proc_dhe_server_kx(gnutls_session_t session, uint8_t * data, size_t _data_size)
+static int proc_dhe_server_kx(gnutls_session_t session, uint8_t *data,
+			      size_t _data_size)
 {
 	gnutls_datum_t vdata;
 	int ret;
@@ -134,12 +133,12 @@ proc_dhe_server_kx(gnutls_session_t session, uint8_t * data, size_t _data_size)
 	vdata.data = data;
 	vdata.size = ret;
 
-	return _gnutls_proc_dhe_signature(session, data + ret,
-					  _data_size - ret, &vdata);
+	return _gnutls_proc_dhe_signature(session, data + ret, _data_size - ret,
+					  &vdata);
 }
 
-static int
-proc_dhe_client_kx(gnutls_session_t session, uint8_t * data, size_t _data_size)
+static int proc_dhe_client_kx(gnutls_session_t session, uint8_t *data,
+			      size_t _data_size)
 {
 	return _gnutls_proc_dh_common_client_kx(session, data, _data_size,
 						NULL);

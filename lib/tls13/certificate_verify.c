@@ -31,14 +31,10 @@
 #include "tls13/certificate_verify.h"
 
 #define SRV_CTX "TLS 1.3, server CertificateVerify"
-static const gnutls_datum_t srv_ctx = {
-	(void *)SRV_CTX, sizeof(SRV_CTX) - 1
-};
+static const gnutls_datum_t srv_ctx = { (void *)SRV_CTX, sizeof(SRV_CTX) - 1 };
 
 #define CLI_CTX "TLS 1.3, client CertificateVerify"
-static const gnutls_datum_t cli_ctx = {
-	(void *)CLI_CTX, sizeof(CLI_CTX) - 1
-};
+static const gnutls_datum_t cli_ctx = { (void *)CLI_CTX, sizeof(CLI_CTX) - 1 };
 
 int _gnutls13_recv_certificate_verify(gnutls_session_t session)
 {
@@ -50,7 +46,7 @@ int _gnutls13_recv_certificate_verify(gnutls_session_t session)
 	unsigned vflags;
 	gnutls_pcert_st peer_cert;
 	cert_auth_info_t info =
-	    _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
+		_gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
 	bool server = 0;
 	gnutls_certificate_type_t cert_type;
 
@@ -64,16 +60,15 @@ int _gnutls13_recv_certificate_verify(gnutls_session_t session)
 	if (session->security_parameters.entity == GNUTLS_SERVER)
 		server = 1;
 
-	cred = (gnutls_certificate_credentials_t)
-	    _gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE);
+	cred = (gnutls_certificate_credentials_t)_gnutls_get_cred(
+		session, GNUTLS_CRD_CERTIFICATE);
 	if (unlikely(cred == NULL))
 		return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
 	if (unlikely(info == NULL))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-	ret =
-	    _gnutls_recv_handshake(session, GNUTLS_HANDSHAKE_CERTIFICATE_VERIFY,
-				   0, &buf);
+	ret = _gnutls_recv_handshake(
+		session, GNUTLS_HANDSHAKE_CERTIFICATE_VERIFY, 0, &buf);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -127,8 +122,8 @@ int _gnutls13_recv_certificate_verify(gnutls_session_t session)
 		goto cleanup;
 	}
 
-	vflags =
-	    cred->verify_flags | session->internals.additional_verify_flags;
+	vflags = cred->verify_flags |
+		 session->internals.additional_verify_flags;
 
 	ret = _gnutls13_handshake_verify_data(session, vflags, &peer_cert,
 					      server ? (&cli_ctx) : (&srv_ctx),
@@ -145,7 +140,7 @@ int _gnutls13_recv_certificate_verify(gnutls_session_t session)
 	}
 
 	ret = 0;
- cleanup:
+cleanup:
 	gnutls_pcert_deinit(&peer_cert);
 	_gnutls_buffer_clear(&buf);
 	return ret;
@@ -184,9 +179,8 @@ int _gnutls13_send_certificate_verify(gnutls_session_t session, unsigned again)
 
 		if (apr_cert_list_length == 0) {
 			if (server) {
-				return
-				    gnutls_assert_val
-				    (GNUTLS_E_INSUFFICIENT_CREDENTIALS);
+				return gnutls_assert_val(
+					GNUTLS_E_INSUFFICIENT_CREDENTIALS);
 			} else {
 				/* for client, this means either we
 				 * didn't get a cert request or we are
@@ -197,15 +191,13 @@ int _gnutls13_send_certificate_verify(gnutls_session_t session, unsigned again)
 		}
 
 		if (server) {
-			algo =
-			    _gnutls_session_get_sign_algo(session,
-							  &apr_cert_list[0],
-							  apr_pkey, 0,
-							  GNUTLS_KX_UNKNOWN);
+			algo = _gnutls_session_get_sign_algo(session,
+							     &apr_cert_list[0],
+							     apr_pkey, 0,
+							     GNUTLS_KX_UNKNOWN);
 			if (algo == GNUTLS_SIGN_UNKNOWN)
-				return
-				    gnutls_assert_val
-				    (GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY);
+				return gnutls_assert_val(
+					GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY);
 
 			gnutls_sign_algorithm_set_server(session, algo);
 		} else {
@@ -213,16 +205,15 @@ int _gnutls13_send_certificate_verify(gnutls_session_t session, unsigned again)
 			 * determined from Certificate Request */
 			algo = gnutls_sign_algorithm_get_client(session);
 			if (unlikely(algo == GNUTLS_SIGN_UNKNOWN))
-				return
-				    gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+				return gnutls_assert_val(
+					GNUTLS_E_INTERNAL_ERROR);
 		}
 
 		se = _gnutls_sign_to_entry(algo);
 
-		ret =
-		    _gnutls13_handshake_sign_data(session, &apr_cert_list[0],
-						  apr_pkey, server ? (&srv_ctx)
-						  : (&cli_ctx), &sig, se);
+		ret = _gnutls13_handshake_sign_data(
+			session, &apr_cert_list[0], apr_pkey,
+			server ? (&srv_ctx) : (&cli_ctx), &sig, se);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
@@ -238,9 +229,8 @@ int _gnutls13_send_certificate_verify(gnutls_session_t session, unsigned again)
 			goto cleanup;
 		}
 
-		ret =
-		    _gnutls_buffer_append_data_prefix(&buf, 16, sig.data,
-						      sig.size);
+		ret = _gnutls_buffer_append_data_prefix(&buf, 16, sig.data,
+							sig.size);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -254,7 +244,7 @@ int _gnutls13_send_certificate_verify(gnutls_session_t session, unsigned again)
 	return _gnutls_send_handshake(session, bufel,
 				      GNUTLS_HANDSHAKE_CERTIFICATE_VERIFY);
 
- cleanup:
+cleanup:
 	gnutls_free(sig.data);
 	_gnutls_buffer_clear(&buf);
 	return ret;

@@ -30,22 +30,22 @@
  */
 
 #if HAVE_CONFIG_H
-# include "config.h"
+#include "config.h"
 #endif
 
 #ifndef HAVE_NETTLE_KUZNYECHIK_SET_KEY
 
-# include <assert.h>
-# include <string.h>
+#include <assert.h>
+#include <string.h>
 
-# include <nettle/macros.h>
-# include <nettle/memxor.h>
-# include "nettle-write.h"
-# include "kuznyechik.h"
+#include <nettle/macros.h>
+#include <nettle/memxor.h>
+#include "nettle-write.h"
+#include "kuznyechik.h"
 
-# include "kuztable.h"
+#include "kuztable.h"
 
-static void S(uint8_t * a, const uint8_t * b)
+static void S(uint8_t *a, const uint8_t *b)
 {
 	a[0] = pi[b[0]];
 	a[1] = pi[b[1]];
@@ -65,7 +65,7 @@ static void S(uint8_t * a, const uint8_t * b)
 	a[15] = pi[b[15]];
 }
 
-static void Sinv(uint8_t * a, const uint8_t * b)
+static void Sinv(uint8_t *a, const uint8_t *b)
 {
 	a[0] = pi_inv[b[0]];
 	a[1] = pi_inv[b[1]];
@@ -85,7 +85,7 @@ static void Sinv(uint8_t * a, const uint8_t * b)
 	a[15] = pi_inv[b[15]];
 }
 
-static void Linv(uint8_t * a, const uint8_t * b)
+static void Linv(uint8_t *a, const uint8_t *b)
 {
 	memcpy(a, &kuz_table_inv[0][b[0] * 16], KUZNYECHIK_BLOCK_SIZE);
 	memxor(a, &kuz_table_inv[1][b[1] * 16], KUZNYECHIK_BLOCK_SIZE);
@@ -105,15 +105,15 @@ static void Linv(uint8_t * a, const uint8_t * b)
 	memxor(a, &kuz_table_inv[15][b[15] * 16], KUZNYECHIK_BLOCK_SIZE);
 }
 
-static void LSX(uint8_t * a, const uint8_t * b, const uint8_t * c)
+static void LSX(uint8_t *a, const uint8_t *b, const uint8_t *c)
 {
 	uint8_t t[16];
 
 	/* https://github.com/llvm/llvm-project/issues/53518 */
-# if defined(__clang_analyzer__) && \
+#if defined(__clang_analyzer__) && \
 	(defined(__clang_major__) && __clang_major__ == 13)
 	assert(0);
-# else
+#else
 	memcpy(t, &kuz_table[0][(b[0] ^ c[0]) * 16], KUZNYECHIK_BLOCK_SIZE);
 	memxor(t, &kuz_table[1][(b[1] ^ c[1]) * 16], KUZNYECHIK_BLOCK_SIZE);
 	memxor(t, &kuz_table[2][(b[2] ^ c[2]) * 16], KUZNYECHIK_BLOCK_SIZE);
@@ -131,10 +131,10 @@ static void LSX(uint8_t * a, const uint8_t * b, const uint8_t * c)
 	memxor(t, &kuz_table[14][(b[14] ^ c[14]) * 16], KUZNYECHIK_BLOCK_SIZE);
 	memxor3(a, t, &kuz_table[15][(b[15] ^ c[15]) * 16],
 		KUZNYECHIK_BLOCK_SIZE);
-# endif
+#endif
 }
 
-static void XLiSi(uint8_t * a, const uint8_t * b, const uint8_t * c)
+static void XLiSi(uint8_t *a, const uint8_t *b, const uint8_t *c)
 {
 	uint8_t t[16];
 
@@ -157,7 +157,7 @@ static void XLiSi(uint8_t * a, const uint8_t * b, const uint8_t * c)
 	memxor3(a, t, c, 16);
 }
 
-static void subkey(uint8_t * out, const uint8_t * key, unsigned i)
+static void subkey(uint8_t *out, const uint8_t *key, unsigned i)
 {
 	uint8_t test[16];
 
@@ -179,7 +179,7 @@ static void subkey(uint8_t * out, const uint8_t * key, unsigned i)
 	memxor(out + 0, test, 16);
 }
 
-void kuznyechik_set_key(struct kuznyechik_ctx *ctx, const uint8_t * key)
+void kuznyechik_set_key(struct kuznyechik_ctx *ctx, const uint8_t *key)
 {
 	unsigned i;
 
@@ -192,9 +192,8 @@ void kuznyechik_set_key(struct kuznyechik_ctx *ctx, const uint8_t * key)
 		Linv(ctx->dekey + 16 * i, ctx->key + 16 * i);
 }
 
-void
-kuznyechik_encrypt(const struct kuznyechik_ctx *ctx,
-		   size_t length, uint8_t * dst, const uint8_t * src)
+void kuznyechik_encrypt(const struct kuznyechik_ctx *ctx, size_t length,
+			uint8_t *dst, const uint8_t *src)
 {
 	uint8_t temp[KUZNYECHIK_BLOCK_SIZE];
 
@@ -217,9 +216,8 @@ kuznyechik_encrypt(const struct kuznyechik_ctx *ctx,
 	}
 }
 
-void
-kuznyechik_decrypt(const struct kuznyechik_ctx *ctx,
-		   size_t length, uint8_t * dst, const uint8_t * src)
+void kuznyechik_decrypt(const struct kuznyechik_ctx *ctx, size_t length,
+			uint8_t *dst, const uint8_t *src)
 {
 	uint8_t temp[KUZNYECHIK_BLOCK_SIZE];
 
@@ -243,4 +241,4 @@ kuznyechik_decrypt(const struct kuznyechik_ctx *ctx,
 		length -= KUZNYECHIK_BLOCK_SIZE;
 	}
 }
-#endif				/* HAVE_NETTLE_KUZNYECHIK_SET_KEY */
+#endif /* HAVE_NETTLE_KUZNYECHIK_SET_KEY */

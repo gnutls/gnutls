@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -55,17 +55,16 @@ static void pubkey_check(void)
 
 	ret = gnutls_pubkey_init(&pubkey);
 	if (ret < 0) {
-		fprintf(stderr,
-			"gnutls_pubkey_init: %s\n", gnutls_strerror(ret));
+		fprintf(stderr, "gnutls_pubkey_init: %s\n",
+			gnutls_strerror(ret));
 		exit(1);
 	}
 
-	ret =
-	    gnutls_pubkey_import_x509_raw(pubkey, &server_ca3_rsa_pss2_cert,
-					  GNUTLS_X509_FMT_PEM, 0);
+	ret = gnutls_pubkey_import_x509_raw(pubkey, &server_ca3_rsa_pss2_cert,
+					    GNUTLS_X509_FMT_PEM, 0);
 	if (ret < 0) {
-		fprintf(stderr,
-			"gnutls_pubkey_import: %s\n", gnutls_strerror(ret));
+		fprintf(stderr, "gnutls_pubkey_import: %s\n",
+			gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -101,17 +100,16 @@ static void key_check(void)
 
 	ret = gnutls_privkey_init(&key);
 	if (ret < 0) {
-		fprintf(stderr,
-			"gnutls_privkey_init: %s\n", gnutls_strerror(ret));
+		fprintf(stderr, "gnutls_privkey_init: %s\n",
+			gnutls_strerror(ret));
 		exit(1);
 	}
 
-	ret =
-	    gnutls_privkey_import_x509_raw(key, &server_ca3_rsa_pss2_key,
-					   GNUTLS_X509_FMT_PEM, NULL, 0);
+	ret = gnutls_privkey_import_x509_raw(key, &server_ca3_rsa_pss2_key,
+					     GNUTLS_X509_FMT_PEM, NULL, 0);
 	if (ret < 0) {
-		fprintf(stderr,
-			"gnutls_privkey_import: %s\n", gnutls_strerror(ret));
+		fprintf(stderr, "gnutls_privkey_import: %s\n",
+			gnutls_strerror(ret));
 		exit(1);
 	}
 

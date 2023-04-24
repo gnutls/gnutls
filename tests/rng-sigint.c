@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdlib.h>
@@ -29,19 +29,20 @@
 /* This program verifies whether the low-level random functions can operate
  * properly, even if interrupted by signals */
 
-#if defined(HAVE_SETITIMER) && (defined(HAVE_LINUX_GETRANDOM) || defined(__linux__))
+#if defined(HAVE_SETITIMER) && \
+	(defined(HAVE_LINUX_GETRANDOM) || defined(__linux__))
 
-# include <stdio.h>
-# include <unistd.h>
-# include <sys/types.h>
-# include <sys/time.h>
-# include <errno.h>
-# include <stdint.h>
-# include "utils.h"
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/time.h>
+#include <errno.h>
+#include <stdint.h>
+#include "utils.h"
 
-# define _gnutls_debug_log printf
-# define gnutls_assert()
-# define gnutls_assert_val(val) val
+#define _gnutls_debug_log printf
+#define gnutls_assert()
+#define gnutls_assert_val(val) val
 
 int _rnd_system_entropy_init(void);
 void _rnd_system_entropy_deinit(void);
@@ -49,8 +50,8 @@ void _rnd_system_entropy_deinit(void);
 typedef int (*get_entropy_func)(void *rnd, size_t size);
 get_entropy_func _rnd_get_system_entropy;
 
-# define RND_NO_INCLUDES
-# include "../lib/nettle/sysrng-linux.c"
+#define RND_NO_INCLUDES
+#include "../lib/nettle/sysrng-linux.c"
 
 static volatile int stop_loop = 0;
 
@@ -92,9 +93,8 @@ void doit(void)
 			     gnutls_strerror(ret));
 		}
 
-		if (memcmp
-		    (empty, buf + sizeof(buf) - sizeof(empty) - 1,
-		     sizeof(empty)) == 0) {
+		if (memcmp(empty, buf + sizeof(buf) - sizeof(empty) - 1,
+			   sizeof(empty)) == 0) {
 			fail("_rnd_get_system_entropy: did not fill buffer\n");
 		}
 	}
@@ -102,7 +102,7 @@ void doit(void)
 	_rnd_system_entropy_deinit();
 }
 #else
-void doit(void);		/* prototype to avoid warning with -Wmissing-prototypes */
+void doit(void); /* prototype to avoid warning with -Wmissing-prototypes */
 
 void doit(void)
 {

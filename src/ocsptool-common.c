@@ -37,13 +37,14 @@
 
 #include <ocsptool-common.h>
 
-#define MAX_BUF 4*1024
-#define HEADER_PATTERN "POST /%s HTTP/1.0\r\n" \
-  "Host: %s\r\n" \
-  "Accept: */*\r\n" \
-  "Content-Type: application/ocsp-request\r\n" \
-  "Content-Length: %u\r\n" \
-  "Connection: close\r\n\r\n"
+#define MAX_BUF 4 * 1024
+#define HEADER_PATTERN                               \
+	"POST /%s HTTP/1.0\r\n"                      \
+	"Host: %s\r\n"                               \
+	"Accept: */*\r\n"                            \
+	"Content-Type: application/ocsp-request\r\n" \
+	"Content-Length: %u\r\n"                     \
+	"Connection: close\r\n\r\n"
 static char buffer[MAX_BUF + 1];
 
 /* returns the host part of a URL */
@@ -76,9 +77,8 @@ static const char *host_from_url(const char *url, unsigned int *port,
 	}
 }
 
-void
-_generate_request(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
-		  gnutls_datum_t * rdata, gnutls_datum_t * nonce)
+void _generate_request(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
+		       gnutls_datum_t *rdata, gnutls_datum_t *nonce)
 {
 	gnutls_ocsp_req_t req;
 	int ret;
@@ -133,9 +133,9 @@ static size_t get_data(void *buf, size_t size, size_t nmemb, void *userp)
 }
 
 /* Returns 0 on ok, and -1 on error */
-int send_ocsp_request(const char *server,
-		      gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
-		      gnutls_datum_t * resp_data, gnutls_datum_t * nonce)
+int send_ocsp_request(const char *server, gnutls_x509_crt_t cert,
+		      gnutls_x509_crt_t issuer, gnutls_datum_t *resp_data,
+		      gnutls_datum_t *nonce)
 {
 	gnutls_datum_t ud;
 	int ret;
@@ -158,20 +158,16 @@ int send_ocsp_request(const char *server,
 
 		i = 0;
 		do {
-			ret =
-			    gnutls_x509_crt_get_authority_info_access(cert, i++,
-								      GNUTLS_IA_OCSP_URI,
-								      &data,
-								      NULL);
+			ret = gnutls_x509_crt_get_authority_info_access(
+				cert, i++, GNUTLS_IA_OCSP_URI, &data, NULL);
 		} while (ret == GNUTLS_E_UNKNOWN_ALGORITHM);
 
 		if (ret < 0) {
 			i = 0;
 			do {
-				ret =
-				    gnutls_x509_crt_get_authority_info_access
-				    (issuer, i++, GNUTLS_IA_OCSP_URI, &data,
-				     NULL);
+				ret = gnutls_x509_crt_get_authority_info_access(
+					issuer, i++, GNUTLS_IA_OCSP_URI, &data,
+					NULL);
 			} while (ret == GNUTLS_E_UNKNOWN_ALGORITHM);
 		}
 
@@ -249,7 +245,7 @@ int send_ocsp_request(const char *server,
 
 	ret = 0;
 
- cleanup:
+cleanup:
 	free(ud.data);
 	if (url != server)
 		free(url);
@@ -320,17 +316,16 @@ void print_ocsp_verify_res(unsigned int output)
 }
 
 /* three days */
-#define OCSP_VALIDITY_SECS (3*60*60*24)
+#define OCSP_VALIDITY_SECS (3 * 60 * 60 * 24)
 
 /* Returns:
  *  0: certificate is revoked
  *  1: certificate is ok
  *  -1: dunno
  */
-int
-check_ocsp_response(gnutls_x509_crt_t cert,
-		    gnutls_x509_crt_t issuer, gnutls_datum_t * data,
-		    gnutls_datum_t * nonce, int verbose)
+int check_ocsp_response(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
+			gnutls_datum_t *data, gnutls_datum_t *nonce,
+			int verbose)
 {
 	gnutls_ocsp_resp_t resp;
 	int ret;
@@ -356,11 +351,9 @@ check_ocsp_response(gnutls_x509_crt_t cert,
 	ret = gnutls_ocsp_resp_check_crt(resp, 0, cert);
 	if (ret < 0) {
 		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
-			printf
-			    ("*** Got OCSP response with no data (ignoring)\n");
+			printf("*** Got OCSP response with no data (ignoring)\n");
 		} else {
-			printf
-			    ("*** Got OCSP response on an unrelated certificate (ignoring)\n");
+			printf("*** Got OCSP response on an unrelated certificate (ignoring)\n");
 		}
 		ret = -1;
 		goto cleanup;
@@ -386,8 +379,8 @@ check_ocsp_response(gnutls_x509_crt_t cert,
 	}
 
 	ret = gnutls_ocsp_resp_get_single(resp, 0, NULL, NULL, NULL, NULL,
-					  &cert_status, &vtime, &ntime,
-					  &rtime, NULL);
+					  &cert_status, &vtime, &ntime, &rtime,
+					  NULL);
 	if (ret < 0) {
 		fprintf(stderr, "reading response: %s\n", gnutls_strerror(ret));
 		exit(1);
@@ -402,19 +395,17 @@ check_ocsp_response(gnutls_x509_crt_t cert,
 
 	if (ntime == -1) {
 		if (now - vtime > OCSP_VALIDITY_SECS) {
-			printf
-			    ("*** The OCSP response is old (was issued at: %s) ignoring\n",
-			     simple_ctime(&vtime, timebuf1));
+			printf("*** The OCSP response is old (was issued at: %s) ignoring\n",
+			       simple_ctime(&vtime, timebuf1));
 			ret = -1;
 			goto cleanup;
 		}
 	} else {
 		/* there is a newer OCSP answer, don't trust this one */
 		if (ntime < now) {
-			printf
-			    ("*** The OCSP response was issued at: %s but there is a newer issue at %s\n",
-			     simple_ctime(&vtime, timebuf1),
-			     simple_ctime(&ntime, timebuf2));
+			printf("*** The OCSP response was issued at: %s but there is a newer issue at %s\n",
+			       simple_ctime(&vtime, timebuf1),
+			       simple_ctime(&ntime, timebuf2));
 			ret = -1;
 			goto cleanup;
 		}
@@ -437,8 +428,8 @@ check_ocsp_response(gnutls_x509_crt_t cert,
 			exit(1);
 		}
 
-		if (rnonce.size != nonce->size
-		    || memcmp(nonce->data, rnonce.data, nonce->size) != 0) {
+		if (rnonce.size != nonce->size ||
+		    memcmp(nonce->data, rnonce.data, nonce->size) != 0) {
 			fprintf(stderr,
 				"nonce in the response doesn't match\n");
 			exit(1);
@@ -447,11 +438,11 @@ check_ocsp_response(gnutls_x509_crt_t cert,
 		gnutls_free(rnonce.data);
 	}
 
- finish_ok:
+finish_ok:
 	printf("- OCSP server flags certificate not revoked as of %s\n",
 	       simple_ctime(&vtime, timebuf1));
 	ret = 1;
- cleanup:
+cleanup:
 	gnutls_ocsp_resp_deinit(resp);
 
 	return ret;

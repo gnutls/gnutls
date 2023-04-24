@@ -1,7 +1,7 @@
 /* This example code is placed in the public domain. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -19,9 +19,8 @@
  *  encrypted using a PKCS #12 cipher, or some browsers will crash)
  * password: is the password used to encrypt the PKCS #12 packet.
  */
-int
-write_pkcs12(const gnutls_datum_t * cert,
-	     const gnutls_datum_t * pkcs8_key, const char *password)
+int write_pkcs12(const gnutls_datum_t *cert, const gnutls_datum_t *pkcs8_key,
+		 const char *password)
 {
 	gnutls_pkcs12_t pkcs12;
 	int ret, bag_index;
@@ -71,9 +70,8 @@ write_pkcs12(const gnutls_datum_t * cert,
 	/* Now the key.
 	 */
 
-	ret = gnutls_pkcs12_bag_set_data(key_bag,
-					 GNUTLS_BAG_PKCS8_ENCRYPTED_KEY,
-					 pkcs8_key);
+	ret = gnutls_pkcs12_bag_set_data(
+		key_bag, GNUTLS_BAG_PKCS8_ENCRYPTED_KEY, pkcs8_key);
 	if (ret < 0) {
 		fprintf(stderr, "ret: %s\n", gnutls_strerror(ret));
 		return 1;
@@ -104,9 +102,8 @@ write_pkcs12(const gnutls_datum_t * cert,
 	gnutls_pkcs12_generate_mac(pkcs12, password);
 
 	pkcs12_struct_size = sizeof(pkcs12_struct);
-	ret =
-	    gnutls_pkcs12_export(pkcs12, GNUTLS_X509_FMT_DER,
-				 pkcs12_struct, &pkcs12_struct_size);
+	ret = gnutls_pkcs12_export(pkcs12, GNUTLS_X509_FMT_DER, pkcs12_struct,
+				   &pkcs12_struct_size);
 	if (ret < 0) {
 		fprintf(stderr, "ret: %s\n", gnutls_strerror(ret));
 		return 1;

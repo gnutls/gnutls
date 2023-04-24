@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -36,18 +36,18 @@ int main(int argc, char **argv)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <sys/socket.h>
-# if !defined(_WIN32)
-#  include <sys/wait.h>
-#  include <signal.h>
-# endif
-# include <unistd.h>
-# include <gnutls/gnutls.h>
-# include <assert.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#if !defined(_WIN32)
+#include <sys/wait.h>
+#include <signal.h>
+#endif
+#include <unistd.h>
+#include <gnutls/gnutls.h>
+#include <assert.h>
 
-# include "utils.h"
+#include "utils.h"
 
 /* This test checks whether a large certificate packet can be sent by
  * server and received by client. */
@@ -111,40 +111,39 @@ static void client(int sd, const char *prio)
 }
 
 static unsigned char server_key_pem[] =
-    "-----BEGIN RSA PRIVATE KEY-----\n"
-    "MIIEowIBAAKCAQEAwJo7662RNezA254WRsXlbuzkPV5eNX7pX5Pj66T8/RKfz7rL\n"
-    "GpKs4fNxhhIMSUDjy2KbEQXPUH9MWROgU8V//CfcnagLYCHtniqRE+eXv0fCLwWU\n"
-    "SrA8n0qCBj94/NMA4kSmHf6dE5YdjDSpukyza5IshAuxZ32MDevE3JqMjvnZ5vY7\n"
-    "drJSfal0V5gof3/7J41ZVxl+WJph50e2pY1E27/hY8q5yQ3DXnE5kTQjX664ozQ8\n"
-    "UPtqGfkr4YjYe4e6PUWAjU27mQng0O0K+/w8gg6xBxN/AH3U7dg5/cY5IKDsN+Iq\n"
-    "4UrcCgXWjhosv9IlIXqzK7IBMMphPmRMCLMH2QIDAQABAoIBAGpOdxZdZdH6zHQr\n"
-    "rKYBouJ39H5+8MbcNtmfWmT9WvogZn8U3ffbz3qjkRxsJ8XjABiJY4egyk3nBXAB\n"
-    "KjQyxbKbGeUXFLhJ4cq0OgFfid11MRQdIz2aSsutJ1llfVUm7cz2ES5rE6305Hg3\n"
-    "tRr0LPAJ7XIwtgmmPUCNysnsr/pVrmPLfAnl/CfbLF2v/SfpbSpkgUTrZCNUMC44\n"
-    "929K4c7cFEM4SP6pUad6MipPzY/SmxZ9yhX3MsROcLp+XLCOOJhhkqoB6LWiess2\n"
-    "d7odweFRZ0Q0gBD/9EMMy3J5iUwfasf8b5n7z8AgPg9CeB+p/As2/RhRPXnwlS0A\n"
-    "2KrxWQECgYEA0wM+5fJeL91s19vozCqi3mKVXTv68aL9iQJQNJc4UQm+yu7JvMn9\n"
-    "koPri74QUpYkmyttaJsGNc90Oj54rSsR/cmEFJKgHOEAYSLeVetyO2XNoQvKdyB9\n"
-    "UVof6joMLxQ368YCahfz4ogHTQqpzN0BD2TTnKXwCXQDikN/EBb4fHkCgYEA6aov\n"
-    "8XVIVlxUY4VB/9PQ03OwxTLi+zTJMFJvNJozkat6MLJjAv2zxMt2kmlb0xx3wftD\n"
-    "VJKHIQCeZmU8qWEZS0G58OPg+TPvQPqdnZmRz3bGfW6F++IDAqV4DEhQ+zXQL8Js\n"
-    "j9+ocre+s0zXq1HkHgemBGOHy5/jN9cXnH3XTmECgYATRFiZ5mdzN2SY0RuQiNQW\n"
-    "OiopOTDQn3FG8U8hfi1GOP2Syfrhog/lMOZw/AnBgLQW9wAmbQFEKI0URGAAb85U\n"
-    "vfGxbzHvcRv3wpdKgRUNF16PNeRmvDC1HOWNHX+/TLlObeYKieVa6dDA2Bho/ET8\n"
-    "gthPlVc1hcJM/Zy8e1x1AQKBgQCuLDiugGDaVtpkkIlAu8/WPk9Ovv6oh5FMHrZb\n"
-    "/HFiLPLY56+cJCZjE9Kfkj9rHrY59yQaH1rwg7iO1PmhvAoRqb2DTSl+OHMn+WeR\n"
-    "eU5R2dRc3QysU60wxMy2QxVyG4vCfedUW0ABuutAVZARWOp0Y/khHluzscu57O/h\n"
-    "q3/ZIQKBgEXHmOjftWrkWV+/zfZT64k2Z1g7s3dpXW/SFK9jPrt6oqI1GNkYz6Ds\n"
-    "O1dUiPsNXDCLytUtvYrvrT3rJaPjJDRU2HrN/cYdxXgf6HSEr3Cdcpqyp/5rOOxD\n"
-    "ALEix6R4MZlsQV8FfgWjvTAET7NtY303JrCdFPqIigwl/PFGPLiB\n"
-    "-----END RSA PRIVATE KEY-----\n";
+	"-----BEGIN RSA PRIVATE KEY-----\n"
+	"MIIEowIBAAKCAQEAwJo7662RNezA254WRsXlbuzkPV5eNX7pX5Pj66T8/RKfz7rL\n"
+	"GpKs4fNxhhIMSUDjy2KbEQXPUH9MWROgU8V//CfcnagLYCHtniqRE+eXv0fCLwWU\n"
+	"SrA8n0qCBj94/NMA4kSmHf6dE5YdjDSpukyza5IshAuxZ32MDevE3JqMjvnZ5vY7\n"
+	"drJSfal0V5gof3/7J41ZVxl+WJph50e2pY1E27/hY8q5yQ3DXnE5kTQjX664ozQ8\n"
+	"UPtqGfkr4YjYe4e6PUWAjU27mQng0O0K+/w8gg6xBxN/AH3U7dg5/cY5IKDsN+Iq\n"
+	"4UrcCgXWjhosv9IlIXqzK7IBMMphPmRMCLMH2QIDAQABAoIBAGpOdxZdZdH6zHQr\n"
+	"rKYBouJ39H5+8MbcNtmfWmT9WvogZn8U3ffbz3qjkRxsJ8XjABiJY4egyk3nBXAB\n"
+	"KjQyxbKbGeUXFLhJ4cq0OgFfid11MRQdIz2aSsutJ1llfVUm7cz2ES5rE6305Hg3\n"
+	"tRr0LPAJ7XIwtgmmPUCNysnsr/pVrmPLfAnl/CfbLF2v/SfpbSpkgUTrZCNUMC44\n"
+	"929K4c7cFEM4SP6pUad6MipPzY/SmxZ9yhX3MsROcLp+XLCOOJhhkqoB6LWiess2\n"
+	"d7odweFRZ0Q0gBD/9EMMy3J5iUwfasf8b5n7z8AgPg9CeB+p/As2/RhRPXnwlS0A\n"
+	"2KrxWQECgYEA0wM+5fJeL91s19vozCqi3mKVXTv68aL9iQJQNJc4UQm+yu7JvMn9\n"
+	"koPri74QUpYkmyttaJsGNc90Oj54rSsR/cmEFJKgHOEAYSLeVetyO2XNoQvKdyB9\n"
+	"UVof6joMLxQ368YCahfz4ogHTQqpzN0BD2TTnKXwCXQDikN/EBb4fHkCgYEA6aov\n"
+	"8XVIVlxUY4VB/9PQ03OwxTLi+zTJMFJvNJozkat6MLJjAv2zxMt2kmlb0xx3wftD\n"
+	"VJKHIQCeZmU8qWEZS0G58OPg+TPvQPqdnZmRz3bGfW6F++IDAqV4DEhQ+zXQL8Js\n"
+	"j9+ocre+s0zXq1HkHgemBGOHy5/jN9cXnH3XTmECgYATRFiZ5mdzN2SY0RuQiNQW\n"
+	"OiopOTDQn3FG8U8hfi1GOP2Syfrhog/lMOZw/AnBgLQW9wAmbQFEKI0URGAAb85U\n"
+	"vfGxbzHvcRv3wpdKgRUNF16PNeRmvDC1HOWNHX+/TLlObeYKieVa6dDA2Bho/ET8\n"
+	"gthPlVc1hcJM/Zy8e1x1AQKBgQCuLDiugGDaVtpkkIlAu8/WPk9Ovv6oh5FMHrZb\n"
+	"/HFiLPLY56+cJCZjE9Kfkj9rHrY59yQaH1rwg7iO1PmhvAoRqb2DTSl+OHMn+WeR\n"
+	"eU5R2dRc3QysU60wxMy2QxVyG4vCfedUW0ABuutAVZARWOp0Y/khHluzscu57O/h\n"
+	"q3/ZIQKBgEXHmOjftWrkWV+/zfZT64k2Z1g7s3dpXW/SFK9jPrt6oqI1GNkYz6Ds\n"
+	"O1dUiPsNXDCLytUtvYrvrT3rJaPjJDRU2HrN/cYdxXgf6HSEr3Cdcpqyp/5rOOxD\n"
+	"ALEix6R4MZlsQV8FfgWjvTAET7NtY303JrCdFPqIigwl/PFGPLiB\n"
+	"-----END RSA PRIVATE KEY-----\n";
 
 static void server(int sd, const char *prio)
 {
 	gnutls_certificate_credentials_t serverx509cred;
 	const gnutls_datum_t key = { server_key_pem,
-		sizeof(server_key_pem) - 1
-	};
+				     sizeof(server_key_pem) - 1 };
 	int ret;
 	gnutls_session_t session;
 	gnutls_datum_t cert;
@@ -166,8 +165,7 @@ static void server(int sd, const char *prio)
 	assert(gnutls_load_file(cert_path, &cert) >= 0);
 
 	assert(gnutls_certificate_allocate_credentials(&serverx509cred) >= 0);
-	assert(gnutls_certificate_set_x509_key_mem(serverx509cred,
-						   &cert, &key,
+	assert(gnutls_certificate_set_x509_key_mem(serverx509cred, &cert, &key,
 						   GNUTLS_X509_FMT_PEM) >= 0);
 
 	gnutls_free(cert.data);
@@ -208,8 +206,7 @@ static void server(int sd, const char *prio)
 		success("server: finished\n");
 }
 
-static
-void start(const char *name, const char *prio)
+static void start(const char *name, const char *prio)
 {
 	pid_t child;
 	int sockets[2];
@@ -255,4 +252,4 @@ void doit(void)
 	start("default", "NORMAL");
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

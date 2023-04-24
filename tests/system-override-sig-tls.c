@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <assert.h>
@@ -33,20 +33,26 @@
 #include <gnutls/gnutls.h>
 #include "utils.h"
 
-#define SKIP16(pos, total) { \
-	uint16_t _s; \
-	if (pos+2 > total) fail("error\n"); \
-	_s = (msg->data[pos] << 8) | msg->data[pos+1]; \
-	if ((size_t)(pos+2+_s) > total) fail("error\n"); \
-	pos += 2+_s; \
+#define SKIP16(pos, total)                                       \
+	{                                                        \
+		uint16_t _s;                                     \
+		if (pos + 2 > total)                             \
+			fail("error\n");                         \
+		_s = (msg->data[pos] << 8) | msg->data[pos + 1]; \
+		if ((size_t)(pos + 2 + _s) > total)              \
+			fail("error\n");                         \
+		pos += 2 + _s;                                   \
 	}
 
-#define SKIP8(pos, total) { \
-	uint8_t _s; \
-	if (pos+1 > total) fail("error\n"); \
-	_s = msg->data[pos]; \
-	if ((size_t)(pos+1+_s) > total) fail("error\n"); \
-	pos += 1+_s; \
+#define SKIP8(pos, total)                           \
+	{                                           \
+		uint8_t _s;                         \
+		if (pos + 1 > total)                \
+			fail("error\n");            \
+		_s = msg->data[pos];                \
+		if ((size_t)(pos + 1 + _s) > total) \
+			fail("error\n");            \
+		pos += 1 + _s;                      \
 	}
 
 #define HANDSHAKE_SESSION_ID_POS 34
@@ -65,16 +71,16 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "%s|<%d>| %s", side, level, str);
 }
 
-#define PRIO "NORMAL:-VERS-ALL:+VERS-TLS1.3:-SIGN-ALL:" \
+#define PRIO                                       \
+	"NORMAL:-VERS-ALL:+VERS-TLS1.3:-SIGN-ALL:" \
 	"+SIGN-RSA-PSS-RSAE-SHA256:+SIGN-RSA-PSS-RSAE-SHA384"
 /* rsa_pss_rsae_sha384 */
 #define SIGALGS_EXP "\x00\x02\x08\x05"
 
-static int
-ext_callback(void *ctx, unsigned tls_id,
-	     const unsigned char *data, unsigned size)
+static int ext_callback(void *ctx, unsigned tls_id, const unsigned char *data,
+			unsigned size)
 {
-	if (tls_id == 13) {	/* signature algorithms */
+	if (tls_id == 13) { /* signature algorithms */
 		if (size != sizeof(SIGALGS_EXP) - 1) {
 			fail("invalid signature_algorithms length: %u != 4\n",
 			     size);
@@ -86,10 +92,9 @@ ext_callback(void *ctx, unsigned tls_id,
 	return 0;
 }
 
-static int
-handshake_callback(gnutls_session_t session, unsigned int htype,
-		   unsigned post, unsigned int incoming,
-		   const gnutls_datum_t * msg)
+static int handshake_callback(gnutls_session_t session, unsigned int htype,
+			      unsigned post, unsigned int incoming,
+			      const gnutls_datum_t *msg)
 {
 	assert(post);
 
@@ -133,9 +138,8 @@ void doit(void)
 
 	/* Init server */
 	gnutls_certificate_allocate_credentials(&serverx509cred);
-	gnutls_certificate_set_x509_key_mem(serverx509cred,
-					    &server2_cert, &server2_key,
-					    GNUTLS_X509_FMT_PEM);
+	gnutls_certificate_set_x509_key_mem(serverx509cred, &server2_cert,
+					    &server2_key, GNUTLS_X509_FMT_PEM);
 
 	gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, serverx509cred);
@@ -153,9 +157,8 @@ void doit(void)
 	if (ret < 0)
 		exit(1);
 
-	ret =
-	    gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca2_cert,
-						  GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca2_cert,
+						    GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);
 
@@ -178,8 +181,7 @@ void doit(void)
 						   client_pull_timeout_func);
 	gnutls_transport_set_ptr(client, client);
 
-	gnutls_handshake_set_hook_function(client,
-					   GNUTLS_HANDSHAKE_ANY,
+	gnutls_handshake_set_hook_function(client, GNUTLS_HANDSHAKE_ANY,
 					   GNUTLS_HOOK_POST,
 					   handshake_callback);
 

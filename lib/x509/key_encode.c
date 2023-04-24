@@ -33,16 +33,16 @@
 #include <mpi.h>
 #include <ecc.h>
 
-static int _gnutls_x509_write_rsa_pubkey(const gnutls_pk_params_st * params,
-					 gnutls_datum_t * der);
-static int _gnutls_x509_write_dsa_params(const gnutls_pk_params_st * params,
-					 gnutls_datum_t * der);
-static int _gnutls_x509_write_dsa_pubkey(const gnutls_pk_params_st * params,
-					 gnutls_datum_t * der);
-static int _gnutls_x509_write_gost_params(const gnutls_pk_params_st * params,
-					  gnutls_datum_t * der);
-static int _gnutls_x509_write_gost_pubkey(const gnutls_pk_params_st * params,
-					  gnutls_datum_t * der);
+static int _gnutls_x509_write_rsa_pubkey(const gnutls_pk_params_st *params,
+					 gnutls_datum_t *der);
+static int _gnutls_x509_write_dsa_params(const gnutls_pk_params_st *params,
+					 gnutls_datum_t *der);
+static int _gnutls_x509_write_dsa_pubkey(const gnutls_pk_params_st *params,
+					 gnutls_datum_t *der);
+static int _gnutls_x509_write_gost_params(const gnutls_pk_params_st *params,
+					  gnutls_datum_t *der);
+static int _gnutls_x509_write_gost_pubkey(const gnutls_pk_params_st *params,
+					  gnutls_datum_t *der);
 
 /*
  * some x509 certificate functions that relate to MPI parameter
@@ -51,9 +51,8 @@ static int _gnutls_x509_write_gost_pubkey(const gnutls_pk_params_st * params,
  *
  * Allocates the space used to store the DER data.
  */
-static int
-_gnutls_x509_write_rsa_pubkey(const gnutls_pk_params_st * params,
-			      gnutls_datum_t * der)
+static int _gnutls_x509_write_rsa_pubkey(const gnutls_pk_params_st *params,
+					 gnutls_datum_t *der)
 {
 	int result;
 	asn1_node spk = NULL;
@@ -67,9 +66,9 @@ _gnutls_x509_write_rsa_pubkey(const gnutls_pk_params_st * params,
 		goto cleanup;
 	}
 
-	if ((result = asn1_create_element
-	     (_gnutls_get_gnutls_asn(), "GNUTLS.RSAPublicKey", &spk))
-	    != ASN1_SUCCESS) {
+	if ((result = asn1_create_element(_gnutls_get_gnutls_asn(),
+					  "GNUTLS.RSAPublicKey", &spk)) !=
+	    ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
@@ -80,8 +79,8 @@ _gnutls_x509_write_rsa_pubkey(const gnutls_pk_params_st * params,
 		goto cleanup;
 	}
 
-	result =
-	    _gnutls_x509_write_int(spk, "publicExponent", params->params[1], 1);
+	result = _gnutls_x509_write_int(spk, "publicExponent",
+					params->params[1], 1);
 	if (result < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -95,7 +94,7 @@ _gnutls_x509_write_rsa_pubkey(const gnutls_pk_params_st * params,
 
 	result = 0;
 
- cleanup:
+cleanup:
 	asn1_delete_structure(&spk);
 
 	return result;
@@ -107,9 +106,8 @@ _gnutls_x509_write_rsa_pubkey(const gnutls_pk_params_st * params,
  *
  * Allocates the space used to store the DER data.
  */
-int
-_gnutls_x509_write_ecc_pubkey(const gnutls_pk_params_st * params,
-			      gnutls_datum_t * der)
+int _gnutls_x509_write_ecc_pubkey(const gnutls_pk_params_st *params,
+				  gnutls_datum_t *der)
 {
 	int result;
 
@@ -119,7 +117,9 @@ _gnutls_x509_write_ecc_pubkey(const gnutls_pk_params_st * params,
 	if (params->params_nr < ECC_PUBLIC_PARAMS)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	result = _gnutls_ecc_ansi_x962_export(params->curve, params->params[ECC_X], params->params[ECC_Y],	/*&out */
+	result = _gnutls_ecc_ansi_x962_export(params->curve,
+					      params->params[ECC_X],
+					      params->params[ECC_Y], /*&out */
 					      der);
 	if (result < 0)
 		return gnutls_assert_val(result);
@@ -133,9 +133,8 @@ _gnutls_x509_write_ecc_pubkey(const gnutls_pk_params_st * params,
  *
  * Allocates the space used to store the data.
  */
-int
-_gnutls_x509_write_eddsa_pubkey(const gnutls_pk_params_st * params,
-				gnutls_datum_t * raw)
+int _gnutls_x509_write_eddsa_pubkey(const gnutls_pk_params_st *params,
+				    gnutls_datum_t *raw)
 {
 	int ret;
 
@@ -149,8 +148,8 @@ _gnutls_x509_write_eddsa_pubkey(const gnutls_pk_params_st * params,
 	    params->curve != GNUTLS_ECC_CURVE_ED448)
 		return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
 
-	ret =
-	    _gnutls_set_datum(raw, params->raw_pub.data, params->raw_pub.size);
+	ret = _gnutls_set_datum(raw, params->raw_pub.data,
+				params->raw_pub.size);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -164,8 +163,8 @@ _gnutls_x509_write_eddsa_pubkey(const gnutls_pk_params_st * params,
  * Allocates the space used to store the data.
  */
 static int
-_gnutls_x509_write_modern_ecdh_pubkey(const gnutls_pk_params_st * params,
-				      gnutls_datum_t * raw)
+_gnutls_x509_write_modern_ecdh_pubkey(const gnutls_pk_params_st *params,
+				      gnutls_datum_t *raw)
 {
 	int ret;
 
@@ -179,17 +178,16 @@ _gnutls_x509_write_modern_ecdh_pubkey(const gnutls_pk_params_st * params,
 	    params->curve != GNUTLS_ECC_CURVE_X448)
 		return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
 
-	ret =
-	    _gnutls_set_datum(raw, params->raw_pub.data, params->raw_pub.size);
+	ret = _gnutls_set_datum(raw, params->raw_pub.data,
+				params->raw_pub.size);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
 	return 0;
 }
 
-int
-_gnutls_x509_write_gost_pubkey(const gnutls_pk_params_st * params,
-			       gnutls_datum_t * der)
+int _gnutls_x509_write_gost_pubkey(const gnutls_pk_params_st *params,
+				   gnutls_datum_t *der)
 {
 	bigint_t x, y;
 	int numlen;
@@ -254,14 +252,13 @@ _gnutls_x509_write_gost_pubkey(const gnutls_pk_params_st * params,
 
 	return 0;
 
- cleanup:
+cleanup:
 	_gnutls_free_datum(der);
 	return ret;
 }
 
-int
-_gnutls_x509_write_pubkey_params(const gnutls_pk_params_st * params,
-				 gnutls_datum_t * der)
+int _gnutls_x509_write_pubkey_params(const gnutls_pk_params_st *params,
+				     gnutls_datum_t *der)
 {
 	switch (params->algo) {
 	case GNUTLS_PK_DSA:
@@ -295,9 +292,8 @@ _gnutls_x509_write_pubkey_params(const gnutls_pk_params_st * params,
 	}
 }
 
-int
-_gnutls_x509_write_pubkey(const gnutls_pk_params_st * params,
-			  gnutls_datum_t * der)
+int _gnutls_x509_write_pubkey(const gnutls_pk_params_st *params,
+			      gnutls_datum_t *der)
 {
 	switch (params->algo) {
 	case GNUTLS_PK_DSA:
@@ -328,9 +324,8 @@ _gnutls_x509_write_pubkey(const gnutls_pk_params_st * params,
  *
  * Allocates the space used to store the DER data.
  */
-static int
-_gnutls_x509_write_dsa_params(const gnutls_pk_params_st * params,
-			      gnutls_datum_t * der)
+static int _gnutls_x509_write_dsa_params(const gnutls_pk_params_st *params,
+					 gnutls_datum_t *der)
 {
 	int result;
 	asn1_node spk = NULL;
@@ -344,9 +339,9 @@ _gnutls_x509_write_dsa_params(const gnutls_pk_params_st * params,
 		goto cleanup;
 	}
 
-	if ((result = asn1_create_element
-	     (_gnutls_get_gnutls_asn(), "GNUTLS.DSAParameters", &spk))
-	    != ASN1_SUCCESS) {
+	if ((result = asn1_create_element(_gnutls_get_gnutls_asn(),
+					  "GNUTLS.DSAParameters", &spk)) !=
+	    ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
@@ -377,7 +372,7 @@ _gnutls_x509_write_dsa_params(const gnutls_pk_params_st * params,
 
 	result = 0;
 
- cleanup:
+cleanup:
 	asn1_delete_structure(&spk);
 	return result;
 }
@@ -388,9 +383,8 @@ _gnutls_x509_write_dsa_params(const gnutls_pk_params_st * params,
  *
  * Allocates the space used to store the DER data.
  */
-int
-_gnutls_x509_write_ecc_params(const gnutls_ecc_curve_t curve,
-			      gnutls_datum_t * der)
+int _gnutls_x509_write_ecc_params(const gnutls_ecc_curve_t curve,
+				  gnutls_datum_t *der)
 {
 	int result;
 	asn1_node spk = NULL;
@@ -403,22 +397,22 @@ _gnutls_x509_write_ecc_params(const gnutls_ecc_curve_t curve,
 	if (oid == NULL)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	if ((result = asn1_create_element
-	     (_gnutls_get_gnutls_asn(), "GNUTLS.ECParameters", &spk))
-	    != ASN1_SUCCESS) {
+	if ((result = asn1_create_element(_gnutls_get_gnutls_asn(),
+					  "GNUTLS.ECParameters", &spk)) !=
+	    ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
 
-	if ((result =
-	     asn1_write_value(spk, "", "namedCurve", 1)) != ASN1_SUCCESS) {
+	if ((result = asn1_write_value(spk, "", "namedCurve", 1)) !=
+	    ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
 		goto cleanup;
 	}
 
-	if ((result =
-	     asn1_write_value(spk, "namedCurve", oid, 1)) != ASN1_SUCCESS) {
+	if ((result = asn1_write_value(spk, "namedCurve", oid, 1)) !=
+	    ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
 		goto cleanup;
@@ -432,14 +426,13 @@ _gnutls_x509_write_ecc_params(const gnutls_ecc_curve_t curve,
 
 	result = 0;
 
- cleanup:
+cleanup:
 	asn1_delete_structure(&spk);
 	return result;
 }
 
-int
-_gnutls_x509_write_rsa_pss_params(const gnutls_x509_spki_st * params,
-				  gnutls_datum_t * der)
+int _gnutls_x509_write_rsa_pss_params(const gnutls_x509_spki_st *params,
+				      gnutls_datum_t *der)
 {
 	int result;
 	asn1_node spk = NULL;
@@ -458,9 +451,9 @@ _gnutls_x509_write_rsa_pss_params(const gnutls_x509_spki_st * params,
 	    GNUTLS_SIGN_UNKNOWN)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	if ((result = asn1_create_element
-	     (_gnutls_get_gnutls_asn(), "GNUTLS.RSAPSSParameters", &spk))
-	    != ASN1_SUCCESS) {
+	if ((result = asn1_create_element(_gnutls_get_gnutls_asn(),
+					  "GNUTLS.RSAPSSParameters", &spk)) !=
+	    ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
 		goto cleanup;
@@ -468,47 +461,45 @@ _gnutls_x509_write_rsa_pss_params(const gnutls_x509_spki_st * params,
 
 	oid = gnutls_digest_get_oid(params->rsa_pss_dig);
 
-	if ((result = asn1_write_value(spk, "hashAlgorithm.algorithm", oid, 1))
-	    != ASN1_SUCCESS) {
+	if ((result = asn1_write_value(spk, "hashAlgorithm.algorithm", oid,
+				       1)) != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
 		goto cleanup;
 	}
 
-	if ((result =
-	     asn1_write_value(spk, "hashAlgorithm.parameters", NULL, 0))
-	    != ASN1_SUCCESS) {
+	if ((result = asn1_write_value(spk, "hashAlgorithm.parameters", NULL,
+				       0)) != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
 		goto cleanup;
 	}
 
-	if ((result =
-	     asn1_write_value(spk, "maskGenAlgorithm.algorithm",
-			      PKIX1_RSA_PSS_MGF1_OID, 1))
-	    != ASN1_SUCCESS) {
+	if ((result = asn1_write_value(spk, "maskGenAlgorithm.algorithm",
+				       PKIX1_RSA_PSS_MGF1_OID, 1)) !=
+	    ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
 		goto cleanup;
 	}
 
-	if ((result = asn1_create_element
-	     (_gnutls_get_pkix(), "PKIX1.AlgorithmIdentifier", &c2))
-	    != ASN1_SUCCESS) {
+	if ((result = asn1_create_element(_gnutls_get_pkix(),
+					  "PKIX1.AlgorithmIdentifier", &c2)) !=
+	    ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
 		goto cleanup;
 	}
 
-	if ((result = asn1_write_value(c2, "algorithm", oid, 1))
-	    != ASN1_SUCCESS) {
+	if ((result = asn1_write_value(c2, "algorithm", oid, 1)) !=
+	    ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
 		goto cleanup;
 	}
 
-	if ((result = asn1_write_value(c2, "parameters", NULL, 0))
-	    != ASN1_SUCCESS) {
+	if ((result = asn1_write_value(c2, "parameters", NULL, 0)) !=
+	    ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
 		goto cleanup;
@@ -520,17 +511,15 @@ _gnutls_x509_write_rsa_pss_params(const gnutls_x509_spki_st * params,
 		goto cleanup;
 	}
 
-	if ((result =
-	     asn1_write_value(spk, "maskGenAlgorithm.parameters",
-			      tmp.data, tmp.size))
-	    != ASN1_SUCCESS) {
+	if ((result = asn1_write_value(spk, "maskGenAlgorithm.parameters",
+				       tmp.data, tmp.size)) != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
 		goto cleanup;
 	}
 
-	result = _gnutls_x509_write_uint32(spk, "saltLength",
-					   params->salt_size);
+	result =
+		_gnutls_x509_write_uint32(spk, "saltLength", params->salt_size);
 	if (result < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -550,16 +539,15 @@ _gnutls_x509_write_rsa_pss_params(const gnutls_x509_spki_st * params,
 
 	result = 0;
 
- cleanup:
+cleanup:
 	_gnutls_free_datum(&tmp);
 	asn1_delete_structure(&c2);
 	asn1_delete_structure(&spk);
 	return result;
 }
 
-static int
-_gnutls_x509_write_gost_params(const gnutls_pk_params_st * params,
-			       gnutls_datum_t * der)
+static int _gnutls_x509_write_gost_params(const gnutls_pk_params_st *params,
+					  gnutls_datum_t *der)
 {
 	int result;
 	asn1_node spk = NULL;
@@ -572,18 +560,17 @@ _gnutls_x509_write_gost_params(const gnutls_pk_params_st * params,
 	if (oid == NULL)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	if ((result = asn1_create_element
-	     (_gnutls_get_gnutls_asn(),
-	      params->algo == GNUTLS_PK_GOST_01 ?
-	      "GNUTLS.GOSTParametersOld" : "GNUTLS.GOSTParameters", &spk))
-	    != ASN1_SUCCESS) {
+	if ((result = asn1_create_element(_gnutls_get_gnutls_asn(),
+					  params->algo == GNUTLS_PK_GOST_01 ?
+						  "GNUTLS.GOSTParametersOld" :
+						  "GNUTLS.GOSTParameters",
+					  &spk)) != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
 
-	if ((result =
-	     asn1_write_value(spk, "publicKeyParamSet", oid,
-			      1)) != ASN1_SUCCESS) {
+	if ((result = asn1_write_value(spk, "publicKeyParamSet", oid, 1)) !=
+	    ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
 		goto cleanup;
@@ -608,9 +595,8 @@ _gnutls_x509_write_gost_params(const gnutls_pk_params_st * params,
 	else
 		oid = NULL;
 
-	if ((result =
-	     asn1_write_value(spk, "digestParamSet", oid,
-			      oid ? 1 : 0)) != ASN1_SUCCESS) {
+	if ((result = asn1_write_value(spk, "digestParamSet", oid,
+				       oid ? 1 : 0)) != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
 		goto cleanup;
@@ -628,9 +614,8 @@ _gnutls_x509_write_gost_params(const gnutls_pk_params_st * params,
 		    _gnutls_gost_paramset_default(params->algo))
 			oid = NULL;
 
-		if ((result =
-		     asn1_write_value(spk, "encryptionParamSet", oid,
-				      oid ? 1 : 0)) != ASN1_SUCCESS) {
+		if ((result = asn1_write_value(spk, "encryptionParamSet", oid,
+					       oid ? 1 : 0)) != ASN1_SUCCESS) {
 			gnutls_assert();
 			result = _gnutls_asn2err(result);
 			goto cleanup;
@@ -645,7 +630,7 @@ _gnutls_x509_write_gost_params(const gnutls_pk_params_st * params,
 
 	result = 0;
 
- cleanup:
+cleanup:
 	asn1_delete_structure(&spk);
 	return result;
 }
@@ -656,9 +641,8 @@ _gnutls_x509_write_gost_params(const gnutls_pk_params_st * params,
  *
  * Allocates the space used to store the DER data.
  */
-static int
-_gnutls_x509_write_dsa_pubkey(const gnutls_pk_params_st * params,
-			      gnutls_datum_t * der)
+static int _gnutls_x509_write_dsa_pubkey(const gnutls_pk_params_st *params,
+					 gnutls_datum_t *der)
 {
 	int result;
 	asn1_node spk = NULL;
@@ -672,9 +656,9 @@ _gnutls_x509_write_dsa_pubkey(const gnutls_pk_params_st * params,
 		goto cleanup;
 	}
 
-	if ((result = asn1_create_element
-	     (_gnutls_get_gnutls_asn(), "GNUTLS.DSAPublicKey", &spk))
-	    != ASN1_SUCCESS) {
+	if ((result = asn1_create_element(_gnutls_get_gnutls_asn(),
+					  "GNUTLS.DSAPublicKey", &spk)) !=
+	    ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
@@ -693,14 +677,14 @@ _gnutls_x509_write_dsa_pubkey(const gnutls_pk_params_st * params,
 
 	result = 0;
 
- cleanup:
+cleanup:
 	asn1_delete_structure(&spk);
 	return result;
 }
 
 /* Encodes the RSA parameters into an ASN.1 RSA private key structure.
  */
-static int _gnutls_asn1_encode_rsa(asn1_node * c2, gnutls_pk_params_st * params)
+static int _gnutls_asn1_encode_rsa(asn1_node *c2, gnutls_pk_params_st *params)
 {
 	int result, ret;
 	uint8_t null = '\0';
@@ -731,9 +715,9 @@ static int _gnutls_asn1_encode_rsa(asn1_node * c2, gnutls_pk_params_st * params)
 		*c2 = NULL;
 	}
 
-	if ((result = asn1_create_element
-	     (_gnutls_get_gnutls_asn(), "GNUTLS.RSAPrivateKey", c2))
-	    != ASN1_SUCCESS) {
+	if ((result = asn1_create_element(_gnutls_get_gnutls_asn(),
+					  "GNUTLS.RSAPrivateKey", c2)) !=
+	    ASN1_SUCCESS) {
 		gnutls_assert();
 		ret = _gnutls_asn2err(result);
 		goto cleanup;
@@ -741,79 +725,71 @@ static int _gnutls_asn1_encode_rsa(asn1_node * c2, gnutls_pk_params_st * params)
 
 	/* Write PRIME
 	 */
-	ret =
-	    _gnutls_x509_write_int(*c2, "modulus",
-				   params->params[RSA_MODULUS], 1);
+	ret = _gnutls_x509_write_int(*c2, "modulus",
+				     params->params[RSA_MODULUS], 1);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	ret =
-	    _gnutls_x509_write_int(*c2, "publicExponent",
-				   params->params[RSA_PUB], 1);
+	ret = _gnutls_x509_write_int(*c2, "publicExponent",
+				     params->params[RSA_PUB], 1);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	ret =
-	    _gnutls_x509_write_key_int(*c2, "privateExponent",
-				       params->params[RSA_PRIV], 1);
+	ret = _gnutls_x509_write_key_int(*c2, "privateExponent",
+					 params->params[RSA_PRIV], 1);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	ret =
-	    _gnutls_x509_write_key_int(*c2, "prime1",
-				       params->params[RSA_PRIME1], 1);
+	ret = _gnutls_x509_write_key_int(*c2, "prime1",
+					 params->params[RSA_PRIME1], 1);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	ret =
-	    _gnutls_x509_write_key_int(*c2, "prime2",
-				       params->params[RSA_PRIME2], 1);
+	ret = _gnutls_x509_write_key_int(*c2, "prime2",
+					 params->params[RSA_PRIME2], 1);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	ret =
-	    _gnutls_x509_write_key_int(*c2, "coefficient",
-				       params->params[RSA_COEF], 1);
+	ret = _gnutls_x509_write_key_int(*c2, "coefficient",
+					 params->params[RSA_COEF], 1);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	ret =
-	    _gnutls_x509_write_key_int(*c2, "exponent1",
-				       params->params[RSA_E1], 1);
+	ret = _gnutls_x509_write_key_int(*c2, "exponent1",
+					 params->params[RSA_E1], 1);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	ret =
-	    _gnutls_x509_write_key_int(*c2, "exponent2",
-				       params->params[RSA_E2], 1);
+	ret = _gnutls_x509_write_key_int(*c2, "exponent2",
+					 params->params[RSA_E2], 1);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	if ((result = asn1_write_value(*c2, "otherPrimeInfos",
-				       NULL, 0)) != ASN1_SUCCESS) {
+	if ((result = asn1_write_value(*c2, "otherPrimeInfos", NULL, 0)) !=
+	    ASN1_SUCCESS) {
 		gnutls_assert();
 		ret = _gnutls_asn2err(result);
 		goto cleanup;
 	}
 
-	if ((result =
-	     asn1_write_value(*c2, "version", &null, 1)) != ASN1_SUCCESS) {
+	if ((result = asn1_write_value(*c2, "version", &null, 1)) !=
+	    ASN1_SUCCESS) {
 		gnutls_assert();
 		ret = _gnutls_asn2err(result);
 		goto cleanup;
@@ -821,7 +797,7 @@ static int _gnutls_asn1_encode_rsa(asn1_node * c2, gnutls_pk_params_st * params)
 
 	ret = 0;
 
- cleanup:
+cleanup:
 	if (ret < 0)
 		asn1_delete_structure2(c2, ASN1_DELETE_FLAG_ZEROIZE);
 
@@ -832,7 +808,7 @@ static int _gnutls_asn1_encode_rsa(asn1_node * c2, gnutls_pk_params_st * params)
 
 /* Encodes the ECC parameters into an ASN.1 ECPrivateKey structure.
  */
-static int _gnutls_asn1_encode_ecc(asn1_node * c2, gnutls_pk_params_st * params)
+static int _gnutls_asn1_encode_ecc(asn1_node *c2, gnutls_pk_params_st *params)
 {
 	int ret;
 	uint8_t one = '\x01';
@@ -849,9 +825,9 @@ static int _gnutls_asn1_encode_ecc(asn1_node * c2, gnutls_pk_params_st * params)
 		*c2 = NULL;
 	}
 
-	if ((ret = asn1_create_element
-	     (_gnutls_get_gnutls_asn(), "GNUTLS.ECPrivateKey", c2))
-	    != ASN1_SUCCESS) {
+	if ((ret = asn1_create_element(_gnutls_get_gnutls_asn(),
+				       "GNUTLS.ECPrivateKey", c2)) !=
+	    ASN1_SUCCESS) {
 		gnutls_assert();
 		ret = _gnutls_asn2err(ret);
 		goto cleanup;
@@ -867,18 +843,16 @@ static int _gnutls_asn1_encode_ecc(asn1_node * c2, gnutls_pk_params_st * params)
 	    curve_is_modern_ecdh(params->curve)) {
 		if (params->raw_pub.size == 0 || params->raw_priv.size == 0)
 			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-		ret =
-		    asn1_write_value(*c2, "privateKey", params->raw_priv.data,
-				     params->raw_priv.size);
+		ret = asn1_write_value(*c2, "privateKey", params->raw_priv.data,
+				       params->raw_priv.size);
 		if (ret != ASN1_SUCCESS) {
 			gnutls_assert();
 			ret = _gnutls_asn2err(ret);
 			goto cleanup;
 		}
 
-		ret =
-		    asn1_write_value(*c2, "publicKey", params->raw_pub.data,
-				     params->raw_pub.size * 8);
+		ret = asn1_write_value(*c2, "publicKey", params->raw_pub.data,
+				       params->raw_pub.size * 8);
 		if (ret != ASN1_SUCCESS) {
 			gnutls_assert();
 			ret = _gnutls_asn2err(ret);
@@ -888,25 +862,22 @@ static int _gnutls_asn1_encode_ecc(asn1_node * c2, gnutls_pk_params_st * params)
 		if (params->params_nr != ECC_PRIVATE_PARAMS)
 			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-		ret =
-		    _gnutls_ecc_ansi_x962_export(params->curve,
-						 params->params[ECC_X],
-						 params->params[ECC_Y],
-						 &pubkey);
+		ret = _gnutls_ecc_ansi_x962_export(params->curve,
+						   params->params[ECC_X],
+						   params->params[ECC_Y],
+						   &pubkey);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		ret =
-		    _gnutls_x509_write_key_int(*c2, "privateKey",
-					       params->params[ECC_K], 1);
+		ret = _gnutls_x509_write_key_int(*c2, "privateKey",
+						 params->params[ECC_K], 1);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
 		}
 
-		if ((ret =
-		     asn1_write_value(*c2, "publicKey", pubkey.data,
-				      pubkey.size * 8)) != ASN1_SUCCESS) {
+		if ((ret = asn1_write_value(*c2, "publicKey", pubkey.data,
+					    pubkey.size * 8)) != ASN1_SUCCESS) {
 			gnutls_assert();
 			ret = _gnutls_asn2err(ret);
 			goto cleanup;
@@ -914,17 +885,15 @@ static int _gnutls_asn1_encode_ecc(asn1_node * c2, gnutls_pk_params_st * params)
 	}
 
 	/* write our choice */
-	if ((ret =
-	     asn1_write_value(*c2, "parameters", "namedCurve",
-			      1)) != ASN1_SUCCESS) {
+	if ((ret = asn1_write_value(*c2, "parameters", "namedCurve", 1)) !=
+	    ASN1_SUCCESS) {
 		gnutls_assert();
 		ret = _gnutls_asn2err(ret);
 		goto cleanup;
 	}
 
-	if ((ret =
-	     asn1_write_value(*c2, "parameters.namedCurve", oid,
-			      1)) != ASN1_SUCCESS) {
+	if ((ret = asn1_write_value(*c2, "parameters.namedCurve", oid, 1)) !=
+	    ASN1_SUCCESS) {
 		gnutls_assert();
 		ret = _gnutls_asn2err(ret);
 		goto cleanup;
@@ -933,15 +902,14 @@ static int _gnutls_asn1_encode_ecc(asn1_node * c2, gnutls_pk_params_st * params)
 	_gnutls_free_datum(&pubkey);
 	return 0;
 
- cleanup:
+cleanup:
 	asn1_delete_structure2(c2, ASN1_DELETE_FLAG_ZEROIZE);
 	_gnutls_free_datum(&pubkey);
 
 	return ret;
 }
 
-static int
-_gnutls_asn1_encode_gost(asn1_node * c2, gnutls_pk_params_st * params)
+static int _gnutls_asn1_encode_gost(asn1_node *c2, gnutls_pk_params_st *params)
 {
 	int ret;
 	const char *oid;
@@ -957,9 +925,9 @@ _gnutls_asn1_encode_gost(asn1_node * c2, gnutls_pk_params_st * params)
 		*c2 = NULL;
 	}
 
-	if ((ret = asn1_create_element
-	     (_gnutls_get_gnutls_asn(), "GNUTLS.GOSTPrivateKey", c2))
-	    != ASN1_SUCCESS) {
+	if ((ret = asn1_create_element(_gnutls_get_gnutls_asn(),
+				       "GNUTLS.GOSTPrivateKey", c2)) !=
+	    ASN1_SUCCESS) {
 		gnutls_assert();
 		ret = _gnutls_asn2err(ret);
 		goto cleanup;
@@ -973,7 +941,7 @@ _gnutls_asn1_encode_gost(asn1_node * c2, gnutls_pk_params_st * params)
 
 	return 0;
 
- cleanup:
+cleanup:
 	asn1_delete_structure2(c2, ASN1_DELETE_FLAG_ZEROIZE);
 
 	return ret;
@@ -981,7 +949,7 @@ _gnutls_asn1_encode_gost(asn1_node * c2, gnutls_pk_params_st * params)
 
 /* Encodes the DSA parameters into an ASN.1 DSAPrivateKey structure.
  */
-static int _gnutls_asn1_encode_dsa(asn1_node * c2, gnutls_pk_params_st * params)
+static int _gnutls_asn1_encode_dsa(asn1_node *c2, gnutls_pk_params_st *params)
 {
 	int result, ret;
 	const uint8_t null = '\0';
@@ -992,9 +960,9 @@ static int _gnutls_asn1_encode_dsa(asn1_node * c2, gnutls_pk_params_st * params)
 		*c2 = NULL;
 	}
 
-	if ((result = asn1_create_element
-	     (_gnutls_get_gnutls_asn(), "GNUTLS.DSAPrivateKey", c2))
-	    != ASN1_SUCCESS) {
+	if ((result = asn1_create_element(_gnutls_get_gnutls_asn(),
+					  "GNUTLS.DSAPrivateKey", c2)) !=
+	    ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
@@ -1031,8 +999,8 @@ static int _gnutls_asn1_encode_dsa(asn1_node * c2, gnutls_pk_params_st * params)
 		goto cleanup;
 	}
 
-	if ((result =
-	     asn1_write_value(*c2, "version", &null, 1)) != ASN1_SUCCESS) {
+	if ((result = asn1_write_value(*c2, "version", &null, 1)) !=
+	    ASN1_SUCCESS) {
 		gnutls_assert();
 		ret = _gnutls_asn2err(result);
 		goto cleanup;
@@ -1040,13 +1008,13 @@ static int _gnutls_asn1_encode_dsa(asn1_node * c2, gnutls_pk_params_st * params)
 
 	return 0;
 
- cleanup:
+cleanup:
 	asn1_delete_structure2(c2, ASN1_DELETE_FLAG_ZEROIZE);
 
 	return ret;
 }
 
-int _gnutls_asn1_encode_privkey(asn1_node * c2, gnutls_pk_params_st * params)
+int _gnutls_asn1_encode_privkey(asn1_node *c2, gnutls_pk_params_st *params)
 {
 	switch (params->algo) {
 	case GNUTLS_PK_RSA:

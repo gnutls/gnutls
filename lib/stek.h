@@ -21,26 +21,24 @@
  */
 
 #ifndef GNUTLS_LIB_STEK_H
-# define GNUTLS_LIB_STEK_H
+#define GNUTLS_LIB_STEK_H
 
-# include "gnutls_int.h"
+#include "gnutls_int.h"
 
 int _gnutls_get_session_ticket_encryption_key(gnutls_session_t session,
-					      gnutls_datum_t * key_name,
-					      gnutls_datum_t * mac_key,
-					      gnutls_datum_t * enc_key);
+					      gnutls_datum_t *key_name,
+					      gnutls_datum_t *mac_key,
+					      gnutls_datum_t *enc_key);
 int _gnutls_get_session_ticket_decryption_key(gnutls_session_t session,
-					      const gnutls_datum_t *
-					      ticket_data,
-					      gnutls_datum_t * key_name,
-					      gnutls_datum_t * mac_key,
-					      gnutls_datum_t * enc_key);
+					      const gnutls_datum_t *ticket_data,
+					      gnutls_datum_t *key_name,
+					      gnutls_datum_t *mac_key,
+					      gnutls_datum_t *enc_key);
 
-void _gnutls_set_session_ticket_key_rotation_callback(gnutls_session_t session,
-						      gnutls_stek_rotation_callback_t
-						      cb);
+void _gnutls_set_session_ticket_key_rotation_callback(
+	gnutls_session_t session, gnutls_stek_rotation_callback_t cb);
 
 int _gnutls_initialize_session_ticket_key_rotation(gnutls_session_t session,
-						   const gnutls_datum_t * key);
+						   const gnutls_datum_t *key);
 
-#endif				/* GNUTLS_LIB_STEK_H */
+#endif /* GNUTLS_LIB_STEK_H */

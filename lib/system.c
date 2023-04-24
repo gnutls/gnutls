@@ -33,12 +33,12 @@
 #include <time.h>
 
 #ifdef _WIN32
-# include <windows.h>
-# include <wincrypt.h>
-# if defined(NEED_CERT_ENUM_CRLS)
+#include <windows.h>
+#include <wincrypt.h>
+#if defined(NEED_CERT_ENUM_CRLS)
 CertEnumCRLsInStoreFunc pCertEnumCRLsInStore;
 static HMODULE Crypt32_dll;
-# endif
+#endif
 #endif
 
 /* System specific function wrappers for certificate stores.
@@ -75,9 +75,8 @@ int gnutls_system_global_init(void)
 	if (crypto == NULL)
 		return GNUTLS_E_CRYPTO_INIT_FAILED;
 
-	pCertEnumCRLsInStore =
-	    (CertEnumCRLsInStoreFunc) GetProcAddress(crypto,
-						     "CertEnumCRLsInStore");
+	pCertEnumCRLsInStore = (CertEnumCRLsInStoreFunc)GetProcAddress(
+		crypto, "CertEnumCRLsInStore");
 	if (pCertEnumCRLsInStore == NULL) {
 		FreeLibrary(crypto);
 		return GNUTLS_E_CRYPTO_INIT_FAILED;

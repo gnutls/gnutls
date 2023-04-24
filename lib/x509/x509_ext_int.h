@@ -20,16 +20,16 @@
  */
 
 #ifndef GNUTLS_LIB_X509_X509_EXT_INT_H
-# define GNUTLS_LIB_X509_X509_EXT_INT_H
+#define GNUTLS_LIB_X509_X509_EXT_INT_H
 
-# include "gnutls_int.h"
+#include "gnutls_int.h"
 struct name_st {
 	unsigned int type;
 	gnutls_datum_t san;
 	gnutls_datum_t othername_oid;
 };
 
-int _gnutls_alt_name_process(gnutls_datum_t * out, unsigned type,
-			     const gnutls_datum_t * san, unsigned raw);
+int _gnutls_alt_name_process(gnutls_datum_t *out, unsigned type,
+			     const gnutls_datum_t *san, unsigned raw);
 
-#endif				/* GNUTLS_LIB_X509_X509_EXT_INT_H */
+#endif /* GNUTLS_LIB_X509_X509_EXT_INT_H */

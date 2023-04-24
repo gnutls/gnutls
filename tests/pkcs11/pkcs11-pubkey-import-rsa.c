@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -29,7 +29,7 @@
 #include <unistd.h>
 
 #define CONFIG_NAME "softhsm-pubkey-import-rsa"
-#define CONFIG CONFIG_NAME".config"
+#define CONFIG CONFIG_NAME ".config"
 
 #include "pkcs11-pubkey-import.c"
 

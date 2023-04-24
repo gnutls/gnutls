@@ -37,10 +37,10 @@
 #include "datum.h"
 
 static int _gnutls_client_cert_type_recv_params(gnutls_session_t session,
-						const uint8_t * data,
+						const uint8_t *data,
 						size_t data_size);
 static int _gnutls_client_cert_type_send_params(gnutls_session_t session,
-						gnutls_buffer_st * data);
+						gnutls_buffer_st *data);
 
 const hello_ext_entry_st ext_mod_client_cert_type = {
 	.name = "Client Certificate Type",
@@ -48,10 +48,9 @@ const hello_ext_entry_st ext_mod_client_cert_type = {
 	.gid = GNUTLS_EXTENSION_CLIENT_CERT_TYPE,
 	.client_parse_point = GNUTLS_EXT_TLS,
 	.server_parse_point = GNUTLS_EXT_TLS,
-	.validity = GNUTLS_EXT_FLAG_TLS |
-	    GNUTLS_EXT_FLAG_DTLS |
-	    GNUTLS_EXT_FLAG_CLIENT_HELLO |
-	    GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO | GNUTLS_EXT_FLAG_EE,
+	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_DTLS |
+		    GNUTLS_EXT_FLAG_CLIENT_HELLO |
+		    GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO | GNUTLS_EXT_FLAG_EE,
 	.recv_func = _gnutls_client_cert_type_recv_params,
 	.send_func = _gnutls_client_cert_type_send_params,
 	.pack_func = _gnutls_hello_ext_default_pack,
@@ -61,7 +60,7 @@ const hello_ext_entry_st ext_mod_client_cert_type = {
 };
 
 static int _gnutls_client_cert_type_recv_params(gnutls_session_t session,
-						const uint8_t * data,
+						const uint8_t *data,
 						size_t data_size)
 {
 	int ret;
@@ -76,15 +75,15 @@ static int _gnutls_client_cert_type_recv_params(gnutls_session_t session,
 	    (_gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE) == NULL))
 		return 0;
 
-	if (!IS_SERVER(session)) {	// client mode
-		gnutls_datum_t sent_cert_types;	// Holds the previously sent cert types
+	if (!IS_SERVER(session)) { // client mode
+		gnutls_datum_t
+			sent_cert_types; // Holds the previously sent cert types
 
 		/* Compare packet length with expected packet length. For the
 		 * client this is a single byte. */
 		if (data_size != 1) {
-			return
-			    gnutls_assert_val
-			    (GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+			return gnutls_assert_val(
+				GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 		}
 
 		/* The server picked one of the offered cert types if he supports
@@ -95,23 +94,22 @@ static int _gnutls_client_cert_type_recv_params(gnutls_session_t session,
 		 * to check it nevertheless. */
 		cert_type = IANA2cert_type(pdata[0]);
 
-		_gnutls_handshake_log
-		    ("EXT[%p]: Received a %s client certificate type confirmation from the server.\n",
-		     session, gnutls_certificate_type_get_name(cert_type));
+		_gnutls_handshake_log(
+			"EXT[%p]: Received a %s client certificate type confirmation from the server.\n",
+			session, gnutls_certificate_type_get_name(cert_type));
 
 		// Check validity of cert type
 		if (cert_type == GNUTLS_CRT_UNKNOWN) {
-			return
-			    gnutls_assert_val
-			    (GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE);
+			return gnutls_assert_val(
+				GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE);
 		}
 
 		/* Get the cert types that we sent to the server (they were stored
 		 * in IANA representation.
 		 */
-		ret = _gnutls_hello_ext_get_datum(session,
-						  GNUTLS_EXTENSION_CLIENT_CERT_TYPE,
-						  &sent_cert_types);
+		ret = _gnutls_hello_ext_get_datum(
+			session, GNUTLS_EXTENSION_CLIENT_CERT_TYPE,
+			&sent_cert_types);
 		if (ret < 0) {
 			/* This should not happen and indicate a memory corruption!
 			 * Assertion are always on in production code so execution
@@ -137,20 +135,20 @@ static int _gnutls_client_cert_type_recv_params(gnutls_session_t session,
 
 		return ret;
 
-	} else {		// server mode
-		gnutls_datum_t cert_types;	// Holds the received cert types
+	} else { // server mode
+		gnutls_datum_t cert_types; // Holds the received cert types
 
 		// Compare packet length with expected packet length.
 		DECR_LEN(data_size, 1);
 		if (data[0] != data_size) {
-			return
-			    gnutls_assert_val
-			    (GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+			return gnutls_assert_val(
+				GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 		}
 		pdata += 1;
 
 		// Assign the contents of our data buffer to a gnutls_datum_t
-		cert_types.data = (uint8_t *) pdata;	// Need casting to get rid of 'discards const qualifier' warning
+		cert_types.data = (uint8_t *)
+			pdata; // Need casting to get rid of 'discards const qualifier' warning
 		cert_types.size = data_size;
 
 		// Store the client certificate types in our session
@@ -172,15 +170,15 @@ static int _gnutls_client_cert_type_recv_params(gnutls_session_t session,
 			if (cert_type == GNUTLS_CRT_UNKNOWN)
 				continue;
 
-			_gnutls_handshake_log
-			    ("EXT[%p]: Checking compatibility of a %s client certificate type that was received from the client.\n",
-			     session,
-			     gnutls_certificate_type_get_name(cert_type));
+			_gnutls_handshake_log(
+				"EXT[%p]: Checking compatibility of a %s client certificate type that was received from the client.\n",
+				session,
+				gnutls_certificate_type_get_name(cert_type));
 
 			// Check for support of this cert type
-			if (_gnutls_session_is_cert_type_supported
-			    (session, cert_type, false,
-			     GNUTLS_CTYPE_CLIENT) == 0) {
+			if (_gnutls_session_is_cert_type_supported(
+				    session, cert_type, false,
+				    GNUTLS_CTYPE_CLIENT) == 0) {
 				found = true;
 				break;
 			}
@@ -196,9 +194,10 @@ static int _gnutls_client_cert_type_recv_params(gnutls_session_t session,
 			 * with a fatal alert of type "unsupported_certificate"
 			 * (according to specification rfc7250).
 			 */
-			_gnutls_handshake_log
-			    ("EXT[%p]: No supported client certificate type was found. "
-			     "Aborting connection.\n", session);
+			_gnutls_handshake_log(
+				"EXT[%p]: No supported client certificate type was found. "
+				"Aborting connection.\n",
+				session);
 			ret = GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
 		}
 
@@ -207,10 +206,10 @@ static int _gnutls_client_cert_type_recv_params(gnutls_session_t session,
 }
 
 static int _gnutls_client_cert_type_send_params(gnutls_session_t session,
-						gnutls_buffer_st * data)
+						gnutls_buffer_st *data)
 {
 	int ret;
-	uint8_t cert_type_IANA;	// Holds an IANA cert type ID
+	uint8_t cert_type_IANA; // Holds an IANA cert type ID
 	gnutls_certificate_type_t cert_type;
 
 	/* Only activate this extension if we have cert credentials set
@@ -219,11 +218,12 @@ static int _gnutls_client_cert_type_send_params(gnutls_session_t session,
 	    (_gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE) == NULL))
 		return 0;
 
-	if (!IS_SERVER(session)) {	// Client mode
-		uint8_t cert_types[GNUTLS_CRT_MAX];	// The list with supported (IANA) cert types. Inv: 0 <= cert type Id < 256
+	if (!IS_SERVER(session)) { // Client mode
+		uint8_t cert_types
+			[GNUTLS_CRT_MAX]; // The list with supported (IANA) cert types. Inv: 0 <= cert type Id < 256
 		size_t i, num_cert_types = 0;
 		priority_st *cert_priorities;
-		gnutls_datum_t tmp_cert_types;	// For type conversion
+		gnutls_datum_t tmp_cert_types; // For type conversion
 
 		// For brevity
 		cert_priorities = &session->internals.priorities->client_ctype;
@@ -233,7 +233,8 @@ static int _gnutls_client_cert_type_send_params(gnutls_session_t session,
 		 * initialization values apply. This default is currently set to
 		 * x.509 in which case we don't enable this extension.
 		 */
-		if (cert_priorities->num_priorities > 0) {	// Priorities are explicitly set
+		if (cert_priorities->num_priorities >
+		    0) { // Priorities are explicitly set
 			/* If the certificate priority is explicitly set to only
 			 * X.509 (default) then, according to spec we don't send
 			 * this extension. We check this here to avoid further work in
@@ -242,13 +243,13 @@ static int _gnutls_client_cert_type_send_params(gnutls_session_t session,
 			 */
 			if (cert_priorities->num_priorities == 1 &&
 			    cert_priorities->priorities[0] ==
-			    DEFAULT_CERT_TYPE) {
-				_gnutls_handshake_log
-				    ("EXT[%p]: Client certificate type was set to default cert type (%s). "
-				     "We therefore do not send this extension.\n",
-				     session,
-				     gnutls_certificate_type_get_name
-				     (DEFAULT_CERT_TYPE));
+				    DEFAULT_CERT_TYPE) {
+				_gnutls_handshake_log(
+					"EXT[%p]: Client certificate type was set to default cert type (%s). "
+					"We therefore do not send this extension.\n",
+					session,
+					gnutls_certificate_type_get_name(
+						DEFAULT_CERT_TYPE));
 
 				// Explicitly set but default ctype, so don't send anything
 				return 0;
@@ -261,17 +262,16 @@ static int _gnutls_client_cert_type_send_params(gnutls_session_t session,
 			for (i = 0; i < cert_priorities->num_priorities; i++) {
 				cert_type = cert_priorities->priorities[i];
 
-				if (_gnutls_session_is_cert_type_supported
-				    (session, cert_type, true,
-				     GNUTLS_CTYPE_CLIENT) == 0) {
+				if (_gnutls_session_is_cert_type_supported(
+					    session, cert_type, true,
+					    GNUTLS_CTYPE_CLIENT) == 0) {
 					/* Check whether we are allowed to store another cert type
 					 * in our buffer. In other words, prevent a possible buffer
 					 * overflow. This situation can occur when a user sets
 					 * duplicate cert types in the priority strings. */
 					if (num_cert_types >= GNUTLS_CRT_MAX)
-						return
-						    gnutls_assert_val
-						    (GNUTLS_E_SHORT_MEMORY_BUFFER);
+						return gnutls_assert_val(
+							GNUTLS_E_SHORT_MEMORY_BUFFER);
 
 					// Convert to IANA representation
 					ret = cert_type2IANA(cert_type);
@@ -279,18 +279,19 @@ static int _gnutls_client_cert_type_send_params(gnutls_session_t session,
 					if (ret < 0)
 						return gnutls_assert_val(ret);
 
-					cert_type_IANA = ret;	// For readability
+					cert_type_IANA = ret; // For readability
 
 					// Add this cert type to our list with supported types
 					cert_types[num_cert_types] =
-					    cert_type_IANA;
+						cert_type_IANA;
 					num_cert_types++;
 
-					_gnutls_handshake_log
-					    ("EXT[%p]: Client certificate type %s (%d) was queued.\n",
-					     session,
-					     gnutls_certificate_type_get_name
-					     (cert_type), cert_type_IANA);
+					_gnutls_handshake_log(
+						"EXT[%p]: Client certificate type %s (%d) was queued.\n",
+						session,
+						gnutls_certificate_type_get_name(
+							cert_type),
+						cert_type_IANA);
 				}
 			}
 
@@ -300,22 +301,22 @@ static int _gnutls_client_cert_type_send_params(gnutls_session_t session,
 			 * we do not send this extension (according to RFC7250).
 			 */
 			if (num_cert_types == 0) {
-				_gnutls_handshake_log
-				    ("EXT[%p]: Client certificate types were set but none of them is supported. "
-				     "You might want to check your credentials or your priorities. "
-				     "We do not send this extension.\n",
-				     session);
+				_gnutls_handshake_log(
+					"EXT[%p]: Client certificate types were set but none of them is supported. "
+					"You might want to check your credentials or your priorities. "
+					"We do not send this extension.\n",
+					session);
 
 				return 0;
 			} else if (num_cert_types == 1 &&
 				   IANA2cert_type(cert_types[0]) ==
-				   DEFAULT_CERT_TYPE) {
-				_gnutls_handshake_log
-				    ("EXT[%p]: The only supported client certificate type is (%s) which is the default. "
-				     "We therefore do not send this extension.\n",
-				     session,
-				     gnutls_certificate_type_get_name
-				     (DEFAULT_CERT_TYPE));
+					   DEFAULT_CERT_TYPE) {
+				_gnutls_handshake_log(
+					"EXT[%p]: The only supported client certificate type is (%s) which is the default. "
+					"We therefore do not send this extension.\n",
+					session,
+					gnutls_certificate_type_get_name(
+						DEFAULT_CERT_TYPE));
 
 				return 0;
 			}
@@ -327,17 +328,16 @@ static int _gnutls_client_cert_type_send_params(gnutls_session_t session,
 			tmp_cert_types.data = cert_types;
 			tmp_cert_types.size = num_cert_types;
 
-			_gnutls_hello_ext_set_datum(session,
-						    GNUTLS_EXTENSION_CLIENT_CERT_TYPE,
-						    &tmp_cert_types);
+			_gnutls_hello_ext_set_datum(
+				session, GNUTLS_EXTENSION_CLIENT_CERT_TYPE,
+				&tmp_cert_types);
 
 			/* Serialize the certificate types into a sequence of octets
 			 * uint8: length of sequence of cert types (1 octet)
 			 * uint8: cert types (0 <= #octets <= 255)
 			 */
-			ret = _gnutls_buffer_append_data_prefix(data, 8,
-								cert_types,
-								num_cert_types);
+			ret = _gnutls_buffer_append_data_prefix(
+				data, 8, cert_types, num_cert_types);
 
 			// Check for errors
 			if (ret < 0) {
@@ -347,7 +347,7 @@ static int _gnutls_client_cert_type_send_params(gnutls_session_t session,
 				return num_cert_types + 1;
 			}
 		}
-	} else {		// Server mode
+	} else { // Server mode
 		const version_entry_st *vers = get_version(session);
 		/* TLS 1.2:
 		 * Check whether we are going to send a certificate request,
@@ -370,27 +370,27 @@ static int _gnutls_client_cert_type_send_params(gnutls_session_t session,
 			 * when we cannot find a matching client certificate. This is conform
 			 * spec (RFC7250, 4.2 case 2.).
 			 */
-			cert_type =
-			    get_certificate_type(session, GNUTLS_CTYPE_CLIENT);
+			cert_type = get_certificate_type(session,
+							 GNUTLS_CTYPE_CLIENT);
 			ret = cert_type2IANA(cert_type);
 
 			if (ret < 0)
 				return gnutls_assert_val(ret);
 
-			cert_type_IANA = ret;	// For readability
+			cert_type_IANA = ret; // For readability
 
-			_gnutls_handshake_log
-			    ("EXT[%p]: Confirming to use a %s client certificate type.\n",
-			     session,
-			     gnutls_certificate_type_get_name(cert_type));
+			_gnutls_handshake_log(
+				"EXT[%p]: Confirming to use a %s client certificate type.\n",
+				session,
+				gnutls_certificate_type_get_name(cert_type));
 
-			ret =
-			    gnutls_buffer_append_data(data, &cert_type_IANA, 1);
+			ret = gnutls_buffer_append_data(data, &cert_type_IANA,
+							1);
 
 			if (ret < 0)
 				return gnutls_assert_val(ret);
 
-			return 1;	// sent one byte
+			return 1; // sent one byte
 		}
 	}
 

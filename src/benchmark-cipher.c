@@ -39,12 +39,25 @@ static void tls_log_func(int level, const char *str)
 
 static unsigned page_size = 4096;
 
-#define ALLOC(x) {x=malloc(step+64);assert(x!=NULL);}
-#define ALLOCM(x, mem) {x=malloc(mem); assert(x!=NULL); assert(gnutls_rnd(GNUTLS_RND_NONCE, x, mem) >= 0);}
+#define ALLOC(x)                       \
+	{                              \
+		x = malloc(step + 64); \
+		assert(x != NULL);     \
+	}
+#define ALLOCM(x, mem)                                             \
+	{                                                          \
+		x = malloc(mem);                                   \
+		assert(x != NULL);                                 \
+		assert(gnutls_rnd(GNUTLS_RND_NONCE, x, mem) >= 0); \
+	}
 #define FREE(x) free(x)
-#define INC(orig, x, s) x+=page_size; if ((x+step) >= (((unsigned char*)orig) + MAX_MEM)) { x = orig; }
+#define INC(orig, x, s)                                          \
+	x += page_size;                                          \
+	if ((x + step) >= (((unsigned char *)orig) + MAX_MEM)) { \
+		x = orig;                                        \
+	}
 
-#define MAX_MEM 64*1024*1024
+#define MAX_MEM 64 * 1024 * 1024
 
 static void cipher_mac_bench(int algo, int mac_algo, int size)
 {
@@ -107,15 +120,14 @@ static void cipher_mac_bench(int algo, int mac_algo, int size)
 		gnutls_cipher_encrypt2(ctx, i, step, output, step + 64);
 		st.size += step;
 		INC(input, i, step);
-	}
-	while (benchmark_must_finish == 0);
+	} while (benchmark_must_finish == 0);
 
 	gnutls_cipher_deinit(ctx);
 	gnutls_hmac_deinit(mac_ctx, NULL);
 
 	stop_benchmark(&st, NULL, 1);
 
- leave:
+leave:
 	FREE(input);
 	FREE(output);
 	free(_key);
@@ -156,7 +168,7 @@ static void cipher_bench(int algo, int size, int aead)
 	/* For AES-XTS, the block and tweak key must be different */
 	if (algo == GNUTLS_CIPHER_AES_128_XTS ||
 	    algo == GNUTLS_CIPHER_AES_256_XTS) {
-		memset((uint8_t *) _key + (keysize / 2), 0x0f, (keysize / 2));
+		memset((uint8_t *)_key + (keysize / 2), 0x0f, (keysize / 2));
 	}
 
 	_iv = malloc(ivsize);
@@ -187,8 +199,7 @@ static void cipher_bench(int algo, int size, int aead)
 			force_memcpy(output, i, step);
 			st.size += step;
 			INC(input, i, step);
-		}
-		while (benchmark_must_finish == 0);
+		} while (benchmark_must_finish == 0);
 	} else if (aead != 0) {
 		unsigned tag_size = gnutls_cipher_get_tag_size(algo);
 		size_t out_size;
@@ -201,13 +212,13 @@ static void cipher_bench(int algo, int size, int aead)
 
 		do {
 			out_size = step + tag_size;
-			assert(gnutls_aead_cipher_encrypt
-			       (actx, iv.data, iv.size, NULL, 0, tag_size, i,
-				step, output, &out_size) >= 0);
+			assert(gnutls_aead_cipher_encrypt(
+				       actx, iv.data, iv.size, NULL, 0,
+				       tag_size, i, step, output,
+				       &out_size) >= 0);
 			st.size += step;
 			INC(input, i, step);
-		}
-		while (benchmark_must_finish == 0);
+		} while (benchmark_must_finish == 0);
 
 		gnutls_aead_cipher_deinit(actx);
 	} else {
@@ -221,8 +232,7 @@ static void cipher_bench(int algo, int size, int aead)
 			gnutls_cipher_encrypt2(ctx, i, step, output, step + 64);
 			st.size += step;
 			INC(input, i, step);
-		}
-		while (benchmark_must_finish == 0);
+		} while (benchmark_must_finish == 0);
 
 		gnutls_cipher_deinit(ctx);
 	}
@@ -230,7 +240,7 @@ static void cipher_bench(int algo, int size, int aead)
 
 	FREE(input);
 	FREE(output);
- leave:
+leave:
 	free(_key);
 	free(_iv);
 }
@@ -263,8 +273,7 @@ static void mac_bench(int algo, int size)
 		gnutls_hmac_fast(algo, _key, key_size, i, step, _key);
 		st.size += step;
 		INC(input, i, step);
-	}
-	while (benchmark_must_finish == 0);
+	} while (benchmark_must_finish == 0);
 
 	stop_benchmark(&st, NULL, 1);
 	FREE(input);

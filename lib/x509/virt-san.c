@@ -30,29 +30,27 @@
 #include "krb5.h"
 #include "virt-san.h"
 
-static
-int san_othername_to_virtual(const char *oid, size_t size)
+static int san_othername_to_virtual(const char *oid, size_t size)
 {
 	if (oid) {
-		if ((unsigned)size == (sizeof(XMPP_OID) - 1)
-		    && memcmp(oid, XMPP_OID, sizeof(XMPP_OID) - 1) == 0)
+		if ((unsigned)size == (sizeof(XMPP_OID) - 1) &&
+		    memcmp(oid, XMPP_OID, sizeof(XMPP_OID) - 1) == 0)
 			return GNUTLS_SAN_OTHERNAME_XMPP;
-		else if ((unsigned)size == (sizeof(KRB5_PRINCIPAL_OID) - 1)
-			 && memcmp(oid, KRB5_PRINCIPAL_OID,
-				   sizeof(KRB5_PRINCIPAL_OID) - 1) == 0)
+		else if ((unsigned)size == (sizeof(KRB5_PRINCIPAL_OID) - 1) &&
+			 memcmp(oid, KRB5_PRINCIPAL_OID,
+				sizeof(KRB5_PRINCIPAL_OID) - 1) == 0)
 			return GNUTLS_SAN_OTHERNAME_KRB5PRINCIPAL;
 		else if ((unsigned)size ==
-			 (sizeof(MSUSER_PRINCIPAL_NAME_OID) - 1)
-			 && memcmp(oid, MSUSER_PRINCIPAL_NAME_OID,
-				   sizeof(MSUSER_PRINCIPAL_NAME_OID) - 1) == 0)
+				 (sizeof(MSUSER_PRINCIPAL_NAME_OID) - 1) &&
+			 memcmp(oid, MSUSER_PRINCIPAL_NAME_OID,
+				sizeof(MSUSER_PRINCIPAL_NAME_OID) - 1) == 0)
 			return GNUTLS_SAN_OTHERNAME_MSUSERPRINCIPAL;
 	}
 
 	return GNUTLS_SAN_OTHERNAME;
 }
 
-static
-const char *virtual_to_othername_oid(unsigned type)
+static const char *virtual_to_othername_oid(unsigned type)
 {
 	switch (type) {
 	case GNUTLS_SAN_OTHERNAME_XMPP:
@@ -67,7 +65,7 @@ const char *virtual_to_othername_oid(unsigned type)
 }
 
 int _gnutls_alt_name_assign_virt_type(struct name_st *name, unsigned type,
-				      gnutls_datum_t * san,
+				      gnutls_datum_t *san,
 				      const char *othername_oid, unsigned raw)
 {
 	gnutls_datum_t encoded = { NULL, 0 };
@@ -82,13 +80,13 @@ int _gnutls_alt_name_assign_virt_type(struct name_st *name, unsigned type,
 		gnutls_free(san->data);
 
 		if (othername_oid) {
-			name->othername_oid.data = (uint8_t *) othername_oid;
+			name->othername_oid.data = (uint8_t *)othername_oid;
 			name->othername_oid.size = strlen(othername_oid);
 		} else {
 			name->othername_oid.data = NULL;
 			name->othername_oid.size = 0;
 		}
-	} else {		/* virtual types */
+	} else { /* virtual types */
 		const char *oid = virtual_to_othername_oid(type);
 
 		if (oid == NULL)
@@ -97,9 +95,8 @@ int _gnutls_alt_name_assign_virt_type(struct name_st *name, unsigned type,
 		switch (type) {
 		case GNUTLS_SAN_OTHERNAME_XMPP:
 
-			ret =
-			    gnutls_idna_map((char *)san->data, san->size, &xmpp,
-					    0);
+			ret = gnutls_idna_map((char *)san->data, san->size,
+					      &xmpp, 0);
 			if (ret < 0)
 				return gnutls_assert_val(ret);
 
@@ -119,9 +116,8 @@ int _gnutls_alt_name_assign_virt_type(struct name_st *name, unsigned type,
 			break;
 
 		case GNUTLS_SAN_OTHERNAME_KRB5PRINCIPAL:
-			ret =
-			    _gnutls_krb5_principal_to_der((char *)san->data,
-							  &name->san);
+			ret = _gnutls_krb5_principal_to_der((char *)san->data,
+							    &name->san);
 			if (ret < 0)
 				return gnutls_assert_val(ret);
 
@@ -155,9 +151,9 @@ int _gnutls_alt_name_assign_virt_type(struct name_st *name, unsigned type,
  * Since: 3.3.8
  **/
 int gnutls_x509_othername_to_virtual(const char *oid,
-				     const gnutls_datum_t * othername,
+				     const gnutls_datum_t *othername,
 				     unsigned int *virt_type,
-				     gnutls_datum_t * virt)
+				     gnutls_datum_t *virt)
 {
 	int ret;
 	unsigned type;
@@ -171,9 +167,9 @@ int gnutls_x509_othername_to_virtual(const char *oid,
 
 	switch (type) {
 	case GNUTLS_SAN_OTHERNAME_XMPP:
-		ret = _gnutls_x509_decode_string
-		    (ASN1_ETYPE_UTF8_STRING, othername->data,
-		     othername->size, virt, 0);
+		ret = _gnutls_x509_decode_string(ASN1_ETYPE_UTF8_STRING,
+						 othername->data,
+						 othername->size, virt, 0);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
@@ -187,9 +183,9 @@ int gnutls_x509_othername_to_virtual(const char *oid,
 		}
 		return 0;
 	case GNUTLS_SAN_OTHERNAME_MSUSERPRINCIPAL:
-		ret = _gnutls_x509_decode_string
-		    (ASN1_ETYPE_UTF8_STRING, othername->data,
-		     othername->size, virt, 0);
+		ret = _gnutls_x509_decode_string(ASN1_ETYPE_UTF8_STRING,
+						 othername->data,
+						 othername->size, virt, 0);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;

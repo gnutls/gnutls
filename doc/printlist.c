@@ -56,24 +56,20 @@ static void main_texinfo(void)
 		printf("@heading Ciphersuites\n");
 		printf("@multitable @columnfractions .60 .20 .20\n");
 		printf("@headitem Ciphersuite name @tab TLS ID @tab Since\n");
-		for (i = 0;
-		     (name =
-		      gnutls_cipher_suite_info(i, id, &kx, &cipher, &mac,
-					       &version)); i++) {
+		for (i = 0; (name = gnutls_cipher_suite_info(
+				     i, id, &kx, &cipher, &mac, &version));
+		     i++) {
 			printf("@item %s\n@tab 0x%02X 0x%02X\n@tab %s\n",
-			       escape_texi_string(name, buffer,
-						  sizeof(buffer)),
-			       (unsigned char)id[0],
-			       (unsigned char)id[1],
+			       escape_texi_string(name, buffer, sizeof(buffer)),
+			       (unsigned char)id[0], (unsigned char)id[1],
 			       gnutls_protocol_get_name(version));
 		}
 		printf("@end multitable\n");
-
 	}
 
 	{
 		const gnutls_certificate_type_t *p =
-		    gnutls_certificate_type_list();
+			gnutls_certificate_type_list();
 
 		printf("\n\n@heading Certificate types\n");
 		printf("@table @code\n");
@@ -137,8 +133,7 @@ static void main_texinfo(void)
 	{
 		const gnutls_sign_algorithm_t *p = gnutls_sign_list();
 
-		printf
-		    ("\n@heading Public key signature algorithms\n@table @code\n");
+		printf("\n@heading Public key signature algorithms\n@table @code\n");
 		for (; *p; p++) {
 			printf("@item %s\n", gnutls_sign_get_name(*p));
 		}
@@ -157,7 +152,9 @@ static void main_texinfo(void)
 }
 
 static const char headers[] = "\\tablefirsthead{%\n"
-    "\\hline\n" "Ciphersuite name & TLS ID & Since\\\\\n" "\\hline}\n"
+			      "\\hline\n"
+			      "Ciphersuite name & TLS ID & Since\\\\\n"
+			      "\\hline}\n"
 #if 0
     "\\tablehead{%\n"
     "\\hline\n"
@@ -168,7 +165,8 @@ static const char headers[] = "\\tablefirsthead{%\n"
     "\\multicolumn{3}{|r|}{\\small\\sl continued on next page}\\\\\n"
     "\\hline}\n"
 #endif
-    "\\tablelasttail{\\hline}\n" "\\bottomcaption{The ciphersuites table}\n\n";
+			      "\\tablelasttail{\\hline}\n"
+			      "\\bottomcaption{The ciphersuites table}\n\n";
 
 static void main_latex(void)
 {
@@ -178,8 +176,7 @@ static void main_latex(void)
 
 	puts(headers);
 
-	printf
-	    ("\\begin{supertabular}{|p{.64\\linewidth}|p{.12\\linewidth}|p{.09\\linewidth}|}\n");
+	printf("\\begin{supertabular}{|p{.64\\linewidth}|p{.12\\linewidth}|p{.09\\linewidth}|}\n");
 
 	{
 		size_t i;
@@ -190,19 +187,17 @@ static void main_latex(void)
 		gnutls_mac_algorithm_t mac;
 		gnutls_protocol_t version;
 
-		for (i = 0; (name = gnutls_cipher_suite_info
-			     (i, id, &kx, &cipher, &mac, &version)); i++) {
-			printf
-			    ("{\\small{%s}} & \\code{0x%02X 0x%02X} & %s",
-			     escape_string(name, buffer, sizeof(buffer)),
-			     (unsigned char)id[0], (unsigned char)id[1],
-			     gnutls_protocol_get_name(version));
+		for (i = 0; (name = gnutls_cipher_suite_info(
+				     i, id, &kx, &cipher, &mac, &version));
+		     i++) {
+			printf("{\\small{%s}} & \\code{0x%02X 0x%02X} & %s",
+			       escape_string(name, buffer, sizeof(buffer)),
+			       (unsigned char)id[0], (unsigned char)id[1],
+			       gnutls_protocol_get_name(version));
 			printf("\\\\\n");
 		}
 		printf("\\end{supertabular}\n\n");
-
 	}
 
 	return;
-
 }

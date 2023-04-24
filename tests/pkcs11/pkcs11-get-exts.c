@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -38,9 +38,9 @@
 /* Tests the gnutls_pkcs11_obj_get_exts API */
 
 #ifdef _WIN32
-# define P11LIB "libpkcs11mock1.dll"
+#define P11LIB "libpkcs11mock1.dll"
 #else
-# define P11LIB "libpkcs11mock1.so"
+#define P11LIB "libpkcs11mock1.so"
 #endif
 
 void doit(void)
@@ -81,9 +81,8 @@ void doit(void)
 	assert(gnutls_pkcs11_obj_init(&obj) >= 0);
 
 	/* check extensions */
-	ret =
-	    gnutls_pkcs11_obj_import_url(obj, "pkcs11:type=cert;object=cert1",
-					 0);
+	ret = gnutls_pkcs11_obj_import_url(obj, "pkcs11:type=cert;object=cert1",
+					   0);
 	if (ret < 0) {
 		fail("%d: %s\n", ret, gnutls_strerror(ret));
 		exit(1);
@@ -108,9 +107,8 @@ void doit(void)
 	{
 		unsigned ca;
 		int pathlen;
-		ret =
-		    gnutls_x509_ext_import_basic_constraints(&exts[0].data, &ca,
-							     &pathlen);
+		ret = gnutls_x509_ext_import_basic_constraints(&exts[0].data,
+							       &ca, &pathlen);
 		if (ret < 0) {
 			fail("%d: %s\n", ret, gnutls_strerror(ret));
 			exit(1);
@@ -129,8 +127,8 @@ void doit(void)
 
 	{
 		unsigned keyusage;
-		ret =
-		    gnutls_x509_ext_import_key_usage(&exts[1].data, &keyusage);
+		ret = gnutls_x509_ext_import_key_usage(&exts[1].data,
+						       &keyusage);
 		if (ret < 0) {
 			fail("%d: %s\n", ret, gnutls_strerror(ret));
 			exit(1);

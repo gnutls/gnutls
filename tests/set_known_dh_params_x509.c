@@ -22,7 +22,7 @@
 /* Parts copied from GnuTLS example programs. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -30,10 +30,10 @@
 #include <string.h>
 #include <sys/types.h>
 #if !defined(_WIN32)
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
 #endif
 #include <unistd.h>
 #include <assert.h>
@@ -69,39 +69,36 @@ void doit(void)
 	assert(gnutls_certificate_allocate_credentials(&clicred) >= 0);
 	assert(gnutls_certificate_allocate_credentials(&x509_cred) >= 0);
 
-	ret =
-	    gnutls_certificate_set_x509_trust_mem(clicred, &ca3_cert,
-						  GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_trust_mem(clicred, &ca3_cert,
+						    GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		fail("set_x509_trust_file failed: %s\n", gnutls_strerror(ret));
 
-	ret =
-	    gnutls_certificate_set_x509_key_mem(x509_cred,
-						&server_ca3_localhost_cert_chain,
-						&server_ca3_key,
-						GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_key_mem(
+		x509_cred, &server_ca3_localhost_cert_chain, &server_ca3_key,
+		GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
 		fail("error in error code\n");
 		exit(1);
 	}
 
-	assert(gnutls_certificate_set_known_dh_params
-	       (x509_cred, GNUTLS_SEC_PARAM_LEGACY) >= 0);
+	assert(gnutls_certificate_set_known_dh_params(
+		       x509_cred, GNUTLS_SEC_PARAM_LEGACY) >= 0);
 	test_cli_serv(x509_cred, clicred, "NORMAL:-KX-ALL:+DHE-RSA",
 		      "localhost", NULL, NULL, NULL);
 
-	assert(gnutls_certificate_set_known_dh_params
-	       (x509_cred, GNUTLS_SEC_PARAM_NORMAL) >= 0);
+	assert(gnutls_certificate_set_known_dh_params(
+		       x509_cred, GNUTLS_SEC_PARAM_NORMAL) >= 0);
 	test_cli_serv(x509_cred, clicred, "NORMAL:-KX-ALL:+DHE-RSA",
 		      "localhost", NULL, NULL, NULL);
 
-	assert(gnutls_certificate_set_known_dh_params
-	       (x509_cred, GNUTLS_SEC_PARAM_HIGH) >= 0);
+	assert(gnutls_certificate_set_known_dh_params(
+		       x509_cred, GNUTLS_SEC_PARAM_HIGH) >= 0);
 	test_cli_serv(x509_cred, clicred, "NORMAL:-KX-ALL:+DHE-RSA",
 		      "localhost", NULL, NULL, NULL);
 
-	assert(gnutls_certificate_set_known_dh_params
-	       (x509_cred, GNUTLS_SEC_PARAM_ULTRA) >= 0);
+	assert(gnutls_certificate_set_known_dh_params(
+		       x509_cred, GNUTLS_SEC_PARAM_ULTRA) >= 0);
 	test_cli_serv(x509_cred, clicred, "NORMAL:-KX-ALL:+DHE-RSA",
 		      "localhost", NULL, NULL, NULL);
 

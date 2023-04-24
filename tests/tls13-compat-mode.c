@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <gnutls/gnutls.h>
@@ -44,10 +44,9 @@ struct data {
 	bool compat;
 };
 
-static int
-handshake_callback(gnutls_session_t session, unsigned int htype,
-		   unsigned post, unsigned int incoming,
-		   const gnutls_datum_t * msg)
+static int handshake_callback(gnutls_session_t session, unsigned int htype,
+			      unsigned post, unsigned int incoming,
+			      const gnutls_datum_t *msg)
 {
 	unsigned pos;
 	struct data *data;
@@ -88,16 +87,15 @@ static void test(const char *name, bool client_compat, bool server_compat)
 
 	/* Init server */
 	assert(gnutls_certificate_allocate_credentials(&serverx509cred) >= 0);
-	gnutls_certificate_set_x509_key_mem(serverx509cred,
-					    &server_cert, &server_key,
-					    GNUTLS_X509_FMT_PEM);
+	gnutls_certificate_set_x509_key_mem(serverx509cred, &server_cert,
+					    &server_key, GNUTLS_X509_FMT_PEM);
 
 	assert(gnutls_init(&server, GNUTLS_SERVER) >= 0);
-	assert(gnutls_credentials_set
-	       (server, GNUTLS_CRD_CERTIFICATE, serverx509cred) >= 0);
-	assert(gnutls_priority_set_direct
-	       (server, server_compat ? COMPAT_PRIO : NO_COMPAT_PRIO,
-		NULL) >= 0);
+	assert(gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
+				      serverx509cred) >= 0);
+	assert(gnutls_priority_set_direct(
+		       server, server_compat ? COMPAT_PRIO : NO_COMPAT_PRIO,
+		       NULL) >= 0);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
@@ -108,10 +106,9 @@ static void test(const char *name, bool client_compat, bool server_compat)
 	assert(gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
 				      clientx509cred) >= 0);
 
-	assert(gnutls_priority_set_direct(client,
-					  client_compat ?
-					  COMPAT_PRIO : NO_COMPAT_PRIO,
-					  NULL) >= 0);
+	assert(gnutls_priority_set_direct(
+		       client, client_compat ? COMPAT_PRIO : NO_COMPAT_PRIO,
+		       NULL) >= 0);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);

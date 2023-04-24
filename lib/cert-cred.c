@@ -48,24 +48,20 @@
 /*
  * Adds a public/private key pair to a certificate credential
  */
-int
-_gnutls_certificate_credential_append_keypair(gnutls_certificate_credentials_t
-					      res, gnutls_privkey_t key,
-					      gnutls_str_array_t names,
-					      gnutls_pcert_st * crt, int nr)
+int _gnutls_certificate_credential_append_keypair(
+	gnutls_certificate_credentials_t res, gnutls_privkey_t key,
+	gnutls_str_array_t names, gnutls_pcert_st *crt, int nr)
 {
 	if (unlikely(INT_ADD_OVERFLOW(res->ncerts, 1))) {
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 	}
 
-	res->sorted_cert_idx = _gnutls_reallocarray_fast(res->sorted_cert_idx,
-							 res->ncerts + 1,
-							 sizeof(unsigned int));
+	res->sorted_cert_idx = _gnutls_reallocarray_fast(
+		res->sorted_cert_idx, res->ncerts + 1, sizeof(unsigned int));
 	if (res->sorted_cert_idx == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-	res->certs = _gnutls_reallocarray_fast(res->certs,
-					       res->ncerts + 1,
+	res->certs = _gnutls_reallocarray_fast(res->certs, res->ncerts + 1,
 					       sizeof(certs_st));
 	if (res->certs == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
@@ -103,9 +99,8 @@ _gnutls_certificate_credential_append_keypair(gnutls_certificate_credentials_t
 	/* otherwise append it normally on the end */
 	res->sorted_cert_idx[res->ncerts] = res->ncerts;
 
- finish:
+finish:
 	return 0;
-
 }
 
 /**
@@ -142,12 +137,10 @@ _gnutls_certificate_credential_append_keypair(gnutls_certificate_credentials_t
  *
  * Since: 3.0
  **/
-int
-gnutls_certificate_set_key(gnutls_certificate_credentials_t res,
-			   const char **names,
-			   int names_size,
-			   gnutls_pcert_st * pcert_list,
-			   int pcert_list_size, gnutls_privkey_t key)
+int gnutls_certificate_set_key(gnutls_certificate_credentials_t res,
+			       const char **names, int names_size,
+			       gnutls_pcert_st *pcert_list, int pcert_list_size,
+			       gnutls_privkey_t key)
 {
 	int ret, i;
 	gnutls_str_array_t str_names;
@@ -168,9 +161,8 @@ gnutls_certificate_set_key(gnutls_certificate_credentials_t res,
 
 	if (names != NULL && names_size > 0) {
 		for (i = 0; i < names_size; i++) {
-			ret =
-			    _gnutls_str_array_append_idna(&str_names, names[i],
-							  strlen(names[i]));
+			ret = _gnutls_str_array_append_idna(
+				&str_names, names[i], strlen(names[i]));
 			if (ret < 0) {
 				ret = gnutls_assert_val(ret);
 				goto cleanup;
@@ -185,9 +177,8 @@ gnutls_certificate_set_key(gnutls_certificate_credentials_t res,
 			goto cleanup;
 		}
 
-		ret =
-		    gnutls_x509_crt_import(crt, &pcert_list[0].cert,
-					   GNUTLS_X509_FMT_DER);
+		ret = gnutls_x509_crt_import(crt, &pcert_list[0].cert,
+					     GNUTLS_X509_FMT_DER);
 		if (ret < 0) {
 			gnutls_assert();
 			gnutls_x509_crt_deinit(crt);
@@ -215,10 +206,8 @@ gnutls_certificate_set_key(gnutls_certificate_credentials_t res,
 	memcpy(new_pcert_list, pcert_list,
 	       sizeof(gnutls_pcert_st) * pcert_list_size);
 
-	ret =
-	    _gnutls_certificate_credential_append_keypair(res, key, str_names,
-							  new_pcert_list,
-							  pcert_list_size);
+	ret = _gnutls_certificate_credential_append_keypair(
+		res, key, str_names, new_pcert_list, pcert_list_size);
 	if (ret < 0) {
 		gnutls_assert();
 		gnutls_free(new_pcert_list);
@@ -240,7 +229,7 @@ gnutls_certificate_set_key(gnutls_certificate_credentials_t res,
 
 	CRED_RET_SUCCESS(res);
 
- cleanup:
+cleanup:
 	_gnutls_str_array_clear(&str_names);
 	return ret;
 }
@@ -312,10 +301,9 @@ void gnutls_certificate_free_cas(gnutls_certificate_credentials_t sc)
  *
  * Since: 3.0
  **/
-int
-gnutls_certificate_get_issuer(gnutls_certificate_credentials_t sc,
-			      gnutls_x509_crt_t cert,
-			      gnutls_x509_crt_t * issuer, unsigned int flags)
+int gnutls_certificate_get_issuer(gnutls_certificate_credentials_t sc,
+				  gnutls_x509_crt_t cert,
+				  gnutls_x509_crt_t *issuer, unsigned int flags)
 {
 	return gnutls_x509_trust_list_get_issuer(sc->tlist, cert, issuer,
 						 flags);
@@ -340,10 +328,9 @@ gnutls_certificate_get_issuer(gnutls_certificate_credentials_t sc,
  *
  * Since: 3.2.5
  **/
-int
-gnutls_certificate_get_crt_raw(gnutls_certificate_credentials_t sc,
-			       unsigned idx1,
-			       unsigned idx2, gnutls_datum_t * cert)
+int gnutls_certificate_get_crt_raw(gnutls_certificate_credentials_t sc,
+				   unsigned idx1, unsigned idx2,
+				   gnutls_datum_t *cert)
 {
 	if (idx1 >= sc->ncerts)
 		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
@@ -411,8 +398,8 @@ void gnutls_certificate_free_credentials(gnutls_certificate_credentials_t sc)
  *
  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
  **/
-int
-gnutls_certificate_allocate_credentials(gnutls_certificate_credentials_t * res)
+int gnutls_certificate_allocate_credentials(
+	gnutls_certificate_credentials_t *res)
 {
 	int ret;
 
@@ -436,8 +423,8 @@ gnutls_certificate_allocate_credentials(gnutls_certificate_credentials_t * res)
 /* converts the given x509 certificate list to gnutls_pcert_st* and allocates
  * space for them.
  */
-static gnutls_pcert_st *alloc_and_load_x509_certs(gnutls_x509_crt_t *
-						  certs, unsigned ncerts)
+static gnutls_pcert_st *alloc_and_load_x509_certs(gnutls_x509_crt_t *certs,
+						  unsigned ncerts)
 {
 	gnutls_pcert_st *local_certs;
 	int ret = 0;
@@ -452,8 +439,8 @@ static gnutls_pcert_st *alloc_and_load_x509_certs(gnutls_x509_crt_t *
 		return NULL;
 	}
 
-	local_certs = _gnutls_reallocarray(NULL, ncerts,
-					   sizeof(gnutls_pcert_st));
+	local_certs =
+		_gnutls_reallocarray(NULL, ncerts, sizeof(gnutls_pcert_st));
 	if (local_certs == NULL) {
 		gnutls_assert();
 		return NULL;
@@ -480,8 +467,8 @@ static gnutls_pcert_st *alloc_and_load_x509_certs(gnutls_x509_crt_t *
 /* converts the given x509 key to gnutls_privkey* and allocates
  * space for it.
  */
-static gnutls_privkey_t
-alloc_and_load_x509_key(gnutls_x509_privkey_t key, int deinit)
+static gnutls_privkey_t alloc_and_load_x509_key(gnutls_x509_privkey_t key,
+						int deinit)
 {
 	gnutls_privkey_t local_key;
 	int ret = 0;
@@ -495,10 +482,9 @@ alloc_and_load_x509_key(gnutls_x509_privkey_t key, int deinit)
 		return NULL;
 	}
 
-	ret =
-	    gnutls_privkey_import_x509(local_key, key,
-				       deinit ?
-				       GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE : 0);
+	ret = gnutls_privkey_import_x509(
+		local_key, key,
+		deinit ? GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE : 0);
 	if (ret < 0) {
 		gnutls_assert();
 		gnutls_privkey_deinit(local_key);
@@ -513,8 +499,8 @@ alloc_and_load_x509_key(gnutls_x509_privkey_t key, int deinit)
 /* converts the given raw key to gnutls_privkey* and allocates
  * space for it.
  */
-static gnutls_privkey_t
-alloc_and_load_pkcs11_key(gnutls_pkcs11_privkey_t key, int deinit)
+static gnutls_privkey_t alloc_and_load_pkcs11_key(gnutls_pkcs11_privkey_t key,
+						  int deinit)
 {
 	gnutls_privkey_t local_key;
 	int ret = 0;
@@ -528,11 +514,9 @@ alloc_and_load_pkcs11_key(gnutls_pkcs11_privkey_t key, int deinit)
 		return NULL;
 	}
 
-	ret =
-	    gnutls_privkey_import_pkcs11(local_key, key,
-					 deinit ?
-					 GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE
-					 : 0);
+	ret = gnutls_privkey_import_pkcs11(
+		local_key, key,
+		deinit ? GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE : 0);
 	if (ret < 0) {
 		gnutls_assert();
 		gnutls_privkey_deinit(local_key);
@@ -556,20 +540,19 @@ alloc_and_load_pkcs11_key(gnutls_pkcs11_privkey_t key, int deinit)
  * function then the client will not be asked to send a certificate. Invoking
  * the function with @req GNUTLS_CERT_IGNORE has the same effect.
  **/
-void
-gnutls_certificate_server_set_request(gnutls_session_t session,
-				      gnutls_certificate_request_t req)
+void gnutls_certificate_server_set_request(gnutls_session_t session,
+					   gnutls_certificate_request_t req)
 {
 	session->internals.send_cert_req = req;
 }
 
 static int call_legacy_cert_cb1(gnutls_session_t session,
 				const struct gnutls_cert_retr_st *info,
-				gnutls_pcert_st ** certs,
+				gnutls_pcert_st **certs,
 				unsigned int *pcert_length,
-				gnutls_ocsp_data_st ** ocsp,
+				gnutls_ocsp_data_st **ocsp,
 				unsigned int *ocsp_length,
-				gnutls_privkey_t * privkey, unsigned int *flags)
+				gnutls_privkey_t *privkey, unsigned int *flags)
 {
 	gnutls_retr2_st st2;
 	gnutls_pcert_st *local_certs = NULL;
@@ -581,10 +564,9 @@ static int call_legacy_cert_cb1(gnutls_session_t session,
 
 	memset(&st2, 0, sizeof(st2));
 
-	ret =
-	    info->cred->legacy_cert_cb1(session, info->req_ca_rdn, info->nreqs,
-					info->pk_algos, info->pk_algos_length,
-					&st2);
+	ret = info->cred->legacy_cert_cb1(session, info->req_ca_rdn,
+					  info->nreqs, info->pk_algos,
+					  info->pk_algos_length, &st2);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -612,9 +594,8 @@ static int call_legacy_cert_cb1(gnutls_session_t session,
 #ifdef ENABLE_PKCS11
 	case GNUTLS_PRIVKEY_PKCS11:
 		if (st2.key.pkcs11 != NULL) {
-			local_key =
-			    alloc_and_load_pkcs11_key(st2.key.pkcs11,
-						      st2.deinit_all);
+			local_key = alloc_and_load_pkcs11_key(st2.key.pkcs11,
+							      st2.deinit_all);
 			if (local_key == NULL) {
 				gnutls_assert();
 				ret = GNUTLS_E_INTERNAL_ERROR;
@@ -625,9 +606,8 @@ static int call_legacy_cert_cb1(gnutls_session_t session,
 #endif
 	case GNUTLS_PRIVKEY_X509:
 		if (st2.key.x509 != NULL) {
-			local_key =
-			    alloc_and_load_x509_key(st2.key.x509,
-						    st2.deinit_all);
+			local_key = alloc_and_load_x509_key(st2.key.x509,
+							    st2.deinit_all);
 			if (local_key == NULL) {
 				gnutls_assert();
 				ret = GNUTLS_E_INTERNAL_ERROR;
@@ -650,7 +630,7 @@ static int call_legacy_cert_cb1(gnutls_session_t session,
 
 	ret = 0;
 
- cleanup:
+cleanup:
 
 	if (st2.cert_type == GNUTLS_CRT_X509) {
 		if (st2.deinit_all) {
@@ -662,7 +642,6 @@ static int call_legacy_cert_cb1(gnutls_session_t session,
 	}
 
 	return ret;
-
 }
 
 /**
@@ -705,9 +684,10 @@ static int call_legacy_cert_cb1(gnutls_session_t session,
  *
  * Since: 3.0
  **/
-void gnutls_certificate_set_retrieve_function
-    (gnutls_certificate_credentials_t cred,
-     gnutls_certificate_retrieve_function * func) {
+void gnutls_certificate_set_retrieve_function(
+	gnutls_certificate_credentials_t cred,
+	gnutls_certificate_retrieve_function *func)
+{
 	cred->legacy_cert_cb1 = func;
 	if (!func)
 		cred->get_cert_callback3 = NULL;
@@ -717,20 +697,20 @@ void gnutls_certificate_set_retrieve_function
 
 static int call_legacy_cert_cb2(gnutls_session_t session,
 				const struct gnutls_cert_retr_st *info,
-				gnutls_pcert_st ** certs,
+				gnutls_pcert_st **certs,
 				unsigned int *pcert_length,
-				gnutls_ocsp_data_st ** ocsp,
+				gnutls_ocsp_data_st **ocsp,
 				unsigned int *ocsp_length,
-				gnutls_privkey_t * privkey, unsigned int *flags)
+				gnutls_privkey_t *privkey, unsigned int *flags)
 {
 	int ret;
 	*ocsp_length = 0;
 	/* flags will be assumed to be zero */
 
-	ret =
-	    info->cred->legacy_cert_cb2(session, info->req_ca_rdn, info->nreqs,
-					info->pk_algos, info->pk_algos_length,
-					certs, pcert_length, privkey);
+	ret = info->cred->legacy_cert_cb2(session, info->req_ca_rdn,
+					  info->nreqs, info->pk_algos,
+					  info->pk_algos_length, certs,
+					  pcert_length, privkey);
 	if (ret < 0) {
 		gnutls_assert();
 	}
@@ -782,9 +762,10 @@ static int call_legacy_cert_cb2(gnutls_session_t session,
  *
  * Since: 3.0
  **/
-void gnutls_certificate_set_retrieve_function2
-    (gnutls_certificate_credentials_t cred,
-     gnutls_certificate_retrieve_function2 * func) {
+void gnutls_certificate_set_retrieve_function2(
+	gnutls_certificate_credentials_t cred,
+	gnutls_certificate_retrieve_function2 *func)
+{
 	cred->legacy_cert_cb2 = func;
 	if (!func)
 		cred->get_cert_callback3 = NULL;
@@ -850,9 +831,10 @@ void gnutls_certificate_set_retrieve_function2
  *
  * Since: 3.6.3
  **/
-void gnutls_certificate_set_retrieve_function3
-    (gnutls_certificate_credentials_t cred,
-     gnutls_certificate_retrieve_function3 * func) {
+void gnutls_certificate_set_retrieve_function3(
+	gnutls_certificate_credentials_t cred,
+	gnutls_certificate_retrieve_function3 *func)
+{
 	cred->get_cert_callback3 = func;
 }
 
@@ -879,9 +861,10 @@ void gnutls_certificate_set_retrieve_function3
  *
  * Since: 2.10.0
  **/
-void gnutls_certificate_set_verify_function
-    (gnutls_certificate_credentials_t cred,
-     gnutls_certificate_verify_function * func) {
+void gnutls_certificate_set_verify_function(
+	gnutls_certificate_credentials_t cred,
+	gnutls_certificate_verify_function *func)
+{
 	cred->verify_callback = func;
 }
 
@@ -917,10 +900,9 @@ void gnutls_certificate_set_verify_function
  *
  * Since: 3.7.0
  **/
-void gnutls_x509_trust_list_set_getissuer_function(gnutls_x509_trust_list_t
-						   tlist,
-						   gnutls_x509_trust_list_getissuer_function
-						   * func)
+void gnutls_x509_trust_list_set_getissuer_function(
+	gnutls_x509_trust_list_t tlist,
+	gnutls_x509_trust_list_getissuer_function *func)
 {
 	tlist->issuer_callback = func;
 }
@@ -986,9 +968,8 @@ void *gnutls_x509_trust_list_get_ptr(gnutls_x509_trust_list_t tlist)
  *
  * Since: 3.7.0
  **/
-void gnutls_session_set_verify_output_function(gnutls_session_t session,
-					       gnutls_verify_output_function *
-					       func)
+void gnutls_session_set_verify_output_function(
+	gnutls_session_t session, gnutls_verify_output_function *func)
 {
 	session->internals.cert_output_callback = func;
 }
@@ -1008,17 +989,15 @@ int _gnutls_check_key_cert_match(gnutls_certificate_credentials_t res)
 	if (res->flags & GNUTLS_CERTIFICATE_SKIP_KEY_CERT_MATCH)
 		return 0;
 
-	pk = gnutls_pubkey_get_pk_algorithm(res->certs[res->ncerts -
-						       1].cert_list[0].pubkey,
-					    NULL);
-	pk2 =
-	    gnutls_privkey_get_pk_algorithm(res->certs[res->ncerts - 1].pkey,
-					    NULL);
+	pk = gnutls_pubkey_get_pk_algorithm(
+		res->certs[res->ncerts - 1].cert_list[0].pubkey, NULL);
+	pk2 = gnutls_privkey_get_pk_algorithm(res->certs[res->ncerts - 1].pkey,
+					      NULL);
 
 	if (GNUTLS_PK_IS_RSA(pk) && GNUTLS_PK_IS_RSA(pk2)) {
 		if (pk2 == GNUTLS_PK_RSA_PSS && pk == GNUTLS_PK_RSA) {
-			_gnutls_debug_log
-			    ("you cannot mix an RSA-PSS key with an RSA certificate\n");
+			_gnutls_debug_log(
+				"you cannot mix an RSA-PSS key with an RSA certificate\n");
 			return GNUTLS_E_CERTIFICATE_KEY_MISMATCH;
 		}
 
@@ -1056,17 +1035,16 @@ int _gnutls_check_key_cert_match(gnutls_certificate_credentials_t res)
 		goto finish;
 	}
 
-	ret =
-	    gnutls_pubkey_verify_data2(res->certs[res->ncerts - 1].
-				       cert_list[0].pubkey, sign_algo,
-				       GNUTLS_VERIFY_ALLOW_BROKEN, &test, &sig);
+	ret = gnutls_pubkey_verify_data2(
+		res->certs[res->ncerts - 1].cert_list[0].pubkey, sign_algo,
+		GNUTLS_VERIFY_ALLOW_BROKEN, &test, &sig);
 
 	gnutls_free(sig.data);
 
 	if (ret < 0)
 		return gnutls_assert_val(GNUTLS_E_CERTIFICATE_KEY_MISMATCH);
 
- finish:
+finish:
 	return 0;
 }
 
@@ -1087,11 +1065,10 @@ int _gnutls_check_key_cert_match(gnutls_certificate_credentials_t res)
  *
  * Since: 3.1.4
  **/
-int
-gnutls_certificate_verification_status_print(unsigned int status,
-					     gnutls_certificate_type_t
-					     type, gnutls_datum_t * out,
-					     unsigned int flags)
+int gnutls_certificate_verification_status_print(unsigned int status,
+						 gnutls_certificate_type_t type,
+						 gnutls_datum_t *out,
+						 unsigned int flags)
 {
 	gnutls_buffer_st str;
 
@@ -1101,91 +1078,88 @@ gnutls_certificate_verification_status_print(unsigned int status,
 		_gnutls_buffer_append_str(&str,
 					  _("The certificate is trusted. "));
 	else
-		_gnutls_buffer_append_str(&str,
-					  _
-					  ("The certificate is NOT trusted. "));
+		_gnutls_buffer_append_str(
+			&str, _("The certificate is NOT trusted. "));
 
 	if (type == GNUTLS_CRT_X509) {
 		if (status & GNUTLS_CERT_REVOKED)
-			_gnutls_buffer_append_str(&str,
-						  _
-						  ("The certificate chain is revoked. "));
+			_gnutls_buffer_append_str(
+				&str, _("The certificate chain is revoked. "));
 
 		if (status & GNUTLS_CERT_MISMATCH)
-			_gnutls_buffer_append_str(&str,
-						  _
-						  ("The certificate doesn't match the local copy (TOFU). "));
+			_gnutls_buffer_append_str(
+				&str,
+				_("The certificate doesn't match the local copy (TOFU). "));
 
 		if (status & GNUTLS_CERT_REVOCATION_DATA_SUPERSEDED)
-			_gnutls_buffer_append_str(&str,
-						  _
-						  ("The revocation or OCSP data are old and have been superseded. "));
+			_gnutls_buffer_append_str(
+				&str,
+				_("The revocation or OCSP data are old and have been superseded. "));
 
 		if (status & GNUTLS_CERT_REVOCATION_DATA_ISSUED_IN_FUTURE)
-			_gnutls_buffer_append_str(&str,
-						  _
-						  ("The revocation or OCSP data are issued with a future date. "));
+			_gnutls_buffer_append_str(
+				&str,
+				_("The revocation or OCSP data are issued with a future date. "));
 
 		if (status & GNUTLS_CERT_SIGNER_NOT_FOUND)
-			_gnutls_buffer_append_str(&str,
-						  _
-						  ("The certificate issuer is unknown. "));
+			_gnutls_buffer_append_str(
+				&str, _("The certificate issuer is unknown. "));
 
 		if (status & GNUTLS_CERT_SIGNER_NOT_CA)
-			_gnutls_buffer_append_str(&str,
-						  _
-						  ("The certificate issuer is not a CA. "));
+			_gnutls_buffer_append_str(
+				&str,
+				_("The certificate issuer is not a CA. "));
 	}
 
 	if (status & GNUTLS_CERT_INSECURE_ALGORITHM)
-		_gnutls_buffer_append_str(&str,
-					  _
-					  ("The certificate chain uses insecure algorithm. "));
+		_gnutls_buffer_append_str(
+			&str,
+			_("The certificate chain uses insecure algorithm. "));
 
 	if (status & GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE)
-		_gnutls_buffer_append_str(&str,
-					  _
-					  ("The certificate chain violates the signer's constraints. "));
+		_gnutls_buffer_append_str(
+			&str,
+			_("The certificate chain violates the signer's constraints. "));
 
 	if (status & GNUTLS_CERT_PURPOSE_MISMATCH)
-		_gnutls_buffer_append_str(&str,
-					  _
-					  ("The certificate chain does not match the intended purpose. "));
+		_gnutls_buffer_append_str(
+			&str,
+			_("The certificate chain does not match the intended purpose. "));
 
 	if (status & GNUTLS_CERT_NOT_ACTIVATED)
-		_gnutls_buffer_append_str(&str,
-					  _
-					  ("The certificate chain uses not yet valid certificate. "));
+		_gnutls_buffer_append_str(
+			&str,
+			_("The certificate chain uses not yet valid certificate. "));
 
 	if (status & GNUTLS_CERT_EXPIRED)
-		_gnutls_buffer_append_str(&str,
-					  _
-					  ("The certificate chain uses expired certificate. "));
+		_gnutls_buffer_append_str(
+			&str,
+			_("The certificate chain uses expired certificate. "));
 
 	if (status & GNUTLS_CERT_SIGNATURE_FAILURE)
-		_gnutls_buffer_append_str(&str,
-					  _
-					  ("The signature in the certificate is invalid. "));
+		_gnutls_buffer_append_str(
+			&str,
+			_("The signature in the certificate is invalid. "));
 
 	if (status & GNUTLS_CERT_UNEXPECTED_OWNER)
-		_gnutls_buffer_append_str(&str,
-					  _
-					  ("The name in the certificate does not match the expected. "));
+		_gnutls_buffer_append_str(
+			&str,
+			_("The name in the certificate does not match the expected. "));
 
 	if (status & GNUTLS_CERT_MISSING_OCSP_STATUS)
-		_gnutls_buffer_append_str(&str,
-					  _
-					  ("The certificate requires the server to include an OCSP status in its response, but the OCSP status is missing. "));
+		_gnutls_buffer_append_str(
+			&str,
+			_("The certificate requires the server to include an OCSP status in its response, but the OCSP status is missing. "));
 
 	if (status & GNUTLS_CERT_INVALID_OCSP_STATUS)
-		_gnutls_buffer_append_str(&str,
-					  _
-					  ("The received OCSP status response is invalid. "));
+		_gnutls_buffer_append_str(
+			&str,
+			_("The received OCSP status response is invalid. "));
 
 	if (status & GNUTLS_CERT_UNKNOWN_CRIT_EXTENSIONS)
-		_gnutls_buffer_append_str(&str,
-					  _
-					  ("The certificate contains an unknown critical extension. "));
+		_gnutls_buffer_append_str(
+			&str,
+			_("The certificate contains an unknown critical extension. "));
 
 	return _gnutls_buffer_to_datum(&str, out, 1);
 }
@@ -1207,9 +1181,8 @@ gnutls_certificate_verification_status_print(unsigned int status,
  * following RFC7919.
  *
  **/
-void
-gnutls_certificate_set_dh_params(gnutls_certificate_credentials_t res,
-				 gnutls_dh_params_t dh_params)
+void gnutls_certificate_set_dh_params(gnutls_certificate_credentials_t res,
+				      gnutls_dh_params_t dh_params)
 {
 	if (res->deinit_dh_params) {
 		res->deinit_dh_params = 0;
@@ -1218,10 +1191,8 @@ gnutls_certificate_set_dh_params(gnutls_certificate_credentials_t res,
 	}
 
 	res->dh_params = dh_params;
-	res->dh_sec_param =
-	    gnutls_pk_bits_to_sec_param(GNUTLS_PK_DH,
-					_gnutls_mpi_get_nbits(dh_params->params
-							      [0]));
+	res->dh_sec_param = gnutls_pk_bits_to_sec_param(
+		GNUTLS_PK_DH, _gnutls_mpi_get_nbits(dh_params->params[0]));
 }
 
 /**
@@ -1243,13 +1214,12 @@ gnutls_certificate_set_dh_params(gnutls_certificate_credentials_t res,
  *
  * Since: 3.5.6
  **/
-int
-gnutls_certificate_set_known_dh_params(gnutls_certificate_credentials_t res,
-				       gnutls_sec_param_t sec_param)
+int gnutls_certificate_set_known_dh_params(gnutls_certificate_credentials_t res,
+					   gnutls_sec_param_t sec_param)
 {
 	res->dh_sec_param = sec_param;
 
 	return 0;
 }
 
-#endif				/* DH */
+#endif /* DH */

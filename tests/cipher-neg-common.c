@@ -30,7 +30,7 @@ typedef struct test_case_st {
 	unsigned not_on_fips;
 } test_case_st;
 
-static void try(test_case_st * test)
+static void try(test_case_st *test)
 {
 	int sret, cret;
 	gnutls_certificate_credentials_t s_cert_cred;
@@ -54,15 +54,15 @@ static void try(test_case_st * test)
 	gnutls_certificate_set_known_dh_params(s_cert_cred,
 					       GNUTLS_SEC_PARAM_MEDIUM);
 
-	assert(gnutls_certificate_set_x509_key_mem
-	       (s_cert_cred, &server_ca3_localhost_rsa_decrypt_cert,
-		&server_ca3_key, GNUTLS_X509_FMT_PEM) >= 0);
-	assert(gnutls_certificate_set_x509_key_mem
-	       (s_cert_cred, &server_ca3_localhost_rsa_sign_cert,
-		&server_ca3_key, GNUTLS_X509_FMT_PEM) >= 0);
-	assert(gnutls_certificate_set_x509_key_mem
-	       (s_cert_cred, &server_ca3_localhost_ecc_cert,
-		&server_ca3_ecc_key, GNUTLS_X509_FMT_PEM) >= 0);
+	assert(gnutls_certificate_set_x509_key_mem(
+		       s_cert_cred, &server_ca3_localhost_rsa_decrypt_cert,
+		       &server_ca3_key, GNUTLS_X509_FMT_PEM) >= 0);
+	assert(gnutls_certificate_set_x509_key_mem(
+		       s_cert_cred, &server_ca3_localhost_rsa_sign_cert,
+		       &server_ca3_key, GNUTLS_X509_FMT_PEM) >= 0);
+	assert(gnutls_certificate_set_x509_key_mem(
+		       s_cert_cred, &server_ca3_localhost_ecc_cert,
+		       &server_ca3_ecc_key, GNUTLS_X509_FMT_PEM) >= 0);
 
 	gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE, c_cert_cred);
 
@@ -86,20 +86,26 @@ static void try(test_case_st * test)
 		char *desc2 = gnutls_session_get_desc(client);
 
 		if (strcmp(desc1, desc2) != 0)
-			fail("server and client session description don't match (%s, %s)\n", desc1, desc2);
+			fail("server and client session description don't match (%s, %s)\n",
+			     desc1, desc2);
 
 		if (strcmp(desc1, test->desc) != 0)
-			fail("session and expected session description don't match (%s, %s)\n", desc1, test->desc);
+			fail("session and expected session description don't match (%s, %s)\n",
+			     desc1, test->desc);
 		gnutls_free(desc1);
 		gnutls_free(desc2);
 	}
 
 	if (sret != cret) {
-		fail("%s: client negotiated different cipher than server (%s, %s)!\n", test->name, gnutls_cipher_get_name(cret), gnutls_cipher_get_name(sret));
+		fail("%s: client negotiated different cipher than server (%s, %s)!\n",
+		     test->name, gnutls_cipher_get_name(cret),
+		     gnutls_cipher_get_name(sret));
 	}
 
 	if (cret != test->cipher) {
-		fail("%s: negotiated cipher differs with the expected (%s, %s)!\n", test->name, gnutls_cipher_get_name(cret), gnutls_cipher_get_name(test->cipher));
+		fail("%s: negotiated cipher differs with the expected (%s, %s)!\n",
+		     test->name, gnutls_cipher_get_name(cret),
+		     gnutls_cipher_get_name(test->cipher));
 	}
 
 	if (test->group) {
@@ -107,11 +113,15 @@ static void try(test_case_st * test)
 		cret = gnutls_group_get(server);
 
 		if (sret != cret) {
-			fail("%s: client negotiated different group than server (%s, %s)!\n", test->name, gnutls_group_get_name(cret), gnutls_group_get_name(sret));
+			fail("%s: client negotiated different group than server (%s, %s)!\n",
+			     test->name, gnutls_group_get_name(cret),
+			     gnutls_group_get_name(sret));
 		}
 
 		if (cret != test->group) {
-			fail("%s: negotiated group differs with the expected (%s, %s)!\n", test->name, gnutls_group_get_name(cret), gnutls_group_get_name(test->group));
+			fail("%s: negotiated group differs with the expected (%s, %s)!\n",
+			     test->name, gnutls_group_get_name(cret),
+			     gnutls_group_get_name(test->group));
 		}
 	}
 

@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -40,7 +40,7 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "%s|<%d>| %s", side, level, str);
 }
 
-static time_t mytime(time_t * t)
+static time_t mytime(time_t *t)
 {
 	time_t then = 1461671166;
 
@@ -50,8 +50,7 @@ static time_t mytime(time_t * t)
 	return then;
 }
 
-static
-void start(const char *prio, unsigned expect_max)
+static void start(const char *prio, unsigned expect_max)
 {
 	int ret;
 	/* Server stuff. */
@@ -75,9 +74,8 @@ void start(const char *prio, unsigned expect_max)
 
 	/* Init server */
 	gnutls_certificate_allocate_credentials(&serverx509cred);
-	gnutls_certificate_set_x509_key_mem(serverx509cred,
-					    &server_cert, &server_key,
-					    GNUTLS_X509_FMT_PEM);
+	gnutls_certificate_set_x509_key_mem(serverx509cred, &server_cert,
+					    &server_key, GNUTLS_X509_FMT_PEM);
 
 	gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, serverx509cred);
@@ -91,9 +89,8 @@ void start(const char *prio, unsigned expect_max)
 	if (ret < 0)
 		exit(1);
 
-	ret =
-	    gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca_cert,
-						  GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca_cert,
+						    GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);
 
@@ -181,9 +178,8 @@ void start(const char *prio, unsigned expect_max)
 		}
 
 		/* check gnutls_certificate_verify_peers3 */
-		ret =
-		    gnutls_certificate_verify_peers3(client, "localhost1",
-						     &status);
+		ret = gnutls_certificate_verify_peers3(client, "localhost1",
+						       &status);
 		if (ret < 0) {
 			fail("could not verify certificate: %s\n",
 			     gnutls_strerror(ret));
@@ -195,9 +191,8 @@ void start(const char *prio, unsigned expect_max)
 			exit(1);
 		}
 
-		ret =
-		    gnutls_certificate_verify_peers3(client, "localhost",
-						     &status);
+		ret = gnutls_certificate_verify_peers3(client, "localhost",
+						       &status);
 		if (ret < 0) {
 			fail("could not verify certificate: %s\n",
 			     gnutls_strerror(ret));
@@ -235,7 +230,7 @@ void start(const char *prio, unsigned expect_max)
 
 		if (sizeof(time_t) >= 8) {
 			t = gnutls_certificate_expiration_time_peers(client);
-			if (t != (time_t) 253402300799UL) {
+			if (t != (time_t)253402300799UL) {
 				fail("unexpected expiration time: %lu\n",
 				     (long unsigned)t);
 			}
@@ -252,12 +247,14 @@ void start(const char *prio, unsigned expect_max)
 	if (gnutls_protocol_get_version(client) == GNUTLS_TLS1_2) {
 		ret = gnutls_session_ext_master_secret_status(client);
 		if (ret != 1) {
-			fail("Extended master secret wasn't negotiated by default (client ret: %d)\n", ret);
+			fail("Extended master secret wasn't negotiated by default (client ret: %d)\n",
+			     ret);
 		}
 
 		ret = gnutls_session_ext_master_secret_status(server);
 		if (ret != 1) {
-			fail("Extended master secret wasn't negotiated by default (server ret: %d)\n", ret);
+			fail("Extended master secret wasn't negotiated by default (server ret: %d)\n",
+			     ret);
 		}
 	}
 

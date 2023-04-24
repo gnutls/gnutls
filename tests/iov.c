@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include "gnutls_int.h"
@@ -43,131 +43,97 @@ struct test_st {
 	size_t expcnt;
 };
 
-static const giovec_t iov16[] = {
-	{(void *)"0123456789012345", 16},
-	{(void *)"0123456789012345", 16},
-	{(void *)"0123456789012345", 16},
-	{(void *)"0123456789012345", 16}
-};
+static const giovec_t iov16[] = { { (void *)"0123456789012345", 16 },
+				  { (void *)"0123456789012345", 16 },
+				  { (void *)"0123456789012345", 16 },
+				  { (void *)"0123456789012345", 16 } };
 
-static const struct exp_st exp16_64[] = {
-	{64, 4, 0},
-	{0, 0, 0}
-};
+static const struct exp_st exp16_64[] = { { 64, 4, 0 }, { 0, 0, 0 } };
 
-static const struct exp_st exp16_32[] = {
-	{32, 2, 0},
-	{32, 4, 0},
-	{0, 0, 0}
-};
+static const struct exp_st exp16_32[] = { { 32, 2, 0 },
+					  { 32, 4, 0 },
+					  { 0, 0, 0 } };
 
-static const struct exp_st exp16_16[] = {
-	{16, 1, 0},
-	{16, 2, 0},
-	{16, 3, 0},
-	{16, 4, 0},
-	{0, 0, 0}
-};
+static const struct exp_st exp16_16[] = { { 16, 1, 0 },
+					  { 16, 2, 0 },
+					  { 16, 3, 0 },
+					  { 16, 4, 0 },
+					  { 0, 0, 0 } };
 
-static const struct exp_st exp16_4[] = {
-	{16, 1, 0},
-	{16, 2, 0},
-	{16, 3, 0},
-	{16, 4, 0},
-	{0, 0, 0}
-};
+static const struct exp_st exp16_4[] = { { 16, 1, 0 },
+					 { 16, 2, 0 },
+					 { 16, 3, 0 },
+					 { 16, 4, 0 },
+					 { 0, 0, 0 } };
 
-static const struct exp_st exp16_3[] = {
-	{15, 0, 15},
-	{3, 1, 2},
-	{12, 1, 14},
-	{3, 2, 1},
-	{15, 3, 0},
-	{15, 3, 15},
-	{1, 4, 0},
-	{0, 0, 0}
-};
+static const struct exp_st exp16_3[] = { { 15, 0, 15 }, { 3, 1, 2 },
+					 { 12, 1, 14 }, { 3, 2, 1 },
+					 { 15, 3, 0 },	{ 15, 3, 15 },
+					 { 1, 4, 0 },	{ 0, 0, 0 } };
 
-static const giovec_t iov8[] = {
-	{(void *)"01234567", 8},
-	{(void *)"01234567", 8},
-	{(void *)"01234567", 8},
-	{(void *)"01234567", 8}
-};
+static const giovec_t iov8[] = { { (void *)"01234567", 8 },
+				 { (void *)"01234567", 8 },
+				 { (void *)"01234567", 8 },
+				 { (void *)"01234567", 8 } };
 
-static const struct exp_st exp8_64[] = {
-	{32, 4, 0},
-	{0, 0, 0}
-};
+static const struct exp_st exp8_64[] = { { 32, 4, 0 }, { 0, 0, 0 } };
 
-static const giovec_t iov_odd[] = {
-	{(void *)"0", 1},
-	{(void *)"012", 3},
-	{(void *)"01234", 5},
-	{(void *)"0123456", 7},
-	{(void *)"012345678", 9},
-	{(void *)"01234567890", 11},
-	{(void *)"0123456789012", 13},
-	{(void *)"012345678901234", 15}
-};
+static const giovec_t iov_odd[] = { { (void *)"0", 1 },
+				    { (void *)"012", 3 },
+				    { (void *)"01234", 5 },
+				    { (void *)"0123456", 7 },
+				    { (void *)"012345678", 9 },
+				    { (void *)"01234567890", 11 },
+				    { (void *)"0123456789012", 13 },
+				    { (void *)"012345678901234", 15 } };
 
-static const struct exp_st exp_odd_16[] = {
-	{16, 4, 0},
-	{16, 5, 7},
-	{16, 6, 12},
-	{16, 8, 0},
-	{0, 0, 0}
-};
+static const struct exp_st exp_odd_16[] = { { 16, 4, 0 },
+					    { 16, 5, 7 },
+					    { 16, 6, 12 },
+					    { 16, 8, 0 },
+					    { 0, 0, 0 } };
 
-static const giovec_t iov_skip[] = {
-	{(void *)"0123456789012345", 16},
-	{(void *)"01234567", 8},
-	{(void *)"", 0},
-	{(void *)"", 0},
-	{(void *)"0123456789012345", 16}
-};
+static const giovec_t iov_skip[] = { { (void *)"0123456789012345", 16 },
+				     { (void *)"01234567", 8 },
+				     { (void *)"", 0 },
+				     { (void *)"", 0 },
+				     { (void *)"0123456789012345", 16 } };
 
-static const struct exp_st exp_skip_16[] = {
-	{16, 1, 0},
-	{16, 4, 8},
-	{8, 5, 0},
-	{0, 0, 0}
-};
+static const struct exp_st exp_skip_16[] = { { 16, 1, 0 },
+					     { 16, 4, 8 },
+					     { 8, 5, 0 },
+					     { 0, 0, 0 } };
 
-static const giovec_t iov_empty[] = {
-	{(void *)"", 0},
-	{(void *)"", 0},
-	{(void *)"", 0},
-	{(void *)"", 0}
-};
+static const giovec_t iov_empty[] = { { (void *)"", 0 },
+				      { (void *)"", 0 },
+				      { (void *)"", 0 },
+				      { (void *)"", 0 } };
 
-static const struct exp_st exp_empty_16[] = {
-	{0, 0, 0}
-};
+static const struct exp_st exp_empty_16[] = { { 0, 0, 0 } };
 
 static const struct test_st tests[] = {
-	{"16/64", iov16, sizeof(iov16) / sizeof(iov16[0]), 64,
-	 exp16_64, sizeof(exp16_64) / sizeof(exp16_64[0])},
-	{"16/32", iov16, sizeof(iov16) / sizeof(iov16[0]), 32,
-	 exp16_32, sizeof(exp16_32) / sizeof(exp16_32[0])},
-	{"16/16", iov16, sizeof(iov16) / sizeof(iov16[0]), 16,
-	 exp16_16, sizeof(exp16_16) / sizeof(exp16_16[0])},
-	{"16/4", iov16, sizeof(iov16) / sizeof(iov16[0]), 4,
-	 exp16_4, sizeof(exp16_4) / sizeof(exp16_4[0])},
-	{"16/3", iov16, sizeof(iov16) / sizeof(iov16[0]), 3,
-	 exp16_3, sizeof(exp16_3) / sizeof(exp16_3[0])},
-	{"8/64", iov8, sizeof(iov8) / sizeof(iov8[0]), 64,
-	 exp8_64, sizeof(exp8_64) / sizeof(exp8_64[0])},
-	{"odd/16", iov_odd, sizeof(iov_odd) / sizeof(iov_odd[0]), 16,
-	 exp_odd_16, sizeof(exp_odd_16) / sizeof(exp_odd_16[0])},
-	{"skip/16", iov_skip, sizeof(iov_skip) / sizeof(iov_skip[0]), 16,
-	 exp_skip_16, sizeof(exp_skip_16) / sizeof(exp_skip_16[0])},
-	{"empty/16", iov_empty, sizeof(iov_empty) / sizeof(iov_empty[0]), 16,
-	 exp_empty_16, sizeof(exp_empty_16) / sizeof(exp_empty_16[0])},
+	{ "16/64", iov16, sizeof(iov16) / sizeof(iov16[0]), 64, exp16_64,
+	  sizeof(exp16_64) / sizeof(exp16_64[0]) },
+	{ "16/32", iov16, sizeof(iov16) / sizeof(iov16[0]), 32, exp16_32,
+	  sizeof(exp16_32) / sizeof(exp16_32[0]) },
+	{ "16/16", iov16, sizeof(iov16) / sizeof(iov16[0]), 16, exp16_16,
+	  sizeof(exp16_16) / sizeof(exp16_16[0]) },
+	{ "16/4", iov16, sizeof(iov16) / sizeof(iov16[0]), 4, exp16_4,
+	  sizeof(exp16_4) / sizeof(exp16_4[0]) },
+	{ "16/3", iov16, sizeof(iov16) / sizeof(iov16[0]), 3, exp16_3,
+	  sizeof(exp16_3) / sizeof(exp16_3[0]) },
+	{ "8/64", iov8, sizeof(iov8) / sizeof(iov8[0]), 64, exp8_64,
+	  sizeof(exp8_64) / sizeof(exp8_64[0]) },
+	{ "odd/16", iov_odd, sizeof(iov_odd) / sizeof(iov_odd[0]), 16,
+	  exp_odd_16, sizeof(exp_odd_16) / sizeof(exp_odd_16[0]) },
+	{ "skip/16", iov_skip, sizeof(iov_skip) / sizeof(iov_skip[0]), 16,
+	  exp_skip_16, sizeof(exp_skip_16) / sizeof(exp_skip_16[0]) },
+	{ "empty/16", iov_empty, sizeof(iov_empty) / sizeof(iov_empty[0]), 16,
+	  exp_empty_16, sizeof(exp_empty_16) / sizeof(exp_empty_16[0]) },
 };
 
-static void
-copy(giovec_t * dst, uint8_t * buffer, const giovec_t * src, size_t iovcnt)
+static void copy(giovec_t *dst, uint8_t *buffer, const giovec_t *src,
+		 size_t iovcnt)
 {
 	uint8_t *p = buffer;
 	size_t i;
@@ -180,7 +146,7 @@ copy(giovec_t * dst, uint8_t * buffer, const giovec_t * src, size_t iovcnt)
 	}
 }
 
-static void translate(uint8_t * data, size_t len)
+static void translate(uint8_t *data, size_t len)
 {
 	for (; len > 0; len--) {
 		uint8_t *p = &data[len - 1];
@@ -209,19 +175,18 @@ void doit(void)
 		copy(iov, buffer, tests[i].iov, tests[i].iovcnt);
 
 		success("%s\n", tests[i].name);
-		assert(_gnutls_iov_iter_init(&iter,
-					     iov, tests[i].iovcnt,
+		assert(_gnutls_iov_iter_init(&iter, iov, tests[i].iovcnt,
 					     tests[i].block_size) == 0);
 		for (j = 0; j < tests[i].expcnt; j++) {
 			ssize_t ret;
 
 			ret = _gnutls_iov_iter_next(&iter, &data);
 			if (ret != exp[j].ret)
-				fail("iov_iter_next: %d != %d\n",
-				     (int)ret, (int)exp[j].ret);
+				fail("iov_iter_next: %d != %d\n", (int)ret,
+				     (int)exp[j].ret);
 			else if (debug)
-				success("iov_iter_next: %d == %d\n",
-					(int)ret, (int)exp[j].ret);
+				success("iov_iter_next: %d == %d\n", (int)ret,
+					(int)exp[j].ret);
 			if (ret == 0)
 				break;
 			if (ret > 0) {

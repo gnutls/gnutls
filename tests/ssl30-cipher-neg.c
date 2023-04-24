@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 /* This program tests the ciphersuite negotiation for various key exchange
@@ -38,82 +38,70 @@
 #include "cipher-neg-common.c"
 
 test_case_st tests[] = {
-	{
-	 .name = "server SSL 3.0: AES-128-CBC (server)",
-	 .cipher = GNUTLS_CIPHER_AES_128_CBC,
-	 .server_prio =
-	 "NORMAL:-CIPHER-ALL:+AES-128-CBC:+CIPHER-ALL:-VERS-ALL:+VERS-SSL3.0:%SERVER_PRECEDENCE",
-	 .client_prio = "NORMAL:+VERS-SSL3.0:+AES-128-CBC"},
-	{
-	 .name = "both SSL 3.0: AES-128-CBC (server)",
-	 .cipher = GNUTLS_CIPHER_AES_128_CBC,
-	 .server_prio =
-	 "NORMAL:-CIPHER-ALL:+AES-128-CBC:+CIPHER-ALL:-VERS-ALL:+VERS-SSL3.0:%SERVER_PRECEDENCE",
-	 .client_prio = "NORMAL:+AES-128-CBC:+VERS-SSL3.0"},
-	{
-	 .name = "client SSL 3.0: AES-128-CBC (client)",
-	 .cipher = GNUTLS_CIPHER_AES_128_CBC,
-	 .server_prio = "NORMAL:+VERS-SSL3.0:+AES-128-CBC",
-	 .client_prio =
-	 "NORMAL:-CIPHER-ALL:+AES-128-CBC:+CIPHER-ALL:-VERS-ALL:+VERS-SSL3.0"},
-	{
-	 .name = "both SSL 3.0: AES-128-CBC (client)",
-	 .cipher = GNUTLS_CIPHER_AES_128_CBC,
-	 .server_prio = "NORMAL:+AES-128-CBC:+VERS-SSL3.0",
-	 .client_prio =
-	 "NORMAL:-CIPHER-ALL:+AES-128-CBC:+CIPHER-ALL:-VERS-ALL:+VERS-SSL3.0"},
-	{
-	 .name = "server SSL 3.0: 3DES-CBC (server)",
-	 .cipher = GNUTLS_CIPHER_3DES_CBC,
-	 .server_prio =
-	 "NORMAL:-CIPHER-ALL:+3DES-CBC:+CIPHER-ALL:-VERS-ALL:+VERS-SSL3.0:%SERVER_PRECEDENCE",
-	 .client_prio = "NORMAL:+VERS-SSL3.0:+3DES-CBC"},
-	{
-	 .name = "both SSL 3.0: 3DES-CBC (server)",
-	 .cipher = GNUTLS_CIPHER_3DES_CBC,
-	 .server_prio =
-	 "NORMAL:-CIPHER-ALL:+3DES-CBC:+CIPHER-ALL:-VERS-ALL:+VERS-SSL3.0:%SERVER_PRECEDENCE",
-	 .client_prio = "NORMAL:+3DES-CBC:+VERS-SSL3.0"},
-	{
-	 .name = "client SSL 3.0: 3DES-CBC (client)",
-	 .cipher = GNUTLS_CIPHER_3DES_CBC,
-	 .server_prio = "NORMAL:+VERS-SSL3.0:+3DES-CBC",
-	 .client_prio =
-	 "NORMAL:-CIPHER-ALL:+3DES-CBC:+CIPHER-ALL:-VERS-ALL:+VERS-SSL3.0"},
-	{
-	 .name = "both SSL 3.0: 3DES-CBC (client)",
-	 .cipher = GNUTLS_CIPHER_3DES_CBC,
-	 .server_prio = "NORMAL:+3DES-CBC:+VERS-SSL3.0",
-	 .client_prio =
-	 "NORMAL:-CIPHER-ALL:+3DES-CBC:+CIPHER-ALL:-VERS-ALL:+VERS-SSL3.0"},
-	{
-	 .name = "server SSL 3.0: ARCFOUR-128 (server)",
-	 .cipher = GNUTLS_CIPHER_ARCFOUR_128,
-	 .not_on_fips = 1,
-	 .server_prio =
-	 "NORMAL:-CIPHER-ALL:+ARCFOUR-128:+CIPHER-ALL:-VERS-ALL:+VERS-SSL3.0:%SERVER_PRECEDENCE",
-	 .client_prio = "NORMAL:+VERS-SSL3.0:+ARCFOUR-128"},
-	{
-	 .name = "both SSL 3.0: ARCFOUR-128 (server)",
-	 .cipher = GNUTLS_CIPHER_ARCFOUR_128,
-	 .not_on_fips = 1,
-	 .server_prio =
-	 "NORMAL:-CIPHER-ALL:+ARCFOUR-128:+CIPHER-ALL:-VERS-ALL:+VERS-SSL3.0:%SERVER_PRECEDENCE",
-	 .client_prio = "NORMAL:+ARCFOUR-128:+VERS-SSL3.0"},
-	{
-	 .name = "client SSL 3.0: ARCFOUR-128 (client)",
-	 .cipher = GNUTLS_CIPHER_ARCFOUR_128,
-	 .not_on_fips = 1,
-	 .server_prio = "NORMAL:+VERS-SSL3.0:+ARCFOUR-128",
-	 .client_prio =
-	 "NORMAL:-CIPHER-ALL:+ARCFOUR-128:+CIPHER-ALL:-VERS-ALL:+VERS-SSL3.0"},
-	{
-	 .name = "both SSL 3.0: ARCFOUR-128 (client)",
-	 .cipher = GNUTLS_CIPHER_ARCFOUR_128,
-	 .not_on_fips = 1,
-	 .server_prio = "NORMAL:+ARCFOUR-128:+VERS-SSL3.0",
-	 .client_prio =
-	 "NORMAL:-CIPHER-ALL:+ARCFOUR-128:+CIPHER-ALL:-VERS-ALL:+VERS-SSL3.0"}
+	{ .name = "server SSL 3.0: AES-128-CBC (server)",
+	  .cipher = GNUTLS_CIPHER_AES_128_CBC,
+	  .server_prio =
+		  "NORMAL:-CIPHER-ALL:+AES-128-CBC:+CIPHER-ALL:-VERS-ALL:+VERS-SSL3.0:%SERVER_PRECEDENCE",
+	  .client_prio = "NORMAL:+VERS-SSL3.0:+AES-128-CBC" },
+	{ .name = "both SSL 3.0: AES-128-CBC (server)",
+	  .cipher = GNUTLS_CIPHER_AES_128_CBC,
+	  .server_prio =
+		  "NORMAL:-CIPHER-ALL:+AES-128-CBC:+CIPHER-ALL:-VERS-ALL:+VERS-SSL3.0:%SERVER_PRECEDENCE",
+	  .client_prio = "NORMAL:+AES-128-CBC:+VERS-SSL3.0" },
+	{ .name = "client SSL 3.0: AES-128-CBC (client)",
+	  .cipher = GNUTLS_CIPHER_AES_128_CBC,
+	  .server_prio = "NORMAL:+VERS-SSL3.0:+AES-128-CBC",
+	  .client_prio =
+		  "NORMAL:-CIPHER-ALL:+AES-128-CBC:+CIPHER-ALL:-VERS-ALL:+VERS-SSL3.0" },
+	{ .name = "both SSL 3.0: AES-128-CBC (client)",
+	  .cipher = GNUTLS_CIPHER_AES_128_CBC,
+	  .server_prio = "NORMAL:+AES-128-CBC:+VERS-SSL3.0",
+	  .client_prio =
+		  "NORMAL:-CIPHER-ALL:+AES-128-CBC:+CIPHER-ALL:-VERS-ALL:+VERS-SSL3.0" },
+	{ .name = "server SSL 3.0: 3DES-CBC (server)",
+	  .cipher = GNUTLS_CIPHER_3DES_CBC,
+	  .server_prio =
+		  "NORMAL:-CIPHER-ALL:+3DES-CBC:+CIPHER-ALL:-VERS-ALL:+VERS-SSL3.0:%SERVER_PRECEDENCE",
+	  .client_prio = "NORMAL:+VERS-SSL3.0:+3DES-CBC" },
+	{ .name = "both SSL 3.0: 3DES-CBC (server)",
+	  .cipher = GNUTLS_CIPHER_3DES_CBC,
+	  .server_prio =
+		  "NORMAL:-CIPHER-ALL:+3DES-CBC:+CIPHER-ALL:-VERS-ALL:+VERS-SSL3.0:%SERVER_PRECEDENCE",
+	  .client_prio = "NORMAL:+3DES-CBC:+VERS-SSL3.0" },
+	{ .name = "client SSL 3.0: 3DES-CBC (client)",
+	  .cipher = GNUTLS_CIPHER_3DES_CBC,
+	  .server_prio = "NORMAL:+VERS-SSL3.0:+3DES-CBC",
+	  .client_prio =
+		  "NORMAL:-CIPHER-ALL:+3DES-CBC:+CIPHER-ALL:-VERS-ALL:+VERS-SSL3.0" },
+	{ .name = "both SSL 3.0: 3DES-CBC (client)",
+	  .cipher = GNUTLS_CIPHER_3DES_CBC,
+	  .server_prio = "NORMAL:+3DES-CBC:+VERS-SSL3.0",
+	  .client_prio =
+		  "NORMAL:-CIPHER-ALL:+3DES-CBC:+CIPHER-ALL:-VERS-ALL:+VERS-SSL3.0" },
+	{ .name = "server SSL 3.0: ARCFOUR-128 (server)",
+	  .cipher = GNUTLS_CIPHER_ARCFOUR_128,
+	  .not_on_fips = 1,
+	  .server_prio =
+		  "NORMAL:-CIPHER-ALL:+ARCFOUR-128:+CIPHER-ALL:-VERS-ALL:+VERS-SSL3.0:%SERVER_PRECEDENCE",
+	  .client_prio = "NORMAL:+VERS-SSL3.0:+ARCFOUR-128" },
+	{ .name = "both SSL 3.0: ARCFOUR-128 (server)",
+	  .cipher = GNUTLS_CIPHER_ARCFOUR_128,
+	  .not_on_fips = 1,
+	  .server_prio =
+		  "NORMAL:-CIPHER-ALL:+ARCFOUR-128:+CIPHER-ALL:-VERS-ALL:+VERS-SSL3.0:%SERVER_PRECEDENCE",
+	  .client_prio = "NORMAL:+ARCFOUR-128:+VERS-SSL3.0" },
+	{ .name = "client SSL 3.0: ARCFOUR-128 (client)",
+	  .cipher = GNUTLS_CIPHER_ARCFOUR_128,
+	  .not_on_fips = 1,
+	  .server_prio = "NORMAL:+VERS-SSL3.0:+ARCFOUR-128",
+	  .client_prio =
+		  "NORMAL:-CIPHER-ALL:+ARCFOUR-128:+CIPHER-ALL:-VERS-ALL:+VERS-SSL3.0" },
+	{ .name = "both SSL 3.0: ARCFOUR-128 (client)",
+	  .cipher = GNUTLS_CIPHER_ARCFOUR_128,
+	  .not_on_fips = 1,
+	  .server_prio = "NORMAL:+ARCFOUR-128:+VERS-SSL3.0",
+	  .client_prio =
+		  "NORMAL:-CIPHER-ALL:+ARCFOUR-128:+CIPHER-ALL:-VERS-ALL:+VERS-SSL3.0" }
 };
 
 void doit(void)

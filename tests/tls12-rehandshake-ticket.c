@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <gnutls/gnutls.h>
@@ -62,19 +62,17 @@ static void run(void)
 
 	/* Init server */
 	assert(gnutls_certificate_allocate_credentials(&scred) >= 0);
-	assert(gnutls_certificate_set_x509_key_mem(scred,
-						   &server_ca3_localhost_cert,
-						   &server_ca3_key,
-						   GNUTLS_X509_FMT_PEM) >= 0);
-	assert(gnutls_certificate_set_x509_trust_mem(scred,
-						     &ca3_cert,
+	assert(gnutls_certificate_set_x509_key_mem(
+		       scred, &server_ca3_localhost_cert, &server_ca3_key,
+		       GNUTLS_X509_FMT_PEM) >= 0);
+	assert(gnutls_certificate_set_x509_trust_mem(scred, &ca3_cert,
 						     GNUTLS_X509_FMT_PEM) >= 0);
 
 	assert(gnutls_init(&server, GNUTLS_SERVER) >= 0);
 	gnutls_certificate_server_set_request(server, GNUTLS_CERT_REQUEST);
-	assert(gnutls_priority_set_direct(server,
-					  "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.1:+VERS-TLS1.2",
-					  NULL) >= 0);
+	assert(gnutls_priority_set_direct(
+		       server, "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.1:+VERS-TLS1.2",
+		       NULL) >= 0);
 
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, scred);
 	gnutls_transport_set_push_function(server, server_push);
@@ -86,16 +84,16 @@ static void run(void)
 
 	/* Init client */
 	assert(gnutls_certificate_allocate_credentials(&ccred) >= 0);
-	assert(gnutls_certificate_set_x509_key_mem
-	       (ccred, &cli_ca3_cert_chain, &cli_ca3_key,
-		GNUTLS_X509_FMT_PEM) >= 0);
-	assert(gnutls_certificate_set_x509_trust_mem
-	       (ccred, &ca3_cert, GNUTLS_X509_FMT_PEM) >= 0);
+	assert(gnutls_certificate_set_x509_key_mem(ccred, &cli_ca3_cert_chain,
+						   &cli_ca3_key,
+						   GNUTLS_X509_FMT_PEM) >= 0);
+	assert(gnutls_certificate_set_x509_trust_mem(ccred, &ca3_cert,
+						     GNUTLS_X509_FMT_PEM) >= 0);
 
 	gnutls_init(&client, GNUTLS_CLIENT);
-	assert(gnutls_priority_set_direct(client,
-					  "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.1:+VERS-TLS1.2",
-					  NULL) >= 0);
+	assert(gnutls_priority_set_direct(
+		       client, "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.1:+VERS-TLS1.2",
+		       NULL) >= 0);
 
 	assert(gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE, ccred) >=
 	       0);
@@ -110,8 +108,8 @@ static void run(void)
 	switch_side("server");
 	sret = gnutls_rehandshake(server);
 	if (sret < 0) {
-		fail("Error sending %d byte packet: %s\n",
-		     (int)sizeof(buffer), gnutls_strerror(sret));
+		fail("Error sending %d byte packet: %s\n", (int)sizeof(buffer),
+		     gnutls_strerror(sret));
 	} else if (debug)
 		success("server: starting rehandshake\n");
 
@@ -123,8 +121,8 @@ static void run(void)
 	do {
 		do {
 			cret = gnutls_record_recv(client, buffer, MAX_BUF);
-		} while (cret == GNUTLS_E_AGAIN
-			 || cret == GNUTLS_E_INTERRUPTED);
+		} while (cret == GNUTLS_E_AGAIN ||
+			 cret == GNUTLS_E_INTERRUPTED);
 	} while (cret > 0);
 
 	if (cret != GNUTLS_E_REHANDSHAKE) {

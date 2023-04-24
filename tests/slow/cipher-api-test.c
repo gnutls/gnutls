@@ -43,16 +43,16 @@ int main(int argc, char **argv)
 }
 #else
 
-# include <sys/types.h>
-# include <sys/wait.h>
-# include <unistd.h>
-# include <assert.h>
-# include <utils.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
+#include <assert.h>
+#include <utils.h>
 
-# define AES_GCM_ENCRYPT_PLAINTEXT_MAX ((1ULL << 36) - 32)
-# if SIZE_MAX >= AES_GCM_ENCRYPT_PLAINTEXT_MAX
-#  define TEST_AES_GCM_ENCRYPT_PLAINTEXT_SIZE 1
-# endif
+#define AES_GCM_ENCRYPT_PLAINTEXT_MAX ((1ULL << 36) - 32)
+#if SIZE_MAX >= AES_GCM_ENCRYPT_PLAINTEXT_MAX
+#define TEST_AES_GCM_ENCRYPT_PLAINTEXT_SIZE 1
+#endif
 
 static void tls_log_func(int level, const char *str)
 {
@@ -131,12 +131,12 @@ static void test_cipher_invalid_partial(int algo)
 
 	ret = global_init();
 	if (ret < 0) {
-		fail("Cannot initialize library\n");	/*errcode 1 */
+		fail("Cannot initialize library\n"); /*errcode 1 */
 	}
 
 	ret = gnutls_cipher_init(&ch, algo, &key, &iv);
 	if (ret < 0)
-		fail("gnutls_cipher_init failed\n");	/*errcode 1 */
+		fail("gnutls_cipher_init failed\n"); /*errcode 1 */
 
 	/* try encrypting in a way that violates nettle's block conventions */
 	ret = gnutls_cipher_encrypt(ch, data, sizeof(data) - 1);
@@ -199,19 +199,18 @@ static void test_aead_happy(int algo)
 		fail("gnutls_aead_cipher_init failed\n");
 
 	ctext_len = sizeof(ctext);
-	ret = gnutls_aead_cipher_encrypt(ch, iv.data, iv.size,
-					 auth, sizeof(auth), tag_len,
-					 ptext, sizeof(ptext),
-					 ctext, &ctext_len);
+	ret = gnutls_aead_cipher_encrypt(ch, iv.data, iv.size, auth,
+					 sizeof(auth), tag_len, ptext,
+					 sizeof(ptext), ctext, &ctext_len);
 	if (ret < 0)
 		fail("could not encrypt data\n");
 
 	if (ctext_len != sizeof(ptext) + tag_len)
 		fail("output ciphertext length mismatch\n");
 
-	ret = gnutls_aead_cipher_decrypt(ch, iv.data, iv.size,
-					 auth, sizeof(auth), tag_len,
-					 ctext, ctext_len, ptext, &ptext_len);
+	ret = gnutls_aead_cipher_decrypt(ch, iv.data, iv.size, auth,
+					 sizeof(auth), tag_len, ctext,
+					 ctext_len, ptext, &ptext_len);
 	if (ret < 0)
 		fail("could not decrypt data: %s\n", gnutls_strerror(ret));
 
@@ -255,12 +254,12 @@ static void test_aead_invalid_add_auth(int algo)
 
 	ret = global_init();
 	if (ret < 0) {
-		fail("Cannot initialize library\n");	/*errcode 1 */
+		fail("Cannot initialize library\n"); /*errcode 1 */
 	}
 
 	ret = gnutls_cipher_init(&ch, algo, &key, &iv);
 	if (ret < 0)
-		fail("gnutls_cipher_init failed\n");	/*errcode 1 */
+		fail("gnutls_cipher_init failed\n"); /*errcode 1 */
 
 	ret = gnutls_cipher_add_auth(ch, data, sizeof(data) - 1);
 	if (ret < 0)
@@ -308,12 +307,12 @@ static void test_aead_invalid_partial_encrypt(int algo)
 
 	ret = global_init();
 	if (ret < 0) {
-		fail("Cannot initialize library\n");	/*errcode 1 */
+		fail("Cannot initialize library\n"); /*errcode 1 */
 	}
 
 	ret = gnutls_cipher_init(&ch, algo, &key, &iv);
 	if (ret < 0)
-		fail("gnutls_cipher_init failed\n");	/*errcode 1 */
+		fail("gnutls_cipher_init failed\n"); /*errcode 1 */
 
 	/* try encrypting in a way that violates nettle's AEAD conventions */
 	ret = gnutls_cipher_encrypt(ch, data, sizeof(data) - 1);
@@ -378,10 +377,9 @@ static void test_aead_invalid_short_decrypt(int algo)
 		fail("gnutls_aead_cipher_init failed\n");
 
 	ctext_len = sizeof(ctext);
-	ret = gnutls_aead_cipher_encrypt(ch, iv.data, iv.size,
-					 auth, sizeof(auth), tag_len,
-					 ptext, sizeof(ptext),
-					 ctext, &ctext_len);
+	ret = gnutls_aead_cipher_encrypt(ch, iv.data, iv.size, auth,
+					 sizeof(auth), tag_len, ptext,
+					 sizeof(ptext), ctext, &ctext_len);
 	if (ret < 0)
 		fail("could not encrypt data\n");
 
@@ -389,9 +387,9 @@ static void test_aead_invalid_short_decrypt(int algo)
 		fail("output ciphertext length mismatch\n");
 
 	ptext_len = 0;
-	ret = gnutls_aead_cipher_decrypt(ch, iv.data, iv.size,
-					 auth, sizeof(auth), tag_len,
-					 ctext, ctext_len, ptext, &ptext_len);
+	ret = gnutls_aead_cipher_decrypt(ch, iv.data, iv.size, auth,
+					 sizeof(auth), tag_len, ctext,
+					 ctext_len, ptext, &ptext_len);
 	if (ret >= 0)
 		fail("succeeded in decrypting data onto a short buffer\n");
 	if (ret != GNUTLS_E_SHORT_MEMORY_BUFFER)
@@ -405,7 +403,7 @@ static void test_aead_invalid_short_decrypt(int algo)
 	return;
 }
 
-# ifdef TEST_AES_GCM_ENCRYPT_PLAINTEXT_SIZE
+#ifdef TEST_AES_GCM_ENCRYPT_PLAINTEXT_SIZE
 /* Test whether an invalid call to gnutls_cipher_encrypt() with too
  * long message is caught */
 static void test_aead_invalid_too_long_encrypt(int algo)
@@ -441,12 +439,12 @@ static void test_aead_invalid_too_long_encrypt(int algo)
 
 	ret = global_init();
 	if (ret < 0) {
-		fail("Cannot initialize library\n");	/*errcode 1 */
+		fail("Cannot initialize library\n"); /*errcode 1 */
 	}
 
 	ret = gnutls_cipher_init(&ch, algo, &key, &iv);
 	if (ret < 0)
-		fail("gnutls_cipher_init failed\n");	/*errcode 1 */
+		fail("gnutls_cipher_init failed\n"); /*errcode 1 */
 
 	/* Test exceeding AES-GCM plaintext limit */
 	ret = gnutls_cipher_encrypt(ch, data, sizeof(data));
@@ -471,7 +469,7 @@ static void test_aead_invalid_too_long_encrypt(int algo)
 	gnutls_global_deinit();
 	return;
 }
-# endif
+#endif
 
 static void check_status(int status)
 {
@@ -510,8 +508,7 @@ static void fork_subtest(subtest func, int algo)
 	}
 };
 
-static
-void start(const char *name, int algo, unsigned aead)
+static void start(const char *name, int algo, unsigned aead)
 {
 	success("trying %s\n", name);
 
@@ -538,11 +535,11 @@ void start(const char *name, int algo, unsigned aead)
 		success("trying %s: test_aead_invalid_short_decrypt\n", name);
 		fork_subtest(test_aead_invalid_short_decrypt, algo);
 
-# if TEST_AES_GCM_ENCRYPT_PLAINTEXT_SIZE
+#if TEST_AES_GCM_ENCRYPT_PLAINTEXT_SIZE
 		success("trying %s: test_aead_invalid_too_long_encrypt\n",
 			name);
 		fork_subtest(test_aead_invalid_too_long_encrypt, algo);
-# endif
+#endif
 	}
 }
 

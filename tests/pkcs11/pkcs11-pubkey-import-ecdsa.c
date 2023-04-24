@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -30,7 +30,7 @@
 #include "softhsm.h"
 
 #define CONFIG_NAME "softhsm-pubkey-import-ecdsa"
-#define CONFIG CONFIG_NAME".config"
+#define CONFIG CONFIG_NAME ".config"
 
 #include "pkcs11-pubkey-import.c"
 

@@ -32,42 +32,39 @@
 */
 
 #ifndef GNUTLS_LIB_NETTLE_MAGMA_H_INCLUDED
-# define GNUTLS_LIB_NETTLE_MAGMA_H_INCLUDED
+#define GNUTLS_LIB_NETTLE_MAGMA_H_INCLUDED
 
-# include "config.h"
+#include "config.h"
 
-# ifndef HAVE_NETTLE_MAGMA_SET_KEY
+#ifndef HAVE_NETTLE_MAGMA_SET_KEY
 
-#  include <nettle/nettle-types.h>
+#include <nettle/nettle-types.h>
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#  endif
+#endif
 
-#  define magma_set_key _gnutls_magma_set_key
-#  define magma_set_param _gnutls_magma_set_param
-#  define magma_encrypt _gnutls_magma_encrypt
-#  define magma_decrypt _gnutls_magma_decrypt
+#define magma_set_key _gnutls_magma_set_key
+#define magma_set_param _gnutls_magma_set_param
+#define magma_encrypt _gnutls_magma_encrypt
+#define magma_decrypt _gnutls_magma_decrypt
 
-#  define MAGMA_KEY_SIZE 32
-#  define MAGMA_BLOCK_SIZE 8
+#define MAGMA_KEY_SIZE 32
+#define MAGMA_BLOCK_SIZE 8
 
-	struct magma_ctx {
-		uint32_t key[MAGMA_KEY_SIZE / 4];
-	};
+struct magma_ctx {
+	uint32_t key[MAGMA_KEY_SIZE / 4];
+};
 
-	void
-	 magma_set_key(struct magma_ctx *ctx, const uint8_t * key);
+void magma_set_key(struct magma_ctx *ctx, const uint8_t *key);
 
-	void
-	 magma_encrypt(const struct magma_ctx *ctx,
-		       size_t length, uint8_t * dst, const uint8_t * src);
-	void
-	 magma_decrypt(const struct magma_ctx *ctx,
-		       size_t length, uint8_t * dst, const uint8_t * src);
+void magma_encrypt(const struct magma_ctx *ctx, size_t length, uint8_t *dst,
+		   const uint8_t *src);
+void magma_decrypt(const struct magma_ctx *ctx, size_t length, uint8_t *dst,
+		   const uint8_t *src);
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 }
-#  endif
-# endif
-#endif				/* GNUTLS_LIB_NETTLE_MAGMA_H_INCLUDED */
+#endif
+#endif
+#endif /* GNUTLS_LIB_NETTLE_MAGMA_H_INCLUDED */

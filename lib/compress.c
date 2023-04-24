@@ -23,16 +23,16 @@
 #include "compress.h"
 
 #ifdef HAVE_LIBZ
-# include <zlib.h>
+#include <zlib.h>
 #endif
 
 #ifdef HAVE_LIBBROTLI
-# include <brotli/decode.h>
-# include <brotli/encode.h>
+#include <brotli/decode.h>
+#include <brotli/encode.h>
 #endif
 
 #ifdef HAVE_LIBZSTD
-# include <zstd.h>
+#include <zstd.h>
 #endif
 
 typedef struct {
@@ -40,33 +40,29 @@ typedef struct {
 	const char *name;
 } comp_entry;
 
-static const comp_entry comp_algs[] = {
-	{GNUTLS_COMP_NULL, "NULL"},
+static const comp_entry comp_algs[] = { { GNUTLS_COMP_NULL, "NULL" },
 #ifdef HAVE_LIBZ
-	{GNUTLS_COMP_ZLIB, "ZLIB"},
+					{ GNUTLS_COMP_ZLIB, "ZLIB" },
 #endif
 #ifdef HAVE_LIBBROTLI
-	{GNUTLS_COMP_BROTLI, "BROTLI"},
+					{ GNUTLS_COMP_BROTLI, "BROTLI" },
 #endif
 #ifdef HAVE_LIBZSTD
-	{GNUTLS_COMP_ZSTD, "ZSTD"},
+					{ GNUTLS_COMP_ZSTD, "ZSTD" },
 #endif
-	{GNUTLS_COMP_UNKNOWN, NULL}
-};
+					{ GNUTLS_COMP_UNKNOWN, NULL } };
 
-static const gnutls_compression_method_t alg_list[] = {
-	GNUTLS_COMP_NULL,
+static const gnutls_compression_method_t alg_list[] = { GNUTLS_COMP_NULL,
 #ifdef HAVE_LIBZ
-	GNUTLS_COMP_ZLIB,
+							GNUTLS_COMP_ZLIB,
 #endif
 #ifdef HAVE_LIBBROTLI
-	GNUTLS_COMP_BROTLI,
+							GNUTLS_COMP_BROTLI,
 #endif
 #ifdef HAVE_LIBZSTD
-	GNUTLS_COMP_ZSTD,
+							GNUTLS_COMP_ZSTD,
 #endif
-	0
-};
+							0 };
 
 /**
  * gnutls_compression_get_name:
@@ -146,63 +142,47 @@ size_t _gnutls_compress_bound(gnutls_compression_method_t alg, size_t src_len)
 	return 0;
 }
 
-int
-_gnutls_compress(gnutls_compression_method_t alg,
-		 uint8_t * dst, size_t dst_len,
-		 const uint8_t * src, size_t src_len)
+int _gnutls_compress(gnutls_compression_method_t alg, uint8_t *dst,
+		     size_t dst_len, const uint8_t *src, size_t src_len)
 {
 	int ret = GNUTLS_E_COMPRESSION_FAILED;
 
 	switch (alg) {
 #ifdef HAVE_LIBZ
-	case GNUTLS_COMP_ZLIB:
-		{
-			int err;
-			uLongf comp_len = dst_len;
+	case GNUTLS_COMP_ZLIB: {
+		int err;
+		uLongf comp_len = dst_len;
 
-			err = compress(dst, &comp_len, src, src_len);
-			if (err != Z_OK)
-				return
-				    gnutls_assert_val
-				    (GNUTLS_E_COMPRESSION_FAILED);
-			ret = comp_len;
-		}
-		break;
+		err = compress(dst, &comp_len, src, src_len);
+		if (err != Z_OK)
+			return gnutls_assert_val(GNUTLS_E_COMPRESSION_FAILED);
+		ret = comp_len;
+	} break;
 #endif
 #ifdef HAVE_LIBBROTLI
-	case GNUTLS_COMP_BROTLI:
-		{
-			BROTLI_BOOL err;
-			size_t comp_len = dst_len;
+	case GNUTLS_COMP_BROTLI: {
+		BROTLI_BOOL err;
+		size_t comp_len = dst_len;
 
-			err = BrotliEncoderCompress(BROTLI_DEFAULT_QUALITY,
-						    BROTLI_DEFAULT_WINDOW,
-						    BROTLI_DEFAULT_MODE,
-						    src_len, src, &comp_len,
-						    dst);
-			if (!err)
-				return
-				    gnutls_assert_val
-				    (GNUTLS_E_COMPRESSION_FAILED);
-			ret = comp_len;
-		}
-		break;
+		err = BrotliEncoderCompress(BROTLI_DEFAULT_QUALITY,
+					    BROTLI_DEFAULT_WINDOW,
+					    BROTLI_DEFAULT_MODE, src_len, src,
+					    &comp_len, dst);
+		if (!err)
+			return gnutls_assert_val(GNUTLS_E_COMPRESSION_FAILED);
+		ret = comp_len;
+	} break;
 #endif
 #ifdef HAVE_LIBZSTD
-	case GNUTLS_COMP_ZSTD:
-		{
-			size_t comp_len;
+	case GNUTLS_COMP_ZSTD: {
+		size_t comp_len;
 
-			comp_len =
-			    ZSTD_compress(dst, dst_len, src, src_len,
-					  ZSTD_CLEVEL_DEFAULT);
-			if (ZSTD_isError(comp_len))
-				return
-				    gnutls_assert_val
-				    (GNUTLS_E_COMPRESSION_FAILED);
-			ret = comp_len;
-		}
-		break;
+		comp_len = ZSTD_compress(dst, dst_len, src, src_len,
+					 ZSTD_CLEVEL_DEFAULT);
+		if (ZSTD_isError(comp_len))
+			return gnutls_assert_val(GNUTLS_E_COMPRESSION_FAILED);
+		ret = comp_len;
+	} break;
 #endif
 	default:
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
@@ -216,59 +196,43 @@ _gnutls_compress(gnutls_compression_method_t alg,
 	return ret;
 }
 
-int
-_gnutls_decompress(gnutls_compression_method_t alg,
-		   uint8_t * dst, size_t dst_len,
-		   const uint8_t * src, size_t src_len)
+int _gnutls_decompress(gnutls_compression_method_t alg, uint8_t *dst,
+		       size_t dst_len, const uint8_t *src, size_t src_len)
 {
 	int ret = GNUTLS_E_DECOMPRESSION_FAILED;
 
 	switch (alg) {
 #ifdef HAVE_LIBZ
-	case GNUTLS_COMP_ZLIB:
-		{
-			int err;
-			uLongf plain_len = dst_len;
+	case GNUTLS_COMP_ZLIB: {
+		int err;
+		uLongf plain_len = dst_len;
 
-			err = uncompress(dst, &plain_len, src, src_len);
-			if (err != Z_OK)
-				return
-				    gnutls_assert_val
-				    (GNUTLS_E_DECOMPRESSION_FAILED);
-			ret = plain_len;
-		}
-		break;
+		err = uncompress(dst, &plain_len, src, src_len);
+		if (err != Z_OK)
+			return gnutls_assert_val(GNUTLS_E_DECOMPRESSION_FAILED);
+		ret = plain_len;
+	} break;
 #endif
 #ifdef HAVE_LIBBROTLI
-	case GNUTLS_COMP_BROTLI:
-		{
-			BrotliDecoderResult err;
-			size_t plain_len = dst_len;
+	case GNUTLS_COMP_BROTLI: {
+		BrotliDecoderResult err;
+		size_t plain_len = dst_len;
 
-			err =
-			    BrotliDecoderDecompress(src_len, src, &plain_len,
-						    dst);
-			if (err != BROTLI_DECODER_RESULT_SUCCESS)
-				return
-				    gnutls_assert_val
-				    (GNUTLS_E_DECOMPRESSION_FAILED);
-			ret = plain_len;
-		}
-		break;
+		err = BrotliDecoderDecompress(src_len, src, &plain_len, dst);
+		if (err != BROTLI_DECODER_RESULT_SUCCESS)
+			return gnutls_assert_val(GNUTLS_E_DECOMPRESSION_FAILED);
+		ret = plain_len;
+	} break;
 #endif
 #ifdef HAVE_LIBZSTD
-	case GNUTLS_COMP_ZSTD:
-		{
-			size_t plain_len;
+	case GNUTLS_COMP_ZSTD: {
+		size_t plain_len;
 
-			plain_len = ZSTD_decompress(dst, dst_len, src, src_len);
-			if (ZSTD_isError(plain_len))
-				return
-				    gnutls_assert_val
-				    (GNUTLS_E_DECOMPRESSION_FAILED);
-			ret = plain_len;
-		}
-		break;
+		plain_len = ZSTD_decompress(dst, dst_len, src, src_len);
+		if (ZSTD_isError(plain_len))
+			return gnutls_assert_val(GNUTLS_E_DECOMPRESSION_FAILED);
+		ret = plain_len;
+	} break;
 #endif
 	default:
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);

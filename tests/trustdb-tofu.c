@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -41,46 +41,48 @@ static void tls_log_func(int level, const char *str)
 }
 
 static unsigned char tofu_server_cert_pem[] =
-    "-----BEGIN CERTIFICATE-----\n"
-    "MIICVjCCAcGgAwIBAgIERiYdMTALBgkqhkiG9w0BAQUwGTEXMBUGA1UEAxMOR251\n"
-    "VExTIHRlc3QgQ0EwHhcNMDcwNDE4MTMyOTIxWhcNMDgwNDE3MTMyOTIxWjA3MRsw\n"
-    "GQYDVQQKExJHbnVUTFMgdGVzdCBzZXJ2ZXIxGDAWBgNVBAMTD3Rlc3QuZ251dGxz\n"
-    "Lm9yZzCBnDALBgkqhkiG9w0BAQEDgYwAMIGIAoGA17pcr6MM8C6pJ1aqU46o63+B\n"
-    "dUxrmL5K6rce+EvDasTaDQC46kwTHzYWk95y78akXrJutsoKiFV1kJbtple8DDt2\n"
-    "DZcevensf9Op7PuFZKBroEjOd35znDET/z3IrqVgbtm2jFqab7a+n2q9p/CgMyf1\n"
-    "tx2S5Zacc1LWn9bIjrECAwEAAaOBkzCBkDAMBgNVHRMBAf8EAjAAMBoGA1UdEQQT\n"
-    "MBGCD3Rlc3QuZ251dGxzLm9yZzATBgNVHSUEDDAKBggrBgEFBQcDATAPBgNVHQ8B\n"
-    "Af8EBQMDB6AAMB0GA1UdDgQWBBTrx0Vu5fglyoyNgw106YbU3VW0dTAfBgNVHSME\n"
-    "GDAWgBTpPBz7rZJu5gakViyi4cBTJ8jylTALBgkqhkiG9w0BAQUDgYEAaFEPTt+7\n"
-    "bzvBuOf7+QmeQcn29kT6Bsyh1RHJXf8KTk5QRfwp6ogbp94JQWcNQ/S7YDFHglD1\n"
-    "AwUNBRXwd3riUsMnsxgeSDxYBfJYbDLeohNBsqaPDJb7XailWbMQKfAbFQ8cnOxg\n"
-    "rOKLUQRWJ0K3HyXRMhbqjdLIaQiCvQLuizo=\n" "-----END CERTIFICATE-----\n";
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIICVjCCAcGgAwIBAgIERiYdMTALBgkqhkiG9w0BAQUwGTEXMBUGA1UEAxMOR251\n"
+	"VExTIHRlc3QgQ0EwHhcNMDcwNDE4MTMyOTIxWhcNMDgwNDE3MTMyOTIxWjA3MRsw\n"
+	"GQYDVQQKExJHbnVUTFMgdGVzdCBzZXJ2ZXIxGDAWBgNVBAMTD3Rlc3QuZ251dGxz\n"
+	"Lm9yZzCBnDALBgkqhkiG9w0BAQEDgYwAMIGIAoGA17pcr6MM8C6pJ1aqU46o63+B\n"
+	"dUxrmL5K6rce+EvDasTaDQC46kwTHzYWk95y78akXrJutsoKiFV1kJbtple8DDt2\n"
+	"DZcevensf9Op7PuFZKBroEjOd35znDET/z3IrqVgbtm2jFqab7a+n2q9p/CgMyf1\n"
+	"tx2S5Zacc1LWn9bIjrECAwEAAaOBkzCBkDAMBgNVHRMBAf8EAjAAMBoGA1UdEQQT\n"
+	"MBGCD3Rlc3QuZ251dGxzLm9yZzATBgNVHSUEDDAKBggrBgEFBQcDATAPBgNVHQ8B\n"
+	"Af8EBQMDB6AAMB0GA1UdDgQWBBTrx0Vu5fglyoyNgw106YbU3VW0dTAfBgNVHSME\n"
+	"GDAWgBTpPBz7rZJu5gakViyi4cBTJ8jylTALBgkqhkiG9w0BAQUDgYEAaFEPTt+7\n"
+	"bzvBuOf7+QmeQcn29kT6Bsyh1RHJXf8KTk5QRfwp6ogbp94JQWcNQ/S7YDFHglD1\n"
+	"AwUNBRXwd3riUsMnsxgeSDxYBfJYbDLeohNBsqaPDJb7XailWbMQKfAbFQ8cnOxg\n"
+	"rOKLUQRWJ0K3HyXRMhbqjdLIaQiCvQLuizo=\n"
+	"-----END CERTIFICATE-----\n";
 
 const gnutls_datum_t tofu_server_cert = { tofu_server_cert_pem,
-	sizeof(tofu_server_cert_pem)
-};
+					  sizeof(tofu_server_cert_pem) };
 
 static char client_pem[] =
-    "-----BEGIN CERTIFICATE-----\n"
-    "MIICHjCCAYmgAwIBAgIERiYdNzALBgkqhkiG9w0BAQUwGTEXMBUGA1UEAxMOR251\n"
-    "VExTIHRlc3QgQ0EwHhcNMDcwNDE4MTMyOTI3WhcNMDgwNDE3MTMyOTI3WjAdMRsw\n"
-    "GQYDVQQDExJHbnVUTFMgdGVzdCBjbGllbnQwgZwwCwYJKoZIhvcNAQEBA4GMADCB\n"
-    "iAKBgLtmQ/Xyxde2jMzF3/WIO7HJS2oOoa0gUEAIgKFPXKPQ+GzP5jz37AR2ExeL\n"
-    "ZIkiW8DdU3w77XwEu4C5KL6Om8aOoKUSy/VXHqLnu7czSZ/ju0quak1o/8kR4jKN\n"
-    "zj2AC41179gAgY8oBAOgIo1hBAf6tjd9IQdJ0glhaZiQo1ipAgMBAAGjdjB0MAwG\n"
-    "A1UdEwEB/wQCMAAwEwYDVR0lBAwwCgYIKwYBBQUHAwIwDwYDVR0PAQH/BAUDAweg\n"
-    "ADAdBgNVHQ4EFgQUTLkKm/odNON+3svSBxX+odrLaJEwHwYDVR0jBBgwFoAU6Twc\n"
-    "+62SbuYGpFYsouHAUyfI8pUwCwYJKoZIhvcNAQEFA4GBALujmBJVZnvaTXr9cFRJ\n"
-    "jpfc/3X7sLUsMvumcDE01ls/cG5mIatmiyEU9qI3jbgUf82z23ON/acwJf875D3/\n"
-    "U7jyOsBJ44SEQITbin2yUeJMIm1tievvdNXBDfW95AM507ShzP12sfiJkJfjjdhy\n"
-    "dc8Siq5JojruiMizAf0pA7in\n" "-----END CERTIFICATE-----\n";
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIICHjCCAYmgAwIBAgIERiYdNzALBgkqhkiG9w0BAQUwGTEXMBUGA1UEAxMOR251\n"
+	"VExTIHRlc3QgQ0EwHhcNMDcwNDE4MTMyOTI3WhcNMDgwNDE3MTMyOTI3WjAdMRsw\n"
+	"GQYDVQQDExJHbnVUTFMgdGVzdCBjbGllbnQwgZwwCwYJKoZIhvcNAQEBA4GMADCB\n"
+	"iAKBgLtmQ/Xyxde2jMzF3/WIO7HJS2oOoa0gUEAIgKFPXKPQ+GzP5jz37AR2ExeL\n"
+	"ZIkiW8DdU3w77XwEu4C5KL6Om8aOoKUSy/VXHqLnu7czSZ/ju0quak1o/8kR4jKN\n"
+	"zj2AC41179gAgY8oBAOgIo1hBAf6tjd9IQdJ0glhaZiQo1ipAgMBAAGjdjB0MAwG\n"
+	"A1UdEwEB/wQCMAAwEwYDVR0lBAwwCgYIKwYBBQUHAwIwDwYDVR0PAQH/BAUDAweg\n"
+	"ADAdBgNVHQ4EFgQUTLkKm/odNON+3svSBxX+odrLaJEwHwYDVR0jBBgwFoAU6Twc\n"
+	"+62SbuYGpFYsouHAUyfI8pUwCwYJKoZIhvcNAQEFA4GBALujmBJVZnvaTXr9cFRJ\n"
+	"jpfc/3X7sLUsMvumcDE01ls/cG5mIatmiyEU9qI3jbgUf82z23ON/acwJf875D3/\n"
+	"U7jyOsBJ44SEQITbin2yUeJMIm1tievvdNXBDfW95AM507ShzP12sfiJkJfjjdhy\n"
+	"dc8Siq5JojruiMizAf0pA7in\n"
+	"-----END CERTIFICATE-----\n";
 const gnutls_datum_t client_cert = { (void *)client_pem, sizeof(client_pem) };
 
 #define TMP_FILE "mini-tdb.tmp"
 #define HOSTS_DIR ".gnutls/"
-#define HOSTS_FILE HOSTS_DIR"known_hosts"
+#define HOSTS_FILE HOSTS_DIR "known_hosts"
 
-#define SHA1_HASH "\x53\x4b\x3b\xdc\x5e\xc8\x44\x4c\x02\x20\xbf\x39\x48\x6f\x4c\xfe\xcd\x25\x52\x10"
+#define SHA1_HASH \
+	"\x53\x4b\x3b\xdc\x5e\xc8\x44\x4c\x02\x20\xbf\x39\x48\x6f\x4c\xfe\xcd\x25\x52\x10"
 
 void doit(void)
 {
@@ -101,33 +103,29 @@ void doit(void)
 		gnutls_global_set_log_level(2);
 
 	// X.509 certificates
-	ret =
-	    gnutls_pem_base64_decode_alloc("CERTIFICATE", &tofu_server_cert,
-					   &der_cert);
+	ret = gnutls_pem_base64_decode_alloc("CERTIFICATE", &tofu_server_cert,
+					     &der_cert);
 	if (ret < 0) {
 		fail("base64 decoding\n");
 		goto fail;
 	}
 
-	ret =
-	    gnutls_pem_base64_decode_alloc("CERTIFICATE", &client_cert,
-					   &der_cert2);
+	ret = gnutls_pem_base64_decode_alloc("CERTIFICATE", &client_cert,
+					     &der_cert2);
 	if (ret < 0) {
 		fail("base64 decoding\n");
 		goto fail;
 	}
 	// Raw public keys
-	ret =
-	    gnutls_pem_base64_decode_alloc("PUBLIC KEY", &rawpk_public_key1,
-					   &der_rawpk);
+	ret = gnutls_pem_base64_decode_alloc("PUBLIC KEY", &rawpk_public_key1,
+					     &der_rawpk);
 	if (ret < 0) {
 		fail("base64 decoding\n");
 		goto fail;
 	}
 
-	ret =
-	    gnutls_pem_base64_decode_alloc("PUBLIC KEY", &rawpk_public_key2,
-					   &der_rawpk2);
+	ret = gnutls_pem_base64_decode_alloc("PUBLIC KEY", &rawpk_public_key2,
+					     &der_rawpk2);
 	if (ret < 0) {
 		fail("base64 decoding\n");
 		goto fail;
@@ -148,9 +146,8 @@ void doit(void)
 	if (debug)
 		success("Commitment storage: passed\n");
 
-	ret =
-	    gnutls_verify_stored_pubkey(TMP_FILE, NULL, "localhost",
-					"https", GNUTLS_CRT_X509, &der_cert, 0);
+	ret = gnutls_verify_stored_pubkey(TMP_FILE, NULL, "localhost", "https",
+					  GNUTLS_CRT_X509, &der_cert, 0);
 	remove(TMP_FILE);
 
 	if (ret != 0) {
@@ -161,7 +158,7 @@ void doit(void)
 	if (debug)
 		success("Commitment verification: passed\n");
 
-	/* Verify access to home dir */
+		/* Verify access to home dir */
 #ifndef _WIN32
 	setenv("HOME", getcwd(path, sizeof(path)), 1);
 
@@ -177,9 +174,8 @@ void doit(void)
 	if (debug)
 		success("Commitment storage: passed\n");
 
-	ret =
-	    gnutls_verify_stored_pubkey(NULL, NULL, "localhost",
-					"https", GNUTLS_CRT_X509, &der_cert, 0);
+	ret = gnutls_verify_stored_pubkey(NULL, NULL, "localhost", "https",
+					  GNUTLS_CRT_X509, &der_cert, 0);
 
 	if (ret != 0) {
 		fail("commitment verification: %s\n", gnutls_strerror(ret));
@@ -202,19 +198,16 @@ void doit(void)
 	if (debug)
 		success("Public key storage (from cert): passed\n");
 
-	ret =
-	    gnutls_verify_stored_pubkey(TMP_FILE, NULL, "localhost",
-					"https", GNUTLS_CRT_X509, &der_cert, 0);
+	ret = gnutls_verify_stored_pubkey(TMP_FILE, NULL, "localhost", "https",
+					  GNUTLS_CRT_X509, &der_cert, 0);
 	if (ret != 0) {
 		fail("pubkey verification (from cert): %s\n",
 		     gnutls_strerror(ret));
 		goto fail;
 	}
 
-	ret =
-	    gnutls_verify_stored_pubkey(TMP_FILE, NULL, "localhost",
-					"https", GNUTLS_CRT_X509,
-					&der_cert2, 0);
+	ret = gnutls_verify_stored_pubkey(TMP_FILE, NULL, "localhost", "https",
+					  GNUTLS_CRT_X509, &der_cert2, 0);
 	if (ret == 0) {
 		fail("verification succeeded when shouldn't!\n");
 		goto fail;
@@ -238,20 +231,16 @@ void doit(void)
 	if (debug)
 		success("Public key storage (from raw pk): passed\n");
 
-	ret =
-	    gnutls_verify_stored_pubkey(TMP_FILE, NULL, "localhost",
-					"https", GNUTLS_CRT_RAWPK,
-					&der_rawpk, 0);
+	ret = gnutls_verify_stored_pubkey(TMP_FILE, NULL, "localhost", "https",
+					  GNUTLS_CRT_RAWPK, &der_rawpk, 0);
 	if (ret != 0) {
 		fail("pubkey verification (from raw pk): %s\n",
 		     gnutls_strerror(ret));
 		goto fail;
 	}
 
-	ret =
-	    gnutls_verify_stored_pubkey(TMP_FILE, NULL, "localhost",
-					"https", GNUTLS_CRT_RAWPK,
-					&der_rawpk2, 0);
+	ret = gnutls_verify_stored_pubkey(TMP_FILE, NULL, "localhost", "https",
+					  GNUTLS_CRT_RAWPK, &der_rawpk2, 0);
 	if (ret == 0) {
 		fail("verification succeeded when shouldn't!\n");
 		goto fail;
@@ -275,7 +264,7 @@ void doit(void)
 	gnutls_free(der_rawpk2.data);
 
 	return;
- fail:
+fail:
 	remove(HOSTS_FILE);
 	remove(TMP_FILE);
 	rmdir(HOSTS_DIR);

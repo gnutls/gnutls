@@ -39,7 +39,7 @@
 /* this function parses passwd.psk file. Format is:
  * string(username):hex(passwd)
  */
-static int pwd_put_values(gnutls_datum_t * psk, char *str)
+static int pwd_put_values(gnutls_datum_t *psk, char *str)
 {
 	char *p;
 	int len, ret;
@@ -74,8 +74,8 @@ static int pwd_put_values(gnutls_datum_t * psk, char *str)
 	return 0;
 }
 
-static bool username_matches(const gnutls_datum_t * username,
-			     const char *line, size_t line_size)
+static bool username_matches(const gnutls_datum_t *username, const char *line,
+			     size_t line_size)
 {
 	int retval;
 	unsigned i;
@@ -94,8 +94,7 @@ static bool username_matches(const gnutls_datum_t * username,
 
 	/* move to first ':' */
 	i = 0;
-	while ((i < line_size) && (line[i] != '\0')
-	       && (line[i] != ':')) {
+	while ((i < line_size) && (line[i] != '\0') && (line[i] != ':')) {
 		i++;
 	}
 
@@ -108,17 +107,15 @@ static bool username_matches(const gnutls_datum_t * username,
 			return gnutls_assert_val(0);
 
 		if (hex_username.size == username->size)
-			retval =
-			    memcmp(username->data, hex_username.data,
-				   username->size);
+			retval = memcmp(username->data, hex_username.data,
+					username->size);
 		else
 			retval = -1;
 
 		_gnutls_free_datum(&hex_username);
 	} else {
-		retval =
-		    strncmp((const char *)username->data, line,
-			    MAX(i, username->size));
+		retval = strncmp((const char *)username->data, line,
+				 MAX(i, username->size));
 	}
 
 	return (retval == 0);
@@ -127,7 +124,7 @@ static bool username_matches(const gnutls_datum_t * username,
 /* Randomizes the given password entry. It actually sets a random password. 
  * Returns 0 on success.
  */
-static int _randomize_psk(gnutls_datum_t * psk)
+static int _randomize_psk(gnutls_datum_t *psk)
 {
 	int ret;
 
@@ -151,23 +148,19 @@ static int _randomize_psk(gnutls_datum_t * psk)
 /* Returns the PSK key of the given user. 
  * If the user doesn't exist a random password is returned instead.
  */
-int
-_gnutls_psk_pwd_find_entry(gnutls_session_t session,
-			   const char *username, uint16_t username_len,
-			   gnutls_datum_t * psk)
+int _gnutls_psk_pwd_find_entry(gnutls_session_t session, const char *username,
+			       uint16_t username_len, gnutls_datum_t *psk)
 {
 	gnutls_psk_server_credentials_t cred;
 	FILE *fp;
 	char *line = NULL;
 	size_t line_size = 0;
 	int ret;
-	gnutls_datum_t username_datum = {
-		.data = (unsigned char *)username,
-		.size = username_len
-	};
+	gnutls_datum_t username_datum = { .data = (unsigned char *)username,
+					  .size = username_len };
 
-	cred = (gnutls_psk_server_credentials_t)
-	    _gnutls_get_cred(session, GNUTLS_CRD_PSK);
+	cred = (gnutls_psk_server_credentials_t)_gnutls_get_cred(
+		session, GNUTLS_CRD_PSK);
 	if (cred == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
@@ -179,7 +172,7 @@ _gnutls_psk_pwd_find_entry(gnutls_session_t session,
 	if (cred->pwd_callback != NULL) {
 		ret = cred->pwd_callback(session, &username_datum, psk);
 
-		if (ret == 1) {	/* the user does not exist */
+		if (ret == 1) { /* the user does not exist */
 			ret = _randomize_psk(psk);
 			if (ret < 0) {
 				gnutls_assert();
@@ -232,7 +225,7 @@ _gnutls_psk_pwd_find_entry(gnutls_session_t session,
 	}
 
 	ret = 0;
- cleanup:
+cleanup:
 	if (fp != NULL)
 		fclose(fp);
 
@@ -240,7 +233,6 @@ _gnutls_psk_pwd_find_entry(gnutls_session_t session,
 	free(line);
 
 	return ret;
-
 }
 
 /* returns the username and they key for the PSK session.
@@ -248,7 +240,7 @@ _gnutls_psk_pwd_find_entry(gnutls_session_t session,
  */
 int _gnutls_find_psk_key(gnutls_session_t session,
 			 gnutls_psk_client_credentials_t cred,
-			 gnutls_datum_t * username, gnutls_datum_t * key,
+			 gnutls_datum_t *username, gnutls_datum_t *key,
 			 int *free)
 {
 	int ret;

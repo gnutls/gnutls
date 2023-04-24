@@ -50,7 +50,7 @@
  *
  * Cost: O(1)
  */
-void _mbuffer_head_init(mbuffer_head_st * buf)
+void _mbuffer_head_init(mbuffer_head_st *buf)
 {
 	buf->head = NULL;
 	buf->tail = NULL;
@@ -64,7 +64,7 @@ void _mbuffer_head_init(mbuffer_head_st * buf)
  * Cost: O(n)
  * n: Number of segments currently in the buffer.
  */
-void _mbuffer_head_clear(mbuffer_head_st * buf)
+void _mbuffer_head_clear(mbuffer_head_st *buf)
 {
 	mbuffer_st *bufel, *next;
 
@@ -80,7 +80,7 @@ void _mbuffer_head_clear(mbuffer_head_st * buf)
  *
  * Cost: O(1)
  */
-void _mbuffer_enqueue(mbuffer_head_st * buf, mbuffer_st * bufel)
+void _mbuffer_enqueue(mbuffer_head_st *buf, mbuffer_st *bufel)
 {
 	bufel->next = NULL;
 	bufel->prev = buf->tail;
@@ -101,14 +101,14 @@ void _mbuffer_enqueue(mbuffer_head_st * buf, mbuffer_st * bufel)
  *
  * Returns the buffer following it.
  */
-mbuffer_st *_mbuffer_dequeue(mbuffer_head_st * buf, mbuffer_st * bufel)
+mbuffer_st *_mbuffer_dequeue(mbuffer_head_st *buf, mbuffer_st *bufel)
 {
 	mbuffer_st *ret = bufel->next;
 
-	if (buf->tail == bufel)	/* if last */
+	if (buf->tail == bufel) /* if last */
 		buf->tail = bufel->prev;
 
-	if (buf->head == bufel)	/* if first */
+	if (buf->head == bufel) /* if first */
 		buf->head = bufel->next;
 
 	if (bufel->prev)
@@ -129,7 +129,7 @@ mbuffer_st *_mbuffer_dequeue(mbuffer_head_st * buf, mbuffer_st * bufel)
  *
  * Cost: O(1)
  */
-void _mbuffer_head_push_first(mbuffer_head_st * buf, mbuffer_st * bufel)
+void _mbuffer_head_push_first(mbuffer_head_st *buf, mbuffer_st *bufel)
 {
 	bufel->prev = NULL;
 	bufel->next = buf->head;
@@ -151,7 +151,7 @@ void _mbuffer_head_push_first(mbuffer_head_st * buf, mbuffer_st * bufel)
  *
  * Cost: O(1)
  */
-mbuffer_st *_mbuffer_head_pop_first(mbuffer_head_st * buf)
+mbuffer_st *_mbuffer_head_pop_first(mbuffer_head_st *buf)
 {
 	mbuffer_st *bufel = buf->head;
 
@@ -169,7 +169,7 @@ mbuffer_st *_mbuffer_head_pop_first(mbuffer_head_st * buf)
  *
  * Cost: O(1)
  */
-mbuffer_st *_mbuffer_head_get_first(mbuffer_head_st * buf, gnutls_datum_t * msg)
+mbuffer_st *_mbuffer_head_get_first(mbuffer_head_st *buf, gnutls_datum_t *msg)
 {
 	mbuffer_st *bufel = buf->head;
 
@@ -191,7 +191,7 @@ mbuffer_st *_mbuffer_head_get_first(mbuffer_head_st * buf, gnutls_datum_t * msg)
  *
  * Cost: O(1)
  */
-mbuffer_st *_mbuffer_head_get_next(mbuffer_st * cur, gnutls_datum_t * msg)
+mbuffer_st *_mbuffer_head_get_next(mbuffer_st *cur, gnutls_datum_t *msg)
 {
 	mbuffer_st *bufel = cur->next;
 
@@ -214,7 +214,7 @@ mbuffer_st *_mbuffer_head_get_next(mbuffer_st * cur, gnutls_datum_t * msg)
  *
  * Cost: O(1)
  */
-static inline void remove_front(mbuffer_head_st * buf)
+static inline void remove_front(mbuffer_head_st *buf)
 {
 	mbuffer_st *bufel = buf->head;
 
@@ -235,7 +235,7 @@ static inline void remove_front(mbuffer_head_st * buf)
  * Cost: O(n)
  * n: Number of segments needed to remove the specified amount of data.
  */
-int _mbuffer_head_remove_bytes(mbuffer_head_st * buf, size_t bytes)
+int _mbuffer_head_remove_bytes(mbuffer_head_st *buf, size_t bytes)
 {
 	size_t left = bytes;
 	mbuffer_st *bufel, *next;
@@ -285,7 +285,7 @@ mbuffer_st *_mbuffer_alloc(size_t maximum_size)
 	memset(st, 0, sizeof(*st));
 
 	/* payload points after the mbuffer_st structure */
-	st->msg.data = (uint8_t *) st + sizeof(mbuffer_st);
+	st->msg.data = (uint8_t *)st + sizeof(mbuffer_st);
 	st->msg.size = 0;
 	st->maximum_size = maximum_size;
 
@@ -302,7 +302,7 @@ mbuffer_st *_mbuffer_alloc(size_t maximum_size)
  * Cost: O(n)
  * n: number of bytes to copy
  */
-int _mbuffer_append_data(mbuffer_st * bufel, void *newdata, size_t newdata_size)
+int _mbuffer_append_data(mbuffer_st *bufel, void *newdata, size_t newdata_size)
 {
 	if (bufel->msg.size + newdata_size <= bufel->maximum_size) {
 		memcpy(&bufel->msg.data[bufel->msg.size], newdata,
@@ -317,7 +317,7 @@ int _mbuffer_append_data(mbuffer_st * bufel, void *newdata, size_t newdata_size)
 }
 
 #ifdef ENABLE_ALIGN16
-# define ALIGN_SIZE 16
+#define ALIGN_SIZE 16
 
 /* Allocate a 16-byte aligned buffer segment. The segment is not initially "owned" by
  * any buffer.
@@ -347,7 +347,7 @@ mbuffer_st *_mbuffer_alloc_align16(size_t maximum_size, unsigned align_pos)
 	memset(st, 0, sizeof(*st));
 
 	/* payload points after the mbuffer_st structure */
-	st->msg.data = (uint8_t *) st + sizeof(mbuffer_st);
+	st->msg.data = (uint8_t *)st + sizeof(mbuffer_st);
 
 	cur_alignment = ((size_t)(st->msg.data + align_pos)) % ALIGN_SIZE;
 	if (cur_alignment > 0)
@@ -359,7 +359,7 @@ mbuffer_st *_mbuffer_alloc_align16(size_t maximum_size, unsigned align_pos)
 	return st;
 }
 
-static unsigned is_aligned16(mbuffer_st * bufel, unsigned align_pos)
+static unsigned is_aligned16(mbuffer_st *bufel, unsigned align_pos)
 {
 	uint8_t *ptr = _mbuffer_get_udata_ptr(bufel);
 
@@ -377,7 +377,7 @@ static unsigned is_aligned16(mbuffer_st * bufel, unsigned align_pos)
  * Cost: O(n)
  * n: number of segments initially in the buffer
  */
-int _mbuffer_linearize_align16(mbuffer_head_st * buf, unsigned align_pos)
+int _mbuffer_linearize_align16(mbuffer_head_st *buf, unsigned align_pos)
 {
 	mbuffer_st *bufel, *cur;
 	gnutls_datum_t msg;
@@ -400,8 +400,8 @@ int _mbuffer_linearize_align16(mbuffer_head_st * buf, unsigned align_pos)
 
 	bufel->type = _mbuffer_head_get_first(buf, NULL)->type;
 
-	for (cur = _mbuffer_head_get_first(buf, &msg);
-	     msg.data != NULL; cur = _mbuffer_head_get_next(cur, &msg)) {
+	for (cur = _mbuffer_head_get_first(buf, &msg); msg.data != NULL;
+	     cur = _mbuffer_head_get_next(cur, &msg)) {
 		memcpy(&bufel->msg.data[pos], msg.data, msg.size);
 		bufel->msg.size += msg.size;
 		pos += msg.size;
@@ -413,7 +413,7 @@ int _mbuffer_linearize_align16(mbuffer_head_st * buf, unsigned align_pos)
 	return 0;
 }
 #else
-int _mbuffer_linearize(mbuffer_head_st * buf)
+int _mbuffer_linearize(mbuffer_head_st *buf)
 {
 	mbuffer_st *bufel, *cur;
 	gnutls_datum_t msg;
@@ -432,8 +432,8 @@ int _mbuffer_linearize(mbuffer_head_st * buf)
 
 	bufel->type = _mbuffer_head_get_first(buf, NULL)->type;
 
-	for (cur = _mbuffer_head_get_first(buf, &msg);
-	     msg.data != NULL; cur = _mbuffer_head_get_next(cur, &msg)) {
+	for (cur = _mbuffer_head_get_first(buf, &msg); msg.data != NULL;
+	     cur = _mbuffer_head_get_next(cur, &msg)) {
 		memcpy(&bufel->msg.data[pos], msg.data, msg.size);
 		bufel->msg.size += msg.size;
 		pos += msg.size;

@@ -35,13 +35,13 @@
 
 #ifdef TEST_RUN
 
-# include <dirent.h>
+#include <dirent.h>
 
-# ifdef _WIN32
-#  define SLASH '\\'
-# else
-#  define SLASH '/'
-# endif
+#ifdef _WIN32
+#define SLASH '\\'
+#else
+#define SLASH '/'
+#endif
 
 static int test_single_file(const char *fname)
 {
@@ -121,13 +121,13 @@ int main(int argc, char **argv)
 
 	target_len = strlen(target);
 
-# ifdef _WIN32
-	target_len -= 4;	// ignore .exe
-# endif
+#ifdef _WIN32
+	target_len -= 4; // ignore .exe
+#endif
 
-	if (argc > 1) {		/* test a single file */
+	if (argc > 1) { /* test a single file */
 		test_single_file(argv[1]);
-	} else {		/* test the target directory */
+	} else { /* test the target directory */
 		int rc;
 		char corporadir[sizeof(SRCDIR) + 1 + target_len + 8];
 		snprintf(corporadir, sizeof(corporadir), SRCDIR "/%.*s.in",
@@ -149,7 +149,7 @@ int main(int argc, char **argv)
 
 #else
 
-# ifndef __AFL_LOOP
+#ifndef __AFL_LOOP
 static int __AFL_LOOP(int n)
 {
 	static int first = 1;
@@ -161,14 +161,14 @@ static int __AFL_LOOP(int n)
 
 	return 0;
 }
-# endif
+#endif
 
 int main(int argc, char **argv)
 {
 	int ret;
 	unsigned char buf[64 * 1024];
 
-	while (__AFL_LOOP(10000)) {	// only works with afl-clang-fast
+	while (__AFL_LOOP(10000)) { // only works with afl-clang-fast
 		ret = fread(buf, 1, sizeof(buf), stdin);
 		if (ret < 0)
 			return 0;
@@ -179,4 +179,4 @@ int main(int argc, char **argv)
 	return 0;
 }
 
-#endif				/* TEST_RUN */
+#endif /* TEST_RUN */

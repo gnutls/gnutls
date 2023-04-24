@@ -55,7 +55,7 @@ int _gnutls_file_exists(const char *file)
  *
  * Since 3.1.0
  **/
-int gnutls_load_file(const char *filename, gnutls_datum_t * data)
+int gnutls_load_file(const char *filename, gnutls_datum_t *data)
 {
 	size_t len;
 

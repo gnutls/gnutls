@@ -26,7 +26,7 @@ static uint8_t key_data[64];
 static uint8_t iv_data[16];
 static gnutls_fips140_context_t fips_context;
 
-static const gnutls_datum_t data = {.data = (unsigned char *)"foo", 3 };
+static const gnutls_datum_t data = { .data = (unsigned char *)"foo", 3 };
 
 static const uint8_t rsa2342_sha1_sig_data[] = {
 	0x9b, 0x3e, 0x15, 0x36, 0xec, 0x9d, 0x51, 0xd7, 0xa2, 0xb1, 0x3a, 0x15,
@@ -76,9 +76,8 @@ static const gnutls_datum_t ecc256_sha1_sig = {
 	.size = sizeof(ecc256_sha1_sig_data),
 };
 
-static void
-import_keypair(gnutls_privkey_t * privkey, gnutls_pubkey_t * pubkey,
-	       const char *filename)
+static void import_keypair(gnutls_privkey_t *privkey, gnutls_pubkey_t *pubkey,
+			   const char *filename)
 {
 	const char *srcdir;
 	char path[256];
@@ -125,7 +124,6 @@ import_keypair(gnutls_privkey_t * privkey, gnutls_pubkey_t * pubkey,
 	if (ret < 0) {
 		fail("gnutls_pubkey_import_privkey failed\n");
 	}
-
 }
 
 static void test_aead_cipher_approved(gnutls_cipher_algorithm_t cipher)
@@ -211,10 +209,9 @@ static void test_cipher_disallowed(gnutls_cipher_algorithm_t cipher)
 	FIPS_POP_CONTEXT(ERROR);
 }
 
-static void
-test_ccm_cipher(gnutls_cipher_algorithm_t cipher, size_t tag_length,
-		bool expect_encryption_fail,
-		gnutls_fips140_operation_state_t expected_state)
+static void test_ccm_cipher(gnutls_cipher_algorithm_t cipher, size_t tag_length,
+			    bool expect_encryption_fail,
+			    gnutls_fips140_operation_state_t expected_state)
 {
 	int ret;
 	unsigned key_size = gnutls_cipher_get_key_size(cipher);
@@ -237,15 +234,14 @@ test_ccm_cipher(gnutls_cipher_algorithm_t cipher, size_t tag_length,
 	length = sizeof(buffer);
 	ret = gnutls_aead_cipher_encrypt(h, iv_data,
 					 gnutls_cipher_get_iv_size(cipher),
-					 NULL, 0, tag_length,
-					 buffer, length - tag_length,
-					 buffer, &length);
+					 NULL, 0, tag_length, buffer,
+					 length - tag_length, buffer, &length);
 	if (expect_encryption_fail) {
 		if (ret != GNUTLS_E_INVALID_REQUEST) {
 			fail("gnutls_aead_cipher_encrypt(%s) returned %d "
 			     "while %d is expected\n",
-			     gnutls_cipher_get_name(cipher),
-			     ret, GNUTLS_E_INVALID_REQUEST);
+			     gnutls_cipher_get_name(cipher), ret,
+			     GNUTLS_E_INVALID_REQUEST);
 		}
 	} else if (ret < 0) {
 		fail("gnutls_aead_cipher_encrypt failed for %s\n",
@@ -257,14 +253,14 @@ test_ccm_cipher(gnutls_cipher_algorithm_t cipher, size_t tag_length,
 	length = sizeof(buffer);
 	ret = gnutls_aead_cipher_decrypt(h, iv_data,
 					 gnutls_cipher_get_iv_size(cipher),
-					 NULL, 0, tag_length,
-					 buffer, length, buffer, &length);
+					 NULL, 0, tag_length, buffer, length,
+					 buffer, &length);
 	if (expect_encryption_fail) {
 		if (ret != GNUTLS_E_INVALID_REQUEST) {
 			fail("gnutls_aead_cipher_decrypt(%s) returned %d "
 			     "while %d is expected\n",
-			     gnutls_cipher_get_name(cipher),
-			     ret, GNUTLS_E_INVALID_REQUEST);
+			     gnutls_cipher_get_name(cipher), ret,
+			     GNUTLS_E_INVALID_REQUEST);
 		}
 	} else if (ret < 0) {
 		fail("gnutls_aead_cipher_decrypt failed for %s\n",
@@ -285,19 +281,19 @@ static inline void test_ciphers(void)
 
 	/* Check for all allowed Tlen */
 	for (i = 4; i <= 16; i += 2) {
-		test_ccm_cipher(GNUTLS_CIPHER_AES_128_CCM, i,
-				false, GNUTLS_FIPS140_OP_APPROVED);
-		test_ccm_cipher(GNUTLS_CIPHER_AES_256_CCM, i,
-				false, GNUTLS_FIPS140_OP_APPROVED);
+		test_ccm_cipher(GNUTLS_CIPHER_AES_128_CCM, i, false,
+				GNUTLS_FIPS140_OP_APPROVED);
+		test_ccm_cipher(GNUTLS_CIPHER_AES_256_CCM, i, false,
+				GNUTLS_FIPS140_OP_APPROVED);
 	}
-	test_ccm_cipher(GNUTLS_CIPHER_AES_128_CCM, 3,
-			true, GNUTLS_FIPS140_OP_ERROR);
-	test_ccm_cipher(GNUTLS_CIPHER_AES_256_CCM, 3,
-			true, GNUTLS_FIPS140_OP_ERROR);
-	test_ccm_cipher(GNUTLS_CIPHER_AES_128_CCM, 5,
-			true, GNUTLS_FIPS140_OP_ERROR);
-	test_ccm_cipher(GNUTLS_CIPHER_AES_256_CCM, 5,
-			true, GNUTLS_FIPS140_OP_ERROR);
+	test_ccm_cipher(GNUTLS_CIPHER_AES_128_CCM, 3, true,
+			GNUTLS_FIPS140_OP_ERROR);
+	test_ccm_cipher(GNUTLS_CIPHER_AES_256_CCM, 3, true,
+			GNUTLS_FIPS140_OP_ERROR);
+	test_ccm_cipher(GNUTLS_CIPHER_AES_128_CCM, 5, true,
+			GNUTLS_FIPS140_OP_ERROR);
+	test_ccm_cipher(GNUTLS_CIPHER_AES_256_CCM, 5, true,
+			GNUTLS_FIPS140_OP_ERROR);
 
 	test_aead_cipher_approved(GNUTLS_CIPHER_AES_128_CCM_8);
 	test_aead_cipher_approved(GNUTLS_CIPHER_AES_256_CCM_8);
@@ -432,8 +428,8 @@ void doit(void)
 
 	/* HMAC with key equal to or longer than 112 bits: approved */
 	FIPS_PUSH_CONTEXT();
-	ret = gnutls_hmac_fast(GNUTLS_MAC_SHA256, key.data, key.size,
-			       data.data, data.size, hmac);
+	ret = gnutls_hmac_fast(GNUTLS_MAC_SHA256, key.data, key.size, data.data,
+			       data.size, hmac);
 	if (ret < 0) {
 		fail("gnutls_hmac_fast failed\n");
 	}
@@ -441,8 +437,8 @@ void doit(void)
 
 	/* HMAC with key shorter than 112 bits: not approved */
 	FIPS_PUSH_CONTEXT();
-	ret = gnutls_hmac_fast(GNUTLS_MAC_SHA256, key.data, 13,
-			       data.data, data.size, hmac);
+	ret = gnutls_hmac_fast(GNUTLS_MAC_SHA256, key.data, 13, data.data,
+			       data.size, hmac);
 	if (ret < 0) {
 		fail("gnutls_hmac_fast failed\n");
 	}
@@ -450,8 +446,8 @@ void doit(void)
 
 	/* PBKDF2 with key equal to or longer than 112 bits: approved */
 	FIPS_PUSH_CONTEXT();
-	ret = gnutls_pbkdf2(GNUTLS_MAC_SHA256, &key, &iv, 1000,
-			    &pbkdf2, sizeof(pbkdf2));
+	ret = gnutls_pbkdf2(GNUTLS_MAC_SHA256, &key, &iv, 1000, &pbkdf2,
+			    sizeof(pbkdf2));
 	if (ret < 0) {
 		fail("gnutls_pbkdf2 failed\n");
 	}
@@ -460,8 +456,8 @@ void doit(void)
 	/* PBKDF2 with key shorter than 112 bits: not approved */
 	FIPS_PUSH_CONTEXT();
 	key.size = 13;
-	ret = gnutls_pbkdf2(GNUTLS_MAC_SHA256, &key, &iv, 1000,
-			    &pbkdf2, sizeof(pbkdf2));
+	ret = gnutls_pbkdf2(GNUTLS_MAC_SHA256, &key, &iv, 1000, &pbkdf2,
+			    sizeof(pbkdf2));
 	if (ret < 0) {
 		fail("gnutls_pbkdf2 failed\n");
 	}
@@ -470,8 +466,8 @@ void doit(void)
 
 	/* PBKDF2 with iteration count lower than 1000: not approved */
 	FIPS_PUSH_CONTEXT();
-	ret = gnutls_pbkdf2(GNUTLS_MAC_SHA256, &key, &iv, 999,
-			    &pbkdf2, sizeof(pbkdf2));
+	ret = gnutls_pbkdf2(GNUTLS_MAC_SHA256, &key, &iv, 999, &pbkdf2,
+			    sizeof(pbkdf2));
 	if (ret < 0) {
 		fail("gnutls_pbkdf2 failed\n");
 	}
@@ -480,8 +476,8 @@ void doit(void)
 	/* PBKDF2 with salt shorter than 16 bytes: not approved */
 	FIPS_PUSH_CONTEXT();
 	iv.size = 13;
-	ret = gnutls_pbkdf2(GNUTLS_MAC_SHA256, &key, &iv, 1000,
-			    &pbkdf2, sizeof(pbkdf2));
+	ret = gnutls_pbkdf2(GNUTLS_MAC_SHA256, &key, &iv, 1000, &pbkdf2,
+			    sizeof(pbkdf2));
 	if (ret < 0) {
 		fail("gnutls_pbkdf2 failed\n");
 	}
@@ -543,11 +539,12 @@ void doit(void)
 	if (ret < 0) {
 		fail("gnutls_privkey_init failed\n");
 	}
-	bits =
-	    gnutls_sec_param_to_pk_bits(GNUTLS_PK_RSA, GNUTLS_SEC_PARAM_MEDIUM);
+	bits = gnutls_sec_param_to_pk_bits(GNUTLS_PK_RSA,
+					   GNUTLS_SEC_PARAM_MEDIUM);
 	ret = gnutls_x509_privkey_generate(xprivkey, GNUTLS_PK_RSA, bits, 0);
 	if (ret < 0) {
-		fail("gnutls_x509_privkey_generate failed (%d) for %u-bit key\n", ret, bits);
+		fail("gnutls_x509_privkey_generate failed (%d) for %u-bit key\n",
+		     ret, bits);
 	}
 	gnutls_x509_privkey_deinit(xprivkey);
 	FIPS_POP_CONTEXT(APPROVED);
@@ -560,7 +557,8 @@ void doit(void)
 	}
 	ret = gnutls_x509_privkey_generate(xprivkey, GNUTLS_PK_RSA, 512, 0);
 	if (ret != GNUTLS_E_PK_GENERATION_ERROR) {
-		fail("gnutls_x509_privkey_generate succeeded (%d) for 512-bit key\n", ret);
+		fail("gnutls_x509_privkey_generate succeeded (%d) for 512-bit key\n",
+		     ret);
 	}
 	gnutls_x509_privkey_deinit(xprivkey);
 	FIPS_POP_CONTEXT(ERROR);
@@ -572,8 +570,8 @@ void doit(void)
 
 	/* Create a signature with 2432-bit RSA and SHA256; approved */
 	FIPS_PUSH_CONTEXT();
-	ret = gnutls_privkey_sign_data(privkey, GNUTLS_DIG_SHA256, 0,
-				       &data, &signature);
+	ret = gnutls_privkey_sign_data(privkey, GNUTLS_DIG_SHA256, 0, &data,
+				       &signature);
 	if (ret < 0) {
 		fail("gnutls_privkey_sign_data failed\n");
 	}
@@ -591,8 +589,8 @@ void doit(void)
 
 	/* Create a signature with 2432-bit RSA and SHA-1; not approved */
 	FIPS_PUSH_CONTEXT();
-	ret = gnutls_privkey_sign_data(privkey, GNUTLS_DIG_SHA1, 0,
-				       &data, &signature);
+	ret = gnutls_privkey_sign_data(privkey, GNUTLS_DIG_SHA1, 0, &data,
+				       &signature);
 	if (ret < 0) {
 		fail("gnutls_privkey_sign_data failed\n");
 	}
@@ -618,8 +616,8 @@ void doit(void)
 
 	/* Create a signature with 512-bit RSA and SHA256; not approved */
 	FIPS_PUSH_CONTEXT();
-	ret = gnutls_privkey_sign_data(privkey, GNUTLS_DIG_SHA256, 0,
-				       &data, &signature);
+	ret = gnutls_privkey_sign_data(privkey, GNUTLS_DIG_SHA256, 0, &data,
+				       &signature);
 	if (ret < 0) {
 		fail("gnutls_privkey_sign_data failed\n");
 	}
@@ -663,8 +661,8 @@ void doit(void)
 
 	/* Create a signature with ECDSA and SHA256 (old API); approved */
 	FIPS_PUSH_CONTEXT();
-	ret = gnutls_privkey_sign_data(privkey, GNUTLS_DIG_SHA256, 0,
-				       &data, &signature);
+	ret = gnutls_privkey_sign_data(privkey, GNUTLS_DIG_SHA256, 0, &data,
+				       &signature);
 	if (ret < 0) {
 		fail("gnutls_privkey_sign_data failed\n");
 	}
@@ -723,8 +721,8 @@ void doit(void)
 
 	/* Create a signature with ECDSA and SHA-1 (old API); not approved */
 	FIPS_PUSH_CONTEXT();
-	ret = gnutls_privkey_sign_data(privkey, GNUTLS_DIG_SHA1, 0,
-				       &data, &signature);
+	ret = gnutls_privkey_sign_data(privkey, GNUTLS_DIG_SHA1, 0, &data,
+				       &signature);
 	if (ret < 0) {
 		fail("gnutls_privkey_sign_data failed\n");
 	}

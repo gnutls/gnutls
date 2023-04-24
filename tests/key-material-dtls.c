@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -34,17 +34,17 @@ int main(int argc, char **argv)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
-# include <unistd.h>
-# include <gnutls/gnutls.h>
-# include <gnutls/dtls.h>
+#include <string.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <gnutls/gnutls.h>
+#include <gnutls/dtls.h>
 
-# include "utils.h"
+#include "utils.h"
 
 static void terminate(void);
 
@@ -68,7 +68,7 @@ static pid_t child;
 /* A very basic DTLS client, with anonymous authentication, that negotiates SRTP
  */
 
-static void dump(const char *name, uint8_t * data, unsigned data_size)
+static void dump(const char *name, uint8_t *data, unsigned data_size)
 {
 	unsigned i;
 
@@ -118,9 +118,10 @@ static void client(int fd)
 	gnutls_init(&session, GNUTLS_CLIENT | GNUTLS_DATAGRAM);
 
 	/* Use default priorities */
-	ret = gnutls_priority_set_direct(session,
-					 "NONE:+VERS-DTLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ANON-DH:+ANON-ECDH:+CURVE-ALL",
-					 &err);
+	ret = gnutls_priority_set_direct(
+		session,
+		"NONE:+VERS-DTLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ANON-DH:+ANON-ECDH:+CURVE-ALL",
+		&err);
 	if (ret < 0) {
 		fail("client: priority set failed (%s): %s\n",
 		     gnutls_strerror(ret), err);
@@ -137,8 +138,7 @@ static void client(int fd)
 	 */
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret < 0) {
 		fail("client: Handshake failed: %s\n", strerror(ret));
@@ -150,8 +150,8 @@ static void client(int fd)
 
 	if (debug)
 		success("client: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	ret = gnutls_cipher_get(session);
 	if (ret != GNUTLS_CIPHER_AES_128_CBC) {
@@ -182,9 +182,8 @@ static void client(int fd)
 	p = key_material;
 
 	/* check whether the key material matches our calculations */
-	ret =
-	    gnutls_record_get_state(session, 0, &mac_key, &iv, &cipher_key,
-				    wseq_number);
+	ret = gnutls_record_get_state(session, 0, &mac_key, &iv, &cipher_key,
+				      wseq_number);
 	if (ret < 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		gnutls_perror(ret);
@@ -197,9 +196,8 @@ static void client(int fd)
 		exit(1);
 	}
 
-	ret =
-	    gnutls_record_get_state(session, 1, &read_mac_key, &read_iv,
-				    &read_cipher_key, rseq_number);
+	ret = gnutls_record_get_state(session, 1, &read_mac_key, &read_iv,
+				      &read_cipher_key, rseq_number);
 	if (ret < 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		gnutls_perror(ret);
@@ -212,8 +210,8 @@ static void client(int fd)
 		exit(1);
 	}
 
-	if (hash_size != mac_key.size
-	    || memcmp(p, mac_key.data, hash_size) != 0) {
+	if (hash_size != mac_key.size ||
+	    memcmp(p, mac_key.data, hash_size) != 0) {
 		dump("MAC:", mac_key.data, mac_key.size);
 		dump("Block:", key_material, block_size);
 		fprintf(stderr, "error in %d\n", __LINE__);
@@ -221,8 +219,8 @@ static void client(int fd)
 	}
 	p += hash_size;
 
-	if (hash_size != read_mac_key.size
-	    || memcmp(p, read_mac_key.data, hash_size) != 0) {
+	if (hash_size != read_mac_key.size ||
+	    memcmp(p, read_mac_key.data, hash_size) != 0) {
 		dump("MAC:", read_mac_key.data, read_mac_key.size);
 		dump("Block:", key_material, block_size);
 		fprintf(stderr, "error in %d\n", __LINE__);
@@ -230,15 +228,15 @@ static void client(int fd)
 	}
 	p += hash_size;
 
-	if (key_size != cipher_key.size
-	    || memcmp(p, cipher_key.data, key_size) != 0) {
+	if (key_size != cipher_key.size ||
+	    memcmp(p, cipher_key.data, key_size) != 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		exit(1);
 	}
 	p += key_size;
 
-	if (key_size != read_cipher_key.size
-	    || memcmp(p, read_cipher_key.data, key_size) != 0) {
+	if (key_size != read_cipher_key.size ||
+	    memcmp(p, read_cipher_key.data, key_size) != 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		exit(1);
 	}
@@ -253,8 +251,8 @@ static void client(int fd)
 	}
 
 	memset(wseq_number, 0xAA, sizeof(wseq_number));
-	ret =
-	    gnutls_record_get_state(session, 0, NULL, NULL, NULL, wseq_number);
+	ret = gnutls_record_get_state(session, 0, NULL, NULL, NULL,
+				      wseq_number);
 	if (ret < 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		gnutls_perror(ret);
@@ -268,8 +266,8 @@ static void client(int fd)
 	}
 
 	memset(rseq_number, 0xAA, sizeof(rseq_number));
-	ret =
-	    gnutls_record_get_state(session, 1, NULL, NULL, NULL, rseq_number);
+	ret = gnutls_record_get_state(session, 1, NULL, NULL, NULL,
+				      rseq_number);
 	if (ret < 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		gnutls_perror(ret);
@@ -320,9 +318,8 @@ static void server(int fd)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	ret = gnutls_priority_set_direct(session,
-					 "NORMAL:+VERS-DTLS1.0:+ANON-DH:+ANON-ECDH",
-					 NULL);
+	ret = gnutls_priority_set_direct(
+		session, "NORMAL:+VERS-DTLS1.0:+ANON-DH:+ANON-ECDH", NULL);
 	if (ret < 0) {
 		fail("server: priority set failed (%s)\n\n",
 		     gnutls_strerror(ret));
@@ -335,8 +332,7 @@ static void server(int fd)
 
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 	if (ret < 0) {
 		close(fd);
 		gnutls_deinit(session);
@@ -349,13 +345,13 @@ static void server(int fd)
 
 	if (debug)
 		success("server: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	do {
 		ret = gnutls_record_recv(session, buf, sizeof(buf));
-	} while (ret > 0 || ret == GNUTLS_E_AGAIN
-		 || ret == GNUTLS_E_INTERRUPTED);
+	} while (ret > 0 || ret == GNUTLS_E_AGAIN ||
+		 ret == GNUTLS_E_INTERRUPTED);
 
 	if (ret < 0) {
 		fail("error: %s\n", gnutls_strerror(ret));
@@ -414,4 +410,4 @@ void doit(void)
 	start();
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

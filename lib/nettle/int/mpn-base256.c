@@ -31,13 +31,12 @@
 */
 
 #if HAVE_CONFIG_H
-# include "config.h"
+#include "config.h"
 #endif
 
 #include "mpn-base256.h"
 
-void
-mpn_set_base256(mp_limb_t * rp, mp_size_t rn, const uint8_t * xp, size_t xn)
+void mpn_set_base256(mp_limb_t *rp, mp_size_t rn, const uint8_t *xp, size_t xn)
 {
 	size_t xi;
 	mp_limb_t out;
@@ -61,8 +60,7 @@ mpn_set_base256(mp_limb_t * rp, mp_size_t rn, const uint8_t * xp, size_t xn)
 	}
 }
 
-void
-mpn_get_base256(uint8_t * rp, size_t rn, const mp_limb_t * xp, mp_size_t xn)
+void mpn_get_base256(uint8_t *rp, size_t rn, const mp_limb_t *xp, mp_size_t xn)
 {
 	unsigned bits;
 	mp_limb_t in;

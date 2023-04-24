@@ -30,35 +30,42 @@
 #include <gnutls/gnutls.h>
 #include <cmocka.h>
 
-#define MATCH_FUNC(fname, password, normalized) \
-static void fname(void **glob_state) \
-{ \
-	const char *pwd_normalized = normalized; \
-	gnutls_datum_t out; \
-	int ret = gnutls_utf8_password_normalize((uint8_t*)password, strlen(password), &out, 0); \
-	if (pwd_normalized == NULL) { /* expect failure */ \
-		assert_int_not_equal(ret, 0); \
-	} else { \
-		assert_int_equal(ret, 0); \
-		assert_int_equal(strcmp((char*)out.data, (char*)pwd_normalized), 0); \
-		gnutls_free(out.data); \
-	} \
-}
+#define MATCH_FUNC(fname, password, normalized)                          \
+	static void fname(void **glob_state)                             \
+	{                                                                \
+		const char *pwd_normalized = normalized;                 \
+		gnutls_datum_t out;                                      \
+		int ret = gnutls_utf8_password_normalize(                \
+			(uint8_t *)password, strlen(password), &out, 0); \
+		if (pwd_normalized == NULL) { /* expect failure */       \
+			assert_int_not_equal(ret, 0);                    \
+		} else {                                                 \
+			assert_int_equal(ret, 0);                        \
+			assert_int_equal(strcmp((char *)out.data,        \
+						(char *)pwd_normalized), \
+					 0);                             \
+			gnutls_free(out.data);                           \
+		}                                                        \
+	}
 
-#define INVALID_MATCH_FUNC(fname, password, normalized) \
-static void inv_##fname(void **glob_state) \
-{ \
-	const char *pwd_normalized = normalized; \
-	gnutls_datum_t out; \
-	int ret = gnutls_utf8_password_normalize((uint8_t*)password, strlen(password), &out, GNUTLS_UTF8_IGNORE_ERRS); \
-	if (pwd_normalized == NULL) { \
-		assert_int_not_equal(ret, 0); \
-	} else { \
-		assert_int_equal(ret, 0); \
-		assert_int_equal(strcmp((char*)out.data, (char*)pwd_normalized), 0); \
-		gnutls_free(out.data); \
-	} \
-}
+#define INVALID_MATCH_FUNC(fname, password, normalized)                  \
+	static void inv_##fname(void **glob_state)                       \
+	{                                                                \
+		const char *pwd_normalized = normalized;                 \
+		gnutls_datum_t out;                                      \
+		int ret = gnutls_utf8_password_normalize(                \
+			(uint8_t *)password, strlen(password), &out,     \
+			GNUTLS_UTF8_IGNORE_ERRS);                        \
+		if (pwd_normalized == NULL) {                            \
+			assert_int_not_equal(ret, 0);                    \
+		} else {                                                 \
+			assert_int_equal(ret, 0);                        \
+			assert_int_equal(strcmp((char *)out.data,        \
+						(char *)pwd_normalized), \
+					 0);                             \
+			gnutls_free(out.data);                           \
+		}                                                        \
+	}
 
 MATCH_FUNC(test_ascii, "correct horse battery staple",
 	   "correct horse battery staple");
@@ -79,10 +86,14 @@ MATCH_FUNC(test_compatibility, "char \xcf\x90\xe2\x84\xb5",
 MATCH_FUNC(test_invalid_ignorable1, "my ignorable char is \xe2\x80\x8f", NULL);
 MATCH_FUNC(test_invalid_ignorable2, "my ignorable char is \xe1\x85\x9f", NULL);
 MATCH_FUNC(test_invalid_ignorable3, "my ignorable char is \xef\xbf\xbf", NULL);
-MATCH_FUNC(test_invalid_exception1, "my exception is \xc2\xb7", NULL);	/* CONTEXTO - disallowed */
-MATCH_FUNC(test_invalid_exception2, "my exception is \xcf\x82", "my exception is ς");	/* PVALID */
-MATCH_FUNC(test_invalid_exception3, "my exception is \xd9\xa2", NULL);	/* CONTEXT0/PVALID */
-MATCH_FUNC(test_invalid_exception4, "my exception is \xe3\x80\xae", NULL);	/* CONTEXT0/DISALLOWED */
+MATCH_FUNC(test_invalid_exception1, "my exception is \xc2\xb7",
+	   NULL); /* CONTEXTO - disallowed */
+MATCH_FUNC(test_invalid_exception2, "my exception is \xcf\x82",
+	   "my exception is ς"); /* PVALID */
+MATCH_FUNC(test_invalid_exception3, "my exception is \xd9\xa2",
+	   NULL); /* CONTEXT0/PVALID */
+MATCH_FUNC(test_invalid_exception4, "my exception is \xe3\x80\xae",
+	   NULL); /* CONTEXT0/DISALLOWED */
 MATCH_FUNC(test_invalid_join_control, "my exception is \xe2\x80\x8d", NULL);
 
 INVALID_MATCH_FUNC(test_ascii, "correct horse battery staple",
@@ -95,7 +106,8 @@ INVALID_MATCH_FUNC(test_invalid_exception1, "my exception is \xc2\xb7",
 		   "my exception is ·");
 INVALID_MATCH_FUNC(test_invalid_exception3, "my exception is \xd9\xa2",
 		   "my exception is \xd9\xa2");
-INVALID_MATCH_FUNC(test_invalid_exception4, "my exception is \xe3\x80\xae", "my exception is \xe3\x80\xae");	/* CONTEXT0/DISALLOWED */
+INVALID_MATCH_FUNC(test_invalid_exception4, "my exception is \xe3\x80\xae",
+		   "my exception is \xe3\x80\xae"); /* CONTEXT0/DISALLOWED */
 INVALID_MATCH_FUNC(test_invalid_join_control, "my exception is \xe2\x80\x8d",
 		   "my exception is \xe2\x80\x8d");
 

@@ -34,66 +34,60 @@
 */
 
 #ifndef GOST_CMAC_H_INCLUDED
-# define GOST_CMAC_H_INCLUDED
+#define GOST_CMAC_H_INCLUDED
 
-# if HAVE_CONFIG_H
-#  include <config.h>
-# endif
+#if HAVE_CONFIG_H
+#include <config.h>
+#endif
 
-# ifndef HAVE_NETTLE_CMAC_MAGMA_UPDATE
-#  include "magma.h"
+#ifndef HAVE_NETTLE_CMAC_MAGMA_UPDATE
+#include "magma.h"
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#  endif
+#endif
 
-#  define cmac_magma_set_key _gnutls_cmac_magma_set_key
-#  define cmac_magma_update _gnutls_cmac_magma_update
-#  define cmac_magma_digest _gnutls_cmac_magma_digest
+#define cmac_magma_set_key _gnutls_cmac_magma_set_key
+#define cmac_magma_update _gnutls_cmac_magma_update
+#define cmac_magma_digest _gnutls_cmac_magma_digest
 
-	struct cmac_magma_ctx CMAC64_CTX(struct magma_ctx);
+struct cmac_magma_ctx CMAC64_CTX(struct magma_ctx);
 
-	void
-	 cmac_magma_set_key(struct cmac_magma_ctx *ctx, const uint8_t * key);
+void cmac_magma_set_key(struct cmac_magma_ctx *ctx, const uint8_t *key);
 
-	void
-	 cmac_magma_update(struct cmac_magma_ctx *ctx,
-			   size_t length, const uint8_t * data);
+void cmac_magma_update(struct cmac_magma_ctx *ctx, size_t length,
+		       const uint8_t *data);
 
-	void
-	 cmac_magma_digest(struct cmac_magma_ctx *ctx,
-			   size_t length, uint8_t * digest);
+void cmac_magma_digest(struct cmac_magma_ctx *ctx, size_t length,
+		       uint8_t *digest);
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 }
-#  endif
-# endif				/* HAVE_NETTLE_CMAC_MAGMA_UPDATE */
-# ifndef HAVE_NETTLE_CMAC_KUZNYECHIK_UPDATE
-#  include "kuznyechik.h"
-#  ifdef __cplusplus
+#endif
+#endif /* HAVE_NETTLE_CMAC_MAGMA_UPDATE */
+#ifndef HAVE_NETTLE_CMAC_KUZNYECHIK_UPDATE
+#include "kuznyechik.h"
+#ifdef __cplusplus
 extern "C" {
-#  endif
+#endif
 
-#  define cmac_kuznyechik_set_key _gnutls_cmac_kuznyechik_set_key
-#  define cmac_kuznyechik_update _gnutls_cmac_kuznyechik_update
-#  define cmac_kuznyechik_digest _gnutls_cmac_kuznyechik_digest
+#define cmac_kuznyechik_set_key _gnutls_cmac_kuznyechik_set_key
+#define cmac_kuznyechik_update _gnutls_cmac_kuznyechik_update
+#define cmac_kuznyechik_digest _gnutls_cmac_kuznyechik_digest
 
-	struct cmac_kuznyechik_ctx CMAC128_CTX(struct kuznyechik_ctx);
+struct cmac_kuznyechik_ctx CMAC128_CTX(struct kuznyechik_ctx);
 
-	void
-	 cmac_kuznyechik_set_key(struct cmac_kuznyechik_ctx *ctx,
-				 const uint8_t * key);
+void cmac_kuznyechik_set_key(struct cmac_kuznyechik_ctx *ctx,
+			     const uint8_t *key);
 
-	void
-	 cmac_kuznyechik_update(struct cmac_kuznyechik_ctx *ctx,
-				size_t length, const uint8_t * data);
+void cmac_kuznyechik_update(struct cmac_kuznyechik_ctx *ctx, size_t length,
+			    const uint8_t *data);
 
-	void
-	 cmac_kuznyechik_digest(struct cmac_kuznyechik_ctx *ctx,
-				size_t length, uint8_t * digest);
+void cmac_kuznyechik_digest(struct cmac_kuznyechik_ctx *ctx, size_t length,
+			    uint8_t *digest);
 
-#  ifdef __cplusplus
+#ifdef __cplusplus
 }
-#  endif
-# endif
-#endif				/* CMAC_H_INCLUDED */
+#endif
+#endif
+#endif /* CMAC_H_INCLUDED */

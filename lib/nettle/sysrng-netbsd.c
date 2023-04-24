@@ -35,7 +35,7 @@
 
 #include <sys/sysctl.h>
 
-#define	ARRAY_SIZE(A)	(sizeof(A)/sizeof((A)[0]))
+#define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
 get_entropy_func _rnd_get_system_entropy = NULL;
 
@@ -55,7 +55,7 @@ static int _rnd_get_system_entropy_sysctl(void *_rnd, size_t size)
 		}
 
 		if (count != req) {
-			return GNUTLS_E_RANDOM_DEVICE_ERROR;	/* Can't happen. */
+			return GNUTLS_E_RANDOM_DEVICE_ERROR; /* Can't happen. */
 		}
 
 		p += count;

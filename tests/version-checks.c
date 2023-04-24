@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -60,8 +60,8 @@ static void try(const char *client_prio, int expected)
 	unsigned dtls = 0;
 	const char *server_prio = "NORMAL:+VERS-TLS-ALL";
 
-	if (expected >= GNUTLS_DTLS_VERSION_MIN
-	    && expected <= GNUTLS_DTLS_VERSION_MAX) {
+	if (expected >= GNUTLS_DTLS_VERSION_MIN &&
+	    expected <= GNUTLS_DTLS_VERSION_MAX) {
 		dtls = 1;
 		/* we do not really do negotiation in that version */
 		if (expected == GNUTLS_DTLS0_9)
@@ -75,9 +75,8 @@ static void try(const char *client_prio, int expected)
 
 	/* Init server */
 	gnutls_certificate_allocate_credentials(&serverx509cred);
-	gnutls_certificate_set_x509_key_mem(serverx509cred,
-					    &server_cert, &server_key,
-					    GNUTLS_X509_FMT_PEM);
+	gnutls_certificate_set_x509_key_mem(serverx509cred, &server_cert,
+					    &server_key, GNUTLS_X509_FMT_PEM);
 
 	if (dtls)
 		flags |= (GNUTLS_DATAGRAM | GNUTLS_NONBLOCK);
@@ -98,9 +97,8 @@ static void try(const char *client_prio, int expected)
 	if (ret < 0)
 		exit(1);
 
-	ret =
-	    gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca_cert,
-						  GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca_cert,
+						    GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);
 
@@ -135,7 +133,9 @@ static void try(const char *client_prio, int expected)
 
 		ret = gnutls_protocol_get_version(client);
 		if (ret != expected) {
-			fail("unexpected negotiated protocol %s (expected %s)\n", gnutls_protocol_get_name(ret), gnutls_protocol_get_name(expected));
+			fail("unexpected negotiated protocol %s (expected %s)\n",
+			     gnutls_protocol_get_name(ret),
+			     gnutls_protocol_get_name(expected));
 			exit(1);
 		}
 	} else {

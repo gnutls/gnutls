@@ -1,25 +1,25 @@
 #ifndef GNUTLS_LIB_ACCELERATED_X86_AES_PADLOCK_H
-# define GNUTLS_LIB_ACCELERATED_X86_AES_PADLOCK_H
+#define GNUTLS_LIB_ACCELERATED_X86_AES_PADLOCK_H
 
-# include "gnutls_int.h"
-# include <aes-x86.h>
+#include "gnutls_int.h"
+#include <aes-x86.h>
 
 struct padlock_cipher_data {
-	unsigned char iv[16];	/* Initialization vector */
+	unsigned char iv[16]; /* Initialization vector */
 	union {
 		unsigned int pad[4];
 		struct {
-			unsigned rounds:4;
-			unsigned dgst:1;	/* n/a in C3 */
-			unsigned align:1;	/* n/a in C3 */
-			unsigned ciphr:1;	/* n/a in C3 */
-			unsigned int keygen:1;
-			unsigned interm:1;
-			unsigned int encdec:1;
-			unsigned ksize:2;
+			unsigned rounds : 4;
+			unsigned dgst : 1; /* n/a in C3 */
+			unsigned align : 1; /* n/a in C3 */
+			unsigned ciphr : 1; /* n/a in C3 */
+			unsigned int keygen : 1;
+			unsigned interm : 1;
+			unsigned int encdec : 1;
+			unsigned ksize : 2;
 		} b;
-	} cword;		/* Control word */
-	AES_KEY ks;		/* Encryption key */
+	} cword; /* Control word */
+	AES_KEY ks; /* Encryption key */
 };
 
 struct padlock_ctx {
@@ -42,4 +42,4 @@ int padlock_ecb_encrypt(void *out, const void *inp,
 			struct padlock_cipher_data *ctx, size_t len);
 int padlock_cbc_encrypt(void *out, const void *inp,
 			struct padlock_cipher_data *ctx, size_t len);
-#endif				/* GNUTLS_LIB_ACCELERATED_X86_AES_PADLOCK_H */
+#endif /* GNUTLS_LIB_ACCELERATED_X86_AES_PADLOCK_H */

@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 /* This program tests the various certificate key exchange methods supported
@@ -43,16 +43,13 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "%s|<%d>| %s", side, level, str);
 }
 
-static
-void try_with_key(const char *name,
-		  const char *server_prio,
-		  const char *client_prio,
-		  const gnutls_datum_t * serv_cert,
-		  const gnutls_datum_t * serv_key,
-		  const gnutls_datum_t * client_cert,
-		  const gnutls_datum_t * client_key,
-		  unsigned cert_flags,
-		  int exp_error_server, int exp_error_client)
+static void try_with_key(const char *name, const char *server_prio,
+			 const char *client_prio,
+			 const gnutls_datum_t *serv_cert,
+			 const gnutls_datum_t *serv_key,
+			 const gnutls_datum_t *client_cert,
+			 const gnutls_datum_t *client_key, unsigned cert_flags,
+			 int exp_error_server, int exp_error_client)
 {
 	int ret;
 	/* Server stuff. */
@@ -74,9 +71,8 @@ void try_with_key(const char *name,
 	gnutls_anon_allocate_server_credentials(&s_anoncred);
 	gnutls_certificate_allocate_credentials(&serverx509cred);
 
-	ret = gnutls_certificate_set_x509_key_mem(serverx509cred,
-						  serv_cert, serv_key,
-						  GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_key_mem(
+		serverx509cred, serv_cert, serv_key, GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
 		fail("Could not set key/cert: %s\n", gnutls_strerror(ret));
 	}
@@ -108,8 +104,8 @@ void try_with_key(const char *name,
 		exit(1);
 
 	if (cert_flags == USE_CERT) {
-		gnutls_certificate_set_x509_key_mem(clientx509cred,
-						    client_cert, client_key,
+		gnutls_certificate_set_x509_key_mem(clientx509cred, client_cert,
+						    client_key,
 						    GNUTLS_X509_FMT_PEM);
 		gnutls_certificate_server_set_request(server,
 						      GNUTLS_CERT_REQUIRE);
@@ -168,17 +164,17 @@ void doit(void)
 
 	/* check compatibility and handling of SIGN-ECDSA-SECP256R1-SHA256 which
 	 * is available under TLS1.3 but not TLS1.2 */
-	try_with_key("TLS 1.2 with ecdhe ecdsa with ECDSA-SECP256R1-SHA256",
-		     NULL,
-		     "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ECDHE-ECDSA:-SIGN-ALL:+SIGN-ECDSA-SECP256R1-SHA256:+SIGN-ECDSA-SECP384R1-SHA384:+SIGN-ECDSA-SECP521R1-SHA512:+SIGN-RSA-SHA256",
-		     &server_ca3_localhost_ecc_cert, &server_ca3_ecc_key, NULL,
-		     NULL, 0, GNUTLS_E_NO_CIPHER_SUITES, GNUTLS_E_AGAIN);
+	try_with_key(
+		"TLS 1.2 with ecdhe ecdsa with ECDSA-SECP256R1-SHA256", NULL,
+		"NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ECDHE-ECDSA:-SIGN-ALL:+SIGN-ECDSA-SECP256R1-SHA256:+SIGN-ECDSA-SECP384R1-SHA384:+SIGN-ECDSA-SECP521R1-SHA512:+SIGN-RSA-SHA256",
+		&server_ca3_localhost_ecc_cert, &server_ca3_ecc_key, NULL, NULL,
+		0, GNUTLS_E_NO_CIPHER_SUITES, GNUTLS_E_AGAIN);
 
-	try_with_key("TLS 1.2 with ecdhe ecdsa with ECDSA-SHA256",
-		     NULL,
-		     "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ECDHE-ECDSA:-SIGN-ALL:+SIGN-ECDSA-SHA256:+SIGN-RSA-SHA256",
-		     &server_ca3_localhost_ecc_cert, &server_ca3_ecc_key, NULL,
-		     NULL, 0, 0, 0);
+	try_with_key(
+		"TLS 1.2 with ecdhe ecdsa with ECDSA-SHA256", NULL,
+		"NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ECDHE-ECDSA:-SIGN-ALL:+SIGN-ECDSA-SHA256:+SIGN-RSA-SHA256",
+		&server_ca3_localhost_ecc_cert, &server_ca3_ecc_key, NULL, NULL,
+		0, 0, 0);
 
 	gnutls_global_deinit();
 }

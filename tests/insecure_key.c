@@ -22,7 +22,7 @@
 /* Parts copied from GnuTLS example programs. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -30,10 +30,10 @@
 #include <string.h>
 #include <sys/types.h>
 #if !defined(_WIN32)
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
 #endif
 #include <unistd.h>
 #include <assert.h>
@@ -54,7 +54,7 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "<%d>| %s", level, str);
 }
 
-static time_t mytime(time_t * t)
+static time_t mytime(time_t *t)
 {
 	time_t then = 1474109119;
 	if (t)
@@ -83,25 +83,21 @@ void doit(void)
 	assert(gnutls_certificate_allocate_credentials(&clicred) >= 0);
 	assert(gnutls_certificate_allocate_credentials(&x509_cred) >= 0);
 
-	ret =
-	    gnutls_certificate_set_x509_trust_mem(clicred, &ca3_cert,
-						  GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_trust_mem(clicred, &ca3_cert,
+						    GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		fail("set_x509_trust_file failed: %s\n", gnutls_strerror(ret));
 
-	ret =
-	    gnutls_certificate_set_x509_key_mem2(x509_cred,
-						 &server_ca3_localhost_insecure_cert,
-						 &server_ca3_localhost_insecure_key,
-						 GNUTLS_X509_FMT_PEM, NULL, 0);
+	ret = gnutls_certificate_set_x509_key_mem2(
+		x509_cred, &server_ca3_localhost_insecure_cert,
+		&server_ca3_localhost_insecure_key, GNUTLS_X509_FMT_PEM, NULL,
+		0);
 	if (ret < 0)
 		fail("%s\n", gnutls_strerror(ret));
 
-	ret =
-	    gnutls_certificate_set_x509_key_mem2(x509_cred,
-						 &server_ca3_localhost6_cert_chain,
-						 &server_ca3_key,
-						 GNUTLS_X509_FMT_PEM, NULL, 0);
+	ret = gnutls_certificate_set_x509_key_mem2(
+		x509_cred, &server_ca3_localhost6_cert_chain, &server_ca3_key,
+		GNUTLS_X509_FMT_PEM, NULL, 0);
 	if (ret < 0)
 		fail("%s\n", gnutls_strerror(ret));
 

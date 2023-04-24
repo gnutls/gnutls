@@ -32,7 +32,7 @@
 #include "fuzzer.h"
 
 int __attribute__((visibility("protected")))
-    gnutls_rnd(gnutls_rnd_level_t level, void *data, size_t len)
+gnutls_rnd(gnutls_rnd_level_t level, void *data, size_t len)
 {
 	memset(data, 0xff, len);
 
@@ -43,7 +43,7 @@ int __attribute__((visibility("protected")))
 	return 0;
 }
 
-int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
 	int res;
 	gnutls_session_t session;
@@ -60,10 +60,8 @@ int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 	assert(res >= 0);
 
 	/*res = gnutls_set_default_priority(session); */
-	res =
-	    gnutls_priority_set_direct(session,
-				       "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3",
-				       NULL);
+	res = gnutls_priority_set_direct(
+		session, "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3", NULL);
 	assert(res >= 0);
 
 	memdata.data = data;

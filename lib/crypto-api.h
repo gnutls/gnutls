@@ -22,14 +22,13 @@
  */
 
 #ifndef GNUTLS_LIB_CRYPTO_API_H
-# define GNUTLS_LIB_CRYPTO_API_H
+#define GNUTLS_LIB_CRYPTO_API_H
 
-# include <gnutls_int.h>
+#include <gnutls_int.h>
 
-inline static
-int _gnutls_aead_cipher_init(gnutls_aead_cipher_hd_t handle,
-			     gnutls_cipher_algorithm_t cipher,
-			     const gnutls_datum_t * key)
+inline static int _gnutls_aead_cipher_init(gnutls_aead_cipher_hd_t handle,
+					   gnutls_cipher_algorithm_t cipher,
+					   const gnutls_datum_t *key)
 {
 	const cipher_entry_st *e;
 
@@ -40,22 +39,18 @@ int _gnutls_aead_cipher_init(gnutls_aead_cipher_hd_t handle,
 	return _gnutls_cipher_init(&handle->ctx_enc, e, key, NULL, 1);
 }
 
-inline static
-void _gnutls_aead_cipher_deinit(gnutls_aead_cipher_hd_t handle)
+inline static void _gnutls_aead_cipher_deinit(gnutls_aead_cipher_hd_t handle)
 {
 	api_aead_cipher_hd_st *h = handle;
 
 	_gnutls_cipher_deinit(&h->ctx_enc);
 }
 
-int
-_gnutls_hkdf_extract(gnutls_mac_algorithm_t mac,
-		     const gnutls_datum_t * key,
-		     const gnutls_datum_t * salt, void *output);
+int _gnutls_hkdf_extract(gnutls_mac_algorithm_t mac, const gnutls_datum_t *key,
+			 const gnutls_datum_t *salt, void *output);
 
-int
-_gnutls_hkdf_expand(gnutls_mac_algorithm_t mac,
-		    const gnutls_datum_t * key,
-		    const gnutls_datum_t * info, void *output, size_t length);
+int _gnutls_hkdf_expand(gnutls_mac_algorithm_t mac, const gnutls_datum_t *key,
+			const gnutls_datum_t *info, void *output,
+			size_t length);
 
-#endif				/* GNUTLS_LIB_CRYPTO_API_H */
+#endif /* GNUTLS_LIB_CRYPTO_API_H */

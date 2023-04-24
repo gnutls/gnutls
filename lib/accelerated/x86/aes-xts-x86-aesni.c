@@ -40,9 +40,8 @@ struct x86_aes_xts_ctx {
 	int enc;
 };
 
-static int
-x86_aes_xts_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx,
-			int enc)
+static int x86_aes_xts_cipher_init(gnutls_cipher_algorithm_t algorithm,
+				   void **_ctx, int enc)
 {
 	if (algorithm != GNUTLS_CIPHER_AES_128_XTS &&
 	    algorithm != GNUTLS_CIPHER_AES_256_XTS)
@@ -59,8 +58,8 @@ x86_aes_xts_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx,
 	return 0;
 }
 
-static int
-x86_aes_xts_cipher_setkey(void *_ctx, const void *userkey, size_t keysize)
+static int x86_aes_xts_cipher_setkey(void *_ctx, const void *userkey,
+				     size_t keysize)
 {
 	struct x86_aes_xts_ctx *ctx = _ctx;
 	int ret;
@@ -81,20 +80,17 @@ x86_aes_xts_cipher_setkey(void *_ctx, const void *userkey, size_t keysize)
 	keybits = keysize * 4;
 
 	if (ctx->enc)
-		ret =
-		    aesni_set_encrypt_key(key, keybits,
-					  ALIGN16(&ctx->block_key));
+		ret = aesni_set_encrypt_key(key, keybits,
+					    ALIGN16(&ctx->block_key));
 	else
-		ret =
-		    aesni_set_decrypt_key(key, keybits,
-					  ALIGN16(&ctx->block_key));
+		ret = aesni_set_decrypt_key(key, keybits,
+					    ALIGN16(&ctx->block_key));
 
 	if (ret != 0)
 		return gnutls_assert_val(GNUTLS_E_ENCRYPTION_FAILED);
 
-	ret =
-	    aesni_set_encrypt_key(key + (keysize / 2), keybits,
-				  ALIGN16(&ctx->tweak_key));
+	ret = aesni_set_encrypt_key(key + (keysize / 2), keybits,
+				    ALIGN16(&ctx->tweak_key));
 	if (ret != 0)
 		return gnutls_assert_val(GNUTLS_E_ENCRYPTION_FAILED);
 
@@ -112,9 +108,8 @@ static int x86_aes_xts_setiv(void *_ctx, const void *iv, size_t iv_size)
 	return 0;
 }
 
-static int
-x86_aes_xts_encrypt(void *_ctx, const void *src, size_t src_size,
-		    void *dst, size_t dst_size)
+static int x86_aes_xts_encrypt(void *_ctx, const void *src, size_t src_size,
+			       void *dst, size_t dst_size)
 {
 	struct x86_aes_xts_ctx *ctx = _ctx;
 
@@ -129,9 +124,8 @@ x86_aes_xts_encrypt(void *_ctx, const void *src, size_t src_size,
 	return 0;
 }
 
-static int
-x86_aes_xts_decrypt(void *_ctx, const void *src, size_t src_size,
-		    void *dst, size_t dst_size)
+static int x86_aes_xts_decrypt(void *_ctx, const void *src, size_t src_size,
+			       void *dst, size_t dst_size)
 {
 	struct x86_aes_xts_ctx *ctx = _ctx;
 

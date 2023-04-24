@@ -53,9 +53,12 @@
  *     connect -> connection established: (TLS1.1)-(RSA)-(AES-128-CBC)-(SHA1)
  */
 
-#define _assert(cond, format, ...) if (!(cond)) \
+#define _assert(cond, format, ...) \
+	if (!(cond))               \
 	_fail("Assertion `" #cond "` failed: " format "\n", ##__VA_ARGS__)
-#define _check(cond) if (!(cond)) _fail("Assertion `" #cond "` failed.")
+#define _check(cond) \
+	if (!(cond)) \
+	_fail("Assertion `" #cond "` failed.")
 
 unsigned parse_port(const char *port_str);
 gnutls_protocol_t parse_protocol(const char *name);
@@ -130,23 +133,21 @@ void cmd_connect(const char *ca_file, unsigned port)
 		return;
 	}
 
-	_check(gnutls_server_name_set(session, GNUTLS_NAME_DNS,
-				      "example.com",
+	_check(gnutls_server_name_set(session, GNUTLS_NAME_DNS, "example.com",
 				      strlen("example.com")) >= 0);
 	gnutls_session_set_verify_cert(session, "example.com", 0);
 
 	_check(gnutls_certificate_allocate_credentials(&cred) >= 0);
-	_check(gnutls_certificate_set_x509_trust_file(cred,
-						      ca_file,
-						      GNUTLS_X509_FMT_PEM) ==
-	       1);
+	_check(gnutls_certificate_set_x509_trust_file(
+		       cred, ca_file, GNUTLS_X509_FMT_PEM) == 1);
 	_check(gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, cred) >=
 	       0);
 
 	sock = tcp_connect("127.0.0.1", port);
 	_assert(sock != -1, "Connection to 127.0.0.1:%u has failed!", port);
-	_assert(setsockopt(sock, IPPROTO_TCP, TCP_NODELAY,
-			   &sock_flags, sizeof(int)) == 0, "setsockopt failed");
+	_assert(setsockopt(sock, IPPROTO_TCP, TCP_NODELAY, &sock_flags,
+			   sizeof(int)) == 0,
+		"setsockopt failed");
 
 	gnutls_transport_set_int(session, sock);
 	gnutls_handshake_set_timeout(session, GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT);
@@ -175,9 +176,9 @@ void cmd_protocol_set_disabled(const char *name)
 	int ret;
 	ret = gnutls_protocol_set_enabled(parse_protocol(name), 0);
 	printf("protocol_set_disabled %s -> %s\n", name,
-	       ret == 0 ? "OK" :
+	       ret == 0			       ? "OK" :
 	       ret == GNUTLS_E_INVALID_REQUEST ? "INVALID_REQUEST" :
-	       gnutls_strerror(ret));
+						 gnutls_strerror(ret));
 }
 
 void cmd_protocol_set_enabled(const char *name)
@@ -185,9 +186,9 @@ void cmd_protocol_set_enabled(const char *name)
 	int ret;
 	ret = gnutls_protocol_set_enabled(parse_protocol(name), 1);
 	printf("protocol_set_enabled %s -> %s\n", name,
-	       ret == 0 ? "OK" :
+	       ret == 0			       ? "OK" :
 	       ret == GNUTLS_E_INVALID_REQUEST ? "INVALID_REQUEST" :
-	       gnutls_strerror(ret));
+						 gnutls_strerror(ret));
 }
 
 void cmd_reinit(void)

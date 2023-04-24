@@ -30,10 +30,10 @@
 #include <ext/ext_master_secret.h>
 
 static int _gnutls_ext_master_secret_recv_params(gnutls_session_t session,
-						 const uint8_t * data,
+						 const uint8_t *data,
 						 size_t data_size);
 static int _gnutls_ext_master_secret_send_params(gnutls_session_t session,
-						 gnutls_buffer_st * extdata);
+						 gnutls_buffer_st *extdata);
 
 const hello_ext_entry_st ext_mod_ext_master_secret = {
 	.name = "Extended Master Secret",
@@ -41,9 +41,9 @@ const hello_ext_entry_st ext_mod_ext_master_secret = {
 	.gid = GNUTLS_EXTENSION_EXT_MASTER_SECRET,
 	.client_parse_point = GNUTLS_EXT_MANDATORY,
 	.server_parse_point = GNUTLS_EXT_MANDATORY,
-	.validity =
-	    GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_DTLS |
-	    GNUTLS_EXT_FLAG_CLIENT_HELLO | GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
+	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_DTLS |
+		    GNUTLS_EXT_FLAG_CLIENT_HELLO |
+		    GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
 	.recv_func = _gnutls_ext_master_secret_recv_params,
 	.send_func = _gnutls_ext_master_secret_send_params,
 	.pack_func = NULL,
@@ -57,7 +57,7 @@ static inline unsigned have_only_ssl3_enabled(gnutls_session_t session)
 {
 	if (session->internals.priorities->protocol.num_priorities == 1 &&
 	    session->internals.priorities->protocol.priorities[0] ==
-	    GNUTLS_SSL3)
+		    GNUTLS_SSL3)
 		return 1;
 	return 0;
 }
@@ -68,9 +68,9 @@ static inline unsigned have_only_ssl3_enabled(gnutls_session_t session)
  * sets a flag into the session security parameters.
  *
  */
-static int
-_gnutls_ext_master_secret_recv_params(gnutls_session_t session,
-				      const uint8_t * data, size_t _data_size)
+static int _gnutls_ext_master_secret_recv_params(gnutls_session_t session,
+						 const uint8_t *data,
+						 size_t _data_size)
 {
 	ssize_t data_size = _data_size;
 
@@ -102,9 +102,8 @@ _gnutls_ext_master_secret_recv_params(gnutls_session_t session,
 
 /* returns data_size or a negative number on failure
  */
-static int
-_gnutls_ext_master_secret_send_params(gnutls_session_t session,
-				      gnutls_buffer_st * extdata)
+static int _gnutls_ext_master_secret_send_params(gnutls_session_t session,
+						 gnutls_buffer_st *extdata)
 {
 	if ((session->internals.flags & GNUTLS_NO_DEFAULT_EXTENSIONS) ||
 	    session->internals.priorities->no_extensions != 0 ||
@@ -117,16 +116,16 @@ _gnutls_ext_master_secret_send_params(gnutls_session_t session,
 #ifdef ENABLE_SSL3
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
 		if (have_only_ssl3_enabled(session))
-			return 0;	/* this extension isn't available for SSL 3.0 */
+			return 0; /* this extension isn't available for SSL 3.0 */
 
 		return GNUTLS_E_INT_RET_0;
-	} else {		/* server side */
+	} else { /* server side */
 		const version_entry_st *ver = get_version(session);
 		if (unlikely(ver == NULL))
 			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-		if (ver->id != GNUTLS_SSL3
-		    && session->security_parameters.ext_master_secret != 0)
+		if (ver->id != GNUTLS_SSL3 &&
+		    session->security_parameters.ext_master_secret != 0)
 			return GNUTLS_E_INT_RET_0;
 	}
 

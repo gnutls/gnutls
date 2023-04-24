@@ -37,9 +37,8 @@ void _gnutls_hello_ext_default_deinit(gnutls_ext_priv_data_t priv)
  *
  * This also prevents and errors on duplicate entries.
  */
-int
-_gnutls_hello_ext_set_datum(gnutls_session_t session,
-			    extensions_t id, const gnutls_datum_t * data)
+int _gnutls_hello_ext_set_datum(gnutls_session_t session, extensions_t id,
+				const gnutls_datum_t *data)
 {
 	gnutls_ext_priv_data_t epriv;
 
@@ -54,17 +53,15 @@ _gnutls_hello_ext_set_datum(gnutls_session_t session,
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
 	_gnutls_write_uint16(data->size, epriv);
-	memcpy(((uint8_t *) epriv) + 2, data->data, data->size);
+	memcpy(((uint8_t *)epriv) + 2, data->data, data->size);
 
 	_gnutls_hello_ext_set_priv(session, id, epriv);
 
 	return 0;
 }
 
-int
-_gnutls_hello_ext_get_datum(gnutls_session_t session,
-			    extensions_t id,
-			    gnutls_datum_t * data /* constant contents */ )
+int _gnutls_hello_ext_get_datum(gnutls_session_t session, extensions_t id,
+				gnutls_datum_t *data /* constant contents */)
 {
 	gnutls_ext_priv_data_t epriv;
 	int ret;
@@ -74,16 +71,14 @@ _gnutls_hello_ext_get_datum(gnutls_session_t session,
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 
 	data->size = _gnutls_read_uint16(epriv);
-	data->data = ((uint8_t *) epriv) + 2;
+	data->data = ((uint8_t *)epriv) + 2;
 
 	return 0;
 }
 
-int
-_gnutls_hello_ext_get_resumed_datum(gnutls_session_t session,
-				    extensions_t id,
-				    gnutls_datum_t *
-				    data /* constant contents */ )
+int _gnutls_hello_ext_get_resumed_datum(
+	gnutls_session_t session, extensions_t id,
+	gnutls_datum_t *data /* constant contents */)
 {
 	gnutls_ext_priv_data_t epriv;
 	int ret;
@@ -93,14 +88,13 @@ _gnutls_hello_ext_get_resumed_datum(gnutls_session_t session,
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 
 	data->size = _gnutls_read_uint16(epriv);
-	data->data = ((uint8_t *) epriv) + 2;
+	data->data = ((uint8_t *)epriv) + 2;
 
 	return 0;
 }
 
-int
-_gnutls_hello_ext_default_pack(gnutls_ext_priv_data_t epriv,
-			       gnutls_buffer_st * ps)
+int _gnutls_hello_ext_default_pack(gnutls_ext_priv_data_t epriv,
+				   gnutls_buffer_st *ps)
 {
 	size_t size;
 
@@ -109,9 +103,8 @@ _gnutls_hello_ext_default_pack(gnutls_ext_priv_data_t epriv,
 	return _gnutls_buffer_append_data(ps, epriv, size + 2);
 }
 
-int
-_gnutls_hello_ext_default_unpack(gnutls_buffer_st * ps,
-				 gnutls_ext_priv_data_t * epriv)
+int _gnutls_hello_ext_default_unpack(gnutls_buffer_st *ps,
+				     gnutls_ext_priv_data_t *epriv)
 {
 	gnutls_datum_t data;
 	uint8_t *store;

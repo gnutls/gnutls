@@ -22,7 +22,7 @@
 /* Parts copied from GnuTLS example programs. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -30,10 +30,10 @@
 #include <string.h>
 #include <sys/types.h>
 #if !defined(_WIN32)
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
 #endif
 #include <unistd.h>
 #include <assert.h>
@@ -44,7 +44,7 @@
 
 #include "cert-common.h"
 #include "utils.h"
-#define MIN(x,y) (((x)<(y))?(x):(y))
+#define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
 /* Test for gnutls_certificate_set_x509_key()
  *
@@ -55,7 +55,7 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "<%d>| %s", level, str);
 }
 
-static time_t mytime(time_t * t)
+static time_t mytime(time_t *t)
 {
 	time_t then = 1461671166;
 	if (t)
@@ -64,7 +64,7 @@ static time_t mytime(time_t * t)
 	return then;
 }
 
-static void compare(const gnutls_datum_t * der, const void *ipem)
+static void compare(const gnutls_datum_t *der, const void *ipem)
 {
 	gnutls_datum_t pem = { (void *)ipem, strlen((char *)ipem) };
 	gnutls_datum_t new_der;
@@ -75,8 +75,8 @@ static void compare(const gnutls_datum_t * der, const void *ipem)
 		fail("error: %s\n", gnutls_strerror(ret));
 	}
 
-	if (der->size != new_der.size
-	    || memcmp(der->data, new_der.data, der->size) != 0) {
+	if (der->size != new_der.size ||
+	    memcmp(der->data, new_der.data, der->size) != 0) {
 		fail("error in %d: %s\n", __LINE__, "cert don't match");
 		exit(1);
 	}
@@ -85,7 +85,7 @@ static void compare(const gnutls_datum_t * der, const void *ipem)
 }
 
 static int import_key(gnutls_certificate_credentials_t xcred,
-		      const gnutls_datum_t * skey, const gnutls_datum_t * cert)
+		      const gnutls_datum_t *skey, const gnutls_datum_t *cert)
 {
 	gnutls_x509_privkey_t key;
 	gnutls_x509_crt_t *crt_list;
@@ -95,9 +95,8 @@ static int import_key(gnutls_certificate_credentials_t xcred,
 
 	assert(gnutls_x509_privkey_init(&key) >= 0);
 
-	ret =
-	    gnutls_x509_crt_list_import2(&crt_list, &crt_list_size, cert,
-					 GNUTLS_X509_FMT_PEM, 0);
+	ret = gnutls_x509_crt_list_import2(&crt_list, &crt_list_size, cert,
+					   GNUTLS_X509_FMT_PEM, 0);
 	if (ret < 0) {
 		fail("error in gnutls_x509_crt_list_import2: %s\n",
 		     gnutls_strerror(ret));
@@ -108,8 +107,8 @@ static int import_key(gnutls_certificate_credentials_t xcred,
 		fail("error in key import: %s\n", gnutls_strerror(ret));
 	}
 
-	ret = gnutls_certificate_set_x509_key(xcred, crt_list,
-					      crt_list_size, key);
+	ret = gnutls_certificate_set_x509_key(xcred, crt_list, crt_list_size,
+					      key);
 	if (ret < 0) {
 		success("error in gnutls_certificate_set_x509_key: %s\n",
 			gnutls_strerror(ret));
@@ -132,7 +131,7 @@ static int import_key(gnutls_certificate_credentials_t xcred,
 		compare(&tcert, cert->data + i);
 	}
 
- cleanup:
+cleanup:
 	gnutls_x509_privkey_deinit(key);
 	for (i = 0; i < crt_list_size; i++) {
 		gnutls_x509_crt_deinit(crt_list[i]);
@@ -164,9 +163,8 @@ static void basic(void)
 
 	gnutls_certificate_set_flags(x509_cred, GNUTLS_CERTIFICATE_API_V2);
 
-	ret =
-	    gnutls_certificate_set_x509_trust_mem(clicred, &ca_cert,
-						  GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_trust_mem(clicred, &ca_cert,
+						    GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		fail("set_x509_trust_file failed: %s\n", gnutls_strerror(ret));
 

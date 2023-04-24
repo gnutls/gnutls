@@ -46,9 +46,8 @@ typedef struct test_case_st {
 	const char *server_prio;
 } test_case_st;
 
-static int
-serv_psk_func(gnutls_session_t session, const char *username,
-	      gnutls_datum_t * key)
+static int serv_psk_func(gnutls_session_t session, const char *username,
+			 gnutls_datum_t *key)
 {
 	key->data = gnutls_malloc(4);
 	assert(key->data != NULL);
@@ -61,22 +60,17 @@ serv_psk_func(gnutls_session_t session, const char *username,
 }
 
 #define SALT_TEST1 "3a3xX3Myzb9YJn5X0R7sbx"
-#define VERIF_TEST1 "CEqjUZBlkQCocfOR0E4AsPZKOFYPGjKFMHW7KDcnpE4sH4.iGMbkygb/bViRNjskF9/TQdD46Mvlt6pLs5MZoTn8mO3G.RGyXdWuIrhnVn29p41Cpc5RhTLaeUm3asW6LF60VTKnGERC0eB37xZUsaTpzmaTNdD4mOoYCN3bD9Y"
-#define PRIME "Ewl2hcjiutMd3Fu2lgFnUXWSc67TVyy2vwYCKoS9MLsrdJVT9RgWTCuEqWJrfB6uE3LsE9GkOlaZabS7M29sj5TnzUqOLJMjiwEzArfiLr9WbMRANlF68N5AVLcPWvNx6Zjl3m5Scp0BzJBz9TkgfhzKJZ.WtP3Mv/67I/0wmRZ"
-gnutls_datum_t tprime = {
-	.data = (void *)PRIME,
-	.size = sizeof(PRIME) - 1
-};
+#define VERIF_TEST1 \
+	"CEqjUZBlkQCocfOR0E4AsPZKOFYPGjKFMHW7KDcnpE4sH4.iGMbkygb/bViRNjskF9/TQdD46Mvlt6pLs5MZoTn8mO3G.RGyXdWuIrhnVn29p41Cpc5RhTLaeUm3asW6LF60VTKnGERC0eB37xZUsaTpzmaTNdD4mOoYCN3bD9Y"
+#define PRIME \
+	"Ewl2hcjiutMd3Fu2lgFnUXWSc67TVyy2vwYCKoS9MLsrdJVT9RgWTCuEqWJrfB6uE3LsE9GkOlaZabS7M29sj5TnzUqOLJMjiwEzArfiLr9WbMRANlF68N5AVLcPWvNx6Zjl3m5Scp0BzJBz9TkgfhzKJZ.WtP3Mv/67I/0wmRZ"
+gnutls_datum_t tprime = { .data = (void *)PRIME, .size = sizeof(PRIME) - 1 };
 
-gnutls_datum_t test1_verif = {
-	.data = (void *)VERIF_TEST1,
-	.size = sizeof(VERIF_TEST1) - 1
-};
+gnutls_datum_t test1_verif = { .data = (void *)VERIF_TEST1,
+			       .size = sizeof(VERIF_TEST1) - 1 };
 
-gnutls_datum_t test1_salt = {
-	.data = (void *)SALT_TEST1,
-	.size = sizeof(SALT_TEST1) - 1
-};
+gnutls_datum_t test1_salt = { .data = (void *)SALT_TEST1,
+			      .size = sizeof(SALT_TEST1) - 1 };
 
 const char *side;
 #define switch_side(str) side = str
@@ -87,10 +81,9 @@ static void tls_log_func(int level, const char *str)
 }
 
 #ifdef ENABLE_SRP
-static int
-serv_srp_func(gnutls_session_t session, const char *username,
-	      gnutls_datum_t * salt, gnutls_datum_t * verifier,
-	      gnutls_datum_t * generator, gnutls_datum_t * prime)
+static int serv_srp_func(gnutls_session_t session, const char *username,
+			 gnutls_datum_t *salt, gnutls_datum_t *verifier,
+			 gnutls_datum_t *generator, gnutls_datum_t *prime)
 {
 	int ret;
 	if (debug)
@@ -120,7 +113,7 @@ serv_srp_func(gnutls_session_t session, const char *username,
 }
 #endif
 
-static void try(test_case_st * test)
+static void try(test_case_st *test)
 {
 	int sret, cret, ret;
 	gnutls_anon_client_credentials_t c_anon_cred;
@@ -133,8 +126,8 @@ static void try(test_case_st * test)
 	gnutls_srp_server_credentials_t s_srp_cred;
 	gnutls_srp_client_credentials_t c_srp_cred;
 #endif
-	const gnutls_datum_t p3_2048 =
-	    { (void *)pkcs3_2048, strlen(pkcs3_2048) };
+	const gnutls_datum_t p3_2048 = { (void *)pkcs3_2048,
+					 strlen(pkcs3_2048) };
 	gnutls_dh_params_t dh_params = NULL;
 
 	gnutls_session_t server, client;
@@ -170,11 +163,11 @@ static void try(test_case_st * test)
 	if (test->have_anon_cred) {
 		gnutls_credentials_set(server, GNUTLS_CRD_ANON, s_anon_cred);
 		if (test->have_anon_dh_params)
-			gnutls_anon_set_server_known_dh_params(s_anon_cred,
-							       GNUTLS_SEC_PARAM_MEDIUM);
+			gnutls_anon_set_server_known_dh_params(
+				s_anon_cred, GNUTLS_SEC_PARAM_MEDIUM);
 		else if (test->have_anon_exp_dh_params) {
-			ret = gnutls_dh_params_import_pkcs3(dh_params, &p3_2048,
-							    GNUTLS_X509_FMT_PEM);
+			ret = gnutls_dh_params_import_pkcs3(
+				dh_params, &p3_2048, GNUTLS_X509_FMT_PEM);
 			assert(ret >= 0);
 			gnutls_anon_set_server_dh_params(s_anon_cred,
 							 dh_params);
@@ -185,11 +178,11 @@ static void try(test_case_st * test)
 		gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
 				       s_cert_cred);
 		if (test->have_cert_dh_params)
-			gnutls_certificate_set_known_dh_params(s_cert_cred,
-							       GNUTLS_SEC_PARAM_MEDIUM);
+			gnutls_certificate_set_known_dh_params(
+				s_cert_cred, GNUTLS_SEC_PARAM_MEDIUM);
 		else if (test->have_cert_exp_dh_params) {
-			ret = gnutls_dh_params_import_pkcs3(dh_params, &p3_2048,
-							    GNUTLS_X509_FMT_PEM);
+			ret = gnutls_dh_params_import_pkcs3(
+				dh_params, &p3_2048, GNUTLS_X509_FMT_PEM);
 			assert(ret >= 0);
 			gnutls_certificate_set_dh_params(s_cert_cred,
 							 dh_params);
@@ -199,11 +192,11 @@ static void try(test_case_st * test)
 	if (test->have_psk_cred) {
 		gnutls_credentials_set(server, GNUTLS_CRD_PSK, s_psk_cred);
 		if (test->have_psk_dh_params)
-			gnutls_psk_set_server_known_dh_params(s_psk_cred,
-							      GNUTLS_SEC_PARAM_MEDIUM);
+			gnutls_psk_set_server_known_dh_params(
+				s_psk_cred, GNUTLS_SEC_PARAM_MEDIUM);
 		else if (test->have_psk_exp_dh_params) {
-			ret = gnutls_dh_params_import_pkcs3(dh_params, &p3_2048,
-							    GNUTLS_X509_FMT_PEM);
+			ret = gnutls_dh_params_import_pkcs3(
+				dh_params, &p3_2048, GNUTLS_X509_FMT_PEM);
 			assert(ret >= 0);
 			gnutls_psk_set_server_dh_params(s_psk_cred, dh_params);
 		}
@@ -221,39 +214,43 @@ static void try(test_case_st * test)
 #endif
 
 	if (test->have_rsa_decrypt_cert) {
-		assert(gnutls_certificate_set_x509_key_mem
-		       (s_cert_cred, &server_ca3_localhost_rsa_decrypt_cert,
-			&server_ca3_key, GNUTLS_X509_FMT_PEM) >= 0);
+		assert(gnutls_certificate_set_x509_key_mem(
+			       s_cert_cred,
+			       &server_ca3_localhost_rsa_decrypt_cert,
+			       &server_ca3_key, GNUTLS_X509_FMT_PEM) >= 0);
 	}
 
 	if (test->have_ecc_sign_cert) {
-		assert(gnutls_certificate_set_x509_key_mem
-		       (s_cert_cred, &server_ca3_localhost_ecc_cert,
-			&server_ca3_ecc_key, GNUTLS_X509_FMT_PEM) >= 0);
+		assert(gnutls_certificate_set_x509_key_mem(
+			       s_cert_cred, &server_ca3_localhost_ecc_cert,
+			       &server_ca3_ecc_key, GNUTLS_X509_FMT_PEM) >= 0);
 	}
 
 	if (test->have_ed25519_sign_cert) {
-		assert(gnutls_certificate_set_x509_key_mem
-		       (s_cert_cred, &server_ca3_eddsa_cert,
-			&server_ca3_eddsa_key, GNUTLS_X509_FMT_PEM) >= 0);
+		assert(gnutls_certificate_set_x509_key_mem(
+			       s_cert_cred, &server_ca3_eddsa_cert,
+			       &server_ca3_eddsa_key,
+			       GNUTLS_X509_FMT_PEM) >= 0);
 	}
 
 	if (test->have_rsa_sign_cert) {
-		assert(gnutls_certificate_set_x509_key_mem
-		       (s_cert_cred, &server_ca3_localhost_rsa_sign_cert,
-			&server_ca3_key, GNUTLS_X509_FMT_PEM) >= 0);
+		assert(gnutls_certificate_set_x509_key_mem(
+			       s_cert_cred, &server_ca3_localhost_rsa_sign_cert,
+			       &server_ca3_key, GNUTLS_X509_FMT_PEM) >= 0);
 	}
 
 	if (test->have_gost12_256_cert) {
-		assert(gnutls_certificate_set_x509_key_mem
-		       (s_cert_cred, &server_ca3_gost12_256_cert,
-			&server_ca3_gost12_256_key, GNUTLS_X509_FMT_PEM) >= 0);
+		assert(gnutls_certificate_set_x509_key_mem(
+			       s_cert_cred, &server_ca3_gost12_256_cert,
+			       &server_ca3_gost12_256_key,
+			       GNUTLS_X509_FMT_PEM) >= 0);
 	}
 
 	if (test->have_gost12_512_cert) {
-		assert(gnutls_certificate_set_x509_key_mem
-		       (s_cert_cred, &server_ca3_gost12_512_cert,
-			&server_ca3_gost12_512_key, GNUTLS_X509_FMT_PEM) >= 0);
+		assert(gnutls_certificate_set_x509_key_mem(
+			       s_cert_cred, &server_ca3_gost12_512_cert,
+			       &server_ca3_gost12_512_key,
+			       GNUTLS_X509_FMT_PEM) >= 0);
 	}
 
 	/* client does everything */
@@ -264,8 +261,8 @@ static void try(test_case_st * test)
 	gnutls_credentials_set(client, GNUTLS_CRD_SRP, c_srp_cred);
 #endif
 
-	assert(gnutls_psk_set_client_credentials
-	       (c_psk_cred, "psk", &pskkey, GNUTLS_PSK_KEY_HEX) >= 0);
+	assert(gnutls_psk_set_client_credentials(c_psk_cred, "psk", &pskkey,
+						 GNUTLS_PSK_KEY_HEX) >= 0);
 
 #ifdef ENABLE_SRP
 	assert(gnutls_srp_set_client_credentials(c_srp_cred, "test1", "test") >=
@@ -284,12 +281,13 @@ static void try(test_case_st * test)
 
 	HANDSHAKE_EXPECT(client, server, test->client_ret, test->server_ret);
 
-	if (test->client_ret == 0 && test->server_ret == 0 && test->exp_version) {
+	if (test->client_ret == 0 && test->server_ret == 0 &&
+	    test->exp_version) {
 		if (gnutls_protocol_get_version(client) != test->exp_version)
 			fail("expected version (%s) does not match %s\n",
 			     gnutls_protocol_get_name(test->exp_version),
-			     gnutls_protocol_get_name
-			     (gnutls_protocol_get_version(client)));
+			     gnutls_protocol_get_name(
+				     gnutls_protocol_get_version(client)));
 	}
 
 	gnutls_deinit(server);

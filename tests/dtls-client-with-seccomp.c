@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,20 +35,20 @@ int main(void)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
-# include <unistd.h>
-# include <signal.h>
-# include <gnutls/gnutls.h>
-# include <gnutls/dtls.h>
-# include <assert.h>
+#include <string.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <signal.h>
+#include <gnutls/gnutls.h>
+#include <gnutls/dtls.h>
+#include <assert.h>
 
-# include "cert-common.h"
-# include "utils.h"
+#include "cert-common.h"
+#include "utils.h"
 
 static void terminate(void);
 
@@ -62,7 +62,7 @@ static void client_log_func(int level, const char *str)
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
 
-# define MAX_BUF 1024
+#define MAX_BUF 1024
 
 static ssize_t push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 {
@@ -111,8 +111,7 @@ static void client(int fd, const char *prio)
 	 */
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret < 0) {
 		fail("client: Handshake failed\n");
@@ -125,8 +124,8 @@ static void client(int fd, const char *prio)
 
 	if (debug)
 		success("client: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	do {
 		ret = gnutls_record_recv(session, buffer, sizeof(buffer) - 1);
@@ -147,7 +146,7 @@ static void client(int fd, const char *prio)
 		     gnutls_strerror(ret));
 	}
 
- end:
+end:
 
 	close(fd);
 
@@ -188,9 +187,8 @@ static void server(int fd, const char *prio)
 
 	gnutls_certificate_allocate_credentials(&xcred);
 
-	ret = gnutls_certificate_set_x509_key_mem(xcred,
-						  &server_cert, &server_key,
-						  GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_key_mem(
+		xcred, &server_cert, &server_key, GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);
 
@@ -210,8 +208,7 @@ static void server(int fd, const char *prio)
 
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 	if (ret < 0) {
 		close(fd);
 		gnutls_deinit(session);
@@ -224,8 +221,8 @@ static void server(int fd, const char *prio)
 
 	if (debug)
 		success("server: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	/* see the Getting peer's information example */
 	/* print_info(session); */
@@ -260,8 +257,7 @@ static void server(int fd, const char *prio)
 		success("server: finished\n");
 }
 
-static
-void run(const char *name, const char *prio)
+static void run(const char *name, const char *prio)
 {
 	int fd[2];
 	int ret;
@@ -302,4 +298,4 @@ void doit(void)
 {
 	run("dtls1.2", "NORMAL:-KX-ALL:+ECDHE-RSA:-VERS-ALL:+VERS-DTLS1.2");
 }
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

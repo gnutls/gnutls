@@ -33,9 +33,8 @@
 #include "session_pack.h"
 #include "db.h"
 
-static int
-pack_ticket(gnutls_session_t session, tls13_ticket_st * ticket,
-	    gnutls_datum_t * packed)
+static int pack_ticket(gnutls_session_t session, tls13_ticket_st *ticket,
+		       gnutls_datum_t *packed)
 {
 	uint8_t *p;
 	gnutls_datum_t state;
@@ -45,9 +44,8 @@ pack_ticket(gnutls_session_t session, tls13_ticket_st * ticket,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	packed->size = 2 + 4 + 4 +
-	    1 + ticket->prf->output_size +
-	    1 + ticket->nonce_size + 2 + state.size + 12;
+	packed->size = 2 + 4 + 4 + 1 + ticket->prf->output_size + 1 +
+		       ticket->nonce_size + 2 + state.size + 12;
 
 	packed->data = gnutls_malloc(packed->size);
 	if (!packed->data) {
@@ -80,7 +78,7 @@ pack_ticket(gnutls_session_t session, tls13_ticket_st * ticket,
 	memcpy(p, state.data, state.size);
 	p += state.size;
 
-	_gnutls_write_uint32((uint64_t) ticket->creation_time.tv_sec >> 32, p);
+	_gnutls_write_uint32((uint64_t)ticket->creation_time.tv_sec >> 32, p);
 	p += 4;
 	_gnutls_write_uint32(ticket->creation_time.tv_sec & 0xFFFFFFFF, p);
 	p += 4;
@@ -88,14 +86,13 @@ pack_ticket(gnutls_session_t session, tls13_ticket_st * ticket,
 
 	ret = 0;
 
- cleanup:
+cleanup:
 	gnutls_free(state.data);
 	return ret;
 }
 
-static int
-unpack_ticket(gnutls_session_t session, gnutls_datum_t * packed,
-	      tls13_ticket_st * data)
+static int unpack_ticket(gnutls_session_t session, gnutls_datum_t *packed,
+			 tls13_ticket_st *data)
 {
 	uint32_t age_add, lifetime;
 	struct timespec creation_time;
@@ -194,8 +191,8 @@ unpack_ticket(gnutls_session_t session, gnutls_datum_t * packed,
 	return 0;
 }
 
-static int
-generate_session_ticket(gnutls_session_t session, tls13_ticket_st * ticket)
+static int generate_session_ticket(gnutls_session_t session,
+				   tls13_ticket_st *ticket)
 {
 	int ret;
 	gnutls_datum_t packed = { NULL, 0 };
@@ -206,14 +203,13 @@ generate_session_ticket(gnutls_session_t session, tls13_ticket_st * ticket)
 	if (session->internals.resumed) {
 		/* If we are resuming ensure that we don't extend the lifetime
 		 * of the ticket past the original session expiration time */
-		if (now.tv_sec >=
-		    session->security_parameters.timestamp +
-		    session->internals.expire_time)
-			return GNUTLS_E_INT_RET_0;	/* don't send ticket */
+		if (now.tv_sec >= session->security_parameters.timestamp +
+					  session->internals.expire_time)
+			return GNUTLS_E_INT_RET_0; /* don't send ticket */
 		else
 			ticket->lifetime =
-			    session->security_parameters.timestamp +
-			    session->internals.expire_time - now.tv_sec;
+				session->security_parameters.timestamp +
+				session->internals.expire_time - now.tv_sec;
 	} else {
 		/* Set ticket lifetime to the default expiration time */
 		ticket->lifetime = session->internals.expire_time;
@@ -222,15 +218,14 @@ generate_session_ticket(gnutls_session_t session, tls13_ticket_st * ticket)
 	/* Generate a random 32-bit ticket nonce */
 	ticket->nonce_size = 4;
 
-	if ((ret = gnutls_rnd(GNUTLS_RND_NONCE,
-			      ticket->nonce, ticket->nonce_size)) < 0)
+	if ((ret = gnutls_rnd(GNUTLS_RND_NONCE, ticket->nonce,
+			      ticket->nonce_size)) < 0)
 		return gnutls_assert_val(ret);
 
-	if ((ret =
-	     gnutls_rnd(GNUTLS_RND_NONCE, &ticket->age_add,
-			sizeof(uint32_t))) < 0)
+	if ((ret = gnutls_rnd(GNUTLS_RND_NONCE, &ticket->age_add,
+			      sizeof(uint32_t))) < 0)
 		return gnutls_assert_val(ret);
-	/* This is merely to produce the same binder value on
+		/* This is merely to produce the same binder value on
 	 * different endian architectures. */
 #ifdef WORDS_BIGENDIAN
 	ticket->age_add = bswap_32(ticket->age_add);
@@ -260,7 +255,7 @@ generate_session_ticket(gnutls_session_t session, tls13_ticket_st * ticket)
 	return 0;
 }
 
-static int append_nst_extension(void *ctx, gnutls_buffer_st * buf)
+static int append_nst_extension(void *ctx, gnutls_buffer_st *buf)
 {
 	gnutls_session_t session = ctx;
 	int ret;
@@ -268,9 +263,8 @@ static int append_nst_extension(void *ctx, gnutls_buffer_st * buf)
 	if (!(session->internals.flags & GNUTLS_ENABLE_EARLY_DATA))
 		return 0;
 
-	ret = _gnutls_buffer_append_prefix(buf, 32,
-					   session->security_parameters.
-					   max_early_data_size);
+	ret = _gnutls_buffer_append_prefix(
+		buf, 32, session->security_parameters.max_early_data_size);
 	if (ret < 0)
 		gnutls_assert();
 
@@ -321,39 +315,32 @@ int _gnutls13_send_session_ticket(gnutls_session_t session, unsigned nr,
 				goto cleanup;
 			}
 
-			ret =
-			    _gnutls_buffer_append_prefix(&buf, 32,
-							 ticket.lifetime);
+			ret = _gnutls_buffer_append_prefix(&buf, 32,
+							   ticket.lifetime);
 			if (ret < 0) {
 				gnutls_assert();
 				goto cleanup;
 			}
 
-			ret =
-			    _gnutls_buffer_append_prefix(&buf, 32,
-							 ticket.age_add);
+			ret = _gnutls_buffer_append_prefix(&buf, 32,
+							   ticket.age_add);
 			if (ret < 0) {
 				gnutls_assert();
 				goto cleanup;
 			}
 
 			/* append ticket_nonce */
-			ret =
-			    _gnutls_buffer_append_data_prefix(&buf, 8,
-							      ticket.nonce,
-							      ticket.nonce_size);
+			ret = _gnutls_buffer_append_data_prefix(
+				&buf, 8, ticket.nonce, ticket.nonce_size);
 			if (ret < 0) {
 				gnutls_assert();
 				goto cleanup;
 			}
 
 			/* append ticket */
-			ret =
-			    _gnutls_buffer_append_data_prefix(&buf, 16,
-							      ticket.
-							      ticket.data,
-							      ticket.
-							      ticket.size);
+			ret = _gnutls_buffer_append_data_prefix(
+				&buf, 16, ticket.ticket.data,
+				ticket.ticket.size);
 			if (ret < 0) {
 				gnutls_assert();
 				goto cleanup;
@@ -369,10 +356,9 @@ int _gnutls13_send_session_ticket(gnutls_session_t session, unsigned nr,
 			}
 			init_pos = ret;
 
-			ret =
-			    _gnutls_extv_append(&buf, ext_mod_early_data.tls_id,
-						session, (extv_append_func)
-						append_nst_extension);
+			ret = _gnutls_extv_append(
+				&buf, ext_mod_early_data.tls_id, session,
+				(extv_append_func)append_nst_extension);
 			if (ret < 0) {
 				gnutls_assert();
 				goto cleanup;
@@ -386,9 +372,9 @@ int _gnutls13_send_session_ticket(gnutls_session_t session, unsigned nr,
 
 			bufel = _gnutls_buffer_to_mbuffer(&buf);
 
-			ret = _gnutls_send_handshake2(session, bufel,
-						      GNUTLS_HANDSHAKE_NEW_SESSION_TICKET,
-						      1);
+			ret = _gnutls_send_handshake2(
+				session, bufel,
+				GNUTLS_HANDSHAKE_NEW_SESSION_TICKET, 1);
 			if (ret < 0) {
 				gnutls_assert();
 				goto cleanup;
@@ -402,7 +388,7 @@ int _gnutls13_send_session_ticket(gnutls_session_t session, unsigned nr,
 
 	return ret;
 
- cleanup:
+cleanup:
 	_gnutls_free_datum(&ticket.ticket);
 	_mbuffer_xfree(&bufel);
 	_gnutls_buffer_clear(&buf);
@@ -416,17 +402,16 @@ static int parse_nst_extension(void *ctx, unsigned tls_id,
 	gnutls_session_t session = ctx;
 	if (tls_id == ext_mod_early_data.tls_id) {
 		if (data_size < 4)
-			return
-			    gnutls_assert_val
-			    (GNUTLS_E_TLS_PACKET_DECODING_ERROR);
+			return gnutls_assert_val(
+				GNUTLS_E_TLS_PACKET_DECODING_ERROR);
 		session->security_parameters.max_early_data_size =
-		    _gnutls_read_uint32(data);
+			_gnutls_read_uint32(data);
 	}
 	return 0;
 }
 
 int _gnutls13_recv_session_ticket(gnutls_session_t session,
-				  gnutls_buffer_st * buf)
+				  gnutls_buffer_st *buf)
 {
 	int ret;
 	uint8_t value;
@@ -476,9 +461,8 @@ int _gnutls13_recv_session_ticket(gnutls_session_t session,
 		return gnutls_assert_val(ret);
 
 	/* Extensions */
-	ret =
-	    _gnutls_extv_parse(session, parse_nst_extension, buf->data,
-			       buf->length);
+	ret = _gnutls_extv_parse(session, parse_nst_extension, buf->data,
+				 buf->length);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -493,8 +477,8 @@ int _gnutls13_recv_session_ticket(gnutls_session_t session,
  * and the KDF ID associated to it.
  */
 int _gnutls13_unpack_session_ticket(gnutls_session_t session,
-				    gnutls_datum_t * data,
-				    tls13_ticket_st * ticket_data)
+				    gnutls_datum_t *data,
+				    tls13_ticket_st *ticket_data)
 {
 	int ret;
 	gnutls_datum_t decrypted = { NULL, 0 };

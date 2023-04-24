@@ -22,7 +22,7 @@
 /* Parts copied from GnuTLS example programs. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -33,7 +33,7 @@
 
 #include "utils.h"
 
-static void encode(const char *test_name, const gnutls_datum_t * raw,
+static void encode(const char *test_name, const gnutls_datum_t *raw,
 		   const char *expected)
 {
 	int ret;
@@ -47,12 +47,14 @@ static void encode(const char *test_name, const gnutls_datum_t * raw,
 	}
 
 	if (strlen(expected) != out.size) {
-		fail("%s: gnutls_pem_base64_encode2: output has incorrect size (%d, expected %d)\n", test_name, (int)out.size, (int)strlen(expected));
+		fail("%s: gnutls_pem_base64_encode2: output has incorrect size (%d, expected %d)\n",
+		     test_name, (int)out.size, (int)strlen(expected));
 		exit(1);
 	}
 
 	if (strncasecmp(expected, (char *)out.data, out.size) != 0) {
-		fail("%s: gnutls_pem_base64_encode2: output does not match the expected\n", test_name);
+		fail("%s: gnutls_pem_base64_encode2: output does not match the expected\n",
+		     test_name);
 		exit(1);
 	}
 
@@ -68,12 +70,14 @@ static void encode(const char *test_name, const gnutls_datum_t * raw,
 	}
 
 	if (raw->size != out.size) {
-		fail("%s: gnutls_pem_base64_decode2: output has incorrect size (%d, expected %d)\n", test_name, out.size, raw->size);
+		fail("%s: gnutls_pem_base64_decode2: output has incorrect size (%d, expected %d)\n",
+		     test_name, out.size, raw->size);
 		exit(1);
 	}
 
 	if (memcmp(raw->data, out.data, out.size) != 0) {
-		fail("%s: gnutls_pem_base64_decode2: output does not match the expected\n", test_name);
+		fail("%s: gnutls_pem_base64_decode2: output does not match the expected\n",
+		     test_name);
 		exit(1);
 	}
 
@@ -82,7 +86,7 @@ static void encode(const char *test_name, const gnutls_datum_t * raw,
 	return;
 }
 
-static void decode(const char *test_name, const gnutls_datum_t * raw,
+static void decode(const char *test_name, const gnutls_datum_t *raw,
 		   const char *hex, unsigned hex_size, int res)
 {
 	int ret;
@@ -96,7 +100,7 @@ static void decode(const char *test_name, const gnutls_datum_t * raw,
 
 	ret = gnutls_pem_base64_decode2(test_name, &in, &out);
 	if (ret < 0) {
-		if (res == ret)	/* expected */
+		if (res == ret) /* expected */
 			return;
 		fail("%s: gnutls_pem_base64_decode2: %d/%s\n", test_name, ret,
 		     gnutls_strerror(ret));
@@ -104,17 +108,20 @@ static void decode(const char *test_name, const gnutls_datum_t * raw,
 	}
 
 	if (res != 0) {
-		fail("%s: gnutls_pem_base64_decode2: expected failure, but succeeded!\n", test_name);
+		fail("%s: gnutls_pem_base64_decode2: expected failure, but succeeded!\n",
+		     test_name);
 		exit(1);
 	}
 
 	if (raw->size != out.size) {
-		fail("%s: gnutls_pem_base64_decode2: output has incorrect size (%d, expected %d)\n", test_name, out.size, raw->size);
+		fail("%s: gnutls_pem_base64_decode2: output has incorrect size (%d, expected %d)\n",
+		     test_name, out.size, raw->size);
 		exit(1);
 	}
 
 	if (memcmp(raw->data, out.data, out.size) != 0) {
-		fail("%s: gnutls_pem_base64_decode2: output does not match the expected\n", test_name);
+		fail("%s: gnutls_pem_base64_decode2: output does not match the expected\n",
+		     test_name);
 		exit(1);
 	}
 
@@ -125,7 +132,7 @@ static void decode(const char *test_name, const gnutls_datum_t * raw,
 	in.size = strlen(hex);
 	ret = gnutls_pem_base64_decode2(NULL, &in, &out);
 	if (ret < 0) {
-		if (res == ret)	/* expected */
+		if (res == ret) /* expected */
 			return;
 		fail("%s: gnutls_pem_base64_decode2: %d/%s\n", test_name, ret,
 		     gnutls_strerror(ret));
@@ -133,17 +140,20 @@ static void decode(const char *test_name, const gnutls_datum_t * raw,
 	}
 
 	if (res != 0) {
-		fail("%s: gnutls_pem_base64_decode2: expected failure, but succeeded!\n", test_name);
+		fail("%s: gnutls_pem_base64_decode2: expected failure, but succeeded!\n",
+		     test_name);
 		exit(1);
 	}
 
 	if (raw->size != out.size) {
-		fail("%s: gnutls_pem_base64_decode2: output has incorrect size (%d, expected %d)\n", test_name, out.size, raw->size);
+		fail("%s: gnutls_pem_base64_decode2: output has incorrect size (%d, expected %d)\n",
+		     test_name, out.size, raw->size);
 		exit(1);
 	}
 
 	if (memcmp(raw->data, out.data, out.size) != 0) {
-		fail("%s: gnutls_pem_base64_decode2: output does not match the expected\n", test_name);
+		fail("%s: gnutls_pem_base64_decode2: output does not match the expected\n",
+		     test_name);
 		exit(1);
 	}
 
@@ -159,22 +169,18 @@ struct encode_tests_st {
 };
 
 struct encode_tests_st encode_tests[] = {
-	{
-	 .name = "rnd1",
-	 .pem = "-----BEGIN rnd1-----\n"
-	 "9ppGioRpeiiD2lLNYC85eA==\n" "-----END rnd1-----\n",
-	 .raw = {(void *)
-		 "\xf6\x9a\x46\x8a\x84\x69\x7a\x28\x83\xda\x52\xcd\x60\x2f\x39\x78",
-		 16}
-	 },
-	{
-	 .name = "rnd2",
-	 .pem = "-----BEGIN rnd2-----\n"
-	 "LJ/7hUZ3TtPIz2dlc5+YvELe+Q==\n" "-----END rnd2-----\n",
-	 .raw = {(void *)
-		 "\x2c\x9f\xfb\x85\x46\x77\x4e\xd3\xc8\xcf\x67\x65\x73\x9f\x98\xbc\x42\xde\xf9",
-		 19}
-	 }
+	{ .name = "rnd1",
+	  .pem = "-----BEGIN rnd1-----\n"
+		 "9ppGioRpeiiD2lLNYC85eA==\n"
+		 "-----END rnd1-----\n",
+	  .raw = { (void *)"\xf6\x9a\x46\x8a\x84\x69\x7a\x28\x83\xda\x52\xcd\x60\x2f\x39\x78",
+		   16 } },
+	{ .name = "rnd2",
+	  .pem = "-----BEGIN rnd2-----\n"
+		 "LJ/7hUZ3TtPIz2dlc5+YvELe+Q==\n"
+		 "-----END rnd2-----\n",
+	  .raw = { (void *)"\x2c\x9f\xfb\x85\x46\x77\x4e\xd3\xc8\xcf\x67\x65\x73\x9f\x98\xbc\x42\xde\xf9",
+		   19 } }
 };
 
 struct decode_tests_st {
@@ -186,60 +192,53 @@ struct decode_tests_st {
 };
 
 struct decode_tests_st decode_tests[] = {
-	{
-	 .name = "dec-rnd1",
-	 .pem = "-----BEGIN dec-rnd1-----\n"
-	 "9ppGioRpeiiD2lLNYC85eA==\n" "-----END rnd1-----\n",
-	 .raw = {(void *)
-		 "\xf6\x9a\x46\x8a\x84\x69\x7a\x28\x83\xda\x52\xcd\x60\x2f\x39\x78",
-		 16},
-	 .res = 0},
-	{
-	 .name = "dec-rnd2",
-	 .pem = "-----BEGIN dec-rnd2-----\n"
-	 "LJ/7hUZ3TtPIz2dlc5+YvELe+Q==\n" "-----END rnd2-----\n",
-	 .raw = {(void *)
-		 "\x2c\x9f\xfb\x85\x46\x77\x4e\xd3\xc8\xcf\x67\x65\x73\x9f\x98\xbc\x42\xde\xf9",
-		 19},
-	 .res = 0},
-	{
-	 .name = "dec-extra-chars",
-	 .pem = "-----BEGIN dec-extra-chars-----   \n\n"
-	 "\n\n  LJ/7hUZ3TtPIz2dlc5+YvELe+Q==  \n" "   -----END rnd2-----  \n  ",
-	 .raw = {(void *)
-		 "\x2c\x9f\xfb\x85\x46\x77\x4e\xd3\xc8\xcf\x67\x65\x73\x9f\x98\xbc\x42\xde\xf9",
-		 19},
-	 .res = 0},
-	{
-	 .name = "dec-invalid-header",
-	 .pem = "-----BEGIN dec-xxx-----\n"
-	 "LJ/7hUZ3TtPIz2dlc5+YvELe+Q==\n" "-----END rnd2-----\n",
-	 .raw = {(void *)
-		 "\x2c\x9f\xfb\x85\x46\x77\x4e\xd3\xc8\xcf\x67\x65\x73\x9f\x98\xbc\x42\xde\xf9",
-		 19},
-	 .res = GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR},
-	{
-	 .name = "dec-invalid-data",
-	 .pem = "-----BEGIN dec-invalid-data-----\n"
-	 "XLJ/7hUZ3TtPIz2dlc5+YvELe+Q==\n" "-----END rnd2-----\n",
-	 .raw = {(void *)
-		 "\x2c\x9f\xfb\x85\x46\x77\x4e\xd3\xc8\xcf\x67\x65\x73\x9f\x98\xbc\x42\xde\xf9",
-		 19},
-	 .res = GNUTLS_E_BASE64_DECODING_ERROR},
-	{
-	 .name = "leak1",
-	 .pem = "-----BEGIN leak1-----E-\x00\x00-----END ",
-	 .pem_size = 34,
-	 .raw = {(void *)"", 0},
-	 .res = GNUTLS_E_BASE64_DECODING_ERROR},
-	{
-	 .name = "dec-invalid-suffix",
-	 .pem = "-----BEGIN dec-invalid-suffix-----\n"
-	 "LJ/7hUZ3TtPIz2dlc5+YvELe+Q==XXX\n" "-----END rnd2-----\n",
-	 .raw = {(void *)
-		 "\x2c\x9f\xfb\x85\x46\x77\x4e\xd3\xc8\xcf\x67\x65\x73\x9f\x98\xbc\x42\xde\xf9",
-		 19},
-	 .res = GNUTLS_E_BASE64_DECODING_ERROR}
+	{ .name = "dec-rnd1",
+	  .pem = "-----BEGIN dec-rnd1-----\n"
+		 "9ppGioRpeiiD2lLNYC85eA==\n"
+		 "-----END rnd1-----\n",
+	  .raw = { (void *)"\xf6\x9a\x46\x8a\x84\x69\x7a\x28\x83\xda\x52\xcd\x60\x2f\x39\x78",
+		   16 },
+	  .res = 0 },
+	{ .name = "dec-rnd2",
+	  .pem = "-----BEGIN dec-rnd2-----\n"
+		 "LJ/7hUZ3TtPIz2dlc5+YvELe+Q==\n"
+		 "-----END rnd2-----\n",
+	  .raw = { (void *)"\x2c\x9f\xfb\x85\x46\x77\x4e\xd3\xc8\xcf\x67\x65\x73\x9f\x98\xbc\x42\xde\xf9",
+		   19 },
+	  .res = 0 },
+	{ .name = "dec-extra-chars",
+	  .pem = "-----BEGIN dec-extra-chars-----   \n\n"
+		 "\n\n  LJ/7hUZ3TtPIz2dlc5+YvELe+Q==  \n"
+		 "   -----END rnd2-----  \n  ",
+	  .raw = { (void *)"\x2c\x9f\xfb\x85\x46\x77\x4e\xd3\xc8\xcf\x67\x65\x73\x9f\x98\xbc\x42\xde\xf9",
+		   19 },
+	  .res = 0 },
+	{ .name = "dec-invalid-header",
+	  .pem = "-----BEGIN dec-xxx-----\n"
+		 "LJ/7hUZ3TtPIz2dlc5+YvELe+Q==\n"
+		 "-----END rnd2-----\n",
+	  .raw = { (void *)"\x2c\x9f\xfb\x85\x46\x77\x4e\xd3\xc8\xcf\x67\x65\x73\x9f\x98\xbc\x42\xde\xf9",
+		   19 },
+	  .res = GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR },
+	{ .name = "dec-invalid-data",
+	  .pem = "-----BEGIN dec-invalid-data-----\n"
+		 "XLJ/7hUZ3TtPIz2dlc5+YvELe+Q==\n"
+		 "-----END rnd2-----\n",
+	  .raw = { (void *)"\x2c\x9f\xfb\x85\x46\x77\x4e\xd3\xc8\xcf\x67\x65\x73\x9f\x98\xbc\x42\xde\xf9",
+		   19 },
+	  .res = GNUTLS_E_BASE64_DECODING_ERROR },
+	{ .name = "leak1",
+	  .pem = "-----BEGIN leak1-----E-\x00\x00-----END ",
+	  .pem_size = 34,
+	  .raw = { (void *)"", 0 },
+	  .res = GNUTLS_E_BASE64_DECODING_ERROR },
+	{ .name = "dec-invalid-suffix",
+	  .pem = "-----BEGIN dec-invalid-suffix-----\n"
+		 "LJ/7hUZ3TtPIz2dlc5+YvELe+Q==XXX\n"
+		 "-----END rnd2-----\n",
+	  .raw = { (void *)"\x2c\x9f\xfb\x85\x46\x77\x4e\xd3\xc8\xcf\x67\x65\x73\x9f\x98\xbc\x42\xde\xf9",
+		   19 },
+	  .res = GNUTLS_E_BASE64_DECODING_ERROR }
 };
 
 void doit(void)

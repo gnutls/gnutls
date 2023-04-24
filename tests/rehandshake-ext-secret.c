@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -65,9 +65,8 @@ static void try(unsigned onclient)
 
 	/* Init server */
 	gnutls_certificate_allocate_credentials(&serverx509cred);
-	gnutls_certificate_set_x509_key_mem(serverx509cred,
-					    &server_cert, &server_key,
-					    GNUTLS_X509_FMT_PEM);
+	gnutls_certificate_set_x509_key_mem(serverx509cred, &server_cert,
+					    &server_key, GNUTLS_X509_FMT_PEM);
 	gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, serverx509cred);
 	gnutls_priority_set_direct(server, "NORMAL:-VERS-ALL:+VERS-TLS1.2",
@@ -98,26 +97,26 @@ static void try(unsigned onclient)
 		     onclient);
 	}
 
-	if ((gnutls_session_get_flags(server) & GNUTLS_SFLAGS_EXT_MASTER_SECRET)
-	    == 0) {
+	if ((gnutls_session_get_flags(server) &
+	     GNUTLS_SFLAGS_EXT_MASTER_SECRET) == 0) {
 		fail("%d: ext master secret was not detected by server\n",
 		     onclient);
 	}
 
-	if ((gnutls_session_get_flags(client) & GNUTLS_SFLAGS_EXT_MASTER_SECRET)
-	    == 0) {
+	if ((gnutls_session_get_flags(client) &
+	     GNUTLS_SFLAGS_EXT_MASTER_SECRET) == 0) {
 		fail("%d: ext master secret was not detected by client\n",
 		     onclient);
 	}
 
 	if (onclient)
-		gnutls_priority_set_direct(client,
-					   "NORMAL:-VERS-ALL:+VERS-TLS1.2:%NO_SESSION_HASH",
-					   NULL);
+		gnutls_priority_set_direct(
+			client,
+			"NORMAL:-VERS-ALL:+VERS-TLS1.2:%NO_SESSION_HASH", NULL);
 	else
-		gnutls_priority_set_direct(server,
-					   "NORMAL:-VERS-ALL:+VERS-TLS1.2:%NO_SESSION_HASH",
-					   NULL);
+		gnutls_priority_set_direct(
+			server,
+			"NORMAL:-VERS-ALL:+VERS-TLS1.2:%NO_SESSION_HASH", NULL);
 
 	sret = gnutls_rehandshake(server);
 	if (debug) {

@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdlib.h>
@@ -33,41 +33,42 @@
 #include "utils.h"
 
 static char pem1_cert[] =
-    "-----BEGIN CERTIFICATE-----\n"
-    "MIICHjCCAYmgAwIBAgIERiYdNzALBgkqhkiG9w0BAQUwGTEXMBUGA1UEAxMOR251\n"
-    "VExTIHRlc3QgQ0EwHhcNMDcwNDE4MTMyOTI3WhcNMDgwNDE3MTMyOTI3WjAdMRsw\n"
-    "GQYDVQQDExJHbnVUTFMgdGVzdCBjbGllbnQwgZwwCwYJKoZIhvcNAQEBA4GMADCB\n"
-    "iAKBgLtmQ/Xyxde2jMzF3/WIO7HJS2oOoa0gUEAIgKFPXKPQ+GzP5jz37AR2ExeL\n"
-    "ZIkiW8DdU3w77XwEu4C5KL6Om8aOoKUSy/VXHqLnu7czSZ/ju0quak1o/8kR4jKN\n"
-    "zj2AC41179gAgY8oBAOgIo1hBAf6tjd9IQdJ0glhaZiQo1ipAgMBAAGjdjB0MAwG\n"
-    "A1UdEwEB/wQCMAAwEwYDVR0lBAwwCgYIKwYBBQUHAwIwDwYDVR0PAQH/BAUDAweg\n"
-    "ADAdBgNVHQ4EFgQUTLkKm/odNON+3svSBxX+odrLaJEwHwYDVR0jBBgwFoAU6Twc\n"
-    "+62SbuYGpFYsouHAUyfI8pUwCwYJKoZIhvcNAQEFA4GBALujmBJVZnvaTXr9cFRJ\n"
-    "jpfc/3X7sLUsMvumcDE01ls/cG5mIatmiyEU9qI3jbgUf82z23ON/acwJf875D3/\n"
-    "U7jyOsBJ44SEQITbin2yUeJMIm1tievvdNXBDfW95AM507ShzP12sfiJkJfjjdhy\n"
-    "dc8Siq5JojruiMizAf0pA7in\n" "-----END CERTIFICATE-----\n";
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIICHjCCAYmgAwIBAgIERiYdNzALBgkqhkiG9w0BAQUwGTEXMBUGA1UEAxMOR251\n"
+	"VExTIHRlc3QgQ0EwHhcNMDcwNDE4MTMyOTI3WhcNMDgwNDE3MTMyOTI3WjAdMRsw\n"
+	"GQYDVQQDExJHbnVUTFMgdGVzdCBjbGllbnQwgZwwCwYJKoZIhvcNAQEBA4GMADCB\n"
+	"iAKBgLtmQ/Xyxde2jMzF3/WIO7HJS2oOoa0gUEAIgKFPXKPQ+GzP5jz37AR2ExeL\n"
+	"ZIkiW8DdU3w77XwEu4C5KL6Om8aOoKUSy/VXHqLnu7czSZ/ju0quak1o/8kR4jKN\n"
+	"zj2AC41179gAgY8oBAOgIo1hBAf6tjd9IQdJ0glhaZiQo1ipAgMBAAGjdjB0MAwG\n"
+	"A1UdEwEB/wQCMAAwEwYDVR0lBAwwCgYIKwYBBQUHAwIwDwYDVR0PAQH/BAUDAweg\n"
+	"ADAdBgNVHQ4EFgQUTLkKm/odNON+3svSBxX+odrLaJEwHwYDVR0jBBgwFoAU6Twc\n"
+	"+62SbuYGpFYsouHAUyfI8pUwCwYJKoZIhvcNAQEFA4GBALujmBJVZnvaTXr9cFRJ\n"
+	"jpfc/3X7sLUsMvumcDE01ls/cG5mIatmiyEU9qI3jbgUf82z23ON/acwJf875D3/\n"
+	"U7jyOsBJ44SEQITbin2yUeJMIm1tievvdNXBDfW95AM507ShzP12sfiJkJfjjdhy\n"
+	"dc8Siq5JojruiMizAf0pA7in\n"
+	"-----END CERTIFICATE-----\n";
 
 static char pem1_key[] =
-    "-----BEGIN RSA PRIVATE KEY-----\n"
-    "MIICXAIBAAKBgQC7ZkP18sXXtozMxd/1iDuxyUtqDqGtIFBACIChT1yj0Phsz+Y8\n"
-    "9+wEdhMXi2SJIlvA3VN8O+18BLuAuSi+jpvGjqClEsv1Vx6i57u3M0mf47tKrmpN\n"
-    "aP/JEeIyjc49gAuNde/YAIGPKAQDoCKNYQQH+rY3fSEHSdIJYWmYkKNYqQIDAQAB\n"
-    "AoGADpmARG5CQxS+AesNkGmpauepiCz1JBF/JwnyiX6vEzUh0Ypd39SZztwrDxvF\n"
-    "PJjQaKVljml1zkJpIDVsqvHdyVdse8M+Qn6hw4x2p5rogdvhhIL1mdWo7jWeVJTF\n"
-    "RKB7zLdMPs3ySdtcIQaF9nUAQ2KJEvldkO3m/bRJFEp54k0CQQDYy+RlTmwRD6hy\n"
-    "7UtMjR0H3CSZJeQ8svMCxHLmOluG9H1UKk55ZBYfRTsXniqUkJBZ5wuV1L+pR9EK\n"
-    "ca89a+1VAkEA3UmBelwEv2u9cAU1QjKjmwju1JgXbrjEohK+3B5y0ESEXPAwNQT9\n"
-    "TrDM1m9AyxYTWLxX93dI5QwNFJtmbtjeBQJARSCWXhsoaDRG8QZrCSjBxfzTCqZD\n"
-    "ZXtl807ymCipgJm60LiAt0JLr4LiucAsMZz6+j+quQbSakbFCACB8SLV1QJBAKZQ\n"
-    "YKf+EPNtnmta/rRKKvySsi3GQZZN+Dt3q0r094XgeTsAqrqujVNfPhTMeP4qEVBX\n"
-    "/iVX2cmMTSh3w3z8MaECQEp0XJWDVKOwcTW6Ajp9SowtmiZ3YDYo1LF9igb4iaLv\n"
-    "sWZGfbnU3ryjvkb6YuFjgtzbZDZHWQCo8/cOtOBmPdk=\n"
-    "-----END RSA PRIVATE KEY-----\n";
+	"-----BEGIN RSA PRIVATE KEY-----\n"
+	"MIICXAIBAAKBgQC7ZkP18sXXtozMxd/1iDuxyUtqDqGtIFBACIChT1yj0Phsz+Y8\n"
+	"9+wEdhMXi2SJIlvA3VN8O+18BLuAuSi+jpvGjqClEsv1Vx6i57u3M0mf47tKrmpN\n"
+	"aP/JEeIyjc49gAuNde/YAIGPKAQDoCKNYQQH+rY3fSEHSdIJYWmYkKNYqQIDAQAB\n"
+	"AoGADpmARG5CQxS+AesNkGmpauepiCz1JBF/JwnyiX6vEzUh0Ypd39SZztwrDxvF\n"
+	"PJjQaKVljml1zkJpIDVsqvHdyVdse8M+Qn6hw4x2p5rogdvhhIL1mdWo7jWeVJTF\n"
+	"RKB7zLdMPs3ySdtcIQaF9nUAQ2KJEvldkO3m/bRJFEp54k0CQQDYy+RlTmwRD6hy\n"
+	"7UtMjR0H3CSZJeQ8svMCxHLmOluG9H1UKk55ZBYfRTsXniqUkJBZ5wuV1L+pR9EK\n"
+	"ca89a+1VAkEA3UmBelwEv2u9cAU1QjKjmwju1JgXbrjEohK+3B5y0ESEXPAwNQT9\n"
+	"TrDM1m9AyxYTWLxX93dI5QwNFJtmbtjeBQJARSCWXhsoaDRG8QZrCSjBxfzTCqZD\n"
+	"ZXtl807ymCipgJm60LiAt0JLr4LiucAsMZz6+j+quQbSakbFCACB8SLV1QJBAKZQ\n"
+	"YKf+EPNtnmta/rRKKvySsi3GQZZN+Dt3q0r094XgeTsAqrqujVNfPhTMeP4qEVBX\n"
+	"/iVX2cmMTSh3w3z8MaECQEp0XJWDVKOwcTW6Ajp9SowtmiZ3YDYo1LF9igb4iaLv\n"
+	"sWZGfbnU3ryjvkb6YuFjgtzbZDZHWQCo8/cOtOBmPdk=\n"
+	"-----END RSA PRIVATE KEY-----\n";
 
 const gnutls_datum_t cert = { (void *)pem1_cert, sizeof(pem1_cert) - 1 };
 const gnutls_datum_t key = { (void *)pem1_key, sizeof(pem1_key) - 1 };
 
-static time_t mytime(time_t * t)
+static time_t mytime(time_t *t)
 {
 	time_t then = 1199142000;
 
@@ -115,9 +116,8 @@ void doit(void)
 		exit(1);
 	}
 
-	ret =
-	    gnutls_privkey_import_x509_raw(pkey, &key, GNUTLS_X509_FMT_PEM, 0,
-					   0);
+	ret = gnutls_privkey_import_x509_raw(pkey, &key, GNUTLS_X509_FMT_PEM, 0,
+					     0);
 	if (ret < 0) {
 		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
 		exit(1);
@@ -136,33 +136,29 @@ void doit(void)
 		exit(1);
 	}
 
-	ret =
-	    gnutls_pkcs7_add_attr(&list1, "1.2.3.4", &data1,
-				  GNUTLS_PKCS7_ATTR_ENCODE_OCTET_STRING);
+	ret = gnutls_pkcs7_add_attr(&list1, "1.2.3.4", &data1,
+				    GNUTLS_PKCS7_ATTR_ENCODE_OCTET_STRING);
 	if (ret < 0) {
 		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
 		exit(1);
 	}
 
-	ret =
-	    gnutls_pkcs7_add_attr(&list1, "2.3.4", &data2,
-				  GNUTLS_PKCS7_ATTR_ENCODE_OCTET_STRING);
+	ret = gnutls_pkcs7_add_attr(&list1, "2.3.4", &data2,
+				    GNUTLS_PKCS7_ATTR_ENCODE_OCTET_STRING);
 	if (ret < 0) {
 		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
 		exit(1);
 	}
 
-	ret =
-	    gnutls_pkcs7_add_attr(&list2, "2.3.4", &data3,
-				  GNUTLS_PKCS7_ATTR_ENCODE_OCTET_STRING);
+	ret = gnutls_pkcs7_add_attr(&list2, "2.3.4", &data3,
+				    GNUTLS_PKCS7_ATTR_ENCODE_OCTET_STRING);
 	if (ret < 0) {
 		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
 		exit(1);
 	}
 
-	ret =
-	    gnutls_pkcs7_sign(pkcs7, crt, pkey, &data3, list1, list2,
-			      GNUTLS_DIG_SHA256, 0);
+	ret = gnutls_pkcs7_sign(pkcs7, crt, pkey, &data3, list1, list2,
+				GNUTLS_DIG_SHA256, 0);
 	if (ret < 0) {
 		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
 		exit(1);
@@ -213,46 +209,43 @@ void doit(void)
 	}
 	gnutls_free(data.data);
 
-	ret =
-	    gnutls_pkcs7_get_attr(info.signed_attrs, 2, &oid, &data,
-				  GNUTLS_PKCS7_ATTR_ENCODE_OCTET_STRING);
+	ret = gnutls_pkcs7_get_attr(info.signed_attrs, 2, &oid, &data,
+				    GNUTLS_PKCS7_ATTR_ENCODE_OCTET_STRING);
 	if (ret < 0) {
 		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
 		exit(1);
 	}
 
-	if (strcmp(oid, "1.2.3.4") != 0 || data.size != data1.size
-	    || memcmp(data.data, data1.data, data.size) != 0) {
+	if (strcmp(oid, "1.2.3.4") != 0 || data.size != data1.size ||
+	    memcmp(data.data, data1.data, data.size) != 0) {
 		fail("error in %d: %s\n", __LINE__, oid);
 		exit(1);
 	}
 	gnutls_free(data.data);
 
-	ret =
-	    gnutls_pkcs7_get_attr(info.signed_attrs, 3, &oid, &data,
-				  GNUTLS_PKCS7_ATTR_ENCODE_OCTET_STRING);
+	ret = gnutls_pkcs7_get_attr(info.signed_attrs, 3, &oid, &data,
+				    GNUTLS_PKCS7_ATTR_ENCODE_OCTET_STRING);
 	if (ret < 0) {
 		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
 		exit(1);
 	}
 
-	if (strcmp(oid, "2.3.4") != 0 || data.size != data2.size
-	    || memcmp(data.data, data2.data, data.size) != 0) {
+	if (strcmp(oid, "2.3.4") != 0 || data.size != data2.size ||
+	    memcmp(data.data, data2.data, data.size) != 0) {
 		fail("error in %d: %s\n", __LINE__, oid);
 		exit(1);
 	}
 	gnutls_free(data.data);
 
-	ret =
-	    gnutls_pkcs7_get_attr(info.unsigned_attrs, 0, &oid, &data,
-				  GNUTLS_PKCS7_ATTR_ENCODE_OCTET_STRING);
+	ret = gnutls_pkcs7_get_attr(info.unsigned_attrs, 0, &oid, &data,
+				    GNUTLS_PKCS7_ATTR_ENCODE_OCTET_STRING);
 	if (ret < 0) {
 		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
 		exit(1);
 	}
 
-	if (strcmp(oid, "2.3.4") != 0 || data.size != data3.size
-	    || memcmp(data.data, data3.data, data.size) != 0) {
+	if (strcmp(oid, "2.3.4") != 0 || data.size != data3.size ||
+	    memcmp(data.data, data3.data, data.size) != 0) {
 		fail("error in %d: %s\n", __LINE__, oid);
 		exit(1);
 	}

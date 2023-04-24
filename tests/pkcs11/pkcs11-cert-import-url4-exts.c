@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -38,12 +38,12 @@
 /* Tests the certificate extension override in "trusted" PKCS#11 modules */
 
 #ifdef _WIN32
-# define P11LIB "libpkcs11mock1.dll"
+#define P11LIB "libpkcs11mock1.dll"
 #else
-# define P11LIB "libpkcs11mock1.so"
+#define P11LIB "libpkcs11mock1.so"
 #endif
 
-static time_t mytime(time_t * t)
+static time_t mytime(time_t *t)
 {
 	time_t then = 1424466893;
 
@@ -96,19 +96,16 @@ void doit(void)
 	assert(gnutls_x509_crt_init(&ocrt) >= 0);
 
 	/* check low level certificate import functions */
-	ret =
-	    gnutls_pkcs11_obj_list_import_url4(&plist, &plist_size,
-					       "pkcs11:type=cert;object=cert1",
-					       0);
+	ret = gnutls_pkcs11_obj_list_import_url4(
+		&plist, &plist_size, "pkcs11:type=cert;object=cert1", 0);
 	if (ret < 0) {
 		fail("%d: %s\n", ret, gnutls_strerror(ret));
 		exit(1);
 	}
 
-	ret =
-	    gnutls_pkcs11_obj_list_import_url4(&plist2, &plist2_size,
-					       "pkcs11:type=cert;object=cert1",
-					       GNUTLS_PKCS11_OBJ_FLAG_OVERWRITE_TRUSTMOD_EXT);
+	ret = gnutls_pkcs11_obj_list_import_url4(
+		&plist2, &plist2_size, "pkcs11:type=cert;object=cert1",
+		GNUTLS_PKCS11_OBJ_FLAG_OVERWRITE_TRUSTMOD_EXT);
 	if (ret < 0) {
 		fail("%d: %s\n", ret, gnutls_strerror(ret));
 		exit(1);
@@ -158,9 +155,8 @@ void doit(void)
 		exit(1);
 	}
 
-	if (keyusage !=
-	    (GNUTLS_KEY_KEY_ENCIPHERMENT | GNUTLS_KEY_ENCIPHER_ONLY |
-	     GNUTLS_KEY_KEY_CERT_SIGN)) {
+	if (keyusage != (GNUTLS_KEY_KEY_ENCIPHERMENT |
+			 GNUTLS_KEY_ENCIPHER_ONLY | GNUTLS_KEY_KEY_CERT_SIGN)) {
 		fail("Extension does not have the expected key usage!\n");
 	}
 

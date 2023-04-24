@@ -21,11 +21,10 @@
  */
 
 #ifndef GNUTLS_LIB_TLS13_ANTI_REPLAY_H
-# define GNUTLS_LIB_TLS13_ANTI_REPLAY_H
+#define GNUTLS_LIB_TLS13_ANTI_REPLAY_H
 
-int _gnutls_anti_replay_check(gnutls_anti_replay_t,
-			      uint32_t client_ticket_age,
+int _gnutls_anti_replay_check(gnutls_anti_replay_t, uint32_t client_ticket_age,
 			      struct timespec *ticket_creation_time,
-			      gnutls_datum_t * id);
+			      gnutls_datum_t *id);
 
-#endif				/* GNUTLS_LIB_TLS13_ANTI_REPLAY_H */
+#endif /* GNUTLS_LIB_TLS13_ANTI_REPLAY_H */

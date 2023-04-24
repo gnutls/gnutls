@@ -22,7 +22,7 @@
 /* Parts copied from GnuTLS example programs. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -42,9 +42,8 @@ static void encode(const char *test_name, const char *type, unsigned key_size,
 	int ret;
 	gnutls_datum_t out;
 
-	ret =
-	    gnutls_random_art(GNUTLS_RANDOM_ART_OPENSSH, type, key_size, input,
-			      input_size, &out);
+	ret = gnutls_random_art(GNUTLS_RANDOM_ART_OPENSSH, type, key_size,
+				input, input_size, &out);
 	if (ret < 0) {
 		fail("%s: gnutls_random_art: %s\n", test_name,
 		     gnutls_strerror(ret));
@@ -52,12 +51,14 @@ static void encode(const char *test_name, const char *type, unsigned key_size,
 	}
 
 	if (strlen(expected) != out.size) {
-		fail("%s: gnutls_random_art: output has incorrect size (%d, expected %d)\n%s\n", test_name, (int)out.size, (int)strlen(expected), out.data);
+		fail("%s: gnutls_random_art: output has incorrect size (%d, expected %d)\n%s\n",
+		     test_name, (int)out.size, (int)strlen(expected), out.data);
 		exit(1);
 	}
 
 	if (strncasecmp(expected, (char *)out.data, out.size) != 0) {
-		fail("%s: gnutls_random_art: output does not match the expected:\n%s\n", test_name, out.data);
+		fail("%s: gnutls_random_art: output does not match the expected:\n%s\n",
+		     test_name, out.data);
 		exit(1);
 	}
 
@@ -76,54 +77,54 @@ struct encode_tests_st {
 };
 
 struct encode_tests_st encode_tests[] = {
-	{
-	 .name = "key1",
-	 .raw = (void *)
-	 "\x38\x17\x0c\x08\xcb\x45\x8f\xd4\x87\x9c\x34\xb6\xf6\x08\x29\x4c\x50\x31\x2b\xbb",
-	 .raw_size = 20,
-	 .key_type = "RSA",
-	 .key_size = 2048,
-	 .art = "+--[ RSA 2048]----+\n"
-	 "|.o*++==o         |\n"
-	 "| + *.===.        |\n"
-	 "|. * + +.o        |\n"
-	 "| o . o + .       |\n"
-	 "|.     + S        |\n"
-	 "| .     o         |\n"
-	 "|E                |\n"
-	 "|                 |\n" "|                 |\n" "+-----------------+"},
-	{
-	 .name = "key2",
-	 .raw = (void *)
-	 "\xf8\xa7\x1c\x08\x76\x47\x2c\x08\x38\x17\x0c\x08\x38\x17\x0c\x08\xcb\x45\x8f\xd4\x87\x9c\xa4\xb6\xf6\xf8\x29\xfc\x50\x3f\x2b\xbb",
-	 .raw_size = 32,
-	 .key_type = "RSA",
-	 .key_size = 3072,
-	 .art = "+--[ RSA 3072]----+\n"
-	 "|@*=*+.o          |\n"
-	 "|O.B.+* o         |\n"
-	 "|.* +..o o        |\n"
-	 "|  . .  +         |\n"
-	 "|   oo.o S        |\n"
-	 "|  ..+o.+         |\n"
-	 "|  .o ..oo .      |\n"
-	 "|   oo...o+       |\n" "|    oE+.o        |\n" "+-----------------+"},
-	{
-	 .name = "key3",
-	 .raw = (void *)
-	 "\x38\xf7\x0c\x08\xcb\x34\x8a\xd4\xb7\x9c\x34\xb4\xf6\x08\x29\x4c\x50\x3f\x2b\xbb",
-	 .raw_size = 20,
-	 .key_type = "ECDSA",
-	 .key_size = 256,
-	 .art = "+--[ECDSA  256]---+\n"
-	 "|oo.  .           |\n"
-	 "|o ..o .          |\n"
-	 "| + +**           |\n"
-	 "|...+***o         |\n"
-	 "|. o +=+.S        |\n"
-	 "|   o   o +       |\n"
-	 "|  .       o      |\n"
-	 "|   .             |\n" "|  E              |\n" "+-----------------+"}
+	{ .name = "key1",
+	  .raw = (void *)"\x38\x17\x0c\x08\xcb\x45\x8f\xd4\x87\x9c\x34\xb6\xf6\x08\x29\x4c\x50\x31\x2b\xbb",
+	  .raw_size = 20,
+	  .key_type = "RSA",
+	  .key_size = 2048,
+	  .art = "+--[ RSA 2048]----+\n"
+		 "|.o*++==o         |\n"
+		 "| + *.===.        |\n"
+		 "|. * + +.o        |\n"
+		 "| o . o + .       |\n"
+		 "|.     + S        |\n"
+		 "| .     o         |\n"
+		 "|E                |\n"
+		 "|                 |\n"
+		 "|                 |\n"
+		 "+-----------------+" },
+	{ .name = "key2",
+	  .raw = (void *)"\xf8\xa7\x1c\x08\x76\x47\x2c\x08\x38\x17\x0c\x08\x38\x17\x0c\x08\xcb\x45\x8f\xd4\x87\x9c\xa4\xb6\xf6\xf8\x29\xfc\x50\x3f\x2b\xbb",
+	  .raw_size = 32,
+	  .key_type = "RSA",
+	  .key_size = 3072,
+	  .art = "+--[ RSA 3072]----+\n"
+		 "|@*=*+.o          |\n"
+		 "|O.B.+* o         |\n"
+		 "|.* +..o o        |\n"
+		 "|  . .  +         |\n"
+		 "|   oo.o S        |\n"
+		 "|  ..+o.+         |\n"
+		 "|  .o ..oo .      |\n"
+		 "|   oo...o+       |\n"
+		 "|    oE+.o        |\n"
+		 "+-----------------+" },
+	{ .name = "key3",
+	  .raw = (void *)"\x38\xf7\x0c\x08\xcb\x34\x8a\xd4\xb7\x9c\x34\xb4\xf6\x08\x29\x4c\x50\x3f\x2b\xbb",
+	  .raw_size = 20,
+	  .key_type = "ECDSA",
+	  .key_size = 256,
+	  .art = "+--[ECDSA  256]---+\n"
+		 "|oo.  .           |\n"
+		 "|o ..o .          |\n"
+		 "| + +**           |\n"
+		 "|...+***o         |\n"
+		 "|. o +=+.S        |\n"
+		 "|   o   o +       |\n"
+		 "|  .       o      |\n"
+		 "|   .             |\n"
+		 "|  E              |\n"
+		 "+-----------------+" }
 };
 
 void doit(void)

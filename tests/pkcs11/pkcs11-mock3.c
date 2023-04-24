@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <dlfcn.h>
@@ -44,13 +44,13 @@ static CK_C_GetAttributeValue base_C_GetAttributeValue;
 static CK_FUNCTION_LIST override_funcs;
 
 #ifdef __sun
-# pragma fini(mock_deinit)
-# pragma init(mock_init)
-# define _CONSTRUCTOR
-# define _DESTRUCTOR
+#pragma fini(mock_deinit)
+#pragma init(mock_init)
+#define _CONSTRUCTOR
+#define _DESTRUCTOR
 #else
-# define _CONSTRUCTOR __attribute__((constructor))
-# define _DESTRUCTOR __attribute__((destructor))
+#define _CONSTRUCTOR __attribute__((constructor))
+#define _DESTRUCTOR __attribute__((destructor))
 #endif
 
 /* Should be a date before the activation time of chain[0] in
@@ -58,10 +58,10 @@ static CK_FUNCTION_LIST override_funcs;
  */
 #define DISTRUST_AFTER "230314000000Z"
 
-static CK_RV
-override_C_GetAttributeValue(CK_SESSION_HANDLE hSession,
-			     CK_OBJECT_HANDLE hObject,
-			     CK_ATTRIBUTE_PTR pTemplate, CK_ULONG ulCount)
+static CK_RV override_C_GetAttributeValue(CK_SESSION_HANDLE hSession,
+					  CK_OBJECT_HANDLE hObject,
+					  CK_ATTRIBUTE_PTR pTemplate,
+					  CK_ULONG ulCount)
 {
 	CK_ATTRIBUTE *template;
 	CK_ULONG count = 0, i, offset = ulCount;
@@ -89,17 +89,17 @@ override_C_GetAttributeValue(CK_SESSION_HANDLE hSession,
 	if (offset < ulCount) {
 		if (!pTemplate[offset].pValue) {
 			pTemplate[offset].ulValueLen =
-			    sizeof(DISTRUST_AFTER) - 1;
+				sizeof(DISTRUST_AFTER) - 1;
 		} else if (pTemplate[offset].ulValueLen <
 			   sizeof(DISTRUST_AFTER) - 1) {
 			pTemplate[offset].ulValueLen =
-			    CK_UNAVAILABLE_INFORMATION;
+				CK_UNAVAILABLE_INFORMATION;
 			rv = CKR_BUFFER_TOO_SMALL;
 		} else {
 			memcpy(pTemplate[offset].pValue, DISTRUST_AFTER,
 			       sizeof(DISTRUST_AFTER) - 1);
 			pTemplate[offset].ulValueLen =
-			    sizeof(DISTRUST_AFTER) - 1;
+				sizeof(DISTRUST_AFTER) - 1;
 		}
 	}
 
@@ -112,7 +112,7 @@ override_C_GetAttributeValue(CK_SESSION_HANDLE hSession,
 	return rv;
 }
 
-CK_RV C_GetFunctionList(CK_FUNCTION_LIST ** function_list)
+CK_RV C_GetFunctionList(CK_FUNCTION_LIST **function_list)
 {
 	CK_C_GetFunctionList func;
 	CK_FUNCTION_LIST *funcs;

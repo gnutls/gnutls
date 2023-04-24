@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,20 +35,20 @@ int main(void)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
-# include <unistd.h>
-# include <gnutls/gnutls.h>
-# include <gnutls/dtls.h>
-# include <assert.h>
-# include <signal.h>
+#include <string.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <gnutls/gnutls.h>
+#include <gnutls/dtls.h>
+#include <assert.h>
+#include <signal.h>
 
-# include "utils.h"
-# include "cert-common.h"
+#include "utils.h"
+#include "cert-common.h"
 
 /* This program tests whether the GNUTLS_CERT_* flags
  * work as expected.
@@ -56,7 +56,7 @@ int main(void)
 
 static void server_log_func(int level, const char *str)
 {
-//  fprintf (stderr, "server|<%d>| %s", level, str);
+	//  fprintf (stderr, "server|<%d>| %s", level, str);
 }
 
 static void client_log_func(int level, const char *str)
@@ -64,7 +64,7 @@ static void client_log_func(int level, const char *str)
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
 
-# define MAX_BUF 1024
+#define MAX_BUF 1024
 
 static void client(int fd, const char *prio)
 {
@@ -98,8 +98,7 @@ static void client(int fd, const char *prio)
 	 */
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret < 0) {
 		if (debug) {
@@ -114,8 +113,8 @@ static void client(int fd, const char *prio)
 
 	if (debug)
 		success("client: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	close(fd);
 
@@ -158,14 +157,12 @@ static void server(int fd, const char *prio, unsigned status, int expected)
 
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret == expected) {
 		if (debug)
-			success
-			    ("server: Handshake finished as expected (%d)\n",
-			     ret);
+			success("server: Handshake finished as expected (%d)\n",
+				ret);
 		goto finish;
 	} else {
 		fail("expected %d, handshake returned %d\n", expected, ret);
@@ -176,9 +173,9 @@ static void server(int fd, const char *prio, unsigned status, int expected)
 
 	if (debug)
 		success("server: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
- finish:
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
+finish:
 	close(fd);
 	gnutls_deinit(session);
 
@@ -257,4 +254,4 @@ void doit(void)
 	start("NORMAL", GNUTLS_CERT_REQUIRE, GNUTLS_E_CERTIFICATE_REQUIRED);
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

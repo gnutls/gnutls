@@ -19,10 +19,14 @@
  */
 
 #ifndef GNUTLS_SRC_TESTS_H
-# define GNUTLS_SRC_TESTS_H
+#define GNUTLS_SRC_TESTS_H
 
 typedef enum {
-	TEST_SUCCEED, TEST_FAILED, TEST_UNSURE, TEST_IGNORE /*keep socket */ , TEST_IGNORE2	/*destroy socket */
+	TEST_SUCCEED,
+	TEST_FAILED,
+	TEST_UNSURE,
+	TEST_IGNORE /*keep socket */,
+	TEST_IGNORE2 /*destroy socket */
 } test_code_t;
 
 test_code_t test_chain_order(gnutls_session_t session);
@@ -75,8 +79,8 @@ test_code_t test_rsa_pms_version_check(gnutls_session_t session);
 test_code_t test_version_oob(gnutls_session_t session);
 test_code_t test_send_record(gnutls_session_t session);
 test_code_t test_send_record_with_allow_small_records(gnutls_session_t session);
-int _test_srp_username_callback(gnutls_session_t session,
-				char **username, char **password);
+int _test_srp_username_callback(gnutls_session_t session, char **username,
+				char **password);
 
 test_code_t test_rsa(gnutls_session_t session);
 test_code_t test_ecdhe_x25519(gnutls_session_t session);
@@ -89,10 +93,10 @@ test_code_t test_aes_ccm(gnutls_session_t session);
 test_code_t test_aes_ccm_8(gnutls_session_t session);
 test_code_t test_sha256(gnutls_session_t session);
 
-# ifdef ENABLE_GOST
+#ifdef ENABLE_GOST
 test_code_t test_vko_gost_12(gnutls_session_t session);
 test_code_t test_gost_cnt(gnutls_session_t session);
 test_code_t test_gost_imit(gnutls_session_t session);
-# endif
+#endif
 
-#endif				/* GNUTLS_SRC_TESTS_H */
+#endif /* GNUTLS_SRC_TESTS_H */

@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -45,7 +45,7 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "%s|<%d>| %s", side, level, str);
 }
 
-static time_t mytime(time_t * t)
+static time_t mytime(time_t *t)
 {
 	time_t then = 1461671166;
 
@@ -55,8 +55,8 @@ static time_t mytime(time_t * t)
 	return then;
 }
 
-static ssize_t
-server_pull_fail(gnutls_transport_ptr_t tr, void *data, size_t len)
+static ssize_t server_pull_fail(gnutls_transport_ptr_t tr, void *data,
+				size_t len)
 {
 	fail("unexpected call to pull callback detected\n");
 	return -1;
@@ -85,8 +85,8 @@ void doit(void)
 	gnutls_global_set_time_function(mytime);
 
 	assert(gnutls_certificate_allocate_credentials(&serverx509cred) >= 0);
-	assert(gnutls_certificate_set_x509_key_mem(serverx509cred,
-						   &server_cert, &server_key,
+	assert(gnutls_certificate_set_x509_key_mem(serverx509cred, &server_cert,
+						   &server_key,
 						   GNUTLS_X509_FMT_PEM) >= 0);
 
 	assert(gnutls_init(&server, GNUTLS_SERVER) >= 0);
@@ -98,16 +98,16 @@ void doit(void)
 
 	assert(gnutls_certificate_allocate_credentials(&clientx509cred) >= 0);
 
-	assert(gnutls_certificate_set_x509_trust_mem
-	       (clientx509cred, &ca_cert, GNUTLS_X509_FMT_PEM) >= 0);
+	assert(gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca_cert,
+						     GNUTLS_X509_FMT_PEM) >= 0);
 
 	assert(gnutls_init(&client, GNUTLS_CLIENT) >= 0);
 
 	assert(gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
 				      clientx509cred) >= 0);
 
-	assert(gnutls_priority_set_direct
-	       (client, "NORMAL:-VERS-ALL:+VERS-TLS1.3", NULL) >= 0);
+	assert(gnutls_priority_set_direct(
+		       client, "NORMAL:-VERS-ALL:+VERS-TLS1.3", NULL) >= 0);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);

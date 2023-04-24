@@ -32,78 +32,73 @@
 /* Contains PSK code for DHE and ECDHE
  */
 
-# include "auth.h"
-# include "errors.h"
-# include "dh.h"
-# include <auth/psk.h>
-# include "num.h"
-# include "mpi.h"
-# include <state.h>
-# include <auth/dh_common.h>
-# include <auth/ecdhe.h>
-# include <datum.h>
-# include <auth/psk_passwd.h>
+#include "auth.h"
+#include "errors.h"
+#include "dh.h"
+#include <auth/psk.h>
+#include "num.h"
+#include "mpi.h"
+#include <state.h>
+#include <auth/dh_common.h>
+#include <auth/ecdhe.h>
+#include <datum.h>
+#include <auth/psk_passwd.h>
 
-static int
-proc_ecdhe_psk_server_kx(gnutls_session_t session, uint8_t * data,
-			 size_t _data_size);
+static int proc_ecdhe_psk_server_kx(gnutls_session_t session, uint8_t *data,
+				    size_t _data_size);
 static int gen_dhe_psk_server_kx(gnutls_session_t, gnutls_buffer_st *);
 static int gen_dhe_psk_client_kx(gnutls_session_t, gnutls_buffer_st *);
 static int gen_ecdhe_psk_client_kx(gnutls_session_t, gnutls_buffer_st *);
 static int proc_ecdhe_psk_client_kx(gnutls_session_t, uint8_t *, size_t);
 static int proc_dhe_psk_server_kx(gnutls_session_t, uint8_t *, size_t);
 static int gen_ecdhe_psk_server_kx(gnutls_session_t session,
-				   gnutls_buffer_st * data);
-static int proc_dhe_psk_client_kx(gnutls_session_t session, uint8_t * data,
+				   gnutls_buffer_st *data);
+static int proc_dhe_psk_client_kx(gnutls_session_t session, uint8_t *data,
 				  size_t _data_size);
-# ifdef ENABLE_DHE
-const mod_auth_st dhe_psk_auth_struct = {
-	"DHE PSK",
-	NULL,
-	NULL,
-	gen_dhe_psk_server_kx,
-	gen_dhe_psk_client_kx,
-	NULL,
-	NULL,
+#ifdef ENABLE_DHE
+const mod_auth_st dhe_psk_auth_struct = { "DHE PSK",
+					  NULL,
+					  NULL,
+					  gen_dhe_psk_server_kx,
+					  gen_dhe_psk_client_kx,
+					  NULL,
+					  NULL,
 
-	NULL,
-	NULL,			/* certificate */
-	proc_dhe_psk_server_kx,
-	proc_dhe_psk_client_kx,
-	NULL,
-	NULL
-};
-# endif
+					  NULL,
+					  NULL, /* certificate */
+					  proc_dhe_psk_server_kx,
+					  proc_dhe_psk_client_kx,
+					  NULL,
+					  NULL };
+#endif
 
-# ifdef ENABLE_ECDHE
-const mod_auth_st ecdhe_psk_auth_struct = {
-	"ECDHE PSK",
-	NULL,
-	NULL,
-	gen_ecdhe_psk_server_kx,
-	gen_ecdhe_psk_client_kx,
-	NULL,
-	NULL,
+#ifdef ENABLE_ECDHE
+const mod_auth_st ecdhe_psk_auth_struct = { "ECDHE PSK",
+					    NULL,
+					    NULL,
+					    gen_ecdhe_psk_server_kx,
+					    gen_ecdhe_psk_client_kx,
+					    NULL,
+					    NULL,
 
-	NULL,
-	NULL,			/* certificate */
-	proc_ecdhe_psk_server_kx,
-	proc_ecdhe_psk_client_kx,
-	NULL,
-	NULL
-};
-# endif
+					    NULL,
+					    NULL, /* certificate */
+					    proc_ecdhe_psk_server_kx,
+					    proc_ecdhe_psk_client_kx,
+					    NULL,
+					    NULL };
+#endif
 
-static int
-gen_ecdhe_psk_client_kx(gnutls_session_t session, gnutls_buffer_st * data)
+static int gen_ecdhe_psk_client_kx(gnutls_session_t session,
+				   gnutls_buffer_st *data)
 {
 	int ret, free;
 	gnutls_psk_client_credentials_t cred;
 	gnutls_datum_t username, key;
 	unsigned init_pos = data->length;
 
-	cred = (gnutls_psk_client_credentials_t)
-	    _gnutls_get_cred(session, GNUTLS_CRD_PSK);
+	cred = (gnutls_psk_client_credentials_t)_gnutls_get_cred(
+		session, GNUTLS_CRD_PSK);
 
 	if (cred == NULL)
 		return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
@@ -112,9 +107,8 @@ gen_ecdhe_psk_client_kx(gnutls_session_t session, gnutls_buffer_st * data)
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret =
-	    _gnutls_buffer_append_data_prefix(data, 16, username.data,
-					      username.size);
+	ret = _gnutls_buffer_append_data_prefix(data, 16, username.data,
+						username.size);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -129,7 +123,7 @@ gen_ecdhe_psk_client_kx(gnutls_session_t session, gnutls_buffer_st * data)
 
 	ret = data->length - init_pos;
 
- cleanup:
+cleanup:
 	if (free) {
 		_gnutls_free_datum(&username);
 		_gnutls_free_temp_key_datum(&key);
@@ -138,16 +132,16 @@ gen_ecdhe_psk_client_kx(gnutls_session_t session, gnutls_buffer_st * data)
 	return ret;
 }
 
-static int
-gen_dhe_psk_client_kx(gnutls_session_t session, gnutls_buffer_st * data)
+static int gen_dhe_psk_client_kx(gnutls_session_t session,
+				 gnutls_buffer_st *data)
 {
 	int ret, free;
 	gnutls_psk_client_credentials_t cred;
 	gnutls_datum_t username, key;
 	unsigned init_pos = data->length;
 
-	cred = (gnutls_psk_client_credentials_t)
-	    _gnutls_get_cred(session, GNUTLS_CRD_PSK);
+	cred = (gnutls_psk_client_credentials_t)_gnutls_get_cred(
+		session, GNUTLS_CRD_PSK);
 
 	if (cred == NULL)
 		return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
@@ -156,9 +150,8 @@ gen_dhe_psk_client_kx(gnutls_session_t session, gnutls_buffer_st * data)
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret =
-	    _gnutls_buffer_append_data_prefix(data, 16, username.data,
-					      username.size);
+	ret = _gnutls_buffer_append_data_prefix(data, 16, username.data,
+						username.size);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -173,7 +166,7 @@ gen_dhe_psk_client_kx(gnutls_session_t session, gnutls_buffer_st * data)
 
 	ret = data->length - init_pos;
 
- cleanup:
+cleanup:
 	if (free) {
 		_gnutls_free_datum(&username);
 		_gnutls_free_temp_key_datum(&key);
@@ -182,37 +175,35 @@ gen_dhe_psk_client_kx(gnutls_session_t session, gnutls_buffer_st * data)
 	return ret;
 }
 
-static int
-gen_dhe_psk_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
+static int gen_dhe_psk_server_kx(gnutls_session_t session,
+				 gnutls_buffer_st *data)
 {
 	int ret;
 	gnutls_psk_server_credentials_t cred;
 	gnutls_datum_t hint = { NULL, 0 };
 
-	cred = (gnutls_psk_server_credentials_t)
-	    _gnutls_get_cred(session, GNUTLS_CRD_PSK);
+	cred = (gnutls_psk_server_credentials_t)_gnutls_get_cred(
+		session, GNUTLS_CRD_PSK);
 	if (cred == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
-	if ((ret =
-	     _gnutls_auth_info_init(session, GNUTLS_CRD_PSK,
-				    sizeof(psk_auth_info_st), 1)) < 0) {
+	if ((ret = _gnutls_auth_info_init(session, GNUTLS_CRD_PSK,
+					  sizeof(psk_auth_info_st), 1)) < 0) {
 		gnutls_assert();
 		return ret;
 	}
 
-	ret =
-	    _gnutls_figure_dh_params(session, cred->dh_params,
-				     cred->params_func, cred->dh_sec_param);
+	ret = _gnutls_figure_dh_params(session, cred->dh_params,
+				       cred->params_func, cred->dh_sec_param);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
 	}
 
 	if (cred->hint) {
-		hint.data = (uint8_t *) cred->hint;
+		hint.data = (uint8_t *)cred->hint;
 		hint.size = strlen(cred->hint);
 	}
 
@@ -227,22 +218,21 @@ gen_dhe_psk_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 	return ret;
 }
 
-static int
-gen_ecdhe_psk_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
+static int gen_ecdhe_psk_server_kx(gnutls_session_t session,
+				   gnutls_buffer_st *data)
 {
 	int ret;
 	gnutls_psk_server_credentials_t cred;
 	gnutls_datum_t hint = { NULL, 0 };
 
-	if ((ret =
-	     _gnutls_auth_info_init(session, GNUTLS_CRD_PSK,
-				    sizeof(psk_auth_info_st), 1)) < 0) {
+	if ((ret = _gnutls_auth_info_init(session, GNUTLS_CRD_PSK,
+					  sizeof(psk_auth_info_st), 1)) < 0) {
 		gnutls_assert();
 		return ret;
 	}
 
-	cred = (gnutls_psk_server_credentials_t)
-	    _gnutls_get_cred(session, GNUTLS_CRD_PSK);
+	cred = (gnutls_psk_server_credentials_t)_gnutls_get_cred(
+		session, GNUTLS_CRD_PSK);
 
 	if (cred == NULL) {
 		gnutls_assert();
@@ -250,7 +240,7 @@ gen_ecdhe_psk_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 	}
 
 	if (cred->hint) {
-		hint.data = (uint8_t *) cred->hint;
+		hint.data = (uint8_t *)cred->hint;
 		hint.size = strlen(cred->hint);
 	}
 
@@ -266,9 +256,8 @@ gen_ecdhe_psk_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 	return ret;
 }
 
-static int
-proc_dhe_psk_client_kx(gnutls_session_t session, uint8_t * data,
-		       size_t _data_size)
+static int proc_dhe_psk_client_kx(gnutls_session_t session, uint8_t *data,
+				  size_t _data_size)
 {
 	int ret;
 	gnutls_datum_t psk_key;
@@ -277,17 +266,16 @@ proc_dhe_psk_client_kx(gnutls_session_t session, uint8_t * data,
 	gnutls_datum_t username;
 	ssize_t data_size = _data_size;
 
-	cred = (gnutls_psk_server_credentials_t)
-	    _gnutls_get_cred(session, GNUTLS_CRD_PSK);
+	cred = (gnutls_psk_server_credentials_t)_gnutls_get_cred(
+		session, GNUTLS_CRD_PSK);
 
 	if (cred == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
-	if ((ret =
-	     _gnutls_auth_info_init(session, GNUTLS_CRD_PSK,
-				    sizeof(psk_auth_info_st), 1)) < 0) {
+	if ((ret = _gnutls_auth_info_init(session, GNUTLS_CRD_PSK,
+					  sizeof(psk_auth_info_st), 1)) < 0) {
 		gnutls_assert();
 		return ret;
 	}
@@ -319,9 +307,8 @@ proc_dhe_psk_client_kx(gnutls_session_t session, uint8_t * data,
 	/* Adjust the data */
 	data += username.size + 2;
 
-	ret =
-	    _gnutls_psk_pwd_find_entry(session, info->username,
-				       info->username_len, &psk_key);
+	ret = _gnutls_psk_pwd_find_entry(session, info->username,
+					 info->username_len, &psk_key);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -331,12 +318,10 @@ proc_dhe_psk_client_kx(gnutls_session_t session, uint8_t * data,
 	_gnutls_free_key_datum(&psk_key);
 
 	return ret;
-
 }
 
-static int
-proc_ecdhe_psk_client_kx(gnutls_session_t session, uint8_t * data,
-			 size_t _data_size)
+static int proc_ecdhe_psk_client_kx(gnutls_session_t session, uint8_t *data,
+				    size_t _data_size)
 {
 	int ret;
 	gnutls_psk_server_credentials_t cred;
@@ -345,17 +330,16 @@ proc_ecdhe_psk_client_kx(gnutls_session_t session, uint8_t * data,
 	gnutls_datum_t username;
 	ssize_t data_size = _data_size;
 
-	cred = (gnutls_psk_server_credentials_t)
-	    _gnutls_get_cred(session, GNUTLS_CRD_PSK);
+	cred = (gnutls_psk_server_credentials_t)_gnutls_get_cred(
+		session, GNUTLS_CRD_PSK);
 
 	if (cred == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
-	if ((ret =
-	     _gnutls_auth_info_init(session, GNUTLS_CRD_PSK,
-				    sizeof(psk_auth_info_st), 1)) < 0) {
+	if ((ret = _gnutls_auth_info_init(session, GNUTLS_CRD_PSK,
+					  sizeof(psk_auth_info_st), 1)) < 0) {
 		gnutls_assert();
 		return ret;
 	}
@@ -389,9 +373,8 @@ proc_ecdhe_psk_client_kx(gnutls_session_t session, uint8_t * data,
 
 	/* should never fail. It will always return a key even if it is
 	 * a random one */
-	ret =
-	    _gnutls_psk_pwd_find_entry(session, info->username,
-				       info->username_len, &psk_key);
+	ret = _gnutls_psk_pwd_find_entry(session, info->username,
+					 info->username_len, &psk_key);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -403,20 +386,17 @@ proc_ecdhe_psk_client_kx(gnutls_session_t session, uint8_t * data,
 	return ret;
 }
 
-static int
-proc_dhe_psk_server_kx(gnutls_session_t session, uint8_t * data,
-		       size_t _data_size)
+static int proc_dhe_psk_server_kx(gnutls_session_t session, uint8_t *data,
+				  size_t _data_size)
 {
-
 	int ret;
 	ssize_t data_size = _data_size;
 	psk_auth_info_t info;
 	gnutls_datum_t hint;
 
 	/* set auth_info */
-	if ((ret =
-	     _gnutls_auth_info_init(session, GNUTLS_CRD_PSK,
-				    sizeof(psk_auth_info_st), 1)) < 0) {
+	if ((ret = _gnutls_auth_info_init(session, GNUTLS_CRD_PSK,
+					  sizeof(psk_auth_info_st), 1)) < 0) {
 		gnutls_assert();
 		return ret;
 	}
@@ -451,20 +431,17 @@ proc_dhe_psk_server_kx(gnutls_session_t session, uint8_t * data,
 	return 0;
 }
 
-static int
-proc_ecdhe_psk_server_kx(gnutls_session_t session, uint8_t * data,
-			 size_t _data_size)
+static int proc_ecdhe_psk_server_kx(gnutls_session_t session, uint8_t *data,
+				    size_t _data_size)
 {
-
 	int ret;
 	ssize_t data_size = _data_size;
 	psk_auth_info_t info;
 	gnutls_datum_t hint;
 
 	/* set auth_info */
-	if ((ret =
-	     _gnutls_auth_info_init(session, GNUTLS_CRD_PSK,
-				    sizeof(psk_auth_info_st), 1)) < 0) {
+	if ((ret = _gnutls_auth_info_init(session, GNUTLS_CRD_PSK,
+					  sizeof(psk_auth_info_st), 1)) < 0) {
 		gnutls_assert();
 		return ret;
 	}
@@ -499,4 +476,4 @@ proc_ecdhe_psk_server_kx(gnutls_session_t session, uint8_t * data,
 	return 0;
 }
 
-#endif				/* ENABLE_PSK */
+#endif /* ENABLE_PSK */

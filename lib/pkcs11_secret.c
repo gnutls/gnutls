@@ -43,11 +43,10 @@
  *
  * Since: 2.12.0
  **/
-int
-gnutls_pkcs11_copy_secret_key(const char *token_url, gnutls_datum_t * key,
-			      const char *label,
-			      unsigned int key_usage, unsigned int flags
-			      /* GNUTLS_PKCS11_OBJ_FLAG_* */ )
+int gnutls_pkcs11_copy_secret_key(const char *token_url, gnutls_datum_t *key,
+				  const char *label, unsigned int key_usage,
+				  unsigned int flags
+				  /* GNUTLS_PKCS11_OBJ_FLAG_* */)
 {
 	int ret;
 	struct p11_kit_uri *info = NULL;
@@ -78,9 +77,9 @@ gnutls_pkcs11_copy_secret_key(const char *token_url, gnutls_datum_t * key,
 		return ret;
 	}
 
-	ret =
-	    pkcs11_open_session(&sinfo, NULL, info,
-				SESSION_WRITE | pkcs11_obj_flags_to_int(flags));
+	ret = pkcs11_open_session(&sinfo, NULL, info,
+				  SESSION_WRITE |
+					  pkcs11_obj_flags_to_int(flags));
 	p11_kit_uri_free(info);
 
 	if (ret < 0) {
@@ -141,9 +140,8 @@ gnutls_pkcs11_copy_secret_key(const char *token_url, gnutls_datum_t * key,
 
 	ret = 0;
 
- cleanup:
+cleanup:
 	pkcs11_close_session(&sinfo);
 
 	return ret;
-
 }

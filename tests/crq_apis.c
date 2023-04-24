@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdlib.h>
@@ -38,42 +38,43 @@ static void tls_log_func(int level, const char *str)
 }
 
 static unsigned char saved_crq_pem[] =
-    "-----BEGIN NEW CERTIFICATE REQUEST-----\n"
-    "MIICSDCCAbECAQAwKzEOMAwGA1UEAxMFbmlrb3MxGTAXBgNVBAoTEG5vbmUgdG8s\n"
-    "IG1lbnRpb24wgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBALtmQ/Xyxde2jMzF\n"
-    "3/WIO7HJS2oOoa0gUEAIgKFPXKPQ+GzP5jz37AR2ExeLZIkiW8DdU3w77XwEu4C5\n"
-    "KL6Om8aOoKUSy/VXHqLnu7czSZ/ju0quak1o/8kR4jKNzj2AC41179gAgY8oBAOg\n"
-    "Io1hBAf6tjd9IQdJ0glhaZiQo1ipAgMBAAGggdwwEgYJKoZIhvcNAQkHMQUTA2Zv\n"
-    "bzCBxQYJKoZIhvcNAQkOMYG3MIG0MA8GA1UdEwEB/wQFMAMCAQAwDQYDVR0PAQH/\n"
-    "BAMDAQAwIwYDVR0RBBwwGoIDYXBhggNmb2+CDnhuLS1reGF3aGsuY29tMB0GA1Ud\n"
-    "JQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjALBgQqAwQFBAPK/v8wFAYILQOCiPS5\n"
-    "FwUBAf8EBcr+//r+MCsGA1UdEAQkMCKADzIwMTkwNzA5MDQyODI2WoEPMjAxOTA3\n"
-    "MDkwNzE1MDZaMA0GCSqGSIb3DQEBCwUAA4GBAD5WboLhAYvbStlK1UwvB4b2vmJP\n"
-    "mfl7S/VmaeBFX8w0lpZTCTCRuB0WJek6YPfXyRsUUJsjWElZeEE0N8V+eQ3oz4um\n"
-    "N2QCk4Zrc5FRyCkKUe+qaqQhB1ho01ZQDMgkj2B10tubhdrKf17QCzgKEp+5VR46\n"
-    "Bme4HDJqbHlH+O0y\n" "-----END NEW CERTIFICATE REQUEST-----\n";
+	"-----BEGIN NEW CERTIFICATE REQUEST-----\n"
+	"MIICSDCCAbECAQAwKzEOMAwGA1UEAxMFbmlrb3MxGTAXBgNVBAoTEG5vbmUgdG8s\n"
+	"IG1lbnRpb24wgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBALtmQ/Xyxde2jMzF\n"
+	"3/WIO7HJS2oOoa0gUEAIgKFPXKPQ+GzP5jz37AR2ExeLZIkiW8DdU3w77XwEu4C5\n"
+	"KL6Om8aOoKUSy/VXHqLnu7czSZ/ju0quak1o/8kR4jKNzj2AC41179gAgY8oBAOg\n"
+	"Io1hBAf6tjd9IQdJ0glhaZiQo1ipAgMBAAGggdwwEgYJKoZIhvcNAQkHMQUTA2Zv\n"
+	"bzCBxQYJKoZIhvcNAQkOMYG3MIG0MA8GA1UdEwEB/wQFMAMCAQAwDQYDVR0PAQH/\n"
+	"BAMDAQAwIwYDVR0RBBwwGoIDYXBhggNmb2+CDnhuLS1reGF3aGsuY29tMB0GA1Ud\n"
+	"JQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjALBgQqAwQFBAPK/v8wFAYILQOCiPS5\n"
+	"FwUBAf8EBcr+//r+MCsGA1UdEAQkMCKADzIwMTkwNzA5MDQyODI2WoEPMjAxOTA3\n"
+	"MDkwNzE1MDZaMA0GCSqGSIb3DQEBCwUAA4GBAD5WboLhAYvbStlK1UwvB4b2vmJP\n"
+	"mfl7S/VmaeBFX8w0lpZTCTCRuB0WJek6YPfXyRsUUJsjWElZeEE0N8V+eQ3oz4um\n"
+	"N2QCk4Zrc5FRyCkKUe+qaqQhB1ho01ZQDMgkj2B10tubhdrKf17QCzgKEp+5VR46\n"
+	"Bme4HDJqbHlH+O0y\n"
+	"-----END NEW CERTIFICATE REQUEST-----\n";
 
 const gnutls_datum_t saved_crq = { saved_crq_pem, sizeof(saved_crq_pem) - 1 };
 
 static unsigned char key_pem[] =
-    "-----BEGIN RSA PRIVATE KEY-----\n"
-    "MIICXAIBAAKBgQC7ZkP18sXXtozMxd/1iDuxyUtqDqGtIFBACIChT1yj0Phsz+Y8\n"
-    "9+wEdhMXi2SJIlvA3VN8O+18BLuAuSi+jpvGjqClEsv1Vx6i57u3M0mf47tKrmpN\n"
-    "aP/JEeIyjc49gAuNde/YAIGPKAQDoCKNYQQH+rY3fSEHSdIJYWmYkKNYqQIDAQAB\n"
-    "AoGADpmARG5CQxS+AesNkGmpauepiCz1JBF/JwnyiX6vEzUh0Ypd39SZztwrDxvF\n"
-    "PJjQaKVljml1zkJpIDVsqvHdyVdse8M+Qn6hw4x2p5rogdvhhIL1mdWo7jWeVJTF\n"
-    "RKB7zLdMPs3ySdtcIQaF9nUAQ2KJEvldkO3m/bRJFEp54k0CQQDYy+RlTmwRD6hy\n"
-    "7UtMjR0H3CSZJeQ8svMCxHLmOluG9H1UKk55ZBYfRTsXniqUkJBZ5wuV1L+pR9EK\n"
-    "ca89a+1VAkEA3UmBelwEv2u9cAU1QjKjmwju1JgXbrjEohK+3B5y0ESEXPAwNQT9\n"
-    "TrDM1m9AyxYTWLxX93dI5QwNFJtmbtjeBQJARSCWXhsoaDRG8QZrCSjBxfzTCqZD\n"
-    "ZXtl807ymCipgJm60LiAt0JLr4LiucAsMZz6+j+quQbSakbFCACB8SLV1QJBAKZQ\n"
-    "YKf+EPNtnmta/rRKKvySsi3GQZZN+Dt3q0r094XgeTsAqrqujVNfPhTMeP4qEVBX\n"
-    "/iVX2cmMTSh3w3z8MaECQEp0XJWDVKOwcTW6Ajp9SowtmiZ3YDYo1LF9igb4iaLv\n"
-    "sWZGfbnU3ryjvkb6YuFjgtzbZDZHWQCo8/cOtOBmPdk=\n"
-    "-----END RSA PRIVATE KEY-----\n";
+	"-----BEGIN RSA PRIVATE KEY-----\n"
+	"MIICXAIBAAKBgQC7ZkP18sXXtozMxd/1iDuxyUtqDqGtIFBACIChT1yj0Phsz+Y8\n"
+	"9+wEdhMXi2SJIlvA3VN8O+18BLuAuSi+jpvGjqClEsv1Vx6i57u3M0mf47tKrmpN\n"
+	"aP/JEeIyjc49gAuNde/YAIGPKAQDoCKNYQQH+rY3fSEHSdIJYWmYkKNYqQIDAQAB\n"
+	"AoGADpmARG5CQxS+AesNkGmpauepiCz1JBF/JwnyiX6vEzUh0Ypd39SZztwrDxvF\n"
+	"PJjQaKVljml1zkJpIDVsqvHdyVdse8M+Qn6hw4x2p5rogdvhhIL1mdWo7jWeVJTF\n"
+	"RKB7zLdMPs3ySdtcIQaF9nUAQ2KJEvldkO3m/bRJFEp54k0CQQDYy+RlTmwRD6hy\n"
+	"7UtMjR0H3CSZJeQ8svMCxHLmOluG9H1UKk55ZBYfRTsXniqUkJBZ5wuV1L+pR9EK\n"
+	"ca89a+1VAkEA3UmBelwEv2u9cAU1QjKjmwju1JgXbrjEohK+3B5y0ESEXPAwNQT9\n"
+	"TrDM1m9AyxYTWLxX93dI5QwNFJtmbtjeBQJARSCWXhsoaDRG8QZrCSjBxfzTCqZD\n"
+	"ZXtl807ymCipgJm60LiAt0JLr4LiucAsMZz6+j+quQbSakbFCACB8SLV1QJBAKZQ\n"
+	"YKf+EPNtnmta/rRKKvySsi3GQZZN+Dt3q0r094XgeTsAqrqujVNfPhTMeP4qEVBX\n"
+	"/iVX2cmMTSh3w3z8MaECQEp0XJWDVKOwcTW6Ajp9SowtmiZ3YDYo1LF9igb4iaLv\n"
+	"sWZGfbnU3ryjvkb6YuFjgtzbZDZHWQCo8/cOtOBmPdk=\n"
+	"-----END RSA PRIVATE KEY-----\n";
 const gnutls_datum_t key = { key_pem, sizeof(key_pem) - 1 };
 
-static time_t mytime(time_t * t)
+static time_t mytime(time_t *t)
 {
 	time_t then = 1207000800;
 
@@ -137,9 +138,8 @@ static gnutls_x509_crq_t generate_crq(void)
 		fail("%d: gnutls_x509_crq_get_challenge_password %d: %s\n",
 		     __LINE__, ret, gnutls_strerror(ret));
 
-	ret =
-	    gnutls_x509_crq_set_dn(crq, "o = none to\\, mention,cn = nikos",
-				   &err);
+	ret = gnutls_x509_crq_set_dn(crq, "o = none to\\, mention,cn = nikos",
+				     &err);
 	if (ret < 0) {
 		fail("gnutls_x509_crq_set_dn: %s, %s\n", gnutls_strerror(ret),
 		     err);
@@ -152,7 +152,8 @@ static gnutls_x509_crq_t generate_crq(void)
 	s = 0;
 	ret = gnutls_x509_crq_get_challenge_password(crq, NULL, &s);
 	if (ret != GNUTLS_E_SHORT_MEMORY_BUFFER || s != 4)
-		fail("%d: gnutls_x509_crq_get_challenge_password %d: %s (passlen: %d)\n", __LINE__, ret, gnutls_strerror(ret), (int)s);
+		fail("%d: gnutls_x509_crq_get_challenge_password %d: %s (passlen: %d)\n",
+		     __LINE__, ret, gnutls_strerror(ret), (int)s);
 
 	s = 10;
 	ret = gnutls_x509_crq_get_challenge_password(crq, smallbuf, &s);
@@ -170,15 +171,13 @@ static gnutls_x509_crq_t generate_crq(void)
 	if (ret != 0)
 		fail("gnutls_x509_crq_get_extension_data\n");
 
-	ret = gnutls_x509_crq_set_subject_alt_name(crq, GNUTLS_SAN_DNSNAME,
-						   "foo", 3,
-						   GNUTLS_FSAN_APPEND);
+	ret = gnutls_x509_crq_set_subject_alt_name(
+		crq, GNUTLS_SAN_DNSNAME, "foo", 3, GNUTLS_FSAN_APPEND);
 	if (ret != 0)
 		fail("gnutls_x509_crq_set_subject_alt_name\n");
 
-	ret = gnutls_x509_crq_set_subject_alt_name(crq, GNUTLS_SAN_DNSNAME,
-						   "bar", 3,
-						   GNUTLS_FSAN_APPEND);
+	ret = gnutls_x509_crq_set_subject_alt_name(
+		crq, GNUTLS_SAN_DNSNAME, "bar", 3, GNUTLS_FSAN_APPEND);
 	if (ret != 0)
 		fail("gnutls_x509_crq_set_subject_alt_name\n");
 
@@ -187,9 +186,8 @@ static gnutls_x509_crq_t generate_crq(void)
 	if (ret != 0)
 		fail("gnutls_x509_crq_set_subject_alt_name\n");
 
-	ret = gnutls_x509_crq_set_subject_alt_name(crq, GNUTLS_SAN_DNSNAME,
-						   "foo", 3,
-						   GNUTLS_FSAN_APPEND);
+	ret = gnutls_x509_crq_set_subject_alt_name(
+		crq, GNUTLS_SAN_DNSNAME, "foo", 3, GNUTLS_FSAN_APPEND);
 	if (ret != 0)
 		fail("gnutls_x509_crq_set_subject_alt_name\n");
 
@@ -213,9 +211,8 @@ static gnutls_x509_crq_t generate_crq(void)
 		fail("gnutls_x509_crq_get_key_purpose_oid %d\n", ret);
 
 	s = 0;
-	ret =
-	    gnutls_x509_crq_set_key_purpose_oid(crq,
-						GNUTLS_KP_TLS_WWW_SERVER, 0);
+	ret = gnutls_x509_crq_set_key_purpose_oid(crq, GNUTLS_KP_TLS_WWW_SERVER,
+						  0);
 	if (ret != 0)
 		fail("gnutls_x509_crq_set_key_purpose_oid %d\n", ret);
 
@@ -225,9 +222,8 @@ static gnutls_x509_crq_t generate_crq(void)
 		fail("gnutls_x509_crq_get_key_purpose_oid %d\n", ret);
 
 	s = 0;
-	ret =
-	    gnutls_x509_crq_set_key_purpose_oid(crq,
-						GNUTLS_KP_TLS_WWW_CLIENT, 1);
+	ret = gnutls_x509_crq_set_key_purpose_oid(crq, GNUTLS_KP_TLS_WWW_CLIENT,
+						  1);
 	if (ret != 0)
 		fail("gnutls_x509_crq_set_key_purpose_oid2 %d\n", ret);
 
@@ -236,16 +232,14 @@ static gnutls_x509_crq_t generate_crq(void)
 #define EXT_DATA1 "\xCA\xFE\xFF"
 #define EXT_DATA2 "\xCA\xFE\xFF\xFA\xFE"
 	/* test writing arbitrary extensions */
-	ret =
-	    gnutls_x509_crq_set_extension_by_oid(crq, EXT_ID1, EXT_DATA1,
-						 sizeof(EXT_DATA1) - 1, 0);
+	ret = gnutls_x509_crq_set_extension_by_oid(crq, EXT_ID1, EXT_DATA1,
+						   sizeof(EXT_DATA1) - 1, 0);
 	if (ret != 0)
 		fail("gnutls_x509_crq_set_extension_by_oid %s\n",
 		     gnutls_strerror(ret));
 
-	ret =
-	    gnutls_x509_crq_set_extension_by_oid(crq, EXT_ID2, EXT_DATA2,
-						 sizeof(EXT_DATA2) - 1, 1);
+	ret = gnutls_x509_crq_set_extension_by_oid(crq, EXT_ID2, EXT_DATA2,
+						   sizeof(EXT_DATA2) - 1, 1);
 	if (ret != 0)
 		fail("gnutls_x509_crq_set_extension_by_oid %s\n",
 		     gnutls_strerror(ret));
@@ -269,14 +263,14 @@ static gnutls_x509_crq_t generate_crq(void)
 
 	/* test reading the arb. extensions */
 	crit = -1;
-	ret =
-	    gnutls_x509_crq_get_extension_by_oid2(crq, EXT_ID1, 0, &out, &crit);
+	ret = gnutls_x509_crq_get_extension_by_oid2(crq, EXT_ID1, 0, &out,
+						    &crit);
 	if (ret < 0)
 		fail("gnutls_x509_crq_get_extension_by_oid2: %s\n",
 		     gnutls_strerror(ret));
 
-	if (out.size != sizeof(EXT_DATA1) - 1
-	    || memcmp(out.data, EXT_DATA1, out.size) != 0) {
+	if (out.size != sizeof(EXT_DATA1) - 1 ||
+	    memcmp(out.data, EXT_DATA1, out.size) != 0) {
 		fail("ext1 doesn't match\n");
 	}
 	if (crit != 0) {
@@ -285,14 +279,14 @@ static gnutls_x509_crq_t generate_crq(void)
 	gnutls_free(out.data);
 
 	crit = -1;
-	ret =
-	    gnutls_x509_crq_get_extension_by_oid2(crq, EXT_ID2, 0, &out, &crit);
+	ret = gnutls_x509_crq_get_extension_by_oid2(crq, EXT_ID2, 0, &out,
+						    &crit);
 	if (ret < 0)
 		fail("gnutls_x509_crq_get_extension_by_oid2: %s\n",
 		     gnutls_strerror(ret));
 
-	if (out.size != sizeof(EXT_DATA2) - 1
-	    || memcmp(out.data, EXT_DATA2, out.size) != 0) {
+	if (out.size != sizeof(EXT_DATA2) - 1 ||
+	    memcmp(out.data, EXT_DATA2, out.size) != 0) {
 		fail("ext2 doesn't match\n");
 	}
 	if (crit != 1) {
@@ -344,8 +338,8 @@ static void test_crq(gnutls_x509_crq_t crq)
 	assert(pathlen == 0);
 
 	s = sizeof(buf);
-	ret =
-	    gnutls_x509_crq_get_subject_alt_name(crq, 0, buf, &s, &type, &crit);
+	ret = gnutls_x509_crq_get_subject_alt_name(crq, 0, buf, &s, &type,
+						   &crit);
 	assert(ret >= 0);
 	assert(s == 3);
 	assert(memcmp(buf, "apa", s) == 0);
@@ -353,16 +347,16 @@ static void test_crq(gnutls_x509_crq_t crq)
 	assert(crit == 0);
 
 	s = sizeof(buf);
-	ret =
-	    gnutls_x509_crq_get_subject_alt_name(crq, 1, buf, &s, &type, &crit);
+	ret = gnutls_x509_crq_get_subject_alt_name(crq, 1, buf, &s, &type,
+						   &crit);
 	assert(ret >= 0);
 	assert(s == 3);
 	assert(memcmp(buf, "foo", s) == 0);
 	assert(type == GNUTLS_SAN_DNSNAME);
 	assert(crit == 0);
 
-	ret =
-	    gnutls_x509_crq_get_private_key_usage_period(crq, &t1, &t2, &crit);
+	ret = gnutls_x509_crq_get_private_key_usage_period(crq, &t1, &t2,
+							   &crit);
 	if (ret < 0)
 		fail("gnutls_x509_crq_get_private_key_usage_period: %s\n",
 		     gnutls_strerror(ret));
@@ -408,9 +402,8 @@ static void run_set_extensions(gnutls_x509_crq_t crq)
 	if (ret != 0)
 		fail("gnutls_x509_crt_set_crq: %s\n", gnutls_strerror(ret));
 
-	ret =
-	    gnutls_x509_crt_set_issuer_dn(crt, "o = big\\, and one, cn = my CA",
-					  &err);
+	ret = gnutls_x509_crt_set_issuer_dn(
+		crt, "o = big\\, and one, cn = my CA", &err);
 	if (ret < 0) {
 		fail("gnutls_x509_crt_set_issuer_dn: %s, %s\n",
 		     gnutls_strerror(ret), err);
@@ -488,9 +481,8 @@ static void run_set_extension_by_oid(gnutls_x509_crq_t crq)
 	if (ret != 0)
 		fail("gnutls_x509_crt_set_crq: %s\n", gnutls_strerror(ret));
 
-	ret =
-	    gnutls_x509_crt_set_issuer_dn(crt, "o = big\\, and one,cn = my CA",
-					  &err);
+	ret = gnutls_x509_crt_set_issuer_dn(
+		crt, "o = big\\, and one,cn = my CA", &err);
 	if (ret < 0) {
 		fail("gnutls_x509_crt_set_issuer_dn: %s, %s\n",
 		     gnutls_strerror(ret), err);
@@ -500,10 +492,8 @@ static void run_set_extension_by_oid(gnutls_x509_crq_t crq)
 	if (ret != 0)
 		fail("gnutls_x509_crt_set_version\n");
 
-	ret =
-	    gnutls_x509_crt_set_crq_extension_by_oid(crt, crq,
-						     GNUTLS_X509EXT_OID_EXTENDED_KEY_USAGE,
-						     0);
+	ret = gnutls_x509_crt_set_crq_extension_by_oid(
+		crt, crq, GNUTLS_X509EXT_OID_EXTENDED_KEY_USAGE, 0);
 	if (ret != 0)
 		fail("gnutls_x509_crt_set_crq_extension_by_oid\n");
 
@@ -521,22 +511,21 @@ static void run_set_extension_by_oid(gnutls_x509_crq_t crq)
 
 	for (i = 0;; i++) {
 		oid_size = sizeof(oid);
-		ret =
-		    gnutls_x509_crq_get_extension_info(crq, i, oid, &oid_size,
-						       NULL);
+		ret = gnutls_x509_crq_get_extension_info(crq, i, oid, &oid_size,
+							 NULL);
 		if (ret < 0)
 			fail("loop: ext not found: %s\n", gnutls_strerror(ret));
 		if (strcmp(oid, GNUTLS_X509EXT_OID_EXTENDED_KEY_USAGE) == 0) {
-			ret =
-			    gnutls_x509_crq_get_extension_data2(crq, 3, &out2);
+			ret = gnutls_x509_crq_get_extension_data2(crq, 3,
+								  &out2);
 			if (ret != 0)
 				fail("gnutls_x509_crt_get_extension_data2\n");
 			break;
 		}
-
 	}
 
-	if (out.size != out2.size || memcmp(out.data, out2.data, out.size) != 0) {
+	if (out.size != out2.size ||
+	    memcmp(out.data, out2.data, out.size) != 0) {
 		fail("memcmp %d, %d\n", out.size, out2.size);
 	}
 

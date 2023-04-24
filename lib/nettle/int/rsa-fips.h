@@ -20,27 +20,25 @@
  */
 
 #ifndef GNUTLS_LIB_NETTLE_INT_RSA_FIPS_H
-# define GNUTLS_LIB_NETTLE_INT_RSA_FIPS_H
+#define GNUTLS_LIB_NETTLE_INT_RSA_FIPS_H
 
-# include <nettle/rsa.h>
+#include <nettle/rsa.h>
 
-int
-_rsa_generate_fips186_4_keypair(struct rsa_public_key *pub,
-				struct rsa_private_key *key,
-				unsigned seed_length, uint8_t * seed,
-				void *progress_ctx,
-				nettle_progress_func * progress,
-				/* Desired size of modulo, in bits */
-				unsigned n_size);
+int _rsa_generate_fips186_4_keypair(struct rsa_public_key *pub,
+				    struct rsa_private_key *key,
+				    unsigned seed_length, uint8_t *seed,
+				    void *progress_ctx,
+				    nettle_progress_func *progress,
+				    /* Desired size of modulo, in bits */
+				    unsigned n_size);
 
-int
-rsa_generate_fips186_4_keypair(struct rsa_public_key *pub,
-			       struct rsa_private_key *key,
-			       void *random_ctx, nettle_random_func * random,
-			       void *progress_ctx,
-			       nettle_progress_func * progress,
-			       unsigned *rseed_size, void *rseed,
-			       /* Desired size of modulo, in bits */
-			       unsigned n_size);
+int rsa_generate_fips186_4_keypair(struct rsa_public_key *pub,
+				   struct rsa_private_key *key,
+				   void *random_ctx, nettle_random_func *random,
+				   void *progress_ctx,
+				   nettle_progress_func *progress,
+				   unsigned *rseed_size, void *rseed,
+				   /* Desired size of modulo, in bits */
+				   unsigned n_size);
 
-#endif				/* GNUTLS_LIB_NETTLE_INT_RSA_FIPS_H */
+#endif /* GNUTLS_LIB_NETTLE_INT_RSA_FIPS_H */

@@ -1,7 +1,7 @@
 /* This example code is placed in the public domain. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -41,12 +41,12 @@ extern int udp_connect(void)
 
 #if defined(IP_DONTFRAG)
 	optval = 1;
-	setsockopt(sd, IPPROTO_IP, IP_DONTFRAG,
-		   (const void *)&optval, sizeof(optval));
+	setsockopt(sd, IPPROTO_IP, IP_DONTFRAG, (const void *)&optval,
+		   sizeof(optval));
 #elif defined(IP_MTU_DISCOVER)
 	optval = IP_PMTUDISC_DO;
-	setsockopt(sd, IPPROTO_IP, IP_MTU_DISCOVER,
-		   (const void *)&optval, sizeof(optval));
+	setsockopt(sd, IPPROTO_IP, IP_MTU_DISCOVER, (const void *)&optval,
+		   sizeof(optval));
 #endif
 
 	err = connect(sd, (struct sockaddr *)&sa, sizeof(sa));

@@ -21,10 +21,10 @@
  */
 
 #ifndef GNUTLS_LIB_STR_ARRAY_H
-# define GNUTLS_LIB_STR_ARRAY_H
+#define GNUTLS_LIB_STR_ARRAY_H
 
-# include "gnutls_int.h"
-# include "errors.h"
+#include "gnutls_int.h"
+#include "errors.h"
 
 /* Functionality to allow an array of strings. Strings
  * are allowed to be added to the list and matched against it.
@@ -36,12 +36,12 @@ typedef struct gnutls_str_array_st {
 	struct gnutls_str_array_st *next;
 } *gnutls_str_array_t;
 
-inline static void _gnutls_str_array_init(gnutls_str_array_t * head)
+inline static void _gnutls_str_array_init(gnutls_str_array_t *head)
 {
 	*head = NULL;
 }
 
-inline static void _gnutls_str_array_clear(gnutls_str_array_t * head)
+inline static void _gnutls_str_array_clear(gnutls_str_array_t *head)
 {
 	gnutls_str_array_t prev, array = *head;
 
@@ -76,13 +76,13 @@ inline static void append(gnutls_str_array_t array, const char *str, int len)
 	array->next = NULL;
 }
 
-inline static int _gnutls_str_array_append(gnutls_str_array_t * head,
+inline static int _gnutls_str_array_append(gnutls_str_array_t *head,
 					   const char *str, int len)
 {
 	gnutls_str_array_t prev, array;
 	if (*head == NULL) {
-		*head =
-		    gnutls_malloc(len + 1 + sizeof(struct gnutls_str_array_st));
+		*head = gnutls_malloc(len + 1 +
+				      sizeof(struct gnutls_str_array_st));
 		if (*head == NULL)
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
@@ -95,8 +95,8 @@ inline static int _gnutls_str_array_append(gnutls_str_array_t * head,
 			prev = array;
 			array = prev->next;
 		}
-		prev->next =
-		    gnutls_malloc(len + 1 + sizeof(struct gnutls_str_array_st));
+		prev->next = gnutls_malloc(len + 1 +
+					   sizeof(struct gnutls_str_array_st));
 
 		array = prev->next;
 
@@ -109,7 +109,7 @@ inline static int _gnutls_str_array_append(gnutls_str_array_t * head,
 	return 0;
 }
 
-inline static int _gnutls_str_array_append_idna(gnutls_str_array_t * head,
+inline static int _gnutls_str_array_append_idna(gnutls_str_array_t *head,
 						const char *name, size_t size)
 {
 	int ret;
@@ -118,8 +118,8 @@ inline static int _gnutls_str_array_append_idna(gnutls_str_array_t * head,
 	/* convert the provided hostname to ACE-Labels domain. */
 	ret = gnutls_idna_map(name, size, &ahost, 0);
 	if (ret < 0) {
-		_gnutls_debug_log
-		    ("unable to convert hostname %s to IDNA format\n", name);
+		_gnutls_debug_log(
+			"unable to convert hostname %s to IDNA format\n", name);
 		/* insert the raw name */
 		return _gnutls_str_array_append(head, name, size);
 	}
@@ -130,4 +130,4 @@ inline static int _gnutls_str_array_append_idna(gnutls_str_array_t * head,
 	return ret;
 }
 
-#endif				/* GNUTLS_LIB_STR_ARRAY_H */
+#endif /* GNUTLS_LIB_STR_ARRAY_H */

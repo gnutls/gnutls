@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -63,8 +63,8 @@ static void crq_check(void)
 
 	ret = gnutls_x509_crq_init(&crq);
 	if (ret < 0) {
-		fprintf(stderr,
-			"gnutls_x509_crq_init: %s\n", gnutls_strerror(ret));
+		fprintf(stderr, "gnutls_x509_crq_init: %s\n",
+			gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -127,17 +127,16 @@ static void cert_check(void)
 
 	ret = gnutls_x509_crt_init(&crt);
 	if (ret < 0) {
-		fprintf(stderr,
-			"gnutls_x509_crt_init: %s\n", gnutls_strerror(ret));
+		fprintf(stderr, "gnutls_x509_crt_init: %s\n",
+			gnutls_strerror(ret));
 		exit(1);
 	}
 
-	ret =
-	    gnutls_x509_crt_import(crt, &server_ca3_rsa_pss2_cert,
-				   GNUTLS_X509_FMT_PEM);
+	ret = gnutls_x509_crt_import(crt, &server_ca3_rsa_pss2_cert,
+				     GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
-		fprintf(stderr,
-			"gnutls_x509_crt_import: %s\n", gnutls_strerror(ret));
+		fprintf(stderr, "gnutls_x509_crt_import: %s\n",
+			gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -185,17 +184,15 @@ static void key_check(void)
 
 	ret = gnutls_x509_privkey_init(&key);
 	if (ret < 0) {
-		fprintf(stderr,
-			"gnutls_x509_privkey_init: %s\n", gnutls_strerror(ret));
+		fprintf(stderr, "gnutls_x509_privkey_init: %s\n",
+			gnutls_strerror(ret));
 		exit(1);
 	}
 
-	ret =
-	    gnutls_x509_privkey_import(key, &server_ca3_rsa_pss2_key,
-				       GNUTLS_X509_FMT_PEM);
+	ret = gnutls_x509_privkey_import(key, &server_ca3_rsa_pss2_key,
+					 GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
-		fprintf(stderr,
-			"gnutls_x509_privkey_import: %s\n",
+		fprintf(stderr, "gnutls_x509_privkey_import: %s\n",
 			gnutls_strerror(ret));
 		exit(1);
 	}

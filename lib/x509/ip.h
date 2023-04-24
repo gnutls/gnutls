@@ -22,7 +22,7 @@
  */
 
 #ifndef GNUTLS_LIB_X509_IP_H
-# define GNUTLS_LIB_X509_IP_H
+#define GNUTLS_LIB_X509_IP_H
 
 // for documentation, see the definition
 int _gnutls_mask_to_prefix(const unsigned char *mask, unsigned mask_size);
@@ -39,4 +39,4 @@ const char *_gnutls_cidr_to_string(const void *_ip, unsigned int ip_size,
 int _gnutls_mask_ip(unsigned char *ip, const unsigned char *mask,
 		    unsigned ipsize);
 
-#endif				/* GNUTLS_LIB_X509_IP_H */
+#endif /* GNUTLS_LIB_X509_IP_H */

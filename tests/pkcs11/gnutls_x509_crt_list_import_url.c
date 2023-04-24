@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -41,7 +41,7 @@
  */
 
 #define CONFIG_NAME "x509-crt-list-import-url"
-#define CONFIG CONFIG_NAME".config"
+#define CONFIG CONFIG_NAME ".config"
 
 #include "../test-chains.h"
 
@@ -52,9 +52,9 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "|<%d>| %s", level, str);
 }
 
-static
-int pin_func(void *userdata, int attempt, const char *url, const char *label,
-	     unsigned flags, char *pin, size_t pin_max)
+static int pin_func(void *userdata, int attempt, const char *url,
+		    const char *label, unsigned flags, char *pin,
+		    size_t pin_max)
 {
 	if (attempt == 0) {
 		strcpy(pin, PIN);
@@ -104,10 +104,10 @@ static void load_cert(const char *url, unsigned i)
 		fail("error[%d]: %s\n", i, gnutls_strerror(ret));
 
 	snprintf(name, sizeof(name), "cert-%d", i);
-	ret =
-	    gnutls_pkcs11_copy_x509_crt(url, crt, name,
-					GNUTLS_PKCS11_OBJ_FLAG_LOGIN |
-					GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE);
+	ret = gnutls_pkcs11_copy_x509_crt(
+		url, crt, name,
+		GNUTLS_PKCS11_OBJ_FLAG_LOGIN |
+			GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE);
 	if (ret < 0)
 		fail("error[%d]: %s\n", i, gnutls_strerror(ret));
 
@@ -153,8 +153,9 @@ void doit(void)
 
 	set_softhsm_conf(CONFIG);
 	snprintf(buf, sizeof(buf),
-		 "%s --init-token --slot 0 --label test --so-pin " PIN " --pin "
-		 PIN, bin);
+		 "%s --init-token --slot 0 --label test --so-pin " PIN
+		 " --pin " PIN,
+		 bin);
 	system(buf);
 
 	ret = gnutls_pkcs11_add_provider(lib, NULL);
@@ -169,9 +170,8 @@ void doit(void)
 		fail("gnutls_pkcs11_token_init: %s\n", gnutls_strerror(ret));
 	}
 
-	ret =
-	    gnutls_pkcs11_token_set_pin(SOFTHSM_URL, NULL, PIN,
-					GNUTLS_PIN_USER);
+	ret = gnutls_pkcs11_token_set_pin(SOFTHSM_URL, NULL, PIN,
+					  GNUTLS_PIN_USER);
 	if (ret < 0) {
 		fail("gnutls_pkcs11_token_set_pin: %s\n", gnutls_strerror(ret));
 	}
@@ -180,19 +180,17 @@ void doit(void)
 	gnutls_pkcs11_set_pin_function(NULL, NULL);
 
 	/* try importing without login */
-	ret =
-	    gnutls_x509_crt_list_import_url(&crts, &crts_size,
-					    SOFTHSM_URL ";object=cert-0",
-					    pin_func, NULL, 0);
+	ret = gnutls_x509_crt_list_import_url(&crts, &crts_size,
+					      SOFTHSM_URL ";object=cert-0",
+					      pin_func, NULL, 0);
 	if (ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 		fail("cannot load certs: %s\n", gnutls_strerror(ret));
 
 	/* try importing with login */
-	ret =
-	    gnutls_x509_crt_list_import_url(&crts, &crts_size,
-					    SOFTHSM_URL ";object=cert-0",
-					    pin_func, NULL,
-					    GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
+	ret = gnutls_x509_crt_list_import_url(&crts, &crts_size,
+					      SOFTHSM_URL ";object=cert-0",
+					      pin_func, NULL,
+					      GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
 	if (ret < 0)
 		fail("cannot load certs: %s\n", gnutls_strerror(ret));
 

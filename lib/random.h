@@ -21,11 +21,11 @@
  */
 
 #ifndef GNUTLS_LIB_RANDOM_H
-# define GNUTLS_LIB_RANDOM_H
+#define GNUTLS_LIB_RANDOM_H
 
-# include <gnutls/crypto.h>
-# include <crypto-backend.h>
-# include "nettle/rnd-common.h"
+#include <gnutls/crypto.h>
+#include <crypto-backend.h>
+#include "nettle/rnd-common.h"
 
 extern int crypto_rnd_prio;
 extern gnutls_crypto_rnd_st _gnutls_rnd_ops;
@@ -33,4 +33,4 @@ extern gnutls_crypto_rnd_st _gnutls_rnd_ops;
 void _gnutls_rnd_deinit(void);
 int _gnutls_rnd_preinit(void);
 
-#endif				/* GNUTLS_LIB_RANDOM_H */
+#endif /* GNUTLS_LIB_RANDOM_H */

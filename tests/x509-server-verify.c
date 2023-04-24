@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -69,19 +69,15 @@ static void start(const char *prio)
 		gnutls_global_set_log_level(2);
 
 	assert(gnutls_certificate_allocate_credentials(&serverx509cred) >= 0);
-	ret =
-	    gnutls_certificate_set_x509_key_mem2(serverx509cred,
-						 &server_ca3_localhost6_cert,
-						 &server_ca3_key,
-						 GNUTLS_X509_FMT_PEM, NULL, 0);
+	ret = gnutls_certificate_set_x509_key_mem2(
+		serverx509cred, &server_ca3_localhost6_cert, &server_ca3_key,
+		GNUTLS_X509_FMT_PEM, NULL, 0);
 	assert(ret >= 0);
 	index1 = ret;
 
-	ret =
-	    gnutls_certificate_set_ocsp_status_request_mem(serverx509cred,
-							   &ocsp_ca3_localhost6_unknown_pem,
-							   index1,
-							   GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_ocsp_status_request_mem(
+		serverx509cred, &ocsp_ca3_localhost6_unknown_pem, index1,
+		GNUTLS_X509_FMT_PEM);
 	assert(ret >= 0);
 
 	assert(gnutls_init(&server, GNUTLS_SERVER) >= 0);
@@ -96,19 +92,15 @@ static void start(const char *prio)
 	assert(gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca3_cert,
 						     GNUTLS_X509_FMT_PEM) >= 0);
 
-	ret =
-	    gnutls_certificate_set_x509_key_mem2(clientx509cred,
-						 &cli_ca3_cert_chain,
-						 &cli_ca3_key,
-						 GNUTLS_X509_FMT_PEM, NULL, 0);
+	ret = gnutls_certificate_set_x509_key_mem2(
+		clientx509cred, &cli_ca3_cert_chain, &cli_ca3_key,
+		GNUTLS_X509_FMT_PEM, NULL, 0);
 	assert(ret >= 0);
 	index1 = ret;
 
-	ret =
-	    gnutls_certificate_set_ocsp_status_request_mem(clientx509cred,
-							   &ocsp_cli_ca3_good_pem,
-							   index1,
-							   GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_ocsp_status_request_mem(
+		clientx509cred, &ocsp_cli_ca3_good_pem, index1,
+		GNUTLS_X509_FMT_PEM);
 	assert(ret >= 0);
 
 	assert(gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca3_cert,
@@ -139,8 +131,9 @@ static void start(const char *prio)
 		if (status == 0)
 			fail("No CAs present but succeeded!\n");
 
-		assert(gnutls_certificate_set_x509_trust_mem
-		       (serverx509cred, &ca3_cert, GNUTLS_X509_FMT_PEM) >= 0);
+		assert(gnutls_certificate_set_x509_trust_mem(
+			       serverx509cred, &ca3_cert,
+			       GNUTLS_X509_FMT_PEM) >= 0);
 
 		ret = gnutls_certificate_verify_peers2(server, &status);
 		if (ret < 0) {
@@ -153,17 +146,15 @@ static void start(const char *prio)
 
 		/* under TLS1.3 the client can send OCSP responses too */
 		if (gnutls_protocol_get_version(server) == GNUTLS_TLS1_3) {
-			ret =
-			    gnutls_ocsp_status_request_is_checked(server,
-								  GNUTLS_OCSP_SR_IS_AVAIL);
+			ret = gnutls_ocsp_status_request_is_checked(
+				server, GNUTLS_OCSP_SR_IS_AVAIL);
 			assert(ret >= 0);
 
 			ret = gnutls_ocsp_status_request_is_checked(server, 0);
 			assert(ret >= 0);
 		} else {
-			ret =
-			    gnutls_ocsp_status_request_is_checked(server,
-								  GNUTLS_OCSP_SR_IS_AVAIL);
+			ret = gnutls_ocsp_status_request_is_checked(
+				server, GNUTLS_OCSP_SR_IS_AVAIL);
 			assert(ret == 0);
 
 			ret = gnutls_ocsp_status_request_is_checked(server, 0);

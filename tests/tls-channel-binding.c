@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -46,15 +46,14 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "%s|<%d>| %s", side, level, str);
 }
 
-static int
-check_binding_data(gnutls_session_t client, gnutls_session_t server,
-		   int cbtype, const char *cbname, int negative)
+static int check_binding_data(gnutls_session_t client, gnutls_session_t server,
+			      int cbtype, const char *cbname, int negative)
 {
 	gnutls_datum_t client_cb = { 0 };
 	gnutls_datum_t server_cb = { 0 };
 
-	if (gnutls_session_channel_binding(client, cbtype, &client_cb)
-	    != GNUTLS_E_SUCCESS) {
+	if (gnutls_session_channel_binding(client, cbtype, &client_cb) !=
+	    GNUTLS_E_SUCCESS) {
 		if (negative == 0) {
 			fail("Cannot get client binding %s\n", cbname);
 			return 1;
@@ -63,8 +62,8 @@ check_binding_data(gnutls_session_t client, gnutls_session_t server,
 		fail("Client retrieval of %s was supposed to fail\n", cbname);
 		return 1;
 	}
-	if (gnutls_session_channel_binding(server, cbtype, &server_cb)
-	    != GNUTLS_E_SUCCESS) {
+	if (gnutls_session_channel_binding(server, cbtype, &server_cb) !=
+	    GNUTLS_E_SUCCESS) {
 		if (negative == 0) {
 			fail("Cannot get server binding %s\n", cbname);
 			return -1;
@@ -78,11 +77,12 @@ check_binding_data(gnutls_session_t client, gnutls_session_t server,
 		return 0;
 
 	if (server_cb.size != client_cb.size && client_cb.size > 0) {
-		fail("%s wrong binding data length: %d:%d\n",
-		     cbname, client_cb.size, server_cb.size);
+		fail("%s wrong binding data length: %d:%d\n", cbname,
+		     client_cb.size, server_cb.size);
 		return 2;
 	}
-	if (gnutls_memcmp(client_cb.data, server_cb.data, client_cb.size) != 0) {
+	if (gnutls_memcmp(client_cb.data, server_cb.data, client_cb.size) !=
+	    0) {
 		fail("%s wrong binding data content\n", cbname);
 		return -2;
 	}
@@ -91,8 +91,8 @@ check_binding_data(gnutls_session_t client, gnutls_session_t server,
 	return 0;
 }
 
-static int
-serv_psk_func(gnutls_session_t session, const char *user, gnutls_datum_t * pass)
+static int serv_psk_func(gnutls_session_t session, const char *user,
+			 gnutls_datum_t *pass)
 {
 	pass->size = 4;
 	pass->data = gnutls_malloc(pass->size);
@@ -103,9 +103,8 @@ serv_psk_func(gnutls_session_t session, const char *user, gnutls_datum_t * pass)
 	return 0;
 }
 
-static void
-tls_setup_peers(gnutls_session_t * client, gnutls_session_t * server,
-		const char *cprio, const char *sprio, int raw)
+static void tls_setup_peers(gnutls_session_t *client, gnutls_session_t *server,
+			    const char *cprio, const char *sprio, int raw)
 {
 	gnutls_certificate_credentials_t clientx509cred;
 	gnutls_certificate_credentials_t serverx509cred;
@@ -126,11 +125,9 @@ tls_setup_peers(gnutls_session_t * client, gnutls_session_t * server,
 	/* Init server */
 	gnutls_certificate_allocate_credentials(&serverx509cred);
 	if (raw)
-		gnutls_certificate_set_rawpk_key_mem(serverx509cred,
-						     &rawpk_public_key1,
-						     &rawpk_private_key1,
-						     GNUTLS_X509_FMT_PEM, NULL,
-						     0, NULL, 0, 0);
+		gnutls_certificate_set_rawpk_key_mem(
+			serverx509cred, &rawpk_public_key1, &rawpk_private_key1,
+			GNUTLS_X509_FMT_PEM, NULL, 0, NULL, 0, 0);
 	else
 		gnutls_certificate_set_x509_key_mem(serverx509cred,
 						    &server_cert, &server_key,
@@ -206,8 +203,7 @@ static void tlsv13_binding(void)
 
 	success("testing TLSv1.3 x509 channel binding\n");
 
-	tls_setup_peers(&client, &server,
-			"NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3",
+	tls_setup_peers(&client, &server, "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3",
 			"NORMAL:+VERS-TLS1.3", 0);
 
 	if (gnutls_protocol_get_version(client) != GNUTLS_TLS1_3)
@@ -246,10 +242,11 @@ static void rawv13_binding(void)
 
 	success("testing TLSv1.3 RAWPK channel binding\n");
 
-	tls_setup_peers(&client, &server,
-			"NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-X25519:+CTYPE-ALL",
-			"NORMAL:+VERS-TLS1.3:+ANON-ECDH:+ANON-DH:+ECDHE-RSA:+DHE-RSA:+RSA:+ECDHE-ECDSA:+CURVE-X25519:+SIGN-EDDSA-ED25519:+CTYPE-ALL",
-			1);
+	tls_setup_peers(
+		&client, &server,
+		"NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-X25519:+CTYPE-ALL",
+		"NORMAL:+VERS-TLS1.3:+ANON-ECDH:+ANON-DH:+ECDHE-RSA:+DHE-RSA:+RSA:+ECDHE-ECDSA:+CURVE-X25519:+SIGN-EDDSA-ED25519:+CTYPE-ALL",
+		1);
 
 	if (gnutls_protocol_get_version(client) != GNUTLS_TLS1_3)
 		fail("TLS1.3 was not negotiated\n");
@@ -268,8 +265,7 @@ static void rawv13_binding(void)
 	/* tls-server-end-point testing, undefined for anon and psk */
 	if (check_binding_data(client, server, GNUTLS_CB_TLS_SERVER_END_POINT,
 			       "tls-server-end-point", 1) == 0)
-		success
-		    ("binding fail: tls-server-end-point invalid for rawpk\n");
+		success("binding fail: tls-server-end-point invalid for rawpk\n");
 
 	/* tls-exporter testing, take both sides and compare */
 	if (check_binding_data(client, server, GNUTLS_CB_TLS_EXPORTER,
@@ -309,8 +305,7 @@ static void pskv13_binding(void)
 	/* tls-server-end-point testing, undefined for anon and psk */
 	if (check_binding_data(client, server, GNUTLS_CB_TLS_SERVER_END_POINT,
 			       "tls-server-end-point", 1) == 0)
-		success
-		    ("binding fail: tls-server-end-point invalid for anon\n");
+		success("binding fail: tls-server-end-point invalid for anon\n");
 
 	/* tls-exporter testing, take both sides and compare */
 	if (check_binding_data(client, server, GNUTLS_CB_TLS_EXPORTER,
@@ -390,8 +385,7 @@ static void anon12_binding(void)
 	/* tls-server-end-point testing, undefined for anon and psk */
 	if (check_binding_data(client, server, GNUTLS_CB_TLS_SERVER_END_POINT,
 			       "tls-server-end-point", 1) == 0)
-		success
-		    ("binding fail: tls-server-end-point invalid for anon\n");
+		success("binding fail: tls-server-end-point invalid for anon\n");
 
 	/* tls-exporter testing, take both sides and compare */
 	if (check_binding_data(client, server, GNUTLS_CB_TLS_EXPORTER,
@@ -431,8 +425,7 @@ static void pskv12_binding(void)
 	/* tls-server-end-point testing, undefined for anon and psk */
 	if (check_binding_data(client, server, GNUTLS_CB_TLS_SERVER_END_POINT,
 			       "tls-server-end-point", 1) == 0)
-		success
-		    ("binding fail: tls-server-end-point invalid for anon\n");
+		success("binding fail: tls-server-end-point invalid for anon\n");
 
 	/* tls-exporter testing, take both sides and compare */
 	if (check_binding_data(client, server, GNUTLS_CB_TLS_EXPORTER,

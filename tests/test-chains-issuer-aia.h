@@ -21,9 +21,7 @@
  */
 
 #ifndef GNUTLS_TESTS_TEST_CHAINS_ISSUER_AIA_H
-# define GNUTLS_TESTS_TEST_CHAINS_ISSUER_AIA_H
-
-/* *INDENT-OFF* */
+#define GNUTLS_TESTS_TEST_CHAINS_ISSUER_AIA_H
 
 #define MAX_CHAIN 1
 
@@ -129,9 +127,7 @@ static const char *missing_cert_aia_ca[] = {
 };
 
 #if defined __clang__ || __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5)
-#  pragma GCC diagnostic pop
+#pragma GCC diagnostic pop
 #endif
 
-/* *INDENT-ON* */
-
-#endif				/* GNUTLS_TESTS_TEST_CHAINS_ISSUER_AIA_H */
+#endif /* GNUTLS_TESTS_TEST_CHAINS_ISSUER_AIA_H */

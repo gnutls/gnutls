@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <dlfcn.h>
@@ -43,18 +43,18 @@ static CK_C_GetMechanismInfo base_C_GetMechanismInfo;
 static CK_FUNCTION_LIST override_funcs;
 
 #ifdef __sun
-# pragma fini(mock_deinit)
-# pragma init(mock_init)
-# define _CONSTRUCTOR
-# define _DESTRUCTOR
+#pragma fini(mock_deinit)
+#pragma init(mock_init)
+#define _CONSTRUCTOR
+#define _DESTRUCTOR
 #else
-# define _CONSTRUCTOR __attribute__((constructor))
-# define _DESTRUCTOR __attribute__((destructor))
+#define _CONSTRUCTOR __attribute__((constructor))
+#define _DESTRUCTOR __attribute__((destructor))
 #endif
 
-static CK_RV
-override_C_GetMechanismInfo(CK_SLOT_ID slot_id,
-			    CK_MECHANISM_TYPE type, CK_MECHANISM_INFO * info)
+static CK_RV override_C_GetMechanismInfo(CK_SLOT_ID slot_id,
+					 CK_MECHANISM_TYPE type,
+					 CK_MECHANISM_INFO *info)
 {
 	if (type == CKM_RSA_PKCS_PSS)
 		return CKR_MECHANISM_INVALID;
@@ -62,7 +62,7 @@ override_C_GetMechanismInfo(CK_SLOT_ID slot_id,
 	return base_C_GetMechanismInfo(slot_id, type, info);
 }
 
-CK_RV C_GetFunctionList(CK_FUNCTION_LIST ** function_list)
+CK_RV C_GetFunctionList(CK_FUNCTION_LIST **function_list)
 {
 	CK_C_GetFunctionList func;
 	CK_FUNCTION_LIST *funcs;

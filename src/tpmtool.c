@@ -48,15 +48,15 @@
 #include "common.h"
 
 static void cmd_parser(int argc, char **argv);
-static void tpm_generate(FILE * outfile, unsigned int key_type,
+static void tpm_generate(FILE *outfile, unsigned int key_type,
 			 unsigned int bits, unsigned int flags,
 			 unsigned int srk_well_known);
-static void tpm_pubkey(const char *url, FILE * outfile,
+static void tpm_pubkey(const char *url, FILE *outfile,
 		       unsigned int srk_well_known);
-static void tpm_delete(const char *url, FILE * outfile,
+static void tpm_delete(const char *url, FILE *outfile,
 		       unsigned int srk_well_known);
-static void tpm_test_sign(const char *url, FILE * outfile);
-static void tpm_list(FILE * outfile);
+static void tpm_test_sign(const char *url, FILE *outfile);
+static void tpm_list(FILE *outfile);
 
 static gnutls_x509_crt_fmt_t incert_format, outcert_format;
 static gnutls_tpmkey_fmt_t inkey_format, outkey_format;
@@ -186,7 +186,7 @@ static void cmd_parser(int argc, char **argv)
 
 #define TEST_DATA "Test data to sign"
 
-static void tpm_test_sign(const char *url, FILE * out)
+static void tpm_test_sign(const char *url, FILE *out)
 {
 	gnutls_privkey_t privkey;
 	gnutls_pubkey_t pubkey;
@@ -201,15 +201,15 @@ static void tpm_test_sign(const char *url, FILE * out)
 
 	ret = gnutls_privkey_init(&privkey);
 	if (ret < 0) {
-		fprintf(stderr, "Error in %s:%d: %s\n", __func__,
-			__LINE__, gnutls_strerror(ret));
+		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
+			gnutls_strerror(ret));
 		exit(1);
 	}
 
 	ret = gnutls_pubkey_init(&pubkey);
 	if (ret < 0) {
-		fprintf(stderr, "Error in %s:%d: %s\n", __func__,
-			__LINE__, gnutls_strerror(ret));
+		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
+			gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -227,8 +227,8 @@ static void tpm_test_sign(const char *url, FILE * out)
 		exit(1);
 	}
 
-	ret =
-	    gnutls_privkey_sign_data(privkey, GNUTLS_DIG_SHA1, 0, &data, &sig);
+	ret = gnutls_privkey_sign_data(privkey, GNUTLS_DIG_SHA1, 0, &data,
+				       &sig);
 	if (ret < 0) {
 		fprintf(stderr, "Cannot sign data: %s\n", gnutls_strerror(ret));
 		exit(1);
@@ -237,10 +237,8 @@ static void tpm_test_sign(const char *url, FILE * out)
 	pk = gnutls_pubkey_get_pk_algorithm(pubkey, NULL);
 
 	fprintf(stderr, "Verifying against private key parameters... ");
-	ret =
-	    gnutls_pubkey_verify_data2(pubkey,
-				       gnutls_pk_to_sign(pk, GNUTLS_DIG_SHA1),
-				       0, &data, &sig);
+	ret = gnutls_pubkey_verify_data2(
+		pubkey, gnutls_pk_to_sign(pk, GNUTLS_DIG_SHA1), 0, &data, &sig);
 	if (ret < 0) {
 		fprintf(stderr, "Cannot verify signed data: %s\n",
 			gnutls_strerror(ret));
@@ -254,9 +252,8 @@ static void tpm_test_sign(const char *url, FILE * out)
 	gnutls_privkey_deinit(privkey);
 }
 
-static void tpm_generate(FILE * out, unsigned int key_type,
-			 unsigned int bits, unsigned int flags,
-			 unsigned int srk_well_known)
+static void tpm_generate(FILE *out, unsigned int key_type, unsigned int bits,
+			 unsigned int flags, unsigned int srk_well_known)
 {
 	int ret;
 	char *srk_pass = NULL, *key_pass = NULL;
@@ -274,10 +271,9 @@ static void tpm_generate(FILE * out, unsigned int key_type,
 			key_pass = strdup(pass);
 	}
 
-	ret =
-	    gnutls_tpm_privkey_generate(key_type, bits, srk_pass, key_pass,
-					outkey_format, outcert_format,
-					&privkey, &pubkey, flags);
+	ret = gnutls_tpm_privkey_generate(key_type, bits, srk_pass, key_pass,
+					  outkey_format, outcert_format,
+					  &privkey, &pubkey, flags);
 
 	free(key_pass);
 	free(srk_pass);
@@ -295,7 +291,7 @@ static void tpm_generate(FILE * out, unsigned int key_type,
 	gnutls_free(pubkey.data);
 }
 
-static void tpm_delete(const char *url, FILE * out, unsigned int srk_well_known)
+static void tpm_delete(const char *url, FILE *out, unsigned int srk_well_known)
 {
 	int ret;
 	char *srk_pass = NULL;
@@ -313,7 +309,7 @@ static void tpm_delete(const char *url, FILE * out, unsigned int srk_well_known)
 	fprintf(out, "Key %s deleted\n", url);
 }
 
-static void tpm_list(FILE * out)
+static void tpm_list(FILE *out)
 {
 	int ret;
 	gnutls_tpm_key_list_t list;
@@ -347,7 +343,7 @@ static void tpm_list(FILE * out)
 	fputs("\n", out);
 }
 
-static void tpm_pubkey(const char *url, FILE * out, unsigned int srk_well_known)
+static void tpm_pubkey(const char *url, FILE *out, unsigned int srk_well_known)
 {
 	int ret;
 	char *srk_pass = NULL;

@@ -21,9 +21,9 @@
  */
 
 #ifndef GNUTLS_DANE_H
-# define GNUTLS_DANE_H
+#define GNUTLS_DANE_H
 
-# include <gnutls/gnutls.h>	/* for gnutls_datum_t */
+#include <gnutls/gnutls.h> /* for gnutls_datum_t */
 
 /**
  * dane_cert_usage_t:
@@ -104,21 +104,21 @@ typedef enum dane_state_flags_t {
 	DANE_F_IGNORE_DNSSEC = 4
 } dane_state_flags_t;
 
-int dane_state_init(dane_state_t * s, unsigned int flags);
+int dane_state_init(dane_state_t *s, unsigned int flags);
 int dane_state_set_dlv_file(dane_state_t s, const char *file);
 void dane_state_deinit(dane_state_t s);
 
-int dane_raw_tlsa(dane_state_t s, dane_query_t * r, char *const *dane_data,
+int dane_raw_tlsa(dane_state_t s, dane_query_t *r, char *const *dane_data,
 		  const int *dane_data_len, int secure, int bogus);
 
-int dane_query_tlsa(dane_state_t s, dane_query_t * r, const char *host,
+int dane_query_tlsa(dane_state_t s, dane_query_t *r, const char *host,
 		    const char *proto, unsigned int port);
 
 dane_query_status_t dane_query_status(dane_query_t q);
 unsigned int dane_query_entries(dane_query_t q);
-int dane_query_data(dane_query_t q, unsigned int idx,
-		    unsigned int *usage, unsigned int *type,
-		    unsigned int *match, gnutls_datum_t * data);
+int dane_query_data(dane_query_t q, unsigned int idx, unsigned int *usage,
+		    unsigned int *type, unsigned int *match,
+		    gnutls_datum_t *data);
 int dane_query_to_raw_tlsa(dane_query_t q, unsigned int *data_entries,
 			   char ***dane_data, int **dane_data_len, int *secure,
 			   int *bogus);
@@ -156,49 +156,45 @@ typedef enum dane_verify_status_t {
 	DANE_VERIFY_UNKNOWN_DANE_INFO = 1 << 2,
 } dane_verify_status_t;
 
-# define DANE_VERIFY_CA_CONSTRAINS_VIOLATED DANE_VERIFY_CA_CONSTRAINTS_VIOLATED
-# define DANE_VERIFY_NO_DANE_INFO DANE_VERIFY_UNKNOWN_DANE_INFO
+#define DANE_VERIFY_CA_CONSTRAINS_VIOLATED DANE_VERIFY_CA_CONSTRAINTS_VIOLATED
+#define DANE_VERIFY_NO_DANE_INFO DANE_VERIFY_UNKNOWN_DANE_INFO
 
-int
-dane_verification_status_print(unsigned int status,
-			       gnutls_datum_t * out, unsigned int flags);
+int dane_verification_status_print(unsigned int status, gnutls_datum_t *out,
+				   unsigned int flags);
 
-int dane_verify_crt_raw(dane_state_t s,
-			const gnutls_datum_t * chain, unsigned chain_size,
-			gnutls_certificate_type_t chain_type,
-			dane_query_t r,
+int dane_verify_crt_raw(dane_state_t s, const gnutls_datum_t *chain,
+			unsigned chain_size,
+			gnutls_certificate_type_t chain_type, dane_query_t r,
 			unsigned int sflags, unsigned int vflags,
 			unsigned int *verify);
 
-int dane_verify_crt(dane_state_t s,
-		    const gnutls_datum_t * chain, unsigned chain_size,
-		    gnutls_certificate_type_t chain_type,
-		    const char *hostname, const char *proto,
-		    unsigned int port, unsigned int sflags,
-		    unsigned int vflags, unsigned int *verify);
+int dane_verify_crt(dane_state_t s, const gnutls_datum_t *chain,
+		    unsigned chain_size, gnutls_certificate_type_t chain_type,
+		    const char *hostname, const char *proto, unsigned int port,
+		    unsigned int sflags, unsigned int vflags,
+		    unsigned int *verify);
 
-int dane_verify_session_crt(dane_state_t s,
-			    gnutls_session_t session,
+int dane_verify_session_crt(dane_state_t s, gnutls_session_t session,
 			    const char *hostname, const char *proto,
 			    unsigned int port, unsigned int sflags,
 			    unsigned int vflags, unsigned int *verify);
 
 const char *dane_strerror(int error);
 
-# define DANE_E_SUCCESS 0
-# define DANE_E_INITIALIZATION_ERROR -1
-# define DANE_E_RESOLVING_ERROR -2
-# define DANE_E_NO_DANE_DATA -3
-# define DANE_E_RECEIVED_CORRUPT_DATA -4
-# define DANE_E_INVALID_DNSSEC_SIG -5
-# define DANE_E_NO_DNSSEC_SIG -6
-# define DANE_E_MEMORY_ERROR -7
-# define DANE_E_REQUESTED_DATA_NOT_AVAILABLE -8
-# define DANE_E_INVALID_REQUEST -9
-# define DANE_E_PUBKEY_ERROR -10
-# define DANE_E_NO_CERT -11
-# define DANE_E_FILE_ERROR -12
-# define DANE_E_CERT_ERROR -13
-# define DANE_E_UNKNOWN_DANE_DATA -14
+#define DANE_E_SUCCESS 0
+#define DANE_E_INITIALIZATION_ERROR -1
+#define DANE_E_RESOLVING_ERROR -2
+#define DANE_E_NO_DANE_DATA -3
+#define DANE_E_RECEIVED_CORRUPT_DATA -4
+#define DANE_E_INVALID_DNSSEC_SIG -5
+#define DANE_E_NO_DNSSEC_SIG -6
+#define DANE_E_MEMORY_ERROR -7
+#define DANE_E_REQUESTED_DATA_NOT_AVAILABLE -8
+#define DANE_E_INVALID_REQUEST -9
+#define DANE_E_PUBKEY_ERROR -10
+#define DANE_E_NO_CERT -11
+#define DANE_E_FILE_ERROR -12
+#define DANE_E_CERT_ERROR -13
+#define DANE_E_UNKNOWN_DANE_DATA -14
 
-#endif				/* GNUTLS_DANE_H */
+#endif /* GNUTLS_DANE_H */

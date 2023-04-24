@@ -30,22 +30,25 @@
 #include <fips.h>
 #include <algorithms.h>
 
-#define SR_FB(x, cleanup) ret=(x); if ( ret<0 ) { \
-  if (ret == GNUTLS_E_NEED_FALLBACK) { \
-    if (handle->handle) \
-	handle->deinit(handle->handle); \
-    goto fallback; \
-  } \
-  gnutls_assert(); \
-  ret = GNUTLS_E_INTERNAL_ERROR; \
-  goto cleanup; \
-  }
+#define SR_FB(x, cleanup)                                       \
+	ret = (x);                                              \
+	if (ret < 0) {                                          \
+		if (ret == GNUTLS_E_NEED_FALLBACK) {            \
+			if (handle->handle)                     \
+				handle->deinit(handle->handle); \
+			goto fallback;                          \
+		}                                               \
+		gnutls_assert();                                \
+		ret = GNUTLS_E_INTERNAL_ERROR;                  \
+		goto cleanup;                                   \
+	}
 
-#define SR(x, cleanup) if ( (x)<0 ) { \
-  gnutls_assert(); \
-  ret = GNUTLS_E_INTERNAL_ERROR; \
-  goto cleanup; \
-  }
+#define SR(x, cleanup)                         \
+	if ((x) < 0) {                         \
+		gnutls_assert();               \
+		ret = GNUTLS_E_INTERNAL_ERROR; \
+		goto cleanup;                  \
+	}
 
 /* Returns true(non-zero) or false(0) if the 
  * provided cipher exists
@@ -73,10 +76,9 @@ int _gnutls_cipher_exists(gnutls_cipher_algorithm_t cipher)
 	return ret;
 }
 
-int
-_gnutls_cipher_init(cipher_hd_st * handle, const cipher_entry_st * e,
-		    const gnutls_datum_t * key, const gnutls_datum_t * iv,
-		    int enc)
+int _gnutls_cipher_init(cipher_hd_st *handle, const cipher_entry_st *e,
+			const gnutls_datum_t *key, const gnutls_datum_t *iv,
+			int enc)
 {
 	int ret = GNUTLS_E_INTERNAL_ERROR;
 	const gnutls_crypto_cipher_st *cc = NULL;
@@ -117,8 +119,8 @@ _gnutls_cipher_init(cipher_hd_st * handle, const cipher_entry_st * e,
 						handle->deinit(handle->handle);
 					goto fallback;
 				}
-				return
-				    gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+				return gnutls_assert_val(
+					GNUTLS_E_INVALID_REQUEST);
 			}
 			SR(cc->setiv(handle->handle, iv->data, iv->size),
 			   cc_cleanup);
@@ -127,7 +129,7 @@ _gnutls_cipher_init(cipher_hd_st * handle, const cipher_entry_st * e,
 		return 0;
 	}
 
- fallback:
+fallback:
 	handle->encrypt = _gnutls_cipher_ops.encrypt;
 	handle->decrypt = _gnutls_cipher_ops.decrypt;
 	handle->aead_encrypt = _gnutls_cipher_ops.aead_encrypt;
@@ -154,9 +156,8 @@ _gnutls_cipher_init(cipher_hd_st * handle, const cipher_entry_st * e,
 	}
 
 	if (iv) {
-		ret =
-		    _gnutls_cipher_ops.setiv(handle->handle, iv->data,
-					     iv->size);
+		ret = _gnutls_cipher_ops.setiv(handle->handle, iv->data,
+					       iv->size);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cc_cleanup;
@@ -165,7 +166,7 @@ _gnutls_cipher_init(cipher_hd_st * handle, const cipher_entry_st * e,
 
 	return 0;
 
- cc_cleanup:
+cc_cleanup:
 
 	if (handle->handle)
 		handle->deinit(handle->handle);
@@ -175,12 +176,11 @@ _gnutls_cipher_init(cipher_hd_st * handle, const cipher_entry_st * e,
 
 /* Auth_cipher API 
  */
-int _gnutls_auth_cipher_init(auth_cipher_hd_st * handle,
-			     const cipher_entry_st * e,
-			     const gnutls_datum_t * cipher_key,
-			     const gnutls_datum_t * iv,
-			     const mac_entry_st * me,
-			     const gnutls_datum_t * mac_key, unsigned etm,
+int _gnutls_auth_cipher_init(auth_cipher_hd_st *handle,
+			     const cipher_entry_st *e,
+			     const gnutls_datum_t *cipher_key,
+			     const gnutls_datum_t *iv, const mac_entry_st *me,
+			     const gnutls_datum_t *mac_key, unsigned etm,
 #ifdef ENABLE_SSL3
 			     unsigned ssl_hmac,
 #endif
@@ -198,9 +198,8 @@ int _gnutls_auth_cipher_init(auth_cipher_hd_st * handle,
 
 	if (e->id != GNUTLS_CIPHER_NULL) {
 		handle->non_null = 1;
-		ret =
-		    _gnutls_cipher_init(&handle->cipher, e, cipher_key, iv,
-					enc);
+		ret = _gnutls_cipher_init(&handle->cipher, e, cipher_key, iv,
+					  enc);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 	} else
@@ -212,21 +211,20 @@ int _gnutls_auth_cipher_init(auth_cipher_hd_st * handle,
 		handle->ssl_hmac = ssl_hmac;
 
 		if (ssl_hmac)
-			ret =
-			    _gnutls_mac_init_ssl3(&handle->mac.dig, me,
-						  mac_key->data, mac_key->size);
+			ret = _gnutls_mac_init_ssl3(&handle->mac.dig, me,
+						    mac_key->data,
+						    mac_key->size);
 		else
 #endif
-			ret =
-			    _gnutls_mac_init(&handle->mac.mac, me,
-					     mac_key->data, mac_key->size);
+			ret = _gnutls_mac_init(&handle->mac.mac, me,
+					       mac_key->data, mac_key->size);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
 		}
 #ifdef ENABLE_GOST
 		handle->continuous_mac =
-		    !!(me->flags & GNUTLS_MAC_FLAG_CONTINUOUS_MAC);
+			!!(me->flags & GNUTLS_MAC_FLAG_CONTINUOUS_MAC);
 #endif
 
 		handle->tag_size = _gnutls_mac_get_algo_len(me);
@@ -239,32 +237,30 @@ int _gnutls_auth_cipher_init(auth_cipher_hd_st * handle,
 	}
 
 	return 0;
- cleanup:
+cleanup:
 	if (handle->non_null != 0)
 		_gnutls_cipher_deinit(&handle->cipher);
 	return ret;
-
 }
 
 #ifdef ENABLE_SSL3
-# define MAC(handle, text, textlen) \
-		if (handle->ssl_hmac) { \
-			ret = \
-			    _gnutls_hash(&handle->mac.dig, text, textlen); \
-		} else { \
-			ret = _gnutls_mac(&handle->mac.mac, text, textlen); \
-		} \
-		if (unlikely(ret < 0)) \
-			return gnutls_assert_val(ret)
+#define MAC(handle, text, textlen)                                   \
+	if (handle->ssl_hmac) {                                      \
+		ret = _gnutls_hash(&handle->mac.dig, text, textlen); \
+	} else {                                                     \
+		ret = _gnutls_mac(&handle->mac.mac, text, textlen);  \
+	}                                                            \
+	if (unlikely(ret < 0))                                       \
+	return gnutls_assert_val(ret)
 #else
-# define MAC(handle, text, textlen) \
-		ret = _gnutls_mac(&handle->mac.mac, text, textlen); \
-		if (unlikely(ret < 0)) \
-			return gnutls_assert_val(ret)
+#define MAC(handle, text, textlen)                          \
+	ret = _gnutls_mac(&handle->mac.mac, text, textlen); \
+	if (unlikely(ret < 0))                              \
+	return gnutls_assert_val(ret)
 #endif
 
-int _gnutls_auth_cipher_add_auth(auth_cipher_hd_st * handle,
-				 const void *text, int textlen)
+int _gnutls_auth_cipher_add_auth(auth_cipher_hd_st *handle, const void *text,
+				 int textlen)
 {
 	int ret;
 
@@ -276,8 +272,8 @@ int _gnutls_auth_cipher_add_auth(auth_cipher_hd_st * handle,
 }
 
 /* The caller must make sure that textlen+pad_size+tag_size is divided by the block size of the cipher */
-int _gnutls_auth_cipher_encrypt2_tag(auth_cipher_hd_st * handle,
-				     const uint8_t * text, int textlen,
+int _gnutls_auth_cipher_encrypt2_tag(auth_cipher_hd_st *handle,
+				     const uint8_t *text, int textlen,
 				     void *_ciphertext, int ciphertextlen,
 				     int pad_size)
 {
@@ -288,44 +284,42 @@ int _gnutls_auth_cipher_encrypt2_tag(auth_cipher_hd_st * handle,
 
 	assert(ciphertext != NULL);
 
-	if (handle->is_mac) {	/* cipher + mac */
-		if (handle->non_null == 0) {	/* NULL cipher + MAC */
+	if (handle->is_mac) { /* cipher + mac */
+		if (handle->non_null == 0) { /* NULL cipher + MAC */
 			MAC(handle, text, textlen);
 
 			if (unlikely(textlen + pad_size + handle->tag_size) >
 			    ciphertextlen)
-				return
-				    gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+				return gnutls_assert_val(
+					GNUTLS_E_INTERNAL_ERROR);
 
 			if (text != ciphertext)
 				memcpy(ciphertext, text, textlen);
-			ret =
-			    _gnutls_auth_cipher_tag(handle,
-						    ciphertext + textlen,
-						    handle->tag_size);
+			ret = _gnutls_auth_cipher_tag(
+				handle, ciphertext + textlen, handle->tag_size);
 			if (ret < 0)
 				return gnutls_assert_val(ret);
 
 		} else {
 			uint8_t *orig_ciphertext = ciphertext;
 
-			if (handle->etm == 0
-			    || handle->cipher.e->type != CIPHER_BLOCK) {
+			if (handle->etm == 0 ||
+			    handle->cipher.e->type != CIPHER_BLOCK) {
 				MAC(handle, text, textlen);
 			}
 
 			if (unlikely(textlen + pad_size + handle->tag_size) >
 			    ciphertextlen)
-				return
-				    gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+				return gnutls_assert_val(
+					GNUTLS_E_INTERNAL_ERROR);
 
 			assert(blocksize != 0);
 			l = (textlen / blocksize) * blocksize;
 			if (l > 0) {
-				ret =
-				    _gnutls_cipher_encrypt2(&handle->cipher,
-							    text, l, ciphertext,
-							    ciphertextlen);
+				ret = _gnutls_cipher_encrypt2(&handle->cipher,
+							      text, l,
+							      ciphertext,
+							      ciphertextlen);
 				if (ret < 0)
 					return gnutls_assert_val(ret);
 
@@ -338,13 +332,11 @@ int _gnutls_auth_cipher_encrypt2_tag(auth_cipher_hd_st * handle,
 			if (ciphertext != text && textlen > 0)
 				memcpy(ciphertext, text, textlen);
 
-			if (handle->etm == 0
-			    || handle->cipher.e->type != CIPHER_BLOCK) {
-				ret =
-				    _gnutls_auth_cipher_tag(handle,
-							    ciphertext +
-							    textlen,
-							    handle->tag_size);
+			if (handle->etm == 0 ||
+			    handle->cipher.e->type != CIPHER_BLOCK) {
+				ret = _gnutls_auth_cipher_tag(
+					handle, ciphertext + textlen,
+					handle->tag_size);
 				if (ret < 0)
 					return gnutls_assert_val(ret);
 				textlen += handle->tag_size;
@@ -357,46 +349,43 @@ int _gnutls_auth_cipher_encrypt2_tag(auth_cipher_hd_st * handle,
 				textlen += pad_size;
 			}
 
-			ret =
-			    _gnutls_cipher_encrypt2(&handle->cipher,
-						    ciphertext, textlen,
-						    ciphertext, ciphertextlen);
+			ret = _gnutls_cipher_encrypt2(&handle->cipher,
+						      ciphertext, textlen,
+						      ciphertext,
+						      ciphertextlen);
 			if (ret < 0)
 				return gnutls_assert_val(ret);
 
-			if (handle->etm != 0
-			    && handle->cipher.e->type == CIPHER_BLOCK) {
+			if (handle->etm != 0 &&
+			    handle->cipher.e->type == CIPHER_BLOCK) {
 				MAC(handle, orig_ciphertext, l);
 				MAC(handle, ciphertext, textlen);
 
-				ret =
-				    _gnutls_auth_cipher_tag(handle,
-							    ciphertext +
-							    textlen,
-							    handle->tag_size);
+				ret = _gnutls_auth_cipher_tag(
+					handle, ciphertext + textlen,
+					handle->tag_size);
 				if (ret < 0)
 					return gnutls_assert_val(ret);
 			}
 		}
 	} else if (_gnutls_cipher_is_aead(&handle->cipher)) {
-		ret =
-		    _gnutls_cipher_encrypt2(&handle->cipher, text, textlen,
-					    ciphertext, ciphertextlen);
+		ret = _gnutls_cipher_encrypt2(&handle->cipher, text, textlen,
+					      ciphertext, ciphertextlen);
 		if (unlikely(ret < 0))
 			return gnutls_assert_val(ret);
 
-		ret =
-		    _gnutls_auth_cipher_tag(handle, ciphertext + textlen,
-					    handle->tag_size);
+		ret = _gnutls_auth_cipher_tag(handle, ciphertext + textlen,
+					      handle->tag_size);
 		if (unlikely(ret < 0))
 			return gnutls_assert_val(ret);
-	} else if (handle->non_null == 0 && text != ciphertext)	/* NULL cipher - no MAC */
+	} else if (handle->non_null == 0 &&
+		   text != ciphertext) /* NULL cipher - no MAC */
 		memcpy(ciphertext, text, textlen);
 
 	return 0;
 }
 
-int _gnutls_auth_cipher_decrypt2(auth_cipher_hd_st * handle,
+int _gnutls_auth_cipher_decrypt2(auth_cipher_hd_st *handle,
 				 const void *ciphertext, int ciphertextlen,
 				 void *text, int textlen)
 {
@@ -405,8 +394,8 @@ int _gnutls_auth_cipher_decrypt2(auth_cipher_hd_st * handle,
 	if (unlikely(ciphertextlen > textlen))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-	if (handle->is_mac
-	    && (handle->etm != 0 && handle->cipher.e->type == CIPHER_BLOCK)) {
+	if (handle->is_mac &&
+	    (handle->etm != 0 && handle->cipher.e->type == CIPHER_BLOCK)) {
 		/* The MAC is not to be hashed */
 		ciphertextlen -= handle->tag_size;
 
@@ -414,16 +403,15 @@ int _gnutls_auth_cipher_decrypt2(auth_cipher_hd_st * handle,
 	}
 
 	if (handle->non_null != 0) {
-		ret =
-		    _gnutls_cipher_decrypt2(&handle->cipher, ciphertext,
-					    ciphertextlen, text, textlen);
+		ret = _gnutls_cipher_decrypt2(&handle->cipher, ciphertext,
+					      ciphertextlen, text, textlen);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 	} else if (handle->non_null == 0 && text != ciphertext)
 		memcpy(text, ciphertext, ciphertextlen);
 
-	if (handle->is_mac
-	    && (handle->etm == 0 || handle->cipher.e->type != CIPHER_BLOCK)) {
+	if (handle->is_mac &&
+	    (handle->etm == 0 || handle->cipher.e->type != CIPHER_BLOCK)) {
 		/* The MAC is not to be hashed */
 		ciphertextlen -= handle->tag_size;
 
@@ -433,28 +421,29 @@ int _gnutls_auth_cipher_decrypt2(auth_cipher_hd_st * handle,
 	return 0;
 }
 
-int _gnutls_auth_cipher_tag(auth_cipher_hd_st * handle, void *tag, int tag_size)
+int _gnutls_auth_cipher_tag(auth_cipher_hd_st *handle, void *tag, int tag_size)
 {
 	if (handle->is_mac) {
 #ifdef ENABLE_SSL3
 		if (handle->ssl_hmac) {
 			int ret =
-			    _gnutls_mac_output_ssl3(&handle->mac.dig, tag);
+				_gnutls_mac_output_ssl3(&handle->mac.dig, tag);
 			if (ret < 0)
 				return gnutls_assert_val(ret);
 		} else
 #endif
 #ifdef ENABLE_GOST
 			/* draft-smyshlyaev-tls12-gost-suites section 4.1.2 */
-		if (handle->continuous_mac) {
-			mac_hd_st temp_mac;
-			int ret = _gnutls_mac_copy(&handle->mac.mac, &temp_mac);
-			if (ret < 0)
-				return gnutls_assert_val(ret);
-			_gnutls_mac_deinit(&temp_mac, tag);
-		} else
+			if (handle->continuous_mac) {
+				mac_hd_st temp_mac;
+				int ret = _gnutls_mac_copy(&handle->mac.mac,
+							   &temp_mac);
+				if (ret < 0)
+					return gnutls_assert_val(ret);
+				_gnutls_mac_deinit(&temp_mac, tag);
+			} else
 #endif
-			_gnutls_mac_output(&handle->mac.mac, tag);
+				_gnutls_mac_output(&handle->mac.mac, tag);
 	} else if (_gnutls_cipher_is_aead(&handle->cipher)) {
 		_gnutls_cipher_tag(&handle->cipher, tag, tag_size);
 	} else
@@ -463,11 +452,11 @@ int _gnutls_auth_cipher_tag(auth_cipher_hd_st * handle, void *tag, int tag_size)
 	return 0;
 }
 
-void _gnutls_auth_cipher_deinit(auth_cipher_hd_st * handle)
+void _gnutls_auth_cipher_deinit(auth_cipher_hd_st *handle)
 {
 	if (handle->is_mac) {
 #ifdef ENABLE_SSL3
-		if (handle->ssl_hmac)	/* failure here doesn't matter */
+		if (handle->ssl_hmac) /* failure here doesn't matter */
 			_gnutls_mac_deinit_ssl3(&handle->mac.dig, NULL);
 		else
 #endif

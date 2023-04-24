@@ -22,7 +22,7 @@
 /* Parts copied from GnuTLS example programs. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -39,17 +39,17 @@ int main(int argc, char **argv)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <sys/socket.h>
-# if !defined(_WIN32)
-#  include <sys/wait.h>
-# endif
-# include <unistd.h>
-# include <gnutls/gnutls.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#if !defined(_WIN32)
+#include <sys/wait.h>
+#endif
+#include <unistd.h>
+#include <gnutls/gnutls.h>
 
-# include "utils.h"
-# include "cert-common.h"
+#include "utils.h"
+#include "cert-common.h"
 
 /* A very basic TLS client, with supplemental data
  */
@@ -63,21 +63,17 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "%s|<%d>| %s", side, level, str);
 }
 
-# define TLS_SUPPLEMENTALDATATYPE_SAMPLE	0xBABE
+#define TLS_SUPPLEMENTALDATATYPE_SAMPLE 0xBABE
 
 static int TLS_SUPPLEMENTALDATA_client_sent = 0;
 static int TLS_SUPPLEMENTALDATA_client_received = 0;
 static int TLS_SUPPLEMENTALDATA_server_sent = 0;
 static int TLS_SUPPLEMENTALDATA_server_received = 0;
 
-static const unsigned char supp_data[] = {
-	0xFE,
-	0xED
-};
+static const unsigned char supp_data[] = { 0xFE, 0xED };
 
-static
-int supp_client_recv_func(gnutls_session_t session, const unsigned char *buf,
-			  size_t buflen)
+static int supp_client_recv_func(gnutls_session_t session,
+				 const unsigned char *buf, size_t buflen)
 {
 	TLS_SUPPLEMENTALDATA_client_received = 1;
 
@@ -90,17 +86,15 @@ int supp_client_recv_func(gnutls_session_t session, const unsigned char *buf,
 	return GNUTLS_E_SUCCESS;
 }
 
-static
-int supp_client_send_func(gnutls_session_t session, gnutls_buffer_t buf)
+static int supp_client_send_func(gnutls_session_t session, gnutls_buffer_t buf)
 {
 	TLS_SUPPLEMENTALDATA_client_sent = 1;
 	gnutls_buffer_append_data(buf, supp_data, sizeof(supp_data));
 	return GNUTLS_E_SUCCESS;
 }
 
-static
-int supp_server_recv_func(gnutls_session_t session, const unsigned char *buf,
-			  size_t buflen)
+static int supp_server_recv_func(gnutls_session_t session,
+				 const unsigned char *buf, size_t buflen)
 {
 	TLS_SUPPLEMENTALDATA_server_received = 1;
 
@@ -113,8 +107,7 @@ int supp_server_recv_func(gnutls_session_t session, const unsigned char *buf,
 	return GNUTLS_E_SUCCESS;
 }
 
-static
-int supp_server_send_func(gnutls_session_t session, gnutls_buffer_t buf)
+static int supp_server_send_func(gnutls_session_t session, gnutls_buffer_t buf)
 {
 	TLS_SUPPLEMENTALDATA_server_sent = 1;
 	gnutls_buffer_append_data(buf, supp_data, sizeof(supp_data));
@@ -128,9 +121,11 @@ static void client(int sd, const char *prio, unsigned server_only)
 	gnutls_certificate_credentials_t clientx509cred;
 
 	if (!server_only) {
-		assert(gnutls_supplemental_register
-		       ("supplemental_client", TLS_SUPPLEMENTALDATATYPE_SAMPLE,
-			supp_client_recv_func, supp_client_send_func) >= 0);
+		assert(gnutls_supplemental_register(
+			       "supplemental_client",
+			       TLS_SUPPLEMENTALDATATYPE_SAMPLE,
+			       supp_client_recv_func,
+			       supp_client_send_func) >= 0);
 	}
 
 	side = "client";
@@ -165,9 +160,11 @@ static void client(int sd, const char *prio, unsigned server_only)
 	}
 
 	if (!server_only) {
-		if (TLS_SUPPLEMENTALDATA_client_sent != 1
-		    || TLS_SUPPLEMENTALDATA_client_received != 1)
-			fail("client: extension not properly sent/received (%d.%d)\n", TLS_SUPPLEMENTALDATA_client_sent, TLS_SUPPLEMENTALDATA_client_received);
+		if (TLS_SUPPLEMENTALDATA_client_sent != 1 ||
+		    TLS_SUPPLEMENTALDATA_client_received != 1)
+			fail("client: extension not properly sent/received (%d.%d)\n",
+			     TLS_SUPPLEMENTALDATA_client_sent,
+			     TLS_SUPPLEMENTALDATA_client_received);
 	} else {
 		/* we expect TLS1.2 handshake as TLS1.3 is not (yet) defined
 		 * with supplemental data */
@@ -176,7 +173,7 @@ static void client(int sd, const char *prio, unsigned server_only)
 
 	gnutls_bye(session, GNUTLS_SHUT_RDWR);
 
- end:
+end:
 	close(sd);
 
 	gnutls_deinit(session);
@@ -194,16 +191,17 @@ static void server(int sd, const char *prio, unsigned server_only)
 	side = "server";
 
 	if (!registered) {
-		assert(gnutls_supplemental_register
-		       ("supplemental_server", TLS_SUPPLEMENTALDATATYPE_SAMPLE,
-			supp_server_recv_func, supp_server_send_func) >= 0);
+		assert(gnutls_supplemental_register(
+			       "supplemental_server",
+			       TLS_SUPPLEMENTALDATATYPE_SAMPLE,
+			       supp_server_recv_func,
+			       supp_server_send_func) >= 0);
 		registered = 0;
 	}
 
 	gnutls_certificate_allocate_credentials(&serverx509cred);
-	gnutls_certificate_set_x509_key_mem(serverx509cred,
-					    &server_cert, &server_key,
-					    GNUTLS_X509_FMT_PEM);
+	gnutls_certificate_set_x509_key_mem(serverx509cred, &server_cert,
+					    &server_key, GNUTLS_X509_FMT_PEM);
 
 	gnutls_init(&session, GNUTLS_SERVER);
 
@@ -229,8 +227,8 @@ static void server(int sd, const char *prio, unsigned server_only)
 		success("server: Handshake was completed\n");
 
 	if (!server_only) {
-		if (TLS_SUPPLEMENTALDATA_server_sent != 1
-		    || TLS_SUPPLEMENTALDATA_server_received != 1)
+		if (TLS_SUPPLEMENTALDATA_server_sent != 1 ||
+		    TLS_SUPPLEMENTALDATA_server_received != 1)
 			fail("server: extension not properly sent/received\n");
 	}
 
@@ -249,8 +247,7 @@ static void server(int sd, const char *prio, unsigned server_only)
 	_gnutls_supplemental_deinit();
 }
 
-static
-void start(const char *prio, unsigned server_only)
+static void start(const char *prio, unsigned server_only)
 {
 	pid_t child;
 	int sockets[2], err;
@@ -305,4 +302,4 @@ void doit(void)
 	start("NORMAL", 1);
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

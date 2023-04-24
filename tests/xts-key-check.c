@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <gnutls/crypto.h>
@@ -65,7 +65,8 @@ static void test_xts_check(gnutls_cipher_algorithm_t alg)
 		gnutls_cipher_deinit(ctx);
 	else
 		fail("cipher initialization should succeed with key1 != key2"
-		     "\n%s\n", gnutls_strerror(ret));
+		     "\n%s\n",
+		     gnutls_strerror(ret));
 }
 
 void doit(void)

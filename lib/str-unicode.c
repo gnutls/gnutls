@@ -67,22 +67,22 @@ inline static int is_allowed_exception(uint32_t ch)
 	case 0x3034:
 	case 0x3035:
 	case 0x303B:
-		return 0;	/* disallowed */
+		return 0; /* disallowed */
 	case 0xDF:
 	case 0x03C2:
 	case 0x06FD:
 	case 0x06FE:
 	case 0x0F0B:
 	case 0x3007:
-		return 1;	/* allowed */
+		return 1; /* allowed */
 	default:
-		return -1;	/* not exception */
+		return -1; /* not exception */
 	}
 }
 
 /* Checks whether the provided string is in the valid set of FreeFormClass (RFC7564
  * as an RFC7613 requirement), and converts all spaces to the ASCII-space. */
-static int check_for_valid_freeformclass(uint32_t * ucs4, unsigned ucs4_size)
+static int check_for_valid_freeformclass(uint32_t *ucs4, unsigned ucs4_size)
 {
 	unsigned i;
 	int rc;
@@ -93,29 +93,32 @@ static int check_for_valid_freeformclass(uint32_t * ucs4, unsigned ucs4_size)
 	unsigned is_invalid;
 
 	/* make the union of Valid categories, excluding any invalid (i.e., control) */
-	cat = uc_general_category_or(UC_CATEGORY_Ll, UC_CATEGORY_Lu);	/* LetterDigits */
+	cat = uc_general_category_or(UC_CATEGORY_Ll,
+				     UC_CATEGORY_Lu); /* LetterDigits */
 	cat = uc_general_category_or(cat, UC_CATEGORY_Lo);
 	cat = uc_general_category_or(cat, UC_CATEGORY_Nd);
 	cat = uc_general_category_or(cat, UC_CATEGORY_Lm);
 	cat = uc_general_category_or(cat, UC_CATEGORY_Mn);
 	cat = uc_general_category_or(cat, UC_CATEGORY_Mc);
-	cat = uc_general_category_or(cat, UC_CATEGORY_Lt);	/* OtherLetterDigits */
+	cat = uc_general_category_or(cat,
+				     UC_CATEGORY_Lt); /* OtherLetterDigits */
 	cat = uc_general_category_or(cat, UC_CATEGORY_Nl);
 	cat = uc_general_category_or(cat, UC_CATEGORY_No);
 	cat = uc_general_category_or(cat, UC_CATEGORY_Me);
-	cat = uc_general_category_or(cat, UC_CATEGORY_Sm);	/* Symbols */
+	cat = uc_general_category_or(cat, UC_CATEGORY_Sm); /* Symbols */
 	cat = uc_general_category_or(cat, UC_CATEGORY_Sc);
 	cat = uc_general_category_or(cat, UC_CATEGORY_So);
 	cat = uc_general_category_or(cat, UC_CATEGORY_Sk);
-	cat = uc_general_category_or(cat, UC_CATEGORY_Pc);	/* Punctuation */
+	cat = uc_general_category_or(cat, UC_CATEGORY_Pc); /* Punctuation */
 	cat = uc_general_category_or(cat, UC_CATEGORY_Pd);
 	cat = uc_general_category_or(cat, UC_CATEGORY_Ps);
 	cat = uc_general_category_or(cat, UC_CATEGORY_Pe);
 	cat = uc_general_category_or(cat, UC_CATEGORY_Pi);
 	cat = uc_general_category_or(cat, UC_CATEGORY_Pf);
 	cat = uc_general_category_or(cat, UC_CATEGORY_Po);
-	cat = uc_general_category_or(cat, UC_CATEGORY_Zs);	/* Spaces */
-	cat = uc_general_category_and_not(cat, UC_CATEGORY_Cc);	/* Not in Control */
+	cat = uc_general_category_or(cat, UC_CATEGORY_Zs); /* Spaces */
+	cat = uc_general_category_and_not(cat,
+					  UC_CATEGORY_Cc); /* Not in Control */
 
 	/* check for being in the allowed sets in rfc7564#section-4.3 */
 	for (i = 0; i < ucs4_size; i++) {
@@ -143,29 +146,28 @@ static int check_for_valid_freeformclass(uint32_t * ucs4, unsigned ucs4_size)
 		if (rc == 0 || uc_is_property_join_control(ucs4[i]))
 			return gnutls_assert_val(GNUTLS_E_INVALID_UTF8_STRING);
 
-		if (rc == 1)	/* exceptionally allowed, continue */
+		if (rc == 1) /* exceptionally allowed, continue */
 			continue;
 
 		/* Replace all spaces; an RFC7613 requirement
 		 */
-		if (uc_is_general_category(ucs4[i], UC_CATEGORY_Zs))	/* replace */
+		if (uc_is_general_category(ucs4[i],
+					   UC_CATEGORY_Zs)) /* replace */
 			ucs4[i] = 0x20;
 
 		/* Valid */
-		if ((ucs4[i] < 0x21 || ucs4[i] > 0x7E)
-		    && !uc_is_general_category(ucs4[i], cat))
+		if ((ucs4[i] < 0x21 || ucs4[i] > 0x7E) &&
+		    !uc_is_general_category(ucs4[i], cat))
 			is_invalid = 1;
 
 		/* HasCompat */
 		if (is_invalid) {
 			tmp_size = sizeof(tmp) / sizeof(tmp[0]);
-			nrm =
-			    u32_normalize(UNINORM_NFKC, &ucs4[i], 1, tmp,
-					  &tmp_size);
+			nrm = u32_normalize(UNINORM_NFKC, &ucs4[i], 1, tmp,
+					    &tmp_size);
 			if (nrm == NULL || (tmp_size == 1 && nrm[0] == ucs4[i]))
-				return
-				    gnutls_assert_val
-				    (GNUTLS_E_INVALID_UTF8_STRING);
+				return gnutls_assert_val(
+					GNUTLS_E_INVALID_UTF8_STRING);
 		}
 	}
 
@@ -190,7 +192,7 @@ static int check_for_valid_freeformclass(uint32_t * ucs4, unsigned ucs4_size)
  * Since: 3.5.7
  **/
 int gnutls_utf8_password_normalize(const unsigned char *password, unsigned plen,
-				   gnutls_datum_t * out, unsigned flags)
+				   gnutls_datum_t *out, unsigned flags)
 {
 	size_t ucs4_size = 0, nrm_size = 0;
 	size_t final_size = 0;
@@ -201,7 +203,7 @@ int gnutls_utf8_password_normalize(const unsigned char *password, unsigned plen,
 	int ret;
 
 	if (plen == 0) {
-		out->data = (uint8_t *) gnutls_strdup("");
+		out->data = (uint8_t *)gnutls_strdup("");
 		out->size = 0;
 		if (out->data == NULL)
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
@@ -209,10 +211,10 @@ int gnutls_utf8_password_normalize(const unsigned char *password, unsigned plen,
 	}
 
 	/* check for invalid UTF-8 */
-	if (u8_check((uint8_t *) password, plen) != NULL) {
+	if (u8_check((uint8_t *)password, plen) != NULL) {
 		gnutls_assert();
 		if (flags & GNUTLS_UTF8_IGNORE_ERRS) {
- raw_copy:
+		raw_copy:
 			out->data = gnutls_malloc(plen + 1);
 			if (out->data == NULL)
 				return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
@@ -226,7 +228,7 @@ int gnutls_utf8_password_normalize(const unsigned char *password, unsigned plen,
 	}
 
 	/* convert to UTF-32 */
-	ucs4 = u8_to_u32((uint8_t *) password, plen, NULL, &ucs4_size);
+	ucs4 = u8_to_u32((uint8_t *)password, plen, NULL, &ucs4_size);
 	if (ucs4 == NULL) {
 		gnutls_assert();
 		ret = GNUTLS_E_PARSING_ERROR;
@@ -282,7 +284,7 @@ int gnutls_utf8_password_normalize(const unsigned char *password, unsigned plen,
 
 	return 0;
 
- fail:
+fail:
 	gnutls_free(final);
 	free(ucs4);
 	free(nrm);

@@ -45,7 +45,7 @@
  *
  * Since: 3.5.1
  **/
-int gnutls_x509_tlsfeatures_init(gnutls_x509_tlsfeatures_t * f)
+int gnutls_x509_tlsfeatures_init(gnutls_x509_tlsfeatures_t *f)
 {
 	*f = gnutls_calloc(1, sizeof(struct gnutls_x509_tlsfeatures_st));
 	if (*f == NULL)
@@ -134,9 +134,9 @@ int gnutls_x509_crt_get_tlsfeatures(gnutls_x509_crt_t crt,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	if ((ret =
-	     _gnutls_x509_crt_get_extension(crt, GNUTLS_X509EXT_OID_TLSFEATURES,
-					    0, &der, critical)) < 0) {
+	if ((ret = _gnutls_x509_crt_get_extension(
+		     crt, GNUTLS_X509EXT_OID_TLSFEATURES, 0, &der, critical)) <
+	    0) {
 		return ret;
 	}
 
@@ -152,7 +152,7 @@ int gnutls_x509_crt_get_tlsfeatures(gnutls_x509_crt_t crt,
 	}
 
 	ret = 0;
- cleanup:
+cleanup:
 	gnutls_free(der.data);
 	return ret;
 }
@@ -188,9 +188,8 @@ int gnutls_x509_crt_set_tlsfeatures(gnutls_x509_crt_t crt,
 		return ret;
 	}
 
-	ret =
-	    _gnutls_x509_crt_set_extension(crt, GNUTLS_X509EXT_OID_TLSFEATURES,
-					   &der, 0);
+	ret = _gnutls_x509_crt_set_extension(
+		crt, GNUTLS_X509EXT_OID_TLSFEATURES, &der, 0);
 
 	_gnutls_free_datum(&der);
 
@@ -222,7 +221,7 @@ unsigned gnutls_x509_tlsfeatures_check_crt(gnutls_x509_tlsfeatures_t feat,
 	unsigned i, j, uret, found;
 
 	if (feat->size == 0)
-		return 1;	/* shortcut; no constraints to check */
+		return 1; /* shortcut; no constraints to check */
 
 	ret = gnutls_x509_tlsfeatures_init(&cfeat);
 	if (ret < 0)
@@ -237,9 +236,9 @@ unsigned gnutls_x509_tlsfeatures_check_crt(gnutls_x509_tlsfeatures_t feat,
 
 	/* if cert's features cannot be a superset */
 	if (feat->size > cfeat->size) {
-		_gnutls_debug_log
-		    ("certificate has %u, while issuer has %u tlsfeatures\n",
-		     cfeat->size, feat->size);
+		_gnutls_debug_log(
+			"certificate has %u, while issuer has %u tlsfeatures\n",
+			cfeat->size, feat->size);
 		gnutls_assert();
 		uret = 0;
 		goto cleanup;
@@ -263,7 +262,7 @@ unsigned gnutls_x509_tlsfeatures_check_crt(gnutls_x509_tlsfeatures_t feat,
 	}
 
 	uret = 1;
- cleanup:
+cleanup:
 	gnutls_x509_tlsfeatures_deinit(cfeat);
 	return uret;
 }

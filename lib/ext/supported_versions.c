@@ -32,20 +32,21 @@
 #include "handshake.h"
 
 static int supported_versions_recv_params(gnutls_session_t session,
-					  const uint8_t * data,
+					  const uint8_t *data,
 					  size_t data_size);
 static int supported_versions_send_params(gnutls_session_t session,
-					  gnutls_buffer_st * extdata);
+					  gnutls_buffer_st *extdata);
 
 const hello_ext_entry_st ext_mod_supported_versions = {
 	.name = "Supported Versions",
 	.tls_id = 43,
 	.gid = GNUTLS_EXTENSION_SUPPORTED_VERSIONS,
-	.validity =
-	    GNUTLS_EXT_FLAG_CLIENT_HELLO | GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO |
-	    GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO | GNUTLS_EXT_FLAG_HRR |
-	    GNUTLS_EXT_FLAG_TLS,
-	.client_parse_point = GNUTLS_EXT_VERSION_NEG,	/* force parsing prior to EXT_TLS extensions */
+	.validity = GNUTLS_EXT_FLAG_CLIENT_HELLO |
+		    GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO |
+		    GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO | GNUTLS_EXT_FLAG_HRR |
+		    GNUTLS_EXT_FLAG_TLS,
+	.client_parse_point =
+		GNUTLS_EXT_VERSION_NEG, /* force parsing prior to EXT_TLS extensions */
 	.server_parse_point = GNUTLS_EXT_VERSION_NEG,
 	.recv_func = supported_versions_recv_params,
 	.send_func = supported_versions_send_params,
@@ -55,9 +56,8 @@ const hello_ext_entry_st ext_mod_supported_versions = {
 	.cannot_be_overriden = 1
 };
 
-static int
-supported_versions_recv_params(gnutls_session_t session,
-			       const uint8_t * data, size_t data_size)
+static int supported_versions_recv_params(gnutls_session_t session,
+					  const uint8_t *data, size_t data_size)
 {
 	const version_entry_st *vers;
 	uint8_t major, minor;
@@ -82,16 +82,14 @@ supported_versions_recv_params(gnutls_session_t session,
 		data++;
 
 		if (bytes % 2 == 1)
-			return
-			    gnutls_assert_val
-			    (GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+			return gnutls_assert_val(
+				GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
 		DECR_LEN(data_size, bytes);
 
 		if (data_size != 0)
-			return
-			    gnutls_assert_val
-			    (GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+			return gnutls_assert_val(
+				GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
 		while (bytes > 0) {
 			major = data[0];
@@ -102,8 +100,8 @@ supported_versions_recv_params(gnutls_session_t session,
 			_gnutls_handshake_log("EXT[%p]: Found version: %d.%d\n",
 					      session, (int)major, (int)minor);
 
-			if (!_gnutls_nversion_is_supported
-			    (session, major, minor))
+			if (!_gnutls_nversion_is_supported(session, major,
+							   minor))
 				continue;
 
 			/* Prefer the latest possible version
@@ -111,23 +109,20 @@ supported_versions_recv_params(gnutls_session_t session,
 			 * https://gitlab.com/gnutls/gnutls/issues/837
 			 * for the rationale.
 			 */
-			if (!cli_vers ||
-			    major > cli_vers->major ||
+			if (!cli_vers || major > cli_vers->major ||
 			    (major == cli_vers->major &&
 			     minor > cli_vers->minor))
 				cli_vers = nversion_to_entry(major, minor);
 		}
 
 		if (!cli_vers)
-			return
-			    gnutls_assert_val
-			    (GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
+			return gnutls_assert_val(
+				GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
 
 		session->security_parameters.pversion = cli_vers;
 
 		_gnutls_handshake_log("EXT[%p]: Negotiated version: %d.%d\n",
-				      session,
-				      (int)cli_vers->major,
+				      session, (int)cli_vers->major,
 				      (int)cli_vers->minor);
 
 		if (old_vers != cli_vers) {
@@ -140,7 +135,7 @@ supported_versions_recv_params(gnutls_session_t session,
 		}
 
 		return 0;
-	} else {		/* client */
+	} else { /* client */
 
 		if (!have_creds_for_tls13(session)) {
 			/* if we don't have certificate or PSK (which work under TLS1.3)
@@ -153,18 +148,16 @@ supported_versions_recv_params(gnutls_session_t session,
 		DECR_LEN(data_size, 2);
 
 		if (data_size != 0)
-			return
-			    gnutls_assert_val
-			    (GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+			return gnutls_assert_val(
+				GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
 		major = data[0];
 		minor = data[1];
 
 		vers = nversion_to_entry(major, minor);
 		if (!vers)
-			return
-			    gnutls_assert_val
-			    (GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
+			return gnutls_assert_val(
+				GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
 
 		set_adv_version(session, major, minor);
 
@@ -172,9 +165,8 @@ supported_versions_recv_params(gnutls_session_t session,
 				      session, (int)major, (int)minor);
 
 		if (!vers->tls13_sem)
-			return
-			    gnutls_assert_val
-			    (GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+			return gnutls_assert_val(
+				GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 		ret = _gnutls_negotiate_version(session, major, minor, 1);
 		if (ret < 0) {
@@ -188,9 +180,8 @@ supported_versions_recv_params(gnutls_session_t session,
 
 /* returns data_size or a negative number on failure
  */
-static int
-supported_versions_send_params(gnutls_session_t session,
-			       gnutls_buffer_st * extdata)
+static int supported_versions_send_params(gnutls_session_t session,
+					  gnutls_buffer_st *extdata)
 {
 	uint8_t versions[32];
 	size_t versions_size;
@@ -217,17 +208,16 @@ supported_versions_send_params(gnutls_session_t session,
 		if (vers && !vers->tls13_sem)
 			return 0;
 
-		ret =
-		    _gnutls_write_supported_versions(session, versions,
-						     sizeof(versions));
-		if (ret <= 0)	/* if this function doesn't succeed do not send anything */
+		ret = _gnutls_write_supported_versions(session, versions,
+						       sizeof(versions));
+		if (ret <=
+		    0) /* if this function doesn't succeed do not send anything */
 			return 0;
 
 		versions_size = ret;
 
-		ret =
-		    _gnutls_buffer_append_data_prefix(extdata, 8, versions,
-						      versions_size);
+		ret = _gnutls_buffer_append_data_prefix(extdata, 8, versions,
+							versions_size);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 

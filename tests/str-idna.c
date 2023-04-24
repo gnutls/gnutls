@@ -33,38 +33,44 @@
 
 #define GLOBAL_FLAGS 0
 
-#define MATCH_FUNC(fname, str, normalized) \
-static void fname(void **glob_state) \
-{ \
-	gnutls_datum_t out; \
-	int ret = gnutls_idna_map(str, strlen(str), &out, GLOBAL_FLAGS); \
-	if (normalized == NULL) { /* expect failure */ \
-		assert_int_not_equal(ret, 0); \
-		return; \
-	} else { \
-		assert_int_equal(ret, 0); \
-	} \
-	assert_int_equal(strcmp((char*)out.data, (char*)normalized), 0); \
-	gnutls_free(out.data); \
-}
+#define MATCH_FUNC(fname, str, normalized)                                     \
+	static void fname(void **glob_state)                                   \
+	{                                                                      \
+		gnutls_datum_t out;                                            \
+		int ret =                                                      \
+			gnutls_idna_map(str, strlen(str), &out, GLOBAL_FLAGS); \
+		if (normalized == NULL) { /* expect failure */                 \
+			assert_int_not_equal(ret, 0);                          \
+			return;                                                \
+		} else {                                                       \
+			assert_int_equal(ret, 0);                              \
+		}                                                              \
+		assert_int_equal(strcmp((char *)out.data, (char *)normalized), \
+				 0);                                           \
+		gnutls_free(out.data);                                         \
+	}
 
-#define MATCH_FUNC_TWO_WAY(fname, str, normalized) \
-static void fname##_reverse(void **glob_state) \
-{ \
-	gnutls_datum_t out; \
-	int ret; \
-	if (normalized == NULL) \
-		return; \
-	ret = gnutls_idna_reverse_map(normalized, strlen(normalized), &out, 0); \
-	assert_int_equal(ret, 0); \
-	\
-	assert_int_equal(strcmp((char*)out.data, (char*)str), 0); \
-	gnutls_free(out.data); \
-} \
-MATCH_FUNC(fname, str, normalized)
+#define MATCH_FUNC_TWO_WAY(fname, str, normalized)                            \
+	static void fname##_reverse(void **glob_state)                        \
+	{                                                                     \
+		gnutls_datum_t out;                                           \
+		int ret;                                                      \
+		if (normalized == NULL)                                       \
+			return;                                               \
+		ret = gnutls_idna_reverse_map(normalized, strlen(normalized), \
+					      &out, 0);                       \
+		assert_int_equal(ret, 0);                                     \
+                                                                              \
+		assert_int_equal(strcmp((char *)out.data, (char *)str), 0);   \
+		gnutls_free(out.data);                                        \
+	}                                                                     \
+	MATCH_FUNC(fname, str, normalized)
 
-#define EMPTY_FUNC(name) static void name(void **glob_state) { \
-	return; }
+#define EMPTY_FUNC(name)                    \
+	static void name(void **glob_state) \
+	{                                   \
+		return;                     \
+	}
 
 /* some vectors taken from:
  * https://www.unicode.org/Public/idna/9.0.0/IdnaTest.txt

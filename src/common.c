@@ -23,7 +23,7 @@
 /* Work around problem reported in
    <https://permalink.gmane.org/gmane.comp.lib.gnulib.bugs/15755>.*/
 #if GETTIMEOFDAY_CLOBBERS_LOCALTIME
-# undef localtime
+#undef localtime
 #endif
 
 #include <getpass.h>
@@ -39,16 +39,16 @@
 #include <unistd.h>
 
 #ifndef _WIN32
-# include <signal.h>
+#include <signal.h>
 #else
-# include <ws2tcpip.h>
+#include <ws2tcpip.h>
 #endif
 
 #ifdef ENABLE_PKCS11
-# include <gnutls/pkcs11.h>
+#include <gnutls/pkcs11.h>
 #endif
 
-#define SU(x) (x!=NULL?x:"Unknown")
+#define SU(x) (x != NULL ? x : "Unknown")
 
 const char str_unknown[] = "(unknown)";
 
@@ -114,9 +114,8 @@ const char *raw_to_base64(const unsigned char *raw, size_t raw_size)
 	return buf;
 }
 
-static void
-print_x509_info(gnutls_session_t session, FILE * out, int flag, int print_cert,
-		int print_crt_status)
+static void print_x509_info(gnutls_session_t session, FILE *out, int flag,
+			    int print_cert, int print_crt_status)
 {
 	gnutls_x509_crt_t crt;
 	const gnutls_datum_t *cert_list;
@@ -143,9 +142,8 @@ print_x509_info(gnutls_session_t session, FILE * out, int flag, int print_cert,
 			return;
 		}
 
-		ret =
-		    gnutls_x509_crt_import(crt, &cert_list[j],
-					   GNUTLS_X509_FMT_DER);
+		ret = gnutls_x509_crt_import(crt, &cert_list[j],
+					     GNUTLS_X509_FMT_DER);
 		if (ret < 0) {
 			fprintf(stderr, "Decoding error: %s\n",
 				gnutls_strerror(ret));
@@ -165,9 +163,8 @@ print_x509_info(gnutls_session_t session, FILE * out, int flag, int print_cert,
 		if (print_cert) {
 			gnutls_datum_t pem;
 
-			ret =
-			    gnutls_x509_crt_export2(crt,
-						    GNUTLS_X509_FMT_PEM, &pem);
+			ret = gnutls_x509_crt_export2(crt, GNUTLS_X509_FMT_PEM,
+						      &pem);
 			if (ret < 0) {
 				fprintf(stderr, "Encoding error: %s\n",
 					gnutls_strerror(ret));
@@ -183,9 +180,8 @@ print_x509_info(gnutls_session_t session, FILE * out, int flag, int print_cert,
 	}
 }
 
-static void
-print_rawpk_info(gnutls_session_t session, FILE * out, int flag, int print_cert,
-		 int print_crt_status)
+static void print_rawpk_info(gnutls_session_t session, FILE *out, int flag,
+			     int print_cert, int print_crt_status)
 {
 	gnutls_pcert_st pk_cert;
 	gnutls_pk_algorithm_t pk_algo;
@@ -203,9 +199,8 @@ print_rawpk_info(gnutls_session_t session, FILE * out, int flag, int print_cert,
 	log_msg(out, "- Certificate type: Raw Public Key\n");
 	log_msg(out, "- Got %d Raw public-key(s).\n", cert_list_size);
 
-	ret =
-	    gnutls_pcert_import_rawpk_raw(&pk_cert, cert_list,
-					  GNUTLS_X509_FMT_DER, 0, 0);
+	ret = gnutls_pcert_import_rawpk_raw(&pk_cert, cert_list,
+					    GNUTLS_X509_FMT_DER, 0, 0);
 	if (ret < 0) {
 		fprintf(stderr, "Decoding error: %s\n", gnutls_strerror(ret));
 		return;
@@ -219,9 +214,8 @@ print_rawpk_info(gnutls_session_t session, FILE * out, int flag, int print_cert,
 	if (print_cert) {
 		gnutls_datum_t pem;
 
-		ret =
-		    gnutls_pubkey_export2(pk_cert.pubkey, GNUTLS_X509_FMT_PEM,
-					  &pem);
+		ret = gnutls_pubkey_export2(pk_cert.pubkey, GNUTLS_X509_FMT_PEM,
+					    &pem);
 		if (ret < 0) {
 			fprintf(stderr, "Encoding error: %s\n",
 				gnutls_strerror(ret));
@@ -233,7 +227,7 @@ print_rawpk_info(gnutls_session_t session, FILE * out, int flag, int print_cert,
 		gnutls_free(pem.data);
 	}
 
- cleanup:
+cleanup:
 	gnutls_pcert_deinit(&pk_cert);
 }
 
@@ -276,8 +270,8 @@ int cert_verify(gnutls_session_t session, const char *hostname,
 	}
 
 	type = gnutls_certificate_type_get(session);
-	rc = gnutls_certificate_verification_status_print(status, type,
-							  &out, 0);
+	rc = gnutls_certificate_verification_status_print(status, type, &out,
+							  0);
 	if (rc < 0) {
 		log_msg(stdout,
 			"- Could not print verification flags (err: %s)\n",
@@ -299,8 +293,8 @@ int cert_verify(gnutls_session_t session, const char *hostname,
 }
 
 /* Parse input string and set certificate compression methods */
-int compress_cert_set_methods(gnutls_session_t session,
-			      const char **strings, size_t n_strings)
+int compress_cert_set_methods(gnutls_session_t session, const char **strings,
+			      size_t n_strings)
 {
 	int ret = 0;
 	gnutls_compression_method_t *methods;
@@ -330,9 +324,8 @@ int compress_cert_set_methods(gnutls_session_t session,
 		}
 	}
 
-	ret =
-	    gnutls_compress_certificate_set_methods(session, methods,
-						    n_strings);
+	ret = gnutls_compress_certificate_set_methods(session, methods,
+						      n_strings);
 	if (ret < 0) {
 		fprintf(stderr,
 			"Could not set certificate compression methods: %s\n",
@@ -340,7 +333,7 @@ int compress_cert_set_methods(gnutls_session_t session,
 		goto cleanup;
 	}
 
- cleanup:
+cleanup:
 	free(methods);
 
 #pragma GCC diagnostic pop
@@ -393,8 +386,7 @@ static void print_dh_info(gnutls_session_t session, const char *str, int print)
 		goto out;
 	}
 
-	ret = gnutls_dh_params_export_pkcs3(dh_params,
-					    GNUTLS_X509_FMT_PEM,
+	ret = gnutls_dh_params_export_pkcs3(dh_params, GNUTLS_X509_FMT_PEM,
 					    params_data, &params_data_size);
 	if (ret != GNUTLS_E_SHORT_MEMORY_BUFFER) {
 		fprintf(stderr, "gnutls_dh_params_export_pkcs3 %d\n", ret);
@@ -407,18 +399,17 @@ static void print_dh_info(gnutls_session_t session, const char *str, int print)
 		goto out;
 	}
 
-	ret = gnutls_dh_params_export_pkcs3(dh_params,
-					    GNUTLS_X509_FMT_PEM,
+	ret = gnutls_dh_params_export_pkcs3(dh_params, GNUTLS_X509_FMT_PEM,
 					    params_data, &params_data_size);
 	if (ret) {
 		fprintf(stderr, "gnutls_dh_params_export_pkcs3-2 %d\n", ret);
 		goto out;
 	}
 
-	log_msg(stdout, " - PKCS#3 format:\n\n%.*s\n",
-		(int)params_data_size, params_data);
+	log_msg(stdout, " - PKCS#3 format:\n\n%.*s\n", (int)params_data_size,
+		params_data);
 
- out:
+out:
 	gnutls_free(params_data);
 	gnutls_free(raw_prime.data);
 	gnutls_free(raw_gen.data);
@@ -442,7 +433,6 @@ static void print_ecdh_info(gnutls_session_t session, const char *str,
 		gnutls_ecc_curve_get_name(curve));
 	log_msg(stdout, " - Curve size: %d bits\n",
 		gnutls_ecc_curve_get_size(curve) * 8);
-
 }
 
 struct channel_binding_request {
@@ -453,9 +443,9 @@ struct channel_binding_request {
 static void print_channel_bindings(gnutls_session_t session, int print)
 {
 	static const struct channel_binding_request requests[] = {
-		{GNUTLS_CB_TLS_UNIQUE, "tls-unique"},
-		{GNUTLS_CB_TLS_SERVER_END_POINT, "tls-server-end-point"},
-		{GNUTLS_CB_TLS_EXPORTER, "tls-exporter"}
+		{ GNUTLS_CB_TLS_UNIQUE, "tls-unique" },
+		{ GNUTLS_CB_TLS_SERVER_END_POINT, "tls-server-end-point" },
+		{ GNUTLS_CB_TLS_EXPORTER, "tls-exporter" }
 	};
 	size_t i;
 
@@ -468,8 +458,8 @@ static void print_channel_bindings(gnutls_session_t session, int print)
 		gnutls_datum_t cb;
 		int rc;
 
-		rc = gnutls_session_channel_binding(session,
-						    requests[i].type, &cb);
+		rc = gnutls_session_channel_binding(session, requests[i].type,
+						    &cb);
 		if (rc == GNUTLS_E_CHANNEL_BINDING_NOT_AVAILABLE) {
 			log_msg(stdout, " - '%s': not available\n",
 				requests[i].name);
@@ -562,22 +552,21 @@ int print_info(gnutls_session_t session, int verbose, int flags)
 	case GNUTLS_CRD_IA:
 		log_msg(stdout, "- TLS/IA authentication\n");
 		break;
-	case GNUTLS_CRD_CERTIFICATE:
-		{
-			char dns[256];
-			size_t dns_size = sizeof(dns);
-			unsigned int type;
+	case GNUTLS_CRD_CERTIFICATE: {
+		char dns[256];
+		size_t dns_size = sizeof(dns);
+		unsigned int type;
 
-			/* This fails in client side */
-			if (gnutls_server_name_get
-			    (session, dns, &dns_size, &type, 0) == 0) {
-				log_msg(stdout, "- Given server name[%d]: %s\n",
-					type, dns);
-			}
+		/* This fails in client side */
+		if (gnutls_server_name_get(session, dns, &dns_size, &type, 0) ==
+		    0) {
+			log_msg(stdout, "- Given server name[%d]: %s\n", type,
+				dns);
 		}
+	}
 
-		if ((flags & P_WAIT_FOR_CERT)
-		    && gnutls_certificate_get_ours(session) == 0)
+		if ((flags & P_WAIT_FOR_CERT) &&
+		    gnutls_certificate_get_ours(session) == 0)
 			log_msg(stdout, "- No certificate was sent to peer\n");
 
 		if (flags & P_PRINT_CERT)
@@ -586,8 +575,8 @@ int print_info(gnutls_session_t session, int verbose, int flags)
 
 		if (kx == GNUTLS_KX_DHE_RSA || kx == GNUTLS_KX_DHE_DSS)
 			print_dh_info(session, "Ephemeral ", verbose);
-		else if (kx == GNUTLS_KX_ECDHE_RSA
-			 || kx == GNUTLS_KX_ECDHE_ECDSA)
+		else if (kx == GNUTLS_KX_ECDHE_RSA ||
+			 kx == GNUTLS_KX_ECDHE_ECDSA)
 			print_ecdh_info(session, "Ephemeral ", verbose);
 		break;
 	default:
@@ -606,17 +595,15 @@ int print_info(gnutls_session_t session, int verbose, int flags)
 		}
 
 		if (gnutls_sign_algorithm_get(session) != GNUTLS_SIGN_UNKNOWN) {
-			tmp =
-			    SU(gnutls_sign_get_name
-			       (gnutls_sign_algorithm_get(session)));
+			tmp = SU(gnutls_sign_get_name(
+				gnutls_sign_algorithm_get(session)));
 			log_msg(stdout, "- Server Signature: %s\n", tmp);
 		}
 
 		if (gnutls_sign_algorithm_get_client(session) !=
 		    GNUTLS_SIGN_UNKNOWN) {
-			tmp =
-			    SU(gnutls_sign_get_name
-			       (gnutls_sign_algorithm_get_client(session)));
+			tmp = SU(gnutls_sign_get_name(
+				gnutls_sign_algorithm_get_client(session)));
 			log_msg(stdout, "- Client Signature: %s\n", tmp);
 		}
 
@@ -635,12 +622,12 @@ int print_info(gnutls_session_t session, int verbose, int flags)
 	if (gnutls_session_etm_status(session) != 0)
 		log_msg(stdout, " EtM,");
 #ifdef ENABLE_OCSP
-	if (gnutls_ocsp_status_request_is_checked
-	    (session, GNUTLS_OCSP_SR_IS_AVAIL) != 0) {
+	if (gnutls_ocsp_status_request_is_checked(
+		    session, GNUTLS_OCSP_SR_IS_AVAIL) != 0) {
 		log_msg(stdout, " OCSP status request%s,",
-			gnutls_ocsp_status_request_is_checked(session,
-							      0) !=
-			0 ? "" : "[ignored]");
+			gnutls_ocsp_status_request_is_checked(session, 0) != 0 ?
+				"" :
+				"[ignored]");
 	}
 #endif
 	log_msg(stdout, "\n");
@@ -665,12 +652,13 @@ int print_info(gnutls_session_t session, int verbose, int flags)
 	if (ktls_flags != 0) {
 		log_msg(stdout, "- KTLS: %s\n",
 			(ktls_flags & GNUTLS_KTLS_DUPLEX) ==
-			GNUTLS_KTLS_DUPLEX ? "send, recv" : (ktls_flags &
-							     GNUTLS_KTLS_SEND)
-			==
-			GNUTLS_KTLS_SEND ? "send" : (ktls_flags &
-						     GNUTLS_KTLS_RECV) ==
-			GNUTLS_KTLS_RECV ? "recv" : "unknown");
+					GNUTLS_KTLS_DUPLEX ?
+				"send, recv" :
+			(ktls_flags & GNUTLS_KTLS_SEND) == GNUTLS_KTLS_SEND ?
+				"send" :
+			(ktls_flags & GNUTLS_KTLS_RECV) == GNUTLS_KTLS_RECV ?
+				"recv" :
+				"unknown");
 	}
 
 	fflush(stdout);
@@ -683,7 +671,7 @@ void print_cert_info(gnutls_session_t session, int verbose, int print_cert)
 	print_cert_info2(session, verbose, stdout, print_cert);
 }
 
-void print_cert_info2(gnutls_session_t session, int verbose, FILE * out,
+void print_cert_info2(gnutls_session_t session, int verbose, FILE *out,
 		      int print_cert)
 {
 	int flag, print_crt_status = 0;
@@ -741,17 +729,15 @@ void print_list(const char *priorities, int verbose)
 		}
 
 		for (i = 0;; i++) {
-			ret =
-			    gnutls_priority_get_cipher_suite_index(pcache,
-								   i, &idx);
+			ret = gnutls_priority_get_cipher_suite_index(pcache, i,
+								     &idx);
 			if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 				break;
 			if (ret == GNUTLS_E_UNKNOWN_CIPHER_SUITE)
 				continue;
 
-			name =
-			    gnutls_cipher_suite_info(idx, id, NULL, NULL,
-						     NULL, &version);
+			name = gnutls_cipher_suite_info(idx, id, NULL, NULL,
+							NULL, &version);
 
 			if (name != NULL)
 				log_msg(stdout, "%-50s\t0x%02x, 0x%02x\t%s\n",
@@ -871,8 +857,8 @@ void print_list(const char *priorities, int verbose)
 				log_msg(stdout, "none\n");
 			for (i = 0; i < (unsigned)ret; i++) {
 				log_msg(stdout, "SIGN-%s",
-					gnutls_sign_algorithm_get_name(list
-								       [i]));
+					gnutls_sign_algorithm_get_name(
+						list[i]));
 				if (i + 1 != (unsigned)ret)
 					log_msg(stdout, ", ");
 				else
@@ -885,25 +871,24 @@ void print_list(const char *priorities, int verbose)
 	}
 
 	log_msg(stdout, "Cipher suites:\n");
-	for (i = 0; (name = gnutls_cipher_suite_info
-		     (i, id, &kx, &cipher, &mac, &version)); i++) {
-		log_msg(stdout, "%-50s\t0x%02x, 0x%02x\t%s\n",
-			name,
+	for (i = 0; (name = gnutls_cipher_suite_info(i, id, &kx, &cipher, &mac,
+						     &version));
+	     i++) {
+		log_msg(stdout, "%-50s\t0x%02x, 0x%02x\t%s\n", name,
 			(unsigned char)id[0], (unsigned char)id[1],
 			gnutls_protocol_get_name(version));
 		if (verbose)
-			log_msg
-			    (stdout,
-			     "\tKey exchange: %s\n\tCipher: %s\n\tMAC: %s\n\n",
-			     gnutls_kx_get_name(kx),
-			     gnutls_cipher_get_name(cipher),
-			     gnutls_mac_get_name(mac));
+			log_msg(stdout,
+				"\tKey exchange: %s\n\tCipher: %s\n\tMAC: %s\n\n",
+				gnutls_kx_get_name(kx),
+				gnutls_cipher_get_name(cipher),
+				gnutls_mac_get_name(mac));
 	}
 
 	log_msg(stdout, "\n");
 	{
 		const gnutls_certificate_type_t *p =
-		    gnutls_certificate_type_list();
+			gnutls_certificate_type_list();
 
 		log_msg(stdout, "Certificate types: ");
 		for (; *p; p++) {
@@ -984,7 +969,7 @@ void print_list(const char *priorities, int verbose)
 
 	{
 		const gnutls_compression_method_t *p =
-		    gnutls_compression_list();
+			gnutls_compression_list();
 
 		log_msg(stdout, "Compression: ");
 		for (; *p; p++) {
@@ -1038,8 +1023,8 @@ void print_list(const char *priorities, int verbose)
 	}
 }
 
-void
-print_key_material(gnutls_session_t session, const char *label, size_t size)
+void print_key_material(gnutls_session_t session, const char *label,
+			size_t size)
 {
 	gnutls_datum_t bin = { NULL, 0 }, hex = { NULL, 0 };
 	int ret;
@@ -1053,8 +1038,8 @@ print_key_material(gnutls_session_t session, const char *label, size_t size)
 
 	bin.size = size;
 
-	ret = gnutls_prf_rfc5705(session, strlen(label), label,
-				 0, NULL, size, (char *)bin.data);
+	ret = gnutls_prf_rfc5705(session, strlen(label), label, 0, NULL, size,
+				 (char *)bin.data);
 	if (ret < 0) {
 		fprintf(stderr, "Error in gnutls_prf_rfc5705: %s\n",
 			gnutls_strerror(ret));
@@ -1070,7 +1055,7 @@ print_key_material(gnutls_session_t session, const char *label, size_t size)
 	log_msg(stdout, "- Key material: %s\n", hex.data);
 	fflush(stdout);
 
- out:
+out:
 	gnutls_free(bin.data);
 	gnutls_free(hex.data);
 }
@@ -1084,37 +1069,33 @@ int check_command(gnutls_session_t session, const char *str,
 	fprintf(stderr, "*** Processing %u bytes command: %s\n", (unsigned)len,
 		str);
 	if (len > 2 && str[0] == str[1] && str[0] == '*') {
-		if (strncmp
-		    (str, "**REHANDSHAKE**",
-		     sizeof("**REHANDSHAKE**") - 1) == 0) {
+		if (strncmp(str, "**REHANDSHAKE**",
+			    sizeof("**REHANDSHAKE**") - 1) == 0) {
 			fprintf(stderr, "*** Sending rehandshake request\n");
 			gnutls_rehandshake(session);
 			return 1;
-		} else if (strncmp
-			   (str, "**REAUTH**", sizeof("**REAUTH**") - 1) == 0) {
+		} else if (strncmp(str, "**REAUTH**",
+				   sizeof("**REAUTH**") - 1) == 0) {
 			/* in case we have a re-auth cmd prepare for it */
 			if (no_cli_cert)
-				gnutls_certificate_server_set_request(session,
-								      GNUTLS_CERT_REQUIRE);
+				gnutls_certificate_server_set_request(
+					session, GNUTLS_CERT_REQUIRE);
 
 			fprintf(stderr, "*** Sending re-auth request\n");
 			do {
 				ret = gnutls_reauth(session, 0);
-			} while (ret == GNUTLS_E_AGAIN
-				 || ret == GNUTLS_E_INTERRUPTED);
+			} while (ret == GNUTLS_E_AGAIN ||
+				 ret == GNUTLS_E_INTERRUPTED);
 			if (ret < 0) {
 				fprintf(stderr, "reauth: %s\n",
 					gnutls_strerror(ret));
 				return ret;
 			}
 			return 1;
-		} else
-		    if (strncmp
-			(str, "**HEARTBEAT**",
-			 sizeof("**HEARTBEAT**") - 1) == 0) {
-			ret =
-			    gnutls_heartbeat_ping(session, 300, 5,
-						  GNUTLS_HEARTBEAT_WAIT);
+		} else if (strncmp(str, "**HEARTBEAT**",
+				   sizeof("**HEARTBEAT**") - 1) == 0) {
+			ret = gnutls_heartbeat_ping(session, 300, 5,
+						    GNUTLS_HEARTBEAT_WAIT);
 			if (ret < 0) {
 				if (ret == GNUTLS_E_INVALID_REQUEST) {
 					fprintf(stderr,
@@ -1179,19 +1160,18 @@ void getenv_copy(char *str, size_t max_str_size, const char *envvar)
 	return;
 }
 
-#define MIN(x,y) ((x)<(y))?(x):(y)
+#define MIN(x, y) ((x) < (y)) ? (x) : (y)
 #define MAX_CACHE_TRIES 5
-int
-pin_callback(void *user, int attempt, const char *token_url,
-	     const char *token_label, unsigned int flags, char *pin,
-	     size_t pin_max)
+int pin_callback(void *user, int attempt, const char *token_url,
+		 const char *token_label, unsigned int flags, char *pin,
+		 size_t pin_max)
 {
 	char password[MAX_PIN_LEN] = "";
 	common_info_st *info = user;
 	const char *desc;
 	int cache = MAX_CACHE_TRIES;
 	unsigned len;
-/* allow caching of PIN */
+	/* allow caching of PIN */
 	static char *cached_url = NULL;
 	static char cached_pin[MAX_PIN_LEN] = "";
 	const char *env;
@@ -1243,12 +1223,12 @@ pin_callback(void *user, int attempt, const char *token_url,
 
 	if (password[0] == 0) {
 		getenv_copy(password, sizeof(password), env);
-		if (password[0] == 0)	/* compatibility */
+		if (password[0] == 0) /* compatibility */
 			getenv_copy(password, sizeof(password), "GNUTLS_PIN");
 	}
 
-	if (password[0] == 0 && info != NULL && info->password != NULL
-	    && info->ask_pass == 0) {
+	if (password[0] == 0 && info != NULL && info->password != NULL &&
+	    info->ask_pass == 0) {
 		if (strlen(info->password) < sizeof(password)) {
 			strcpy(password, info->password);
 		} else {
@@ -1257,8 +1237,8 @@ pin_callback(void *user, int attempt, const char *token_url,
 		}
 	}
 
-	if (password[0] == 0
-	    && (info == NULL || info->batch == 0 || info->ask_pass != 0)) {
+	if (password[0] == 0 &&
+	    (info == NULL || info->batch == 0 || info->ask_pass != 0)) {
 		if (token_label && token_label[0] != 0) {
 			fprintf(stderr, "Token '%s' with URL '%s' ",
 				token_label, token_url);
@@ -1332,12 +1312,10 @@ static int token_callback(void *user, const char *label, const unsigned retry)
 	return 0;
 }
 
-void pkcs11_common(common_info_st * c)
+void pkcs11_common(common_info_st *c)
 {
-
 	gnutls_pkcs11_set_pin_function(pin_callback, c);
 	gnutls_pkcs11_set_token_function(token_callback, c);
-
 }
 
 #endif
@@ -1357,7 +1335,7 @@ void sockets_init(void)
 #endif
 }
 
-int log_msg(FILE * file, const char *message, ...)
+int log_msg(FILE *file, const char *message, ...)
 {
 	va_list args;
 	int rv;
@@ -1371,7 +1349,7 @@ int log_msg(FILE * file, const char *message, ...)
 	return rv;
 }
 
-void log_set(FILE * file)
+void log_set(FILE *file)
 {
 	logfile = file;
 }
@@ -1380,7 +1358,7 @@ void log_set(FILE * file)
 #pragma GCC diagnostic ignored "-Wformat-y2k"
 /* This is very similar to ctime() but it does not force a newline.
  */
-char *simple_ctime(const time_t * t, char out[SIMPLE_CTIME_BUF_SIZE])
+char *simple_ctime(const time_t *t, char out[SIMPLE_CTIME_BUF_SIZE])
 {
 	struct tm tm;
 
@@ -1392,7 +1370,7 @@ char *simple_ctime(const time_t * t, char out[SIMPLE_CTIME_BUF_SIZE])
 
 	return out;
 
- error:
+error:
 	snprintf(out, SIMPLE_CTIME_BUF_SIZE, "[error]");
 	return out;
 }

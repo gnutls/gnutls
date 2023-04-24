@@ -25,7 +25,7 @@
 
 /* Tests whether the included parameters are indeed prime */
 
-static void test_prime(const gnutls_datum_t * prime, const gnutls_datum_t * _q)
+static void test_prime(const gnutls_datum_t *prime, const gnutls_datum_t *_q)
 {
 	mpz_t p;
 	unsigned bits = prime->size * 8;

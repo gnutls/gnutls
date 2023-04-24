@@ -107,7 +107,7 @@ int _gnutls_rnd_preinit(void)
 	int ret;
 
 #if defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)
-# warning Insecure PRNG is enabled
+#warning Insecure PRNG is enabled
 	ret = gnutls_crypto_rnd_register(100, &_gnutls_fuzz_rnd_ops);
 	if (ret < 0)
 		return ret;
@@ -131,9 +131,8 @@ int _gnutls_rnd_preinit(void)
 	if (ret)
 		return gnutls_assert_val(GNUTLS_E_RANDOM_FAILED);
 
-	list =
-	    gl_list_nx_create_empty(GL_LINKEDHASH_LIST, NULL, NULL, free_ctx,
-				    false);
+	list = gl_list_nx_create_empty(GL_LINKEDHASH_LIST, NULL, NULL, free_ctx,
+				       false);
 	if (list == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 

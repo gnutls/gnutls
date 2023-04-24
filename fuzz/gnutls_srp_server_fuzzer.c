@@ -34,10 +34,9 @@
 #include "mem.h"
 #include "fuzzer.h"
 
-static int
-srp_cb(gnutls_session_t session, const char *username,
-       gnutls_datum_t * salt, gnutls_datum_t * verifier,
-       gnutls_datum_t * generator, gnutls_datum_t * prime)
+static int srp_cb(gnutls_session_t session, const char *username,
+		  gnutls_datum_t *salt, gnutls_datum_t *verifier,
+		  gnutls_datum_t *generator, gnutls_datum_t *prime)
 {
 	int ret;
 
@@ -45,28 +44,27 @@ srp_cb(gnutls_session_t session, const char *username,
 	memcpy(salt->data, (unsigned char *)SALT, SALT_SIZE);
 	salt->size = SALT_SIZE;
 
-	generator->data = (unsigned char *)
-	    gnutls_malloc(gnutls_srp_1024_group_generator.size);
+	generator->data = (unsigned char *)gnutls_malloc(
+		gnutls_srp_1024_group_generator.size);
 	memcpy(generator->data, gnutls_srp_1024_group_generator.data,
 	       gnutls_srp_1024_group_generator.size);
 	generator->size = gnutls_srp_1024_group_generator.size;
 
-	prime->data =
-	    (unsigned char *)gnutls_malloc(gnutls_srp_1024_group_prime.size);
+	prime->data = (unsigned char *)gnutls_malloc(
+		gnutls_srp_1024_group_prime.size);
 	memcpy(prime->data, gnutls_srp_1024_group_prime.data,
 	       gnutls_srp_1024_group_prime.size);
 	prime->size = gnutls_srp_1024_group_prime.size;
 
-	ret =
-	    gnutls_srp_verifier(USERNAME, PASSWORD, salt, generator, prime,
-				verifier);
+	ret = gnutls_srp_verifier(USERNAME, PASSWORD, salt, generator, prime,
+				  verifier);
 	if (ret < 0)
 		return -1;
 
 	return 0;
 }
 
-int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
 	IGNORE_CERTS;
 	int res;
@@ -104,20 +102,16 @@ int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 	ed25519_key.data = (unsigned char *)kEd25519PrivateKeyDER;
 	ed25519_key.size = sizeof(kEd25519PrivateKeyDER);
 
-	res =
-	    gnutls_certificate_set_x509_key_mem(xcred, &rsa_cert, &rsa_key,
-						GNUTLS_X509_FMT_DER);
+	res = gnutls_certificate_set_x509_key_mem(xcred, &rsa_cert, &rsa_key,
+						  GNUTLS_X509_FMT_DER);
 	assert(res >= 0);
 
-	res =
-	    gnutls_certificate_set_x509_key_mem(xcred, &ecdsa_cert, &ecdsa_key,
-						GNUTLS_X509_FMT_DER);
+	res = gnutls_certificate_set_x509_key_mem(
+		xcred, &ecdsa_cert, &ecdsa_key, GNUTLS_X509_FMT_DER);
 	assert(res >= 0);
 
-	res =
-	    gnutls_certificate_set_x509_key_mem(xcred, &ed25519_cert,
-						&ed25519_key,
-						GNUTLS_X509_FMT_DER);
+	res = gnutls_certificate_set_x509_key_mem(
+		xcred, &ed25519_cert, &ed25519_key, GNUTLS_X509_FMT_DER);
 	assert(res >= 0);
 
 	gnutls_certificate_set_known_dh_params(xcred, GNUTLS_SEC_PARAM_MEDIUM);
@@ -128,10 +122,8 @@ int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 	res = gnutls_credentials_set(session, GNUTLS_CRD_SRP, pcred);
 	assert(res >= 0);
 
-	res =
-	    gnutls_priority_set_direct(session,
-				       "NORMAL:-KX-ALL:+SRP:+SRP-RSA:+SRP-DSS",
-				       NULL);
+	res = gnutls_priority_set_direct(
+		session, "NORMAL:-KX-ALL:+SRP:+SRP-RSA:+SRP-DSS", NULL);
 	assert(res >= 0);
 
 	memdata.data = data;

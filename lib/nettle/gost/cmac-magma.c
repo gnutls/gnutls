@@ -23,30 +23,29 @@
  */
 
 #if HAVE_CONFIG_H
-# include "config.h"
+#include "config.h"
 #endif
 
 #ifndef HAVE_NETTLE_CMAC_MAGMA_UPDATE
 
-# include <nettle/cmac.h>
+#include <nettle/cmac.h>
 
-# include "magma.h"
-# include "cmac.h"
+#include "magma.h"
+#include "cmac.h"
 
-void cmac_magma_set_key(struct cmac_magma_ctx *ctx, const uint8_t * key)
+void cmac_magma_set_key(struct cmac_magma_ctx *ctx, const uint8_t *key)
 {
 	CMAC64_SET_KEY(ctx, magma_set_key, magma_encrypt, key);
 }
 
-void
-cmac_magma_update(struct cmac_magma_ctx *ctx,
-		  size_t length, const uint8_t * data)
+void cmac_magma_update(struct cmac_magma_ctx *ctx, size_t length,
+		       const uint8_t *data)
 {
 	CMAC64_UPDATE(ctx, magma_encrypt, length, data);
 }
 
-void
-cmac_magma_digest(struct cmac_magma_ctx *ctx, size_t length, uint8_t * digest)
+void cmac_magma_digest(struct cmac_magma_ctx *ctx, size_t length,
+		       uint8_t *digest)
 {
 	CMAC64_DIGEST(ctx, magma_encrypt, length, digest);
 }

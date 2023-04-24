@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdbool.h>
@@ -36,31 +36,31 @@ int main(void)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
-# include <unistd.h>
-# include <gnutls/gnutls.h>
-# include <gnutls/crypto.h>
-# include <gnutls/dtls.h>
-# include <signal.h>
-# include <assert.h>
+#include <string.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <gnutls/gnutls.h>
+#include <gnutls/crypto.h>
+#include <gnutls/dtls.h>
+#include <signal.h>
+#include <assert.h>
 
-# include "cert-common.h"
-# include "utils.h"
-# include "virt-time.h"
-# define MIN(x,y) (((x)<(y))?(x):(y))
+#include "cert-common.h"
+#include "utils.h"
+#include "virt-time.h"
+#define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
-# define TRACE_CLIENT 1
-# define TRACE_SERVER 2
+#define TRACE_CLIENT 1
+#define TRACE_SERVER 2
 
 /* To reproduce the entries in {client,server}-secrets.h, set this to
  * either TRACE_CLIENT or TRACE_SERVER.
  */
-# define TRACE 0
+#define TRACE 0
 
 /* This program tests the robustness of record sending with padding.
  */
@@ -78,9 +78,9 @@ static void client_log_func(int level, const char *str)
 /* A very basic TLS client.
  */
 
-# define MAX_BUF 1024
-# define MSG "Hello TLS"
-# define EARLY_MSG "Hello TLS, it's early"
+#define MAX_BUF 1024
+#define MSG "Hello TLS"
+#define EARLY_MSG "Hello TLS, it's early"
 
 extern unsigned int _gnutls_global_version;
 
@@ -90,26 +90,26 @@ extern unsigned int _gnutls_global_version;
  * is to check that the early data is encrypted with the ciphersuite
  * selected during the initial handshake, not the resuming handshakes.
  */
-# define SESSIONS 3
-# define TLS13_AES_128_GCM "NONE:+VERS-TLS1.3:+AES-128-GCM:+AEAD:+SIGN-RSA-PSS-RSAE-SHA384:+GROUP-SECP256R1:%NO_SHUFFLE_EXTENSIONS"
-# define TLS13_CHACHA20_POLY1305 "NONE:+VERS-TLS1.3:+CHACHA20-POLY1305:+AEAD:+SIGN-RSA-PSS-RSAE-SHA384:+GROUP-SECP256R1:%NO_SHUFFLE_EXTENSIONS"
+#define SESSIONS 3
+#define TLS13_AES_128_GCM \
+	"NONE:+VERS-TLS1.3:+AES-128-GCM:+AEAD:+SIGN-RSA-PSS-RSAE-SHA384:+GROUP-SECP256R1:%NO_SHUFFLE_EXTENSIONS"
+#define TLS13_CHACHA20_POLY1305 \
+	"NONE:+VERS-TLS1.3:+CHACHA20-POLY1305:+AEAD:+SIGN-RSA-PSS-RSAE-SHA384:+GROUP-SECP256R1:%NO_SHUFFLE_EXTENSIONS"
 
-static const
-gnutls_datum_t hrnd = { (void *)
-	    "\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+static const gnutls_datum_t hrnd = {
+	(void *)"\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
 	32
 };
 
-static const
-gnutls_datum_t hsrnd = { (void *)
-	    "\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+static const gnutls_datum_t hsrnd = {
+	(void *)"\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
 	32
 };
 
 static int gnutls_rnd_works;
 
 int __attribute__((visibility("protected")))
-    gnutls_rnd(gnutls_rnd_level_t level, void *data, size_t len)
+gnutls_rnd(gnutls_rnd_level_t level, void *data, size_t len)
 {
 	gnutls_rnd_works = 1;
 
@@ -122,8 +122,8 @@ int __attribute__((visibility("protected")))
 	return 0;
 }
 
-# define MAX_SECRET_SIZE 64
-# define MAX_SECRET_COUNT 10
+#define MAX_SECRET_SIZE 64
+#define MAX_SECRET_COUNT 10
 
 struct secret {
 	gnutls_record_encryption_level_t level;
@@ -134,62 +134,62 @@ struct secret {
 	uint8_t secret_write_buf[MAX_SECRET_SIZE];
 };
 
-# include "client-secrets.h"
-# include "server-secrets.h"
+#include "client-secrets.h"
+#include "server-secrets.h"
 
 struct secrets_expected {
 	const struct secret *secrets;
 	size_t count;
 };
 
-# define SIZEOF(array) (sizeof(array) / sizeof(array[0]))
+#define SIZEOF(array) (sizeof(array) / sizeof(array[0]))
 
 static const struct secrets_expected client_normal[SESSIONS] = {
-	{client_normal_0, SIZEOF(client_normal_0)},
-	{client_normal_1, SIZEOF(client_normal_1)},
-	{client_normal_2, SIZEOF(client_normal_2)},
+	{ client_normal_0, SIZEOF(client_normal_0) },
+	{ client_normal_1, SIZEOF(client_normal_1) },
+	{ client_normal_2, SIZEOF(client_normal_2) },
 };
 
 static const struct secrets_expected client_small[SESSIONS] = {
-	{client_small_0, SIZEOF(client_small_0)},
-	{client_small_1, SIZEOF(client_small_1)},
-	{client_small_2, SIZEOF(client_small_2)},
+	{ client_small_0, SIZEOF(client_small_0) },
+	{ client_small_1, SIZEOF(client_small_1) },
+	{ client_small_2, SIZEOF(client_small_2) },
 };
 
 static const struct secrets_expected client_empty[SESSIONS] = {
-	{client_empty_0, SIZEOF(client_empty_0)},
-	{client_empty_1, SIZEOF(client_empty_1)},
-	{client_empty_2, SIZEOF(client_empty_2)},
+	{ client_empty_0, SIZEOF(client_empty_0) },
+	{ client_empty_1, SIZEOF(client_empty_1) },
+	{ client_empty_2, SIZEOF(client_empty_2) },
 };
 
 static const struct secrets_expected client_explicit[SESSIONS] = {
-	{client_explicit_0, SIZEOF(client_explicit_0)},
-	{client_explicit_1, SIZEOF(client_explicit_1)},
-	{client_explicit_2, SIZEOF(client_explicit_2)},
+	{ client_explicit_0, SIZEOF(client_explicit_0) },
+	{ client_explicit_1, SIZEOF(client_explicit_1) },
+	{ client_explicit_2, SIZEOF(client_explicit_2) },
 };
 
 static const struct secrets_expected server_normal[SESSIONS] = {
-	{server_normal_0, SIZEOF(server_normal_0)},
-	{server_normal_1, SIZEOF(server_normal_1)},
-	{server_normal_2, SIZEOF(server_normal_2)},
+	{ server_normal_0, SIZEOF(server_normal_0) },
+	{ server_normal_1, SIZEOF(server_normal_1) },
+	{ server_normal_2, SIZEOF(server_normal_2) },
 };
 
 static const struct secrets_expected server_small[SESSIONS] = {
-	{server_small_0, SIZEOF(server_small_0)},
-	{server_small_1, SIZEOF(server_small_1)},
-	{server_small_2, SIZEOF(server_small_2)},
+	{ server_small_0, SIZEOF(server_small_0) },
+	{ server_small_1, SIZEOF(server_small_1) },
+	{ server_small_2, SIZEOF(server_small_2) },
 };
 
 static const struct secrets_expected server_empty[SESSIONS] = {
-	{server_empty_0, SIZEOF(server_empty_0)},
-	{server_empty_1, SIZEOF(server_empty_1)},
-	{server_empty_2, SIZEOF(server_empty_2)},
+	{ server_empty_0, SIZEOF(server_empty_0) },
+	{ server_empty_1, SIZEOF(server_empty_1) },
+	{ server_empty_2, SIZEOF(server_empty_2) },
 };
 
 static const struct secrets_expected server_explicit[SESSIONS] = {
-	{server_explicit_0, SIZEOF(server_explicit_0)},
-	{server_explicit_1, SIZEOF(server_explicit_1)},
-	{server_explicit_2, SIZEOF(server_explicit_2)},
+	{ server_explicit_0, SIZEOF(server_explicit_0) },
+	{ server_explicit_1, SIZEOF(server_explicit_1) },
+	{ server_explicit_2, SIZEOF(server_explicit_2) },
 };
 
 struct fixture {
@@ -205,49 +205,49 @@ struct fixture {
 
 static const struct fixture fixtures[] = {
 	{
-	 .name = "normal",
-	 .cflags = 0,
-	 .sflags = 0,
-	 .early_data = {(uint8_t *) EARLY_MSG, sizeof(EARLY_MSG)},
-	 .max_early_data_size = MAX_BUF,
-	 .expect_early_data = true,
-	 .client_secrets = client_normal,
-	 .server_secrets = server_normal,
-	 },
+		.name = "normal",
+		.cflags = 0,
+		.sflags = 0,
+		.early_data = { (uint8_t *)EARLY_MSG, sizeof(EARLY_MSG) },
+		.max_early_data_size = MAX_BUF,
+		.expect_early_data = true,
+		.client_secrets = client_normal,
+		.server_secrets = server_normal,
+	},
 	{
-	 .name = "small",
-	 .cflags = 0,
-	 .sflags = 0,
-	 .early_data = {(uint8_t *) EARLY_MSG, sizeof(EARLY_MSG)},
-	 .max_early_data_size = 10,
-	 .expect_early_data = true,
-	 .client_secrets = client_small,
-	 .server_secrets = server_small,
-	 },
+		.name = "small",
+		.cflags = 0,
+		.sflags = 0,
+		.early_data = { (uint8_t *)EARLY_MSG, sizeof(EARLY_MSG) },
+		.max_early_data_size = 10,
+		.expect_early_data = true,
+		.client_secrets = client_small,
+		.server_secrets = server_small,
+	},
 	{
-	 .name = "empty",
-	 .cflags = 0,
-	 .sflags = 0,
-	 .early_data = {NULL, 0},
-	 .max_early_data_size = MAX_BUF,
-	 .expect_early_data = false,
-	 .client_secrets = client_empty,
-	 .server_secrets = server_empty,
-	 },
+		.name = "empty",
+		.cflags = 0,
+		.sflags = 0,
+		.early_data = { NULL, 0 },
+		.max_early_data_size = MAX_BUF,
+		.expect_early_data = false,
+		.client_secrets = client_empty,
+		.server_secrets = server_empty,
+	},
 	{
-	 .name = "explicit",
-	 .cflags = GNUTLS_ENABLE_EARLY_DATA,
-	 .sflags = 0,
-	 .early_data = {NULL, 0},
-	 .max_early_data_size = MAX_BUF,
-	 .expect_early_data = false,
-	 .client_secrets = client_explicit,
-	 .server_secrets = server_explicit,
-	 },
+		.name = "explicit",
+		.cflags = GNUTLS_ENABLE_EARLY_DATA,
+		.sflags = 0,
+		.early_data = { NULL, 0 },
+		.max_early_data_size = MAX_BUF,
+		.expect_early_data = false,
+		.client_secrets = client_explicit,
+		.server_secrets = server_explicit,
+	},
 };
 
-# if TRACE
-static void print_secret(FILE * out, struct secret *secret)
+#if TRACE
+static void print_secret(FILE *out, struct secret *secret)
 {
 	const char *level;
 
@@ -291,14 +291,13 @@ static void print_secret(FILE * out, struct secret *secret)
 	}
 }
 
-static void
-print_secrets(FILE * out, const char *side, const char *name, int t,
-	      struct secret *secrets, size_t count)
+static void print_secrets(FILE *out, const char *side, const char *name, int t,
+			  struct secret *secrets, size_t count)
 {
 	size_t i;
 
-	fprintf(out, "static const struct secret %s_%s_%d[] = {\n",
-		side, name, t);
+	fprintf(out, "static const struct secret %s_%s_%d[] = {\n", side, name,
+		t);
 	for (i = 0; i < count; i++) {
 		fputs("\t{\n", out);
 		print_secret(out, &secrets[i]);
@@ -306,17 +305,16 @@ print_secrets(FILE * out, const char *side, const char *name, int t,
 	}
 	fputs("};\n\n", out);
 }
-# endif
+#endif
 
-static void
-check_secrets(const struct secret *secrets, size_t count,
-	      const struct secrets_expected *expected)
+static void check_secrets(const struct secret *secrets, size_t count,
+			  const struct secrets_expected *expected)
 {
 	size_t i;
 
 	if (count != expected->count) {
-		fail("unexpected number of secrets: %zu != %zu\n",
-		     count, expected->count);
+		fail("unexpected number of secrets: %zu != %zu\n", count,
+		     expected->count);
 	}
 
 	for (i = 0; i < count; i++) {
@@ -324,7 +322,8 @@ check_secrets(const struct secret *secrets, size_t count,
 			fail("unexpected secret level: %d != %d\n",
 			     secrets[i].level, expected->secrets[i].level);
 		}
-		if (secrets[i].secret_size != expected->secrets[i].secret_size) {
+		if (secrets[i].secret_size !=
+		    expected->secrets[i].secret_size) {
 			fail("unexpected secret size: %zu != %zu\n",
 			     secrets[i].secret_size,
 			     expected->secrets[i].secret_size);
@@ -362,11 +361,10 @@ struct callback_data {
 	struct secret secrets[MAX_SECRET_COUNT];
 };
 
-static int
-secret_callback(gnutls_session_t session,
-		gnutls_record_encryption_level_t level,
-		const void *secret_read,
-		const void *secret_write, size_t secret_size)
+static int secret_callback(gnutls_session_t session,
+			   gnutls_record_encryption_level_t level,
+			   const void *secret_read, const void *secret_write,
+			   size_t secret_size)
 {
 	struct callback_data *data = gnutls_session_get_ptr(session);
 	struct secret *secret = &data->secrets[data->secret_callback_called];
@@ -382,12 +380,17 @@ secret_callback(gnutls_session_t session,
 
 			cipher_algo = gnutls_early_cipher_get(session);
 			if (cipher_algo != GNUTLS_CIPHER_AES_128_GCM) {
-				fail("unexpected cipher used for early data: %s != %s\n", gnutls_cipher_get_name(cipher_algo), gnutls_cipher_get_name(GNUTLS_CIPHER_AES_128_GCM));
+				fail("unexpected cipher used for early data: %s != %s\n",
+				     gnutls_cipher_get_name(cipher_algo),
+				     gnutls_cipher_get_name(
+					     GNUTLS_CIPHER_AES_128_GCM));
 			}
 
 			digest_algo = gnutls_early_prf_hash_get(session);
 			if (digest_algo != GNUTLS_DIG_SHA256) {
-				fail("unexpected PRF hash used for early data: %s != %s\n", gnutls_digest_get_name(digest_algo), gnutls_digest_get_name(GNUTLS_DIG_SHA256));
+				fail("unexpected PRF hash used for early data: %s != %s\n",
+				     gnutls_digest_get_name(digest_algo),
+				     gnutls_digest_get_name(GNUTLS_DIG_SHA256));
 			}
 		}
 	}
@@ -442,10 +445,11 @@ static void client(int sds[], const struct fixture *fixture)
 
 		assert(gnutls_init(&session, GNUTLS_CLIENT | fixture->cflags) >=
 		       0);
-		assert(gnutls_priority_set_direct
-		       (session,
-			t == 0 ? TLS13_AES_128_GCM : TLS13_CHACHA20_POLY1305,
-			NULL) >= 0);
+		assert(gnutls_priority_set_direct(
+			       session,
+			       t == 0 ? TLS13_AES_128_GCM :
+					TLS13_CHACHA20_POLY1305,
+			       NULL) >= 0);
 
 		gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
 				       x509_cred);
@@ -459,20 +463,20 @@ static void client(int sds[], const struct fixture *fixture)
 		gnutls_handshake_set_secret_function(session, secret_callback);
 
 		if (t > 0) {
-			assert(gnutls_session_set_data
-			       (session, session_data.data,
-				session_data.size) >= 0);
+			assert(gnutls_session_set_data(session,
+						       session_data.data,
+						       session_data.size) >= 0);
 			/* The server should have advertised the same maximum. */
 			if (gnutls_record_get_max_early_data_size(session) !=
 			    fixture->max_early_data_size)
-				fail("client: max_early_data_size mismatch %d != %d\n", (int)gnutls_record_get_max_early_data_size(session), (int)fixture->max_early_data_size);
-			assert(gnutls_record_send_early_data(session,
-							     fixture->early_data.
-							     data,
-							     MIN
-							     (fixture->early_data.size,
-							      fixture->max_early_data_size))
-			       >= 0);
+				fail("client: max_early_data_size mismatch %d != %d\n",
+				     (int)gnutls_record_get_max_early_data_size(
+					     session),
+				     (int)fixture->max_early_data_size);
+			assert(gnutls_record_send_early_data(
+				       session, fixture->early_data.data,
+				       MIN(fixture->early_data.size,
+					   fixture->max_early_data_size)) >= 0);
 		}
 
 		/* Perform the TLS handshake
@@ -480,8 +484,7 @@ static void client(int sds[], const struct fixture *fixture)
 		gnutls_handshake_set_timeout(session, get_timeout());
 		do {
 			ret = gnutls_handshake(session);
-		}
-		while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+		} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 		if (ret < 0) {
 			fail("client: Handshake failed: %s\n",
@@ -492,14 +495,13 @@ static void client(int sds[], const struct fixture *fixture)
 		}
 
 		if (!gnutls_rnd_works) {
-			success
-			    ("client: gnutls_rnd() could not be overridden\n");
+			success("client: gnutls_rnd() could not be overridden\n");
 		} else {
-# if TRACE == TRACE_CLIENT
+#if TRACE == TRACE_CLIENT
 			print_secrets(stderr, "client", fixture->name, t,
 				      callback_data.secrets,
 				      callback_data.secret_callback_called);
-# endif
+#endif
 			check_secrets(callback_data.secrets,
 				      callback_data.secret_callback_called,
 				      &fixture->client_secrets[t]);
@@ -529,13 +531,12 @@ static void client(int sds[], const struct fixture *fixture)
 		gnutls_record_send(session, MSG, strlen(MSG));
 
 		do {
-			ret =
-			    gnutls_record_recv(session, buffer, sizeof(buffer));
+			ret = gnutls_record_recv(session, buffer,
+						 sizeof(buffer));
 		} while (ret == GNUTLS_E_AGAIN);
 		if (ret == 0) {
 			if (debug)
-				success
-				    ("client: Peer has closed the TLS connection\n");
+				success("client: Peer has closed the TLS connection\n");
 			goto end;
 		} else if (ret < 0) {
 			fail("client: Error: %s\n", gnutls_strerror(ret));
@@ -548,7 +549,7 @@ static void client(int sds[], const struct fixture *fixture)
 		gnutls_deinit(session);
 	}
 
- end:
+end:
 	gnutls_free(session_data.data);
 	gnutls_certificate_free_credentials(x509_cred);
 
@@ -557,16 +558,15 @@ static void client(int sds[], const struct fixture *fixture)
 
 static pid_t child;
 
-# define MAX_CLIENT_HELLO_RECORDED 10
+#define MAX_CLIENT_HELLO_RECORDED 10
 
 struct storage_st {
 	gnutls_datum_t entries[MAX_CLIENT_HELLO_RECORDED];
 	size_t num_entries;
 };
 
-static int
-storage_add(void *ptr, time_t expires, const gnutls_datum_t * key,
-	    const gnutls_datum_t * value)
+static int storage_add(void *ptr, time_t expires, const gnutls_datum_t *key,
+		       const gnutls_datum_t *value)
 {
 	struct storage_st *storage = ptr;
 	gnutls_datum_t *datum;
@@ -574,8 +574,8 @@ storage_add(void *ptr, time_t expires, const gnutls_datum_t * key,
 
 	for (i = 0; i < storage->num_entries; i++) {
 		if (key->size == storage->entries[i].size &&
-		    memcmp(storage->entries[i].data, key->data,
-			   key->size) == 0) {
+		    memcmp(storage->entries[i].data, key->data, key->size) ==
+			    0) {
 			return GNUTLS_E_DB_ENTRY_EXISTS;
 		}
 	}
@@ -650,14 +650,15 @@ static void server(int sds[], const struct fixture *fixture)
 		int sd = sds[t];
 		struct callback_data callback_data;
 
-		assert(gnutls_init
-		       (&session,
-			GNUTLS_SERVER | GNUTLS_ENABLE_EARLY_DATA) >= 0);
+		assert(gnutls_init(&session,
+				   GNUTLS_SERVER | GNUTLS_ENABLE_EARLY_DATA) >=
+		       0);
 
-		assert(gnutls_priority_set_direct
-		       (session,
-			t == 0 ? TLS13_AES_128_GCM : TLS13_CHACHA20_POLY1305,
-			NULL) >= 0);
+		assert(gnutls_priority_set_direct(
+			       session,
+			       t == 0 ? TLS13_AES_128_GCM :
+					TLS13_CHACHA20_POLY1305,
+			       NULL) >= 0);
 
 		gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
 				       x509_cred);
@@ -671,8 +672,8 @@ static void server(int sds[], const struct fixture *fixture)
 		 * until max_early_data_size without decryption
 		 */
 		if (t < 2)
-			(void)gnutls_record_set_max_early_data_size(session,
-								    fixture->max_early_data_size);
+			(void)gnutls_record_set_max_early_data_size(
+				session, fixture->max_early_data_size);
 
 		assert(gnutls_handshake_set_random(session, &hsrnd) >= 0);
 		gnutls_transport_set_int(session, sd);
@@ -684,8 +685,7 @@ static void server(int sds[], const struct fixture *fixture)
 
 		do {
 			ret = gnutls_handshake(session);
-		}
-		while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+		} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 		if (ret < 0) {
 			close(sd);
 			gnutls_deinit(session);
@@ -703,8 +703,7 @@ static void server(int sds[], const struct fixture *fixture)
 		}
 
 		if (!gnutls_rnd_works) {
-			success
-			    ("server: gnutls_rnd() could not be overridden\n");
+			success("server: gnutls_rnd() could not be overridden\n");
 			goto skip_early_data;
 		}
 
@@ -714,11 +713,11 @@ static void server(int sds[], const struct fixture *fixture)
 			fail("negotiated unexpected cipher: %s\n",
 			     gnutls_cipher_get_name(ret));
 		}
-# if TRACE == TRACE_SERVER
+#if TRACE == TRACE_SERVER
 		print_secrets(stderr, "server", fixture->name, t,
 			      callback_data.secrets,
 			      callback_data.secret_callback_called);
-# endif
+#endif
 		check_secrets(callback_data.secrets,
 			      callback_data.secret_callback_called,
 			      &fixture->server_secrets[t]);
@@ -729,45 +728,48 @@ static void server(int sds[], const struct fixture *fixture)
 			if (fixture->expect_early_data &&
 			    !(gnutls_session_get_flags(session) &
 			      GNUTLS_SFLAGS_EARLY_DATA)) {
-				fail("server: early data is not received (%d)\n", t);
+				fail("server: early data is not received (%d)\n",
+				     t);
 			}
 
-			ret =
-			    gnutls_record_recv_early_data(session, buffer,
-							  sizeof(buffer));
+			ret = gnutls_record_recv_early_data(session, buffer,
+							    sizeof(buffer));
 			if (ret < 0) {
 				if (fixture->early_data.size == 0 ||
 				    fixture->max_early_data_size == 0) {
 					if (ret !=
-					    GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
-					{
-						fail("server: unexpected error code when retrieving empty early data: %s\n", gnutls_strerror(ret));
+					    GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+						fail("server: unexpected error code when retrieving empty early data: %s\n",
+						     gnutls_strerror(ret));
 					}
 				} else {
-					fail("server: failed to retrieve early data: %s\n", gnutls_strerror(ret));
+					fail("server: failed to retrieve early data: %s\n",
+					     gnutls_strerror(ret));
 				}
 			} else {
 				if (fixture->early_data.size == 0 ||
 				    fixture->max_early_data_size == 0) {
-					fail("server: unexpected early data received: %d\n", ret);
+					fail("server: unexpected early data received: %d\n",
+					     ret);
 				} else if ((size_t)ret !=
-					   MIN(fixture->early_data.size,
-					       fixture->max_early_data_size)
-					   || memcmp(buffer,
-						     fixture->early_data.data,
-						     ret)) {
+						   MIN(fixture->early_data.size,
+						       fixture->max_early_data_size) ||
+					   memcmp(buffer,
+						  fixture->early_data.data,
+						  ret)) {
 					fail("server: early data mismatch\n");
 				}
 			}
 		} else if (t == 2) {
 			if (fixture->expect_early_data &&
 			    gnutls_session_get_flags(session) &
-			    GNUTLS_SFLAGS_EARLY_DATA) {
-				fail("server: early data is not rejected (%d)\n", t);
+				    GNUTLS_SFLAGS_EARLY_DATA) {
+				fail("server: early data is not rejected (%d)\n",
+				     t);
 			}
 		}
 
- skip_early_data:
+	skip_early_data:
 		/* see the Getting peer's information example */
 		/* print_info(session); */
 
@@ -777,8 +779,7 @@ static void server(int sds[], const struct fixture *fixture)
 
 			if (ret == 0) {
 				if (debug)
-					success
-					    ("server: Peer has closed the GnuTLS connection\n");
+					success("server: Peer has closed the GnuTLS connection\n");
 				break;
 			} else if (ret < 0) {
 				kill(child, SIGTERM);
@@ -875,4 +876,4 @@ void doit(void)
 	}
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

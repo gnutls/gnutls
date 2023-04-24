@@ -24,60 +24,56 @@
 
 #ifdef ENABLE_SRP
 
-# include "errors.h"
-# include <auth/srp_passwd.h>
-# include "auth.h"
-# include "auth.h"
-# include "srp.h"
-# include "debug.h"
-# include "num.h"
-# include <auth/srp_kx.h>
-# include <str.h>
-# include <auth/cert.h>
-# include <datum.h>
-# include <tls-sig.h>
-# include <x509.h>
-# include <algorithms.h>
+#include "errors.h"
+#include <auth/srp_passwd.h>
+#include "auth.h"
+#include "auth.h"
+#include "srp.h"
+#include "debug.h"
+#include "num.h"
+#include <auth/srp_kx.h>
+#include <str.h>
+#include <auth/cert.h>
+#include <datum.h>
+#include <tls-sig.h>
+#include <x509.h>
+#include <algorithms.h>
 
 static int gen_srp_cert_server_kx(gnutls_session_t, gnutls_buffer_st *);
 static int proc_srp_cert_server_kx(gnutls_session_t, uint8_t *, size_t);
 
-const mod_auth_st srp_rsa_auth_struct = {
-	"SRP",
-	_gnutls_gen_cert_server_crt,
-	NULL,
-	gen_srp_cert_server_kx,
-	_gnutls_gen_srp_client_kx,
-	NULL,
-	NULL,
+const mod_auth_st srp_rsa_auth_struct = { "SRP",
+					  _gnutls_gen_cert_server_crt,
+					  NULL,
+					  gen_srp_cert_server_kx,
+					  _gnutls_gen_srp_client_kx,
+					  NULL,
+					  NULL,
 
-	_gnutls_proc_crt,
-	NULL,			/* certificate */
-	proc_srp_cert_server_kx,
-	_gnutls_proc_srp_client_kx,
-	NULL,
-	NULL
-};
+					  _gnutls_proc_crt,
+					  NULL, /* certificate */
+					  proc_srp_cert_server_kx,
+					  _gnutls_proc_srp_client_kx,
+					  NULL,
+					  NULL };
 
-const mod_auth_st srp_dss_auth_struct = {
-	"SRP",
-	_gnutls_gen_cert_server_crt,
-	NULL,
-	gen_srp_cert_server_kx,
-	_gnutls_gen_srp_client_kx,
-	NULL,
-	NULL,
+const mod_auth_st srp_dss_auth_struct = { "SRP",
+					  _gnutls_gen_cert_server_crt,
+					  NULL,
+					  gen_srp_cert_server_kx,
+					  _gnutls_gen_srp_client_kx,
+					  NULL,
+					  NULL,
 
-	_gnutls_proc_crt,
-	NULL,			/* certificate */
-	proc_srp_cert_server_kx,
-	_gnutls_proc_srp_client_kx,
-	NULL,
-	NULL
-};
+					  _gnutls_proc_crt,
+					  NULL, /* certificate */
+					  proc_srp_cert_server_kx,
+					  _gnutls_proc_srp_client_kx,
+					  NULL,
+					  NULL };
 
-static int
-gen_srp_cert_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
+static int gen_srp_cert_server_kx(gnutls_session_t session,
+				  gnutls_buffer_st *data)
 {
 	ssize_t ret;
 	gnutls_datum_t signature, ddata;
@@ -102,25 +98,24 @@ gen_srp_cert_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 	ddata.data = &data->data[init_pos];
 	ddata.size = data->length - init_pos;
 
-	cred = (gnutls_certificate_credentials_t)
-	    _gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE);
+	cred = (gnutls_certificate_credentials_t)_gnutls_get_cred(
+		session, GNUTLS_CRD_CERTIFICATE);
 	if (cred == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
 	/* find the appropriate certificate */
-	if ((ret =
-	     _gnutls_get_selected_cert(session, &apr_cert_list,
-				       &apr_cert_list_length, &apr_pkey)) < 0) {
+	if ((ret = _gnutls_get_selected_cert(session, &apr_cert_list,
+					     &apr_cert_list_length,
+					     &apr_pkey)) < 0) {
 		gnutls_assert();
 		return ret;
 	}
 
-	if ((ret =
-	     _gnutls_handshake_sign_data(session, &apr_cert_list[0],
-					 apr_pkey, &ddata, &signature,
-					 &sign_algo)) < 0) {
+	if ((ret = _gnutls_handshake_sign_data(session, &apr_cert_list[0],
+					       apr_pkey, &ddata, &signature,
+					       &sign_algo)) < 0) {
 		gnutls_assert();
 		return ret;
 	}
@@ -151,9 +146,8 @@ gen_srp_cert_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 		}
 	}
 
-	ret =
-	    _gnutls_buffer_append_data_prefix(data, 16, signature.data,
-					      signature.size);
+	ret = _gnutls_buffer_append_data_prefix(data, 16, signature.data,
+						signature.size);
 
 	if (ret < 0) {
 		gnutls_assert();
@@ -162,14 +156,13 @@ gen_srp_cert_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 
 	ret = data->length - init_pos;
 
- cleanup:
+cleanup:
 	_gnutls_free_datum(&signature);
 	return ret;
 }
 
-static int
-proc_srp_cert_server_kx(gnutls_session_t session, uint8_t * data,
-			size_t _data_size)
+static int proc_srp_cert_server_kx(gnutls_session_t session, uint8_t *data,
+				   size_t _data_size)
 {
 	ssize_t ret;
 	int sigsize;
@@ -192,15 +185,15 @@ proc_srp_cert_server_kx(gnutls_session_t session, uint8_t * data,
 
 	data_size = _data_size - ret;
 
-	cred = (gnutls_certificate_credentials_t)
-	    _gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE);
+	cred = (gnutls_certificate_credentials_t)_gnutls_get_cred(
+		session, GNUTLS_CRD_CERTIFICATE);
 	if (cred == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
-	vflags =
-	    cred->verify_flags | session->internals.additional_verify_flags;
+	vflags = cred->verify_flags |
+		 session->internals.additional_verify_flags;
 
 	info = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
 	if (info == NULL || info->ncerts == 0) {
@@ -211,7 +204,7 @@ proc_srp_cert_server_kx(gnutls_session_t session, uint8_t * data,
 
 	/* VERIFY SIGNATURE */
 
-	vparams.size = ret;	/* all the data minus the signature */
+	vparams.size = ret; /* all the data minus the signature */
 	vparams.data = data;
 
 	p = &data[vparams.size];
@@ -239,19 +232,16 @@ proc_srp_cert_server_kx(gnutls_session_t session, uint8_t * data,
 	signature.data = &p[2];
 	signature.size = sigsize;
 
-	ret =
-	    _gnutls_get_auth_info_pcert(&peer_cert,
-					session->
-					security_parameters.server_ctype, info);
+	ret = _gnutls_get_auth_info_pcert(
+		&peer_cert, session->security_parameters.server_ctype, info);
 
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
 	}
 
-	ret =
-	    _gnutls_handshake_verify_data(session, vflags, &peer_cert, &vparams,
-					  &signature, sign_algo);
+	ret = _gnutls_handshake_verify_data(session, vflags, &peer_cert,
+					    &vparams, &signature, sign_algo);
 
 	gnutls_pcert_deinit(&peer_cert);
 	if (ret < 0) {
@@ -262,4 +252,4 @@ proc_srp_cert_server_kx(gnutls_session_t session, uint8_t * data,
 	return 0;
 }
 
-#endif				/* ENABLE_SRP */
+#endif /* ENABLE_SRP */

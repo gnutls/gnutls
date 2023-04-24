@@ -64,10 +64,10 @@ static int bindtoaddress(char *addrport)
 	snprintf(addr, sizeof(addr), "%s", addrport);
 
 	memset(&hints, 0, sizeof(struct addrinfo));
-	hints.ai_flags = AI_PASSIVE;	/* For wildcard IP address */
-	hints.ai_family = AF_UNSPEC;	/* Allow IPv4 or IPv6 */
-	hints.ai_socktype = SOCK_STREAM;	/* Stream socket */
-	hints.ai_protocol = 0;	/* any protocol */
+	hints.ai_flags = AI_PASSIVE; /* For wildcard IP address */
+	hints.ai_family = AF_UNSPEC; /* Allow IPv4 or IPv6 */
+	hints.ai_socktype = SOCK_STREAM; /* Stream socket */
+	hints.ai_protocol = 0; /* any protocol */
 
 	char *colon = strrchr(addr, ':');
 	const char *port = defaultport;
@@ -90,9 +90,8 @@ static int bindtoaddress(char *addrport)
 
 		if (fd >= 0) {
 			int one = 1;
-			if (setsockopt
-			    (fd, SOL_SOCKET, SO_REUSEADDR, &one,
-			     sizeof(one)) < 0) {
+			if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &one,
+				       sizeof(one)) < 0) {
 				close(fd);
 				continue;
 			}
@@ -108,7 +107,7 @@ static int bindtoaddress(char *addrport)
 		return -1;
 	}
 
-	freeaddrinfo(result);	/* No longer needed */
+	freeaddrinfo(result); /* No longer needed */
 
 	if (listen(fd, 5) < 0) {
 		close(fd);
@@ -128,10 +127,10 @@ static int connecttoaddress(char *addrport)
 	snprintf(addr, sizeof(addr), "%s", addrport);
 
 	memset(&hints, 0, sizeof(struct addrinfo));
-	hints.ai_flags = AI_PASSIVE;	/* For wildcard IP address */
-	hints.ai_family = AF_UNSPEC;	/* Allow IPv4 or IPv6 */
-	hints.ai_socktype = SOCK_STREAM;	/* Stream socket */
-	hints.ai_protocol = 0;	/* any protocol */
+	hints.ai_flags = AI_PASSIVE; /* For wildcard IP address */
+	hints.ai_family = AF_UNSPEC; /* Allow IPv4 or IPv6 */
+	hints.ai_socktype = SOCK_STREAM; /* Stream socket */
+	hints.ai_protocol = 0; /* any protocol */
 
 	char *colon = strrchr(addr, ':');
 	const char *port = defaultport;
@@ -166,7 +165,7 @@ static int connecttoaddress(char *addrport)
 		return -1;
 	}
 
-	freeaddrinfo(result);	/* No longer needed */
+	freeaddrinfo(result); /* No longer needed */
 
 	return fd;
 }
@@ -185,10 +184,9 @@ static int runproxy(int acceptfd)
 		return -1;
 	}
 
-	tlssession_t *session =
-	    tlssession_new(server, keyfile, certfile, cacertfile, hostname,
-			   insecure,
-			   debug, quitfn, NULL, NULL);
+	tlssession_t *session = tlssession_new(server, keyfile, certfile,
+					       cacertfile, hostname, insecure,
+					       debug, quitfn, NULL, NULL);
 	if (!session) {
 		fprintf(stderr, "Could create TLS session\n");
 		close(connectfd);
@@ -235,8 +233,7 @@ static int runlistener(void)
 					return -1;
 				}
 			}
-		}
-		while (fd < 0 && !rxsigquit);
+		} while (fd < 0 && !rxsigquit);
 		if (rxsigquit)
 			break;
 		if (nofork < 2) {
@@ -287,18 +284,18 @@ static void processoptions(int argc, char **argv)
 {
 	while (1) {
 		static const struct option longopts[] = {
-			{"connect", required_argument, 0, 'c'},
-			{"listen", required_argument, 0, 'l'},
-			{"key", required_argument, 0, 'K'},
-			{"cert", required_argument, 0, 'C'},
-			{"cacert", required_argument, 0, 'A'},
-			{"hostname", required_argument, 0, 'H'},
-			{"server", no_argument, 0, 's'},
-			{"insecure", no_argument, 0, 'i'},
-			{"nofork", no_argument, 0, 'n'},
-			{"debug", no_argument, 0, 'd'},
-			{"help", no_argument, 0, 'h'},
-			{0, 0, 0, 0}
+			{ "connect", required_argument, 0, 'c' },
+			{ "listen", required_argument, 0, 'l' },
+			{ "key", required_argument, 0, 'K' },
+			{ "cert", required_argument, 0, 'C' },
+			{ "cacert", required_argument, 0, 'A' },
+			{ "hostname", required_argument, 0, 'H' },
+			{ "server", no_argument, 0, 's' },
+			{ "insecure", no_argument, 0, 'i' },
+			{ "nofork", no_argument, 0, 'n' },
+			{ "debug", no_argument, 0, 'd' },
+			{ "help", no_argument, 0, 'h' },
+			{ 0, 0, 0, 0 }
 		};
 
 		int optidx = 0;
@@ -309,7 +306,7 @@ static void processoptions(int argc, char **argv)
 			break;
 
 		switch (c) {
-		case 0:	/* set a flag, nothing else to do */
+		case 0: /* set a flag, nothing else to do */
 			break;
 
 		case 'c':

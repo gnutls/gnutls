@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -45,13 +45,13 @@ void doit(void)
 
 #else
 
-# include "../utils.h"
-# include "softhsm.h"
-# include <assert.h>
+#include "../utils.h"
+#include "softhsm.h"
+#include <assert.h>
 
-# define CONFIG_NAME "softhsm-generate"
-# define CONFIG CONFIG_NAME".config"
-# define PIN "1234"
+#define CONFIG_NAME "softhsm-generate"
+#define CONFIG CONFIG_NAME ".config"
+#define PIN "1234"
 /* Tests whether a gnutls_privkey_generate3 will work generate a key
  * which is marked as sensitive.
  */
@@ -64,9 +64,9 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "|<%d>| %s", level, str);
 }
 
-static
-int pin_func(void *userdata, int attempt, const char *url, const char *label,
-	     unsigned flags, char *pin, size_t pin_max)
+static int pin_func(void *userdata, int attempt, const char *url,
+		    const char *label, unsigned flags, char *pin,
+		    size_t pin_max)
 {
 	if (_pin == NULL)
 		return -1;
@@ -104,8 +104,9 @@ void doit(void)
 
 	set_softhsm_conf(CONFIG);
 	snprintf(buf, sizeof(buf),
-		 "%s --init-token --slot 0 --label test --so-pin " PIN " --pin "
-		 PIN, bin);
+		 "%s --init-token --slot 0 --label test --so-pin " PIN
+		 " --pin " PIN,
+		 bin);
 	system(buf);
 
 	ret = gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_MANUAL, NULL);
@@ -123,11 +124,10 @@ void doit(void)
 	gnutls_pkcs11_set_pin_function(pin_func, NULL);
 
 	/* generate sensitive */
-	ret =
-	    gnutls_pkcs11_privkey_generate3("pkcs11:token=test", GNUTLS_PK_RSA,
-					    2048, "testkey", NULL,
-					    GNUTLS_X509_FMT_DER, &out, 0,
-					    GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
+	ret = gnutls_pkcs11_privkey_generate3("pkcs11:token=test",
+					      GNUTLS_PK_RSA, 2048, "testkey",
+					      NULL, GNUTLS_X509_FMT_DER, &out,
+					      0, GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
 	if (ret < 0) {
 		fail("%d: %s\n", ret, gnutls_strerror(ret));
 		exit(1);
@@ -137,9 +137,9 @@ void doit(void)
 	assert(out.size > 0);
 
 	gnutls_pkcs11_obj_set_pin_function(obj, pin_func, NULL);
-	assert(gnutls_pkcs11_obj_import_url
-	       (obj, "pkcs11:token=test;object=testkey;type=private",
-		GNUTLS_PKCS11_OBJ_FLAG_LOGIN) >= 0);
+	assert(gnutls_pkcs11_obj_import_url(
+		       obj, "pkcs11:token=test;object=testkey;type=private",
+		       GNUTLS_PKCS11_OBJ_FLAG_LOGIN) >= 0);
 
 	assert(gnutls_pkcs11_obj_get_flags(obj, &flags) >= 0);
 
@@ -150,12 +150,11 @@ void doit(void)
 	gnutls_pkcs11_obj_deinit(obj);
 
 	/* generate non-sensitive */
-	ret =
-	    gnutls_pkcs11_privkey_generate3("pkcs11:token=test", GNUTLS_PK_RSA,
-					    2048, "testkey2", NULL,
-					    GNUTLS_X509_FMT_DER, &out, 0,
-					    GNUTLS_PKCS11_OBJ_FLAG_LOGIN |
-					    GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_SENSITIVE);
+	ret = gnutls_pkcs11_privkey_generate3(
+		"pkcs11:token=test", GNUTLS_PK_RSA, 2048, "testkey2", NULL,
+		GNUTLS_X509_FMT_DER, &out, 0,
+		GNUTLS_PKCS11_OBJ_FLAG_LOGIN |
+			GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_SENSITIVE);
 	if (ret < 0) {
 		fail("%d: %s\n", ret, gnutls_strerror(ret));
 		exit(1);
@@ -165,9 +164,9 @@ void doit(void)
 	assert(out.size > 0);
 
 	gnutls_pkcs11_obj_set_pin_function(obj, pin_func, NULL);
-	assert(gnutls_pkcs11_obj_import_url
-	       (obj, "pkcs11:token=test;object=testkey2;type=private",
-		GNUTLS_PKCS11_OBJ_FLAG_LOGIN) >= 0);
+	assert(gnutls_pkcs11_obj_import_url(
+		       obj, "pkcs11:token=test;object=testkey2;type=private",
+		       GNUTLS_PKCS11_OBJ_FLAG_LOGIN) >= 0);
 
 	assert(gnutls_pkcs11_obj_get_flags(obj, &flags) >= 0);
 

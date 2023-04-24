@@ -45,7 +45,7 @@
  **/
 void gnutls_credentials_clear(gnutls_session_t session)
 {
-	if (session->key.cred) {	/* beginning of the list */
+	if (session->key.cred) { /* beginning of the list */
 		auth_cred_st *ccred, *ncred;
 		ccred = session->key.cred;
 		while (ccred != NULL) {
@@ -91,14 +91,13 @@ void gnutls_credentials_clear(gnutls_session_t session)
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.
  **/
-int
-gnutls_credentials_set(gnutls_session_t session,
-		       gnutls_credentials_type_t type, void *cred)
+int gnutls_credentials_set(gnutls_session_t session,
+			   gnutls_credentials_type_t type, void *cred)
 {
 	auth_cred_st *ccred = NULL, *pcred = NULL;
 	int exists = 0;
 
-	if (session->key.cred == NULL) {	/* beginning of the list */
+	if (session->key.cred == NULL) { /* beginning of the list */
 
 		session->key.cred = gnutls_malloc(sizeof(auth_cred_st));
 		if (session->key.cred == NULL)
@@ -122,7 +121,7 @@ gnutls_credentials_set(gnutls_session_t session,
 		/* After this, pcred is not null.
 		 */
 
-		if (exists == 0) {	/* new entry */
+		if (exists == 0) { /* new entry */
 			pcred->next = gnutls_malloc(sizeof(auth_cred_st));
 			if (pcred->next == NULL)
 				return GNUTLS_E_MEMORY_ERROR;
@@ -134,7 +133,7 @@ gnutls_credentials_set(gnutls_session_t session,
 
 			ccred->next = NULL;
 			ccred->algorithm = type;
-		} else {	/* modify existing entry */
+		} else { /* modify existing entry */
 			ccred->credentials = cred;
 		}
 	}
@@ -148,20 +147,20 @@ gnutls_credentials_set(gnutls_session_t session,
 
 		if (c != NULL && c->ncerts != 0) {
 			for (i = 0; i < c->ncerts; i++) {
-				key_usage =
-				    get_key_usage(session,
-						  c->certs[i].
-						  cert_list[0].pubkey);
-				if (key_usage == 0
-				    || (key_usage &
-					GNUTLS_KEY_DIGITAL_SIGNATURE)) {
+				key_usage = get_key_usage(
+					session,
+					c->certs[i].cert_list[0].pubkey);
+				if (key_usage == 0 ||
+				    (key_usage &
+				     GNUTLS_KEY_DIGITAL_SIGNATURE)) {
 					allow_tls13 = 1;
 					break;
 				}
 			}
 
-			if (session->security_parameters.entity == GNUTLS_SERVER
-			    && !c->tls13_ok)
+			if (session->security_parameters.entity ==
+				    GNUTLS_SERVER &&
+			    !c->tls13_ok)
 				allow_tls13 = 0;
 
 			if (!allow_tls13) {
@@ -198,9 +197,8 @@ gnutls_credentials_set(gnutls_session_t session,
  *
  * Since: 3.3.3
  **/
-int
-gnutls_credentials_get(gnutls_session_t session,
-		       gnutls_credentials_type_t type, void **cred)
+int gnutls_credentials_get(gnutls_session_t session,
+			   gnutls_credentials_type_t type, void **cred)
 {
 	const void *_cred;
 
@@ -285,8 +283,8 @@ gnutls_credentials_type_t gnutls_auth_client_get_type(gnutls_session_t session)
 const void *_gnutls_get_kx_cred(gnutls_session_t session,
 				gnutls_kx_algorithm_t algo)
 {
-	int server =
-	    session->security_parameters.entity == GNUTLS_SERVER ? 1 : 0;
+	int server = session->security_parameters.entity == GNUTLS_SERVER ? 1 :
+									    0;
 
 	return _gnutls_get_cred(session, _gnutls_map_kx_get_cred(algo, server));
 }
@@ -328,93 +326,83 @@ void _gnutls_free_auth_info(gnutls_session_t session)
 	}
 
 	switch (session->key.auth_info_type) {
-	case GNUTLS_CRD_SRP:
-		{
-			srp_server_auth_info_t info =
-			    _gnutls_get_auth_info(session, GNUTLS_CRD_SRP);
+	case GNUTLS_CRD_SRP: {
+		srp_server_auth_info_t info =
+			_gnutls_get_auth_info(session, GNUTLS_CRD_SRP);
 
-			if (info == NULL)
-				break;
+		if (info == NULL)
+			break;
 
-			gnutls_free(info->username);
-			info->username = NULL;
-		}
-		break;
+		gnutls_free(info->username);
+		info->username = NULL;
+	} break;
 #ifdef ENABLE_ANON
-	case GNUTLS_CRD_ANON:
-		{
-			anon_auth_info_t info =
-			    _gnutls_get_auth_info(session, GNUTLS_CRD_ANON);
+	case GNUTLS_CRD_ANON: {
+		anon_auth_info_t info =
+			_gnutls_get_auth_info(session, GNUTLS_CRD_ANON);
 
-			if (info == NULL)
-				break;
+		if (info == NULL)
+			break;
 
-			dh_info = &info->dh;
-			_gnutls_free_dh_info(dh_info);
-		}
-		break;
+		dh_info = &info->dh;
+		_gnutls_free_dh_info(dh_info);
+	} break;
 #endif
-	case GNUTLS_CRD_PSK:
-		{
-			psk_auth_info_t info =
-			    _gnutls_get_auth_info(session, GNUTLS_CRD_PSK);
+	case GNUTLS_CRD_PSK: {
+		psk_auth_info_t info =
+			_gnutls_get_auth_info(session, GNUTLS_CRD_PSK);
 
-			if (info == NULL)
-				break;
+		if (info == NULL)
+			break;
 
-			gnutls_free(info->username);
-			info->username = NULL;
-			info->username_len = 0;
+		gnutls_free(info->username);
+		info->username = NULL;
+		info->username_len = 0;
 
-			gnutls_free(info->hint);
-			info->hint = NULL;
-			info->hint_len = 0;
+		gnutls_free(info->hint);
+		info->hint = NULL;
+		info->hint_len = 0;
 
 #ifdef ENABLE_DHE
-			dh_info = &info->dh;
-			_gnutls_free_dh_info(dh_info);
+		dh_info = &info->dh;
+		_gnutls_free_dh_info(dh_info);
 #endif
+	} break;
+	case GNUTLS_CRD_CERTIFICATE: {
+		unsigned int i;
+		cert_auth_info_t info =
+			_gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
+
+		if (info == NULL)
+			break;
+
+		dh_info = &info->dh;
+		for (i = 0; i < info->ncerts; i++) {
+			_gnutls_free_datum(&info->raw_certificate_list[i]);
 		}
-		break;
-	case GNUTLS_CRD_CERTIFICATE:
-		{
-			unsigned int i;
-			cert_auth_info_t info = _gnutls_get_auth_info(session,
-								      GNUTLS_CRD_CERTIFICATE);
 
-			if (info == NULL)
-				break;
+		for (i = 0; i < info->nocsp; i++) {
+			_gnutls_free_datum(&info->raw_ocsp_list[i]);
+		}
 
-			dh_info = &info->dh;
-			for (i = 0; i < info->ncerts; i++) {
-				_gnutls_free_datum(&info->raw_certificate_list
-						   [i]);
-			}
-
-			for (i = 0; i < info->nocsp; i++) {
-				_gnutls_free_datum(&info->raw_ocsp_list[i]);
-			}
-
-			gnutls_free(info->raw_certificate_list);
-			gnutls_free(info->raw_ocsp_list);
-			info->ncerts = 0;
-			info->nocsp = 0;
+		gnutls_free(info->raw_certificate_list);
+		gnutls_free(info->raw_ocsp_list);
+		info->ncerts = 0;
+		info->nocsp = 0;
 
 #ifdef ENABLE_DHE
-			_gnutls_free_dh_info(dh_info);
+		_gnutls_free_dh_info(dh_info);
 #endif
-		}
+	}
 
-		break;
+	break;
 	default:
 		return;
-
 	}
 
 	gnutls_free(session->key.auth_info);
 	session->key.auth_info_size = 0;
 	session->key.auth_info_type = 0;
-
 }
 
 /* This function will create the auth info structure in the key
@@ -423,10 +411,9 @@ void _gnutls_free_auth_info(gnutls_session_t session)
  * If allow change is !=0 then this will allow changing the auth
  * info structure to a different type.
  */
-int
-_gnutls_auth_info_init(gnutls_session_t session,
-		       gnutls_credentials_type_t type, int size,
-		       int allow_change)
+int _gnutls_auth_info_init(gnutls_session_t session,
+			   gnutls_credentials_type_t type, int size,
+			   int allow_change)
 {
 	if (session->key.auth_info == NULL) {
 		session->key.auth_info = gnutls_calloc(1, size);
@@ -456,7 +443,6 @@ _gnutls_auth_info_init(gnutls_session_t session,
 			 * to passive eavesdropers.
 			 */
 			if (type != session->key.auth_info_type) {
-
 				_gnutls_free_auth_info(session);
 
 				session->key.auth_info = gnutls_calloc(1, size);

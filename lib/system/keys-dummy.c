@@ -33,13 +33,10 @@ void gnutls_system_key_iter_deinit(gnutls_system_key_iter_t iter)
 	return;
 }
 
-int
-gnutls_system_key_iter_get_info(gnutls_system_key_iter_t * iter,
-				unsigned cert_type,
-				char **cert_url,
-				char **key_url,
-				char **label,
-				gnutls_datum_t * der, unsigned int flags)
+int gnutls_system_key_iter_get_info(gnutls_system_key_iter_t *iter,
+				    unsigned cert_type, char **cert_url,
+				    char **key_url, char **label,
+				    gnutls_datum_t *der, unsigned int flags)
 {
 	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }

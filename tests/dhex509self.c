@@ -23,7 +23,7 @@
 /* Parts copied from GnuTLS example programs. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -40,19 +40,19 @@ int main(int argc, char **argv)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <sys/socket.h>
-# if !defined(_WIN32)
-#  include <sys/wait.h>
-# endif
-# include <unistd.h>
-# include <gnutls/gnutls.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#if !defined(_WIN32)
+#include <sys/wait.h>
+#endif
+#include <unistd.h>
+#include <gnutls/gnutls.h>
 
-# include "utils.h"
+#include "utils.h"
 
-# include "ex-session-info.c"
-# include "ex-x509-info.c"
+#include "ex-session-info.c"
+#include "ex-x509-info.c"
 
 pid_t child;
 
@@ -65,8 +65,8 @@ static void tls_log_func(int level, const char *str)
 /* A very basic TLS client, with anonymous authentication.
  */
 
-# define MAX_BUF 1024
-# define MSG "Hello TLS"
+#define MAX_BUF 1024
+#define MSG "Hello TLS"
 
 static void client(int sd)
 {
@@ -96,9 +96,9 @@ static void client(int sd)
 	gnutls_init(&session, GNUTLS_CLIENT);
 
 	/* Use default priorities */
-	gnutls_priority_set_direct(session,
-				   "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+DHE-RSA",
-				   NULL);
+	gnutls_priority_set_direct(
+		session, "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+DHE-RSA",
+		NULL);
 
 	/* put the x509 credentials to the current session
 	 */
@@ -120,8 +120,8 @@ static void client(int sd)
 
 	if (debug)
 		success("client: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	/* see the Getting peer's information example */
 	if (debug)
@@ -129,9 +129,8 @@ static void client(int sd)
 
 	print_dh_params_info(session);
 
-	ret =
-	    gnutls_credentials_get(session, GNUTLS_CRD_CERTIFICATE,
-				   (void **)&tst_cred);
+	ret = gnutls_credentials_get(session, GNUTLS_CRD_CERTIFICATE,
+				     (void **)&tst_cred);
 	if (ret < 0) {
 		fail("client: gnutls_credentials_get failed: %s\n",
 		     gnutls_strerror(ret));
@@ -162,8 +161,7 @@ static void client(int sd)
 		ret = gnutls_handshake(session);
 		if (ret == 0) {
 			if (debug)
-				success
-				    ("client: handshake complete, reading again.\n");
+				success("client: handshake complete, reading again.\n");
 			ret = gnutls_record_recv(session, buffer, MAX_BUF);
 		} else {
 			fail("client: handshake failed.\n");
@@ -189,7 +187,7 @@ static void client(int sd)
 
 	gnutls_bye(session, GNUTLS_SHUT_RDWR);
 
- end:
+end:
 
 	close(sd);
 
@@ -203,8 +201,8 @@ static void client(int sd)
 /* This is a sample TLS 1.0 echo server, using X.509 authentication.
  */
 
-# define MAX_BUF 1024
-# define DH_BITS 1024
+#define MAX_BUF 1024
+#define DH_BITS 1024
 
 /* These are global */
 gnutls_certificate_credentials_t x509_cred;
@@ -218,9 +216,9 @@ static gnutls_session_t initialize_tls_session(void)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_priority_set_direct(session,
-				   "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+DHE-RSA",
-				   NULL);
+	gnutls_priority_set_direct(
+		session, "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+DHE-RSA",
+		NULL);
 	gnutls_handshake_set_timeout(session, get_timeout());
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
@@ -292,8 +290,8 @@ static void server(int sd)
 	if (debug) {
 		success("server: Handshake was completed\n");
 		success("server: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 	}
 
 	/* see the Getting peer's information example */
@@ -308,19 +306,18 @@ static void server(int sd)
 
 		if (ret == 0) {
 			if (debug)
-				success
-				    ("server: Peer has closed the GnuTLS connection\n");
+				success("server: Peer has closed the GnuTLS connection\n");
 			break;
 		} else if (ret < 0) {
-			fail("server: Received corrupted data(%d). Closing...\n", ret);
+			fail("server: Received corrupted data(%d). Closing...\n",
+			     ret);
 			break;
 		} else if (ret > 0) {
-			gnutls_certificate_server_set_request(session,
-							      GNUTLS_CERT_REQUEST);
+			gnutls_certificate_server_set_request(
+				session, GNUTLS_CERT_REQUEST);
 
 			if (debug)
-				success
-				    ("server: got data, forcing rehandshake.\n");
+				success("server: got data, forcing rehandshake.\n");
 
 			ret = gnutls_rehandshake(session);
 			if (ret < 0) {
@@ -394,4 +391,4 @@ void doit(void)
 	}
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

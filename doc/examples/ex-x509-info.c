@@ -1,7 +1,7 @@
 /* This example code is placed in the public domain. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -69,9 +69,8 @@ void print_x509_certificate_info(gnutls_session_t session)
 		/* This is the preferred way of printing short information about
 		   a certificate. */
 
-		ret =
-		    gnutls_x509_crt_print(cert, GNUTLS_CRT_PRINT_ONELINE,
-					  &cinfo);
+		ret = gnutls_x509_crt_print(cert, GNUTLS_CRT_PRINT_ONELINE,
+					    &cinfo);
 		if (ret == 0) {
 			printf("\t%s\n", cinfo.data);
 			gnutls_free(cinfo.data);
@@ -117,6 +116,5 @@ void print_x509_certificate_info(gnutls_session_t session)
 		printf("\tIssuer's DN: %s\n", dn);
 
 		gnutls_x509_crt_deinit(cert);
-
 	}
 }

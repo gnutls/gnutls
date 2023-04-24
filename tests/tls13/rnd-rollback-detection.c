@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,20 +35,20 @@ int main(void)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
-# include <unistd.h>
-# include <gnutls/gnutls.h>
-# include <gnutls/dtls.h>
-# include <signal.h>
-# include <assert.h>
+#include <string.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <gnutls/gnutls.h>
+#include <gnutls/dtls.h>
+#include <signal.h>
+#include <assert.h>
 
-# include "cert-common.h"
-# include "utils.h"
+#include "cert-common.h"
+#include "utils.h"
 
 /* This program checks whether a TLS 1.3 client will detect
  * a TLS 1.2 rollback attempt via the server random value.
@@ -87,10 +87,10 @@ static void client(int fd)
 
 	gnutls_handshake_set_timeout(session, get_timeout());
 
-	ret =
-	    gnutls_priority_set_direct(session,
-				       "NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:+VERS-TLS1.1:+VERS-TLS1.0",
-				       NULL);
+	ret = gnutls_priority_set_direct(
+		session,
+		"NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:+VERS-TLS1.1:+VERS-TLS1.0",
+		NULL);
 	if (ret < 0)
 		fail("cannot set TLS 1.2 priorities\n");
 
@@ -104,8 +104,7 @@ static void client(int fd)
 	 */
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret != GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER) {
 		fail("unexpected error during rollback: %s\n",
@@ -121,29 +120,27 @@ static void client(int fd)
 	gnutls_global_deinit();
 }
 
-# ifdef TLS12
-#  define RND tls12_rnd
-#  define PRIO "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2"
-# elif TLS11
-#  define RND tls11_rnd
-#  define PRIO "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.1:+VERS-TLS1.0"
-# else
-#  error unknown version to test
-# endif
+#ifdef TLS12
+#define RND tls12_rnd
+#define PRIO "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2"
+#elif TLS11
+#define RND tls11_rnd
+#define PRIO "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.1:+VERS-TLS1.0"
+#else
+#error unknown version to test
+#endif
 
 gnutls_datum_t tls12_rnd = { (void *)"\x00\x00\x00\x04\x00\x00\x00\x04"
-	    "\x00\x00\x00\x04\x00\x00\x00\x04"
-	    "\x00\x00\x00\x04\x00\x00\x00\x04"
-	    "\x44\x4F\x57\x4E\x47\x52\x44\x01",
-	32
-};
+				     "\x00\x00\x00\x04\x00\x00\x00\x04"
+				     "\x00\x00\x00\x04\x00\x00\x00\x04"
+				     "\x44\x4F\x57\x4E\x47\x52\x44\x01",
+			     32 };
 
 gnutls_datum_t tls11_rnd = { (void *)"\x00\x00\x00\x04\x00\x00\x00\x04"
-	    "\x00\x00\x00\x04\x00\x00\x00\x04"
-	    "\x00\x00\x00\x04\x00\x00\x00\x04"
-	    "\x44\x4F\x57\x4E\x47\x52\x44\x00",
-	32
-};
+				     "\x00\x00\x00\x04\x00\x00\x00\x04"
+				     "\x00\x00\x00\x04\x00\x00\x00\x04"
+				     "\x44\x4F\x57\x4E\x47\x52\x44\x00",
+			     32 };
 
 static void server(int fd)
 {
@@ -177,7 +174,7 @@ static void server(int fd)
 
 	do {
 		ret = gnutls_handshake(session);
-		if (ret == GNUTLS_E_INTERRUPTED) {	/* expected */
+		if (ret == GNUTLS_E_INTERRUPTED) { /* expected */
 			break;
 		}
 	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
@@ -235,4 +232,4 @@ void doit(void)
 	}
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

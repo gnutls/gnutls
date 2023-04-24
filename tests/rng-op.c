@@ -22,7 +22,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -30,7 +30,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #if !defined(_WIN32)
-# include <sys/wait.h>
+#include <sys/wait.h>
 #endif
 
 #include "utils.h"
@@ -60,7 +60,7 @@ static void try(int rnd)
 		}
 	}
 
-#define TMP_SIZE (65*1024)
+#define TMP_SIZE (65 * 1024)
 	tmp = malloc(TMP_SIZE);
 	if (tmp == NULL) {
 		fail("memory error\n");
@@ -70,7 +70,8 @@ static void try(int rnd)
 	for (i = 0; i <= 65539; i++) {
 		ret = gnutls_rnd(rnd, tmp, TMP_SIZE);
 		if (ret < 0) {
-			fail("Error iterating RNG-%d more than %u times for %d data\n", rnd, i, TMP_SIZE);
+			fail("Error iterating RNG-%d more than %u times for %d data\n",
+			     rnd, i, TMP_SIZE);
 			exit(1);
 		}
 	}

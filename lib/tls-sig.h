@@ -21,43 +21,40 @@
  */
 
 #ifndef GNUTLS_LIB_TLS_SIG_H
-# define GNUTLS_LIB_TLS_SIG_H
+#define GNUTLS_LIB_TLS_SIG_H
 
-# include <gnutls/abstract.h>
+#include <gnutls/abstract.h>
 
 /* While this is currently equal to the length of RSA/SHA512
  * signature, it should also be sufficient for DSS signature and any
  * other RSA signatures including one with the old MD5/SHA1-combined
  * format.
  */
-# define MAX_SIG_SIZE (19 + MAX_HASH_SIZE)
+#define MAX_SIG_SIZE (19 + MAX_HASH_SIZE)
 
 int _gnutls_check_key_usage_for_sig(gnutls_session_t session,
 				    unsigned key_usage, unsigned our_cert);
 
 int _gnutls_handshake_sign_crt_vrfy(gnutls_session_t session,
-				    gnutls_pcert_st * cert,
+				    gnutls_pcert_st *cert,
 				    gnutls_privkey_t pkey,
-				    gnutls_datum_t * signature);
+				    gnutls_datum_t *signature);
 
-int _gnutls_handshake_sign_data(gnutls_session_t session,
-				gnutls_pcert_st * cert,
-				gnutls_privkey_t pkey,
-				gnutls_datum_t * params,
-				gnutls_datum_t * signature,
-				gnutls_sign_algorithm_t * algo);
+int _gnutls_handshake_sign_data(gnutls_session_t session, gnutls_pcert_st *cert,
+				gnutls_privkey_t pkey, gnutls_datum_t *params,
+				gnutls_datum_t *signature,
+				gnutls_sign_algorithm_t *algo);
 
 int _gnutls_handshake_verify_crt_vrfy(gnutls_session_t session,
 				      unsigned verify_flags,
-				      gnutls_pcert_st * cert,
-				      gnutls_datum_t * signature,
+				      gnutls_pcert_st *cert,
+				      gnutls_datum_t *signature,
 				      gnutls_sign_algorithm_t);
 
 int _gnutls_handshake_verify_data(gnutls_session_t session,
-				  unsigned verify_flags,
-				  gnutls_pcert_st * cert,
-				  const gnutls_datum_t * params,
-				  gnutls_datum_t * signature,
+				  unsigned verify_flags, gnutls_pcert_st *cert,
+				  const gnutls_datum_t *params,
+				  gnutls_datum_t *signature,
 				  gnutls_sign_algorithm_t algo);
 
-#endif				/* GNUTLS_LIB_TLS_SIG_H */
+#endif /* GNUTLS_LIB_TLS_SIG_H */

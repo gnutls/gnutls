@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -40,8 +40,7 @@
 
 const char *testname = "";
 
-#define myfail(fmt, ...) \
-	fail("%s: "fmt, testname, ##__VA_ARGS__)
+#define myfail(fmt, ...) fail("%s: " fmt, testname, ##__VA_ARGS__)
 
 const char *side = "";
 
@@ -51,12 +50,9 @@ static void tls_log_func(int level, const char *str)
 }
 
 unsigned int tls_id_to_group[] = {
-	[23] = GNUTLS_GROUP_SECP256R1,
-	[24] = GNUTLS_GROUP_SECP384R1,
-	[29] = GNUTLS_GROUP_X25519,
-	[30] = GNUTLS_GROUP_X448,
-	[0x100] = GNUTLS_GROUP_FFDHE2048,
-	[0x101] = GNUTLS_GROUP_FFDHE3072
+	[23] = GNUTLS_GROUP_SECP256R1,	  [24] = GNUTLS_GROUP_SECP384R1,
+	[29] = GNUTLS_GROUP_X25519,	  [30] = GNUTLS_GROUP_X448,
+	[0x100] = GNUTLS_GROUP_FFDHE2048, [0x101] = GNUTLS_GROUP_FFDHE3072
 };
 
 #define TLS_EXT_KEY_SHARE 51
@@ -66,8 +62,7 @@ typedef struct ctx_st {
 	unsigned ngroups;
 } ctx_st;
 
-static
-void check_ks_contents(void *priv, gnutls_datum_t * msg)
+static void check_ks_contents(void *priv, gnutls_datum_t *msg)
 {
 	ctx_st *ctx;
 	int len;
@@ -112,11 +107,12 @@ void check_ks_contents(void *priv, gnutls_datum_t * msg)
 
 static int client_hello_callback(gnutls_session_t session, unsigned int htype,
 				 unsigned post, unsigned int incoming,
-				 const gnutls_datum_t * msg)
+				 const gnutls_datum_t *msg)
 {
-	if (htype == GNUTLS_HANDSHAKE_CLIENT_HELLO && post == GNUTLS_HOOK_POST) {
-		if (find_client_extension
-		    (msg, TLS_EXT_KEY_SHARE, session, check_ks_contents) == 0)
+	if (htype == GNUTLS_HANDSHAKE_CLIENT_HELLO &&
+	    post == GNUTLS_HOOK_POST) {
+		if (find_client_extension(msg, TLS_EXT_KEY_SHARE, session,
+					  check_ks_contents) == 0)
 			fail("Could not find key share extension!\n");
 	}
 
@@ -141,8 +137,7 @@ static void start(const char *name, const char *prio, unsigned flag,
 
 	/* Init server */
 	assert(gnutls_certificate_allocate_credentials(&scred) >= 0);
-	assert(gnutls_certificate_set_x509_key_mem(scred,
-						   &server_cert,
+	assert(gnutls_certificate_set_x509_key_mem(scred, &server_cert,
 						   &server_key,
 						   GNUTLS_X509_FMT_PEM) >= 0);
 
@@ -167,8 +162,8 @@ static void start(const char *name, const char *prio, unsigned flag,
 
 	/* Init client */
 	gnutls_certificate_allocate_credentials(&ccred);
-	assert(gnutls_certificate_set_x509_trust_mem
-	       (ccred, &ca3_cert, GNUTLS_X509_FMT_PEM) >= 0);
+	assert(gnutls_certificate_set_x509_trust_mem(ccred, &ca3_cert,
+						     GNUTLS_X509_FMT_PEM) >= 0);
 
 	gnutls_init(&client, GNUTLS_CLIENT | flag);
 

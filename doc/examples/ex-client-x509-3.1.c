@@ -1,7 +1,7 @@
 /* This example code is placed in the public domain. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -17,12 +17,12 @@
  * Note that error recovery is minimal for simplicity.
  */
 
-#define CHECK(x) assert((x)>=0)
-#define LOOP_CHECK(rval, cmd) \
-        do { \
-                rval = cmd; \
-        } while(rval == GNUTLS_E_AGAIN || rval == GNUTLS_E_INTERRUPTED); \
-        assert(rval >= 0)
+#define CHECK(x) assert((x) >= 0)
+#define LOOP_CHECK(rval, cmd)                                             \
+	do {                                                              \
+		rval = cmd;                                               \
+	} while (rval == GNUTLS_E_AGAIN || rval == GNUTLS_E_INTERRUPTED); \
+	assert(rval >= 0)
 
 #define MAX_BUF 1024
 #define CAFILE "/etc/ssl/certs/ca-certificates.crt"
@@ -101,8 +101,7 @@ int main(void)
 	 */
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret < 0) {
 		fprintf(stderr, "*** Handshake failed\n");
@@ -139,7 +138,7 @@ int main(void)
 
 	CHECK(gnutls_bye(session, GNUTLS_SHUT_RDWR));
 
- end:
+end:
 
 	tcp_close(sd);
 
@@ -173,14 +172,14 @@ static int _verify_certificate_callback(gnutls_session_t session)
 
 	type = gnutls_certificate_type_get(session);
 
-	CHECK(gnutls_certificate_verification_status_print(status, type,
-							   &out, 0));
+	CHECK(gnutls_certificate_verification_status_print(status, type, &out,
+							   0));
 
 	printf("%s", out.data);
 
 	gnutls_free(out.data);
 
-	if (status != 0)	/* Certificate is not trusted */
+	if (status != 0) /* Certificate is not trusted */
 		return GNUTLS_E_CERTIFICATE_ERROR;
 
 	/* notify gnutls to continue handshake normally */

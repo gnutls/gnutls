@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,18 +35,18 @@ int main(void)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
-# include <unistd.h>
-# include <gnutls/gnutls.h>
-# include <gnutls/dtls.h>
-# include <signal.h>
+#include <string.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <gnutls/gnutls.h>
+#include <gnutls/dtls.h>
+#include <signal.h>
 
-# include "utils.h"
+#include "utils.h"
 
 static void terminate(void);
 
@@ -66,7 +66,7 @@ static void client_log_func(int level, const char *str)
 /* A very basic TLS client, with anonymous authentication.
  */
 
-# define MAX_BUF 1024
+#define MAX_BUF 1024
 
 static ssize_t push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 {
@@ -99,9 +99,10 @@ static void client(int fd)
 	gnutls_handshake_set_timeout(session, get_timeout());
 
 	/* Use default priorities */
-	gnutls_priority_set_direct(session,
-				   "NONE:+VERS-DTLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL",
-				   NULL);
+	gnutls_priority_set_direct(
+		session,
+		"NONE:+VERS-DTLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL",
+		NULL);
 
 	/* put the anonymous credentials to the current session
 	 */
@@ -114,8 +115,7 @@ static void client(int fd)
 	 */
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret < 0) {
 		fail("client: Handshake failed\n");
@@ -128,8 +128,8 @@ static void client(int fd)
 
 	if (debug)
 		success("client: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	do {
 		ret = gnutls_record_recv(session, buffer, MAX_BUF);
@@ -146,7 +146,7 @@ static void client(int fd)
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
- end:
+end:
 
 	close(fd);
 
@@ -169,8 +169,8 @@ static void terminate(void)
 	exit(1);
 }
 
-# define CLI_ADDR (void*)"test"
-# define CLI_ADDR_LEN 4
+#define CLI_ADDR (void *)"test"
+#define CLI_ADDR_LEN 4
 
 static void server(int fd)
 {
@@ -205,9 +205,10 @@ static void server(int fd)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_priority_set_direct(session,
-				   "NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL",
-				   NULL);
+	gnutls_priority_set_direct(
+		session,
+		"NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL",
+		NULL);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
 
@@ -222,20 +223,16 @@ static void server(int fd)
 		}
 
 		memset(&prestate, 0, sizeof(prestate));
-		ret =
-		    gnutls_dtls_cookie_verify(&cookie_key, CLI_ADDR,
-					      CLI_ADDR_LEN, buffer, ret,
-					      &prestate);
-		if (ret < 0) {	/* cookie not valid */
+		ret = gnutls_dtls_cookie_verify(&cookie_key, CLI_ADDR,
+						CLI_ADDR_LEN, buffer, ret,
+						&prestate);
+		if (ret < 0) { /* cookie not valid */
 			if (debug)
 				success("Sending hello verify request\n");
 
-			ret =
-			    gnutls_dtls_cookie_send(&cookie_key, CLI_ADDR,
-						    CLI_ADDR_LEN,
-						    &prestate,
-						    (gnutls_transport_ptr_t)
-						    (long)fd, push);
+			ret = gnutls_dtls_cookie_send(
+				&cookie_key, CLI_ADDR, CLI_ADDR_LEN, &prestate,
+				(gnutls_transport_ptr_t)(long)fd, push);
 			if (ret < 0) {
 				fail("Cannot send data\n");
 				terminate();
@@ -261,8 +258,7 @@ static void server(int fd)
 
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 	if (ret < 0) {
 		close(fd);
 		gnutls_deinit(session);
@@ -275,8 +271,8 @@ static void server(int fd)
 
 	if (debug)
 		success("server: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	/* see the Getting peer's information example */
 	/* print_info(session); */
@@ -343,4 +339,4 @@ void doit(void)
 	}
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

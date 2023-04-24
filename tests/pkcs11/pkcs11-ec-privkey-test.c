@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -37,7 +37,7 @@
 #include "softhsm.h"
 
 #define CONFIG_NAME "softhsm-privkey-ecdsa-test"
-#define CONFIG CONFIG_NAME".config"
+#define CONFIG CONFIG_NAME ".config"
 
 /* Tests whether signing with PKCS#11 may produce signed (invalid) 
  * INTEGER values in DSASignatureValue. */
@@ -53,9 +53,9 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "|<%d>| %s", level, str);
 }
 
-static
-int pin_func(void *userdata, int attempt, const char *url, const char *label,
-	     unsigned flags, char *pin, size_t pin_max)
+static int pin_func(void *userdata, int attempt, const char *url,
+		    const char *label, unsigned flags, char *pin,
+		    size_t pin_max)
 {
 	if (attempt == 0) {
 		strcpy(pin, PIN);
@@ -64,8 +64,8 @@ int pin_func(void *userdata, int attempt, const char *url, const char *label,
 	return -1;
 }
 
-int _gnutls_decode_ber_rs_raw(const gnutls_datum_t * sig_value,
-			      gnutls_datum_t * r, gnutls_datum_t * s);
+int _gnutls_decode_ber_rs_raw(const gnutls_datum_t *sig_value,
+			      gnutls_datum_t *r, gnutls_datum_t *s);
 
 void doit(void)
 {
@@ -102,8 +102,9 @@ void doit(void)
 
 	set_softhsm_conf(CONFIG);
 	snprintf(buf, sizeof(buf),
-		 "%s --init-token --slot 0 --label test --so-pin " PIN " --pin "
-		 PIN, bin);
+		 "%s --init-token --slot 0 --label test --so-pin " PIN
+		 " --pin " PIN,
+		 bin);
 	system(buf);
 
 	ret = gnutls_pkcs11_add_provider(lib, "trusted");
@@ -115,16 +116,16 @@ void doit(void)
 
 	ret = gnutls_x509_crt_init(&crt);
 	if (ret < 0) {
-		fprintf(stderr,
-			"gnutls_x509_crt_init: %s\n", gnutls_strerror(ret));
+		fprintf(stderr, "gnutls_x509_crt_init: %s\n",
+			gnutls_strerror(ret));
 		exit(1);
 	}
 
-	ret =
-	    gnutls_x509_crt_import(crt, &server_ecc_cert, GNUTLS_X509_FMT_PEM);
+	ret = gnutls_x509_crt_import(crt, &server_ecc_cert,
+				     GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
-		fprintf(stderr,
-			"gnutls_x509_crt_import: %s\n", gnutls_strerror(ret));
+		fprintf(stderr, "gnutls_x509_crt_import: %s\n",
+			gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -137,17 +138,15 @@ void doit(void)
 
 	ret = gnutls_x509_privkey_init(&key);
 	if (ret < 0) {
-		fprintf(stderr,
-			"gnutls_x509_privkey_init: %s\n", gnutls_strerror(ret));
+		fprintf(stderr, "gnutls_x509_privkey_init: %s\n",
+			gnutls_strerror(ret));
 		exit(1);
 	}
 
-	ret =
-	    gnutls_x509_privkey_import(key, &server_ecc_key,
-				       GNUTLS_X509_FMT_PEM);
+	ret = gnutls_x509_privkey_import(key, &server_ecc_key,
+					 GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
-		fprintf(stderr,
-			"gnutls_x509_privkey_import: %s\n",
+		fprintf(stderr, "gnutls_x509_privkey_import: %s\n",
 			gnutls_strerror(ret));
 		exit(1);
 	}
@@ -159,9 +158,8 @@ void doit(void)
 		exit(1);
 	}
 
-	ret =
-	    gnutls_pkcs11_token_set_pin(SOFTHSM_URL, NULL, PIN,
-					GNUTLS_PIN_USER);
+	ret = gnutls_pkcs11_token_set_pin(SOFTHSM_URL, NULL, PIN,
+					  GNUTLS_PIN_USER);
 	if (ret < 0) {
 		fail("gnutls_pkcs11_token_set_pin: %s\n", gnutls_strerror(ret));
 		exit(1);
@@ -169,20 +167,18 @@ void doit(void)
 
 	ret = gnutls_pkcs11_copy_x509_crt(SOFTHSM_URL, crt, "cert",
 					  GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE |
-					  GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
+						  GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
 	if (ret < 0) {
 		fail("gnutls_pkcs11_copy_x509_crt: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
-	ret =
-	    gnutls_pkcs11_copy_x509_privkey(SOFTHSM_URL, key, "cert",
-					    GNUTLS_KEY_DIGITAL_SIGNATURE |
-					    GNUTLS_KEY_KEY_ENCIPHERMENT,
-					    GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE
-					    |
-					    GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE
-					    | GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
+	ret = gnutls_pkcs11_copy_x509_privkey(
+		SOFTHSM_URL, key, "cert",
+		GNUTLS_KEY_DIGITAL_SIGNATURE | GNUTLS_KEY_KEY_ENCIPHERMENT,
+		GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE |
+			GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE |
+			GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
 	if (ret < 0) {
 		fail("gnutls_pkcs11_copy_x509_privkey: %s\n",
 		     gnutls_strerror(ret));
@@ -193,9 +189,9 @@ void doit(void)
 	assert(gnutls_pubkey_init(&pubkey) == 0);
 	assert(gnutls_pubkey_import_x509(pubkey, crt, 0) == 0);
 
-	ret = gnutls_pkcs11_copy_pubkey(SOFTHSM_URL, pubkey, "cert", NULL,
-					GNUTLS_KEY_DIGITAL_SIGNATURE |
-					GNUTLS_KEY_KEY_ENCIPHERMENT, 0);
+	ret = gnutls_pkcs11_copy_pubkey(
+		SOFTHSM_URL, pubkey, "cert", NULL,
+		GNUTLS_KEY_DIGITAL_SIGNATURE | GNUTLS_KEY_KEY_ENCIPHERMENT, 0);
 	if (ret < 0) {
 		fail("gnutls_pkcs11_copy_pubkey: %s\n", gnutls_strerror(ret));
 	}
@@ -207,11 +203,9 @@ void doit(void)
 
 	assert(gnutls_privkey_init(&pkey) == 0);
 
-	ret =
-	    gnutls_privkey_import_pkcs11_url(pkey,
-					     SOFTHSM_URL
-					     ";object=cert;object-type=private;pin-value="
-					     PIN);
+	ret = gnutls_privkey_import_pkcs11_url(
+		pkey,
+		SOFTHSM_URL ";object=cert;object-type=private;pin-value=" PIN);
 	if (ret < 0) {
 		fprintf(stderr, "error in %d: %s\n", __LINE__,
 			gnutls_strerror(ret));
@@ -221,11 +215,10 @@ void doit(void)
 	/* Try to read the public key with public key URI */
 	assert(gnutls_pubkey_init(&pubkey3) == 0);
 
-	ret =
-	    gnutls_pubkey_import_pkcs11_url(pubkey3,
-					    SOFTHSM_URL
-					    ";object=cert;object-type=public;pin-value="
-					    PIN, 0);
+	ret = gnutls_pubkey_import_pkcs11_url(
+		pubkey3,
+		SOFTHSM_URL ";object=cert;object-type=public;pin-value=" PIN,
+		0);
 	if (ret < 0) {
 		fail("error in gnutls_pubkey_import_pkcs11_url: %s\n",
 		     gnutls_strerror(ret));
@@ -234,11 +227,9 @@ void doit(void)
 	/* Try to read the public key with certificate URI */
 	assert(gnutls_pubkey_init(&pubkey4) == 0);
 
-	ret =
-	    gnutls_pubkey_import_pkcs11_url(pubkey4,
-					    SOFTHSM_URL
-					    ";object=cert;object-type=cert;pin-value="
-					    PIN, 0);
+	ret = gnutls_pubkey_import_pkcs11_url(
+		pubkey4,
+		SOFTHSM_URL ";object=cert;object-type=cert;pin-value=" PIN, 0);
 	if (ret < 0) {
 		fail("error in gnutls_pubkey_import_pkcs11_url: %s\n",
 		     gnutls_strerror(ret));
@@ -250,8 +241,8 @@ void doit(void)
 	pk = gnutls_pubkey_get_pk_algorithm(pubkey, NULL);
 
 	assert(gnutls_pubkey_init(&pubkey2) == 0);
-	assert(gnutls_pubkey_import_x509_raw
-	       (pubkey2, &server_ecc_cert, GNUTLS_X509_FMT_PEM, 0) == 0);
+	assert(gnutls_pubkey_import_x509_raw(pubkey2, &server_ecc_cert,
+					     GNUTLS_X509_FMT_PEM, 0) == 0);
 
 	for (i = 0; i < 100; i++) {
 		gnutls_datum_t r = { NULL, 0 };
@@ -259,8 +250,8 @@ void doit(void)
 
 		/* check whether privkey and pubkey are operational
 		 * by signing and verifying */
-		assert(gnutls_privkey_sign_data
-		       (pkey, GNUTLS_DIG_SHA256, 0, &testdata, &sig) == 0);
+		assert(gnutls_privkey_sign_data(pkey, GNUTLS_DIG_SHA256, 0,
+						&testdata, &sig) == 0);
 
 		assert(_gnutls_decode_ber_rs_raw(&sig, &r, &s) == 0);
 		if (r.data[0] >= 0x80) {
@@ -272,14 +263,15 @@ void doit(void)
 		}
 
 		/* verify against the raw pubkey */
-		assert(gnutls_pubkey_verify_data2
-		       (pubkey2, gnutls_pk_to_sign(pk, GNUTLS_DIG_SHA256), 0,
-			&testdata, &sig) == 0);
+		assert(gnutls_pubkey_verify_data2(
+			       pubkey2,
+			       gnutls_pk_to_sign(pk, GNUTLS_DIG_SHA256), 0,
+			       &testdata, &sig) == 0);
 
 		/* verify against the pubkey in PKCS #11 */
-		assert(gnutls_pubkey_verify_data2
-		       (pubkey, gnutls_pk_to_sign(pk, GNUTLS_DIG_SHA256), 0,
-			&testdata, &sig) == 0);
+		assert(gnutls_pubkey_verify_data2(
+			       pubkey, gnutls_pk_to_sign(pk, GNUTLS_DIG_SHA256),
+			       0, &testdata, &sig) == 0);
 
 		gnutls_free(sig.data);
 		gnutls_free(r.data);

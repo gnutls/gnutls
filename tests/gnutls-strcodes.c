@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdlib.h>
@@ -37,15 +37,13 @@ unsigned _gnutls_ecc_curve_is_supported(gnutls_ecc_curve_t);
  * non null value.
  */
 
-static
-void _check_non_null(int line, int i, const char *val)
+static void _check_non_null(int line, int i, const char *val)
 {
 	if (val == NULL)
 		fail("issue in line %d, item %d\n", line, i);
 }
 
-static
-void _check_unique_non_null(int line, int i, const char *val)
+static void _check_unique_non_null(int line, int i, const char *val)
 {
 	static char previous_val[128];
 
@@ -59,8 +57,7 @@ void _check_unique_non_null(int line, int i, const char *val)
 	snprintf(previous_val, sizeof(previous_val), "%s", val);
 }
 
-static
-void _check_unique(int line, int i, const char *val)
+static void _check_unique(int line, int i, const char *val)
 {
 	static char previous_val[128];
 
@@ -115,18 +112,18 @@ void doit(void)
 		check_non_null(gnutls_sec_param_get_name(i));
 	}
 
-	check_non_null(gnutls_certificate_verification_profile_get_name
-		       (GNUTLS_PROFILE_VERY_WEAK));
-	check_non_null(gnutls_certificate_verification_profile_get_name
-		       (GNUTLS_PROFILE_LOW));
-	check_non_null(gnutls_certificate_verification_profile_get_name
-		       (GNUTLS_PROFILE_LEGACY));
-	check_non_null(gnutls_certificate_verification_profile_get_name
-		       (GNUTLS_PROFILE_MEDIUM));
-	check_non_null(gnutls_certificate_verification_profile_get_name
-		       (GNUTLS_PROFILE_HIGH));
-	check_non_null(gnutls_certificate_verification_profile_get_name
-		       (GNUTLS_PROFILE_ULTRA));
+	check_non_null(gnutls_certificate_verification_profile_get_name(
+		GNUTLS_PROFILE_VERY_WEAK));
+	check_non_null(gnutls_certificate_verification_profile_get_name(
+		GNUTLS_PROFILE_LOW));
+	check_non_null(gnutls_certificate_verification_profile_get_name(
+		GNUTLS_PROFILE_LEGACY));
+	check_non_null(gnutls_certificate_verification_profile_get_name(
+		GNUTLS_PROFILE_MEDIUM));
+	check_non_null(gnutls_certificate_verification_profile_get_name(
+		GNUTLS_PROFILE_HIGH));
+	check_non_null(gnutls_certificate_verification_profile_get_name(
+		GNUTLS_PROFILE_ULTRA));
 
 	for (i = GNUTLS_ECC_CURVE_INVALID + 1; i <= GNUTLS_ECC_CURVE_MAX; i++) {
 		if (_gnutls_ecc_curve_is_supported(i) == 0)
@@ -134,9 +131,9 @@ void doit(void)
 
 		check_unique_non_null(gnutls_ecc_curve_get_name(i));
 		if (i == GNUTLS_ECC_CURVE_X25519)
-			continue;	/* no oid yet */
+			continue; /* no oid yet */
 		if (i == GNUTLS_ECC_CURVE_X448)
-			continue;	/* no oid yet */
+			continue; /* no oid yet */
 		check_unique_non_null(gnutls_ecc_curve_get_oid(i));
 	}
 

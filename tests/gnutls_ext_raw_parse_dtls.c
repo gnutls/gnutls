@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,27 +35,27 @@ int main(void)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
-# include <unistd.h>
-# include <time.h>
-# include <gnutls/gnutls.h>
-# include <signal.h>
-# include <assert.h>
+#include <string.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <time.h>
+#include <gnutls/gnutls.h>
+#include <signal.h>
+#include <assert.h>
 
-# include "utils.h"
-# include "cert-common.h"
-# include "tls13/ext-parse.h"
+#include "utils.h"
+#include "cert-common.h"
+#include "tls13/ext-parse.h"
 
 /* This program tests gnutls_ext_raw_parse with GNUTLS_EXT_RAW_FLAG_TLS_CLIENT_HELLO
  * flag.
  */
 
-# define HOSTNAME "example.com"
+#define HOSTNAME "example.com"
 
 static void server_log_func(int level, const char *str)
 {
@@ -73,7 +73,7 @@ static unsigned found_status_req = 0;
 static int ext_callback(void *ctx, unsigned tls_id, const unsigned char *data,
 			unsigned size)
 {
-	if (tls_id == 0) {	/* server name */
+	if (tls_id == 0) { /* server name */
 		/* very interesting extension, 4 bytes of sizes
 		 * and 1 byte of type. */
 		unsigned esize = (data[0] << 8) | data[1];
@@ -105,14 +105,14 @@ static int ext_callback(void *ctx, unsigned tls_id, const unsigned char *data,
 
 static int handshake_callback(gnutls_session_t session, unsigned int htype,
 			      unsigned post, unsigned int incoming,
-			      const gnutls_datum_t * msg)
+			      const gnutls_datum_t *msg)
 {
 	int ret;
 
 	if (htype == GNUTLS_HANDSHAKE_CLIENT_HELLO && post) {
-		ret =
-		    gnutls_ext_raw_parse(NULL, ext_callback, msg,
-					 GNUTLS_EXT_RAW_FLAG_DTLS_CLIENT_HELLO);
+		ret = gnutls_ext_raw_parse(
+			NULL, ext_callback, msg,
+			GNUTLS_EXT_RAW_FLAG_DTLS_CLIENT_HELLO);
 
 		assert(ret >= 0);
 	}
@@ -139,21 +139,20 @@ static void client(int fd)
 	gnutls_init(&session, GNUTLS_CLIENT | GNUTLS_DATAGRAM);
 	gnutls_handshake_set_timeout(session, get_timeout());
 
-	assert(gnutls_priority_set_direct
-	       (session, "NORMAL:-VERS-ALL:+VERS-DTLS1.2", NULL) >= 0);
+	assert(gnutls_priority_set_direct(
+		       session, "NORMAL:-VERS-ALL:+VERS-DTLS1.2", NULL) >= 0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
 	gnutls_transport_set_int(session, fd);
-	assert(gnutls_server_name_set
-	       (session, GNUTLS_NAME_DNS, HOSTNAME, strlen(HOSTNAME)) >= 0);
+	assert(gnutls_server_name_set(session, GNUTLS_NAME_DNS, HOSTNAME,
+				      strlen(HOSTNAME)) >= 0);
 
 	/* Perform the TLS handshake
 	 */
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret == GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM) {
 		/* success */
@@ -169,12 +168,12 @@ static void client(int fd)
 
 	if (debug)
 		success("client: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
- end:
+end:
 
 	close(fd);
 
@@ -212,8 +211,8 @@ static void server(int fd)
 					   GNUTLS_HOOK_POST,
 					   handshake_callback);
 
-	assert(gnutls_priority_set_direct
-	       (session, "NORMAL:-VERS-ALL:+VERS-DTLS1.2", NULL) >= 0);
+	assert(gnutls_priority_set_direct(
+		       session, "NORMAL:-VERS-ALL:+VERS-DTLS1.2", NULL) >= 0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
@@ -232,15 +231,15 @@ static void server(int fd)
 
 	if (debug)
 		success("server: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	assert(found_server_name != 0);
 	assert(found_status_req != 0);
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
- end:
+end:
 	close(fd);
 	gnutls_deinit(session);
 
@@ -294,4 +293,4 @@ void doit(void)
 	return;
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

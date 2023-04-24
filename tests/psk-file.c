@@ -23,7 +23,7 @@
 /* Parts copied from GnuTLS example programs. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdbool.h>
@@ -40,18 +40,18 @@ int main(int argc, char **argv)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <sys/socket.h>
-# if !defined(_WIN32)
-#  include <sys/wait.h>
-# endif
-# include <unistd.h>
-# include <signal.h>
-# include <assert.h>
-# include <gnutls/gnutls.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#if !defined(_WIN32)
+#include <sys/wait.h>
+#endif
+#include <unistd.h>
+#include <signal.h>
+#include <assert.h>
+#include <gnutls/gnutls.h>
 
-# include "utils.h"
+#include "utils.h"
 
 static char hexchar(unsigned int val)
 {
@@ -94,11 +94,11 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "%s|<%d>| %s", side, level, str);
 }
 
-# define MAX_BUF 1024
-# define MSG "Hello TLS"
+#define MAX_BUF 1024
+#define MSG "Hello TLS"
 
-static void client(int sd, const char *prio, const gnutls_datum_t * user,
-		   const gnutls_datum_t * key, unsigned expect_hint,
+static void client(int sd, const char *prio, const gnutls_datum_t *user,
+		   const gnutls_datum_t *key, unsigned expect_hint,
 		   int expect_fail, int exp_kx, unsigned binary_user)
 {
 	int ret, ii, kx;
@@ -196,7 +196,7 @@ static void client(int sd, const char *prio, const gnutls_datum_t * user,
 		     gnutls_kx_get_name(exp_kx), gnutls_kx_get_name(kx));
 	}
 
- end:
+end:
 
 	close(sd);
 
@@ -210,9 +210,9 @@ static void client(int sd, const char *prio, const gnutls_datum_t * user,
 /* This is a sample TLS 1.0 echo server, for PSK authentication.
  */
 
-# define MAX_BUF 1024
+#define MAX_BUF 1024
 
-static void server(int sd, const char *prio, const gnutls_datum_t * user,
+static void server(int sd, const char *prio, const gnutls_datum_t *user,
 		   bool no_cred, int expect_fail, int exp_kx,
 		   unsigned binary_user)
 {
@@ -241,7 +241,8 @@ static void server(int sd, const char *prio, const gnutls_datum_t * user,
 	gnutls_psk_set_server_credentials_hint(server_pskcred, "hint");
 	ret = gnutls_psk_set_server_credentials_file(server_pskcred, psk_file);
 	if (ret < 0) {
-		fail("server: gnutls_psk_set_server_credentials_file failed (%s)\n\n", gnutls_strerror(ret));
+		fail("server: gnutls_psk_set_server_credentials_file failed (%s)\n\n",
+		     gnutls_strerror(ret));
 		return;
 	}
 
@@ -262,8 +263,9 @@ static void server(int sd, const char *prio, const gnutls_datum_t * user,
 		 * test client reads our fatal alert, otherwise it might exit
 		 * with GNUTLS_E_PUSH_ERROR instead */
 		gnutls_session_force_valid(session);
-		while ((gnutls_record_recv_seq(session, buf, sizeof(buf), seq))
-		       >= 0) ;
+		while ((gnutls_record_recv_seq(session, buf, sizeof(buf),
+					       seq)) >= 0)
+			;
 
 		if (expect_fail) {
 			if (ret != expect_fail) {
@@ -273,9 +275,8 @@ static void server(int sd, const char *prio, const gnutls_datum_t * user,
 			}
 
 			if (debug)
-				success
-				    ("server: Handshake has failed - expected (%s)\n\n",
-				     gnutls_strerror(ret));
+				success("server: Handshake has failed - expected (%s)\n\n",
+					gnutls_strerror(ret));
 		} else {
 			fail("server: Handshake has failed (%s)\n\n",
 			     gnutls_strerror(ret));
@@ -295,11 +296,11 @@ static void server(int sd, const char *prio, const gnutls_datum_t * user,
 
 		if (ret == 0) {
 			if (debug)
-				success
-				    ("server: Peer has closed the GnuTLS connection\n");
+				success("server: Peer has closed the GnuTLS connection\n");
 			break;
 		} else if (ret < 0) {
-			fail("server: Received corrupted data(%d). Closing...\n", ret);
+			fail("server: Received corrupted data(%d). Closing...\n",
+			     ret);
 			break;
 		} else if (ret > 0) {
 			/* echo data back to the client
@@ -324,8 +325,8 @@ static void server(int sd, const char *prio, const gnutls_datum_t * user,
 		if (binary_user) {
 			char pskid_bin[1024], userdata_bin[1024];
 
-			if (gnutls_psk_server_get_username2
-			    (session, &pskid_binary))
+			if (gnutls_psk_server_get_username2(session,
+							    &pskid_binary))
 				fail("server: Could not get binary pskid\n");
 
 			if (memcmp(pskid_binary.data, user->data, user->size) !=
@@ -334,13 +335,15 @@ static void server(int sd, const char *prio, const gnutls_datum_t * user,
 					   sizeof(userdata_bin));
 				hex_encode(pskid_binary.data, pskid_binary.size,
 					   pskid_bin, sizeof(pskid_bin));
-				fail("server: binary username (%s) does not match expected (%s)\n", pskid_bin, userdata_bin);
+				fail("server: binary username (%s) does not match expected (%s)\n",
+				     pskid_bin, userdata_bin);
 			}
 		} else {
 			pskid = gnutls_psk_server_get_username(session);
-			if (pskid == NULL
-			    || strcmp(pskid, (const char *)user->data) != 0) {
-				fail("server: username (%s), does not match expected (%s)\n", pskid, (const char *)user->data);
+			if (pskid == NULL ||
+			    strcmp(pskid, (const char *)user->data) != 0) {
+				fail("server: username (%s), does not match expected (%s)\n",
+				     pskid, (const char *)user->data);
 			}
 		}
 	}
@@ -350,7 +353,7 @@ static void server(int sd, const char *prio, const gnutls_datum_t * user,
 		     gnutls_kx_get_name(exp_kx), gnutls_kx_get_name(kx));
 	}
 
- end:
+end:
 	close(sd);
 	gnutls_deinit(session);
 
@@ -363,7 +366,7 @@ static void server(int sd, const char *prio, const gnutls_datum_t * user,
 }
 
 static void print_user(const char *caption, const char *prio,
-		       const gnutls_datum_t * user, unsigned binary_user)
+		       const gnutls_datum_t *user, unsigned binary_user)
 {
 	char hexuser[100];
 
@@ -375,11 +378,11 @@ static void print_user(const char *caption, const char *prio,
 			(const char *)user->data);
 }
 
-static
-void run_test3(const char *prio, const char *sprio, const gnutls_datum_t * user,
-	       const gnutls_datum_t * key, bool no_cred, unsigned expect_hint,
-	       int exp_kx, int expect_fail_cli, int expect_fail_serv,
-	       unsigned binary_user)
+static void run_test3(const char *prio, const char *sprio,
+		      const gnutls_datum_t *user, const gnutls_datum_t *key,
+		      bool no_cred, unsigned expect_hint, int exp_kx,
+		      int expect_fail_cli, int expect_fail_serv,
+		      unsigned binary_user)
 {
 	pid_t child;
 	int err;
@@ -422,37 +425,34 @@ void run_test3(const char *prio, const char *sprio, const gnutls_datum_t * user,
 	}
 }
 
-static
-void run_test2(const char *prio, const char *sprio, const gnutls_datum_t * user,
-	       const gnutls_datum_t * key, unsigned expect_hint, int exp_kx,
-	       int expect_fail_cli, int expect_fail_serv, unsigned binary_user)
+static void run_test2(const char *prio, const char *sprio,
+		      const gnutls_datum_t *user, const gnutls_datum_t *key,
+		      unsigned expect_hint, int exp_kx, int expect_fail_cli,
+		      int expect_fail_serv, unsigned binary_user)
 {
 	run_test3(prio, sprio, user, key, 0, expect_hint, exp_kx,
 		  expect_fail_cli, expect_fail_serv, binary_user);
 }
 
-static
-void run_test_ok(const char *prio, const gnutls_datum_t * user,
-		 const gnutls_datum_t * key, unsigned expect_hint,
-		 int expect_fail, unsigned binary_user)
+static void run_test_ok(const char *prio, const gnutls_datum_t *user,
+			const gnutls_datum_t *key, unsigned expect_hint,
+			int expect_fail, unsigned binary_user)
 {
 	run_test2(prio, NULL, user, key, expect_hint, GNUTLS_KX_PSK,
 		  expect_fail, expect_fail, binary_user);
 }
 
-static
-void run_ectest_ok(const char *prio, const gnutls_datum_t * user,
-		   const gnutls_datum_t * key, unsigned expect_hint,
-		   int expect_fail, unsigned binary_user)
+static void run_ectest_ok(const char *prio, const gnutls_datum_t *user,
+			  const gnutls_datum_t *key, unsigned expect_hint,
+			  int expect_fail, unsigned binary_user)
 {
 	run_test2(prio, NULL, user, key, expect_hint, GNUTLS_KX_ECDHE_PSK,
 		  expect_fail, expect_fail, binary_user);
 }
 
-static
-void run_dhtest_ok(const char *prio, const gnutls_datum_t * user,
-		   const gnutls_datum_t * key, unsigned expect_hint,
-		   int expect_fail, unsigned binary_user)
+static void run_dhtest_ok(const char *prio, const gnutls_datum_t *user,
+			  const gnutls_datum_t *key, unsigned expect_hint,
+			  int expect_fail, unsigned binary_user)
 {
 	run_test2(prio, NULL, user, key, expect_hint, GNUTLS_KX_DHE_PSK,
 		  expect_fail, expect_fail, binary_user);
@@ -460,22 +460,23 @@ void run_dhtest_ok(const char *prio, const gnutls_datum_t * user,
 
 void doit(void)
 {
-	char hexuser[] = { 0xde, 0xad, 0xbe, 0xef },
-	    nulluser1[] = { 0 }, nulluser2[] = { 0, 0, 0xaa, 0 };
+	char hexuser[] = { 0xde, 0xad, 0xbe, 0xef }, nulluser1[] = { 0 },
+	     nulluser2[] = { 0, 0, 0xaa, 0 };
 	const gnutls_datum_t user_jas = { (void *)"jas", strlen("jas") };
-	const gnutls_datum_t user_unknown =
-	    { (void *)"unknown", strlen("unknown") };
-	const gnutls_datum_t user_nonhex =
-	    { (void *)"non-hex", strlen("non-hex") };
+	const gnutls_datum_t user_unknown = { (void *)"unknown",
+					      strlen("unknown") };
+	const gnutls_datum_t user_nonhex = { (void *)"non-hex",
+					     strlen("non-hex") };
 	const gnutls_datum_t user_hex = { (void *)hexuser, sizeof(hexuser) };
-	const gnutls_datum_t user_null_1 =
-	    { (void *)nulluser1, sizeof(nulluser1) };
-	const gnutls_datum_t user_null_2 =
-	    { (void *)nulluser2, sizeof(nulluser2) };
-	const gnutls_datum_t key =
-	    { (void *)"9e32cf7786321a828ef7668f09fb35db", 32 };
-	const gnutls_datum_t wrong_key =
-	    { (void *)"9e31cf7786321a828ef7668f09fb35db", 32 };
+	const gnutls_datum_t user_null_1 = { (void *)nulluser1,
+					     sizeof(nulluser1) };
+	const gnutls_datum_t user_null_2 = { (void *)nulluser2,
+					     sizeof(nulluser2) };
+	const gnutls_datum_t key = { (void *)"9e32cf7786321a828ef7668f09fb35db",
+				     32 };
+	const gnutls_datum_t wrong_key = {
+		(void *)"9e31cf7786321a828ef7668f09fb35db", 32
+	};
 
 	run_test_ok("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+PSK", &user_jas,
 		    &key, 1, 0, 0);
@@ -562,63 +563,63 @@ void doit(void)
 		    0, 1);
 
 	/* test priorities of DHE-PSK and PSK */
-	run_ectest_ok
-	    ("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+DHE-PSK:+PSK:-GROUP-DH-ALL",
-	     &user_jas, &key, 0, 0, 0);
-	run_ectest_ok
-	    ("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+DHE-PSK:+PSK:-GROUP-DH-ALL",
-	     &user_hex, &key, 0, 0, 1);
-	run_ectest_ok
-	    ("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+DHE-PSK:+PSK:-GROUP-DH-ALL",
-	     &user_null_1, &key, 0, 0, 1);
-	run_ectest_ok
-	    ("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+DHE-PSK:+PSK:-GROUP-DH-ALL",
-	     &user_null_2, &key, 0, 0, 1);
-	run_test_ok
-	    ("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+PSK:+DHE-PSK:-GROUP-DH-ALL",
-	     &user_jas, &key, 0, 0, 0);
-	run_test_ok
-	    ("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+PSK:+DHE-PSK:-GROUP-DH-ALL",
-	     &user_hex, &key, 0, 0, 1);
-	run_test_ok
-	    ("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+PSK:+DHE-PSK:-GROUP-DH-ALL",
-	     &user_null_1, &key, 0, 0, 1);
-	run_test_ok
-	    ("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+PSK:+DHE-PSK:-GROUP-DH-ALL",
-	     &user_null_2, &key, 0, 0, 1);
-	run_test2
-	    ("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+DHE-PSK:+PSK:-GROUP-DH-ALL",
-	     "NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+PSK:+DHE-PSK:%SERVER_PRECEDENCE:-GROUP-DH-ALL",
-	     &user_jas, &key, 0, GNUTLS_KX_PSK, 0, 0, 0);
-	run_test2
-	    ("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+DHE-PSK:+PSK:-GROUP-DH-ALL",
-	     "NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+PSK:+DHE-PSK:%SERVER_PRECEDENCE:-GROUP-DH-ALL",
-	     &user_hex, &key, 0, GNUTLS_KX_PSK, 0, 0, 1);
-	run_test2
-	    ("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+DHE-PSK:+PSK:-GROUP-DH-ALL",
-	     "NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+PSK:+DHE-PSK:%SERVER_PRECEDENCE:-GROUP-DH-ALL",
-	     &user_null_1, &key, 0, GNUTLS_KX_PSK, 0, 0, 1);
-	run_test2
-	    ("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+DHE-PSK:+PSK:-GROUP-DH-ALL",
-	     "NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+PSK:+DHE-PSK:%SERVER_PRECEDENCE:-GROUP-DH-ALL",
-	     &user_null_2, &key, 0, GNUTLS_KX_PSK, 0, 0, 1);
+	run_ectest_ok(
+		"NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+DHE-PSK:+PSK:-GROUP-DH-ALL",
+		&user_jas, &key, 0, 0, 0);
+	run_ectest_ok(
+		"NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+DHE-PSK:+PSK:-GROUP-DH-ALL",
+		&user_hex, &key, 0, 0, 1);
+	run_ectest_ok(
+		"NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+DHE-PSK:+PSK:-GROUP-DH-ALL",
+		&user_null_1, &key, 0, 0, 1);
+	run_ectest_ok(
+		"NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+DHE-PSK:+PSK:-GROUP-DH-ALL",
+		&user_null_2, &key, 0, 0, 1);
+	run_test_ok(
+		"NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+PSK:+DHE-PSK:-GROUP-DH-ALL",
+		&user_jas, &key, 0, 0, 0);
+	run_test_ok(
+		"NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+PSK:+DHE-PSK:-GROUP-DH-ALL",
+		&user_hex, &key, 0, 0, 1);
+	run_test_ok(
+		"NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+PSK:+DHE-PSK:-GROUP-DH-ALL",
+		&user_null_1, &key, 0, 0, 1);
+	run_test_ok(
+		"NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+PSK:+DHE-PSK:-GROUP-DH-ALL",
+		&user_null_2, &key, 0, 0, 1);
+	run_test2(
+		"NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+DHE-PSK:+PSK:-GROUP-DH-ALL",
+		"NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+PSK:+DHE-PSK:%SERVER_PRECEDENCE:-GROUP-DH-ALL",
+		&user_jas, &key, 0, GNUTLS_KX_PSK, 0, 0, 0);
+	run_test2(
+		"NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+DHE-PSK:+PSK:-GROUP-DH-ALL",
+		"NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+PSK:+DHE-PSK:%SERVER_PRECEDENCE:-GROUP-DH-ALL",
+		&user_hex, &key, 0, GNUTLS_KX_PSK, 0, 0, 1);
+	run_test2(
+		"NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+DHE-PSK:+PSK:-GROUP-DH-ALL",
+		"NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+PSK:+DHE-PSK:%SERVER_PRECEDENCE:-GROUP-DH-ALL",
+		&user_null_1, &key, 0, GNUTLS_KX_PSK, 0, 0, 1);
+	run_test2(
+		"NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+DHE-PSK:+PSK:-GROUP-DH-ALL",
+		"NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+PSK:+DHE-PSK:%SERVER_PRECEDENCE:-GROUP-DH-ALL",
+		&user_null_2, &key, 0, GNUTLS_KX_PSK, 0, 0, 1);
 	/* try with PRF that doesn't match binder (SHA256) */
-	run_test2
-	    ("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-256-GCM:+PSK:+DHE-PSK",
-	     NULL, &user_jas, &key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED,
-	     GNUTLS_E_NO_CIPHER_SUITES, 0);
-	run_test2
-	    ("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-256-GCM:+PSK:+DHE-PSK",
-	     NULL, &user_hex, &key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED,
-	     GNUTLS_E_NO_CIPHER_SUITES, 1);
-	run_test2
-	    ("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-256-GCM:+PSK:+DHE-PSK",
-	     NULL, &user_null_1, &key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED,
-	     GNUTLS_E_NO_CIPHER_SUITES, 1);
-	run_test2
-	    ("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-256-GCM:+PSK:+DHE-PSK",
-	     NULL, &user_null_2, &key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED,
-	     GNUTLS_E_NO_CIPHER_SUITES, 1);
+	run_test2(
+		"NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-256-GCM:+PSK:+DHE-PSK",
+		NULL, &user_jas, &key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED,
+		GNUTLS_E_NO_CIPHER_SUITES, 0);
+	run_test2(
+		"NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-256-GCM:+PSK:+DHE-PSK",
+		NULL, &user_hex, &key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED,
+		GNUTLS_E_NO_CIPHER_SUITES, 1);
+	run_test2(
+		"NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-256-GCM:+PSK:+DHE-PSK",
+		NULL, &user_null_1, &key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED,
+		GNUTLS_E_NO_CIPHER_SUITES, 1);
+	run_test2(
+		"NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-256-GCM:+PSK:+DHE-PSK",
+		NULL, &user_null_2, &key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED,
+		GNUTLS_E_NO_CIPHER_SUITES, 1);
 	/* try with no groups and PSK */
 	run_test_ok("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK:-GROUP-ALL", &user_jas,
 		    &key, 0, 0, 0);
@@ -683,22 +684,22 @@ void doit(void)
 		  GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER, 1);
 
 	/* try with HelloRetryRequest and PSK */
-	run_test2
-	    ("NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL:+GROUP-FFDHE2048:+GROUP-FFDHE4096",
-	     "NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL:+GROUP-FFDHE4096",
-	     &user_jas, &key, 0, GNUTLS_KX_DHE_PSK, 0, 0, 0);
-	run_test2
-	    ("NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL:+GROUP-FFDHE2048:+GROUP-FFDHE4096",
-	     "NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL:+GROUP-FFDHE4096",
-	     &user_hex, &key, 0, GNUTLS_KX_DHE_PSK, 0, 0, 1);
-	run_test2
-	    ("NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL:+GROUP-FFDHE2048:+GROUP-FFDHE4096",
-	     "NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL:+GROUP-FFDHE4096",
-	     &user_null_1, &key, 0, GNUTLS_KX_DHE_PSK, 0, 0, 1);
-	run_test2
-	    ("NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL:+GROUP-FFDHE2048:+GROUP-FFDHE4096",
-	     "NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL:+GROUP-FFDHE4096",
-	     &user_null_2, &key, 0, GNUTLS_KX_DHE_PSK, 0, 0, 1);
+	run_test2(
+		"NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL:+GROUP-FFDHE2048:+GROUP-FFDHE4096",
+		"NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL:+GROUP-FFDHE4096",
+		&user_jas, &key, 0, GNUTLS_KX_DHE_PSK, 0, 0, 0);
+	run_test2(
+		"NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL:+GROUP-FFDHE2048:+GROUP-FFDHE4096",
+		"NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL:+GROUP-FFDHE4096",
+		&user_hex, &key, 0, GNUTLS_KX_DHE_PSK, 0, 0, 1);
+	run_test2(
+		"NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL:+GROUP-FFDHE2048:+GROUP-FFDHE4096",
+		"NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL:+GROUP-FFDHE4096",
+		&user_null_1, &key, 0, GNUTLS_KX_DHE_PSK, 0, 0, 1);
+	run_test2(
+		"NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL:+GROUP-FFDHE2048:+GROUP-FFDHE4096",
+		"NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL:+GROUP-FFDHE4096",
+		&user_null_2, &key, 0, GNUTLS_KX_DHE_PSK, 0, 0, 1);
 
 	/* try without server credentials */
 	run_test3("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK:+DHE-PSK", NULL,
@@ -715,4 +716,4 @@ void doit(void)
 		  GNUTLS_E_INSUFFICIENT_CREDENTIALS, 1);
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

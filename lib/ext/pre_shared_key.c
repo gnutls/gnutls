@@ -35,8 +35,8 @@
 #include <ext/pre_shared_key.h>
 #include <assert.h>
 
-static int
-compute_psk_from_ticket(const tls13_ticket_st * ticket, gnutls_datum_t * key)
+static int compute_psk_from_ticket(const tls13_ticket_st *ticket,
+				   gnutls_datum_t *key)
 {
 	int ret;
 
@@ -50,8 +50,7 @@ compute_psk_from_ticket(const tls13_ticket_st * ticket, gnutls_datum_t * key)
 	}
 	key->size = ticket->prf->output_size;
 
-	ret = _tls13_expand_secret2(ticket->prf,
-				    RESUMPTION_LABEL,
+	ret = _tls13_expand_secret2(ticket->prf, RESUMPTION_LABEL,
 				    sizeof(RESUMPTION_LABEL) - 1, ticket->nonce,
 				    ticket->nonce_size,
 				    ticket->resumption_master_secret, key->size,
@@ -62,9 +61,8 @@ compute_psk_from_ticket(const tls13_ticket_st * ticket, gnutls_datum_t * key)
 	return ret;
 }
 
-static int
-compute_binder_key(const mac_entry_st * prf,
-		   const uint8_t * key, size_t keylen, bool resuming, void *out)
+static int compute_binder_key(const mac_entry_st *prf, const uint8_t *key,
+			      size_t keylen, bool resuming, void *out)
 {
 	int ret;
 	const char ext_label[] = EXT_BINDER_LABEL;
@@ -81,21 +79,19 @@ compute_binder_key(const mac_entry_st * prf,
 		return ret;
 
 	/* Compute Derive-Secret(secret, label, transcript_hash) */
-	ret = _tls13_derive_secret2(prf, label, label_len,
-				    NULL, 0, tmp_key, out);
+	ret = _tls13_derive_secret2(prf, label, label_len, NULL, 0, tmp_key,
+				    out);
 	if (ret < 0)
 		return ret;
 
 	return 0;
 }
 
-static int
-compute_psk_binder(gnutls_session_t session,
-		   const mac_entry_st * prf, unsigned binders_length,
-		   int exts_length, int ext_offset,
-		   const gnutls_datum_t * psk,
-		   const gnutls_datum_t * client_hello, bool resuming,
-		   void *out)
+static int compute_psk_binder(gnutls_session_t session, const mac_entry_st *prf,
+			      unsigned binders_length, int exts_length,
+			      int ext_offset, const gnutls_datum_t *psk,
+			      const gnutls_datum_t *client_hello, bool resuming,
+			      void *out)
 {
 	int ret;
 	unsigned client_hello_pos, extensions_len_pos;
@@ -106,12 +102,11 @@ compute_psk_binder(gnutls_session_t session,
 
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
 		if (session->internals.hsk_flags & HSK_HRR_RECEIVED) {
-			ret = gnutls_buffer_append_data(&handshake_buf,
-							(const void *)
-							session->
-							internals.handshake_hash_buffer.data,
-							session->
-							internals.handshake_hash_buffer.length);
+			ret = gnutls_buffer_append_data(
+				&handshake_buf,
+				(const void *)session->internals
+					.handshake_hash_buffer.data,
+				session->internals.handshake_hash_buffer.length);
 			if (ret < 0) {
 				gnutls_assert();
 				goto error;
@@ -119,10 +114,8 @@ compute_psk_binder(gnutls_session_t session,
 		}
 
 		client_hello_pos = handshake_buf.length;
-		ret =
-		    gnutls_buffer_append_data(&handshake_buf,
-					      client_hello->data,
-					      client_hello->size);
+		ret = gnutls_buffer_append_data(
+			&handshake_buf, client_hello->data, client_hello->size);
 		if (ret < 0) {
 			gnutls_assert();
 			goto error;
@@ -130,41 +123,38 @@ compute_psk_binder(gnutls_session_t session,
 
 		/* This is a ClientHello message */
 		handshake_buf.data[client_hello_pos] =
-		    GNUTLS_HANDSHAKE_CLIENT_HELLO;
+			GNUTLS_HANDSHAKE_CLIENT_HELLO;
 
 		/* At this point we have not yet added the binders to the ClientHello,
 		 * but we have to overwrite the size field, pretending as if binders
 		 * of the correct length were present.
 		 */
 		_gnutls_write_uint24(handshake_buf.length - client_hello_pos +
-				     binders_length - 2,
+					     binders_length - 2,
 				     &handshake_buf.data[client_hello_pos + 1]);
-		_gnutls_write_uint16(handshake_buf.length - client_hello_pos +
-				     binders_length - ext_offset,
-				     &handshake_buf.data[client_hello_pos +
-							 ext_offset]);
-		extensions_len_pos =
-		    handshake_buf.length - client_hello_pos - exts_length - 2;
+		_gnutls_write_uint16(
+			handshake_buf.length - client_hello_pos +
+				binders_length - ext_offset,
+			&handshake_buf.data[client_hello_pos + ext_offset]);
+		extensions_len_pos = handshake_buf.length - client_hello_pos -
+				     exts_length - 2;
 		_gnutls_write_uint16(exts_length + binders_length + 2,
 				     &handshake_buf.data[client_hello_pos +
 							 extensions_len_pos]);
 	} else {
 		if (session->internals.hsk_flags & HSK_HRR_SENT) {
-			if (unlikely
-			    (session->internals.handshake_hash_buffer.length <=
-			     client_hello->size)) {
-				ret =
-				    gnutls_assert_val
-				    (GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+			if (unlikely(session->internals.handshake_hash_buffer
+					     .length <= client_hello->size)) {
+				ret = gnutls_assert_val(
+					GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 				goto error;
 			}
 
-			ret = gnutls_buffer_append_data(&handshake_buf,
-							session->
-							internals.handshake_hash_buffer.data,
-							session->
-							internals.handshake_hash_buffer.length
-							- client_hello->size);
+			ret = gnutls_buffer_append_data(
+				&handshake_buf,
+				session->internals.handshake_hash_buffer.data,
+				session->internals.handshake_hash_buffer.length -
+					client_hello->size);
 			if (ret < 0) {
 				gnutls_assert();
 				goto error;
@@ -172,24 +162,22 @@ compute_psk_binder(gnutls_session_t session,
 		}
 
 		if (unlikely(client_hello->size <= binders_length)) {
-			ret =
-			    gnutls_assert_val
-			    (GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+			ret = gnutls_assert_val(
+				GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 			goto error;
 		}
 
-		ret = gnutls_buffer_append_data(&handshake_buf, (const void *)
-						client_hello->data,
-						client_hello->size -
-						binders_length);
+		ret = gnutls_buffer_append_data(
+			&handshake_buf, (const void *)client_hello->data,
+			client_hello->size - binders_length);
 		if (ret < 0) {
 			gnutls_assert();
 			goto error;
 		}
 	}
 
-	ret = compute_binder_key(prf,
-				 psk->data, psk->size, resuming, binder_key);
+	ret = compute_binder_key(prf, psk->data, psk->size, resuming,
+				 binder_key);
 	if (ret < 0) {
 		gnutls_assert();
 		goto error;
@@ -202,24 +190,22 @@ compute_psk_binder(gnutls_session_t session,
 	}
 
 	ret = 0;
- error:
+error:
 	_gnutls_buffer_clear(&handshake_buf);
 	return ret;
 }
 
-static int
-generate_early_secrets(gnutls_session_t session, const mac_entry_st * prf)
+static int generate_early_secrets(gnutls_session_t session,
+				  const mac_entry_st *prf)
 {
 	int ret;
 
-	ret =
-	    _tls13_derive_secret2(prf, EARLY_TRAFFIC_LABEL,
-				  sizeof(EARLY_TRAFFIC_LABEL) - 1,
-				  session->internals.handshake_hash_buffer.data,
-				  session->
-				  internals.handshake_hash_buffer_client_hello_len,
-				  session->key.proto.tls13.temp_secret,
-				  session->key.proto.tls13.e_ckey);
+	ret = _tls13_derive_secret2(
+		prf, EARLY_TRAFFIC_LABEL, sizeof(EARLY_TRAFFIC_LABEL) - 1,
+		session->internals.handshake_hash_buffer.data,
+		session->internals.handshake_hash_buffer_client_hello_len,
+		session->key.proto.tls13.temp_secret,
+		session->key.proto.tls13.e_ckey);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -229,14 +215,13 @@ generate_early_secrets(gnutls_session_t session, const mac_entry_st * prf)
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret =
-	    _tls13_derive_secret2(prf, EARLY_EXPORTER_MASTER_LABEL,
-				  sizeof(EARLY_EXPORTER_MASTER_LABEL) - 1,
-				  session->internals.handshake_hash_buffer.data,
-				  session->
-				  internals.handshake_hash_buffer_client_hello_len,
-				  session->key.proto.tls13.temp_secret,
-				  session->key.proto.tls13.ap_expkey);
+	ret = _tls13_derive_secret2(
+		prf, EARLY_EXPORTER_MASTER_LABEL,
+		sizeof(EARLY_EXPORTER_MASTER_LABEL) - 1,
+		session->internals.handshake_hash_buffer.data,
+		session->internals.handshake_hash_buffer_client_hello_len,
+		session->key.proto.tls13.temp_secret,
+		session->key.proto.tls13.ap_expkey);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -279,10 +264,8 @@ int _gnutls_generate_early_secrets_for_psk(gnutls_session_t session)
 	return 0;
 }
 
-static int
-client_send_params(gnutls_session_t session,
-		   gnutls_buffer_t extdata,
-		   const gnutls_psk_client_credentials_t cred)
+static int client_send_params(gnutls_session_t session, gnutls_buffer_t extdata,
+			      const gnutls_psk_client_credentials_t cred)
 {
 	int ret, ext_offset = 0;
 	uint8_t binder_value[MAX_HASH_SIZE];
@@ -304,7 +287,6 @@ client_send_params(gnutls_session_t session,
 	if (((session->internals.flags & GNUTLS_NO_TICKETS) ||
 	     session->internals.tls13_ticket.ticket.data == NULL) &&
 	    (!cred || !_gnutls_have_psk_credentials(cred, session))) {
-
 		return 0;
 	}
 
@@ -319,7 +301,6 @@ client_send_params(gnutls_session_t session,
 	/* First, let's see if we have a session ticket to send */
 	if (!(session->internals.flags & GNUTLS_NO_TICKETS) &&
 	    ticket->ticket.data != NULL) {
-
 		/* We found a session ticket */
 		if (unlikely(ticket->prf == NULL)) {
 			tls13_ticket_deinit(ticket);
@@ -353,20 +334,16 @@ client_send_params(gnutls_session_t session,
 		/* Calculate obfuscated ticket age, in milliseconds, mod 2^32 */
 		ob_ticket_age = ticket_age + ticket->age_add;
 
-		if ((ret = _gnutls_buffer_append_data_prefix(extdata, 16,
-							     ticket->
-							     ticket.data,
-							     ticket->
-							     ticket.size)) <
-		    0) {
+		if ((ret = _gnutls_buffer_append_data_prefix(
+			     extdata, 16, ticket->ticket.data,
+			     ticket->ticket.size)) < 0) {
 			gnutls_assert();
 			goto cleanup;
 		}
 
 		/* Now append the obfuscated ticket age */
-		if ((ret =
-		     _gnutls_buffer_append_prefix(extdata, 32,
-						  ob_ticket_age)) < 0) {
+		if ((ret = _gnutls_buffer_append_prefix(extdata, 32,
+							ob_ticket_age)) < 0) {
 			gnutls_assert();
 			goto cleanup;
 		}
@@ -375,23 +352,21 @@ client_send_params(gnutls_session_t session,
 		binders_len += 1 + _gnutls_mac_get_algo_len(prf_res);
 	}
 
- ignore_ticket:
+ignore_ticket:
 	if (cred && _gnutls_have_psk_credentials(cred, session)) {
 		gnutls_datum_t tkey;
 
 		if (cred->binder_algo == NULL) {
 			gnutls_assert();
-			ret =
-			    gnutls_assert_val
-			    (GNUTLS_E_INSUFFICIENT_CREDENTIALS);
+			ret = gnutls_assert_val(
+				GNUTLS_E_INSUFFICIENT_CREDENTIALS);
 			goto cleanup;
 		}
 
 		prf_psk = cred->binder_algo;
 
-		ret =
-		    _gnutls_find_psk_key(session, cred, &username, &tkey,
-					 &free_username);
+		ret = _gnutls_find_psk_key(session, cred, &username, &tkey,
+					   &free_username);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -404,8 +379,8 @@ client_send_params(gnutls_session_t session,
 
 		if (!free_username) {
 			/* we need to copy the key */
-			ret =
-			    _gnutls_set_datum(&user_key, tkey.data, tkey.size);
+			ret = _gnutls_set_datum(&user_key, tkey.data,
+						tkey.size);
 			if (ret < 0) {
 				gnutls_assert();
 				goto cleanup;
@@ -415,9 +390,8 @@ client_send_params(gnutls_session_t session,
 			user_key.size = tkey.size;
 		}
 
-		ret =
-		    _gnutls_auth_info_init(session, GNUTLS_CRD_PSK,
-					   sizeof(psk_auth_info_st), 1);
+		ret = _gnutls_auth_info_init(session, GNUTLS_CRD_PSK,
+					     sizeof(psk_auth_info_st), 1);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -432,10 +406,8 @@ client_send_params(gnutls_session_t session,
 			goto cleanup;
 		}
 
-		if ((ret = _gnutls_buffer_append_data_prefix(extdata, 16,
-							     username.data,
-							     username.size)) <
-		    0) {
+		if ((ret = _gnutls_buffer_append_data_prefix(
+			     extdata, 16, username.data, username.size)) < 0) {
 			gnutls_assert();
 			goto cleanup;
 		}
@@ -465,7 +437,7 @@ client_send_params(gnutls_session_t session,
 	/* Compute the binders. extdata->data points to the start
 	 * of this client hello. */
 	assert(extdata->length >= sizeof(mbuffer_st));
-	assert(ext_offset >= (ssize_t) sizeof(mbuffer_st));
+	assert(ext_offset >= (ssize_t)sizeof(mbuffer_st));
 	ext_offset -= sizeof(mbuffer_st);
 	client_hello_len = extdata->length - sizeof(mbuffer_st);
 
@@ -483,10 +455,9 @@ client_send_params(gnutls_session_t session,
 		client_hello.data = extdata->data + sizeof(mbuffer_st);
 		client_hello.size = client_hello_len;
 
-		ret = compute_psk_binder(session, prf_res,
-					 binders_len, binders_pos,
-					 ext_offset, &rkey, &client_hello, 1,
-					 binder_value);
+		ret = compute_psk_binder(session, prf_res, binders_len,
+					 binders_pos, ext_offset, &rkey,
+					 &client_hello, 1, binder_value);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -502,16 +473,15 @@ client_send_params(gnutls_session_t session,
 		session->key.binders[next_idx].resumption = 1;
 		session->key.binders[next_idx].idx = next_idx;
 
-		_gnutls_handshake_log
-		    ("EXT[%p]: sent PSK resumption identity (%d)\n", session,
-		     next_idx);
+		_gnutls_handshake_log(
+			"EXT[%p]: sent PSK resumption identity (%d)\n", session,
+			next_idx);
 
 		next_idx++;
 
 		/* Add the binder */
-		ret =
-		    _gnutls_buffer_append_data_prefix(extdata, 8, binder_value,
-						      prf_res->output_size);
+		ret = _gnutls_buffer_append_data_prefix(
+			extdata, 8, binder_value, prf_res->output_size);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -526,10 +496,9 @@ client_send_params(gnutls_session_t session,
 		client_hello.data = extdata->data + sizeof(mbuffer_st);
 		client_hello.size = client_hello_len;
 
-		ret = compute_psk_binder(session, prf_psk,
-					 binders_len, binders_pos,
-					 ext_offset, &user_key, &client_hello,
-					 0, binder_value);
+		ret = compute_psk_binder(session, prf_psk, binders_len,
+					 binders_pos, ext_offset, &user_key,
+					 &client_hello, 0, binder_value);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -551,9 +520,8 @@ client_send_params(gnutls_session_t session,
 		next_idx++;
 
 		/* Add the binder */
-		ret =
-		    _gnutls_buffer_append_data_prefix(extdata, 8, binder_value,
-						      prf_psk->output_size);
+		ret = _gnutls_buffer_append_data_prefix(
+			extdata, 8, binder_value, prf_psk->output_size);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -562,7 +530,7 @@ client_send_params(gnutls_session_t session,
 
 	ret = 0;
 
- cleanup:
+cleanup:
 	if (free_username)
 		_gnutls_free_datum(&username);
 
@@ -659,19 +627,16 @@ static int server_recv_params(gnutls_session_t session,
 
 			resuming = 1;
 			break;
-		} else if (pskcred &&
-			   psk.ob_ticket_age == 0 &&
-			   psk.identity.size > 0
-			   && psk.identity.size <= MAX_USERNAME_SIZE) {
+		} else if (pskcred && psk.ob_ticket_age == 0 &&
+			   psk.identity.size > 0 &&
+			   psk.identity.size <= MAX_USERNAME_SIZE) {
 			prf = pskcred->binder_algo;
 
 			/* this fails only on configuration errors; as such we always
 			 * return its error code in that case */
-			ret =
-			    _gnutls_psk_pwd_find_entry(session,
-						       (char *)psk.
-						       identity.data,
-						       psk.identity.size, &key);
+			ret = _gnutls_psk_pwd_find_entry(
+				session, (char *)psk.identity.data,
+				psk.identity.size, &key);
 			if (ret < 0)
 				return gnutls_assert_val(ret);
 
@@ -682,9 +647,8 @@ static int server_recv_params(gnutls_session_t session,
 
 	_gnutls13_psk_ext_iter_init(&psk_iter, &psk_parser);
 	for (i = 0; i <= psk_index; i++) {
-		ret =
-		    _gnutls13_psk_ext_iter_next_binder(&psk_iter,
-						       &binder_recvd);
+		ret = _gnutls13_psk_ext_iter_next_binder(&psk_iter,
+							 &binder_recvd);
 		if (ret < 0) {
 			gnutls_assert();
 			/* We couldn't extract binder */
@@ -730,9 +694,8 @@ static int server_recv_params(gnutls_session_t session,
 	if (!resuming) {
 		assert(psk.identity.size <= MAX_USERNAME_SIZE);
 
-		ret =
-		    _gnutls_auth_info_init(session, GNUTLS_CRD_PSK,
-					   sizeof(psk_auth_info_st), 1);
+		ret = _gnutls_auth_info_init(session, GNUTLS_CRD_PSK,
+					     sizeof(psk_auth_info_st), 1);
 		if (ret < 0) {
 			gnutls_assert();
 			goto fail;
@@ -747,9 +710,9 @@ static int server_recv_params(gnutls_session_t session,
 			goto fail;
 		}
 
-		_gnutls_handshake_log
-		    ("EXT[%p]: selected PSK identity: %s (%d)\n", session,
-		     info->username, psk_index);
+		_gnutls_handshake_log(
+			"EXT[%p]: selected PSK identity: %s (%d)\n", session,
+			info->username, psk_index);
 
 		/* We currently only support early data in resuming connection,
 		 * due to lack of API function to associate encryption
@@ -759,28 +722,28 @@ static int server_recv_params(gnutls_session_t session,
 	} else {
 		if (session->internals.hsk_flags & HSK_EARLY_DATA_IN_FLIGHT) {
 			if (session->internals.anti_replay) {
-				ret =
-				    _gnutls_anti_replay_check
-				    (session->internals.anti_replay, ticket_age,
-				     &ticket_creation_time, &binder_recvd);
+				ret = _gnutls_anti_replay_check(
+					session->internals.anti_replay,
+					ticket_age, &ticket_creation_time,
+					&binder_recvd);
 				if (ret < 0) {
 					refuse_early_data = true;
-					_gnutls_handshake_log
-					    ("EXT[%p]: replay detected; rejecting early data\n",
-					     session);
+					_gnutls_handshake_log(
+						"EXT[%p]: replay detected; rejecting early data\n",
+						session);
 				}
 			} else {
 				refuse_early_data = true;
-				_gnutls_handshake_log
-				    ("EXT[%p]: anti-replay is not enabled; rejecting early data\n",
-				     session);
+				_gnutls_handshake_log(
+					"EXT[%p]: anti-replay is not enabled; rejecting early data\n",
+					session);
 			}
 		}
 
 		session->internals.resumed = true;
-		_gnutls_handshake_log
-		    ("EXT[%p]: selected resumption PSK identity (%d)\n",
-		     session, psk_index);
+		_gnutls_handshake_log(
+			"EXT[%p]: selected resumption PSK identity (%d)\n",
+			session, psk_index);
 	}
 
 	session->internals.hsk_flags |= HSK_PSK_SELECTED;
@@ -810,7 +773,7 @@ static int server_recv_params(gnutls_session_t session,
 
 	return 0;
 
- fail:
+fail:
 	gnutls_free(key.data);
 	return ret;
 }
@@ -855,11 +818,11 @@ static int _gnutls_psk_send_params(gnutls_session_t session,
 
 		if (session->internals.hsk_flags & HSK_PSK_KE_MODES_SENT) {
 			cred = (gnutls_psk_client_credentials_t)
-			    _gnutls_get_cred(session, GNUTLS_CRD_PSK);
+				_gnutls_get_cred(session, GNUTLS_CRD_PSK);
 		}
 
-		if ((session->internals.flags & GNUTLS_NO_TICKETS)
-		    && !session->internals.priorities->have_psk)
+		if ((session->internals.flags & GNUTLS_NO_TICKETS) &&
+		    !session->internals.priorities->have_psk)
 			return 0;
 
 		return client_send_params(session, extdata, cred);
@@ -869,8 +832,8 @@ static int _gnutls_psk_send_params(gnutls_session_t session,
 		if (!vers || !vers->tls13_sem)
 			return 0;
 
-		if ((session->internals.flags & GNUTLS_NO_TICKETS)
-		    && !session->internals.priorities->have_psk)
+		if ((session->internals.flags & GNUTLS_NO_TICKETS) &&
+		    !session->internals.priorities->have_psk)
 			return 0;
 
 		if (session->internals.hsk_flags & HSK_PSK_KE_MODES_RECEIVED)
@@ -911,23 +874,22 @@ static int _gnutls_psk_recv_params(gnutls_session_t session,
 		if (session->internals.hsk_flags & HSK_PSK_KE_MODES_SENT) {
 			uint16_t selected_identity = _gnutls_read_uint16(data);
 
-			for (i = 0;
-			     i <
-			     sizeof(session->key.binders) /
-			     sizeof(session->key.binders[0]); i++) {
-				if (session->key.binders[i].prf != NULL
-				    && session->key.binders[i].idx ==
-				    selected_identity) {
+			for (i = 0; i < sizeof(session->key.binders) /
+						sizeof(session->key.binders[0]);
+			     i++) {
+				if (session->key.binders[i].prf != NULL &&
+				    session->key.binders[i].idx ==
+					    selected_identity) {
 					if (session->key.binders[i].resumption) {
 						session->internals.resumed =
-						    true;
-						_gnutls_handshake_log
-						    ("EXT[%p]: selected PSK-resumption mode\n",
-						     session);
+							true;
+						_gnutls_handshake_log(
+							"EXT[%p]: selected PSK-resumption mode\n",
+							session);
 					} else {
-						_gnutls_handshake_log
-						    ("EXT[%p]: selected PSK mode\n",
-						     session);
+						_gnutls_handshake_log(
+							"EXT[%p]: selected PSK mode\n",
+							session);
 					}
 
 					/* different PSK is selected, than the one we calculated early secrets */
@@ -935,47 +897,43 @@ static int _gnutls_psk_recv_params(gnutls_session_t session,
 						/* ensure that selected binder is set on (our) index zero */
 						swap_binders(session);
 
-						ret =
-						    _gnutls_generate_early_secrets_for_psk
-						    (session);
+						ret = _gnutls_generate_early_secrets_for_psk(
+							session);
 						if (ret < 0)
-							return
-							    gnutls_assert_val
-							    (ret);
+							return gnutls_assert_val(
+								ret);
 					}
 					session->internals.hsk_flags |=
-					    HSK_PSK_SELECTED;
+						HSK_PSK_SELECTED;
 				}
 			}
 
 			return 0;
 		} else {
-			return
-			    gnutls_assert_val
-			    (GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION);
+			return gnutls_assert_val(
+				GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION);
 		}
 	} else {
 		if (session->internals.hsk_flags & HSK_PSK_KE_MODES_RECEIVED) {
-			if (session->
-			    internals.hsk_flags & HSK_PSK_KE_MODE_INVALID) {
+			if (session->internals.hsk_flags &
+			    HSK_PSK_KE_MODE_INVALID) {
 				/* We received a "psk_ke_modes" extension, but with a value we don't support */
 				return 0;
 			}
 
 			pskcred = (gnutls_psk_server_credentials_t)
-			    _gnutls_get_cred(session, GNUTLS_CRD_PSK);
+				_gnutls_get_cred(session, GNUTLS_CRD_PSK);
 
 			/* If there are no PSK credentials, this extension is not applicable,
 			 * so we return zero. */
-			if (pskcred == NULL
-			    && (session->internals.flags & GNUTLS_NO_TICKETS))
+			if (pskcred == NULL &&
+			    (session->internals.flags & GNUTLS_NO_TICKETS))
 				return 0;
 
 			return server_recv_params(session, data, len, pskcred);
 		} else {
-			return
-			    gnutls_assert_val
-			    (GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION);
+			return gnutls_assert_val(
+				GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION);
 		}
 	}
 }
@@ -986,9 +944,8 @@ const hello_ext_entry_st ext_mod_pre_shared_key = {
 	.gid = GNUTLS_EXTENSION_PRE_SHARED_KEY,
 	.client_parse_point = GNUTLS_EXT_TLS,
 	.server_parse_point = GNUTLS_EXT_TLS,
-	.validity =
-	    GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_CLIENT_HELLO |
-	    GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO,
+	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_CLIENT_HELLO |
+		    GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO,
 	.send_func = _gnutls_psk_send_params,
 	.recv_func = _gnutls_psk_recv_params
 };

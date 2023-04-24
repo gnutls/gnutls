@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -43,17 +43,17 @@ int main(int argc, char **argv)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <sys/socket.h>
-# if !defined(_WIN32)
-#  include <sys/wait.h>
-# endif
-# include <unistd.h>
-# include <gnutls/gnutls.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#if !defined(_WIN32)
+#include <sys/wait.h>
+#endif
+#include <unistd.h>
+#include <gnutls/gnutls.h>
 
-# include "utils.h"
-# include "cert-common.h"
+#include "utils.h"
+#include "cert-common.h"
 
 pid_t child;
 
@@ -67,12 +67,12 @@ static void tls_log_func(int level, const char *str)
  */
 
 static unsigned char ssl2_hello[] =
-    "\x80\x59\x01\x03\x01\x00\x30\x00\x00\x00\x20\x00\x00\x39\x00\x00"
-    "\x38\x00\x00\x35\x00\x00\x16\x00\x00\x13\x00\x00\x0a\x00\x00\x33"
-    "\x00\x00\x32\x00\x00\x2f\x00\x00\x07\x00\x00\x05\x00\x00\x04\x00"
-    "\x00\x15\x00\x00\x12\x00\x00\x09\x00\x00\xff\xb1\xc9\x95\x1a\x02"
-    "\x6c\xd6\x42\x11\x6e\x99\xe2\x84\x97\xc9\x17\x53\xaf\x53\xf7\xfc"
-    "\x8d\x1e\x72\x87\x18\x53\xee\xa6\x7d\x18\xc6";
+	"\x80\x59\x01\x03\x01\x00\x30\x00\x00\x00\x20\x00\x00\x39\x00\x00"
+	"\x38\x00\x00\x35\x00\x00\x16\x00\x00\x13\x00\x00\x0a\x00\x00\x33"
+	"\x00\x00\x32\x00\x00\x2f\x00\x00\x07\x00\x00\x05\x00\x00\x04\x00"
+	"\x00\x15\x00\x00\x12\x00\x00\x09\x00\x00\xff\xb1\xc9\x95\x1a\x02"
+	"\x6c\xd6\x42\x11\x6e\x99\xe2\x84\x97\xc9\x17\x53\xaf\x53\xf7\xfc"
+	"\x8d\x1e\x72\x87\x18\x53\xee\xa6\x7d\x18\xc6";
 
 static unsigned char tls_alert[] = "\x15\x03\x01\x00\x02\x02\x5A";
 
@@ -135,8 +135,8 @@ static void server(int sd)
 
 	gnutls_transport_set_int(session, sd);
 	ret = gnutls_handshake(session);
-	if (ret != GNUTLS_E_FATAL_ALERT_RECEIVED
-	    || gnutls_alert_get(session) != GNUTLS_A_USER_CANCELED) {
+	if (ret != GNUTLS_E_FATAL_ALERT_RECEIVED ||
+	    gnutls_alert_get(session) != GNUTLS_A_USER_CANCELED) {
 		fail("server: Handshake failed unexpectedly (%s)\n\n",
 		     gnutls_strerror(ret));
 		return;
@@ -190,4 +190,4 @@ void doit(void)
 	}
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

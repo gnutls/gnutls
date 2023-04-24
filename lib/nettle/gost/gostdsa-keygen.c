@@ -32,7 +32,7 @@
 /* Development of Nettle's ECC support was funded by the .SE Internet Fund. */
 
 #if HAVE_CONFIG_H
-# include "config.h"
+#include "config.h"
 #endif
 
 #include <assert.h>
@@ -43,10 +43,8 @@
 #include "ecc-gost-curve.h"
 #include "nettle-alloca.h"
 
-void
-gostdsa_generate_keypair(struct ecc_point *pub,
-			 struct ecc_scalar *key,
-			 void *random_ctx, nettle_random_func * random)
+void gostdsa_generate_keypair(struct ecc_point *pub, struct ecc_scalar *key,
+			      void *random_ctx, nettle_random_func *random)
 {
 	TMP_DECL(p, mp_limb_t, 3 * ECC_MAX_SIZE + ECC_MUL_G_ITCH(ECC_MAX_SIZE));
 	const struct ecc_curve *ecc = pub->ecc;

@@ -32,7 +32,7 @@
 */
 
 #if HAVE_CONFIG_H
-# include "config.h"
+#include "config.h"
 #endif
 
 #include <gnutls_int.h>
@@ -42,7 +42,7 @@
 #include <nettle/bignum.h>
 #include "bignum-le.h"
 
-void nettle_mpz_get_str_256_u_le(size_t length, uint8_t * s, const mpz_t x)
+void nettle_mpz_get_str_256_u_le(size_t length, uint8_t *s, const mpz_t x)
 {
 	if (!length) {
 		/* x must be zero */
@@ -58,14 +58,14 @@ void nettle_mpz_get_str_256_u_le(size_t length, uint8_t * s, const mpz_t x)
 }
 
 #define nettle_mpz_from_octets_le(x, length, s) \
-   mpz_import((x), (length), -1, 1, 0, 0, (s))
+	mpz_import((x), (length), -1, 1, 0, 0, (s))
 
-void nettle_mpz_set_str_256_u_le(mpz_t x, size_t length, const uint8_t * s)
+void nettle_mpz_set_str_256_u_le(mpz_t x, size_t length, const uint8_t *s)
 {
 	nettle_mpz_from_octets_le(x, length, s);
 }
 
-void nettle_mpz_init_set_str_256_u_le(mpz_t x, size_t length, const uint8_t * s)
+void nettle_mpz_init_set_str_256_u_le(mpz_t x, size_t length, const uint8_t *s)
 {
 	mpz_init(x);
 	nettle_mpz_from_octets_le(x, length, s);

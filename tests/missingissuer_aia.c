@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -43,7 +43,7 @@ static time_t then = DEFAULT_THEN;
    verifying certificates.  To avoid a time bomb, we hard code the
    current time.  This should work fine on systems where the library
    call to time is resolved at run-time.  */
-static time_t mytime(time_t * t)
+static time_t mytime(time_t *t)
 {
 	if (t)
 		*t = then;
@@ -58,7 +58,7 @@ static void tls_log_func(int level, const char *str)
 
 static int getissuer_callback(gnutls_x509_trust_list_t tlist,
 			      const gnutls_x509_crt_t crt,
-			      gnutls_x509_crt_t ** issuers,
+			      gnutls_x509_crt_t **issuers,
 			      unsigned int *issuers_size)
 {
 	int ret;
@@ -69,13 +69,12 @@ static int getissuer_callback(gnutls_x509_trust_list_t tlist,
 	assert(gnutls_x509_crt_print(crt, GNUTLS_CRT_PRINT_ONELINE, &tmp) >= 0);
 
 	if (debug)
-		printf("\t Certificate missing issuer is: %.*s\n",
-		       tmp.size, tmp.data);
+		printf("\t Certificate missing issuer is: %.*s\n", tmp.size,
+		       tmp.data);
 	gnutls_free(tmp.data);
 
-	ret = gnutls_x509_crt_get_authority_info_access(crt, 1,
-							GNUTLS_IA_CAISSUERS_URI,
-							&aia, NULL);
+	ret = gnutls_x509_crt_get_authority_info_access(
+		crt, 1, GNUTLS_IA_CAISSUERS_URI, &aia, NULL);
 	if (ret < 0) {
 		fprintf(stderr, "error: %s\n", gnutls_strerror(ret));
 		return -1;
@@ -98,8 +97,9 @@ static int getissuer_callback(gnutls_x509_trust_list_t tlist,
 	}
 
 	for (i = 0; i < *issuers_size; i++) {
-		assert(gnutls_x509_crt_print
-		       (*issuers[i], GNUTLS_CRT_PRINT_ONELINE, &tmp) >= 0);
+		assert(gnutls_x509_crt_print(*issuers[i],
+					     GNUTLS_CRT_PRINT_ONELINE,
+					     &tmp) >= 0);
 
 		if (debug)
 			printf("\t Appended missing certificate is: %.*s\n",
@@ -145,8 +145,7 @@ void doit(void)
 
 		ret = gnutls_x509_crt_init(&certs[j]);
 		if (ret < 0) {
-			fprintf(stderr,
-				"gnutls_x509_crt_init[%d]: %s\n",
+			fprintf(stderr, "gnutls_x509_crt_init[%d]: %s\n",
 				(int)j, gnutls_strerror(ret));
 			exit(1);
 		}
@@ -154,21 +153,20 @@ void doit(void)
 		tmp.data = (unsigned char *)missing_cert_aia[j];
 		tmp.size = strlen(missing_cert_aia[j]);
 
-		ret =
-		    gnutls_x509_crt_import(certs[j], &tmp, GNUTLS_X509_FMT_PEM);
+		ret = gnutls_x509_crt_import(certs[j], &tmp,
+					     GNUTLS_X509_FMT_PEM);
 		if (debug > 2)
 			printf("done\n");
 		if (ret < 0) {
-			fprintf(stderr,
-				"gnutls_x509_crt_import[%d]: %s\n",
+			fprintf(stderr, "gnutls_x509_crt_import[%d]: %s\n",
 				(int)j, gnutls_strerror(ret));
 			exit(1);
 		}
 
 		gnutls_x509_crt_print(certs[j], GNUTLS_CRT_PRINT_ONELINE, &tmp);
 		if (debug)
-			printf("\tCertificate %d: %.*s\n", (int)j,
-			       tmp.size, tmp.data);
+			printf("\tCertificate %d: %.*s\n", (int)j, tmp.size,
+			       tmp.data);
 		gnutls_free(tmp.data);
 	}
 
@@ -212,16 +210,16 @@ void doit(void)
 
 	gnutls_x509_trust_list_set_getissuer_function(tl, getissuer_callback);
 
-	ret = gnutls_x509_trust_list_verify_crt(tl, certs, MAX_CHAIN,
-						0, &verify_status, NULL);
+	ret = gnutls_x509_trust_list_verify_crt(tl, certs, MAX_CHAIN, 0,
+						&verify_status, NULL);
 	if (ret < 0) {
 		fail("gnutls_x509_crt_list_verify: %s\n", gnutls_strerror(ret));
 	}
 	if (verify_status) {
 		gnutls_datum_t out;
 
-		gnutls_certificate_verification_status_print
-		    (verify_status, GNUTLS_CRT_X509, &out, 0);
+		gnutls_certificate_verification_status_print(
+			verify_status, GNUTLS_CRT_X509, &out, 0);
 		fail("verification failed: %s\n", out.data);
 		gnutls_free(out.data);
 	}

@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -36,19 +36,19 @@ int main(void)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
-# include <unistd.h>
-# include <gnutls/gnutls.h>
-# include <gnutls/dtls.h>
-# include <signal.h>
+#include <string.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <gnutls/gnutls.h>
+#include <gnutls/dtls.h>
+#include <signal.h>
 
-# include "utils.h"
-# include "cert-common.h"
+#include "utils.h"
+#include "cert-common.h"
 
 static void terminate(void);
 
@@ -66,7 +66,7 @@ static void client_log_func(int level, const char *str)
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
 
-# define MAX_BUF 1024
+#define MAX_BUF 1024
 
 static int to_send = -1;
 static int mtu = 0;
@@ -78,10 +78,10 @@ static ssize_t push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 	return send(fd, data, len, 0);
 }
 
-# define RECORD_HEADER_SIZE (5+8)
+#define RECORD_HEADER_SIZE (5 + 8)
 
-static ssize_t
-push_crippled(gnutls_transport_ptr_t tr, const void *data, size_t len)
+static ssize_t push_crippled(gnutls_transport_ptr_t tr, const void *data,
+			     size_t len)
 {
 	int fd = (long int)tr;
 	int _len, ret;
@@ -90,11 +90,11 @@ push_crippled(gnutls_transport_ptr_t tr, const void *data, size_t len)
 	if (to_send == -1)
 		return send(fd, data, len, 0);
 	else {
-# if 0
+#if 0
 		_len = ((uint8_t *) data)[11] << 8 | ((uint8_t *) data)[12];
 		fprintf(stderr, "mtu: %d, len: %d", mtu, (int)_len);
 		fprintf(stderr, " send: %d\n", (int)to_send);
-# endif
+#endif
 
 		_len = to_send;
 		_data[11] = _len >> 8;
@@ -154,8 +154,7 @@ static void client(int fd, const char *prio)
 	 */
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret < 0) {
 		fail("client: Handshake failed\n");
@@ -168,8 +167,8 @@ static void client(int fd, const char *prio)
 
 	if (debug)
 		success("client: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	/* make sure we are not blocked forever */
 	gnutls_record_set_timeout(session, 10000);
@@ -193,7 +192,7 @@ static void client(int fd, const char *prio)
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
- end:
+end:
 
 	close(fd);
 
@@ -260,8 +259,7 @@ static void server(int fd, const char *prio)
 
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 	if (ret < 0) {
 		close(fd);
 		gnutls_deinit(session);
@@ -274,15 +272,15 @@ static void server(int fd, const char *prio)
 
 	if (debug)
 		success("server: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 	mtu = gnutls_dtls_get_mtu(session);
 
 	do {
-		usleep(10000);	/* some systems like FreeBSD have their buffers full during this send */
+		usleep(10000); /* some systems like FreeBSD have their buffers full during this send */
 		do {
-			ret =
-			    gnutls_record_send(session, buffer, sizeof(buffer));
+			ret = gnutls_record_send(session, buffer,
+						 sizeof(buffer));
 		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 		if (ret < 0) {
@@ -291,8 +289,7 @@ static void server(int fd, const char *prio)
 			terminate();
 		}
 		to_send++;
-	}
-	while (to_send < 64);
+	} while (to_send < 64);
 
 	to_send = -1;
 
@@ -344,12 +341,18 @@ static void start(const char *name, const char *prio)
 	}
 }
 
-# define AES_CBC "NONE:+VERS-DTLS1.0:-CIPHER-ALL:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
-# define AES_CBC_SHA256 "NONE:+VERS-DTLS1.2:-CIPHER-ALL:+RSA:+AES-128-CBC:+AES-256-CBC:+SHA256:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
-# define AES_GCM "NONE:+VERS-DTLS1.2:-CIPHER-ALL:+RSA:+AES-128-GCM:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
-# define AES_CCM "NONE:+VERS-DTLS1.2:-CIPHER-ALL:+RSA:+AES-128-CCM:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
-# define AES_CCM_8 "NONE:+VERS-DTLS1.2:-CIPHER-ALL:+RSA:+AES-128-CCM-8:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
-# define CHACHA_POLY1305 "NONE:+VERS-DTLS1.2:-CIPHER-ALL:+RSA:+CHACHA20-POLY1305:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ECDHE-RSA:+CURVE-ALL"
+#define AES_CBC \
+	"NONE:+VERS-DTLS1.0:-CIPHER-ALL:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
+#define AES_CBC_SHA256 \
+	"NONE:+VERS-DTLS1.2:-CIPHER-ALL:+RSA:+AES-128-CBC:+AES-256-CBC:+SHA256:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
+#define AES_GCM \
+	"NONE:+VERS-DTLS1.2:-CIPHER-ALL:+RSA:+AES-128-GCM:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
+#define AES_CCM \
+	"NONE:+VERS-DTLS1.2:-CIPHER-ALL:+RSA:+AES-128-CCM:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
+#define AES_CCM_8 \
+	"NONE:+VERS-DTLS1.2:-CIPHER-ALL:+RSA:+AES-128-CCM-8:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
+#define CHACHA_POLY1305 \
+	"NONE:+VERS-DTLS1.2:-CIPHER-ALL:+RSA:+CHACHA20-POLY1305:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ECDHE-RSA:+CURVE-ALL"
 
 static void ch_handler(int sig)
 {
@@ -371,4 +374,4 @@ void doit(void)
 	}
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

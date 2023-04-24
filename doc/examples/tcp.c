@@ -1,7 +1,7 @@
 /* This example code is placed in the public domain. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -49,6 +49,6 @@ extern int tcp_connect(void)
  */
 extern void tcp_close(int sd)
 {
-	shutdown(sd, SHUT_RDWR);	/* no more receptions */
+	shutdown(sd, SHUT_RDWR); /* no more receptions */
 	close(sd);
 }

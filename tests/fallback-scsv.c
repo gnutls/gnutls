@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,20 +35,20 @@ int main(void)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
-# include <unistd.h>
-# include <gnutls/gnutls.h>
-# include <gnutls/dtls.h>
-# include <signal.h>
-# include <assert.h>
+#include <string.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <gnutls/gnutls.h>
+#include <gnutls/dtls.h>
+#include <signal.h>
+#include <assert.h>
 
-# include "utils.h"
-# include "cert-common.h"
+#include "utils.h"
+#include "cert-common.h"
 
 static void terminate(void);
 
@@ -68,7 +68,7 @@ static void client_log_func(int level, const char *str)
 /* This tests whether the fallback SCSV is working as intended.
  */
 
-# define MAX_BUF 1024
+#define MAX_BUF 1024
 
 static void client(int fd, const char *prio, unsigned expect_fail)
 {
@@ -101,8 +101,7 @@ static void client(int fd, const char *prio, unsigned expect_fail)
 	 */
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (expect_fail) {
 		goto end;
@@ -119,8 +118,8 @@ static void client(int fd, const char *prio, unsigned expect_fail)
 
 	if (debug)
 		success("client: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	do {
 		do {
@@ -141,7 +140,7 @@ static void client(int fd, const char *prio, unsigned expect_fail)
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
- end:
+end:
 
 	close(fd);
 
@@ -202,8 +201,7 @@ static void server(int fd, const char *prio, unsigned expect_fail)
 	if (expect_fail) {
 		if (ret == GNUTLS_E_INAPPROPRIATE_FALLBACK) {
 			if (debug)
-				success
-				    ("server: received inappropriate fallback error\n");
+				success("server: received inappropriate fallback error\n");
 			goto cleanup;
 		} else {
 			fail("server: received unexpected error: %s\n",
@@ -224,13 +222,13 @@ static void server(int fd, const char *prio, unsigned expect_fail)
 
 	if (debug)
 		success("server: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	do {
 		do {
-			ret =
-			    gnutls_record_send(session, buffer, sizeof(buffer));
+			ret = gnutls_record_send(session, buffer,
+						 sizeof(buffer));
 		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 		if (ret < 0) {
@@ -239,14 +237,13 @@ static void server(int fd, const char *prio, unsigned expect_fail)
 			terminate();
 		}
 		to_send++;
-	}
-	while (to_send < 64);
+	} while (to_send < 64);
 
 	to_send = -1;
 	/* do not wait for the peer to close the connection.
 	 */
 	gnutls_bye(session, GNUTLS_SHUT_WR);
- cleanup:
+cleanup:
 	close(fd);
 	gnutls_deinit(session);
 
@@ -318,4 +315,4 @@ void doit(void)
 	      0);
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

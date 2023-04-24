@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -36,19 +36,19 @@ int main(void)
 
 #else
 
-# include <string.h>
-# include <errno.h>
-# include <sys/types.h>
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
-# include <unistd.h>
-# include <signal.h>
-# include <gnutls/gnutls.h>
-# include <gnutls/dtls.h>
+#include <string.h>
+#include <errno.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <signal.h>
+#include <gnutls/gnutls.h>
+#include <gnutls/dtls.h>
 
-# include "utils.h"
+#include "utils.h"
 
 static int test_finished = 0;
 static void terminate(void);
@@ -82,16 +82,14 @@ static pid_t child;
 /* A test client/server app for DTLS duplicate packet detection.
  */
 
-# define MAX_BUF 1024
+#define MAX_BUF 1024
 
-# define MAX_SEQ 128
+#define MAX_SEQ 128
 
-static int msg_seq[] =
-    { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 16, 5, 32, 11, 11, 11, 11, 12,
-	10, 13, 14, 15, 16, 17, 19, 20, 18, 22, 24, 23, 25, 26, 27, 29, 28,
-	29, 29, 30, 31, 32, 33, 34, 35, 37, 36, 38, 39, 42, 37, 40, 41, 41,
-	-1
-};
+static int msg_seq[] = { 0,  1,	 2,  3,	 4,  5,	 6,  7,	 8,  9,	 10, 10, 16, 5,
+			 32, 11, 11, 11, 11, 12, 10, 13, 14, 15, 16, 17, 19, 20,
+			 18, 22, 24, 23, 25, 26, 27, 29, 28, 29, 29, 30, 31, 32,
+			 33, 34, 35, 37, 36, 38, 39, 42, 37, 40, 41, 41, -1 };
 
 static unsigned int current = 0;
 static unsigned int pos = 0;
@@ -118,14 +116,11 @@ static ssize_t odd_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 		for (i = pos; i <= current; i++) {
 			if (stored_messages[msg_seq[i]] != NULL) {
 				do {
-					ret =
-					    send((long int)tr,
-						 stored_messages[msg_seq
-								 [i]],
-						 stored_sizes[msg_seq[i]], 0);
-				}
-				while (ret == -1
-				       && (errno == EAGAIN || errno == EINTR));
+					ret = send((long int)tr,
+						   stored_messages[msg_seq[i]],
+						   stored_sizes[msg_seq[i]], 0);
+				} while (ret == -1 &&
+					 (errno == EAGAIN || errno == EINTR));
 				pos++;
 			} else
 				break;
@@ -133,8 +128,7 @@ static ssize_t odd_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 	} else if (msg_seq[current] == (int)current) {
 		do {
 			ret = send((long int)tr, data, len, 0);
-		}
-		while (ret == -1 && (errno == EAGAIN || errno == EINTR));
+		} while (ret == -1 && (errno == EAGAIN || errno == EINTR));
 
 		current++;
 		pos++;
@@ -142,12 +136,10 @@ static ssize_t odd_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 		return ret;
 	} else if (stored_messages[msg_seq[current]] != NULL) {
 		do {
-			ret =
-			    send((long int)tr,
-				 stored_messages[msg_seq[current]],
-				 stored_sizes[msg_seq[current]], 0);
-		}
-		while (ret == -1 && (errno == EAGAIN || errno == EINTR));
+			ret = send((long int)tr,
+				   stored_messages[msg_seq[current]],
+				   stored_sizes[msg_seq[current]], 0);
+		} while (ret == -1 && (errno == EAGAIN || errno == EINTR));
 		current++;
 		pos++;
 		return ret;
@@ -164,11 +156,10 @@ static ssize_t n_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 }
 
 /* The first five messages are handshake. Thus corresponds to msg_seq+5 */
-static int recv_msg_seq[] =
-    { 1, 2, 3, 4, 5, 6, 12, 28, 7, 8, 9, 10, 11, 13, 15, 16, 14, 18, 20,
-	19, 21, 22, 23, 25, 24, 26, 27, 29, 30, 31, 33, 32, 34, 35, 38, 36, 37,
-	-1
-};
+static int recv_msg_seq[] = { 1,  2,  3,  4,  5,  6,  12, 28, 7,  8,
+			      9,  10, 11, 13, 15, 16, 14, 18, 20, 19,
+			      21, 22, 23, 25, 24, 26, 27, 29, 30, 31,
+			      33, 32, 34, 35, 38, 36, 37, -1 };
 
 static void client(int fd)
 {
@@ -183,7 +174,7 @@ static void client(int fd)
 
 	/* Need to enable anonymous KX specifically. */
 
-/*    gnutls_global_set_audit_log_function (tls_audit_log_func); */
+	/*    gnutls_global_set_audit_log_function (tls_audit_log_func); */
 	global_init();
 
 	if (debug) {
@@ -202,9 +193,10 @@ static void client(int fd)
 	gnutls_dtls_set_mtu(session, 1500);
 
 	/* Use default priorities */
-	gnutls_priority_set_direct(session,
-				   "NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL",
-				   NULL);
+	gnutls_priority_set_direct(
+		session,
+		"NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL",
+		NULL);
 
 	/* put the anonymous credentials to the current session
 	 */
@@ -216,8 +208,7 @@ static void client(int fd)
 	 */
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret < 0) {
 		fail("client: Handshake failed\n");
@@ -232,17 +223,15 @@ static void client(int fd)
 
 	if (debug)
 		success("client: DTLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 	do {
-		ret =
-		    gnutls_record_recv_seq(session, buffer, sizeof(buffer),
-					   seq);
+		ret = gnutls_record_recv_seq(session, buffer, sizeof(buffer),
+					     seq);
 
 		if (ret > 0) {
-			useq =
-			    seq[7] | (seq[6] << 8) | (seq[5] << 16) |
-			    (seq[4] << 24);
+			useq = seq[7] | (seq[6] << 8) | (seq[5] << 16) |
+			       (seq[4] << 24);
 
 			if (debug)
 				success("received %u\n", (unsigned int)useq);
@@ -251,16 +240,17 @@ static void client(int fd)
 				fail("received message sequence differs\n");
 				exit(1);
 			}
-			if (((uint32_t) recv_msg_seq[current]) != useq) {
-				fail("received message sequence differs (current: %u, got: %u, expected: %u)\n", (unsigned)current, (unsigned)useq, (unsigned)recv_msg_seq[current]);
+			if (((uint32_t)recv_msg_seq[current]) != useq) {
+				fail("received message sequence differs (current: %u, got: %u, expected: %u)\n",
+				     (unsigned)current, (unsigned)useq,
+				     (unsigned)recv_msg_seq[current]);
 				exit(1);
 			}
 
 			current++;
 		}
-	}
-	while ((ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED
-		|| ret > 0));
+	} while ((ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED ||
+		  ret > 0));
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
@@ -308,17 +298,17 @@ static void server(int fd)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_priority_set_direct(session,
-				   "NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL",
-				   NULL);
+	gnutls_priority_set_direct(
+		session,
+		"NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL",
+		NULL);
 	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
 
 	gnutls_transport_set_int(session, fd);
 
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 	if (ret < 0) {
 		close(fd);
 		gnutls_deinit(session);
@@ -331,28 +321,25 @@ static void server(int fd)
 
 	if (debug)
 		success("server: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	gnutls_record_recv(session, &c, 1);
 	do {
 		do {
 			ret = gnutls_record_send(session, &c, 1);
-		}
-		while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 		if (ret < 0) {
 			fail("send: %s\n", gnutls_strerror(ret));
 			terminate();
 		}
-	}
-	while (test_finished == 0);
+	} while (test_finished == 0);
 
 	gnutls_transport_set_push_function(session, n_push);
 	do {
 		ret = gnutls_bye(session, GNUTLS_SHUT_WR);
-	}
-	while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 	close(fd);
 	gnutls_deinit(session);
@@ -404,4 +391,4 @@ void doit(void)
 	start();
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

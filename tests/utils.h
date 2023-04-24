@@ -21,45 +21,45 @@
  */
 
 #ifndef GNUTLS_TESTS_UTILS_H
-# define GNUTLS_TESTS_UTILS_H
+#define GNUTLS_TESTS_UTILS_H
 
-# include <assert.h>
-# include <limits.h>
-# include <stdio.h>
-# include <stdlib.h>
-# include <signal.h>
-# include <string.h>
-# include <stdarg.h>
-# include <unistd.h>
-# include <gnutls/gnutls.h>
-# include <gnutls/pkcs11.h>
+#include <assert.h>
+#include <limits.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <signal.h>
+#include <string.h>
+#include <stdarg.h>
+#include <unistd.h>
+#include <gnutls/gnutls.h>
+#include <gnutls/pkcs11.h>
 
-# ifndef __attribute__
-#  if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 5)
-#   define __attribute__(Spec)	/* empty */
-#  endif
-# endif
+#ifndef __attribute__
+#if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 5)
+#define __attribute__(Spec) /* empty */
+#endif
+#endif
 
-# ifdef NDEBUG
-#  error tests cannot be compiled with NDEBUG defined
-# endif
+#ifdef NDEBUG
+#error tests cannot be compiled with NDEBUG defined
+#endif
 
-# ifndef FALLTHROUGH
-#  if _GNUTLS_GCC_VERSION >= 70100
-#   define FALLTHROUGH      __attribute__ ((fallthrough))
-#  else
-#   define FALLTHROUGH
-#  endif
-# endif
+#ifndef FALLTHROUGH
+#if _GNUTLS_GCC_VERSION >= 70100
+#define FALLTHROUGH __attribute__((fallthrough))
+#else
+#define FALLTHROUGH
+#endif
+#endif
 
 /* number of elements within an array */
-# define countof(a) (sizeof(a)/sizeof(*(a)))
+#define countof(a) (sizeof(a) / sizeof(*(a)))
 
 inline static int global_init(void)
 {
-# ifdef ENABLE_PKCS11
+#ifdef ENABLE_PKCS11
 	gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_MANUAL, NULL);
-# endif
+#endif
 	return gnutls_global_init();
 }
 
@@ -71,22 +71,20 @@ extern const char *pkcs3;
 extern const char *pkcs3_2048;
 extern const char *pkcs3_3072;
 
-# define fail(format, ...) \
-    _fail("%s:%d: "format, __func__, __LINE__, ##__VA_ARGS__)
+#define fail(format, ...) \
+	_fail("%s:%d: " format, __func__, __LINE__, ##__VA_ARGS__)
 
-extern void _fail(const char *format, ...)
-    __attribute__((format(printf, 1, 2))) __attribute__((__noreturn__));
+extern void _fail(const char *format, ...) __attribute__((format(printf, 1, 2)))
+__attribute__((__noreturn__));
 extern void fail_ignore(const char *format, ...)
-    __attribute__((format(printf, 1, 2))) __attribute__((__noreturn__));
+	__attribute__((format(printf, 1, 2))) __attribute__((__noreturn__));
 extern void success(const char *format, ...)
-    __attribute__((format(printf, 1, 2)));
+	__attribute__((format(printf, 1, 2)));
 
 /* assumes test_name is defined */
-# define test_fail(fmt, ...) \
-	fail("%s: "fmt, test_name, ##__VA_ARGS__)
+#define test_fail(fmt, ...) fail("%s: " fmt, test_name, ##__VA_ARGS__)
 
-# define test_success(fmt, ...) \
-	success("%s: "fmt, test_name, ##__VA_ARGS__)
+#define test_success(fmt, ...) success("%s: " fmt, test_name, ##__VA_ARGS__)
 
 extern void c_print(const unsigned char *str, size_t len);
 extern void escapeprint(const char *str, size_t len);
@@ -95,53 +93,46 @@ extern void binprint(const void *str, size_t len);
 int disable_system_calls(void);
 void sec_sleep(int sec);
 
-int
-test_cli_serv_anon(gnutls_anon_server_credentials_t server_cred,
-		   gnutls_anon_client_credentials_t client_cred,
-		   const char *prio);
+int test_cli_serv_anon(gnutls_anon_server_credentials_t server_cred,
+		       gnutls_anon_client_credentials_t client_cred,
+		       const char *prio);
 
-int
-test_cli_serv_psk(gnutls_psk_server_credentials_t server_cred,
-		  gnutls_psk_client_credentials_t client_cred,
-		  const char *prio);
+int test_cli_serv_psk(gnutls_psk_server_credentials_t server_cred,
+		      gnutls_psk_client_credentials_t client_cred,
+		      const char *prio);
 
 typedef void callback_func(gnutls_session_t, void *priv);
 void test_cli_serv(gnutls_certificate_credentials_t server_cred,
 		   gnutls_certificate_credentials_t client_cred,
-		   const char *prio, const char *host,
-		   void *priv,
-		   callback_func * client_cb, callback_func * server_cb);
+		   const char *prio, const char *host, void *priv,
+		   callback_func *client_cb, callback_func *server_cb);
 
-int
-_test_cli_serv(gnutls_certificate_credentials_t server_cred,
-	       gnutls_certificate_credentials_t client_cred,
-	       const char *serv_prio, const char *cli_prio,
-	       const char *host,
-	       void *priv, callback_func * client_cb, callback_func * server_cb,
-	       unsigned expect_verification_failure,
-	       unsigned require_cert, int serv_err, int cli_err);
+int _test_cli_serv(gnutls_certificate_credentials_t server_cred,
+		   gnutls_certificate_credentials_t client_cred,
+		   const char *serv_prio, const char *cli_prio,
+		   const char *host, void *priv, callback_func *client_cb,
+		   callback_func *server_cb,
+		   unsigned expect_verification_failure, unsigned require_cert,
+		   int serv_err, int cli_err);
 
 void print_dh_params_info(gnutls_session_t);
 
-void
-test_cli_serv_cert(gnutls_certificate_credentials_t server_cred,
-		   gnutls_certificate_credentials_t client_cred,
-		   const char *serv_prio, const char *cli_prio,
-		   const char *host);
+void test_cli_serv_cert(gnutls_certificate_credentials_t server_cred,
+			gnutls_certificate_credentials_t client_cred,
+			const char *serv_prio, const char *cli_prio,
+			const char *host);
 
-void
-test_cli_serv_expect(gnutls_certificate_credentials_t server_cred,
-		     gnutls_certificate_credentials_t client_cred,
-		     const char *serv_prio, const char *cli_prio,
-		     const char *host, int serv_err, int cli_err);
+void test_cli_serv_expect(gnutls_certificate_credentials_t server_cred,
+			  gnutls_certificate_credentials_t client_cred,
+			  const char *serv_prio, const char *cli_prio,
+			  const char *host, int serv_err, int cli_err);
 
 /* verification failed */
-unsigned
-test_cli_serv_vf(gnutls_certificate_credentials_t server_cred,
-		 gnutls_certificate_credentials_t client_cred,
-		 const char *prio, const char *host);
+unsigned test_cli_serv_vf(gnutls_certificate_credentials_t server_cred,
+			  gnutls_certificate_credentials_t client_cred,
+			  const char *prio, const char *host);
 
-# define TMPNAME_SIZE 128
+#define TMPNAME_SIZE 128
 char *get_tmpname(char s[TMPNAME_SIZE]);
 void track_temp_files(void);
 void delete_temp_files(void);
@@ -154,7 +145,7 @@ extern void doit(void);
 /* calls fail() if status indicates an error  */
 inline static void _check_wait_status(int status, unsigned sigonly)
 {
-# if defined WEXITSTATUS && defined WIFSIGNALED
+#if defined WEXITSTATUS && defined WIFSIGNALED
 	if (WEXITSTATUS(status) != 0 ||
 	    (WIFSIGNALED(status) && WTERMSIG(status) != SIGTERM)) {
 		if (WIFSIGNALED(status)) {
@@ -168,7 +159,7 @@ inline static void _check_wait_status(int status, unsigned sigonly)
 			}
 		}
 	}
-# endif
+#endif
 }
 
 inline static void check_wait_status(int status)
@@ -211,8 +202,8 @@ inline static unsigned int get_dtls_retransmit_timeout(void)
 	return (unsigned int)ul;
 }
 
-static inline const char
-*fips_operation_state_to_string(gnutls_fips140_operation_state_t state)
+static inline const char *
+fips_operation_state_to_string(gnutls_fips140_operation_state_t state)
 {
 	switch (state) {
 	case GNUTLS_FIPS140_OP_INITIAL:
@@ -224,7 +215,7 @@ static inline const char
 	case GNUTLS_FIPS140_OP_ERROR:
 		return "ERROR";
 	default:
-		 /*NOTREACHED*/ assert(0);
+		/*NOTREACHED*/ assert(0);
 		return NULL;
 	}
 }
@@ -264,7 +255,8 @@ fips_pop_context(gnutls_fips140_context_t context,
 }
 
 /* To use those convenient macros, define fips_context variable. */
-# define FIPS_PUSH_CONTEXT() fips_push_context(fips_context)
-# define FIPS_POP_CONTEXT(state) fips_pop_context(fips_context, GNUTLS_FIPS140_OP_ ## state)
+#define FIPS_PUSH_CONTEXT() fips_push_context(fips_context)
+#define FIPS_POP_CONTEXT(state) \
+	fips_pop_context(fips_context, GNUTLS_FIPS140_OP_##state)
 
-#endif				/* GNUTLS_TESTS_UTILS_H */
+#endif /* GNUTLS_TESTS_UTILS_H */

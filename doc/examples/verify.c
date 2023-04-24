@@ -1,5 +1,5 @@
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -43,8 +43,8 @@ int verify_certificate_callback(gnutls_session_t session)
 
 	type = gnutls_certificate_type_get(session);
 
-	ret =
-	    gnutls_certificate_verification_status_print(status, type, &out, 0);
+	ret = gnutls_certificate_verification_status_print(status, type, &out,
+							   0);
 	if (ret < 0) {
 		printf("Error\n");
 		return GNUTLS_E_CERTIFICATE_ERROR;
@@ -54,7 +54,7 @@ int verify_certificate_callback(gnutls_session_t session)
 
 	gnutls_free(out.data);
 
-	if (status != 0)	/* Certificate is not trusted */
+	if (status != 0) /* Certificate is not trusted */
 		return GNUTLS_E_CERTIFICATE_ERROR;
 
 	/* notify gnutls to continue handshake normally */

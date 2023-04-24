@@ -22,16 +22,16 @@
  */
 
 #ifndef GNUTLS_LIB_PATHBUF_H
-# define GNUTLS_LIB_PATHBUF_H
+#define GNUTLS_LIB_PATHBUF_H
 
-# include "pathmax.h"
-# define GNUTLS_PATH_MAX PATH_MAX
+#include "pathmax.h"
+#define GNUTLS_PATH_MAX PATH_MAX
 
 struct gnutls_pathbuf_st {
 	char base[GNUTLS_PATH_MAX + 1];
-	char *ptr;		/* API */
-	size_t len;		/* API: NOT including NUL */
-	size_t cap;		/* including NUL */
+	char *ptr; /* API */
+	size_t len; /* API: NOT including NUL */
+	size_t cap; /* including NUL */
 };
 
 /* Initialize BUFFER with the content BASE.  */
@@ -47,4 +47,4 @@ int _gnutls_pathbuf_truncate(struct gnutls_pathbuf_st *buffer, size_t len);
 /* Deinitialize BUFFER.  */
 void _gnutls_pathbuf_deinit(struct gnutls_pathbuf_st *buffer);
 
-#endif				/* GNUTLS_LIB_PATHBUF_H */
+#endif /* GNUTLS_LIB_PATHBUF_H */

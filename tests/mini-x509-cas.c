@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -43,8 +43,7 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "%s|<%d>| %s", side, level, str);
 }
 
-static
-void start(const char *prio)
+static void start(const char *prio)
 {
 	const char *ca_file;
 	/* Server stuff. */
@@ -71,12 +70,10 @@ void start(const char *prio)
 
 	/* Init server */
 	gnutls_certificate_allocate_credentials(&serverx509cred);
-	gnutls_certificate_set_x509_key_mem(serverx509cred,
-					    &server_cert, &server_key,
-					    GNUTLS_X509_FMT_PEM);
-	ret =
-	    gnutls_certificate_set_x509_trust_file(serverx509cred, ca_file,
-						   GNUTLS_X509_FMT_PEM);
+	gnutls_certificate_set_x509_key_mem(serverx509cred, &server_cert,
+					    &server_key, GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_trust_file(serverx509cred, ca_file,
+						     GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
 		fprintf(stderr, "%s\n", gnutls_strerror(ret));
 		exit(1);

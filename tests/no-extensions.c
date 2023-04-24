@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -46,7 +46,7 @@ static void tls_log_func(int level, const char *str)
 static int server_handshake_callback(gnutls_session_t session,
 				     unsigned int htype, unsigned post,
 				     unsigned int incoming,
-				     const gnutls_datum_t * msg)
+				     const gnutls_datum_t *msg)
 {
 	unsigned pos;
 	gnutls_datum_t mmsg;
@@ -58,7 +58,7 @@ static int server_handshake_callback(gnutls_session_t session,
 		assert(msg->size >= HANDSHAKE_SESSION_ID_POS);
 		pos = HANDSHAKE_SESSION_ID_POS;
 		SKIP8(pos, msg->size);
-		pos += 3;	/* ciphersuite + compression */
+		pos += 3; /* ciphersuite + compression */
 
 		mmsg.data = &msg->data[pos];
 		mmsg.size = msg->size - pos;
@@ -77,7 +77,7 @@ static int server_handshake_callback(gnutls_session_t session,
 static int client_handshake_callback(gnutls_session_t session,
 				     unsigned int htype, unsigned post,
 				     unsigned int incoming,
-				     const gnutls_datum_t * msg)
+				     const gnutls_datum_t *msg)
 {
 	unsigned pos;
 	gnutls_datum_t mmsg;
@@ -107,8 +107,7 @@ static int client_handshake_callback(gnutls_session_t session,
 	return 0;
 }
 
-static
-void start(const char *prio, gnutls_protocol_t exp_version)
+static void start(const char *prio, gnutls_protocol_t exp_version)
 {
 	int ret;
 	/* Server stuff. */
@@ -130,9 +129,8 @@ void start(const char *prio, gnutls_protocol_t exp_version)
 
 	/* Init server */
 	gnutls_certificate_allocate_credentials(&serverx509cred);
-	gnutls_certificate_set_x509_key_mem(serverx509cred,
-					    &server_cert, &server_key,
-					    GNUTLS_X509_FMT_PEM);
+	gnutls_certificate_set_x509_key_mem(serverx509cred, &server_cert,
+					    &server_key, GNUTLS_X509_FMT_PEM);
 
 	gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, serverx509cred);
@@ -151,9 +149,8 @@ void start(const char *prio, gnutls_protocol_t exp_version)
 	if (ret < 0)
 		exit(1);
 
-	ret =
-	    gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca_cert,
-						  GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca_cert,
+						    GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);
 

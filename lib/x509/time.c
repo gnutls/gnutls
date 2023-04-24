@@ -46,7 +46,7 @@
  */
 typedef struct fake_tm {
 	int tm_mon;
-	int tm_year;		/* FULL year - ie 1971 */
+	int tm_year; /* FULL year - ie 1971 */
 	int tm_mday;
 	int tm_hour;
 	int tm_min;
@@ -63,7 +63,7 @@ static const int MONTHDAYS[] = {
 	31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
 };
 
-    /* Whether a given year is a leap year. */
+/* Whether a given year is a leap year. */
 #define ISLEAP(year) \
 	(((year) % 4) == 0 && (((year) % 100) != 0 || ((year) % 400) == 0))
 
@@ -78,20 +78,20 @@ static time_t mktime_utc(const struct fake_tm *tm)
 	time_t result = 0;
 	int i;
 
-/* We do allow some ill-formed dates, but we don't do anything special
+	/* We do allow some ill-formed dates, but we don't do anything special
  * with them and our callers really shouldn't pass them to us.  Do
  * explicitly disallow the ones that would cause invalid array accesses
  * or other algorithm problems.
  */
 	if (tm->tm_mon < 0 || tm->tm_mon > 11 || tm->tm_year < 1970)
-		return (time_t) - 1;
+		return (time_t)-1;
 
 	/* Check for "obvious" mistakes in dates */
-	if (tm->tm_sec > 60 || tm->tm_min > 59 || tm->tm_mday > 31
-	    || tm->tm_mday < 1 || tm->tm_hour > 23)
-		return (time_t) - 1;
+	if (tm->tm_sec > 60 || tm->tm_min > 59 || tm->tm_mday > 31 ||
+	    tm->tm_mday < 1 || tm->tm_hour > 23)
+		return (time_t)-1;
 
-/* Convert to a time_t.
+	/* Convert to a time_t.
  */
 	for (i = 1970; i < tm->tm_year; i++)
 		result += 365 + ISLEAP(i);
@@ -116,7 +116,7 @@ static time_t time2gtime(const char *ttime, int year)
 
 	if (strlen(ttime) < 8) {
 		gnutls_assert();
-		return (time_t) - 1;
+		return (time_t)-1;
 	}
 
 	etime.tm_year = year;
@@ -125,34 +125,34 @@ static time_t time2gtime(const char *ttime, int year)
 	 * time_t.
 	 */
 	if (sizeof(time_t) <= 4 && etime.tm_year >= 2038)
-		return (time_t) 2145914603;	/* 2037-12-31 23:23:23 */
+		return (time_t)2145914603; /* 2037-12-31 23:23:23 */
 
 	if (etime.tm_year < 1970)
-		return (time_t) 0;
+		return (time_t)0;
 
 	xx[2] = 0;
 
-/* get the month
+	/* get the month
  */
-	memcpy(xx, ttime, 2);	/* month */
+	memcpy(xx, ttime, 2); /* month */
 	etime.tm_mon = atoi(xx) - 1;
 	ttime += 2;
 
-/* get the day
+	/* get the day
  */
-	memcpy(xx, ttime, 2);	/* day */
+	memcpy(xx, ttime, 2); /* day */
 	etime.tm_mday = atoi(xx);
 	ttime += 2;
 
-/* get the hour
+	/* get the hour
  */
-	memcpy(xx, ttime, 2);	/* hour */
+	memcpy(xx, ttime, 2); /* hour */
 	etime.tm_hour = atoi(xx);
 	ttime += 2;
 
-/* get the minutes
+	/* get the minutes
  */
-	memcpy(xx, ttime, 2);	/* minutes */
+	memcpy(xx, ttime, 2); /* minutes */
 	etime.tm_min = atoi(xx);
 	ttime += 2;
 
@@ -179,21 +179,21 @@ time_t _gnutls_utcTime2gtime(const char *ttime)
 
 	if (len < 10) {
 		gnutls_assert();
-		return (time_t) - 1;
+		return (time_t)-1;
 	}
 #ifdef STRICT_DER_TIME
 	/* Make sure everything else is digits. */
 	for (i = 0; i < len - 1; i++) {
 		if (c_isdigit(ttime[i]))
 			continue;
-		return gnutls_assert_val((time_t) - 1);
+		return gnutls_assert_val((time_t)-1);
 	}
 #endif
 	xx[2] = 0;
 
-/* get the year
+	/* get the year
  */
-	memcpy(xx, ttime, 2);	/* year */
+	memcpy(xx, ttime, 2); /* year */
 	year = atoi(xx);
 	ttime += 2;
 
@@ -216,25 +216,25 @@ time_t _gnutls_x509_generalTime2gtime(const char *ttime)
 
 	if (strlen(ttime) < 12) {
 		gnutls_assert();
-		return (time_t) - 1;
+		return (time_t)-1;
 	}
 
 	if (strchr(ttime, 'Z') == 0) {
 		gnutls_assert();
 		/* required to be in GMT */
-		return (time_t) - 1;
+		return (time_t)-1;
 	}
 
 	if (strchr(ttime, '.') != 0) {
 		gnutls_assert();
 		/* no fractional seconds allowed */
-		return (time_t) - 1;
+		return (time_t)-1;
 	}
 	xx[4] = 0;
 
-/* get the year
+	/* get the year
  */
-	memcpy(xx, ttime, 4);	/* year */
+	memcpy(xx, ttime, 4); /* year */
 	year = atoi(xx);
 	ttime += 4;
 
@@ -244,18 +244,17 @@ time_t _gnutls_x509_generalTime2gtime(const char *ttime)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-y2k"
 /* tag will contain ASN1_TAG_UTCTime or ASN1_TAG_GENERALIZEDTime */
-static int
-gtime_to_suitable_time(time_t gtime, char *str_time, size_t str_time_size,
-		       unsigned *tag)
+static int gtime_to_suitable_time(time_t gtime, char *str_time,
+				  size_t str_time_size, unsigned *tag)
 {
 	size_t ret;
 	struct tm _tm;
 
-	if (gtime == (time_t) - 1
+	if (gtime == (time_t)-1
 #if SIZEOF_LONG == 8
 	    || gtime >= 253402210800
 #endif
-	    ) {
+	) {
 		if (tag)
 			*tag = ASN1_TAG_GENERALIZEDTime;
 		snprintf(str_time, str_time_size, "99991231235959Z");
@@ -287,17 +286,17 @@ gtime_to_suitable_time(time_t gtime, char *str_time, size_t str_time_size,
 
 #pragma GCC diagnostic pop
 
-static int
-gtime_to_generalTime(time_t gtime, char *str_time, size_t str_time_size)
+static int gtime_to_generalTime(time_t gtime, char *str_time,
+				size_t str_time_size)
 {
 	size_t ret;
 	struct tm _tm;
 
-	if (gtime == (time_t) - 1
+	if (gtime == (time_t)-1
 #if SIZEOF_LONG == 8
 	    || gtime >= 253402210800
 #endif
-	    ) {
+	) {
 		snprintf(str_time, str_time_size, "99991231235959Z");
 		return 0;
 	}
@@ -324,14 +323,14 @@ time_t _gnutls_x509_get_time(asn1_node c2, const char *where, int force_general)
 {
 	char ttime[MAX_TIME];
 	char name[128];
-	time_t c_time = (time_t) - 1;
+	time_t c_time = (time_t)-1;
 	int len, result;
 
 	len = sizeof(ttime) - 1;
 	result = asn1_read_value(c2, where, ttime, &len);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
-		return (time_t) (-1);
+		return (time_t)(-1);
 	}
 
 	if (force_general != 0) {
@@ -351,7 +350,7 @@ time_t _gnutls_x509_get_time(asn1_node c2, const char *where, int force_general)
 			result = asn1_read_value(c2, name, ttime, &len);
 			if (result == ASN1_SUCCESS)
 				c_time = _gnutls_x509_generalTime2gtime(ttime);
-		} else {	/* UTCTIME */
+		} else { /* UTCTIME */
 			if (name[0] == 0)
 				_gnutls_str_cpy(name, sizeof(name), "utcTime");
 			else
@@ -367,7 +366,7 @@ time_t _gnutls_x509_get_time(asn1_node c2, const char *where, int force_general)
 		 */
 		if (result != ASN1_SUCCESS) {
 			gnutls_assert();
-			return (time_t) (-1);
+			return (time_t)(-1);
 		}
 	}
 
@@ -377,9 +376,8 @@ time_t _gnutls_x509_get_time(asn1_node c2, const char *where, int force_general)
 /* Sets the time in time_t in the asn1_node given. Where should
  * be something like "tbsCertList.thisUpdate".
  */
-int
-_gnutls_x509_set_time(asn1_node c2, const char *where, time_t tim,
-		      int force_general)
+int _gnutls_x509_set_time(asn1_node c2, const char *where, time_t tim,
+			  int force_general)
 {
 	char str_time[MAX_TIME];
 	char name[128];
@@ -412,8 +410,8 @@ _gnutls_x509_set_time(asn1_node c2, const char *where, time_t tim,
 		}
 		_gnutls_str_cat(name, sizeof(name), ".utcTime");
 	} else {
-		if ((result =
-		     asn1_write_value(c2, where, "generalTime", 1)) < 0) {
+		if ((result = asn1_write_value(c2, where, "generalTime", 1)) <
+		    0) {
 			gnutls_assert();
 			return _gnutls_asn2err(result);
 		}

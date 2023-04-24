@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -36,17 +36,17 @@ int main(void)
 
 #else
 
-# include <sys/types.h>
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
-# include <unistd.h>
-# include <gnutls/gnutls.h>
-# include <gnutls/dtls.h>
-# include <signal.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <gnutls/gnutls.h>
+#include <gnutls/dtls.h>
+#include <signal.h>
 
-# include "utils.h"
+#include "utils.h"
 
 /* This program tests whether a DTLS handshake would timeout
  * in the expected time.
@@ -135,9 +135,10 @@ static void client(int fd, unsigned timeout)
 	gnutls_dtls_set_timeouts(session, 1 * 1000, timeout * 1000);
 
 	/* Use default priorities */
-	gnutls_priority_set_direct(session,
-				   "NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL",
-				   NULL);
+	gnutls_priority_set_direct(
+		session,
+		"NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL",
+		NULL);
 
 	/* put the anonymous credentials to the current session
 	 */
@@ -151,9 +152,8 @@ static void client(int fd, unsigned timeout)
 	 */
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0
-	       && (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED));
+	} while (ret < 0 &&
+		 (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED));
 
 	gnutls_deinit(session);
 	gnutls_anon_free_client_credentials(anoncred);
@@ -198,9 +198,10 @@ static void server(int fd, int packet, unsigned timeout)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_priority_set_direct(session,
-				   "NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL",
-				   NULL);
+	gnutls_priority_set_direct(
+		session,
+		"NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL",
+		NULL);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
 
@@ -212,9 +213,8 @@ static void server(int fd, int packet, unsigned timeout)
 
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0
-	       && (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED));
+	} while (ret < 0 &&
+		 (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED));
 
 	gnutls_deinit(session);
 	gnutls_anon_free_server_credentials(anoncred);
@@ -291,7 +291,8 @@ static void ch_handler(int sig)
 void doit(void)
 {
 	time_t tstart, tstop;
-	int tries = 5;		/* we try multiple times because in very busy systems the suite may fail to finish on time */
+	int tries =
+		5; /* we try multiple times because in very busy systems the suite may fail to finish on time */
 
 	signal(SIGCHLD, ch_handler);
 	signal(SIGPIPE, SIG_IGN);
@@ -335,4 +336,4 @@ void doit(void)
 	}
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

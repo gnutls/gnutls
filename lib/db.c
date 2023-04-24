@@ -48,9 +48,8 @@
  * The first argument to @retr_func will be null unless
  * gnutls_db_set_ptr() has been called.
  **/
-void
-gnutls_db_set_retrieve_function(gnutls_session_t session,
-				gnutls_db_retr_func retr_func)
+void gnutls_db_set_retrieve_function(gnutls_session_t session,
+				     gnutls_db_retr_func retr_func)
 {
 	session->internals.db_retrieve_func = retr_func;
 }
@@ -66,9 +65,8 @@ gnutls_db_set_retrieve_function(gnutls_session_t session,
  * The first argument to @rem_func will be null unless
  * gnutls_db_set_ptr() has been called.
  **/
-void
-gnutls_db_set_remove_function(gnutls_session_t session,
-			      gnutls_db_remove_func rem_func)
+void gnutls_db_set_remove_function(gnutls_session_t session,
+				   gnutls_db_remove_func rem_func)
 {
 	session->internals.db_remove_func = rem_func;
 }
@@ -84,9 +82,8 @@ gnutls_db_set_remove_function(gnutls_session_t session,
  * The first argument to @store_func will be null unless
  * gnutls_db_set_ptr() has been called.
  **/
-void
-gnutls_db_set_store_function(gnutls_session_t session,
-			     gnutls_db_store_func store_func)
+void gnutls_db_set_store_function(gnutls_session_t session,
+				  gnutls_db_store_func store_func)
 {
 	session->internals.db_store_func = store_func;
 }
@@ -159,8 +156,8 @@ unsigned gnutls_db_get_default_cache_expiration(void)
  *
  * Deprecated: This function is deprecated.
  **/
-int
-gnutls_db_check_entry(gnutls_session_t session, gnutls_datum_t session_entry)
+int gnutls_db_check_entry(gnutls_session_t session,
+			  gnutls_datum_t session_entry)
 {
 	return 0;
 }
@@ -174,7 +171,7 @@ gnutls_db_check_entry(gnutls_session_t session, gnutls_datum_t session_entry)
  *
  * Returns: The time this entry was created, or zero on error.
  **/
-time_t gnutls_db_check_entry_time(gnutls_datum_t * entry)
+time_t gnutls_db_check_entry_time(gnutls_datum_t *entry)
 {
 	uint32_t t;
 	uint32_t magic;
@@ -203,7 +200,7 @@ time_t gnutls_db_check_entry_time(gnutls_datum_t * entry)
  *
  * Since: 3.6.5
  **/
-time_t gnutls_db_check_entry_expire_time(gnutls_datum_t * entry)
+time_t gnutls_db_check_entry_expire_time(gnutls_datum_t *entry)
 {
 	uint32_t t;
 	uint32_t e;
@@ -240,9 +237,8 @@ static int db_func_is_ok(gnutls_session_t session)
 
 /* Stores session data to the db backend.
  */
-static int
-store_session(gnutls_session_t session,
-	      gnutls_datum_t session_id, gnutls_datum_t session_data)
+static int store_session(gnutls_session_t session, gnutls_datum_t session_id,
+			 gnutls_datum_t session_data)
 {
 	int ret = 0;
 
@@ -299,19 +295,18 @@ int _gnutls_check_resumed_params(gnutls_session_t session)
 	const version_entry_st *vers;
 
 	/* check whether the session is expired */
-	if (timestamp -
+	if (timestamp - session->internals.resumed_security_parameters.timestamp >
+		    session->internals.expire_time ||
 	    session->internals.resumed_security_parameters.timestamp >
-	    session->internals.expire_time
-	    || session->internals.resumed_security_parameters.timestamp >
-	    timestamp)
+		    timestamp)
 		return gnutls_assert_val(GNUTLS_E_EXPIRED);
 
 	/* check various parameters applicable to resumption in TLS1.2 or earlier
 	 */
 	vers = get_version(session);
 	if (!vers || !vers->tls13_sem) {
-		if (session->internals.
-		    resumed_security_parameters.ext_master_secret !=
+		if (session->internals.resumed_security_parameters
+			    .ext_master_secret !=
 		    session->security_parameters.ext_master_secret)
 			return gnutls_assert_val(GNUTLS_E_INVALID_SESSION);
 
@@ -322,9 +317,8 @@ int _gnutls_check_resumed_params(gnutls_session_t session)
 	return 0;
 }
 
-int
-_gnutls_server_restore_session(gnutls_session_t session,
-			       uint8_t * session_id, int session_id_size)
+int _gnutls_server_restore_session(gnutls_session_t session,
+				   uint8_t *session_id, int session_id_size)
 {
 	gnutls_datum_t data;
 	gnutls_datum_t key;
@@ -335,14 +329,15 @@ _gnutls_server_restore_session(gnutls_session_t session,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	if (session->internals.premaster_set != 0) {	/* hack for CISCO's DTLS-0.9 */
+	if (session->internals.premaster_set !=
+	    0) { /* hack for CISCO's DTLS-0.9 */
 		if (session_id_size ==
-		    session->internals.resumed_security_parameters.
-		    session_id_size
-		    && memcmp(session_id,
-			      session->internals.
-			      resumed_security_parameters.session_id,
-			      session_id_size) == 0)
+			    session->internals.resumed_security_parameters
+				    .session_id_size &&
+		    memcmp(session_id,
+			   session->internals.resumed_security_parameters
+				   .session_id,
+			   session_id_size) == 0)
 			return 0;
 	}
 
@@ -354,8 +349,8 @@ _gnutls_server_restore_session(gnutls_session_t session,
 		return GNUTLS_E_INVALID_SESSION;
 	}
 
-	data =
-	    session->internals.db_retrieve_func(session->internals.db_ptr, key);
+	data = session->internals.db_retrieve_func(session->internals.db_ptr,
+						   key);
 
 	if (data.data == NULL) {
 		gnutls_assert();
@@ -400,12 +395,12 @@ void gnutls_db_remove_session(gnutls_session_t session)
 
 	if (session->internals.db_remove_func == NULL) {
 		gnutls_assert();
-		return /* GNUTLS_E_DB_ERROR */ ;
+		return /* GNUTLS_E_DB_ERROR */;
 	}
 
 	if (session_id.data == NULL || session_id.size == 0) {
 		gnutls_assert();
-		return /* GNUTLS_E_INVALID_SESSION */ ;
+		return /* GNUTLS_E_INVALID_SESSION */;
 	}
 
 	/* if we can't read why bother writing? */

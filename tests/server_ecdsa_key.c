@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -28,10 +28,10 @@
 #include <string.h>
 #include <sys/types.h>
 #if !defined(_WIN32)
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
 #endif
 #include <unistd.h>
 #include <assert.h>
@@ -67,26 +67,22 @@ void doit(void)
 
 	assert(gnutls_certificate_allocate_credentials(&cli_cred) >= 0);
 
-	ret =
-	    gnutls_certificate_set_x509_trust_mem(cli_cred, &ca3_cert,
-						  GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_trust_mem(cli_cred, &ca3_cert,
+						    GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		fail("set_x509_trust_file failed: %s\n", gnutls_strerror(ret));
 
 	/* test gnutls_certificate_flags() */
 	gnutls_certificate_allocate_credentials(&serv_cred);
 
-	ret =
-	    gnutls_certificate_set_x509_trust_mem(serv_cred, &ca3_cert,
-						  GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_trust_mem(serv_cred, &ca3_cert,
+						    GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		fail("set_x509_trust_file failed: %s\n", gnutls_strerror(ret));
 
-	ret =
-	    gnutls_certificate_set_x509_key_mem(serv_cred,
-						&server_ca3_localhost_ecc_cert,
-						&server_ca3_ecc_key,
-						GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_key_mem(
+		serv_cred, &server_ca3_localhost_ecc_cert, &server_ca3_ecc_key,
+		GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
 		fail("error in error code\n");
 		exit(1);
@@ -95,9 +91,10 @@ void doit(void)
 	test_cli_serv_expect(serv_cred, cli_cred, "NORMAL",
 			     "NORMAL:-VERS-TLS1.1:+VERS-TLS1.2:-SIGN-ALL", NULL,
 			     0, 0);
-	test_cli_serv_expect(serv_cred, cli_cred, "NORMAL",
-			     "NORMAL:-SIGN-ECDSA-SHA224:-SIGN-ECDSA-SHA1:-SIGN-ECDSA-SHA256:-SIGN-ECDSA-SHA384:-SIGN-ECDSA-SHA512:-SIGN-ECDSA-SECP256R1-SHA256:-SIGN-ECDSA-SECP384R1-SHA384:-SIGN-ECDSA-SECP521R1-SHA512",
-			     NULL, GNUTLS_E_NO_CIPHER_SUITES, GNUTLS_E_AGAIN);
+	test_cli_serv_expect(
+		serv_cred, cli_cred, "NORMAL",
+		"NORMAL:-SIGN-ECDSA-SHA224:-SIGN-ECDSA-SHA1:-SIGN-ECDSA-SHA256:-SIGN-ECDSA-SHA384:-SIGN-ECDSA-SHA512:-SIGN-ECDSA-SECP256R1-SHA256:-SIGN-ECDSA-SECP384R1-SHA384:-SIGN-ECDSA-SECP521R1-SHA512",
+		NULL, GNUTLS_E_NO_CIPHER_SUITES, GNUTLS_E_AGAIN);
 
 	gnutls_certificate_free_credentials(serv_cred);
 	gnutls_certificate_free_credentials(cli_cred);

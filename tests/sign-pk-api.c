@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -32,10 +32,11 @@
 
 #include "utils.h"
 
-#define ALGO_MATCHES(sig, pk, val) \
-	ret = gnutls_sign_supports_pk_algorithm(sig, pk); \
-	if (ret != val) { \
-		fail("error testing %s with %s\n", gnutls_sign_get_name(sig), gnutls_pk_get_name(pk)); \
+#define ALGO_MATCHES(sig, pk, val)                                            \
+	ret = gnutls_sign_supports_pk_algorithm(sig, pk);                     \
+	if (ret != val) {                                                     \
+		fail("error testing %s with %s\n", gnutls_sign_get_name(sig), \
+		     gnutls_pk_get_name(pk));                                 \
 	}
 
 void doit(void)
@@ -63,5 +64,4 @@ void doit(void)
 	ALGO_MATCHES(GNUTLS_SIGN_RSA_SHA256, GNUTLS_PK_RSA_PSS, 0);
 	ALGO_MATCHES(GNUTLS_SIGN_RSA_SHA384, GNUTLS_PK_RSA_PSS, 0);
 	ALGO_MATCHES(GNUTLS_SIGN_RSA_SHA512, GNUTLS_PK_RSA_PSS, 0);
-
 }

@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -40,18 +40,18 @@ int main(int argc, char **argv)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <sys/socket.h>
-# if !defined(_WIN32)
-#  include <sys/wait.h>
-# endif
-# include <unistd.h>
-# include <assert.h>
-# include <gnutls/gnutls.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#if !defined(_WIN32)
+#include <sys/wait.h>
+#endif
+#include <unistd.h>
+#include <assert.h>
+#include <gnutls/gnutls.h>
 
-# include "utils.h"
-# include "cert-common.h"
+#include "utils.h"
+#include "cert-common.h"
 
 pid_t child;
 
@@ -111,8 +111,8 @@ static void server(int sd)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	assert(gnutls_priority_set_direct
-	       (session, "NORMAL:-VERS-ALL:+VERS-TLS1.2", NULL) >= 0);
+	assert(gnutls_priority_set_direct(
+		       session, "NORMAL:-VERS-ALL:+VERS-TLS1.2", NULL) >= 0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
@@ -123,11 +123,12 @@ static void server(int sd)
 		loops++;
 		if (loops > 64)
 			fail("Too many loops in the handshake!\n");
-	} while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN
-		 || ret == GNUTLS_E_WARNING_ALERT_RECEIVED);
+	} while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN ||
+		 ret == GNUTLS_E_WARNING_ALERT_RECEIVED);
 
 	if (ret != GNUTLS_E_UNEXPECTED_PACKET) {
-		fail("server: Handshake didn't fail with expected code (failed with %d)\n", ret);
+		fail("server: Handshake didn't fail with expected code (failed with %d)\n",
+		     ret);
 	}
 
 	close(sd);
@@ -174,4 +175,4 @@ void doit(void)
 	}
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

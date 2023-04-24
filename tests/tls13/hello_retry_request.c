@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,29 +35,28 @@ int main(void)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
-# include <unistd.h>
-# include <gnutls/gnutls.h>
-# include <gnutls/dtls.h>
-# include <assert.h>
-# include <signal.h>
+#include <string.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <gnutls/gnutls.h>
+#include <gnutls/dtls.h>
+#include <assert.h>
+#include <signal.h>
 
-# include "cert-common.h"
-# include "utils.h"
-# include "tls13/ext-parse.h"
+#include "cert-common.h"
+#include "utils.h"
+#include "tls13/ext-parse.h"
 
 /* This program tests whether the version in Hello Retry Request message
  * is the expected */
 
 const char *testname = "";
 
-# define myfail(fmt, ...) \
-	fail("%s: "fmt, testname, ##__VA_ARGS__)
+#define myfail(fmt, ...) fail("%s: " fmt, testname, ##__VA_ARGS__)
 
 static void server_log_func(int level, const char *str)
 {
@@ -69,7 +68,7 @@ static void client_log_func(int level, const char *str)
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
 
-# define HANDSHAKE_SESSION_ID_POS 34
+#define HANDSHAKE_SESSION_ID_POS 34
 
 struct ctx_st {
 	unsigned hrr_seen;
@@ -80,7 +79,7 @@ struct ctx_st {
 
 static int hello_callback(gnutls_session_t session, unsigned int htype,
 			  unsigned post, unsigned int incoming,
-			  const gnutls_datum_t * msg)
+			  const gnutls_datum_t *msg)
 {
 	struct ctx_st *ctx = gnutls_session_get_ptr(session);
 	assert(ctx != NULL);
@@ -88,7 +87,8 @@ static int hello_callback(gnutls_session_t session, unsigned int htype,
 	if (htype == GNUTLS_HANDSHAKE_HELLO_RETRY_REQUEST)
 		ctx->hrr_seen = 1;
 
-	if (htype == GNUTLS_HANDSHAKE_CLIENT_HELLO && post == GNUTLS_HOOK_POST) {
+	if (htype == GNUTLS_HANDSHAKE_CLIENT_HELLO &&
+	    post == GNUTLS_HOOK_POST) {
 		size_t session_id_len;
 		uint8_t *session_id;
 
@@ -141,10 +141,10 @@ static void client(int fd)
 	gnutls_handshake_set_timeout(session, get_timeout());
 	gnutls_session_set_ptr(session, &ctx);
 
-	ret =
-	    gnutls_priority_set_direct(session,
-				       "NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-SECP256R1:+GROUP-X25519",
-				       NULL);
+	ret = gnutls_priority_set_direct(
+		session,
+		"NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-SECP256R1:+GROUP-X25519",
+		NULL);
 	if (ret < 0)
 		myfail("cannot set TLS 1.3 priorities\n");
 
@@ -157,8 +157,7 @@ static void client(int fd)
 
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	assert(ctx.hrr_seen != 0);
 
@@ -190,10 +189,10 @@ static void server(int fd)
 	gnutls_handshake_set_timeout(session, get_timeout());
 
 	/* server only supports x25519, client advertises secp256r1 */
-	assert(gnutls_priority_set_direct
-	       (session,
-		"NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-X25519",
-		NULL) >= 0);
+	assert(gnutls_priority_set_direct(
+		       session,
+		       "NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-X25519",
+		       NULL) >= 0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
@@ -201,7 +200,7 @@ static void server(int fd)
 
 	do {
 		ret = gnutls_handshake(session);
-		if (ret == GNUTLS_E_INTERRUPTED) {	/* expected */
+		if (ret == GNUTLS_E_INTERRUPTED) { /* expected */
 			break;
 		}
 	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
@@ -261,4 +260,4 @@ void doit(void)
 	}
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

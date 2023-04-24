@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,20 +35,20 @@ int main(void)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
-# include <unistd.h>
-# include <gnutls/gnutls.h>
-# include <gnutls/dtls.h>
-# include <signal.h>
-# include <assert.h>
+#include <string.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <gnutls/gnutls.h>
+#include <gnutls/dtls.h>
+#include <signal.h>
+#include <assert.h>
 
-# include "cert-common.h"
-# include "utils.h"
+#include "cert-common.h"
+#include "utils.h"
 
 /* This program is a reproducer for issue #543; the timeout
  * of DTLS handshake when a NewSessionTicket is lost.
@@ -64,7 +64,7 @@ static void client_log_func(int level, const char *str)
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
 
-# define MAX_BUF 1024
+#define MAX_BUF 1024
 
 static void client(int fd, const char *prio)
 {
@@ -89,8 +89,7 @@ static void client(int fd, const char *prio)
 
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret < 0) {
 		fail("client: Handshake failed: %s\n", gnutls_strerror(ret));
@@ -112,8 +111,8 @@ static void client(int fd, const char *prio)
 	gnutls_certificate_free_credentials(x509_cred);
 }
 
-static ssize_t
-server_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
+static ssize_t server_push(gnutls_transport_ptr_t tr, const void *data,
+			   size_t len)
 {
 	const uint8_t *d = data;
 	static int dropped = 0;
@@ -184,7 +183,7 @@ static void server(int fd, const char *prio)
 	if (ret != 0)
 		fail("error waiting for EOF: %s\n", gnutls_strerror(ret));
 
- end:
+end:
 	close(fd);
 	gnutls_deinit(session);
 	gnutls_free(skey.data);
@@ -200,8 +199,7 @@ static void ch_handler(int sig)
 	return;
 }
 
-static
-void start(const char *prio)
+static void start(const char *prio)
 {
 	int fd[2];
 	int ret, status = 0;
@@ -244,4 +242,4 @@ void doit(void)
 	start("NORMAL:-VERS-ALL:+VERS-DTLS1.2");
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

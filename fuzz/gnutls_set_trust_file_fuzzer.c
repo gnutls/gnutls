@@ -26,14 +26,15 @@
 static const uint8_t *g_data;
 static size_t g_size;
 
-#if ! defined _WIN32 && defined HAVE_FMEMOPEN
-# include <stdio.h>
-# include <string.h>
-# include <dlfcn.h>
+#if !defined _WIN32 && defined HAVE_FMEMOPEN
+#include <stdio.h>
+#include <string.h>
+#include <dlfcn.h>
 FILE *fopen(const char *pathname, const char *mode)
 {
 	FILE *(*libc_fopen)(const char *, const char *) =
-	    (FILE *(*)(const char *, const char *))dlsym(RTLD_NEXT, "fopen");
+		(FILE * (*)(const char *, const char *))
+			dlsym(RTLD_NEXT, "fopen");
 
 	if (!strcmp(pathname, "ca_or_crl"))
 		return fmemopen((void *)g_data, g_size, mode);
@@ -42,7 +43,7 @@ FILE *fopen(const char *pathname, const char *mode)
 }
 #endif
 
-int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
 	g_data = data;
 	g_size = size;

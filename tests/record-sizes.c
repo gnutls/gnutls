@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -77,9 +77,10 @@ void doit(void)
 	gnutls_dh_params_import_pkcs3(dh_params, &p3, GNUTLS_X509_FMT_PEM);
 	gnutls_anon_set_server_dh_params(s_anoncred, dh_params);
 	gnutls_init(&server, GNUTLS_SERVER);
-	gnutls_priority_set_direct(server,
-				   "NONE:+VERS-TLS1.2:+ARCFOUR-128:+MD5:+MAC-ALL:+SIGN-ALL:+COMP-NULL:+ANON-DH",
-				   NULL);
+	gnutls_priority_set_direct(
+		server,
+		"NONE:+VERS-TLS1.2:+ARCFOUR-128:+MD5:+MAC-ALL:+SIGN-ALL:+COMP-NULL:+ANON-DH",
+		NULL);
 	gnutls_credentials_set(server, GNUTLS_CRD_ANON, s_anoncred);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
@@ -88,9 +89,10 @@ void doit(void)
 	/* Init client */
 	gnutls_anon_allocate_client_credentials(&c_anoncred);
 	gnutls_init(&client, GNUTLS_CLIENT);
-	gnutls_priority_set_direct(client,
-				   "NONE:+VERS-TLS1.2:+CIPHER-ALL:+ARCFOUR-128:+MD5:+MAC-ALL:+SIGN-ALL:+COMP-NULL:+ANON-DH",
-				   NULL);
+	gnutls_priority_set_direct(
+		client,
+		"NONE:+VERS-TLS1.2:+CIPHER-ALL:+ARCFOUR-128:+MD5:+MAC-ALL:+SIGN-ALL:+COMP-NULL:+ANON-DH",
+		NULL);
 	gnutls_credentials_set(client, GNUTLS_CRD_ANON, c_anoncred);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
@@ -107,8 +109,8 @@ void doit(void)
 	/* try the maximum allowed */
 	ret = gnutls_record_send(client, b1, MAX_BUF);
 	if (ret < 0) {
-		fprintf(stderr, "Error sending %d bytes: %s\n",
-			(int)MAX_BUF, gnutls_strerror(ret));
+		fprintf(stderr, "Error sending %d bytes: %s\n", (int)MAX_BUF,
+			gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -119,8 +121,8 @@ void doit(void)
 
 	ret = gnutls_record_recv(server, buffer, MAX_BUF);
 	if (ret < 0) {
-		fprintf(stderr, "Error receiving %d bytes: %s\n",
-			(int)MAX_BUF, gnutls_strerror(ret));
+		fprintf(stderr, "Error receiving %d bytes: %s\n", (int)MAX_BUF,
+			gnutls_strerror(ret));
 		exit(1);
 	}
 

@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -28,9 +28,9 @@
 #include <string.h>
 #include <sys/types.h>
 #ifndef _WIN32
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
 #endif
 #include <unistd.h>
 #include <gnutls/gnutls.h>
@@ -49,22 +49,19 @@ static void tls_log_func(int level, const char *str)
 
 /* sha1 hash of "hello" string */
 const gnutls_datum_t raw_data = {
-	(void *)
-	    "\xaa\xf4\xc6\x1d\xdc\xc5\xe8\xa2\xda\xbe"
-	    "\xde\x0f\x3b\x48\x2c\xd9\xae\xa9\x43\x4d",
+	(void *)"\xaa\xf4\xc6\x1d\xdc\xc5\xe8\xa2\xda\xbe"
+		"\xde\x0f\x3b\x48\x2c\xd9\xae\xa9\x43\x4d",
 	20
 };
 
 const gnutls_datum_t invalid_raw_data = {
-	(void *)
-	    "\xaa\xf4\xc6\x1d\xdc\xc5\xe8\xa2\xda\xbe"
-	    "\xde\x0f\x3b\x48\x3c\xd9\xae\xa9\x43\x4d",
+	(void *)"\xaa\xf4\xc6\x1d\xdc\xc5\xe8\xa2\xda\xbe"
+		"\xde\x0f\x3b\x48\x3c\xd9\xae\xa9\x43\x4d",
 	20
 };
 
 #define tests common_key_tests
-#define testfail(fmt, ...) \
-	fail("%s: "fmt, tests[i].name, ##__VA_ARGS__)
+#define testfail(fmt, ...) fail("%s: " fmt, tests[i].name, ##__VA_ARGS__)
 
 void doit(void)
 {
@@ -97,17 +94,14 @@ void doit(void)
 		if (ret < 0)
 			testfail("gnutls_pubkey_init\n");
 
-		ret =
-		    gnutls_privkey_import_x509_raw(privkey, &tests[i].key,
-						   GNUTLS_X509_FMT_PEM, NULL,
-						   0);
+		ret = gnutls_privkey_import_x509_raw(
+			privkey, &tests[i].key, GNUTLS_X509_FMT_PEM, NULL, 0);
 		if (ret < 0)
 			testfail("gnutls_privkey_import_x509\n");
 
-		ret =
-		    gnutls_privkey_sign_data(privkey, tests[i].digest,
-					     tests[i].sign_flags, &raw_data,
-					     &signature);
+		ret = gnutls_privkey_sign_data(privkey, tests[i].digest,
+					       tests[i].sign_flags, &raw_data,
+					       &signature);
 		if (ret < 0)
 			testfail("gnutls_x509_privkey_sign_hash\n");
 
@@ -115,9 +109,8 @@ void doit(void)
 		if (ret < 0)
 			testfail("gnutls_x509_crt_init\n");
 
-		ret =
-		    gnutls_x509_crt_import(crt, &tests[i].cert,
-					   GNUTLS_X509_FMT_PEM);
+		ret = gnutls_x509_crt_import(crt, &tests[i].cert,
+					     GNUTLS_X509_FMT_PEM);
 		if (ret < 0)
 			testfail("gnutls_x509_crt_import\n");
 
@@ -125,37 +118,33 @@ void doit(void)
 		if (ret < 0)
 			testfail("gnutls_x509_pubkey_import\n");
 
-		ret =
-		    gnutls_pubkey_verify_data2(pubkey, tests[i].sigalgo, 0,
-					       &raw_data, &signature);
+		ret = gnutls_pubkey_verify_data2(pubkey, tests[i].sigalgo, 0,
+						 &raw_data, &signature);
 		if (ret < 0)
 			testfail("gnutls_x509_pubkey_verify_data2\n");
 
 		/* should fail */
-		ret =
-		    gnutls_pubkey_verify_data2(pubkey, tests[i].sigalgo, 0,
-					       &invalid_raw_data, &signature);
+		ret = gnutls_pubkey_verify_data2(pubkey, tests[i].sigalgo, 0,
+						 &invalid_raw_data, &signature);
 		if (ret != GNUTLS_E_PK_SIG_VERIFY_FAILED)
-			testfail
-			    ("gnutls_x509_pubkey_verify_data2-2 (hashed data)\n");
+			testfail(
+				"gnutls_x509_pubkey_verify_data2-2 (hashed data)\n");
 
-		sign_algo =
-		    gnutls_pk_to_sign(gnutls_pubkey_get_pk_algorithm
-				      (pubkey, NULL), tests[i].digest);
-		ret =
-		    gnutls_pubkey_verify_data2(pubkey, sign_algo, 0,
-					       &raw_data, &signature);
+		sign_algo = gnutls_pk_to_sign(
+			gnutls_pubkey_get_pk_algorithm(pubkey, NULL),
+			tests[i].digest);
+		ret = gnutls_pubkey_verify_data2(pubkey, sign_algo, 0,
+						 &raw_data, &signature);
 		if (ret < 0)
-			testfail
-			    ("gnutls_x509_pubkey_verify_data2-1 (hashed data)\n");
+			testfail(
+				"gnutls_x509_pubkey_verify_data2-1 (hashed data)\n");
 
 		/* should fail */
-		ret =
-		    gnutls_pubkey_verify_data2(pubkey, sign_algo, 0,
-					       &invalid_raw_data, &signature);
+		ret = gnutls_pubkey_verify_data2(pubkey, sign_algo, 0,
+						 &invalid_raw_data, &signature);
 		if (ret != GNUTLS_E_PK_SIG_VERIFY_FAILED)
-			testfail
-			    ("gnutls_x509_pubkey_verify_data2-2 (hashed data)\n");
+			testfail(
+				"gnutls_x509_pubkey_verify_data2-2 (hashed data)\n");
 
 		/* test the raw interface */
 		gnutls_free(signature.data);

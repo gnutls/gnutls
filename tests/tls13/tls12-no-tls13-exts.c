@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,20 +35,20 @@ int main(void)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
-# include <unistd.h>
-# include <gnutls/gnutls.h>
-# include <gnutls/dtls.h>
-# include <signal.h>
+#include <string.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <gnutls/gnutls.h>
+#include <gnutls/dtls.h>
+#include <signal.h>
 
-# include "cert-common.h"
-# include "tls13/ext-parse.h"
-# include "utils.h"
+#include "cert-common.h"
+#include "tls13/ext-parse.h"
+#include "utils.h"
 
 /* This program checks whether any TLS 1.3 extensions are
  * present when TLS 1.2 is the only protocol supported by
@@ -88,10 +88,8 @@ static void client(int fd)
 
 	gnutls_handshake_set_timeout(session, get_timeout());
 
-	ret =
-	    gnutls_priority_set_direct(session,
-				       "NORMAL:-VERS-ALL:+VERS-TLS1.2:+VERS-TLS1.0",
-				       NULL);
+	ret = gnutls_priority_set_direct(
+		session, "NORMAL:-VERS-ALL:+VERS-TLS1.2:+VERS-TLS1.0", NULL);
 	if (ret < 0)
 		fail("cannot set TLS 1.2 priorities\n");
 
@@ -105,8 +103,7 @@ static void client(int fd)
 	 */
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	close(fd);
 
@@ -121,12 +118,13 @@ static unsigned client_hello_ok = 0;
 
 static int client_hello_callback(gnutls_session_t session, unsigned int htype,
 				 unsigned post, unsigned int incoming,
-				 const gnutls_datum_t * msg)
+				 const gnutls_datum_t *msg)
 {
 	if (htype != GNUTLS_HANDSHAKE_CLIENT_HELLO || post != GNUTLS_HOOK_PRE)
 		return 0;
 
-	if (find_client_extension(msg, TLS_EXT_SUPPORTED_VERSIONS, NULL, NULL)) {
+	if (find_client_extension(msg, TLS_EXT_SUPPORTED_VERSIONS, NULL,
+				  NULL)) {
 		fail("Found TLS 1.3 supported versions extension in TLS 1.2!\n");
 	}
 
@@ -176,7 +174,7 @@ static void server(int fd)
 
 	do {
 		ret = gnutls_handshake(session);
-		if (ret == GNUTLS_E_INTERRUPTED) {	/* expected */
+		if (ret == GNUTLS_E_INTERRUPTED) { /* expected */
 			break;
 		}
 	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
@@ -238,4 +236,4 @@ void doit(void)
 	}
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

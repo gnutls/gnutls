@@ -50,9 +50,8 @@
  *
  * Since: 3.4.2
  **/
-int
-gnutls_pkcs7_add_attr(gnutls_pkcs7_attrs_t * list, const char *oid,
-		      gnutls_datum_t * data, unsigned flags)
+int gnutls_pkcs7_add_attr(gnutls_pkcs7_attrs_t *list, const char *oid,
+			  gnutls_datum_t *data, unsigned flags)
 {
 	int ret;
 	gnutls_pkcs7_attrs_st *r;
@@ -79,14 +78,13 @@ gnutls_pkcs7_add_attr(gnutls_pkcs7_attrs_t * list, const char *oid,
 	*list = r;
 
 	return 0;
- fail:
+fail:
 	if (r) {
 		gnutls_free(r->data.data);
 		gnutls_free(r);
 	}
 	gnutls_pkcs7_attrs_deinit(*list);
 	return GNUTLS_E_MEMORY_ERROR;
-
 }
 
 /**
@@ -107,9 +105,8 @@ gnutls_pkcs7_add_attr(gnutls_pkcs7_attrs_t * list, const char *oid,
  *
  * Since: 3.4.2
  **/
-int
-gnutls_pkcs7_get_attr(gnutls_pkcs7_attrs_t list, unsigned idx, char **oid,
-		      gnutls_datum_t * data, unsigned flags)
+int gnutls_pkcs7_get_attr(gnutls_pkcs7_attrs_t list, unsigned idx, char **oid,
+			  gnutls_datum_t *data, unsigned flags)
 {
 	unsigned i;
 	gnutls_pkcs7_attrs_st *p = list;

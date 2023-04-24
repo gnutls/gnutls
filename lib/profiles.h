@@ -21,16 +21,15 @@
  */
 
 #ifndef GNUTLS_LIB_PROFILES_H
-# define GNUTLS_LIB_PROFILES_H
+#define GNUTLS_LIB_PROFILES_H
 
-# include <gnutls/gnutls.h>
-# include <gnutls/x509.h>
+#include <gnutls/gnutls.h>
+#include <gnutls/x509.h>
 
-gnutls_sec_param_t
-_gnutls_profile_to_sec_level(gnutls_certificate_verification_profiles_t profile)
-__GNUTLS_PURE__;
+gnutls_sec_param_t _gnutls_profile_to_sec_level(
+	gnutls_certificate_verification_profiles_t profile) __GNUTLS_PURE__;
 
 gnutls_certificate_verification_profiles_t
 _gnutls_get_system_wide_verification_profile(void);
 
-#endif				/* GNUTLS_LIB_PROFILES_H */
+#endif /* GNUTLS_LIB_PROFILES_H */

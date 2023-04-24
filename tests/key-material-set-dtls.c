@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -34,18 +34,18 @@ int main(int argc, char **argv)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
-# include <unistd.h>
-# include <signal.h>
-# include <gnutls/gnutls.h>
-# include <gnutls/dtls.h>
+#include <string.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <signal.h>
+#include <gnutls/gnutls.h>
+#include <gnutls/dtls.h>
 
-# include "utils.h"
+#include "utils.h"
 
 static void terminate(void);
 
@@ -104,9 +104,10 @@ static void client(int fd)
 	gnutls_record_set_timeout(session, 10000);
 
 	/* Use default priorities */
-	ret = gnutls_priority_set_direct(session,
-					 "NONE:+VERS-DTLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ANON-DH:+ANON-ECDH:+CURVE-ALL",
-					 &err);
+	ret = gnutls_priority_set_direct(
+		session,
+		"NONE:+VERS-DTLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ANON-DH:+ANON-ECDH:+CURVE-ALL",
+		&err);
 	if (ret < 0) {
 		fail("client: priority set failed (%s): %s\n",
 		     gnutls_strerror(ret), err);
@@ -123,8 +124,7 @@ static void client(int fd)
 	 */
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret < 0) {
 		fail("client: Handshake failed: %s\n", strerror(ret));
@@ -136,8 +136,8 @@ static void client(int fd)
 
 	if (debug)
 		success("client: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	ret = gnutls_cipher_get(session);
 	if (ret != GNUTLS_CIPHER_AES_128_CBC) {
@@ -154,16 +154,16 @@ static void client(int fd)
 	}
 
 	/* save state */
-	ret =
-	    gnutls_record_get_state(session, 0, NULL, NULL, NULL, wseq_number);
+	ret = gnutls_record_get_state(session, 0, NULL, NULL, NULL,
+				      wseq_number);
 	if (ret < 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		gnutls_perror(ret);
 		exit(1);
 	}
 
-	ret =
-	    gnutls_record_get_state(session, 1, NULL, NULL, NULL, rseq_number);
+	ret = gnutls_record_get_state(session, 1, NULL, NULL, NULL,
+				      rseq_number);
 	if (ret < 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		gnutls_perror(ret);
@@ -258,9 +258,8 @@ static void server(int fd)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	ret = gnutls_priority_set_direct(session,
-					 "NORMAL:+VERS-DTLS1.0:+ANON-DH:+ANON-ECDH",
-					 NULL);
+	ret = gnutls_priority_set_direct(
+		session, "NORMAL:+VERS-DTLS1.0:+ANON-DH:+ANON-ECDH", NULL);
 	if (ret < 0) {
 		fail("server: priority set failed (%s)\n\n",
 		     gnutls_strerror(ret));
@@ -273,8 +272,7 @@ static void server(int fd)
 
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 	if (ret < 0) {
 		close(fd);
 		gnutls_deinit(session);
@@ -287,18 +285,18 @@ static void server(int fd)
 
 	if (debug)
 		success("server: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	/* save state */
-	ret =
-	    gnutls_record_get_state(session, 0, NULL, NULL, NULL, wseq_number);
+	ret = gnutls_record_get_state(session, 0, NULL, NULL, NULL,
+				      wseq_number);
 	if (ret < 0) {
 		fail("error in %d\n", __LINE__);
 	}
 
-	ret =
-	    gnutls_record_get_state(session, 1, NULL, NULL, NULL, rseq_number);
+	ret = gnutls_record_get_state(session, 1, NULL, NULL, NULL,
+				      rseq_number);
 	if (ret < 0) {
 		fail("error in %d\n", __LINE__);
 	}
@@ -396,4 +394,4 @@ void doit(void)
 	start();
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

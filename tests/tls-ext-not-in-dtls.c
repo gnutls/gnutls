@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,21 +35,21 @@ int main(void)
 
 #else
 
-# include <stdint.h>
-# include <sys/types.h>
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
-# include <unistd.h>
-# include <gnutls/gnutls.h>
-# include <gnutls/dtls.h>
-# include <signal.h>
-# include <string.h>
-# include <assert.h>
+#include <stdint.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <gnutls/gnutls.h>
+#include <gnutls/dtls.h>
+#include <signal.h>
+#include <string.h>
+#include <assert.h>
 
-# include "utils.h"
-# include "cert-common.h"
+#include "utils.h"
+#include "cert-common.h"
 
 enum {
 	TEST_DEF_HANDHAKE,
@@ -84,8 +84,8 @@ static int ext_recv(gnutls_session_t session, const unsigned char *buf,
 	return 0;
 }
 
-# define TLS_EXT_IMPL_DTLS 0xfeee
-# define TLS_EXT_EXPL_TLS 0xfeea
+#define TLS_EXT_IMPL_DTLS 0xfeee
+#define TLS_EXT_EXPL_TLS 0xfeea
 
 static void client(int fd, int type)
 {
@@ -102,27 +102,30 @@ static void client(int fd, int type)
 	assert(gnutls_init(&session, GNUTLS_CLIENT | GNUTLS_DATAGRAM) >= 0);
 
 	if (type == TEST_CUSTOM_EXT) {
-		assert(gnutls_session_ext_register
-		       (session, "implicit-dtls", TLS_EXT_IMPL_DTLS,
-			GNUTLS_EXT_TLS, ext_recv, ext_send, NULL, NULL, NULL,
-			GNUTLS_EXT_FLAG_CLIENT_HELLO |
-			GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO |
-			GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO) >= 0);
-		assert(gnutls_session_ext_register
-		       (session, "explicit-tls", TLS_EXT_EXPL_TLS,
-			GNUTLS_EXT_TLS, ext_recv, ext_send, NULL, NULL, NULL,
-			GNUTLS_EXT_FLAG_CLIENT_HELLO |
-			GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO |
-			GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO |
-			GNUTLS_EXT_FLAG_TLS) >= 0);
+		assert(gnutls_session_ext_register(
+			       session, "implicit-dtls", TLS_EXT_IMPL_DTLS,
+			       GNUTLS_EXT_TLS, ext_recv, ext_send, NULL, NULL,
+			       NULL,
+			       GNUTLS_EXT_FLAG_CLIENT_HELLO |
+				       GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO |
+				       GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO) >=
+		       0);
+		assert(gnutls_session_ext_register(
+			       session, "explicit-tls", TLS_EXT_EXPL_TLS,
+			       GNUTLS_EXT_TLS, ext_recv, ext_send, NULL, NULL,
+			       NULL,
+			       GNUTLS_EXT_FLAG_CLIENT_HELLO |
+				       GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO |
+				       GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO |
+				       GNUTLS_EXT_FLAG_TLS) >= 0);
 	}
 
 	gnutls_handshake_set_timeout(session, get_timeout());
 
-	assert(gnutls_priority_set_direct
-	       (session,
-		"NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:+VERS-TLS1.0",
-		NULL) >= 0);
+	assert(gnutls_priority_set_direct(
+		       session,
+		       "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:+VERS-TLS1.0",
+		       NULL) >= 0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
@@ -130,8 +133,7 @@ static void client(int fd, int type)
 
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret < 0)
 		fail("handshake: %s\n", gnutls_strerror(ret));
@@ -145,8 +147,8 @@ static void client(int fd, int type)
 	gnutls_global_deinit();
 }
 
-# define TLS_EXT_KEY_SHARE 51
-# define TLS_EXT_POST_HANDSHAKE 49
+#define TLS_EXT_KEY_SHARE 51
+#define TLS_EXT_POST_HANDSHAKE 49
 
 struct ext_ctx_st {
 	int extno;
@@ -164,7 +166,7 @@ static int parse_ext(void *ctx, unsigned tls_id, const unsigned char *data,
 	return 0;
 }
 
-static unsigned find_client_extension(const gnutls_datum_t * msg, int extno)
+static unsigned find_client_extension(const gnutls_datum_t *msg, int extno)
 {
 	int ret;
 	struct ext_ctx_st s;
@@ -172,9 +174,8 @@ static unsigned find_client_extension(const gnutls_datum_t * msg, int extno)
 	memset(&s, 0, sizeof(s));
 	s.extno = extno;
 
-	ret =
-	    gnutls_ext_raw_parse(&s, parse_ext, msg,
-				 GNUTLS_EXT_RAW_FLAG_DTLS_CLIENT_HELLO);
+	ret = gnutls_ext_raw_parse(&s, parse_ext, msg,
+				   GNUTLS_EXT_RAW_FLAG_DTLS_CLIENT_HELLO);
 	assert(ret >= 0);
 
 	if (s.found)
@@ -185,7 +186,7 @@ static unsigned find_client_extension(const gnutls_datum_t * msg, int extno)
 
 static int hellos_callback(gnutls_session_t session, unsigned int htype,
 			   unsigned post, unsigned int incoming,
-			   const gnutls_datum_t * msg)
+			   const gnutls_datum_t *msg)
 {
 	int *type;
 
@@ -226,19 +227,19 @@ static void server(int fd, int type)
 						   &server_key,
 						   GNUTLS_X509_FMT_PEM) >= 0);
 
-	assert(gnutls_init
-	       (&session,
-		GNUTLS_SERVER | GNUTLS_POST_HANDSHAKE_AUTH | GNUTLS_DATAGRAM) >=
-	       0);
+	assert(gnutls_init(&session, GNUTLS_SERVER |
+					     GNUTLS_POST_HANDSHAKE_AUTH |
+					     GNUTLS_DATAGRAM) >= 0);
 
 	gnutls_handshake_set_timeout(session, get_timeout());
 	gnutls_handshake_set_hook_function(session, GNUTLS_HANDSHAKE_ANY,
 					   GNUTLS_HOOK_BOTH, hellos_callback);
 
 	gnutls_session_set_ptr(session, &type);
-	assert(gnutls_priority_set_direct
-	       (session, "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3:+VERS-TLS1.2",
-		NULL) >= 0);
+	assert(gnutls_priority_set_direct(
+		       session,
+		       "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3:+VERS-TLS1.2",
+		       NULL) >= 0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
@@ -267,8 +268,7 @@ static void ch_handler(int sig)
 	return;
 }
 
-static
-void start(const char *name, int type)
+static void start(const char *name, int type)
 {
 	int fd[2];
 	int ret;
@@ -300,7 +300,6 @@ void start(const char *name, int type)
 		client(fd[1], type);
 		exit(0);
 	}
-
 }
 
 void doit(void)
@@ -309,4 +308,4 @@ void doit(void)
 	start("check registered extensions", TEST_CUSTOM_EXT);
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

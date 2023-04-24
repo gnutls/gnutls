@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,19 +35,19 @@ int main(void)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
-# include <unistd.h>
-# include <signal.h>
-# include <assert.h>
-# include <gnutls/gnutls.h>
-# include <gnutls/dtls.h>
+#include <string.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <signal.h>
+#include <assert.h>
+#include <gnutls/gnutls.h>
+#include <gnutls/dtls.h>
 
-# include "utils.h"
+#include "utils.h"
 
 static void server_log_func(int level, const char *str)
 {
@@ -62,7 +62,7 @@ static void client_log_func(int level, const char *str)
 /* A DTLS client handling DTLS 1.2 resumption under AnyConnect protocol which sets premaster secret.
  */
 
-# define MAX_BUF 1024
+#define MAX_BUF 1024
 
 static ssize_t push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 {
@@ -71,8 +71,8 @@ static ssize_t push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 	return send(fd, data, len, 0);
 }
 
-static gnutls_datum_t master = { (void *)
-	    "\x44\x66\x44\xa9\xb6\x29\xed\x6e\xd6\x93\x15\xdb\xf0\x7d\x4b\x2e\x18\xb1\x9d\xed\xff\x6a\x86\x76\xc9\x0e\x16\xab\xc2\x10\xbb\x17\x99\x24\xb1\xd9\xb9\x95\xe7\xea\xea\xea\xea\xea\xff\xaa\xac",
+static gnutls_datum_t master = {
+	(void *)"\x44\x66\x44\xa9\xb6\x29\xed\x6e\xd6\x93\x15\xdb\xf0\x7d\x4b\x2e\x18\xb1\x9d\xed\xff\x6a\x86\x76\xc9\x0e\x16\xab\xc2\x10\xbb\x17\x99\x24\xb1\xd9\xb9\x95\xe7\xea\xea\xea\xea\xea\xff\xaa\xac",
 	48
 };
 static gnutls_datum_t sess_id = { (void *)"\xd9\xb9\x95\xe7\xea", 5 };
@@ -101,9 +101,9 @@ static void client(int fd, const char *prio, int proto, int cipher, int kx,
 
 	assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);
 
-	ret = gnutls_session_set_premaster(session, GNUTLS_CLIENT,
-					   proto, kx, cipher, mac,
-					   GNUTLS_COMP_NULL, &master, &sess_id);
+	ret = gnutls_session_set_premaster(session, GNUTLS_CLIENT, proto, kx,
+					   cipher, mac, GNUTLS_COMP_NULL,
+					   &master, &sess_id);
 	if (ret < 0) {
 		fail("client: gnutls_session_set_premaster failed: %s\n",
 		     gnutls_strerror(ret));
@@ -119,8 +119,7 @@ static void client(int fd, const char *prio, int proto, int cipher, int kx,
 	 */
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret < 0) {
 		fail("client: Handshake failed\n");
@@ -144,8 +143,8 @@ static void client(int fd, const char *prio, int proto, int cipher, int kx,
 
 	if (debug)
 		success("client: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	do {
 		ret = gnutls_record_recv(session, buffer, sizeof(buffer) - 1);
@@ -162,7 +161,7 @@ static void client(int fd, const char *prio, int proto, int cipher, int kx,
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
- end:
+end:
 
 	close(fd);
 
@@ -201,9 +200,9 @@ static void server(int fd, const char *prio, int proto, int cipher, int kx,
 	 */
 	assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);
 
-	ret = gnutls_session_set_premaster(session, GNUTLS_SERVER,
-					   proto, kx, cipher, mac,
-					   GNUTLS_COMP_NULL, &master, &sess_id);
+	ret = gnutls_session_set_premaster(session, GNUTLS_SERVER, proto, kx,
+					   cipher, mac, GNUTLS_COMP_NULL,
+					   &master, &sess_id);
 	if (ret < 0) {
 		fail("server: gnutls_session_set_premaster failed: %s\n",
 		     gnutls_strerror(ret));
@@ -217,8 +216,7 @@ static void server(int fd, const char *prio, int proto, int cipher, int kx,
 
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 	if (ret < 0) {
 		close(fd);
 		gnutls_deinit(session);
@@ -230,8 +228,8 @@ static void server(int fd, const char *prio, int proto, int cipher, int kx,
 
 	if (debug)
 		success("server: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	/* see the Getting peer's information example */
 	/* print_info(session); */
@@ -324,4 +322,4 @@ void doit(void)
 	    GNUTLS_MAC_AEAD, "(DTLS1.2)-(RSA)-(AES-256-GCM)");
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

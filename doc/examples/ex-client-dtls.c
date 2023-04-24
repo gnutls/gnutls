@@ -1,7 +1,7 @@
 /* This example code is placed in the public domain. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -18,12 +18,12 @@
 /* A very basic Datagram TLS client, over UDP with X.509 authentication.
  */
 
-#define CHECK(x) assert((x)>=0)
-#define LOOP_CHECK(rval, cmd) \
-        do { \
-                rval = cmd; \
-        } while(rval == GNUTLS_E_AGAIN || rval == GNUTLS_E_INTERRUPTED); \
-        assert(rval >= 0)
+#define CHECK(x) assert((x) >= 0)
+#define LOOP_CHECK(rval, cmd)                                             \
+	do {                                                              \
+		rval = cmd;                                               \
+	} while (rval == GNUTLS_E_AGAIN || rval == GNUTLS_E_INTERRUPTED); \
+	assert(rval >= 0)
 
 #define MAX_BUF 1024
 #define MSG "GET / HTTP/1.0\r\n\r\n"
@@ -62,9 +62,9 @@ int main(void)
 
 	/* put the x509 credentials to the current session */
 	CHECK(gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred));
-	CHECK(gnutls_server_name_set
-	      (session, GNUTLS_NAME_DNS, "www.example.com",
-	       strlen("www.example.com")));
+	CHECK(gnutls_server_name_set(session, GNUTLS_NAME_DNS,
+				     "www.example.com",
+				     strlen("www.example.com")));
 
 	gnutls_session_set_verify_cert(session, "www.example.com", 0);
 
@@ -80,8 +80,7 @@ int main(void)
 	/* Perform the TLS handshake */
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
+	} while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
 	/* Note that DTLS may also receive GNUTLS_E_LARGE_PACKET */
 
 	if (ret < 0) {
@@ -122,7 +121,7 @@ int main(void)
 	 * be lost */
 	CHECK(gnutls_bye(session, GNUTLS_SHUT_WR));
 
- end:
+end:
 
 	udp_close(sd);
 

@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -37,20 +37,20 @@ int main(void)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
-# include <unistd.h>
-# include <gnutls/gnutls.h>
-# include <gnutls/dtls.h>
-# include <signal.h>
+#include <string.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <gnutls/gnutls.h>
+#include <gnutls/dtls.h>
+#include <signal.h>
 
-# include "utils.h"
+#include "utils.h"
 
-# define MAX_BUF 1024
+#define MAX_BUF 1024
 static void terminate(void);
 
 /* This program tests gnutls_server_name_set() and gnutls_server_name_get().
@@ -115,8 +115,7 @@ static void client(const char *test_name, const char *prio, int fd,
 	 */
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret < 0) {
 		if (server_err < 0)
@@ -130,12 +129,12 @@ static void client(const char *test_name, const char *prio, int fd,
 
 	if (debug)
 		test_success("TLS version is: %s\n",
-			     gnutls_protocol_get_name
-			     (gnutls_protocol_get_version(session)));
+			     gnutls_protocol_get_name(
+				     gnutls_protocol_get_version(session)));
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
- cleanup:
+cleanup:
 	close(fd);
 
 	gnutls_deinit(session);
@@ -197,8 +196,7 @@ static void server(const char *test_name, const char *prio, int fd,
 
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 	if (ret < 0) {
 		if (exp_err == ret)
 			goto cleanup;
@@ -213,15 +211,15 @@ static void server(const char *test_name, const char *prio, int fd,
 
 	if (debug)
 		test_success("TLS version is: %s\n",
-			     gnutls_protocol_get_name
-			     (gnutls_protocol_get_version(session)));
+			     gnutls_protocol_get_name(
+				     gnutls_protocol_get_version(session)));
 
 	buffer_size = sizeof(buffer);
 	ret = gnutls_server_name_get(session, buffer, &buffer_size, &type, 0);
 
-	if ((name == NULL || name[0] == 0)
-	    && (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
-		|| ret == GNUTLS_E_IDNA_ERROR)) {
+	if ((name == NULL || name[0] == 0) &&
+	    (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE ||
+	     ret == GNUTLS_E_IDNA_ERROR)) {
 		/* expected */
 		if (debug)
 			test_success("empty name matches\n");
@@ -229,19 +227,19 @@ static void server(const char *test_name, const char *prio, int fd,
 		test_fail("server_name: %s/%d\n", gnutls_strerror(ret), ret);
 	} else {
 		if (name == NULL || name[0] == 0) {
-			test_fail
-			    ("did not receive the expected name: got: %s\n",
-			     buffer);
+			test_fail(
+				"did not receive the expected name: got: %s\n",
+				buffer);
 			exit(1);
 		}
 		if (buffer_size != strlen(buffer)) {
-			test_fail
-			    ("received name '%s/%d/%d', with embedded null\n",
-			     buffer, (int)buffer_size, (int)strlen(buffer));
+			test_fail(
+				"received name '%s/%d/%d', with embedded null\n",
+				buffer, (int)buffer_size, (int)strlen(buffer));
 			exit(1);
 		}
-		if (name_len != buffer_size
-		    || memcmp(name, buffer, name_len) != 0) {
+		if (name_len != buffer_size ||
+		    memcmp(name, buffer, name_len) != 0) {
 			test_fail("received name '%s/%d', expected '%s/%d'\n",
 				  buffer, (int)buffer_size, name,
 				  (int)name_len);
@@ -254,7 +252,7 @@ static void server(const char *test_name, const char *prio, int fd,
 	/* do not wait for the peer to close the connection.
 	 */
 	gnutls_bye(session, GNUTLS_SHUT_WR);
- cleanup:
+cleanup:
 	close(fd);
 	gnutls_deinit(session);
 
@@ -311,9 +309,9 @@ static void ch_handler(int sig)
 	return;
 }
 
-# define PRIO_TLS12 "NORMAL:-VERS-ALL:+VERS-TLS1.2"
-# define PRIO_TLS13 "NORMAL:-VERS-ALL:+VERS-TLS1.3"
-# define PRIO_NORMAL "NORMAL"
+#define PRIO_TLS12 "NORMAL:-VERS-ALL:+VERS-TLS1.2"
+#define PRIO_TLS13 "NORMAL:-VERS-ALL:+VERS-TLS1.3"
+#define PRIO_NORMAL "NORMAL"
 
 void doit(void)
 {
@@ -360,4 +358,4 @@ void doit(void)
 	      GNUTLS_E_RECEIVED_DISALLOWED_NAME);
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

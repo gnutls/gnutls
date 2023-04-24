@@ -22,7 +22,7 @@
 /* Parts copied from GnuTLS example programs. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -30,10 +30,10 @@
 #include <string.h>
 #include <sys/types.h>
 #if !defined(_WIN32)
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
 #endif
 #include <unistd.h>
 #include <assert.h>
@@ -68,25 +68,25 @@ void doit(void)
 	assert(gnutls_anon_allocate_client_credentials(&clicred) >= 0);
 	assert(gnutls_anon_allocate_server_credentials(&servcred) >= 0);
 
-	assert(gnutls_anon_set_server_known_dh_params
-	       (servcred, GNUTLS_SEC_PARAM_LEGACY) >= 0);
-	assert(test_cli_serv_anon(servcred, clicred, "NORMAL:-KX-ALL:+ANON-DH")
-	       >= 0);
+	assert(gnutls_anon_set_server_known_dh_params(
+		       servcred, GNUTLS_SEC_PARAM_LEGACY) >= 0);
+	assert(test_cli_serv_anon(servcred, clicred,
+				  "NORMAL:-KX-ALL:+ANON-DH") >= 0);
 
-	assert(gnutls_anon_set_server_known_dh_params
-	       (servcred, GNUTLS_SEC_PARAM_NORMAL) >= 0);
-	assert(test_cli_serv_anon(servcred, clicred, "NORMAL:-KX-ALL:+ANON-DH")
-	       >= 0);
+	assert(gnutls_anon_set_server_known_dh_params(
+		       servcred, GNUTLS_SEC_PARAM_NORMAL) >= 0);
+	assert(test_cli_serv_anon(servcred, clicred,
+				  "NORMAL:-KX-ALL:+ANON-DH") >= 0);
 
-	assert(gnutls_anon_set_server_known_dh_params
-	       (servcred, GNUTLS_SEC_PARAM_HIGH) >= 0);
-	assert(test_cli_serv_anon(servcred, clicred, "NORMAL:-KX-ALL:+ANON-DH")
-	       >= 0);
+	assert(gnutls_anon_set_server_known_dh_params(
+		       servcred, GNUTLS_SEC_PARAM_HIGH) >= 0);
+	assert(test_cli_serv_anon(servcred, clicred,
+				  "NORMAL:-KX-ALL:+ANON-DH") >= 0);
 
-	assert(gnutls_anon_set_server_known_dh_params
-	       (servcred, GNUTLS_SEC_PARAM_ULTRA) >= 0);
-	assert(test_cli_serv_anon(servcred, clicred, "NORMAL:-KX-ALL:+ANON-DH")
-	       >= 0);
+	assert(gnutls_anon_set_server_known_dh_params(
+		       servcred, GNUTLS_SEC_PARAM_ULTRA) >= 0);
+	assert(test_cli_serv_anon(servcred, clicred,
+				  "NORMAL:-KX-ALL:+ANON-DH") >= 0);
 
 	gnutls_anon_free_server_credentials(servcred);
 	gnutls_anon_free_client_credentials(clicred);

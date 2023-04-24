@@ -21,14 +21,17 @@
  */
 
 #ifndef GNUTLS_LIB_EXT_SRP_H
-# define GNUTLS_LIB_EXT_SRP_H
+#define GNUTLS_LIB_EXT_SRP_H
 
-# include <hello_ext.h>
+#include <hello_ext.h>
 
-# define IS_SRP_KX(kx) ((kx == GNUTLS_KX_SRP || (kx == GNUTLS_KX_SRP_RSA) || \
-	  kx == GNUTLS_KX_SRP_DSS)?1:0)
+#define IS_SRP_KX(kx)                                         \
+	((kx == GNUTLS_KX_SRP || (kx == GNUTLS_KX_SRP_RSA) || \
+	  kx == GNUTLS_KX_SRP_DSS) ?                          \
+		 1 :                                          \
+		 0)
 
-# ifdef ENABLE_SRP
+#ifdef ENABLE_SRP
 
 extern const hello_ext_entry_st ext_mod_srp;
 
@@ -37,6 +40,6 @@ typedef struct {
 	char *password;
 } srp_ext_st;
 
-# endif
+#endif
 
-#endif				/* GNUTLS_LIB_EXT_SRP_H */
+#endif /* GNUTLS_LIB_EXT_SRP_H */

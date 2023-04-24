@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -29,63 +29,64 @@
 #include <gnutls/x509-ext.h>
 #include "utils.h"
 
-static char invalid_cert[] =	/* v1 certificate with extensions */
-    "-----BEGIN CERTIFICATE-----\n"
-    "MIIDHjCCAgYCDFQ7zlUDsihSxVF4mDANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQD\n"
-    "EwRDQS0wMCIYDzIwMTQxMDEzMTMwNjI5WhgPOTk5OTEyMzEyMzU5NTlaMBMxETAP\n"
-    "BgNVBAMTCHNlcnZlci0xMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA\n"
-    "zoG3/1YtwGHh/5u3ex6xAmwO0/H4gdIy/yiYLxqWcy+HzyMBBZHNXuV7W0z7x+Qo\n"
-    "qCGtenWkzIQSgeYKyzdcpPDscZIYOgwHWUFczxgVGdLsBKPSczgqMHpSCLgMgnDM\n"
-    "RaN6SNQeTQdftkLt5wdBSzNaxhhPYsCEbopSeZ8250FCLS3gRpoMtYCBiy7cjSJB\n"
-    "zv6zmZStXNgTYr8pLwI0nyxPyRdB+TZyqAC6r9W154y51vsqUCGmC0I9hn1A5kkD\n"
-    "5057x+Ho1kDwPxOfObdOR+AJSAw/FeGuStzViJY0I68B90sEo/HD+h7mB+CwJ2Yf\n"
-    "64/xVdh+D8L65eYkM9z88wIDAQABo3cwdTAMBgNVHRMBAf8EAjAAMBQGA1UdEQQN\n"
-    "MAuCCWxvY2FsaG9zdDAPBgNVHQ8BAf8EBQMDB6AAMB0GA1UdDgQWBBT7Gk/u95zI\n"
-    "JTM89CXJ70IxxqhegDAfBgNVHSMEGDAWgBQ9X77/zddjG9ob2zrR/WuGmxwFGDAN\n"
-    "BgkqhkiG9w0BAQsFAAOCAQEAaTrAcTkQ7yqf6afoTkFXZuZ+jJXYNGkubxs8Jo/z\n"
-    "srJk/WWVGAKuxiBDumk88Gjm+WXGyIDA7Hq9fhGaklJV2PGRfNVx9No51HXeAToT\n"
-    "sHs2XKhk9SdKKR4UJkuX3U2malMlCpmFMtm3EieDVZLxeukhODJQtRa3vGg8QWoz\n"
-    "ODlewHSmQiXhnqq52fLCbdVUaBnaRGOIwNZ0FcBWv9n0ZCuhjg9908rUVH9/OjI3\n"
-    "AGVZcbN9Jac2ZO8NTxP5vS1hrG2wT9+sVRh1sD5ISZSM4gWdq9sK8d7j+SwOPBWY\n"
-    "3dcxQlfvWw2Dt876XYoyUZuKirmASVlMw+hkm1WXM7Svsw==\n"
-    "-----END CERTIFICATE-----\n";
+static char invalid_cert[] = /* v1 certificate with extensions */
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIDHjCCAgYCDFQ7zlUDsihSxVF4mDANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQD\n"
+	"EwRDQS0wMCIYDzIwMTQxMDEzMTMwNjI5WhgPOTk5OTEyMzEyMzU5NTlaMBMxETAP\n"
+	"BgNVBAMTCHNlcnZlci0xMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA\n"
+	"zoG3/1YtwGHh/5u3ex6xAmwO0/H4gdIy/yiYLxqWcy+HzyMBBZHNXuV7W0z7x+Qo\n"
+	"qCGtenWkzIQSgeYKyzdcpPDscZIYOgwHWUFczxgVGdLsBKPSczgqMHpSCLgMgnDM\n"
+	"RaN6SNQeTQdftkLt5wdBSzNaxhhPYsCEbopSeZ8250FCLS3gRpoMtYCBiy7cjSJB\n"
+	"zv6zmZStXNgTYr8pLwI0nyxPyRdB+TZyqAC6r9W154y51vsqUCGmC0I9hn1A5kkD\n"
+	"5057x+Ho1kDwPxOfObdOR+AJSAw/FeGuStzViJY0I68B90sEo/HD+h7mB+CwJ2Yf\n"
+	"64/xVdh+D8L65eYkM9z88wIDAQABo3cwdTAMBgNVHRMBAf8EAjAAMBQGA1UdEQQN\n"
+	"MAuCCWxvY2FsaG9zdDAPBgNVHQ8BAf8EBQMDB6AAMB0GA1UdDgQWBBT7Gk/u95zI\n"
+	"JTM89CXJ70IxxqhegDAfBgNVHSMEGDAWgBQ9X77/zddjG9ob2zrR/WuGmxwFGDAN\n"
+	"BgkqhkiG9w0BAQsFAAOCAQEAaTrAcTkQ7yqf6afoTkFXZuZ+jJXYNGkubxs8Jo/z\n"
+	"srJk/WWVGAKuxiBDumk88Gjm+WXGyIDA7Hq9fhGaklJV2PGRfNVx9No51HXeAToT\n"
+	"sHs2XKhk9SdKKR4UJkuX3U2malMlCpmFMtm3EieDVZLxeukhODJQtRa3vGg8QWoz\n"
+	"ODlewHSmQiXhnqq52fLCbdVUaBnaRGOIwNZ0FcBWv9n0ZCuhjg9908rUVH9/OjI3\n"
+	"AGVZcbN9Jac2ZO8NTxP5vS1hrG2wT9+sVRh1sD5ISZSM4gWdq9sK8d7j+SwOPBWY\n"
+	"3dcxQlfvWw2Dt876XYoyUZuKirmASVlMw+hkm1WXM7Svsw==\n"
+	"-----END CERTIFICATE-----\n";
 
 static char pem[] =
-    "-----BEGIN CERTIFICATE-----"
-    "MIIFdDCCBN2gAwIBAgIBBzANBgkqhkiG9w0BAQsFADCBkzEVMBMGA1UEAxMMQ2lu"
-    "ZHkgTGF1cGVyMRcwFQYKCZImiZPyLGQBARMHY2xhdXBlcjERMA8GA1UECxMIQ0Eg"
-    "ZGVwdC4xEjAQBgNVBAoTCUtva28gaW5jLjEPMA0GA1UECBMGQXR0aWtpMQswCQYD"
-    "VQQGEwJHUjEcMBoGCSqGSIb3DQEJARYNbm9uZUBub25lLm9yZzAiGA8yMDA3MDQy"
-    "MTIyMDAwMFoYDzk5OTkxMjMxMjM1OTU5WjCBkzEVMBMGA1UEAxMMQ2luZHkgTGF1"
-    "cGVyMRcwFQYKCZImiZPyLGQBARMHY2xhdXBlcjERMA8GA1UECxMIQ0EgZGVwdC4x"
-    "EjAQBgNVBAoTCUtva28gaW5jLjEPMA0GA1UECBMGQXR0aWtpMQswCQYDVQQGEwJH"
-    "UjEcMBoGCSqGSIb3DQEJARYNbm9uZUBub25lLm9yZzCBnzANBgkqhkiG9w0BAQEF"
-    "AAOBjQAwgYkCgYEApcbOdUOEv2SeAicT8QNZ93ktku18L1CkA/EtebmGiwV+OrtE"
-    "qq+EzxOYHhxKOPczLXqfctRrbSawMTdwEPtC6didGGV+GUn8BZYEaIMed4a/7fXl"
-    "EjsT/jMYnBp6HWmvRwJgeh+56M/byDQwUZY9jJZcALxh3ggPsTYhf6kA4wUCAwEA"
-    "AaOCAtAwggLMMBIGA1UdEwEB/wQIMAYBAf8CAQQwagYDVR0RBGMwYYIMd3d3Lm5v"
-    "bmUub3JnghN3d3cubW9yZXRoYW5vbmUub3Jnghd3d3cuZXZlbm1vcmV0aGFub25l"
-    "Lm9yZ4cEwKgBAYENbm9uZUBub25lLm9yZ4EOd2hlcmVAbm9uZS5vcmcwgfcGA1Ud"
-    "IASB7zCB7DB3BgwrBgEEAapsAQpjAQAwZzAwBggrBgEFBQcCAjAkDCJUaGlzIGlz"
-    "IGEgbG9uZyBwb2xpY3kgdG8gc3VtbWFyaXplMDMGCCsGAQUFBwIBFidodHRwOi8v"
-    "d3d3LmV4YW1wbGUuY29tL2EtcG9saWN5LXRvLXJlYWQwcQYMKwYBBAGqbAEKYwEB"
-    "MGEwJAYIKwYBBQUHAgIwGAwWVGhpcyBpcyBhIHNob3J0IHBvbGljeTA5BggrBgEF"
-    "BQcCARYtaHR0cDovL3d3dy5leGFtcGxlLmNvbS9hbm90aGVyLXBvbGljeS10by1y"
-    "ZWFkMB0GA1UdJQQWMBQGCCsGAQUFBwMDBggrBgEFBQcDCTBYBgNVHR4BAf8ETjBM"
-    "oCQwDYILZXhhbXBsZS5jb20wE4ERbm1hdkBAZXhhbXBsZS5uZXShJDASghB0ZXN0"
-    "LmV4YW1wbGUuY29tMA6BDC5leGFtcGxlLmNvbTA2BggrBgEFBQcBAQQqMCgwJgYI"
-    "KwYBBQUHMAGGGmh0dHA6Ly9teS5vY3NwLnNlcnZlci9vY3NwMA8GA1UdDwEB/wQF"
-    "AwMHBgAwHQYDVR0OBBYEFF1ArfDOlECVi36ZlB2SVCLKcjZfMG8GA1UdHwRoMGYw"
-    "ZKBioGCGHmh0dHA6Ly93d3cuZ2V0Y3JsLmNybC9nZXRjcmwxL4YeaHR0cDovL3d3"
-    "dy5nZXRjcmwuY3JsL2dldGNybDIvhh5odHRwOi8vd3d3LmdldGNybC5jcmwvZ2V0"
-    "Y3JsMy8wDQYJKoZIhvcNAQELBQADgYEAdacOt4/Vgc9Y3pSkik3HBifDeK2OtiW0"
-    "BZ7xOXqXtL8Uwx6wx/DybZsUbzuR55GLUROYAc3cio5M/0pTwjqmmQ8vuHIt2p8A"
-    "2fegFcBbNLX38XxACQh4TDAT/4ftPwOtEol4UR4ItZ1d7faDzDXNpmGE+sp5s6ii"
-    "3cIIpInMKE8=" "-----END CERTIFICATE-----";
+	"-----BEGIN CERTIFICATE-----"
+	"MIIFdDCCBN2gAwIBAgIBBzANBgkqhkiG9w0BAQsFADCBkzEVMBMGA1UEAxMMQ2lu"
+	"ZHkgTGF1cGVyMRcwFQYKCZImiZPyLGQBARMHY2xhdXBlcjERMA8GA1UECxMIQ0Eg"
+	"ZGVwdC4xEjAQBgNVBAoTCUtva28gaW5jLjEPMA0GA1UECBMGQXR0aWtpMQswCQYD"
+	"VQQGEwJHUjEcMBoGCSqGSIb3DQEJARYNbm9uZUBub25lLm9yZzAiGA8yMDA3MDQy"
+	"MTIyMDAwMFoYDzk5OTkxMjMxMjM1OTU5WjCBkzEVMBMGA1UEAxMMQ2luZHkgTGF1"
+	"cGVyMRcwFQYKCZImiZPyLGQBARMHY2xhdXBlcjERMA8GA1UECxMIQ0EgZGVwdC4x"
+	"EjAQBgNVBAoTCUtva28gaW5jLjEPMA0GA1UECBMGQXR0aWtpMQswCQYDVQQGEwJH"
+	"UjEcMBoGCSqGSIb3DQEJARYNbm9uZUBub25lLm9yZzCBnzANBgkqhkiG9w0BAQEF"
+	"AAOBjQAwgYkCgYEApcbOdUOEv2SeAicT8QNZ93ktku18L1CkA/EtebmGiwV+OrtE"
+	"qq+EzxOYHhxKOPczLXqfctRrbSawMTdwEPtC6didGGV+GUn8BZYEaIMed4a/7fXl"
+	"EjsT/jMYnBp6HWmvRwJgeh+56M/byDQwUZY9jJZcALxh3ggPsTYhf6kA4wUCAwEA"
+	"AaOCAtAwggLMMBIGA1UdEwEB/wQIMAYBAf8CAQQwagYDVR0RBGMwYYIMd3d3Lm5v"
+	"bmUub3JnghN3d3cubW9yZXRoYW5vbmUub3Jnghd3d3cuZXZlbm1vcmV0aGFub25l"
+	"Lm9yZ4cEwKgBAYENbm9uZUBub25lLm9yZ4EOd2hlcmVAbm9uZS5vcmcwgfcGA1Ud"
+	"IASB7zCB7DB3BgwrBgEEAapsAQpjAQAwZzAwBggrBgEFBQcCAjAkDCJUaGlzIGlz"
+	"IGEgbG9uZyBwb2xpY3kgdG8gc3VtbWFyaXplMDMGCCsGAQUFBwIBFidodHRwOi8v"
+	"d3d3LmV4YW1wbGUuY29tL2EtcG9saWN5LXRvLXJlYWQwcQYMKwYBBAGqbAEKYwEB"
+	"MGEwJAYIKwYBBQUHAgIwGAwWVGhpcyBpcyBhIHNob3J0IHBvbGljeTA5BggrBgEF"
+	"BQcCARYtaHR0cDovL3d3dy5leGFtcGxlLmNvbS9hbm90aGVyLXBvbGljeS10by1y"
+	"ZWFkMB0GA1UdJQQWMBQGCCsGAQUFBwMDBggrBgEFBQcDCTBYBgNVHR4BAf8ETjBM"
+	"oCQwDYILZXhhbXBsZS5jb20wE4ERbm1hdkBAZXhhbXBsZS5uZXShJDASghB0ZXN0"
+	"LmV4YW1wbGUuY29tMA6BDC5leGFtcGxlLmNvbTA2BggrBgEFBQcBAQQqMCgwJgYI"
+	"KwYBBQUHMAGGGmh0dHA6Ly9teS5vY3NwLnNlcnZlci9vY3NwMA8GA1UdDwEB/wQF"
+	"AwMHBgAwHQYDVR0OBBYEFF1ArfDOlECVi36ZlB2SVCLKcjZfMG8GA1UdHwRoMGYw"
+	"ZKBioGCGHmh0dHA6Ly93d3cuZ2V0Y3JsLmNybC9nZXRjcmwxL4YeaHR0cDovL3d3"
+	"dy5nZXRjcmwuY3JsL2dldGNybDIvhh5odHRwOi8vd3d3LmdldGNybC5jcmwvZ2V0"
+	"Y3JsMy8wDQYJKoZIhvcNAQELBQADgYEAdacOt4/Vgc9Y3pSkik3HBifDeK2OtiW0"
+	"BZ7xOXqXtL8Uwx6wx/DybZsUbzuR55GLUROYAc3cio5M/0pTwjqmmQ8vuHIt2p8A"
+	"2fegFcBbNLX38XxACQh4TDAT/4ftPwOtEol4UR4ItZ1d7faDzDXNpmGE+sp5s6ii"
+	"3cIIpInMKE8="
+	"-----END CERTIFICATE-----";
 
 #define MAX_DATA_SIZE 1024
 
-typedef int (*ext_parse_func)(const gnutls_datum_t * der);
+typedef int (*ext_parse_func)(const gnutls_datum_t *der);
 
 struct ext_handler_st {
 	const char *oid;
@@ -93,12 +94,12 @@ struct ext_handler_st {
 	unsigned critical;
 };
 
-static int basic_constraints(const gnutls_datum_t * der)
+static int basic_constraints(const gnutls_datum_t *der)
 {
 	int ret, pathlen;
 	unsigned ca;
 
-/*
+	/*
 		Basic Constraints (critical):
 			Certificate Authority (CA): TRUE
 			Path Length Constraint: 4
@@ -122,8 +123,8 @@ static int basic_constraints(const gnutls_datum_t * der)
 	return 0;
 }
 
-static int cmp_name(unsigned type, gnutls_datum_t * name,
-		    unsigned expected_type, const char *expected_name)
+static int cmp_name(unsigned type, gnutls_datum_t *name, unsigned expected_type,
+		    const char *expected_name)
 {
 	if (type != expected_type) {
 		fprintf(stderr, "error in %d\n", __LINE__);
@@ -142,7 +143,7 @@ static int cmp_name(unsigned type, gnutls_datum_t * name,
 	return 0;
 }
 
-static int subject_alt_name(const gnutls_datum_t * der)
+static int subject_alt_name(const gnutls_datum_t *der)
 {
 	int ret;
 	gnutls_subject_alt_names_t san;
@@ -168,7 +169,7 @@ static int subject_alt_name(const gnutls_datum_t * der)
 		return ret;
 	}
 
-/*
+	/*
 		Subject Alternative Name (not critical):
 			DNSname: www.none.org
 			DNSname: www.morethanone.org
@@ -199,9 +200,8 @@ static int subject_alt_name(const gnutls_datum_t * der)
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return ret;
 	}
-	ret =
-	    cmp_name(type, &name, GNUTLS_SAN_DNSNAME,
-		     "www.evenmorethanone.org");
+	ret = cmp_name(type, &name, GNUTLS_SAN_DNSNAME,
+		       "www.evenmorethanone.org");
 	if (ret < 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return ret;
@@ -250,9 +250,9 @@ static int subject_alt_name(const gnutls_datum_t * der)
 	return 0;
 }
 
-static int ext_key_usage(const gnutls_datum_t * der)
+static int ext_key_usage(const gnutls_datum_t *der)
 {
-/*
+	/*
 		Key Purpose (not critical):
 			OCSP signing.
 */
@@ -308,7 +308,7 @@ static int ext_key_usage(const gnutls_datum_t * der)
 	return 0;
 }
 
-static int crt_policies(const gnutls_datum_t * der)
+static int crt_policies(const gnutls_datum_t *der)
 {
 	int ret;
 	gnutls_x509_policies_t policies;
@@ -332,7 +332,7 @@ static int crt_policies(const gnutls_datum_t * der)
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return ret;
 	}
-/*
+	/*
 		Certificate Policies (not critical):
 			1.3.6.1.4.1.5484.1.10.99.1.0
 				Note: This is a long policy to summarize
@@ -341,8 +341,8 @@ static int crt_policies(const gnutls_datum_t * der)
 				Note: This is a short policy
 				URI: http://www.example.com/another-policy-to-read
 */
-	if (strcmp(policy.oid, "1.3.6.1.4.1.5484.1.10.99.1.0") != 0
-	    || policy.qualifiers != 2) {
+	if (strcmp(policy.oid, "1.3.6.1.4.1.5484.1.10.99.1.0") != 0 ||
+	    policy.qualifiers != 2) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return -1;
 	}
@@ -355,9 +355,9 @@ static int crt_policies(const gnutls_datum_t * der)
 
 	if (policy.qualifier[1].type != GNUTLS_X509_QUALIFIER_URI ||
 	    policy.qualifier[1].size !=
-	    strlen("http://www.example.com/a-policy-to-read")
-	    || strcmp("http://www.example.com/a-policy-to-read",
-		      policy.qualifier[1].data) != 0) {
+		    strlen("http://www.example.com/a-policy-to-read") ||
+	    strcmp("http://www.example.com/a-policy-to-read",
+		   policy.qualifier[1].data) != 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return -1;
 	}
@@ -368,8 +368,8 @@ static int crt_policies(const gnutls_datum_t * der)
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return ret;
 	}
-	if (strcmp(policy.oid, "1.3.6.1.4.1.5484.1.10.99.1.1") != 0
-	    || policy.qualifiers != 2) {
+	if (strcmp(policy.oid, "1.3.6.1.4.1.5484.1.10.99.1.1") != 0 ||
+	    policy.qualifiers != 2) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return -1;
 	}
@@ -382,9 +382,9 @@ static int crt_policies(const gnutls_datum_t * der)
 
 	if (policy.qualifier[1].type != GNUTLS_X509_QUALIFIER_URI ||
 	    policy.qualifier[1].size !=
-	    strlen("http://www.example.com/another-policy-to-read")
-	    || strcmp("http://www.example.com/another-policy-to-read",
-		      policy.qualifier[1].data) != 0) {
+		    strlen("http://www.example.com/another-policy-to-read") ||
+	    strcmp("http://www.example.com/another-policy-to-read",
+		   policy.qualifier[1].data) != 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return -1;
 	}
@@ -400,9 +400,9 @@ static int crt_policies(const gnutls_datum_t * der)
 	return 0;
 }
 
-static int key_usage(const gnutls_datum_t * der)
+static int key_usage(const gnutls_datum_t *der)
 {
-/*
+	/*
 		Key Usage (critical):
 			Certificate signing.
 */
@@ -423,9 +423,9 @@ static int key_usage(const gnutls_datum_t * der)
 	return 0;
 }
 
-static int subject_key_id(const gnutls_datum_t * der)
+static int subject_key_id(const gnutls_datum_t *der)
 {
-/*
+	/*
 		Subject Key Identifier (not critical):
 			5d40adf0ce9440958b7e99941d925422ca72365f
 */
@@ -450,7 +450,7 @@ static int subject_key_id(const gnutls_datum_t * der)
 	return 0;
 }
 
-static int crl_dist_points(const gnutls_datum_t * der)
+static int crl_dist_points(const gnutls_datum_t *der)
 {
 	int ret;
 	gnutls_x509_crl_dist_points_t dp = NULL;
@@ -459,7 +459,7 @@ static int crl_dist_points(const gnutls_datum_t * der)
 	gnutls_datum_t url;
 	unsigned type;
 
-/*
+	/*
 		CRL Distribution points (not critical):
 			URI: http://www.getcrl.crl/getcrl1/
 			URI: http://www.getcrl.crl/getcrl2/
@@ -525,7 +525,7 @@ static int crl_dist_points(const gnutls_datum_t * der)
 	return 0;
 }
 
-static int name_constraints(const gnutls_datum_t * der)
+static int name_constraints(const gnutls_datum_t *der)
 {
 	int ret;
 	gnutls_x509_name_constraints_t nc = NULL;
@@ -533,7 +533,7 @@ static int name_constraints(const gnutls_datum_t * der)
 	gnutls_datum_t name;
 	unsigned type;
 
-/*
+	/*
 		Name Constraints (critical):
 			Permitted:
 				DNSname: example.com
@@ -621,7 +621,7 @@ static int name_constraints(const gnutls_datum_t * der)
 	return 0;
 }
 
-static int ext_aia(const gnutls_datum_t * der)
+static int ext_aia(const gnutls_datum_t *der)
 {
 	int ret;
 	gnutls_x509_aia_t aia = NULL;
@@ -630,7 +630,7 @@ static int ext_aia(const gnutls_datum_t * der)
 	gnutls_datum_t name;
 	unsigned type;
 
-/*		Authority Information Access (not critical):
+	/*		Authority Information Access (not critical):
 			Access Method: 1.3.6.1.5.5.7.48.1 (id-ad-ocsp)
 			Access Location URI: http://my.ocsp.server/ocsp
 */
@@ -675,24 +675,24 @@ static int ext_aia(const gnutls_datum_t * der)
 }
 
 struct ext_handler_st handlers[] = {
-	{GNUTLS_X509EXT_OID_BASIC_CONSTRAINTS, basic_constraints, 1},
-	{GNUTLS_X509EXT_OID_SAN, subject_alt_name, 0},
-	{GNUTLS_X509EXT_OID_CRT_POLICY, crt_policies, 0},
-	{GNUTLS_X509EXT_OID_EXTENDED_KEY_USAGE, ext_key_usage, 0},
-	{GNUTLS_X509EXT_OID_KEY_USAGE, key_usage, 1},
-	{GNUTLS_X509EXT_OID_SUBJECT_KEY_ID, subject_key_id, 0},
-	{GNUTLS_X509EXT_OID_CRL_DIST_POINTS, crl_dist_points, 0},
-	{GNUTLS_X509EXT_OID_NAME_CONSTRAINTS, name_constraints, 1},
-	{GNUTLS_X509EXT_OID_AUTHORITY_INFO_ACCESS, ext_aia, 0},
-	{NULL, NULL}
+	{ GNUTLS_X509EXT_OID_BASIC_CONSTRAINTS, basic_constraints, 1 },
+	{ GNUTLS_X509EXT_OID_SAN, subject_alt_name, 0 },
+	{ GNUTLS_X509EXT_OID_CRT_POLICY, crt_policies, 0 },
+	{ GNUTLS_X509EXT_OID_EXTENDED_KEY_USAGE, ext_key_usage, 0 },
+	{ GNUTLS_X509EXT_OID_KEY_USAGE, key_usage, 1 },
+	{ GNUTLS_X509EXT_OID_SUBJECT_KEY_ID, subject_key_id, 0 },
+	{ GNUTLS_X509EXT_OID_CRL_DIST_POINTS, crl_dist_points, 0 },
+	{ GNUTLS_X509EXT_OID_NAME_CONSTRAINTS, name_constraints, 1 },
+	{ GNUTLS_X509EXT_OID_AUTHORITY_INFO_ACCESS, ext_aia, 0 },
+	{ NULL, NULL }
 };
 
 void doit(void)
 {
 	int ret;
 	gnutls_datum_t derCert = { (void *)pem, sizeof(pem) - 1 };
-	gnutls_datum_t v1Cert =
-	    { (void *)invalid_cert, sizeof(invalid_cert) - 1 };
+	gnutls_datum_t v1Cert = { (void *)invalid_cert,
+				  sizeof(invalid_cert) - 1 };
 	gnutls_x509_crt_t cert;
 	size_t oid_len = MAX_DATA_SIZE;
 	gnutls_datum_t ext;
@@ -710,7 +710,8 @@ void doit(void)
 
 	ret = gnutls_x509_crt_import(cert, &v1Cert, GNUTLS_X509_FMT_PEM);
 	if (ret >= 0)
-		fail("crt_import of v1 cert with extensions should have failed: %d\n", ret);
+		fail("crt_import of v1 cert with extensions should have failed: %d\n",
+		     ret);
 	gnutls_x509_crt_deinit(cert);
 
 	ret = gnutls_x509_crt_init(&cert);
@@ -723,9 +724,8 @@ void doit(void)
 
 	for (i = 0;; i++) {
 		oid_len = sizeof(oid);
-		ret =
-		    gnutls_x509_crt_get_extension_info(cert, i, oid, &oid_len,
-						       &critical);
+		ret = gnutls_x509_crt_get_extension_info(cert, i, oid, &oid_len,
+							 &critical);
 		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
 			if (i != 9) {
 				fail("unexpected number of extensions: %d\n",
@@ -748,7 +748,8 @@ void doit(void)
 		/* find the handler for this extension and run it */
 		for (j = 0;; j++) {
 			if (handlers[j].oid == NULL) {
-				fail("could not find handler for extension %s\n", oid);
+				fail("could not find handler for extension %s\n",
+				     oid);
 				break;
 			}
 

@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -40,7 +40,7 @@ static time_t then = DEFAULT_THEN;
    verifying certificates.  To avoid a time bomb, we hard code the
    current time.  This should work fine on systems where the library
    call to time is resolved at run-time.  */
-static time_t mytime(time_t * t)
+static time_t mytime(time_t *t)
 {
 	if (t)
 		*t = then;
@@ -85,7 +85,6 @@ void doit(void)
 		gnutls_global_set_log_level(4711);
 
 	for (i = 0; chains[i].chain; i++) {
-
 		printf("[%d]: Chain '%s'...\n", (int)i, chains[i].name);
 
 		if (chains[i].notfips && gnutls_fips140_mode_enabled()) {
@@ -109,9 +108,8 @@ void doit(void)
 			tmp.data = (unsigned char *)chains[i].chain[j];
 			tmp.size = strlen(chains[i].chain[j]);
 
-			ret =
-			    gnutls_x509_crt_import(certs[j], &tmp,
-						   GNUTLS_X509_FMT_PEM);
+			ret = gnutls_x509_crt_import(certs[j], &tmp,
+						     GNUTLS_X509_FMT_PEM);
 			if (debug > 2)
 				printf("done\n");
 			if (ret < 0) {
@@ -167,11 +165,9 @@ void doit(void)
 			then = DEFAULT_THEN;
 
 		if (chains[i].purpose == NULL) {
-			ret = gnutls_x509_crt_list_verify(certs, j,
-							  &ca, 1, NULL, 0,
-							  chains
-							  [i].verify_flags,
-							  &verify_status);
+			ret = gnutls_x509_crt_list_verify(
+				certs, j, &ca, 1, NULL, 0,
+				chains[i].verify_flags, &verify_status);
 			if (ret < 0) {
 				fprintf(stderr,
 					"gnutls_x509_crt_list_verify[%d,%d]: %s\n",
@@ -181,12 +177,16 @@ void doit(void)
 
 			if (verify_status != chains[i].expected_verify_result) {
 				gnutls_datum_t out1, out2;
-				gnutls_certificate_verification_status_print
-				    (verify_status, GNUTLS_CRT_X509, &out1, 0);
-				gnutls_certificate_verification_status_print
-				    (chains[i].expected_verify_result,
-				     GNUTLS_CRT_X509, &out2, 0);
-				fail("chain[%s]:\nverify_status: %d: %s\nexpected: %d: %s\n", chains[i].name, verify_status, out1.data, chains[i].expected_verify_result, out2.data);
+				gnutls_certificate_verification_status_print(
+					verify_status, GNUTLS_CRT_X509, &out1,
+					0);
+				gnutls_certificate_verification_status_print(
+					chains[i].expected_verify_result,
+					GNUTLS_CRT_X509, &out2, 0);
+				fail("chain[%s]:\nverify_status: %d: %s\nexpected: %d: %s\n",
+				     chains[i].name, verify_status, out1.data,
+				     chains[i].expected_verify_result,
+				     out2.data);
 				gnutls_free(out1.data);
 				gnutls_free(out2.data);
 
@@ -203,7 +203,6 @@ void doit(void)
 					exit(1);
 			} else if (debug)
 				printf("done\n");
-
 		}
 
 		gnutls_x509_trust_list_init(&tl, 0);
@@ -219,20 +218,13 @@ void doit(void)
 			vdata[0].type = GNUTLS_DT_KEY_PURPOSE_OID;
 			vdata[0].data = (void *)chains[i].purpose;
 
-			ret =
-			    gnutls_x509_trust_list_verify_crt2(tl, certs, j,
-							       vdata, 1,
-							       chains
-							       [i].verify_flags,
-							       &verify_status1,
-							       NULL);
+			ret = gnutls_x509_trust_list_verify_crt2(
+				tl, certs, j, vdata, 1, chains[i].verify_flags,
+				&verify_status1, NULL);
 		} else {
-			ret =
-			    gnutls_x509_trust_list_verify_crt(tl, certs, j,
-							      chains
-							      [i].verify_flags,
-							      &verify_status1,
-							      NULL);
+			ret = gnutls_x509_trust_list_verify_crt(
+				tl, certs, j, chains[i].verify_flags,
+				&verify_status1, NULL);
 		}
 		if (ret < 0) {
 			fprintf(stderr,
@@ -244,23 +236,32 @@ void doit(void)
 		if (chains[i].purpose == NULL) {
 			if (verify_status != verify_status1) {
 				gnutls_datum_t out1, out2;
-				gnutls_certificate_verification_status_print
-				    (verify_status, GNUTLS_CRT_X509, &out1, 0);
-				gnutls_certificate_verification_status_print
-				    (verify_status1, GNUTLS_CRT_X509, &out2, 0);
-				fail("chain[%s]:\nverify_status: %d: %s\ntrust list vstatus: %d: %s\n", chains[i].name, verify_status, out1.data, verify_status1, out2.data);
+				gnutls_certificate_verification_status_print(
+					verify_status, GNUTLS_CRT_X509, &out1,
+					0);
+				gnutls_certificate_verification_status_print(
+					verify_status1, GNUTLS_CRT_X509, &out2,
+					0);
+				fail("chain[%s]:\nverify_status: %d: %s\ntrust list vstatus: %d: %s\n",
+				     chains[i].name, verify_status, out1.data,
+				     verify_status1, out2.data);
 				gnutls_free(out1.data);
 				gnutls_free(out2.data);
 			}
 		} else {
-			if (verify_status1 != chains[i].expected_verify_result) {
+			if (verify_status1 !=
+			    chains[i].expected_verify_result) {
 				gnutls_datum_t out1, out2;
-				gnutls_certificate_verification_status_print
-				    (verify_status1, GNUTLS_CRT_X509, &out1, 0);
-				gnutls_certificate_verification_status_print
-				    (chains[i].expected_verify_result,
-				     GNUTLS_CRT_X509, &out2, 0);
-				fail("chain[%s]:\nverify_status: %d: %s\nexpected: %d: %s\n", chains[i].name, verify_status1, out1.data, chains[i].expected_verify_result, out2.data);
+				gnutls_certificate_verification_status_print(
+					verify_status1, GNUTLS_CRT_X509, &out1,
+					0);
+				gnutls_certificate_verification_status_print(
+					chains[i].expected_verify_result,
+					GNUTLS_CRT_X509, &out2, 0);
+				fail("chain[%s]:\nverify_status: %d: %s\nexpected: %d: %s\n",
+				     chains[i].name, verify_status1, out1.data,
+				     chains[i].expected_verify_result,
+				     out2.data);
 				gnutls_free(out1.data);
 				gnutls_free(out2.data);
 			}

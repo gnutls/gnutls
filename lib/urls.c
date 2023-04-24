@@ -47,9 +47,8 @@ unsigned gnutls_url_is_supported(const char *url)
 	unsigned i;
 
 	for (i = 0; i < _gnutls_custom_urls_size; i++) {
-		if (c_strncasecmp
-		    (url, _gnutls_custom_urls[i].name,
-		     _gnutls_custom_urls[i].name_size) == 0)
+		if (c_strncasecmp(url, _gnutls_custom_urls[i].name,
+				  _gnutls_custom_urls[i].name_size) == 0)
 			return 1;
 	}
 
@@ -79,9 +78,9 @@ int _gnutls_url_is_known(const char *url)
 		return 1;
 	else {
 		for (i = 0; i < _gnutls_custom_urls_size; i++) {
-			if (c_strncasecmp
-			    (url, _gnutls_custom_urls[i].name,
-			     _gnutls_custom_urls[i].name_size) == 0)
+			if (c_strncasecmp(url, _gnutls_custom_urls[i].name,
+					  _gnutls_custom_urls[i].name_size) ==
+			    0)
 				return 1;
 		}
 
@@ -110,7 +109,7 @@ int _gnutls_url_is_known(const char *url)
  *
  * Since: 3.4.0
  **/
-int gnutls_register_custom_url(const gnutls_custom_url_st * st)
+int gnutls_register_custom_url(const gnutls_custom_url_st *st)
 {
 	unsigned i;
 
@@ -147,7 +146,7 @@ int gnutls_register_custom_url(const gnutls_custom_url_st * st)
  * Since: 3.4.0
  -*/
 int _gnutls_get_raw_issuer(const char *url, gnutls_x509_crt_t cert,
-			   gnutls_datum_t * issuer, unsigned int flags)
+			   gnutls_datum_t *issuer, unsigned int flags)
 {
 	unsigned i;
 
@@ -158,14 +157,11 @@ int _gnutls_get_raw_issuer(const char *url, gnutls_x509_crt_t cert,
 	}
 #endif
 	for (i = 0; i < _gnutls_custom_urls_size; i++) {
-		if (c_strncasecmp
-		    (url, _gnutls_custom_urls[i].name,
-		     _gnutls_custom_urls[i].name_size) == 0) {
+		if (c_strncasecmp(url, _gnutls_custom_urls[i].name,
+				  _gnutls_custom_urls[i].name_size) == 0) {
 			if (_gnutls_custom_urls[i].get_issuer) {
-				return _gnutls_custom_urls[i].get_issuer(url,
-									 cert,
-									 issuer,
-									 flags);
+				return _gnutls_custom_urls[i].get_issuer(
+					url, cert, issuer, flags);
 			}
 			break;
 		}

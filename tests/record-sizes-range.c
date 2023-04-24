@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -42,22 +42,22 @@ static void tls_log_func(int level, const char *str)
 /* This test attempts to transfer various sizes using AES-128-CBC.
  */
 
-#define MAX_BUF 32*1024
+#define MAX_BUF 32 * 1024
 #define MAX_SEND 16384
 static char buffer1[MAX_BUF + 1];
 static char buffer[MAX_BUF + 1];
 
-static void try_send(gnutls_session_t client, gnutls_session_t server,
-		     void *b1, ssize_t b1_size, void *b2, ssize_t b2_size,
-		     gnutls_range_st * range)
+static void try_send(gnutls_session_t client, gnutls_session_t server, void *b1,
+		     ssize_t b1_size, void *b2, ssize_t b2_size,
+		     gnutls_range_st *range)
 {
 	int ret, recvd;
 
 	/* Try sending various other sizes */
 	ret = gnutls_record_send_range(client, b1, b1_size, range);
 	if (ret < 0) {
-		fprintf(stderr, "Error sending %d bytes: %s\n",
-			(int)b1_size, gnutls_strerror(ret));
+		fprintf(stderr, "Error sending %d bytes: %s\n", (int)b1_size,
+			gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -75,15 +75,13 @@ static void try_send(gnutls_session_t client, gnutls_session_t server,
 			exit(1);
 		}
 		recvd += ret;
-	}
-	while (recvd < b1_size);
+	} while (recvd < b1_size);
 
 	if (recvd != b1_size) {
 		fprintf(stderr, "Couldn't receive %d bytes, received %d\n",
 			(int)b1_size, recvd);
 		exit(1);
 	}
-
 }
 
 void doit(void)
@@ -113,9 +111,10 @@ void doit(void)
 	gnutls_dh_params_import_pkcs3(dh_params, &p3, GNUTLS_X509_FMT_PEM);
 	gnutls_anon_set_server_dh_params(s_anoncred, dh_params);
 	gnutls_init(&server, GNUTLS_SERVER);
-	gnutls_priority_set_direct(server,
-				   "NONE:+VERS-TLS1.2:+AES-128-CBC:+MAC-ALL:+SIGN-ALL:+COMP-NULL:+ANON-DH",
-				   NULL);
+	gnutls_priority_set_direct(
+		server,
+		"NONE:+VERS-TLS1.2:+AES-128-CBC:+MAC-ALL:+SIGN-ALL:+COMP-NULL:+ANON-DH",
+		NULL);
 	gnutls_credentials_set(server, GNUTLS_CRD_ANON, s_anoncred);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
@@ -124,9 +123,10 @@ void doit(void)
 	/* Init client */
 	gnutls_anon_allocate_client_credentials(&c_anoncred);
 	gnutls_init(&client, GNUTLS_CLIENT);
-	gnutls_priority_set_direct(client,
-				   "NONE:+VERS-TLS1.2:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-NULL:+ANON-DH",
-				   NULL);
+	gnutls_priority_set_direct(
+		client,
+		"NONE:+VERS-TLS1.2:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-NULL:+ANON-DH",
+		NULL);
 	gnutls_credentials_set(client, GNUTLS_CRD_ANON, c_anoncred);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
@@ -146,7 +146,7 @@ void doit(void)
 	try_send(client, server, buffer1, MAX_SEND, buffer, MAX_BUF, &range);
 	try_send(client, server, buffer1, 1024, buffer, MAX_BUF, &range);
 	try_send(client, server, buffer1, 4096, buffer, MAX_BUF, &range);
-	/*try_send(client, server, buffer1, 128, buffer, MAX_BUF, &range) */ ;
+	/*try_send(client, server, buffer1, 128, buffer, MAX_BUF, &range) */;
 
 	if (debug)
 		fputs("\n", stdout);

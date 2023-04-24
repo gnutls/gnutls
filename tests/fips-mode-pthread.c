@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -33,11 +33,11 @@
 #include <signal.h>
 #include <unistd.h>
 #ifndef _WIN32
-# include <netinet/in.h>
-# include <sys/types.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <pthread.h>
+#include <netinet/in.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <pthread.h>
 #endif
 #include "utils.h"
 
@@ -70,7 +70,8 @@ static void *test_set_per_thread(void *arg)
 
 	mode = gnutls_fips140_mode_enabled();
 	if (mode != data->mode)
-		fail("%d: gnutls_fips140_mode_enabled: wrong mode returned (%d, exp: %d)\n", data->line, mode, data->mode);
+		fail("%d: gnutls_fips140_mode_enabled: wrong mode returned (%d, exp: %d)\n",
+		     data->line, mode, data->mode);
 
 	if (data->set_mode)
 		gnutls_fips140_set_mode(data->set_mode,
@@ -78,17 +79,19 @@ static void *test_set_per_thread(void *arg)
 
 	mode = gnutls_fips140_mode_enabled();
 	if (mode != data->set_mode) {
-		fail("%d: gnutls_fips140_mode_enabled: wrong mode returned after set (%d, exp: %d)\n", data->line, mode, data->set_mode);
+		fail("%d: gnutls_fips140_mode_enabled: wrong mode returned after set (%d, exp: %d)\n",
+		     data->line, mode, data->set_mode);
 	}
 
 	/* reset mode */
 	gnutls_fips140_set_mode(data->mode, GNUTLS_FIPS140_SET_MODE_THREAD);
 	mode = gnutls_fips140_mode_enabled();
 	if (mode != data->mode)
-		fail("%d: gnutls_fips140_mode_enabled: wrong mode returned after set (%d, exp: %d)\n", data->line, mode, data->mode);
+		fail("%d: gnutls_fips140_mode_enabled: wrong mode returned after set (%d, exp: %d)\n",
+		     data->line, mode, data->mode);
 
-	ret = gnutls_hmac_fast(GNUTLS_MAC_MD5, "keykeykey", 9, "abcdefgh",
-			       8, digest);
+	ret = gnutls_hmac_fast(GNUTLS_MAC_MD5, "keykeykey", 9, "abcdefgh", 8,
+			       digest);
 	if (mode == GNUTLS_FIPS140_STRICT && ret >= 0) {
 		fail("gnutls_hmac_fast(MD5): succeeded in strict mode!\n");
 	} else if (mode != GNUTLS_FIPS140_STRICT && ret < 0) {
@@ -101,7 +104,7 @@ static void *test_set_per_thread(void *arg)
 	pthread_exit(0);
 }
 
-# define MAX_THREADS 48
+#define MAX_THREADS 48
 
 void doit(void)
 {
@@ -137,9 +140,8 @@ void doit(void)
 		else
 			data[i].set_mode = GNUTLS_FIPS140_STRICT;
 
-		ret =
-		    pthread_create(&data[i].id, NULL, test_set_per_thread,
-				   &data[i]);
+		ret = pthread_create(&data[i].id, NULL, test_set_per_thread,
+				     &data[i]);
 		if (ret != 0) {
 			abort();
 		}
@@ -156,7 +158,8 @@ void doit(void)
 
 	/* main thread should be in the same state */
 	if (mode != gnutls_fips140_mode_enabled())
-		fail("gnutls_fips140_mode_enabled: main thread changed mode (%d, exp: %d)\n", gnutls_fips140_mode_enabled(), mode);
+		fail("gnutls_fips140_mode_enabled: main thread changed mode (%d, exp: %d)\n",
+		     gnutls_fips140_mode_enabled(), mode);
 
 	success("checking whether global changes are seen in threads\n");
 	/* Test if changes globally are visible in threads */
@@ -167,9 +170,8 @@ void doit(void)
 		data[i].line = __LINE__;
 		data[i].mode = mode;
 		data[i].set_mode = GNUTLS_FIPS140_LAX;
-		ret =
-		    pthread_create(&data[i].id, NULL, test_set_per_thread,
-				   &data[i]);
+		ret = pthread_create(&data[i].id, NULL, test_set_per_thread,
+				     &data[i]);
 		if (ret != 0)
 			abort();
 	}
@@ -182,14 +184,14 @@ void doit(void)
 	}
 
 	if (mode != gnutls_fips140_mode_enabled())
-		fail("gnutls_fips140_mode_enabled: main thread changed mode (%d, exp: %d)\n", gnutls_fips140_mode_enabled(), mode);
+		fail("gnutls_fips140_mode_enabled: main thread changed mode (%d, exp: %d)\n",
+		     gnutls_fips140_mode_enabled(), mode);
 
 	gnutls_fips140_set_mode(GNUTLS_FIPS140_SELFTESTS, 0);
 	if (GNUTLS_FIPS140_SELFTESTS == gnutls_fips140_mode_enabled())
 		fail("gnutls_fips140_mode_enabled: setting to GNUTLS_FIPS140_SELFTESTS succeeded!\n");
 
 	free(data);
-
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

@@ -34,16 +34,16 @@ typedef struct {
 } gnutls_profile_entry;
 
 static const gnutls_profile_entry profiles[] = {
-	{"Very weak", GNUTLS_PROFILE_VERY_WEAK, GNUTLS_SEC_PARAM_VERY_WEAK},
-	{"Low", GNUTLS_PROFILE_LOW, GNUTLS_SEC_PARAM_LOW},
-	{"Legacy", GNUTLS_PROFILE_LEGACY, GNUTLS_SEC_PARAM_LEGACY},
-	{"Medium", GNUTLS_PROFILE_MEDIUM, GNUTLS_SEC_PARAM_MEDIUM},
-	{"High", GNUTLS_PROFILE_HIGH, GNUTLS_SEC_PARAM_HIGH},
-	{"Ultra", GNUTLS_PROFILE_ULTRA, GNUTLS_SEC_PARAM_ULTRA},
-	{"Future", GNUTLS_PROFILE_FUTURE, GNUTLS_SEC_PARAM_FUTURE},
-	{"SuiteB128", GNUTLS_PROFILE_SUITEB128, GNUTLS_SEC_PARAM_HIGH},
-	{"SuiteB192", GNUTLS_PROFILE_SUITEB192, GNUTLS_SEC_PARAM_ULTRA},
-	{NULL, 0, 0}
+	{ "Very weak", GNUTLS_PROFILE_VERY_WEAK, GNUTLS_SEC_PARAM_VERY_WEAK },
+	{ "Low", GNUTLS_PROFILE_LOW, GNUTLS_SEC_PARAM_LOW },
+	{ "Legacy", GNUTLS_PROFILE_LEGACY, GNUTLS_SEC_PARAM_LEGACY },
+	{ "Medium", GNUTLS_PROFILE_MEDIUM, GNUTLS_SEC_PARAM_MEDIUM },
+	{ "High", GNUTLS_PROFILE_HIGH, GNUTLS_SEC_PARAM_HIGH },
+	{ "Ultra", GNUTLS_PROFILE_ULTRA, GNUTLS_SEC_PARAM_ULTRA },
+	{ "Future", GNUTLS_PROFILE_FUTURE, GNUTLS_SEC_PARAM_FUTURE },
+	{ "SuiteB128", GNUTLS_PROFILE_SUITEB128, GNUTLS_SEC_PARAM_HIGH },
+	{ "SuiteB192", GNUTLS_PROFILE_SUITEB192, GNUTLS_SEC_PARAM_ULTRA },
+	{ NULL, 0, 0 }
 };
 
 gnutls_sec_param_t
@@ -93,9 +93,9 @@ gnutls_certificate_verification_profile_get_id(const char *name)
  *
  * Returns: a string that contains the name of the specified profile or %NULL.
  **/
-const char
-*gnutls_certificate_verification_profile_get_name
-    (gnutls_certificate_verification_profiles_t id) {
+const char *gnutls_certificate_verification_profile_get_name(
+	gnutls_certificate_verification_profiles_t id)
+{
 	const gnutls_profile_entry *p;
 
 	for (p = profiles; p->name != NULL; p++) {

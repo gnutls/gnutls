@@ -37,9 +37,8 @@
 /* Overwrite the given attribute (using the index)
  * index here starts from one.
  */
-static int
-overwrite_attribute(asn1_node asn, const char *root, unsigned indx,
-		    const gnutls_datum_t * ext_data)
+static int overwrite_attribute(asn1_node asn, const char *root, unsigned indx,
+			       const gnutls_datum_t *ext_data)
 {
 	char name[MAX_NAME_SIZE], name2[MAX_NAME_SIZE];
 	int result;
@@ -68,10 +67,9 @@ overwrite_attribute(asn1_node asn, const char *root, unsigned indx,
  * "certificationRequestInfo.attributes"
  *
  */
-int
-_x509_parse_attribute(asn1_node asn1_struct,
-		      const char *attr_name, const char *given_oid,
-		      unsigned indx, int raw, gnutls_datum_t * out)
+int _x509_parse_attribute(asn1_node asn1_struct, const char *attr_name,
+			  const char *given_oid, unsigned indx, int raw,
+			  gnutls_datum_t *out)
 {
 	int k1, result;
 	char tmpbuffer1[MAX_NAME_SIZE];
@@ -83,7 +81,6 @@ _x509_parse_attribute(asn1_node asn1_struct,
 
 	k1 = 0;
 	do {
-
 		k1++;
 		/* create a string like "attribute.?1"
 		 */
@@ -125,7 +122,7 @@ _x509_parse_attribute(asn1_node asn1_struct,
 			goto cleanup;
 		}
 
-		if (strcmp(oid, given_oid) == 0) {	/* Found the OID */
+		if (strcmp(oid, given_oid) == 0) { /* Found the OID */
 
 			/* Read the Value
 			 */
@@ -133,9 +130,8 @@ _x509_parse_attribute(asn1_node asn1_struct,
 				 "%s.values.?%u", tmpbuffer1, indx + 1);
 
 			len = sizeof(value) - 1;
-			result =
-			    _gnutls_x509_read_value(asn1_struct,
-						    tmpbuffer3, &td);
+			result = _gnutls_x509_read_value(asn1_struct,
+							 tmpbuffer3, &td);
 
 			if (result != ASN1_SUCCESS) {
 				gnutls_assert();
@@ -144,9 +140,8 @@ _x509_parse_attribute(asn1_node asn1_struct,
 			}
 
 			if (raw == 0) {
-				result =
-				    _gnutls_x509_dn_to_string
-				    (oid, td.data, td.size, out);
+				result = _gnutls_x509_dn_to_string(
+					oid, td.data, td.size, out);
 
 				_gnutls_free_datum(&td);
 
@@ -155,7 +150,7 @@ _x509_parse_attribute(asn1_node asn1_struct,
 					goto cleanup;
 				}
 				return 0;
-			} else {	/* raw!=0 */
+			} else { /* raw!=0 */
 				out->data = td.data;
 				out->size = td.size;
 
@@ -163,14 +158,13 @@ _x509_parse_attribute(asn1_node asn1_struct,
 			}
 		}
 
-	}
-	while (1);
+	} while (1);
 
 	gnutls_assert();
 
 	result = GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 
- cleanup:
+cleanup:
 	return result;
 }
 
@@ -179,9 +173,9 @@ _x509_parse_attribute(asn1_node asn1_struct,
  *
  * Critical will be either 0 or 1.
  */
-static int
-add_attribute(asn1_node asn, const char *root, const char *attribute_id,
-	      const gnutls_datum_t * ext_data)
+static int add_attribute(asn1_node asn, const char *root,
+			 const char *attribute_id,
+			 const gnutls_datum_t *ext_data)
 {
 	int result;
 	char name[MAX_NAME_SIZE];
@@ -223,9 +217,8 @@ add_attribute(asn1_node asn, const char *root, const char *attribute_id,
 	return 0;
 }
 
-int
-_x509_set_attribute(asn1_node asn, const char *root,
-		    const char *ext_id, const gnutls_datum_t * ext_data)
+int _x509_set_attribute(asn1_node asn, const char *root, const char *ext_id,
+			const gnutls_datum_t *ext_data)
 {
 	int result;
 	int k, len;
@@ -251,7 +244,6 @@ _x509_set_attribute(asn1_node asn, const char *root,
 		}
 
 		do {
-
 			_gnutls_str_cpy(name2, sizeof(name2), name);
 			_gnutls_str_cat(name2, sizeof(name2), ".type");
 
@@ -275,10 +267,8 @@ _x509_set_attribute(asn1_node asn, const char *root,
 							   ext_data);
 			}
 
-		}
-		while (0);
-	}
-	while (1);
+		} while (0);
+	} while (1);
 
 	if (result == ASN1_ELEMENT_NOT_FOUND) {
 		return add_attribute(asn, root, ext_id, ext_data);

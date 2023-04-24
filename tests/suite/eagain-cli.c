@@ -41,8 +41,8 @@ EV_P;
 ev_io remote_w;
 gnutls_session_t session;
 
-static const char
-*SSL_GNUTLS_PRINT_HANDSHAKE_STATUS(gnutls_handshake_description_t status)
+static const char *
+SSL_GNUTLS_PRINT_HANDSHAKE_STATUS(gnutls_handshake_description_t status)
 {
 	return gnutls_handshake_description_get_name(status);
 }
@@ -53,7 +53,7 @@ static const char
 static int _tcp_connect_eagain(void)
 {
 	const char *PORT = getenv("PORT");
-	const char *SERVER = "127.0.0.1";	//verisign.com
+	const char *SERVER = "127.0.0.1"; //verisign.com
 	int err, sd;
 	int flag = 1, curstate = 0;
 	struct sockaddr_in sa;
@@ -76,8 +76,8 @@ static int _tcp_connect_eagain(void)
 	}
 
 	/* lower the send buffers to force EAGAIN */
-	assert(setsockopt
-	       (sd, IPPROTO_TCP, TCP_NODELAY, (char *)&flag, sizeof(int)) >= 0);
+	assert(setsockopt(sd, IPPROTO_TCP, TCP_NODELAY, (char *)&flag,
+			  sizeof(int)) >= 0);
 	assert(fcntl(sd, F_SETFL, O_NONBLOCK) >= 0);
 
 	return sd;
@@ -85,14 +85,14 @@ static int _tcp_connect_eagain(void)
 
 static void tcp_close(int sd)
 {
-	shutdown(sd, SHUT_RDWR);	/* no more receptions */
+	shutdown(sd, SHUT_RDWR); /* no more receptions */
 	close(sd);
 }
 
 /* We provide this helper to ensure that we test EAGAIN while writing
  * even on a reliable connection */
-static ssize_t
-_client_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
+static ssize_t _client_push(gnutls_transport_ptr_t tr, const void *data,
+			    size_t len)
 {
 	struct timeval tv;
 
@@ -125,7 +125,7 @@ static int _client_pull_timeout(gnutls_transport_ptr_t ptr, unsigned int ms)
 	return gnutls_system_recv_timeout(ptr, ms);
 }
 
-static void _process_data(EV_P_ ev_io * w, int revents)
+static void _process_data(EV_P_ ev_io *w, int revents)
 {
 	static int ret = -1, lastret = 0;
 	static unsigned int count = 0;
@@ -163,24 +163,23 @@ static void _process_data(EV_P_ ev_io * w, int revents)
 			fprintf(stderr, "gnutls returned with: %s - %s\n",
 				gnutls_strerror_name(ret),
 				gnutls_strerror(ret));
-			if ((ret == GNUTLS_E_WARNING_ALERT_RECEIVED)
-			    || (ret == GNUTLS_E_FATAL_ALERT_RECEIVED))
+			if ((ret == GNUTLS_E_WARNING_ALERT_RECEIVED) ||
+			    (ret == GNUTLS_E_FATAL_ALERT_RECEIVED))
 				fprintf(stderr, "Also received alert: %s\n",
-					gnutls_alert_get_name
-					(gnutls_alert_get(session)));
+					gnutls_alert_get_name(
+						gnutls_alert_get(session)));
 			fprintf(stderr, "last out: %s\n",
-				SSL_GNUTLS_PRINT_HANDSHAKE_STATUS
-				(gnutls_handshake_get_last_out(session)));
+				SSL_GNUTLS_PRINT_HANDSHAKE_STATUS(
+					gnutls_handshake_get_last_out(session)));
 			fprintf(stderr, "last in: %s\n",
-				SSL_GNUTLS_PRINT_HANDSHAKE_STATUS
-				(gnutls_handshake_get_last_in(session)));
+				SSL_GNUTLS_PRINT_HANDSHAKE_STATUS(
+					gnutls_handshake_get_last_in(session)));
 		}
 
 		if (gnutls_error_is_fatal(ret)) {
 			fprintf(stderr, "yarrr this be an error!");
 			exit(1);
 		}
-
 	}
 
 	if (ret == GNUTLS_E_SUCCESS) {
@@ -212,16 +211,16 @@ static void try(const char *name, const char *prio)
 		assert(gnutls_init(&session, GNUTLS_CLIENT) >= 0);
 		gnutls_transport_set_push_function(session, _client_push);
 		gnutls_transport_set_pull_function(session, _client_pull);
-		gnutls_transport_set_pull_timeout_function(session,
-							   _client_pull_timeout);
+		gnutls_transport_set_pull_timeout_function(
+			session, _client_pull_timeout);
 		gnutls_handshake_set_timeout(session,
 					     GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT);
 
 		assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);
 		gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
 				       c_certcred);
-		gnutls_server_name_set(session, GNUTLS_NAME_DNS,
-				       "localhost", strlen("localhost"));
+		gnutls_server_name_set(session, GNUTLS_NAME_DNS, "localhost",
+				       strlen("localhost"));
 
 		sd = _tcp_connect_eagain();
 

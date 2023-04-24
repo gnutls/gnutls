@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -31,12 +31,12 @@
 #include <assert.h>
 #include <errno.h>
 #ifndef _WIN32
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
 #else
-# include <windows.h>		/* for Sleep */
-# include <winbase.h>
+#include <windows.h> /* for Sleep */
+#include <winbase.h>
 #endif
 
 #include <gnutls/gnutls.h>
@@ -52,38 +52,39 @@ int break_on_error = 0;
 
 /* doc/credentials/dhparams/rfc3526-group-14-2048.pem */
 const char *pkcs3 =
-    "-----BEGIN DH PARAMETERS-----\n"
-    "MIIBCAKCAQEA///////////JD9qiIWjCNMTGYouA3BzRKQJOCIpnzHQCC76mOxOb\n"
-    "IlFKCHmONATd75UZs806QxswKwpt8l8UN0/hNW1tUcJF5IW1dmJefsb0TELppjft\n"
-    "awv/XLb0Brft7jhr+1qJn6WunyQRfEsf5kkoZlHs5Fs9wgB8uKFjvwWY2kg2HFXT\n"
-    "mmkWP6j9JM9fg2VdI9yjrZYcYvNWIIVSu57VKQdwlpZtZww1Tkq8mATxdGwIyhgh\n"
-    "fDKQXkYuNs474553LBgOhgObJ4Oi7Aeij7XFXfBvTFLJ3ivL9pVYFxg5lUl86pVq\n"
-    "5RXSJhiY+gUQFXKOWoqsqmj//////////wIBAg==\n"
-    "-----END DH PARAMETERS-----\n";
+	"-----BEGIN DH PARAMETERS-----\n"
+	"MIIBCAKCAQEA///////////JD9qiIWjCNMTGYouA3BzRKQJOCIpnzHQCC76mOxOb\n"
+	"IlFKCHmONATd75UZs806QxswKwpt8l8UN0/hNW1tUcJF5IW1dmJefsb0TELppjft\n"
+	"awv/XLb0Brft7jhr+1qJn6WunyQRfEsf5kkoZlHs5Fs9wgB8uKFjvwWY2kg2HFXT\n"
+	"mmkWP6j9JM9fg2VdI9yjrZYcYvNWIIVSu57VKQdwlpZtZww1Tkq8mATxdGwIyhgh\n"
+	"fDKQXkYuNs474553LBgOhgObJ4Oi7Aeij7XFXfBvTFLJ3ivL9pVYFxg5lUl86pVq\n"
+	"5RXSJhiY+gUQFXKOWoqsqmj//////////wIBAg==\n"
+	"-----END DH PARAMETERS-----\n";
 
 /* doc/credentials/dhparams/rfc7919-ffdhe2048.pem */
 const char *pkcs3_2048 =
-    "-----BEGIN DH PARAMETERS-----\n"
-    "MIIBCAKCAQEA//////////+t+FRYortKmq/cViAnPTzx2LnFg84tNpWp4TZBFGQz\n"
-    "+8yTnc4kmz75fS/jY2MMddj2gbICrsRhetPfHtXV/WVhJDP1H18GbtCFY2VVPe0a\n"
-    "87VXE15/V8k1mE8McODmi3fipona8+/och3xWKE2rec1MKzKT0g6eXq8CrGCsyT7\n"
-    "YdEIqUuyyOP7uWrat2DX9GgdT0Kj3jlN9K5W7edjcrsZCwenyO4KbXCeAvzhzffi\n"
-    "7MA0BM0oNC9hkXL+nOmFg/+OTxIy7vKBg8P+OxtMb61zO7X8vC7CIAXFjvGDfRaD\n"
-    "ssbzSibBsu/6iGtCOGEoXJf//////////wIBAg==\n"
-    "-----END DH PARAMETERS-----\n";
+	"-----BEGIN DH PARAMETERS-----\n"
+	"MIIBCAKCAQEA//////////+t+FRYortKmq/cViAnPTzx2LnFg84tNpWp4TZBFGQz\n"
+	"+8yTnc4kmz75fS/jY2MMddj2gbICrsRhetPfHtXV/WVhJDP1H18GbtCFY2VVPe0a\n"
+	"87VXE15/V8k1mE8McODmi3fipona8+/och3xWKE2rec1MKzKT0g6eXq8CrGCsyT7\n"
+	"YdEIqUuyyOP7uWrat2DX9GgdT0Kj3jlN9K5W7edjcrsZCwenyO4KbXCeAvzhzffi\n"
+	"7MA0BM0oNC9hkXL+nOmFg/+OTxIy7vKBg8P+OxtMb61zO7X8vC7CIAXFjvGDfRaD\n"
+	"ssbzSibBsu/6iGtCOGEoXJf//////////wIBAg==\n"
+	"-----END DH PARAMETERS-----\n";
 
 /* doc/credentials/dhparams/rfc7919-ffdhe3072.pem */
 const char *pkcs3_3072 =
-    "-----BEGIN DH PARAMETERS-----\n"
-    "MIIBiAKCAYEA//////////+t+FRYortKmq/cViAnPTzx2LnFg84tNpWp4TZBFGQz\n"
-    "+8yTnc4kmz75fS/jY2MMddj2gbICrsRhetPfHtXV/WVhJDP1H18GbtCFY2VVPe0a\n"
-    "87VXE15/V8k1mE8McODmi3fipona8+/och3xWKE2rec1MKzKT0g6eXq8CrGCsyT7\n"
-    "YdEIqUuyyOP7uWrat2DX9GgdT0Kj3jlN9K5W7edjcrsZCwenyO4KbXCeAvzhzffi\n"
-    "7MA0BM0oNC9hkXL+nOmFg/+OTxIy7vKBg8P+OxtMb61zO7X8vC7CIAXFjvGDfRaD\n"
-    "ssbzSibBsu/6iGtCOGEfz9zeNVs7ZRkDW7w09N75nAI4YbRvydbmyQd62R0mkff3\n"
-    "7lmMsPrBhtkcrv4TCYUTknC0EwyTvEN5RPT9RFLi103TZPLiHnH1S/9croKrnJ32\n"
-    "nuhtK8UiNjoNq8Uhl5sN6todv5pC1cRITgq80Gv6U93vPBsg7j/VnXwl5B0rZsYu\n"
-    "N///////////AgEC\n" "-----END DH PARAMETERS-----\n";
+	"-----BEGIN DH PARAMETERS-----\n"
+	"MIIBiAKCAYEA//////////+t+FRYortKmq/cViAnPTzx2LnFg84tNpWp4TZBFGQz\n"
+	"+8yTnc4kmz75fS/jY2MMddj2gbICrsRhetPfHtXV/WVhJDP1H18GbtCFY2VVPe0a\n"
+	"87VXE15/V8k1mE8McODmi3fipona8+/och3xWKE2rec1MKzKT0g6eXq8CrGCsyT7\n"
+	"YdEIqUuyyOP7uWrat2DX9GgdT0Kj3jlN9K5W7edjcrsZCwenyO4KbXCeAvzhzffi\n"
+	"7MA0BM0oNC9hkXL+nOmFg/+OTxIy7vKBg8P+OxtMb61zO7X8vC7CIAXFjvGDfRaD\n"
+	"ssbzSibBsu/6iGtCOGEfz9zeNVs7ZRkDW7w09N75nAI4YbRvydbmyQd62R0mkff3\n"
+	"7lmMsPrBhtkcrv4TCYUTknC0EwyTvEN5RPT9RFLi103TZPLiHnH1S/9croKrnJ32\n"
+	"nuhtK8UiNjoNq8Uhl5sN6todv5pC1cRITgq80Gv6U93vPBsg7j/VnXwl5B0rZsYu\n"
+	"N///////////AgEC\n"
+	"-----END DH PARAMETERS-----\n";
 
 void _fail(const char *format, ...)
 {
@@ -161,8 +162,8 @@ void escapeprint(const char *str, size_t len)
 	for (i = 0; i < len; i++) {
 		if (((str[i] & 0xFF) >= 'A' && (str[i] & 0xFF) <= 'Z') ||
 		    ((str[i] & 0xFF) >= 'a' && (str[i] & 0xFF) <= 'z') ||
-		    ((str[i] & 0xFF) >= '0' && (str[i] & 0xFF) <= '9')
-		    || (str[i] & 0xFF) == ' ' || (str[i] & 0xFF) == '.')
+		    ((str[i] & 0xFF) >= '0' && (str[i] & 0xFF) <= '9') ||
+		    (str[i] & 0xFF) == ' ' || (str[i] & 0xFF) == '.')
 			printf("%c", (str[i] & 0xFF));
 		else
 			printf("\\x%02X", (str[i] & 0xFF));
@@ -208,8 +209,7 @@ void binprint(const void *_str, size_t len)
 
 	printf("\t;; ");
 	for (i = 0; i < len; i++) {
-		printf("%d%d%d%d%d%d%d%d ",
-		       (str[i] & 0xFF) & 0x80 ? 1 : 0,
+		printf("%d%d%d%d%d%d%d%d ", (str[i] & 0xFF) & 0x80 ? 1 : 0,
 		       (str[i] & 0xFF) & 0x40 ? 1 : 0,
 		       (str[i] & 0xFF) & 0x20 ? 1 : 0,
 		       (str[i] & 0xFF) & 0x10 ? 1 : 0,
@@ -237,12 +237,11 @@ int main(int argc, char *argv[])
 		else if (strcmp(argv[argc - 1], "-h") == 0 ||
 			 strcmp(argv[argc - 1], "-?") == 0 ||
 			 strcmp(argv[argc - 1], "--help") == 0) {
-			printf
-			    ("Usage: %s [-vbh?] [--verbose] [--break-on-error] [--help]\n",
-			     argv[0]);
+			printf("Usage: %s [-vbh?] [--verbose] [--break-on-error] [--help]\n",
+			       argv[0]);
 			return 1;
 		}
-	while (argc-- > 1) ;
+	while (argc-- > 1);
 
 	doit();
 

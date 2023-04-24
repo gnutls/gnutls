@@ -18,15 +18,15 @@
  */
 
 #ifndef GNUTLS_SRC_UDP_SERV_H
-# define GNUTLS_SRC_UDP_SERV_H
+#define GNUTLS_SRC_UDP_SERV_H
 
-# include <gnutls/dtls.h>
+#include <gnutls/dtls.h>
 
 void udp_server(const char *name, int port, int mtu);
 gnutls_session_t initialize_session(int dtls);
-const char *human_addr(const struct sockaddr *sa, socklen_t salen,
-		       char *buf, size_t buflen);
+const char *human_addr(const struct sockaddr *sa, socklen_t salen, char *buf,
+		       size_t buflen);
 int wait_for_connection(void);
 int listen_socket(const char *name, int listen_port, int socktype);
 
-#endif				/* GNUTLS_SRC_UDP_SERV_H */
+#endif /* GNUTLS_SRC_UDP_SERV_H */

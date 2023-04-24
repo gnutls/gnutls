@@ -1,7 +1,7 @@
 /* This example code is placed in the public domain. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -22,7 +22,7 @@
 /* A TLS client that loads the certificate and key.
  */
 
-#define CHECK(x) assert((x)>=0)
+#define CHECK(x) assert((x) >= 0)
 
 #define MAX_BUF 1024
 #define MSG "GET / HTTP/1.0\r\n\r\n"
@@ -34,12 +34,11 @@
 extern int tcp_connect(void);
 extern void tcp_close(int sd);
 
-static int
-cert_callback(gnutls_session_t session,
-	      const gnutls_datum_t * req_ca_rdn, int nreqs,
-	      const gnutls_pk_algorithm_t * sign_algos,
-	      int sign_algos_length, gnutls_pcert_st ** pcert,
-	      unsigned int *pcert_length, gnutls_privkey_t * pkey);
+static int cert_callback(gnutls_session_t session,
+			 const gnutls_datum_t *req_ca_rdn, int nreqs,
+			 const gnutls_pk_algorithm_t *sign_algos,
+			 int sign_algos_length, gnutls_pcert_st **pcert,
+			 unsigned int *pcert_length, gnutls_privkey_t *pkey);
 
 gnutls_pcert_st pcrt;
 gnutls_privkey_t key;
@@ -52,8 +51,8 @@ static void load_keys(void)
 
 	CHECK(gnutls_load_file(CERT_FILE, &data));
 
-	CHECK(gnutls_pcert_import_x509_raw(&pcrt, &data,
-					   GNUTLS_X509_FMT_PEM, 0));
+	CHECK(gnutls_pcert_import_x509_raw(&pcrt, &data, GNUTLS_X509_FMT_PEM,
+					   0));
 
 	gnutls_free(data.data);
 
@@ -61,8 +60,8 @@ static void load_keys(void)
 
 	CHECK(gnutls_privkey_init(&key));
 
-	CHECK(gnutls_privkey_import_x509_raw(key, &data,
-					     GNUTLS_X509_FMT_PEM, NULL, 0));
+	CHECK(gnutls_privkey_import_x509_raw(key, &data, GNUTLS_X509_FMT_PEM,
+					     NULL, 0));
 	gnutls_free(data.data);
 }
 
@@ -146,7 +145,7 @@ int main(void)
 
 	CHECK(gnutls_bye(session, GNUTLS_SHUT_RDWR));
 
- end:
+end:
 
 	tcp_close(sd);
 
@@ -164,12 +163,11 @@ int main(void)
  * before a handshake.
  */
 
-static int
-cert_callback(gnutls_session_t session,
-	      const gnutls_datum_t * req_ca_rdn, int nreqs,
-	      const gnutls_pk_algorithm_t * sign_algos,
-	      int sign_algos_length, gnutls_pcert_st ** pcert,
-	      unsigned int *pcert_length, gnutls_privkey_t * pkey)
+static int cert_callback(gnutls_session_t session,
+			 const gnutls_datum_t *req_ca_rdn, int nreqs,
+			 const gnutls_pk_algorithm_t *sign_algos,
+			 int sign_algos_length, gnutls_pcert_st **pcert,
+			 unsigned int *pcert_length, gnutls_privkey_t *pkey)
 {
 	char issuer_dn[256];
 	int i, ret;
@@ -181,8 +179,7 @@ cert_callback(gnutls_session_t session,
 	if (nreqs > 0)
 		printf("- Server's trusted authorities:\n");
 	else
-		printf
-		    ("- Server did not send us any trusted authorities names.\n");
+		printf("- Server did not send us any trusted authorities names.\n");
 
 	/* print the names (if any) */
 	for (i = 0; i < nreqs; i++) {
@@ -208,5 +205,4 @@ cert_callback(gnutls_session_t session,
 	}
 
 	return 0;
-
 }

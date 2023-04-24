@@ -1,15 +1,49 @@
 #!/bin/sh
 
 # Copyright (c) 2022 Simon Josefsson
+# Copyright (c) 2023 Daiki Ueno
 # License: GPLv3+ <http://gnu.org/licenses/gpl.html>
 
-if ! indent --version 2> /dev/null | grep 'GNU indent' > /dev/null; then
-    echo 1>&2 "$0: GNU indent is missing"
+: ${CLANG_FORMAT=clang-format}
+
+if ! $CLANG_FORMAT --version 2>&1 >/dev/null; then
+    echo 1>&2 "$0: clang-format is missing"
     exit 77
 fi
 
-INDENT="indent -ppi1 -linux"; export INDENT
+parallel=0
+mode=indent
 
-git ls-files -z | grep -z '\.[ch]\(.in\)\?$' | grep -z -v '^./devel/' | xargs -0 -n1 `dirname "$0"`/indent-maybe
+while test $# -gt 0; do
+    case "$1" in
+	--parallel | -p )
+	    shift
+            parallel=$1
+            shift ;;
+	--check )
+	    mode=check
+	    shift ;;
+	--help )
+	    echo "Usage: indent-gnutls [--parallel=MAX-PROCS] [--check]"
+            exit ;;
+	-* )
+            echo "indent-gnutls: unknown option $1" 1>&2
+            echo "Try 'indent-gnutls --help' for more information." 1>&2
+            exit 1 ;;
+	* )
+            break ;;
+    esac
+done
+
+case $mode in
+    check )
+	CLANG_FORMAT_ARGS="$CLANG_FORMAT_ARGS --dry-run -Werror"
+	;;
+    indent )
+	CLANG_FORMAT_ARGS="$CLANG_FORMAT_ARGS -i"
+	;;
+esac
+
+git ls-files -z | grep -z '\.[ch]\(.in\)\?$' | grep -z -v '^./devel/' | xargs -P "$parallel" -0 -n1 "$CLANG_FORMAT" $CLANG_FORMAT_ARGS
 
 exit $?

@@ -45,9 +45,12 @@
 
 #include "utils.h"
 
-#define _assert(cond, format, ...) if (!(cond)) \
+#define _assert(cond, format, ...) \
+	if (!(cond))               \
 	_fail("Assertion `" #cond "` failed: " format "\n", ##__VA_ARGS__)
-#define _check(cond) if (!(cond)) _fail("Assertion `" #cond "` failed.\n")
+#define _check(cond) \
+	if (!(cond)) \
+	_fail("Assertion `" #cond "` failed.\n")
 
 gnutls_ecc_curve_t unlocked_ecc_curve_get_id(const char *curve);
 gnutls_pk_algorithm_t curve_name_to_pk(const char *curve);

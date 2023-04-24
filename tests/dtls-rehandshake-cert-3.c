@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -36,23 +36,23 @@ int main(void)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
-# include <unistd.h>
-# include <gnutls/gnutls.h>
-# include <gnutls/dtls.h>
-# include <assert.h>
+#include <string.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <gnutls/gnutls.h>
+#include <gnutls/dtls.h>
+#include <assert.h>
 
-# include "cert-common.h"
-# include "utils.h"
+#include "cert-common.h"
+#include "utils.h"
 
-# define MTU 1500
-# define MAX_BUF 4096
-# define MSG "Hello TLS"
+#define MTU 1500
+#define MAX_BUF 4096
+#define MSG "Hello TLS"
 
 static int server_fd = -1;
 static char pkt_buf[MAX_BUF];
@@ -139,8 +139,7 @@ static void client(int fd, const char *prio)
 	 */
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret < 0) {
 		fail("client: Handshake failed\n");
@@ -153,8 +152,8 @@ static void client(int fd, const char *prio)
 
 	if (debug)
 		success("client: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	/* update priorities to allow cert auth */
 	snprintf(buffer, sizeof(buffer), "%s:+ECDHE-RSA", prio);
@@ -171,12 +170,10 @@ static void client(int fd, const char *prio)
 	} else if (ret < 0) {
 		if (ret == GNUTLS_E_REHANDSHAKE) {
 			if (debug)
-				success
-				    ("Initiating rehandshake due to server request\n");
+				success("Initiating rehandshake due to server request\n");
 			do {
 				ret = gnutls_handshake(session);
-			}
-			while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+			} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 		}
 
 		if (ret != 0) {
@@ -190,7 +187,7 @@ static void client(int fd, const char *prio)
 	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
- end:
+end:
 
 	close(fd);
 
@@ -232,8 +229,8 @@ static void server(int fd, const char *prio)
 
 	assert(gnutls_anon_allocate_server_credentials(&anoncred) >= 0);
 	assert(gnutls_certificate_allocate_credentials(&serverx509cred) >= 0);
-	assert(gnutls_certificate_set_x509_key_mem(serverx509cred,
-						   &server_cert, &server_key,
+	assert(gnutls_certificate_set_x509_key_mem(serverx509cred, &server_cert,
+						   &server_key,
 						   GNUTLS_X509_FMT_PEM) >= 0);
 
 	gnutls_init(&session, GNUTLS_SERVER | GNUTLS_DATAGRAM);
@@ -253,8 +250,7 @@ static void server(int fd, const char *prio)
 
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 	if (ret < 0) {
 		close(fd);
 		gnutls_deinit(session);
@@ -267,8 +263,8 @@ static void server(int fd, const char *prio)
 
 	if (debug)
 		success("server: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	if (gnutls_kx_get(session) != GNUTLS_KX_ANON_ECDH) {
 		fail("did not negotiate an anonymous ciphersuite on initial auth\n");
@@ -289,8 +285,7 @@ static void server(int fd, const char *prio)
 		success("server: Initiating rehandshake\n");
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret < 0) {
 		fail("server: 2nd gnutls_handshake: %s\n",
@@ -307,21 +302,20 @@ static void server(int fd, const char *prio)
 
 		if (ret == 0) {
 			if (debug)
-				success
-				    ("server: Peer has closed the GnuTLS connection\n");
+				success("server: Peer has closed the GnuTLS connection\n");
 			break;
 		} else if (ret < 0) {
-			fail("server: Received corrupted data(%s). Closing...\n", gnutls_strerror(ret));
+			fail("server: Received corrupted data(%s). Closing...\n",
+			     gnutls_strerror(ret));
 			terminate();
 		} else if (ret > 0) {
 			/* echo data back to the client
 			 */
 			do {
-				ret =
-				    gnutls_record_send(session, buffer,
-						       strlen(buffer));
-			} while (ret == GNUTLS_E_AGAIN
-				 || ret == GNUTLS_E_INTERRUPTED);
+				ret = gnutls_record_send(session, buffer,
+							 strlen(buffer));
+			} while (ret == GNUTLS_E_AGAIN ||
+				 ret == GNUTLS_E_INTERRUPTED);
 		}
 	}
 
@@ -380,8 +374,7 @@ static void start(const char *prio)
 
 void doit(void)
 {
-	start
-	    ("NONE:+VERS-DTLS1.2:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+CURVE-ALL");
+	start("NONE:+VERS-DTLS1.2:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+CURVE-ALL");
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

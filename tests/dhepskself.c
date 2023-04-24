@@ -23,7 +23,7 @@
 /* Parts copied from GnuTLS example programs. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -39,22 +39,22 @@ int main(int argc, char **argv)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <sys/socket.h>
-# if !defined(_WIN32)
-#  include <sys/wait.h>
-# endif
-# include <unistd.h>
-# include <gnutls/gnutls.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#if !defined(_WIN32)
+#include <sys/wait.h>
+#endif
+#include <unistd.h>
+#include <gnutls/gnutls.h>
 
-# include "utils.h"
+#include "utils.h"
 
 /* A very basic TLS client, with PSK authentication.
  */
 
-# define MAX_BUF 1024
-# define MSG "Hello TLS"
+#define MAX_BUF 1024
+#define MSG "Hello TLS"
 
 static void tls_log_func(int level, const char *str)
 {
@@ -84,9 +84,8 @@ static void client(int sd)
 	gnutls_init(&session, GNUTLS_CLIENT);
 
 	/* Use default priorities */
-	gnutls_priority_set_direct(session,
-				   "NORMAL:-VERS-ALL:+VERS-TLS1.2:+DHE-PSK",
-				   NULL);
+	gnutls_priority_set_direct(
+		session, "NORMAL:-VERS-ALL:+VERS-TLS1.2:+DHE-PSK", NULL);
 
 	/* put the anonymous credentials to the current session
 	 */
@@ -130,7 +129,7 @@ static void client(int sd)
 
 	gnutls_bye(session, GNUTLS_SHUT_RDWR);
 
- end:
+end:
 
 	close(sd);
 
@@ -144,7 +143,7 @@ static void client(int sd)
 /* This is a sample TLS 1.0 echo server, for PSK authentication.
  */
 
-# define MAX_BUF 1024
+#define MAX_BUF 1024
 
 /* These are global */
 gnutls_psk_server_credentials_t server_pskcred;
@@ -158,9 +157,8 @@ static gnutls_session_t initialize_tls_session(void)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_priority_set_direct(session,
-				   "NORMAL:-VERS-ALL:+VERS-TLS1.2:+DHE-PSK",
-				   NULL);
+	gnutls_priority_set_direct(
+		session, "NORMAL:-VERS-ALL:+VERS-TLS1.2:+DHE-PSK", NULL);
 
 	gnutls_handshake_set_timeout(session, get_timeout());
 	gnutls_credentials_set(session, GNUTLS_CRD_PSK, server_pskcred);
@@ -183,8 +181,8 @@ static int generate_dh_params(void)
 					     GNUTLS_X509_FMT_PEM);
 }
 
-static int
-pskfunc(gnutls_session_t session, const char *username, gnutls_datum_t * key)
+static int pskfunc(gnutls_session_t session, const char *username,
+		   gnutls_datum_t *key)
 {
 	if (debug)
 		printf("psk callback to get %s's password\n", username);
@@ -244,11 +242,11 @@ static void server(int sd)
 
 		if (ret == 0) {
 			if (debug)
-				success
-				    ("server: Peer has closed the GnuTLS connection\n");
+				success("server: Peer has closed the GnuTLS connection\n");
 			break;
 		} else if (ret < 0) {
-			fail("server: Received corrupted data(%d). Closing...\n", ret);
+			fail("server: Received corrupted data(%d). Closing...\n",
+			     ret);
 			break;
 		} else if (ret > 0) {
 			/* echo data back to the client
@@ -306,4 +304,4 @@ void doit(void)
 	}
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

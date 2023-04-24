@@ -35,9 +35,8 @@
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned
  */
-int
-_gnutls_iov_iter_init(struct iov_iter_st *iter,
-		      const giovec_t * iov, size_t iov_count, size_t block_size)
+int _gnutls_iov_iter_init(struct iov_iter_st *iter, const giovec_t *iov,
+			  size_t iov_count, size_t block_size)
 {
 	if (unlikely(block_size > MAX_CIPHER_BLOCK_SIZE))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -67,7 +66,7 @@ _gnutls_iov_iter_init(struct iov_iter_st *iter,
  * Returns: On success, a value greater than or equal to zero is
  *   returned, otherwise a negative error code is returned
  */
-ssize_t _gnutls_iov_iter_next(struct iov_iter_st *iter, uint8_t ** data)
+ssize_t _gnutls_iov_iter_next(struct iov_iter_st *iter, uint8_t **data)
 {
 	while (iter->iov_index < iter->iov_count) {
 		const giovec_t *iov = &iter->iov[iter->iov_index];
@@ -82,9 +81,8 @@ ssize_t _gnutls_iov_iter_next(struct iov_iter_st *iter, uint8_t ** data)
 		}
 
 		if (unlikely(len < iter->iov_offset))
-			return
-			    gnutls_assert_val
-			    (GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+			return gnutls_assert_val(
+				GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 		len -= iter->iov_offset;
 		p += iter->iov_offset;
 
@@ -148,9 +146,8 @@ ssize_t _gnutls_iov_iter_next(struct iov_iter_st *iter, uint8_t ** data)
  *
  * Flush the content of temp buffer (if any) to the data buffer.
  */
-int
-_gnutls_iov_iter_sync(struct iov_iter_st *iter, const uint8_t * data,
-		      size_t data_size)
+int _gnutls_iov_iter_sync(struct iov_iter_st *iter, const uint8_t *data,
+			  size_t data_size)
 {
 	size_t iov_index;
 	size_t iov_offset;
@@ -180,8 +177,8 @@ _gnutls_iov_iter_sync(struct iov_iter_st *iter, const uint8_t * data,
 
 		while (iov_offset == 0) {
 			if (unlikely(iov_index == 0))
-				return
-				    gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+				return gnutls_assert_val(
+					GNUTLS_E_INTERNAL_ERROR);
 
 			iov_index--;
 			iov_offset = iter->iov[iov_index].iov_len;

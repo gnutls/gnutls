@@ -37,7 +37,7 @@
 #include "gthreads.h"
 
 #ifdef HAVE_DL_ITERATE_PHDR
-# include <link.h>
+#include <link.h>
 #endif
 
 unsigned int _gnutls_lib_state = LIB_STATE_POWERON;
@@ -49,10 +49,10 @@ struct gnutls_fips140_context_st {
 
 #ifdef ENABLE_FIPS140
 
-# include <dlfcn.h>
+#include <dlfcn.h>
 
-# define FIPS_KERNEL_FILE "/proc/sys/crypto/fips_enabled"
-# define FIPS_SYSTEM_FILE "/etc/system-fips"
+#define FIPS_KERNEL_FILE "/proc/sys/crypto/fips_enabled"
+#define FIPS_SYSTEM_FILE "/etc/system-fips"
 
 /* We provide a per-thread FIPS-mode so that an application
  * can use gnutls_fips140_set_mode() to override a specific
@@ -81,10 +81,10 @@ unsigned _gnutls_fips_mode_enabled(void)
 	 * is called on library initialization, the
 	 * _global_fips_mode is always set during app run.
 	 */
-	if (_tfips_mode != (gnutls_fips_mode_t) - 1)
+	if (_tfips_mode != (gnutls_fips_mode_t)-1)
 		return _tfips_mode;
 
-	if (_global_fips_mode != (gnutls_fips_mode_t) - 1) {
+	if (_global_fips_mode != (gnutls_fips_mode_t)-1) {
 		return _global_fips_mode;
 	}
 
@@ -138,7 +138,7 @@ unsigned _gnutls_fips_mode_enabled(void)
 	ret = GNUTLS_FIPS140_DISABLED;
 	goto exit;
 
- exit:
+exit:
 	_global_fips_mode = ret;
 	return ret;
 }
@@ -154,14 +154,14 @@ void _gnutls_fips_mode_reset_zombie(void)
 
 /* These only works with the platform where SONAME is part of the ABI.
  * For example, *_SONAME will be set to "none" on Windows platforms. */
-# define GNUTLS_LIBRARY_NAME GNUTLS_LIBRARY_SONAME
-# define NETTLE_LIBRARY_NAME NETTLE_LIBRARY_SONAME
-# define HOGWEED_LIBRARY_NAME HOGWEED_LIBRARY_SONAME
-# define GMP_LIBRARY_NAME GMP_LIBRARY_SONAME
+#define GNUTLS_LIBRARY_NAME GNUTLS_LIBRARY_SONAME
+#define NETTLE_LIBRARY_NAME NETTLE_LIBRARY_SONAME
+#define HOGWEED_LIBRARY_NAME HOGWEED_LIBRARY_SONAME
+#define GMP_LIBRARY_NAME GMP_LIBRARY_SONAME
 
-# define HMAC_SIZE 32
-# define HMAC_ALGO GNUTLS_MAC_SHA256
-# define HMAC_FORMAT_VERSION 1
+#define HMAC_SIZE 32
+#define HMAC_ALGO GNUTLS_MAC_SHA256
+#define HMAC_FORMAT_VERSION 1
 
 struct hmac_entry {
 	char path[GNUTLS_PATH_MAX];
@@ -193,7 +193,7 @@ struct lib_paths {
  *
  * Returns: 0 on success, a negative error code otherwise
  */
-static int get_hmac(uint8_t * dest, const char *value)
+static int get_hmac(uint8_t *dest, const char *value)
 {
 	int ret;
 	size_t hmac_size;
@@ -213,9 +213,8 @@ static int get_hmac(uint8_t * dest, const char *value)
 	return 0;
 }
 
-static int
-lib_handler(struct hmac_entry *entry,
-	    const char *section, const char *name, const char *value)
+static int lib_handler(struct hmac_entry *entry, const char *section,
+		       const char *name, const char *value)
 {
 	if (!strcmp(name, "path")) {
 		snprintf(entry->path, GNUTLS_PATH_MAX, "%s", value);
@@ -272,8 +271,8 @@ static int get_hmac_path(char *mac_file, size_t mac_file_size,
 	p = strrchr(gnutls_path, '/');
 
 	if (p == NULL)
-		ret =
-		    snprintf(mac_file, mac_file_size, ".%s.hmac", gnutls_path);
+		ret = snprintf(mac_file, mac_file_size, ".%s.hmac",
+			       gnutls_path);
 	else
 		ret = snprintf(mac_file, mac_file_size, "%.*s/.%s.hmac",
 			       (int)(p - gnutls_path), gnutls_path, p + 1);
@@ -286,13 +285,12 @@ static int get_hmac_path(char *mac_file, size_t mac_file_size,
 		return GNUTLS_E_SUCCESS;
 
 	if (p == NULL)
-		ret =
-		    snprintf(mac_file, mac_file_size, "fipscheck/.%s.hmac",
-			     gnutls_path);
+		ret = snprintf(mac_file, mac_file_size, "fipscheck/.%s.hmac",
+			       gnutls_path);
 	else
-		ret =
-		    snprintf(mac_file, mac_file_size, "%.*s/fipscheck/.%s.hmac",
-			     (int)(p - gnutls_path), gnutls_path, p + 1);
+		ret = snprintf(mac_file, mac_file_size,
+			       "%.*s/fipscheck/.%s.hmac",
+			       (int)(p - gnutls_path), gnutls_path, p + 1);
 
 	if ((size_t)ret >= mac_file_size)
 		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
@@ -353,8 +351,8 @@ static int check_lib_hmac(struct hmac_entry *entry, const char *path)
 	_gnutls_debug_log("Loading: %s\n", path);
 	ret = gnutls_load_file(path, &data);
 	if (ret < 0) {
-		_gnutls_debug_log("Could not load %s: %s\n",
-				  path, gnutls_strerror(ret));
+		_gnutls_debug_log("Could not load %s: %s\n", path,
+				  gnutls_strerror(ret));
 		return gnutls_assert_val(ret);
 	}
 
@@ -366,8 +364,8 @@ static int check_lib_hmac(struct hmac_entry *entry, const char *path)
 
 	gnutls_free(data.data);
 	if (ret < 0) {
-		_gnutls_debug_log("Could not calculate HMAC for %s: %s\n",
-				  path, gnutls_strerror(ret));
+		_gnutls_debug_log("Could not calculate HMAC for %s: %s\n", path,
+				  gnutls_strerror(ret));
 		return gnutls_assert_val(ret);
 	}
 
@@ -381,7 +379,7 @@ static int check_lib_hmac(struct hmac_entry *entry, const char *path)
 	return 0;
 }
 
-# ifdef HAVE_DL_ITERATE_PHDR
+#ifdef HAVE_DL_ITERATE_PHDR
 
 static int callback(struct dl_phdr_info *info, size_t size, void *data)
 {
@@ -425,7 +423,7 @@ static int load_lib_paths(struct lib_paths *paths)
 	return GNUTLS_E_SUCCESS;
 }
 
-# else
+#else
 
 static int load_lib_paths(struct lib_paths *paths)
 {
@@ -434,7 +432,7 @@ static int load_lib_paths(struct lib_paths *paths)
 	return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 }
 
-# endif				/* HAVE_DL_ITERATE_PHDR */
+#endif /* HAVE_DL_ITERATE_PHDR */
 
 static int check_binary_integrity(void)
 {
@@ -698,10 +696,12 @@ void gnutls_fips140_set_mode(gnutls_fips_mode_t mode, unsigned flags)
 {
 #ifdef ENABLE_FIPS140
 	gnutls_fips_mode_t prev = _gnutls_fips_mode_enabled();
-	if (prev == GNUTLS_FIPS140_DISABLED || prev == GNUTLS_FIPS140_SELFTESTS) {
+	if (prev == GNUTLS_FIPS140_DISABLED ||
+	    prev == GNUTLS_FIPS140_SELFTESTS) {
 		/* we need to run self-tests first to be in FIPS140-2 mode */
-		_gnutls_audit_log(NULL,
-				  "The library should be initialized in FIPS140-2 mode to do that operation\n");
+		_gnutls_audit_log(
+			NULL,
+			"The library should be initialized in FIPS140-2 mode to do that operation\n");
 		return;
 	}
 
@@ -712,14 +712,16 @@ void gnutls_fips140_set_mode(gnutls_fips_mode_t mode, unsigned flags)
 	case GNUTLS_FIPS140_DISABLED:
 		break;
 	case GNUTLS_FIPS140_SELFTESTS:
-		_gnutls_audit_log(NULL,
-				  "Cannot switch library to FIPS140-2 self-tests mode; defaulting to strict\n");
+		_gnutls_audit_log(
+			NULL,
+			"Cannot switch library to FIPS140-2 self-tests mode; defaulting to strict\n");
 		mode = GNUTLS_FIPS140_STRICT;
 		break;
 	default:
-		_gnutls_audit_log(NULL,
-				  "Cannot switch library to mode %u; defaulting to strict\n",
-				  (unsigned)mode);
+		_gnutls_audit_log(
+			NULL,
+			"Cannot switch library to mode %u; defaulting to strict\n",
+			(unsigned)mode);
 		mode = GNUTLS_FIPS140_STRICT;
 		break;
 	}
@@ -753,7 +755,7 @@ void _gnutls_lib_force_operational(void)
  *
  * Since: 3.7.3
  */
-int gnutls_fips140_context_init(gnutls_fips140_context_t * context)
+int gnutls_fips140_context_init(gnutls_fips140_context_t *context)
 {
 	*context = gnutls_malloc(sizeof(struct gnutls_fips140_context_st));
 	if (!*context) {
@@ -862,8 +864,8 @@ int gnutls_fips140_pop_context(void)
 
 #ifdef ENABLE_FIPS140
 
-static inline const char
-*operation_state_to_string(gnutls_fips140_operation_state_t state)
+static inline const char *
+operation_state_to_string(gnutls_fips140_operation_state_t state)
 {
 	switch (state) {
 	case GNUTLS_FIPS140_OP_INITIAL:
@@ -875,7 +877,7 @@ static inline const char
 	case GNUTLS_FIPS140_OP_ERROR:
 		return "error";
 	default:
-		 /*NOTREACHED*/ assert(0);
+		/*NOTREACHED*/ assert(0);
 		return NULL;
 	}
 }
@@ -900,9 +902,10 @@ void _gnutls_switch_fips_state(gnutls_fips140_operation_state_t state)
 	case GNUTLS_FIPS140_OP_INITIAL:
 		/* initial can be transitioned to any state */
 		if (mode != GNUTLS_FIPS140_LAX) {
-			_gnutls_audit_log(NULL,
-					  "FIPS140-2 operation mode switched from initial to %s\n",
-					  operation_state_to_string(state));
+			_gnutls_audit_log(
+				NULL,
+				"FIPS140-2 operation mode switched from initial to %s\n",
+				operation_state_to_string(state));
 		}
 		_tfips_context->state = state;
 		break;
@@ -910,10 +913,10 @@ void _gnutls_switch_fips_state(gnutls_fips140_operation_state_t state)
 		/* approved can only be transitioned to not-approved */
 		if (likely(state == GNUTLS_FIPS140_OP_NOT_APPROVED)) {
 			if (mode != GNUTLS_FIPS140_LAX) {
-				_gnutls_audit_log(NULL,
-						  "FIPS140-2 operation mode switched from approved to %s\n",
-						  operation_state_to_string
-						  (state));
+				_gnutls_audit_log(
+					NULL,
+					"FIPS140-2 operation mode switched from approved to %s\n",
+					operation_state_to_string(state));
 			}
 			_tfips_context->state = state;
 			return;
@@ -922,11 +925,12 @@ void _gnutls_switch_fips_state(gnutls_fips140_operation_state_t state)
 	default:
 		/* other transitions are prohibited */
 		if (mode != GNUTLS_FIPS140_LAX) {
-			_gnutls_audit_log(NULL,
-					  "FIPS140-2 operation mode cannot be switched from %s to %s\n",
-					  operation_state_to_string
-					  (_tfips_context->state),
-					  operation_state_to_string(state));
+			_gnutls_audit_log(
+				NULL,
+				"FIPS140-2 operation mode cannot be switched from %s to %s\n",
+				operation_state_to_string(
+					_tfips_context->state),
+				operation_state_to_string(state));
 		}
 		break;
 	}
@@ -981,7 +985,8 @@ int gnutls_fips140_run_self_tests(void)
 	_gnutls_switch_lib_state(LIB_STATE_SELFTEST);
 
 	ret = _gnutls_fips_perform_self_checks2();
-	if (gnutls_fips140_mode_enabled() != GNUTLS_FIPS140_DISABLED && ret < 0) {
+	if (gnutls_fips140_mode_enabled() != GNUTLS_FIPS140_DISABLED &&
+	    ret < 0) {
 		_gnutls_switch_lib_state(LIB_STATE_ERROR);
 		_gnutls_audit_log(NULL,
 				  "FIPS140-2 self testing part 2 failed\n");
@@ -991,12 +996,12 @@ int gnutls_fips140_run_self_tests(void)
 	}
 
 	/* Restore the previous FIPS context */
-	if (gnutls_fips140_mode_enabled() != GNUTLS_FIPS140_DISABLED
-	    && fips_context) {
+	if (gnutls_fips140_mode_enabled() != GNUTLS_FIPS140_DISABLED &&
+	    fips_context) {
 		if (gnutls_fips140_pop_context() < 0) {
 			_gnutls_switch_lib_state(LIB_STATE_ERROR);
-			_gnutls_audit_log(NULL,
-					  "FIPS140-2 context restoration failed\n");
+			_gnutls_audit_log(
+				NULL, "FIPS140-2 context restoration failed\n");
 		}
 		gnutls_fips140_context_deinit(fips_context);
 	}
