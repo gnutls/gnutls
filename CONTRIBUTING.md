@@ -66,8 +66,8 @@ case by case basis.
 
 # Indentation style:
 
- In general, use [the Linux kernel coding style](https://www.kernel.org/doc/html/latest/process/coding-style.html).
-You may indent the source using GNU indent, e.g. "indent -linux *.c".
+  We use [the Linux kernel coding style](https://www.kernel.org/doc/html/latest/process/coding-style.html). You may indent the source using the
+[devel/indent-gnutls](devel/indent-gnutls) script.
 
 
 # Commenting style

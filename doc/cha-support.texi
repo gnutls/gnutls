@@ -95,13 +95,12 @@ For code contributions, a number of style guides will help you:
 @itemize @bullet
 
 @item Coding Style.
-Follow the GNU Standards document.
-@c (@pxref{top, GNU Coding Standards,,standards}).
+Follow the Linux kernel coding style@footnote{see @uref{https://www.kernel.org/doc/html/latest/process/coding-style.html}.}.
 
 If you normally code using another coding standard, there is no
-problem, but you should use @samp{indent} to reformat the code
-@c (@pxref{top, GNU Indent,, indent}) 
-before submitting your work.
+problem, but you should run the @samp{indent-gnutls} script found in
+the @samp{devel} directory to reformat the code before submitting your
+work.
 
 @item Use the unified diff format @samp{diff -u}.
 
