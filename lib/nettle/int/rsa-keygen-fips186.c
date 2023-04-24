@@ -22,7 +22,7 @@
  */
 
 #if HAVE_CONFIG_H
-# include "config.h"
+#include "config.h"
 #endif
 
 #include <assert.h>
@@ -36,12 +36,11 @@
 
 #include <nettle/bignum.h>
 
-static int
-rsa_provable_prime(mpz_t p,
-		   unsigned *prime_seed_length, void *prime_seed,
-		   unsigned bits,
-		   unsigned seed_length, const void *seed,
-		   mpz_t e, void *progress_ctx, nettle_progress_func * progress)
+static int rsa_provable_prime(mpz_t p, unsigned *prime_seed_length,
+			      void *prime_seed, unsigned bits,
+			      unsigned seed_length, const void *seed, mpz_t e,
+			      void *progress_ctx,
+			      nettle_progress_func *progress)
 {
 	mpz_t x, t, s, r1, r2, p0, sq;
 	int ret;
@@ -63,9 +62,9 @@ rsa_provable_prime(mpz_t p,
 
 	/* p1 = p2 = 1 */
 
-	ret = st_provable_prime(p0, &pseed_length, pseed,
-				NULL, 1 + div_ceil(bits, 2), seed_length,
-				seed, progress_ctx, progress);
+	ret = st_provable_prime(p0, &pseed_length, pseed, NULL,
+				1 + div_ceil(bits, 2), seed_length, seed,
+				progress_ctx, progress);
 	if (ret == 0) {
 		goto cleanup;
 	}
@@ -83,7 +82,7 @@ rsa_provable_prime(mpz_t p,
 		nettle_mpz_set_str_256_u(s, pseed_length, pseed);
 		for (i = 0; i < iterations; i++) {
 			tseed_length =
-			    mpz_seed_sizeinbase_256_u(s, pseed_length);
+				mpz_seed_sizeinbase_256_u(s, pseed_length);
 			if (tseed_length > sizeof(pseed))
 				goto fail;
 			nettle_mpz_get_str_256(tseed_length, pseed, s);
@@ -126,7 +125,7 @@ rsa_provable_prime(mpz_t p,
 	/* t = ((2 y p0 p1) + x) / (2 p0 p1 p2) */
 	mpz_cdiv_q(t, r1, r2);
 
- retry:
+retry:
 	/* p = t p2 - y = t - 1 */
 	mpz_sub_ui(p, t, 1);
 
@@ -167,17 +166,17 @@ rsa_provable_prime(mpz_t p,
 	mpz_gcd(r1, e, r2);
 
 	if (mpz_cmp_ui(r1, 1) == 0) {
-		mpz_set_ui(x, 0);	/* a = 0 */
+		mpz_set_ui(x, 0); /* a = 0 */
 		if (iterations > 0) {
 			for (i = 0; i < iterations; i++) {
-				tseed_length =
-				    mpz_seed_sizeinbase_256_u(s, pseed_length);
+				tseed_length = mpz_seed_sizeinbase_256_u(
+					s, pseed_length);
 				if (tseed_length > sizeof(pseed))
 					goto fail;
 				nettle_mpz_get_str_256(tseed_length, pseed, s);
 
-				hash(&storage
-				     [(iterations - i - 1) * DIGEST_SIZE],
+				hash(&storage[(iterations - i - 1) *
+					      DIGEST_SIZE],
 				     tseed_length, pseed);
 				mpz_add_ui(s, s, 1);
 			}
@@ -186,7 +185,8 @@ rsa_provable_prime(mpz_t p,
 		}
 
 		/* a = 2 + a mod p-3 */
-		mpz_sub_ui(r1, p, 3);	/* p is too large to worry about negatives */
+		mpz_sub_ui(r1, p,
+			   3); /* p is too large to worry about negatives */
 		mpz_mod(x, x, r1);
 		mpz_add_ui(x, x, 2);
 
@@ -208,8 +208,8 @@ rsa_provable_prime(mpz_t p,
 			if (mpz_cmp_ui(r1, 1) == 0) {
 				if (prime_seed_length != NULL) {
 					tseed_length =
-					    mpz_seed_sizeinbase_256_u(s,
-								      pseed_length);
+						mpz_seed_sizeinbase_256_u(
+							s, pseed_length);
 					if (tseed_length > sizeof(pseed))
 						goto fail;
 
@@ -218,7 +218,7 @@ rsa_provable_prime(mpz_t p,
 
 					if (*prime_seed_length < tseed_length) {
 						*prime_seed_length =
-						    tseed_length;
+							tseed_length;
 						goto fail;
 					}
 					*prime_seed_length = tseed_length;
@@ -239,9 +239,9 @@ rsa_provable_prime(mpz_t p,
 	mpz_add_ui(t, t, 1);
 	goto retry;
 
- fail:
+fail:
 	ret = 0;
- cleanup:
+cleanup:
 	free(storage);
 	mpz_clear(p0);
 	mpz_clear(sq);
@@ -260,24 +260,23 @@ rsa_provable_prime(mpz_t p,
 static inline unsigned seed_length_for_modulus_size(unsigned modulus_size)
 {
 	switch (modulus_size) {
-	case 2048:		/* SP 800-56B rev 2 Appendix D and FIPS 140-2 IG 7.5 */
+	case 2048: /* SP 800-56B rev 2 Appendix D and FIPS 140-2 IG 7.5 */
 		return 14 * 2;
-	case 3072:		/* SP 800-56B rev 2 Appendix D and FIPS 140-2 IG 7.5 */
+	case 3072: /* SP 800-56B rev 2 Appendix D and FIPS 140-2 IG 7.5 */
 		return 16 * 2;
-	case 4096:		/* SP 800-56B rev 2 Appendix D */
+	case 4096: /* SP 800-56B rev 2 Appendix D */
 		return 19 * 2;
-	case 6144:		/* SP 800-56B rev 2 Appendix D */
+	case 6144: /* SP 800-56B rev 2 Appendix D */
 		return 22 * 2;
-	case 7680:		/* FIPS 140-2 IG 7.5 */
+	case 7680: /* FIPS 140-2 IG 7.5 */
 		return 24 * 2;
-	case 8192:		/* SP 800-56B rev 2 Appendix D */
+	case 8192: /* SP 800-56B rev 2 Appendix D */
 		return 25 * 2;
-	case 15360:		/* FIPS 140-2 IG 7.5 */
+	case 15360: /* FIPS 140-2 IG 7.5 */
 		return 32 * 2;
 	default:
 		return 0;
 	}
-
 }
 
 /* This generates p,q params using the B.3.2.2 algorithm in FIPS 186-4.
@@ -285,14 +284,13 @@ static inline unsigned seed_length_for_modulus_size(unsigned modulus_size)
  * The hash function used is SHA384.
  * The exponent e used is the value in pub->e.
  */
-int
-_rsa_generate_fips186_4_keypair(struct rsa_public_key *pub,
-				struct rsa_private_key *key,
-				unsigned seed_length, uint8_t * seed,
-				void *progress_ctx,
-				nettle_progress_func * progress,
-				/* Desired size of modulo, in bits */
-				unsigned n_size)
+int _rsa_generate_fips186_4_keypair(struct rsa_public_key *pub,
+				    struct rsa_private_key *key,
+				    unsigned seed_length, uint8_t *seed,
+				    void *progress_ctx,
+				    nettle_progress_func *progress,
+				    /* Desired size of modulo, in bits */
+				    unsigned n_size)
 {
 	mpz_t t, r, p1, q1, lcm;
 	int ret;
@@ -331,15 +329,15 @@ _rsa_generate_fips186_4_keypair(struct rsa_public_key *pub,
 	}
 
 	cert.pseed_length = sizeof(cert.pseed);
-	ret = rsa_provable_prime(key->p, &cert.pseed_length, cert.pseed,
-				 l, seed_length,
-				 seed, pub->e, progress_ctx, progress);
+	ret = rsa_provable_prime(key->p, &cert.pseed_length, cert.pseed, l,
+				 seed_length, seed, pub->e, progress_ctx,
+				 progress);
 	if (ret == 0) {
 		goto cleanup;
 	}
 
 	mpz_set_ui(r, 1);
-	mpz_mul_2exp(r, r, (l) - 100);
+	mpz_mul_2exp(r, r, (l)-100);
 
 	do {
 		cert.qseed_length = sizeof(cert.qseed);
@@ -406,7 +404,7 @@ _rsa_generate_fips186_4_keypair(struct rsa_public_key *pub,
 	}
 
 	ret = 1;
- cleanup:
+cleanup:
 	mpz_clear(p1);
 	mpz_clear(q1);
 	mpz_clear(lcm);
@@ -420,15 +418,14 @@ _rsa_generate_fips186_4_keypair(struct rsa_public_key *pub,
  * The hash function used is SHA384.
  * The exponent e used is the value in pub->e.
  */
-int
-rsa_generate_fips186_4_keypair(struct rsa_public_key *pub,
-			       struct rsa_private_key *key,
-			       void *random_ctx, nettle_random_func * random,
-			       void *progress_ctx,
-			       nettle_progress_func * progress,
-			       unsigned *rseed_size, void *rseed,
-			       /* Desired size of modulo, in bits */
-			       unsigned n_size)
+int rsa_generate_fips186_4_keypair(struct rsa_public_key *pub,
+				   struct rsa_private_key *key,
+				   void *random_ctx, nettle_random_func *random,
+				   void *progress_ctx,
+				   nettle_progress_func *progress,
+				   unsigned *rseed_size, void *rseed,
+				   /* Desired size of modulo, in bits */
+				   unsigned n_size)
 {
 	uint8_t seed[128];
 	unsigned seed_length;

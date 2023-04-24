@@ -31,16 +31,14 @@
 */
 
 #ifndef NETTLE_GMP_GLUE_H_INCLUDED
-# define NETTLE_GMP_GLUE_H_INCLUDED
+#define NETTLE_GMP_GLUE_H_INCLUDED
 
-# include <nettle/bignum.h>
+#include <nettle/bignum.h>
 
 /* Like mpn_set_str, but always writes rn limbs. If input is larger,
    higher bits are ignored. */
-void
-mpn_set_base256(mp_limb_t * rp, mp_size_t rn, const uint8_t * xp, size_t xn);
+void mpn_set_base256(mp_limb_t *rp, mp_size_t rn, const uint8_t *xp, size_t xn);
 
-void
-mpn_get_base256(uint8_t * rp, size_t rn, const mp_limb_t * xp, mp_size_t xn);
+void mpn_get_base256(uint8_t *rp, size_t rn, const mp_limb_t *xp, mp_size_t xn);
 
-#endif				/* NETTLE_GMP_GLUE_H_INCLUDED */
+#endif /* NETTLE_GMP_GLUE_H_INCLUDED */

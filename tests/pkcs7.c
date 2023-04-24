@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include "config.h"
+#include "config.h"
 #endif
 
 #include <gnutls/gnutls.h>
@@ -40,7 +40,7 @@
 
 #define CERT_DIR "pkcs7-interesting"
 
-static int getnextfile(DIR ** dirp, gnutls_datum_t * der, int *exp_ret)
+static int getnextfile(DIR **dirp, gnutls_datum_t *der, int *exp_ret)
 {
 	struct dirent *d;
 	char path[256];
@@ -67,7 +67,7 @@ static int getnextfile(DIR ** dirp, gnutls_datum_t * der, int *exp_ret)
 #ifdef _DIRENT_HAVE_D_TYPE
 		    && d->d_type == DT_REG
 #endif
-		    ) {
+		) {
 			if (strstr(d->d_name, ".der") == 0)
 				continue;
 			if (strstr(d->d_name, ".err") != 0)
@@ -85,7 +85,7 @@ static int getnextfile(DIR ** dirp, gnutls_datum_t * der, int *exp_ret)
 				 d->d_name);
 			success("Loading errfile %s\n", path);
 			ret = gnutls_load_file(path, &local);
-			if (ret < 0) {	/* not found assume success */
+			if (ret < 0) { /* not found assume success */
 				*exp_ret = 0;
 			} else {
 				*exp_ret = atoi((char *)local.data);
@@ -98,7 +98,7 @@ static int getnextfile(DIR ** dirp, gnutls_datum_t * der, int *exp_ret)
 	} while (d != NULL);
 
 	closedir(*dirp);
-	return -1;		/* finished */
+	return -1; /* finished */
 }
 
 void doit(void)
@@ -125,9 +125,8 @@ void doit(void)
 		if (ret == 0) {
 			/* attempt to fully decode */
 			gnutls_datum_t out;
-			ret =
-			    gnutls_pkcs7_print(cert, GNUTLS_CRT_PRINT_FULL,
-					       &out);
+			ret = gnutls_pkcs7_print(cert, GNUTLS_CRT_PRINT_FULL,
+						 &out);
 			if (ret < 0) {
 				fail("print: %s\n", gnutls_strerror(ret));
 			}

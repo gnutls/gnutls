@@ -28,10 +28,9 @@
 #include <fips.h>
 #include <assert.h>
 
-int
-drbg_aes_init(struct drbg_aes_ctx *ctx,
-	      unsigned entropy_size, const uint8_t * entropy,
-	      unsigned pstring_size, const uint8_t * pstring)
+int drbg_aes_init(struct drbg_aes_ctx *ctx, unsigned entropy_size,
+		  const uint8_t *entropy, unsigned pstring_size,
+		  const uint8_t *pstring)
 {
 	uint8_t tmp[AES256_KEY_SIZE];
 
@@ -41,14 +40,13 @@ drbg_aes_init(struct drbg_aes_ctx *ctx,
 
 	aes256_set_encrypt_key(&ctx->key, tmp);
 
-	return drbg_aes_reseed(ctx, entropy_size, entropy,
-			       pstring_size, pstring);
+	return drbg_aes_reseed(ctx, entropy_size, entropy, pstring_size,
+			       pstring);
 }
 
 /* Sets V and key based on pdata */
-static void
-drbg_aes_update(struct drbg_aes_ctx *ctx,
-		const uint8_t pdata[DRBG_AES_SEED_SIZE])
+static void drbg_aes_update(struct drbg_aes_ctx *ctx,
+			    const uint8_t pdata[DRBG_AES_SEED_SIZE])
 {
 	unsigned len = 0;
 	uint8_t tmp[DRBG_AES_SEED_SIZE];
@@ -70,10 +68,9 @@ drbg_aes_update(struct drbg_aes_ctx *ctx,
 	ctx->seeded = 1;
 }
 
-int
-drbg_aes_reseed(struct drbg_aes_ctx *ctx,
-		unsigned entropy_size, const uint8_t * entropy,
-		unsigned add_size, const uint8_t * add)
+int drbg_aes_reseed(struct drbg_aes_ctx *ctx, unsigned entropy_size,
+		    const uint8_t *entropy, unsigned add_size,
+		    const uint8_t *add)
 {
 	uint8_t tmp[DRBG_AES_SEED_SIZE];
 	unsigned len = 0;
@@ -97,7 +94,7 @@ drbg_aes_reseed(struct drbg_aes_ctx *ctx,
 	return 1;
 }
 
-int drbg_aes_random(struct drbg_aes_ctx *ctx, unsigned length, uint8_t * dst)
+int drbg_aes_random(struct drbg_aes_ctx *ctx, unsigned length, uint8_t *dst)
 {
 	unsigned p_len;
 	int left = length;
@@ -118,8 +115,8 @@ int drbg_aes_random(struct drbg_aes_ctx *ctx, unsigned length, uint8_t * dst)
 }
 
 /* we don't use additional input */
-int drbg_aes_generate(struct drbg_aes_ctx *ctx, unsigned length, uint8_t * dst,
-		      unsigned add_size, const uint8_t * add)
+int drbg_aes_generate(struct drbg_aes_ctx *ctx, unsigned length, uint8_t *dst,
+		      unsigned add_size, const uint8_t *add)
 {
 	uint8_t tmp[AES_BLOCK_SIZE];
 	uint8_t seed[DRBG_AES_SEED_SIZE];
@@ -151,7 +148,7 @@ int drbg_aes_generate(struct drbg_aes_ctx *ctx, unsigned length, uint8_t * dst,
 		aes256_encrypt(&ctx->key, AES_BLOCK_SIZE, dst, ctx->v);
 	}
 
-	if (left > 0) {		/* partial fill */
+	if (left > 0) { /* partial fill */
 		INCREMENT(sizeof(ctx->v), ctx->v);
 		aes256_encrypt(&ctx->key, AES_BLOCK_SIZE, tmp, ctx->v);
 		memcpy(dst, tmp, left);

@@ -1,1 +1,1 @@
-#define assert_int_nequal(x,y) assert((x)==(y))
+#define assert_int_nequal(x, y) assert((x) == (y))

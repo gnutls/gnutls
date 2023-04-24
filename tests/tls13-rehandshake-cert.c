@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -44,8 +44,7 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "%s|<%d>| %s", side, level, str);
 }
 
-static
-void server_initiated_handshake(void)
+static void server_initiated_handshake(void)
 {
 	/* Server stuff. */
 	gnutls_certificate_credentials_t serverx509cred;
@@ -68,9 +67,8 @@ void server_initiated_handshake(void)
 
 	/* Init server */
 	gnutls_certificate_allocate_credentials(&serverx509cred);
-	gnutls_certificate_set_x509_key_mem(serverx509cred,
-					    &server_cert, &server_key,
-					    GNUTLS_X509_FMT_PEM);
+	gnutls_certificate_set_x509_key_mem(serverx509cred, &server_cert,
+					    &server_key, GNUTLS_X509_FMT_PEM);
 	gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, serverx509cred);
 	gnutls_priority_set_direct(server, "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3",
@@ -126,8 +124,7 @@ void server_initiated_handshake(void)
 	reset_buffers();
 }
 
-static
-void client_initiated_handshake(void)
+static void client_initiated_handshake(void)
 {
 	/* Server stuff. */
 	gnutls_certificate_credentials_t serverx509cred;
@@ -150,9 +147,8 @@ void client_initiated_handshake(void)
 
 	/* Init server */
 	gnutls_certificate_allocate_credentials(&serverx509cred);
-	gnutls_certificate_set_x509_key_mem(serverx509cred,
-					    &server_cert, &server_key,
-					    GNUTLS_X509_FMT_PEM);
+	gnutls_certificate_set_x509_key_mem(serverx509cred, &server_cert,
+					    &server_key, GNUTLS_X509_FMT_PEM);
 	gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, serverx509cred);
 	gnutls_priority_set_direct(server, "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3",

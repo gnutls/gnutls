@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -41,8 +41,8 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "%s|<%d>| %s", side, level, str);
 }
 
-static void
-try(const char *name, const char *sprio, const char *cprio, int serr, int cerr)
+static void try(const char *name, const char *sprio, const char *cprio,
+		int serr, int cerr)
 {
 	int sret, cret;
 	gnutls_certificate_credentials_t scred, ccred;
@@ -52,14 +52,14 @@ try(const char *name, const char *sprio, const char *cprio, int serr, int cerr)
 
 	assert(gnutls_certificate_allocate_credentials(&scred) >= 0);
 
-	assert(gnutls_certificate_set_x509_key_mem
-	       (scred, &server_ca3_localhost_cert,
-		&server_ca3_key, GNUTLS_X509_FMT_PEM) >= 0);
+	assert(gnutls_certificate_set_x509_key_mem(
+		       scred, &server_ca3_localhost_cert, &server_ca3_key,
+		       GNUTLS_X509_FMT_PEM) >= 0);
 
 	assert(gnutls_certificate_allocate_credentials(&ccred) >= 0);
 
-	assert(gnutls_certificate_set_x509_trust_mem
-	       (ccred, &ca3_cert, GNUTLS_X509_FMT_PEM) >= 0);
+	assert(gnutls_certificate_set_x509_trust_mem(ccred, &ca3_cert,
+						     GNUTLS_X509_FMT_PEM) >= 0);
 
 	assert(gnutls_init(&server, GNUTLS_SERVER) >= 0);
 	assert(gnutls_init(&client, GNUTLS_CLIENT) >= 0);

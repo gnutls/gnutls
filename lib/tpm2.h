@@ -22,14 +22,14 @@
  */
 
 #ifndef GNUTLS_LIB_TPM2_H
-# define GNUTLS_LIB_TPM2_H
+#define GNUTLS_LIB_TPM2_H
 
-# include "pin.h"
+#include "pin.h"
 
 /* Functions used outside tpm2.c */
 
 void _gnutls_tpm2_deinit(void);
-int _gnutls_load_tpm2_key(gnutls_privkey_t pkey, const gnutls_datum_t * fdata);
+int _gnutls_load_tpm2_key(gnutls_privkey_t pkey, const gnutls_datum_t *fdata);
 
 /* Functions only used in tpm2.c */
 
@@ -43,22 +43,22 @@ void release_tpm2_ctx(struct tpm2_info_st *info);
 
 int install_tpm2_key(struct tpm2_info_st *info, gnutls_privkey_t pkey,
 		     unsigned int parent, bool emptyauth,
-		     gnutls_datum_t * privdata, gnutls_datum_t * pubdata);
+		     gnutls_datum_t *privdata, gnutls_datum_t *pubdata);
 
 void tpm2_deinit_fn(gnutls_privkey_t key, void *priv);
 
 int tpm2_rsa_sign_hash_fn(gnutls_privkey_t key, gnutls_sign_algorithm_t algo,
 			  void *_info, unsigned int flags,
-			  const gnutls_datum_t * data, gnutls_datum_t * sig);
+			  const gnutls_datum_t *data, gnutls_datum_t *sig);
 
 int tpm2_ec_sign_hash_fn(gnutls_privkey_t key, gnutls_sign_algorithm_t algo,
 			 void *_info, unsigned int flags,
-			 const gnutls_datum_t * data, gnutls_datum_t * sig);
+			 const gnutls_datum_t *data, gnutls_datum_t *sig);
 
 uint16_t tpm2_key_curve(struct tpm2_info_st *info);
 int tpm2_rsa_key_bits(struct tpm2_info_st *info);
 
-int tpm2_convert_public(gnutls_privkey_t key,
-			void *userdata, gnutls_pk_params_st * params);
+int tpm2_convert_public(gnutls_privkey_t key, void *userdata,
+			gnutls_pk_params_st *params);
 
-#endif				/* GNUTLS_LIB_TPM2_H */
+#endif /* GNUTLS_LIB_TPM2_H */

@@ -21,42 +21,43 @@
  */
 
 #ifndef GNUTLS_LIB_DTLS_H
-# define GNUTLS_LIB_DTLS_H
+#define GNUTLS_LIB_DTLS_H
 
-# include <config.h>
-# include "gnutls_int.h"
-# include <buffers.h>
-# include <mbuffers.h>
-# include <constate.h>
+#include <config.h>
+#include "gnutls_int.h"
+#include <buffers.h>
+#include <mbuffers.h>
+#include <constate.h>
 
 int _dtls_transmit(gnutls_session_t session);
 int _dtls_record_check(struct record_parameters_st *rp, uint64_t seq_num);
 void _dtls_reset_hsk_state(gnutls_session_t session);
 void _dtls_reset_window(struct record_parameters_st *rp);
 
-# define MAX_DTLS_TIMEOUT 60000
+#define MAX_DTLS_TIMEOUT 60000
 
-# define RETURN_DTLS_EAGAIN_OR_TIMEOUT(session, r) { \
-  struct timespec _now; \
-  unsigned int _diff; \
-  gnutls_gettime(&_now); \
-   \
-  _diff = timespec_sub_ms(&_now, &session->internals.handshake_start_time); \
-  if (_diff > session->internals.handshake_timeout_ms) \
-    { \
-      _gnutls_dtls_log("Session timeout: %u ms\n", _diff); \
-      return gnutls_assert_val(GNUTLS_E_TIMEDOUT); \
-    } \
-  else \
-    { \
-      int _rr; \
-      if (r != GNUTLS_E_INTERRUPTED) _rr = GNUTLS_E_AGAIN; \
-      else _rr = r; \
-      if (!(session->internals.flags & GNUTLS_NONBLOCK)) \
-	millisleep(50); \
-      return gnutls_assert_val(_rr); \
-    } \
-  }
+#define RETURN_DTLS_EAGAIN_OR_TIMEOUT(session, r)                            \
+	{                                                                    \
+		struct timespec _now;                                        \
+		unsigned int _diff;                                          \
+		gnutls_gettime(&_now);                                       \
+                                                                             \
+		_diff = timespec_sub_ms(                                     \
+			&_now, &session->internals.handshake_start_time);    \
+		if (_diff > session->internals.handshake_timeout_ms) {       \
+			_gnutls_dtls_log("Session timeout: %u ms\n", _diff); \
+			return gnutls_assert_val(GNUTLS_E_TIMEDOUT);         \
+		} else {                                                     \
+			int _rr;                                             \
+			if (r != GNUTLS_E_INTERRUPTED)                       \
+				_rr = GNUTLS_E_AGAIN;                        \
+			else                                                 \
+				_rr = r;                                     \
+			if (!(session->internals.flags & GNUTLS_NONBLOCK))   \
+				millisleep(50);                              \
+			return gnutls_assert_val(_rr);                       \
+		}                                                            \
+	}
 
 int _dtls_wait_and_retransmit(gnutls_session_t session);
 
@@ -65,10 +66,10 @@ int _dtls_wait_and_retransmit(gnutls_session_t session);
  */
 inline static int _dtls_is_async(gnutls_session_t session)
 {
-	if ((session->security_parameters.entity == GNUTLS_SERVER
-	     && !session->internals.resumed)
-	    || (session->security_parameters.entity == GNUTLS_CLIENT
-		&& session->internals.resumed))
+	if ((session->security_parameters.entity == GNUTLS_SERVER &&
+	     !session->internals.resumed) ||
+	    (session->security_parameters.entity == GNUTLS_CLIENT &&
+	     session->internals.resumed))
 		return 1;
 	else
 		return 0;
@@ -77,11 +78,11 @@ inline static int _dtls_is_async(gnutls_session_t session)
 inline static void _dtls_async_timer_init(gnutls_session_t session)
 {
 	if (_dtls_is_async(session)) {
-		_gnutls_dtls_log
-		    ("DTLS[%p]: Initializing timer for handshake state.\n",
-		     session);
+		_gnutls_dtls_log(
+			"DTLS[%p]: Initializing timer for handshake state.\n",
+			session);
 		session->internals.dtls.async_term =
-		    gnutls_time(0) + MAX_DTLS_TIMEOUT / 1000;
+			gnutls_time(0) + MAX_DTLS_TIMEOUT / 1000;
 	} else {
 		_dtls_reset_hsk_state(session);
 		_gnutls_handshake_io_buffer_clear(session);
@@ -109,9 +110,9 @@ inline static void _dtls_async_timer_check(gnutls_session_t session)
 	}
 }
 
-unsigned _gnutls_record_overhead(const version_entry_st * ver,
-				 const cipher_entry_st * cipher,
-				 const mac_entry_st * mac, unsigned max);
+unsigned _gnutls_record_overhead(const version_entry_st *ver,
+				 const cipher_entry_st *cipher,
+				 const mac_entry_st *mac, unsigned max);
 
 /* Returns non-zero if the async timer is active */
 inline static int _dtls_async_timer_active(gnutls_session_t session)
@@ -132,4 +133,4 @@ inline static int _dtls_retransmit(gnutls_session_t session)
 	return _dtls_transmit(session);
 }
 
-#endif				/* GNUTLS_LIB_DTLS_H */
+#endif /* GNUTLS_LIB_DTLS_H */

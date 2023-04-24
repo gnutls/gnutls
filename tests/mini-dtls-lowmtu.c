@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -37,18 +37,18 @@ int main(void)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
-# include <unistd.h>
-# include <gnutls/gnutls.h>
-# include <gnutls/dtls.h>
-# include <signal.h>
+#include <string.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <gnutls/gnutls.h>
+#include <gnutls/dtls.h>
+#include <signal.h>
 
-# include "utils.h"
+#include "utils.h"
 
 static void terminate(void);
 
@@ -67,38 +67,36 @@ static void client_log_func(int level, const char *str)
 }
 
 static unsigned char server_cert_pem[] =
-    "-----BEGIN CERTIFICATE-----\n"
-    "MIICHzCCAaWgAwIBAgIBCTAKBggqhkjOPQQDAjA+MQswCQYDVQQGEwJOTDERMA8G\n"
-    "A1UEChMIUG9sYXJTU0wxHDAaBgNVBAMTE1BvbGFyc3NsIFRlc3QgRUMgQ0EwHhcN\n"
-    "MTMwOTI0MTU1MjA0WhcNMjMwOTIyMTU1MjA0WjA0MQswCQYDVQQGEwJOTDERMA8G\n"
-    "A1UEChMIUG9sYXJTU0wxEjAQBgNVBAMTCWxvY2FsaG9zdDBZMBMGByqGSM49AgEG\n"
-    "CCqGSM49AwEHA0IABDfMVtl2CR5acj7HWS3/IG7ufPkGkXTQrRS192giWWKSTuUA\n"
-    "2CMR/+ov0jRdXRa9iojCa3cNVc2KKg76Aci07f+jgZ0wgZowCQYDVR0TBAIwADAd\n"
-    "BgNVHQ4EFgQUUGGlj9QH2deCAQzlZX+MY0anE74wbgYDVR0jBGcwZYAUnW0gJEkB\n"
-    "PyvLeLUZvH4kydv7NnyhQqRAMD4xCzAJBgNVBAYTAk5MMREwDwYDVQQKEwhQb2xh\n"
-    "clNTTDEcMBoGA1UEAxMTUG9sYXJzc2wgVGVzdCBFQyBDQYIJAMFD4n5iQ8zoMAoG\n"
-    "CCqGSM49BAMCA2gAMGUCMQCaLFzXptui5WQN8LlO3ddh1hMxx6tzgLvT03MTVK2S\n"
-    "C12r0Lz3ri/moSEpNZWqPjkCMCE2f53GXcYLqyfyJR078c/xNSUU5+Xxl7VZ414V\n"
-    "fGa5kHvHARBPc8YAIVIqDvHH1Q==\n" "-----END CERTIFICATE-----\n";
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIICHzCCAaWgAwIBAgIBCTAKBggqhkjOPQQDAjA+MQswCQYDVQQGEwJOTDERMA8G\n"
+	"A1UEChMIUG9sYXJTU0wxHDAaBgNVBAMTE1BvbGFyc3NsIFRlc3QgRUMgQ0EwHhcN\n"
+	"MTMwOTI0MTU1MjA0WhcNMjMwOTIyMTU1MjA0WjA0MQswCQYDVQQGEwJOTDERMA8G\n"
+	"A1UEChMIUG9sYXJTU0wxEjAQBgNVBAMTCWxvY2FsaG9zdDBZMBMGByqGSM49AgEG\n"
+	"CCqGSM49AwEHA0IABDfMVtl2CR5acj7HWS3/IG7ufPkGkXTQrRS192giWWKSTuUA\n"
+	"2CMR/+ov0jRdXRa9iojCa3cNVc2KKg76Aci07f+jgZ0wgZowCQYDVR0TBAIwADAd\n"
+	"BgNVHQ4EFgQUUGGlj9QH2deCAQzlZX+MY0anE74wbgYDVR0jBGcwZYAUnW0gJEkB\n"
+	"PyvLeLUZvH4kydv7NnyhQqRAMD4xCzAJBgNVBAYTAk5MMREwDwYDVQQKEwhQb2xh\n"
+	"clNTTDEcMBoGA1UEAxMTUG9sYXJzc2wgVGVzdCBFQyBDQYIJAMFD4n5iQ8zoMAoG\n"
+	"CCqGSM49BAMCA2gAMGUCMQCaLFzXptui5WQN8LlO3ddh1hMxx6tzgLvT03MTVK2S\n"
+	"C12r0Lz3ri/moSEpNZWqPjkCMCE2f53GXcYLqyfyJR078c/xNSUU5+Xxl7VZ414V\n"
+	"fGa5kHvHARBPc8YAIVIqDvHH1Q==\n"
+	"-----END CERTIFICATE-----\n";
 
-const gnutls_datum_t server_cert = { server_cert_pem,
-	sizeof(server_cert_pem)
-};
+const gnutls_datum_t server_cert = { server_cert_pem, sizeof(server_cert_pem) };
 
 static unsigned char server_key_pem[] =
-    "-----BEGIN EC PRIVATE KEY-----\n"
-    "MHcCAQEEIPEqEyB2AnCoPL/9U/YDHvdqXYbIogTywwyp6/UfDw6noAoGCCqGSM49\n"
-    "AwEHoUQDQgAEN8xW2XYJHlpyPsdZLf8gbu58+QaRdNCtFLX3aCJZYpJO5QDYIxH/\n"
-    "6i/SNF1dFr2KiMJrdw1VzYoqDvoByLTt/w==\n" "-----END EC PRIVATE KEY-----\n";
+	"-----BEGIN EC PRIVATE KEY-----\n"
+	"MHcCAQEEIPEqEyB2AnCoPL/9U/YDHvdqXYbIogTywwyp6/UfDw6noAoGCCqGSM49\n"
+	"AwEHoUQDQgAEN8xW2XYJHlpyPsdZLf8gbu58+QaRdNCtFLX3aCJZYpJO5QDYIxH/\n"
+	"6i/SNF1dFr2KiMJrdw1VzYoqDvoByLTt/w==\n"
+	"-----END EC PRIVATE KEY-----\n";
 
-const gnutls_datum_t server_key = { server_key_pem,
-	sizeof(server_key_pem)
-};
+const gnutls_datum_t server_key = { server_key_pem, sizeof(server_key_pem) };
 
 /* A very basic TLS client, with anonymous authentication.
  */
 
-# define MAX_BUF 1024
+#define MAX_BUF 1024
 
 static int mtu = 0;
 
@@ -124,7 +122,7 @@ static void client(int fd, const char *prio)
 	/* Initialize TLS session
 	 */
 	gnutls_init(&session, GNUTLS_CLIENT | GNUTLS_DATAGRAM);
-//      gnutls_dtls_set_mtu(session, 104);
+	//      gnutls_dtls_set_mtu(session, 104);
 
 	/* Use default priorities */
 	gnutls_priority_set_direct(session, prio, NULL);
@@ -140,8 +138,7 @@ static void client(int fd, const char *prio)
 	 */
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret < 0) {
 		fail("client: Handshake failed: %s (%d)\n",
@@ -154,8 +151,8 @@ static void client(int fd, const char *prio)
 
 	if (debug)
 		success("client: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	do {
 		do {
@@ -176,7 +173,7 @@ static void client(int fd, const char *prio)
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
- end:
+end:
 
 	close(fd);
 
@@ -237,8 +234,7 @@ static void server(int fd, const char *prio)
 
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 	if (ret < 0) {
 		close(fd);
 		gnutls_deinit(session);
@@ -251,14 +247,13 @@ static void server(int fd, const char *prio)
 
 	if (debug)
 		success("server: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 	mtu = gnutls_dtls_get_mtu(session);
 
 	do {
-		ret =
-		    gnutls_record_send(session, buffer,
-				       gnutls_dtls_get_data_mtu(session));
+		ret = gnutls_record_send(session, buffer,
+					 gnutls_dtls_get_data_mtu(session));
 	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 	if (ret < 0) {
 		fail("Error sending packet: %s\n", gnutls_strerror(ret));
@@ -311,7 +306,8 @@ static void start(const char *prio)
 	}
 }
 
-# define AES_GCM "NONE:+VERS-DTLS1.2:-CIPHER-ALL:+ECDHE-ECDSA:+AES-128-GCM:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
+#define AES_GCM \
+	"NONE:+VERS-DTLS1.2:-CIPHER-ALL:+ECDHE-ECDSA:+AES-128-GCM:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
 
 static void ch_handler(int sig)
 {
@@ -328,4 +324,4 @@ void doit(void)
 	start(AES_GCM);
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

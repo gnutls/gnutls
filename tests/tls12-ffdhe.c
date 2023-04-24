@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 /* This program tests the various certificate key exchange methods supported
@@ -48,14 +48,13 @@ typedef struct test_case_st {
 	unsigned have_ecc_sign_cert;
 	unsigned have_rsa_decrypt_cert;
 	unsigned not_on_fips;
-	unsigned group;		/* expected */
+	unsigned group; /* expected */
 	const char *client_prio;
 	const char *server_prio;
 } test_case_st;
 
-static int
-serv_psk_func(gnutls_session_t session, const char *username,
-	      gnutls_datum_t * key)
+static int serv_psk_func(gnutls_session_t session, const char *username,
+			 gnutls_datum_t *key)
 {
 	key->data = gnutls_malloc(4);
 	assert(key->data != NULL);
@@ -67,7 +66,7 @@ serv_psk_func(gnutls_session_t session, const char *username,
 	return 0;
 }
 
-static void try(test_case_st * test)
+static void try(test_case_st *test)
 {
 	int sret, cret;
 	gnutls_anon_client_credentials_t c_anon_cred;
@@ -114,21 +113,22 @@ static void try(test_case_st * test)
 	}
 
 	if (test->have_rsa_decrypt_cert) {
-		assert(gnutls_certificate_set_x509_key_mem
-		       (s_cert_cred, &server_ca3_localhost_rsa_decrypt_cert,
-			&server_ca3_key, GNUTLS_X509_FMT_PEM) >= 0);
+		assert(gnutls_certificate_set_x509_key_mem(
+			       s_cert_cred,
+			       &server_ca3_localhost_rsa_decrypt_cert,
+			       &server_ca3_key, GNUTLS_X509_FMT_PEM) >= 0);
 	}
 
 	if (test->have_ecc_sign_cert) {
-		assert(gnutls_certificate_set_x509_key_mem
-		       (s_cert_cred, &server_ca3_localhost_ecc_cert,
-			&server_ca3_ecc_key, GNUTLS_X509_FMT_PEM) >= 0);
+		assert(gnutls_certificate_set_x509_key_mem(
+			       s_cert_cred, &server_ca3_localhost_ecc_cert,
+			       &server_ca3_ecc_key, GNUTLS_X509_FMT_PEM) >= 0);
 	}
 
 	if (test->have_rsa_sign_cert) {
-		assert(gnutls_certificate_set_x509_key_mem
-		       (s_cert_cred, &server_ca3_localhost_rsa_sign_cert,
-			&server_ca3_key, GNUTLS_X509_FMT_PEM) >= 0);
+		assert(gnutls_certificate_set_x509_key_mem(
+			       s_cert_cred, &server_ca3_localhost_rsa_sign_cert,
+			       &server_ca3_key, GNUTLS_X509_FMT_PEM) >= 0);
 	}
 
 	/* client does everything */
@@ -136,8 +136,8 @@ static void try(test_case_st * test)
 	gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE, c_cert_cred);
 	gnutls_credentials_set(client, GNUTLS_CRD_PSK, c_psk_cred);
 
-	assert(gnutls_psk_set_client_credentials
-	       (c_psk_cred, "psk", &pskkey, GNUTLS_PSK_KEY_HEX) >= 0);
+	assert(gnutls_psk_set_client_credentials(c_psk_cred, "psk", &pskkey,
+						 GNUTLS_PSK_KEY_HEX) >= 0);
 
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
@@ -160,21 +160,21 @@ static void try(test_case_st * test)
 	}
 
 	if (test->group) {
-		if (test->group == GNUTLS_GROUP_FFDHE2048
-		    || test->group == GNUTLS_GROUP_FFDHE3072
-		    || test->group == GNUTLS_GROUP_FFDHE4096
-		    || test->group == GNUTLS_GROUP_FFDHE6144
-		    || test->group == GNUTLS_GROUP_FFDHE8192) {
-			if (!
-			    (gnutls_session_get_flags(client) &
-			     GNUTLS_SFLAGS_RFC7919)) {
-				fail("%s: gnutls_session_get_flags(client) reports that no RFC7919 negotiation was performed!\n", test->name);
+		if (test->group == GNUTLS_GROUP_FFDHE2048 ||
+		    test->group == GNUTLS_GROUP_FFDHE3072 ||
+		    test->group == GNUTLS_GROUP_FFDHE4096 ||
+		    test->group == GNUTLS_GROUP_FFDHE6144 ||
+		    test->group == GNUTLS_GROUP_FFDHE8192) {
+			if (!(gnutls_session_get_flags(client) &
+			      GNUTLS_SFLAGS_RFC7919)) {
+				fail("%s: gnutls_session_get_flags(client) reports that no RFC7919 negotiation was performed!\n",
+				     test->name);
 			}
 
-			if (!
-			    (gnutls_session_get_flags(server) &
-			     GNUTLS_SFLAGS_RFC7919)) {
-				fail("%s: gnutls_session_get_flags(server) reports that no RFC7919 negotiation was performed!\n", test->name);
+			if (!(gnutls_session_get_flags(server) &
+			      GNUTLS_SFLAGS_RFC7919)) {
+				fail("%s: gnutls_session_get_flags(server) reports that no RFC7919 negotiation was performed!\n",
+				     test->name);
 			}
 		}
 	}
@@ -191,226 +191,204 @@ static void try(test_case_st * test)
 }
 
 test_case_st tests[] = {
-	{
-	 .name = "TLS 1.2 ANON-DH (defaults)",
-	 .client_ret = 0,
-	 .server_ret = 0,
-	 .have_anon_cred = 1,
-	 .server_prio = "NORMAL:-KX-ALL:+ANON-DH:-VERS-ALL:+VERS-TLS1.2",
-	 .client_prio = "NORMAL:-KX-ALL:+ANON-DH:-VERS-ALL:+VERS-TLS1.2"},
-	{
-	 .name = "TLS 1.2 ANON-DH (FFDHE2048)",
-	 .group = GNUTLS_GROUP_FFDHE2048,
-	 .client_ret = 0,
-	 .server_ret = 0,
-	 .have_anon_cred = 1,
-	 .server_prio =
-	 "NORMAL:-KX-ALL:+ANON-DH:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE2048",
-	 .client_prio =
-	 "NORMAL:-KX-ALL:+ANON-DH:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE2048"},
-	{
-	 .name = "TLS 1.2 ANON-DH (FFDHE3072)",
-	 .group = GNUTLS_GROUP_FFDHE3072,
-	 .client_ret = 0,
-	 .server_ret = 0,
-	 .have_anon_cred = 1,
-	 .server_prio =
-	 "NORMAL:-KX-ALL:+ANON-DH:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE3072",
-	 .client_prio =
-	 "NORMAL:-KX-ALL:+ANON-DH:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE3072"},
-	{
-	 .name = "TLS 1.2 ANON-DH (FFDHE4096)",
-	 .group = GNUTLS_GROUP_FFDHE4096,
-	 .client_ret = 0,
-	 .server_ret = 0,
-	 .have_anon_cred = 1,
-	 .server_prio =
-	 "NORMAL:-KX-ALL:+ANON-DH:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE4096",
-	 .client_prio =
-	 "NORMAL:-KX-ALL:+ANON-DH:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE4096"},
-	{
-	 .name = "TLS 1.2 ANON-DH (FFDHE6144)",
-	 .group = GNUTLS_GROUP_FFDHE6144,
-	 .client_ret = 0,
-	 .server_ret = 0,
-	 .have_anon_cred = 1,
-	 .server_prio =
-	 "NORMAL:-KX-ALL:+ANON-DH:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE6144",
-	 .client_prio =
-	 "NORMAL:-KX-ALL:+ANON-DH:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE6144"},
-	{
-	 .name = "TLS 1.2 ANON-DH (FFDHE8192)",
-	 .group = GNUTLS_GROUP_FFDHE8192,
-	 .client_ret = 0,
-	 .server_ret = 0,
-	 .have_anon_cred = 1,
-	 .server_prio =
-	 "NORMAL:-KX-ALL:+ANON-DH:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE8192",
-	 .client_prio =
-	 "NORMAL:-KX-ALL:+ANON-DH:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE8192"},
-	{
-	 .name = "TLS 1.2 DHE-PSK (defaults)",
-	 .client_ret = 0,
-	 .server_ret = 0,
-	 .have_psk_cred = 1,
-	 .server_prio = "NORMAL:-KX-ALL:+DHE-PSK:-VERS-ALL:+VERS-TLS1.2",
-	 .client_prio = "NORMAL:-KX-ALL:+DHE-PSK:-VERS-ALL:+VERS-TLS1.2"},
-	{
-	 .name = "TLS 1.2 DHE-PSK (FFDHE2048)",
-	 .client_ret = 0,
-	 .server_ret = 0,
-	 .group = GNUTLS_GROUP_FFDHE2048,
-	 .have_psk_cred = 1,
-	 .server_prio =
-	 "NORMAL:-KX-ALL:+DHE-PSK:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE2048",
-	 .client_prio =
-	 "NORMAL:-KX-ALL:+DHE-PSK:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE2048"},
-	{
-	 .name = "TLS 1.2 DHE-PSK (FFDHE3072)",
-	 .group = GNUTLS_GROUP_FFDHE3072,
-	 .client_ret = 0,
-	 .server_ret = 0,
-	 .have_psk_cred = 1,
-	 .server_prio =
-	 "NORMAL:-KX-ALL:+DHE-PSK:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE3072",
-	 .client_prio =
-	 "NORMAL:-KX-ALL:+DHE-PSK:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE3072"},
-	{
-	 .name = "TLS 1.2 DHE-PSK (FFDHE4096)",
-	 .group = GNUTLS_GROUP_FFDHE4096,
-	 .client_ret = 0,
-	 .server_ret = 0,
-	 .have_psk_cred = 1,
-	 .server_prio =
-	 "NORMAL:-KX-ALL:+DHE-PSK:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE4096",
-	 .client_prio =
-	 "NORMAL:-KX-ALL:+DHE-PSK:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE4096"},
-	{
-	 .name = "TLS 1.2 DHE-PSK (FFDHE6144)",
-	 .client_ret = 0,
-	 .server_ret = 0,
-	 .group = GNUTLS_GROUP_FFDHE6144,
-	 .have_psk_cred = 1,
-	 .server_prio =
-	 "NORMAL:-KX-ALL:+DHE-PSK:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE6144",
-	 .client_prio =
-	 "NORMAL:-KX-ALL:+DHE-PSK:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE6144"},
-	{
-	 .name = "TLS 1.2 DHE-PSK (FFDHE8192)",
-	 .group = GNUTLS_GROUP_FFDHE8192,
-	 .client_ret = 0,
-	 .server_ret = 0,
-	 .have_psk_cred = 1,
-	 .server_prio =
-	 "NORMAL:-KX-ALL:+DHE-PSK:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE8192",
-	 .client_prio =
-	 "NORMAL:-KX-ALL:+DHE-PSK:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE8192"},
-	{
-	 .name = "TLS 1.2 DHE-RSA (defaults)",
-	 .client_ret = 0,
-	 .server_ret = 0,
-	 .have_cert_cred = 1,
-	 .have_rsa_sign_cert = 1,
-	 .server_prio = "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2",
-	 .client_prio = "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2"},
-	{
-	 .name = "TLS 1.2 DHE-RSA (FFDHE2048)",
-	 .group = GNUTLS_GROUP_FFDHE2048,
-	 .client_ret = 0,
-	 .server_ret = 0,
-	 .have_cert_cred = 1,
-	 .have_rsa_sign_cert = 1,
-	 .server_prio =
-	 "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE2048",
-	 .client_prio =
-	 "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE2048"},
-	{
-	 .name = "TLS 1.2 DHE-RSA (FFDHE3072)",
-	 .group = GNUTLS_GROUP_FFDHE3072,
-	 .client_ret = 0,
-	 .server_ret = 0,
-	 .have_cert_cred = 1,
-	 .have_rsa_sign_cert = 1,
-	 .server_prio =
-	 "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE3072",
-	 .client_prio =
-	 "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE3072"},
-	{
-	 .name = "TLS 1.2 DHE-RSA (FFDHE4096)",
-	 .group = GNUTLS_GROUP_FFDHE4096,
-	 .client_ret = 0,
-	 .server_ret = 0,
-	 .have_cert_cred = 1,
-	 .have_rsa_sign_cert = 1,
-	 .server_prio =
-	 "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE4096",
-	 .client_prio =
-	 "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE4096"},
-	{
-	 .name = "TLS 1.2 DHE-RSA (FFDHE6144)",
-	 .group = GNUTLS_GROUP_FFDHE6144,
-	 .client_ret = 0,
-	 .server_ret = 0,
-	 .have_cert_cred = 1,
-	 .have_rsa_sign_cert = 1,
-	 .server_prio =
-	 "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE6144",
-	 .client_prio =
-	 "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE6144"},
-	{
-	 .name = "TLS 1.2 DHE-RSA (FFDHE8192)",
-	 .group = GNUTLS_GROUP_FFDHE8192,
-	 .client_ret = 0,
-	 .server_ret = 0,
-	 .have_cert_cred = 1,
-	 .have_rsa_sign_cert = 1,
-	 .server_prio =
-	 "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE8192",
-	 .client_prio =
-	 "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE8192"},
-	{
-	 .name = "TLS 1.2 DHE-RSA (incompatible options)",
-	 .client_ret = GNUTLS_E_AGAIN,
-	 .server_ret = GNUTLS_E_NO_CIPHER_SUITES,
-	 .have_cert_cred = 1,
-	 .have_rsa_sign_cert = 1,
-	 .server_prio =
-	 "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE8192",
-	 .client_prio =
-	 "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE3072"},
-	{
-	 .name = "TLS 1.2 DHE-RSA (complex neg)",
-	 .group = GNUTLS_GROUP_FFDHE3072,
-	 .client_ret = 0,
-	 .server_ret = 0,
-	 .have_cert_cred = 1,
-	 .have_rsa_sign_cert = 1,
-	 .server_prio =
-	 "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE8192:+GROUP-FFDHE2048:+GROUP-FFDHE3072",
-	 .client_prio =
-	 "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE3072"},
-	{
-	 .name = "TLS 1.2 DHE-RSA (negotiation over ECDHE)",
-	 .group = GNUTLS_GROUP_FFDHE3072,
-	 .client_ret = 0,
-	 .server_ret = 0,
-	 .have_cert_cred = 1,
-	 .have_rsa_sign_cert = 1,
-	 .server_prio =
-	 "NORMAL:-KX-ALL:+DHE-RSA:+ECDHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-SECP256R1:+GROUP-FFDHE8192:+GROUP-FFDHE2048:+GROUP-FFDHE3072",
-	 .client_prio =
-	 "NORMAL:-KX-ALL:+DHE-RSA:+ECDHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-SECP256R1:+GROUP-FFDHE3072"},
-	{
-	 .name = "TLS 1.2 DHE-RSA (negotiation over ECDHE - prio on ECDHE)",
-	 .group = GNUTLS_GROUP_SECP256R1,
-	 .client_ret = 0,
-	 .server_ret = 0,
-	 .have_cert_cred = 1,
-	 .have_rsa_sign_cert = 1,
-	 .server_prio =
-	 "NORMAL:-KX-ALL:+ECDHE-RSA:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE8192:+GROUP-FFDHE2048:+GROUP-FFDHE3072:+GROUP-SECP256R1",
-	 .client_prio =
-	 "NORMAL:-KX-ALL:+ECDHE-RSA:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE3072:+GROUP-SECP256R1"}
+	{ .name = "TLS 1.2 ANON-DH (defaults)",
+	  .client_ret = 0,
+	  .server_ret = 0,
+	  .have_anon_cred = 1,
+	  .server_prio = "NORMAL:-KX-ALL:+ANON-DH:-VERS-ALL:+VERS-TLS1.2",
+	  .client_prio = "NORMAL:-KX-ALL:+ANON-DH:-VERS-ALL:+VERS-TLS1.2" },
+	{ .name = "TLS 1.2 ANON-DH (FFDHE2048)",
+	  .group = GNUTLS_GROUP_FFDHE2048,
+	  .client_ret = 0,
+	  .server_ret = 0,
+	  .have_anon_cred = 1,
+	  .server_prio =
+		  "NORMAL:-KX-ALL:+ANON-DH:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE2048",
+	  .client_prio =
+		  "NORMAL:-KX-ALL:+ANON-DH:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE2048" },
+	{ .name = "TLS 1.2 ANON-DH (FFDHE3072)",
+	  .group = GNUTLS_GROUP_FFDHE3072,
+	  .client_ret = 0,
+	  .server_ret = 0,
+	  .have_anon_cred = 1,
+	  .server_prio =
+		  "NORMAL:-KX-ALL:+ANON-DH:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE3072",
+	  .client_prio =
+		  "NORMAL:-KX-ALL:+ANON-DH:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE3072" },
+	{ .name = "TLS 1.2 ANON-DH (FFDHE4096)",
+	  .group = GNUTLS_GROUP_FFDHE4096,
+	  .client_ret = 0,
+	  .server_ret = 0,
+	  .have_anon_cred = 1,
+	  .server_prio =
+		  "NORMAL:-KX-ALL:+ANON-DH:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE4096",
+	  .client_prio =
+		  "NORMAL:-KX-ALL:+ANON-DH:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE4096" },
+	{ .name = "TLS 1.2 ANON-DH (FFDHE6144)",
+	  .group = GNUTLS_GROUP_FFDHE6144,
+	  .client_ret = 0,
+	  .server_ret = 0,
+	  .have_anon_cred = 1,
+	  .server_prio =
+		  "NORMAL:-KX-ALL:+ANON-DH:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE6144",
+	  .client_prio =
+		  "NORMAL:-KX-ALL:+ANON-DH:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE6144" },
+	{ .name = "TLS 1.2 ANON-DH (FFDHE8192)",
+	  .group = GNUTLS_GROUP_FFDHE8192,
+	  .client_ret = 0,
+	  .server_ret = 0,
+	  .have_anon_cred = 1,
+	  .server_prio =
+		  "NORMAL:-KX-ALL:+ANON-DH:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE8192",
+	  .client_prio =
+		  "NORMAL:-KX-ALL:+ANON-DH:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE8192" },
+	{ .name = "TLS 1.2 DHE-PSK (defaults)",
+	  .client_ret = 0,
+	  .server_ret = 0,
+	  .have_psk_cred = 1,
+	  .server_prio = "NORMAL:-KX-ALL:+DHE-PSK:-VERS-ALL:+VERS-TLS1.2",
+	  .client_prio = "NORMAL:-KX-ALL:+DHE-PSK:-VERS-ALL:+VERS-TLS1.2" },
+	{ .name = "TLS 1.2 DHE-PSK (FFDHE2048)",
+	  .client_ret = 0,
+	  .server_ret = 0,
+	  .group = GNUTLS_GROUP_FFDHE2048,
+	  .have_psk_cred = 1,
+	  .server_prio =
+		  "NORMAL:-KX-ALL:+DHE-PSK:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE2048",
+	  .client_prio =
+		  "NORMAL:-KX-ALL:+DHE-PSK:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE2048" },
+	{ .name = "TLS 1.2 DHE-PSK (FFDHE3072)",
+	  .group = GNUTLS_GROUP_FFDHE3072,
+	  .client_ret = 0,
+	  .server_ret = 0,
+	  .have_psk_cred = 1,
+	  .server_prio =
+		  "NORMAL:-KX-ALL:+DHE-PSK:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE3072",
+	  .client_prio =
+		  "NORMAL:-KX-ALL:+DHE-PSK:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE3072" },
+	{ .name = "TLS 1.2 DHE-PSK (FFDHE4096)",
+	  .group = GNUTLS_GROUP_FFDHE4096,
+	  .client_ret = 0,
+	  .server_ret = 0,
+	  .have_psk_cred = 1,
+	  .server_prio =
+		  "NORMAL:-KX-ALL:+DHE-PSK:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE4096",
+	  .client_prio =
+		  "NORMAL:-KX-ALL:+DHE-PSK:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE4096" },
+	{ .name = "TLS 1.2 DHE-PSK (FFDHE6144)",
+	  .client_ret = 0,
+	  .server_ret = 0,
+	  .group = GNUTLS_GROUP_FFDHE6144,
+	  .have_psk_cred = 1,
+	  .server_prio =
+		  "NORMAL:-KX-ALL:+DHE-PSK:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE6144",
+	  .client_prio =
+		  "NORMAL:-KX-ALL:+DHE-PSK:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE6144" },
+	{ .name = "TLS 1.2 DHE-PSK (FFDHE8192)",
+	  .group = GNUTLS_GROUP_FFDHE8192,
+	  .client_ret = 0,
+	  .server_ret = 0,
+	  .have_psk_cred = 1,
+	  .server_prio =
+		  "NORMAL:-KX-ALL:+DHE-PSK:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE8192",
+	  .client_prio =
+		  "NORMAL:-KX-ALL:+DHE-PSK:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE8192" },
+	{ .name = "TLS 1.2 DHE-RSA (defaults)",
+	  .client_ret = 0,
+	  .server_ret = 0,
+	  .have_cert_cred = 1,
+	  .have_rsa_sign_cert = 1,
+	  .server_prio = "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2",
+	  .client_prio = "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2" },
+	{ .name = "TLS 1.2 DHE-RSA (FFDHE2048)",
+	  .group = GNUTLS_GROUP_FFDHE2048,
+	  .client_ret = 0,
+	  .server_ret = 0,
+	  .have_cert_cred = 1,
+	  .have_rsa_sign_cert = 1,
+	  .server_prio =
+		  "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE2048",
+	  .client_prio =
+		  "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE2048" },
+	{ .name = "TLS 1.2 DHE-RSA (FFDHE3072)",
+	  .group = GNUTLS_GROUP_FFDHE3072,
+	  .client_ret = 0,
+	  .server_ret = 0,
+	  .have_cert_cred = 1,
+	  .have_rsa_sign_cert = 1,
+	  .server_prio =
+		  "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE3072",
+	  .client_prio =
+		  "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE3072" },
+	{ .name = "TLS 1.2 DHE-RSA (FFDHE4096)",
+	  .group = GNUTLS_GROUP_FFDHE4096,
+	  .client_ret = 0,
+	  .server_ret = 0,
+	  .have_cert_cred = 1,
+	  .have_rsa_sign_cert = 1,
+	  .server_prio =
+		  "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE4096",
+	  .client_prio =
+		  "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE4096" },
+	{ .name = "TLS 1.2 DHE-RSA (FFDHE6144)",
+	  .group = GNUTLS_GROUP_FFDHE6144,
+	  .client_ret = 0,
+	  .server_ret = 0,
+	  .have_cert_cred = 1,
+	  .have_rsa_sign_cert = 1,
+	  .server_prio =
+		  "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE6144",
+	  .client_prio =
+		  "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE6144" },
+	{ .name = "TLS 1.2 DHE-RSA (FFDHE8192)",
+	  .group = GNUTLS_GROUP_FFDHE8192,
+	  .client_ret = 0,
+	  .server_ret = 0,
+	  .have_cert_cred = 1,
+	  .have_rsa_sign_cert = 1,
+	  .server_prio =
+		  "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE8192",
+	  .client_prio =
+		  "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE8192" },
+	{ .name = "TLS 1.2 DHE-RSA (incompatible options)",
+	  .client_ret = GNUTLS_E_AGAIN,
+	  .server_ret = GNUTLS_E_NO_CIPHER_SUITES,
+	  .have_cert_cred = 1,
+	  .have_rsa_sign_cert = 1,
+	  .server_prio =
+		  "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE8192",
+	  .client_prio =
+		  "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE3072" },
+	{ .name = "TLS 1.2 DHE-RSA (complex neg)",
+	  .group = GNUTLS_GROUP_FFDHE3072,
+	  .client_ret = 0,
+	  .server_ret = 0,
+	  .have_cert_cred = 1,
+	  .have_rsa_sign_cert = 1,
+	  .server_prio =
+		  "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE8192:+GROUP-FFDHE2048:+GROUP-FFDHE3072",
+	  .client_prio =
+		  "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE3072" },
+	{ .name = "TLS 1.2 DHE-RSA (negotiation over ECDHE)",
+	  .group = GNUTLS_GROUP_FFDHE3072,
+	  .client_ret = 0,
+	  .server_ret = 0,
+	  .have_cert_cred = 1,
+	  .have_rsa_sign_cert = 1,
+	  .server_prio =
+		  "NORMAL:-KX-ALL:+DHE-RSA:+ECDHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-SECP256R1:+GROUP-FFDHE8192:+GROUP-FFDHE2048:+GROUP-FFDHE3072",
+	  .client_prio =
+		  "NORMAL:-KX-ALL:+DHE-RSA:+ECDHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-SECP256R1:+GROUP-FFDHE3072" },
+	{ .name = "TLS 1.2 DHE-RSA (negotiation over ECDHE - prio on ECDHE)",
+	  .group = GNUTLS_GROUP_SECP256R1,
+	  .client_ret = 0,
+	  .server_ret = 0,
+	  .have_cert_cred = 1,
+	  .have_rsa_sign_cert = 1,
+	  .server_prio =
+		  "NORMAL:-KX-ALL:+ECDHE-RSA:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE8192:+GROUP-FFDHE2048:+GROUP-FFDHE3072:+GROUP-SECP256R1",
+	  .client_prio =
+		  "NORMAL:-KX-ALL:+ECDHE-RSA:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE3072:+GROUP-SECP256R1" }
 };
 
 void doit(void)

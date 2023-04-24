@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,22 +35,22 @@ int main(void)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
-# include <unistd.h>
-# include <gnutls/gnutls.h>
-# include <gnutls/dtls.h>
-# include <signal.h>
-# include <assert.h>
+#include <string.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <gnutls/gnutls.h>
+#include <gnutls/dtls.h>
+#include <signal.h>
+#include <assert.h>
 
-# include "cert-common.h"
-# include "tls13/ext-parse.h"
-# include "pkcs11/softhsm.h"
-# include "utils.h"
+#include "cert-common.h"
+#include "tls13/ext-parse.h"
+#include "pkcs11/softhsm.h"
+#include "utils.h"
 
 /* This program tests that TLS 1.3 is disabled as expected.
  */
@@ -65,16 +65,16 @@ static void client_log_func(int level, const char *str)
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
 
-# define P11LIB "libpkcs11mock2.so"
+#define P11LIB "libpkcs11mock2.so"
 
-# define PIN "1234"
+#define PIN "1234"
 
-# define CONFIG_NAME "softhsm-neg-no-key"
-# define CONFIG CONFIG_NAME".config"
+#define CONFIG_NAME "softhsm-neg-no-key"
+#define CONFIG CONFIG_NAME ".config"
 
-static
-int pin_func(void *userdata, int attempt, const char *url, const char *label,
-	     unsigned flags, char *pin, size_t pin_max)
+static int pin_func(void *userdata, int attempt, const char *url,
+		    const char *label, unsigned flags, char *pin,
+		    size_t pin_max)
 {
 	if (attempt == 0) {
 		strcpy(pin, PIN);
@@ -100,9 +100,8 @@ static void client(int fd)
 	if (ret < 0)
 		exit(1);
 
-	ret =
-	    gnutls_certificate_set_x509_trust_mem(x509_cred, &ca_cert,
-						  GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_trust_mem(x509_cred, &ca_cert,
+						    GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);
 
@@ -112,15 +111,13 @@ static void client(int fd)
 
 	gnutls_handshake_set_timeout(session, get_timeout());
 
-	ret =
-	    gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
+	ret = gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
+				     x509_cred);
 	if (ret < 0)
 		fail("cannot set credentials\n");
 
-	ret =
-	    gnutls_priority_set_direct(session,
-				       "NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2",
-				       NULL);
+	ret = gnutls_priority_set_direct(
+		session, "NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2", NULL);
 	if (ret < 0)
 		fail("cannot set priorities\n");
 
@@ -130,8 +127,7 @@ static void client(int fd)
 	 */
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret != 0)
 		fail("handshake failed: %s\n", gnutls_strerror(ret));
@@ -198,16 +194,16 @@ static void server(int fd)
 
 	ret = gnutls_x509_crt_init(&crt);
 	if (ret < 0) {
-		fprintf(stderr,
-			"gnutls_x509_crt_init: %s\n", gnutls_strerror(ret));
+		fprintf(stderr, "gnutls_x509_crt_init: %s\n",
+			gnutls_strerror(ret));
 		exit(1);
 	}
 
-	ret =
-	    gnutls_x509_crt_import(crt, &server_ca3_cert, GNUTLS_X509_FMT_PEM);
+	ret = gnutls_x509_crt_import(crt, &server_ca3_cert,
+				     GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
-		fprintf(stderr,
-			"gnutls_x509_crt_import: %s\n", gnutls_strerror(ret));
+		fprintf(stderr, "gnutls_x509_crt_import: %s\n",
+			gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -220,17 +216,15 @@ static void server(int fd)
 
 	ret = gnutls_x509_privkey_init(&key);
 	if (ret < 0) {
-		fprintf(stderr,
-			"gnutls_x509_privkey_init: %s\n", gnutls_strerror(ret));
+		fprintf(stderr, "gnutls_x509_privkey_init: %s\n",
+			gnutls_strerror(ret));
 		exit(1);
 	}
 
-	ret =
-	    gnutls_x509_privkey_import(key, &server_ca3_key,
-				       GNUTLS_X509_FMT_PEM);
+	ret = gnutls_x509_privkey_import(key, &server_ca3_key,
+					 GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
-		fprintf(stderr,
-			"gnutls_x509_privkey_import: %s\n",
+		fprintf(stderr, "gnutls_x509_privkey_import: %s\n",
 			gnutls_strerror(ret));
 		exit(1);
 	}
@@ -242,9 +236,8 @@ static void server(int fd)
 		exit(1);
 	}
 
-	ret =
-	    gnutls_pkcs11_token_set_pin(SOFTHSM_URL, NULL, PIN,
-					GNUTLS_PIN_USER);
+	ret = gnutls_pkcs11_token_set_pin(SOFTHSM_URL, NULL, PIN,
+					  GNUTLS_PIN_USER);
 	if (ret < 0) {
 		fail("gnutls_pkcs11_token_set_pin: %s\n", gnutls_strerror(ret));
 		exit(1);
@@ -252,20 +245,18 @@ static void server(int fd)
 
 	ret = gnutls_pkcs11_copy_x509_crt(SOFTHSM_URL, crt, "cert",
 					  GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE |
-					  GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
+						  GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
 	if (ret < 0) {
 		fail("gnutls_pkcs11_copy_x509_crt: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
-	ret =
-	    gnutls_pkcs11_copy_x509_privkey(SOFTHSM_URL, key, "cert",
-					    GNUTLS_KEY_DIGITAL_SIGNATURE |
-					    GNUTLS_KEY_KEY_ENCIPHERMENT,
-					    GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE
-					    |
-					    GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE
-					    | GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
+	ret = gnutls_pkcs11_copy_x509_privkey(
+		SOFTHSM_URL, key, "cert",
+		GNUTLS_KEY_DIGITAL_SIGNATURE | GNUTLS_KEY_KEY_ENCIPHERMENT,
+		GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE |
+			GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE |
+			GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
 	if (ret < 0) {
 		fail("gnutls_pkcs11_copy_x509_privkey: %s\n",
 		     gnutls_strerror(ret));
@@ -281,22 +272,19 @@ static void server(int fd)
 
 	gnutls_handshake_set_timeout(session, get_timeout());
 
-	assert(gnutls_certificate_set_x509_key_file(x509_cred,
-						    SOFTHSM_URL
-						    ";object=cert;object-type=cert",
-						    SOFTHSM_URL
-						    ";object=cert;object-type=private;pin-value="
-						    PIN,
-						    GNUTLS_X509_FMT_DER) >= 0);
+	assert(gnutls_certificate_set_x509_key_file(
+		       x509_cred, SOFTHSM_URL ";object=cert;object-type=cert",
+		       SOFTHSM_URL
+		       ";object=cert;object-type=private;pin-value=" PIN,
+		       GNUTLS_X509_FMT_DER) >= 0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_priority_set_direct(session,
-				   "NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2",
-				   NULL);
+	gnutls_priority_set_direct(
+		session, "NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2", NULL);
 
 	gnutls_transport_set_int(session, fd);
 
@@ -351,8 +339,9 @@ void doit(void)
 
 	set_softhsm_conf(CONFIG);
 	snprintf(buf, sizeof(buf),
-		 "%s --init-token --slot 0 --label test --so-pin " PIN " --pin "
-		 PIN, bin);
+		 "%s --init-token --slot 0 --label test --so-pin " PIN
+		 " --pin " PIN,
+		 bin);
 	system(buf);
 
 	signal(SIGCHLD, SIG_IGN);
@@ -383,6 +372,5 @@ void doit(void)
 		client(fd[1]);
 		exit(0);
 	}
-
 }
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

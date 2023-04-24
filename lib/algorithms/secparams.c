@@ -28,34 +28,35 @@
 typedef struct {
 	const char *name;
 	gnutls_sec_param_t sec_param;
-	unsigned int bits;	/* security level */
-	unsigned int pk_bits;	/* DH, RSA, SRP */
-	unsigned int dsa_bits;	/* bits for DSA. Handled differently since
+	unsigned int bits; /* security level */
+	unsigned int pk_bits; /* DH, RSA, SRP */
+	unsigned int dsa_bits; /* bits for DSA. Handled differently since
 				 * choice of key size in DSA is political.
 				 */
-	unsigned int subgroup_bits;	/* subgroup bits */
-	unsigned int ecc_bits;	/* bits for ECC keys */
+	unsigned int subgroup_bits; /* subgroup bits */
+	unsigned int ecc_bits; /* bits for ECC keys */
 } gnutls_sec_params_entry;
 
 static const gnutls_sec_params_entry sec_params[] = {
-	{"Insecure", GNUTLS_SEC_PARAM_INSECURE, 0, 0, 0, 0, 0},
-	{"Export", GNUTLS_SEC_PARAM_EXPORT, 42, 512, 0, 84, 0},
-	{"Very weak", GNUTLS_SEC_PARAM_VERY_WEAK, 64, 767, 0, 128, 0},
-	{"Weak", GNUTLS_SEC_PARAM_WEAK, 72, 1008, 1008, 160, 160},
+	{ "Insecure", GNUTLS_SEC_PARAM_INSECURE, 0, 0, 0, 0, 0 },
+	{ "Export", GNUTLS_SEC_PARAM_EXPORT, 42, 512, 0, 84, 0 },
+	{ "Very weak", GNUTLS_SEC_PARAM_VERY_WEAK, 64, 767, 0, 128, 0 },
+	{ "Weak", GNUTLS_SEC_PARAM_WEAK, 72, 1008, 1008, 160, 160 },
 #ifdef ENABLE_FIPS140
-	{"Low", GNUTLS_SEC_PARAM_LOW, 80, 1024, 1024, 160, 160},
-	{"Legacy", GNUTLS_SEC_PARAM_LEGACY, 96, 1024, 1024, 192, 192},
-	{"Medium", GNUTLS_SEC_PARAM_MEDIUM, 112, 2048, 2048, 224, 224},
-	{"High", GNUTLS_SEC_PARAM_HIGH, 128, 3072, 3072, 256, 256},
+	{ "Low", GNUTLS_SEC_PARAM_LOW, 80, 1024, 1024, 160, 160 },
+	{ "Legacy", GNUTLS_SEC_PARAM_LEGACY, 96, 1024, 1024, 192, 192 },
+	{ "Medium", GNUTLS_SEC_PARAM_MEDIUM, 112, 2048, 2048, 224, 224 },
+	{ "High", GNUTLS_SEC_PARAM_HIGH, 128, 3072, 3072, 256, 256 },
 #else
-	{"Low", GNUTLS_SEC_PARAM_LOW, 80, 1024, 1024, 160, 160},	/* ENISA-LEGACY */
-	{"Legacy", GNUTLS_SEC_PARAM_LEGACY, 96, 1776, 2048, 192, 192},
-	{"Medium", GNUTLS_SEC_PARAM_MEDIUM, 112, 2048, 2048, 256, 224},
-	{"High", GNUTLS_SEC_PARAM_HIGH, 128, 3072, 3072, 256, 256},
+	{ "Low", GNUTLS_SEC_PARAM_LOW, 80, 1024, 1024, 160,
+	  160 }, /* ENISA-LEGACY */
+	{ "Legacy", GNUTLS_SEC_PARAM_LEGACY, 96, 1776, 2048, 192, 192 },
+	{ "Medium", GNUTLS_SEC_PARAM_MEDIUM, 112, 2048, 2048, 256, 224 },
+	{ "High", GNUTLS_SEC_PARAM_HIGH, 128, 3072, 3072, 256, 256 },
 #endif
-	{"Ultra", GNUTLS_SEC_PARAM_ULTRA, 192, 8192, 8192, 384, 384},
-	{"Future", GNUTLS_SEC_PARAM_FUTURE, 256, 15360, 15360, 512, 512},
-	{NULL, 0, 0, 0, 0, 0}
+	{ "Ultra", GNUTLS_SEC_PARAM_ULTRA, 192, 8192, 8192, 384, 384 },
+	{ "Future", GNUTLS_SEC_PARAM_FUTURE, 256, 15360, 15360, 512, 512 },
+	{ NULL, 0, 0, 0, 0, 0 }
 };
 
 /**
@@ -73,9 +74,8 @@ static const gnutls_sec_params_entry sec_params[] = {
  *
  * Since: 2.12.0
  **/
-unsigned int
-gnutls_sec_param_to_pk_bits(gnutls_pk_algorithm_t algo,
-			    gnutls_sec_param_t param)
+unsigned int gnutls_sec_param_to_pk_bits(gnutls_pk_algorithm_t algo,
+					 gnutls_sec_param_t param)
 {
 	unsigned int ret = 0;
 	const gnutls_sec_params_entry *p;
@@ -201,8 +201,8 @@ const char *gnutls_sec_param_get_name(gnutls_sec_param_t param)
  *
  * Since: 2.12.0
  **/
-gnutls_sec_param_t
-gnutls_pk_bits_to_sec_param(gnutls_pk_algorithm_t algo, unsigned int bits)
+gnutls_sec_param_t gnutls_pk_bits_to_sec_param(gnutls_pk_algorithm_t algo,
+					       unsigned int bits)
 {
 	gnutls_sec_param_t ret = GNUTLS_SEC_PARAM_INSECURE;
 	const gnutls_sec_params_entry *p;

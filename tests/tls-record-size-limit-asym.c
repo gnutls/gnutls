@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <assert.h>
@@ -112,8 +112,8 @@ static void start(const struct test_st *test)
 	/* Init client */
 	assert(gnutls_certificate_allocate_credentials(&clientx509cred) >= 0);
 
-	assert(gnutls_certificate_set_x509_trust_mem
-	       (clientx509cred, &ca2_cert, GNUTLS_X509_FMT_PEM) >= 0);
+	assert(gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca2_cert,
+						     GNUTLS_X509_FMT_PEM) >= 0);
 
 	assert(gnutls_init(&client, GNUTLS_CLIENT) >= 0);
 
@@ -141,8 +141,8 @@ static void start(const struct test_st *test)
 		exit(1);
 	}
 	if (ret != (int)test->server_exp.size)
-		fail("server: unexpected record size sent: %d (%d)\n",
-		     ret, (int)test->server_exp.size);
+		fail("server: unexpected record size sent: %d (%d)\n", ret,
+		     (int)test->server_exp.size);
 	success("server: did not send a %d-byte packet\n",
 		(int)test->server_exp.size);
 
@@ -160,8 +160,8 @@ static void start(const struct test_st *test)
 		exit(1);
 	}
 	if (ret != (int)test->client_exp.size)
-		fail("client: unexpected record size sent: %d (%d)\n",
-		     ret, (int)test->client_exp.size);
+		fail("client: unexpected record size sent: %d (%d)\n", ret,
+		     (int)test->client_exp.size);
 	success("client: did not send a %d-byte packet\n",
 		(int)test->server_max_size + 1);
 

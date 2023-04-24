@@ -1,7 +1,7 @@
 /* This example code is placed in the public domain. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,17 +35,17 @@ int main(void)
 
 	/* Generate an RSA key of moderate security.
 	 */
-	bits =
-	    gnutls_sec_param_to_pk_bits(GNUTLS_PK_RSA, GNUTLS_SEC_PARAM_MEDIUM);
+	bits = gnutls_sec_param_to_pk_bits(GNUTLS_PK_RSA,
+					   GNUTLS_SEC_PARAM_MEDIUM);
 	gnutls_x509_privkey_generate(key, GNUTLS_PK_RSA, bits, 0);
 
 	/* Add stuff to the distinguished name
 	 */
-	gnutls_x509_crq_set_dn_by_oid(crq, GNUTLS_OID_X520_COUNTRY_NAME,
-				      0, "GR", 2);
+	gnutls_x509_crq_set_dn_by_oid(crq, GNUTLS_OID_X520_COUNTRY_NAME, 0,
+				      "GR", 2);
 
-	gnutls_x509_crq_set_dn_by_oid(crq, GNUTLS_OID_X520_COMMON_NAME,
-				      0, "Nikos", strlen("Nikos"));
+	gnutls_x509_crq_set_dn_by_oid(crq, GNUTLS_OID_X520_COMMON_NAME, 0,
+				      "Nikos", strlen("Nikos"));
 
 	/* Set the request version.
 	 */
@@ -84,5 +84,4 @@ int main(void)
 	gnutls_x509_privkey_deinit(key);
 
 	return 0;
-
 }

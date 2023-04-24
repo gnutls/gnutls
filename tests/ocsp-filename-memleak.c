@@ -24,7 +24,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -49,10 +49,10 @@ void doit(void)
 	gnutls_certificate_allocate_credentials(&x509_cred);
 	/* The file does not need to exist for this test
 	 */
-	gnutls_certificate_set_ocsp_status_request_file
-	    (x509_cred, "ocsp-status.der", 0);
-	gnutls_certificate_set_ocsp_status_request_file
-	    (x509_cred, "ocsp-status.der", 0);
+	gnutls_certificate_set_ocsp_status_request_file(x509_cred,
+							"ocsp-status.der", 0);
+	gnutls_certificate_set_ocsp_status_request_file(x509_cred,
+							"ocsp-status.der", 0);
 
 	gnutls_certificate_free_credentials(x509_cred);
 }

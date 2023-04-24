@@ -32,10 +32,10 @@
 #include <record.h>
 #include <state.h>
 #include <ext/safe_renegotiation.h>
-#include <auth/anon.h>		/* for gnutls_anon_server_credentials_t */
-#include <auth/psk.h>		/* for gnutls_psk_server_credentials_t */
+#include <auth/anon.h> /* for gnutls_anon_server_credentials_t */
+#include <auth/psk.h> /* for gnutls_psk_server_credentials_t */
 #ifdef ENABLE_SRP
-# include <auth/srp_kx.h>
+#include <auth/srp_kx.h>
 #endif
 
 int _gnutls_check_id_for_change(gnutls_session_t session)
@@ -57,18 +57,18 @@ int _gnutls_check_id_for_change(gnutls_session_t session)
 
 			ai = _gnutls_get_auth_info(session, GNUTLS_CRD_PSK);
 			if (ai == NULL)
-				return
-				    gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+				return gnutls_assert_val(
+					GNUTLS_E_INTERNAL_ERROR);
 
 			username = ai->username;
 			username_length = ai->username_len;
 #ifdef ENABLE_SRP
 		} else {
 			srp_server_auth_info_t ai =
-			    _gnutls_get_auth_info(session, GNUTLS_CRD_SRP);
+				_gnutls_get_auth_info(session, GNUTLS_CRD_SRP);
 			if (ai == NULL)
-				return
-				    gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+				return gnutls_assert_val(
+					GNUTLS_E_INTERNAL_ERROR);
 
 			username = ai->username;
 			username_length = strlen(ai->username);
@@ -81,20 +81,19 @@ int _gnutls_check_id_for_change(gnutls_session_t session)
 		if (session->internals.saved_username &&
 		    session->internals.saved_username_size != -1) {
 			if (session->internals.saved_username_size ==
-			    username_length
-			    && strncmp(session->internals.saved_username,
-				       username, username_length)) {
-				_gnutls_debug_log
-				    ("Session's PSK username changed during rehandshake; aborting!\n");
-				return
-				    gnutls_assert_val
-				    (GNUTLS_E_SESSION_USER_ID_CHANGED);
+				    username_length &&
+			    strncmp(session->internals.saved_username, username,
+				    username_length)) {
+				_gnutls_debug_log(
+					"Session's PSK username changed during rehandshake; aborting!\n");
+				return gnutls_assert_val(
+					GNUTLS_E_SESSION_USER_ID_CHANGED);
 			}
 		} else if (session->internals.saved_username == NULL &&
 			   session->internals.saved_username_size == -1) {
 			if (username_length > MAX_USERNAME_SIZE)
-				return
-				    gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+				return gnutls_assert_val(
+					GNUTLS_E_INTERNAL_ERROR);
 			char *tmp = gnutls_malloc(username_length + 1);
 			if (tmp == NULL)
 				return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
@@ -102,10 +101,9 @@ int _gnutls_check_id_for_change(gnutls_session_t session)
 			tmp[username_length] = '\0';
 			session->internals.saved_username = tmp;
 			session->internals.saved_username_size =
-			    username_length;
+				username_length;
 		} else
 			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
-
 	}
 
 	return 0;
@@ -133,10 +131,10 @@ int _gnutls_check_if_cert_hash_is_same(gnutls_session_t session,
 
 	if (session->internals.cert_hash_set) {
 		if (memcmp(tmp, session->internals.cert_hash, 32) != 0) {
-			_gnutls_debug_log
-			    ("Session certificate changed during rehandshake; aborting!\n");
-			return
-			    gnutls_assert_val(GNUTLS_E_SESSION_USER_ID_CHANGED);
+			_gnutls_debug_log(
+				"Session certificate changed during rehandshake; aborting!\n");
+			return gnutls_assert_val(
+				GNUTLS_E_SESSION_USER_ID_CHANGED);
 		}
 	} else {
 		memcpy(session->internals.cert_hash, tmp, 32);

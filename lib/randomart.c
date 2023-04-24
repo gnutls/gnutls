@@ -41,16 +41,15 @@
  *   an error code is returned.
  *
  **/
-int gnutls_random_art(gnutls_random_art_t type,
-		      const char *key_type, unsigned int key_size,
-		      void *fpr, size_t fpr_size, gnutls_datum_t * art)
+int gnutls_random_art(gnutls_random_art_t type, const char *key_type,
+		      unsigned int key_size, void *fpr, size_t fpr_size,
+		      gnutls_datum_t *art)
 {
 	if (type != GNUTLS_RANDOM_ART_OPENSSH)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	art->data =
-	    (void *)_gnutls_key_fingerprint_randomart(fpr, fpr_size,
-						      key_type, key_size, NULL);
+	art->data = (void *)_gnutls_key_fingerprint_randomart(
+		fpr, fpr_size, key_type, key_size, NULL);
 	if (art->data == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 

@@ -1,7 +1,7 @@
 /* This example code is placed in the public domain. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -56,8 +56,8 @@ int main(void)
 
 	/* Set the priorities.
 	 */
-	gnutls_priority_set_direct(session,
-				   "NORMAL:+SRP:+SRP-RSA:+SRP-DSS", NULL);
+	gnutls_priority_set_direct(session, "NORMAL:+SRP:+SRP-RSA:+SRP-DSS",
+				   NULL);
 
 	/* put the SRP credentials to the current session
 	 */
@@ -71,8 +71,7 @@ int main(void)
 	 */
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret < 0) {
 		fprintf(stderr, "*** Handshake failed\n");
@@ -110,7 +109,7 @@ int main(void)
 	}
 	gnutls_bye(session, GNUTLS_SHUT_RDWR);
 
- end:
+end:
 
 	tcp_close(sd);
 

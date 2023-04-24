@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdlib.h>
@@ -38,12 +38,10 @@ typedef struct {
 	const char *pass;
 } files_st;
 
-files_st files[] = {
-	{"client.p12", "foobar"},
-	{"cert-ca.p12", "1234"},	/* 2 certs, one is a CA */
-	{"pkcs12_2certs.p12", ""},	/* 2 certs, on is unrelated */
-	{NULL, NULL}
-};
+files_st files[] = { { "client.p12", "foobar" },
+		     { "cert-ca.p12", "1234" }, /* 2 certs, one is a CA */
+		     { "pkcs12_2certs.p12", "" }, /* 2 certs, on is unrelated */
+		     { NULL, NULL } };
 
 void doit(void)
 {
@@ -66,10 +64,10 @@ void doit(void)
 		gnutls_global_set_log_level(4711);
 
 	for (i = 0; files[i].file != NULL; i++) {
-
 		ret = gnutls_certificate_allocate_credentials(&x509cred);
 		if (ret < 0)
-			fail("gnutls_certificate_allocate_credentials failed %d\n", ret);
+			fail("gnutls_certificate_allocate_credentials failed %d\n",
+			     ret);
 
 		path = getenv("PKCS12PATH");
 		if (!path)
@@ -78,15 +76,10 @@ void doit(void)
 		snprintf(file, sizeof(file), "%s/%s", path, files[i].file);
 
 		if (debug)
-			success
-			    ("Reading PKCS#12 blob from `%s' using password `%s'.\n",
-			     file, files[i].pass);
-		ret =
-		    gnutls_certificate_set_x509_simple_pkcs12_file(x509cred,
-								   file,
-								   GNUTLS_X509_FMT_DER,
-								   files
-								   [i].pass);
+			success("Reading PKCS#12 blob from `%s' using password `%s'.\n",
+				file, files[i].pass);
+		ret = gnutls_certificate_set_x509_simple_pkcs12_file(
+			x509cred, file, GNUTLS_X509_FMT_DER, files[i].pass);
 		if (ret < 0)
 			fail("x509_pkcs12 failed %d: %s\n", ret,
 			     gnutls_strerror(ret));

@@ -28,16 +28,15 @@
 #include <algorithms.h>
 #include <num.h>
 #include <mpi.h>
-#include <nettle/bignum.h>	/* includes gmp.h */
+#include <nettle/bignum.h> /* includes gmp.h */
 #if ENABLE_GOST
-# include "gost/bignum-le.h"
+#include "gost/bignum-le.h"
 #endif
 #include <gnettle.h>
 #include <random.h>
 
-static int
-wrap_nettle_mpi_print(const bigint_t a, void *buffer, size_t *nbytes,
-		      gnutls_bigint_format_t format)
+static int wrap_nettle_mpi_print(const bigint_t a, void *buffer, size_t *nbytes,
+				 gnutls_bigint_format_t format)
 {
 	unsigned int size;
 	mpz_t *p = (void *)a;
@@ -72,7 +71,7 @@ wrap_nettle_mpi_print(const bigint_t a, void *buffer, size_t *nbytes,
 	return 0;
 }
 
-static int wrap_nettle_mpi_init(bigint_t * w)
+static int wrap_nettle_mpi_init(bigint_t *w)
 {
 	bigint_t r;
 
@@ -88,7 +87,7 @@ static int wrap_nettle_mpi_init(bigint_t * w)
 	return 0;
 }
 
-static int wrap_nettle_mpi_init_multi(bigint_t * w, ...)
+static int wrap_nettle_mpi_init_multi(bigint_t *w, ...)
 {
 	va_list args;
 	bigint_t *next;
@@ -119,7 +118,7 @@ static int wrap_nettle_mpi_init_multi(bigint_t * w, ...)
 	va_end(args);
 
 	return 0;
- fail:
+fail:
 	mpz_clear(TOMPZ(*w));
 	gnutls_free(*w);
 
@@ -138,9 +137,8 @@ static int wrap_nettle_mpi_init_multi(bigint_t * w, ...)
 	return GNUTLS_E_MEMORY_ERROR;
 }
 
-static int
-wrap_nettle_mpi_scan(bigint_t r, const void *buffer, size_t nbytes,
-		     gnutls_bigint_format_t format)
+static int wrap_nettle_mpi_scan(bigint_t r, const void *buffer, size_t nbytes,
+				gnutls_bigint_format_t format)
 {
 	if (format == GNUTLS_MPI_FORMAT_USG) {
 		nettle_mpz_set_str_256_u(TOMPZ(r), nbytes, buffer);
@@ -156,7 +154,7 @@ wrap_nettle_mpi_scan(bigint_t r, const void *buffer, size_t nbytes,
 	}
 
 	return 0;
- fail:
+fail:
 	return GNUTLS_E_MPI_SCAN_FAILED;
 }
 
@@ -229,18 +227,16 @@ static int wrap_nettle_mpi_modm(bigint_t r, const bigint_t a, const bigint_t b)
 	return 0;
 }
 
-static int
-wrap_nettle_mpi_powm(bigint_t w, const bigint_t b, const bigint_t e,
-		     const bigint_t m)
+static int wrap_nettle_mpi_powm(bigint_t w, const bigint_t b, const bigint_t e,
+				const bigint_t m)
 {
 	mpz_powm(TOMPZ(w), TOMPZ(b), TOMPZ(e), TOMPZ(m));
 
 	return 0;
 }
 
-static int
-wrap_nettle_mpi_addm(bigint_t w, const bigint_t a, const bigint_t b,
-		     const bigint_t m)
+static int wrap_nettle_mpi_addm(bigint_t w, const bigint_t a, const bigint_t b,
+				const bigint_t m)
 {
 	mpz_add(TOMPZ(w), TOMPZ(b), TOMPZ(a));
 	mpz_fdiv_r(TOMPZ(w), TOMPZ(w), TOMPZ(m));
@@ -248,9 +244,8 @@ wrap_nettle_mpi_addm(bigint_t w, const bigint_t a, const bigint_t b,
 	return 0;
 }
 
-static int
-wrap_nettle_mpi_subm(bigint_t w, const bigint_t a, const bigint_t b,
-		     const bigint_t m)
+static int wrap_nettle_mpi_subm(bigint_t w, const bigint_t a, const bigint_t b,
+				const bigint_t m)
 {
 	mpz_sub(TOMPZ(w), TOMPZ(a), TOMPZ(b));
 	mpz_fdiv_r(TOMPZ(w), TOMPZ(w), TOMPZ(m));
@@ -258,9 +253,8 @@ wrap_nettle_mpi_subm(bigint_t w, const bigint_t a, const bigint_t b,
 	return 0;
 }
 
-static int
-wrap_nettle_mpi_mulm(bigint_t w, const bigint_t a, const bigint_t b,
-		     const bigint_t m)
+static int wrap_nettle_mpi_mulm(bigint_t w, const bigint_t a, const bigint_t b,
+				const bigint_t m)
 {
 	mpz_mul(TOMPZ(w), TOMPZ(a), TOMPZ(b));
 	mpz_fdiv_r(TOMPZ(w), TOMPZ(w), TOMPZ(m));
@@ -327,7 +321,7 @@ static int wrap_nettle_prime_check(bigint_t pp)
 		return 0;
 	}
 
-	return GNUTLS_E_INTERNAL_ERROR;	/* ignored */
+	return GNUTLS_E_INTERNAL_ERROR; /* ignored */
 }
 
 int crypto_bigint_prio = INT_MAX;

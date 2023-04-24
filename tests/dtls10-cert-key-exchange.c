@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 /* This program tests the various certificate key exchange methods supported
@@ -49,10 +49,11 @@ void doit(void)
 		 "NORMAL:-VERS-ALL:+VERS-DTLS1.0:-KX-ALL:+DHE-RSA",
 		 GNUTLS_KX_DHE_RSA, GNUTLS_SIGN_RSA_SHA256,
 		 GNUTLS_SIGN_UNKNOWN);
-	dtls_try("DTLS 1.0 with ecdhe x25519 rsa no cert",
-		 "NORMAL:-VERS-ALL:+VERS-DTLS1.0:-KX-ALL:+ECDHE-RSA:-CURVE-ALL:+CURVE-X25519",
-		 GNUTLS_KX_ECDHE_RSA, GNUTLS_SIGN_RSA_SHA256,
-		 GNUTLS_SIGN_UNKNOWN);
+	dtls_try(
+		"DTLS 1.0 with ecdhe x25519 rsa no cert",
+		"NORMAL:-VERS-ALL:+VERS-DTLS1.0:-KX-ALL:+ECDHE-RSA:-CURVE-ALL:+CURVE-X25519",
+		GNUTLS_KX_ECDHE_RSA, GNUTLS_SIGN_RSA_SHA256,
+		GNUTLS_SIGN_UNKNOWN);
 	dtls_try("DTLS 1.0 with ecdhe rsa no cert",
 		 "NORMAL:-VERS-ALL:+VERS-DTLS1.0:-KX-ALL:+ECDHE-RSA",
 		 GNUTLS_KX_ECDHE_RSA, GNUTLS_SIGN_RSA_SHA256,

@@ -82,15 +82,11 @@
  *
  * Since: 3.6.6
  **/
-int gnutls_certificate_set_rawpk_key_mem(gnutls_certificate_credentials_t cred,
-					 const gnutls_datum_t * spki,
-					 const gnutls_datum_t * pkey,
-					 gnutls_x509_crt_fmt_t format,
-					 const char *pass,
-					 unsigned int key_usage,
-					 const char **names,
-					 unsigned int names_length,
-					 unsigned int flags)
+int gnutls_certificate_set_rawpk_key_mem(
+	gnutls_certificate_credentials_t cred, const gnutls_datum_t *spki,
+	const gnutls_datum_t *pkey, gnutls_x509_crt_fmt_t format,
+	const char *pass, unsigned int key_usage, const char **names,
+	unsigned int names_length, unsigned int flags)
 {
 	int ret;
 	gnutls_privkey_t privkey;
@@ -104,8 +100,8 @@ int gnutls_certificate_set_rawpk_key_mem(gnutls_certificate_credentials_t cred,
 
 	/* Import our private key. This function does all the necessary
 	 * inits, checks and imports. */
-	ret = _gnutls_read_key_mem(cred, pkey->data, pkey->size,
-				   format, pass, flags, &privkey);
+	ret = _gnutls_read_key_mem(cred, pkey->data, pkey->size, format, pass,
+				   flags, &privkey);
 	if (ret < 0) {
 		return gnutls_assert_val(ret);
 	}
@@ -130,9 +126,8 @@ int gnutls_certificate_set_rawpk_key_mem(gnutls_certificate_credentials_t cred,
 
 	if (names != NULL && names_length > 0) {
 		for (i = 0; i < names_length; i++) {
-			ret =
-			    _gnutls_str_array_append_idna(&str_names, names[i],
-							  strlen(names[i]));
+			ret = _gnutls_str_array_append_idna(
+				&str_names, names[i], strlen(names[i]));
 			if (ret < 0) {
 				gnutls_privkey_deinit(privkey);
 				_gnutls_str_array_clear(&str_names);
@@ -144,9 +139,8 @@ int gnutls_certificate_set_rawpk_key_mem(gnutls_certificate_credentials_t cred,
 
 	/* Now that we have converted the key material to our internal structures
 	 * we can now add them to the credentials structure */
-	ret =
-	    _gnutls_certificate_credential_append_keypair(cred, privkey,
-							  str_names, pcert, 1);
+	ret = _gnutls_certificate_credential_append_keypair(
+		cred, privkey, str_names, pcert, 1);
 	// Check for errors
 	if (ret < 0) {
 		gnutls_privkey_deinit(privkey);
@@ -223,16 +217,11 @@ int gnutls_certificate_set_rawpk_key_mem(gnutls_certificate_credentials_t cred,
  *
  * Since: 3.6.6
  */
-int gnutls_certificate_set_rawpk_key_file(gnutls_certificate_credentials_t cred,
-					  const char *rawpkfile,
-					  const char *privkeyfile,
-					  gnutls_x509_crt_fmt_t format,
-					  const char *pass,
-					  unsigned int key_usage,
-					  const char **names,
-					  unsigned int names_length,
-					  unsigned int privkey_flags,
-					  unsigned int pkcs11_flags)
+int gnutls_certificate_set_rawpk_key_file(
+	gnutls_certificate_credentials_t cred, const char *rawpkfile,
+	const char *privkeyfile, gnutls_x509_crt_fmt_t format, const char *pass,
+	unsigned int key_usage, const char **names, unsigned int names_length,
+	unsigned int privkey_flags, unsigned int pkcs11_flags)
 {
 	int ret;
 	gnutls_privkey_t privkey;
@@ -247,9 +236,8 @@ int gnutls_certificate_set_rawpk_key_file(gnutls_certificate_credentials_t cred,
 
 	/* Import our private key. This function does all the necessary
 	 * inits, checks and imports. */
-	ret =
-	    _gnutls_read_key_file(cred, privkeyfile, format, pass,
-				  privkey_flags, &privkey);
+	ret = _gnutls_read_key_file(cred, privkeyfile, format, pass,
+				    privkey_flags, &privkey);
 	if (ret < 0) {
 		return gnutls_assert_val(ret);
 	}
@@ -265,7 +253,6 @@ int gnutls_certificate_set_rawpk_key_file(gnutls_certificate_credentials_t cred,
 	 * or from a regular file.
 	 */
 	if (gnutls_url_is_supported(rawpkfile)) {
-
 		ret = gnutls_pubkey_init(&pubkey);
 		if (ret < 0) {
 			gnutls_privkey_deinit(privkey);
@@ -290,26 +277,25 @@ int gnutls_certificate_set_rawpk_key_file(gnutls_certificate_credentials_t cred,
 		}
 
 	} else {
-		gnutls_datum_t rawpubkey;	// to hold rawpk data from file
+		gnutls_datum_t rawpubkey; // to hold rawpk data from file
 		size_t key_size;
 
 		/* Read our raw public-key into memory from file */
-		rawpubkey.data = (void *)read_file(rawpkfile,
-						   RF_BINARY | RF_SENSITIVE,
-						   &key_size);
+		rawpubkey.data = (void *)read_file(
+			rawpkfile, RF_BINARY | RF_SENSITIVE, &key_size);
 		if (rawpubkey.data == NULL) {
 			gnutls_privkey_deinit(privkey);
 
 			return gnutls_assert_val(GNUTLS_E_FILE_ERROR);
 		}
-		rawpubkey.size = key_size;	// Implicit type casting
+		rawpubkey.size = key_size; // Implicit type casting
 
 		/* We now convert our raw public key that we've loaded into memory to
 		 * a parsed certificate (pcert) structure. Note that rawpubkey will
 		 * be copied into pcert. Therefore we can directly cleanup rawpubkey.
 		 */
-		ret = gnutls_pcert_import_rawpk_raw(pcert, &rawpubkey,
-						    format, key_usage, 0);
+		ret = gnutls_pcert_import_rawpk_raw(pcert, &rawpubkey, format,
+						    key_usage, 0);
 
 		zeroize_key(rawpubkey.data, rawpubkey.size);
 		free(rawpubkey.data);
@@ -320,7 +306,6 @@ int gnutls_certificate_set_rawpk_key_file(gnutls_certificate_credentials_t cred,
 
 			return gnutls_assert_val(ret);
 		}
-
 	}
 
 	/* Process the names, if any */
@@ -328,9 +313,8 @@ int gnutls_certificate_set_rawpk_key_file(gnutls_certificate_credentials_t cred,
 
 	if (names != NULL && names_length > 0) {
 		for (i = 0; i < names_length; i++) {
-			ret =
-			    _gnutls_str_array_append_idna(&str_names, names[i],
-							  strlen(names[i]));
+			ret = _gnutls_str_array_append_idna(
+				&str_names, names[i], strlen(names[i]));
 			if (ret < 0) {
 				gnutls_privkey_deinit(privkey);
 				_gnutls_str_array_clear(&str_names);
@@ -342,9 +326,8 @@ int gnutls_certificate_set_rawpk_key_file(gnutls_certificate_credentials_t cred,
 
 	/* Now that we have converted the key material to our internal structures
 	 * we can now add them to the credentials structure */
-	ret =
-	    _gnutls_certificate_credential_append_keypair(cred, privkey,
-							  str_names, pcert, 1);
+	ret = _gnutls_certificate_credential_append_keypair(
+		cred, privkey, str_names, pcert, 1);
 	if (ret < 0) {
 		gnutls_privkey_deinit(privkey);
 		gnutls_pcert_deinit(pcert);

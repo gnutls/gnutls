@@ -34,16 +34,15 @@
 #define PREFIX_SIZE 64
 #if PREFIX_SIZE < MAX_HASH_SIZE
 /* we assume later that prefix is sufficient to store hash output */
-# error Need to modify code
+#error Need to modify code
 #endif
 
-int
-_gnutls13_handshake_verify_data(gnutls_session_t session,
-				unsigned verify_flags,
-				gnutls_pcert_st * cert,
-				const gnutls_datum_t * context,
-				const gnutls_datum_t * signature,
-				const gnutls_sign_entry_st * se)
+int _gnutls13_handshake_verify_data(gnutls_session_t session,
+				    unsigned verify_flags,
+				    gnutls_pcert_st *cert,
+				    const gnutls_datum_t *context,
+				    const gnutls_datum_t *signature,
+				    const gnutls_sign_entry_st *se)
 {
 	int ret;
 	const version_entry_st *ver = get_version(session);
@@ -52,23 +51,21 @@ _gnutls13_handshake_verify_data(gnutls_session_t session,
 	unsigned key_usage = 0;
 	gnutls_datum_t p;
 
-	_gnutls_handshake_log
-	    ("HSK[%p]: verifying TLS 1.3 handshake data using %s\n", session,
-	     se->name);
+	_gnutls_handshake_log(
+		"HSK[%p]: verifying TLS 1.3 handshake data using %s\n", session,
+		se->name);
 
-	ret =
-	    _gnutls_pubkey_compatible_with_sig(session,
-					       cert->pubkey, ver, se->id);
+	ret = _gnutls_pubkey_compatible_with_sig(session, cert->pubkey, ver,
+						 se->id);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	if (unlikely
-	    (sign_supports_cert_pk_algorithm(se, cert->pubkey->params.algo) ==
-	     0)) {
-		_gnutls_handshake_log
-		    ("HSK[%p]: certificate of %s cannot be combined with %s sig\n",
-		     session, gnutls_pk_get_name(cert->pubkey->params.algo),
-		     se->name);
+	if (unlikely(sign_supports_cert_pk_algorithm(
+			     se, cert->pubkey->params.algo) == 0)) {
+		_gnutls_handshake_log(
+			"HSK[%p]: certificate of %s cannot be combined with %s sig\n",
+			session, gnutls_pk_get_name(cert->pubkey->params.algo),
+			se->name);
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 	}
 
@@ -76,7 +73,8 @@ _gnutls13_handshake_verify_data(gnutls_session_t session,
 	if (ret < 0)
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
-	if ((se->flags & GNUTLS_SIGN_FLAG_TLS13_OK) == 0)	/* explicitly prohibited */
+	if ((se->flags & GNUTLS_SIGN_FLAG_TLS13_OK) ==
+	    0) /* explicitly prohibited */
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 	gnutls_pubkey_get_key_usage(cert->pubkey, &key_usage);
@@ -106,20 +104,17 @@ _gnutls13_handshake_verify_data(gnutls_session_t session,
 		goto cleanup;
 	}
 
-	ret = gnutls_hash_fast(MAC_TO_DIG(session->security_parameters.prf->id),
-			       session->internals.handshake_hash_buffer.data,
-			       session->
-			       internals.handshake_hash_buffer_prev_len,
-			       prefix);
+	ret = gnutls_hash_fast(
+		MAC_TO_DIG(session->security_parameters.prf->id),
+		session->internals.handshake_hash_buffer.data,
+		session->internals.handshake_hash_buffer_prev_len, prefix);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	ret =
-	    _gnutls_buffer_append_data(&buf, prefix,
-				       session->security_parameters.
-				       prf->output_size);
+	ret = _gnutls_buffer_append_data(
+		&buf, prefix, session->security_parameters.prf->output_size);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -137,36 +132,35 @@ _gnutls13_handshake_verify_data(gnutls_session_t session,
 	}
 
 	ret = 0;
- cleanup:
+cleanup:
 	_gnutls_buffer_clear(&buf);
 
 	return ret;
 }
 
-int
-_gnutls13_handshake_sign_data(gnutls_session_t session,
-			      gnutls_pcert_st * cert, gnutls_privkey_t pkey,
-			      const gnutls_datum_t * context,
-			      gnutls_datum_t * signature,
-			      const gnutls_sign_entry_st * se)
+int _gnutls13_handshake_sign_data(gnutls_session_t session,
+				  gnutls_pcert_st *cert, gnutls_privkey_t pkey,
+				  const gnutls_datum_t *context,
+				  gnutls_datum_t *signature,
+				  const gnutls_sign_entry_st *se)
 {
 	gnutls_datum_t p;
 	int ret;
 	gnutls_buffer_st buf;
 	uint8_t tmp[MAX_HASH_SIZE];
 
-	if (unlikely
-	    (se == NULL || (se->flags & GNUTLS_SIGN_FLAG_TLS13_OK) == 0))
+	if (unlikely(se == NULL ||
+		     (se->flags & GNUTLS_SIGN_FLAG_TLS13_OK) == 0))
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
-	if (unlikely
-	    (sign_supports_priv_pk_algorithm(se, pkey->pk_algorithm) == 0))
+	if (unlikely(sign_supports_priv_pk_algorithm(se, pkey->pk_algorithm) ==
+		     0))
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 	/* when we reach here we know we have a signing certificate */
-	_gnutls_handshake_log
-	    ("HSK[%p]: signing TLS 1.3 handshake data: using %s and PRF: %s\n",
-	     session, se->name, session->security_parameters.prf->name);
+	_gnutls_handshake_log(
+		"HSK[%p]: signing TLS 1.3 handshake data: using %s and PRF: %s\n",
+		session, se->name, session->security_parameters.prf->name);
 
 	_gnutls_buffer_init(&buf);
 
@@ -200,10 +194,8 @@ _gnutls13_handshake_sign_data(gnutls_session_t session,
 		goto cleanup;
 	}
 
-	ret =
-	    _gnutls_buffer_append_data(&buf, tmp,
-				       session->security_parameters.
-				       prf->output_size);
+	ret = _gnutls_buffer_append_data(
+		&buf, tmp, session->security_parameters.prf->output_size);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -212,18 +204,17 @@ _gnutls13_handshake_sign_data(gnutls_session_t session,
 	p.data = buf.data;
 	p.size = buf.length;
 
-	ret = gnutls_privkey_sign_data2(pkey, se->id,
-					GNUTLS_PRIVKEY_FLAG_RSA_PSS_FIXED_SALT_LENGTH,
-					&p, signature);
+	ret = gnutls_privkey_sign_data2(
+		pkey, se->id, GNUTLS_PRIVKEY_FLAG_RSA_PSS_FIXED_SALT_LENGTH, &p,
+		signature);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
 	ret = 0;
- cleanup:
+cleanup:
 	_gnutls_buffer_clear(&buf);
 
 	return ret;
-
 }

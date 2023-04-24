@@ -86,8 +86,9 @@ char *_gnutls_strdup(const char *str)
 
 void *_gnutls_reallocarray(void *ptr, size_t nmemb, size_t size)
 {
-	return xalloc_oversized(nmemb, size) ? NULL :
-	    gnutls_realloc(ptr, nmemb * size);
+	return xalloc_oversized(nmemb, size) ?
+		       NULL :
+		       gnutls_realloc(ptr, nmemb * size);
 }
 
 #if 0
@@ -130,7 +131,7 @@ void gnutls_free(void *ptr)
 /* Returns 1 if the provided buffer is all zero.
  * It leaks no information via timing.
  */
-unsigned _gnutls_mem_is_zero(const uint8_t * ptr, unsigned size)
+unsigned _gnutls_mem_is_zero(const uint8_t *ptr, unsigned size)
 {
 	unsigned i;
 	uint8_t res = 0;

@@ -22,12 +22,12 @@
  */
 
 #ifndef SRP_H
-# define SRP_H
+#define SRP_H
 
-# define USERNAME "test"
-# define PASSWORD "test"
+#define USERNAME "test"
+#define PASSWORD "test"
 
-# define SALT "\xeb\x0e\x6a\x5c\x02\x0d\x4b\xa9\x97\xb6\xbe\x73\x4a\x71\xc5\x00"
-# define SALT_SIZE 16
+#define SALT "\xeb\x0e\x6a\x5c\x02\x0d\x4b\xa9\x97\xb6\xbe\x73\x4a\x71\xc5\x00"
+#define SALT_SIZE 16
 
 #endif

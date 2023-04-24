@@ -24,7 +24,7 @@
 
 #include "fuzzer.h"
 
-int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
 	gnutls_datum_t raw = { (unsigned char *)data, (unsigned int)size };
 	gnutls_pkcs12_t p12;
@@ -49,9 +49,8 @@ int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 	/* catch crashes */
 	gnutls_pkcs12_verify_mac(p12, "1234");
 
-	ret =
-	    gnutls_pkcs12_simple_parse(p12, "1234", &key, &chain, &chain_len,
-				       &extras, &extras_len, &crl, 0);
+	ret = gnutls_pkcs12_simple_parse(p12, "1234", &key, &chain, &chain_len,
+					 &extras, &extras_len, &crl, 0);
 	if (ret >= 0) {
 		gnutls_x509_privkey_deinit(key);
 		if (crl)
@@ -68,7 +67,7 @@ int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 		}
 	}
 
- cleanup:
+cleanup:
 	gnutls_pkcs12_deinit(p12);
 	return 0;
 }

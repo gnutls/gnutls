@@ -37,9 +37,8 @@
  *
  * Returns: non-zero for a successful match, and zero on failure.
  **/
-unsigned
-gnutls_x509_crt_check_email(gnutls_x509_crt_t cert,
-			    const char *email, unsigned int flags)
+unsigned gnutls_x509_crt_check_email(gnutls_x509_crt_t cert, const char *email,
+				     unsigned int flags)
 {
 	char rfc822name[MAX_CN];
 	size_t rfc822namesize;
@@ -72,34 +71,30 @@ gnutls_x509_crt_check_email(gnutls_x509_crt_t cert,
 	 * against all those of type RFC822Name.
 	 */
 	for (i = 0; !(ret < 0); i++) {
-
 		rfc822namesize = sizeof(rfc822name);
-		ret = gnutls_x509_crt_get_subject_alt_name(cert, i,
-							   rfc822name,
-							   &rfc822namesize,
-							   NULL);
+		ret = gnutls_x509_crt_get_subject_alt_name(
+			cert, i, rfc822name, &rfc822namesize, NULL);
 
 		if (ret == GNUTLS_SAN_RFC822NAME) {
 			found_rfc822name = 1;
 
 			if (memchr(rfc822name, '\0', rfc822namesize)) {
-				_gnutls_debug_log
-				    ("certificate has %s with embedded null in rfc822name\n",
-				     rfc822name);
+				_gnutls_debug_log(
+					"certificate has %s with embedded null in rfc822name\n",
+					rfc822name);
 				continue;
 			}
 
 			if (!_gnutls_str_is_print(rfc822name, rfc822namesize)) {
-				_gnutls_debug_log
-				    ("invalid (non-ASCII) email in certificate %.*s\n",
-				     (int)rfc822namesize, rfc822name);
+				_gnutls_debug_log(
+					"invalid (non-ASCII) email in certificate %.*s\n",
+					(int)rfc822namesize, rfc822name);
 				continue;
 			}
 
-			ret =
-			    _gnutls_hostname_compare(rfc822name, rfc822namesize,
-						     a_email,
-						     GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS);
+			ret = _gnutls_hostname_compare(
+				rfc822name, rfc822namesize, a_email,
+				GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS);
 			if (ret != 0) {
 				ret = 1;
 				goto cleanup;
@@ -114,43 +109,44 @@ gnutls_x509_crt_check_email(gnutls_x509_crt_t cert,
 		/* enforce the RFC6125 (§1.8) requirement that only
 		 * a single CN must be present */
 		rfc822namesize = sizeof(rfc822name);
-		ret = gnutls_x509_crt_get_dn_by_oid
-		    (cert, GNUTLS_OID_PKCS9_EMAIL, 1, 0, rfc822name,
-		     &rfc822namesize);
+		ret = gnutls_x509_crt_get_dn_by_oid(cert,
+						    GNUTLS_OID_PKCS9_EMAIL, 1,
+						    0, rfc822name,
+						    &rfc822namesize);
 		if (ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
 			ret = 0;
 			goto cleanup;
 		}
 
 		rfc822namesize = sizeof(rfc822name);
-		ret = gnutls_x509_crt_get_dn_by_oid
-		    (cert, GNUTLS_OID_PKCS9_EMAIL, 0, 0, rfc822name,
-		     &rfc822namesize);
+		ret = gnutls_x509_crt_get_dn_by_oid(cert,
+						    GNUTLS_OID_PKCS9_EMAIL, 0,
+						    0, rfc822name,
+						    &rfc822namesize);
 		if (ret < 0) {
 			ret = 0;
 			goto cleanup;
 		}
 
 		if (memchr(rfc822name, '\0', rfc822namesize)) {
-			_gnutls_debug_log
-			    ("certificate has EMAIL %s with embedded null in name\n",
-			     rfc822name);
+			_gnutls_debug_log(
+				"certificate has EMAIL %s with embedded null in name\n",
+				rfc822name);
 			ret = 0;
 			goto cleanup;
 		}
 
 		if (!_gnutls_str_is_print(rfc822name, rfc822namesize)) {
-			_gnutls_debug_log
-			    ("invalid (non-ASCII) email in certificate DN %.*s\n",
-			     (int)rfc822namesize, rfc822name);
+			_gnutls_debug_log(
+				"invalid (non-ASCII) email in certificate DN %.*s\n",
+				(int)rfc822namesize, rfc822name);
 			ret = 0;
 			goto cleanup;
 		}
 
-		ret =
-		    _gnutls_hostname_compare(rfc822name, rfc822namesize,
-					     a_email,
-					     GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS);
+		ret = _gnutls_hostname_compare(
+			rfc822name, rfc822namesize, a_email,
+			GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS);
 		if (ret != 0) {
 			ret = 1;
 			goto cleanup;
@@ -160,7 +156,7 @@ gnutls_x509_crt_check_email(gnutls_x509_crt_t cert,
 	/* not found a matching name
 	 */
 	ret = 0;
- cleanup:
+cleanup:
 	if (a_email != email) {
 		gnutls_free(a_email);
 	}

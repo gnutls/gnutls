@@ -30,52 +30,52 @@
 
 #ifdef HAVE_LIBNETTLE
 
-# include <gnutls/crypto.h>
-# include "errors.h"
-# include <aes-x86.h>
-# include <x86-common.h>
-# include <byteswap.h>
-# include <nettle/gcm.h>
+#include <gnutls/crypto.h>
+#include "errors.h"
+#include <aes-x86.h>
+#include <x86-common.h>
+#include <byteswap.h>
+#include <nettle/gcm.h>
 
 /* GCM mode 
  * It is used when the CPU doesn't include the PCLMUL instructions.
  */
 struct gcm_x86_aes_ctx {
-	struct GCM_CTX (AES_KEY) inner;
+	struct GCM_CTX(AES_KEY) inner;
 	size_t rekey_counter;
 };
 
-static void x86_aes_encrypt(const void *_ctx,
-			    size_t length, uint8_t * dst, const uint8_t * src)
+static void x86_aes_encrypt(const void *_ctx, size_t length, uint8_t *dst,
+			    const uint8_t *src)
 {
 	AES_KEY *ctx = (void *)_ctx;
 
 	aesni_ecb_encrypt(src, dst, length, ctx, 1);
 }
 
-static void x86_aes128_set_encrypt_key(void *_ctx, const uint8_t * key)
+static void x86_aes128_set_encrypt_key(void *_ctx, const uint8_t *key)
 {
 	AES_KEY *ctx = _ctx;
 
 	aesni_set_encrypt_key(key, 16 * 8, ctx);
 }
 
-static void x86_aes192_set_encrypt_key(void *_ctx, const uint8_t * key)
+static void x86_aes192_set_encrypt_key(void *_ctx, const uint8_t *key)
 {
 	AES_KEY *ctx = _ctx;
 
 	aesni_set_encrypt_key(key, 24 * 8, ctx);
 }
 
-static void x86_aes256_set_encrypt_key(void *_ctx, const uint8_t * key)
+static void x86_aes256_set_encrypt_key(void *_ctx, const uint8_t *key)
 {
 	AES_KEY *ctx = _ctx;
 
 	aesni_set_encrypt_key(key, 32 * 8, ctx);
 }
 
-static int
-aes_gcm_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx, int enc)
+static int aes_gcm_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx,
+			       int enc)
 {
 	/* we use key size to distinguish */
 	if (algorithm != GNUTLS_CIPHER_AES_128_GCM &&
@@ -125,9 +125,8 @@ static int aes_gcm_setiv(void *_ctx, const void *iv, size_t iv_size)
 	return 0;
 }
 
-static int
-aes_gcm_encrypt(void *_ctx, const void *src, size_t src_size,
-		void *dst, size_t length)
+static int aes_gcm_encrypt(void *_ctx, const void *src, size_t src_size,
+			   void *dst, size_t length)
 {
 	struct gcm_x86_aes_ctx *ctx = _ctx;
 	int ret;
@@ -145,9 +144,8 @@ aes_gcm_encrypt(void *_ctx, const void *src, size_t src_size,
 	return 0;
 }
 
-static int
-aes_gcm_decrypt(void *_ctx, const void *src, size_t src_size,
-		void *dst, size_t dst_size)
+static int aes_gcm_decrypt(void *_ctx, const void *src, size_t src_size,
+			   void *dst, size_t dst_size)
 {
 	struct gcm_x86_aes_ctx *ctx = _ctx;
 
@@ -182,7 +180,7 @@ static void aes_gcm_deinit(void *_ctx)
 	gnutls_free(ctx);
 }
 
-# include "aes-gcm-aead.h"
+#include "aes-gcm-aead.h"
 
 const gnutls_crypto_cipher_st _gnutls_aes_gcm_x86_aesni = {
 	.init = aes_gcm_cipher_init,

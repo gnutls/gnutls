@@ -24,7 +24,7 @@
 /* Parts copied from pskself.c. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -40,17 +40,17 @@ int main(int argc, char **argv)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <sys/socket.h>
-# if !defined(_WIN32)
-#  include <sys/wait.h>
-# endif
-# include <unistd.h>
-# include <gnutls/gnutls.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#if !defined(_WIN32)
+#include <sys/wait.h>
+#endif
+#include <unistd.h>
+#include <gnutls/gnutls.h>
 
-# include "utils.h"
-# include "extras/hex.h"
+#include "utils.h"
+#include "extras/hex.h"
 
 /* A very basic TLS client, with PSK authentication.
  */
@@ -62,8 +62,8 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "%s|<%d>| %s", side, level, str);
 }
 
-# define MAX_BUF 1024
-# define MSG "Hello TLS"
+#define MAX_BUF 1024
+#define MSG "Hello TLS"
 
 static void client(int sd, const char *prio, unsigned exp_hint)
 {
@@ -157,7 +157,7 @@ static void client(int sd, const char *prio, unsigned exp_hint)
 
 	gnutls_bye(session, GNUTLS_SHUT_RDWR);
 
- end:
+end:
 
 	close(sd);
 
@@ -172,13 +172,12 @@ static void client(int sd, const char *prio, unsigned exp_hint)
 /* This is a sample TLS 1.0 echo server, for PSK authentication.
  */
 
-# define MAX_BUF 1024
+#define MAX_BUF 1024
 
 /* These are global */
 
-static int
-pskfunc(gnutls_session_t session, const gnutls_datum_t * username,
-	gnutls_datum_t * key)
+static int pskfunc(gnutls_session_t session, const gnutls_datum_t *username,
+		   gnutls_datum_t *key)
 {
 	if (debug)
 		printf("psk: Got username with length %d\n", username->size);
@@ -199,8 +198,8 @@ static void server(int sd, const char *prio)
 	int ret;
 	gnutls_session_t session;
 	gnutls_datum_t psk_username;
-	char buffer[MAX_BUF + 1], expected_psk_username[] =
-	    { 0xDE, 0xAD, 0xBE, 0xEF };
+	char buffer[MAX_BUF + 1],
+		expected_psk_username[] = { 0xDE, 0xAD, 0xBE, 0xEF };
 
 	/* this must be called once in the program
 	 */
@@ -242,8 +241,8 @@ static void server(int sd, const char *prio)
 		if (gnutls_psk_server_get_username2(session, &psk_username) < 0)
 			fail("server: Could not get PSK username\n");
 
-		if (psk_username.size != 4
-		    || memcmp(psk_username.data, expected_psk_username, 4))
+		if (psk_username.size != 4 ||
+		    memcmp(psk_username.data, expected_psk_username, 4))
 			fail("server: Unexpected PSK username\n");
 
 		success("server: PSK username length: %d\n", psk_username.size);
@@ -259,11 +258,11 @@ static void server(int sd, const char *prio)
 
 		if (ret == 0) {
 			if (debug)
-				success
-				    ("server: Peer has closed the GnuTLS connection\n");
+				success("server: Peer has closed the GnuTLS connection\n");
 			break;
 		} else if (ret < 0) {
-			fail("server: Received corrupted data(%d). Closing...\n", ret);
+			fail("server: Received corrupted data(%d). Closing...\n",
+			     ret);
 			break;
 		} else if (ret > 0) {
 			/* echo data back to the client
@@ -286,8 +285,7 @@ static void server(int sd, const char *prio)
 		success("server: finished\n");
 }
 
-static
-void run_test(const char *prio, unsigned exp_hint)
+static void run_test(const char *prio, unsigned exp_hint)
 {
 	pid_t child;
 	int err;
@@ -330,19 +328,19 @@ void doit(void)
 	run_test("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+DHE-PSK", 1);
 
 	run_test("NORMAL:-VERS-ALL:+VERS-TLS1.2:+PSK", 0);
-	run_test
-	    ("NORMAL:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE2048:+DHE-PSK",
-	     0);
-	run_test
-	    ("NORMAL:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-SECP256R1:+ECDHE-PSK",
-	     0);
+	run_test(
+		"NORMAL:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE2048:+DHE-PSK",
+		0);
+	run_test(
+		"NORMAL:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-SECP256R1:+ECDHE-PSK",
+		0);
 	run_test("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK", 0);
-	run_test
-	    ("NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-FFDHE2048:+DHE-PSK",
-	     0);
-	run_test
-	    ("NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-SECP256R1:+ECDHE-PSK",
-	     0);
+	run_test(
+		"NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-FFDHE2048:+DHE-PSK",
+		0);
+	run_test(
+		"NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-SECP256R1:+ECDHE-PSK",
+		0);
 	/* the following should work once we support PSK without DH */
 	run_test("NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+PSK", 0);
 
@@ -351,4 +349,4 @@ void doit(void)
 	run_test("NORMAL:-KX-ALL:+DHE-PSK", 0);
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

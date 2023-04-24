@@ -1,7 +1,7 @@
 /* This example code is placed in the public domain. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <string.h>
@@ -20,12 +20,12 @@ extern void tcp_close(int sd);
  * Note that error recovery is minimal for simplicity.
  */
 
-#define CHECK(x) assert((x)>=0)
-#define LOOP_CHECK(rval, cmd) \
-        do { \
-                rval = cmd; \
-        } while(rval == GNUTLS_E_AGAIN || rval == GNUTLS_E_INTERRUPTED); \
-        assert(rval >= 0)
+#define CHECK(x) assert((x) >= 0)
+#define LOOP_CHECK(rval, cmd)                                             \
+	do {                                                              \
+		rval = cmd;                                               \
+	} while (rval == GNUTLS_E_AGAIN || rval == GNUTLS_E_INTERRUPTED); \
+	assert(rval >= 0)
 
 #define MAX_BUF 1024
 #define MSG "GET / HTTP/1.0\r\n\r\n"
@@ -49,7 +49,7 @@ int main(void)
 	CHECK(gnutls_certificate_allocate_credentials(&xcred));
 	CHECK(gnutls_certificate_set_x509_system_trust(xcred));
 
-	for (t = 0; t < 2; t++) {	/* connect 2 times to the server */
+	for (t = 0; t < 2; t++) { /* connect 2 times to the server */
 
 		sd = tcp_connect();
 
@@ -79,8 +79,7 @@ int main(void)
 		 */
 		do {
 			ret = gnutls_handshake(session);
-		}
-		while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+		} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 		if (ret < 0) {
 			fprintf(stderr, "*** Handshake failed\n");
@@ -90,10 +89,10 @@ int main(void)
 			printf("- Handshake was completed\n");
 		}
 
-		if (t == 0) {	/* the first time we connect */
+		if (t == 0) { /* the first time we connect */
 			/* get the session data */
 			CHECK(gnutls_session_get_data2(session, &sdata));
-		} else {	/* the second time we connect */
+		} else { /* the second time we connect */
 
 			/* check if we actually resumed the previous session */
 			if (gnutls_session_is_resumed(session) != 0) {
@@ -129,13 +128,13 @@ int main(void)
 
 		gnutls_bye(session, GNUTLS_SHUT_RDWR);
 
- end:
+	end:
 
 		tcp_close(sd);
 
 		gnutls_deinit(session);
 
-	}			/* for() */
+	} /* for() */
 
 	gnutls_certificate_free_credentials(xcred);
 

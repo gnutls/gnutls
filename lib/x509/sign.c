@@ -29,7 +29,7 @@
 #include "errors.h"
 #include <libtasn1.h>
 #include <global.h>
-#include <num.h>		/* MAX */
+#include <num.h> /* MAX */
 #include <tls-sig.h>
 #include <str.h>
 #include <datum.h>
@@ -42,16 +42,15 @@
  * the asn1_node given, and sign the DER data. Actually used to get the DER
  * of the TBS and sign it on the fly.
  */
-int
-_gnutls_x509_get_tbs(asn1_node cert, const char *tbs_name, gnutls_datum_t * tbs)
+int _gnutls_x509_get_tbs(asn1_node cert, const char *tbs_name,
+			 gnutls_datum_t *tbs)
 {
 	return _gnutls_x509_der_encode(cert, tbs_name, tbs, 0);
 }
 
-int
-_gnutls_x509_crt_get_spki_params(gnutls_x509_crt_t crt,
-				 const gnutls_x509_spki_st * key_params,
-				 gnutls_x509_spki_st * params)
+int _gnutls_x509_crt_get_spki_params(gnutls_x509_crt_t crt,
+				     const gnutls_x509_spki_st *key_params,
+				     gnutls_x509_spki_st *params)
 {
 	int result;
 	gnutls_x509_spki_st crt_params;
@@ -73,8 +72,8 @@ _gnutls_x509_crt_get_spki_params(gnutls_x509_crt_t crt,
 				gnutls_assert();
 				return GNUTLS_E_CERTIFICATE_ERROR;
 			}
-		} else if (key_params->pk != GNUTLS_PK_RSA
-			   && key_params->pk != GNUTLS_PK_UNKNOWN) {
+		} else if (key_params->pk != GNUTLS_PK_RSA &&
+			   key_params->pk != GNUTLS_PK_UNKNOWN) {
 			gnutls_assert();
 			return GNUTLS_E_CERTIFICATE_ERROR;
 		}
@@ -98,11 +97,10 @@ _gnutls_x509_crt_get_spki_params(gnutls_x509_crt_t crt,
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  -*/
-int
-_gnutls_x509_pkix_sign(asn1_node src, const char *src_name,
-		       gnutls_digest_algorithm_t dig,
-		       unsigned int flags,
-		       gnutls_x509_crt_t issuer, gnutls_privkey_t issuer_key)
+int _gnutls_x509_pkix_sign(asn1_node src, const char *src_name,
+			   gnutls_digest_algorithm_t dig, unsigned int flags,
+			   gnutls_x509_crt_t issuer,
+			   gnutls_privkey_t issuer_key)
 {
 	int result;
 	gnutls_datum_t signature;
@@ -140,8 +138,8 @@ _gnutls_x509_pkix_sign(asn1_node src, const char *src_name,
 	_gnutls_str_cpy(name, sizeof(name), src_name);
 	_gnutls_str_cat(name, sizeof(name), ".issuer");
 
-	result =
-	    asn1_copy_node(src, name, issuer->cert, "tbsCertificate.subject");
+	result = asn1_copy_node(src, name, issuer->cert,
+				"tbsCertificate.subject");
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
@@ -154,8 +152,8 @@ _gnutls_x509_pkix_sign(asn1_node src, const char *src_name,
 
 	se = _gnutls_pk_to_sign_entry(params.pk, dig);
 	if (se == NULL)
-		return
-		    gnutls_assert_val(GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM);
+		return gnutls_assert_val(
+			GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM);
 
 	_gnutls_debug_log("signing structure using %s\n", se->name);
 
@@ -177,12 +175,11 @@ _gnutls_x509_pkix_sign(asn1_node src, const char *src_name,
 	FIX_SIGN_PARAMS(params, flags, dig);
 
 	if (_gnutls_pk_is_not_prehashed(params.pk)) {
-		result =
-		    privkey_sign_raw_data(issuer_key, se, &tbs, &signature,
-					  &params);
+		result = privkey_sign_raw_data(issuer_key, se, &tbs, &signature,
+					       &params);
 	} else {
-		result = privkey_sign_and_hash_data(issuer_key, se,
-						    &tbs, &signature, &params);
+		result = privkey_sign_and_hash_data(issuer_key, se, &tbs,
+						    &signature, &params);
 	}
 	gnutls_free(tbs.data);
 
@@ -193,9 +190,8 @@ _gnutls_x509_pkix_sign(asn1_node src, const char *src_name,
 
 	/* write the signature (bits)
 	 */
-	result =
-	    asn1_write_value(src, "signature", signature.data,
-			     signature.size * 8);
+	result = asn1_write_value(src, "signature", signature.data,
+				  signature.size * 8);
 
 	_gnutls_free_datum(&signature);
 
@@ -208,8 +204,8 @@ _gnutls_x509_pkix_sign(asn1_node src, const char *src_name,
 	 * the same. 
 	 */
 
-	result = _gnutls_x509_write_sign_params(src, "signatureAlgorithm",
-						se, &params);
+	result = _gnutls_x509_write_sign_params(src, "signatureAlgorithm", se,
+						&params);
 	if (result < 0) {
 		gnutls_assert();
 		return result;

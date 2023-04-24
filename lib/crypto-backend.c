@@ -47,8 +47,8 @@ typedef struct algo_list {
 #define mac_list algo_list
 #define digest_list algo_list
 
-static int
-_algo_register(algo_list * al, int algorithm, int priority, void *s, int free_s)
+static int _algo_register(algo_list *al, int algorithm, int priority, void *s,
+			  int free_s)
 {
 	algo_list *cl;
 	algo_list *last_cl = al;
@@ -97,13 +97,13 @@ _algo_register(algo_list * al, int algorithm, int priority, void *s, int free_s)
 	last_cl->next = cl;
 
 	return 0;
- cleanup:
+cleanup:
 	if (free_s)
 		gnutls_free(s);
 	return ret;
 }
 
-static const void *_get_algo(algo_list * al, int algo)
+static const void *_get_algo(algo_list *al, int algo)
 {
 	cipher_list *cl;
 
@@ -124,7 +124,7 @@ static cipher_list glob_cl = { GNUTLS_CIPHER_NULL, 0, NULL, 0, NULL };
 static mac_list glob_ml = { GNUTLS_MAC_NULL, 0, NULL, 0, NULL };
 static digest_list glob_dl = { GNUTLS_MAC_NULL, 0, NULL, 0, NULL };
 
-static void _deregister(algo_list * cl)
+static void _deregister(algo_list *cl)
 {
 	algo_list *next;
 
@@ -172,18 +172,17 @@ void _gnutls_crypto_deregister(void)
  *
  * Since: 2.6.0
  -*/
-int
-gnutls_crypto_single_cipher_register(gnutls_cipher_algorithm_t algorithm,
-				     int priority,
-				     const gnutls_crypto_cipher_st * s,
-				     int free_s)
+int gnutls_crypto_single_cipher_register(gnutls_cipher_algorithm_t algorithm,
+					 int priority,
+					 const gnutls_crypto_cipher_st *s,
+					 int free_s)
 {
 	/* we override const in case free_s is set */
 	return _algo_register(&glob_cl, algorithm, priority, (void *)s, free_s);
 }
 
-const gnutls_crypto_cipher_st
-    * _gnutls_get_crypto_cipher(gnutls_cipher_algorithm_t algo)
+const gnutls_crypto_cipher_st *
+_gnutls_get_crypto_cipher(gnutls_cipher_algorithm_t algo)
 {
 	return _get_algo(&glob_cl, algo);
 }
@@ -218,33 +217,29 @@ const gnutls_crypto_cipher_st
  *
  * Since: 3.4.0
  **/
-int
-gnutls_crypto_register_cipher(gnutls_cipher_algorithm_t algorithm,
-			      int priority,
-			      gnutls_cipher_init_func init,
-			      gnutls_cipher_setkey_func setkey,
-			      gnutls_cipher_setiv_func setiv,
-			      gnutls_cipher_encrypt_func encrypt,
-			      gnutls_cipher_decrypt_func decrypt,
-			      gnutls_cipher_deinit_func deinit)
+int gnutls_crypto_register_cipher(gnutls_cipher_algorithm_t algorithm,
+				  int priority, gnutls_cipher_init_func init,
+				  gnutls_cipher_setkey_func setkey,
+				  gnutls_cipher_setiv_func setiv,
+				  gnutls_cipher_encrypt_func encrypt,
+				  gnutls_cipher_decrypt_func decrypt,
+				  gnutls_cipher_deinit_func deinit)
 {
-	_gnutls_debug_log
-	    ("called the deprecated gnutls_crypto_register_cipher()\n");
+	_gnutls_debug_log(
+		"called the deprecated gnutls_crypto_register_cipher()\n");
 	return 0;
 }
 
-int
-_gnutls_crypto_register_cipher(gnutls_cipher_algorithm_t algorithm,
-			       int priority,
-			       gnutls_cipher_init_func init,
-			       gnutls_cipher_setkey_func setkey,
-			       gnutls_cipher_setiv_func setiv,
-			       gnutls_cipher_encrypt_func encrypt,
-			       gnutls_cipher_decrypt_func decrypt,
-			       gnutls_cipher_deinit_func deinit)
+int _gnutls_crypto_register_cipher(gnutls_cipher_algorithm_t algorithm,
+				   int priority, gnutls_cipher_init_func init,
+				   gnutls_cipher_setkey_func setkey,
+				   gnutls_cipher_setiv_func setiv,
+				   gnutls_cipher_encrypt_func encrypt,
+				   gnutls_cipher_decrypt_func decrypt,
+				   gnutls_cipher_deinit_func deinit)
 {
 	gnutls_crypto_cipher_st *s =
-	    gnutls_calloc(1, sizeof(gnutls_crypto_cipher_st));
+		gnutls_calloc(1, sizeof(gnutls_crypto_cipher_st));
 	if (s == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
@@ -286,17 +281,15 @@ _gnutls_crypto_register_cipher(gnutls_cipher_algorithm_t algorithm,
  *
  * Since: 3.4.0
  **/
-int
-gnutls_crypto_register_aead_cipher(gnutls_cipher_algorithm_t algorithm,
-				   int priority,
-				   gnutls_cipher_init_func init,
-				   gnutls_cipher_setkey_func setkey,
-				   gnutls_cipher_aead_encrypt_func aead_encrypt,
-				   gnutls_cipher_aead_decrypt_func aead_decrypt,
-				   gnutls_cipher_deinit_func deinit)
+int gnutls_crypto_register_aead_cipher(
+	gnutls_cipher_algorithm_t algorithm, int priority,
+	gnutls_cipher_init_func init, gnutls_cipher_setkey_func setkey,
+	gnutls_cipher_aead_encrypt_func aead_encrypt,
+	gnutls_cipher_aead_decrypt_func aead_decrypt,
+	gnutls_cipher_deinit_func deinit)
 {
-	_gnutls_debug_log
-	    ("called the deprecated gnutls_crypto_register_aead_cipher()\n");
+	_gnutls_debug_log(
+		"called the deprecated gnutls_crypto_register_aead_cipher()\n");
 	return 0;
 }
 
@@ -320,7 +313,7 @@ gnutls_crypto_register_aead_cipher(gnutls_cipher_algorithm_t algorithm,
  *
  * Since: 2.6.0
  -*/
-int gnutls_crypto_rnd_register(int priority, const gnutls_crypto_rnd_st * s)
+int gnutls_crypto_rnd_register(int priority, const gnutls_crypto_rnd_st *s)
 {
 	if (crypto_rnd_prio >= priority) {
 		memcpy(&_gnutls_rnd_ops, s, sizeof(*s));
@@ -352,10 +345,9 @@ int gnutls_crypto_rnd_register(int priority, const gnutls_crypto_rnd_st * s)
  *
  * Since: 2.6.0
  -*/
-int
-gnutls_crypto_single_mac_register(gnutls_mac_algorithm_t algorithm,
-				  int priority,
-				  const gnutls_crypto_mac_st * s, int free_s)
+int gnutls_crypto_single_mac_register(gnutls_mac_algorithm_t algorithm,
+				      int priority,
+				      const gnutls_crypto_mac_st *s, int free_s)
 {
 	return _algo_register(&glob_ml, algorithm, priority, (void *)s, free_s);
 }
@@ -386,17 +378,16 @@ const gnutls_crypto_mac_st *_gnutls_get_crypto_mac(gnutls_mac_algorithm_t algo)
  *
  * Since: 2.6.0
  -*/
-int
-gnutls_crypto_single_digest_register(gnutls_digest_algorithm_t algorithm,
-				     int priority,
-				     const gnutls_crypto_digest_st * s,
-				     int free_s)
+int gnutls_crypto_single_digest_register(gnutls_digest_algorithm_t algorithm,
+					 int priority,
+					 const gnutls_crypto_digest_st *s,
+					 int free_s)
 {
 	return _algo_register(&glob_dl, algorithm, priority, (void *)s, free_s);
 }
 
-const gnutls_crypto_digest_st
-    * _gnutls_get_crypto_digest(gnutls_digest_algorithm_t algo)
+const gnutls_crypto_digest_st *
+_gnutls_get_crypto_digest(gnutls_digest_algorithm_t algo)
 {
 	return _get_algo(&glob_dl, algo);
 }
@@ -425,19 +416,17 @@ const gnutls_crypto_digest_st
  *
  * Since: 3.4.0
  **/
-int
-gnutls_crypto_register_mac(gnutls_mac_algorithm_t algorithm,
-			   int priority,
-			   gnutls_mac_init_func init,
-			   gnutls_mac_setkey_func setkey,
-			   gnutls_mac_setnonce_func setnonce,
-			   gnutls_mac_hash_func hash,
-			   gnutls_mac_output_func output,
-			   gnutls_mac_deinit_func deinit,
-			   gnutls_mac_fast_func hash_fast)
+int gnutls_crypto_register_mac(gnutls_mac_algorithm_t algorithm, int priority,
+			       gnutls_mac_init_func init,
+			       gnutls_mac_setkey_func setkey,
+			       gnutls_mac_setnonce_func setnonce,
+			       gnutls_mac_hash_func hash,
+			       gnutls_mac_output_func output,
+			       gnutls_mac_deinit_func deinit,
+			       gnutls_mac_fast_func hash_fast)
 {
-	_gnutls_debug_log
-	    ("called the deprecated gnutls_crypto_register_mac()\n");
+	_gnutls_debug_log(
+		"called the deprecated gnutls_crypto_register_mac()\n");
 	return 0;
 }
 
@@ -463,16 +452,14 @@ gnutls_crypto_register_mac(gnutls_mac_algorithm_t algorithm,
  *
  * Since: 3.4.0
  **/
-int
-gnutls_crypto_register_digest(gnutls_digest_algorithm_t algorithm,
-			      int priority,
-			      gnutls_digest_init_func init,
-			      gnutls_digest_hash_func hash,
-			      gnutls_digest_output_func output,
-			      gnutls_digest_deinit_func deinit,
-			      gnutls_digest_fast_func hash_fast)
+int gnutls_crypto_register_digest(gnutls_digest_algorithm_t algorithm,
+				  int priority, gnutls_digest_init_func init,
+				  gnutls_digest_hash_func hash,
+				  gnutls_digest_output_func output,
+				  gnutls_digest_deinit_func deinit,
+				  gnutls_digest_fast_func hash_fast)
 {
-	_gnutls_debug_log
-	    ("called the deprecated gnutls_crypto_register_digest()\n");
+	_gnutls_debug_log(
+		"called the deprecated gnutls_crypto_register_digest()\n");
 	return 0;
 }

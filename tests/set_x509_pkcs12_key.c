@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -33,7 +33,7 @@
 #include "cert-common.h"
 #include "utils.h"
 
-static void compare(const gnutls_datum_t * der, const void *ipem)
+static void compare(const gnutls_datum_t *der, const void *ipem)
 {
 	gnutls_datum_t pem = { (void *)ipem, strlen((char *)ipem) };
 	gnutls_datum_t new_der;
@@ -44,8 +44,8 @@ static void compare(const gnutls_datum_t * der, const void *ipem)
 		fail("error: %s\n", gnutls_strerror(ret));
 	}
 
-	if (der->size != new_der.size
-	    || memcmp(der->data, new_der.data, der->size) != 0) {
+	if (der->size != new_der.size ||
+	    memcmp(der->data, new_der.data, der->size) != 0) {
 		fail("error in %d: %s\n", __LINE__, "cert don't match");
 		exit(1);
 	}
@@ -70,20 +70,19 @@ void doit(void)
 	assert(gnutls_certificate_allocate_credentials(&xcred) >= 0);
 
 	/* this will fail */
-	ret = gnutls_certificate_set_x509_simple_pkcs12_file(xcred, certfile,
-							     GNUTLS_X509_FMT_PEM,
-							     "1234");
+	ret = gnutls_certificate_set_x509_simple_pkcs12_file(
+		xcred, certfile, GNUTLS_X509_FMT_PEM, "1234");
 	if (ret != GNUTLS_E_FILE_ERROR)
-		fail("gnutls_certificate_set_x509_simple_pkcs12_file failed: %s\n", gnutls_strerror(ret));
+		fail("gnutls_certificate_set_x509_simple_pkcs12_file failed: %s\n",
+		     gnutls_strerror(ret));
 
 	gnutls_certificate_free_credentials(xcred);
 
 	assert(gnutls_certificate_allocate_credentials(&clicred) >= 0);
 	assert(gnutls_certificate_allocate_credentials(&xcred) >= 0);
 
-	ret =
-	    gnutls_certificate_set_x509_trust_mem(clicred, &ca3_cert,
-						  GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_trust_mem(clicred, &ca3_cert,
+						    GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		fail("set_x509_trust_file failed: %s\n", gnutls_strerror(ret));
 
@@ -93,16 +92,15 @@ void doit(void)
 	if (fp == NULL)
 		fail("error in fopen\n");
 
-	assert(fwrite
-	       (server_ca3_pkcs12_pem, 1, strlen((char *)server_ca3_pkcs12_pem),
-		fp) > 0);
+	assert(fwrite(server_ca3_pkcs12_pem, 1,
+		      strlen((char *)server_ca3_pkcs12_pem), fp) > 0);
 	fclose(fp);
 
-	ret = gnutls_certificate_set_x509_simple_pkcs12_file(xcred, certfile,
-							     GNUTLS_X509_FMT_PEM,
-							     "1234");
+	ret = gnutls_certificate_set_x509_simple_pkcs12_file(
+		xcred, certfile, GNUTLS_X509_FMT_PEM, "1234");
 	if (ret < 0)
-		fail("gnutls_certificate_set_x509_simple_pkcs12_file failed: %s\n", gnutls_strerror(ret));
+		fail("gnutls_certificate_set_x509_simple_pkcs12_file failed: %s\n",
+		     gnutls_strerror(ret));
 
 	/* verify whether the stored certificate match the ones we have */
 	ret = gnutls_certificate_get_crt_raw(xcred, 0, 0, &tcert);
@@ -115,7 +113,8 @@ void doit(void)
 
 	remove(certfile);
 
-	test_cli_serv(xcred, clicred, "NORMAL", "localhost", NULL, NULL, NULL);	/* the DNS name of the first cert */
+	test_cli_serv(xcred, clicred, "NORMAL", "localhost", NULL, NULL,
+		      NULL); /* the DNS name of the first cert */
 
 	gnutls_certificate_free_credentials(xcred);
 	gnutls_certificate_free_credentials(clicred);

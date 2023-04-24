@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -33,18 +33,18 @@ int main(int argc, char **argv)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
-# include <unistd.h>
-# include <signal.h>
-# include <gnutls/gnutls.h>
-# include <gnutls/dtls.h>
+#include <string.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <signal.h>
+#include <gnutls/gnutls.h>
+#include <gnutls/dtls.h>
 
-# include "utils.h"
+#include "utils.h"
 
 static void terminate(void);
 
@@ -90,9 +90,10 @@ static void client(int fd, const char *protocol0, const char *protocol2,
 	gnutls_init(&session, GNUTLS_CLIENT);
 
 	/* Use default priorities */
-	gnutls_priority_set_direct(session,
-				   "NONE:+VERS-TLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL",
-				   NULL);
+	gnutls_priority_set_direct(
+		session,
+		"NONE:+VERS-TLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL",
+		NULL);
 	if (protocol1) {
 		gnutls_datum_t t[3];
 		t[0].data = (void *)protocol0;
@@ -119,8 +120,7 @@ static void client(int fd, const char *protocol0, const char *protocol2,
 	 */
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret < 0) {
 		fail("client: Handshake failed\n");
@@ -133,8 +133,8 @@ static void client(int fd, const char *protocol0, const char *protocol2,
 
 	if (debug)
 		success("client: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	ret = gnutls_alpn_get_selected_protocol(session, &proto);
 	if (ret < 0) {
@@ -143,8 +143,8 @@ static void client(int fd, const char *protocol0, const char *protocol2,
 	}
 
 	if (debug) {
-		fprintf(stderr, "selected protocol: %.*s\n",
-			(int)proto.size, proto.data);
+		fprintf(stderr, "selected protocol: %.*s\n", (int)proto.size,
+			proto.data);
 	}
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);
@@ -191,9 +191,10 @@ static void server(int fd, const char *protocol1, const char *protocol2)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_priority_set_direct(session,
-				   "NONE:+VERS-TLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL",
-				   NULL);
+	gnutls_priority_set_direct(
+		session,
+		"NONE:+VERS-TLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL",
+		NULL);
 
 	t[0].data = (void *)protocol1;
 	t[0].size = strlen(protocol1);
@@ -212,8 +213,7 @@ static void server(int fd, const char *protocol1, const char *protocol2)
 
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 	if (ret < 0) {
 		close(fd);
 		gnutls_deinit(session);
@@ -226,8 +226,8 @@ static void server(int fd, const char *protocol1, const char *protocol2)
 
 	if (debug)
 		success("server: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	ret = gnutls_alpn_get_selected_protocol(session, &selected);
 	if (ret < 0) {
@@ -239,9 +239,10 @@ static void server(int fd, const char *protocol1, const char *protocol2)
 		success("Protocol: %.*s\n", (int)selected.size, selected.data);
 	}
 
-	if (selected.size != strlen(protocol1)
-	    || memcmp(selected.data, protocol1, selected.size) != 0) {
-		fail("did not select the expected protocol (selected %.*s, expected %s)\n", selected.size, selected.data, protocol1);
+	if (selected.size != strlen(protocol1) ||
+	    memcmp(selected.data, protocol1, selected.size) != 0) {
+		fail("did not select the expected protocol (selected %.*s, expected %s)\n",
+		     selected.size, selected.data, protocol1);
 		exit(1);
 	}
 
@@ -301,4 +302,4 @@ void doit(void)
 	start("spdy/3", "spdy/2");
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -31,13 +31,13 @@
 #include <signal.h>
 #include <unistd.h>
 #ifndef _WIN32
-# include <netinet/in.h>
-# include <sys/types.h>
-# include <sys/socket.h>
+#include <netinet/in.h>
+#include <sys/types.h>
+#include <sys/socket.h>
 #endif
 #include "utils.h"
 
-#define SERVER_MTU  500
+#define SERVER_MTU 500
 
 #ifdef _WIN32
 
@@ -48,7 +48,7 @@ void doit(void)
 
 #else
 
-# include <sys/wait.h>
+#include <sys/wait.h>
 
 /* Tests whether packing multiple DTLS records in a single UDP packet
  * will be handled correctly.
@@ -62,33 +62,31 @@ static void tls_log_func(int level, const char *str)
 }
 
 static unsigned char server_cert_pem[] =
-    "-----BEGIN CERTIFICATE-----\n"
-    "MIICHzCCAaWgAwIBAgIBCTAKBggqhkjOPQQDAjA+MQswCQYDVQQGEwJOTDERMA8G\n"
-    "A1UEChMIUG9sYXJTU0wxHDAaBgNVBAMTE1BvbGFyc3NsIFRlc3QgRUMgQ0EwHhcN\n"
-    "MTMwOTI0MTU1MjA0WhcNMjMwOTIyMTU1MjA0WjA0MQswCQYDVQQGEwJOTDERMA8G\n"
-    "A1UEChMIUG9sYXJTU0wxEjAQBgNVBAMTCWxvY2FsaG9zdDBZMBMGByqGSM49AgEG\n"
-    "CCqGSM49AwEHA0IABDfMVtl2CR5acj7HWS3/IG7ufPkGkXTQrRS192giWWKSTuUA\n"
-    "2CMR/+ov0jRdXRa9iojCa3cNVc2KKg76Aci07f+jgZ0wgZowCQYDVR0TBAIwADAd\n"
-    "BgNVHQ4EFgQUUGGlj9QH2deCAQzlZX+MY0anE74wbgYDVR0jBGcwZYAUnW0gJEkB\n"
-    "PyvLeLUZvH4kydv7NnyhQqRAMD4xCzAJBgNVBAYTAk5MMREwDwYDVQQKEwhQb2xh\n"
-    "clNTTDEcMBoGA1UEAxMTUG9sYXJzc2wgVGVzdCBFQyBDQYIJAMFD4n5iQ8zoMAoG\n"
-    "CCqGSM49BAMCA2gAMGUCMQCaLFzXptui5WQN8LlO3ddh1hMxx6tzgLvT03MTVK2S\n"
-    "C12r0Lz3ri/moSEpNZWqPjkCMCE2f53GXcYLqyfyJR078c/xNSUU5+Xxl7VZ414V\n"
-    "fGa5kHvHARBPc8YAIVIqDvHH1Q==\n" "-----END CERTIFICATE-----\n";
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIICHzCCAaWgAwIBAgIBCTAKBggqhkjOPQQDAjA+MQswCQYDVQQGEwJOTDERMA8G\n"
+	"A1UEChMIUG9sYXJTU0wxHDAaBgNVBAMTE1BvbGFyc3NsIFRlc3QgRUMgQ0EwHhcN\n"
+	"MTMwOTI0MTU1MjA0WhcNMjMwOTIyMTU1MjA0WjA0MQswCQYDVQQGEwJOTDERMA8G\n"
+	"A1UEChMIUG9sYXJTU0wxEjAQBgNVBAMTCWxvY2FsaG9zdDBZMBMGByqGSM49AgEG\n"
+	"CCqGSM49AwEHA0IABDfMVtl2CR5acj7HWS3/IG7ufPkGkXTQrRS192giWWKSTuUA\n"
+	"2CMR/+ov0jRdXRa9iojCa3cNVc2KKg76Aci07f+jgZ0wgZowCQYDVR0TBAIwADAd\n"
+	"BgNVHQ4EFgQUUGGlj9QH2deCAQzlZX+MY0anE74wbgYDVR0jBGcwZYAUnW0gJEkB\n"
+	"PyvLeLUZvH4kydv7NnyhQqRAMD4xCzAJBgNVBAYTAk5MMREwDwYDVQQKEwhQb2xh\n"
+	"clNTTDEcMBoGA1UEAxMTUG9sYXJzc2wgVGVzdCBFQyBDQYIJAMFD4n5iQ8zoMAoG\n"
+	"CCqGSM49BAMCA2gAMGUCMQCaLFzXptui5WQN8LlO3ddh1hMxx6tzgLvT03MTVK2S\n"
+	"C12r0Lz3ri/moSEpNZWqPjkCMCE2f53GXcYLqyfyJR078c/xNSUU5+Xxl7VZ414V\n"
+	"fGa5kHvHARBPc8YAIVIqDvHH1Q==\n"
+	"-----END CERTIFICATE-----\n";
 
-const gnutls_datum_t server_cert = { server_cert_pem,
-	sizeof(server_cert_pem)
-};
+const gnutls_datum_t server_cert = { server_cert_pem, sizeof(server_cert_pem) };
 
 static unsigned char server_key_pem[] =
-    "-----BEGIN EC PRIVATE KEY-----\n"
-    "MHcCAQEEIPEqEyB2AnCoPL/9U/YDHvdqXYbIogTywwyp6/UfDw6noAoGCCqGSM49\n"
-    "AwEHoUQDQgAEN8xW2XYJHlpyPsdZLf8gbu58+QaRdNCtFLX3aCJZYpJO5QDYIxH/\n"
-    "6i/SNF1dFr2KiMJrdw1VzYoqDvoByLTt/w==\n" "-----END EC PRIVATE KEY-----\n";
+	"-----BEGIN EC PRIVATE KEY-----\n"
+	"MHcCAQEEIPEqEyB2AnCoPL/9U/YDHvdqXYbIogTywwyp6/UfDw6noAoGCCqGSM49\n"
+	"AwEHoUQDQgAEN8xW2XYJHlpyPsdZLf8gbu58+QaRdNCtFLX3aCJZYpJO5QDYIxH/\n"
+	"6i/SNF1dFr2KiMJrdw1VzYoqDvoByLTt/w==\n"
+	"-----END EC PRIVATE KEY-----\n";
 
-const gnutls_datum_t server_key = { server_key_pem,
-	sizeof(server_key_pem)
-};
+const gnutls_datum_t server_key = { server_key_pem, sizeof(server_key_pem) };
 
 static int client_pull_timeout(gnutls_transport_ptr_t ptr, unsigned int ms)
 {
@@ -117,7 +115,8 @@ static ssize_t client_pull(gnutls_transport_ptr_t ptr, void *data, size_t len)
 
 	ret = recv(fd, data, len, 0);
 	if (ret > SERVER_MTU) {
-		fail("client: packet size beyond server MTU, got %d bytes, expect max. %d bytes\n", (int)ret, SERVER_MTU);
+		fail("client: packet size beyond server MTU, got %d bytes, expect max. %d bytes\n",
+		     (int)ret, SERVER_MTU);
 		exit(1);
 	}
 
@@ -148,9 +147,10 @@ static void client(int fd)
 	gnutls_handshake_set_timeout(session, get_timeout());
 
 	/* Use default priorities */
-	gnutls_priority_set_direct(session,
-				   "NONE:+VERS-DTLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ECDHE-ECDSA:+CURVE-ALL",
-				   NULL);
+	gnutls_priority_set_direct(
+		session,
+		"NONE:+VERS-DTLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ECDHE-ECDSA:+CURVE-ALL",
+		NULL);
 
 	/* put the anonymous credentials to the current session
 	 */
@@ -165,8 +165,7 @@ static void client(int fd)
 	 */
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret < 0) {
 		fail("client: Handshake failed\n");
@@ -179,8 +178,8 @@ static void client(int fd)
 
 	if (debug)
 		success("client: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
@@ -232,9 +231,10 @@ static void server(int fd)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_priority_set_direct(session,
-				   "NONE:+VERS-DTLS1.2:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ECDHE-ECDSA:+CURVE-ALL",
-				   NULL);
+	gnutls_priority_set_direct(
+		session,
+		"NONE:+VERS-DTLS1.2:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ECDHE-ECDSA:+CURVE-ALL",
+		NULL);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
@@ -242,8 +242,7 @@ static void server(int fd)
 
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 	if (ret < 0) {
 		close(fd);
 		gnutls_deinit(session);
@@ -256,8 +255,8 @@ static void server(int fd)
 
 	if (debug)
 		success("server: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	/* do not wait for the peer to close the connection.
 	 */
@@ -309,4 +308,4 @@ void doit(void)
 	}
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

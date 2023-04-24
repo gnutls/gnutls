@@ -21,25 +21,24 @@
  */
 
 #ifndef GNUTLS_LIB_TLS13_SESSION_TICKET_H
-# define GNUTLS_LIB_TLS13_SESSION_TICKET_H
+#define GNUTLS_LIB_TLS13_SESSION_TICKET_H
 
 int _gnutls13_recv_session_ticket(gnutls_session_t session,
-				  gnutls_buffer_st * buf);
+				  gnutls_buffer_st *buf);
 int _gnutls13_send_session_ticket(gnutls_session_t session, unsigned nr,
 				  unsigned again);
 
 static inline bool _gnutls13_can_send_session_ticket(gnutls_session_t session)
 {
 	return session->key.stek_initialized &&
-	    !(session->internals.flags & GNUTLS_NO_TICKETS);
+	       !(session->internals.flags & GNUTLS_NO_TICKETS);
 }
 
 int _gnutls13_unpack_session_ticket(gnutls_session_t session,
-				    gnutls_datum_t * data,
-				    tls13_ticket_st * ticket_data);
+				    gnutls_datum_t *data,
+				    tls13_ticket_st *ticket_data);
 
-inline static
-void tls13_ticket_deinit(tls13_ticket_st * ticket)
+inline static void tls13_ticket_deinit(tls13_ticket_st *ticket)
 {
 	zeroize_temp_key(&ticket->resumption_master_secret,
 			 sizeof(ticket->resumption_master_secret));
@@ -48,4 +47,4 @@ void tls13_ticket_deinit(tls13_ticket_st * ticket)
 	memset(ticket, 0, sizeof(tls13_ticket_st));
 }
 
-#endif				/* GNUTLS_LIB_TLS13_SESSION_TICKET_H */
+#endif /* GNUTLS_LIB_TLS13_SESSION_TICKET_H */

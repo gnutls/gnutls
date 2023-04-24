@@ -65,9 +65,8 @@ typedef struct {
       opaque Extensions<0..2^16-1>;
 */
 
-static int
-client_send(gnutls_session_t session,
-	    gnutls_buffer_st * extdata, status_request_ext_st * priv)
+static int client_send(gnutls_session_t session, gnutls_buffer_st *extdata,
+		       status_request_ext_st *priv)
 {
 	const uint8_t data[5] = "\x01\x00\x00\x00\x00";
 	const int len = 5;
@@ -84,8 +83,8 @@ client_send(gnutls_session_t session,
 	return len;
 }
 
-static int
-server_recv(gnutls_session_t session, const uint8_t * data, size_t data_size)
+static int server_recv(gnutls_session_t session, const uint8_t *data,
+		       size_t data_size)
 {
 	unsigned rid_bytes = 0;
 
@@ -121,9 +120,8 @@ server_recv(gnutls_session_t session, const uint8_t * data, size_t data_size)
 	return 0;
 }
 
-static int
-client_recv(gnutls_session_t session,
-	    status_request_ext_st * priv, const uint8_t * data, size_t size)
+static int client_recv(gnutls_session_t session, status_request_ext_st *priv,
+		       const uint8_t *data, size_t size)
 {
 	if (size != 0)
 		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
@@ -153,9 +151,8 @@ client_recv(gnutls_session_t session,
  * are selected (with the _GNUTLS_EXT_TLS_POST_CS type), and we discover
  * (or not) the response to send early.
  */
-static int
-server_send(gnutls_session_t session,
-	    gnutls_buffer_st * extdata, status_request_ext_st * priv)
+static int server_send(gnutls_session_t session, gnutls_buffer_st *extdata,
+		       status_request_ext_st *priv)
 {
 	int ret;
 	gnutls_certificate_credentials_t cred;
@@ -163,9 +160,9 @@ server_send(gnutls_session_t session,
 	void *func_ptr;
 	const version_entry_st *ver = get_version(session);
 
-	cred = (gnutls_certificate_credentials_t)
-	    _gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE);
-	if (cred == NULL)	/* no certificate authentication */
+	cred = (gnutls_certificate_credentials_t)_gnutls_get_cred(
+		session, GNUTLS_CRD_CERTIFICATE);
+	if (cred == NULL) /* no certificate authentication */
 		return 0;
 
 	/* no need to set sresp; responses are send during certificate sending and
@@ -184,13 +181,12 @@ server_send(gnutls_session_t session,
 				return 0;
 			}
 
-			ret = _gnutls_set_datum(&priv->sresp,
-						session->
-						internals.selected_ocsp[0].
-						response.data,
-						session->
-						internals.selected_ocsp[0].
-						response.size);
+			ret = _gnutls_set_datum(
+				&priv->sresp,
+				session->internals.selected_ocsp[0]
+					.response.data,
+				session->internals.selected_ocsp[0]
+					.response.size);
 			if (ret < 0)
 				return gnutls_assert_val(ret);
 			return GNUTLS_E_INT_RET_0;
@@ -216,9 +212,8 @@ server_send(gnutls_session_t session,
 	return GNUTLS_E_INT_RET_0;
 }
 
-static int
-_gnutls_status_request_send_params(gnutls_session_t session,
-				   gnutls_buffer_st * extdata)
+static int _gnutls_status_request_send_params(gnutls_session_t session,
+					      gnutls_buffer_st *extdata)
 {
 	gnutls_ext_priv_data_t epriv;
 	status_request_ext_st *priv;
@@ -233,10 +228,9 @@ _gnutls_status_request_send_params(gnutls_session_t session,
 		if (session->internals.flags & GNUTLS_NO_STATUS_REQUEST)
 			return 0;
 
-		ret = _gnutls_hello_ext_get_priv(session,
-						 GNUTLS_EXTENSION_STATUS_REQUEST,
-						 &epriv);
-		if (ret < 0 || epriv == NULL)	/* it is ok not to have it */
+		ret = _gnutls_hello_ext_get_priv(
+			session, GNUTLS_EXTENSION_STATUS_REQUEST, &epriv);
+		if (ret < 0 || epriv == NULL) /* it is ok not to have it */
 			return 0;
 		priv = epriv;
 
@@ -246,27 +240,24 @@ _gnutls_status_request_send_params(gnutls_session_t session,
 		if (priv == NULL)
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-		_gnutls_hello_ext_set_priv(session,
-					   GNUTLS_EXTENSION_STATUS_REQUEST,
-					   epriv);
+		_gnutls_hello_ext_set_priv(
+			session, GNUTLS_EXTENSION_STATUS_REQUEST, epriv);
 
 		return server_send(session, extdata, priv);
 	}
 }
 
-static int
-_gnutls_status_request_recv_params(gnutls_session_t session,
-				   const uint8_t * data, size_t size)
+static int _gnutls_status_request_recv_params(gnutls_session_t session,
+					      const uint8_t *data, size_t size)
 {
 	gnutls_ext_priv_data_t epriv;
 	status_request_ext_st *priv;
 	int ret;
 
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
-		ret = _gnutls_hello_ext_get_priv(session,
-						 GNUTLS_EXTENSION_STATUS_REQUEST,
-						 &epriv);
-		if (ret < 0 || epriv == NULL)	/* it is ok not to have it */
+		ret = _gnutls_hello_ext_get_priv(
+			session, GNUTLS_EXTENSION_STATUS_REQUEST, &epriv);
+		if (ret < 0 || epriv == NULL) /* it is ok not to have it */
 			return 0;
 		priv = epriv;
 
@@ -297,11 +288,10 @@ _gnutls_status_request_recv_params(gnutls_session_t session,
  *
  * Since: 3.1.3
  **/
-int
-gnutls_ocsp_status_request_enable_client(gnutls_session_t session,
-					 gnutls_datum_t * responder_id,
-					 size_t responder_id_size,
-					 gnutls_datum_t * extensions)
+int gnutls_ocsp_status_request_enable_client(gnutls_session_t session,
+					     gnutls_datum_t *responder_id,
+					     size_t responder_id_size,
+					     gnutls_datum_t *extensions)
 {
 	status_request_ext_st *priv;
 	gnutls_ext_priv_data_t epriv;
@@ -313,8 +303,8 @@ gnutls_ocsp_status_request_enable_client(gnutls_session_t session,
 	if (priv == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-	_gnutls_hello_ext_set_priv(session,
-				   GNUTLS_EXTENSION_STATUS_REQUEST, epriv);
+	_gnutls_hello_ext_set_priv(session, GNUTLS_EXTENSION_STATUS_REQUEST,
+				   epriv);
 
 	session->internals.flags &= ~GNUTLS_NO_STATUS_REQUEST;
 	if (session->internals.priorities)
@@ -338,9 +328,9 @@ const hello_ext_entry_st ext_mod_status_request = {
 	.name = "OCSP Status Request",
 	.tls_id = STATUS_REQUEST_TLS_ID,
 	.gid = GNUTLS_EXTENSION_STATUS_REQUEST,
-	.validity =
-	    GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_DTLS |
-	    GNUTLS_EXT_FLAG_CLIENT_HELLO | GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
+	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_DTLS |
+		    GNUTLS_EXT_FLAG_CLIENT_HELLO |
+		    GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
 	.client_parse_point = _GNUTLS_EXT_TLS_POST_CS,
 	.server_parse_point = _GNUTLS_EXT_TLS_POST_CS,
 	.recv_func = _gnutls_status_request_recv_params,
@@ -364,10 +354,8 @@ int _gnutls_send_server_certificate_status(gnutls_session_t session, int again)
 		return 0;
 
 	if (again == 0) {
-		ret =
-		    _gnutls_hello_ext_get_priv(session,
-					       GNUTLS_EXTENSION_STATUS_REQUEST,
-					       &epriv);
+		ret = _gnutls_hello_ext_get_priv(
+			session, GNUTLS_EXTENSION_STATUS_REQUEST, &epriv);
 		if (ret < 0)
 			return 0;
 
@@ -395,8 +383,8 @@ int _gnutls_send_server_certificate_status(gnutls_session_t session, int again)
 				      GNUTLS_HANDSHAKE_CERTIFICATE_STATUS);
 }
 
-int _gnutls_parse_ocsp_response(gnutls_session_t session, const uint8_t * data,
-				ssize_t data_size, gnutls_datum_t * resp)
+int _gnutls_parse_ocsp_response(gnutls_session_t session, const uint8_t *data,
+				ssize_t data_size, gnutls_datum_t *resp)
 {
 	int ret;
 	ssize_t r_size;
@@ -445,14 +433,13 @@ int _gnutls_recv_server_certificate_status(gnutls_session_t session)
 	status_request_ext_st *priv = NULL;
 	gnutls_ext_priv_data_t epriv;
 	cert_auth_info_t info =
-	    _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
+		_gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
 
 	if (info == NULL)
 		return 0;
 
-	ret =
-	    _gnutls_hello_ext_get_priv(session,
-				       GNUTLS_EXTENSION_STATUS_REQUEST, &epriv);
+	ret = _gnutls_hello_ext_get_priv(
+		session, GNUTLS_EXTENSION_STATUS_REQUEST, &epriv);
 	if (ret < 0)
 		return 0;
 
@@ -461,9 +448,8 @@ int _gnutls_recv_server_certificate_status(gnutls_session_t session)
 	if (!priv->expect_cstatus)
 		return 0;
 
-	ret = _gnutls_recv_handshake(session,
-				     GNUTLS_HANDSHAKE_CERTIFICATE_STATUS,
-				     1, &buf);
+	ret = _gnutls_recv_handshake(
+		session, GNUTLS_HANDSHAKE_CERTIFICATE_STATUS, 1, &buf);
 	if (ret < 0)
 		return gnutls_assert_val_fatal(ret);
 
@@ -500,7 +486,7 @@ int _gnutls_recv_server_certificate_status(gnutls_session_t session)
 
 	ret = 0;
 
- error:
+error:
 	_gnutls_buffer_clear(&buf);
 
 	return ret;

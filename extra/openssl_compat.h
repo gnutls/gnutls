@@ -21,10 +21,10 @@
  */
 
 #ifndef GNUTLS_COMPAT8_H
-# define GNUTLS_COMPAT8_H
+#define GNUTLS_COMPAT8_H
 
 /* Extra definitions */
-# include <gnutls/openssl.h>
+#include <gnutls/openssl.h>
 
 int gnutls_x509_extract_certificate_dn(const gnutls_datum_t *,
 				       gnutls_x509_dn *);

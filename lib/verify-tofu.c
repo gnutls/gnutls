@@ -24,7 +24,7 @@
 #include "errors.h"
 #include <libtasn1.h>
 #include <global.h>
-#include <num.h>		/* MAX */
+#include <num.h> /* MAX */
 #include <tls-sig.h>
 #include "str.h"
 #include <datum.h>
@@ -43,28 +43,22 @@ struct gnutls_tdb_int {
 	gnutls_tdb_verify_func verify;
 };
 
-static int raw_pubkey_to_base64(const gnutls_datum_t * raw,
-				gnutls_datum_t * b64);
+static int raw_pubkey_to_base64(const gnutls_datum_t *raw, gnutls_datum_t *b64);
 static int verify_pubkey(const char *file, const char *host,
-			 const char *service, const gnutls_datum_t * skey);
+			 const char *service, const gnutls_datum_t *skey);
 
-static
-int store_commitment(const char *db_name, const char *host,
-		     const char *service, time_t expiration,
-		     gnutls_digest_algorithm_t hash_algo,
-		     const gnutls_datum_t * hash);
-static
-int store_pubkey(const char *db_name, const char *host,
-		 const char *service, time_t expiration,
-		 const gnutls_datum_t * pubkey);
+static int store_commitment(const char *db_name, const char *host,
+			    const char *service, time_t expiration,
+			    gnutls_digest_algorithm_t hash_algo,
+			    const gnutls_datum_t *hash);
+static int store_pubkey(const char *db_name, const char *host,
+			const char *service, time_t expiration,
+			const gnutls_datum_t *pubkey);
 
 static int find_config_file(char *file, size_t max_size);
 
-struct gnutls_tdb_int default_tdb = {
-	store_pubkey,
-	store_commitment,
-	verify_pubkey
-};
+struct gnutls_tdb_int default_tdb = { store_pubkey, store_commitment,
+				      verify_pubkey };
 
 /**
  * gnutls_verify_stored_pubkey:
@@ -102,15 +96,14 @@ struct gnutls_tdb_int default_tdb = {
  *
  * Since: 3.0.13
  **/
-int
-gnutls_verify_stored_pubkey(const char *db_name,
-			    gnutls_tdb_t tdb,
-			    const char *host,
-			    const char *service,
-			    gnutls_certificate_type_t cert_type,
-			    const gnutls_datum_t * cert, unsigned int flags)
+int gnutls_verify_stored_pubkey(const char *db_name, gnutls_tdb_t tdb,
+				const char *host, const char *service,
+				gnutls_certificate_type_t cert_type,
+				const gnutls_datum_t *cert, unsigned int flags)
 {
-	gnutls_datum_t pubkey = { NULL, 0 };	// Holds the pubkey in subjectPublicKeyInfo format (DER encoded)
+	gnutls_datum_t pubkey = {
+		NULL, 0
+	}; // Holds the pubkey in subjectPublicKeyInfo format (DER encoded)
 	int ret;
 	char local_file[MAX_FILENAME];
 	bool need_free;
@@ -160,10 +153,9 @@ gnutls_verify_stored_pubkey(const char *db_name,
 	return ret;
 }
 
-static int parse_commitment_line(char *line,
-				 const char *host, size_t host_len,
+static int parse_commitment_line(char *line, const char *host, size_t host_len,
 				 const char *service, size_t service_len,
-				 time_t now, const gnutls_datum_t * skey)
+				 time_t now, const gnutls_datum_t *skey)
 {
 	char *p, *kp;
 	char *savep = NULL;
@@ -195,7 +187,7 @@ static int parse_commitment_line(char *line,
 	if (p == NULL)
 		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
-	expiration = (time_t) atol(p);
+	expiration = (time_t)atol(p);
 	if (expiration > 0 && now > expiration)
 		return gnutls_assert_val(GNUTLS_E_EXPIRED);
 
@@ -218,16 +210,15 @@ static int parse_commitment_line(char *line,
 		*p = 0;
 
 	/* hash and hex encode */
-	ret =
-	    _gnutls_hash_fast((gnutls_digest_algorithm_t) hash_algo->id,
-			      skey->data, skey->size, phash);
+	ret = _gnutls_hash_fast((gnutls_digest_algorithm_t)hash_algo->id,
+				skey->data, skey->size, phash);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
 	phash_size = _gnutls_hash_get_algo_len(hash_algo);
 
-	p = _gnutls_bin2hex(phash, phash_size, (void *)hphash,
-			    sizeof(hphash), NULL);
+	p = _gnutls_bin2hex(phash, phash_size, (void *)hphash, sizeof(hphash),
+			    NULL);
 	if (p == NULL)
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
@@ -242,12 +233,10 @@ static int parse_commitment_line(char *line,
 	return 0;
 }
 
-static int parse_line(char *line,
-		      const char *host, size_t host_len,
-		      const char *service, size_t service_len,
-		      time_t now,
-		      const gnutls_datum_t * rawkey,
-		      const gnutls_datum_t * b64key)
+static int parse_line(char *line, const char *host, size_t host_len,
+		      const char *service, size_t service_len, time_t now,
+		      const gnutls_datum_t *rawkey,
+		      const gnutls_datum_t *b64key)
 {
 	char *p, *kp;
 	char *savep = NULL;
@@ -260,8 +249,8 @@ static int parse_line(char *line,
 		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
 	if (strncmp(p, "c0", 2) == 0)
-		return parse_commitment_line(p + 3, host, host_len,
-					     service, service_len, now, rawkey);
+		return parse_commitment_line(p + 3, host, host_len, service,
+					     service_len, now, rawkey);
 
 	if (strncmp(p, "g0", 2) != 0)
 		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
@@ -287,7 +276,7 @@ static int parse_line(char *line,
 	if (p == NULL)
 		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
-	expiration = (time_t) atol(p);
+	expiration = (time_t)atol(p);
 	if (expiration > 0 && now > expiration)
 		return gnutls_assert_val(GNUTLS_E_EXPIRED);
 
@@ -313,9 +302,8 @@ static int parse_line(char *line,
 
 /* Returns the base64 key if found
  */
-static int verify_pubkey(const char *file,
-			 const char *host, const char *service,
-			 const gnutls_datum_t * pubkey)
+static int verify_pubkey(const char *file, const char *host,
+			 const char *service, const gnutls_datum_t *pubkey)
 {
 	FILE *fp;
 	char *line = NULL;
@@ -343,23 +331,21 @@ static int verify_pubkey(const char *file,
 	do {
 		l2 = getline(&line, &line_size, fp);
 		if (l2 > 0) {
-			ret =
-			    parse_line(line, host, host_len, service,
-				       service_len, now, pubkey, &b64key);
-			if (ret == 0) {	/* found */
+			ret = parse_line(line, host, host_len, service,
+					 service_len, now, pubkey, &b64key);
+			if (ret == 0) { /* found */
 				goto cleanup;
 			} else if (ret == GNUTLS_E_CERTIFICATE_KEY_MISMATCH)
 				mismatch = 1;
 		}
-	}
-	while (l2 >= 0);
+	} while (l2 >= 0);
 
 	if (mismatch)
 		ret = GNUTLS_E_CERTIFICATE_KEY_MISMATCH;
 	else
 		ret = GNUTLS_E_NO_CERTIFICATE_FOUND;
 
- cleanup:
+cleanup:
 	free(line);
 	if (fp != NULL)
 		fclose(fp);
@@ -368,8 +354,7 @@ static int verify_pubkey(const char *file,
 	return ret;
 }
 
-static int raw_pubkey_to_base64(const gnutls_datum_t * raw,
-				gnutls_datum_t * b64)
+static int raw_pubkey_to_base64(const gnutls_datum_t *raw, gnutls_datum_t *b64)
 {
 	size_t size;
 
@@ -385,10 +370,9 @@ static int raw_pubkey_to_base64(const gnutls_datum_t * raw,
 	return 0;
 }
 
-static
-int store_pubkey(const char *db_name, const char *host,
-		 const char *service, time_t expiration,
-		 const gnutls_datum_t * pubkey)
+static int store_pubkey(const char *db_name, const char *host,
+			const char *service, time_t expiration,
+			const gnutls_datum_t *pubkey)
 {
 	FILE *fp = NULL;
 	gnutls_datum_t b64key = { NULL, 0 };
@@ -420,7 +404,7 @@ int store_pubkey(const char *db_name, const char *host,
 
 	ret = 0;
 
- cleanup:
+cleanup:
 	if (fp != NULL)
 		fclose(fp);
 
@@ -430,11 +414,10 @@ int store_pubkey(const char *db_name, const char *host,
 	return ret;
 }
 
-static
-int store_commitment(const char *db_name, const char *host,
-		     const char *service, time_t expiration,
-		     gnutls_digest_algorithm_t hash_algo,
-		     const gnutls_datum_t * hash)
+static int store_commitment(const char *db_name, const char *host,
+			    const char *service, time_t expiration,
+			    gnutls_digest_algorithm_t hash_algo,
+			    const gnutls_datum_t *hash)
 {
 	FILE *fp;
 	char buffer[MAX_HASH_SIZE * 2 + 1];
@@ -450,8 +433,8 @@ int store_commitment(const char *db_name, const char *host,
 
 	fprintf(fp, "|c0|%s|%s|%lu|%u|%s\n", host, service,
 		(unsigned long)expiration, (unsigned)hash_algo,
-		_gnutls_bin2hex(hash->data, hash->size, buffer,
-				sizeof(buffer), NULL));
+		_gnutls_bin2hex(hash->data, hash->size, buffer, sizeof(buffer),
+				NULL));
 
 	fclose(fp);
 
@@ -491,16 +474,15 @@ int store_commitment(const char *db_name, const char *host,
  *
  * Since: 3.0.13
  **/
-int
-gnutls_store_pubkey(const char *db_name,
-		    gnutls_tdb_t tdb,
-		    const char *host,
-		    const char *service,
-		    gnutls_certificate_type_t cert_type,
-		    const gnutls_datum_t * cert,
-		    time_t expiration, unsigned int flags)
+int gnutls_store_pubkey(const char *db_name, gnutls_tdb_t tdb, const char *host,
+			const char *service,
+			gnutls_certificate_type_t cert_type,
+			const gnutls_datum_t *cert, time_t expiration,
+			unsigned int flags)
 {
-	gnutls_datum_t pubkey = { NULL, 0 };	// Holds the pubkey in subjectPublicKeyInfo format (DER encoded)
+	gnutls_datum_t pubkey = {
+		NULL, 0
+	}; // Holds the pubkey in subjectPublicKeyInfo format (DER encoded)
 	int ret;
 	char local_file[MAX_FILENAME];
 	bool need_free;
@@ -586,14 +568,11 @@ gnutls_store_pubkey(const char *db_name,
  *
  * Since: 3.0
  **/
-int
-gnutls_store_commitment(const char *db_name,
-			gnutls_tdb_t tdb,
-			const char *host,
-			const char *service,
-			gnutls_digest_algorithm_t hash_algo,
-			const gnutls_datum_t * hash,
-			time_t expiration, unsigned int flags)
+int gnutls_store_commitment(const char *db_name, gnutls_tdb_t tdb,
+			    const char *host, const char *service,
+			    gnutls_digest_algorithm_t hash_algo,
+			    const gnutls_datum_t *hash, time_t expiration,
+			    unsigned int flags)
 {
 	int ret;
 	char local_file[MAX_FILENAME];
@@ -602,8 +581,8 @@ gnutls_store_commitment(const char *db_name,
 	if (me == NULL)
 		return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
 
-	if (!(flags & GNUTLS_SCOMMIT_FLAG_ALLOW_BROKEN)
-	    && _gnutls_digest_is_secure(me) == 0)
+	if (!(flags & GNUTLS_SCOMMIT_FLAG_ALLOW_BROKEN) &&
+	    _gnutls_digest_is_secure(me) == 0)
 		return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_SECURITY);
 
 	if (_gnutls_hash_get_algo_len(me) != hash->size)
@@ -629,7 +608,7 @@ gnutls_store_commitment(const char *db_name,
 	_gnutls_debug_log("Configuration file: %s\n", db_name);
 
 	ret = tdb->cstore(db_name, host, service, expiration,
-			  (gnutls_digest_algorithm_t) me->id, hash);
+			  (gnutls_digest_algorithm_t)me->id, hash);
 	if (ret < 0) {
 		return gnutls_assert_val(GNUTLS_E_DB_ERROR);
 	}
@@ -665,7 +644,7 @@ static int find_config_file(char *file, size_t max_size)
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
-int gnutls_tdb_init(gnutls_tdb_t * tdb)
+int gnutls_tdb_init(gnutls_tdb_t *tdb)
 {
 	*tdb = gnutls_calloc(1, sizeof(struct gnutls_tdb_int));
 
@@ -710,9 +689,8 @@ void gnutls_tdb_set_store_func(gnutls_tdb_t tdb, gnutls_tdb_store_func store)
  * The @db_name should be used to pass any private data to this function.
  *
  **/
-void gnutls_tdb_set_store_commitment_func(gnutls_tdb_t tdb,
-					  gnutls_tdb_store_commitment_func
-					  cstore)
+void gnutls_tdb_set_store_commitment_func(
+	gnutls_tdb_t tdb, gnutls_tdb_store_commitment_func cstore)
 {
 	tdb->cstore = cstore;
 }

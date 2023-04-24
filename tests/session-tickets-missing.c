@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -36,21 +36,21 @@ int main(void)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
-# include <unistd.h>
-# include <time.h>
-# include <gnutls/gnutls.h>
-# include <gnutls/dtls.h>
-# include <signal.h>
-# include <assert.h>
+#include <string.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <time.h>
+#include <gnutls/gnutls.h>
+#include <gnutls/dtls.h>
+#include <signal.h>
+#include <assert.h>
 
-# include "cert-common.h"
-# include "utils.h"
+#include "cert-common.h"
+#include "utils.h"
 
 /* This program tests that handshakes do not include a session ticket
  * if the flag GNUTLS_NO_TICKETS is specified under TLS 1.2.
@@ -59,7 +59,7 @@ int main(void)
  * result in a ticket being sent.
  */
 
-static time_t mytime(time_t * t)
+static time_t mytime(time_t *t)
 {
 	time_t then = 1464610242;
 	if (t)
@@ -82,7 +82,7 @@ static int sent = 0;
 
 static int handshake_callback(gnutls_session_t session, unsigned int htype,
 			      unsigned post, unsigned int incoming,
-			      const gnutls_datum_t * msg)
+			      const gnutls_datum_t *msg)
 {
 	if (htype != GNUTLS_HANDSHAKE_NEW_SESSION_TICKET)
 		return 0;
@@ -91,7 +91,7 @@ static int handshake_callback(gnutls_session_t session, unsigned int htype,
 	return 0;
 }
 
-# define MAX_BUF 1024
+#define MAX_BUF 1024
 
 static void client(int fd, const char *prio, unsigned int flags)
 {
@@ -128,8 +128,7 @@ static void client(int fd, const char *prio, unsigned int flags)
 	 */
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret == GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM) {
 		/* success */
@@ -146,12 +145,12 @@ static void client(int fd, const char *prio, unsigned int flags)
 
 	if (debug)
 		success("client: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
- end:
+end:
 
 	close(fd);
 
@@ -226,8 +225,8 @@ static void server(int fd, const char *prio, unsigned int flags)
 
 	if (debug)
 		success("server: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	if (sent != 0) {
 		fail("new session ticket was sent\n");
@@ -238,7 +237,7 @@ static void server(int fd, const char *prio, unsigned int flags)
 	 */
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
- end:
+end:
 	close(fd);
 	gnutls_deinit(session);
 	gnutls_free(skey.data);
@@ -256,9 +255,8 @@ static void ch_handler(int sig)
 	return;
 }
 
-static
-void start2(const char *prio, const char *sprio, unsigned int flags,
-	    unsigned int sflags)
+static void start2(const char *prio, const char *sprio, unsigned int flags,
+		   unsigned int sflags)
 {
 	int fd[2];
 	int ret, status = 0;
@@ -297,8 +295,7 @@ void start2(const char *prio, const char *sprio, unsigned int flags,
 	return;
 }
 
-static
-void start(const char *prio, unsigned int flags)
+static void start(const char *prio, unsigned int flags)
 {
 	start2(prio, prio, GNUTLS_NO_TICKETS, flags);
 }
@@ -315,4 +312,4 @@ void doit(void)
 	start("NORMAL", GNUTLS_NO_TICKETS);
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

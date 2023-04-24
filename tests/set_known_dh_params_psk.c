@@ -22,7 +22,7 @@
 /* Parts copied from GnuTLS example programs. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -30,10 +30,10 @@
 #include <string.h>
 #include <sys/types.h>
 #if !defined(_WIN32)
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
 #endif
 #include <unistd.h>
 #include <assert.h>
@@ -52,8 +52,8 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "<%d>| %s", level, str);
 }
 
-static int
-pskfunc(gnutls_session_t session, const char *username, gnutls_datum_t * key)
+static int pskfunc(gnutls_session_t session, const char *username,
+		   gnutls_datum_t *key)
 {
 	if (debug)
 		printf("psk callback to get %s's password\n", username);
@@ -88,25 +88,25 @@ void doit(void)
 	assert(gnutls_psk_set_client_credentials(clicred, "test", &key,
 						 GNUTLS_PSK_KEY_HEX) >= 0);
 
-	assert(gnutls_psk_set_server_known_dh_params
-	       (servcred, GNUTLS_SEC_PARAM_LEGACY) >= 0);
-	assert(test_cli_serv_psk(servcred, clicred, "NORMAL:-KX-ALL:+DHE-PSK")
-	       >= 0);
+	assert(gnutls_psk_set_server_known_dh_params(
+		       servcred, GNUTLS_SEC_PARAM_LEGACY) >= 0);
+	assert(test_cli_serv_psk(servcred, clicred,
+				 "NORMAL:-KX-ALL:+DHE-PSK") >= 0);
 
-	assert(gnutls_psk_set_server_known_dh_params
-	       (servcred, GNUTLS_SEC_PARAM_NORMAL) >= 0);
-	assert(test_cli_serv_psk(servcred, clicred, "NORMAL:-KX-ALL:+DHE-PSK")
-	       >= 0);
+	assert(gnutls_psk_set_server_known_dh_params(
+		       servcred, GNUTLS_SEC_PARAM_NORMAL) >= 0);
+	assert(test_cli_serv_psk(servcred, clicred,
+				 "NORMAL:-KX-ALL:+DHE-PSK") >= 0);
 
-	assert(gnutls_psk_set_server_known_dh_params
-	       (servcred, GNUTLS_SEC_PARAM_HIGH) >= 0);
-	assert(test_cli_serv_psk(servcred, clicred, "NORMAL:-KX-ALL:+DHE-PSK")
-	       >= 0);
+	assert(gnutls_psk_set_server_known_dh_params(
+		       servcred, GNUTLS_SEC_PARAM_HIGH) >= 0);
+	assert(test_cli_serv_psk(servcred, clicred,
+				 "NORMAL:-KX-ALL:+DHE-PSK") >= 0);
 
-	assert(gnutls_psk_set_server_known_dh_params
-	       (servcred, GNUTLS_SEC_PARAM_ULTRA) >= 0);
-	assert(test_cli_serv_psk(servcred, clicred, "NORMAL:-KX-ALL:+DHE-PSK")
-	       >= 0);
+	assert(gnutls_psk_set_server_known_dh_params(
+		       servcred, GNUTLS_SEC_PARAM_ULTRA) >= 0);
+	assert(test_cli_serv_psk(servcred, clicred,
+				 "NORMAL:-KX-ALL:+DHE-PSK") >= 0);
 
 	gnutls_psk_free_server_credentials(servcred);
 	gnutls_psk_free_client_credentials(clicred);

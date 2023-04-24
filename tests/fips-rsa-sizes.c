@@ -26,16 +26,16 @@
 #include <gnutls/abstract.h>
 #include <gnutls/x509.h>
 
-void generate_successfully(gnutls_privkey_t * privkey, gnutls_pubkey_t * pubkey,
+void generate_successfully(gnutls_privkey_t *privkey, gnutls_pubkey_t *pubkey,
 			   unsigned int size);
-void generate_unsuccessfully(gnutls_privkey_t * privkey,
-			     gnutls_pubkey_t * pubkey, unsigned int size);
+void generate_unsuccessfully(gnutls_privkey_t *privkey, gnutls_pubkey_t *pubkey,
+			     unsigned int size);
 void sign_verify_successfully(gnutls_privkey_t privkey, gnutls_pubkey_t pubkey);
 void sign_verify_unsuccessfully(gnutls_privkey_t privkey,
 				gnutls_pubkey_t pubkey);
 void nosign_verify(gnutls_privkey_t privkey, gnutls_pubkey_t pubkey);
 
-void generate_successfully(gnutls_privkey_t * privkey, gnutls_pubkey_t * pubkey,
+void generate_successfully(gnutls_privkey_t *privkey, gnutls_pubkey_t *pubkey,
 			   unsigned int size)
 {
 	int ret;
@@ -72,8 +72,8 @@ void generate_successfully(gnutls_privkey_t * privkey, gnutls_pubkey_t * pubkey,
 	gnutls_fips140_context_deinit(fips_context);
 }
 
-void generate_unsuccessfully(gnutls_privkey_t * privkey,
-			     gnutls_pubkey_t * pubkey, unsigned int size)
+void generate_unsuccessfully(gnutls_privkey_t *privkey, gnutls_pubkey_t *pubkey,
+			     unsigned int size)
 {
 	int ret;
 	gnutls_x509_privkey_t xprivkey;
@@ -134,8 +134,7 @@ void sign_verify_successfully(gnutls_privkey_t privkey, gnutls_pubkey_t pubkey)
 
 	gnutls_datum_t signature;
 	gnutls_datum_t plaintext = {
-		.data = (unsigned char *const)"Hello world!",
-		.size = 12
+		.data = (unsigned char *const)"Hello world!", .size = 12
 	};
 	assert(gnutls_fips140_context_init(&fips_context) == 0);
 
@@ -167,8 +166,7 @@ void sign_verify_unsuccessfully(gnutls_privkey_t privkey,
 
 	gnutls_datum_t signature;
 	gnutls_datum_t plaintext = {
-		.data = (unsigned char *const)"Hello world!",
-		.size = 12
+		.data = (unsigned char *const)"Hello world!", .size = 12
 	};
 	assert(gnutls_fips140_context_init(&fips_context) == 0);
 
@@ -201,8 +199,7 @@ void nosign_verify(gnutls_privkey_t privkey, gnutls_pubkey_t pubkey)
 
 	gnutls_datum_t signature;
 	gnutls_datum_t plaintext = {
-		.data = (unsigned char *const)"Hello world!",
-		.size = 12
+		.data = (unsigned char *const)"Hello world!", .size = 12
 	};
 	assert(gnutls_fips140_context_init(&fips_context) == 0);
 
@@ -248,7 +245,7 @@ void doit(void)
 
 	if (gnutls_fips140_mode_enabled() == 0) {
 		success("We are not in FIPS140 mode\n");
-		exit(77);	/* SKIP */
+		exit(77); /* SKIP */
 	}
 
 	assert(gnutls_fips140_context_init(&fips_context) == 0);

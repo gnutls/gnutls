@@ -22,7 +22,7 @@
 /* Parts copied from GnuTLS example programs. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -30,10 +30,10 @@
 #include <string.h>
 #include <sys/types.h>
 #if !defined(_WIN32)
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
 #endif
 #include <unistd.h>
 #include <assert.h>
@@ -54,7 +54,7 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "<%d>| %s", level, str);
 }
 
-static time_t mytime(time_t * t)
+static time_t mytime(time_t *t)
 {
 	time_t then = 1473674242;
 	if (t)
@@ -88,24 +88,22 @@ static void auto_parse(void)
 
 	assert(gnutls_certificate_allocate_credentials(&clicred) >= 0);
 
-	ret =
-	    gnutls_certificate_set_x509_trust_mem(clicred, &ca3_cert,
-						  GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_trust_mem(clicred, &ca3_cert,
+						    GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		fail("set_x509_trust_file failed: %s\n", gnutls_strerror(ret));
 
 	pcert_list_size = sizeof(pcert_list) / sizeof(pcert_list[0]);
-	ret = gnutls_pcert_list_import_x509_raw(pcert_list, &pcert_list_size,
-						&server_ca3_localhost_cert_chain,
-						GNUTLS_X509_FMT_PEM, 0);
+	ret = gnutls_pcert_list_import_x509_raw(
+		pcert_list, &pcert_list_size, &server_ca3_localhost_cert_chain,
+		GNUTLS_X509_FMT_PEM, 0);
 	if (ret < 0) {
 		fail("error in gnutls_pcert_list_import_x509_raw: %s\n",
 		     gnutls_strerror(ret));
 	}
 
-	ret =
-	    gnutls_privkey_import_x509_raw(key, &server_ca3_key,
-					   GNUTLS_X509_FMT_PEM, NULL, 0);
+	ret = gnutls_privkey_import_x509_raw(key, &server_ca3_key,
+					     GNUTLS_X509_FMT_PEM, NULL, 0);
 	if (ret < 0) {
 		fail("error in key import: %s\n", gnutls_strerror(ret));
 	}
@@ -130,24 +128,27 @@ static void auto_parse(void)
 		     gnutls_strerror(ret));
 	}
 
-	ret =
-	    gnutls_privkey_import_x509_raw(second_key, &server_ca3_key,
-					   GNUTLS_X509_FMT_PEM, NULL, 0);
+	ret = gnutls_privkey_import_x509_raw(second_key, &server_ca3_key,
+					     GNUTLS_X509_FMT_PEM, NULL, 0);
 	if (ret < 0) {
 		fail("error in key import: %s\n", gnutls_strerror(ret));
 	}
 
-	ret = gnutls_certificate_set_key(x509_cred, NULL, 0, second_pcert,
-					 1, second_key);
+	ret = gnutls_certificate_set_key(x509_cred, NULL, 0, second_pcert, 1,
+					 second_key);
 	if (ret < 0) {
 		fail("error in gnutls_certificate_set_key: %s\n",
 		     gnutls_strerror(ret));
 		exit(1);
 	}
 
-	test_cli_serv(x509_cred, clicred, "NORMAL", "localhost", NULL, NULL, NULL);	/* the DNS name of the first cert */
-	test_cli_serv(x509_cred, clicred, "NORMAL", "简体中文.εξτρα.com", NULL, NULL, NULL);	/* the second DNS name of cert */
-	test_cli_serv(x509_cred, clicred, "NORMAL", "xn--fiqu1az03c18t.xn--mxah1amo.com", NULL, NULL, NULL);	/* its IDNA equivalent */
+	test_cli_serv(x509_cred, clicred, "NORMAL", "localhost", NULL, NULL,
+		      NULL); /* the DNS name of the first cert */
+	test_cli_serv(x509_cred, clicred, "NORMAL", "简体中文.εξτρα.com", NULL,
+		      NULL, NULL); /* the second DNS name of cert */
+	test_cli_serv(x509_cred, clicred, "NORMAL",
+		      "xn--fiqu1az03c18t.xn--mxah1amo.com", NULL, NULL,
+		      NULL); /* its IDNA equivalent */
 
 	/* the raw DNS should result to verification failure as the advertized name should
 	 * not be considered and the first cert should be provided */

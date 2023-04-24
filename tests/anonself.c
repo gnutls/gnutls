@@ -22,7 +22,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -40,26 +40,26 @@ int main(int argc, char **argv)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <netinet/in.h>
-# include <sys/socket.h>
-# if !defined(_WIN32)
-#  include <sys/wait.h>
-# endif
-# include <unistd.h>
-# include <assert.h>
-# include <gnutls/gnutls.h>
+#include <string.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#if !defined(_WIN32)
+#include <sys/wait.h>
+#endif
+#include <unistd.h>
+#include <assert.h>
+#include <gnutls/gnutls.h>
 
-# include "utils.h"
+#include "utils.h"
 
 static void tls_log_func(int level, const char *str)
 {
 	fprintf(stderr, "|<%d>| %s", level, str);
 }
 
-# define MSG "Hello TLS"
-# define MAX_BUF 1024
+#define MSG "Hello TLS"
+#define MAX_BUF 1024
 
 static void client(int sd, const char *prio)
 {
@@ -108,8 +108,8 @@ static void client(int sd, const char *prio)
 
 	if (debug)
 		success("client: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	ret = gnutls_record_send(session, MSG, sizeof(MSG) - 1);
 	if (ret != sizeof(MSG) - 1) {
@@ -128,7 +128,8 @@ static void client(int sd, const char *prio)
 	}
 
 	if (ret != sizeof(MSG) - 1 || memcmp(buffer, MSG, ret) != 0) {
-		fail("client: received data of different size! (expected: %d, have: %d)\n", (int)strlen(MSG), ret);
+		fail("client: received data of different size! (expected: %d, have: %d)\n",
+		     (int)strlen(MSG), ret);
 		goto end;
 	}
 
@@ -142,7 +143,7 @@ static void client(int sd, const char *prio)
 
 	gnutls_bye(session, GNUTLS_SHUT_RDWR);
 
- end:
+end:
 
 	close(sd);
 
@@ -153,7 +154,7 @@ static void client(int sd, const char *prio)
 	gnutls_global_deinit();
 }
 
-# define DH_BITS 1024
+#define DH_BITS 1024
 
 static void server(int sd, const char *prio)
 {
@@ -206,8 +207,8 @@ static void server(int sd, const char *prio)
 
 	if (debug)
 		success("server: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	if (debug)
 		print_dh_params_info(session);
@@ -218,11 +219,11 @@ static void server(int sd, const char *prio)
 		if (ret == 0) {
 			gnutls_packet_deinit(packet);
 			if (debug)
-				success
-				    ("server: Peer has closed the GnuTLS connection\n");
+				success("server: Peer has closed the GnuTLS connection\n");
 			break;
 		} else if (ret < 0) {
-			fail("server: Received corrupted data(%d). Closing...\n", ret);
+			fail("server: Received corrupted data(%d). Closing...\n",
+			     ret);
 			break;
 		} else if (ret > 0) {
 			gnutls_datum_t pdata;
@@ -251,8 +252,7 @@ static void server(int sd, const char *prio)
 		success("server: finished\n");
 }
 
-static
-void start(const char *name, const char *prio)
+static void start(const char *name, const char *prio)
 {
 	pid_t child;
 	int sockets[2], err;
@@ -300,4 +300,4 @@ void doit(void)
 	start("default anon-ecdh", "NORMAL:-KX-ALL:+ANON-ECDH");
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

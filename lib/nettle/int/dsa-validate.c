@@ -22,7 +22,7 @@
  */
 
 #if HAVE_CONFIG_H
-# include "config.h"
+#include "config.h"
 #endif
 
 #include <stdlib.h>
@@ -44,9 +44,9 @@
  * index: 1 for digital signatures (DSA), 2 for key establishment (DH)
  * 
  */
-int
-dsa_validate_dss_pqg(struct dsa_params *pub,
-		     struct dss_params_validation_seeds *cert, unsigned index)
+int dsa_validate_dss_pqg(struct dsa_params *pub,
+			 struct dss_params_validation_seeds *cert,
+			 unsigned index)
 {
 	int ret;
 	uint8_t domain_seed[MAX_PVP_SEED_SIZE * 3];
@@ -57,7 +57,7 @@ dsa_validate_dss_pqg(struct dsa_params *pub,
 		return 0;
 
 	domain_seed_size =
-	    cert->seed_length + cert->qseed_length + cert->pseed_length;
+		cert->seed_length + cert->qseed_length + cert->pseed_length;
 	memcpy(domain_seed, cert->seed, cert->seed_length);
 	memcpy(&domain_seed[cert->seed_length], cert->pseed,
 	       cert->pseed_length);
@@ -71,10 +71,8 @@ dsa_validate_dss_pqg(struct dsa_params *pub,
 	return 1;
 }
 
-int
-_dsa_validate_dss_g(struct dsa_params *pub,
-		    unsigned domain_seed_size, const uint8_t * domain_seed,
-		    unsigned index)
+int _dsa_validate_dss_g(struct dsa_params *pub, unsigned domain_seed_size,
+			const uint8_t *domain_seed, unsigned index)
 {
 	int ret;
 	unsigned p_bits, q_bits;
@@ -114,9 +112,8 @@ _dsa_validate_dss_g(struct dsa_params *pub,
 	}
 
 	/* repeat g generation */
-	ret = _dsa_generate_dss_g(&pub2,
-				  domain_seed_size, domain_seed,
-				  NULL, NULL, index);
+	ret = _dsa_generate_dss_g(&pub2, domain_seed_size, domain_seed, NULL,
+				  NULL, index);
 	if (ret == 0) {
 		goto fail;
 	}
@@ -129,19 +126,18 @@ _dsa_validate_dss_g(struct dsa_params *pub,
 	ret = 1;
 	goto finish;
 
- fail:
+fail:
 	ret = 0;
 
- finish:
+finish:
 	dsa_params_clear(&pub2);
 	mpz_clear(r);
 
 	return ret;
 }
 
-int
-_dsa_validate_dss_pq(struct dsa_params *pub,
-		     struct dss_params_validation_seeds *cert)
+int _dsa_validate_dss_pq(struct dsa_params *pub,
+			 struct dss_params_validation_seeds *cert)
 {
 	int ret;
 	unsigned p_bits, q_bits;
@@ -203,17 +199,18 @@ _dsa_validate_dss_pq(struct dsa_params *pub,
 		goto fail;
 	}
 
-	if ((cert->pseed_length > 0 && cert->pseed_length != cert2.pseed_length)
-	    || (cert->qseed_length > 0
-		&& cert->qseed_length != cert2.qseed_length)
-	    || (cert->pgen_counter > 0
-		&& cert->pgen_counter != cert2.pgen_counter)
-	    || (cert->qgen_counter > 0
-		&& cert->qgen_counter != cert2.qgen_counter)
-	    || (cert->qseed_length > 0
-		&& memcmp(cert->qseed, cert2.qseed, cert2.qseed_length) != 0)
-	    || (cert->pseed_length > 0
-		&& memcmp(cert->pseed, cert2.pseed, cert2.pseed_length) != 0)) {
+	if ((cert->pseed_length > 0 &&
+	     cert->pseed_length != cert2.pseed_length) ||
+	    (cert->qseed_length > 0 &&
+	     cert->qseed_length != cert2.qseed_length) ||
+	    (cert->pgen_counter > 0 &&
+	     cert->pgen_counter != cert2.pgen_counter) ||
+	    (cert->qgen_counter > 0 &&
+	     cert->qgen_counter != cert2.qgen_counter) ||
+	    (cert->qseed_length > 0 &&
+	     memcmp(cert->qseed, cert2.qseed, cert2.qseed_length) != 0) ||
+	    (cert->pseed_length > 0 &&
+	     memcmp(cert->pseed, cert2.pseed, cert2.pseed_length) != 0)) {
 		goto fail;
 	}
 
@@ -232,10 +229,10 @@ _dsa_validate_dss_pq(struct dsa_params *pub,
 	ret = 1;
 	goto finish;
 
- fail:
+fail:
 	ret = 0;
 
- finish:
+finish:
 	dsa_params_clear(&pub2);
 	mpz_clear(r);
 	mpz_clear(s);

@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -44,7 +44,7 @@ static time_t then = DEFAULT_THEN;
    verifying certificates.  To avoid a time bomb, we hard code the
    current time.  This should work fine on systems where the library
    call to time is resolved at run-time.  */
-static time_t mytime(time_t * t)
+static time_t mytime(time_t *t)
 {
 	if (t)
 		*t = then;
@@ -57,9 +57,9 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "|<%d>| %s", level, str);
 }
 
-static
-int pin_func(void *userdata, int attempt, const char *url, const char *label,
-	     unsigned flags, char *pin, size_t pin_max)
+static int pin_func(void *userdata, int attempt, const char *url,
+		    const char *label, unsigned flags, char *pin,
+		    size_t pin_max)
 {
 	if (attempt == 0) {
 		strcpy(pin, "1234");
@@ -80,7 +80,7 @@ void doit(void)
 	if (gnutls_fips140_mode_enabled())
 		exit(77);
 
-	/* The overloading of time() seems to work in linux (ELF?)
+		/* The overloading of time() seems to work in linux (ELF?)
 	 * systems only. Disable it on windows.
 	 */
 #ifdef _WIN32
@@ -104,9 +104,10 @@ void doit(void)
 		gnutls_global_set_log_level(4711);
 
 	set_softhsm_conf(CONFIG);
-	snprintf(buf, sizeof(buf),
-		 "%s --init-token --slot 0 --label test --so-pin 1234 --pin 1234",
-		 bin);
+	snprintf(
+		buf, sizeof(buf),
+		"%s --init-token --slot 0 --label test --so-pin 1234 --pin 1234",
+		bin);
 	system(buf);
 
 	ret = gnutls_pkcs11_add_provider(lib, "trusted");
@@ -153,9 +154,8 @@ void doit(void)
 			tmp.data = (unsigned char *)chains[i].chain[j];
 			tmp.size = strlen(chains[i].chain[j]);
 
-			ret =
-			    gnutls_x509_crt_import(certs[j], &tmp,
-						   GNUTLS_X509_FMT_PEM);
+			ret = gnutls_x509_crt_import(certs[j], &tmp,
+						     GNUTLS_X509_FMT_PEM);
 			if (debug > 2)
 				printf("done\n");
 			if (ret < 0) {
@@ -213,12 +213,11 @@ void doit(void)
 		}
 
 		/* write CA certificate to softhsm */
-		ret =
-		    gnutls_pkcs11_copy_x509_crt(SOFTHSM_URL, ca, "test-ca",
-						GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED
-						| GNUTLS_PKCS11_OBJ_FLAG_MARK_CA
-						|
-						GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO);
+		ret = gnutls_pkcs11_copy_x509_crt(
+			SOFTHSM_URL, ca, "test-ca",
+			GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED |
+				GNUTLS_PKCS11_OBJ_FLAG_MARK_CA |
+				GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO);
 		if (ret < 0) {
 			fail("gnutls_pkcs11_copy_x509_crt: %s\n",
 			     gnutls_strerror(ret));
@@ -226,9 +225,8 @@ void doit(void)
 
 		gnutls_x509_trust_list_init(&tl, 0);
 
-		ret =
-		    gnutls_x509_trust_list_add_trust_file(tl, SOFTHSM_URL, NULL,
-							  0, 0, 0);
+		ret = gnutls_x509_trust_list_add_trust_file(tl, SOFTHSM_URL,
+							    NULL, 0, 0, 0);
 		if (ret < 0) {
 			fail("gnutls_x509_trust_list_add_trust_file: %s\n",
 			     gnutls_strerror(ret));
@@ -242,21 +240,19 @@ void doit(void)
 
 		/* test trust list iteration */
 		get_ca_iter = NULL;
-		while (gnutls_x509_trust_list_iter_get_ca
-		       (tl, &get_ca_iter, &get_ca_crt) == 0) {
-			ret =
-			    gnutls_x509_crt_export2(get_ca_crt,
-						    GNUTLS_X509_FMT_PEM,
-						    &get_ca_datum_test);
+		while (gnutls_x509_trust_list_iter_get_ca(tl, &get_ca_iter,
+							  &get_ca_crt) == 0) {
+			ret = gnutls_x509_crt_export2(get_ca_crt,
+						      GNUTLS_X509_FMT_PEM,
+						      &get_ca_datum_test);
 			if (ret < 0) {
 				fail("gnutls_x509_crt_export2: %s\n",
 				     gnutls_strerror(ret));
 				exit(1);
 			}
 
-			ret =
-			    gnutls_x509_crt_export2(ca, GNUTLS_X509_FMT_PEM,
-						    &get_ca_datum);
+			ret = gnutls_x509_crt_export2(ca, GNUTLS_X509_FMT_PEM,
+						      &get_ca_datum);
 			if (ret < 0) {
 				fail("gnutls_x509_crt_export2: %s\n",
 				     gnutls_strerror(ret));
@@ -266,7 +262,9 @@ void doit(void)
 			if (get_ca_datum_test.size != get_ca_datum.size ||
 			    memcmp(get_ca_datum_test.data, get_ca_datum.data,
 				   get_ca_datum.size) != 0) {
-				fail("gnutls_x509_trist_list_iter_get_ca: Unexpected certificate (%u != %u):\n\n%s\n\nvs.\n\n%s", get_ca_datum.size, get_ca_datum_test.size, get_ca_datum.data, get_ca_datum_test.data);
+				fail("gnutls_x509_trist_list_iter_get_ca: Unexpected certificate (%u != %u):\n\n%s\n\nvs.\n\n%s",
+				     get_ca_datum.size, get_ca_datum_test.size,
+				     get_ca_datum.data, get_ca_datum_test.data);
 				exit(1);
 			}
 
@@ -284,12 +282,9 @@ void doit(void)
 			then = DEFAULT_THEN;
 
 		/* make sure that the two functions don't diverge */
-		ret = gnutls_x509_trust_list_verify_crt2(tl, certs, j,
-							 vdata,
-							 chains[i].purpose ==
-							 NULL ? 0 : 1,
-							 chains[i].verify_flags,
-							 &verify_status, NULL);
+		ret = gnutls_x509_trust_list_verify_crt2(
+			tl, certs, j, vdata, chains[i].purpose == NULL ? 0 : 1,
+			chains[i].verify_flags, &verify_status, NULL);
 		if (ret < 0) {
 			fprintf(stderr,
 				"gnutls_x509_crt_list_verify[%d,%d]: %s\n",
@@ -299,14 +294,14 @@ void doit(void)
 
 		if (verify_status != chains[i].expected_verify_result) {
 			gnutls_datum_t out1, out2;
-			gnutls_certificate_verification_status_print
-			    (verify_status, GNUTLS_CRT_X509, &out1, 0);
-			gnutls_certificate_verification_status_print(chains
-								     [i].
-								     expected_verify_result,
-								     GNUTLS_CRT_X509,
-								     &out2, 0);
-			fail("chain[%s]:\nverify_status: %d: %s\nexpected: %d: %s\n", chains[i].name, verify_status, out1.data, chains[i].expected_verify_result, out2.data);
+			gnutls_certificate_verification_status_print(
+				verify_status, GNUTLS_CRT_X509, &out1, 0);
+			gnutls_certificate_verification_status_print(
+				chains[i].expected_verify_result,
+				GNUTLS_CRT_X509, &out2, 0);
+			fail("chain[%s]:\nverify_status: %d: %s\nexpected: %d: %s\n",
+			     chains[i].name, verify_status, out1.data,
+			     chains[i].expected_verify_result, out2.data);
 			gnutls_free(out1.data);
 			gnutls_free(out2.data);
 

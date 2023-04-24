@@ -1,7 +1,7 @@
 /* This example code is placed in the public domain. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -17,12 +17,12 @@
 /* A very basic TLS client, with PSK authentication.
  */
 
-#define CHECK(x) assert((x)>=0)
-#define LOOP_CHECK(rval, cmd) \
-        do { \
-                rval = cmd; \
-        } while(rval == GNUTLS_E_AGAIN || rval == GNUTLS_E_INTERRUPTED); \
-        assert(rval >= 0)
+#define CHECK(x) assert((x) >= 0)
+#define LOOP_CHECK(rval, cmd)                                             \
+	do {                                                              \
+		rval = cmd;                                               \
+	} while (rval == GNUTLS_E_AGAIN || rval == GNUTLS_E_INTERRUPTED); \
+	assert(rval >= 0)
 
 #define MAX_BUF 1024
 #define MSG "GET / HTTP/1.0\r\n\r\n"
@@ -55,10 +55,8 @@ int main(void)
 	 */
 	CHECK(gnutls_init(&session, GNUTLS_CLIENT));
 
-	ret =
-	    gnutls_set_default_priority_append(session,
-					       "-KX-ALL:+ECDHE-PSK:+DHE-PSK:+PSK",
-					       &err, 0);
+	ret = gnutls_set_default_priority_append(
+		session, "-KX-ALL:+ECDHE-PSK:+DHE-PSK:+PSK", &err, 0);
 
 	/* Alternative for pre-3.6.3 versions:
 	 * gnutls_priority_set_direct(session, "NORMAL:+ECDHE-PSK:+DHE-PSK:+PSK", &err)
@@ -85,8 +83,7 @@ int main(void)
 	 */
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret < 0) {
 		fprintf(stderr, "*** Handshake failed\n");
@@ -123,7 +120,7 @@ int main(void)
 
 	CHECK(gnutls_bye(session, GNUTLS_SHUT_RDWR));
 
- end:
+end:
 
 	tcp_close(sd);
 

@@ -33,109 +33,110 @@
  */
 
 #ifdef ALLOW_SHA1
-# define SHA1_SECURE_VAL _SECURE
+#define SHA1_SECURE_VAL _SECURE
 #else
-# define SHA1_SECURE_VAL _INSECURE_FOR_CERTS
+#define SHA1_SECURE_VAL _INSECURE_FOR_CERTS
 #endif
 
 static SYSTEM_CONFIG_OR_CONST gnutls_sign_entry_st sign_algorithms[] = {
 	/* RSA-PKCS#1 1.5: must be before PSS,
 	 * so that gnutls_pk_to_sign() will return
 	 * these first for backwards compatibility. */
-	{.name = "RSA-SHA256",
-	 .oid = SIG_RSA_SHA256_OID,
-	 .id = GNUTLS_SIGN_RSA_SHA256,
-	 .pk = GNUTLS_PK_RSA,
-	 .hash = GNUTLS_DIG_SHA256,
-	 .aid = {{4, 1}, SIG_SEM_DEFAULT}},
-	{.name = "RSA-SHA384",
-	 .oid = SIG_RSA_SHA384_OID,
-	 .id = GNUTLS_SIGN_RSA_SHA384,
-	 .pk = GNUTLS_PK_RSA,
-	 .hash = GNUTLS_DIG_SHA384,
-	 .aid = {{5, 1}, SIG_SEM_DEFAULT}},
-	{.name = "RSA-SHA512",
-	 .oid = SIG_RSA_SHA512_OID,
-	 .id = GNUTLS_SIGN_RSA_SHA512,
-	 .pk = GNUTLS_PK_RSA,
-	 .hash = GNUTLS_DIG_SHA512,
-	 .aid = {{6, 1}, SIG_SEM_DEFAULT}},
+	{ .name = "RSA-SHA256",
+	  .oid = SIG_RSA_SHA256_OID,
+	  .id = GNUTLS_SIGN_RSA_SHA256,
+	  .pk = GNUTLS_PK_RSA,
+	  .hash = GNUTLS_DIG_SHA256,
+	  .aid = { { 4, 1 }, SIG_SEM_DEFAULT } },
+	{ .name = "RSA-SHA384",
+	  .oid = SIG_RSA_SHA384_OID,
+	  .id = GNUTLS_SIGN_RSA_SHA384,
+	  .pk = GNUTLS_PK_RSA,
+	  .hash = GNUTLS_DIG_SHA384,
+	  .aid = { { 5, 1 }, SIG_SEM_DEFAULT } },
+	{ .name = "RSA-SHA512",
+	  .oid = SIG_RSA_SHA512_OID,
+	  .id = GNUTLS_SIGN_RSA_SHA512,
+	  .pk = GNUTLS_PK_RSA,
+	  .hash = GNUTLS_DIG_SHA512,
+	  .aid = { { 6, 1 }, SIG_SEM_DEFAULT } },
 
 	/* RSA-PSS */
-	{.name = "RSA-PSS-SHA256",
-	 .oid = PK_PKIX1_RSA_PSS_OID,
-	 .id = GNUTLS_SIGN_RSA_PSS_SHA256,
-	 .pk = GNUTLS_PK_RSA_PSS,
-	 .priv_pk = GNUTLS_PK_RSA,	/* PKCS#11 doesn't separate RSA from RSA-PSS privkeys */
-	 .hash = GNUTLS_DIG_SHA256,
-	 .flags = GNUTLS_SIGN_FLAG_TLS13_OK,
-	 .aid = {{8, 9}, SIG_SEM_DEFAULT}},
-	{.name = "RSA-PSS-RSAE-SHA256",
-	 .oid = PK_PKIX1_RSA_PSS_OID,
-	 .id = GNUTLS_SIGN_RSA_PSS_RSAE_SHA256,
-	 .pk = GNUTLS_PK_RSA_PSS,
-	 .cert_pk = GNUTLS_PK_RSA,
-	 .priv_pk = GNUTLS_PK_RSA,
-	 .hash = GNUTLS_DIG_SHA256,
-	 .flags = GNUTLS_SIGN_FLAG_TLS13_OK,
-	 .aid = {{8, 4}, SIG_SEM_DEFAULT}},
-	{.name = "RSA-PSS-SHA384",
-	 .oid = PK_PKIX1_RSA_PSS_OID,
-	 .id = GNUTLS_SIGN_RSA_PSS_SHA384,
-	 .pk = GNUTLS_PK_RSA_PSS,
-	 .priv_pk = GNUTLS_PK_RSA,
-	 .hash = GNUTLS_DIG_SHA384,
-	 .flags = GNUTLS_SIGN_FLAG_TLS13_OK,
-	 .aid = {{8, 0x0A}, SIG_SEM_DEFAULT}},
-	{.name = "RSA-PSS-RSAE-SHA384",
-	 .oid = PK_PKIX1_RSA_PSS_OID,
-	 .id = GNUTLS_SIGN_RSA_PSS_RSAE_SHA384,
-	 .pk = GNUTLS_PK_RSA_PSS,
-	 .cert_pk = GNUTLS_PK_RSA,
-	 .priv_pk = GNUTLS_PK_RSA,
-	 .hash = GNUTLS_DIG_SHA384,
-	 .flags = GNUTLS_SIGN_FLAG_TLS13_OK,
-	 .aid = {{8, 5}, SIG_SEM_DEFAULT}},
-	{.name = "RSA-PSS-SHA512",
-	 .oid = PK_PKIX1_RSA_PSS_OID,
-	 .id = GNUTLS_SIGN_RSA_PSS_SHA512,
-	 .pk = GNUTLS_PK_RSA_PSS,
-	 .priv_pk = GNUTLS_PK_RSA,
-	 .hash = GNUTLS_DIG_SHA512,
-	 .flags = GNUTLS_SIGN_FLAG_TLS13_OK,
-	 .aid = {{8, 0x0B}, SIG_SEM_DEFAULT}},
-	{.name = "RSA-PSS-RSAE-SHA512",
-	 .oid = PK_PKIX1_RSA_PSS_OID,
-	 .id = GNUTLS_SIGN_RSA_PSS_RSAE_SHA512,
-	 .pk = GNUTLS_PK_RSA_PSS,
-	 .cert_pk = GNUTLS_PK_RSA,
-	 .priv_pk = GNUTLS_PK_RSA,
-	 .hash = GNUTLS_DIG_SHA512,
-	 .flags = GNUTLS_SIGN_FLAG_TLS13_OK,
-	 .aid = {{8, 6}, SIG_SEM_DEFAULT}},
+	{ .name = "RSA-PSS-SHA256",
+	  .oid = PK_PKIX1_RSA_PSS_OID,
+	  .id = GNUTLS_SIGN_RSA_PSS_SHA256,
+	  .pk = GNUTLS_PK_RSA_PSS,
+	  .priv_pk =
+		  GNUTLS_PK_RSA, /* PKCS#11 doesn't separate RSA from RSA-PSS privkeys */
+	  .hash = GNUTLS_DIG_SHA256,
+	  .flags = GNUTLS_SIGN_FLAG_TLS13_OK,
+	  .aid = { { 8, 9 }, SIG_SEM_DEFAULT } },
+	{ .name = "RSA-PSS-RSAE-SHA256",
+	  .oid = PK_PKIX1_RSA_PSS_OID,
+	  .id = GNUTLS_SIGN_RSA_PSS_RSAE_SHA256,
+	  .pk = GNUTLS_PK_RSA_PSS,
+	  .cert_pk = GNUTLS_PK_RSA,
+	  .priv_pk = GNUTLS_PK_RSA,
+	  .hash = GNUTLS_DIG_SHA256,
+	  .flags = GNUTLS_SIGN_FLAG_TLS13_OK,
+	  .aid = { { 8, 4 }, SIG_SEM_DEFAULT } },
+	{ .name = "RSA-PSS-SHA384",
+	  .oid = PK_PKIX1_RSA_PSS_OID,
+	  .id = GNUTLS_SIGN_RSA_PSS_SHA384,
+	  .pk = GNUTLS_PK_RSA_PSS,
+	  .priv_pk = GNUTLS_PK_RSA,
+	  .hash = GNUTLS_DIG_SHA384,
+	  .flags = GNUTLS_SIGN_FLAG_TLS13_OK,
+	  .aid = { { 8, 0x0A }, SIG_SEM_DEFAULT } },
+	{ .name = "RSA-PSS-RSAE-SHA384",
+	  .oid = PK_PKIX1_RSA_PSS_OID,
+	  .id = GNUTLS_SIGN_RSA_PSS_RSAE_SHA384,
+	  .pk = GNUTLS_PK_RSA_PSS,
+	  .cert_pk = GNUTLS_PK_RSA,
+	  .priv_pk = GNUTLS_PK_RSA,
+	  .hash = GNUTLS_DIG_SHA384,
+	  .flags = GNUTLS_SIGN_FLAG_TLS13_OK,
+	  .aid = { { 8, 5 }, SIG_SEM_DEFAULT } },
+	{ .name = "RSA-PSS-SHA512",
+	  .oid = PK_PKIX1_RSA_PSS_OID,
+	  .id = GNUTLS_SIGN_RSA_PSS_SHA512,
+	  .pk = GNUTLS_PK_RSA_PSS,
+	  .priv_pk = GNUTLS_PK_RSA,
+	  .hash = GNUTLS_DIG_SHA512,
+	  .flags = GNUTLS_SIGN_FLAG_TLS13_OK,
+	  .aid = { { 8, 0x0B }, SIG_SEM_DEFAULT } },
+	{ .name = "RSA-PSS-RSAE-SHA512",
+	  .oid = PK_PKIX1_RSA_PSS_OID,
+	  .id = GNUTLS_SIGN_RSA_PSS_RSAE_SHA512,
+	  .pk = GNUTLS_PK_RSA_PSS,
+	  .cert_pk = GNUTLS_PK_RSA,
+	  .priv_pk = GNUTLS_PK_RSA,
+	  .hash = GNUTLS_DIG_SHA512,
+	  .flags = GNUTLS_SIGN_FLAG_TLS13_OK,
+	  .aid = { { 8, 6 }, SIG_SEM_DEFAULT } },
 
 	/* Ed25519: The hash algorithm here is set to be SHA512, although that is
 	 * an internal detail of Ed25519; we set it, because CMS/PKCS#7 requires
 	 * that mapping. */
-	{.name = "EdDSA-Ed25519",
-	 .oid = SIG_EDDSA_SHA512_OID,
-	 .id = GNUTLS_SIGN_EDDSA_ED25519,
-	 .pk = GNUTLS_PK_EDDSA_ED25519,
-	 .hash = GNUTLS_DIG_SHA512,
-	 .flags = GNUTLS_SIGN_FLAG_TLS13_OK,
-	 .aid = {{8, 7}, SIG_SEM_DEFAULT}},
+	{ .name = "EdDSA-Ed25519",
+	  .oid = SIG_EDDSA_SHA512_OID,
+	  .id = GNUTLS_SIGN_EDDSA_ED25519,
+	  .pk = GNUTLS_PK_EDDSA_ED25519,
+	  .hash = GNUTLS_DIG_SHA512,
+	  .flags = GNUTLS_SIGN_FLAG_TLS13_OK,
+	  .aid = { { 8, 7 }, SIG_SEM_DEFAULT } },
 
 	/* Ed448: The hash algorithm here is set to be SHAKE256, although that is
 	 * an internal detail of Ed448; we set it, because CMS/PKCS#7 requires
 	 * that mapping. */
-	{.name = "EdDSA-Ed448",
-	 .oid = SIG_ED448_OID,
-	 .id = GNUTLS_SIGN_EDDSA_ED448,
-	 .pk = GNUTLS_PK_EDDSA_ED448,
-	 .hash = GNUTLS_DIG_SHAKE_256,
-	 .flags = GNUTLS_SIGN_FLAG_TLS13_OK,
-	 .aid = {{8, 8}, SIG_SEM_DEFAULT},
-	 .hash_output_size = 114},
+	{ .name = "EdDSA-Ed448",
+	  .oid = SIG_ED448_OID,
+	  .id = GNUTLS_SIGN_EDDSA_ED448,
+	  .pk = GNUTLS_PK_EDDSA_ED448,
+	  .hash = GNUTLS_DIG_SHAKE_256,
+	  .flags = GNUTLS_SIGN_FLAG_TLS13_OK,
+	  .aid = { { 8, 8 }, SIG_SEM_DEFAULT },
+	  .hash_output_size = 114 },
 
 	/* ECDSA */
 	/* The following three signature algorithms
@@ -147,277 +148,282 @@ static SYSTEM_CONFIG_OR_CONST gnutls_sign_entry_st sign_algorithms[] = {
 	 * as an alias to them. */
 	/* we have intentionally the ECDSA-SHAXXX algorithms first
 	 * so that gnutls_pk_to_sign() will return these. */
-	{.name = "ECDSA-SHA256",
-	 .oid = "1.2.840.10045.4.3.2",
-	 .id = GNUTLS_SIGN_ECDSA_SHA256,
-	 .pk = GNUTLS_PK_ECDSA,
-	 .hash = GNUTLS_DIG_SHA256,
-	 .aid = {{4, 3}, SIG_SEM_PRE_TLS12}},
-	{.name = "ECDSA-SHA384",
-	 .oid = "1.2.840.10045.4.3.3",
-	 .id = GNUTLS_SIGN_ECDSA_SHA384,
-	 .pk = GNUTLS_PK_ECDSA,
-	 .hash = GNUTLS_DIG_SHA384,
-	 .aid = {{5, 3}, SIG_SEM_PRE_TLS12}},
-	{.name = "ECDSA-SHA512",
-	 .oid = "1.2.840.10045.4.3.4",
-	 .id = GNUTLS_SIGN_ECDSA_SHA512,
-	 .pk = GNUTLS_PK_ECDSA,
-	 .hash = GNUTLS_DIG_SHA512,
-	 .aid = {{6, 3}, SIG_SEM_PRE_TLS12}},
+	{ .name = "ECDSA-SHA256",
+	  .oid = "1.2.840.10045.4.3.2",
+	  .id = GNUTLS_SIGN_ECDSA_SHA256,
+	  .pk = GNUTLS_PK_ECDSA,
+	  .hash = GNUTLS_DIG_SHA256,
+	  .aid = { { 4, 3 }, SIG_SEM_PRE_TLS12 } },
+	{ .name = "ECDSA-SHA384",
+	  .oid = "1.2.840.10045.4.3.3",
+	  .id = GNUTLS_SIGN_ECDSA_SHA384,
+	  .pk = GNUTLS_PK_ECDSA,
+	  .hash = GNUTLS_DIG_SHA384,
+	  .aid = { { 5, 3 }, SIG_SEM_PRE_TLS12 } },
+	{ .name = "ECDSA-SHA512",
+	  .oid = "1.2.840.10045.4.3.4",
+	  .id = GNUTLS_SIGN_ECDSA_SHA512,
+	  .pk = GNUTLS_PK_ECDSA,
+	  .hash = GNUTLS_DIG_SHA512,
+	  .aid = { { 6, 3 }, SIG_SEM_PRE_TLS12 } },
 
-	{.name = "ECDSA-SECP256R1-SHA256",
-	 .id = GNUTLS_SIGN_ECDSA_SECP256R1_SHA256,
-	 .pk = GNUTLS_PK_ECDSA,
-	 .curve = GNUTLS_ECC_CURVE_SECP256R1,
-	 .hash = GNUTLS_DIG_SHA256,
-	 .flags = GNUTLS_SIGN_FLAG_TLS13_OK,
-	 .aid = {{4, 3}, SIG_SEM_TLS13}},
-	{.name = "ECDSA-SECP384R1-SHA384",
-	 .id = GNUTLS_SIGN_ECDSA_SECP384R1_SHA384,
-	 .pk = GNUTLS_PK_ECDSA,
-	 .curve = GNUTLS_ECC_CURVE_SECP384R1,
-	 .hash = GNUTLS_DIG_SHA384,
-	 .flags = GNUTLS_SIGN_FLAG_TLS13_OK,
-	 .aid = {{5, 3}, SIG_SEM_TLS13}},
-	{.name = "ECDSA-SECP521R1-SHA512",
-	 .id = GNUTLS_SIGN_ECDSA_SECP521R1_SHA512,
-	 .pk = GNUTLS_PK_ECDSA,
-	 .curve = GNUTLS_ECC_CURVE_SECP521R1,
-	 .hash = GNUTLS_DIG_SHA512,
-	 .flags = GNUTLS_SIGN_FLAG_TLS13_OK,
-	 .aid = {{6, 3}, SIG_SEM_TLS13}},
+	{ .name = "ECDSA-SECP256R1-SHA256",
+	  .id = GNUTLS_SIGN_ECDSA_SECP256R1_SHA256,
+	  .pk = GNUTLS_PK_ECDSA,
+	  .curve = GNUTLS_ECC_CURVE_SECP256R1,
+	  .hash = GNUTLS_DIG_SHA256,
+	  .flags = GNUTLS_SIGN_FLAG_TLS13_OK,
+	  .aid = { { 4, 3 }, SIG_SEM_TLS13 } },
+	{ .name = "ECDSA-SECP384R1-SHA384",
+	  .id = GNUTLS_SIGN_ECDSA_SECP384R1_SHA384,
+	  .pk = GNUTLS_PK_ECDSA,
+	  .curve = GNUTLS_ECC_CURVE_SECP384R1,
+	  .hash = GNUTLS_DIG_SHA384,
+	  .flags = GNUTLS_SIGN_FLAG_TLS13_OK,
+	  .aid = { { 5, 3 }, SIG_SEM_TLS13 } },
+	{ .name = "ECDSA-SECP521R1-SHA512",
+	  .id = GNUTLS_SIGN_ECDSA_SECP521R1_SHA512,
+	  .pk = GNUTLS_PK_ECDSA,
+	  .curve = GNUTLS_ECC_CURVE_SECP521R1,
+	  .hash = GNUTLS_DIG_SHA512,
+	  .flags = GNUTLS_SIGN_FLAG_TLS13_OK,
+	  .aid = { { 6, 3 }, SIG_SEM_TLS13 } },
 
 	/* ECDSA-SHA3 */
-	{.name = "ECDSA-SHA3-224",
-	 .oid = SIG_ECDSA_SHA3_224_OID,
-	 .id = GNUTLS_SIGN_ECDSA_SHA3_224,
-	 .pk = GNUTLS_PK_EC,
-	 .hash = GNUTLS_DIG_SHA3_224,
-	 .aid = TLS_SIGN_AID_UNKNOWN},
-	{.name = "ECDSA-SHA3-256",
-	 .oid = SIG_ECDSA_SHA3_256_OID,
-	 .id = GNUTLS_SIGN_ECDSA_SHA3_256,
-	 .pk = GNUTLS_PK_EC,
-	 .hash = GNUTLS_DIG_SHA3_256,
-	 .aid = TLS_SIGN_AID_UNKNOWN},
-	{.name = "ECDSA-SHA3-384",
-	 .oid = SIG_ECDSA_SHA3_384_OID,
-	 .id = GNUTLS_SIGN_ECDSA_SHA3_384,
-	 .pk = GNUTLS_PK_EC,
-	 .hash = GNUTLS_DIG_SHA3_384,
-	 .aid = TLS_SIGN_AID_UNKNOWN},
-	{.name = "ECDSA-SHA3-512",
-	 .oid = SIG_ECDSA_SHA3_512_OID,
-	 .id = GNUTLS_SIGN_ECDSA_SHA3_512,
-	 .pk = GNUTLS_PK_EC,
-	 .hash = GNUTLS_DIG_SHA3_512,
-	 .aid = TLS_SIGN_AID_UNKNOWN},
-	{.name = "RSA-SHA3-224",
-	 .oid = SIG_RSA_SHA3_224_OID,
-	 .id = GNUTLS_SIGN_RSA_SHA3_224,
-	 .pk = GNUTLS_PK_RSA,
-	 .hash = GNUTLS_DIG_SHA3_224,
-	 .aid = TLS_SIGN_AID_UNKNOWN},
-	{.name = "RSA-SHA3-256",
-	 .oid = SIG_RSA_SHA3_256_OID,
-	 .id = GNUTLS_SIGN_RSA_SHA3_256,
-	 .pk = GNUTLS_PK_RSA,
-	 .hash = GNUTLS_DIG_SHA3_256,
-	 .aid = TLS_SIGN_AID_UNKNOWN},
-	{.name = "RSA-SHA3-384",
-	 .oid = SIG_RSA_SHA3_384_OID,
-	 .id = GNUTLS_SIGN_RSA_SHA3_384,
-	 .pk = GNUTLS_PK_RSA,
-	 .hash = GNUTLS_DIG_SHA3_384,
-	 .aid = TLS_SIGN_AID_UNKNOWN},
-	{.name = "RSA-SHA3-512",
-	 .oid = SIG_RSA_SHA3_512_OID,
-	 .id = GNUTLS_SIGN_RSA_SHA3_512,
-	 .pk = GNUTLS_PK_RSA,
-	 .hash = GNUTLS_DIG_SHA3_512,
-	 .aid = TLS_SIGN_AID_UNKNOWN},
+	{ .name = "ECDSA-SHA3-224",
+	  .oid = SIG_ECDSA_SHA3_224_OID,
+	  .id = GNUTLS_SIGN_ECDSA_SHA3_224,
+	  .pk = GNUTLS_PK_EC,
+	  .hash = GNUTLS_DIG_SHA3_224,
+	  .aid = TLS_SIGN_AID_UNKNOWN },
+	{ .name = "ECDSA-SHA3-256",
+	  .oid = SIG_ECDSA_SHA3_256_OID,
+	  .id = GNUTLS_SIGN_ECDSA_SHA3_256,
+	  .pk = GNUTLS_PK_EC,
+	  .hash = GNUTLS_DIG_SHA3_256,
+	  .aid = TLS_SIGN_AID_UNKNOWN },
+	{ .name = "ECDSA-SHA3-384",
+	  .oid = SIG_ECDSA_SHA3_384_OID,
+	  .id = GNUTLS_SIGN_ECDSA_SHA3_384,
+	  .pk = GNUTLS_PK_EC,
+	  .hash = GNUTLS_DIG_SHA3_384,
+	  .aid = TLS_SIGN_AID_UNKNOWN },
+	{ .name = "ECDSA-SHA3-512",
+	  .oid = SIG_ECDSA_SHA3_512_OID,
+	  .id = GNUTLS_SIGN_ECDSA_SHA3_512,
+	  .pk = GNUTLS_PK_EC,
+	  .hash = GNUTLS_DIG_SHA3_512,
+	  .aid = TLS_SIGN_AID_UNKNOWN },
+	{ .name = "RSA-SHA3-224",
+	  .oid = SIG_RSA_SHA3_224_OID,
+	  .id = GNUTLS_SIGN_RSA_SHA3_224,
+	  .pk = GNUTLS_PK_RSA,
+	  .hash = GNUTLS_DIG_SHA3_224,
+	  .aid = TLS_SIGN_AID_UNKNOWN },
+	{ .name = "RSA-SHA3-256",
+	  .oid = SIG_RSA_SHA3_256_OID,
+	  .id = GNUTLS_SIGN_RSA_SHA3_256,
+	  .pk = GNUTLS_PK_RSA,
+	  .hash = GNUTLS_DIG_SHA3_256,
+	  .aid = TLS_SIGN_AID_UNKNOWN },
+	{ .name = "RSA-SHA3-384",
+	  .oid = SIG_RSA_SHA3_384_OID,
+	  .id = GNUTLS_SIGN_RSA_SHA3_384,
+	  .pk = GNUTLS_PK_RSA,
+	  .hash = GNUTLS_DIG_SHA3_384,
+	  .aid = TLS_SIGN_AID_UNKNOWN },
+	{ .name = "RSA-SHA3-512",
+	  .oid = SIG_RSA_SHA3_512_OID,
+	  .id = GNUTLS_SIGN_RSA_SHA3_512,
+	  .pk = GNUTLS_PK_RSA,
+	  .hash = GNUTLS_DIG_SHA3_512,
+	  .aid = TLS_SIGN_AID_UNKNOWN },
 
 	/* DSA-SHA3 */
-	{.name = "DSA-SHA3-224",
-	 .oid = SIG_DSA_SHA3_224_OID,
-	 .id = GNUTLS_SIGN_DSA_SHA3_224,
-	 .pk = GNUTLS_PK_DSA,
-	 .hash = GNUTLS_DIG_SHA3_224,
-	 .aid = TLS_SIGN_AID_UNKNOWN},
-	{.name = "DSA-SHA3-256",
-	 .oid = SIG_DSA_SHA3_256_OID,
-	 .id = GNUTLS_SIGN_DSA_SHA3_256,
-	 .pk = GNUTLS_PK_DSA,
-	 .hash = GNUTLS_DIG_SHA3_256,
-	 .aid = TLS_SIGN_AID_UNKNOWN},
-	{.name = "DSA-SHA3-384",
-	 .oid = SIG_DSA_SHA3_384_OID,
-	 .id = GNUTLS_SIGN_DSA_SHA3_384,
-	 .pk = GNUTLS_PK_DSA,
-	 .hash = GNUTLS_DIG_SHA3_384,
-	 .aid = TLS_SIGN_AID_UNKNOWN},
-	{.name = "DSA-SHA3-512",
-	 .oid = SIG_DSA_SHA3_512_OID,
-	 .id = GNUTLS_SIGN_DSA_SHA3_512,
-	 .pk = GNUTLS_PK_DSA,
-	 .hash = GNUTLS_DIG_SHA3_512,
-	 .aid = TLS_SIGN_AID_UNKNOWN},
+	{ .name = "DSA-SHA3-224",
+	  .oid = SIG_DSA_SHA3_224_OID,
+	  .id = GNUTLS_SIGN_DSA_SHA3_224,
+	  .pk = GNUTLS_PK_DSA,
+	  .hash = GNUTLS_DIG_SHA3_224,
+	  .aid = TLS_SIGN_AID_UNKNOWN },
+	{ .name = "DSA-SHA3-256",
+	  .oid = SIG_DSA_SHA3_256_OID,
+	  .id = GNUTLS_SIGN_DSA_SHA3_256,
+	  .pk = GNUTLS_PK_DSA,
+	  .hash = GNUTLS_DIG_SHA3_256,
+	  .aid = TLS_SIGN_AID_UNKNOWN },
+	{ .name = "DSA-SHA3-384",
+	  .oid = SIG_DSA_SHA3_384_OID,
+	  .id = GNUTLS_SIGN_DSA_SHA3_384,
+	  .pk = GNUTLS_PK_DSA,
+	  .hash = GNUTLS_DIG_SHA3_384,
+	  .aid = TLS_SIGN_AID_UNKNOWN },
+	{ .name = "DSA-SHA3-512",
+	  .oid = SIG_DSA_SHA3_512_OID,
+	  .id = GNUTLS_SIGN_DSA_SHA3_512,
+	  .pk = GNUTLS_PK_DSA,
+	  .hash = GNUTLS_DIG_SHA3_512,
+	  .aid = TLS_SIGN_AID_UNKNOWN },
 
 	/* legacy */
-	{.name = "RSA-RAW",
-	 .oid = NULL,
-	 .id = GNUTLS_SIGN_RSA_RAW,
-	 .pk = GNUTLS_PK_RSA,
-	 .hash = GNUTLS_DIG_UNKNOWN,
-	 .aid = TLS_SIGN_AID_UNKNOWN},
-	{.name = "RSA-SHA1",
-	 .oid = SIG_RSA_SHA1_OID,
-	 .id = GNUTLS_SIGN_RSA_SHA1,
-	 .pk = GNUTLS_PK_RSA,
-	 .hash = GNUTLS_DIG_SHA1,
-	 .slevel = SHA1_SECURE_VAL,
-	 .aid = {{2, 1}, SIG_SEM_DEFAULT}},
-	{.name = "RSA-SHA1",
-	 .oid = ISO_SIG_RSA_SHA1_OID,
-	 .id = GNUTLS_SIGN_RSA_SHA1,
-	 .pk = GNUTLS_PK_RSA,
-	 .slevel = SHA1_SECURE_VAL,
-	 .hash = GNUTLS_DIG_SHA1,
-	 .aid = {{2, 1}, SIG_SEM_DEFAULT}},
-	{.name = "RSA-SHA224",
-	 .oid = SIG_RSA_SHA224_OID,
-	 .id = GNUTLS_SIGN_RSA_SHA224,
-	 .pk = GNUTLS_PK_RSA,
-	 .hash = GNUTLS_DIG_SHA224,
-	 .aid = TLS_SIGN_AID_UNKNOWN},
-	{.name = "RSA-RMD160",
-	 .oid = SIG_RSA_RMD160_OID,
-	 .id = GNUTLS_SIGN_RSA_RMD160,
-	 .pk = GNUTLS_PK_RSA,
-	 .hash = GNUTLS_DIG_RMD160,
-	 .slevel = _INSECURE_FOR_CERTS,
-	 .aid = TLS_SIGN_AID_UNKNOWN},
-	{.name = "DSA-SHA1",
-	 .oid = SIG_DSA_SHA1_OID,
-	 .id = GNUTLS_SIGN_DSA_SHA1,
-	 .pk = GNUTLS_PK_DSA,
-	 .slevel = SHA1_SECURE_VAL,
-	 .hash = GNUTLS_DIG_SHA1,
-	 .aid = {{2, 2}, SIG_SEM_PRE_TLS12}},
-	{.name = "DSA-SHA1",
-	 .oid = "1.3.14.3.2.27",
-	 .id = GNUTLS_SIGN_DSA_SHA1,
-	 .pk = GNUTLS_PK_DSA,
-	 .hash = GNUTLS_DIG_SHA1,
-	 .slevel = SHA1_SECURE_VAL,
-	 .aid = {{2, 2}, SIG_SEM_PRE_TLS12}},
-	{.name = "DSA-SHA224",
-	 .oid = SIG_DSA_SHA224_OID,
-	 .id = GNUTLS_SIGN_DSA_SHA224,
-	 .pk = GNUTLS_PK_DSA,
-	 .hash = GNUTLS_DIG_SHA224,
-	 .aid = TLS_SIGN_AID_UNKNOWN},
-	{.name = "DSA-SHA256",
-	 .oid = SIG_DSA_SHA256_OID,
-	 .id = GNUTLS_SIGN_DSA_SHA256,
-	 .pk = GNUTLS_PK_DSA,
-	 .hash = GNUTLS_DIG_SHA256,
-	 .aid = TLS_SIGN_AID_UNKNOWN},
-	{.name = "RSA-MD5",
-	 .oid = SIG_RSA_MD5_OID,
-	 .id = GNUTLS_SIGN_RSA_MD5,
-	 .pk = GNUTLS_PK_RSA,
-	 .hash = GNUTLS_DIG_MD5,
-	 .slevel = _INSECURE,
-	 .aid = TLS_SIGN_AID_UNKNOWN},
-	{.name = "RSA-MD5",
-	 .oid = "1.3.14.3.2.25",
-	 .id = GNUTLS_SIGN_RSA_MD5,
-	 .pk = GNUTLS_PK_RSA,
-	 .hash = GNUTLS_DIG_MD5,
-	 .slevel = _INSECURE,
-	 .aid = TLS_SIGN_AID_UNKNOWN},
-	{.name = "RSA-MD2",
-	 .oid = SIG_RSA_MD2_OID,
-	 .id = GNUTLS_SIGN_RSA_MD2,
-	 .pk = GNUTLS_PK_RSA,
-	 .hash = GNUTLS_DIG_MD2,
-	 .slevel = _INSECURE,
-	 .aid = TLS_SIGN_AID_UNKNOWN},
-	{.name = "ECDSA-SHA1",
-	 .oid = "1.2.840.10045.4.1",
-	 .id = GNUTLS_SIGN_ECDSA_SHA1,
-	 .pk = GNUTLS_PK_EC,
-	 .slevel = SHA1_SECURE_VAL,
-	 .hash = GNUTLS_DIG_SHA1,
-	 .aid = {{2, 3}, SIG_SEM_DEFAULT}},
-	{.name = "ECDSA-SHA224",
-	 .oid = "1.2.840.10045.4.3.1",
-	 .id = GNUTLS_SIGN_ECDSA_SHA224,
-	 .pk = GNUTLS_PK_EC,
-	 .hash = GNUTLS_DIG_SHA224,
-	 .aid = TLS_SIGN_AID_UNKNOWN},
+	{ .name = "RSA-RAW",
+	  .oid = NULL,
+	  .id = GNUTLS_SIGN_RSA_RAW,
+	  .pk = GNUTLS_PK_RSA,
+	  .hash = GNUTLS_DIG_UNKNOWN,
+	  .aid = TLS_SIGN_AID_UNKNOWN },
+	{ .name = "RSA-SHA1",
+	  .oid = SIG_RSA_SHA1_OID,
+	  .id = GNUTLS_SIGN_RSA_SHA1,
+	  .pk = GNUTLS_PK_RSA,
+	  .hash = GNUTLS_DIG_SHA1,
+	  .slevel = SHA1_SECURE_VAL,
+	  .aid = { { 2, 1 }, SIG_SEM_DEFAULT } },
+	{ .name = "RSA-SHA1",
+	  .oid = ISO_SIG_RSA_SHA1_OID,
+	  .id = GNUTLS_SIGN_RSA_SHA1,
+	  .pk = GNUTLS_PK_RSA,
+	  .slevel = SHA1_SECURE_VAL,
+	  .hash = GNUTLS_DIG_SHA1,
+	  .aid = { { 2, 1 }, SIG_SEM_DEFAULT } },
+	{ .name = "RSA-SHA224",
+	  .oid = SIG_RSA_SHA224_OID,
+	  .id = GNUTLS_SIGN_RSA_SHA224,
+	  .pk = GNUTLS_PK_RSA,
+	  .hash = GNUTLS_DIG_SHA224,
+	  .aid = TLS_SIGN_AID_UNKNOWN },
+	{ .name = "RSA-RMD160",
+	  .oid = SIG_RSA_RMD160_OID,
+	  .id = GNUTLS_SIGN_RSA_RMD160,
+	  .pk = GNUTLS_PK_RSA,
+	  .hash = GNUTLS_DIG_RMD160,
+	  .slevel = _INSECURE_FOR_CERTS,
+	  .aid = TLS_SIGN_AID_UNKNOWN },
+	{ .name = "DSA-SHA1",
+	  .oid = SIG_DSA_SHA1_OID,
+	  .id = GNUTLS_SIGN_DSA_SHA1,
+	  .pk = GNUTLS_PK_DSA,
+	  .slevel = SHA1_SECURE_VAL,
+	  .hash = GNUTLS_DIG_SHA1,
+	  .aid = { { 2, 2 }, SIG_SEM_PRE_TLS12 } },
+	{ .name = "DSA-SHA1",
+	  .oid = "1.3.14.3.2.27",
+	  .id = GNUTLS_SIGN_DSA_SHA1,
+	  .pk = GNUTLS_PK_DSA,
+	  .hash = GNUTLS_DIG_SHA1,
+	  .slevel = SHA1_SECURE_VAL,
+	  .aid = { { 2, 2 }, SIG_SEM_PRE_TLS12 } },
+	{ .name = "DSA-SHA224",
+	  .oid = SIG_DSA_SHA224_OID,
+	  .id = GNUTLS_SIGN_DSA_SHA224,
+	  .pk = GNUTLS_PK_DSA,
+	  .hash = GNUTLS_DIG_SHA224,
+	  .aid = TLS_SIGN_AID_UNKNOWN },
+	{ .name = "DSA-SHA256",
+	  .oid = SIG_DSA_SHA256_OID,
+	  .id = GNUTLS_SIGN_DSA_SHA256,
+	  .pk = GNUTLS_PK_DSA,
+	  .hash = GNUTLS_DIG_SHA256,
+	  .aid = TLS_SIGN_AID_UNKNOWN },
+	{ .name = "RSA-MD5",
+	  .oid = SIG_RSA_MD5_OID,
+	  .id = GNUTLS_SIGN_RSA_MD5,
+	  .pk = GNUTLS_PK_RSA,
+	  .hash = GNUTLS_DIG_MD5,
+	  .slevel = _INSECURE,
+	  .aid = TLS_SIGN_AID_UNKNOWN },
+	{ .name = "RSA-MD5",
+	  .oid = "1.3.14.3.2.25",
+	  .id = GNUTLS_SIGN_RSA_MD5,
+	  .pk = GNUTLS_PK_RSA,
+	  .hash = GNUTLS_DIG_MD5,
+	  .slevel = _INSECURE,
+	  .aid = TLS_SIGN_AID_UNKNOWN },
+	{ .name = "RSA-MD2",
+	  .oid = SIG_RSA_MD2_OID,
+	  .id = GNUTLS_SIGN_RSA_MD2,
+	  .pk = GNUTLS_PK_RSA,
+	  .hash = GNUTLS_DIG_MD2,
+	  .slevel = _INSECURE,
+	  .aid = TLS_SIGN_AID_UNKNOWN },
+	{ .name = "ECDSA-SHA1",
+	  .oid = "1.2.840.10045.4.1",
+	  .id = GNUTLS_SIGN_ECDSA_SHA1,
+	  .pk = GNUTLS_PK_EC,
+	  .slevel = SHA1_SECURE_VAL,
+	  .hash = GNUTLS_DIG_SHA1,
+	  .aid = { { 2, 3 }, SIG_SEM_DEFAULT } },
+	{ .name = "ECDSA-SHA224",
+	  .oid = "1.2.840.10045.4.3.1",
+	  .id = GNUTLS_SIGN_ECDSA_SHA224,
+	  .pk = GNUTLS_PK_EC,
+	  .hash = GNUTLS_DIG_SHA224,
+	  .aid = TLS_SIGN_AID_UNKNOWN },
 	/* GOST R 34.10-2012-512 */
-	{.name = "GOSTR341012-512",
-	 .oid = SIG_GOST_R3410_2012_512_OID,
-	 .id = GNUTLS_SIGN_GOST_512,
-	 .pk = GNUTLS_PK_GOST_12_512,
-	 .hash = GNUTLS_DIG_STREEBOG_512,
-	 .flags = GNUTLS_SIGN_FLAG_CRT_VRFY_REVERSE,
-	 .aid = {{8, 65}, SIG_SEM_PRE_TLS12}},
+	{ .name = "GOSTR341012-512",
+	  .oid = SIG_GOST_R3410_2012_512_OID,
+	  .id = GNUTLS_SIGN_GOST_512,
+	  .pk = GNUTLS_PK_GOST_12_512,
+	  .hash = GNUTLS_DIG_STREEBOG_512,
+	  .flags = GNUTLS_SIGN_FLAG_CRT_VRFY_REVERSE,
+	  .aid = { { 8, 65 }, SIG_SEM_PRE_TLS12 } },
 	/* GOST R 34.10-2012-256 */
-	{.name = "GOSTR341012-256",
-	 .oid = SIG_GOST_R3410_2012_256_OID,
-	 .id = GNUTLS_SIGN_GOST_256,
-	 .pk = GNUTLS_PK_GOST_12_256,
-	 .hash = GNUTLS_DIG_STREEBOG_256,
-	 .flags = GNUTLS_SIGN_FLAG_CRT_VRFY_REVERSE,
-	 .aid = {{8, 64}, SIG_SEM_PRE_TLS12}},
+	{ .name = "GOSTR341012-256",
+	  .oid = SIG_GOST_R3410_2012_256_OID,
+	  .id = GNUTLS_SIGN_GOST_256,
+	  .pk = GNUTLS_PK_GOST_12_256,
+	  .hash = GNUTLS_DIG_STREEBOG_256,
+	  .flags = GNUTLS_SIGN_FLAG_CRT_VRFY_REVERSE,
+	  .aid = { { 8, 64 }, SIG_SEM_PRE_TLS12 } },
 	/* GOST R 34.10-2001 */
-	{.name = "GOSTR341001",
-	 .oid = SIG_GOST_R3410_2001_OID,
-	 .id = GNUTLS_SIGN_GOST_94,
-	 .pk = GNUTLS_PK_GOST_01,
-	 .hash = GNUTLS_DIG_GOSTR_94,
-	 .flags = GNUTLS_SIGN_FLAG_CRT_VRFY_REVERSE,
-	 .aid = TLS_SIGN_AID_UNKNOWN},
+	{ .name = "GOSTR341001",
+	  .oid = SIG_GOST_R3410_2001_OID,
+	  .id = GNUTLS_SIGN_GOST_94,
+	  .pk = GNUTLS_PK_GOST_01,
+	  .hash = GNUTLS_DIG_GOSTR_94,
+	  .flags = GNUTLS_SIGN_FLAG_CRT_VRFY_REVERSE,
+	  .aid = TLS_SIGN_AID_UNKNOWN },
 	/* GOST R 34.10-94 */
-	{.name = "GOSTR341094",
-	 .oid = SIG_GOST_R3410_94_OID,
-	 .id = 0,
-	 .pk = 0,
-	 .hash = 0,
-	 .aid = TLS_SIGN_AID_UNKNOWN},
-	{.name = "DSA-SHA384",
-	 .oid = SIG_DSA_SHA384_OID,
-	 .id = GNUTLS_SIGN_DSA_SHA384,
-	 .pk = GNUTLS_PK_DSA,
-	 .hash = GNUTLS_DIG_SHA384,
-	 .aid = TLS_SIGN_AID_UNKNOWN},
-	{.name = "DSA-SHA512",
-	 .oid = SIG_DSA_SHA512_OID,
-	 .id = GNUTLS_SIGN_DSA_SHA512,
-	 .pk = GNUTLS_PK_DSA,
-	 .hash = GNUTLS_DIG_SHA512,
-	 .aid = TLS_SIGN_AID_UNKNOWN},
+	{ .name = "GOSTR341094",
+	  .oid = SIG_GOST_R3410_94_OID,
+	  .id = 0,
+	  .pk = 0,
+	  .hash = 0,
+	  .aid = TLS_SIGN_AID_UNKNOWN },
+	{ .name = "DSA-SHA384",
+	  .oid = SIG_DSA_SHA384_OID,
+	  .id = GNUTLS_SIGN_DSA_SHA384,
+	  .pk = GNUTLS_PK_DSA,
+	  .hash = GNUTLS_DIG_SHA384,
+	  .aid = TLS_SIGN_AID_UNKNOWN },
+	{ .name = "DSA-SHA512",
+	  .oid = SIG_DSA_SHA512_OID,
+	  .id = GNUTLS_SIGN_DSA_SHA512,
+	  .pk = GNUTLS_PK_DSA,
+	  .hash = GNUTLS_DIG_SHA512,
+	  .aid = TLS_SIGN_AID_UNKNOWN },
 
-	{.name = 0,
-	 .oid = 0,
-	 .id = 0,
-	 .pk = 0,
-	 .hash = 0,
-	 .aid = TLS_SIGN_AID_UNKNOWN}
+	{ .name = 0,
+	  .oid = 0,
+	  .id = 0,
+	  .pk = 0,
+	  .hash = 0,
+	  .aid = TLS_SIGN_AID_UNKNOWN }
 };
 
-#define GNUTLS_SIGN_LOOP(b) \
-  do {								       \
-    const gnutls_sign_entry_st *p;					       \
-    for(p = sign_algorithms; p->name != NULL; p++) { b ; }	       \
-  } while (0)
+#define GNUTLS_SIGN_LOOP(b)                                       \
+	do {                                                      \
+		const gnutls_sign_entry_st *p;                    \
+		for (p = sign_algorithms; p->name != NULL; p++) { \
+			b;                                        \
+		}                                                 \
+	} while (0)
 
-#define GNUTLS_SIGN_ALG_LOOP(a) \
-  GNUTLS_SIGN_LOOP( if(p->id && p->id == sign) { a; break; } )
+#define GNUTLS_SIGN_ALG_LOOP(a)                        \
+	GNUTLS_SIGN_LOOP(if (p->id && p->id == sign) { \
+		a;                                     \
+		break;                                 \
+	})
 
 /**
  * gnutls_sign_get_name:
@@ -450,24 +456,23 @@ unsigned gnutls_sign_is_secure(gnutls_sign_algorithm_t algorithm)
 	return gnutls_sign_is_secure2(algorithm, 0);
 }
 
-bool _gnutls_sign_is_secure2(const gnutls_sign_entry_st * se,
-			     unsigned int flags)
+bool _gnutls_sign_is_secure2(const gnutls_sign_entry_st *se, unsigned int flags)
 {
 	if (se->hash != GNUTLS_DIG_UNKNOWN &&
-	    _gnutls_digest_is_insecure2(se->hash,
-					flags &
-					GNUTLS_SIGN_FLAG_ALLOW_INSECURE_REVERTIBLE
-					?
-					GNUTLS_MAC_FLAG_ALLOW_INSECURE_REVERTIBLE
-					: 0)) {
+	    _gnutls_digest_is_insecure2(
+		    se->hash,
+		    flags & GNUTLS_SIGN_FLAG_ALLOW_INSECURE_REVERTIBLE ?
+			    GNUTLS_MAC_FLAG_ALLOW_INSECURE_REVERTIBLE :
+			    0)) {
 		return gnutls_assert_val(false);
 	}
 
 	return (flags & GNUTLS_SIGN_FLAG_SECURE_FOR_CERTS ?
-		se->slevel == _SECURE :
-		(se->slevel == _SECURE || se->slevel == _INSECURE_FOR_CERTS)) ||
-	    (flags & GNUTLS_SIGN_FLAG_ALLOW_INSECURE_REVERTIBLE &&
-	     se->flags & GNUTLS_SIGN_FLAG_INSECURE_REVERTIBLE);
+			se->slevel == _SECURE :
+			(se->slevel == _SECURE ||
+			 se->slevel == _INSECURE_FOR_CERTS)) ||
+	       (flags & GNUTLS_SIGN_FLAG_ALLOW_INSECURE_REVERTIBLE &&
+		se->flags & GNUTLS_SIGN_FLAG_INSECURE_REVERTIBLE);
 }
 
 /* This is only called by cfg_apply in priority.c, in blocklisting mode. */
@@ -505,18 +510,18 @@ void _gnutls_sign_mark_insecure_all(hash_security_level_t level)
 #endif
 }
 
-int
-_gnutls_sign_set_secure(gnutls_sign_algorithm_t sign,
-			hash_security_level_t slevel)
+int _gnutls_sign_set_secure(gnutls_sign_algorithm_t sign,
+			    hash_security_level_t slevel)
 {
 #ifndef DISABLE_SYSTEM_CONFIG
 	gnutls_sign_entry_st *p;
 
 	for (p = sign_algorithms; p->name != NULL; p++) {
 		if (p->id && p->id == sign) {
-			if (!(p->flags & GNUTLS_SIGN_FLAG_INSECURE_REVERTIBLE)) {
-				return
-				    gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			if (!(p->flags &
+			      GNUTLS_SIGN_FLAG_INSECURE_REVERTIBLE)) {
+				return gnutls_assert_val(
+					GNUTLS_E_INVALID_REQUEST);
 			}
 			p->slevel = slevel;
 			return 0;
@@ -563,13 +568,13 @@ const gnutls_sign_algorithm_t *gnutls_sign_list(void)
 		int i = 0;
 
 		GNUTLS_SIGN_LOOP(
-					/* list all algorithms, but not duplicates */
-					if (supported_sign[i] != p->id &&
-					    _gnutls_pk_sign_exists(p->id)) {
-					assert(i + 1 < MAX_ALGOS);
-					supported_sign[i++] = p->id;
-					supported_sign[i + 1] = 0;}
-		) ;
+			/* list all algorithms, but not duplicates */
+			if (supported_sign[i] != p->id &&
+			    _gnutls_pk_sign_exists(p->id)) {
+				assert(i + 1 < MAX_ALGOS);
+				supported_sign[i++] = p->id;
+				supported_sign[i + 1] = 0;
+			});
 	}
 
 	return supported_sign;
@@ -589,18 +594,16 @@ gnutls_sign_algorithm_t gnutls_sign_get_id(const char *name)
 	gnutls_sign_algorithm_t ret = GNUTLS_SIGN_UNKNOWN;
 
 	GNUTLS_SIGN_LOOP(if (c_strcasecmp(p->name, name) == 0) {
-			 ret = p->id; break;}
-	) ;
+		ret = p->id;
+		break;
+	});
 
 	return ret;
-
 }
 
 const gnutls_sign_entry_st *_gnutls_oid_to_sign_entry(const char *oid)
 {
-	GNUTLS_SIGN_LOOP(if (p->oid && strcmp(oid, p->oid) == 0) {
-			 return p;}
-	) ;
+	GNUTLS_SIGN_LOOP(if (p->oid && strcmp(oid, p->oid) == 0) { return p; });
 	return NULL;
 }
 
@@ -627,13 +630,11 @@ gnutls_sign_algorithm_t gnutls_oid_to_sign(const char *oid)
 	return se->id;
 }
 
-const gnutls_sign_entry_st *_gnutls_pk_to_sign_entry(gnutls_pk_algorithm_t pk,
-						     gnutls_digest_algorithm_t
-						     hash)
+const gnutls_sign_entry_st *
+_gnutls_pk_to_sign_entry(gnutls_pk_algorithm_t pk,
+			 gnutls_digest_algorithm_t hash)
 {
-	GNUTLS_SIGN_LOOP(if (pk == p->pk && hash == p->hash) {
-			 return p;}
-	) ;
+	GNUTLS_SIGN_LOOP(if (pk == p->pk && hash == p->hash) { return p; });
 
 	return NULL;
 }
@@ -648,8 +649,8 @@ const gnutls_sign_entry_st *_gnutls_pk_to_sign_entry(gnutls_pk_algorithm_t pk,
  *
  * Returns: return a #gnutls_sign_algorithm_t value, or %GNUTLS_SIGN_UNKNOWN on error.
  **/
-gnutls_sign_algorithm_t
-gnutls_pk_to_sign(gnutls_pk_algorithm_t pk, gnutls_digest_algorithm_t hash)
+gnutls_sign_algorithm_t gnutls_pk_to_sign(gnutls_pk_algorithm_t pk,
+					  gnutls_digest_algorithm_t hash)
 {
 	const gnutls_sign_entry_st *e;
 
@@ -735,9 +736,8 @@ gnutls_pk_algorithm_t gnutls_sign_get_pk_algorithm(gnutls_sign_algorithm_t sign)
  *
  * Returns: return non-zero when the provided algorithms are compatible.
  **/
-unsigned
-gnutls_sign_supports_pk_algorithm(gnutls_sign_algorithm_t sign,
-				  gnutls_pk_algorithm_t pk)
+unsigned gnutls_sign_supports_pk_algorithm(gnutls_sign_algorithm_t sign,
+					   gnutls_pk_algorithm_t pk)
 {
 	const gnutls_sign_entry_st *p;
 	unsigned r;
@@ -753,20 +753,19 @@ gnutls_sign_supports_pk_algorithm(gnutls_sign_algorithm_t sign,
 	return 0;
 }
 
-gnutls_sign_algorithm_t
-_gnutls_tls_aid_to_sign(uint8_t id0, uint8_t id1, const version_entry_st * ver)
+gnutls_sign_algorithm_t _gnutls_tls_aid_to_sign(uint8_t id0, uint8_t id1,
+						const version_entry_st *ver)
 {
 	gnutls_sign_algorithm_t ret = GNUTLS_SIGN_UNKNOWN;
 
 	if (id0 == 255 && id1 == 255)
 		return ret;
 
-	GNUTLS_SIGN_LOOP(if (p->aid.id[0] == id0 &&
-			     p->aid.id[1] == id1 &&
+	GNUTLS_SIGN_LOOP(if (p->aid.id[0] == id0 && p->aid.id[1] == id1 &&
 			     ((p->aid.tls_sem & ver->tls_sig_sem) != 0)) {
-
-			 ret = p->id; break;}
-	) ;
+		ret = p->id;
+		break;
+	});
 
 	return ret;
 }
@@ -794,32 +793,26 @@ const gnutls_sign_entry_st *_gnutls_sign_to_entry(gnutls_sign_algorithm_t sign)
 	return ret;
 }
 
-const gnutls_sign_entry_st *_gnutls_tls_aid_to_sign_entry(uint8_t id0,
-							  uint8_t id1,
-							  const version_entry_st
-							  * ver)
+const gnutls_sign_entry_st *
+_gnutls_tls_aid_to_sign_entry(uint8_t id0, uint8_t id1,
+			      const version_entry_st *ver)
 {
 	if (id0 == 255 && id1 == 255)
 		return NULL;
 
-	GNUTLS_SIGN_LOOP(if (p->aid.id[0] == id0 &&
-			     p->aid.id[1] == id1 &&
-			     ((p->aid.tls_sem & ver->tls_sig_sem) != 0)) {
-
-			 return p;}
-	) ;
+	GNUTLS_SIGN_LOOP(
+		if (p->aid.id[0] == id0 && p->aid.id[1] == id1 &&
+		    ((p->aid.tls_sem & ver->tls_sig_sem) != 0)) { return p; });
 
 	return NULL;
 }
 
-const gnutls_sign_entry_st
-    * _gnutls13_sign_get_compatible_with_privkey(gnutls_privkey_t privkey)
+const gnutls_sign_entry_st *
+_gnutls13_sign_get_compatible_with_privkey(gnutls_privkey_t privkey)
 {
 	GNUTLS_SIGN_LOOP(if ((p->flags & GNUTLS_SIGN_FLAG_TLS13_OK) &&
-			     _gnutls_privkey_compatible_with_sig(privkey,
-								 p->id)) {
-			 return p;}
-	) ;
+			     _gnutls_privkey_compatible_with_sig(
+				     privkey, p->id)) { return p; });
 
 	return NULL;
 }

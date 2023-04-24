@@ -60,20 +60,20 @@ struct tlssession {
 };
 
 #define BUF_SIZE 65536
-#define BUF_HWM ((BUF_SIZE*3)/4)
+#define BUF_HWM ((BUF_SIZE * 3) / 4)
 
 static int falsequit(void *opaque)
 {
 	return FALSE;
 }
 
-static int quit(tlssession_t * s)
+static int quit(tlssession_t *s)
 {
 	return s->quitfn(s->opaque);
 }
 
 #if defined __clang__ || __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5)
-# pragma GCC diagnostic ignored "-Wsuggest-attribute=format"
+#pragma GCC diagnostic ignored "-Wsuggest-attribute=format"
 #endif
 
 static int stderrout(void *opaque, const char *format, va_list ap)
@@ -81,7 +81,7 @@ static int stderrout(void *opaque, const char *format, va_list ap)
 	return vfprintf(stderr, format, ap);
 }
 
-static int errout(tlssession_t * s, const char *format, ...)
+static int errout(tlssession_t *s, const char *format, ...)
 {
 	va_list ap;
 	int ret;
@@ -91,7 +91,7 @@ static int errout(tlssession_t * s, const char *format, ...)
 	return ret;
 }
 
-static int debugout(tlssession_t * s, const char *format, ...)
+static int debugout(tlssession_t *s, const char *format, ...)
 {
 	va_list ap;
 	int ret = 0;
@@ -122,7 +122,7 @@ static int verify_certificate_callback(gnutls_session_t session)
 	tlssession_t *s;
 
 	/* read session pointer */
-	s = (tlssession_t *) gnutls_session_get_ptr(session);
+	s = (tlssession_t *)gnutls_session_get_ptr(session);
 
 	if (gnutls_certificate_type_get(session) != GNUTLS_CRT_X509)
 		return GNUTLS_E_CERTIFICATE_ERROR;
@@ -131,9 +131,8 @@ static int verify_certificate_callback(gnutls_session_t session)
 	 * structure. So you must have installed one or more CA certificates.
 	 */
 	if (s->hostname && *s->hostname)
-		ret =
-		    gnutls_certificate_verify_peers3(session, s->hostname,
-						     &status);
+		ret = gnutls_certificate_verify_peers3(session, s->hostname,
+						       &status);
 	else
 		ret = gnutls_certificate_verify_peers2(session, &status);
 
@@ -145,10 +144,8 @@ static int verify_certificate_callback(gnutls_session_t session)
 
 	if (status) {
 		gnutls_datum_t txt;
-		ret =
-		    gnutls_certificate_verification_status_print(status,
-								 GNUTLS_CRT_X509,
-								 &txt, 0);
+		ret = gnutls_certificate_verification_status_print(
+			status, GNUTLS_CRT_X509, &txt, 0);
 		if (ret >= 0) {
 			debugout(s, "verification error: %s\n", txt.data);
 			gnutls_free(txt.data);
@@ -163,12 +160,12 @@ static int verify_certificate_callback(gnutls_session_t session)
 	return 0;
 }
 
-tlssession_t *tlssession_new(int isserver,
-			     char *keyfile, char *certfile, char *cacertfile,
-			     char *hostname, int insecure, int debug,
-			     int (*quitfn)(void *opaque),
+tlssession_t *tlssession_new(int isserver, char *keyfile, char *certfile,
+			     char *cacertfile, char *hostname, int insecure,
+			     int debug, int (*quitfn)(void *opaque),
 			     int (*erroutfn)(void *opaque, const char *format,
-					     va_list ap), void *opaque)
+					     va_list ap),
+			     void *opaque)
 {
 	int ret;
 	tlssession_t *s = calloc(1, sizeof(tlssession_t));
@@ -196,9 +193,8 @@ tlssession_t *tlssession_new(int isserver,
 	}
 
 	if (cacertfile != NULL) {
-		ret =
-		    gnutls_certificate_set_x509_trust_file(s->creds, cacertfile,
-							   GNUTLS_X509_FMT_PEM);
+		ret = gnutls_certificate_set_x509_trust_file(
+			s->creds, cacertfile, GNUTLS_X509_FMT_PEM);
 		if (ret < 0) {
 			errout(s, "Error setting the x509 trust file: %s\n",
 			       gnutls_strerror(ret));
@@ -206,10 +202,10 @@ tlssession_t *tlssession_new(int isserver,
 		}
 
 		if (!insecure) {
-			gnutls_certificate_set_verify_function(s->creds,
-							       verify_certificate_callback);
-			gnutls_certificate_set_verify_flags(s->creds,
-							    GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT);
+			gnutls_certificate_set_verify_function(
+				s->creds, verify_certificate_callback);
+			gnutls_certificate_set_verify_flags(
+				s->creds, GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT);
 		}
 	}
 
@@ -217,10 +213,8 @@ tlssession_t *tlssession_new(int isserver,
 		certfile = keyfile;
 
 	if (certfile != NULL && keyfile != NULL) {
-		ret =
-		    gnutls_certificate_set_x509_key_file(s->creds, certfile,
-							 keyfile,
-							 GNUTLS_X509_FMT_PEM);
+		ret = gnutls_certificate_set_x509_key_file(
+			s->creds, certfile, keyfile, GNUTLS_X509_FMT_PEM);
 
 		if (ret < 0) {
 			errout(s,
@@ -244,9 +238,8 @@ tlssession_t *tlssession_new(int isserver,
 	gnutls_session_set_ptr(s->session, (void *)s);
 
 	if (!isserver && s->hostname && *s->hostname) {
-		ret =
-		    gnutls_server_name_set(s->session, GNUTLS_NAME_DNS,
-					   s->hostname, strlen(s->hostname));
+		ret = gnutls_server_name_set(s->session, GNUTLS_NAME_DNS,
+					     s->hostname, strlen(s->hostname));
 		if (ret < 0) {
 			errout(s, "Cannot set server name: %s\n",
 			       gnutls_strerror(ret));
@@ -261,9 +254,8 @@ tlssession_t *tlssession_new(int isserver,
 		goto error;
 	}
 
-	ret =
-	    gnutls_credentials_set(s->session, GNUTLS_CRD_CERTIFICATE,
-				   s->creds);
+	ret = gnutls_credentials_set(s->session, GNUTLS_CRD_CERTIFICATE,
+				     s->creds);
 	if (ret < 0) {
 		errout(s, "Cannot set session GNUTL credentials: %s\n",
 		       gnutls_strerror(ret));
@@ -278,14 +270,14 @@ tlssession_t *tlssession_new(int isserver,
 
 	return s;
 
- error:
+error:
 	if (s->session)
 		gnutls_deinit(s->session);
 	free(s);
 	return NULL;
 }
 
-void tlssession_close(tlssession_t * s)
+void tlssession_close(tlssession_t *s)
 {
 	if (s->session)
 		gnutls_deinit(s->session);
@@ -298,7 +290,7 @@ int tlssession_init(void)
 	return gnutls_global_init();
 }
 
-int tlssession_mainloop(int cryptfd, int plainfd, tlssession_t * s)
+int tlssession_mainloop(int cryptfd, int plainfd, tlssession_t *s)
 {
 	fd_set readfds;
 	fd_set writefds;
@@ -318,7 +310,7 @@ int tlssession_mainloop(int cryptfd, int plainfd, tlssession_t * s)
 
 	/* set it up to work with our FD */
 	gnutls_transport_set_ptr(s->session,
-				 (gnutls_transport_ptr_t) (intptr_t) cryptfd);
+				 (gnutls_transport_ptr_t)(intptr_t)cryptfd);
 
 	/* Now do the handshake */
 	ret = gnutls_handshake(s->session);
@@ -350,7 +342,7 @@ int tlssession_mainloop(int cryptfd, int plainfd, tlssession_t * s)
 
 		size_t buffered = gnutls_record_check_pending(s->session);
 		if (buffered)
-			wait = FALSE;	/* do not wait for select to return if we have buffered data */
+			wait = FALSE; /* do not wait for select to return if we have buffered data */
 
 		if (plainEOF) {
 			/* plain text end has closed, but me may still have
@@ -384,12 +376,11 @@ int tlssession_mainloop(int cryptfd, int plainfd, tlssession_t * s)
 		do {
 			timeout.tv_sec = wait ? 1 : 0;
 			timeout.tv_usec = 0;
-			result =
-			    select(maxfd, &readfds, &writefds, NULL, &timeout);
+			result = select(maxfd, &readfds, &writefds, NULL,
+					&timeout);
 
 			selecterrno = errno;
-		}
-		while ((result == -1) && (selecterrno == EINTR) && !quit(s));
+		} while ((result == -1) && (selecterrno == EINTR) && !quit(s));
 		if (quit(s))
 			break;
 
@@ -404,9 +395,8 @@ int tlssession_mainloop(int cryptfd, int plainfd, tlssession_t * s)
 			if (len > 0) {
 				do {
 					ret = read(plainfd, addr, (size_t)len);
-				}
-				while ((ret < 0) && (errno == EINTR)
-				       && !quit(s));
+				} while ((ret < 0) && (errno == EINTR) &&
+					 !quit(s));
 				if (quit(s))
 					break;
 				if (ret < 0) {
@@ -417,7 +407,9 @@ int tlssession_mainloop(int cryptfd, int plainfd, tlssession_t * s)
 				if (ret == 0) {
 					plainEOF = TRUE;
 				} else {
-					bufDoneWrite(plainToCrypt, ret);	/* mark ret bytes as written to the buffer */
+					bufDoneWrite(
+						plainToCrypt,
+						ret); /* mark ret bytes as written to the buffer */
 				}
 			}
 		}
@@ -433,9 +425,8 @@ int tlssession_mainloop(int cryptfd, int plainfd, tlssession_t * s)
 			if (len > 0) {
 				do {
 					ret = write(plainfd, addr, (size_t)len);
-				}
-				while ((ret < 0) && (errno == EINTR)
-				       && !quit(s));
+				} while ((ret < 0) && (errno == EINTR) &&
+					 !quit(s));
 				if (quit(s))
 					break;
 				if (ret < 0) {
@@ -443,7 +434,9 @@ int tlssession_mainloop(int cryptfd, int plainfd, tlssession_t * s)
 					       "Error on write to plain socket: %m\n");
 					goto error;
 				}
-				bufDoneRead(cryptToPlain, ret);	/* mark ret bytes as read from the buffer */
+				bufDoneRead(
+					cryptToPlain,
+					ret); /* mark ret bytes as read from the buffer */
 			}
 		}
 
@@ -457,11 +450,10 @@ int tlssession_mainloop(int cryptfd, int plainfd, tlssession_t * s)
 			ssize_t len = bufGetWriteSpan(cryptToPlain, &addr);
 			if (len > 0) {
 				do {
-					ret =
-					    gnutls_record_recv(s->session, addr,
-							       (size_t)len);
-				}
-				while (ret == GNUTLS_E_INTERRUPTED && !quit(s));
+					ret = gnutls_record_recv(
+						s->session, addr, (size_t)len);
+				} while (ret == GNUTLS_E_INTERRUPTED &&
+					 !quit(s));
 				/* do not loop on GNUTLS_E_AGAIN - this means we'd block so we'd loop for
 				 * ever
 				 */
@@ -476,7 +468,9 @@ int tlssession_mainloop(int cryptfd, int plainfd, tlssession_t * s)
 				if (ret == 0) {
 					cryptEOF = TRUE;
 				} else {
-					bufDoneWrite(cryptToPlain, ret);	/* mark ret bytes as written to the buffer */
+					bufDoneWrite(
+						cryptToPlain,
+						ret); /* mark ret bytes as written to the buffer */
 				}
 			}
 		}
@@ -492,16 +486,14 @@ int tlssession_mainloop(int cryptfd, int plainfd, tlssession_t * s)
 			if (len > 0) {
 				do {
 					if (tls_wr_interrupted) {
-						ret =
-						    gnutls_record_send
-						    (s->session, NULL, 0);
+						ret = gnutls_record_send(
+							s->session, NULL, 0);
 					} else {
-						ret =
-						    gnutls_record_send
-						    (s->session, addr, len);
+						ret = gnutls_record_send(
+							s->session, addr, len);
 					}
-				}
-				while (ret == GNUTLS_E_INTERRUPTED && !quit(s));
+				} while (ret == GNUTLS_E_INTERRUPTED &&
+					 !quit(s));
 				if (quit(s))
 					break;
 				if (ret == GNUTLS_E_AGAIN) {
@@ -515,7 +507,9 @@ int tlssession_mainloop(int cryptfd, int plainfd, tlssession_t * s)
 					       gnutls_strerror(ret));
 					goto error;
 				} else {
-					bufDoneRead(plainToCrypt, ret);	/* mark ret bytes as read from the buffer */
+					bufDoneRead(
+						plainToCrypt,
+						ret); /* mark ret bytes as read from the buffer */
 				}
 			}
 		}
@@ -524,10 +518,10 @@ int tlssession_mainloop(int cryptfd, int plainfd, tlssession_t * s)
 	ret = 0;
 	goto freereturn;
 
- error:
+error:
 	ret = -1;
 
- freereturn:
+freereturn:
 	gnutls_bye(s->session, GNUTLS_SHUT_RDWR);
 	shutdown(plainfd, SHUT_RDWR);
 	bufFree(plainToCrypt);

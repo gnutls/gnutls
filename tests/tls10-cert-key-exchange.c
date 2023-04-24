@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 /* This program tests the various certificate key exchange methods supported
@@ -48,9 +48,10 @@ void doit(void)
 	try_x509("TLS 1.0 with dhe-rsa no cert",
 		 "NORMAL:-VERS-ALL:+VERS-TLS1.0:-KX-ALL:+DHE-RSA",
 		 GNUTLS_KX_DHE_RSA, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_UNKNOWN);
-	try_x509("TLS 1.0 with ecdhe x25519 rsa no cert",
-		 "NORMAL:-VERS-ALL:+VERS-TLS1.0:-KX-ALL:+ECDHE-RSA:-CURVE-ALL:+CURVE-X25519",
-		 GNUTLS_KX_ECDHE_RSA, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_UNKNOWN);
+	try_x509(
+		"TLS 1.0 with ecdhe x25519 rsa no cert",
+		"NORMAL:-VERS-ALL:+VERS-TLS1.0:-KX-ALL:+ECDHE-RSA:-CURVE-ALL:+CURVE-X25519",
+		GNUTLS_KX_ECDHE_RSA, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_UNKNOWN);
 	try_x509("TLS 1.0 with ecdhe rsa no cert",
 		 "NORMAL:-VERS-ALL:+VERS-TLS1.0:-KX-ALL:+ECDHE-RSA",
 		 GNUTLS_KX_ECDHE_RSA, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_UNKNOWN);

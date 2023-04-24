@@ -21,10 +21,10 @@
  */
 
 #ifndef GNUTLS_LIB_EXT_EC_POINT_FORMATS_H
-# define GNUTLS_LIB_EXT_EC_POINT_FORMATS_H
+#define GNUTLS_LIB_EXT_EC_POINT_FORMATS_H
 
-# include <hello_ext.h>
+#include <hello_ext.h>
 
 extern const hello_ext_entry_st ext_mod_supported_ec_point_formats;
 
-#endif				/* GNUTLS_LIB_EXT_EC_POINT_FORMATS_H */
+#endif /* GNUTLS_LIB_EXT_EC_POINT_FORMATS_H */

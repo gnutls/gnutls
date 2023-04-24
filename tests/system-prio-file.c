@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -58,7 +58,7 @@ static void try_prio(const char *prio, const char *expected_str)
 		exit(1);
 	}
 
- ok:
+ok:
 	gnutls_free(p);
 	gnutls_global_deinit();
 }
@@ -70,8 +70,9 @@ void doit(void)
 	try_prio("@HELLO1", "NORMAL");
 	try_prio("@HELLO1:+AES-256-CBC:+AEAD", "NORMAL:+AES-256-CBC:+AEAD");
 	try_prio("@HELLO2", "NORMAL:+AES-128-CBC");
-	try_prio("@HELLO3",
-		 "NONE:+VERS-TLS-ALL:-VERS-SSL3.0:+AEAD:+SHA1:+SHA256:+SHA384:+ECDHE-RSA:+ECDHE-ECDSA:+RSA:+DHE-RSA:+DHE-DSS:+AES-256-GCM:+AES-256-CBC:+CAMELLIA-256-GCM:+CAMELLIA-256-CBC:+AES-128-GCM:+AES-128-CBC:+CAMELLIA-128-GCM:+CAMELLIA-128-CBC:+3DES-CBC:+SIGN-ALL:-SIGN-RSA-MD5:+CURVE-ALL:+COMP-NULL:%PROFILE_LOW");
+	try_prio(
+		"@HELLO3",
+		"NONE:+VERS-TLS-ALL:-VERS-SSL3.0:+AEAD:+SHA1:+SHA256:+SHA384:+ECDHE-RSA:+ECDHE-ECDSA:+RSA:+DHE-RSA:+DHE-DSS:+AES-256-GCM:+AES-256-CBC:+CAMELLIA-256-GCM:+CAMELLIA-256-CBC:+AES-128-GCM:+AES-128-CBC:+CAMELLIA-128-GCM:+CAMELLIA-128-CBC:+3DES-CBC:+SIGN-ALL:-SIGN-RSA-MD5:+CURVE-ALL:+COMP-NULL:%PROFILE_LOW");
 	try_prio("@HELLO1,HELLO2", "NORMAL");
 	try_prio("@HELLO1,HELLO2:+AES-128-CBC", "NORMAL:+AES-128-CBC");
 	try_prio("@HELLO1,HELLO1", "NORMAL");

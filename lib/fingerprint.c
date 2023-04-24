@@ -51,15 +51,15 @@
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
  **/
-int
-gnutls_fingerprint(gnutls_digest_algorithm_t algo,
-		   const gnutls_datum_t * data, void *result,
-		   size_t *result_size)
+int gnutls_fingerprint(gnutls_digest_algorithm_t algo,
+		       const gnutls_datum_t *data, void *result,
+		       size_t *result_size)
 {
 	int ret;
 	int hash_len = _gnutls_hash_get_algo_len(hash_to_entry(algo));
 
-	if (hash_len < 0 || (unsigned)hash_len > *result_size || result == NULL) {
+	if (hash_len < 0 || (unsigned)hash_len > *result_size ||
+	    result == NULL) {
 		*result_size = hash_len;
 		return GNUTLS_E_SHORT_MEMORY_BUFFER;
 	}

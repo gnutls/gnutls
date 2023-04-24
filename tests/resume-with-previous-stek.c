@@ -20,7 +20,7 @@
  *
  */
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -33,36 +33,35 @@ int main(int argc, char **argv)
 }
 #else
 
-# include <stdint.h>
-# include <unistd.h>
-# include <sys/wait.h>
-# include <sys/socket.h>
-# include <gnutls/gnutls.h>
-# include <assert.h>
-# include "utils.h"
-# include "cert-common.h"
-# include "virt-time.h"
+#include <stdint.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <sys/socket.h>
+#include <gnutls/gnutls.h>
+#include <assert.h>
+#include "utils.h"
+#include "cert-common.h"
+#include "virt-time.h"
 
-# define TICKET_EXPIRATION 1	/* seconds */
-# define TICKET_ROTATION_PERIOD 3	/* seconds */
+#define TICKET_EXPIRATION 1 /* seconds */
+#define TICKET_ROTATION_PERIOD 3 /* seconds */
 
 unsigned num_stek_rotations;
 
-static void stek_rotation_callback(const gnutls_datum_t * prev_key,
-				   const gnutls_datum_t * new_key, uint64_t t)
+static void stek_rotation_callback(const gnutls_datum_t *prev_key,
+				   const gnutls_datum_t *new_key, uint64_t t)
 {
 	num_stek_rotations++;
 	success("STEK was rotated!\n");
 }
 
 static int client_handshake(gnutls_session_t session,
-			    gnutls_datum_t * session_data, int resume)
+			    gnutls_datum_t *session_data, int resume)
 {
 	int ret;
 
 	if (resume) {
-		if ((ret = gnutls_session_set_data(session,
-						   session_data->data,
+		if ((ret = gnutls_session_set_data(session, session_data->data,
 						   session_data->size)) < 0) {
 			fail("client: Could not get session data\n");
 		}
@@ -84,7 +83,8 @@ static int client_handshake(gnutls_session_t session,
 		success("client: Success: Session was NOT resumed\n");
 
 	if (!resume) {
-		if ((ret = gnutls_session_get_data2(session, session_data)) < 0) {
+		if ((ret = gnutls_session_get_data2(session, session_data)) <
+		    0) {
 			fail("client: Could not get session data\n");
 		}
 	}
@@ -103,8 +103,8 @@ static void client(int fd, int *resume, unsigned rounds, const char *prio)
 	gnutls_certificate_credentials_t clientx509cred = NULL;
 
 	for (unsigned i = 0; i < rounds; i++) {
-		assert(gnutls_certificate_allocate_credentials(&clientx509cred)
-		       >= 0);
+		assert(gnutls_certificate_allocate_credentials(
+			       &clientx509cred) >= 0);
 
 		assert(gnutls_init(&session, GNUTLS_CLIENT) >= 0);
 		assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);
@@ -130,12 +130,11 @@ static void client(int fd, int *resume, unsigned rounds, const char *prio)
 	gnutls_free(session_data.data);
 }
 
-typedef void (*gnutls_stek_rotation_callback_t)(const gnutls_datum_t * prev_key,
-						const gnutls_datum_t * new_key,
+typedef void (*gnutls_stek_rotation_callback_t)(const gnutls_datum_t *prev_key,
+						const gnutls_datum_t *new_key,
 						uint64_t t);
-void _gnutls_set_session_ticket_key_rotation_callback(gnutls_session_t session,
-						      gnutls_stek_rotation_callback_t
-						      cb);
+void _gnutls_set_session_ticket_key_rotation_callback(
+	gnutls_session_t session, gnutls_stek_rotation_callback_t cb);
 
 static void server(int fd, unsigned rounds, const char *prio)
 {
@@ -153,13 +152,11 @@ static void server(int fd, unsigned rounds, const char *prio)
 	for (unsigned i = 0; i < rounds; i++) {
 		assert(gnutls_init(&session, GNUTLS_SERVER) >= 0);
 
-		assert(gnutls_certificate_allocate_credentials(&serverx509cred)
-		       >= 0);
-		retval =
-		    gnutls_certificate_set_x509_key_mem(serverx509cred,
-							&server_cert,
-							&server_key,
-							GNUTLS_X509_FMT_PEM);
+		assert(gnutls_certificate_allocate_credentials(
+			       &serverx509cred) >= 0);
+		retval = gnutls_certificate_set_x509_key_mem(
+			serverx509cred, &server_cert, &server_key,
+			GNUTLS_X509_FMT_PEM);
 		if (retval < 0)
 			fail("error setting key: %s\n",
 			     gnutls_strerror(retval));
@@ -169,11 +166,11 @@ static void server(int fd, unsigned rounds, const char *prio)
 				       serverx509cred);
 
 		gnutls_db_set_cache_expiration(session, TICKET_EXPIRATION);
-		_gnutls_set_session_ticket_key_rotation_callback(session,
-								 stek_rotation_callback);
+		_gnutls_set_session_ticket_key_rotation_callback(
+			session, stek_rotation_callback);
 
-		retval = gnutls_session_ticket_enable_server(session,
-							     &session_ticket_key);
+		retval = gnutls_session_ticket_enable_server(
+			session, &session_ticket_key);
 		if (retval != GNUTLS_E_SUCCESS) {
 			fail("server: Could not enable session tickets: %s\n",
 			     gnutls_strerror(retval));
@@ -186,8 +183,8 @@ static void server(int fd, unsigned rounds, const char *prio)
 
 		do {
 			retval = gnutls_handshake(session);
-		} while (retval == GNUTLS_E_AGAIN
-			 || retval == GNUTLS_E_INTERRUPTED);
+		} while (retval == GNUTLS_E_AGAIN ||
+			 retval == GNUTLS_E_INTERRUPTED);
 
 		if (retval < 0) {
 			fail("server: Handshake failed: %s\n",

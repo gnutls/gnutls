@@ -32,8 +32,8 @@
 #define addf _gnutls_buffer_append_printf
 #define adds _gnutls_buffer_append_str
 
-static void print_dn(gnutls_buffer_st * str, const char *prefix,
-		     const gnutls_datum_t * raw)
+static void print_dn(gnutls_buffer_st *str, const char *prefix,
+		     const gnutls_datum_t *raw)
 {
 	gnutls_x509_dn_t dn = NULL;
 	gnutls_datum_t output = { NULL, 0 };
@@ -59,14 +59,21 @@ static void print_dn(gnutls_buffer_st * str, const char *prefix,
 
 	addf(str, "%s: %s\n", prefix, output.data);
 
- cleanup:
+cleanup:
 	gnutls_x509_dn_deinit(dn);
 	gnutls_free(output.data);
 }
 
 /* Do not encode ASN1 and type for now */
-#define ENTRY(oid, name, type) {oid, sizeof(oid)-1, name, sizeof(name)-1, NULL, type}
-#define ENTRY2(oid, name) {oid, sizeof(oid)-1, name, sizeof(name)-1, NULL, ASN1_ETYPE_INVALID}
+#define ENTRY(oid, name, type)                                           \
+	{                                                                \
+		oid, sizeof(oid) - 1, name, sizeof(name) - 1, NULL, type \
+	}
+#define ENTRY2(oid, name)                                           \
+	{                                                           \
+		oid, sizeof(oid) - 1, name, sizeof(name) - 1, NULL, \
+			ASN1_ETYPE_INVALID                          \
+	}
 
 static const struct oid_to_string pkcs7_attrs[] = {
 	ENTRY("1.2.840.113549.1.9.3", "contentType", ASN1_ETYPE_OBJECT_ID),
@@ -86,11 +93,11 @@ static const struct oid_to_string pkcs7_attrs[] = {
 	ENTRY2("1.2.840.113549.1.9.16.2.19", "aa-ets-otherSigCert"),
 	ENTRY2("1.2.840.113549.1.9.16.2.47", "aa-signingCertificateV2"),
 
-	{NULL, 0, NULL, 0, NULL, 0}
+	{ NULL, 0, NULL, 0, NULL, 0 }
 };
 
-static void print_raw(gnutls_buffer_st * str, const char *prefix,
-		      const gnutls_datum_t * raw)
+static void print_raw(gnutls_buffer_st *str, const char *prefix,
+		      const gnutls_datum_t *raw)
 {
 	gnutls_datum_t result;
 	int ret;
@@ -108,8 +115,8 @@ static void print_raw(gnutls_buffer_st * str, const char *prefix,
 	gnutls_free(result.data);
 }
 
-static void print_pkcs7_info(gnutls_pkcs7_signature_info_st * info,
-			     gnutls_buffer_st * str,
+static void print_pkcs7_info(gnutls_pkcs7_signature_info_st *info,
+			     gnutls_buffer_st *str,
 			     gnutls_certificate_print_formats_t format)
 {
 	unsigned i;
@@ -148,9 +155,8 @@ static void print_pkcs7_info(gnutls_pkcs7_signature_info_st * info,
 	if (format == GNUTLS_CRT_PRINT_FULL) {
 		if (info->signed_attrs) {
 			for (i = 0;; i++) {
-				ret =
-				    gnutls_pkcs7_get_attr(info->signed_attrs, i,
-							  &oid, &data, 0);
+				ret = gnutls_pkcs7_get_attr(info->signed_attrs,
+							    i, &oid, &data, 0);
 				if (ret < 0)
 					break;
 				if (i == 0)
@@ -158,18 +164,18 @@ static void print_pkcs7_info(gnutls_pkcs7_signature_info_st * info,
 
 				entry = _gnutls_oid_get_entry(pkcs7_attrs, oid);
 				snprintf(prefix, sizeof(prefix), "\t\t%s",
-					 (entry
-					  && entry->
-					  name_desc) ? entry->name_desc : oid);
+					 (entry && entry->name_desc) ?
+						 entry->name_desc :
+						 oid);
 				print_raw(str, prefix, &data);
 				gnutls_free(data.data);
 			}
 		}
 		if (info->unsigned_attrs) {
 			for (i = 0;; i++) {
-				ret =
-				    gnutls_pkcs7_get_attr(info->unsigned_attrs,
-							  i, &oid, &data, 0);
+				ret = gnutls_pkcs7_get_attr(
+					info->unsigned_attrs, i, &oid, &data,
+					0);
 				if (ret < 0)
 					break;
 				if (i == 0)
@@ -177,9 +183,9 @@ static void print_pkcs7_info(gnutls_pkcs7_signature_info_st * info,
 
 				entry = _gnutls_oid_get_entry(pkcs7_attrs, oid);
 				snprintf(prefix, sizeof(prefix), "\t\t%s",
-					 (entry
-					  && entry->
-					  name_desc) ? entry->name_desc : oid);
+					 (entry && entry->name_desc) ?
+						 entry->name_desc :
+						 oid);
 				print_raw(str, prefix, &data);
 				gnutls_free(data.data);
 			}
@@ -207,9 +213,9 @@ static void print_pkcs7_info(gnutls_pkcs7_signature_info_st * info,
  *
  * Since: 3.6.14
  **/
-int gnutls_pkcs7_print_signature_info(gnutls_pkcs7_signature_info_st * info,
+int gnutls_pkcs7_print_signature_info(gnutls_pkcs7_signature_info_st *info,
 				      gnutls_certificate_print_formats_t format,
-				      gnutls_datum_t * out)
+				      gnutls_datum_t *out)
 {
 	gnutls_buffer_st str;
 
@@ -238,7 +244,7 @@ int gnutls_pkcs7_print_signature_info(gnutls_pkcs7_signature_info_st * info,
  **/
 int gnutls_pkcs7_print(gnutls_pkcs7_t pkcs7,
 		       gnutls_certificate_print_formats_t format,
-		       gnutls_datum_t * out)
+		       gnutls_datum_t *out)
 {
 	int count, ret, i;
 	gnutls_pkcs7_signature_info_st info;
@@ -251,8 +257,8 @@ int gnutls_pkcs7_print(gnutls_pkcs7_t pkcs7,
 	 * we don't print the eContent Type explicitly */
 	oid = gnutls_pkcs7_get_embedded_data_oid(pkcs7);
 	if (oid) {
-		if (strcmp(oid, DATA_OID) != 0
-		    && strcmp(oid, DIGESTED_DATA_OID) != 0) {
+		if (strcmp(oid, DATA_OID) != 0 &&
+		    strcmp(oid, DIGESTED_DATA_OID) != 0) {
 			addf(&str, "eContent Type: %s\n", oid);
 		}
 	}
@@ -278,8 +284,8 @@ int gnutls_pkcs7_print(gnutls_pkcs7_t pkcs7,
 			addf(&str, "Number of certificates: %u\n\n", count);
 
 			for (i = 0; i < count; i++) {
-				ret =
-				    gnutls_pkcs7_get_crt_raw2(pkcs7, i, &data);
+				ret = gnutls_pkcs7_get_crt_raw2(pkcs7, i,
+								&data);
 				if (ret < 0) {
 					addf(&str,
 					     "Error: cannot print certificate %d\n",
@@ -287,9 +293,8 @@ int gnutls_pkcs7_print(gnutls_pkcs7_t pkcs7,
 					continue;
 				}
 
-				ret =
-				    gnutls_pem_base64_encode_alloc
-				    ("CERTIFICATE", &data, &b64);
+				ret = gnutls_pem_base64_encode_alloc(
+					"CERTIFICATE", &data, &b64);
 				if (ret < 0) {
 					gnutls_free(data.data);
 					continue;
@@ -307,8 +312,8 @@ int gnutls_pkcs7_print(gnutls_pkcs7_t pkcs7,
 			addf(&str, "Number of CRLs: %u\n\n", count);
 
 			for (i = 0; i < count; i++) {
-				ret =
-				    gnutls_pkcs7_get_crl_raw2(pkcs7, i, &data);
+				ret = gnutls_pkcs7_get_crl_raw2(pkcs7, i,
+								&data);
 				if (ret < 0) {
 					addf(&str,
 					     "Error: cannot print certificate %d\n",
@@ -316,9 +321,8 @@ int gnutls_pkcs7_print(gnutls_pkcs7_t pkcs7,
 					continue;
 				}
 
-				ret =
-				    gnutls_pem_base64_encode_alloc("X509 CRL",
-								   &data, &b64);
+				ret = gnutls_pem_base64_encode_alloc(
+					"X509 CRL", &data, &b64);
 				if (ret < 0) {
 					gnutls_free(data.data);
 					continue;

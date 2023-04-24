@@ -52,10 +52,9 @@ get_entropy_func _rnd_get_system_entropy = NULL;
 
 static HCRYPTPROV device_fd = 0;
 
-static
-int _rnd_get_system_entropy_win32(void *rnd, size_t size)
+static int _rnd_get_system_entropy_win32(void *rnd, size_t size)
 {
-	if (!CryptGenRandom(device_fd, (DWORD) size, rnd)) {
+	if (!CryptGenRandom(device_fd, (DWORD)size, rnd)) {
 		_gnutls_debug_log("Error in CryptGenRandom: %d\n",
 				  (int)GetLastError());
 		return GNUTLS_E_RANDOM_DEVICE_ERROR;
@@ -66,9 +65,8 @@ int _rnd_get_system_entropy_win32(void *rnd, size_t size)
 
 int _rnd_system_entropy_init(void)
 {
-	if (!CryptAcquireContext
-	    (&device_fd, NULL, NULL, PROV_RSA_FULL,
-	     CRYPT_SILENT | CRYPT_VERIFYCONTEXT)) {
+	if (!CryptAcquireContext(&device_fd, NULL, NULL, PROV_RSA_FULL,
+				 CRYPT_SILENT | CRYPT_VERIFYCONTEXT)) {
 		_gnutls_debug_log("error in CryptAcquireContext!\n");
 		return GNUTLS_E_RANDOM_DEVICE_ERROR;
 	}

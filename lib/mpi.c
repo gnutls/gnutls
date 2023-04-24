@@ -36,8 +36,8 @@
  */
 
 /* Returns a random number r, 0 < r < p */
-bigint_t
-_gnutls_mpi_random_modp(bigint_t r, bigint_t p, gnutls_rnd_level_t level)
+bigint_t _gnutls_mpi_random_modp(bigint_t r, bigint_t p,
+				 gnutls_rnd_level_t level)
 {
 	size_t size;
 	int ret;
@@ -100,7 +100,7 @@ _gnutls_mpi_random_modp(bigint_t r, bigint_t p, gnutls_rnd_level_t level)
 
 	return tmp;
 
- cleanup:
+cleanup:
 	if (buf_release != 0)
 		gnutls_free(buf);
 	return NULL;
@@ -108,7 +108,7 @@ _gnutls_mpi_random_modp(bigint_t r, bigint_t p, gnutls_rnd_level_t level)
 
 /* returns %GNUTLS_E_SUCCESS (0) on success
  */
-int _gnutls_mpi_init_scan(bigint_t * ret_mpi, const void *buffer, size_t nbytes)
+int _gnutls_mpi_init_scan(bigint_t *ret_mpi, const void *buffer, size_t nbytes)
 {
 	bigint_t r;
 	int ret;
@@ -131,8 +131,8 @@ int _gnutls_mpi_init_scan(bigint_t * ret_mpi, const void *buffer, size_t nbytes)
 
 /* returns %GNUTLS_E_SUCCESS (0) on success. Fails if the number is zero.
  */
-int
-_gnutls_mpi_init_scan_nz(bigint_t * ret_mpi, const void *buffer, size_t nbytes)
+int _gnutls_mpi_init_scan_nz(bigint_t *ret_mpi, const void *buffer,
+			     size_t nbytes)
 {
 	int ret;
 
@@ -150,8 +150,8 @@ _gnutls_mpi_init_scan_nz(bigint_t * ret_mpi, const void *buffer, size_t nbytes)
 	return 0;
 }
 
-int
-_gnutls_mpi_init_scan_le(bigint_t * ret_mpi, const void *buffer, size_t nbytes)
+int _gnutls_mpi_init_scan_le(bigint_t *ret_mpi, const void *buffer,
+			     size_t nbytes)
 {
 	bigint_t r;
 	int ret;
@@ -172,7 +172,7 @@ _gnutls_mpi_init_scan_le(bigint_t * ret_mpi, const void *buffer, size_t nbytes)
 	return 0;
 }
 
-int _gnutls_mpi_dprint_le(const bigint_t a, gnutls_datum_t * dest)
+int _gnutls_mpi_dprint_le(const bigint_t a, gnutls_datum_t *dest)
 {
 	int ret;
 	uint8_t *buf = NULL;
@@ -199,7 +199,7 @@ int _gnutls_mpi_dprint_le(const bigint_t a, gnutls_datum_t * dest)
 }
 
 /* Always has the first bit zero */
-int _gnutls_mpi_dprint_lz(const bigint_t a, gnutls_datum_t * dest)
+int _gnutls_mpi_dprint_lz(const bigint_t a, gnutls_datum_t *dest)
 {
 	int ret;
 	uint8_t *buf = NULL;
@@ -226,7 +226,7 @@ int _gnutls_mpi_dprint_lz(const bigint_t a, gnutls_datum_t * dest)
 	return 0;
 }
 
-int _gnutls_mpi_dprint(const bigint_t a, gnutls_datum_t * dest)
+int _gnutls_mpi_dprint(const bigint_t a, gnutls_datum_t *dest)
 {
 	int ret;
 	uint8_t *buf = NULL;
@@ -256,8 +256,7 @@ int _gnutls_mpi_dprint(const bigint_t a, gnutls_datum_t * dest)
  * but will set minimum size to 'size'. That means that
  * the output value is left padded with zeros.
  */
-int
-_gnutls_mpi_dprint_size(const bigint_t a, gnutls_datum_t * dest, size_t size)
+int _gnutls_mpi_dprint_size(const bigint_t a, gnutls_datum_t *dest, size_t size)
 {
 	int ret;
 	uint8_t *buf = NULL;
@@ -293,7 +292,7 @@ _gnutls_mpi_dprint_size(const bigint_t a, gnutls_datum_t * dest, size_t size)
 }
 
 /* like _gnutls_mpi_dprint_size, but prints into preallocated byte buffer */
-int _gnutls_mpi_bprint_size(const bigint_t a, uint8_t * buf, size_t size)
+int _gnutls_mpi_bprint_size(const bigint_t a, uint8_t *buf, size_t size)
 {
 	int result;
 	size_t bytes = 0;
@@ -317,17 +316,16 @@ int _gnutls_mpi_bprint_size(const bigint_t a, uint8_t * buf, size_t size)
 }
 
 /* Flags for __gnutls_x509_read_int() and __gnutls_x509_write_int */
-#define GNUTLS_X509_INT_OVERWRITE	(1 << 0)
-#define GNUTLS_X509_INT_LE		(1 << 1)
-#define GNUTLS_X509_INT_LZ		(1 << 2)	/* write only */
+#define GNUTLS_X509_INT_OVERWRITE (1 << 0)
+#define GNUTLS_X509_INT_LE (1 << 1)
+#define GNUTLS_X509_INT_LZ (1 << 2) /* write only */
 
 /* this function reads an integer
  * from asn1 structs. Combines the read and mpi_scan
  * steps.
  */
-static int
-__gnutls_x509_read_int(asn1_node node, const char *value,
-		       bigint_t * ret_mpi, unsigned int flags)
+static int __gnutls_x509_read_int(asn1_node node, const char *value,
+				  bigint_t *ret_mpi, unsigned int flags)
 {
 	int result;
 	uint8_t *tmpstr = NULL;
@@ -370,32 +368,30 @@ __gnutls_x509_read_int(asn1_node node, const char *value,
 	return 0;
 }
 
-int _gnutls_x509_read_int(asn1_node node, const char *value, bigint_t * ret_mpi)
+int _gnutls_x509_read_int(asn1_node node, const char *value, bigint_t *ret_mpi)
 {
 	return __gnutls_x509_read_int(node, value, ret_mpi, 0);
 }
 
-int
-_gnutls_x509_read_key_int(asn1_node node, const char *value, bigint_t * ret_mpi)
+int _gnutls_x509_read_key_int(asn1_node node, const char *value,
+			      bigint_t *ret_mpi)
 {
 	return __gnutls_x509_read_int(node, value, ret_mpi,
 				      GNUTLS_X509_INT_OVERWRITE);
 }
 
-int
-_gnutls_x509_read_key_int_le(asn1_node node, const char *value,
-			     bigint_t * ret_mpi)
+int _gnutls_x509_read_key_int_le(asn1_node node, const char *value,
+				 bigint_t *ret_mpi)
 {
 	return __gnutls_x509_read_int(node, value, ret_mpi,
 				      GNUTLS_X509_INT_OVERWRITE |
-				      GNUTLS_X509_INT_LE);
+					      GNUTLS_X509_INT_LE);
 }
 
 /* Writes the specified integer into the specified node.
  */
-static int
-__gnutls_x509_write_int(asn1_node node, const char *value, bigint_t mpi,
-			unsigned int flags)
+static int __gnutls_x509_write_int(asn1_node node, const char *value,
+				   bigint_t mpi, unsigned int flags)
 {
 	uint8_t *tmpstr;
 	size_t s_len;
@@ -448,26 +444,25 @@ __gnutls_x509_write_int(asn1_node node, const char *value, bigint_t mpi,
 	return 0;
 }
 
-int
-_gnutls_x509_write_int(asn1_node node, const char *value, bigint_t mpi, int lz)
+int _gnutls_x509_write_int(asn1_node node, const char *value, bigint_t mpi,
+			   int lz)
 {
 	return __gnutls_x509_write_int(node, value, mpi,
 				       lz ? GNUTLS_X509_INT_LZ : 0);
 }
 
-int
-_gnutls_x509_write_key_int(asn1_node node, const char *value, bigint_t mpi,
-			   int lz)
+int _gnutls_x509_write_key_int(asn1_node node, const char *value, bigint_t mpi,
+			       int lz)
 {
 	return __gnutls_x509_write_int(node, value, mpi,
 				       (lz ? GNUTLS_X509_INT_LZ : 0) |
-				       GNUTLS_X509_INT_OVERWRITE);
+					       GNUTLS_X509_INT_OVERWRITE);
 }
 
-int
-_gnutls_x509_write_key_int_le(asn1_node node, const char *value, bigint_t mpi)
+int _gnutls_x509_write_key_int_le(asn1_node node, const char *value,
+				  bigint_t mpi)
 {
 	return __gnutls_x509_write_int(node, value, mpi,
 				       GNUTLS_X509_INT_OVERWRITE |
-				       GNUTLS_X509_INT_LE);
+					       GNUTLS_X509_INT_LE);
 }

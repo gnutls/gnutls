@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -34,34 +34,33 @@ int main(void)
 
 #else
 
-# include <sys/types.h>
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
-# include <unistd.h>
-# include <gnutls/gnutls.h>
-# include <gnutls/dtls.h>
-# include <signal.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <gnutls/gnutls.h>
+#include <gnutls/dtls.h>
+#include <signal.h>
 
-# ifndef MSG_NOSIGNAL
+#ifndef MSG_NOSIGNAL
 
 int main(void)
 {
 	exit(77);
 }
 
-# else
+#else
 
-#  include "utils.h"
+#include "utils.h"
 
-static
-void sigpipe(int sig)
+static void sigpipe(int sig)
 {
 	_exit(2);
 }
 
-#  define BUF_SIZE 64
+#define BUF_SIZE 64
 
 static void client(int fd)
 {
@@ -86,9 +85,10 @@ static void client(int fd)
 	gnutls_handshake_set_timeout(session, get_timeout());
 
 	/* Use default priorities */
-	gnutls_priority_set_direct(session,
-				   "NONE:+VERS-TLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL",
-				   NULL);
+	gnutls_priority_set_direct(
+		session,
+		"NONE:+VERS-TLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL",
+		NULL);
 
 	/* put the anonymous credentials to the current session
 	 */
@@ -100,9 +100,8 @@ static void client(int fd)
 	 */
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0
-	       && (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED));
+	} while (ret < 0 &&
+		 (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED));
 
 	ret = gnutls_record_recv(session, buf, sizeof(buf));
 	if (ret < 0 || ret != sizeof(buf)) {
@@ -157,9 +156,10 @@ static void server(int fd)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_priority_set_direct(session,
-				   "NONE:+VERS-TLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL",
-				   NULL);
+	gnutls_priority_set_direct(
+		session,
+		"NONE:+VERS-TLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL",
+		NULL);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
 
@@ -167,9 +167,8 @@ static void server(int fd)
 
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0
-	       && (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED));
+	} while (ret < 0 &&
+		 (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED));
 
 	if (ret < 0) {
 		fail("error in handshake: %s\n", gnutls_strerror(ret));
@@ -189,7 +188,6 @@ static void server(int fd)
 	gnutls_deinit(session);
 	gnutls_anon_free_server_credentials(anoncred);
 	gnutls_global_deinit();
-
 }
 
 static void start(void)
@@ -241,5 +239,5 @@ void doit(void)
 	start();
 }
 
-# endif				/* MSG_NOSIGNAL */
-#endif				/* _WIN32 */
+#endif /* MSG_NOSIGNAL */
+#endif /* _WIN32 */

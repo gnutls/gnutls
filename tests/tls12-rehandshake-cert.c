@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -67,9 +67,8 @@ static void test_rehandshake(void **glob_state, unsigned appdata)
 	ret = gnutls_certificate_allocate_credentials(&serverx509cred);
 	assert_return_code(ret, 0);
 
-	ret = gnutls_certificate_set_x509_key_mem(serverx509cred,
-						  &server_cert, &server_key,
-						  GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_key_mem(
+		serverx509cred, &server_cert, &server_key, GNUTLS_X509_FMT_PEM);
 	assert_return_code(ret, 0);
 
 	ret = gnutls_init(&server, GNUTLS_SERVER);
@@ -79,10 +78,8 @@ static void test_rehandshake(void **glob_state, unsigned appdata)
 				     serverx509cred);
 	assert_return_code(ret, 0);
 
-	ret =
-	    gnutls_priority_set_direct(server,
-				       "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.1:+VERS-TLS1.2",
-				       NULL);
+	ret = gnutls_priority_set_direct(
+		server, "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.1:+VERS-TLS1.2", NULL);
 	assert_return_code(ret, 0);
 
 	gnutls_transport_set_push_function(server, server_push);
@@ -100,10 +97,8 @@ static void test_rehandshake(void **glob_state, unsigned appdata)
 				     clientx509cred);
 	assert_return_code(ret, 0);
 
-	ret =
-	    gnutls_priority_set_direct(client,
-				       "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.1:+VERS-TLS1.2",
-				       NULL);
+	ret = gnutls_priority_set_direct(
+		client, "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.1:+VERS-TLS1.2", NULL);
 	assert_return_code(ret, 0);
 
 	gnutls_transport_set_push_function(client, client_push);

@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 /* This is a unit test of _gnutls_record_overhead. */
@@ -49,53 +49,54 @@
 
 /* #pragma doesn't work to suppress preprocessor warnings like -Wunused-macros.
  * So we just use the above defined macros here. */
-#if defined _gnutls_debug_log && defined gnutls_assert && defined gnutls_assert_val
-# include "../lib/algorithms.h"
+#if defined _gnutls_debug_log && defined gnutls_assert && \
+	defined gnutls_assert_val
+#include "../lib/algorithms.h"
 #endif
 
-unsigned _gnutls_record_overhead(const version_entry_st * ver,
-				 const cipher_entry_st * cipher,
-				 const mac_entry_st * mac, unsigned max);
+unsigned _gnutls_record_overhead(const version_entry_st *ver,
+				 const cipher_entry_st *cipher,
+				 const mac_entry_st *mac, unsigned max);
 
-#define OVERHEAD(v, c, m)						\
-	_gnutls_record_overhead(version_to_entry(v), cipher_to_entry(c), mac_to_entry(m), \
-				0)
+#define OVERHEAD(v, c, m)                                                \
+	_gnutls_record_overhead(version_to_entry(v), cipher_to_entry(c), \
+				mac_to_entry(m), 0)
 
-#define MAX_OVERHEAD(v, c, m)						\
-	_gnutls_record_overhead(version_to_entry(v), cipher_to_entry(c), mac_to_entry(m), \
-				1)
+#define MAX_OVERHEAD(v, c, m)                                            \
+	_gnutls_record_overhead(version_to_entry(v), cipher_to_entry(c), \
+				mac_to_entry(m), 1)
 
 static void check_aes_gcm(void **glob_state)
 {
 	const unsigned ov = 16 + 8;
 	/* Under AES-GCM the overhead is constant */
-	assert_int_equal(OVERHEAD
-			 (GNUTLS_TLS1_2, GNUTLS_CIPHER_AES_128_GCM,
-			  GNUTLS_MAC_AEAD), ov);
-	assert_int_equal(MAX_OVERHEAD
-			 (GNUTLS_TLS1_2, GNUTLS_CIPHER_AES_128_GCM,
-			  GNUTLS_MAC_AEAD), ov);
+	assert_int_equal(OVERHEAD(GNUTLS_TLS1_2, GNUTLS_CIPHER_AES_128_GCM,
+				  GNUTLS_MAC_AEAD),
+			 ov);
+	assert_int_equal(MAX_OVERHEAD(GNUTLS_TLS1_2, GNUTLS_CIPHER_AES_128_GCM,
+				      GNUTLS_MAC_AEAD),
+			 ov);
 }
 
 static void check_tls13_aes_gcm(void **glob_state)
 {
 	const unsigned ov = 16 + 1;
 	/* Under AES-GCM the overhead is constant */
-	assert_int_equal(OVERHEAD
-			 (GNUTLS_TLS1_3, GNUTLS_CIPHER_AES_128_GCM,
-			  GNUTLS_MAC_AEAD), ov);
-	assert_int_equal(MAX_OVERHEAD
-			 (GNUTLS_TLS1_3, GNUTLS_CIPHER_AES_128_GCM,
-			  GNUTLS_MAC_AEAD), ov);
+	assert_int_equal(OVERHEAD(GNUTLS_TLS1_3, GNUTLS_CIPHER_AES_128_GCM,
+				  GNUTLS_MAC_AEAD),
+			 ov);
+	assert_int_equal(MAX_OVERHEAD(GNUTLS_TLS1_3, GNUTLS_CIPHER_AES_128_GCM,
+				      GNUTLS_MAC_AEAD),
+			 ov);
 }
 
 static void check_aes_sha1_min(void **glob_state)
 {
 	const unsigned mac = 20;
 	const unsigned block = 16;
-	assert_int_equal(OVERHEAD
-			 (GNUTLS_TLS1_2, GNUTLS_CIPHER_AES_128_CBC,
-			  GNUTLS_MAC_SHA1), 1 + mac + block);
+	assert_int_equal(OVERHEAD(GNUTLS_TLS1_2, GNUTLS_CIPHER_AES_128_CBC,
+				  GNUTLS_MAC_SHA1),
+			 1 + mac + block);
 }
 
 static void check_aes_sha1_max(void **glob_state)
@@ -103,9 +104,9 @@ static void check_aes_sha1_max(void **glob_state)
 	const unsigned mac = 20;
 	const unsigned block = 16;
 
-	assert_int_equal(MAX_OVERHEAD
-			 (GNUTLS_TLS1_2, GNUTLS_CIPHER_AES_128_CBC,
-			  GNUTLS_MAC_SHA1), block + mac + block);
+	assert_int_equal(MAX_OVERHEAD(GNUTLS_TLS1_2, GNUTLS_CIPHER_AES_128_CBC,
+				      GNUTLS_MAC_SHA1),
+			 block + mac + block);
 }
 
 int main(void)

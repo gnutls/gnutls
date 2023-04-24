@@ -33,8 +33,8 @@
 
 #if defined(ENABLE_GOST)
 static int gen_vko_gost_client_kx(gnutls_session_t, gnutls_buffer_st *);
-static int proc_vko_gost_client_kx(gnutls_session_t session,
-				   uint8_t * data, size_t _data_size);
+static int proc_vko_gost_client_kx(gnutls_session_t session, uint8_t *data,
+				   size_t _data_size);
 
 /* VKO GOST Key Exchange:
  * see draft-smyshlyaev-tls12-gost-suites-06, Section 4.2.4
@@ -51,26 +51,24 @@ static int proc_vko_gost_client_kx(gnutls_session_t session,
  * Note, this KX is not PFS one, despite using ephemeral key pairs on client
  * side.
  */
-const mod_auth_st vko_gost_auth_struct = {
-	"VKO_GOST",
-	_gnutls_gen_cert_server_crt,
-	_gnutls_gen_cert_client_crt,
-	NULL,
-	gen_vko_gost_client_kx,
-	_gnutls_gen_cert_client_crt_vrfy,
-	_gnutls_gen_cert_server_cert_req,
+const mod_auth_st vko_gost_auth_struct = { "VKO_GOST",
+					   _gnutls_gen_cert_server_crt,
+					   _gnutls_gen_cert_client_crt,
+					   NULL,
+					   gen_vko_gost_client_kx,
+					   _gnutls_gen_cert_client_crt_vrfy,
+					   _gnutls_gen_cert_server_cert_req,
 
-	_gnutls_proc_crt,
-	_gnutls_proc_crt,
-	NULL,
-	proc_vko_gost_client_kx,
-	_gnutls_proc_cert_client_crt_vrfy,
-	_gnutls_proc_cert_cert_req
-};
+					   _gnutls_proc_crt,
+					   _gnutls_proc_crt,
+					   NULL,
+					   proc_vko_gost_client_kx,
+					   _gnutls_proc_cert_client_crt_vrfy,
+					   _gnutls_proc_cert_cert_req };
 
-# define VKO_GOST_UKM_LEN	8
+#define VKO_GOST_UKM_LEN 8
 
-static int calc_ukm(gnutls_session_t session, uint8_t * ukm)
+static int calc_ukm(gnutls_session_t session, uint8_t *ukm)
 {
 	gnutls_digest_algorithm_t digalg = GNUTLS_DIG_STREEBOG_256;
 	gnutls_hash_hd_t dig;
@@ -91,7 +89,7 @@ static int calc_ukm(gnutls_session_t session, uint8_t * ukm)
 	return gnutls_hash_get_len(digalg);
 }
 
-static int print_priv_key(gnutls_pk_params_st * params)
+static int print_priv_key(gnutls_pk_params_st *params)
 {
 	int ret;
 	uint8_t priv_buf[512 / 8];
@@ -106,15 +104,15 @@ static int print_priv_key(gnutls_pk_params_st * params)
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	_gnutls_hard_log("INT: VKO PRIVATE KEY[%zd]: %s\n",
-			 bytes, _gnutls_bin2hex(priv_buf,
-						bytes, buf, sizeof(buf), NULL));
+	_gnutls_hard_log("INT: VKO PRIVATE KEY[%zd]: %s\n", bytes,
+			 _gnutls_bin2hex(priv_buf, bytes, buf, sizeof(buf),
+					 NULL));
 	return 0;
 }
 
-static int
-vko_prepare_client_keys(gnutls_session_t session,
-			gnutls_pk_params_st * pub, gnutls_pk_params_st * priv)
+static int vko_prepare_client_keys(gnutls_session_t session,
+				   gnutls_pk_params_st *pub,
+				   gnutls_pk_params_st *priv)
 {
 	int ret;
 	gnutls_ecc_curve_t curve;
@@ -126,9 +124,8 @@ vko_prepare_client_keys(gnutls_session_t session,
 	if (info == NULL || info->ncerts == 0)
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-	ret = _gnutls_get_auth_info_pcert(&peer_cert,
-					  session->security_parameters.
-					  server_ctype, info);
+	ret = _gnutls_get_auth_info_pcert(
+		&peer_cert, session->security_parameters.server_ctype, info);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -167,7 +164,7 @@ vko_prepare_client_keys(gnutls_session_t session,
 
 	print_priv_key(priv);
 
-	session->key.key.size = 32;	/* GOST key size */
+	session->key.key.size = 32; /* GOST key size */
 	session->key.key.data = gnutls_malloc(session->key.key.size);
 	if (session->key.key.data == NULL) {
 		gnutls_assert();
@@ -202,9 +199,8 @@ vko_prepare_client_keys(gnutls_session_t session,
    _gnutls_gost_keytrans_decrypt will decrypt GostR3410-KeyTransport
    */
 
-static int
-proc_vko_gost_client_kx(gnutls_session_t session,
-			uint8_t * data, size_t _data_size)
+static int proc_vko_gost_client_kx(gnutls_session_t session, uint8_t *data,
+				   size_t _data_size)
 {
 	int ret, i = 0;
 	ssize_t data_size = _data_size;
@@ -237,7 +233,7 @@ proc_vko_gost_client_kx(gnutls_session_t session,
 	data += i;
 
 	/* Now do the tricky part: determine length of GostR3410-KeyTransport */
-	DECR_LEN(data_size, 1);	/* tag */
+	DECR_LEN(data_size, 1); /* tag */
 	ret = asn1_get_length_der(&data[1], data_size, &len);
 	DECR_LEN_FINAL(data_size, len + ret);
 
@@ -248,19 +244,19 @@ proc_vko_gost_client_kx(gnutls_session_t session,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret = _gnutls_gost_keytrans_decrypt(&privkey->key.x509->params,
-					    &cek, &ukm, &session->key.key);
+	ret = _gnutls_gost_keytrans_decrypt(&privkey->key.x509->params, &cek,
+					    &ukm, &session->key.key);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
 	return 0;
 }
 
-static int
-gen_vko_gost_client_kx(gnutls_session_t session, gnutls_buffer_st * data)
+static int gen_vko_gost_client_kx(gnutls_session_t session,
+				  gnutls_buffer_st *data)
 {
 	int ret;
-	gnutls_datum_t out = { };
+	gnutls_datum_t out = {};
 	uint8_t ukm_data[MAX_HASH_SIZE];
 	gnutls_datum_t ukm = { ukm_data, VKO_GOST_UKM_LEN };
 	gnutls_pk_params_st pub;
@@ -278,9 +274,8 @@ gen_vko_gost_client_kx(gnutls_session_t session, gnutls_buffer_st * data)
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret = _gnutls_gost_keytrans_encrypt(&pub,
-					    &priv,
-					    &session->key.key, &ukm, &out);
+	ret = _gnutls_gost_keytrans_encrypt(&pub, &priv, &session->key.key,
+					    &ukm, &out);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -301,7 +296,7 @@ gen_vko_gost_client_kx(gnutls_session_t session, gnutls_buffer_st * data)
 	}
 
 	ret = data->length;
- cleanup:
+cleanup:
 	/* no longer needed */
 	gnutls_pk_params_release(&priv);
 	gnutls_pk_params_release(&pub);

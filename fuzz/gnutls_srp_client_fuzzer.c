@@ -35,7 +35,7 @@
 #include "mem.h"
 #include "fuzzer.h"
 
-int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
 	int res;
 	gnutls_session_t session;
@@ -54,10 +54,8 @@ int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 	res = gnutls_credentials_set(session, GNUTLS_CRD_SRP, pcred);
 	assert(res >= 0);
 
-	res =
-	    gnutls_priority_set_direct(session,
-				       "NORMAL:-KX-ALL:+SRP:+SRP-RSA:+SRP-DSS",
-				       NULL);
+	res = gnutls_priority_set_direct(
+		session, "NORMAL:-KX-ALL:+SRP:+SRP-RSA:+SRP-DSS", NULL);
 	assert(res >= 0);
 
 	memdata.data = data;

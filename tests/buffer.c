@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -34,12 +34,30 @@ void doit(void)
 		const char *input;
 		const char *output;
 	} test_data[] = {
-		{"%20%20", "  ",},
-		{"%20", " ",},
-		{"%2z", "%2z",},
-		{"%2", "%2",},
-		{"%", "%",},
-		{"", "",},
+		{
+			"%20%20",
+			"  ",
+		},
+		{
+			"%20",
+			" ",
+		},
+		{
+			"%2z",
+			"%2z",
+		},
+		{
+			"%2",
+			"%2",
+		},
+		{
+			"%",
+			"%",
+		},
+		{
+			"",
+			"",
+		},
 	};
 
 	for (unsigned it = 0; it < countof(test_data); it++) {
@@ -49,9 +67,8 @@ void doit(void)
 
 		_gnutls_buffer_init(&str);
 
-		ret =
-		    _gnutls_buffer_append_data(&str, t->input,
-					       strlen(t->input));
+		ret = _gnutls_buffer_append_data(&str, t->input,
+						 strlen(t->input));
 		if (ret < 0)
 			fail("_gnutls_buffer_append_str: %s\n",
 			     gnutls_strerror(ret));

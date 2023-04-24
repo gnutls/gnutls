@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,21 +35,21 @@ int main(void)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
-# include <unistd.h>
-# include <gnutls/gnutls.h>
-# include <gnutls/abstract.h>
-# include <gnutls/urls.h>
-# include <signal.h>
-# include <assert.h>
+#include <string.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <gnutls/gnutls.h>
+#include <gnutls/abstract.h>
+#include <gnutls/urls.h>
+#include <signal.h>
+#include <assert.h>
 
-# include "cert-common.h"
-# include "utils.h"
+#include "cert-common.h"
+#include "utils.h"
 
 static void terminate(void);
 
@@ -96,8 +96,8 @@ static void client(int fd)
 	gnutls_init(&session, GNUTLS_CLIENT);
 
 	/* Use default priorities */
-	assert(gnutls_priority_set_direct
-	       (session, "NORMAL:-VERS-ALL:+VERS-TLS1.2", NULL) >= 0);
+	assert(gnutls_priority_set_direct(
+		       session, "NORMAL:-VERS-ALL:+VERS-TLS1.2", NULL) >= 0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
@@ -107,8 +107,7 @@ static void client(int fd)
 	 */
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret < 0) {
 		fail("client: Handshake failed\n");
@@ -121,8 +120,8 @@ static void client(int fd)
 
 	if (debug)
 		success("client: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
@@ -154,19 +153,16 @@ static void server(int fd)
 	/* this must be called once in the program
 	 */
 	gnutls_certificate_allocate_credentials(&x509_cred);
-	ret =
-	    gnutls_certificate_set_x509_key_file(x509_cred, "nomyurl:cert",
-						 "nomyurl:key",
-						 GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_key_file(
+		x509_cred, "nomyurl:cert", "nomyurl:key", GNUTLS_X509_FMT_PEM);
 	if (ret != GNUTLS_E_FILE_ERROR) {
-		fail("server: gnutls_certificate_set_x509_key_file unexpected error (%s)\n\n", gnutls_strerror(ret));
+		fail("server: gnutls_certificate_set_x509_key_file unexpected error (%s)\n\n",
+		     gnutls_strerror(ret));
 		terminate();
 	}
 
-	ret =
-	    gnutls_certificate_set_x509_key_file(x509_cred, "myurl:cert",
-						 "myurl:key",
-						 GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_key_file(
+		x509_cred, "myurl:cert", "myurl:key", GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
 		fail("server: gnutls_certificate_set_x509_key_file (%s)\n\n",
 		     gnutls_strerror(ret));
@@ -178,8 +174,8 @@ static void server(int fd)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	assert(gnutls_priority_set_direct
-	       (session, "NORMAL:-VERS-ALL:+VERS-TLS1.2", NULL) >= 0);
+	assert(gnutls_priority_set_direct(
+		       session, "NORMAL:-VERS-ALL:+VERS-TLS1.2", NULL) >= 0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
@@ -187,8 +183,7 @@ static void server(int fd)
 
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 	if (ret < 0) {
 		close(fd);
 		gnutls_deinit(session);
@@ -201,8 +196,8 @@ static void server(int fd)
 
 	if (debug)
 		success("server: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	/* do not wait for the peer to close the connection.
 	 */
@@ -219,12 +214,10 @@ static void server(int fd)
 		success("server: finished\n");
 }
 
-const gnutls_custom_url_st custom_url_st = {
-	.name = "myurl:",
-	.name_size = sizeof("myurl:") - 1,
-	.import_key = url_import_key,
-	.import_crt = url_import_crt
-};
+const gnutls_custom_url_st custom_url_st = { .name = "myurl:",
+					     .name_size = sizeof("myurl:") - 1,
+					     .import_key = url_import_key,
+					     .import_crt = url_import_crt };
 
 static void start(void)
 {
@@ -285,4 +278,4 @@ void doit(void)
 	start();
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

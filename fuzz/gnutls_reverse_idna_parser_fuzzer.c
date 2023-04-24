@@ -25,7 +25,7 @@
 
 #include "fuzzer.h"
 
-int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
 	gnutls_datum_t out;
 	int ret;
@@ -37,6 +37,6 @@ int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 	assert(out.size == strlen((char *)out.data));
 	gnutls_free(out.data);
 
- cleanup:
+cleanup:
 	return 0;
 }

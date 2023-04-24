@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -52,12 +52,11 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "%s|<%d>| %s", side, level, str);
 }
 
-static int
-cert_callback(gnutls_session_t session,
-	      const gnutls_datum_t * req_ca_rdn, int nreqs,
-	      const gnutls_pk_algorithm_t * pk_algos,
-	      int pk_algos_length, gnutls_pcert_st ** pcert,
-	      unsigned int *pcert_length, gnutls_privkey_t * pkey)
+static int cert_callback(gnutls_session_t session,
+			 const gnutls_datum_t *req_ca_rdn, int nreqs,
+			 const gnutls_pk_algorithm_t *pk_algos,
+			 int pk_algos_length, gnutls_pcert_st **pcert,
+			 unsigned int *pcert_length, gnutls_privkey_t *pkey)
 {
 	unsigned i;
 
@@ -108,14 +107,14 @@ static void start(const char *prio)
 	/* Init server */
 	gnutls_certificate_allocate_credentials(&serverx509cred);
 
-	assert(gnutls_certificate_set_x509_key_mem
-	       (serverx509cred, &server_cert, &server_key,
-		GNUTLS_X509_FMT_PEM) >= 0);
+	assert(gnutls_certificate_set_x509_key_mem(serverx509cred, &server_cert,
+						   &server_key,
+						   GNUTLS_X509_FMT_PEM) >= 0);
 
-	assert(gnutls_certificate_set_x509_trust_mem
-	       (serverx509cred, CA1_PTR, GNUTLS_X509_FMT_PEM) >= 0);
-	assert(gnutls_certificate_set_x509_trust_mem
-	       (serverx509cred, CA2_PTR, GNUTLS_X509_FMT_PEM) >= 0);
+	assert(gnutls_certificate_set_x509_trust_mem(serverx509cred, CA1_PTR,
+						     GNUTLS_X509_FMT_PEM) >= 0);
+	assert(gnutls_certificate_set_x509_trust_mem(serverx509cred, CA2_PTR,
+						     GNUTLS_X509_FMT_PEM) >= 0);
 
 	gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, serverx509cred);
@@ -131,9 +130,8 @@ static void start(const char *prio)
 	if (ret < 0)
 		exit(1);
 
-	ret =
-	    gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca3_cert,
-						  GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca3_cert,
+						    GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);
 
@@ -170,7 +168,7 @@ static void start(const char *prio)
 	reset_buffers();
 }
 
-static void find_dn(const gnutls_datum_t * cert, gnutls_datum_t * dn)
+static void find_dn(const gnutls_datum_t *cert, gnutls_datum_t *dn)
 {
 	gnutls_x509_crt_t crt;
 

@@ -23,7 +23,7 @@
 /* Parts copied from GnuTLS example programs. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -39,16 +39,16 @@ int main(int argc, char **argv)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <sys/socket.h>
-# if !defined(_WIN32)
-#  include <sys/wait.h>
-# endif
-# include <unistd.h>
-# include <gnutls/gnutls.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#if !defined(_WIN32)
+#include <sys/wait.h>
+#endif
+#include <unistd.h>
+#include <gnutls/gnutls.h>
 
-# include "utils.h"
+#include "utils.h"
 
 /* A very basic TLS client, with PSK authentication.
  */
@@ -60,8 +60,8 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "%s|<%d>| %s", side, level, str);
 }
 
-# define MAX_BUF 1024
-# define MSG "Hello TLS"
+#define MAX_BUF 1024
+#define MSG "Hello TLS"
 
 static void client(int sd, const char *prio, unsigned exp_hint)
 {
@@ -142,7 +142,7 @@ static void client(int sd, const char *prio, unsigned exp_hint)
 
 	gnutls_bye(session, GNUTLS_SHUT_RDWR);
 
- end:
+end:
 
 	close(sd);
 
@@ -156,12 +156,12 @@ static void client(int sd, const char *prio, unsigned exp_hint)
 /* This is a sample TLS 1.0 echo server, for PSK authentication.
  */
 
-# define MAX_BUF 1024
+#define MAX_BUF 1024
 
 /* These are global */
 
-static int
-pskfunc(gnutls_session_t session, const char *username, gnutls_datum_t * key)
+static int pskfunc(gnutls_session_t session, const char *username,
+		   gnutls_datum_t *key)
 {
 	if (debug)
 		printf("psk: username %s\n", username);
@@ -242,11 +242,11 @@ static void server(int sd, const char *prio)
 
 		if (ret == 0) {
 			if (debug)
-				success
-				    ("server: Peer has closed the GnuTLS connection\n");
+				success("server: Peer has closed the GnuTLS connection\n");
 			break;
 		} else if (ret < 0) {
-			fail("server: Received corrupted data(%d). Closing...\n", ret);
+			fail("server: Received corrupted data(%d). Closing...\n",
+			     ret);
 			break;
 		} else if (ret > 0) {
 			/* echo data back to the client
@@ -269,8 +269,7 @@ static void server(int sd, const char *prio)
 		success("server: finished\n");
 }
 
-static
-void run_test(const char *prio, unsigned exp_hint)
+static void run_test(const char *prio, unsigned exp_hint)
 {
 	pid_t child;
 	int err;
@@ -315,12 +314,12 @@ void doit(void)
 	run_test("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+DHE-PSK", 1);
 
 	run_test("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK", 0);
-	run_test
-	    ("NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-FFDHE2048:+DHE-PSK",
-	     0);
-	run_test
-	    ("NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-SECP256R1:+ECDHE-PSK",
-	     0);
+	run_test(
+		"NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-FFDHE2048:+DHE-PSK",
+		0);
+	run_test(
+		"NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-SECP256R1:+ECDHE-PSK",
+		0);
 	/* the following should work once we support PSK without DH */
 	run_test("NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+PSK", 0);
 
@@ -331,4 +330,4 @@ void doit(void)
 	gnutls_dh_params_deinit(dh_params);
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

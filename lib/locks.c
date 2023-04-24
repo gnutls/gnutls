@@ -49,9 +49,8 @@
  *
  * Since: 2.12.0
  **/
-void
-gnutls_global_set_mutex(mutex_init_func init, mutex_deinit_func deinit,
-			mutex_lock_func lock, mutex_unlock_func unlock)
+void gnutls_global_set_mutex(mutex_init_func init, mutex_deinit_func deinit,
+			     mutex_lock_func lock, mutex_unlock_func unlock)
 {
 	if (init == NULL || deinit == NULL || lock == NULL || unlock == NULL) {
 		return;

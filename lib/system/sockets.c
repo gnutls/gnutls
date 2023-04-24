@@ -32,9 +32,9 @@
 #include <sys/types.h>
 
 #ifdef _WIN32
-# include <windows.h>
-#else				/* !_WIN32 */
-# include <poll.h>
+#include <windows.h>
+#else /* !_WIN32 */
+#include <poll.h>
 #endif
 
 /* System specific socket function wrappers.
@@ -44,9 +44,9 @@
 /* Do not use the gnulib functions for sending and receiving data.
  * Using them makes gnutls only working with gnulib applications.
  */
-# undef send
-# undef recv
-# undef select
+#undef send
+#undef recv
+#undef select
 
 int system_errno(gnutls_transport_ptr p)
 {
@@ -74,14 +74,14 @@ int system_errno(gnutls_transport_ptr p)
 	return ret;
 }
 
-ssize_t
-system_write(gnutls_transport_ptr ptr, const void *data, size_t data_size)
+ssize_t system_write(gnutls_transport_ptr ptr, const void *data,
+		     size_t data_size)
 {
 	return send(GNUTLS_POINTER_TO_INT(ptr), data, data_size, 0);
 }
 
-ssize_t
-system_writev(gnutls_transport_ptr_t ptr, const giovec_t * iovec, int iovec_cnt)
+ssize_t system_writev(gnutls_transport_ptr_t ptr, const giovec_t *iovec,
+		      int iovec_cnt)
 {
 	WSABUF bufs[32];
 	DWORD bytes_sent;
@@ -91,28 +91,30 @@ system_writev(gnutls_transport_ptr_t ptr, const giovec_t * iovec, int iovec_cnt)
 	if ((size_t)iovec_cnt > sizeof(bufs) / sizeof(bufs[0]))
 		iovec_cnt = sizeof(bufs) / sizeof(bufs[0]);
 
-	while (to_send_cnt < (DWORD) iovec_cnt && to_send_bytes < SSIZE_MAX) {
+	while (to_send_cnt < (DWORD)iovec_cnt && to_send_bytes < SSIZE_MAX) {
 		bufs[to_send_cnt].buf = iovec[to_send_cnt].iov_base;
 
 		if (to_send_bytes + iovec[to_send_cnt].iov_len > SSIZE_MAX) {
 			/* Return value limit: successful result value cannot
 			 * exceed SSIZE_MAX */
 			size_t space_left = (size_t)SSIZE_MAX - to_send_bytes;
-			bufs[to_send_cnt].len = (unsigned long)
-			    (space_left > ULONG_MAX ? ULONG_MAX : space_left);
+			bufs[to_send_cnt].len =
+				(unsigned long)(space_left > ULONG_MAX ?
+							ULONG_MAX :
+							space_left);
 			to_send_cnt++;
 			break;
 		}
-# ifdef _WIN64
+#ifdef _WIN64
 		if (iovec[to_send_cnt].iov_len > ULONG_MAX) {
 			/* WSASend() limitation */
 			bufs[to_send_cnt].len = ULONG_MAX;
 			to_send_cnt++;
 			break;
 		}
-# endif
+#endif
 		bufs[to_send_cnt].len =
-		    (unsigned long)iovec[to_send_cnt].iov_len;
+			(unsigned long)iovec[to_send_cnt].iov_len;
 		to_send_bytes += iovec[to_send_cnt].iov_len;
 		to_send_cnt++;
 	}
@@ -121,23 +123,22 @@ system_writev(gnutls_transport_ptr_t ptr, const giovec_t * iovec, int iovec_cnt)
 		    0, NULL, NULL) != 0)
 		return -1;
 
-	return (ssize_t) bytes_sent;
+	return (ssize_t)bytes_sent;
 }
 
-#else				/* POSIX */
+#else /* POSIX */
 int system_errno(gnutls_transport_ptr_t ptr)
 {
-# if defined(_AIX) || defined(AIX)
+#if defined(_AIX) || defined(AIX)
 	if (errno == 0)
 		errno = EAGAIN;
-# endif
+#endif
 
 	return errno;
 }
 
-static ssize_t
-_system_writev(gnutls_transport_ptr_t ptr, const giovec_t * iovec,
-	       int iovec_cnt, int flags)
+static ssize_t _system_writev(gnutls_transport_ptr_t ptr, const giovec_t *iovec,
+			      int iovec_cnt, int flags)
 {
 	struct msghdr hdr;
 
@@ -148,18 +149,17 @@ _system_writev(gnutls_transport_ptr_t ptr, const giovec_t * iovec,
 	return sendmsg(GNUTLS_POINTER_TO_INT(ptr), &hdr, flags);
 }
 
-# ifdef MSG_NOSIGNAL
-ssize_t
-system_writev_nosignal(gnutls_transport_ptr_t ptr, const giovec_t * iovec,
-		       int iovec_cnt)
+#ifdef MSG_NOSIGNAL
+ssize_t system_writev_nosignal(gnutls_transport_ptr_t ptr,
+			       const giovec_t *iovec, int iovec_cnt)
 {
 	return _system_writev(ptr, iovec, iovec_cnt, MSG_NOSIGNAL);
 }
 
-# endif
+#endif
 
-ssize_t
-system_writev(gnutls_transport_ptr_t ptr, const giovec_t * iovec, int iovec_cnt)
+ssize_t system_writev(gnutls_transport_ptr_t ptr, const giovec_t *iovec,
+		      int iovec_cnt)
 {
 	return _system_writev(ptr, iovec, iovec_cnt, 0);
 }

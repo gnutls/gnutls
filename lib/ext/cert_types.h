@@ -24,7 +24,7 @@
  */
 
 #ifndef GNUTLS_LIB_EXT_CERT_TYPES_H
-# define GNUTLS_LIB_EXT_CERT_TYPES_H
+#define GNUTLS_LIB_EXT_CERT_TYPES_H
 
 /* Maps IANA TLS Certificate Types identifiers to internal
  * certificate type representation.
@@ -79,11 +79,11 @@ static inline bool is_cert_type_enabled(gnutls_session_t session,
 static inline bool are_alternative_cert_types_allowed(gnutls_session_t session)
 {
 	// OR-ed list of defined cert type init flags
-# define CERT_TYPES_FLAGS GNUTLS_ENABLE_RAWPK
+#define CERT_TYPES_FLAGS GNUTLS_ENABLE_RAWPK
 
 	return session->internals.flags & CERT_TYPES_FLAGS;
 
-# undef CERT_TYPES_FLAGS
+#undef CERT_TYPES_FLAGS
 }
 
-#endif				/* GNUTLS_LIB_EXT_CERT_TYPES_H */
+#endif /* GNUTLS_LIB_EXT_CERT_TYPES_H */

@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 /* This program tests the various certificate key exchange methods supported
@@ -49,10 +49,11 @@ void doit(void)
 		 "NORMAL:-VERS-ALL:+VERS-DTLS1.2:-KX-ALL:+DHE-RSA",
 		 GNUTLS_KX_DHE_RSA, GNUTLS_SIGN_RSA_SHA256,
 		 GNUTLS_SIGN_UNKNOWN);
-	dtls_try("DTLS 1.2 with ecdhe x25519 rsa no-cli-cert",
-		 "NORMAL:-VERS-ALL:+VERS-DTLS1.2:-KX-ALL:+ECDHE-RSA:-CURVE-ALL:+CURVE-X25519",
-		 GNUTLS_KX_ECDHE_RSA, GNUTLS_SIGN_RSA_SHA256,
-		 GNUTLS_SIGN_UNKNOWN);
+	dtls_try(
+		"DTLS 1.2 with ecdhe x25519 rsa no-cli-cert",
+		"NORMAL:-VERS-ALL:+VERS-DTLS1.2:-KX-ALL:+ECDHE-RSA:-CURVE-ALL:+CURVE-X25519",
+		GNUTLS_KX_ECDHE_RSA, GNUTLS_SIGN_RSA_SHA256,
+		GNUTLS_SIGN_UNKNOWN);
 	dtls_try("DTLS 1.2 with ecdhe rsa no-cli-cert",
 		 "NORMAL:-VERS-ALL:+VERS-DTLS1.2:-KX-ALL:+ECDHE-RSA",
 		 GNUTLS_KX_ECDHE_RSA, GNUTLS_SIGN_RSA_SHA256,
@@ -63,19 +64,22 @@ void doit(void)
 			  GNUTLS_SIGN_UNKNOWN, &server_ca3_localhost_ecc_cert,
 			  &server_ca3_ecc_key, NULL, NULL, 0);
 
-	dtls_try("DTLS 1.2 with ecdhe rsa-pss sig no-cli-cert",
-		 "NORMAL:-VERS-ALL:+VERS-DTLS1.2:-KX-ALL:+ECDHE-RSA:-SIGN-ALL:+SIGN-RSA-PSS-RSAE-SHA256",
-		 GNUTLS_KX_ECDHE_RSA, GNUTLS_SIGN_RSA_PSS_RSAE_SHA256,
-		 GNUTLS_SIGN_UNKNOWN);
-	dtls_try("DTLS 1.2 with ecdhe rsa-pss no-cli-cert",
-		 "NORMAL:-VERS-ALL:+VERS-DTLS1.2:-KX-ALL:+ECDHE-RSA:-SIGN-ALL:+SIGN-RSA-PSS-RSAE-SHA256",
-		 GNUTLS_KX_ECDHE_RSA, GNUTLS_SIGN_RSA_PSS_RSAE_SHA256,
-		 GNUTLS_SIGN_UNKNOWN);
-	dtls_try_with_key("TLS 1.2 with ecdhe rsa-pss/rsa-pss no-cli-cert",
-			  "NORMAL:-VERS-ALL:+VERS-DTLS1.2:-KX-ALL:+ECDHE-RSA:-SIGN-ALL:+SIGN-RSA-PSS-SHA256",
-			  GNUTLS_KX_ECDHE_RSA, GNUTLS_SIGN_RSA_PSS_SHA256,
-			  GNUTLS_SIGN_UNKNOWN, &server_ca3_rsa_pss_cert,
-			  &server_ca3_rsa_pss_key, NULL, NULL, 0);
+	dtls_try(
+		"DTLS 1.2 with ecdhe rsa-pss sig no-cli-cert",
+		"NORMAL:-VERS-ALL:+VERS-DTLS1.2:-KX-ALL:+ECDHE-RSA:-SIGN-ALL:+SIGN-RSA-PSS-RSAE-SHA256",
+		GNUTLS_KX_ECDHE_RSA, GNUTLS_SIGN_RSA_PSS_RSAE_SHA256,
+		GNUTLS_SIGN_UNKNOWN);
+	dtls_try(
+		"DTLS 1.2 with ecdhe rsa-pss no-cli-cert",
+		"NORMAL:-VERS-ALL:+VERS-DTLS1.2:-KX-ALL:+ECDHE-RSA:-SIGN-ALL:+SIGN-RSA-PSS-RSAE-SHA256",
+		GNUTLS_KX_ECDHE_RSA, GNUTLS_SIGN_RSA_PSS_RSAE_SHA256,
+		GNUTLS_SIGN_UNKNOWN);
+	dtls_try_with_key(
+		"TLS 1.2 with ecdhe rsa-pss/rsa-pss no-cli-cert",
+		"NORMAL:-VERS-ALL:+VERS-DTLS1.2:-KX-ALL:+ECDHE-RSA:-SIGN-ALL:+SIGN-RSA-PSS-SHA256",
+		GNUTLS_KX_ECDHE_RSA, GNUTLS_SIGN_RSA_PSS_SHA256,
+		GNUTLS_SIGN_UNKNOWN, &server_ca3_rsa_pss_cert,
+		&server_ca3_rsa_pss_key, NULL, NULL, 0);
 	dtls_try("DTLS 1.2 with rsa no-cli-cert",
 		 "NORMAL:-VERS-ALL:+VERS-DTLS1.2:-KX-ALL:+RSA", GNUTLS_KX_RSA,
 		 GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_UNKNOWN);
@@ -106,16 +110,18 @@ void doit(void)
 			  &server_ca3_localhost_ecc_cert, &server_ca3_ecc_key,
 			  USE_CERT);
 
-	dtls_try_cli("DTLS 1.2 with ecdhe-rsa-pss cli-cert",
-		     "NORMAL:-VERS-ALL:+VERS-DTLS1.2:-KX-ALL:+ECDHE-RSA:-SIGN-ALL:+SIGN-RSA-PSS-RSAE-SHA256",
-		     GNUTLS_KX_ECDHE_RSA, GNUTLS_SIGN_RSA_PSS_RSAE_SHA256,
-		     GNUTLS_SIGN_RSA_PSS_RSAE_SHA256, USE_CERT);
-	dtls_try_with_key("DTLS 1.2 with ecdhe-rsa-pss/rsa-pss cli-cert",
-			  "NORMAL:-VERS-ALL:+VERS-DTLS1.2:-KX-ALL:+ECDHE-RSA:-SIGN-ALL:+SIGN-RSA-PSS-SHA256",
-			  GNUTLS_KX_ECDHE_RSA, GNUTLS_SIGN_RSA_PSS_SHA256,
-			  GNUTLS_SIGN_RSA_PSS_SHA256, &server_ca3_rsa_pss_cert,
-			  &server_ca3_rsa_pss_key, &cli_ca3_rsa_pss_cert,
-			  &cli_ca3_rsa_pss_key, USE_CERT);
+	dtls_try_cli(
+		"DTLS 1.2 with ecdhe-rsa-pss cli-cert",
+		"NORMAL:-VERS-ALL:+VERS-DTLS1.2:-KX-ALL:+ECDHE-RSA:-SIGN-ALL:+SIGN-RSA-PSS-RSAE-SHA256",
+		GNUTLS_KX_ECDHE_RSA, GNUTLS_SIGN_RSA_PSS_RSAE_SHA256,
+		GNUTLS_SIGN_RSA_PSS_RSAE_SHA256, USE_CERT);
+	dtls_try_with_key(
+		"DTLS 1.2 with ecdhe-rsa-pss/rsa-pss cli-cert",
+		"NORMAL:-VERS-ALL:+VERS-DTLS1.2:-KX-ALL:+ECDHE-RSA:-SIGN-ALL:+SIGN-RSA-PSS-SHA256",
+		GNUTLS_KX_ECDHE_RSA, GNUTLS_SIGN_RSA_PSS_SHA256,
+		GNUTLS_SIGN_RSA_PSS_SHA256, &server_ca3_rsa_pss_cert,
+		&server_ca3_rsa_pss_key, &cli_ca3_rsa_pss_cert,
+		&cli_ca3_rsa_pss_key, USE_CERT);
 	dtls_try_cli("DTLS 1.2 with dhe-rsa ask cli-cert",
 		     "NORMAL:-VERS-ALL:+VERS-DTLS1.2:-KX-ALL:+DHE-RSA",
 		     GNUTLS_KX_DHE_RSA, GNUTLS_SIGN_RSA_SHA256,

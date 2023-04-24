@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -39,16 +39,16 @@
  * some problematic cases. */
 
 #ifdef ALL_CAPS_URI
-# define PURI "PKCS11:"
+#define PURI "PKCS11:"
 #else
-# define PURI "pkcs11:"
+#define PURI "pkcs11:"
 #endif
 
 #ifdef _WIN32
-# define P11LIB "libpkcs11mock1.dll"
+#define P11LIB "libpkcs11mock1.dll"
 #else
-# include <dlfcn.h>
-# define P11LIB "libpkcs11mock1.so"
+#include <dlfcn.h>
+#define P11LIB "libpkcs11mock1.so"
 #endif
 
 void doit(void)
@@ -81,9 +81,9 @@ void doit(void)
 		exit(1);
 	}
 
-	ret =
-	    gnutls_pkcs11_obj_list_import_url4(&obj_list, &obj_list_size, PURI,
-					       GNUTLS_PKCS11_OBJ_FLAG_PRIVKEY);
+	ret = gnutls_pkcs11_obj_list_import_url4(
+		&obj_list, &obj_list_size, PURI,
+		GNUTLS_PKCS11_OBJ_FLAG_PRIVKEY);
 	if (ret < 0) {
 		fail("%d: %s\n", ret, gnutls_strerror(ret));
 		exit(1);
@@ -113,10 +113,9 @@ void doit(void)
 
 		*pflags = MOCK_FLAG_BROKEN_GET_ATTRIBUTES;
 
-		ret =
-		    gnutls_pkcs11_obj_list_import_url4(&obj_list,
-						       &obj_list_size, PURI,
-						       GNUTLS_PKCS11_OBJ_FLAG_PRIVKEY);
+		ret = gnutls_pkcs11_obj_list_import_url4(
+			&obj_list, &obj_list_size, PURI,
+			GNUTLS_PKCS11_OBJ_FLAG_PRIVKEY);
 		if (ret < 0) {
 			fail("%d: %s\n", ret, gnutls_strerror(ret));
 			exit(1);

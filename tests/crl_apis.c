@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdlib.h>
@@ -36,7 +36,7 @@
 
 static time_t then = 1207000800;
 
-static time_t mytime(time_t * t)
+static time_t mytime(time_t *t)
 {
 	if (t)
 		*t = then;
@@ -45,43 +45,44 @@ static time_t mytime(time_t * t)
 }
 
 static unsigned char saved_crl_pem[] =
-    "-----BEGIN X509 CRL-----\n"
-    "MIICXzCByAIBADANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDEwRDQS0zFw0wODAz\n"
-    "MzEyMjAwMDBaFw0wODAzMzEyMjAyMDBaMFQwFAIDAQIDFw0wODAzMzEyMjAwMDBa\n"
-    "MB0CDFejHTI2Wi75obBaUhcNMDgwMzMxMjIwMDAwWjAdAgxXox0yNbNP0Ln15zwX\n"
-    "DTA4MDMzMTIyMDAwMFqgLzAtMB8GA1UdIwQYMBaAFPmohhljtqQUE2B2DwGaNTbv\n"
-    "8bSvMAoGA1UdFAQDAgEBMA0GCSqGSIb3DQEBCwUAA4IBgQAFpyifa5AJclRpJfjh\n"
-    "QOcSoiCJz5QsrGaK5I/UYHcY958hhFjnE2c9g3wYEEt13M2gkgOTXapImPbLXHv+\n"
-    "cHWGoTqX6+crs7xcC6mFc6JfY7q9O2eP1x386dzCxhsXMti5ml0iOeBpNrMO46Pr\n"
-    "PuvNaY7OE1UgN0Ha3YjmhP8HtWJSQCMmqIo6vP1/HBSzaXP/cjS7f0WBZemj0eE7\n"
-    "wwA1GUoUx9wHipvNkCSKy/eQz4fpOJExrvHeb1/N3po9hfZaZJAqR+rsC0j9J+wd\n"
-    "ZGAdVFKCJUZs0IgsWQqagg0tXGJ8ejdt4yE8zvhhcpf4pcGoYUqtoUPT+Fjnsw7C\n"
-    "P1GCVZQ2ciGxixljTJFdifhqPshgC1Ytd75MkDYH2RRir/JwypQK9CcqIAOjBzTl\n"
-    "uk4SkKL2xAIduw6Dz5kAC7G2EM94uODoI/RO5b6eN6Kb/592JrKAfB96jh2wwqW+\n"
-    "swaA4JPFqNQaiMWW1IXM3VJwXBt8DRSRo46JV5OktvvFRwI=\n"
-    "-----END X509 CRL-----\n";
+	"-----BEGIN X509 CRL-----\n"
+	"MIICXzCByAIBADANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDEwRDQS0zFw0wODAz\n"
+	"MzEyMjAwMDBaFw0wODAzMzEyMjAyMDBaMFQwFAIDAQIDFw0wODAzMzEyMjAwMDBa\n"
+	"MB0CDFejHTI2Wi75obBaUhcNMDgwMzMxMjIwMDAwWjAdAgxXox0yNbNP0Ln15zwX\n"
+	"DTA4MDMzMTIyMDAwMFqgLzAtMB8GA1UdIwQYMBaAFPmohhljtqQUE2B2DwGaNTbv\n"
+	"8bSvMAoGA1UdFAQDAgEBMA0GCSqGSIb3DQEBCwUAA4IBgQAFpyifa5AJclRpJfjh\n"
+	"QOcSoiCJz5QsrGaK5I/UYHcY958hhFjnE2c9g3wYEEt13M2gkgOTXapImPbLXHv+\n"
+	"cHWGoTqX6+crs7xcC6mFc6JfY7q9O2eP1x386dzCxhsXMti5ml0iOeBpNrMO46Pr\n"
+	"PuvNaY7OE1UgN0Ha3YjmhP8HtWJSQCMmqIo6vP1/HBSzaXP/cjS7f0WBZemj0eE7\n"
+	"wwA1GUoUx9wHipvNkCSKy/eQz4fpOJExrvHeb1/N3po9hfZaZJAqR+rsC0j9J+wd\n"
+	"ZGAdVFKCJUZs0IgsWQqagg0tXGJ8ejdt4yE8zvhhcpf4pcGoYUqtoUPT+Fjnsw7C\n"
+	"P1GCVZQ2ciGxixljTJFdifhqPshgC1Ytd75MkDYH2RRir/JwypQK9CcqIAOjBzTl\n"
+	"uk4SkKL2xAIduw6Dz5kAC7G2EM94uODoI/RO5b6eN6Kb/592JrKAfB96jh2wwqW+\n"
+	"swaA4JPFqNQaiMWW1IXM3VJwXBt8DRSRo46JV5OktvvFRwI=\n"
+	"-----END X509 CRL-----\n";
 
 static unsigned char saved_min_crl_pem[] =
-    "-----BEGIN X509 CRL-----\n"
-    "MIICUDCBuQIBADANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDEwRDQS0zFw0wODAz\n"
-    "MzEyMjAwMTBaMFQwFAIDAQIDFw0wODAzMzEyMjAwMTBaMB0CDFejHTI2Wi75obBa\n"
-    "UhcNMDgwMzMxMjIwMDEwWjAdAgxXox0yNbNP0Ln15zwXDTA4MDMzMTIyMDAxMFqg\n"
-    "LzAtMB8GA1UdIwQYMBaAFPmohhljtqQUE2B2DwGaNTbv8bSvMAoGA1UdFAQDAgEB\n"
-    "MA0GCSqGSIb3DQEBCwUAA4IBgQB/Y7MxKf7HpYBoi7N5lNCe7nSd0epQiNPOford\n"
-    "hGb1ZirZk9m67zg146Cwc0W4ipPzW/OjwgUoVQTm21I7oZj/GPItAABlILd6eRQe\n"
-    "jYJap0fxiXV7aMRfu2o3qCRGAITQf306H5zJmpdeNxbxzlr3t6IAHBDbLI1WYXiC\n"
-    "pTHo3wlpwFJEPw5NQ0j6rCAzSH81FHTrEiIOar17uRqeMjbGN6Eo4zjezEx2+ewg\n"
-    "unsdzx4OWx3KgzsQnyV9EoU6l9jREe519mICx7La6DZkhO4dSPJv6R5jEFitWDNB\n"
-    "lxZMA5ePrYXuE/3b+Li89R53O+xZxShLQYwBRSHDue44xUv6hh6YNIKDgt4ycIs8\n"
-    "9JAWsOYJDYUEbAUo+S4sWCU6LzloEvmg7EdJtvJWsScUKK4qbwkDfkBTKjbeBdFj\n"
-    "w6naZIjzbjMPEe8/T+hmu/txFj3fGj/GzOM1GaJNZ4vMWA4Y6LhB+H1Zf3xK+hV0\n"
-    "sc0eYw7RpIzEyc9PPz/uM+XabsI=\n" "-----END X509 CRL-----\n";
+	"-----BEGIN X509 CRL-----\n"
+	"MIICUDCBuQIBADANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDEwRDQS0zFw0wODAz\n"
+	"MzEyMjAwMTBaMFQwFAIDAQIDFw0wODAzMzEyMjAwMTBaMB0CDFejHTI2Wi75obBa\n"
+	"UhcNMDgwMzMxMjIwMDEwWjAdAgxXox0yNbNP0Ln15zwXDTA4MDMzMTIyMDAxMFqg\n"
+	"LzAtMB8GA1UdIwQYMBaAFPmohhljtqQUE2B2DwGaNTbv8bSvMAoGA1UdFAQDAgEB\n"
+	"MA0GCSqGSIb3DQEBCwUAA4IBgQB/Y7MxKf7HpYBoi7N5lNCe7nSd0epQiNPOford\n"
+	"hGb1ZirZk9m67zg146Cwc0W4ipPzW/OjwgUoVQTm21I7oZj/GPItAABlILd6eRQe\n"
+	"jYJap0fxiXV7aMRfu2o3qCRGAITQf306H5zJmpdeNxbxzlr3t6IAHBDbLI1WYXiC\n"
+	"pTHo3wlpwFJEPw5NQ0j6rCAzSH81FHTrEiIOar17uRqeMjbGN6Eo4zjezEx2+ewg\n"
+	"unsdzx4OWx3KgzsQnyV9EoU6l9jREe519mICx7La6DZkhO4dSPJv6R5jEFitWDNB\n"
+	"lxZMA5ePrYXuE/3b+Li89R53O+xZxShLQYwBRSHDue44xUv6hh6YNIKDgt4ycIs8\n"
+	"9JAWsOYJDYUEbAUo+S4sWCU6LzloEvmg7EdJtvJWsScUKK4qbwkDfkBTKjbeBdFj\n"
+	"w6naZIjzbjMPEe8/T+hmu/txFj3fGj/GzOM1GaJNZ4vMWA4Y6LhB+H1Zf3xK+hV0\n"
+	"sc0eYw7RpIzEyc9PPz/uM+XabsI=\n"
+	"-----END X509 CRL-----\n";
 
 const gnutls_datum_t saved_crl = { saved_crl_pem, sizeof(saved_crl_pem) - 1 };
-const gnutls_datum_t saved_min_crl =
-    { saved_min_crl_pem, sizeof(saved_min_crl_pem) - 1 };
+const gnutls_datum_t saved_min_crl = { saved_min_crl_pem,
+				       sizeof(saved_min_crl_pem) - 1 };
 
-static void append_crt(gnutls_x509_crl_t crl, const gnutls_datum_t * pem)
+static void append_crt(gnutls_x509_crl_t crl, const gnutls_datum_t *pem)
 {
 	gnutls_x509_crt_t crt;
 	int ret;
@@ -95,7 +96,7 @@ static void append_crt(gnutls_x509_crl_t crl, const gnutls_datum_t * pem)
 	gnutls_x509_crt_deinit(crt);
 }
 
-static void append_aki(gnutls_x509_crl_t crl, const gnutls_datum_t * pem)
+static void append_aki(gnutls_x509_crl_t crl, const gnutls_datum_t *pem)
 {
 	gnutls_x509_crt_t crt;
 	int ret;
@@ -140,8 +141,8 @@ static void verify_crl(gnutls_x509_crl_t _crl, gnutls_x509_crt_t crt)
 	gnutls_x509_crl_deinit(crl);
 }
 
-static void sign_crl(gnutls_x509_crl_t crl, const gnutls_datum_t * cert,
-		     const gnutls_datum_t * key)
+static void sign_crl(gnutls_x509_crl_t crl, const gnutls_datum_t *cert,
+		     const gnutls_datum_t *key)
 {
 	gnutls_x509_crt_t crt;
 	gnutls_x509_privkey_t pkey;
@@ -201,8 +202,8 @@ static gnutls_x509_crl_t generate_crl(unsigned skip_optional)
 
 	ret = gnutls_x509_crl_set_number(crl, "\x01", 1);
 	if (ret != 0)
-		fail("gnutls_x509_crl_set_number %d: %s\n",
-		     ret, gnutls_strerror(ret));
+		fail("gnutls_x509_crl_set_number %d: %s\n", ret,
+		     gnutls_strerror(ret));
 
 	sign_crl(crl, &ca3_cert, &ca3_key);
 
@@ -210,7 +211,7 @@ static gnutls_x509_crl_t generate_crl(unsigned skip_optional)
 }
 
 static void verify_issuer(gnutls_x509_crl_t crl,
-			  const gnutls_datum_t * issuer_cert)
+			  const gnutls_datum_t *issuer_cert)
 {
 #define DN_MAX_LEN (1024)
 	gnutls_x509_crt_t crt;
@@ -226,32 +227,33 @@ static void verify_issuer(gnutls_x509_crl_t crl,
 	char *crl_issuer = gnutls_calloc(DN_MAX_LEN, sizeof(char));
 	assert(crl_issuer != NULL);
 	size_t crl_issuer_size = DN_MAX_LEN;
-	assert(gnutls_x509_crl_get_issuer_dn(crl, crl_issuer, &crl_issuer_size)
-	       == GNUTLS_E_SUCCESS);
-	assert(crl_issuer_size == issuer_size
-	       && memcmp(crl_issuer, issuer, issuer_size) == 0);
+	assert(gnutls_x509_crl_get_issuer_dn(
+		       crl, crl_issuer, &crl_issuer_size) == GNUTLS_E_SUCCESS);
+	assert(crl_issuer_size == issuer_size &&
+	       memcmp(crl_issuer, issuer, issuer_size) == 0);
 
 	gnutls_datum_t dn;
 	dn.data = NULL;
 	dn.size = 0;
 	assert(gnutls_x509_crl_get_issuer_dn2(crl, &dn) == GNUTLS_E_SUCCESS);
-	assert(dn.size == issuer_size
-	       && memcmp(dn.data, issuer, issuer_size) == 0);
+	assert(dn.size == issuer_size &&
+	       memcmp(dn.data, issuer, issuer_size) == 0);
 	gnutls_free(dn.data);
 	dn.data = NULL;
 	dn.size = 0;
 
 	assert(gnutls_x509_crl_get_issuer_dn3(crl, &dn, 0) == GNUTLS_E_SUCCESS);
-	assert(dn.size == issuer_size
-	       && memcmp(dn.data, issuer, issuer_size) == 0);
+	assert(dn.size == issuer_size &&
+	       memcmp(dn.data, issuer, issuer_size) == 0);
 	gnutls_free(dn.data);
 	dn.data = NULL;
 	dn.size = 0;
 
-	assert(gnutls_x509_crl_get_issuer_dn3
-	       (crl, &dn, GNUTLS_X509_DN_FLAG_COMPAT) == GNUTLS_E_SUCCESS);
-	assert(dn.size == issuer_size
-	       && memcmp(dn.data, issuer, issuer_size) == 0);
+	assert(gnutls_x509_crl_get_issuer_dn3(crl, &dn,
+					      GNUTLS_X509_DN_FLAG_COMPAT) ==
+	       GNUTLS_E_SUCCESS);
+	assert(dn.size == issuer_size &&
+	       memcmp(dn.data, issuer, issuer_size) == 0);
 	gnutls_free(dn.data);
 	dn.data = NULL;
 	dn.size = 0;
@@ -262,7 +264,7 @@ static void verify_issuer(gnutls_x509_crl_t crl,
 }
 
 static void get_dn_by_oid(gnutls_x509_crl_t crl,
-			  const gnutls_datum_t * issuer_cert)
+			  const gnutls_datum_t *issuer_cert)
 {
 	gnutls_x509_crt_t crt;
 	assert(gnutls_x509_crt_init(&crt) >= 0);
@@ -279,8 +281,8 @@ static void get_dn_by_oid(gnutls_x509_crl_t crl,
 	gnutls_x509_crl_get_issuer_dn_by_oid(crl, "2.5.4.3", 0, 0, crl_buf,
 					     &crl_buf_size);
 
-	assert(crt_buf_size == crl_buf_size
-	       && memcmp(crt_buf, crl_buf, crl_buf_size) == 0);
+	assert(crt_buf_size == crl_buf_size &&
+	       memcmp(crt_buf, crl_buf, crl_buf_size) == 0);
 
 	gnutls_free(crt_buf);
 	gnutls_free(crl_buf);
@@ -294,8 +296,8 @@ static void import_der_crl_list(gnutls_x509_crl_t crl)
 
 	gnutls_x509_crl_t crl_list;
 	unsigned int crl_list_max = 1;
-	assert(gnutls_x509_crl_list_import
-	       (&crl_list, &crl_list_max, &out, GNUTLS_X509_FMT_DER, 0) > 0);
+	assert(gnutls_x509_crl_list_import(&crl_list, &crl_list_max, &out,
+					   GNUTLS_X509_FMT_DER, 0) > 0);
 
 	gnutls_free(out.data);
 	gnutls_x509_crl_deinit(crl_list);
@@ -341,5 +343,4 @@ void doit(void)
 
 	gnutls_free(out.data);
 	gnutls_x509_crl_deinit(crl);
-
 }

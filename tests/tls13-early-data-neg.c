@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,23 +35,23 @@ int main(void)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
-# include <unistd.h>
-# include <gnutls/gnutls.h>
-# include <gnutls/crypto.h>
-# include <gnutls/dtls.h>
-# include <signal.h>
-# include <sys/wait.h>
-# include <assert.h>
+#include <string.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <gnutls/gnutls.h>
+#include <gnutls/crypto.h>
+#include <gnutls/dtls.h>
+#include <signal.h>
+#include <sys/wait.h>
+#include <assert.h>
 
-# include "cert-common.h"
-# include "utils.h"
-# include "virt-time.h"
+#include "cert-common.h"
+#include "utils.h"
+#include "virt-time.h"
 
 /* This program tests the robustness of record sending with padding.
  */
@@ -66,22 +66,21 @@ static void client_log_func(int level, const char *str)
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
 
-# define SESSIONS 3
-# define MAX_BUF 1024
-# define MSG "Hello TLS"
-# define EARLY_MSG "Hello TLS, it's early"
-# define PRIORITY "NORMAL:-VERS-ALL:+VERS-TLS1.3"
+#define SESSIONS 3
+#define MAX_BUF 1024
+#define MSG "Hello TLS"
+#define EARLY_MSG "Hello TLS, it's early"
+#define PRIORITY "NORMAL:-VERS-ALL:+VERS-TLS1.3"
 
-static const
-gnutls_datum_t hrnd = { (void *)
-	    "\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+static const gnutls_datum_t hrnd = {
+	(void *)"\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
 	32
 };
 
 static int gnutls_rnd_works;
 
 int __attribute__((visibility("protected")))
-    gnutls_rnd(gnutls_rnd_level_t level, void *data, size_t len)
+gnutls_rnd(gnutls_rnd_level_t level, void *data, size_t len)
 {
 	gnutls_rnd_works = 1;
 
@@ -98,7 +97,7 @@ gnutls_datum_t client_hello_msg = { NULL, 0 };
 
 static int handshake_callback(gnutls_session_t session, unsigned int htype,
 			      unsigned post, unsigned int incoming,
-			      const gnutls_datum_t * msg)
+			      const gnutls_datum_t *msg)
 {
 	assert(client_hello_msg.data == NULL);
 
@@ -155,18 +154,18 @@ static void client(int sds[])
 		gnutls_transport_set_int(session, sd);
 
 		if (t > 0) {
-			assert(gnutls_session_set_data
-			       (session, session_data.data,
-				session_data.size) >= 0);
-			assert(gnutls_record_send_early_data
-			       (session, EARLY_MSG, sizeof(EARLY_MSG)) >= 0);
+			assert(gnutls_session_set_data(session,
+						       session_data.data,
+						       session_data.size) >= 0);
+			assert(gnutls_record_send_early_data(
+				       session, EARLY_MSG, sizeof(EARLY_MSG)) >=
+			       0);
 			assert(gnutls_handshake_set_random(session, &hrnd) >=
 			       0);
 
-			gnutls_handshake_set_hook_function(session,
-							   GNUTLS_HANDSHAKE_CLIENT_HELLO,
-							   GNUTLS_HOOK_POST,
-							   handshake_callback);
+			gnutls_handshake_set_hook_function(
+				session, GNUTLS_HANDSHAKE_CLIENT_HELLO,
+				GNUTLS_HOOK_POST, handshake_callback);
 		}
 
 		/* Perform the TLS handshake
@@ -174,8 +173,7 @@ static void client(int sds[])
 		gnutls_handshake_set_timeout(session, get_timeout());
 		do {
 			ret = gnutls_handshake(session);
-		}
-		while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+		} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 		if (ret < 0) {
 			fail("client: Handshake failed\n");
@@ -203,13 +201,12 @@ static void client(int sds[])
 		gnutls_record_send(session, MSG, strlen(MSG));
 
 		do {
-			ret =
-			    gnutls_record_recv(session, buffer, sizeof(buffer));
+			ret = gnutls_record_recv(session, buffer,
+						 sizeof(buffer));
 		} while (ret == GNUTLS_E_AGAIN);
 		if (ret == 0) {
 			if (debug)
-				success
-				    ("client: Peer has closed the TLS connection\n");
+				success("client: Peer has closed the TLS connection\n");
 			goto end;
 		} else if (ret < 0) {
 			fail("client: Error: %s\n", gnutls_strerror(ret));
@@ -225,12 +222,11 @@ static void client(int sds[])
 
 	assert(client_hello_msg.data != NULL);
 
-	ret =
-	    send(sds[SESSIONS - 1], client_hello_msg.data,
-		 client_hello_msg.size, 0);
+	ret = send(sds[SESSIONS - 1], client_hello_msg.data,
+		   client_hello_msg.size, 0);
 	assert(ret == (int)client_hello_msg.size);
 
- end:
+end:
 	gnutls_free(client_hello_msg.data);
 	gnutls_free(session_data.data);
 	gnutls_certificate_free_credentials(x509_cred);
@@ -238,16 +234,15 @@ static void client(int sds[])
 
 static pid_t child;
 
-# define MAX_CLIENT_HELLO_RECORDED 10
+#define MAX_CLIENT_HELLO_RECORDED 10
 
 struct storage_st {
 	gnutls_datum_t entries[MAX_CLIENT_HELLO_RECORDED];
 	size_t num_entries;
 };
 
-static int
-storage_add(void *ptr, time_t expires, const gnutls_datum_t * key,
-	    const gnutls_datum_t * value)
+static int storage_add(void *ptr, time_t expires, const gnutls_datum_t *key,
+		       const gnutls_datum_t *value)
 {
 	struct storage_st *storage = ptr;
 	gnutls_datum_t *datum;
@@ -255,8 +250,8 @@ storage_add(void *ptr, time_t expires, const gnutls_datum_t * key,
 
 	for (i = 0; i < storage->num_entries; i++) {
 		if (key->size == storage->entries[i].size &&
-		    memcmp(storage->entries[i].data, key->data,
-			   key->size) == 0) {
+		    memcmp(storage->entries[i].data, key->data, key->size) ==
+			    0) {
 			return GNUTLS_E_DB_ENTRY_EXISTS;
 		}
 	}
@@ -327,9 +322,9 @@ static void server(int sds[])
 
 		success("=== session %d ===\n", t);
 
-		assert(gnutls_init
-		       (&session,
-			GNUTLS_SERVER | GNUTLS_ENABLE_EARLY_DATA) >= 0);
+		assert(gnutls_init(&session,
+				   GNUTLS_SERVER | GNUTLS_ENABLE_EARLY_DATA) >=
+		       0);
 
 		assert(gnutls_priority_set_direct(session, PRIORITY, NULL) >=
 		       0);
@@ -350,23 +345,23 @@ static void server(int sds[])
 
 		if (t == SESSIONS - 1) {
 			/* duplicate data expected */
-			if (ret < 0
-			    && !(gnutls_session_get_flags(session) &
-				 GNUTLS_SFLAGS_EARLY_DATA)) {
+			if (ret < 0 && !(gnutls_session_get_flags(session) &
+					 GNUTLS_SFLAGS_EARLY_DATA)) {
 				success("we detected the duplicate data!\n");
 				close(sd);
 				gnutls_deinit(session);
 				goto cleanup;
 			} else {
-				fail("server: duplicate early data was not detected (%d)\n", t);
+				fail("server: duplicate early data was not detected (%d)\n",
+				     t);
 			}
 		}
 
 		if (ret < 0) {
 			close(sd);
 			gnutls_deinit(session);
-			fail("server[%d]: Handshake has failed (%s)\n\n",
-			     t, gnutls_strerror(ret));
+			fail("server[%d]: Handshake has failed (%s)\n\n", t,
+			     gnutls_strerror(ret));
 			return;
 		}
 		if (debug)
@@ -382,39 +377,36 @@ static void server(int sds[])
 			 * early data only on the first resumption */
 			if (t == 1) {
 				if (gnutls_rnd_works) {
-					if (!
-					    (gnutls_session_get_flags(session) &
-					     GNUTLS_SFLAGS_EARLY_DATA)) {
-						fail("server: early data is not received (%d)\n", t);
+					if (!(gnutls_session_get_flags(session) &
+					      GNUTLS_SFLAGS_EARLY_DATA)) {
+						fail("server: early data is not received (%d)\n",
+						     t);
 					}
 				} else {
-					success
-					    ("server: gnutls_rnd() could not be overridden, skip checking replay (%d)\n",
-					     t);
+					success("server: gnutls_rnd() could not be overridden, skip checking replay (%d)\n",
+						t);
 				}
 
-				ret =
-				    gnutls_record_recv_early_data(session,
-								  buffer,
-								  sizeof
-								  (buffer));
+				ret = gnutls_record_recv_early_data(
+					session, buffer, sizeof(buffer));
 				if (ret < 0) {
-					fail("server: failed to retrieve early data: %s\n", gnutls_strerror(ret));
+					fail("server: failed to retrieve early data: %s\n",
+					     gnutls_strerror(ret));
 				}
 
-				if (ret != sizeof(EARLY_MSG)
-				    || memcmp(buffer, EARLY_MSG, ret))
+				if (ret != sizeof(EARLY_MSG) ||
+				    memcmp(buffer, EARLY_MSG, ret))
 					fail("server: early data mismatch\n");
 			} else {
 				if (gnutls_rnd_works) {
 					if (gnutls_session_get_flags(session) &
 					    GNUTLS_SFLAGS_EARLY_DATA) {
-						fail("server: early data is not rejected (%d)\n", t);
+						fail("server: early data is not rejected (%d)\n",
+						     t);
 					}
 				} else {
-					success
-					    ("server: gnutls_rnd() could not be overridden, skip checking replay (%d)\n",
-					     t);
+					success("server: gnutls_rnd() could not be overridden, skip checking replay (%d)\n",
+						t);
 				}
 			}
 		}
@@ -425,12 +417,12 @@ static void server(int sds[])
 
 			if (ret == 0) {
 				if (debug)
-					success
-					    ("server: Peer has closed the GnuTLS connection\n");
+					success("server: Peer has closed the GnuTLS connection\n");
 				break;
 			} else if (ret < 0) {
 				kill(child, SIGTERM);
-				fail("server: Received corrupted data(%d). Closing...\n", ret);
+				fail("server: Received corrupted data(%d). Closing...\n",
+				     ret);
 				break;
 			} else if (ret > 0) {
 				/* echo data back to the client
@@ -448,7 +440,7 @@ static void server(int sds[])
 		gnutls_deinit(session);
 	}
 
- cleanup:
+cleanup:
 	gnutls_anti_replay_deinit(anti_replay);
 
 	storage_clear(&storage);
@@ -505,4 +497,4 @@ void doit(void)
 	}
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

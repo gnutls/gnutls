@@ -25,7 +25,7 @@
 #include "errors.h"
 #include <num.h>
 #include <mpi.h>
-#include <nettle/bignum.h>	/* includes gmp.h */
+#include <nettle/bignum.h> /* includes gmp.h */
 
 static void gnutls_free_zero(void *data, size_t size);
 static void *gnutls_realloc_zero(void *data, size_t old_size, size_t new_size);

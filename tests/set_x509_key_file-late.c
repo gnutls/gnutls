@@ -25,7 +25,7 @@
  * is called */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -40,8 +40,7 @@
 #include "utils.h"
 
 static unsigned set_cert(gnutls_certificate_credentials_t xcred,
-			 const gnutls_datum_t * key,
-			 const gnutls_datum_t * cert)
+			 const gnutls_datum_t *key, const gnutls_datum_t *cert)
 {
 	const char *certfile;
 	FILE *fp;
@@ -56,9 +55,8 @@ static unsigned set_cert(gnutls_certificate_credentials_t xcred,
 	assert(fwrite(key->data, 1, key->size, fp) > 0);
 	fclose(fp);
 
-	ret = gnutls_certificate_set_x509_key_file2(xcred, certfile, certfile,
-						    GNUTLS_X509_FMT_PEM, NULL,
-						    0);
+	ret = gnutls_certificate_set_x509_key_file2(
+		xcred, certfile, certfile, GNUTLS_X509_FMT_PEM, NULL, 0);
 	if (ret < 0)
 		fail("set_x509_key_file failed: %s\n", gnutls_strerror(ret));
 
@@ -66,10 +64,9 @@ static unsigned set_cert(gnutls_certificate_credentials_t xcred,
 	return ret;
 }
 
-static
-int handshake_hook_func(gnutls_session_t session, unsigned int htype,
-			unsigned when, unsigned int incoming,
-			const gnutls_datum_t * msg)
+static int handshake_hook_func(gnutls_session_t session, unsigned int htype,
+			       unsigned when, unsigned int incoming,
+			       const gnutls_datum_t *msg)
 {
 	gnutls_certificate_credentials_t xcred;
 	int idx;
@@ -79,8 +76,8 @@ int handshake_hook_func(gnutls_session_t session, unsigned int htype,
 	assert(gnutls_certificate_allocate_credentials(&xcred) >= 0);
 
 	gnutls_certificate_set_flags(xcred, GNUTLS_CERTIFICATE_API_V2);
-	idx =
-	    set_cert(xcred, &server_ca3_key, &server_ca3_localhost6_cert_chain);
+	idx = set_cert(xcred, &server_ca3_key,
+		       &server_ca3_localhost6_cert_chain);
 	assert(idx == 0);
 
 	idx = set_cert(xcred, &server_ca3_key, &server_ca3_localhost_cert);
@@ -102,9 +99,8 @@ static void start(const char *prio)
 
 	assert(gnutls_certificate_allocate_credentials(&clicred) >= 0);
 
-	ret =
-	    gnutls_certificate_set_x509_trust_mem(clicred, &subca3_cert,
-						  GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_trust_mem(clicred, &subca3_cert,
+						    GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		fail("set_x509_trust_file failed: %s\n", gnutls_strerror(ret));
 
@@ -134,8 +130,8 @@ static void start(const char *prio)
 
 	HANDSHAKE(client, server);
 
-	assert(gnutls_credentials_get
-	       (server, GNUTLS_CRD_CERTIFICATE, (void *)&xcred) >= 0);
+	assert(gnutls_credentials_get(server, GNUTLS_CRD_CERTIFICATE,
+				      (void *)&xcred) >= 0);
 
 	gnutls_deinit(client);
 	gnutls_deinit(server);

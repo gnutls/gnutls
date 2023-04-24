@@ -33,8 +33,10 @@ typedef struct {
 	const char *desc;
 } gnutls_alert_entry;
 
-#define ALERT_ENTRY(x,y) \
-  {x, #x, y}
+#define ALERT_ENTRY(x, y) \
+	{                 \
+		x, #x, y  \
+	}
 
 static const gnutls_alert_entry sup_alerts[] = {
 	ALERT_ENTRY(GNUTLS_A_CLOSE_NOTIFY, N_("Close notify")),
@@ -42,26 +44,22 @@ static const gnutls_alert_entry sup_alerts[] = {
 	ALERT_ENTRY(GNUTLS_A_BAD_RECORD_MAC, N_("Bad record MAC")),
 	ALERT_ENTRY(GNUTLS_A_DECRYPTION_FAILED, N_("Decryption failed")),
 	ALERT_ENTRY(GNUTLS_A_RECORD_OVERFLOW, N_("Record overflow")),
-	ALERT_ENTRY(GNUTLS_A_DECOMPRESSION_FAILURE,
-		    N_("Decompression failed")),
+	ALERT_ENTRY(GNUTLS_A_DECOMPRESSION_FAILURE, N_("Decompression failed")),
 	ALERT_ENTRY(GNUTLS_A_HANDSHAKE_FAILURE, N_("Handshake failed")),
 	ALERT_ENTRY(GNUTLS_A_BAD_CERTIFICATE, N_("Certificate is bad")),
 	ALERT_ENTRY(GNUTLS_A_UNSUPPORTED_CERTIFICATE,
 		    N_("Certificate is not supported")),
 	ALERT_ENTRY(GNUTLS_A_CERTIFICATE_REVOKED,
 		    N_("Certificate was revoked")),
-	ALERT_ENTRY(GNUTLS_A_CERTIFICATE_EXPIRED,
-		    N_("Certificate is expired")),
-	ALERT_ENTRY(GNUTLS_A_CERTIFICATE_UNKNOWN,
-		    N_("Unknown certificate")),
+	ALERT_ENTRY(GNUTLS_A_CERTIFICATE_EXPIRED, N_("Certificate is expired")),
+	ALERT_ENTRY(GNUTLS_A_CERTIFICATE_UNKNOWN, N_("Unknown certificate")),
 	ALERT_ENTRY(GNUTLS_A_ILLEGAL_PARAMETER, N_("Illegal parameter")),
 	ALERT_ENTRY(GNUTLS_A_UNKNOWN_CA, N_("CA is unknown")),
 	ALERT_ENTRY(GNUTLS_A_ACCESS_DENIED, N_("Access was denied")),
 	ALERT_ENTRY(GNUTLS_A_DECODE_ERROR, N_("Decode error")),
 	ALERT_ENTRY(GNUTLS_A_DECRYPT_ERROR, N_("Decrypt error")),
 	ALERT_ENTRY(GNUTLS_A_EXPORT_RESTRICTION, N_("Export restriction")),
-	ALERT_ENTRY(GNUTLS_A_PROTOCOL_VERSION,
-		    N_("Error in protocol version")),
+	ALERT_ENTRY(GNUTLS_A_PROTOCOL_VERSION, N_("Error in protocol version")),
 	ALERT_ENTRY(GNUTLS_A_INSUFFICIENT_SECURITY,
 		    N_("Insufficient security")),
 	ALERT_ENTRY(GNUTLS_A_USER_CANCELED, N_("User canceled")),
@@ -83,11 +81,10 @@ static const gnutls_alert_entry sup_alerts[] = {
 	ALERT_ENTRY(GNUTLS_A_MISSING_EXTENSION,
 		    N_("An extension was expected but was not seen")),
 	ALERT_ENTRY(GNUTLS_A_NO_APPLICATION_PROTOCOL,
-		    N_
-		    ("No supported application protocol could be negotiated")),
+		    N_("No supported application protocol could be negotiated")),
 	ALERT_ENTRY(GNUTLS_A_CERTIFICATE_REQUIRED,
 		    N_("Certificate is required")),
-	{0, NULL, NULL}
+	{ 0, NULL, NULL }
 };
 
 /**
@@ -149,22 +146,21 @@ const char *gnutls_alert_get_strname(gnutls_alert_description_t alert)
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
  **/
-int
-gnutls_alert_send(gnutls_session_t session, gnutls_alert_level_t level,
-		  gnutls_alert_description_t desc)
+int gnutls_alert_send(gnutls_session_t session, gnutls_alert_level_t level,
+		      gnutls_alert_description_t desc)
 {
 	uint8_t data[2];
 	int ret;
 	const char *name;
 
-	data[0] = (uint8_t) level;
-	data[1] = (uint8_t) desc;
+	data[0] = (uint8_t)level;
+	data[1] = (uint8_t)desc;
 
-	name = gnutls_alert_get_name((gnutls_alert_description_t) data[1]);
+	name = gnutls_alert_get_name((gnutls_alert_description_t)data[1]);
 	if (name == NULL)
 		name = "(unknown)";
-	_gnutls_record_log("REC: Sending Alert[%d|%d] - %s\n", data[0],
-			   data[1], name);
+	_gnutls_record_log("REC: Sending Alert[%d|%d] - %s\n", data[0], data[1],
+			   name);
 
 	if (session->internals.alert_read_func) {
 		record_parameters_st *params;
@@ -172,17 +168,16 @@ gnutls_alert_send(gnutls_session_t session, gnutls_alert_level_t level,
 		ret = _gnutls_epoch_get(session, EPOCH_WRITE_CURRENT, &params);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
-		ret = session->internals.alert_read_func(session,
-							 params->write.level,
-							 level, desc);
+		ret = session->internals.alert_read_func(
+			session, params->write.level, level, desc);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
 		return ret;
 	}
 
-	ret = _gnutls_send_int(session, GNUTLS_ALERT, -1,
-			       EPOCH_WRITE_CURRENT, data, 2, MBUFFER_FLUSH);
+	ret = _gnutls_send_int(session, GNUTLS_ALERT, -1, EPOCH_WRITE_CURRENT,
+			       data, 2, MBUFFER_FLUSH);
 
 	return (ret < 0) ? ret : 0;
 }
@@ -207,7 +202,7 @@ int gnutls_error_to_alert(int err, int *level)
 {
 	int ret, _level = -1;
 
-	switch (err) {		/* send appropriate alert */
+	switch (err) { /* send appropriate alert */
 	case GNUTLS_E_PK_SIG_VERIFY_FAILED:
 	case GNUTLS_E_ERROR_IN_FINISHED_PACKET:
 		ret = GNUTLS_A_DECRYPT_ERROR;
@@ -384,14 +379,14 @@ int gnutls_alert_send_appropriate(gnutls_session_t session, int err)
 	int alert;
 	int level;
 
-	if (err != GNUTLS_E_REHANDSHAKE && (!gnutls_error_is_fatal(err) ||
-					    err ==
-					    GNUTLS_E_FATAL_ALERT_RECEIVED))
+	if (err != GNUTLS_E_REHANDSHAKE &&
+	    (!gnutls_error_is_fatal(err) ||
+	     err == GNUTLS_E_FATAL_ALERT_RECEIVED))
 		return gnutls_assert_val(0);
 
 	alert = gnutls_error_to_alert(err, &level);
 
-	return gnutls_alert_send(session, (gnutls_alert_level_t) level, alert);
+	return gnutls_alert_send(session, (gnutls_alert_level_t)level, alert);
 }
 
 /**
@@ -409,5 +404,5 @@ int gnutls_alert_send_appropriate(gnutls_session_t session, int err)
  **/
 gnutls_alert_description_t gnutls_alert_get(gnutls_session_t session)
 {
-	return (gnutls_alert_description_t) session->internals.last_alert;
+	return (gnutls_alert_description_t)session->internals.last_alert;
 }

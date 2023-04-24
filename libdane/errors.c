@@ -25,11 +25,13 @@
 
 /* I18n of error codes. */
 #include "gettext.h"
-#define _(String) dgettext (PACKAGE, String)
-#define N_(String) gettext_noop (String)
+#define _(String) dgettext(PACKAGE, String)
+#define N_(String) gettext_noop(String)
 
-#define ERROR_ENTRY(desc, name) \
-	{ desc, #name, name}
+#define ERROR_ENTRY(desc, name)   \
+	{                         \
+		desc, #name, name \
+	}
 
 struct error_entry {
 	const char *desc;
@@ -44,31 +46,24 @@ static const error_entry error_algorithms[] = {
 		    DANE_E_INITIALIZATION_ERROR),
 	ERROR_ENTRY(N_("There was an error while resolving."),
 		    DANE_E_RESOLVING_ERROR),
-	ERROR_ENTRY(N_("No DANE data were found."),
-		    DANE_E_NO_DANE_DATA),
+	ERROR_ENTRY(N_("No DANE data were found."), DANE_E_NO_DANE_DATA),
 	ERROR_ENTRY(N_("Unknown DANE data were found."),
 		    DANE_E_UNKNOWN_DANE_DATA),
-	ERROR_ENTRY(N_("No DNSSEC signature was found."),
-		    DANE_E_NO_DNSSEC_SIG),
-	ERROR_ENTRY(N_("Received corrupt data."),
-		    DANE_E_RECEIVED_CORRUPT_DATA),
+	ERROR_ENTRY(N_("No DNSSEC signature was found."), DANE_E_NO_DNSSEC_SIG),
+	ERROR_ENTRY(N_("Received corrupt data."), DANE_E_RECEIVED_CORRUPT_DATA),
 	ERROR_ENTRY(N_("The DNSSEC signature is invalid."),
 		    DANE_E_INVALID_DNSSEC_SIG),
-	ERROR_ENTRY(N_("There was a memory error."),
-		    DANE_E_MEMORY_ERROR),
+	ERROR_ENTRY(N_("There was a memory error."), DANE_E_MEMORY_ERROR),
 	ERROR_ENTRY(N_("The requested data are not available."),
 		    DANE_E_REQUESTED_DATA_NOT_AVAILABLE),
-	ERROR_ENTRY(N_("The request is invalid."),
-		    DANE_E_INVALID_REQUEST),
+	ERROR_ENTRY(N_("The request is invalid."), DANE_E_INVALID_REQUEST),
 	ERROR_ENTRY(N_("There was an error in the certificate."),
 		    DANE_E_CERT_ERROR),
 	ERROR_ENTRY(N_("There was an error in the public key."),
 		    DANE_E_PUBKEY_ERROR),
-	ERROR_ENTRY(N_("No certificate was found."),
-		    DANE_E_NO_CERT),
-	ERROR_ENTRY(N_("Error in file."),
-		    DANE_E_FILE_ERROR),
-	{NULL, NULL, 0}
+	ERROR_ENTRY(N_("No certificate was found."), DANE_E_NO_CERT),
+	ERROR_ENTRY(N_("Error in file."), DANE_E_FILE_ERROR),
+	{ NULL, NULL, 0 }
 };
 
 /**

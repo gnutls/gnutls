@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -44,8 +44,7 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "%s|<%d>| %s", side, level, str);
 }
 
-static
-void start(const char *prio)
+static void start(const char *prio)
 {
 	int ret;
 	/* Server stuff. */
@@ -74,9 +73,8 @@ void start(const char *prio)
 
 	/* Init server */
 	gnutls_certificate_allocate_credentials(&serverx509cred);
-	gnutls_certificate_set_x509_key_mem(serverx509cred,
-					    &server2_cert, &server2_key,
-					    GNUTLS_X509_FMT_PEM);
+	gnutls_certificate_set_x509_key_mem(serverx509cred, &server2_cert,
+					    &server2_key, GNUTLS_X509_FMT_PEM);
 
 	gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, serverx509cred);
@@ -94,9 +92,8 @@ void start(const char *prio)
 	if (ret < 0)
 		exit(1);
 
-	ret =
-	    gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca2_cert,
-						  GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca2_cert,
+						    GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);
 
@@ -168,8 +165,8 @@ void start(const char *prio)
 			fail("error in client's master secret\n");
 		}
 
-		if (v1.size != v2.size
-		    || memcmp(v1.data, v2.data, v1.size) != 0) {
+		if (v1.size != v2.size ||
+		    memcmp(v1.data, v2.data, v1.size) != 0) {
 			fail("master secret don't match!\n");
 		}
 	}

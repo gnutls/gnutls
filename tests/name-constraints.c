@@ -22,7 +22,7 @@
 /* Parts copied from GnuTLS example programs. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -48,7 +48,7 @@ static void check_for_error(int ret)
 #define NAME_REJECTED 0
 
 static void check_test_result(int ret, int expected_outcome,
-			      gnutls_datum_t * tested_data)
+			      gnutls_datum_t *tested_data)
 {
 	if (expected_outcome == NAME_ACCEPTED ? ret == 0 : ret != 0) {
 		if (expected_outcome == NAME_ACCEPTED) {
@@ -61,7 +61,7 @@ static void check_test_result(int ret, int expected_outcome,
 	}
 }
 
-static void set_name(const char *name, gnutls_datum_t * datum)
+static void set_name(const char *name, gnutls_datum_t *datum)
 {
 	datum->data = (unsigned char *)name;
 	datum->size = strlen((char *)name);
@@ -73,48 +73,49 @@ static void tls_log_func(int level, const char *str)
 }
 
 static unsigned char cert_pem[] =
-    "-----BEGIN CERTIFICATE-----\n"
-    "MIIEMTCCAxmgAwIBAgIBADANBgkqhkiG9w0BAQUFADCBlTELMAkGA1UEBhMCR1Ix\n"
-    "RDBCBgNVBAoTO0hlbGxlbmljIEFjYWRlbWljIGFuZCBSZXNlYXJjaCBJbnN0aXR1\n"
-    "dGlvbnMgQ2VydC4gQXV0aG9yaXR5MUAwPgYDVQQDEzdIZWxsZW5pYyBBY2FkZW1p\n"
-    "YyBhbmQgUmVzZWFyY2ggSW5zdGl0dXRpb25zIFJvb3RDQSAyMDExMB4XDTExMTIw\n"
-    "NjEzNDk1MloXDTMxMTIwMTEzNDk1MlowgZUxCzAJBgNVBAYTAkdSMUQwQgYDVQQK\n"
-    "EztIZWxsZW5pYyBBY2FkZW1pYyBhbmQgUmVzZWFyY2ggSW5zdGl0dXRpb25zIENl\n"
-    "cnQuIEF1dGhvcml0eTFAMD4GA1UEAxM3SGVsbGVuaWMgQWNhZGVtaWMgYW5kIFJl\n"
-    "c2VhcmNoIEluc3RpdHV0aW9ucyBSb290Q0EgMjAxMTCCASIwDQYJKoZIhvcNAQEB\n"
-    "BQADggEPADCCAQoCggEBAKlTAOMupvaO+mDYLZU++CwqVE7NuYRhlFhPjz2L5EPz\n"
-    "dYmNUeTDN9KKiE15HrcS3UN4SoqS5tdI1Q+kOilENbgH9mgdVc04UfCMJDGFr4PJ\n"
-    "fel3r+0ae50X+bOdOFAPplp5kYCvN66m0zH7tSYJnTxa71HFK9+WXesyHgLacEns\n"
-    "bgzImjeN9/E2YEsmLIKe0HjzDQ9jpFEw4fkrJxIH2Oq9GGKYsFk3fb7u8yBRQlqD\n"
-    "75O6aRXxYp2fmTmCobd0LovUxQt7L/DICto9eQqakxylKHJzkUOap9FNhYS5qXSP\n"
-    "FEDH3N6sQWRstBmbAmNtJGSPRLIl6s5ddAxjMlyNh+UCAwEAAaOBiTCBhjAPBgNV\n"
-    "HRMBAf8EBTADAQH/MAsGA1UdDwQEAwIBBjAdBgNVHQ4EFgQUppFC/RNhSiOeCKQp\n"
-    "5dgTBCPuQSUwRwYDVR0eBEAwPqA8MAWCAy5ncjAFggMuZXUwBoIELmVkdTAGggQu\n"
-    "b3JnMAWBAy5ncjAFgQMuZXUwBoEELmVkdTAGgQQub3JnMA0GCSqGSIb3DQEBBQUA\n"
-    "A4IBAQAf73lB4XtuP7KMhjdCSk4cNx6NZrokgclPEg8hwAOXhiVtXdMiKahsog2p\n"
-    "6z0GW5k6x8zDmjR/qw7IThzh+uTczQ2+vyT+bOdrwg3IBp5OjWEopmr95fZi6hg8\n"
-    "TqBTnbI6nOulnJEWtk2C4AwFSKls9cz4y51JtPACpf1wA+2KIaWuE4ZJwzNzvoc7\n"
-    "dIsXRSZMFpGD/md9zU1jZ/rzAxKWeAaNsWftjj++n08C9bMJL/NMh98qy5V8Acys\n"
-    "Nnq/onN694/BtZqhFLKPM58N7yLcZnuEvUUXBj08yrl3NI/K6s8/MT7jiOOASSXI\n"
-    "l7WdmplNsDz4SgCbZN2fOUvRJ9e4\n" "-----END CERTIFICATE-----\n";
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIEMTCCAxmgAwIBAgIBADANBgkqhkiG9w0BAQUFADCBlTELMAkGA1UEBhMCR1Ix\n"
+	"RDBCBgNVBAoTO0hlbGxlbmljIEFjYWRlbWljIGFuZCBSZXNlYXJjaCBJbnN0aXR1\n"
+	"dGlvbnMgQ2VydC4gQXV0aG9yaXR5MUAwPgYDVQQDEzdIZWxsZW5pYyBBY2FkZW1p\n"
+	"YyBhbmQgUmVzZWFyY2ggSW5zdGl0dXRpb25zIFJvb3RDQSAyMDExMB4XDTExMTIw\n"
+	"NjEzNDk1MloXDTMxMTIwMTEzNDk1MlowgZUxCzAJBgNVBAYTAkdSMUQwQgYDVQQK\n"
+	"EztIZWxsZW5pYyBBY2FkZW1pYyBhbmQgUmVzZWFyY2ggSW5zdGl0dXRpb25zIENl\n"
+	"cnQuIEF1dGhvcml0eTFAMD4GA1UEAxM3SGVsbGVuaWMgQWNhZGVtaWMgYW5kIFJl\n"
+	"c2VhcmNoIEluc3RpdHV0aW9ucyBSb290Q0EgMjAxMTCCASIwDQYJKoZIhvcNAQEB\n"
+	"BQADggEPADCCAQoCggEBAKlTAOMupvaO+mDYLZU++CwqVE7NuYRhlFhPjz2L5EPz\n"
+	"dYmNUeTDN9KKiE15HrcS3UN4SoqS5tdI1Q+kOilENbgH9mgdVc04UfCMJDGFr4PJ\n"
+	"fel3r+0ae50X+bOdOFAPplp5kYCvN66m0zH7tSYJnTxa71HFK9+WXesyHgLacEns\n"
+	"bgzImjeN9/E2YEsmLIKe0HjzDQ9jpFEw4fkrJxIH2Oq9GGKYsFk3fb7u8yBRQlqD\n"
+	"75O6aRXxYp2fmTmCobd0LovUxQt7L/DICto9eQqakxylKHJzkUOap9FNhYS5qXSP\n"
+	"FEDH3N6sQWRstBmbAmNtJGSPRLIl6s5ddAxjMlyNh+UCAwEAAaOBiTCBhjAPBgNV\n"
+	"HRMBAf8EBTADAQH/MAsGA1UdDwQEAwIBBjAdBgNVHQ4EFgQUppFC/RNhSiOeCKQp\n"
+	"5dgTBCPuQSUwRwYDVR0eBEAwPqA8MAWCAy5ncjAFggMuZXUwBoIELmVkdTAGggQu\n"
+	"b3JnMAWBAy5ncjAFgQMuZXUwBoEELmVkdTAGgQQub3JnMA0GCSqGSIb3DQEBBQUA\n"
+	"A4IBAQAf73lB4XtuP7KMhjdCSk4cNx6NZrokgclPEg8hwAOXhiVtXdMiKahsog2p\n"
+	"6z0GW5k6x8zDmjR/qw7IThzh+uTczQ2+vyT+bOdrwg3IBp5OjWEopmr95fZi6hg8\n"
+	"TqBTnbI6nOulnJEWtk2C4AwFSKls9cz4y51JtPACpf1wA+2KIaWuE4ZJwzNzvoc7\n"
+	"dIsXRSZMFpGD/md9zU1jZ/rzAxKWeAaNsWftjj++n08C9bMJL/NMh98qy5V8Acys\n"
+	"Nnq/onN694/BtZqhFLKPM58N7yLcZnuEvUUXBj08yrl3NI/K6s8/MT7jiOOASSXI\n"
+	"l7WdmplNsDz4SgCbZN2fOUvRJ9e4\n"
+	"-----END CERTIFICATE-----\n";
 
 const gnutls_datum_t cert = { cert_pem, sizeof(cert_pem) };
 
 const gnutls_datum_t name1 = { (void *)"com", 3 };
-const gnutls_datum_t name2 =
-    { (void *)"example.com", sizeof("example.com") - 1 };
-const gnutls_datum_t name3 =
-    { (void *)"another.example.com", sizeof("another.example.com") - 1 };
+const gnutls_datum_t name2 = { (void *)"example.com",
+			       sizeof("example.com") - 1 };
+const gnutls_datum_t name3 = { (void *)"another.example.com",
+			       sizeof("another.example.com") - 1 };
 const gnutls_datum_t name4 = { (void *)".gr", 3 };
 
-const gnutls_datum_t mail1 =
-    { (void *)"example.com", sizeof("example.com") - 1 };
-const gnutls_datum_t mail2 =
-    { (void *)".example.net", sizeof(".example.net") - 1 };
-const gnutls_datum_t mail3 =
-    { (void *)"nmav@redhat.com", sizeof("nmav@redhat.com") - 1 };
-const gnutls_datum_t mail4 =
-    { (void *)"koko.example.net", sizeof("koko.example.net") - 1 };
+const gnutls_datum_t mail1 = { (void *)"example.com",
+			       sizeof("example.com") - 1 };
+const gnutls_datum_t mail2 = { (void *)".example.net",
+			       sizeof(".example.net") - 1 };
+const gnutls_datum_t mail3 = { (void *)"nmav@redhat.com",
+			       sizeof("nmav@redhat.com") - 1 };
+const gnutls_datum_t mail4 = { (void *)"koko.example.net",
+			       sizeof("koko.example.net") - 1 };
 
 void doit(void)
 {
@@ -149,12 +150,12 @@ void doit(void)
 
 	i = 0;
 	do {
-		ret =
-		    gnutls_x509_name_constraints_get_permitted(nc, i++, &type,
-							       &name);
+		ret = gnutls_x509_name_constraints_get_permitted(nc, i++, &type,
+								 &name);
 
 		if (ret >= 0 && i == 2) {
-			if (name.size != 3 || memcmp(name.data, ".eu", 3) != 0) {
+			if (name.size != 3 ||
+			    memcmp(name.data, ".eu", 3) != 0) {
 				fail("error reading 2nd constraint\n");
 			}
 		}
@@ -183,60 +184,48 @@ void doit(void)
 	check_for_error(ret);
 
 	permitted++;
-	ret =
-	    gnutls_x509_name_constraints_add_permitted(nc, GNUTLS_SAN_DNSNAME,
-						       &name1);
+	ret = gnutls_x509_name_constraints_add_permitted(nc, GNUTLS_SAN_DNSNAME,
+							 &name1);
 	check_for_error(ret);
 
 	excluded++;
-	ret =
-	    gnutls_x509_name_constraints_add_excluded(nc, GNUTLS_SAN_DNSNAME,
-						      &name2);
+	ret = gnutls_x509_name_constraints_add_excluded(nc, GNUTLS_SAN_DNSNAME,
+							&name2);
 	check_for_error(ret);
 
 	excluded++;
-	ret =
-	    gnutls_x509_name_constraints_add_excluded(nc, GNUTLS_SAN_DNSNAME,
-						      &name3);
+	ret = gnutls_x509_name_constraints_add_excluded(nc, GNUTLS_SAN_DNSNAME,
+							&name3);
 	check_for_error(ret);
 
 	permitted++;
-	ret =
-	    gnutls_x509_name_constraints_add_permitted(nc, GNUTLS_SAN_DNSNAME,
-						       &name4);
+	ret = gnutls_x509_name_constraints_add_permitted(nc, GNUTLS_SAN_DNSNAME,
+							 &name4);
 	check_for_error(ret);
 
 	excluded++;
-	ret =
-	    gnutls_x509_name_constraints_add_excluded(nc, GNUTLS_SAN_URI,
-						      &name3);
+	ret = gnutls_x509_name_constraints_add_excluded(nc, GNUTLS_SAN_URI,
+							&name3);
 	check_for_error(ret);
 
 	permitted++;
-	ret =
-	    gnutls_x509_name_constraints_add_permitted(nc,
-						       GNUTLS_SAN_RFC822NAME,
-						       &mail1);
+	ret = gnutls_x509_name_constraints_add_permitted(
+		nc, GNUTLS_SAN_RFC822NAME, &mail1);
 	check_for_error(ret);
 
 	permitted++;
-	ret =
-	    gnutls_x509_name_constraints_add_permitted(nc,
-						       GNUTLS_SAN_RFC822NAME,
-						       &mail2);
+	ret = gnutls_x509_name_constraints_add_permitted(
+		nc, GNUTLS_SAN_RFC822NAME, &mail2);
 	check_for_error(ret);
 
 	permitted++;
-	ret =
-	    gnutls_x509_name_constraints_add_permitted(nc,
-						       GNUTLS_SAN_RFC822NAME,
-						       &mail3);
+	ret = gnutls_x509_name_constraints_add_permitted(
+		nc, GNUTLS_SAN_RFC822NAME, &mail3);
 	check_for_error(ret);
 
 	excluded++;
-	ret =
-	    gnutls_x509_name_constraints_add_excluded(nc, GNUTLS_SAN_RFC822NAME,
-						      &mail4);
+	ret = gnutls_x509_name_constraints_add_excluded(
+		nc, GNUTLS_SAN_RFC822NAME, &mail4);
 	check_for_error(ret);
 
 	ret = gnutls_x509_crt_set_name_constraints(crt, nc, 1);
@@ -246,13 +235,12 @@ void doit(void)
 
 	i = 0;
 	do {
-		ret =
-		    gnutls_x509_name_constraints_get_permitted(nc, i++, &type,
-							       &name);
+		ret = gnutls_x509_name_constraints_get_permitted(nc, i++, &type,
+								 &name);
 
 		if (ret >= 0 && i == 1) {
-			if (name.size != name1.size
-			    || memcmp(name.data, name1.data, name1.size) != 0) {
+			if (name.size != name1.size ||
+			    memcmp(name.data, name1.data, name1.size) != 0) {
 				fail("%d: error reading 1st constraint\n",
 				     __LINE__);
 			}
@@ -266,26 +254,28 @@ void doit(void)
 
 	i = 0;
 	do {
-		ret =
-		    gnutls_x509_name_constraints_get_excluded(nc, i++, &type,
-							      &name);
+		ret = gnutls_x509_name_constraints_get_excluded(nc, i++, &type,
+								&name);
 
 		if (ret >= 0 && i == 1) {
-			if (name.size != name2.size
-			    || memcmp(name.data, name2.data, name2.size) != 0) {
-				fail("%d: error reading 1st excluded constraint\n", __LINE__);
+			if (name.size != name2.size ||
+			    memcmp(name.data, name2.data, name2.size) != 0) {
+				fail("%d: error reading 1st excluded constraint\n",
+				     __LINE__);
 			}
 		}
 		if (ret >= 0 && i == 2) {
-			if (name.size != name3.size
-			    || memcmp(name.data, name3.data, name3.size) != 0) {
-				fail("%d: error reading 1st excluded constraint\n", __LINE__);
+			if (name.size != name3.size ||
+			    memcmp(name.data, name3.data, name3.size) != 0) {
+				fail("%d: error reading 1st excluded constraint\n",
+				     __LINE__);
 			}
 		}
 	} while (ret == 0);
 
 	if (i - 1 != excluded) {
-		fail("Could not read all excluded constraints; read %d, expected %d\n", i - 1, excluded);
+		fail("Could not read all excluded constraints; read %d, expected %d\n",
+		     i - 1, excluded);
 	}
 
 	/* 3: test the name constraints check function */
@@ -298,39 +288,33 @@ void doit(void)
 
 	/* Test e-mails */
 	set_name("nmav@redhat.com", &name);
-	ret =
-	    gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_RFC822NAME,
-					       &name);
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_RFC822NAME,
+						 &name);
 	check_test_result(ret, NAME_ACCEPTED, &name);
 
 	set_name("nmav@radhat.com", &name);
-	ret =
-	    gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_RFC822NAME,
-					       &name);
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_RFC822NAME,
+						 &name);
 	check_test_result(ret, NAME_REJECTED, &name);
 
 	set_name("nmav@example.com", &name);
-	ret =
-	    gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_RFC822NAME,
-					       &name);
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_RFC822NAME,
+						 &name);
 	check_test_result(ret, NAME_ACCEPTED, &name);
 
 	set_name("nmav@test.example.net", &name);
-	ret =
-	    gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_RFC822NAME,
-					       &name);
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_RFC822NAME,
+						 &name);
 	check_test_result(ret, NAME_ACCEPTED, &name);
 
 	set_name("nmav@example.net", &name);
-	ret =
-	    gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_RFC822NAME,
-					       &name);
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_RFC822NAME,
+						 &name);
 	check_test_result(ret, NAME_REJECTED, &name);
 
 	set_name("nmav@koko.example.net", &name);
-	ret =
-	    gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_RFC822NAME,
-					       &name);
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_RFC822NAME,
+						 &name);
 	check_test_result(ret, NAME_REJECTED, &name);
 
 	/* This name constraints structure does have an excluded URI so
@@ -370,9 +354,8 @@ void doit(void)
 	check_for_error(ret);
 
 	set_name("", &name);
-	ret =
-	    gnutls_x509_name_constraints_add_excluded(nc, GNUTLS_SAN_DNSNAME,
-						      &name);
+	ret = gnutls_x509_name_constraints_add_excluded(nc, GNUTLS_SAN_DNSNAME,
+							&name);
 	check_for_error(ret);
 
 	set_name("example.net", &name);

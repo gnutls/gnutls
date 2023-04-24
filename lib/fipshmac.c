@@ -27,16 +27,16 @@
 
 #ifdef HAVE_DL_ITERATE_PHDR
 
-# include <gnutls/gnutls.h>
-# include <gnutls/crypto.h>
-# include <link.h>
-# include "dirname.h"
-# include "errors.h"
+#include <gnutls/gnutls.h>
+#include <gnutls/crypto.h>
+#include <link.h>
+#include "dirname.h"
+#include "errors.h"
 
-# define FORMAT_VERSION 1
-# define HMAC_SIZE 32
-# define HMAC_ALGO GNUTLS_MAC_SHA256
-# define HMAC_STR_SIZE (2 * HMAC_SIZE + 1)
+#define FORMAT_VERSION 1
+#define HMAC_SIZE 32
+#define HMAC_ALGO GNUTLS_MAC_SHA256
+#define HMAC_STR_SIZE (2 * HMAC_SIZE + 1)
 
 static int get_hmac(const char *path, char *hmac, size_t hmac_size)
 {
@@ -91,7 +91,7 @@ static int print_lib(const char *path, const char *soname)
 	printf("path = %s\n", real_path);
 	printf("hmac = %s\n", hmac);
 
- cleanup:
+cleanup:
 	free(real_path);
 	return ret;
 }
@@ -134,4 +134,4 @@ int main(void)
 	return EXIT_FAILURE;
 }
 
-#endif				/* HAVE_DL_ITERATE_PHDR */
+#endif /* HAVE_DL_ITERATE_PHDR */

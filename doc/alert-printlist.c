@@ -52,25 +52,24 @@ static void main_texinfo(void)
 		gnutls_mac_algorithm_t mac;
 		gnutls_protocol_t version;
 
-		printf
-		    ("@multitable @columnfractions .55 .10 .30\n@anchor{tab:alerts}\n");
+		printf("@multitable @columnfractions .55 .10 .30\n@anchor{tab:alerts}\n");
 		printf("@headitem Alert @tab ID @tab Description\n");
 		for (i = 0; i < 256; i++) {
 			if (gnutls_alert_get_strname(i) == NULL)
 				continue;
 			printf("@item %s\n@tab %d\n@tab %s\n",
-			       escape_texi_string(gnutls_alert_get_strname
-						  (i), buffer,
-						  sizeof(buffer)),
+			       escape_texi_string(gnutls_alert_get_strname(i),
+						  buffer, sizeof(buffer)),
 			       (unsigned int)i, gnutls_alert_get_name(i));
 		}
 		printf("@end multitable\n");
-
 	}
 }
 
 static const char headers[] = "\\tablefirsthead{%\n"
-    "\\hline\n" "Alert & ID & Description\\\\\n" "\\hline}\n"
+			      "\\hline\n"
+			      "Alert & ID & Description\\\\\n"
+			      "\\hline}\n"
 #if 0
     "\\tablehead{%\n"
     "\\hline\n"
@@ -81,7 +80,8 @@ static const char headers[] = "\\tablefirsthead{%\n"
     "\\multicolumn{3}{|r|}{\\small\\sl continued on next page}\\\\\n"
     "\\hline}\n"
 #endif
-    "\\tablelasttail{\\hline}\n" "\\bottomcaption{The TLS alert table}\n\n";
+			      "\\tablelasttail{\\hline}\n"
+			      "\\bottomcaption{The TLS alert table}\n\n";
 
 static void main_latex(void)
 {
@@ -91,8 +91,7 @@ static void main_latex(void)
 
 	puts(headers);
 
-	printf
-	    ("\\begin{supertabular}{|p{.50\\linewidth}|p{.07\\linewidth}|p{.34\\linewidth}|}\n\\label{tab:alerts}\n");
+	printf("\\begin{supertabular}{|p{.50\\linewidth}|p{.07\\linewidth}|p{.34\\linewidth}|}\n\\label{tab:alerts}\n");
 
 	{
 		size_t i;
@@ -113,9 +112,7 @@ static void main_latex(void)
 		}
 
 		printf("\\end{supertabular}\n\n");
-
 	}
 
 	return;
-
 }

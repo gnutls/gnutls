@@ -47,8 +47,8 @@
 #include "systemkey-tool-options.h"
 
 static void cmd_parser(int argc, char **argv);
-static void systemkey_delete(const char *url, FILE * outfile);
-static void systemkey_list(FILE * outfile);
+static void systemkey_delete(const char *url, FILE *outfile);
+static void systemkey_list(FILE *outfile);
 
 static gnutls_x509_crt_fmt_t outcert_format;
 static gnutls_x509_crt_fmt_t outkey_format;
@@ -124,7 +124,7 @@ static void cmd_parser(int argc, char **argv)
 	gnutls_global_deinit();
 }
 
-static void systemkey_delete(const char *url, FILE * out)
+static void systemkey_delete(const char *url, FILE *out)
 {
 	int ret;
 
@@ -138,17 +138,16 @@ static void systemkey_delete(const char *url, FILE * out)
 	fprintf(out, "Key %s deleted\n", url);
 }
 
-static void systemkey_list(FILE * out)
+static void systemkey_list(FILE *out)
 {
 	int ret;
 	gnutls_system_key_iter_t iter = NULL;
 	char *cert_url, *key_url, *label;
 
 	do {
-		ret =
-		    gnutls_system_key_iter_get_info(&iter, GNUTLS_CRT_X509,
-						    &cert_url, &key_url, &label,
-						    NULL, 0);
+		ret = gnutls_system_key_iter_get_info(&iter, GNUTLS_CRT_X509,
+						      &cert_url, &key_url,
+						      &label, NULL, 0);
 		if (ret >= 0) {
 			fprintf(out, "Label:\t%s\nCert:\t%s\nKey:\t%s\n\n",
 				label, cert_url, key_url);

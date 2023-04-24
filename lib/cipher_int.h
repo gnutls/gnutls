@@ -21,29 +21,25 @@
  */
 
 #ifndef GNUTLS_LIB_CIPHER_INT_H
-# define GNUTLS_LIB_CIPHER_INT_H
+#define GNUTLS_LIB_CIPHER_INT_H
 
-# include <gnutls/crypto.h>
-# include "errors.h"
-# include <crypto-backend.h>
+#include <gnutls/crypto.h>
+#include "errors.h"
+#include <crypto-backend.h>
 
 extern int crypto_cipher_prio;
 extern gnutls_crypto_cipher_st _gnutls_cipher_ops;
 
-typedef int (*cipher_encrypt_func)(void *hd, const void *plaintext,
-				   size_t, void *ciphertext, size_t);
-typedef int (*cipher_decrypt_func)(void *hd, const void *ciphertext,
-				   size_t, void *plaintext, size_t);
-typedef int (*aead_cipher_encrypt_func)(void *hd,
-					const void *nonce, size_t,
-					const void *auth, size_t,
-					size_t tag,
+typedef int (*cipher_encrypt_func)(void *hd, const void *plaintext, size_t,
+				   void *ciphertext, size_t);
+typedef int (*cipher_decrypt_func)(void *hd, const void *ciphertext, size_t,
+				   void *plaintext, size_t);
+typedef int (*aead_cipher_encrypt_func)(void *hd, const void *nonce, size_t,
+					const void *auth, size_t, size_t tag,
 					const void *plaintext, size_t,
 					void *ciphertext, size_t);
-typedef int (*aead_cipher_decrypt_func)(void *hd,
-					const void *nonce, size_t,
-					const void *auth, size_t,
-					size_t tag,
+typedef int (*aead_cipher_decrypt_func)(void *hd, const void *nonce, size_t,
+					const void *auth, size_t, size_t tag,
 					const void *ciphertext, size_t,
 					void *plaintext, size_t);
 typedef void (*cipher_deinit_func)(void *hd);
@@ -71,18 +67,18 @@ typedef struct {
 	cipher_deinit_func deinit;
 } cipher_hd_st;
 
-int _gnutls_cipher_init(cipher_hd_st *, const cipher_entry_st * e,
-			const gnutls_datum_t * key,
-			const gnutls_datum_t * iv, int enc);
+int _gnutls_cipher_init(cipher_hd_st *, const cipher_entry_st *e,
+			const gnutls_datum_t *key, const gnutls_datum_t *iv,
+			int enc);
 
-inline static int _gnutls_cipher_setiv(const cipher_hd_st * handle,
+inline static int _gnutls_cipher_setiv(const cipher_hd_st *handle,
 				       const void *iv, size_t ivlen)
 {
 	return handle->setiv(handle->handle, iv, ivlen);
 }
 
-inline static int _gnutls_cipher_getiv(const cipher_hd_st * handle,
-				       void *iv, size_t ivlen)
+inline static int _gnutls_cipher_getiv(const cipher_hd_st *handle, void *iv,
+				       size_t ivlen)
 {
 	if (unlikely(handle == NULL || handle->handle == NULL ||
 		     handle->getiv == NULL))
@@ -91,15 +87,16 @@ inline static int _gnutls_cipher_getiv(const cipher_hd_st * handle,
 	return handle->getiv(handle->handle, iv, ivlen);
 }
 
-inline static int _gnutls_cipher_setkey(const cipher_hd_st * handle,
+inline static int _gnutls_cipher_setkey(const cipher_hd_st *handle,
 					const void *key, size_t keylen)
 {
 	return handle->setkey(handle->handle, key, keylen);
 }
 
-inline static int
-_gnutls_cipher_encrypt2(const cipher_hd_st * handle, const void *text,
-			size_t textlen, void *ciphertext, size_t ciphertextlen)
+inline static int _gnutls_cipher_encrypt2(const cipher_hd_st *handle,
+					  const void *text, size_t textlen,
+					  void *ciphertext,
+					  size_t ciphertextlen)
 {
 	if (likely(handle != NULL && handle->handle != NULL)) {
 		if (handle->encrypt == NULL) {
@@ -112,10 +109,10 @@ _gnutls_cipher_encrypt2(const cipher_hd_st * handle, const void *text,
 	return 0;
 }
 
-inline static int
-_gnutls_cipher_decrypt2(const cipher_hd_st * handle,
-			const void *ciphertext, size_t ciphertextlen,
-			void *text, size_t textlen)
+inline static int _gnutls_cipher_decrypt2(const cipher_hd_st *handle,
+					  const void *ciphertext,
+					  size_t ciphertextlen, void *text,
+					  size_t textlen)
 {
 	if (likely(handle != NULL && handle->handle != NULL)) {
 		if (handle->decrypt == NULL) {
@@ -129,16 +126,13 @@ _gnutls_cipher_decrypt2(const cipher_hd_st * handle,
 }
 
 inline static int
-_gnutls_aead_cipher_encrypt(const cipher_hd_st * handle,
-			    const void *nonce, size_t nonce_len,
-			    const void *auth, size_t auth_len,
-			    size_t tag,
-			    const void *text, size_t textlen,
+_gnutls_aead_cipher_encrypt(const cipher_hd_st *handle, const void *nonce,
+			    size_t nonce_len, const void *auth, size_t auth_len,
+			    size_t tag, const void *text, size_t textlen,
 			    void *ciphertext, size_t ciphertextlen)
 {
-	if (likely
-	    (handle != NULL && handle->handle != NULL
-	     && handle->aead_encrypt != NULL)) {
+	if (likely(handle != NULL && handle->handle != NULL &&
+		   handle->aead_encrypt != NULL)) {
 		return handle->aead_encrypt(handle->handle, nonce, nonce_len,
 					    auth, auth_len, tag, text, textlen,
 					    ciphertext, ciphertextlen);
@@ -148,16 +142,13 @@ _gnutls_aead_cipher_encrypt(const cipher_hd_st * handle,
 }
 
 inline static int
-_gnutls_aead_cipher_decrypt(const cipher_hd_st * handle,
-			    const void *nonce, size_t nonce_len,
-			    const void *auth, size_t auth_len,
-			    size_t tag,
-			    const void *ciphertext, size_t ciphertextlen,
-			    void *text, size_t textlen)
+_gnutls_aead_cipher_decrypt(const cipher_hd_st *handle, const void *nonce,
+			    size_t nonce_len, const void *auth, size_t auth_len,
+			    size_t tag, const void *ciphertext,
+			    size_t ciphertextlen, void *text, size_t textlen)
 {
-	if (likely
-	    (handle != NULL && handle->handle != NULL
-	     && handle->aead_decrypt != NULL)) {
+	if (likely(handle != NULL && handle->handle != NULL &&
+		   handle->aead_decrypt != NULL)) {
 		return handle->aead_decrypt(handle->handle, nonce, nonce_len,
 					    auth, auth_len, tag, ciphertext,
 					    ciphertextlen, text, textlen);
@@ -166,7 +157,7 @@ _gnutls_aead_cipher_decrypt(const cipher_hd_st * handle,
 	return GNUTLS_E_INVALID_REQUEST;
 }
 
-inline static void _gnutls_cipher_deinit(cipher_hd_st * handle)
+inline static void _gnutls_cipher_deinit(cipher_hd_st *handle)
 {
 	if (likely(handle != NULL && handle->handle != NULL)) {
 		handle->deinit(handle->handle);
@@ -180,11 +171,11 @@ int _gnutls_cipher_get_iv(gnutls_cipher_hd_t handle, void *iv, size_t ivlen);
 
 int _gnutls_cipher_set_key(gnutls_cipher_hd_t handle, void *key, size_t keylen);
 
-# define _gnutls_cipher_is_aead(h) _gnutls_cipher_algo_is_aead((h)->e)
+#define _gnutls_cipher_is_aead(h) _gnutls_cipher_algo_is_aead((h)->e)
 
 /* returns the tag in AUTHENC ciphers */
-inline static void _gnutls_cipher_tag(const cipher_hd_st * handle,
-				      void *tag, size_t tag_size)
+inline static void _gnutls_cipher_tag(const cipher_hd_st *handle, void *tag,
+				      size_t tag_size)
 {
 	if (likely(handle != NULL && handle->handle != NULL)) {
 		handle->tag(handle->handle, tag, tag_size);
@@ -193,7 +184,7 @@ inline static void _gnutls_cipher_tag(const cipher_hd_st * handle,
 
 /* Add auth data for AUTHENC ciphers
  */
-inline static int _gnutls_cipher_auth(const cipher_hd_st * handle,
+inline static int _gnutls_cipher_auth(const cipher_hd_st *handle,
 				      const void *text, size_t textlen)
 {
 	if (likely(handle != NULL && handle->handle != NULL)) {
@@ -202,8 +193,8 @@ inline static int _gnutls_cipher_auth(const cipher_hd_st * handle,
 	return GNUTLS_E_INTERNAL_ERROR;
 }
 
-# define _gnutls_cipher_encrypt(x,y,z) _gnutls_cipher_encrypt2(x,y,z,y,z)
-# define _gnutls_cipher_decrypt(x,y,z) _gnutls_cipher_decrypt2(x,y,z,y,z)
+#define _gnutls_cipher_encrypt(x, y, z) _gnutls_cipher_encrypt2(x, y, z, y, z)
+#define _gnutls_cipher_decrypt(x, y, z) _gnutls_cipher_decrypt2(x, y, z, y, z)
 
 /* auth_cipher API. Allows combining a cipher with a MAC.
  */
@@ -214,56 +205,53 @@ typedef struct {
 		digest_hd_st dig;
 		mac_hd_st mac;
 	} mac;
-	unsigned int is_mac:1;
-# ifdef ENABLE_SSL3
-	unsigned int ssl_hmac:1;
-# endif
-# ifdef ENABLE_GOST
-	unsigned int continuous_mac:1;
-# endif
-	unsigned int non_null:1;
-	unsigned int etm:1;
+	unsigned int is_mac : 1;
+#ifdef ENABLE_SSL3
+	unsigned int ssl_hmac : 1;
+#endif
+#ifdef ENABLE_GOST
+	unsigned int continuous_mac : 1;
+#endif
+	unsigned int non_null : 1;
+	unsigned int etm : 1;
 	size_t tag_size;
 } auth_cipher_hd_st;
 
-int _gnutls_auth_cipher_init(auth_cipher_hd_st * handle,
-			     const cipher_entry_st * e,
-			     const gnutls_datum_t * cipher_key,
-			     const gnutls_datum_t * iv,
-			     const mac_entry_st * me,
-			     const gnutls_datum_t * mac_key, unsigned etm,
-# ifdef ENABLE_SSL3
+int _gnutls_auth_cipher_init(auth_cipher_hd_st *handle,
+			     const cipher_entry_st *e,
+			     const gnutls_datum_t *cipher_key,
+			     const gnutls_datum_t *iv, const mac_entry_st *me,
+			     const gnutls_datum_t *mac_key, unsigned etm,
+#ifdef ENABLE_SSL3
 			     unsigned ssl_hmac,
-# endif
+#endif
 			     int enc);
 
-int _gnutls_auth_cipher_add_auth(auth_cipher_hd_st * handle,
-				 const void *text, int textlen);
+int _gnutls_auth_cipher_add_auth(auth_cipher_hd_st *handle, const void *text,
+				 int textlen);
 
-int _gnutls_auth_cipher_encrypt2_tag(auth_cipher_hd_st * handle,
-				     const uint8_t * text, int textlen,
+int _gnutls_auth_cipher_encrypt2_tag(auth_cipher_hd_st *handle,
+				     const uint8_t *text, int textlen,
 				     void *ciphertext, int ciphertextlen,
 				     int pad_size);
-int _gnutls_auth_cipher_decrypt2(auth_cipher_hd_st * handle,
+int _gnutls_auth_cipher_decrypt2(auth_cipher_hd_st *handle,
 				 const void *ciphertext, int ciphertextlen,
 				 void *text, int textlen);
-int _gnutls_auth_cipher_tag(auth_cipher_hd_st * handle, void *tag,
-			    int tag_size);
+int _gnutls_auth_cipher_tag(auth_cipher_hd_st *handle, void *tag, int tag_size);
 
-inline static int _gnutls_auth_cipher_setiv(const auth_cipher_hd_st *
-					    handle, const void *iv,
-					    size_t ivlen)
+inline static int _gnutls_auth_cipher_setiv(const auth_cipher_hd_st *handle,
+					    const void *iv, size_t ivlen)
 {
 	return _gnutls_cipher_setiv(&handle->cipher, iv, ivlen);
 }
 
-inline static size_t _gnutls_auth_cipher_tag_len(auth_cipher_hd_st * handle)
+inline static size_t _gnutls_auth_cipher_tag_len(auth_cipher_hd_st *handle)
 {
 	return handle->tag_size;
 }
 
-# define _gnutls_auth_cipher_is_aead(h) _gnutls_cipher_is_aead(&(h)->cipher)
+#define _gnutls_auth_cipher_is_aead(h) _gnutls_cipher_is_aead(&(h)->cipher)
 
-void _gnutls_auth_cipher_deinit(auth_cipher_hd_st * handle);
+void _gnutls_auth_cipher_deinit(auth_cipher_hd_st *handle);
 
-#endif				/* GNUTLS_LIB_CIPHER_INT_H */
+#endif /* GNUTLS_LIB_CIPHER_INT_H */

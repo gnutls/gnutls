@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -30,7 +30,9 @@
 #include <gnutls/gnutls.h>
 #include "utils.h"
 
-#define SERVER_PUSH_ADD if (len > 512 + 5+32) fail("max record set to 512, len: %d\n", (int)len);
+#define SERVER_PUSH_ADD         \
+	if (len > 512 + 5 + 32) \
+		fail("max record set to 512, len: %d\n", (int)len);
 #include "eagain-common.h"
 
 #include "cert-common.h"
@@ -67,15 +69,14 @@ void doit(void)
 
 	/* Init server */
 	gnutls_certificate_allocate_credentials(&serverx509cred);
-	gnutls_certificate_set_x509_key_mem(serverx509cred,
-					    &server2_cert, &server2_key,
-					    GNUTLS_X509_FMT_PEM);
+	gnutls_certificate_set_x509_key_mem(serverx509cred, &server2_cert,
+					    &server2_key, GNUTLS_X509_FMT_PEM);
 
 	gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, serverx509cred);
 
-	gnutls_priority_set_direct(server,
-				   "NORMAL:-VERS-ALL:+VERS-TLS1.2", NULL);
+	gnutls_priority_set_direct(server, "NORMAL:-VERS-ALL:+VERS-TLS1.2",
+				   NULL);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_pull_timeout_function(server,
@@ -88,9 +89,8 @@ void doit(void)
 	if (ret < 0)
 		exit(1);
 
-	ret =
-	    gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca2_cert,
-						  GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca2_cert,
+						    GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);
 
@@ -103,9 +103,8 @@ void doit(void)
 	if (ret < 0)
 		exit(1);
 
-	ret =
-	    gnutls_priority_set_direct(client, "NORMAL:-VERS-ALL:+VERS-TLS1.2",
-				       NULL);
+	ret = gnutls_priority_set_direct(client,
+					 "NORMAL:-VERS-ALL:+VERS-TLS1.2", NULL);
 	if (ret < 0)
 		exit(1);
 

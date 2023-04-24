@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 /* This program tests the various certificate key exchange methods supported
@@ -48,9 +48,10 @@ void doit(void)
 	try_x509("TLS 1.1 with dhe-rsa no cert",
 		 "NORMAL:-VERS-ALL:+VERS-TLS1.1:-KX-ALL:+DHE-RSA",
 		 GNUTLS_KX_DHE_RSA, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_UNKNOWN);
-	try_x509("TLS 1.1 with ecdhe x25519 rsa no cert",
-		 "NORMAL:-VERS-ALL:+VERS-TLS1.1:-KX-ALL:+ECDHE-RSA:-CURVE-ALL:+CURVE-X25519",
-		 GNUTLS_KX_ECDHE_RSA, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_UNKNOWN);
+	try_x509(
+		"TLS 1.1 with ecdhe x25519 rsa no cert",
+		"NORMAL:-VERS-ALL:+VERS-TLS1.1:-KX-ALL:+ECDHE-RSA:-CURVE-ALL:+CURVE-X25519",
+		GNUTLS_KX_ECDHE_RSA, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_UNKNOWN);
 	try_x509("TLS 1.1 with ecdhe rsa no cert",
 		 "NORMAL:-VERS-ALL:+VERS-TLS1.1:-KX-ALL:+ECDHE-RSA",
 		 GNUTLS_KX_ECDHE_RSA, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_UNKNOWN);
@@ -105,11 +106,11 @@ void doit(void)
 
 	/* illegal setups */
 	server_priority = NULL;
-	try_with_key_fail("TLS 1.1 with rsa-pss cert and no cli cert",
-			  "NORMAL:-VERS-ALL:+VERS-TLS1.1:-KX-ALL:+DHE-RSA:-SIGN-ALL:+SIGN-RSA-PSS-SHA256:+SIGN-RSA-PSS-SHA384:+SIGN-RSA-PSS-SHA512",
-			  GNUTLS_E_UNWANTED_ALGORITHM, GNUTLS_E_AGAIN,
-			  &server_ca3_rsa_pss_cert, &server_ca3_rsa_pss_key,
-			  NULL, NULL);
+	try_with_key_fail(
+		"TLS 1.1 with rsa-pss cert and no cli cert",
+		"NORMAL:-VERS-ALL:+VERS-TLS1.1:-KX-ALL:+DHE-RSA:-SIGN-ALL:+SIGN-RSA-PSS-SHA256:+SIGN-RSA-PSS-SHA384:+SIGN-RSA-PSS-SHA512",
+		GNUTLS_E_UNWANTED_ALGORITHM, GNUTLS_E_AGAIN,
+		&server_ca3_rsa_pss_cert, &server_ca3_rsa_pss_key, NULL, NULL);
 
 	gnutls_global_deinit();
 }

@@ -49,7 +49,7 @@ struct gnutls_anti_replay_st {
  *
  * Since: 3.6.5
  **/
-int gnutls_anti_replay_init(gnutls_anti_replay_t * anti_replay)
+int gnutls_anti_replay_init(gnutls_anti_replay_t *anti_replay)
 {
 	*anti_replay = gnutls_calloc(1, sizeof(struct gnutls_anti_replay_st));
 	if (!*anti_replay)
@@ -78,9 +78,8 @@ int gnutls_anti_replay_init(gnutls_anti_replay_t * anti_replay)
  *
  * Since: 3.6.5
  */
-void
-gnutls_anti_replay_set_window(gnutls_anti_replay_t anti_replay,
-			      unsigned int window)
+void gnutls_anti_replay_set_window(gnutls_anti_replay_t anti_replay,
+				   unsigned int window)
 {
 	anti_replay->window = window;
 }
@@ -108,9 +107,8 @@ void gnutls_anti_replay_deinit(gnutls_anti_replay_t anti_replay)
  *
  * Since: 3.6.5
  **/
-void
-gnutls_anti_replay_enable(gnutls_session_t session,
-			  gnutls_anti_replay_t anti_replay)
+void gnutls_anti_replay_enable(gnutls_session_t session,
+			       gnutls_anti_replay_t anti_replay)
 {
 	if (unlikely(session->security_parameters.entity != GNUTLS_SERVER)) {
 		gnutls_assert();
@@ -120,11 +118,10 @@ gnutls_anti_replay_enable(gnutls_session_t session,
 	session->internals.anti_replay = anti_replay;
 }
 
-int
-_gnutls_anti_replay_check(gnutls_anti_replay_t anti_replay,
-			  uint32_t client_ticket_age,
-			  struct timespec *ticket_creation_time,
-			  gnutls_datum_t * id)
+int _gnutls_anti_replay_check(gnutls_anti_replay_t anti_replay,
+			      uint32_t client_ticket_age,
+			      struct timespec *ticket_creation_time,
+			      gnutls_datum_t *id)
 {
 	struct timespec now;
 	time_t window;
@@ -132,7 +129,7 @@ _gnutls_anti_replay_check(gnutls_anti_replay_t anti_replay,
 	gnutls_datum_t key = { NULL, 0 };
 	gnutls_datum_t entry = { NULL, 0 };
 	unsigned char key_buffer[MAX_HASH_SIZE + 12];
-	unsigned char entry_buffer[12];	/* magic + timestamp + expire_time */
+	unsigned char entry_buffer[12]; /* magic + timestamp + expire_time */
 	unsigned char *p;
 	int ret;
 
@@ -153,8 +150,8 @@ _gnutls_anti_replay_check(gnutls_anti_replay_t anti_replay,
 	 */
 	if (_gnutls_timespec_cmp(ticket_creation_time,
 				 &anti_replay->start_time) < 0) {
-		_gnutls_handshake_log
-		    ("anti_replay: ticket is created before recording has started\n");
+		_gnutls_handshake_log(
+			"anti_replay: ticket is created before recording has started\n");
 		return gnutls_assert_val(GNUTLS_E_EARLY_DATA_REJECTED);
 	}
 
@@ -169,9 +166,9 @@ _gnutls_anti_replay_check(gnutls_anti_replay_t anti_replay,
 	 * data.
 	 */
 	if (server_ticket_age - client_ticket_age > anti_replay->window) {
-		_gnutls_handshake_log
-		    ("anti_replay: server ticket age: %u, client ticket age: %u\n",
-		     server_ticket_age, client_ticket_age);
+		_gnutls_handshake_log(
+			"anti_replay: server ticket age: %u, client ticket age: %u\n",
+			server_ticket_age, client_ticket_age);
 		return gnutls_assert_val(GNUTLS_E_EARLY_DATA_REJECTED);
 	}
 
@@ -186,8 +183,7 @@ _gnutls_anti_replay_check(gnutls_anti_replay_t anti_replay,
 	 * the key becomes 44+ octets.
 	 */
 	p = key_buffer;
-	_gnutls_write_uint32((uint64_t) anti_replay->start_time.tv_sec >> 32,
-			     p);
+	_gnutls_write_uint32((uint64_t)anti_replay->start_time.tv_sec >> 32, p);
 	p += 4;
 	_gnutls_write_uint32(anti_replay->start_time.tv_sec & 0xFFFFFFFF, p);
 	p += 4;
@@ -214,11 +210,11 @@ _gnutls_anti_replay_check(gnutls_anti_replay_t anti_replay,
 	entry.size = p - entry_buffer;
 
 	ret = anti_replay->db_add_func(anti_replay->db_ptr,
-				       (uint64_t) now.tv_sec +
-				       (uint64_t) window, &key, &entry);
+				       (uint64_t)now.tv_sec + (uint64_t)window,
+				       &key, &entry);
 	if (ret < 0) {
-		_gnutls_handshake_log
-		    ("anti_replay: duplicate ClientHello found\n");
+		_gnutls_handshake_log(
+			"anti_replay: duplicate ClientHello found\n");
 		return gnutls_assert_val(GNUTLS_E_EARLY_DATA_REJECTED);
 	}
 
@@ -260,9 +256,8 @@ void gnutls_anti_replay_set_ptr(gnutls_anti_replay_t anti_replay, void *ptr)
  *
  * Since: 3.6.5
  **/
-void
-gnutls_anti_replay_set_add_function(gnutls_anti_replay_t anti_replay,
-				    gnutls_db_add_func add_func)
+void gnutls_anti_replay_set_add_function(gnutls_anti_replay_t anti_replay,
+					 gnutls_db_add_func add_func)
 {
 	anti_replay->db_add_func = add_func;
 }

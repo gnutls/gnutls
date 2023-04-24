@@ -1,11 +1,11 @@
 /* CC0 (Public domain) - see LICENSE file for details */
 
 #ifndef GNUTLS_LIB_EXTRAS_HEX_H
-# define GNUTLS_LIB_EXTRAS_HEX_H
+#define GNUTLS_LIB_EXTRAS_HEX_H
 
-# include "config.h"
-# include <stdbool.h>
-# include <stdlib.h>
+#include "config.h"
+#include <stdbool.h>
+#include <stdlib.h>
 
 /**
  * hex_decode - Unpack a hex string.
@@ -74,4 +74,4 @@ static inline size_t hex_data_size(size_t slen)
 	return slen / 2;
 }
 
-#endif				/* GNUTLS_LIB_EXTRAS_HEX_H */
+#endif /* GNUTLS_LIB_EXTRAS_HEX_H */

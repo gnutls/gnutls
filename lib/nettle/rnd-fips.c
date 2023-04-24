@@ -48,7 +48,7 @@ struct fips_ctx {
 static int _rngfips_ctx_reinit(struct fips_ctx *fctx);
 static int _rngfips_ctx_init(struct fips_ctx *fctx);
 static int drbg_reseed(struct fips_ctx *fctx, struct drbg_aes_ctx *ctx);
-static int get_entropy(struct fips_ctx *fctx, uint8_t * buffer, size_t length);
+static int get_entropy(struct fips_ctx *fctx, uint8_t *buffer, size_t length);
 
 static int get_random(struct drbg_aes_ctx *ctx, struct fips_ctx *fctx,
 		      void *buffer, size_t length)
@@ -81,7 +81,7 @@ static int get_random(struct drbg_aes_ctx *ctx, struct fips_ctx *fctx,
 	return 0;
 }
 
-static int get_entropy(struct fips_ctx *fctx, uint8_t * buffer, size_t length)
+static int get_entropy(struct fips_ctx *fctx, uint8_t *buffer, size_t length)
 {
 	int ret;
 	uint8_t block[ENTROPY_BLOCK_SIZE];
@@ -123,7 +123,7 @@ static int get_entropy(struct fips_ctx *fctx, uint8_t * buffer, size_t length)
 }
 
 #define PSTRING "gnutls-rng"
-#define PSTRING_SIZE (sizeof(PSTRING)-1)
+#define PSTRING_SIZE (sizeof(PSTRING) - 1)
 static int drbg_init(struct fips_ctx *fctx, struct drbg_aes_ctx *ctx)
 {
 	uint8_t buffer[DRBG_AES_SEED_SIZE];
@@ -135,8 +135,8 @@ static int drbg_init(struct fips_ctx *fctx, struct drbg_aes_ctx *ctx)
 		return gnutls_assert_val(ret);
 	}
 
-	ret = drbg_aes_init(ctx, sizeof(buffer), buffer,
-			    PSTRING_SIZE, (void *)PSTRING);
+	ret = drbg_aes_init(ctx, sizeof(buffer), buffer, PSTRING_SIZE,
+			    (void *)PSTRING);
 	zeroize_key(buffer, sizeof(buffer));
 	if (ret == 0) {
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
@@ -228,7 +228,7 @@ static int _rngfips_ctx_reinit(struct fips_ctx *fctx)
 /* Initialize this random subsystem. */
 static int _rngfips_init(void **_ctx)
 {
-/* Basic initialization is required to
+	/* Basic initialization is required to
    do a few checks on the implementation.  */
 	struct fips_ctx *ctx;
 	int ret;

@@ -22,11 +22,12 @@
  */
 
 #ifndef GNUTLS_TESTS_TEST_CHAINS_ISSUER_H
-# define GNUTLS_TESTS_TEST_CHAINS_ISSUER_H
+#define GNUTLS_TESTS_TEST_CHAINS_ISSUER_H
 
-# define MAX_CHAIN 15
+#define MAX_CHAIN 15
 
-# define SERVER_CERT "-----BEGIN CERTIFICATE-----\n"			\
+#define SERVER_CERT                                                          \
+	"-----BEGIN CERTIFICATE-----\n"                                      \
 	"MIIDATCCAbmgAwIBAgIUQdvdegP8JFszFHLfV4+lrEdafzAwPQYJKoZIhvcNAQEK\n" \
 	"MDCgDTALBglghkgBZQMEAgGhGjAYBgkqhkiG9w0BAQgwCwYJYIZIAWUDBAIBogMC\n" \
 	"AUAwDzENMAsGA1UEAxMEQ0EtNTAgFw0yMDA0MjAxMTI2NDFaGA85OTk5MTIzMTIz\n" \
@@ -43,10 +44,11 @@
 	"5woB5KENnYfoAWaYmXa1EPRh2xb2XDI0uCHg1bPljg61/T2cJZ4VfkOvsKgFAI4p\n" \
 	"lAKQCZSKbEY1oWDdDhVcSipYu2E88RXczvcnEQV3C3p6CGcf8xclZdZIwMAyXYAK\n" \
 	"oNccbSIfDlN4iD+2bztCRWHD6hWL1NJsFqmv3Ts8eYU8z8J8NdhtCXr76lFkFmDx\n" \
-	"+lfZEv4=\n"							\
+	"+lfZEv4=\n"                                                         \
 	"-----END CERTIFICATE-----\n"
 
-# define CA_CERT_5 "-----BEGIN CERTIFICATE-----\n"			\
+#define CA_CERT_5                                                            \
+	"-----BEGIN CERTIFICATE-----\n"                                      \
 	"MIIDojCCAlqgAwIBAgIUHRb3xJ2ZGqqgdC/pBq/sDtAwvtowPQYJKoZIhvcNAQEK\n" \
 	"MDCgDTALBglghkgBZQMEAgGhGjAYBgkqhkiG9w0BAQgwCwYJYIZIAWUDBAIBogMC\n" \
 	"AUAwDzENMAsGA1UEAxMEQ0EtNDAgFw0yMDA0MjAxMTI2NDFaGA85OTk5MTIzMTIz\n" \
@@ -66,10 +68,11 @@
 	"XveeQysCKsDEfdrfn1mACQj8eC4lL9KJcHptHdTSLfa58MV2Qe5smCIByXxendO5\n" \
 	"UQHZy5UrzWAdtO7y75vXeXynsXAqcE4TTNjdFiCnn6Q5/pVyW14kepfjaOzQFP7H\n" \
 	"QlnHtgQDRAlQuB1aGseb6jn2Joy33itpBthvtgBosZIqsMyPoX5YzjqZUSjfPZOP\n" \
-	"/aOd/5HR4ZPDWfHdIWbXogYX0ndhNg==\n"				\
+	"/aOd/5HR4ZPDWfHdIWbXogYX0ndhNg==\n"                                 \
 	"-----END CERTIFICATE-----\n"
 
-# define CA_CERT_4 "-----BEGIN CERTIFICATE-----\n"			\
+#define CA_CERT_4                                                            \
+	"-----BEGIN CERTIFICATE-----\n"                                      \
 	"MIIDojCCAlqgAwIBAgIUGybZZ1e/iFUKafPdh8xUbh7YVnwwPQYJKoZIhvcNAQEK\n" \
 	"MDCgDTALBglghkgBZQMEAgGhGjAYBgkqhkiG9w0BAQgwCwYJYIZIAWUDBAIBogMC\n" \
 	"AUAwDzENMAsGA1UEAxMEQ0EtMzAgFw0yMDA0MjAxMTI2NDFaGA85OTk5MTIzMTIz\n" \
@@ -89,10 +92,11 @@
 	"wQ7s/JNNk/SZt4bKjX9GrTscZmOVtrwpZ6uQBHITScsr4V431G6wojZ09iEG0yFQ\n" \
 	"ZD8ECn2ZOPVQXIswa75NelcGKup838HoDIjQ3vIvrx8rqf5HRg4t9mXzjECzXHVy\n" \
 	"8wDamoE3fLAZZX2RxOWnHfjI8qB83qYyR5kN002EFJ/e060SPia1rTHyLqLngRtq\n" \
-	"xgR9bRjZf++h/dg6L87b26J5KdDafw==\n"				\
+	"xgR9bRjZf++h/dg6L87b26J5KdDafw==\n"                                 \
 	"-----END CERTIFICATE-----\n"
 
-# define CA_CERT_3 "-----BEGIN CERTIFICATE-----\n"			\
+#define CA_CERT_3                                                            \
+	"-----BEGIN CERTIFICATE-----\n"                                      \
 	"MIIDojCCAlqgAwIBAgIUHRkWa8ZOaRrqjxigoEhxJHMLM2UwPQYJKoZIhvcNAQEK\n" \
 	"MDCgDTALBglghkgBZQMEAgGhGjAYBgkqhkiG9w0BAQgwCwYJYIZIAWUDBAIBogMC\n" \
 	"AUAwDzENMAsGA1UEAxMEQ0EtMjAgFw0yMDA0MjAxMTI2NDFaGA85OTk5MTIzMTIz\n" \
@@ -112,10 +116,11 @@
 	"jTu7jvLbRSHkBQFimWorPfgf15nlXSCBtejEwvDLXlptLbKEa3q7VFXDzCyeiKGb\n" \
 	"IHRozrAP5qiyIjYFJevXrZ/7bWDwMcJrB0uSQN9TD2mJjNXTCHu3GYnEmnu7KRpb\n" \
 	"M3OdswIyjIFYvwlYGe2+GbigSaMZY9KCHR7vkJ1JGdxfh+CADcbL4fwj3kOpyEoe\n" \
-	"TTqtWQ93AfQnd2Vm3/SAr/+jSuMbSA==\n"				\
+	"TTqtWQ93AfQnd2Vm3/SAr/+jSuMbSA==\n"                                 \
 	"-----END CERTIFICATE-----\n"
 
-# define CA_CERT_2 "-----BEGIN CERTIFICATE-----\n"			\
+#define CA_CERT_2                                                            \
+	"-----BEGIN CERTIFICATE-----\n"                                      \
 	"MIIDojCCAlqgAwIBAgIUVd3TT33d1fy/8INiIKhudYmRE5swPQYJKoZIhvcNAQEK\n" \
 	"MDCgDTALBglghkgBZQMEAgGhGjAYBgkqhkiG9w0BAQgwCwYJYIZIAWUDBAIBogMC\n" \
 	"AUAwDzENMAsGA1UEAxMEQ0EtMTAgFw0yMDA0MjAxMTI2NDFaGA85OTk5MTIzMTIz\n" \
@@ -135,10 +140,11 @@
 	"FTYE+42MFBr6f5SNp9Q+ZUcjSK5DO7yNiyKDFfNffFGxHmnmGj2LhgyrvYA/aNyB\n" \
 	"2ichlfihcKkExGBN44ODoK+8/W8oiMt541AvPyJxTJjxWjeJ42EBXO+J5k8wRuCu\n" \
 	"nXCW5OjnEIExXGKZLlieH4t8kUyHlrTlHO7spiqA/QM7GUtBQfJTLdPFmvHU3Jtw\n" \
-	"qGN2PrhXyLoaUfIpNbWO9Jmj2GYaWg==\n"				\
+	"qGN2PrhXyLoaUfIpNbWO9Jmj2GYaWg==\n"                                 \
 	"-----END CERTIFICATE-----\n"
 
-# define CA_CERT_1 "-----BEGIN CERTIFICATE-----\n"			\
+#define CA_CERT_1                                                            \
+	"-----BEGIN CERTIFICATE-----\n"                                      \
 	"MIICxjCCAiegAwIBAgIUKnsCQlR0jpxEnpzqxbi+Y2rqwpMwCgYIKoZIzj0EAwQw\n" \
 	"DzENMAsGA1UEAxMEQ0EtMDAgFw0yMDA0MjAxMTI2NDFaGA85OTk5MTIzMTIzNTk1\n" \
 	"OVowDzENMAsGA1UEAxMEQ0EtMTCCAVIwPQYJKoZIhvcNAQEKMDCgDTALBglghkgB\n" \
@@ -153,10 +159,11 @@
 	"BgNVHSMEGDAWgBRBWngghShY2X+P7m45LPH1V4p5czAKBggqhkjOPQQDBAOBjAAw\n" \
 	"gYgCQgHnvF1Dq32xBBEME4UlVsVeOflvGw5Sr/hVhbUZ1KfAQIV2ZuBuvJNMBrj8\n" \
 	"Pzi/nhRuV8vH5xabyQb9RYVcJ8oilQJCAdduIVVvL6DmUBOJfz1znsxPA5JCBBY2\n" \
-	"pAOhFZBrNXE2zZrgttgR6TG4Obst1fQzL3RsmqAYAuWSpKPNz6Hdq+kl\n"	\
+	"pAOhFZBrNXE2zZrgttgR6TG4Obst1fQzL3RsmqAYAuWSpKPNz6Hdq+kl\n"         \
 	"-----END CERTIFICATE-----\n"
 
-# define CA_CERT_0 "-----BEGIN CERTIFICATE-----\n"			\
+#define CA_CERT_0                                                            \
+	"-----BEGIN CERTIFICATE-----\n"                                      \
 	"MIIB7TCCAU6gAwIBAgIUWmldb3tGP48wFh5P/cmVytYv5JcwCgYIKoZIzj0EAwQw\n" \
 	"DzENMAsGA1UEAxMEQ0EtMDAgFw0yMDA0MjAxMTI2NDFaGA85OTk5MTIzMTIzNTk1\n" \
 	"OVowDzENMAsGA1UEAxMEQ0EtMDCBmzAQBgcqhkjOPQIBBgUrgQQAIwOBhgAEAarU\n" \
@@ -167,10 +174,11 @@
 	"8fVXinlzMAoGCCqGSM49BAMEA4GMADCBiAJCAcmtP2IVnOTF2wHhfUn13qsUpqyc\n" \
 	"3kCI1ueg75NgR7xgpL9JQ1CnPaUbCp+5ROKf5IHn8f1jjZIu45WpiWhnZDkkAkIA\n" \
 	"pCTZn7t7memhMJUqrHGywx2gR9fgID/REZUZdVe9KcTzWvwSrbffDMCcf10SpM6C\n" \
-	"/YXiDLiWNiK+WV8Z557eWKI=\n"					\
+	"/YXiDLiWNiK+WV8Z557eWKI=\n"                                         \
 	"-----END CERTIFICATE-----\n"
 
-# define UNRELATED "-----BEGIN CERTIFICATE-----\n"			\
+#define UNRELATED                                                            \
+	"-----BEGIN CERTIFICATE-----\n"                                      \
 	"MIIEaDCCAqCgAwIBAgIMWXi5rBKSNwkPo4olMD0GCSqGSIb3DQEBCjAwoA0wCwYJ\n" \
 	"YIZIAWUDBAIDoRowGAYJKoZIhvcNAQEIMAsGCWCGSAFlAwQCA6IDAgFAMA8xDTAL\n" \
 	"BgNVBAMTBENBLTAwIBcNMTcwNzI2MTU0NzU2WhgPOTk5OTEyMzEyMzU5NTlaMA8x\n" \
@@ -194,16 +202,11 @@
 	"3eoeffRfWQXO2y0/K9TUqZM+6n10N32ZkR45I+XSQ13qS73l4QS4djay9z/bAMeb\n" \
 	"/zgaf6J790LULzDBEvhPZLNn4bBu/t7WVj2NI+frQvAHyQ9ZhBYkow84qF+//zK9\n" \
 	"d/VzQbBQOJFX9TWdWgUxklrWnXE0gmxzGBdq+cMQyHulVVbgShftCRJ8jn8e0Cl1\n" \
-	"dl+Cpj08yyLpT9/ZmL8ytgD3Iobw0wPHppb/jQ==\n"			\
+	"dl+Cpj08yyLpT9/ZmL8ytgD3Iobw0wPHppb/jQ==\n"                         \
 	"-----END CERTIFICATE-----\n"
 
 static const char *missing_middle_single[] = {
-	SERVER_CERT,
-	CA_CERT_5,
-	CA_CERT_4,
-	CA_CERT_2,
-	CA_CERT_1,
-	NULL,
+	SERVER_CERT, CA_CERT_5, CA_CERT_4, CA_CERT_2, CA_CERT_1, NULL,
 };
 
 static const char *missing_middle_single_insert[] = {
@@ -212,11 +215,7 @@ static const char *missing_middle_single_insert[] = {
 };
 
 static const char *missing_middle_multiple[] = {
-	SERVER_CERT,
-	CA_CERT_5,
-	CA_CERT_4,
-	CA_CERT_1,
-	NULL,
+	SERVER_CERT, CA_CERT_5, CA_CERT_4, CA_CERT_1, NULL,
 };
 
 static const char *missing_middle_multiple_insert[] = {
@@ -225,12 +224,7 @@ static const char *missing_middle_multiple_insert[] = {
 };
 
 static const char *missing_last_single[] = {
-	SERVER_CERT,
-	CA_CERT_5,
-	CA_CERT_4,
-	CA_CERT_3,
-	CA_CERT_2,
-	NULL,
+	SERVER_CERT, CA_CERT_5, CA_CERT_4, CA_CERT_3, CA_CERT_2, NULL,
 };
 
 static const char *missing_last_single_insert[] = {
@@ -239,11 +233,7 @@ static const char *missing_last_single_insert[] = {
 };
 
 static const char *missing_last_multiple[] = {
-	SERVER_CERT,
-	CA_CERT_5,
-	CA_CERT_4,
-	CA_CERT_3,
-	NULL,
+	SERVER_CERT, CA_CERT_5, CA_CERT_4, CA_CERT_3, NULL,
 };
 
 static const char *missing_last_multiple_insert[] = {
@@ -252,11 +242,7 @@ static const char *missing_last_multiple_insert[] = {
 };
 
 static const char *missing_skip_single[] = {
-	SERVER_CERT,
-	CA_CERT_5,
-	CA_CERT_3,
-	CA_CERT_1,
-	NULL,
+	SERVER_CERT, CA_CERT_5, CA_CERT_3, CA_CERT_1, NULL,
 };
 
 static const char *missing_skip_single_insert[] = {
@@ -279,45 +265,23 @@ static const char *missing_skip_multiple_insert[] = {
 };
 
 static const char *missing_middle_single_unsorted[] = {
-	SERVER_CERT,
-	CA_CERT_1,
-	CA_CERT_2,
-	CA_CERT_4,
-	CA_CERT_5,
-	NULL,
+	SERVER_CERT, CA_CERT_1, CA_CERT_2, CA_CERT_4, CA_CERT_5, NULL,
 };
 
 static const char *missing_middle_multiple_unsorted[] = {
-	SERVER_CERT,
-	CA_CERT_1,
-	CA_CERT_4,
-	CA_CERT_5,
-	NULL,
+	SERVER_CERT, CA_CERT_1, CA_CERT_4, CA_CERT_5, NULL,
 };
 
 static const char *missing_last_single_unsorted[] = {
-	SERVER_CERT,
-	CA_CERT_2,
-	CA_CERT_3,
-	CA_CERT_4,
-	CA_CERT_5,
-	NULL,
+	SERVER_CERT, CA_CERT_2, CA_CERT_3, CA_CERT_4, CA_CERT_5, NULL,
 };
 
 static const char *missing_last_multiple_unsorted[] = {
-	SERVER_CERT,
-	CA_CERT_3,
-	CA_CERT_4,
-	CA_CERT_5,
-	NULL,
+	SERVER_CERT, CA_CERT_3, CA_CERT_4, CA_CERT_5, NULL,
 };
 
 static const char *missing_skip_single_unsorted[] = {
-	SERVER_CERT,
-	CA_CERT_1,
-	CA_CERT_3,
-	CA_CERT_5,
-	NULL,
+	SERVER_CERT, CA_CERT_1, CA_CERT_3, CA_CERT_5, NULL,
 };
 
 static const char *missing_skip_multiple_unsorted[] = {
@@ -339,77 +303,33 @@ static const char *missing_middle_unrelated_extra_insert[] = {
 };
 
 static const char *missing_middle_single_duplicate[] = {
-	SERVER_CERT,
-	SERVER_CERT,
-	CA_CERT_5,
-	CA_CERT_5,
-	CA_CERT_4,
-	CA_CERT_4,
-	CA_CERT_2,
-	CA_CERT_2,
-	CA_CERT_1,
-	CA_CERT_1,
-	NULL,
+	SERVER_CERT, SERVER_CERT, CA_CERT_5, CA_CERT_5, CA_CERT_4, CA_CERT_4,
+	CA_CERT_2,   CA_CERT_2,	  CA_CERT_1, CA_CERT_1, NULL,
 };
 
 static const char *missing_middle_multiple_duplicate[] = {
-	SERVER_CERT,
-	SERVER_CERT,
-	CA_CERT_5,
-	CA_CERT_5,
-	CA_CERT_4,
-	CA_CERT_4,
-	CA_CERT_1,
-	CA_CERT_1,
-	NULL,
+	SERVER_CERT, SERVER_CERT, CA_CERT_5, CA_CERT_5, CA_CERT_4,
+	CA_CERT_4,   CA_CERT_1,	  CA_CERT_1, NULL,
 };
 
 static const char *missing_last_single_duplicate[] = {
-	SERVER_CERT,
-	SERVER_CERT,
-	CA_CERT_5,
-	CA_CERT_5,
-	CA_CERT_4,
-	CA_CERT_4,
-	CA_CERT_3,
-	CA_CERT_3,
-	CA_CERT_2,
-	CA_CERT_2,
-	NULL,
+	SERVER_CERT, SERVER_CERT, CA_CERT_5, CA_CERT_5, CA_CERT_4, CA_CERT_4,
+	CA_CERT_3,   CA_CERT_3,	  CA_CERT_2, CA_CERT_2, NULL,
 };
 
 static const char *missing_last_multiple_duplicate[] = {
-	SERVER_CERT,
-	SERVER_CERT,
-	CA_CERT_5,
-	CA_CERT_5,
-	CA_CERT_4,
-	CA_CERT_4,
-	CA_CERT_3,
-	CA_CERT_3,
-	NULL,
+	SERVER_CERT, SERVER_CERT, CA_CERT_5, CA_CERT_5, CA_CERT_4,
+	CA_CERT_4,   CA_CERT_3,	  CA_CERT_3, NULL,
 };
 
 static const char *missing_skip_single_duplicate[] = {
-	SERVER_CERT,
-	SERVER_CERT,
-	CA_CERT_5,
-	CA_CERT_5,
-	CA_CERT_3,
-	CA_CERT_3,
-	CA_CERT_1,
-	CA_CERT_1,
-	NULL,
+	SERVER_CERT, SERVER_CERT, CA_CERT_5, CA_CERT_5, CA_CERT_3,
+	CA_CERT_3,   CA_CERT_1,	  CA_CERT_1, NULL,
 };
 
 static const char *missing_skip_multiple_duplicate[] = {
-	SERVER_CERT,
-	SERVER_CERT,
-	CA_CERT_5,
-	CA_CERT_5,
-	CA_CERT_3,
-	CA_CERT_3,
-	NULL,
+	SERVER_CERT, SERVER_CERT, CA_CERT_5, CA_CERT_5,
+	CA_CERT_3,   CA_CERT_3,	  NULL,
 };
 
 static const char *missing_ca[] = {
@@ -418,15 +338,8 @@ static const char *missing_ca[] = {
 };
 
 static const char *middle_single_duplicate_ca[] = {
-	SERVER_CERT,
-	CA_CERT_5,
-	CA_CERT_0,
-	CA_CERT_4,
-	CA_CERT_0,
-	CA_CERT_2,
-	CA_CERT_0,
-	CA_CERT_1,
-	NULL,
+	SERVER_CERT, CA_CERT_5, CA_CERT_0, CA_CERT_4, CA_CERT_0,
+	CA_CERT_2,   CA_CERT_0, CA_CERT_1, NULL,
 };
 
 static const char *missing_middle_single_duplicate_ca_unrelated_insert[] = {
@@ -442,95 +355,95 @@ static struct chains {
 	unsigned int verify_flags;
 	unsigned int expected_verify_result;
 } chains[] = {
-	{"middle single - no sort", missing_middle_single,
-	 missing_middle_single_insert, missing_ca,
-	 GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN, 0},
-	{"middle multiple - no sort", missing_middle_multiple,
-	 missing_middle_multiple_insert, missing_ca,
-	 GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN, 0},
-	{"last single - no sort", missing_last_single,
-	 missing_last_single_insert, missing_ca,
-	 GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN, 0},
-	{"last multiple - no sort", missing_last_multiple,
-	 missing_last_multiple_insert, missing_ca,
-	 GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN, 0},
-	{"skip single - no sort", missing_skip_single,
-	 missing_skip_single_insert, missing_ca,
-	 GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN, 0},
-	{"skip multiple - no sort", missing_skip_multiple,
-	 missing_skip_multiple_insert, missing_ca,
-	 GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN, 0},
-	{"middle single unsorted - no sort", missing_middle_single_unsorted,
-	 missing_middle_single_insert, missing_ca,
-	 GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN,
-	 GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_NOT_FOUND},
-	{"middle multiple unsorted - no sort", missing_middle_multiple_unsorted,
-	 missing_middle_multiple_insert, missing_ca,
-	 GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN,
-	 GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_NOT_FOUND},
-	{"last single unsorted - no sort", missing_last_single_unsorted,
-	 missing_last_single_insert, missing_ca,
-	 GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN,
-	 GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_NOT_FOUND},
-	{"last multiple unsorted - no sort", missing_last_multiple_unsorted,
-	 missing_last_multiple_insert, missing_ca,
-	 GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN,
-	 GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_NOT_FOUND},
-	{"skip single unsorted - no sort", missing_skip_single_unsorted,
-	 missing_skip_single_insert, missing_ca,
-	 GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN,
-	 GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_NOT_FOUND},
-	{"skip multiple unsorted - no sort", missing_skip_multiple_unsorted,
-	 missing_skip_multiple_insert, missing_ca,
-	 GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN,
-	 GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_NOT_FOUND},
-	{"middle single", missing_middle_single, missing_middle_single_insert,
-	 missing_ca, 0, 0},
-	{"middle multiple", missing_middle_multiple,
-	 missing_middle_multiple_insert, missing_ca, 0, 0},
-	{"last single", missing_last_single, missing_last_single_insert,
-	 missing_ca, 0, 0},
-	{"last multiple", missing_last_multiple, missing_last_multiple_insert,
-	 missing_ca, 0, 0},
-	{"skip single", missing_skip_single, missing_skip_single_insert,
-	 missing_ca, 0, 0},
-	{"skip multiple", missing_skip_multiple, missing_skip_multiple_insert,
-	 missing_ca, 0, 0},
-	{"middle single unsorted", missing_middle_single_unsorted,
-	 missing_middle_single_insert, missing_ca, 0, 0},
-	{"middle multiple unsorted", missing_middle_multiple_unsorted,
-	 missing_middle_multiple_insert, missing_ca, 0, 0},
-	{"last single unsorted", missing_last_single_unsorted,
-	 missing_last_single_insert, missing_ca, 0, 0},
-	{"last multiple unsorted", missing_last_multiple_unsorted,
-	 missing_last_multiple_insert, missing_ca, 0, 0},
-	{"skip single unsorted", missing_skip_single_unsorted,
-	 missing_skip_single_insert, missing_ca, 0, 0},
-	{"skip multiple unsorted", missing_skip_multiple_unsorted,
-	 missing_skip_multiple_insert, missing_ca, 0, 0},
-	{"unrelated", missing_middle_single, missing_middle_unrelated_insert,
-	 missing_ca, 0, GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_NOT_FOUND},
-	{"unrelated extra", missing_middle_single,
-	 missing_middle_unrelated_extra_insert, missing_ca, 0, 0},
-	{"middle single duplicate", missing_middle_single_duplicate,
-	 missing_middle_single_insert, missing_ca, 0, 0},
-	{"middle multiple duplicate", missing_middle_multiple_duplicate,
-	 missing_middle_multiple_insert, missing_ca, 0, 0},
-	{"last single duplicate", missing_last_single_duplicate,
-	 missing_last_single_insert, missing_ca, 0, 0},
-	{"last multiple duplicate", missing_last_multiple_duplicate,
-	 missing_last_multiple_insert, missing_ca, 0, 0},
-	{"skip single duplicate", missing_skip_single_duplicate,
-	 missing_skip_single_insert, missing_ca, 0, 0},
-	{"skip multiple duplicate", missing_skip_multiple_duplicate,
-	 missing_skip_multiple_insert, missing_ca, 0, 0},
-	{"middle single duplicate ca", middle_single_duplicate_ca,
-	 missing_middle_single_insert, missing_ca, 0, 0},
-	{"middle single duplicate ca - insert unrelated",
-	 middle_single_duplicate_ca,
-	 missing_middle_single_duplicate_ca_unrelated_insert, missing_ca, 0,
-	 GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_NOT_FOUND},
-	{NULL, NULL, NULL, NULL},
+	{ "middle single - no sort", missing_middle_single,
+	  missing_middle_single_insert, missing_ca,
+	  GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN, 0 },
+	{ "middle multiple - no sort", missing_middle_multiple,
+	  missing_middle_multiple_insert, missing_ca,
+	  GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN, 0 },
+	{ "last single - no sort", missing_last_single,
+	  missing_last_single_insert, missing_ca,
+	  GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN, 0 },
+	{ "last multiple - no sort", missing_last_multiple,
+	  missing_last_multiple_insert, missing_ca,
+	  GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN, 0 },
+	{ "skip single - no sort", missing_skip_single,
+	  missing_skip_single_insert, missing_ca,
+	  GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN, 0 },
+	{ "skip multiple - no sort", missing_skip_multiple,
+	  missing_skip_multiple_insert, missing_ca,
+	  GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN, 0 },
+	{ "middle single unsorted - no sort", missing_middle_single_unsorted,
+	  missing_middle_single_insert, missing_ca,
+	  GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN,
+	  GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_NOT_FOUND },
+	{ "middle multiple unsorted - no sort",
+	  missing_middle_multiple_unsorted, missing_middle_multiple_insert,
+	  missing_ca, GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN,
+	  GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_NOT_FOUND },
+	{ "last single unsorted - no sort", missing_last_single_unsorted,
+	  missing_last_single_insert, missing_ca,
+	  GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN,
+	  GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_NOT_FOUND },
+	{ "last multiple unsorted - no sort", missing_last_multiple_unsorted,
+	  missing_last_multiple_insert, missing_ca,
+	  GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN,
+	  GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_NOT_FOUND },
+	{ "skip single unsorted - no sort", missing_skip_single_unsorted,
+	  missing_skip_single_insert, missing_ca,
+	  GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN,
+	  GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_NOT_FOUND },
+	{ "skip multiple unsorted - no sort", missing_skip_multiple_unsorted,
+	  missing_skip_multiple_insert, missing_ca,
+	  GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN,
+	  GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_NOT_FOUND },
+	{ "middle single", missing_middle_single, missing_middle_single_insert,
+	  missing_ca, 0, 0 },
+	{ "middle multiple", missing_middle_multiple,
+	  missing_middle_multiple_insert, missing_ca, 0, 0 },
+	{ "last single", missing_last_single, missing_last_single_insert,
+	  missing_ca, 0, 0 },
+	{ "last multiple", missing_last_multiple, missing_last_multiple_insert,
+	  missing_ca, 0, 0 },
+	{ "skip single", missing_skip_single, missing_skip_single_insert,
+	  missing_ca, 0, 0 },
+	{ "skip multiple", missing_skip_multiple, missing_skip_multiple_insert,
+	  missing_ca, 0, 0 },
+	{ "middle single unsorted", missing_middle_single_unsorted,
+	  missing_middle_single_insert, missing_ca, 0, 0 },
+	{ "middle multiple unsorted", missing_middle_multiple_unsorted,
+	  missing_middle_multiple_insert, missing_ca, 0, 0 },
+	{ "last single unsorted", missing_last_single_unsorted,
+	  missing_last_single_insert, missing_ca, 0, 0 },
+	{ "last multiple unsorted", missing_last_multiple_unsorted,
+	  missing_last_multiple_insert, missing_ca, 0, 0 },
+	{ "skip single unsorted", missing_skip_single_unsorted,
+	  missing_skip_single_insert, missing_ca, 0, 0 },
+	{ "skip multiple unsorted", missing_skip_multiple_unsorted,
+	  missing_skip_multiple_insert, missing_ca, 0, 0 },
+	{ "unrelated", missing_middle_single, missing_middle_unrelated_insert,
+	  missing_ca, 0, GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_NOT_FOUND },
+	{ "unrelated extra", missing_middle_single,
+	  missing_middle_unrelated_extra_insert, missing_ca, 0, 0 },
+	{ "middle single duplicate", missing_middle_single_duplicate,
+	  missing_middle_single_insert, missing_ca, 0, 0 },
+	{ "middle multiple duplicate", missing_middle_multiple_duplicate,
+	  missing_middle_multiple_insert, missing_ca, 0, 0 },
+	{ "last single duplicate", missing_last_single_duplicate,
+	  missing_last_single_insert, missing_ca, 0, 0 },
+	{ "last multiple duplicate", missing_last_multiple_duplicate,
+	  missing_last_multiple_insert, missing_ca, 0, 0 },
+	{ "skip single duplicate", missing_skip_single_duplicate,
+	  missing_skip_single_insert, missing_ca, 0, 0 },
+	{ "skip multiple duplicate", missing_skip_multiple_duplicate,
+	  missing_skip_multiple_insert, missing_ca, 0, 0 },
+	{ "middle single duplicate ca", middle_single_duplicate_ca,
+	  missing_middle_single_insert, missing_ca, 0, 0 },
+	{ "middle single duplicate ca - insert unrelated",
+	  middle_single_duplicate_ca,
+	  missing_middle_single_duplicate_ca_unrelated_insert, missing_ca, 0,
+	  GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_NOT_FOUND },
+	{ NULL, NULL, NULL, NULL },
 };
 
-#endif				/* GNUTLS_TESTS_TEST_CHAINS_ISSUER_H */
+#endif /* GNUTLS_TESTS_TEST_CHAINS_ISSUER_H */

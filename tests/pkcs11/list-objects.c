@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -48,9 +48,9 @@ static void tls_log_func(int level, const char *str)
 
 static const char *opt_pin;
 
-static
-int pin_func(void *userdata, int attempt, const char *url, const char *label,
-	     unsigned flags, char *pin, size_t pin_max)
+static int pin_func(void *userdata, int attempt, const char *url,
+		    const char *label, unsigned flags, char *pin,
+		    size_t pin_max)
 {
 	if (attempt == 0) {
 		strcpy(pin, opt_pin);
@@ -124,9 +124,8 @@ int main(int argc, char **argv)
 		flags = 0;
 	}
 
-	ret =
-	    gnutls_pkcs11_obj_list_import_url2(&crt_list, &crt_list_size,
-					       url, attrs, obj_flags);
+	ret = gnutls_pkcs11_obj_list_import_url2(&crt_list, &crt_list_size, url,
+						 attrs, obj_flags);
 	if (ret != 0) {
 		fprintf(stderr, "error at %d: %s\n", __LINE__,
 			gnutls_strerror(ret));

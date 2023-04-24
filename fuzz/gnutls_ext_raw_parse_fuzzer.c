@@ -26,14 +26,13 @@
 
 #include "fuzzer.h"
 
-static
-int cb(void *ctx, unsigned tls_id, const unsigned char *data,
-       unsigned data_size)
+static int cb(void *ctx, unsigned tls_id, const unsigned char *data,
+	      unsigned data_size)
 {
 	return 0;
 }
 
-int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
 	gnutls_datum_t raw;
 

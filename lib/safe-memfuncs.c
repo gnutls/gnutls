@@ -74,7 +74,6 @@ int main(void)
 	gnutls_memset(x, 0, sizeof(x));
 
 	return 0;
-
 }
 
 #endif

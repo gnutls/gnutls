@@ -1,7 +1,7 @@
 /* This example code is placed in the public domain. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -18,9 +18,13 @@
 /* This is a sample TLS 1.0 echo server, for anonymous authentication only.
  */
 
-#define SOCKET_ERR(err,s) if(err==-1) {perror(s);return(1);}
+#define SOCKET_ERR(err, s)  \
+	if (err == -1) {    \
+		perror(s);  \
+		return (1); \
+	}
 #define MAX_BUF 1024
-#define PORT 5556		/* listen to 5556 port */
+#define PORT 5556 /* listen to 5556 port */
 
 int main(void)
 {
@@ -57,7 +61,7 @@ int main(void)
 	memset(&sa_serv, '\0', sizeof(sa_serv));
 	sa_serv.sin_family = AF_INET;
 	sa_serv.sin_addr.s_addr = INADDR_ANY;
-	sa_serv.sin_port = htons(PORT);	/* Server Port number */
+	sa_serv.sin_port = htons(PORT); /* Server Port number */
 
 	setsockopt(listen_sd, SOL_SOCKET, SO_REUSEADDR, (void *)&optval,
 		   sizeof(int));
@@ -80,20 +84,19 @@ int main(void)
 
 		printf("- connection from %s, port %d\n",
 		       inet_ntop(AF_INET, &sa_cli.sin_addr, topbuf,
-				 sizeof(topbuf)), ntohs(sa_cli.sin_port));
+				 sizeof(topbuf)),
+		       ntohs(sa_cli.sin_port));
 
 		gnutls_transport_set_int(session, sd);
 
 		do {
 			ret = gnutls_handshake(session);
-		}
-		while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+		} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 		if (ret < 0) {
 			close(sd);
 			gnutls_deinit(session);
-			fprintf(stderr,
-				"*** Handshake has failed (%s)\n\n",
+			fprintf(stderr, "*** Handshake has failed (%s)\n\n",
 				gnutls_strerror(ret));
 			continue;
 		}
@@ -106,14 +109,14 @@ int main(void)
 			ret = gnutls_record_recv(session, buffer, MAX_BUF);
 
 			if (ret == 0) {
-				printf
-				    ("\n- Peer has closed the GnuTLS connection\n");
+				printf("\n- Peer has closed the GnuTLS connection\n");
 				break;
 			} else if (ret < 0 && gnutls_error_is_fatal(ret) == 0) {
 				fprintf(stderr, "*** Warning: %s\n",
 					gnutls_strerror(ret));
 			} else if (ret < 0) {
-				fprintf(stderr, "\n*** Received corrupted "
+				fprintf(stderr,
+					"\n*** Received corrupted "
 					"data(%d). Closing the connection.\n\n",
 					ret);
 				break;
@@ -130,7 +133,6 @@ int main(void)
 
 		close(sd);
 		gnutls_deinit(session);
-
 	}
 	close(listen_sd);
 
@@ -139,5 +141,4 @@ int main(void)
 	gnutls_global_deinit();
 
 	return 0;
-
 }

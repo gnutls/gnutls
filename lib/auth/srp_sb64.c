@@ -32,36 +32,24 @@
  * It seems that everybody makes their own base64 conversion.
  */
 static const uint8_t b64table[] =
-    "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz./";
+	"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz./";
 
 static const uint8_t asciitable[128] = {
-	0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-	0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-	0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-	0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-	0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-	0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-	0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-	0xff, 0xff, 0xff, 0xff, 0x3e, 0x3f,
-	0x00, 0x01, 0x02, 0x03, 0x04, 0x05,
-	0x06, 0x07, 0x08, 0x09, 0xff, 0xff,
-	0xff, 0xff, 0xff, 0xff, 0xff, 0x0a,
-	0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10,
-	0x11, 0x12, 0x13, 0x14, 0x15, 0x16,
-	0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c,
-	0x1d, 0x1e, 0x1f, 0x20, 0x21, 0x22,
-	0x23, 0xff, 0xff, 0xff, 0xff, 0xff,
-	0xff, 0x24, 0x25, 0x26, 0x27, 0x28,
-	0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e,
-	0x2f, 0x30, 0x31, 0x32, 0x33, 0x34,
-	0x35, 0x36, 0x37, 0x38, 0x39, 0x3a,
-	0x3b, 0x3c, 0x3d, 0xff, 0xff, 0xff,
-	0xff, 0xff
+	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x3e, 0x3f,
+	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0xff, 0xff,
+	0xff, 0xff, 0xff, 0xff, 0xff, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10,
+	0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c,
+	0x1d, 0x1e, 0x1f, 0x20, 0x21, 0x22, 0x23, 0xff, 0xff, 0xff, 0xff, 0xff,
+	0xff, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e,
+	0x2f, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a,
+	0x3b, 0x3c, 0x3d, 0xff, 0xff, 0xff, 0xff, 0xff
 };
 
-inline static int encode(uint8_t * result, const uint8_t * rdata, unsigned left)
+inline static int encode(uint8_t *result, const uint8_t *rdata, unsigned left)
 {
-
 	int data_len;
 	int c, ret = 4;
 	uint8_t data[3];
@@ -78,26 +66,23 @@ inline static int encode(uint8_t * result, const uint8_t * rdata, unsigned left)
 	case 3:
 		result[0] = b64table[((data[0] & 0xfc) >> 2)];
 		result[1] =
-		    b64table[(((((data[0] & 0x03) & 0xff) << 4) & 0xff) |
-			      ((data[1] & 0xf0) >> 4))];
-		result[2] =
-		    b64table[((((data[1] & 0x0f) << 2) & 0xff) |
-			      ((data[2] & 0xc0) >> 6))];
+			b64table[(((((data[0] & 0x03) & 0xff) << 4) & 0xff) |
+				  ((data[1] & 0xf0) >> 4))];
+		result[2] = b64table[((((data[1] & 0x0f) << 2) & 0xff) |
+				      ((data[2] & 0xc0) >> 6))];
 		result[3] = b64table[(data[2] & 0x3f) & 0xff];
 		break;
 	case 2:
 		if ((c = ((data[0] & 0xf0) >> 4)) != 0) {
 			result[0] = b64table[c];
-			result[1] =
-			    b64table[((((data[0] & 0x0f) << 2) & 0xff) |
-				      ((data[1] & 0xc0) >> 6))];
+			result[1] = b64table[((((data[0] & 0x0f) << 2) & 0xff) |
+					      ((data[1] & 0xc0) >> 6))];
 			result[2] = b64table[(data[1] & 0x3f) & 0xff];
 			result[3] = '\0';
 			ret -= 1;
 		} else {
-			if ((c =
-			     ((data[0] & 0x0f) << 2) | ((data[1] & 0xc0) >>
-							6)) != 0) {
+			if ((c = ((data[0] & 0x0f) << 2) |
+				 ((data[1] & 0xc0) >> 6)) != 0) {
 				result[0] = b64table[c];
 				result[1] = b64table[data[1] & 0x3f];
 				result[2] = '\0';
@@ -132,14 +117,13 @@ inline static int encode(uint8_t * result, const uint8_t * rdata, unsigned left)
 	}
 
 	return ret;
-
 }
 
 /* encodes data and puts the result into result (locally allocated)
  * The result_size is the return value
  */
-static int
-_gnutls_sbase64_encode(uint8_t * data, size_t data_size, char **result)
+static int _gnutls_sbase64_encode(uint8_t *data, size_t data_size,
+				  char **result)
 {
 	unsigned i, j;
 	int ret, tmp;
@@ -159,7 +143,7 @@ _gnutls_sbase64_encode(uint8_t * data, size_t data_size, char **result)
 		return GNUTLS_E_MEMORY_ERROR;
 
 	i = j = 0;
-/* encode the bytes that are not a multiple of 3 
+	/* encode the bytes that are not a multiple of 3 
  */
 	if (mod > 0) {
 		tmp = encode(tmpres, &data[0], mod);
@@ -171,9 +155,8 @@ _gnutls_sbase64_encode(uint8_t * data, size_t data_size, char **result)
 		memcpy(&(*result)[0], tmpres, tmp);
 		i = mod;
 		j = tmp;
-
 	}
-/* encode the rest
+	/* encode the rest
  */
 	for (; i < data_size; i += 3, j += 4) {
 		tmp = encode(tmpres, &data[i], data_size - i);
@@ -190,8 +173,8 @@ _gnutls_sbase64_encode(uint8_t * data, size_t data_size, char **result)
 /* data must be 4 bytes
  * result should be 3 bytes
  */
-# define TOASCII(c) (c < 127 ? asciitable[c] : 0xff)
-inline static int decode(uint8_t * result, const uint8_t * data)
+#define TOASCII(c) (c < 127 ? asciitable[c] : 0xff)
+inline static int decode(uint8_t *result, const uint8_t *data)
 {
 	uint8_t a1, a2;
 	int ret = 3;
@@ -233,7 +216,7 @@ inline static int decode(uint8_t * result, const uint8_t * data)
  * That function does not ignore newlines tabs etc. You should remove them
  * before calling it.
  */
-int _gnutls_sbase64_decode(char *data, size_t idata_size, uint8_t ** result)
+int _gnutls_sbase64_decode(char *data, size_t idata_size, uint8_t **result)
 {
 	unsigned i, j;
 	int ret, left;
@@ -272,7 +255,7 @@ int _gnutls_sbase64_decode(char *data, size_t idata_size, uint8_t ** result)
 
 	/* rest data */
 	for (i = left, j = tmp; i < idata_size; i += 4) {
-		tmp = decode(tmpres, (uint8_t *) & data[i]);
+		tmp = decode(tmpres, (uint8_t *)&data[i]);
 		if (tmp < 0) {
 			gnutls_free((*result));
 			return tmp;
@@ -303,9 +286,8 @@ int _gnutls_sbase64_decode(char *data, size_t idata_size, uint8_t ** result)
  * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the buffer given is not
  * long enough, or 0 on success.
  **/
-int
-gnutls_srp_base64_encode(const gnutls_datum_t * data, char *result,
-			 size_t *result_size)
+int gnutls_srp_base64_encode(const gnutls_datum_t *data, char *result,
+			     size_t *result_size)
 {
 	char *res;
 	int size;
@@ -344,8 +326,8 @@ gnutls_srp_base64_encode(const gnutls_datum_t * data, char *result,
  *
  * Returns: 0 on success, or an error code.
  **/
-int
-gnutls_srp_base64_encode2(const gnutls_datum_t * data, gnutls_datum_t * result)
+int gnutls_srp_base64_encode2(const gnutls_datum_t *data,
+			      gnutls_datum_t *result)
 {
 	char *res;
 	int size;
@@ -358,7 +340,7 @@ gnutls_srp_base64_encode2(const gnutls_datum_t * data, gnutls_datum_t * result)
 		gnutls_free(res);
 		return GNUTLS_E_INVALID_REQUEST;
 	} else {
-		result->data = (uint8_t *) res;
+		result->data = (uint8_t *)res;
 		result->size = size;
 	}
 
@@ -382,16 +364,14 @@ gnutls_srp_base64_encode2(const gnutls_datum_t * data, gnutls_datum_t * result)
  * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the buffer given is not
  * long enough, or 0 on success.
  **/
-int
-gnutls_srp_base64_decode(const gnutls_datum_t * b64_data, char *result,
-			 size_t *result_size)
+int gnutls_srp_base64_decode(const gnutls_datum_t *b64_data, char *result,
+			     size_t *result_size)
 {
 	uint8_t *res;
 	int size;
 
-	size =
-	    _gnutls_sbase64_decode((char *)b64_data->data, b64_data->size,
-				   &res);
+	size = _gnutls_sbase64_decode((char *)b64_data->data, b64_data->size,
+				      &res);
 	if (size < 0)
 		return size;
 
@@ -424,16 +404,14 @@ gnutls_srp_base64_decode(const gnutls_datum_t * b64_data, char *result,
  *
  * Returns: 0 on success, or an error code.
  **/
-int
-gnutls_srp_base64_decode2(const gnutls_datum_t * b64_data,
-			  gnutls_datum_t * result)
+int gnutls_srp_base64_decode2(const gnutls_datum_t *b64_data,
+			      gnutls_datum_t *result)
 {
 	uint8_t *ret;
 	int size;
 
-	size =
-	    _gnutls_sbase64_decode((char *)b64_data->data, b64_data->size,
-				   &ret);
+	size = _gnutls_sbase64_decode((char *)b64_data->data, b64_data->size,
+				      &ret);
 	if (size < 0)
 		return size;
 
@@ -450,34 +428,30 @@ gnutls_srp_base64_decode2(const gnutls_datum_t * b64_data,
 
 #else
 
-int
-gnutls_srp_base64_encode(const gnutls_datum_t * data MAYBE_UNUSED,
-			 char *result MAYBE_UNUSED,
-			 size_t *result_size MAYBE_UNUSED)
+int gnutls_srp_base64_encode(const gnutls_datum_t *data MAYBE_UNUSED,
+			     char *result MAYBE_UNUSED,
+			     size_t *result_size MAYBE_UNUSED)
 {
 	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }
 
-int
-gnutls_srp_base64_encode2(const gnutls_datum_t * data MAYBE_UNUSED,
-			  gnutls_datum_t * result MAYBE_UNUSED)
+int gnutls_srp_base64_encode2(const gnutls_datum_t *data MAYBE_UNUSED,
+			      gnutls_datum_t *result MAYBE_UNUSED)
 {
 	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }
 
-int
-gnutls_srp_base64_decode(const gnutls_datum_t * b64_data MAYBE_UNUSED,
-			 char *result MAYBE_UNUSED,
-			 size_t *result_size MAYBE_UNUSED)
+int gnutls_srp_base64_decode(const gnutls_datum_t *b64_data MAYBE_UNUSED,
+			     char *result MAYBE_UNUSED,
+			     size_t *result_size MAYBE_UNUSED)
 {
 	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }
 
-int
-gnutls_srp_base64_decode2(const gnutls_datum_t * b64_data MAYBE_UNUSED,
-			  gnutls_datum_t * result MAYBE_UNUSED)
+int gnutls_srp_base64_decode2(const gnutls_datum_t *b64_data MAYBE_UNUSED,
+			      gnutls_datum_t *result MAYBE_UNUSED)
 {
 	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }
 
-#endif				/* ENABLE_SRP */
+#endif /* ENABLE_SRP */

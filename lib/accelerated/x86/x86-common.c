@@ -34,15 +34,15 @@
 #include <sha-x86.h>
 #include <x86-common.h>
 #ifdef HAVE_LIBNETTLE
-# include <nettle/aes.h>	/* for key generation in 192 and 256 bits */
-# include <sha-padlock.h>
+#include <nettle/aes.h> /* for key generation in 192 and 256 bits */
+#include <sha-padlock.h>
 #endif
 #include <aes-padlock.h>
 #ifdef HAVE_CPUID_H
-# include <cpuid.h>
+#include <cpuid.h>
 #else
-# define __get_cpuid(...) 0
-# define __get_cpuid_count(...) 0
+#define __get_cpuid(...) 0
+#define __get_cpuid_count(...) 0
 #endif
 
 /* ebx, ecx, edx 
@@ -56,57 +56,57 @@ __hidden
 unsigned int GNUTLS_x86_cpuid_s[4];
 
 #ifndef bit_SHA
-# define bit_SHA (1<<29)
+#define bit_SHA (1 << 29)
 #endif
 
 /* ecx */
 #ifndef bit_AVX512BITALG
-# define bit_AVX512BITALG 0x4000
+#define bit_AVX512BITALG 0x4000
 #endif
 
 #ifndef bit_PCLMUL
-# define bit_PCLMUL 0x2
+#define bit_PCLMUL 0x2
 #endif
 
 #ifndef bit_SSSE3
 /* ecx */
-# define bit_SSSE3 0x0000200
+#define bit_SSSE3 0x0000200
 #endif
 
 #ifndef bit_AES
-# define bit_AES 0x2000000
+#define bit_AES 0x2000000
 #endif
 
 #ifndef bit_AVX
-# define bit_AVX 0x10000000
+#define bit_AVX 0x10000000
 #endif
 
 #ifndef bit_AVX2
-# define bit_AVX2 0x00000020
+#define bit_AVX2 0x00000020
 #endif
 
 #ifndef bit_AVX512F
-# define bit_AVX512F 0x00010000
+#define bit_AVX512F 0x00010000
 #endif
 
 #ifndef bit_AVX512IFMA
-# define bit_AVX512IFMA 0x00200000
+#define bit_AVX512IFMA 0x00200000
 #endif
 
 #ifndef bit_AVX512BW
-# define bit_AVX512BW 0x40000000
+#define bit_AVX512BW 0x40000000
 #endif
 
 #ifndef bit_AVX512VL
-# define bit_AVX512VL 0x80000000
+#define bit_AVX512VL 0x80000000
 #endif
 
 #ifndef bit_OSXSAVE
-# define bit_OSXSAVE 0x8000000
+#define bit_OSXSAVE 0x8000000
 #endif
 
 #ifndef bit_MOVBE
-# define bit_MOVBE 0x00400000
+#define bit_MOVBE 0x00400000
 #endif
 
 #define bit_PADLOCK (0x3 << 6)
@@ -116,19 +116,18 @@ unsigned int GNUTLS_x86_cpuid_s[4];
 /* Our internal bit-string for cpu capabilities. Should be set
  * in GNUTLS_CPUID_OVERRIDE */
 #define EMPTY_SET 1
-#define INTEL_AES_NI (1<<1)
-#define INTEL_SSSE3 (1<<2)
-#define INTEL_PCLMUL (1<<3)
-#define INTEL_AVX (1<<4)
-#define INTEL_SHA (1<<5)
-#define PADLOCK (1<<20)
-#define PADLOCK_PHE (1<<21)
-#define PADLOCK_PHE_SHA512 (1<<22)
+#define INTEL_AES_NI (1 << 1)
+#define INTEL_SSSE3 (1 << 2)
+#define INTEL_PCLMUL (1 << 3)
+#define INTEL_AVX (1 << 4)
+#define INTEL_SHA (1 << 5)
+#define PADLOCK (1 << 20)
+#define PADLOCK_PHE (1 << 21)
+#define PADLOCK_PHE_SHA512 (1 << 22)
 
 #ifndef HAVE_GET_CPUID_COUNT
-static inline void
-get_cpuid_level7(unsigned int *eax, unsigned int *ebx,
-		 unsigned int *ecx, unsigned int *edx)
+static inline void get_cpuid_level7(unsigned int *eax, unsigned int *ebx,
+				    unsigned int *ecx, unsigned int *edx)
 {
 	/* we avoid using __get_cpuid_count, because it is not available with gcc 4.8 */
 	if (__get_cpuid_max(7, 0) < 7)
@@ -138,7 +137,7 @@ get_cpuid_level7(unsigned int *eax, unsigned int *ebx,
 	return;
 }
 #else
-# define get_cpuid_level7(a,b,c,d) __get_cpuid_count(7, 0, a, b, c, d)
+#define get_cpuid_level7(a, b, c, d) __get_cpuid_count(7, 0, a, b, c, d)
 #endif
 
 static unsigned read_cpuid_vals(unsigned int vals[4])
@@ -170,7 +169,7 @@ static unsigned check_4th_gen_intel_features(unsigned ecx)
 #if defined(_MSC_VER) && !defined(__clang__)
 	xcr0 = _xgetbv(0);
 #else
- __asm__("xgetbv": "=a"(xcr0): "c"(0):"%edx");
+	__asm__("xgetbv" : "=a"(xcr0) : "c"(0) : "%edx");
 #endif
 	/* Check if xmm and ymm state are enabled in XCR0. */
 	return (xcr0 & 6) == 6;
@@ -191,8 +190,8 @@ static void capabilities_to_intel_cpuid(unsigned capabilities)
 		if (a[1] & bit_AES) {
 			GNUTLS_x86_cpuid_s[1] |= bit_AES;
 		} else {
-			_gnutls_debug_log
-			    ("AESNI acceleration requested but not available\n");
+			_gnutls_debug_log(
+				"AESNI acceleration requested but not available\n");
 		}
 	}
 
@@ -200,8 +199,8 @@ static void capabilities_to_intel_cpuid(unsigned capabilities)
 		if (a[1] & bit_SSSE3) {
 			GNUTLS_x86_cpuid_s[1] |= bit_SSSE3;
 		} else {
-			_gnutls_debug_log
-			    ("SSSE3 acceleration requested but not available\n");
+			_gnutls_debug_log(
+				"SSSE3 acceleration requested but not available\n");
 		}
 	}
 
@@ -210,8 +209,8 @@ static void capabilities_to_intel_cpuid(unsigned capabilities)
 		    check_4th_gen_intel_features(a[1])) {
 			GNUTLS_x86_cpuid_s[1] |= bit_AVX | bit_MOVBE;
 		} else {
-			_gnutls_debug_log
-			    ("AVX acceleration requested but not available\n");
+			_gnutls_debug_log(
+				"AVX acceleration requested but not available\n");
 		}
 	}
 
@@ -219,8 +218,8 @@ static void capabilities_to_intel_cpuid(unsigned capabilities)
 		if (a[1] & bit_PCLMUL) {
 			GNUTLS_x86_cpuid_s[1] |= bit_PCLMUL;
 		} else {
-			_gnutls_debug_log
-			    ("PCLMUL acceleration requested but not available\n");
+			_gnutls_debug_log(
+				"PCLMUL acceleration requested but not available\n");
 		}
 	}
 
@@ -228,8 +227,8 @@ static void capabilities_to_intel_cpuid(unsigned capabilities)
 		if (a[2] & bit_SHA) {
 			GNUTLS_x86_cpuid_s[2] |= bit_SHA;
 		} else {
-			_gnutls_debug_log
-			    ("SHA acceleration requested but not available\n");
+			_gnutls_debug_log(
+				"SHA acceleration requested but not available\n");
 		}
 	}
 }
@@ -253,7 +252,7 @@ static unsigned check_sha(void)
 static unsigned check_avx_movbe(void)
 {
 	return (GNUTLS_x86_cpuid_s[1] & (bit_AVX | bit_MOVBE)) ==
-	    (bit_AVX | bit_MOVBE);
+	       (bit_AVX | bit_MOVBE);
 }
 
 static unsigned check_pclmul(void)
@@ -277,8 +276,8 @@ static unsigned capabilities_to_zhaoxin_edx(unsigned capabilities)
 		if (c & bit_PADLOCK) {
 			GNUTLS_x86_cpuid_s[2] |= bit_PADLOCK;
 		} else {
-			_gnutls_debug_log
-			    ("Padlock acceleration requested but not available\n");
+			_gnutls_debug_log(
+				"Padlock acceleration requested but not available\n");
 		}
 	}
 
@@ -286,8 +285,8 @@ static unsigned capabilities_to_zhaoxin_edx(unsigned capabilities)
 		if (c & bit_PADLOCK_PHE) {
 			GNUTLS_x86_cpuid_s[2] |= bit_PADLOCK_PHE;
 		} else {
-			_gnutls_debug_log
-			    ("Padlock-PHE acceleration requested but not available\n");
+			_gnutls_debug_log(
+				"Padlock-PHE acceleration requested but not available\n");
 		}
 	}
 
@@ -295,8 +294,8 @@ static unsigned capabilities_to_zhaoxin_edx(unsigned capabilities)
 		if (c & bit_PADLOCK_PHE_SHA512) {
 			GNUTLS_x86_cpuid_s[2] |= bit_PADLOCK_PHE_SHA512;
 		} else {
-			_gnutls_debug_log
-			    ("Padlock-PHE-SHA512 acceleration requested but not available\n");
+			_gnutls_debug_log(
+				"Padlock-PHE-SHA512 acceleration requested but not available\n");
 		}
 	}
 
@@ -340,12 +339,10 @@ static int check_fast_pclmul(void)
 
 static int check_phe_partial(void)
 {
-	const char text[64] =
-	    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-	    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-	uint32_t iv[5] = { 0x67452301UL, 0xEFCDAB89UL,
-		0x98BADCFEUL, 0x10325476UL, 0xC3D2E1F0UL
-	};
+	const char text[64] = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+			      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+	uint32_t iv[5] = { 0x67452301UL, 0xEFCDAB89UL, 0x98BADCFEUL,
+			   0x10325476UL, 0xC3D2E1F0UL };
 
 	/* If EAX is set to -1 (this is the case with padlock_sha1_blocks), the
 	 * xsha1 instruction takes a complete SHA-1 block (64 bytes), while it
@@ -368,19 +365,17 @@ static unsigned check_zhaoxin(void)
 		return 0;
 
 	/* Zhaoxin and VIA CPU was detected */
-	if ((memcmp(&b, "Cent", 4) == 0 &&
-	     memcmp(&d, "aurH", 4) == 0 &&
+	if ((memcmp(&b, "Cent", 4) == 0 && memcmp(&d, "aurH", 4) == 0 &&
 	     memcmp(&c, "auls", 4) == 0) ||
-	    (memcmp(&b, "  Sh", 4) == 0 &&
-	     memcmp(&d, "angh", 4) == 0 && memcmp(&c, "ai  ", 4) == 0)) {
+	    (memcmp(&b, "  Sh", 4) == 0 && memcmp(&d, "angh", 4) == 0 &&
+	     memcmp(&c, "ai  ", 4) == 0)) {
 		return 1;
 	}
 
 	return 0;
 }
 
-static
-void register_x86_padlock_crypto(unsigned capabilities)
+static void register_x86_padlock_crypto(unsigned capabilities)
 {
 	int ret, phe;
 	unsigned edx;
@@ -402,47 +397,41 @@ void register_x86_padlock_crypto(unsigned capabilities)
 	if (check_ssse3()) {
 		_gnutls_debug_log("Zhaoxin SSSE3 was detected\n");
 
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_128_GCM, 90,
-		     &_gnutls_aes_gcm_x86_ssse3, 0);
+		ret = gnutls_crypto_single_cipher_register(
+			GNUTLS_CIPHER_AES_128_GCM, 90,
+			&_gnutls_aes_gcm_x86_ssse3, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_192_GCM, 90,
-		     &_gnutls_aes_gcm_x86_ssse3, 0);
+		ret = gnutls_crypto_single_cipher_register(
+			GNUTLS_CIPHER_AES_192_GCM, 90,
+			&_gnutls_aes_gcm_x86_ssse3, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_256_GCM, 90,
-		     &_gnutls_aes_gcm_x86_ssse3, 0);
+		ret = gnutls_crypto_single_cipher_register(
+			GNUTLS_CIPHER_AES_256_GCM, 90,
+			&_gnutls_aes_gcm_x86_ssse3, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_128_CBC, 90, &_gnutls_aes_ssse3, 0);
+		ret = gnutls_crypto_single_cipher_register(
+			GNUTLS_CIPHER_AES_128_CBC, 90, &_gnutls_aes_ssse3, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_192_CBC, 90, &_gnutls_aes_ssse3, 0);
+		ret = gnutls_crypto_single_cipher_register(
+			GNUTLS_CIPHER_AES_192_CBC, 90, &_gnutls_aes_ssse3, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_256_CBC, 90, &_gnutls_aes_ssse3, 0);
+		ret = gnutls_crypto_single_cipher_register(
+			GNUTLS_CIPHER_AES_256_CBC, 90, &_gnutls_aes_ssse3, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
@@ -452,239 +441,191 @@ void register_x86_padlock_crypto(unsigned capabilities)
 		if (check_sha())
 			_gnutls_debug_log("Zhaoxin SHA was detected\n");
 
-		ret =
-		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA1,
-							 80,
-							 &_gnutls_sha_x86_ssse3,
-							 0);
+		ret = gnutls_crypto_single_digest_register(
+			GNUTLS_DIG_SHA1, 80, &_gnutls_sha_x86_ssse3, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA224,
-							 80,
-							 &_gnutls_sha_x86_ssse3,
-							 0);
+		ret = gnutls_crypto_single_digest_register(
+			GNUTLS_DIG_SHA224, 80, &_gnutls_sha_x86_ssse3, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA256,
-							 80,
-							 &_gnutls_sha_x86_ssse3,
-							 0);
+		ret = gnutls_crypto_single_digest_register(
+			GNUTLS_DIG_SHA256, 80, &_gnutls_sha_x86_ssse3, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA1,
-						      80,
-						      &_gnutls_hmac_sha_x86_ssse3,
-						      0);
+		ret = gnutls_crypto_single_mac_register(
+			GNUTLS_MAC_SHA1, 80, &_gnutls_hmac_sha_x86_ssse3, 0);
 		if (ret < 0)
 			gnutls_assert();
 
-		ret =
-		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA224,
-						      80,
-						      &_gnutls_hmac_sha_x86_ssse3,
-						      0);
+		ret = gnutls_crypto_single_mac_register(
+			GNUTLS_MAC_SHA224, 80, &_gnutls_hmac_sha_x86_ssse3, 0);
 		if (ret < 0)
 			gnutls_assert();
 
-		ret =
-		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA256,
-						      80,
-						      &_gnutls_hmac_sha_x86_ssse3,
-						      0);
+		ret = gnutls_crypto_single_mac_register(
+			GNUTLS_MAC_SHA256, 80, &_gnutls_hmac_sha_x86_ssse3, 0);
 		if (ret < 0)
 			gnutls_assert();
 
-		ret =
-		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA384,
-							 80,
-							 &_gnutls_sha_x86_ssse3,
-							 0);
+		ret = gnutls_crypto_single_digest_register(
+			GNUTLS_DIG_SHA384, 80, &_gnutls_sha_x86_ssse3, 0);
 		if (ret < 0)
 			gnutls_assert();
 
-		ret =
-		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA512,
-							 80,
-							 &_gnutls_sha_x86_ssse3,
-							 0);
+		ret = gnutls_crypto_single_digest_register(
+			GNUTLS_DIG_SHA512, 80, &_gnutls_sha_x86_ssse3, 0);
 		if (ret < 0)
 			gnutls_assert();
-		ret =
-		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA384,
-						      80,
-						      &_gnutls_hmac_sha_x86_ssse3,
-						      0);
+		ret = gnutls_crypto_single_mac_register(
+			GNUTLS_MAC_SHA384, 80, &_gnutls_hmac_sha_x86_ssse3, 0);
 		if (ret < 0)
 			gnutls_assert();
 
-		ret =
-		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA512,
-						      80,
-						      &_gnutls_hmac_sha_x86_ssse3,
-						      0);
+		ret = gnutls_crypto_single_mac_register(
+			GNUTLS_MAC_SHA512, 80, &_gnutls_hmac_sha_x86_ssse3, 0);
 		if (ret < 0)
 			gnutls_assert();
 	}
 
 	if (check_optimized_aes()) {
 		_gnutls_debug_log("Zhaoxin AES accelerator was detected\n");
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_128_CBC, 80, &_gnutls_aesni_x86, 0);
+		ret = gnutls_crypto_single_cipher_register(
+			GNUTLS_CIPHER_AES_128_CBC, 80, &_gnutls_aesni_x86, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_192_CBC, 80, &_gnutls_aesni_x86, 0);
+		ret = gnutls_crypto_single_cipher_register(
+			GNUTLS_CIPHER_AES_192_CBC, 80, &_gnutls_aesni_x86, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_256_CBC, 80, &_gnutls_aesni_x86, 0);
+		ret = gnutls_crypto_single_cipher_register(
+			GNUTLS_CIPHER_AES_256_CBC, 80, &_gnutls_aesni_x86, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_128_CCM, 80,
-		     &_gnutls_aes_ccm_x86_aesni, 0);
+		ret = gnutls_crypto_single_cipher_register(
+			GNUTLS_CIPHER_AES_128_CCM, 80,
+			&_gnutls_aes_ccm_x86_aesni, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_256_CCM, 80,
-		     &_gnutls_aes_ccm_x86_aesni, 0);
+		ret = gnutls_crypto_single_cipher_register(
+			GNUTLS_CIPHER_AES_256_CCM, 80,
+			&_gnutls_aes_ccm_x86_aesni, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_128_CCM_8, 80,
-		     &_gnutls_aes_ccm_x86_aesni, 0);
+		ret = gnutls_crypto_single_cipher_register(
+			GNUTLS_CIPHER_AES_128_CCM_8, 80,
+			&_gnutls_aes_ccm_x86_aesni, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_256_CCM_8, 80,
-		     &_gnutls_aes_ccm_x86_aesni, 0);
+		ret = gnutls_crypto_single_cipher_register(
+			GNUTLS_CIPHER_AES_256_CCM_8, 80,
+			&_gnutls_aes_ccm_x86_aesni, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_128_XTS, 80,
-		     &_gnutls_aes_xts_x86_aesni, 0);
+		ret = gnutls_crypto_single_cipher_register(
+			GNUTLS_CIPHER_AES_128_XTS, 80,
+			&_gnutls_aes_xts_x86_aesni, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_256_XTS, 80,
-		     &_gnutls_aes_xts_x86_aesni, 0);
+		ret = gnutls_crypto_single_cipher_register(
+			GNUTLS_CIPHER_AES_256_XTS, 80,
+			&_gnutls_aes_xts_x86_aesni, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-# ifdef ASM_X86_64
+#ifdef ASM_X86_64
 		if (check_pclmul()) {
 			/* register GCM ciphers */
-			_gnutls_debug_log
-			    ("Zhaoxin GCM accelerator was detected\n");
+			_gnutls_debug_log(
+				"Zhaoxin GCM accelerator was detected\n");
 			if (check_avx_movbe() && check_fast_pclmul()) {
-				_gnutls_debug_log
-				    ("Zhaoxin GCM accelerator (AVX) was detected\n");
-				ret =
-				    gnutls_crypto_single_cipher_register
-				    (GNUTLS_CIPHER_AES_128_GCM, 80,
-				     &_gnutls_aes_gcm_pclmul_avx, 0);
+				_gnutls_debug_log(
+					"Zhaoxin GCM accelerator (AVX) was detected\n");
+				ret = gnutls_crypto_single_cipher_register(
+					GNUTLS_CIPHER_AES_128_GCM, 80,
+					&_gnutls_aes_gcm_pclmul_avx, 0);
 				if (ret < 0) {
 					gnutls_assert();
 				}
 
-				ret =
-				    gnutls_crypto_single_cipher_register
-				    (GNUTLS_CIPHER_AES_192_GCM, 80,
-				     &_gnutls_aes_gcm_pclmul_avx, 0);
+				ret = gnutls_crypto_single_cipher_register(
+					GNUTLS_CIPHER_AES_192_GCM, 80,
+					&_gnutls_aes_gcm_pclmul_avx, 0);
 				if (ret < 0) {
 					gnutls_assert();
 				}
 
-				ret =
-				    gnutls_crypto_single_cipher_register
-				    (GNUTLS_CIPHER_AES_256_GCM, 80,
-				     &_gnutls_aes_gcm_pclmul_avx, 0);
+				ret = gnutls_crypto_single_cipher_register(
+					GNUTLS_CIPHER_AES_256_GCM, 80,
+					&_gnutls_aes_gcm_pclmul_avx, 0);
 				if (ret < 0) {
 					gnutls_assert();
 				}
 			} else {
-				ret =
-				    gnutls_crypto_single_cipher_register
-				    (GNUTLS_CIPHER_AES_128_GCM, 80,
-				     &_gnutls_aes_gcm_pclmul, 0);
+				ret = gnutls_crypto_single_cipher_register(
+					GNUTLS_CIPHER_AES_128_GCM, 80,
+					&_gnutls_aes_gcm_pclmul, 0);
 				if (ret < 0) {
 					gnutls_assert();
 				}
 
-				ret =
-				    gnutls_crypto_single_cipher_register
-				    (GNUTLS_CIPHER_AES_192_GCM, 80,
-				     &_gnutls_aes_gcm_pclmul, 0);
+				ret = gnutls_crypto_single_cipher_register(
+					GNUTLS_CIPHER_AES_192_GCM, 80,
+					&_gnutls_aes_gcm_pclmul, 0);
 				if (ret < 0) {
 					gnutls_assert();
 				}
 
-				ret =
-				    gnutls_crypto_single_cipher_register
-				    (GNUTLS_CIPHER_AES_256_GCM, 80,
-				     &_gnutls_aes_gcm_pclmul, 0);
+				ret = gnutls_crypto_single_cipher_register(
+					GNUTLS_CIPHER_AES_256_GCM, 80,
+					&_gnutls_aes_gcm_pclmul, 0);
 				if (ret < 0) {
 					gnutls_assert();
 				}
 			}
 		} else
-# endif
+#endif
 		{
-			ret =
-			    gnutls_crypto_single_cipher_register
-			    (GNUTLS_CIPHER_AES_128_GCM, 80,
-			     &_gnutls_aes_gcm_x86_aesni, 0);
+			ret = gnutls_crypto_single_cipher_register(
+				GNUTLS_CIPHER_AES_128_GCM, 80,
+				&_gnutls_aes_gcm_x86_aesni, 0);
 			if (ret < 0) {
 				gnutls_assert();
 			}
 
-			ret =
-			    gnutls_crypto_single_cipher_register
-			    (GNUTLS_CIPHER_AES_192_GCM, 80,
-			     &_gnutls_aes_gcm_x86_aesni, 0);
+			ret = gnutls_crypto_single_cipher_register(
+				GNUTLS_CIPHER_AES_192_GCM, 80,
+				&_gnutls_aes_gcm_x86_aesni, 0);
 			if (ret < 0) {
 				gnutls_assert();
 			}
 
-			ret =
-			    gnutls_crypto_single_cipher_register
-			    (GNUTLS_CIPHER_AES_256_GCM, 80,
-			     &_gnutls_aes_gcm_x86_aesni, 0);
+			ret = gnutls_crypto_single_cipher_register(
+				GNUTLS_CIPHER_AES_256_GCM, 80,
+				&_gnutls_aes_gcm_x86_aesni, 0);
 			if (ret < 0) {
 				gnutls_assert();
 			}
@@ -693,40 +634,35 @@ void register_x86_padlock_crypto(unsigned capabilities)
 
 	if (check_padlock(edx)) {
 		_gnutls_debug_log("Padlock AES accelerator was detected\n");
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_128_CBC, 80, &_gnutls_aes_padlock, 0);
+		ret = gnutls_crypto_single_cipher_register(
+			GNUTLS_CIPHER_AES_128_CBC, 80, &_gnutls_aes_padlock, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_192_CBC, 80, &_gnutls_aes_padlock, 0);
+		ret = gnutls_crypto_single_cipher_register(
+			GNUTLS_CIPHER_AES_192_CBC, 80, &_gnutls_aes_padlock, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
 		/* register GCM ciphers */
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_128_GCM, 90,
-		     &_gnutls_aes_gcm_padlock, 0);
+		ret = gnutls_crypto_single_cipher_register(
+			GNUTLS_CIPHER_AES_128_GCM, 90, &_gnutls_aes_gcm_padlock,
+			0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_256_CBC, 80, &_gnutls_aes_padlock, 0);
+		ret = gnutls_crypto_single_cipher_register(
+			GNUTLS_CIPHER_AES_256_CBC, 80, &_gnutls_aes_padlock, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_256_GCM, 90,
-		     &_gnutls_aes_gcm_padlock, 0);
+		ret = gnutls_crypto_single_cipher_register(
+			GNUTLS_CIPHER_AES_256_GCM, 90, &_gnutls_aes_gcm_padlock,
+			0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
@@ -735,134 +671,105 @@ void register_x86_padlock_crypto(unsigned capabilities)
 	if (!check_optimized_aes() && !check_padlock(edx))
 		_gnutls_priority_update_non_aesni();
 
-# ifdef HAVE_LIBNETTLE
+#ifdef HAVE_LIBNETTLE
 	phe = check_phe(edx);
 
 	if (phe && check_phe_partial()) {
-		_gnutls_debug_log
-		    ("Padlock SHA1 and SHA256 (partial) accelerator was detected\n");
+		_gnutls_debug_log(
+			"Padlock SHA1 and SHA256 (partial) accelerator was detected\n");
 		if (check_phe_sha512(edx)) {
-			_gnutls_debug_log
-			    ("Padlock SHA512 (partial) accelerator was detected\n");
-			ret =
-			    gnutls_crypto_single_digest_register
-			    (GNUTLS_DIG_SHA384, 80, &_gnutls_sha_padlock, 0);
+			_gnutls_debug_log(
+				"Padlock SHA512 (partial) accelerator was detected\n");
+			ret = gnutls_crypto_single_digest_register(
+				GNUTLS_DIG_SHA384, 80, &_gnutls_sha_padlock, 0);
 			if (ret < 0) {
 				gnutls_assert();
 			}
 
-			ret =
-			    gnutls_crypto_single_digest_register
-			    (GNUTLS_DIG_SHA512, 80, &_gnutls_sha_padlock, 0);
+			ret = gnutls_crypto_single_digest_register(
+				GNUTLS_DIG_SHA512, 80, &_gnutls_sha_padlock, 0);
 			if (ret < 0) {
 				gnutls_assert();
 			}
 
-			ret =
-			    gnutls_crypto_single_mac_register
-			    (GNUTLS_MAC_SHA384, 80,
-			     &_gnutls_hmac_sha_padlock, 0);
+			ret = gnutls_crypto_single_mac_register(
+				GNUTLS_MAC_SHA384, 80,
+				&_gnutls_hmac_sha_padlock, 0);
 			if (ret < 0) {
 				gnutls_assert();
 			}
 
-			ret =
-			    gnutls_crypto_single_mac_register
-			    (GNUTLS_MAC_SHA512, 80,
-			     &_gnutls_hmac_sha_padlock, 0);
+			ret = gnutls_crypto_single_mac_register(
+				GNUTLS_MAC_SHA512, 80,
+				&_gnutls_hmac_sha_padlock, 0);
 			if (ret < 0) {
 				gnutls_assert();
 			}
 		}
 
-		ret =
-		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA1,
-							 90,
-							 &_gnutls_sha_padlock,
-							 0);
+		ret = gnutls_crypto_single_digest_register(
+			GNUTLS_DIG_SHA1, 90, &_gnutls_sha_padlock, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA224,
-							 90,
-							 &_gnutls_sha_padlock,
-							 0);
+		ret = gnutls_crypto_single_digest_register(
+			GNUTLS_DIG_SHA224, 90, &_gnutls_sha_padlock, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA256,
-							 90,
-							 &_gnutls_sha_padlock,
-							 0);
+		ret = gnutls_crypto_single_digest_register(
+			GNUTLS_DIG_SHA256, 90, &_gnutls_sha_padlock, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA1,
-						      90,
-						      &_gnutls_hmac_sha_padlock,
-						      0);
+		ret = gnutls_crypto_single_mac_register(
+			GNUTLS_MAC_SHA1, 90, &_gnutls_hmac_sha_padlock, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
 		/* we don't register MAC_SHA224 because it is not used by TLS */
 
-		ret =
-		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA256,
-						      90,
-						      &_gnutls_hmac_sha_padlock,
-						      0);
+		ret = gnutls_crypto_single_mac_register(
+			GNUTLS_MAC_SHA256, 90, &_gnutls_hmac_sha_padlock, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 	} else if (phe) {
 		/* Original padlock PHE. Does not support incremental operations.
 		 */
-		_gnutls_debug_log
-		    ("Padlock SHA1 and SHA256 accelerator was detected\n");
-		ret =
-		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA1,
-							 90,
-							 &_gnutls_sha_padlock_oneshot,
-							 0);
+		_gnutls_debug_log(
+			"Padlock SHA1 and SHA256 accelerator was detected\n");
+		ret = gnutls_crypto_single_digest_register(
+			GNUTLS_DIG_SHA1, 90, &_gnutls_sha_padlock_oneshot, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA256,
-							 90,
-							 &_gnutls_sha_padlock_oneshot,
-							 0);
+		ret = gnutls_crypto_single_digest_register(
+			GNUTLS_DIG_SHA256, 90, &_gnutls_sha_padlock_oneshot, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA1,
-						      90,
-						      &_gnutls_hmac_sha_padlock_oneshot,
-						      0);
+		ret = gnutls_crypto_single_mac_register(
+			GNUTLS_MAC_SHA1, 90, &_gnutls_hmac_sha_padlock_oneshot,
+			0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA256,
-						      90,
-						      &_gnutls_hmac_sha_padlock_oneshot,
-						      0);
+		ret = gnutls_crypto_single_mac_register(
+			GNUTLS_MAC_SHA256, 90,
+			&_gnutls_hmac_sha_padlock_oneshot, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 	}
-# endif
+#endif
 
 	return;
 }
@@ -882,21 +789,20 @@ static enum x86_cpu_vendor check_x86_cpu_vendor(void)
 		return X86_CPU_VENDOR_OTHER;
 	}
 
-	if (memcmp(&b, "Genu", 4) == 0 &&
-	    memcmp(&d, "ineI", 4) == 0 && memcmp(&c, "ntel", 4) == 0) {
+	if (memcmp(&b, "Genu", 4) == 0 && memcmp(&d, "ineI", 4) == 0 &&
+	    memcmp(&c, "ntel", 4) == 0) {
 		return X86_CPU_VENDOR_INTEL;
 	}
 
-	if (memcmp(&b, "Auth", 4) == 0 &&
-	    memcmp(&d, "enti", 4) == 0 && memcmp(&c, "cAMD", 4) == 0) {
+	if (memcmp(&b, "Auth", 4) == 0 && memcmp(&d, "enti", 4) == 0 &&
+	    memcmp(&c, "cAMD", 4) == 0) {
 		return X86_CPU_VENDOR_AMD;
 	}
 
 	return X86_CPU_VENDOR_OTHER;
 }
 
-static
-void register_x86_intel_crypto(unsigned capabilities)
+static void register_x86_intel_crypto(unsigned capabilities)
 {
 	int ret;
 	enum x86_cpu_vendor vendor;
@@ -918,10 +824,9 @@ void register_x86_intel_crypto(unsigned capabilities)
 			 * OpenSSL does.  Should we clear
 			 * bit_AVX512DQ, bit_AVX512PF, bit_AVX512ER,
 			 * and bit_AVX512CD? */
-			GNUTLS_x86_cpuid_s[2] &= ~(bit_AVX2 |
-						   bit_AVX512F |
-						   bit_AVX512IFMA |
-						   bit_AVX512BW | bit_AVX512BW);
+			GNUTLS_x86_cpuid_s[2] &=
+				~(bit_AVX2 | bit_AVX512F | bit_AVX512IFMA |
+				  bit_AVX512BW | bit_AVX512BW);
 		}
 	} else {
 		capabilities_to_intel_cpuid(capabilities);
@@ -937,47 +842,41 @@ void register_x86_intel_crypto(unsigned capabilities)
 	if (check_ssse3()) {
 		_gnutls_debug_log("Intel SSSE3 was detected\n");
 
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_128_GCM, 90,
-		     &_gnutls_aes_gcm_x86_ssse3, 0);
+		ret = gnutls_crypto_single_cipher_register(
+			GNUTLS_CIPHER_AES_128_GCM, 90,
+			&_gnutls_aes_gcm_x86_ssse3, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_192_GCM, 90,
-		     &_gnutls_aes_gcm_x86_ssse3, 0);
+		ret = gnutls_crypto_single_cipher_register(
+			GNUTLS_CIPHER_AES_192_GCM, 90,
+			&_gnutls_aes_gcm_x86_ssse3, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_256_GCM, 90,
-		     &_gnutls_aes_gcm_x86_ssse3, 0);
+		ret = gnutls_crypto_single_cipher_register(
+			GNUTLS_CIPHER_AES_256_GCM, 90,
+			&_gnutls_aes_gcm_x86_ssse3, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_128_CBC, 90, &_gnutls_aes_ssse3, 0);
+		ret = gnutls_crypto_single_cipher_register(
+			GNUTLS_CIPHER_AES_128_CBC, 90, &_gnutls_aes_ssse3, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_192_CBC, 90, &_gnutls_aes_ssse3, 0);
+		ret = gnutls_crypto_single_cipher_register(
+			GNUTLS_CIPHER_AES_192_CBC, 90, &_gnutls_aes_ssse3, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_256_CBC, 90, &_gnutls_aes_ssse3, 0);
+		ret = gnutls_crypto_single_cipher_register(
+			GNUTLS_CIPHER_AES_256_CBC, 90, &_gnutls_aes_ssse3, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
@@ -987,156 +886,117 @@ void register_x86_intel_crypto(unsigned capabilities)
 		if (check_sha())
 			_gnutls_debug_log("Intel SHA was detected\n");
 
-		ret =
-		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA1,
-							 80,
-							 &_gnutls_sha_x86_ssse3,
-							 0);
+		ret = gnutls_crypto_single_digest_register(
+			GNUTLS_DIG_SHA1, 80, &_gnutls_sha_x86_ssse3, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA224,
-							 80,
-							 &_gnutls_sha_x86_ssse3,
-							 0);
+		ret = gnutls_crypto_single_digest_register(
+			GNUTLS_DIG_SHA224, 80, &_gnutls_sha_x86_ssse3, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA256,
-							 80,
-							 &_gnutls_sha_x86_ssse3,
-							 0);
+		ret = gnutls_crypto_single_digest_register(
+			GNUTLS_DIG_SHA256, 80, &_gnutls_sha_x86_ssse3, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA1,
-						      80,
-						      &_gnutls_hmac_sha_x86_ssse3,
-						      0);
+		ret = gnutls_crypto_single_mac_register(
+			GNUTLS_MAC_SHA1, 80, &_gnutls_hmac_sha_x86_ssse3, 0);
 		if (ret < 0)
 			gnutls_assert();
 
-		ret =
-		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA224,
-						      80,
-						      &_gnutls_hmac_sha_x86_ssse3,
-						      0);
+		ret = gnutls_crypto_single_mac_register(
+			GNUTLS_MAC_SHA224, 80, &_gnutls_hmac_sha_x86_ssse3, 0);
 		if (ret < 0)
 			gnutls_assert();
 
-		ret =
-		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA256,
-						      80,
-						      &_gnutls_hmac_sha_x86_ssse3,
-						      0);
+		ret = gnutls_crypto_single_mac_register(
+			GNUTLS_MAC_SHA256, 80, &_gnutls_hmac_sha_x86_ssse3, 0);
 		if (ret < 0)
 			gnutls_assert();
 
-		ret =
-		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA384,
-							 80,
-							 &_gnutls_sha_x86_ssse3,
-							 0);
+		ret = gnutls_crypto_single_digest_register(
+			GNUTLS_DIG_SHA384, 80, &_gnutls_sha_x86_ssse3, 0);
 		if (ret < 0)
 			gnutls_assert();
 
-		ret =
-		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA512,
-							 80,
-							 &_gnutls_sha_x86_ssse3,
-							 0);
+		ret = gnutls_crypto_single_digest_register(
+			GNUTLS_DIG_SHA512, 80, &_gnutls_sha_x86_ssse3, 0);
 		if (ret < 0)
 			gnutls_assert();
-		ret =
-		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA384,
-						      80,
-						      &_gnutls_hmac_sha_x86_ssse3,
-						      0);
+		ret = gnutls_crypto_single_mac_register(
+			GNUTLS_MAC_SHA384, 80, &_gnutls_hmac_sha_x86_ssse3, 0);
 		if (ret < 0)
 			gnutls_assert();
 
-		ret =
-		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA512,
-						      80,
-						      &_gnutls_hmac_sha_x86_ssse3,
-						      0);
+		ret = gnutls_crypto_single_mac_register(
+			GNUTLS_MAC_SHA512, 80, &_gnutls_hmac_sha_x86_ssse3, 0);
 		if (ret < 0)
 			gnutls_assert();
 	}
 
 	if (check_optimized_aes()) {
 		_gnutls_debug_log("Intel AES accelerator was detected\n");
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_128_CBC, 80, &_gnutls_aesni_x86, 0);
+		ret = gnutls_crypto_single_cipher_register(
+			GNUTLS_CIPHER_AES_128_CBC, 80, &_gnutls_aesni_x86, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_192_CBC, 80, &_gnutls_aesni_x86, 0);
+		ret = gnutls_crypto_single_cipher_register(
+			GNUTLS_CIPHER_AES_192_CBC, 80, &_gnutls_aesni_x86, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_256_CBC, 80, &_gnutls_aesni_x86, 0);
+		ret = gnutls_crypto_single_cipher_register(
+			GNUTLS_CIPHER_AES_256_CBC, 80, &_gnutls_aesni_x86, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_128_CCM, 80,
-		     &_gnutls_aes_ccm_x86_aesni, 0);
+		ret = gnutls_crypto_single_cipher_register(
+			GNUTLS_CIPHER_AES_128_CCM, 80,
+			&_gnutls_aes_ccm_x86_aesni, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_256_CCM, 80,
-		     &_gnutls_aes_ccm_x86_aesni, 0);
+		ret = gnutls_crypto_single_cipher_register(
+			GNUTLS_CIPHER_AES_256_CCM, 80,
+			&_gnutls_aes_ccm_x86_aesni, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_128_CCM_8, 80,
-		     &_gnutls_aes_ccm_x86_aesni, 0);
+		ret = gnutls_crypto_single_cipher_register(
+			GNUTLS_CIPHER_AES_128_CCM_8, 80,
+			&_gnutls_aes_ccm_x86_aesni, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_256_CCM_8, 80,
-		     &_gnutls_aes_ccm_x86_aesni, 0);
+		ret = gnutls_crypto_single_cipher_register(
+			GNUTLS_CIPHER_AES_256_CCM_8, 80,
+			&_gnutls_aes_ccm_x86_aesni, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_128_XTS, 80,
-		     &_gnutls_aes_xts_x86_aesni, 0);
+		ret = gnutls_crypto_single_cipher_register(
+			GNUTLS_CIPHER_AES_128_XTS, 80,
+			&_gnutls_aes_xts_x86_aesni, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_256_XTS, 80,
-		     &_gnutls_aes_xts_x86_aesni, 0);
+		ret = gnutls_crypto_single_cipher_register(
+			GNUTLS_CIPHER_AES_256_XTS, 80,
+			&_gnutls_aes_xts_x86_aesni, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
@@ -1145,54 +1005,48 @@ void register_x86_intel_crypto(unsigned capabilities)
 		if (check_pclmul()) {
 			/* register GCM ciphers */
 			if (check_avx_movbe()) {
-				_gnutls_debug_log
-				    ("Intel GCM accelerator (AVX) was detected\n");
-				ret =
-				    gnutls_crypto_single_cipher_register
-				    (GNUTLS_CIPHER_AES_128_GCM, 80,
-				     &_gnutls_aes_gcm_pclmul_avx, 0);
+				_gnutls_debug_log(
+					"Intel GCM accelerator (AVX) was detected\n");
+				ret = gnutls_crypto_single_cipher_register(
+					GNUTLS_CIPHER_AES_128_GCM, 80,
+					&_gnutls_aes_gcm_pclmul_avx, 0);
 				if (ret < 0) {
 					gnutls_assert();
 				}
 
-				ret =
-				    gnutls_crypto_single_cipher_register
-				    (GNUTLS_CIPHER_AES_192_GCM, 80,
-				     &_gnutls_aes_gcm_pclmul_avx, 0);
+				ret = gnutls_crypto_single_cipher_register(
+					GNUTLS_CIPHER_AES_192_GCM, 80,
+					&_gnutls_aes_gcm_pclmul_avx, 0);
 				if (ret < 0) {
 					gnutls_assert();
 				}
 
-				ret =
-				    gnutls_crypto_single_cipher_register
-				    (GNUTLS_CIPHER_AES_256_GCM, 80,
-				     &_gnutls_aes_gcm_pclmul_avx, 0);
+				ret = gnutls_crypto_single_cipher_register(
+					GNUTLS_CIPHER_AES_256_GCM, 80,
+					&_gnutls_aes_gcm_pclmul_avx, 0);
 				if (ret < 0) {
 					gnutls_assert();
 				}
 			} else {
-				_gnutls_debug_log
-				    ("Intel GCM accelerator was detected\n");
-				ret =
-				    gnutls_crypto_single_cipher_register
-				    (GNUTLS_CIPHER_AES_128_GCM, 80,
-				     &_gnutls_aes_gcm_pclmul, 0);
+				_gnutls_debug_log(
+					"Intel GCM accelerator was detected\n");
+				ret = gnutls_crypto_single_cipher_register(
+					GNUTLS_CIPHER_AES_128_GCM, 80,
+					&_gnutls_aes_gcm_pclmul, 0);
 				if (ret < 0) {
 					gnutls_assert();
 				}
 
-				ret =
-				    gnutls_crypto_single_cipher_register
-				    (GNUTLS_CIPHER_AES_192_GCM, 80,
-				     &_gnutls_aes_gcm_pclmul, 0);
+				ret = gnutls_crypto_single_cipher_register(
+					GNUTLS_CIPHER_AES_192_GCM, 80,
+					&_gnutls_aes_gcm_pclmul, 0);
 				if (ret < 0) {
 					gnutls_assert();
 				}
 
-				ret =
-				    gnutls_crypto_single_cipher_register
-				    (GNUTLS_CIPHER_AES_256_GCM, 80,
-				     &_gnutls_aes_gcm_pclmul, 0);
+				ret = gnutls_crypto_single_cipher_register(
+					GNUTLS_CIPHER_AES_256_GCM, 80,
+					&_gnutls_aes_gcm_pclmul, 0);
 				if (ret < 0) {
 					gnutls_assert();
 				}
@@ -1200,26 +1054,23 @@ void register_x86_intel_crypto(unsigned capabilities)
 		} else
 #endif
 		{
-			ret =
-			    gnutls_crypto_single_cipher_register
-			    (GNUTLS_CIPHER_AES_128_GCM, 80,
-			     &_gnutls_aes_gcm_x86_aesni, 0);
+			ret = gnutls_crypto_single_cipher_register(
+				GNUTLS_CIPHER_AES_128_GCM, 80,
+				&_gnutls_aes_gcm_x86_aesni, 0);
 			if (ret < 0) {
 				gnutls_assert();
 			}
 
-			ret =
-			    gnutls_crypto_single_cipher_register
-			    (GNUTLS_CIPHER_AES_192_GCM, 80,
-			     &_gnutls_aes_gcm_x86_aesni, 0);
+			ret = gnutls_crypto_single_cipher_register(
+				GNUTLS_CIPHER_AES_192_GCM, 80,
+				&_gnutls_aes_gcm_x86_aesni, 0);
 			if (ret < 0) {
 				gnutls_assert();
 			}
 
-			ret =
-			    gnutls_crypto_single_cipher_register
-			    (GNUTLS_CIPHER_AES_256_GCM, 80,
-			     &_gnutls_aes_gcm_x86_aesni, 0);
+			ret = gnutls_crypto_single_cipher_register(
+				GNUTLS_CIPHER_AES_256_GCM, 80,
+				&_gnutls_aes_gcm_x86_aesni, 0);
 			if (ret < 0) {
 				gnutls_assert();
 			}

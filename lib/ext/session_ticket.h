@@ -21,9 +21,9 @@
  */
 
 #ifndef GNUTLS_LIB_EXT_SESSION_TICKET_H
-# define GNUTLS_LIB_EXT_SESSION_TICKET_H
+#define GNUTLS_LIB_EXT_SESSION_TICKET_H
 
-# include <hello_ext.h>
+#include <hello_ext.h>
 
 extern const hello_ext_entry_st ext_mod_session_ticket;
 
@@ -31,11 +31,11 @@ int _gnutls_send_new_session_ticket(gnutls_session_t session, int again);
 int _gnutls_recv_new_session_ticket(gnutls_session_t session);
 
 int _gnutls_encrypt_session_ticket(gnutls_session_t session,
-				   const gnutls_datum_t * state,
-				   gnutls_datum_t * ticket_data);
+				   const gnutls_datum_t *state,
+				   gnutls_datum_t *ticket_data);
 int _gnutls_decrypt_session_ticket(gnutls_session_t session,
-				   const gnutls_datum_t * ticket_data,
-				   gnutls_datum_t * state);
+				   const gnutls_datum_t *ticket_data,
+				   gnutls_datum_t *state);
 void _gnutls_session_ticket_disable_server(gnutls_session_t session);
 
-#endif				/* GNUTLS_LIB_EXT_SESSION_TICKET_H */
+#endif /* GNUTLS_LIB_EXT_SESSION_TICKET_H */

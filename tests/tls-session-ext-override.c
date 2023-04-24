@@ -24,7 +24,7 @@
  * at the session level */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -40,18 +40,18 @@ int main(int argc, char **argv)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <sys/socket.h>
-# if !defined(_WIN32)
-#  include <sys/wait.h>
-#  include <signal.h>
-# endif
-# include <unistd.h>
-# include <gnutls/gnutls.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#if !defined(_WIN32)
+#include <sys/wait.h>
+#include <signal.h>
+#endif
+#include <unistd.h>
+#include <gnutls/gnutls.h>
 
-# include "utils.h"
-# include "cert-common.h"
+#include "utils.h"
+#include "cert-common.h"
 
 const char *side = "";
 
@@ -66,10 +66,7 @@ static int TLSEXT_TYPE_server_sent = 0;
 static int TLSEXT_TYPE_server_received = 0;
 static int overridden_extension = -1;
 
-static const unsigned char ext_data[] = {
-	0xFE,
-	0xED
-};
+static const unsigned char ext_data[] = { 0xFE, 0xED };
 
 static int ext_recv_client_params(gnutls_session_t session,
 				  const unsigned char *buf, size_t buflen)
@@ -84,7 +81,7 @@ static int ext_recv_client_params(gnutls_session_t session,
 
 	gnutls_ext_set_data(session, overridden_extension, session);
 
-	return 0;		//Success
+	return 0; //Success
 }
 
 static int ext_send_client_params(gnutls_session_t session,
@@ -106,7 +103,7 @@ static int ext_recv_server_params(gnutls_session_t session,
 
 	TLSEXT_TYPE_server_received = 1;
 
-	return 0;		//Success
+	return 0; //Success
 }
 
 static int ext_send_server_params(gnutls_session_t session,
@@ -148,32 +145,26 @@ static void client(int sd)
 	gnutls_transport_set_int(session, sd);
 	gnutls_handshake_set_timeout(session, get_timeout());
 
-	ret =
-	    gnutls_session_ext_register(session, "ext_client",
-					overridden_extension, GNUTLS_EXT_TLS,
-					ext_recv_client_params,
-					ext_send_client_params, NULL, NULL,
-					NULL, 0);
+	ret = gnutls_session_ext_register(session, "ext_client",
+					  overridden_extension, GNUTLS_EXT_TLS,
+					  ext_recv_client_params,
+					  ext_send_client_params, NULL, NULL,
+					  NULL, 0);
 	if (ret != GNUTLS_E_ALREADY_REGISTERED)
 		fail("client: register existing extension (%d)\n",
 		     overridden_extension);
 
-	ret =
-	    gnutls_session_ext_register(session, "ext_client", 0,
-					GNUTLS_EXT_TLS, ext_recv_client_params,
-					ext_send_client_params, NULL, NULL,
-					NULL,
-					GNUTLS_EXT_FLAG_OVERRIDE_INTERNAL);
+	ret = gnutls_session_ext_register(
+		session, "ext_client", 0, GNUTLS_EXT_TLS,
+		ext_recv_client_params, ext_send_client_params, NULL, NULL,
+		NULL, GNUTLS_EXT_FLAG_OVERRIDE_INTERNAL);
 	if (ret != GNUTLS_E_ALREADY_REGISTERED)
 		fail("client: register extension %d\n", 0);
 
-	ret =
-	    gnutls_session_ext_register(session, "ext_client",
-					overridden_extension, GNUTLS_EXT_TLS,
-					ext_recv_client_params,
-					ext_send_client_params, NULL, NULL,
-					NULL,
-					GNUTLS_EXT_FLAG_OVERRIDE_INTERNAL);
+	ret = gnutls_session_ext_register(
+		session, "ext_client", overridden_extension, GNUTLS_EXT_TLS,
+		ext_recv_client_params, ext_send_client_params, NULL, NULL,
+		NULL, GNUTLS_EXT_FLAG_OVERRIDE_INTERNAL);
 	if (ret < 0)
 		fail("client: register extension (%d)\n", overridden_extension);
 
@@ -204,7 +195,7 @@ static void client(int sd)
 
 	gnutls_bye(session, GNUTLS_SHUT_RDWR);
 
- end:
+end:
 	close(sd);
 
 	gnutls_deinit(session);
@@ -230,9 +221,8 @@ static void server(int sd)
 	side = "server";
 
 	gnutls_certificate_allocate_credentials(&serverx509cred);
-	gnutls_certificate_set_x509_key_mem(serverx509cred,
-					    &server_cert, &server_key,
-					    GNUTLS_X509_FMT_PEM);
+	gnutls_certificate_set_x509_key_mem(serverx509cred, &server_cert,
+					    &server_key, GNUTLS_X509_FMT_PEM);
 
 	gnutls_init(&session, GNUTLS_SERVER);
 
@@ -244,22 +234,18 @@ static void server(int sd)
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, serverx509cred);
 
-	ret =
-	    gnutls_session_ext_register(session, "ext_server",
-					overridden_extension, GNUTLS_EXT_TLS,
-					ext_recv_server_params,
-					ext_send_server_params, NULL, NULL,
-					NULL, 0);
+	ret = gnutls_session_ext_register(session, "ext_server",
+					  overridden_extension, GNUTLS_EXT_TLS,
+					  ext_recv_server_params,
+					  ext_send_server_params, NULL, NULL,
+					  NULL, 0);
 	if (ret != GNUTLS_E_ALREADY_REGISTERED)
 		fail("client: register existing extension\n");
 
-	ret =
-	    gnutls_session_ext_register(session, "ext_server",
-					overridden_extension, GNUTLS_EXT_TLS,
-					ext_recv_server_params,
-					ext_send_server_params, NULL, NULL,
-					NULL,
-					GNUTLS_EXT_FLAG_OVERRIDE_INTERNAL);
+	ret = gnutls_session_ext_register(
+		session, "ext_server", overridden_extension, GNUTLS_EXT_TLS,
+		ext_recv_server_params, ext_send_server_params, NULL, NULL,
+		NULL, GNUTLS_EXT_FLAG_OVERRIDE_INTERNAL);
 	if (ret < 0)
 		fail("client: register extension\n");
 
@@ -343,4 +329,4 @@ void doit(void)
 	override_ext(21);
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

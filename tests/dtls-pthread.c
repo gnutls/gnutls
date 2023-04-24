@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -33,11 +33,11 @@
 #include <signal.h>
 #include <unistd.h>
 #ifndef _WIN32
-# include <netinet/in.h>
-# include <sys/types.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <pthread.h>
+#include <netinet/in.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <pthread.h>
 #endif
 #include <assert.h>
 #include "utils.h"
@@ -67,10 +67,10 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "%s|<%d>| %s", side, level, str);
 }
 
-# define MSG "hello1111"
-# define MSG2 "xxxxxxxxxxxx"
+#define MSG "hello1111"
+#define MSG2 "xxxxxxxxxxxx"
 
-# define NO_MSGS 128
+#define NO_MSGS 128
 
 static void *recv_thread(void *arg)
 {
@@ -81,8 +81,8 @@ static void *recv_thread(void *arg)
 
 	if (debug)
 		success("client: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	for (i = 0; i < NO_MSGS; i++) {
 		/* the peer should reflect our messages */
@@ -91,9 +91,10 @@ static void *recv_thread(void *arg)
 		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 		if (ret < 0)
 			fail("client: recv failed: %s\n", gnutls_strerror(ret));
-		if (ret != sizeof(MSG) - 1
-		    || memcmp(buf, MSG, sizeof(MSG) - 1) != 0) {
-			fail("client: recv failed; not the expected values (got: %d, exp: %d)\n", ret, (int)sizeof(MSG) - 1);
+		if (ret != sizeof(MSG) - 1 ||
+		    memcmp(buf, MSG, sizeof(MSG) - 1) != 0) {
+			fail("client: recv failed; not the expected values (got: %d, exp: %d)\n",
+			     ret, (int)sizeof(MSG) - 1);
 		}
 
 		if (debug)
@@ -107,7 +108,8 @@ static void *recv_thread(void *arg)
 	if (ret < 0)
 		fail("client: recv2 failed: %s\n", gnutls_strerror(ret));
 
-	if (ret != sizeof(MSG2) - 1 || memcmp(buf, MSG2, sizeof(MSG2) - 1) != 0) {
+	if (ret != sizeof(MSG2) - 1 ||
+	    memcmp(buf, MSG2, sizeof(MSG2) - 1) != 0) {
 		fail("client: recv2 failed; not the expected values\n");
 	}
 
@@ -119,8 +121,7 @@ static void *recv_thread(void *arg)
 	pthread_exit(0);
 }
 
-static
-void do_thread_stuff(gnutls_session_t session)
+static void do_thread_stuff(gnutls_session_t session)
 {
 	int ret;
 	unsigned i;
@@ -226,15 +227,14 @@ static void client(int fd, const char *prio, unsigned do_thread,
 
 	assert(gnutls_priority_set_direct(session, prio, NULL) >= 0);
 
-	assert(gnutls_credentials_set
-	       (session, GNUTLS_CRD_CERTIFICATE, x509_cred) >= 0);
+	assert(gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
+				      x509_cred) >= 0);
 
 	gnutls_transport_set_int(session, fd);
 
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret < 0) {
 		fail("client: Handshake failed: %s\n", gnutls_strerror(ret));
@@ -265,13 +265,13 @@ static void server(int fd, const char *prio, unsigned do_thread)
 
 	global_init();
 
-# if 0
+#if 0
 	if (debug) {
 		side = "server";
 		gnutls_global_set_log_function(tls_log_func);
 		gnutls_global_set_log_level(4711);
 	}
-# endif
+#endif
 
 	assert(gnutls_certificate_allocate_credentials(&x509_cred) >= 0);
 	assert(gnutls_certificate_set_x509_key_mem(x509_cred, &server_cert,
@@ -303,8 +303,8 @@ static void server(int fd, const char *prio, unsigned do_thread)
 
 	if (debug)
 		success("server: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	if (do_thread)
 		do_thread_stuff(session);
@@ -322,9 +322,8 @@ static void server(int fd, const char *prio, unsigned do_thread)
 		success("server: finished\n");
 }
 
-static
-void run(const char *str, const char *prio, unsigned do_thread,
-	 unsigned false_start)
+static void run(const char *str, const char *prio, unsigned do_thread,
+		unsigned false_start)
 {
 	int fd[2];
 	int ret;
@@ -372,4 +371,4 @@ void doit(void)
 	run("dtls1.2 false start, threaded server",
 	    "NORMAL:-VERS-ALL:+VERS-DTLS1.2", 1, 1);
 }
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

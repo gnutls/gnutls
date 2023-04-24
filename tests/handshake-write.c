@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -47,10 +47,11 @@ static void tls_log_func(int level, const char *str)
 }
 
 #define MAX_BUF 1024
-#define MSG "Hello TLS, and hi and how are you and more data here... and more... and even more and even more more data..."
+#define MSG \
+	"Hello TLS, and hi and how are you and more data here... and more... and even more and even more more data..."
 
-static ssize_t
-error_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
+static ssize_t error_push(gnutls_transport_ptr_t tr, const void *data,
+			  size_t len)
 {
 	fail("push_func called unexpectedly");
 	return -1;
@@ -62,11 +63,10 @@ static ssize_t error_pull(gnutls_transport_ptr_t tr, void *data, size_t len)
 	return -1;
 }
 
-static int
-handshake_read_func(gnutls_session_t session,
-		    gnutls_record_encryption_level_t level,
-		    gnutls_handshake_description_t htype,
-		    const void *data, size_t data_size)
+static int handshake_read_func(gnutls_session_t session,
+			       gnutls_record_encryption_level_t level,
+			       gnutls_handshake_description_t htype,
+			       const void *data, size_t data_size)
 {
 	gnutls_session_t peer = gnutls_session_get_ptr(session);
 
@@ -98,10 +98,9 @@ static void run(const char *name, const char *prio)
 
 	/* Init server */
 	assert(gnutls_certificate_allocate_credentials(&scred) >= 0);
-	assert(gnutls_certificate_set_x509_key_mem(scred,
-						   &server_ca3_localhost_cert,
-						   &server_ca3_key,
-						   GNUTLS_X509_FMT_PEM) >= 0);
+	assert(gnutls_certificate_set_x509_key_mem(
+		       scred, &server_ca3_localhost_cert, &server_ca3_key,
+		       GNUTLS_X509_FMT_PEM) >= 0);
 
 	assert(gnutls_init(&server, GNUTLS_SERVER) >= 0);
 	assert(gnutls_priority_set_direct(server, prio, NULL) >= 0);
@@ -112,8 +111,8 @@ static void run(const char *name, const char *prio)
 
 	/* Init client */
 	assert(gnutls_certificate_allocate_credentials(&ccred) >= 0);
-	assert(gnutls_certificate_set_x509_trust_mem
-	       (ccred, &ca3_cert, GNUTLS_X509_FMT_PEM) >= 0);
+	assert(gnutls_certificate_set_x509_trust_mem(ccred, &ca3_cert,
+						     GNUTLS_X509_FMT_PEM) >= 0);
 
 	gnutls_init(&client, GNUTLS_CLIENT);
 	assert(gnutls_priority_set_direct(client, prio, NULL) >= 0);

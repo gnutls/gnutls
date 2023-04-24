@@ -21,14 +21,13 @@
  */
 
 #ifndef GNUTLS_LIB_RECORD_H
-# define GNUTLS_LIB_RECORD_H
+#define GNUTLS_LIB_RECORD_H
 
-# include <gnutls/gnutls.h>
-# include <buffers.h>
-# include <constate.h>
+#include <gnutls/gnutls.h>
+#include <buffers.h>
+#include <constate.h>
 
-ssize_t _gnutls_send_tlen_int(gnutls_session_t session,
-			      content_type_t type,
+ssize_t _gnutls_send_tlen_int(gnutls_session_t session, content_type_t type,
 			      gnutls_handshake_description_t htype,
 			      unsigned int epoch_rel, const void *data,
 			      size_t sizeofdata, size_t min_pad,
@@ -36,26 +35,24 @@ ssize_t _gnutls_send_tlen_int(gnutls_session_t session,
 
 inline static ssize_t
 _gnutls_send_int(gnutls_session_t session, content_type_t type,
-		 gnutls_handshake_description_t htype,
-		 unsigned int epoch_rel, const void *_data,
-		 size_t data_size, unsigned int mflags)
+		 gnutls_handshake_description_t htype, unsigned int epoch_rel,
+		 const void *_data, size_t data_size, unsigned int mflags)
 {
-	return _gnutls_send_tlen_int(session, type, htype, epoch_rel,
-				     _data, data_size, 0, mflags);
+	return _gnutls_send_tlen_int(session, type, htype, epoch_rel, _data,
+				     data_size, 0, mflags);
 }
 
 ssize_t _gnutls_recv_int(gnutls_session_t session, content_type_t type,
-			 uint8_t * data,
-			 size_t sizeofdata, void *seq, unsigned int ms);
+			 uint8_t *data, size_t sizeofdata, void *seq,
+			 unsigned int ms);
 
 inline static unsigned max_record_recv_size(gnutls_session_t session)
 {
 	unsigned size;
 
 	if (session->internals.max_recv_size == 0) {
-		size =
-		    session->security_parameters.max_record_recv_size +
-		    RECORD_HEADER_SIZE(session);
+		size = session->security_parameters.max_record_recv_size +
+		       RECORD_HEADER_SIZE(session);
 		if (session->internals.allow_large_records != 0)
 			size += EXTRA_COMP_SIZE;
 	} else {
@@ -79,8 +76,7 @@ inline static unsigned max_decrypted_size(gnutls_session_t session)
 
 /* Returns the headers + any IV that the ciphersuite
  * requires */
-inline static
-unsigned int get_total_headers(gnutls_session_t session)
+inline static unsigned int get_total_headers(gnutls_session_t session)
 {
 	int ret;
 	record_parameters_st *params;
@@ -94,9 +90,8 @@ unsigned int get_total_headers(gnutls_session_t session)
 	return total + _gnutls_cipher_get_explicit_iv_size(params->cipher);
 }
 
-inline static
-unsigned int get_total_headers2(gnutls_session_t session,
-				record_parameters_st * params)
+inline static unsigned int get_total_headers2(gnutls_session_t session,
+					      record_parameters_st *params)
 {
 	unsigned total = RECORD_HEADER_SIZE(session);
 
@@ -108,4 +103,4 @@ inline static void session_invalidate(gnutls_session_t session)
 	session->internals.invalid_connection = 1;
 }
 
-#endif				/* GNUTLS_LIB_RECORD_H */
+#endif /* GNUTLS_LIB_RECORD_H */

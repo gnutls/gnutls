@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -28,10 +28,10 @@
 #include <string.h>
 #include <sys/types.h>
 #if !defined(_WIN32)
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
 #endif
 #include <unistd.h>
 #include <assert.h>
@@ -67,9 +67,8 @@ void doit(void)
 
 	assert(gnutls_certificate_allocate_credentials(&cli_cred) >= 0);
 
-	ret =
-	    gnutls_certificate_set_x509_trust_mem(cli_cred, &ca3_cert,
-						  GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_trust_mem(cli_cred, &ca3_cert,
+						    GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		fail("set_x509_trust_file failed: %s\n", gnutls_strerror(ret));
 
@@ -88,26 +87,23 @@ void doit(void)
 	gnutls_certificate_set_verify_flags(serv_cred,
 					    GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1);
 
-	ret =
-	    gnutls_certificate_set_x509_trust_mem(serv_cred, &ca3_cert,
-						  GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_trust_mem(serv_cred, &ca3_cert,
+						    GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		fail("set_x509_trust_file failed: %s\n", gnutls_strerror(ret));
 
-	ret =
-	    gnutls_certificate_set_x509_key_mem(serv_cred,
-						&server_ca3_localhost_cert_chain,
-						&server_ca3_key,
-						GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_key_mem(
+		serv_cred, &server_ca3_localhost_cert_chain, &server_ca3_key,
+		GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
 		fail("error in error code\n");
 		exit(1);
 	}
 
-	test_cli_serv_cert(serv_cred, cli_cred,
-			   "NORMAL:+DHE-DSS:+SIGN-DSA-SHA1",
-			   "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2:-DHE-DSS:+SIGN-DSA-SHA1",
-			   "localhost");
+	test_cli_serv_cert(
+		serv_cred, cli_cred, "NORMAL:+DHE-DSS:+SIGN-DSA-SHA1",
+		"NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2:-DHE-DSS:+SIGN-DSA-SHA1",
+		"localhost");
 
 	gnutls_certificate_free_credentials(serv_cred);
 	gnutls_certificate_free_credentials(cli_cred);

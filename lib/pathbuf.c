@@ -91,8 +91,8 @@ int _gnutls_pathbuf_init(struct gnutls_pathbuf_st *buffer, const char *base)
 	return 0;
 }
 
-int
-_gnutls_pathbuf_append(struct gnutls_pathbuf_st *buffer, const char *component)
+int _gnutls_pathbuf_append(struct gnutls_pathbuf_st *buffer,
+			   const char *component)
 {
 	size_t len;
 	char *p;

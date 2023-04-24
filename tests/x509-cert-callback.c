@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -47,12 +47,11 @@ static void tls_log_func(int level, const char *str)
 static gnutls_privkey_t g_pkey = NULL;
 static gnutls_pcert_st *g_pcert = NULL;
 
-static int
-cert_callback(gnutls_session_t session,
-	      const gnutls_datum_t * req_ca_rdn, int nreqs,
-	      const gnutls_pk_algorithm_t * sign_algos,
-	      int sign_algos_length, gnutls_pcert_st ** pcert,
-	      unsigned int *pcert_length, gnutls_privkey_t * pkey)
+static int cert_callback(gnutls_session_t session,
+			 const gnutls_datum_t *req_ca_rdn, int nreqs,
+			 const gnutls_pk_algorithm_t *sign_algos,
+			 int sign_algos_length, gnutls_pcert_st **pcert,
+			 unsigned int *pcert_length, gnutls_privkey_t *pkey)
 {
 	int ret;
 	gnutls_pcert_st *p;
@@ -86,10 +85,8 @@ cert_callback(gnutls_session_t session,
 		if (ret < 0)
 			return -1;
 
-		ret =
-		    gnutls_privkey_import_x509_raw(lkey, &cli_ca3_key,
-						   GNUTLS_X509_FMT_PEM, NULL,
-						   0);
+		ret = gnutls_privkey_import_x509_raw(
+			lkey, &cli_ca3_key, GNUTLS_X509_FMT_PEM, NULL, 0);
 		if (ret < 0)
 			return -1;
 
@@ -102,7 +99,8 @@ cert_callback(gnutls_session_t session,
 	} else {
 		*pcert = g_pcert;
 		*pcert_length = 2;
-		if (gnutls_certificate_client_get_request_status(session) == 0) {
+		if (gnutls_certificate_client_get_request_status(session) ==
+		    0) {
 			fail("gnutls_certificate_client_get_request_status failed\n");
 			return -1;
 		}
@@ -115,12 +113,12 @@ cert_callback(gnutls_session_t session,
 static gnutls_privkey_t server_pkey = NULL;
 static gnutls_pcert_st *server_pcert = NULL;
 
-static int
-server_cert_callback(gnutls_session_t session,
-		     const gnutls_datum_t * req_ca_rdn, int nreqs,
-		     const gnutls_pk_algorithm_t * sign_algos,
-		     int sign_algos_length, gnutls_pcert_st ** pcert,
-		     unsigned int *pcert_length, gnutls_privkey_t * pkey)
+static int server_cert_callback(gnutls_session_t session,
+				const gnutls_datum_t *req_ca_rdn, int nreqs,
+				const gnutls_pk_algorithm_t *sign_algos,
+				int sign_algos_length, gnutls_pcert_st **pcert,
+				unsigned int *pcert_length,
+				gnutls_privkey_t *pkey)
 {
 	int ret;
 	gnutls_pcert_st *p;
@@ -133,9 +131,9 @@ server_cert_callback(gnutls_session_t session,
 		if (p == NULL)
 			return -1;
 
-		ret = gnutls_x509_crt_list_import2(&certs, &certs_size,
-						   &server_ca3_localhost_cert_chain,
-						   GNUTLS_X509_FMT_PEM, 0);
+		ret = gnutls_x509_crt_list_import2(
+			&certs, &certs_size, &server_ca3_localhost_cert_chain,
+			GNUTLS_X509_FMT_PEM, 0);
 		if (ret < 0)
 			return -1;
 		ret = gnutls_pcert_import_x509_list(p, certs, &certs_size, 0);
@@ -149,10 +147,8 @@ server_cert_callback(gnutls_session_t session,
 		if (ret < 0)
 			return -1;
 
-		ret =
-		    gnutls_privkey_import_x509_raw(lkey, &server_ca3_key,
-						   GNUTLS_X509_FMT_PEM, NULL,
-						   0);
+		ret = gnutls_privkey_import_x509_raw(
+			lkey, &server_ca3_key, GNUTLS_X509_FMT_PEM, NULL, 0);
 		if (ret < 0)
 			return -1;
 
@@ -211,9 +207,8 @@ static void start(const char *prio)
 	if (ret < 0)
 		exit(1);
 
-	ret =
-	    gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca3_cert,
-						  GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca3_cert,
+						    GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);
 
@@ -254,9 +249,8 @@ static void start(const char *prio)
 		}
 
 		gnutls_x509_crt_init(&crt);
-		ret =
-		    gnutls_x509_crt_import(crt, &server_ca3_localhost_cert,
-					   GNUTLS_X509_FMT_PEM);
+		ret = gnutls_x509_crt_import(crt, &server_ca3_localhost_cert,
+					     GNUTLS_X509_FMT_PEM);
 		if (ret < 0) {
 			fail("gnutls_x509_crt_import: %s\n",
 			     gnutls_strerror(ret));
@@ -271,8 +265,8 @@ static void start(const char *prio)
 		}
 		gnutls_x509_crt_deinit(crt);
 
-		if (scert.size != mcert->size
-		    || memcmp(scert.data, mcert->data, mcert->size) != 0) {
+		if (scert.size != mcert->size ||
+		    memcmp(scert.data, mcert->data, mcert->size) != 0) {
 			fail("gnutls_certificate_get_ours output doesn't match cert\n");
 			exit(1);
 		}
@@ -292,9 +286,8 @@ static void start(const char *prio)
 		}
 
 		gnutls_x509_crt_init(&crt);
-		ret =
-		    gnutls_x509_crt_import(crt, &cli_ca3_cert,
-					   GNUTLS_X509_FMT_PEM);
+		ret = gnutls_x509_crt_import(crt, &cli_ca3_cert,
+					     GNUTLS_X509_FMT_PEM);
 		if (ret < 0) {
 			fail("gnutls_x509_crt_import: %s\n",
 			     gnutls_strerror(ret));
@@ -309,8 +302,8 @@ static void start(const char *prio)
 		}
 		gnutls_x509_crt_deinit(crt);
 
-		if (ccert.size != mcert->size
-		    || memcmp(ccert.data, mcert->data, mcert->size) != 0) {
+		if (ccert.size != mcert->size ||
+		    memcmp(ccert.data, mcert->data, mcert->size) != 0) {
 			fail("gnutls_certificate_get_ours output doesn't match cert\n");
 			exit(1);
 		}

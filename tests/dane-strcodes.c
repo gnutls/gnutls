@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdlib.h>
@@ -35,8 +35,7 @@
  * non null value.
  */
 
-static
-void _check_unique_non_null(int line, int i, const char *val)
+static void _check_unique_non_null(int line, int i, const char *val)
 {
 	static char previous_val[128];
 

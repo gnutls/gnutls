@@ -32,17 +32,17 @@
 #include "errors.h"
 #include <aes-x86.h>
 #include <x86-common.h>
-#include <nettle/aes.h>		/* for key generation in 192 and 256 bits */
+#include <nettle/aes.h> /* for key generation in 192 and 256 bits */
 #include <sha-padlock.h>
 #include <aes-padlock.h>
 
-static int
-aes_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx, int enc)
+static int aes_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx,
+			   int enc)
 {
 	/* we use key size to distinguish */
-	if (algorithm != GNUTLS_CIPHER_AES_128_CBC
-	    && algorithm != GNUTLS_CIPHER_AES_256_CBC
-	    && algorithm != GNUTLS_CIPHER_AES_192_CBC)
+	if (algorithm != GNUTLS_CIPHER_AES_128_CBC &&
+	    algorithm != GNUTLS_CIPHER_AES_256_CBC &&
+	    algorithm != GNUTLS_CIPHER_AES_192_CBC)
 		return GNUTLS_E_INVALID_REQUEST;
 
 	*_ctx = gnutls_calloc(1, sizeof(struct padlock_ctx));
@@ -125,9 +125,8 @@ static int aes_setiv(void *_ctx, const void *iv, size_t iv_size)
 	return 0;
 }
 
-static int
-padlock_aes_cbc_encrypt(void *_ctx, const void *src, size_t src_size,
-			void *dst, size_t dst_size)
+static int padlock_aes_cbc_encrypt(void *_ctx, const void *src, size_t src_size,
+				   void *dst, size_t dst_size)
 {
 	struct padlock_ctx *ctx = _ctx;
 	struct padlock_cipher_data *pce;
@@ -144,9 +143,8 @@ padlock_aes_cbc_encrypt(void *_ctx, const void *src, size_t src_size,
 	return ret ? 0 : GNUTLS_E_ENCRYPTION_FAILED;
 }
 
-static int
-padlock_aes_cbc_decrypt(void *_ctx, const void *src, size_t src_size,
-			void *dst, size_t dst_size)
+static int padlock_aes_cbc_decrypt(void *_ctx, const void *src, size_t src_size,
+				   void *dst, size_t dst_size)
 {
 	struct padlock_ctx *ctx = _ctx;
 	struct padlock_cipher_data *pcd;

@@ -27,21 +27,19 @@ static void print_cipher_suite_list(const char *priorities)
 		}
 
 		for (i = 0;; i++) {
-			ret =
-			    gnutls_priority_get_cipher_suite_index(pcache,
-								   i, &idx);
+			ret = gnutls_priority_get_cipher_suite_index(pcache, i,
+								     &idx);
 			if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 				break;
 			if (ret == GNUTLS_E_UNKNOWN_CIPHER_SUITE)
 				continue;
 
-			name =
-			    gnutls_cipher_suite_info(idx, id, NULL, NULL,
-						     NULL, &version);
+			name = gnutls_cipher_suite_info(idx, id, NULL, NULL,
+							NULL, &version);
 
 			if (name != NULL)
-				printf("%-50s\t0x%02x, 0x%02x\t%s\n",
-				       name, (unsigned char)id[0],
+				printf("%-50s\t0x%02x, 0x%02x\t%s\n", name,
+				       (unsigned char)id[0],
 				       (unsigned char)id[1],
 				       gnutls_protocol_get_name(version));
 		}

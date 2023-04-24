@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -36,19 +36,19 @@ int main(void)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
-# include <unistd.h>
-# include <gnutls/gnutls.h>
-# include <gnutls/dtls.h>
-# include <signal.h>
-# include "cert-common.h"
+#include <string.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <gnutls/gnutls.h>
+#include <gnutls/dtls.h>
+#include <signal.h>
+#include "cert-common.h"
 
-# include "utils.h"
+#include "utils.h"
 
 static void terminate(void);
 
@@ -105,8 +105,7 @@ static void client(int fd, const char *prio, int ign)
 	 */
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret < 0) {
 		fail("client (%s): Handshake has failed (%s)\n\n", prio,
@@ -119,20 +118,19 @@ static void client(int fd, const char *prio, int ign)
 
 	if (debug)
 		success("client: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
-	ret =
-	    gnutls_alert_send(session, GNUTLS_AL_WARNING,
-			      GNUTLS_A_USER_CANCELED);
+	ret = gnutls_alert_send(session, GNUTLS_AL_WARNING,
+				GNUTLS_A_USER_CANCELED);
 	if (ret < 0) {
 		fail("server: Error sending user cancelled alert: %s\n",
 		     gnutls_strerror(ret));
 		exit(1);
 	}
 
-	ret =
-	    gnutls_alert_send(session, GNUTLS_AL_FATAL, GNUTLS_A_DECRYPT_ERROR);
+	ret = gnutls_alert_send(session, GNUTLS_AL_FATAL,
+				GNUTLS_A_DECRYPT_ERROR);
 	if (ret < 0) {
 		fail("server: Error sending decrypt error alert: %s\n",
 		     gnutls_strerror(ret));
@@ -197,8 +195,7 @@ static void server(int fd, const char *prio, int ign)
 
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 	if (ret < 0) {
 		close(fd);
 		gnutls_deinit(session);
@@ -211,13 +208,13 @@ static void server(int fd, const char *prio, int ign)
 
 	if (debug)
 		success("server: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	do {
 		do {
-			ret =
-			    gnutls_record_recv(session, buffer, sizeof(buffer));
+			ret = gnutls_record_recv(session, buffer,
+						 sizeof(buffer));
 		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 		if (ret > 0)
 			fail("error receiving alert: ret: %d\n", ret);
@@ -230,8 +227,8 @@ static void server(int fd, const char *prio, int ign)
 
 	do {
 		do {
-			ret =
-			    gnutls_record_recv(session, buffer, sizeof(buffer));
+			ret = gnutls_record_recv(session, buffer,
+						 sizeof(buffer));
 		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 		if (ret > 0)
 			fail("error receiving alert: ret: %d\n", ret);
@@ -282,7 +279,8 @@ static void start(const char *prio, int ign)
 	}
 }
 
-# define AES_GCM "NONE:+VERS-TLS1.2:-CIPHER-ALL:+RSA:+AES-128-GCM:+MAC-ALL:+SIGN-ALL:+COMP-NULL:+ANON-ECDH:+CURVE-ALL"
+#define AES_GCM \
+	"NONE:+VERS-TLS1.2:-CIPHER-ALL:+RSA:+AES-128-GCM:+MAC-ALL:+SIGN-ALL:+COMP-NULL:+ANON-ECDH:+CURVE-ALL"
 
 static void ch_handler(int sig)
 {
@@ -299,4 +297,4 @@ void doit(void)
 	start(AES_GCM, 0);
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

@@ -40,7 +40,7 @@ struct find_ext_data_st {
 	unsigned int exts_size;
 };
 
-static int override_ext(gnutls_x509_crt_t crt, gnutls_datum_t * ext)
+static int override_ext(gnutls_x509_crt_t crt, gnutls_datum_t *ext)
 {
 	gnutls_x509_ext_st parsed;
 	int ret;
@@ -50,16 +50,15 @@ static int override_ext(gnutls_x509_crt_t crt, gnutls_datum_t * ext)
 		return gnutls_assert_val(ret);
 
 	/* set the new extension */
-	ret =
-	    _gnutls_x509_crt_set_extension(crt, parsed.oid, &parsed.data,
-					   parsed.critical);
+	ret = _gnutls_x509_crt_set_extension(crt, parsed.oid, &parsed.data,
+					     parsed.critical);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
 	ret = 0;
- cleanup:
+cleanup:
 	gnutls_x509_ext_deinit(&parsed);
 	return ret;
 }
@@ -68,7 +67,7 @@ static int override_ext(gnutls_x509_crt_t crt, gnutls_datum_t * ext)
  * That assumes that the certificate is not in the distrusted list.
  */
 int pkcs11_override_cert_exts(struct pkcs11_session_info *sinfo,
-			      gnutls_datum_t * spki, gnutls_datum_t * der)
+			      gnutls_datum_t *spki, gnutls_datum_t *der)
 {
 	int ret;
 	gnutls_datum_t new_der = { NULL, 0 };
@@ -84,8 +83,8 @@ int pkcs11_override_cert_exts(struct pkcs11_session_info *sinfo,
 	ck_object_handle_t obj;
 
 	if (sinfo->trusted == 0) {
-		_gnutls_debug_log
-		    ("p11: cannot override extensions on a non-p11-kit trust module\n");
+		_gnutls_debug_log(
+			"p11: cannot override extensions on a non-p11-kit trust module\n");
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
 
@@ -102,8 +101,8 @@ int pkcs11_override_cert_exts(struct pkcs11_session_info *sinfo,
 	rv = pkcs11_find_objects_init(sinfo->module, sinfo->pks, a, 2);
 	if (rv != CKR_OK) {
 		gnutls_assert();
-		_gnutls_debug_log
-		    ("p11: FindObjectsInit failed for cert extensions.\n");
+		_gnutls_debug_log(
+			"p11: FindObjectsInit failed for cert extensions.\n");
 		ret = pkcs11_rv_to_err(rv);
 		goto cleanup;
 	}
@@ -131,15 +130,15 @@ int pkcs11_override_cert_exts(struct pkcs11_session_info *sinfo,
 		}
 
 		do {
-
 			b[0].type = CKA_VALUE;
 			b[0].value = ext_data;
 			b[0].value_len = ext_data_size;
 
-			if (pkcs11_get_attribute_value
-			    (sinfo->module, sinfo->pks, obj, b, 1) == CKR_OK) {
-				gnutls_datum_t data =
-				    { b[0].value, b[0].value_len };
+			if (pkcs11_get_attribute_value(sinfo->module,
+						       sinfo->pks, obj, b,
+						       1) == CKR_OK) {
+				gnutls_datum_t data = { b[0].value,
+							b[0].value_len };
 
 				ret = override_ext(crt, &data);
 				if (ret < 0) {
@@ -147,13 +146,13 @@ int pkcs11_override_cert_exts(struct pkcs11_session_info *sinfo,
 					goto cleanup;
 				}
 			}
-		} while (pkcs11_find_objects
-			 (sinfo->module, sinfo->pks, &obj, 1, &count) == CKR_OK
-			 && count == 1);
+		} while (pkcs11_find_objects(sinfo->module, sinfo->pks, &obj, 1,
+					     &count) == CKR_OK &&
+			 count == 1);
 
 		/* overwrite the old certificate with the new */
-		ret =
-		    gnutls_x509_crt_export2(crt, GNUTLS_X509_FMT_DER, &new_der);
+		ret = gnutls_x509_crt_export2(crt, GNUTLS_X509_FMT_DER,
+					      &new_der);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -165,19 +164,19 @@ int pkcs11_override_cert_exts(struct pkcs11_session_info *sinfo,
 	}
 
 	ret = 0;
- cleanup:
+cleanup:
 	if (crt != NULL)
 		gnutls_x509_crt_deinit(crt);
 	if (finalize != 0)
 		pkcs11_find_objects_final(sinfo);
 	gnutls_free(ext_data);
 	return ret;
-
 }
 
-static int
-find_ext_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
-	    struct ck_token_info *tinfo, struct ck_info *lib_info, void *input)
+static int find_ext_cb(struct ck_function_list *module,
+		       struct pkcs11_session_info *sinfo,
+		       struct ck_token_info *tinfo, struct ck_info *lib_info,
+		       void *input)
 {
 	struct find_ext_data_st *find_data = input;
 	struct ck_attribute a[4];
@@ -188,15 +187,15 @@ find_ext_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
 	int ret;
 	gnutls_datum_t ext;
 
-	if (tinfo == NULL) {	/* we don't support multiple calls */
+	if (tinfo == NULL) { /* we don't support multiple calls */
 		gnutls_assert();
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
 
 	/* do not bother reading the token if basic fields do not match
 	 */
-	if (!p11_kit_uri_match_token_info(find_data->obj->info, tinfo)
-	    || !p11_kit_uri_match_module_info(find_data->obj->info, lib_info)) {
+	if (!p11_kit_uri_match_token_info(find_data->obj->info, tinfo) ||
+	    !p11_kit_uri_match_module_info(find_data->obj->info, lib_info)) {
 		gnutls_assert();
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
@@ -214,35 +213,35 @@ find_ext_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
 	rv = pkcs11_find_objects_init(sinfo->module, sinfo->pks, a, 2);
 	if (rv != CKR_OK) {
 		gnutls_assert();
-		_gnutls_debug_log
-		    ("p11: FindObjectsInit failed for cert extensions.\n");
+		_gnutls_debug_log(
+			"p11: FindObjectsInit failed for cert extensions.\n");
 		return pkcs11_rv_to_err(rv);
 	}
 
-	while (pkcs11_find_objects(sinfo->module, sinfo->pks, &obj, 1, &count)
-	       == CKR_OK && count == 1) {
+	while (pkcs11_find_objects(sinfo->module, sinfo->pks, &obj, 1,
+				   &count) == CKR_OK &&
+	       count == 1) {
 		rv = pkcs11_get_attribute_avalue(sinfo->module, sinfo->pks, obj,
 						 CKA_VALUE, &ext);
 		if (rv == CKR_OK) {
-
-			if (unlikely(INT_ADD_OVERFLOW(find_data->exts_size, 1))) {
+			if (unlikely(INT_ADD_OVERFLOW(find_data->exts_size,
+						      1))) {
 				ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 				goto cleanup;
 			}
 
-			find_data->exts =
-			    _gnutls_reallocarray_fast(find_data->exts,
-						      find_data->exts_size + 1,
-						      sizeof(find_data->exts
-							     [0]));
+			find_data->exts = _gnutls_reallocarray_fast(
+				find_data->exts, find_data->exts_size + 1,
+				sizeof(find_data->exts[0]));
 			if (find_data->exts == NULL) {
 				ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 				goto cleanup;
 			}
 
-			if (_gnutls_x509_decode_ext
-			    (&ext,
-			     &find_data->exts[find_data->exts_size]) == 0) {
+			if (_gnutls_x509_decode_ext(
+				    &ext,
+				    &find_data->exts[find_data->exts_size]) ==
+			    0) {
 				find_data->exts_size++;
 			}
 			gnutls_free(ext.data);
@@ -250,7 +249,7 @@ find_ext_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
 	}
 
 	ret = 0;
- cleanup:
+cleanup:
 	pkcs11_find_objects_final(sinfo);
 	return ret;
 }
@@ -273,10 +272,9 @@ find_ext_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
  *
  * Since: 3.3.8
  **/
-int
-gnutls_pkcs11_obj_get_exts(gnutls_pkcs11_obj_t obj,
-			   gnutls_x509_ext_st ** exts, unsigned int *exts_size,
-			   unsigned int flags)
+int gnutls_pkcs11_obj_get_exts(gnutls_pkcs11_obj_t obj,
+			       gnutls_x509_ext_st **exts,
+			       unsigned int *exts_size, unsigned int flags)
 {
 	int ret;
 	gnutls_datum_t spki = { NULL, 0 };
@@ -288,8 +286,8 @@ gnutls_pkcs11_obj_get_exts(gnutls_pkcs11_obj_t obj,
 
 	*exts_size = 0;
 
-	if (obj->type != GNUTLS_PKCS11_OBJ_X509_CRT
-	    && obj->type != GNUTLS_PKCS11_OBJ_PUBKEY)
+	if (obj->type != GNUTLS_PKCS11_OBJ_X509_CRT &&
+	    obj->type != GNUTLS_PKCS11_OBJ_PUBKEY)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	if (obj->type == GNUTLS_PKCS11_OBJ_PUBKEY) {
@@ -305,9 +303,9 @@ gnutls_pkcs11_obj_get_exts(gnutls_pkcs11_obj_t obj,
 	find_data.spki.data = spki.data;
 	find_data.spki.size = spki.size;
 	find_data.obj = obj;
-	ret =
-	    _pkcs11_traverse_tokens(find_ext_cb, &find_data, obj->info,
-				    &obj->pin, pkcs11_obj_flags_to_int(flags));
+	ret = _pkcs11_traverse_tokens(find_ext_cb, &find_data, obj->info,
+				      &obj->pin,
+				      pkcs11_obj_flags_to_int(flags));
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -317,7 +315,7 @@ gnutls_pkcs11_obj_get_exts(gnutls_pkcs11_obj_t obj,
 	*exts_size = find_data.exts_size;
 
 	ret = 0;
- cleanup:
+cleanup:
 	if (deinit_spki)
 		gnutls_free(spki.data);
 	return ret;

@@ -22,7 +22,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -39,20 +39,20 @@ int main(int argc, char **argv)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <sys/socket.h>
-# if !defined(_WIN32)
-#  include <sys/wait.h>
-# endif
-# include <unistd.h>
-# include <gnutls/gnutls.h>
-# include <assert.h>
-# include <signal.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#if !defined(_WIN32)
+#include <sys/wait.h>
+#endif
+#include <unistd.h>
+#include <gnutls/gnutls.h>
+#include <assert.h>
+#include <signal.h>
 
-# include "tls13/ext-parse.h"
+#include "tls13/ext-parse.h"
 
-# include "utils.h"
+#include "utils.h"
 
 /* Tests whether the pre-shared key extension will always be last
  * even if the dumbfw extension is present.
@@ -65,8 +65,8 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "%s|<%d>| %s", side, level, str);
 }
 
-# define MAX_BUF 1024
-# define MSG "Hello TLS"
+#define MAX_BUF 1024
+#define MSG "Hello TLS"
 
 static void client(int sd, const char *prio)
 {
@@ -131,7 +131,7 @@ static void client(int sd, const char *prio)
 
 	gnutls_bye(session, GNUTLS_SHUT_RDWR);
 
- end:
+end:
 
 	close(sd);
 
@@ -142,8 +142,8 @@ static void client(int sd, const char *prio)
 	gnutls_global_deinit();
 }
 
-static int
-pskfunc(gnutls_session_t session, const char *username, gnutls_datum_t * key)
+static int pskfunc(gnutls_session_t session, const char *username,
+		   gnutls_datum_t *key)
 {
 	if (debug)
 		printf("psk: username %s\n", username);
@@ -156,16 +156,15 @@ pskfunc(gnutls_session_t session, const char *username, gnutls_datum_t * key)
 	return 0;
 }
 
-# define EXT_CLIENTHELLO_PADDING 21
-# define EXT_PRE_SHARED_KEY 41
+#define EXT_CLIENTHELLO_PADDING 21
+#define EXT_PRE_SHARED_KEY 41
 
 struct ctx_st {
 	unsigned long pos;
 	void *base;
 };
 
-static
-void check_ext_pos(void *priv, gnutls_datum_t * msg)
+static void check_ext_pos(void *priv, gnutls_datum_t *msg)
 {
 	struct ctx_st *ctx = priv;
 
@@ -174,23 +173,24 @@ void check_ext_pos(void *priv, gnutls_datum_t * msg)
 
 static int client_hello_callback(gnutls_session_t session, unsigned int htype,
 				 unsigned post, unsigned int incoming,
-				 const gnutls_datum_t * msg)
+				 const gnutls_datum_t *msg)
 {
 	unsigned long pos_psk;
 	unsigned long pos_pad;
 
-	if (htype == GNUTLS_HANDSHAKE_CLIENT_HELLO && post == GNUTLS_HOOK_POST) {
+	if (htype == GNUTLS_HANDSHAKE_CLIENT_HELLO &&
+	    post == GNUTLS_HOOK_POST) {
 		struct ctx_st ctx;
 
 		ctx.base = msg->data;
-		if (find_client_extension
-		    (msg, EXT_CLIENTHELLO_PADDING, &ctx, check_ext_pos) == 0)
+		if (find_client_extension(msg, EXT_CLIENTHELLO_PADDING, &ctx,
+					  check_ext_pos) == 0)
 			fail("Could not find dumbfw/client hello padding extension!\n");
 		pos_pad = ctx.pos;
 
 		ctx.base = msg->data;
-		if (find_client_extension
-		    (msg, EXT_PRE_SHARED_KEY, &ctx, check_ext_pos) == 0)
+		if (find_client_extension(msg, EXT_PRE_SHARED_KEY, &ctx,
+					  check_ext_pos) == 0)
 			fail("Could not find psk extension!\n");
 		pos_psk = ctx.pos;
 
@@ -252,11 +252,11 @@ static void server(int sd, const char *prio)
 
 		if (ret == 0) {
 			if (debug)
-				success
-				    ("server: Peer has closed the GnuTLS connection\n");
+				success("server: Peer has closed the GnuTLS connection\n");
 			break;
 		} else if (ret < 0) {
-			fail("server: Received corrupted data(%d). Closing...\n", ret);
+			fail("server: Received corrupted data(%d). Closing...\n",
+			     ret);
 			break;
 		} else if (ret > 0) {
 			/* echo data back to the client
@@ -286,8 +286,7 @@ static void ch_handler(int sig)
 	return;
 }
 
-static
-void run_test(const char *prio)
+static void run_test(const char *prio)
 {
 	pid_t child;
 	int err;
@@ -328,8 +327,8 @@ void run_test(const char *prio)
 
 void doit(void)
 {
-	run_test
-	    ("NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:+PSK:%DUMBFW:-GROUP-ALL:+GROUP-FFDHE2048");
+	run_test(
+		"NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:+PSK:%DUMBFW:-GROUP-ALL:+GROUP-FFDHE2048");
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

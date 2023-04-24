@@ -296,7 +296,7 @@ static char *read_value(struct parser_st *parser)
 	}
 
 	if (c == '\n') {
-		return strdup("");	/* empty value */
+		return strdup(""); /* empty value */
 	} else if (c == '"' || c == '\'') {
 		parser_ungetc(parser, c);
 		return read_quoted_value(parser);
@@ -323,7 +323,7 @@ static char *read_value(struct parser_st *parser)
 		}
 	}
 
- out:
+out:
 	/* NUL terminate */
 	buffer_append(&buffer, '\0');
 	return buffer.data;
@@ -413,7 +413,7 @@ cfg_option_t cfg_load(const char *filename)
 	take_option(&options, &null_option);
 	return options.data;
 
- error:
+error:
 	clear_options(&options);
 	fclose(parser.fp);
 	return NULL;

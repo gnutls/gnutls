@@ -88,7 +88,7 @@ buffer_t *bufNew(ssize_t size, ssize_t hwm)
 	return b;
 }
 
-void bufFree(buffer_t * b)
+void bufFree(buffer_t *b)
 {
 	free(b->buf);
 	free(b);
@@ -97,7 +97,7 @@ void bufFree(buffer_t * b)
 /* get a maximal span to read. Returns 0 if buffer
  * is empty
  */
-ssize_t bufGetReadSpan(buffer_t * b, void **addr)
+ssize_t bufGetReadSpan(buffer_t *b, void **addr)
 {
 	if (b->empty) {
 		*addr = NULL;
@@ -112,7 +112,7 @@ ssize_t bufGetReadSpan(buffer_t * b, void **addr)
 
 /* get a maximal span to write. Returns 0 id buffer is full
  */
-ssize_t bufGetWriteSpan(buffer_t * b, void **addr)
+ssize_t bufGetWriteSpan(buffer_t *b, void **addr)
 {
 	if (b->empty) {
 		*addr = b->buf;
@@ -132,7 +132,7 @@ ssize_t bufGetWriteSpan(buffer_t * b, void **addr)
 }
 
 /* mark size bytes as read */
-void bufDoneRead(buffer_t * b, ssize_t size)
+void bufDoneRead(buffer_t *b, ssize_t size)
 {
 	while (!b->empty && (size > 0)) {
 		/* empty can't occur here, so equal pointers means full */
@@ -159,7 +159,7 @@ void bufDoneRead(buffer_t * b, ssize_t size)
 }
 
 /* mark size bytes as written */
-void bufDoneWrite(buffer_t * b, ssize_t size)
+void bufDoneWrite(buffer_t *b, ssize_t size)
 {
 	while ((b->empty || (b->ridx != b->widx)) && (size > 0)) {
 		/* full can't occur here, so equal pointers means empty */
@@ -182,27 +182,27 @@ void bufDoneWrite(buffer_t * b, ssize_t size)
 	}
 }
 
-int bufIsEmpty(buffer_t * b)
+int bufIsEmpty(buffer_t *b)
 {
 	return b->empty;
 }
 
-int bufIsFull(buffer_t * b)
+int bufIsFull(buffer_t *b)
 {
 	return !b->empty && (b->ridx == b->widx);
 }
 
-int bufIsOverHWM(buffer_t * b)
+int bufIsOverHWM(buffer_t *b)
 {
 	return bufGetCount(b) > b->hwm;
 }
 
-ssize_t bufGetFree(buffer_t * b)
+ssize_t bufGetFree(buffer_t *b)
 {
 	return b->size - bufGetCount(b);
 }
 
-ssize_t bufGetCount(buffer_t * b)
+ssize_t bufGetCount(buffer_t *b)
 {
 	if (b->empty)
 		return 0;

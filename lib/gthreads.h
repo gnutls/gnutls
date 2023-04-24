@@ -21,20 +21,22 @@
  */
 
 #ifndef GNUTLS_LIB_GTHREADS_H
-# define GNUTLS_LIB_GTHREADS_H
+#define GNUTLS_LIB_GTHREADS_H
 
-# include <config.h>
+#include <config.h>
 
 /* Using a C99-only compiler installed in parallel with modern C11 environment
  * will see HAVE_THREADS_H, but won't be able to use _Thread_local. */
-# if __STDC_VERSION__ >= 201112 && !defined(__STDC_NO_THREADS__) && defined(HAVE_THREADS_H)
-#  include <threads.h>
-# elif defined(__GNUC__) || defined(__SUNPRO_C) || defined(__xlC__)	/* clang is covered by __GNUC__ */
-#  define _Thread_local __thread
-# elif defined(_MSC_VER)
-#  define _Thread_local __declspec(thread)
-# else
-#  error Unsupported platform
-# endif
+#if __STDC_VERSION__ >= 201112 && !defined(__STDC_NO_THREADS__) && \
+	defined(HAVE_THREADS_H)
+#include <threads.h>
+#elif defined(__GNUC__) || defined(__SUNPRO_C) || \
+	defined(__xlC__) /* clang is covered by __GNUC__ */
+#define _Thread_local __thread
+#elif defined(_MSC_VER)
+#define _Thread_local __declspec(thread)
+#else
+#error Unsupported platform
+#endif
 
-#endif				/* GNUTLS_LIB_GTHREADS_H */
+#endif /* GNUTLS_LIB_GTHREADS_H */

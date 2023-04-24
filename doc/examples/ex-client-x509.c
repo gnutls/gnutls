@@ -1,7 +1,7 @@
 /* This example code is placed in the public domain. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -16,12 +16,12 @@
  * verification. Note that error recovery is minimal for simplicity.
  */
 
-#define CHECK(x) assert((x)>=0)
-#define LOOP_CHECK(rval, cmd) \
-        do { \
-                rval = cmd; \
-        } while(rval == GNUTLS_E_AGAIN || rval == GNUTLS_E_INTERRUPTED); \
-        assert(rval >= 0)
+#define CHECK(x) assert((x) >= 0)
+#define LOOP_CHECK(rval, cmd)                                             \
+	do {                                                              \
+		rval = cmd;                                               \
+	} while (rval == GNUTLS_E_AGAIN || rval == GNUTLS_E_INTERRUPTED); \
+	assert(rval >= 0)
 
 #define MAX_BUF 1024
 #define MSG "GET / HTTP/1.0\r\n\r\n"
@@ -63,9 +63,9 @@ int main(void)
 	/* Initialize TLS session */
 	CHECK(gnutls_init(&session, GNUTLS_CLIENT));
 
-	CHECK(gnutls_server_name_set
-	      (session, GNUTLS_NAME_DNS, "www.example.com",
-	       strlen("www.example.com")));
+	CHECK(gnutls_server_name_set(session, GNUTLS_NAME_DNS,
+				     "www.example.com",
+				     strlen("www.example.com")));
 
 	/* It is recommended to use the default priorities */
 	CHECK(gnutls_set_default_priority(session));
@@ -86,15 +86,14 @@ int main(void)
 	 */
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 	if (ret < 0) {
 		if (ret == GNUTLS_E_CERTIFICATE_VERIFICATION_ERROR) {
 			/* check certificate verification status */
 			type = gnutls_certificate_type_get(session);
 			status = gnutls_session_get_verify_cert_status(session);
-			CHECK(gnutls_certificate_verification_status_print
-			      (status, type, &out, 0));
+			CHECK(gnutls_certificate_verification_status_print(
+				status, type, &out, 0));
 			printf("cert verify output: %s\n", out.data);
 			gnutls_free(out.data);
 		}
@@ -131,7 +130,7 @@ int main(void)
 
 	CHECK(gnutls_bye(session, GNUTLS_SHUT_RDWR));
 
- end:
+end:
 
 	tcp_close(sd);
 

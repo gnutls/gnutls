@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -43,7 +43,7 @@ static time_t then = DEFAULT_THEN;
    verifying certificates.  To avoid a time bomb, we hard code the
    current time.  This should work fine on systems where the library
    call to time is resolved at run-time.  */
-static time_t mytime(time_t * t)
+static time_t mytime(time_t *t)
 {
 	if (t)
 		*t = then;
@@ -63,7 +63,7 @@ struct getissuer_data {
 
 static int getissuer_callback(gnutls_x509_trust_list_t tlist,
 			      const gnutls_x509_crt_t crt,
-			      gnutls_x509_crt_t ** issuers,
+			      gnutls_x509_crt_t **issuers,
 			      unsigned int *issuers_size)
 {
 	gnutls_datum_t tmp;
@@ -94,13 +94,14 @@ static int getissuer_callback(gnutls_x509_trust_list_t tlist,
 	assert(gnutls_x509_crt_print(crt, GNUTLS_CRT_PRINT_ONELINE, &tmp) >= 0);
 
 	if (debug)
-		printf("\t Certificate missing issuer is: %.*s\n",
-		       tmp.size, tmp.data);
+		printf("\t Certificate missing issuer is: %.*s\n", tmp.size,
+		       tmp.data);
 	gnutls_free(tmp.data);
 
 	for (i = 0; i < *issuers_size; i++) {
-		assert(gnutls_x509_crt_print
-		       ((*issuers)[i], GNUTLS_CRT_PRINT_ONELINE, &tmp) >= 0);
+		assert(gnutls_x509_crt_print((*issuers)[i],
+					     GNUTLS_CRT_PRINT_ONELINE,
+					     &tmp) >= 0);
 
 		if (debug)
 			printf("\t Appended issuer certificate is: %.*s\n",
@@ -163,9 +164,8 @@ void doit(void)
 			tmp.data = (unsigned char *)chains[i].chain[j];
 			tmp.size = strlen(chains[i].chain[j]);
 
-			ret =
-			    gnutls_x509_crt_import(certs[j], &tmp,
-						   GNUTLS_X509_FMT_PEM);
+			ret = gnutls_x509_crt_import(certs[j], &tmp,
+						     GNUTLS_X509_FMT_PEM);
 			if (debug > 2)
 				printf("done\n");
 			if (ret < 0) {
@@ -226,8 +226,8 @@ void doit(void)
 		data.insert = chains[i].insert;
 
 		gnutls_x509_trust_list_set_ptr(tl, &data);
-		gnutls_x509_trust_list_set_getissuer_function(tl,
-							      getissuer_callback);
+		gnutls_x509_trust_list_set_getissuer_function(
+			tl, getissuer_callback);
 
 		ret = gnutls_x509_trust_list_verify_crt(tl, certs, j,
 							chains[i].verify_flags,
@@ -241,12 +241,14 @@ void doit(void)
 
 		if (verify_status != chains[i].expected_verify_result) {
 			gnutls_datum_t out1, out2;
-			gnutls_certificate_verification_status_print
-			    (verify_status, GNUTLS_CRT_X509, &out1, 0);
-			gnutls_certificate_verification_status_print
-			    (chains[i].expected_verify_result,
-			     GNUTLS_CRT_X509, &out2, 0);
-			fail("chain[%s]:\nverify_status: %d: %s\nexpected: %d: %s\n", chains[i].name, verify_status, out1.data, chains[i].expected_verify_result, out2.data);
+			gnutls_certificate_verification_status_print(
+				verify_status, GNUTLS_CRT_X509, &out1, 0);
+			gnutls_certificate_verification_status_print(
+				chains[i].expected_verify_result,
+				GNUTLS_CRT_X509, &out2, 0);
+			fail("chain[%s]:\nverify_status: %d: %s\nexpected: %d: %s\n",
+			     chains[i].name, verify_status, out1.data,
+			     chains[i].expected_verify_result, out2.data);
 			gnutls_free(out1.data);
 			gnutls_free(out2.data);
 

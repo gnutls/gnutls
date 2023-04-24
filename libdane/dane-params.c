@@ -37,11 +37,10 @@ typedef struct cert_type_entry {
 	dane_cert_type_t type;
 } cert_type_entry;
 
-static const cert_type_entry dane_cert_types[] = {
-	{"X.509", DANE_CERT_X509},
-	{"SubjectPublicKeyInfo", DANE_CERT_PK},
-	{NULL, 0}
-};
+static const cert_type_entry dane_cert_types[] = { { "X.509", DANE_CERT_X509 },
+						   { "SubjectPublicKeyInfo",
+						     DANE_CERT_PK },
+						   { NULL, 0 } };
 
 typedef struct match_type_entry {
 	const char *name;
@@ -49,10 +48,10 @@ typedef struct match_type_entry {
 } match_type_entry;
 
 static const match_type_entry dane_match_types[] = {
-	{"Exact match", DANE_MATCH_EXACT},
-	{"SHA2-256 hash", DANE_MATCH_SHA2_256},
-	{"SHA2-512 hash", DANE_MATCH_SHA2_512},
-	{NULL, 0}
+	{ "Exact match", DANE_MATCH_EXACT },
+	{ "SHA2-256 hash", DANE_MATCH_SHA2_256 },
+	{ "SHA2-512 hash", DANE_MATCH_SHA2_512 },
+	{ NULL, 0 }
 };
 
 typedef struct cert_usage_entry {
@@ -61,11 +60,11 @@ typedef struct cert_usage_entry {
 } cert_usage_entry;
 
 static const cert_usage_entry dane_cert_usages[] = {
-	{"CA", DANE_CERT_USAGE_CA},
-	{"End-entity", DANE_CERT_USAGE_EE},
-	{"Local CA", DANE_CERT_USAGE_LOCAL_CA},
-	{"Local end-entity", DANE_CERT_USAGE_LOCAL_EE},
-	{NULL, 0}
+	{ "CA", DANE_CERT_USAGE_CA },
+	{ "End-entity", DANE_CERT_USAGE_EE },
+	{ "Local CA", DANE_CERT_USAGE_LOCAL_CA },
+	{ "Local end-entity", DANE_CERT_USAGE_LOCAL_EE },
+	{ NULL, 0 }
 };
 
 /**
@@ -132,5 +131,4 @@ const char *dane_cert_usage_name(dane_cert_usage_t usage)
 	}
 
 	return NULL;
-
 }

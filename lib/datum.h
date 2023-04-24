@@ -21,24 +21,24 @@
  */
 
 #ifndef GNUTLS_LIB_DATUM_H
-# define GNUTLS_LIB_DATUM_H
+#define GNUTLS_LIB_DATUM_H
 
-# include "gnutls_int.h"
+#include "gnutls_int.h"
 
 /* This will copy the provided data in @dat. If the provided data are
  * NULL or zero-size @dat will be NULL as well.
  */
-NODISCARD ATTRIBUTE_NONNULL((1))
-int _gnutls_set_datum(gnutls_datum_t * dat, const void *data, size_t data_size);
+NODISCARD ATTRIBUTE_NONNULL((1)) int _gnutls_set_datum(gnutls_datum_t *dat,
+						       const void *data,
+						       size_t data_size);
 
 /* This will always return a non-NULL, and zero-terminated string in @dat.
  */
-NODISCARD ATTRIBUTE_NONNULL((1))
-int _gnutls_set_strdatum(gnutls_datum_t * dat, const void *data,
-			 size_t data_size);
+NODISCARD ATTRIBUTE_NONNULL((1)) int _gnutls_set_strdatum(gnutls_datum_t *dat,
+							  const void *data,
+							  size_t data_size);
 
-inline static
-void _gnutls_free_datum(gnutls_datum_t * dat)
+inline static void _gnutls_free_datum(gnutls_datum_t *dat)
 {
 	if (dat != NULL) {
 		gnutls_free(dat->data);
@@ -46,8 +46,8 @@ void _gnutls_free_datum(gnutls_datum_t * dat)
 	}
 }
 
-inline static ATTRIBUTE_NONNULL()
-void _gnutls_free_temp_key_datum(gnutls_datum_t * dat)
+inline static ATTRIBUTE_NONNULL() void _gnutls_free_temp_key_datum(
+	gnutls_datum_t *dat)
 {
 	if (dat->data != NULL) {
 		zeroize_temp_key(dat->data, dat->size);
@@ -57,8 +57,8 @@ void _gnutls_free_temp_key_datum(gnutls_datum_t * dat)
 	dat->size = 0;
 }
 
-inline static ATTRIBUTE_NONNULL()
-void _gnutls_free_key_datum(gnutls_datum_t * dat)
+inline static ATTRIBUTE_NONNULL() void _gnutls_free_key_datum(
+	gnutls_datum_t *dat)
 {
 	if (dat->data != NULL) {
 		zeroize_key(dat->data, dat->size);
@@ -68,4 +68,4 @@ void _gnutls_free_key_datum(gnutls_datum_t * dat)
 	dat->size = 0;
 }
 
-#endif				/* GNUTLS_LIB_DATUM_H */
+#endif /* GNUTLS_LIB_DATUM_H */

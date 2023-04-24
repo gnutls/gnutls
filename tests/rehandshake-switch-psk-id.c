@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -43,8 +43,8 @@ static void tls_log_func(int level, const char *str)
 
 #include "cert-common.h"
 
-static int
-pskfunc(gnutls_session_t session, const char *username, gnutls_datum_t * key)
+static int pskfunc(gnutls_session_t session, const char *username,
+		   gnutls_datum_t *key)
 {
 	if (debug)
 		printf("psk: username %s\n", username);
@@ -134,7 +134,9 @@ static void try(const char *prio, gnutls_kx_algorithm_t kx,
 	HANDSHAKE(client, server);
 
 	if (gnutls_kx_get(client) != kx) {
-		fail("got unexpected key exchange algorithm: %s (expected %s)\n", gnutls_kx_get_name(gnutls_kx_get(client)), gnutls_kx_get_name(kx));
+		fail("got unexpected key exchange algorithm: %s (expected %s)\n",
+		     gnutls_kx_get_name(gnutls_kx_get(client)),
+		     gnutls_kx_get_name(kx));
 		exit(1);
 	}
 

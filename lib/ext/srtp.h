@@ -21,13 +21,13 @@
  */
 
 #ifndef GNUTLS_LIB_EXT_SRTP_H
-# define GNUTLS_LIB_EXT_SRTP_H
-# ifndef EXT_SRTP_H
-#  define EXT_SRTP_H
+#define GNUTLS_LIB_EXT_SRTP_H
+#ifndef EXT_SRTP_H
+#define EXT_SRTP_H
 
-#  include <hello_ext.h>
+#include <hello_ext.h>
 
-#  define MAX_SRTP_PROFILES 4
+#define MAX_SRTP_PROFILES 4
 
 typedef struct {
 	gnutls_srtp_profile_t profiles[MAX_SRTP_PROFILES];
@@ -40,6 +40,6 @@ typedef struct {
 
 extern const hello_ext_entry_st ext_mod_srtp;
 
-# endif
+#endif
 
-#endif				/* GNUTLS_LIB_EXT_SRTP_H */
+#endif /* GNUTLS_LIB_EXT_SRTP_H */

@@ -20,7 +20,7 @@ int main(int argc, char **argv)
 	exit(77);
 }
 #else
-# include <unistd.h>
+#include <unistd.h>
 
 static void handle_sigill(int sig)
 {

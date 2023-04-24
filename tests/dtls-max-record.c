@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -32,7 +32,9 @@
 #include <assert.h>
 #include "utils.h"
 
-#define SERVER_PUSH_ADD if (len > 512 + 5+8+32) fail("max record set to 512, len: %d\n", (int)len);
+#define SERVER_PUSH_ADD             \
+	if (len > 512 + 5 + 8 + 32) \
+		fail("max record set to 512, len: %d\n", (int)len);
 #include "eagain-common.h"
 
 #include "cert-common.h"
@@ -47,8 +49,7 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "%s|<%d>| %s", side, level, str);
 }
 
-static
-void run(const char *prio)
+static void run(const char *prio)
 {
 	global_init();
 
@@ -70,9 +71,8 @@ void run(const char *prio)
 
 	/* Init server */
 	gnutls_certificate_allocate_credentials(&serverx509cred);
-	gnutls_certificate_set_x509_key_mem(serverx509cred,
-					    &server2_cert, &server2_key,
-					    GNUTLS_X509_FMT_PEM);
+	gnutls_certificate_set_x509_key_mem(serverx509cred, &server2_cert,
+					    &server2_key, GNUTLS_X509_FMT_PEM);
 
 	gnutls_init(&server, GNUTLS_SERVER | GNUTLS_DATAGRAM | GNUTLS_NONBLOCK);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, serverx509cred);
@@ -90,15 +90,13 @@ void run(const char *prio)
 	if (ret < 0)
 		exit(1);
 
-	ret =
-	    gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca2_cert,
-						  GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca2_cert,
+						    GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);
 
-	ret =
-	    gnutls_init(&client,
-			GNUTLS_CLIENT | GNUTLS_DATAGRAM | GNUTLS_NONBLOCK);
+	ret = gnutls_init(&client,
+			  GNUTLS_CLIENT | GNUTLS_DATAGRAM | GNUTLS_NONBLOCK);
 	if (ret < 0)
 		exit(1);
 

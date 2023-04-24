@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -36,23 +36,18 @@
  * return no certificates.
  */
 
-static int cert_cb1(gnutls_session_t session,
-		    const gnutls_datum_t * req_ca_rdn,
-		    int nreqs,
-		    const gnutls_pk_algorithm_t * pk_algos,
-		    int pk_algos_length, gnutls_retr2_st * retr)
+static int cert_cb1(gnutls_session_t session, const gnutls_datum_t *req_ca_rdn,
+		    int nreqs, const gnutls_pk_algorithm_t *pk_algos,
+		    int pk_algos_length, gnutls_retr2_st *retr)
 {
 	memset(retr, 0, sizeof(*retr));
 	return 0;
 }
 
-static int cert_cb2(gnutls_session_t session,
-		    const gnutls_datum_t * req_ca_rdn,
-		    int nreqs,
-		    const gnutls_pk_algorithm_t * pk_algos,
-		    int pk_algos_length,
-		    gnutls_pcert_st ** pcert,
-		    unsigned int *pcert_length, gnutls_privkey_t * privkey)
+static int cert_cb2(gnutls_session_t session, const gnutls_datum_t *req_ca_rdn,
+		    int nreqs, const gnutls_pk_algorithm_t *pk_algos,
+		    int pk_algos_length, gnutls_pcert_st **pcert,
+		    unsigned int *pcert_length, gnutls_privkey_t *privkey)
 {
 	*pcert_length = 0;
 	*privkey = NULL;
@@ -63,11 +58,9 @@ static int cert_cb2(gnutls_session_t session,
 
 static int cert_cb3(gnutls_session_t session,
 		    const struct gnutls_cert_retr_st *info,
-		    gnutls_pcert_st ** certs,
-		    unsigned int *pcert_length,
-		    gnutls_ocsp_data_st ** ocsp,
-		    unsigned int *ocsp_length,
-		    gnutls_privkey_t * privkey, unsigned int *flags)
+		    gnutls_pcert_st **certs, unsigned int *pcert_length,
+		    gnutls_ocsp_data_st **ocsp, unsigned int *ocsp_length,
+		    gnutls_privkey_t *privkey, unsigned int *flags)
 {
 	*privkey = NULL;
 	*ocsp_length = 0;
@@ -96,11 +89,9 @@ void doit(void)
 
 	gnutls_certificate_allocate_credentials(&x509_cred);
 
-	ret =
-	    gnutls_certificate_set_x509_key_mem(x509_cred,
-						&server_ca3_localhost_cert_chain,
-						&server_ca3_key,
-						GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_key_mem(
+		x509_cred, &server_ca3_localhost_cert_chain, &server_ca3_key,
+		GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
 		fail("error in error code\n");
 		exit(1);

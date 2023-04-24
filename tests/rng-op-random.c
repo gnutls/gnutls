@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -29,7 +29,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #if !defined(_WIN32)
-# include <sys/wait.h>
+#include <sys/wait.h>
 #endif
 
 #include "utils.h"

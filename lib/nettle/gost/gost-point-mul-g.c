@@ -32,7 +32,7 @@
 /* Development of Nettle's ECC support was funded by the .SE Internet Fund. */
 
 #if HAVE_CONFIG_H
-# include "config.h"
+#include "config.h"
 #endif
 
 #include <assert.h>

@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -41,12 +41,12 @@
 
 #if defined(HAVE___REGISTER_ATFORK)
 
-# ifdef _WIN32
-#  define P11LIB "libpkcs11mock1.dll"
-# else
-#  include <dlfcn.h>
-#  define P11LIB "libpkcs11mock1.so"
-# endif
+#ifdef _WIN32
+#define P11LIB "libpkcs11mock1.dll"
+#else
+#include <dlfcn.h>
+#define P11LIB "libpkcs11mock1.so"
+#endif
 
 static void tls_log_func(int level, const char *str)
 {
@@ -91,11 +91,11 @@ void doit(void)
 		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 			break;
 		success("mech: %lu\n", mech);
-		ret =
-		    gnutls_pkcs11_token_check_mechanism("pkcs11:", mech, NULL,
-							0, 0);
+		ret = gnutls_pkcs11_token_check_mechanism("pkcs11:", mech, NULL,
+							  0, 0);
 		if (ret == 0) {
-			fail("mechanism %ld was reported are supported, but is not found!\n", mech);
+			fail("mechanism %ld was reported are supported, but is not found!\n",
+			     mech);
 		}
 	}
 	if (debug)

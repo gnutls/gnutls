@@ -29,20 +29,21 @@
 #include "hello_ext_lib.h"
 #include <ext/early_data.h>
 
-static int early_data_recv_params(gnutls_session_t session,
-				  const uint8_t * data, size_t data_size);
+static int early_data_recv_params(gnutls_session_t session, const uint8_t *data,
+				  size_t data_size);
 static int early_data_send_params(gnutls_session_t session,
-				  gnutls_buffer_st * extdata);
+				  gnutls_buffer_st *extdata);
 
 const hello_ext_entry_st ext_mod_early_data = {
 	.name = "Early Data",
 	.tls_id = 42,
 	.gid = GNUTLS_EXTENSION_EARLY_DATA,
-	.validity =
-	    GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_CLIENT_HELLO |
-	    GNUTLS_EXT_FLAG_EE,
-	.client_parse_point = GNUTLS_EXT_MANDATORY,	/* force parsing prior to EXT_TLS extensions */
-	.server_parse_point = GNUTLS_EXT_MANDATORY,	/* force parsing prior to EXT_TLS extensions */
+	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_CLIENT_HELLO |
+		    GNUTLS_EXT_FLAG_EE,
+	.client_parse_point =
+		GNUTLS_EXT_MANDATORY, /* force parsing prior to EXT_TLS extensions */
+	.server_parse_point =
+		GNUTLS_EXT_MANDATORY, /* force parsing prior to EXT_TLS extensions */
 	.recv_func = early_data_recv_params,
 	.send_func = early_data_send_params,
 	.pack_func = NULL,
@@ -51,9 +52,8 @@ const hello_ext_entry_st ext_mod_early_data = {
 	.cannot_be_overriden = 0
 };
 
-static int
-early_data_recv_params(gnutls_session_t session,
-		       const uint8_t * data, size_t _data_size)
+static int early_data_recv_params(gnutls_session_t session, const uint8_t *data,
+				  size_t _data_size)
 {
 	const version_entry_st *vers = get_version(session);
 
@@ -75,8 +75,8 @@ early_data_recv_params(gnutls_session_t session,
 
 /* returns data_size or a negative number on failure
  */
-static int
-early_data_send_params(gnutls_session_t session, gnutls_buffer_st * extdata)
+static int early_data_send_params(gnutls_session_t session,
+				  gnutls_buffer_st *extdata)
 {
 	if (session->security_parameters.entity == GNUTLS_SERVER) {
 		if (session->internals.hsk_flags & HSK_EARLY_DATA_ACCEPTED)
@@ -87,10 +87,10 @@ early_data_send_params(gnutls_session_t session, gnutls_buffer_st * extdata)
 		    !(session->internals.resumption_requested == 0 &&
 		      session->internals.premaster_set == 0) &&
 		    session->internals.resumed_security_parameters.pversion &&
-		    session->internals.resumed_security_parameters.
-		    pversion->tls13_sem) {
+		    session->internals.resumed_security_parameters.pversion
+			    ->tls13_sem) {
 			session->internals.hsk_flags |=
-			    HSK_EARLY_DATA_IN_FLIGHT;
+				HSK_EARLY_DATA_IN_FLIGHT;
 			return GNUTLS_E_INT_RET_0;
 		}
 	}
@@ -140,7 +140,7 @@ int gnutls_record_set_max_early_data_size(gnutls_session_t session, size_t size)
 	if (size == 0 || size > UINT32_MAX)
 		return GNUTLS_E_INVALID_REQUEST;
 
-	session->security_parameters.max_early_data_size = (uint32_t) size;
+	session->security_parameters.max_early_data_size = (uint32_t)size;
 
 	return 0;
 }

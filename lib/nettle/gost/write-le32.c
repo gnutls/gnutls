@@ -30,7 +30,7 @@
 */
 
 #if HAVE_CONFIG_H
-# include "config.h"
+#include "config.h"
 #endif
 
 #include <stdlib.h>
@@ -39,7 +39,7 @@
 
 #include <nettle/macros.h>
 
-void _nettle_write_le32(size_t length, uint8_t * dst, const uint32_t * src)
+void _nettle_write_le32(size_t length, uint8_t *dst, const uint32_t *src)
 {
 	size_t i;
 	size_t words;
@@ -59,7 +59,6 @@ void _nettle_write_le32(size_t length, uint8_t * dst, const uint32_t * src)
 		do {
 			*dst++ = word & 0xff;
 			word >>= 8;
-		}
-		while (--leftover);
+		} while (--leftover);
 	}
 }

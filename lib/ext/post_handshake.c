@@ -31,10 +31,10 @@
 #include "auth/cert.h"
 
 static int _gnutls_post_handshake_recv_params(gnutls_session_t session,
-					      const uint8_t * data,
+					      const uint8_t *data,
 					      size_t data_size);
 static int _gnutls_post_handshake_send_params(gnutls_session_t session,
-					      gnutls_buffer_st * extdata);
+					      gnutls_buffer_st *extdata);
 
 const hello_ext_entry_st ext_mod_post_handshake = {
 	.name = "Post Handshake Auth",
@@ -51,9 +51,9 @@ const hello_ext_entry_st ext_mod_post_handshake = {
 	.cannot_be_overriden = 1
 };
 
-static int
-_gnutls_post_handshake_recv_params(gnutls_session_t session,
-				   const uint8_t * data, size_t _data_size)
+static int _gnutls_post_handshake_recv_params(gnutls_session_t session,
+					      const uint8_t *data,
+					      size_t _data_size)
 {
 	const version_entry_st *vers;
 
@@ -72,9 +72,8 @@ _gnutls_post_handshake_recv_params(gnutls_session_t session,
 
 /* returns data_size or a negative number on failure
  */
-static int
-_gnutls_post_handshake_send_params(gnutls_session_t session,
-				   gnutls_buffer_st * extdata)
+static int _gnutls_post_handshake_send_params(gnutls_session_t session,
+					      gnutls_buffer_st *extdata)
 {
 	gnutls_certificate_credentials_t cred;
 	const version_entry_st *max;
@@ -85,9 +84,9 @@ _gnutls_post_handshake_send_params(gnutls_session_t session,
 		return 0;
 	}
 
-	cred = (gnutls_certificate_credentials_t)
-	    _gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE);
-	if (cred == NULL)	/* no certificate authentication */
+	cred = (gnutls_certificate_credentials_t)_gnutls_get_cred(
+		session, GNUTLS_CRD_CERTIFICATE);
+	if (cred == NULL) /* no certificate authentication */
 		return gnutls_assert_val(0);
 
 	max = _gnutls_version_max(session);

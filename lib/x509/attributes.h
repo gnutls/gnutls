@@ -21,15 +21,13 @@
  */
 
 #ifndef GNUTLS_LIB_X509_ATTRIBUTES_H
-# define GNUTLS_LIB_X509_ATTRIBUTES_H
+#define GNUTLS_LIB_X509_ATTRIBUTES_H
 
-int
-_x509_parse_attribute(asn1_node asn1_struct,
-		      const char *attr_name, const char *given_oid,
-		      unsigned indx, int raw, gnutls_datum_t * out);
+int _x509_parse_attribute(asn1_node asn1_struct, const char *attr_name,
+			  const char *given_oid, unsigned indx, int raw,
+			  gnutls_datum_t *out);
 
-int
-_x509_set_attribute(asn1_node asn, const char *root,
-		    const char *ext_id, const gnutls_datum_t * ext_data);
+int _x509_set_attribute(asn1_node asn, const char *root, const char *ext_id,
+			const gnutls_datum_t *ext_data);
 
-#endif				/* GNUTLS_LIB_X509_ATTRIBUTES_H */
+#endif /* GNUTLS_LIB_X509_ATTRIBUTES_H */

@@ -25,11 +25,11 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #ifndef _WIN32
-# error "This test shouldn't have been included"
+#error "This test shouldn't have been included"
 #endif
 
 #include <windows.h>

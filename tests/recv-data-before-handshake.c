@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,19 +35,19 @@ int main(void)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
-# include <unistd.h>
-# include <gnutls/gnutls.h>
-# include <gnutls/dtls.h>
-# include <signal.h>
-# include <assert.h>
-# include "cert-common.h"
-# include "utils.h"
+#include <string.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <gnutls/gnutls.h>
+#include <gnutls/dtls.h>
+#include <signal.h>
+#include <assert.h>
+#include "cert-common.h"
+#include "utils.h"
 
 static void terminate(void);
 
@@ -68,7 +68,7 @@ static void client_log_func(int level, const char *str)
 
 static int handshake_callback(gnutls_session_t session, unsigned int htype,
 			      unsigned post, unsigned int incoming,
-			      const gnutls_datum_t * msg)
+			      const gnutls_datum_t *msg)
 {
 	int ret;
 	char c = 0;
@@ -94,7 +94,7 @@ static int handshake_callback(gnutls_session_t session, unsigned int htype,
 	return 0;
 }
 
-# define MAX_BUF 1024
+#define MAX_BUF 1024
 
 static void client(int fd, const char *prio)
 {
@@ -130,8 +130,7 @@ static void client(int fd, const char *prio)
 	 */
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret == GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM) {
 		/* success */
@@ -148,8 +147,8 @@ static void client(int fd, const char *prio)
 
 	if (debug)
 		success("client: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	do {
 		do {
@@ -168,7 +167,7 @@ static void client(int fd, const char *prio)
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
- end:
+end:
 
 	close(fd);
 
@@ -235,14 +234,14 @@ static void server(int fd, const char *prio)
 
 	if (debug)
 		success("server: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	/* do not wait for the peer to close the connection.
 	 */
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
- end:
+end:
 	close(fd);
 	gnutls_deinit(session);
 
@@ -259,8 +258,7 @@ static void ch_handler(int sig)
 	return;
 }
 
-static
-void start(const char *prio)
+static void start(const char *prio)
 {
 	int fd[2];
 	int ret, status = 0;
@@ -302,4 +300,4 @@ void doit(void)
 	start("NORMAL");
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

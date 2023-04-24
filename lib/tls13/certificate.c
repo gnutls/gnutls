@@ -31,14 +31,14 @@
 #include "ext/compress_certificate.h"
 #include "ext/status_request.h"
 
-static int parse_cert_extension(void *ctx, unsigned tls_id,
-				const uint8_t * data, unsigned data_size);
-static int parse_cert_list(gnutls_session_t session, uint8_t * data,
+static int parse_cert_extension(void *ctx, unsigned tls_id, const uint8_t *data,
+				unsigned data_size);
+static int parse_cert_list(gnutls_session_t session, uint8_t *data,
 			   size_t data_size);
-static int compress_certificate(gnutls_buffer_st * buf, unsigned cert_pos_mark,
+static int compress_certificate(gnutls_buffer_st *buf, unsigned cert_pos_mark,
 				gnutls_compression_method_t comp_method);
 static int decompress_certificate(gnutls_session_t session,
-				  gnutls_buffer_st * buf);
+				  gnutls_buffer_st *buf);
 
 int _gnutls13_recv_certificate(gnutls_session_t session)
 {
@@ -59,31 +59,27 @@ int _gnutls13_recv_certificate(gnutls_session_t session)
 			optional = 1;
 	}
 
-	ret =
-	    _gnutls_recv_handshake(session, GNUTLS_HANDSHAKE_CERTIFICATE_PKT, 0,
-				   &buf);
+	ret = _gnutls_recv_handshake(session, GNUTLS_HANDSHAKE_CERTIFICATE_PKT,
+				     0, &buf);
 	if (ret == GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET) {
 		/* check if we received compressed certificate */
-		err =
-		    _gnutls_recv_handshake(session,
-					   GNUTLS_HANDSHAKE_COMPRESSED_CERTIFICATE_PKT,
-					   0, &buf);
+		err = _gnutls_recv_handshake(
+			session, GNUTLS_HANDSHAKE_COMPRESSED_CERTIFICATE_PKT, 0,
+			&buf);
 		if (err >= 0) {
 			/* fail if we receive unsolicited compressed certificate */
-			if (!
-			    (session->
-			     internals.hsk_flags & HSK_COMP_CRT_REQ_SENT))
-				return
-				    gnutls_assert_val
-				    (GNUTLS_E_UNEXPECTED_PACKET);
+			if (!(session->internals.hsk_flags &
+			      HSK_COMP_CRT_REQ_SENT))
+				return gnutls_assert_val(
+					GNUTLS_E_UNEXPECTED_PACKET);
 
 			decompress_cert = 1;
 			ret = err;
 		}
 	}
 	if (ret < 0) {
-		if (ret == GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET
-		    && session->internals.send_cert_req)
+		if (ret == GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET &&
+		    session->internals.send_cert_req)
 			return gnutls_assert_val(GNUTLS_E_NO_CERTIFICATE_FOUND);
 
 		return gnutls_assert_val(ret);
@@ -117,10 +113,10 @@ int _gnutls13_recv_certificate(gnutls_session_t session)
 		}
 
 		if (context.size !=
-		    session->internals.post_handshake_cr_context.size
-		    || memcmp(context.data,
-			      session->internals.post_handshake_cr_context.data,
-			      context.size) != 0) {
+			    session->internals.post_handshake_cr_context.size ||
+		    memcmp(context.data,
+			   session->internals.post_handshake_cr_context.data,
+			   context.size) != 0) {
 			ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 			gnutls_assert();
 			goto cleanup;
@@ -157,7 +153,7 @@ int _gnutls13_recv_certificate(gnutls_session_t session)
 	session->internals.hsk_flags |= HSK_CRT_VRFY_EXPECTED;
 
 	ret = 0;
- cleanup:
+cleanup:
 
 	_gnutls_buffer_clear(&buf);
 	return ret;
@@ -170,8 +166,7 @@ struct ocsp_req_ctx_st {
 	gnutls_certificate_credentials_t cred;
 };
 
-static
-int append_status_request(void *_ctx, gnutls_buffer_st * buf)
+static int append_status_request(void *_ctx, gnutls_buffer_st *buf)
 {
 	struct ocsp_req_ctx_st *ctx = _ctx;
 	gnutls_session_t session = ctx->session;
@@ -184,41 +179,39 @@ int append_status_request(void *_ctx, gnutls_buffer_st * buf)
 
 	/* The global ocsp callback function can only be used to return
 	 * a single certificate request */
-	if (session->internals.selected_ocsp_length == 1
-	    && ctx->cert_index != 0)
+	if (session->internals.selected_ocsp_length == 1 &&
+	    ctx->cert_index != 0)
 		return 0;
 
 	if (session->internals.selected_ocsp_length > 0) {
 		if (ctx->cert_index < session->internals.selected_ocsp_length) {
-			if ((session->internals.
-			     selected_ocsp[ctx->cert_index].exptime != 0
-			     && gnutls_time(0) >=
-			     session->internals.selected_ocsp[ctx->
-							      cert_index].exptime)
-			    || session->internals.
-			    selected_ocsp[ctx->cert_index].response.data ==
-			    NULL) {
+			if ((session->internals.selected_ocsp[ctx->cert_index]
+					     .exptime != 0 &&
+			     gnutls_time(0) >=
+				     session->internals
+					     .selected_ocsp[ctx->cert_index]
+					     .exptime) ||
+			    session->internals.selected_ocsp[ctx->cert_index]
+					    .response.data == NULL) {
 				return 0;
 			}
 
-			resp.data =
-			    session->internals.selected_ocsp[ctx->
-							     cert_index].response.
-			    data;
-			resp.size =
-			    session->internals.selected_ocsp[ctx->
-							     cert_index].response.
-			    size;
+			resp.data = session->internals
+					    .selected_ocsp[ctx->cert_index]
+					    .response.data;
+			resp.size = session->internals
+					    .selected_ocsp[ctx->cert_index]
+					    .response.size;
 			ret = 0;
 		} else {
 			return 0;
 		}
 	} else if (session->internals.selected_ocsp_func) {
 		if (ctx->cert_index == 0) {
-			ret =
-			    session->internals.selected_ocsp_func(session,
-								  session->internals.selected_ocsp_func_ptr,
-								  &resp);
+			ret = session->internals.selected_ocsp_func(
+				session,
+				session->internals.selected_ocsp_func_ptr,
+				&resp);
 			free_resp = 1;
 		} else {
 			return 0;
@@ -245,7 +238,7 @@ int append_status_request(void *_ctx, gnutls_buffer_st * buf)
 	}
 
 	ret = 0;
- cleanup:
+cleanup:
 	if (free_resp)
 		gnutls_free(resp.data);
 	return ret;
@@ -268,8 +261,8 @@ int _gnutls13_send_certificate(gnutls_session_t session, unsigned again)
 
 	comp_method = gnutls_compress_certificate_get_selected_method(session);
 	compress_cert = comp_method != GNUTLS_COMP_UNKNOWN;
-	h_type = compress_cert ? GNUTLS_HANDSHAKE_COMPRESSED_CERTIFICATE_PKT
-	    : GNUTLS_HANDSHAKE_CERTIFICATE_PKT;
+	h_type = compress_cert ? GNUTLS_HANDSHAKE_COMPRESSED_CERTIFICATE_PKT :
+				 GNUTLS_HANDSHAKE_CERTIFICATE_PKT;
 
 	if (again == 0) {
 		if (!session->internals.initial_negotiation_completed &&
@@ -280,8 +273,8 @@ int _gnutls13_send_certificate(gnutls_session_t session, unsigned again)
 		    session->internals.resumed)
 			return 0;
 
-		cred = (gnutls_certificate_credentials_t)
-		    _gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE);
+		cred = (gnutls_certificate_credentials_t)_gnutls_get_cred(
+			session, GNUTLS_CRD_CERTIFICATE);
 		if (cred == NULL) {
 			gnutls_assert();
 			return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
@@ -305,9 +298,12 @@ int _gnutls13_send_certificate(gnutls_session_t session, unsigned again)
 		cert_pos_mark = buf.length;
 
 		if (session->security_parameters.entity == GNUTLS_CLIENT) {
-			ret = _gnutls_buffer_append_data_prefix(&buf, 8,
-								session->internals.post_handshake_cr_context.data,
-								session->internals.post_handshake_cr_context.size);
+			ret = _gnutls_buffer_append_data_prefix(
+				&buf, 8,
+				session->internals.post_handshake_cr_context
+					.data,
+				session->internals.post_handshake_cr_context
+					.size);
 			if (ret < 0) {
 				gnutls_assert();
 				goto cleanup;
@@ -330,11 +326,9 @@ int _gnutls13_send_certificate(gnutls_session_t session, unsigned again)
 		}
 
 		for (i = 0; i < (unsigned)apr_cert_list_length; i++) {
-			ret = _gnutls_buffer_append_data_prefix(&buf, 24,
-								apr_cert_list
-								[i].cert.data,
-								apr_cert_list
-								[i].cert.size);
+			ret = _gnutls_buffer_append_data_prefix(
+				&buf, 24, apr_cert_list[i].cert.data,
+				apr_cert_list[i].cert.size);
 			if (ret < 0) {
 				gnutls_assert();
 				goto cleanup;
@@ -342,13 +336,12 @@ int _gnutls13_send_certificate(gnutls_session_t session, unsigned again)
 #ifdef ENABLE_OCSP
 			if ((session->internals.selected_ocsp_length > 0 ||
 			     session->internals.selected_ocsp_func) &&
-			    (((session->
-			       internals.hsk_flags & HSK_OCSP_REQUESTED)
-			      && IS_SERVER(session))
-			     ||
-			     ((session->
-			       internals.hsk_flags & HSK_CLIENT_OCSP_REQUESTED)
-			      && !IS_SERVER(session)))) {
+			    (((session->internals.hsk_flags &
+			       HSK_OCSP_REQUESTED) &&
+			      IS_SERVER(session)) ||
+			     ((session->internals.hsk_flags &
+			       HSK_CLIENT_OCSP_REQUESTED) &&
+			      !IS_SERVER(session)))) {
 				/* append status response if available */
 				ret = _gnutls_extv_append_init(&buf);
 				if (ret < 0) {
@@ -361,19 +354,16 @@ int _gnutls13_send_certificate(gnutls_session_t session, unsigned again)
 				ctx.cert_index = i;
 				ctx.session = session;
 				ctx.cred = cred;
-				ret =
-				    _gnutls_extv_append(&buf,
-							STATUS_REQUEST_TLS_ID,
-							&ctx,
-							append_status_request);
+				ret = _gnutls_extv_append(
+					&buf, STATUS_REQUEST_TLS_ID, &ctx,
+					append_status_request);
 				if (ret < 0) {
 					gnutls_assert();
 					goto cleanup;
 				}
 
-				ret =
-				    _gnutls_extv_append_final(&buf,
-							      ext_pos_mark, 0);
+				ret = _gnutls_extv_append_final(
+					&buf, ext_pos_mark, 0);
 				if (ret < 0) {
 					gnutls_assert();
 					goto cleanup;
@@ -393,9 +383,8 @@ int _gnutls13_send_certificate(gnutls_session_t session, unsigned again)
 				     &buf.data[pos_mark]);
 
 		if (compress_cert) {
-			ret =
-			    compress_certificate(&buf, cert_pos_mark,
-						 comp_method);
+			ret = compress_certificate(&buf, cert_pos_mark,
+						   comp_method);
 			if (ret < 0) {
 				gnutls_assert();
 				goto cleanup;
@@ -407,7 +396,7 @@ int _gnutls13_send_certificate(gnutls_session_t session, unsigned again)
 
 	return _gnutls_send_handshake(session, bufel, h_type);
 
- cleanup:
+cleanup:
 	_gnutls_buffer_clear(&buf);
 	return ret;
 }
@@ -419,7 +408,7 @@ typedef struct crt_cert_ctx_st {
 } crt_cert_ctx_st;
 
 static int parse_cert_extension(void *_ctx, unsigned tls_id,
-				const uint8_t * data, unsigned data_size)
+				const uint8_t *data, unsigned data_size)
 {
 	crt_cert_ctx_st *ctx = _ctx;
 	gnutls_session_t session = ctx->session;
@@ -427,8 +416,8 @@ static int parse_cert_extension(void *_ctx, unsigned tls_id,
 
 	if (tls_id == STATUS_REQUEST_TLS_ID) {
 #ifdef ENABLE_OCSP
-		if (!_gnutls_hello_ext_is_present
-		    (session, ext_mod_status_request.gid)) {
+		if (!_gnutls_hello_ext_is_present(session,
+						  ext_mod_status_request.gid)) {
 			gnutls_assert();
 			goto unexpected;
 		}
@@ -436,9 +425,8 @@ static int parse_cert_extension(void *_ctx, unsigned tls_id,
 		_gnutls_handshake_log("Found OCSP response on cert %d\n",
 				      ctx->idx);
 
-		ret =
-		    _gnutls_parse_ocsp_response(session, data, data_size,
-						ctx->ocsp);
+		ret = _gnutls_parse_ocsp_response(session, data, data_size,
+						  ctx->ocsp);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 #endif
@@ -448,14 +436,14 @@ static int parse_cert_extension(void *_ctx, unsigned tls_id,
 
 	return 0;
 
- unexpected:
+unexpected:
 	_gnutls_debug_log("received unexpected certificate extension (%d)\n",
 			  (int)tls_id);
 	return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION);
 }
 
-static int
-parse_cert_list(gnutls_session_t session, uint8_t * data, size_t data_size)
+static int parse_cert_list(gnutls_session_t session, uint8_t *data,
+			   size_t data_size)
 {
 	int ret;
 	size_t len;
@@ -470,16 +458,15 @@ parse_cert_list(gnutls_session_t session, uint8_t * data, size_t data_size)
 	gnutls_datum_t *peer_ocsp = NULL;
 	unsigned nentries = 0;
 
-	cred = (gnutls_certificate_credentials_t)
-	    _gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE);
+	cred = (gnutls_certificate_credentials_t)_gnutls_get_cred(
+		session, GNUTLS_CRD_CERTIFICATE);
 	if (cred == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
-	if ((ret =
-	     _gnutls_auth_info_init(session, GNUTLS_CRD_CERTIFICATE,
-				    sizeof(cert_auth_info_st), 1)) < 0) {
+	if ((ret = _gnutls_auth_info_init(session, GNUTLS_CRD_CERTIFICATE,
+					  sizeof(cert_auth_info_st), 1)) < 0) {
 		gnutls_assert();
 		return ret;
 	}
@@ -509,9 +496,8 @@ parse_cert_list(gnutls_session_t session, uint8_t * data, size_t data_size)
 		DECR_LEN(data_size, 3);
 		len = _gnutls_read_uint24(p);
 		if (len == 0)
-			return
-			    gnutls_assert_val
-			    (GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+			return gnutls_assert_val(
+				GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
 		DECR_LEN(data_size, len);
 		p += len + 3;
@@ -579,8 +565,8 @@ parse_cert_list(gnutls_session_t session, uint8_t * data, size_t data_size)
 		ctx.ocsp = &peer_ocsp[j];
 		ctx.idx = j;
 
-		ret =
-		    _gnutls_extv_parse(&ctx, parse_cert_extension, p, len + 2);
+		ret = _gnutls_extv_parse(&ctx, parse_cert_extension, p,
+					 len + 2);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -609,7 +595,7 @@ parse_cert_list(gnutls_session_t session, uint8_t * data, size_t data_size)
 
 	return 0;
 
- cleanup:
+cleanup:
 	for (j = 0; j < npeer_certs; j++)
 		gnutls_free(peer_certs[j].data);
 
@@ -618,12 +604,10 @@ parse_cert_list(gnutls_session_t session, uint8_t * data, size_t data_size)
 	gnutls_free(peer_certs);
 	gnutls_free(peer_ocsp);
 	return ret;
-
 }
 
-static int
-compress_certificate(gnutls_buffer_st * buf, unsigned cert_pos_mark,
-		     gnutls_compression_method_t comp_method)
+static int compress_certificate(gnutls_buffer_st *buf, unsigned cert_pos_mark,
+				gnutls_compression_method_t comp_method)
 {
 	int ret, method_num;
 	size_t comp_bound;
@@ -642,9 +626,8 @@ compress_certificate(gnutls_buffer_st * buf, unsigned cert_pos_mark,
 	comp.data = gnutls_malloc(comp_bound);
 	if (comp.data == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-	ret =
-	    _gnutls_compress(comp_method, comp.data, comp_bound, plain.data,
-			     plain.size);
+	ret = _gnutls_compress(comp_method, comp.data, comp_bound, plain.data,
+			       plain.size);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -668,13 +651,13 @@ compress_certificate(gnutls_buffer_st * buf, unsigned cert_pos_mark,
 		goto cleanup;
 	}
 
- cleanup:
+cleanup:
 	gnutls_free(comp.data);
 	return ret;
 }
 
-static int
-decompress_certificate(gnutls_session_t session, gnutls_buffer_st * buf)
+static int decompress_certificate(gnutls_session_t session,
+				  gnutls_buffer_st *buf)
 {
 	int ret;
 	size_t method_num, plain_exp_len;
@@ -686,8 +669,8 @@ decompress_certificate(gnutls_session_t session, gnutls_buffer_st * buf)
 		return gnutls_assert_val(ret);
 	comp_method = _gnutls_compress_certificate_num2method(method_num);
 
-	if (!_gnutls_compress_certificate_is_method_enabled
-	    (session, comp_method))
+	if (!_gnutls_compress_certificate_is_method_enabled(session,
+							    comp_method))
 		return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
 
 	ret = _gnutls_buffer_pop_prefix24(buf, &plain_exp_len, 0);
@@ -701,9 +684,8 @@ decompress_certificate(gnutls_session_t session, gnutls_buffer_st * buf)
 	plain.data = gnutls_malloc(plain_exp_len);
 	if (plain.data == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-	ret =
-	    _gnutls_decompress(comp_method, plain.data, plain_exp_len,
-			       comp.data, comp.size);
+	ret = _gnutls_decompress(comp_method, plain.data, plain_exp_len,
+				 comp.data, comp.size);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -723,7 +705,7 @@ decompress_certificate(gnutls_session_t session, gnutls_buffer_st * buf)
 		goto cleanup;
 	}
 
- cleanup:
+cleanup:
 	gnutls_free(plain.data);
 	return ret;
 }

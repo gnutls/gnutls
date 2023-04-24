@@ -28,11 +28,10 @@
 #include "pk.h"
 #include "common.h"
 
-static int
-_gnutls_gost_vko_key(gnutls_pk_params_st * pub,
-		     gnutls_pk_params_st * priv,
-		     gnutls_datum_t * ukm,
-		     gnutls_digest_algorithm_t digalg, gnutls_datum_t * kek)
+static int _gnutls_gost_vko_key(gnutls_pk_params_st *pub,
+				gnutls_pk_params_st *priv, gnutls_datum_t *ukm,
+				gnutls_digest_algorithm_t digalg,
+				gnutls_datum_t *kek)
 {
 	gnutls_datum_t tmp_vko_key;
 	int ret;
@@ -49,9 +48,8 @@ _gnutls_gost_vko_key(gnutls_pk_params_st * pub,
 		goto cleanup;
 	}
 
-	ret =
-	    gnutls_hash_fast(digalg, tmp_vko_key.data, tmp_vko_key.size,
-			     kek->data);
+	ret = gnutls_hash_fast(digalg, tmp_vko_key.data, tmp_vko_key.size,
+			       kek->data);
 	if (ret < 0) {
 		gnutls_assert();
 		_gnutls_free_datum(kek);
@@ -60,7 +58,7 @@ _gnutls_gost_vko_key(gnutls_pk_params_st * pub,
 
 	ret = 0;
 
- cleanup:
+cleanup:
 	_gnutls_free_temp_key_datum(&tmp_vko_key);
 
 	return ret;
@@ -68,11 +66,10 @@ _gnutls_gost_vko_key(gnutls_pk_params_st * pub,
 
 static const gnutls_datum_t zero_data = { NULL, 0 };
 
-int
-_gnutls_gost_keytrans_encrypt(gnutls_pk_params_st * pub,
-			      gnutls_pk_params_st * priv,
-			      gnutls_datum_t * cek,
-			      gnutls_datum_t * ukm, gnutls_datum_t * out)
+int _gnutls_gost_keytrans_encrypt(gnutls_pk_params_st *pub,
+				  gnutls_pk_params_st *priv,
+				  gnutls_datum_t *cek, gnutls_datum_t *ukm,
+				  gnutls_datum_t *out)
 {
 	int ret;
 	gnutls_datum_t kek;
@@ -92,8 +89,8 @@ _gnutls_gost_keytrans_encrypt(gnutls_pk_params_st * pub,
 		return ret;
 	}
 
-	ret = _gnutls_gost_key_wrap(pub->gost_params, &kek, ukm, cek,
-				    &enc, &imit);
+	ret = _gnutls_gost_key_wrap(pub->gost_params, &kek, ukm, cek, &enc,
+				    &imit);
 	_gnutls_free_key_datum(&kek);
 	if (ret < 0) {
 		gnutls_assert();
@@ -118,34 +115,31 @@ _gnutls_gost_keytrans_encrypt(gnutls_pk_params_st * pub,
 		goto cleanup;
 	}
 
-	ret = _gnutls_x509_encode_and_copy_PKI_params(kx,
-						      "transportParameters.ephemeralPublicKey",
-						      priv);
+	ret = _gnutls_x509_encode_and_copy_PKI_params(
+		kx, "transportParameters.ephemeralPublicKey", priv);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	if ((ret =
-	     asn1_write_value(kx, "transportParameters.encryptionParamSet",
-			      gnutls_gost_paramset_get_oid(pub->gost_params),
-			      1)) != ASN1_SUCCESS) {
+	if ((ret = asn1_write_value(
+		     kx, "transportParameters.encryptionParamSet",
+		     gnutls_gost_paramset_get_oid(pub->gost_params), 1)) !=
+	    ASN1_SUCCESS) {
 		gnutls_assert();
 		ret = _gnutls_asn2err(ret);
 		goto cleanup;
 	}
 
-	ret =
-	    _gnutls_x509_write_value(kx, "sessionEncryptedKey.encryptedKey",
-				     &enc);
+	ret = _gnutls_x509_write_value(kx, "sessionEncryptedKey.encryptedKey",
+				       &enc);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	ret =
-	    _gnutls_x509_write_value(kx, "sessionEncryptedKey.maskKey",
-				     &zero_data);
+	ret = _gnutls_x509_write_value(kx, "sessionEncryptedKey.maskKey",
+				       &zero_data);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -164,7 +158,7 @@ _gnutls_gost_keytrans_encrypt(gnutls_pk_params_st * pub,
 
 	ret = 0;
 
- cleanup:
+cleanup:
 	asn1_delete_structure(&kx);
 	_gnutls_free_datum(&enc);
 	_gnutls_free_datum(&imit);
@@ -172,10 +166,9 @@ _gnutls_gost_keytrans_encrypt(gnutls_pk_params_st * pub,
 	return ret;
 }
 
-int
-_gnutls_gost_keytrans_decrypt(gnutls_pk_params_st * priv,
-			      gnutls_datum_t * cek,
-			      gnutls_datum_t * ukm, gnutls_datum_t * out)
+int _gnutls_gost_keytrans_decrypt(gnutls_pk_params_st *priv,
+				  gnutls_datum_t *cek, gnutls_datum_t *ukm,
+				  gnutls_datum_t *out)
 {
 	int ret;
 	asn1_node kx;
@@ -187,8 +180,8 @@ _gnutls_gost_keytrans_decrypt(gnutls_pk_params_st * priv,
 	gnutls_digest_algorithm_t digalg;
 
 	if ((ret = asn1_create_element(_gnutls_get_gnutls_asn(),
-				       "GNUTLS.GostR3410-KeyTransport",
-				       &kx)) != ASN1_SUCCESS) {
+				       "GNUTLS.GostR3410-KeyTransport", &kx)) !=
+	    ASN1_SUCCESS) {
 		gnutls_assert();
 		ret = _gnutls_asn2err(ret);
 
@@ -204,25 +197,23 @@ _gnutls_gost_keytrans_decrypt(gnutls_pk_params_st * priv,
 		return ret;
 	}
 
-	ret = _gnutls_get_asn_mpis(kx,
-				   "transportParameters.ephemeralPublicKey",
+	ret = _gnutls_get_asn_mpis(kx, "transportParameters.ephemeralPublicKey",
 				   &pub);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	if (pub.algo != priv->algo ||
-	    pub.gost_params != priv->gost_params || pub.curve != priv->curve) {
+	if (pub.algo != priv->algo || pub.gost_params != priv->gost_params ||
+	    pub.curve != priv->curve) {
 		gnutls_assert();
 		ret = GNUTLS_E_ILLEGAL_PARAMETER;
 		goto cleanup;
 	}
 
 	oid_size = sizeof(oid);
-	ret =
-	    asn1_read_value(kx, "transportParameters.encryptionParamSet", oid,
-			    &oid_size);
+	ret = asn1_read_value(kx, "transportParameters.encryptionParamSet", oid,
+			      &oid_size);
 	if (ret != ASN1_SUCCESS) {
 		gnutls_assert();
 		ret = _gnutls_asn2err(ret);
@@ -248,8 +239,8 @@ _gnutls_gost_keytrans_decrypt(gnutls_pk_params_st * priv,
 	 * of any kind as all values are transmitted in cleartext. Returning
 	 * that this point won't give any information to the attacker.
 	 */
-	if (ukm2.size != ukm->size
-	    || memcmp(ukm2.data, ukm->data, ukm->size) != 0) {
+	if (ukm2.size != ukm->size ||
+	    memcmp(ukm2.data, ukm->data, ukm->size) != 0) {
 		gnutls_assert();
 		_gnutls_free_datum(&ukm2);
 		ret = GNUTLS_E_DECRYPTION_FAILED;
@@ -282,8 +273,8 @@ _gnutls_gost_keytrans_decrypt(gnutls_pk_params_st * priv,
 		goto cleanup2;
 	}
 
-	ret = _gnutls_gost_key_unwrap(pub.gost_params, &kek, ukm,
-				      &enc, &imit, out);
+	ret = _gnutls_gost_key_unwrap(pub.gost_params, &kek, ukm, &enc, &imit,
+				      out);
 	_gnutls_free_key_datum(&kek);
 
 	if (ret < 0) {
@@ -293,10 +284,10 @@ _gnutls_gost_keytrans_decrypt(gnutls_pk_params_st * priv,
 
 	ret = 0;
 
- cleanup2:
+cleanup2:
 	_gnutls_free_datum(&imit);
 	_gnutls_free_datum(&enc);
- cleanup:
+cleanup:
 	gnutls_pk_params_release(&pub);
 	asn1_delete_structure(&kx);
 

@@ -42,17 +42,17 @@
 
 #ifdef ENABLE_SSL2
 /* This selects the best supported ciphersuite from the ones provided */
-static int
-_gnutls_handshake_select_v2_suite(gnutls_session_t session,
-				  uint8_t * data, unsigned int datalen)
+static int _gnutls_handshake_select_v2_suite(gnutls_session_t session,
+					     uint8_t *data,
+					     unsigned int datalen)
 {
 	unsigned int i, j;
 	int ret;
 	uint8_t *_data;
 	int _datalen;
 
-	_gnutls_handshake_log
-	    ("HSK[%p]: Parsing a version 2.0 client hello.\n", session);
+	_gnutls_handshake_log("HSK[%p]: Parsing a version 2.0 client hello.\n",
+			      session);
 
 	if (datalen % 3 != 0) {
 		gnutls_assert();
@@ -78,15 +78,13 @@ _gnutls_handshake_select_v2_suite(gnutls_session_t session,
 	gnutls_free(_data);
 
 	return ret;
-
 }
 
 /* Read a v2 client hello. Some browsers still use that beast!
  * However they set their version to 3.0 or 3.1.
  */
-int
-_gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
-			     unsigned int len)
+int _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t *data,
+				 unsigned int len)
 {
 	uint16_t session_id_len = 0;
 	int pos = 0;
@@ -100,9 +98,9 @@ _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 
 	DECR_LEN(len, 2);
 
-	_gnutls_handshake_log
-	    ("HSK[%p]: SSL 2.0 Hello: Client's version: %d.%d\n", session,
-	     data[pos], data[pos + 1]);
+	_gnutls_handshake_log(
+		"HSK[%p]: SSL 2.0 Hello: Client's version: %d.%d\n", session,
+		data[pos], data[pos + 1]);
 
 	major = data[pos];
 	minor = data[pos + 1];
@@ -162,9 +160,8 @@ _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 	/* find an appropriate cipher suite */
 
 	DECR_LEN(len, sizeOfSuites);
-	ret =
-	    _gnutls_handshake_select_v2_suite(session, &data[pos],
-					      sizeOfSuites);
+	ret = _gnutls_handshake_select_v2_suite(session, &data[pos],
+						sizeOfSuites);
 
 	pos += sizeOfSuites;
 	if (ret < 0) {
@@ -174,8 +171,9 @@ _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 
 	/* check if the credentials (username, public key etc.) are ok
 	 */
-	if (_gnutls_get_kx_cred
-	    (session, session->security_parameters.cs->kx_algorithm) == NULL) {
+	if (_gnutls_get_kx_cred(
+		    session, session->security_parameters.cs->kx_algorithm) ==
+	    NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
@@ -184,21 +182,19 @@ _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 	 * according to the KX algorithm. This is needed since all the
 	 * handshake functions are read from there;
 	 */
-	session->internals.auth_struct =
-	    _gnutls_kx_auth_struct(session->security_parameters.
-				   cs->kx_algorithm);
+	session->internals.auth_struct = _gnutls_kx_auth_struct(
+		session->security_parameters.cs->kx_algorithm);
 	if (session->internals.auth_struct == NULL) {
-
-		_gnutls_handshake_log
-		    ("HSK[%p]: SSL 2.0 Hello: Cannot find the appropriate handler for the KX algorithm\n",
-		     session);
+		_gnutls_handshake_log(
+			"HSK[%p]: SSL 2.0 Hello: Cannot find the appropriate handler for the KX algorithm\n",
+			session);
 
 		gnutls_assert();
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	/* read random new values -skip session id for now */
-	DECR_LEN(len, session_id_len);	/* skip session id for now */
+	DECR_LEN(len, session_id_len); /* skip session id for now */
 	memcpy(session_id, &data[pos], session_id_len);
 	pos += session_id_len;
 
@@ -219,28 +215,26 @@ _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 	/* RESUME SESSION */
 
 	DECR_LEN(len, session_id_len);
-	ret =
-	    _gnutls_server_restore_session(session, session_id, session_id_len);
+	ret = _gnutls_server_restore_session(session, session_id,
+					     session_id_len);
 
-	if (ret == 0) {		/* resumed! */
+	if (ret == 0) { /* resumed! */
 		/* get the new random values */
-		memcpy(session->internals.resumed_security_parameters.
-		       server_random,
+		memcpy(session->internals.resumed_security_parameters
+			       .server_random,
 		       session->security_parameters.server_random,
 		       GNUTLS_RANDOM_SIZE);
-		memcpy(session->internals.resumed_security_parameters.
-		       client_random,
+		memcpy(session->internals.resumed_security_parameters
+			       .client_random,
 		       session->security_parameters.client_random,
 		       GNUTLS_RANDOM_SIZE);
 
 		session->internals.resumed = true;
 		return 0;
 	} else {
-		ret =
-		    _gnutls_generate_session_id(session->
-						security_parameters.session_id,
-						&session->
-						security_parameters.session_id_size);
+		ret = _gnutls_generate_session_id(
+			session->security_parameters.session_id,
+			&session->security_parameters.session_id_size);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 

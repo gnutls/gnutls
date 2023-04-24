@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -31,9 +31,8 @@
 
 #include "utils.h"
 
-static void
-try_prio(const char *prio, unsigned expected_cs, unsigned expected_ciphers,
-	 unsigned line)
+static void try_prio(const char *prio, unsigned expected_cs,
+		     unsigned expected_ciphers, unsigned line)
 {
 	int ret;
 	gnutls_priority_t p;
@@ -61,7 +60,6 @@ try_prio(const char *prio, unsigned expected_cs, unsigned expected_ciphers,
 			count++;
 			/* fprintf(stderr, "%s\n", gnutls_cipher_suite_info(si, NULL, NULL, NULL, NULL, NULL)); */
 		}
-
 	}
 
 	ret = gnutls_priority_cipher_list(p, &t);
@@ -114,7 +112,7 @@ void doit(void)
 	int sec256_cs = 12;
 	int normal_cs = 29;
 	int pfs_cs = 23;
-	int null_normal_cs = 28;	/* disables TLS1.3 CS */
+	int null_normal_cs = 28; /* disables TLS1.3 CS */
 	int normal_ciphers = 7;
 
 	if (gnutls_fips140_mode_enabled()) {
@@ -131,10 +129,15 @@ void doit(void)
 
 	if (!gnutls_fips140_mode_enabled()) {
 		try_prio("PFS", pfs_cs, normal_ciphers, __LINE__);
-		try_prio("NORMAL:+CIPHER-ALL", normal_cs, 7, __LINE__);	/* all (except null) */
-		try_prio("NORMAL:-CIPHER-ALL:+NULL", null, 1, __LINE__);	/* null */
-		try_prio("NORMAL:-CIPHER-ALL:+NULL:+CIPHER-ALL", null_normal_cs, 8, __LINE__);	/* should be null + all */
-		try_prio("NORMAL:-CIPHER-ALL:+NULL:+CIPHER-ALL:-CIPHER-ALL:+AES-128-CBC", 4, 1, __LINE__);	/* should be null + all */
+		try_prio("NORMAL:+CIPHER-ALL", normal_cs, 7,
+			 __LINE__); /* all (except null) */
+		try_prio("NORMAL:-CIPHER-ALL:+NULL", null, 1,
+			 __LINE__); /* null */
+		try_prio("NORMAL:-CIPHER-ALL:+NULL:+CIPHER-ALL", null_normal_cs,
+			 8, __LINE__); /* should be null + all */
+		try_prio(
+			"NORMAL:-CIPHER-ALL:+NULL:+CIPHER-ALL:-CIPHER-ALL:+AES-128-CBC",
+			4, 1, __LINE__); /* should be null + all */
 #ifdef ENABLE_GOST
 		try_prio("NONE:+VERS-TLS1.2:+GOST", 1, 1, __LINE__);
 #endif
@@ -143,17 +146,19 @@ void doit(void)
 	try_prio("PERFORMANCE", normal_cs, normal_ciphers, __LINE__);
 	try_prio("SECURE256", sec256_cs, 4, __LINE__);
 	try_prio("SECURE128", sec128_cs, 7, __LINE__);
-	try_prio("SECURE128:+SECURE256", sec128_cs, 7, __LINE__);	/* should be the same as SECURE128 */
-	try_prio("SECURE128:+SECURE256:+NORMAL", normal_cs, 7, __LINE__);	/* should be the same as NORMAL */
+	try_prio("SECURE128:+SECURE256", sec128_cs, 7,
+		 __LINE__); /* should be the same as SECURE128 */
+	try_prio("SECURE128:+SECURE256:+NORMAL", normal_cs, 7,
+		 __LINE__); /* should be the same as NORMAL */
 	try_prio("SUITEB192", 1, 1, __LINE__);
 	try_prio("SUITEB128", 2, 2, __LINE__);
 	/* check legacy strings */
 	try_prio("NORMAL:+RSA-EXPORT:+ARCFOUR-40", normal_cs, normal_ciphers,
 		 __LINE__);
 
-	try_prio_err
-	    ("NORMAL:-VERS-ALL:+VERS-TLS1.2:-SIGN-ALL:+SIGN-ECDSA-SECP256R1-SHA256",
-	     GNUTLS_E_NO_PRIORITIES_WERE_SET);
+	try_prio_err(
+		"NORMAL:-VERS-ALL:+VERS-TLS1.2:-SIGN-ALL:+SIGN-ECDSA-SECP256R1-SHA256",
+		GNUTLS_E_NO_PRIORITIES_WERE_SET);
 	try_prio_err("NORMAL:-VERS-ALL:+VERS-TLS1.2:-SIGN-ALL",
 		     GNUTLS_E_NO_PRIORITIES_WERE_SET);
 	try_prio_err("NORMAL:-VERS-ALL:+VERS-DTLS1.2:-SIGN-ALL",

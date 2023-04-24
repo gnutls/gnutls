@@ -34,7 +34,7 @@
  */
 
 static int _gnutls_dumbfw_send_params(gnutls_session_t session,
-				      gnutls_buffer_st * extdata);
+				      gnutls_buffer_st *extdata);
 
 const hello_ext_entry_st ext_mod_dumbfw = {
 	.name = "ClientHello Padding",
@@ -51,8 +51,8 @@ const hello_ext_entry_st ext_mod_dumbfw = {
 	.cannot_be_overriden = 0
 };
 
-static int
-_gnutls_dumbfw_send_params(gnutls_session_t session, gnutls_buffer_st * extdata)
+static int _gnutls_dumbfw_send_params(gnutls_session_t session,
+				      gnutls_buffer_st *extdata)
 {
 	int total_size = 0, ret;
 	uint8_t pad[257];
@@ -60,8 +60,8 @@ _gnutls_dumbfw_send_params(gnutls_session_t session, gnutls_buffer_st * extdata)
 	ssize_t len = extdata->length - sizeof(mbuffer_st);
 
 	if (session->security_parameters.entity == GNUTLS_SERVER ||
-	    session->internals.dumbfw == 0 ||
-	    IS_DTLS(session) != 0 || (len < 256 || len >= 512)) {
+	    session->internals.dumbfw == 0 || IS_DTLS(session) != 0 ||
+	    (len < 256 || len >= 512)) {
 		return 0;
 	} else {
 		/* 256 <= extdata->length < 512 */

@@ -29,28 +29,27 @@
 
 #ifdef HAVE_LIBNETTLE
 
-# include <gnutls/crypto.h>
-# include "errors.h"
-# include <aes-x86.h>
-# include <x86-common.h>
-# include <byteswap.h>
-# include <nettle/gcm.h>
-# include <aes-padlock.h>
+#include <gnutls/crypto.h>
+#include "errors.h"
+#include <aes-x86.h>
+#include <x86-common.h>
+#include <byteswap.h>
+#include <nettle/gcm.h>
+#include <aes-padlock.h>
 
-# define GCM_BLOCK_SIZE 16
+#define GCM_BLOCK_SIZE 16
 
 /* GCM mode 
  * Actually padlock doesn't include GCM mode. We just use
  * the ECB part of padlock and nettle for everything else.
  */
 struct gcm_padlock_aes_ctx {
-	struct GCM_CTX (struct padlock_ctx) inner;
+	struct GCM_CTX(struct padlock_ctx) inner;
 	size_t rekey_counter;
 };
 
-static void padlock_aes_encrypt(const void *_ctx,
-				size_t length, uint8_t * dst,
-				const uint8_t * src)
+static void padlock_aes_encrypt(const void *_ctx, size_t length, uint8_t *dst,
+				const uint8_t *src)
 {
 	struct padlock_ctx *ctx = (void *)_ctx;
 	struct padlock_cipher_data *pce;
@@ -62,7 +61,7 @@ static void padlock_aes_encrypt(const void *_ctx,
 }
 
 static void padlock_aes128_set_encrypt_key(struct padlock_ctx *_ctx,
-					   const uint8_t * key)
+					   const uint8_t *key)
 {
 	struct padlock_ctx *ctx = _ctx;
 	ctx->enc = 1;
@@ -71,7 +70,7 @@ static void padlock_aes128_set_encrypt_key(struct padlock_ctx *_ctx,
 }
 
 static void padlock_aes256_set_encrypt_key(struct padlock_ctx *_ctx,
-					   const uint8_t * key)
+					   const uint8_t *key)
 {
 	struct padlock_ctx *ctx = _ctx;
 	ctx->enc = 1;
@@ -87,8 +86,8 @@ static void aes_gcm_deinit(void *_ctx)
 	gnutls_free(ctx);
 }
 
-static int
-aes_gcm_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx, int enc)
+static int aes_gcm_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx,
+			       int enc)
 {
 	/* we use key size to distinguish */
 	if (algorithm != GNUTLS_CIPHER_AES_128_GCM &&
@@ -134,9 +133,8 @@ static int aes_gcm_setiv(void *_ctx, const void *iv, size_t iv_size)
 	return 0;
 }
 
-static int
-aes_gcm_encrypt(void *_ctx, const void *src, size_t src_size,
-		void *dst, size_t length)
+static int aes_gcm_encrypt(void *_ctx, const void *src, size_t src_size,
+			   void *dst, size_t length)
 {
 	struct gcm_padlock_aes_ctx *ctx = _ctx;
 	int ret;
@@ -154,9 +152,8 @@ aes_gcm_encrypt(void *_ctx, const void *src, size_t src_size,
 	return 0;
 }
 
-static int
-aes_gcm_decrypt(void *_ctx, const void *src, size_t src_size,
-		void *dst, size_t dst_size)
+static int aes_gcm_decrypt(void *_ctx, const void *src, size_t src_size,
+			   void *dst, size_t dst_size)
 {
 	struct gcm_padlock_aes_ctx *ctx = _ctx;
 
@@ -183,7 +180,7 @@ static void aes_gcm_tag(void *_ctx, void *tag, size_t tagsize)
 	GCM_DIGEST(&ctx->inner, padlock_aes_encrypt, tagsize, tag);
 }
 
-# include "aes-gcm-aead.h"
+#include "aes-gcm-aead.h"
 
 const gnutls_crypto_cipher_st _gnutls_aes_gcm_padlock = {
 	.init = aes_gcm_cipher_init,

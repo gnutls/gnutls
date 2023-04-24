@@ -29,9 +29,8 @@
 #include <algorithms.h>
 #include "errors.h"
 
-int
-_gnutls_ecc_ansi_x962_export(gnutls_ecc_curve_t curve, bigint_t x,
-			     bigint_t y, gnutls_datum_t * out)
+int _gnutls_ecc_ansi_x962_export(gnutls_ecc_curve_t curve, bigint_t x,
+				 bigint_t y, gnutls_datum_t *out)
 {
 	int numlen = gnutls_ecc_curve_get_size(curve);
 	int byte_size, ret;
@@ -72,10 +71,8 @@ _gnutls_ecc_ansi_x962_export(gnutls_ecc_curve_t curve, bigint_t x,
 	}
 
 	size = out->size - (1 + (numlen + numlen - byte_size));
-	ret =
-	    _gnutls_mpi_print(y,
-			      &out->data[1 + numlen + numlen - byte_size],
-			      &size);
+	ret = _gnutls_mpi_print(y, &out->data[1 + numlen + numlen - byte_size],
+				&size);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -83,14 +80,13 @@ _gnutls_ecc_ansi_x962_export(gnutls_ecc_curve_t curve, bigint_t x,
 
 	/* pad and store y */
 	return 0;
- cleanup:
+cleanup:
 	_gnutls_free_datum(out);
 	return ret;
 }
 
-int
-_gnutls_ecc_ansi_x962_import(const uint8_t * in,
-			     unsigned long inlen, bigint_t * x, bigint_t * y)
+int _gnutls_ecc_ansi_x962_import(const uint8_t *in, unsigned long inlen,
+				 bigint_t *x, bigint_t *y)
 {
 	int ret;
 
@@ -109,9 +105,8 @@ _gnutls_ecc_ansi_x962_import(const uint8_t * in,
 	if (ret < 0)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-	ret =
-	    _gnutls_mpi_init_scan(y, in + 1 + ((inlen - 1) >> 1),
-				  (inlen - 1) >> 1);
+	ret = _gnutls_mpi_init_scan(y, in + 1 + ((inlen - 1) >> 1),
+				    (inlen - 1) >> 1);
 	if (ret < 0) {
 		_gnutls_mpi_release(x);
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);

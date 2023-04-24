@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -36,19 +36,19 @@ int main(int argc, char **argv)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <sys/socket.h>
-# if !defined(_WIN32)
-#  include <sys/wait.h>
-#  include <signal.h>
-# endif
-# include <unistd.h>
-# include <gnutls/gnutls.h>
-# include <assert.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#if !defined(_WIN32)
+#include <sys/wait.h>
+#include <signal.h>
+#endif
+#include <unistd.h>
+#include <gnutls/gnutls.h>
+#include <assert.h>
 
-# include "utils.h"
-# include "cert-common.h"
+#include "utils.h"
+#include "cert-common.h"
 
 /* This test checks whether a large handshake packet is accepted by client
  * and by server. (large is around 64kb)
@@ -60,16 +60,16 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "%s|<%d>| %s", side, level, str);
 }
 
-# define TLSEXT_TYPE1 0xFA
-# define TLSEXT_TYPE2 0xFB
-# define TLSEXT_TYPE3 0xFC
-# define TLSEXT_TYPE4 0xFD
-# define TLSEXT_TYPE5 0xFE
+#define TLSEXT_TYPE1 0xFA
+#define TLSEXT_TYPE2 0xFB
+#define TLSEXT_TYPE3 0xFC
+#define TLSEXT_TYPE4 0xFD
+#define TLSEXT_TYPE5 0xFE
 
 static int TLSEXT_TYPE_server_sent = 0;
 static int TLSEXT_TYPE_client_received = 0;
 
-# define MAX_SIZE (12*1024)
+#define MAX_SIZE (12 * 1024)
 
 static int ext_recv_client_params(gnutls_session_t session,
 				  const unsigned char *buf, size_t buflen)
@@ -79,7 +79,7 @@ static int ext_recv_client_params(gnutls_session_t session,
 
 	TLSEXT_TYPE_client_received++;
 
-	return 0;		//Success
+	return 0; //Success
 }
 
 static int ext_send_client_params(gnutls_session_t session,
@@ -97,7 +97,7 @@ static int ext_send_client_params(gnutls_session_t session,
 static int ext_recv_server_params(gnutls_session_t session,
 				  const unsigned char *buf, size_t buflen)
 {
-	return 0;		//Success
+	return 0; //Success
 }
 
 static int ext_send_server_params(gnutls_session_t session,
@@ -183,7 +183,7 @@ static void client(int sd, const char *prio)
 
 	gnutls_bye(session, GNUTLS_SHUT_RDWR);
 
- end:
+end:
 	close(sd);
 
 	gnutls_deinit(session);
@@ -209,9 +209,8 @@ static void server(int sd, const char *prio)
 	side = "server";
 
 	gnutls_certificate_allocate_credentials(&serverx509cred);
-	gnutls_certificate_set_x509_key_mem(serverx509cred,
-					    &server_cert, &server_key,
-					    GNUTLS_X509_FMT_PEM);
+	gnutls_certificate_set_x509_key_mem(serverx509cred, &server_cert,
+					    &server_key, GNUTLS_X509_FMT_PEM);
 
 	gnutls_init(&session, GNUTLS_SERVER);
 
@@ -278,8 +277,7 @@ static void server(int sd, const char *prio)
 		success("server: finished\n");
 }
 
-static
-void start(const char *prio)
+static void start(const char *prio)
 {
 	pid_t child;
 	int sockets[2];
@@ -325,4 +323,4 @@ void doit(void)
 	start("NORMAL");
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

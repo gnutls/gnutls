@@ -21,7 +21,7 @@
  */
 
 #if HAVE_CONFIG_H
-# include "config.h"
+#include "config.h"
 #endif
 
 #include "gnutls_int.h"
@@ -35,10 +35,8 @@
  * use with TLS (such as TPM2); not recommended for general usage.
  */
 
-int
-_gnutls_rsa_pkcs1_sign_pad(size_t key_bits,
-			   const gnutls_datum_t * data,
-			   unsigned char *buffer, size_t buffer_size)
+int _gnutls_rsa_pkcs1_sign_pad(size_t key_bits, const gnutls_datum_t *data,
+			       unsigned char *buffer, size_t buffer_size)
 {
 	size_t key_size = (key_bits + 7) / 8;
 	size_t size;
@@ -58,16 +56,14 @@ _gnutls_rsa_pkcs1_sign_pad(size_t key_bits,
 	}
 	nettle_mpz_get_str_256(buffer_size, buffer, m);
 
- out:
+out:
 	mpz_clear(m);
 	return ret;
 }
 
-int
-_gnutls_rsa_pss_sign_pad(gnutls_x509_spki_st * params,
-			 size_t key_bits,
-			 const gnutls_datum_t * data,
-			 unsigned char *buffer, size_t buffer_size)
+int _gnutls_rsa_pss_sign_pad(gnutls_x509_spki_st *params, size_t key_bits,
+			     const gnutls_datum_t *data, unsigned char *buffer,
+			     size_t buffer_size)
 {
 	mpz_t m;
 	int ret = 0;
@@ -117,7 +113,7 @@ _gnutls_rsa_pss_sign_pad(gnutls_x509_spki_st * params,
 	}
 	nettle_mpz_get_str_256(buffer_size, buffer, m);
 
- out:
+out:
 	mpz_clear(m);
 	return ret;
 }

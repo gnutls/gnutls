@@ -21,10 +21,10 @@
  */
 
 #ifndef GNUTLS_LIB_EXT_COOKIE_H
-# define GNUTLS_LIB_EXT_COOKIE_H
+#define GNUTLS_LIB_EXT_COOKIE_H
 
-# include <hello_ext.h>
+#include <hello_ext.h>
 
 extern const hello_ext_entry_st ext_mod_cookie;
 
-#endif				/* GNUTLS_LIB_EXT_COOKIE_H */
+#endif /* GNUTLS_LIB_EXT_COOKIE_H */

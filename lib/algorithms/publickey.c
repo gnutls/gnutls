@@ -30,7 +30,8 @@
 typedef struct {
 	gnutls_kx_algorithm_t kx_algorithm;
 	gnutls_pk_algorithm_t pk_algorithm;
-	enum encipher_type encipher_type;	/* CIPHER_ENCRYPT if this algorithm is to be used
+	enum encipher_type
+		encipher_type; /* CIPHER_ENCRYPT if this algorithm is to be used
 						 * for encryption, CIPHER_SIGN if signature only,
 						 * CIPHER_IGN if this does not apply at all.
 						 *
@@ -45,60 +46,60 @@ typedef struct {
  * use GNUTLS_KX_RSA or GNUTLS_KX_DHE_RSA.
  */
 static const gnutls_pk_map pk_mappings[] = {
-	{GNUTLS_KX_RSA, GNUTLS_PK_RSA, CIPHER_ENCRYPT},
-	{GNUTLS_KX_DHE_RSA, GNUTLS_PK_RSA, CIPHER_SIGN},
-	{GNUTLS_KX_SRP_RSA, GNUTLS_PK_RSA, CIPHER_SIGN},
-	{GNUTLS_KX_ECDHE_RSA, GNUTLS_PK_RSA, CIPHER_SIGN},
-	{GNUTLS_KX_ECDHE_ECDSA, GNUTLS_PK_EC, CIPHER_SIGN},
-	{GNUTLS_KX_ECDHE_ECDSA, GNUTLS_PK_EDDSA_ED25519, CIPHER_SIGN},
-	{GNUTLS_KX_ECDHE_ECDSA, GNUTLS_PK_EDDSA_ED448, CIPHER_SIGN},
-	{GNUTLS_KX_DHE_DSS, GNUTLS_PK_DSA, CIPHER_SIGN},
-	{GNUTLS_KX_DHE_RSA, GNUTLS_PK_RSA_PSS, CIPHER_SIGN},
-	{GNUTLS_KX_ECDHE_RSA, GNUTLS_PK_RSA_PSS, CIPHER_SIGN},
-	{GNUTLS_KX_SRP_DSS, GNUTLS_PK_DSA, CIPHER_SIGN},
-	{GNUTLS_KX_RSA_PSK, GNUTLS_PK_RSA, CIPHER_ENCRYPT},
-	{GNUTLS_KX_VKO_GOST_12, GNUTLS_PK_GOST_01, CIPHER_SIGN},
-	{GNUTLS_KX_VKO_GOST_12, GNUTLS_PK_GOST_12_256, CIPHER_SIGN},
-	{GNUTLS_KX_VKO_GOST_12, GNUTLS_PK_GOST_12_512, CIPHER_SIGN},
-	{0, 0, 0}
+	{ GNUTLS_KX_RSA, GNUTLS_PK_RSA, CIPHER_ENCRYPT },
+	{ GNUTLS_KX_DHE_RSA, GNUTLS_PK_RSA, CIPHER_SIGN },
+	{ GNUTLS_KX_SRP_RSA, GNUTLS_PK_RSA, CIPHER_SIGN },
+	{ GNUTLS_KX_ECDHE_RSA, GNUTLS_PK_RSA, CIPHER_SIGN },
+	{ GNUTLS_KX_ECDHE_ECDSA, GNUTLS_PK_EC, CIPHER_SIGN },
+	{ GNUTLS_KX_ECDHE_ECDSA, GNUTLS_PK_EDDSA_ED25519, CIPHER_SIGN },
+	{ GNUTLS_KX_ECDHE_ECDSA, GNUTLS_PK_EDDSA_ED448, CIPHER_SIGN },
+	{ GNUTLS_KX_DHE_DSS, GNUTLS_PK_DSA, CIPHER_SIGN },
+	{ GNUTLS_KX_DHE_RSA, GNUTLS_PK_RSA_PSS, CIPHER_SIGN },
+	{ GNUTLS_KX_ECDHE_RSA, GNUTLS_PK_RSA_PSS, CIPHER_SIGN },
+	{ GNUTLS_KX_SRP_DSS, GNUTLS_PK_DSA, CIPHER_SIGN },
+	{ GNUTLS_KX_RSA_PSK, GNUTLS_PK_RSA, CIPHER_ENCRYPT },
+	{ GNUTLS_KX_VKO_GOST_12, GNUTLS_PK_GOST_01, CIPHER_SIGN },
+	{ GNUTLS_KX_VKO_GOST_12, GNUTLS_PK_GOST_12_256, CIPHER_SIGN },
+	{ GNUTLS_KX_VKO_GOST_12, GNUTLS_PK_GOST_12_512, CIPHER_SIGN },
+	{ 0, 0, 0 }
 };
 
-#define GNUTLS_PK_MAP_LOOP(b) \
-	const gnutls_pk_map *p; \
-		for(p = pk_mappings; p->kx_algorithm != 0; p++) { b }
+#define GNUTLS_PK_MAP_LOOP(b)                              \
+	const gnutls_pk_map *p;                            \
+	for (p = pk_mappings; p->kx_algorithm != 0; p++) { \
+		b                                          \
+	}
 
-#define GNUTLS_PK_MAP_ALG_LOOP(a) \
-			GNUTLS_PK_MAP_LOOP( if(p->kx_algorithm == kx_algorithm) { a; break; })
+#define GNUTLS_PK_MAP_ALG_LOOP(a)                                 \
+	GNUTLS_PK_MAP_LOOP(if (p->kx_algorithm == kx_algorithm) { \
+		a;                                                \
+		break;                                            \
+	})
 
-unsigned
-_gnutls_kx_supports_pk(gnutls_kx_algorithm_t kx_algorithm,
-		       gnutls_pk_algorithm_t pk_algorithm)
+unsigned _gnutls_kx_supports_pk(gnutls_kx_algorithm_t kx_algorithm,
+				gnutls_pk_algorithm_t pk_algorithm)
 {
-	GNUTLS_PK_MAP_LOOP(if
-			   (p->kx_algorithm == kx_algorithm
-			    && p->pk_algorithm == pk_algorithm) {
-			   return 1;}
-	)
-		return 0;
+	GNUTLS_PK_MAP_LOOP(if (p->kx_algorithm == kx_algorithm &&
+			       p->pk_algorithm == pk_algorithm) { return 1; })
+	return 0;
 }
 
-unsigned
-_gnutls_kx_supports_pk_usage(gnutls_kx_algorithm_t kx_algorithm,
-			     gnutls_pk_algorithm_t pk_algorithm,
-			     unsigned int key_usage)
+unsigned _gnutls_kx_supports_pk_usage(gnutls_kx_algorithm_t kx_algorithm,
+				      gnutls_pk_algorithm_t pk_algorithm,
+				      unsigned int key_usage)
 {
 	const gnutls_pk_map *p;
 
 	for (p = pk_mappings; p->kx_algorithm != 0; p++) {
-		if (p->kx_algorithm == kx_algorithm
-		    && p->pk_algorithm == pk_algorithm) {
+		if (p->kx_algorithm == kx_algorithm &&
+		    p->pk_algorithm == pk_algorithm) {
 			if (key_usage == 0)
 				return 1;
-			else if (p->encipher_type == CIPHER_SIGN
-				 && (key_usage & GNUTLS_KEY_DIGITAL_SIGNATURE))
+			else if (p->encipher_type == CIPHER_SIGN &&
+				 (key_usage & GNUTLS_KEY_DIGITAL_SIGNATURE))
 				return 1;
-			else if (p->encipher_type == CIPHER_ENCRYPT
-				 && (key_usage & GNUTLS_KEY_KEY_ENCIPHERMENT))
+			else if (p->encipher_type == CIPHER_ENCRYPT &&
+				 (key_usage & GNUTLS_KEY_KEY_ENCIPHERMENT))
 				return 1;
 			else
 				return 0;
@@ -114,63 +115,103 @@ struct gnutls_pk_entry {
 	const char *name;
 	const char *oid;
 	gnutls_pk_algorithm_t id;
-	gnutls_ecc_curve_t curve;	/* to map PK to specific OID, we need to know the curve for EdDSA */
-	bool no_prehashed;	/* non-zero if the algorithm cannot sign pre-hashed data */
+	gnutls_ecc_curve_t
+		curve; /* to map PK to specific OID, we need to know the curve for EdDSA */
+	bool no_prehashed; /* non-zero if the algorithm cannot sign pre-hashed data */
 };
 typedef struct gnutls_pk_entry gnutls_pk_entry;
 
 static const gnutls_pk_entry pk_algorithms[] = {
 	/* having duplicate entries is ok, as long as the one
 	 * we want to return OID from is first */
-	{.name = "RSA",.oid = PK_PKIX1_RSA_OID,.id = GNUTLS_PK_RSA,
-	 .curve = GNUTLS_ECC_CURVE_INVALID},
-	{.name = "RSA-PSS",.oid = PK_PKIX1_RSA_PSS_OID,.id = GNUTLS_PK_RSA_PSS,
-	 .curve = GNUTLS_ECC_CURVE_INVALID},
-	{.name = "RSA (X.509)",.oid = PK_X509_RSA_OID,.id = GNUTLS_PK_RSA,
-	 .curve = GNUTLS_ECC_CURVE_INVALID},	/* some certificates use this OID for RSA */
-	{.name = "RSA-MD5",.oid = SIG_RSA_MD5_OID,.id = GNUTLS_PK_RSA,
-	 .curve = GNUTLS_ECC_CURVE_INVALID},	/* some other broken certificates set RSA with MD5 as an indicator of RSA */
-	{.name = "RSA-SHA1",.oid = SIG_RSA_SHA1_OID,.id = GNUTLS_PK_RSA,
-	 .curve = GNUTLS_ECC_CURVE_INVALID},	/* some other broken certificates set RSA with SHA1 as an indicator of RSA */
-	{.name = "RSA-SHA1",.oid = ISO_SIG_RSA_SHA1_OID,.id = GNUTLS_PK_RSA,
-	 .curve = GNUTLS_ECC_CURVE_INVALID},	/* some other broken certificates set RSA with SHA1 as an indicator of RSA */
-	{.name = "DSA",.oid = PK_DSA_OID,.id = GNUTLS_PK_DSA,
-	 .curve = GNUTLS_ECC_CURVE_INVALID},
-	{.name = "GOST R 34.10-2012-512",.oid = PK_GOST_R3410_2012_512_OID,.id =
-	 GNUTLS_PK_GOST_12_512,
-	 .curve = GNUTLS_ECC_CURVE_INVALID},
-	{.name = "GOST R 34.10-2012-256",.oid = PK_GOST_R3410_2012_256_OID,.id =
-	 GNUTLS_PK_GOST_12_256,
-	 .curve = GNUTLS_ECC_CURVE_INVALID},
-	{.name = "GOST R 34.10-2001",.oid = PK_GOST_R3410_2001_OID,.id =
-	 GNUTLS_PK_GOST_01,
-	 .curve = GNUTLS_ECC_CURVE_INVALID},
-	{.name = "GOST R 34.10-94",.oid = PK_GOST_R3410_94_OID,.id =
-	 GNUTLS_PK_UNKNOWN,
-	 .curve = GNUTLS_ECC_CURVE_INVALID},
-	{.name = "EC/ECDSA",.oid = "1.2.840.10045.2.1",.id = GNUTLS_PK_ECDSA,
-	 .curve = GNUTLS_ECC_CURVE_INVALID},
-	{.name = "EdDSA (Ed25519)",.oid = SIG_EDDSA_SHA512_OID,.id =
-	 GNUTLS_PK_EDDSA_ED25519,
-	 .curve = GNUTLS_ECC_CURVE_ED25519,.no_prehashed = 1},
-	{.name = "EdDSA (Ed448)",.oid = SIG_ED448_OID,.id =
-	 GNUTLS_PK_EDDSA_ED448,
-	 .curve = GNUTLS_ECC_CURVE_ED448,.no_prehashed = 1},
-	{.name = "DH",.oid = NULL,.id = GNUTLS_PK_DH,
-	 .curve = GNUTLS_ECC_CURVE_INVALID},
-	{.name = "ECDH (X25519)",.oid = ECDH_X25519_OID,.id =
-	 GNUTLS_PK_ECDH_X25519,
-	 .curve = GNUTLS_ECC_CURVE_X25519},
-	{.name = "ECDH (X448)",.oid = ECDH_X448_OID,.id = GNUTLS_PK_ECDH_X448,
-	 .curve = GNUTLS_ECC_CURVE_X448},
-	{.name = "UNKNOWN",.oid = NULL,.id = GNUTLS_PK_UNKNOWN,
-	 .curve = GNUTLS_ECC_CURVE_INVALID},
-	{0, 0, 0, 0}
+	{ .name = "RSA",
+	  .oid = PK_PKIX1_RSA_OID,
+	  .id = GNUTLS_PK_RSA,
+	  .curve = GNUTLS_ECC_CURVE_INVALID },
+	{ .name = "RSA-PSS",
+	  .oid = PK_PKIX1_RSA_PSS_OID,
+	  .id = GNUTLS_PK_RSA_PSS,
+	  .curve = GNUTLS_ECC_CURVE_INVALID },
+	{ .name = "RSA (X.509)",
+	  .oid = PK_X509_RSA_OID,
+	  .id = GNUTLS_PK_RSA,
+	  .curve =
+		  GNUTLS_ECC_CURVE_INVALID }, /* some certificates use this OID for RSA */
+	{ .name = "RSA-MD5",
+	  .oid = SIG_RSA_MD5_OID,
+	  .id = GNUTLS_PK_RSA,
+	  .curve =
+		  GNUTLS_ECC_CURVE_INVALID }, /* some other broken certificates set RSA with MD5 as an indicator of RSA */
+	{ .name = "RSA-SHA1",
+	  .oid = SIG_RSA_SHA1_OID,
+	  .id = GNUTLS_PK_RSA,
+	  .curve =
+		  GNUTLS_ECC_CURVE_INVALID }, /* some other broken certificates set RSA with SHA1 as an indicator of RSA */
+	{ .name = "RSA-SHA1",
+	  .oid = ISO_SIG_RSA_SHA1_OID,
+	  .id = GNUTLS_PK_RSA,
+	  .curve =
+		  GNUTLS_ECC_CURVE_INVALID }, /* some other broken certificates set RSA with SHA1 as an indicator of RSA */
+	{ .name = "DSA",
+	  .oid = PK_DSA_OID,
+	  .id = GNUTLS_PK_DSA,
+	  .curve = GNUTLS_ECC_CURVE_INVALID },
+	{ .name = "GOST R 34.10-2012-512",
+	  .oid = PK_GOST_R3410_2012_512_OID,
+	  .id = GNUTLS_PK_GOST_12_512,
+	  .curve = GNUTLS_ECC_CURVE_INVALID },
+	{ .name = "GOST R 34.10-2012-256",
+	  .oid = PK_GOST_R3410_2012_256_OID,
+	  .id = GNUTLS_PK_GOST_12_256,
+	  .curve = GNUTLS_ECC_CURVE_INVALID },
+	{ .name = "GOST R 34.10-2001",
+	  .oid = PK_GOST_R3410_2001_OID,
+	  .id = GNUTLS_PK_GOST_01,
+	  .curve = GNUTLS_ECC_CURVE_INVALID },
+	{ .name = "GOST R 34.10-94",
+	  .oid = PK_GOST_R3410_94_OID,
+	  .id = GNUTLS_PK_UNKNOWN,
+	  .curve = GNUTLS_ECC_CURVE_INVALID },
+	{ .name = "EC/ECDSA",
+	  .oid = "1.2.840.10045.2.1",
+	  .id = GNUTLS_PK_ECDSA,
+	  .curve = GNUTLS_ECC_CURVE_INVALID },
+	{ .name = "EdDSA (Ed25519)",
+	  .oid = SIG_EDDSA_SHA512_OID,
+	  .id = GNUTLS_PK_EDDSA_ED25519,
+	  .curve = GNUTLS_ECC_CURVE_ED25519,
+	  .no_prehashed = 1 },
+	{ .name = "EdDSA (Ed448)",
+	  .oid = SIG_ED448_OID,
+	  .id = GNUTLS_PK_EDDSA_ED448,
+	  .curve = GNUTLS_ECC_CURVE_ED448,
+	  .no_prehashed = 1 },
+	{ .name = "DH",
+	  .oid = NULL,
+	  .id = GNUTLS_PK_DH,
+	  .curve = GNUTLS_ECC_CURVE_INVALID },
+	{ .name = "ECDH (X25519)",
+	  .oid = ECDH_X25519_OID,
+	  .id = GNUTLS_PK_ECDH_X25519,
+	  .curve = GNUTLS_ECC_CURVE_X25519 },
+	{ .name = "ECDH (X448)",
+	  .oid = ECDH_X448_OID,
+	  .id = GNUTLS_PK_ECDH_X448,
+	  .curve = GNUTLS_ECC_CURVE_X448 },
+	{ .name = "UNKNOWN",
+	  .oid = NULL,
+	  .id = GNUTLS_PK_UNKNOWN,
+	  .curve = GNUTLS_ECC_CURVE_INVALID },
+	{ 0, 0, 0, 0 }
 };
 
-#define GNUTLS_PK_LOOP(b) \
-	{ const gnutls_pk_entry *p; \
-		for(p = pk_algorithms; p->name != NULL; p++) { b ; } }
+#define GNUTLS_PK_LOOP(b)                                       \
+	{                                                       \
+		const gnutls_pk_entry *p;                       \
+		for (p = pk_algorithms; p->name != NULL; p++) { \
+			b;                                      \
+		}                                               \
+	}
 
 /**
  * gnutls_pk_algorithm_get_name:
@@ -186,8 +227,9 @@ const char *gnutls_pk_algorithm_get_name(gnutls_pk_algorithm_t algorithm)
 	const char *ret = NULL;
 
 	GNUTLS_PK_LOOP(if (p->id == algorithm) {
-		       ret = p->name; break;}
-	) ;
+		ret = p->name;
+		break;
+	});
 
 	return ret;
 }
@@ -211,11 +253,12 @@ const gnutls_pk_algorithm_t *gnutls_pk_list(void)
 	if (supported_pks[0] == 0) {
 		int i = 0;
 
-		GNUTLS_PK_LOOP(if (p->id != GNUTLS_PK_UNKNOWN &&
-				   supported_pks[i > 0 ? (i - 1) : 0] != p->id
-				   && _gnutls_pk_exists(p->id)) {
-			       supported_pks[i++] = p->id;}
-		) ;
+		GNUTLS_PK_LOOP(
+			if (p->id != GNUTLS_PK_UNKNOWN &&
+			    supported_pks[i > 0 ? (i - 1) : 0] != p->id &&
+			    _gnutls_pk_exists(p->id)) {
+				supported_pks[i++] = p->id;
+			});
 		supported_pks[i++] = 0;
 	}
 
@@ -361,7 +404,7 @@ const char *gnutls_pk_get_oid(gnutls_pk_algorithm_t algorithm)
  * Since: 3.6.0
  -*/
 gnutls_pk_algorithm_t _gnutls_oid_to_pk_and_curve(const char *oid,
-						  gnutls_ecc_curve_t * curve)
+						  gnutls_ecc_curve_t *curve)
 {
 	gnutls_pk_algorithm_t ret = GNUTLS_PK_UNKNOWN;
 	const gnutls_pk_entry *p;
@@ -389,8 +432,7 @@ enum encipher_type _gnutls_kx_encipher_type(gnutls_kx_algorithm_t kx_algorithm)
 {
 	int ret = CIPHER_IGN;
 	GNUTLS_PK_MAP_ALG_LOOP(ret = p->encipher_type)
-	    return ret;
-
+	return ret;
 }
 
 bool _gnutls_pk_are_compat(gnutls_pk_algorithm_t pk1, gnutls_pk_algorithm_t pk2)

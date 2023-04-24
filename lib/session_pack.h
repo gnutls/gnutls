@@ -21,11 +21,11 @@
  */
 
 #ifndef GNUTLS_LIB_SESSION_PACK_H
-# define GNUTLS_LIB_SESSION_PACK_H
+#define GNUTLS_LIB_SESSION_PACK_H
 
 int _gnutls_session_pack(gnutls_session_t session,
-			 gnutls_datum_t * packed_session);
+			 gnutls_datum_t *packed_session);
 int _gnutls_session_unpack(gnutls_session_t session,
-			   const gnutls_datum_t * packed_session);
+			   const gnutls_datum_t *packed_session);
 
-#endif				/* GNUTLS_LIB_SESSION_PACK_H */
+#endif /* GNUTLS_LIB_SESSION_PACK_H */

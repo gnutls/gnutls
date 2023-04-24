@@ -21,21 +21,22 @@
  */
 
 #ifndef GNUTLS_LIB_EXT_SAFE_RENEGOTIATION_H
-# define GNUTLS_LIB_EXT_SAFE_RENEGOTIATION_H
+#define GNUTLS_LIB_EXT_SAFE_RENEGOTIATION_H
 
-# include <hello_ext.h>
+#include <hello_ext.h>
 
 typedef struct {
 	uint8_t client_verify_data[MAX_VERIFY_DATA_SIZE];
 	size_t client_verify_data_len;
 	uint8_t server_verify_data[MAX_VERIFY_DATA_SIZE];
 	size_t server_verify_data_len;
-	uint8_t ri_extension_data[MAX_VERIFY_DATA_SIZE * 2];	/* max signal is 72 bytes in s->c sslv3 */
+	uint8_t ri_extension_data[MAX_VERIFY_DATA_SIZE *
+				  2]; /* max signal is 72 bytes in s->c sslv3 */
 	size_t ri_extension_data_len;
 
-	unsigned int safe_renegotiation_received:1;
-	unsigned int initial_negotiation_completed:1;
-	unsigned int connection_using_safe_renegotiation:1;
+	unsigned int safe_renegotiation_received : 1;
+	unsigned int initial_negotiation_completed : 1;
+	unsigned int connection_using_safe_renegotiation : 1;
 } sr_ext_st;
 
 extern const hello_ext_entry_st ext_mod_sr;
@@ -46,4 +47,4 @@ int _gnutls_ext_sr_recv_cs(gnutls_session_t session);
 int _gnutls_ext_sr_verify(gnutls_session_t session);
 int _gnutls_ext_sr_send_cs(gnutls_session_t);
 
-#endif				/* GNUTLS_LIB_EXT_SAFE_RENEGOTIATION_H */
+#endif /* GNUTLS_LIB_EXT_SAFE_RENEGOTIATION_H */

@@ -35,12 +35,9 @@
 
 static gnutls_fips140_context_t fips_context;
 
-static void
-test_hkdf(gnutls_mac_algorithm_t mac,
-	  const char *ikm_hex,
-	  const char *salt_hex,
-	  const char *info_hex,
-	  size_t length, const char *prk_hex, const char *okm_hex)
+static void test_hkdf(gnutls_mac_algorithm_t mac, const char *ikm_hex,
+		      const char *salt_hex, const char *info_hex, size_t length,
+		      const char *prk_hex, const char *okm_hex)
 {
 	gnutls_datum_t hex;
 	gnutls_datum_t ikm;
@@ -73,8 +70,8 @@ test_hkdf(gnutls_mac_algorithm_t mac,
 	assert(gnutls_hex_encode2(&prk, &hex) >= 0);
 
 	if (strcmp((char *)hex.data, prk_hex))
-		fail("prk doesn't match: %s != %s\n",
-		     (char *)hex.data, prk_hex);
+		fail("prk doesn't match: %s != %s\n", (char *)hex.data,
+		     prk_hex);
 
 	gnutls_free(hex.data);
 
@@ -101,8 +98,8 @@ test_hkdf(gnutls_mac_algorithm_t mac,
 	assert(gnutls_hex_encode2(&okm, &hex) >= 0);
 
 	if (strcmp((char *)hex.data, okm_hex))
-		fail("okm doesn't match: %s != %s\n",
-		     (char *)hex.data, okm_hex);
+		fail("okm doesn't match: %s != %s\n", (char *)hex.data,
+		     okm_hex);
 
 	gnutls_free(hex.data);
 }
@@ -126,14 +123,10 @@ is_mac_algo_hmac_approved_in_fips(gnutls_mac_algorithm_t algo)
 	}
 }
 
-static void
-test_pbkdf2(gnutls_mac_algorithm_t mac,
-	    const char *ikm_hex,
-	    const char *salt_hex,
-	    unsigned iter_count,
-	    size_t length,
-	    const char *okm_hex,
-	    gnutls_fips140_operation_state_t expected_state)
+static void test_pbkdf2(gnutls_mac_algorithm_t mac, const char *ikm_hex,
+			const char *salt_hex, unsigned iter_count,
+			size_t length, const char *okm_hex,
+			gnutls_fips140_operation_state_t expected_state)
 {
 	gnutls_datum_t hex;
 	gnutls_datum_t ikm;
@@ -162,8 +155,8 @@ test_pbkdf2(gnutls_mac_algorithm_t mac,
 	assert(gnutls_hex_encode2(&okm, &hex) >= 0);
 
 	if (strcmp((char *)hex.data, okm_hex))
-		fail("okm doesn't match: %s != %s\n",
-		     (char *)hex.data, okm_hex);
+		fail("okm doesn't match: %s != %s\n", (char *)hex.data,
+		     okm_hex);
 
 	gnutls_free(hex.data);
 }
@@ -177,24 +170,25 @@ void doit(void)
 	test_hkdf(GNUTLS_MAC_SHA256,
 		  "0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b"
 		  "0b0b0b0b0b0b",
-		  "000102030405060708090a0b0c",
-		  "f0f1f2f3f4f5f6f7f8f9",
-		  42,
+		  "000102030405060708090a0b0c", "f0f1f2f3f4f5f6f7f8f9", 42,
 		  "077709362c2e32df0ddc3f0dc47bba63"
 		  "90b6c73bb50f9c3122ec844ad7c2b3e5",
 		  "3cb25f25faacd57a90434f64d0362f2a"
-		  "2d2d0a90cf1a5a4c5db02d56ecc4c5bf" "34007208d5b887185865");
+		  "2d2d0a90cf1a5a4c5db02d56ecc4c5bf"
+		  "34007208d5b887185865");
 
 	/* Test vector from RFC 6070.  More thorough testing is done
 	 * in nettle. */
-	test_pbkdf2(GNUTLS_MAC_SHA1, "70617373776f7264",	/* "password" */
-		    "73616c74",	/* "salt" */
-		    4096, 20, "4b007901b765489abead49d926f721d065a429c1",
-		    /* Key sizes and output sizes less than 112-bit are not approved.  */
-		    GNUTLS_FIPS140_OP_NOT_APPROVED);
+	test_pbkdf2(
+		GNUTLS_MAC_SHA1, "70617373776f7264", /* "password" */
+		"73616c74", /* "salt" */
+		4096, 20, "4b007901b765489abead49d926f721d065a429c1",
+		/* Key sizes and output sizes less than 112-bit are not approved.  */
+		GNUTLS_FIPS140_OP_NOT_APPROVED);
 
-	test_pbkdf2(GNUTLS_MAC_AES_CMAC_128, "70617373776f726470617373776f7264",	/* "passwordpassword" */
-		    "73616c74",	/* "salt" */
+	test_pbkdf2(GNUTLS_MAC_AES_CMAC_128,
+		    "70617373776f726470617373776f7264", /* "passwordpassword" */
+		    "73616c74", /* "salt" */
 		    4096, 20, "c4c112c6e1e3b8757640603dec78825ff87605a7",
 		    /* Use of AES-CMAC in PBKDF2 is not supported in ACVP.  */
 		    GNUTLS_FIPS140_OP_NOT_APPROVED);

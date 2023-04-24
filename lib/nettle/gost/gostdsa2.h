@@ -33,25 +33,24 @@
 /* Development of Nettle's ECC support was funded by the .SE Internet Fund. */
 
 #ifndef GNUTLS_LIB_NETTLE_GOST_GOSTDSA2_H
-# define GNUTLS_LIB_NETTLE_GOST_GOSTDSA2_H
+#define GNUTLS_LIB_NETTLE_GOST_GOSTDSA2_H
 
-# include <nettle/ecc.h>
+#include <nettle/ecc.h>
 
-# if HAVE_CONFIG_H
-#  include "config.h"
-# endif
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
 
-# ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-# endif
+#endif
 
 /* Name mangling */
-# define gostdsa_unmask_key _gnutls_gostdsa_unmask_key
+#define gostdsa_unmask_key _gnutls_gostdsa_unmask_key
 
-	int
-	 gostdsa_unmask_key(const struct ecc_curve *ecc, mpz_t key);
+int gostdsa_unmask_key(const struct ecc_curve *ecc, mpz_t key);
 
-# ifdef __cplusplus
+#ifdef __cplusplus
 }
-# endif
-#endif				/* GNUTLS_LIB_NETTLE_GOST_GOSTDSA2_H */
+#endif
+#endif /* GNUTLS_LIB_NETTLE_GOST_GOSTDSA2_H */

@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -66,12 +66,10 @@ static void try(void)
 	/* Init server */
 	gnutls_certificate_allocate_credentials(&serverx509cred);
 	gnutls_certificate_allocate_credentials(&serverx509cred2);
-	gnutls_certificate_set_x509_key_mem(serverx509cred,
-					    &server_cert, &server_key,
-					    GNUTLS_X509_FMT_PEM);
-	gnutls_certificate_set_x509_key_mem(serverx509cred2,
-					    &server2_cert, &server2_key,
-					    GNUTLS_X509_FMT_PEM);
+	gnutls_certificate_set_x509_key_mem(serverx509cred, &server_cert,
+					    &server_key, GNUTLS_X509_FMT_PEM);
+	gnutls_certificate_set_x509_key_mem(serverx509cred2, &server2_cert,
+					    &server2_key, GNUTLS_X509_FMT_PEM);
 
 	gnutls_dh_params_init(&dh_params);
 	gnutls_dh_params_import_pkcs3(dh_params, &p3, GNUTLS_X509_FMT_PEM);
@@ -80,8 +78,8 @@ static void try(void)
 	gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, serverx509cred);
 
-	gnutls_priority_set_direct(server,
-				   "NORMAL:-VERS-ALL:+VERS-TLS1.2", NULL);
+	gnutls_priority_set_direct(server, "NORMAL:-VERS-ALL:+VERS-TLS1.2",
+				   NULL);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
@@ -92,9 +90,8 @@ static void try(void)
 	if (ret < 0)
 		exit(1);
 
-	ret =
-	    gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca_cert,
-						  GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca_cert,
+						    GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);
 
@@ -107,10 +104,8 @@ static void try(void)
 	if (ret < 0)
 		exit(1);
 
-	ret =
-	    gnutls_priority_set_direct(client,
-				       "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+RSA",
-				       NULL);
+	ret = gnutls_priority_set_direct(
+		client, "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+RSA", NULL);
 	if (ret < 0)
 		exit(1);
 
@@ -121,7 +116,8 @@ static void try(void)
 	HANDSHAKE(client, server);
 
 	if (gnutls_kx_get(client) != GNUTLS_KX_RSA) {
-		fail("got unexpected key exchange algorithm: %s (expected RSA)\n", gnutls_kx_get_name(gnutls_kx_get(client)));
+		fail("got unexpected key exchange algorithm: %s (expected RSA)\n",
+		     gnutls_kx_get_name(gnutls_kx_get(client)));
 		exit(1);
 	}
 

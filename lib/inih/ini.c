@@ -8,7 +8,7 @@ https://github.com/benhoyt/inih
 */
 
 #if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)
-# define _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
 #endif
 
 #include <stdio.h>
@@ -18,7 +18,7 @@ https://github.com/benhoyt/inih
 #include "ini.h"
 
 #if !INI_USE_STACK
-# include <stdlib.h>
+#include <stdlib.h>
 #endif
 
 #define MAX_SECTION 50
@@ -70,7 +70,7 @@ static char *strncpy0(char *dest, const char *src, size_t size)
 }
 
 /* See documentation in header file. */
-int ini_parse_file(FILE * file, ini_handler handler, void *user)
+int ini_parse_file(FILE *file, ini_handler handler, void *user)
 {
 	/* Uses a fair bit of stack (use heap instead if you need to) */
 #if INI_USE_STACK
@@ -101,9 +101,9 @@ int ini_parse_file(FILE * file, ini_handler handler, void *user)
 #endif
 
 #if INI_HANDLER_LINENO
-# define HANDLER(u, s, n, v) handler(u, s, n, v, lineno)
+#define HANDLER(u, s, n, v) handler(u, s, n, v, lineno)
 #else
-# define HANDLER(u, s, n, v) handler(u, s, n, v)
+#define HANDLER(u, s, n, v) handler(u, s, n, v)
 #endif
 
 	/* Scan through stream line by line */
@@ -181,8 +181,8 @@ int ini_parse_file(FILE * file, ini_handler handler, void *user)
 
 				/* Valid name[=:]value pair found, call handler */
 				strncpy0(prev_name, name, sizeof(prev_name));
-				if (!HANDLER(user, section, name, value)
-				    && !error)
+				if (!HANDLER(user, section, name, value) &&
+				    !error)
 					error = lineno;
 			} else if (!error) {
 				/* No '=' or ':' found on name[=:]value line */

@@ -21,10 +21,10 @@
  */
 
 #ifndef GNUTLS_LIB_GLOBAL_H
-# define GNUTLS_LIB_GLOBAL_H
+#define GNUTLS_LIB_GLOBAL_H
 
-# include <libtasn1.h>
-# include <gnutls/gnutls.h>
+#include <libtasn1.h>
+#include <gnutls/gnutls.h>
 
 int gnutls_is_secure_memory(const void *mem);
 
@@ -35,8 +35,8 @@ extern asn1_node _gnutls_gnutls_asn;
  * prevent warnings, since libtasn1 doesn't
  * use the const keyword in its functions.
  */
-# define _gnutls_get_gnutls_asn() ((asn1_node) _gnutls_gnutls_asn)
-# define _gnutls_get_pkix() ((asn1_node) _gnutls_pkix1_asn)
+#define _gnutls_get_gnutls_asn() ((asn1_node)_gnutls_gnutls_asn)
+#define _gnutls_get_pkix() ((asn1_node)_gnutls_pkix1_asn)
 
 extern gnutls_log_func _gnutls_log_func;
 extern gnutls_audit_log_func _gnutls_audit_log_func;
@@ -50,4 +50,4 @@ extern void _gnutls_prepare_to_load_system_priorities(void);
 extern void _gnutls_unload_system_priorities(void);
 extern bool _gnutls_allowlisting_mode(void);
 
-#endif				/* GNUTLS_LIB_GLOBAL_H */
+#endif /* GNUTLS_LIB_GLOBAL_H */

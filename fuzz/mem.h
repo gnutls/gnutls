@@ -22,14 +22,14 @@
  */
 
 #ifndef MEM_H
-# define MEM_H
+#define MEM_H
 
 typedef struct mem_st {
 	const uint8_t *data;
 	size_t size;
 } mem_st;
 
-# define MIN(x,y) ((x)<(y)?(x):(y))
+#define MIN(x, y) ((x) < (y) ? (x) : (y))
 static ssize_t mem_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 {
 	return len;
@@ -52,15 +52,14 @@ static ssize_t mem_pull(gnutls_transport_ptr_t tr, void *data, size_t len)
 	return len;
 }
 
-static
-int mem_pull_timeout(gnutls_transport_ptr_t tr, unsigned int ms)
+static int mem_pull_timeout(gnutls_transport_ptr_t tr, unsigned int ms)
 {
 	struct mem_st *p = (struct mem_st *)tr;
 
 	if (p->size > 0)
-		return 1;	/* available data */
+		return 1; /* available data */
 	else
-		return 0;	/* timeout */
+		return 0; /* timeout */
 }
 
 #endif

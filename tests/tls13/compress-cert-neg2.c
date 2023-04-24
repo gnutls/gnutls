@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,19 +35,19 @@ int main(int argc, char **argv)
 
 #else
 
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <unistd.h>
-# include <gnutls/gnutls.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <unistd.h>
+#include <gnutls/gnutls.h>
 
-# include "cert-common.h"
-# include "utils.h"
+#include "cert-common.h"
+#include "utils.h"
 
 /* This program tests whether the compress_certificate extension correctly fails
  * in the case of compression/decompression failure */
 
-# define PRIO "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3"
-# define CHECK(X) assert((X)>=0)
+#define PRIO "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3"
+#define CHECK(X) assert((X) >= 0)
 
 static pid_t child;
 
@@ -74,7 +74,7 @@ static void server_log_func(int level, const char *str)
 
 static int client_callback(gnutls_session_t session, unsigned htype,
 			   unsigned post, unsigned incoming,
-			   const gnutls_datum_t * msg)
+			   const gnutls_datum_t *msg)
 {
 	/* change compression method to BROTLI */
 	msg->data[1] = 0x02;
@@ -88,7 +88,7 @@ static void client(int fd)
 	gnutls_certificate_credentials_t x509_cred;
 	gnutls_compression_method_t methods[] = { GNUTLS_COMP_ZLIB };
 	size_t methods_len =
-	    sizeof(methods) / sizeof(gnutls_compression_method_t);
+		sizeof(methods) / sizeof(gnutls_compression_method_t);
 
 	global_init();
 
@@ -98,34 +98,32 @@ static void client(int fd)
 	}
 
 	CHECK(gnutls_certificate_allocate_credentials(&x509_cred));
-	CHECK(gnutls_certificate_set_x509_trust_mem
-	      (x509_cred, &ca3_cert, GNUTLS_X509_FMT_PEM));
-	CHECK(gnutls_certificate_set_x509_key_mem
-	      (x509_cred, &cli_ca3_cert_chain, &cli_ca3_key,
-	       GNUTLS_X509_FMT_PEM));
+	CHECK(gnutls_certificate_set_x509_trust_mem(x509_cred, &ca3_cert,
+						    GNUTLS_X509_FMT_PEM));
+	CHECK(gnutls_certificate_set_x509_key_mem(
+		x509_cred, &cli_ca3_cert_chain, &cli_ca3_key,
+		GNUTLS_X509_FMT_PEM));
 	CHECK(gnutls_init(&session, GNUTLS_CLIENT));
-	CHECK(gnutls_credentials_set
-	      (session, GNUTLS_CRD_CERTIFICATE, x509_cred));
+	CHECK(gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
+				     x509_cred));
 	CHECK(gnutls_priority_set_direct(session, PRIO, NULL));
 
-	ret =
-	    gnutls_compress_certificate_set_methods(session, methods,
-						    methods_len);
+	ret = gnutls_compress_certificate_set_methods(session, methods,
+						      methods_len);
 	if (ret < 0) {
 		fail("client: setting compression method failed (%s)\n\n",
 		     gnutls_strerror(ret));
 		terminate();
 	}
 
-	gnutls_handshake_set_hook_function(session,
-					   GNUTLS_HANDSHAKE_COMPRESSED_CERTIFICATE_PKT,
-					   GNUTLS_HOOK_PRE, client_callback);
+	gnutls_handshake_set_hook_function(
+		session, GNUTLS_HANDSHAKE_COMPRESSED_CERTIFICATE_PKT,
+		GNUTLS_HOOK_PRE, client_callback);
 	gnutls_transport_set_int(session, fd);
 
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 	if (ret >= 0)
 		fail("client: handshake should have failed\n");
 
@@ -144,7 +142,7 @@ static void server(int fd)
 	gnutls_compression_method_t method;
 	gnutls_compression_method_t methods[] = { GNUTLS_COMP_ZLIB };
 	size_t methods_len =
-	    sizeof(methods) / sizeof(gnutls_compression_method_t);
+		sizeof(methods) / sizeof(gnutls_compression_method_t);
 
 	global_init();
 
@@ -154,19 +152,18 @@ static void server(int fd)
 	}
 
 	CHECK(gnutls_certificate_allocate_credentials(&x509_cred));
-	CHECK(gnutls_certificate_set_x509_trust_mem
-	      (x509_cred, &ca3_cert, GNUTLS_X509_FMT_PEM));
-	CHECK(gnutls_certificate_set_x509_key_mem
-	      (x509_cred, &server_ca3_localhost_cert_chain, &server_ca3_key,
-	       GNUTLS_X509_FMT_PEM));
+	CHECK(gnutls_certificate_set_x509_trust_mem(x509_cred, &ca3_cert,
+						    GNUTLS_X509_FMT_PEM));
+	CHECK(gnutls_certificate_set_x509_key_mem(
+		x509_cred, &server_ca3_localhost_cert_chain, &server_ca3_key,
+		GNUTLS_X509_FMT_PEM));
 	CHECK(gnutls_init(&session, GNUTLS_SERVER));
-	CHECK(gnutls_credentials_set
-	      (session, GNUTLS_CRD_CERTIFICATE, x509_cred));
+	CHECK(gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
+				     x509_cred));
 	CHECK(gnutls_priority_set_direct(session, PRIO, NULL));
 
-	ret =
-	    gnutls_compress_certificate_set_methods(session, methods,
-						    methods_len);
+	ret = gnutls_compress_certificate_set_methods(session, methods,
+						      methods_len);
 	if (ret < 0) {
 		fail("server: setting compression method failed (%s)\n\n",
 		     gnutls_strerror(ret));
@@ -177,8 +174,7 @@ static void server(int fd)
 
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 	if (ret >= 0)
 		fail("server: handshake should have failed\n");
 
@@ -229,4 +225,4 @@ void doit(void)
 	}
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

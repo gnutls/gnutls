@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,23 +35,23 @@ int main(void)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
-# include <unistd.h>
-# include <gnutls/gnutls.h>
-# include <gnutls/dtls.h>
-# include <signal.h>
-# include <assert.h>
+#include <string.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <gnutls/gnutls.h>
+#include <gnutls/dtls.h>
+#include <signal.h>
+#include <assert.h>
 
-# include "cert-common.h"
-# include "utils.h"
+#include "cert-common.h"
+#include "utils.h"
 
-# define MAX_BUF 1024
-# define HIGH(x) (3*x)
+#define MAX_BUF 1024
+#define HIGH(x) (3 * x)
 static void terminate(void);
 static size_t total;
 
@@ -121,8 +121,7 @@ static void client(int fd, struct test_st *test)
 	 */
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret < 0) {
 		fail("client: Handshake failed\n");
@@ -135,13 +134,13 @@ static void client(int fd, struct test_st *test)
 
 	if (debug)
 		success("client: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	do {
 		do {
-			ret =
-			    gnutls_record_recv(session, buffer, sizeof(buffer));
+			ret = gnutls_record_recv(session, buffer,
+						 sizeof(buffer));
 		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 	} while (ret > 0);
 
@@ -158,7 +157,7 @@ static void client(int fd, struct test_st *test)
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
- end:
+end:
 
 	close(fd);
 
@@ -216,8 +215,7 @@ static void server(int fd, struct test_st *test)
 
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 	if (ret < 0) {
 		close(fd);
 		gnutls_deinit(session);
@@ -230,8 +228,8 @@ static void server(int fd, struct test_st *test)
 
 	if (debug)
 		success("server: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	gnutls_transport_set_push_function(session, push);
 
@@ -239,16 +237,16 @@ static void server(int fd, struct test_st *test)
 
 	total = 0;
 	do {
-		ret =
-		    gnutls_record_send2(session, buffer,
-					test->data, test->pad, 0);
+		ret = gnutls_record_send2(session, buffer, test->data,
+					  test->pad, 0);
 	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 	if (test->sret < 0) {
 		if (ret >= 0)
 			fail("server: expected failure got success!\n");
 		if (ret != test->sret)
-			fail("server: expected different failure: '%s', got: '%s'\n", gnutls_strerror(test->sret), gnutls_strerror(ret));
+			fail("server: expected different failure: '%s', got: '%s'\n",
+			     gnutls_strerror(test->sret), gnutls_strerror(ret));
 		goto finish;
 	}
 
@@ -258,14 +256,14 @@ static void server(int fd, struct test_st *test)
 	}
 
 	expected =
-	    test->data + test->pad + gnutls_record_overhead_size(session);
+		test->data + test->pad + gnutls_record_overhead_size(session);
 	if (total != expected) {
 		fail("Sent data (%u) are lower than expected (%u)\n",
 		     (unsigned)total, (unsigned)expected);
 		terminate();
 	}
 
- finish:
+finish:
 	/* do not wait for the peer to close the connection.
 	 */
 	gnutls_bye(session, GNUTLS_SHUT_WR);
@@ -314,7 +312,7 @@ static void start(struct test_st *test)
 	}
 }
 
-# define AES_GCM "NONE:+VERS-TLS1.3:+AES-256-GCM:+AEAD:+SIGN-ALL:+GROUP-ALL"
+#define AES_GCM "NONE:+VERS-TLS1.3:+AES-256-GCM:+AEAD:+SIGN-ALL:+GROUP-ALL"
 
 static void ch_handler(int sig)
 {
@@ -325,61 +323,52 @@ static void ch_handler(int sig)
 }
 
 struct test_st tests[] = {
-	{
-	 .name = "AES-GCM with max pad",
-	 .pad = HIGH(MAX_BUF + 1) - (MAX_BUF + 1),
-	 .data = MAX_BUF,
-	 .prio = AES_GCM,
-	 .flags = 0},
-	{
-	 .name = "AES-GCM with zero pad",
-	 .pad = 0,
-	 .data = MAX_BUF,
-	 .prio = AES_GCM,
-	 .flags = 0},
-	{
-	 .name = "AES-GCM with 1-byte pad",
-	 .pad = 1,
-	 .data = MAX_BUF,
-	 .prio = AES_GCM,
-	 .flags = 0},
-	{
-	 .name = "AES-GCM with pad, but no data",
-	 .pad = 16,
-	 .data = 0,
-	 .prio = AES_GCM,
-	 .flags = 0},
-	{
-	 .name = "AES-GCM with max pad and safe padding check",
-	 .pad = HIGH(MAX_BUF + 1) - (MAX_BUF + 1),
-	 .data = MAX_BUF,
-	 .prio = AES_GCM,
-	 .flags = GNUTLS_SAFE_PADDING_CHECK},
-	{
-	 .name = "AES-GCM with zero pad and safe padding check",
-	 .pad = 0,
-	 .data = MAX_BUF,
-	 .prio = AES_GCM,
-	 .flags = GNUTLS_SAFE_PADDING_CHECK},
-	{
-	 .name = "AES-GCM with 1-byte pad and safe padding check",
-	 .pad = 1,
-	 .data = MAX_BUF,
-	 .prio = AES_GCM,
-	 .flags = GNUTLS_SAFE_PADDING_CHECK},
-	{
-	 .name = "AES-GCM with pad, but no data and safe padding check",
-	 .pad = 16,
-	 .data = 0,
-	 .prio = AES_GCM,
-	 .flags = GNUTLS_SAFE_PADDING_CHECK},
-	{
-	 .name = "AES-GCM with pad, but no data and no pad",
-	 .pad = 0,
-	 .data = 0,
-	 .prio = AES_GCM,
-	 .flags = GNUTLS_SAFE_PADDING_CHECK,
-	 .sret = GNUTLS_E_INVALID_REQUEST},
+	{ .name = "AES-GCM with max pad",
+	  .pad = HIGH(MAX_BUF + 1) - (MAX_BUF + 1),
+	  .data = MAX_BUF,
+	  .prio = AES_GCM,
+	  .flags = 0 },
+	{ .name = "AES-GCM with zero pad",
+	  .pad = 0,
+	  .data = MAX_BUF,
+	  .prio = AES_GCM,
+	  .flags = 0 },
+	{ .name = "AES-GCM with 1-byte pad",
+	  .pad = 1,
+	  .data = MAX_BUF,
+	  .prio = AES_GCM,
+	  .flags = 0 },
+	{ .name = "AES-GCM with pad, but no data",
+	  .pad = 16,
+	  .data = 0,
+	  .prio = AES_GCM,
+	  .flags = 0 },
+	{ .name = "AES-GCM with max pad and safe padding check",
+	  .pad = HIGH(MAX_BUF + 1) - (MAX_BUF + 1),
+	  .data = MAX_BUF,
+	  .prio = AES_GCM,
+	  .flags = GNUTLS_SAFE_PADDING_CHECK },
+	{ .name = "AES-GCM with zero pad and safe padding check",
+	  .pad = 0,
+	  .data = MAX_BUF,
+	  .prio = AES_GCM,
+	  .flags = GNUTLS_SAFE_PADDING_CHECK },
+	{ .name = "AES-GCM with 1-byte pad and safe padding check",
+	  .pad = 1,
+	  .data = MAX_BUF,
+	  .prio = AES_GCM,
+	  .flags = GNUTLS_SAFE_PADDING_CHECK },
+	{ .name = "AES-GCM with pad, but no data and safe padding check",
+	  .pad = 16,
+	  .data = 0,
+	  .prio = AES_GCM,
+	  .flags = GNUTLS_SAFE_PADDING_CHECK },
+	{ .name = "AES-GCM with pad, but no data and no pad",
+	  .pad = 0,
+	  .data = 0,
+	  .prio = AES_GCM,
+	  .flags = GNUTLS_SAFE_PADDING_CHECK,
+	  .sret = GNUTLS_E_INVALID_REQUEST },
 };
 
 void doit(void)
@@ -392,4 +381,4 @@ void doit(void)
 	}
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

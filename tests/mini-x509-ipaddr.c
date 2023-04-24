@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -41,7 +41,7 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "%s|<%d>| %s", side, level, str);
 }
 
-static time_t mytime(time_t * t)
+static time_t mytime(time_t *t)
 {
 	time_t then = 1490171562;
 
@@ -100,9 +100,8 @@ void doit(void)
 	if (ret < 0)
 		exit(1);
 
-	ret =
-	    gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca3_cert,
-						  GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca3_cert,
+						    GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);
 
@@ -124,7 +123,6 @@ void doit(void)
 
 	/* attempt to verify */
 	{
-
 		/* try hostname - which is invalid */
 		memset(data, 0, sizeof(data));
 
@@ -186,15 +184,14 @@ void doit(void)
 		}
 
 		if (status != 0) {
-			assert(gnutls_certificate_verification_status_print
-			       (status, GNUTLS_CRT_X509, &t, 0) >= 0);
+			assert(gnutls_certificate_verification_status_print(
+				       status, GNUTLS_CRT_X509, &t, 0) >= 0);
 			fail("could not verify: %s/%.4x!\n", t.data, status);
 		}
 
 		/* try the other verification functions */
-		ret =
-		    gnutls_certificate_verify_peers3(client, "127.0.0.1",
-						     &status);
+		ret = gnutls_certificate_verify_peers3(client, "127.0.0.1",
+						       &status);
 		if (ret < 0) {
 			fail("could not verify certificate: %s\n",
 			     gnutls_strerror(ret));
@@ -202,21 +199,20 @@ void doit(void)
 		}
 
 		if (status != 0) {
-			assert(gnutls_certificate_verification_status_print
-			       (status, GNUTLS_CRT_X509, &t, 0) >= 0);
+			assert(gnutls_certificate_verification_status_print(
+				       status, GNUTLS_CRT_X509, &t, 0) >= 0);
 			fail("could not verify: %s/%.4x!\n", t.data, status);
 		}
 	}
 
 	{
 		/* change the flags */
-		gnutls_certificate_set_verify_flags(clientx509cred,
-						    GNUTLS_VERIFY_DO_NOT_ALLOW_IP_MATCHES);
+		gnutls_certificate_set_verify_flags(
+			clientx509cred, GNUTLS_VERIFY_DO_NOT_ALLOW_IP_MATCHES);
 
 		/* now the compatibility option should fail */
-		ret =
-		    gnutls_certificate_verify_peers3(client, "127.0.0.1",
-						     &status);
+		ret = gnutls_certificate_verify_peers3(client, "127.0.0.1",
+						       &status);
 		if (ret < 0) {
 			fail("could not verify certificate: %s\n",
 			     gnutls_strerror(ret));
@@ -266,8 +262,8 @@ void doit(void)
 		}
 
 		if (status != 0) {
-			assert(gnutls_certificate_verification_status_print
-			       (status, GNUTLS_CRT_X509, &t, 0) >= 0);
+			assert(gnutls_certificate_verification_status_print(
+				       status, GNUTLS_CRT_X509, &t, 0) >= 0);
 			fail("could not verify: %s/%.4x!\n", t.data, status);
 		}
 	}

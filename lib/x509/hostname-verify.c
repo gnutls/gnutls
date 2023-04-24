@@ -43,8 +43,8 @@
  *
  * Returns: non-zero for a successful match, and zero on failure.
  **/
-unsigned
-gnutls_x509_crt_check_hostname(gnutls_x509_crt_t cert, const char *hostname)
+unsigned gnutls_x509_crt_check_hostname(gnutls_x509_crt_t cert,
+					const char *hostname)
 {
 	return gnutls_x509_crt_check_hostname2(cert, hostname, 0);
 }
@@ -66,13 +66,12 @@ static int check_ip(gnutls_x509_crt_t cert, const void *ip, unsigned ip_size)
 	 */
 	for (i = 0; !(ret < 0); i++) {
 		temp_size = sizeof(temp);
-		ret = gnutls_x509_crt_get_subject_alt_name(cert, i,
-							   temp,
+		ret = gnutls_x509_crt_get_subject_alt_name(cert, i, temp,
 							   &temp_size, NULL);
 
 		if (ret == GNUTLS_SAN_IPADDRESS) {
-			if (temp_size == ip_size
-			    && memcmp(temp, ip, ip_size) == 0)
+			if (temp_size == ip_size &&
+			    memcmp(temp, ip, ip_size) == 0)
 				return 1;
 		} else if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER) {
 			ret = 0;
@@ -97,10 +96,9 @@ static int check_ip(gnutls_x509_crt_t cert, const void *ip, unsigned ip_size)
  *
  * Returns: non-zero for a successful match, and zero on failure.
  **/
-unsigned
-gnutls_x509_crt_check_ip(gnutls_x509_crt_t cert,
-			 const unsigned char *ip, unsigned int ip_size,
-			 unsigned int flags)
+unsigned gnutls_x509_crt_check_ip(gnutls_x509_crt_t cert,
+				  const unsigned char *ip, unsigned int ip_size,
+				  unsigned int flags)
 {
 	return check_ip(cert, ip, ip_size);
 }
@@ -110,7 +108,8 @@ gnutls_x509_crt_check_ip(gnutls_x509_crt_t cert,
  * that we do not fallback to CN-ID if we encounter a supported name
  * type.
  */
-#define IS_SAN_SUPPORTED(san) (san==GNUTLS_SAN_DNSNAME||san==GNUTLS_SAN_IPADDRESS)
+#define IS_SAN_SUPPORTED(san) \
+	(san == GNUTLS_SAN_DNSNAME || san == GNUTLS_SAN_IPADDRESS)
 
 /**
  * gnutls_x509_crt_check_hostname2:
@@ -146,9 +145,9 @@ gnutls_x509_crt_check_ip(gnutls_x509_crt_t cert,
  *
  * Since: 3.3.0
  **/
-unsigned
-gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
-				const char *hostname, unsigned int flags)
+unsigned gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
+					 const char *hostname,
+					 unsigned int flags)
 {
 	char dnsname[MAX_CN];
 	size_t dnsnamesize;
@@ -163,9 +162,8 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 
 	/* check whether @hostname is an ip address */
 	if (!(flags & GNUTLS_VERIFY_DO_NOT_ALLOW_IP_MATCHES) &&
-	    ((p = strchr(hostname, ':')) != NULL
-	     || inet_pton(AF_INET, hostname, &ipv4) != 0)) {
-
+	    ((p = strchr(hostname, ':')) != NULL ||
+	     inet_pton(AF_INET, hostname, &ipv4) != 0)) {
 		if (p != NULL) {
 			struct in6_addr ipv6;
 
@@ -184,13 +182,13 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 		return ret;
 	}
 
- hostname_fallback:
+hostname_fallback:
 	/* convert the provided hostname to ACE-Labels domain. */
 	ret = gnutls_idna_map(hostname, strlen(hostname), &out, 0);
 	if (ret < 0) {
-		_gnutls_debug_log
-		    ("unable to convert hostname %s to IDNA format\n",
-		     hostname);
+		_gnutls_debug_log(
+			"unable to convert hostname %s to IDNA format\n",
+			hostname);
 		a_hostname = (char *)hostname;
 	} else {
 		a_hostname = (char *)out.data;
@@ -211,32 +209,29 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 	 * against all those of type dNSName.
 	 */
 	for (i = 0; !(ret < 0); i++) {
-
 		dnsnamesize = sizeof(dnsname);
-		ret = gnutls_x509_crt_get_subject_alt_name(cert, i,
-							   dnsname,
+		ret = gnutls_x509_crt_get_subject_alt_name(cert, i, dnsname,
 							   &dnsnamesize, NULL);
 
 		if (ret == GNUTLS_SAN_DNSNAME) {
 			found_dnsname = 1;
 
 			if (memchr(dnsname, '\0', dnsnamesize)) {
-				_gnutls_debug_log
-				    ("certificate has %s with embedded null in name\n",
-				     dnsname);
+				_gnutls_debug_log(
+					"certificate has %s with embedded null in name\n",
+					dnsname);
 				continue;
 			}
 
 			if (!_gnutls_str_is_print(dnsname, dnsnamesize)) {
-				_gnutls_debug_log
-				    ("invalid (non-ASCII) name in certificate %.*s\n",
-				     (int)dnsnamesize, dnsname);
+				_gnutls_debug_log(
+					"invalid (non-ASCII) name in certificate %.*s\n",
+					(int)dnsnamesize, dnsname);
 				continue;
 			}
 
-			ret =
-			    _gnutls_hostname_compare(dnsname, dnsnamesize,
-						     a_hostname, flags);
+			ret = _gnutls_hostname_compare(dnsname, dnsnamesize,
+						       a_hostname, flags);
 			if (ret != 0) {
 				ret = 1;
 				goto cleanup;
@@ -247,9 +242,8 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 		}
 	}
 
-	if (!have_other_addresses && !found_dnsname
-	    && _gnutls_check_key_purpose(cert, GNUTLS_KP_TLS_WWW_SERVER,
-					 0) != 0) {
+	if (!have_other_addresses && !found_dnsname &&
+	    _gnutls_check_key_purpose(cert, GNUTLS_KP_TLS_WWW_SERVER, 0) != 0) {
 		/* did not get the necessary extension, use CN instead, if the
 		 * certificate would have been acceptable for a TLS WWW server purpose.
 		 * That is because only for that purpose the CN is a valid field to
@@ -259,40 +253,41 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 		/* enforce the RFC6125 (§1.8) requirement that only
 		 * a single CN must be present */
 		dnsnamesize = sizeof(dnsname);
-		ret = gnutls_x509_crt_get_dn_by_oid
-		    (cert, OID_X520_COMMON_NAME, 1, 0, dnsname, &dnsnamesize);
+		ret = gnutls_x509_crt_get_dn_by_oid(cert, OID_X520_COMMON_NAME,
+						    1, 0, dnsname,
+						    &dnsnamesize);
 		if (ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
 			ret = 0;
 			goto cleanup;
 		}
 
 		dnsnamesize = sizeof(dnsname);
-		ret = gnutls_x509_crt_get_dn_by_oid
-		    (cert, OID_X520_COMMON_NAME, 0, 0, dnsname, &dnsnamesize);
+		ret = gnutls_x509_crt_get_dn_by_oid(cert, OID_X520_COMMON_NAME,
+						    0, 0, dnsname,
+						    &dnsnamesize);
 		if (ret < 0) {
 			ret = 0;
 			goto cleanup;
 		}
 
 		if (memchr(dnsname, '\0', dnsnamesize)) {
-			_gnutls_debug_log
-			    ("certificate has CN %s with embedded null in name\n",
-			     dnsname);
+			_gnutls_debug_log(
+				"certificate has CN %s with embedded null in name\n",
+				dnsname);
 			ret = 0;
 			goto cleanup;
 		}
 
 		if (!_gnutls_str_is_print(dnsname, dnsnamesize)) {
-			_gnutls_debug_log
-			    ("invalid (non-ASCII) name in certificate CN %.*s\n",
-			     (int)dnsnamesize, dnsname);
+			_gnutls_debug_log(
+				"invalid (non-ASCII) name in certificate CN %.*s\n",
+				(int)dnsnamesize, dnsname);
 			ret = 0;
 			goto cleanup;
 		}
 
-		ret =
-		    _gnutls_hostname_compare(dnsname, dnsnamesize, a_hostname,
-					     flags);
+		ret = _gnutls_hostname_compare(dnsname, dnsnamesize, a_hostname,
+					       flags);
 		if (ret != 0) {
 			ret = 1;
 			goto cleanup;
@@ -302,7 +297,7 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 	/* not found a matching name
 	 */
 	ret = 0;
- cleanup:
+cleanup:
 	if (a_hostname != hostname) {
 		gnutls_free(a_hostname);
 	}

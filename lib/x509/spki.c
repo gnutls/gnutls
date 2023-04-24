@@ -40,7 +40,7 @@
  * Since: 3.6.0
  *
  **/
-int gnutls_x509_spki_init(gnutls_x509_spki_t * spki)
+int gnutls_x509_spki_init(gnutls_x509_spki_t *spki)
 {
 	gnutls_x509_spki_t tmp;
 
@@ -54,7 +54,7 @@ int gnutls_x509_spki_init(gnutls_x509_spki_t * spki)
 
 	*spki = tmp;
 
-	return 0;		/* success */
+	return 0; /* success */
 }
 
 /**
@@ -83,10 +83,9 @@ void gnutls_x509_spki_deinit(gnutls_x509_spki_t spki)
  * Since: 3.6.0
  *
  **/
-void
-gnutls_x509_spki_set_rsa_pss_params(gnutls_x509_spki_t spki,
-				    gnutls_digest_algorithm_t dig,
-				    unsigned int salt_size)
+void gnutls_x509_spki_set_rsa_pss_params(gnutls_x509_spki_t spki,
+					 gnutls_digest_algorithm_t dig,
+					 unsigned int salt_size)
 {
 	spki->pk = GNUTLS_PK_RSA_PSS;
 	spki->rsa_pss_dig = dig;
@@ -108,10 +107,9 @@ gnutls_x509_spki_set_rsa_pss_params(gnutls_x509_spki_t spki,
  * Since: 3.6.0
  *
  **/
-int
-gnutls_x509_spki_get_rsa_pss_params(gnutls_x509_spki_t spki,
-				    gnutls_digest_algorithm_t * dig,
-				    unsigned int *salt_size)
+int gnutls_x509_spki_get_rsa_pss_params(gnutls_x509_spki_t spki,
+					gnutls_digest_algorithm_t *dig,
+					unsigned int *salt_size)
 {
 	if (spki->pk == 0)
 		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);

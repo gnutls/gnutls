@@ -23,13 +23,13 @@
 
 #ifdef ENABLE_AFALG
 
-# include "errors.h"
-# include "gnutls_int.h"
+#include "errors.h"
+#include "gnutls_int.h"
 
-# include <gnutls/crypto.h>
-# include <kcapi.h>
-# include <limits.h>
-# include "malloca.h"
+#include <gnutls/crypto.h>
+#include <kcapi.h>
+#include <limits.h>
+#include "malloca.h"
 
 /************************ Symmetric cipher algorithms ************************/
 
@@ -52,8 +52,8 @@ static const char *gnutls_cipher_map[] = {
 	[GNUTLS_CIPHER_AES_256_XTS] = "xts(aes)",
 };
 
-static int
-afalg_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx, int enc)
+static int afalg_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx,
+			     int enc)
 {
 	struct kcapi_handle *handle;
 	struct kcapi_ctx *ctx;
@@ -102,14 +102,14 @@ static int afalg_cipher_setiv(void *_ctx, const void *iv, size_t iv_size)
 
 	memcpy(ctx->iv, iv, iv_size);
 	if (ctx->enc) {
-		if (kcapi_cipher_stream_init_enc(ctx->handle, ctx->iv, NULL, 0)
-		    < 0) {
+		if (kcapi_cipher_stream_init_enc(ctx->handle, ctx->iv, NULL,
+						 0) < 0) {
 			gnutls_assert();
 			return GNUTLS_E_ENCRYPTION_FAILED;
 		}
 	} else {
-		if (kcapi_cipher_stream_init_dec(ctx->handle, ctx->iv, NULL, 0)
-		    < 0) {
+		if (kcapi_cipher_stream_init_dec(ctx->handle, ctx->iv, NULL,
+						 0) < 0) {
 			gnutls_assert();
 			return GNUTLS_E_ENCRYPTION_FAILED;
 		}
@@ -218,9 +218,8 @@ static int afalg_cipher_register(void)
 
 		_gnutls_debug_log("afalg: registering: %s\n",
 				  gnutls_cipher_get_name(i));
-		ret = gnutls_crypto_single_cipher_register(i, 90,
-							   &afalg_cipher_struct,
-							   0);
+		ret = gnutls_crypto_single_cipher_register(
+			i, 90, &afalg_cipher_struct, 0);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
@@ -255,8 +254,8 @@ static void afalg_aead_deinit(void *_ctx)
 	gnutls_free(ctx);
 }
 
-static int
-afalg_aead_init(gnutls_cipher_algorithm_t algorithm, void **_ctx, int enc)
+static int afalg_aead_init(gnutls_cipher_algorithm_t algorithm, void **_ctx,
+			   int enc)
 {
 	struct kcapi_handle *handle;
 	struct kcapi_aead_ctx *ctx;
@@ -299,12 +298,10 @@ static int afalg_aead_setkey(void *_ctx, const void *key, size_t keysize)
 	return 0;
 }
 
-static int afalg_aead_decrypt(void *_ctx,
-			      const void *nonce, size_t nonce_size,
+static int afalg_aead_decrypt(void *_ctx, const void *nonce, size_t nonce_size,
 			      const void *auth, size_t auth_size,
-			      size_t tag_size,
-			      const void *encr, size_t encr_size,
-			      void *plain, size_t plain_size)
+			      size_t tag_size, const void *encr,
+			      size_t encr_size, void *plain, size_t plain_size)
 {
 	int ret = 0;
 	struct kcapi_aead_ctx *ctx = _ctx;
@@ -349,8 +346,8 @@ static int afalg_aead_decrypt(void *_ctx,
 			ret = GNUTLS_E_DECRYPTION_FAILED;
 			goto end;
 		}
-		if (kcapi_aead_stream_init_dec(ctx->handle, ccm_iv, NULL, 0)
-		    < 0) {
+		if (kcapi_aead_stream_init_dec(ctx->handle, ccm_iv, NULL, 0) <
+		    0) {
 			free(ccm_iv);
 			gnutls_assert();
 			ret = GNUTLS_E_DECRYPTION_FAILED;
@@ -358,8 +355,8 @@ static int afalg_aead_decrypt(void *_ctx,
 		}
 		free(ccm_iv);
 	} else {
-		if (kcapi_aead_stream_init_dec(ctx->handle, nonce, NULL, 0)
-		    < 0) {
+		if (kcapi_aead_stream_init_dec(ctx->handle, nonce, NULL, 0) <
+		    0) {
 			gnutls_assert();
 			ret = GNUTLS_E_DECRYPTION_FAILED;
 			goto end;
@@ -392,8 +389,8 @@ static int afalg_aead_decrypt(void *_ctx,
 	/* Set PT buffer to be filled by kernel */
 	uint32_t outbuflen = kcapi_aead_outbuflen_dec(ctx->handle,
 						      encr_size - tag_size,
-						      auth_size,
-						      tag_size) - auth_size;
+						      auth_size, tag_size) -
+			     auth_size;
 	iov[1].iov_base = (void *)plain;
 	iov[1].iov_len = (plain_size > outbuflen) ? outbuflen : plain_size;
 
@@ -403,16 +400,15 @@ static int afalg_aead_decrypt(void *_ctx,
 		goto end;
 	}
 
- end:
+end:
 	freea(authtmp);
 	return ret;
 }
 
 static int afalg_aead_encrypt(void *_ctx, const void *nonce, size_t nonce_size,
 			      const void *auth, size_t auth_size,
-			      size_t tag_size,
-			      const void *plain, size_t plain_size,
-			      void *encr, size_t encr_size)
+			      size_t tag_size, const void *plain,
+			      size_t plain_size, void *encr, size_t encr_size)
 {
 	int ret = 0;
 	struct kcapi_aead_ctx *ctx = _ctx;
@@ -460,8 +456,8 @@ static int afalg_aead_encrypt(void *_ctx, const void *nonce, size_t nonce_size,
 			ret = GNUTLS_E_ENCRYPTION_FAILED;
 			goto end;
 		}
-		if (kcapi_aead_stream_init_enc(ctx->handle, ccm_iv, NULL, 0)
-		    < 0) {
+		if (kcapi_aead_stream_init_enc(ctx->handle, ccm_iv, NULL, 0) <
+		    0) {
 			free(ccm_iv);
 			gnutls_assert();
 			ret = GNUTLS_E_ENCRYPTION_FAILED;
@@ -469,8 +465,8 @@ static int afalg_aead_encrypt(void *_ctx, const void *nonce, size_t nonce_size,
 		}
 		free(ccm_iv);
 	} else {
-		if (kcapi_aead_stream_init_enc(ctx->handle, nonce, NULL, 0)
-		    < 0) {
+		if (kcapi_aead_stream_init_enc(ctx->handle, nonce, NULL, 0) <
+		    0) {
 			gnutls_assert();
 			ret = GNUTLS_E_ENCRYPTION_FAILED;
 			goto end;
@@ -513,9 +509,9 @@ static int afalg_aead_encrypt(void *_ctx, const void *nonce, size_t nonce_size,
 	iov[0].iov_len = auth_size;
 
 	/* Set CT buffer to be filled by kernel */
-	uint32_t outbuflen = kcapi_aead_outbuflen_enc(ctx->handle,
-						      plain_size, auth_size,
-						      tag_size) - auth_size;
+	uint32_t outbuflen = kcapi_aead_outbuflen_enc(ctx->handle, plain_size,
+						      auth_size, tag_size) -
+			     auth_size;
 
 	iov[1].iov_base = encr;
 	iov[1].iov_len = (encr_size > outbuflen) ? outbuflen : encr_size;
@@ -526,7 +522,7 @@ static int afalg_aead_encrypt(void *_ctx, const void *nonce, size_t nonce_size,
 		goto end;
 	}
 
- end:
+end:
 	freea(authtmp);
 	return ret;
 }
@@ -544,8 +540,8 @@ static int afalg_aead_register(void)
 	unsigned int i;
 	int ret = 0;
 
-	for (i = 0;
-	     i < sizeof(gnutls_aead_map) / sizeof(gnutls_aead_map[0]); i++) {
+	for (i = 0; i < sizeof(gnutls_aead_map) / sizeof(gnutls_aead_map[0]);
+	     i++) {
 		struct kcapi_handle *handle;
 
 		if (gnutls_aead_map[i] == 0)
@@ -559,9 +555,8 @@ static int afalg_aead_register(void)
 
 		_gnutls_debug_log("afalg: registering: %s\n",
 				  gnutls_cipher_get_name(i));
-		ret = gnutls_crypto_single_cipher_register(i, 90,
-							   &afalg_aead_struct,
-							   0);
+		ret = gnutls_crypto_single_cipher_register(
+			i, 90, &afalg_aead_struct, 0);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
@@ -639,7 +634,6 @@ static int afalg_mac_output(void *ctx, void *digest, size_t digestsize)
 	}
 
 	return 0;
-
 }
 
 static void afalg_mac_deinit(void *ctx)
@@ -686,7 +680,7 @@ static int afalg_mac_fast(gnutls_mac_algorithm_t algorithm, const void *nonce,
 
 	ret = 0;
 
- out:
+out:
 	kcapi_md_destroy(handle);
 
 	return ret;
@@ -707,7 +701,8 @@ static int afalg_mac_register(void)
 	unsigned int i;
 	int ret = 0;
 
-	for (i = 0; i < sizeof(gnutls_mac_map) / sizeof(gnutls_mac_map[0]); i++) {
+	for (i = 0; i < sizeof(gnutls_mac_map) / sizeof(gnutls_mac_map[0]);
+	     i++) {
 		struct kcapi_handle *handle;
 
 		if (gnutls_mac_map[i] == 0)
@@ -787,7 +782,7 @@ static int afalg_digest_fast(gnutls_digest_algorithm_t algorithm,
 
 	ret = 0;
 
- out:
+out:
 	kcapi_md_destroy(handle);
 
 	return ret;
@@ -822,9 +817,8 @@ static int afalg_digest_register(void)
 
 		_gnutls_debug_log("afalg: registering: %s\n",
 				  gnutls_digest_get_name(i));
-		ret = gnutls_crypto_single_digest_register(i, 90,
-							   &afalg_digest_struct,
-							   0);
+		ret = gnutls_crypto_single_digest_register(
+			i, 90, &afalg_digest_struct, 0);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
@@ -858,7 +852,7 @@ void _gnutls_afalg_deinit(void)
 	return;
 }
 
-#else				/* ENABLE_AFALG */
+#else /* ENABLE_AFALG */
 
 int _gnutls_afalg_init(void)
 {
@@ -870,4 +864,4 @@ void _gnutls_afalg_deinit(void)
 	return;
 }
 
-#endif				/* ENABLE_AFALG */
+#endif /* ENABLE_AFALG */

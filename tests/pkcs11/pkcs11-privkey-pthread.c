@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,11 +35,11 @@
 #include <unistd.h>
 #include <assert.h>
 #ifndef _WIN32
-# include <netinet/in.h>
-# include <sys/types.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <pthread.h>
+#include <netinet/in.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <pthread.h>
 #endif
 #include "utils.h"
 
@@ -52,20 +52,20 @@ void doit(void)
 
 #else
 
-# ifdef _WIN32
-#  define P11LIB "libpkcs11mock1.dll"
-# else
-#  include <dlfcn.h>
-#  define P11LIB "libpkcs11mock1.so"
-# endif
+#ifdef _WIN32
+#define P11LIB "libpkcs11mock1.dll"
+#else
+#include <dlfcn.h>
+#define P11LIB "libpkcs11mock1.so"
+#endif
 
 /* Tests whether we can use gnutls_privkey_sign() under multiple threads
  * with the same key when PKCS#11 is in use.
  */
 
-# include "../cert-common.h"
+#include "../cert-common.h"
 
-# define PIN "1234"
+#define PIN "1234"
 
 static const gnutls_datum_t testdata = { (void *)"test test", 9 };
 
@@ -74,9 +74,9 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "|<%d>| %s", level, str);
 }
 
-static
-int pin_func(void *userdata, int attempt, const char *url, const char *label,
-	     unsigned flags, char *pin, size_t pin_max)
+static int pin_func(void *userdata, int attempt, const char *url,
+		    const char *label, unsigned flags, char *pin,
+		    size_t pin_max)
 {
 	if (attempt == 0) {
 		strcpy(pin, PIN);
@@ -96,9 +96,8 @@ static void *start_thread(void *arg)
 	int ret;
 	gnutls_datum_t sig;
 
-	ret =
-	    gnutls_privkey_sign_data(data->pkey, GNUTLS_DIG_SHA256, 0,
-				     &testdata, &sig);
+	ret = gnutls_privkey_sign_data(data->pkey, GNUTLS_DIG_SHA256, 0,
+				       &testdata, &sig);
 	if (ret < 0)
 		pthread_exit((void *)-2);
 
@@ -107,10 +106,9 @@ static void *start_thread(void *arg)
 	pthread_exit(0);
 }
 
-# define MAX_THREADS 48
+#define MAX_THREADS 48
 
-static
-void do_thread_stuff(gnutls_privkey_t pkey)
+static void do_thread_stuff(gnutls_privkey_t pkey)
 {
 	int ret;
 	thread_data_st *data;
@@ -136,7 +134,6 @@ void do_thread_stuff(gnutls_privkey_t pkey)
 		}
 	}
 	free(data);
-
 }
 
 void doit(void)
@@ -171,9 +168,8 @@ void doit(void)
 
 	assert(gnutls_privkey_init(&pkey) == 0);
 
-	ret =
-	    gnutls_privkey_import_url(pkey, "pkcs11:object=test",
-				      GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
+	ret = gnutls_privkey_import_url(pkey, "pkcs11:object=test",
+					GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
 	if (ret < 0) {
 		fprintf(stderr, "error in %d: %s\n", __LINE__,
 			gnutls_strerror(ret));
@@ -192,7 +188,7 @@ void doit(void)
 
 	do_thread_stuff(pkey);
 
- cleanup:
+cleanup:
 	gnutls_privkey_deinit(pkey);
 }
 

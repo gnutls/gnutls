@@ -22,7 +22,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -38,20 +38,20 @@ int main(void)
 
 #else
 
-# include <string.h>
-# include <sys/types.h>
-# include <netinet/in.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <arpa/inet.h>
-# include <unistd.h>
-# include <time.h>
-# include <gnutls/gnutls.h>
-# include <gnutls/dtls.h>
-# include <signal.h>
+#include <string.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <time.h>
+#include <gnutls/gnutls.h>
+#include <gnutls/dtls.h>
+#include <signal.h>
 
-# include "utils.h"
-# include "cert-common.h"
+#include "utils.h"
+#include "cert-common.h"
 
 /* This program tests that handshakes succeed if the server includes the
  * requested certificate status with the server certificate having
@@ -60,7 +60,7 @@ int main(void)
  * See RFC 7633
  */
 
-static time_t mytime(time_t * t)
+static time_t mytime(time_t *t)
 {
 	time_t then = 1559941819;
 	if (t)
@@ -135,13 +135,13 @@ static int received = 0;
 
 static int handshake_callback(gnutls_session_t session, unsigned int htype,
 			      unsigned post, unsigned int incoming,
-			      const gnutls_datum_t * msg)
+			      const gnutls_datum_t *msg)
 {
 	received = 1;
 	return 0;
 }
 
-# define MAX_BUF 1024
+#define MAX_BUF 1024
 
 static void client(int fd, const char *prio)
 {
@@ -159,8 +159,8 @@ static void client(int fd, const char *prio)
 	}
 
 	assert(gnutls_certificate_allocate_credentials(&x509_cred) >= 0);
-	assert(gnutls_certificate_set_x509_trust_mem
-	       (x509_cred, &ca3_cert, GNUTLS_X509_FMT_PEM) >= 0);
+	assert(gnutls_certificate_set_x509_trust_mem(x509_cred, &ca3_cert,
+						     GNUTLS_X509_FMT_PEM) >= 0);
 
 	assert(gnutls_init(&session, GNUTLS_CLIENT) >= 0);
 
@@ -177,8 +177,7 @@ static void client(int fd, const char *prio)
 
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 	if (ret < 0) {
 		fail("client: Handshake failed: %s\n", gnutls_strerror(ret));
 	} else {
@@ -188,11 +187,11 @@ static void client(int fd, const char *prio)
 
 	if (debug)
 		success("client: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
-	if (received == 0
-	    && gnutls_protocol_get_version(session) == GNUTLS_TLS1_2) {
+	if (received == 0 &&
+	    gnutls_protocol_get_version(session) == GNUTLS_TLS1_2) {
 		fail("client: did not receive certificate status when we should.\n");
 	}
 
@@ -203,9 +202,10 @@ static void client(int fd, const char *prio)
 	} else {
 		if (status) {
 			gnutls_datum_t tmp;
-			assert(gnutls_certificate_verification_status_print
-			       (status, GNUTLS_CRT_X509, &tmp, 0) >= 0);
-			fail("client: Validation status is not success (%x: %s)\n", status, (char *)tmp.data);
+			assert(gnutls_certificate_verification_status_print(
+				       status, GNUTLS_CRT_X509, &tmp, 0) >= 0);
+			fail("client: Validation status is not success (%x: %s)\n",
+			     status, (char *)tmp.data);
 		}
 	}
 
@@ -221,7 +221,7 @@ static void client(int fd, const char *prio)
 }
 
 static int status_func(gnutls_session_t session, void *ptr,
-		       gnutls_datum_t * resp)
+		       gnutls_datum_t *resp)
 {
 	resp->data = gnutls_malloc(sizeof(ocsp_resp));
 	if (resp->data == NULL)
@@ -250,9 +250,9 @@ static void server(int fd, const char *prio)
 	}
 
 	assert(gnutls_certificate_allocate_credentials(&x509_cred) >= 0);
-	assert(gnutls_certificate_set_x509_key_mem
-	       (x509_cred, &server_ca3_tlsfeat_cert, &server_ca3_key,
-		GNUTLS_X509_FMT_PEM) >= 0);
+	assert(gnutls_certificate_set_x509_key_mem(
+		       x509_cred, &server_ca3_tlsfeat_cert, &server_ca3_key,
+		       GNUTLS_X509_FMT_PEM) >= 0);
 
 	assert(gnutls_init(&session, GNUTLS_SERVER) >= 0);
 
@@ -279,8 +279,8 @@ static void server(int fd, const char *prio)
 
 	if (debug)
 		success("server: TLS version is: %s\n",
-			gnutls_protocol_get_name
-			(gnutls_protocol_get_version(session)));
+			gnutls_protocol_get_name(
+				gnutls_protocol_get_version(session)));
 
 	/* do not wait for the peer to close the connection.
 	 */
@@ -349,4 +349,4 @@ void doit(void)
 	start("default", "NORMAL");
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

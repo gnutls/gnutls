@@ -24,7 +24,7 @@
 
 #ifndef ENABLE_PSK
 
-# include <stdio.h>
+#include <stdio.h>
 
 int main(int argc, char **argv)
 {
@@ -34,43 +34,42 @@ int main(int argc, char **argv)
 
 #else
 
-# include <stdio.h>
-# include <string.h>
-# include <stdlib.h>
-# include <errno.h>
-# include <gnutls/gnutls.h>
-# include "psktool-options.h"
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <gnutls/gnutls.h>
+#include "psktool-options.h"
 
-# include <gnutls/crypto.h>	/* for random */
+#include <gnutls/crypto.h> /* for random */
 
-# include <stdbool.h>
-# include <sys/types.h>
-# include <sys/stat.h>
+#include <stdbool.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
-# ifndef _WIN32
-#  include <pwd.h>
-#  include <unistd.h>
-# else
-#  include <windows.h>
-# endif
+#ifndef _WIN32
+#include <pwd.h>
+#include <unistd.h>
+#else
+#include <windows.h>
+#endif
 
 /* Gnulib portability files. */
-# include <minmax.h>
-# include "close-stream.h"
-# include "getpass.h"
-# include "xsize.h"
+#include <minmax.h>
+#include "close-stream.h"
+#include "getpass.h"
+#include "xsize.h"
 
-static int write_key(const char *username,
-		     const unsigned char *key, size_t key_size,
-		     const char *passwd_file);
+static int write_key(const char *username, const unsigned char *key,
+		     size_t key_size, const char *passwd_file);
 
-# define MAX_KEY_SIZE 512
+#define MAX_KEY_SIZE 512
 int main(int argc, char **argv)
 {
 	int ret;
-# ifndef _WIN32
+#ifndef _WIN32
 	struct passwd *pwd;
-# endif
+#endif
 	unsigned char key[MAX_KEY_SIZE];
 	size_t key_size;
 	const char *passwd, *username;
@@ -91,7 +90,7 @@ int main(int argc, char **argv)
 		passwd = OPT_ARG(PSKFILE);
 
 	if (!HAVE_OPT(USERNAME)) {
-# ifndef _WIN32
+#ifndef _WIN32
 		pwd = getpwuid(getuid());
 
 		if (pwd == NULL) {
@@ -100,10 +99,10 @@ int main(int argc, char **argv)
 		}
 
 		username = pwd->pw_name;
-# else
+#else
 		fprintf(stderr, "Please specify a user\n");
 		return -1;
-# endif
+#endif
 	} else
 		username = OPT_ARG(USERNAME);
 
@@ -158,8 +157,7 @@ static int filecopy(const char *src, const char *dst)
 			break;
 
 		fputs(line, fp);
-	}
-	while (1);
+	} while (1);
 
 	fclose(fp);
 	fclose(fp2);
@@ -167,9 +165,8 @@ static int filecopy(const char *src, const char *dst)
 	return 0;
 }
 
-static int
-write_key(const char *username, const unsigned char *key, size_t key_size,
-	  const char *passwd_file)
+static int write_key(const char *username, const unsigned char *key,
+		     size_t key_size, const char *passwd_file)
 {
 	FILE *fp;
 	char line[5 * 1024];
@@ -288,10 +285,10 @@ write_key(const char *username, const unsigned char *key, size_t key_size,
 		fprintf(fp, "%s:%s\n", _username.data, _key.data);
 	}
 
- out:
+out:
 	if (close_stream(fp) == EOF) {
-		fprintf(stderr, "Error writing %s: %s\n",
-			passwd_file, strerror(errno));
+		fprintf(stderr, "Error writing %s: %s\n", passwd_file,
+			strerror(errno));
 		ret = -1;
 	}
 
@@ -304,4 +301,4 @@ write_key(const char *username, const unsigned char *key, size_t key_size,
 	return ret;
 }
 
-#endif				/* ENABLE_PSK */
+#endif /* ENABLE_PSK */

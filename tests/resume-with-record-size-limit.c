@@ -24,7 +24,7 @@
 /* Parts copied from GnuTLS example programs. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -40,31 +40,34 @@ int main(int argc, char **argv)
 
 #else
 
-# ifndef _GNU_SOURCE
-#  define _GNU_SOURCE
-# endif
-# include <string.h>
-# include <stdint.h>
-# include <sys/types.h>
-# include <sys/socket.h>
-# if !defined(_WIN32)
-#  include <sys/wait.h>
-# endif
-# include <unistd.h>
-# include <gnutls/gnutls.h>
-# include <sys/wait.h>
-# include <signal.h>
-# include <assert.h>
-# include "utils.h"
-# include "cert-common.h"
-# include "virt-time.h"
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+#include <string.h>
+#include <stdint.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#if !defined(_WIN32)
+#include <sys/wait.h>
+#endif
+#include <unistd.h>
+#include <gnutls/gnutls.h>
+#include <sys/wait.h>
+#include <signal.h>
+#include <assert.h>
+#include "utils.h"
+#include "cert-common.h"
+#include "virt-time.h"
 
-# define SKIP8(pos, total) { \
-	uint8_t _s; \
-	if (pos+1 > total) fail("error\n"); \
-	_s = msg->data[pos]; \
-	if ((size_t)(pos+1+_s) > total) fail("error\n"); \
-	pos += 1+_s; \
+#define SKIP8(pos, total)                           \
+	{                                           \
+		uint8_t _s;                         \
+		if (pos + 1 > total)                \
+			fail("error\n");            \
+		_s = msg->data[pos];                \
+		if ((size_t)(pos + 1 + _s) > total) \
+			fail("error\n");            \
+		pos += 1 + _s;                      \
 	}
 
 pid_t child;
@@ -72,14 +75,14 @@ pid_t child;
 /* A very basic TLS client, with anonymous authentication.
  */
 
-# define SESSIONS 2
-# define MAX_BUF 5*1024
-# define MSG "Hello TLS"
+#define SESSIONS 2
+#define MAX_BUF 5 * 1024
+#define MSG "Hello TLS"
 
 /* 2^13, which is not supported by max_fragment_length */
-# define MAX_DATA_SIZE 8192
+#define MAX_DATA_SIZE 8192
 
-# define HANDSHAKE_SESSION_ID_POS (2+32)
+#define HANDSHAKE_SESSION_ID_POS (2 + 32)
 
 static void tls_log_func(int level, const char *str)
 {
@@ -90,7 +93,7 @@ static void tls_log_func(int level, const char *str)
 static int ext_callback(void *ctx, unsigned tls_id, const unsigned char *data,
 			unsigned size)
 {
-	if (tls_id == 28) {	/* record size limit */
+	if (tls_id == 28) { /* record size limit */
 		uint16_t max_data_size;
 
 		assert(size == 2);
@@ -104,7 +107,7 @@ static int ext_callback(void *ctx, unsigned tls_id, const unsigned char *data,
 
 static int handshake_callback(gnutls_session_t session, unsigned int htype,
 			      unsigned post, unsigned int incoming,
-			      const gnutls_datum_t * msg)
+			      const gnutls_datum_t *msg)
 {
 	int ret;
 	unsigned pos;
@@ -154,8 +157,8 @@ static void client(int sds[], const char *prio)
 
 	gnutls_certificate_allocate_credentials(&clientx509cred);
 
-	assert(gnutls_certificate_set_x509_key_mem(clientx509cred,
-						   &cli_cert, &cli_key,
+	assert(gnutls_certificate_set_x509_key_mem(clientx509cred, &cli_cert,
+						   &cli_key,
 						   GNUTLS_X509_FMT_PEM) >= 0);
 
 	for (t = 0; t < SESSIONS; t++) {
@@ -172,8 +175,8 @@ static void client(int sds[], const char *prio)
 				       clientx509cred);
 
 		if (t == 0) {
-			ret =
-			    gnutls_record_set_max_size(session, MAX_DATA_SIZE);
+			ret = gnutls_record_set_max_size(session,
+							 MAX_DATA_SIZE);
 			if (ret < 0)
 				fail("gnutls_set_max_size: %s\n",
 				     gnutls_strerror(ret));
@@ -214,7 +217,7 @@ static void client(int sds[], const char *prio)
 			if (ret < 0)
 				fail("Getting resume data failed\n");
 
-		} else {	/* the second time we connect */
+		} else { /* the second time we connect */
 			/* check if we actually resumed the previous session */
 			if (gnutls_session_is_resumed(session) == 0) {
 				fail("- Previous session was resumed but NOT expected\n");
@@ -228,8 +231,7 @@ static void client(int sds[], const char *prio)
 		} while (ret == GNUTLS_E_AGAIN);
 		if (ret == 0) {
 			if (debug)
-				success
-				    ("client: Peer has closed the TLS connection\n");
+				success("client: Peer has closed the TLS connection\n");
 			break;
 		} else if (ret < 0) {
 			fail("client: Error: %s\n", gnutls_strerror(ret));
@@ -285,8 +287,8 @@ static void server(int sds[], const char *prio)
 	}
 
 	gnutls_certificate_allocate_credentials(&serverx509cred);
-	assert(gnutls_certificate_set_x509_key_mem(serverx509cred,
-						   &server_cert, &server_key,
+	assert(gnutls_certificate_set_x509_key_mem(serverx509cred, &server_cert,
+						   &server_key,
 						   GNUTLS_X509_FMT_PEM) >= 0);
 
 	gnutls_session_ticket_key_generate(&session_ticket_key);
@@ -340,12 +342,12 @@ static void server(int sds[], const char *prio)
 
 			if (ret == 0) {
 				if (debug)
-					success
-					    ("server: Peer has closed the GnuTLS connection\n");
+					success("server: Peer has closed the GnuTLS connection\n");
 				break;
 			} else if (ret < 0) {
 				kill(child, SIGTERM);
-				fail("server: Received corrupted data(%d). Closing...\n", ret);
+				fail("server: Received corrupted data(%d). Closing...\n",
+				     ret);
 				break;
 			} else if (ret > 0) {
 				/* echo data back to the client
@@ -424,4 +426,4 @@ void doit(void)
 	run("NORMAL:-VERS-ALL:+VERS-TLS1.3");
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

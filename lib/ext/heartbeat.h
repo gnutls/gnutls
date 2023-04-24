@@ -22,23 +22,23 @@
  */
 
 #ifndef GNUTLS_LIB_EXT_HEARTBEAT_H
-# define GNUTLS_LIB_EXT_HEARTBEAT_H
+#define GNUTLS_LIB_EXT_HEARTBEAT_H
 
-# include <hello_ext.h>
+#include <hello_ext.h>
 
-# define HEARTBEAT_REQUEST 1
-# define HEARTBEAT_RESPONSE 2
+#define HEARTBEAT_REQUEST 1
+#define HEARTBEAT_RESPONSE 2
 
-# define MAX_HEARTBEAT_LENGTH DEFAULT_MAX_RECORD_SIZE
+#define MAX_HEARTBEAT_LENGTH DEFAULT_MAX_RECORD_SIZE
 
-# define LOCAL_ALLOWED_TO_SEND (1<<2)
-# define LOCAL_NOT_ALLOWED_TO_SEND (1<<3)
+#define LOCAL_ALLOWED_TO_SEND (1 << 2)
+#define LOCAL_NOT_ALLOWED_TO_SEND (1 << 3)
 
-# define HEARTBEAT_DEFAULT_POLICY PEER_NOT_ALLOWED_TO_SEND
+#define HEARTBEAT_DEFAULT_POLICY PEER_NOT_ALLOWED_TO_SEND
 
 extern const hello_ext_entry_st ext_mod_heartbeat;
 
-int _gnutls_heartbeat_handle(gnutls_session_t session, mbuffer_st * bufel);
+int _gnutls_heartbeat_handle(gnutls_session_t session, mbuffer_st *bufel);
 int _gnutls_heartbeat_enabled(gnutls_session_t session, int local);
 
-#endif				/* GNUTLS_LIB_EXT_HEARTBEAT_H */
+#endif /* GNUTLS_LIB_EXT_HEARTBEAT_H */

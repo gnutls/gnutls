@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -30,9 +30,9 @@
 
 #include "utils.h"
 
-static void
-try_prio(const char *prio, unsigned group_size, const unsigned int *group_list,
-	 unsigned curve_size, const unsigned int *curve_list)
+static void try_prio(const char *prio, unsigned group_size,
+		     const unsigned int *group_list, unsigned curve_size,
+		     const unsigned int *curve_list)
 {
 	int ret;
 	gnutls_priority_t p;
@@ -101,9 +101,9 @@ void doit(void)
 	list1[2] = GNUTLS_GROUP_FFDHE2048;
 	list2[0] = GNUTLS_ECC_CURVE_SECP256R1;
 	list2[1] = GNUTLS_ECC_CURVE_SECP384R1;
-	try_prio
-	    ("NORMAL:-GROUP-ALL:+GROUP-SECP256R1:+GROUP-SECP384R1:+GROUP-FFDHE2048",
-	     3, list1, 2, list2);
+	try_prio(
+		"NORMAL:-GROUP-ALL:+GROUP-SECP256R1:+GROUP-SECP384R1:+GROUP-FFDHE2048",
+		3, list1, 2, list2);
 
 	memset(list1, 0, sizeof(list1));
 	memset(list2, 0, sizeof(list2));
@@ -113,7 +113,7 @@ void doit(void)
 	list1[3] = GNUTLS_GROUP_FFDHE3072;
 	list2[0] = GNUTLS_ECC_CURVE_SECP521R1;
 	list2[1] = GNUTLS_ECC_CURVE_SECP384R1;
-	try_prio
-	    ("NORMAL:-CURVE-ALL:+CURVE-SECP521R1:+GROUP-SECP384R1:+GROUP-FFDHE2048:+GROUP-FFDHE3072",
-	     4, list1, 2, list2);
+	try_prio(
+		"NORMAL:-CURVE-ALL:+CURVE-SECP521R1:+GROUP-SECP384R1:+GROUP-FFDHE2048:+GROUP-FFDHE3072",
+		4, list1, 2, list2);
 }

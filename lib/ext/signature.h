@@ -21,25 +21,23 @@
  */
 
 #ifndef GNUTLS_LIB_EXT_SIGNATURE_H
-# define GNUTLS_LIB_EXT_SIGNATURE_H
+#define GNUTLS_LIB_EXT_SIGNATURE_H
 
 /* signature algorithms extension
  */
 
-# include <hello_ext.h>
+#include <hello_ext.h>
 
 extern const hello_ext_entry_st ext_mod_sig;
 
 gnutls_sign_algorithm_t
-_gnutls_session_get_sign_algo(gnutls_session_t session,
-			      gnutls_pcert_st * cert,
-			      gnutls_privkey_t privkey,
-			      unsigned client_cert,
+_gnutls_session_get_sign_algo(gnutls_session_t session, gnutls_pcert_st *cert,
+			      gnutls_privkey_t privkey, unsigned client_cert,
 			      gnutls_kx_algorithm_t kx_algorithm);
 int _gnutls_sign_algorithm_parse_data(gnutls_session_t session,
-				      const uint8_t * data, size_t data_size);
+				      const uint8_t *data, size_t data_size);
 int _gnutls_sign_algorithm_write_params(gnutls_session_t session,
-					gnutls_buffer_st * extdata);
+					gnutls_buffer_st *extdata);
 int _gnutls_session_sign_algo_enabled(gnutls_session_t session,
 				      gnutls_sign_algorithm_t sig);
 
@@ -57,4 +55,4 @@ gnutls_sign_algorithm_set_client(gnutls_session_t session,
 	session->security_parameters.client_sign_algo = sign;
 }
 
-#endif				/* GNUTLS_LIB_EXT_SIGNATURE_H */
+#endif /* GNUTLS_LIB_EXT_SIGNATURE_H */

@@ -17,15 +17,15 @@ int main(int argc, char **argv)
 	int ret;
 	unsigned int i;
 
-	ret = gnutls_pkcs11_obj_list_import_url4(&obj_list, &obj_list_size, URL,
-						 GNUTLS_PKCS11_OBJ_FLAG_CRT |
-						 GNUTLS_PKCS11_OBJ_FLAG_WITH_PRIVKEY);
+	ret = gnutls_pkcs11_obj_list_import_url4(
+		&obj_list, &obj_list_size, URL,
+		GNUTLS_PKCS11_OBJ_FLAG_CRT |
+			GNUTLS_PKCS11_OBJ_FLAG_WITH_PRIVKEY);
 	if (ret < 0)
 		return -1;
 
 	/* now all certificates are in obj_list */
 	for (i = 0; i < obj_list_size; i++) {
-
 		gnutls_x509_crt_init(&xcrt);
 
 		gnutls_x509_crt_import_pkcs11(xcrt, obj_list[i]);

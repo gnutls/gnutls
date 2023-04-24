@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -50,8 +50,9 @@ enum {
 	TESTNO_MAX
 };
 
-#define myfail(fmt, ...) \
-	fail("%s%s %d: "fmt, dtls?"dtls":"tls", name, testno, ##__VA_ARGS__)
+#define myfail(fmt, ...)                                           \
+	fail("%s%s %d: " fmt, dtls ? "dtls" : "tls", name, testno, \
+	     ##__VA_ARGS__)
 
 static void try(const char *name, unsigned testno, unsigned fs,
 		const char *prio, unsigned dhsize, unsigned dtls)
@@ -68,10 +69,10 @@ static void try(const char *name, unsigned testno, unsigned fs,
 	gnutls_certificate_credentials_t clientx509cred;
 	gnutls_session_t client;
 	int cret = GNUTLS_E_AGAIN;
-	const gnutls_datum_t p3_2048 =
-	    { (void *)pkcs3_2048, strlen(pkcs3_2048) };
-	const gnutls_datum_t p3_3072 =
-	    { (void *)pkcs3_3072, strlen(pkcs3_3072) };
+	const gnutls_datum_t p3_2048 = { (void *)pkcs3_2048,
+					 strlen(pkcs3_2048) };
+	const gnutls_datum_t p3_3072 = { (void *)pkcs3_3072,
+					 strlen(pkcs3_3072) };
 	gnutls_dh_params_t dh_params;
 	unsigned flags = 0;
 
@@ -101,11 +102,10 @@ static void try(const char *name, unsigned testno, unsigned fs,
 	gnutls_anon_set_server_dh_params(serveranoncred, dh_params);
 
 	gnutls_certificate_allocate_credentials(&serverx509cred);
-	gnutls_certificate_set_x509_key_mem(serverx509cred,
-					    &server_cert, &server_key,
-					    GNUTLS_X509_FMT_PEM);
-	gnutls_certificate_set_x509_key_mem(serverx509cred,
-					    &server_ecc_cert, &server_ecc_key,
+	gnutls_certificate_set_x509_key_mem(serverx509cred, &server_cert,
+					    &server_key, GNUTLS_X509_FMT_PEM);
+	gnutls_certificate_set_x509_key_mem(serverx509cred, &server_ecc_cert,
+					    &server_ecc_key,
 					    GNUTLS_X509_FMT_PEM);
 	gnutls_certificate_set_dh_params(serverx509cred, dh_params);
 
@@ -128,15 +128,13 @@ static void try(const char *name, unsigned testno, unsigned fs,
 	if (ret < 0)
 		exit(1);
 
-	ret =
-	    gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca_cert,
-						  GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca_cert,
+						    GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);
 
-	ret =
-	    gnutls_init(&client,
-			GNUTLS_CLIENT | GNUTLS_ENABLE_FALSE_START | flags);
+	ret = gnutls_init(&client,
+			  GNUTLS_CLIENT | GNUTLS_ENABLE_FALSE_START | flags);
 	if (ret < 0)
 		exit(1);
 
@@ -161,20 +159,20 @@ static void try(const char *name, unsigned testno, unsigned fs,
 
 	HANDSHAKE(client, server);
 
-	if ((gnutls_session_get_flags(client) & GNUTLS_SFLAGS_FALSE_START)
-	    && !fs) {
+	if ((gnutls_session_get_flags(client) & GNUTLS_SFLAGS_FALSE_START) &&
+	    !fs) {
 		myfail("false start occurred but not expected\n");
 	}
 
-	if (!(gnutls_session_get_flags(client) & GNUTLS_SFLAGS_FALSE_START)
-	    && fs) {
+	if (!(gnutls_session_get_flags(client) & GNUTLS_SFLAGS_FALSE_START) &&
+	    fs) {
 		myfail("false start expected but not happened\n");
 	}
 
 	if (testno == TEST_SEND_RECV) {
 		side = "client";
-		ret =
-		    gnutls_record_send(client, TESTDATA, sizeof(TESTDATA) - 1);
+		ret = gnutls_record_send(client, TESTDATA,
+					 sizeof(TESTDATA) - 1);
 		if (ret < 0) {
 			myfail("error sending false start data: %s\n",
 			       gnutls_strerror(ret));
@@ -198,8 +196,8 @@ static void try(const char *name, unsigned testno, unsigned fs,
 		}
 
 		/* check handshake completion */
-		ret =
-		    gnutls_record_send(server, TESTDATA, sizeof(TESTDATA) - 1);
+		ret = gnutls_record_send(server, TESTDATA,
+					 sizeof(TESTDATA) - 1);
 		if (ret < 0) {
 			myfail("error sending false start data: %s\n",
 			       gnutls_strerror(ret));
@@ -208,8 +206,8 @@ static void try(const char *name, unsigned testno, unsigned fs,
 
 		side = "client";
 		do {
-			ret =
-			    gnutls_record_recv(client, buffer, sizeof(buffer));
+			ret = gnutls_record_recv(client, buffer,
+						 sizeof(buffer));
 		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 		if (ret < 0) {
 			myfail("error receiving data: %s\n",
@@ -217,8 +215,8 @@ static void try(const char *name, unsigned testno, unsigned fs,
 		}
 	} else if (testno == TEST_RECV_SEND) {
 		side = "server";
-		ret =
-		    gnutls_record_send(server, TESTDATA, sizeof(TESTDATA) - 1);
+		ret = gnutls_record_send(server, TESTDATA,
+					 sizeof(TESTDATA) - 1);
 		if (ret < 0) {
 			myfail("error sending false start data: %s\n",
 			       gnutls_strerror(ret));
@@ -244,9 +242,8 @@ static void try(const char *name, unsigned testno, unsigned fs,
 		/* explicit completion by caller */
 		ret = gnutls_handshake(client);
 		if (ret != GNUTLS_E_HANDSHAKE_DURING_FALSE_START) {
-			myfail
-			    ("error in explicit handshake after false start: %s\n",
-			     gnutls_strerror(ret));
+			myfail("error in explicit handshake after false start: %s\n",
+			       gnutls_strerror(ret));
 			exit(1);
 		}
 
@@ -266,7 +263,7 @@ static void try(const char *name, unsigned testno, unsigned fs,
 	}
 
 	success("%5s%s \tok\n", dtls ? "dtls-" : "tls-", name);
- exit:
+exit:
 	gnutls_deinit(client);
 	gnutls_deinit(server);
 

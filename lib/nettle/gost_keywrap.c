@@ -21,8 +21,8 @@
 #include "gnutls_int.h"
 #include "gost/gost28147.h"
 
-static const struct gost28147_param
-*_gnutls_gost_get_param(gnutls_gost_paramset_t param)
+static const struct gost28147_param *
+_gnutls_gost_get_param(gnutls_gost_paramset_t param)
 {
 	if (param == GNUTLS_GOST_PARAMSET_TC26_Z)
 		return &gost28147_param_TC26_Z;
@@ -41,10 +41,9 @@ static const struct gost28147_param
 }
 
 int _gnutls_gost_key_wrap(gnutls_gost_paramset_t gost_params,
-			  const gnutls_datum_t * kek,
-			  const gnutls_datum_t * ukm,
-			  const gnutls_datum_t * cek,
-			  gnutls_datum_t * enc, gnutls_datum_t * imit)
+			  const gnutls_datum_t *kek, const gnutls_datum_t *ukm,
+			  const gnutls_datum_t *cek, gnutls_datum_t *enc,
+			  gnutls_datum_t *imit)
 {
 	const struct gost28147_param *gp;
 
@@ -79,10 +78,10 @@ int _gnutls_gost_key_wrap(gnutls_gost_paramset_t gost_params,
 }
 
 int _gnutls_gost_key_unwrap(gnutls_gost_paramset_t gost_params,
-			    const gnutls_datum_t * kek,
-			    const gnutls_datum_t * ukm,
-			    const gnutls_datum_t * enc,
-			    const gnutls_datum_t * imit, gnutls_datum_t * cek)
+			    const gnutls_datum_t *kek,
+			    const gnutls_datum_t *ukm,
+			    const gnutls_datum_t *enc,
+			    const gnutls_datum_t *imit, gnutls_datum_t *cek)
 {
 	const struct gost28147_param *gp;
 	int ret;
@@ -105,9 +104,9 @@ int _gnutls_gost_key_unwrap(gnutls_gost_paramset_t gost_params,
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 	}
 
-	ret = gost28147_key_unwrap_cryptopro(gp, kek->data,
-					     ukm->data, ukm->size,
-					     enc->data, imit->data, cek->data);
+	ret = gost28147_key_unwrap_cryptopro(gp, kek->data, ukm->data,
+					     ukm->size, enc->data, imit->data,
+					     cek->data);
 	if (ret == 0) {
 		gnutls_assert();
 		_gnutls_free_temp_key_datum(cek);

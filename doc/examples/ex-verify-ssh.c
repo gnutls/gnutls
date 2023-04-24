@@ -1,7 +1,7 @@
 /* This example code is placed in the public domain. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -12,7 +12,7 @@
 #include <assert.h>
 #include "examples.h"
 
-#define CHECK(x) assert((x)>=0)
+#define CHECK(x) assert((x) >= 0)
 
 /* This function will verify the peer's certificate, check
  * if the hostname matches. In addition it will perform an
@@ -38,13 +38,13 @@ int _ssh_verify_certificate_callback(gnutls_session_t session)
 
 	type = gnutls_certificate_type_get(session);
 
-	CHECK(gnutls_certificate_verification_status_print(status,
-							   type, &out, 0));
+	CHECK(gnutls_certificate_verification_status_print(status, type, &out,
+							   0));
 	printf("%s", out.data);
 
 	gnutls_free(out.data);
 
-	if (status != 0)	/* Certificate is not trusted */
+	if (status != 0) /* Certificate is not trusted */
 		return GNUTLS_E_CERTIFICATE_ERROR;
 
 	/* Do SSH verification */
@@ -55,8 +55,8 @@ int _ssh_verify_certificate_callback(gnutls_session_t session)
 	}
 
 	/* service may be obtained alternatively using getservbyport() */
-	ret = gnutls_verify_stored_pubkey(NULL, NULL, hostname, "https",
-					  type, &cert_list[0], 0);
+	ret = gnutls_verify_stored_pubkey(NULL, NULL, hostname, "https", type,
+					  &cert_list[0], 0);
 	if (ret == GNUTLS_E_NO_CERTIFICATE_FOUND) {
 		printf("Host %s is not known.", hostname);
 		if (status == 0)
@@ -68,11 +68,9 @@ int _ssh_verify_certificate_callback(gnutls_session_t session)
 		/* if not trusted */
 		return GNUTLS_E_CERTIFICATE_ERROR;
 	} else if (ret == GNUTLS_E_CERTIFICATE_KEY_MISMATCH) {
-		printf
-		    ("Warning: host %s is known but has another key associated.",
-		     hostname);
-		printf
-		    ("It might be that the server has multiple keys, or you are under attack\n");
+		printf("Warning: host %s is known but has another key associated.",
+		       hostname);
+		printf("It might be that the server has multiple keys, or you are under attack\n");
 		if (status == 0)
 			printf("Its certificate is valid for %s.\n", hostname);
 
@@ -89,8 +87,8 @@ int _ssh_verify_certificate_callback(gnutls_session_t session)
 
 	/* user trusts the key -> store it */
 	if (ret != 0) {
-		CHECK(gnutls_store_pubkey(NULL, NULL, hostname, "https",
-					  type, &cert_list[0], 0, 0));
+		CHECK(gnutls_store_pubkey(NULL, NULL, hostname, "https", type,
+					  &cert_list[0], 0, 0));
 	}
 
 	/* notify gnutls to continue handshake normally */

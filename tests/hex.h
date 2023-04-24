@@ -20,11 +20,11 @@
  */
 
 #ifndef GNUTLS_TESTS_HEX_H
-# define GNUTLS_TESTS_HEX_H
+#define GNUTLS_TESTS_HEX_H
 
-# include <stdio.h>
-# include <string.h>
-# include <gnutls/gnutls.h>
+#include <stdio.h>
+#include <string.h>
+#include <gnutls/gnutls.h>
 
 inline static gnutls_datum_t SHEX(const char *hex)
 {
@@ -47,4 +47,4 @@ inline static gnutls_datum_t SDATA(const char *txt)
 	return output;
 }
 
-#endif				/* GNUTLS_TESTS_HEX_H */
+#endif /* GNUTLS_TESTS_HEX_H */

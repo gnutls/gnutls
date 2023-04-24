@@ -18,7 +18,7 @@
 // along with GnuTLS.  If not, see <https://www.gnu.org/licenses/>.
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -50,73 +50,77 @@ int main(void)
 
 #else
 
-# define MAX_BUF 1024
-# define MSG "Hello world!"
+#define MAX_BUF 1024
+#define MSG "Hello world!"
 
-# define HANDSHAKE(session, name, ret)\
-{\
-	do {\
-		ret = gnutls_handshake(session);\
-	}\
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);\
-	if (ret < 0) {\
-		fail("%s: Handshake failed\n", name);\
-		goto end;\
-	}\
-}
+#define HANDSHAKE(session, name, ret)                                 \
+	{                                                             \
+		do {                                                  \
+			ret = gnutls_handshake(session);              \
+		} while (ret < 0 && gnutls_error_is_fatal(ret) == 0); \
+		if (ret < 0) {                                        \
+			fail("%s: Handshake failed\n", name);         \
+			goto end;                                     \
+		}                                                     \
+	}
 
-# define SEND_MSG(session, name, ret)\
-{\
-	do {\
-		ret = gnutls_record_send(session, MSG, strlen(MSG)+1);\
-	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);\
-	if (ret < 0) {\
-		fail("%s: data sending has failed (%s)\n",name,\
-		     gnutls_strerror(ret));\
-		goto end;\
-	}\
-}
+#define SEND_MSG(session, name, ret)                                     \
+	{                                                                \
+		do {                                                     \
+			ret = gnutls_record_send(session, MSG,           \
+						 strlen(MSG) + 1);       \
+		} while (ret == GNUTLS_E_AGAIN ||                        \
+			 ret == GNUTLS_E_INTERRUPTED);                   \
+		if (ret < 0) {                                           \
+			fail("%s: data sending has failed (%s)\n", name, \
+			     gnutls_strerror(ret));                      \
+			goto end;                                        \
+		}                                                        \
+	}
 
-# define RECV_MSG(session, name, buffer, buffer_len, ret)\
-{\
-	memset(buffer, 0, sizeof(buffer));\
-	do{\
-		ret = gnutls_record_recv(session, buffer, sizeof(buffer));\
-	}\
-	while(ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);\
-	if (ret == 0) {\
-		success("%s: Peer has closed the TLS connection\n", name);\
-		goto end;\
-	} else if (ret < 0) {\
-		fail("%s: Error -> %s\n", name, gnutls_strerror(ret));\
-		goto end;\
-	}\
-	if(strncmp(buffer, MSG, ret)){\
-		fail("%s: Message doesn't match\n", name);\
-		goto end;\
-	}\
-}
+#define RECV_MSG(session, name, buffer, buffer_len, ret)                       \
+	{                                                                      \
+		memset(buffer, 0, sizeof(buffer));                             \
+		do {                                                           \
+			ret = gnutls_record_recv(session, buffer,              \
+						 sizeof(buffer));              \
+		} while (ret == GNUTLS_E_AGAIN ||                              \
+			 ret == GNUTLS_E_INTERRUPTED);                         \
+		if (ret == 0) {                                                \
+			success("%s: Peer has closed the TLS connection\n",    \
+				name);                                         \
+			goto end;                                              \
+		} else if (ret < 0) {                                          \
+			fail("%s: Error -> %s\n", name, gnutls_strerror(ret)); \
+			goto end;                                              \
+		}                                                              \
+		if (strncmp(buffer, MSG, ret)) {                               \
+			fail("%s: Message doesn't match\n", name);             \
+			goto end;                                              \
+		}                                                              \
+	}
 
-# define KEY_UPDATE(session, name, peer_req, ret)\
-{\
-	do {\
-		ret = gnutls_session_key_update(session, peer_req);\
-	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);\
-	if (ret < 0) {\
-		fail("%s: key update has failed (%s)\n", name, \
-		     gnutls_strerror(ret));\
-			 goto end;\
-	}\
-}
+#define KEY_UPDATE(session, name, peer_req, ret)                            \
+	{                                                                   \
+		do {                                                        \
+			ret = gnutls_session_key_update(session, peer_req); \
+		} while (ret == GNUTLS_E_AGAIN ||                           \
+			 ret == GNUTLS_E_INTERRUPTED);                      \
+		if (ret < 0) {                                              \
+			fail("%s: key update has failed (%s)\n", name,      \
+			     gnutls_strerror(ret));                         \
+			goto end;                                           \
+		}                                                           \
+	}
 
-# define CHECK_KTLS_ENABLED(session, ret)\
-{\
-	ret = gnutls_transport_is_ktls_enabled(session);\
-	if (!(ret & GNUTLS_KTLS_RECV)){\
-		fail("client: KTLS was not properly initialized\n");\
-		goto end;\
-	}\
-}
+#define CHECK_KTLS_ENABLED(session, ret)                                     \
+	{                                                                    \
+		ret = gnutls_transport_is_ktls_enabled(session);             \
+		if (!(ret & GNUTLS_KTLS_RECV)) {                             \
+			fail("client: KTLS was not properly initialized\n"); \
+			goto end;                                            \
+		}                                                            \
+	}
 
 static void server_log_func(int level, const char *str)
 {
@@ -158,28 +162,28 @@ static void client(int fd, const char *prio, int pipe)
 	HANDSHAKE(session, name, ret);
 
 	CHECK_KTLS_ENABLED(session, ret)
-	    // Test 0: Try sending/receiving data
-	    RECV_MSG(session, name, buffer, MAX_BUF + 1, ret)
-	    SEND_MSG(session, name, ret)
-	    CHECK_KTLS_ENABLED(session, ret)
-	    // Test 1: Servers does key update
-	    read(pipe, &foo, 1);
+	// Test 0: Try sending/receiving data
 	RECV_MSG(session, name, buffer, MAX_BUF + 1, ret)
-	    SEND_MSG(session, name, ret)
-	    CHECK_KTLS_ENABLED(session, ret)
-	    // Test 2: Does key update witch request
-	    read(pipe, &foo, 1);
+	SEND_MSG(session, name, ret)
+	CHECK_KTLS_ENABLED(session, ret)
+	// Test 1: Servers does key update
+	read(pipe, &foo, 1);
 	RECV_MSG(session, name, buffer, MAX_BUF + 1, ret)
-	    SEND_MSG(session, name, ret)
-	    CHECK_KTLS_ENABLED(session, ret)
-	    ret = gnutls_bye(session, GNUTLS_SHUT_RDWR);
+	SEND_MSG(session, name, ret)
+	CHECK_KTLS_ENABLED(session, ret)
+	// Test 2: Does key update witch request
+	read(pipe, &foo, 1);
+	RECV_MSG(session, name, buffer, MAX_BUF + 1, ret)
+	SEND_MSG(session, name, ret)
+	CHECK_KTLS_ENABLED(session, ret)
+	ret = gnutls_bye(session, GNUTLS_SHUT_RDWR);
 	if (ret < 0) {
 		fail("client: error in closing session: %s\n",
 		     gnutls_strerror(ret));
 	}
 
 	ret = 0;
- end:
+end:
 
 	close(fd);
 
@@ -218,9 +222,8 @@ static void server(int fd, const char *prio, int pipe)
 	}
 
 	gnutls_certificate_allocate_credentials(&x509_cred);
-	ret = gnutls_certificate_set_x509_key_mem(x509_cred, &server_cert,
-						  &server_key,
-						  GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_key_mem(
+		x509_cred, &server_cert, &server_key, GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);
 
@@ -234,31 +237,31 @@ static void server(int fd, const char *prio, int pipe)
 	gnutls_transport_set_int(session, fd);
 
 	HANDSHAKE(session, name, ret)
-	    CHECK_KTLS_ENABLED(session, ret)
-	    success("Test 0: sending/receiving data\n");
+	CHECK_KTLS_ENABLED(session, ret)
+	success("Test 0: sending/receiving data\n");
 	SEND_MSG(session, name, ret)
-	    RECV_MSG(session, name, buffer, MAX_BUF + 1, ret)
-	    CHECK_KTLS_ENABLED(session, ret)
-	    success("Test 1: server key update without request\n");
+	RECV_MSG(session, name, buffer, MAX_BUF + 1, ret)
+	CHECK_KTLS_ENABLED(session, ret)
+	success("Test 1: server key update without request\n");
 	KEY_UPDATE(session, name, 0, ret)
-	    write(pipe, &bar, 1);
+	write(pipe, &bar, 1);
 	SEND_MSG(session, name, ret)
-	    RECV_MSG(session, name, buffer, MAX_BUF + 1, ret)
-	    CHECK_KTLS_ENABLED(session, ret)
-	    success("Test 2: server key update with request\n");
+	RECV_MSG(session, name, buffer, MAX_BUF + 1, ret)
+	CHECK_KTLS_ENABLED(session, ret)
+	success("Test 2: server key update with request\n");
 	KEY_UPDATE(session, name, GNUTLS_KU_PEER, ret)
-	    write(pipe, &bar, 1);
+	write(pipe, &bar, 1);
 	SEND_MSG(session, name, ret)
-	    RECV_MSG(session, name, buffer, MAX_BUF + 1, ret)
-	    CHECK_KTLS_ENABLED(session, ret)
-	    ret = gnutls_bye(session, GNUTLS_SHUT_RDWR);
+	RECV_MSG(session, name, buffer, MAX_BUF + 1, ret)
+	CHECK_KTLS_ENABLED(session, ret)
+	ret = gnutls_bye(session, GNUTLS_SHUT_RDWR);
 	if (ret < 0) {
 		fail("server: error in closing session: %s\n",
 		     gnutls_strerror(ret));
 	}
 
 	ret = 0;
- end:
+end:
 	close(fd);
 	gnutls_deinit(session);
 
@@ -287,7 +290,7 @@ static void run(const char *prio)
 	int listener;
 	int fd;
 
-	int sync_pipe[2];	//used for synchronization
+	int sync_pipe[2]; //used for synchronization
 	pipe(sync_pipe);
 
 	success("running ktls test with %s\n", prio);
@@ -362,4 +365,4 @@ void doit(void)
 	run("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-256-GCM");
 }
 
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

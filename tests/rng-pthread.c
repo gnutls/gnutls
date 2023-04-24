@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -33,11 +33,11 @@
 #include <signal.h>
 #include <unistd.h>
 #ifndef _WIN32
-# include <netinet/in.h>
-# include <sys/types.h>
-# include <sys/socket.h>
-# include <sys/wait.h>
-# include <pthread.h>
+#include <netinet/in.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <pthread.h>
 #endif
 #include "utils.h"
 
@@ -76,10 +76,9 @@ static void *start_thread(void *arg)
 	pthread_exit(0);
 }
 
-# define MAX_THREADS 48
+#define MAX_THREADS 48
 
-static
-void do_thread_stuff(unsigned level)
+static void do_thread_stuff(unsigned level)
 {
 	int ret;
 	thread_data_st *data;
@@ -101,16 +100,15 @@ void do_thread_stuff(unsigned level)
 		pthread_join(data[i].id, NULL);
 		for (j = 0; j < MAX_THREADS; j++) {
 			if (i != j) {
-				if (memcmp
-				    (data[i].buf, data[j].buf,
-				     sizeof(data[i].buf)) == 0) {
-					fail("identical data found in thread %d and %d\n", i, j);
+				if (memcmp(data[i].buf, data[j].buf,
+					   sizeof(data[i].buf)) == 0) {
+					fail("identical data found in thread %d and %d\n",
+					     i, j);
 				}
 			}
 		}
 	}
 	free(data);
-
 }
 
 void doit(void)
@@ -124,4 +122,4 @@ void doit(void)
 		gnutls_global_deinit();
 	}
 }
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

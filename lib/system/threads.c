@@ -57,7 +57,7 @@ static int gnutls_system_mutex_init(void **priv)
 
 static int gnutls_system_mutex_deinit(void **priv)
 {
-	if (glthread_lock_destroy((gl_lock_t *) * priv)) {
+	if (glthread_lock_destroy((gl_lock_t *)*priv)) {
 		return gnutls_assert_val(GNUTLS_E_LOCKING_ERROR);
 	}
 	free(*priv);
@@ -66,7 +66,7 @@ static int gnutls_system_mutex_deinit(void **priv)
 
 static int gnutls_system_mutex_lock(void **priv)
 {
-	if (glthread_lock_lock((gl_lock_t *) * priv)) {
+	if (glthread_lock_lock((gl_lock_t *)*priv)) {
 		return gnutls_assert_val(GNUTLS_E_LOCKING_ERROR);
 	}
 	return 0;
@@ -74,7 +74,7 @@ static int gnutls_system_mutex_lock(void **priv)
 
 static int gnutls_system_mutex_unlock(void **priv)
 {
-	if (glthread_lock_unlock((gl_lock_t *) * priv)) {
+	if (glthread_lock_unlock((gl_lock_t *)*priv)) {
 		return gnutls_assert_val(GNUTLS_E_LOCKING_ERROR);
 	}
 	return 0;

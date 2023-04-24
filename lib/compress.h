@@ -21,14 +21,14 @@
  */
 
 #ifndef GNUTLS_LIB_COMPRESS_H
-# define GNUTLS_LIB_COMPRESS_H
+#define GNUTLS_LIB_COMPRESS_H
 
-# include "gnutls_int.h"
+#include "gnutls_int.h"
 
 size_t _gnutls_compress_bound(gnutls_compression_method_t alg, size_t src_len);
-int _gnutls_compress(gnutls_compression_method_t alg, uint8_t * dst,
-		     size_t dst_len, const uint8_t * src, size_t src_len);
-int _gnutls_decompress(gnutls_compression_method_t alg, uint8_t * dst,
-		       size_t dst_len, const uint8_t * src, size_t src_len);
+int _gnutls_compress(gnutls_compression_method_t alg, uint8_t *dst,
+		     size_t dst_len, const uint8_t *src, size_t src_len);
+int _gnutls_decompress(gnutls_compression_method_t alg, uint8_t *dst,
+		       size_t dst_len, const uint8_t *src, size_t src_len);
 
-#endif				/* GNUTLS_LIB_COMPRESS_H */
+#endif /* GNUTLS_LIB_COMPRESS_H */

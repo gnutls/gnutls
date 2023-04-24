@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -42,7 +42,7 @@
    verifying certificates.  To avoid a time bomb, we hard code the
    current time.  This should work fine on systems where the library
    call to time is resolved at run-time.  */
-static time_t mytime(time_t * t)
+static time_t mytime(time_t *t)
 {
 	time_t then = 1256803113;
 
@@ -59,9 +59,9 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "|<%d>| %s", level, str);
 }
 
-static
-int pin_func(void *userdata, int attempt, const char *url, const char *label,
-	     unsigned flags, char *pin, size_t pin_max)
+static int pin_func(void *userdata, int attempt, const char *url,
+		    const char *label, unsigned flags, char *pin,
+		    size_t pin_max)
 {
 	if (attempt == 0) {
 		strcpy(pin, PIN);
@@ -87,7 +87,7 @@ void doit(void)
 	if (gnutls_fips140_mode_enabled())
 		exit(77);
 
-	/* The overloading of time() seems to work in linux (ELF?)
+		/* The overloading of time() seems to work in linux (ELF?)
 	 * systems only. Disable it on windows.
 	 */
 #ifdef _WIN32
@@ -127,8 +127,9 @@ void doit(void)
 
 	set_softhsm_conf(CONFIG);
 	snprintf(buf, sizeof(buf),
-		 "%s --init-token --slot 0 --label test --so-pin " PIN " --pin "
-		 PIN, bin);
+		 "%s --init-token --slot 0 --label test --so-pin " PIN
+		 " --pin " PIN,
+		 bin);
 	system(buf);
 
 	ret = gnutls_pkcs11_add_provider(lib, "trusted");
@@ -144,8 +145,7 @@ void doit(void)
 
 		ret = gnutls_x509_crt_init(&certs[j]);
 		if (ret < 0) {
-			fprintf(stderr,
-				"gnutls_x509_crt_init[%d,%d]: %s\n",
+			fprintf(stderr, "gnutls_x509_crt_init[%d,%d]: %s\n",
 				(int)3, (int)j, gnutls_strerror(ret));
 			exit(1);
 		}
@@ -153,21 +153,20 @@ void doit(void)
 		tmp.data = (unsigned char *)chains[idx].chain[j];
 		tmp.size = strlen(chains[idx].chain[j]);
 
-		ret =
-		    gnutls_x509_crt_import(certs[j], &tmp, GNUTLS_X509_FMT_PEM);
+		ret = gnutls_x509_crt_import(certs[j], &tmp,
+					     GNUTLS_X509_FMT_PEM);
 		if (debug > 2)
 			printf("done\n");
 		if (ret < 0) {
-			fprintf(stderr,
-				"gnutls_x509_crt_import[%s,%d]: %s\n",
+			fprintf(stderr, "gnutls_x509_crt_import[%s,%d]: %s\n",
 				chains[idx].name, (int)j, gnutls_strerror(ret));
 			exit(1);
 		}
 
 		gnutls_x509_crt_print(certs[j], GNUTLS_CRT_PRINT_ONELINE, &tmp);
 		if (debug)
-			printf("\tCertificate %d: %.*s\n", (int)j,
-			       tmp.size, tmp.data);
+			printf("\tCertificate %d: %.*s\n", (int)j, tmp.size,
+			       tmp.data);
 		gnutls_free(tmp.data);
 	}
 
@@ -210,10 +209,10 @@ void doit(void)
 	}
 
 	/* write CA certificate to softhsm */
-	ret =
-	    gnutls_pkcs11_copy_x509_crt(SOFTHSM_URL, ca, "test-ca",
-					GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED |
-					GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO);
+	ret = gnutls_pkcs11_copy_x509_crt(
+		SOFTHSM_URL, ca, "test-ca",
+		GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED |
+			GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO);
 	if (ret < 0) {
 		fail("gnutls_pkcs11_copy_x509_crt: %s\n", gnutls_strerror(ret));
 		exit(1);
@@ -221,9 +220,8 @@ void doit(void)
 
 	gnutls_x509_trust_list_init(&tl, 0);
 
-	ret =
-	    gnutls_x509_trust_list_add_trust_file(tl, SOFTHSM_URL, NULL, 0, 0,
-						  0);
+	ret = gnutls_x509_trust_list_add_trust_file(tl, SOFTHSM_URL, NULL, 0, 0,
+						    0);
 	if (ret < 0) {
 		fail("gnutls_x509_trust_list_add_trust_file\n");
 		exit(1);
@@ -231,9 +229,8 @@ void doit(void)
 
 	/* extract the issuer of the certificate */
 	issuer = NULL;
-	ret =
-	    gnutls_x509_trust_list_get_issuer(tl, certs[2], &issuer,
-					      GNUTLS_TL_GET_COPY);
+	ret = gnutls_x509_trust_list_get_issuer(tl, certs[2], &issuer,
+						GNUTLS_TL_GET_COPY);
 	if (ret < 0) {
 		fail("error in gnutls_x509_trust_list_get_issuer\n");
 		exit(1);

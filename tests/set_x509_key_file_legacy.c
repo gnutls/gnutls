@@ -24,7 +24,7 @@
  * when the GNUTLS_CERTIFICATE_API_V2 is not set */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -36,7 +36,7 @@
 #include "cert-common.h"
 #include "utils.h"
 
-static time_t mytime(time_t * t)
+static time_t mytime(time_t *t)
 {
 	time_t then = 1470002400;
 	if (t)
@@ -45,7 +45,7 @@ static time_t mytime(time_t * t)
 	return then;
 }
 
-static void compare(const gnutls_datum_t * der, const void *ipem)
+static void compare(const gnutls_datum_t *der, const void *ipem)
 {
 	gnutls_datum_t pem = { (void *)ipem, strlen((char *)ipem) };
 	gnutls_datum_t new_der;
@@ -56,8 +56,8 @@ static void compare(const gnutls_datum_t * der, const void *ipem)
 		fail("error: %s\n", gnutls_strerror(ret));
 	}
 
-	if (der->size != new_der.size
-	    || memcmp(der->data, new_der.data, der->size) != 0) {
+	if (der->size != new_der.size ||
+	    memcmp(der->data, new_der.data, der->size) != 0) {
 		fail("error in %d: %s\n", __LINE__, "cert don't match");
 		exit(1);
 	}
@@ -66,8 +66,7 @@ static void compare(const gnutls_datum_t * der, const void *ipem)
 }
 
 static unsigned set_cert(gnutls_certificate_credentials_t xcred,
-			 const gnutls_datum_t * key,
-			 const gnutls_datum_t * cert)
+			 const gnutls_datum_t *key, const gnutls_datum_t *cert)
 {
 	const char *certfile;
 	FILE *fp;
@@ -82,9 +81,8 @@ static unsigned set_cert(gnutls_certificate_credentials_t xcred,
 	assert(fwrite(key->data, 1, key->size, fp) > 0);
 	fclose(fp);
 
-	ret = gnutls_certificate_set_x509_key_file2(xcred, certfile, certfile,
-						    GNUTLS_X509_FMT_PEM, NULL,
-						    0);
+	ret = gnutls_certificate_set_x509_key_file2(
+		xcred, certfile, certfile, GNUTLS_X509_FMT_PEM, NULL, 0);
 	if (ret < 0)
 		fail("set_x509_key_file failed: %s\n", gnutls_strerror(ret));
 
@@ -93,7 +91,7 @@ static unsigned set_cert(gnutls_certificate_credentials_t xcred,
 }
 
 static void verify_written_cert(gnutls_certificate_credentials_t xcred,
-				unsigned idx, const gnutls_datum_t * cert,
+				unsigned idx, const gnutls_datum_t *cert,
 				unsigned ncerts)
 {
 	int ret;
@@ -135,9 +133,8 @@ void doit(void)
 	track_temp_files();
 
 	/* this will fail */
-	ret = gnutls_certificate_set_x509_key_file2(xcred, certfile, keyfile,
-						    GNUTLS_X509_FMT_PEM, NULL,
-						    0);
+	ret = gnutls_certificate_set_x509_key_file2(
+		xcred, certfile, keyfile, GNUTLS_X509_FMT_PEM, NULL, 0);
 	if (ret != GNUTLS_E_FILE_ERROR)
 		fail("set_x509_key_file failed: %s\n", gnutls_strerror(ret));
 
@@ -146,16 +143,15 @@ void doit(void)
 	assert(gnutls_certificate_allocate_credentials(&xcred) >= 0);
 	assert(gnutls_certificate_allocate_credentials(&clicred) >= 0);
 
-	ret =
-	    gnutls_certificate_set_x509_trust_mem(clicred, &subca3_cert,
-						  GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_trust_mem(clicred, &subca3_cert,
+						    GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		fail("set_x509_trust_file failed: %s\n", gnutls_strerror(ret));
 
 	success("Testing store of certificates\n");
 
-	idx =
-	    set_cert(xcred, &server_ca3_key, &server_ca3_localhost6_cert_chain);
+	idx = set_cert(xcred, &server_ca3_key,
+		       &server_ca3_localhost6_cert_chain);
 	verify_written_cert(xcred, idx, &server_ca3_localhost6_cert_chain, 2);
 	assert(idx == 0);
 
@@ -166,7 +162,8 @@ void doit(void)
 
 	success("Tested store of %d\n", idx);
 
-	test_cli_serv(xcred, clicred, "NORMAL", "localhost", NULL, NULL, NULL);	/* the DNS name of the first cert */
+	test_cli_serv(xcred, clicred, "NORMAL", "localhost", NULL, NULL,
+		      NULL); /* the DNS name of the first cert */
 
 	idx = set_cert(xcred, &server_key, &server_cert);
 	assert(idx == 0);

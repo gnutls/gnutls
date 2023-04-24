@@ -1,7 +1,7 @@
 /* This example code is placed in the public domain. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -21,11 +21,11 @@
 #define CAFILE "/etc/ssl/certs/ca-certificates.crt"
 #define CRLFILE "crl.pem"
 
-#define CHECK(x) assert((x)>=0)
+#define CHECK(x) assert((x) >= 0)
 #define LOOP_CHECK(rval, cmd) \
-        do { \
-                rval = cmd; \
-        } while(rval == GNUTLS_E_AGAIN || rval == GNUTLS_E_INTERRUPTED)
+	do {                  \
+		rval = cmd;   \
+	} while (rval == GNUTLS_E_AGAIN || rval == GNUTLS_E_INTERRUPTED)
 
 /* The OCSP status file contains up to date information about revocation
  * of the server's certificate. That can be periodically be updated
@@ -40,7 +40,7 @@
  */
 
 #define MAX_BUF 1024
-#define PORT 5556		/* listen to 5556 port */
+#define PORT 5556 /* listen to 5556 port */
 
 int main(void)
 {
@@ -73,13 +73,11 @@ int main(void)
 	 * (the latter since 3.5.6). See the manual pages of the individual
 	 * functions for more information.
 	 */
-	CHECK(gnutls_certificate_set_x509_key_file(x509_cred, CERTFILE,
-						   KEYFILE,
+	CHECK(gnutls_certificate_set_x509_key_file(x509_cred, CERTFILE, KEYFILE,
 						   GNUTLS_X509_FMT_PEM));
 
-	CHECK(gnutls_certificate_set_ocsp_status_request_file(x509_cred,
-							      OCSP_STATUS_FILE,
-							      0));
+	CHECK(gnutls_certificate_set_ocsp_status_request_file(
+		x509_cred, OCSP_STATUS_FILE, 0));
 
 	CHECK(gnutls_priority_init(&priority_cache, NULL, NULL));
 
@@ -105,7 +103,7 @@ int main(void)
 	memset(&sa_serv, '\0', sizeof(sa_serv));
 	sa_serv.sin_family = AF_INET;
 	sa_serv.sin_addr.s_addr = INADDR_ANY;
-	sa_serv.sin_port = htons(PORT);	/* Server Port number */
+	sa_serv.sin_port = htons(PORT); /* Server Port number */
 
 	setsockopt(listen_sd, SOL_SOCKET, SO_REUSEADDR, (void *)&optval,
 		   sizeof(int));
@@ -137,7 +135,8 @@ int main(void)
 
 		printf("- connection from %s, port %d\n",
 		       inet_ntop(AF_INET, &sa_cli.sin_addr, topbuf,
-				 sizeof(topbuf)), ntohs(sa_cli.sin_port));
+				 sizeof(topbuf)),
+		       ntohs(sa_cli.sin_port));
 
 		gnutls_transport_set_int(session, sd);
 
@@ -145,8 +144,7 @@ int main(void)
 		if (ret < 0) {
 			close(sd);
 			gnutls_deinit(session);
-			fprintf(stderr,
-				"*** Handshake has failed (%s)\n\n",
+			fprintf(stderr, "*** Handshake has failed (%s)\n\n",
 				gnutls_strerror(ret));
 			continue;
 		}
@@ -156,19 +154,18 @@ int main(void)
 		/* print_info(session); */
 
 		for (;;) {
-			LOOP_CHECK(ret,
-				   gnutls_record_recv(session, buffer,
-						      MAX_BUF));
+			LOOP_CHECK(ret, gnutls_record_recv(session, buffer,
+							   MAX_BUF));
 
 			if (ret == 0) {
-				printf
-				    ("\n- Peer has closed the GnuTLS connection\n");
+				printf("\n- Peer has closed the GnuTLS connection\n");
 				break;
 			} else if (ret < 0 && gnutls_error_is_fatal(ret) == 0) {
 				fprintf(stderr, "*** Warning: %s\n",
 					gnutls_strerror(ret));
 			} else if (ret < 0) {
-				fprintf(stderr, "\n*** Received corrupted "
+				fprintf(stderr,
+					"\n*** Received corrupted "
 					"data(%d). Closing the connection.\n\n",
 					ret);
 				break;
@@ -185,7 +182,6 @@ int main(void)
 
 		close(sd);
 		gnutls_deinit(session);
-
 	}
 	close(listen_sd);
 
@@ -195,5 +191,4 @@ int main(void)
 	gnutls_global_deinit();
 
 	return 0;
-
 }

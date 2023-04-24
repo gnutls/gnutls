@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -71,8 +71,7 @@ static void start(const char *name, const char *prio, unsigned exp_update)
 
 	/* Init Server */
 	assert(gnutls_certificate_allocate_credentials(&scred) >= 0);
-	assert(gnutls_certificate_set_x509_key_mem(scred,
-						   &server_cert,
+	assert(gnutls_certificate_set_x509_key_mem(scred, &server_cert,
 						   &server_key,
 						   GNUTLS_X509_FMT_PEM) >= 0);
 
@@ -94,8 +93,8 @@ static void start(const char *name, const char *prio, unsigned exp_update)
 
 	/* Init client */
 	gnutls_certificate_allocate_credentials(&ccred);
-	assert(gnutls_certificate_set_x509_trust_mem
-	       (ccred, &ca3_cert, GNUTLS_X509_FMT_PEM) >= 0);
+	assert(gnutls_certificate_set_x509_trust_mem(ccred, &ca3_cert,
+						     GNUTLS_X509_FMT_PEM) >= 0);
 
 	gnutls_init(&client, GNUTLS_CLIENT);
 
@@ -115,22 +114,24 @@ static void start(const char *name, const char *prio, unsigned exp_update)
 		success("Handshake established\n");
 
 	assert(gnutls_record_get_state(server, 0, NULL, NULL, NULL, seq) >= 0);
-	assert(gnutls_record_set_state
-	       (server, 0, (void *)"\x00\x00\x00\x00\x00\xff\xff\xfa") >= 0);
+	assert(gnutls_record_set_state(
+		       server, 0, (void *)"\x00\x00\x00\x00\x00\xff\xff\xfa") >=
+	       0);
 
 	assert(gnutls_record_get_state(client, 1, NULL, NULL, NULL, seq) >= 0);
-	assert(gnutls_record_set_state
-	       (client, 1, (void *)"\x00\x00\x00\x00\x00\xff\xff\xfa") >= 0);
+	assert(gnutls_record_set_state(
+		       client, 1, (void *)"\x00\x00\x00\x00\x00\xff\xff\xfa") >=
+	       0);
 
 	memset(buffer, 1, sizeof(buffer));
 
 	for (i = 0; i < 32; i++) {
-		usleep(10000);	/* some systems like FreeBSD have their buffers full during this send */
+		usleep(10000); /* some systems like FreeBSD have their buffers full during this send */
 		do {
-			sret =
-			    gnutls_record_send(server, buffer, sizeof(buffer));
-		} while (sret == GNUTLS_E_AGAIN
-			 || sret == GNUTLS_E_INTERRUPTED);
+			sret = gnutls_record_send(server, buffer,
+						  sizeof(buffer));
+		} while (sret == GNUTLS_E_AGAIN ||
+			 sret == GNUTLS_E_INTERRUPTED);
 
 		if (sret < 0) {
 			fail("Error sending %d byte packet: %s\n",
@@ -142,11 +143,10 @@ static void start(const char *name, const char *prio, unsigned exp_update)
 			     (int)sizeof(buffer), sret);
 		}
 		do {
-			cret =
-			    gnutls_record_recv_seq(client, buffer, MAX_BUF,
-						   seq);
-		} while (cret == GNUTLS_E_AGAIN
-			 || cret == GNUTLS_E_INTERRUPTED);
+			cret = gnutls_record_recv_seq(client, buffer, MAX_BUF,
+						      seq);
+		} while (cret == GNUTLS_E_AGAIN ||
+			 cret == GNUTLS_E_INTERRUPTED);
 
 		if (memcmp(seq, "\x00\x00\x00\x00\x00\x00\x00\x01", 8) == 0) {
 			update_happened = 1;
@@ -176,11 +176,11 @@ static void start(const char *name, const char *prio, unsigned exp_update)
 }
 
 #define AES_GCM "NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM"
-#define CHACHA_POLY1305 "NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+CHACHA20-POLY1305"
+#define CHACHA_POLY1305 \
+	"NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+CHACHA20-POLY1305"
 
 void doit(void)
 {
-
 	start("aes-gcm", AES_GCM, 1);
 	if (!gnutls_fips140_mode_enabled()) {
 		start("chacha20", CHACHA_POLY1305, 0);

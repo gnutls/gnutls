@@ -24,43 +24,39 @@
 
 #ifdef ENABLE_PSK
 
-# include "errors.h"
-# include "auth.h"
-# include "debug.h"
-# include "num.h"
-# include <auth/psk.h>
-# include <auth/psk_passwd.h>
-# include <str.h>
-# include <datum.h>
+#include "errors.h"
+#include "auth.h"
+#include "debug.h"
+#include "num.h"
+#include <auth/psk.h>
+#include <auth/psk_passwd.h>
+#include <str.h>
+#include <datum.h>
 
 static int _gnutls_proc_psk_client_kx(gnutls_session_t, uint8_t *, size_t);
-static int
-_gnutls_proc_psk_server_kx(gnutls_session_t session, uint8_t * data,
-			   size_t _data_size);
+static int _gnutls_proc_psk_server_kx(gnutls_session_t session, uint8_t *data,
+				      size_t _data_size);
 
-const mod_auth_st psk_auth_struct = {
-	"PSK",
-	NULL,
-	NULL,
-	_gnutls_gen_psk_server_kx,
-	_gnutls_gen_psk_client_kx,
-	NULL,
-	NULL,
+const mod_auth_st psk_auth_struct = { "PSK",
+				      NULL,
+				      NULL,
+				      _gnutls_gen_psk_server_kx,
+				      _gnutls_gen_psk_client_kx,
+				      NULL,
+				      NULL,
 
-	NULL,
-	NULL,			/* certificate */
-	_gnutls_proc_psk_server_kx,
-	_gnutls_proc_psk_client_kx,
-	NULL,
-	NULL
-};
+				      NULL,
+				      NULL, /* certificate */
+				      _gnutls_proc_psk_server_kx,
+				      _gnutls_proc_psk_client_kx,
+				      NULL,
+				      NULL };
 
 /* Set the PSK premaster secret.
  */
-int
-_gnutls_set_psk_session_key(gnutls_session_t session,
-			    gnutls_datum_t * ppsk /* key */ ,
-			    gnutls_datum_t * dh_secret)
+int _gnutls_set_psk_session_key(gnutls_session_t session,
+				gnutls_datum_t *ppsk /* key */,
+				gnutls_datum_t *dh_secret)
 {
 	gnutls_datum_t pwd_psk = { NULL, 0 };
 	size_t dh_secret_size;
@@ -103,7 +99,7 @@ _gnutls_set_psk_session_key(gnutls_session_t session,
 
 	ret = 0;
 
- error:
+error:
 	_gnutls_free_temp_key_datum(&pwd_psk);
 	return ret;
 }
@@ -118,7 +114,7 @@ _gnutls_set_psk_session_key(gnutls_session_t session,
  * } ClientKeyExchange;
  *
  */
-int _gnutls_gen_psk_client_kx(gnutls_session_t session, gnutls_buffer_st * data)
+int _gnutls_gen_psk_client_kx(gnutls_session_t session, gnutls_buffer_st *data)
 {
 	int ret, free;
 	gnutls_datum_t username = { NULL, 0 };
@@ -126,8 +122,8 @@ int _gnutls_gen_psk_client_kx(gnutls_session_t session, gnutls_buffer_st * data)
 	gnutls_psk_client_credentials_t cred;
 	psk_auth_info_t info;
 
-	cred = (gnutls_psk_client_credentials_t)
-	    _gnutls_get_cred(session, GNUTLS_CRD_PSK);
+	cred = (gnutls_psk_client_credentials_t)_gnutls_get_cred(
+		session, GNUTLS_CRD_PSK);
 
 	if (cred == NULL) {
 		gnutls_assert();
@@ -150,9 +146,8 @@ int _gnutls_gen_psk_client_kx(gnutls_session_t session, gnutls_buffer_st * data)
 		goto cleanup;
 	}
 
-	ret =
-	    _gnutls_buffer_append_data_prefix(data, 16, username.data,
-					      username.size);
+	ret = _gnutls_buffer_append_data_prefix(data, 16, username.data,
+						username.size);
 	if (ret < 0) {
 		gnutls_assert();
 	}
@@ -170,7 +165,7 @@ int _gnutls_gen_psk_client_kx(gnutls_session_t session, gnutls_buffer_st * data)
 		goto cleanup;
 	}
 
- cleanup:
+cleanup:
 	if (free) {
 		gnutls_free(username.data);
 		_gnutls_free_temp_key_datum(&key);
@@ -181,9 +176,8 @@ int _gnutls_gen_psk_client_kx(gnutls_session_t session, gnutls_buffer_st * data)
 
 /* just read the username from the client key exchange.
  */
-static int
-_gnutls_proc_psk_client_kx(gnutls_session_t session, uint8_t * data,
-			   size_t _data_size)
+static int _gnutls_proc_psk_client_kx(gnutls_session_t session, uint8_t *data,
+				      size_t _data_size)
 {
 	ssize_t data_size = _data_size;
 	int ret;
@@ -191,17 +185,16 @@ _gnutls_proc_psk_client_kx(gnutls_session_t session, uint8_t * data,
 	gnutls_psk_server_credentials_t cred;
 	psk_auth_info_t info;
 
-	cred = (gnutls_psk_server_credentials_t)
-	    _gnutls_get_cred(session, GNUTLS_CRD_PSK);
+	cred = (gnutls_psk_server_credentials_t)_gnutls_get_cred(
+		session, GNUTLS_CRD_PSK);
 
 	if (cred == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
-	if ((ret =
-	     _gnutls_auth_info_init(session, GNUTLS_CRD_PSK,
-				    sizeof(psk_auth_info_st), 1)) < 0) {
+	if ((ret = _gnutls_auth_info_init(session, GNUTLS_CRD_PSK,
+					  sizeof(psk_auth_info_st), 1)) < 0) {
 		gnutls_assert();
 		return ret;
 	}
@@ -230,9 +223,8 @@ _gnutls_proc_psk_client_kx(gnutls_session_t session, uint8_t * data,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret =
-	    _gnutls_psk_pwd_find_entry(session, info->username,
-				       info->username_len, &psk_key);
+	ret = _gnutls_psk_pwd_find_entry(session, info->username,
+					 info->username_len, &psk_key);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -244,7 +236,7 @@ _gnutls_proc_psk_client_kx(gnutls_session_t session, uint8_t * data,
 
 	ret = 0;
 
- error:
+error:
 	_gnutls_free_key_datum(&psk_key);
 
 	return ret;
@@ -261,13 +253,13 @@ _gnutls_proc_psk_client_kx(gnutls_session_t session, uint8_t * data,
  * } ServerKeyExchange;
  *
  */
-int _gnutls_gen_psk_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
+int _gnutls_gen_psk_server_kx(gnutls_session_t session, gnutls_buffer_st *data)
 {
 	gnutls_psk_server_credentials_t cred;
 	gnutls_datum_t hint;
 
-	cred = (gnutls_psk_server_credentials_t)
-	    _gnutls_get_cred(session, GNUTLS_CRD_PSK);
+	cred = (gnutls_psk_server_credentials_t)_gnutls_get_cred(
+		session, GNUTLS_CRD_PSK);
 
 	if (cred == NULL) {
 		gnutls_assert();
@@ -280,7 +272,7 @@ int _gnutls_gen_psk_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 		return GNUTLS_E_INT_RET_0;
 	}
 
-	hint.data = (uint8_t *) cred->hint;
+	hint.data = (uint8_t *)cred->hint;
 	hint.size = strlen(cred->hint);
 
 	return _gnutls_buffer_append_data_prefix(data, 16, hint.data,
@@ -288,9 +280,8 @@ int _gnutls_gen_psk_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 }
 
 /* Read the hint from the server key exchange */
-static int
-_gnutls_proc_psk_server_kx(gnutls_session_t session, uint8_t * data,
-			   size_t _data_size)
+static int _gnutls_proc_psk_server_kx(gnutls_session_t session, uint8_t *data,
+				      size_t _data_size)
 {
 	int ret;
 	ssize_t data_size = _data_size;
@@ -298,15 +289,13 @@ _gnutls_proc_psk_server_kx(gnutls_session_t session, uint8_t * data,
 	psk_auth_info_t info;
 	gnutls_datum_t hint;
 
-	cred =
-	    (gnutls_psk_client_credentials_t) _gnutls_get_cred(session,
-							       GNUTLS_CRD_PSK);
+	cred = (gnutls_psk_client_credentials_t)_gnutls_get_cred(
+		session, GNUTLS_CRD_PSK);
 	if (cred == NULL)
 		return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
 
-	ret =
-	    _gnutls_auth_info_init(session, GNUTLS_CRD_PSK,
-				   sizeof(psk_auth_info_st), 1);
+	ret = _gnutls_auth_info_init(session, GNUTLS_CRD_PSK,
+				     sizeof(psk_auth_info_st), 1);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -327,4 +316,4 @@ _gnutls_proc_psk_server_kx(gnutls_session_t session, uint8_t * data,
 	return ret;
 }
 
-#endif				/* ENABLE_PSK */
+#endif /* ENABLE_PSK */

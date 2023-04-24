@@ -28,21 +28,21 @@
 
 #ifdef ENABLE_CRYPTODEV
 
-# include <fcntl.h>
-# include <sys/ioctl.h>
-# include <crypto/cryptodev.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <crypto/cryptodev.h>
 
-# ifndef CRYPTO_CIPHER_MAX_KEY_LEN
-#  define CRYPTO_CIPHER_MAX_KEY_LEN 64
-# endif
+#ifndef CRYPTO_CIPHER_MAX_KEY_LEN
+#define CRYPTO_CIPHER_MAX_KEY_LEN 64
+#endif
 
-# ifndef EALG_MAX_BLOCK_LEN
-#  define EALG_MAX_BLOCK_LEN 16
-# endif
+#ifndef EALG_MAX_BLOCK_LEN
+#define EALG_MAX_BLOCK_LEN 16
+#endif
 
-# ifdef CIOCAUTHCRYPT
+#ifdef CIOCAUTHCRYPT
 
-#  define GCM_BLOCK_SIZE 16
+#define GCM_BLOCK_SIZE 16
 
 struct cryptodev_gcm_ctx {
 	struct session_op sess;
@@ -53,7 +53,7 @@ struct cryptodev_gcm_ctx {
 	void *auth_data;
 	unsigned int auth_data_size;
 
-	int op;			/* whether encryption op has been executed */
+	int op; /* whether encryption op has been executed */
 
 	int cfd;
 };
@@ -72,8 +72,8 @@ static const int cipher_map[] = {
 	[GNUTLS_CIPHER_AES_256_GCM] = CRYPTO_AES_GCM,
 };
 
-static int
-aes_gcm_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx, int enc)
+static int aes_gcm_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx,
+			       int enc)
 {
 	struct cryptodev_gcm_ctx *ctx;
 
@@ -92,8 +92,8 @@ aes_gcm_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx, int enc)
 	return 0;
 }
 
-static int
-aes_gcm_cipher_setkey(void *_ctx, const void *userkey, size_t keysize)
+static int aes_gcm_cipher_setkey(void *_ctx, const void *userkey,
+				 size_t keysize)
 {
 	struct cryptodev_gcm_ctx *ctx = _ctx;
 
@@ -125,9 +125,8 @@ static int aes_gcm_setiv(void *_ctx, const void *iv, size_t iv_size)
 	return 0;
 }
 
-static int
-aes_gcm_encrypt(void *_ctx, const void *src, size_t src_size,
-		void *dst, size_t dst_size)
+static int aes_gcm_encrypt(void *_ctx, const void *src, size_t src_size,
+			   void *dst, size_t dst_size)
 {
 	struct cryptodev_gcm_ctx *ctx = _ctx;
 
@@ -152,13 +151,12 @@ aes_gcm_encrypt(void *_ctx, const void *src, size_t src_size,
 
 	ctx->cryp.auth_len = 0;
 	ctx->op = 1;
-	memcpy(ctx->tag, &((uint8_t *) dst)[src_size], GCM_BLOCK_SIZE);
+	memcpy(ctx->tag, &((uint8_t *)dst)[src_size], GCM_BLOCK_SIZE);
 	return 0;
 }
 
-static int
-aes_gcm_decrypt(void *_ctx, const void *src, size_t src_size,
-		void *dst, size_t dst_size)
+static int aes_gcm_decrypt(void *_ctx, const void *src, size_t src_size,
+			   void *dst, size_t dst_size)
 {
 	struct cryptodev_gcm_ctx *ctx = _ctx;
 
@@ -183,7 +181,7 @@ aes_gcm_decrypt(void *_ctx, const void *src, size_t src_size,
 
 	ctx->cryp.auth_len = 0;
 	ctx->op = 1;
-	memcpy(ctx->tag, &((uint8_t *) dst)[src_size], GCM_BLOCK_SIZE);
+	memcpy(ctx->tag, &((uint8_t *)dst)[src_size], GCM_BLOCK_SIZE);
 	return 0;
 }
 
@@ -221,7 +219,7 @@ static void aes_gcm_tag(void *_ctx, void *tag, size_t tagsize)
 	ctx->op = 0;
 }
 
-#  include "x86/aes-gcm-aead.h"
+#include "x86/aes-gcm-aead.h"
 
 static const gnutls_crypto_cipher_st cipher_struct = {
 	.init = aes_gcm_cipher_init,
@@ -242,11 +240,11 @@ int _cryptodev_register_gcm_crypto(int cfd)
 	uint8_t fake_key[CRYPTO_CIPHER_MAX_KEY_LEN];
 	unsigned int i;
 	int ret;
-#  ifdef CIOCGSESSINFO
+#ifdef CIOCGSESSINFO
 	struct session_info_op siop;
 
 	memset(&siop, 0, sizeof(siop));
-#  endif
+#endif
 
 	memset(&sess, 0, sizeof(sess));
 
@@ -262,33 +260,32 @@ int _cryptodev_register_gcm_crypto(int cfd)
 		if (ioctl(cfd, CIOCGSESSION, &sess)) {
 			continue;
 		}
-#  ifdef CIOCGSESSINFO
-		siop.ses = sess.ses;	/* do not register ciphers that are not hw accelerated */
+#ifdef CIOCGSESSINFO
+		siop.ses =
+			sess.ses; /* do not register ciphers that are not hw accelerated */
 		if (ioctl(cfd, CIOCGSESSINFO, &siop) == 0) {
 			if (!(siop.flags & SIOP_FLAG_KERNEL_DRIVER_ONLY)) {
 				ioctl(cfd, CIOCFSESSION, &sess.ses);
 				continue;
 			}
 		}
-#  endif
+#endif
 
 		ioctl(cfd, CIOCFSESSION, &sess.ses);
 
 		_gnutls_debug_log("/dev/crypto: registering: %s\n",
 				  gnutls_cipher_get_name(i));
-		ret =
-		    gnutls_crypto_single_cipher_register(i, 90,
-							 &cipher_struct, 0);
+		ret = gnutls_crypto_single_cipher_register(i, 90,
+							   &cipher_struct, 0);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
 		}
-
 	}
 
 	return 0;
 }
 
-# endif				/* CIOCAUTHCRYPT */
+#endif /* CIOCAUTHCRYPT */
 
-#endif				/* ENABLE_CRYPTODEV */
+#endif /* ENABLE_CRYPTODEV */

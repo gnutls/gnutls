@@ -29,14 +29,11 @@
 #include "state.h"
 #include <gnutls/gnutls.h>
 
-static int _gnutls_supported_ec_point_formats_recv_params(gnutls_session_t
-							  session,
-							  const uint8_t * data,
-							  size_t data_size);
-static int _gnutls_supported_ec_point_formats_send_params(gnutls_session_t
-							  session,
-							  gnutls_buffer_st *
-							  extdata);
+static int _gnutls_supported_ec_point_formats_recv_params(
+	gnutls_session_t session, const uint8_t *data, size_t data_size);
+static int
+_gnutls_supported_ec_point_formats_send_params(gnutls_session_t session,
+					       gnutls_buffer_st *extdata);
 
 const hello_ext_entry_st ext_mod_supported_ec_point_formats = {
 	.name = "Supported EC Point Formats",
@@ -45,7 +42,8 @@ const hello_ext_entry_st ext_mod_supported_ec_point_formats = {
 	.client_parse_point = GNUTLS_EXT_TLS,
 	.server_parse_point = GNUTLS_EXT_TLS,
 	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_DTLS |
-	    GNUTLS_EXT_FLAG_CLIENT_HELLO | GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
+		    GNUTLS_EXT_FLAG_CLIENT_HELLO |
+		    GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
 	.recv_func = _gnutls_supported_ec_point_formats_recv_params,
 	.send_func = _gnutls_supported_ec_point_formats_send_params,
 	.pack_func = NULL,
@@ -55,30 +53,26 @@ const hello_ext_entry_st ext_mod_supported_ec_point_formats = {
 
 /* Receive point formats
  */
-static int
-_gnutls_supported_ec_point_formats_recv_params(gnutls_session_t session,
-					       const uint8_t * data,
-					       size_t data_size)
+static int _gnutls_supported_ec_point_formats_recv_params(
+	gnutls_session_t session, const uint8_t *data, size_t data_size)
 {
 	size_t len, i;
 	int uncompressed = 0;
 
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
 		if (data_size < 1)
-			return
-			    gnutls_assert_val
-			    (GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION);
+			return gnutls_assert_val(
+				GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION);
 
 		len = data[0];
 		if (len < 1)
-			return
-			    gnutls_assert_val
-			    (GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION);
+			return gnutls_assert_val(
+				GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION);
 
 		DECR_LEN(data_size, len + 1);
 
 		for (i = 1; i <= len; i++)
-			if (data[i] == 0) {	/* uncompressed */
+			if (data[i] == 0) { /* uncompressed */
 				uncompressed = 1;
 				break;
 			}
@@ -90,9 +84,8 @@ _gnutls_supported_ec_point_formats_recv_params(gnutls_session_t session,
 		 * and a client must support it thus nothing to check.
 		 */
 		if (data_size < 1)
-			return
-			    gnutls_assert_val
-			    (GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION);
+			return gnutls_assert_val(
+				GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION);
 	}
 
 	return 0;
@@ -102,13 +95,15 @@ _gnutls_supported_ec_point_formats_recv_params(gnutls_session_t session,
  */
 static int
 _gnutls_supported_ec_point_formats_send_params(gnutls_session_t session,
-					       gnutls_buffer_st * extdata)
+					       gnutls_buffer_st *extdata)
 {
-	const uint8_t p[2] = { 0x01, 0x00 };	/* only support uncompressed point format */
+	const uint8_t p[2] = {
+		0x01, 0x00
+	}; /* only support uncompressed point format */
 	int ret;
 
-	if (session->security_parameters.entity == GNUTLS_SERVER
-	    && !_gnutls_session_is_ecc(session))
+	if (session->security_parameters.entity == GNUTLS_SERVER &&
+	    !_gnutls_session_is_ecc(session))
 		return 0;
 
 	if (session->internals.priorities->groups.size > 0) {

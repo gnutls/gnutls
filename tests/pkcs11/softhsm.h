@@ -18,31 +18,33 @@
  */
 
 #ifndef SOFTHSM_H
-# define SOFTHSM_H
+#define SOFTHSM_H
 
-# include <sys/stat.h>
+#include <sys/stat.h>
 
-# define SOFTHSM_V2
+#define SOFTHSM_V2
 
-# ifdef SOFTHSM_V1
-#  define SOFTHSM_URL "pkcs11:model=SoftHSM;manufacturer=SoftHSM;serial=1;token=test"
-#  define LIB1 "/usr/lib64/pkcs11/libsofthsm.so"
-#  define LIB2 "/usr/lib/pkcs11/libsofthsm.so"
-#  define LIB3 "/usr/lib/softhsm/libsofthsm.so"
-#  define LIB4 "/usr/local/lib/softhsm/libsofthsm.so"
-#  define SOFTHSM_BIN1 "/usr/bin/softhsm"
-#  define SOFTHSM_BIN2 "/usr/local/bin/softhsm"
-#  define SOFTHSM_ENV "SOFTHSM_CONF"
-# else
-#  define SOFTHSM_URL "pkcs11:model=SoftHSM%20v2;manufacturer=SoftHSM%20project;token=test"
-#  define LIB1 "/usr/lib64/pkcs11/libsofthsm2.so"
-#  define LIB2 "/usr/lib/pkcs11/libsofthsm2.so"
-#  define LIB3 "/usr/lib/softhsm/libsofthsm2.so"
-#  define LIB4 "/usr/lib/x86_64-linux-gnu/softhsm/libsofthsm2.so"
-#  define SOFTHSM_BIN1 "/usr/bin/softhsm2-util"
-#  define SOFTHSM_BIN2 "/usr/local/bin/softhsm2-util"
-#  define SOFTHSM_ENV "SOFTHSM2_CONF"
-# endif
+#ifdef SOFTHSM_V1
+#define SOFTHSM_URL \
+	"pkcs11:model=SoftHSM;manufacturer=SoftHSM;serial=1;token=test"
+#define LIB1 "/usr/lib64/pkcs11/libsofthsm.so"
+#define LIB2 "/usr/lib/pkcs11/libsofthsm.so"
+#define LIB3 "/usr/lib/softhsm/libsofthsm.so"
+#define LIB4 "/usr/local/lib/softhsm/libsofthsm.so"
+#define SOFTHSM_BIN1 "/usr/bin/softhsm"
+#define SOFTHSM_BIN2 "/usr/local/bin/softhsm"
+#define SOFTHSM_ENV "SOFTHSM_CONF"
+#else
+#define SOFTHSM_URL \
+	"pkcs11:model=SoftHSM%20v2;manufacturer=SoftHSM%20project;token=test"
+#define LIB1 "/usr/lib64/pkcs11/libsofthsm2.so"
+#define LIB2 "/usr/lib/pkcs11/libsofthsm2.so"
+#define LIB3 "/usr/lib/softhsm/libsofthsm2.so"
+#define LIB4 "/usr/lib/x86_64-linux-gnu/softhsm/libsofthsm2.so"
+#define SOFTHSM_BIN1 "/usr/bin/softhsm2-util"
+#define SOFTHSM_BIN2 "/usr/local/bin/softhsm2-util"
+#define SOFTHSM_ENV "SOFTHSM2_CONF"
+#endif
 
 inline static const char *softhsm_lib(void)
 {
@@ -80,8 +82,7 @@ inline static const char *softhsm_bin(void)
 	return bin;
 }
 
-static
-void set_softhsm_conf(const char *config)
+static void set_softhsm_conf(const char *config)
 {
 	char buf[128];
 	char db_dir[128];
@@ -96,11 +97,11 @@ void set_softhsm_conf(const char *config)
 		fprintf(stderr, "error writing %s\n", config);
 		exit(1);
 	}
-# ifdef SOFTHSM_V1
+#ifdef SOFTHSM_V1
 	remove(db_dir);
 	snprintf(buf, sizeof(buf), "0:./%s\n", db_dir);
 	fputs(buf, fp);
-# else
+#else
 	fputs("directories.tokendir = ", fp);
 	fputs(db_dir, fp);
 	fputs("\n", fp);
@@ -113,7 +114,7 @@ void set_softhsm_conf(const char *config)
 	snprintf(buf, sizeof(buf), "rm -rf %s\n", db_dir);
 	system(buf);
 	mkdir(db_dir, 0755);
-# endif
+#endif
 	fclose(fp);
 
 	setenv(SOFTHSM_ENV, config, 0);

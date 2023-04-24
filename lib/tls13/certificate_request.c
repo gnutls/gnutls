@@ -42,13 +42,12 @@ typedef struct crt_req_ctx_st {
 	unsigned got_sig_algo;
 	gnutls_pk_algorithm_t pk_algos[MAX_ALGOS];
 	unsigned pk_algos_length;
-	const uint8_t *rdn;	/* pointer inside the message buffer */
+	const uint8_t *rdn; /* pointer inside the message buffer */
 	unsigned rdn_size;
 } crt_req_ctx_st;
 
 static unsigned is_algo_in_list(gnutls_pk_algorithm_t algo,
-				gnutls_pk_algorithm_t * list,
-				unsigned list_size)
+				gnutls_pk_algorithm_t *list, unsigned list_size)
 {
 	unsigned j;
 
@@ -59,9 +58,8 @@ static unsigned is_algo_in_list(gnutls_pk_algorithm_t algo,
 	return 0;
 }
 
-static
-int parse_cert_extension(void *_ctx, unsigned tls_id, const uint8_t * data,
-			 unsigned data_size)
+static int parse_cert_extension(void *_ctx, unsigned tls_id,
+				const uint8_t *data, unsigned data_size)
 {
 	crt_req_ctx_st *ctx = _ctx;
 	gnutls_session_t session = ctx->session;
@@ -78,28 +76,25 @@ int parse_cert_extension(void *_ctx, unsigned tls_id, const uint8_t * data,
 		unsigned i;
 
 		if (ctx->got_sig_algo)
-			return
-			    gnutls_assert_val
-			    (GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION);
+			return gnutls_assert_val(
+				GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION);
 
 		ctx->got_sig_algo = 1;
 
 		if (data_size < 2)
-			return
-			    gnutls_assert_val
-			    (GNUTLS_E_TLS_PACKET_DECODING_ERROR);
+			return gnutls_assert_val(
+				GNUTLS_E_TLS_PACKET_DECODING_ERROR);
 
 		v = _gnutls_read_uint16(data);
 		if (v != data_size - 2)
-			return
-			    gnutls_assert_val
-			    (GNUTLS_E_TLS_PACKET_DECODING_ERROR);
+			return gnutls_assert_val(
+				GNUTLS_E_TLS_PACKET_DECODING_ERROR);
 
 		data += 2;
 		data_size -= 2;
 
-		ret =
-		    _gnutls_sign_algorithm_parse_data(session, data, data_size);
+		ret = _gnutls_sign_algorithm_parse_data(session, data,
+							data_size);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
@@ -117,8 +112,8 @@ int parse_cert_extension(void *_ctx, unsigned tls_id, const uint8_t * data,
 			    sizeof(ctx->pk_algos) / sizeof(ctx->pk_algos[0]))
 				break;
 
-			if (is_algo_in_list
-			    (se->pk, ctx->pk_algos, ctx->pk_algos_length))
+			if (is_algo_in_list(se->pk, ctx->pk_algos,
+					    ctx->pk_algos_length))
 				continue;
 
 			ctx->pk_algos[ctx->pk_algos_length++] = se->pk;
@@ -126,31 +121,28 @@ int parse_cert_extension(void *_ctx, unsigned tls_id, const uint8_t * data,
 #ifdef ENABLE_OCSP
 	} else if (tls_id == ext_mod_status_request.tls_id) {
 		if (data_size != 0)
-			return
-			    gnutls_assert_val
-			    (GNUTLS_E_TLS_PACKET_DECODING_ERROR);
+			return gnutls_assert_val(
+				GNUTLS_E_TLS_PACKET_DECODING_ERROR);
 
 		/* we are now allowed to send OCSP staples */
 		session->internals.hsk_flags |= HSK_CLIENT_OCSP_REQUESTED;
 #endif
 	} else if (tls_id == EXTID_CERTIFICATE_AUTHORITIES) {
 		if (data_size < 3) {
-			return
-			    gnutls_assert_val
-			    (GNUTLS_E_TLS_PACKET_DECODING_ERROR);
+			return gnutls_assert_val(
+				GNUTLS_E_TLS_PACKET_DECODING_ERROR);
 		}
 
 		v = _gnutls_read_uint16(data);
 		if (v != data_size - 2)
-			return
-			    gnutls_assert_val
-			    (GNUTLS_E_TLS_PACKET_DECODING_ERROR);
+			return gnutls_assert_val(
+				GNUTLS_E_TLS_PACKET_DECODING_ERROR);
 
 		ctx->rdn = data + 2;
 		ctx->rdn_size = v;
 	} else if (tls_id == ext_mod_compress_certificate.tls_id) {
-		ret = _gnutls_compress_certificate_recv_params(session,
-							       data, data_size);
+		ret = _gnutls_compress_certificate_recv_params(session, data,
+							       data_size);
 		if (ret < 0) {
 			return gnutls_assert_val(ret);
 		}
@@ -160,7 +152,7 @@ int parse_cert_extension(void *_ctx, unsigned tls_id, const uint8_t * data,
 }
 
 int _gnutls13_recv_certificate_request_int(gnutls_session_t session,
-					   gnutls_buffer_st * buf)
+					   gnutls_buffer_st *buf)
 {
 	int ret;
 	crt_req_ctx_st ctx;
@@ -178,9 +170,8 @@ int _gnutls13_recv_certificate_request_int(gnutls_session_t session,
 	if (!session->internals.initial_negotiation_completed) {
 		if (buf->data[0] != 0) {
 			/* The context field must be empty during handshake */
-			return
-			    gnutls_assert_val
-			    (GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+			return gnutls_assert_val(
+				GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 		}
 
 		/* buf->length is positive */
@@ -194,10 +185,9 @@ int _gnutls13_recv_certificate_request_int(gnutls_session_t session,
 			return gnutls_assert_val(ret);
 
 		gnutls_free(session->internals.post_handshake_cr_context.data);
-		ret =
-		    _gnutls_set_datum(&session->
-				      internals.post_handshake_cr_context,
-				      context.data, context.size);
+		ret = _gnutls_set_datum(
+			&session->internals.post_handshake_cr_context,
+			context.data, context.size);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 	}
@@ -205,9 +195,8 @@ int _gnutls13_recv_certificate_request_int(gnutls_session_t session,
 	memset(&ctx, 0, sizeof(ctx));
 	ctx.session = session;
 
-	ret =
-	    _gnutls_extv_parse(&ctx, parse_cert_extension, buf->data,
-			       buf->length);
+	ret = _gnutls_extv_parse(&ctx, parse_cert_extension, buf->data,
+				 buf->length);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -230,14 +219,13 @@ int _gnutls13_recv_certificate_request_int(gnutls_session_t session,
 	if (apr_cert_list_length > 0) {
 		gnutls_sign_algorithm_t algo;
 
-		algo =
-		    _gnutls_session_get_sign_algo(session, &apr_cert_list[0],
-						  apr_pkey, 0,
-						  GNUTLS_KX_UNKNOWN);
+		algo = _gnutls_session_get_sign_algo(session, &apr_cert_list[0],
+						     apr_pkey, 0,
+						     GNUTLS_KX_UNKNOWN);
 		if (algo == GNUTLS_SIGN_UNKNOWN) {
-			_gnutls_handshake_log
-			    ("HSK[%p]: rejecting client auth because of no suitable signature algorithm\n",
-			     session);
+			_gnutls_handshake_log(
+				"HSK[%p]: rejecting client auth because of no suitable signature algorithm\n",
+				session);
 			_gnutls_selected_certs_deinit(session);
 			return gnutls_assert_val(0);
 		}
@@ -260,10 +248,8 @@ int _gnutls13_recv_certificate_request(gnutls_session_t session)
 	if (unlikely(session->security_parameters.entity != GNUTLS_CLIENT))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-	ret =
-	    _gnutls_recv_handshake(session,
-				   GNUTLS_HANDSHAKE_CERTIFICATE_REQUEST, 1,
-				   &buf);
+	ret = _gnutls_recv_handshake(
+		session, GNUTLS_HANDSHAKE_CERTIFICATE_REQUEST, 1, &buf);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -279,8 +265,7 @@ int _gnutls13_recv_certificate_request(gnutls_session_t session)
 	return ret;
 }
 
-static
-int write_certificate_authorities(void *ctx, gnutls_buffer_st * buf)
+static int write_certificate_authorities(void *ctx, gnutls_buffer_st *buf)
 {
 	gnutls_session_t session = ctx;
 	gnutls_certificate_credentials_t cred;
@@ -288,8 +273,8 @@ int write_certificate_authorities(void *ctx, gnutls_buffer_st * buf)
 	if (session->internals.ignore_rdn_sequence != 0)
 		return 0;
 
-	cred = (gnutls_certificate_credentials_t)
-	    _gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE);
+	cred = (gnutls_certificate_credentials_t)_gnutls_get_cred(
+		session, GNUTLS_CRD_CERTIFICATE);
 	if (cred == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
@@ -298,15 +283,12 @@ int write_certificate_authorities(void *ctx, gnutls_buffer_st * buf)
 	if (cred->tlist->x509_rdn_sequence.size == 0)
 		return 0;
 
-	return
-	    _gnutls_buffer_append_data_prefix(buf, 16,
-					      cred->tlist->x509_rdn_sequence.
-					      data,
-					      cred->tlist->x509_rdn_sequence.
-					      size);
+	return _gnutls_buffer_append_data_prefix(
+		buf, 16, cred->tlist->x509_rdn_sequence.data,
+		cred->tlist->x509_rdn_sequence.size);
 }
 
-static int append_empty_ext(void *ctx, gnutls_buffer_st * buf)
+static int append_empty_ext(void *ctx, gnutls_buffer_st *buf)
 {
 	return GNUTLS_E_INT_RET_0;
 }
@@ -329,38 +311,40 @@ int _gnutls13_send_certificate_request(gnutls_session_t session, unsigned again)
 		if (session->internals.send_cert_req == 0)
 			return 0;
 
-		cred = (gnutls_certificate_credentials_t)
-		    _gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE);
+		cred = (gnutls_certificate_credentials_t)_gnutls_get_cred(
+			session, GNUTLS_CRD_CERTIFICATE);
 		if (cred == NULL)
-			return
-			    gnutls_assert_val
-			    (GNUTLS_E_INSUFFICIENT_CREDENTIALS);
+			return gnutls_assert_val(
+				GNUTLS_E_INSUFFICIENT_CREDENTIALS);
 
 		ret = _gnutls_buffer_init_handshake_mbuffer(&buf);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		if (session->internals.initial_negotiation_completed) {	/* reauth */
+		if (session->internals
+			    .initial_negotiation_completed) { /* reauth */
 			ret = gnutls_rnd(GNUTLS_RND_NONCE, rnd, sizeof(rnd));
 			if (ret < 0) {
 				gnutls_assert();
 				goto cleanup;
 			}
 
-			gnutls_free(session->
-				    internals.post_handshake_cr_context.data);
-			ret =
-			    _gnutls_set_datum(&session->
-					      internals.post_handshake_cr_context,
-					      rnd, sizeof(rnd));
+			gnutls_free(session->internals.post_handshake_cr_context
+					    .data);
+			ret = _gnutls_set_datum(
+				&session->internals.post_handshake_cr_context,
+				rnd, sizeof(rnd));
 			if (ret < 0) {
 				gnutls_assert();
 				goto cleanup;
 			}
 
-			ret = _gnutls_buffer_append_data_prefix(&buf, 8,
-								session->internals.post_handshake_cr_context.data,
-								session->internals.post_handshake_cr_context.size);
+			ret = _gnutls_buffer_append_data_prefix(
+				&buf, 8,
+				session->internals.post_handshake_cr_context
+					.data,
+				session->internals.post_handshake_cr_context
+					.size);
 		} else {
 			ret = _gnutls_buffer_append_prefix(&buf, 8, 0);
 		}
@@ -377,26 +361,25 @@ int _gnutls13_send_certificate_request(gnutls_session_t session, unsigned again)
 		}
 		init_pos = ret;
 
-		ret = _gnutls_extv_append(&buf, ext_mod_sig.tls_id, session,
-					  (extv_append_func)
-					  _gnutls_sign_algorithm_write_params);
+		ret = _gnutls_extv_append(
+			&buf, ext_mod_sig.tls_id, session,
+			(extv_append_func)_gnutls_sign_algorithm_write_params);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
 		}
 
-		ret =
-		    _gnutls_extv_append(&buf, EXTID_CERTIFICATE_AUTHORITIES,
-					session, write_certificate_authorities);
+		ret = _gnutls_extv_append(&buf, EXTID_CERTIFICATE_AUTHORITIES,
+					  session,
+					  write_certificate_authorities);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
 		}
 #ifdef ENABLE_OCSP
 		/* We always advertise our support for OCSP stapling */
-		ret =
-		    _gnutls_extv_append(&buf, ext_mod_status_request.tls_id,
-					session, append_empty_ext);
+		ret = _gnutls_extv_append(&buf, ext_mod_status_request.tls_id,
+					  session, append_empty_ext);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -404,11 +387,10 @@ int _gnutls13_send_certificate_request(gnutls_session_t session, unsigned again)
 		session->internals.hsk_flags |= HSK_CLIENT_OCSP_REQUESTED;
 #endif
 
-		ret =
-		    _gnutls_extv_append(&buf,
-					ext_mod_compress_certificate.tls_id,
-					session, (extv_append_func)
-					_gnutls_compress_certificate_send_params);
+		ret = _gnutls_extv_append(
+			&buf, ext_mod_compress_certificate.tls_id, session,
+			(extv_append_func)
+				_gnutls_compress_certificate_send_params);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -428,8 +410,7 @@ int _gnutls13_send_certificate_request(gnutls_session_t session, unsigned again)
 	return _gnutls_send_handshake(session, bufel,
 				      GNUTLS_HANDSHAKE_CERTIFICATE_REQUEST);
 
- cleanup:
+cleanup:
 	_gnutls_buffer_clear(&buf);
 	return ret;
-
 }

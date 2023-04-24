@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -47,10 +47,9 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "|<%d>| %s", level, str);
 }
 
-int
-_gnutls_pkcs11_token_get_url(unsigned int seq,
-			     gnutls_pkcs11_url_type_t detailed, char **url,
-			     unsigned flags);
+int _gnutls_pkcs11_token_get_url(unsigned int seq,
+				 gnutls_pkcs11_url_type_t detailed, char **url,
+				 unsigned flags);
 
 int main(int argc, char **argv)
 {
@@ -83,8 +82,8 @@ int main(int argc, char **argv)
 			break;
 		case 'm':
 			/* initialize manually - i.e., do no module loading */
-			ret =
-			    gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_MANUAL, NULL);
+			ret = gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_MANUAL,
+						 NULL);
 			if (ret != 0) {
 				fprintf(stderr, "error at %d: %s\n", __LINE__,
 					gnutls_strerror(ret));
@@ -122,9 +121,8 @@ int main(int argc, char **argv)
 			break;
 		case 't':
 			/* do trusted module loading */
-			ret =
-			    gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_AUTO_TRUSTED,
-					       NULL);
+			ret = gnutls_pkcs11_init(
+				GNUTLS_PKCS11_FLAG_AUTO_TRUSTED, NULL);
 			if (ret != 0) {
 				fprintf(stderr, "error at %d: %s\n", __LINE__,
 					gnutls_strerror(ret));
@@ -134,12 +132,13 @@ int main(int argc, char **argv)
 		case 'v':
 			/* do verification which should trigger trusted module loading */
 			assert(gnutls_x509_crt_init(&crt) >= 0);
-			assert(gnutls_x509_crt_import
-			       (crt, &ca3_cert, GNUTLS_X509_FMT_PEM) >= 0);
+			assert(gnutls_x509_crt_import(crt, &ca3_cert,
+						      GNUTLS_X509_FMT_PEM) >=
+			       0);
 
 			assert(gnutls_x509_trust_list_init(&tl, 0) >= 0);
-			assert(gnutls_x509_trust_list_add_system_trust(tl, 0, 0)
-			       >= 0);
+			assert(gnutls_x509_trust_list_add_system_trust(tl, 0,
+								       0) >= 0);
 			gnutls_x509_trust_list_verify_crt2(tl, &crt, 1, NULL, 0,
 							   0, &status, NULL);
 			gnutls_x509_trust_list_deinit(tl, 1);

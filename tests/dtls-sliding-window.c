@@ -48,14 +48,12 @@ int _dtls_record_check(struct record_parameters_st *rp, uint64_t _seq);
 #define DTLS_SW_NO_INCLUDES
 #include "../lib/dtls-sw.c"
 
-#define RESET_WINDOW \
-	memset(&state, 0, sizeof(state))
+#define RESET_WINDOW memset(&state, 0, sizeof(state))
 
-#define SET_WINDOW_NEXT(x) \
-	state.dtls_sw_next = (((x)&DTLS_SEQ_NUM_MASK))
+#define SET_WINDOW_NEXT(x) state.dtls_sw_next = (((x)&DTLS_SEQ_NUM_MASK))
 
 #define SET_WINDOW_LAST_RECV(x) \
-	t = x; \
+	t = x;                  \
 	state.dtls_sw_have_recv = 1
 
 static void check_dtls_window_uninit_0(void **glob_state)

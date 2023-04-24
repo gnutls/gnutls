@@ -32,33 +32,34 @@
 */
 
 #ifndef NETTLE_ACPKM_H_INCLUDED
-# define NETTLE_ACPKM_H_INCLUDED
+#define NETTLE_ACPKM_H_INCLUDED
 
-# include <nettle/nettle-types.h>
+#include <nettle/nettle-types.h>
 
-# ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-# endif
+#endif
 
-# define acpkm_crypt _gnutls_acpkm_crypt
+#define acpkm_crypt _gnutls_acpkm_crypt
 
-	struct acpkm_ctx {
-		size_t N;
-		size_t pos;
-	};
+struct acpkm_ctx {
+	size_t N;
+	size_t pos;
+};
 
-# define ACPKM_CTX(type) \
-{ struct acpkm_ctx ctx; type cipher; }
+#define ACPKM_CTX(type)               \
+	{                             \
+		struct acpkm_ctx ctx; \
+		type cipher;          \
+	}
 
-# define ACPKM_KEY_SIZE 32
+#define ACPKM_KEY_SIZE 32
 
-	void acpkm_crypt(struct acpkm_ctx *ctx,
-			 void *cipher,
-			 nettle_cipher_func * encrypt,
-			 nettle_set_key_func * set_key,
-			 size_t length, uint8_t * dst, const uint8_t * src);
+void acpkm_crypt(struct acpkm_ctx *ctx, void *cipher,
+		 nettle_cipher_func *encrypt, nettle_set_key_func *set_key,
+		 size_t length, uint8_t *dst, const uint8_t *src);
 
-# ifdef __cplusplus
+#ifdef __cplusplus
 }
-# endif
-#endif				/* NETTLE_ACPKM_H_INCLUDED */
+#endif
+#endif /* NETTLE_ACPKM_H_INCLUDED */

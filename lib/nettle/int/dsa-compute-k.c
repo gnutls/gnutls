@@ -21,7 +21,7 @@
  */
 
 #if HAVE_CONFIG_H
-# include "config.h"
+#include "config.h"
 #endif
 
 #include "dsa-compute-k.h"
@@ -43,12 +43,9 @@
 #define MAX_HASH_BITS (MAX_HASH_SIZE * 8)
 #define MAX_HASH_LIMBS BITS_TO_LIMBS(MAX_HASH_BITS)
 
-int
-_gnutls_dsa_compute_k(mpz_t k,
-		      const mpz_t q,
-		      const mpz_t x,
-		      gnutls_mac_algorithm_t mac,
-		      const uint8_t * digest, size_t length)
+int _gnutls_dsa_compute_k(mpz_t k, const mpz_t q, const mpz_t x,
+			  gnutls_mac_algorithm_t mac, const uint8_t *digest,
+			  size_t length)
 {
 	uint8_t V[MAX_HASH_SIZE];
 	uint8_t K[MAX_HASH_SIZE];
@@ -177,7 +174,8 @@ _gnutls_dsa_compute_k(mpz_t k,
 		if (tlen * 8 > q_bits)
 			mpn_rshift(h, h, qn, tlen * 8 - q_bits);
 		/* Check if k is in [1,q-1] */
-		if (!mpn_zero_p(h, qn) && mpn_cmp(h, mpz_limbs_read(q), qn) < 0) {
+		if (!mpn_zero_p(h, qn) &&
+		    mpn_cmp(h, mpz_limbs_read(q), qn) < 0) {
 			mpn_copyi(mpz_limbs_write(k, qn), h, qn);
 			mpz_limbs_finish(k, qn);
 			break;
@@ -199,7 +197,7 @@ _gnutls_dsa_compute_k(mpz_t k,
 			goto out;
 	}
 
- out:
+out:
 	zeroize_key(xp, sizeof(xp));
 	zeroize_key(tp, sizeof(tp));
 

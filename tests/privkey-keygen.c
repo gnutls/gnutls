@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdlib.h>
@@ -42,9 +42,9 @@
 
 static int sec_param[MAX_TRIES] =
 #ifdef ENABLE_FIPS140
-{ GNUTLS_SEC_PARAM_MEDIUM, GNUTLS_SEC_PARAM_HIGH };
+	{ GNUTLS_SEC_PARAM_MEDIUM, GNUTLS_SEC_PARAM_HIGH };
 #else
-{ GNUTLS_SEC_PARAM_LOW, GNUTLS_SEC_PARAM_MEDIUM };
+	{ GNUTLS_SEC_PARAM_LOW, GNUTLS_SEC_PARAM_MEDIUM };
 #endif
 
 static void tls_log_func(int level, const char *str)
@@ -52,10 +52,7 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "%s |<%d>| %s", "privkey-keygen", level, str);
 }
 
-const gnutls_datum_t raw_data = {
-	(void *)"hello there",
-	11
-};
+const gnutls_datum_t raw_data = { (void *)"hello there", 11 };
 
 static void sign_verify_data(gnutls_pk_algorithm_t algorithm,
 			     gnutls_x509_privkey_t pkey)
@@ -87,18 +84,17 @@ static void sign_verify_data(gnutls_pk_algorithm_t algorithm,
 		vflags |= GNUTLS_VERIFY_ALLOW_BROKEN;
 
 	/* sign arbitrary data */
-	ret = gnutls_privkey_sign_data(privkey, digest, 0,
-				       &raw_data, &signature);
+	ret = gnutls_privkey_sign_data(privkey, digest, 0, &raw_data,
+				       &signature);
 	if (ret < 0)
 		fail("gnutls_privkey_sign_data\n");
 
 	/* verify data */
-	ret =
-	    gnutls_pubkey_verify_data2(pubkey,
-				       gnutls_pk_to_sign
-				       (gnutls_pubkey_get_pk_algorithm
-					(pubkey, NULL), digest), vflags,
-				       &raw_data, &signature);
+	ret = gnutls_pubkey_verify_data2(
+		pubkey,
+		gnutls_pk_to_sign(gnutls_pubkey_get_pk_algorithm(pubkey, NULL),
+				  digest),
+		vflags, &raw_data, &signature);
 	if (ret < 0)
 		fail("gnutls_pubkey_verify_data2\n");
 
@@ -172,17 +168,21 @@ void doit(void)
 			}
 
 			FIPS_PUSH_CONTEXT();
-			ret =
-			    gnutls_x509_privkey_generate(pkey, algorithm,
-							 gnutls_sec_param_to_pk_bits
-							 (algorithm,
-							  sec_param[i]), 0);
+			ret = gnutls_x509_privkey_generate(
+				pkey, algorithm,
+				gnutls_sec_param_to_pk_bits(algorithm,
+							    sec_param[i]),
+				0);
 			if (ret < 0) {
-				fail("gnutls_x509_privkey_generate (%s-%d): %s (%d)\n", gnutls_pk_algorithm_get_name(algorithm), gnutls_sec_param_to_pk_bits(algorithm, sec_param[i]), gnutls_strerror(ret), ret);
+				fail("gnutls_x509_privkey_generate (%s-%d): %s (%d)\n",
+				     gnutls_pk_algorithm_get_name(algorithm),
+				     gnutls_sec_param_to_pk_bits(algorithm,
+								 sec_param[i]),
+				     gnutls_strerror(ret), ret);
 			} else if (debug) {
 				success("Key[%s] generation ok: %d\n",
-					gnutls_pk_algorithm_get_name
-					(algorithm), ret);
+					gnutls_pk_algorithm_get_name(algorithm),
+					ret);
 			}
 			if (is_approved_pk_algo(algorithm)) {
 				FIPS_POP_CONTEXT(APPROVED);
@@ -192,7 +192,9 @@ void doit(void)
 
 			ret = gnutls_x509_privkey_verify_params(pkey);
 			if (ret < 0) {
-				fail("gnutls_x509_privkey_generate (%s): %s (%d)\n", gnutls_pk_algorithm_get_name(algorithm), gnutls_strerror(ret), ret);
+				fail("gnutls_x509_privkey_generate (%s): %s (%d)\n",
+				     gnutls_pk_algorithm_get_name(algorithm),
+				     gnutls_strerror(ret), ret);
 			}
 
 			/* include test of cpy */
@@ -205,7 +207,9 @@ void doit(void)
 
 			ret = gnutls_x509_privkey_verify_params(pkey);
 			if (ret < 0) {
-				fail("gnutls_x509_privkey_generate after cpy (%s): %s (%d)\n", gnutls_pk_algorithm_get_name(algorithm), gnutls_strerror(ret), ret);
+				fail("gnutls_x509_privkey_generate after cpy (%s): %s (%d)\n",
+				     gnutls_pk_algorithm_get_name(algorithm),
+				     gnutls_strerror(ret), ret);
 			}
 
 			FIPS_PUSH_CONTEXT();

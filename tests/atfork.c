@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -29,7 +29,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #if !defined(_WIN32)
-# include <sys/wait.h>
+#include <sys/wait.h>
 #endif
 
 #include <gnutls/gnutls.h>
@@ -42,12 +42,12 @@ void doit(void)
 }
 #else
 
-# include "../lib/atfork.h"
-# include "../lib/atfork.c"
+#include "../lib/atfork.h"
+#include "../lib/atfork.c"
 
 /* utils.h must be loaded after gnutls_int.h, as it redefines some
  * macros from gnulib */
-# include "utils.h"
+#include "utils.h"
 
 void doit(void)
 {

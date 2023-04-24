@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -44,7 +44,8 @@ static void tls_log_func(int level, const char *str)
 }
 
 #define MAX_BUF 1024
-#define MSG "Hello TLS, and hi and how are you and more data here... and more... and even more and even more more data..."
+#define MSG \
+	"Hello TLS, and hi and how are you and more data here... and more... and even more and even more more data..."
 
 static void async_handshake(void **glob_state, const char *prio, unsigned rehsk)
 {
@@ -65,20 +66,20 @@ static void async_handshake(void **glob_state, const char *prio, unsigned rehsk)
 	gnutls_global_set_log_function(tls_log_func);
 
 	/* Init server */
-	assert_return_code(gnutls_certificate_allocate_credentials
-			   (&serverx509cred), 0);
-	assert_return_code(gnutls_certificate_set_x509_key_mem
-			   (serverx509cred, &server_cert, &server_key,
-			    GNUTLS_X509_FMT_PEM), 0);
+	assert_return_code(
+		gnutls_certificate_allocate_credentials(&serverx509cred), 0);
+	assert_return_code(gnutls_certificate_set_x509_key_mem(
+				   serverx509cred, &server_cert, &server_key,
+				   GNUTLS_X509_FMT_PEM),
+			   0);
 	ret = gnutls_init(&server, GNUTLS_SERVER);
 	assert_return_code(ret, 0);
 
 	ret = gnutls_priority_set_direct(server, prio, NULL);
 	assert_return_code(ret, 0);
 
-	ret =
-	    gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-				   serverx509cred);
+	ret = gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
+				     serverx509cred);
 	assert_return_code(ret, 0);
 
 	gnutls_transport_set_push_function(server, server_push);
@@ -94,9 +95,8 @@ static void async_handshake(void **glob_state, const char *prio, unsigned rehsk)
 	ret = gnutls_priority_set_direct(client, prio, NULL);
 	assert_return_code(ret, 0);
 
-	ret =
-	    gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-				   clientx509cred);
+	ret = gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
+				     clientx509cred);
 	assert_return_code(ret, 0);
 
 	gnutls_transport_set_push_function(client, client_push);

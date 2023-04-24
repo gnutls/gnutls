@@ -49,33 +49,34 @@ const mod_auth_st rsa_auth_struct = {
 	"RSA",
 	_gnutls_gen_cert_server_crt,
 	_gnutls_gen_cert_client_crt,
-	NULL,			/* gen server kx */
+	NULL, /* gen server kx */
 	_gnutls_gen_rsa_client_kx,
-	_gnutls_gen_cert_client_crt_vrfy,	/* gen client cert vrfy */
-	_gnutls_gen_cert_server_cert_req,	/* server cert request */
+	_gnutls_gen_cert_client_crt_vrfy, /* gen client cert vrfy */
+	_gnutls_gen_cert_server_cert_req, /* server cert request */
 
 	_gnutls_proc_crt,
 	_gnutls_proc_crt,
-	NULL,			/* proc server kx */
-	proc_rsa_client_kx,	/* proc client kx */
-	_gnutls_proc_cert_client_crt_vrfy,	/* proc client cert vrfy */
-	_gnutls_proc_cert_cert_req	/* proc server cert request */
+	NULL, /* proc server kx */
+	proc_rsa_client_kx, /* proc client kx */
+	_gnutls_proc_cert_client_crt_vrfy, /* proc client cert vrfy */
+	_gnutls_proc_cert_cert_req /* proc server cert request */
 };
 
-static
-int check_key_usage_for_enc(gnutls_session_t session, unsigned key_usage)
+static int check_key_usage_for_enc(gnutls_session_t session, unsigned key_usage)
 {
 	if (key_usage != 0) {
-		if (!(key_usage & GNUTLS_KEY_KEY_ENCIPHERMENT)
-		    && !(key_usage & GNUTLS_KEY_KEY_AGREEMENT)) {
+		if (!(key_usage & GNUTLS_KEY_KEY_ENCIPHERMENT) &&
+		    !(key_usage & GNUTLS_KEY_KEY_AGREEMENT)) {
 			gnutls_assert();
 			if (session->internals.allow_key_usage_violation == 0) {
-				_gnutls_audit_log(session,
-						  "Peer's certificate does not allow encryption. Key usage violation detected.\n");
+				_gnutls_audit_log(
+					session,
+					"Peer's certificate does not allow encryption. Key usage violation detected.\n");
 				return GNUTLS_E_KEY_USAGE_VIOLATION;
 			} else {
-				_gnutls_audit_log(session,
-						  "Peer's certificate does not allow encryption. Key usage violation detected (ignored).\n");
+				_gnutls_audit_log(
+					session,
+					"Peer's certificate does not allow encryption. Key usage violation detected (ignored).\n");
 			}
 		}
 	}
@@ -96,9 +97,8 @@ int check_key_usage_for_enc(gnutls_session_t session, unsigned key_usage)
  * checks need to be build in order to retrieve the correct
  * certificate type.
  */
-int
-_gnutls_get_public_rsa_params(gnutls_session_t session,
-			      gnutls_pk_params_st * params)
+int _gnutls_get_public_rsa_params(gnutls_session_t session,
+				  gnutls_pk_params_st *params)
 {
 	int ret;
 	cert_auth_info_t info;
@@ -145,14 +145,14 @@ _gnutls_get_public_rsa_params(gnutls_session_t session,
 	gnutls_pcert_deinit(&peer_cert);
 	return 0;
 
- cleanup2:
+cleanup2:
 	gnutls_pcert_deinit(&peer_cert);
 
 	return ret;
 }
 
-static int
-proc_rsa_client_kx(gnutls_session_t session, uint8_t * data, size_t _data_size)
+static int proc_rsa_client_kx(gnutls_session_t session, uint8_t *data,
+			      size_t _data_size)
 {
 	gnutls_datum_t ciphertext;
 	int ret, dsize;
@@ -201,8 +201,8 @@ proc_rsa_client_kx(gnutls_session_t session, uint8_t * data, size_t _data_size)
 		return ret;
 	}
 
-	gnutls_privkey_decrypt_data2(session->internals.selected_key,
-				     0, &ciphertext, session->key.key.data,
+	gnutls_privkey_decrypt_data2(session->internals.selected_key, 0,
+				     &ciphertext, session->key.key.data,
 				     session->key.key.size);
 	/* After this point, any conditional on failure that cause differences
 	 * in execution may create a timing or cache access pattern side
@@ -230,10 +230,10 @@ proc_rsa_client_kx(gnutls_session_t session, uint8_t * data, size_t _data_size)
 
 /* return RSA(random) using the peers public key 
  */
-int _gnutls_gen_rsa_client_kx(gnutls_session_t session, gnutls_buffer_st * data)
+int _gnutls_gen_rsa_client_kx(gnutls_session_t session, gnutls_buffer_st *data)
 {
 	cert_auth_info_t auth = session->key.auth_info;
-	gnutls_datum_t sdata;	/* data to send */
+	gnutls_datum_t sdata; /* data to send */
 	gnutls_pk_params_st params;
 	int ret;
 
@@ -262,14 +262,14 @@ int _gnutls_gen_rsa_client_kx(gnutls_session_t session, gnutls_buffer_st * data)
 
 	if (session->internals.rsa_pms_version[0] == 0) {
 		session->key.key.data[0] =
-		    _gnutls_get_adv_version_major(session);
+			_gnutls_get_adv_version_major(session);
 		session->key.key.data[1] =
-		    _gnutls_get_adv_version_minor(session);
-	} else {		/* use the version provided */
+			_gnutls_get_adv_version_minor(session);
+	} else { /* use the version provided */
 		session->key.key.data[0] =
-		    session->internals.rsa_pms_version[0];
+			session->internals.rsa_pms_version[0];
 		session->key.key.data[1] =
-		    session->internals.rsa_pms_version[1];
+			session->internals.rsa_pms_version[1];
 	}
 
 	/* move RSA parameters to key (session).
@@ -279,9 +279,8 @@ int _gnutls_gen_rsa_client_kx(gnutls_session_t session, gnutls_buffer_st * data)
 		return ret;
 	}
 
-	ret =
-	    _gnutls_pk_encrypt(GNUTLS_PK_RSA, &sdata, &session->key.key,
-			       &params);
+	ret = _gnutls_pk_encrypt(GNUTLS_PK_RSA, &sdata, &session->key.key,
+				 &params);
 
 	gnutls_pk_params_release(&params);
 
@@ -297,10 +296,9 @@ int _gnutls_gen_rsa_client_kx(gnutls_session_t session, gnutls_buffer_st * data)
 		return ret;
 	} else
 #endif
-	{			/* TLS 1.x */
-		ret =
-		    _gnutls_buffer_append_data_prefix(data, 16, sdata.data,
-						      sdata.size);
+	{ /* TLS 1.x */
+		ret = _gnutls_buffer_append_data_prefix(data, 16, sdata.data,
+							sdata.size);
 
 		_gnutls_free_datum(&sdata);
 		return ret;

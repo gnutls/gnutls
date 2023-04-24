@@ -21,12 +21,12 @@
  */
 
 #ifndef GNUTLS_LIB_HASH_INT_H
-# define GNUTLS_LIB_HASH_INT_H
+#define GNUTLS_LIB_HASH_INT_H
 
-# include "gnutls_int.h"
-# include <gnutls/crypto.h>
-# include <crypto-backend.h>
-# include <crypto.h>
+#include "gnutls_int.h"
+#include <gnutls/crypto.h>
+#include <crypto-backend.h>
+#include <crypto.h>
 
 /* for message digests */
 
@@ -50,7 +50,7 @@ typedef struct {
 	hash_deinit_func deinit;
 	copy_func copy;
 
-	const void *key;	/* esoteric use by SSL3 MAC functions */
+	const void *key; /* esoteric use by SSL3 MAC functions */
 	int keysize;
 
 	void *handle;
@@ -74,17 +74,17 @@ typedef struct {
 int _gnutls_digest_exists(gnutls_digest_algorithm_t algo);
 
 int _gnutls_mac_exists(gnutls_mac_algorithm_t algorithm);
-int _gnutls_mac_init(mac_hd_st *, const mac_entry_st * e,
-		     const void *key, int keylen);
+int _gnutls_mac_init(mac_hd_st *, const mac_entry_st *e, const void *key,
+		     int keylen);
 
-int _gnutls_mac_copy(const mac_hd_st * handle, mac_hd_st * dst);
+int _gnutls_mac_copy(const mac_hd_st *handle, mac_hd_st *dst);
 
 int _gnutls_mac_fast(gnutls_mac_algorithm_t algorithm, const void *key,
 		     int keylen, const void *text, size_t textlen,
 		     void *digest);
 
-inline static int
-_gnutls_mac(mac_hd_st * handle, const void *text, size_t textlen)
+inline static int _gnutls_mac(mac_hd_st *handle, const void *text,
+			      size_t textlen)
 {
 	if (textlen > 0) {
 		return handle->hash(handle->handle, text, textlen);
@@ -92,34 +92,34 @@ _gnutls_mac(mac_hd_st * handle, const void *text, size_t textlen)
 	return 0;
 }
 
-inline static void _gnutls_mac_output(mac_hd_st * handle, void *digest)
+inline static void _gnutls_mac_output(mac_hd_st *handle, void *digest)
 {
 	if (digest != NULL) {
 		handle->output(handle->handle, digest, handle->mac_len);
 	}
 }
 
-inline static int
-_gnutls_mac_set_nonce(mac_hd_st * handle, const void *nonce, size_t n_size)
+inline static int _gnutls_mac_set_nonce(mac_hd_st *handle, const void *nonce,
+					size_t n_size)
 {
 	if (handle->setnonce)
 		return handle->setnonce(handle->handle, nonce, n_size);
 	return 0;
 }
 
-inline static int
-_gnutls_mac_setkey(mac_hd_st * handle, const void *key, size_t key_size)
+inline static int _gnutls_mac_setkey(mac_hd_st *handle, const void *key,
+				     size_t key_size)
 {
 	return handle->setkey(handle->handle, key, key_size);
 }
 
-void _gnutls_mac_deinit(mac_hd_st * handle, void *digest);
+void _gnutls_mac_deinit(mac_hd_st *handle, void *digest);
 
 /* Hash interface */
-int _gnutls_hash_init(digest_hd_st *, const mac_entry_st * e);
+int _gnutls_hash_init(digest_hd_st *, const mac_entry_st *e);
 
-inline static int
-_gnutls_hash(digest_hd_st * handle, const void *text, size_t textlen)
+inline static int _gnutls_hash(digest_hd_st *handle, const void *text,
+			       size_t textlen)
 {
 	if (textlen > 0) {
 		return handle->hash(handle->handle, text, textlen);
@@ -129,31 +129,29 @@ _gnutls_hash(digest_hd_st * handle, const void *text, size_t textlen)
 
 /* when the current output is needed without calling deinit
  */
-# define _gnutls_hash_output(h, d) \
-  (h)->output((h)->handle, d, _gnutls_hash_get_algo_len((h)->e))
+#define _gnutls_hash_output(h, d) \
+	(h)->output((h)->handle, d, _gnutls_hash_get_algo_len((h)->e))
 
-void _gnutls_hash_deinit(digest_hd_st * handle, void *digest);
+void _gnutls_hash_deinit(digest_hd_st *handle, void *digest);
 
-int _gnutls_hash_copy(const digest_hd_st * handle, digest_hd_st * dst);
+int _gnutls_hash_copy(const digest_hd_st *handle, digest_hd_st *dst);
 
-int
-_gnutls_hash_fast(gnutls_digest_algorithm_t algorithm,
-		  const void *text, size_t textlen, void *digest);
+int _gnutls_hash_fast(gnutls_digest_algorithm_t algorithm, const void *text,
+		      size_t textlen, void *digest);
 
-# ifdef ENABLE_SSL3
+#ifdef ENABLE_SSL3
 /* helper functions */
-int _gnutls_mac_init_ssl3(digest_hd_st *, const mac_entry_st * e,
-			  void *key, int keylen);
-int _gnutls_mac_deinit_ssl3(digest_hd_st * handle, void *digest);
-int _gnutls_mac_output_ssl3(digest_hd_st * handle, void *digest);
+int _gnutls_mac_init_ssl3(digest_hd_st *, const mac_entry_st *e, void *key,
+			  int keylen);
+int _gnutls_mac_deinit_ssl3(digest_hd_st *handle, void *digest);
+int _gnutls_mac_output_ssl3(digest_hd_st *handle, void *digest);
 
-int _gnutls_ssl3_generate_random(void *secret, int secret_len,
-				 void *rnd, int random_len, int bytes,
-				 uint8_t * ret);
+int _gnutls_ssl3_generate_random(void *secret, int secret_len, void *rnd,
+				 int random_len, int bytes, uint8_t *ret);
 
-int _gnutls_mac_deinit_ssl3_handshake(digest_hd_st * handle, void *digest,
-				      uint8_t * key, uint32_t key_size);
-# endif
+int _gnutls_mac_deinit_ssl3_handshake(digest_hd_st *handle, void *digest,
+				      uint8_t *key, uint32_t key_size);
+#endif
 
 inline static int IS_SHA(gnutls_digest_algorithm_t algo)
 {
@@ -164,4 +162,4 @@ inline static int IS_SHA(gnutls_digest_algorithm_t algo)
 	return 0;
 }
 
-#endif				/* GNUTLS_LIB_HASH_INT_H */
+#endif /* GNUTLS_LIB_HASH_INT_H */

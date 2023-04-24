@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -47,7 +47,7 @@ static int _rnd_called = 0;
  * calls.
  */
 int __attribute__((visibility("protected")))
-    gnutls_rnd(gnutls_rnd_level_t level, void *data, size_t len)
+gnutls_rnd(gnutls_rnd_level_t level, void *data, size_t len)
 {
 	_rnd_called = 1;
 
@@ -68,4 +68,4 @@ void doit(void)
 
 	gnutls_global_deinit();
 }
-#endif				/* _WIN32 */
+#endif /* _WIN32 */

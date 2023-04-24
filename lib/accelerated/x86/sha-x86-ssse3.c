@@ -70,7 +70,7 @@ static void wrap_x86_hash_deinit(void *hd)
 	gnutls_free(hd);
 }
 
-void x86_sha1_update(struct sha1_ctx *ctx, size_t length, const uint8_t * data)
+void x86_sha1_update(struct sha1_ctx *ctx, size_t length, const uint8_t *data)
 {
 	struct {
 		uint32_t h0, h1, h2, h3, h4;
@@ -103,7 +103,6 @@ void x86_sha1_update(struct sha1_ctx *ctx, size_t length, const uint8_t * data)
 	length -= res;
 
 	if (length > 0) {
-
 		t2 = length / SHA1_DATA_SIZE;
 
 		sha1_block_data_order(&octx, data, t2);
@@ -125,11 +124,10 @@ void x86_sha1_update(struct sha1_ctx *ctx, size_t length, const uint8_t * data)
 	if (res > 0) {
 		sha1_update(ctx, res, data);
 	}
-
 }
 
 void x86_sha256_update(struct sha256_ctx *ctx, size_t length,
-		       const uint8_t * data)
+		       const uint8_t *data)
 {
 	struct {
 		uint32_t h[8];
@@ -177,7 +175,7 @@ void x86_sha256_update(struct sha256_ctx *ctx, size_t length,
 }
 
 void x86_sha512_update(struct sha512_ctx *ctx, size_t length,
-		       const uint8_t * data)
+		       const uint8_t *data)
 {
 	struct {
 		uint64_t h[8];
@@ -232,41 +230,41 @@ static int _ctx_init(gnutls_digest_algorithm_t algo, struct x86_hash_ctx *ctx)
 	switch (algo) {
 	case GNUTLS_DIG_SHA1:
 		sha1_init(&ctx->ctx.sha1);
-		ctx->update = (update_func) x86_sha1_update;
-		ctx->digest = (digest_func) sha1_digest;
-		ctx->init = (init_func) sha1_init;
+		ctx->update = (update_func)x86_sha1_update;
+		ctx->digest = (digest_func)sha1_digest;
+		ctx->init = (init_func)sha1_init;
 		ctx->ctx_ptr = &ctx->ctx.sha1;
 		ctx->length = SHA1_DIGEST_SIZE;
 		break;
 	case GNUTLS_DIG_SHA224:
 		sha224_init(&ctx->ctx.sha224);
-		ctx->update = (update_func) x86_sha256_update;
-		ctx->digest = (digest_func) sha224_digest;
-		ctx->init = (init_func) sha224_init;
+		ctx->update = (update_func)x86_sha256_update;
+		ctx->digest = (digest_func)sha224_digest;
+		ctx->init = (init_func)sha224_init;
 		ctx->ctx_ptr = &ctx->ctx.sha224;
 		ctx->length = SHA224_DIGEST_SIZE;
 		break;
 	case GNUTLS_DIG_SHA256:
 		sha256_init(&ctx->ctx.sha256);
-		ctx->update = (update_func) x86_sha256_update;
-		ctx->digest = (digest_func) sha256_digest;
-		ctx->init = (init_func) sha256_init;
+		ctx->update = (update_func)x86_sha256_update;
+		ctx->digest = (digest_func)sha256_digest;
+		ctx->init = (init_func)sha256_init;
 		ctx->ctx_ptr = &ctx->ctx.sha256;
 		ctx->length = SHA256_DIGEST_SIZE;
 		break;
 	case GNUTLS_DIG_SHA384:
 		sha384_init(&ctx->ctx.sha384);
-		ctx->update = (update_func) x86_sha512_update;
-		ctx->digest = (digest_func) sha384_digest;
-		ctx->init = (init_func) sha384_init;
+		ctx->update = (update_func)x86_sha512_update;
+		ctx->digest = (digest_func)sha384_digest;
+		ctx->init = (init_func)sha384_init;
 		ctx->ctx_ptr = &ctx->ctx.sha384;
 		ctx->length = SHA384_DIGEST_SIZE;
 		break;
 	case GNUTLS_DIG_SHA512:
 		sha512_init(&ctx->ctx.sha512);
-		ctx->update = (update_func) x86_sha512_update;
-		ctx->digest = (digest_func) sha512_digest;
-		ctx->init = (init_func) sha512_init;
+		ctx->update = (update_func)x86_sha512_update;
+		ctx->digest = (digest_func)sha512_digest;
+		ctx->init = (init_func)sha512_init;
 		ctx->ctx_ptr = &ctx->ctx.sha512;
 		ctx->length = SHA512_DIGEST_SIZE;
 		break;
@@ -305,7 +303,7 @@ static void *wrap_x86_hash_copy(const void *_ctx)
 {
 	struct x86_hash_ctx *new_ctx;
 	const struct x86_hash_ctx *ctx = _ctx;
-	ptrdiff_t off = (uint8_t *) ctx->ctx_ptr - (uint8_t *) (&ctx->ctx);
+	ptrdiff_t off = (uint8_t *)ctx->ctx_ptr - (uint8_t *)(&ctx->ctx);
 
 	new_ctx = gnutls_malloc(sizeof(struct x86_hash_ctx));
 	if (new_ctx == NULL) {
@@ -314,7 +312,7 @@ static void *wrap_x86_hash_copy(const void *_ctx)
 	}
 
 	memcpy(new_ctx, ctx, sizeof(*new_ctx));
-	new_ctx->ctx_ptr = (uint8_t *) & new_ctx->ctx + off;
+	new_ctx->ctx_ptr = (uint8_t *)&new_ctx->ctx + off;
 
 	return new_ctx;
 }
@@ -332,8 +330,8 @@ static int wrap_x86_hash_output(void *src_ctx, void *digest, size_t digestsize)
 	return 0;
 }
 
-static int wrap_x86_hash_fast(gnutls_digest_algorithm_t algo,
-			      const void *text, size_t text_size, void *digest)
+static int wrap_x86_hash_fast(gnutls_digest_algorithm_t algo, const void *text,
+			      size_t text_size, void *digest)
 {
 	struct x86_hash_ctx ctx;
 	int ret;
@@ -349,16 +347,16 @@ static int wrap_x86_hash_fast(gnutls_digest_algorithm_t algo,
 }
 
 const struct nettle_hash x86_sha1 =
-NN_HASH(sha1, x86_sha1_update, sha1_digest, SHA1);
+	NN_HASH(sha1, x86_sha1_update, sha1_digest, SHA1);
 const struct nettle_hash x86_sha224 =
-NN_HASH(sha224, x86_sha256_update, sha224_digest, SHA224);
+	NN_HASH(sha224, x86_sha256_update, sha224_digest, SHA224);
 const struct nettle_hash x86_sha256 =
-NN_HASH(sha256, x86_sha256_update, sha256_digest, SHA256);
+	NN_HASH(sha256, x86_sha256_update, sha256_digest, SHA256);
 
 const struct nettle_hash x86_sha384 =
-NN_HASH(sha384, x86_sha512_update, sha384_digest, SHA384);
+	NN_HASH(sha384, x86_sha512_update, sha384_digest, SHA384);
 const struct nettle_hash x86_sha512 =
-NN_HASH(sha512, x86_sha512_update, sha512_digest, SHA512);
+	NN_HASH(sha512, x86_sha512_update, sha512_digest, SHA512);
 
 const gnutls_crypto_digest_st _gnutls_sha_x86_ssse3 = {
 	.init = wrap_x86_hash_init,

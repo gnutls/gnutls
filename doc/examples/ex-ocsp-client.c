@@ -1,7 +1,7 @@
 /* This example code is placed in the public domain. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -11,19 +11,17 @@
 #include <gnutls/crypto.h>
 #include <gnutls/ocsp.h>
 #ifndef NO_LIBCURL
-# include <curl/curl.h>
+#include <curl/curl.h>
 #endif
 #include "read-file.h"
 
 size_t get_data(void *buffer, size_t size, size_t nmemb, void *userp);
 static gnutls_x509_crt_t load_cert(const char *cert_file);
-static void _response_info(const gnutls_datum_t * data);
-static void
-_generate_request(gnutls_datum_t * rdata, gnutls_x509_crt_t cert,
-		  gnutls_x509_crt_t issuer, gnutls_datum_t * nonce);
-static int
-_verify_response(gnutls_datum_t * data, gnutls_x509_crt_t cert,
-		 gnutls_x509_crt_t signer, gnutls_datum_t * nonce);
+static void _response_info(const gnutls_datum_t *data);
+static void _generate_request(gnutls_datum_t *rdata, gnutls_x509_crt_t cert,
+			      gnutls_x509_crt_t issuer, gnutls_datum_t *nonce);
+static int _verify_response(gnutls_datum_t *data, gnutls_x509_crt_t cert,
+			    gnutls_x509_crt_t signer, gnutls_datum_t *nonce);
 
 /* This program queries an OCSP server.
    It expects three files. argv[1] containing the certificate to
@@ -66,14 +64,9 @@ int main(int argc, char *argv[])
 	signer = load_cert(signer_file);
 
 	if (hostname == NULL) {
-
 		for (seq = 0;; seq++) {
-			ret =
-			    gnutls_x509_crt_get_authority_info_access(cert,
-								      seq,
-								      GNUTLS_IA_OCSP_URI,
-								      &tmp,
-								      NULL);
+			ret = gnutls_x509_crt_get_authority_info_access(
+				cert, seq, GNUTLS_IA_OCSP_URI, &tmp, NULL);
 			if (ret == GNUTLS_E_UNKNOWN_ALGORITHM)
 				continue;
 			if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
@@ -101,7 +94,6 @@ int main(int argc, char *argv[])
 			gnutls_free(tmp.data);
 			break;
 		}
-
 	}
 
 	/* Note that the OCSP servers hostname might be available
@@ -120,9 +112,8 @@ int main(int argc, char *argv[])
 	if (handle == NULL)
 		exit(1);
 
-	headers =
-	    curl_slist_append(headers,
-			      "Content-Type: application/ocsp-request");
+	headers = curl_slist_append(headers,
+				    "Content-Type: application/ocsp-request");
 
 	curl_easy_setopt(handle, CURLOPT_HTTPHEADER, headers);
 	curl_easy_setopt(handle, CURLOPT_POSTFIELDS, (void *)req.data);
@@ -152,7 +143,7 @@ int main(int argc, char *argv[])
 	return v;
 }
 
-static void _response_info(const gnutls_datum_t * data)
+static void _response_info(const gnutls_datum_t *data)
 {
 	gnutls_ocsp_resp_t resp;
 	int ret;
@@ -206,9 +197,8 @@ static gnutls_x509_crt_t load_cert(const char *cert_file)
 	return crt;
 }
 
-static void
-_generate_request(gnutls_datum_t * rdata, gnutls_x509_crt_t cert,
-		  gnutls_x509_crt_t issuer, gnutls_datum_t * nonce)
+static void _generate_request(gnutls_datum_t *rdata, gnutls_x509_crt_t cert,
+			      gnutls_x509_crt_t issuer, gnutls_datum_t *nonce)
 {
 	gnutls_ocsp_req_t req;
 	int ret;
@@ -234,9 +224,8 @@ _generate_request(gnutls_datum_t * rdata, gnutls_x509_crt_t cert,
 	return;
 }
 
-static int
-_verify_response(gnutls_datum_t * data, gnutls_x509_crt_t cert,
-		 gnutls_x509_crt_t signer, gnutls_datum_t * nonce)
+static int _verify_response(gnutls_datum_t *data, gnutls_x509_crt_t cert,
+			    gnutls_x509_crt_t signer, gnutls_datum_t *nonce)
 {
 	gnutls_ocsp_resp_t resp;
 	int ret;
@@ -259,8 +248,8 @@ _verify_response(gnutls_datum_t * data, gnutls_x509_crt_t cert,
 	if (ret < 0)
 		exit(1);
 
-	if (rnonce.size != nonce->size || memcmp(nonce->data, rnonce.data,
-						 nonce->size) != 0) {
+	if (rnonce.size != nonce->size ||
+	    memcmp(nonce->data, rnonce.data, nonce->size) != 0) {
 		exit(1);
 	}
 

@@ -37,8 +37,8 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "%s|<%d>| %s", side, level, str);
 }
 
-static void
-start(const char *test_name, const char *prio, const char *expected_name)
+static void start(const char *test_name, const char *prio,
+		  const char *expected_name)
 {
 	int sret, cret;
 	gnutls_certificate_credentials_t scred, ccred;
@@ -54,8 +54,7 @@ start(const char *test_name, const char *prio, const char *expected_name)
 
 	/* Init server */
 	assert(gnutls_certificate_allocate_credentials(&scred) >= 0);
-	assert(gnutls_certificate_set_x509_key_mem(scred,
-						   &server_cert,
+	assert(gnutls_certificate_set_x509_key_mem(scred, &server_cert,
 						   &server_key,
 						   GNUTLS_X509_FMT_PEM) >= 0);
 
@@ -69,8 +68,8 @@ start(const char *test_name, const char *prio, const char *expected_name)
 
 	/* Init client */
 	gnutls_certificate_allocate_credentials(&ccred);
-	assert(gnutls_certificate_set_x509_trust_mem
-	       (ccred, &ca3_cert, GNUTLS_X509_FMT_PEM) >= 0);
+	assert(gnutls_certificate_set_x509_trust_mem(ccred, &ca3_cert,
+						     GNUTLS_X509_FMT_PEM) >= 0);
 
 	gnutls_init(&client, GNUTLS_CLIENT);
 
@@ -86,12 +85,14 @@ start(const char *test_name, const char *prio, const char *expected_name)
 
 	name = gnutls_ciphersuite_get(server);
 	if (!name || strcmp(name, expected_name) != 0) {
-		fail("server: gnutls_ciphersuite_get returned %s while %s is expected\n", name, expected_name);
+		fail("server: gnutls_ciphersuite_get returned %s while %s is expected\n",
+		     name, expected_name);
 	}
 
 	name = gnutls_ciphersuite_get(client);
 	if (!name || strcmp(name, expected_name) != 0) {
-		fail("client: gnutls_ciphersuite_get returned %s while %s is expected\n", name, expected_name);
+		fail("client: gnutls_ciphersuite_get returned %s while %s is expected\n",
+		     name, expected_name);
 	}
 
 	gnutls_bye(client, GNUTLS_SHUT_WR);

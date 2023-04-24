@@ -32,7 +32,7 @@
 /* Development of Nettle's ECC support was funded by the .SE Internet Fund. */
 
 #if HAVE_CONFIG_H
-# include "config.h"
+#include "config.h"
 #endif
 
 #include <gnutls_int.h>
@@ -50,9 +50,8 @@
    unusual limb sizes.
 */
 
-void
-gost_hash(const struct ecc_modulo *m,
-	  mp_limb_t * hp, size_t length, const uint8_t * digest)
+void gost_hash(const struct ecc_modulo *m, mp_limb_t *hp, size_t length,
+	       const uint8_t *digest)
 {
 	if (length > ((size_t)m->bit_size + 7) / 8)
 		length = (m->bit_size + 7) / 8;

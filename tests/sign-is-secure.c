@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -32,46 +32,46 @@
 
 #include "utils.h"
 
-#define CHECK_SECURE_SIG(sig) \
-	ret = gnutls_sign_is_secure2(sig, 0); \
-	if (ret == 0) { \
+#define CHECK_SECURE_SIG(sig)                                                  \
+	ret = gnutls_sign_is_secure2(sig, 0);                                  \
+	if (ret == 0) {                                                        \
 		fail("error testing %d/%s\n", sig, gnutls_sign_get_name(sig)); \
-	} \
-	ret = gnutls_sign_is_secure(sig); \
-	if (ret == 0) { \
+	}                                                                      \
+	ret = gnutls_sign_is_secure(sig);                                      \
+	if (ret == 0) {                                                        \
 		fail("error testing %d/%s\n", sig, gnutls_sign_get_name(sig)); \
 	}
 
-#define CHECK_INSECURE_SIG(sig) \
-	ret = gnutls_sign_is_secure2(sig, 0); \
-	if (ret != 0) { \
+#define CHECK_INSECURE_SIG(sig)                                                \
+	ret = gnutls_sign_is_secure2(sig, 0);                                  \
+	if (ret != 0) {                                                        \
 		fail("error testing %d/%s\n", sig, gnutls_sign_get_name(sig)); \
-	} \
-	ret = gnutls_sign_is_secure2(sig, GNUTLS_SIGN_FLAG_SECURE_FOR_CERTS); \
-	if (ret != 0) { \
+	}                                                                      \
+	ret = gnutls_sign_is_secure2(sig, GNUTLS_SIGN_FLAG_SECURE_FOR_CERTS);  \
+	if (ret != 0) {                                                        \
 		fail("error testing %d/%s\n", sig, gnutls_sign_get_name(sig)); \
-	} \
-	ret = gnutls_sign_is_secure(sig); \
-	if (ret != 0) { \
+	}                                                                      \
+	ret = gnutls_sign_is_secure(sig);                                      \
+	if (ret != 0) {                                                        \
 		fail("error testing %d/%s\n", sig, gnutls_sign_get_name(sig)); \
 	}
 
 #ifndef ALLOW_SHA1
-# define CHECK_INSECURE_FOR_CERTS_SIG(sig) \
-	ret = gnutls_sign_is_secure2(sig, 0); \
-	if (ret == 0) { \
+#define CHECK_INSECURE_FOR_CERTS_SIG(sig)                                      \
+	ret = gnutls_sign_is_secure2(sig, 0);                                  \
+	if (ret == 0) {                                                        \
 		fail("error testing %d/%s\n", sig, gnutls_sign_get_name(sig)); \
-	} \
-	ret = gnutls_sign_is_secure2(sig, GNUTLS_SIGN_FLAG_SECURE_FOR_CERTS); \
-	if (ret != 0) { \
+	}                                                                      \
+	ret = gnutls_sign_is_secure2(sig, GNUTLS_SIGN_FLAG_SECURE_FOR_CERTS);  \
+	if (ret != 0) {                                                        \
 		fail("error testing %d/%s\n", sig, gnutls_sign_get_name(sig)); \
-	} \
-	ret = gnutls_sign_is_secure(sig); \
-	if (ret == 0) { \
+	}                                                                      \
+	ret = gnutls_sign_is_secure(sig);                                      \
+	if (ret == 0) {                                                        \
 		fail("error testing %d/%s\n", sig, gnutls_sign_get_name(sig)); \
 	}
 #else
-# define CHECK_INSECURE_FOR_CERTS_SIG(sig)
+#define CHECK_INSECURE_FOR_CERTS_SIG(sig)
 #endif
 
 void doit(void)
@@ -89,12 +89,12 @@ void doit(void)
 
 	for (i = 1; i <= GNUTLS_SIGN_MAX; i++) {
 #ifndef ALLOW_SHA1
-		if (i == GNUTLS_SIGN_RSA_SHA1 || i == GNUTLS_SIGN_DSA_SHA1
-		    || i == GNUTLS_SIGN_ECDSA_SHA1)
+		if (i == GNUTLS_SIGN_RSA_SHA1 || i == GNUTLS_SIGN_DSA_SHA1 ||
+		    i == GNUTLS_SIGN_ECDSA_SHA1)
 			continue;
 #endif
-		if (i == GNUTLS_SIGN_GOST_94 || i == GNUTLS_SIGN_RSA_MD5
-		    || i == GNUTLS_SIGN_RSA_MD2 || i == GNUTLS_SIGN_UNKNOWN)
+		if (i == GNUTLS_SIGN_GOST_94 || i == GNUTLS_SIGN_RSA_MD5 ||
+		    i == GNUTLS_SIGN_RSA_MD2 || i == GNUTLS_SIGN_UNKNOWN)
 			continue;
 		/* skip any unused elements */
 		if (gnutls_sign_algorithm_get_name(i) == NULL)
