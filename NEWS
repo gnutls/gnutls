@@ -14,6 +14,20 @@ See the end for copying conditions.
    extension without payload, the behavior can be reverted with the
    %NO_SHUFFLE_EXTENSIONS priority keyword.
 
+** libgnutls: Add support for RFC 9258 external PSK importer.
+   This enables to deploy the same PSK across multiple TLS versions
+   (TLS 1.2 and TLS 1.3) in a secure manner. To use, the application
+   needs to set up a callback that formats the PSK identity using
+   gnutls_psk_format_imported_identity().
+
+** API and ABI modifications:
+gnutls_psk_client_credentials_function3: New typedef
+gnutls_psk_server_credentials_function3: New typedef
+gnutls_psk_set_server_credentials_function3: New function
+gnutls_psk_set_client_credentials_function3: New function
+gnutls_psk_format_imported_identity: New function
+GNUTLS_PSK_KEY_EXT: New enum member of gnutls_psk_key_flags
+
 * Version 3.8.0 (released 2023-02-09)
 
 ** libgnutls: Fix a Bleichenbacher oracle in the TLS RSA key exchange.

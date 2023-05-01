@@ -103,7 +103,7 @@ static int gen_ecdhe_psk_client_kx(gnutls_session_t session,
 	if (cred == NULL)
 		return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
 
-	ret = _gnutls_find_psk_key(session, cred, &username, &key, &free);
+	ret = _gnutls_find_psk_key(session, cred, &username, &key, NULL, &free);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -146,7 +146,7 @@ static int gen_dhe_psk_client_kx(gnutls_session_t session,
 	if (cred == NULL)
 		return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
 
-	ret = _gnutls_find_psk_key(session, cred, &username, &key, &free);
+	ret = _gnutls_find_psk_key(session, cred, &username, &key, NULL, &free);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -308,7 +308,7 @@ static int proc_dhe_psk_client_kx(gnutls_session_t session, uint8_t *data,
 	data += username.size + 2;
 
 	ret = _gnutls_psk_pwd_find_entry(session, info->username,
-					 info->username_len, &psk_key);
+					 info->username_len, &psk_key, NULL);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -374,7 +374,7 @@ static int proc_ecdhe_psk_client_kx(gnutls_session_t session, uint8_t *data,
 	/* should never fail. It will always return a key even if it is
 	 * a random one */
 	ret = _gnutls_psk_pwd_find_entry(session, info->username,
-					 info->username_len, &psk_key);
+					 info->username_len, &psk_key, NULL);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 

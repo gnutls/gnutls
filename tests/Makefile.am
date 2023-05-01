@@ -234,7 +234,8 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 set_x509_ocsp_multi_cli kdf-api keylog-func handshake-write \
 	 x509cert-dntypes id-on-xmppAddr tls13-compat-mode ciphersuite-name \
 	 x509-upnconstraint xts-key-check cipher-padding pkcs7-verify-double-free \
-	 fips-rsa-sizes tls12-rehandshake-ticket pathbuf tls-force-ems
+	 fips-rsa-sizes tls12-rehandshake-ticket pathbuf tls-force-ems \
+	 psk-importer
 
 ctests += tls-channel-binding
 

@@ -280,9 +280,9 @@ int gnutls_psk_set_server_credentials_hint(gnutls_psk_server_credentials_t res,
 	return 0;
 }
 
-static int call_server_callback_legacy(gnutls_session_t session,
-				       const gnutls_datum_t *username,
-				       gnutls_datum_t *key)
+static int call_server_callback1(gnutls_session_t session,
+				 const gnutls_datum_t *username,
+				 gnutls_datum_t *key)
 {
 	gnutls_psk_server_credentials_t cred =
 		(gnutls_psk_server_credentials_t)_gnutls_get_cred(
@@ -290,8 +290,29 @@ static int call_server_callback_legacy(gnutls_session_t session,
 	if (unlikely(cred == NULL))
 		return gnutls_assert_val(-1);
 
-	return cred->pwd_callback_legacy(session, (const char *)username->data,
-					 key);
+	return cred->pwd_callback1(session, (const char *)username->data, key);
+}
+
+static int call_server_callback2(gnutls_session_t session,
+				 const gnutls_datum_t *username,
+				 gnutls_datum_t *key,
+				 gnutls_psk_key_flags *flags)
+{
+	gnutls_psk_server_credentials_t cred;
+	int ret;
+
+	cred = (gnutls_psk_server_credentials_t)_gnutls_get_cred(
+		session, GNUTLS_CRD_PSK);
+	if (unlikely(cred == NULL))
+		return gnutls_assert_val(-1);
+
+	ret = cred->pwd_callback2(session, username, key);
+	if (ret >= 0) {
+		if (flags) {
+			*flags = 0;
+		}
+	}
+	return ret;
 }
 
 /**
@@ -318,8 +339,9 @@ void gnutls_psk_set_server_credentials_function(
 	gnutls_psk_server_credentials_t cred,
 	gnutls_psk_server_credentials_function *func)
 {
-	cred->pwd_callback_legacy = func;
-	cred->pwd_callback = call_server_callback_legacy;
+	cred->pwd_callback1 = func;
+	cred->pwd_callback2 = call_server_callback1;
+	cred->pwd_callback = call_server_callback2;
 }
 
 /**
@@ -349,31 +371,88 @@ void gnutls_psk_set_server_credentials_function2(
 	gnutls_psk_server_credentials_t cred,
 	gnutls_psk_server_credentials_function2 func)
 {
-	cred->pwd_callback = func;
-	cred->pwd_callback_legacy = NULL;
+	cred->pwd_callback1 = NULL;
+	cred->pwd_callback2 = func;
+	cred->pwd_callback = call_server_callback2;
 }
 
-static int call_client_callback_legacy(gnutls_session_t session,
-				       gnutls_datum_t *username,
-				       gnutls_datum_t *key)
+/**
+ * gnutls_psk_set_server_credentials_function3:
+ * @cred: is a #gnutls_psk_server_credentials_t type.
+ * @func: is the callback function
+ *
+ * This function can be used to set a callback to retrieve the user's PSK credentials.
+ * The callback's function form is:
+ * int (*callback)(gnutls_session_t, const gnutls_datum_t* username,
+ *  gnutls_datum_t* key, gnutls_psk_key_flags *flags);
+ *
+ * This callback function has the same semantics as that of
+ * gnutls_psk_set_server_credentials_function2(), but it returns flags
+ * associated with the key.  The callback may import external PSK
+ * using the method described in RFC 9258 by using
+ * gnutls_psk_format_imported_identity().
+ *
+ * @username contains the actual username.
+ * The @key must be filled in using the gnutls_malloc().
+ *
+ * In case the callback returned a negative number then gnutls will
+ * assume that the username does not exist.
+ *
+ * The callback function will only be called once per handshake.  The
+ * callback function should return 0 on success, while -1 indicates
+ * an error.
+ **/
+void gnutls_psk_set_server_credentials_function3(
+	gnutls_psk_server_credentials_t cred,
+	gnutls_psk_server_credentials_function3 func)
 {
+	cred->pwd_callback1 = NULL;
+	cred->pwd_callback2 = NULL;
+	cred->pwd_callback = func;
+}
+
+static int call_client_callback1(gnutls_session_t session,
+				 gnutls_datum_t *username, gnutls_datum_t *key)
+{
+	gnutls_psk_client_credentials_t cred;
 	int ret;
 	char *user_p;
-	gnutls_psk_client_credentials_t cred =
-		(gnutls_psk_client_credentials_t)_gnutls_get_cred(
-			session, GNUTLS_CRD_PSK);
+
+	cred = (gnutls_psk_client_credentials_t)_gnutls_get_cred(
+		session, GNUTLS_CRD_PSK);
 	if (unlikely(cred == NULL))
 		return gnutls_assert_val(-1);
 
-	ret = cred->get_function_legacy(session, &user_p, key);
+	ret = cred->get_function1(session, &user_p, key);
+	if (ret >= 0) {
+		username->data = (uint8_t *)user_p;
+		username->size = strlen(user_p);
+	}
 
-	if (ret)
-		goto end;
+	return ret;
+}
 
-	username->data = (uint8_t *)user_p;
-	username->size = strlen(user_p);
+static int call_client_callback2(gnutls_session_t session,
+				 gnutls_datum_t *username, gnutls_datum_t *key,
+				 gnutls_psk_key_flags *flags)
+{
+	gnutls_psk_client_credentials_t cred;
+	int ret;
 
-end:
+	cred = (gnutls_psk_client_credentials_t)_gnutls_get_cred(
+		session, GNUTLS_CRD_PSK);
+	if (unlikely(cred == NULL))
+		return gnutls_assert_val(-1);
+
+	ret = cred->get_function2(session, username, key);
+	if (ret < 0) {
+		return ret;
+	}
+
+	if (flags) {
+		*flags = 0;
+	}
+
 	return ret;
 }
 
@@ -402,8 +481,9 @@ void gnutls_psk_set_client_credentials_function(
 	gnutls_psk_client_credentials_t cred,
 	gnutls_psk_client_credentials_function *func)
 {
-	cred->get_function = call_client_callback_legacy;
-	cred->get_function_legacy = func;
+	cred->get_function1 = func;
+	cred->get_function2 = call_client_callback1;
+	cred->get_function = call_client_callback2;
 }
 
 /**
@@ -434,8 +514,45 @@ void gnutls_psk_set_client_credentials_function2(
 	gnutls_psk_client_credentials_t cred,
 	gnutls_psk_client_credentials_function2 *func)
 {
+	cred->get_function1 = NULL;
+	cred->get_function2 = func;
+	cred->get_function = call_client_callback2;
+}
+
+/**
+ * gnutls_psk_set_client_credentials_function3:
+ * @cred: is a #gnutls_psk_server_credentials_t type.
+ * @func: is the callback function
+ *
+ * This function can be used to set a callback to retrieve the username and
+ * password for client PSK authentication.
+ * The callback's function form is:
+ * int (*callback)(gnutls_session_t, gnutls_datum_t* username,
+ *  gnutls_datum_t* key, gnutls_datum_t* context, gnutls_psk_key_flags *flags);
+ *
+ * This callback function has the same semantics as that of
+ * gnutls_psk_set_client_credentials_function2(), but it returns flags
+ * associated with the key.  The callback may import external PSK
+ * using the method described in RFC 9258 by using
+ * gnutls_psk_format_imported_identity().
+ *
+ * The data field of @username, @key, and @context must be allocated
+ * using gnutls_malloc().  The @username should be an ASCII string or
+ * UTF-8 string. In case of a UTF-8 string it is recommended to be
+ * following the PRECIS framework for usernames (rfc8265).
+ *
+ * The callback function will be called once per handshake.
+ *
+ * The callback function should return 0 on success.
+ * -1 indicates an error.
+ **/
+void gnutls_psk_set_client_credentials_function3(
+	gnutls_psk_client_credentials_t cred,
+	gnutls_psk_client_credentials_function3 *func)
+{
+	cred->get_function1 = NULL;
+	cred->get_function2 = NULL;
 	cred->get_function = func;
-	cred->get_function_legacy = NULL;
 }
 
 /**

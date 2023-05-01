@@ -149,7 +149,8 @@ static int _randomize_psk(gnutls_datum_t *psk)
  * If the user doesn't exist a random password is returned instead.
  */
 int _gnutls_psk_pwd_find_entry(gnutls_session_t session, const char *username,
-			       uint16_t username_len, gnutls_datum_t *psk)
+			       uint16_t username_len, gnutls_datum_t *psk,
+			       gnutls_psk_key_flags *flags)
 {
 	gnutls_psk_server_credentials_t cred;
 	FILE *fp;
@@ -170,8 +171,7 @@ int _gnutls_psk_pwd_find_entry(gnutls_session_t session, const char *username,
 	 * set, use it.
 	 */
 	if (cred->pwd_callback != NULL) {
-		ret = cred->pwd_callback(session, &username_datum, psk);
-
+		ret = cred->pwd_callback(session, &username_datum, psk, flags);
 		if (ret == 1) { /* the user does not exist */
 			ret = _randomize_psk(psk);
 			if (ret < 0) {
@@ -212,6 +212,9 @@ int _gnutls_psk_pwd_find_entry(gnutls_session_t session, const char *username,
 				ret = GNUTLS_E_SRP_PWD_ERROR;
 				goto cleanup;
 			}
+			if (flags) {
+				*flags = 0;
+			}
 			ret = 0;
 			goto cleanup;
 		}
@@ -224,6 +227,9 @@ int _gnutls_psk_pwd_find_entry(gnutls_session_t session, const char *username,
 		goto cleanup;
 	}
 
+	if (flags) {
+		*flags = 0;
+	}
 	ret = 0;
 cleanup:
 	if (fp != NULL)
@@ -241,7 +247,7 @@ cleanup:
 int _gnutls_find_psk_key(gnutls_session_t session,
 			 gnutls_psk_client_credentials_t cred,
 			 gnutls_datum_t *username, gnutls_datum_t *key,
-			 int *free)
+			 gnutls_psk_key_flags *flags, int *free)
 {
 	int ret;
 
@@ -252,11 +258,14 @@ int _gnutls_find_psk_key(gnutls_session_t session,
 		username->size = cred->username.size;
 		key->data = cred->key.data;
 		key->size = cred->key.size;
+		if (flags) {
+			*flags = 0;
+		}
 	} else if (cred->get_function != NULL) {
-		ret = cred->get_function(session, username, key);
-
-		if (ret)
+		ret = cred->get_function(session, username, key, flags);
+		if (ret) {
 			return gnutls_assert_val(ret);
+		}
 
 		*free = 1;
 	} else
