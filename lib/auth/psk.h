@@ -36,19 +36,20 @@
 typedef struct gnutls_psk_client_credentials_st {
 	gnutls_datum_t username;
 	gnutls_datum_t key;
-	gnutls_psk_client_credentials_function2 *get_function;
-	gnutls_psk_client_credentials_function *get_function_legacy;
+	gnutls_psk_client_credentials_function3 *get_function;
+	gnutls_psk_client_credentials_function2 *get_function2;
+	gnutls_psk_client_credentials_function *get_function1;
 	/* TLS 1.3 - The HMAC algorithm to use to compute the binder values */
 	const mac_entry_st *binder_algo;
 } psk_client_credentials_st;
 
 typedef struct gnutls_psk_server_credentials_st {
 	char *password_file;
-	/* callback function, instead of reading the
-	 * password files.
+	/* callback functions, instead of reading the password files.
 	 */
-	gnutls_psk_server_credentials_function2 *pwd_callback;
-	gnutls_psk_server_credentials_function *pwd_callback_legacy;
+	gnutls_psk_server_credentials_function3 *pwd_callback;
+	gnutls_psk_server_credentials_function2 *pwd_callback2;
+	gnutls_psk_server_credentials_function *pwd_callback1;
 
 	/* For DHE_PSK */
 	gnutls_dh_params_t dh_params;

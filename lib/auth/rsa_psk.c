@@ -193,7 +193,7 @@ static int _gnutls_gen_rsa_psk_client_kx(gnutls_session_t session,
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
-	ret = _gnutls_find_psk_key(session, cred, &username, &key, &free);
+	ret = _gnutls_find_psk_key(session, cred, &username, &key, NULL, &free);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -382,7 +382,8 @@ static int _gnutls_proc_rsa_psk_client_kx(gnutls_session_t session,
 	/* find the key of this username
 	 */
 	ret = _gnutls_psk_pwd_find_entry(session, info->username,
-					 strlen(info->username), &pwd_psk);
+					 strlen(info->username), &pwd_psk,
+					 NULL);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;

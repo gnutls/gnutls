@@ -25,11 +25,12 @@
 
 /* this is locally allocated. It should be freed using the provided function */
 int _gnutls_psk_pwd_find_entry(gnutls_session_t, const char *username,
-			       uint16_t username_len, gnutls_datum_t *key);
+			       uint16_t username_len, gnutls_datum_t *key,
+			       gnutls_psk_key_flags *flags);
 
 int _gnutls_find_psk_key(gnutls_session_t session,
 			 gnutls_psk_client_credentials_t cred,
 			 gnutls_datum_t *username, gnutls_datum_t *key,
-			 int *free);
+			 gnutls_psk_key_flags *flags, int *free);
 
 #endif /* GNUTLS_LIB_AUTH_PSK_PASSWD_H */

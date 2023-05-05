@@ -2533,12 +2533,14 @@ typedef struct gnutls_psk_client_credentials_st *gnutls_psk_client_credentials_t
  * gnutls_psk_key_flags:
  * @GNUTLS_PSK_KEY_RAW: PSK-key in raw format.
  * @GNUTLS_PSK_KEY_HEX: PSK-key in hex format.
+ * @GNUTLS_PSK_KEY_EXT: PSK-key is external and to be imported.
  *
  * Enumeration of different PSK key flags.
  */
 typedef enum gnutls_psk_key_flags {
 	GNUTLS_PSK_KEY_RAW = 0,
-	GNUTLS_PSK_KEY_HEX
+	GNUTLS_PSK_KEY_HEX = 1 << 0,
+	GNUTLS_PSK_KEY_EXT = 1 << 1
 } gnutls_psk_key_flags;
 
 void gnutls_psk_free_client_credentials(gnutls_psk_client_credentials_t sc);
@@ -2570,12 +2572,24 @@ typedef int gnutls_psk_server_credentials_function(gnutls_session_t,
 						   gnutls_datum_t *key);
 typedef int gnutls_psk_server_credentials_function2(
 	gnutls_session_t, const gnutls_datum_t *username, gnutls_datum_t *key);
+typedef int gnutls_psk_server_credentials_function3(
+	gnutls_session_t, const gnutls_datum_t *username, gnutls_datum_t *key,
+	gnutls_psk_key_flags *flags);
 void gnutls_psk_set_server_credentials_function(
 	gnutls_psk_server_credentials_t cred,
 	gnutls_psk_server_credentials_function *func);
 void gnutls_psk_set_server_credentials_function2(
 	gnutls_psk_server_credentials_t cred,
 	gnutls_psk_server_credentials_function2 *func);
+void gnutls_psk_set_server_credentials_function3(
+	gnutls_psk_server_credentials_t cred,
+	gnutls_psk_server_credentials_function3 *func);
+
+int gnutls_psk_format_imported_identity(const gnutls_datum_t *identity,
+					const gnutls_datum_t *context,
+					gnutls_protocol_t version,
+					gnutls_digest_algorithm_t hash,
+					gnutls_datum_t *imported_identity);
 
 typedef int gnutls_psk_client_credentials_function(gnutls_session_t,
 						   char **username,
@@ -2583,12 +2597,18 @@ typedef int gnutls_psk_client_credentials_function(gnutls_session_t,
 typedef int gnutls_psk_client_credentials_function2(gnutls_session_t,
 						    gnutls_datum_t *username,
 						    gnutls_datum_t *key);
+typedef int gnutls_psk_client_credentials_function3(
+	gnutls_session_t, gnutls_datum_t *username, gnutls_datum_t *key,
+	gnutls_psk_key_flags *flags);
 void gnutls_psk_set_client_credentials_function(
 	gnutls_psk_client_credentials_t cred,
 	gnutls_psk_client_credentials_function *func);
 void gnutls_psk_set_client_credentials_function2(
 	gnutls_psk_client_credentials_t cred,
 	gnutls_psk_client_credentials_function2 *func);
+void gnutls_psk_set_client_credentials_function3(
+	gnutls_psk_client_credentials_t cred,
+	gnutls_psk_client_credentials_function3 *func);
 
 int gnutls_hex_encode(const gnutls_datum_t *data, char *result,
 		      size_t *result_size);

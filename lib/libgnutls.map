@@ -1409,6 +1409,16 @@ GNUTLS_3_7_7
 	*;
 } GNUTLS_3_7_5;
 
+GNUTLS_3_8_1
+{
+ global:
+	gnutls_psk_set_server_credentials_function3;
+	gnutls_psk_set_client_credentials_function3;
+	gnutls_psk_format_imported_identity;
+ local:
+	*;
+} GNUTLS_3_7_7;
+
 GNUTLS_FIPS140_3_4 {
   global:
 	gnutls_cipher_self_test;

@@ -623,6 +623,7 @@ tests/privkey-keygen
 tests/privkey-verify-broken
 tests/protocol-set-allowlist
 tests/psk-file
+tests/psk-importer
 tests/pskself
 tests/pskself2
 tests/pubkey-import-export
