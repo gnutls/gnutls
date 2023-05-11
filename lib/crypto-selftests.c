@@ -2583,27 +2583,22 @@ static int test_mac(gnutls_mac_algorithm_t mac,
 	return 0;
 }
 
-#define CASE(x, func, vectors)                                       \
-	case x:                                                      \
-		ret = func(x, V(vectors), flags);                    \
-		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL) || ret < 0) \
-		return ret
+#define CHECK(x, func, vectors)                                        \
+	do {                                                           \
+		ret = func(x, V(vectors), flags);                      \
+		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL) || ret < 0) { \
+			return ret;                                    \
+		}                                                      \
+	} while (0)
 
-#define CASE2(x, func, func2, vectors)                               \
-	case x:                                                      \
-		ret = func(x, V(vectors), flags);                    \
-		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL) || ret < 0) \
-			return ret;                                  \
-		ret = func2(x, V(vectors), flags);                   \
-		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL) || ret < 0) \
-		return ret
+#define CASE(x, func, vectors) \
+	case x:                \
+		CHECK(x, func, vectors)
 
-#define NON_FIPS_CASE(x, func, vectors)                                      \
-	case x:                                                              \
-		if (_gnutls_fips_mode_enabled() == 0) {                      \
-			ret = func(x, V(vectors), flags);                    \
-			if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL) || ret < 0) \
-				return ret;                                  \
+#define NON_FIPS_CASE(x, func, vectors)                 \
+	case x:                                         \
+		if (_gnutls_fips_mode_enabled() == 0) { \
+			CHECK(x, func, vectors);        \
 		}
 
 /*-
@@ -2660,14 +2655,23 @@ int gnutls_cipher_self_test(unsigned flags, gnutls_cipher_algorithm_t cipher)
 		NON_FIPS_CASE(GNUTLS_CIPHER_CHACHA20_POLY1305, test_cipher_aead,
 			      chacha_poly1305_vectors);
 		FALLTHROUGH;
-		CASE2(GNUTLS_CIPHER_AES_128_CFB8, test_cipher,
-		      test_cipher_all_block_sizes, aes128_cfb8_vectors);
+		CASE(GNUTLS_CIPHER_AES_128_CFB8, test_cipher,
+		     aes128_cfb8_vectors);
+		/* Optional check to exercise all block sizes */
+		CHECK(GNUTLS_CIPHER_AES_128_CFB8, test_cipher_all_block_sizes,
+		      aes128_cfb8_vectors);
 		FALLTHROUGH;
-		CASE2(GNUTLS_CIPHER_AES_192_CFB8, test_cipher,
-		      test_cipher_all_block_sizes, aes192_cfb8_vectors);
+		CASE(GNUTLS_CIPHER_AES_192_CFB8, test_cipher,
+		     aes192_cfb8_vectors);
+		/* Optional check to exercise all block sizes */
+		CHECK(GNUTLS_CIPHER_AES_192_CFB8, test_cipher_all_block_sizes,
+		      aes192_cfb8_vectors);
 		FALLTHROUGH;
-		CASE2(GNUTLS_CIPHER_AES_256_CFB8, test_cipher,
-		      test_cipher_all_block_sizes, aes256_cfb8_vectors);
+		CASE(GNUTLS_CIPHER_AES_256_CFB8, test_cipher,
+		     aes256_cfb8_vectors);
+		/* Optional check to exercise all block sizes */
+		CHECK(GNUTLS_CIPHER_AES_256_CFB8, test_cipher_all_block_sizes,
+		      aes256_cfb8_vectors);
 		FALLTHROUGH;
 		CASE(GNUTLS_CIPHER_AES_128_XTS, test_cipher,
 		     aes128_xts_vectors);
