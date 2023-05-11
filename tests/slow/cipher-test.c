@@ -42,19 +42,19 @@ int main(int argc, char **argv)
 	signal(SIGILL, handle_sigill);
 
 	/* ciphers */
-	if (gnutls_cipher_self_test(1, 0) < 0)
+	if (gnutls_cipher_self_test(GNUTLS_SELF_TEST_FLAG_ALL, 0) < 0)
 		return 1;
 
 	/* message digests */
-	if (gnutls_digest_self_test(1, 0) < 0)
+	if (gnutls_digest_self_test(GNUTLS_SELF_TEST_FLAG_ALL, 0) < 0)
 		return 1;
 
 	/* MAC */
-	if (gnutls_mac_self_test(1, 0) < 0)
+	if (gnutls_mac_self_test(GNUTLS_SELF_TEST_FLAG_ALL, 0) < 0)
 		return 1;
 
 	/* PK */
-	if (gnutls_pk_self_test(1, 0) < 0)
+	if (gnutls_pk_self_test(GNUTLS_SELF_TEST_FLAG_ALL, 0) < 0)
 		return 1;
 
 	gnutls_global_deinit();
