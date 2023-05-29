@@ -40,20 +40,20 @@
 #define ENTRY(name, canonical_name, block_algorithm, kx_algorithm,          \
 	      mac_algorithm, min_version, dtls_version)                     \
 	{                                                                   \
-#name, name, canonical_name, block_algorithm, kx_algorithm, \
+		#name, name, canonical_name, block_algorithm, kx_algorithm, \
 			mac_algorithm, min_version, GNUTLS_TLS1_2,          \
 			dtls_version, GNUTLS_DTLS1_2, GNUTLS_MAC_SHA256     \
 	}
 #define ENTRY_PRF(name, canonical_name, block_algorithm, kx_algorithm,      \
 		  mac_algorithm, min_version, dtls_version, prf)            \
 	{                                                                   \
-#name, name, canonical_name, block_algorithm, kx_algorithm, \
+		#name, name, canonical_name, block_algorithm, kx_algorithm, \
 			mac_algorithm, min_version, GNUTLS_TLS1_2,          \
 			dtls_version, GNUTLS_DTLS1_2, prf                   \
 	}
 #define ENTRY_TLS13(name, canonical_name, block_algorithm, min_version, prf) \
 	{                                                                    \
-#name, name, canonical_name, block_algorithm, 0,             \
+		#name, name, canonical_name, block_algorithm, 0,             \
 			GNUTLS_MAC_AEAD, min_version, GNUTLS_TLS1_3,         \
 			GNUTLS_VERSION_UNKNOWN, GNUTLS_VERSION_UNKNOWN, prf  \
 	}
