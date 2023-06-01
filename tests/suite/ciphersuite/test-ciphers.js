@@ -35,17 +35,24 @@ include(srcdir + "/registry-ciphers.js");
 		var cipher = cs.cipher.replace("3DES-CBC", "3DES-EDE-CBC");
 		var kx = cs.kx.replace("ANON-DH", "DH-ANON").replace("ANON-ECDH", "ECDH-ANON").replace("SRP", "SRP-SHA");
 
-		if (cs.mac == "AEAD") {
-			if (kx + "-" + cipher != cs.gnutlsname && kx + "-" + cipher + "-SHA256" != cs.gnutlsname && kx + "-" + cipher + "-SHA384" != cs.gnutlsname) {
-				console.log("Broken AEAD ciphersuite: ", kx + "-" + cipher, " ", cs.gnutlsname);
-				process.exit(1);
-			}
-		} else {
-			if (kx + "-" + cipher + "-" + mac != cs.gnutlsname) {
-				console.log("Broken ciphersuite name: ", kx + "-" + cipher + "-" + mac, " ", cs.gnutlsname);
-				process.exit(1);
-			}
-		}
+                if (cs.min_version !== "TLS1.3") {
+		        if (cs.mac == "AEAD") {
+			        if (kx + "-" + cipher != cs.gnutlsname && kx + "-" + cipher + "-SHA256" != cs.gnutlsname && kx + "-" + cipher + "-SHA384" != cs.gnutlsname) {
+				        console.log("Broken AEAD ciphersuite: ", kx + "-" + cipher, " ", cs.gnutlsname);
+				        process.exit(1);
+			        }
+                        } else if (kx + "-" + cipher + "-" + mac == "VKO-GOST-12-GOST28147-TC26Z-CNT-GOST28147-TC26Z-IMIT") {
+                                if (cs.gnutlsname != "GOSTR341112-256-28147-CNT-IMIT") {
+				        console.log("Broken ciphersuite name: ", kx + "-" + cipher + "-" + mac, " ", cs.gnutlsname);
+				        process.exit(1);
+                                }
+                        } else {
+			        if (kx + "-" + cipher + "-" + mac != cs.gnutlsname) {
+				        console.log("Broken ciphersuite name: ", kx + "-" + cipher + "-" + mac, " ", cs.gnutlsname);
+				        process.exit(1);
+			        }
+		        }
+                }
 		if (cs.name !== i) {
 			console.log("Name doesn't match index:", cs.name, i);
 			process.exit(1);
