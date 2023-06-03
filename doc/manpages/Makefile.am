@@ -49,7 +49,7 @@ CLIGEN_ARGS = \
 	--package '$(PACKAGE)' \
 	--version='$(VERSION)' \
 	--authors='Nikos Mavrogiannopoulos, Simon Josefsson and others; see /usr/share/doc/gnutls/AUTHORS for a complete list.' \
-	--copyright-year=2020-2021 \
+	--copyright-year=2020-2023 \
 	--copyright-holder='Free Software Foundation, and others all rights reserved.' \
 	--bug-email=bugs@gnutls.org
 
