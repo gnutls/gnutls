@@ -51,7 +51,9 @@ scripts_to_test = chain.sh \
 	testcompat-openssl-serv-no-tickets.sh \
 	testcompat-openssl-serv-no-safe-renegotiation.sh \
 	testcompat-openssl-serv-safe-renegotiation.sh \
-	testrandom.sh tls-fuzzer/tls-fuzzer-nocert.sh \
+	testrandom.sh \
+	test-ciphersuite-names.sh \
+	tls-fuzzer/tls-fuzzer-nocert.sh \
 	tls-fuzzer/tls-fuzzer-cert.sh tls-fuzzer/tls-fuzzer-alpn.sh \
 	tls-fuzzer/tls-fuzzer-nocert-tls13.sh tls-fuzzer/tls-fuzzer-psk.sh \
 	tls-fuzzer/tls-fuzzer-nolimit.sh tls-fuzzer/tls-fuzzer-nolimit-tls13.sh \
