@@ -1,4 +1,5 @@
 #include "gnutls_int.h"
+#include <alloca.h>
 #include <gnutls/ct.h>
 #include <gnutls/crypto.h>
 #include <nettle/base64.h>
@@ -285,6 +286,7 @@ int gnutls_ct_sct_validate(const gnutls_x509_ct_scts_t scts, unsigned idx,
 
 	/* gnutls_hash_output(md, signed_data_digest); */
 	gnutls_hash_deinit(md, signed_data_digest);
+	_gnutls_free_datum(&crtder);
 
 	/* if ((retval = gnutls_pubkey_verify_hash2(log->public_key, log->sign_algo, 0, */
 	/* 					 &signed_data_digest_datum, &signature)) < 0) */
@@ -306,8 +308,10 @@ int gnutls_ct_add_log(gnutls_ct_logs_t logs,
 {
 	int retval;
 	struct ct_log_st ct_log;
-	gnutls_datum_t realkey;
-	bool realkey_must_be_freed = 0;
+	gnutls_datum_t realkey = {
+		.data = NULL,
+		.size = 0
+	};
 
 	if (!logs || !key || !key->data || !key->size)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -325,7 +329,6 @@ int gnutls_ct_add_log(gnutls_ct_logs_t logs,
 		}
 
 		key = &realkey;
-		realkey_must_be_freed = 1;
 	}
 
 	if ((retval = _gnutls_init_log(&ct_log, name, description, key)) < 0) {
@@ -348,7 +351,7 @@ int gnutls_ct_add_log(gnutls_ct_logs_t logs,
 	retval = 0;
 
 bail:
-	if (realkey_must_be_freed)
+	if (realkey.data)
 		_gnutls_free_datum(&realkey);
 	return retval;
 }
