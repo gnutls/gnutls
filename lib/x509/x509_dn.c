@@ -47,6 +47,8 @@ static int dn_attr_crt_set(set_dn_func f, void *crt, const gnutls_datum_t *name,
 	if (name->size == 0 || val->size == 0)
 		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
+	assert(name->data);
+
 	if (c_isdigit(name->data[0]) != 0) {
 		if (name->size >= sizeof(_oid))
 			return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);

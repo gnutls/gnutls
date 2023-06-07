@@ -74,6 +74,7 @@ static int pwd_put_values(gnutls_datum_t *psk, char *str)
 	return 0;
 }
 
+ATTRIBUTE_NONNULL((1, 2))
 static bool username_matches(const gnutls_datum_t *username, const char *line,
 			     size_t line_size)
 {

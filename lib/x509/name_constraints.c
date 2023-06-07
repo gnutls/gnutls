@@ -748,19 +748,19 @@ static unsigned ends_with(const gnutls_datum_t *str,
 static unsigned email_ends_with(const gnutls_datum_t *str,
 				const gnutls_datum_t *suffix)
 {
-	if (suffix->size >= str->size)
+	if (suffix->size >= str->size) {
 		return 0;
+	}
 
-	if (suffix->size > 1 && suffix->data[0] == '.') {
-		/* .domain.com */
-		if (memcmp(str->data + str->size - suffix->size, suffix->data,
-			   suffix->size) == 0)
-			return 1; /* match */
-	} else {
-		if (memcmp(str->data + str->size - suffix->size, suffix->data,
-			   suffix->size) == 0 &&
-		    str->data[str->size - suffix->size - 1] == '@')
-			return 1; /* match */
+	if (suffix->size > 0 && memcmp(str->data + str->size - suffix->size,
+				       suffix->data, suffix->size) != 0) {
+		return 0;
+	}
+
+	if (suffix->size > 1 && suffix->data[0] == '.') { /* .domain.com */
+		return 1; /* match */
+	} else if (str->data[str->size - suffix->size - 1] == '@') {
+		return 1; /* match */
 	}
 
 	return 0;
