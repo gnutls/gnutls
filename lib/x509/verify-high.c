@@ -1432,13 +1432,15 @@ int gnutls_x509_trust_list_verify_crt2(
 	for (i = 0; i < cert_list_size &&
 		    cert_list_size <= DEFAULT_MAX_VERIFY_DEPTH;) {
 		unsigned int sorted_size = 1;
-		unsigned int j;
+		unsigned int j, k;
 		gnutls_x509_crt_t issuer;
 
 		if (!(flags & GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN)) {
 			sorted_size = _gnutls_sort_clist(&cert_list[i],
 							 cert_list_size - i);
 		}
+
+		assert(sorted_size > 0);
 
 		/* Remove duplicates. Start with index 1, as the first element
 		 * may be re-checked after issuer retrieval. */
@@ -1459,12 +1461,19 @@ int gnutls_x509_trust_list_verify_crt2(
 		}
 
 		/* Record the certificates seen. */
-		for (j = 0; j < sorted_size; j++, i++) {
+		for (k = 0; k < sorted_size; k++, i++) {
 			if (!gl_list_nx_add_last(records, cert_list[i])) {
 				ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 				goto cleanup;
 			}
 		}
+
+		/* Pacify GCC analyzer: the condition always holds
+		 * true as sorted_size > 0 is checked above, and the
+		 * following loop should iterate at least once so i++
+		 * is called.
+		 */
+		assert(i > 0);
 
 		/* If the issuer of the certificate is known, no need
 		 * for further processing. */
