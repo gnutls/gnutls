@@ -2066,7 +2066,9 @@ static int wrap_db_store(void *dbf, gnutls_datum_t key, gnutls_datum_t data)
 			return GNUTLS_E_MEMORY_ERROR;
 		cache_db[i].session_data.data = ptr;
 	}
-	memcpy(cache_db[i].session_data.data, data.data, data.size);
+	if (data.size > 0) {
+		memcpy(cache_db[i].session_data.data, data.data, data.size);
+	}
 	cache_db[i].session_data.size = data.size;
 
 	return 0;
