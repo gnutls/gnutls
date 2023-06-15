@@ -2796,7 +2796,7 @@ inline static int _gnutls_abort_handshake(gnutls_session_t session, int ret)
 			if (session->security_parameters.entity ==
 			    GNUTLS_SERVER) {
 				STATE = STATE0;
-				return ret;
+				break;
 			}
 
 			/* The client should tolerete a "no_renegotiation" alert only if:
@@ -2808,18 +2808,25 @@ inline static int _gnutls_abort_handshake(gnutls_session_t session, int ret)
 			      internals.hsk_flags & HSK_SERVER_HELLO_RECEIVED))
 			{
 				STATE = STATE0;
-				return ret;
+				break;
 			}
 
-			return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
+			ret = gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
+			break;
 		}
 		return ret;
 	case GNUTLS_E_GOT_APPLICATION_DATA:
 		STATE = STATE0;
-		return ret;
+		break;
 	default:
-		return ret;
+		if (!gnutls_error_is_fatal(ret)) {
+			return ret;
+		}
+		break;
 	}
+
+	_gnutls_audit_pop_context(&session->internals.audit_context_stack);
+	return ret;
 }
 
 static int _gnutls_send_supplemental(gnutls_session_t session, int again)
@@ -2995,7 +3002,6 @@ int gnutls_handshake(gnutls_session_t session)
 	} else {
 		ret = handshake_server(session);
 	}
-	_gnutls_audit_pop_context(&session->internals.audit_context_stack);
 
 	if (ret < 0) {
 		return _gnutls_abort_handshake(session, ret);
@@ -3050,6 +3056,7 @@ int gnutls_handshake(gnutls_session_t session)
 	}
 #endif
 
+	_gnutls_audit_pop_context(&session->internals.audit_context_stack);
 	return 0;
 }
 
