@@ -845,7 +845,7 @@ static void enable_no_ext_master_secret(gnutls_priority_t c)
 
 static void enable_force_ext_master_secret(gnutls_priority_t c)
 {
-	c->force_ext_master_secret = 1;
+	c->force_ext_master_secret = EMS_REQUIRE;
 }
 
 static void enable_no_etm(gnutls_priority_t c)
@@ -1013,6 +1013,9 @@ struct cfg {
 	gnutls_digest_algorithm_t hashes[MAX_ALGOS + 1];
 	gnutls_ecc_curve_t ecc_curves[MAX_ALGOS + 1];
 	gnutls_sign_algorithm_t sigs_for_cert[MAX_ALGOS + 1];
+
+	ext_master_secret_t force_ext_master_secret;
+	bool force_ext_master_secret_set;
 };
 
 static inline void cfg_deinit(struct cfg *cfg)
@@ -1117,6 +1120,8 @@ static inline void cfg_steal(struct cfg *dst, struct cfg *src)
 
 	dst->allowlisting = src->allowlisting;
 	dst->ktls_enabled = src->ktls_enabled;
+	dst->force_ext_master_secret = src->force_ext_master_secret;
+	dst->force_ext_master_secret_set = src->force_ext_master_secret_set;
 	memcpy(dst->ciphers, src->ciphers, sizeof(src->ciphers));
 	memcpy(dst->macs, src->macs, sizeof(src->macs));
 	memcpy(dst->groups, src->groups, sizeof(src->groups));
@@ -2032,6 +2037,21 @@ static int cfg_ini_handler(void *_ctx, const char *section, const char *name,
 			}
 			cfg->kxs[i] = algo;
 			cfg->kxs[i + 1] = 0;
+		} else if (c_strcasecmp(name, "tls-session-hash") == 0) {
+			if (c_strcasecmp(value, "request") == 0) {
+				cfg->force_ext_master_secret = EMS_REQUEST;
+				cfg->force_ext_master_secret_set = true;
+			} else if (c_strcasecmp(value, "require") == 0) {
+				cfg->force_ext_master_secret = EMS_REQUIRE;
+				cfg->force_ext_master_secret_set = true;
+			} else {
+				_gnutls_debug_log(
+					"cfg: unknown value for %s: %s\n", name,
+					value);
+				if (fail_on_invalid_config)
+					return 0;
+				goto exit;
+			}
 		} else {
 			_gnutls_debug_log("unknown parameter %s\n", name);
 			if (fail_on_invalid_config)
@@ -3106,7 +3126,9 @@ int gnutls_priority_init(gnutls_priority_t *priority_cache,
 	gnutls_atomic_init(&(*priority_cache)->usage_cnt);
 
 	if (_gnutls_fips_mode_enabled()) {
-		(*priority_cache)->force_ext_master_secret = true;
+		(*priority_cache)->force_ext_master_secret = EMS_REQUIRE;
+	} else {
+		(*priority_cache)->force_ext_master_secret = EMS_REQUEST;
 	}
 
 	if (system_wide_config.allowlisting && !priorities) {
@@ -3382,6 +3404,15 @@ int gnutls_priority_init(gnutls_priority_t *priority_cache,
 			o->func(*priority_cache);
 		} else
 			goto error;
+	}
+
+	/* This needs to be done after parsing modifiers, as
+	 * tls-session-hash has precedence over modifiers.
+	 */
+	if (system_wide_config.force_ext_master_secret_set) {
+		(*priority_cache)->force_ext_master_secret =
+			system_wide_config.force_ext_master_secret;
+		(*priority_cache)->_no_ext_master_secret = false;
 	}
 
 	ret = set_ciphersuite_list(*priority_cache);
