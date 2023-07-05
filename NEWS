@@ -20,6 +20,11 @@ See the end for copying conditions.
    needs to set up a callback that formats the PSK identity using
    gnutls_psk_format_imported_identity().
 
+** New option --attime to specify current time.
+   To make testing with different timestamp to the system easier, the
+   tools doing certificate verification now provide a new option
+   --attime, which takes an arbitrary time.
+
 ** API and ABI modifications:
 gnutls_psk_client_credentials_function3: New typedef
 gnutls_psk_server_credentials_function3: New typedef
