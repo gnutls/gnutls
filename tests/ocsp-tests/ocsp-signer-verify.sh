@@ -38,7 +38,7 @@ trusted="${sample_dir}/trust.pem"
 verify_response ()
 {
     echo "verifying ${sample_dir}/${1} using ${trusted}"
-    gnutls_timewrapper_standalone static "${date}" \
+    "$FAKETIME" "$FAKETIME_F_OPT" "${date}" \
               "${OCSPTOOL}" --infile="${sample_dir}/${1}" \
               --verify-response --load-trust="${trusted}"
     return $?

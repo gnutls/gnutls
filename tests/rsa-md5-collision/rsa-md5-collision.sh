@@ -36,7 +36,7 @@ skip_if_no_datefudge
 ASAN_OPTIONS="detect_leaks=0"
 export ASAN_OPTIONS
 
-gnutls_timewrapper_standalone static "2006-10-01 00:00:00" \
+"$FAKETIME" "$FAKETIME_F_OPT" "2006-10-01 00:00:00" \
 "${CERTTOOL}" --verify-chain --outfile "$TMPFILE1" --infile "${srcdir}/rsa-md5-collision/colliding-chain-md5-1.pem"
 if test $? = 0;then
 	echo "Verification on chain1 succeeded"
@@ -50,7 +50,7 @@ if test $? != 0;then
 fi
 
 
-gnutls_timewrapper_standalone static "2006-10-01 00:00:00" \
+"$FAKETIME" "$FAKETIME_F_OPT" "2006-10-01 00:00:00" \
 "${CERTTOOL}" --verify-chain --outfile "$TMPFILE2" --infile "${srcdir}/rsa-md5-collision/colliding-chain-md5-2.pem"
 if test $? = 0;then
 	echo "Verification on chain2 succeeded"

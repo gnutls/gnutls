@@ -34,7 +34,7 @@ export TZ="UTC"
 
 skip_if_no_datefudge
 
-gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
+"$FAKETIME" "$FAKETIME_F_OPT" "2007-04-22 00:00:00" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/arb-extensions.tmpl" \
@@ -52,7 +52,7 @@ fi
 rm -f "$OUTFILE"
 
 # Test adding critical extensions only
-gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
+"$FAKETIME" "$FAKETIME_F_OPT" "2007-04-22 00:00:00" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/crit-extensions.tmpl" \
@@ -69,7 +69,7 @@ fi
 
 rm -f "$OUTFILE"
 
-gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
+"$FAKETIME" "$FAKETIME_F_OPT" "2007-04-22 00:00:00" \
 	"${CERTTOOL}" --generate-request \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/arb-extensions.tmpl" \

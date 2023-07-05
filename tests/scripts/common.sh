@@ -96,53 +96,10 @@ GETPORT='
 '
 
 skip_if_no_datefudge() {
-	# Prefer faketime, fall back to datefudge.
-	# Allow datefudge/faketime to be manually selected by setting env-var
-	if test -z "${GNUTLS_TIMEWRAPPER_CMD}" ; then
-		if test "$WINDOWS" = 1; then
-			exit 77
-		fi
-
-		TSTAMP=`faketime -f "2006-09-23 00:00:00" "${top_builddir}/tests/datefudge-check" || true`
-		if test "$TSTAMP" = "1158969600"; then
-			GNUTLS_TIMEWRAPPER_CMD=faketime
-		else
-			TSTAMP=`datefudge -s "2006-09-23 00:00:00" "${top_builddir}/tests/datefudge-check" || true`
-			if test "$TSTAMP" = "1158969600"; then
-				GNUTLS_TIMEWRAPPER_CMD=datefudge
-			else
-				echo "You need faketime/datefudge to run this test"
-				exit 77
-			fi
-		fi
+	if test "$ac_cv_faketime_works" != yes; then
+		exit 77
 	fi
 }
-
-gnutls_timewrapper_standalone() {
-	if test -z "${GNUTLS_TIMEWRAPPER_CMD}" ; then
-		echo "Missing invocation of skip_if_no_datefudge()"
-		exit 1
-	fi
-
-	if [ "$1" = "static" ] ; then
-		shift
-		case  ${GNUTLS_TIMEWRAPPER_CMD} in
-			faketime)
-				faketime -f "$@"
-				;;
-			datefudge)
-				datefudge -s "$@"
-				;;
-			*)
-				echo "GNUTLS_TIMEWRAPPER_CMD ${GNUTLS_TIMEWRAPPER_CMD} invalid" 1>&2
-				exit 1
-				;;
-		esac
-	else
-		${GNUTLS_TIMEWRAPPER_CMD} "$@"
-	fi
-}
-
 
 fail() {
    PID="$1"

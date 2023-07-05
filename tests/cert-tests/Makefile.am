@@ -181,6 +181,11 @@ if DISABLE_BASH_TESTS
 TESTS_ENVIRONMENT += DISABLE_BASH_TESTS=1
 endif
 
+TESTS_ENVIRONMENT +=					\
+	FAKETIME="$(FAKETIME)"				\
+	FAKETIME_F_OPT="$(FAKETIME_F_OPT)"		\
+	ac_cv_faketime_works="$(ac_cv_faketime_works)"
+
 AM_VALGRINDFLAGS = --suppressions=$(srcdir)/suppressions.valgrind
 LOG_COMPILER = $(LOG_VALGRIND)
 

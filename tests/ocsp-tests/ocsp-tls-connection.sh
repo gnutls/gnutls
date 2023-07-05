@@ -96,7 +96,7 @@ chmod u+w "$TEMPLATE_FILE"
 echo "ocsp_uri=http://localhost:${OCSP_PORT}/ocsp/" >>"$TEMPLATE_FILE"
 
 # Generate certificates with the random port
-gnutls_timewrapper_standalone static "${CERTDATE}" ${CERTTOOL} \
+"$FAKETIME" "$FAKETIME_F_OPT" "${CERTDATE}" ${CERTTOOL} \
 	--generate-certificate --load-ca-privkey "${srcdir}/ocsp-tests/certs/ca.key" \
 	--load-ca-certificate "${srcdir}/ocsp-tests/certs/ca.pem" \
 	--load-privkey "${srcdir}/ocsp-tests/certs/server_good.key" \
@@ -111,7 +111,7 @@ echo "=== Bringing OCSP server up ==="
 # SO_REUSEADDR usage.
 PORT=${OCSP_PORT}
 launch_bare_server \
-	  gnutls_timewrapper_standalone "${TESTDATE}" \
+	  "$FAKETIME" "${TESTDATE}" \
 	  "${OPENSSL}" ocsp -index "${srcdir}/ocsp-tests/certs/ocsp_index.txt" -text \
 	  -port "${OCSP_PORT}" \
 	  -rsigner "${srcdir}/ocsp-tests/certs/ocsp-server.pem" \
@@ -127,7 +127,7 @@ echo "=== Verifying OCSP server is up ==="
 t=0
 while test "${t}" -lt "${SERVER_START_TIMEOUT}"; do
     # Run a test request to make sure the server works
-    gnutls_timewrapper_standalone "${TESTDATE}" \
+    "$FAKETIME" "${TESTDATE}" \
 	      ${VALGRIND} "${OCSPTOOL}" --ask \
 	      --load-cert "${SERVER_CERT_FILE}" \
 	      --load-issuer "${srcdir}/ocsp-tests/certs/ca.pem"
@@ -149,7 +149,7 @@ echo "=== Test 1: Server with valid certificate ==="
 
 PORT=${TLS_SERVER_PORT}
 launch_bare_server \
-	  gnutls_timewrapper_standalone "${TESTDATE}" \
+	  "$FAKETIME" "${TESTDATE}" \
 	  "${SERV}" --echo --disable-client-cert \
 	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
 	  --x509certfile="${SERVER_CERT_FILE}" \
@@ -160,7 +160,7 @@ wait_server $TLS_SERVER_PID
 wait_for_port "${TLS_SERVER_PORT}"
 
 echo "test 123456" | \
-    gnutls_timewrapper_standalone static "${TESTDATE}" \
+    "$FAKETIME" "$FAKETIME_F_OPT" "${TESTDATE}" \
 	      "${CLI}" --ocsp --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
 	      --port="${TLS_SERVER_PORT}" localhost
 rc=$?
@@ -182,7 +182,7 @@ cp "${srcdir}/ocsp-tests/certs/server_bad.template" "$TEMPLATE_FILE"
 echo "ocsp_uri=http://localhost:${OCSP_PORT}/ocsp/" >>"$TEMPLATE_FILE"
 
 # Generate certificates with the random port
-gnutls_timewrapper_standalone static "${CERTDATE}" ${CERTTOOL} \
+"$FAKETIME" "$FAKETIME_F_OPT" "${CERTDATE}" ${CERTTOOL} \
 	--generate-certificate --load-ca-privkey "${srcdir}/ocsp-tests/certs/ca.key" \
 	--load-ca-certificate "${srcdir}/ocsp-tests/certs/ca.pem" \
 	--load-privkey "${srcdir}/ocsp-tests/certs/server_bad.key" \
@@ -194,7 +194,7 @@ eval "${GETPORT}"
 TLS_SERVER_PORT=$PORT
 
 launch_bare_server \
-	  gnutls_timewrapper_standalone "${TESTDATE}" \
+	  "$FAKETIME" "${TESTDATE}" \
 	  "${SERV}" --echo --disable-client-cert \
 	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_bad.key" \
 	  --x509certfile="${SERVER_CERT_FILE}" \
@@ -204,7 +204,7 @@ wait_server ${TLS_SERVER_PID}
 wait_for_port "${TLS_SERVER_PORT}"
 
 echo "test 123456" | \
-    gnutls_timewrapper_standalone static "${TESTDATE}" \
+    "$FAKETIME" "$FAKETIME_F_OPT" "${TESTDATE}" \
 	      "${CLI}" --ocsp --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
 	      --port="${TLS_SERVER_PORT}" localhost
 rc=$?

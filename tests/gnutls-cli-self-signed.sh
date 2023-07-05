@@ -123,7 +123,7 @@ launch_server --echo --x509keyfile ${TMPFILE} --x509certfile ${TMPFILE}
 PID=$!
 wait_server ${PID}
 
-gnutls_timewrapper_standalone "2018-1-1" \
+"$FAKETIME" "2018-1-1" \
 ${VALGRIND} "${CLI}" -p "${PORT}" localhost >${TMPFILE} 2>&1 </dev/null && \
 	fail ${PID} "1. handshake should have failed!"
 

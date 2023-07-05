@@ -86,7 +86,7 @@ fi
 
 skip_if_no_datefudge
 #this was causing a double free; verify that we receive the expected error code
-gnutls_timewrapper_standalone static "2020-01-01 00:00:00" \
+"$FAKETIME" "$FAKETIME_F_OPT" "2020-01-01 00:00:00" \
 ${VALGRIND} "${CERTTOOL}" --verify-chain --infile "${srcdir}/data/cve-2019-3829.pem"
 rc=$?
 

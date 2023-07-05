@@ -100,7 +100,7 @@ chmod u+w "$TEMPLATE_FILE"
 echo "ocsp_uri=http://localhost:${OCSP_PORT}/ocsp/" >>"$TEMPLATE_FILE"
 
 # Generate certificates with the random port
-gnutls_timewrapper_standalone static "${CERTDATE}" ${CERTTOOL} \
+"$FAKETIME" "$FAKETIME_F_OPT" "${CERTDATE}" ${CERTTOOL} \
 	--generate-certificate --load-ca-privkey "${srcdir}/ocsp-tests/certs/ca.key" \
 	--load-ca-certificate "${srcdir}/ocsp-tests/certs/ca.pem" \
 	--load-privkey "${srcdir}/ocsp-tests/certs/server_good.key" \
@@ -109,7 +109,7 @@ gnutls_timewrapper_standalone static "${CERTDATE}" ${CERTTOOL} \
 # Generate certificates with the random port (with mandatory stapling extension)
 echo "tls_feature = 5" >>"$TEMPLATE_FILE"
 
-gnutls_timewrapper_standalone static "${CERTDATE}" ${CERTTOOL} \
+"$FAKETIME" "$FAKETIME_F_OPT" "${CERTDATE}" ${CERTTOOL} \
 	--generate-certificate --load-ca-privkey "${srcdir}/ocsp-tests/certs/ca.key" \
 	--load-ca-certificate "${srcdir}/ocsp-tests/certs/ca.pem" \
 	--load-privkey "${srcdir}/ocsp-tests/certs/server_good.key" \
@@ -129,7 +129,7 @@ cp "${srcdir}/ocsp-tests/certs/ocsp_index.txt.attr" ${ATTRFILE}
 # SO_REUSEADDR usage.
 PORT=${OCSP_PORT}
 launch_bare_server \
-	  gnutls_timewrapper_standalone "${TESTDATE}" \
+	  "$FAKETIME" "${TESTDATE}" \
 	  "${OPENSSL}" ocsp -index "${INDEXFILE}" -text \
 	  -port "${OCSP_PORT}" \
 	  -rsigner "${srcdir}/ocsp-tests/certs/ocsp-server.pem" \
@@ -145,7 +145,7 @@ echo "=== Verifying OCSP server is up ==="
 t=0
 while test "${t}" -lt "${SERVER_START_TIMEOUT}"; do
     # Run a test request to make sure the server works
-    gnutls_timewrapper_standalone "${TESTDATE}" \
+    "$FAKETIME" "${TESTDATE}" \
 	      ${VALGRIND} "${OCSPTOOL}" --ask \
 	      --load-cert "${SERVER_CERT_FILE}" \
 	      --load-issuer "${srcdir}/ocsp-tests/certs/ca.pem" \
@@ -170,7 +170,7 @@ echo "=== Test 1: Server with valid certificate - no staple ==="
 
 PORT=${TLS_SERVER_PORT}
 launch_bare_server \
-	  gnutls_timewrapper_standalone "${TESTDATE}" \
+	  "$FAKETIME" "${TESTDATE}" \
 	  "${SERV}" --echo --disable-client-cert \
 	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
 	  --x509certfile="${SERVER_CERT_FILE}" \
@@ -181,7 +181,7 @@ wait_server $TLS_SERVER_PID
 wait_for_port "${TLS_SERVER_PORT}"
 
 echo "test 123456" | \
-    gnutls_timewrapper_standalone static "${TESTDATE}" \
+    "$FAKETIME" "$FAKETIME_F_OPT" "${TESTDATE}" \
 	      "${CLI}" --ocsp --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
 	      --port="${TLS_SERVER_PORT}" localhost
 rc=$?
@@ -202,7 +202,7 @@ eval "${GETPORT}"
 TLS_SERVER_PORT=$PORT
 PORT=${TLS_SERVER_PORT}
 launch_bare_server \
-	  gnutls_timewrapper_standalone "${TESTDATE}" \
+	  "$FAKETIME" "${TESTDATE}" \
 	  "${SERV}" --echo --disable-client-cert \
 	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
 	  --x509certfile="${SERVER_CERT_FILE}" \
@@ -214,7 +214,7 @@ wait_server $TLS_SERVER_PID
 wait_for_port "${TLS_SERVER_PORT}"
 
 echo "test 123456" | \
-    gnutls_timewrapper_standalone static "${TESTDATE}" \
+    "$FAKETIME" "$FAKETIME_F_OPT" "${TESTDATE}" \
 	      "${CLI}" --ocsp --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
 	      --port="${TLS_SERVER_PORT}" localhost
 rc=$?
@@ -237,7 +237,7 @@ eval "${GETPORT}"
 TLS_SERVER_PORT=$PORT
 PORT=${TLS_SERVER_PORT}
 launch_bare_server \
-	  gnutls_timewrapper_standalone "${TESTDATE}" \
+	  "$FAKETIME" "${TESTDATE}" \
 	  "${SERV}" --echo --disable-client-cert \
 	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
 	  --x509certfile="${SERVER_CERT_FILE}" \
@@ -249,7 +249,7 @@ wait_server $TLS_SERVER_PID
 wait_for_port "${TLS_SERVER_PORT}"
 
 echo "test 123456" | \
-    gnutls_timewrapper_standalone static "${TESTDATE}" \
+    "$FAKETIME" "$FAKETIME_F_OPT" "${TESTDATE}" \
 	      "${CLI}" --ocsp --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
 	      --port="${TLS_SERVER_PORT}" localhost
 rc=$?
@@ -273,7 +273,7 @@ eval "${GETPORT}"
 TLS_SERVER_PORT=$PORT
 PORT=${TLS_SERVER_PORT}
 launch_bare_server \
-	  gnutls_timewrapper_standalone "${TESTDATE}" \
+	  "$FAKETIME" "${TESTDATE}" \
 	  "${SERV}" --echo --disable-client-cert \
 	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
 	  --x509certfile="${SERVER_CERT_FILE}" \
@@ -285,7 +285,7 @@ wait_server $TLS_SERVER_PID
 wait_for_port "${TLS_SERVER_PORT}"
 
 echo "test 123456" | \
-    gnutls_timewrapper_standalone static "${TESTDATE}" \
+    "$FAKETIME" "$FAKETIME_F_OPT" "${TESTDATE}" \
 	      "${CLI}" --ocsp --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
 	      --port="${TLS_SERVER_PORT}" localhost
 rc=$?
@@ -307,7 +307,7 @@ rm -f "${OCSP_RESPONSE_FILE}"
 # Generate an OCSP response which expires in 2 days and use it after
 # a month. gnutls server doesn't send such a staple to clients.
 ${VALGRIND} ${OCSPTOOL} --generate-request --load-issuer "${srcdir}/ocsp-tests/certs/ocsp-server.pem" --load-cert "${SERVER_CERT_FILE}" --outfile "${OCSP_REQ_FILE}"
-gnutls_timewrapper_standalone static "${EXP_OCSP_DATE}" \
+"$FAKETIME" "$FAKETIME_F_OPT" "${EXP_OCSP_DATE}" \
 	${OPENSSL} ocsp -index "${INDEXFILE}" -rsigner "${srcdir}/ocsp-tests/certs/ocsp-server.pem" -rkey "${srcdir}/ocsp-tests/certs/ocsp-server.key" -CA "${srcdir}/ocsp-tests/certs/ca.pem" -reqin "${OCSP_REQ_FILE}" -respout "${OCSP_RESPONSE_FILE}" -ndays 2
 
 eval "${GETPORT}"
@@ -331,7 +331,7 @@ fi
 echo "=== Test 5.1: Server with valid certificate - expired staple (ignoring errors) ==="
 
 launch_bare_server \
-	  gnutls_timewrapper_standalone "${TESTDATE}" \
+	  "$FAKETIME" "${TESTDATE}" \
 	  "${SERV}" --echo --disable-client-cert \
 	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
 	  --x509certfile="${SERVER_CERT_FILE}" \
@@ -344,7 +344,7 @@ wait_server $TLS_SERVER_PID
 wait_for_port "${TLS_SERVER_PORT}"
 
 echo "test 123456" | \
-    gnutls_timewrapper_standalone static "${TESTDATE}" \
+    "$FAKETIME" "$FAKETIME_F_OPT" "${TESTDATE}" \
 	      "${CLI}" --ocsp --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
 	      --port="${TLS_SERVER_PORT}" localhost
 rc=$?
@@ -367,7 +367,7 @@ echo "=== Test 6: Server with valid certificate - old staple ==="
 rm -f "${OCSP_RESPONSE_FILE}"
 
 ${VALGRIND} ${OCSPTOOL} --generate-request --load-issuer "${srcdir}/ocsp-tests/certs/ocsp-server.pem" --load-cert "${SERVER_CERT_FILE}" --outfile "${OCSP_REQ_FILE}"
-gnutls_timewrapper_standalone static "${EXP_OCSP_DATE}" \
+"$FAKETIME" "$FAKETIME_F_OPT" "${EXP_OCSP_DATE}" \
 	${OPENSSL} ocsp -index ${INDEXFILE} -rsigner "${srcdir}/ocsp-tests/certs/ocsp-server.pem" -rkey "${srcdir}/ocsp-tests/certs/ocsp-server.key" -CA "${srcdir}/ocsp-tests/certs/ca.pem" -reqin "${OCSP_REQ_FILE}" -respout "${OCSP_RESPONSE_FILE}"
 
 eval "${GETPORT}"
@@ -375,7 +375,7 @@ eval "${GETPORT}"
 TLS_SERVER_PORT=$PORT
 PORT=${TLS_SERVER_PORT}
 launch_bare_server \
-	  gnutls_timewrapper_standalone "${TESTDATE}" \
+	  "$FAKETIME" "${TESTDATE}" \
 	  "${SERV}" --echo --disable-client-cert \
 	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
 	  --x509certfile="${SERVER_CERT_FILE}" \
@@ -387,7 +387,7 @@ wait_server $TLS_SERVER_PID
 wait_for_port "${TLS_SERVER_PORT}"
 
 echo "test 123456" | \
-    gnutls_timewrapper_standalone static "${TESTDATE}" \
+    "$FAKETIME" "$FAKETIME_F_OPT" "${TESTDATE}" \
 	      "${CLI}" --ocsp --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
 	      --port="${TLS_SERVER_PORT}" localhost
 rc=$?
@@ -410,7 +410,7 @@ if test "${GNUTLS_FORCE_FIPS_MODE}" != 1; then
     TLS_SERVER_PORT=$PORT
     PORT=${TLS_SERVER_PORT}
     launch_bare_server \
-	gnutls_timewrapper_standalone "${TESTDATE}" \
+	"$FAKETIME" "${TESTDATE}" \
 	"${SERV}" --echo --disable-client-cert \
 	--x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
 	--x509certfile="${SERVER_CERT_FILE}" \
@@ -422,7 +422,7 @@ if test "${GNUTLS_FORCE_FIPS_MODE}" != 1; then
     wait_for_port "${TLS_SERVER_PORT}"
 
     echo "test 123456" | \
-	gnutls_timewrapper_standalone static "${TESTDATE}" \
+	"$FAKETIME" "$FAKETIME_F_OPT" "${TESTDATE}" \
 		  "${CLI}" --priority "NORMAL:%NO_EXTENSIONS" --ocsp --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
 		  --port="${TLS_SERVER_PORT}" localhost
     rc=$?
@@ -445,7 +445,7 @@ eval "${GETPORT}"
 TLS_SERVER_PORT=$PORT
 PORT=${TLS_SERVER_PORT}
 launch_bare_server \
-	  gnutls_timewrapper_standalone "${TESTDATE}" \
+	  "$FAKETIME" "${TESTDATE}" \
 	  "${SERV}" --echo --disable-client-cert \
 	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
 	  --x509certfile="${SERVER_CERT_NO_EXT_FILE}" \
@@ -457,7 +457,7 @@ wait_server $TLS_SERVER_PID
 wait_for_port "${TLS_SERVER_PORT}"
 
 echo "test 123456" | \
-    gnutls_timewrapper_standalone static "${TESTDATE}" \
+    "$FAKETIME" "$FAKETIME_F_OPT" "${TESTDATE}" \
 	      "${CLI}" --ocsp --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
 	      --port="${TLS_SERVER_PORT}" localhost
 rc=$?
@@ -478,7 +478,7 @@ eval "${GETPORT}"
 TLS_SERVER_PORT=$PORT
 PORT=${TLS_SERVER_PORT}
 launch_bare_server \
-	  gnutls_timewrapper_standalone "${TESTDATE}" \
+	  "$FAKETIME" "${TESTDATE}" \
 	  "${SERV}" --echo --disable-client-cert \
 	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
 	  --x509certfile="${SERVER_CERT_FILE}" \
@@ -490,7 +490,7 @@ wait_server $TLS_SERVER_PID
 wait_for_port "${TLS_SERVER_PORT}"
 
 echo "test 123456" | \
-    gnutls_timewrapper_standalone static "${TESTDATE}" \
+    "$FAKETIME" "$FAKETIME_F_OPT" "${TESTDATE}" \
 	      "${CLI}" --ocsp --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
 	      --port="${TLS_SERVER_PORT}" localhost
 rc=$?

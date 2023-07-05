@@ -59,7 +59,7 @@ fi
 rm -f "${OUTFILE}"
 
 # check whether the honor_crq_extension option works
-gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
+"$FAKETIME" "$FAKETIME_F_OPT" "2007-04-22 00:00:00" \
 	"${CERTTOOL}" --generate-request \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-tlsfeature.tmpl" \
@@ -78,7 +78,7 @@ if grep -v '^-----BEGIN [A-Z0-9 ]\+-----$' ${TMPFILE} | grep -v '^[A-Za-z0-9/+=]
 	exit 1
 fi
 
-gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
+"$FAKETIME" "$FAKETIME_F_OPT" "2007-04-22 00:00:00" \
 	"${CERTTOOL}" --generate-certificate \
 		--load-ca-privkey "${srcdir}/data/template-test.key" \
 		--load-ca-certificate "${srcdir}/data/template-tlsfeature.pem" \
@@ -130,7 +130,7 @@ N
 N
 __EOF__
 
-gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
+"$FAKETIME" "$FAKETIME_F_OPT" "2007-04-22 00:00:00" \
 setsid \
 	"${CERTTOOL}" -q \
 		--load-privkey "${srcdir}/data/template-test.key" \
@@ -147,7 +147,7 @@ if test "${rc}" != "0"; then
 fi
 
 # check whether the generation with extension works
-gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
+"$FAKETIME" "$FAKETIME_F_OPT" "2007-04-22 00:00:00" \
 	"${CERTTOOL}" --generate-request \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/arb-extensions.tmpl" \
@@ -168,7 +168,7 @@ if test "${rc}" != "0"; then
 fi
 
 # Generate certificate from CRQ with no explicit extensions
-gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
+"$FAKETIME" "$FAKETIME_F_OPT" "2007-04-22 00:00:00" \
 	"${CERTTOOL}" --generate-certificate \
 		--load-ca-privkey "${srcdir}/../../doc/credentials/x509/ca-key.pem" \
 		--load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" \
@@ -191,7 +191,7 @@ if test "${rc}" != "0"; then
 fi
 
 # Generate certificate from CRQ with CRQ extensions
-gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
+"$FAKETIME" "$FAKETIME_F_OPT" "2007-04-22 00:00:00" \
 	"${CERTTOOL}" --generate-certificate \
 		--load-ca-privkey "${srcdir}/../../doc/credentials/x509/ca-key.pem" \
 		--load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" \
@@ -214,7 +214,7 @@ if test "${rc}" != "0"; then
 fi
 
 # Generate certificate from CRQ with explicit extensions
-gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
+"$FAKETIME" "$FAKETIME_F_OPT" "2007-04-22 00:00:00" \
 	"${CERTTOOL}" --generate-certificate \
 		--load-ca-privkey "${srcdir}/../../doc/credentials/x509/ca-key.pem" \
 		--load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" \

@@ -33,7 +33,7 @@ export TZ="UTC"
 
 skip_if_no_datefudge
 
-gnutls_timewrapper_standalone static "2017-06-19 00:00:00" \
+"$FAKETIME" "$FAKETIME_F_OPT" "2017-06-19 00:00:00" \
 	"${OCSPTOOL}" -e --load-chain "${srcdir}/ocsp-tests/certs/chain-amazon.com.pem" --infile "${srcdir}/ocsp-tests/certs/ocsp-amazon.com.der" --verify-allow-broken
 rc=$?
 
@@ -43,7 +43,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-gnutls_timewrapper_standalone static "2017-06-19 00:00:00" \
+"$FAKETIME" "$FAKETIME_F_OPT" "2017-06-19 00:00:00" \
 	"${OCSPTOOL}" -e --load-chain "${srcdir}/ocsp-tests/certs/chain-amazon.com-unsorted.pem" --infile "${srcdir}/ocsp-tests/certs/ocsp-amazon.com.der" --verify-allow-broken
 rc=$?
 
@@ -54,7 +54,7 @@ if test "${rc}" != "0"; then
 fi
 
 # verify an OCSP response using ECDSA
-gnutls_timewrapper_standalone static "2017-06-29 00:00:00" \
+"$FAKETIME" "$FAKETIME_F_OPT" "2017-06-29 00:00:00" \
 	"${OCSPTOOL}" -d 6 -e --load-chain "${srcdir}/ocsp-tests/certs/chain-akamai.com.pem" --infile "${srcdir}/ocsp-tests/certs/ocsp-akamai.com.der"
 rc=$?
 

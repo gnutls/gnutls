@@ -71,7 +71,7 @@ launch_server --echo --priority "NORMAL:-VERS-ALL:+VERS-TLS1.2:+VERS-TLS1.1" --x
 PID=$!
 wait_server ${PID}
 
-gnutls_timewrapper_standalone "2017-08-9" timeout 1800 \
+"$FAKETIME" "2017-08-9" timeout 1800 \
 "${DCLI}" -p "${PORT}" localhost >$OUTFILE 2>&1 || fail ${PID} "gnutls-cli-debug run should have succeeded!"
 
 kill ${PID}
@@ -118,7 +118,7 @@ launch_server --echo --priority "NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2" --x
 PID=$!
 wait_server ${PID}
 
-gnutls_timewrapper_standalone "2017-08-9" timeout 1800 \
+"$FAKETIME" "2017-08-9" timeout 1800 \
 "${DCLI}" -p "${PORT}" localhost >$OUTFILE 2>&1 || fail ${PID} "gnutls-cli-debug run should have succeeded!"
 
 kill ${PID}
@@ -160,7 +160,7 @@ launch_server --echo --priority "NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:-RSA
 PID=$!
 wait_server ${PID}
 
-gnutls_timewrapper_standalone "2017-08-9" timeout 1800 \
+"$FAKETIME" "2017-08-9" timeout 1800 \
 "${DCLI}" -p "${PORT}" localhost >$OUTFILE 2>&1 || fail ${PID} "gnutls-cli-debug run should have succeeded!"
 
 kill ${PID}
@@ -186,7 +186,7 @@ tls-disabled-cipher = CAMELLIA-256-CBC
 _EOF_
 
 GNUTLS_SYSTEM_PRIORITY_FILE="${TMPFILE}" \
-gnutls_timewrapper_standalone "2017-08-9" timeout 1800 \
+"$FAKETIME" "2017-08-9" timeout 1800 \
 "${DCLI}" -p "${PORT}" localhost >$OUTFILE 2>&1 || fail ${PID} "gnutls-cli-debug run should have succeeded!"
 
 kill ${PID}
@@ -209,7 +209,7 @@ if test "${ENABLE_GOST}" = "1" && test "${GNUTLS_FORCE_FIPS_MODE}" != 1 ; then
 	PID=$!
 	wait_server ${PID}
 
-	gnutls_timewrapper_standalone "2017-08-9" timeout 1800 \
+	"$FAKETIME" "2017-08-9" timeout 1800 \
 	"${DCLI}" -p "${PORT}" localhost >$OUTFILE 2>&1 || fail ${PID} "gnutls-cli-debug run should have succeeded!"
 
 	kill ${PID}

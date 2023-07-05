@@ -37,7 +37,7 @@ export TZ="UTC"
 
 skip_if_no_datefudge
 
-gnutls_timewrapper_standalone "2017-2-28" \
+"$FAKETIME" "2017-2-28" \
 ${VALGRIND} "${CERTTOOL}" --verify-chain --infile ${srcdir}/data/chain-with-critical-on-root.pem
 rc=$?
 
@@ -46,7 +46,7 @@ if test "${rc}" != "1"; then
 	exit 1
 fi
 
-gnutls_timewrapper_standalone "2017-2-28" \
+"$FAKETIME" "2017-2-28" \
 ${VALGRIND} "${CERTTOOL}" --verify-chain --infile ${srcdir}/data/chain-with-critical-on-endcert.pem
 rc=$?
 
@@ -55,7 +55,7 @@ if test "${rc}" != "1"; then
 	exit 1
 fi
 
-gnutls_timewrapper_standalone "2017-2-28" \
+"$FAKETIME" "2017-2-28" \
 ${VALGRIND} "${CERTTOOL}" --verify-chain --infile ${srcdir}/data/chain-with-critical-on-intermediate.pem
 rc=$?
 

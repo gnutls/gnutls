@@ -38,7 +38,7 @@ skip_if_no_datefudge
 # time set using faketime/datefudge could have changed since the generation
 # (if example the system was busy)
 
-gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
+"$FAKETIME" "$FAKETIME_F_OPT" "2007-04-22 00:00:00" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-othername.tmpl" \
@@ -53,7 +53,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
+"$FAKETIME" "$FAKETIME_F_OPT" "2007-04-22 00:00:00" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-othername-xmpp.tmpl" \

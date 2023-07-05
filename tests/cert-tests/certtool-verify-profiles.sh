@@ -38,7 +38,7 @@ OUTFILE=out-pkcs7.$$.tmp
 skip_if_no_datefudge
 
 echo "Checking chain with insecure leaf"
-gnutls_timewrapper_standalone static "2019-12-19 00:00:00" \
+"$FAKETIME" "$FAKETIME_F_OPT" "2019-12-19 00:00:00" \
 ${VALGRIND} "${CERTTOOL}" --verify-chain --verify-profile=medium --infile "${srcdir}/data/chain-512-leaf.pem" >${OUTFILE}
 rc=$?
 
@@ -49,7 +49,7 @@ if test "${rc}" != "1"; then
 fi
 
 echo "Checking chain with insecure subca"
-gnutls_timewrapper_standalone static "2019-12-19 00:00:00" \
+"$FAKETIME" "$FAKETIME_F_OPT" "2019-12-19 00:00:00" \
 ${VALGRIND} "${CERTTOOL}" --verify-chain --verify-profile=medium --infile "${srcdir}/data/chain-512-subca.pem" >${OUTFILE}
 rc=$?
 
@@ -61,7 +61,7 @@ fi
 
 
 echo "Checking chain with insecure ca"
-gnutls_timewrapper_standalone static "2019-12-19 00:00:00" \
+"$FAKETIME" "$FAKETIME_F_OPT" "2019-12-19 00:00:00" \
 ${VALGRIND} "${CERTTOOL}" --verify-chain --verify-profile=medium --infile "${srcdir}/data/chain-512-ca.pem" >${OUTFILE}
 rc=$?
 

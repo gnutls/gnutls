@@ -126,7 +126,7 @@ rm -f "${KEYFILE}"
 skip_if_no_datefudge
 
 # Test certificate chain using Ed25519
-gnutls_timewrapper_standalone "2017-7-6" \
+"$FAKETIME" "2017-7-6" \
 ${VALGRIND} "${CERTTOOL}" --verify-chain --infile ${srcdir}/data/chain-eddsa.pem
 
 if test $? != 0; then

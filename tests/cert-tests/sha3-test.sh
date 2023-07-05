@@ -41,7 +41,7 @@ skip_if_no_datefudge
 # Test SHA3 signatures
 
 for i in sha3-224 sha3-256 sha3-384 sha3-512;do
-gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
+"$FAKETIME" "$FAKETIME_F_OPT" "2007-04-22 00:00:00" \
 "${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-test.tmpl" \
@@ -59,7 +59,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-gnutls_timewrapper_standalone static "2007-04-25 00:00:00" \
+"$FAKETIME" "$FAKETIME_F_OPT" "2007-04-25 00:00:00" \
 	"${CERTTOOL}" --load-ca-certificate "${TMPFILE}" --verify --infile "${TMPFILE}" >/dev/null 2>&1
 rc=$?
 if test "${rc}" != "0"; then
@@ -71,7 +71,7 @@ done
 # Test SHA3 signatures with ECDSA
 
 for i in sha3-224 sha3-256 sha3-384 sha3-512;do
-gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
+"$FAKETIME" "$FAKETIME_F_OPT" "2007-04-22 00:00:00" \
 "${CERTTOOL}" --generate-self-signed \
 	--load-privkey "${srcdir}/data/template-test-ecc.key" \
 	--template "${srcdir}/templates/template-test.tmpl" \
@@ -83,7 +83,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-gnutls_timewrapper_standalone static "2007-04-25 00:00:00" \
+"$FAKETIME" "$FAKETIME_F_OPT" "2007-04-25 00:00:00" \
 	"${CERTTOOL}" --load-ca-certificate "${TMPFILE}" --verify --infile "${TMPFILE}" >/dev/null 2>&1
 rc=$?
 if test "${rc}" != "0"; then

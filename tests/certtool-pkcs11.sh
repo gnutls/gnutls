@@ -115,7 +115,7 @@ verify_certificate_test() {
 	file=$2
 
 	echo -n "* Verifying a certificate... "
-	gnutls_timewrapper_standalone static "2015-10-10 00:00:00" \
+	"$FAKETIME" "$FAKETIME_F_OPT" "2015-10-10 00:00:00" \
 	$CERTTOOL ${ADDITIONAL_PARAM} --verify --load-ca-certificate "$url" --infile "$file" >>"${TMPFILE}" 2>&1
 	if test $? = 0; then
 		echo ok
