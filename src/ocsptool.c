@@ -292,7 +292,7 @@ static int _verify_response(gnutls_datum_t *data, gnutls_datum_t *nonce,
 	gnutls_x509_trust_list_t list;
 	unsigned int x509_ncas = 0;
 	unsigned verify;
-	gnutls_datum_t dat;
+	gnutls_datum_t dat = { NULL, 0 };
 
 	ret = gnutls_ocsp_resp_init(&resp);
 	if (ret < 0) {
@@ -365,6 +365,7 @@ static int _verify_response(gnutls_datum_t *data, gnutls_datum_t *nonce,
 				gnutls_strerror(ret));
 			app_exit(1);
 		}
+		gnutls_free(dat.data);
 
 		if (HAVE_OPT(VERBOSE)) {
 			unsigned int i;
@@ -405,6 +406,8 @@ static int _verify_response(gnutls_datum_t *data, gnutls_datum_t *nonce,
 				gnutls_strerror(ret));
 			app_exit(1);
 		}
+		gnutls_x509_trust_list_deinit(list, 1);
+		gnutls_free(x509_ca_list);
 	} else if (signer) {
 		if (HAVE_OPT(VERBOSE)) {
 			gnutls_datum_t out;
