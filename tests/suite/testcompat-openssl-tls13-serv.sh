@@ -90,7 +90,7 @@ fi
 
 #AES-128-CCM
 for i in AES-128-GCM AES-256-GCM CHACHA20-POLY1305 AES-128-CCM AES-128-CCM-8;do
-	echo_cmd "${PREFIX}Checking TLS 1.3 with ${i}..."
+	echo_cmd "${PREFIX}Checking TLS 1.3 with cipher ${i}..."
 
 	eval "${GETPORT}"
 	launch_server --priority "NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+${i}${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" >>${OUTPUT} 2>&1
@@ -104,9 +104,8 @@ for i in AES-128-GCM AES-256-GCM CHACHA20-POLY1305 AES-128-CCM AES-128-CCM-8;do
 	wait
 done
 
-GROUPS="GROUP-X25519 GROUP-X448 GROUP-SECP256R1 GROUP-SECP384R1 GROUP-SECP521R1"
-for i in $GROUPS;do
-	echo_cmd "${PREFIX}Checking TLS 1.3 with ${i}..."
+for i in GROUP-X25519 GROUP-X448 GROUP-SECP256R1 GROUP-SECP384R1 GROUP-SECP521R1;do
+	echo_cmd "${PREFIX}Checking TLS 1.3 with group ${i}..."
 
 	eval "${GETPORT}"
 	launch_server --priority "NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+${i}${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}"  >>${OUTPUT} 2>&1
