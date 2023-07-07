@@ -54,8 +54,6 @@ LDPATH=/usr/local/OLDGNUTLS/lib/x86_64-linux-gnu:/usr/local/OLDGNUTLS/usr/lib/x8
 
 . "${srcdir}/../scripts/common.sh"
 
-skip_if_no_datefudge
-
 . "${srcdir}/testcompat-common"
 
 : ${PORT=${RPORT}}

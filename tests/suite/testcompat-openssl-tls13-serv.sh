@@ -49,8 +49,6 @@ fi
 
 . "${srcdir}/../scripts/common.sh"
 
-skip_if_no_datefudge
-
 . "${srcdir}/testcompat-common"
 
 : ${PORT=${RPORT}}
