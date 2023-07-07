@@ -670,6 +670,7 @@ void socket_open2(socket_st *hd, const char *hostname, const char *service,
 /* converts a textual service or port to
  * a service.
  */
+ATTRIBUTE_NONNULL((1, 2))
 const char *port_to_service(const char *sport, const char *proto)
 {
 	unsigned int port;

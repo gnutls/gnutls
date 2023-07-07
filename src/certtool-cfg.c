@@ -726,6 +726,7 @@ int64_t read_int(const char *input_str)
 	return read_int_with_default(input_str, 0);
 }
 
+ATTRIBUTE_NONNULL((1, 2))
 int serial_decode(const char *input, gnutls_datum_t *output)
 {
 	int i;

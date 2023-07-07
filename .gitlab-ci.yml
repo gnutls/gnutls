@@ -14,8 +14,8 @@ variables:
   DEBIAN_BUILD: buildenv-debian-testing
   DEBIAN_CROSS_BUILD: buildenv-debian-cross-testing
   DEBIAN_X86_CROSS_BUILD: buildenv-debian-x86-cross
-  FEDORA_BUILD: buildenv-fedora37
-  MINGW_BUILD: buildenv-mingw-fedora37
+  FEDORA_BUILD: buildenv-fedora38
+  MINGW_BUILD: buildenv-mingw-fedora38
   ALPINE_BASE_BUILD: buildenv-alpine-base
   COMPILER: gcc
   CPPCHECK_OPTIONS: "--enable=warning --enable=performance --enable=portability --std=c99 --suppressions-list=devel/cppcheck.suppressions --template='{id}:{file}:{line},{severity},{message}'"
