@@ -2471,7 +2471,7 @@ int gnutls_pkcs11_token_get_info(const char *url,
 				 size_t *output_size)
 {
 	struct p11_kit_uri *info = NULL;
-	const uint8_t *str;
+	const uint8_t *str = NULL;
 	char *temp_str = NULL;
 	size_t len;
 	int ret;
