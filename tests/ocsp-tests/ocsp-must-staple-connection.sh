@@ -23,11 +23,6 @@
 : ${SERV=../src/gnutls-serv${EXEEXT}}
 : ${CLI=../src/gnutls-cli${EXEEXT}}
 : ${DIFF=diff}
-TEMPLATE_FILE="ms-out.$$.tmpl.tmp"
-SERVER_CERT_FILE="ms-cert.$$.pem.tmp"
-SERVER_CERT_NO_EXT_FILE="ms-cert-no-ext.$$.pem.tmp"
-OCSP_RESPONSE_FILE="ms-resp.$$.tmp"
-OCSP_REQ_FILE="ms-req.$$.tmp"
 
 export TZ="UTC"
 
@@ -80,17 +75,23 @@ EXP_OCSP_DATE="2016-03-27 00:00:00"
 
 OCSP_PID=""
 TLS_SERVER_PID=""
+
+testdir=`create_testdir ocsp-must-staple-connection`
+
+TEMPLATE_FILE="$testdir/ms-out.tmpl.tmp"
+SERVER_CERT_FILE="$testdir/ms-cert.pem.tmp"
+SERVER_CERT_NO_EXT_FILE="$testdir/ms-cert-no-ext.pem.tmp"
+OCSP_RESPONSE_FILE="$testdir/ms-resp.tmp"
+OCSP_REQ_FILE="$testdir/ms-req.tmp"
+INDEXFILE="$testdir/ocsp_index.txt"
+ATTRFILE="${INDEXFILE}.attr"
+
 stop_servers ()
 {
     test -z "${OCSP_PID}" || kill "${OCSP_PID}"
     test -z "${TLS_SERVER_PID}" || kill "${TLS_SERVER_PID}"
-    rm -f "$TEMPLATE_FILE"
-    rm -f "$SERVER_CERT_FILE"
-    rm -f "$SERVER_CERT_NO_EXT_FILE"
-    rm -f "$OCSP_RESPONSE_FILE"
-    rm -f "$OCSP_REQ_FILE"
 }
-trap stop_servers 1 15 2 EXIT
+trap stop_servers 1 15 2
 
 echo "=== Generating good server certificate ==="
 
@@ -119,8 +120,6 @@ ${CERTTOOL} \
 
 echo "=== Bringing OCSP server up ==="
 
-INDEXFILE="ocsp_index.txt"
-ATTRFILE="${INDEXFILE}.attr"
 cp "${srcdir}/ocsp-tests/certs/ocsp_index.txt" ${INDEXFILE}
 cp "${srcdir}/ocsp-tests/certs/ocsp_index.txt.attr" ${ATTRFILE}
 
@@ -185,9 +184,9 @@ echo "test 123456" | \
 		 --port="${TLS_SERVER_PORT}" localhost
 rc=$?
 
-if test "${rc}" != "1"; then
+if test "${rc}" = "0"; then
     echo "Connecting to server with valid certificate and no staple succeeded"
-    exit ${rc}
+    exit 1
 fi
 
 kill "${TLS_SERVER_PID}"
@@ -249,9 +248,9 @@ echo "test 123456" | \
 		 --port="${TLS_SERVER_PORT}" localhost
 rc=$?
 
-if test "${rc}" != "1"; then
+if test "${rc}" = "0"; then
     echo "Connecting to server with valid certificate and invalid staple succeeded"
-    exit ${rc}
+    exit 1
 fi
 
 kill "${TLS_SERVER_PID}"
@@ -283,9 +282,9 @@ echo "test 123456" | \
 		 --port="${TLS_SERVER_PORT}" localhost
 rc=$?
 
-if test "${rc}" != "1"; then
+if test "${rc}" = "0"; then
     echo "Connecting to server with valid certificate and invalid staple succeeded"
-    exit ${rc}
+    exit 1
 fi
 
 kill "${TLS_SERVER_PID}"
@@ -340,9 +339,9 @@ echo "test 123456" | \
 		 --port="${TLS_SERVER_PORT}" localhost
 rc=$?
 
-if test "${rc}" != "1"; then
+if test "${rc}" = "0"; then
     echo "Connecting to server with valid certificate and expired staple succeeded"
-    exit ${rc}
+    exit 1
 fi
 
 kill "${TLS_SERVER_PID}"
@@ -381,9 +380,9 @@ echo "test 123456" | \
 		 --port="${TLS_SERVER_PORT}" localhost
 rc=$?
 
-if test "${rc}" != "1"; then
+if test "${rc}" = "0"; then
     echo "Connecting to server with valid certificate and old staple succeeded"
-    exit ${rc}
+    exit 1
 fi
 
 kill "${TLS_SERVER_PID}"
@@ -480,7 +479,7 @@ rc=$?
 
 if test "${rc}" = "0"; then
     echo "Connecting to server with valid certificate and OCSP error response unexpectedly succeeded"
-    exit ${rc}
+    exit 1
 fi
 
 kill "${TLS_SERVER_PID}"
@@ -492,10 +491,6 @@ kill ${OCSP_PID}
 wait ${OCSP_PID}
 unset OCSP_PID
 
-rm -f "${OCSP_RESPONSE_FILE}"
-rm -f "${OCSP_REQ_FILE}"
-rm -f "${SERVER_CERT_FILE}"
-rm -f "${TEMPLATE_FILE}"
-rm -f "${INDEXFILE}" "${ATTRFILE}"
+rm -rf "$testdir"
 
 exit 0
