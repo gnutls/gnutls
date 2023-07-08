@@ -90,9 +90,6 @@ static int status_func(gnutls_session_t session, void *ptr,
 
 #define MAX_BUF 1024
 
-/* Keep backward compatibility */
-#define GNUTLS_NO_EXTENSIONS GNUTLS_NO_DEFAULT_EXTENSIONS
-
 static void client(int fd, const char *prio)
 {
 	int ret;

@@ -1621,9 +1621,6 @@ static void print_priority_list(void)
 	return;
 }
 
-/* Keeps backward compatibility */
-#define GNUTLS_NO_EXTENSIONS GNUTLS_NO_DEFAULT_EXTENSIONS
-
 static void cmd_parser(int argc, char **argv)
 {
 	char *rest = NULL;
