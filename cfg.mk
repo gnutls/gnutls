@@ -100,8 +100,15 @@ glimport:
 # Update Copyright year in tools and docs
 
 update-copyright-year:
-	$(AM_V_at)$(SED) -i "s/\"2000-[0-9]\{4,\}\"/\"2000-`date +%Y`\"/g" src/args-std.def.in
 	$(AM_V_at)$(SED) -i "s/ 2001-[0-9]\{4,\} / 2001-`date +%Y` /g" doc/gnutls.texi
+	$(AM_V_at)$(SED) -i \
+		-e "s/ 2001-[0-9]\{4,\} / 2001-`date +%Y` /g" \
+		-e "s/ 2020-[0-9]\{4,\} / 2020-`date +%Y` /g" \
+		doc/manpages/Makefile.am
+	$(AM_V_at)$(SED) -i \
+		-e "s/ 2000-[0-9]\{4,\} / 2000-`date +%Y` /g" \
+		doc/Makefile.am \
+		src/Makefile.am
 
 # Code Coverage
 

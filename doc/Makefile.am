@@ -41,7 +41,7 @@ endif
 
 CLIGEN_ARGS = \
 	--bug-email bugs@gnutls.org \
-	--copyright-year 2000-2021 \
+	--copyright-year 2000-2023 \
 	--copyright-holder 'Free Software Foundation, and others' \
 	--license gpl3+ \
 	--package '$(PACKAGE)' \

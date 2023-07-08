@@ -49,7 +49,7 @@ CLIGEN_ARGS = \
 	--package '$(PACKAGE)' \
 	--version='$(VERSION)' \
 	--authors='Nikos Mavrogiannopoulos, Simon Josefsson and others; see /usr/share/doc/gnutls/AUTHORS for a complete list.' \
-	--copyright-year=2020-2021 \
+	--copyright-year=2020-2023 \
 	--copyright-holder='Free Software Foundation, and others all rights reserved.' \
 	--bug-email=bugs@gnutls.org
 
@@ -1367,7 +1367,7 @@ stamp_mans: $(HEADER_FILES)
 			-pkg-site "https://www.gnutls.org" \
 			-include "gnutls/`basename $$header .in`" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
+			-copyright "2001-2023 Free Software Foundation, Inc., and others" \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 && \
 		echo $(ECHO_N) "."; \
