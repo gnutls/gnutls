@@ -39,6 +39,7 @@
 #include <socket.h>
 
 /* Gnulib portability files. */
+#include "parse-datetime.h"
 #include "sockets.h"
 
 static void cmd_parser(int argc, char **argv);
@@ -261,6 +262,18 @@ int main(int argc, char **argv)
 	if (gnutls_global_init() < 0) {
 		fprintf(stderr, "global state initialization error\n");
 		exit(1);
+	}
+
+	if (ENABLED_OPT(ATTIME)) {
+		struct timespec r;
+
+		if (!parse_datetime(&r, OPT_ARG(ATTIME), NULL)) {
+			fprintf(stderr,
+				"%s option value %s is not a valid time\n",
+				"attime", OPT_ARG(ATTIME));
+			exit(1);
+		}
+		set_system_time(&r);
 	}
 
 	gnutls_global_set_log_function(tls_log_func);

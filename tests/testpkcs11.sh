@@ -80,8 +80,6 @@ exit_error () {
 	exit 1
 }
 
-skip_if_no_datefudge
-
 # $1: token
 # $2: PIN
 # $3: filename
@@ -938,8 +936,7 @@ use_certificate_test () {
 	echo -n "* Using PKCS #11 with gnutls-cli (${txt})... "
 	# start server
 	eval "${GETPORT}"
-	launch_bare_server "$FAKETIME" "$FAKETIME_F_OPT" "$TESTDATE" \
-	        $VALGRIND $SERV $DEBUG -p "$PORT" \
+	launch_bare_server $VALGRIND $SERV $DEBUG --attime "$TESTDATE" -p "$PORT" \
 		${ADDITIONAL_PARAM} --debug 10 --echo --priority NORMAL --x509certfile="${certfile}" \
 		--x509keyfile="$keyfile" --x509cafile="${cafile}" \
 		--verify-client-cert --require-client-cert >>"${LOGFILE}" 2>&1
@@ -948,17 +945,14 @@ use_certificate_test () {
 	wait_server ${PID}
 
 	# connect to server using SC
-	"$FAKETIME" "$FAKETIME_F_OPT" "$TESTDATE" \
-	${VALGRIND} "${CLI}" ${ADDITIONAL_PARAM} -p "${PORT}" localhost --priority NORMAL --x509cafile="${cafile}" </dev/null >>"${LOGFILE}" 2>&1 && \
+	${VALGRIND} "${CLI}" --attime "$TESTDATE" ${ADDITIONAL_PARAM} -p "${PORT}" localhost --priority NORMAL --x509cafile="${cafile}" </dev/null >>"${LOGFILE}" 2>&1 && \
 		fail ${PID} "Connection should have failed!"
 
-	"$FAKETIME" "$FAKETIME_F_OPT" "$TESTDATE" \
-	${VALGRIND} "${CLI}" ${ADDITIONAL_PARAM} -p "${PORT}" localhost --priority NORMAL --x509certfile="${certfile}" \
+	${VALGRIND} "${CLI}" --attime "$TESTDATE" ${ADDITIONAL_PARAM} -p "${PORT}" localhost --priority NORMAL --x509certfile="${certfile}" \
 	--x509keyfile="$keyfile" --x509cafile="${cafile}" </dev/null >>"${LOGFILE}" 2>&1 || \
 		fail ${PID} "Connection (with files) should have succeeded!"
 
-	"$FAKETIME" "$FAKETIME_F_OPT" "$TESTDATE" \
-	${VALGRIND} "${CLI}" ${ADDITIONAL_PARAM} -p "${PORT}" localhost --priority NORMAL --x509certfile="${token};object=gnutls-client;object-type=cert" \
+	${VALGRIND} "${CLI}" --attime "$TESTDATE" ${ADDITIONAL_PARAM} -p "${PORT}" localhost --priority NORMAL --x509certfile="${token};object=gnutls-client;object-type=cert" \
 		--x509keyfile="${token};object=gnutls-client;object-type=private" \
 		--x509cafile="${cafile}" </dev/null >>"${LOGFILE}" 2>&1 || \
 		fail ${PID} "Connection (with SC) should have succeeded!"

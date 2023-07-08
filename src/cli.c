@@ -59,6 +59,7 @@
 #include <read-file.h>
 #include <getpass.h>
 #include <minmax.h>
+#include "parse-datetime.h"
 
 #include "sockets.h"
 #include "benchmark.h"
@@ -1318,6 +1319,18 @@ int main(int argc, char **argv)
 	if ((ret = gnutls_global_init()) < 0) {
 		fprintf(stderr, "global_init: %s\n", gnutls_strerror(ret));
 		exit(1);
+	}
+
+	if (ENABLED_OPT(ATTIME)) {
+		struct timespec r;
+
+		if (!parse_datetime(&r, OPT_ARG(ATTIME), NULL)) {
+			fprintf(stderr,
+				"%s option value %s is not a valid time\n",
+				"attime", OPT_ARG(ATTIME));
+			exit(1);
+		}
+		set_system_time(&r);
 	}
 
 	if (hostname == NULL) {

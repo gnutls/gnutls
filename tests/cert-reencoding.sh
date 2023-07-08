@@ -249,8 +249,7 @@ launch_bare_server \
 SERVER_PID="${!}"
 wait_server "${SERVER_PID}"
 
-"$FAKETIME" "$FAKETIME_F_OPT" "${TESTDATE}" \
-      "${CLI}" --x509certfile ${CLIENT_CERT_FILE} \
+"${CLI}" --attime "${TESTDATE}" --x509certfile ${CLIENT_CERT_FILE} \
       --x509keyfile ${CLIENT_KEY_FILE} --x509cafile=${CA_FILE} \
       --port="${PORT}" localhost </dev/null
 rc=$?

@@ -149,8 +149,7 @@ echo "=== Test 1: Server with valid certificate ==="
 
 PORT=${TLS_SERVER_PORT}
 launch_bare_server \
-	  "$FAKETIME" "${TESTDATE}" \
-	  "${SERV}" --echo --disable-client-cert \
+	  "${SERV}" --attime "${TESTDATE}" --echo --disable-client-cert \
 	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
 	  --x509certfile="${SERVER_CERT_FILE}" \
 	  --port="${TLS_SERVER_PORT}"
@@ -160,8 +159,7 @@ wait_server $TLS_SERVER_PID
 wait_for_port "${TLS_SERVER_PORT}"
 
 echo "test 123456" | \
-    "$FAKETIME" "$FAKETIME_F_OPT" "${TESTDATE}" \
-	      "${CLI}" --ocsp --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
+    "${CLI}" --attime "${TESTDATE}" --ocsp --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
 	      --port="${TLS_SERVER_PORT}" localhost
 rc=$?
 
@@ -195,8 +193,7 @@ eval "${GETPORT}"
 TLS_SERVER_PORT=$PORT
 
 launch_bare_server \
-	  "$FAKETIME" "${TESTDATE}" \
-	  "${SERV}" --echo --disable-client-cert \
+	  "${SERV}" --attime "${TESTDATE}" --echo --disable-client-cert \
 	  --x509keyfile="${srcdir}/ocsp-tests/certs/server_bad.key" \
 	  --x509certfile="${SERVER_CERT_FILE}" \
 	  --port="${TLS_SERVER_PORT}"
@@ -205,8 +202,7 @@ wait_server ${TLS_SERVER_PID}
 wait_for_port "${TLS_SERVER_PORT}"
 
 echo "test 123456" | \
-    "$FAKETIME" "$FAKETIME_F_OPT" "${TESTDATE}" \
-	      "${CLI}" --ocsp --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
+    "${CLI}" --attime "${TESTDATE}" --ocsp --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
 	      --port="${TLS_SERVER_PORT}" localhost
 rc=$?
 
