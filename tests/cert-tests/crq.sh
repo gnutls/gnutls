@@ -88,7 +88,7 @@ rc=$?
 # We're done.
 if test "${rc}" != "0"; then
 	echo "Certificate request generation failed"
-	echo $OUTFILE2
+	cat "$OUTFILE2"
 	exit ${rc}
 fi
 
@@ -137,7 +137,7 @@ rc=$?
 # We're done.
 if test "${rc}" != "0"; then
 	echo "Certificate request generation with long DNS failed"
-	echo $OUTFILE
+	cat "$OUTFILE"
 	exit ${rc}
 fi
 
@@ -158,6 +158,7 @@ rc=$?
 
 if test "${rc}" != "0"; then
 	echo "Certificate request generation with explicit extensions failed"
+	cat "$OUTFILE"
 	exit ${rc}
 fi
 
@@ -180,6 +181,7 @@ rc=$?
 
 if test "${rc}" != "0"; then
 	echo "Certificate from request generation failed"
+	cat "$OUTFILE"
 	exit ${rc}
 fi
 
@@ -202,6 +204,7 @@ rc=$?
 
 if test "${rc}" != "0"; then
 	echo "Certificate from request generation with honor flag failed"
+	cat "$OUTFILE"
 	exit ${rc}
 fi
 
@@ -224,6 +227,7 @@ rc=$?
 
 if test "${rc}" != "0"; then
 	echo "Certificate from request generation with explicit extensions failed"
+	cat "$OUTFILE"
 	exit ${rc}
 fi
 
