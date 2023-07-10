@@ -91,6 +91,8 @@ static void try(const char *name, const char *sprio, const char *cprio,
 
 void doit(void)
 {
+	gnutls_fips140_context_t fips_context;
+
 	global_init();
 
 	/* General init. */
@@ -98,10 +100,20 @@ void doit(void)
 	if (debug)
 		gnutls_global_set_log_level(2);
 
-	try("default", AES_GCM ":%FORCE_SESSION_HASH",
-	    AES_GCM ":%FORCE_SESSION_HASH", 0, 0);
+	assert(gnutls_fips140_context_init(&fips_context) >= 0);
+
+	/* Default: EMS is requested in non-FIPS mode, while it is
+	 * required in FIPS mode.
+	 */
+	FIPS_PUSH_CONTEXT();
+	try("default", AES_GCM, AES_GCM, 0, 0);
+	FIPS_POP_CONTEXT(APPROVED);
+
+	FIPS_PUSH_CONTEXT();
 	try("both force EMS", AES_GCM ":%FORCE_SESSION_HASH",
 	    AES_GCM ":%FORCE_SESSION_HASH", 0, 0);
+	FIPS_POP_CONTEXT(APPROVED);
+
 	if (gnutls_fips140_mode_enabled()) {
 		try("neither negotiates EMS", AES_GCM ":%NO_SESSION_HASH",
 		    AES_GCM ":%NO_SESSION_HASH", GNUTLS_E_INSUFFICIENT_SECURITY,
@@ -129,6 +141,8 @@ void doit(void)
 	try("server forces EMS, client doesn't negotiate EMS",
 	    AES_GCM ":%FORCE_SESSION_HASH", AES_GCM ":%NO_SESSION_HASH",
 	    GNUTLS_E_INSUFFICIENT_SECURITY, GNUTLS_E_AGAIN);
+
+	gnutls_fips140_context_deinit(fips_context);
 
 	gnutls_global_deinit();
 }

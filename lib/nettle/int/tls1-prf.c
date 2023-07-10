@@ -28,6 +28,7 @@
 #endif
 
 #include <gnutls_int.h>
+#include "fips.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -140,8 +141,26 @@ int tls12_prf(void *mac_ctx, nettle_hash_update_func *update,
 	      size_t label_size, const char *label, size_t seed_size,
 	      const uint8_t *seed, size_t length, uint8_t *dst)
 {
+#define MASTER_SECRET "master secret"
+#define MASTER_SECRET_SIZE (sizeof(MASTER_SECRET) - 1)
+
 	P_hash(mac_ctx, update, digest, digest_size, seed_size, seed,
 	       label_size, label, length, dst);
+
+	/* Since May 16, 2023, the use of extended master secret is
+	 * mandatory according to FIPS 140-3 IG D.Q.  Instead of
+	 * allowing the "extended master secret" label specifically,
+	 * we mark the use of non-EMS label, i.e., "master secret" as
+	 * non-approved, because it is still useful to call the
+	 * gnutls_prf_raw function with arbitrary label, e.g., in
+	 * self-tests.
+	 */
+	if (label_size == MASTER_SECRET_SIZE &&
+	    memcmp(label, MASTER_SECRET, MASTER_SECRET_SIZE) == 0) {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_NOT_APPROVED);
+	} else {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_APPROVED);
+	}
 
 	return 1;
 }

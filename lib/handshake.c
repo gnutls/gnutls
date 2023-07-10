@@ -880,7 +880,8 @@ static int read_client_hello(gnutls_session_t session, uint8_t *data,
 	/* check if EMS is required */
 	if (!vers->tls13_sem && vers->id != GNUTLS_SSL3 &&
 	    vers->id != GNUTLS_DTLS0_9 &&
-	    session->internals.priorities->force_ext_master_secret &&
+	    session->internals.priorities->force_ext_master_secret ==
+		    EMS_REQUIRE &&
 	    !session->security_parameters.ext_master_secret) {
 		return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_SECURITY);
 	}
@@ -2061,7 +2062,8 @@ static int read_server_hello(gnutls_session_t session, uint8_t *data,
 
 		/* check if EMS is required */
 		if (vers->id != GNUTLS_SSL3 && vers->id != GNUTLS_DTLS0_9 &&
-		    session->internals.priorities->force_ext_master_secret &&
+		    session->internals.priorities->force_ext_master_secret ==
+			    EMS_REQUIRE &&
 		    !session->security_parameters.ext_master_secret) {
 			return gnutls_assert_val(
 				GNUTLS_E_INSUFFICIENT_SECURITY);
