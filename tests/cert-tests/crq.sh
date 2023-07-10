@@ -96,40 +96,10 @@ rm -f "${OUTFILE}" "${OUTFILE2}"
 
 
 # Test interactive CRQ creation with very long input
-cat >$TMPFILE <<__EOF__
-
-
-
-
-
-super-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-long.com
-
-
-super-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-long.com
-
-
-
-
-
-
-
-
-N
-Y
-N
-Y
-N
-N
-N
-N
-N
-N
-__EOF__
-
-setsid \
 "${CERTTOOL}" --attime "2007-04-22" -q \
-	--load-privkey "${srcdir}/data/template-test.key" \
-	--outfile "${OUTFILE}" <$TMPFILE 2>/dev/null
+	      --load-privkey "${srcdir}/data/template-test.key" \
+	      --template "${srcdir}/templates/template-long-dns.tmpl" \
+	      --outfile "${OUTFILE}" 2>/dev/null
 
 ${DIFF} --ignore-matching-lines "Algorithm Security Level" "${srcdir}/data/template-long-dns-crq.pem" "${OUTFILE}" >/dev/null 2>&1
 rc=$?
