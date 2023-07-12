@@ -37,10 +37,12 @@
 #include <read-file.h>
 #include <socket.h>
 #include <minmax.h>
+#include "parse-datetime.h"
 
 #include <ocsptool-common.h>
 #include "ocsptool-options.h"
 #include "certtool-common.h"
+#include "common.h"
 
 FILE *outfile;
 static unsigned int incert_format, outcert_format;
@@ -290,7 +292,7 @@ static int _verify_response(gnutls_datum_t *data, gnutls_datum_t *nonce,
 	gnutls_x509_trust_list_t list;
 	unsigned int x509_ncas = 0;
 	unsigned verify;
-	gnutls_datum_t dat;
+	gnutls_datum_t dat = { NULL, 0 };
 
 	ret = gnutls_ocsp_resp_init(&resp);
 	if (ret < 0) {
@@ -363,6 +365,7 @@ static int _verify_response(gnutls_datum_t *data, gnutls_datum_t *nonce,
 				gnutls_strerror(ret));
 			app_exit(1);
 		}
+		gnutls_free(dat.data);
 
 		if (HAVE_OPT(VERBOSE)) {
 			unsigned int i;
@@ -403,6 +406,8 @@ static int _verify_response(gnutls_datum_t *data, gnutls_datum_t *nonce,
 				gnutls_strerror(ret));
 			app_exit(1);
 		}
+		gnutls_x509_trust_list_deinit(list, 1);
+		gnutls_free(x509_ca_list);
 	} else if (signer) {
 		if (HAVE_OPT(VERBOSE)) {
 			gnutls_datum_t out;
@@ -647,6 +652,18 @@ int main(int argc, char **argv)
 
 	gnutls_global_set_log_function(tls_log_func);
 	gnutls_global_set_log_level(OPT_VALUE_DEBUG);
+
+	if (ENABLED_OPT(ATTIME)) {
+		struct timespec r;
+
+		if (!parse_datetime(&r, OPT_ARG(ATTIME), NULL)) {
+			fprintf(stderr,
+				"%s option value %s is not a valid time\n",
+				"attime", OPT_ARG(ATTIME));
+			app_exit(1);
+		}
+		set_system_time(&r);
+	}
 
 	if (ENABLED_OPT(INDER))
 		incert_format = GNUTLS_X509_FMT_DER;

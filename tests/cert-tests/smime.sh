@@ -35,8 +35,6 @@ OUTFILE=out-pkcs7.$$.tmp
 
 . ${srcdir}/../scripts/common.sh
 
-skip_if_no_datefudge
-
 # test the --smime-to-p7 functionality
 ${VAGRLIND} "${CERTTOOL}" --smime-to-p7 --infile "${srcdir}/data/pkcs7.smime" --outfile ${OUTFILE}
 rc=$?
@@ -46,8 +44,7 @@ if test "${rc}" != "0"; then
 fi
 
 
-gnutls_timewrapper_standalone static "2017-04-06 00:00:00" \
-${VALGRIND} "${CERTTOOL}" --p7-verify --load-certificate "${srcdir}/../../doc/credentials/x509/cert-rsa.pem" <"${OUTFILE}"
+${VALGRIND} "${CERTTOOL}" --attime "2017-04-06" --p7-verify --load-certificate "${srcdir}/../../doc/credentials/x509/cert-rsa.pem" <"${OUTFILE}"
 rc=$?
 
 if test "${rc}" != "0"; then

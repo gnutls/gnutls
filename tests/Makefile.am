@@ -604,11 +604,6 @@ sanity_cpp_CXXFLAGS = $(AM_CPPFLAGS) \
 endif
 endif
 
-if !WINDOWS
-indirect_tests += datefudge-check
-noinst_PROGRAMS = datefudge-check
-endif
-
 check_PROGRAMS = $(cpptests) $(ctests) $(indirect_tests)
 TESTS = $(cpptests) $(ctests) $(dist_check_SCRIPTS)
 
@@ -650,6 +645,11 @@ TESTS_ENVIRONMENT += ENABLE_GOST=1
 else
 TESTS_ENVIRONMENT += ENABLE_GOST=0
 endif
+
+TESTS_ENVIRONMENT +=					\
+	FAKETIME="$(FAKETIME)"				\
+	FAKETIME_F_OPT="$(FAKETIME_F_OPT)"		\
+	ac_cv_faketime_works="$(ac_cv_faketime_works)"
 
 TEST_EXTENSIONS = .sh
 SH_LOG_COMPILER = $(SHELL)

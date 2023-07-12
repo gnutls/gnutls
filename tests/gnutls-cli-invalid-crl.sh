@@ -47,8 +47,6 @@ SERV="${SERV} -q"
 
 . "${srcdir}/scripts/common.sh"
 
-skip_if_no_datefudge
-
 echo "Checking whether connecting to a server but with an invalid CRL provided, returns the expected error"
 
 cat <<__EOF__ >${TMPFILE}
@@ -168,8 +166,7 @@ launch_server --echo --x509keyfile ${TMPFILE} --x509certfile ${TMPFILE}
 PID=$!
 wait_server ${PID}
 
-gnutls_timewrapper_standalone "2018-9-19" \
-${VALGRIND} "${CLI}" -p "${PORT}" localhost --x509crlfile ${CRLFILE} --x509cafile ${CAFILE} >${TMPFILE} 2>&1 </dev/null && \
+${VALGRIND} "${CLI}" --attime "2018-9-19" -p "${PORT}" localhost --x509crlfile ${CRLFILE} --x509cafile ${CAFILE} >${TMPFILE} 2>&1 </dev/null && \
 	fail ${PID} "1. handshake should have failed!"
 
 

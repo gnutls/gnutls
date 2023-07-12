@@ -33,11 +33,8 @@ fi
 
 . ${srcdir}/scripts/common.sh
 
-skip_if_no_datefudge
-
 #try verification
-gnutls_timewrapper_standalone static "2010-10-10 00:00:00" \
-${VALGRIND} "${CERTTOOL}" --verify-allow-broken --inder --p7-verify --infile "${srcdir}/data/test1.cat" --load-certificate "${srcdir}/data/pkcs7-cat-ca.pem"
+${VALGRIND} "${CERTTOOL}" --attime "2010-10-10" --verify-allow-broken --inder --p7-verify --infile "${srcdir}/data/test1.cat" --load-certificate "${srcdir}/data/pkcs7-cat-ca.pem"
 rc=$?
 
 if test "${rc}" = "0"; then
@@ -45,8 +42,7 @@ if test "${rc}" = "0"; then
 	exit 1
 fi
 
-gnutls_timewrapper_standalone static "2016-10-10 00:00:00" \
-${VALGRIND} "${CERTTOOL}" --verify-allow-broken --inder --p7-verify --infile "${srcdir}/data/test1.cat" --load-certificate "${srcdir}/data/pkcs7-cat-ca.pem"
+${VALGRIND} "${CERTTOOL}" --attime "2016-10-10" --verify-allow-broken --inder --p7-verify --infile "${srcdir}/data/test1.cat" --load-certificate "${srcdir}/data/pkcs7-cat-ca.pem"
 rc=$?
 
 if test "${rc}" != "0"; then

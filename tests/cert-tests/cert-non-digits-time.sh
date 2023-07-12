@@ -31,11 +31,8 @@ if ! test -z "${VALGRIND}"; then
     VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
 
-skip_if_no_datefudge
-
 # Check whether certificates with non-digits time fields are accepted
-gnutls_timewrapper_standalone static "2019-12-19 00:00:00" \
-${VALGRIND}"${CERTTOOL}" --verify --load-ca-certificate "${srcdir}/data/cert-with-non-digits-time-ca.pem" --infile "${srcdir}/data/cert-with-non-digits-time.pem"
+${VALGRIND}"${CERTTOOL}" --attime "2019-12-19" --verify --load-ca-certificate "${srcdir}/data/cert-with-non-digits-time-ca.pem" --infile "${srcdir}/data/cert-with-non-digits-time.pem"
 rc=$?
 
 if test "${rc}" = "0";then

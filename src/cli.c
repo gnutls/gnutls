@@ -59,6 +59,7 @@
 #include <read-file.h>
 #include <getpass.h>
 #include <minmax.h>
+#include "parse-datetime.h"
 
 #include "sockets.h"
 #include "benchmark.h"
@@ -1320,6 +1321,18 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
+	if (ENABLED_OPT(ATTIME)) {
+		struct timespec r;
+
+		if (!parse_datetime(&r, OPT_ARG(ATTIME), NULL)) {
+			fprintf(stderr,
+				"%s option value %s is not a valid time\n",
+				"attime", OPT_ARG(ATTIME));
+			exit(1);
+		}
+		set_system_time(&r);
+	}
+
 	if (hostname == NULL) {
 		fprintf(stderr, "No hostname given\n");
 		exit(1);
@@ -1607,9 +1620,6 @@ static void print_priority_list(void)
 
 	return;
 }
-
-/* Keeps backward compatibility */
-#define GNUTLS_NO_EXTENSIONS GNUTLS_NO_DEFAULT_EXTENSIONS
 
 static void cmd_parser(int argc, char **argv)
 {

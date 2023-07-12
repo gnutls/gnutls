@@ -32,17 +32,11 @@ export TZ="UTC"
 
 . ${srcdir}/../scripts/common.sh
 
-skip_if_no_datefudge
-
-# Note that in rare cases this test may fail because the
-# time set using faketime/datefudge could have changed since the generation
-# (if example the system was busy)
 
 # Test PSS signatures on certificate
 
 for i in sha256 sha384 sha512;do
-gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
-"${CERTTOOL}" --generate-self-signed --key-type rsa-pss \
+"${CERTTOOL}" --attime "2007-04-22" --generate-self-signed --key-type rsa-pss \
 		--load-privkey "${srcdir}/data/privkey1.pem" \
 		--template "${srcdir}/templates/template-test.tmpl" \
 		--outfile "${TMPFILE}" --hash $i
@@ -59,8 +53,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-gnutls_timewrapper_standalone static "2007-04-25 00:00:00" \
-	"${CERTTOOL}" --load-ca-certificate "${TMPFILE}" --verify --infile "${TMPFILE}" >/dev/null 2>&1
+"${CERTTOOL}" --attime "2007-04-25" --load-ca-certificate "${TMPFILE}" --verify --infile "${TMPFILE}" >/dev/null 2>&1
 rc=$?
 if test "${rc}" != "0"; then
 	echo "Test (verification of RSA-PSS-$i) failed"

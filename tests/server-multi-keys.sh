@@ -45,8 +45,6 @@ SERV="${SERV} -q"
 
 . "${srcdir}/scripts/common.sh"
 
-skip_if_no_datefudge
-
 echo "Checking whether server can utilize multiple keys"
 
 KEY1=${srcdir}/../doc/credentials/x509/key-rsa.pem
@@ -64,16 +62,13 @@ launch_server --echo --priority "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA" --x509keyfile $
 PID=$!
 wait_server ${PID}
 
-gnutls_timewrapper_standalone "2017-08-9" timeout 1800 \
-"${CLI}" -p "${PORT}" localhost --x509cafile ${CAFILE} --priority "NORMAL:-KX-ALL:+ECDHE-RSA" </dev/null || \
+"${CLI}" --attime "2017-08-9" -p "${PORT}" localhost --x509cafile ${CAFILE} --priority "NORMAL:-KX-ALL:+ECDHE-RSA" </dev/null || \
 	fail ${PID} "1. handshake with RSA should have succeeded!"
 
-gnutls_timewrapper_standalone "2017-08-9" timeout 1800 \
-"${CLI}" -p "${PORT}" localhost --x509cafile ${CAFILE} --priority "NORMAL:-KX-ALL:+ECDHE-ECDSA" </dev/null || \
+"${CLI}" --attime "2017-08-9" -p "${PORT}" localhost --x509cafile ${CAFILE} --priority "NORMAL:-KX-ALL:+ECDHE-ECDSA" </dev/null || \
 	fail ${PID} "2. handshake with ECC should have succeeded!"
 
-gnutls_timewrapper_standalone "2017-08-9" timeout 1800 \
-"${CLI}" -p "${PORT}" localhost --x509cafile ${CAFILE} --priority "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ECDHE-RSA:-SIGN-ALL:+SIGN-RSA-SHA256" --save-cert ${TMPFILE} </dev/null || \
+"${CLI}" --attime "2017-08-9" -p "${PORT}" localhost --x509cafile ${CAFILE} --priority "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ECDHE-RSA:-SIGN-ALL:+SIGN-RSA-SHA256" --save-cert ${TMPFILE} </dev/null || \
 	fail ${PID} "3. handshake with RSA should have succeeded!"
 
 cmp ${TMPFILE} ${CERT1}
@@ -81,14 +76,12 @@ if test $? != 0;then
 	fail ${PID} "3. the certificate used by server was not the expected"
 fi
 
-gnutls_timewrapper_standalone "2017-08-9" timeout 1800 \
-"${CLI}" -p "${PORT}" localhost --x509cafile ${CAFILE} --priority "NORMAL:-KX-ALL:+ECDHE-RSA:+SIGN-RSA-SHA256:+SIGN-RSA-PSS-RSAE-SHA256" --save-cert ${TMPFILE} </dev/null || \
+"${CLI}" --attime "2017-08-9" -p "${PORT}" localhost --x509cafile ${CAFILE} --priority "NORMAL:-KX-ALL:+ECDHE-RSA:+SIGN-RSA-SHA256:+SIGN-RSA-PSS-RSAE-SHA256" --save-cert ${TMPFILE} </dev/null || \
 	fail ${PID} "4. handshake with RSA should have succeeded!"
 
 
 # check whether the server used the RSA-PSS certificate when we asked for RSA-PSS signature
-gnutls_timewrapper_standalone "2017-08-9" timeout 1800 \
-"${CLI}" -p "${PORT}" localhost --x509cafile ${CAFILE} --priority "NORMAL:-KX-ALL:+ECDHE-RSA:-SIGN-ALL:+SIGN-RSA-PSS-SHA256" --save-cert ${TMPFILE} </dev/null || \
+"${CLI}" --attime "2017-08-9" -p "${PORT}" localhost --x509cafile ${CAFILE} --priority "NORMAL:-KX-ALL:+ECDHE-RSA:-SIGN-ALL:+SIGN-RSA-PSS-SHA256" --save-cert ${TMPFILE} </dev/null || \
 	fail ${PID} "4. handshake with RSA-PSS and SHA256 should have succeeded!"
 
 cmp ${TMPFILE} ${CERT3}

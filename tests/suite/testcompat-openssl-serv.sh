@@ -56,7 +56,7 @@ export TZ="UTC"
 
 skip_if_no_datefudge
 
-gnutls_timewrapper_standalone "2012-09-02" timeout 1800 \
+"$FAKETIME" "2012-09-02" timeout 1800 \
 "${srcdir}/testcompat-openssl-serv-common.sh"
 
 ret=$?

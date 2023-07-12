@@ -170,10 +170,9 @@ export TZ="UTC"
 
 . ${srcdir}/../scripts/common.sh
 
-skip_if_no_datefudge
 
-gnutls_timewrapper_standalone static "2020-01-20 10:00:00" ${VALGRIND} \
-	"${CERTTOOL}" --generate-crl --load-ca-privkey "${srcdir}/data/template-test.key" \
+${VALGRIND} \
+	"${CERTTOOL}" --attime "2020-01-20 10:00:00" --generate-crl --load-ca-privkey "${srcdir}/data/template-test.key" \
 	--load-ca-certificate "${srcdir}/data/template-test.pem" \
 	--load-certificate "${srcdir}/data/ca-certs.pem" --template \
 	"${TMPFILE}" >${OUTFILE} 2>${INFOFILE}
@@ -194,8 +193,8 @@ fi
 
 if test "${ac_cv_sizeof_time_t}" = 8;then
 	# we should test that on systems which have 64-bit time_t
-	gnutls_timewrapper_standalone static "2138-01-20 10:00:00" ${VALGRIND} \
-		"${CERTTOOL}" --generate-crl --load-ca-privkey "${srcdir}/data/template-test.key" \
+	${VALGRIND} \
+		"${CERTTOOL}" --attime "2138-01-20 10:00:00" --generate-crl --load-ca-privkey "${srcdir}/data/template-test.key" \
 		--load-ca-certificate "${srcdir}/data/template-test.pem" \
 		--load-certificate "${srcdir}/data/ca-certs.pem" --template \
 		"${TMPFILE}" >${OUTFILE} 2>${INFOFILE}

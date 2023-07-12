@@ -40,8 +40,6 @@ fi
 
 . "${srcdir}/scripts/common.sh"
 
-skip_if_no_datefudge
-
 CERT="${srcdir}/certs/cert-ecc256.pem"
 KEY="${srcdir}/certs/ecc256.pem"
 
@@ -53,12 +51,10 @@ wait_server ${PID}
 #successful case, test whether the ciphers we disable below work
 echo "Sanity testing"
 
-gnutls_timewrapper_standalone "2017-11-22" \
-"${CLI}" -p "${PORT}" 127.0.0.1 --priority NORMAL:-CIPHER-ALL:+AES-128-GCM:-GROUP-ALL:+GROUP-FFDHE2048 --verify-hostname localhost --x509cafile "${srcdir}/certs/ca-cert-ecc.pem" </dev/null >/dev/null ||
+"${CLI}" --attime "2017-11-22" -p "${PORT}" 127.0.0.1 --priority NORMAL:-CIPHER-ALL:+AES-128-GCM:-GROUP-ALL:+GROUP-FFDHE2048 --verify-hostname localhost --x509cafile "${srcdir}/certs/ca-cert-ecc.pem" </dev/null >/dev/null ||
 	fail ${PID} "stage1: expected connection to succeed (1)"
 
-gnutls_timewrapper_standalone "2017-11-22" \
-"${CLI}" -p "${PORT}" 127.0.0.1 --priority NORMAL:-VERS-ALL:+VERS-TLS1.2:-CIPHER-ALL:+AES-128-CBC:+AES-256-CBC:-MAC-ALL:+SHA1 --verify-hostname localhost --x509cafile "${srcdir}/certs/ca-cert-ecc.pem" </dev/null >/dev/null ||
+"${CLI}" --attime "2017-11-22" -p "${PORT}" 127.0.0.1 --priority NORMAL:-VERS-ALL:+VERS-TLS1.2:-CIPHER-ALL:+AES-128-CBC:+AES-256-CBC:-MAC-ALL:+SHA1 --verify-hostname localhost --x509cafile "${srcdir}/certs/ca-cert-ecc.pem" </dev/null >/dev/null ||
 	fail ${PID} "stage1: expected connection to succeed (2)"
 
 cat <<_EOF_ > ${TMPFILE}
@@ -76,44 +72,36 @@ export GNUTLS_SYSTEM_PRIORITY_FILE
 
 echo "Testing TLS1.3"
 echo " * sanity"
-gnutls_timewrapper_standalone "2017-11-22" \
-"${CLI}" -p "${PORT}" 127.0.0.1 --priority NORMAL --verify-hostname localhost --x509cafile "${srcdir}/certs/ca-cert-ecc.pem" </dev/null >/dev/null ||
+"${CLI}" --attime "2017-11-22" -p "${PORT}" 127.0.0.1 --priority NORMAL --verify-hostname localhost --x509cafile "${srcdir}/certs/ca-cert-ecc.pem" </dev/null >/dev/null ||
 	fail ${PID} "stage2: expected connection to succeed (1)"
 
 echo " * fallback to good options"
-gnutls_timewrapper_standalone "2017-11-22" \
-"${CLI}" -p "${PORT}" 127.0.0.1 --priority NORMAL:-CIPHER-ALL:+AES-128-GCM:+AES-256-GCM:-GROUP-ALL:+GROUP-FFDHE2048:+GROUP-FFDHE3072 --verify-hostname localhost --x509cafile "${srcdir}/certs/ca-cert-ecc.pem" </dev/null >/dev/null ||
+"${CLI}" --attime "2017-11-22" -p "${PORT}" 127.0.0.1 --priority NORMAL:-CIPHER-ALL:+AES-128-GCM:+AES-256-GCM:-GROUP-ALL:+GROUP-FFDHE2048:+GROUP-FFDHE3072 --verify-hostname localhost --x509cafile "${srcdir}/certs/ca-cert-ecc.pem" </dev/null >/dev/null ||
 	fail ${PID} "stage2: expected connection to succeed (2)"
 
 echo " * disabled cipher"
-gnutls_timewrapper_standalone "2017-11-22" \
-"${CLI}" -p "${PORT}" 127.0.0.1 --priority NORMAL:-CIPHER-ALL:+AES-128-GCM --verify-hostname localhost --x509cafile "${srcdir}/certs/ca-cert-ecc.pem" </dev/null && #>/dev/null &&
+"${CLI}" --attime "2017-11-22" -p "${PORT}" 127.0.0.1 --priority NORMAL:-CIPHER-ALL:+AES-128-GCM --verify-hostname localhost --x509cafile "${srcdir}/certs/ca-cert-ecc.pem" </dev/null && #>/dev/null &&
 	fail ${PID} "stage2: expected connection to fail (1)"
 
 echo " * disabled group"
-gnutls_timewrapper_standalone "2017-11-22" \
-"${CLI}" -p "${PORT}" 127.0.0.1 --priority NORMAL:-GROUP-ALL:+GROUP-FFDHE2048 --verify-hostname localhost --x509cafile "${srcdir}/certs/ca-cert-ecc.pem" </dev/null >/dev/null &&
+"${CLI}" --attime "2017-11-22" -p "${PORT}" 127.0.0.1 --priority NORMAL:-GROUP-ALL:+GROUP-FFDHE2048 --verify-hostname localhost --x509cafile "${srcdir}/certs/ca-cert-ecc.pem" </dev/null >/dev/null &&
 	fail ${PID} "stage2: expected connection to fail (2)"
 
 echo "Testing TLS1.2"
 echo " * sanity"
-gnutls_timewrapper_standalone "2017-11-22" \
-"${CLI}" -p "${PORT}" 127.0.0.1 --priority NORMAL:-VERS-ALL:+VERS-TLS1.2 --verify-hostname localhost --x509cafile "${srcdir}/certs/ca-cert-ecc.pem" </dev/null >/dev/null ||
+"${CLI}" --attime "2017-11-22" -p "${PORT}" 127.0.0.1 --priority NORMAL:-VERS-ALL:+VERS-TLS1.2 --verify-hostname localhost --x509cafile "${srcdir}/certs/ca-cert-ecc.pem" </dev/null >/dev/null ||
 	fail ${PID} "stage3: expected connection to succeed (1)"
 
 echo " * fallback to good options"
-gnutls_timewrapper_standalone "2017-11-22" \
-"${CLI}" -p "${PORT}" 127.0.0.1 --priority NORMAL:-VERS-ALL:+VERS-TLS1.2:-CIPHER-ALL:+AES-128-CBC:+AES-256-CBC:+AES-256-GCM:-MAC-ALL:+SHA1:+AEAD --verify-hostname localhost --x509cafile "${srcdir}/certs/ca-cert-ecc.pem" </dev/null >/dev/null ||
+"${CLI}" --attime "2017-11-22" -p "${PORT}" 127.0.0.1 --priority NORMAL:-VERS-ALL:+VERS-TLS1.2:-CIPHER-ALL:+AES-128-CBC:+AES-256-CBC:+AES-256-GCM:-MAC-ALL:+SHA1:+AEAD --verify-hostname localhost --x509cafile "${srcdir}/certs/ca-cert-ecc.pem" </dev/null >/dev/null ||
 	fail ${PID} "stage3: expected connection to succeed (2)"
 
 echo " * disabled cipher"
-gnutls_timewrapper_standalone "2017-11-22" \
-"${CLI}" -p "${PORT}" 127.0.0.1 --priority NORMAL:-VERS-ALL:+VERS-TLS1.2:-CIPHER-ALL:+AES-128-CBC --verify-hostname localhost --x509cafile "${srcdir}/certs/ca-cert-ecc.pem" </dev/null >/dev/null &&
+"${CLI}" --attime "2017-11-22" -p "${PORT}" 127.0.0.1 --priority NORMAL:-VERS-ALL:+VERS-TLS1.2:-CIPHER-ALL:+AES-128-CBC --verify-hostname localhost --x509cafile "${srcdir}/certs/ca-cert-ecc.pem" </dev/null >/dev/null &&
 	fail ${PID} "stage3: expected connection to fail (1)"
 
 echo " * disabled MAC"
-gnutls_timewrapper_standalone "2017-11-22" \
-"${CLI}" -p "${PORT}" 127.0.0.1 --priority NORMAL:-VERS-ALL:+VERS-TLS1.2:-MAC-ALL:+SHA1 --verify-hostname localhost --x509cafile "${srcdir}/certs/ca-cert-ecc.pem" </dev/null >/dev/null &&
+"${CLI}" --attime "2017-11-22" -p "${PORT}" 127.0.0.1 --priority NORMAL:-VERS-ALL:+VERS-TLS1.2:-MAC-ALL:+SHA1 --verify-hostname localhost --x509cafile "${srcdir}/certs/ca-cert-ecc.pem" </dev/null >/dev/null &&
 	fail ${PID} "stage3: expected connection to fail (2)"
 
 

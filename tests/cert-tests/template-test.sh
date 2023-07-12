@@ -33,19 +33,12 @@ TMPFILE=tmp-tt.pem.$$.tmp
 
 . ${srcdir}/../scripts/common.sh
 
-skip_if_no_datefudge
-
 echo "Running test for ${ac_cv_sizeof_time_t}-byte time_t"
 
-# Note that in rare cases this test may fail because the
-# time set using faketime/datefudge could have changed since the generation
-# (if example the system was busy)
-
-gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
-	"${CERTTOOL}" --generate-self-signed \
-		--load-privkey "${srcdir}/data/template-test.key" \
-		--template "${srcdir}/templates/template-test.tmpl" \
-		--outfile ${TMPFILE} 2>/dev/null
+"${CERTTOOL}" --attime "2007-04-22" --generate-self-signed \
+	--load-privkey "${srcdir}/data/template-test.key" \
+	--template "${srcdir}/templates/template-test.tmpl" \
+	--outfile ${TMPFILE} 2>/dev/null
 
 ${DIFF} "${srcdir}/data/template-test.pem" ${TMPFILE} >/dev/null 2>&1
 rc=$?
@@ -58,11 +51,10 @@ fi
 
 rm -f ${TMPFILE}
 
-gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
-	"${CERTTOOL}" --generate-self-signed \
-		--load-privkey "${srcdir}/data/template-test.key" \
-		--template "${srcdir}/templates/template-utf8.tmpl" \
-		--outfile ${TMPFILE} 2>/dev/null
+"${CERTTOOL}" --attime "2007-04-22" --generate-self-signed \
+	--load-privkey "${srcdir}/data/template-test.key" \
+	--template "${srcdir}/templates/template-utf8.tmpl" \
+	--outfile ${TMPFILE} 2>/dev/null
 
 ${DIFF} "${srcdir}/data/template-utf8.pem" ${TMPFILE} >/dev/null 2>&1
 rc=$?
@@ -75,11 +67,10 @@ fi
 
 rm -f ${TMPFILE}
 
-gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
-	"${CERTTOOL}" --generate-self-signed \
-		--load-privkey "${srcdir}/data/template-test.key" \
-		--template "${srcdir}/templates/template-dn.tmpl" \
-		--outfile ${TMPFILE} 2>/dev/null
+"${CERTTOOL}" --attime "2007-04-22" --generate-self-signed \
+	--load-privkey "${srcdir}/data/template-test.key" \
+	--template "${srcdir}/templates/template-dn.tmpl" \
+	--outfile ${TMPFILE} 2>/dev/null
 
 ${DIFF} "${srcdir}/data/template-dn.pem" ${TMPFILE} >/dev/null 2>&1
 rc=$?
@@ -94,13 +85,12 @@ rm -f ${TMPFILE}
 
 echo "Running test for certificate generation with --generate-self-signed"
 
-gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
-	"${CERTTOOL}" --generate-certificate \
-		--load-privkey "${srcdir}/data/template-test.key" \
-		--load-ca-privkey "${srcdir}/../../doc/credentials/x509/ca-key.pem" \
-		--load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" \
-		--template "${srcdir}/templates/template-dn.tmpl" \
-		--outfile ${TMPFILE} 2>/dev/null
+"${CERTTOOL}" --attime "2007-04-22" --generate-certificate \
+	--load-privkey "${srcdir}/data/template-test.key" \
+	--load-ca-privkey "${srcdir}/../../doc/credentials/x509/ca-key.pem" \
+	--load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" \
+	--template "${srcdir}/templates/template-dn.tmpl" \
+	--outfile ${TMPFILE} 2>/dev/null
 
 ${DIFF} "${srcdir}/data/template-sgenerate.pem" ${TMPFILE} >/dev/null 2>&1
 rc=$?
@@ -113,11 +103,10 @@ fi
 
 rm -f ${TMPFILE}
 
-gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
-	"${CERTTOOL}" --generate-self-signed \
-		--load-privkey "${srcdir}/data/template-test.key" \
-		--template "${srcdir}/templates/template-dn-err.tmpl" \
-		--outfile ${TMPFILE} 2>/dev/null
+"${CERTTOOL}" --attime "2007-04-22" --generate-self-signed \
+	--load-privkey "${srcdir}/data/template-test.key" \
+	--template "${srcdir}/templates/template-dn-err.tmpl" \
+	--outfile ${TMPFILE} 2>/dev/null
 rc=$?
 
 if test "${rc}" = "0"; then
@@ -127,11 +116,10 @@ fi
 
 rm -f ${TMPFILE}
 
-gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
-	"${CERTTOOL}" --generate-self-signed \
-		--load-privkey "${srcdir}/data/template-test.key" \
-		--template "${srcdir}/templates/template-overflow.tmpl" \
-		--outfile ${TMPFILE} 2>/dev/null
+"${CERTTOOL}" --attime "2007-04-22" --generate-self-signed \
+	--load-privkey "${srcdir}/data/template-test.key" \
+	--template "${srcdir}/templates/template-overflow.tmpl" \
+	--outfile ${TMPFILE} 2>/dev/null
 
 ${DIFF} "${srcdir}/data/template-overflow.pem" ${TMPFILE} >/dev/null 2>&1
 rc=$?
@@ -146,11 +134,10 @@ rm -f ${TMPFILE}
 
 # The following test works in 64-bit systems
 
-gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
-	"${CERTTOOL}" --generate-self-signed \
-		--load-privkey "${srcdir}/data/template-test.key" \
-		--template "${srcdir}/templates/template-overflow2.tmpl" \
-		--outfile ${TMPFILE} 2>/dev/null
+"${CERTTOOL}" --attime "2007-04-22" --generate-self-signed \
+	--load-privkey "${srcdir}/data/template-test.key" \
+	--template "${srcdir}/templates/template-overflow2.tmpl" \
+	--outfile ${TMPFILE} 2>/dev/null
 
 rc=$?
 if test "${ac_cv_sizeof_time_t}" -lt 8;then
@@ -176,11 +163,10 @@ else
 fi
 rm -f ${TMPFILE}
 
-gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
-	"${CERTTOOL}" --generate-self-signed \
-		--load-privkey "${srcdir}/data/template-test.key" \
-		--template "${srcdir}/templates/template-date.tmpl" \
-		--outfile ${TMPFILE} 2>/dev/null
+"${CERTTOOL}" --attime "2007-04-22" --generate-self-signed \
+	--load-privkey "${srcdir}/data/template-test.key" \
+	--template "${srcdir}/templates/template-date.tmpl" \
+	--outfile ${TMPFILE} 2>/dev/null
 
 ${DIFF} "${srcdir}/data/template-date.pem" ${TMPFILE} >/dev/null 2>&1
 rc=$?
@@ -193,11 +179,10 @@ fi
 
 rm -f ${TMPFILE}
 
-gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
-	"${CERTTOOL}" --generate-self-signed \
-		--load-privkey "${srcdir}/data/template-test.key" \
-		--template "${srcdir}/templates/template-dates-after2038.tmpl" \
-		--outfile ${TMPFILE} 2>/dev/null
+"${CERTTOOL}" --attime "2007-04-22" --generate-self-signed \
+	--load-privkey "${srcdir}/data/template-test.key" \
+	--template "${srcdir}/templates/template-dates-after2038.tmpl" \
+	--outfile ${TMPFILE} 2>/dev/null
 rc=$?
 if test "${ac_cv_sizeof_time_t}" -lt 8;then
 	if test "$rc" = "0"; then
@@ -223,11 +208,10 @@ rm -f ${TMPFILE}
 
 # Test name constraints generation
 
-gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
-	"${CERTTOOL}" --generate-self-signed \
-		--load-privkey "${srcdir}/data/template-test.key" \
-		--template "${srcdir}/templates/template-nc.tmpl" \
-		--outfile ${TMPFILE} 2>/dev/null
+"${CERTTOOL}" --attime "2007-04-22" --generate-self-signed \
+	--load-privkey "${srcdir}/data/template-test.key" \
+	--template "${srcdir}/templates/template-nc.tmpl" \
+	--outfile ${TMPFILE} 2>/dev/null
 
 ${DIFF} "${srcdir}/data/template-nc.pem" ${TMPFILE} >/dev/null 2>&1
 rc=$?
@@ -244,11 +228,10 @@ rm -f ${TMPFILE}
 # Test the GeneralizedTime support
 if test "${ac_cv_sizeof_time_t}" = 8;then
 	# we should test that on systems which have 64-bit time_t.
-	gnutls_timewrapper_standalone static "2051-04-22 00:00:00" \
-			"${CERTTOOL}" --generate-self-signed \
-				--load-privkey "${srcdir}/data/template-test.key" \
-				--template "${srcdir}/templates/template-generalized.tmpl" \
-				--outfile ${TMPFILE} 2>/dev/null
+	"${CERTTOOL}" --attime "2051-04-22" --generate-self-signed \
+		--load-privkey "${srcdir}/data/template-test.key" \
+		--template "${srcdir}/templates/template-generalized.tmpl" \
+		--outfile ${TMPFILE} 2>/dev/null
 
 	${DIFF} "${srcdir}/data/template-generalized.pem" ${TMPFILE} >/dev/null 2>&1
 	rc=$?
@@ -264,11 +247,10 @@ rm -f ${TMPFILE}
 
 # Test unique ID field generation
 
-gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
-	"${CERTTOOL}" --generate-self-signed \
-		--load-privkey "${srcdir}/data/template-test.key" \
-		--template "${srcdir}/templates/template-unique.tmpl" \
-		--outfile ${TMPFILE} 2>/dev/null
+"${CERTTOOL}" --attime "2007-04-22" --generate-self-signed \
+	--load-privkey "${srcdir}/data/template-test.key" \
+	--template "${srcdir}/templates/template-unique.tmpl" \
+	--outfile ${TMPFILE} 2>/dev/null
 
 ${DIFF} "${srcdir}/data/template-unique.pem" ${TMPFILE} >/dev/null 2>&1
 rc=$?
@@ -283,11 +265,10 @@ rm -f ${TMPFILE}
 
 # Test generation with very long dns names
 
-gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
-	"${CERTTOOL}" --generate-self-signed \
-		--load-privkey "${srcdir}/data/template-test.key" \
-		--template "${srcdir}/templates/template-long-dns.tmpl" \
-		--outfile ${TMPFILE} 2>/dev/null
+"${CERTTOOL}" --attime "2007-04-22" --generate-self-signed \
+	--load-privkey "${srcdir}/data/template-test.key" \
+	--template "${srcdir}/templates/template-long-dns.tmpl" \
+	--outfile ${TMPFILE} 2>/dev/null
 
 ${DIFF} "${srcdir}/data/long-dns.pem" ${TMPFILE} >/dev/null 2>&1
 rc=$?
@@ -302,11 +283,10 @@ rm -f ${TMPFILE}
 
 # Test generation with larger serial number
 
-gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
-	"${CERTTOOL}" --generate-self-signed \
-		--load-privkey "${srcdir}/data/template-test.key" \
-		--template "${srcdir}/templates/template-long-serial.tmpl" \
-		--outfile ${TMPFILE} 2>/dev/null
+"${CERTTOOL}" --attime "2007-04-22" --generate-self-signed \
+	--load-privkey "${srcdir}/data/template-test.key" \
+	--template "${srcdir}/templates/template-long-serial.tmpl" \
+	--outfile ${TMPFILE} 2>/dev/null
 
 ${DIFF} "${srcdir}/data/long-serial.pem" ${TMPFILE} >/dev/null 2>&1
 rc=$?

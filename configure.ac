@@ -65,6 +65,42 @@ AM_MISSING_PROG([GPERF], [gperf])
 AM_MISSING_PROG([ASN1PARSER], [asn1Parser])
 AM_MISSING_PROG([PERL], [perl])
 
+AC_CHECK_PROGS([FAKETIME], [faketime])
+AS_IF([test -n "$FAKETIME"], [FAKETIME_F_OPT="-f"; AC_SUBST([FAKETIME_F_OPT])], [
+  AC_CHECK_PROGS([DATEFUDGE], [datefudge])
+  AS_IF([test -n "$DATEFUDGE"], [
+    FAKETIME_F_OPT="-s"
+    AC_SUBST([FAKETIME], [$DATEFUDGE])
+    AC_SUBST([FAKETIME_F_OPT])
+  ])
+])
+
+AC_MSG_CHECKING([whether faketime program works])
+AC_RUN_IFELSE(
+  [AC_LANG_PROGRAM(
+    [[#include <stdio.h>
+      #include <stdlib.h>
+      #include <time.h>
+    ]],
+    [[time_t t = time(NULL);
+      struct tm *tmp = localtime(&t);
+      char outstr[200];
+      if (!tmp) return 0;
+      if (!strftime(outstr, sizeof(outstr), "%s", tmp)) return 0;
+      puts(outstr);
+      return 0;
+    ]])],
+  [AS_IF([test `TZ=UTC $FAKETIME $FAKETIME_F_OPT "2006-09-23 00:00:00" ./conftest$EXEEXT` = "1158969600"], [
+     ac_cv_faketime_works=yes
+   ], [
+     ac_cv_faketime_works=no
+   ])],
+  [ac_cv_faketime_works=no],
+  [ac_cv_faketime_works=cross-compiling])
+
+AC_MSG_RESULT([$ac_cv_faketime_works])
+AC_SUBST([ac_cv_faketime_works])
+
 AC_ARG_ENABLE(bash-tests,
   AS_HELP_STRING([--disable-bash-tests], [skip some tests that badly need bash]),
     enable_bash_tests=$enableval, enable_bash_tests=yes)

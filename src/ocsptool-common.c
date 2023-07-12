@@ -330,11 +330,13 @@ int check_ocsp_response(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
 	gnutls_ocsp_resp_t resp;
 	int ret;
 	unsigned int status, cert_status;
+	struct timespec r;
 	time_t rtime, vtime, ntime, now;
 	char timebuf1[SIMPLE_CTIME_BUF_SIZE];
 	char timebuf2[SIMPLE_CTIME_BUF_SIZE];
 
-	now = time(0);
+	get_system_time(&r);
+	now = r.tv_sec;
 
 	ret = gnutls_ocsp_resp_init(&resp);
 	if (ret < 0) {

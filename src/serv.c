@@ -47,6 +47,7 @@
 #include "gl_linked_list.h"
 #include "gl_xlist.h"
 #include "minmax.h"
+#include "parse-datetime.h"
 #include "read-file.h"
 #include "sockets.h"
 #include "xalloc.h"
@@ -1207,6 +1208,19 @@ int main(int argc, char **argv)
 		fprintf(stderr, "global_init: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
+
+	if (ENABLED_OPT(ATTIME)) {
+		struct timespec r;
+
+		if (!parse_datetime(&r, OPT_ARG(ATTIME), NULL)) {
+			fprintf(stderr,
+				"%s option value %s is not a valid time\n",
+				"attime", OPT_ARG(ATTIME));
+			exit(1);
+		}
+		set_system_time(&r);
+	}
+
 #ifdef ENABLE_PKCS11
 	if (HAVE_OPT(PROVIDER)) {
 		ret = gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_MANUAL, NULL);

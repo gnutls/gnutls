@@ -45,8 +45,6 @@ SERV="${SERV} -q"
 
 . "${srcdir}/scripts/common.sh"
 
-skip_if_no_datefudge
-
 echo "Checking whether a client will refuse weak but trusted keys"
 
 KEY1=${srcdir}/certs/rsa-512.pem
@@ -57,12 +55,10 @@ launch_server --echo --priority "NORMAL" --x509keyfile ${KEY1} --x509certfile ${
 PID=$!
 wait_server ${PID}
 
-gnutls_timewrapper_standalone "2019-12-20" timeout 1800 \
-"${CLI}" -d 4 -p "${PORT}" localhost --x509cafile ${CERT1} --priority NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2 </dev/null && \
+"${CLI}" --attime "2019-12-20" -d 4 -p "${PORT}" localhost --x509cafile ${CERT1} --priority NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2 </dev/null && \
 	fail ${PID} "1. handshake with RSA should have failed!"
 
-gnutls_timewrapper_standalone "2019-12-20" timeout 1800 \
-"${CLI}" -d 4 -p "${PORT}" localhost --x509cafile ${CERT1} --priority NORMAL </dev/null && \
+"${CLI}" --attime "2019-12-20" -d 4 -p "${PORT}" localhost --x509cafile ${CERT1} --priority NORMAL </dev/null && \
 	fail ${PID} "2. handshake with RSA should have failed!"
 
 kill ${PID}

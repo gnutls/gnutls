@@ -31,10 +31,7 @@ export TZ="UTC"
 
 . "${srcdir}/scripts/common.sh"
 
-skip_if_no_datefudge
-
-gnutls_timewrapper_standalone static "2017-06-19 00:00:00" \
-	"${OCSPTOOL}" -e --load-chain "${srcdir}/ocsp-tests/certs/chain-amazon.com.pem" --infile "${srcdir}/ocsp-tests/certs/ocsp-amazon.com.der" --verify-allow-broken
+"${OCSPTOOL}" --attime "2017-06-19" -e --load-chain "${srcdir}/ocsp-tests/certs/chain-amazon.com.pem" --infile "${srcdir}/ocsp-tests/certs/ocsp-amazon.com.der" --verify-allow-broken
 rc=$?
 
 # We're done.
@@ -43,8 +40,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-gnutls_timewrapper_standalone static "2017-06-19 00:00:00" \
-	"${OCSPTOOL}" -e --load-chain "${srcdir}/ocsp-tests/certs/chain-amazon.com-unsorted.pem" --infile "${srcdir}/ocsp-tests/certs/ocsp-amazon.com.der" --verify-allow-broken
+"${OCSPTOOL}" --attime "2017-06-19" -e --load-chain "${srcdir}/ocsp-tests/certs/chain-amazon.com-unsorted.pem" --infile "${srcdir}/ocsp-tests/certs/ocsp-amazon.com.der" --verify-allow-broken
 rc=$?
 
 # We're done.
@@ -53,9 +49,9 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
+
 # verify an OCSP response using ECDSA
-gnutls_timewrapper_standalone static "2017-06-29 00:00:00" \
-	"${OCSPTOOL}" -d 6 -e --load-chain "${srcdir}/ocsp-tests/certs/chain-akamai.com.pem" --infile "${srcdir}/ocsp-tests/certs/ocsp-akamai.com.der"
+"${OCSPTOOL}" --attime "2017-06-29" -d 6 -e --load-chain "${srcdir}/ocsp-tests/certs/chain-akamai.com.pem" --infile "${srcdir}/ocsp-tests/certs/ocsp-akamai.com.der"
 rc=$?
 
 # We're done.

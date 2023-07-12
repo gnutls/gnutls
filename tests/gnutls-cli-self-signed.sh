@@ -45,8 +45,6 @@ SERV="${SERV} -q"
 
 . "${srcdir}/scripts/common.sh"
 
-skip_if_no_datefudge
-
 echo "Checking whether connecting to a self signed certificate returns the expected error"
 
 cat <<__EOF__ >${TMPFILE}
@@ -123,8 +121,7 @@ launch_server --echo --x509keyfile ${TMPFILE} --x509certfile ${TMPFILE}
 PID=$!
 wait_server ${PID}
 
-gnutls_timewrapper_standalone "2018-1-1" \
-${VALGRIND} "${CLI}" -p "${PORT}" localhost >${TMPFILE} 2>&1 </dev/null && \
+${VALGRIND} "${CLI}" --attime "2018-1-1" -p "${PORT}" localhost >${TMPFILE} 2>&1 </dev/null && \
 	fail ${PID} "1. handshake should have failed!"
 
 

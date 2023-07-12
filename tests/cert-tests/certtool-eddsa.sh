@@ -123,11 +123,8 @@ rm -f "${TMPFILE}" "${TMPFILE2}"
 rm -f "${KEYFILE}"
 
 
-skip_if_no_datefudge
-
 # Test certificate chain using Ed25519
-gnutls_timewrapper_standalone "2017-7-6" \
-${VALGRIND} "${CERTTOOL}" --verify-chain --infile ${srcdir}/data/chain-eddsa.pem
+${VALGRIND} "${CERTTOOL}" --attime "2017-7-6" --verify-chain --infile ${srcdir}/data/chain-eddsa.pem
 
 if test $? != 0; then
 	echo "There was an issue verifying the Ed25519 chain"

@@ -80,6 +80,11 @@ scripts_to_test += tls-fuzzer/tls-fuzzer-nocert-ssl3.sh
 TESTS_ENVIRONMENT += ENABLE_SSL3=1
 endif
 
+TESTS_ENVIRONMENT +=					\
+	FAKETIME="$(FAKETIME)"				\
+	FAKETIME_F_OPT="$(FAKETIME_F_OPT)"		\
+	ac_cv_faketime_works="$(ac_cv_faketime_works)"
+
 if ENABLE_TLS13_INTEROP
 scripts_to_test += \
 	testcompat-openssl-tls13-cli.sh \

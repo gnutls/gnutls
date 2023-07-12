@@ -32,13 +32,10 @@ export TZ="UTC"
 
 . ${srcdir}/../scripts/common.sh
 
-skip_if_no_datefudge
-
-gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
-	"${CERTTOOL}" --generate-self-signed \
-		--load-privkey "${srcdir}/data/template-test.key" \
-		--template "${srcdir}/templates/simple-policy.tmpl" \
-		--outfile $OUTCERT #2>/dev/null
+"${CERTTOOL}" --attime "2007-04-22" --generate-self-signed \
+	--load-privkey "${srcdir}/data/template-test.key" \
+	--template "${srcdir}/templates/simple-policy.tmpl" \
+	--outfile $OUTCERT #2>/dev/null
 
 ${DIFF} "${srcdir}/data/simple-policy.pem" $OUTCERT #>/dev/null 2>&1
 rc=$?

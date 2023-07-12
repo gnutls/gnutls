@@ -29,6 +29,7 @@
 
 /* for uint64_t */
 #include <stdint.h>
+#include "timespec.h"
 
 #if defined(HAVE_CLOCK_GETTIME) && defined(CLOCK_PROCESS_CPUTIME_ID)
 #undef gettime

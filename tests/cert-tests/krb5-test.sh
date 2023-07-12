@@ -33,22 +33,15 @@ export TZ="UTC"
 
 . ${srcdir}/../scripts/common.sh
 
-skip_if_no_datefudge
-
 if ! test -z "${VALGRIND}"; then
 	ORIG_VALGRIND=${VALGRIND}
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=3"
 fi
 
-# Note that in rare cases this test may fail because the
-# time set using faketime/datefudge could have changed since the generation
-# (if example the system was busy)
-
-gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
-	"${CERTTOOL}" --generate-self-signed \
-		--load-privkey "${srcdir}/data/template-test.key" \
-		--template "${srcdir}/templates/template-krb5name.tmpl" \
-		--outfile ${OUTFILE} 2>/dev/null
+"${CERTTOOL}" --attime "2007-04-22" --generate-self-signed \
+	--load-privkey "${srcdir}/data/template-test.key" \
+	--template "${srcdir}/templates/template-krb5name.tmpl" \
+	--outfile ${OUTFILE} 2>/dev/null
 
 ${DIFF} "${srcdir}/data/template-krb5name.pem" ${OUTFILE} >/dev/null 2>&1
 rc=$?
@@ -70,8 +63,7 @@ fi
 cp "${srcdir}/templates/template-krb5name.tmpl" ${TMPLFILE}
 echo "krb5_principal = 'xxxxxxxxxxxxxx'" >>${TMPLFILE}
 
-gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
-${VALGRIND} "${CERTTOOL}" --generate-self-signed \
+${VALGRIND} "${CERTTOOL}" --attime "2007-04-22" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template ${TMPLFILE} \
 		--outfile ${OUTFILE} 2>/dev/null
@@ -87,8 +79,7 @@ fi
 cp "${srcdir}/templates/template-krb5name.tmpl" ${TMPLFILE}
 echo "krb5_principal = 'comp1/comp2/comp3/comp4/comp5/comp6/comp7/comp8/comp9/comp10@REALM.COM'" >>${TMPLFILE}
 
-gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
-${VALGRIND} "${CERTTOOL}" --generate-self-signed \
+${VALGRIND} "${CERTTOOL}" --attime "2007-04-22" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template ${TMPLFILE} \
 		--outfile ${OUTFILE} 2>/dev/null

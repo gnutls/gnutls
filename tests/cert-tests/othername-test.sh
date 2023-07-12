@@ -32,14 +32,7 @@ export TZ="UTC"
 
 . ${srcdir}/../scripts/common.sh
 
-skip_if_no_datefudge
-
-# Note that in rare cases this test may fail because the
-# time set using faketime/datefudge could have changed since the generation
-# (if example the system was busy)
-
-gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
-	"${CERTTOOL}" --generate-self-signed \
+"${CERTTOOL}" --attime "2007-04-22" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-othername.tmpl" \
 		--outfile ${OUTFILE} 2>/dev/null
@@ -53,11 +46,10 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
-	"${CERTTOOL}" --generate-self-signed \
-		--load-privkey "${srcdir}/data/template-test.key" \
-		--template "${srcdir}/templates/template-othername-xmpp.tmpl" \
-		--outfile ${OUTFILE} 2>/dev/null
+"${CERTTOOL}" --attime "2007-04-22" --generate-self-signed \
+	--load-privkey "${srcdir}/data/template-test.key" \
+	--template "${srcdir}/templates/template-othername-xmpp.tmpl" \
+	--outfile ${OUTFILE} 2>/dev/null
 
 ${DIFF} "${srcdir}/data/template-othername-xmpp.pem" ${OUTFILE} >/dev/null 2>&1
 rc=$?

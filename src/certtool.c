@@ -47,6 +47,7 @@
 
 /* Gnulib portability files. */
 #include <read-file.h>
+#include "parse-datetime.h"
 
 #include <certtool-cfg.h>
 #include <common.h>
@@ -1337,6 +1338,18 @@ static void cmd_parser(int argc, char **argv)
 
 	if (HAVE_OPT(VERBOSE))
 		cinfo.verbose = 1;
+
+	if (ENABLED_OPT(ATTIME)) {
+		struct timespec r;
+
+		if (!parse_datetime(&r, OPT_ARG(ATTIME), NULL)) {
+			fprintf(stderr,
+				"%s option value %s is not a valid time\n",
+				"attime", OPT_ARG(ATTIME));
+			app_exit(1);
+		}
+		set_system_time(&r);
+	}
 
 	if (HAVE_OPT(SEED)) {
 		gnutls_datum_t seed;

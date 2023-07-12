@@ -243,14 +243,13 @@ TESTDATE="2018-03-01 00:00:00"
 # Start OpenSSL TLS server
 #
 launch_bare_server \
-	  gnutls_timewrapper_standalone "${TESTDATE}" \
+	  "$FAKETIME" "${TESTDATE}" \
 	  "${OPENSSL}" s_server -cert ${SERVER_CERT_FILE} -key ${SERVER_KEY_FILE} \
 	  -CAfile ${CA_FILE} -port ${PORT} -Verify 1 -verify_return_error -www
 SERVER_PID="${!}"
 wait_server "${SERVER_PID}"
 
-gnutls_timewrapper_standalone static "${TESTDATE}" \
-      "${CLI}" --x509certfile ${CLIENT_CERT_FILE} \
+"${CLI}" --attime "${TESTDATE}" --x509certfile ${CLIENT_CERT_FILE} \
       --x509keyfile ${CLIENT_KEY_FILE} --x509cafile=${CA_FILE} \
       --port="${PORT}" localhost </dev/null
 rc=$?

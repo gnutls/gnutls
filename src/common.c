@@ -1354,6 +1354,34 @@ void log_set(FILE *file)
 	logfile = file;
 }
 
+static struct timespec time_at;
+static bool time_at_set;
+
+void get_system_time(struct timespec *ts)
+{
+	if (time_at_set) {
+		*ts = time_at;
+	} else {
+		gettime(ts);
+	}
+}
+
+static time_t mytime(time_t *t)
+{
+	if (t) {
+		*t = time_at.tv_sec;
+	}
+	return time_at.tv_sec;
+}
+
+void set_system_time(struct timespec *ts)
+{
+	time_at = *ts;
+	time_at_set = true;
+
+	gnutls_global_set_time_function(mytime);
+}
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-y2k"
 /* This is very similar to ctime() but it does not force a newline.

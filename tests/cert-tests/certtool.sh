@@ -171,10 +171,8 @@ export TZ="UTC"
 
 . ${srcdir}/../scripts/common.sh
 
-skip_if_no_datefudge
-
-cat "${srcdir}/../certs/cert-ecc256.pem" "${srcdir}/../certs/ca-cert-ecc.pem"|gnutls_timewrapper_standalone "2012-11-22" \
-${VALGRIND} "${CERTTOOL}" --verify-chain
+cat "${srcdir}/../certs/cert-ecc256.pem" "${srcdir}/../certs/ca-cert-ecc.pem"|
+${VALGRIND} "${CERTTOOL}" --attime "2012-11-22" --verify-chain
 rc=$?
 
 if test "${rc}" != "0"; then

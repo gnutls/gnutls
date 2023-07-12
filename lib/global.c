@@ -125,6 +125,12 @@ void gnutls_global_set_audit_log_function(gnutls_audit_log_func log_func)
 	_gnutls_audit_log_func = log_func;
 }
 
+static void gettime_from_time(struct timespec *t)
+{
+	t->tv_sec = gnutls_time(NULL);
+	t->tv_nsec = 0;
+}
+
 /**
  * gnutls_global_set_time_function:
  * @time_func: it's the system time function, a gnutls_time_func() callback.
@@ -138,6 +144,12 @@ void gnutls_global_set_audit_log_function(gnutls_audit_log_func log_func)
 void gnutls_global_set_time_function(gnutls_time_func time_func)
 {
 	gnutls_time = time_func;
+
+	/* When the time function is overridden, also override the
+	 * gettime function to use the derived value, even if its
+	 * resolution is lower.
+	 */
+	_gnutls_global_set_gettime_function(gettime_from_time);
 }
 
 /**

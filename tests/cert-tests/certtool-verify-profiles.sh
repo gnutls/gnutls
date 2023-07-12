@@ -35,11 +35,8 @@ OUTFILE=out-pkcs7.$$.tmp
 
 . ${srcdir}/../scripts/common.sh
 
-skip_if_no_datefudge
-
 echo "Checking chain with insecure leaf"
-gnutls_timewrapper_standalone static "2019-12-19 00:00:00" \
-${VALGRIND} "${CERTTOOL}" --verify-chain --verify-profile=medium --infile "${srcdir}/data/chain-512-leaf.pem" >${OUTFILE}
+${VALGRIND} "${CERTTOOL}" --attime "2019-12-19" --verify-chain --verify-profile=medium --infile "${srcdir}/data/chain-512-leaf.pem" >${OUTFILE}
 rc=$?
 
 if test "${rc}" != "1"; then
@@ -49,8 +46,7 @@ if test "${rc}" != "1"; then
 fi
 
 echo "Checking chain with insecure subca"
-gnutls_timewrapper_standalone static "2019-12-19 00:00:00" \
-${VALGRIND} "${CERTTOOL}" --verify-chain --verify-profile=medium --infile "${srcdir}/data/chain-512-subca.pem" >${OUTFILE}
+${VALGRIND} "${CERTTOOL}" --attime "2019-12-19" --verify-chain --verify-profile=medium --infile "${srcdir}/data/chain-512-subca.pem" >${OUTFILE}
 rc=$?
 
 if test "${rc}" != "1"; then
@@ -61,8 +57,7 @@ fi
 
 
 echo "Checking chain with insecure ca"
-gnutls_timewrapper_standalone static "2019-12-19 00:00:00" \
-${VALGRIND} "${CERTTOOL}" --verify-chain --verify-profile=medium --infile "${srcdir}/data/chain-512-ca.pem" >${OUTFILE}
+${VALGRIND} "${CERTTOOL}" --attime "2019-12-19" --verify-chain --verify-profile=medium --infile "${srcdir}/data/chain-512-ca.pem" >${OUTFILE}
 rc=$?
 
 if test "${rc}" != "1"; then

@@ -34,6 +34,12 @@
 
 #define MAX_CLIENT_HELLO_RECORDED 10
 
+static void mygettime(struct timespec *t)
+{
+	t->tv_sec = mytime(NULL);
+	t->tv_nsec = 0;
+}
+
 struct storage_st {
 	gnutls_datum_t entries[MAX_CLIENT_HELLO_RECORDED];
 	size_t num_entries;

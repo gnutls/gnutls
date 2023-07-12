@@ -32,13 +32,10 @@ export TZ="UTC"
 
 . ${srcdir}/../scripts/common.sh
 
-skip_if_no_datefudge
-
-gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
-	"${CERTTOOL}" --generate-self-signed \
-		--load-privkey "${srcdir}/data/template-test.key" \
-		--template "${srcdir}/templates/arb-extensions.tmpl" \
-		--outfile $OUTFILE #2>/dev/null
+"${CERTTOOL}" --attime "2007-04-22" --generate-self-signed \
+	--load-privkey "${srcdir}/data/template-test.key" \
+	--template "${srcdir}/templates/arb-extensions.tmpl" \
+	--outfile $OUTFILE #2>/dev/null
 
 ${DIFF} "${srcdir}/data/arb-extensions.pem" $OUTFILE #>/dev/null 2>&1
 rc=$?
@@ -52,11 +49,10 @@ fi
 rm -f "$OUTFILE"
 
 # Test adding critical extensions only
-gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
-	"${CERTTOOL}" --generate-self-signed \
-		--load-privkey "${srcdir}/data/template-test.key" \
-		--template "${srcdir}/templates/crit-extensions.tmpl" \
-		--outfile $OUTFILE #2>/dev/null
+"${CERTTOOL}" --attime "2007-04-22" --generate-self-signed \
+	--load-privkey "${srcdir}/data/template-test.key" \
+	--template "${srcdir}/templates/crit-extensions.tmpl" \
+	--outfile $OUTFILE #2>/dev/null
 
 ${DIFF} "${srcdir}/data/crit-extensions.pem" $OUTFILE #>/dev/null 2>&1
 rc=$?
@@ -69,11 +65,10 @@ fi
 
 rm -f "$OUTFILE"
 
-gnutls_timewrapper_standalone static "2007-04-22 00:00:00" \
-	"${CERTTOOL}" --generate-request \
-		--load-privkey "${srcdir}/data/template-test.key" \
-		--template "${srcdir}/templates/arb-extensions.tmpl" \
-		2>/dev/null | grep -v "Algorithm Security Level" >$OUTFILE
+"${CERTTOOL}" --attime "2007-04-22" --generate-request \
+	--load-privkey "${srcdir}/data/template-test.key" \
+	--template "${srcdir}/templates/arb-extensions.tmpl" \
+	2>/dev/null | grep -v "Algorithm Security Level" >$OUTFILE
 
 ${DIFF} "${srcdir}/data/arb-extensions.csr" $OUTFILE #>/dev/null 2>&1
 rc=$?

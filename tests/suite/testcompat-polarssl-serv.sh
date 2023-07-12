@@ -50,7 +50,7 @@ if test $? = 0; then
 	exit 77
 fi
 
-gnutls_timewrapper_standalone "2012-09-02" timeout 1800 \
+"$FAKETIME" "2012-09-02" timeout 1800 \
 "${srcdir}/testcompat-polarssl-serv-common.sh"
 
 ret=$?

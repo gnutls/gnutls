@@ -33,20 +33,16 @@ export TZ="UTC"
 
 . ${srcdir}/../scripts/common.sh
 
-skip_if_no_datefudge
-
 # Test MD5 signatures
 
-gnutls_timewrapper_standalone static "2016-04-15 00:00:00" \
-	"${CERTTOOL}" --verify-chain --infile "${srcdir}/data/chain-md5.pem" >/dev/null 2>&1
+"${CERTTOOL}" --attime "2016-04-15" --verify-chain --infile "${srcdir}/data/chain-md5.pem" >/dev/null 2>&1
 rc=$?
 if test "${rc}" != "1"; then
 	echo "Test 1 (verification of RSA-MD5) failed"
 	exit ${rc}
 fi
 
-gnutls_timewrapper_standalone static "2016-04-15 00:00:00" \
-	"${CERTTOOL}" --verify-allow-broken --verify-chain --infile "${srcdir}/data/chain-md5.pem" >/dev/null 2>&1
+"${CERTTOOL}" --attime "2016-04-15" --verify-allow-broken --verify-chain --infile "${srcdir}/data/chain-md5.pem" >/dev/null 2>&1
 rc=$?
 if test "${rc}" != "0"; then
 	echo "Test 2 (verification of RSA-MD5 with allow-broken) failed"

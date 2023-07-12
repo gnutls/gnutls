@@ -67,8 +67,6 @@ exit_error () {
 	exit 1
 }
 
-skip_if_no_datefudge
-
 # $1: token
 # $2: PIN
 # $3: filename
@@ -115,8 +113,7 @@ verify_certificate_test() {
 	file=$2
 
 	echo -n "* Verifying a certificate... "
-	gnutls_timewrapper_standalone static "2015-10-10 00:00:00" \
-	$CERTTOOL ${ADDITIONAL_PARAM} --verify --load-ca-certificate "$url" --infile "$file" >>"${TMPFILE}" 2>&1
+	$CERTTOOL ${ADDITIONAL_PARAM} --attime "2015-10-10" --verify --load-ca-certificate "$url" --infile "$file" >>"${TMPFILE}" 2>&1
 	if test $? = 0; then
 		echo ok
 	else

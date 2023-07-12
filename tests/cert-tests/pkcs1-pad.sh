@@ -33,8 +33,6 @@ export TZ="UTC"
 
 . ${srcdir}/../scripts/common.sh
 
-skip_if_no_datefudge
-
 TMPFILE1=pkcs1-pad.$$.tmp
 TMPFILE2=pkcs1-pad-2.$$.tmp
 
@@ -42,8 +40,8 @@ TMPFILE2=pkcs1-pad-2.$$.tmp
 
 EXPECT1=2002
 
-gnutls_timewrapper_standalone "2006-09-23" "${CERTTOOL}" --verify-allow-broken --verify-chain --infile "${srcdir}/data/pkcs1-pad-ok.pem" | tee $TMPFILE1 >/dev/null 2>&1
-gnutls_timewrapper_standalone "2006-09-23" "${CERTTOOL}" --verify-allow-broken --verify-chain --infile "${srcdir}/data/pkcs1-pad-broken.pem" | tee $TMPFILE2 >/dev/null 2>&1
+"${CERTTOOL}" --attime "2006-09-23" --verify-allow-broken --verify-chain --infile "${srcdir}/data/pkcs1-pad-ok.pem" | tee $TMPFILE1 >/dev/null 2>&1
+"${CERTTOOL}" --attime "2006-09-23" --verify-allow-broken --verify-chain --infile "${srcdir}/data/pkcs1-pad-broken.pem" | tee $TMPFILE2 >/dev/null 2>&1
 
 out1oks=`grep 'Verified.' $TMPFILE1 | wc -l | tr -d " "`
 out2oks=`grep 'Verified.' $TMPFILE2 | wc -l | tr -d " "`
@@ -65,8 +63,8 @@ echo "PKCS1-PAD1 OK"
 
 EXPECT2=2002
 
-gnutls_timewrapper_standalone "2006-09-23" "${CERTTOOL}" --verify-chain --infile "${srcdir}/data/pkcs1-pad-ok2.pem" | tee $TMPFILE1 >/dev/null 2>&1
-gnutls_timewrapper_standalone "2006-09-23" "${CERTTOOL}" --verify-chain --infile "${srcdir}/data/pkcs1-pad-broken2.pem" | tee $TMPFILE2 >/dev/null 2>&1
+"${CERTTOOL}" --attime "2006-09-23" --verify-chain --infile "${srcdir}/data/pkcs1-pad-ok2.pem" | tee $TMPFILE1 >/dev/null 2>&1
+"${CERTTOOL}" --attime "2006-09-23" --verify-chain --infile "${srcdir}/data/pkcs1-pad-broken2.pem" | tee $TMPFILE2 >/dev/null 2>&1
 
 out1oks=`grep 'Verified.' $TMPFILE1 | wc -l | tr -d " "`
 out2oks=`grep 'Verified.' $TMPFILE2 | wc -l | tr -d " "`
@@ -88,7 +86,7 @@ echo "PKCS1-PAD2 OK"
 # by Andrei Pyshkin, Erik Tews and Ralf-Philipp Weinmann.
 
 
-gnutls_timewrapper_standalone "2006-09-23" "${CERTTOOL}" --verify-chain --infile "${srcdir}/data/pkcs1-pad-broken3.pem" | tee $TMPFILE1 >/dev/null 2>&1
+"${CERTTOOL}" --attime "2006-09-23" --verify-chain --infile "${srcdir}/data/pkcs1-pad-broken3.pem" | tee $TMPFILE1 >/dev/null 2>&1
 
 out1oks=`grep 'Verified.' $TMPFILE1 | wc -l | tr -d " "`
 out1fails=`grep 'Not verified.' $TMPFILE1 | wc -l | tr -d " "`
