@@ -102,7 +102,7 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/chain-512-leaf.pem data/chain-512-subca.pem data/chain-512-ca.pem \
 	templates/template-no-ca-honor.tmpl templates/template-no-ca-explicit.tmpl \
 	data/crq-cert-no-ca-explicit.pem data/crq-cert-no-ca-honor.pem data/commonName.cer \
-	templates/simple-policy.tmpl data/simple-policy.pem
+	templates/simple-policy.tmpl data/simple-policy.pem templates/template-negative-serial.tmpl
 
 dist_check_SCRIPTS = pathlen.sh aki.sh invalid-sig.sh email.sh \
 	pkcs7.sh pkcs7-broken-sigs.sh privkey-import.sh name-constraints.sh certtool-long-cn.sh crl.sh provable-privkey.sh \
@@ -112,7 +112,8 @@ dist_check_SCRIPTS = pathlen.sh aki.sh invalid-sig.sh email.sh \
 	pkcs12.sh certtool-crl-decoding.sh pkcs12-encode.sh pkcs12-corner-cases.sh inhibit-anypolicy.sh \
 	smime.sh cert-time.sh alt-chain.sh pkcs7-list-sign.sh pkcs7-eddsa.sh certtool-ecdsa.sh \
 	key-id.sh pkcs8.sh pkcs8-decode.sh ecdsa.sh illegal-rsa.sh pkcs8-invalid.sh key-invalid.sh \
-	pkcs8-eddsa.sh certtool-subca.sh certtool-verify-profiles.sh x509-duplicate-ext.sh x25519-and-x448.sh
+	pkcs8-eddsa.sh certtool-subca.sh certtool-verify-profiles.sh x509-duplicate-ext.sh x25519-and-x448.sh \
+	reject-negative-serial.sh
 
 dist_check_SCRIPTS += key-id.sh ecdsa.sh pkcs8-invalid.sh key-invalid.sh pkcs8-decode.sh pkcs8.sh pkcs8-eddsa.sh \
 	certtool-utf8.sh crq.sh

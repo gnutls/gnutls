@@ -1611,6 +1611,14 @@ static void read_serial_value(unsigned char *serial, size_t *size,
 			continue;
 		}
 
+		if (decoded.data[0] & 0x80) {
+			fprintf(stderr,
+				"%s serial number is negative, "
+				"see RFC 5280, section %s\n",
+				label, rfc_section);
+			continue;
+		}
+
 		if (decoded.size > max_size) {
 			fprintf(stderr, "maximum %zu octets allowed for %s\n",
 				max_size, label);
@@ -1659,6 +1667,14 @@ static void get_serial_value(unsigned char *serial, size_t *size,
 	    *size > SERIAL_MAX_BYTES) {
 		fprintf(stderr,
 			"%s would be encoded in more than 20 bytes,"
+			"see RFC 5280, section %s\n",
+			label, rfc_section);
+		exit(1);
+	}
+
+	if (serial[0] & 0x80) {
+		fprintf(stderr,
+			"%s serial number is negative, "
 			"see RFC 5280, section %s\n",
 			label, rfc_section);
 		exit(1);
