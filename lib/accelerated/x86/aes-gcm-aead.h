@@ -6,12 +6,19 @@ static int aes_gcm_aead_encrypt(void *ctx, const void *nonce, size_t nonce_size,
 				size_t tag_size, const void *plain,
 				size_t plain_size, void *encr, size_t encr_size)
 {
+	int ret;
+
 	/* proper AEAD cipher */
 	if (unlikely(encr_size - tag_size < plain_size))
 		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
 
-	aes_gcm_setiv(ctx, nonce, nonce_size);
-	aes_gcm_auth(ctx, auth, auth_size);
+	ret = aes_gcm_setiv(ctx, nonce, nonce_size);
+	if (ret < 0) {
+		return gnutls_assert_val(ret);
+	}
+
+	/* Always succeeds in this call sequence.  */
+	(void)aes_gcm_auth(ctx, auth, auth_size);
 
 	aes_gcm_encrypt(ctx, plain, plain_size, encr, encr_size);
 
@@ -26,6 +33,7 @@ static int aes_gcm_aead_decrypt(void *ctx, const void *nonce, size_t nonce_size,
 				size_t plain_size)
 {
 	uint8_t tag[MAX_HASH_SIZE];
+	int ret;
 
 	if (unlikely(encr_size < tag_size))
 		return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
@@ -33,8 +41,13 @@ static int aes_gcm_aead_decrypt(void *ctx, const void *nonce, size_t nonce_size,
 	if (unlikely(plain_size < encr_size - tag_size))
 		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
 
-	aes_gcm_setiv(ctx, nonce, nonce_size);
-	aes_gcm_auth(ctx, auth, auth_size);
+	ret = aes_gcm_setiv(ctx, nonce, nonce_size);
+	if (ret < 0) {
+		return gnutls_assert_val(ret);
+	}
+
+	/* Always succeeds in this call sequence.  */
+	(void)aes_gcm_auth(ctx, auth, auth_size);
 
 	encr_size -= tag_size;
 	aes_gcm_decrypt(ctx, encr, encr_size, plain, plain_size);
