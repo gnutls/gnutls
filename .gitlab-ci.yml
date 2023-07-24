@@ -12,8 +12,6 @@ variables:
   # name to allow expiration of old caches.
   BUILD_IMAGES_PROJECT: gnutls/build-images
   DEBIAN_BUILD: buildenv-debian-testing
-  DEBIAN_CROSS_BUILD: buildenv-debian-cross-testing
-  DEBIAN_X86_CROSS_BUILD: buildenv-debian-x86-cross
   FEDORA_BUILD: buildenv-fedora38
   FEDORA_CROSS_BUILD: buildenv-cross-fedora38
   MINGW_BUILD: buildenv-mingw-fedora38
@@ -112,12 +110,6 @@ default:
 
 .debian:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$DEBIAN_BUILD
-
-.debian-cross-i686:
-  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$DEBIAN_X86_CROSS_BUILD
-
-.debian-cross-other:
-  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$DEBIAN_CROSS_BUILD
 
 .mingw:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$MINGW_BUILD
@@ -764,87 +756,6 @@ debian/test:
     - debian/build
   needs:
     - debian/build
-
-.debian-cross/build:
-  extends:
-    - .build
-  script:
-    - build=$(dpkg-architecture -qDEB_HOST_GNU_TYPE)
-    - host=$(echo $CI_JOB_NAME |cut -d/ -f2)
-    - echo "host is $host"
-    # not setting CC_FOR_BUILD paired with qemu-user/binfmt somehow causes
-    # config.guess to detect the target as the build platform and not activate
-    # cross-compile mode even though --build is given
-    - export CC_FOR_BUILD="ccache gcc"
-    - export CC="ccache $host-gcc"
-    # Debian's softhsm package is not multiarch yet. Missing softhsm libraries
-    # for the target will cause the test suite to fail when p11-kit is enabled.
-    - dash ./configure --build=$build --host=$host --disable-gcc-warnings
-        --cache-file $CCACHE_FILE --disable-doc
-        --without-p11-kit --disable-full-test-suite
-        --with-pkcs12-iter-count=10000
-    - make -j$BUILDJOBS
-    # build tests, but don't execute them
-    - make -j$BUILDJOBS check TESTS=""
-  tags:
-    - shared
-    - docker
-    - linux
-
-.debian-cross/test:
-  extends:
-    - .test
-  script:
-    - make pic-check
-    # Parallel tests cause random failures, likely timing errors
-    - make -j1 check
-  tags:
-    - shared
-    - docker
-    - linux
-
-debian-cross-i686/bootstrap:
-  extends:
-    - .bootstrap
-    - .debian-cross-i686
-
-debian-cross/i686-linux-gnu/build: # name is important, see .debian-cross/build
-  extends:
-    - .debian-cross/build
-    - .debian-cross-i686
-  needs:
-    - debian-cross-i686/bootstrap
-
-debian-cross/i686-linux-gnu/test:
-  extends:
-    - .debian-cross/test
-    - .debian-cross-i686
-  dependencies:
-    - debian-cross/i686-linux-gnu/build
-  needs:
-    - debian-cross/i686-linux-gnu/build
-
-debian-cross-other/bootstrap:
-  extends:
-    - .bootstrap
-    - .debian-cross-other
-
-debian-cross/arm-linux-gnueabihf/build: # name is important, see .debian-cross/build
-  extends:
-    - .debian-cross/build
-    - .debian-cross-other
-  needs:
-    - debian-cross-other/bootstrap
-
-debian-cross/arm-linux-gnueabihf/test:
-  extends:
-    - .debian-cross/test
-    - .debian-cross-other
-  dependencies:
-    - debian-cross/arm-linux-gnueabihf/build
-  needs:
-    - debian-cross/arm-linux-gnueabihf/build
-  timeout: 2h
 
 ##############################################################################
 ########################### MinGW pipelines ##################################
