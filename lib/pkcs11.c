@@ -3060,7 +3060,7 @@ static int find_privkeys(struct pkcs11_session_info *sinfo,
 
 /* Recover certificate list from tokens */
 
-#define OBJECTS_A_TIME 8 * 1024
+#define OBJECTS_A_TIME 512
 
 static int find_multi_objs_cb(struct ck_function_list *module,
 			      struct pkcs11_session_info *sinfo,
