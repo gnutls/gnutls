@@ -12,9 +12,8 @@ variables:
   # name to allow expiration of old caches.
   BUILD_IMAGES_PROJECT: gnutls/build-images
   DEBIAN_BUILD: buildenv-debian-testing
-  DEBIAN_CROSS_BUILD: buildenv-debian-cross-testing
-  DEBIAN_X86_CROSS_BUILD: buildenv-debian-x86-cross
   FEDORA_BUILD: buildenv-fedora38
+  FEDORA_CROSS_BUILD: buildenv-cross-fedora38
   MINGW_BUILD: buildenv-mingw-fedora38
   ALPINE_BASE_BUILD: buildenv-alpine-base
   COMPILER: gcc
@@ -30,7 +29,7 @@ variables:
   CHECKJOBS: 16
 
 cache:
-  key: "$CI_JOB_NAME-ver29"
+  key: "$CI_JOB_NAME-ver30"
   paths:
     - cache/
 
@@ -99,6 +98,9 @@ default:
 .fedora:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
 
+.fedora-cross:
+  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_CROSS_BUILD
+
 .fedora-nettle:
   extends:
     - .fedora
@@ -108,12 +110,6 @@ default:
 
 .debian:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$DEBIAN_BUILD
-
-.debian-cross-i686:
-  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$DEBIAN_X86_CROSS_BUILD
-
-.debian-cross-other:
-  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$DEBIAN_CROSS_BUILD
 
 .mingw:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$MINGW_BUILD
@@ -636,6 +632,130 @@ fedora-abicoverage/test:
       - gnutls-prev-abi.tmp/
       - compat_reports/
 
+fedora-cross/bootstrap:
+  extends:
+    - .bootstrap
+    - .fedora-cross
+
+.fedora-cross/build:
+  extends:
+    - .build
+  script:
+    - build=$(build-aux/config.guess)
+    - host=$(echo $CI_JOB_NAME |cut -d/ -f2)
+    - echo "host is $host"
+    - export PKG_CONFIG_PATH=/usr/$host/sys-root/lib64/pkgconfig:/usr/$host/sys-root/lib/pkgconfig
+    - export PKG_CONFIG_SYSROOT_DIR=/usr/$host/sys-root
+    - export CC="ccache $host-gcc"
+    - ./configure --host=$host --build=$build --disable-gcc-warnings
+        --cache-file $CCACHE_FILE --disable-doc --disable-cxx
+        --disable-full-test-suite --with-pkcs12-iter-count=10000
+    - make -j$BUILDJOBS
+    # build tests, but don't execute them
+    - make -j$BUILDJOBS -C tests check TESTS=""
+  tags:
+    - shared
+    - docker
+    - linux
+
+.fedora-cross/test:
+  extends:
+    - .test
+  script:
+    - host=$(echo $CI_JOB_NAME |cut -d/ -f2)
+    - arch=$(echo $host |cut -d- -f1)
+    - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
+    - echo -1 > /proc/sys/fs/binfmt_misc/qemu-$arch
+    - cat /usr/lib/binfmt.d/qemu-$arch-static.conf > /proc/sys/fs/binfmt_misc/register
+    - make pic-check
+    - make -j$BUILDJOBS -C tests check
+  tags:
+    - shared
+    - docker
+    - linux
+
+fedora-cross/aarch64-linux-gnu/build: # name is important, see .fedora-cross/build
+  extends:
+    - .fedora-cross/build
+    - .fedora-cross
+  needs:
+    - fedora-cross/bootstrap
+
+fedora-cross/aarch64-linux-gnu/test:
+  extends:
+    - .fedora-cross/test
+    - .fedora-cross
+  dependencies:
+    - fedora-cross/aarch64-linux-gnu/build
+  needs:
+    - fedora-cross/aarch64-linux-gnu/build
+  timeout: 2h
+  allow_failure: true
+
+fedora-cross/ppc64le-linux-gnu/build: # name is important, see .fedora-cross/build
+  extends:
+    - .fedora-cross/build
+    - .fedora-cross
+  needs:
+    - fedora-cross/bootstrap
+
+fedora-cross/ppc64le-linux-gnu/test:
+  extends:
+    - .fedora-cross/test
+    - .fedora-cross
+  dependencies:
+    - fedora-cross/ppc64le-linux-gnu/build
+  needs:
+    - fedora-cross/ppc64le-linux-gnu/build
+  timeout: 2h
+  allow_failure: true
+
+fedora-cross/s390x-linux-gnu/build: # name is important, see .fedora-cross/build
+  extends:
+    - .fedora-cross/build
+    - .fedora-cross
+  needs:
+    - fedora-cross/bootstrap
+
+fedora-cross/s390x-linux-gnu/test:
+  extends:
+    - .fedora-cross/test
+    - .fedora-cross
+  dependencies:
+    - fedora-cross/s390x-linux-gnu/build
+  needs:
+    - fedora-cross/s390x-linux-gnu/build
+  timeout: 2h
+  allow_failure: true
+
+fedora-cross/i686-linux-gnu/build:
+  extends:
+    - .build
+    - .fedora
+  needs:
+    - fedora/bootstrap
+  script:
+    # Fedora's softhsm package is not multiarch yet. Missing softhsm libraries
+    # for the target will cause the test suite to fail when p11-kit is enabled.
+    - setarch i686 -- ./configure --disable-gcc-warnings
+        --cache-file $CCACHE_FILE --disable-doc --disable-cxx
+        --without-p11-kit --disable-full-test-suite
+        --with-pkcs12-iter-count=10000 CFLAGS="-m32 -march=i686"
+    - setarch i686 -- make -j$BUILDJOBS
+    # build tests, but don't execute them
+    - setarch i686 -- make -j$BUILDJOBS -C tests check TESTS=""
+
+fedora-cross/i686-linux-gnu/test:
+  extends:
+    - .test
+    - .fedora
+  dependencies:
+    - fedora-cross/i686-linux-gnu/build
+  needs:
+    - fedora-cross/i686-linux-gnu/build
+  script:
+    - setarch i686 -- make -j$CHECKJOBS check
+
 ##############################################################################
 ########################### Debian pipelines #################################
 ##############################################################################
@@ -664,105 +784,6 @@ debian/test:
     - debian/build
   needs:
     - debian/build
-
-.debian-cross/build:
-  extends:
-    - .build
-  script:
-    - build=$(dpkg-architecture -qDEB_HOST_GNU_TYPE)
-    - host=$(echo $CI_JOB_NAME |cut -d/ -f2)
-    - echo "host is $host"
-    # not setting CC_FOR_BUILD paired with qemu-user/binfmt somehow causes
-    # config.guess to detect the target as the build platform and not activate
-    # cross-compile mode even though --build is given
-    - export CC_FOR_BUILD="ccache gcc"
-    - export CC="ccache $host-gcc"
-    # Debian's softhsm package is not multiarch yet. Missing softhsm libraries
-    # for the target will cause the test suite to fail when p11-kit is enabled.
-    - dash ./configure --build=$build --host=$host --disable-gcc-warnings
-        --cache-file $CCACHE_FILE --disable-doc
-        --without-p11-kit --disable-full-test-suite
-        --with-pkcs12-iter-count=10000
-    - make -j$BUILDJOBS
-    # build tests, but don't execute them
-    - make -j$BUILDJOBS check TESTS=""
-  tags:
-    - shared
-    - docker
-    - linux
-
-.debian-cross/test:
-  extends:
-    - .test
-  script:
-    - make pic-check
-    # Parallel tests cause random failures, likely timing errors
-    - make -j1 check
-  tags:
-    - shared
-    - docker
-    - linux
-
-debian-cross-i686/bootstrap:
-  extends:
-    - .bootstrap
-    - .debian-cross-i686
-
-debian-cross/i686-linux-gnu/build: # name is important, see .debian-cross/build
-  extends:
-    - .debian-cross/build
-    - .debian-cross-i686
-  needs:
-    - debian-cross-i686/bootstrap
-
-debian-cross/i686-linux-gnu/test:
-  extends:
-    - .debian-cross/test
-    - .debian-cross-i686
-  dependencies:
-    - debian-cross/i686-linux-gnu/build
-  needs:
-    - debian-cross/i686-linux-gnu/build
-
-debian-cross-other/bootstrap:
-  extends:
-    - .bootstrap
-    - .debian-cross-other
-
-debian-cross/arm-linux-gnueabihf/build: # name is important, see .debian-cross/build
-  extends:
-    - .debian-cross/build
-    - .debian-cross-other
-  needs:
-    - debian-cross-other/bootstrap
-
-debian-cross/arm-linux-gnueabihf/test:
-  extends:
-    - .debian-cross/test
-    - .debian-cross-other
-  dependencies:
-    - debian-cross/arm-linux-gnueabihf/build
-  needs:
-    - debian-cross/arm-linux-gnueabihf/build
-  timeout: 2h
-
-debian-cross/aarch64-linux-gnu/build: # name is important, see .debian-cross/build
-  extends:
-    - .debian-cross/build
-    - .debian-cross-other
-  needs:
-    - debian-cross-other/bootstrap
-
-debian-cross/aarch64-linux-gnu/test:
-  extends:
-    - .debian-cross/test
-    - .debian-cross-other
-  dependencies:
-    - debian-cross/aarch64-linux-gnu/build
-  needs:
-    - debian-cross/aarch64-linux-gnu/build
-  timeout: 2h
-  allow_failure: true
 
 ##############################################################################
 ########################### MinGW pipelines ##################################
