@@ -1251,27 +1251,36 @@ gnutls_privkey_sign_hash2(gnutls_privkey_t signer,
 		se = _gnutls_sign_to_entry(GNUTLS_SIGN_RSA_RAW);
 	} else {
 		se = _gnutls_sign_to_entry(algo);
-		if (unlikely(se == NULL))
-			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-
+		if (unlikely(se == NULL)) {
+			ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			goto cleanup;
+		}
 	}
 
 	ret = _gnutls_privkey_get_spki_params(signer, &params);
 	if (ret < 0) {
 		gnutls_assert();
-		return ret;
+		goto cleanup;
 	}
 
 	ret = _gnutls_privkey_update_spki_params(signer, se->pk, se->hash,
 					         flags, &params);
 	if (ret < 0) {
 		gnutls_assert();
-		return ret;
+		goto cleanup;
 	}
 
 	FIX_SIGN_PARAMS(params, flags, se->hash);
 
-	return privkey_sign_prehashed(signer, se, hash_data, signature, &params);
+	ret = privkey_sign_prehashed(signer, se, hash_data, signature, &params);
+
+ cleanup:
+	if (ret < 0) {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
+	} else {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_NOT_APPROVED);
+	}
+	return ret;
 }
 
 int
@@ -1366,14 +1375,14 @@ gnutls_privkey_sign_hash(gnutls_privkey_t signer,
 	ret = _gnutls_privkey_get_spki_params(signer, &params);
 	if (ret < 0) {
 		gnutls_assert();
-		return ret;
+		goto cleanup;
 	}
 
 	ret = _gnutls_privkey_update_spki_params(signer, signer->pk_algorithm,
 					       hash_algo, flags, &params);
 	if (ret < 0) {
 		gnutls_assert();
-		return ret;
+		goto cleanup;
 	}
 
 	/* legacy callers of this API could use a hash algorithm of 0 (unknown)
@@ -1391,13 +1400,22 @@ gnutls_privkey_sign_hash(gnutls_privkey_t signer,
 		se = _gnutls_pk_to_sign_entry(params.pk, hash_algo);
 	}
 
-	if (unlikely(se == NULL))
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	if (unlikely(se == NULL)) {
+		ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		goto cleanup;
+	}
 
 	FIX_SIGN_PARAMS(params, flags, hash_algo);
 
-	return privkey_sign_prehashed(signer, se,
-				      hash_data, signature, &params);
+	ret = privkey_sign_prehashed(signer, se,
+				     hash_data, signature, &params);
+ cleanup:
+	if (ret < 0) {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
+	} else {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_NOT_APPROVED);
+	}
+	return ret;
 }
 
 static int
