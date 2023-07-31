@@ -298,12 +298,18 @@ static int aesni_gcm_aead_encrypt(void *_ctx, const void *nonce,
 {
 	struct aes_gcm_ctx *ctx = _ctx;
 	size_t s = 0;
+	int ret;
 
 	if (encr_size < plain_size + tag_size)
 		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
 
-	aes_gcm_setiv(ctx, nonce, nonce_size);
-	aes_gcm_auth(ctx, auth, auth_size);
+	ret = aes_gcm_setiv(ctx, nonce, nonce_size);
+	if (ret < 0) {
+		return gnutls_assert_val(ret);
+	}
+
+	/* Always succeeds in this call sequence.  */
+	(void)aes_gcm_auth(ctx, auth, auth_size);
 
 	if (plain_size >= 96) {
 		s = aesni_gcm_encrypt(plain, encr, plain_size,
@@ -330,6 +336,7 @@ static int aesni_gcm_aead_decrypt(void *_ctx, const void *nonce,
 	struct aes_gcm_ctx *ctx = _ctx;
 	uint8_t tag[MAX_HASH_SIZE];
 	size_t s = 0;
+	int ret;
 
 	if (unlikely(encr_size < tag_size))
 		return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
@@ -337,8 +344,13 @@ static int aesni_gcm_aead_decrypt(void *_ctx, const void *nonce,
 	if (unlikely(plain_size < encr_size - tag_size))
 		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
 
-	aes_gcm_setiv(ctx, nonce, nonce_size);
-	aes_gcm_auth(ctx, auth, auth_size);
+	ret = aes_gcm_setiv(ctx, nonce, nonce_size);
+	if (ret < 0) {
+		return gnutls_assert_val(ret);
+	}
+
+	/* Always succeeds in this call sequence.  */
+	(void)aes_gcm_auth(ctx, auth, auth_size);
 
 	encr_size -= tag_size;
 

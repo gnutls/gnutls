@@ -1291,8 +1291,17 @@ static int wrap_nettle_cipher_aead_encrypt(void *_ctx, const void *nonce,
 
 	if (ctx->cipher->aead_encrypt == NULL) {
 		/* proper AEAD cipher */
+		unsigned max_iv;
+
 		if (encr_size < plain_size + tag_size)
 			return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+
+		max_iv = ctx->cipher->max_iv_size;
+		if (max_iv == 0)
+			max_iv = MAX_CIPHER_BLOCK_SIZE;
+
+		if (nonce_size > max_iv)
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 		ctx->cipher->set_iv(ctx->ctx_ptr, nonce_size, nonce);
 		ctx->cipher->auth(ctx->ctx_ptr, auth_size, auth);
@@ -1360,6 +1369,14 @@ static int wrap_nettle_cipher_aead_decrypt(void *_ctx, const void *nonce,
 	if (ctx->cipher->aead_decrypt == NULL) {
 		/* proper AEAD cipher */
 		uint8_t tag[MAX_HASH_SIZE];
+		unsigned max_iv;
+
+		max_iv = ctx->cipher->max_iv_size;
+		if (max_iv == 0)
+			max_iv = MAX_CIPHER_BLOCK_SIZE;
+
+		if (nonce_size > max_iv)
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 		ctx->cipher->set_iv(ctx->ctx_ptr, nonce_size, nonce);
 		ctx->cipher->auth(ctx->ctx_ptr, auth_size, auth);
