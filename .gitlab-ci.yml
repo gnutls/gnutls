@@ -728,6 +728,34 @@ fedora-cross/s390x-linux-gnu/test:
   timeout: 2h
   allow_failure: true
 
+fedora-cross/i686-linux-gnu/build:
+  extends:
+    - .build
+    - .fedora
+  needs:
+    - fedora/bootstrap
+  script:
+    # Fedora's softhsm package is not multiarch yet. Missing softhsm libraries
+    # for the target will cause the test suite to fail when p11-kit is enabled.
+    - setarch i686 -- ./configure --disable-gcc-warnings
+        --cache-file $CCACHE_FILE --disable-doc --disable-cxx
+        --without-p11-kit --disable-full-test-suite
+        --with-pkcs12-iter-count=10000 CFLAGS="-m32 -march=i686"
+    - setarch i686 -- make -j$BUILDJOBS
+    # build tests, but don't execute them
+    - setarch i686 -- make -j$BUILDJOBS -C tests check TESTS=""
+
+fedora-cross/i686-linux-gnu/test:
+  extends:
+    - .test
+    - .fedora
+  dependencies:
+    - fedora-cross/i686-linux-gnu/build
+  needs:
+    - fedora-cross/i686-linux-gnu/build
+  script:
+    - setarch i686 -- make -j$CHECKJOBS check
+
 ##############################################################################
 ########################### Debian pipelines #################################
 ##############################################################################
