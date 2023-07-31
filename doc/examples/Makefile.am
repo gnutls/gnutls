@@ -52,6 +52,10 @@ endif
 if ENABLE_CXX
 ex_cxx_SOURCES = ex-cxx.cpp
 ex_cxx_LDADD = $(CXX_LDADD)
+# Gnulib overrides `write` as a macro if it's not available, which conflicts
+# with `std::iostream::write`.  Use a custom namespace to hide it:
+# https://www.gnu.org/software/gnulib/manual/html_node/A-C_002b_002b-namespace-for-gnulib.html
+ex_cxx_CPPFLAGS = $(AM_CPPFLAGS) -DGNULIB_NAMESPACE=gnulib
 noinst_PROGRAMS += ex-cxx
 endif
 
