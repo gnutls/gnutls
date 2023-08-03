@@ -42,6 +42,9 @@
 #include <atfork.h>
 #include "intprops.h"
 
+#define P11_KIT_FUTURE_UNSTABLE_API
+#include <p11-kit/iter.h>
+
 #define MAX_PROVIDERS 16
 
 #define MAX_SLOTS 48
@@ -3058,10 +3061,8 @@ static int find_privkeys(struct pkcs11_session_info *sinfo,
 	return 0;
 }
 
-/* Recover certificate list from tokens */
-
-#define OBJECTS_A_TIME 512
-
+/* Recover certificate list from tokens
+ */
 static int find_multi_objs_cb(struct ck_function_list *module,
 			      struct pkcs11_session_info *sinfo,
 			      struct ck_token_info *tinfo,
@@ -3075,13 +3076,13 @@ static int find_multi_objs_cb(struct ck_function_list *module,
 	ck_bool_t trusted;
 	unsigned long category;
 	ck_rv_t rv;
-	ck_object_handle_t *ctx = NULL;
-	unsigned long count;
 	char certid_tmp[PKCS11_ID_SIZE];
 	int ret;
 	struct find_pkey_list_st plist; /* private key holder */
 	unsigned int i, tot_values = 0, class_set = 0;
-	unsigned start_elem;
+	gnutls_datum_t id, spki;
+	P11KitIter *iter = NULL;
+	size_t alloc_size;
 
 	if (tinfo == NULL) {
 		gnutls_assert();
@@ -3111,7 +3112,8 @@ static int find_multi_objs_cb(struct ck_function_list *module,
 		}
 	}
 
-	/* Find objects with given class and type */
+	/* Find objects with given class and type
+	 */
 	attr = p11_kit_uri_get_attribute(find_data->info, CKA_CLASS);
 	if (attr) {
 		if (attr->value && attr->value_len == sizeof(ck_object_class_t))
@@ -3219,116 +3221,91 @@ static int find_multi_objs_cb(struct ck_function_list *module,
 		_gnutls_assert_log("p11 attrs: CKA_LABEL\n");
 	}
 
-	rv = pkcs11_find_objects_init(sinfo->module, sinfo->pks, a, tot_values);
-	if (rv != CKR_OK) {
-		gnutls_assert();
-		_gnutls_debug_log("p11: FindObjectsInit failed.\n");
-		return pkcs11_rv_to_err(rv);
-	}
-
-	ctx = _gnutls_reallocarray(NULL, OBJECTS_A_TIME, sizeof(ctx[0]));
-	if (ctx == NULL) {
+	iter = p11_kit_iter_new(find_data->info, 0);
+	if (iter == NULL) {
 		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 		goto fail;
 	}
 
-	start_elem = find_data->current;
-
-	while (pkcs11_find_objects(sinfo->module, sinfo->pks, ctx,
-				   OBJECTS_A_TIME, &count) == CKR_OK &&
-	       count > 0) {
-		unsigned j;
-		gnutls_datum_t id;
-
-		if (unlikely(INT_ADD_OVERFLOW(find_data->current, count))) {
+	p11_kit_iter_add_filter(iter, a, tot_values);
+	p11_kit_iter_begin_with(iter, sinfo->module, sinfo->sid, sinfo->pks);
+	alloc_size = find_data->current;
+	for (; p11_kit_iter_next(iter) == CKR_OK; find_data->current++) {
+		if (unlikely(INT_ADD_OVERFLOW(find_data->current, 1))) {
 			ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 			goto fail;
 		}
 
-		find_data->p_list = _gnutls_reallocarray_fast(
-			find_data->p_list, find_data->current + count,
-			sizeof(find_data->p_list[0]));
-		if (find_data->p_list == NULL) {
-			ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-			goto fail;
-		}
-
-		for (j = 0; j < count; j++) {
-			a[0].type = CKA_ID;
-			a[0].value = certid_tmp;
-			a[0].value_len = sizeof certid_tmp;
-
-			if (pkcs11_get_attribute_value(sinfo->module,
-						       sinfo->pks, ctx[j], a,
-						       1) == CKR_OK) {
-				id.data = a[0].value;
-				id.size = a[0].value_len;
-			} else {
-				id.data = NULL;
-				id.size = 0;
-			}
-
-			if (class_set == 0) {
-				a[0].type = CKA_CLASS;
-				a[0].value = &class;
-				a[0].value_len = sizeof class;
-
-				rv = pkcs11_get_attribute_value(sinfo->module,
-								sinfo->pks,
-								ctx[j], a, 1);
-				if (rv != CKR_OK) {
-					class = -1;
-				}
-			}
-
-			if (find_data->flags &
-			    GNUTLS_PKCS11_OBJ_FLAG_WITH_PRIVKEY) {
-				for (i = 0; i < plist.key_ids_size; i++) {
-					if (plist.key_ids[i].length !=
-						    id.size ||
-					    memcmp(plist.key_ids[i].data,
-						   id.data, id.size) != 0) {
-						/* not found */
-						continue;
-					}
-				}
-			}
-
-			ret = gnutls_pkcs11_obj_init(
-				&find_data->p_list[find_data->current]);
-			if (ret < 0) {
-				gnutls_assert();
+		if (find_data->current + 1 > alloc_size) {
+			alloc_size = alloc_size == 0 ? 2 : alloc_size * 2;
+			find_data->p_list = _gnutls_reallocarray_fast(
+				find_data->p_list, alloc_size,
+				sizeof(find_data->p_list[0]));
+			if (find_data->p_list == NULL) {
+				ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 				goto fail;
 			}
-
-			ret = pkcs11_import_object(
-				ctx[j], class, sinfo, tinfo, lib_info,
-				find_data->p_list[find_data->current]);
-			if (ret < 0) {
-				gnutls_assert();
-				/* skip the failed object */
-				continue;
-			}
-
-			find_data->current++;
 		}
-	}
 
-	pkcs11_find_objects_final(sinfo);
+		a[0].type = CKA_ID;
+		a[0].value = certid_tmp;
+		a[0].value_len = sizeof certid_tmp;
 
-	/* we can have only a search state going on, so we can only overwrite extensions
-	 * after we have read everything. */
-	if (find_data->overwrite_exts) {
-		for (i = start_elem; i < find_data->current; i++) {
-			if (find_data->p_list[i]->raw.size > 0) {
-				gnutls_datum_t spki;
+		rv = p11_kit_iter_get_attributes(iter, a, 1);
+		if (rv == CKR_OK) {
+			id.data = a[0].value;
+			id.size = a[0].value_len;
+		} else {
+			id.data = NULL;
+			id.size = 0;
+		}
+
+		if (class_set == 0) {
+			a[0].type = CKA_CLASS;
+			a[0].value = &class;
+			a[0].value_len = sizeof class;
+
+			rv = p11_kit_iter_get_attributes(iter, a, 1);
+			if (rv != CKR_OK)
+				class = -1;
+		}
+
+		if (find_data->flags & GNUTLS_PKCS11_OBJ_FLAG_WITH_PRIVKEY)
+			for (i = 0; i < plist.key_ids_size; ++i)
+				if (plist.key_ids[i].length != id.size ||
+				    memcmp(plist.key_ids[i].data, id.data,
+					   id.size) != 0)
+					continue;
+
+		ret = gnutls_pkcs11_obj_init(
+			&find_data->p_list[find_data->current]);
+		if (ret < 0) {
+			gnutls_assert();
+			goto fail;
+		}
+
+		ret = pkcs11_import_object(
+			p11_kit_iter_get_object(iter), class, sinfo, tinfo,
+			lib_info, find_data->p_list[find_data->current]);
+		if (ret < 0) {
+			gnutls_assert();
+			/* skip the failed object */
+			continue;
+		}
+
+		if (find_data->overwrite_exts) {
+			if (find_data->p_list[find_data->current]->raw.size >
+			    0) {
 				rv = pkcs11_get_attribute_avalue(
-					sinfo->module, sinfo->pks, ctx[i],
+					sinfo->module, sinfo->pks,
+					p11_kit_iter_get_object(iter),
 					CKA_PUBLIC_KEY_INFO, &spki);
 				if (rv == CKR_OK) {
 					ret = pkcs11_override_cert_exts(
 						sinfo, &spki,
-						&find_data->p_list[i]->raw);
+						&find_data
+							 ->p_list[find_data->current]
+							 ->raw);
 					gnutls_free(spki.data);
 					if (ret < 0) {
 						gnutls_assert();
@@ -3338,13 +3315,14 @@ static int find_multi_objs_cb(struct ck_function_list *module,
 			}
 		}
 	}
-	gnutls_free(ctx);
 
-	return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE; /* continue until all tokens have been checked */
+	p11_kit_iter_free(iter);
 
+	/* continue until all tokens have been checked
+	 */
+	return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 fail:
-	gnutls_free(ctx);
-	pkcs11_find_objects_final(sinfo);
+	p11_kit_iter_free(iter);
 	if (plist.key_ids != NULL) {
 		for (i = 0; i < plist.key_ids_size; i++) {
 			_gnutls_buffer_clear(&plist.key_ids[i]);
