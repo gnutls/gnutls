@@ -5,7 +5,7 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.8.1 (unreleased)
+* Version 3.8.1 (released 2023-08-03)
 
 ** libgnutls: ClientHello extensions are randomized by default
    To make fingerprinting harder, TLS extensions in ClientHello
@@ -19,6 +19,23 @@ See the end for copying conditions.
    (TLS 1.2 and TLS 1.3) in a secure manner. To use, the application
    needs to set up a callback that formats the PSK identity using
    gnutls_psk_format_imported_identity().
+
+** libgnutls: %GNUTLS_NO_EXTENSIONS has been renamed to
+   %GNUTLS_NO_DEFAULT_EXTENSIONS.
+
+** libgnutls: Add additional PBKDF limit checks in FIPS mode as
+   defined in SP 800-132. Minimum salt length is 128 bits and
+   minimum iterations bound is 1000 for PBKDF in FIPS mode.
+
+** libgnutls: Add a mechanism to control whether to enforce extended
+   master secret (RFC 7627). FIPS 140-3 mandates the use of TLS
+   session hash (extended master secret, EMS) in TLS 1.2. To enforce
+   this, a new priority keyword %FORCE_SESSION_HASH is added and if
+   it is set and EMS is not set, the peer aborts the connection. This
+   behavior is the default in FIPS mode, though it can be overridden
+   through the configuration file with the "tls-session-hash" option.
+   In either case non-EMS PRF is reported as a non-approved operation
+   through the FIPS service indicator.
 
 ** New option --attime to specify current time.
    To make testing with different timestamp to the system easier, the
@@ -3025,7 +3042,7 @@ response corresponds to the given certificate.
 
 ** libgnutls: In client side gnutls_init() enables the session ticket and
 OCSP certificate status request extensions by default. The flag
-GNUTLS_NO_DEFAULT_EXTENSIONS can be used to prevent that.
+GNUTLS_NO_EXTENSIONS can be used to prevent that.
 
 ** libgnutls: Several updates in the OpenPGP code. The generating code
 is fully RFC6091 compliant and RFC5081 support is only supported in client
