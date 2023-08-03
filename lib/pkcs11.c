@@ -32,6 +32,7 @@
 #include <datum.h>
 #include <x509/common.h>
 #include <locks.h>
+#include "xsize.h"
 
 #include <pin.h>
 #include <pkcs11_int.h>
@@ -3237,7 +3238,11 @@ static int find_multi_objs_cb(struct ck_function_list *module,
 		}
 
 		if (find_data->current + 1 > alloc_size) {
-			alloc_size = alloc_size == 0 ? 2 : alloc_size * 2;
+			alloc_size = xtimes(xsum(alloc_size, 1), 2);
+			if (size_overflow_p(alloc_size)) {
+				ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+				goto fail;
+			}
 			find_data->p_list = _gnutls_reallocarray_fast(
 				find_data->p_list, alloc_size,
 				sizeof(find_data->p_list[0]));
