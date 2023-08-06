@@ -23,9 +23,6 @@
 #ifndef GNUTLS_LIB_EXT_EXT_MASTER_SECRET_H
 #define GNUTLS_LIB_EXT_EXT_MASTER_SECRET_H
 
-/* Keep backward compatibility */
-#define GNUTLS_NO_EXTENSIONS GNUTLS_NO_DEFAULT_EXTENSIONS
-
 #include <hello_ext.h>
 
 extern const hello_ext_entry_st ext_mod_ext_master_secret;
