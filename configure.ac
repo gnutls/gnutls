@@ -90,7 +90,7 @@ AC_RUN_IFELSE(
       puts(outstr);
       return 0;
     ]])],
-  [AS_IF([test `TZ=UTC $FAKETIME $FAKETIME_F_OPT "2006-09-23 00:00:00" ./conftest$EXEEXT` = "1158969600"], [
+  [AS_IF([test -n "$FAKETIME" && test `TZ=UTC $FAKETIME $FAKETIME_F_OPT "2006-09-23 00:00:00" ./conftest$EXEEXT` = "1158969600"], [
      ac_cv_faketime_works=yes
    ], [
      ac_cv_faketime_works=no
