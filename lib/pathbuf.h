@@ -25,7 +25,11 @@
 #define GNUTLS_LIB_PATHBUF_H
 
 #include "pathmax.h"
+#ifdef PATH_MAX
 #define GNUTLS_PATH_MAX PATH_MAX
+#else
+#define GNUTLS_PATH_MAX 1024
+#endif
 
 struct gnutls_pathbuf_st {
 	char base[GNUTLS_PATH_MAX + 1];
