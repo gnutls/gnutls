@@ -542,6 +542,9 @@ typedef enum {
 #define GNUTLS_ENABLE_CERT_TYPE_NEG 0
 // Here for compatibility reasons
 
+/* Keep backward compatibility */
+#define GNUTLS_NO_EXTENSIONS GNUTLS_NO_DEFAULT_EXTENSIONS
+
 /**
  * gnutls_alert_level_t:
  * @GNUTLS_AL_WARNING: Alert of warning severity.
