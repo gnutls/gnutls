@@ -826,6 +826,7 @@ debian/test:
     - cp /usr/${arch_name}-w64-mingw32/sys-root/mingw/bin/libhogweed-*.dll win${arch_bits}-build/bin
     - cp /usr/${arch_name}-w64-mingw32/sys-root/mingw/bin/libgmp-*.dll win${arch_bits}-build/bin
     - cp /usr/${arch_name}-w64-mingw32/sys-root/mingw/bin/libgcc*.dll win${arch_bits}-build/bin
+    - cp /usr/${arch_name}-w64-mingw32/sys-root/mingw/bin/libssp*.dll win${arch_bits}-build/bin
     - cp /usr/${arch_name}-w64-mingw32/sys-root/mingw/bin/libwinpthread*.dll win${arch_bits}-build/bin
     - cp /usr/${arch_name}-w64-mingw32/sys-root/mingw/bin/libidn2-*.dll win${arch_bits}-build/bin
     - cp /usr/${arch_name}-w64-mingw32/sys-root/mingw/bin/libffi-*.dll win${arch_bits}-build/bin
