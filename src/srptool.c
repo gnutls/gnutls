@@ -241,9 +241,8 @@ static int filecopy(const char *src, const char *dst)
 static int find_strchr(const char *username, const char *file)
 {
 	FILE *fp;
-	char *pos;
 	char line[5 * 1024];
-	unsigned int i;
+	size_t len = strlen(username);
 
 	fp = fopen(file, "r");
 	if (fp == NULL) {
@@ -252,13 +251,10 @@ static int find_strchr(const char *username, const char *file)
 	}
 
 	while (fgets(line, sizeof(line), fp) != NULL) {
-		/* move to first ':' */
-		i = 0;
-		while ((line[i] != ':') && (line[i] != '\0') &&
-		       (i < sizeof(line))) {
-			i++;
-		}
-		if (strncmp(username, line, MAX(i, strlen(username))) == 0) {
+		/* parse entry in the form: <username>:<crypt>:<index> */
+		if (strncmp(username, line, len) == 0 && line[len] == ':') {
+			char *pos;
+
 			/* find the index */
 			pos = strrchr(line, ':');
 			pos++;
@@ -279,10 +275,10 @@ static int verify_passwd(const char *conffile, const char *tpasswd,
 {
 	FILE *fp;
 	char line[5 * 1024];
-	unsigned int i;
 	gnutls_datum_t g, n;
 	int iindex;
-	char *p, *pos;
+	char *p;
+	size_t len = strlen(username);
 
 	iindex = find_strchr(username, tpasswd);
 	if (iindex == -1) {
@@ -320,25 +316,13 @@ static int verify_passwd(const char *conffile, const char *tpasswd,
 	}
 
 	while (fgets(line, sizeof(line), fp) != NULL) {
-		/* move to first ':' 
-		 * This is the actual verifier.
-		 */
-		i = 0;
-		while ((line[i] != ':') && (line[i] != '\0') &&
-		       (i < sizeof(line))) {
-			i++;
-		}
-		if (strncmp(username, line, MAX(i, strlen(username))) == 0) {
-			char *verifier_pos, *salt_pos;
+		/* parse entry in the form: <username>:<crypt>:<index> */
+		if (strncmp(username, line, len) == 0 && line[len] == ':') {
+			char *verifier_pos, *salt_pos, *pos;
 
-			pos = strchr(line, ':');
 			fclose(fp);
-			if (pos == NULL) {
-				fprintf(stderr, "Cannot parse conf file '%s'\n",
-					conffile);
-				return -1;
-			}
-			pos++;
+
+			pos = &line[len + 1];
 			verifier_pos = pos;
 
 			/* Move to the salt */
