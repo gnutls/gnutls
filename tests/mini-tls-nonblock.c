@@ -287,6 +287,8 @@ static void start(const char *msg, const char *prio, unsigned expl)
 
 	success("trying %s\n", msg);
 
+	signal(SIGPIPE, SIG_IGN);
+
 	ret = socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
 	if (ret < 0) {
 		perror("socketpair");
