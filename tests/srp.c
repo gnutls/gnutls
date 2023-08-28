@@ -271,6 +271,9 @@ static void start(const char *name, const char *prio, const char *user,
 	int ret;
 
 	success("testing: %s\n", name);
+
+	signal(SIGPIPE, SIG_IGN);
+
 	ret = socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
 	if (ret < 0) {
 		perror("socketpair");
