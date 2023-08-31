@@ -1032,6 +1032,9 @@ int _gnutls_asn1_encode_privkey(asn1_node *c2, gnutls_pk_params_st *params)
 	case GNUTLS_PK_GOST_12_256:
 	case GNUTLS_PK_GOST_12_512:
 		return _gnutls_asn1_encode_gost(c2, params);
+	case GNUTLS_PK_DH:
+		/* DH keys are only exportable in PKCS#8 format */
+		return GNUTLS_E_INVALID_REQUEST;
 	default:
 		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 	}

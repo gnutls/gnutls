@@ -1780,7 +1780,8 @@ int gnutls_x509_privkey_generate2(gnutls_x509_privkey_t key,
 {
 	int ret;
 	unsigned i;
-	gnutls_x509_spki_t tpki = NULL;
+	gnutls_x509_spki_t spki = NULL;
+	gnutls_dh_params_t dh_params = NULL;
 
 	if (key == NULL) {
 		gnutls_assert();
@@ -1790,14 +1791,27 @@ int gnutls_x509_privkey_generate2(gnutls_x509_privkey_t key,
 	gnutls_pk_params_init(&key->params);
 
 	for (i = 0; i < data_size; i++) {
-		if (data[i].type == GNUTLS_KEYGEN_SEED &&
-		    data[i].size < sizeof(key->params.seed)) {
-			key->params.seed_size = data[i].size;
-			memcpy(key->params.seed, data[i].data, data[i].size);
-		} else if (data[i].type == GNUTLS_KEYGEN_DIGEST) {
+		switch (data[i].type) {
+		case GNUTLS_KEYGEN_SEED:
+			if (data[i].size < sizeof(key->params.seed)) {
+				key->params.seed_size = data[i].size;
+				memcpy(key->params.seed, data[i].data,
+				       data[i].size);
+			}
+			break;
+		case GNUTLS_KEYGEN_DIGEST:
 			key->params.palgo = data[i].size;
-		} else if (data[i].type == GNUTLS_KEYGEN_SPKI) {
-			tpki = (void *)data[i].data;
+			break;
+		case GNUTLS_KEYGEN_SPKI:
+			spki = (void *)data[i].data;
+			break;
+		case GNUTLS_KEYGEN_DH:
+			if (algo != GNUTLS_PK_DH) {
+				return gnutls_assert_val(
+					GNUTLS_E_INVALID_REQUEST);
+			}
+			dh_params = (void *)data[i].data;
+			break;
 		}
 	}
 
@@ -1841,10 +1855,22 @@ int gnutls_x509_privkey_generate2(gnutls_x509_privkey_t key,
 
 	key->params.algo = algo;
 
-	ret = _gnutls_pk_generate_params(algo, bits, &key->params);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
+	/* DH params are given, no need to regenerate */
+	if (algo == GNUTLS_PK_DH && dh_params != NULL) {
+		key->params.params[DH_P] =
+			_gnutls_mpi_copy(dh_params->params[0]);
+		key->params.params[DH_Q] =
+			_gnutls_mpi_copy(dh_params->params[2]);
+		key->params.params[DH_G] =
+			_gnutls_mpi_copy(dh_params->params[1]);
+		/* X and Y will be added by _gnutls_pk_generate_keys */
+		key->params.params_nr = 3;
+	} else {
+		ret = _gnutls_pk_generate_params(algo, bits, &key->params);
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
 	}
 
 	if (algo == GNUTLS_PK_RSA_PSS && (flags & GNUTLS_PRIVKEY_FLAG_CA) &&
@@ -1883,18 +1909,21 @@ int gnutls_x509_privkey_generate2(gnutls_x509_privkey_t key,
 		goto cleanup;
 	}
 
-	if (tpki) {
-		ret = gnutls_x509_privkey_set_spki(key, tpki, 0);
+	if (spki) {
+		ret = gnutls_x509_privkey_set_spki(key, spki, 0);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
 		}
 	}
 
-	ret = _gnutls_asn1_encode_privkey(&key->key, &key->params);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
+	/* DH keys are only exportable in PKCS#8 format */
+	if (algo != GNUTLS_PK_DH) {
+		ret = _gnutls_asn1_encode_privkey(&key->key, &key->params);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
 	}
 
 	return 0;
