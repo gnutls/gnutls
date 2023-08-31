@@ -1072,6 +1072,93 @@ cleanup:
 }
 
 /**
+ * gnutls_x509_privkey_import_dh_raw:
+ * @key: The data to store the parsed key
+ * @p: holds the p
+ * @q: holds the q (optional)
+ * @g: holds the g
+ * @y: holds the y (optional)
+ * @x: holds the x
+ *
+ * This function will convert the given Diffie-Hellman raw parameters
+ * to the native #gnutls_x509_privkey_t format.  The output will be
+ * stored in @key.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ **/
+int gnutls_x509_privkey_import_dh_raw(gnutls_x509_privkey_t key,
+				      const gnutls_datum_t *p,
+				      const gnutls_datum_t *q,
+				      const gnutls_datum_t *g,
+				      const gnutls_datum_t *y,
+				      const gnutls_datum_t *x)
+{
+	int ret;
+
+	if (unlikely(key == NULL || p == NULL || g == NULL || x == NULL)) {
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
+
+	gnutls_pk_params_init(&key->params);
+
+	if (_gnutls_mpi_init_scan_nz(&key->params.params[DH_P], p->data,
+				     p->size)) {
+		gnutls_assert();
+		ret = GNUTLS_E_MPI_SCAN_FAILED;
+		goto cleanup;
+	}
+
+	if (q) {
+		if (_gnutls_mpi_init_scan_nz(&key->params.params[DH_Q], q->data,
+					     q->size)) {
+			gnutls_assert();
+			ret = GNUTLS_E_MPI_SCAN_FAILED;
+			goto cleanup;
+		}
+	}
+
+	if (_gnutls_mpi_init_scan_nz(&key->params.params[DH_G], g->data,
+				     g->size)) {
+		gnutls_assert();
+		ret = GNUTLS_E_MPI_SCAN_FAILED;
+		goto cleanup;
+	}
+
+	if (y) {
+		if (_gnutls_mpi_init_scan_nz(&key->params.params[DH_Y], y->data,
+					     y->size)) {
+			gnutls_assert();
+			ret = GNUTLS_E_MPI_SCAN_FAILED;
+			goto cleanup;
+		}
+	}
+
+	if (_gnutls_mpi_init_scan_nz(&key->params.params[DH_X], x->data,
+				     x->size)) {
+		gnutls_assert();
+		ret = GNUTLS_E_MPI_SCAN_FAILED;
+		goto cleanup;
+	}
+
+	ret = _gnutls_pk_fixup(GNUTLS_PK_DH, GNUTLS_IMPORT, &key->params);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	key->params.algo = GNUTLS_PK_DH;
+	key->params.params_nr = DH_PRIVATE_PARAMS;
+
+	return 0;
+
+cleanup:
+	gnutls_pk_params_clear(&key->params);
+	gnutls_pk_params_release(&key->params);
+	return ret;
+}
+
+/**
  * gnutls_x509_privkey_import_ecc_raw:
  * @key: The data to store the parsed key
  * @curve: holds the curve

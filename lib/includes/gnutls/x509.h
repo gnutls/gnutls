@@ -1118,6 +1118,12 @@ int gnutls_x509_privkey_import_dsa_raw(gnutls_x509_privkey_t key,
 				       const gnutls_datum_t *g,
 				       const gnutls_datum_t *y,
 				       const gnutls_datum_t *x);
+int gnutls_x509_privkey_import_dh_raw(gnutls_x509_privkey_t key,
+				      const gnutls_datum_t *p,
+				      const gnutls_datum_t *q,
+				      const gnutls_datum_t *g,
+				      const gnutls_datum_t *y,
+				      const gnutls_datum_t *x);
 
 int gnutls_x509_privkey_get_pk_algorithm(gnutls_x509_privkey_t key);
 int gnutls_x509_privkey_get_pk_algorithm2(gnutls_x509_privkey_t key,

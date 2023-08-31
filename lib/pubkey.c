@@ -1945,6 +1945,79 @@ cleanup:
 	return ret;
 }
 
+/**
+ * gnutls_pubkey_import_dh_raw:
+ * @key: The structure to store the parsed key
+ * @p: holds the p
+ * @q: holds the q (optional)
+ * @g: holds the g
+ * @y: holds the y
+ *
+ * This function will convert the given Diffie-Hellman raw parameters
+ * to the native #gnutls_pubkey_t format.  The output will be stored
+ * in @key.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.8.2
+ **/
+int gnutls_pubkey_import_dh_raw(gnutls_pubkey_t key, const gnutls_datum_t *p,
+				const gnutls_datum_t *q,
+				const gnutls_datum_t *g,
+				const gnutls_datum_t *y)
+{
+	int ret;
+
+	if (unlikely(key == NULL || p == NULL || g == NULL || y == NULL)) {
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
+
+	gnutls_pk_params_release(&key->params);
+	gnutls_pk_params_init(&key->params);
+
+	if (_gnutls_mpi_init_scan_nz(&key->params.params[DH_P], p->data,
+				     p->size)) {
+		gnutls_assert();
+		ret = GNUTLS_E_MPI_SCAN_FAILED;
+		goto cleanup;
+	}
+
+	if (q) {
+		if (_gnutls_mpi_init_scan_nz(&key->params.params[DH_Q], q->data,
+					     q->size)) {
+			gnutls_assert();
+			ret = GNUTLS_E_MPI_SCAN_FAILED;
+			goto cleanup;
+		}
+	}
+
+	if (_gnutls_mpi_init_scan_nz(&key->params.params[DH_G], g->data,
+				     g->size)) {
+		gnutls_assert();
+		ret = GNUTLS_E_MPI_SCAN_FAILED;
+		goto cleanup;
+	}
+
+	if (_gnutls_mpi_init_scan_nz(&key->params.params[DH_Y], y->data,
+				     y->size)) {
+		gnutls_assert();
+		ret = GNUTLS_E_MPI_SCAN_FAILED;
+		goto cleanup;
+	}
+
+	key->params.params_nr = DH_PUBLIC_PARAMS;
+	key->params.algo = GNUTLS_PK_DH;
+	key->bits = pubkey_to_bits(&key->params);
+
+	return 0;
+
+cleanup:
+	gnutls_pk_params_clear(&key->params);
+	gnutls_pk_params_release(&key->params);
+	return ret;
+}
+
 /* Updates the gnutls_x509_spki_st parameters based on the signature
  * information, and reports any incompatibilities between the existing
  * parameters (if any) with the signature algorithm */
