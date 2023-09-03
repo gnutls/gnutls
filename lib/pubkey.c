@@ -1894,42 +1894,42 @@ int gnutls_pubkey_import_dsa_raw(gnutls_pubkey_t key, const gnutls_datum_t *p,
 				 const gnutls_datum_t *g,
 				 const gnutls_datum_t *y)
 {
-	if (key == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
+	int ret;
+
+	if (unlikely(key == NULL || p == NULL || q == NULL || g == NULL ||
+		     y == NULL)) {
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
 
 	gnutls_pk_params_release(&key->params);
 	gnutls_pk_params_init(&key->params);
 
-	if (_gnutls_mpi_init_scan_nz(&key->params.params[0], p->data,
+	if (_gnutls_mpi_init_scan_nz(&key->params.params[DSA_P], p->data,
 				     p->size)) {
 		gnutls_assert();
-		return GNUTLS_E_MPI_SCAN_FAILED;
+		ret = GNUTLS_E_MPI_SCAN_FAILED;
+		goto cleanup;
 	}
 
-	if (_gnutls_mpi_init_scan_nz(&key->params.params[1], q->data,
+	if (_gnutls_mpi_init_scan_nz(&key->params.params[DSA_Q], q->data,
 				     q->size)) {
 		gnutls_assert();
-		_gnutls_mpi_release(&key->params.params[0]);
-		return GNUTLS_E_MPI_SCAN_FAILED;
+		ret = GNUTLS_E_MPI_SCAN_FAILED;
+		goto cleanup;
 	}
 
-	if (_gnutls_mpi_init_scan_nz(&key->params.params[2], g->data,
+	if (_gnutls_mpi_init_scan_nz(&key->params.params[DSA_G], g->data,
 				     g->size)) {
 		gnutls_assert();
-		_gnutls_mpi_release(&key->params.params[1]);
-		_gnutls_mpi_release(&key->params.params[0]);
-		return GNUTLS_E_MPI_SCAN_FAILED;
+		ret = GNUTLS_E_MPI_SCAN_FAILED;
+		goto cleanup;
 	}
 
-	if (_gnutls_mpi_init_scan_nz(&key->params.params[3], y->data,
+	if (_gnutls_mpi_init_scan_nz(&key->params.params[DSA_Y], y->data,
 				     y->size)) {
 		gnutls_assert();
-		_gnutls_mpi_release(&key->params.params[2]);
-		_gnutls_mpi_release(&key->params.params[1]);
-		_gnutls_mpi_release(&key->params.params[0]);
-		return GNUTLS_E_MPI_SCAN_FAILED;
+		ret = GNUTLS_E_MPI_SCAN_FAILED;
+		goto cleanup;
 	}
 
 	key->params.params_nr = DSA_PUBLIC_PARAMS;
@@ -1937,6 +1937,12 @@ int gnutls_pubkey_import_dsa_raw(gnutls_pubkey_t key, const gnutls_datum_t *p,
 	key->bits = pubkey_to_bits(&key->params);
 
 	return 0;
+
+cleanup:
+	gnutls_pk_params_clear(&key->params);
+	gnutls_pk_params_release(&key->params);
+
+	return ret;
 }
 
 /* Updates the gnutls_x509_spki_st parameters based on the signature
