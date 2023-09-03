@@ -1894,8 +1894,6 @@ int gnutls_pubkey_import_dsa_raw(gnutls_pubkey_t key, const gnutls_datum_t *p,
 				 const gnutls_datum_t *g,
 				 const gnutls_datum_t *y)
 {
-	size_t siz = 0;
-
 	if (key == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
@@ -1904,29 +1902,29 @@ int gnutls_pubkey_import_dsa_raw(gnutls_pubkey_t key, const gnutls_datum_t *p,
 	gnutls_pk_params_release(&key->params);
 	gnutls_pk_params_init(&key->params);
 
-	siz = p->size;
-	if (_gnutls_mpi_init_scan_nz(&key->params.params[0], p->data, siz)) {
+	if (_gnutls_mpi_init_scan_nz(&key->params.params[0], p->data,
+				     p->size)) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	siz = q->size;
-	if (_gnutls_mpi_init_scan_nz(&key->params.params[1], q->data, siz)) {
+	if (_gnutls_mpi_init_scan_nz(&key->params.params[1], q->data,
+				     q->size)) {
 		gnutls_assert();
 		_gnutls_mpi_release(&key->params.params[0]);
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	siz = g->size;
-	if (_gnutls_mpi_init_scan_nz(&key->params.params[2], g->data, siz)) {
+	if (_gnutls_mpi_init_scan_nz(&key->params.params[2], g->data,
+				     g->size)) {
 		gnutls_assert();
 		_gnutls_mpi_release(&key->params.params[1]);
 		_gnutls_mpi_release(&key->params.params[0]);
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	siz = y->size;
-	if (_gnutls_mpi_init_scan_nz(&key->params.params[3], y->data, siz)) {
+	if (_gnutls_mpi_init_scan_nz(&key->params.params[3], y->data,
+				     y->size)) {
 		gnutls_assert();
 		_gnutls_mpi_release(&key->params.params[2]);
 		_gnutls_mpi_release(&key->params.params[1]);
