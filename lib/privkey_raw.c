@@ -180,6 +180,33 @@ int gnutls_privkey_export_dsa_raw2(gnutls_privkey_t key, gnutls_datum_t *p,
 }
 
 /**
+ * gnutls_privkey_export_dh_raw:
+ * @key: Holds the public key
+ * @p: will hold the p
+ * @q: will hold the q
+ * @g: will hold the g
+ * @y: will hold the y
+ * @x: will hold the x
+ * @flags: flags from %gnutls_abstract_export_flags_t
+ *
+ * This function will export the Diffie-Hellman private key's
+ * parameters found in the given structure. The new parameters will be
+ * allocated using gnutls_malloc() and will be stored in the
+ * appropriate datum.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
+ *
+ * Since: 3.8.2
+ **/
+int gnutls_privkey_export_dh_raw(gnutls_privkey_t key, gnutls_datum_t *p,
+				 gnutls_datum_t *q, gnutls_datum_t *g,
+				 gnutls_datum_t *y, gnutls_datum_t *x,
+				 unsigned int flags)
+{
+	return gnutls_privkey_export_dsa_raw2(key, p, q, g, y, x, flags);
+}
+
+/**
  * gnutls_privkey_export_ecc_raw:
  * @key: Holds the public key
  * @curve: will hold the curve
@@ -385,6 +412,57 @@ int gnutls_privkey_import_dsa_raw(gnutls_privkey_t key, const gnutls_datum_t *p,
 		return gnutls_assert_val(ret);
 
 	ret = gnutls_x509_privkey_import_dsa_raw(xkey, p, q, g, y, x);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+	ret = gnutls_privkey_import_x509(key, xkey,
+					 GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+	return 0;
+
+error:
+	gnutls_x509_privkey_deinit(xkey);
+	return ret;
+}
+
+/**
+ * gnutls_privkey_import_dh_raw:
+ * @key: The structure to store the parsed key
+ * @p: holds the p
+ * @q: holds the q (optional)
+ * @g: holds the g
+ * @y: holds the y (optional)
+ * @x: holds the x
+ *
+ * This function will convert the given Diffie-Hellman raw parameters
+ * to the native #gnutls_privkey_t format.  The output will be stored
+ * in @key.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.8.2
+ **/
+int gnutls_privkey_import_dh_raw(gnutls_privkey_t key, const gnutls_datum_t *p,
+				 const gnutls_datum_t *q,
+				 const gnutls_datum_t *g,
+				 const gnutls_datum_t *y,
+				 const gnutls_datum_t *x)
+{
+	int ret;
+	gnutls_x509_privkey_t xkey;
+
+	ret = gnutls_x509_privkey_init(&xkey);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = gnutls_x509_privkey_import_dh_raw(xkey, p, q, g, y, x);
 	if (ret < 0) {
 		gnutls_assert();
 		goto error;

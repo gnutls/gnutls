@@ -1419,6 +1419,18 @@ GNUTLS_3_8_1
 	*;
 } GNUTLS_3_7_7;
 
+GNUTLS_3_8_2
+{
+ global:
+	gnutls_pubkey_import_dh_raw;
+	gnutls_privkey_import_dh_raw;
+	gnutls_privkey_export_dh_raw;
+	gnutls_x509_privkey_import_dh_raw;
+	gnutls_privkey_derive_secret;
+ local:
+	*;
+} GNUTLS_3_8_1;
+
 GNUTLS_FIPS140_3_4 {
   global:
 	gnutls_cipher_self_test;

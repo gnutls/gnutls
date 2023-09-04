@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2019 Red Hat, Inc.
+ * Copyright (C) 2019-2023 Red Hat, Inc.
  *
- * Author: Simo Sorce
+ * Author: Simo Sorce, Daiki Ueno
  *
  * This file is part of GnuTLS.
  *
@@ -19,28 +19,18 @@
  * along with GnuTLS.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* This program tests functionality of DH exchanges, with legacy,
- * FIPS-only API
- */
+/* This program tests functionality of DH exchanges, with public API */
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
 
 #include <gnutls/gnutls.h>
+#include <gnutls/abstract.h>
 #include <stdbool.h>
 #include <string.h>
 #include <stdlib.h>
 #include "utils.h"
-
-#ifdef ENABLE_FIPS140
-int _gnutls_dh_generate_key(gnutls_dh_params_t dh_params,
-			    gnutls_datum_t *priv_key, gnutls_datum_t *pub_key);
-
-int _gnutls_dh_compute_key(gnutls_dh_params_t dh_params,
-			   const gnutls_datum_t *priv_key,
-			   const gnutls_datum_t *pub_key,
-			   const gnutls_datum_t *peer_key, gnutls_datum_t *Z);
 
 static void params(gnutls_dh_params_t *dh_params, const gnutls_datum_t *p,
 		   const gnutls_datum_t *q, const gnutls_datum_t *g)
@@ -60,10 +50,25 @@ static void genkey(const gnutls_dh_params_t dh_params, gnutls_datum_t *priv_key,
 		   gnutls_datum_t *pub_key)
 {
 	int ret;
+	gnutls_privkey_t privkey;
+	gnutls_keygen_data_st data;
 
-	ret = _gnutls_dh_generate_key(dh_params, priv_key, pub_key);
+	ret = gnutls_privkey_init(&privkey);
 	if (ret != 0)
 		fail("error\n");
+
+	data.type = GNUTLS_KEYGEN_DH;
+	data.data = (unsigned char *)dh_params;
+	ret = gnutls_privkey_generate2(privkey, GNUTLS_PK_DH, 0, 0, &data, 1);
+	if (ret != 0)
+		fail("error\n");
+
+	ret = gnutls_privkey_export_dh_raw(privkey, NULL, NULL, NULL, pub_key,
+					   priv_key, 0);
+	if (ret != 0)
+		fail("error: %s\n", gnutls_strerror(ret));
+
+	gnutls_privkey_deinit(privkey);
 }
 
 static void compute_key(const char *name, const gnutls_dh_params_t dh_params,
@@ -75,11 +80,36 @@ static void compute_key(const char *name, const gnutls_dh_params_t dh_params,
 	gnutls_datum_t Z = { 0 };
 	bool success;
 	int ret;
+	gnutls_privkey_t privkey;
+	gnutls_pubkey_t pubkey;
+	gnutls_datum_t prime, generator;
+	unsigned int bits;
 
-	ret = _gnutls_dh_compute_key(dh_params, priv_key, pub_key, peer_key,
-				     &Z);
-	if (expect_error != ret)
-		fail("%s: error %d (expected %d)\n", name, ret, expect_error);
+	ret = gnutls_privkey_init(&privkey);
+	if (ret != 0)
+		fail("error\n");
+
+	ret = gnutls_dh_params_export_raw(dh_params, &prime, &generator, &bits);
+	if (ret != 0)
+		fail("error\n");
+
+	ret = gnutls_privkey_import_dh_raw(privkey, &prime, NULL, &generator,
+					   NULL, priv_key);
+	if (ret != 0)
+		fail("error\n");
+
+	ret = gnutls_pubkey_init(&pubkey);
+	if (ret != 0)
+		fail("error\n");
+
+	ret = gnutls_pubkey_import_dh_raw(pubkey, &prime, NULL, &generator,
+					  pub_key);
+	if (ret != 0)
+		fail("error\n");
+
+	ret = gnutls_privkey_derive_secret(privkey, pubkey, NULL, &Z, 0);
+	if (ret != 0)
+		fail("error\n");
 
 	if (result) {
 		success = (Z.size != result->size &&
@@ -88,6 +118,10 @@ static void compute_key(const char *name, const gnutls_dh_params_t dh_params,
 			fail("%s: failed to match result\n", name);
 	}
 	gnutls_free(Z.data);
+	gnutls_free(prime.data);
+	gnutls_free(generator.data);
+	gnutls_privkey_deinit(privkey);
+	gnutls_pubkey_deinit(pubkey);
 }
 
 struct dh_test_data {
@@ -104,47 +138,6 @@ struct dh_test_data {
 void doit(void)
 {
 	struct dh_test_data test_data[] = {
-		{
-			"[y == 0]",
-			gnutls_ffdhe_2048_group_prime,
-			gnutls_ffdhe_2048_group_q,
-			gnutls_ffdhe_2048_group_generator,
-			{ (void *)"\x00", 1 },
-			GNUTLS_E_MPI_SCAN_FAILED,
-			GNUTLS_FIPS140_OP_APPROVED,
-			/* does not reach _wrap_nettle_pk_derive */
-			GNUTLS_FIPS140_OP_INITIAL,
-		},
-		{
-			"[y < 2]",
-			gnutls_ffdhe_2048_group_prime,
-			gnutls_ffdhe_2048_group_q,
-			gnutls_ffdhe_2048_group_generator,
-			{ (void *)"\x01", 1 },
-			GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER,
-			GNUTLS_FIPS140_OP_APPROVED,
-			GNUTLS_FIPS140_OP_ERROR,
-		},
-		{
-			"[y > p - 2]",
-			gnutls_ffdhe_2048_group_prime,
-			gnutls_ffdhe_2048_group_q,
-			gnutls_ffdhe_2048_group_generator,
-			gnutls_ffdhe_2048_group_prime,
-			GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER,
-			GNUTLS_FIPS140_OP_APPROVED,
-			GNUTLS_FIPS140_OP_ERROR,
-		},
-		{
-			"[y ^ q mod p == 1]",
-			gnutls_ffdhe_2048_group_prime,
-			gnutls_ffdhe_2048_group_q,
-			gnutls_ffdhe_2048_group_generator,
-			gnutls_ffdhe_2048_group_q,
-			GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER,
-			GNUTLS_FIPS140_OP_APPROVED,
-			GNUTLS_FIPS140_OP_ERROR,
-		},
 		{
 			"Legal Input",
 			gnutls_ffdhe_2048_group_prime,
@@ -202,9 +195,3 @@ void doit(void)
 
 	success("all ok\n");
 }
-#else
-void doit(void)
-{
-	return;
-}
-#endif

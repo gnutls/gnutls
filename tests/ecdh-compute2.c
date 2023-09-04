@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2019 Red Hat, Inc.
+ * Copyright (C) 2019-2023 Red Hat, Inc.
  *
- * Author: Simo Sorce
+ * Author: Simo Sorce, Daiki Ueno
  *
  * This file is part of GnuTLS.
  *
@@ -19,37 +19,39 @@
  * along with GnuTLS.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* This program tests functionality of ECDH exchanges, with legacy,
- * FIPS-only API
- */
+/* This program tests functionality of ECDH exchanges, using public API */
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
 
 #include <gnutls/gnutls.h>
+#include <gnutls/abstract.h>
 #include <stdbool.h>
 #include <string.h>
 #include <stdlib.h>
 #include "utils.h"
 
-#ifdef ENABLE_FIPS140
-int _gnutls_ecdh_compute_key(gnutls_ecc_curve_t curve, const gnutls_datum_t *x,
-			     const gnutls_datum_t *y, const gnutls_datum_t *k,
-			     const gnutls_datum_t *peer_x,
-			     const gnutls_datum_t *peer_y, gnutls_datum_t *Z);
-
-int _gnutls_ecdh_generate_key(gnutls_ecc_curve_t curve, gnutls_datum_t *x,
-			      gnutls_datum_t *y, gnutls_datum_t *k);
-
 static void genkey(gnutls_ecc_curve_t curve, gnutls_datum_t *x,
 		   gnutls_datum_t *y, gnutls_datum_t *key)
 {
 	int ret;
+	gnutls_privkey_t privkey;
 
-	ret = _gnutls_ecdh_generate_key(curve, x, y, key);
+	ret = gnutls_privkey_init(&privkey);
 	if (ret != 0)
 		fail("error\n");
+
+	ret = gnutls_privkey_generate(privkey, GNUTLS_PK_EC,
+				      GNUTLS_CURVE_TO_BITS(curve), 0);
+	if (ret != 0)
+		fail("error\n");
+
+	ret = gnutls_privkey_export_ecc_raw(privkey, NULL, x, y, key);
+	if (ret != 0)
+		fail("error\n");
+
+	gnutls_privkey_deinit(privkey);
 }
 
 static void compute_key(gnutls_ecc_curve_t curve, const gnutls_datum_t *x,
@@ -61,10 +63,28 @@ static void compute_key(gnutls_ecc_curve_t curve, const gnutls_datum_t *x,
 	gnutls_datum_t Z = { 0 };
 	bool success;
 	int ret;
+	gnutls_privkey_t privkey;
+	gnutls_pubkey_t pubkey;
 
-	ret = _gnutls_ecdh_compute_key(curve, x, y, key, peer_x, peer_y, &Z);
-	if (expect_error != ret)
-		fail("error (%d)\n", ret);
+	ret = gnutls_privkey_init(&privkey);
+	if (ret != 0)
+		fail("error\n");
+
+	ret = gnutls_privkey_import_ecc_raw(privkey, curve, x, y, key);
+	if (ret != 0)
+		fail("error\n");
+
+	ret = gnutls_pubkey_init(&pubkey);
+	if (ret != 0)
+		fail("error\n");
+
+	ret = gnutls_pubkey_import_ecc_raw(pubkey, curve, x, y);
+	if (ret != 0)
+		fail("error\n");
+
+	ret = gnutls_privkey_derive_secret(privkey, pubkey, NULL, &Z, 0);
+	if (ret != 0)
+		fail("error\n");
 
 	if (result) {
 		success = (Z.size != result->size &&
@@ -73,6 +93,9 @@ static void compute_key(gnutls_ecc_curve_t curve, const gnutls_datum_t *x,
 			fail("error\n");
 	}
 	gnutls_free(Z.data);
+
+	gnutls_privkey_deinit(privkey);
+	gnutls_pubkey_deinit(pubkey);
 }
 
 struct dh_test_data {
@@ -88,46 +111,6 @@ struct dh_test_data {
 void doit(void)
 {
 	struct dh_test_data test_data[] = {
-		{
-			/* x == 0, y == 0 */
-			GNUTLS_ECC_CURVE_SECP256R1,
-			{ 0 },
-			{ 0 },
-			{ 0 },
-			{ (void *)"\x00", 1 },
-			{ (void *)"\x00", 1 },
-			/* Should be GNUTLS_E_PK_INVALID_PUBKEY but mpi scan
-		  * balks on values of 0 */
-			GNUTLS_E_MPI_SCAN_FAILED,
-		},
-		{
-			/* x > p -1 */
-			GNUTLS_ECC_CURVE_SECP256R1,
-			{ 0 },
-			{ 0 },
-			{ 0 },
-			{ (void *)"\xff\xff\xff\xff\x00\x00\x00\x01"
-				  "\x00\x00\x00\x00\x00\x00\x00\x00"
-				  "\x00\x00\x00\x00\xff\xff\xff\xff"
-				  "\xff\xff\xff\xff\xff\xff\xff\xff",
-			  1 },
-			{ (void *)"\x02", 1 },
-			GNUTLS_E_PK_INVALID_PUBKEY,
-		},
-		{
-			/* y > p -1 */
-			GNUTLS_ECC_CURVE_SECP256R1,
-			{ 0 },
-			{ 0 },
-			{ 0 },
-			{ (void *)"\x02", 1 },
-			{ (void *)"\xff\xff\xff\xff\x00\x00\x00\x01"
-				  "\x00\x00\x00\x00\x00\x00\x00\x00"
-				  "\x00\x00\x00\x00\xff\xff\xff\xff"
-				  "\xff\xff\xff\xff\xff\xff\xff\xff",
-			  1 },
-			GNUTLS_E_PK_INVALID_PUBKEY,
-		},
 		{
 			/* From CAVS tests */
 			GNUTLS_ECC_CURVE_SECP521R1,
@@ -210,9 +193,3 @@ void doit(void)
 
 	success("all ok\n");
 }
-#else
-void doit(void)
-{
-	return;
-}
-#endif

@@ -3351,6 +3351,7 @@ static int wrap_nettle_pk_verify_priv_params(gnutls_pk_algorithm_t algo,
 	}
 
 	break;
+	case GNUTLS_PK_DH:
 	case GNUTLS_PK_DSA: {
 		bigint_t t1 = NULL;
 

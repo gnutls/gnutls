@@ -1666,7 +1666,7 @@ int gnutls_pubkey_import_ecc_raw(gnutls_pubkey_t key, gnutls_ecc_curve_t curve,
 	gnutls_pk_params_release(&key->params);
 	gnutls_pk_params_init(&key->params);
 
-	if (curve_is_eddsa(curve)) {
+	if (curve_is_eddsa(curve) || curve_is_modern_ecdh(curve)) {
 		unsigned size = gnutls_ecc_curve_get_size(curve);
 		if (x->size != size) {
 			ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -1685,6 +1685,12 @@ int gnutls_pubkey_import_ecc_raw(gnutls_pubkey_t key, gnutls_ecc_curve_t curve,
 			break;
 		case GNUTLS_ECC_CURVE_ED448:
 			key->params.algo = GNUTLS_PK_EDDSA_ED448;
+			break;
+		case GNUTLS_ECC_CURVE_X25519:
+			key->params.algo = GNUTLS_PK_ECDH_X25519;
+			break;
+		case GNUTLS_ECC_CURVE_X448:
+			key->params.algo = GNUTLS_PK_ECDH_X448;
 			break;
 		default:
 			break;
@@ -1888,44 +1894,42 @@ int gnutls_pubkey_import_dsa_raw(gnutls_pubkey_t key, const gnutls_datum_t *p,
 				 const gnutls_datum_t *g,
 				 const gnutls_datum_t *y)
 {
-	size_t siz = 0;
+	int ret;
 
-	if (key == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
+	if (unlikely(key == NULL || p == NULL || q == NULL || g == NULL ||
+		     y == NULL)) {
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
 
 	gnutls_pk_params_release(&key->params);
 	gnutls_pk_params_init(&key->params);
 
-	siz = p->size;
-	if (_gnutls_mpi_init_scan_nz(&key->params.params[0], p->data, siz)) {
+	if (_gnutls_mpi_init_scan_nz(&key->params.params[DSA_P], p->data,
+				     p->size)) {
 		gnutls_assert();
-		return GNUTLS_E_MPI_SCAN_FAILED;
+		ret = GNUTLS_E_MPI_SCAN_FAILED;
+		goto cleanup;
 	}
 
-	siz = q->size;
-	if (_gnutls_mpi_init_scan_nz(&key->params.params[1], q->data, siz)) {
+	if (_gnutls_mpi_init_scan_nz(&key->params.params[DSA_Q], q->data,
+				     q->size)) {
 		gnutls_assert();
-		_gnutls_mpi_release(&key->params.params[0]);
-		return GNUTLS_E_MPI_SCAN_FAILED;
+		ret = GNUTLS_E_MPI_SCAN_FAILED;
+		goto cleanup;
 	}
 
-	siz = g->size;
-	if (_gnutls_mpi_init_scan_nz(&key->params.params[2], g->data, siz)) {
+	if (_gnutls_mpi_init_scan_nz(&key->params.params[DSA_G], g->data,
+				     g->size)) {
 		gnutls_assert();
-		_gnutls_mpi_release(&key->params.params[1]);
-		_gnutls_mpi_release(&key->params.params[0]);
-		return GNUTLS_E_MPI_SCAN_FAILED;
+		ret = GNUTLS_E_MPI_SCAN_FAILED;
+		goto cleanup;
 	}
 
-	siz = y->size;
-	if (_gnutls_mpi_init_scan_nz(&key->params.params[3], y->data, siz)) {
+	if (_gnutls_mpi_init_scan_nz(&key->params.params[DSA_Y], y->data,
+				     y->size)) {
 		gnutls_assert();
-		_gnutls_mpi_release(&key->params.params[2]);
-		_gnutls_mpi_release(&key->params.params[1]);
-		_gnutls_mpi_release(&key->params.params[0]);
-		return GNUTLS_E_MPI_SCAN_FAILED;
+		ret = GNUTLS_E_MPI_SCAN_FAILED;
+		goto cleanup;
 	}
 
 	key->params.params_nr = DSA_PUBLIC_PARAMS;
@@ -1933,6 +1937,85 @@ int gnutls_pubkey_import_dsa_raw(gnutls_pubkey_t key, const gnutls_datum_t *p,
 	key->bits = pubkey_to_bits(&key->params);
 
 	return 0;
+
+cleanup:
+	gnutls_pk_params_clear(&key->params);
+	gnutls_pk_params_release(&key->params);
+
+	return ret;
+}
+
+/**
+ * gnutls_pubkey_import_dh_raw:
+ * @key: The structure to store the parsed key
+ * @p: holds the p
+ * @q: holds the q (optional)
+ * @g: holds the g
+ * @y: holds the y
+ *
+ * This function will convert the given Diffie-Hellman raw parameters
+ * to the native #gnutls_pubkey_t format.  The output will be stored
+ * in @key.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.8.2
+ **/
+int gnutls_pubkey_import_dh_raw(gnutls_pubkey_t key, const gnutls_datum_t *p,
+				const gnutls_datum_t *q,
+				const gnutls_datum_t *g,
+				const gnutls_datum_t *y)
+{
+	int ret;
+
+	if (unlikely(key == NULL || p == NULL || g == NULL || y == NULL)) {
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
+
+	gnutls_pk_params_release(&key->params);
+	gnutls_pk_params_init(&key->params);
+
+	if (_gnutls_mpi_init_scan_nz(&key->params.params[DH_P], p->data,
+				     p->size)) {
+		gnutls_assert();
+		ret = GNUTLS_E_MPI_SCAN_FAILED;
+		goto cleanup;
+	}
+
+	if (q) {
+		if (_gnutls_mpi_init_scan_nz(&key->params.params[DH_Q], q->data,
+					     q->size)) {
+			gnutls_assert();
+			ret = GNUTLS_E_MPI_SCAN_FAILED;
+			goto cleanup;
+		}
+	}
+
+	if (_gnutls_mpi_init_scan_nz(&key->params.params[DH_G], g->data,
+				     g->size)) {
+		gnutls_assert();
+		ret = GNUTLS_E_MPI_SCAN_FAILED;
+		goto cleanup;
+	}
+
+	if (_gnutls_mpi_init_scan_nz(&key->params.params[DH_Y], y->data,
+				     y->size)) {
+		gnutls_assert();
+		ret = GNUTLS_E_MPI_SCAN_FAILED;
+		goto cleanup;
+	}
+
+	key->params.params_nr = DH_PUBLIC_PARAMS;
+	key->params.algo = GNUTLS_PK_DH;
+	key->bits = pubkey_to_bits(&key->params);
+
+	return 0;
+
+cleanup:
+	gnutls_pk_params_clear(&key->params);
+	gnutls_pk_params_release(&key->params);
+	return ret;
 }
 
 /* Updates the gnutls_x509_spki_st parameters based on the signature

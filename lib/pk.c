@@ -922,7 +922,7 @@ int _gnutls_params_get_dsa_raw(const gnutls_pk_params_st *params,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	if (params->algo != GNUTLS_PK_DSA) {
+	if (params->algo != GNUTLS_PK_DSA && params->algo != GNUTLS_PK_DH) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
