@@ -11,6 +11,19 @@ DST=$srcdir/lib/nettle/backport
 
 IMPORTS="
 block-internal.h
+bswap-internal.h
+ctr-internal.h
+ctr.h
+ctr16.c
+ghash-internal.h
+ghash-set-key.c
+ghash-update.c
+siv-gcm-aes128.c
+siv-gcm-aes256.c
+siv-gcm.c
+siv-gcm.h
+siv-ghash-set-key.c
+siv-ghash-update.c
 "
 
 PUBLIC="
@@ -20,6 +33,7 @@ ctr.h
 des.h
 ecc-curve.h
 ecc.h
+gcm.h
 macros.h
 memops.h
 memxor.h
@@ -80,6 +94,14 @@ for f in $IMPORTS; do
 	  -e '/^#include <nettle\/nettle-types\.h>/a\
 #include "block8.h"
 ' \
+	  $dst > $dst-t && mv $dst-t $dst
+	;;
+    esac
+    # Avoid -Wcast-align=strict warnings
+    case $dst in
+      */ctr16.c)
+	sed \
+	  -e 's/\((union nettle_block16 \*) \)\(dst\)/\1(void *) \2/' \
 	  $dst > $dst-t && mv $dst-t $dst
 	;;
     esac
