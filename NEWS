@@ -13,6 +13,13 @@ See the end for copying conditions.
    to implement custom protocols leveraging non-interactive key
    agreement with ECDH and DH.
 
+** libgnutls: Added support for AES-GCM-SIV ciphers (RFC 8452)
+   The new algorithms GNUTLS_CIPHER_AES_128_SIV_GCM and
+   GNUTLS_CIPHER_AES_256_SIV_GCM have been added to be used through
+   the AEAD interface.  Note that, unlike
+   GNUTLS_CIPHER_AES_{128,256}_SIV_GCM, the authentication tag is
+   appended to the ciphertext, not prepended.
+
 ** API and ABI modifications:
 gnutls_pubkey_import_dh_raw: New function
 gnutls_privkey_import_dh_raw: New function
@@ -20,6 +27,8 @@ gnutls_privkey_export_dh_raw: New function
 gnutls_x509_privkey_import_dh_raw: New function
 gnutls_privkey_derive_secret: New function
 GNUTLS_KEYGEN_DH: New enum member of gnutls_keygen_types_t
+GNUTLS_CIPHER_AES_128_SIV_GCM: Added
+GNUTLS_CIPHER_AES_256_SIV_GCM: Added
 
 * Version 3.8.1 (released 2023-08-03)
 
