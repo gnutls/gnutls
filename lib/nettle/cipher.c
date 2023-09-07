@@ -62,6 +62,11 @@
 #include <nettle/cfb.h>
 #include <nettle/xts.h>
 #include <nettle/siv-cmac.h>
+#ifdef HAVE_NETTLE_SIV_GCM_ENCRYPT_MESSAGE
+#include <nettle/siv-gcm.h>
+#else
+#include "backport/siv-gcm.h"
+#endif
 #include <fips.h>
 #include <intprops.h>
 
@@ -355,6 +360,50 @@ static int _siv_cmac_aes256_decrypt_message(struct nettle_cipher_ctx *ctx,
 	return siv_cmac_aes256_decrypt_message((void *)ctx->ctx_ptr, nonce_size,
 					       nonce, auth_size, auth, length,
 					       dst, src);
+}
+
+static void _siv_gcm_aes128_encrypt_message(struct nettle_cipher_ctx *ctx,
+					    size_t nonce_size,
+					    const void *nonce, size_t auth_size,
+					    const void *auth, size_t tag_size,
+					    size_t length, uint8_t *dst,
+					    const uint8_t *src)
+{
+	siv_gcm_aes128_encrypt_message((void *)ctx->ctx_ptr, nonce_size, nonce,
+				       auth_size, auth, length, dst, src);
+}
+
+static int _siv_gcm_aes128_decrypt_message(struct nettle_cipher_ctx *ctx,
+					   size_t nonce_size, const void *nonce,
+					   size_t auth_size, const void *auth,
+					   size_t tag_size, size_t length,
+					   uint8_t *dst, const uint8_t *src)
+{
+	return siv_gcm_aes128_decrypt_message((void *)ctx->ctx_ptr, nonce_size,
+					      nonce, auth_size, auth, length,
+					      dst, src);
+}
+
+static void _siv_gcm_aes256_encrypt_message(struct nettle_cipher_ctx *ctx,
+					    size_t nonce_size,
+					    const void *nonce, size_t auth_size,
+					    const void *auth, size_t tag_size,
+					    size_t length, uint8_t *dst,
+					    const uint8_t *src)
+{
+	siv_gcm_aes256_encrypt_message((void *)ctx->ctx_ptr, nonce_size, nonce,
+				       auth_size, auth, length, dst, src);
+}
+
+static int _siv_gcm_aes256_decrypt_message(struct nettle_cipher_ctx *ctx,
+					   size_t nonce_size, const void *nonce,
+					   size_t auth_size, const void *auth,
+					   size_t tag_size, size_t length,
+					   uint8_t *dst, const uint8_t *src)
+{
+	return siv_gcm_aes256_decrypt_message((void *)ctx->ctx_ptr, nonce_size,
+					      nonce, auth_size, auth, length,
+					      dst, src);
 }
 
 static void _chacha_set_nonce(struct chacha_ctx *ctx, size_t length,
@@ -1081,6 +1130,38 @@ static const struct nettle_cipher_st builtin_ciphers[] = {
 		.set_decrypt_key =
 			(nettle_set_key_func *)siv_cmac_aes256_set_key,
 		.max_iv_size = SIV_DIGEST_SIZE,
+	},
+	{
+		.algo = GNUTLS_CIPHER_AES_128_SIV_GCM,
+		.block_size = SIV_GCM_BLOCK_SIZE,
+		.key_size = AES128_KEY_SIZE,
+
+		.ctx_size = sizeof(struct aes128_ctx),
+		.aead_encrypt =
+			(aead_encrypt_func)_siv_gcm_aes128_encrypt_message,
+		.aead_decrypt =
+			(aead_decrypt_func)_siv_gcm_aes128_decrypt_message,
+		.set_encrypt_key =
+			(nettle_set_key_func *)aes128_set_encrypt_key,
+		.set_decrypt_key =
+			(nettle_set_key_func *)aes128_set_encrypt_key,
+		.max_iv_size = SIV_GCM_NONCE_SIZE,
+	},
+	{
+		.algo = GNUTLS_CIPHER_AES_256_SIV_GCM,
+		.block_size = SIV_GCM_BLOCK_SIZE,
+		.key_size = AES256_KEY_SIZE,
+
+		.ctx_size = sizeof(struct aes256_ctx),
+		.aead_encrypt =
+			(aead_encrypt_func)_siv_gcm_aes256_encrypt_message,
+		.aead_decrypt =
+			(aead_decrypt_func)_siv_gcm_aes256_decrypt_message,
+		.set_encrypt_key =
+			(nettle_set_key_func *)aes256_set_encrypt_key,
+		.set_decrypt_key =
+			(nettle_set_key_func *)aes256_set_encrypt_key,
+		.max_iv_size = SIV_GCM_NONCE_SIZE,
 	},
 };
 
