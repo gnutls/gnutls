@@ -143,6 +143,37 @@ static int get_indx_extension(asn1_node asn, const char *root, int indx,
 	return 0;
 }
 
+int _gnutls_delete_extension(asn1_node root, const char *oid)
+{
+	int retval, k, len;
+	char name[MAX_NAME_SIZE], name2[MAX_NAME_SIZE], extnID[MAX_OID_SIZE],
+	     extensions[] = "tbsCertificate.extensions";
+
+	for (k = 1; ; k++) {
+		snprintf(name, sizeof(name), "%s.?%d", extensions, k);
+
+		_gnutls_str_cpy(name2, sizeof(name2), name);
+		_gnutls_str_cat(name2, sizeof(name2), ".extnID");
+
+		len = sizeof(extnID) - 1;
+		if ((retval = asn1_read_value(root, name2, extnID, &len)) == ASN1_ELEMENT_NOT_FOUND)
+			break;
+
+		if (strcmp(extnID, oid) == 0) {
+			// Extension found - remove it
+			if ((retval = asn1_delete_element(root, name)) != ASN1_SUCCESS)
+				break;
+			return 0;
+		}
+	}
+
+	if (retval == ASN1_ELEMENT_NOT_FOUND)
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+
+	gnutls_assert();
+	return _gnutls_asn2err(retval);
+}
+
 int _gnutls_x509_crt_get_extension(gnutls_x509_crt_t cert,
 				   const char *extension_id, int indx,
 				   gnutls_datum_t *data, unsigned int *critical)

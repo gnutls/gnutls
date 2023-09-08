@@ -1,4 +1,6 @@
 #include "gnutls_int.h"
+#include "common.h"
+#include "x509_int.h"
 #include <alloca.h>
 #include <gnutls/ct.h>
 #include <gnutls/crypto.h>
@@ -128,24 +130,72 @@ static struct ct_log_st *_gnutls_lookup_log_by_id(const struct gnutls_ct_logs_st
 
 static int generate_precert(const gnutls_x509_crt_t crt, gnutls_datum_t *out)
 {
+	asn1_node tbsroot;
+	int retval, outlen;
+	unsigned char *outbuf = NULL;
+
+	/*
+	 * Create a copy of "tbsCertificate" and remove the SCT list extension,
+	 * then export the resulting structure to DER.
+	 */
+	if ((tbsroot = asn1_dup_node(crt->cert, "tbsCertificate")) == NULL) {
+		gnutls_assert();
+		return -1;
+	}
+
+	if ((retval = _gnutls_delete_extension(tbsroot, GNUTLS_X509EXT_OID_CT_SCT_V1)) < 0) {
+		gnutls_assert();
+		goto bail;
+	}
+
+	// Query how much space we need to hold the new structure
+	outlen = 0;
+	retval = asn1_der_coding(tbsroot, "tbsCertificate", NULL, &outlen, NULL);
+	if (retval != ASN1_MEM_ERROR) {
+		gnutls_assert();
+		retval = _gnutls_asn2err(retval);
+		goto bail;
+	}
+
+	// Now outlen holds the necessary amount of space to export the DER encoding
+	if ((outbuf = gnutls_malloc(outlen)) == NULL) {
+		gnutls_assert();
+		retval = GNUTLS_E_MEMORY_ERROR;
+		goto bail;
+	}
+
+	if ((retval = asn1_der_coding(tbsroot, "tbsCertificate", outbuf, &outlen, NULL))) {
+		gnutls_assert();
+		retval = _gnutls_asn2err(retval);
+		goto bail;
+	}
+
+	out->size = outlen;
+	out->data = outbuf;
+
+	return 0;
+
+bail:
+	if (outbuf)
+		gnutls_free(outbuf);
+	asn1_delete_structure(&tbsroot);
+	return retval;
+}
+
+static int compute_issuer_key_hash(const gnutls_x509_crt_t cert, gnutls_datum_t *out)
+{
 	int retval;
-	size_t output_data_size = 0;
+	char md[gnutls_hash_get_len(GNUTLS_DIG_SHA256)];
 
-	retval = gnutls_x509_crt_export(crt, GNUTLS_X509_FMT_DER,
-					NULL, &output_data_size);
-	if (retval != GNUTLS_E_SHORT_MEMORY_BUFFER || output_data_size == 0)
-		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
-
-	if ((out->data = gnutls_malloc(output_data_size)) == NULL)
-		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-
-	out->size = output_data_size;
-
-	if ((retval = gnutls_x509_crt_export(crt, GNUTLS_X509_FMT_DER,
-					     out->data, (size_t *) &output_data_size)) < 0)
+	if ((retval = gnutls_hash_fast(GNUTLS_DIG_SHA256,
+				       cert->raw_spki.data, cert->raw_spki.size,
+				       md)) < 0)
 		return gnutls_assert_val(retval);
 
-	return retval;
+	if ((retval = _gnutls_set_datum(out, md, gnutls_hash_get_len(GNUTLS_DIG_SHA256))) < 0)
+		return gnutls_assert_val(retval);
+
+	return 0;
 }
 
 static int _gnutls_update_hash_with_precert(gnutls_hash_hd_t md, uint64_t timestamp,
@@ -161,7 +211,7 @@ static int _gnutls_update_hash_with_precert(gnutls_hash_hd_t md, uint64_t timest
 		return gnutls_assert_val(retval);
 
 	_gnutls_write_uint64(timestamp, u64_be);
-	if ((retval = gnutls_hash(md, timestamp, sizeof(timestamp))) < 0)
+	if ((retval = gnutls_hash(md, u64_be, sizeof(u64_be))) < 0)
 		return gnutls_assert_val(retval);
 
 	if ((retval = gnutls_hash(md, &three_bytes[1], 2)) < 0)
@@ -173,13 +223,14 @@ static int _gnutls_update_hash_with_precert(gnutls_hash_hd_t md, uint64_t timest
 
 	/* Certificate in DER encoding, with length prefix */
 	_gnutls_write_uint24(crtder_len, u32_be);
-	if ((retval = gnutls_hash(md, &u32_be[1], 3)) < 0)
+	if ((retval = gnutls_hash(md, u32_be, 3)) < 0)
 		return gnutls_assert_val(retval);
 	if ((retval = gnutls_hash(md, crtder, crtder_len)) < 0)
 		return gnutls_assert_val(retval);
 
 	/* Extensions, with length prefix */
-	/* TODO complete this */
+	if ((retval = gnutls_hash(md, three_bytes, 2)) < 0)
+		return gnutls_assert_val(retval);
 
 	return 0;
 }
@@ -235,7 +286,8 @@ void gnutls_ct_logs_deinit(gnutls_ct_logs_t logs)
 
 int gnutls_ct_sct_validate(const gnutls_x509_ct_scts_t scts, unsigned idx,
 			   const gnutls_ct_logs_t logs,
-			   gnutls_x509_crt_t crt, gnutls_time_func time_func)
+			   gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
+			   gnutls_time_func time_func)
 {
 	int retval;
 	time_t timestamp;
@@ -273,6 +325,12 @@ int gnutls_ct_sct_validate(const gnutls_x509_ct_scts_t scts, unsigned idx,
 
 	/* Compute preCert as DER */
 	if ((retval = generate_precert(crt, &crtder)) < 0) {
+		gnutls_assert();
+		goto bail;
+	}
+
+	/* Compute issuer key hash */
+	if ((retval = compute_issuer_key_hash(issuer, &ikey_hash)) < 0) {
 		gnutls_assert();
 		goto bail;
 	}

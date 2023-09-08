@@ -270,6 +270,8 @@ int _gnutls_x509_raw_crt_to_raw_pubkey(const gnutls_datum_t *cert,
 
 int _gnutls_x509_get_version(asn1_node root, const char *name);
 
+int _gnutls_delete_extension(asn1_node root, const char *oid);
+
 int x509_crt_to_raw_pubkey(gnutls_x509_crt_t crt, gnutls_datum_t *rpubkey);
 
 typedef void (*gnutls_cert_vfunc)(gnutls_x509_crt_t);

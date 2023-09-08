@@ -52,7 +52,8 @@ int gnutls_ct_add_log(gnutls_ct_logs_t logs,
 		      unsigned flags);
 int gnutls_ct_sct_validate(const gnutls_x509_ct_scts_t scts, unsigned idx,
 			   const gnutls_ct_logs_t logs,
-			   gnutls_x509_crt_t crt, gnutls_time_func time_func);
+			   gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
+			   gnutls_time_func time_func);
 #ifdef __cplusplus
 }
 #endif
