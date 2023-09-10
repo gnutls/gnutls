@@ -478,9 +478,11 @@ int _gnutls_pk_params_copy(gnutls_pk_params_st *dst,
 	dst->algo = src->algo;
 
 	for (i = 0; i < src->params_nr; i++) {
-		dst->params[i] = _gnutls_mpi_copy(src->params[i]);
-		if (dst->params[i] == NULL) {
-			goto fail;
+		if (src->params[i]) {
+			dst->params[i] = _gnutls_mpi_copy(src->params[i]);
+			if (dst->params[i] == NULL) {
+				goto fail;
+			}
 		}
 
 		dst->params_nr++;
