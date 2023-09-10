@@ -571,7 +571,7 @@ int gnutls_privkey_import_pkcs11(gnutls_privkey_t pkey,
  * @key: A key of type #gnutls_pubkey_t
  * @url: A PKCS 11 url
  *
- * This function will import a PKCS 11 private key to a #gnutls_private_key_t
+ * This function will import a PKCS 11 private key to a #gnutls_privkey_t
  * type.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a

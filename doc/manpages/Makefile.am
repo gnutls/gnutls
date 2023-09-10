@@ -758,6 +758,7 @@ APIMANS += gnutls_pubkey_deinit.3
 APIMANS += gnutls_pubkey_encrypt_data.3
 APIMANS += gnutls_pubkey_export.3
 APIMANS += gnutls_pubkey_export2.3
+APIMANS += gnutls_pubkey_export_dh_raw.3
 APIMANS += gnutls_pubkey_export_dsa_raw.3
 APIMANS += gnutls_pubkey_export_dsa_raw2.3
 APIMANS += gnutls_pubkey_export_ecc_raw.3

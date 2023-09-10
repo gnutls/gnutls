@@ -181,29 +181,51 @@ int gnutls_privkey_export_dsa_raw2(gnutls_privkey_t key, gnutls_datum_t *p,
 
 /**
  * gnutls_privkey_export_dh_raw:
- * @key: Holds the public key
- * @p: will hold the p
- * @q: will hold the q
- * @g: will hold the g
- * @y: will hold the y
+ * @key: Holds the private key
+ * @params: will hold the Diffie-Hellman parameters (optional), must be initialized
+ * @y: will hold the y (optional)
  * @x: will hold the x
  * @flags: flags from %gnutls_abstract_export_flags_t
  *
- * This function will export the Diffie-Hellman private key's
- * parameters found in the given structure. The new parameters will be
- * allocated using gnutls_malloc() and will be stored in the
+ * This function will export the Diffie-Hellman private key parameter
+ * found in the given %gnutls_privkey_t structure. The new parameter
+ * will be allocated using gnutls_malloc() and will be stored in the
  * appropriate datum.
+ *
+ * To retrieve other parameters common in both public key and private
+ * key, use gnutls_dh_params_export_raw().
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
  * Since: 3.8.2
  **/
-int gnutls_privkey_export_dh_raw(gnutls_privkey_t key, gnutls_datum_t *p,
-				 gnutls_datum_t *q, gnutls_datum_t *g,
-				 gnutls_datum_t *y, gnutls_datum_t *x,
-				 unsigned int flags)
+int gnutls_privkey_export_dh_raw(gnutls_privkey_t key,
+				 gnutls_dh_params_t params, gnutls_datum_t *y,
+				 gnutls_datum_t *x, unsigned int flags)
 {
-	return gnutls_privkey_export_dsa_raw2(key, p, q, g, y, x, flags);
+	if (params) {
+		gnutls_pk_params_st pk_params;
+		int ret;
+
+		gnutls_pk_params_init(&pk_params);
+
+		ret = _gnutls_privkey_get_mpis(key, &pk_params);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		params->params[0] = _gnutls_mpi_copy(pk_params.params[DH_P]);
+		params->params[1] = _gnutls_mpi_copy(pk_params.params[DH_G]);
+		if (pk_params.params[DH_Q]) {
+			params->params[2] =
+				_gnutls_mpi_copy(pk_params.params[DH_Q]);
+		}
+		params->q_bits = pk_params.qbits;
+
+		gnutls_pk_params_release(&pk_params);
+	}
+
+	return gnutls_privkey_export_dsa_raw2(key, NULL, NULL, NULL, y, x,
+					      flags);
 }
 
 /**
@@ -434,9 +456,7 @@ error:
 /**
  * gnutls_privkey_import_dh_raw:
  * @key: The structure to store the parsed key
- * @p: holds the p
- * @q: holds the q (optional)
- * @g: holds the g
+ * @params: holds the %gnutls_dh_params_t
  * @y: holds the y (optional)
  * @x: holds the x
  *
@@ -449,9 +469,8 @@ error:
  *
  * Since: 3.8.2
  **/
-int gnutls_privkey_import_dh_raw(gnutls_privkey_t key, const gnutls_datum_t *p,
-				 const gnutls_datum_t *q,
-				 const gnutls_datum_t *g,
+int gnutls_privkey_import_dh_raw(gnutls_privkey_t key,
+				 const gnutls_dh_params_t params,
 				 const gnutls_datum_t *y,
 				 const gnutls_datum_t *x)
 {
@@ -462,7 +481,7 @@ int gnutls_privkey_import_dh_raw(gnutls_privkey_t key, const gnutls_datum_t *p,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret = gnutls_x509_privkey_import_dh_raw(xkey, p, q, g, y, x);
+	ret = gnutls_x509_privkey_import_dh_raw(xkey, params, y, x);
 	if (ret < 0) {
 		gnutls_assert();
 		goto error;

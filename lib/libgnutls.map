@@ -1424,6 +1424,7 @@ GNUTLS_3_8_2
  global:
 	gnutls_pubkey_import_dh_raw;
 	gnutls_privkey_import_dh_raw;
+	gnutls_pubkey_export_dh_raw;
 	gnutls_privkey_export_dh_raw;
 	gnutls_x509_privkey_import_dh_raw;
 	gnutls_privkey_derive_secret;

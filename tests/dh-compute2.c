@@ -46,16 +46,50 @@ static void params(gnutls_dh_params_t *dh_params, const gnutls_datum_t *p,
 		fail("error\n");
 }
 
+static bool dh_params_equal(const gnutls_dh_params_t a,
+			    const gnutls_dh_params_t b)
+{
+	gnutls_datum_t prime1, generator1;
+	unsigned int bits1;
+	gnutls_datum_t prime2, generator2;
+	unsigned int bits2;
+	int ret;
+	bool ok;
+
+	ret = gnutls_dh_params_export_raw(a, &prime1, &generator1, &bits1);
+	assert(ret >= 0);
+	ret = gnutls_dh_params_export_raw(b, &prime2, &generator2, &bits2);
+	assert(ret >= 0);
+
+	ok = prime1.size == prime2.size &&
+	     !memcmp(prime1.data, prime2.data, prime1.size) &&
+	     generator1.size == generator2.size &&
+	     !memcmp(generator1.data, generator2.data, generator1.size) &&
+	     bits1 == bits2;
+
+	gnutls_free(prime1.data);
+	gnutls_free(prime2.data);
+	gnutls_free(generator1.data);
+	gnutls_free(generator2.data);
+
+	return ok;
+}
+
 static void genkey(const gnutls_dh_params_t dh_params, gnutls_datum_t *priv_key,
 		   gnutls_datum_t *pub_key)
 {
 	int ret;
 	gnutls_privkey_t privkey;
+	gnutls_pubkey_t pubkey;
 	gnutls_keygen_data_st data;
+	gnutls_dh_params_t dh_params_exported;
+	gnutls_datum_t tmp;
 
 	ret = gnutls_privkey_init(&privkey);
-	if (ret != 0)
-		fail("error\n");
+	assert(ret >= 0);
+
+	ret = gnutls_pubkey_init(&pubkey);
+	assert(ret >= 0);
 
 	data.type = GNUTLS_KEYGEN_DH;
 	data.data = (unsigned char *)dh_params;
@@ -63,12 +97,59 @@ static void genkey(const gnutls_dh_params_t dh_params, gnutls_datum_t *priv_key,
 	if (ret != 0)
 		fail("error\n");
 
-	ret = gnutls_privkey_export_dh_raw(privkey, NULL, NULL, NULL, pub_key,
-					   priv_key, 0);
-	if (ret != 0)
-		fail("error: %s\n", gnutls_strerror(ret));
+	ret = gnutls_pubkey_import_privkey(pubkey, privkey, 0, 0);
+	assert(ret >= 0);
 
+	/* Retrieve only private key */
+	ret = gnutls_privkey_export_dh_raw(privkey, NULL, NULL, &tmp, 0);
+	if (ret != 0) {
+		fail("unable to export private key: %s\n",
+		     gnutls_strerror(ret));
+	}
+	gnutls_free(tmp.data);
+
+	/* Retrieve DH params and private key */
+	ret = gnutls_dh_params_init(&dh_params_exported);
+	assert(ret >= 0);
+
+	ret = gnutls_privkey_export_dh_raw(privkey, dh_params_exported, NULL,
+					   &tmp, 0);
+	if (ret != 0) {
+		fail("unable to export private key: %s\n",
+		     gnutls_strerror(ret));
+	}
+	*priv_key = tmp;
+
+	if (!dh_params_equal(dh_params_exported, dh_params)) {
+		fail("error\n");
+	}
+
+	gnutls_dh_params_deinit(dh_params_exported);
+
+	/* Retrieve only public key */
+	ret = gnutls_pubkey_export_dh_raw(pubkey, NULL, &tmp, 0);
+	if (ret != 0) {
+		fail("unable to export public key: %s\n", gnutls_strerror(ret));
+	}
+	gnutls_free(tmp.data);
+
+	/* Retrieve DH params and public key */
+	ret = gnutls_dh_params_init(&dh_params_exported);
+	assert(ret >= 0);
+
+	ret = gnutls_pubkey_export_dh_raw(pubkey, dh_params_exported, &tmp, 0);
+	if (ret != 0) {
+		fail("unable to export public key: %s\n", gnutls_strerror(ret));
+	}
+	*pub_key = tmp;
+
+	if (!dh_params_equal(dh_params_exported, dh_params)) {
+		fail("error\n");
+	}
+
+	gnutls_dh_params_deinit(dh_params_exported);
 	gnutls_privkey_deinit(privkey);
+	gnutls_pubkey_deinit(pubkey);
 }
 
 static void compute_key(const char *name, const gnutls_dh_params_t dh_params,
@@ -82,34 +163,23 @@ static void compute_key(const char *name, const gnutls_dh_params_t dh_params,
 	int ret;
 	gnutls_privkey_t privkey;
 	gnutls_pubkey_t pubkey;
-	gnutls_datum_t prime, generator;
-	unsigned int bits;
 
 	ret = gnutls_privkey_init(&privkey);
-	if (ret != 0)
-		fail("error\n");
+	assert(ret >= 0);
 
-	ret = gnutls_dh_params_export_raw(dh_params, &prime, &generator, &bits);
-	if (ret != 0)
-		fail("error\n");
-
-	ret = gnutls_privkey_import_dh_raw(privkey, &prime, NULL, &generator,
-					   NULL, priv_key);
-	if (ret != 0)
-		fail("error\n");
+	ret = gnutls_privkey_import_dh_raw(privkey, dh_params, NULL, priv_key);
+	assert(ret >= 0);
 
 	ret = gnutls_pubkey_init(&pubkey);
-	if (ret != 0)
-		fail("error\n");
+	assert(ret >= 0);
 
-	ret = gnutls_pubkey_import_dh_raw(pubkey, &prime, NULL, &generator,
-					  pub_key);
-	if (ret != 0)
-		fail("error\n");
+	ret = gnutls_pubkey_import_dh_raw(pubkey, dh_params, pub_key);
+	assert(ret >= 0);
 
 	ret = gnutls_privkey_derive_secret(privkey, pubkey, NULL, &Z, 0);
-	if (ret != 0)
-		fail("error\n");
+	if (ret != 0) {
+		fail("unable to derive secret: %s\n", gnutls_strerror(ret));
+	}
 
 	if (result) {
 		success = (Z.size != result->size &&
@@ -118,8 +188,6 @@ static void compute_key(const char *name, const gnutls_dh_params_t dh_params,
 			fail("%s: failed to match result\n", name);
 	}
 	gnutls_free(Z.data);
-	gnutls_free(prime.data);
-	gnutls_free(generator.data);
 	gnutls_privkey_deinit(privkey);
 	gnutls_pubkey_deinit(pubkey);
 }

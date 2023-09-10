@@ -708,6 +708,7 @@ gnutls_pubkey_deinit@GNUTLS_3_4
 gnutls_pubkey_encrypt_data@GNUTLS_3_4
 gnutls_pubkey_export2@GNUTLS_3_4
 gnutls_pubkey_export@GNUTLS_3_4
+gnutls_pubkey_export_dh_raw@GNUTLS_3_8_2
 gnutls_pubkey_export_dsa_raw2@GNUTLS_3_6_0
 gnutls_pubkey_export_dsa_raw@GNUTLS_3_4
 gnutls_pubkey_export_ecc_raw2@GNUTLS_3_6_0
