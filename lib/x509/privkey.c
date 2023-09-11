@@ -1915,10 +1915,12 @@ int gnutls_x509_privkey_generate2(gnutls_x509_privkey_t key,
 	if (algo == GNUTLS_PK_DH && dh_params != NULL) {
 		key->params.params[DH_P] =
 			_gnutls_mpi_copy(dh_params->params[0]);
-		key->params.params[DH_Q] =
-			_gnutls_mpi_copy(dh_params->params[2]);
 		key->params.params[DH_G] =
 			_gnutls_mpi_copy(dh_params->params[1]);
+		if (dh_params->params[2]) {
+			key->params.params[DH_Q] =
+				_gnutls_mpi_copy(dh_params->params[2]);
+		}
 		/* X and Y will be added by _gnutls_pk_generate_keys */
 		key->params.params_nr = 3;
 		key->params.qbits = dh_params->q_bits;

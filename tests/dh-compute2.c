@@ -33,7 +33,8 @@
 #include "utils.h"
 
 static void params(gnutls_dh_params_t *dh_params, const gnutls_datum_t *p,
-		   const gnutls_datum_t *q, const gnutls_datum_t *g)
+		   const gnutls_datum_t *q, const gnutls_datum_t *g,
+		   int expect_error)
 {
 	int ret;
 
@@ -42,7 +43,7 @@ static void params(gnutls_dh_params_t *dh_params, const gnutls_datum_t *p,
 		fail("error\n");
 
 	ret = gnutls_dh_params_import_raw3(*dh_params, p, q, g);
-	if (ret != 0)
+	if (ret != expect_error)
 		fail("error\n");
 }
 
@@ -76,7 +77,7 @@ static bool dh_params_equal(const gnutls_dh_params_t a,
 }
 
 static void genkey(const gnutls_dh_params_t dh_params, gnutls_datum_t *priv_key,
-		   gnutls_datum_t *pub_key)
+		   gnutls_datum_t *pub_key, int expect_error)
 {
 	int ret;
 	gnutls_privkey_t privkey;
@@ -94,7 +95,7 @@ static void genkey(const gnutls_dh_params_t dh_params, gnutls_datum_t *priv_key,
 	data.type = GNUTLS_KEYGEN_DH;
 	data.data = (unsigned char *)dh_params;
 	ret = gnutls_privkey_generate2(privkey, GNUTLS_PK_DH, 0, 0, &data, 1);
-	if (ret != 0)
+	if (ret != expect_error)
 		fail("error\n");
 
 	ret = gnutls_pubkey_import_privkey(pubkey, privkey, 0, 0);
@@ -192,36 +193,57 @@ static void compute_key(const char *name, const gnutls_dh_params_t dh_params,
 	gnutls_pubkey_deinit(pubkey);
 }
 
+struct dh_test_data_expected {
+	int ret;
+	int fips_ret;
+	gnutls_fips140_operation_state_t state;
+};
+
 struct dh_test_data {
 	const char *name;
-	const gnutls_datum_t prime;
-	const gnutls_datum_t q;
-	const gnutls_datum_t generator;
+	const gnutls_datum_t *prime;
+	const gnutls_datum_t *q;
+	const gnutls_datum_t *generator;
 	const gnutls_datum_t peer_key;
-	int expected_error;
-	gnutls_fips140_operation_state_t fips_state_genkey;
-	gnutls_fips140_operation_state_t fips_state_compute_key;
+	struct dh_test_data_expected params_expected;
+	struct dh_test_data_expected genkey_expected;
+	struct dh_test_data_expected compute_key_expected;
 };
+
+static inline int get_expected(struct dh_test_data_expected *expected)
+{
+	return gnutls_fips140_mode_enabled() ? expected->fips_ret :
+					       expected->ret;
+}
 
 void doit(void)
 {
 	struct dh_test_data test_data[] = {
 		{
 			"Legal Input",
-			gnutls_ffdhe_2048_group_prime,
-			gnutls_ffdhe_2048_group_q,
-			gnutls_ffdhe_2048_group_generator,
+			&gnutls_ffdhe_2048_group_prime,
+			&gnutls_ffdhe_2048_group_q,
+			&gnutls_ffdhe_2048_group_generator,
 			{ (void *)"\x02", 1 },
-			0,
-			GNUTLS_FIPS140_OP_APPROVED,
-			GNUTLS_FIPS140_OP_APPROVED,
+			{ 0, 0, GNUTLS_FIPS140_OP_INITIAL },
+			{ 0, 0, GNUTLS_FIPS140_OP_APPROVED },
+			{ 0, 0, GNUTLS_FIPS140_OP_APPROVED },
+		},
+		{
+			"Legal Input without Q",
+			&gnutls_ffdhe_2048_group_prime,
+			NULL,
+			&gnutls_ffdhe_2048_group_generator,
+			{ (void *)"\x02", 1 },
+			{ 0, GNUTLS_E_DH_PRIME_UNACCEPTABLE,
+			  GNUTLS_FIPS140_OP_INITIAL },
 		},
 		{ NULL }
 	};
 
 	for (int i = 0; test_data[i].name != NULL; i++) {
-		gnutls_datum_t priv_key, pub_key;
-		gnutls_dh_params_t dh_params;
+		gnutls_datum_t priv_key = { NULL, 0 }, pub_key = { NULL, 0 };
+		gnutls_dh_params_t dh_params = NULL;
 		gnutls_fips140_context_t fips_context;
 		int ret;
 
@@ -232,26 +254,46 @@ void doit(void)
 			}
 		}
 
+		success("%s params\n", test_data[i].name);
+
 		fips_push_context(fips_context);
-		params(&dh_params, &test_data[i].prime, &test_data[i].q,
-		       &test_data[i].generator);
-		fips_pop_context(fips_context, GNUTLS_FIPS140_OP_INITIAL);
+		params(&dh_params, test_data[i].prime, test_data[i].q,
+		       test_data[i].generator,
+		       get_expected(&test_data[i].params_expected));
+		fips_pop_context(fips_context,
+				 test_data[i].params_expected.state);
+
+		if (get_expected(&test_data[i].params_expected) < 0) {
+			goto skip;
+		}
 
 		success("%s genkey\n", test_data[i].name);
 
 		fips_push_context(fips_context);
-		genkey(dh_params, &priv_key, &pub_key);
-		fips_pop_context(fips_context, test_data[i].fips_state_genkey);
+		genkey(dh_params, &priv_key, &pub_key,
+		       get_expected(&test_data[i].genkey_expected));
+		fips_pop_context(fips_context,
+				 test_data[i].genkey_expected.state);
+
+		if (get_expected(&test_data[i].genkey_expected) < 0) {
+			goto skip;
+		}
 
 		success("%s compute_key\n", test_data[i].name);
 
 		fips_push_context(fips_context);
 		compute_key(test_data[i].name, dh_params, &priv_key, &pub_key,
-			    &test_data[i].peer_key, test_data[i].expected_error,
+			    &test_data[i].peer_key,
+			    get_expected(&test_data[i].compute_key_expected),
 			    NULL, 0);
 		fips_pop_context(fips_context,
-				 test_data[i].fips_state_compute_key);
+				 test_data[i].compute_key_expected.state);
 
+		if (get_expected(&test_data[i].compute_key_expected) < 0) {
+			goto skip;
+		}
+
+	skip:
 		gnutls_dh_params_deinit(dh_params);
 		gnutls_free(priv_key.data);
 		gnutls_free(pub_key.data);
