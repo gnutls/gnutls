@@ -181,19 +181,44 @@ static int privkey_to_pubkey(gnutls_pk_algorithm_t pk,
 
 		break;
 	case GNUTLS_PK_DSA:
-		pub->params[0] = _gnutls_mpi_copy(priv->params[0]);
-		pub->params[1] = _gnutls_mpi_copy(priv->params[1]);
-		pub->params[2] = _gnutls_mpi_copy(priv->params[2]);
-		pub->params[3] = _gnutls_mpi_copy(priv->params[3]);
+		pub->params[DSA_P] = _gnutls_mpi_copy(priv->params[DSA_P]);
+		pub->params[DSA_Q] = _gnutls_mpi_copy(priv->params[DSA_Q]);
+		pub->params[DSA_G] = _gnutls_mpi_copy(priv->params[DSA_G]);
+		pub->params[DSA_Y] = _gnutls_mpi_copy(priv->params[DSA_Y]);
 
 		pub->params_nr = DSA_PUBLIC_PARAMS;
 
-		if (pub->params[0] == NULL || pub->params[1] == NULL ||
-		    pub->params[2] == NULL || pub->params[3] == NULL) {
+		if (pub->params[DSA_P] == NULL || pub->params[DSA_Q] == NULL ||
+		    pub->params[DSA_G] == NULL || pub->params[DSA_Y] == NULL) {
 			gnutls_assert();
 			ret = GNUTLS_E_MEMORY_ERROR;
 			goto cleanup;
 		}
+
+		break;
+	case GNUTLS_PK_DH:
+		pub->params[DH_P] = _gnutls_mpi_copy(priv->params[DH_P]);
+		pub->params[DH_G] = _gnutls_mpi_copy(priv->params[DH_G]);
+		pub->params[DH_Y] = _gnutls_mpi_copy(priv->params[DH_Y]);
+
+		if (pub->params[DH_P] == NULL || pub->params[DH_G] == NULL ||
+		    pub->params[DH_Y] == NULL) {
+			gnutls_assert();
+			ret = GNUTLS_E_MEMORY_ERROR;
+			goto cleanup;
+		}
+
+		if (priv->params[DH_Q]) {
+			pub->params[DH_Q] =
+				_gnutls_mpi_copy(priv->params[DH_Q]);
+			if (pub->params[DH_Q] == NULL) {
+				gnutls_assert();
+				ret = GNUTLS_E_MEMORY_ERROR;
+				goto cleanup;
+			}
+		}
+
+		pub->params_nr = DH_PUBLIC_PARAMS;
 
 		break;
 	case GNUTLS_PK_ECDSA:
@@ -546,7 +571,7 @@ int gnutls_privkey_import_pkcs11(gnutls_privkey_t pkey,
  * @key: A key of type #gnutls_pubkey_t
  * @url: A PKCS 11 url
  *
- * This function will import a PKCS 11 private key to a #gnutls_private_key_t
+ * This function will import a PKCS 11 private key to a #gnutls_privkey_t
  * type.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a

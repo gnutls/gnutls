@@ -23,6 +23,7 @@ See the end for copying conditions.
 ** API and ABI modifications:
 gnutls_pubkey_import_dh_raw: New function
 gnutls_privkey_import_dh_raw: New function
+gnutls_pubkey_export_dh_raw: New function
 gnutls_privkey_export_dh_raw: New function
 gnutls_x509_privkey_import_dh_raw: New function
 gnutls_privkey_derive_secret: New function

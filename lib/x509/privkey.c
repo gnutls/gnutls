@@ -1074,9 +1074,7 @@ cleanup:
 /**
  * gnutls_x509_privkey_import_dh_raw:
  * @key: The data to store the parsed key
- * @p: holds the p
- * @q: holds the q (optional)
- * @g: holds the g
+ * @params: holds the %gnutls_dh_params_t
  * @y: holds the y (optional)
  * @x: holds the x
  *
@@ -1088,42 +1086,24 @@ cleanup:
  *   negative error value.
  **/
 int gnutls_x509_privkey_import_dh_raw(gnutls_x509_privkey_t key,
-				      const gnutls_datum_t *p,
-				      const gnutls_datum_t *q,
-				      const gnutls_datum_t *g,
+				      const gnutls_dh_params_t params,
 				      const gnutls_datum_t *y,
 				      const gnutls_datum_t *x)
 {
 	int ret;
 
-	if (unlikely(key == NULL || p == NULL || g == NULL || x == NULL)) {
+	if (unlikely(key == NULL || params == NULL || x == NULL)) {
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
 
 	gnutls_pk_params_init(&key->params);
 
-	if (_gnutls_mpi_init_scan_nz(&key->params.params[DH_P], p->data,
-				     p->size)) {
-		gnutls_assert();
-		ret = GNUTLS_E_MPI_SCAN_FAILED;
-		goto cleanup;
+	key->params.params[DH_P] = _gnutls_mpi_copy(params->params[0]);
+	key->params.params[DH_G] = _gnutls_mpi_copy(params->params[1]);
+	if (params->params[2]) {
+		key->params.params[DH_Q] = _gnutls_mpi_copy(params->params[2]);
 	}
-
-	if (q) {
-		if (_gnutls_mpi_init_scan_nz(&key->params.params[DH_Q], q->data,
-					     q->size)) {
-			gnutls_assert();
-			ret = GNUTLS_E_MPI_SCAN_FAILED;
-			goto cleanup;
-		}
-	}
-
-	if (_gnutls_mpi_init_scan_nz(&key->params.params[DH_G], g->data,
-				     g->size)) {
-		gnutls_assert();
-		ret = GNUTLS_E_MPI_SCAN_FAILED;
-		goto cleanup;
-	}
+	key->params.qbits = params->q_bits;
 
 	if (y) {
 		if (_gnutls_mpi_init_scan_nz(&key->params.params[DH_Y], y->data,
@@ -1935,12 +1915,15 @@ int gnutls_x509_privkey_generate2(gnutls_x509_privkey_t key,
 	if (algo == GNUTLS_PK_DH && dh_params != NULL) {
 		key->params.params[DH_P] =
 			_gnutls_mpi_copy(dh_params->params[0]);
-		key->params.params[DH_Q] =
-			_gnutls_mpi_copy(dh_params->params[2]);
 		key->params.params[DH_G] =
 			_gnutls_mpi_copy(dh_params->params[1]);
+		if (dh_params->params[2]) {
+			key->params.params[DH_Q] =
+				_gnutls_mpi_copy(dh_params->params[2]);
+		}
 		/* X and Y will be added by _gnutls_pk_generate_keys */
 		key->params.params_nr = 3;
+		key->params.qbits = dh_params->q_bits;
 	} else {
 		ret = _gnutls_pk_generate_params(algo, bits, &key->params);
 		if (ret < 0) {

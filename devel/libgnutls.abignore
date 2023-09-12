@@ -77,6 +77,9 @@ name = gnutls_pubkey_import_dh_raw
 name = gnutls_privkey_import_dh_raw
 
 [suppress_function]
+name = gnutls_pubkey_export_dh_raw
+
+[suppress_function]
 name = gnutls_privkey_export_dh_raw
 
 [suppress_function]

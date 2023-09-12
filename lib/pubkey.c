@@ -1074,6 +1074,65 @@ int gnutls_pubkey_export_dsa_raw2(gnutls_pubkey_t key, gnutls_datum_t *p,
 }
 
 /**
+ * gnutls_pubkey_export_dh_raw:
+ * @key: Holds the public key
+ * @params: will hold the Diffie-Hellman parameter (optional), must be initialized
+ * @y: will hold the y
+ * @flags: flags from %gnutls_abstract_export_flags_t
+ *
+ * This function will export the Diffie-Hellman public key parameter
+ * found in the given public key.  The new parameter will be allocated
+ * using gnutls_malloc() and will be stored in the appropriate datum.
+ *
+ * To retrieve other parameters common in both public key and private
+ * key, use gnutls_dh_params_export_raw().
+ *
+ * This function allows for %NULL parameters since 3.4.1.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
+ *
+ * Since: 3.8.2
+ **/
+int gnutls_pubkey_export_dh_raw(gnutls_pubkey_t key, gnutls_dh_params_t params,
+				gnutls_datum_t *y, unsigned flags)
+{
+	int ret;
+	mpi_dprint_func dprint = _gnutls_mpi_dprint_lz;
+
+	if (flags & GNUTLS_EXPORT_FLAG_NO_LZ) {
+		dprint = _gnutls_mpi_dprint;
+	}
+
+	if (key == NULL) {
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
+
+	if (key->params.algo != GNUTLS_PK_DH) {
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
+
+	if (params) {
+		params->params[0] = _gnutls_mpi_copy(key->params.params[DH_P]);
+		params->params[1] = _gnutls_mpi_copy(key->params.params[DH_G]);
+		if (key->params.params[DH_Q]) {
+			params->params[2] =
+				_gnutls_mpi_copy(key->params.params[DH_Q]);
+		}
+		params->q_bits = key->params.qbits;
+	}
+
+	/* Y */
+	if (y) {
+		ret = dprint(key->params.params[DH_Y], y);
+		if (ret < 0) {
+			return gnutls_assert_val(ret);
+		}
+	}
+
+	return 0;
+}
+
+/**
  * gnutls_pubkey_export_ecc_raw:
  * @key: Holds the public key
  * @curve: will hold the curve (may be %NULL)
@@ -1948,9 +2007,7 @@ cleanup:
 /**
  * gnutls_pubkey_import_dh_raw:
  * @key: The structure to store the parsed key
- * @p: holds the p
- * @q: holds the q (optional)
- * @g: holds the g
+ * @params: holds the %gnutls_dh_params_t
  * @y: holds the y
  *
  * This function will convert the given Diffie-Hellman raw parameters
@@ -1962,42 +2019,25 @@ cleanup:
  *
  * Since: 3.8.2
  **/
-int gnutls_pubkey_import_dh_raw(gnutls_pubkey_t key, const gnutls_datum_t *p,
-				const gnutls_datum_t *q,
-				const gnutls_datum_t *g,
+int gnutls_pubkey_import_dh_raw(gnutls_pubkey_t key,
+				const gnutls_dh_params_t params,
 				const gnutls_datum_t *y)
 {
 	int ret;
 
-	if (unlikely(key == NULL || p == NULL || g == NULL || y == NULL)) {
+	if (unlikely(key == NULL || params == NULL || y == NULL)) {
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
 
 	gnutls_pk_params_release(&key->params);
 	gnutls_pk_params_init(&key->params);
 
-	if (_gnutls_mpi_init_scan_nz(&key->params.params[DH_P], p->data,
-				     p->size)) {
-		gnutls_assert();
-		ret = GNUTLS_E_MPI_SCAN_FAILED;
-		goto cleanup;
+	key->params.params[DH_P] = _gnutls_mpi_copy(params->params[0]);
+	key->params.params[DH_G] = _gnutls_mpi_copy(params->params[1]);
+	if (params->params[2]) {
+		key->params.params[DH_Q] = _gnutls_mpi_copy(params->params[2]);
 	}
-
-	if (q) {
-		if (_gnutls_mpi_init_scan_nz(&key->params.params[DH_Q], q->data,
-					     q->size)) {
-			gnutls_assert();
-			ret = GNUTLS_E_MPI_SCAN_FAILED;
-			goto cleanup;
-		}
-	}
-
-	if (_gnutls_mpi_init_scan_nz(&key->params.params[DH_G], g->data,
-				     g->size)) {
-		gnutls_assert();
-		ret = GNUTLS_E_MPI_SCAN_FAILED;
-		goto cleanup;
-	}
+	key->params.qbits = params->q_bits;
 
 	if (_gnutls_mpi_init_scan_nz(&key->params.params[DH_Y], y->data,
 				     y->size)) {
