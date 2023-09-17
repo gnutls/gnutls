@@ -681,7 +681,7 @@ static int get_packet_from_buffers(gnutls_session_t session,
 	return 0;
 }
 
-/* Here we check if the advertized version is the one we
+/* Here we check if the advertised version is the one we
  * negotiated in the handshake.
  */
 inline static int record_check_version(gnutls_session_t session,
@@ -1201,7 +1201,7 @@ static int recv_headers(gnutls_session_t session,
 	if ((ret = check_recv_type(session, record->type)) < 0)
 		return gnutls_assert_val(ret);
 
-	/* Here we check if the advertized version is the one we
+	/* Here we check if the advertised version is the one we
 	 * negotiated in the handshake.
 	 */
 	if ((ret = record_check_version(session, htype, record->version)) < 0)

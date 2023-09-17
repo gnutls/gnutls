@@ -1790,7 +1790,7 @@ static unsigned check_server_dh_params(gnutls_session_t session,
 	}
 
 	if (session->internals.hsk_flags & HSK_HAVE_FFDHE) {
-		/* if the client has advertized FFDHE then it doesn't matter
+		/* if the client has advertised FFDHE then it doesn't matter
 		 * whether we have server DH parameters. They are no good. */
 		gnutls_assert();
 		return 0;

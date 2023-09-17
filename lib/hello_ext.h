@@ -158,7 +158,7 @@ typedef struct hello_ext_entry_st {
 
 /* Checks if the extension @id provided has been requested
  * by us (in client side).In server side it checks whether this
- * extension was advertized by the client.
+ * extension was advertised by the client.
  *
  * It returns non-zero for true, otherwise zero.
  */

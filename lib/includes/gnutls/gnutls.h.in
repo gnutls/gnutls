@@ -467,7 +467,7 @@ typedef enum {
  *   For example (ECDH + x25519). This is the default.
  * @GNUTLS_KEY_SHARE_TOP: Generate key share for the first group which is enabled.
  *   For example x25519. This option is the most performant for client (less CPU spent
- *   generating keys), but if the server doesn't support the advertized option it may
+ *   generating keys), but if the server doesn't support the advertised option it may
  *   result to more roundtrips needed to discover the server's choice.
  * @GNUTLS_NO_AUTO_REKEY: Disable auto-rekeying under TLS1.3. If this option is not specified
  *   gnutls will force a rekey after 2^24 records have been sent.
