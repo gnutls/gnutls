@@ -34,7 +34,7 @@ fi
 
 . ${srcdir}/../scripts/common.sh
 
-#check whether a different PKCS #1 signature than the advertized in certificate is tolerated
+#check whether a different PKCS #1 signature than the advertised in certificate is tolerated
 ${VALGRIND} "${CERTTOOL}" -e --infile "${srcdir}/data/invalid-sig.pem"
 rc=$?
 

@@ -64,7 +64,7 @@ void _gnutls_x509_privkey_reinit(gnutls_x509_privkey_t key)
 {
 	gnutls_pk_params_clear(&key->params);
 	gnutls_pk_params_release(&key->params);
-	/* avoid re-use of fields which may have had some sensible value */
+	/* avoid reuse of fields which may have had some sensible value */
 	zeroize_key(&key->params, sizeof(key->params));
 
 	if (key->key)

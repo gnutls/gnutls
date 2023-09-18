@@ -1600,7 +1600,7 @@ static int aead_cipher_encryptv2_fallback(gnutls_aead_cipher_hd_t handle,
 		}
 
 		/* We must set ptext_data after the above
-		 * grow/append opereations, otherwise it will point to an invalid pointer after realloc.
+		 * grow/append operations, otherwise it will point to an invalid pointer after realloc.
 		 */
 		ptext_data = (uint8_t *)ptext.data + _tag_size;
 		ptext_size = ptext.length - _tag_size;
@@ -1619,7 +1619,7 @@ static int aead_cipher_encryptv2_fallback(gnutls_aead_cipher_hd_t handle,
 		}
 
 		/* We must set ptext_data after the above
-		 * grow/append opereations, otherwise it will point to an invalid pointer after realloc.
+		 * grow/append operations, otherwise it will point to an invalid pointer after realloc.
 		 */
 		ptext_data = ptext.data;
 		ptext_size = ptext.length;
@@ -1837,7 +1837,7 @@ static int aead_cipher_decryptv2_fallback(gnutls_aead_cipher_hd_t handle,
 		}
 
 		/* We must set ctext_data after the above
-		 * grow/append opereations, otherwise it will point to an invalid pointer after realloc.
+		 * grow/append operations, otherwise it will point to an invalid pointer after realloc.
 		 */
 		ctext_data = (uint8_t *)ctext.data + tag_size;
 	} else {
@@ -1857,7 +1857,7 @@ static int aead_cipher_decryptv2_fallback(gnutls_aead_cipher_hd_t handle,
 		ctext.length += tag_size;
 
 		/* We must set ctext_data after the above
-		 * grow/append opereations, otherwise it will point to an invalid pointer after realloc.
+		 * grow/append operations, otherwise it will point to an invalid pointer after realloc.
 		 */
 		ctext_data = ctext.data;
 	}

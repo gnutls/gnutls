@@ -1851,7 +1851,7 @@ static int ext_hook_func(void *ctx, unsigned tls_id,
                          const unsigned char *data, unsigned size)
 @{
 	if (tls_id == 0) @{ /* server name */
-		/* figure the advertized name - the following hack
+		/* figure the advertised name - the following hack
                  * relies on the fact that this extension only supports
                  * DNS names, and due to a protocol bug cannot be extended
                  * to support anything else. */
@@ -2119,7 +2119,7 @@ The re-authentication process, allows the connected client to switch
 identity by presenting a new certificate. Unlike TLS 1.2, the server
 is not allowed to change identities. That client re-authentication, or
 post-handshake authentication can be initiated only by the server using
-@funcref{gnutls_reauth}, and only if a client has advertized support for it.
+@funcref{gnutls_reauth}, and only if a client has advertised support for it.
 Both server and client have to explicitly enable support for post handshake
 authentication using the @code{GNUTLS_POST_HANDSHAKE_AUTH} flag at @funcref{gnutls_init}.
 

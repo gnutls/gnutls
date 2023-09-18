@@ -823,7 +823,7 @@ cleanup:
  * PKIX - certificate chain - verification. To be run independently
  * the %DANE_VFLAG_ONLY_CHECK_EE_USAGE flag should be specified;
  * then the function will check whether the key of the peer matches the
- * key advertized in the DANE entry.
+ * key advertised in the DANE entry.
  *
  * Returns: a negative error code on error and %DANE_E_SUCCESS (0)
  * when the DANE entries were successfully parsed, irrespective of

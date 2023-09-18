@@ -1304,7 +1304,7 @@ typedef struct {
 		*auth_struct; /* used in handshake packets and KX algorithms */
 
 	/* this is the highest version available
-	 * to the peer. (advertized version).
+	 * to the peer. (advertised version).
 	 * This is obtained by the Handshake Client Hello
 	 * message. (some implementations read the Record version)
 	 */
@@ -1470,7 +1470,7 @@ typedef struct {
 #define HSK_KEY_UPDATE_ASKED (1 << 7) /* flag is not used during handshake */
 #define HSK_FALSE_START_USED (1 << 8) /* TLS1.2 only */
 #define HSK_HAVE_FFDHE \
-	(1 << 9) /* whether the peer has advertized at least an FFDHE group */
+	(1 << 9) /* whether the peer has advertised at least an FFDHE group */
 #define HSK_USED_FFDHE \
 	(1 << 10) /* whether ffdhe was actually negotiated and used */
 #define HSK_PSK_KE_MODES_SENT (1 << 11)

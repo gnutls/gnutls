@@ -460,7 +460,7 @@ int _gnutls_negotiate_version(gnutls_session_t session, uint8_t major,
 	const version_entry_st *aversion = nversion_to_entry(major, minor);
 
 	/* if we do not support that version, unless that version is TLS 1.2;
-	 * TLS 1.2 is handled separately because it is always advertized under TLS 1.3 or later */
+	 * TLS 1.2 is handled separately because it is always advertised under TLS 1.3 or later */
 	if (aversion == NULL ||
 	    _gnutls_nversion_is_supported(session, major, minor) == 0) {
 		if (aversion && aversion->id == GNUTLS_TLS1_2) {
@@ -2206,7 +2206,7 @@ static int send_client_hello(gnutls_session_t session, int again)
 		/* if we are replying to an HRR the version is already negotiated */
 		if (!(session->internals.hsk_flags & HSK_HRR_RECEIVED) ||
 		    !get_version(session)) {
-			/* Set the version we advertized as maximum
+			/* Set the version we advertised as maximum
 			 * (RSA uses it). */
 			set_adv_version(session, hver->major, hver->minor);
 			if (_gnutls_set_current_version(session, hver->id) <

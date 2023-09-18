@@ -135,7 +135,7 @@ indication of the peer's identity.  This kind of authentication
 is vulnerable to a man in the middle attack, but can be
 used even if there is no prior communication or shared trusted parties 
 with the peer. It is useful to establish a session over which certificate
-authentication will occur in order to hide the indentities of the participants
+authentication will occur in order to hide the identities of the participants
 from passive eavesdroppers. It is only available under TLS 1.2 or earlier
 versions.
 

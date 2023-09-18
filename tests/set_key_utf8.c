@@ -150,7 +150,7 @@ static void auto_parse(void)
 		      "xn--fiqu1az03c18t.xn--mxah1amo.com", NULL, NULL,
 		      NULL); /* its IDNA equivalent */
 
-	/* the raw DNS should result to verification failure as the advertized name should
+	/* the raw DNS should result to verification failure as the advertised name should
 	 * not be considered and the first cert should be provided */
 	test_cli_serv_expect(x509_cred, clicred, "NORMAL", "NORMAL",
 			     "raw:简体中文.εξτρα.com",

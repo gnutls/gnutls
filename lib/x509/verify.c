@@ -664,7 +664,7 @@ static unsigned verify_crt(gnutls_x509_trust_list_t tlist,
 
 	if (vparams->max_path == 0) {
 		MARK_INVALID(GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE);
-		/* bail immediately, to avoid inconistency  */
+		/* bail immediately, to avoid inconsistency  */
 		goto cleanup;
 	}
 	vparams->max_path--;
