@@ -35,6 +35,7 @@
 #include <gnutls/x509.h>
 #include <gnutls/abstract.h>
 #include <gnutls/pkcs11.h>
+#include <p11-kit/pkcs11.h>
 
 #ifdef _WIN32
 
@@ -133,6 +134,8 @@ void doit(void)
 		exit(1);
 	}
 
+	success("generated RSA key\n");
+
 	assert(gnutls_pkcs11_obj_init(&obj) >= 0);
 	assert(out.size > 0);
 
@@ -160,6 +163,8 @@ void doit(void)
 		exit(1);
 	}
 
+	success("generated RSA key (non-sensitive)\n");
+
 	assert(gnutls_pkcs11_obj_init(&obj) >= 0);
 	assert(out.size > 0);
 
@@ -175,6 +180,40 @@ void doit(void)
 
 	gnutls_free(out.data);
 	gnutls_pkcs11_obj_deinit(obj);
+
+#ifdef CKM_EC_EDWARDS_KEY_PAIR_GEN
+	ret = gnutls_pkcs11_token_check_mechanism(
+		"pkcs11:token=test", CKM_EC_EDWARDS_KEY_PAIR_GEN, NULL, 0, 0);
+	if (ret != 0) {
+		ret = gnutls_pkcs11_privkey_generate3(
+			"pkcs11:token=test", GNUTLS_PK_EDDSA_ED25519, 256,
+			"testkey-ed25519", NULL, GNUTLS_X509_FMT_DER, &out, 0,
+			GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
+		if (ret < 0) {
+			fail("%d: %s\n", ret, gnutls_strerror(ret));
+			exit(1);
+		}
+
+		success("generated Ed25519 key\n");
+
+		assert(gnutls_pkcs11_obj_init(&obj) >= 0);
+		assert(out.size > 0);
+
+		gnutls_pkcs11_obj_set_pin_function(obj, pin_func, NULL);
+		assert(gnutls_pkcs11_obj_import_url(
+			       obj,
+			       "pkcs11:token=test;object=testkey-ed25519;type=private",
+			       GNUTLS_PKCS11_OBJ_FLAG_LOGIN) >= 0);
+
+		assert(gnutls_pkcs11_obj_get_flags(obj, &flags) >= 0);
+
+		assert(!(flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_SENSITIVE));
+		assert(flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE);
+
+		gnutls_free(out.data);
+		gnutls_pkcs11_obj_deinit(obj);
+	}
+#endif
 
 	gnutls_pkcs11_deinit();
 	gnutls_global_deinit();

@@ -1883,7 +1883,7 @@ int pkcs11_read_pubkey(struct ck_function_list *module, ck_session_handle_t pks,
 		}
 
 		break;
-#ifdef HAVE_CKM_EDDSA
+#ifdef HAVE_PKCS11_EDDSA
 	case CKK_EC_EDWARDS:
 		a[0].type = CKA_EC_PARAMS;
 		a[0].value = tmp1;

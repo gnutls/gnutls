@@ -934,7 +934,7 @@ int gnutls_pkcs11_copy_x509_privkey2(const char *token_url,
 
 		break;
 	}
-#ifdef HAVE_CKM_EDDSA
+#ifdef HAVE_PKCS11_EDDSA
 	case GNUTLS_PK_EDDSA_ED25519: {
 		ret = _gnutls_x509_write_ecc_params(key->params.curve, &p);
 		if (ret < 0) {
