@@ -29,8 +29,8 @@
 #include <x509/x509_int.h>
 
 /* Part of PKCS#11 3.0 interface, which was added in p11-kit 0.23.14 */
-#ifdef CKM_EDDSA
-#define HAVE_CKM_EDDSA
+#if defined(CKM_EDDSA) && defined(CKM_EC_EDWARDS_KEY_PAIR_GEN)
+#define HAVE_PKCS11_EDDSA
 #endif
 
 #define PKCS11_ID_SIZE 128
@@ -246,7 +246,7 @@ static inline int pk_to_mech(gnutls_pk_algorithm_t pk)
 		return CKM_RSA_PKCS;
 	else if (pk == GNUTLS_PK_RSA_PSS)
 		return CKM_RSA_PKCS_PSS;
-#ifdef HAVE_CKM_EDDSA
+#ifdef HAVE_PKCS11_EDDSA
 	else if (pk == GNUTLS_PK_EDDSA_ED25519)
 		return CKM_EDDSA;
 #endif
@@ -262,7 +262,7 @@ static inline int pk_to_key_type(gnutls_pk_algorithm_t pk)
 		return CKK_ECDSA;
 	else if (pk == GNUTLS_PK_RSA_PSS || pk == GNUTLS_PK_RSA)
 		return CKK_RSA;
-#ifdef HAVE_CKM_EDDSA
+#ifdef HAVE_PKCS11_EDDSA
 	else if (pk == GNUTLS_PK_EDDSA_ED25519)
 		return CKK_EC_EDWARDS;
 #endif
@@ -278,7 +278,7 @@ static inline gnutls_pk_algorithm_t key_type_to_pk(ck_key_type_t m)
 		return GNUTLS_PK_DSA;
 	else if (m == CKK_ECDSA)
 		return GNUTLS_PK_EC;
-#ifdef HAVE_CKM_EDDSA
+#ifdef HAVE_PKCS11_EDDSA
 	else if (m == CKK_EC_EDWARDS)
 		return GNUTLS_PK_EDDSA_ED25519;
 #endif
@@ -297,10 +297,10 @@ static inline int pk_to_genmech(gnutls_pk_algorithm_t pk, ck_key_type_t *type)
 	} else if (pk == GNUTLS_PK_RSA_PSS || pk == GNUTLS_PK_RSA) {
 		*type = CKK_RSA;
 		return CKM_RSA_PKCS_KEY_PAIR_GEN;
-#ifdef HAVE_CKM_EDDSA
+#ifdef HAVE_PKCS11_EDDSA
 	} else if (pk == GNUTLS_PK_EDDSA_ED25519) {
 		*type = CKK_EC_EDWARDS;
-		return CKM_EDDSA;
+		return CKM_EC_EDWARDS_KEY_PAIR_GEN;
 #endif
 	} else {
 		*type = -1;
