@@ -36,7 +36,8 @@
  * IPv4 server (SAN: IPAddr: 127.0.0.1): server_ca3_ipaddr_cert, server_ca3_key
  * IPv4 server (RSA-PSS, SAN: localhost IPAddr: 127.0.0.1): server_ca3_rsa_pss_cert, server_ca3_rsa_pss_key
  * IPv4 server (RSA-PSS key, SAN: localhost IPAddr: 127.0.0.1): server_ca3_rsa_pss2_cert, server_ca3_rsa_pss2_key
- * IPv4 server (EdDSA, SAN: localhost IPAddr: 127.0.0.1): server_ca3_eddsa_cert, server_ca3_eddsa_key
+ * IPv4 server (Ed25519, SAN: localhost IPAddr: 127.0.0.1): server_ca3_eddsa_cert, server_ca3_eddsa_key
+ * IPv4 server (Ed448, SAN: localhost IPAddr: 127.0.0.1): server_ca3_ed448_cert, server_ca3_ed448_key
  * IPv4 server (GOST R 34.10-2001, SAN: localhost): server_ca3_gost01_cert, server_ca3_gost01_key
  * IPv4 server (GOST R 34.10-2012-256, SAN: localhost): server_ca3_gost12-256_cert, server_ca3_gost12-256_key
  * IPv4 server (GOST R 34.10-2012-512, SAN: localhost): server_ca3_gost12-512_cert, server_ca3_gost12-512_key
@@ -349,7 +350,7 @@ static unsigned char ca2_cert_pem[] =
 
 const gnutls_datum_t ca2_cert = { ca2_cert_pem, sizeof(ca2_cert_pem) - 1 };
 
-static unsigned char cert_pem[] =
+static unsigned char cli_cert_pem[] =
 	"-----BEGIN CERTIFICATE-----\n"
 	"MIICHjCCAYmgAwIBAgIERiYdNzALBgkqhkiG9w0BAQUwGTEXMBUGA1UEAxMOR251\n"
 	"VExTIHRlc3QgQ0EwHhcNMDcwNDE4MTMyOTI3WhcNMDgwNDE3MTMyOTI3WjAdMRsw\n"
@@ -364,9 +365,9 @@ static unsigned char cert_pem[] =
 	"U7jyOsBJ44SEQITbin2yUeJMIm1tievvdNXBDfW95AM507ShzP12sfiJkJfjjdhy\n"
 	"dc8Siq5JojruiMizAf0pA7in\n"
 	"-----END CERTIFICATE-----\n";
-const gnutls_datum_t cli_cert = { cert_pem, sizeof(cert_pem) - 1 };
+const gnutls_datum_t cli_cert = { cli_cert_pem, sizeof(cli_cert_pem) - 1 };
 
-static unsigned char key_pem[] =
+static unsigned char cli_key_pem[] =
 	"-----BEGIN RSA PRIVATE KEY-----\n"
 	"MIICXAIBAAKBgQC7ZkP18sXXtozMxd/1iDuxyUtqDqGtIFBACIChT1yj0Phsz+Y8\n"
 	"9+wEdhMXi2SJIlvA3VN8O+18BLuAuSi+jpvGjqClEsv1Vx6i57u3M0mf47tKrmpN\n"
@@ -382,7 +383,7 @@ static unsigned char key_pem[] =
 	"/iVX2cmMTSh3w3z8MaECQEp0XJWDVKOwcTW6Ajp9SowtmiZ3YDYo1LF9igb4iaLv\n"
 	"sWZGfbnU3ryjvkb6YuFjgtzbZDZHWQCo8/cOtOBmPdk=\n"
 	"-----END RSA PRIVATE KEY-----\n";
-const gnutls_datum_t cli_key = { key_pem, sizeof(key_pem) - 1 };
+const gnutls_datum_t cli_key = { cli_key_pem, sizeof(cli_key_pem) - 1 };
 
 static char dsa_key_pem[] =
 	"-----BEGIN DSA PRIVATE KEY-----\n"
@@ -1079,6 +1080,42 @@ static char server_ca3_eddsa_cert_pem[] =
 const gnutls_datum_t server_ca3_eddsa_cert = {
 	(unsigned char *)server_ca3_eddsa_cert_pem,
 	sizeof(server_ca3_eddsa_cert_pem) - 1
+};
+
+/* server Ed448 key */
+static char server_ca3_ed448_key_pem[] =
+	"-----BEGIN PRIVATE KEY-----\n"
+	"MEcCAQAwBQYDK2VxBDsEOXPoCtsxxy7itrHfeuQ2bG7oh3uerkBwhabkeSsNFYoS\n"
+	"QYy6KKYld8lnhlYQQmMo6lx28x9GmpTiag==\n"
+	"-----END PRIVATE KEY-----\n";
+
+const gnutls_datum_t server_ca3_ed448_key = {
+	(unsigned char *)server_ca3_ed448_key_pem,
+	sizeof(server_ca3_ed448_key_pem) - 1
+};
+
+static char server_ca3_ed448_cert_pem[] =
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIICqzCCAROgAwIBAgIUAvQ9bcei1eNZ9viV1kP7MKODp9YwDQYJKoZIhvcNAQEL\n"
+	"BQAwDzENMAsGA1UEAxMEQ0EtMzAgFw0yMzA5MjgwNjU1NThaGA85OTk5MTIzMTIz\n"
+	"NTk1OVowDTELMAkGA1UEBhMCR1IwQzAFBgMrZXEDOgAYxZxGeKtoWUL20zvrFClm\n"
+	"irhECIIdccq6x0uZccYHfmRVkFoUI7iOFj6Mlsp5vg24XZ2tGF5MBACjYDBeMAwG\n"
+	"A1UdEwEB/wQCMAAwDgYDVR0PAQH/BAQDAgeAMB0GA1UdDgQWBBTYq6RhA2qMWmYM\n"
+	"UAEx3AlNSnhWHDAfBgNVHSMEGDAWgBT5qIYZY7akFBNgdg8BmjU27/G0rzANBgkq\n"
+	"hkiG9w0BAQsFAAOCAYEAhEd0coRahGvMx8gLS8biuaqh50+9RJIjMpf+/0IQJ4DV\n"
+	"FHT5E70YyaQ0YOsvyxGa04d+KyhdVLppD1pDztLGXYZWxzmowopwpgnpPNT25M+0\n"
+	"aQOvCZZvRlqmwgUiRXdhSxqPsUj/73uUBPIjFknrxajoox7sOLris9ujmidqgBGa\n"
+	"H1FVbQQQgDOBCKcKXTAllVKzS/ZLwlRHibbm+4UDxGk1tJv1dbnQhJk0FYSQZn3h\n"
+	"ZVmSSfP4ZB+U+lsCshypBJ9qVZEqMM2b4m1wv/VAOuw0lGA2SiPub5q91hFYRdeL\n"
+	"9FB78/WlrSCTbGeMzzDPXBf/Y2KvFAv3o7K0tsMg1vBsDJBARHEzo4GMRsYDZzvI\n"
+	"JXb5tSmJOi/PBfup8GPiG0WbZV9nuvW8V/zmfaP3s9YBfYOtL/+nZch9VdSee2xp\n"
+	"T8arukB/s2jLaXQUduD3hoFvFNgCvWJwAWQWNNyHN3ivArqNQpfl2Gtftmb6xCdW\n"
+	"Xwt1/q2XKqqLpnF1N2wU\n"
+	"-----END CERTIFICATE-----\n";
+
+const gnutls_datum_t server_ca3_ed448_cert = {
+	(unsigned char *)server_ca3_ed448_cert_pem,
+	sizeof(server_ca3_ed448_cert_pem) - 1
 };
 
 static char server_ca3_gost01_key_pem[] =

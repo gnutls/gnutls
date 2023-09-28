@@ -98,8 +98,7 @@ static void generate_keypair(gnutls_pk_algorithm_t algo, size_t bits,
 		fail("%d: %s\n", ret, gnutls_strerror(ret));
 	}
 
-	success("generated %s key (%s)\n",
-		gnutls_pk_get_name(algo),
+	success("generated %s key (%s)\n", gnutls_pk_get_name(algo),
 		sensitive ? "sensitive" : "non sensitive");
 
 	assert(gnutls_pkcs11_obj_init(&obj) >= 0);
@@ -131,6 +130,9 @@ void doit(void)
 	char buf[128];
 	int ret;
 	const char *lib, *bin;
+#ifdef CKM_EC_EDWARDS_KEY_PAIR_GEN
+	CK_MECHANISM_INFO minfo;
+#endif
 
 	if (gnutls_fips140_mode_enabled())
 		exit(77);
@@ -174,13 +176,20 @@ void doit(void)
 	generate_keypair(GNUTLS_PK_RSA, 2048, "rsa-non-sensitive", false);
 
 #ifdef CKM_EC_EDWARDS_KEY_PAIR_GEN
-	ret = gnutls_pkcs11_token_check_mechanism(
-		"pkcs11:token=test", CKM_EC_EDWARDS_KEY_PAIR_GEN, NULL, 0, 0);
+	ret = gnutls_pkcs11_token_check_mechanism("pkcs11:token=test",
+						  CKM_EC_EDWARDS_KEY_PAIR_GEN,
+						  &minfo, sizeof(minfo), 0);
 	if (ret != 0) {
 		generate_keypair(GNUTLS_PK_EDDSA_ED25519, 256,
 				 "ed25519-sensitive", true);
 		generate_keypair(GNUTLS_PK_EDDSA_ED25519, 256,
 				 "ed25519-non-sensitive", false);
+		if (minfo.ulMaxKeySize >= 456) {
+			generate_keypair(GNUTLS_PK_EDDSA_ED448, 456,
+					 "ed448-sensitive", true);
+			generate_keypair(GNUTLS_PK_EDDSA_ED448, 456,
+					 "ed448-non-sensitive", false);
+		}
 	}
 #endif
 

@@ -486,6 +486,61 @@ cleanup:
 	return ret;
 }
 
+static inline gnutls_pk_algorithm_t
+key_type_to_pk(struct ck_function_list *module, ck_session_handle_t pks,
+	       ck_object_handle_t ctx, ck_key_type_t m)
+{
+	switch (m) {
+	case CKK_RSA:
+		return GNUTLS_PK_RSA;
+	case CKK_DSA:
+		return GNUTLS_PK_DSA;
+	case CKK_ECDSA:
+		return GNUTLS_PK_EC;
+#ifdef HAVE_PKCS11_EDDSA
+	case CKK_EC_EDWARDS: {
+		struct ck_attribute a[1];
+		uint8_t *tmp1;
+		size_t tmp1_size;
+		gnutls_pk_algorithm_t pk = GNUTLS_PK_UNKNOWN;
+
+		tmp1_size = MAX_PK_PARAM_SIZE;
+		tmp1 = gnutls_calloc(1, tmp1_size);
+		if (tmp1 == NULL)
+			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+		a[0].type = CKA_EC_PARAMS;
+		a[0].value = tmp1;
+		a[0].value_len = tmp1_size;
+
+		if (pkcs11_get_attribute_value(module, pks, ctx, a, 1) ==
+		    CKR_OK) {
+			gnutls_ecc_curve_t curve;
+			const gnutls_ecc_curve_entry_st *ce;
+			int ret;
+
+			ret = _gnutls_x509_read_ecc_params(
+				a[0].value, a[0].value_len, &curve);
+			if (ret < 0) {
+				goto edwards_cleanup;
+			}
+			ce = _gnutls_ecc_curve_get_params(curve);
+			if (unlikely(ce == NULL)) {
+				goto edwards_cleanup;
+			}
+			pk = ce->pk;
+		}
+
+	edwards_cleanup:
+		gnutls_free(tmp1);
+		return pk;
+	}
+#endif
+	default:
+		return GNUTLS_PK_UNKNOWN;
+	}
+}
+
 /**
  * gnutls_pkcs11_privkey_import_url:
  * @pkey: The private key
@@ -561,7 +616,9 @@ int gnutls_pkcs11_privkey_import_url(gnutls_pkcs11_privkey_t pkey,
 	a[0].value_len = sizeof(key_type);
 	if (pkcs11_get_attribute_value(pkey->sinfo.module, pkey->sinfo.pks,
 				       pkey->ref, a, 1) == CKR_OK) {
-		pkey->pk_algorithm = key_type_to_pk(key_type);
+		pkey->pk_algorithm = key_type_to_pk(pkey->sinfo.module,
+						    pkey->sinfo.pks, pkey->ref,
+						    key_type);
 	}
 
 	if (pkey->pk_algorithm == GNUTLS_PK_UNKNOWN) {
@@ -1188,6 +1245,7 @@ int gnutls_pkcs11_privkey_generate3(const char *url, gnutls_pk_algorithm_t pk,
 
 		break;
 	case GNUTLS_PK_EDDSA_ED25519:
+	case GNUTLS_PK_EDDSA_ED448:
 		p[p_val].type = CKA_SIGN;
 		p[p_val].value = (void *)&tval;
 		p[p_val].value_len = sizeof(tval);
@@ -1198,8 +1256,11 @@ int gnutls_pkcs11_privkey_generate3(const char *url, gnutls_pk_algorithm_t pk,
 		a[a_val].value_len = sizeof(tval);
 		a_val++;
 
-		ret = _gnutls_x509_write_ecc_params(GNUTLS_ECC_CURVE_ED25519,
-						    &der);
+		ret = _gnutls_x509_write_ecc_params(
+			pk == GNUTLS_PK_EDDSA_ED25519 ?
+				GNUTLS_ECC_CURVE_ED25519 :
+				GNUTLS_ECC_CURVE_ED448,
+			&der);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;

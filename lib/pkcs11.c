@@ -1796,6 +1796,7 @@ int pkcs11_read_pubkey(struct ck_function_list *module, ck_session_handle_t pks,
 			pobj->pubkey[1].size = a[1].value_len;
 
 			pobj->pubkey_size = 2;
+			pobj->pk_algorithm = GNUTLS_PK_RSA;
 		} else {
 			gnutls_assert();
 			ret = GNUTLS_E_PKCS11_ERROR;
@@ -1851,6 +1852,7 @@ int pkcs11_read_pubkey(struct ck_function_list *module, ck_session_handle_t pks,
 			pobj->pubkey[3].size = a[1].value_len;
 
 			pobj->pubkey_size = 4;
+			pobj->pk_algorithm = GNUTLS_PK_DSA;
 		} else {
 			gnutls_assert();
 			ret = pkcs11_rv_to_err(rv);
@@ -1875,6 +1877,7 @@ int pkcs11_read_pubkey(struct ck_function_list *module, ck_session_handle_t pks,
 			pobj->pubkey[1].size = a[1].value_len;
 
 			pobj->pubkey_size = 2;
+			pobj->pk_algorithm = GNUTLS_PK_EC;
 		} else {
 			gnutls_assert();
 
@@ -1895,6 +1898,9 @@ int pkcs11_read_pubkey(struct ck_function_list *module, ck_session_handle_t pks,
 
 		if ((rv = pkcs11_get_attribute_value(module, pks, ctx, a, 2)) ==
 		    CKR_OK) {
+			gnutls_ecc_curve_t curve;
+			const gnutls_ecc_curve_entry_st *ce;
+
 			pobj->pubkey[0].data = a[0].value;
 			pobj->pubkey[0].size = a[0].value_len;
 
@@ -1902,13 +1908,26 @@ int pkcs11_read_pubkey(struct ck_function_list *module, ck_session_handle_t pks,
 			pobj->pubkey[1].size = a[1].value_len;
 
 			pobj->pubkey_size = 2;
+
+			ret = _gnutls_x509_read_ecc_params(pobj->pubkey[0].data,
+							   pobj->pubkey[0].size,
+							   &curve);
+			if (ret < 0) {
+				ret = GNUTLS_E_INVALID_REQUEST;
+				goto cleanup;
+			}
+			ce = _gnutls_ecc_curve_get_params(curve);
+			if (unlikely(ce == NULL)) {
+				ret = GNUTLS_E_INVALID_REQUEST;
+				goto cleanup;
+			}
+			pobj->pk_algorithm = ce->pk;
 		} else {
 			gnutls_assert();
 
 			ret = pkcs11_rv_to_err(rv);
 			goto cleanup;
 		}
-
 		break;
 #endif
 	default:
@@ -1945,8 +1964,6 @@ pkcs11_obj_import_pubkey(struct ck_function_list *module,
 	a[0].value_len = sizeof(key_type);
 
 	if (pkcs11_get_attribute_value(module, pks, ctx, a, 1) == CKR_OK) {
-		pobj->pk_algorithm = key_type_to_pk(key_type);
-
 		ret = pkcs11_read_pubkey(module, pks, ctx, key_type, pobj);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
