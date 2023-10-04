@@ -25,14 +25,23 @@
 
 #ifdef ENABLE_KTLS
 
-#include <linux/tls.h>
-#include <record.h>
 #include <sys/socket.h>
 #include <netinet/tcp.h>
 #include <unistd.h>
 #include <errno.h>
+#include <record.h>
+
+#if defined(__FreeBSD__)
+#include <sys/ktls.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <crypto/cryptodev.h>
+
+#else
+#include <linux/tls.h>
 #include "ext/session_ticket.h"
 #include <sys/sendfile.h>
+#endif
 
 /**
  * gnutls_transport_is_ktls_enabled:
@@ -57,6 +66,10 @@ gnutls_transport_is_ktls_enabled(gnutls_session_t session)
 
 void _gnutls_ktls_enable(gnutls_session_t session)
 {
+#if defined(__FreeBSD__)
+	session->internals.ktls_enabled |= GNUTLS_KTLS_RECV;
+	session->internals.ktls_enabled |= GNUTLS_KTLS_SEND;
+#else
 	int sockin, sockout;
 
 	gnutls_transport_get_int2(session, &sockin, &sockout);
@@ -81,7 +94,372 @@ void _gnutls_ktls_enable(gnutls_session_t session)
 				errno);
 		}
 	}
+#endif
 }
+
+#if defined(__FreeBSD__)
+
+int _gnutls_ktls_set_keys(gnutls_session_t session,
+			  gnutls_transport_ktls_enable_flags_t in)
+{
+	gnutls_cipher_algorithm_t cipher = gnutls_cipher_get(session);
+	gnutls_datum_t mac_key;
+	gnutls_datum_t iv;
+	gnutls_datum_t cipher_key;
+	unsigned char seq_number[12];
+	int sockin, sockout;
+	int ret;
+
+	gnutls_transport_get_int2(session, &sockin, &sockout);
+	/* check whether or not cipher suite supports ktls
+	 */
+	int version = gnutls_protocol_get_version(session);
+	if ((version != GNUTLS_TLS1_3 && version != GNUTLS_TLS1_2) ||
+	    (cipher != GNUTLS_CIPHER_AES_128_GCM &&
+	     cipher != GNUTLS_CIPHER_AES_256_GCM &&
+	     cipher != GNUTLS_CIPHER_CHACHA20_POLY1305)) {
+		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+	}
+
+	ret = gnutls_record_get_state(session, 1, &mac_key, &iv, &cipher_key,
+				      seq_number);
+	if (ret < 0) {
+		return ret;
+	}
+
+	in &= session->internals.ktls_enabled;
+
+	if (in & GNUTLS_KTLS_RECV) {
+		struct tls_enable crypto_info;
+		memset(&crypto_info, 0, sizeof(crypto_info));
+		switch (cipher) {
+		case GNUTLS_CIPHER_AES_128_GCM: {
+			crypto_info.cipher_algorithm = CRYPTO_AES_NIST_GCM_16;
+			assert(cipher_key.size == AES_128_GMAC_KEY_LEN);
+
+			if (version == GNUTLS_TLS1_2) {
+				crypto_info.tls_vmajor = TLS_MAJOR_VER_ONE;
+				crypto_info.tls_vminor = TLS_MINOR_VER_TWO;
+				crypto_info.iv =
+					gnutls_malloc(TLS_AEAD_GCM_LEN);
+				if (!crypto_info.iv) {
+					gnutls_assert();
+					return GNUTLS_E_MEMORY_ERROR;
+				}
+				crypto_info.iv_len = TLS_AEAD_GCM_LEN;
+				memcpy(crypto_info.iv, seq_number,
+				       TLS_AEAD_GCM_LEN);
+			} else {
+				crypto_info.tls_vmajor = TLS_MAJOR_VER_ONE;
+				crypto_info.tls_vminor = TLS_MINOR_VER_THREE;
+				assert(iv.size == TLS_1_3_GCM_IV_LEN);
+
+				crypto_info.iv =
+					gnutls_malloc(TLS_1_3_GCM_IV_LEN);
+				if (!crypto_info.iv) {
+					gnutls_assert();
+					return GNUTLS_E_MEMORY_ERROR;
+				}
+				crypto_info.iv_len = TLS_1_3_GCM_IV_LEN;
+				memcpy(crypto_info.iv, iv.data,
+				       TLS_1_3_GCM_IV_LEN);
+			}
+
+			memcpy(crypto_info.rec_seq, seq_number, 8);
+
+			crypto_info.cipher_key_len = AES_128_GMAC_KEY_LEN;
+			crypto_info.cipher_key =
+				gnutls_malloc(AES_128_GMAC_KEY_LEN);
+			if (!crypto_info.cipher_key) {
+				gnutls_assert();
+				return GNUTLS_E_MEMORY_ERROR;
+			}
+			memcpy(crypto_info.cipher_key, cipher_key.data,
+			       AES_128_GMAC_KEY_LEN);
+
+			if (setsockopt(sockin, IPPROTO_TCP, TCP_RXTLS_ENABLE,
+				       &crypto_info, sizeof(crypto_info))) {
+				session->internals.ktls_enabled &=
+					~GNUTLS_KTLS_RECV;
+				return gnutls_assert_val(
+					GNUTLS_E_INTERNAL_ERROR);
+			}
+		} break;
+		case GNUTLS_CIPHER_AES_256_GCM: {
+			crypto_info.cipher_algorithm = CRYPTO_AES_NIST_GCM_16;
+			assert(cipher_key.size == AES_256_GMAC_KEY_LEN);
+
+			if (version == GNUTLS_TLS1_2) {
+				crypto_info.tls_vmajor = TLS_MAJOR_VER_ONE;
+				crypto_info.tls_vminor = TLS_MINOR_VER_TWO;
+				crypto_info.iv =
+					gnutls_malloc(TLS_AEAD_GCM_LEN);
+				if (!crypto_info.iv) {
+					gnutls_assert();
+					return GNUTLS_E_MEMORY_ERROR;
+				}
+				crypto_info.iv_len = TLS_AEAD_GCM_LEN;
+				memcpy(crypto_info.iv, seq_number,
+				       TLS_AEAD_GCM_LEN);
+			} else {
+				crypto_info.tls_vmajor = TLS_MAJOR_VER_ONE;
+				crypto_info.tls_vminor = TLS_MINOR_VER_THREE;
+				assert(iv.size == TLS_1_3_GCM_IV_LEN);
+
+				crypto_info.iv =
+					gnutls_malloc(TLS_1_3_GCM_IV_LEN);
+				if (!crypto_info.iv) {
+					gnutls_assert();
+					return GNUTLS_E_MEMORY_ERROR;
+				}
+				crypto_info.iv_len = TLS_1_3_GCM_IV_LEN;
+				memcpy(crypto_info.iv, iv.data,
+				       TLS_1_3_GCM_IV_LEN);
+			}
+
+			memcpy(crypto_info.rec_seq, seq_number, 8);
+
+			crypto_info.cipher_key_len = AES_256_GMAC_KEY_LEN;
+			crypto_info.cipher_key =
+				gnutls_malloc(AES_256_GMAC_KEY_LEN);
+			if (!crypto_info.cipher_key) {
+				gnutls_assert();
+				return GNUTLS_E_MEMORY_ERROR;
+			}
+			memcpy(crypto_info.cipher_key, cipher_key.data,
+			       AES_256_GMAC_KEY_LEN);
+
+			if (setsockopt(sockin, IPPROTO_TCP, TCP_RXTLS_ENABLE,
+				       &crypto_info, sizeof(crypto_info))) {
+				session->internals.ktls_enabled &=
+					~GNUTLS_KTLS_RECV;
+				return gnutls_assert_val(
+					GNUTLS_E_INTERNAL_ERROR);
+			}
+
+		} break;
+		case GNUTLS_CIPHER_CHACHA20_POLY1305: {
+			crypto_info.cipher_algorithm = CRYPTO_CHACHA20_POLY1305;
+			assert(cipher_key.size == POLY1305_KEY_LEN);
+
+			if (version == GNUTLS_TLS1_2) {
+				crypto_info.tls_vmajor = TLS_MAJOR_VER_ONE;
+				crypto_info.tls_vminor = TLS_MINOR_VER_TWO;
+			} else {
+				crypto_info.tls_vmajor = TLS_MAJOR_VER_ONE;
+				crypto_info.tls_vminor = TLS_MINOR_VER_THREE;
+			}
+
+			assert(iv.size == CHACHA20_POLY1305_IV_LEN);
+			crypto_info.iv =
+				gnutls_malloc(CHACHA20_POLY1305_IV_LEN);
+			if (!crypto_info.iv) {
+				gnutls_assert();
+				return GNUTLS_E_MEMORY_ERROR;
+			}
+			crypto_info.iv_len = TLS_CHACHA20_IV_LEN;
+			memcpy(crypto_info.iv, iv.data, TLS_CHACHA20_IV_LEN);
+
+			memcpy(crypto_info.rec_seq, seq_number, 8);
+
+			crypto_info.cipher_key_len = POLY1305_KEY_LEN;
+			crypto_info.cipher_key =
+				gnutls_malloc(POLY1305_KEY_LEN);
+			if (!crypto_info.cipher_key) {
+				gnutls_assert();
+				return GNUTLS_E_MEMORY_ERROR;
+			}
+			memcpy(crypto_info.cipher_key, cipher_key.data,
+			       POLY1305_KEY_LEN);
+
+			if (setsockopt(sockin, IPPROTO_TCP, TCP_RXTLS_ENABLE,
+				       &crypto_info, sizeof(crypto_info))) {
+				session->internals.ktls_enabled &=
+					~GNUTLS_KTLS_RECV;
+				return gnutls_assert_val(
+					GNUTLS_E_INTERNAL_ERROR);
+			}
+
+		} break;
+		default:
+			assert(0);
+		}
+	}
+
+	ret = gnutls_record_get_state(session, 0, &mac_key, &iv, &cipher_key,
+				      seq_number);
+	if (ret < 0) {
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+	}
+
+	if (in & GNUTLS_KTLS_SEND) {
+		struct tls_enable crypto_info;
+		memset(&crypto_info, 0, sizeof(crypto_info));
+		switch (cipher) {
+		case GNUTLS_CIPHER_AES_128_GCM: {
+			crypto_info.cipher_algorithm = CRYPTO_AES_NIST_GCM_16;
+			assert(cipher_key.size == AES_128_GMAC_KEY_LEN);
+
+			if (version == GNUTLS_TLS1_2) {
+				crypto_info.tls_vmajor = TLS_MAJOR_VER_ONE;
+				crypto_info.tls_vminor = TLS_MINOR_VER_TWO;
+				crypto_info.iv =
+					gnutls_malloc(TLS_AEAD_GCM_LEN);
+				if (!crypto_info.iv) {
+					gnutls_assert();
+					return GNUTLS_E_MEMORY_ERROR;
+				}
+				crypto_info.iv_len = TLS_AEAD_GCM_LEN;
+				memcpy(crypto_info.iv, seq_number,
+				       TLS_AEAD_GCM_LEN);
+			} else {
+				crypto_info.tls_vmajor = TLS_MAJOR_VER_ONE;
+				crypto_info.tls_vminor = TLS_MINOR_VER_THREE;
+				assert(iv.size == TLS_1_3_GCM_IV_LEN);
+
+				crypto_info.iv =
+					gnutls_malloc(TLS_1_3_GCM_IV_LEN);
+				if (!crypto_info.iv) {
+					gnutls_assert();
+					return GNUTLS_E_MEMORY_ERROR;
+				}
+				crypto_info.iv_len = TLS_1_3_GCM_IV_LEN;
+				memcpy(crypto_info.iv, iv.data,
+				       TLS_1_3_GCM_IV_LEN);
+			}
+
+			memcpy(crypto_info.rec_seq, seq_number, 8);
+
+			crypto_info.cipher_key_len = AES_128_GMAC_KEY_LEN;
+			crypto_info.cipher_key =
+				gnutls_malloc(AES_128_GMAC_KEY_LEN);
+			if (!crypto_info.cipher_key) {
+				gnutls_assert();
+				return GNUTLS_E_MEMORY_ERROR;
+			}
+			memcpy(crypto_info.cipher_key, cipher_key.data,
+			       AES_128_GMAC_KEY_LEN);
+
+			if (setsockopt(sockin, IPPROTO_TCP, TCP_TXTLS_ENABLE,
+				       &crypto_info, sizeof(crypto_info))) {
+				session->internals.ktls_enabled &=
+					~GNUTLS_KTLS_SEND;
+				return gnutls_assert_val(
+					GNUTLS_E_INTERNAL_ERROR);
+			}
+		} break;
+		case GNUTLS_CIPHER_AES_256_GCM: {
+			crypto_info.cipher_algorithm = CRYPTO_AES_NIST_GCM_16;
+			assert(cipher_key.size == AES_256_GMAC_KEY_LEN);
+
+			if (version == GNUTLS_TLS1_2) {
+				crypto_info.tls_vmajor = TLS_MAJOR_VER_ONE;
+				crypto_info.tls_vminor = TLS_MINOR_VER_TWO;
+				crypto_info.iv =
+					gnutls_malloc(TLS_AEAD_GCM_LEN);
+				if (!crypto_info.iv) {
+					gnutls_assert();
+					return GNUTLS_E_MEMORY_ERROR;
+				}
+				crypto_info.iv_len = TLS_AEAD_GCM_LEN;
+				memcpy(crypto_info.iv, seq_number,
+				       TLS_AEAD_GCM_LEN);
+			} else {
+				crypto_info.tls_vmajor = TLS_MAJOR_VER_ONE;
+				crypto_info.tls_vminor = TLS_MINOR_VER_THREE;
+				assert(iv.size == TLS_1_3_GCM_IV_LEN);
+
+				crypto_info.iv =
+					gnutls_malloc(TLS_1_3_GCM_IV_LEN);
+				if (!crypto_info.iv) {
+					gnutls_assert();
+					return GNUTLS_E_MEMORY_ERROR;
+				}
+				crypto_info.iv_len = TLS_1_3_GCM_IV_LEN;
+				memcpy(crypto_info.iv, iv.data,
+				       TLS_1_3_GCM_IV_LEN);
+			}
+
+			memcpy(crypto_info.rec_seq, seq_number, 8);
+
+			crypto_info.cipher_key_len = AES_256_GMAC_KEY_LEN;
+			crypto_info.cipher_key =
+				gnutls_malloc(AES_256_GMAC_KEY_LEN);
+			if (!crypto_info.cipher_key) {
+				gnutls_assert();
+				return GNUTLS_E_MEMORY_ERROR;
+			}
+			memcpy(crypto_info.cipher_key, cipher_key.data,
+			       AES_256_GMAC_KEY_LEN);
+
+			if (setsockopt(sockin, IPPROTO_TCP, TCP_TXTLS_ENABLE,
+				       &crypto_info, sizeof(crypto_info))) {
+				session->internals.ktls_enabled &=
+					~GNUTLS_KTLS_SEND;
+				return gnutls_assert_val(
+					GNUTLS_E_INTERNAL_ERROR);
+			}
+
+		} break;
+		case GNUTLS_CIPHER_CHACHA20_POLY1305: {
+			crypto_info.cipher_algorithm = CRYPTO_CHACHA20_POLY1305;
+			assert(cipher_key.size == POLY1305_KEY_LEN);
+
+			if (version == GNUTLS_TLS1_2) {
+				crypto_info.tls_vmajor = TLS_MAJOR_VER_ONE;
+				crypto_info.tls_vminor = TLS_MINOR_VER_TWO;
+			} else {
+				crypto_info.tls_vmajor = TLS_MAJOR_VER_ONE;
+				crypto_info.tls_vminor = TLS_MINOR_VER_THREE;
+			}
+
+			assert(iv.size == CHACHA20_POLY1305_IV_LEN);
+			crypto_info.iv =
+				gnutls_malloc(CHACHA20_POLY1305_IV_LEN);
+			if (!crypto_info.iv) {
+				gnutls_assert();
+				return GNUTLS_E_MEMORY_ERROR;
+			}
+			crypto_info.iv_len = TLS_CHACHA20_IV_LEN;
+			memcpy(crypto_info.iv, iv.data, TLS_CHACHA20_IV_LEN);
+
+			memcpy(crypto_info.rec_seq, seq_number, 8);
+
+			crypto_info.cipher_key_len = POLY1305_KEY_LEN;
+			crypto_info.cipher_key =
+				gnutls_malloc(POLY1305_KEY_LEN);
+			if (!crypto_info.cipher_key) {
+				gnutls_assert();
+				return GNUTLS_E_MEMORY_ERROR;
+			}
+			memcpy(crypto_info.cipher_key, cipher_key.data,
+			       POLY1305_KEY_LEN);
+
+			if (setsockopt(sockin, IPPROTO_TCP, TCP_TXTLS_ENABLE,
+				       &crypto_info, sizeof(crypto_info))) {
+				session->internals.ktls_enabled &=
+					~GNUTLS_KTLS_SEND;
+				return gnutls_assert_val(
+					GNUTLS_E_INTERNAL_ERROR);
+			}
+
+		} break;
+		default:
+			assert(0);
+		}
+
+		// set callback for sending handshake messages
+		gnutls_handshake_set_read_function(
+			session, _gnutls_ktls_send_handshake_msg);
+
+		// set callback for sending alert messages
+		gnutls_alert_set_read_function(session,
+					       _gnutls_ktls_send_alert_msg);
+	}
+
+	return in;
+}
+#else
 
 int _gnutls_ktls_set_keys(gnutls_session_t session,
 			  gnutls_transport_ktls_enable_flags_t in)
@@ -468,6 +846,7 @@ int _gnutls_ktls_set_keys(gnutls_session_t session,
 
 	return in;
 }
+#endif
 
 ssize_t _gnutls_ktls_send_file(gnutls_session_t session, int fd, off_t *offset,
 			       size_t count)
@@ -476,10 +855,17 @@ ssize_t _gnutls_ktls_send_file(gnutls_session_t session, int fd, off_t *offset,
 	int sockin, sockout;
 
 	assert(session != NULL);
+#if defined(__FreeBSD__)
+	off_t sbytes = 0;
+	assert(offset != NULL);
+#endif
 
 	gnutls_transport_get_int2(session, &sockin, &sockout);
-
+#if defined(__FreeBSD__)
+	ret = sendfile(fd, sockout, *offset, count, NULL, &sbytes, 0);
+#else
 	ret = sendfile(sockout, fd, offset, count);
+#endif
 	if (ret == -1) {
 		switch (errno) {
 		case EINTR:
@@ -490,8 +876,12 @@ ssize_t _gnutls_ktls_send_file(gnutls_session_t session, int fd, off_t *offset,
 			return GNUTLS_E_PUSH_ERROR;
 		}
 	}
-
+#if defined(__FreeBSD__)
+	*offset += sbytes; /* follow linux sendfile behavior */
+	return sbytes;
+#else
 	return ret;
+#endif
 }
 
 int _gnutls_ktls_send_control_msg(gnutls_session_t session,
@@ -517,7 +907,11 @@ int _gnutls_ktls_send_control_msg(gnutls_session_t session,
 		msg.msg_controllen = sizeof cmsg;
 
 		hdr = CMSG_FIRSTHDR(&msg);
+#if defined(__FreeBSD__)
+		hdr->cmsg_level = IPPROTO_TCP;
+#else
 		hdr->cmsg_level = SOL_TLS;
+#endif
 		hdr->cmsg_type = TLS_SET_RECORD_TYPE;
 		hdr->cmsg_len = CMSG_LEN(sizeof(unsigned char));
 
@@ -638,7 +1032,11 @@ int _gnutls_ktls_recv_control_msg(gnutls_session_t session,
 	if (hdr == NULL) {
 		return GNUTLS_E_PULL_ERROR;
 	}
+#if defined(__FreeBSD__)
+	if (hdr->cmsg_level == IPPROTO_TCP && hdr->cmsg_type == TLS_GET_RECORD)
+#else
 	if (hdr->cmsg_level == SOL_TLS && hdr->cmsg_type == TLS_GET_RECORD_TYPE)
+#endif
 		*record_type = *(unsigned char *)CMSG_DATA(hdr);
 	else
 		*record_type = GNUTLS_APPLICATION_DATA;
@@ -689,7 +1087,6 @@ int _gnutls_ktls_recv_int(gnutls_session_t session, content_type_t type,
 	}
 	return ret;
 }
-
 #else //ENABLE_KTLS
 gnutls_transport_ktls_enable_flags_t
 gnutls_transport_is_ktls_enabled(gnutls_session_t session)
