@@ -247,7 +247,7 @@ static inline int pk_to_mech(gnutls_pk_algorithm_t pk)
 	else if (pk == GNUTLS_PK_RSA_PSS)
 		return CKM_RSA_PKCS_PSS;
 #ifdef HAVE_PKCS11_EDDSA
-	else if (pk == GNUTLS_PK_EDDSA_ED25519)
+	else if (pk == GNUTLS_PK_EDDSA_ED25519 || pk == GNUTLS_PK_EDDSA_ED448)
 		return CKM_EDDSA;
 #endif
 	else
@@ -263,27 +263,11 @@ static inline int pk_to_key_type(gnutls_pk_algorithm_t pk)
 	else if (pk == GNUTLS_PK_RSA_PSS || pk == GNUTLS_PK_RSA)
 		return CKK_RSA;
 #ifdef HAVE_PKCS11_EDDSA
-	else if (pk == GNUTLS_PK_EDDSA_ED25519)
+	else if (pk == GNUTLS_PK_EDDSA_ED25519 || pk == GNUTLS_PK_EDDSA_ED448)
 		return CKK_EC_EDWARDS;
 #endif
 	else
 		return -1;
-}
-
-static inline gnutls_pk_algorithm_t key_type_to_pk(ck_key_type_t m)
-{
-	if (m == CKK_RSA)
-		return GNUTLS_PK_RSA;
-	else if (m == CKK_DSA)
-		return GNUTLS_PK_DSA;
-	else if (m == CKK_ECDSA)
-		return GNUTLS_PK_EC;
-#ifdef HAVE_PKCS11_EDDSA
-	else if (m == CKK_EC_EDWARDS)
-		return GNUTLS_PK_EDDSA_ED25519;
-#endif
-	else
-		return GNUTLS_PK_UNKNOWN;
 }
 
 static inline int pk_to_genmech(gnutls_pk_algorithm_t pk, ck_key_type_t *type)
@@ -298,7 +282,8 @@ static inline int pk_to_genmech(gnutls_pk_algorithm_t pk, ck_key_type_t *type)
 		*type = CKK_RSA;
 		return CKM_RSA_PKCS_KEY_PAIR_GEN;
 #ifdef HAVE_PKCS11_EDDSA
-	} else if (pk == GNUTLS_PK_EDDSA_ED25519) {
+	} else if (pk == GNUTLS_PK_EDDSA_ED25519 ||
+		   pk == GNUTLS_PK_EDDSA_ED448) {
 		*type = CKK_EC_EDWARDS;
 		return CKM_EC_EDWARDS_KEY_PAIR_GEN;
 #endif

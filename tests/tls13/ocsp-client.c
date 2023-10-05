@@ -169,8 +169,8 @@ void doit(void)
 	fp = fopen(certfile3, "wb");
 	if (fp == NULL)
 		fail("error in fopen\n");
-	assert(fwrite(cert_pem, 1, strlen((char *)cert_pem), fp) > 0);
-	assert(fwrite(key_pem, 1, strlen((char *)key_pem), fp) > 0);
+	assert(fwrite(cli_cert_pem, 1, strlen((char *)cli_cert_pem), fp) > 0);
+	assert(fwrite(cli_key_pem, 1, strlen((char *)cli_key_pem), fp) > 0);
 	fclose(fp);
 
 	ret = gnutls_certificate_set_x509_key_file2(

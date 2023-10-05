@@ -64,8 +64,8 @@ static int pin_func(void *userdata, int attempt, const char *url,
 	return -1;
 }
 
-#define myfail(fmt, ...)                                             \
-	fail("%s (iter %d): " fmt, gnutls_sign_get_name(sigalgo), i, \
+#define myfail(fmt, ...)                                              \
+	fail("%s (iter %zu): " fmt, gnutls_sign_get_name(sigalgo), i, \
 	     ##__VA_ARGS__)
 
 static unsigned verify_eddsa_presence(void)
@@ -85,11 +85,10 @@ static unsigned verify_eddsa_presence(void)
 	return 0;
 }
 
-void doit(void)
+static void test(const char *name, const gnutls_datum_t *cert_pem,
+		 const gnutls_datum_t *key_pem, gnutls_sign_algorithm_t sigalgo)
 {
-	char buf[128];
 	int ret;
-	const char *lib, *bin;
 	gnutls_x509_crt_t crt;
 	gnutls_x509_privkey_t key;
 	gnutls_datum_t tmp, sig;
@@ -98,51 +97,16 @@ void doit(void)
 	gnutls_pubkey_t pubkey2;
 	gnutls_pubkey_t pubkey3;
 	gnutls_pubkey_t pubkey4;
-	unsigned i, sigalgo;
+	char buf[256];
+	size_t i;
 
-	bin = softhsm_bin();
-
-	lib = softhsm_lib();
-
-	ret = global_init();
-	if (ret != 0) {
-		fail("%d: %s\n", ret, gnutls_strerror(ret));
-	}
-
-	if (gnutls_fips140_mode_enabled()) {
-		gnutls_global_deinit();
-		return;
-	}
-
-	gnutls_pkcs11_set_pin_function(pin_func, NULL);
-	gnutls_global_set_log_function(tls_log_func);
-	if (debug)
-		gnutls_global_set_log_level(4711);
-
-	set_softhsm_conf(CONFIG);
-	snprintf(buf, sizeof(buf),
-		 "%s --init-token --slot 0 --label test --so-pin " PIN
-		 " --pin " PIN,
-		 bin);
-	system(buf);
-
-	ret = gnutls_pkcs11_add_provider(lib, NULL);
-	if (ret < 0) {
-		fail("gnutls_x509_crt_init: %s\n", gnutls_strerror(ret));
-	}
-
-	if (verify_eddsa_presence() == 0) {
-		fprintf(stderr,
-			"Skipping test as no EDDSA mech is supported\n");
-		exit(77);
-	}
+	success("%s\n", name);
 
 	ret = gnutls_x509_crt_init(&crt);
 	if (ret < 0)
 		fail("gnutls_x509_crt_init: %s\n", gnutls_strerror(ret));
 
-	ret = gnutls_x509_crt_import(crt, &server_ca3_eddsa_cert,
-				     GNUTLS_X509_FMT_PEM);
+	ret = gnutls_x509_crt_import(crt, cert_pem, GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		fail("gnutls_x509_crt_import: %s\n", gnutls_strerror(ret));
 
@@ -158,25 +122,12 @@ void doit(void)
 		fail("gnutls_x509_privkey_init: %s\n", gnutls_strerror(ret));
 	}
 
-	ret = gnutls_x509_privkey_import(key, &server_ca3_eddsa_key,
-					 GNUTLS_X509_FMT_PEM);
+	ret = gnutls_x509_privkey_import(key, key_pem, GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
 		fail("gnutls_x509_privkey_import: %s\n", gnutls_strerror(ret));
 	}
 
-	/* initialize softhsm token */
-	ret = gnutls_pkcs11_token_init(SOFTHSM_URL, PIN, "test");
-	if (ret < 0) {
-		fail("gnutls_pkcs11_token_init: %s\n", gnutls_strerror(ret));
-	}
-
-	ret = gnutls_pkcs11_token_set_pin(SOFTHSM_URL, NULL, PIN,
-					  GNUTLS_PIN_USER);
-	if (ret < 0) {
-		fail("gnutls_pkcs11_token_set_pin: %s\n", gnutls_strerror(ret));
-	}
-
-	ret = gnutls_pkcs11_copy_x509_crt(SOFTHSM_URL, crt, "cert",
+	ret = gnutls_pkcs11_copy_x509_crt(SOFTHSM_URL, crt, name,
 					  GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE |
 						  GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
 	if (ret < 0) {
@@ -184,7 +135,7 @@ void doit(void)
 	}
 
 	ret = gnutls_pkcs11_copy_x509_privkey(
-		SOFTHSM_URL, key, "cert",
+		SOFTHSM_URL, key, name,
 		GNUTLS_KEY_DIGITAL_SIGNATURE | GNUTLS_KEY_KEY_ENCIPHERMENT,
 		GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE |
 			GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE |
@@ -199,7 +150,7 @@ void doit(void)
 	assert(gnutls_pubkey_import_x509(pubkey, crt, 0) == 0);
 
 	ret = gnutls_pkcs11_copy_pubkey(
-		SOFTHSM_URL, pubkey, "cert", NULL,
+		SOFTHSM_URL, pubkey, name, NULL,
 		GNUTLS_KEY_DIGITAL_SIGNATURE | GNUTLS_KEY_KEY_ENCIPHERMENT, 0);
 	if (ret < 0) {
 		fail("gnutls_pkcs11_copy_pubkey: %s\n", gnutls_strerror(ret));
@@ -210,11 +161,13 @@ void doit(void)
 	gnutls_pubkey_deinit(pubkey);
 	gnutls_pkcs11_set_pin_function(NULL, NULL);
 
+	assert(snprintf(buf, sizeof(buf),
+			"%s;object=%s;object-type=private?pin-value=" PIN,
+			SOFTHSM_URL, name) < (int)sizeof(buf));
+
 	assert(gnutls_privkey_init(&pkey) == 0);
 
-	ret = gnutls_privkey_import_pkcs11_url(
-		pkey,
-		SOFTHSM_URL ";object=cert;object-type=private;pin-value=" PIN);
+	ret = gnutls_privkey_import_pkcs11_url(pkey, buf);
 	if (ret < 0) {
 		fail("error in gnutls_privkey_import_pkcs11_url: %s\n",
 		     gnutls_strerror(ret));
@@ -223,10 +176,7 @@ void doit(void)
 	/* Try to read the public key with public key URI */
 	assert(gnutls_pubkey_init(&pubkey3) == 0);
 
-	ret = gnutls_pubkey_import_pkcs11_url(
-		pubkey3,
-		SOFTHSM_URL ";object=cert;object-type=public;pin-value=" PIN,
-		0);
+	ret = gnutls_pubkey_import_pkcs11_url(pubkey3, buf, 0);
 	if (ret < 0) {
 		fail("error in gnutls_pubkey_import_pkcs11_url: %s\n",
 		     gnutls_strerror(ret));
@@ -235,9 +185,7 @@ void doit(void)
 	/* Try to read the public key with certificate URI */
 	assert(gnutls_pubkey_init(&pubkey4) == 0);
 
-	ret = gnutls_pubkey_import_pkcs11_url(
-		pubkey4,
-		SOFTHSM_URL ";object=cert;object-type=cert;pin-value=" PIN, 0);
+	ret = gnutls_pubkey_import_pkcs11_url(pubkey4, buf, 0);
 	if (ret < 0) {
 		fail("error in gnutls_pubkey_import_pkcs11_url: %s\n",
 		     gnutls_strerror(ret));
@@ -247,11 +195,8 @@ void doit(void)
 	assert(gnutls_pubkey_import_privkey(pubkey, pkey, 0, 0) == 0);
 
 	assert(gnutls_pubkey_init(&pubkey2) == 0);
-	assert(gnutls_pubkey_import_x509_raw(pubkey2, &server_ca3_eddsa_cert,
+	assert(gnutls_pubkey_import_x509_raw(pubkey2, cert_pem,
 					     GNUTLS_X509_FMT_PEM, 0) == 0);
-
-	/* this is the algorithm supported by the certificate */
-	sigalgo = GNUTLS_SIGN_EDDSA_ED25519;
 
 	for (i = 0; i < 20; i++) {
 		/* check whether privkey and pubkey are operational
@@ -284,6 +229,71 @@ void doit(void)
 	gnutls_pubkey_deinit(pubkey2);
 	gnutls_pubkey_deinit(pubkey);
 	gnutls_privkey_deinit(pkey);
+}
+
+void doit(void)
+{
+	char buf[256];
+	int ret;
+	const char *lib, *bin;
+
+	bin = softhsm_bin();
+
+	lib = softhsm_lib();
+
+	ret = global_init();
+	if (ret != 0) {
+		fail("%d: %s\n", ret, gnutls_strerror(ret));
+	}
+
+	if (gnutls_fips140_mode_enabled()) {
+		gnutls_global_deinit();
+		return;
+	}
+
+	gnutls_pkcs11_set_pin_function(pin_func, NULL);
+	gnutls_global_set_log_function(tls_log_func);
+	if (debug)
+		gnutls_global_set_log_level(4711);
+
+	set_softhsm_conf(CONFIG);
+	assert(snprintf(buf, sizeof(buf),
+			"%s --init-token --slot 0 --label test --so-pin " PIN
+			" --pin " PIN,
+			bin) < (int)sizeof(buf));
+	system(buf);
+
+	ret = gnutls_pkcs11_add_provider(lib, NULL);
+	if (ret < 0) {
+		fail("gnutls_x509_crt_init: %s\n", gnutls_strerror(ret));
+	}
+
+	if (verify_eddsa_presence() == 0) {
+		fprintf(stderr,
+			"Skipping test as no EDDSA mech is supported\n");
+		exit(77);
+	}
+
+	/* initialize softhsm token */
+	ret = gnutls_pkcs11_token_init(SOFTHSM_URL, PIN, "test");
+	if (ret < 0) {
+		fail("gnutls_pkcs11_token_init: %s\n", gnutls_strerror(ret));
+	}
+
+	ret = gnutls_pkcs11_token_set_pin(SOFTHSM_URL, NULL, PIN,
+					  GNUTLS_PIN_USER);
+	if (ret < 0) {
+		fail("gnutls_pkcs11_token_set_pin: %s\n", gnutls_strerror(ret));
+	}
+
+	test("ed25519", &server_ca3_eddsa_cert, &server_ca3_eddsa_key,
+	     GNUTLS_SIGN_EDDSA_ED25519);
+
+	/* test clears PIN function to check "?pin-value" works */
+	gnutls_pkcs11_set_pin_function(pin_func, NULL);
+
+	test("ed448", &server_ca3_ed448_cert, &server_ca3_ed448_key,
+	     GNUTLS_SIGN_EDDSA_ED448);
 
 	gnutls_global_deinit();
 
