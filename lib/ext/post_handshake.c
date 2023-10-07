@@ -26,8 +26,8 @@
 #include "gnutls_int.h"
 #include "errors.h"
 #include "num.h"
-#include <hello_ext.h>
-#include <ext/post_handshake.h>
+#include "hello_ext.h"
+#include "ext/post_handshake.h"
 #include "auth/cert.h"
 
 static int _gnutls_post_handshake_recv_params(gnutls_session_t session,

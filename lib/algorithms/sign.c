@@ -22,9 +22,9 @@
  */
 
 #include "gnutls_int.h"
-#include <algorithms.h>
+#include "algorithms.h"
 #include "errors.h"
-#include <x509/common.h>
+#include "x509/common.h"
 #include <assert.h>
 #include "c-strcase.h"
 #include "pk.h"

@@ -24,8 +24,8 @@
 #define GNUTLS_LIB_ERRORS_H
 
 #include "gnutls_int.h"
-#include <global.h>
-#include <mpi.h>
+#include "global.h"
+#include "mpi.h"
 #include <gnutls/x509.h>
 
 #ifdef __FILE__

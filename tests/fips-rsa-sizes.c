@@ -21,7 +21,7 @@
 
 #include <assert.h>
 #include <stdio.h>
-#include <utils.h>
+#include "utils.h"
 #include <gnutls/gnutls.h>
 #include <gnutls/abstract.h>
 #include <gnutls/x509.h>

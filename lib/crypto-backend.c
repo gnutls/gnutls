@@ -23,12 +23,12 @@
 #include "errors.h"
 #include "gnutls_int.h"
 #include <gnutls/crypto.h>
-#include <crypto-backend.h>
-#include <crypto.h>
-#include <mpi.h>
-#include <pk.h>
-#include <random.h>
-#include <cipher_int.h>
+#include "crypto-backend.h"
+#include "crypto.h"
+#include "mpi.h"
+#include "pk.h"
+#include "random.h"
+#include "cipher_int.h"
 
 /* default values for priorities */
 int crypto_mac_prio = INT_MAX;

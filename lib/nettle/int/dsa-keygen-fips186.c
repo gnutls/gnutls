@@ -29,7 +29,7 @@
 #include <string.h>
 
 #include <nettle/dsa.h>
-#include <dsa-fips.h>
+#include "dsa-fips.h"
 
 #include <nettle/bignum.h>
 

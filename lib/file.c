@@ -22,7 +22,7 @@
  */
 
 #include "gnutls_int.h"
-#include <file.h>
+#include "file.h"
 #include <read-file.h>
 
 int _gnutls_file_exists(const char *file)

@@ -22,10 +22,10 @@
 
 #include "gnutls_int.h"
 
-#include <mpi.h>
+#include "mpi.h"
 #include "errors.h"
-#include <x509_int.h>
-#include <algorithms.h>
+#include "x509_int.h"
+#include "algorithms.h"
 
 #define MAX_PASS_LEN 8192
 #define MAX_V_SIZE 128

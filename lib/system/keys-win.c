@@ -26,7 +26,7 @@
 #define _WIN32_WINNT 0x600
 #endif
 
-#include <config.h>
+#include "config.h"
 #include "gnutls_int.h"
 #include "errors.h"
 #include <gnutls/gnutls.h>
@@ -34,9 +34,9 @@
 #include <gnutls/pkcs12.h>
 #include <gnutls/system-keys.h>
 #include "system-keys.h"
-#include <tls-sig.h>
-#include <pk.h>
-#include <urls.h>
+#include "tls-sig.h"
+#include "pk.h"
+#include "urls.h"
 
 #if !defined(_WIN32)
 #error should not be included

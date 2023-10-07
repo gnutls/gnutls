@@ -19,7 +19,7 @@
 
 #include "config.h"
 
-#include <accelerated/afalg.h>
+#include "accelerated/afalg.h"
 
 #ifdef ENABLE_AFALG
 

@@ -20,7 +20,7 @@
  *
  */
 
-#include <config.h>
+#include "config.h"
 
 #include <gnutls/crypto.h>
 #include <limits.h>

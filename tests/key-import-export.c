@@ -18,14 +18,14 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+#include "config.h"
 #endif
 
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
-#include <utils.h>
+#include "utils.h"
 #include <assert.h>
 
 #include <gnutls/gnutls.h>

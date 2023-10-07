@@ -20,18 +20,18 @@
  * License along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <config.h>
+#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <sys/types.h>
-#include <drbg-aes.h>
-#include <fips.h>
+#include "drbg-aes.h"
+#include "fips.h"
 
 #include "gnutls_int.h"
 #include "errors.h"
 #include <stdlib.h>
-#include <rnd-common.h>
+#include "rnd-common.h"
 
 #ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
 

@@ -21,13 +21,13 @@
  */
 
 #include "gnutls_int.h"
-#include <common.h>
-#include <x509.h>
-#include <x509_int.h>
-#include <num.h>
+#include "common.h"
+#include "x509.h"
+#include "x509_int.h"
+#include "num.h"
 #include "errors.h"
-#include <extras/randomart.h>
-#include <pkcs7_int.h>
+#include "extras/randomart.h"
+#include "pkcs7_int.h"
 
 #define addf _gnutls_buffer_append_printf
 #define adds _gnutls_buffer_append_str

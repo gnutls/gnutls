@@ -27,15 +27,15 @@
 #include "errors.h"
 #include "debug.h"
 #include "handshake.h"
-#include <auth/cert.h>
+#include "auth/cert.h"
 #include "constate.h"
-#include <record.h>
-#include <state.h>
-#include <ext/safe_renegotiation.h>
-#include <auth/anon.h> /* for gnutls_anon_server_credentials_t */
-#include <auth/psk.h> /* for gnutls_psk_server_credentials_t */
+#include "record.h"
+#include "state.h"
+#include "ext/safe_renegotiation.h"
+#include "auth/anon.h" /* for gnutls_anon_server_credentials_t */
+#include "auth/psk.h" /* for gnutls_psk_server_credentials_t */
 #ifdef ENABLE_SRP
-#include <auth/srp_kx.h>
+#include "auth/srp_kx.h"
 #endif
 
 int _gnutls_check_id_for_change(gnutls_session_t session)

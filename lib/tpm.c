@@ -28,7 +28,7 @@
  * Carolin Latze <latze@angry-red-pla.net> and Tobias Soder
  */
 
-#include <config.h>
+#include "config.h"
 #include <gnutls/gnutls.h>
 #include <gnutls/abstract.h>
 #include <gnutls/tpm.h>
@@ -37,11 +37,11 @@
 #ifdef HAVE_TROUSERS
 
 #include "errors.h"
-#include <pkcs11_int.h>
-#include <x509/common.h>
-#include <x509_b64.h>
-#include <random.h>
-#include <pin.h>
+#include "pkcs11_int.h"
+#include "x509/common.h"
+#include "x509_b64.h"
+#include "random.h"
+#include "pin.h"
 #include <c-ctype.h>
 
 #include <dlfcn.h>

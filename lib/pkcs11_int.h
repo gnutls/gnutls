@@ -26,7 +26,7 @@
 #define CRYPTOKI_GNU
 #include <p11-kit/pkcs11.h>
 #include <gnutls/pkcs11.h>
-#include <x509/x509_int.h>
+#include "x509/x509_int.h"
 
 /* Part of PKCS#11 3.0 interface, which was added in p11-kit 0.23.14 */
 #if defined(CKM_EDDSA) && defined(CKM_EC_EDWARDS_KEY_PAIR_GEN)

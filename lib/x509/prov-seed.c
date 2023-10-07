@@ -21,13 +21,13 @@
  */
 
 #include "gnutls_int.h"
-#include <datum.h>
-#include <global.h>
+#include "datum.h"
+#include "global.h"
 #include "errors.h"
-#include <common.h>
-#include <x509.h>
-#include <x509_int.h>
-#include <mpi.h>
+#include "common.h"
+#include "x509.h"
+#include "x509_int.h"
+#include "mpi.h"
 #include "prov-seed.h"
 
 /* This function encodes a seed value and a hash algorithm OID to the format

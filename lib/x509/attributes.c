@@ -24,10 +24,10 @@
 
 #include "gnutls_int.h"
 
-#include <datum.h>
+#include "datum.h"
 #include "errors.h"
-#include <common.h>
-#include <x509.h>
+#include "common.h"
+#include "x509.h"
 #include "x509_int.h"
 #include "attributes.h"
 

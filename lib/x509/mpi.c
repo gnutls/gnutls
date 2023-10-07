@@ -23,12 +23,12 @@
 
 #include "gnutls_int.h"
 #include "errors.h"
-#include <global.h>
+#include "global.h"
 #include <libtasn1.h>
-#include <datum.h>
+#include "datum.h"
 #include "common.h"
 #include "x509_int.h"
-#include <num.h>
+#include "num.h"
 #include <limits.h>
 
 /* Reads an Integer from the DER encoded data

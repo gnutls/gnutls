@@ -23,11 +23,11 @@
  */
 
 #include "gnutls_int.h"
-#include <global.h>
+#include "global.h"
 #include "errors.h"
 #include <libtasn1.h>
-#include <pk.h>
-#include <str.h>
+#include "pk.h"
+#include "str.h"
 #include "algorithms.h"
 
 #include <gnutls/ocsp.h>

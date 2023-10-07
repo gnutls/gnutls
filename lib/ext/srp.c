@@ -21,16 +21,16 @@
  */
 
 #include "gnutls_int.h"
-#include <ext/srp.h>
+#include "ext/srp.h"
 
 #ifdef ENABLE_SRP
 
 #include "auth.h"
-#include <auth/srp_kx.h>
+#include "auth/srp_kx.h"
 #include "errors.h"
 #include "algorithms.h"
-#include <num.h>
-#include <hello_ext.h>
+#include "num.h"
+#include "hello_ext.h"
 
 static int _gnutls_srp_unpack(gnutls_buffer_st *ps,
 			      gnutls_ext_priv_data_t *_priv);

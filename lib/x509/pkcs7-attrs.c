@@ -25,11 +25,11 @@
 
 #include "gnutls_int.h"
 
-#include <datum.h>
-#include <global.h>
+#include "datum.h"
+#include "global.h"
 #include "errors.h"
-#include <common.h>
-#include <x509_b64.h>
+#include "common.h"
+#include "x509_b64.h"
 #include <gnutls/abstract.h>
 #include <gnutls/pkcs7.h>
 

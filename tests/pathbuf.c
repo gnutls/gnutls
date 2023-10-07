@@ -20,7 +20,7 @@
  *
  */
 
-#include <config.h>
+#include "config.h"
 
 #include "../lib/pathbuf.h"
 #include "utils.h"

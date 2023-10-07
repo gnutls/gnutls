@@ -21,12 +21,12 @@
  * Written by Nikos Mavrogiannopoulos <nmav@gnutls.org>.
  */
 
-#include <config.h>
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include <certtool-cfg.h>
+#include "certtool-cfg.h"
 #include <gnutls/x509.h>
 #include <gnutls/x509-ext.h>
 #include <string.h>

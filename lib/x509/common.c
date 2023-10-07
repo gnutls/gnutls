@@ -23,17 +23,17 @@
 
 #include "gnutls_int.h"
 #include <libtasn1.h>
-#include <datum.h>
-#include <global.h>
+#include "datum.h"
+#include "global.h"
 #include "errors.h"
-#include <str.h>
-#include <x509.h>
-#include <num.h>
-#include <x509_b64.h>
+#include "str.h"
+#include "x509.h"
+#include "num.h"
+#include "x509_b64.h"
 #include <c-strcase.h>
 #include "x509_int.h"
 #include "extras/hex.h"
-#include <common.h>
+#include "common.h"
 
 static int data2hex(const void *data, size_t data_size, gnutls_datum_t *out);
 

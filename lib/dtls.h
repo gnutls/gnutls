@@ -23,11 +23,11 @@
 #ifndef GNUTLS_LIB_DTLS_H
 #define GNUTLS_LIB_DTLS_H
 
-#include <config.h>
+#include "config.h"
 #include "gnutls_int.h"
-#include <buffers.h>
-#include <mbuffers.h>
-#include <constate.h>
+#include "buffers.h"
+#include "mbuffers.h"
+#include "constate.h"
 
 int _dtls_transmit(gnutls_session_t session);
 int _dtls_record_check(struct record_parameters_st *rp, uint64_t seq_num);

@@ -22,7 +22,7 @@
 /* This checks the old low level DN encoding and decoding routines */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+#include "config.h"
 #endif
 
 #include <stdio.h>

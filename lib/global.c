@@ -24,20 +24,20 @@
 #include "gnutls_int.h"
 #include "errors.h"
 #include <libtasn1.h>
-#include <dh.h>
-#include <random.h>
+#include "dh.h"
+#include "random.h"
 #include <gnutls/pkcs11.h>
 
-#include <hello_ext.h> /* for _gnutls_hello_ext_init */
-#include <supplemental.h> /* for _gnutls_supplemental_deinit */
-#include <locks.h>
-#include <system.h>
-#include <accelerated/cryptodev.h>
-#include <accelerated/afalg.h>
-#include <accelerated/accelerated.h>
-#include <fips.h>
-#include <atfork.h>
-#include <system-keys.h>
+#include "hello_ext.h" /* for _gnutls_hello_ext_init */
+#include "supplemental.h" /* for _gnutls_supplemental_deinit */
+#include "locks.h"
+#include "system.h"
+#include "accelerated/cryptodev.h"
+#include "accelerated/afalg.h"
+#include "accelerated/accelerated.h"
+#include "fips.h"
+#include "atfork.h"
+#include "system-keys.h"
 #include "str.h"
 #include "global.h"
 

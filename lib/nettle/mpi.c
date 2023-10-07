@@ -25,15 +25,15 @@
 
 #include "gnutls_int.h"
 #include "errors.h"
-#include <algorithms.h>
-#include <num.h>
-#include <mpi.h>
+#include "algorithms.h"
+#include "num.h"
+#include "mpi.h"
 #include <nettle/bignum.h> /* includes gmp.h */
 #if ENABLE_GOST
 #include "gost/bignum-le.h"
 #endif
-#include <gnettle.h>
-#include <random.h>
+#include "gnettle.h"
+#include "random.h"
 
 static int wrap_nettle_mpi_print(const bigint_t a, void *buffer, size_t *nbytes,
 				 gnutls_bigint_format_t format)

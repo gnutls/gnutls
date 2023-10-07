@@ -29,18 +29,18 @@
 #include <gnutls/pkcs11.h>
 #include <string.h>
 #include "errors.h"
-#include <datum.h>
-#include <x509/common.h>
-#include <locks.h>
+#include "datum.h"
+#include "x509/common.h"
+#include "locks.h"
 #include "xsize.h"
 
-#include <pin.h>
-#include <pkcs11_int.h>
+#include "pin.h"
+#include "pkcs11_int.h"
 #include "pkcs11x.h"
-#include <system-keys.h>
+#include "system-keys.h"
 #include "x509/x509_int.h"
 
-#include <atfork.h>
+#include "atfork.h"
 #include "intprops.h"
 
 #define P11_KIT_FUTURE_UNSTABLE_API

@@ -27,9 +27,9 @@
 
 #include "gnutls_int.h"
 #include "errors.h"
-#include <auth.h>
-#include <auth/cert.h>
-#include <handshake.h>
+#include "auth.h"
+#include "auth/cert.h"
+#include "handshake.h"
 #include <minmax.h>
 
 #ifdef ENABLE_OCSP

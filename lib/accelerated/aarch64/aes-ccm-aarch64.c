@@ -32,11 +32,11 @@
 
 #include <gnutls/crypto.h>
 #include "errors.h"
-#include <aarch64-common.h>
+#include "aarch64-common.h"
 #include <byteswap.h>
 #include <nettle/ccm.h>
-#include <aes-aarch64.h>
-#include <fips.h>
+#include "aes-aarch64.h"
+#include "fips.h"
 
 typedef struct ccm_aarch64_aes_ctx {
 	AES_KEY key;

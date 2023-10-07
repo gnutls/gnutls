@@ -27,10 +27,10 @@
 #include "gnutls_int.h"
 #include <libtasn1.h>
 #include "errors.h"
-#include <num.h>
-#include <mpi.h>
-#include <random.h>
-#include <x509/x509_int.h>
+#include "num.h"
+#include "mpi.h"
+#include "random.h"
+#include "x509/x509_int.h"
 
 /* Functions that refer to the mpi library.
  */

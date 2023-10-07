@@ -25,13 +25,13 @@
 
 #include "gnutls_int.h"
 #include "errors.h"
-#include <global.h>
+#include "global.h"
 #include <libtasn1.h>
-#include <common.h>
+#include "common.h"
 #include <gnutls/x509-ext.h>
 #include <gnutls/x509.h>
-#include <x509_int.h>
-#include <datum.h>
+#include "x509_int.h"
+#include "datum.h"
 
 int _gnutls_get_extension(asn1_node asn, const char *root,
 			  const char *extension_id, int indx,

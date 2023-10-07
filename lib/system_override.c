@@ -26,13 +26,13 @@
 
 #include "gnutls_int.h"
 #include "errors.h"
-#include <num.h>
-#include <record.h>
-#include <buffers.h>
-#include <mbuffers.h>
-#include <state.h>
-#include <dtls.h>
-#include <system.h>
+#include "num.h"
+#include "record.h"
+#include "buffers.h"
+#include "mbuffers.h"
+#include "state.h"
+#include "dtls.h"
+#include "system.h"
 
 #include <errno.h>
 #ifdef _WIN32

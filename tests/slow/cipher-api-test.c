@@ -20,7 +20,7 @@
  *
  */
 
-#include <config.h>
+#include "config.h"
 #include <limits.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -47,7 +47,7 @@ int main(int argc, char **argv)
 #include <sys/wait.h>
 #include <unistd.h>
 #include <assert.h>
-#include <utils.h>
+#include "utils.h"
 
 #define AES_GCM_ENCRYPT_PLAINTEXT_MAX ((1ULL << 36) - 32)
 #if SIZE_MAX >= AES_GCM_ENCRYPT_PLAINTEXT_MAX

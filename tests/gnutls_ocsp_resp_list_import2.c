@@ -22,7 +22,7 @@
 /* This tests key import for gnutls_ocsp_resp_t APIs */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+#include "config.h"
 #endif
 
 #include <stdio.h>

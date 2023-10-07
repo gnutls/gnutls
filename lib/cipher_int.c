@@ -23,12 +23,12 @@
 
 #include "gnutls_int.h"
 #include "errors.h"
-#include <cipher_int.h>
-#include <datum.h>
+#include "cipher_int.h"
+#include "datum.h"
 #include <gnutls/crypto.h>
-#include <crypto.h>
-#include <fips.h>
-#include <algorithms.h>
+#include "crypto.h"
+#include "fips.h"
+#include "algorithms.h"
 
 #define SR_FB(x, cleanup)                                       \
 	ret = (x);                                              \

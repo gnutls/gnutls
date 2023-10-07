@@ -23,8 +23,8 @@
 #ifndef GNUTLS_LIB_AUTH_PSK_H
 #define GNUTLS_LIB_AUTH_PSK_H
 
-#include <auth.h>
-#include <auth/dh_common.h>
+#include "auth.h"
+#include "auth/dh_common.h"
 
 #define _gnutls_copy_psk_username(info, datum)                            \
 	_gnutls_copy_psk_string(&(info)->username, &(info)->username_len, \

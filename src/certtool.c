@@ -19,7 +19,7 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include <config.h>
+#include "config.h"
 
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
@@ -49,8 +49,8 @@
 #include <read-file.h>
 #include "parse-datetime.h"
 
-#include <certtool-cfg.h>
-#include <common.h>
+#include "certtool-cfg.h"
+#include "common.h"
 #include "certtool-options.h"
 #include "certtool-common.h"
 

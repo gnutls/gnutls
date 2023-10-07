@@ -35,7 +35,7 @@
 #include "config.h"
 #endif
 
-#include <gnutls_int.h>
+#include "gnutls_int.h"
 
 #include <string.h>
 

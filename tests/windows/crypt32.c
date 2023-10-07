@@ -22,7 +22,7 @@
 /* Parts copied from GnuTLS example programs. */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+#include "config.h"
 #endif
 
 #undef DECLSPEC_IMPORT
@@ -39,7 +39,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include "ncrypt-int.h"
-#include <utils.h>
+#include "utils.h"
 
 #define VALID_PTR (void *)0x0001
 

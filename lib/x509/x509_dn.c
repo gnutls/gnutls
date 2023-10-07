@@ -24,12 +24,12 @@
 
 #include "gnutls_int.h"
 
-#include <datum.h>
-#include <global.h>
+#include "datum.h"
+#include "global.h"
 #include "errors.h"
-#include <common.h>
-#include <x509.h>
-#include <x509_b64.h>
+#include "common.h"
+#include "x509.h"
+#include "x509_b64.h"
 #include <c-ctype.h>
 
 typedef int (*set_dn_func)(void *, const char *oid, unsigned int raw_flag,

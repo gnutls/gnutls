@@ -22,7 +22,7 @@
 
 #include "gnutls_int.h"
 #include "errors.h"
-#include <auth/cert.h>
+#include "auth/cert.h"
 #include <gnutls/gnutls.h>
 
 /* This file implements the client certificate auto verification functionality.

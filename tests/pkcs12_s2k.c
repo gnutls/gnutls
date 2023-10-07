@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -31,7 +31,7 @@
 
 /* utils.h must be loaded after gnutls_int.h, as it redefines some
  * macros from gnulib */
-#include <utils.h>
+#include "utils.h"
 
 static void tls_log_func(int level, const char *str)
 {

@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <config.h>
+#include "config.h"
 #include <fcntl.h>
 #include <netinet/tcp.h>
 #include <netinet/in.h>

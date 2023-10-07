@@ -27,9 +27,9 @@
 #include "errors.h"
 #include "num.h"
 #include "ext/supported_groups.h"
-#include <state.h>
-#include <num.h>
-#include <algorithms.h>
+#include "state.h"
+#include "num.h"
+#include "algorithms.h"
 #include "auth/psk.h"
 #include "auth/cert.h"
 #include "handshake.h"

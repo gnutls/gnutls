@@ -25,10 +25,10 @@
  */
 
 #include "gnutls_int.h"
-#include <hash_int.h>
+#include "hash_int.h"
 #include "errors.h"
-#include <algorithms.h>
-#include <fips.h>
+#include "algorithms.h"
+#include "fips.h"
 
 int _gnutls_hash_init(digest_hd_st *dig, const mac_entry_st *e)
 {

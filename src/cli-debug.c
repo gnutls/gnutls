@@ -19,7 +19,7 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include <config.h>
+#include "config.h"
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -32,11 +32,11 @@
 #elif HAVE_WS2TCPIP_H
 #include <ws2tcpip.h>
 #endif
-#include <tests.h>
-#include <common.h>
+#include "tests.h"
+#include "common.h"
 #include <ctype.h>
 #include "gnutls-cli-debug-options.h"
-#include <socket.h>
+#include "socket.h"
 
 /* Gnulib portability files. */
 #include "parse-datetime.h"

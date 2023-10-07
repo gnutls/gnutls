@@ -23,10 +23,10 @@
 #include <stdio.h>
 #include <string.h>
 #include "errors.h"
-#include <datum.h>
-#include <pkcs11_int.h>
+#include "datum.h"
+#include "pkcs11_int.h"
 #include "pkcs11x.h"
-#include <x509/common.h>
+#include "x509/common.h"
 #include "pk.h"
 
 static const ck_bool_t tval = 1;

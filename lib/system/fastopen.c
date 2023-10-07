@@ -20,8 +20,8 @@
  *
  */
 
-#include <config.h>
-#include <system.h>
+#include "config.h"
+#include "system.h"
 #include "gnutls_int.h"
 #include "errors.h"
 

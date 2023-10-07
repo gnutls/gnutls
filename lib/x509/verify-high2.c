@@ -24,17 +24,17 @@
 #include "gnutls_int.h"
 #include "errors.h"
 #include <libtasn1.h>
-#include <global.h>
-#include <num.h>
-#include <tls-sig.h>
-#include <str.h>
+#include "global.h"
+#include "num.h"
+#include "tls-sig.h"
+#include "str.h"
 #include <c-strcase.h>
-#include <datum.h>
+#include "datum.h"
 #include "x509_int.h"
-#include <common.h>
+#include "common.h"
 #include "verify-high.h"
 #include "read-file.h"
-#include <pkcs11_int.h>
+#include "pkcs11_int.h"
 #include "urls.h"
 
 #include <dirent.h>

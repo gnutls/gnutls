@@ -21,7 +21,7 @@
  *
  */
 
-#include <config.h>
+#include "config.h"
 #include "gnutls_int.h"
 #include "errors.h"
 
@@ -29,7 +29,7 @@
 #include <errno.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <atfork.h>
+#include "atfork.h"
 
 unsigned int _gnutls_forkid = 0;
 

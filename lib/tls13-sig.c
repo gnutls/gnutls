@@ -22,10 +22,10 @@
 
 #include "gnutls_int.h"
 #include "errors.h"
-#include <auth/cert.h>
-#include <algorithms.h>
-#include <ext/signature.h>
-#include <abstract_int.h>
+#include "auth/cert.h"
+#include "algorithms.h"
+#include "ext/signature.h"
+#include "abstract_int.h"
 #include "tls13-sig.h"
 #include "tls-sig.h"
 #include "hash_int.h"

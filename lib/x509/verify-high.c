@@ -24,14 +24,14 @@
 #include "gnutls_int.h"
 #include "errors.h"
 #include <libtasn1.h>
-#include <global.h>
-#include <num.h> /* MAX */
-#include <tls-sig.h>
-#include <str.h>
-#include <datum.h>
+#include "global.h"
+#include "num.h" /* MAX */
+#include "tls-sig.h"
+#include "str.h"
+#include "datum.h"
 #include <hash-pjw-bare.h>
 #include "x509_int.h"
-#include <common.h>
+#include "common.h"
 #include <gnutls/x509-ext.h>
 #include "verify-high.h"
 #include "intprops.h"

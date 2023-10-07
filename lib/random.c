@@ -25,9 +25,9 @@
 
 #include "gnutls_int.h"
 #include "errors.h"
-#include <random.h>
+#include "random.h"
 #include "locks.h"
-#include <fips.h>
+#include "fips.h"
 
 #include "gl_linkedhash_list.h"
 #include "gl_list.h"

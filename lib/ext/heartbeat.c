@@ -26,11 +26,11 @@
 
 #include "errors.h"
 #include "gnutls_int.h"
-#include <dtls.h>
-#include <record.h>
-#include <ext/heartbeat.h>
-#include <hello_ext.h>
-#include <random.h>
+#include "dtls.h"
+#include "record.h"
+#include "ext/heartbeat.h"
+#include "hello_ext.h"
+#include "random.h"
 
 #ifdef ENABLE_HEARTBEAT
 /**

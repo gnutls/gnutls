@@ -23,7 +23,7 @@
 #ifndef GNUTLS_LIB_GTHREADS_H
 #define GNUTLS_LIB_GTHREADS_H
 
-#include <config.h>
+#include "config.h"
 
 /* Using a C99-only compiler installed in parallel with modern C11 environment
  * will see HAVE_THREADS_H, but won't be able to use _Thread_local. */

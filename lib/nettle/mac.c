@@ -24,7 +24,7 @@
  */
 
 #include "gnutls_int.h"
-#include <hash_int.h>
+#include "hash_int.h"
 #include "errors.h"
 #include <nettle/md5.h>
 #include <nettle/md2.h>

@@ -22,9 +22,9 @@
  */
 
 #include "gnutls_int.h"
-#include <algorithms.h>
+#include "algorithms.h"
 #include "errors.h"
-#include <x509/common.h>
+#include "x509/common.h"
 #include "c-strcase.h"
 
 #define MAC_OID_SHA1 "1.2.840.113549.2.7"

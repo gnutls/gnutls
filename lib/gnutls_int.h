@@ -25,7 +25,7 @@
 #define GNUTLS_LIB_GNUTLS_INT_H
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+#include "config.h"
 #endif
 
 #include <stddef.h>
@@ -82,7 +82,7 @@ typedef int ssize_t;
 #include <gnutls/dtls.h>
 #include <gnutls/abstract.h>
 #include <gnutls/socket.h>
-#include <system.h>
+#include "system.h"
 
 /* in case we compile with system headers taking priority, we
  * make sure that some new attributes are still available.
@@ -238,7 +238,7 @@ typedef enum record_send_state_t {
 #define DEFAULT_MAX_VERIFY_BITS (MAX_PK_PARAM_SIZE * 8)
 #define MAX_VERIFY_DEPTH 4096
 
-#include <mem.h>
+#include "mem.h"
 
 #define MEMSUB(x, y) ((ssize_t)((ptrdiff_t)x - (ptrdiff_t)y))
 
@@ -267,7 +267,7 @@ typedef enum record_send_state_t {
 
 #define GNUTLS_KX_INVALID (-1)
 
-#include <mpi.h>
+#include "mpi.h"
 
 typedef enum handshake_state_t {
 	STATE0 = 0,
@@ -821,8 +821,8 @@ typedef struct {
 
 /* STATE (cont) */
 
-#include <hash_int.h>
-#include <cipher_int.h>
+#include "hash_int.h"
+#include "cipher_int.h"
 
 typedef struct {
 	uint8_t id[2]; /* used to be (in TLS 1.2) hash algorithm , PK algorithm */
@@ -1726,7 +1726,7 @@ inline static int _gnutls_timespec_cmp(struct timespec *a, struct timespec *b)
 	return 0;
 }
 
-#include <algorithms.h>
+#include "algorithms.h"
 inline static int _gnutls_set_current_version(gnutls_session_t s, unsigned v)
 {
 	s->security_parameters.pversion = version_to_entry(v);

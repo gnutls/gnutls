@@ -34,7 +34,7 @@
 #endif
 
 #ifndef HAVE_NETTLE_STREEBOG512_UPDATE
-#include <gnutls_int.h>
+#include "gnutls_int.h"
 
 #include <nettle/nettle-meta.h>
 

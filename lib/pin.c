@@ -20,7 +20,7 @@
 
 #include "gnutls_int.h"
 #include <gnutls/pkcs11.h>
-#include <pin.h>
+#include "pin.h"
 #include "errors.h"
 
 gnutls_pin_callback_t _gnutls_pin_func;

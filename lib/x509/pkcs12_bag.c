@@ -26,10 +26,10 @@
 
 #include "gnutls_int.h"
 
-#include <datum.h>
-#include <global.h>
+#include "datum.h"
+#include "global.h"
 #include "errors.h"
-#include <common.h>
+#include "common.h"
 #include "x509_int.h"
 #include "pkcs7_int.h"
 

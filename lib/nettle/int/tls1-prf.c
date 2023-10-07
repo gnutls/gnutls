@@ -24,10 +24,10 @@
  */
 
 #if HAVE_CONFIG_H
-#include <config.h>
+#include "config.h"
 #endif
 
-#include <gnutls_int.h>
+#include "gnutls_int.h"
 #include "fips.h"
 
 #include <stdlib.h>

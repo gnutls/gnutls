@@ -2,7 +2,7 @@
 #define GNUTLS_LIB_ACCELERATED_X86_AES_PADLOCK_H
 
 #include "gnutls_int.h"
-#include <aes-x86.h>
+#include "aes-x86.h"
 
 struct padlock_cipher_data {
 	unsigned char iv[16]; /* Initialization vector */

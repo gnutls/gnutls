@@ -25,8 +25,8 @@
 
 #include "gnutls_int.h"
 #include <gnutls/crypto.h>
-#include <crypto-backend.h>
-#include <crypto.h>
+#include "crypto-backend.h"
+#include "crypto.h"
 
 /* for message digests */
 

@@ -23,14 +23,14 @@
 #include "gnutls_int.h"
 #include "errors.h"
 #include "fips.h"
-#include <cipher_int.h>
-#include <datum.h>
+#include "cipher_int.h"
+#include "datum.h"
 #include <gnutls/crypto.h>
 #include <gnutls/self-test.h>
 #include "errors.h"
 #include <gnutls/abstract.h>
-#include <pk.h>
-#include <debug.h>
+#include "pk.h"
+#include "debug.h"
 
 #define DATASTR "Hello there!"
 static const gnutls_datum_t signed_data = { .data = (void *)DATASTR,

@@ -22,15 +22,15 @@
  */
 
 #include "gnutls_int.h"
-#include <hash_int.h>
+#include "hash_int.h"
 #include "errors.h"
 #include <nettle/sha.h>
 #include <nettle/hmac.h>
 #include <nettle/macros.h>
-#include <aes-padlock.h>
+#include "aes-padlock.h"
 #include <assert.h>
-#include <sha-padlock.h>
-#include <x86-common.h>
+#include "sha-padlock.h"
+#include "x86-common.h"
 
 #ifdef HAVE_LIBNETTLE
 

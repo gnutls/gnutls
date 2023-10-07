@@ -23,10 +23,10 @@
 #include "gnutls_int.h"
 #include "errors.h"
 #include <libtasn1.h>
-#include <dh.h>
-#include <random.h>
+#include "dh.h"
+#include "random.h"
 
-#include <locks.h>
+#include "locks.h"
 
 /**
  * gnutls_global_set_mutex:

@@ -24,7 +24,7 @@
 #ifndef GNUTLS_LIB_AUTH_ECDHE_H
 #define GNUTLS_LIB_AUTH_ECDHE_H
 
-#include <auth.h>
+#include "auth.h"
 
 int _gnutls_gen_ecdh_common_client_kx(gnutls_session_t session,
 				      gnutls_buffer_st *data);

@@ -32,7 +32,7 @@
 #include <sys/resource.h>
 #endif
 
-#include <fips.h>
+#include "fips.h"
 
 int _rnd_system_entropy_init(void);
 void _rnd_system_entropy_deinit(void);

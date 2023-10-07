@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+#include "config.h"
 #endif
 
 /*
@@ -33,7 +33,7 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
-#include <utils.h>
+#include "utils.h"
 
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>

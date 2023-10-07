@@ -23,7 +23,7 @@
 #ifndef GNUTLS_LIB_ATFORK_H
 #define GNUTLS_LIB_ATFORK_H
 
-#include <config.h>
+#include "config.h"
 #include "gnutls_int.h"
 
 extern unsigned int _gnutls_forkid;

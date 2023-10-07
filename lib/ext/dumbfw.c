@@ -23,7 +23,7 @@
 #include "auth.h"
 #include "errors.h"
 #include "num.h"
-#include <ext/dumbfw.h>
+#include "ext/dumbfw.h"
 
 /* This extension adds additional padding data in the TLS client hello.
  * There is an issue with some firewalls [0] rejecting TLS client hello

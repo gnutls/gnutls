@@ -32,11 +32,11 @@
 */
 
 #if HAVE_CONFIG_H
-#include <config.h>
+#include "config.h"
 #endif
 
 #ifndef HAVE_NETTLE_STREEBOG512_UPDATE
-#include <gnutls_int.h>
+#include "gnutls_int.h"
 
 #include <nettle/hmac.h>
 #include "hmac-gost.h"

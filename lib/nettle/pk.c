@@ -27,20 +27,20 @@
  */
 
 #include "gnutls_int.h"
-#include <mpi.h>
-#include <pk.h>
+#include "mpi.h"
+#include "pk.h"
 #include "errors.h"
-#include <datum.h>
-#include <global.h>
-#include <tls-sig.h>
-#include <num.h>
-#include <x509/x509_int.h>
-#include <x509/common.h>
-#include <random.h>
-#include <pk.h>
+#include "datum.h"
+#include "global.h"
+#include "tls-sig.h"
+#include "num.h"
+#include "x509/x509_int.h"
+#include "x509/common.h"
+#include "random.h"
+#include "pk.h"
 #include <nettle/dsa.h>
-#include <dsa-fips.h>
-#include <rsa-fips.h>
+#include "dsa-fips.h"
+#include "rsa-fips.h"
 #include <nettle/rsa.h>
 #include <gnutls/crypto.h>
 #include <nettle/bignum.h>
@@ -64,8 +64,8 @@
 #endif
 #include "int/ecdsa-compute-k.h"
 #include "int/dsa-compute-k.h"
-#include <gnettle.h>
-#include <fips.h>
+#include "gnettle.h"
+#include "fips.h"
 #include "dh.h"
 
 static inline const struct ecc_curve *get_supported_nist_curve(int curve);

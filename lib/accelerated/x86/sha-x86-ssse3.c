@@ -24,12 +24,12 @@
 #include "gnutls_int.h"
 #include <gnutls/crypto.h>
 #include "errors.h"
-#include <aes-x86.h>
+#include "aes-x86.h"
 #include <nettle/sha.h>
 #include <nettle/macros.h>
 #include <nettle/nettle-meta.h>
-#include <sha-x86.h>
-#include <x86-common.h>
+#include "sha-x86.h"
+#include "x86-common.h"
 
 void sha1_block_data_order(void *c, const void *p, size_t len);
 void sha256_block_data_order(void *c, const void *p, size_t len);

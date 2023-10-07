@@ -23,14 +23,14 @@
 
 #include "gnutls_int.h"
 #include "errors.h"
-#include <global.h>
+#include "global.h"
 #include <libtasn1.h>
-#include <datum.h>
+#include "datum.h"
 #include "common.h"
 #include "x509_int.h"
 #include "pk.h"
-#include <num.h>
-#include <ecc.h>
+#include "num.h"
+#include "ecc.h"
 
 static int _gnutls_x509_read_rsa_pubkey(uint8_t *der, int dersize,
 					gnutls_pk_params_st *params);

@@ -22,7 +22,7 @@
  */
 
 #include "gnutls_int.h"
-#include <extras/randomart.h>
+#include "extras/randomart.h"
 
 /**
  * gnutls_random_art:

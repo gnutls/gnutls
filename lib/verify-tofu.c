@@ -23,17 +23,17 @@
 #include "gnutls_int.h"
 #include "errors.h"
 #include <libtasn1.h>
-#include <global.h>
-#include <num.h> /* MAX */
-#include <tls-sig.h>
+#include "global.h"
+#include "num.h" /* MAX */
+#include "tls-sig.h"
 #include "str.h"
-#include <datum.h>
+#include "datum.h"
 #include "x509_int.h"
 #include <nettle/base64.h>
-#include <common.h>
+#include "common.h"
 #include <gnutls/abstract.h>
-#include <system.h>
-#include <locks.h>
+#include "system.h"
+#include "locks.h"
 
 GNUTLS_STATIC_MUTEX(file_mutex);
 

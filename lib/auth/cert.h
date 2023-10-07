@@ -25,11 +25,11 @@
 #define GNUTLS_LIB_AUTH_CERT_H
 
 #include "auth.h"
-#include <auth/dh_common.h>
-#include <x509/x509_int.h>
+#include "auth/dh_common.h"
+#include "x509/x509_int.h"
 #include <gnutls/abstract.h>
 #include <gnutls/compat.h>
-#include <str_array.h>
+#include "str_array.h"
 #include "abstract_int.h"
 
 #define MAX_OCSP_RESPONSES 8

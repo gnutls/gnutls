@@ -30,8 +30,8 @@
 #include "gnutls_int.h"
 #include <gnutls/crypto.h>
 #include "errors.h"
-#include <aes-aarch64.h>
-#include <aarch64-common.h>
+#include "aes-aarch64.h"
+#include "aarch64-common.h"
 
 struct aes_ctx {
 	AES_KEY expanded_key;

@@ -22,15 +22,15 @@
 
 #include "gnutls_int.h"
 
-#include <datum.h>
-#include <global.h>
+#include "datum.h"
+#include "global.h"
 #include "errors.h"
-#include <common.h>
-#include <x509.h>
-#include <x509_b64.h>
+#include "common.h"
+#include "x509.h"
+#include "x509_b64.h"
 #include "x509_int.h"
 #include "pkcs7_int.h"
-#include <algorithms.h>
+#include "algorithms.h"
 #include <nettle/md5.h>
 
 /* This file includes support for PKCS#8 PBES1 with DES and MD5.

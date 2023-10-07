@@ -26,8 +26,8 @@
 
 #include "gnutls_int.h"
 #include "errors.h"
-#include <datum.h>
-#include <x509_b64.h>
+#include "datum.h"
+#include "x509_b64.h"
 #include <nettle/base64.h>
 
 #define INCR(what, size, max_len)                       \

@@ -22,7 +22,7 @@
 
 #include "gnutls_int.h"
 #include "errors.h"
-#include <num.h>
+#include "num.h"
 #include "xalloc-oversized.h"
 
 gnutls_alloc_function gnutls_secure_malloc = malloc;

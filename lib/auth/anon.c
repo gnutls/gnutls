@@ -36,8 +36,8 @@
 #include "auth/anon.h"
 #include "num.h"
 #include "mpi.h"
-#include <state.h>
-#include <auth/dh_common.h>
+#include "state.h"
+#include "auth/dh_common.h"
 
 static int gen_anon_server_kx(gnutls_session_t, gnutls_buffer_st *);
 static int proc_anon_client_kx(gnutls_session_t, uint8_t *, size_t);

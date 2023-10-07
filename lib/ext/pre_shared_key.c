@@ -31,8 +31,8 @@
 #include "tls13/finished.h"
 #include "tls13/session_ticket.h"
 #include "auth/psk_passwd.h"
-#include <ext/session_ticket.h>
-#include <ext/pre_shared_key.h>
+#include "ext/session_ticket.h"
+#include "ext/pre_shared_key.h"
 #include <assert.h>
 
 inline static bool

@@ -34,7 +34,7 @@
 
 #ifndef HAVE_NETTLE_GOST28147_SET_KEY
 
-#include <gnutls_int.h>
+#include "gnutls_int.h"
 
 #include <string.h>
 

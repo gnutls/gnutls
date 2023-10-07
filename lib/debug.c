@@ -25,7 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "debug.h"
-#include <mpi.h>
+#include "mpi.h"
 
 #ifdef DEBUG
 void _gnutls_dump_mpi(const char *prefix, bigint_t a)

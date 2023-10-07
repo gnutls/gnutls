@@ -24,7 +24,7 @@
 #ifndef GNUTLS_LIB_EXT_SERVER_NAME_H
 #define GNUTLS_LIB_EXT_SERVER_NAME_H
 
-#include <hello_ext.h>
+#include "hello_ext.h"
 
 extern const hello_ext_entry_st ext_mod_server_name;
 

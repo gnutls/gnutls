@@ -31,11 +31,11 @@
 
 #include "gnutls_int.h"
 #include "errors.h"
-#include <locks.h>
-#include <num.h>
+#include "locks.h"
+#include "num.h"
 #include <nettle/yarrow.h>
 #include <errno.h>
-#include <rnd-common.h>
+#include "rnd-common.h"
 #include <hash-pjw-bare.h>
 
 #include <sys/types.h>

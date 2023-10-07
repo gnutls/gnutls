@@ -28,9 +28,9 @@
 #ifndef RND_NO_INCLUDES
 #include "gnutls_int.h"
 #include "errors.h"
-#include <num.h>
+#include "num.h"
 #include <errno.h>
-#include <rnd-common.h>
+#include "rnd-common.h"
 #endif
 
 #include <sys/types.h>

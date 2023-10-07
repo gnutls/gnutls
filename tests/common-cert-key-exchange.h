@@ -23,7 +23,7 @@
 #define GNUTLS_TESTS_COMMON_CERT_KEY_EXCHANGE_H
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+#include "config.h"
 #endif
 
 #include <gnutls/gnutls.h>

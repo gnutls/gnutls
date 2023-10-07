@@ -37,7 +37,7 @@
 #define GOST_CMAC_H_INCLUDED
 
 #if HAVE_CONFIG_H
-#include <config.h>
+#include "config.h"
 #endif
 
 #ifndef HAVE_NETTLE_CMAC_MAGMA_UPDATE

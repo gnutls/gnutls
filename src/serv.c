@@ -24,7 +24,7 @@
  * (which means it is quite unreadable)
  */
 
-#include <config.h>
+#include "config.h"
 
 #include "common.h"
 #include "gnutls-serv-options.h"
@@ -41,7 +41,7 @@
 #include <fcntl.h>
 #include <netdb.h>
 #include <unistd.h>
-#include <socket.h>
+#include "socket.h"
 
 /* Gnulib portability files. */
 #include "gl_linked_list.h"

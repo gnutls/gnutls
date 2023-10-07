@@ -20,14 +20,14 @@
  */
 
 #if HAVE_CONFIG_H
-#include <config.h>
+#include "config.h"
 #endif
 
 #include <assert.h>
 #include <stdlib.h>
 #include <nettle/memxor.h>
 #include <nettle/bignum.h>
-#include <dsa-fips.h>
+#include "dsa-fips.h"
 
 #include <nettle/macros.h>
 

@@ -19,7 +19,7 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include <config.h>
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,11 +35,11 @@
 
 /* Gnulib portability files. */
 #include <read-file.h>
-#include <socket.h>
+#include "socket.h"
 #include <minmax.h>
 #include "parse-datetime.h"
 
-#include <ocsptool-common.h>
+#include "ocsptool-common.h"
 #include "ocsptool-options.h"
 #include "certtool-common.h"
 #include "common.h"

@@ -1,6 +1,6 @@
 /* CC0 license (public domain) - see LICENSE file for details */
-#include <config.h>
-#include <hex.h>
+#include "config.h"
+#include "hex.h"
 #include <stdio.h>
 #include <stdlib.h>
 

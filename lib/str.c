@@ -23,7 +23,7 @@
 
 #include "gnutls_int.h"
 #include "errors.h"
-#include <num.h>
+#include "num.h"
 #include "str.h"
 #include <stdarg.h>
 #include <c-ctype.h>

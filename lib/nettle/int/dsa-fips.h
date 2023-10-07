@@ -25,7 +25,7 @@
 #include <nettle/bignum.h> /* includes gmp.h */
 #include <nettle/dsa.h>
 #include <nettle/sha2.h>
-#include <fips.h>
+#include "fips.h"
 
 #define div_ceil(x, y) ((x + (y)-1) / (y))
 

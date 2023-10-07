@@ -27,23 +27,23 @@
 
 #include "gnutls_int.h"
 #ifdef ENABLE_SRP
-#include <auth/srp_kx.h>
+#include "auth/srp_kx.h"
 #endif
 #ifdef ENABLE_PSK
-#include <auth/psk.h>
+#include "auth/psk.h"
 #endif
-#include <auth/anon.h>
-#include <auth/cert.h>
+#include "auth/anon.h"
+#include "auth/cert.h"
 #include "errors.h"
-#include <auth.h>
-#include <session_pack.h>
-#include <datum.h>
-#include <num.h>
-#include <hello_ext.h>
-#include <constate.h>
-#include <algorithms.h>
-#include <state.h>
-#include <db.h>
+#include "auth.h"
+#include "session_pack.h"
+#include "datum.h"
+#include "num.h"
+#include "hello_ext.h"
+#include "constate.h"
+#include "algorithms.h"
+#include "state.h"
+#include "db.h"
 #include "tls13/session_ticket.h"
 
 static int pack_certificate_auth_info(gnutls_session_t,

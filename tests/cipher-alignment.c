@@ -24,7 +24,7 @@
 /* Tests whether memory input to ciphers are properly aligned */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+#include "config.h"
 #endif
 
 #include <stdio.h>

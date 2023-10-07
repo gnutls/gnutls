@@ -18,7 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <config.h>
+#include "config.h"
 
 /* Work around problem reported in
    <https://permalink.gmane.org/gmane.comp.lib.gnulib.bugs/15755>.*/
@@ -35,7 +35,7 @@
 #include <gnutls/x509.h>
 #include <gnutls/crypto.h>
 #include <time.h>
-#include <common.h>
+#include "common.h"
 #include <unistd.h>
 
 #ifndef _WIN32
