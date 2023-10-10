@@ -29,11 +29,11 @@
 #include "errors.h"
 #include "num.h"
 #include <gnutls/gnutls.h>
-#include <ext/signature.h>
-#include <state.h>
-#include <num.h>
-#include <algorithms.h>
-#include <abstract_int.h>
+#include "ext/signature.h"
+#include "state.h"
+#include "num.h"
+#include "algorithms.h"
+#include "abstract_int.h"
 
 /*
  * Some (all SChannel) clients fail to send proper SigAlgs due to Micro$oft crazyness.

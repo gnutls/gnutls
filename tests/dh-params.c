@@ -22,7 +22,7 @@
 /* This program tests functionality in gnutls_dh_params structure */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+#include "config.h"
 #endif
 
 #include <gnutls/gnutls.h>

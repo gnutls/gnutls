@@ -27,12 +27,12 @@
 #include "gnutls_int.h"
 #include <libtasn1.h>
 
-#include <datum.h>
-#include <global.h>
+#include "datum.h"
+#include "global.h"
 #include "errors.h"
-#include <common.h>
-#include <x509_b64.h>
-#include <pkcs7_int.h>
+#include "common.h"
+#include "x509_b64.h"
+#include "pkcs7_int.h"
 #include <gnutls/abstract.h>
 #include <gnutls/pkcs7.h>
 

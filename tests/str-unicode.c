@@ -19,7 +19,7 @@
  * along with GnuTLS.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <config.h>
+#include "config.h"
 #include <stdarg.h>
 #include <stddef.h>
 #include <setjmp.h>

@@ -23,18 +23,18 @@
 
 #include "gnutls_int.h"
 #include "errors.h"
-#include <auth/srp_kx.h>
-#include <state.h>
+#include "auth/srp_kx.h"
+#include "state.h"
 
 #ifdef ENABLE_SRP
 
 #include "srp.h"
-#include <auth/srp_passwd.h>
-#include <mpi.h>
-#include <num.h>
-#include <file.h>
-#include <algorithms.h>
-#include <random.h>
+#include "auth/srp_passwd.h"
+#include "mpi.h"
+#include "num.h"
+#include "file.h"
+#include "algorithms.h"
+#include "random.h"
 
 #include "debug.h"
 #include "attribute.h"

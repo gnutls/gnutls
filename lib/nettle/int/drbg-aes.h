@@ -22,7 +22,7 @@
 #ifndef GNUTLS_LIB_NETTLE_INT_DRBG_AES_H
 #define GNUTLS_LIB_NETTLE_INT_DRBG_AES_H
 
-#include <config.h>
+#include "config.h"
 #include <nettle/aes.h>
 
 /* This is nettle's increment macro */

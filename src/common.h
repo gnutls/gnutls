@@ -23,10 +23,10 @@
 
 #define SERVER "127.0.0.1"
 
-#include <config.h>
+#include "config.h"
 #include <gnutls/gnutls.h>
 #include <gnutls/pkcs11.h>
-#include <certtool-common.h>
+#include "certtool-common.h"
 #include <c-ctype.h>
 #include <string.h>
 #include <sys/socket.h>

@@ -23,15 +23,15 @@
 
 #include "gnutls_int.h"
 #include "errors.h"
-#include <datum.h>
-#include <x509_b64.h> /* for PKCS3 PEM decoding */
-#include <global.h>
-#include <dh.h>
-#include <pk.h>
-#include <x509/common.h>
+#include "datum.h"
+#include "x509_b64.h" /* for PKCS3 PEM decoding */
+#include "global.h"
+#include "dh.h"
+#include "pk.h"
+#include "x509/common.h"
 #include <gnutls/crypto.h>
 #include "x509/x509_int.h"
-#include <mpi.h>
+#include "mpi.h"
 #include "debug.h"
 #include "state.h"
 

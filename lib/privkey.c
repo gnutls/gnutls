@@ -25,19 +25,19 @@
 #include <stdio.h>
 #include <string.h>
 #include "errors.h"
-#include <datum.h>
-#include <pkcs11_int.h>
+#include "datum.h"
+#include "pkcs11_int.h"
 #include <gnutls/abstract.h>
-#include <pk.h>
-#include <x509_int.h>
-#include <tls-sig.h>
-#include <algorithms.h>
-#include <fips.h>
-#include <system-keys.h>
+#include "pk.h"
+#include "x509_int.h"
+#include "tls-sig.h"
+#include "algorithms.h"
+#include "fips.h"
+#include "system-keys.h"
 #include "urls.h"
 #include "tpm2.h"
 #include "pkcs11_int.h"
-#include <abstract_int.h>
+#include "abstract_int.h"
 
 static int privkey_sign_prehashed(gnutls_privkey_t signer,
 				  const gnutls_sign_entry_st *se,

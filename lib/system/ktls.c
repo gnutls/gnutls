@@ -29,7 +29,7 @@
 #include <netinet/tcp.h>
 #include <unistd.h>
 #include <errno.h>
-#include <record.h>
+#include "record.h"
 
 #if defined(__FreeBSD__)
 #include <sys/ktls.h>

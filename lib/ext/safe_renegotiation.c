@@ -21,7 +21,7 @@
  */
 
 #include "gnutls_int.h"
-#include <ext/safe_renegotiation.h>
+#include "ext/safe_renegotiation.h"
 #include "errors.h"
 
 static int _gnutls_sr_recv_params(gnutls_session_t state, const uint8_t *data,

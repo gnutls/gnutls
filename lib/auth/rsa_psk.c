@@ -37,15 +37,15 @@
 #include "gnutls_int.h"
 #include "pk.h"
 #include "random.h"
-#include <abstract_int.h>
-#include <algorithms.h>
-#include <auth/dh_common.h>
-#include <auth/psk.h>
-#include <auth/psk_passwd.h>
-#include <auth/rsa_common.h>
-#include <cert.h>
-#include <datum.h>
-#include <state.h>
+#include "abstract_int.h"
+#include "algorithms.h"
+#include "auth/dh_common.h"
+#include "auth/psk.h"
+#include "auth/psk_passwd.h"
+#include "auth/rsa_common.h"
+#include "cert.h"
+#include "datum.h"
+#include "state.h"
 
 static int _gnutls_gen_rsa_psk_client_kx(gnutls_session_t session,
 					 gnutls_buffer_st *data);

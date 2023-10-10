@@ -25,7 +25,7 @@
 #ifdef ENABLE_ANON
 
 #include "errors.h"
-#include <auth/anon.h>
+#include "auth/anon.h"
 #include "auth.h"
 #include "dh.h"
 #include "num.h"

@@ -25,10 +25,10 @@
  */
 
 #include "gnutls_int.h"
-#include <common.h>
-#include <x509.h>
-#include <x509_int.h>
-#include <num.h>
+#include "common.h"
+#include "x509.h"
+#include "x509_int.h"
+#include "num.h"
 #include "errors.h"
 #include "hello_ext.h"
 #include "ip.h"

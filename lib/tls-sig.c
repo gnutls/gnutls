@@ -23,22 +23,22 @@
 
 #include "gnutls_int.h"
 #include "errors.h"
-#include <x509_b64.h>
-#include <auth/cert.h>
-#include <algorithms.h>
-#include <datum.h>
-#include <mpi.h>
-#include <global.h>
-#include <pk.h>
-#include <debug.h>
-#include <buffers.h>
-#include <tls-sig.h>
-#include <kx.h>
+#include "x509_b64.h"
+#include "auth/cert.h"
+#include "algorithms.h"
+#include "datum.h"
+#include "mpi.h"
+#include "global.h"
+#include "pk.h"
+#include "debug.h"
+#include "buffers.h"
+#include "tls-sig.h"
+#include "kx.h"
 #include <libtasn1.h>
-#include <ext/signature.h>
-#include <state.h>
-#include <x509/common.h>
-#include <abstract_int.h>
+#include "ext/signature.h"
+#include "state.h"
+#include "x509/common.h"
+#include "abstract_int.h"
 
 int _gnutls_check_key_usage_for_sig(gnutls_session_t session,
 				    unsigned key_usage, unsigned our_cert)

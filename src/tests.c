@@ -18,7 +18,7 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include <config.h>
+#include "config.h"
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 
@@ -32,8 +32,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <common.h>
-#include <tests.h>
+#include "common.h"
+#include "tests.h"
 
 void _gnutls_record_set_default_version(gnutls_session_t session,
 					unsigned char major,

@@ -25,7 +25,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+#include "config.h"
 #endif
 
 #ifndef _WIN32
@@ -51,7 +51,7 @@ void doit(void)
 #include <gnutls/crypto.h>
 #include <stdio.h>
 #include <assert.h>
-#include <utils.h>
+#include "utils.h"
 #include "../cert-common.h"
 #include "ncrypt-int.h"
 

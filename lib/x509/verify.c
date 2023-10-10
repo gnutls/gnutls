@@ -29,16 +29,16 @@
 #include "gnutls_int.h"
 #include "errors.h"
 #include <libtasn1.h>
-#include <global.h>
-#include <num.h> /* MAX */
-#include <tls-sig.h>
-#include <str.h>
-#include <datum.h>
-#include <pkcs11_int.h>
-#include <x509_int.h>
-#include <common.h>
-#include <pk.h>
-#include <x509/verify-high.h>
+#include "global.h"
+#include "num.h" /* MAX */
+#include "tls-sig.h"
+#include "str.h"
+#include "datum.h"
+#include "pkcs11_int.h"
+#include "x509_int.h"
+#include "common.h"
+#include "pk.h"
+#include "x509/verify-high.h"
 #include "supported_exts.h"
 #include "profiles.h"
 

@@ -28,17 +28,17 @@
 
 #include "x509_b64.h"
 #include "errors.h"
-#include <auth/srp_passwd.h>
-#include <auth/srp_kx.h>
+#include "auth/srp_passwd.h"
+#include "auth/srp_kx.h"
 #include "auth.h"
 #include "srp.h"
 #include "dh.h"
 #include "debug.h"
-#include <str.h>
-#include <datum.h>
-#include <num.h>
-#include <random.h>
-#include <algorithms.h>
+#include "str.h"
+#include "datum.h"
+#include "num.h"
+#include "random.h"
+#include "algorithms.h"
 
 static int _randomize_pwd_entry(SRP_PWD_ENTRY *entry,
 				gnutls_srp_server_credentials_t cred,

@@ -26,10 +26,10 @@
 
 #include "gnutls_int.h"
 #include "errors.h"
-#include <locks.h>
-#include <num.h>
+#include "locks.h"
+#include "num.h"
 #include <errno.h>
-#include <rnd-common.h>
+#include "rnd-common.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>

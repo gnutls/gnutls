@@ -22,7 +22,7 @@
 /* This tests the gnutls_privkey_import_ext2() APIs */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+#include "config.h"
 #endif
 
 #include <stdio.h>

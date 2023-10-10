@@ -26,8 +26,8 @@
  */
 
 #include "gnutls_int.h"
-#include <num.h>
-#include <datum.h>
+#include "num.h"
+#include "datum.h"
 #include "errors.h"
 
 /* On error, @dat is not changed. */

@@ -18,14 +18,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>
  */
 
-#include <config.h>
-#include <drbg-aes.h>
+#include "config.h"
+#include "drbg-aes.h"
 #include <nettle/memxor.h>
 #include <nettle/aes.h>
 #include <minmax.h>
 #include <string.h>
 #include <stdio.h>
-#include <fips.h>
+#include "fips.h"
 #include <assert.h>
 
 int drbg_aes_init(struct drbg_aes_ctx *ctx, unsigned entropy_size,

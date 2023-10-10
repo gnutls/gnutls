@@ -23,7 +23,7 @@
 #ifndef GNUTLS_LIB_EXT_SAFE_RENEGOTIATION_H
 #define GNUTLS_LIB_EXT_SAFE_RENEGOTIATION_H
 
-#include <hello_ext.h>
+#include "hello_ext.h"
 
 typedef struct {
 	uint8_t client_verify_data[MAX_VERIFY_DATA_SIZE];

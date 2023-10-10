@@ -18,7 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <config.h>
+#include "config.h"
 
 #if HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
@@ -34,7 +34,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <arpa/inet.h>
-#include <socket.h>
+#include "socket.h"
 #include <c-ctype.h>
 #include "sockets.h"
 #include "common.h"

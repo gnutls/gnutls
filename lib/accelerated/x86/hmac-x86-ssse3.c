@@ -25,14 +25,14 @@
  */
 
 #include "gnutls_int.h"
-#include <hash_int.h>
+#include "hash_int.h"
 #include "errors.h"
 #include <nettle/sha.h>
 #include <nettle/hmac.h>
 #include <nettle/macros.h>
-#include <aes-x86.h>
-#include <sha-x86.h>
-#include <algorithms.h>
+#include "aes-x86.h"
+#include "sha-x86.h"
+#include "algorithms.h"
 
 #ifdef HAVE_LIBNETTLE
 

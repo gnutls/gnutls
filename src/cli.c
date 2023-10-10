@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <config.h>
+#include "config.h"
 
 #include <stdio.h>
 #include <errno.h>
@@ -69,11 +69,11 @@
 #include <gnutls/dane.h>
 #endif
 
-#include <common.h>
-#include <socket.h>
+#include "common.h"
+#include "socket.h"
 
 #include "gnutls-cli-options.h"
-#include <ocsptool-common.h>
+#include "ocsptool-common.h"
 
 #define MAX_BUF 4096
 

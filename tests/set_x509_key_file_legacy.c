@@ -24,7 +24,7 @@
  * when the GNUTLS_CERTIFICATE_API_V2 is not set */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+#include "config.h"
 #endif
 
 #include <stdio.h>

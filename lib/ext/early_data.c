@@ -27,7 +27,7 @@
 #include "errors.h"
 #include "num.h"
 #include "hello_ext_lib.h"
-#include <ext/early_data.h>
+#include "ext/early_data.h"
 
 static int early_data_recv_params(gnutls_session_t session, const uint8_t *data,
 				  size_t data_size);

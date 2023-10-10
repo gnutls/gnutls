@@ -22,15 +22,15 @@
 #include <stdio.h>
 #include <string.h>
 #include "errors.h"
-#include <datum.h>
-#include <pkcs11_int.h>
+#include "datum.h"
+#include "pkcs11_int.h"
 #include <gnutls/abstract.h>
-#include <pk.h>
-#include <x509_int.h>
-#include <tls-sig.h>
-#include <algorithms.h>
-#include <fips.h>
-#include <abstract_int.h>
+#include "pk.h"
+#include "x509_int.h"
+#include "tls-sig.h"
+#include "algorithms.h"
+#include "fips.h"
+#include "abstract_int.h"
 
 /**
  * gnutls_privkey_export_rsa_raw:

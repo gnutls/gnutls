@@ -24,8 +24,8 @@
 #define GNUTLS_LIB_AUTH_ANON_H
 
 /* this is not to be included by gnutls_anon.c */
-#include <auth.h>
-#include <auth/dh_common.h>
+#include "auth.h"
+#include "auth/dh_common.h"
 
 typedef struct gnutls_anon_server_credentials_st {
 	gnutls_dh_params_t dh_params;

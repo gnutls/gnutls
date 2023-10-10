@@ -21,11 +21,11 @@
 
 #include "gnutls_int.h"
 #include <gnutls/pkcs11.h>
-#include <global.h>
+#include "global.h"
 #include "errors.h"
 #include "x509/common.h"
 
-#include <pkcs11_int.h>
+#include "pkcs11_int.h"
 #include <p11-kit/p11-kit.h>
 #include "pkcs11x.h"
 #include "intprops.h"

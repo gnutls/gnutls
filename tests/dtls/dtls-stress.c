@@ -84,7 +84,7 @@
  * 8    error parsing command line
  */
 
-#include <config.h>
+#include "config.h"
 #include <gnutls/gnutls.h>
 #include <gnutls/openpgp.h>
 #include <gnutls/dtls.h>

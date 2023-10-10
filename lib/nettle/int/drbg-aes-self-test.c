@@ -20,9 +20,9 @@
 /* This is a known-answer test for the DRBG-CTR-AES. 
  */
 
-#include <config.h>
+#include "config.h"
 #include "errors.h"
-#include <drbg-aes.h>
+#include "drbg-aes.h"
 #include <string.h>
 #include <stdio.h>
 

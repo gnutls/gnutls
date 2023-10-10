@@ -26,7 +26,7 @@
 
 #include "gnutls_int.h"
 #include "errors.h"
-#include <randomart.h>
+#include "randomart.h"
 
 /*
  * Draw an ASCII-Art representing the fingerprint so human brain can

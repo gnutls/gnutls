@@ -30,8 +30,8 @@
 #include "gnutls_int.h"
 #include "fips.h"
 #include <gnutls/crypto.h>
-#include <aes-x86.h>
-#include <x86-common.h>
+#include "aes-x86.h"
+#include "x86-common.h"
 
 struct x86_aes_xts_ctx {
 	AES_KEY block_key;

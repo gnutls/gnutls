@@ -21,15 +21,15 @@
  */
 
 #include "gnutls_int.h"
-#include <auth/srp_kx.h>
-#include <auth/anon.h>
-#include <auth/cert.h>
-#include <auth/psk.h>
+#include "auth/srp_kx.h"
+#include "auth/anon.h"
+#include "auth/cert.h"
+#include "auth/psk.h"
 #include "errors.h"
-#include <auth.h>
-#include <state.h>
-#include <datum.h>
-#include <algorithms.h>
+#include "auth.h"
+#include "state.h"
+#include "datum.h"
+#include "algorithms.h"
 
 /**
  * gnutls_fingerprint:

@@ -23,13 +23,13 @@
 #include "auth.h"
 #include "errors.h"
 #include "vko.h"
-#include <state.h>
-#include <datum.h>
-#include <ext/signature.h>
-#include <ext/supported_groups.h>
-#include <auth/cert.h>
-#include <pk.h>
-#include <abstract_int.h>
+#include "state.h"
+#include "datum.h"
+#include "ext/signature.h"
+#include "ext/supported_groups.h"
+#include "auth/cert.h"
+#include "pk.h"
+#include "abstract_int.h"
 
 #if defined(ENABLE_GOST)
 static int gen_vko_gost_client_kx(gnutls_session_t, gnutls_buffer_st *);

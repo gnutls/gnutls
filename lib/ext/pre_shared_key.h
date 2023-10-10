@@ -2,7 +2,7 @@
 #define GNUTLS_LIB_EXT_PRE_SHARED_KEY_H
 
 #include "auth/psk.h"
-#include <hello_ext.h>
+#include "hello_ext.h"
 #include "tls13/session_ticket.h"
 
 #define PRE_SHARED_KEY_TLS_ID 41

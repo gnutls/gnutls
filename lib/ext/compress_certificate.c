@@ -24,7 +24,7 @@
 #include "gnutls_int.h"
 #include "hello_ext_lib.h"
 #include "num.h"
-#include <ext/compress_certificate.h>
+#include "ext/compress_certificate.h"
 
 /* Check whether certificate compression method is valid, ie. supported by gnutls
  */

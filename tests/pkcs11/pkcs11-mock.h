@@ -20,7 +20,7 @@
  */
 
 #define _POSIX_C_SOURCE 200809
-#include <config.h>
+#include "config.h"
 #include <stdio.h>
 #include <string.h>
 

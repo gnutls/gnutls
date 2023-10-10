@@ -25,19 +25,19 @@
 #ifdef ENABLE_SRP
 
 #include "errors.h"
-#include <auth/srp_passwd.h>
+#include "auth/srp_passwd.h"
 #include "auth.h"
 #include "auth.h"
 #include "srp.h"
 #include "debug.h"
 #include "num.h"
-#include <auth/srp_kx.h>
-#include <str.h>
-#include <auth/cert.h>
-#include <datum.h>
-#include <tls-sig.h>
-#include <x509.h>
-#include <algorithms.h>
+#include "auth/srp_kx.h"
+#include "str.h"
+#include "auth/cert.h"
+#include "datum.h"
+#include "tls-sig.h"
+#include "x509.h"
+#include "algorithms.h"
 
 static int gen_srp_cert_server_kx(gnutls_session_t, gnutls_buffer_st *);
 static int proc_srp_cert_server_kx(gnutls_session_t, uint8_t *, size_t);

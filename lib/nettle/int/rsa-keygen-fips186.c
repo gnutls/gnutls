@@ -31,8 +31,8 @@
 #include <string.h>
 
 #include <nettle/rsa.h>
-#include <dsa-fips.h>
-#include <rsa-fips.h>
+#include "dsa-fips.h"
+#include "rsa-fips.h"
 
 #include <nettle/bignum.h>
 

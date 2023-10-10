@@ -39,8 +39,8 @@
 #include "record.h"
 #include "constate.h"
 #include "mbuffers.h"
-#include <state.h>
-#include <random.h>
+#include "state.h"
+#include "random.h"
 
 #include <nettle/memxor.h>
 

@@ -22,7 +22,7 @@
 /* This program tests functionality of ECDH exchanges, using public API */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+#include "config.h"
 #endif
 
 #include <gnutls/gnutls.h>

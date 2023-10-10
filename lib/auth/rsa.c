@@ -30,17 +30,17 @@
 #include "dh.h"
 #include "num.h"
 #include "datum.h"
-#include <auth/cert.h>
-#include <pk.h>
-#include <algorithms.h>
-#include <global.h>
+#include "auth/cert.h"
+#include "pk.h"
+#include "algorithms.h"
+#include "global.h"
 #include "debug.h"
-#include <tls-sig.h>
-#include <x509.h>
-#include <random.h>
-#include <mpi.h>
-#include <abstract_int.h>
-#include <auth/rsa_common.h>
+#include "tls-sig.h"
+#include "x509.h"
+#include "random.h"
+#include "mpi.h"
+#include "abstract_int.h"
+#include "auth/rsa_common.h"
 
 int _gnutls_gen_rsa_client_kx(gnutls_session_t, gnutls_buffer_st *);
 static int proc_rsa_client_kx(gnutls_session_t, uint8_t *, size_t);

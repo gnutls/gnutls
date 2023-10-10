@@ -28,12 +28,12 @@
 
 #include "gnutls_int.h"
 #include "errors.h"
-#include <hello_ext.h>
-#include <ext/status_request.h>
-#include <mbuffers.h>
-#include <auth.h>
-#include <auth/cert.h>
-#include <handshake.h>
+#include "hello_ext.h"
+#include "ext/status_request.h"
+#include "mbuffers.h"
+#include "auth.h"
+#include "auth/cert.h"
+#include "handshake.h"
 
 #ifdef ENABLE_OCSP
 

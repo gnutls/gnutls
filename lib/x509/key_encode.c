@@ -23,15 +23,15 @@
 
 #include "gnutls_int.h"
 #include "errors.h"
-#include <global.h>
+#include "global.h"
 #include <libtasn1.h>
-#include <datum.h>
+#include "datum.h"
 #include "common.h"
 #include "x509_int.h"
-#include <num.h>
-#include <pk.h>
-#include <mpi.h>
-#include <ecc.h>
+#include "num.h"
+#include "pk.h"
+#include "mpi.h"
+#include "ecc.h"
 
 static int _gnutls_x509_write_rsa_pubkey(const gnutls_pk_params_st *params,
 					 gnutls_datum_t *der);

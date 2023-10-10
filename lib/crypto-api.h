@@ -24,7 +24,7 @@
 #ifndef GNUTLS_LIB_CRYPTO_API_H
 #define GNUTLS_LIB_CRYPTO_API_H
 
-#include <gnutls_int.h>
+#include "gnutls_int.h"
 
 inline static int _gnutls_aead_cipher_init(gnutls_aead_cipher_hd_t handle,
 					   gnutls_cipher_algorithm_t cipher,

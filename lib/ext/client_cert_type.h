@@ -29,7 +29,7 @@
 #ifndef GNUTLS_LIB_EXT_CLIENT_CERT_TYPE_H
 #define GNUTLS_LIB_EXT_CLIENT_CERT_TYPE_H
 
-#include <hello_ext.h>
+#include "hello_ext.h"
 
 extern const hello_ext_entry_st ext_mod_client_cert_type;
 

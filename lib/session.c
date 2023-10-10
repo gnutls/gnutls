@@ -23,8 +23,8 @@
 #include "gnutls_int.h"
 #include "errors.h"
 #include "debug.h"
-#include <session_pack.h>
-#include <datum.h>
+#include "session_pack.h"
+#include "datum.h"
 #include "buffers.h"
 #include "state.h"
 #include "ext/cert_types.h"

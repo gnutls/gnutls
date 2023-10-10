@@ -23,18 +23,18 @@
  */
 
 #include "gnutls_int.h"
-#include <datum.h>
-#include <global.h>
+#include "datum.h"
+#include "global.h"
 #include "errors.h"
-#include <tls-sig.h>
-#include <common.h>
-#include <x509.h>
-#include <x509_b64.h>
-#include <x509_int.h>
-#include <pk.h>
-#include <mpi.h>
-#include <ecc.h>
-#include <pin.h>
+#include "tls-sig.h"
+#include "common.h"
+#include "x509.h"
+#include "x509_b64.h"
+#include "x509_int.h"
+#include "pk.h"
+#include "mpi.h"
+#include "ecc.h"
+#include "pin.h"
 
 /**
  * gnutls_x509_privkey_init:

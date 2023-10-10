@@ -23,12 +23,12 @@
 
 #include "gnutls_int.h"
 #include "errors.h"
-#include <locks.h>
-#include <num.h>
+#include "locks.h"
+#include "num.h"
 #include <nettle/chacha.h>
-#include <rnd-common.h>
-#include <system.h>
-#include <atfork.h>
+#include "rnd-common.h"
+#include "system.h"
+#include "atfork.h"
 #include <errno.h>
 #include <minmax.h>
 

@@ -26,7 +26,7 @@
  * by the server in a subsequent certificate payload.
  */
 
-#include <gnutls_int.h>
+#include "gnutls_int.h"
 #include <gnutls/gnutls.h>
 #include "ext/cert_types.h"
 #include "ext/server_cert_type.h"

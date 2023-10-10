@@ -24,7 +24,7 @@
 #include "auth.h"
 #include "errors.h"
 #include "num.h"
-#include <ext/srtp.h>
+#include "ext/srtp.h"
 
 static int _gnutls_srtp_recv_params(gnutls_session_t session,
 				    const uint8_t *data, size_t data_size);

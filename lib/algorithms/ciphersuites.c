@@ -22,15 +22,15 @@
  */
 
 #include "gnutls_int.h"
-#include <algorithms.h>
+#include "algorithms.h"
 #include "errors.h"
-#include <dh.h>
-#include <state.h>
-#include <x509/common.h>
-#include <auth/cert.h>
-#include <auth/anon.h>
-#include <auth/psk.h>
-#include <ext/safe_renegotiation.h>
+#include "dh.h"
+#include "state.h"
+#include "x509/common.h"
+#include "auth/cert.h"
+#include "auth/anon.h"
+#include "auth/psk.h"
+#include "ext/safe_renegotiation.h"
 
 #ifndef ENABLE_SSL3
 #define GNUTLS_SSL3 GNUTLS_TLS1

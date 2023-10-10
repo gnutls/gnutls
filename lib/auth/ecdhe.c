@@ -32,16 +32,16 @@
 #include "dh.h"
 #include "num.h"
 #include "tls-sig.h"
-#include <state.h>
-#include <datum.h>
-#include <x509.h>
-#include <auth/ecdhe.h>
-#include <ecc.h>
-#include <ext/supported_groups.h>
-#include <algorithms.h>
-#include <auth/psk.h>
-#include <auth/cert.h>
-#include <pk.h>
+#include "state.h"
+#include "datum.h"
+#include "x509.h"
+#include "auth/ecdhe.h"
+#include "ecc.h"
+#include "ext/supported_groups.h"
+#include "algorithms.h"
+#include "auth/psk.h"
+#include "auth/cert.h"
+#include "pk.h"
 
 static int gen_ecdhe_server_kx(gnutls_session_t, gnutls_buffer_st *);
 static int proc_ecdhe_server_kx(gnutls_session_t session, uint8_t *data,

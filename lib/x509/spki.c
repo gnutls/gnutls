@@ -22,9 +22,9 @@
 
 #include "gnutls_int.h"
 #include "errors.h"
-#include <common.h>
-#include <x509.h>
-#include <x509_int.h>
+#include "common.h"
+#include "x509.h"
+#include "x509_int.h"
 
 /**
  * gnutls_x509_spki_init:

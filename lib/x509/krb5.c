@@ -20,13 +20,13 @@
  *
  */
 
-#include <config.h>
+#include "config.h"
 #include <gnutls/gnutls.h>
 #include <libtasn1.h>
 #include <string.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <errors.h>
+#include "errors.h"
 #include "krb5.h"
 #include "common.h"
 

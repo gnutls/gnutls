@@ -26,7 +26,7 @@
 
 #include "gnutls_int.h"
 #include "errors.h"
-#include <cipher_int.h>
+#include "cipher_int.h"
 #include <nettle/aes.h>
 #include <nettle/camellia.h>
 #include <nettle/arcfour.h>
@@ -67,7 +67,7 @@
 #else
 #include "backport/siv-gcm.h"
 #endif
-#include <fips.h>
+#include "fips.h"
 #include <intprops.h>
 
 struct nettle_cipher_ctx;

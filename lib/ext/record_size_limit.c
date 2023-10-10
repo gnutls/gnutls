@@ -26,8 +26,8 @@
 #include "gnutls_int.h"
 #include "errors.h"
 #include "num.h"
-#include <hello_ext.h>
-#include <ext/record_size_limit.h>
+#include "hello_ext.h"
+#include "ext/record_size_limit.h"
 
 static int _gnutls_record_size_limit_recv_params(gnutls_session_t session,
 						 const uint8_t *data,

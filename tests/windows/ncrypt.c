@@ -22,7 +22,7 @@
 /* Parts copied from GnuTLS example programs. */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+#include "config.h"
 #endif
 
 #include <windows.h>
@@ -38,7 +38,7 @@
 #include <assert.h>
 #include "../cert-common.h"
 #include "ncrypt-int.h"
-#include <utils.h>
+#include "utils.h"
 
 /* This is a dummy replacement of ncrypt. It will pretend to open a specified
  * key by using a hardcoded one, and perform operations using that key.

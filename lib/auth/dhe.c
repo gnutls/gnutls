@@ -32,13 +32,13 @@
 #include "dh.h"
 #include "num.h"
 #include "tls-sig.h"
-#include <datum.h>
-#include <algorithms.h>
-#include <auth/cert.h>
-#include <x509.h>
-#include <state.h>
-#include <auth/dh_common.h>
-#include <auth/ecdhe.h>
+#include "datum.h"
+#include "algorithms.h"
+#include "auth/cert.h"
+#include "x509.h"
+#include "state.h"
+#include "auth/dh_common.h"
+#include "auth/ecdhe.h"
 
 static int gen_dhe_server_kx(gnutls_session_t, gnutls_buffer_st *);
 static int proc_dhe_server_kx(gnutls_session_t, uint8_t *, size_t);

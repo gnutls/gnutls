@@ -28,8 +28,8 @@
 #include <nettle/sha.h>
 #include <nettle/macros.h>
 #include <nettle/nettle-meta.h>
-#include <sha-aarch64.h>
-#include <aarch64-common.h>
+#include "sha-aarch64.h"
+#include "aarch64-common.h"
 
 void sha1_block_data_order(void *c, const void *p, size_t len);
 void sha256_block_data_order(void *c, const void *p, size_t len);

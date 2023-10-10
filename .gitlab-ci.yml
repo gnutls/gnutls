@@ -166,6 +166,7 @@ commit-check:
     - apk add git bash grep clang16-extra-tools
     - devel/check_if_signed
     - devel/indent-gnutls
+    - devel/check-headers.sh
     - git diff --exit-code # nothing should change version controlled files
   retry: 0
 

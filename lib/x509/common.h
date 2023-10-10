@@ -24,10 +24,10 @@
 #ifndef GNUTLS_LIB_X509_COMMON_H
 #define GNUTLS_LIB_X509_COMMON_H
 
-#include <algorithms.h>
-#include <abstract_int.h>
-#include <x509/x509_int.h>
-#include <fips.h>
+#include "algorithms.h"
+#include "abstract_int.h"
+#include "x509/x509_int.h"
+#include "fips.h"
 
 #define MAX_STRING_LEN 512
 

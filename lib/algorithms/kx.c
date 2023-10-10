@@ -21,9 +21,9 @@
  */
 
 #include "gnutls_int.h"
-#include <algorithms.h>
+#include "algorithms.h"
 #include "errors.h"
-#include <x509/common.h>
+#include "x509/common.h"
 #include "state.h"
 #include "c-strcase.h"
 

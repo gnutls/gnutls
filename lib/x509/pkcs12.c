@@ -28,15 +28,15 @@
 #include "gnutls_int.h"
 #include <libtasn1.h>
 
-#include <datum.h>
-#include <global.h>
+#include "datum.h"
+#include "global.h"
 #include "errors.h"
-#include <num.h>
-#include <common.h>
-#include <x509_b64.h>
+#include "num.h"
+#include "common.h"
+#include "x509_b64.h"
 #include "x509_int.h"
 #include "pkcs7_int.h"
-#include <random.h>
+#include "random.h"
 #include "intprops.h"
 
 /* Decodes the PKCS #12 auth_safe, and returns the allocated raw data,

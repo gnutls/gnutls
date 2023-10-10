@@ -26,16 +26,16 @@
  */
 
 #include "gnutls_int.h"
-#include <constate.h>
+#include "constate.h"
 #include "errors.h"
 #include "fips.h"
-#include <kx.h>
-#include <algorithms.h>
-#include <num.h>
-#include <datum.h>
-#include <state.h>
-#include <hello_ext.h>
-#include <buffers.h>
+#include "kx.h"
+#include "algorithms.h"
+#include "num.h"
+#include "datum.h"
+#include "state.h"
+#include "hello_ext.h"
+#include "buffers.h"
 #include "dtls.h"
 #include "secrets.h"
 #include "handshake.h"

@@ -22,12 +22,12 @@
 
 #include "gnutls_int.h"
 #include <libtasn1.h>
-#include <datum.h>
-#include <global.h>
+#include "datum.h"
+#include "global.h"
 #include "errors.h"
-#include <str.h>
-#include <common.h>
-#include <num.h>
+#include "str.h"
+#include "common.h"
+#include "num.h"
 
 /* This file includes all the required to parse an X.509 Distriguished
  * Name (you need a parser just to read a name in the X.509 protocols!!!)

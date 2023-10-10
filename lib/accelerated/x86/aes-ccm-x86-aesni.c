@@ -32,12 +32,12 @@
 
 #include <gnutls/crypto.h>
 #include "errors.h"
-#include <aes-x86.h>
-#include <x86-common.h>
+#include "aes-x86.h"
+#include "x86-common.h"
 #include <byteswap.h>
 #include <nettle/ccm.h>
-#include <aes-x86.h>
-#include <fips.h>
+#include "aes-x86.h"
+#include "fips.h"
 
 typedef struct ccm_x86_aes_ctx {
 	AES_KEY key;

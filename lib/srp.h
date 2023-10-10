@@ -23,7 +23,7 @@
 #ifndef GNUTLS_LIB_SRP_H
 #define GNUTLS_LIB_SRP_H
 
-#include <config.h>
+#include "config.h"
 
 #ifdef ENABLE_SRP
 

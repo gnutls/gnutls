@@ -25,17 +25,17 @@
  */
 
 #include "gnutls_int.h"
-#include <global.h>
+#include "global.h"
 #include "errors.h"
 #include <libtasn1.h>
-#include <pk.h>
+#include "pk.h"
 #include "common.h"
 #include "verify-high.h"
 #include "x509.h"
 #include "ocsp.h"
 
 #include <gnutls/ocsp.h>
-#include <auth/cert.h>
+#include "auth/cert.h"
 
 #include <assert.h>
 #include "intprops.h"

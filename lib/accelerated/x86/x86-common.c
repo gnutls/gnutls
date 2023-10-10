@@ -30,14 +30,14 @@
 #include "gnutls_int.h"
 #include <gnutls/crypto.h>
 #include "errors.h"
-#include <aes-x86.h>
-#include <sha-x86.h>
-#include <x86-common.h>
+#include "aes-x86.h"
+#include "sha-x86.h"
+#include "x86-common.h"
 #ifdef HAVE_LIBNETTLE
 #include <nettle/aes.h> /* for key generation in 192 and 256 bits */
-#include <sha-padlock.h>
+#include "sha-padlock.h"
 #endif
-#include <aes-padlock.h>
+#include "aes-padlock.h"
 #ifdef HAVE_CPUID_H
 #include <cpuid.h>
 #else

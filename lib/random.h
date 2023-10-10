@@ -24,7 +24,7 @@
 #define GNUTLS_LIB_RANDOM_H
 
 #include <gnutls/crypto.h>
-#include <crypto-backend.h>
+#include "crypto-backend.h"
 #include "nettle/rnd-common.h"
 
 extern int crypto_rnd_prio;

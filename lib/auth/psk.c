@@ -28,10 +28,10 @@
 #include "auth.h"
 #include "debug.h"
 #include "num.h"
-#include <auth/psk.h>
-#include <auth/psk_passwd.h>
-#include <str.h>
-#include <datum.h>
+#include "auth/psk.h"
+#include "auth/psk_passwd.h"
+#include "str.h"
+#include "datum.h"
 
 static int _gnutls_proc_psk_client_kx(gnutls_session_t, uint8_t *, size_t);
 static int _gnutls_proc_psk_server_kx(gnutls_session_t session, uint8_t *data,

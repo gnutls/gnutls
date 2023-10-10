@@ -25,8 +25,8 @@
 #include <gnutls/pkcs12.h>
 #include <gnutls/system-keys.h>
 #include "system-keys.h"
-#include <tls-sig.h>
-#include <pk.h>
+#include "tls-sig.h"
+#include "pk.h"
 
 void gnutls_system_key_iter_deinit(gnutls_system_key_iter_t iter)
 {

@@ -30,8 +30,8 @@
 #include "gnutls_int.h"
 #include <gnutls/crypto.h>
 #include "errors.h"
-#include <aes-aarch64.h>
-#include <aarch64-common.h>
+#include "aes-aarch64.h"
+#include "aarch64-common.h"
 #include <nettle/memxor.h>
 #include <nettle/macros.h>
 #include <byteswap.h>

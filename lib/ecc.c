@@ -24,9 +24,9 @@
  * based on public domain code by Tom St. Dennis.
  */
 #include "gnutls_int.h"
-#include <mpi.h>
-#include <ecc.h>
-#include <algorithms.h>
+#include "mpi.h"
+#include "ecc.h"
+#include "algorithms.h"
 #include "errors.h"
 
 int _gnutls_ecc_ansi_x962_export(gnutls_ecc_curve_t curve, bigint_t x,

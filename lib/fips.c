@@ -28,11 +28,11 @@
 #include "file.h"
 #include "inih/ini.h"
 #include "str.h"
-#include <fips.h>
+#include "fips.h"
 #include <gnutls/self-test.h>
 #include <stdio.h>
-#include <extras/hex.h>
-#include <random.h>
+#include "extras/hex.h"
+#include "random.h"
 
 #include "gthreads.h"
 

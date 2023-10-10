@@ -22,7 +22,7 @@
 /* This program tests functionality of DH exchanges, with public API */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+#include "config.h"
 #endif
 
 #include <gnutls/gnutls.h>

@@ -22,7 +22,7 @@
 #ifndef GNUTLS_LIB_ACCELERATED_X86_X86_COMMON_H
 #define GNUTLS_LIB_ACCELERATED_X86_X86_COMMON_H
 
-#include <config.h>
+#include "config.h"
 
 #if defined(ASM_X86)
 

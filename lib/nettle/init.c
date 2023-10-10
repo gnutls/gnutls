@@ -23,8 +23,8 @@
 
 #include "gnutls_int.h"
 #include "errors.h"
-#include <num.h>
-#include <mpi.h>
+#include "num.h"
+#include "mpi.h"
 #include <nettle/bignum.h> /* includes gmp.h */
 
 static void gnutls_free_zero(void *data, size_t size);

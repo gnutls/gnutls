@@ -20,7 +20,7 @@
  *
  */
 
-#include <gnutls_int.h>
+#include "gnutls_int.h"
 #include "int/tls1-prf.h"
 #include <nettle/hmac.h>
 #if ENABLE_GOST

@@ -24,10 +24,10 @@
 #ifndef GNUTLS_LIB_STR_H
 #define GNUTLS_LIB_STR_H
 
-#include <config.h>
+#include "config.h"
 #include "gnutls_int.h"
 #include "errors.h"
-#include <datum.h>
+#include "datum.h"
 #include <c-ctype.h>
 #include "errors.h"
 
@@ -103,7 +103,7 @@ int _gnutls_buffer_append_str(gnutls_buffer_st *, const char *str);
 
 #define _gnutls_buffer_append_data gnutls_buffer_append_data
 
-#include <num.h>
+#include "num.h"
 
 int _gnutls_buffer_append_prefix(gnutls_buffer_st *buf, int pfx_size,
 				 size_t data_size);

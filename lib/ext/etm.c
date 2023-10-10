@@ -26,8 +26,8 @@
 #include "gnutls_int.h"
 #include "errors.h"
 #include "num.h"
-#include <hello_ext.h>
-#include <ext/etm.h>
+#include "hello_ext.h"
+#include "ext/etm.h"
 
 static int _gnutls_ext_etm_recv_params(gnutls_session_t session,
 				       const uint8_t *data, size_t data_size);

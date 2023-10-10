@@ -26,15 +26,15 @@
 
 #include "x509_b64.h"
 #include "errors.h"
-#include <auth/psk_passwd.h>
-#include <auth/psk.h>
+#include "auth/psk_passwd.h"
+#include "auth/psk.h"
 #include "auth.h"
 #include "dh.h"
 #include "debug.h"
-#include <str.h>
-#include <datum.h>
-#include <num.h>
-#include <random.h>
+#include "str.h"
+#include "datum.h"
+#include "num.h"
+#include "random.h"
 
 /* this function parses passwd.psk file. Format is:
  * string(username):hex(passwd)

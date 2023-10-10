@@ -18,7 +18,7 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include <config.h>
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,9 +33,9 @@
 
 /* Gnulib portability files. */
 #include <read-file.h>
-#include <socket.h>
+#include "socket.h"
 
-#include <ocsptool-common.h>
+#include "ocsptool-common.h"
 
 #define MAX_BUF 4 * 1024
 #define HEADER_PATTERN                               \

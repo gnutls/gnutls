@@ -24,7 +24,7 @@
 #ifndef GNUTLS_LIB_EXT_HEARTBEAT_H
 #define GNUTLS_LIB_EXT_HEARTBEAT_H
 
-#include <hello_ext.h>
+#include "hello_ext.h"
 
 #define HEARTBEAT_REQUEST 1
 #define HEARTBEAT_RESPONSE 2

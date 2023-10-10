@@ -25,14 +25,14 @@
 #ifdef ENABLE_SRP
 
 #include "errors.h"
-#include <auth/srp_passwd.h>
+#include "auth/srp_passwd.h"
 #include "auth.h"
 #include "srp.h"
 #include "num.h"
-#include <auth/srp_kx.h>
-#include <str.h>
-#include <datum.h>
-#include <ext/srp.h>
+#include "auth/srp_kx.h"
+#include "str.h"
+#include "datum.h"
+#include "ext/srp.h"
 
 const mod_auth_st srp_auth_struct = { "SRP",
 				      NULL,

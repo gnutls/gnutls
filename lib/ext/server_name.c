@@ -26,7 +26,7 @@
 #include "errors.h"
 #include "num.h"
 #include "str.h"
-#include <ext/server_name.h>
+#include "ext/server_name.h"
 #include "hello_ext_lib.h"
 
 static int _gnutls_server_name_recv_params(gnutls_session_t session,

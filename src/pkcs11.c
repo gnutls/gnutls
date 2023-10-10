@@ -19,7 +19,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <config.h>
+#include "config.h"
 
 #include <gnutls/gnutls.h>
 #include <gnutls/pkcs11.h>
@@ -32,7 +32,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdint.h>
-#include <common.h>
+#include "common.h"
 
 #include <p11-kit/pkcs11.h>
 

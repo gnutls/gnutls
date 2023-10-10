@@ -30,11 +30,11 @@
 #include "gnutls_int.h"
 #include <gnutls/crypto.h>
 #include "errors.h"
-#include <aes-x86.h>
-#include <x86-common.h>
+#include "aes-x86.h"
+#include "x86-common.h"
 #include <nettle/aes.h> /* for key generation in 192 and 256 bits */
-#include <sha-padlock.h>
-#include <aes-padlock.h>
+#include "sha-padlock.h"
+#include "aes-padlock.h"
 
 static int aes_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx,
 			   int enc)

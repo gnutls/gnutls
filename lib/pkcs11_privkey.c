@@ -24,11 +24,11 @@
 #include <stdio.h>
 #include <string.h>
 #include "errors.h"
-#include <datum.h>
-#include <pkcs11_int.h>
-#include <tls-sig.h>
-#include <pk.h>
-#include <fips.h>
+#include "datum.h"
+#include "pkcs11_int.h"
+#include "tls-sig.h"
+#include "pk.h"
+#include "fips.h"
 #include "urls.h"
 #include "locks.h"
 #include <p11-kit/uri.h>

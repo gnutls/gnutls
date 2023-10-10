@@ -31,13 +31,13 @@
 #include "dh.h"
 #include "num.h"
 #include "tls-sig.h"
-#include <datum.h>
-#include <x509.h>
-#include <state.h>
-#include <pk.h>
-#include <auth/dh_common.h>
-#include <algorithms.h>
-#include <auth/psk.h>
+#include "datum.h"
+#include "x509.h"
+#include "state.h"
+#include "pk.h"
+#include "auth/dh_common.h"
+#include "algorithms.h"
+#include "auth/psk.h"
 
 #if defined(ENABLE_DHE) || defined(ENABLE_ANON)
 

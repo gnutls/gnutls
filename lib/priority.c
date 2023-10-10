@@ -27,10 +27,10 @@
 #include "gnutls_int.h"
 #include "algorithms.h"
 #include "errors.h"
-#include <num.h>
+#include "num.h"
 #include <gnutls/x509.h>
 #include <c-ctype.h>
-#include <hello_ext.h>
+#include "hello_ext.h"
 #include <c-strcase.h>
 #include "fips.h"
 #include "errno.h"

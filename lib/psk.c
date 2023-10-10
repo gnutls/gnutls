@@ -24,16 +24,16 @@
 
 #include "gnutls_int.h"
 #include "errors.h"
-#include <str.h>
-#include <auth/psk.h>
-#include <state.h>
+#include "str.h"
+#include "auth/psk.h"
+#include "state.h"
 
 #ifdef ENABLE_PSK
 
-#include <auth/psk_passwd.h>
-#include <num.h>
-#include <file.h>
-#include <datum.h>
+#include "auth/psk_passwd.h"
+#include "num.h"
+#include "file.h"
+#include "datum.h"
 #include "debug.h"
 #include "dh.h"
 

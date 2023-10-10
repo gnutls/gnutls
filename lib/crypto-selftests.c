@@ -22,13 +22,13 @@
 
 #include "gnutls_int.h"
 #include "errors.h"
-#include <cipher_int.h>
-#include <datum.h>
+#include "cipher_int.h"
+#include "datum.h"
 #include <gnutls/crypto.h>
 #include <gnutls/self-test.h>
 #include "errors.h"
-#include <random.h>
-#include <crypto.h>
+#include "random.h"
+#include "crypto.h"
 #include <nettle/sha3.h>
 
 #define STR(tag, tag_size, val) \

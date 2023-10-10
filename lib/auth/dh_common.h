@@ -23,7 +23,7 @@
 #ifndef GNUTLS_LIB_AUTH_DH_COMMON_H
 #define GNUTLS_LIB_AUTH_DH_COMMON_H
 
-#include <auth.h>
+#include "auth.h"
 
 typedef struct {
 	int secret_bits;

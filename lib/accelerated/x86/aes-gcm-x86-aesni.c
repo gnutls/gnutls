@@ -32,8 +32,8 @@
 
 #include <gnutls/crypto.h>
 #include "errors.h"
-#include <aes-x86.h>
-#include <x86-common.h>
+#include "aes-x86.h"
+#include "x86-common.h"
 #include <byteswap.h>
 #include <nettle/gcm.h>
 

@@ -35,14 +35,14 @@
 #include "auth.h"
 #include "errors.h"
 #include "dh.h"
-#include <auth/psk.h>
+#include "auth/psk.h"
 #include "num.h"
 #include "mpi.h"
-#include <state.h>
-#include <auth/dh_common.h>
-#include <auth/ecdhe.h>
-#include <datum.h>
-#include <auth/psk_passwd.h>
+#include "state.h"
+#include "auth/dh_common.h"
+#include "auth/ecdhe.h"
+#include "datum.h"
+#include "auth/psk_passwd.h"
 
 static int proc_ecdhe_psk_server_kx(gnutls_session_t session, uint8_t *data,
 				    size_t _data_size);

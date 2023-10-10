@@ -28,15 +28,15 @@
 
 #include "errors.h"
 #include <libtasn1.h>
-#include <global.h>
-#include <num.h> /* MAX */
-#include <tls-sig.h>
-#include <str.h>
-#include <datum.h>
-#include <x509_int.h>
-#include <common.h>
+#include "global.h"
+#include "num.h" /* MAX */
+#include "tls-sig.h"
+#include "str.h"
+#include "datum.h"
+#include "x509_int.h"
+#include "common.h"
 #include <gnutls/abstract.h>
-#include <pk.h>
+#include "pk.h"
 
 /* This is the same as the _gnutls_x509_sign, but this one will decode
  * the asn1_node given, and sign the DER data. Actually used to get the DER

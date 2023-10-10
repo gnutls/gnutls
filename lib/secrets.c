@@ -23,7 +23,7 @@
 /* TLS 1.3 secret key derivation handling.
  */
 
-#include <config.h>
+#include "config.h"
 #include "crypto-api.h"
 #include "fips.h"
 #include "gnutls_int.h"

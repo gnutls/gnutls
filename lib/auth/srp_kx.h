@@ -23,7 +23,7 @@
 #ifndef GNUTLS_LIB_AUTH_SRP_KX_H
 #define GNUTLS_LIB_AUTH_SRP_KX_H
 
-#include <auth.h>
+#include "auth.h"
 
 #define MAX_FAKE_SALT_SEED_SIZE 64
 

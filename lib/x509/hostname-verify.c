@@ -21,11 +21,11 @@
  */
 
 #include "gnutls_int.h"
-#include <str.h>
-#include <x509_int.h>
-#include <common.h>
+#include "str.h"
+#include "x509_int.h"
+#include "common.h"
 #include "errors.h"
-#include <system.h>
+#include "system.h"
 #include <netinet/in.h>
 #include <arpa/inet.h>
 

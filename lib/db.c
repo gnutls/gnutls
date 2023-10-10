@@ -26,9 +26,9 @@
 
 #include "gnutls_int.h"
 #include "errors.h"
-#include <db.h>
-#include <session_pack.h>
-#include <datum.h>
+#include "db.h"
+#include "session_pack.h"
+#include "datum.h"
 #include "ext/server_name.h"
 #include <intprops.h>
 

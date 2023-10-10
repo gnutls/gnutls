@@ -23,9 +23,9 @@
 #include <stdio.h>
 #include <string.h>
 #include "errors.h"
-#include <datum.h>
-#include <pkcs11_int.h>
-#include <random.h>
+#include "datum.h"
+#include "pkcs11_int.h"
+#include "random.h"
 
 /**
  * gnutls_pkcs11_copy_secret_key:

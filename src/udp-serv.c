@@ -17,7 +17,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <config.h>
+#include "config.h"
 
 #include <stdio.h>
 #if HAVE_SYS_SOCKET_H
@@ -34,7 +34,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
-#include <common.h>
+#include "common.h"
 #include "udp-serv.h"
 #include "gnutls-serv-options.h"
 

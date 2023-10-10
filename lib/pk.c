@@ -26,16 +26,16 @@
  */
 
 #include "gnutls_int.h"
-#include <mpi.h>
-#include <pk.h>
+#include "mpi.h"
+#include "pk.h"
 #include "errors.h"
-#include <datum.h>
-#include <global.h>
-#include <num.h>
+#include "datum.h"
+#include "global.h"
+#include "num.h"
 #include "debug.h"
-#include <x509/x509_int.h>
-#include <x509/common.h>
-#include <random.h>
+#include "x509/x509_int.h"
+#include "x509/common.h"
+#include "random.h"
 #include <gnutls/crypto.h>
 
 /**

@@ -23,7 +23,7 @@
 #ifndef GNUTLS_LIB_EXT_STATUS_REQUEST_H
 #define GNUTLS_LIB_EXT_STATUS_REQUEST_H
 
-#include <hello_ext.h>
+#include "hello_ext.h"
 
 #define STATUS_REQUEST_TLS_ID 5
 

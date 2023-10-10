@@ -22,9 +22,9 @@
 
 #include "gnutls_int.h"
 #include "errors.h"
-#include <auth/cert.h>
-#include <x509/common.h>
-#include <x509.h>
+#include "auth/cert.h"
+#include "x509/common.h"
+#include "x509.h"
 #include "x509/x509_int.h"
 #include <gnutls/x509.h>
 #include "x509_b64.h"

@@ -24,7 +24,7 @@
 /* Tests the RSA-PSK ciphersuites under TLS1.2 */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+#include "config.h"
 #endif
 
 #include <stdio.h>

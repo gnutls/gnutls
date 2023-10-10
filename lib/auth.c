@@ -26,11 +26,11 @@
 #include "auth.h"
 #include "auth.h"
 #include "algorithms.h"
-#include <auth/cert.h>
-#include <auth/psk.h>
-#include <auth/srp_kx.h>
-#include <auth/anon.h>
-#include <datum.h>
+#include "auth/cert.h"
+#include "auth/psk.h"
+#include "auth/srp_kx.h"
+#include "auth/anon.h"
+#include "datum.h"
 
 /* The functions here are used in order for authentication algorithms
  * to be able to retrieve the needed credentials eg public and private

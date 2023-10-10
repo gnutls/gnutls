@@ -24,8 +24,8 @@
 #define GNUTLS_LIB_RECORD_H
 
 #include <gnutls/gnutls.h>
-#include <buffers.h>
-#include <constate.h>
+#include "buffers.h"
+#include "constate.h"
 
 ssize_t _gnutls_send_tlen_int(gnutls_session_t session, content_type_t type,
 			      gnutls_handshake_description_t htype,
