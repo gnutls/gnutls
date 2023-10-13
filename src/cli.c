@@ -1050,8 +1050,9 @@ static int try_resume(socket_st *hd)
 		fclose(fp);
 	}
 
-	socket_open3(hd, hostname, service, OPT_ARG(STARTTLS_PROTO),
-		     socket_flags, CONNECT_MSG, &rdata, &edata);
+	socket_open_int(hd, hostname, service, OPT_ARG(STARTTLS_PROTO),
+			OPT_ARG(STARTTLS_NAME), socket_flags, CONNECT_MSG,
+			&rdata, &edata, NULL, NULL);
 
 	log_msg(stdout, "- Resume Handshake was completed\n");
 	if (gnutls_session_is_resumed(hd->session) != 0)
@@ -1362,9 +1363,9 @@ int main(int argc, char **argv)
 		client_fp = fopen(OPT_ARG(SAVE_CLIENT_TRACE), "wb");
 	}
 
-	socket_open2(&hd, hostname, service, OPT_ARG(STARTTLS_PROTO),
-		     socket_flags, CONNECT_MSG, NULL, NULL, server_fp,
-		     client_fp);
+	socket_open_int(&hd, hostname, service, OPT_ARG(STARTTLS_PROTO),
+			OPT_ARG(STARTTLS_NAME), socket_flags, CONNECT_MSG, NULL,
+			NULL, server_fp, client_fp);
 
 	hd.verbose = verbose;
 
