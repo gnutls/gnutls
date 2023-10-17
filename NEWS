@@ -20,6 +20,10 @@ See the end for copying conditions.
    GNUTLS_CIPHER_AES_{128,256}_SIV_GCM, the authentication tag is
    appended to the ciphertext, not prepended.
 
+** libgnutls: transparent KTLS support is extended to FreeBSD kernel
+   The kernel TLS feature can now be enabled on FreeBSD as well as
+   Linux when compiled with the --enable-ktls configure option.
+
 ** gnutls-cli: New option --starttls-name
    Depending on deployment, application protocols such as XMPP may
    require a different origin address than the external address to be
