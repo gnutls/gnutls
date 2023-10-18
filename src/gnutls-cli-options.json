@@ -114,6 +114,18 @@
           "argument-type": "string"
         },
         {
+          "long-option": "starttls-name",
+          "description": "The hostname presented to the application protocol for STARTTLS (for smtp, xmpp, lmtp)",
+          "detail": "Specify the hostname presented to the application protocol for STARTTLS.",
+          "requires": [
+            "starttls-proto"
+          ],
+          "conflicts": [
+            "starttls"
+          ],
+          "argument-type": "string"
+        },
+        {
           "long-option": "udp",
           "short-option": "u",
           "description": "Use DTLS (datagram TLS) over UDP"

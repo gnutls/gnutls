@@ -219,7 +219,9 @@ static void socket_starttls(socket_st *socket)
 			log_msg(stdout, "Negotiating SMTP STARTTLS\n");
 
 		wait_for_text(socket, "220 ", 4);
-		snprintf(buf, sizeof(buf), "EHLO %s\r\n", socket->hostname);
+		snprintf(buf, sizeof(buf), "EHLO %s\r\n",
+			 socket->app_hostname ? socket->app_hostname :
+						socket->hostname);
 		send_line(socket, buf);
 		wait_for_text(socket, "250 ", 4);
 		send_line(socket, "STARTTLS\r\n");
@@ -240,7 +242,8 @@ static void socket_starttls(socket_st *socket)
 		snprintf(
 			buf, sizeof(buf),
 			"<stream:stream xmlns:stream='http://etherx.jabber.org/streams' xmlns='jabber:client' to='%s' version='1.0'>\n",
-			socket->hostname);
+			socket->app_hostname ? socket->app_hostname :
+					       socket->hostname);
 		send_line(socket, buf);
 		wait_for_text(socket, "<?", 2);
 		send_line(
@@ -268,7 +271,9 @@ static void socket_starttls(socket_st *socket)
 			log_msg(stdout, "Negotiating LMTP STARTTLS\n");
 
 		wait_for_text(socket, "220 ", 4);
-		snprintf(buf, sizeof(buf), "LHLO %s\r\n", socket->hostname);
+		snprintf(buf, sizeof(buf), "LHLO %s\r\n",
+			 socket->app_hostname ? socket->app_hostname :
+						socket->hostname);
 		send_line(socket, buf);
 		wait_for_text(socket, "250 ", 4);
 		send_line(socket, "STARTTLS\r\n");
@@ -453,10 +458,11 @@ inline static int wrap_pull_timeout_func(gnutls_transport_ptr_t ptr,
 					  ms);
 }
 
-void socket_open2(socket_st *hd, const char *hostname, const char *service,
-		  const char *app_proto, int flags, const char *msg,
-		  gnutls_datum_t *rdata, gnutls_datum_t *edata,
-		  FILE *server_trace, FILE *client_trace)
+void socket_open_int(socket_st *hd, const char *hostname, const char *service,
+		     const char *app_proto, const char *app_hostname, int flags,
+		     const char *msg, gnutls_datum_t *rdata,
+		     gnutls_datum_t *edata, FILE *server_trace,
+		     FILE *client_trace)
 {
 	struct addrinfo hints, *res, *ptr;
 	int sd, err = 0;
@@ -559,6 +565,7 @@ void socket_open2(socket_st *hd, const char *hostname, const char *service,
 		hd->fd = sd;
 		if (flags & SOCKET_FLAG_STARTTLS) {
 			hd->app_proto = app_proto;
+			hd->app_hostname = app_hostname;
 			socket_starttls(hd);
 			hd->app_proto = NULL;
 		}

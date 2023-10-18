@@ -20,6 +20,12 @@ See the end for copying conditions.
    GNUTLS_CIPHER_AES_{128,256}_SIV_GCM, the authentication tag is
    appended to the ciphertext, not prepended.
 
+** gnutls-cli: New option --starttls-name
+   Depending on deployment, application protocols such as XMPP may
+   require a different origin address than the external address to be
+   presented prior to STARTTLS negotiation.  The --starttls-name can
+   be used to specify specify the addresses separately.
+
 ** API and ABI modifications:
 gnutls_pubkey_import_dh_raw: New function
 gnutls_privkey_import_dh_raw: New function
