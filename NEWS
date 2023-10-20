@@ -5,7 +5,10 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.8.2 (unreleased)
+* Version 3.8.2 (released 2023-11-14)
+
+** libgnutls: Fix timing side-channel inside RSA-PSK key exchange.
+   [GNUTLS-SA-2023-10-23, CVSS: medium] [CVE-2023-5981]
 
 ** libgnutls: Add API functions to perform ECDH and DH key agreement
    The functionality has been there for a long time though they were
