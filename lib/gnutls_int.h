@@ -985,7 +985,6 @@ struct gnutls_priority_st {
 	bool _no_etm;
 	bool _no_ext_master_secret;
 	bool _allow_key_usage_violation;
-	bool _allow_wrong_pms;
 	bool _dumbfw;
 	unsigned int _dh_prime_bits;	/* old (deprecated) variable */
 
@@ -1003,7 +1002,6 @@ struct gnutls_priority_st {
 	      (x)->no_etm = 1; \
 	      (x)->no_ext_master_secret = 1; \
 	      (x)->allow_key_usage_violation = 1; \
-	      (x)->allow_wrong_pms = 1; \
 	      (x)->dumbfw = 1
 
 #define ENABLE_PRIO_COMPAT(x) \
@@ -1012,7 +1010,6 @@ struct gnutls_priority_st {
 	      (x)->_no_etm = 1; \
 	      (x)->_no_ext_master_secret = 1; \
 	      (x)->_allow_key_usage_violation = 1; \
-	      (x)->_allow_wrong_pms = 1; \
 	      (x)->_dumbfw = 1
 
 /* DH and RSA parameters types.
@@ -1137,7 +1134,6 @@ typedef struct {
 	bool no_etm;
 	bool no_ext_master_secret;
 	bool allow_key_usage_violation;
-	bool allow_wrong_pms;
 	bool dumbfw;
 
 	/* old (deprecated) variable. This is used for both srp_prime_bits

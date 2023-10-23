@@ -264,14 +264,13 @@ _gnutls_proc_rsa_psk_client_kx(gnutls_session_t session, uint8_t * data,
 {
 	gnutls_datum_t username;
 	psk_auth_info_t info;
-	gnutls_datum_t plaintext;
 	gnutls_datum_t ciphertext;
 	gnutls_datum_t pwd_psk = { NULL, 0 };
 	int ret, dsize;
-	int randomize_key = 0;
 	ssize_t data_size = _data_size;
 	gnutls_psk_server_credentials_t cred;
 	gnutls_datum_t premaster_secret = { NULL, 0 };
+	volatile uint8_t ver_maj, ver_min;
 
 	cred = (gnutls_psk_server_credentials_t)
 	    _gnutls_get_cred(session, GNUTLS_CRD_PSK);
@@ -329,71 +328,47 @@ _gnutls_proc_rsa_psk_client_kx(gnutls_session_t session, uint8_t * data,
 	}
 	ciphertext.size = dsize;
 
-	ret =
-	    gnutls_privkey_decrypt_data(session->internals.selected_key, 0,
-					&ciphertext, &plaintext);
-	if (ret < 0 || plaintext.size != GNUTLS_MASTER_SIZE) {
-		/* In case decryption fails then don't inform
-		 * the peer. Just use a random key. (in order to avoid
-		 * attack against pkcs-1 formatting).
-		 */
+	ver_maj = _gnutls_get_adv_version_major(session);
+	ver_min = _gnutls_get_adv_version_minor(session);
+
+	premaster_secret.data = gnutls_malloc(GNUTLS_MASTER_SIZE);
+	if (premaster_secret.data == NULL) {
 		gnutls_assert();
-		_gnutls_debug_log
-		    ("auth_rsa_psk: Possible PKCS #1 format attack\n");
-		if (ret >= 0) {
-			gnutls_free(plaintext.data);
-		}
-		randomize_key = 1;
-	} else {
-		/* If the secret was properly formatted, then
-		 * check the version number.
-		 */
-		if (_gnutls_get_adv_version_major(session) !=
-		    plaintext.data[0]
-		    || (session->internals.allow_wrong_pms == 0
-			&& _gnutls_get_adv_version_minor(session) !=
-			plaintext.data[1])) {
-			/* No error is returned here, if the version number check
-			 * fails. We proceed normally.
-			 * That is to defend against the attack described in the paper
-			 * "Attacking RSA-based sessions in SSL/TLS" by Vlastimil Klima,
-			 * Ondej Pokorny and Tomas Rosa.
-			 */
-			gnutls_assert();
-			_gnutls_debug_log
-			    ("auth_rsa: Possible PKCS #1 version check format attack\n");
-		}
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+	premaster_secret.size = GNUTLS_MASTER_SIZE;
+
+	/* Fallback value when decryption fails. Needs to be unpredictable. */
+	ret = gnutls_rnd(GNUTLS_RND_NONCE, premaster_secret.data,
+			 premaster_secret.size);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
 	}
 
+	gnutls_privkey_decrypt_data2(session->internals.selected_key, 0,
+				     &ciphertext, premaster_secret.data,
+				     premaster_secret.size);
+	/* After this point, any conditional on failure that cause differences
+	 * in execution may create a timing or cache access pattern side
+	 * channel that can be used as an oracle, so tread carefully */
 
-	if (randomize_key != 0) {
-		premaster_secret.size = GNUTLS_MASTER_SIZE;
-		premaster_secret.data =
-		    gnutls_malloc(premaster_secret.size);
-		if (premaster_secret.data == NULL) {
-			gnutls_assert();
-			return GNUTLS_E_MEMORY_ERROR;
-		}
-
-		/* we do not need strong random numbers here.
-		 */
-		ret = gnutls_rnd(GNUTLS_RND_NONCE, premaster_secret.data,
-				  premaster_secret.size);
-		if (ret < 0) {
-			gnutls_assert();
-			goto cleanup;
-		}
-	} else {
-		premaster_secret.data = plaintext.data;
-		premaster_secret.size = plaintext.size;
-	}
+	/* Error handling logic:
+	 * In case decryption fails then don't inform the peer. Just use the
+	 * random key previously generated. (in order to avoid attack against
+	 * pkcs-1 formatting).
+	 *
+	 * If we get version mismatches no error is returned either. We
+	 * proceed normally. This is to defend against the attack described
+	 * in the paper "Attacking RSA-based sessions in SSL/TLS" by
+	 * Vlastimil Klima, Ondej Pokorny and Tomas Rosa.
+	 */
 
 	/* This is here to avoid the version check attack
 	 * discussed above.
 	 */
-
-	premaster_secret.data[0] = _gnutls_get_adv_version_major(session);
-	premaster_secret.data[1] = _gnutls_get_adv_version_minor(session);
+	premaster_secret.data[0] = ver_maj;
+	premaster_secret.data[1] = ver_min;
 
 	/* find the key of this username
 	 */
