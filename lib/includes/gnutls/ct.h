@@ -37,6 +37,7 @@
 extern "C" {
 #endif
 
+typedef struct gnutls_ct_log_st  *gnutls_ct_log_t;
 typedef struct gnutls_ct_logs_st *gnutls_ct_logs_t;
 
 int gnutls_ct_logs_init(gnutls_ct_logs_t * logs);
@@ -44,12 +45,16 @@ void gnutls_ct_logs_deinit(gnutls_ct_logs_t logs);
 
 #define GNUTLS_CT_KEY_AS_DER    0
 #define GNUTLS_CT_KEY_AS_BASE64 1
-int gnutls_ct_add_log(gnutls_ct_logs_t logs,
-		      const char * name,
-		      const char * description,
-		      const gnutls_datum_t * key,
-		      time_t not_before, time_t not_after,
-		      unsigned flags);
+int gnutls_ct_log_init(gnutls_ct_log_t *log,
+		       const char *name,
+		       const gnutls_datum_t *key, int flags);
+void gnutls_ct_log_deinit(gnutls_ct_log_t log);
+
+int gnutls_ct_add_log(gnutls_ct_logs_t logs, gnutls_ct_log_t log);
+int gnutls_ct_get_log(gnutls_ct_logs_t logs, unsigned idx,
+		      gnutls_datum_t *name,
+		      gnutls_pubkey_t *public_key);
+
 int gnutls_ct_sct_validate(const gnutls_x509_ct_scts_t scts, unsigned idx,
 			   const gnutls_ct_logs_t logs,
 			   gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,

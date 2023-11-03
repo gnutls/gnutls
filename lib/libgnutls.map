@@ -1419,6 +1419,20 @@ GNUTLS_3_8_1
 	*;
 } GNUTLS_3_7_7;
 
+GNUTLS_3_8_2
+{
+ global:
+	gnutls_ct_logs_init;
+	gnutls_ct_logs_deinit;
+	gnutls_ct_log_init;
+	gnutls_ct_log_deinit;
+	gnutls_ct_add_log;
+	gnutls_ct_get_log;
+	gnutls_ct_sct_validate;
+ local:
+	*;
+} GNUTLS_3_8_1;
+
 GNUTLS_FIPS140_3_4 {
   global:
 	gnutls_cipher_self_test;

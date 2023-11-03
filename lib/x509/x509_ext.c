@@ -3936,7 +3936,7 @@ int gnutls_x509_ct_sct_get(const gnutls_x509_ct_scts_t scts, unsigned idx,
 	}
 
 	if (timestamp)
-		*timestamp = sct->timestamp / 1000;
+		*timestamp = sct->timestamp;
 
 	if (sigalg)
 		*sigalg = sct->sigalg;

@@ -9,48 +9,42 @@
 
 #define SCT_V1_LOGID_SIZE 32
 
-struct ct_log_st {
+struct gnutls_ct_log_st {
 	char *name;
-	char *description;
 	gnutls_pubkey_t public_key;
 	uint8_t id[SCT_V1_LOGID_SIZE];
 	time_t not_before, not_after;
 };
 
 struct gnutls_ct_logs_st {
-	struct ct_log_st *logs;
+	struct gnutls_ct_log_st *logs;
 	size_t size;
 };
 
-static int _gnutls_ct_add_log(struct ct_log_st *log,
-			      struct ct_log_st **logs, size_t *size)
+static int _gnutls_ct_add_log(struct gnutls_ct_log_st *log,
+			      struct gnutls_ct_log_st **logs, size_t *size)
 {
-	struct ct_log_st *new_logs;
+	struct gnutls_ct_log_st *new_logs;
 
 	new_logs =
-		_gnutls_reallocarray(*logs, *size + 1, sizeof(struct ct_log_st));
+		_gnutls_reallocarray(*logs, *size + 1, sizeof(struct gnutls_ct_log_st));
 	if (new_logs == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-	memcpy(&new_logs[*size], log, sizeof(struct ct_log_st));
+	memcpy(&new_logs[*size], log, sizeof(struct gnutls_ct_log_st));
 	(*size)++;
 	*logs = new_logs;
 
 	return 0;
 }
 
-static int _gnutls_init_log(struct ct_log_st *log,
-			    const char *name, const char *description,
+static int _gnutls_init_log(struct gnutls_ct_log_st *log,
+			    const char *name,
 			    const gnutls_datum_t *pubkey_data)
 {
 	int retval;
 
 	if (name && (log->name = strdup(name)) == NULL) {
-		gnutls_assert();
-		retval = GNUTLS_E_MEMORY_ERROR;
-		goto bail;
-	}
-	if (description && (log->description = strdup(description)) == NULL) {
 		gnutls_assert();
 		retval = GNUTLS_E_MEMORY_ERROR;
 		goto bail;
@@ -72,17 +66,12 @@ static int _gnutls_init_log(struct ct_log_st *log,
 bail:
 	if (log->name)
 		gnutls_free(log->name);
-	if (log->description)
-		gnutls_free(log->description);
 	return gnutls_assert_val(retval);
 }
 
-static void _gnutls_free_log(struct ct_log_st *log)
+static void _gnutls_free_log(struct gnutls_ct_log_st *log)
 {
-	if (log->name)
-		gnutls_free(log->name);
-	if (log->description)
-		gnutls_free(log->description);
+	gnutls_free(log->name);
 	gnutls_pubkey_deinit(log->public_key);
 
 }
@@ -115,9 +104,9 @@ bail:
 	return GNUTLS_E_INVALID_UTF8_STRING;
 }
 
-static struct ct_log_st *_gnutls_lookup_log_by_id(const struct gnutls_ct_logs_st *logs, const uint8_t *log_id)
+static struct gnutls_ct_log_st *_gnutls_lookup_log_by_id(const struct gnutls_ct_logs_st *logs, const uint8_t *log_id)
 {
-	struct ct_log_st *cur_log;
+	struct gnutls_ct_log_st *cur_log;
 
 	for (unsigned i = 0; i < logs->size; i++) {
 		cur_log = &logs->logs[i];
@@ -205,7 +194,7 @@ static int _gnutls_update_hash_with_precert(gnutls_hash_hd_t md, uint64_t timest
 {
 	int retval;
 	uint8_t three_bytes[3] = { 0x00, 0x00, 0x01 };
-	uint8_t u16_be[sizeof(uint16_t)], u32_be[sizeof(uint32_t)], u64_be[sizeof(uint64_t)];
+	uint8_t u32_be[sizeof(uint32_t)], u64_be[sizeof(uint64_t)];
 
 	if ((retval = gnutls_hash(md, three_bytes, 2)) < 0)
 		return gnutls_assert_val(retval);
@@ -236,7 +225,7 @@ static int _gnutls_update_hash_with_precert(gnutls_hash_hd_t md, uint64_t timest
 }
 
 static int _gnutls_ct_sct_verify_precert(const gnutls_datum_t *precert_digest, const gnutls_datum_t *signature,
-					 gnutls_sign_algorithm_t algo, const struct ct_log_st *log,
+					 gnutls_sign_algorithm_t algo, const struct gnutls_ct_log_st *log,
 					 gnutls_time_func time_func)
 {
 	time_t curtime;
@@ -244,10 +233,10 @@ static int _gnutls_ct_sct_verify_precert(const gnutls_datum_t *precert_digest, c
 	if (time_func)
 		curtime = time_func(NULL);
 
-	if (time_func && log->not_before > curtime)
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-	if (time_func && log->not_after < curtime)
-		return gnutls_assert_val(GNUTLS_E_EXPIRED);
+	/* if (time_func && log->not_before > curtime) */
+	/* 	return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST); */
+	/* if (time_func && log->not_after < curtime) */
+	/* 	return gnutls_assert_val(GNUTLS_E_EXPIRED); */
 
 	/* if (gnutls_pubkey_verify_data2(&log.public_key, algo, 0, precert, signature) < 0) */
 	/* 	return gnutls_assert_val(GNUTLS_E_PK_SIG_VERIFY_FAILED); */
@@ -284,6 +273,60 @@ void gnutls_ct_logs_deinit(gnutls_ct_logs_t logs)
 	}
 }
 
+int gnutls_ct_log_init(gnutls_ct_log_t *log,
+		       const char *name,
+		       const gnutls_datum_t *key, int flags)
+{
+	int retval;
+	gnutls_datum_t realkey = {
+		.data = NULL,
+		.size = 0
+	};
+
+	*log = gnutls_malloc(sizeof(struct gnutls_ct_log_st));
+	if (!*log)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+	/*
+	 * If key is in base64, decode it first.
+	 * This will allocate new memory that must be freed after public key import.
+	 */
+	if (flags == GNUTLS_CT_KEY_AS_BASE64) {
+		if ((retval = decode_base64(key, &realkey)) < 0) {
+			gnutls_assert();
+			goto bail;
+		}
+
+		key = &realkey;
+	}
+
+	if ((retval = _gnutls_init_log(*log, name, key)) < 0) {
+		gnutls_assert();
+		goto bail;
+	}
+
+	/* Pre-compute key's SHA-256 hash for faster lookup later */
+	if ((retval = gnutls_hash_fast(GNUTLS_DIG_SHA256,
+				       key->data, key->size, (*log)->id)) < 0) {
+		gnutls_assert();
+		goto bail;
+	}
+
+	return retval;
+
+bail:
+	if (realkey.data)
+		_gnutls_free_datum(&realkey);
+
+	return retval;
+}
+
+void gnutls_ct_log_deinit(gnutls_ct_log_t log)
+{
+	_gnutls_free_log(log);
+	gnutls_free(log);
+}
+
 int gnutls_ct_sct_validate(const gnutls_x509_ct_scts_t scts, unsigned idx,
 			   const gnutls_ct_logs_t logs,
 			   gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
@@ -294,7 +337,7 @@ int gnutls_ct_sct_validate(const gnutls_x509_ct_scts_t scts, unsigned idx,
 	gnutls_sign_algorithm_t sigalg;
 	gnutls_datum_t logid, signature;
 	gnutls_hash_hd_t md;
-	struct ct_log_st *log;
+	struct gnutls_ct_log_st *log;
 	uint8_t signed_data_digest[gnutls_hash_get_len(GNUTLS_DIG_SHA256)];
 	gnutls_datum_t signed_data_digest_datum = {
 		.data = signed_data_digest,
@@ -358,58 +401,41 @@ bail:
 	return retval;
 }
 
-int gnutls_ct_add_log(gnutls_ct_logs_t logs,
-		      const char *name, const char *description,
-		      const gnutls_datum_t *key,
-		      time_t not_before, time_t not_after,
-		      unsigned flags)
+int gnutls_ct_add_log(gnutls_ct_logs_t logs, const gnutls_ct_log_t log)
 {
 	int retval;
-	struct ct_log_st ct_log;
-	gnutls_datum_t realkey = {
-		.data = NULL,
-		.size = 0
-	};
 
-	if (!logs || !key || !key->data || !key->size)
+	if (!logs || !log)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	memset(&ct_log, 0, sizeof(struct ct_log_st));
-
-	/*
-	 * If key is in base64, decode it first.
-	 * This will allocate new memory that must be freed after public key import.
-	 */
-	if (flags == GNUTLS_CT_KEY_AS_BASE64) {
-		if ((retval = decode_base64(key, &realkey)) < 0) {
-			gnutls_assert();
-			goto bail;
-		}
-
-		key = &realkey;
-	}
-
-	if ((retval = _gnutls_init_log(&ct_log, name, description, key)) < 0) {
+	if ((retval = _gnutls_ct_add_log(log, &logs->logs, &logs->size)) < 0) {
 		gnutls_assert();
-		goto bail;
-	}
-
-	/* Pre-compute key's SHA-256 hash for faster lookup later */
-	if ((retval = gnutls_hash_fast(GNUTLS_DIG_SHA256,
-				       key->data, key->size, ct_log.id)) < 0) {
-		gnutls_assert();
-		goto bail;
-	}
-
-	if ((retval = _gnutls_ct_add_log(&ct_log, &logs->logs, &logs->size)) < 0) {
-		gnutls_assert();
-		goto bail;
+		goto end;
 	}
 
 	retval = 0;
 
-bail:
-	if (realkey.data)
-		_gnutls_free_datum(&realkey);
+end:
 	return retval;
+}
+
+int gnutls_ct_get_log(gnutls_ct_logs_t logs, unsigned idx,
+		      gnutls_datum_t *name,
+		      gnutls_pubkey_t *public_key)
+{
+	struct gnutls_ct_log_st *cur_log;
+
+	if (idx >= logs->size)
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+
+	cur_log = &logs->logs[idx];
+
+	if (name) {
+		name->data = cur_log->name;
+		name->size = strlen(cur_log->name);
+	}
+	if (public_key)
+		*public_key = cur_log->public_key;
+
+	return GNUTLS_E_SUCCESS;
 }
