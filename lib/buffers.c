@@ -189,15 +189,14 @@ inline static void reset_errno(gnutls_session_t session)
 	session->internals.errnum = 0;
 }
 
-inline static int get_errno(gnutls_session_t session)
+inline static int get_errno(gnutls_session_t session, gnutls_transport_ptr_t fd)
 {
 	int ret;
 
 	if (session->internals.errnum != 0)
 		ret = session->internals.errnum;
 	else
-		ret = session->internals.errno_func(
-			session->internals.transport_recv_ptr);
+		ret = session->internals.errno_func(fd);
 	return ret;
 }
 
@@ -253,7 +252,7 @@ static ssize_t _gnutls_dgram_read(gnutls_session_t session, mbuffer_st **bufel,
 	i = pull_func(fd, ptr, recv_size);
 
 	if (i < 0) {
-		int err = get_errno(session);
+		int err = get_errno(session, fd);
 
 		_gnutls_read_log("READ: %d returned from %p, errno=%d\n",
 				 (int)i, fd, err);
@@ -333,7 +332,7 @@ static ssize_t _gnutls_stream_read(gnutls_session_t session, mbuffer_st **bufel,
 		i = pull_func(fd, &ptr[size - left], left);
 
 		if (i < 0) {
-			int err = get_errno(session);
+			int err = get_errno(session, fd);
 
 			_gnutls_read_log(
 				"READ: %d returned from %p, errno=%d gerrno=%d\n",
@@ -491,7 +490,7 @@ static ssize_t _gnutls_writev(gnutls_session_t session, const giovec_t *giovec,
 		return gnutls_assert_val(GNUTLS_E_PUSH_ERROR);
 
 	if (i == -1) {
-		int err = get_errno(session);
+		int err = get_errno(session, fd);
 		_gnutls_debug_log("WRITE: %d returned from %p, errno: %d\n", i,
 				  fd, err);
 
@@ -723,7 +722,7 @@ int _gnutls_io_check_recv(gnutls_session_t session, unsigned int ms)
 
 	ret = session->internals.pull_timeout_func(fd, ms);
 	if (ret == -1) {
-		err = get_errno(session);
+		err = get_errno(session, fd);
 		_gnutls_read_log(
 			"READ_TIMEOUT: %d returned from %p, errno=%d (timeout: %u)\n",
 			(int)ret, fd, err, ms);
