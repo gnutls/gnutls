@@ -1627,8 +1627,10 @@ int _gnutls_recv_handshake(gnutls_session_t session,
 		{
 			/* Reference the full ClientHello in case an extension needs it */
 			ret = _gnutls_ext_set_full_client_hello(session, &hsk);
-			if (ret < 0)
-				return gnutls_assert_val(ret);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
 
 			ret = read_client_hello(session, hsk.data.data,
 						hsk.data.length);
