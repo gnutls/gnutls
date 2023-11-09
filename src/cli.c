@@ -2294,6 +2294,12 @@ static int getissuer_callback(const gnutls_x509_trust_list_t tlist,
 		fprintf(stderr,
 			"*** Cannot find caIssuer URI in certificate: %s\n",
 			gnutls_strerror(ret));
+
+		/* Initialize the output arguments as we are not
+		 * treating this as error.
+		 */
+		*issuers = NULL;
+		*issuers_size = 0;
 		return 0;
 	}
 
