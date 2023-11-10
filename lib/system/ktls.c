@@ -41,6 +41,7 @@
 #include <linux/tls.h>
 #include "ext/session_ticket.h"
 #include <sys/sendfile.h>
+#include <sys/utsname.h>
 #endif
 
 /**
@@ -465,6 +466,10 @@ int _gnutls_ktls_set_keys(gnutls_session_t session,
 			  gnutls_transport_ktls_enable_flags_t in)
 {
 	gnutls_cipher_algorithm_t cipher = gnutls_cipher_get(session);
+	int version = gnutls_protocol_get_version(session);
+	struct utsname utsname;
+	char *endptr;
+	long major, minor;
 	gnutls_datum_t mac_key;
 	gnutls_datum_t iv;
 	gnutls_datum_t cipher_key;
@@ -472,18 +477,53 @@ int _gnutls_ktls_set_keys(gnutls_session_t session,
 	int sockin, sockout;
 	int ret;
 
-	gnutls_transport_get_int2(session, &sockin, &sockout);
+	ret = uname(&utsname);
+	if (unlikely(ret < 0)) {
+		return GNUTLS_E_INTERNAL_ERROR;
+	}
+
+	if (strcmp(utsname.sysname, "Linux") == 0) {
+		return GNUTLS_E_INTERNAL_ERROR;
+	}
+
+	major = strtol(utsname.release, &endptr, 10);
+	if (major < 0 || major == LONG_MAX || *endptr != '.') {
+		return GNUTLS_E_INTERNAL_ERROR;
+	}
+	minor = strtol(endptr + 1, &endptr, 10);
+	if (minor < 0 || minor == LONG_MAX || *endptr != '.') {
+		return GNUTLS_E_INTERNAL_ERROR;
+	}
+
+	/* setsockopt(SOL_TLS, TLS_RX) support added in 5.10 */
+	if (major < 5 || (major == 5 && minor < 10)) {
+		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+	}
 
 	/* check whether or not cipher suite supports ktls
 	 */
-	int version = gnutls_protocol_get_version(session);
-	if ((version != GNUTLS_TLS1_3 && version != GNUTLS_TLS1_2) ||
-	    (gnutls_cipher_get(session) != GNUTLS_CIPHER_AES_128_GCM &&
-	     gnutls_cipher_get(session) != GNUTLS_CIPHER_AES_256_GCM &&
-	     gnutls_cipher_get(session) != GNUTLS_CIPHER_AES_128_CCM &&
-	     gnutls_cipher_get(session) != GNUTLS_CIPHER_CHACHA20_POLY1305)) {
+	switch (cipher) {
+	case GNUTLS_CIPHER_AES_128_GCM:
+	case GNUTLS_CIPHER_AES_256_GCM:
+		break;
+	case GNUTLS_CIPHER_AES_128_CCM:
+	case GNUTLS_CIPHER_CHACHA20_POLY1305:
+		/* AES-128-CCM and CHACHA20-POLY1305 can only be set
+		 * using setsockopt since 5.11.
+		 */
+		if (major < 5 || (major == 5 && minor < 11)) {
+			return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+		}
+		break;
+	default:
 		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 	}
+
+	if (version < GNUTLS_TLS1_2) {
+		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+	}
+
+	gnutls_transport_get_int2(session, &sockin, &sockout);
 
 	ret = gnutls_record_get_state(session, 1, &mac_key, &iv, &cipher_key,
 				      seq_number);
