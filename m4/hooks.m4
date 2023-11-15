@@ -40,9 +40,9 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   #     in CONTRIBUTION.md for more info.
   #
   # Interfaces removed:                           AGE=0 (+bump all symbol versions in .map)
-  AC_SUBST(LT_CURRENT, 66)
+  AC_SUBST(LT_CURRENT, 67)
   AC_SUBST(LT_REVISION, 0)
-  AC_SUBST(LT_AGE, 36)
+  AC_SUBST(LT_AGE, 37)
 
   AC_SUBST(LT_SSL_CURRENT, 27)
   AC_SUBST(LT_SSL_REVISION, 2)

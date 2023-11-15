@@ -70,24 +70,3 @@ name = drbg_aes_reseed
 
 # The following should be removed in the new release, after updating the
 # abi-dump repository:
-[suppress_function]
-name = gnutls_pubkey_import_dh_raw
-
-[suppress_function]
-name = gnutls_privkey_import_dh_raw
-
-[suppress_function]
-name = gnutls_pubkey_export_dh_raw
-
-[suppress_function]
-name = gnutls_privkey_export_dh_raw
-
-[suppress_function]
-name = gnutls_x509_privkey_import_dh_raw
-
-[suppress_function]
-name = gnutls_privkey_derive_secret
-
-[suppress_type]
-name = gnutls_cipher_algorithm_t
-changed_enumerators = GNUTLS_CIPHER_AES_128_SIV_GCM, GNUTLS_CIPHER_AES_256_SIV_GCM
