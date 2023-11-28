@@ -289,7 +289,7 @@ static int add_system_trust(gnutls_x509_trust_list_t list,
 	return r;
 }
 #elif defined(__APPLE__) && __MAC_OS_X_VERSION_MIN_REQUIRED >= 1070
-static int osstatus_error(status)
+static int osstatus_error(OSStatus status)
 {
 	CFStringRef err_str = SecCopyErrorMessageString(status, NULL);
 	_gnutls_debug_log("Error loading system root certificates: %s\n",
