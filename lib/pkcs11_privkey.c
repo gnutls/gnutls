@@ -515,12 +515,15 @@ key_type_to_pk(struct ck_function_list *module, ck_session_handle_t pks,
 
 		if (pkcs11_get_attribute_value(module, pks, ctx, a, 1) ==
 		    CKR_OK) {
+			const gnutls_datum_t pubkey = {
+				.data = a[0].value, .size = a[0].value_len
+			};
 			gnutls_ecc_curve_t curve;
 			const gnutls_ecc_curve_entry_st *ce;
 			int ret;
 
-			ret = _gnutls_x509_read_ecc_params(
-				a[0].value, a[0].value_len, &curve);
+			ret = _gnutls_pubkey_parse_ecc_eddsa_params(&pubkey,
+								    &curve);
 			if (ret < 0) {
 				goto edwards_cleanup;
 			}
