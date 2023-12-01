@@ -562,7 +562,7 @@ dist_check_SCRIPTS += gnutls-cli-self-signed.sh gnutls-cli-invalid-crl.sh gnutls
 dist_check_SCRIPTS += dh-fips-approved.sh
 
 if ENABLE_PKCS11
-dist_check_SCRIPTS += p11-kit-trust.sh testpkcs11.sh certtool-pkcs11.sh
+dist_check_SCRIPTS += p11-kit-trust.sh testpkcs11.sh certtool-pkcs11.sh pkcs11-tool.sh
 
 if HAVE_PKCS11_TRUST_STORE
 if P11KIT_0_23_11_API
