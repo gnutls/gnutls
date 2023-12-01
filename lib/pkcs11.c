@@ -1909,9 +1909,8 @@ int pkcs11_read_pubkey(struct ck_function_list *module, ck_session_handle_t pks,
 
 			pobj->pubkey_size = 2;
 
-			ret = _gnutls_x509_read_ecc_params(pobj->pubkey[0].data,
-							   pobj->pubkey[0].size,
-							   &curve);
+			ret = _gnutls_pubkey_parse_ecc_eddsa_params(
+				&pobj->pubkey[0], &curve);
 			if (ret < 0) {
 				ret = GNUTLS_E_INVALID_REQUEST;
 				goto cleanup;

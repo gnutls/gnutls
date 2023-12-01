@@ -363,9 +363,8 @@ int gnutls_pubkey_get_preferred_hash_algorithm(gnutls_pubkey_t key,
 
 /* The EC_PARAMS attribute can contain either printable string with curve name
  * or OID defined in RFC 8410 */
-static int
-gnutls_pubkey_parse_ecc_eddsa_params(const gnutls_datum_t *parameters,
-				     gnutls_ecc_curve_t *outcurve)
+int _gnutls_pubkey_parse_ecc_eddsa_params(const gnutls_datum_t *parameters,
+					  gnutls_ecc_curve_t *outcurve)
 {
 	gnutls_ecc_curve_t curve = GNUTLS_ECC_CURVE_INVALID;
 	asn1_node asn1 = NULL;
@@ -475,7 +474,7 @@ static int gnutls_pubkey_import_ecc_eddsa(gnutls_pubkey_t key,
 	gnutls_ecc_curve_t curve = GNUTLS_ECC_CURVE_INVALID;
 	gnutls_datum_t raw_point = { NULL, 0 };
 
-	ret = gnutls_pubkey_parse_ecc_eddsa_params(parameters, &curve);
+	ret = _gnutls_pubkey_parse_ecc_eddsa_params(parameters, &curve);
 	if (ret < 0) {
 		return gnutls_assert_val(ret);
 	}
