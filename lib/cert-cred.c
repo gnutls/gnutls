@@ -889,14 +889,17 @@ void gnutls_certificate_set_verify_function(
  * gnutls_x509_crt_get_authority_info_access() to get a URI from which
  * to attempt to download the missing issuer certificate, if available.
  *
- * On a successful call, the callback shall allocate the 'issuers' array with
- * gnutls_x509_crt_list_import2(). The ownership of both the array and the
- * elements is transferred to the caller and thus the application does not need
- * to maintain the memory after the call.
+ * On a successful call, the callback shall set '*issuers' and '*issuers_size'
+ * even if the result is empty; in that case '*issuers' will point to %NULL and
+ * '*issuers_size' will be 0.  Otherwise, the '*issuers' array shall be
+ * allocated using gnutls_x509_crt_list_import2(). The ownership of both the
+ * array and the elements is transferred to the caller and thus the application
+ * does not need to maintain the memory after the call.
  *
- * The callback function should return 0 if the missing issuer certificate
- * for 'crt' was properly populated and added to the 'issuers', or non-zero
- * to continue the certificate list verification but with issuer as %NULL.
+ * The callback function should return 0 if the attempt to retrieve the issuer
+ * certificates for 'crt' succeeded, or non-zero to indicate any error occurred
+ * during the attempt. In the latter case, '*issuers' and '*issuers_size' are
+ * not set.
  *
  * Since: 3.7.0
  **/
