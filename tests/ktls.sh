@@ -23,15 +23,23 @@
 
 . "$srcdir/scripts/common.sh"
 
-if [ "$host_os" = "FreeBSD" ]; then 
+case "$host_os" in
+    FreeBSD)
 	if ! sysctl -n kern.ipc.tls.enable | grep 1 > /dev/null; then 
 		exit 77 
-	fi 
-else #check KTLS on Linux 
+	fi
+	;;
+    Linux)
 	if ! grep '^tls ' /proc/modules 2>&1 /dev/null; then 
 		exit 77 
-	fi 
-fi
+	fi
+	case "$(uname -r)" in
+	    4.* | 5.[0-9].* | 5.10.*)
+		exit 77 
+		;;
+	esac
+	;;
+esac
 
 testdir=`create_testdir ktls`
 
