@@ -12,9 +12,9 @@ variables:
   # name to allow expiration of old caches.
   BUILD_IMAGES_PROJECT: gnutls/build-images
   DEBIAN_BUILD: buildenv-debian-testing
-  FEDORA_BUILD: buildenv-fedora38
-  FEDORA_CROSS_BUILD: buildenv-cross-fedora38
-  MINGW_BUILD: buildenv-mingw-fedora38
+  FEDORA_BUILD: buildenv-fedora39
+  FEDORA_CROSS_BUILD: buildenv-cross-fedora39
+  MINGW_BUILD: buildenv-mingw-fedora39
   ALPINE_BASE_BUILD: buildenv-alpine-base
   COMPILER: gcc
   CPPCHECK_OPTIONS: "--enable=warning --enable=performance --enable=portability --std=c99 --suppressions-list=devel/cppcheck.suppressions --template='{id}:{file}:{line},{severity},{message}'"
