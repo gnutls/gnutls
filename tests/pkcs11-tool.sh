@@ -28,10 +28,23 @@ set -x
 : ${CERTTOOL=../src/certtool${EXEEXT}}
 : ${P11TOOL=../src/p11tool${EXEEXT}}
 : ${DIFF=diff}
-TMP_SOFTHSM_DIR="./softhsm-load.$$.tmp"
-TEMPLATE="./cert.cfg"
+
+. "$srcdir/scripts/common.sh"
+
+testdir=`create_testdir ktls_keyupdate`
+
+TMP_SOFTHSM_DIR="$testdir/softhsm-load.$$.tmp"
+TEMPLATE="$testdir/cert.cfg"
 PIN=1234
 PUK=1234
+
+if ! test -x "${P11TOOL}"; then
+	exit 77
+fi
+
+if ! test -x "${CERTTOOL}"; then
+	exit 77
+fi
 
 for lib in ${libdir} ${libdir}/pkcs11 /usr/lib64/pkcs11/ /usr/lib/pkcs11/ /usr/lib/x86_64-linux-gnu/pkcs11/ /usr/lib/softhsm/; do
 	if test -f "${lib}/libsofthsm2.so"; then
@@ -91,7 +104,7 @@ cert_signing_key
 expiration_days = 1
 _EOF_
 
-GNUTLS_PIN="$PIN" ${CERTTOOL} --generate-self-signed --outfile="${CRT}.crt" \
+GNUTLS_PIN="$PIN" ${CERTTOOL} --generate-self-signed --outfile="$testdir/ed25519-ca.crt" \
     --template=${TEMPLATE} --provider="$SOFTHSM_MODULE" \
     --load-privkey "pkcs11:object=$LABEL;type=private" \
     --load-pubkey "pkcs11:object=$LABEL;type=public" --outder
@@ -109,4 +122,5 @@ fi
 #fi
 
 
+rm -rf "$testdir"
 exit 0
