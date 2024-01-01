@@ -290,7 +290,7 @@ void gnutls_privkey_deinit(gnutls_privkey_t key);
 	(unsigned int)((subgroup << 16) | (group))
 #define GNUTLS_BITS_TO_SUBGROUP(bits) ((bits >> 16) & 0xFFFF)
 #define GNUTLS_BITS_TO_GROUP(bits) (bits & 0xFFFF)
-#define GNUTLS_BITS_HAVE_SUBGROUP(bits) ((bits)&0xFFFF0000)
+#define GNUTLS_BITS_HAVE_SUBGROUP(bits) ((bits) & 0xFFFF0000)
 
 int gnutls_privkey_generate(gnutls_privkey_t key, gnutls_pk_algorithm_t algo,
 			    unsigned int bits, unsigned int flags);

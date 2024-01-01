@@ -248,7 +248,7 @@ typedef enum {
 
 #define FIX_SIGN_PARAMS(params, flags, dig)                            \
 	do {                                                           \
-		if ((flags)&GNUTLS_PRIVKEY_FLAG_REPRODUCIBLE) {        \
+		if ((flags) & GNUTLS_PRIVKEY_FLAG_REPRODUCIBLE) {      \
 			(params).flags |= GNUTLS_PK_FLAG_REPRODUCIBLE; \
 		}                                                      \
 		if ((params).pk == GNUTLS_PK_DSA ||                    \
