@@ -256,7 +256,6 @@ static int _gnutls_proc_rsa_psk_client_kx(gnutls_session_t session,
 	int ret, dsize;
 	ssize_t data_size = _data_size;
 	gnutls_psk_server_credentials_t cred;
-	gnutls_datum_t premaster_secret = { NULL, 0 };
 	volatile uint8_t ver_maj, ver_min;
 
 	cred = (gnutls_psk_server_credentials_t)_gnutls_get_cred(
@@ -318,24 +317,49 @@ static int _gnutls_proc_rsa_psk_client_kx(gnutls_session_t session,
 	ver_maj = _gnutls_get_adv_version_major(session);
 	ver_min = _gnutls_get_adv_version_minor(session);
 
-	premaster_secret.data = gnutls_malloc(GNUTLS_MASTER_SIZE);
-	if (premaster_secret.data == NULL) {
+	/* Find the key of this username. A random value will be
+	 * filled in if the key is not found.
+	 */
+	ret = _gnutls_psk_pwd_find_entry(session, info->username,
+					 strlen(info->username), &pwd_psk,
+					 NULL);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	/* Allocate memory for premaster secret, and fill in the
+	 * fields except the decryption result.
+	 */
+	session->key.key.size = 2 + GNUTLS_MASTER_SIZE + 2 + pwd_psk.size;
+	session->key.key.data = gnutls_malloc(session->key.key.size);
+	if (session->key.key.data == NULL) {
 		gnutls_assert();
+		_gnutls_free_key_datum(&pwd_psk);
+		/* No need to zeroize, as the secret is not copied in yet */
+		_gnutls_free_datum(&session->key.key);
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-	premaster_secret.size = GNUTLS_MASTER_SIZE;
 
 	/* Fallback value when decryption fails. Needs to be unpredictable. */
-	ret = gnutls_rnd(GNUTLS_RND_NONCE, premaster_secret.data,
-			 premaster_secret.size);
+	ret = gnutls_rnd(GNUTLS_RND_NONCE, session->key.key.data + 2,
+			 GNUTLS_MASTER_SIZE);
 	if (ret < 0) {
 		gnutls_assert();
-		goto cleanup;
+		_gnutls_free_key_datum(&pwd_psk);
+		/* No need to zeroize, as the secret is not copied in yet */
+		_gnutls_free_datum(&session->key.key);
+		return ret;
 	}
 
+	_gnutls_write_uint16(GNUTLS_MASTER_SIZE, session->key.key.data);
+	_gnutls_write_uint16(pwd_psk.size,
+			     &session->key.key.data[2 + GNUTLS_MASTER_SIZE]);
+	memcpy(&session->key.key.data[2 + GNUTLS_MASTER_SIZE + 2], pwd_psk.data,
+	       pwd_psk.size);
+	_gnutls_free_key_datum(&pwd_psk);
+
 	gnutls_privkey_decrypt_data2(session->internals.selected_key, 0,
-				     &ciphertext, premaster_secret.data,
-				     premaster_secret.size);
+				     &ciphertext, session->key.key.data + 2,
+				     GNUTLS_MASTER_SIZE);
 	/* After this point, any conditional on failure that cause differences
 	 * in execution may create a timing or cache access pattern side
 	 * channel that can be used as an oracle, so tread carefully */
@@ -354,31 +378,10 @@ static int _gnutls_proc_rsa_psk_client_kx(gnutls_session_t session,
 	/* This is here to avoid the version check attack
 	 * discussed above.
 	 */
-	premaster_secret.data[0] = ver_maj;
-	premaster_secret.data[1] = ver_min;
+	session->key.key.data[2] = ver_maj;
+	session->key.key.data[3] = ver_min;
 
-	/* find the key of this username
-	 */
-	ret = _gnutls_psk_pwd_find_entry(session, info->username,
-					 strlen(info->username), &pwd_psk,
-					 NULL);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	ret = set_rsa_psk_session_key(session, &pwd_psk, &premaster_secret);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	ret = 0;
-cleanup:
-	_gnutls_free_key_datum(&pwd_psk);
-	_gnutls_free_temp_key_datum(&premaster_secret);
-
-	return ret;
+	return 0;
 }
 
 static int _gnutls_proc_rsa_psk_server_kx(gnutls_session_t session,
