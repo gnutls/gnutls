@@ -872,6 +872,8 @@ mingw64/test:
   extends:
     - .mingw/test
     - .mingw64
+  variables:
+    GNUTLS_NO_IMPLICIT_INIT: 1
   dependencies:
     - mingw64/build
   needs:
@@ -900,6 +902,8 @@ mingw64-vista/test:
     - .mingw/test
     - .mingw64
     - .mingw-vista
+  variables:
+    GNUTLS_NO_IMPLICIT_INIT: 1
   dependencies:
     - mingw64-vista/build
   needs:
