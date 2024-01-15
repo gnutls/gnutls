@@ -372,10 +372,12 @@ static int check_lib_hmac(struct hmac_entry *entry, const char *path)
 	if (gnutls_memcmp(entry->hmac, hmac, HMAC_SIZE)) {
 		_gnutls_debug_log("Calculated MAC for %s does not match\n",
 				  path);
+		gnutls_memset(hmac, 0, HMAC_SIZE);
 		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 	}
 	_gnutls_debug_log("Successfully verified MAC for %s\n", path);
 
+	gnutls_memset(hmac, 0, HMAC_SIZE);
 	return 0;
 }
 
