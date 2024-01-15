@@ -29,7 +29,7 @@ variables:
   CHECKJOBS: 16
 
 cache:
-  key: "$CI_JOB_NAME-ver30"
+  key: "$CI_JOB_NAME-ver31"
   paths:
     - cache/
 
@@ -165,7 +165,7 @@ commit-check:
     # we want $ALPINE_BASE_BUILD without git, so we are adding it here
     - apk add git bash grep clang16-extra-tools
     - devel/check_if_signed
-    - devel/indent-gnutls
+    - PATH=/usr/lib/llvm16/bin:$PATH devel/indent-gnutls
     - devel/check-headers.sh
     - git diff --exit-code # nothing should change version controlled files
   retry: 0
