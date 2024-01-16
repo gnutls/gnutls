@@ -5,6 +5,22 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.8.3 (released 2024-01-16)
+
+** libgnutls: Fix more timing side-channel inside RSA-PSK key exchange
+   [GNUTLS-SA-2024-01-14, CVSS: medium] [CVE-2024-0553]
+
+** libgnutls: Fix assertion failure when verifying a certificate chain with a
+   cycle of cross signatures
+   [GNUTLS-SA-2024-01-09, CVSS: medium] [CVE-2024-0567]
+
+** libgnutls: Fix regression in handling Ed25519 keys stored in PKCS#11 token
+   certtool was unable to handle Ed25519 keys generated on PKCS#11
+   with pkcs11-tool (OpenSC). This is a regression introduced in 3.8.2.
+
+** API and ABI modifications:
+No changes since last version.
+
 * Version 3.8.2 (released 2023-11-14)
 
 ** libgnutls: Fix timing side-channel inside RSA-PSK key exchange.

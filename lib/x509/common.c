@@ -1741,6 +1741,10 @@ unsigned int _gnutls_sort_clist(gnutls_x509_crt_t *clist,
 			break;
 		}
 
+		if (insorted[prev]) { /* loop detected */
+			break;
+		}
+
 		sorted[i] = clist[prev];
 		insorted[prev] = 1;
 	}
