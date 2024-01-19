@@ -25,6 +25,8 @@
 
 #include "gnutls_int.h"
 
+int _gnutls_compression_init_method(gnutls_compression_method_t method);
+void _gnutls_compression_deinit(void);
 size_t _gnutls_compress_bound(gnutls_compression_method_t alg, size_t src_len);
 int _gnutls_compress(gnutls_compression_method_t alg, uint8_t *dst,
 		     size_t dst_len, const uint8_t *src, size_t src_len);

@@ -23,10 +23,21 @@
 #include "config.h"
 #endif
 
-#include <stdbool.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#if defined(_WIN32) || !defined(HAVE_LIBZ) || !defined(HAVE_LIBBROTLI) || \
+	!defined(HAVE_LIBZSTD)
+
+int main(int argc, char **argv)
+{
+	exit(77);
+}
+
+#else
+
+#include <stdbool.h>
+#include <stdint.h>
 #include <string.h>
 #include <errno.h>
 #include <gnutls/gnutls.h>
@@ -236,8 +247,7 @@ static void run(void)
 
 void doit(void)
 {
-#if !defined(HAVE_LIBZ) || !defined(HAVE_LIBBROTLI) || !defined(HAVE_LIBZSTD)
-	exit(77);
-#endif
 	run();
 }
+
+#endif /* _WIN32 */
