@@ -20,33 +20,12 @@
  *
  */
 
+#include "compress.h"
 #include "errors.h"
 #include "gnutls_int.h"
 #include "hello_ext_lib.h"
 #include "num.h"
 #include "ext/compress_certificate.h"
-
-/* Check whether certificate compression method is valid, ie. supported by gnutls
- */
-static inline int is_valid_method(gnutls_compression_method_t method)
-{
-	switch (method) {
-#ifdef HAVE_LIBZ
-	case GNUTLS_COMP_ZLIB:
-		return 1;
-#endif
-#ifdef HAVE_LIBBROTLI
-	case GNUTLS_COMP_BROTLI:
-		return 1;
-#endif
-#ifdef HAVE_LIBZSTD
-	case GNUTLS_COMP_ZSTD:
-		return 1;
-#endif
-	default:
-		return 0;
-	}
-}
 
 /* Converts compression algorithm number established in RFC8879 to internal compression method type
  */
@@ -159,6 +138,7 @@ int gnutls_compress_certificate_set_methods(
 	gnutls_session_t session, const gnutls_compression_method_t *methods,
 	size_t methods_len)
 {
+	int ret;
 	unsigned i;
 	compress_certificate_ext_st *priv;
 
@@ -172,8 +152,8 @@ int gnutls_compress_certificate_set_methods(
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	for (i = 0; i < methods_len; ++i)
-		if (!is_valid_method(methods[i]))
-			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		if ((ret = _gnutls_compression_init_method(methods[i])) < 0)
+			return gnutls_assert_val(ret);
 
 	priv = gnutls_malloc(sizeof(*priv));
 	if (priv == NULL)

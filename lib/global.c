@@ -25,6 +25,7 @@
 #include "errors.h"
 #include <libtasn1.h>
 #include "dh.h"
+#include "compress.h"
 #include "random.h"
 #include <gnutls/pkcs11.h>
 
@@ -415,6 +416,7 @@ static void _gnutls_global_deinit(unsigned destructor)
 
 		_gnutls_system_key_deinit();
 		gnutls_crypto_deinit();
+		_gnutls_compression_deinit();
 		_gnutls_rnd_deinit();
 		_gnutls_hello_ext_deinit();
 		asn1_delete_structure(&_gnutls_gnutls_asn);
