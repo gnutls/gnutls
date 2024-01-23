@@ -482,7 +482,7 @@ int _gnutls_ktls_set_keys(gnutls_session_t session,
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
-	if (strcmp(utsname.sysname, "Linux") == 0) {
+	if (strcmp(utsname.sysname, "Linux") != 0) {
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
@@ -494,6 +494,9 @@ int _gnutls_ktls_set_keys(gnutls_session_t session,
 	if (minor < 0 || minor == LONG_MAX || *endptr != '.') {
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
+
+	_gnutls_debug_log("Linux kernel version %lu.%lu has been detected\n",
+			  major, minor);
 
 	/* setsockopt(SOL_TLS, TLS_RX) support added in 5.10 */
 	if (major < 5 || (major == 5 && minor < 10)) {
