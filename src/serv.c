@@ -186,6 +186,7 @@ static void listener_free(const void *elt)
 		close(j->fd);
 		gnutls_deinit(j->tls_session);
 	}
+	free(j);
 }
 
 /* we use primes up to 1024 in this server.
