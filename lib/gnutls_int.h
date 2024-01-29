@@ -232,7 +232,10 @@ typedef enum record_send_state_t {
 
 #define MAX_PK_PARAM_SIZE 2048
 
-/* defaults for verification functions
+/* Defaults for verification functions.
+ *
+ * update many_icas in tests/test-chains.h when increasing
+ * DEFAULT_MAX_VERIFY_DEPTH.
  */
 #define DEFAULT_MAX_VERIFY_DEPTH 16
 #define DEFAULT_MAX_VERIFY_BITS (MAX_PK_PARAM_SIZE * 8)
