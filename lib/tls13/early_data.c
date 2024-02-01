@@ -88,18 +88,14 @@ int _gnutls13_recv_end_of_early_data(gnutls_session_t session)
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
+		_gnutls_buffer_clear(&buf);
+
 		if (buf.length != 0) {
-			gnutls_assert();
 			ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
-			goto cleanup;
+			return gnutls_assert_val(ret);
 		}
 	}
 
 	session->internals.hsk_flags &= ~HSK_EARLY_DATA_IN_FLIGHT;
-
-	ret = 0;
-cleanup:
-
-	_gnutls_buffer_clear(&buf);
-	return ret;
+	return 0;
 }
