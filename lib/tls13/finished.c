@@ -82,10 +82,8 @@ int _gnutls13_recv_finished(gnutls_session_t session)
 	ret = _gnutls13_compute_finished(
 		session->security_parameters.prf, base_key,
 		&session->internals.handshake_hash_buffer, verifier);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	ret = _gnutls_recv_handshake(session, GNUTLS_HANDSHAKE_FINISHED, 0,
 				     &buf);
