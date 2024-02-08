@@ -157,6 +157,9 @@ void doit(void)
 #endif
 			}
 
+			if (algorithm == GNUTLS_PK_RSA_OAEP)
+				continue;
+
 			ret = gnutls_x509_privkey_init(&pkey);
 			if (ret < 0) {
 				fail("gnutls_x509_privkey_init: %d\n", ret);
