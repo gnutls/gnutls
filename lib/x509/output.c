@@ -1486,7 +1486,8 @@ static void print_pubkey(gnutls_buffer_st *str, const char *key_name,
 
 	switch (pk) {
 	case GNUTLS_PK_RSA:
-	case GNUTLS_PK_RSA_PSS: {
+	case GNUTLS_PK_RSA_PSS:
+	case GNUTLS_PK_RSA_OAEP: {
 		gnutls_datum_t m, e;
 
 		err = gnutls_pubkey_get_pk_rsa_raw(pubkey, &m, &e);

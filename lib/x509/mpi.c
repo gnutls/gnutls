@@ -262,6 +262,34 @@ int _gnutls_x509_read_pkalgo_params(asn1_node src, const char *src_name,
 			gnutls_assert();
 
 		return result;
+	} else if (strcmp(oid, PK_PKIX1_RSA_OAEP_OID) == 0) {
+		gnutls_datum_t tmp = { NULL, 0 };
+
+		_gnutls_str_cpy(name, sizeof(name), src_name);
+		_gnutls_str_cat(name, sizeof(name), ".parameters");
+
+		result = _gnutls_x509_read_value(src, name, &tmp);
+		if (result < 0) {
+			if (!is_sig) {
+				if (result == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND ||
+				    result != GNUTLS_E_ASN1_VALUE_NOT_FOUND) {
+					/* it is ok to not have parameters in SPKI, but
+					 * not in signatures */
+					return 0;
+				}
+			}
+
+			return gnutls_assert_val(result);
+		}
+
+		result = _gnutls_x509_read_rsa_oaep_params(tmp.data, tmp.size,
+							   spki);
+		_gnutls_free_datum(&tmp);
+
+		if (result < 0)
+			gnutls_assert();
+
+		return result;
 	}
 
 	return 0;

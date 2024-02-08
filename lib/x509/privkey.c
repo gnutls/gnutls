@@ -1957,6 +1957,21 @@ int gnutls_x509_privkey_generate2(gnutls_x509_privkey_t key,
 		key->params.spki.salt_size = ret;
 	}
 
+	if (algo == GNUTLS_PK_RSA_OAEP && !key->params.spki.pk) {
+		const mac_entry_st *me;
+		key->params.spki.pk = GNUTLS_PK_RSA_OAEP;
+
+		key->params.spki.rsa_oaep_dig =
+			_gnutls_pk_bits_to_sha_hash(bits);
+
+		me = hash_to_entry(key->params.spki.rsa_oaep_dig);
+		if (unlikely(me == NULL)) {
+			gnutls_assert();
+			ret = GNUTLS_E_INVALID_REQUEST;
+			goto cleanup;
+		}
+	}
+
 	ret = _gnutls_pk_generate_keys(algo, bits, &key->params, 0);
 	if (ret < 0) {
 		gnutls_assert();

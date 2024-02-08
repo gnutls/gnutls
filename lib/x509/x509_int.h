@@ -263,6 +263,11 @@ int _gnutls_x509_read_rsa_pss_params(uint8_t *der, int dersize,
 int _gnutls_x509_write_rsa_pss_params(const gnutls_x509_spki_st *params,
 				      gnutls_datum_t *der);
 
+int _gnutls_x509_read_rsa_oaep_params(uint8_t *der, int dersize,
+				      gnutls_x509_spki_st *params);
+int _gnutls_x509_write_rsa_oaep_params(const gnutls_x509_spki_st *params,
+				       gnutls_datum_t *der);
+
 /* extensions.c */
 int _gnutls_x509_crl_get_extension_oid(gnutls_x509_crl_t crl, int indx,
 				       void *oid, size_t *sizeof_oid);

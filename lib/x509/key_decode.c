@@ -285,6 +285,90 @@ cleanup:
 	return ret;
 }
 
+static int check_mgf1(asn1_node root, const char *name,
+		      gnutls_digest_algorithm_t digest, bool allow_null)
+{
+	char buffer[MAX_NAME_SIZE];
+	char oid[MAX_OID_SIZE];
+	gnutls_digest_algorithm_t digest2;
+	asn1_node ai = NULL;
+	int size;
+	int result;
+	gnutls_datum_t value = { NULL, 0 };
+
+	result = snprintf(buffer, sizeof(buffer), "%s.algorithm", name);
+	if (result < 0 || (size_t)result >= sizeof(buffer))
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+	size = sizeof(oid);
+	result = asn1_read_value(root, buffer, oid, &size);
+	if (result < 0) {
+		if (result == ASN1_ELEMENT_NOT_FOUND && allow_null)
+			return 0;
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	/* Error out if algorithm other than mgf1 is specified */
+	if (strcmp(oid, PKIX1_RSA_PSS_MGF1_OID) != 0) {
+		gnutls_assert();
+		_gnutls_debug_log("Unknown mask algorithm: %s\n", oid);
+		return gnutls_assert_val(GNUTLS_E_UNKNOWN_ALGORITHM);
+	}
+
+	/* Check if maskGenAlgorithm.parameters does exist and
+	 * is identical to hashAlgorithm */
+	result = snprintf(buffer, sizeof(buffer), "%s.parameters", name);
+	if (result < 0 || (size_t)result >= sizeof(buffer))
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+	result = _gnutls_x509_read_value(root, buffer, &value);
+	if (result < 0)
+		return gnutls_assert_val(result);
+
+	if ((result = asn1_create_element(_gnutls_get_pkix(),
+					  "PKIX1.AlgorithmIdentifier", &ai)) !=
+	    ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	result = _asn1_strict_der_decode(&ai, value.data, value.size, NULL);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	size = sizeof(oid);
+	result = asn1_read_value(ai, "algorithm", oid, &size);
+	if (result == ASN1_SUCCESS)
+		digest2 = gnutls_oid_to_digest(oid);
+	else if (result == ASN1_ELEMENT_NOT_FOUND)
+		/* The default hash algorithm for mgf1 is SHA-1 */
+		digest2 = GNUTLS_DIG_SHA1;
+	else {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	if (digest != digest2) {
+		gnutls_assert();
+		result = GNUTLS_E_CONSTRAINT_ERROR;
+		goto cleanup;
+	}
+
+	result = 0;
+
+cleanup:
+	_gnutls_free_datum(&value);
+	asn1_delete_structure(&ai);
+
+	return result;
+}
+
 /* Reads RSA-PSS parameters.
  */
 int _gnutls_x509_read_rsa_pss_params(uint8_t *der, int dersize,
@@ -292,12 +376,10 @@ int _gnutls_x509_read_rsa_pss_params(uint8_t *der, int dersize,
 {
 	int result;
 	asn1_node spk = NULL;
-	asn1_node c2 = NULL;
 	gnutls_digest_algorithm_t digest;
 	char oid[MAX_OID_SIZE] = "";
 	int size;
 	unsigned int trailer;
-	gnutls_datum_t value = { NULL, 0 };
 
 	if ((result = asn1_create_element(_gnutls_get_gnutls_asn(),
 					  "GNUTLS.RSAPSSParameters", &spk)) !=
@@ -335,65 +417,9 @@ int _gnutls_x509_read_rsa_pss_params(uint8_t *der, int dersize,
 		goto cleanup;
 	}
 
-	size = sizeof(oid);
-	result = asn1_read_value(spk, "maskGenAlgorithm.algorithm", oid, &size);
-	if (result == ASN1_SUCCESS) {
-		gnutls_digest_algorithm_t digest2;
-
-		/* Error out if algorithm other than mgf1 is specified */
-		if (strcmp(oid, PKIX1_RSA_PSS_MGF1_OID) != 0) {
-			gnutls_assert();
-			_gnutls_debug_log("Unknown mask algorithm: %s\n", oid);
-			result = GNUTLS_E_UNKNOWN_ALGORITHM;
-			goto cleanup;
-		}
-
-		/* Check if maskGenAlgorithm.parameters does exist and
-		 * is identical to hashAlgorithm */
-		result = _gnutls_x509_read_value(
-			spk, "maskGenAlgorithm.parameters", &value);
-		if (result < 0) {
-			gnutls_assert();
-			goto cleanup;
-		}
-
-		if ((result = asn1_create_element(_gnutls_get_pkix(),
-						  "PKIX1.AlgorithmIdentifier",
-						  &c2)) != ASN1_SUCCESS) {
-			gnutls_assert();
-			result = _gnutls_asn2err(result);
-			goto cleanup;
-		}
-
-		result = _asn1_strict_der_decode(&c2, value.data, value.size,
-						 NULL);
-		if (result != ASN1_SUCCESS) {
-			gnutls_assert();
-			result = _gnutls_asn2err(result);
-			goto cleanup;
-		}
-
-		size = sizeof(oid);
-		result = asn1_read_value(c2, "algorithm", oid, &size);
-		if (result == ASN1_SUCCESS)
-			digest2 = gnutls_oid_to_digest(oid);
-		else if (result == ASN1_ELEMENT_NOT_FOUND)
-			/* The default hash algorithm for mgf1 is SHA-1 */
-			digest2 = GNUTLS_DIG_SHA1;
-		else {
-			gnutls_assert();
-			result = _gnutls_asn2err(result);
-			goto cleanup;
-		}
-
-		if (digest != digest2) {
-			gnutls_assert();
-			result = GNUTLS_E_CONSTRAINT_ERROR;
-			goto cleanup;
-		}
-	} else if (result != ASN1_ELEMENT_NOT_FOUND) {
+	result = check_mgf1(spk, "maskGenAlgorithm", digest, true);
+	if (result < 0) {
 		gnutls_assert();
-		result = _gnutls_asn2err(result);
 		goto cleanup;
 	}
 
@@ -426,8 +452,137 @@ int _gnutls_x509_read_rsa_pss_params(uint8_t *der, int dersize,
 
 	result = 0;
 cleanup:
-	_gnutls_free_datum(&value);
-	asn1_delete_structure(&c2);
+	asn1_delete_structure(&spk);
+	return result;
+}
+
+static int read_rsa_oaep_label(asn1_node root, const char *name,
+			       gnutls_datum_t *label, bool allow_null)
+{
+	char buffer[MAX_NAME_SIZE];
+	char oid[MAX_OID_SIZE] = "";
+	int size;
+	int result;
+	gnutls_datum_t der = { NULL, 0 };
+
+	result = snprintf(buffer, sizeof(buffer), "%s.algorithm", name);
+	if (result < 0 || (size_t)result >= sizeof(buffer))
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+	size = sizeof(oid);
+	result = asn1_read_value(root, buffer, oid, &size);
+	if (result < 0) {
+		if (result != ASN1_ELEMENT_NOT_FOUND && allow_null)
+			return 0;
+
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	/* Error out if algorithm other than mgf1 is specified */
+	if (strcmp(oid, PKIX1_RSA_OAEP_P_SPECIFIED_OID) != 0) {
+		gnutls_assert();
+		_gnutls_debug_log("Unknown pSourceFunc algorithm: %s\n", oid);
+		return GNUTLS_E_UNKNOWN_ALGORITHM;
+	}
+
+	/* Extract label from pSourceFunc.parameters */
+	result = snprintf(buffer, sizeof(buffer), "%s.parameters", name);
+	if (result < 0 || (size_t)result >= sizeof(buffer))
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+	result = _gnutls_x509_read_null_value(root, buffer, &der);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	result = _gnutls_x509_decode_string(ASN1_ETYPE_OCTET_STRING, der.data,
+					    der.size, label, 0);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	result = 0;
+
+cleanup:
+	_gnutls_free_datum(&der);
+
+	return result;
+}
+
+/* Reads RSA-OAEP parameters.
+ */
+int _gnutls_x509_read_rsa_oaep_params(uint8_t *der, int dersize,
+				      gnutls_x509_spki_st *params)
+{
+	int result;
+	asn1_node spk = NULL;
+	gnutls_digest_algorithm_t digest;
+	char oid[MAX_OID_SIZE] = "";
+	int size;
+	gnutls_datum_t label = { NULL, 0 };
+
+	if ((result = asn1_create_element(_gnutls_get_gnutls_asn(),
+					  "GNUTLS.RSAOAEPParameters", &spk)) !=
+	    ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	result = _asn1_strict_der_decode(&spk, der, dersize, NULL);
+
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	size = sizeof(oid);
+	result = asn1_read_value(spk, "hashAlgorithm.algorithm", oid, &size);
+	if (result == ASN1_SUCCESS)
+		digest = gnutls_oid_to_digest(oid);
+	else if (result == ASN1_ELEMENT_NOT_FOUND)
+		/* The default hash algorithm is SHA-1 */
+		digest = GNUTLS_DIG_SHA1;
+	else {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	if (digest == GNUTLS_DIG_UNKNOWN) {
+		gnutls_assert();
+		_gnutls_debug_log("Unknown RSA-OAEP hash: %s\n", oid);
+		result = GNUTLS_E_UNKNOWN_HASH_ALGORITHM;
+		goto cleanup;
+	}
+
+	result = check_mgf1(spk, "maskGenAlgorithm", digest, true);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	result = read_rsa_oaep_label(spk, "pSourceFunc", &label, true);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	memset(params, 0, sizeof(gnutls_x509_spki_st));
+	params->pk = GNUTLS_PK_RSA_OAEP;
+	params->rsa_oaep_dig = digest;
+	if (label.data) {
+		params->rsa_oaep_label = label;
+		label.data = NULL;
+	}
+
+	result = 0;
+cleanup:
+	_gnutls_free_datum(&label);
 	asn1_delete_structure(&spk);
 	return result;
 }
@@ -530,6 +685,7 @@ int _gnutls_x509_read_pubkey(gnutls_pk_algorithm_t algo, uint8_t *der,
 	switch (algo) {
 	case GNUTLS_PK_RSA:
 	case GNUTLS_PK_RSA_PSS:
+	case GNUTLS_PK_RSA_OAEP:
 		ret = _gnutls_x509_read_rsa_pubkey(der, dersize, params);
 		if (ret >= 0) {
 			params->algo = algo;
@@ -599,6 +755,9 @@ int _gnutls_x509_read_pubkey_params(gnutls_pk_algorithm_t algo, uint8_t *der,
 	case GNUTLS_PK_RSA_PSS:
 		return _gnutls_x509_read_rsa_pss_params(der, dersize,
 							&params->spki);
+	case GNUTLS_PK_RSA_OAEP:
+		return _gnutls_x509_read_rsa_oaep_params(der, dersize,
+							 &params->spki);
 	case GNUTLS_PK_DSA:
 		return _gnutls_x509_read_dsa_params(der, dersize, params);
 	case GNUTLS_PK_EC:
@@ -637,6 +796,28 @@ int _gnutls_x509_check_pubkey_params(gnutls_pk_params_st *params)
 
 		hash_size = _gnutls_hash_get_algo_len(me);
 		if (hash_size + params->spki.salt_size + 2 > (bits + 7) / 8)
+			return gnutls_assert_val(
+				GNUTLS_E_PK_INVALID_PUBKEY_PARAMS);
+		return 0;
+	}
+	case GNUTLS_PK_RSA_OAEP: {
+		unsigned bits;
+		const mac_entry_st *me;
+		size_t hash_size;
+
+		if (params->spki.pk ==
+		    GNUTLS_PK_UNKNOWN) /* no params present */
+			return 0;
+
+		bits = pubkey_to_bits(params);
+
+		me = hash_to_entry(params->spki.rsa_oaep_dig);
+		if (unlikely(me == NULL))
+			return gnutls_assert_val(
+				GNUTLS_E_PK_INVALID_PUBKEY_PARAMS);
+
+		hash_size = _gnutls_hash_get_algo_len(me);
+		if (2 * hash_size + 2 > (bits + 7) / 8)
 			return gnutls_assert_val(
 				GNUTLS_E_PK_INVALID_PUBKEY_PARAMS);
 		return 0;
