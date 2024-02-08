@@ -163,7 +163,11 @@ static int privkey_to_pubkey(gnutls_pk_algorithm_t pk,
 	pub->curve = priv->curve;
 	pub->gost_params = priv->gost_params;
 	pub->qbits = priv->qbits;
-	memcpy(&pub->spki, &priv->spki, sizeof(gnutls_x509_spki_st));
+	ret = _gnutls_x509_spki_copy(&pub->spki, &priv->spki);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
 
 	switch (pk) {
 	case GNUTLS_PK_RSA_PSS:
@@ -344,8 +348,8 @@ int _gnutls_privkey_get_spki_params(gnutls_privkey_t key,
 	case GNUTLS_PRIVKEY_EXT:
 		break;
 	case GNUTLS_PRIVKEY_X509:
-		_gnutls_x509_privkey_get_spki_params(key->key.x509, params);
-		return 0;
+		return _gnutls_x509_privkey_get_spki_params(key->key.x509,
+							    params);
 	default:
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
@@ -1929,9 +1933,7 @@ int gnutls_privkey_get_spki(gnutls_privkey_t privkey, gnutls_x509_spki_t spki,
 	if (p->pk == GNUTLS_PK_UNKNOWN)
 		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
-	memcpy(spki, p, sizeof(gnutls_x509_spki_st));
-
-	return 0;
+	return _gnutls_x509_spki_copy(spki, p);
 }
 
 /**

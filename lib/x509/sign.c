@@ -49,8 +49,8 @@ int _gnutls_x509_get_tbs(asn1_node cert, const char *tbs_name,
 }
 
 int _gnutls_x509_crt_get_spki_params(gnutls_x509_crt_t crt,
-				     const gnutls_x509_spki_st *key_params,
-				     gnutls_x509_spki_st *params)
+				     const gnutls_x509_spki_t key_params,
+				     gnutls_x509_spki_t params)
 {
 	int result;
 	gnutls_x509_spki_st crt_params;
@@ -77,9 +77,13 @@ int _gnutls_x509_crt_get_spki_params(gnutls_x509_crt_t crt,
 			gnutls_assert();
 			return GNUTLS_E_CERTIFICATE_ERROR;
 		}
-		memcpy(params, &crt_params, sizeof(gnutls_x509_spki_st));
+		result = _gnutls_x509_spki_copy(params, &crt_params);
+		if (result < 0)
+			return gnutls_assert_val(result);
 	} else {
-		memcpy(params, key_params, sizeof(gnutls_x509_spki_st));
+		result = _gnutls_x509_spki_copy(params, key_params);
+		if (result < 0)
+			return gnutls_assert_val(result);
 	}
 
 	return 0;

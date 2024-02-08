@@ -2386,7 +2386,11 @@ static int pct_test(gnutls_pk_algorithm_t algo,
 	gnutls_x509_spki_st spki;
 	gnutls_fips140_context_t context;
 
-	memcpy(&spki, &params->spki, sizeof(spki));
+	ret = _gnutls_x509_spki_copy(&spki, &params->spki);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
 
 	if (algo == GNUTLS_PK_DSA || algo == GNUTLS_PK_EC) {
 		unsigned hash_len;
@@ -2537,6 +2541,7 @@ cleanup:
 	if (ret == GNUTLS_E_PK_GENERATION_ERROR) {
 		_gnutls_switch_lib_state(LIB_STATE_ERROR);
 	}
+	gnutls_x509_spki_clear(&spki);
 	gnutls_free(gen_data);
 	gnutls_free(sig.data);
 	gnutls_free(tmp.data);

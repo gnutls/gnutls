@@ -19,6 +19,7 @@ GNUTLS_3_7_5@GNUTLS_3_7_5
 GNUTLS_3_7_7@GNUTLS_3_7_7
 GNUTLS_3_8_1@GNUTLS_3_8_1
 GNUTLS_3_8_2@GNUTLS_3_8_2
+GNUTLS_3_8_4@GNUTLS_3_8_4
 _gnutls_global_init_skip@GNUTLS_3_4
 gnutls_aead_cipher_decrypt@GNUTLS_3_4
 gnutls_aead_cipher_decryptv2@GNUTLS_3_6_10
@@ -1272,8 +1273,10 @@ gnutls_x509_rdn_get@GNUTLS_3_4
 gnutls_x509_rdn_get_by_oid@GNUTLS_3_4
 gnutls_x509_rdn_get_oid@GNUTLS_3_4
 gnutls_x509_spki_deinit@GNUTLS_3_6_0
+gnutls_x509_spki_get_rsa_oaep_params@GNUTLS_3_8_4
 gnutls_x509_spki_get_rsa_pss_params@GNUTLS_3_6_0
 gnutls_x509_spki_init@GNUTLS_3_6_0
+gnutls_x509_spki_set_rsa_oaep_params@GNUTLS_3_8_4
 gnutls_x509_spki_set_rsa_pss_params@GNUTLS_3_6_0
 gnutls_x509_tlsfeatures_add@GNUTLS_3_4
 gnutls_x509_tlsfeatures_check_crt@GNUTLS_3_4

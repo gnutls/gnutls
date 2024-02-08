@@ -992,7 +992,11 @@ skip_params:
 	}
 
 	pkey->params.algo = GNUTLS_PK_RSA_PSS;
-	memcpy(&pkey->params.spki, &params, sizeof(gnutls_x509_spki_st));
+	ret = _gnutls_x509_spki_copy(&pkey->params.spki, &params);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
 
 	ret = 0;
 
