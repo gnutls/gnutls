@@ -73,4 +73,16 @@
 	} while (0)
 #endif
 
+/* Limits that apply to systems that don't have alloca */
+#define NETTLE_MAX_HASH_BLOCK_SIZE 144 /* For sha3_224*/
+#define NETTLE_MAX_HASH_DIGEST_SIZE 64
+#define NETTLE_MAX_HASH_CONTEXT_SIZE (sizeof(struct sha3_224_ctx))
+#define NETTLE_MAX_SEXP_ASSOC 17
+#define NETTLE_MAX_CIPHER_BLOCK_SIZE 32
+#define NETTLE_MAX_CIPHER_KEY_SIZE 32
+
+/* Equivalent to x == 0, but with an expression that should compile to
+   branch free code on all compilers. Requires that x is at most 31 bits. */
+#define IS_ZERO_SMALL(x) (((uint32_t)(x)-1U) >> 31)
+
 #endif /* GNUTLS_NETTLE_INT_NETTLE_INTERNAL_H_INCLUDED */
