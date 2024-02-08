@@ -67,6 +67,8 @@ typedef struct common_info {
 	unsigned char *seed;
 	unsigned seed_size;
 
+	gnutls_datum_t label;
+
 	const char *pin;
 	const char *so_pin;
 

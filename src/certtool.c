@@ -134,7 +134,7 @@ int main(int argc, char **argv)
 	return 0;
 }
 
-#define SET_SPKI_PARAMS(spki, cinfo)                                                                               \
+#define SET_RSA_PSS_PARAMS(spki, cinfo)                                                                            \
 	do {                                                                                                       \
 		unsigned _salt_size;                                                                               \
 		if (!cinfo->hash) {                                                                                \
@@ -149,6 +149,18 @@ int main(int argc, char **argv)
 		}                                                                                                  \
 		gnutls_x509_spki_set_rsa_pss_params(spki, cinfo->hash,                                             \
 						    _salt_size);                                                   \
+	} while (0)
+
+#define SET_RSA_OAEP_PARAMS(spki, cinfo)                                                                        \
+	do {                                                                                                    \
+		if (!cinfo->hash) {                                                                             \
+			fprintf(stderr,                                                                         \
+				"You must provide the hash algorithm and optionally the label for RSA-OAEP\n"); \
+			app_exit(1);                                                                            \
+		}                                                                                               \
+		gnutls_x509_spki_set_rsa_oaep_params(                                                           \
+			spki, cinfo->hash,                                                                      \
+			cinfo->label.data ? &cinfo->label : NULL);                                              \
 	} while (0)
 
 static gnutls_x509_privkey_t generate_private_key_int(common_info_st *cinfo)
@@ -264,7 +276,16 @@ static gnutls_x509_privkey_t generate_private_key_int(common_info_st *cinfo)
 
 	if (key_type == GNUTLS_PK_RSA_PSS &&
 	    (cinfo->hash || HAVE_OPT(SALT_SIZE))) {
-		SET_SPKI_PARAMS(spki, cinfo);
+		SET_RSA_PSS_PARAMS(spki, cinfo);
+
+		kdata[kdata_size].type = GNUTLS_KEYGEN_SPKI;
+		kdata[kdata_size].data = (void *)spki;
+		kdata[kdata_size++].size = sizeof(spki);
+	}
+
+	if (key_type == GNUTLS_PK_RSA_OAEP &&
+	    (cinfo->hash || HAVE_OPT(LABEL))) {
+		SET_RSA_OAEP_PARAMS(spki, cinfo);
 
 		kdata[kdata_size].type = GNUTLS_KEYGEN_SPKI;
 		kdata[kdata_size].data = (void *)spki;
@@ -780,7 +801,7 @@ static gnutls_x509_crt_t generate_certificate(gnutls_privkey_t *ret_key,
 			app_exit(1);
 		}
 
-		SET_SPKI_PARAMS(spki, cinfo);
+		SET_RSA_PSS_PARAMS(spki, cinfo);
 
 		result = gnutls_x509_crt_set_spki(crt, spki, 0);
 		if (result < 0) {
@@ -1357,6 +1378,20 @@ static void cmd_parser(int argc, char **argv)
 
 		cinfo.seed = seed.data;
 		cinfo.seed_size = seed.size;
+	}
+
+	if (HAVE_OPT(LABEL)) {
+		gnutls_datum_t hex;
+
+		hex.data = (uint8_t *)OPT_ARG(LABEL);
+		hex.size = strlen(OPT_ARG(LABEL));
+
+		ret = gnutls_hex_decode2(&hex, &cinfo.label);
+		if (ret < 0) {
+			fprintf(stderr, "unable to decode label: %s\n",
+				gnutls_strerror(ret));
+			app_exit(1);
+		}
 	}
 
 	cinfo.batch = batch;
