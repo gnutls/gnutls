@@ -400,7 +400,7 @@ static int __gnutls_x509_write_int(asn1_node node, const char *value,
 	s_len = 0;
 	if (flags & GNUTLS_X509_INT_LZ)
 		result = _gnutls_mpi_print_lz(mpi, NULL, &s_len);
-	else if (GNUTLS_X509_INT_LE)
+	else if (flags & GNUTLS_X509_INT_LE)
 		result = _gnutls_mpi_print_le(mpi, NULL, &s_len);
 	else
 		result = _gnutls_mpi_print(mpi, NULL, &s_len);
@@ -418,7 +418,7 @@ static int __gnutls_x509_write_int(asn1_node node, const char *value,
 
 	if (flags & GNUTLS_X509_INT_LZ)
 		result = _gnutls_mpi_print_lz(mpi, tmpstr, &s_len);
-	else if (GNUTLS_X509_INT_LE)
+	else if (flags & GNUTLS_X509_INT_LE)
 		result = _gnutls_mpi_print_le(mpi, tmpstr, &s_len);
 	else
 		result = _gnutls_mpi_print(mpi, tmpstr, &s_len);
