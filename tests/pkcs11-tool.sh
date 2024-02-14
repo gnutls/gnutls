@@ -29,6 +29,11 @@ set -x
 : ${P11TOOL=../src/p11tool${EXEEXT}}
 : ${DIFF=diff}
 
+if test "${GNUTLS_FORCE_FIPS_MODE}" = 1;then
+	echo "Cannot run in FIPS140-2 mode"
+	exit 77
+fi
+
 . "$srcdir/scripts/common.sh"
 
 testdir=`create_testdir ktls_keyupdate`
