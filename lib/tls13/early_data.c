@@ -78,6 +78,8 @@ int _gnutls13_recv_end_of_early_data(gnutls_session_t session)
 	int ret;
 	gnutls_buffer_st buf;
 
+	_gnutls_buffer_init(&buf);
+
 	if (!(session->security_parameters.entity == GNUTLS_SERVER &&
 	      session->internals.hsk_flags & HSK_EARLY_DATA_ACCEPTED))
 		return 0;
