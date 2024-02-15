@@ -36,7 +36,7 @@ fi
 
 . "$srcdir/scripts/common.sh"
 
-testdir=`create_testdir ktls_keyupdate`
+testdir=`create_testdir pkcs11-tool`
 
 TMP_SOFTHSM_DIR="$testdir/softhsm-load.$$.tmp"
 TEMPLATE="$testdir/cert.cfg"
