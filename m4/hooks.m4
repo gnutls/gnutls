@@ -367,8 +367,8 @@ LIBTASN1_MINIMUM=4.9
   AC_MSG_RESULT($enable_ktls)
 
   if test "$enable_ktls" = "yes"; then
-    AC_MSG_CHECKING([whethwe KTLS is supported by the OS])
-    AS_CASE([$host_os], 
+    AC_MSG_CHECKING([whether KTLS is supported by the OS])
+    AS_CASE([$host_os],
       [freebsd*], [AC_CHECK_HEADERS([sys/ktls.h], [
         AC_DEFINE([HAVE_KTLS],[1],[KTLS headers found at compile time])
       ], [

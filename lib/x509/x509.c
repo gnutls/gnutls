@@ -662,7 +662,8 @@ int _gnutls_check_cert_sanity(gnutls_x509_crt_t cert)
 			if (critical && !is_valid_extension(oid, &der)) {
 				_gnutls_free_datum(&der);
 				_gnutls_debug_log(
-					"error: could not parse extension (%s)\n");
+					"error: could not parse extension (%s)\n",
+					oid);
 				return gnutls_assert_val(
 					GNUTLS_E_X509_CERTIFICATE_ERROR);
 			}
