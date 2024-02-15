@@ -107,8 +107,10 @@ static int callback(struct dl_phdr_info *info, size_t size, void *data)
 		return print_lib(path, soname);
 	if (!strcmp(soname, HOGWEED_LIBRARY_SONAME))
 		return print_lib(path, soname);
+#ifdef GMP_LIBRARY_SONAME
 	if (!strcmp(soname, GMP_LIBRARY_SONAME))
 		return print_lib(path, soname);
+#endif
 	return 0;
 }
 

@@ -566,7 +566,9 @@ static const struct gnutls_library_config_st _gnutls_library_config[] = {
 	{ "libgnutls-soname", GNUTLS_LIBRARY_SONAME },
 	{ "libnettle-soname", NETTLE_LIBRARY_SONAME },
 	{ "libhogweed-soname", HOGWEED_LIBRARY_SONAME },
+#ifdef GMP_LIBRARY_SONAME
 	{ "libgmp-soname", GMP_LIBRARY_SONAME },
+#endif
 	{ "hardware-features", HW_FEATURES },
 	{ "tls-features", TLS_FEATURES },
 	{ "default-system-config", SYSTEM_PRIORITY_FILE },

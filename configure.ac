@@ -786,6 +786,8 @@ LIBS=$save_LIBS
 AM_CONDITIONAL([NEED_SIV_GCM], [test "$ac_cv_func_nettle_siv_gcm_encrypt_message" != yes])
 
 # Check sonames of the linked libraries needed for FIPS selftests.
+save_CFLAGS=$CFLAGS
+CFLAGS="$CFLAGS $GMP_CFLAGS"
 save_LIBS=$LIBS
 LIBS="$LIBS $GMP_LIBS"
 AC_MSG_CHECKING([gmp soname])
@@ -799,9 +801,14 @@ if test -z "$gmp_so"; then
 	gmp_so=none
 fi
 AC_MSG_RESULT($gmp_so)
-AC_DEFINE_UNQUOTED([GMP_LIBRARY_SONAME], ["$gmp_so"], [The soname of gmp library])
+if test "$gmp_so" != none; then
+	AC_DEFINE_UNQUOTED([GMP_LIBRARY_SONAME], ["$gmp_so"], [The soname of gmp library])
+fi
 LIBS=$save_LIBS
+CFLAGS=$save_CFLAGS
 
+save_CFLAGS=$CFLAGS
+CFLAGS="$CFLAGS $NETTLE_CFLAGS"
 save_LIBS=$LIBS
 LIBS="$LIBS $NETTLE_LIBS"
 AC_MSG_CHECKING([nettle soname])
@@ -817,7 +824,11 @@ fi
 AC_MSG_RESULT($nettle_so)
 AC_DEFINE_UNQUOTED([NETTLE_LIBRARY_SONAME], ["$nettle_so"], [The soname of nettle library])
 LIBS=$save_LIBS
+CFLAGS=$save_CFLAGS
 
+save_CFLAGS=$CFLAGS
+# <nettle/bignum.h> includes <gmp.h>
+CFLAGS="$CFLAGS $HOGWEED_CFLAGS $GMP_CFLAGS"
 save_LIBS=$LIBS
 LIBS="$LIBS $HOGWEED_LIBS"
 AC_MSG_CHECKING([hogweed soname])
@@ -833,6 +844,7 @@ fi
 AC_MSG_RESULT($hogweed_so)
 AC_DEFINE_UNQUOTED([HOGWEED_LIBRARY_SONAME], ["$hogweed_so"], [The soname of hogweed library])
 LIBS=$save_LIBS
+CFLAGS=$save_CFLAGS
 
 gnutls_so=libgnutls.so.`expr "$LT_CURRENT" - "$LT_AGE"`
 AC_DEFINE_UNQUOTED([GNUTLS_LIBRARY_SONAME], ["$gnutls_so"], [The soname of gnutls library])
