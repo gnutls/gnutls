@@ -2038,6 +2038,7 @@ int gnutls_pubkey_import_dh_raw(gnutls_pubkey_t key,
 		key->params.params[DH_Q] = _gnutls_mpi_copy(params->params[2]);
 	}
 	key->params.qbits = params->q_bits;
+	key->params.params_nr = DH_PUBLIC_PARAMS;
 
 	if (_gnutls_mpi_init_scan_nz(&key->params.params[DH_Y], y->data,
 				     y->size)) {
@@ -2046,7 +2047,6 @@ int gnutls_pubkey_import_dh_raw(gnutls_pubkey_t key,
 		goto cleanup;
 	}
 
-	key->params.params_nr = DH_PUBLIC_PARAMS;
 	key->params.algo = GNUTLS_PK_DH;
 	key->bits = pubkey_to_bits(&key->params);
 
