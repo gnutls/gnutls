@@ -52,36 +52,40 @@ static void genkey(gnutls_ecc_curve_t curve, gnutls_datum_t *x,
 		fail("error\n");
 }
 
-static void compute_key(gnutls_ecc_curve_t curve, const gnutls_datum_t *x,
-			const gnutls_datum_t *y, const gnutls_datum_t *key,
-			const gnutls_datum_t *peer_x,
+static void compute_key(const char *name, gnutls_ecc_curve_t curve,
+			const gnutls_datum_t *x, const gnutls_datum_t *y,
+			const gnutls_datum_t *key, const gnutls_datum_t *peer_x,
 			const gnutls_datum_t *peer_y, int expect_error,
-			gnutls_datum_t *result, bool expect_success)
+			const gnutls_datum_t *result)
 {
 	gnutls_datum_t Z = { 0 };
-	bool success;
+	bool ok;
 	int ret;
 
 	ret = _gnutls_ecdh_compute_key(curve, x, y, key, peer_x, peer_y, &Z);
 	if (expect_error != ret)
-		fail("error (%d)\n", ret);
+		fail("%s: error %d (expected %d)\n", name, ret, expect_error);
 
 	if (result) {
-		success = (Z.size != result->size &&
-			   memcmp(Z.data, result->data, Z.size));
-		if (success != expect_success)
-			fail("error\n");
+		ok = Z.size == result->size &&
+		     memcmp(Z.data, result->data, Z.size) == 0;
+		if (!ok) {
+			hexprint(Z.data, Z.size);
+			fail("%s: failed to match result\n", name);
+		}
 	}
 	gnutls_free(Z.data);
 }
 
 struct dh_test_data {
+	const char *name;
 	gnutls_ecc_curve_t curve;
 	const gnutls_datum_t x;
 	const gnutls_datum_t y;
 	const gnutls_datum_t key;
 	const gnutls_datum_t peer_x;
 	const gnutls_datum_t peer_y;
+	const gnutls_datum_t result;
 	int expected_error;
 };
 
@@ -89,19 +93,20 @@ void doit(void)
 {
 	struct dh_test_data test_data[] = {
 		{
-			/* x == 0, y == 0 */
+			"[x == 0, y == 0]",
 			GNUTLS_ECC_CURVE_SECP256R1,
 			{ 0 },
 			{ 0 },
 			{ 0 },
 			{ (void *)"\x00", 1 },
 			{ (void *)"\x00", 1 },
+			{ NULL, 0 },
 			/* Should be GNUTLS_E_PK_INVALID_PUBKEY but mpi scan
-		  * balks on values of 0 */
+			 * balks on values of 0 */
 			GNUTLS_E_MPI_SCAN_FAILED,
 		},
 		{
-			/* x > p -1 */
+			"[x > p - 1]",
 			GNUTLS_ECC_CURVE_SECP256R1,
 			{ 0 },
 			{ 0 },
@@ -112,10 +117,11 @@ void doit(void)
 				  "\xff\xff\xff\xff\xff\xff\xff\xff",
 			  1 },
 			{ (void *)"\x02", 1 },
+			{ NULL, 0 },
 			GNUTLS_E_PK_INVALID_PUBKEY,
 		},
 		{
-			/* y > p -1 */
+			"[y > p - 1]",
 			GNUTLS_ECC_CURVE_SECP256R1,
 			{ 0 },
 			{ 0 },
@@ -126,10 +132,11 @@ void doit(void)
 				  "\x00\x00\x00\x00\xff\xff\xff\xff"
 				  "\xff\xff\xff\xff\xff\xff\xff\xff",
 			  1 },
+			{ NULL, 0 },
 			GNUTLS_E_PK_INVALID_PUBKEY,
 		},
 		{
-			/* From CAVS tests */
+			"From CAVS tests",
 			GNUTLS_ECC_CURVE_SECP521R1,
 			{ (void *)"\xac\xbe\x4a\xd4\xf6\x73\x44\x0a"
 				  "\xfc\x31\xf0\xb0\x3d\x28\xd4\xd5"
@@ -181,6 +188,16 @@ void doit(void)
 				  "\x86\x92\x6c\xbe\x9b\x57\x32\xe3"
 				  "\x2c",
 			  65 },
+			{ (void *)"\x00\x31\xda\x88\xde\x3b\x7b\x7b"
+				  "\x26\xf2\x70\xd4\x9e\xf8\x80\x5a"
+				  "\x61\xe4\x8b\xf9\x04\xe1\xf5\xf7"
+				  "\x34\xdd\xc3\x42\x35\x36\xaf\x66"
+				  "\xaa\xe9\x3c\x22\xfc\x83\x94\x7d"
+				  "\x80\xc5\x2f\xfe\xda\x4b\x61\x51"
+				  "\x1a\xbe\xd6\xd7\xcf\x53\x1b\x27"
+				  "\xc4\x14\x94\x74\xe4\x94\x6d\xa3"
+				  "\xe2\xd4",
+			  66 },
 			0,
 		},
 		{ 0 }
@@ -188,8 +205,13 @@ void doit(void)
 
 	for (int i = 0; test_data[i].curve != 0; i++) {
 		gnutls_datum_t x, y, key;
+		const gnutls_datum_t *result =
+			test_data[i].result.data == NULL ? NULL :
+							   &test_data[i].result;
 
 		if (test_data[i].key.data == NULL) {
+			success("%s genkey\n", test_data[i].name);
+
 			genkey(test_data[i].curve, &x, &y, &key);
 		} else {
 			x = test_data[i].x;
@@ -197,9 +219,11 @@ void doit(void)
 			key = test_data[i].key;
 		}
 
-		compute_key(test_data[i].curve, &x, &y, &key,
+		success("%s compute_key\n", test_data[i].name);
+
+		compute_key(test_data[i].name, test_data[i].curve, &x, &y, &key,
 			    &test_data[i].peer_x, &test_data[i].peer_y,
-			    test_data[i].expected_error, NULL, 0);
+			    test_data[i].expected_error, result);
 
 		if (test_data[i].key.data == NULL) {
 			gnutls_free(x.data);

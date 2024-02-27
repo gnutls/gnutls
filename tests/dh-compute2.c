@@ -31,6 +31,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "utils.h"
+#include "dh-compute.h"
 
 static void params(gnutls_dh_params_t *dh_params, const gnutls_datum_t *p,
 		   const gnutls_datum_t *q, const gnutls_datum_t *g,
@@ -44,7 +45,7 @@ static void params(gnutls_dh_params_t *dh_params, const gnutls_datum_t *p,
 
 	ret = gnutls_dh_params_import_raw3(*dh_params, p, q, g);
 	if (ret != expect_error)
-		fail("error\n");
+		fail("error %d (expected %d)\n", ret, expect_error);
 }
 
 static bool dh_params_equal(const gnutls_dh_params_t a,
@@ -96,7 +97,7 @@ static void genkey(const gnutls_dh_params_t dh_params, gnutls_datum_t *priv_key,
 	data.data = (unsigned char *)dh_params;
 	ret = gnutls_privkey_generate2(privkey, GNUTLS_PK_DH, 0, 0, &data, 1);
 	if (ret != expect_error)
-		fail("error\n");
+		fail("error %d (expected %d)\n", ret, expect_error);
 
 	ret = gnutls_pubkey_import_privkey(pubkey, privkey, 0, 0);
 	assert(ret >= 0);
@@ -156,14 +157,15 @@ static void genkey(const gnutls_dh_params_t dh_params, gnutls_datum_t *priv_key,
 static void compute_key(const char *name, const gnutls_dh_params_t dh_params,
 			const gnutls_datum_t *priv_key,
 			const gnutls_datum_t *pub_key,
-			const gnutls_datum_t *peer_key, int expect_error,
-			gnutls_datum_t *result, bool expect_success)
+			const gnutls_datum_t *peer_key,
+			int expect_error_on_import, int expect_error_on_derive,
+			const gnutls_datum_t *result)
 {
 	gnutls_datum_t Z = { 0 };
-	bool success;
+	bool ok;
 	int ret;
-	gnutls_privkey_t privkey;
-	gnutls_pubkey_t pubkey;
+	gnutls_privkey_t privkey = NULL;
+	gnutls_pubkey_t pubkey = NULL;
 
 	ret = gnutls_privkey_init(&privkey);
 	assert(ret >= 0);
@@ -174,20 +176,37 @@ static void compute_key(const char *name, const gnutls_dh_params_t dh_params,
 	ret = gnutls_pubkey_init(&pubkey);
 	assert(ret >= 0);
 
-	ret = gnutls_pubkey_import_dh_raw(pubkey, dh_params, pub_key);
-	assert(ret >= 0);
+	ret = gnutls_pubkey_import_dh_raw(pubkey, dh_params, peer_key);
+	if (ret != expect_error_on_import)
+		fail("%s: error %d (expected %d)\n", name, ret,
+		     expect_error_on_import);
+
+	if (expect_error_on_import != 0)
+		goto cleanup;
 
 	ret = gnutls_privkey_derive_secret(privkey, pubkey, NULL, &Z, 0);
-	if (ret != 0) {
-		fail("unable to derive secret: %s\n", gnutls_strerror(ret));
-	}
+	if (ret != expect_error_on_derive)
+		fail("%s: error %d (expected %d)\n", name, ret,
+		     expect_error_on_derive);
+
+	if (expect_error_on_derive != 0)
+		goto cleanup;
 
 	if (result) {
-		success = (Z.size != result->size &&
-			   memcmp(Z.data, result->data, Z.size));
-		if (success != expect_success)
+		ok = Z.size == result->size &&
+		     memcmp(Z.data, result->data, Z.size) == 0;
+		if (!ok) {
+			success("priv_key\n");
+			hexprint(priv_key->data, priv_key->size);
+			success("pub_key\n");
+			hexprint(pub_key->data, pub_key->size);
+			success("Z\n");
+			hexprint(Z.data, Z.size);
 			fail("%s: failed to match result\n", name);
+		}
 	}
+
+cleanup:
 	gnutls_free(Z.data);
 	gnutls_privkey_deinit(privkey);
 	gnutls_pubkey_deinit(pubkey);
@@ -201,13 +220,17 @@ struct dh_test_data_expected {
 
 struct dh_test_data {
 	const char *name;
-	const gnutls_datum_t *prime;
-	const gnutls_datum_t *q;
-	const gnutls_datum_t *generator;
+	const gnutls_datum_t prime;
+	const gnutls_datum_t q;
+	const gnutls_datum_t generator;
 	const gnutls_datum_t peer_key;
+	const gnutls_datum_t priv_key;
+	const gnutls_datum_t pub_key;
+	const gnutls_datum_t result;
 	struct dh_test_data_expected params_expected;
 	struct dh_test_data_expected genkey_expected;
-	struct dh_test_data_expected compute_key_expected;
+	struct dh_test_data_expected import_expected;
+	struct dh_test_data_expected derive_expected;
 };
 
 static inline int get_expected(struct dh_test_data_expected *expected)
@@ -220,29 +243,123 @@ void doit(void)
 {
 	struct dh_test_data test_data[] = {
 		{
-			"Legal Input",
-			&gnutls_ffdhe_2048_group_prime,
-			&gnutls_ffdhe_2048_group_q,
-			&gnutls_ffdhe_2048_group_generator,
-			{ (void *)"\x02", 1 },
+			"[y == 0]",
+			gnutls_ffdhe_2048_group_prime,
+			gnutls_ffdhe_2048_group_q,
+			gnutls_ffdhe_2048_group_generator,
+			{ (void *)"\x00", 1 },
+			{ NULL, 0 },
+			{ NULL, 0 },
+			{ NULL, 0 },
 			{ 0, 0, GNUTLS_FIPS140_OP_INITIAL },
+			{ 0, 0, GNUTLS_FIPS140_OP_APPROVED },
+			{ GNUTLS_E_MPI_SCAN_FAILED, GNUTLS_E_MPI_SCAN_FAILED,
+			  GNUTLS_FIPS140_OP_INITIAL },
+		},
+		{
+			"[y < 2]",
+			gnutls_ffdhe_2048_group_prime,
+			gnutls_ffdhe_2048_group_q,
+			gnutls_ffdhe_2048_group_generator,
+			{ (void *)"\x01", 1 },
+			{ NULL, 0 },
+			{ NULL, 0 },
+			{ NULL, 0 },
+			{ 0, 0, GNUTLS_FIPS140_OP_INITIAL },
+			{ 0, 0, GNUTLS_FIPS140_OP_APPROVED },
+			{ 0, 0, GNUTLS_FIPS140_OP_APPROVED },
+			{ GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER,
+			  GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER,
+			  GNUTLS_FIPS140_OP_ERROR },
+		},
+		{
+			"[y > p - 2]",
+			gnutls_ffdhe_2048_group_prime,
+			gnutls_ffdhe_2048_group_q,
+			gnutls_ffdhe_2048_group_generator,
+			gnutls_ffdhe_2048_group_prime,
+			{ NULL, 0 },
+			{ NULL, 0 },
+			{ NULL, 0 },
+			{ 0, 0, GNUTLS_FIPS140_OP_INITIAL },
+			{ 0, 0, GNUTLS_FIPS140_OP_APPROVED },
+			{ 0, 0, GNUTLS_FIPS140_OP_APPROVED },
+			{ GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER,
+			  GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER,
+			  GNUTLS_FIPS140_OP_ERROR },
+		},
+		{
+			"[y ^ q mod p == 1]",
+			gnutls_ffdhe_2048_group_prime,
+			gnutls_ffdhe_2048_group_q,
+			gnutls_ffdhe_2048_group_generator,
+			gnutls_ffdhe_2048_group_q,
+			{ NULL, 0 },
+			{ NULL, 0 },
+			{ NULL, 0 },
+			{ 0, 0, GNUTLS_FIPS140_OP_INITIAL },
+			{ 0, 0, GNUTLS_FIPS140_OP_APPROVED },
+			{ 0, 0, GNUTLS_FIPS140_OP_APPROVED },
+			{ GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER,
+			  GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER,
+			  GNUTLS_FIPS140_OP_ERROR },
+		},
+		{
+			"Legal Input",
+			gnutls_ffdhe_2048_group_prime,
+			gnutls_ffdhe_2048_group_q,
+			gnutls_ffdhe_2048_group_generator,
+			{ (void *)"\x02", 1 },
+			{ NULL, 0 },
+			{ NULL, 0 },
+			{ NULL, 0 },
+			{ 0, 0, GNUTLS_FIPS140_OP_INITIAL },
+			{ 0, 0, GNUTLS_FIPS140_OP_APPROVED },
 			{ 0, 0, GNUTLS_FIPS140_OP_APPROVED },
 			{ 0, 0, GNUTLS_FIPS140_OP_APPROVED },
 		},
 		{
 			"Legal Input without Q",
-			&gnutls_ffdhe_2048_group_prime,
-			NULL,
-			&gnutls_ffdhe_2048_group_generator,
+			gnutls_ffdhe_2048_group_prime,
+			{ NULL, 0 },
+			gnutls_ffdhe_2048_group_generator,
 			{ (void *)"\x02", 1 },
+			{ NULL, 0 },
+			{ NULL, 0 },
+			{ NULL, 0 },
 			{ 0, GNUTLS_E_DH_PRIME_UNACCEPTABLE,
 			  GNUTLS_FIPS140_OP_INITIAL },
+		},
+		{
+			"Legal Input (KAT)",
+			gnutls_ffdhe_2048_group_prime,
+			gnutls_ffdhe_2048_group_q,
+			gnutls_ffdhe_2048_group_generator,
+			{ (void *)"\x02", 1 },
+			{ (void *)ffdhe_2048_priv_key,
+			  sizeof(ffdhe_2048_priv_key) /
+				  sizeof(ffdhe_2048_priv_key[0]) },
+			{ (void *)ffdhe_2048_pub_key,
+			  sizeof(ffdhe_2048_pub_key) /
+				  sizeof(ffdhe_2048_pub_key[0]) },
+			{ (void *)ffdhe_2048_result,
+			  sizeof(ffdhe_2048_result) /
+				  sizeof(ffdhe_2048_result[0]) },
+			{ 0, 0, GNUTLS_FIPS140_OP_INITIAL },
+			{ 0, 0, GNUTLS_FIPS140_OP_APPROVED },
+			{ 0, 0, GNUTLS_FIPS140_OP_APPROVED },
+			{ 0, 0, GNUTLS_FIPS140_OP_APPROVED },
 		},
 		{ NULL }
 	};
 
 	for (int i = 0; test_data[i].name != NULL; i++) {
 		gnutls_datum_t priv_key = { NULL, 0 }, pub_key = { NULL, 0 };
+		const gnutls_datum_t *q =
+			test_data[i].q.data == NULL ? NULL : &test_data[i].q;
+		const gnutls_datum_t *result =
+			test_data[i].result.data == NULL ? NULL :
+							   &test_data[i].result;
 		gnutls_dh_params_t dh_params = NULL;
 		gnutls_fips140_context_t fips_context;
 		int ret;
@@ -257,8 +374,8 @@ void doit(void)
 		success("%s params\n", test_data[i].name);
 
 		fips_push_context(fips_context);
-		params(&dh_params, test_data[i].prime, test_data[i].q,
-		       test_data[i].generator,
+		params(&dh_params, &test_data[i].prime, q,
+		       &test_data[i].generator,
 		       get_expected(&test_data[i].params_expected));
 		fips_pop_context(fips_context,
 				 test_data[i].params_expected.state);
@@ -267,16 +384,21 @@ void doit(void)
 			goto skip;
 		}
 
-		success("%s genkey\n", test_data[i].name);
+		if (test_data[i].priv_key.data == NULL) {
+			success("%s genkey\n", test_data[i].name);
 
-		fips_push_context(fips_context);
-		genkey(dh_params, &priv_key, &pub_key,
-		       get_expected(&test_data[i].genkey_expected));
-		fips_pop_context(fips_context,
-				 test_data[i].genkey_expected.state);
+			fips_push_context(fips_context);
+			genkey(dh_params, &priv_key, &pub_key,
+			       get_expected(&test_data[i].genkey_expected));
+			fips_pop_context(fips_context,
+					 test_data[i].genkey_expected.state);
 
-		if (get_expected(&test_data[i].genkey_expected) < 0) {
-			goto skip;
+			if (get_expected(&test_data[i].genkey_expected) < 0) {
+				goto skip;
+			}
+		} else {
+			priv_key = test_data[i].priv_key;
+			pub_key = test_data[i].pub_key;
 		}
 
 		success("%s compute_key\n", test_data[i].name);
@@ -284,19 +406,32 @@ void doit(void)
 		fips_push_context(fips_context);
 		compute_key(test_data[i].name, dh_params, &priv_key, &pub_key,
 			    &test_data[i].peer_key,
-			    get_expected(&test_data[i].compute_key_expected),
-			    NULL, 0);
-		fips_pop_context(fips_context,
-				 test_data[i].compute_key_expected.state);
+			    get_expected(&test_data[i].import_expected),
+			    get_expected(&test_data[i].derive_expected),
+			    result);
 
-		if (get_expected(&test_data[i].compute_key_expected) < 0) {
+		if (get_expected(&test_data[i].import_expected) < 0) {
+			fips_pop_context(fips_context,
+					 test_data[i].import_expected.state);
 			goto skip;
 		}
 
+		if (get_expected(&test_data[i].derive_expected) < 0) {
+			fips_pop_context(fips_context,
+					 test_data[i].derive_expected.state);
+			goto skip;
+		}
+
+		fips_pop_context(fips_context,
+				 test_data[i].derive_expected.state);
+
 	skip:
 		gnutls_dh_params_deinit(dh_params);
-		gnutls_free(priv_key.data);
-		gnutls_free(pub_key.data);
+
+		if (test_data[i].priv_key.data == NULL) {
+			gnutls_free(priv_key.data);
+			gnutls_free(pub_key.data);
+		}
 
 		if (gnutls_fips140_mode_enabled()) {
 			gnutls_fips140_context_deinit(fips_context);
