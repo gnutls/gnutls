@@ -208,7 +208,7 @@ int gnutls_system_recv_timeout(gnutls_transport_ptr_t ptr, unsigned int ms)
 	} while (ret == -1 && errno == EINTR);
 #else
 	fd_set rfds;
-	struct timeval _tv, *tv = NULL;
+	TIMEVAL _tv, *tv = NULL;
 
 	FD_ZERO(&rfds);
 	FD_SET(fd, &rfds);
