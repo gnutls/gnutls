@@ -170,7 +170,7 @@ void _gnutls_mpi_log(const char *prefix, bigint_t a);
 #define _gnutls_dtls_log _gnutls_null_log
 #define _gnutls_read_log _gnutls_null_log
 #define _gnutls_write_log _gnutls_null_log
-#define _gnutls_no_log _gnutle_null_log
+#define _gnutls_no_log _gnutls_null_log
 
 void _gnutls_null_log(void *, ...);
 
