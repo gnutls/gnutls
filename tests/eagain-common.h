@@ -93,8 +93,6 @@ extern const char *side;
 
 #define HANDSHAKE_DTLS(c, s) HANDSHAKE_DTLS_EXPECT(c, s, 0, 0)
 
-#define HANDSHAKE(c, s) HANDSHAKE_EXPECT(c, s, 0, 0)
-
 #define TRANSFER2(c, s, msg, msglen, buf, buflen, retry_send_with_null)        \
 	{                                                                      \
 		int _ret;                                                      \
