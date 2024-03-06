@@ -29,7 +29,7 @@ variables:
   CHECKJOBS: 16
 
 cache:
-  key: "$CI_JOB_NAME-ver31"
+  key: "$CI_JOB_NAME-ver32"
   paths:
     - cache/
 
@@ -325,14 +325,63 @@ fedora-minimal/test:
   needs:
     - fedora-minimal/build
 
+# using same configure arguments as in Fedora RPM build
+fedora/build:
+  extends:
+    - .build
+    - .fedora
+  needs:
+    - fedora/bootstrap
+  script:
+    - dnf install -y libunistring-devel libtasn1-devel libidn-devel
+    - ./configure --cache-file $CCACHE_FILE --disable-doc
+      --program-prefix= --disable-dependency-tracking --prefix=/usr --exec-prefix=/usr
+      --bindir=/usr/bin --sbindir=/usr/sbin --sysconfdir=/etc --datadir=/usr/share
+      --includedir=/usr/include --libdir=/usr/lib64 --libexecdir=/usr/libexec
+      --localstatedir=/var --runstatedir=/run --sharedstatedir=/var/lib
+      --mandir=/usr/share/man --infodir=/usr/share/info
+      --enable-fips140-mode
+      --with-fips140-module-name='Fedora Linux 39 gnutls'
+      --with-fips140-module-version=$(git describe)
+      --enable-gost --enable-sha1-support --disable-static --disable-openssl-compatibility
+      --disable-non-suiteb-curves
+      --with-system-priority-file=/etc/crypto-policies/back-ends/gnutls.config
+      --with-default-trust-store-pkcs11='pkcs11:'
+      --without-tpm --with-tpm2 --enable-ktls
+      --htmldir=/usr/share/doc/manual
+      --with-unbound-root-key-file=/var/lib/unbound/root.key
+      --enable-libdane --without-zlib --without-brotli --without-zstd --disable-rpath
+      --with-default-priority-string=@SYSTEM
+    - make -j$BUILDJOBS
+    # build tests, but don't execute them
+    - make -j$BUILDJOBS check TESTS=""
+
+fedora/test:
+  extends:
+    - .test
+    - .fedora
+  dependencies:
+    - fedora/build
+  needs:
+    - fedora/build
+  script:
+    - |
+      cat > /etc/crypto-policies/local.d/gnutls-ktls.config <<EOF
+      [global]
+      ktls = true
+      EOF
+      update-crypto-policies
+      echo "SYSTEM=NORMAL" >> tests/system.prio
+    - make -j$CHECKJOBS check
+
 fedora-interop/test:
   extends:
     - .test
     - .fedora
   dependencies:
-    - fedora-minimal/build
+    - fedora/build
   needs:
-    - fedora-minimal/build
+    - fedora/build
   parallel:
     matrix:
       - COMPONENT: openssl
@@ -350,12 +399,16 @@ fedora-interop/test:
   timeout: 45 minutes
   allow_failure: true
   script:
+    - export PATH=$CI_PROJECT_DIR/src:$PATH
+    - echo "PATH=$PATH"
+    - which gnutls-cli gnutls-serv
     - cd tests/suite/tls-interoperability/
     - echo "Tests to run:"
     - tmt run plans -n interop tests -f "tag:interop-gnutls" -f "tag:interop-$TYPE" -f "tag:interop-$COMPONENT"  discover -v
     - echo "Slicing SLICE_TOTAL=$SLICES SLICE_ID=$SLICEID"
     - echo "Run the tests:"
     - tmt run -a -e "SLICE_TOTAL=$SLICES" -e "SLICE_ID=$SLICEID" plans -n interop tests -f "tag:interop-gnutls" -f "tag:interop-$TYPE" -f "tag:interop-$COMPONENT" provision -h local execute -h tmt --interactive
+    - if [[ $PATH != $CI_PROJECT_DIR/src:* ]]; then echo "Wrong PATH=$PATH"; false; fi
 
 fedora-SSL-3.0/build:
   extends:
@@ -401,35 +454,6 @@ fedora-FIPS140-2/test:
     - fedora-FIPS140-2/build
   script:
     - GNUTLS_FORCE_FIPS_MODE=1 make -j$CHECKJOBS check
-
-fedora-ktls/build:
-  extends:
-    - .build
-    - .fedora
-  needs:
-    - fedora/bootstrap
-  script:
-    - dash ./configure --disable-gcc-warnings --cache-file $CCACHE_FILE --disable-non-suiteb-curves --enable-ktls --disable-doc --disable-full-test-suite --with-pkcs12-iter-count=10000
-    - make -j$BUILDJOBS
-    # build tests, but don't execute them
-    - make -j$BUILDJOBS check TESTS=""
-
-fedora-ktls/test:
-  extends:
-    - .test
-    - .fedora
-  dependencies:
-    - fedora-ktls/build
-  needs:
-    - fedora-ktls/build
-  script:
-    - |
-      cat > /etc/crypto-policies/local.d/gnutls-ktls.config <<EOF
-      [global]
-      ktls = true
-      EOF
-      update-crypto-policies
-    - make -j$CHECKJOBS check
 
 .fedora-nettle/build:
   extends:
