@@ -102,7 +102,8 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/chain-512-leaf.pem data/chain-512-subca.pem data/chain-512-ca.pem \
 	templates/template-no-ca-honor.tmpl templates/template-no-ca-explicit.tmpl \
 	data/crq-cert-no-ca-explicit.pem data/crq-cert-no-ca-honor.pem data/commonName.cer \
-	templates/simple-policy.tmpl data/simple-policy.pem templates/template-negative-serial.tmpl
+	templates/simple-policy.tmpl data/simple-policy.pem templates/template-negative-serial.tmpl \
+	templates/template-encryption-only.tmpl
 
 dist_check_SCRIPTS = pathlen.sh aki.sh invalid-sig.sh email.sh \
 	pkcs7.sh pkcs7-broken-sigs.sh privkey-import.sh name-constraints.sh certtool-long-cn.sh crl.sh provable-privkey.sh \
@@ -145,7 +146,7 @@ dist_check_SCRIPTS += pkcs12-gost.sh pkcs8-gost.sh
 endif
 endif
 
-dist_check_SCRIPTS += certtool-rsa-pss.sh certtool-eddsa.sh
+dist_check_SCRIPTS += certtool-rsa-pss.sh certtool-eddsa.sh certtool-rsa-oaep.sh
 
 TESTS = $(dist_check_SCRIPTS)
 

@@ -54,6 +54,7 @@ unsigned pubkey_to_bits(const gnutls_pk_params_st *params)
 	switch (params->algo) {
 	case GNUTLS_PK_RSA:
 	case GNUTLS_PK_RSA_PSS:
+	case GNUTLS_PK_RSA_OAEP:
 		return _gnutls_mpi_get_nbits(params->params[RSA_MODULUS]);
 	case GNUTLS_PK_DSA:
 		return _gnutls_mpi_get_nbits(params->params[DSA_P]);
@@ -2142,8 +2143,6 @@ int gnutls_pubkey_verify_data2(gnutls_pubkey_t pubkey,
 	if (flags & GNUTLS_VERIFY_USE_TLS1_RSA)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	memcpy(&params, &pubkey->params.spki, sizeof(gnutls_x509_spki_st));
-
 	se = _gnutls_sign_to_entry(algo);
 	if (se == NULL)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -2152,22 +2151,28 @@ int gnutls_pubkey_verify_data2(gnutls_pubkey_t pubkey,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
+	me = hash_to_entry(se->hash);
+	if (me == NULL && !_gnutls_pk_is_not_prehashed(se->pk))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	ret = _gnutls_x509_spki_copy(&params, &pubkey->params.spki);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
 	params.pk = se->pk;
 	if (flags & GNUTLS_VERIFY_RSA_PSS_FIXED_SALT_LENGTH) {
 		params.flags |= GNUTLS_PK_FLAG_RSA_PSS_FIXED_SALT_LENGTH;
 	}
 
-	me = hash_to_entry(se->hash);
-	if (me == NULL && !_gnutls_pk_is_not_prehashed(se->pk))
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-
 	ret = pubkey_verify_data(se, me, data, signature, &pubkey->params,
 				 &params, flags);
 	if (ret < 0) {
 		gnutls_assert();
+		_gnutls_x509_spki_clear(&params);
 		return ret;
 	}
 
+	_gnutls_x509_spki_clear(&params);
 	return 0;
 }
 
@@ -2210,40 +2215,58 @@ int gnutls_pubkey_verify_hash2(gnutls_pubkey_t key,
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
 
-	memcpy(&params, &key->params.spki, sizeof(gnutls_x509_spki_st));
+	ret = _gnutls_x509_spki_copy(&params, &key->params.spki);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	if (flags & GNUTLS_VERIFY_USE_TLS1_RSA) {
-		if (!GNUTLS_PK_IS_RSA(key->params.algo))
-			return gnutls_assert_val(
-				GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY);
+		if (!GNUTLS_PK_IS_RSA(key->params.algo)) {
+			gnutls_assert();
+			ret = GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY;
+			goto cleanup;
+		}
 		params.pk = GNUTLS_PK_RSA;
 		/* we do not check for insecure algorithms with this flag */
-		return _gnutls_pk_verify(params.pk, hash, signature,
-					 &key->params, &params);
+		ret = _gnutls_pk_verify(params.pk, hash, signature,
+					&key->params, &params);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
 	} else {
 		se = _gnutls_sign_to_entry(algo);
-		if (se == NULL)
-			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		if (se == NULL) {
+			gnutls_assert();
+			ret = GNUTLS_E_INVALID_REQUEST;
+			goto cleanup;
+		}
 
 		ret = pubkey_supports_sig(key, se);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
 
 		params.pk = se->pk;
 
 		me = hash_to_entry(se->hash);
-		if (me == NULL && !_gnutls_pk_is_not_prehashed(se->pk))
-			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		if (me == NULL && !_gnutls_pk_is_not_prehashed(se->pk)) {
+			gnutls_assert();
+			ret = GNUTLS_E_INVALID_REQUEST;
+			goto cleanup;
+		}
 
 		ret = pubkey_verify_hashed_data(se, me, hash, signature,
 						&key->params, &params, flags);
 		if (ret < 0) {
 			gnutls_assert();
-			return ret;
+			goto cleanup;
 		}
 	}
 
-	return 0;
+cleanup:
+	_gnutls_x509_spki_clear(&params);
+	return ret;
 }
 
 /**
@@ -2821,9 +2844,7 @@ int gnutls_pubkey_get_spki(gnutls_pubkey_t pubkey, gnutls_x509_spki_t spki,
 	if (p->pk == GNUTLS_PK_UNKNOWN)
 		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
-	memcpy(spki, p, sizeof(gnutls_x509_spki_st));
-
-	return 0;
+	return _gnutls_x509_spki_copy(spki, p);
 }
 
 /**
@@ -2843,6 +2864,8 @@ int gnutls_pubkey_get_spki(gnutls_pubkey_t pubkey, gnutls_x509_spki_t spki,
 int gnutls_pubkey_set_spki(gnutls_pubkey_t pubkey,
 			   const gnutls_x509_spki_t spki, unsigned int flags)
 {
+	int ret;
+
 	if (pubkey == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
@@ -2851,7 +2874,9 @@ int gnutls_pubkey_set_spki(gnutls_pubkey_t pubkey,
 	if (!_gnutls_pk_are_compat(pubkey->params.algo, spki->pk))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	memcpy(&pubkey->params.spki, spki, sizeof(gnutls_x509_spki_st));
+	ret = _gnutls_x509_spki_copy(&pubkey->params.spki, spki);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	pubkey->params.algo = spki->pk;
 

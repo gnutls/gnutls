@@ -273,6 +273,8 @@ int _gnutls_x509_write_pubkey_params(const gnutls_pk_params_st *params,
 		return 0;
 	case GNUTLS_PK_RSA_PSS:
 		return _gnutls_x509_write_rsa_pss_params(&params->spki, der);
+	case GNUTLS_PK_RSA_OAEP:
+		return _gnutls_x509_write_rsa_oaep_params(&params->spki, der);
 	case GNUTLS_PK_ECDSA:
 		return _gnutls_x509_write_ecc_params(params->curve, der);
 	case GNUTLS_PK_EDDSA_ED25519:
@@ -300,6 +302,7 @@ int _gnutls_x509_write_pubkey(const gnutls_pk_params_st *params,
 		return _gnutls_x509_write_dsa_pubkey(params, der);
 	case GNUTLS_PK_RSA:
 	case GNUTLS_PK_RSA_PSS:
+	case GNUTLS_PK_RSA_OAEP:
 		return _gnutls_x509_write_rsa_pubkey(params, der);
 	case GNUTLS_PK_ECDSA:
 		return _gnutls_x509_write_ecc_pubkey(params, der);
@@ -541,6 +544,135 @@ int _gnutls_x509_write_rsa_pss_params(const gnutls_x509_spki_st *params,
 
 cleanup:
 	_gnutls_free_datum(&tmp);
+	asn1_delete_structure(&c2);
+	asn1_delete_structure(&spk);
+	return result;
+}
+
+int _gnutls_x509_write_rsa_oaep_params(const gnutls_x509_spki_st *params,
+				       gnutls_datum_t *der)
+{
+	int result;
+	asn1_node spk = NULL;
+	asn1_node c2 = NULL;
+	const char *oid;
+	gnutls_datum_t tmp = { NULL, 0 };
+	gnutls_datum_t label = { NULL, 0 };
+
+	der->data = NULL;
+	der->size = 0;
+
+	if (params->pk != GNUTLS_PK_RSA_OAEP)
+		return 0;
+
+	if ((result = asn1_create_element(_gnutls_get_gnutls_asn(),
+					  "GNUTLS.RSAOAEPParameters", &spk)) !=
+	    ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	oid = gnutls_digest_get_oid(params->rsa_oaep_dig);
+
+	if ((result = asn1_write_value(spk, "hashAlgorithm.algorithm", oid,
+				       1)) != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	if ((result = asn1_write_value(spk, "hashAlgorithm.parameters", NULL,
+				       0)) != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	if ((result = asn1_write_value(spk, "maskGenAlgorithm.algorithm",
+				       PKIX1_RSA_PSS_MGF1_OID, 1)) !=
+	    ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	if ((result = asn1_create_element(_gnutls_get_pkix(),
+					  "PKIX1.AlgorithmIdentifier", &c2)) !=
+	    ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	if ((result = asn1_write_value(c2, "algorithm", oid, 1)) !=
+	    ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	if ((result = asn1_write_value(c2, "parameters", NULL, 0)) !=
+	    ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	result = _gnutls_x509_der_encode(c2, "", &tmp, 0);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	if ((result = asn1_write_value(spk, "maskGenAlgorithm.parameters",
+				       tmp.data, tmp.size)) != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	if ((result = asn1_write_value(spk, "pSourceFunc.algorithm",
+				       PKIX1_RSA_OAEP_P_SPECIFIED_OID, 1)) !=
+	    ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	if (params->rsa_oaep_label.data) {
+		result = _gnutls_x509_encode_string(ASN1_ETYPE_OCTET_STRING,
+						    params->rsa_oaep_label.data,
+						    params->rsa_oaep_label.size,
+						    &label);
+	} else {
+		result = _gnutls_x509_encode_string(ASN1_ETYPE_OCTET_STRING, "",
+						    0, &label);
+	}
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	result = asn1_write_value(spk, "pSourceFunc.parameters", label.data,
+				  label.size);
+	if (result < 0) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	result = _gnutls_x509_der_encode(spk, "", der, 0);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	result = 0;
+
+cleanup:
+	_gnutls_free_datum(&tmp);
+	_gnutls_free_datum(&label);
 	asn1_delete_structure(&c2);
 	asn1_delete_structure(&spk);
 	return result;
@@ -1019,6 +1151,7 @@ int _gnutls_asn1_encode_privkey(asn1_node *c2, gnutls_pk_params_st *params)
 	switch (params->algo) {
 	case GNUTLS_PK_RSA:
 	case GNUTLS_PK_RSA_PSS:
+	case GNUTLS_PK_RSA_OAEP:
 		return _gnutls_asn1_encode_rsa(c2, params);
 	case GNUTLS_PK_DSA:
 		return _gnutls_asn1_encode_dsa(c2, params);

@@ -223,7 +223,7 @@ static const char gost12_512_privkey[] =
 	"-----END PRIVATE KEY-----\n";
 
 static int test_rsa_enc(gnutls_pk_algorithm_t pk, unsigned bits,
-			gnutls_digest_algorithm_t ign)
+			gnutls_digest_algorithm_t dig)
 {
 	int ret;
 	gnutls_datum_t enc = { NULL, 0 };
@@ -233,6 +233,8 @@ static int test_rsa_enc(gnutls_pk_algorithm_t pk, unsigned bits,
 	gnutls_privkey_t key;
 	gnutls_pubkey_t pub = NULL;
 	unsigned char plaintext2[sizeof(DATASTR) - 1];
+	gnutls_x509_spki_t spki = NULL;
+	gnutls_datum_t oaep_label = { NULL, 0 };
 
 	ret = gnutls_privkey_init(&key);
 	if (ret < 0)
@@ -249,6 +251,27 @@ static int test_rsa_enc(gnutls_pk_algorithm_t pk, unsigned bits,
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
+	}
+
+	if (pk == GNUTLS_PK_RSA_OAEP) {
+		ret = gnutls_x509_spki_init(&spki);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		ret = gnutls_x509_spki_set_rsa_oaep_params(spki, dig,
+							   &oaep_label);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		ret = gnutls_privkey_set_spki(key, spki, 0);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
 	}
 
 	ret = gnutls_pubkey_import_privkey(pub, key, 0, 0);
@@ -297,6 +320,8 @@ static int test_rsa_enc(gnutls_pk_algorithm_t pk, unsigned bits,
 
 	ret = 0;
 cleanup:
+	if (spki != NULL)
+		gnutls_x509_spki_deinit(spki);
 	if (pub != NULL)
 		gnutls_pubkey_deinit(pub);
 	gnutls_privkey_deinit(key);
@@ -969,6 +994,14 @@ int gnutls_pk_self_test(unsigned flags, gnutls_pk_algorithm_t pk)
 	case GNUTLS_PK_RSA_PSS:
 		PK_TEST(GNUTLS_PK_RSA_PSS, test_sig, 2048,
 			GNUTLS_SIGN_RSA_PSS_RSAE_SHA256);
+
+		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
+			return 0;
+
+		FALLTHROUGH;
+	case GNUTLS_PK_RSA_OAEP:
+		PK_TEST(GNUTLS_PK_RSA_OAEP, test_rsa_enc, 2048,
+			GNUTLS_DIG_SHA256);
 
 		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
 			return 0;

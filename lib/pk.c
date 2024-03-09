@@ -506,7 +506,10 @@ int _gnutls_pk_params_copy(gnutls_pk_params_st *dst,
 	}
 	dst->palgo = src->palgo;
 
-	memcpy(&dst->spki, &src->spki, sizeof(gnutls_x509_spki_st));
+	if (_gnutls_x509_spki_copy(&dst->spki, &src->spki) < 0) {
+		gnutls_assert();
+		goto fail;
+	}
 
 	return 0;
 
@@ -529,6 +532,7 @@ void gnutls_pk_params_release(gnutls_pk_params_st *p)
 	}
 	gnutls_free(p->raw_priv.data);
 	gnutls_free(p->raw_pub.data);
+	_gnutls_x509_spki_clear(&p->spki);
 
 	p->params_nr = 0;
 }

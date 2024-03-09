@@ -280,6 +280,7 @@ static int add_pubkey(gnutls_pubkey_t pubkey, struct ck_attribute *a,
 
 	switch (pk) {
 	case GNUTLS_PK_RSA_PSS:
+	case GNUTLS_PK_RSA_OAEP:
 	case GNUTLS_PK_RSA: {
 		gnutls_datum_t m, e;
 
@@ -823,7 +824,8 @@ int gnutls_pkcs11_copy_x509_privkey2(const char *token_url,
 
 	switch (pk) {
 	case GNUTLS_PK_RSA:
-	case GNUTLS_PK_RSA_PSS: {
+	case GNUTLS_PK_RSA_PSS:
+	case GNUTLS_PK_RSA_OAEP: {
 		ret = _gnutls_params_get_rsa_raw(&key->params, &m, &e, &d, &p,
 						 &q, &u, &exp1, &exp2,
 						 GNUTLS_EXPORT_FLAG_NO_LZ);
@@ -983,6 +985,7 @@ int gnutls_pkcs11_copy_x509_privkey2(const char *token_url,
 cleanup:
 	switch (pk) {
 	case GNUTLS_PK_RSA_PSS:
+	case GNUTLS_PK_RSA_OAEP:
 	case GNUTLS_PK_RSA: {
 		gnutls_free(m.data);
 		gnutls_free(e.data);

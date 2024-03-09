@@ -1185,7 +1185,8 @@ static void privkey_info_int(FILE *outfile, common_info_st *cinfo,
 	cprint = gnutls_pk_algorithm_get_name(key_type);
 	fprintf(outfile, "%s\n", cprint ? cprint : "Unknown");
 
-	if (key_type == GNUTLS_PK_RSA_PSS) {
+	switch (key_type) {
+	case GNUTLS_PK_RSA_PSS: {
 		unsigned int salt_size;
 
 		ret = gnutls_x509_privkey_get_spki(key, spki, 0);
@@ -1207,6 +1208,44 @@ static void privkey_info_int(FILE *outfile, common_info_st *cinfo,
 				gnutls_digest_get_name(dig));
 			fprintf(outfile, "\t\tSalt Length: %d\n", salt_size);
 		}
+		break;
+	}
+	case GNUTLS_PK_RSA_OAEP: {
+		gnutls_datum_t label = { NULL, 0 };
+
+		ret = gnutls_x509_privkey_get_spki(key, spki, 0);
+		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+			goto spki_skip;
+
+		if (ret < 0) {
+			fprintf(stderr, "spki_get: %s\n", gnutls_strerror(ret));
+			goto spki_skip;
+		}
+
+		ret = gnutls_x509_spki_get_rsa_oaep_params(spki, &dig, &label);
+		if (ret < 0) {
+			fprintf(stderr, "spki_get_rsa_oaep_params: %s\n",
+				gnutls_strerror(ret));
+		} else {
+			fprintf(outfile, "\t\tHash Algorithm: %s\n",
+				gnutls_digest_get_name(dig));
+			if (label.data) {
+				gnutls_datum_t hex;
+
+				ret = gnutls_hex_encode2(&label, &hex);
+				if (ret < 0) {
+					fprintf(stderr, "hex_encode2: %s\n",
+						gnutls_strerror(ret));
+					goto spki_skip;
+				}
+				fprintf(outfile, "\t\tLabel: %s\n", hex.data);
+				gnutls_free(hex.data);
+			}
+		}
+		break;
+	}
+	default:
+		break;
 	}
 
 spki_skip:
@@ -1602,6 +1641,8 @@ gnutls_pk_algorithm_t figure_key_type(const char *key_type)
 		return GNUTLS_PK_RSA;
 	else if (strcasecmp(key_type, "rsa-pss") == 0)
 		return GNUTLS_PK_RSA_PSS;
+	else if (strcasecmp(key_type, "rsa-oaep") == 0)
+		return GNUTLS_PK_RSA_OAEP;
 	else if (strcasecmp(key_type, "ed25519") == 0 ||
 		 strcasecmp(key_type, "eddsa") == 0)
 		return GNUTLS_PK_EDDSA_ED25519;

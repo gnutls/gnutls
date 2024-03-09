@@ -175,12 +175,12 @@
           "long-option": "generate-privkey",
           "short-option": "p",
           "description": "Generate a private key",
-          "detail": "When generating RSA-PSS private keys, the --hash option will\nrestrict the allowed hash for the key; in the same keys the --salt-size\noption is also acceptable."
+          "detail": "When generating RSA-PSS or RSA-OAEP private keys, the --hash option will\nrestrict the allowed hash for the key; For RSA-PSS keys the --salt-size\noption is also acceptable."
         },
         {
           "long-option": "key-type",
           "description": "Specify the key type to use on key generation",
-          "detail": "This option can be combined with --generate-privkey, to specify\nthe key type to be generated. Valid options are, 'rsa', 'rsa-pss', 'dsa', 'ecdsa', 'ed25519, 'ed448', 'x25519', and 'x448'.'.\nWhen combined with certificate generation it can be used to specify an\nRSA-PSS certificate when an RSA key is given.",
+          "detail": "This option can be combined with --generate-privkey, to specify\nthe key type to be generated. Valid options are, 'rsa', 'rsa-pss', 'rsa-oaep', 'dsa', 'ecdsa', 'ed25519, 'ed448', 'x25519', and 'x448'.'.\nWhen combined with certificate generation it can be used to specify an\nRSA-PSS certificate when an RSA key is given.",
           "argument-type": "string"
         },
         {
@@ -481,6 +481,12 @@
           "description": "Specify the RSA-PSS key default salt size",
           "detail": "Typical keys shouldn't set or restrict this option.",
           "argument-type": "number"
+        },
+        {
+          "long-option": "label",
+          "description": "Specify the RSA-OAEP label, encoded in hexadecimal",
+          "detail": "Typical keys shouldn't set or restrict this option.",
+          "argument-type": "string"
         },
         {
           "long-option": "inder",

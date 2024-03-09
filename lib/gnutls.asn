@@ -129,6 +129,13 @@ RSAPSSParameters ::= SEQUENCE {
 	trailerField		[3] INTEGER DEFAULT 1
 }
 
+-- from RFC4055
+RSAOAEPParameters ::= SEQUENCE {
+	hashAlgorithm		[0] AlgorithmIdentifier OPTIONAL, -- sha1Identifier
+	maskGenAlgorithm	[1] AlgorithmIdentifier OPTIONAL, -- mgf1SHA1Identifier
+	pSourceFunc             [2] AlgorithmIdentifier OPTIONAL  -- pSpecifiedEmptyIdentifier
+}
+
 -- GOST R 34.10
 GOSTParameters ::= SEQUENCE {
    publicKeyParamSet  OBJECT IDENTIFIER,

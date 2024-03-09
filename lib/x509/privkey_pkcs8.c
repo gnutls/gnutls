@@ -108,6 +108,7 @@ inline static int _encode_privkey(gnutls_x509_privkey_t pkey,
 
 	case GNUTLS_PK_RSA:
 	case GNUTLS_PK_RSA_PSS:
+	case GNUTLS_PK_RSA_OAEP:
 	case GNUTLS_PK_ECDSA:
 		ret = _gnutls_x509_export_int2(pkey->key, GNUTLS_X509_FMT_DER,
 					       "", raw);
@@ -992,7 +993,58 @@ skip_params:
 	}
 
 	pkey->params.algo = GNUTLS_PK_RSA_PSS;
-	memcpy(&pkey->params.spki, &params, sizeof(gnutls_x509_spki_st));
+	ret = _gnutls_x509_spki_copy(&pkey->params.spki, &params);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+	ret = 0;
+
+error:
+	return ret;
+}
+
+/* Decodes an RSA-OAEP privateKey from a PKCS8 structure.
+ */
+static int _decode_pkcs8_rsa_oaep_key(asn1_node pkcs8_asn,
+				      gnutls_x509_privkey_t pkey)
+{
+	int ret;
+	gnutls_datum_t tmp = { NULL, 0 };
+	gnutls_x509_spki_st params;
+
+	memset(&params, 0, sizeof(params));
+
+	ret = _gnutls_x509_read_value(pkcs8_asn,
+				      "privateKeyAlgorithm.parameters", &tmp);
+	if (ret < 0) {
+		if (ret == GNUTLS_E_ASN1_VALUE_NOT_FOUND ||
+		    ret == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND)
+			goto skip_params;
+
+		gnutls_assert();
+		goto error;
+	}
+
+	ret = _gnutls_x509_read_rsa_oaep_params(tmp.data, tmp.size, &params);
+	_gnutls_free_key_datum(&tmp);
+
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+skip_params:
+	ret = _decode_pkcs8_rsa_key(pkcs8_asn, pkey);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+	pkey->params.algo = GNUTLS_PK_RSA_OAEP;
+	/* Take ownership of allocated members of params */
+	pkey->params.spki = params;
 
 	ret = 0;
 
@@ -1456,6 +1508,9 @@ static int decode_private_key_info(const gnutls_datum_t *der,
 		break;
 	case GNUTLS_PK_RSA_PSS:
 		result = _decode_pkcs8_rsa_pss_key(pkcs8_asn, pkey);
+		break;
+	case GNUTLS_PK_RSA_OAEP:
+		result = _decode_pkcs8_rsa_oaep_key(pkcs8_asn, pkey);
 		break;
 	case GNUTLS_PK_DSA:
 		result = _decode_pkcs8_dsa_key(pkcs8_asn, pkey);

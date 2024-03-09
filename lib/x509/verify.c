@@ -1446,6 +1446,7 @@ static int _gnutls_x509_verify_data(gnutls_sign_algorithm_t sign,
 	gnutls_x509_spki_st sign_params;
 	const gnutls_sign_entry_st *se;
 
+	memset(&sign_params, 0, sizeof(sign_params));
 	/* Read the MPI parameters from the issuer's certificate.
 	 */
 	ret = _gnutls_x509_crt_get_mpis(issuer, &params);
@@ -1479,7 +1480,11 @@ static int _gnutls_x509_verify_data(gnutls_sign_algorithm_t sign,
 			goto cleanup;
 		}
 	} else {
-		memcpy(&sign_params, &params.spki, sizeof(gnutls_x509_spki_st));
+		ret = _gnutls_x509_spki_copy(&sign_params, &params.spki);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
 
 		sign_params.pk = se->pk;
 		if (sign_params.pk == GNUTLS_PK_RSA_PSS)
@@ -1496,6 +1501,7 @@ cleanup:
 	/* release all allocated MPIs
 	 */
 	gnutls_pk_params_release(&params);
+	_gnutls_x509_spki_clear(&sign_params);
 
 	return ret;
 }

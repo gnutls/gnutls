@@ -169,8 +169,8 @@ int _gnutls_x509_pkix_sign(asn1_node src, const char *src_name,
 			   gnutls_x509_crt_t issuer,
 			   gnutls_privkey_t issuer_key);
 int _gnutls_x509_crt_get_spki_params(gnutls_x509_crt_t issuer,
-				     const gnutls_x509_spki_st *key_params,
-				     gnutls_x509_spki_st *params);
+				     const gnutls_x509_spki_t key_params,
+				     gnutls_x509_spki_t params);
 
 #define map_errs_to_zero(x) ((x) < 0 ? 0 : (x))
 
@@ -255,13 +255,18 @@ int _gnutls_x509_read_gost_params(uint8_t *der, int dersize,
 
 int _gnutls_asn1_encode_privkey(asn1_node *c2, gnutls_pk_params_st *params);
 
-void _gnutls_x509_privkey_get_spki_params(gnutls_x509_privkey_t key,
-					  gnutls_x509_spki_st *params);
+int _gnutls_x509_privkey_get_spki_params(gnutls_x509_privkey_t key,
+					 gnutls_x509_spki_st *params);
 
 int _gnutls_x509_read_rsa_pss_params(uint8_t *der, int dersize,
 				     gnutls_x509_spki_st *params);
 int _gnutls_x509_write_rsa_pss_params(const gnutls_x509_spki_st *params,
 				      gnutls_datum_t *der);
+
+int _gnutls_x509_read_rsa_oaep_params(uint8_t *der, int dersize,
+				      gnutls_x509_spki_st *params);
+int _gnutls_x509_write_rsa_oaep_params(const gnutls_x509_spki_st *params,
+				       gnutls_datum_t *der);
 
 /* extensions.c */
 int _gnutls_x509_crl_get_extension_oid(gnutls_x509_crl_t crl, int indx,

@@ -42,6 +42,9 @@
 #include "dsa-fips.h"
 #include "rsa-fips.h"
 #include <nettle/rsa.h>
+#ifndef HAVE_NETTLE_RSA_OAEP_SHA256_ENCRYPT
+#include "int/rsa-oaep.h"
+#endif
 #include <gnutls/crypto.h>
 #include <nettle/bignum.h>
 #include <nettle/ecc.h>
@@ -678,20 +681,121 @@ cleanup:
 	return ret;
 }
 
+/* This wraps nettle_rsa_encrypt so it returns ciphertext as a byte
+ * array instead of a mpz_t value.  Returns 1 on success; 0 otherwise.
+ */
+static inline int _rsa_encrypt(const struct rsa_public_key *key, void *rnd_ctx,
+			       nettle_random_func *rnd_func, size_t length,
+			       const uint8_t *message, uint8_t *ciphertext)
+{
+	mpz_t p;
+	int ret;
+
+	mpz_init(p);
+
+	ret = rsa_encrypt(key, rnd_ctx, rnd_func, length, message, p);
+
+	if (ret == 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	if (_gnutls_mpi_bprint_size(p, ciphertext, key->size) < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+cleanup:
+	mpz_clear(p);
+	return ret;
+}
+
+/* This wraps nettle_rsa_oaep_sha*_encrypt to parametrize the function
+ * calls with a DIG argument.  Returns 1 on success; 0 otherwise.
+ */
+static inline int _rsa_oaep_encrypt(gnutls_digest_algorithm_t dig,
+				    const struct rsa_public_key *pub,
+				    void *rnd_ctx, nettle_random_func *rnd_func,
+				    size_t label_length, const uint8_t *label,
+				    size_t length, const uint8_t *message,
+				    uint8_t *ciphertext)
+{
+	int (*encrypt_func)(const struct rsa_public_key *, void *,
+			    nettle_random_func *, size_t, const uint8_t *,
+			    size_t, const uint8_t *, uint8_t *);
+
+	switch (dig) {
+	case GNUTLS_DIG_SHA256:
+		encrypt_func = rsa_oaep_sha256_encrypt;
+		break;
+	case GNUTLS_DIG_SHA384:
+		encrypt_func = rsa_oaep_sha384_encrypt;
+		break;
+	case GNUTLS_DIG_SHA512:
+		encrypt_func = rsa_oaep_sha512_encrypt;
+		break;
+	default:
+		gnutls_assert();
+		return 0;
+	}
+
+	return encrypt_func(pub, rnd_ctx, rnd_func, label_length, label, length,
+			    message, ciphertext);
+}
+
 static int _wrap_nettle_pk_encrypt(gnutls_pk_algorithm_t algo,
 				   gnutls_datum_t *ciphertext,
 				   const gnutls_datum_t *plaintext,
 				   const gnutls_pk_params_st *pk_params)
 {
 	int ret;
-	mpz_t p;
+	bool not_approved = false;
+	uint8_t *buf = NULL;
 
 	FAIL_IF_LIB_ERROR;
 
-	mpz_init(p);
+	if (algo == GNUTLS_PK_RSA && pk_params->spki.pk == GNUTLS_PK_RSA_OAEP) {
+		algo = GNUTLS_PK_RSA_OAEP;
+	}
 
 	switch (algo) {
 	case GNUTLS_PK_RSA: {
+		struct rsa_public_key pub;
+		nettle_random_func *random_func;
+
+		/* RSA encryption with PKCS#1 v1.5 padding is not approved */
+		not_approved = true;
+
+		ret = _rsa_params_to_pubkey(pk_params, &pub);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		if (_gnutls_get_lib_state() == LIB_STATE_SELFTEST)
+			random_func = rnd_nonce_func_fallback;
+		else
+			random_func = rnd_nonce_func;
+
+		buf = gnutls_malloc(pub.size);
+		if (!buf) {
+			ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+			goto cleanup;
+		}
+
+		ret = _rsa_encrypt(&pub, NULL, random_func, plaintext->size,
+				   plaintext->data, buf);
+		if (ret == 0 || HAVE_LIB_ERROR()) {
+			ret = gnutls_assert_val(GNUTLS_E_ENCRYPTION_FAILED);
+			goto cleanup;
+		}
+
+		ciphertext->data = buf;
+		buf = NULL;
+		ciphertext->size = pub.size;
+		break;
+	}
+	case GNUTLS_PK_RSA_OAEP: {
 		struct rsa_public_key pub;
 		nettle_random_func *random_func;
 
@@ -705,19 +809,25 @@ static int _wrap_nettle_pk_encrypt(gnutls_pk_algorithm_t algo,
 			random_func = rnd_nonce_func_fallback;
 		else
 			random_func = rnd_nonce_func;
-		ret = rsa_encrypt(&pub, NULL, random_func, plaintext->size,
-				  plaintext->data, p);
+
+		buf = gnutls_malloc(pub.size);
+		if (!buf) {
+			ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+			goto cleanup;
+		}
+
+		ret = _rsa_oaep_encrypt(pk_params->spki.rsa_oaep_dig, &pub,
+					NULL, random_func,
+					pk_params->spki.rsa_oaep_label.size,
+					pk_params->spki.rsa_oaep_label.data,
+					plaintext->size, plaintext->data, buf);
 		if (ret == 0 || HAVE_LIB_ERROR()) {
 			ret = gnutls_assert_val(GNUTLS_E_ENCRYPTION_FAILED);
 			goto cleanup;
 		}
-
-		ret = _gnutls_mpi_dprint_size(p, ciphertext, pub.size);
-		if (ret < 0) {
-			gnutls_assert();
-			goto cleanup;
-		}
-
+		ciphertext->data = buf;
+		buf = NULL;
+		ciphertext->size = pub.size;
 		break;
 	}
 	default:
@@ -729,16 +839,76 @@ static int _wrap_nettle_pk_encrypt(gnutls_pk_algorithm_t algo,
 	ret = 0;
 
 cleanup:
+	gnutls_free(buf);
 	if (ret < 0) {
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
-	} else {
+	} else if (not_approved) {
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_NOT_APPROVED);
+	} else {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_APPROVED);
 	}
-
-	mpz_clear(p);
 
 	FAIL_IF_LIB_ERROR;
 	return ret;
+}
+
+/* This wraps nettle_rsa_decrypt_tr so it takes ciphertext as a byte
+ * array instead of a mpz_t value.  Returns 1 on success; 0 otherwise.
+ */
+static inline int _rsa_decrypt_tr(const struct rsa_public_key *pub,
+				  const struct rsa_private_key *key,
+				  void *rnd_ctx, nettle_random_func *rnd_func,
+				  size_t *length, uint8_t *message,
+				  const uint8_t *ciphertext)
+{
+	bigint_t c;
+	int ret;
+
+	if (_gnutls_mpi_init_scan_nz(&c, ciphertext, pub->size) < 0) {
+		gnutls_assert();
+		return 0;
+	}
+
+	ret = rsa_decrypt_tr(pub, key, rnd_ctx, rnd_func, length, message, c);
+
+	_gnutls_mpi_release(&c);
+
+	return ret;
+}
+
+/* This wraps nettle_rsa_oaep_sha*_decrypt to parametrize the function
+ * calls with a DIG argument.  Returns 1 on success; 0 otherwise.
+ */
+static inline int _rsa_oaep_decrypt(gnutls_digest_algorithm_t dig,
+				    const struct rsa_public_key *pub,
+				    const struct rsa_private_key *key,
+				    void *rnd_ctx, nettle_random_func *rnd_func,
+				    size_t label_length, const uint8_t *label,
+				    size_t *length, uint8_t *message,
+				    const uint8_t *ciphertext)
+{
+	int (*decrypt_func)(const struct rsa_public_key *,
+			    const struct rsa_private_key *, void *,
+			    nettle_random_func *, size_t, const uint8_t *,
+			    size_t *, uint8_t *, const uint8_t *);
+
+	switch (dig) {
+	case GNUTLS_DIG_SHA256:
+		decrypt_func = rsa_oaep_sha256_decrypt;
+		break;
+	case GNUTLS_DIG_SHA384:
+		decrypt_func = rsa_oaep_sha384_decrypt;
+		break;
+	case GNUTLS_DIG_SHA512:
+		decrypt_func = rsa_oaep_sha512_decrypt;
+		break;
+	default:
+		gnutls_assert();
+		return GNUTLS_E_UNKNOWN_ALGORITHM;
+	}
+
+	return decrypt_func(pub, key, rnd_ctx, rnd_func, label_length, label,
+			    length, message, ciphertext);
 }
 
 static int _wrap_nettle_pk_decrypt(gnutls_pk_algorithm_t algo,
@@ -747,18 +917,65 @@ static int _wrap_nettle_pk_decrypt(gnutls_pk_algorithm_t algo,
 				   const gnutls_pk_params_st *pk_params)
 {
 	int ret;
+	bool not_approved = false;
+	uint8_t *buf = NULL;
 
 	FAIL_IF_LIB_ERROR;
 
-	plaintext->data = NULL;
+	if (algo == GNUTLS_PK_RSA && pk_params->spki.pk == GNUTLS_PK_RSA_OAEP) {
+		algo = GNUTLS_PK_RSA_OAEP;
+	}
 
-	/* make a sexp from pkey */
 	switch (algo) {
 	case GNUTLS_PK_RSA: {
 		struct rsa_private_key priv;
 		struct rsa_public_key pub;
 		size_t length;
-		bigint_t c;
+		nettle_random_func *random_func;
+
+		/* RSA decryption with PKCS#1 v1.5 padding is not approved */
+		not_approved = true;
+
+		_rsa_params_to_privkey(pk_params, &priv);
+		ret = _rsa_params_to_pubkey(pk_params, &pub);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		if (ciphertext->size != pub.size) {
+			ret = gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
+			goto cleanup;
+		}
+
+		length = pub.size;
+		buf = gnutls_malloc(length);
+		if (!buf) {
+			ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+			goto cleanup;
+		}
+
+		if (_gnutls_get_lib_state() == LIB_STATE_SELFTEST)
+			random_func = rnd_nonce_func_fallback;
+		else
+			random_func = rnd_nonce_func;
+		ret = _rsa_decrypt_tr(&pub, &priv, NULL, random_func, &length,
+				      buf, ciphertext->data);
+
+		if (ret == 0 || HAVE_LIB_ERROR()) {
+			ret = gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
+			goto cleanup;
+		}
+
+		plaintext->data = buf;
+		buf = NULL;
+		plaintext->size = length;
+		break;
+	}
+	case GNUTLS_PK_RSA_OAEP: {
+		struct rsa_private_key priv;
+		struct rsa_public_key pub;
+		size_t length;
 		nettle_random_func *random_func;
 
 		_rsa_params_to_privkey(pk_params, &priv);
@@ -773,15 +990,9 @@ static int _wrap_nettle_pk_decrypt(gnutls_pk_algorithm_t algo,
 			goto cleanup;
 		}
 
-		if (_gnutls_mpi_init_scan_nz(&c, ciphertext->data,
-					     ciphertext->size) != 0) {
-			ret = gnutls_assert_val(GNUTLS_E_MPI_SCAN_FAILED);
-			goto cleanup;
-		}
-
 		length = pub.size;
-		plaintext->data = gnutls_malloc(length);
-		if (plaintext->data == NULL) {
+		buf = gnutls_malloc(length);
+		if (!buf) {
 			ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 			goto cleanup;
 		}
@@ -790,16 +1001,20 @@ static int _wrap_nettle_pk_decrypt(gnutls_pk_algorithm_t algo,
 			random_func = rnd_nonce_func_fallback;
 		else
 			random_func = rnd_nonce_func;
-		ret = rsa_decrypt_tr(&pub, &priv, NULL, random_func, &length,
-				     plaintext->data, TOMPZ(c));
-		_gnutls_mpi_release(&c);
-		plaintext->size = length;
+		ret = _rsa_oaep_decrypt(pk_params->spki.rsa_oaep_dig, &pub,
+					&priv, NULL, random_func,
+					pk_params->spki.rsa_oaep_label.size,
+					pk_params->spki.rsa_oaep_label.data,
+					&length, buf, ciphertext->data);
 
 		if (ret == 0 || HAVE_LIB_ERROR()) {
 			ret = gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 			goto cleanup;
 		}
 
+		plaintext->data = buf;
+		buf = NULL;
+		plaintext->size = length;
 		break;
 	}
 	default:
@@ -811,14 +1026,41 @@ static int _wrap_nettle_pk_decrypt(gnutls_pk_algorithm_t algo,
 	ret = 0;
 
 cleanup:
+	gnutls_free(buf);
 	if (ret < 0) {
 		gnutls_free(plaintext->data);
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
-	} else {
+	} else if (not_approved) {
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_NOT_APPROVED);
+	} else {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_APPROVED);
 	}
 
 	FAIL_IF_LIB_ERROR;
+	return ret;
+}
+
+/* This wraps nettle_rsa_sec_decrypt so it takes ciphertext as a byte
+ * array instead of a mpz_t value.  Returns 1 on success; 0 otherwise.
+ */
+static inline int _rsa_sec_decrypt(const struct rsa_public_key *pub,
+				   const struct rsa_private_key *key,
+				   void *rnd_ctx, nettle_random_func *rnd_func,
+				   size_t length, uint8_t *message,
+				   const uint8_t *ciphertext)
+{
+	bigint_t c;
+	int ret;
+
+	if (_gnutls_mpi_init_scan_nz(&c, ciphertext, pub->size) < 0) {
+		gnutls_assert();
+		return 0;
+	}
+
+	ret = rsa_sec_decrypt(pub, key, rnd_ctx, rnd_func, length, message, c);
+
+	_gnutls_mpi_release(&c);
+
 	return ret;
 }
 
@@ -833,16 +1075,20 @@ static int _wrap_nettle_pk_decrypt2(gnutls_pk_algorithm_t algo,
 {
 	struct rsa_private_key priv;
 	struct rsa_public_key pub;
-	bigint_t c;
 	uint32_t is_err;
 	int ret;
 	nettle_random_func *random_func;
+	bool not_approved = false;
 
 	FAIL_IF_LIB_ERROR;
 
 	if (algo != GNUTLS_PK_RSA || plaintext == NULL) {
 		ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 		goto fail;
+	}
+
+	if (pk_params->spki.pk == GNUTLS_PK_RSA_OAEP) {
+		algo = GNUTLS_PK_RSA_OAEP;
 	}
 
 	_rsa_params_to_privkey(pk_params, &priv);
@@ -857,29 +1103,46 @@ static int _wrap_nettle_pk_decrypt2(gnutls_pk_algorithm_t algo,
 		goto fail;
 	}
 
-	if (_gnutls_mpi_init_scan_nz(&c, ciphertext->data, ciphertext->size) !=
-	    0) {
-		ret = gnutls_assert_val(GNUTLS_E_MPI_SCAN_FAILED);
-		goto fail;
-	}
-
 	if (_gnutls_get_lib_state() == LIB_STATE_SELFTEST)
 		random_func = rnd_nonce_func_fallback;
 	else
 		random_func = rnd_nonce_func;
-	ret = rsa_sec_decrypt(&pub, &priv, NULL, random_func, plaintext_size,
-			      plaintext, TOMPZ(c));
+
+	switch (algo) {
+	case GNUTLS_PK_RSA:
+		/* RSA decryption with PKCS#1 v1.5 padding is not approved */
+		not_approved = true;
+
+		ret = _rsa_sec_decrypt(&pub, &priv, NULL, random_func,
+				       plaintext_size, plaintext,
+				       ciphertext->data);
+		break;
+	case GNUTLS_PK_RSA_OAEP:
+		ret = _rsa_oaep_decrypt(pk_params->spki.rsa_oaep_dig, &pub,
+					&priv, NULL, random_func,
+					pk_params->spki.rsa_oaep_label.size,
+					pk_params->spki.rsa_oaep_label.data,
+					&plaintext_size, plaintext,
+					ciphertext->data);
+		break;
+	default:
+		gnutls_assert();
+		ret = GNUTLS_E_INTERNAL_ERROR;
+		goto fail;
+	}
 
 	/* The decrypt operation is infallible; treat the approved
 	 * operation as complete at this point, regardless of any
 	 * decryption failure detected below.
 	 */
-	_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_NOT_APPROVED);
+	_gnutls_switch_fips_state(not_approved ?
+					  GNUTLS_FIPS140_OP_NOT_APPROVED :
+					  GNUTLS_FIPS140_OP_APPROVED);
 
 	/* after this point, any conditional on failure that cause differences
 	 * in execution may create a timing or cache access pattern side
 	 * channel that can be used as an oracle, so thread very carefully */
-	_gnutls_mpi_release(&c);
+
 	/* Here HAVE_LIB_ERROR() should be fine as it doesn't have
 	 * branches in it and returns a bool */
 	is_err = HAVE_LIB_ERROR();
@@ -1913,6 +2176,7 @@ static int _wrap_nettle_pk_exists(gnutls_pk_algorithm_t pk)
 	case GNUTLS_PK_ECDSA:
 	case GNUTLS_PK_ECDH_X25519:
 	case GNUTLS_PK_RSA_PSS:
+	case GNUTLS_PK_RSA_OAEP:
 	case GNUTLS_PK_EDDSA_ED25519:
 #if ENABLE_GOST
 	case GNUTLS_PK_GOST_01:
@@ -2110,6 +2374,7 @@ static int wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 		break;
 	}
 	case GNUTLS_PK_RSA_PSS:
+	case GNUTLS_PK_RSA_OAEP:
 	case GNUTLS_PK_RSA:
 	case GNUTLS_PK_ECDSA:
 	case GNUTLS_PK_EDDSA_ED25519:
@@ -2386,7 +2651,11 @@ static int pct_test(gnutls_pk_algorithm_t algo,
 	gnutls_x509_spki_st spki;
 	gnutls_fips140_context_t context;
 
-	memcpy(&spki, &params->spki, sizeof(spki));
+	ret = _gnutls_x509_spki_copy(&spki, &params->spki);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
 
 	if (algo == GNUTLS_PK_DSA || algo == GNUTLS_PK_EC) {
 		unsigned hash_len;
@@ -2433,17 +2702,22 @@ static int pct_test(gnutls_pk_algorithm_t algo,
 
 	switch (algo) {
 	case GNUTLS_PK_RSA:
-		/* Push a temporary FIPS context because _gnutls_pk_encrypt and
-		 * _gnutls_pk_decrypt below will mark RSAES-PKCS1-v1_5 operation
-		 * non-approved */
-		if (gnutls_fips140_context_init(&context) < 0) {
-			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
-			goto cleanup;
-		}
-		if (gnutls_fips140_push_context(context) < 0) {
-			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
-			gnutls_fips140_context_deinit(context);
-			goto cleanup;
+	case GNUTLS_PK_RSA_OAEP:
+		if (algo == GNUTLS_PK_RSA) {
+			/* Push a temporary FIPS context because _gnutls_pk_encrypt and
+			 * _gnutls_pk_decrypt below will mark RSAES-PKCS1-v1_5 operation
+			 * non-approved */
+			if (gnutls_fips140_context_init(&context) < 0) {
+				ret = gnutls_assert_val(
+					GNUTLS_E_PK_GENERATION_ERROR);
+				goto cleanup;
+			}
+			if (gnutls_fips140_push_context(context) < 0) {
+				ret = gnutls_assert_val(
+					GNUTLS_E_PK_GENERATION_ERROR);
+				gnutls_fips140_context_deinit(context);
+				goto cleanup;
+			}
 		}
 
 		ret = _gnutls_pk_encrypt(algo, &sig, &ddata, params);
@@ -2464,10 +2738,13 @@ static int pct_test(gnutls_pk_algorithm_t algo,
 			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
 		}
 
-		if (unlikely(gnutls_fips140_pop_context() < 0)) {
-			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
+		if (algo == GNUTLS_PK_RSA) {
+			if (unlikely(gnutls_fips140_pop_context() < 0)) {
+				ret = gnutls_assert_val(
+					GNUTLS_E_PK_GENERATION_ERROR);
+			}
+			gnutls_fips140_context_deinit(context);
 		}
-		gnutls_fips140_context_deinit(context);
 
 		if (ret < 0) {
 			goto cleanup;
@@ -2475,6 +2752,11 @@ static int pct_test(gnutls_pk_algorithm_t algo,
 
 		free(sig.data);
 		sig.data = NULL;
+
+		/* RSA-OAEP can't be used for signing */
+		if (algo == GNUTLS_PK_RSA_OAEP) {
+			break;
+		}
 
 		FALLTHROUGH;
 	case GNUTLS_PK_EC: /* we only do keys for ECDSA */
@@ -2537,6 +2819,7 @@ cleanup:
 	if (ret == GNUTLS_E_PK_GENERATION_ERROR) {
 		_gnutls_switch_lib_state(LIB_STATE_ERROR);
 	}
+	_gnutls_x509_spki_clear(&spki);
 	gnutls_free(gen_data);
 	gnutls_free(sig.data);
 	gnutls_free(tmp.data);
@@ -2831,6 +3114,7 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 		break;
 	}
 	case GNUTLS_PK_RSA_PSS:
+	case GNUTLS_PK_RSA_OAEP:
 	case GNUTLS_PK_RSA: {
 		struct rsa_public_key pub;
 		struct rsa_private_key priv;
@@ -3292,7 +3576,8 @@ static int wrap_nettle_pk_verify_priv_params(gnutls_pk_algorithm_t algo,
 
 	switch (algo) {
 	case GNUTLS_PK_RSA:
-	case GNUTLS_PK_RSA_PSS: {
+	case GNUTLS_PK_RSA_PSS:
+	case GNUTLS_PK_RSA_OAEP: {
 		bigint_t t1 = NULL, t2 = NULL;
 
 		if (params->params_nr != RSA_PRIVATE_PARAMS)
@@ -3583,6 +3868,7 @@ static int wrap_nettle_pk_verify_pub_params(gnutls_pk_algorithm_t algo,
 	switch (algo) {
 	case GNUTLS_PK_RSA:
 	case GNUTLS_PK_RSA_PSS:
+	case GNUTLS_PK_RSA_OAEP:
 	case GNUTLS_PK_DSA:
 	case GNUTLS_PK_EDDSA_ED25519:
 	case GNUTLS_PK_EDDSA_ED448:

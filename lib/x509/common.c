@@ -600,13 +600,38 @@ int _gnutls_x509_decode_string(unsigned int etype, const uint8_t *der,
 			       size_t der_size, gnutls_datum_t *output,
 			       unsigned allow_ber)
 {
-	int ret;
+	long ret;
 	uint8_t *str;
 	unsigned int str_size, len;
 	gnutls_datum_t td;
+	int tag_len, len_len;
+	unsigned char class;
+	unsigned long tag;
 
 	output->data = NULL;
 	output->size = 0;
+
+	/* asn1_decode_simple_{ber,der} don't accept empty string,
+	 * check it beforehand.
+	 */
+	ret = asn1_get_tag_der(der, der_size, &class, &tag_len, &tag);
+	if (ret != ASN1_SUCCESS) {
+		gnutls_assert();
+		ret = _gnutls_asn2err(ret);
+		return ret;
+	}
+
+	if (allow_ber)
+		ret = asn1_get_length_ber(der + tag_len, der_size - tag_len,
+					  &len_len);
+	else
+		ret = asn1_get_length_der(der + tag_len, der_size - tag_len,
+					  &len_len);
+	if (ret == 0) {
+		output->data = NULL;
+		output->size = 0;
+		return 0;
+	}
 
 	if (allow_ber)
 		ret = asn1_decode_simple_ber(etype, der, der_size, &str,

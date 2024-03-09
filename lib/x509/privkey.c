@@ -1402,10 +1402,10 @@ int gnutls_x509_privkey_get_pk_algorithm2(gnutls_x509_privkey_t key,
 	return key->params.algo;
 }
 
-void _gnutls_x509_privkey_get_spki_params(gnutls_x509_privkey_t key,
-					  gnutls_x509_spki_st *params)
+int _gnutls_x509_privkey_get_spki_params(gnutls_x509_privkey_t key,
+					 gnutls_x509_spki_st *params)
 {
-	memcpy(params, &key->params.spki, sizeof(gnutls_x509_spki_st));
+	return _gnutls_x509_spki_copy(params, &key->params.spki);
 }
 
 /**
@@ -1430,9 +1430,7 @@ int gnutls_x509_privkey_get_spki(gnutls_x509_privkey_t key,
 	if (key->params.spki.pk == GNUTLS_PK_UNKNOWN)
 		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
-	_gnutls_x509_privkey_get_spki_params(key, spki);
-
-	return 0;
+	return _gnutls_x509_privkey_get_spki_params(key, spki);
 }
 
 /**
@@ -1462,12 +1460,15 @@ int gnutls_x509_privkey_set_spki(gnutls_x509_privkey_t key,
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	memcpy(&tparams, &key->params, sizeof(gnutls_pk_params_st));
+	/* No need for a deep copy, as this is only for one time check */
 	memcpy(&tparams.spki, spki, sizeof(gnutls_x509_spki_st));
 	ret = _gnutls_x509_check_pubkey_params(&tparams);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	memcpy(&key->params.spki, spki, sizeof(gnutls_x509_spki_st));
+	ret = _gnutls_x509_spki_copy(&key->params.spki, spki);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	key->params.algo = spki->pk;
 
@@ -1954,6 +1955,21 @@ int gnutls_x509_privkey_generate2(gnutls_x509_privkey_t key,
 		}
 
 		key->params.spki.salt_size = ret;
+	}
+
+	if (algo == GNUTLS_PK_RSA_OAEP && !key->params.spki.pk) {
+		const mac_entry_st *me;
+		key->params.spki.pk = GNUTLS_PK_RSA_OAEP;
+
+		key->params.spki.rsa_oaep_dig =
+			_gnutls_pk_bits_to_sha_hash(bits);
+
+		me = hash_to_entry(key->params.spki.rsa_oaep_dig);
+		if (unlikely(me == NULL)) {
+			gnutls_assert();
+			ret = GNUTLS_E_INVALID_REQUEST;
+			goto cleanup;
+		}
 	}
 
 	ret = _gnutls_pk_generate_keys(algo, bits, &key->params, 0);

@@ -188,6 +188,12 @@ typedef struct gnutls_x509_spki_st {
 	/* the size of salt used by RSA-PSS */
 	unsigned int salt_size;
 
+	/* the digest used by RSA-OAEP */
+	gnutls_digest_algorithm_t rsa_oaep_dig;
+
+	/* the optional label used by RSA-OAEP */
+	gnutls_datum_t rsa_oaep_label;
+
 	/* if non-zero, the legacy value for PKCS#7 signatures will be
 	 * written for RSA signatures. */
 	unsigned int legacy;
@@ -199,6 +205,10 @@ typedef struct gnutls_x509_spki_st {
 	 * deterministic ECDSA/DSA */
 	unsigned int flags;
 } gnutls_x509_spki_st;
+
+int _gnutls_x509_spki_copy(gnutls_x509_spki_st *dst,
+			   const gnutls_x509_spki_st *src);
+void _gnutls_x509_spki_clear(gnutls_x509_spki_st *spki);
 
 #define GNUTLS_MAX_PK_PARAMS 16
 

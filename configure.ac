@@ -785,6 +785,13 @@ AC_CHECK_FUNCS(nettle_siv_gcm_encrypt_message)
 LIBS=$save_LIBS
 AM_CONDITIONAL([NEED_SIV_GCM], [test "$ac_cv_func_nettle_siv_gcm_encrypt_message" != yes])
 
+# Check for RSA-OAEP
+save_LIBS=$LIBS
+LIBS="$LIBS $NETTLE_LIBS"
+AC_CHECK_FUNCS(nettle_rsa_oaep_sha256_encrypt)
+LIBS=$save_LIBS
+AM_CONDITIONAL([NEED_RSA_OAEP], [test "$ac_cv_func_nettle_rsa_oaep_sha256_encrypt" != yes])
+
 # Check sonames of the linked libraries needed for FIPS selftests.
 save_CFLAGS=$CFLAGS
 CFLAGS="$CFLAGS $GMP_CFLAGS"

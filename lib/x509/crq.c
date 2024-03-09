@@ -2880,6 +2880,8 @@ int gnutls_x509_crq_set_spki(gnutls_x509_crq_t crq,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
+	memset(&tpki, 0, sizeof(gnutls_x509_spki_st));
+
 	ret = _gnutls_x509_crq_get_mpis(crq, &params);
 	if (ret < 0) {
 		gnutls_assert();
@@ -2904,8 +2906,6 @@ int gnutls_x509_crq_set_spki(gnutls_x509_crq_t crq,
 		ret = GNUTLS_E_INVALID_REQUEST;
 		goto cleanup;
 	}
-
-	memset(&tpki, 0, sizeof(gnutls_x509_spki_st));
 
 	if (crq_pk == GNUTLS_PK_RSA) {
 		const mac_entry_st *me;
@@ -2942,7 +2942,11 @@ int gnutls_x509_crq_set_spki(gnutls_x509_crq_t crq,
 		tpki.rsa_pss_dig = spki->rsa_pss_dig;
 	}
 
-	memcpy(&params.spki, &tpki, sizeof(tpki));
+	ret = _gnutls_x509_spki_copy(&params.spki, &tpki);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
 	ret = _gnutls_x509_check_pubkey_params(&params);
 	if (ret < 0) {
 		gnutls_assert();
@@ -2962,5 +2966,6 @@ int gnutls_x509_crq_set_spki(gnutls_x509_crq_t crq,
 	ret = 0;
 cleanup:
 	gnutls_pk_params_release(&params);
+	_gnutls_x509_spki_clear(&tpki);
 	return ret;
 }

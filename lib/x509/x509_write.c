@@ -1998,7 +1998,11 @@ int gnutls_x509_crt_set_spki(gnutls_x509_crt_t crt,
 		tpki.rsa_pss_dig = spki->rsa_pss_dig;
 	}
 
-	memcpy(&params.spki, &tpki, sizeof(tpki));
+	ret = _gnutls_x509_spki_copy(&params.spki, &tpki);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
 	ret = _gnutls_x509_check_pubkey_params(&params);
 	if (ret < 0) {
 		gnutls_assert();
@@ -2019,5 +2023,6 @@ int gnutls_x509_crt_set_spki(gnutls_x509_crt_t crt,
 	ret = 0;
 cleanup:
 	gnutls_pk_params_release(&params);
+	_gnutls_x509_spki_clear(&tpki);
 	return ret;
 }

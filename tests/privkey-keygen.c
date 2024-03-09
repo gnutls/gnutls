@@ -108,6 +108,7 @@ static unsigned int is_approved_pk_algo(gnutls_pk_algorithm_t algo)
 	switch (algo) {
 	case GNUTLS_PK_RSA:
 	case GNUTLS_PK_RSA_PSS:
+	case GNUTLS_PK_RSA_OAEP:
 	case GNUTLS_PK_EC:
 		return 1;
 	default:
@@ -212,6 +213,11 @@ void doit(void)
 				     gnutls_strerror(ret), ret);
 			}
 
+			/* RSA-OAEP doesn't support signing */
+			if (algorithm == GNUTLS_PK_RSA_OAEP) {
+				goto end;
+			}
+
 			FIPS_PUSH_CONTEXT();
 			sign_verify_data(algorithm, pkey);
 			if (is_approved_pk_algo(algorithm)) {
@@ -228,6 +234,7 @@ void doit(void)
 				FIPS_POP_CONTEXT(NOT_APPROVED);
 			}
 
+		end:
 			gnutls_x509_privkey_deinit(pkey);
 			gnutls_x509_privkey_deinit(dst);
 			success("Generated key with %s-%d\n",

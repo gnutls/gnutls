@@ -876,6 +876,7 @@ typedef enum gnutls_certificate_print_formats {
  * gnutls_pk_algorithm_t:
  * @GNUTLS_PK_UNKNOWN: Unknown public-key algorithm.
  * @GNUTLS_PK_RSA: RSA public-key algorithm.
+ * @GNUTLS_PK_RSA_OAEP: RSA public-key algorithm, with OAEP padding.
  * @GNUTLS_PK_RSA_PSS: RSA public-key algorithm, with PSS padding.
  * @GNUTLS_PK_DSA: DSA public-key algorithm.
  * @GNUTLS_PK_DH: Diffie-Hellman algorithm. Used to generate parameters.
@@ -904,7 +905,8 @@ typedef enum {
 	GNUTLS_PK_GOST_12_512 = 10,
 	GNUTLS_PK_ECDH_X448 = 11,
 	GNUTLS_PK_EDDSA_ED448 = 12,
-	GNUTLS_PK_MAX = GNUTLS_PK_EDDSA_ED448
+	GNUTLS_PK_RSA_OAEP = 13,
+	GNUTLS_PK_MAX = GNUTLS_PK_RSA_OAEP
 } gnutls_pk_algorithm_t;
 
 const char *gnutls_pk_algorithm_get_name(gnutls_pk_algorithm_t algorithm);

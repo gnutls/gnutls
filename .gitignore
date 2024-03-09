@@ -670,6 +670,7 @@ tests/rsa-md5-collision/Makefile
 tests/rsa-md5-collision/Makefile.in
 tests/rsa-psk
 tests/rsa-psk-cb
+tests/rsa-rsa-oaep
 tests/rsa-rsa-pss
 tests/safe-renegotiation/Makefile
 tests/safe-renegotiation/Makefile.in
