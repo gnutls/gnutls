@@ -302,7 +302,7 @@ static int check_mgf1(asn1_node root, const char *name,
 
 	size = sizeof(oid);
 	result = asn1_read_value(root, buffer, oid, &size);
-	if (result < 0) {
+	if (result != ASN1_SUCCESS) {
 		if (result == ASN1_ELEMENT_NOT_FOUND && allow_null)
 			return 0;
 		gnutls_assert();
@@ -471,7 +471,7 @@ static int read_rsa_oaep_label(asn1_node root, const char *name,
 
 	size = sizeof(oid);
 	result = asn1_read_value(root, buffer, oid, &size);
-	if (result < 0) {
+	if (result != ASN1_SUCCESS) {
 		if (result != ASN1_ELEMENT_NOT_FOUND && allow_null)
 			return 0;
 
