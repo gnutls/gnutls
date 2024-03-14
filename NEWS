@@ -5,6 +5,20 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.8.4 (unreleased)
+
+** libgnutls: RSA-OAEP encryption scheme is now supported
+   To use it with an unrestricted RSA private key, one would need to
+   initialize a gnutls_x509_spki_t object with necessary parameters
+   for RSA-OAEP and attach it to the private key. It is also possible
+   to import restricted private keys if they are stored in PKCS#8
+   format.
+
+** API and ABI modifications:
+gnutls_x509_spki_get_rsa_oaep_params: New function.
+gnutls_x509_spki_set_rsa_oaep_params: New function.
+GNUTLS_PK_RSA_OAEP: New enum member of gnutls_pk_algorithm_t.
+
 * Version 3.8.3 (released 2024-01-16)
 
 ** libgnutls: Fix more timing side-channel inside RSA-PSK key exchange
