@@ -66,7 +66,7 @@ apt-get install -y texinfo texlive texlive-plain-generic texlive-extra-utils
 ```
 
 __NOTE:__ Some software versions might not be available in older releases, e.g. `nettle-dev`. 
-Available backport repos, APT-Pinning or source code compilating can be used to install these versions (and dependencies) from a newer release.
+Available backport repos, APT-Pinning or source code compiling can be used to install these versions (and dependencies) from a newer release.
 
 Fedora/RHEL:
 ```
