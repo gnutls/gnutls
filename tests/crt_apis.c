@@ -353,7 +353,7 @@ void doit(void)
 	assert(memcmp(out.data, saved_crt.data, out.size) == 0);
 #endif
 
-	/* test behavior of gnutls_x509_crt_export on varios corner cases */
+	/* test behavior of gnutls_x509_crt_export on various corner cases */
 	s = 0;
 	assert(gnutls_x509_crt_export(crt, GNUTLS_X509_FMT_PEM, NULL, &s) ==
 	       GNUTLS_E_SHORT_MEMORY_BUFFER);
