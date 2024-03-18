@@ -70,8 +70,3 @@ name = drbg_aes_reseed
 
 # The following should be removed in the new release, after updating the
 # abi-dump repository:
-[suppress_function]
-name = gnutls_x509_spki_get_rsa_oaep_params
-
-[suppress_function]
-name = gnutls_x509_spki_set_rsa_oaep_params
