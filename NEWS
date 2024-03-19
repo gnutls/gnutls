@@ -5,7 +5,7 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.8.4 (unreleased)
+* Version 3.8.4 (released 2024-03-18)
 
 ** libgnutls: RSA-OAEP encryption scheme is now supported
    To use it with an unrestricted RSA private key, one would need to
@@ -13,6 +13,25 @@ See the end for copying conditions.
    for RSA-OAEP and attach it to the private key. It is also possible
    to import restricted private keys if they are stored in PKCS#8
    format.
+
+** libgnutls: Fix side-channel in the deterministic ECDSA.
+   Reported by George Pantelakis (#1516).
+   [GNUTLS-SA-2023-12-04, CVSS: medium] [CVE-2024-28834]
+
+** libgnutls: Fixed a bug where certtool crashed when verifying a certificate
+   chain with more than 16 certificates. Reported by William Woodruff (#1525)
+   and yixiangzhike (#1527).
+   [GNUTLS-SA-2024-01-23, CVSS: medium] [CVE-2024-28835]
+
+** libgnutls: Compression libraries are now loaded dynamically as needed
+   instead of all being loaded during gnutls library initialization.
+   As a result, the library initialization should be faster.
+
+** build: The gnutls library can now be linked with the static library
+   of GMP.  Note that in order for this to work libgmp.a needs to be
+   compiled with -fPIC and libhogweed in Nettle also has to be linked
+   to the static library of GMP.  This can be used to prevent custom
+   memory allocators from being overriden by other applications.
 
 ** API and ABI modifications:
 gnutls_x509_spki_get_rsa_oaep_params: New function.

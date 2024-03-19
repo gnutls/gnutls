@@ -103,10 +103,16 @@ static void rnd_nonce_func(void *_ctx, size_t length, uint8_t *data)
 	}
 }
 
-static void rnd_mpz_func(void *_ctx, size_t length, uint8_t *data)
+static void rnd_datum_func(void *ctx, size_t length, uint8_t *data)
 {
-	mpz_t *k = _ctx;
-	nettle_mpz_get_str_256(length, data, *k);
+	gnutls_datum_t *d = ctx;
+
+	if (length > d->size) {
+		memset(data, 0, length - d->size);
+		memcpy(data + (length - d->size), d->data, d->size);
+	} else {
+		memcpy(data, d->data, length);
+	}
 }
 
 static void rnd_nonce_func_fallback(void *_ctx, size_t length, uint8_t *data)
@@ -1403,7 +1409,10 @@ static int _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 		struct dsa_signature sig;
 		int curve_id = pk_params->curve;
 		const struct ecc_curve *curve;
-		mpz_t k;
+		mpz_t q;
+		/* 521-bit elliptic curve generator at maximum */
+		uint8_t buf[(521 + 7) / 8];
+		gnutls_datum_t k = { NULL, 0 };
 		void *random_ctx;
 		nettle_random_func *random_func;
 
@@ -1447,17 +1456,32 @@ static int _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 			not_approved = true;
 		}
 
-		mpz_init(k);
+		mpz_init(q);
+
 		if (_gnutls_get_lib_state() == LIB_STATE_SELFTEST ||
 		    (sign_params->flags & GNUTLS_PK_FLAG_REPRODUCIBLE)) {
-			ret = _gnutls_ecdsa_compute_k(
-				k, curve_id, pk_params->params[ECC_K],
+			mp_limb_t h[DSA_COMPUTE_K_ITCH];
+
+			ret = _gnutls_ecc_curve_to_dsa_q(q, curve_id);
+			if (ret < 0)
+				goto ecdsa_cleanup;
+
+			ret = _gnutls_dsa_compute_k(
+				h, mpz_limbs_read(q), priv.p,
+				ecc_size(priv.ecc), ecc_bit_size(priv.ecc),
 				DIG_TO_MAC(sign_params->dsa_dig), vdata->data,
 				vdata->size);
 			if (ret < 0)
 				goto ecdsa_cleanup;
+
+			k.data = buf;
+			k.size = (ecc_bit_size(priv.ecc) + 7) / 8;
+
+			_gnutls_ecdsa_compute_k_finish(k.data, k.size, h,
+						       ecc_size(priv.ecc));
+
 			random_ctx = &k;
-			random_func = rnd_mpz_func;
+			random_func = rnd_datum_func;
 		} else {
 			random_ctx = NULL;
 			random_func = rnd_nonce_func;
@@ -1476,7 +1500,7 @@ static int _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 	ecdsa_cleanup:
 		dsa_signature_clear(&sig);
 		ecc_scalar_zclear(&priv);
-		mpz_clear(k);
+		mpz_clear(q);
 
 		if (ret < 0) {
 			gnutls_assert();
@@ -1488,7 +1512,9 @@ static int _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 		struct dsa_params pub;
 		bigint_t priv;
 		struct dsa_signature sig;
-		mpz_t k;
+		/* 512-bit DSA subgroup at maximum */
+		uint8_t buf[(512 + 7) / 8];
+		gnutls_datum_t k = { NULL, 0 };
 		void *random_ctx;
 		nettle_random_func *random_func;
 
@@ -1515,19 +1541,27 @@ static int _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 			hash_len = vdata->size;
 		}
 
-		mpz_init(k);
 		if (_gnutls_get_lib_state() == LIB_STATE_SELFTEST ||
 		    (sign_params->flags & GNUTLS_PK_FLAG_REPRODUCIBLE)) {
+			mp_limb_t h[DSA_COMPUTE_K_ITCH];
+
 			ret = _gnutls_dsa_compute_k(
-				k, pub.q, TOMPZ(priv),
+				h, mpz_limbs_read(pub.q),
+				mpz_limbs_read(TOMPZ(priv)), mpz_size(pub.q),
+				mpz_sizeinbase(pub.q, 2),
 				DIG_TO_MAC(sign_params->dsa_dig), vdata->data,
 				vdata->size);
 			if (ret < 0)
 				goto dsa_fail;
-			/* cancel-out dsa_sign's addition of 1 to random data */
-			mpz_sub_ui(k, k, 1);
+
+			k.data = buf;
+			k.size = (mpz_sizeinbase(pub.q, 2) + 7) / 8;
+
+			_gnutls_dsa_compute_k_finish(k.data, k.size, h,
+						     mpz_size(pub.q));
+
 			random_ctx = &k;
-			random_func = rnd_mpz_func;
+			random_func = rnd_datum_func;
 		} else {
 			random_ctx = NULL;
 			random_func = rnd_nonce_func;
@@ -1544,7 +1578,6 @@ static int _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 
 	dsa_fail:
 		dsa_signature_clear(&sig);
-		mpz_clear(k);
 
 		if (ret < 0) {
 			gnutls_assert();

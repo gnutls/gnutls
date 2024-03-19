@@ -25,7 +25,7 @@
 #include "errors.h"
 #include <libtasn1.h>
 #include "global.h"
-#include "num.h" /* MAX */
+#include "num.h" /* MIN */
 #include "tls-sig.h"
 #include "str.h"
 #include "datum.h"
@@ -1361,7 +1361,8 @@ int gnutls_x509_trust_list_verify_crt2(
 	int ret = 0;
 	unsigned int i;
 	size_t hash;
-	gnutls_x509_crt_t sorted[DEFAULT_MAX_VERIFY_DEPTH];
+	gnutls_x509_crt_t *cert_list_copy = NULL;
+	unsigned int cert_list_max_size = 0;
 	gnutls_x509_crt_t retrieved[DEFAULT_MAX_VERIFY_DEPTH];
 	unsigned int retrieved_size = 0;
 	const char *hostname = NULL, *purpose = NULL, *email = NULL;
@@ -1421,16 +1422,28 @@ int gnutls_x509_trust_list_verify_crt2(
 		}
 	}
 
-	memcpy(sorted, cert_list, cert_list_size * sizeof(gnutls_x509_crt_t));
-	cert_list = sorted;
+	/* Allocate extra for retrieved certificates. */
+	if (!INT_ADD_OK(cert_list_size, DEFAULT_MAX_VERIFY_DEPTH,
+			&cert_list_max_size))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	cert_list_copy = _gnutls_reallocarray(NULL, cert_list_max_size,
+					      sizeof(gnutls_x509_crt_t));
+	if (!cert_list_copy)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+	memcpy(cert_list_copy, cert_list,
+	       cert_list_size * sizeof(gnutls_x509_crt_t));
+	cert_list = cert_list_copy;
 
 	records = gl_list_nx_create_empty(GL_LINKEDHASH_LIST, cert_eq,
 					  cert_hashcode, NULL, false);
-	if (records == NULL)
-		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+	if (records == NULL) {
+		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		goto cleanup;
+	}
 
-	for (i = 0; i < cert_list_size &&
-		    cert_list_size <= DEFAULT_MAX_VERIFY_DEPTH;) {
+	for (i = 0; i < cert_list_size;) {
 		unsigned int sorted_size = 1;
 		unsigned int j, k;
 		gnutls_x509_crt_t issuer;
@@ -1442,8 +1455,7 @@ int gnutls_x509_trust_list_verify_crt2(
 
 		assert(sorted_size > 0);
 
-		/* Remove duplicates. Start with index 1, as the first element
-		 * may be re-checked after issuer retrieval. */
+		/* Remove duplicates. */
 		for (j = 0; j < sorted_size; j++) {
 			if (gl_list_search(records, cert_list[i + j])) {
 				if (i + j < cert_list_size - 1) {
@@ -1495,13 +1507,15 @@ int gnutls_x509_trust_list_verify_crt2(
 
 		ret = retrieve_issuers(
 			list, cert_list[i - 1], &retrieved[retrieved_size],
-			DEFAULT_MAX_VERIFY_DEPTH -
-				MAX(retrieved_size, cert_list_size));
+			MIN(DEFAULT_MAX_VERIFY_DEPTH - retrieved_size,
+			    cert_list_max_size - cert_list_size));
 		if (ret < 0) {
 			break;
 		} else if (ret > 0) {
 			assert((unsigned int)ret <=
-			       DEFAULT_MAX_VERIFY_DEPTH - cert_list_size);
+			       DEFAULT_MAX_VERIFY_DEPTH - retrieved_size);
+			assert((unsigned int)ret <=
+			       cert_list_max_size - cert_list_size);
 			memmove(&cert_list[i + ret], &cert_list[i],
 				(cert_list_size - i) *
 					sizeof(gnutls_x509_crt_t));
@@ -1517,8 +1531,10 @@ int gnutls_x509_trust_list_verify_crt2(
 	}
 
 	cert_list_size = shorten_clist(list, cert_list, cert_list_size);
-	if (cert_list_size <= 0)
-		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+	if (cert_list_size <= 0) {
+		ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+		goto cleanup;
+	}
 
 	hash = hash_pjw_bare(cert_list[cert_list_size - 1]->raw_issuer_dn.data,
 			     cert_list[cert_list_size - 1]->raw_issuer_dn.size);
@@ -1661,10 +1677,13 @@ int gnutls_x509_trust_list_verify_crt2(
 	}
 
 cleanup:
+	gnutls_free(cert_list_copy);
 	for (i = 0; i < retrieved_size; i++) {
 		gnutls_x509_crt_deinit(retrieved[i]);
 	}
-	gl_list_free(records);
+	if (records) {
+		gl_list_free(records);
+	}
 	return ret;
 }
 
