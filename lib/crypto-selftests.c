@@ -2088,6 +2088,14 @@ const struct hash_vectors_st md5_vectors[] = {
 	},
 };
 
+const struct hash_vectors_st rmd160_vectors[] = {
+	{
+		STR(plaintext, plaintext_size, "abcdefghijklmnopqrstuvwxyz"),
+		STR(output, output_size,
+		    "\xf7\x1c\x27\x10\x9c\x69\x2c\x1b\x56\xbb\xdc\xeb\x5b\x9d\x28\x65\xb3\x70\x8d\xbc"),
+	},
+};
+
 const struct hash_vectors_st sha1_vectors[] = {
 	{
 		STR(plaintext, plaintext_size, "what do ya want for nothing?"),
@@ -2861,6 +2869,8 @@ int gnutls_digest_self_test(unsigned flags, gnutls_digest_algorithm_t digest)
 	switch (digest) {
 	case GNUTLS_DIG_UNKNOWN:
 		NON_FIPS_CASE(GNUTLS_DIG_MD5, test_digest, md5_vectors);
+		FALLTHROUGH;
+		NON_FIPS_CASE(GNUTLS_DIG_RMD160, test_digest, rmd160_vectors);
 		FALLTHROUGH;
 		CASE(GNUTLS_DIG_SHA1, test_digest, sha1_vectors);
 		FALLTHROUGH;
