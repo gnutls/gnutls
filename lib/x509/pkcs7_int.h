@@ -50,7 +50,8 @@ typedef enum schema_id {
 	PKCS12_3DES_SHA1, /* the stuff in PKCS #12 */
 	PKCS12_ARCFOUR_SHA1,
 	PKCS12_RC2_40_SHA1,
-	PBES1_DES_MD5 /* openssl before 1.1.0 uses that by default */
+	PBES1_DES_MD5, /* openssl before 1.1.0 uses that by default */
+	PBES1_DES_SHA1 /* for compatibility */
 } schema_id;
 
 struct pkcs_cipher_schema_st {
@@ -82,6 +83,13 @@ int _gnutls_decrypt_pbes1_des_md5_data(const char *password,
 				       const struct pbe_enc_params *enc_params,
 				       const gnutls_datum_t *encrypted_data,
 				       gnutls_datum_t *decrypted_data);
+
+int _gnutls_decrypt_pbes1_des_sha1_data(const char *password,
+					unsigned password_len,
+					const struct pbkdf2_params *kdf_params,
+					const struct pbe_enc_params *enc_params,
+					const gnutls_datum_t *encrypted_data,
+					gnutls_datum_t *decrypted_data);
 
 int _gnutls_check_pkcs_cipher_schema(const char *oid);
 

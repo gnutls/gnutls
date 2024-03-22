@@ -1012,6 +1012,7 @@ unsigned gnutls_x509_crt_check_key_purpose(gnutls_x509_crt_t cert,
  * @GNUTLS_PKCS_PBES2_AES_256: PBES2 AES-256.
  * @GNUTLS_PKCS_PBES2_DES: PBES2 single DES.
  * @GNUTLS_PKCS_PBES1_DES_MD5: PBES1 with single DES; for compatibility with openssl only.
+ * @GNUTLS_PKCS_PBES1_DES_SHA1: PBES1 with single DES; for compatibility purposes only.
  * @GNUTLS_PKCS_PBES2_GOST_TC26Z: PBES2 GOST 28147-89 CFB with TC26-Z S-box.
  * @GNUTLS_PKCS_PBES2_GOST_CPA: PBES2 GOST 28147-89 CFB with CryptoPro-A S-box.
  * @GNUTLS_PKCS_PBES2_GOST_CPB: PBES2 GOST 28147-89 CFB with CryptoPro-B S-box.
@@ -1036,7 +1037,8 @@ typedef enum gnutls_pkcs_encrypt_flags_t {
 	GNUTLS_PKCS_PBES2_GOST_CPA = 1 << 12,
 	GNUTLS_PKCS_PBES2_GOST_CPB = 1 << 13,
 	GNUTLS_PKCS_PBES2_GOST_CPC = 1 << 14,
-	GNUTLS_PKCS_PBES2_GOST_CPD = 1 << 15
+	GNUTLS_PKCS_PBES2_GOST_CPD = 1 << 15,
+	GNUTLS_PKCS_PBES1_DES_SHA1 = 1 << 16
 } gnutls_pkcs_encrypt_flags_t;
 
 #define GNUTLS_PKCS_CIPHER_MASK(x) ((x) & (~(GNUTLS_PKCS_NULL_PASSWORD)))

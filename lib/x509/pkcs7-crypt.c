@@ -38,6 +38,7 @@
 #include "pk.h"
 
 #define PBES1_DES_MD5_OID "1.2.840.113549.1.5.3"
+#define PBES1_DES_SHA1_OID "1.2.840.113549.1.5.10"
 
 #define PBES2_OID "1.2.840.113549.1.5.13"
 #define PBKDF2_OID "1.2.840.113549.1.5.12"
@@ -60,6 +61,16 @@ static const struct pkcs_cipher_schema_st avail_pkcs_cipher_schemas[] = {
 	  .pbes2 = 0,
 	  .cipher_oid = PBES1_DES_MD5_OID,
 	  .write_oid = PBES1_DES_MD5_OID,
+	  .desc = NULL,
+	  .iv_name = NULL,
+	  .decrypt_only = 1 },
+	{ .schema = PBES1_DES_SHA1,
+	  .name = "PBES1-DES-CBC-SHA1",
+	  .flag = GNUTLS_PKCS_PBES1_DES_SHA1,
+	  .cipher = GNUTLS_CIPHER_DES_CBC,
+	  .pbes2 = 0,
+	  .cipher_oid = PBES1_DES_SHA1_OID,
+	  .write_oid = PBES1_DES_SHA1_OID,
 	  .desc = NULL,
 	  .iv_name = NULL,
 	  .decrypt_only = 1 },
@@ -995,7 +1006,7 @@ int _gnutls_read_pkcs_schema_params(schema_id *schema, const char *password,
 
 		*schema = p->schema;
 		return 0;
-	} else if (*schema == PBES1_DES_MD5) {
+	} else if (*schema == PBES1_DES_MD5 || *schema == PBES1_DES_SHA1) {
 		return _gnutls_read_pbkdf1_params(data, data_size, kdf_params,
 						  enc_params);
 	} else { /* PKCS #12 schema */
@@ -1114,6 +1125,14 @@ int _gnutls_pkcs_raw_decrypt_data(schema_id schema, asn1_node pkcs8_asn,
 		ret = _gnutls_decrypt_pbes1_des_md5_data(password, pass_len,
 							 kdf_params, enc_params,
 							 &enc, decrypted_data);
+		if (ret < 0)
+			goto error;
+		goto cleanup;
+	} else if (schema == PBES1_DES_SHA1) {
+		ret = _gnutls_decrypt_pbes1_des_sha1_data(password, pass_len,
+							  kdf_params,
+							  enc_params, &enc,
+							  decrypted_data);
 		if (ret < 0)
 			goto error;
 		goto cleanup;

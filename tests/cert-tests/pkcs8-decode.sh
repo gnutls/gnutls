@@ -53,6 +53,21 @@ for p8 in "pkcs8-pbes1-des-md5.pem password" "encpkcs8.pem foobar" "unencpkcs8.p
 	fi
 done
 
+for p8 in "der-key-PBE-SHA1-DES.p8 booo"; do
+	set -- ${p8}
+	file="$1"
+	passwd="$2"
+	${VALGRIND} "${CERTTOOL}" --key-info --pkcs8 --inder \
+		    --password "${passwd}" --infile "${srcdir}/data/${file}"
+	rc=$?
+	if test ${rc} != 0; then
+		echo "PKCS8 FATAL ${p8}"
+		ret=1
+	else
+		echo "PKCS8 OK ${p8}"
+	fi
+done
+
 for p8 in "openssl-aes128.p8" "openssl-aes256.p8" "openssl-3des.p8"; do
 	set -- ${p8}
 	file="$1"
