@@ -53,6 +53,7 @@ static void encrypt_decrypt_data(gnutls_privkey_t privkey,
 	gnutls_pubkey_t pubkey;
 	gnutls_datum_t ciphertext = { NULL, 0 };
 	gnutls_datum_t decrypted = { NULL, 0 };
+	gnutls_datum_t uninitialized;
 
 	assert(gnutls_pubkey_init(&pubkey) >= 0);
 	ret = gnutls_pubkey_import_privkey(pubkey, privkey, 0, 0);
@@ -69,6 +70,15 @@ static void encrypt_decrypt_data(gnutls_privkey_t privkey,
 	fips_push_context(fips_context);
 	ret = gnutls_privkey_decrypt_data(privkey, 0, &ciphertext, &decrypted);
 	fips_pop_context(fips_context, exp_state);
+
+	/* gnutls_privkey_decrypt_data shouldn't touch plaintext upon
+	 * failure */
+	assert(ciphertext.size >= 4);
+	memcpy(ciphertext.data, "\xde\xad\xbe\xef", 4);
+	ret = gnutls_privkey_decrypt_data(privkey, 0, &ciphertext,
+					  &uninitialized);
+	if (ret >= 0)
+		fail("gnutls_privkey_decrypt_data unexpectedly succeeded\n");
 
 out:
 	gnutls_pubkey_deinit(pubkey);

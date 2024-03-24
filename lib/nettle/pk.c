@@ -1034,7 +1034,6 @@ static int _wrap_nettle_pk_decrypt(gnutls_pk_algorithm_t algo,
 cleanup:
 	gnutls_free(buf);
 	if (ret < 0) {
-		gnutls_free(plaintext->data);
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 	} else if (not_approved) {
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_NOT_APPROVED);
