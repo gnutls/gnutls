@@ -113,6 +113,15 @@ for f in $IMPORTS; do
 	;;
     esac
     case $dst in
+      */rsa-sign-tr.c)
+	sed \
+	  -e '/^#include <nettle\/rsa\.h>/i\
+#define nettle_rsa_compute_root_tr _gnutls_nettle_backport_rsa_compute_root_tr\
+' \
+	  $dst > $dst-t && mv $dst-t $dst
+	;;
+    esac
+    case $dst in
       */rsa-oaep-*.c)
 	sed \
 	  -e '/^#include <nettle\/rsa\.h>/a\
