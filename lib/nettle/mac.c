@@ -28,6 +28,7 @@
 #include "errors.h"
 #include <nettle/md5.h>
 #include <nettle/md2.h>
+#include <nettle/ripemd160.h>
 #include <nettle/sha.h>
 #include <nettle/sha3.h>
 #include <nettle/hmac.h>
@@ -82,6 +83,7 @@ struct nettle_hash_ctx {
 		struct sha3_512_ctx sha3_512;
 		struct sha1_ctx sha1;
 		struct md2_ctx md2;
+		struct ripemd160_ctx ripemd160;
 		struct md5_sha1_ctx md5_sha1;
 #if ENABLE_GOST
 		struct gosthash94cp_ctx gosthash94cp;
@@ -737,6 +739,14 @@ static int _ctx_init(gnutls_digest_algorithm_t algo,
 		ctx->digest = (digest_func)md2_digest;
 		ctx->ctx_ptr = &ctx->ctx.md2;
 		ctx->length = MD2_DIGEST_SIZE;
+		break;
+
+	case GNUTLS_DIG_RMD160:
+		ripemd160_init(&ctx->ctx.ripemd160);
+		ctx->update = (update_func)ripemd160_update;
+		ctx->digest = (digest_func)ripemd160_digest;
+		ctx->ctx_ptr = &ctx->ctx.ripemd160;
+		ctx->length = RIPEMD160_DIGEST_SIZE;
 		break;
 #if ENABLE_GOST
 	case GNUTLS_DIG_GOSTR_94:
