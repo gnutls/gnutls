@@ -3379,6 +3379,7 @@ gnutls_transport_is_ktls_enabled(gnutls_session_t session);
 #define GNUTLS_E_TOO_MANY_HANDSHAKE_PACKETS -81
 #define GNUTLS_E_RECEIVED_DISALLOWED_NAME -82 /* GNUTLS_A_ILLEGAL_PARAMETER */
 #define GNUTLS_E_CERTIFICATE_REQUIRED -112 /* GNUTLS_A_CERTIFICATE_REQUIRED */
+#define GNUTLS_E_UNSUPPORTED_ENCRYPTION_ALGORITHM -113
 
 /* returned if you need to generate temporary RSA
    * parameters. These are needed for export cipher suites.

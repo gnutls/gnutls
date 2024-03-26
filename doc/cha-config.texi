@@ -27,6 +27,7 @@ used can be queried using @funcref{gnutls_get_system_config_file}.
 * Overriding the parameter verification profile::
 * Overriding the default priority string::
 * Enabling/Disabling system/acceleration protocols::
+* Enabling/Disabling RSAES-PKCS1-v1_5
 @end menu
 
 @node Application-specific priority strings
@@ -264,3 +265,17 @@ ktls = true
 @subsection Enabling KTLS
 When GnuTLS is build with -–enable-ktls configuration, KTLS is disabled by default.
 This can be enabled by setting @code{ktls = true} in @code{[global]} section.
+
+
+@node Enabling/Disabling RSAES-PKCS1-v1_5
+@section Enabling/Disabling RSAES-PKCS1-v1_5
+
+This option can be used to enable/disable RSA PKCS1 v1.5 encryption and decryption
+in GnuTLS. The RSAES-PKCS1-v1_5 is enabled by default.
+
+Below example shows how to explicitely disable the RSAES-PKCS1-v1_5.
+@example
+[overrides]
+allow-rsa-pkcs1-encrypt = false
+
+@end example

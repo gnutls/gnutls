@@ -996,6 +996,7 @@ static void dummy_func(gnutls_priority_t c)
 struct cfg {
 	bool allowlisting;
 	bool ktls_enabled;
+	bool allow_rsa_pkcs1_encrypt;
 
 	name_val_array_t priority_strings;
 	char *priority_string;
@@ -1119,6 +1120,7 @@ static inline void cfg_steal(struct cfg *dst, struct cfg *src)
 
 	dst->allowlisting = src->allowlisting;
 	dst->ktls_enabled = src->ktls_enabled;
+	dst->allow_rsa_pkcs1_encrypt = src->allow_rsa_pkcs1_encrypt;
 	dst->force_ext_master_secret = src->force_ext_master_secret;
 	dst->force_ext_master_secret_set = src->force_ext_master_secret_set;
 	memcpy(dst->ciphers, src->ciphers, sizeof(src->ciphers));
@@ -1420,6 +1422,9 @@ static inline int cfg_apply(struct cfg *cfg, struct ini_ctx *ctx)
 	if (cfg->default_priority_string) {
 		_gnutls_default_priority_string = cfg->default_priority_string;
 	}
+
+	/* enable RSA-PKCS1-V1_5 by default */
+	cfg->allow_rsa_pkcs1_encrypt = true;
 
 	if (cfg->allowlisting) {
 		/* also updates `flags` of global `hash_algorithms[]` */
@@ -2047,6 +2052,20 @@ static int cfg_ini_handler(void *_ctx, const char *section, const char *name,
 				_gnutls_debug_log(
 					"cfg: unknown value for %s: %s\n", name,
 					value);
+				if (fail_on_invalid_config)
+					return 0;
+				goto exit;
+			}
+		} else if (c_strcasecmp(name, "allow-rsa-pkcs1-encrypt") == 0) {
+			p = clear_spaces(value, str);
+			if (c_strcasecmp(p, "true") == 0) {
+				cfg->allow_rsa_pkcs1_encrypt = true;
+			} else if (c_strcasecmp(p, "false") == 0) {
+				cfg->allow_rsa_pkcs1_encrypt = false;
+			} else {
+				_gnutls_debug_log(
+					"cfg: unknown RSA PKCS1 encryption mode %s\n",
+					p);
 				if (fail_on_invalid_config)
 					return 0;
 				goto exit;
@@ -3895,6 +3914,11 @@ const char *gnutls_priority_string_list(unsigned iter, unsigned int flags)
 bool _gnutls_config_is_ktls_enabled(void)
 {
 	return system_wide_config.ktls_enabled;
+}
+
+bool _gnutls_config_is_rsa_pkcs1_encrypt_allowed(void)
+{
+	return system_wide_config.allow_rsa_pkcs1_encrypt;
 }
 
 /*
