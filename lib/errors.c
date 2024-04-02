@@ -417,6 +417,8 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_NO_COMMON_KEY_SHARE),
 	ERROR_ENTRY(N_("The early data were rejected."),
 		    GNUTLS_E_EARLY_DATA_REJECTED),
+	ERROR_ENTRY(N_("The encryption algorithm is not supported."),
+		    GNUTLS_E_UNSUPPORTED_ENCRYPTION_ALGORITHM),
 	{ NULL, NULL, 0 }
 };
 

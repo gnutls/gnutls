@@ -5,6 +5,20 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.8.5 (unreleased ????-??-??)
+
+** libgnutls: Due to majority of usages and implementations of
+   RSA decryption with PKCS#1 v1.5 padding being incorrect,
+   leaving them vulnerable to Marvin attack, the RSAES-PKCS1-v1_5
+   is being deprecated (encryption and decryption) and will be
+   disabled in the future. A new option `allow-rsa-pkcs1-encrypt`
+   has been added into the system-wide library configuration which
+   allows to enable/disable the RSAES-PKCS1-v1_5. Currently, the
+   RSAES-PKCS1-v1_5 is enabled by default.
+
+** API and ABI modifications:
+No changes since last version.
+
 * Version 3.8.4 (released 2024-03-18)
 
 ** libgnutls: RSA-OAEP encryption scheme is now supported

@@ -1793,5 +1793,6 @@ get_certificate_type(gnutls_session_t session, gnutls_ctype_target_t target)
 extern unsigned int _gnutls_global_version;
 
 bool _gnutls_config_is_ktls_enabled(void);
+bool _gnutls_config_is_rsa_pkcs1_encrypt_allowed(void);
 
 #endif /* GNUTLS_LIB_GNUTLS_INT_H */
