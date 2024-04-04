@@ -5,7 +5,7 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.8.5 (unreleased ????-??-??)
+* Version 3.8.5 (released 2024-04-04)
 
 ** libgnutls: Due to majority of usages and implementations of
    RSA decryption with PKCS#1 v1.5 padding being incorrect,
@@ -16,8 +16,19 @@ See the end for copying conditions.
    allows to enable/disable the RSAES-PKCS1-v1_5. Currently, the
    RSAES-PKCS1-v1_5 is enabled by default.
 
+** libgnutls: Added support for RIPEMD160 and PBES1-DES-SHA1 for
+   backward compatibility with GCR.
+
+** libgnutls: A couple of memory related issues have been fixed in RSA PKCS#1
+   v1.5 decryption error handling and deterministic ECDSA with earlier
+   versions of GMP.  These were a regression introduced in the 3.8.4
+   release. See #1535 and !1827.
+
+** build: Fixed a bug where building gnutls statically failed due
+   to a duplicate definition of nettle_rsa_compute_root_tr().
+
 ** API and ABI modifications:
-No changes since last version.
+GNUTLS_PKCS_PBES1_DES_SHA1: New enum member of gnutls_pkcs_encrypt_flags_t
 
 * Version 3.8.4 (released 2024-03-18)
 
