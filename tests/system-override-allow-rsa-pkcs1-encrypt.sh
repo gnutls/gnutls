@@ -19,9 +19,8 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-: ${srcdir=.}
-TEST=${srcdir}/rsaes-pkcs1-v1_5
-CONF=${srcdir}/config.$$.tmp
+TEST=${builddir}/rsaes-pkcs1-v1_5
+CONF=config.$$.tmp
 export GNUTLS_SYSTEM_PRIORITY_FILE=${CONF}
 export GNUTLS_SYSTEM_PRIORITY_FAIL_ON_INVALID=1
 
@@ -38,15 +37,33 @@ cat <<_EOF_ > ${CONF}
 allow-rsa-pkcs1-encrypt = true
 _EOF_
 
-${TEST} && fail "RSAES-PKCS1-v1_5 expected to succeed"
+${TEST}
+if [ $? != 0 ]; then
+	echo "${TEST} expected to succeed"
+	exit 1
+fi
+echo "RSAES-PKCS1-v1_5 successfully enabled"
 
 cat <<_EOF_ > ${CONF}
 [overrides]
 allow-rsa-pkcs1-encrypt = false
 _EOF_
 
-${TEST} || fail "RSAES-PKCS1-v1_5 expected to fail"
+${TEST}
+if [ $? = 0 ]; then
+	echo "${TEST} expected to fail"
+	exit 1
+fi
+echo "RSAES-PKCS1-v1_5 successfully disabled"
 
 unset GNUTLS_SYSTEM_PRIORITY_FILE
 unset GNUTLS_SYSTEM_PRIORITY_FAIL_ON_INVALID
+
+${TEST}
+if [ $? != 0 ]; then
+	echo "${TEST} expected to succeed by default"
+	exit 1
+fi
+echo "RSAES-PKCS1-v1_5 successfully enabled by default"
+
 exit 0
