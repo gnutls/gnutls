@@ -640,7 +640,7 @@ fedora-abicoverage/test:
     - make abi-check
     - make pic-check
     - make -j$CHECKJOBS check
-    - gcovr --xml-pretty --exclude-unreachable-branches --print-summary -o coverage.xml --root ${CI_PROJECT_DIR}
+    - gcovr -fprofile-update=atomic --xml-pretty --exclude-unreachable-branches --print-summary -o coverage.xml --root ${CI_PROJECT_DIR}
     - if objdump -R lib/.libs/libgnutls.so | grep INTERNAL ; then false ; fi
   coverage: /^\s*lines:\s*\d+.\d+\%/
   artifacts:
