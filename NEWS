@@ -5,6 +5,30 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.7.11 (released 2024-04-13)
+
+** libgnutls: Fix side-channel in the deterministic ECDSA.
+   Reported by George Pantelakis (#1516).
+   [GNUTLS-SA-2023-12-04, CVSS: medium] [CVE-2024-28834]
+
+** libgnutls: Fixed a bug where certtool crashed when verifying a certificate
+   chain with more than 16 certificates. Reported by William Woodruff (#1525)
+   and yixiangzhike (#1527).
+   [GNUTLS-SA-2024-01-23, CVSS: medium] [CVE-2024-28835]
+
+** libgnutls: Fix more timing side-channel inside RSA-PSK key exchange
+   [GNUTLS-SA-2024-01-14, CVSS: medium] [CVE-2024-0553]
+
+** libgnutls: Fix assertion failure when verifying a certificate chain with a
+   cycle of cross signatures
+   [GNUTLS-SA-2024-01-09, CVSS: medium] [CVE-2024-0567]
+
+** libgnutls: Fix timing side-channel inside RSA-PSK key exchange.
+   [GNUTLS-SA-2023-10-23, CVSS: medium] [CVE-2023-5981]
+
+** API and ABI modifications:
+No changes since last version.
+
 * Version 3.7.10 (released 2023-08-03)
 
 ** libgnutls: Fixed removal of duplicate certificates during verification.
