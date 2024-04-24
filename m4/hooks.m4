@@ -97,7 +97,7 @@ AC_MSG_ERROR([[
     GMP_CFLAGS=""
     GMP_LIBS=""
   else
-    if test x$GMP_LIBS = x; then
+    if test "x$GMP_LIBS" = "x"; then
 	AC_CHECK_LIB(gmp, __gmpz_cmp, [GMP_LIBS="-lgmp"], [AC_MSG_ERROR([[
 ***
 *** gmp was not found.
