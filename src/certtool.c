@@ -2959,6 +2959,7 @@ void generate_pkcs8(common_info_st *cinfo)
 void generate_pkcs12(common_info_st *cinfo)
 {
 	gnutls_pkcs12_t pkcs12;
+	gnutls_pkcs12_flags_t pkcs12_flags = 0;
 	gnutls_x509_crl_t *crls;
 	gnutls_x509_crt_t *crts, ca_crt;
 	gnutls_x509_privkey_t *keys;
@@ -3000,6 +3001,9 @@ void generate_pkcs12(common_info_st *cinfo)
 	} else {
 		name = get_pkcs12_key_name();
 	}
+
+	if (HAVE_OPT(PBMAC1))
+		pkcs12_flags |= GNUTLS_PKCS12_USE_PBMAC1;
 
 	result = gnutls_pkcs12_init(&pkcs12);
 	if (result < 0) {
@@ -3215,7 +3219,7 @@ void generate_pkcs12(common_info_st *cinfo)
 		gnutls_pkcs12_bag_deinit(kbag);
 	}
 
-	result = gnutls_pkcs12_generate_mac2(pkcs12, mac, pass);
+	result = gnutls_pkcs12_generate_mac3(pkcs12, mac, pass, pkcs12_flags);
 	if (result < 0) {
 		fprintf(stderr, "generate_mac: %s\n", gnutls_strerror(result));
 		app_exit(1);

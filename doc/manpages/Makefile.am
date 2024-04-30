@@ -610,6 +610,7 @@ APIMANS += gnutls_pkcs12_export.3
 APIMANS += gnutls_pkcs12_export2.3
 APIMANS += gnutls_pkcs12_generate_mac.3
 APIMANS += gnutls_pkcs12_generate_mac2.3
+APIMANS += gnutls_pkcs12_generate_mac3.3
 APIMANS += gnutls_pkcs12_get_bag.3
 APIMANS += gnutls_pkcs12_import.3
 APIMANS += gnutls_pkcs12_init.3

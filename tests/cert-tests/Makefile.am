@@ -102,6 +102,11 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/chain-512-leaf.pem data/chain-512-subca.pem data/chain-512-ca.pem \
 	templates/template-no-ca-honor.tmpl templates/template-no-ca-explicit.tmpl \
 	data/crq-cert-no-ca-explicit.pem data/crq-cert-no-ca-honor.pem data/commonName.cer \
+	data/pbmac1_256_256.bad-iter.p12 data/pbmac1_256_256.bad-salt.p12 \
+	data/pbmac1_256_256.good.p12 data/pbmac1_256_256.no-len.p12 \
+	data/pbmac1_256_256.short-len.p12 \
+	data/pbmac1_512_256.good.p12 data/pbmac1_512_512.good.p12 \
+	data/pbmac1-simple.p12 \
 	templates/simple-policy.tmpl data/simple-policy.pem templates/template-negative-serial.tmpl \
 	templates/template-encryption-only.tmpl
 
@@ -110,7 +115,7 @@ dist_check_SCRIPTS = pathlen.sh aki.sh invalid-sig.sh email.sh \
 	provable-dh.sh sha2-test.sh sha2-dsa-test.sh provable-privkey-dsa2048.sh \
 	provable-privkey-rsa2048.sh provable-privkey-gen-default.sh pkcs7-constraints.sh \
 	pkcs7-constraints2.sh certtool-long-oids.sh pkcs7-cat.sh cert-sanity.sh cert-critical.sh \
-	pkcs12.sh certtool-crl-decoding.sh pkcs12-encode.sh pkcs12-corner-cases.sh inhibit-anypolicy.sh \
+	pkcs12.sh certtool-crl-decoding.sh pkcs12-encode.sh pkcs12-corner-cases.sh pkcs12-pbmac1.sh inhibit-anypolicy.sh \
 	smime.sh cert-time.sh alt-chain.sh pkcs7-list-sign.sh pkcs7-eddsa.sh certtool-ecdsa.sh \
 	key-id.sh pkcs8.sh pkcs8-decode.sh ecdsa.sh illegal-rsa.sh pkcs8-invalid.sh key-invalid.sh \
 	pkcs8-eddsa.sh certtool-subca.sh certtool-verify-profiles.sh x509-duplicate-ext.sh x25519-and-x448.sh \
