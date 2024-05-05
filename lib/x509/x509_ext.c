@@ -1466,7 +1466,7 @@ int gnutls_x509_ext_export_basic_constraints(unsigned int ca, int pathlen,
 
 	if (pathlen < 0) {
 		result = asn1_write_value(c2, "pathLenConstraint", NULL, 0);
-		if (result < 0)
+		if (result != ASN1_SUCCESS)
 			result = _gnutls_asn2err(result);
 	} else
 		result = _gnutls_x509_write_uint32(c2, "pathLenConstraint",
@@ -1633,7 +1633,7 @@ int gnutls_x509_ext_export_proxy(int pathLenConstraint,
 
 	result = asn1_write_value(c2, "proxyPolicy.policyLanguage",
 				  policyLanguage, 1);
-	if (result < 0) {
+	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
 		goto cleanup;
@@ -1641,7 +1641,7 @@ int gnutls_x509_ext_export_proxy(int pathLenConstraint,
 
 	result = asn1_write_value(c2, "proxyPolicy.policy", policy,
 				  sizeof_policy);
-	if (result < 0) {
+	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
 		goto cleanup;

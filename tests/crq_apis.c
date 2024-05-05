@@ -97,6 +97,7 @@ static gnutls_x509_crq_t generate_crq(void)
 	int ret;
 	size_t s = 0;
 	char smallbuf[10];
+	char oidbuf[128];
 	gnutls_datum_t out;
 	unsigned crit;
 
@@ -163,8 +164,12 @@ static gnutls_x509_crq_t generate_crq(void)
 
 	s = 0;
 	ret = gnutls_x509_crq_get_extension_info(crq, 0, NULL, &s, NULL);
-	if (ret != 0)
+	if (ret != GNUTLS_E_SHORT_MEMORY_BUFFER || s > sizeof(oidbuf))
 		fail("gnutls_x509_crq_get_extension_info2\n");
+
+	ret = gnutls_x509_crq_get_extension_info(crq, 0, oidbuf, &s, NULL);
+	if (ret != 0)
+		fail("gnutls_x509_crq_get_extension_info3\n");
 
 	s = 0;
 	ret = gnutls_x509_crq_get_extension_data(crq, 0, NULL, &s);

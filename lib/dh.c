@@ -735,8 +735,11 @@ int gnutls_dh_params_export2_pkcs3(gnutls_dh_params_t params,
 	if (params->q_bits > 0)
 		result = _gnutls_x509_write_uint32(c2, "privateValueLength",
 						   params->q_bits);
-	else
+	else {
 		result = asn1_write_value(c2, "privateValueLength", NULL, 0);
+		if (result != ASN1_SUCCESS)
+			result = _gnutls_asn2err(result);
+	}
 
 	if (result < 0) {
 		gnutls_assert();

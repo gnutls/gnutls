@@ -404,14 +404,15 @@ int _gnutls_x509_set_time(asn1_node c2, const char *where, time_t tim,
 
 	_gnutls_str_cpy(name, sizeof(name), where);
 	if (tag == ASN1_TAG_UTCTime) {
-		if ((result = asn1_write_value(c2, where, "utcTime", 1)) < 0) {
+		if ((result = asn1_write_value(c2, where, "utcTime", 1)) !=
+		    ASN1_SUCCESS) {
 			gnutls_assert();
 			return _gnutls_asn2err(result);
 		}
 		_gnutls_str_cat(name, sizeof(name), ".utcTime");
 	} else {
-		if ((result = asn1_write_value(c2, where, "generalTime", 1)) <
-		    0) {
+		if ((result = asn1_write_value(c2, where, "generalTime", 1)) !=
+		    ASN1_SUCCESS) {
 			gnutls_assert();
 			return _gnutls_asn2err(result);
 		}
