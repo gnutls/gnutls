@@ -656,7 +656,7 @@ int _gnutls_x509_write_rsa_oaep_params(const gnutls_x509_spki_st *params,
 
 	result = asn1_write_value(spk, "pSourceFunc.parameters", label.data,
 				  label.size);
-	if (result < 0) {
+	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
 		goto cleanup;

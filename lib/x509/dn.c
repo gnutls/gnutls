@@ -587,7 +587,7 @@ static int _gnutls_x509_write_attribute(const char *given_oid,
 	_gnutls_str_cat(tmp, sizeof(tmp), ".value");
 
 	result = asn1_write_value(asn1_struct, tmp, _data, sizeof_data);
-	if (result < 0) {
+	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}

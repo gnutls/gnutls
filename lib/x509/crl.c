@@ -908,7 +908,7 @@ int gnutls_x509_crl_get_authority_key_gn_serial(
 
 		*serial_size = len;
 
-		if (result < 0) {
+		if (result != ASN1_SUCCESS) {
 			ret = _gnutls_asn2err(result);
 			goto fail;
 		}
@@ -1177,7 +1177,7 @@ int gnutls_x509_crl_get_extension_data(gnutls_x509_crl_t crl, unsigned indx,
 
 	if (result == ASN1_ELEMENT_NOT_FOUND)
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
-	else if (result < 0) {
+	else if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
