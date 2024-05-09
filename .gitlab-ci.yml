@@ -60,8 +60,7 @@ default:
 .bootstrap:
   stage: bootstrap
   tags:
-    - shared
-    - linux
+    - saas-linux-small-amd64
   script:
     - devel/preserve-timestamp stamp.pre-bootstrap
     - SUBMODULE_NOFETCH=1 ./bootstrap --copy --skip-po
@@ -72,8 +71,7 @@ default:
 .build:
   stage: build
   tags:
-    - shared
-    - linux
+    - saas-linux-small-amd64
   except:
     - tags # TODO
   artifacts:
@@ -85,8 +83,7 @@ default:
   script:
     - make -j$CHECKJOBS check
   tags:
-    - shared
-    - linux
+    - saas-linux-small-amd64
   except:
     - tags # TODO
   artifacts:
@@ -224,8 +221,7 @@ UB+ASAN-Werror.Fedora.x86_64.gcc:
     # Use $BUILDJOBS since most of the job is building all tests, then just running 4 tests
     - make -j$BUILDJOBS check -C tests TESTS="trust-store p11-kit-load.sh priority-init2 set-default-prio" SUBDIRS=.
   tags:
-    - shared
-    - linux
+    - saas-linux-small-amd64
   except:
     - tags
 
@@ -259,8 +255,7 @@ UB+ASAN-Werror-aggressive.Fedora.x86_64.gcc:
     # Use $BUILDJOBS since most of the job is building all tests, then just running 4 tests
     - make -j$BUILDJOBS check -C tests TESTS="trust-store p11-kit-load.sh priority-init2 set-default-prio" SUBDIRS=.
   tags:
-    - shared
-    - linux
+    - saas-linux-small-amd64
   except:
     - tags
 
@@ -295,8 +290,7 @@ UB+ASAN-Werror.Fedora.x86_64.gcc-aggressive:
     # Use $BUILDJOBS since most of the job is building all tests, then just running 4 tests
     - make -j$BUILDJOBS check -C tests TESTS="trust-store p11-kit-load.sh priority-init2 set-default-prio" SUBDIRS=.
   tags:
-    - shared
-    - linux
+    - saas-linux-small-amd64
   except:
     - tags
 
@@ -642,8 +636,7 @@ fedora-abicoverage/build:
     - make -j$BUILDJOBS
     - make -j$BUILDJOBS check TESTS=""
   tags:
-    - shared
-    - linux
+    - saas-linux-small-amd64
   except:
     - tags
 
@@ -722,9 +715,7 @@ debian/test:
     # build tests, but don't execute them
     - make -j$BUILDJOBS check TESTS=""
   tags:
-    - shared
-    - docker
-    - linux
+    - saas-linux-small-amd64
 
 .debian-cross/test:
   extends:
@@ -734,9 +725,7 @@ debian/test:
     # Parallel tests cause random failures, likely timing errors
     - make -j1 check
   tags:
-    - shared
-    - docker
-    - linux
+    - saas-linux-small-amd64
 
 debian-cross-i686/bootstrap:
   extends:
