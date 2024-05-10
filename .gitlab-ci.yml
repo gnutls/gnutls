@@ -515,10 +515,9 @@ fedora-threadsan/build:
   needs:
     - fedora/bootstrap
   script:
-    - CFLAGS="-fsanitize=thread -g -O2" CXXFLAGS=$CFLAGS
-      dash ./configure --disable-gcc-warnings --disable-doc --cache-file $CCACHE_FILE --disable-non-suiteb-curves --enable-fips140-mode --disable-full-test-suite --with-pkcs12-iter-count=10000
-    - make -j$BUILDJOBS
-    - make -j$BUILDJOBS -C tests check SUBDIRS=. TESTS="" TSAN_OPTIONS="suppressions=$(pwd)/devel/tsan.supp" GNUTLS_SKIP_FIPS_INTEGRITY_CHECKS=1 GNUTLS_FORCE_FIPS_MODE=1
+    - setarch $(uname -m) -R -- dash ./configure --disable-gcc-warnings --disable-doc --cache-file $CCACHE_FILE --disable-non-suiteb-curves --enable-fips140-mode --disable-full-test-suite --with-pkcs12-iter-count=10000 CFLAGS="-fsanitize=thread -g -O2" CXXFLAGS=$CFLAGS
+    - setarch $(uname -m) -R -- make -j$BUILDJOBS
+    - setarch $(uname -m) -R -- make -j$BUILDJOBS -C tests check SUBDIRS=. TESTS="" TSAN_OPTIONS="suppressions=$(pwd)/devel/tsan.supp" GNUTLS_SKIP_FIPS_INTEGRITY_CHECKS=1 GNUTLS_FORCE_FIPS_MODE=1
 
 fedora-threadsan/test:
   extends:
@@ -529,7 +528,7 @@ fedora-threadsan/test:
   needs:
     - fedora-threadsan/build
   script:
-    - make -j$CHECKJOBS -C tests check SUBDIRS=. TESTS="tls-pthread dtls-pthread fips-mode-pthread rng-pthread" TSAN_OPTIONS="suppressions=$(pwd)/devel/tsan.supp" GNUTLS_SKIP_FIPS_INTEGRITY_CHECKS=1 GNUTLS_FORCE_FIPS_MODE=1
+    - setarch $(uname -m) -R -- make -j$CHECKJOBS -C tests check SUBDIRS=. TESTS="tls-pthread dtls-pthread fips-mode-pthread rng-pthread" TSAN_OPTIONS="suppressions=$(pwd)/devel/tsan.supp" GNUTLS_SKIP_FIPS_INTEGRITY_CHECKS=1 GNUTLS_FORCE_FIPS_MODE=1
 
 fedora-static-analyzers/build:
   extends:
