@@ -29,7 +29,7 @@ variables:
   CHECKJOBS: 16
 
 cache:
-  key: "$CI_JOB_NAME-ver32"
+  key: "$CI_JOB_NAME-ver33"
   paths:
     - cache/
 
@@ -59,8 +59,7 @@ default:
 .bootstrap:
   stage: bootstrap
   tags:
-    - shared
-    - linux
+    - saas-linux-small-amd64
   script:
     - devel/preserve-timestamp stamp.pre-bootstrap
     - SUBMODULE_NOFETCH=1 ./bootstrap --copy --skip-po
@@ -71,8 +70,7 @@ default:
 .build:
   stage: build
   tags:
-    - shared
-    - linux
+    - saas-linux-small-amd64
   except:
     - tags # TODO
   artifacts:
@@ -84,8 +82,7 @@ default:
   script:
     - make -j$CHECKJOBS check
   tags:
-    - shared
-    - linux
+    - saas-linux-small-amd64
   except:
     - tags # TODO
   artifacts:
@@ -221,8 +218,7 @@ UB+ASAN-Werror.Fedora.x86_64.gcc:
     # Use $BUILDJOBS since most of the job is building all tests, then just running 4 tests
     - make -j$BUILDJOBS check -C tests TESTS="trust-store p11-kit-load.sh priority-init2 set-default-prio" SUBDIRS=.
   tags:
-    - shared
-    - linux
+    - saas-linux-small-amd64
   except:
     - tags
 
@@ -258,8 +254,7 @@ UB+ASAN-Werror-aggressive.Fedora.x86_64.gcc:
     # Use $BUILDJOBS since most of the job is building all tests, then just running 4 tests
     - make -j$BUILDJOBS check -C tests TESTS="trust-store p11-kit-load.sh priority-init2 set-default-prio" SUBDIRS=.
   tags:
-    - shared
-    - linux
+    - saas-linux-small-amd64
   except:
     - tags
 
@@ -520,10 +515,9 @@ fedora-threadsan/build:
   needs:
     - fedora/bootstrap
   script:
-    - CFLAGS="-fsanitize=thread -g -O2" CXXFLAGS=$CFLAGS
-      dash ./configure --disable-gcc-warnings --disable-doc --cache-file $CCACHE_FILE --disable-non-suiteb-curves --enable-fips140-mode --disable-full-test-suite --with-pkcs12-iter-count=10000
-    - make -j$BUILDJOBS
-    - make -j$BUILDJOBS -C tests check SUBDIRS=. TESTS="" TSAN_OPTIONS="suppressions=$(pwd)/devel/tsan.supp" GNUTLS_SKIP_FIPS_INTEGRITY_CHECKS=1 GNUTLS_FORCE_FIPS_MODE=1
+    - setarch $(uname -m) -R -- dash ./configure --disable-gcc-warnings --disable-doc --cache-file $CCACHE_FILE --disable-non-suiteb-curves --enable-fips140-mode --disable-full-test-suite --with-pkcs12-iter-count=10000 CFLAGS="-fsanitize=thread -g -O2" CXXFLAGS=$CFLAGS
+    - setarch $(uname -m) -R -- make -j$BUILDJOBS
+    - setarch $(uname -m) -R -- make -j$BUILDJOBS -C tests check SUBDIRS=. TESTS="" TSAN_OPTIONS="suppressions=$(pwd)/devel/tsan.supp" GNUTLS_SKIP_FIPS_INTEGRITY_CHECKS=1 GNUTLS_FORCE_FIPS_MODE=1
 
 fedora-threadsan/test:
   extends:
@@ -534,7 +528,7 @@ fedora-threadsan/test:
   needs:
     - fedora-threadsan/build
   script:
-    - make -j$CHECKJOBS -C tests check SUBDIRS=. TESTS="tls-pthread dtls-pthread fips-mode-pthread rng-pthread" TSAN_OPTIONS="suppressions=$(pwd)/devel/tsan.supp" GNUTLS_SKIP_FIPS_INTEGRITY_CHECKS=1 GNUTLS_FORCE_FIPS_MODE=1
+    - setarch $(uname -m) -R -- make -j$CHECKJOBS -C tests check SUBDIRS=. TESTS="tls-pthread dtls-pthread fips-mode-pthread rng-pthread" TSAN_OPTIONS="suppressions=$(pwd)/devel/tsan.supp" GNUTLS_SKIP_FIPS_INTEGRITY_CHECKS=1 GNUTLS_FORCE_FIPS_MODE=1
 
 fedora-static-analyzers/build:
   extends:
@@ -623,8 +617,7 @@ fedora-abicoverage/build:
     - make -j$BUILDJOBS
     - make -j$BUILDJOBS check TESTS=""
   tags:
-    - shared
-    - linux
+    - saas-linux-small-amd64
   except:
     - tags
 
@@ -679,9 +672,7 @@ fedora-cross/bootstrap:
     # build tests, but don't execute them
     - make -j$BUILDJOBS -C tests check TESTS=""
   tags:
-    - shared
-    - docker
-    - linux
+    - saas-linux-small-amd64
 
 .fedora-cross/test:
   extends:
@@ -695,9 +686,7 @@ fedora-cross/bootstrap:
     - make pic-check
     - make -j$BUILDJOBS -C tests check
   tags:
-    - shared
-    - docker
-    - linux
+    - saas-linux-small-amd64
 
 fedora-cross/aarch64-linux-gnu/build: # name is important, see .fedora-cross/build
   extends:
