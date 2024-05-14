@@ -378,6 +378,10 @@ pkcs-5-PBES2-params ::= SEQUENCE {
   keyDerivationFunc AlgorithmIdentifier,
   encryptionScheme AlgorithmIdentifier }
 
+pkcs-5-PBMAC1-params ::= SEQUENCE {
+  keyDerivationFunc AlgorithmIdentifier,
+  messageAuthScheme AlgorithmIdentifier }
+
 -- PBKDF2
 
 -- pkcs-5-algid-hmacWithSHA1 AlgorithmIdentifier ::=

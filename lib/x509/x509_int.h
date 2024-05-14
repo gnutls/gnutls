@@ -397,6 +397,24 @@ inline static int _gnutls_x509_crq_read_spki_params(gnutls_x509_crq_t crt,
 					     params);
 }
 
+/* pkcs7-crypto.c */
+int _gnutls_pbes2_string_to_key(unsigned int pass_len, const char *password,
+				const struct pbkdf2_params *kdf_params,
+				int key_size, uint8_t *key);
+int _gnutls_read_pbkdf2_params(asn1_node pasn, const gnutls_datum_t *der,
+			       struct pbkdf2_params *params);
+int _gnutls_write_pbkdf2_params(asn1_node pasn,
+				const struct pbkdf2_params *kdf_params);
+int _gnutls_pbmac1(gnutls_mac_algorithm_t mac, const gnutls_datum_t *key,
+		   const struct pbkdf2_params *params,
+		   const gnutls_datum_t *data, uint8_t *output);
+int _gnutls_read_pbmac1_params(const uint8_t *data, int data_size,
+			       struct pbkdf2_params *kdf_params,
+			       gnutls_mac_algorithm_t *mac);
+int _gnutls_write_pbmac1_params(asn1_node pkcs12,
+				const struct pbkdf2_params *kdf_params,
+				gnutls_mac_algorithm_t algo, const char *where);
+
 /* pkcs12.h */
 #include <gnutls/pkcs12.h>
 

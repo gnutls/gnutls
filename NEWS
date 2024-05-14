@@ -5,6 +5,17 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.8.6 (unreleased)
+
+** libgnutls: PBMAC1 is now supported as a MAC mechanism for PKCS#12
+   To be compliant with FIPS 140-3, PKCS#12 files with MAC based on
+   PBKDF2 (PBMAC1) is now supported, according to the specification
+   proposed in draft-ietf-lamps-pkcs12-pbmac1.
+
+** API and ABI modifications:
+gnutls_pkcs12_generate_mac3: New function
+gnutls_pkcs12_flags_t: New enum
+
 * Version 3.8.5 (released 2024-04-04)
 
 ** libgnutls: Due to majority of usages and implementations of

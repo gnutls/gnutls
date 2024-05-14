@@ -149,6 +149,10 @@
           "long-option": "to-p12",
           "description": "Generate a PKCS #12 structure",
           "detail": "It requires a certificate, a private key and possibly a CA certificate to be specified."
+        },
+        {
+          "long-option": "pbmac1",
+          "description": "Use PBMAC1 in a PKCS #12 structure"
         }
       ]
     },

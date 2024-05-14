@@ -1441,6 +1441,14 @@ GNUTLS_3_8_4
 	*;
 } GNUTLS_3_8_2;
 
+GNUTLS_3_8_6
+{
+ global:
+	gnutls_pkcs12_generate_mac3;
+ local:
+	*;
+} GNUTLS_3_8_4;
+
 GNUTLS_FIPS140_3_4 {
   global:
 	gnutls_cipher_self_test;

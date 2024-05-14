@@ -359,7 +359,9 @@ typedef enum {
 	GNUTLS_MAC_SHAKE_128 = 209,
 	GNUTLS_MAC_SHAKE_256 = 210,
 	GNUTLS_MAC_MAGMA_OMAC = 211,
-	GNUTLS_MAC_KUZNYECHIK_OMAC = 212
+	GNUTLS_MAC_KUZNYECHIK_OMAC = 212,
+	GNUTLS_MAC_PBMAC1 =
+		213 /* indicates that PBMAC1 is embedded the PKCS#12 structure */
 } gnutls_mac_algorithm_t;
 
 /**

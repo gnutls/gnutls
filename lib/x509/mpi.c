@@ -398,7 +398,7 @@ int _gnutls_x509_write_sign_params(asn1_node dst, const char *dst_name,
 int _gnutls_x509_read_uint(asn1_node node, const char *value, unsigned int *ret)
 {
 	int len, result;
-	uint8_t *tmpstr;
+	uint8_t tmpstr[5];
 
 	len = 0;
 	result = asn1_read_value(node, value, NULL, &len);
@@ -406,18 +406,22 @@ int _gnutls_x509_read_uint(asn1_node node, const char *value, unsigned int *ret)
 		return _gnutls_asn2err(result);
 	}
 
-	tmpstr = gnutls_malloc(len);
-	if (tmpstr == NULL) {
+	if (len <= 0 || len > 5) {
 		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	result = asn1_read_value(node, value, tmpstr, &len);
 
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
-		gnutls_free(tmpstr);
 		return _gnutls_asn2err(result);
+	}
+
+	/* Negative integer in 2's complement format. */
+	if (tmpstr[0] > SCHAR_MAX) {
+		gnutls_assert();
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	if (len == 1)
@@ -428,13 +432,13 @@ int _gnutls_x509_read_uint(asn1_node node, const char *value, unsigned int *ret)
 		*ret = _gnutls_read_uint24(tmpstr);
 	else if (len == 4)
 		*ret = _gnutls_read_uint32(tmpstr);
-	else {
-		gnutls_assert();
-		gnutls_free(tmpstr);
-		return GNUTLS_E_INTERNAL_ERROR;
+	else if (len == 5) {
+		if (tmpstr[0] != 0) {
+			gnutls_assert();
+			return GNUTLS_E_INTERNAL_ERROR;
+		}
+		*ret = _gnutls_read_uint32(tmpstr + 1);
 	}
-
-	gnutls_free(tmpstr);
 
 	return 0;
 }
