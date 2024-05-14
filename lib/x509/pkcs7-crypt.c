@@ -1338,11 +1338,13 @@ static int write_pbkdf2_params(asn1_node pasn,
 
 	/* write the keylength, if it is set.
 	 */
-	result = asn1_write_value(pbkdf2_asn, "keyLength", NULL, 0);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto error;
+	if (kdf_params->key_size > 0) {
+		result = _gnutls_x509_write_uint32(pbkdf2_asn, "keyLength",
+						   kdf_params->key_size);
+		if (result < 0) {
+			gnutls_assert();
+			goto error;
+		}
 	}
 
 	me = _gnutls_mac_to_entry(kdf_params->mac);
