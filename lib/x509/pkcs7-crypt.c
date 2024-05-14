@@ -1287,7 +1287,6 @@ static int write_pbkdf2_params(asn1_node pasn,
 {
 	int result;
 	asn1_node pbkdf2_asn = NULL;
-	uint8_t tmp[MAX_OID_SIZE];
 	const mac_entry_st *me;
 
 	/* Write the key derivation algorithm
@@ -1329,12 +1328,10 @@ static int write_pbkdf2_params(asn1_node pasn,
 
 	/* write the iteration count 
 	 */
-	_gnutls_write_uint32(kdf_params->iter_count, tmp);
-
-	result = asn1_write_value(pbkdf2_asn, "iterationCount", tmp, 4);
-	if (result != ASN1_SUCCESS) {
+	result = _gnutls_x509_write_uint32(pbkdf2_asn, "iterationCount",
+					   kdf_params->iter_count);
+	if (result < 0) {
 		gnutls_assert();
-		result = _gnutls_asn2err(result);
 		goto error;
 	}
 	_gnutls_hard_log("iterationCount: %d\n", kdf_params->iter_count);
