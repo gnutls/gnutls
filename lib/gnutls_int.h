@@ -428,7 +428,7 @@ verify(GNUTLS_EXTENSION_MAX < MAX_EXT_TYPES);
  */
 verify(GNUTLS_EXTENSION_MAX_VALUE - GNUTLS_EXTENSION_MAX >= 16);
 
-/* MAX_EXT_TYPES + 1 must fit in a single byte, to generate random
+/* MAX_EXT_TYPES must fit in a single byte, to generate random
  * permutation at once.
  */
 verify(MAX_EXT_TYPES <= UINT8_MAX);
