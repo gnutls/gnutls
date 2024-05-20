@@ -394,6 +394,7 @@ static int load_dir_certs(const char *dirname, gnutls_x509_trust_list_t list,
 
 		ret = _gnutls_pathbuf_init(&pathbuf, dirname);
 		if (ret < 0) {
+			closedir(dirp);
 			return r;
 		}
 

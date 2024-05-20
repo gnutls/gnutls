@@ -413,7 +413,10 @@ static int shuffle_exts(extensions_t *exts, size_t size)
 
 	assert(size <= MAX_EXT_TYPES);
 
-	/* Generate random permutation, assuming MAX_EXT_TYPES <
+	if (unlikely(size == 0))
+		return 0;
+
+	/* Generate random permutation, assuming MAX_EXT_TYPES <=
 	 * UINT8_MAX.
 	 */
 	ret = gnutls_rnd(GNUTLS_RND_RANDOM, permutation, size);
