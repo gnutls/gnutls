@@ -207,7 +207,7 @@ proc_rsa_client_kx(gnutls_session_t session, uint8_t * data,
 				     session->key.key.size);
 	/* After this point, any conditional on failure that cause differences
 	 * in execution may create a timing or cache access pattern side
-	 * channel that can be used as an oracle, so treat very carefully */
+	 * channel that can be used as an oracle, so tread carefully */
 
 	/* Error handling logic:
 	 * In case decryption fails then don't inform the peer. Just use the

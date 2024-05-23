@@ -1755,7 +1755,15 @@ unsigned int _gnutls_sort_clist(gnutls_x509_crt_t *clist,
 	bool insorted[DEFAULT_MAX_VERIFY_DEPTH]; /* non zero if clist[i] used in sorted list */
 	gnutls_x509_crt_t sorted[DEFAULT_MAX_VERIFY_DEPTH];
 
-	assert(clist_size <= DEFAULT_MAX_VERIFY_DEPTH);
+	/* Limit the number of certificates in the chain, to avoid DoS
+	 * because of the O(n^2) sorting below.  FIXME: Switch to a
+	 * topological sort algorithm which should be linear to the
+	 * number of certificates and subject-issuer relationships.
+	 */
+	if (clist_size > DEFAULT_MAX_VERIFY_DEPTH) {
+		_gnutls_debug_log("too many certificates; skipping sorting\n");
+		return 1;
+	}
 
 	for (i = 0; i < DEFAULT_MAX_VERIFY_DEPTH; i++) {
 		issuer[i] = -1;
@@ -1793,6 +1801,10 @@ unsigned int _gnutls_sort_clist(gnutls_x509_crt_t *clist,
 	for (i = 1; i < clist_size; i++) {
 		prev = issuer[prev];
 		if (prev < 0) {	/* no issuer */
+			break;
+		}
+
+		if (insorted[prev]) { /* loop detected */
 			break;
 		}
 

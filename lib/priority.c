@@ -701,7 +701,6 @@ gnutls_priority_set(gnutls_session_t session, gnutls_priority_t priority)
 	COPY_TO_INTERNALS(no_etm);
 	COPY_TO_INTERNALS(no_ext_master_secret);
 	COPY_TO_INTERNALS(allow_key_usage_violation);
-	COPY_TO_INTERNALS(allow_wrong_pms);
 	COPY_TO_INTERNALS(dumbfw);
 	COPY_TO_INTERNALS(dh_prime_bits);
 

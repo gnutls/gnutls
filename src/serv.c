@@ -185,6 +185,7 @@ static void listener_free(const void *elt)
 		close(j->fd);
 		gnutls_deinit(j->tls_session);
 	}
+	free(j);
 }
 
 

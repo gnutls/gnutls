@@ -26,12 +26,6 @@
 #include <gnutls/gnutls.h>
 #include <nettle/bignum.h> /* includes gmp.h */
 
-int
-_gnutls_ecdsa_compute_k (mpz_t k,
-			 gnutls_ecc_curve_t curve,
-			 const mpz_t x,
-			 gnutls_mac_algorithm_t mac,
-			 const uint8_t *digest,
-			 size_t length);
+int _gnutls_ecc_curve_to_dsa_q(mpz_t q, gnutls_ecc_curve_t curve);
 
 #endif /* GNUTLS_LIB_NETTLE_INT_ECDSA_COMPUTE_K_H */

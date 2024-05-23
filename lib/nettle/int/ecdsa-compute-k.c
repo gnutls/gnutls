@@ -29,39 +29,38 @@
 #include "dsa-compute-k.h"
 #include "gnutls_int.h"
 
-static inline int
-_gnutls_ecc_curve_to_dsa_q(mpz_t *q, gnutls_ecc_curve_t curve)
+int _gnutls_ecc_curve_to_dsa_q(mpz_t q, gnutls_ecc_curve_t curve)
 {
 	switch (curve) {
 #ifdef ENABLE_NON_SUITEB_CURVES
 	case GNUTLS_ECC_CURVE_SECP192R1:
-		mpz_init_set_str(*q,
+		mpz_init_set_str(q,
 				 "FFFFFFFFFFFFFFFFFFFFFFFF99DEF836"
 				 "146BC9B1B4D22831",
 				 16);
 		return 0;
 	case GNUTLS_ECC_CURVE_SECP224R1:
-		mpz_init_set_str(*q,
+		mpz_init_set_str(q,
 				 "FFFFFFFFFFFFFFFFFFFFFFFFFFFF16A2"
 				 "E0B8F03E13DD29455C5C2A3D",
 				 16);
 		return 0;
 #endif
 	case GNUTLS_ECC_CURVE_SECP256R1:
-		mpz_init_set_str(*q,
+		mpz_init_set_str(q,
 				 "FFFFFFFF00000000FFFFFFFFFFFFFFFF"
 				 "BCE6FAADA7179E84F3B9CAC2FC632551",
 				 16);
 		return 0;
 	case GNUTLS_ECC_CURVE_SECP384R1:
-		mpz_init_set_str(*q,
+		mpz_init_set_str(q,
 				 "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 				 "FFFFFFFFFFFFFFFFC7634D81F4372DDF"
 				 "581A0DB248B0A77AECEC196ACCC52973",
 				 16);
 		return 0;
 	case GNUTLS_ECC_CURVE_SECP521R1:
-		mpz_init_set_str(*q,
+		mpz_init_set_str(q,
 				 "1FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 				 "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 				 "FFA51868783BF2F966B7FCC0148F709A"
@@ -72,24 +71,4 @@ _gnutls_ecc_curve_to_dsa_q(mpz_t *q, gnutls_ecc_curve_t curve)
 	default:
 		return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM);
 	}
-}
-
-int
-_gnutls_ecdsa_compute_k (mpz_t k,
-			 gnutls_ecc_curve_t curve,
-			 const mpz_t x,
-			 gnutls_mac_algorithm_t mac,
-			 const uint8_t *digest,
-			 size_t length)
-{
-	mpz_t q;
-	int ret;
-
-	ret = _gnutls_ecc_curve_to_dsa_q(&q, curve);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	ret = _gnutls_dsa_compute_k (k, q, x, mac, digest, length);
-	mpz_clear(q);
-	return ret;
 }

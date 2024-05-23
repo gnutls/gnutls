@@ -197,7 +197,7 @@ void doit(void)
 					      &signature);
 		if (ret < 0)
 			testfail("gnutls_pubkey_verify_data2\n");
-		success(" - pass");
+		success(" - pass\n");
 
 	next:
 		gnutls_free(signature.data);
