@@ -777,6 +777,8 @@ typedef struct gnutls_group_entry_st {
 #define GNUTLS_MAC_FLAG_ALLOW_INSECURE_REVERTIBLE \
 	(1                                        \
 	 << 3) /* when checking with _gnutls_digest_is_insecure2, don't treat revertible setting as fatal */
+#define GNUTLS_MAC_FLAG_XOF \
+	(1 << 4) /* this function is an extendable output function (XOF) */
 /* This structure is used both for MACs and digests
  */
 typedef struct mac_entry_st {

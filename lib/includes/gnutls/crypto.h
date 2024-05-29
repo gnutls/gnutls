@@ -154,6 +154,7 @@ gnutls_hash_get_len(gnutls_digest_algorithm_t algorithm) __GNUTLS_CONST__;
 int gnutls_hash_fast(gnutls_digest_algorithm_t algorithm, const void *text,
 		     size_t textlen, void *digest);
 gnutls_hash_hd_t gnutls_hash_copy(gnutls_hash_hd_t handle);
+int gnutls_hash_squeeze(gnutls_hash_hd_t handle, void *output, size_t length);
 
 /* KDF API */
 

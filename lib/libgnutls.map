@@ -1445,6 +1445,7 @@ GNUTLS_3_8_6
 {
  global:
 	gnutls_pkcs12_generate_mac3;
+	gnutls_hash_squeeze;
  local:
 	*;
 } GNUTLS_3_8_4;

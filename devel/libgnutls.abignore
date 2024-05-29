@@ -76,3 +76,6 @@ name = gnutls_pkcs12_generate_mac3
 [suppress_type]
 name = gnutls_mac_algorithm_t
 changed_enumerators = GNUTLS_MAC_PBMAC1
+
+[suppress_function]
+name = gnutls_hash_squeeze

@@ -562,6 +562,16 @@ int _gnutls_fips_perform_self_checks2(void)
 		return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
 	}
 
+	ret = gnutls_digest_self_test(0, GNUTLS_DIG_SHAKE_128);
+	if (ret < 0) {
+		return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+	}
+
+	ret = gnutls_digest_self_test(0, GNUTLS_DIG_SHAKE_256);
+	if (ret < 0) {
+		return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+	}
+
 	/* MAC (includes message digest test) */
 	ret = gnutls_mac_self_test(0, GNUTLS_MAC_SHA1);
 	if (ret < 0) {

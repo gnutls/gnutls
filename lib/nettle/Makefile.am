@@ -133,10 +133,12 @@ endif
 if NEED_SHAKE_OUTPUT
 libcrypto_la_SOURCES += \
 	backport/md-internal.h \
+	backport/nettle-write.h \
 	backport/sha3.c \
 	backport/sha3-internal.h \
 	backport/sha3-shake.c \
 	backport/shake128.c \
 	backport/shake256.c \
+	backport/write-le64.c \
 	$(NULL)
 endif

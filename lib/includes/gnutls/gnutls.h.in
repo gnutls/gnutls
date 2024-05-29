@@ -318,8 +318,8 @@ typedef enum {
  * @GNUTLS_MAC_SHA3_384: Reserved; unimplemented.
  * @GNUTLS_MAC_SHA3_512: Reserved; unimplemented.
  * @GNUTLS_MAC_GOST28147_TC26Z_IMIT: The GOST 28147-89 working in IMIT mode with TC26 Z S-box.
- * @GNUTLS_MAC_SHAKE_128: Reserved; unimplemented.
- * @GNUTLS_MAC_SHAKE_256: Reserved; unimplemented.
+ * @GNUTLS_MAC_SHAKE_128: The SHAKE128 extendable output function.
+ * @GNUTLS_MAC_SHAKE_256: The SHAKE256 extendable output function.
  * @GNUTLS_MAC_MAGMA_OMAC: GOST R 34.12-2015 (Magma) in OMAC (CMAC) mode.
  * @GNUTLS_MAC_KUZNYECHIK_OMAC: GOST R 34.12-2015 (Kuznyechik) in OMAC (CMAC) mode.
  *
@@ -384,8 +384,8 @@ typedef enum {
  * @GNUTLS_DIG_GOSTR_94: GOST R 34.11-94 algorithm.
  * @GNUTLS_DIG_STREEBOG_256: GOST R 34.11-2001 (Streebog) algorithm, 256 bit.
  * @GNUTLS_DIG_STREEBOG_512: GOST R 34.11-2001 (Streebog) algorithm, 512 bit.
- * @GNUTLS_DIG_SHAKE_128: Reserved; unimplemented.
- * @GNUTLS_DIG_SHAKE_256: Reserved; unimplemented.
+ * @GNUTLS_DIG_SHAKE_128: The SHAKE128 extendable output function.
+ * @GNUTLS_DIG_SHAKE_256: The SHAKE256 extendable output function.
  *
  * Enumeration of different digest (hash) algorithms.
  */
