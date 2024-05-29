@@ -31,6 +31,9 @@
 #include <nettle/ripemd160.h>
 #include <nettle/sha.h>
 #include <nettle/sha3.h>
+#ifndef HAVE_NETTLE_SHA3_128_SHAKE_OUTPUT
+#include "int/sha3-shake.h"
+#endif
 #include <nettle/hmac.h>
 #include <nettle/umac.h>
 #include <nettle/hkdf.h>
@@ -77,6 +80,7 @@ struct nettle_hash_ctx {
 		struct sha256_ctx sha256;
 		struct sha384_ctx sha384;
 		struct sha512_ctx sha512;
+		struct sha3_128_ctx sha3_128;
 		struct sha3_224_ctx sha3_224;
 		struct sha3_256_ctx sha3_256;
 		struct sha3_384_ctx sha3_384;
@@ -608,10 +612,9 @@ static int wrap_nettle_hash_exists(gnutls_digest_algorithm_t algo)
 	case GNUTLS_DIG_SHA3_256:
 	case GNUTLS_DIG_SHA3_384:
 	case GNUTLS_DIG_SHA3_512:
-#endif
-
 	case GNUTLS_DIG_SHAKE_128:
 	case GNUTLS_DIG_SHAKE_256:
+#endif
 
 	case GNUTLS_DIG_MD2:
 	case GNUTLS_DIG_RMD160:
@@ -732,6 +735,20 @@ static int _ctx_init(gnutls_digest_algorithm_t algo,
 		ctx->ctx_ptr = &ctx->ctx.sha3_512;
 		ctx->length = SHA3_512_DIGEST_SIZE;
 		break;
+	case GNUTLS_DIG_SHAKE_128:
+		sha3_128_init(&ctx->ctx.sha3_128);
+		ctx->update = (update_func)sha3_128_update;
+		ctx->digest = (digest_func)sha3_128_shake_output;
+		ctx->ctx_ptr = &ctx->ctx.sha3_128;
+		ctx->length = 0; /* unused */
+		break;
+	case GNUTLS_DIG_SHAKE_256:
+		sha3_256_init(&ctx->ctx.sha3_256);
+		ctx->update = (update_func)sha3_256_update;
+		ctx->digest = (digest_func)sha3_256_shake_output;
+		ctx->ctx_ptr = &ctx->ctx.sha3_256;
+		ctx->length = 0; /* unused */
+		break;
 #endif
 	case GNUTLS_DIG_MD2:
 		md2_init(&ctx->ctx.md2);
@@ -845,7 +862,7 @@ static int wrap_nettle_hash_output(void *src_ctx, void *digest,
 	struct nettle_hash_ctx *ctx;
 	ctx = src_ctx;
 
-	if (digestsize < ctx->length) {
+	if (ctx->length > 0 && digestsize < ctx->length) {
 		gnutls_assert();
 		return GNUTLS_E_SHORT_MEMORY_BUFFER;
 	}

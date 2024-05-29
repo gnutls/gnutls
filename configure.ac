@@ -798,6 +798,13 @@ LIBS="$LIBS $NETTLE_LIBS"
 AC_CHECK_FUNCS(nettle_cbc_aes128_encrypt)
 LIBS=$save_LIBS
 
+# Check for incremental SHAKE
+save_LIBS=$LIBS
+LIBS="$LIBS $NETTLE_LIBS"
+AC_CHECK_FUNCS(nettle_sha3_128_shake_output)
+LIBS=$save_LIBS
+AM_CONDITIONAL([NEED_SHAKE_OUTPUT], [test "$ac_cv_func_nettle_sha3_128_shake_output" != yes])
+
 # Check sonames of the linked libraries needed for FIPS selftests.
 save_CFLAGS=$CFLAGS
 CFLAGS="$CFLAGS $GMP_CFLAGS"
