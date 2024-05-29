@@ -47,7 +47,7 @@ libcrypto_la_SOURCES = pk.c mpi.c mac.c cipher.c init.c \
 	int/ecdsa-compute-k.c int/ecdsa-compute-k.h \
 	int/mpn-base256.c int/mpn-base256.h \
 	int/block8.h backport/block-internal.h \
-	int/rsa-oaep.h int/rsa-pad.c int/nettle-internal.h
+	int/rsa-oaep.h int/rsa-pad.c int/nettle-internal.h int/sha3-shake.h
 
 if WINDOWS
 if HAVE_BCRYPT
@@ -127,5 +127,18 @@ libcrypto_la_SOURCES += \
 	backport/rsa-oaep-decrypt.c \
 	backport/rsa-sec-compute-root.c \
 	backport/rsa-sign-tr.c \
+	$(NULL)
+endif
+
+if NEED_SHAKE_OUTPUT
+libcrypto_la_SOURCES += \
+	backport/md-internal.h \
+	backport/nettle-write.h \
+	backport/sha3.c \
+	backport/sha3-internal.h \
+	backport/sha3-shake.c \
+	backport/shake128.c \
+	backport/shake256.c \
+	backport/write-le64.c \
 	$(NULL)
 endif

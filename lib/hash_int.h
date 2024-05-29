@@ -139,6 +139,8 @@ int _gnutls_hash_copy(const digest_hd_st *handle, digest_hd_st *dst);
 int _gnutls_hash_fast(gnutls_digest_algorithm_t algorithm, const void *text,
 		      size_t textlen, void *digest);
 
+int _gnutls_hash_squeeze(digest_hd_st *handle, void *output, size_t length);
+
 #ifdef ENABLE_SSL3
 /* helper functions */
 int _gnutls_mac_init_ssl3(digest_hd_st *, const mac_entry_st *e, void *key,

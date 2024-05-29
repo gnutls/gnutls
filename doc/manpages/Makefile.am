@@ -419,6 +419,7 @@ APIMANS += gnutls_hash_fast.3
 APIMANS += gnutls_hash_get_len.3
 APIMANS += gnutls_hash_init.3
 APIMANS += gnutls_hash_output.3
+APIMANS += gnutls_hash_squeeze.3
 APIMANS += gnutls_heartbeat_allowed.3
 APIMANS += gnutls_heartbeat_enable.3
 APIMANS += gnutls_heartbeat_get_timeout.3

@@ -148,6 +148,18 @@ int _gnutls_hash_fast(gnutls_digest_algorithm_t algorithm, const void *text,
 	return 0;
 }
 
+int _gnutls_hash_squeeze(digest_hd_st *handle, void *output, size_t length)
+{
+	if (handle->output == NULL)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	if (!(handle->e->flags & GNUTLS_MAC_FLAG_XOF))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	handle->output(handle->handle, output, length);
+	return 0;
+}
+
 /* HMAC interface */
 
 int _gnutls_mac_fast(gnutls_mac_algorithm_t algorithm, const void *key,

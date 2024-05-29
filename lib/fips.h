@@ -108,6 +108,9 @@ inline static bool is_mac_algo_approved_in_fips(gnutls_mac_algorithm_t algo)
 	case GNUTLS_MAC_AES_GMAC_128:
 	case GNUTLS_MAC_AES_GMAC_192:
 	case GNUTLS_MAC_AES_GMAC_256:
+	/* They are not a MAC algorithm, but go through the same check */
+	case GNUTLS_MAC_SHAKE_128:
+	case GNUTLS_MAC_SHAKE_256:
 		return true;
 	default:
 		return false;

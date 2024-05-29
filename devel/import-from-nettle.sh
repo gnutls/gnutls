@@ -20,6 +20,8 @@ ghash-set-key.c
 ghash-update.c
 gmp-glue.c
 gmp-glue.h
+md-internal.h
+nettle-write.h
 oaep.c
 oaep.h
 pss-mgf1.h
@@ -35,6 +37,12 @@ siv-gcm.c
 siv-gcm.h
 siv-ghash-set-key.c
 siv-ghash-update.c
+sha3.c
+sha3-internal.h
+sha3-shake.c
+shake128.c
+shake256.c
+write-le64.c
 "
 
 PUBLIC="
@@ -54,6 +62,7 @@ nettle-types.h
 rsa.h
 sha1.h
 sha2.h
+sha3.h
 "
 
 test -d $DST || mkdir $DST
@@ -126,6 +135,15 @@ for f in $IMPORTS; do
 	sed \
 	  -e '/^#include <nettle\/rsa\.h>/a\
 #include "int/rsa-oaep.h"
+' \
+	  $dst > $dst-t && mv $dst-t $dst
+	;;
+    esac
+    case $dst in
+      */shake*.c)
+	sed \
+	  -e '/^#include <nettle\/sha3\.h>/a\
+#include "int/sha3-shake.h"
 ' \
 	  $dst > $dst-t && mv $dst-t $dst
 	;;

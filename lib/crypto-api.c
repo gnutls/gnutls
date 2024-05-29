@@ -1012,6 +1012,28 @@ gnutls_hash_hd_t gnutls_hash_copy(gnutls_hash_hd_t handle)
 }
 
 /**
+ * gnutls_hash_squeeze:
+ * @handle: a #gnutls_hash_hd_t
+ * @output: destination to store the output; must be equal to or larger than @length
+ * @length: length of @output
+ *
+ * This function will extract digest output of @length bytes. The @handle must
+ * be initialized with gnutls_hash_init() as an extended output function (XOF),
+ * such as %GNUTLS_DIG_SHAKE_128 or %GNUTLS_DIG_SHAKE_256.
+ *
+ * This function can be called multiple times. To reset the state of @handle,
+ * call gnutls_hash_deinit() with %NULL as the digest argument.
+ *
+ * Returns: %GNUTLS_E_SUCCESS (0) on success; negative error code otherwise.
+ *
+ * Since: 3.8.6
+ */
+int gnutls_hash_squeeze(gnutls_hash_hd_t handle, void *output, size_t length)
+{
+	return _gnutls_hash_squeeze((digest_hd_st *)handle, output, length);
+}
+
+/**
  * gnutls_key_generate:
  * @key: is a pointer to a #gnutls_datum_t which will contain a newly
  * created key

@@ -12,9 +12,14 @@ See the end for copying conditions.
    PBKDF2 (PBMAC1) is now supported, according to the specification
    proposed in draft-ietf-lamps-pkcs12-pbmac1.
 
+** libgnutls: SHA3 extendable output functions (XOF) are now supported
+   SHA3 XOF, SHAKE128 and SHAKE256, are now usable through a new
+   public API gnutls_hash_squeeze.
+
 ** API and ABI modifications:
 gnutls_pkcs12_generate_mac3: New function
 gnutls_pkcs12_flags_t: New enum
+gnutls_hash_squeeze: New function
 
 * Version 3.8.5 (released 2024-04-04)
 

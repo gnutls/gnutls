@@ -2184,6 +2184,34 @@ const struct hash_vectors_st sha3_512_vectors[] = {
 	},
 };
 
+const struct hash_vectors_st shake128_vectors[] = {
+	{
+		STR(plaintext, plaintext_size, "\xC1\xEC\xFD\xFC"),
+		STR(output, output_size,
+		    "\xB5\xEB\x98\x7E\x7C\xBF\xC7\xC9\xD1\x40\xAF\xD2\x0B\x50\x0E\x30"),
+	},
+	{
+		STR(plaintext, plaintext_size, "\xC1\xEC\xFD\xFC"),
+		STR(output, output_size,
+		    "\xB5\xEB\x98\x7E\x7C\xBF\xC7\xC9\xD1\x40\xAF\xD2\x0B\x50\x0E\x30"
+		    "\xF2\xF7\x11\x88\xBC\xE8\x85\x95\x1F\x22\xFB\xC3\x5D\xE4\x0E\x74"),
+	},
+};
+
+const struct hash_vectors_st shake256_vectors[] = {
+	{
+		STR(plaintext, plaintext_size, "\xC1\xEC\xFD\xFC"),
+		STR(output, output_size,
+		    "\xCE\x7F\xBC\x15\x50\x39\x86\xE3\xB8\x45\x30\xD8\x4A\x16\xEF\x64"),
+	},
+	{
+		STR(plaintext, plaintext_size, "\xC1\xEC\xFD\xFC"),
+		STR(output, output_size,
+		    "\xCE\x7F\xBC\x15\x50\x39\x86\xE3\xB8\x45\x30\xD8\x4A\x16\xEF\x64"
+		    "\x33\x2A\x6E\xA5\x7E\x35\x4E\x9F\x20\x54\xBF\xC2\xAA\x88\x91\xF9"),
+	},
+};
+
 const struct hash_vectors_st gostr_94_vectors[] = {
 	{
 		STR(plaintext, plaintext_size,
@@ -2313,6 +2341,62 @@ static int test_digest(gnutls_digest_algorithm_t dig,
 				return gnutls_assert_val(
 					GNUTLS_E_SELF_TEST_ERROR);
 			}
+		}
+	}
+
+	_gnutls_debug_log("%s self check succeeded\n",
+			  gnutls_digest_get_name(dig));
+
+	return 0;
+}
+
+static int test_xof(gnutls_digest_algorithm_t dig,
+		    const struct hash_vectors_st *vectors, size_t vectors_size,
+		    unsigned flags)
+{
+	uint8_t data[2 * HASH_DATA_SIZE];
+	unsigned int i;
+	int ret;
+	gnutls_hash_hd_t hd;
+
+	if (!_gnutls_digest_exists(dig))
+		return 0;
+
+	for (i = 0; i < vectors_size; i++) {
+		ret = gnutls_hash_init(&hd, dig);
+		if (ret < 0) {
+			_gnutls_debug_log("error initializing: %s\n",
+					  gnutls_digest_get_name(dig));
+			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+		}
+
+		ret = gnutls_hash(hd, vectors[i].plaintext, 1);
+		if (ret < 0) {
+			gnutls_hash_deinit(hd, NULL);
+			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+		}
+
+		ret = gnutls_hash(hd, &vectors[i].plaintext[1],
+				  vectors[i].plaintext_size - 1);
+		if (ret < 0) {
+			gnutls_hash_deinit(hd, NULL);
+			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+		}
+
+		assert(sizeof(data) >= vectors[i].output_size);
+		ret = gnutls_hash_squeeze(hd, data, vectors[i].output_size);
+		if (ret < 0) {
+			gnutls_hash_deinit(hd, NULL);
+			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+		}
+
+		gnutls_hash_deinit(hd, NULL);
+
+		if (memcmp(data, vectors[i].output, vectors[i].output_size) !=
+		    0) {
+			_gnutls_debug_log("%s test vector %d failed!\n",
+					  gnutls_digest_get_name(dig), i);
+			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
 		}
 	}
 
@@ -2891,6 +2975,10 @@ int gnutls_digest_self_test(unsigned flags, gnutls_digest_algorithm_t digest)
 		FALLTHROUGH;
 		CASE(GNUTLS_DIG_SHA3_512, test_digest, sha3_512_vectors);
 #endif
+		FALLTHROUGH;
+		CASE(GNUTLS_DIG_SHAKE_128, test_xof, shake128_vectors);
+		FALLTHROUGH;
+		CASE(GNUTLS_DIG_SHAKE_256, test_xof, shake256_vectors);
 #if ENABLE_GOST
 		FALLTHROUGH;
 		NON_FIPS_CASE(GNUTLS_DIG_GOSTR_94, test_digest,

@@ -308,6 +308,7 @@ gnutls_hash_fast@GNUTLS_3_4
 gnutls_hash_get_len@GNUTLS_3_4
 gnutls_hash_init@GNUTLS_3_4
 gnutls_hash_output@GNUTLS_3_4
+gnutls_hash_squeeze@GNUTLS_3_8_6
 gnutls_heartbeat_allowed@GNUTLS_3_4
 gnutls_heartbeat_enable@GNUTLS_3_4
 gnutls_heartbeat_get_timeout@GNUTLS_3_4
