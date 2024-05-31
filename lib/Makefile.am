@@ -29,6 +29,10 @@ if ENABLE_MINITASN1
 SUBDIRS += minitasn1
 endif
 
+if ENABLE_LIBOQS
+SUBDIRS += liboqs
+endif
+
 localedir = $(datadir)/locale
 
 include $(top_srcdir)/lib/common.mk
@@ -116,6 +120,16 @@ AM_CPPFLAGS += $(LIBBROTLIDEC_CFLAGS) -DGNUTLS_BROTLIDEC_ENABLE_DLOPEN=1
 else
 thirdparty_libadd += $(LIBBROTLIENC_LIBS)
 thirdparty_libadd += $(LIBBROTLIDEC_LIBS)
+endif
+endif
+
+if ENABLE_LIBOQS
+COBJECTS += dlwrap/oqs.c dlwrap/oqsfuncs.h dlwrap/oqs.h
+
+if ENABLE_DLOPEN
+AM_CPPFLAGS += $(LIBOQS_CFLAGS) -DGNUTLS_OQS_ENABLE_DLOPEN=1
+else
+thirdparty_libadd += $(LIBOQS_LIBS)
 endif
 endif
 
