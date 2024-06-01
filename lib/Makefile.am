@@ -273,6 +273,10 @@ thirdparty_libadd += $(NETTLE_LIBS) $(HOGWEED_LIBS) $(GMP_LIBS)
 libgnutls_la_LIBADD += nettle/libcrypto.la
 endif
 
+if ENABLE_LIBOQS
+libgnutls_la_LIBADD += liboqs/libcrypto.la
+endif
+
 if HAVE_LD_OUTPUT_DEF
 libgnutls_la_LDFLAGS += -Wl,--output-def,libgnutls-$(DLL_VERSION).def
 libgnutls-$(DLL_VERSION).def: libgnutls.la

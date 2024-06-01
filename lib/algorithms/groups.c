@@ -170,6 +170,14 @@ static const gnutls_group_entry_st supported_groups[] = {
 	  .pk = GNUTLS_PK_DH,
 	  .tls_id = 0x104 },
 #endif
+#ifdef HAVE_LIBOQS
+	{ .name = "X25519-KYBER768",
+	  .id = GNUTLS_GROUP_EXP_X25519_KYBER768,
+	  .curve = GNUTLS_ECC_CURVE_X25519,
+	  .pk = GNUTLS_PK_ECDH_X25519,
+	  .pk2 = GNUTLS_PK_EXP_KYBER768,
+	  .tls_id = 0x6399 },
+#endif
 	{ 0, 0, 0 }
 };
 
