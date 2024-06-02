@@ -38,13 +38,16 @@
 extern "C" {
 #endif
 
+/* This function has already been public in older Nettle releases */
+#undef sha3_256_shake
+
 /* Name mangling */
-#define sha3_128_init nettle_sha3_128_init
-#define sha3_128_update nettle_sha3_128_update
-#define sha3_128_shake nettle_sha3_128_shake
-#define sha3_128_shake_output nettle_sha3_128_shake_output
-#define sha3_256_shake nettle_sha3_256_shake
-#define sha3_256_shake_output nettle_sha3_256_shake_output
+#define sha3_128_init gnutls_nettle_backport_sha3_128_init
+#define sha3_128_update gnutls_nettle_backport_sha3_128_update
+#define sha3_128_shake gnutls_nettle_backport_sha3_128_shake
+#define sha3_128_shake_output gnutls_nettle_backport_sha3_128_shake_output
+#define sha3_256_shake gnutls_nettle_backport_sha3_256_shake
+#define sha3_256_shake_output gnutls_nettle_backport_sha3_256_shake_output
 
 #define SHA3_128_DIGEST_SIZE 16
 #define SHA3_128_BLOCK_SIZE 168
