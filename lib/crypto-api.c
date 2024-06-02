@@ -895,8 +895,9 @@ int gnutls_hash(gnutls_hash_hd_t handle, const void *ptext, size_t ptext_len)
  * @handle: is a #gnutls_hash_hd_t type
  * @digest: is the output value of the hash
  *
- * This function will output the current hash value
- * and reset the state of the hash.
+ * This function will output the current hash value and reset the
+ * state of the hash. If @digest is %NULL, it only resets the state of
+ * the hash.
  *
  * Since: 2.10.0
  **/
