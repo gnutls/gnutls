@@ -255,6 +255,8 @@ void doit(void)
 	unsigned pcert_list_size, flags, i;
 	int ret;
 
+	global_init();
+
 	flags = GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED;
 
 	pcert_list_size = 3;
@@ -370,4 +372,6 @@ void doit(void)
 		gnutls_pcert_deinit(&pcert_list[i]);
 
 	success("all ok\n");
+
+	gnutls_global_deinit();
 }

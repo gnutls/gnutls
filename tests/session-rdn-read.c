@@ -98,12 +98,6 @@ static void start(const char *prio)
 
 	success("testing %s\n", prio);
 
-	/* General init. */
-	global_init();
-	gnutls_global_set_log_function(tls_log_func);
-	if (debug)
-		gnutls_global_set_log_level(2);
-
 	/* Init server */
 	gnutls_certificate_allocate_credentials(&serverx509cred);
 
@@ -163,8 +157,6 @@ static void start(const char *prio)
 	gnutls_certificate_free_credentials(serverx509cred);
 	gnutls_certificate_free_credentials(clientx509cred);
 
-	gnutls_global_deinit();
-
 	reset_buffers();
 }
 
@@ -180,10 +172,18 @@ static void find_dn(const gnutls_datum_t *cert, gnutls_datum_t *dn)
 
 void doit(void)
 {
+	/* General init. */
+	global_init();
+	gnutls_global_set_log_function(tls_log_func);
+	if (debug)
+		gnutls_global_set_log_level(2);
+
 	find_dn(CA1_PTR, &ca_dn[0]);
 	find_dn(CA2_PTR, &ca_dn[1]);
 	start("NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3");
 	start("NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2");
 	gnutls_free(ca_dn[0].data);
 	gnutls_free(ca_dn[1].data);
+
+	gnutls_global_deinit();
 }

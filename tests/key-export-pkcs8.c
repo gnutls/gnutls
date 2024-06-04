@@ -259,6 +259,8 @@ static int check_ecc(void)
 
 void doit(void)
 {
+	global_init();
+
 	if (check_dsa() != 0) {
 		fail("error in DSA check\n");
 		exit(1);
@@ -280,4 +282,6 @@ void doit(void)
 	if (check_gost() != 0) {
 		fail("error in gost check\n");
 	}
+
+	gnutls_global_deinit();
 }

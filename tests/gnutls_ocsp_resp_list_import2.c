@@ -242,6 +242,8 @@ void doit(void)
 {
 	unsigned int i;
 
+	global_init();
+
 	for (i = 0; i < sizeof(tests) / sizeof(tests[0]); i++) {
 		success("checking: %s\n", tests[i].name);
 

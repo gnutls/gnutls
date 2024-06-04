@@ -242,5 +242,13 @@ int main(void)
 		cmocka_unit_test(tls13_handshake),
 		cmocka_unit_test(tls12_handshake)
 	};
-	return cmocka_run_group_tests(tests, NULL, NULL);
+	int ret;
+
+	gnutls_global_init();
+
+	ret = cmocka_run_group_tests(tests, NULL, NULL);
+
+	gnutls_global_deinit();
+
+	return ret;
 }

@@ -93,12 +93,6 @@ static void run(const char *name, bool exceed_limit)
 
 	success("%s\n", name);
 
-	/* General init. */
-	global_init();
-	gnutls_global_set_log_function(tls_log_func);
-	if (debug)
-		gnutls_global_set_log_level(9);
-
 	/* Init server */
 	assert(gnutls_certificate_allocate_credentials(&scred) >= 0);
 	assert(gnutls_certificate_set_x509_key_mem(
@@ -216,14 +210,21 @@ static void run(const char *name, bool exceed_limit)
 	gnutls_certificate_free_credentials(scred);
 	gnutls_certificate_free_credentials(ccred);
 
-	gnutls_global_deinit();
 	reset_buffers();
 }
 
 void doit(void)
 {
+	/* General init. */
+	global_init();
+	gnutls_global_set_log_function(tls_log_func);
+	if (debug)
+		gnutls_global_set_log_level(9);
+
 	virt_time_init();
 
 	run("not exceeding limit", 0);
 	run("exceeding limit", 1);
+
+	gnutls_global_deinit();
 }

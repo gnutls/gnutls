@@ -72,6 +72,8 @@ void doit(void)
 	gnutls_datum_t secret = { NULL, 0 };
 	int ret;
 
+	global_init();
+
 	ret = gnutls_privkey_init(&privkey);
 	if (ret < 0) {
 		fail("unable to init privkey: %s\n", gnutls_strerror(ret));
@@ -111,4 +113,5 @@ void doit(void)
 	gnutls_pubkey_deinit(pubkey);
 	gnutls_privkey_deinit(privkey);
 	gnutls_free(secret.data);
+	gnutls_global_deinit();
 }

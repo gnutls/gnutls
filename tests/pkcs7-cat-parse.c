@@ -93,6 +93,8 @@ void doit(void)
 	gnutls_datum_t data;
 	int ret;
 
+	global_init();
+
 	gnutls_global_set_log_function(tls_log_func);
 	if (debug)
 		gnutls_global_set_log_level(6);
@@ -131,4 +133,6 @@ void doit(void)
 
 	gnutls_pkcs7_deinit(pkcs7);
 	gnutls_free(data.data);
+
+	gnutls_global_deinit();
 }

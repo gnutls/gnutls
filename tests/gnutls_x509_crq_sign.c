@@ -145,6 +145,8 @@ void doit(void)
 	gnutls_datum_t out;
 	gnutls_x509_crq_t crq;
 
+	global_init();
+
 	gnutls_global_set_time_function(mytime);
 
 	crq = generate_crq();
@@ -161,4 +163,6 @@ void doit(void)
 
 	gnutls_free(out.data);
 	gnutls_x509_crq_deinit(crq);
+
+	gnutls_global_deinit();
 }

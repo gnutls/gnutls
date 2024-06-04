@@ -99,10 +99,6 @@ static unsigned handshake(const char *prio, unsigned t,
 	int cret = GNUTLS_E_AGAIN;
 	char buf[128];
 
-	gnutls_global_set_log_function(tls_log_func);
-	if (debug)
-		gnutls_global_set_log_level(6);
-
 	assert(gnutls_certificate_allocate_credentials(&serverx509cred) >= 0);
 	assert(gnutls_certificate_set_x509_key_mem(serverx509cred, &server_cert,
 						   &server_key,
@@ -273,10 +269,18 @@ static void start2(const char *name, const char *prio, unsigned t, unsigned s)
 
 void doit(void)
 {
+	global_init();
+
+	gnutls_global_set_log_function(tls_log_func);
+	if (debug)
+		gnutls_global_set_log_level(6);
+
 	virt_time_init();
 
 	start("TLS1.3 sanity", "NORMAL:-VERS-ALL:+VERS-TLS1.3", 64, 0);
 	start("TLS1.3 ticket extension", "NORMAL:-VERS-ALL:+VERS-TLS1.3", 5, 3);
 	start2("TLS1.3 ticket extension - expires at handshake",
 	       "NORMAL:-VERS-ALL:+VERS-TLS1.3", 2, 3);
+
+	gnutls_global_deinit();
 }

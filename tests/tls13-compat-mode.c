@@ -130,8 +130,12 @@ static void test(const char *name, bool client_compat, bool server_compat)
 
 void doit(void)
 {
+	global_init();
+
 	test("client compat, server compat", true, true);
 	test("client compat, server non-compat", true, false);
 	test("client non-compat, server compat", false, true);
 	test("client non-compat, server non-compat", false, false);
+
+	gnutls_global_deinit();
 }

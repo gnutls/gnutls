@@ -153,10 +153,11 @@ void doit(void)
 {
 	char filename[TMPNAME_SIZE];
 
+	global_init();
+
 	assert(get_tmpname(filename) != NULL);
 
 	remove(filename);
-	global_init();
 
 	run(filename,
 	    "NONE:+VERS-TLS1.2:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA",

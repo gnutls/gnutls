@@ -162,8 +162,12 @@ void doit(void)
 {
 	unsigned i;
 
+	global_init();
+
 	for (i = 0; i < sizeof(tests) / sizeof(tests[0]); i++) {
 		decode(tests[i].name, &tests[i].raw, tests[i].str,
 		       tests[i].compat_str);
 	}
+
+	gnutls_global_deinit();
 }

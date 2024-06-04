@@ -193,8 +193,12 @@ void doit(void)
 {
 	unsigned i;
 
+	global_init();
+
 	for (i = 0; i < sizeof(encode_tests) / sizeof(encode_tests[0]); i++) {
 		encode(encode_tests[i].name, &encode_tests[i].sig,
 		       &encode_tests[i].r, &encode_tests[i].s);
 	}
+
+	gnutls_global_deinit();
 }

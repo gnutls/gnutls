@@ -68,5 +68,9 @@ static int test_decode(void)
 
 void doit(void)
 {
+	global_init();
+
 	test_decode();
+
+	gnutls_global_deinit();
 }

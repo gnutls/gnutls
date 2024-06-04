@@ -232,6 +232,8 @@ void doit(void)
 	gnutls_datum_t issuingca_datum = { (void *)_issuingca,
 					   sizeof(_issuingca) - 1 };
 
+	global_init();
+
 	gnutls_x509_crt_init(&issuingca);
 
 	ret = gnutls_x509_crt_import(issuingca, &issuingca_datum,
@@ -267,6 +269,8 @@ void doit(void)
 	gnutls_x509_crt_deinit(issuingca);
 
 	success("UPN constraints tests completed successfully\n");
+
+	gnutls_global_deinit();
 }
 
 /* The following cert is the root CA that signed the intermediate CA used in
