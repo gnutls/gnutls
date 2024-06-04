@@ -46,6 +46,8 @@ void doit(void)
 {
 	gnutls_certificate_credentials_t x509_cred;
 
+	global_init();
+
 	gnutls_certificate_allocate_credentials(&x509_cred);
 	/* The file does not need to exist for this test
 	 */
@@ -55,6 +57,8 @@ void doit(void)
 							"ocsp-status.der", 0);
 
 	gnutls_certificate_free_credentials(x509_cred);
+
+	gnutls_global_deinit();
 }
 
 #endif

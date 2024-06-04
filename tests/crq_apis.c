@@ -391,14 +391,6 @@ static void run_set_extensions(gnutls_x509_crq_t crq)
 	gnutls_datum_t out;
 	int ret;
 
-	ret = global_init();
-	if (ret < 0)
-		fail("global_init\n");
-
-	gnutls_global_set_log_function(tls_log_func);
-	if (debug)
-		gnutls_global_set_log_level(4711);
-
 	ret = gnutls_x509_crt_init(&crt);
 	if (ret != 0)
 		fail("gnutls_x509_crt_init\n");
@@ -456,8 +448,6 @@ static void run_set_extensions(gnutls_x509_crq_t crq)
 	gnutls_free(out.data);
 
 	gnutls_x509_crt_deinit(crt);
-
-	gnutls_global_deinit();
 }
 
 static void run_set_extension_by_oid(gnutls_x509_crq_t crq)
@@ -469,14 +459,6 @@ static void run_set_extension_by_oid(gnutls_x509_crq_t crq)
 	unsigned i;
 	int ret;
 	char oid[128];
-
-	ret = global_init();
-	if (ret < 0)
-		fail("global_init\n");
-
-	gnutls_global_set_log_function(tls_log_func);
-	if (debug)
-		gnutls_global_set_log_level(4711);
 
 	ret = gnutls_x509_crt_init(&crt);
 	if (ret != 0)
@@ -555,14 +537,21 @@ static void run_set_extension_by_oid(gnutls_x509_crq_t crq)
 	gnutls_free(out.data);
 
 	gnutls_x509_crt_deinit(crt);
-
-	gnutls_global_deinit();
 }
 
 void doit(void)
 {
 	gnutls_datum_t out;
 	gnutls_x509_crq_t crq;
+	int ret;
+
+	ret = global_init();
+	if (ret < 0)
+		fail("global_init\n");
+
+	gnutls_global_set_log_function(tls_log_func);
+	if (debug)
+		gnutls_global_set_log_level(4711);
 
 	gnutls_global_set_time_function(mytime);
 
@@ -582,4 +571,6 @@ void doit(void)
 
 	gnutls_free(out.data);
 	gnutls_x509_crq_deinit(crq);
+
+	gnutls_global_deinit();
 }

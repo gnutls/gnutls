@@ -353,6 +353,8 @@ void doit(void)
 		{ NULL }
 	};
 
+	global_init();
+
 	for (int i = 0; test_data[i].name != NULL; i++) {
 		gnutls_datum_t priv_key = { NULL, 0 }, pub_key = { NULL, 0 };
 		const gnutls_datum_t *q =
@@ -439,4 +441,6 @@ void doit(void)
 	}
 
 	success("all ok\n");
+
+	gnutls_global_deinit();
 }

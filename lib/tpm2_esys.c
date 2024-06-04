@@ -349,8 +349,8 @@ static const TPML_PCR_SELECTION all_creation_pcr = {
 	.count = 0,
 };
 
-#define rc_is_key_auth_failed(rc) (((rc)&0xff) == TPM2_RC_BAD_AUTH)
-#define rc_is_parent_auth_failed(rc) (((rc)&0xff) == TPM2_RC_AUTH_FAIL)
+#define rc_is_key_auth_failed(rc) (((rc) & 0xff) == TPM2_RC_BAD_AUTH)
+#define rc_is_parent_auth_failed(rc) (((rc) & 0xff) == TPM2_RC_AUTH_FAIL)
 
 struct tpm2_info_st *tpm2_info_init(struct pin_info_st *pin)
 {

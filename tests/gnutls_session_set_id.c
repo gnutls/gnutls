@@ -102,10 +102,6 @@ static void start(const char *test, unsigned try_resume)
 	success("%s\n", test);
 	reset_buffers();
 
-	gnutls_global_set_log_function(tls_log_func);
-	if (debug)
-		gnutls_global_set_log_level(6);
-
 	assert(gnutls_certificate_allocate_credentials(&serverx509cred) >= 0);
 	assert(gnutls_certificate_set_x509_key_mem(serverx509cred, &server_cert,
 						   &server_key,
@@ -207,6 +203,14 @@ static void start(const char *test, unsigned try_resume)
 
 void doit(void)
 {
+	global_init();
+
+	gnutls_global_set_log_function(tls_log_func);
+	if (debug)
+		gnutls_global_set_log_level(6);
+
 	start("functional: see if session ID is sent", 0);
 	start("negative: see if the expected error is seen on client side", 1);
+
+	gnutls_global_deinit();
 }

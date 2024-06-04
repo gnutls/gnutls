@@ -182,6 +182,8 @@ void doit(void)
 	gnutls_pkcs7_t pkcs7 = NULL;
 	gnutls_datum_t data = { (unsigned char *)"xxx", 3 };
 
+	global_init();
+
 	if (debug) {
 		gnutls_global_set_log_function(tls_log_func);
 		gnutls_global_set_log_level(4711);
@@ -214,4 +216,6 @@ void doit(void)
 	gnutls_x509_crt_deinit(ee_cert);
 	gnutls_x509_trust_list_deinit(tlist, 0);
 	gnutls_pkcs7_deinit(pkcs7);
+
+	gnutls_global_deinit();
 }

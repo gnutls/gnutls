@@ -73,5 +73,9 @@ static int test_load(void)
 
 void doit(void)
 {
+	global_init();
+
 	test_load();
+
+	gnutls_global_deinit();
 }

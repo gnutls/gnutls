@@ -169,6 +169,8 @@ void doit(void)
 	gnutls_datum_t cert = { (unsigned char *)cert_pem,
 				sizeof(cert_pem) - 1 };
 
+	global_init();
+
 	CHECK(gnutls_x509_crt_list_import2(&certs, &certs_size, &cert,
 					   GNUTLS_X509_FMT_PEM, 0));
 	CHECK(gnutls_x509_trust_list_init(&tl, 0));
@@ -183,4 +185,6 @@ void doit(void)
 	for (i = 0; i < certs_size; ++i)
 		gnutls_x509_crt_deinit(certs[i]);
 	gnutls_free(certs);
+
+	gnutls_global_deinit();
 }

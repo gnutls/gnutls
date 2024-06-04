@@ -308,6 +308,8 @@ void doit(void)
 	gnutls_datum_t out;
 	gnutls_x509_crl_t crl;
 
+	global_init();
+
 	gnutls_global_set_time_function(mytime);
 
 	crl = generate_crl(0);
@@ -343,4 +345,6 @@ void doit(void)
 
 	gnutls_free(out.data);
 	gnutls_x509_crl_deinit(crl);
+
+	gnutls_global_deinit();
 }

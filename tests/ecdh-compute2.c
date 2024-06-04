@@ -241,6 +241,8 @@ void doit(void)
 		{ 0 }
 	};
 
+	global_init();
+
 	for (int i = 0; test_data[i].curve != 0; i++) {
 		gnutls_datum_t x, y, key;
 		const gnutls_datum_t *result =
@@ -272,4 +274,6 @@ void doit(void)
 	}
 
 	success("all ok\n");
+
+	gnutls_global_deinit();
 }

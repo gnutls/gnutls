@@ -213,6 +213,8 @@ void doit(void)
 {
 	unsigned i;
 
+	global_init();
+
 	for (i = 0; i < sizeof(encode_tests) / sizeof(encode_tests[0]); i++) {
 		encode(encode_tests[i].name, encode_tests[i].hash,
 		       &encode_tests[i].raw, &encode_tests[i].di);
@@ -223,4 +225,6 @@ void doit(void)
 		       &decode_tests[i].raw, &decode_tests[i].di,
 		       decode_tests[i].res);
 	}
+
+	gnutls_global_deinit();
 }

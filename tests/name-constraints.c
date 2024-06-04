@@ -126,6 +126,8 @@ void doit(void)
 	unsigned type;
 	gnutls_datum_t name;
 
+	global_init();
+
 	gnutls_global_set_log_function(tls_log_func);
 	if (debug)
 		gnutls_global_set_log_level(6);
@@ -368,4 +370,6 @@ void doit(void)
 
 	if (debug)
 		success("Test success.\n");
+
+	gnutls_global_deinit();
 }

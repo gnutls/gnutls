@@ -12,9 +12,9 @@ variables:
   # name to allow expiration of old caches.
   BUILD_IMAGES_PROJECT: gnutls/build-images
   DEBIAN_BUILD: buildenv-debian-testing
-  FEDORA_BUILD: buildenv-fedora38
-  FEDORA_CROSS_BUILD: buildenv-cross-fedora38
-  MINGW_BUILD: buildenv-mingw-fedora38
+  FEDORA_BUILD: buildenv-fedora39
+  FEDORA_CROSS_BUILD: buildenv-cross-fedora39
+  MINGW_BUILD: buildenv-mingw-fedora39
   ALPINE_BASE_BUILD: buildenv-alpine-base
   COMPILER: gcc
   CPPCHECK_OPTIONS: "--enable=warning --enable=performance --enable=portability --std=c99 --suppressions-list=devel/cppcheck.suppressions --template='{id}:{file}:{line},{severity},{message}'"
@@ -29,7 +29,7 @@ variables:
   CHECKJOBS: 16
 
 cache:
-  key: "$CI_JOB_NAME-ver33"
+  key: "$CI_JOB_NAME-ver37"
   paths:
     - cache/
 
@@ -111,10 +111,10 @@ default:
 .mingw:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$MINGW_BUILD
   variables:
-    COMPILER: "${arch_name}-w64-mingw32-gcc"
-    CFLAGS: "-fstack-protector"
-    CXXFLAGS: "-fstack-protector"
-    LDFLAGS: "-fstack-protector"
+    # COMPILER: "${arch_name}-w64-mingw32-gcc"
+    # CFLAGS: "-fstack-protector"
+    # CXXFLAGS: "-fstack-protector"
+    # LDFLAGS: "-fstack-protector"
     WINEPATH: "/usr/${arch_name}-w64-mingw32/sys-root/mingw/bin"
   before_script:
     - *prepare-ccache
@@ -160,7 +160,7 @@ commit-check:
   cache: {}
   script:
     # we want $ALPINE_BASE_BUILD without git, so we are adding it here
-    - apk add git bash grep clang16-extra-tools
+    - apk add git bash grep clang17-extra-tools
     - devel/check_if_signed
     - PATH=/usr/lib/llvm16/bin:$PATH devel/indent-gnutls
     - devel/check-headers.sh
@@ -809,7 +809,7 @@ debian/test:
   script:
 #    - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
 #    - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
-    - dash ./configure --disable-gcc-warnings --host=${arch_name}-w64-mingw32 --target=${arch_name}-w64-mingw32 --cache-file $CCACHE_FILE --with-included-libtasn1 --disable-nls --with-included-unistring --without-p11-kit --disable-non-suiteb-curves --disable-full-test-suite --disable-doc --with-pkcs12-iter-count=10000
+    - mingw${arch_bits}-configure --disable-gcc-warnings --host=${arch_name}-w64-mingw32 --target=${arch_name}-w64-mingw32 --cache-file $CCACHE_FILE --disable-nls --with-included-unistring --disable-non-suiteb-curves --disable-full-test-suite --disable-doc --with-pkcs12-iter-count=10000
     - mingw${arch_bits}-make -j$BUILDJOBS
     # https://bugzilla.redhat.com/show_bug.cgi?id=2049401
     - mingw${arch_bits}-make -j$BUILDJOBS -C $PWD/tests check TESTS=""
@@ -872,6 +872,8 @@ mingw64/test:
   extends:
     - .mingw/test
     - .mingw64
+  variables:
+    GNUTLS_NO_IMPLICIT_INIT: 1
   dependencies:
     - mingw64/build
   needs:
@@ -900,6 +902,8 @@ mingw64-vista/test:
     - .mingw/test
     - .mingw64
     - .mingw-vista
+  variables:
+    GNUTLS_NO_IMPLICIT_INIT: 1
   dependencies:
     - mingw64-vista/build
   needs:

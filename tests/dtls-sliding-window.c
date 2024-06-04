@@ -50,7 +50,7 @@ int _dtls_record_check(struct record_parameters_st *rp, uint64_t _seq);
 
 #define RESET_WINDOW memset(&state, 0, sizeof(state))
 
-#define SET_WINDOW_NEXT(x) state.dtls_sw_next = (((x)&DTLS_SEQ_NUM_MASK))
+#define SET_WINDOW_NEXT(x) state.dtls_sw_next = (((x) & DTLS_SEQ_NUM_MASK))
 
 #define SET_WINDOW_LAST_RECV(x) \
 	t = x;                  \

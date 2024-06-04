@@ -191,11 +191,6 @@ static void try_with_key_ks(const char *name, const char *client_prio,
 	int cret = GNUTLS_E_AGAIN, version;
 	const char *err;
 
-	/* General init. */
-	gnutls_global_set_log_function(tls_log_func);
-	if (debug)
-		gnutls_global_set_log_level(6);
-
 	reset_buffers();
 	/* Init server */
 	gnutls_certificate_allocate_credentials(&serverx509cred);
@@ -318,6 +313,13 @@ static void try_with_key(const char *name, const char *client_prio,
 
 void doit(void)
 {
+	/* General init. */
+	global_init();
+
+	gnutls_global_set_log_function(tls_log_func);
+	if (debug)
+		gnutls_global_set_log_level(6);
+
 	/* TLS 1.3 no client cert: early start expected */
 	try_ok("TLS 1.3 with ffdhe2048 rsa no-cli-cert",
 	       "NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-FFDHE2048");
@@ -354,4 +356,6 @@ void doit(void)
 			  "NORMAL:-VERS-ALL:+VERS-TLS1.3:-KX-ALL:+ECDHE-RSA",
 			  &server_ca3_localhost_ecc_cert, &server_ca3_ecc_key,
 			  NULL, NULL, 0);
+
+	gnutls_global_deinit();
 }

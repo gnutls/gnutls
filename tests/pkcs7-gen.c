@@ -99,6 +99,8 @@ void doit(void)
 	char *oid;
 	gnutls_datum_t data;
 
+	global_init();
+
 	gnutls_global_set_time_function(mytime);
 	gnutls_global_set_log_function(tls_log_func);
 	if (debug)
@@ -265,4 +267,6 @@ void doit(void)
 	gnutls_pkcs7_deinit(pkcs7);
 	gnutls_privkey_deinit(pkey);
 	gnutls_x509_crt_deinit(crt);
+
+	gnutls_global_deinit();
 }

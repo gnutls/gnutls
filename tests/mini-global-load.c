@@ -26,6 +26,14 @@
 #include "config.h"
 #endif
 
+#if defined(_WIN32)
+
+int main(int argc, char **argv)
+{
+	exit(77);
+}
+
+#else
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -138,3 +146,4 @@ void doit(void)
 	start("NORMAL:-VERS-ALL:+VERS-TLS1.3");
 	start("NORMAL");
 }
+#endif

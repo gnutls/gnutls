@@ -68,6 +68,8 @@ void doit(void)
 	unsigned bits = 0;
 	int ret;
 
+	global_init();
+
 	/* import DH parameters from DSA key and verify they are the same */
 	assert(gnutls_dh_params_init(&dh_params) >= 0);
 	assert(gnutls_dh_params_init(&tmp_params) >= 0);
@@ -112,4 +114,6 @@ void doit(void)
 	gnutls_dh_params_deinit(dh_params);
 	gnutls_x509_privkey_deinit(privkey);
 	success("all ok\n");
+
+	gnutls_global_deinit();
 }
