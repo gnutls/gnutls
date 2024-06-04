@@ -111,10 +111,10 @@ default:
 .mingw:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$MINGW_BUILD
   variables:
-    COMPILER: "${arch_name}-w64-mingw32-gcc"
-    CFLAGS: "-fstack-protector"
-    CXXFLAGS: "-fstack-protector"
-    LDFLAGS: "-fstack-protector"
+    # COMPILER: "${arch_name}-w64-mingw32-gcc"
+    # CFLAGS: "-fstack-protector"
+    # CXXFLAGS: "-fstack-protector"
+    # LDFLAGS: "-fstack-protector"
     WINEPATH: "/usr/${arch_name}-w64-mingw32/sys-root/mingw/bin"
   before_script:
     - *prepare-ccache
@@ -809,7 +809,7 @@ debian/test:
   script:
 #    - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
 #    - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
-    - dash ./configure --disable-gcc-warnings --host=${arch_name}-w64-mingw32 --target=${arch_name}-w64-mingw32 --cache-file $CCACHE_FILE --with-included-libtasn1 --disable-nls --with-included-unistring --without-p11-kit --disable-non-suiteb-curves --disable-full-test-suite --disable-doc --with-pkcs12-iter-count=10000
+    - mingw${arch_bits}-configure --disable-gcc-warnings --host=${arch_name}-w64-mingw32 --target=${arch_name}-w64-mingw32 --cache-file $CCACHE_FILE --disable-nls --with-included-unistring --disable-non-suiteb-curves --disable-full-test-suite --disable-doc --with-pkcs12-iter-count=10000
     - mingw${arch_bits}-make -j$BUILDJOBS
     # https://bugzilla.redhat.com/show_bug.cgi?id=2049401
     - mingw${arch_bits}-make -j$BUILDJOBS -C $PWD/tests check TESTS=""
