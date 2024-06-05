@@ -86,7 +86,6 @@ if ! test -z "${ADD}"; then
 	PREFIX="$(echo $ADD|sed 's/://g'): "
 fi
 
-#AES-128-CCM
 for i in AES-128-GCM AES-256-GCM CHACHA20-POLY1305 AES-128-CCM AES-128-CCM-8;do
 	echo_cmd "${PREFIX}Checking TLS 1.3 with cipher ${i}..."
 
@@ -95,7 +94,7 @@ for i in AES-128-GCM AES-256-GCM CHACHA20-POLY1305 AES-128-CCM AES-128-CCM-8;do
 	PID=$!
 	wait_server ${PID}
 
-	${OPENSSL} s_client -ciphersuites ${OCIPHERSUITES} -host localhost -port "${PORT}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
+	${OPENSSL} s_client -cipher ALL:@SECLEVEL=0 -min_protocol TLSv1.3 -ciphersuites ${OCIPHERSUITES} -host localhost -port "${PORT}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
 		fail ${PID} "Failed"
 
 	kill ${PID}

@@ -86,11 +86,10 @@ fi
 
 
 eval "${GETPORT}"
-launch_bare_server "$OPENSSL" s_server -ciphersuites ${OCIPHERSUITES} -groups 'X25519:P-256:X448:P-521:P-384' -quiet -www -accept "${PORT}" -keyform pem -certform pem ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" -CAfile "${CA_CERT}"
+launch_bare_server "$OPENSSL" s_server -cipher ALL:@SECLEVEL=0 -min_protocol TLSv1.3 -ciphersuites ${OCIPHERSUITES} -groups 'X25519:P-256:X448:P-521:P-384' -quiet -www -accept "${PORT}" -keyform pem -certform pem ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" -CAfile "${CA_CERT}"
 PID=$!
 wait_server ${PID}
 
-#AES-128-CCM
 for i in AES-128-GCM AES-256-GCM CHACHA20-POLY1305 AES-128-CCM AES-128-CCM-8;do
 	echo_cmd "${PREFIX}Checking TLS 1.3 with ${i}..."
 	${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+${i}${ADD}" --insecure </dev/null >>${OUTPUT} || \
