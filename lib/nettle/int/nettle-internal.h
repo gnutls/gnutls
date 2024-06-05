@@ -83,6 +83,6 @@
 
 /* Equivalent to x == 0, but with an expression that should compile to
    branch free code on all compilers. Requires that x is at most 31 bits. */
-#define IS_ZERO_SMALL(x) (((uint32_t)(x)-1U) >> 31)
+#define IS_ZERO_SMALL(x) (((uint32_t)(x) - 1U) >> 31)
 
 #endif /* GNUTLS_NETTLE_INT_NETTLE_INTERNAL_H_INCLUDED */

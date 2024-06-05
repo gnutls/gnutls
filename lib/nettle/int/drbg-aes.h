@@ -29,7 +29,7 @@
 /* Requires that size > 0 */
 #define INCREMENT(size, ctr)                                                   \
 	do {                                                                   \
-		unsigned increment_i = (size)-1;                               \
+		unsigned increment_i = (size) - 1;                             \
 		if (++(ctr)[increment_i] == 0)                                 \
 			while (increment_i > 0 && ++(ctr)[--increment_i] == 0) \
 				;                                              \

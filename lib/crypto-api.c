@@ -1391,10 +1391,7 @@ static int copy_to_iov(const uint8_t *data, size_t size, const giovec_t *iov,
 	return 0;
 }
 
-#define IOV_STORE_INIT     \
-	{                  \
-		NULL, 0, 0 \
-	}
+#define IOV_STORE_INIT { NULL, 0, 0 }
 
 static int aead_cipher_encryptv_fallback(gnutls_aead_cipher_hd_t handle,
 					 const void *nonce, size_t nonce_len,

@@ -1076,10 +1076,8 @@ hexdump:
 	adds(str, "\n");
 }
 
-#define ENTRY(oid, name)                                              \
-	{                                                             \
-		oid, sizeof(oid) - 1, name, sizeof(name) - 1, NULL, 0 \
-	}
+#define ENTRY(oid, name) \
+	{ oid, sizeof(oid) - 1, name, sizeof(name) - 1, NULL, 0 }
 
 static const struct oid_to_string cp_oid2str[] = {
 	ENTRY("2.5.29.32.0", "anyPolicy"),

@@ -35,13 +35,13 @@ void gnutls_cpuid(unsigned int func, unsigned int *ax, unsigned int *bx,
 	if (s != 16 && s != 24 && s != 32) \
 	return GNUTLS_E_INVALID_REQUEST
 
-#define NN_HASH(name, update_func, digest_func, NAME)                 \
-	{                                                             \
-		#name, sizeof(struct name##_ctx), NAME##_DIGEST_SIZE, \
-			NAME##_DATA_SIZE,                             \
-			(nettle_hash_init_func *)name##_init,         \
-			(nettle_hash_update_func *)update_func,       \
-			(nettle_hash_digest_func *)digest_func        \
-	}
+#define NN_HASH(name, update_func, digest_func, NAME) \
+	{ #name,                                      \
+	  sizeof(struct name##_ctx),                  \
+	  NAME##_DIGEST_SIZE,                         \
+	  NAME##_DATA_SIZE,                           \
+	  (nettle_hash_init_func *)name##_init,       \
+	  (nettle_hash_update_func *)update_func,     \
+	  (nettle_hash_digest_func *)digest_func }
 
 #endif

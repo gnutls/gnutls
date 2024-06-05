@@ -37,16 +37,11 @@
 
 static int data2hex(const void *data, size_t data_size, gnutls_datum_t *out);
 
-#define ENTRY(oid, ldap, asn, etype)                                     \
-	{                                                                \
-		oid, sizeof(oid) - 1, ldap, sizeof(ldap) - 1, asn, etype \
-	}
+#define ENTRY(oid, ldap, asn, etype) \
+	{ oid, sizeof(oid) - 1, ldap, sizeof(ldap) - 1, asn, etype }
 
 /* when there is no name description */
-#define ENTRY_ND(oid, asn, etype)                         \
-	{                                                 \
-		oid, sizeof(oid) - 1, NULL, 0, asn, etype \
-	}
+#define ENTRY_ND(oid, asn, etype) { oid, sizeof(oid) - 1, NULL, 0, asn, etype }
 
 /* This list contains all the OIDs that may be
  * contained in a rdnSequence and are printable.

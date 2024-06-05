@@ -33,10 +33,7 @@ typedef struct {
 	const char *desc;
 } gnutls_alert_entry;
 
-#define ALERT_ENTRY(x, y) \
-	{                 \
-		x, #x, y  \
-	}
+#define ALERT_ENTRY(x, y) { x, #x, y }
 
 static const gnutls_alert_entry sup_alerts[] = {
 	ALERT_ENTRY(GNUTLS_A_CLOSE_NOTIFY, N_("Close notify")),

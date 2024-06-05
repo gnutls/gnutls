@@ -24,14 +24,14 @@
 #define GNUTLS_LIB_ACCELERATED_AARCH64_AARCH64_COMMON_H
 
 #if !__ASSEMBLER__
-#define NN_HASH(name, update_func, digest_func, NAME)                 \
-	{                                                             \
-		#name, sizeof(struct name##_ctx), NAME##_DIGEST_SIZE, \
-			NAME##_DATA_SIZE,                             \
-			(nettle_hash_init_func *)name##_init,         \
-			(nettle_hash_update_func *)update_func,       \
-			(nettle_hash_digest_func *)digest_func        \
-	}
+#define NN_HASH(name, update_func, digest_func, NAME) \
+	{ #name,                                      \
+	  sizeof(struct name##_ctx),                  \
+	  NAME##_DIGEST_SIZE,                         \
+	  NAME##_DATA_SIZE,                           \
+	  (nettle_hash_init_func *)name##_init,       \
+	  (nettle_hash_update_func *)update_func,     \
+	  (nettle_hash_digest_func *)digest_func }
 
 void register_aarch64_crypto(void);
 #endif

@@ -28,10 +28,7 @@
 #define _(String) dgettext(PACKAGE, String)
 #define N_(String) gettext_noop(String)
 
-#define ERROR_ENTRY(desc, name)   \
-	{                         \
-		desc, #name, name \
-	}
+#define ERROR_ENTRY(desc, name) { desc, #name, name }
 
 struct error_entry {
 	const char *desc;
