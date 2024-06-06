@@ -22,7 +22,15 @@
          {"name" : "test-client-compatibility.py",
           "arguments" : ["-p", "@PORT@", "18: IE 6 on XP",
                          "52: YandexBot 3.0 on unknown",
-                         "100: IE 6 on XP"]}
+                         "100: IE 6 on XP"]},
+         {"name" : "test-dhe-no-shared-secret-padding.py",
+          "arguments" : ["-p", "@PORT@", "-z",
+                         "Protocol (3, 0)",
+                         "Protocol (3, 0) in SSLv2 compatible ClientHello"]},
+         {"name" : "test-ecdhe-padded-shared-secret.py",
+          "arguments" : ["-p", "@PORT@", "-z",
+                         "Protocol (3, 0) in SSLv2 compatible ClientHello",
+                         "Protocol (3, 0)"]}
      ]
     }
 ]
