@@ -57,6 +57,8 @@ if test "$ac_cv_prog_cc_c99" = "no"; then
   AC_MSG_WARN([[Compiler does not support C99. It may not be able to compile the project.]])
 fi
 
+AM_CONDITIONAL(CROSS_COMPILING, test "$cross_compiling" = yes)
+
 AX_CODE_COVERAGE
 
 AM_MAINTAINER_MODE([enable])
