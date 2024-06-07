@@ -65,14 +65,12 @@ cleanup:
 }
 
 /* Do not encode ASN1 and type for now */
-#define ENTRY(oid, name, type)                                           \
-	{                                                                \
-		oid, sizeof(oid) - 1, name, sizeof(name) - 1, NULL, type \
-	}
-#define ENTRY2(oid, name)                                           \
-	{                                                           \
-		oid, sizeof(oid) - 1, name, sizeof(name) - 1, NULL, \
-			ASN1_ETYPE_INVALID                          \
+#define ENTRY(oid, name, type) \
+	{ oid, sizeof(oid) - 1, name, sizeof(name) - 1, NULL, type }
+#define ENTRY2(oid, name)                                        \
+	{                                                        \
+		oid,  sizeof(oid) - 1,	 name, sizeof(name) - 1, \
+		NULL, ASN1_ETYPE_INVALID                         \
 	}
 
 static const struct oid_to_string pkcs7_attrs[] = {

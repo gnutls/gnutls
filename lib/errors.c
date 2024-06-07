@@ -27,10 +27,7 @@
 #endif
 #include "str.h"
 
-#define ERROR_ENTRY(desc, name)   \
-	{                         \
-		desc, #name, name \
-	}
+#define ERROR_ENTRY(desc, name) { desc, #name, name }
 
 struct gnutls_error_entry {
 	const char *desc;

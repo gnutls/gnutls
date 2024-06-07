@@ -37,881 +37,327 @@
 #endif
 
 /* Cipher SUITES */
-#define ENTRY(name, canonical_name, block_algorithm, kx_algorithm,          \
-	      mac_algorithm, min_version, dtls_version)                     \
-	{                                                                   \
-		#name, name, canonical_name, block_algorithm, kx_algorithm, \
-			mac_algorithm, min_version, GNUTLS_TLS1_2,          \
-			dtls_version, GNUTLS_DTLS1_2, GNUTLS_MAC_SHA256     \
-	}
-#define ENTRY_PRF(name, canonical_name, block_algorithm, kx_algorithm,      \
-		  mac_algorithm, min_version, dtls_version, prf)            \
-	{                                                                   \
-		#name, name, canonical_name, block_algorithm, kx_algorithm, \
-			mac_algorithm, min_version, GNUTLS_TLS1_2,          \
-			dtls_version, GNUTLS_DTLS1_2, prf                   \
-	}
+#define ENTRY(name, canonical_name, block_algorithm, kx_algorithm,         \
+	      mac_algorithm, min_version, dtls_version)                    \
+	{ #name,	name,		canonical_name,	  block_algorithm, \
+	  kx_algorithm, mac_algorithm,	min_version,	  GNUTLS_TLS1_2,   \
+	  dtls_version, GNUTLS_DTLS1_2, GNUTLS_MAC_SHA256 }
+#define ENTRY_PRF(name, canonical_name, block_algorithm, kx_algorithm, \
+		  mac_algorithm, min_version, dtls_version, prf)       \
+	{ #name,                                                       \
+	  name,                                                        \
+	  canonical_name,                                              \
+	  block_algorithm,                                             \
+	  kx_algorithm,                                                \
+	  mac_algorithm,                                               \
+	  min_version,                                                 \
+	  GNUTLS_TLS1_2,                                               \
+	  dtls_version,                                                \
+	  GNUTLS_DTLS1_2,                                              \
+	  prf }
 #define ENTRY_TLS13(name, canonical_name, block_algorithm, min_version, prf) \
-	{                                                                    \
-		#name, name, canonical_name, block_algorithm, 0,             \
-			GNUTLS_MAC_AEAD, min_version, GNUTLS_TLS1_3,         \
-			GNUTLS_VERSION_UNKNOWN, GNUTLS_VERSION_UNKNOWN, prf  \
-	}
+	{ #name,                                                             \
+	  name,                                                              \
+	  canonical_name,                                                    \
+	  block_algorithm,                                                   \
+	  0,                                                                 \
+	  GNUTLS_MAC_AEAD,                                                   \
+	  min_version,                                                       \
+	  GNUTLS_TLS1_3,                                                     \
+	  GNUTLS_VERSION_UNKNOWN,                                            \
+	  GNUTLS_VERSION_UNKNOWN,                                            \
+	  prf }
 
 /* TLS 1.3 ciphersuites */
-#define GNUTLS_AES_128_GCM_SHA256 \
-	{                         \
-		0x13, 0x01        \
-	}
-#define GNUTLS_AES_256_GCM_SHA384 \
-	{                         \
-		0x13, 0x02        \
-	}
-#define GNUTLS_CHACHA20_POLY1305_SHA256 \
-	{                               \
-		0x13, 0x03              \
-	}
-#define GNUTLS_AES_128_CCM_SHA256 \
-	{                         \
-		0x13, 0x04        \
-	}
-#define GNUTLS_AES_128_CCM_8_SHA256 \
-	{                           \
-		0x13, 0x05          \
-	}
+#define GNUTLS_AES_128_GCM_SHA256 { 0x13, 0x01 }
+#define GNUTLS_AES_256_GCM_SHA384 { 0x13, 0x02 }
+#define GNUTLS_CHACHA20_POLY1305_SHA256 { 0x13, 0x03 }
+#define GNUTLS_AES_128_CCM_SHA256 { 0x13, 0x04 }
+#define GNUTLS_AES_128_CCM_8_SHA256 { 0x13, 0x05 }
 
 /* RSA with NULL cipher and MD5 MAC
  * for test purposes.
  */
-#define GNUTLS_RSA_NULL_MD5 \
-	{                   \
-		0x00, 0x01  \
-	}
-#define GNUTLS_RSA_NULL_SHA1 \
-	{                    \
-		0x00, 0x02   \
-	}
-#define GNUTLS_RSA_NULL_SHA256 \
-	{                      \
-		0x00, 0x3B     \
-	}
+#define GNUTLS_RSA_NULL_MD5 { 0x00, 0x01 }
+#define GNUTLS_RSA_NULL_SHA1 { 0x00, 0x02 }
+#define GNUTLS_RSA_NULL_SHA256 { 0x00, 0x3B }
 
 /* ANONymous cipher suites.
  */
 
-#define GNUTLS_DH_ANON_3DES_EDE_CBC_SHA1 \
-	{                                \
-		0x00, 0x1B               \
-	}
-#define GNUTLS_DH_ANON_ARCFOUR_128_MD5 \
-	{                              \
-		0x00, 0x18             \
-	}
+#define GNUTLS_DH_ANON_3DES_EDE_CBC_SHA1 { 0x00, 0x1B }
+#define GNUTLS_DH_ANON_ARCFOUR_128_MD5 { 0x00, 0x18 }
 
 /* rfc3268: */
-#define GNUTLS_DH_ANON_AES_128_CBC_SHA1 \
-	{                               \
-		0x00, 0x34              \
-	}
-#define GNUTLS_DH_ANON_AES_256_CBC_SHA1 \
-	{                               \
-		0x00, 0x3A              \
-	}
+#define GNUTLS_DH_ANON_AES_128_CBC_SHA1 { 0x00, 0x34 }
+#define GNUTLS_DH_ANON_AES_256_CBC_SHA1 { 0x00, 0x3A }
 
 /* rfc4132 */
-#define GNUTLS_DH_ANON_CAMELLIA_128_CBC_SHA1 \
-	{                                    \
-		0x00, 0x46                   \
-	}
-#define GNUTLS_DH_ANON_CAMELLIA_256_CBC_SHA1 \
-	{                                    \
-		0x00, 0x89                   \
-	}
+#define GNUTLS_DH_ANON_CAMELLIA_128_CBC_SHA1 { 0x00, 0x46 }
+#define GNUTLS_DH_ANON_CAMELLIA_256_CBC_SHA1 { 0x00, 0x89 }
 
 /* rfc5932 */
-#define GNUTLS_RSA_CAMELLIA_128_CBC_SHA256 \
-	{                                  \
-		0x00, 0xBA                 \
-	}
-#define GNUTLS_DHE_DSS_CAMELLIA_128_CBC_SHA256 \
-	{                                      \
-		0x00, 0xBD                     \
-	}
-#define GNUTLS_DHE_RSA_CAMELLIA_128_CBC_SHA256 \
-	{                                      \
-		0x00, 0xBE                     \
-	}
-#define GNUTLS_DH_ANON_CAMELLIA_128_CBC_SHA256 \
-	{                                      \
-		0x00, 0xBF                     \
-	}
-#define GNUTLS_RSA_CAMELLIA_256_CBC_SHA256 \
-	{                                  \
-		0x00, 0xC0                 \
-	}
-#define GNUTLS_DHE_DSS_CAMELLIA_256_CBC_SHA256 \
-	{                                      \
-		0x00, 0xC3                     \
-	}
-#define GNUTLS_DHE_RSA_CAMELLIA_256_CBC_SHA256 \
-	{                                      \
-		0x00, 0xC4                     \
-	}
-#define GNUTLS_DH_ANON_CAMELLIA_256_CBC_SHA256 \
-	{                                      \
-		0x00, 0xC5                     \
-	}
+#define GNUTLS_RSA_CAMELLIA_128_CBC_SHA256 { 0x00, 0xBA }
+#define GNUTLS_DHE_DSS_CAMELLIA_128_CBC_SHA256 { 0x00, 0xBD }
+#define GNUTLS_DHE_RSA_CAMELLIA_128_CBC_SHA256 { 0x00, 0xBE }
+#define GNUTLS_DH_ANON_CAMELLIA_128_CBC_SHA256 { 0x00, 0xBF }
+#define GNUTLS_RSA_CAMELLIA_256_CBC_SHA256 { 0x00, 0xC0 }
+#define GNUTLS_DHE_DSS_CAMELLIA_256_CBC_SHA256 { 0x00, 0xC3 }
+#define GNUTLS_DHE_RSA_CAMELLIA_256_CBC_SHA256 { 0x00, 0xC4 }
+#define GNUTLS_DH_ANON_CAMELLIA_256_CBC_SHA256 { 0x00, 0xC5 }
 
 /* rfc6367 */
-#define GNUTLS_ECDHE_ECDSA_CAMELLIA_128_CBC_SHA256 \
-	{                                          \
-		0xC0, 0x72                         \
-	}
-#define GNUTLS_ECDHE_ECDSA_CAMELLIA_256_CBC_SHA384 \
-	{                                          \
-		0xC0, 0x73                         \
-	}
-#define GNUTLS_ECDHE_RSA_CAMELLIA_128_CBC_SHA256 \
-	{                                        \
-		0xC0, 0x76                       \
-	}
-#define GNUTLS_ECDHE_RSA_CAMELLIA_256_CBC_SHA384 \
-	{                                        \
-		0xC0, 0x77                       \
-	}
-#define GNUTLS_PSK_CAMELLIA_128_CBC_SHA256 \
-	{                                  \
-		0xC0, 0x94                 \
-	}
-#define GNUTLS_PSK_CAMELLIA_256_CBC_SHA384 \
-	{                                  \
-		0xC0, 0x95                 \
-	}
-#define GNUTLS_DHE_PSK_CAMELLIA_128_CBC_SHA256 \
-	{                                      \
-		0xC0, 0x96                     \
-	}
-#define GNUTLS_DHE_PSK_CAMELLIA_256_CBC_SHA384 \
-	{                                      \
-		0xC0, 0x97                     \
-	}
-#define GNUTLS_RSA_PSK_CAMELLIA_128_CBC_SHA256 \
-	{                                      \
-		0xC0, 0x98                     \
-	}
-#define GNUTLS_RSA_PSK_CAMELLIA_256_CBC_SHA384 \
-	{                                      \
-		0xC0, 0x99                     \
-	}
-#define GNUTLS_ECDHE_PSK_CAMELLIA_128_CBC_SHA256 \
-	{                                        \
-		0xC0, 0x9A                       \
-	}
-#define GNUTLS_ECDHE_PSK_CAMELLIA_256_CBC_SHA384 \
-	{                                        \
-		0xC0, 0x9B                       \
-	}
+#define GNUTLS_ECDHE_ECDSA_CAMELLIA_128_CBC_SHA256 { 0xC0, 0x72 }
+#define GNUTLS_ECDHE_ECDSA_CAMELLIA_256_CBC_SHA384 { 0xC0, 0x73 }
+#define GNUTLS_ECDHE_RSA_CAMELLIA_128_CBC_SHA256 { 0xC0, 0x76 }
+#define GNUTLS_ECDHE_RSA_CAMELLIA_256_CBC_SHA384 { 0xC0, 0x77 }
+#define GNUTLS_PSK_CAMELLIA_128_CBC_SHA256 { 0xC0, 0x94 }
+#define GNUTLS_PSK_CAMELLIA_256_CBC_SHA384 { 0xC0, 0x95 }
+#define GNUTLS_DHE_PSK_CAMELLIA_128_CBC_SHA256 { 0xC0, 0x96 }
+#define GNUTLS_DHE_PSK_CAMELLIA_256_CBC_SHA384 { 0xC0, 0x97 }
+#define GNUTLS_RSA_PSK_CAMELLIA_128_CBC_SHA256 { 0xC0, 0x98 }
+#define GNUTLS_RSA_PSK_CAMELLIA_256_CBC_SHA384 { 0xC0, 0x99 }
+#define GNUTLS_ECDHE_PSK_CAMELLIA_128_CBC_SHA256 { 0xC0, 0x9A }
+#define GNUTLS_ECDHE_PSK_CAMELLIA_256_CBC_SHA384 { 0xC0, 0x9B }
 
-#define GNUTLS_RSA_CAMELLIA_128_GCM_SHA256 \
-	{                                  \
-		0xC0, 0x7A                 \
-	}
-#define GNUTLS_RSA_CAMELLIA_256_GCM_SHA384 \
-	{                                  \
-		0xC0, 0x7B                 \
-	}
-#define GNUTLS_DHE_RSA_CAMELLIA_128_GCM_SHA256 \
-	{                                      \
-		0xC0, 0x7C                     \
-	}
-#define GNUTLS_DHE_RSA_CAMELLIA_256_GCM_SHA384 \
-	{                                      \
-		0xC0, 0x7D                     \
-	}
-#define GNUTLS_DHE_DSS_CAMELLIA_128_GCM_SHA256 \
-	{                                      \
-		0xC0, 0x80                     \
-	}
-#define GNUTLS_DHE_DSS_CAMELLIA_256_GCM_SHA384 \
-	{                                      \
-		0xC0, 0x81                     \
-	}
-#define GNUTLS_DH_ANON_CAMELLIA_128_GCM_SHA256 \
-	{                                      \
-		0xC0, 0x84                     \
-	}
-#define GNUTLS_DH_ANON_CAMELLIA_256_GCM_SHA384 \
-	{                                      \
-		0xC0, 0x85                     \
-	}
-#define GNUTLS_ECDHE_ECDSA_CAMELLIA_128_GCM_SHA256 \
-	{                                          \
-		0xC0, 0x86                         \
-	}
-#define GNUTLS_ECDHE_ECDSA_CAMELLIA_256_GCM_SHA384 \
-	{                                          \
-		0xC0, 0x87                         \
-	}
-#define GNUTLS_ECDHE_RSA_CAMELLIA_128_GCM_SHA256 \
-	{                                        \
-		0xC0, 0x8A                       \
-	}
-#define GNUTLS_ECDHE_RSA_CAMELLIA_256_GCM_SHA384 \
-	{                                        \
-		0xC0, 0x8B                       \
-	}
-#define GNUTLS_PSK_CAMELLIA_128_GCM_SHA256 \
-	{                                  \
-		0xC0, 0x8E                 \
-	}
-#define GNUTLS_PSK_CAMELLIA_256_GCM_SHA384 \
-	{                                  \
-		0xC0, 0x8F                 \
-	}
-#define GNUTLS_DHE_PSK_CAMELLIA_128_GCM_SHA256 \
-	{                                      \
-		0xC0, 0x90                     \
-	}
-#define GNUTLS_DHE_PSK_CAMELLIA_256_GCM_SHA384 \
-	{                                      \
-		0xC0, 0x91                     \
-	}
-#define GNUTLS_RSA_PSK_CAMELLIA_128_GCM_SHA256 \
-	{                                      \
-		0xC0, 0x92                     \
-	}
-#define GNUTLS_RSA_PSK_CAMELLIA_256_GCM_SHA384 \
-	{                                      \
-		0xC0, 0x93                     \
-	}
+#define GNUTLS_RSA_CAMELLIA_128_GCM_SHA256 { 0xC0, 0x7A }
+#define GNUTLS_RSA_CAMELLIA_256_GCM_SHA384 { 0xC0, 0x7B }
+#define GNUTLS_DHE_RSA_CAMELLIA_128_GCM_SHA256 { 0xC0, 0x7C }
+#define GNUTLS_DHE_RSA_CAMELLIA_256_GCM_SHA384 { 0xC0, 0x7D }
+#define GNUTLS_DHE_DSS_CAMELLIA_128_GCM_SHA256 { 0xC0, 0x80 }
+#define GNUTLS_DHE_DSS_CAMELLIA_256_GCM_SHA384 { 0xC0, 0x81 }
+#define GNUTLS_DH_ANON_CAMELLIA_128_GCM_SHA256 { 0xC0, 0x84 }
+#define GNUTLS_DH_ANON_CAMELLIA_256_GCM_SHA384 { 0xC0, 0x85 }
+#define GNUTLS_ECDHE_ECDSA_CAMELLIA_128_GCM_SHA256 { 0xC0, 0x86 }
+#define GNUTLS_ECDHE_ECDSA_CAMELLIA_256_GCM_SHA384 { 0xC0, 0x87 }
+#define GNUTLS_ECDHE_RSA_CAMELLIA_128_GCM_SHA256 { 0xC0, 0x8A }
+#define GNUTLS_ECDHE_RSA_CAMELLIA_256_GCM_SHA384 { 0xC0, 0x8B }
+#define GNUTLS_PSK_CAMELLIA_128_GCM_SHA256 { 0xC0, 0x8E }
+#define GNUTLS_PSK_CAMELLIA_256_GCM_SHA384 { 0xC0, 0x8F }
+#define GNUTLS_DHE_PSK_CAMELLIA_128_GCM_SHA256 { 0xC0, 0x90 }
+#define GNUTLS_DHE_PSK_CAMELLIA_256_GCM_SHA384 { 0xC0, 0x91 }
+#define GNUTLS_RSA_PSK_CAMELLIA_128_GCM_SHA256 { 0xC0, 0x92 }
+#define GNUTLS_RSA_PSK_CAMELLIA_256_GCM_SHA384 { 0xC0, 0x93 }
 
-#define GNUTLS_DH_ANON_AES_128_CBC_SHA256 \
-	{                                 \
-		0x00, 0x6C                \
-	}
-#define GNUTLS_DH_ANON_AES_256_CBC_SHA256 \
-	{                                 \
-		0x00, 0x6D                \
-	}
+#define GNUTLS_DH_ANON_AES_128_CBC_SHA256 { 0x00, 0x6C }
+#define GNUTLS_DH_ANON_AES_256_CBC_SHA256 { 0x00, 0x6D }
 
 /* draft-ietf-tls-chacha20-poly1305-02 */
-#define GNUTLS_ECDHE_RSA_CHACHA20_POLY1305 \
-	{                                  \
-		0xCC, 0xA8                 \
-	}
-#define GNUTLS_ECDHE_ECDSA_CHACHA20_POLY1305 \
-	{                                    \
-		0xCC, 0xA9                   \
-	}
-#define GNUTLS_DHE_RSA_CHACHA20_POLY1305 \
-	{                                \
-		0xCC, 0xAA               \
-	}
+#define GNUTLS_ECDHE_RSA_CHACHA20_POLY1305 { 0xCC, 0xA8 }
+#define GNUTLS_ECDHE_ECDSA_CHACHA20_POLY1305 { 0xCC, 0xA9 }
+#define GNUTLS_DHE_RSA_CHACHA20_POLY1305 { 0xCC, 0xAA }
 
-#define GNUTLS_PSK_CHACHA20_POLY1305 \
-	{                            \
-		0xCC, 0xAB           \
-	}
-#define GNUTLS_ECDHE_PSK_CHACHA20_POLY1305 \
-	{                                  \
-		0xCC, 0xAC                 \
-	}
-#define GNUTLS_DHE_PSK_CHACHA20_POLY1305 \
-	{                                \
-		0xCC, 0xAD               \
-	}
-#define GNUTLS_RSA_PSK_CHACHA20_POLY1305 \
-	{                                \
-		0xCC, 0xAE               \
-	}
+#define GNUTLS_PSK_CHACHA20_POLY1305 { 0xCC, 0xAB }
+#define GNUTLS_ECDHE_PSK_CHACHA20_POLY1305 { 0xCC, 0xAC }
+#define GNUTLS_DHE_PSK_CHACHA20_POLY1305 { 0xCC, 0xAD }
+#define GNUTLS_RSA_PSK_CHACHA20_POLY1305 { 0xCC, 0xAE }
 
 /* PSK (not in TLS 1.0)
  * draft-ietf-tls-psk:
  */
-#define GNUTLS_PSK_ARCFOUR_128_SHA1 \
-	{                           \
-		0x00, 0x8A          \
-	}
-#define GNUTLS_PSK_3DES_EDE_CBC_SHA1 \
-	{                            \
-		0x00, 0x8B           \
-	}
-#define GNUTLS_PSK_AES_128_CBC_SHA1 \
-	{                           \
-		0x00, 0x8C          \
-	}
-#define GNUTLS_PSK_AES_256_CBC_SHA1 \
-	{                           \
-		0x00, 0x8D          \
-	}
+#define GNUTLS_PSK_ARCFOUR_128_SHA1 { 0x00, 0x8A }
+#define GNUTLS_PSK_3DES_EDE_CBC_SHA1 { 0x00, 0x8B }
+#define GNUTLS_PSK_AES_128_CBC_SHA1 { 0x00, 0x8C }
+#define GNUTLS_PSK_AES_256_CBC_SHA1 { 0x00, 0x8D }
 
-#define GNUTLS_DHE_PSK_ARCFOUR_128_SHA1 \
-	{                               \
-		0x00, 0x8E              \
-	}
-#define GNUTLS_DHE_PSK_3DES_EDE_CBC_SHA1 \
-	{                                \
-		0x00, 0x8F               \
-	}
-#define GNUTLS_DHE_PSK_AES_128_CBC_SHA1 \
-	{                               \
-		0x00, 0x90              \
-	}
-#define GNUTLS_DHE_PSK_AES_256_CBC_SHA1 \
-	{                               \
-		0x00, 0x91              \
-	}
+#define GNUTLS_DHE_PSK_ARCFOUR_128_SHA1 { 0x00, 0x8E }
+#define GNUTLS_DHE_PSK_3DES_EDE_CBC_SHA1 { 0x00, 0x8F }
+#define GNUTLS_DHE_PSK_AES_128_CBC_SHA1 { 0x00, 0x90 }
+#define GNUTLS_DHE_PSK_AES_256_CBC_SHA1 { 0x00, 0x91 }
 
-#define GNUTLS_RSA_PSK_ARCFOUR_128_SHA1 \
-	{                               \
-		0x00, 0x92              \
-	}
-#define GNUTLS_RSA_PSK_3DES_EDE_CBC_SHA1 \
-	{                                \
-		0x00, 0x93               \
-	}
-#define GNUTLS_RSA_PSK_AES_128_CBC_SHA1 \
-	{                               \
-		0x00, 0x94              \
-	}
-#define GNUTLS_RSA_PSK_AES_256_CBC_SHA1 \
-	{                               \
-		0x00, 0x95              \
-	}
+#define GNUTLS_RSA_PSK_ARCFOUR_128_SHA1 { 0x00, 0x92 }
+#define GNUTLS_RSA_PSK_3DES_EDE_CBC_SHA1 { 0x00, 0x93 }
+#define GNUTLS_RSA_PSK_AES_128_CBC_SHA1 { 0x00, 0x94 }
+#define GNUTLS_RSA_PSK_AES_256_CBC_SHA1 { 0x00, 0x95 }
 
 #ifdef ENABLE_SRP
 /* SRP (rfc5054)
  */
-#define GNUTLS_SRP_SHA_3DES_EDE_CBC_SHA1 \
-	{                                \
-		0xC0, 0x1A               \
-	}
-#define GNUTLS_SRP_SHA_RSA_3DES_EDE_CBC_SHA1 \
-	{                                    \
-		0xC0, 0x1B                   \
-	}
-#define GNUTLS_SRP_SHA_DSS_3DES_EDE_CBC_SHA1 \
-	{                                    \
-		0xC0, 0x1C                   \
-	}
+#define GNUTLS_SRP_SHA_3DES_EDE_CBC_SHA1 { 0xC0, 0x1A }
+#define GNUTLS_SRP_SHA_RSA_3DES_EDE_CBC_SHA1 { 0xC0, 0x1B }
+#define GNUTLS_SRP_SHA_DSS_3DES_EDE_CBC_SHA1 { 0xC0, 0x1C }
 
-#define GNUTLS_SRP_SHA_AES_128_CBC_SHA1 \
-	{                               \
-		0xC0, 0x1D              \
-	}
-#define GNUTLS_SRP_SHA_RSA_AES_128_CBC_SHA1 \
-	{                                   \
-		0xC0, 0x1E                  \
-	}
-#define GNUTLS_SRP_SHA_DSS_AES_128_CBC_SHA1 \
-	{                                   \
-		0xC0, 0x1F                  \
-	}
+#define GNUTLS_SRP_SHA_AES_128_CBC_SHA1 { 0xC0, 0x1D }
+#define GNUTLS_SRP_SHA_RSA_AES_128_CBC_SHA1 { 0xC0, 0x1E }
+#define GNUTLS_SRP_SHA_DSS_AES_128_CBC_SHA1 { 0xC0, 0x1F }
 
-#define GNUTLS_SRP_SHA_AES_256_CBC_SHA1 \
-	{                               \
-		0xC0, 0x20              \
-	}
-#define GNUTLS_SRP_SHA_RSA_AES_256_CBC_SHA1 \
-	{                                   \
-		0xC0, 0x21                  \
-	}
-#define GNUTLS_SRP_SHA_DSS_AES_256_CBC_SHA1 \
-	{                                   \
-		0xC0, 0x22                  \
-	}
+#define GNUTLS_SRP_SHA_AES_256_CBC_SHA1 { 0xC0, 0x20 }
+#define GNUTLS_SRP_SHA_RSA_AES_256_CBC_SHA1 { 0xC0, 0x21 }
+#define GNUTLS_SRP_SHA_DSS_AES_256_CBC_SHA1 { 0xC0, 0x22 }
 #endif
 
 /* RSA
  */
-#define GNUTLS_RSA_ARCFOUR_128_SHA1 \
-	{                           \
-		0x00, 0x05          \
-	}
-#define GNUTLS_RSA_ARCFOUR_128_MD5 \
-	{                          \
-		0x00, 0x04         \
-	}
-#define GNUTLS_RSA_3DES_EDE_CBC_SHA1 \
-	{                            \
-		0x00, 0x0A           \
-	}
+#define GNUTLS_RSA_ARCFOUR_128_SHA1 { 0x00, 0x05 }
+#define GNUTLS_RSA_ARCFOUR_128_MD5 { 0x00, 0x04 }
+#define GNUTLS_RSA_3DES_EDE_CBC_SHA1 { 0x00, 0x0A }
 
 /* rfc3268:
  */
-#define GNUTLS_RSA_AES_128_CBC_SHA1 \
-	{                           \
-		0x00, 0x2F          \
-	}
-#define GNUTLS_RSA_AES_256_CBC_SHA1 \
-	{                           \
-		0x00, 0x35          \
-	}
+#define GNUTLS_RSA_AES_128_CBC_SHA1 { 0x00, 0x2F }
+#define GNUTLS_RSA_AES_256_CBC_SHA1 { 0x00, 0x35 }
 
 /* rfc4132 */
-#define GNUTLS_RSA_CAMELLIA_128_CBC_SHA1 \
-	{                                \
-		0x00, 0x41               \
-	}
-#define GNUTLS_RSA_CAMELLIA_256_CBC_SHA1 \
-	{                                \
-		0x00, 0x84               \
-	}
+#define GNUTLS_RSA_CAMELLIA_128_CBC_SHA1 { 0x00, 0x41 }
+#define GNUTLS_RSA_CAMELLIA_256_CBC_SHA1 { 0x00, 0x84 }
 
-#define GNUTLS_RSA_AES_128_CBC_SHA256 \
-	{                             \
-		0x00, 0x3C            \
-	}
-#define GNUTLS_RSA_AES_256_CBC_SHA256 \
-	{                             \
-		0x00, 0x3D            \
-	}
+#define GNUTLS_RSA_AES_128_CBC_SHA256 { 0x00, 0x3C }
+#define GNUTLS_RSA_AES_256_CBC_SHA256 { 0x00, 0x3D }
 
 /* DHE DSS
  */
-#define GNUTLS_DHE_DSS_3DES_EDE_CBC_SHA1 \
-	{                                \
-		0x00, 0x13               \
-	}
+#define GNUTLS_DHE_DSS_3DES_EDE_CBC_SHA1 { 0x00, 0x13 }
 
 /* draft-ietf-tls-56-bit-ciphersuites-01:
  */
-#define GNUTLS_DHE_DSS_ARCFOUR_128_SHA1 \
-	{                               \
-		0x00, 0x66              \
-	}
+#define GNUTLS_DHE_DSS_ARCFOUR_128_SHA1 { 0x00, 0x66 }
 
 /* rfc3268:
  */
-#define GNUTLS_DHE_DSS_AES_256_CBC_SHA1 \
-	{                               \
-		0x00, 0x38              \
-	}
-#define GNUTLS_DHE_DSS_AES_128_CBC_SHA1 \
-	{                               \
-		0x00, 0x32              \
-	}
+#define GNUTLS_DHE_DSS_AES_256_CBC_SHA1 { 0x00, 0x38 }
+#define GNUTLS_DHE_DSS_AES_128_CBC_SHA1 { 0x00, 0x32 }
 
 /* rfc4132 */
-#define GNUTLS_DHE_DSS_CAMELLIA_128_CBC_SHA1 \
-	{                                    \
-		0x00, 0x44                   \
-	}
-#define GNUTLS_DHE_DSS_CAMELLIA_256_CBC_SHA1 \
-	{                                    \
-		0x00, 0x87                   \
-	}
+#define GNUTLS_DHE_DSS_CAMELLIA_128_CBC_SHA1 { 0x00, 0x44 }
+#define GNUTLS_DHE_DSS_CAMELLIA_256_CBC_SHA1 { 0x00, 0x87 }
 
-#define GNUTLS_DHE_DSS_AES_128_CBC_SHA256 \
-	{                                 \
-		0x00, 0x40                \
-	}
-#define GNUTLS_DHE_DSS_AES_256_CBC_SHA256 \
-	{                                 \
-		0x00, 0x6A                \
-	}
+#define GNUTLS_DHE_DSS_AES_128_CBC_SHA256 { 0x00, 0x40 }
+#define GNUTLS_DHE_DSS_AES_256_CBC_SHA256 { 0x00, 0x6A }
 
 /* DHE RSA
  */
-#define GNUTLS_DHE_RSA_3DES_EDE_CBC_SHA1 \
-	{                                \
-		0x00, 0x16               \
-	}
+#define GNUTLS_DHE_RSA_3DES_EDE_CBC_SHA1 { 0x00, 0x16 }
 
 /* rfc3268:
  */
-#define GNUTLS_DHE_RSA_AES_128_CBC_SHA1 \
-	{                               \
-		0x00, 0x33              \
-	}
-#define GNUTLS_DHE_RSA_AES_256_CBC_SHA1 \
-	{                               \
-		0x00, 0x39              \
-	}
+#define GNUTLS_DHE_RSA_AES_128_CBC_SHA1 { 0x00, 0x33 }
+#define GNUTLS_DHE_RSA_AES_256_CBC_SHA1 { 0x00, 0x39 }
 
 /* rfc4132 */
-#define GNUTLS_DHE_RSA_CAMELLIA_128_CBC_SHA1 \
-	{                                    \
-		0x00, 0x45                   \
-	}
-#define GNUTLS_DHE_RSA_CAMELLIA_256_CBC_SHA1 \
-	{                                    \
-		0x00, 0x88                   \
-	}
+#define GNUTLS_DHE_RSA_CAMELLIA_128_CBC_SHA1 { 0x00, 0x45 }
+#define GNUTLS_DHE_RSA_CAMELLIA_256_CBC_SHA1 { 0x00, 0x88 }
 
-#define GNUTLS_DHE_RSA_AES_128_CBC_SHA256 \
-	{                                 \
-		0x00, 0x67                \
-	}
-#define GNUTLS_DHE_RSA_AES_256_CBC_SHA256 \
-	{                                 \
-		0x00, 0x6B                \
-	}
+#define GNUTLS_DHE_RSA_AES_128_CBC_SHA256 { 0x00, 0x67 }
+#define GNUTLS_DHE_RSA_AES_256_CBC_SHA256 { 0x00, 0x6B }
 
 /* GCM: RFC5288 */
-#define GNUTLS_RSA_AES_128_GCM_SHA256 \
-	{                             \
-		0x00, 0x9C            \
-	}
-#define GNUTLS_DHE_RSA_AES_128_GCM_SHA256 \
-	{                                 \
-		0x00, 0x9E                \
-	}
-#define GNUTLS_DHE_DSS_AES_128_GCM_SHA256 \
-	{                                 \
-		0x00, 0xA2                \
-	}
-#define GNUTLS_DH_ANON_AES_128_GCM_SHA256 \
-	{                                 \
-		0x00, 0xA6                \
-	}
-#define GNUTLS_RSA_AES_256_GCM_SHA384 \
-	{                             \
-		0x00, 0x9D            \
-	}
-#define GNUTLS_DHE_RSA_AES_256_GCM_SHA384 \
-	{                                 \
-		0x00, 0x9F                \
-	}
-#define GNUTLS_DHE_DSS_AES_256_GCM_SHA384 \
-	{                                 \
-		0x00, 0xA3                \
-	}
-#define GNUTLS_DH_ANON_AES_256_GCM_SHA384 \
-	{                                 \
-		0x00, 0xA7                \
-	}
+#define GNUTLS_RSA_AES_128_GCM_SHA256 { 0x00, 0x9C }
+#define GNUTLS_DHE_RSA_AES_128_GCM_SHA256 { 0x00, 0x9E }
+#define GNUTLS_DHE_DSS_AES_128_GCM_SHA256 { 0x00, 0xA2 }
+#define GNUTLS_DH_ANON_AES_128_GCM_SHA256 { 0x00, 0xA6 }
+#define GNUTLS_RSA_AES_256_GCM_SHA384 { 0x00, 0x9D }
+#define GNUTLS_DHE_RSA_AES_256_GCM_SHA384 { 0x00, 0x9F }
+#define GNUTLS_DHE_DSS_AES_256_GCM_SHA384 { 0x00, 0xA3 }
+#define GNUTLS_DH_ANON_AES_256_GCM_SHA384 { 0x00, 0xA7 }
 
 /* CCM: RFC6655/7251 */
-#define GNUTLS_RSA_AES_128_CCM \
-	{                      \
-		0xC0, 0x9C     \
-	}
-#define GNUTLS_RSA_AES_256_CCM \
-	{                      \
-		0xC0, 0x9D     \
-	}
-#define GNUTLS_DHE_RSA_AES_128_CCM \
-	{                          \
-		0xC0, 0x9E         \
-	}
-#define GNUTLS_DHE_RSA_AES_256_CCM \
-	{                          \
-		0xC0, 0x9F         \
-	}
+#define GNUTLS_RSA_AES_128_CCM { 0xC0, 0x9C }
+#define GNUTLS_RSA_AES_256_CCM { 0xC0, 0x9D }
+#define GNUTLS_DHE_RSA_AES_128_CCM { 0xC0, 0x9E }
+#define GNUTLS_DHE_RSA_AES_256_CCM { 0xC0, 0x9F }
 
-#define GNUTLS_ECDHE_ECDSA_AES_128_CCM \
-	{                              \
-		0xC0, 0xAC             \
-	}
-#define GNUTLS_ECDHE_ECDSA_AES_256_CCM \
-	{                              \
-		0xC0, 0xAD             \
-	}
+#define GNUTLS_ECDHE_ECDSA_AES_128_CCM { 0xC0, 0xAC }
+#define GNUTLS_ECDHE_ECDSA_AES_256_CCM { 0xC0, 0xAD }
 
-#define GNUTLS_PSK_AES_128_CCM \
-	{                      \
-		0xC0, 0xA4     \
-	}
-#define GNUTLS_PSK_AES_256_CCM \
-	{                      \
-		0xC0, 0xA5     \
-	}
-#define GNUTLS_DHE_PSK_AES_128_CCM \
-	{                          \
-		0xC0, 0xA6         \
-	}
-#define GNUTLS_DHE_PSK_AES_256_CCM \
-	{                          \
-		0xC0, 0xA7         \
-	}
+#define GNUTLS_PSK_AES_128_CCM { 0xC0, 0xA4 }
+#define GNUTLS_PSK_AES_256_CCM { 0xC0, 0xA5 }
+#define GNUTLS_DHE_PSK_AES_128_CCM { 0xC0, 0xA6 }
+#define GNUTLS_DHE_PSK_AES_256_CCM { 0xC0, 0xA7 }
 
 /* CCM-8: RFC6655/7251 */
-#define GNUTLS_RSA_AES_128_CCM_8 \
-	{                        \
-		0xC0, 0xA0       \
-	}
-#define GNUTLS_RSA_AES_256_CCM_8 \
-	{                        \
-		0xC0, 0xA1       \
-	}
-#define GNUTLS_DHE_RSA_AES_128_CCM_8 \
-	{                            \
-		0xC0, 0xA2           \
-	}
-#define GNUTLS_DHE_RSA_AES_256_CCM_8 \
-	{                            \
-		0xC0, 0xA3           \
-	}
+#define GNUTLS_RSA_AES_128_CCM_8 { 0xC0, 0xA0 }
+#define GNUTLS_RSA_AES_256_CCM_8 { 0xC0, 0xA1 }
+#define GNUTLS_DHE_RSA_AES_128_CCM_8 { 0xC0, 0xA2 }
+#define GNUTLS_DHE_RSA_AES_256_CCM_8 { 0xC0, 0xA3 }
 
-#define GNUTLS_ECDHE_ECDSA_AES_128_CCM_8 \
-	{                                \
-		0xC0, 0xAE               \
-	}
-#define GNUTLS_ECDHE_ECDSA_AES_256_CCM_8 \
-	{                                \
-		0xC0, 0xAF               \
-	}
+#define GNUTLS_ECDHE_ECDSA_AES_128_CCM_8 { 0xC0, 0xAE }
+#define GNUTLS_ECDHE_ECDSA_AES_256_CCM_8 { 0xC0, 0xAF }
 
-#define GNUTLS_PSK_AES_128_CCM_8 \
-	{                        \
-		0xC0, 0xA8       \
-	}
-#define GNUTLS_PSK_AES_256_CCM_8 \
-	{                        \
-		0xC0, 0xA9       \
-	}
-#define GNUTLS_DHE_PSK_AES_128_CCM_8 \
-	{                            \
-		0xC0, 0xAA           \
-	}
-#define GNUTLS_DHE_PSK_AES_256_CCM_8 \
-	{                            \
-		0xC0, 0xAB           \
-	}
+#define GNUTLS_PSK_AES_128_CCM_8 { 0xC0, 0xA8 }
+#define GNUTLS_PSK_AES_256_CCM_8 { 0xC0, 0xA9 }
+#define GNUTLS_DHE_PSK_AES_128_CCM_8 { 0xC0, 0xAA }
+#define GNUTLS_DHE_PSK_AES_256_CCM_8 { 0xC0, 0xAB }
 
 /* RFC 5487 */
 /* GCM-PSK */
-#define GNUTLS_PSK_AES_128_GCM_SHA256 \
-	{                             \
-		0x00, 0xA8            \
-	}
-#define GNUTLS_DHE_PSK_AES_128_GCM_SHA256 \
-	{                                 \
-		0x00, 0xAA                \
-	}
-#define GNUTLS_PSK_AES_256_GCM_SHA384 \
-	{                             \
-		0x00, 0xA9            \
-	}
-#define GNUTLS_DHE_PSK_AES_256_GCM_SHA384 \
-	{                                 \
-		0x00, 0xAB                \
-	}
+#define GNUTLS_PSK_AES_128_GCM_SHA256 { 0x00, 0xA8 }
+#define GNUTLS_DHE_PSK_AES_128_GCM_SHA256 { 0x00, 0xAA }
+#define GNUTLS_PSK_AES_256_GCM_SHA384 { 0x00, 0xA9 }
+#define GNUTLS_DHE_PSK_AES_256_GCM_SHA384 { 0x00, 0xAB }
 
-#define GNUTLS_PSK_AES_256_CBC_SHA384 \
-	{                             \
-		0x00, 0xAF            \
-	}
-#define GNUTLS_PSK_NULL_SHA384 \
-	{                      \
-		0x00, 0xB1     \
-	}
-#define GNUTLS_DHE_PSK_AES_256_CBC_SHA384 \
-	{                                 \
-		0x00, 0xB3                \
-	}
-#define GNUTLS_DHE_PSK_NULL_SHA384 \
-	{                          \
-		0x00, 0xB5         \
-	}
+#define GNUTLS_PSK_AES_256_CBC_SHA384 { 0x00, 0xAF }
+#define GNUTLS_PSK_NULL_SHA384 { 0x00, 0xB1 }
+#define GNUTLS_DHE_PSK_AES_256_CBC_SHA384 { 0x00, 0xB3 }
+#define GNUTLS_DHE_PSK_NULL_SHA384 { 0x00, 0xB5 }
 
-#define GNUTLS_PSK_NULL_SHA1 \
-	{                    \
-		0x00, 0x2C   \
-	}
-#define GNUTLS_DHE_PSK_NULL_SHA1 \
-	{                        \
-		0x00, 0x2D       \
-	}
-#define GNUTLS_RSA_PSK_NULL_SHA1 \
-	{                        \
-		0x00, 0x2E       \
-	}
-#define GNUTLS_ECDHE_PSK_NULL_SHA1 \
-	{                          \
-		0xC0, 0x39         \
-	}
+#define GNUTLS_PSK_NULL_SHA1 { 0x00, 0x2C }
+#define GNUTLS_DHE_PSK_NULL_SHA1 { 0x00, 0x2D }
+#define GNUTLS_RSA_PSK_NULL_SHA1 { 0x00, 0x2E }
+#define GNUTLS_ECDHE_PSK_NULL_SHA1 { 0xC0, 0x39 }
 
-#define GNUTLS_RSA_PSK_AES_128_GCM_SHA256 \
-	{                                 \
-		0x00, 0xAC                \
-	}
-#define GNUTLS_RSA_PSK_AES_256_GCM_SHA384 \
-	{                                 \
-		0x00, 0xAD                \
-	}
-#define GNUTLS_RSA_PSK_AES_128_CBC_SHA256 \
-	{                                 \
-		0x00, 0xB6                \
-	}
-#define GNUTLS_RSA_PSK_AES_256_CBC_SHA384 \
-	{                                 \
-		0x00, 0xB7                \
-	}
-#define GNUTLS_RSA_PSK_NULL_SHA256 \
-	{                          \
-		0x00, 0xB8         \
-	}
-#define GNUTLS_RSA_PSK_NULL_SHA384 \
-	{                          \
-		0x00, 0xB9         \
-	}
+#define GNUTLS_RSA_PSK_AES_128_GCM_SHA256 { 0x00, 0xAC }
+#define GNUTLS_RSA_PSK_AES_256_GCM_SHA384 { 0x00, 0xAD }
+#define GNUTLS_RSA_PSK_AES_128_CBC_SHA256 { 0x00, 0xB6 }
+#define GNUTLS_RSA_PSK_AES_256_CBC_SHA384 { 0x00, 0xB7 }
+#define GNUTLS_RSA_PSK_NULL_SHA256 { 0x00, 0xB8 }
+#define GNUTLS_RSA_PSK_NULL_SHA384 { 0x00, 0xB9 }
 
 /* PSK - SHA256 HMAC */
-#define GNUTLS_PSK_AES_128_CBC_SHA256 \
-	{                             \
-		0x00, 0xAE            \
-	}
-#define GNUTLS_DHE_PSK_AES_128_CBC_SHA256 \
-	{                                 \
-		0x00, 0xB2                \
-	}
+#define GNUTLS_PSK_AES_128_CBC_SHA256 { 0x00, 0xAE }
+#define GNUTLS_DHE_PSK_AES_128_CBC_SHA256 { 0x00, 0xB2 }
 
-#define GNUTLS_PSK_NULL_SHA256 \
-	{                      \
-		0x00, 0xB0     \
-	}
-#define GNUTLS_DHE_PSK_NULL_SHA256 \
-	{                          \
-		0x00, 0xB4         \
-	}
+#define GNUTLS_PSK_NULL_SHA256 { 0x00, 0xB0 }
+#define GNUTLS_DHE_PSK_NULL_SHA256 { 0x00, 0xB4 }
 
 /* ECC */
-#define GNUTLS_ECDH_ANON_NULL_SHA1 \
-	{                          \
-		0xC0, 0x15         \
-	}
-#define GNUTLS_ECDH_ANON_3DES_EDE_CBC_SHA1 \
-	{                                  \
-		0xC0, 0x17                 \
-	}
-#define GNUTLS_ECDH_ANON_AES_128_CBC_SHA1 \
-	{                                 \
-		0xC0, 0x18                \
-	}
-#define GNUTLS_ECDH_ANON_AES_256_CBC_SHA1 \
-	{                                 \
-		0xC0, 0x19                \
-	}
-#define GNUTLS_ECDH_ANON_ARCFOUR_128_SHA1 \
-	{                                 \
-		0xC0, 0x16                \
-	}
+#define GNUTLS_ECDH_ANON_NULL_SHA1 { 0xC0, 0x15 }
+#define GNUTLS_ECDH_ANON_3DES_EDE_CBC_SHA1 { 0xC0, 0x17 }
+#define GNUTLS_ECDH_ANON_AES_128_CBC_SHA1 { 0xC0, 0x18 }
+#define GNUTLS_ECDH_ANON_AES_256_CBC_SHA1 { 0xC0, 0x19 }
+#define GNUTLS_ECDH_ANON_ARCFOUR_128_SHA1 { 0xC0, 0x16 }
 
 /* ECC-RSA */
-#define GNUTLS_ECDHE_RSA_NULL_SHA1 \
-	{                          \
-		0xC0, 0x10         \
-	}
-#define GNUTLS_ECDHE_RSA_3DES_EDE_CBC_SHA1 \
-	{                                  \
-		0xC0, 0x12                 \
-	}
-#define GNUTLS_ECDHE_RSA_AES_128_CBC_SHA1 \
-	{                                 \
-		0xC0, 0x13                \
-	}
-#define GNUTLS_ECDHE_RSA_AES_256_CBC_SHA1 \
-	{                                 \
-		0xC0, 0x14                \
-	}
-#define GNUTLS_ECDHE_RSA_ARCFOUR_128_SHA1 \
-	{                                 \
-		0xC0, 0x11                \
-	}
+#define GNUTLS_ECDHE_RSA_NULL_SHA1 { 0xC0, 0x10 }
+#define GNUTLS_ECDHE_RSA_3DES_EDE_CBC_SHA1 { 0xC0, 0x12 }
+#define GNUTLS_ECDHE_RSA_AES_128_CBC_SHA1 { 0xC0, 0x13 }
+#define GNUTLS_ECDHE_RSA_AES_256_CBC_SHA1 { 0xC0, 0x14 }
+#define GNUTLS_ECDHE_RSA_ARCFOUR_128_SHA1 { 0xC0, 0x11 }
 
 /* ECC-ECDSA */
-#define GNUTLS_ECDHE_ECDSA_NULL_SHA1 \
-	{                            \
-		0xC0, 0x06           \
-	}
-#define GNUTLS_ECDHE_ECDSA_3DES_EDE_CBC_SHA1 \
-	{                                    \
-		0xC0, 0x08                   \
-	}
-#define GNUTLS_ECDHE_ECDSA_AES_128_CBC_SHA1 \
-	{                                   \
-		0xC0, 0x09                  \
-	}
-#define GNUTLS_ECDHE_ECDSA_AES_256_CBC_SHA1 \
-	{                                   \
-		0xC0, 0x0A                  \
-	}
-#define GNUTLS_ECDHE_ECDSA_ARCFOUR_128_SHA1 \
-	{                                   \
-		0xC0, 0x07                  \
-	}
+#define GNUTLS_ECDHE_ECDSA_NULL_SHA1 { 0xC0, 0x06 }
+#define GNUTLS_ECDHE_ECDSA_3DES_EDE_CBC_SHA1 { 0xC0, 0x08 }
+#define GNUTLS_ECDHE_ECDSA_AES_128_CBC_SHA1 { 0xC0, 0x09 }
+#define GNUTLS_ECDHE_ECDSA_AES_256_CBC_SHA1 { 0xC0, 0x0A }
+#define GNUTLS_ECDHE_ECDSA_ARCFOUR_128_SHA1 { 0xC0, 0x07 }
 
 /* RFC5289 */
 /* ECC with SHA2 */
-#define GNUTLS_ECDHE_ECDSA_AES_128_CBC_SHA256 \
-	{                                     \
-		0xC0, 0x23                    \
-	}
-#define GNUTLS_ECDHE_RSA_AES_128_CBC_SHA256 \
-	{                                   \
-		0xC0, 0x27                  \
-	}
-#define GNUTLS_ECDHE_RSA_AES_256_CBC_SHA384 \
-	{                                   \
-		0xC0, 0x28                  \
-	}
+#define GNUTLS_ECDHE_ECDSA_AES_128_CBC_SHA256 { 0xC0, 0x23 }
+#define GNUTLS_ECDHE_RSA_AES_128_CBC_SHA256 { 0xC0, 0x27 }
+#define GNUTLS_ECDHE_RSA_AES_256_CBC_SHA384 { 0xC0, 0x28 }
 
 /* ECC with AES-GCM */
-#define GNUTLS_ECDHE_ECDSA_AES_128_GCM_SHA256 \
-	{                                     \
-		0xC0, 0x2B                    \
-	}
-#define GNUTLS_ECDHE_RSA_AES_128_GCM_SHA256 \
-	{                                   \
-		0xC0, 0x2F                  \
-	}
-#define GNUTLS_ECDHE_RSA_AES_256_GCM_SHA384 \
-	{                                   \
-		0xC0, 0x30                  \
-	}
+#define GNUTLS_ECDHE_ECDSA_AES_128_GCM_SHA256 { 0xC0, 0x2B }
+#define GNUTLS_ECDHE_RSA_AES_128_GCM_SHA256 { 0xC0, 0x2F }
+#define GNUTLS_ECDHE_RSA_AES_256_GCM_SHA384 { 0xC0, 0x30 }
 
 /* SuiteB */
-#define GNUTLS_ECDHE_ECDSA_AES_256_GCM_SHA384 \
-	{                                     \
-		0xC0, 0x2C                    \
-	}
-#define GNUTLS_ECDHE_ECDSA_AES_256_CBC_SHA384 \
-	{                                     \
-		0xC0, 0x24                    \
-	}
+#define GNUTLS_ECDHE_ECDSA_AES_256_GCM_SHA384 { 0xC0, 0x2C }
+#define GNUTLS_ECDHE_ECDSA_AES_256_CBC_SHA384 { 0xC0, 0x24 }
 
 /* ECC with PSK */
-#define GNUTLS_ECDHE_PSK_3DES_EDE_CBC_SHA1 \
-	{                                  \
-		0xC0, 0x34                 \
-	}
-#define GNUTLS_ECDHE_PSK_AES_128_CBC_SHA1 \
-	{                                 \
-		0xC0, 0x35                \
-	}
-#define GNUTLS_ECDHE_PSK_AES_256_CBC_SHA1 \
-	{                                 \
-		0xC0, 0x36                \
-	}
-#define GNUTLS_ECDHE_PSK_AES_128_CBC_SHA256 \
-	{                                   \
-		0xC0, 0x37                  \
-	}
-#define GNUTLS_ECDHE_PSK_AES_256_CBC_SHA384 \
-	{                                   \
-		0xC0, 0x38                  \
-	}
-#define GNUTLS_ECDHE_PSK_ARCFOUR_128_SHA1 \
-	{                                 \
-		0xC0, 0x33                \
-	}
-#define GNUTLS_ECDHE_PSK_NULL_SHA256 \
-	{                            \
-		0xC0, 0x3A           \
-	}
-#define GNUTLS_ECDHE_PSK_NULL_SHA384 \
-	{                            \
-		0xC0, 0x3B           \
-	}
+#define GNUTLS_ECDHE_PSK_3DES_EDE_CBC_SHA1 { 0xC0, 0x34 }
+#define GNUTLS_ECDHE_PSK_AES_128_CBC_SHA1 { 0xC0, 0x35 }
+#define GNUTLS_ECDHE_PSK_AES_256_CBC_SHA1 { 0xC0, 0x36 }
+#define GNUTLS_ECDHE_PSK_AES_128_CBC_SHA256 { 0xC0, 0x37 }
+#define GNUTLS_ECDHE_PSK_AES_256_CBC_SHA384 { 0xC0, 0x38 }
+#define GNUTLS_ECDHE_PSK_ARCFOUR_128_SHA1 { 0xC0, 0x33 }
+#define GNUTLS_ECDHE_PSK_NULL_SHA256 { 0xC0, 0x3A }
+#define GNUTLS_ECDHE_PSK_NULL_SHA384 { 0xC0, 0x3B }
 
 /* draft-smyshlyaev-tls12-gost-suites */
 #ifdef ENABLE_GOST
-#define GNUTLS_GOSTR341112_256_28147_CNT_IMIT \
-	{                                     \
-		0xc1, 0x02                    \
-	}
+#define GNUTLS_GOSTR341112_256_28147_CNT_IMIT { 0xc1, 0x02 }
 #endif
 
 #define CIPHER_SUITES_COUNT \

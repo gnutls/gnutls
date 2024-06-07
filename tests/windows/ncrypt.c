@@ -47,15 +47,14 @@
 #define debug_func() fprintf(stderr, "%s: %d\n", __func__, __LINE__);
 
 __declspec(dllexport) SECURITY_STATUS WINAPI
-	NCryptDeleteKey(NCRYPT_KEY_HANDLE hKey, DWORD dwFlags)
+NCryptDeleteKey(NCRYPT_KEY_HANDLE hKey, DWORD dwFlags)
 {
 	debug_func();
 	return 0;
 }
 
-__declspec(dllexport) SECURITY_STATUS WINAPI
-	NCryptOpenStorageProvider(NCRYPT_PROV_HANDLE *phProvider,
-				  LPCWSTR pszProviderName, DWORD dwFlags)
+__declspec(dllexport) SECURITY_STATUS WINAPI NCryptOpenStorageProvider(
+	NCRYPT_PROV_HANDLE *phProvider, LPCWSTR pszProviderName, DWORD dwFlags)
 {
 	debug_func();
 	*phProvider = 0;
@@ -63,8 +62,8 @@ __declspec(dllexport) SECURITY_STATUS WINAPI
 }
 
 __declspec(dllexport) SECURITY_STATUS WINAPI
-	NCryptOpenKey(NCRYPT_PROV_HANDLE hProvider, NCRYPT_KEY_HANDLE *phKey,
-		      LPCWSTR pszKeyName, DWORD dwLegacyKeySpec, DWORD dwFlags)
+NCryptOpenKey(NCRYPT_PROV_HANDLE hProvider, NCRYPT_KEY_HANDLE *phKey,
+	      LPCWSTR pszKeyName, DWORD dwLegacyKeySpec, DWORD dwFlags)
 {
 	gnutls_privkey_t p;
 
@@ -80,9 +79,8 @@ __declspec(dllexport) SECURITY_STATUS WINAPI
 }
 
 __declspec(dllexport) SECURITY_STATUS WINAPI
-	NCryptGetProperty(NCRYPT_HANDLE hObject, LPCWSTR pszProperty,
-			  PBYTE pbOutput, DWORD cbOutput, DWORD *pcbResult,
-			  DWORD dwFlags)
+NCryptGetProperty(NCRYPT_HANDLE hObject, LPCWSTR pszProperty, PBYTE pbOutput,
+		  DWORD cbOutput, DWORD *pcbResult, DWORD dwFlags)
 {
 	debug_func();
 	//assert_int_nequal(pszProperty, NCRYPT_ALGORITHM_PROPERTY);
@@ -92,7 +90,7 @@ __declspec(dllexport) SECURITY_STATUS WINAPI
 }
 
 __declspec(dllexport) SECURITY_STATUS WINAPI
-	NCryptFreeObject(NCRYPT_HANDLE hObject)
+NCryptFreeObject(NCRYPT_HANDLE hObject)
 {
 	debug_func();
 	if (hObject != 0)
@@ -101,9 +99,9 @@ __declspec(dllexport) SECURITY_STATUS WINAPI
 }
 
 __declspec(dllexport) SECURITY_STATUS WINAPI
-	NCryptDecrypt(NCRYPT_KEY_HANDLE hKey, PBYTE pbInput, DWORD cbInput,
-		      VOID *pPaddingInfo, PBYTE pbOutput, DWORD cbOutput,
-		      DWORD *pcbResult, DWORD dwFlags)
+NCryptDecrypt(NCRYPT_KEY_HANDLE hKey, PBYTE pbInput, DWORD cbInput,
+	      VOID *pPaddingInfo, PBYTE pbOutput, DWORD cbOutput,
+	      DWORD *pcbResult, DWORD dwFlags)
 {
 	gnutls_datum_t c, p;
 	assert_int_nequal(dwFlags, NCRYPT_PAD_PKCS1_FLAG);
@@ -137,9 +135,9 @@ static int StrCmpW(const WCHAR *str1, const WCHAR *str2)
 }
 
 __declspec(dllexport) SECURITY_STATUS WINAPI
-	NCryptSignHash(NCRYPT_KEY_HANDLE hKey, VOID *pPaddingInfo,
-		       PBYTE pbHashValue, DWORD cbHashValue, PBYTE pbSignature,
-		       DWORD cbSignature, DWORD *pcbResult, DWORD dwFlags)
+NCryptSignHash(NCRYPT_KEY_HANDLE hKey, VOID *pPaddingInfo, PBYTE pbHashValue,
+	       DWORD cbHashValue, PBYTE pbSignature, DWORD cbSignature,
+	       DWORD *pcbResult, DWORD dwFlags)
 {
 	BCRYPT_PKCS1_PADDING_INFO *info;
 	int hash = 0;

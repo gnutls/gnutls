@@ -53,10 +53,7 @@
 #define SIG_SEM_TLS13 (1 << 2)
 #define SIG_SEM_DEFAULT (SIG_SEM_PRE_TLS12 | SIG_SEM_TLS13)
 
-#define TLS_SIGN_AID_UNKNOWN    \
-	{                       \
-		{ 255, 255 }, 0 \
-	}
+#define TLS_SIGN_AID_UNKNOWN { { 255, 255 }, 0 }
 #define HAVE_UNKNOWN_SIGAID(aid) ((aid)->id[0] == 255 && (aid)->id[1] == 255)
 
 #define CS_INVALID_MAJOR 0x00

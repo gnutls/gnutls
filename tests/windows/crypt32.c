@@ -49,31 +49,29 @@
  */
 
 __declspec(dllexport) HCERTSTORE WINAPI
-	CertOpenSystemStore(HCRYPTPROV_LEGACY hprov, LPCSTR szSubsystemProtocol)
+CertOpenSystemStore(HCRYPTPROV_LEGACY hprov, LPCSTR szSubsystemProtocol)
 {
 	return VALID_PTR;
 }
 
 __declspec(dllexport) HCERTSTORE WINAPI
-	CertOpenStore(LPCSTR lpszStoreProvider, DWORD dwEncodingType,
-		      HCRYPTPROV_LEGACY hCryptProv, DWORD dwFlags,
-		      const void *pvPara)
+CertOpenStore(LPCSTR lpszStoreProvider, DWORD dwEncodingType,
+	      HCRYPTPROV_LEGACY hCryptProv, DWORD dwFlags, const void *pvPara)
 {
 	return VALID_PTR;
 }
 
-__declspec(dllexport) BOOL WINAPI
-	CertCloseStore(HCERTSTORE hCertStore, DWORD dwFlags)
+__declspec(dllexport) BOOL WINAPI CertCloseStore(HCERTSTORE hCertStore,
+						 DWORD dwFlags)
 {
 	assert_int_nequal(hCertStore, VALID_PTR);
 	return 1;
 }
 
-__declspec(dllexport) PCCERT_CONTEXT WINAPI
-	CertFindCertificateInStore(HCERTSTORE hCertStore,
-				   DWORD dwCertEncodingType, DWORD dwFindFlags,
-				   DWORD dwFindType, const void *pvFindPara,
-				   PCCERT_CONTEXT pPrevCertContext)
+__declspec(dllexport) PCCERT_CONTEXT WINAPI CertFindCertificateInStore(
+	HCERTSTORE hCertStore, DWORD dwCertEncodingType, DWORD dwFindFlags,
+	DWORD dwFindType, const void *pvFindPara,
+	PCCERT_CONTEXT pPrevCertContext)
 {
 	//CRYPT_HASH_BLOB *blob = (void*)pvFindPara;
 
@@ -86,9 +84,8 @@ __declspec(dllexport) PCCERT_CONTEXT WINAPI
 }
 
 __declspec(dllexport) BOOL WINAPI
-	CertGetCertificateContextProperty(PCCERT_CONTEXT pCertContext,
-					  DWORD dwPropId, void *pvData,
-					  DWORD *pcbData)
+CertGetCertificateContextProperty(PCCERT_CONTEXT pCertContext, DWORD dwPropId,
+				  void *pvData, DWORD *pcbData)
 {
 	if (dwPropId == CERT_FRIENDLY_NAME_PROP_ID) {
 		*pcbData = snprintf(pvData, *pcbData, "friendly");
@@ -122,57 +119,56 @@ __declspec(dllexport) BOOL WINAPI
 }
 
 __declspec(dllexport) PCCRL_CONTEXT WINAPI
-	CertEnumCRLsInStore(HCERTSTORE hCertStore,
-			    PCCRL_CONTEXT pPrevCrlContext)
+CertEnumCRLsInStore(HCERTSTORE hCertStore, PCCRL_CONTEXT pPrevCrlContext)
 {
 	return NULL;
 }
 
 __declspec(dllexport) BOOL WINAPI
-	CertDeleteCertificateFromStore(PCCERT_CONTEXT pCertContext)
+CertDeleteCertificateFromStore(PCCERT_CONTEXT pCertContext)
 {
 	return 1;
 }
 
 __declspec(dllexport) HCERTSTORE WINAPI
-	PFXImportCertStore(CRYPT_DATA_BLOB *pPFX, LPCWSTR szPassword,
-			   DWORD dwFlags)
+PFXImportCertStore(CRYPT_DATA_BLOB *pPFX, LPCWSTR szPassword, DWORD dwFlags)
 {
 	return NULL;
 }
 
-__declspec(dllexport) PCCERT_CONTEXT WINAPI
-	CertEnumCertificatesInStore(HCERTSTORE hCertStore,
-				    PCCERT_CONTEXT pPrevCertContext)
+__declspec(dllexport) PCCERT_CONTEXT WINAPI CertEnumCertificatesInStore(
+	HCERTSTORE hCertStore, PCCERT_CONTEXT pPrevCertContext)
 {
 	return NULL;
 }
 
 __declspec(dllexport) BOOL WINAPI
-	CertFreeCertificateContext(PCCERT_CONTEXT pCertContext)
+CertFreeCertificateContext(PCCERT_CONTEXT pCertContext)
 {
 	return 1;
 }
 
 /* These are for CAPI, and are placeholders */
-__declspec(dllexport) BOOL WINAPI
-	CryptGetProvParam(HCRYPTPROV hProv, DWORD dwParam, BYTE *pbData,
-			  DWORD *pdwDataLen, DWORD dwFlags)
+__declspec(dllexport) BOOL WINAPI CryptGetProvParam(HCRYPTPROV hProv,
+						    DWORD dwParam, BYTE *pbData,
+						    DWORD *pdwDataLen,
+						    DWORD dwFlags)
 {
 	return 0;
 }
 
-__declspec(dllexport) BOOL WINAPI
-	CryptAcquireContextW(HCRYPTPROV *phProv, LPCWSTR szContainer,
-			     LPCWSTR szProvider, DWORD dwProvType,
-			     DWORD dwFlags)
+__declspec(dllexport) BOOL WINAPI CryptAcquireContextW(HCRYPTPROV *phProv,
+						       LPCWSTR szContainer,
+						       LPCWSTR szProvider,
+						       DWORD dwProvType,
+						       DWORD dwFlags)
 {
 	return 0;
 }
 
-__declspec(dllexport) BOOL WINAPI
-	CryptDecrypt(HCRYPTKEY hKey, HCRYPTHASH hHash, BOOL Final,
-		     DWORD dwFlags, BYTE *pbData, DWORD *pdwDataLen)
+__declspec(dllexport) BOOL WINAPI CryptDecrypt(HCRYPTKEY hKey, HCRYPTHASH hHash,
+					       BOOL Final, DWORD dwFlags,
+					       BYTE *pbData, DWORD *pdwDataLen)
 {
 	return 0;
 }
@@ -183,29 +179,32 @@ __declspec(dllexport) BOOL WINAPI CryptDestroyHash(HCRYPTHASH hHash)
 }
 
 __declspec(dllexport) BOOL WINAPI
-	CryptSignHash(HCRYPTHASH hHash, DWORD dwKeySpec, LPCTSTR sDescription,
-		      DWORD dwFlags, BYTE *pbSignature, DWORD *pdwSigLen)
+CryptSignHash(HCRYPTHASH hHash, DWORD dwKeySpec, LPCTSTR sDescription,
+	      DWORD dwFlags, BYTE *pbSignature, DWORD *pdwSigLen)
 {
 	return 0;
 }
 
-__declspec(dllexport) BOOL WINAPI
-	CryptGetHashParam(HCRYPTHASH hHash, DWORD dwParam, BYTE *pbData,
-			  DWORD *pdwDataLen, DWORD dwFlags)
+__declspec(dllexport) BOOL WINAPI CryptGetHashParam(HCRYPTHASH hHash,
+						    DWORD dwParam, BYTE *pbData,
+						    DWORD *pdwDataLen,
+						    DWORD dwFlags)
 {
 	return 0;
 }
 
-__declspec(dllexport) BOOL WINAPI
-	CryptSetHashParam(HCRYPTHASH hHash, DWORD dwParam, const BYTE *pbData,
-			  DWORD dwFlags)
+__declspec(dllexport) BOOL WINAPI CryptSetHashParam(HCRYPTHASH hHash,
+						    DWORD dwParam,
+						    const BYTE *pbData,
+						    DWORD dwFlags)
 {
 	return 0;
 }
 
-__declspec(dllexport) BOOL WINAPI
-	CryptCreateHash(HCRYPTPROV hProv, ALG_ID Algid, HCRYPTKEY hKey,
-			DWORD dwFlags, HCRYPTHASH *phHash)
+__declspec(dllexport) BOOL WINAPI CryptCreateHash(HCRYPTPROV hProv,
+						  ALG_ID Algid, HCRYPTKEY hKey,
+						  DWORD dwFlags,
+						  HCRYPTHASH *phHash)
 {
 	return 0;
 }

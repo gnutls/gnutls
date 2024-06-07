@@ -26,6 +26,8 @@
 #include "config.h"
 #endif
 
+#include <stdlib.h>
+
 #if defined(_WIN32)
 
 int main(int argc, char **argv)
@@ -35,7 +37,6 @@ int main(int argc, char **argv)
 
 #else
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 #include <gnutls/gnutls.h>

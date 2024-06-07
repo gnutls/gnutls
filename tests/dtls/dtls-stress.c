@@ -1577,7 +1577,7 @@ int main(int argc, const char *argv[])
 			exit(5);
 		}
 
-		job_pids = calloc(sizeof(int), job_limit);
+		job_pids = calloc(job_limit, sizeof(int));
 		if (batch) {
 			return run_tests_from_id_list(job_limit);
 		} else {

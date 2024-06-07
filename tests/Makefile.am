@@ -166,14 +166,14 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 tls13-rehandshake-cert gnutls_ext_raw_parse handshake-large-cert \
 	 x509cert x509cert-tl x509cert-ct infoaccess mini-dtls-hello-verify sign-verify-ed25519-rfc8080 \
 	 trustdb-tofu dtls-rehandshake-anon mini-alpn mini-dtls-large \
-	 mini-termination mini-x509-cas mini-x509-2 pkcs12_simple tls-pthread \
+	 mini-termination mini-x509-cas mini-x509-2 pkcs12_simple \
 	 mini-emsgsize-dtls chainverify-unsorted mini-overhead tls12-ffdhe \
 	 mini-dtls-heartbeat mini-x509-callbacks key-openssl priorities priorities-groups	\
 	 gnutls_x509_privkey_import gnutls_x509_crt_list_import time x509-server-verify \
 	 sign-verify-ext4 tls-neg-ext4-key resume-lifetime \
 	 mini-dtls-srtp rsa-encrypt-decrypt mini-loss-time gnutls-strcodes \
 	 mini-record mini-dtls-record handshake-timeout mini-record-range \
-	 cert-status fips-mode-pthread rsa-psk global-init sec-params sign-verify-data \
+	 cert-status rsa-psk global-init sec-params sign-verify-data \
 	 fips-test fips-override-test mini-global-load name-constraints x509-extensions \
 	 long-session-id mini-x509-callbacks-intr mini-dtls-lowmtu set_x509_key_file-late \
 	 crlverify mini-dtls-discard mini-record-failure openconnect-dtls12 \
@@ -183,7 +183,7 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 mini-dtls-record-asym key-import-export priority-set priority-set2 \
 	 pubkey-import-export sign-is-secure spki spki-abstract \
 	 rsa-rsa-oaep rsa-rsa-pss \
-	 mini-dtls-fork dtls-pthread mini-key-material x509cert-invalid \
+	 mini-dtls-fork mini-key-material x509cert-invalid \
 	 tls-ext-register tls-supplemental mini-dtls0-9 duplicate-extensions \
 	 record-retvals mini-server-name tls-etm tls-force-etm x509-cert-callback alerts \
 	 client-sign-md5-rep tls12-invalid-key-exchanges session-rdn-read \
@@ -209,7 +209,7 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 dtls12-cert-key-exchange dtls10-cert-key-exchange x509-cert-callback-legacy \
 	 keylog-env ssl2-hello tlsfeature-ext dtls-rehandshake-cert-2 dtls-session-ticket-lost \
 	 tlsfeature-crt dtls-rehandshake-cert-3 resume-with-false-start \
-	 set_x509_key_file_ocsp client-fastopen rng-sigint srp rng-pthread \
+	 set_x509_key_file_ocsp client-fastopen rng-sigint srp \
 	 safe-renegotiation/srn0 safe-renegotiation/srn1 safe-renegotiation/srn2 \
 	 safe-renegotiation/srn3 safe-renegotiation/srn4 safe-renegotiation/srn5 \
 	 rsa-illegal-import set_x509_ocsp_multi_invalid set_key set_x509_key_file_ocsp_multi2 \
@@ -281,10 +281,14 @@ ip_utils_CPPFLAGS = $(AM_CPPFLAGS) \
 
 endif
 
+# FIXME: pthread tests hangs under qemu-user-static on Fedora 40
+if !CROSS_COMPILING
+ctests += tls-pthread fips-mode-pthread dtls-pthread rng-pthread
 tls_pthread_LDADD = $(LDADD) -lpthread
 fips_mode_pthread_LDADD = $(LDADD) -lpthread
 dtls_pthread_LDADD = $(LDADD) -lpthread
 rng_pthread_LDADD = $(LDADD) -lpthread
+endif
 
 tls12_rollback_detection_CFLAGS = -DTLS12
 tls12_rollback_detection_SOURCES = tls13/rnd-rollback-detection.c
