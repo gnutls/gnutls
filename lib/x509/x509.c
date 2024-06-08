@@ -4535,6 +4535,11 @@ int gnutls_x509_crt_verify_data3(gnutls_x509_crt_t crt,
 			}
 		}
 
+		if(vdata_size && vdata == NULL ) {
+			gnutls_assert();
+                	return GNUTLS_E_INVALID_REQUEST;
+		}
+
 		for (i = 0; i < vdata_size; i++) {
 			if (vdata[i].type == GNUTLS_DT_KEY_PURPOSE_OID) {
 				res = _gnutls_check_key_purpose(
