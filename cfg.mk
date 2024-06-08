@@ -254,7 +254,7 @@ lib/accelerated/x86/coff/%-x86_64.s: devel/perlasm/%-x86_64.pl .submodule.stamp
 	echo "" >> $@
 	sed -i 's/OPENSSL_ia32cap_P/GNUTLS_x86_cpuid_s/g' $@
 
-lib/accelerated/x86/macosx/%.s: devel/perlasm/%.pl .submodule.stamp 
+lib/accelerated/x86/macosx/%.s: devel/perlasm/%.pl ./lib/accelerated/x86/x86-common.h .submodule.stamp
 	CC=gcc perl $< macosx \
 		$(if $(findstring $(<F),$(PL_NEEDS_FPIC)),-fPIC) \
 		$@.tmp
@@ -262,7 +262,7 @@ lib/accelerated/x86/macosx/%.s: devel/perlasm/%.pl .submodule.stamp
 	echo "" >> $@
 	sed -i 's/OPENSSL_ia32cap_P/GNUTLS_x86_cpuid_s/g' $@
 
-lib/accelerated/aarch64/elf/%.s: devel/perlasm/%.pl .submodule.stamp 
+lib/accelerated/aarch64/elf/%.s: devel/perlasm/%.pl lib/accelerated/aarch64/aarch64-common.h .submodule.stamp
 	rm -f $@tmp
 	CC=aarch64-linux-gnu-gcc perl $< linux64 \
 		$(if $(findstring $(<F),$(PL_NEEDS_FPIC)),-fPIC) \
