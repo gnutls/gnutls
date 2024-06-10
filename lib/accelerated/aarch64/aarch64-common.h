@@ -106,7 +106,7 @@ void register_aarch64_crypto(void);
  */
 #if defined(__ASSEMBLER__)
 #if GNU_PROPERTY_AARCH64_POINTER_AUTH != 0 || GNU_PROPERTY_AARCH64_BTI != 0
-.pushsection.note.gnu.property, "a";
+.pushsection .note.gnu.property, "a";
 .balign 8;
 .long 4;
 .long 0x10;
