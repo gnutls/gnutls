@@ -398,6 +398,7 @@ fedora-interop/test:
     - echo "PATH=$PATH"
     - which gnutls-cli gnutls-serv
     - cd tests/suite/tls-interoperability/
+    - cp openssl/openssl.cnf /etc/pki/tls/openssl.cnf # workaround for CCM8 ciphers moved to SECLEVEL=0
     - echo "Tests to run:"
     - tmt run plans -n interop tests -f "tag:interop-gnutls" -f "tag:interop-$TYPE" -f "tag:interop-$COMPONENT"  discover -v
     - echo "Slicing SLICE_TOTAL=$SLICES SLICE_ID=$SLICEID"
