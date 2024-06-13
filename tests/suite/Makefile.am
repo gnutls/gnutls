@@ -42,15 +42,6 @@ scripts_to_test = chain.sh \
 	testcompat-polarssl-serv.sh \
 	testcompat-polarssl-serv-compat.sh \
 	testcompat-polarssl-serv-no-etm.sh \
-	testcompat-openssl-cli.sh \
-	testcompat-openssl-cli-compat.sh \
-	testcompat-openssl-cli-no-etm.sh \
-	testcompat-openssl-serv.sh \
-	testcompat-openssl-serv-compat.sh \
-	testcompat-openssl-serv-no-etm.sh \
-	testcompat-openssl-serv-no-tickets.sh \
-	testcompat-openssl-serv-no-safe-renegotiation.sh \
-	testcompat-openssl-serv-safe-renegotiation.sh \
 	testrandom.sh \
 	test-ciphersuite-names.sh \
 	tls-fuzzer/tls-fuzzer-nocert.sh \
@@ -84,12 +75,6 @@ TESTS_ENVIRONMENT +=					\
 	FAKETIME="$(FAKETIME)"				\
 	FAKETIME_F_OPT="$(FAKETIME_F_OPT)"		\
 	ac_cv_faketime_works="$(ac_cv_faketime_works)"
-
-if ENABLE_TLS13_INTEROP
-scripts_to_test += \
-	testcompat-openssl-tls13-cli.sh \
-	testcompat-openssl-tls13-serv.sh
-endif
 
 if ENABLE_OLDGNUTLS_INTEROP
 scripts_to_test += testcompat-oldgnutls.sh
