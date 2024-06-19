@@ -34,6 +34,13 @@ fi
 OUTFILE=out-pkcs7.$$.tmp
 OUTFILE2=out2-pkcs7.$$.tmp
 
+: ${ac_cv_sizeof_time_t=8}
+if test "${ac_cv_sizeof_time_t}" -ge 8; then
+	ATTIME_VALID="2038-10-12"  # almost the pregenerated cert expiration
+else
+	ATTIME_VALID="2037-12-31"  # before 2038
+fi
+
 # Test signing with MD5
 FILE="signing"
 ${VALGRIND} "${CERTTOOL}" --p7-sign --hash md5 --load-privkey  "${srcdir}/../../doc/credentials/x509/key-rsa.pem" --load-certificate "${srcdir}/../../doc/credentials/x509/cert-rsa.pem" --infile "${srcdir}/data/pkcs7-detached.txt" >"${OUTFILE}"
@@ -45,7 +52,7 @@ if test "${rc}" != "0"; then
 fi
 
 FILE="signing-verify"
-${VALGRIND} "${CERTTOOL}" --p7-verify --load-certificate "${srcdir}/../../doc/credentials/x509/cert-rsa.pem" <"${OUTFILE}"
+${VALGRIND} "${CERTTOOL}" --attime "${ATTIME_VALID}" --p7-verify --load-certificate "${srcdir}/../../doc/credentials/x509/cert-rsa.pem" <"${OUTFILE}"
 rc=$?
 
 if test "${rc}" != "1"; then
@@ -54,7 +61,7 @@ if test "${rc}" != "1"; then
 fi
 
 FILE="signing-verify"
-${VALGRIND} "${CERTTOOL}" --p7-verify --verify-allow-broken --load-certificate "${srcdir}/../../doc/credentials/x509/cert-rsa.pem" <"${OUTFILE}"
+${VALGRIND} "${CERTTOOL}" --attime "${ATTIME_VALID}" --p7-verify --verify-allow-broken --load-certificate "${srcdir}/../../doc/credentials/x509/cert-rsa.pem" <"${OUTFILE}"
 rc=$?
 
 if test "${rc}" != "0"; then
