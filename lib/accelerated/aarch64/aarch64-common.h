@@ -106,7 +106,8 @@ void register_aarch64_crypto(void);
  */
 #if defined(__ASSEMBLER__)
 #if GNU_PROPERTY_AARCH64_POINTER_AUTH != 0 || GNU_PROPERTY_AARCH64_BTI != 0
-.pushsection.note.gnu.property, "a";
+/* clang-format off */
+.pushsection .note.gnu.property, "a";
 .balign 8;
 .long 4;
 .long 0x10;
@@ -117,6 +118,7 @@ void register_aarch64_crypto(void);
 .long(GNU_PROPERTY_AARCH64_POINTER_AUTH | GNU_PROPERTY_AARCH64_BTI);
 .long 0;
 .popsection;
+/* clang-format on */
 #endif
 #endif
 
