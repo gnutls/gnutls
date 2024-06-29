@@ -1048,8 +1048,6 @@ AC_DEFINE_UNQUOTED([TROUSERS_LIB], ["$ac_trousers_lib"], [the location of the tr
 AC_SUBST(TROUSERS_LIB)
 
 
-AM_CONDITIONAL(NEED_LTLIBDL, test "$need_ltlibdl" = yes)
-
 # For minitasn1.
 AC_CHECK_SIZEOF(unsigned long int, 4)
 AC_CHECK_SIZEOF(unsigned int, 4)
@@ -1058,34 +1056,44 @@ AC_CHECK_SIZEOF(time_t, 4)
 AC_ARG_WITH(zlib, AS_HELP_STRING([--without-zlib],
                                  [disable zlib compression support]),
             ac_zlib=$withval, ac_zlib=yes)
-AC_MSG_CHECKING([whether to include zlib compression support])
 if test x$ac_zlib != xno; then
-    AC_MSG_RESULT(yes)
-    AC_LIB_HAVE_LINKFLAGS(z,, [#include <zlib.h>], [compress (0, 0, 0, 0);])
-    if test x$ac_cv_libz != xyes; then
-	AC_MSG_WARN(
-  *** 
-  *** ZLIB was not found. You will not be able to use ZLIB compression.)
-fi
-else
-    AC_MSG_RESULT(no)
-fi
-
-PKG_CHECK_EXISTS(zlib, ZLIB_HAS_PKGCONFIG=y, ZLIB_HAS_PKGCONFIG=n)
-
-if test x$ac_zlib != xno; then
+    PKG_CHECK_EXISTS(zlib, ZLIB_HAS_PKGCONFIG=y, ZLIB_HAS_PKGCONFIG=n)
     if test "$ZLIB_HAS_PKGCONFIG" = "y" ; then
+        PKG_CHECK_MODULES(ZLIB, [zlib])
 	if test "x$GNUTLS_REQUIRES_PRIVATE" = x; then
 	    GNUTLS_REQUIRES_PRIVATE="Requires.private: zlib"
 	else
 	    GNUTLS_REQUIRES_PRIVATE="$GNUTLS_REQUIRES_PRIVATE, zlib"
 	fi
-	LIBZ_PC=""
+	ac_zlib=yes
     else
+	AC_LIB_HAVE_LINKFLAGS(z,, [#include <zlib.h>], [compress (0, 0, 0, 0);])
+	if test x$ac_cv_libz != xyes; then
+	    AC_MSG_WARN([[
+*** 
+*** ZLIB was not found. You will not be able to use ZLIB compression.
+*** ]])
+        fi
+	ac_zlib=$ac_cv_libz
+	ZLIB_LIBS=$LIBZ
 	LIBZ_PC=$LIBZ
     fi
 fi
+if test x$ac_zlib != xno; then
+    AC_DEFINE([HAVE_LIBZ], 1, [Define if ZLIB compression is enabled.])
+    need_ltlibdl=yes
+fi
 AC_SUBST(LIBZ_PC)
+
+AS_IF([test "$ac_cv_dlopen_soname_works" = yes], [
+    save_LIBS=$LIBS
+    LIBS="$LIBS $ZLIB_LIBS"
+    LIBGNUTLS_CHECK_SONAME([z], [AC_LANG_PROGRAM([
+                   #include <zlib.h>],[
+                   compress (0, 0, 0, 0);])])
+    LIBS="$save_LIBS"
+    CFLAGS="$save_CFLAGS"
+])
 
 AC_ARG_WITH(brotli,
 	    AS_HELP_STRING([--without-brotli], [disable brotli compression support]),
@@ -1102,6 +1110,7 @@ if test x$ac_brotli != xno; then
 	else
 	    GNUTLS_REQUIRES_PRIVATE="${GNUTLS_REQUIRES_PRIVATE}, libbrotlienc, libbrotlidec"
 	fi
+	need_ltlibdl=yes
     else
 	AC_MSG_WARN(*** LIBBROTLI was not found. You will not be able to use BROTLI compression.)
     fi
@@ -1109,6 +1118,28 @@ else
     AC_MSG_RESULT(no)
 fi
 AM_CONDITIONAL(HAVE_LIBBROTLI, test "$with_libbrotlienc" != "no" && test "$with_libbrotlidec" != "no")
+
+AS_IF([test "$ac_cv_dlopen_soname_works" = yes], [
+    save_CFLAGS=$CFLAGS
+    CFLAGS="$CFLAGS $LIBBROTLIENC_CFLAGS"
+    save_LIBS=$LIBS
+    LIBS="$LIBS $LIBBROTLIENC_LIBS"
+    LIBGNUTLS_CHECK_SONAME([brotlienc], [AC_LANG_PROGRAM([
+           #include <brotli/encode.h>],[
+           BrotliEncoderVersion();])])
+    LIBS="$save_LIBS"
+    CFLAGS="$save_CFLAGS"
+
+    save_CFLAGS=$CFLAGS
+    CFLAGS="$CFLAGS $LIBBROTLIDEC_CFLAGS"
+    save_LIBS=$LIBS
+    LIBS="$LIBS $LIBBROTLIDEC_LIBS"
+    LIBGNUTLS_CHECK_SONAME([brotlidec], [AC_LANG_PROGRAM([
+           #include <brotli/decode.h>],[
+           BrotliDecoderVersion();])])
+    LIBS="$save_LIBS"
+    CFLAGS="$save_CFLAGS"
+])
 
 AC_ARG_WITH(zstd,
 	    AS_HELP_STRING([--without-zstd], [disable zstd compression support]),
@@ -1124,6 +1155,7 @@ if test x$ac_zstd != xno; then
 	else
 	    GNUTLS_REQUIRES_PRIVATE="${GNUTLS_REQUIRES_PRIVATE}, libzstd"
 	fi
+	need_ltlibdl=yes
     else
 	AC_MSG_WARN(*** LIBZSTD was not found. You will not be able to use ZSTD compression.)
     fi
@@ -1131,6 +1163,20 @@ else
     AC_MSG_RESULT(no)
 fi
 AM_CONDITIONAL(HAVE_LIBZSTD, test "$with_libzstd" != "no")
+
+AS_IF([test "$ac_cv_dlopen_soname_works" = yes], [
+    save_CFLAGS=$CFLAGS
+    CFLAGS="$CFLAGS $LIBZSTD_CFLAGS"
+    save_LIBS=$LIBS
+    LIBS="$LIBS $LIBZSTD_LIBS"
+    LIBGNUTLS_CHECK_SONAME([zstd], [AC_LANG_PROGRAM([
+           #include <zstd.h>],[
+           ZSTD_versionNumber();])])
+    LIBS="$save_LIBS"
+    CFLAGS="$save_CFLAGS"
+])
+
+AM_CONDITIONAL(NEED_LTLIBDL, test "$need_ltlibdl" = yes)
 
 # export for use in scripts
 AC_SUBST(ac_cv_sizeof_time_t)
