@@ -34,6 +34,20 @@
 #include "errors.h"
 
 #define FORMAT_VERSION 1
+
+/* These only works with the platform where SONAME is part of the ABI. */
+#ifndef GNUTLS_LIBRARY_SONAME
+#define GNUTLS_LIBRARY_SONAME "none"
+#endif
+
+#ifndef NETTLE_LIBRARY_SONAME
+#define NETTLE_LIBRARY_SONAME "none"
+#endif
+
+#ifndef HOGWEED_LIBRARY_SONAME
+#define HOGWEED_LIBRARY_SONAME "none"
+#endif
+
 #define HMAC_SIZE 32
 #define HMAC_ALGO GNUTLS_MAC_SHA256
 #define HMAC_STR_SIZE (2 * HMAC_SIZE + 1)

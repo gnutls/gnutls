@@ -810,61 +810,35 @@ save_CFLAGS=$CFLAGS
 CFLAGS="$CFLAGS $GMP_CFLAGS"
 save_LIBS=$LIBS
 LIBS="$LIBS $GMP_LIBS"
-AC_MSG_CHECKING([gmp soname])
-AC_LINK_IFELSE([AC_LANG_PROGRAM([
+LIBGNUTLS_CHECK_SONAME([gmp], [AC_LANG_PROGRAM([
                #include <gmp.h>],[
                mpz_t n;
-               mpz_init(n);])],
-	[gmp_so=`(eval "$LDDPROG conftest$EXEEXT $LDDPOSTPROC") | grep '^libgmp\.so'`],
-	[gmp_so=none])
-if test -z "$gmp_so"; then
-	gmp_so=none
-fi
-AC_MSG_RESULT($gmp_so)
-if test "$gmp_so" != none; then
-	AC_DEFINE_UNQUOTED([GMP_LIBRARY_SONAME], ["$gmp_so"], [The soname of gmp library])
-fi
-LIBS=$save_LIBS
-CFLAGS=$save_CFLAGS
+               mpz_init(n);])])
+LIBS="$save_LIBS"
+CFLAGS="$save_CFLAGS"
 
 save_CFLAGS=$CFLAGS
 CFLAGS="$CFLAGS $NETTLE_CFLAGS"
 save_LIBS=$LIBS
 LIBS="$LIBS $NETTLE_LIBS"
-AC_MSG_CHECKING([nettle soname])
-AC_LINK_IFELSE([AC_LANG_PROGRAM([
+LIBGNUTLS_CHECK_SONAME([nettle], [AC_LANG_PROGRAM([
                #include <nettle/sha2.h>],[
                struct sha256_ctx ctx;
-               sha256_init(&ctx);])],
-	[nettle_so=`(eval "$LDDPROG conftest$EXEEXT $LDDPOSTPROC") | grep '^libnettle\.so'`],
-	[nettle_so=none])
-if test -z "$nettle_so"; then
-	nettle_so=none
-fi
-AC_MSG_RESULT($nettle_so)
-AC_DEFINE_UNQUOTED([NETTLE_LIBRARY_SONAME], ["$nettle_so"], [The soname of nettle library])
-LIBS=$save_LIBS
-CFLAGS=$save_CFLAGS
+               sha256_init(&ctx);])])
+LIBS="$save_LIBS"
+CFLAGS="$save_CFLAGS"
 
 save_CFLAGS=$CFLAGS
 # <nettle/bignum.h> includes <gmp.h>
 CFLAGS="$CFLAGS $HOGWEED_CFLAGS $GMP_CFLAGS"
 save_LIBS=$LIBS
 LIBS="$LIBS $HOGWEED_LIBS"
-AC_MSG_CHECKING([hogweed soname])
-AC_LINK_IFELSE([AC_LANG_PROGRAM([
+LIBGNUTLS_CHECK_SONAME([hogweed], [AC_LANG_PROGRAM([
                #include <nettle/rsa.h>],[
                struct rsa_private_key priv;
-               nettle_rsa_private_key_init(&priv);])],
-	[hogweed_so=`(eval "$LDDPROG conftest$EXEEXT $LDDPOSTPROC") | grep '^libhogweed\.so'`],
-	[hogweed_so=none])
-if test -z "$hogweed_so"; then
-	hogweed_so=none
-fi
-AC_MSG_RESULT($hogweed_so)
-AC_DEFINE_UNQUOTED([HOGWEED_LIBRARY_SONAME], ["$hogweed_so"], [The soname of hogweed library])
-LIBS=$save_LIBS
-CFLAGS=$save_CFLAGS
+               nettle_rsa_private_key_init(&priv);])])
+LIBS="$save_LIBS"
+CFLAGS="$save_CFLAGS"
 
 gnutls_so=libgnutls.so.`expr "$LT_CURRENT" - "$LT_AGE"`
 AC_DEFINE_UNQUOTED([GNUTLS_LIBRARY_SONAME], ["$gnutls_so"], [The soname of gnutls library])
