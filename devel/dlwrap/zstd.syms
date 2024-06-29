@@ -1,0 +1,4 @@
+ZSTD_isError
+ZSTD_compressBound
+ZSTD_compress
+ZSTD_decompress

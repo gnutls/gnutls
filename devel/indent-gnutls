@@ -44,6 +44,6 @@ case $mode in
 	;;
 esac
 
-git ls-files -z | grep -z '\.[ch]\(.in\)\?$' | grep -z -v '^./devel/' | xargs -P "$parallel" -0 -n1 "$CLANG_FORMAT" $CLANG_FORMAT_ARGS
+git ls-files -z | grep -z '\.[ch]\(.in\)\?$' | grep -z -v '^devel/' | grep -z -v '^lib/dlwrap/' | xargs -P "$parallel" -0 -n1 "$CLANG_FORMAT" $CLANG_FORMAT_ARGS
 
 exit $?

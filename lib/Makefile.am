@@ -33,7 +33,7 @@ localedir = $(datadir)/locale
 
 include $(top_srcdir)/lib/common.mk
 
-AM_CPPFLAGS = \
+AM_CPPFLAGS =					\
 	-DLOCALEDIR=\"$(localedir)\"		\
 	-I$(srcdir)/../gl			\
 	-I$(builddir)/../gl			\
@@ -45,7 +45,8 @@ AM_CPPFLAGS = \
 	$(LIBTASN1_CFLAGS)			\
 	$(P11_KIT_CFLAGS)			\
 	$(TSS2_CFLAGS)
-	$(LIBZSTD_CFLAGS)
+
+thirdparty_libadd =
 
 if !HAVE_LIBUNISTRING
 SUBDIRS += unistring
@@ -84,6 +85,39 @@ COBJECTS = range.c record.c compress.c debug.c cipher.c gthreads.h handshake-tls
 	crypto-selftests.c crypto-selftests-pk.c secrets.c extv.c extv.h \
 	hello_ext_lib.c hello_ext_lib.h ocsp-api.c stek.c cert-cred-rawpk.c \
 	iov.c iov.h system/ktls.c system/ktls.h pathbuf.c pathbuf.h
+
+if HAVE_ZLIB
+COBJECTS += dlwrap/zlib.c dlwrap/zlibfuncs.h dlwrap/zlib.h
+
+if ENABLE_DLOPEN
+AM_CPPFLAGS += $(ZLIB_CFLAGS) -DGNUTLS_ZLIB_ENABLE_DLOPEN=1
+else
+thirdparty_libadd += $(ZLIB_LIBS)
+endif
+endif
+
+if HAVE_LIBZSTD
+COBJECTS += dlwrap/zstd.c dlwrap/zstdfuncs.h dlwrap/zstd.h
+
+if ENABLE_DLOPEN
+AM_CPPFLAGS += $(LIBZSTD_CFLAGS) -DGNUTLS_ZSTD_ENABLE_DLOPEN=1
+else
+thirdparty_libadd += $(LIBZSTD_LIBS)
+endif
+endif
+
+if HAVE_LIBBROTLI
+COBJECTS += dlwrap/brotlienc.c dlwrap/brotliencfuncs.h dlwrap/brotlienc.h
+COBJECTS += dlwrap/brotlidec.c dlwrap/brotlidecfuncs.h dlwrap/brotlidec.h
+
+if ENABLE_DLOPEN
+AM_CPPFLAGS += $(LIBBROTLIENC_CFLAGS) -DGNUTLS_BROTLIENC_ENABLE_DLOPEN=1
+AM_CPPFLAGS += $(LIBBROTLIDEC_CFLAGS) -DGNUTLS_BROTLIDEC_ENABLE_DLOPEN=1
+else
+thirdparty_libadd += $(LIBBROTLIENC_LIBS)
+thirdparty_libadd += $(LIBBROTLIDEC_LIBS)
+endif
+endif
 
 if ENABLE_GOST
 COBJECTS += vko.c
@@ -156,7 +190,7 @@ libgnutls_la_LIBADD = ../gl/libgnu.la x509/libgnutls_x509.la \
 	ext/libgnutls_ext.la \
 	auth/libgnutls_auth.la algorithms/libgnutls_alg.la \
 	extras/libgnutls_extras.la
-thirdparty_libadd = $(LTLIBINTL) $(LIBSOCKET) $(LTLIBNSL) \
+thirdparty_libadd += $(LTLIBINTL) $(LIBSOCKET) $(LTLIBNSL) \
 	$(P11_KIT_LIBS) $(LIB_SELECT) $(GNUTLS_LIBS_PRIVATE)
 
 if HAVE_LIBIDN2
