@@ -39,6 +39,13 @@ fi
 
 . "${srcdir}/../scripts/common.sh"
 
+: ${ac_cv_sizeof_time_t=8}
+if test "${ac_cv_sizeof_time_t}" -ge 8; then
+	ATTIME_VALID="2038-10-12"  # almost the pregenerated cert expiration
+else
+	ATTIME_VALID="2030-12-17"  # end of epoch − 2590 days of validity
+fi
+
 # Test certificate in draft-ietf-curdle-pkix-04
 ${VALGRIND} "${CERTTOOL}" -i --infile "${srcdir}/data/cert-eddsa.pem" --outfile "${TMPFILE}"
 
@@ -84,7 +91,7 @@ fi
 
 
 # Create an EdDSA certificate from an EdDSA private key
-${VALGRIND} "${CERTTOOL}" --generate-self-signed \
+${VALGRIND} "${CERTTOOL}" --attime "${ATTIME_VALID}" --generate-self-signed \
 	--pkcs8 --load-privkey "$KEYFILE" --password '' \
 	--template "${srcdir}/templates/template-test.tmpl" \
 	--outfile "${TMPFILE}"
@@ -94,14 +101,14 @@ if test $? != 0; then
 	exit 1
 fi
 
-${VALGRIND} "${CERTTOOL}" --verify --load-ca-certificate "${TMPFILE}" --infile "${TMPFILE}"
+${VALGRIND} "${CERTTOOL}" --attime "${ATTIME_VALID}" --verify --load-ca-certificate "${TMPFILE}" --infile "${TMPFILE}"
 if test $? != 0; then
 	echo "There was an issue verifying the generated certificate (1)"
 	exit 1
 fi
 
 # Create an EdDSA certificate from an RSA key
-${VALGRIND} "${CERTTOOL}" --generate-certificate --key-type eddsa \
+${VALGRIND} "${CERTTOOL}" --attime "${ATTIME_VALID}" --generate-certificate --key-type eddsa \
 	    --load-privkey ${KEYFILE} \
 	    --load-ca-privkey "${srcdir}/../../doc/credentials/x509/ca-key.pem" \
 	    --load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" \
@@ -113,7 +120,7 @@ if test $? != 0; then
 	exit 1
 fi
 
-${VALGRIND} "${CERTTOOL}" --verify --load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" --infile "${TMPFILE}"
+${VALGRIND} "${CERTTOOL}" --attime "${ATTIME_VALID}" --verify --load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" --infile "${TMPFILE}"
 if test $? != 0; then
 	echo "There was an issue verifying the generated certificate (2)"
 	exit 1

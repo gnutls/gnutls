@@ -37,6 +37,12 @@ TMPFILE=tmp-pkcs7.$$.tmp
 
 . ${srcdir}/../scripts/common.sh
 
+: ${ac_cv_sizeof_time_t=8}
+if test "${ac_cv_sizeof_time_t}" -ge 8; then
+	ATTIME_VALID="2038-10-12"  # almost the pregenerated cert expiration
+else
+	ATTIME_VALID="2037-12-31"  # before 2038
+fi
 
 if test "${ENABLE_GOST}" = "1" && test "${GNUTLS_FORCE_FIPS_MODE}" != "1"
 then
@@ -97,15 +103,17 @@ if test "${rc}" = "0"; then
 fi
 
 # check validation with date after intermediate cert issuance
-${VALGRIND} "${CERTTOOL}" --attime "2038-10-13" --inder --p7-verify --load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" --infile "${srcdir}/data/${FILE}" >"${OUTFILE}"
-rc=$?
+if test "${ac_cv_sizeof_time_t}" -ge 8; then
+	${VALGRIND} "${CERTTOOL}" --attime "2038-10-13" --inder --p7-verify --load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" --infile "${srcdir}/data/${FILE}" >"${OUTFILE}"
+	rc=$?
 
-if test "${rc}" = "0"; then
-	echo "${FILE}: PKCS7 verification succeeded with invalid date (3)"
-	exit 1
-fi
+	if test "${rc}" = "0"; then
+		echo "${FILE}: PKCS7 verification succeeded with invalid date (3)"
+		exit 1
+	fi
+fi  # cannot test that with 32-bit time_t
 
-${VALGRIND} "${CERTTOOL}" --inder --p7-verify --load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" --infile "${srcdir}/data/${FILE}" >"${OUTFILE}"
+${VALGRIND} "${CERTTOOL}" --attime "${ATTIME_VALID}" --inder --p7-verify --load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" --infile "${srcdir}/data/${FILE}" >"${OUTFILE}"
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -118,7 +126,7 @@ done
 #check key purpose verification
 for FILE in full.p7b; do
 
-${VALGRIND} "${CERTTOOL}" --verify-purpose=1.3.6.1.5.5.7.3.1 --inder --p7-verify --load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" --infile "${srcdir}/data/${FILE}" >"${OUTFILE}"
+${VALGRIND} "${CERTTOOL}" --attime "${ATTIME_VALID}" --verify-purpose=1.3.6.1.5.5.7.3.1 --inder --p7-verify --load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" --infile "${srcdir}/data/${FILE}" >"${OUTFILE}"
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -147,11 +155,11 @@ if test "${rc}" = "0"; then
 	exit 2
 fi
 
-${VALGRIND} "${CERTTOOL}" --inder --p7-verify --load-data "${srcdir}/data/pkcs7-detached.txt" --load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" --infile "${srcdir}/data/${FILE}"
+${VALGRIND} "${CERTTOOL}" --attime "${ATTIME_VALID}" --inder --p7-verify --load-data "${srcdir}/data/pkcs7-detached.txt" --load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" --infile "${srcdir}/data/${FILE}"
 rc=$?
 
 if test "${rc}" != "0"; then
-	echo "${FILE}: PKCS7 verification failed"
+	echo "${FILE}: PKCS7 verification failed with detached data"
 	exit ${rc}
 fi
 
@@ -188,7 +196,7 @@ if test "${rc}" != "0"; then
 fi
 
 FILE="signing-verify"
-${VALGRIND} "${CERTTOOL}" --p7-verify --load-certificate "${srcdir}/../../doc/credentials/x509/cert-rsa.pem" <"${OUTFILE}"
+${VALGRIND} "${CERTTOOL}" --attime "${ATTIME_VALID}" --p7-verify --load-certificate "${srcdir}/../../doc/credentials/x509/cert-rsa.pem" <"${OUTFILE}"
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -198,7 +206,7 @@ fi
 
 #check extraction of embedded data in signature
 FILE="signing-verify-data"
-${VALGRIND} "${CERTTOOL}" --p7-verify --p7-show-data --load-certificate "${srcdir}/../../doc/credentials/x509/cert-rsa.pem" --outfile "${OUTFILE2}" <"${OUTFILE}"
+${VALGRIND} "${CERTTOOL}" --attime "${ATTIME_VALID}" --p7-verify --p7-show-data --load-certificate "${srcdir}/../../doc/credentials/x509/cert-rsa.pem" --outfile "${OUTFILE2}" <"${OUTFILE}"
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -223,7 +231,7 @@ if test "${rc}" != "0"; then
 fi
 
 FILE="signing-detached-verify"
-${VALGRIND} "${CERTTOOL}" --p7-verify --load-certificate "${srcdir}/../../doc/credentials/x509/cert-rsa.pem" --load-data "${srcdir}/data/pkcs7-detached.txt" <"${OUTFILE}"
+${VALGRIND} "${CERTTOOL}" --attime "${ATTIME_VALID}" --p7-verify --load-certificate "${srcdir}/../../doc/credentials/x509/cert-rsa.pem" --load-data "${srcdir}/data/pkcs7-detached.txt" <"${OUTFILE}"
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -273,7 +281,7 @@ if test "${rc}" != "0"; then
 fi
 
 FILE="signing-time-verify"
-${VALGRIND} "${CERTTOOL}" --p7-verify --load-certificate "${srcdir}/../../doc/credentials/x509/cert-rsa.pem" --load-data "${srcdir}/data/pkcs7-detached.txt" <"${OUTFILE}"
+${VALGRIND} "${CERTTOOL}" --attime "${ATTIME_VALID}" --p7-verify --load-certificate "${srcdir}/../../doc/credentials/x509/cert-rsa.pem" --load-data "${srcdir}/data/pkcs7-detached.txt" <"${OUTFILE}"
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -302,7 +310,7 @@ fi
 # Test BER encoding, see RFC 4134 Section 4.5
 # SHA1 signature, so --verify-allow-broken
 FILE="rfc4134-4.5"
-${VALGRIND} "${CERTTOOL}" --p7-verify --verify-allow-broken --load-ca-certificate "${srcdir}/data/rfc4134-ca-rsa.pem" --infile "${srcdir}/data/rfc4134-4.5.p7b" --inder
+${VALGRIND} "${CERTTOOL}" --attime "${ATTIME_VALID}" --p7-verify --verify-allow-broken --load-ca-certificate "${srcdir}/data/rfc4134-ca-rsa.pem" --infile "${srcdir}/data/rfc4134-4.5.p7b" --inder
 rc=$?
 
 if test "${rc}" != "0"; then

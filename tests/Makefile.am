@@ -638,6 +638,7 @@ TESTS_ENVIRONMENT +=						\
 	OPENSSL_ia32cap=0x00000000				\
 	EXEEXT=$(EXEEXT)					\
 	GNUTLS_TEST_SUITE_RUN=1					\
+	ac_cv_sizeof_time_t="$(ac_cv_sizeof_time_t)"		\
 	builddir="$(builddir)"					\
 	top_builddir="$(top_builddir)"				\
 	abs_top_builddir="$(abs_top_builddir)"			\

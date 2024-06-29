@@ -45,6 +45,13 @@ SERV="${SERV} -q"
 
 . "${srcdir}/scripts/common.sh"
 
+: ${ac_cv_sizeof_time_t=8}
+if test "${ac_cv_sizeof_time_t}" -ge 8; then
+	ATTIME_VALID="2038-10-12"  # almost the pregenerated cert expiration
+else
+	ATTIME_VALID="2037-12-31"  # before 2038
+fi
+
 echo "Checking whether logfile option works."
 
 KEY1=${srcdir}/../doc/credentials/x509/example.com-key.pem
@@ -118,7 +125,7 @@ launch_server --echo --sni-hostname-fatal --sni-hostname example.com --x509keyfi
 PID=$!
 wait_server ${PID}
 
-${VALGRIND} "${CLI}" -p "${PORT}" 127.0.0.1 ${OPTS} --priority "NORMAL:-VERS-ALL:+VERS-TLS1.2" --x509cafile ${CA1}  </dev/null >${TMPFILE2}
+${VALGRIND} "${CLI}" --attime "${ATTIME_VALID}" -p "${PORT}" 127.0.0.1 ${OPTS} --priority "NORMAL:-VERS-ALL:+VERS-TLS1.2" --x509cafile ${CA1}  </dev/null >${TMPFILE2}
 kill ${PID}
 wait
 
@@ -144,7 +151,7 @@ launch_server --echo --sni-hostname-fatal --sni-hostname example.com --x509keyfi
 PID=$!
 wait_server ${PID}
 
-${VALGRIND} "${CLI}" -p "${PORT}" 127.0.0.1 ${OPTS} --priority "NORMAL:-VERS-ALL:+VERS-TLS1.2" --x509cafile ${CA1} --logfile ${TMPFILE1} </dev/null >${TMPFILE2}
+${VALGRIND} "${CLI}" --attime "${ATTIME_VALID}" -p "${PORT}" 127.0.0.1 ${OPTS} --priority "NORMAL:-VERS-ALL:+VERS-TLS1.2" --x509cafile ${CA1} --logfile ${TMPFILE1} </dev/null >${TMPFILE2}
 kill ${PID}
 wait
 

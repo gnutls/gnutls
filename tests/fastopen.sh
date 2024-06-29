@@ -34,7 +34,7 @@ fi
 
 if test "${WINDIR}" != ""; then
 	exit 77
-fi 
+fi
 
 if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=15"
@@ -44,6 +44,13 @@ fi
 SERV="${SERV} -q"
 
 . "${srcdir}/scripts/common.sh"
+
+: ${ac_cv_sizeof_time_t=8}
+if test "${ac_cv_sizeof_time_t}" -ge 8; then
+	ATTIME_VALID="2038-10-12"  # almost the pregenerated cert expiration
+else
+	ATTIME_VALID="2037-12-31"  # before 2038
+fi
 
 echo "Checking Fast open"
 
@@ -56,10 +63,10 @@ launch_server --echo --x509keyfile ${KEY1} --x509certfile ${CERT1}
 PID=$!
 wait_server ${PID}
 
-${VALGRIND} "${CLI}" -p "${PORT}" localhost --fastopen --priority "NORMAL:-VERS-ALL:+VERS-TLS1.2" --x509cafile ${CA1}  </dev/null || \
+${VALGRIND} "${CLI}" --attime "${ATTIME_VALID}" -p "${PORT}" localhost --fastopen --priority "NORMAL:-VERS-ALL:+VERS-TLS1.2" --x509cafile ${CA1}  </dev/null || \
 	fail ${PID} "1. TLS1.2 handshake should have succeeded!"
 
-${VALGRIND} "${CLI}" -p "${PORT}" localhost --fastopen --x509cafile ${CA1}  </dev/null || \
+${VALGRIND} "${CLI}" --attime "${ATTIME_VALID}" -p "${PORT}" localhost --fastopen --x509cafile ${CA1}  </dev/null || \
 	fail ${PID} "2. handshake should have succeeded!"
 
 

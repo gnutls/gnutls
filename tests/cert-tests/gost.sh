@@ -153,7 +153,7 @@ if ! cmp "${srcdir}"/data/gost-cert-new.pem $TMPFILE ; then
 	exit 1
 fi
 
-"${CERTTOOL}" --verify --load-ca-certificate "${srcdir}"/data/gost-cert-ca.pem --infile "${srcdir}"/data/gost-cert-new.pem --outfile $TMPFILE
+"${CERTTOOL}" --attime "2037-10-01" --verify --load-ca-certificate "${srcdir}"/data/gost-cert-ca.pem --infile "${srcdir}"/data/gost-cert-new.pem --outfile $TMPFILE
 if [ $? != 0 ]; then
 	cat $TMPFILE
 	exit 1

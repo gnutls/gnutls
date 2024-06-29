@@ -40,6 +40,13 @@ if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=15"
 fi
 
+: ${ac_cv_sizeof_time_t=8}
+if test "${ac_cv_sizeof_time_t}" -ge 8; then
+	ATTIME_VALID="2038-10-12"  # almost the pregenerated cert expiration
+else
+	ATTIME_VALID="2037-12-31"  # before 2038
+fi
+
 
 SERV="${SERV} -q"
 
@@ -89,7 +96,7 @@ for params in $ALLOWED_PARAMS; do
 	PID=$!
 	wait_server ${PID}
 
-	${VALGRIND} "${CLI}" ${OPTS} -p "${PORT}" 127.0.0.1 --verify-hostname=localhost --x509cafile ${CA1} </dev/null >/dev/null || \
+	${VALGRIND} "${CLI}" --attime "${ATTIME_VALID}" ${OPTS} -p "${PORT}" 127.0.0.1 --verify-hostname=localhost --x509cafile ${CA1} </dev/null >/dev/null || \
 		fail ${PID} "handshake should have succeeded!"
 
 	kill ${PID}
@@ -106,7 +113,7 @@ for params in $DISALLOWED_PARAMS; do
 	PID=$!
 	wait_server ${PID}
 
-	${VALGRIND} "${CLI}" ${OPTS} -p "${PORT}" 127.0.0.1 --verify-hostname=localhost --x509cafile ${CA1} </dev/null >/dev/null
+	${VALGRIND} "${CLI}" --attime "${ATTIME_VALID}" ${OPTS} -p "${PORT}" 127.0.0.1 --verify-hostname=localhost --x509cafile ${CA1} </dev/null >/dev/null
 
 	RET=$?
 
