@@ -37,20 +37,21 @@
 #
 # *** This file is auto-generated ***
 #
-# 1 "lib/accelerated/aarch64/macosx/ghash-aarch64.s.tmp.S"
-# 1 "<built-in>"
-# 1 "<command-line>"
+# 0 "lib/accelerated/aarch64/macosx/ghash-aarch64.s.tmp.S"
+# 0 "<built-in>"
+# 0 "<command-line>"
 # 1 "lib/accelerated/aarch64/macosx/ghash-aarch64.s.tmp.S"
 # 1 "lib/accelerated/aarch64/aarch64-common.h" 1
 # 2 "lib/accelerated/aarch64/macosx/ghash-aarch64.s.tmp.S" 2
 
 
-.text
 
+.text
 .globl _gcm_init_v8
 
 .align 4
 _gcm_init_v8:
+
  ld1 {v17.2d},[x1]
  movi v19.16b,#0xe1
  shl v19.2d,v19.2d,#57
@@ -126,21 +127,110 @@ _gcm_init_v8:
  pmull v5.1q,v5.1d,v19.1d
  eor v18.16b,v18.16b,v2.16b
  eor v4.16b,v4.16b,v7.16b
- eor v20.16b, v0.16b,v18.16b
- eor v22.16b,v5.16b,v4.16b
+ eor v23.16b, v0.16b,v18.16b
+ eor v25.16b,v5.16b,v4.16b
 
- ext v16.16b,v20.16b, v20.16b,#8
- ext v17.16b,v22.16b,v22.16b,#8
- eor v16.16b,v16.16b,v20.16b
- eor v17.16b,v17.16b,v22.16b
- ext v21.16b,v16.16b,v17.16b,#8
- st1 {v20.2d,v21.2d,v22.2d},[x0]
+ ext v16.16b,v23.16b, v23.16b,#8
+ ext v17.16b,v25.16b,v25.16b,#8
+ ext v18.16b,v22.16b,v22.16b,#8
+ eor v16.16b,v16.16b,v23.16b
+ eor v17.16b,v17.16b,v25.16b
+ eor v18.16b,v18.16b,v22.16b
+ ext v24.16b,v16.16b,v17.16b,#8
+ st1 {v23.2d,v24.2d,v25.2d},[x0],#48
+
+
+ pmull v0.1q,v22.1d, v23.1d
+ pmull v5.1q,v23.1d,v23.1d
+ pmull2 v2.1q,v22.2d, v23.2d
+ pmull2 v7.1q,v23.2d,v23.2d
+ pmull v1.1q,v16.1d,v18.1d
+ pmull v6.1q,v16.1d,v16.1d
+
+ ext v16.16b,v0.16b,v2.16b,#8
+ ext v17.16b,v5.16b,v7.16b,#8
+ eor v18.16b,v0.16b,v2.16b
+ eor v1.16b,v1.16b,v16.16b
+ eor v4.16b,v5.16b,v7.16b
+ eor v6.16b,v6.16b,v17.16b
+ eor v1.16b,v1.16b,v18.16b
+ pmull v18.1q,v0.1d,v19.1d
+ eor v6.16b,v6.16b,v4.16b
+ pmull v4.1q,v5.1d,v19.1d
+
+ ins v2.d[0],v1.d[1]
+ ins v7.d[0],v6.d[1]
+ ins v1.d[1],v0.d[0]
+ ins v6.d[1],v5.d[0]
+ eor v0.16b,v1.16b,v18.16b
+ eor v5.16b,v6.16b,v4.16b
+
+ ext v18.16b,v0.16b,v0.16b,#8
+ ext v4.16b,v5.16b,v5.16b,#8
+ pmull v0.1q,v0.1d,v19.1d
+ pmull v5.1q,v5.1d,v19.1d
+ eor v18.16b,v18.16b,v2.16b
+ eor v4.16b,v4.16b,v7.16b
+ eor v26.16b,v0.16b,v18.16b
+ eor v28.16b,v5.16b,v4.16b
+
+ ext v16.16b,v26.16b, v26.16b,#8
+ ext v17.16b,v28.16b,v28.16b,#8
+ ext v18.16b,v22.16b,v22.16b,#8
+ eor v16.16b,v16.16b,v26.16b
+ eor v17.16b,v17.16b,v28.16b
+ eor v18.16b,v18.16b,v22.16b
+ ext v27.16b,v16.16b,v17.16b,#8
+ st1 {v26.2d,v27.2d,v28.2d},[x0],#48
+
+
+ pmull v0.1q,v22.1d,v26.1d
+ pmull v5.1q,v22.1d,v28.1d
+ pmull2 v2.1q,v22.2d,v26.2d
+ pmull2 v7.1q,v22.2d,v28.2d
+ pmull v1.1q,v16.1d,v18.1d
+ pmull v6.1q,v17.1d,v18.1d
+
+ ext v16.16b,v0.16b,v2.16b,#8
+ ext v17.16b,v5.16b,v7.16b,#8
+ eor v18.16b,v0.16b,v2.16b
+ eor v1.16b,v1.16b,v16.16b
+ eor v4.16b,v5.16b,v7.16b
+ eor v6.16b,v6.16b,v17.16b
+ eor v1.16b,v1.16b,v18.16b
+ pmull v18.1q,v0.1d,v19.1d
+ eor v6.16b,v6.16b,v4.16b
+ pmull v4.1q,v5.1d,v19.1d
+
+ ins v2.d[0],v1.d[1]
+ ins v7.d[0],v6.d[1]
+ ins v1.d[1],v0.d[0]
+ ins v6.d[1],v5.d[0]
+ eor v0.16b,v1.16b,v18.16b
+ eor v5.16b,v6.16b,v4.16b
+
+ ext v18.16b,v0.16b,v0.16b,#8
+ ext v4.16b,v5.16b,v5.16b,#8
+ pmull v0.1q,v0.1d,v19.1d
+ pmull v5.1q,v5.1d,v19.1d
+ eor v18.16b,v18.16b,v2.16b
+ eor v4.16b,v4.16b,v7.16b
+ eor v29.16b,v0.16b,v18.16b
+ eor v31.16b,v5.16b,v4.16b
+
+ ext v16.16b,v29.16b,v29.16b,#8
+ ext v17.16b,v31.16b,v31.16b,#8
+ eor v16.16b,v16.16b,v29.16b
+ eor v17.16b,v17.16b,v31.16b
+ ext v30.16b,v16.16b,v17.16b,#8
+ st1 {v29.2d,v30.2d,v31.2d},[x0]
  ret
 
 .globl _gcm_gmult_v8
 
 .align 4
 _gcm_gmult_v8:
+
  ld1 {v17.2d},[x0]
  movi v19.16b,#0xe1
  ld1 {v20.2d,v21.2d},[x1]
@@ -182,6 +272,7 @@ _gcm_gmult_v8:
 
 .align 4
 _gcm_ghash_v8:
+
  cmp x3,#64
  b.hs Lgcm_ghash_v8_4x
  ld1 {v0.2d},[x0]
@@ -192,7 +283,7 @@ _gcm_ghash_v8:
 
  subs x3,x3,#32
  mov x12,#16
-# 159 "lib/accelerated/aarch64/macosx/ghash-aarch64.s.tmp.S"
+# 250 "lib/accelerated/aarch64/macosx/ghash-aarch64.s.tmp.S"
  ld1 {v20.2d,v21.2d},[x1],#32
  movi v19.16b,#0xe1
  ld1 {v22.2d},[x1]

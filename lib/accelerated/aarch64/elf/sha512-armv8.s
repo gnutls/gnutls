@@ -37,36 +37,33 @@
 #
 # *** This file is auto-generated ***
 #
+# 0 "lib/accelerated/aarch64/elf/sha512-armv8.s.tmp.S"
+# 1 "/home/zfridric/upstream/gnutls//"
+# 0 "<built-in>"
+# 0 "<command-line>"
 # 1 "lib/accelerated/aarch64/elf/sha512-armv8.s.tmp.S"
-# 1 "<built-in>"
-# 1 "<command-line>"
-# 1 "lib/accelerated/aarch64/elf/sha512-armv8.s.tmp.S"
-# 56 "lib/accelerated/aarch64/elf/sha512-armv8.s.tmp.S"
+# 58 "lib/accelerated/aarch64/elf/sha512-armv8.s.tmp.S"
 # 1 "lib/accelerated/aarch64/aarch64-common.h" 1
-# 57 "lib/accelerated/aarch64/elf/sha512-armv8.s.tmp.S" 2
+# 59 "lib/accelerated/aarch64/elf/sha512-armv8.s.tmp.S" 2
+
+
+.hidden _gnutls_arm_cpuid_s
 
 
 .text
 
-
-.hidden _gnutls_arm_cpuid_s
 .globl sha512_block_data_order
 .type sha512_block_data_order,%function
 .align 6
 sha512_block_data_order:
 
 
-
-
- ldr x16,.L_gnutls_arm_cpuid_s
-
- adr x17,.L_gnutls_arm_cpuid_s
- add x16,x16,x17
- ldr w16,[x16]
- tst w16,#(1<<6)
+ adrp x16,_gnutls_arm_cpuid_s
+ ldr w16,[x16,#:lo12:_gnutls_arm_cpuid_s]
+ tst w16,#(1 << 6)
  b.ne .Lv8_entry
 
-.inst 0xd503233f
+
  stp x29,x30,[sp,#-128]!
  add x29,sp,#0
 
@@ -1026,7 +1023,7 @@ sha512_block_data_order:
  ldp x25,x26,[x29,#64]
  ldp x27,x28,[x29,#80]
  ldp x29,x30,[sp],#128
-.inst 0xd50323bf
+
  ret
 .size sha512_block_data_order,.-sha512_block_data_order
 
@@ -1075,15 +1072,6 @@ sha512_block_data_order:
 .quad 0x5fcb6fab3ad6faec,0x6c44198c4a475817
 .quad 0
 .size .LK512,.-.LK512
-
-.align 3
-.L_gnutls_arm_cpuid_s:
-
-
-
-.quad _gnutls_arm_cpuid_s-.
-
-
 .byte 83,72,65,53,49,50,32,98,108,111,99,107,32,116,114,97,110,115,102,111,114,109,32,102,111,114,32,65,82,77,118,56,44,32,67,82,89,80,84,79,71,65,77,83,32,98,121,32,60,97,112,112,114,111,64,111,112,101,110,115,115,108,46,111,114,103,62,0
 .align 2
 .align 2
@@ -1092,6 +1080,7 @@ sha512_block_data_order:
 .align 6
 sha512_block_armv8:
 .Lv8_entry:
+
  stp x29,x30,[sp,#-16]!
  add x29,sp,#0
 
