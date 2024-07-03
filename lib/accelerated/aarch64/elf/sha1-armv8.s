@@ -37,31 +37,30 @@
 #
 # *** This file is auto-generated ***
 #
-# 1 "lib/accelerated/aarch64/elf/sha1-armv8.s.tmp.S"
-# 1 "<built-in>"
-# 1 "<command-line>"
+# 0 "lib/accelerated/aarch64/elf/sha1-armv8.s.tmp.S"
+# 1 "/home/zfridric/upstream/gnutls//"
+# 0 "<built-in>"
+# 0 "<command-line>"
 # 1 "lib/accelerated/aarch64/elf/sha1-armv8.s.tmp.S"
 # 1 "lib/accelerated/aarch64/aarch64-common.h" 1
 # 2 "lib/accelerated/aarch64/elf/sha1-armv8.s.tmp.S" 2
 
-.text
-
 
 .hidden _gnutls_arm_cpuid_s
+
+
+.text
+
 .globl sha1_block_data_order
 .type sha1_block_data_order,%function
 .align 6
 sha1_block_data_order:
 
-
-
- ldr x16,.L_gnutls_arm_cpuid_s
-
- adr x17,.L_gnutls_arm_cpuid_s
- add x16,x16,x17
- ldr w16,[x16]
- tst w16,#(1<<3)
+ adrp x16,_gnutls_arm_cpuid_s
+ ldr w16,[x16,#:lo12:_gnutls_arm_cpuid_s]
+ tst w16,#(1 << 3)
  b.ne .Lv8_entry
+
 
  stp x29,x30,[sp,#-96]!
  add x29,sp,#0
@@ -88,7 +87,7 @@ sha1_block_data_order:
  add w24,w24,w28
  add w24,w24,w3
  lsr x4,x3,#32
- ldr x5,[x1,#-56]
+ ldur x5,[x1,#-56]
  bic w25,w23,w21
  and w26,w22,w21
  ror w27,w20,#27
@@ -113,7 +112,7 @@ sha1_block_data_order:
  add w22,w22,w5
  add w23,w23,w25
  lsr x6,x5,#32
- ldr x7,[x1,#-48]
+ ldur x7,[x1,#-48]
  bic w25,w21,w24
  and w26,w20,w24
  ror w27,w23,#27
@@ -138,7 +137,7 @@ sha1_block_data_order:
  add w20,w20,w7
  add w21,w21,w25
  lsr x8,x7,#32
- ldr x9,[x1,#-40]
+ ldur x9,[x1,#-40]
  bic w25,w24,w22
  and w26,w23,w22
  ror w27,w21,#27
@@ -163,7 +162,7 @@ sha1_block_data_order:
  add w23,w23,w9
  add w24,w24,w25
  lsr x10,x9,#32
- ldr x11,[x1,#-32]
+ ldur x11,[x1,#-32]
  bic w25,w22,w20
  and w26,w21,w20
  ror w27,w24,#27
@@ -188,7 +187,7 @@ sha1_block_data_order:
  add w21,w21,w11
  add w22,w22,w25
  lsr x12,x11,#32
- ldr x13,[x1,#-24]
+ ldur x13,[x1,#-24]
  bic w25,w20,w23
  and w26,w24,w23
  ror w27,w22,#27
@@ -213,7 +212,7 @@ sha1_block_data_order:
  add w24,w24,w13
  add w20,w20,w25
  lsr x14,x13,#32
- ldr x15,[x1,#-16]
+ ldur x15,[x1,#-16]
  bic w25,w23,w21
  and w26,w22,w21
  ror w27,w20,#27
@@ -238,7 +237,7 @@ sha1_block_data_order:
  add w22,w22,w15
  add w23,w23,w25
  lsr x16,x15,#32
- ldr x17,[x1,#-8]
+ ldur x17,[x1,#-8]
  bic w25,w21,w24
  and w26,w20,w24
  ror w27,w23,#27
@@ -1122,6 +1121,7 @@ sha1_block_data_order:
 .align 6
 sha1_block_armv8:
 .Lv8_entry:
+
  stp x29,x30,[sp,#-16]!
  add x29,sp,#0
 
@@ -1254,12 +1254,6 @@ sha1_block_armv8:
 .long 0x6ed9eba1,0x6ed9eba1,0x6ed9eba1,0x6ed9eba1
 .long 0x8f1bbcdc,0x8f1bbcdc,0x8f1bbcdc,0x8f1bbcdc
 .long 0xca62c1d6,0xca62c1d6,0xca62c1d6,0xca62c1d6
-.L_gnutls_arm_cpuid_s:
-
-
-
-.quad _gnutls_arm_cpuid_s-.
-
 .byte 83,72,65,49,32,98,108,111,99,107,32,116,114,97,110,115,102,111,114,109,32,102,111,114,32,65,82,77,118,56,44,32,67,82,89,80,84,79,71,65,77,83,32,98,121,32,60,97,112,112,114,111,64,111,112,101,110,115,115,108,46,111,114,103,62,0
 .align 2
 .align 2

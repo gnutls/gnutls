@@ -5,7 +5,7 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.8.6 (unreleased)
+* Version 3.8.6 (released 2024-07-03)
 
 ** libgnutls: PBMAC1 is now supported as a MAC mechanism for PKCS#12
    To be compliant with FIPS 140-3, PKCS#12 files with MAC based on
