@@ -946,6 +946,27 @@ AM_CONDITIONAL(P11KIT_0_23_11_API, $PKG_CONFIG --atleast-version=0.23.11 p11-kit
 
 AM_CONDITIONAL(ENABLE_PKCS11, test "$with_p11_kit" != "no")
 
+save_LIBS=$LIBS
+LIBS="$LIBS -lm"
+LIBGNUTLS_CHECK_SONAME([m], [AC_LANG_PROGRAM([
+               #include <math.h>],[
+               trunc (0);])])
+LIBS="$save_LIBS"
+CFLAGS="$save_CFLAGS"
+
+AC_RUN_IFELSE(
+  [AC_LANG_PROGRAM(
+    [[#include <dlfcn.h>
+      #include <stdlib.h>
+    ]],
+    [[void *handle = dlopen("$M_LIBRARY_SONAME", RTLD_LAZY | RTLD_GLOBAL);
+      return handle != NULL ? 0 : 1;
+    ]])],
+  [ac_cv_dlopen_soname_works=yes],
+  [ac_cv_dlopen_soname_works=no],
+  [ac_cv_dlopen_soname_works=cross-compiling])
+
+AM_CONDITIONAL([ENABLE_DLOPEN], [test "$ac_cv_dlopen_soname_works" = yes])
 need_ltlibdl=no
 
 AC_ARG_WITH(tpm2,
