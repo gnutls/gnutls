@@ -563,9 +563,15 @@ static const struct gnutls_library_config_st _gnutls_library_config[] = {
 #ifdef FIPS_MODULE_VERSION
 	{ "fips-module-version", FIPS_MODULE_VERSION },
 #endif
+#ifdef GNUTLS_LIBRARY_SONAME
 	{ "libgnutls-soname", GNUTLS_LIBRARY_SONAME },
+#endif
+#ifdef NETTLE_LIBRARY_SONAME
 	{ "libnettle-soname", NETTLE_LIBRARY_SONAME },
+#endif
+#ifdef HOGWEED_LIBRARY_SONAME
 	{ "libhogweed-soname", HOGWEED_LIBRARY_SONAME },
+#endif
 #ifdef GMP_LIBRARY_SONAME
 	{ "libgmp-soname", GMP_LIBRARY_SONAME },
 #endif

@@ -25,198 +25,91 @@
 
 #include "compress.h"
 
-#ifndef _WIN32
+#ifdef _WIN32
+#define RTLD_NOW 0
+#define RTLD_GLOBAL 0
+#else
 #include <dlfcn.h>
 #endif
 
+#ifndef Z_LIBRARY_SONAME
+#define Z_LIBRARY_SONAME "none"
+#endif
+
+#ifndef BROTLIENC_LIBRARY_SONAME
+#define BROTLIENC_LIBRARY_SONAME "none"
+#endif
+
+#ifndef BROTLIDEC_LIBRARY_SONAME
+#define BROTLIDEC_LIBRARY_SONAME "none"
+#endif
+
+#ifndef ZSTD_LIBRARY_SONAME
+#define ZSTD_LIBRARY_SONAME "none"
+#endif
+
 #ifdef HAVE_LIBZ
-#include <zlib.h>
+#include "dlwrap/zlib.h"
 #endif
 
 #ifdef HAVE_LIBBROTLI
-#include <brotli/decode.h>
-#include <brotli/encode.h>
+#include "dlwrap/brotlienc.h"
+#include "dlwrap/brotlidec.h"
 #endif
 
 #ifdef HAVE_LIBZSTD
-#include <zstd.h>
+#include "dlwrap/zstd.h"
 #endif
 
 #ifdef HAVE_LIBZ
-static void *_zlib_handle;
-
-#if HAVE___TYPEOF__
-static __typeof__(compressBound)(*_gnutls_zlib_compressBound);
-static __typeof__(compress)(*_gnutls_zlib_compress);
-static __typeof__(uncompress)(*_gnutls_zlib_uncompress);
-#else
-static uLong (*_gnutls_zlib_compressBound)(uLong sourceLen);
-static int (*_gnutls_zlib_compress)(Bytef *dest, uLongf *destLen,
-				    const Bytef *source, uLong sourceLen);
-static int (*_gnutls_zlib_uncompress)(Bytef *dest, uLongf *destLen,
-				      const Bytef *source, uLong sourceLen);
-#endif /* HAVE___TYPEOF__ */
-
 static void zlib_deinit(void)
 {
-#ifndef _WIN32
-	if (_zlib_handle != NULL) {
-		dlclose(_zlib_handle);
-		_zlib_handle = NULL;
-	}
-#endif /* _WIN32 */
+	gnutls_zlib_unload_library();
 }
 
 static int zlib_init(void)
 {
-#ifndef _WIN32
-	if (_zlib_handle != NULL)
-		return 0;
-	if ((_zlib_handle = dlopen("libz.so.1", RTLD_NOW | RTLD_GLOBAL)) ==
-	    NULL)
-		goto error;
-	if ((_gnutls_zlib_compressBound =
-		     dlsym(_zlib_handle, "compressBound")) == NULL)
-		goto error;
-	if ((_gnutls_zlib_compress = dlsym(_zlib_handle, "compress")) == NULL)
-		goto error;
-	if ((_gnutls_zlib_uncompress = dlsym(_zlib_handle, "uncompress")) ==
-	    NULL)
-		goto error;
+	if (gnutls_zlib_ensure_library(Z_LIBRARY_SONAME,
+				       RTLD_NOW | RTLD_GLOBAL) < 0)
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 	return 0;
-error:
-	zlib_deinit();
-	return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
-#else
-	return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
-#endif /* _WIN32 */
 }
 #endif /* HAVE_LIBZ */
 
 #ifdef HAVE_LIBBROTLI
-static void *_brotlienc_handle;
-static void *_brotlidec_handle;
-
-#if HAVE___TYPEOF__
-static __typeof__(BrotliEncoderMaxCompressedSize)(
-	*_gnutls_BrotliEncoderMaxCompressedSize);
-static __typeof__(BrotliEncoderCompress)(*_gnutls_BrotliEncoderCompress);
-static __typeof__(BrotliDecoderDecompress)(*_gnutls_BrotliDecoderDecompress);
-#else
-static size_t (*_gnutls_BrotliEncoderMaxCompressedSize)(size_t input_size);
-static BROTLI_BOOL (*_gnutls_BrotliEncoderCompress)(
-	int quality, int lgwin, BrotliEncoderMode mode, size_t input_size,
-	const uint8_t input_buffer[BROTLI_ARRAY_PARAM(input_size)],
-	size_t *encoded_size,
-	uint8_t encoded_buffer[BROTLI_ARRAY_PARAM(*encoded_size)]);
-static BrotliDecoderResult (*_gnutls_BrotliDecoderDecompress)(
-	size_t encoded_size,
-	const uint8_t encoded_buffer[BROTLI_ARRAY_PARAM(encoded_size)],
-	size_t *decoded_size,
-	uint8_t decoded_buffer[BROTLI_ARRAY_PARAM(*decoded_size)]);
-#endif /* HAVE___TYPEOF__ */
 
 static void brotli_deinit(void)
 {
-#ifndef _WIN32
-	if (_brotlienc_handle != NULL) {
-		dlclose(_brotlienc_handle);
-		_brotlienc_handle = NULL;
-	}
-	if (_brotlidec_handle != NULL) {
-		dlclose(_brotlidec_handle);
-		_brotlidec_handle = NULL;
-	}
-#endif /* _WIN32 */
+	gnutls_brotlienc_unload_library();
+	gnutls_brotlidec_unload_library();
 }
 
 static int brotli_init(void)
 {
-#ifndef _WIN32
-	if (_brotlienc_handle != NULL || _brotlidec_handle != NULL)
-		return 0;
-	if ((_brotlienc_handle = dlopen("libbrotlienc.so.1",
-					RTLD_NOW | RTLD_GLOBAL)) == NULL)
-		goto error;
-	if ((_brotlidec_handle = dlopen("libbrotlidec.so.1",
-					RTLD_NOW | RTLD_GLOBAL)) == NULL)
-		goto error;
-	if ((_gnutls_BrotliEncoderMaxCompressedSize =
-		     dlsym(_brotlienc_handle,
-			   "BrotliEncoderMaxCompressedSize")) == NULL)
-		goto error;
-	if ((_gnutls_BrotliEncoderCompress =
-		     dlsym(_brotlienc_handle, "BrotliEncoderCompress")) == NULL)
-		goto error;
-	if ((_gnutls_BrotliDecoderDecompress = dlsym(
-		     _brotlidec_handle, "BrotliDecoderDecompress")) == NULL)
-		goto error;
+	if (gnutls_brotlienc_ensure_library(BROTLIENC_LIBRARY_SONAME,
+					    RTLD_NOW | RTLD_GLOBAL) < 0)
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+	if (gnutls_brotlidec_ensure_library(BROTLIDEC_LIBRARY_SONAME,
+					    RTLD_NOW | RTLD_GLOBAL) < 0)
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 	return 0;
-error:
-	brotli_deinit();
-	return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
-#else
-	return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
-#endif /* _WIN32 */
 }
 #endif /* HAVE_LIBBROTLI */
 
 #ifdef HAVE_LIBZSTD
-static void *_zstd_handle;
-
-#if HAVE___TYPEOF__
-static __typeof__(ZSTD_isError)(*_gnutls_ZSTD_isError);
-static __typeof__(ZSTD_compressBound)(*_gnutls_ZSTD_compressBound);
-static __typeof__(ZSTD_compress)(*_gnutls_ZSTD_compress);
-static __typeof__(ZSTD_decompress)(*_gnutls_ZSTD_decompress);
-#else
-static unsigned (*_gnutls_ZSTD_isError)(size_t code);
-static size_t (*_gnutls_ZSTD_compressBound)(size_t srcSize);
-static size_t (*_gnutls_ZSTD_compress)(void *dst, size_t dstCapacity,
-				       const void *src, size_t srcSize,
-				       int compressionLevel);
-static size_t (*_gnutls_ZSTD_decompress)(void *dst, size_t dstCapacity,
-					 const void *src,
-					 size_t compressedSize);
-#endif /* HAVE___TYPEOF__ */
 
 static void zstd_deinit(void)
 {
-#ifndef _WIN32
-	if (_zstd_handle != NULL) {
-		dlclose(_zstd_handle);
-		_zstd_handle = NULL;
-	}
-#endif /* _WIN32 */
+	gnutls_zstd_unload_library();
 }
 
 static int zstd_init(void)
 {
-#ifndef _WIN32
-	if (_zstd_handle != NULL)
-		return 0;
-	if ((_zstd_handle = dlopen("libzstd.so.1", RTLD_NOW | RTLD_GLOBAL)) ==
-	    NULL)
-		goto error;
-	if ((_gnutls_ZSTD_isError = dlsym(_zstd_handle, "ZSTD_isError")) ==
-	    NULL)
-		goto error;
-	if ((_gnutls_ZSTD_compressBound =
-		     dlsym(_zstd_handle, "ZSTD_compressBound")) == NULL)
-		goto error;
-	if ((_gnutls_ZSTD_compress = dlsym(_zstd_handle, "ZSTD_compress")) ==
-	    NULL)
-		goto error;
-	if ((_gnutls_ZSTD_decompress =
-		     dlsym(_zstd_handle, "ZSTD_decompress")) == NULL)
-		goto error;
+	if (gnutls_zstd_ensure_library(ZSTD_LIBRARY_SONAME,
+				       RTLD_NOW | RTLD_GLOBAL) < 0)
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 	return 0;
-error:
-	zstd_deinit();
-	return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
-#else
-	return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
-#endif /* _WIN32 */
 }
 #endif /* HAVE_LIBZSTD */
 
@@ -345,15 +238,16 @@ size_t _gnutls_compress_bound(gnutls_compression_method_t alg, size_t src_len)
 	switch (alg) {
 #ifdef HAVE_LIBZ
 	case GNUTLS_COMP_ZLIB:
-		return _gnutls_zlib_compressBound(src_len);
+		return GNUTLS_ZLIB_FUNC(compressBound)(src_len);
 #endif
 #ifdef HAVE_LIBBROTLI
 	case GNUTLS_COMP_BROTLI:
-		return _gnutls_BrotliEncoderMaxCompressedSize(src_len);
+		return GNUTLS_BROTLIENC_FUNC(BrotliEncoderMaxCompressedSize)(
+			src_len);
 #endif
 #ifdef HAVE_LIBZSTD
 	case GNUTLS_COMP_ZSTD:
-		return _gnutls_ZSTD_compressBound(src_len);
+		return GNUTLS_ZSTD_FUNC(ZSTD_compressBound)(src_len);
 #endif
 	default:
 		return 0;
@@ -372,7 +266,7 @@ int _gnutls_compress(gnutls_compression_method_t alg, uint8_t *dst,
 		int err;
 		uLongf comp_len = dst_len;
 
-		err = _gnutls_zlib_compress(dst, &comp_len, src, src_len);
+		err = GNUTLS_ZLIB_FUNC(compress)(dst, &comp_len, src, src_len);
 		if (err != Z_OK)
 			return gnutls_assert_val(GNUTLS_E_COMPRESSION_FAILED);
 		ret = comp_len;
@@ -383,7 +277,7 @@ int _gnutls_compress(gnutls_compression_method_t alg, uint8_t *dst,
 		BROTLI_BOOL err;
 		size_t comp_len = dst_len;
 
-		err = _gnutls_BrotliEncoderCompress(
+		err = GNUTLS_BROTLIENC_FUNC(BrotliEncoderCompress)(
 			BROTLI_DEFAULT_QUALITY, BROTLI_DEFAULT_WINDOW,
 			BROTLI_DEFAULT_MODE, src_len, src, &comp_len, dst);
 		if (!err)
@@ -395,9 +289,9 @@ int _gnutls_compress(gnutls_compression_method_t alg, uint8_t *dst,
 	case GNUTLS_COMP_ZSTD: {
 		size_t comp_len;
 
-		comp_len = _gnutls_ZSTD_compress(dst, dst_len, src, src_len,
-						 ZSTD_CLEVEL_DEFAULT);
-		if (_gnutls_ZSTD_isError(comp_len))
+		comp_len = GNUTLS_ZSTD_FUNC(ZSTD_compress)(
+			dst, dst_len, src, src_len, ZSTD_CLEVEL_DEFAULT);
+		if (GNUTLS_ZSTD_FUNC(ZSTD_isError)(comp_len))
 			return gnutls_assert_val(GNUTLS_E_COMPRESSION_FAILED);
 		ret = comp_len;
 	} break;
@@ -425,7 +319,8 @@ int _gnutls_decompress(gnutls_compression_method_t alg, uint8_t *dst,
 		int err;
 		uLongf plain_len = dst_len;
 
-		err = _gnutls_zlib_uncompress(dst, &plain_len, src, src_len);
+		err = GNUTLS_ZLIB_FUNC(uncompress)(dst, &plain_len, src,
+						   src_len);
 		if (err != Z_OK)
 			return gnutls_assert_val(GNUTLS_E_DECOMPRESSION_FAILED);
 		ret = plain_len;
@@ -436,8 +331,8 @@ int _gnutls_decompress(gnutls_compression_method_t alg, uint8_t *dst,
 		BrotliDecoderResult err;
 		size_t plain_len = dst_len;
 
-		err = _gnutls_BrotliDecoderDecompress(src_len, src, &plain_len,
-						      dst);
+		err = GNUTLS_BROTLIDEC_FUNC(
+			BrotliDecoderDecompress)(src_len, src, &plain_len, dst);
 		if (err != BROTLI_DECODER_RESULT_SUCCESS)
 			return gnutls_assert_val(GNUTLS_E_DECOMPRESSION_FAILED);
 		ret = plain_len;
@@ -447,8 +342,9 @@ int _gnutls_decompress(gnutls_compression_method_t alg, uint8_t *dst,
 	case GNUTLS_COMP_ZSTD: {
 		size_t plain_len;
 
-		plain_len = _gnutls_ZSTD_decompress(dst, dst_len, src, src_len);
-		if (_gnutls_ZSTD_isError(plain_len))
+		plain_len = GNUTLS_ZSTD_FUNC(ZSTD_decompress)(dst, dst_len, src,
+							      src_len);
+		if (GNUTLS_ZSTD_FUNC(ZSTD_isError)(plain_len))
 			return gnutls_assert_val(GNUTLS_E_DECOMPRESSION_FAILED);
 		ret = plain_len;
 	} break;

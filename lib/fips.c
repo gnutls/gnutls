@@ -152,15 +152,17 @@ void _gnutls_fips_mode_reset_zombie(void)
 	}
 }
 
-/* These only works with the platform where SONAME is part of the ABI.
- * For example, *_SONAME will be set to "none" on Windows platforms. */
-#define GNUTLS_LIBRARY_NAME GNUTLS_LIBRARY_SONAME
-#define NETTLE_LIBRARY_NAME NETTLE_LIBRARY_SONAME
-#define HOGWEED_LIBRARY_NAME HOGWEED_LIBRARY_SONAME
+/* These only works with the platform where SONAME is part of the ABI. */
+#ifndef GNUTLS_LIBRARY_SONAME
+#define GNUTLS_LIBRARY_SONAME "none"
+#endif
 
-/* GMP can be statically linked. */
-#ifdef GMP_LIBRARY_SONAME
-#define GMP_LIBRARY_NAME GMP_LIBRARY_SONAME
+#ifndef NETTLE_LIBRARY_SONAME
+#define NETTLE_LIBRARY_SONAME "none"
+#endif
+
+#ifndef HOGWEED_LIBRARY_SONAME
+#define HOGWEED_LIBRARY_SONAME "none"
 #endif
 
 #define HMAC_SIZE 32
@@ -246,14 +248,14 @@ static int handler(void *user, const char *section, const char *name,
 		} else {
 			return 0;
 		}
-	} else if (!strcmp(section, GNUTLS_LIBRARY_NAME)) {
+	} else if (!strcmp(section, GNUTLS_LIBRARY_SONAME)) {
 		return lib_handler(&p->gnutls, section, name, value);
-	} else if (!strcmp(section, NETTLE_LIBRARY_NAME)) {
+	} else if (!strcmp(section, NETTLE_LIBRARY_SONAME)) {
 		return lib_handler(&p->nettle, section, name, value);
-	} else if (!strcmp(section, HOGWEED_LIBRARY_NAME)) {
+	} else if (!strcmp(section, HOGWEED_LIBRARY_SONAME)) {
 		return lib_handler(&p->hogweed, section, name, value);
 #ifdef GMP_LIBRARY_SONAME
-	} else if (!strcmp(section, GMP_LIBRARY_NAME)) {
+	} else if (!strcmp(section, GMP_LIBRARY_SONAME)) {
 		return lib_handler(&p->gmp, section, name, value);
 #endif
 	} else {

@@ -345,7 +345,7 @@ fedora/build:
       --without-tpm --with-tpm2 --enable-ktls
       --htmldir=/usr/share/doc/manual
       --with-unbound-root-key-file=/var/lib/unbound/root.key
-      --enable-libdane --without-zlib --without-brotli --without-zstd --disable-rpath
+      --enable-libdane --disable-rpath
       --with-default-priority-string=@SYSTEM
     - make -j$BUILDJOBS
     # build tests, but don't execute them

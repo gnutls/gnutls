@@ -24,7 +24,7 @@ while test $# -gt 0; do
 	    mode=format
 	    shift ;;
 	--help )
-	    echo "Usage: $progname [--parallel=MAX-PROCS] [--format]"
+	    echo "Usage: $progname [--format]"
             exit ;;
 	-* )
             echo "$progname: unknown option $1" 1>&2
@@ -39,7 +39,7 @@ lib_quoted='config\.h'
 lib_dirs=
 
 for i in 1 2 3; do
-    lib_quoted1=$(git ls-files "$top_srcdir"/lib | grep -v '^lib/includes' | grep '\.h$' | sed -n 's!^lib/'"$lib_dirs"'!!p' | paste -s -d'|' | sed -e 's!\.!\\.!g' -e 's!|!\\|!g')
+    lib_quoted1=$(git ls-files "$top_srcdir"/lib | grep -v '^lib/includes' | grep -v '^lib/dlwrap' | grep '\.h$' | sed -n 's!^lib/'"$lib_dirs"'!!p' | paste -s -d'|' | sed -e 's!\.!\\.!g' -e 's!|!\\|!g')
     lib_quoted="$lib_quoted\|$lib_quoted1"
     lib_dirs="$lib_dirs[^/]*/"
 done

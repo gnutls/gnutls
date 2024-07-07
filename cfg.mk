@@ -24,7 +24,7 @@ PACKAGE ?= gnutls
 
 .PHONY: config glimport
 
-INDENT_SOURCES = `find . -name \*.[ch] -o -name gnutls.h.in | grep -v -e ^./build-aux/ -e ^./config.h -e ^./devel/ -e ^./gnulib -e ^./lib/minitasn1/ -e ^./lib/includes/gnutls/gnutls.h -e ^./lib/nettle/backport/ -e ^./lib/priority_options.h -e ^./lib/unistring/ -e ^./lib/x509/supported_exts.h -e ^./lib/build-aux/ -e ^./gl/ -e ^./src/gl/ -e ^./src/.*-options.[ch] -e -args.[ch] -e asn1_tab.c -e ^./tests/suite/`
+INDENT_SOURCES = `find . -name \*.[ch] -o -name gnutls.h.in | grep -v -e ^./build-aux/ -e ^./config.h -e ^./devel/ -e ^./gnulib -e ^./lib/minitasn1/ -e ^./lib/includes/gnutls/gnutls.h -e ^./lib/nettle/backport/ -e ^./lib/priority_options.h -e ^./lib/unistring/ -e ^./lib/x509/supported_exts.h -e ^./lib/build-aux/ -e ^./lib/dlwrap/ -e ^./gl/ -e ^./src/gl/ -e ^./src/.*-options.[ch] -e -args.[ch] -e asn1_tab.c -e ^./tests/suite/`
 
 ifeq ($(.DEFAULT_GOAL),abort-due-to-no-makefile)
 .DEFAULT_GOAL := bootstrap
