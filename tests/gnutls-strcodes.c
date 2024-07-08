@@ -101,6 +101,17 @@ void doit(void)
 	for (i = GNUTLS_SIGN_UNKNOWN + 1; i <= GNUTLS_SIGN_MAX; i++) {
 		if (i == 19)
 			continue;
+#ifndef ENABLE_DSA
+		if (i == GNUTLS_SIGN_DSA_SHA1 || i == GNUTLS_SIGN_DSA_SHA224 ||
+		    i == GNUTLS_SIGN_DSA_SHA256 ||
+		    i == GNUTLS_SIGN_DSA_SHA384 ||
+		    i == GNUTLS_SIGN_DSA_SHA512 ||
+		    i == GNUTLS_SIGN_DSA_SHA3_224 ||
+		    i == GNUTLS_SIGN_DSA_SHA3_256 ||
+		    i == GNUTLS_SIGN_DSA_SHA3_384 ||
+		    i == GNUTLS_SIGN_DSA_SHA3_512)
+			continue;
+#endif
 		check_unique_non_null(gnutls_sign_algorithm_get_name(i));
 	}
 

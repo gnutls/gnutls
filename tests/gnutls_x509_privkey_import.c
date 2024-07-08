@@ -197,12 +197,14 @@ static const test_st tests[] = { {
 					 .sig = GNUTLS_SIGN_RSA_PSS_SHA256,
 					 .key = &server_ca3_rsa_pss2_key,
 				 },
+#ifdef ENABLE_DSA
 				 {
 					 .name = "dsa key",
 					 .pk = GNUTLS_PK_DSA,
 					 .sig = GNUTLS_SIGN_DSA_SHA1,
 					 .key = &dsa_key,
 				 },
+#endif
 				 {
 					 .name = "ed25519 key (PKCS#8)",
 					 .pk = GNUTLS_PK_EDDSA_ED25519,

@@ -1177,15 +1177,20 @@ fi
 generate_temp_rsa_privkey "${TOKEN}" "${TEST_PIN}" 2048
 delete_temp_privkey "${TOKEN}" "${TEST_PIN}" rsa-2048
 
-generate_temp_dsa_privkey "${TOKEN}" "${TEST_PIN}" 3072
-delete_temp_privkey "${TOKEN}" "${TEST_PIN}" dsa-3072
+if test "x$ENABLE_DSA" = "x1"; then
+	generate_temp_dsa_privkey "${TOKEN}" "${TEST_PIN}" 3072
+	delete_temp_privkey "${TOKEN}" "${TEST_PIN}" dsa-3072
+fi
 
 import_temp_rsa_privkey "${TOKEN}" "${TEST_PIN}" 1024
 delete_temp_privkey "${TOKEN}" "${TEST_PIN}" rsa-1024
 import_temp_ecc_privkey "${TOKEN}" "${TEST_PIN}" 256
 delete_temp_privkey "${TOKEN}" "${TEST_PIN}" ecc-256
-import_temp_dsa_privkey "${TOKEN}" "${TEST_PIN}" 2048
-delete_temp_privkey "${TOKEN}" "${TEST_PIN}" dsa-2048
+
+if test "x$ENABLE_DSA" = "x1"; then
+	import_temp_dsa_privkey "${TOKEN}" "${TEST_PIN}" 2048
+	delete_temp_privkey "${TOKEN}" "${TEST_PIN}" dsa-2048
+fi
 
 if test $have_ed25519 != 0;then
 	import_temp_ed25519_privkey "${TOKEN}" "${TEST_PIN}" ed25519

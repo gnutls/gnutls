@@ -63,6 +63,10 @@ void doit(void)
 
 	for (algorithm = GNUTLS_PK_RSA; algorithm <= GNUTLS_PK_DSA;
 	     algorithm++) {
+#ifndef ENABLE_DSA
+		if (algorithm == GNUTLS_PK_DSA)
+			continue;
+#endif
 		ret = gnutls_x509_crq_init(&crq);
 		if (ret < 0)
 			fail("gnutls_x509_crq_init: %d: %s\n", ret,

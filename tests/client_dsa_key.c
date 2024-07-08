@@ -23,8 +23,18 @@
 #include "config.h"
 #endif
 
-#include <stdio.h>
 #include <stdlib.h>
+
+#ifndef ENABLE_DSA
+
+int main(int argc, char **argv)
+{
+	exit(77);
+}
+
+#else
+
+#include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
 #if !defined(_WIN32)
@@ -113,3 +123,5 @@ void doit(void)
 	if (debug)
 		success("success");
 }
+
+#endif /* ENABLE_DSA */

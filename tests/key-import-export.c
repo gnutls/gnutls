@@ -318,7 +318,10 @@ static int check_privkey_import_export(void)
 		{ &_rsa_u, NULL, &_rsa_e2 },
 	};
 	gnutls_privkey_t key;
-	gnutls_datum_t p, q, g, y, x;
+#ifdef ENABLE_DSA
+	gnutls_datum_t g;
+#endif
+	gnutls_datum_t p, q, y, x;
 	gnutls_datum_t m, e, u, e1, e2, d;
 	gnutls_ecc_curve_t curve;
 #ifdef ENABLE_GOST
@@ -330,6 +333,7 @@ static int check_privkey_import_export(void)
 
 	global_init();
 
+#ifdef ENABLE_DSA
 	ret = gnutls_privkey_init(&key);
 	if (ret < 0)
 		fail("error\n");
@@ -396,6 +400,7 @@ static int check_privkey_import_export(void)
 	gnutls_free(y.data);
 	gnutls_free(x.data);
 	gnutls_privkey_deinit(key);
+#endif
 
 	/* RSA */
 
@@ -667,6 +672,7 @@ static int check_privkey_import_export(void)
 	return 0;
 }
 
+#ifdef ENABLE_DSA
 static int check_dsa(void)
 {
 	gnutls_privkey_t key;
@@ -747,6 +753,7 @@ static int check_dsa(void)
 
 	return 0;
 }
+#endif
 
 static int check_rsa(void)
 {
@@ -1159,10 +1166,12 @@ void doit(void)
 		exit(1);
 	}
 
+#ifdef ENABLE_DSA
 	if (check_dsa() != 0) {
 		fail("error in DSA check\n");
 		exit(1);
 	}
+#endif
 
 	if (check_rsa() != 0) {
 		fail("error in RSA check\n");
