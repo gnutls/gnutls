@@ -1428,7 +1428,9 @@ GNUTLS_3_8_2
 	gnutls_ct_log_deinit;
 	gnutls_ct_add_log;
 	gnutls_ct_get_log;
-	gnutls_ct_sct_validate;
+	gnutls_ct_sct_init;
+	gnutls_ct_sct_deinit;
+	gnutls_ct_verify;
  local:
 	*;
 } GNUTLS_3_8_1;

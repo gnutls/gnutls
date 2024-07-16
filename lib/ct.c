@@ -7,7 +7,8 @@
 #include <nettle/base64.h>
 #include <gnutls/x509-ext.h>
 
-#define SCT_V1_LOGID_SIZE 32
+#define SHA256_OUTPUT_SIZE 32
+#define SCT_V1_LOGID_SIZE SHA256_OUTPUT_SIZE
 
 struct gnutls_ct_log_st {
 	char *name;
@@ -19,6 +20,14 @@ struct gnutls_ct_log_st {
 struct gnutls_ct_logs_st {
 	struct gnutls_ct_log_st *logs;
 	size_t size;
+};
+
+struct gnutls_ct_sct_st {
+	gnutls_datum_t
+		logid,
+		signature;
+	gnutls_sign_algorithm_t signature_algorithm;
+	time_t timestamp;
 };
 
 static int _gnutls_ct_add_log(struct gnutls_ct_log_st *log,
@@ -117,8 +126,15 @@ static struct gnutls_ct_log_st *_gnutls_lookup_log_by_id(const struct gnutls_ct_
 	return NULL;
 }
 
-static int generate_precert(const gnutls_x509_crt_t crt, gnutls_datum_t *out)
+static int generate_tbsCertificate(const gnutls_x509_crt_t crt, gnutls_datum_t *out)
 {
+	/*
+	 * Generate a TBSCertificate structure.
+	 * According to RFC 9162, sect. 8.1.2:
+	 *
+	 *   1. Remove the Transparency Information extension
+	 *   2. Remove embedded v1 SCTs, identified by OID 1.3.6.1.4.1.11129.2.4.2.
+	*/
 	asn1_node tbsroot;
 	int retval, outlen;
 	unsigned char *outbuf = NULL;
@@ -137,7 +153,7 @@ static int generate_precert(const gnutls_x509_crt_t crt, gnutls_datum_t *out)
 		goto bail;
 	}
 
-	// Query how much space we need to hold the new structure
+	/* Query how much space we need to hold the new structure */
 	outlen = 0;
 	retval = asn1_der_coding(tbsroot, "tbsCertificate", NULL, &outlen, NULL);
 	if (retval != ASN1_MEM_ERROR) {
@@ -146,7 +162,7 @@ static int generate_precert(const gnutls_x509_crt_t crt, gnutls_datum_t *out)
 		goto bail;
 	}
 
-	// Now outlen holds the necessary amount of space to export the DER encoding
+	/* Now outlen holds the necessary amount of space to export the DER encoding */
 	if ((outbuf = gnutls_malloc(outlen)) == NULL) {
 		gnutls_assert();
 		retval = GNUTLS_E_MEMORY_ERROR;
@@ -171,17 +187,13 @@ bail:
 	return retval;
 }
 
-static int compute_issuer_key_hash(const gnutls_x509_crt_t cert, gnutls_datum_t *out)
+static int compute_issuer_key_hash(const gnutls_x509_crt_t cert, uint8_t md[])
 {
 	int retval;
-	char md[gnutls_hash_get_len(GNUTLS_DIG_SHA256)];
 
 	if ((retval = gnutls_hash_fast(GNUTLS_DIG_SHA256,
 				       cert->raw_spki.data, cert->raw_spki.size,
 				       md)) < 0)
-		return gnutls_assert_val(retval);
-
-	if ((retval = _gnutls_set_datum(out, md, gnutls_hash_get_len(GNUTLS_DIG_SHA256))) < 0)
 		return gnutls_assert_val(retval);
 
 	return 0;
@@ -195,6 +207,22 @@ static int _gnutls_update_hash_with_precert(gnutls_hash_hd_t md, uint64_t timest
 	int retval;
 	uint8_t three_bytes[3] = { 0x00, 0x00, 0x01 };
 	uint8_t u32_be[sizeof(uint32_t)], u64_be[sizeof(uint64_t)];
+
+	/*
+	 * Compute a TimestampedCertificateEntryDataV2 structure, that is,
+	 * a TransItem structure of type 'precert_entry_v2'.
+	 *
+	 * We're dealing with SCTs included in X.509 certs here.
+	 *
+	 * From RFC 9162, chapt. 4.7:
+	 *
+	 *     struct {
+         *       uint64 timestamp;
+         *       opaque issuer_key_hash<32..2^8-1>;
+         *       TBSCertificate tbs_certificate;
+         *       Extension sct_extensions<0..2^16-1>;
+    	 *     } TimestampedCertificateEntryDataV2;
+	 */
 
 	if ((retval = gnutls_hash(md, three_bytes, 2)) < 0)
 		return gnutls_assert_val(retval);
@@ -327,73 +355,113 @@ void gnutls_ct_log_deinit(gnutls_ct_log_t log)
 	gnutls_free(log);
 }
 
-int gnutls_ct_sct_validate(const gnutls_x509_ct_scts_t scts, unsigned idx,
-			   const gnutls_ct_logs_t logs,
-			   gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
-			   gnutls_time_func time_func)
+
+int gnutls_ct_sct_init(gnutls_ct_sct_t *sct,
+		       const gnutls_datum_t *logid,
+		       gnutls_sign_algorithm_t signature_algorithm, const gnutls_datum_t *signature,
+		       time_t timestamp)
+{
+	int ret;
+
+	*sct = gnutls_malloc(sizeof(struct gnutls_ct_sct_st));
+	if (!*sct)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+	/*
+	 * Currently Log IDs are defined as the SHA-256 hash of the log's public key.
+	 * Hence, they cannot be greater than the output of SHA-256.
+	 */
+ 	if (logid->size != SCT_V1_LOGID_SIZE)
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+	(*sct)->logid.data = NULL;
+	(*sct)->logid.size = 0;
+	if ((ret = _gnutls_set_datum(&(*sct)->logid, logid->data, logid->size)) < 0) {
+		gnutls_assert();
+		goto bail;
+	}
+
+	if ((ret = _gnutls_set_datum(&(*sct)->signature, signature->data, signature->size)) < 0) {
+		gnutls_assert();
+		goto bail;
+	}
+
+	(*sct)->signature_algorithm = signature_algorithm;
+	(*sct)->timestamp = timestamp;
+
+	return 0;
+
+bail:
+	if ((*sct)->logid.data)
+		_gnutls_free_datum(&(*sct)->logid);
+
+	return ret;
+}
+
+void gnutls_ct_sct_deinit(gnutls_ct_sct_t sct)
+{
+	_gnutls_free_datum(&sct->logid);
+	_gnutls_free_datum(&sct->signature);
+	gnutls_free(sct);
+}
+
+int gnutls_ct_verify(gnutls_ct_sct_t sct,
+		     gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
+		     const gnutls_ct_logs_t logs,
+		     char **log_name)
 {
 	int retval;
-	time_t timestamp;
-	gnutls_sign_algorithm_t sigalg;
-	gnutls_datum_t logid, signature;
 	gnutls_hash_hd_t md;
-	struct gnutls_ct_log_st *log;
-	uint8_t signed_data_digest[gnutls_hash_get_len(GNUTLS_DIG_SHA256)];
-	gnutls_datum_t signed_data_digest_datum = {
-		.data = signed_data_digest,
-		.size = gnutls_hash_get_len(GNUTLS_DIG_SHA256)
-	};
-	gnutls_datum_t ikey_hash, crtder = {
+	gnutls_ct_log_t log;
+	uint8_t signature_digest[gnutls_hash_get_len(GNUTLS_DIG_SHA256)],
+		issuer_key_digest[gnutls_hash_get_len(GNUTLS_DIG_SHA256)];
+	gnutls_datum_t signed_data_digest, issuer_key_hash, crtder = {
 		.data = NULL,
 		.size = 0
 	};
 
-	if ((retval = gnutls_x509_ct_sct_get(scts, idx,
-					     &timestamp, &logid, &sigalg, &signature)) < 0) {
-		gnutls_assert();
-		return retval;
-	}
+	/* Lookup this SCT in the log store, by its Log ID */
+	if ((log = _gnutls_lookup_log_by_id(logs, sct->logid.data)) == NULL)
+		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
-	if (logid.size != SCT_V1_LOGID_SIZE)
-		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+	if (log_name)
+		*log_name = log->name;  /* TODO should we copy it instead? */
 
-	/* Lookup the log */
-	if ((log = _gnutls_lookup_log_by_id(logs, logid.data)) == NULL)
-		return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
-
+	/* TODO clarify - why SHA-256? */
 	if ((retval = gnutls_hash_init(&md, GNUTLS_DIG_SHA256)) < 0) {
 		gnutls_assert();
 		goto bail;
 	}
 
-	/* Compute preCert as DER */
-	if ((retval = generate_precert(crt, &crtder)) < 0) {
+	/* Compute TBSCertificate structure, and export as DER */
+	if ((retval = generate_tbsCertificate(cert, &crtder)) < 0) {
 		gnutls_assert();
 		goto bail;
 	}
 
-	/* Compute issuer key hash */
-	if ((retval = compute_issuer_key_hash(issuer, &ikey_hash)) < 0) {
+	/* Compute issuer key hash - hash of the public key of the CA that issued the certificate */
+	if ((retval = compute_issuer_key_hash(issuer, issuer_key_digest)) < 0) {
 		gnutls_assert();
 		goto bail;
 	}
 
-	if ((retval = _gnutls_update_hash_with_precert(md, timestamp,
-						       crtder.data, crtder.size, &ikey_hash,
+	/* Finally, compute the signature input */
+	issuer_key_hash.data = issuer_key_digest;
+	issuer_key_hash.size = gnutls_hash_get_len(GNUTLS_DIG_SHA256);
+	if ((retval = _gnutls_update_hash_with_precert(md, sct->timestamp,
+						       crtder.data, crtder.size, &issuer_key_hash,
 						       NULL, 0)) < 0) {
 		gnutls_assert();
 		goto bail;
 	}
 
-	/* gnutls_hash_output(md, signed_data_digest); */
-	gnutls_hash_deinit(md, signed_data_digest);
+	gnutls_hash_deinit(md, signature_digest);
 	_gnutls_free_datum(&crtder);
 
-	/* if ((retval = gnutls_pubkey_verify_hash2(log->public_key, log->sign_algo, 0, */
-	/* 					 &signed_data_digest_datum, &signature)) < 0) */
-	/* 	return gnutls_assert_val(retval); */
-
-	return _gnutls_ct_sct_verify_precert(&signed_data_digest_datum, &signature, sigalg, log, time_func);
+	signed_data_digest.data = signature_digest;
+	signed_data_digest.size = gnutls_hash_get_len(GNUTLS_DIG_SHA256);
+	return _gnutls_ct_sct_verify_precert(&signed_data_digest,
+					     &sct->signature, sct->signature_algorithm, log, NULL);
 
 bail:
 	gnutls_hash_deinit(md, NULL);

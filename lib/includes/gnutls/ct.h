@@ -30,6 +30,7 @@
 #ifndef GNUTLS_CT_H
 # define GNUTLS_CT_H
 
+# include <stdint.h>
 # include <gnutls/gnutls.h>
 # include <gnutls/x509-ext.h>
 
@@ -39,6 +40,8 @@ extern "C" {
 
 typedef struct gnutls_ct_log_st  *gnutls_ct_log_t;
 typedef struct gnutls_ct_logs_st *gnutls_ct_logs_t;
+
+typedef struct gnutls_ct_sct_st *gnutls_ct_sct_t;
 
 int gnutls_ct_logs_init(gnutls_ct_logs_t * logs);
 void gnutls_ct_logs_deinit(gnutls_ct_logs_t logs);
@@ -55,10 +58,20 @@ int gnutls_ct_get_log(gnutls_ct_logs_t logs, unsigned idx,
 		      gnutls_datum_t *name,
 		      gnutls_pubkey_t *public_key);
 
-int gnutls_ct_sct_validate(const gnutls_x509_ct_scts_t scts, unsigned idx,
-			   const gnutls_ct_logs_t logs,
-			   gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
-			   gnutls_time_func time_func);
+
+int gnutls_ct_sct_init(gnutls_ct_sct_t *sct,
+		       const gnutls_datum_t *logid,
+		       gnutls_sign_algorithm_t signature_algorithm, const gnutls_datum_t *signature,
+		       time_t timestamp);
+
+void gnutls_ct_sct_deinit(gnutls_ct_sct_t sct);
+
+
+int gnutls_ct_verify(gnutls_ct_sct_t sct,
+		     gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
+		     const gnutls_ct_logs_t logs,
+		     char **log_name);
+
 #ifdef __cplusplus
 }
 #endif
