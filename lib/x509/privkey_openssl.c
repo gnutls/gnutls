@@ -257,7 +257,6 @@ int gnutls_x509_privkey_import_openssl(gnutls_x509_privkey_t key,
 		ret = gnutls_cipher_init(&handle, cipher, &enc_key, &salt);
 		if (ret < 0) {
 			gnutls_assert();
-			gnutls_cipher_deinit(handle);
 			goto out;
 		}
 
