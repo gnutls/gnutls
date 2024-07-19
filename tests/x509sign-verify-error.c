@@ -116,6 +116,7 @@ static char pem2_cert[] =
 	"QcDzQ8REwidsfh9uKAluk1c/KQ==\n"
 	"-----END CERTIFICATE-----\n";
 
+#ifdef ENABLE_DSA
 static char pem2_key[] =
 	"-----BEGIN DSA PRIVATE KEY-----\n"
 	"MIIBugIBAAKBgQC5hPVagb4aDcWKc48Mmy+btg5Lw3Qaf2StnfMoxaBHvJtXVvGX\n"
@@ -129,12 +130,16 @@ static char pem2_key[] =
 	"jlvXN8gyPpbCPvRD2n2RAg+3vPjvj/dBAF6W3w8IltzqsukGgq/SLwIUS5/r/2ya\n"
 	"AoNBXjeBjgCGMei2m8E=\n"
 	"-----END DSA PRIVATE KEY-----\n";
+#endif
 
 const gnutls_datum_t cert_dat[] = { { (void *)pem1_cert, sizeof(pem1_cert) },
 				    { (void *)pem2_cert, sizeof(pem2_cert) } };
 
 const gnutls_datum_t key_dat[] = { { (void *)pem1_key, sizeof(pem1_key) },
-				   { (void *)pem2_key, sizeof(pem2_key) } };
+#ifdef ENABLE_DSA
+				   { (void *)pem2_key, sizeof(pem2_key) }
+#endif
+};
 
 void _gnutls_lib_simulate_error(void);
 void _gnutls_lib_force_operational(void);

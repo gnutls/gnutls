@@ -139,6 +139,9 @@ void doit(void)
 		for (algorithm = GNUTLS_PK_RSA; algorithm <= GNUTLS_PK_MAX;
 		     algorithm++) {
 			if (algorithm == GNUTLS_PK_DH ||
+#ifndef ENABLE_DSA
+			    algorithm == GNUTLS_PK_DSA ||
+#endif
 			    algorithm == GNUTLS_PK_ECDH_X25519 ||
 			    algorithm == GNUTLS_PK_ECDH_X448)
 				continue;

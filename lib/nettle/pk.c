@@ -1525,6 +1525,7 @@ static int _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 		}
 		break;
 	}
+#ifdef ENABLE_DSA
 	case GNUTLS_PK_DSA: {
 		struct dsa_params pub;
 		bigint_t priv;
@@ -1602,6 +1603,7 @@ static int _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 		}
 		break;
 	}
+#endif
 	case GNUTLS_PK_RSA: {
 		struct rsa_private_key priv;
 		struct rsa_public_key pub;
@@ -1945,6 +1947,7 @@ static int _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 		ecc_point_clear(&pub);
 		break;
 	}
+#ifdef ENABLE_DSA
 	case GNUTLS_PK_DSA: {
 		struct dsa_params pub;
 		struct dsa_signature sig;
@@ -1980,6 +1983,7 @@ static int _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 
 		break;
 	}
+#endif
 	case GNUTLS_PK_RSA: {
 		struct rsa_public_key pub;
 		size_t bits;
@@ -2221,7 +2225,9 @@ static int _wrap_nettle_pk_exists(gnutls_pk_algorithm_t pk)
 {
 	switch (pk) {
 	case GNUTLS_PK_RSA:
+#ifdef ENABLE_DSA
 	case GNUTLS_PK_DSA:
+#endif
 	case GNUTLS_PK_DH:
 	case GNUTLS_PK_ECDSA:
 	case GNUTLS_PK_ECDH_X25519:
@@ -2245,7 +2251,9 @@ static int _wrap_nettle_pk_sign_exists(gnutls_sign_algorithm_t sign)
 {
 	switch (sign) {
 	case GNUTLS_SIGN_RSA_SHA1:
+#ifdef ENABLE_DSA
 	case GNUTLS_SIGN_DSA_SHA1:
+#endif
 	case GNUTLS_SIGN_RSA_MD5:
 	case GNUTLS_SIGN_RSA_MD2:
 	case GNUTLS_SIGN_RSA_RMD160:
@@ -2253,24 +2261,30 @@ static int _wrap_nettle_pk_sign_exists(gnutls_sign_algorithm_t sign)
 	case GNUTLS_SIGN_RSA_SHA384:
 	case GNUTLS_SIGN_RSA_SHA512:
 	case GNUTLS_SIGN_RSA_SHA224:
+#ifdef ENABLE_DSA
 	case GNUTLS_SIGN_DSA_SHA224:
 	case GNUTLS_SIGN_DSA_SHA256:
+#endif
 	case GNUTLS_SIGN_ECDSA_SHA1:
 	case GNUTLS_SIGN_ECDSA_SHA224:
 	case GNUTLS_SIGN_ECDSA_SHA256:
 	case GNUTLS_SIGN_ECDSA_SHA384:
 	case GNUTLS_SIGN_ECDSA_SHA512:
+#ifdef ENABLE_DSA
 	case GNUTLS_SIGN_DSA_SHA384:
 	case GNUTLS_SIGN_DSA_SHA512:
+#endif
 	case GNUTLS_SIGN_ECDSA_SHA3_224:
 	case GNUTLS_SIGN_ECDSA_SHA3_256:
 	case GNUTLS_SIGN_ECDSA_SHA3_384:
 	case GNUTLS_SIGN_ECDSA_SHA3_512:
 
+#ifdef ENABLE_DSA
 	case GNUTLS_SIGN_DSA_SHA3_224:
 	case GNUTLS_SIGN_DSA_SHA3_256:
 	case GNUTLS_SIGN_DSA_SHA3_384:
 	case GNUTLS_SIGN_DSA_SHA3_512:
+#endif
 	case GNUTLS_SIGN_RSA_SHA3_224:
 	case GNUTLS_SIGN_RSA_SHA3_256:
 	case GNUTLS_SIGN_RSA_SHA3_384:
@@ -2319,7 +2333,9 @@ static int wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 	params->algo = algo;
 
 	switch (algo) {
+#ifdef ENABLE_DSA
 	case GNUTLS_PK_DSA:
+#endif
 	case GNUTLS_PK_DH: {
 		struct dsa_params pub;
 		struct dss_params_validation_seeds cert;
@@ -2812,7 +2828,9 @@ static int pct_test(gnutls_pk_algorithm_t algo,
 	case GNUTLS_PK_EC: /* we only do keys for ECDSA */
 	case GNUTLS_PK_EDDSA_ED25519:
 	case GNUTLS_PK_EDDSA_ED448:
+#ifdef ENABLE_DSA
 	case GNUTLS_PK_DSA:
+#endif
 	case GNUTLS_PK_RSA_PSS:
 	case GNUTLS_PK_GOST_01:
 	case GNUTLS_PK_GOST_12_256:
@@ -2983,6 +3001,7 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 	}
 
 	switch (algo) {
+#ifdef ENABLE_DSA
 	case GNUTLS_PK_DSA:
 #ifdef ENABLE_FIPS140
 		if (_gnutls_fips_mode_enabled() != 0) {
@@ -3035,6 +3054,7 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 		}
 #endif
 		FALLTHROUGH;
+#endif
 	case GNUTLS_PK_DH: {
 		struct dsa_params pub;
 		mpz_t r;
@@ -3686,8 +3706,10 @@ static int wrap_nettle_pk_verify_priv_params(gnutls_pk_algorithm_t algo,
 	}
 
 	break;
-	case GNUTLS_PK_DH:
-	case GNUTLS_PK_DSA: {
+#ifdef ENABLE_DSA
+	case GNUTLS_PK_DSA:
+#endif
+	case GNUTLS_PK_DH: {
 		bigint_t t1 = NULL;
 
 		if (params->params_nr != DSA_PRIVATE_PARAMS)
@@ -3919,7 +3941,9 @@ static int wrap_nettle_pk_verify_pub_params(gnutls_pk_algorithm_t algo,
 	case GNUTLS_PK_RSA:
 	case GNUTLS_PK_RSA_PSS:
 	case GNUTLS_PK_RSA_OAEP:
+#ifdef ENABLE_DSA
 	case GNUTLS_PK_DSA:
+#endif
 	case GNUTLS_PK_EDDSA_ED25519:
 	case GNUTLS_PK_EDDSA_ED448:
 		return 0;
@@ -4074,6 +4098,7 @@ static int calc_rsa_priv(gnutls_pk_params_st *params)
 	return 0;
 }
 
+#ifdef ENABLE_DSA
 static int calc_dsa_pub(gnutls_pk_params_st *params)
 {
 	int ret;
@@ -4094,6 +4119,7 @@ static int calc_dsa_pub(gnutls_pk_params_st *params)
 
 	return 0;
 }
+#endif
 
 static int wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 				gnutls_direction_t direction,
@@ -4217,7 +4243,9 @@ static int wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 				params->spki.salt_size, pub_size,
 				GNUTLS_E_PK_INVALID_PUBKEY_PARAMS);
 		}
-	} else if (algo == GNUTLS_PK_DSA) {
+	}
+#ifdef ENABLE_DSA
+	else if (algo == GNUTLS_PK_DSA) {
 		if (params->params[DSA_Y] == NULL) {
 			ret = calc_dsa_pub(params);
 			if (ret < 0)
@@ -4225,6 +4253,7 @@ static int wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 			params->params_nr++;
 		}
 	}
+#endif
 #if ENABLE_GOST
 	else if (algo == GNUTLS_PK_GOST_01 || algo == GNUTLS_PK_GOST_12_256 ||
 		 algo == GNUTLS_PK_GOST_12_512) {

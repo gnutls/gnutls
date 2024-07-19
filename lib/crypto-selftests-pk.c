@@ -110,11 +110,13 @@ static const char dsa_2048_privkey[] =
 	"kTlCAhxYGpVgtfB96qmJukyl9GOGvfkwFTgEyIDoV84M\n"
 	"-----END DSA PRIVATE KEY-----\n";
 
+#ifdef ENABLE_DSA
 static const char dsa_2048_sig[] =
 	"\x30\x3d\x02\x1d\x00\xbe\x87\x2f\xcf\xa1\xe4\x86\x5c\x72\x58\x4a"
 	"\x7b\x8f\x32\x7f\xa5\x1b\xdc\x5c\xae\xda\x98\xea\x15\x32\xed\x0c"
 	"\x4e\x02\x1c\x4c\x76\x01\x2b\xcd\xb9\x33\x95\xf2\xfa\xde\x56\x01"
 	"\xb7\xaa\xe4\x5a\x4a\x2e\xf1\x24\x5a\xd1\xb5\x83\x9a\x93\x61";
+#endif
 
 /* secp256r1 private key and signature */
 static const char ecdsa_secp256r1_privkey[] =
@@ -1007,6 +1009,7 @@ int gnutls_pk_self_test(unsigned flags, gnutls_pk_algorithm_t pk)
 			return 0;
 
 		FALLTHROUGH;
+#ifdef ENABLE_DSA
 	case GNUTLS_PK_DSA:
 		if (is_post || !is_fips140_mode_enabled) {
 			PK_KNOWN_TEST(GNUTLS_PK_DSA, 2048, GNUTLS_DIG_SHA256,
@@ -1021,6 +1024,7 @@ int gnutls_pk_self_test(unsigned flags, gnutls_pk_algorithm_t pk)
 			return 0;
 
 		FALLTHROUGH;
+#endif
 	case GNUTLS_PK_EC:
 		/* Test ECDH and ECDSA */
 		ret = test_ecdh();

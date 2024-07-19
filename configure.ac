@@ -733,6 +733,14 @@ if test "$enable_non_suiteb" = "yes";then
 fi
 AM_CONDITIONAL(ENABLE_NON_SUITEB_CURVES, test "$enable_non_suiteb" = "yes")
 
+AC_ARG_ENABLE(dsa,
+  AS_HELP_STRING([--disable-dsa], [disable DSA]),
+  enable_dsa=$enableval, enable_dsa=yes)
+if test x$enable_dsa != xno; then
+    AC_DEFINE([ENABLE_DSA], 1, [Define if DSA is enabled.])
+fi
+AM_CONDITIONAL([ENABLE_DSA], [test x$enable_dsa != xno])
+
 # We MUST require a Nettle version that has rsa_sec_decrypt now.
 save_LIBS=$LIBS
 LIBS="$LIBS $HOGWEED_LIBS $NETTLE_LIBS $GMP_LIBS"

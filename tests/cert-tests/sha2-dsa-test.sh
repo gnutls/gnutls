@@ -30,6 +30,10 @@ TMPFILE=sha2-dsa.$$.tmp
 USERFILE=user-dsa.$$.tmp
 VERIFYFILE=verify-dsa.$$.tmp
 
+if test "x$ENABLE_DSA" != "x1"; then
+	exit 77
+fi
+
 if ! test -x "${CERTTOOL}"; then
 	exit 77
 fi

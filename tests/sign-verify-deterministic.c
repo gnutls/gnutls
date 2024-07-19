@@ -58,6 +58,7 @@ struct _key_tests_st {
 };
 
 /* Test vectors from RFC 6979 */
+#ifdef ENABLE_DSA
 static const char dsa_privkey_rfc6979[] =
 	"-----BEGIN DSA PRIVATE KEY-----\n"
 	"MIIBugIBAAKBgQCG9coD3P6yJQY/+DCgx2m53Z1hU62R184n94fEMni0R+ZTO4ax\n"
@@ -71,6 +72,7 @@ static const char dsa_privkey_rfc6979[] =
 	"xeRzUIJTseaC9ly9xPrpPC6iEjkOVJBahuIiMXC0Tqp9pd2f/Pt/OwIUQRYCyxmm\n"
 	"zMNElNedmO8eftWvJfc=\n"
 	"-----END DSA PRIVATE KEY-----\n";
+#endif
 
 static const char ecdsa_secp256r1_privkey_rfc6979[] =
 	"-----BEGIN EC PRIVATE KEY-----\n"
@@ -82,6 +84,7 @@ static const char ecdsa_secp256r1_privkey_rfc6979[] =
 static const char sample[] = "sample";
 
 static const struct _key_tests_st tests[] = {
+#ifdef ENABLE_DSA
 	{ .name = "dsa key",
 	  .key = { (void *)dsa_privkey_rfc6979,
 		   sizeof(dsa_privkey_rfc6979) - 1 },
@@ -92,6 +95,7 @@ static const struct _key_tests_st tests[] = {
 	  .digest = GNUTLS_DIG_SHA256,
 	  .sigalgo = GNUTLS_SIGN_DSA_SHA256,
 	  .sign_flags = GNUTLS_PRIVKEY_FLAG_REPRODUCIBLE },
+#endif
 	{ .name = "ecdsa key",
 	  .key = { (void *)ecdsa_secp256r1_privkey_rfc6979,
 		   sizeof(ecdsa_secp256r1_privkey_rfc6979) - 1 },

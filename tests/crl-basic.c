@@ -60,6 +60,7 @@ static const char simple1_constraints[] =
 	"9Yzpq6gAi39ZK+LjopgGDkrQjxzBIaoe2bcDqB7X\n"
 	"-----END X509 CRL-----\n";
 
+#ifdef ENABLE_DSA
 static const char crl_dsa[] =
 	"-----BEGIN X509 CRL-----\n"
 	"MIGmMGUwCwYHKoZIzjgEAwUAMDgxCzAJBgNVBAYTAnVzMQwwCgYDVQQKEwNzdW4x\n"
@@ -67,6 +68,7 @@ static const char crl_dsa[] =
 	"NTE3MTk1OTQwWjALBgcqhkjOOAQDBQADMAAwLQIUBBFLGYjUCVrRTGf3GTR6SGs/\n"
 	"accCFQCUhnSmr+CXCWKq8DtydVwH9FLsRA==\n"
 	"-----END X509 CRL-----\n";
+#endif
 
 static const char crl_rsa_sha1[] =
 	"-----BEGIN X509 CRL-----\n"
@@ -108,6 +110,7 @@ static struct {
 		   .crt_count = 0,
 		   .this_update = 1410598756,
 		   .next_update = 1442134756 },
+#ifdef ENABLE_DSA
 		 { .name = "crl-dsa",
 		   .crl = crl_dsa,
 		   .sign_algo = GNUTLS_SIGN_DSA_SHA1,
@@ -115,6 +118,7 @@ static struct {
 		   .crt_count = 0,
 		   .this_update = 1116359980,
 		   .next_update = 1147895980 },
+#endif
 		 { .name = "crl-rsa-sha1",
 		   .crl = crl_rsa_sha1,
 		   .sign_algo = GNUTLS_SIGN_RSA_SHA1,
