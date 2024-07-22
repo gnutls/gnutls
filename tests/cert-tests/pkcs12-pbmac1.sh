@@ -35,7 +35,7 @@ fi
 DEBUG=""
 
 . "${srcdir}/../scripts/common.sh"
-testdir=`create_testdir pkcs12`
+testdir=`create_testdir pkcs12-pbmac1`
 
 TMPFILE=$testdir/pkcs12
 TMPFILE_PEM=$testdir/pkcs12.pem
