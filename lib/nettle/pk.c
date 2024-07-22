@@ -70,6 +70,9 @@
 #include "gnettle.h"
 #include "fips.h"
 #include "dh.h"
+#ifdef HAVE_LIBOQS
+#include "dlwrap/oqs.h"
+#endif
 
 static inline const struct ecc_curve *get_supported_nist_curve(int curve);
 static inline const struct ecc_curve *get_supported_gost_curve(int curve);
@@ -684,6 +687,111 @@ cleanup:
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_APPROVED);
 	}
 
+	return ret;
+}
+
+static int _wrap_nettle_pk_encaps(gnutls_pk_algorithm_t algo,
+				  gnutls_datum_t *ciphertext,
+				  gnutls_datum_t *shared_secret,
+				  const gnutls_datum_t *pub)
+{
+	int ret;
+
+	switch (algo) {
+#ifdef HAVE_LIBOQS
+	case GNUTLS_PK_EXP_KYBER768: {
+		OQS_KEM *kem = NULL;
+		OQS_STATUS rc;
+
+		kem = GNUTLS_OQS_FUNC(OQS_KEM_new)(OQS_KEM_alg_kyber_768);
+		if (kem == NULL)
+			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+		ciphertext->data = gnutls_malloc(kem->length_ciphertext);
+		if (ciphertext->data == NULL) {
+			GNUTLS_OQS_FUNC(OQS_KEM_free)(kem);
+			ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+			goto cleanup;
+		}
+		ciphertext->size = kem->length_ciphertext;
+
+		shared_secret->data = gnutls_malloc(kem->length_shared_secret);
+		if (shared_secret->data == NULL) {
+			GNUTLS_OQS_FUNC(OQS_KEM_free)(kem);
+			ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+			goto cleanup;
+		}
+		shared_secret->size = kem->length_shared_secret;
+
+		rc = GNUTLS_OQS_FUNC(OQS_KEM_encaps)(
+			kem, ciphertext->data, shared_secret->data, pub->data);
+		if (rc != OQS_SUCCESS) {
+			GNUTLS_OQS_FUNC(OQS_KEM_free)(kem);
+			ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			goto cleanup;
+		}
+
+		GNUTLS_OQS_FUNC(OQS_KEM_free)(kem);
+		ret = 0;
+	} break;
+#endif
+	default:
+		ret = gnutls_assert_val(GNUTLS_E_UNKNOWN_ALGORITHM);
+		goto cleanup;
+	}
+
+cleanup:
+	if (ret < 0) {
+		gnutls_free(ciphertext->data);
+		gnutls_free(shared_secret->data);
+	}
+	return ret;
+}
+
+static int _wrap_nettle_pk_decaps(gnutls_pk_algorithm_t algo,
+				  gnutls_datum_t *shared_secret,
+				  const gnutls_datum_t *ciphertext,
+				  const gnutls_datum_t *priv)
+{
+	int ret;
+
+	switch (algo) {
+#ifdef HAVE_LIBOQS
+	case GNUTLS_PK_EXP_KYBER768: {
+		OQS_KEM *kem = NULL;
+		OQS_STATUS rc;
+
+		kem = GNUTLS_OQS_FUNC(OQS_KEM_new)(OQS_KEM_alg_kyber_768);
+		if (kem == NULL)
+			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+		shared_secret->data = gnutls_malloc(kem->length_shared_secret);
+		if (shared_secret->data == NULL) {
+			GNUTLS_OQS_FUNC(OQS_KEM_free)(kem);
+			ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+			goto cleanup;
+		}
+		shared_secret->size = kem->length_shared_secret;
+
+		rc = GNUTLS_OQS_FUNC(OQS_KEM_decaps)(
+			kem, shared_secret->data, ciphertext->data, priv->data);
+		if (rc != OQS_SUCCESS) {
+			GNUTLS_OQS_FUNC(OQS_KEM_free)(kem);
+			ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			goto cleanup;
+		}
+
+		GNUTLS_OQS_FUNC(OQS_KEM_free)(kem);
+		ret = 0;
+	} break;
+#endif
+	default:
+		ret = gnutls_assert_val(GNUTLS_E_UNKNOWN_ALGORITHM);
+		goto cleanup;
+	}
+cleanup:
+	if (ret < 0)
+		gnutls_free(shared_secret->data);
 	return ret;
 }
 
@@ -2234,6 +2342,9 @@ static int _wrap_nettle_pk_exists(gnutls_pk_algorithm_t pk)
 	case GNUTLS_PK_RSA_PSS:
 	case GNUTLS_PK_RSA_OAEP:
 	case GNUTLS_PK_EDDSA_ED25519:
+#ifdef HAVE_LIBOQS
+	case GNUTLS_PK_EXP_KYBER768:
+#endif
 #if ENABLE_GOST
 	case GNUTLS_PK_GOST_01:
 	case GNUTLS_PK_GOST_12_256:
@@ -2875,6 +2986,9 @@ static int pct_test(gnutls_pk_algorithm_t algo,
 	}
 	case GNUTLS_PK_ECDH_X25519:
 	case GNUTLS_PK_ECDH_X448:
+#ifdef HAVE_LIBOQS
+	case GNUTLS_PK_EXP_KYBER768:
+#endif
 		ret = 0;
 		goto cleanup;
 	default:
@@ -3605,6 +3719,49 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			goto cleanup;
 		break;
 	}
+#ifdef HAVE_LIBOQS
+	case GNUTLS_PK_EXP_KYBER768: {
+		OQS_KEM *kem = NULL;
+		OQS_STATUS rc;
+
+		not_approved = true;
+
+		kem = GNUTLS_OQS_FUNC(OQS_KEM_new)(OQS_KEM_alg_kyber_768);
+		if (kem == NULL) {
+			ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+			goto cleanup;
+		}
+
+		params->raw_priv.size = kem->length_secret_key;
+		params->raw_priv.data = gnutls_malloc(params->raw_priv.size);
+		if (params->raw_priv.data == NULL) {
+			GNUTLS_OQS_FUNC(OQS_KEM_free)(kem);
+			ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+			goto cleanup;
+		}
+
+		params->raw_pub.size = kem->length_public_key;
+		params->raw_pub.data = gnutls_malloc(params->raw_pub.size);
+		if (params->raw_pub.data == NULL) {
+			GNUTLS_OQS_FUNC(OQS_KEM_free)(kem);
+			ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+			goto cleanup;
+		}
+
+		rc = GNUTLS_OQS_FUNC(OQS_KEM_keypair)(kem, params->raw_pub.data,
+						      params->raw_priv.data);
+		if (rc != OQS_SUCCESS) {
+			GNUTLS_OQS_FUNC(OQS_KEM_free)(kem);
+			ret = gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+			goto cleanup;
+		}
+
+		GNUTLS_OQS_FUNC(OQS_KEM_free)(kem);
+
+		ret = 0;
+		break;
+	}
+#endif
 	default:
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
@@ -3858,6 +4015,11 @@ static int wrap_nettle_pk_verify_priv_params(gnutls_pk_algorithm_t algo,
 		ret = 0;
 		break;
 	}
+#ifdef HAVE_LIBOQS
+	case GNUTLS_PK_EXP_KYBER768:
+		ret = 0;
+		break;
+#endif
 #if ENABLE_GOST
 	case GNUTLS_PK_GOST_01:
 	case GNUTLS_PK_GOST_12_256:
@@ -4307,6 +4469,8 @@ gnutls_crypto_pk_st _gnutls_pk_ops = {
 	.generate_keys = wrap_nettle_pk_generate_keys,
 	.pk_fixup_private_params = wrap_nettle_pk_fixup,
 	.derive = _wrap_nettle_pk_derive,
+	.encaps = _wrap_nettle_pk_encaps,
+	.decaps = _wrap_nettle_pk_decaps,
 	.curve_exists = _wrap_nettle_pk_curve_exists,
 	.pk_exists = _wrap_nettle_pk_exists,
 	.sign_exists = _wrap_nettle_pk_sign_exists

@@ -342,7 +342,7 @@ fedora/build:
       --disable-non-suiteb-curves
       --with-system-priority-file=/etc/crypto-policies/back-ends/gnutls.config
       --with-default-trust-store-pkcs11='pkcs11:'
-      --without-tpm --with-tpm2 --enable-ktls
+      --without-tpm --with-tpm2 --enable-ktls --with-liboqs
       --htmldir=/usr/share/doc/manual
       --with-unbound-root-key-file=/var/lib/unbound/root.key
       --enable-libdane --disable-rpath

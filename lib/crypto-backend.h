@@ -411,6 +411,13 @@ typedef struct gnutls_crypto_pk {
 		      const gnutls_pk_params_st *pub,
 		      const gnutls_datum_t *nonce, unsigned int flags);
 
+	int (*encaps)(gnutls_pk_algorithm_t, gnutls_datum_t *ciphertext,
+		      gnutls_datum_t *shared_secret, const gnutls_datum_t *pub);
+
+	int (*decaps)(gnutls_pk_algorithm_t, gnutls_datum_t *shared_secret,
+		      const gnutls_datum_t *ciphertext,
+		      const gnutls_datum_t *priv);
+
 	int (*curve_exists)(gnutls_ecc_curve_t); /* true/false */
 	int (*pk_exists)(gnutls_pk_algorithm_t); /* true/false */
 	int (*sign_exists)(gnutls_sign_algorithm_t); /* true/false */

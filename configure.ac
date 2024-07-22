@@ -1185,6 +1185,41 @@ AS_IF([test "$ac_cv_dlopen_soname_works" = yes], [
     CFLAGS="$save_CFLAGS"
 ])
 
+AC_ARG_WITH(liboqs,
+	AS_HELP_STRING([--with-liboqs],
+		[Enable liboqs support.]),
+	[with_liboqs=$withval], [with_liboqs=no])
+AS_IF([test "$with_liboqs" != "no"], [PKG_CHECK_MODULES(LIBOQS, [liboqs >= 0.10.1], [have_liboqs=yes], [have_liboqs=no])])
+AS_IF([test "$have_liboqs" = "yes"], [AC_DEFINE([HAVE_LIBOQS], 1, [Have liboqs])],
+      [test "$with_liboqs" = "yes"], [AC_MSG_ERROR([[
+***
+*** liboqs support was requested but the required libraries were not found.
+*** ]])])
+
+save_CFLAGS=$CFLAGS
+CFLAGS="$CFLAGS $LIBOQS_CFLAGS"
+AC_CHECK_DECLS([OQS_SHA3_set_callbacks])
+CFLAGS="$save_CFLAGS"
+
+# liboqs 0.10.1 didn't expose OQS_SHA3_set_callbacks from the header
+# file, so extra treatment is needed:
+# https://github.com/open-quantum-safe/liboqs/pull/1832
+AM_CONDITIONAL(NEED_LIBOQS_SHA3_OPS_H, test "$ac_cv_have_decl_OQS_SHA3_set_callbacks" != yes)
+
+AM_CONDITIONAL(ENABLE_LIBOQS, test "$have_liboqs" = "yes")
+
+AS_IF([test "$ac_cv_dlopen_soname_works" = yes], [
+    save_CFLAGS=$CFLAGS
+    CFLAGS="$CFLAGS $LIBOQS_CFLAGS"
+    save_LIBS=$LIBS
+    LIBS="$LIBS $LIBOQS_LIBS"
+    LIBGNUTLS_CHECK_SONAME([oqs], [AC_LANG_PROGRAM([
+                   #include <oqs/oqs.h>],[
+                   OQS_version ();])])
+    LIBS="$save_LIBS"
+    CFLAGS="$save_CFLAGS"
+])
+
 AM_CONDITIONAL(NEED_LTLIBDL, test "$need_ltlibdl" = yes)
 
 # export for use in scripts
@@ -1382,6 +1417,7 @@ AC_CONFIG_FILES([
   lib/gnutls.pc
   lib/includes/Makefile
   lib/includes/gnutls/gnutls.h
+  lib/liboqs/Makefile
   lib/minitasn1/Makefile
   lib/nettle/Makefile
   lib/x509/Makefile
@@ -1463,6 +1499,7 @@ if features are disabled)
   Non-SuiteB curves:    $enable_non_suiteb
   FIPS140 mode:         $enable_fips
   Strict DER time:	$ac_strict_der_time
+  liboqs:               $have_liboqs
 ])
 
 AC_MSG_NOTICE([Optional libraries:

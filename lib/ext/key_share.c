@@ -120,6 +120,8 @@ static int client_gen_key_share(gnutls_session_t session,
 
 	} else if (group->pk == GNUTLS_PK_ECDH_X25519 ||
 		   group->pk == GNUTLS_PK_ECDH_X448) {
+		unsigned int length_pos;
+
 		gnutls_pk_params_release(&session->key.kshare.ecdhx_params);
 		gnutls_pk_params_init(&session->key.kshare.ecdhx_params);
 
@@ -128,6 +130,8 @@ static int client_gen_key_share(gnutls_session_t session,
 			&session->key.kshare.ecdhx_params, 1);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
+
+		length_pos = extdata->length;
 
 		ret = _gnutls_buffer_append_data_prefix(
 			extdata, 16,
@@ -140,6 +144,33 @@ static int client_gen_key_share(gnutls_session_t session,
 
 		session->key.kshare.ecdhx_params.algo = group->pk;
 		session->key.kshare.ecdhx_params.curve = group->curve;
+
+		if (group->pk2 != GNUTLS_PK_UNKNOWN) {
+			gnutls_pk_params_release(
+				&session->key.kshare.kem_params);
+			gnutls_pk_params_init(&session->key.kshare.kem_params);
+
+			ret = _gnutls_pk_generate_keys(
+				group->pk2, 0, &session->key.kshare.kem_params,
+				1);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+
+			ret = _gnutls_buffer_append_data(
+				extdata,
+				session->key.kshare.kem_params.raw_pub.data,
+				session->key.kshare.kem_params.raw_pub.size);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+
+			/* copy actual length */
+			_gnutls_write_uint16(extdata->length - length_pos - 2,
+					     &extdata->data[length_pos]);
+		}
 
 		ret = 0;
 
@@ -243,6 +274,10 @@ static int server_gen_key_share(gnutls_session_t session,
 
 	} else if (group->pk == GNUTLS_PK_ECDH_X25519 ||
 		   group->pk == GNUTLS_PK_ECDH_X448) {
+		unsigned int length_pos;
+
+		length_pos = extdata->length;
+
 		ret = _gnutls_buffer_append_data_prefix(
 			extdata, 16,
 			session->key.kshare.ecdhx_params.raw_pub.data,
@@ -250,8 +285,22 @@ static int server_gen_key_share(gnutls_session_t session,
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		ret = 0;
+		if (group->pk2 != GNUTLS_PK_UNKNOWN) {
+			ret = _gnutls_buffer_append_data(
+				extdata,
+				session->key.kshare.kem_params.raw_pub.data,
+				session->key.kshare.kem_params.raw_pub.size);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
 
+			/* copy actual length */
+			_gnutls_write_uint16(extdata->length - length_pos - 2,
+					     &extdata->data[length_pos]);
+		}
+
+		ret = 0;
 	} else if (group->pk == GNUTLS_PK_DH) {
 		ret = _gnutls_buffer_append_prefix(extdata, 16,
 						   group->prime->size);
@@ -333,9 +382,15 @@ static int server_use_key_share(gnutls_session_t session,
 
 		curve = _gnutls_ecc_curve_get_params(group->curve);
 
-		if (curve->size != data_size)
-			return gnutls_assert_val(
-				GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+		if (group->pk2 != GNUTLS_PK_UNKNOWN) {
+			if (curve->size > data_size)
+				return gnutls_assert_val(
+					GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+		} else {
+			if (curve->size != data_size)
+				return gnutls_assert_val(
+					GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+		}
 
 		/* generate our key */
 		ret = _gnutls_pk_generate_keys(
@@ -351,7 +406,7 @@ static int server_use_key_share(gnutls_session_t session,
 		pub.curve = curve->id;
 
 		pub.raw_pub.data = (void *)data;
-		pub.raw_pub.size = data_size;
+		pub.raw_pub.size = curve->size;
 
 		/* We don't mask the MSB in the final byte as required
 		 * by RFC7748. This will be done internally by nettle 3.3 or later.
@@ -361,6 +416,50 @@ static int server_use_key_share(gnutls_session_t session,
 					      &pub);
 		if (ret < 0) {
 			return gnutls_assert_val(ret);
+		}
+
+		if (group->pk2 != GNUTLS_PK_UNKNOWN) {
+			gnutls_datum_t key;
+			gnutls_datum_t peer_pub;
+
+			gnutls_pk_params_release(
+				&session->key.kshare.kem_params);
+			gnutls_pk_params_init(&session->key.kshare.kem_params);
+
+			/* generate our key */
+			ret = _gnutls_pk_generate_keys(
+				group->pk2, 0, &session->key.kshare.kem_params,
+				1);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+
+			/* server's public key is unused, but the raw_pub field
+			 * is used to store ciphertext */
+			gnutls_free(
+				session->key.kshare.kem_params.raw_pub.data);
+
+			peer_pub.data = (uint8_t *)data + curve->size;
+			peer_pub.size = data_size - curve->size;
+
+			ret = _gnutls_pk_encaps(
+				group->pk2,
+				&session->key.kshare.kem_params.raw_pub, &key,
+				&peer_pub);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+
+			session->key.key.data = gnutls_realloc_fast(
+				session->key.key.data,
+				session->key.key.size + key.size);
+			if (!session->key.key.data) {
+				_gnutls_free_datum(&key);
+				return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+			}
+
+			memcpy(session->key.key.data + session->key.key.size,
+			       key.data, key.size);
+			session->key.key.size += key.size;
+			_gnutls_free_datum(&key);
 		}
 
 		ret = 0;
@@ -496,9 +595,15 @@ static int client_use_key_share(gnutls_session_t session,
 			return gnutls_assert_val(
 				GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
-		if (curve->size != data_size)
-			return gnutls_assert_val(
-				GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+		if (group->pk2 != GNUTLS_PK_UNKNOWN) {
+			if (curve->size > data_size)
+				return gnutls_assert_val(
+					GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+		} else {
+			if (curve->size != data_size)
+				return gnutls_assert_val(
+					GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+		}
 
 		/* read the public key and generate shared */
 		gnutls_pk_params_init(&pub);
@@ -517,6 +622,33 @@ static int client_use_key_share(gnutls_session_t session,
 					      &pub);
 		if (ret < 0) {
 			return gnutls_assert_val(ret);
+		}
+
+		if (group->pk2 != GNUTLS_PK_UNKNOWN) {
+			gnutls_datum_t key;
+			gnutls_datum_t ciphertext;
+
+			ciphertext.data = (uint8_t *)data + curve->size;
+			ciphertext.size = data_size - curve->size;
+
+			ret = _gnutls_pk_decaps(
+				group->pk2, &key, &ciphertext,
+				&session->key.kshare.kem_params.raw_priv);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+
+			session->key.key.data = gnutls_realloc_fast(
+				session->key.key.data,
+				session->key.key.size + key.size);
+			if (!session->key.key.data) {
+				_gnutls_free_datum(&key);
+				return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+			}
+
+			memcpy(session->key.key.data + session->key.key.size,
+			       key.data, key.size);
+			session->key.key.size += key.size;
+			_gnutls_free_datum(&key);
 		}
 
 		ret = 0;

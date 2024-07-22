@@ -459,6 +459,7 @@ static void deinit_keys(gnutls_session_t session)
 	gnutls_pk_params_release(&session->key.kshare.ecdhx_params);
 	gnutls_pk_params_release(&session->key.kshare.ecdh_params);
 	gnutls_pk_params_release(&session->key.kshare.dh_params);
+	gnutls_pk_params_release(&session->key.kshare.kem_params);
 
 	if (!vers->tls13_sem && session->key.binders[0].prf == NULL) {
 		gnutls_pk_params_release(&session->key.proto.tls12.ecdh.params);

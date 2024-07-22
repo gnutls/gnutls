@@ -594,6 +594,7 @@ struct gnutls_key_st {
 		gnutls_pk_params_st ecdh_params;
 		gnutls_pk_params_st ecdhx_params;
 		gnutls_pk_params_st dh_params;
+		gnutls_pk_params_st kem_params;
 	} kshare;
 
 	/* The union contents depend on the negotiated protocol.
@@ -764,6 +765,7 @@ typedef struct gnutls_group_entry_st {
 	const unsigned *q_bits;
 	gnutls_ecc_curve_t curve;
 	gnutls_pk_algorithm_t pk;
+	gnutls_pk_algorithm_t pk2;
 	unsigned tls_id; /* The RFC4492 namedCurve ID or TLS 1.3 group ID */
 } gnutls_group_entry_st;
 

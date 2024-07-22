@@ -46,6 +46,10 @@ extern gnutls_crypto_pk_st _gnutls_pk_ops;
 	_gnutls_pk_ops.derive(algo, out, pub, priv, nonce, 0)
 #define _gnutls_pk_derive_tls13(algo, out, pub, priv) \
 	_gnutls_pk_ops.derive(algo, out, pub, priv, NULL, PK_DERIVE_TLS13)
+#define _gnutls_pk_encaps(algo, ciphertext, shared_secret, pub) \
+	_gnutls_pk_ops.encaps(algo, ciphertext, shared_secret, pub)
+#define _gnutls_pk_decaps(algo, shared_secret, ciphertext, priv) \
+	_gnutls_pk_ops.decaps(algo, shared_secret, ciphertext, priv)
 #define _gnutls_pk_generate_keys(algo, bits, params, temporal) \
 	_gnutls_pk_ops.generate_keys(algo, bits, params, temporal)
 #define _gnutls_pk_generate_params(algo, bits, priv) \

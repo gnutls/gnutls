@@ -36,6 +36,10 @@ if ENABLE_MINITASN1
 AM_CPPFLAGS += -I$(srcdir)/../minitasn1
 endif
 
+if ENABLE_DLOPEN
+AM_CPPFLAGS += $(LIBOQS_CFLAGS) -DGNUTLS_OQS_ENABLE_DLOPEN=1
+endif
+
 noinst_LTLIBRARIES = libcrypto.la
 
 libcrypto_la_SOURCES = pk.c mpi.c mac.c cipher.c init.c \

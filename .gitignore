@@ -222,6 +222,7 @@ lib/libgnutls-xssl.la
 lib/libgnutlsxx.la
 lib/Makefile
 lib/Makefile.in
+lib/liboqs/libcrypto.la
 lib/minitasn1/libminitasn1.la
 lib/minitasn1/Makefile
 lib/minitasn1/Makefile.in
