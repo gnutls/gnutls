@@ -44,4 +44,11 @@ int gnutls_brotlienc_ensure_library (const char *soname, int flags);
  */
 void gnutls_brotlienc_unload_library (void);
 
+/* Return 1 if the library is loaded and usable.
+ *
+ * Note that this function is NOT thread-safe; when calling it from
+ * multi-threaded programs, protect it with a locking mechanism.
+ */
+unsigned gnutls_brotlienc_is_usable (void);
+
 #endif /* GNUTLS_LIB_DLWRAP_BROTLIENC_H_ */

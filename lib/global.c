@@ -329,14 +329,6 @@ static int _gnutls_global_init(unsigned constructor)
 		goto out;
 	}
 
-#ifdef HAVE_LIBOQS
-	ret = _gnutls_liboqs_init();
-	if (ret < 0) {
-		gnutls_assert();
-		goto out;
-	}
-#endif
-
 #ifndef _WIN32
 	ret = _gnutls_register_fork_handler();
 	if (ret < 0) {

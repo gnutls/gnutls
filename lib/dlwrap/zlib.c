@@ -128,10 +128,13 @@ gnutls_zlib_ensure_library (const char *soname, int flags)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-macros"
 
-#define FUNC(ret, name, args, cargs)	\
-  err = ENSURE_SYMBOL(name);		\
-  if (err < 0)				\
-    return err;
+#define FUNC(ret, name, args, cargs)		\
+  err = ENSURE_SYMBOL(name);			\
+  if (err < 0)					\
+    {						\
+      gnutls_zlib_dlhandle = NULL;		\
+      return err;				\
+    }
 #define VOID_FUNC FUNC
 #include "zlibfuncs.h"
 #undef VOID_FUNC
@@ -165,6 +168,12 @@ gnutls_zlib_unload_library (void)
 #pragma GCC diagnostic pop
 }
 
+unsigned
+gnutls_zlib_is_usable (void)
+{
+  return gnutls_zlib_dlhandle != NULL;
+}
+
 #else /* GNUTLS_ZLIB_ENABLE_DLOPEN */
 
 int
@@ -178,6 +187,13 @@ gnutls_zlib_ensure_library (const char *soname, int flags)
 void
 gnutls_zlib_unload_library (void)
 {
+}
+
+unsigned
+gnutls_zlib_is_usable (void)
+{
+  /* The library is linked at build time, thus always usable */
+  return 1;
 }
 
 #endif /* !GNUTLS_ZLIB_ENABLE_DLOPEN */
