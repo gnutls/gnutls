@@ -18,16 +18,16 @@
 #include <errno.h>
 #include <stdlib.h>
 
-/* If BROTLIDEC_LIBRARY_SONAME is defined, dlopen handle can be automatically
+/* If BROTLIDEC_LIBRARY_SONAME_UNUSED is defined, dlopen handle can be automatically
  * set; otherwise, the caller needs to call
  * gnutls_brotlidec_ensure_library with soname determined at run time.
  */
-#ifdef BROTLIDEC_LIBRARY_SONAME
+#ifdef BROTLIDEC_LIBRARY_SONAME_UNUSED
 
 static void
 ensure_library (void)
 {
-  if (gnutls_brotlidec_ensure_library (BROTLIDEC_LIBRARY_SONAME, RTLD_LAZY | RTLD_LOCAL) < 0)
+  if (gnutls_brotlidec_ensure_library (BROTLIDEC_LIBRARY_SONAME_UNUSED, RTLD_LAZY | RTLD_LOCAL) < 0)
     abort ();
 }
 
@@ -47,11 +47,11 @@ static pthread_once_t dlopen_once = PTHREAD_ONCE_INIT;
 
 #endif /* !GNUTLS_BROTLIDEC_ENABLE_PTHREAD */
 
-#else /* BROTLIDEC_LIBRARY_SONAME */
+#else /* BROTLIDEC_LIBRARY_SONAME_UNUSED */
 
 #define ENSURE_LIBRARY do {} while (0)
 
-#endif /* !BROTLIDEC_LIBRARY_SONAME */
+#endif /* !BROTLIDEC_LIBRARY_SONAME_UNUSED */
 
 static void *gnutls_brotlidec_dlhandle;
 
@@ -147,7 +147,10 @@ void
 gnutls_brotlidec_unload_library (void)
 {
   if (gnutls_brotlidec_dlhandle)
-    dlclose (gnutls_brotlidec_dlhandle);
+    {
+      dlclose (gnutls_brotlidec_dlhandle);
+      gnutls_brotlidec_dlhandle = NULL;
+    }
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-macros"
@@ -160,8 +163,6 @@ gnutls_brotlidec_unload_library (void)
 #undef FUNC
 
 #pragma GCC diagnostic pop
-
-#undef RESET_SYMBOL
 }
 
 #else /* GNUTLS_BROTLIDEC_ENABLE_DLOPEN */

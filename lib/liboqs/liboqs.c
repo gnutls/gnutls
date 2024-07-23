@@ -22,15 +22,33 @@
 
 #include "liboqs/liboqs.h"
 
+#ifdef _WIN32
+#define RTLD_NOW 0
+#define RTLD_GLOBAL 0
+#else
+#include <dlfcn.h>
+#endif
+
+#ifndef OQS_LIBRARY_SONAME
+#define OQS_LIBRARY_SONAME "none"
+#endif
+
+#include "errors.h"
+
 #include "dlwrap/oqs.h"
 #include "liboqs/rand.h"
 #include "liboqs/sha3.h"
 
-void _gnutls_liboqs_init(void)
+int _gnutls_liboqs_init(void)
 {
+	if (gnutls_oqs_ensure_library(OQS_LIBRARY_SONAME,
+				      RTLD_NOW | RTLD_GLOBAL) < 0)
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
 	_gnutls_liboqs_sha3_init();
 	GNUTLS_OQS_FUNC(OQS_init)();
 	_gnutls_liboqs_rand_init();
+	return 0;
 }
 
 void _gnutls_liboqs_deinit(void)
@@ -38,4 +56,5 @@ void _gnutls_liboqs_deinit(void)
 	_gnutls_liboqs_rand_deinit();
 	_gnutls_liboqs_sha3_deinit();
 	GNUTLS_OQS_FUNC(OQS_destroy)();
+	gnutls_oqs_unload_library();
 }

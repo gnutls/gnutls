@@ -21,7 +21,7 @@
 #ifndef GNUTLS_LIB_LIBOQS_LIBOQS_H
 #define GNUTLS_LIB_LIBOQS_LIBOQS_H
 
-void _gnutls_liboqs_init(void);
+int _gnutls_liboqs_init(void);
 void _gnutls_liboqs_deinit(void);
 
 #endif /* GNUTLS_LIB_LIBOQS_LIBOQS_H */

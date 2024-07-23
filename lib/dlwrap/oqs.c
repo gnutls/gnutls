@@ -18,16 +18,16 @@
 #include <errno.h>
 #include <stdlib.h>
 
-/* If OQS_LIBRARY_SONAME is defined, dlopen handle can be automatically
+/* If OQS_LIBRARY_SONAME_UNUSED is defined, dlopen handle can be automatically
  * set; otherwise, the caller needs to call
  * gnutls_oqs_ensure_library with soname determined at run time.
  */
-#ifdef OQS_LIBRARY_SONAME
+#ifdef OQS_LIBRARY_SONAME_UNUSED
 
 static void
 ensure_library (void)
 {
-  if (gnutls_oqs_ensure_library (OQS_LIBRARY_SONAME, RTLD_LAZY | RTLD_LOCAL) < 0)
+  if (gnutls_oqs_ensure_library (OQS_LIBRARY_SONAME_UNUSED, RTLD_LAZY | RTLD_LOCAL) < 0)
     abort ();
 }
 
@@ -47,11 +47,11 @@ static pthread_once_t dlopen_once = PTHREAD_ONCE_INIT;
 
 #endif /* !GNUTLS_OQS_ENABLE_PTHREAD */
 
-#else /* OQS_LIBRARY_SONAME */
+#else /* OQS_LIBRARY_SONAME_UNUSED */
 
 #define ENSURE_LIBRARY do {} while (0)
 
-#endif /* !OQS_LIBRARY_SONAME */
+#endif /* !OQS_LIBRARY_SONAME_UNUSED */
 
 static void *gnutls_oqs_dlhandle;
 
@@ -147,7 +147,10 @@ void
 gnutls_oqs_unload_library (void)
 {
   if (gnutls_oqs_dlhandle)
-    dlclose (gnutls_oqs_dlhandle);
+    {
+      dlclose (gnutls_oqs_dlhandle);
+      gnutls_oqs_dlhandle = NULL;
+    }
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-macros"
@@ -160,8 +163,6 @@ gnutls_oqs_unload_library (void)
 #undef FUNC
 
 #pragma GCC diagnostic pop
-
-#undef RESET_SYMBOL
 }
 
 #else /* GNUTLS_OQS_ENABLE_DLOPEN */
