@@ -330,7 +330,11 @@ static int _gnutls_global_init(unsigned constructor)
 	}
 
 #ifdef HAVE_LIBOQS
-	_gnutls_liboqs_init();
+	ret = _gnutls_liboqs_init();
+	if (ret < 0) {
+		gnutls_assert();
+		goto out;
+	}
 #endif
 
 #ifndef _WIN32
