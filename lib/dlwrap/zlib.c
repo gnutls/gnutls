@@ -18,16 +18,16 @@
 #include <errno.h>
 #include <stdlib.h>
 
-/* If Z_LIBRARY_SONAME is defined, dlopen handle can be automatically
+/* If Z_LIBRARY_SONAME_UNUSED is defined, dlopen handle can be automatically
  * set; otherwise, the caller needs to call
  * gnutls_zlib_ensure_library with soname determined at run time.
  */
-#ifdef Z_LIBRARY_SONAME
+#ifdef Z_LIBRARY_SONAME_UNUSED
 
 static void
 ensure_library (void)
 {
-  if (gnutls_zlib_ensure_library (Z_LIBRARY_SONAME, RTLD_LAZY | RTLD_LOCAL) < 0)
+  if (gnutls_zlib_ensure_library (Z_LIBRARY_SONAME_UNUSED, RTLD_LAZY | RTLD_LOCAL) < 0)
     abort ();
 }
 
@@ -47,11 +47,11 @@ static pthread_once_t dlopen_once = PTHREAD_ONCE_INIT;
 
 #endif /* !GNUTLS_ZLIB_ENABLE_PTHREAD */
 
-#else /* Z_LIBRARY_SONAME */
+#else /* Z_LIBRARY_SONAME_UNUSED */
 
 #define ENSURE_LIBRARY do {} while (0)
 
-#endif /* !Z_LIBRARY_SONAME */
+#endif /* !Z_LIBRARY_SONAME_UNUSED */
 
 static void *gnutls_zlib_dlhandle;
 
@@ -147,7 +147,10 @@ void
 gnutls_zlib_unload_library (void)
 {
   if (gnutls_zlib_dlhandle)
-    dlclose (gnutls_zlib_dlhandle);
+    {
+      dlclose (gnutls_zlib_dlhandle);
+      gnutls_zlib_dlhandle = NULL;
+    }
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-macros"
@@ -160,8 +163,6 @@ gnutls_zlib_unload_library (void)
 #undef FUNC
 
 #pragma GCC diagnostic pop
-
-#undef RESET_SYMBOL
 }
 
 #else /* GNUTLS_ZLIB_ENABLE_DLOPEN */
