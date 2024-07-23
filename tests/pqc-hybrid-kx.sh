@@ -34,8 +34,8 @@ fi
 . "${srcdir}/scripts/common.sh"
 testdir=`create_testdir pqc-hybrid-kx`
 
-KEY="$srcdir/../doc/credentials/x509/key-ed25519.pem"
-CERT="$srcdir/../doc/credentials/x509/cert-ed25519.pem"
+KEY="$srcdir/../doc/credentials/x509/key-ecc.pem"
+CERT="$srcdir/../doc/credentials/x509/cert-ecc.pem"
 CACERT="$srcdir/../doc/credentials/x509/ca.pem"
 
 eval "${GETPORT}"
@@ -43,12 +43,12 @@ launch_server --echo --priority NORMAL:-GROUP-ALL:+GROUP-X25519-KYBER768 --x509k
 PID=$!
 wait_server ${PID}
 
-${VALGRIND} "${CLI}" -p "${PORT}" 127.0.0.1 --priority NORMAL:-GROUP-ALL:+GROUP-X25519-KYBER768 --x509cafile="$CACERT" --logfile="$testdir/cli.log" </dev/null
+${VALGRIND} "${CLI}" -p "${PORT}" localhost --priority NORMAL:-GROUP-ALL:+GROUP-X25519-KYBER768 --x509cafile="$CACERT" --logfile="$testdir/cli.log" </dev/null
 
 kill ${PID}
 wait
 
-grep -- '- Description: (TLS1.3-X.509)-(ECDHE-X25519-KYBER768)-(EdDSA-Ed25519)-(AES-256-GCM)' "$testdir/cli.log" || { echo "unexpected handshake description"; exit 1; }
+grep -- '- Description: (TLS1.3-X.509)-(ECDHE-X25519-KYBER768)-(ECDSA-SECP256R1-SHA256)-(AES-256-GCM)' "$testdir/cli.log" || { echo "unexpected handshake description"; exit 1; }
 
 rm -rf "$testdir"
 exit 0
