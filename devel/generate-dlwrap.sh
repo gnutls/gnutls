@@ -46,3 +46,15 @@ sed -i '/^#include <oqs\/oqs.h>/i\
 #include "liboqs/backport/sha3_ops.h"\
 #endif\
 ' "$DST/oqs.h"
+
+echo "Generating $DST/tss2_esys.h"
+
+"$DLWRAP" --input /usr/include/tss2/tss2_esys.h -o "$DST" --clang-resource-dir $(clang -print-resource-dir) --symbol-file "$SRC/tss2-esys.syms" --license "SPDX-License-Identifier: BSD-2-Clause" --soname TSS2_ESYS_LIBRARY_SONAME_UNUSED --prefix gnutls_tss2_esys --header-guard GNUTLS_LIB_DLWRAP_TSS2_ESYS_H_ --include "<tss2/tss2_esys.h>"
+
+echo "Generating $DST/tss2_mu.h"
+
+"$DLWRAP" --input /usr/include/tss2/tss2_mu.h -o "$DST" --clang-resource-dir $(clang -print-resource-dir) --symbol-file "$SRC/tss2-mu.syms" --license "SPDX-License-Identifier: BSD-2-Clause" --soname TSS2_MU_LIBRARY_SONAME_UNUSED --prefix gnutls_tss2_mu --header-guard GNUTLS_LIB_DLWRAP_TSS2_MU_H_ --include "<tss2/tss2_mu.h>"
+
+echo "Generating $DST/tss2_tctildr.h"
+
+"$DLWRAP" --input /usr/include/tss2/tss2_tctildr.h -o "$DST" --clang-resource-dir $(clang -print-resource-dir) --symbol-file "$SRC/tss2-tctildr.syms" --license "SPDX-License-Identifier: BSD-2-Clause" --soname TSS2_TCTILDR_LIBRARY_SONAME_UNUSED --prefix gnutls_tss2_tctildr --header-guard GNUTLS_LIB_DLWRAP_TSS2_TCTILDR_H_ --include "<tss2/tss2_tctildr.h>"

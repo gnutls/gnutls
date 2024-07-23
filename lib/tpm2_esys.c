@@ -65,184 +65,31 @@
 #include <stdint.h>
 #include <string.h>
 
+#ifdef _WIN32
+#define RTLD_NOW 0
+#define RTLD_GLOBAL 0
+#else
+#include <dlfcn.h>
+#endif
+
+#ifndef TSS2_ESYS_LIBRARY_SONAME
+#define TSS2_ESYS_LIBRARY_SONAME "none"
+#endif
+
+#ifndef TSS2_MU_LIBRARY_SONAME
+#define TSS2_MU_LIBRARY_SONAME "none"
+#endif
+
+#ifndef TSS2_TCTILDR_LIBRARY_SONAME
+#define TSS2_TCTILDR_LIBRARY_SONAME "none"
+#endif
+
 #include "tpm2.h"
 #include "locks.h"
 
-#include <tss2/tss2_mu.h>
-#include <tss2/tss2_esys.h>
-#include <tss2/tss2_tctildr.h>
-
-#include <dlfcn.h>
-
-/* We don't want to link to libtss2-esys, as it brings in other
- * crypto libraries.  Instead, only dlopen it as needed.
- */
-
-static void *_gnutls_tss2_esys_dlhandle;
-static void *_gnutls_tss2_mu_dlhandle;
-static void *_gnutls_tss2_tctildr_dlhandle;
-
-/* Copied from gnulib/lib/intprops.h */
-
-/* Does the __typeof__ keyword work?  This could be done by
-   'configure', but for now it's easier to do it by hand.  */
-#undef HAVE___TYPEOF__
-#if (2 <= __GNUC__ || (4 <= __clang_major__) ||       \
-     (1210 <= __IBMC__ && defined __IBM__TYPEOF__) || \
-     (0x5110 <= __SUNPRO_C && !__STDC__))
-#define HAVE___TYPEOF__ 1
-#else
-#define HAVE___TYPEOF__ 0
-#endif
-
-#if HAVE___TYPEOF__
-static __typeof__(Esys_GetCapability)(*_gnutls_tss2_Esys_GetCapability);
-static __typeof__(Esys_Free)(*_gnutls_tss2_Esys_Free);
-static __typeof__(Esys_TR_SetAuth)(*_gnutls_tss2_Esys_TR_SetAuth);
-static __typeof__(Esys_CreatePrimary)(*_gnutls_tss2_Esys_CreatePrimary);
-static __typeof__(Esys_Initialize)(*_gnutls_tss2_Esys_Initialize);
-static __typeof__(Esys_Startup)(*_gnutls_tss2_Esys_Startup);
-static __typeof__(Esys_TR_FromTPMPublic)(*_gnutls_tss2_Esys_TR_FromTPMPublic);
-static __typeof__(Esys_ReadPublic)(*_gnutls_tss2_Esys_ReadPublic);
-static __typeof__(Esys_Load)(*_gnutls_tss2_Esys_Load);
-static __typeof__(Esys_FlushContext)(*_gnutls_tss2_Esys_FlushContext);
-static __typeof__(Esys_Finalize)(*_gnutls_tss2_Esys_Finalize);
-static __typeof__(Esys_RSA_Decrypt)(*_gnutls_tss2_Esys_RSA_Decrypt);
-static __typeof__(Esys_Sign)(*_gnutls_tss2_Esys_Sign);
-
-static __typeof__(Tss2_MU_TPM2B_PRIVATE_Unmarshal)(
-	*_gnutls_tss2_Tss2_MU_TPM2B_PRIVATE_Unmarshal);
-static __typeof__(Tss2_MU_TPM2B_PUBLIC_Unmarshal)(
-	*_gnutls_tss2_Tss2_MU_TPM2B_PUBLIC_Unmarshal);
-
-static __typeof__(Tss2_TctiLdr_Initialize)(
-	*_gnutls_tss2_Tss2_TctiLdr_Initialize);
-static __typeof__(Tss2_TctiLdr_Finalize)(*_gnutls_tss2_Tss2_TctiLdr_Finalize);
-#else
-static TSS2_RC (*_gnutls_tss2_Esys_GetCapability)(
-	ESYS_CONTEXT *esysContext, ESYS_TR shandle1, ESYS_TR shandle2,
-	ESYS_TR shandle3, TPM2_CAP capability, UINT32 property,
-	UINT32 propertyCount, TPMI_YES_NO *moreData,
-	TPMS_CAPABILITY_DATA **capabilityData);
-static void (*_gnutls_tss2_Esys_Free)(void *__ptr);
-static TSS2_RC (*_gnutls_tss2_Esys_TR_SetAuth)(ESYS_CONTEXT *esysContext,
-					       ESYS_TR handle,
-					       TPM2B_AUTH const *authValue);
-static TSS2_RC (*_gnutls_tss2_Esys_CreatePrimary)(
-	ESYS_CONTEXT *esysContext, ESYS_TR primaryHandle, ESYS_TR shandle1,
-	ESYS_TR shandle2, ESYS_TR shandle3,
-	const TPM2B_SENSITIVE_CREATE *inSensitive, const TPM2B_PUBLIC *inPublic,
-	const TPM2B_DATA *outsideInfo, const TPML_PCR_SELECTION *creationPCR,
-	ESYS_TR *objectHandle, TPM2B_PUBLIC **outPublic,
-	TPM2B_CREATION_DATA **creationData, TPM2B_DIGEST **creationHash,
-	TPMT_TK_CREATION **creationTicket);
-static TSS2_RC (*_gnutls_tss2_Esys_Initialize)(ESYS_CONTEXT **esys_context,
-					       TSS2_TCTI_CONTEXT *tcti,
-					       TSS2_ABI_VERSION *abiVersion);
-static TSS2_RC (*_gnutls_tss2_Esys_Startup)(ESYS_CONTEXT *esysContext,
-					    TPM2_SU startupType);
-static TSS2_RC (*_gnutls_tss2_Esys_TR_FromTPMPublic)(ESYS_CONTEXT *esysContext,
-						     TPM2_HANDLE tpm_handle,
-						     ESYS_TR optionalSession1,
-						     ESYS_TR optionalSession2,
-						     ESYS_TR optionalSession3,
-						     ESYS_TR *object);
-static TSS2_RC (*_gnutls_tss2_Esys_ReadPublic)(
-	ESYS_CONTEXT *esysContext, ESYS_TR objectHandle, ESYS_TR shandle1,
-	ESYS_TR shandle2, ESYS_TR shandle3, TPM2B_PUBLIC **outPublic,
-	TPM2B_NAME **name, TPM2B_NAME **qualifiedName);
-static TSS2_RC (*_gnutls_tss2_Esys_Load)(ESYS_CONTEXT *esysContext,
-					 ESYS_TR parentHandle, ESYS_TR shandle1,
-					 ESYS_TR shandle2, ESYS_TR shandle3,
-					 const TPM2B_PRIVATE *inPrivate,
-					 const TPM2B_PUBLIC *inPublic,
-					 ESYS_TR *objectHandle);
-static TSS2_RC (*_gnutls_tss2_Esys_FlushContext)(ESYS_CONTEXT *esysContext,
-						 ESYS_TR flushHandle);
-static void (*_gnutls_tss2_Esys_Finalize)(ESYS_CONTEXT **context);
-static TSS2_RC (*_gnutls_tss2_Esys_RSA_Decrypt)(
-	ESYS_CONTEXT *esysContext, ESYS_TR keyHandle, ESYS_TR shandle1,
-	ESYS_TR shandle2, ESYS_TR shandle3,
-	const TPM2B_PUBLIC_KEY_RSA *cipherText,
-	const TPMT_RSA_DECRYPT *inScheme, const TPM2B_DATA *label,
-	TPM2B_PUBLIC_KEY_RSA **message);
-static TSS2_RC (*_gnutls_tss2_Esys_Sign)(ESYS_CONTEXT *esysContext,
-					 ESYS_TR keyHandle, ESYS_TR shandle1,
-					 ESYS_TR shandle2, ESYS_TR shandle3,
-					 const TPM2B_DIGEST *digest,
-					 const TPMT_SIG_SCHEME *inScheme,
-					 const TPMT_TK_HASHCHECK *validation,
-					 TPMT_SIGNATURE **signature);
-
-static TSS2_RC (*_gnutls_tss2_Tss2_MU_TPM2B_PRIVATE_Unmarshal)(
-	uint8_t const buffer[], size_t buffer_size, size_t *offset,
-	TPM2B_PRIVATE *dest);
-static TSS2_RC (*_gnutls_tss2_Tss2_MU_TPM2B_PUBLIC_Unmarshal)(
-	uint8_t const buffer[], size_t buffer_size, size_t *offset,
-	TPM2B_PUBLIC *dest);
-
-static TSS2_RC (*_gnutls_tss2_Tss2_TctiLdr_Initialize)(
-	const char *nameConf, TSS2_TCTI_CONTEXT **context);
-static void (*_gnutls_tss2_Tss2_TctiLdr_Finalize)(TSS2_TCTI_CONTEXT **context);
-#endif
-
-#define DLSYM_TSS2(sys, sym)                                             \
-	_gnutls_tss2_##sym = dlsym(_gnutls_tss2_##sys##_dlhandle, #sym); \
-	if (!_gnutls_tss2_##sym) {                                       \
-		return -1;                                               \
-	}
-
-static int init_tss2_funcs(void)
-{
-	if (!_gnutls_tss2_esys_dlhandle) {
-		_gnutls_tss2_esys_dlhandle =
-			dlopen("libtss2-esys.so.0", RTLD_NOW | RTLD_GLOBAL);
-		if (!_gnutls_tss2_esys_dlhandle) {
-			_gnutls_debug_log(
-				"tpm2: unable to dlopen libtss2-esys\n");
-			return -1;
-		}
-	}
-
-	DLSYM_TSS2(esys, Esys_GetCapability)
-	DLSYM_TSS2(esys, Esys_Free)
-	DLSYM_TSS2(esys, Esys_TR_SetAuth)
-	DLSYM_TSS2(esys, Esys_CreatePrimary)
-	DLSYM_TSS2(esys, Esys_Initialize)
-	DLSYM_TSS2(esys, Esys_Startup)
-	DLSYM_TSS2(esys, Esys_TR_FromTPMPublic)
-	DLSYM_TSS2(esys, Esys_ReadPublic)
-	DLSYM_TSS2(esys, Esys_Load)
-	DLSYM_TSS2(esys, Esys_FlushContext)
-	DLSYM_TSS2(esys, Esys_Finalize)
-	DLSYM_TSS2(esys, Esys_RSA_Decrypt)
-	DLSYM_TSS2(esys, Esys_Sign)
-	if (!_gnutls_tss2_mu_dlhandle) {
-		_gnutls_tss2_mu_dlhandle =
-			dlopen("libtss2-mu.so.0", RTLD_NOW | RTLD_GLOBAL);
-		if (!_gnutls_tss2_mu_dlhandle) {
-			_gnutls_debug_log(
-				"tpm2: unable to dlopen libtss2-mu\n");
-			return -1;
-		}
-	}
-
-	DLSYM_TSS2(mu, Tss2_MU_TPM2B_PRIVATE_Unmarshal)
-	DLSYM_TSS2(mu, Tss2_MU_TPM2B_PUBLIC_Unmarshal)
-	if (!_gnutls_tss2_tctildr_dlhandle) {
-		_gnutls_tss2_tctildr_dlhandle =
-			dlopen("libtss2-tctildr.so.0", RTLD_NOW | RTLD_GLOBAL);
-		if (!_gnutls_tss2_tctildr_dlhandle) {
-			_gnutls_debug_log(
-				"tpm2: unable to dlopen libtss2-tctildr\n");
-			return -1;
-		}
-	}
-
-	DLSYM_TSS2(tctildr, Tss2_TctiLdr_Initialize)
-	DLSYM_TSS2(tctildr, Tss2_TctiLdr_Finalize)
-	return 0;
-}
+#include "dlwrap/tss2_mu.h"
+#include "dlwrap/tss2_esys.h"
+#include "dlwrap/tss2_tctildr.h"
 
 struct tpm2_info_st {
 	TPM2B_PUBLIC pub;
@@ -400,10 +247,9 @@ static const TPM2B_PUBLIC *get_primary_template(ESYS_CONTEXT *ctx)
 	UINT32 i;
 	TSS2_RC rc;
 
-	rc = _gnutls_tss2_Esys_GetCapability(ctx, ESYS_TR_NONE, ESYS_TR_NONE,
-					     ESYS_TR_NONE, TPM2_CAP_ALGS, 0,
-					     TPM2_MAX_CAP_ALGS, NULL,
-					     &capability_data);
+	rc = GNUTLS_TSS2_ESYS_FUNC(Esys_GetCapability)(
+		ctx, ESYS_TR_NONE, ESYS_TR_NONE, ESYS_TR_NONE, TPM2_CAP_ALGS, 0,
+		TPM2_MAX_CAP_ALGS, NULL, &capability_data);
 	if (rc) {
 		_gnutls_debug_log("tpm2: Esys_GetCapability failed: 0x%x\n",
 				  rc);
@@ -413,7 +259,7 @@ static const TPM2B_PUBLIC *get_primary_template(ESYS_CONTEXT *ctx)
 	for (i = 0; i < capability_data->data.algorithms.count; i++) {
 		if (capability_data->data.algorithms.algProperties[i].alg ==
 		    TPM2_ALG_ECC) {
-			_gnutls_tss2_Esys_Free(capability_data);
+			GNUTLS_TSS2_ESYS_FUNC(Esys_Free)(capability_data);
 			return &primary_template_ecc;
 		}
 	}
@@ -421,12 +267,12 @@ static const TPM2B_PUBLIC *get_primary_template(ESYS_CONTEXT *ctx)
 	for (i = 0; i < capability_data->data.algorithms.count; i++) {
 		if (capability_data->data.algorithms.algProperties[i].alg ==
 		    TPM2_ALG_RSA) {
-			_gnutls_tss2_Esys_Free(capability_data);
+			GNUTLS_TSS2_ESYS_FUNC(Esys_Free)(capability_data);
 			return &primary_template_rsa;
 		}
 	}
 
-	_gnutls_tss2_Esys_Free(capability_data);
+	GNUTLS_TSS2_ESYS_FUNC(Esys_Free)(capability_data);
 	_gnutls_debug_log("tpm2: unable to find primary template\n");
 	return NULL;
 }
@@ -493,7 +339,8 @@ reauth:
 		install_tpm_passphrase(&info->ownerauth, pass);
 		info->need_ownerauth = false;
 	}
-	rc = _gnutls_tss2_Esys_TR_SetAuth(ctx, hierarchy, &info->ownerauth);
+	rc = GNUTLS_TSS2_ESYS_FUNC(Esys_TR_SetAuth)(ctx, hierarchy,
+						    &info->ownerauth);
 	if (rc) {
 		_gnutls_debug_log("tpm2: Esys_TR_SetAuth failed: 0x%x\n", rc);
 		return gnutls_assert_val(GNUTLS_E_TPM_ERROR);
@@ -502,7 +349,7 @@ reauth:
 	if (!primary_template) {
 		return gnutls_assert_val(GNUTLS_E_TPM_ERROR);
 	}
-	rc = _gnutls_tss2_Esys_CreatePrimary(
+	rc = GNUTLS_TSS2_ESYS_FUNC(Esys_CreatePrimary)(
 		ctx, hierarchy, ESYS_TR_PASSWORD, ESYS_TR_NONE, ESYS_TR_NONE,
 		&primary_sensitive, primary_template, &all_outside_info,
 		&all_creation_pcr, primary_handle, NULL, NULL, NULL, NULL);
@@ -534,14 +381,14 @@ static int init_tpm2_key(ESYS_CONTEXT **ctx, ESYS_TR *key_handle,
 
 	_gnutls_debug_log("tpm2: establishing connection with TPM\n");
 
-	rc = _gnutls_tss2_Esys_Initialize(ctx, tcti_ctx, NULL);
+	rc = GNUTLS_TSS2_ESYS_FUNC(Esys_Initialize)(ctx, tcti_ctx, NULL);
 	if (rc) {
 		gnutls_assert();
 		_gnutls_debug_log("tpm2: Esys_Initialize failed: 0x%x\n", rc);
 		goto error;
 	}
 
-	rc = _gnutls_tss2_Esys_Startup(*ctx, TPM2_SU_CLEAR);
+	rc = GNUTLS_TSS2_ESYS_FUNC(Esys_Startup)(*ctx, TPM2_SU_CLEAR);
 	if (rc == TPM2_RC_INITIALIZE) {
 		_gnutls_debug_log(
 			"tpm2: was already started up thus false positive failing in tpm2tss log\n");
@@ -557,7 +404,7 @@ static int init_tpm2_key(ESYS_CONTEXT **ctx, ESYS_TR *key_handle,
 			goto error;
 		}
 	} else {
-		rc = _gnutls_tss2_Esys_TR_FromTPMPublic(
+		rc = GNUTLS_TSS2_ESYS_FUNC(Esys_TR_FromTPMPublic)(
 			*ctx, info->parent, ESYS_TR_NONE, ESYS_TR_NONE,
 			ESYS_TR_NONE, &parent_handle);
 		if (rc) {
@@ -574,14 +421,14 @@ static int init_tpm2_key(ESYS_CONTEXT **ctx, ESYS_TR *key_handle,
 		if (!info->did_ownerauth && !info->ownerauth.size) {
 			TPM2B_PUBLIC *pub = NULL;
 
-			rc = _gnutls_tss2_Esys_ReadPublic(
+			rc = GNUTLS_TSS2_ESYS_FUNC(Esys_ReadPublic)(
 				*ctx, parent_handle, ESYS_TR_NONE, ESYS_TR_NONE,
 				ESYS_TR_NONE, &pub, NULL, NULL);
 			if (!rc && !(pub->publicArea.objectAttributes &
 				     TPMA_OBJECT_NODA)) {
 				info->need_ownerauth = true;
 			}
-			_gnutls_tss2_Esys_Free(pub);
+			GNUTLS_TSS2_ESYS_FUNC(Esys_Free)(pub);
 		}
 	reauth:
 		if (info->need_ownerauth) {
@@ -594,8 +441,8 @@ static int init_tpm2_key(ESYS_CONTEXT **ctx, ESYS_TR *key_handle,
 			install_tpm_passphrase(&info->ownerauth, pass);
 			info->need_ownerauth = false;
 		}
-		rc = _gnutls_tss2_Esys_TR_SetAuth(*ctx, parent_handle,
-						  &info->ownerauth);
+		rc = GNUTLS_TSS2_ESYS_FUNC(Esys_TR_SetAuth)(*ctx, parent_handle,
+							    &info->ownerauth);
 		if (rc) {
 			gnutls_assert();
 			_gnutls_debug_log(
@@ -607,9 +454,9 @@ static int init_tpm2_key(ESYS_CONTEXT **ctx, ESYS_TR *key_handle,
 	_gnutls_debug_log("tpm2: loading TPM2 key blob, parent handle 0x%x\n",
 			  parent_handle);
 
-	rc = _gnutls_tss2_Esys_Load(*ctx, parent_handle, ESYS_TR_PASSWORD,
-				    ESYS_TR_NONE, ESYS_TR_NONE, &info->priv,
-				    &info->pub, key_handle);
+	rc = GNUTLS_TSS2_ESYS_FUNC(
+		Esys_Load)(*ctx, parent_handle, ESYS_TR_PASSWORD, ESYS_TR_NONE,
+			   ESYS_TR_NONE, &info->priv, &info->pub, key_handle);
 	if (rc_is_parent_auth_failed(rc)) {
 		gnutls_assert();
 		_gnutls_debug_log("tpm2: Esys_Load auth failed\n");
@@ -624,7 +471,8 @@ static int init_tpm2_key(ESYS_CONTEXT **ctx, ESYS_TR *key_handle,
 	info->did_ownerauth = true;
 
 	if (parent_is_generated(info->parent)) {
-		rc = _gnutls_tss2_Esys_FlushContext(*ctx, parent_handle);
+		rc = GNUTLS_TSS2_ESYS_FUNC(Esys_FlushContext)(*ctx,
+							      parent_handle);
 		if (rc) {
 			_gnutls_debug_log(
 				"tpm2: Esys_FlushContext for generated primary failed: 0x%x\n",
@@ -637,14 +485,14 @@ static int init_tpm2_key(ESYS_CONTEXT **ctx, ESYS_TR *key_handle,
 error:
 	if (parent_is_generated(info->parent) &&
 	    parent_handle != ESYS_TR_NONE) {
-		_gnutls_tss2_Esys_FlushContext(*ctx, parent_handle);
+		GNUTLS_TSS2_ESYS_FUNC(Esys_FlushContext)(*ctx, parent_handle);
 	}
 	if (*key_handle != ESYS_TR_NONE) {
-		_gnutls_tss2_Esys_FlushContext(*ctx, *key_handle);
+		GNUTLS_TSS2_ESYS_FUNC(Esys_FlushContext)(*ctx, *key_handle);
 	}
 	*key_handle = ESYS_TR_NONE;
 
-	_gnutls_tss2_Esys_Finalize(ctx);
+	GNUTLS_TSS2_ESYS_FUNC(Esys_Finalize)(ctx);
 	return GNUTLS_E_TPM_ERROR;
 }
 
@@ -665,7 +513,8 @@ static int auth_tpm2_key(struct tpm2_info_st *info, ESYS_CONTEXT *ctx,
 		info->need_userauth = false;
 	}
 
-	rc = _gnutls_tss2_Esys_TR_SetAuth(ctx, key_handle, &info->userauth);
+	rc = GNUTLS_TSS2_ESYS_FUNC(Esys_TR_SetAuth)(ctx, key_handle,
+						    &info->userauth);
 	if (rc) {
 		_gnutls_debug_log("tpm2: Esys_TR_SetAuth failed: 0x%x\n", rc);
 		return gnutls_assert_val(GNUTLS_E_TPM_ERROR);
@@ -748,9 +597,9 @@ reauth:
 		goto out;
 	}
 
-	rc = _gnutls_tss2_Esys_RSA_Decrypt(ectx, key_handle, ESYS_TR_PASSWORD,
-					   ESYS_TR_NONE, ESYS_TR_NONE, &digest,
-					   &in_scheme, &label, &tsig);
+	rc = GNUTLS_TSS2_ESYS_FUNC(Esys_RSA_Decrypt)(
+		ectx, key_handle, ESYS_TR_PASSWORD, ESYS_TR_NONE, ESYS_TR_NONE,
+		&digest, &in_scheme, &label, &tsig);
 	if (rc_is_key_auth_failed(rc)) {
 		gnutls_assert();
 		_gnutls_debug_log("tpm2: Esys_RSA_Decrypt auth failed\n");
@@ -766,14 +615,14 @@ reauth:
 
 	ret = _gnutls_set_datum(sig, tsig->buffer, tsig->size);
 out:
-	_gnutls_tss2_Esys_Free(tsig);
+	GNUTLS_TSS2_ESYS_FUNC(Esys_Free)(tsig);
 
 	if (key_handle != ESYS_TR_NONE) {
-		_gnutls_tss2_Esys_FlushContext(ectx, key_handle);
+		GNUTLS_TSS2_ESYS_FUNC(Esys_FlushContext)(ectx, key_handle);
 	}
 
 	if (ectx) {
-		_gnutls_tss2_Esys_Finalize(&ectx);
+		GNUTLS_TSS2_ESYS_FUNC(Esys_Finalize)(&ectx);
 	}
 
 	return ret;
@@ -836,9 +685,10 @@ reauth:
 		goto out;
 	}
 
-	rc = _gnutls_tss2_Esys_Sign(ectx, key_handle, ESYS_TR_PASSWORD,
-				    ESYS_TR_NONE, ESYS_TR_NONE, &digest,
-				    &in_scheme, &validation, &tsig);
+	rc = GNUTLS_TSS2_ESYS_FUNC(Esys_Sign)(ectx, key_handle,
+					      ESYS_TR_PASSWORD, ESYS_TR_NONE,
+					      ESYS_TR_NONE, &digest, &in_scheme,
+					      &validation, &tsig);
 	if (rc_is_key_auth_failed(rc)) {
 		_gnutls_debug_log("tpm2: Esys_Sign auth failed\n");
 		info->need_userauth = true;
@@ -857,34 +707,29 @@ reauth:
 
 	ret = gnutls_encode_rs_value(sig, &sig_r, &sig_s);
 out:
-	_gnutls_tss2_Esys_Free(tsig);
+	GNUTLS_TSS2_ESYS_FUNC(Esys_Free)(tsig);
 
 	if (key_handle != ESYS_TR_NONE) {
-		_gnutls_tss2_Esys_FlushContext(ectx, key_handle);
+		GNUTLS_TSS2_ESYS_FUNC(Esys_FlushContext)(ectx, key_handle);
 	}
 
 	if (ectx) {
-		_gnutls_tss2_Esys_Finalize(&ectx);
+		GNUTLS_TSS2_ESYS_FUNC(Esys_Finalize)(&ectx);
 	}
 
 	return ret;
 }
 
-GNUTLS_ONCE(tpm2_esys_once);
+/* We can't use GNUTLS_ONCE here, as it wouldn't allow manual unloading */
+GNUTLS_STATIC_MUTEX(tpm2_esys_init_mutex);
+static int _tpm2_esys_init = 0;
 
-static void tpm2_esys_once_init(void)
+static int init_tcti(void)
 {
 	const char *tcti;
 	const char *const tcti_vars[] = { "GNUTLS_TPM2_TCTI", "TPM2TOOLS_TCTI",
 					  "TCTI", "TEST_TCTI" };
 	size_t i;
-	TSS2_RC rc;
-
-	if (init_tss2_funcs() < 0) {
-		_gnutls_debug_log(
-			"tpm2: unable to initialize TSS2 functions\n");
-		return;
-	}
 
 	for (i = 0; i < sizeof(tcti_vars) / sizeof(tcti_vars[0]); i++) {
 		tcti = secure_getenv(tcti_vars[i]);
@@ -895,35 +740,85 @@ static void tpm2_esys_once_init(void)
 			break;
 		}
 	}
+
 	if (tcti && *tcti != '\0') {
-		rc = _gnutls_tss2_Tss2_TctiLdr_Initialize(tcti, &tcti_ctx);
+		TSS2_RC rc;
+
+		rc = GNUTLS_TSS2_TCTILDR_FUNC(
+			Tss2_TctiLdr_Initialize)(tcti, &tcti_ctx);
 		if (rc) {
 			_gnutls_debug_log(
-				"tpm2: TSS2_TctiLdr_Initialize failed: 0x%x\n",
-				rc);
+				"tpm2: unable to initialize TCTI \"%s\": 0x%x\n",
+				tcti, rc);
+			return gnutls_assert_val(GNUTLS_E_TPM_ERROR);
 		}
 	}
+
+	return GNUTLS_E_SUCCESS;
+}
+
+static int tpm2_esys_ensure(void)
+{
+	int ret;
+
+	if (_tpm2_esys_init)
+		return GNUTLS_E_SUCCESS;
+
+	ret = gnutls_static_mutex_lock(&tpm2_esys_init_mutex);
+	if (unlikely(ret < 0))
+		return gnutls_assert_val(ret);
+
+	if (gnutls_tss2_esys_ensure_library(TSS2_ESYS_LIBRARY_SONAME,
+					    RTLD_NOW | RTLD_GLOBAL) < 0) {
+		_gnutls_debug_log(
+			"tpm2: unable to initialize tss2-esys functions\n");
+		ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+		goto out;
+	}
+
+	if (gnutls_tss2_mu_ensure_library(TSS2_MU_LIBRARY_SONAME,
+					  RTLD_NOW | RTLD_GLOBAL) < 0) {
+		_gnutls_debug_log(
+			"tpm2: unable to initialize tss2-mu functions\n");
+		ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+		goto out;
+	}
+
+	if (gnutls_tss2_tctildr_ensure_library(TSS2_TCTILDR_LIBRARY_SONAME,
+					       RTLD_NOW | RTLD_GLOBAL) < 0) {
+		_gnutls_debug_log(
+			"tpm2: unable to initialize tss2-tctildr functions\n");
+		ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+		goto out;
+	}
+
+	ret = init_tcti();
+	if (ret < 0)
+		goto out;
+
+	_tpm2_esys_init = 1;
+	ret = GNUTLS_E_SUCCESS;
+
+out:
+	(void)gnutls_static_mutex_unlock(&tpm2_esys_init_mutex);
+
+	return ret;
 }
 
 /* called by the global destructor through _gnutls_tpm2_deinit */
 void tpm2_esys_deinit(void)
 {
-	if (tcti_ctx) {
-		_gnutls_tss2_Tss2_TctiLdr_Finalize(&tcti_ctx);
-		tcti_ctx = NULL;
+	if (_tpm2_esys_init) {
+		if (tcti_ctx) {
+			GNUTLS_TSS2_TCTILDR_FUNC(Tss2_TctiLdr_Finalize)
+			(&tcti_ctx);
+			tcti_ctx = NULL;
+		}
+		gnutls_tss2_esys_unload_library();
+		gnutls_tss2_mu_unload_library();
+		gnutls_tss2_tctildr_unload_library();
 	}
-	if (_gnutls_tss2_esys_dlhandle) {
-		dlclose(_gnutls_tss2_esys_dlhandle);
-		_gnutls_tss2_esys_dlhandle = NULL;
-	}
-	if (_gnutls_tss2_mu_dlhandle) {
-		dlclose(_gnutls_tss2_mu_dlhandle);
-		_gnutls_tss2_mu_dlhandle = NULL;
-	}
-	if (_gnutls_tss2_tctildr_dlhandle) {
-		dlclose(_gnutls_tss2_tctildr_dlhandle);
-		_gnutls_tss2_tctildr_dlhandle = NULL;
-	}
+	_tpm2_esys_init = 0;
 }
 
 int install_tpm2_key(struct tpm2_info_st *info, gnutls_privkey_t pkey,
@@ -931,12 +826,11 @@ int install_tpm2_key(struct tpm2_info_st *info, gnutls_privkey_t pkey,
 		     gnutls_datum_t *privdata, gnutls_datum_t *pubdata)
 {
 	TSS2_RC rc;
+	int ret;
 
-	(void)gnutls_once(&tpm2_esys_once, tpm2_esys_once_init);
-
-	if (!tcti_ctx) {
-		return gnutls_assert_val(GNUTLS_E_TPM_ERROR);
-	}
+	ret = tpm2_esys_ensure();
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	if (!parent_is_persistent(parent) && parent != TPM2_RH_OWNER &&
 	    parent != TPM2_RH_NULL && parent != TPM2_RH_ENDORSEMENT &&
@@ -948,7 +842,7 @@ int install_tpm2_key(struct tpm2_info_st *info, gnutls_privkey_t pkey,
 
 	info->parent = parent;
 
-	rc = _gnutls_tss2_Tss2_MU_TPM2B_PRIVATE_Unmarshal(
+	rc = GNUTLS_TSS2_MU_FUNC(Tss2_MU_TPM2B_PRIVATE_Unmarshal)(
 		privdata->data, privdata->size, NULL, &info->priv);
 	if (rc) {
 		_gnutls_debug_log(
@@ -956,7 +850,7 @@ int install_tpm2_key(struct tpm2_info_st *info, gnutls_privkey_t pkey,
 		return gnutls_assert_val(GNUTLS_E_TPM_ERROR);
 	}
 
-	rc = _gnutls_tss2_Tss2_MU_TPM2B_PUBLIC_Unmarshal(
+	rc = GNUTLS_TSS2_MU_FUNC(Tss2_MU_TPM2B_PUBLIC_Unmarshal)(
 		pubdata->data, pubdata->size, NULL, &info->pub);
 	if (rc) {
 		_gnutls_debug_log(
