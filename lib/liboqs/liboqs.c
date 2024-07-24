@@ -34,27 +34,59 @@
 #endif
 
 #include "errors.h"
+#include "locks.h"
 
 #include "dlwrap/oqs.h"
 #include "liboqs/rand.h"
 #include "liboqs/sha3.h"
 
-int _gnutls_liboqs_init(void)
+/* We can't use GNUTLS_ONCE here, as it wouldn't allow manual unloading */
+GNUTLS_STATIC_MUTEX(liboqs_init_mutex);
+static int _liboqs_init = 0;
+
+int _gnutls_liboqs_ensure(void)
 {
+	int ret;
+
+	if (_liboqs_init)
+		return GNUTLS_E_SUCCESS;
+
+	ret = gnutls_static_mutex_lock(&liboqs_init_mutex);
+	if (unlikely(ret < 0))
+		return gnutls_assert_val(ret);
+
 	if (gnutls_oqs_ensure_library(OQS_LIBRARY_SONAME,
-				      RTLD_NOW | RTLD_GLOBAL) < 0)
-		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+				      RTLD_NOW | RTLD_GLOBAL) < 0) {
+		_gnutls_debug_log(
+			"liboqs: unable to initialize liboqs functions\n");
+		ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+		goto out;
+	}
 
 	_gnutls_liboqs_sha3_init();
 	GNUTLS_OQS_FUNC(OQS_init)();
 	_gnutls_liboqs_rand_init();
-	return 0;
+
+	_liboqs_init = 1;
+	ret = GNUTLS_E_SUCCESS;
+
+out:
+	(void)gnutls_static_mutex_unlock(&liboqs_init_mutex);
+
+	return ret;
 }
 
+/* This is not thread-safe: call this function only from
+ * gnutls_global_deinit, which has a proper protection.
+ */
 void _gnutls_liboqs_deinit(void)
 {
-	_gnutls_liboqs_rand_deinit();
-	_gnutls_liboqs_sha3_deinit();
-	GNUTLS_OQS_FUNC(OQS_destroy)();
+	if (_liboqs_init) {
+		_gnutls_liboqs_rand_deinit();
+		_gnutls_liboqs_sha3_deinit();
+		GNUTLS_OQS_FUNC(OQS_destroy)();
+	}
+
 	gnutls_oqs_unload_library();
+	_liboqs_init = 0;
 }
