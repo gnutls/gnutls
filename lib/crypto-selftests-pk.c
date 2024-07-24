@@ -87,6 +87,7 @@ static const char rsa_2048_sig[] =
 	"\xef\x62\x18\x39\x7a\x50\x01\x46\x1b\xde\x8d\x37\xbc\x90\x6c\x07"
 	"\xc0\x07\xed\x60\xce\x2e\x31\xd6\x8f\xe8\x75\xdb\x45\x21\xc6\xcb";
 
+#ifdef ENABLE_DSA
 /* DSA 2048 private key and signature */
 static const char dsa_2048_privkey[] =
 	"-----BEGIN DSA PRIVATE KEY-----\n"
@@ -110,7 +111,6 @@ static const char dsa_2048_privkey[] =
 	"kTlCAhxYGpVgtfB96qmJukyl9GOGvfkwFTgEyIDoV84M\n"
 	"-----END DSA PRIVATE KEY-----\n";
 
-#ifdef ENABLE_DSA
 static const char dsa_2048_sig[] =
 	"\x30\x3d\x02\x1d\x00\xbe\x87\x2f\xcf\xa1\xe4\x86\x5c\x72\x58\x4a"
 	"\x7b\x8f\x32\x7f\xa5\x1b\xdc\x5c\xae\xda\x98\xea\x15\x32\xed\x0c"
@@ -375,11 +375,13 @@ static int test_sig(gnutls_pk_algorithm_t pk, unsigned bits,
 		raw_key.size = sizeof(rsa_2048_privkey) - 1;
 		snprintf(param_name, sizeof(param_name), "%u", bits);
 		break;
+#ifdef ENABLE_DSA
 	case GNUTLS_PK_DSA:
 		raw_key.data = (void *)dsa_2048_privkey;
 		raw_key.size = sizeof(dsa_2048_privkey) - 1;
 		snprintf(param_name, sizeof(param_name), "%u", bits);
 		break;
+#endif
 	case GNUTLS_PK_ECC:
 		switch (bits) {
 #ifdef ENABLE_NON_SUITEB_CURVES

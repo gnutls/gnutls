@@ -3770,10 +3770,12 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 	params->algo = algo;
 
 #ifdef ENABLE_FIPS140
-	ret = pct_test(algo, params);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
+	if (_gnutls_fips_mode_enabled()) {
+		ret = pct_test(algo, params);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
 	}
 #endif
 

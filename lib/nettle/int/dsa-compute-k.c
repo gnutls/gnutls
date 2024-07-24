@@ -104,7 +104,7 @@ int _gnutls_dsa_compute_k(mp_limb_t *h, const mp_limb_t *q, const mp_limb_t *x,
 
 	cy = mpn_sub_n(h, h, q, qn);
 	/* Fall back to addmul_1, if nettle is linked with mini-gmp. */
-#ifdef mpn_cnd_add_n
+#if defined(mpn_cnd_add_n) && !NETTLE_USE_MINI_GMP
 	mpn_cnd_add_n(cy, h, h, q, qn);
 #else
 	mpn_addmul_1(h, q, qn, cy != 0);

@@ -35,7 +35,7 @@ fi
 DEBUG=""
 
 . "${srcdir}/../scripts/common.sh"
-testdir=`create_testdir pkcs12`
+testdir=`create_testdir pkcs12-pbmac1`
 
 TMPFILE=$testdir/pkcs12
 TMPFILE_PEM=$testdir/pkcs12.pem
@@ -54,6 +54,8 @@ pbmac1_256_256.bad-iter.p12
 pbmac1_256_256.bad-salt.p12
 pbmac1_256_256.no-len.p12
 pbmac1_256_256.short-len.p12
+pbmac1_256_256.extended-mac.p12
+pbmac1_256_256.truncated-len.p12
 "
 
 for p12 in $GOOD; do

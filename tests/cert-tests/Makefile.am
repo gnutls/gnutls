@@ -105,6 +105,8 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/pbmac1_256_256.bad-iter.p12 data/pbmac1_256_256.bad-salt.p12 \
 	data/pbmac1_256_256.good.p12 data/pbmac1_256_256.no-len.p12 \
 	data/pbmac1_256_256.short-len.p12 \
+	data/pbmac1_256_256.extended-mac.p12 \
+	data/pbmac1_256_256.truncated-mac.p12 \
 	data/pbmac1_512_256.good.p12 data/pbmac1_512_512.good.p12 \
 	data/pbmac1-simple.p12 \
 	templates/simple-policy.tmpl data/simple-policy.pem templates/template-negative-serial.tmpl \

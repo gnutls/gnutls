@@ -116,6 +116,10 @@ void doit(void)
 		fail("failed in %d\n", __LINE__);
 	}
 
+	/* Test gnutls_hash_output(..., NULL) resets the context */
+	gnutls_hash(td, "foo", 3);
+	gnutls_hash_output(td, NULL);
+
 	size2 = size;
 	p = buf;
 	while (size2 > 0) {

@@ -224,13 +224,14 @@ void doit(void)
 		for (j = 0; j < tests[i].iovcnt; j++) {
 			translate(iov[j].iov_base, iov[j].iov_len);
 
-			if (memcmp(iov[j].iov_base, tests[i].iov[j].iov_base,
+			if (iov[j].iov_len != tests[i].iov[j].iov_len ||
+			    memcmp(iov[j].iov_base, tests[i].iov[j].iov_base,
 				   iov[j].iov_len) != 0)
-				fail("iov doesn't match: %*s != %*s\n",
+				fail("iov doesn't match: \"%.*s\" != \"%.*s\"\n",
 				     (int)iov[j].iov_len,
 				     (char *)iov[j].iov_base,
 				     (int)tests[i].iov[j].iov_len,
-				     (char *)tests[i].iov[j].iov_len);
+				     (char *)tests[i].iov[j].iov_base);
 		}
 	}
 }

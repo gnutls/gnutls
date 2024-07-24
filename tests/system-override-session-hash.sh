@@ -39,7 +39,7 @@ fi
 
 . "${srcdir}/scripts/common.sh"
 
-testdir=`create_testdir cfg`
+testdir=`create_testdir system-override-session-hash`
 
 cat <<_EOF_ > "$testdir/request.cfg"
 [overrides]
