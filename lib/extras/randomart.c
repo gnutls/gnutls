@@ -61,7 +61,8 @@
 #define FLDBASE 8
 #define FLDSIZE_Y (FLDBASE + 1)
 #define FLDSIZE_X (FLDBASE * 2 + 1)
-char *_gnutls_key_fingerprint_randomart(uint8_t *dgst_raw, u_int dgst_raw_len,
+char *_gnutls_key_fingerprint_randomart(uint8_t *dgst_raw,
+					unsigned int dgst_raw_len,
 					const char *key_type,
 					unsigned int key_size,
 					const char *prefix)
