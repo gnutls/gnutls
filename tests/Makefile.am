@@ -612,9 +612,7 @@ cpptests += sanity-cpp
 
 sanity_cpp_SOURCES = sanity-cpp.cpp
 sanity_cpp_LDADD = $(CMOCKA_LDADD)
-sanity_cpp_CXXFLAGS = $(AM_CPPFLAGS) \
-	-I$(top_srcdir)/gl	\
-	-I$(top_builddir)/gl
+sanity_cpp_CXXFLAGS = $(AM_CPPFLAGS) $(CMOCKA_CFLAGS)
 endif
 endif
 
