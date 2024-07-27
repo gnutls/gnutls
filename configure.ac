@@ -592,6 +592,7 @@ if test "$gl_gcc_warnings" = yes; then
   nw="$nw -Wredundant-decls"        # Some files cannot be compiled with that (gl_fd_to_handle)
   nw="$nw -Wtype-limits"            # Too many warnings in gnulib macros
   nw="$nw -Warith-conversion"       # Too compiler dependent
+  nw="$nw -Wmissing-variable-declarations" # asn1Parser provides no way to embed declarations in generated code
 
   gl_MANYWARN_ALL_GCC([ws])
   gl_MANYWARN_COMPLEMENT(ws, [$ws], [$nw])
