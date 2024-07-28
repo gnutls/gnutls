@@ -704,7 +704,9 @@ static int _wrap_nettle_pk_encaps(gnutls_pk_algorithm_t algo,
 		OQS_KEM *kem = NULL;
 		OQS_STATUS rc;
 
-		if (_gnutls_liboqs_ensure() < 0)
+		if (_gnutls_liboqs_ensure() < 0 ||
+		    !GNUTLS_OQS_FUNC(OQS_KEM_alg_is_enabled)(
+			    OQS_KEM_alg_kyber_768))
 			return gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
 
 		kem = GNUTLS_OQS_FUNC(OQS_KEM_new)(OQS_KEM_alg_kyber_768);
@@ -765,7 +767,9 @@ static int _wrap_nettle_pk_decaps(gnutls_pk_algorithm_t algo,
 		OQS_KEM *kem = NULL;
 		OQS_STATUS rc;
 
-		if (_gnutls_liboqs_ensure() < 0)
+		if (_gnutls_liboqs_ensure() < 0 ||
+		    !GNUTLS_OQS_FUNC(OQS_KEM_alg_is_enabled)(
+			    OQS_KEM_alg_kyber_768))
 			return gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
 
 		kem = GNUTLS_OQS_FUNC(OQS_KEM_new)(OQS_KEM_alg_kyber_768);
@@ -2359,7 +2363,9 @@ static int _wrap_nettle_pk_exists(gnutls_pk_algorithm_t pk)
 		return 1;
 #ifdef HAVE_LIBOQS
 	case GNUTLS_PK_EXP_KYBER768:
-		return _gnutls_liboqs_ensure() == 0;
+		return _gnutls_liboqs_ensure() == 0 &&
+		       GNUTLS_OQS_FUNC(OQS_KEM_alg_is_enabled)(
+			       OQS_KEM_alg_kyber_768);
 #endif
 	default:
 		return 0;
@@ -2997,7 +3003,9 @@ static int pct_test(gnutls_pk_algorithm_t algo,
 		break;
 #ifdef HAVE_LIBOQS
 	case GNUTLS_PK_EXP_KYBER768:
-		if (_gnutls_liboqs_ensure() < 0) {
+		if (_gnutls_liboqs_ensure() < 0 ||
+		    !GNUTLS_OQS_FUNC(OQS_KEM_alg_is_enabled)(
+			    OQS_KEM_alg_kyber_768)) {
 			ret = gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
 			goto cleanup;
 		}
@@ -3736,12 +3744,12 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 		OQS_KEM *kem = NULL;
 		OQS_STATUS rc;
 
-#ifdef HAVE_LIBOQS
-		if (_gnutls_liboqs_ensure() < 0) {
+		if (_gnutls_liboqs_ensure() < 0 ||
+		    !GNUTLS_OQS_FUNC(OQS_KEM_alg_is_enabled)(
+			    OQS_KEM_alg_kyber_768)) {
 			ret = gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
 			goto cleanup;
 		}
-#endif
 
 		not_approved = true;
 
@@ -4038,8 +4046,9 @@ static int wrap_nettle_pk_verify_priv_params(gnutls_pk_algorithm_t algo,
 	}
 #ifdef HAVE_LIBOQS
 	case GNUTLS_PK_EXP_KYBER768:
-		ret = _gnutls_liboqs_ensure();
-		if (ret < 0)
+		if (_gnutls_liboqs_ensure() < 0 ||
+		    !GNUTLS_OQS_FUNC(OQS_KEM_alg_is_enabled)(
+			    OQS_KEM_alg_kyber_768))
 			ret = gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
 		break;
 #endif
