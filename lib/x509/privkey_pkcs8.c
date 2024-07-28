@@ -39,6 +39,10 @@
 #include "attributes.h"
 #include "prov-seed.h"
 
+#ifdef HAVE_LIBOQS
+#include <oqs/oqs.h>
+#endif
+
 static int _decode_pkcs8_ecc_key(asn1_node pkcs8_asn,
 				 gnutls_x509_privkey_t pkey);
 static int pkcs8_key_info(const gnutls_datum_t *raw_key,
@@ -78,6 +82,33 @@ inline static int _encode_privkey(gnutls_x509_privkey_t pkey,
 		if (ret < 0)
 			gnutls_assert();
 		return ret;
+#ifdef HAVE_LIBOQS
+	case GNUTLS_PK_EXP_DILITHIUM2:
+	case GNUTLS_PK_EXP_DILITHIUM3:
+	case GNUTLS_PK_EXP_DILITHIUM5:
+	case GNUTLS_PK_EXP_FALCON512:
+	case GNUTLS_PK_EXP_FALCON1024:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_128F:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_128S:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_192F:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_192S:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_256F:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_256S:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_128F:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_128S:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_192F:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_192S:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_256F:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_256S:
+		// Dilithium public key is appended to private key
+		ret = _gnutls_x509_encode_string(
+			ASN1_ETYPE_OCTET_STRING, pkey->params.raw_priv.data,
+			pkey->params.raw_priv.size + pkey->params.raw_pub.size,
+			raw);
+		if (ret < 0)
+			gnutls_assert();
+		return ret;
+#endif
 
 	case GNUTLS_PK_GOST_01:
 	case GNUTLS_PK_GOST_12_256:
@@ -1454,6 +1485,148 @@ error:
 	return ret;
 }
 
+#ifdef HAVE_LIBOQS
+struct pqc_key_length_st {
+	gnutls_pk_algorithm_t algorithm;
+	int secret_key_length;
+	int public_key_length;
+};
+
+struct pqc_key_length_st pqc_key_lengths[] = {
+#ifdef defined(GNUTLS_PK_EXP_DILITHIUM2) &&               \
+	defined(OQS_SIG_dilithium_2_length_secret_key) && \
+	defined(OQS_SIG_dilithium_2_length_public_key)
+	{ GNUTLS_PK_EXP_DILITHIUM2, OQS_SIG_dilithium_2_length_secret_key,
+	  OQS_SIG_dilithium_2_length_public_key },
+#endif
+#ifdef defined(GNUTLS_PK_EXP_DILITHIUM3) &&               \
+	defined(OQS_SIG_dilithium_3_length_secret_key) && \
+	defined(OQS_SIG_dilithium_3_length_public_key)
+	{ GNUTLS_PK_EXP_DILITHIUM3, OQS_SIG_dilithium_3_length_secret_key,
+	  OQS_SIG_dilithium_3_length_public_key },
+#endif
+#ifdef defined(GNUTLS_PK_EXP_DILITHIUM5) &&               \
+	defined(OQS_SIG_dilithium_5_length_secret_key) && \
+	defined(OQS_SIG_dilithium_5_length_public_key)
+	{ GNUTLS_PK_EXP_DILITHIUM5, OQS_SIG_dilithium_5_length_secret_key,
+	  OQS_SIG_dilithium_5_length_public_key },
+#endif
+	{ GNUTLS_PK_EXP_FALCON512, OQS_SIG_falcon_512_length_secret_key,
+	  OQS_SIG_falcon_512_length_public_key },
+	{ GNUTLS_PK_EXP_FALCON1024, OQS_SIG_falcon_1024_length_secret_key,
+	  OQS_SIG_falcon_1024_length_public_key },
+	{ GNUTLS_PK_EXP_SPHINCS_SHA2_128F,
+	  OQS_SIG_sphincs_sha2_128f_simple_length_secret_key,
+	  OQS_SIG_sphincs_sha2_128f_simple_length_public_key },
+	{ GNUTLS_PK_EXP_SPHINCS_SHA2_128S,
+	  OQS_SIG_sphincs_sha2_128s_simple_length_secret_key,
+	  OQS_SIG_sphincs_sha2_128s_simple_length_public_key },
+	{ GNUTLS_PK_EXP_SPHINCS_SHA2_192F,
+	  OQS_SIG_sphincs_sha2_192f_simple_length_secret_key,
+	  OQS_SIG_sphincs_sha2_192f_simple_length_public_key },
+	{ GNUTLS_PK_EXP_SPHINCS_SHA2_192S,
+	  OQS_SIG_sphincs_sha2_192s_simple_length_secret_key,
+	  OQS_SIG_sphincs_sha2_192s_simple_length_public_key },
+	{ GNUTLS_PK_EXP_SPHINCS_SHA2_256F,
+	  OQS_SIG_sphincs_sha2_256f_simple_length_secret_key,
+	  OQS_SIG_sphincs_sha2_256f_simple_length_public_key },
+	{ GNUTLS_PK_EXP_SPHINCS_SHA2_256S,
+	  OQS_SIG_sphincs_sha2_256s_simple_length_secret_key,
+	  OQS_SIG_sphincs_sha2_256s_simple_length_public_key },
+	{ GNUTLS_PK_EXP_SPHINCS_SHAKE_128F,
+	  OQS_SIG_sphincs_shake_128f_simple_length_secret_key,
+	  OQS_SIG_sphincs_shake_128f_simple_length_public_key },
+	{ GNUTLS_PK_EXP_SPHINCS_SHAKE_128S,
+	  OQS_SIG_sphincs_shake_128s_simple_length_secret_key,
+	  OQS_SIG_sphincs_shake_128s_simple_length_public_key },
+	{ GNUTLS_PK_EXP_SPHINCS_SHAKE_192F,
+	  OQS_SIG_sphincs_shake_192f_simple_length_secret_key,
+	  OQS_SIG_sphincs_shake_192f_simple_length_public_key },
+	{ GNUTLS_PK_EXP_SPHINCS_SHAKE_192S,
+	  OQS_SIG_sphincs_shake_192s_simple_length_secret_key,
+	  OQS_SIG_sphincs_shake_192s_simple_length_public_key },
+	{ GNUTLS_PK_EXP_SPHINCS_SHAKE_256F,
+	  OQS_SIG_sphincs_shake_256f_simple_length_secret_key,
+	  OQS_SIG_sphincs_shake_256f_simple_length_public_key },
+	{ GNUTLS_PK_EXP_SPHINCS_SHAKE_256S,
+	  OQS_SIG_sphincs_shake_256s_simple_length_secret_key,
+	  OQS_SIG_sphincs_shake_256s_simple_length_public_key },
+
+	{ GNUTLS_PK_UNKNOWN, 0, 0 }
+};
+
+static int _get_pqc_keys_length(gnutls_pk_algorithm_t algo,
+				int *pqc_alg_secret_key_length,
+				int *pqc_alg_public_key_length)
+{
+	struct pqc_key_length_st *pqc_key_length = pqc_key_lengths;
+	while (pqc_key_length->algorithm != algo &&
+	       pqc_key_length->algorithm != GNUTLS_PK_UNKNOWN)
+		pqc_key_length++;
+
+	if (pqc_key_length->algorithm == GNUTLS_PK_UNKNOWN)
+		return GNUTLS_E_UNKNOWN_ALGORITHM;
+
+	*pqc_alg_secret_key_length = pqc_key_length->secret_key_length;
+	*pqc_alg_public_key_length = pqc_key_length->public_key_length;
+
+	return 0;
+}
+
+static int _decode_pkcs8_pqc_alg_key(asn1_node pkcs8_asn,
+				     gnutls_x509_privkey_t pkey,
+				     const char *oid)
+{
+	int ret;
+	gnutls_datum_t private_key;
+	gnutls_pk_algorithm_t algo = pkey->params.algo;
+	int pqc_alg_secret_key_length;
+	int pqc_alg_public_key_length;
+
+	ret = _get_pqc_keys_length(pkey->params.algo,
+				   &pqc_alg_secret_key_length,
+				   &pqc_alg_public_key_length);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+	/* TODO: support OneAsymmetricKey to read public key from a
+	 * separate field
+	 */
+
+	gnutls_pk_params_init(&pkey->params);
+
+	ret = _gnutls_x509_read_string(pkcs8_asn, "privateKey", &private_key,
+				       ASN1_ETYPE_OCTET_STRING, 1);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+	pkey->params.algo = algo;
+	pkey->params.raw_priv.data = private_key.data;
+	pkey->params.raw_priv.size = pqc_alg_secret_key_length;
+
+	pkey->params.raw_pub.data = gnutls_malloc(pqc_alg_public_key_length);
+	memcpy(pkey->params.raw_pub.data,
+	       &private_key.data[pqc_alg_secret_key_length],
+	       pqc_alg_public_key_length);
+	pkey->params.raw_pub.size = pqc_alg_public_key_length;
+
+	private_key.data = NULL;
+
+	return GNUTLS_E_SUCCESS;
+
+error:
+	gnutls_free(pkey->params.raw_priv.data);
+	gnutls_pk_params_clear(&pkey->params);
+	gnutls_pk_params_release(&pkey->params);
+
+	return ret;
+}
+#endif
+
 static int decode_private_key_info(const gnutls_datum_t *der,
 				   gnutls_x509_privkey_t pkey)
 {
@@ -1532,6 +1705,27 @@ static int decode_private_key_info(const gnutls_datum_t *der,
 		result = _decode_pkcs8_gost_key(pkcs8_asn, pkey,
 						pkey->params.algo);
 		break;
+#ifdef HAVE_LIBOQS
+	case GNUTLS_PK_EXP_DILITHIUM2:
+	case GNUTLS_PK_EXP_DILITHIUM3:
+	case GNUTLS_PK_EXP_DILITHIUM5:
+	case GNUTLS_PK_EXP_FALCON512:
+	case GNUTLS_PK_EXP_FALCON1024:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_128F:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_128S:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_192F:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_192S:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_256F:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_256S:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_128F:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_128S:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_192F:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_192S:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_256F:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_256S:
+		result = _decode_pkcs8_pqc_alg_key(pkcs8_asn, pkey, oid);
+		break;
+#endif
 	default:
 		result = gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 		goto error;

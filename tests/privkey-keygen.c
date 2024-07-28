@@ -177,7 +177,26 @@ void doit(void)
 				continue;
 #endif
 			}
-
+#ifndef HAVE_LIBOQS
+			if (algorithm == GNUTLS_PK_EXP_DILITHIUM2 ||
+			    algorithm == GNUTLS_PK_EXP_DILITHIUM3 ||
+			    algorithm == GNUTLS_PK_EXP_DILITHIUM5 ||
+			    algorithm == GNUTLS_PK_EXP_FALCON512 ||
+			    algorithm == GNUTLS_PK_EXP_FALCON1024 ||
+			    algorithm == GNUTLS_PK_EXP_SPHINCS_SHA2_128F ||
+			    algorithm == GNUTLS_PK_EXP_SPHINCS_SHA2_128S ||
+			    algorithm == GNUTLS_PK_EXP_SPHINCS_SHA2_192F ||
+			    algorithm == GNUTLS_PK_EXP_SPHINCS_SHA2_192S ||
+			    algorithm == GNUTLS_PK_EXP_SPHINCS_SHA2_256F ||
+			    algorithm == GNUTLS_PK_EXP_SPHINCS_SHA2_256S ||
+			    algorithm == GNUTLS_PK_EXP_SPHINCS_SHAKE_128F ||
+			    algorithm == GNUTLS_PK_EXP_SPHINCS_SHAKE_128S ||
+			    algorithm == GNUTLS_PK_EXP_SPHINCS_SHAKE_192F ||
+			    algorithm == GNUTLS_PK_EXP_SPHINCS_SHAKE_192S ||
+			    algorithm == GNUTLS_PK_EXP_SPHINCS_SHAKE_256F ||
+			    algorithm == GNUTLS_PK_EXP_SPHINCS_SHAKE_256S)
+				continue;
+#endif
 			ret = gnutls_x509_privkey_init(&pkey);
 			if (ret < 0) {
 				fail("gnutls_x509_privkey_init: %d\n", ret);

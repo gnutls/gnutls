@@ -1433,6 +1433,51 @@ static inline int eddsa_sign(gnutls_pk_algorithm_t algo, const uint8_t *pub,
 	}
 }
 
+#ifdef HAVE_LIBOQS
+static inline const char *convert_to_oqs_alg(gnutls_pk_algorithm_t algo)
+{
+	switch (algo) {
+	case GNUTLS_PK_EXP_DILITHIUM2:
+		return OQS_SIG_alg_dilithium_2;
+	case GNUTLS_PK_EXP_DILITHIUM3:
+		return OQS_SIG_alg_dilithium_3;
+	case GNUTLS_PK_EXP_DILITHIUM5:
+		return OQS_SIG_alg_dilithium_5;
+	case GNUTLS_PK_EXP_FALCON512:
+		return OQS_SIG_alg_falcon_512;
+	case GNUTLS_PK_EXP_FALCON1024:
+		return OQS_SIG_alg_falcon_1024;
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_128F:
+		return OQS_SIG_alg_sphincs_sha2_128f_simple;
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_128S:
+		return OQS_SIG_alg_sphincs_sha2_128s_simple;
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_192F:
+		return OQS_SIG_alg_sphincs_sha2_192f_simple;
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_192S:
+		return OQS_SIG_alg_sphincs_sha2_192s_simple;
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_256F:
+		return OQS_SIG_alg_sphincs_sha2_256f_simple;
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_256S:
+		return OQS_SIG_alg_sphincs_sha2_256s_simple;
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_128F:
+		return OQS_SIG_alg_sphincs_shake_128f_simple;
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_128S:
+		return OQS_SIG_alg_sphincs_shake_128s_simple;
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_192F:
+		return OQS_SIG_alg_sphincs_shake_192f_simple;
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_192S:
+		return OQS_SIG_alg_sphincs_shake_192s_simple;
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_256F:
+		return OQS_SIG_alg_sphincs_shake_256f_simple;
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_256S:
+		return OQS_SIG_alg_sphincs_shake_256s_simple;
+	default:
+		gnutls_assert_val(GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM);
+		return "";
+	}
+}
+#endif
+
 /* This is the lower-level part of privkey_sign_raw_data().
  *
  * It accepts data in the appropriate hash form, i.e., DigestInfo
@@ -1852,6 +1897,56 @@ static int _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 
 		break;
 	}
+#ifdef HAVE_LIBOQS
+	case GNUTLS_PK_EXP_DILITHIUM2:
+	case GNUTLS_PK_EXP_DILITHIUM3:
+	case GNUTLS_PK_EXP_DILITHIUM5:
+	case GNUTLS_PK_EXP_FALCON512:
+	case GNUTLS_PK_EXP_FALCON1024:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_128F:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_128S:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_192F:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_192S:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_256F:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_256S:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_128F:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_128S:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_192F:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_192S:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_256F:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_256S: {
+		OQS_SIG *sig;
+		OQS_STATUS rc;
+		size_t size;
+
+		sig = GNUTLS_OQS_FUNC(OQS_SIG_new)(convert_to_oqs_alg(algo));
+		if (sig == NULL) {
+			ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+			goto oqs_fail;
+		}
+
+		size = sig->length_signature;
+		signature->data = gnutls_malloc(size);
+
+		rc = GNUTLS_OQS_FUNC(OQS_SIG_sign)(sig, signature->data, &size,
+						   vdata->data, vdata->size,
+						   pk_params->raw_priv.data);
+		if (rc != OQS_SUCCESS) {
+			ret = gnutls_assert_val(GNUTLS_E_PK_SIGN_FAILED);
+			goto oqs_fail;
+		}
+
+		signature->size = size;
+
+		ret = GNUTLS_E_SUCCESS;
+
+	oqs_fail:
+		GNUTLS_OQS_FUNC(OQS_SIG_free)(sig);
+		if (ret < 0)
+			goto cleanup;
+		break;
+	}
+#endif
 	default:
 		gnutls_assert();
 		ret = GNUTLS_E_INTERNAL_ERROR;
@@ -2224,6 +2319,50 @@ static int _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 
 		break;
 	}
+#ifdef HAVE_LIBOQS
+	case GNUTLS_PK_EXP_DILITHIUM2:
+	case GNUTLS_PK_EXP_DILITHIUM3:
+	case GNUTLS_PK_EXP_DILITHIUM5:
+	case GNUTLS_PK_EXP_FALCON512:
+	case GNUTLS_PK_EXP_FALCON1024:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_128F:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_128S:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_192F:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_192S:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_256F:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_256S:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_128F:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_128S:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_192F:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_192S:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_256F:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_256S: {
+		OQS_SIG *sig;
+		OQS_STATUS rc;
+
+		sig = GNUTLS_OQS_FUNC(OQS_SIG_new)(convert_to_oqs_alg(algo));
+		if (sig == NULL) {
+			ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+			goto oqs_fail;
+		}
+
+		rc = GNUTLS_OQS_FUNC(OQS_SIG_verify)(
+			sig, vdata->data, vdata->size, signature->data,
+			signature->size, pk_params->raw_pub.data);
+		if (rc != OQS_SUCCESS) {
+			ret = gnutls_assert_val(GNUTLS_E_PK_SIG_VERIFY_FAILED);
+			goto oqs_fail;
+		}
+
+		ret = GNUTLS_E_SUCCESS;
+
+	oqs_fail:
+		GNUTLS_OQS_FUNC(OQS_SIG_free)(sig);
+		if (ret < 0)
+			goto cleanup;
+		break;
+	}
+#endif
 	default:
 		gnutls_assert();
 		ret = GNUTLS_E_INTERNAL_ERROR;
@@ -2611,6 +2750,23 @@ static int wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 	case GNUTLS_PK_GOST_12_512:
 #endif
 	case GNUTLS_PK_MLKEM768:
+	case GNUTLS_PK_EXP_DILITHIUM2:
+	case GNUTLS_PK_EXP_DILITHIUM3:
+	case GNUTLS_PK_EXP_DILITHIUM5:
+	case GNUTLS_PK_EXP_FALCON512:
+	case GNUTLS_PK_EXP_FALCON1024:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_128F:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_128S:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_192F:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_192S:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_256F:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_256S:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_128F:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_128S:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_192F:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_192S:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_256F:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_256S:
 		break;
 	default:
 		gnutls_assert();
@@ -3145,6 +3301,27 @@ cleanup:
 
 	return ret;
 }
+
+#ifdef HAVE_LIBOQS
+static inline int pqc_alg_prepare_key_containers(OQS_SIG *sig,
+						 gnutls_pk_params_st *params)
+{
+	params->raw_priv.size = sig->length_secret_key;
+	params->raw_priv.data =
+		gnutls_malloc(params->raw_priv.size + sig->length_public_key);
+
+	if (params->raw_priv.data == NULL)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+	params->raw_pub.size = sig->length_public_key;
+	params->raw_pub.data = gnutls_malloc(params->raw_pub.size);
+
+	if (params->raw_pub.data == NULL)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+	return GNUTLS_E_SUCCESS;
+}
+#endif
 
 /* To generate a DH key either q must be set in the params or
  * level should be set to the number of required bits.
@@ -3838,6 +4015,71 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 		ret = 0;
 		break;
 	}
+	case GNUTLS_PK_EXP_DILITHIUM2:
+	case GNUTLS_PK_EXP_DILITHIUM3:
+	case GNUTLS_PK_EXP_DILITHIUM5:
+	case GNUTLS_PK_EXP_FALCON512:
+	case GNUTLS_PK_EXP_FALCON1024:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_128F:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_128S:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_192F:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_192S:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_256F:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_256S:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_128F:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_128S:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_192F:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_192S:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_256F:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_256S:
+		if (params->pkflags & GNUTLS_PK_FLAG_PROVABLE)
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+		{
+			OQS_SIG *sig = NULL;
+			OQS_STATUS rc;
+
+			if (_gnutls_liboqs_ensure() < 0) {
+				ret = gnutls_assert_val(
+					GNUTLS_E_UNKNOWN_PK_ALGORITHM);
+				goto cleanup;
+			}
+
+			not_approved = true;
+
+			sig = GNUTLS_OQS_FUNC(OQS_SIG_new)(
+				convert_to_oqs_alg(algo));
+			if (sig == NULL) {
+				ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+				goto cleanup;
+			}
+
+			ret = pqc_alg_prepare_key_containers(sig, params);
+			if (ret < 0)
+				goto oqs_fail;
+
+			rc = GNUTLS_OQS_FUNC(
+				OQS_SIG_keypair)(sig, params->raw_pub.data,
+						 params->raw_priv.data);
+			if (rc != OQS_SUCCESS) {
+				ret = gnutls_assert_val(
+					GNUTLS_E_INTERNAL_ERROR);
+				goto oqs_fail;
+			}
+
+			memcpy(&params->raw_priv.data[sig->length_secret_key],
+			       params->raw_pub.data, sig->length_public_key);
+
+			ret = GNUTLS_E_SUCCESS;
+
+		oqs_fail:
+			GNUTLS_OQS_FUNC(OQS_SIG_free)(sig);
+
+			if (ret < 0)
+				goto cleanup;
+
+			break;
+		}
 #endif
 	default:
 		gnutls_assert();
@@ -4110,6 +4352,25 @@ static int wrap_nettle_pk_verify_priv_params(gnutls_pk_algorithm_t algo,
 		ret = 0;
 		break;
 	}
+	case GNUTLS_PK_EXP_DILITHIUM2:
+	case GNUTLS_PK_EXP_DILITHIUM3:
+	case GNUTLS_PK_EXP_DILITHIUM5:
+	case GNUTLS_PK_EXP_FALCON512:
+	case GNUTLS_PK_EXP_FALCON1024:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_128F:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_128S:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_192F:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_192S:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_256F:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_256S:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_128F:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_128S:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_192F:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_192S:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_256F:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_256S:
+		ret = 0;
+		break;
 #endif
 #if ENABLE_GOST
 	case GNUTLS_PK_GOST_01:

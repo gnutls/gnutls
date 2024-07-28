@@ -133,8 +133,28 @@ int _gnutls_get_asn_mpis(asn1_node asn, const char *root,
 	    pk_algorithm != GNUTLS_PK_EDDSA_ED25519 &&
 	    pk_algorithm != GNUTLS_PK_ECDH_X25519 &&
 	    pk_algorithm != GNUTLS_PK_EDDSA_ED448 &&
-	    pk_algorithm != GNUTLS_PK_ECDH_X448) {
-		/* RSA and EdDSA do not use parameters */
+	    pk_algorithm != GNUTLS_PK_ECDH_X448
+#ifdef HAVE_LIBOQS
+	    && pk_algorithm != GNUTLS_PK_EXP_DILITHIUM2 &&
+	    pk_algorithm != GNUTLS_PK_EXP_DILITHIUM3 &&
+	    pk_algorithm != GNUTLS_PK_EXP_DILITHIUM5 &&
+	    pk_algorithm != GNUTLS_PK_EXP_FALCON512 &&
+	    pk_algorithm != GNUTLS_PK_EXP_FALCON1024 &&
+	    pk_algorithm != GNUTLS_PK_EXP_SPHINCS_SHA2_128F &&
+	    pk_algorithm != GNUTLS_PK_EXP_SPHINCS_SHA2_128S &&
+	    pk_algorithm != GNUTLS_PK_EXP_SPHINCS_SHA2_192F &&
+	    pk_algorithm != GNUTLS_PK_EXP_SPHINCS_SHA2_192S &&
+	    pk_algorithm != GNUTLS_PK_EXP_SPHINCS_SHA2_256F &&
+	    pk_algorithm != GNUTLS_PK_EXP_SPHINCS_SHA2_256S &&
+	    pk_algorithm != GNUTLS_PK_EXP_SPHINCS_SHAKE_128F &&
+	    pk_algorithm != GNUTLS_PK_EXP_SPHINCS_SHAKE_128S &&
+	    pk_algorithm != GNUTLS_PK_EXP_SPHINCS_SHAKE_192F &&
+	    pk_algorithm != GNUTLS_PK_EXP_SPHINCS_SHAKE_192S &&
+	    pk_algorithm != GNUTLS_PK_EXP_SPHINCS_SHAKE_256F &&
+	    pk_algorithm != GNUTLS_PK_EXP_SPHINCS_SHAKE_256S
+#endif
+	) {
+		/* RSA, EdDSA and PQC algorithms do not use parameters */
 		result = _gnutls_x509_read_value(asn, name, &tmp);
 		if (pk_algorithm == GNUTLS_PK_RSA_PSS &&
 		    (result == GNUTLS_E_ASN1_VALUE_NOT_FOUND ||

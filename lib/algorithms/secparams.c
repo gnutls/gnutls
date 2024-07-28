@@ -35,28 +35,92 @@ typedef struct {
 				 */
 	unsigned int subgroup_bits; /* subgroup bits */
 	unsigned int ecc_bits; /* bits for ECC keys */
+#ifdef HAVE_LIBOQS
+	unsigned int dilithium_bits;
+	unsigned int falcon_bits;
+	unsigned int sphincs_bits;
+#endif
 } gnutls_sec_params_entry;
 
 static const gnutls_sec_params_entry sec_params[] = {
-	{ "Insecure", GNUTLS_SEC_PARAM_INSECURE, 0, 0, 0, 0, 0 },
-	{ "Export", GNUTLS_SEC_PARAM_EXPORT, 42, 512, 0, 84, 0 },
-	{ "Very weak", GNUTLS_SEC_PARAM_VERY_WEAK, 64, 767, 0, 128, 0 },
-	{ "Weak", GNUTLS_SEC_PARAM_WEAK, 72, 1008, 1008, 160, 160 },
-#ifdef ENABLE_FIPS140
-	{ "Low", GNUTLS_SEC_PARAM_LOW, 80, 1024, 1024, 160, 160 },
-	{ "Legacy", GNUTLS_SEC_PARAM_LEGACY, 96, 1024, 1024, 192, 192 },
-	{ "Medium", GNUTLS_SEC_PARAM_MEDIUM, 112, 2048, 2048, 224, 224 },
-	{ "High", GNUTLS_SEC_PARAM_HIGH, 128, 3072, 3072, 256, 256 },
-#else
-	{ "Low", GNUTLS_SEC_PARAM_LOW, 80, 1024, 1024, 160,
-	  160 }, /* ENISA-LEGACY */
-	{ "Legacy", GNUTLS_SEC_PARAM_LEGACY, 96, 1776, 2048, 192, 192 },
-	{ "Medium", GNUTLS_SEC_PARAM_MEDIUM, 112, 2048, 2048, 256, 224 },
-	{ "High", GNUTLS_SEC_PARAM_HIGH, 128, 3072, 3072, 256, 256 },
+	{ "Insecure", GNUTLS_SEC_PARAM_INSECURE, 0, 0, 0, 0, 0,
+#ifdef HAVE_LIBOQS
+	  0, 0, 0
 #endif
-	{ "Ultra", GNUTLS_SEC_PARAM_ULTRA, 192, 8192, 8192, 384, 384 },
-	{ "Future", GNUTLS_SEC_PARAM_FUTURE, 256, 15360, 15360, 512, 512 },
-	{ NULL, 0, 0, 0, 0, 0 }
+	},
+	{ "Export", GNUTLS_SEC_PARAM_EXPORT, 42, 512, 0, 84, 0,
+#ifdef HAVE_LIBOQS
+	  0, 0, 0
+#endif
+	},
+	{ "Very weak", GNUTLS_SEC_PARAM_VERY_WEAK, 64, 767, 0, 128, 0,
+#ifdef HAVE_LIBOQS
+	  0, 0, 0
+#endif
+	},
+	{ "Weak", GNUTLS_SEC_PARAM_WEAK, 72, 1008, 1008, 160, 160,
+#ifdef HAVE_LIBOQS
+	  0, 0, 0
+#endif
+	},
+#ifdef ENABLE_FIPS140
+	{ "Low", GNUTLS_SEC_PARAM_LOW, 80, 1024, 1024, 160, 160,
+#ifdef HAVE_LIBOQS
+	  0, 0, 0
+#endif
+	},
+	{ "Legacy", GNUTLS_SEC_PARAM_LEGACY, 96, 1024, 1024, 192, 192,
+#ifdef HAVE_LIBOQS
+	  0, 897, 32
+#endif
+	},
+	{ "Medium", GNUTLS_SEC_PARAM_MEDIUM, 112, 2048, 2048, 224, 224,
+#ifdef HAVE_LIBOQS
+	  1312, 0, 0
+#endif
+	},
+	{ "High", GNUTLS_SEC_PARAM_HIGH, 128, 3072, 3072, 256, 256,
+#ifdef HAVE_LIBOQS
+	  0, 0, 48
+#endif
+	},
+#else
+	{ "Low", GNUTLS_SEC_PARAM_LOW, 80, 1024, 1024, 160, 160,
+#ifdef HAVE_LIBOQS
+		 0, 0, 0
+#endif
+	}, /* ENISA-LEGACY */
+	{ "Legacy", GNUTLS_SEC_PARAM_LEGACY, 96, 1776, 2048, 192, 192,
+#ifdef HAVE_LIBOQS
+		 0, 897, 32
+#endif
+	 },
+	{ "Medium", GNUTLS_SEC_PARAM_MEDIUM, 112, 2048, 2048, 256, 224,
+#ifdef HAVE_LIBOQS
+		 1312, 0, 0
+#endif
+		 },
+	{ "High", GNUTLS_SEC_PARAM_HIGH, 128, 3072, 3072, 256, 256,
+#ifdef HAVE_LIBOQS
+		 0, 0, 48
+#endif
+	},
+#endif
+	{ "Ultra", GNUTLS_SEC_PARAM_ULTRA, 192, 8192, 8192, 384, 384,
+#ifdef HAVE_LIBOQS
+	  1952, 0, 0
+#endif
+	},
+	{ "Future", GNUTLS_SEC_PARAM_FUTURE, 256, 15360, 15360, 512, 512,
+#ifdef HAVE_LIBOQS
+	  2592, 1793, 64
+#endif
+	},
+	{ NULL, 0, 0, 0, 0,
+#ifdef HAVE_LIBOQS
+	  0, 0, 0
+#endif
+	}
 };
 
 /**
@@ -87,6 +151,14 @@ unsigned int gnutls_sec_param_to_pk_bits(gnutls_pk_algorithm_t algo,
 				ret = p->dsa_bits;
 			else if (IS_EC(algo) || IS_GOSTEC(algo))
 				ret = p->ecc_bits;
+#ifdef HAVE_LIBOQS
+			else if (IS_DILITHIUM(algo))
+				ret = p->dilithium_bits;
+			else if (IS_FALCON(algo))
+				ret = p->falcon_bits;
+			else if (IS_SPHINCS(algo))
+				ret = p->sphincs_bits;
+#endif
 			else
 				ret = p->pk_bits;
 			break;
@@ -216,6 +288,26 @@ gnutls_sec_param_t gnutls_pk_bits_to_sec_param(gnutls_pk_algorithm_t algo,
 				break;
 			ret = p->sec_param;
 		}
+#ifdef HAVE_LIBOQS
+	} else if (IS_DILITHIUM(algo)) {
+		for (p = sec_params; p->name; p++) {
+			if (p->dilithium_bits > bits)
+				break;
+			ret = p->sec_param;
+		}
+	} else if (IS_FALCON(algo)) {
+		for (p = sec_params; p->name; p++) {
+			if (p->falcon_bits > bits)
+				break;
+			ret = p->sec_param;
+		}
+	} else if (IS_SPHINCS(algo)) {
+		for (p = sec_params; p->name; p++) {
+			if (p->sphincs_bits > bits)
+				break;
+			ret = p->sec_param;
+		}
+#endif
 	} else {
 		for (p = sec_params; p->name; p++) {
 			if (p->pk_bits > bits)

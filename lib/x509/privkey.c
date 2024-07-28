@@ -36,6 +36,9 @@
 #include "ecc.h"
 #include "pin.h"
 
+#ifdef HAVE_LIBOQS
+#include <oqs/oqs.h>
+#endif
 /**
  * gnutls_x509_privkey_init:
  * @key: A pointer to the type to be initialized
@@ -324,6 +327,282 @@ error:
 	return ret;
 }
 
+#ifdef HAVE_LIBOQS
+struct PQCAlgorithmVersion {
+	uint8_t version;
+	gnutls_pk_algorithm_t algorithm;
+	int secret_key_length;
+	int public_key_length;
+};
+
+int _gnutls_decode_pqc_keys(asn1_node *pkey_asn, const gnutls_datum_t *raw_key,
+			    gnutls_x509_privkey_t pkey, uint8_t *version)
+{
+	int result;
+	unsigned int _version;
+
+	result = _asn1_strict_der_decode(pkey_asn, raw_key->data, raw_key->size,
+					 NULL);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return result;
+	}
+
+	result = _gnutls_x509_read_uint(*pkey_asn, "version", &_version);
+	*version = _version;
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	result = _gnutls_x509_read_value(*pkey_asn, "privateKey",
+					 &pkey->params.raw_priv);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	result = _gnutls_x509_read_value(*pkey_asn, "publicKey",
+					 &pkey->params.raw_pub);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	return GNUTLS_E_SUCCESS;
+}
+
+struct PQCAlgorithmVersion dilithium_versions[] = {
+#if defined(GNUTLS_PK_EXP_DILITHIUM2) &&                  \
+	defined(OQS_SIG_dilithium_2_length_secret_key) && \
+	defined(OQS_SIG_dilithium_2_length_public_key)
+	{ '\x02', GNUTLS_PK_EXP_DILITHIUM2,
+	  OQS_SIG_dilithium_2_length_secret_key,
+	  OQS_SIG_dilithium_2_length_public_key },
+#endif
+#if defined(GNUTLS_PK_EXP_DILITHIUM3) &&                  \
+	defined(OQS_SIG_dilithium_3_length_secret_key) && \
+	defined(OQS_SIG_dilithium_3_length_public_key)
+	{ '\x03', GNUTLS_PK_EXP_DILITHIUM3,
+	  OQS_SIG_dilithium_3_length_secret_key,
+	  OQS_SIG_dilithium_3_length_public_key },
+#endif
+#if defined(GNUTLS_PK_EXP_DILITHIUM5) &&                  \
+	defined(OQS_SIG_dilithium_5_length_secret_key) && \
+	defined(OQS_SIG_dilithium_5_length_public_key)
+	{ '\x05', GNUTLS_PK_EXP_DILITHIUM5,
+	  OQS_SIG_dilithium_5_length_secret_key,
+	  OQS_SIG_dilithium_5_length_public_key },
+#endif
+
+	{ '\x00', GNUTLS_PK_UNKNOWN, 0, 0 }
+};
+
+static int _gnutls_set_dilithium_params(const uint8_t *version,
+					gnutls_x509_privkey_t pkey)
+{
+	struct PQCAlgorithmVersion *v = dilithium_versions;
+	while (v->algorithm != GNUTLS_PK_UNKNOWN && v->version != *version)
+		v++;
+
+	pkey->params.raw_priv.size = v->secret_key_length;
+	pkey->params.raw_pub.size = v->public_key_length;
+	pkey->params.params_nr = DILITHIUM_PRIVATE_PARAMS;
+	pkey->params.algo = v->algorithm;
+
+	if (v->algorithm == GNUTLS_PK_UNKNOWN)
+		return GNUTLS_E_UNKNOWN_ALGORITHM;
+
+	return 0;
+}
+
+int _gnutls_privkey_decode_dilithium_key(asn1_node *pkey_asn,
+					 const gnutls_datum_t *raw_key,
+					 gnutls_x509_privkey_t pkey)
+{
+	int result;
+	uint8_t version;
+
+	gnutls_pk_params_init(&pkey->params);
+
+	if ((result = asn1_create_element(_gnutls_get_gnutls_asn(),
+					  "GNUTLS.DilithiumPrivateKey",
+					  pkey_asn)) != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	result = _gnutls_decode_pqc_keys(pkey_asn, raw_key, pkey, &version);
+	if (result < 0)
+		goto error;
+
+	result = _gnutls_set_dilithium_params(&version, pkey);
+	if (result < 0)
+		goto error;
+
+	return 0;
+
+error:
+	asn1_delete_structure2(pkey_asn, ASN1_DELETE_FLAG_ZEROIZE);
+	gnutls_pk_params_clear(&pkey->params);
+	gnutls_pk_params_release(&pkey->params);
+	return result;
+}
+
+struct PQCAlgorithmVersion falcon_versions[] = {
+	{ '\x01', GNUTLS_PK_EXP_FALCON512, OQS_SIG_falcon_512_length_secret_key,
+	  OQS_SIG_falcon_512_length_public_key },
+	{ '\x02', GNUTLS_PK_EXP_FALCON1024,
+	  OQS_SIG_falcon_1024_length_secret_key,
+	  OQS_SIG_falcon_1024_length_public_key },
+
+	{ '\x00', GNUTLS_PK_UNKNOWN, 0, 0 }
+};
+
+static int _gnutls_set_falcon_params(const uint8_t *version,
+				     gnutls_x509_privkey_t pkey)
+{
+	struct PQCAlgorithmVersion *v = falcon_versions;
+	while (v->algorithm != GNUTLS_PK_UNKNOWN && v->version != *version)
+		v++;
+
+	pkey->params.raw_priv.size = v->secret_key_length;
+	pkey->params.raw_pub.size = v->public_key_length;
+	pkey->params.params_nr = FALCON_PRIVATE_PARAMS;
+	pkey->params.algo = v->algorithm;
+
+	if (v->algorithm == GNUTLS_PK_UNKNOWN)
+		return GNUTLS_E_UNKNOWN_ALGORITHM;
+
+	return 0;
+}
+
+int _gnutls_privkey_decode_falcon_key(asn1_node *pkey_asn,
+				      const gnutls_datum_t *raw_key,
+				      gnutls_x509_privkey_t pkey)
+{
+	int result;
+	uint8_t version;
+
+	gnutls_pk_params_init(&pkey->params);
+
+	if ((result = asn1_create_element(_gnutls_get_gnutls_asn(),
+					  "GNUTLS.FalconPrivateKey",
+					  pkey_asn)) != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	result = _gnutls_decode_pqc_keys(pkey_asn, raw_key, pkey, &version);
+	if (result < 0)
+		goto error;
+
+	result = _gnutls_set_falcon_params(&version, pkey);
+	if (result < 0)
+		goto error;
+
+	return 0;
+
+error:
+	asn1_delete_structure2(pkey_asn, ASN1_DELETE_FLAG_ZEROIZE);
+	gnutls_pk_params_clear(&pkey->params);
+	gnutls_pk_params_release(&pkey->params);
+	return result;
+}
+
+struct PQCAlgorithmVersion sphincs_versions[] = {
+	{ '\x01', GNUTLS_PK_EXP_SPHINCS_SHA2_128F,
+	  OQS_SIG_sphincs_sha2_128f_simple_length_secret_key,
+	  OQS_SIG_sphincs_sha2_128f_simple_length_public_key },
+	{ '\x02', GNUTLS_PK_EXP_SPHINCS_SHA2_128S,
+	  OQS_SIG_sphincs_sha2_128s_simple_length_secret_key,
+	  OQS_SIG_sphincs_sha2_128s_simple_length_public_key },
+	{ '\x03', GNUTLS_PK_EXP_SPHINCS_SHA2_192F,
+	  OQS_SIG_sphincs_sha2_192f_simple_length_secret_key,
+	  OQS_SIG_sphincs_sha2_192f_simple_length_public_key },
+	{ '\x04', GNUTLS_PK_EXP_SPHINCS_SHA2_192S,
+	  OQS_SIG_sphincs_sha2_192s_simple_length_secret_key,
+	  OQS_SIG_sphincs_sha2_192s_simple_length_public_key },
+	{ '\x05', GNUTLS_PK_EXP_SPHINCS_SHA2_256F,
+	  OQS_SIG_sphincs_sha2_256f_simple_length_secret_key,
+	  OQS_SIG_sphincs_sha2_256f_simple_length_public_key },
+	{ '\x06', GNUTLS_PK_EXP_SPHINCS_SHA2_256S,
+	  OQS_SIG_sphincs_sha2_256s_simple_length_secret_key,
+	  OQS_SIG_sphincs_sha2_256s_simple_length_public_key },
+	{ '\x07', GNUTLS_PK_EXP_SPHINCS_SHAKE_128F,
+	  OQS_SIG_sphincs_shake_128f_simple_length_secret_key,
+	  OQS_SIG_sphincs_shake_128f_simple_length_public_key },
+	{ '\x08', GNUTLS_PK_EXP_SPHINCS_SHAKE_128S,
+	  OQS_SIG_sphincs_shake_128s_simple_length_secret_key,
+	  OQS_SIG_sphincs_shake_128s_simple_length_public_key },
+	{ '\x09', GNUTLS_PK_EXP_SPHINCS_SHAKE_192F,
+	  OQS_SIG_sphincs_shake_192f_simple_length_secret_key,
+	  OQS_SIG_sphincs_shake_192f_simple_length_public_key },
+	{ '\x0a', GNUTLS_PK_EXP_SPHINCS_SHAKE_192S,
+	  OQS_SIG_sphincs_shake_192s_simple_length_secret_key,
+	  OQS_SIG_sphincs_shake_192s_simple_length_public_key },
+	{ '\x0b', GNUTLS_PK_EXP_SPHINCS_SHAKE_256F,
+	  OQS_SIG_sphincs_shake_256f_simple_length_secret_key,
+	  OQS_SIG_sphincs_shake_256f_simple_length_public_key },
+	{ '\x0c', GNUTLS_PK_EXP_SPHINCS_SHAKE_256S,
+	  OQS_SIG_sphincs_shake_256s_simple_length_secret_key,
+	  OQS_SIG_sphincs_shake_256s_simple_length_public_key },
+
+	{ '\x00', GNUTLS_PK_UNKNOWN, 0, 0 }
+};
+
+static int _gnutls_set_sphincs_params(const uint8_t *version,
+				      gnutls_x509_privkey_t pkey)
+{
+	struct PQCAlgorithmVersion *v = sphincs_versions;
+	while (v->algorithm != GNUTLS_PK_UNKNOWN && v->version != *version)
+		v++;
+
+	pkey->params.raw_priv.size = v->secret_key_length;
+	pkey->params.raw_pub.size = v->public_key_length;
+	pkey->params.params_nr = SPHINCS_PRIVATE_PARAMS;
+	pkey->params.algo = v->algorithm;
+
+	if (v->algorithm == GNUTLS_PK_UNKNOWN)
+		return GNUTLS_E_UNKNOWN_ALGORITHM;
+
+	return 0;
+}
+
+int _gnutls_privkey_decode_sphincs_key(asn1_node *pkey_asn,
+				       const gnutls_datum_t *raw_key,
+				       gnutls_x509_privkey_t pkey)
+{
+	int result;
+	uint8_t version;
+
+	gnutls_pk_params_init(&pkey->params);
+
+	if ((result = asn1_create_element(_gnutls_get_gnutls_asn(),
+					  "GNUTLS.SphincsPrivateKey",
+					  pkey_asn)) != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	result = _gnutls_decode_pqc_keys(pkey_asn, raw_key, pkey, &version);
+	if (result < 0)
+		goto error;
+
+	result = _gnutls_set_sphincs_params(&version, pkey);
+	if (result < 0)
+		goto error;
+
+	return 0;
+
+error:
+	asn1_delete_structure2(pkey_asn, ASN1_DELETE_FLAG_ZEROIZE);
+	gnutls_pk_params_clear(&pkey->params);
+	gnutls_pk_params_release(&pkey->params);
+	return result;
+}
+#endif
+
 static asn1_node decode_dsa_key(const gnutls_datum_t *raw_key,
 				gnutls_x509_privkey_t pkey)
 {
@@ -408,6 +687,11 @@ error:
 #define PEM_KEY_DSA "DSA PRIVATE KEY"
 #define PEM_KEY_RSA "RSA PRIVATE KEY"
 #define PEM_KEY_ECC "EC PRIVATE KEY"
+#ifdef HAVE_LIBOQS
+#define PEM_KEY_DILITHIUM "DILITHIUM PRIVATE KEY"
+#define PEM_KEY_FALCON "FALCON PRIVATE KEY"
+#define PEM_KEY_SPHINCS "SPHINCS PRIVATE KEY"
+#endif
 #define PEM_KEY_PKCS8 "PRIVATE KEY"
 
 #define MAX_PEM_HEADER_SIZE 25
@@ -507,6 +791,41 @@ int gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
 					if (result >= 0)
 						key->params.algo =
 							GNUTLS_PK_DSA;
+#ifdef HAVE_LIBOQS
+				} else if (left > sizeof(PEM_KEY_DILITHIUM) &&
+					   memcmp(ptr, PEM_KEY_DILITHIUM,
+						  sizeof(PEM_KEY_DILITHIUM) -
+							  1) == 0) {
+					result = _gnutls_fbase64_decode(
+						PEM_KEY_DILITHIUM, begin_ptr,
+						left, &_data);
+					if (result >= 0) {
+						key->params.algo =
+							GNUTLS_PK_EXP_DILITHIUM2;
+					}
+				} else if (left > sizeof(PEM_KEY_FALCON) &&
+					   memcmp(ptr, PEM_KEY_FALCON,
+						  sizeof(PEM_KEY_FALCON) - 1) ==
+						   0) {
+					result = _gnutls_fbase64_decode(
+						PEM_KEY_FALCON, begin_ptr, left,
+						&_data);
+					if (result >= 0) {
+						key->params.algo =
+							GNUTLS_PK_EXP_FALCON512;
+					}
+				} else if (left > sizeof(PEM_KEY_SPHINCS) &&
+					   memcmp(ptr, PEM_KEY_SPHINCS,
+						  sizeof(PEM_KEY_SPHINCS) -
+							  1) == 0) {
+					result = _gnutls_fbase64_decode(
+						PEM_KEY_SPHINCS, begin_ptr,
+						left, &_data);
+					if (result >= 0) {
+						key->params.algo =
+							GNUTLS_PK_EXP_SPHINCS_SHA2_128F;
+					}
+#endif
 				}
 
 				if (key->params.algo == GNUTLS_PK_UNKNOWN &&
@@ -566,6 +885,32 @@ int gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
 			gnutls_assert();
 			key->key = NULL;
 		}
+#ifdef HAVE_LIBOQS
+	} else if (key->params.algo == GNUTLS_PK_EXP_DILITHIUM2) {
+		result = _gnutls_privkey_decode_dilithium_key(&key->key, &_data,
+							      key);
+
+		if (result < 0) {
+			gnutls_assert();
+			key->key = NULL;
+		}
+	} else if (key->params.algo == GNUTLS_PK_EXP_FALCON512) {
+		result = _gnutls_privkey_decode_falcon_key(&key->key, &_data,
+							   key);
+
+		if (result < 0) {
+			gnutls_assert();
+			key->key = NULL;
+		}
+	} else if (key->params.algo == GNUTLS_PK_EXP_SPHINCS_SHA2_128F) {
+		result = _gnutls_privkey_decode_sphincs_key(&key->key, &_data,
+							    key);
+
+		if (result < 0) {
+			gnutls_assert();
+			key->key = NULL;
+		}
+#endif
 	} else {
 		/* Try decoding each of the keys, and accept the one that
 		 * succeeds.
@@ -668,6 +1013,14 @@ fail:
 	return ret;
 }
 
+#ifdef HAVE_LIBOQS
+#define MAX_ALGORITHM_NAME_SIZE_IN_PEM_HEADER 21
+#define MAX_PEM_KEY_SIZE PEM_KEY_DILITHIUM
+#else
+#define MAX_ALGORITHM_NAME_SIZE_IN_PEM_HEADER 15
+#define MAX_PEM_KEY_SIZE PEM_KEY_RSA
+#endif
+
 /**
  * gnutls_x509_privkey_import2:
  * @key: The data to store the parsed key
@@ -711,9 +1064,10 @@ int gnutls_x509_privkey_import2(gnutls_x509_privkey_t key,
 			left = data->size -
 			       ((ptrdiff_t)ptr - (ptrdiff_t)data->data);
 
-			if (data->size - left > 15) {
-				ptr -= 15;
-				left += 15;
+			if (data->size - left >
+			    MAX_ALGORITHM_NAME_SIZE_IN_PEM_HEADER) {
+				ptr -= MAX_ALGORITHM_NAME_SIZE_IN_PEM_HEADER;
+				left += MAX_ALGORITHM_NAME_SIZE_IN_PEM_HEADER;
 			} else {
 				ptr = (char *)data->data;
 				left = data->size;
@@ -727,13 +1081,23 @@ int gnutls_x509_privkey_import2(gnutls_x509_privkey_t key,
 				       ((ptrdiff_t)ptr - (ptrdiff_t)data->data);
 			}
 
-			if (ptr != NULL && left > sizeof(PEM_KEY_RSA)) {
+			if (ptr != NULL && left > sizeof(MAX_PEM_KEY_SIZE)) {
 				if (memcmp(ptr, PEM_KEY_RSA,
 					   sizeof(PEM_KEY_RSA) - 1) == 0 ||
 				    memcmp(ptr, PEM_KEY_ECC,
 					   sizeof(PEM_KEY_ECC) - 1) == 0 ||
 				    memcmp(ptr, PEM_KEY_DSA,
-					   sizeof(PEM_KEY_DSA) - 1) == 0) {
+					   sizeof(PEM_KEY_DSA) - 1) == 0
+#ifdef HAVE_LIBOQS
+				    || memcmp(ptr, PEM_KEY_DILITHIUM,
+					      sizeof(PEM_KEY_DILITHIUM) - 1) ==
+					       0 ||
+				    memcmp(ptr, PEM_KEY_FALCON,
+					   sizeof(PEM_KEY_FALCON) - 1) == 0 ||
+				    memcmp(ptr, PEM_KEY_SPHINCS,
+					   sizeof(PEM_KEY_SPHINCS) - 1) == 0
+#endif
+				) {
 					head_enc = 0;
 				}
 			}
@@ -1477,14 +1841,39 @@ int gnutls_x509_privkey_set_spki(gnutls_x509_privkey_t key,
 
 static const char *set_msg(gnutls_x509_privkey_t key)
 {
-	if (GNUTLS_PK_IS_RSA(key->params.algo)) {
+	switch (key->params.algo) {
+	case GNUTLS_PK_RSA:
+	case GNUTLS_PK_RSA_PSS:
 		return PEM_KEY_RSA;
-	} else if (key->params.algo == GNUTLS_PK_DSA) {
+	case GNUTLS_PK_DSA:
 		return PEM_KEY_DSA;
-	} else if (key->params.algo == GNUTLS_PK_EC)
+	case GNUTLS_PK_EC:
 		return PEM_KEY_ECC;
-	else
+#ifdef HAVE_LIBOQS
+	case GNUTLS_PK_EXP_DILITHIUM2:
+	case GNUTLS_PK_EXP_DILITHIUM3:
+	case GNUTLS_PK_EXP_DILITHIUM5:
+		return PEM_KEY_DILITHIUM;
+	case GNUTLS_PK_EXP_FALCON512:
+	case GNUTLS_PK_EXP_FALCON1024:
+		return PEM_KEY_FALCON;
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_128F:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_128S:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_192F:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_192S:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_256F:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_256S:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_128F:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_128S:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_192F:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_192S:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_256F:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_256S:
+		return PEM_KEY_SPHINCS;
+#endif
+	default:
 		return "UNKNOWN";
+	}
 }
 
 /**
