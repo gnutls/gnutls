@@ -4,35 +4,35 @@ on:
 
 jobs:
   build:
-    runs-on: macos-11.0
+    runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: false
       - name: install dependencies
         run: |
           brew update
-          for pkg in openssl autoconf automake libtool nettle p11-kit libtasn1 gettext bison gtk-doc; do
+          for pkg in openssl autoconf automake coreutils libtool gmp nettle p11-kit libtasn1 libunistring gettext bison gtk-doc; do
             brew install $pkg || true
           done
-          for pkg in nettle wget p11-kit libtasn1; do
+          for pkg in nettle wget p11-kit libtasn1 libunistring; do
             brew upgrade $pkg || true
           done
       - name: update path
         run: |
           echo /usr/local/opt/gettext/bin >>${GITHUB_PATH}
-          echo /usr/local/opt/bison/bin >>${GITHUB_PATH}
+          echo /opt/homebrew/opt/bison/bin >>${GITHUB_PATH}
       - name: bootstrap
         run: ./bootstrap
       - name: configure
         run: |
-          CC=clang ./configure --disable-full-test-suite --disable-valgrind-tests --disable-doc --disable-dependency-tracking
+          CFLAGS="-I$(brew --prefix libunistring)/include" LDFLAGS="-L$(brew --prefix libunistring)/lib" GMP_CFLAGS=$(pkg-config --cflags gmp) GMP_LIBS=$(pkg-config --libs gmp) CC=clang ./configure --disable-full-test-suite --disable-valgrind-tests --disable-doc --disable-dependency-tracking
       - name: make
         run: |
           make -j$(sysctl -n hw.ncpu) || make -j$(sysctl -n hw.ncpu) V=1
       - name: make check
         run: |
-          make -j$(sysctl -n hw.ncpu) check gl_public_submodule_commit=
+          make -j$(sysctl -n hw.ncpu) check gl_public_submodule_commit= TIMEOUT=gtimeout
       - name: show debug info
         if: failure()
         run: |
