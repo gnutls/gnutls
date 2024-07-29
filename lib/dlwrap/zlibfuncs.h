@@ -22,6 +22,6 @@
  * Jean-loup Gailly        Mark Adler
  * jloup@gzip.org          madler@alumni.caltech.edu
  */
-FUNC(int, compress, (Bytef *dest, uLongf *destLen, const Bytef *source, uLong sourceLen), (dest, destLen, source, sourceLen))
-FUNC(uLong, compressBound, (uLong sourceLen), (sourceLen))
-FUNC(int, uncompress, (Bytef *dest, uLongf *destLen, const Bytef *source, uLong sourceLen), (dest, destLen, source, sourceLen))
+FUNC(int, compress, (unsigned char *dest, unsigned long *destLen, const unsigned char *source, unsigned long sourceLen), (dest, destLen, source, sourceLen))
+FUNC(unsigned long, compressBound, (unsigned long sourceLen), (sourceLen))
+FUNC(int, uncompress, (unsigned char *dest, unsigned long *destLen, const unsigned char *source, unsigned long sourceLen), (dest, destLen, source, sourceLen))
