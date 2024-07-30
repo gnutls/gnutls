@@ -144,6 +144,22 @@ endif
 
 if ENABLE_TPM2
 COBJECTS += tpm2.c tpm2.h tpm2_esys.c
+COBJECTS += dlwrap/tss2_esys.c dlwrap/tss2_esysfuncs.h dlwrap/tss2_esys.h
+COBJECTS += dlwrap/tss2_mu.c dlwrap/tss2_mufuncs.h dlwrap/tss2_mu.h
+COBJECTS += dlwrap/tss2_tctildr.c dlwrap/tss2_tctildrfuncs.h dlwrap/tss2_tctildr.h
+AM_CPPFLAGS += $(TSS2_ESYS_CFLAGS)
+AM_CPPFLAGS += $(TSS2_MU_CFLAGS)
+AM_CPPFLAGS += $(TSS2_TCTILDR_CFLAGS)
+
+if ENABLE_DLOPEN
+AM_CPPFLAGS += -DGNUTLS_TSS2_ESYS_ENABLE_DLOPEN=1
+AM_CPPFLAGS += -DGNUTLS_TSS2_MU_ENABLE_DLOPEN=1
+AM_CPPFLAGS += -DGNUTLS_TSS2_TCTILDR_ENABLE_DLOPEN=1
+else
+thirdparty_libadd += $(TSS2_ESYS_LIBS)
+thirdparty_libadd += $(TSS2_MU_LIBS)
+thirdparty_libadd += $(TSS2_TCTILDR_LIBS)
+endif
 endif
 
 if WINDOWS

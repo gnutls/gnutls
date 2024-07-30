@@ -1,0 +1,13 @@
+Esys_GetCapability
+Esys_Free
+Esys_TR_SetAuth
+Esys_CreatePrimary
+Esys_Initialize
+Esys_Startup
+Esys_TR_FromTPMPublic
+Esys_ReadPublic
+Esys_Load
+Esys_FlushContext
+Esys_Finalize
+Esys_RSA_Decrypt
+Esys_Sign
