@@ -625,6 +625,7 @@ TESTS = $(cpptests) $(ctests) $(dist_check_SCRIPTS)
 TESTS_ENVIRONMENT +=						\
 	CC="$(CC)"						\
 	CFLAGS="$(CFLAGS)"					\
+	LDFLAGS="$(LDFLAGS)"					\
 	LC_ALL="C"						\
 	LSAN_OPTIONS=suppressions=$(srcdir)/gnutls-asan.supp	\
 	CAFILE=$(srcdir)/cert-tests/data/ca-certs.pem		\
