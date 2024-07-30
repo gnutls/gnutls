@@ -82,6 +82,7 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = \
+	$(LIBIDN2_CFLAGS) \
 	$(P11_KIT_CFLAGS) \
 	-I$(top_srcdir)/lib/includes		\
 	-I$(top_builddir)/lib/includes		\
@@ -106,6 +107,8 @@ dane_strcodes_LDADD = $(LDADD) ../libdane/libgnutls-dane.la
 
 if ENABLE_MINITASN1
 AM_CPPFLAGS += -I$(srcdir)/../lib/minitasn1
+else
+AM_CPPFLAGS += $(LIBTASN1_CFLAGS)
 endif
 
 noinst_LTLIBRARIES = libutils.la
