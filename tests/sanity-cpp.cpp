@@ -36,7 +36,8 @@ extern "C" {
 #include "cert-common.h"
 #include <setjmp.h>
 #include <cmocka.h>
-#include <minmax.h>
+#undef MIN
+#define MIN(x,y) (x > y ? y : x)
 }
 
 /* This is a basic test for C++ API */

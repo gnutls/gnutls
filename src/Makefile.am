@@ -152,6 +152,7 @@ COMMON_LIBS += ../lib/minitasn1/libminitasn1.la ../gl/libgnu.la
 AM_CPPFLAGS += -I$(top_srcdir)/lib/minitasn1
 else
 COMMON_LIBS += $(LIBTASN1_LIBS)
+AM_CPPFLAGS += $(LIBTASN1_CFLAGS)
 endif
 
 

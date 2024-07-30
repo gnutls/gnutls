@@ -19,6 +19,8 @@
  * along with GnuTLS.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "config.h"
+
 #include <nettle/bignum.h>
 #include <gnutls/gnutls.h>
 #include <assert.h>

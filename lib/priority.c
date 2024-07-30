@@ -33,7 +33,7 @@
 #include "hello_ext.h"
 #include <c-strcase.h>
 #include "fips.h"
-#include "errno.h"
+#include <errno.h>
 #include "ext/srp.h"
 #include <gnutls/gnutls.h>
 #include "profiles.h"

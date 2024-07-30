@@ -5,6 +5,19 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.8.7 (unreleased)
+
+** libgnutls: New configure option to compile out DSA support
+   The --disable-dsa configure option has been added to completely disable DSA
+   algorithm support.
+
+** libgnutls: Experimental support for X25519Kyber768Draft00 key exchange in TLS
+   For testing purposes, the hybrid post-quantum key exchange defined
+   in draft-tls-westerbaan-xyber768d00 has been implemented using
+   liboqs. Since the algorithm is still not finalized, the support of
+   this key exchange is disabled by default and can be enabled with
+   the --with-liboqs configure option.
+
 * Version 3.8.6 (released 2024-07-03)
 
 ** libgnutls: PBMAC1 is now supported as a MAC mechanism for PKCS#12

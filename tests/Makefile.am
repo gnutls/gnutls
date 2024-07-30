@@ -82,6 +82,7 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = \
+	$(LIBIDN2_CFLAGS) \
 	$(P11_KIT_CFLAGS) \
 	-I$(top_srcdir)/lib/includes		\
 	-I$(top_builddir)/lib/includes		\
@@ -106,6 +107,8 @@ dane_strcodes_LDADD = $(LDADD) ../libdane/libgnutls-dane.la
 
 if ENABLE_MINITASN1
 AM_CPPFLAGS += -I$(srcdir)/../lib/minitasn1
+else
+AM_CPPFLAGS += $(LIBTASN1_CFLAGS)
 endif
 
 noinst_LTLIBRARIES = libutils.la
@@ -612,9 +615,7 @@ cpptests += sanity-cpp
 
 sanity_cpp_SOURCES = sanity-cpp.cpp
 sanity_cpp_LDADD = $(CMOCKA_LDADD)
-sanity_cpp_CXXFLAGS = $(AM_CPPFLAGS) \
-	-I$(top_srcdir)/gl	\
-	-I$(top_builddir)/gl
+sanity_cpp_CXXFLAGS = $(AM_CPPFLAGS) $(CMOCKA_CFLAGS)
 endif
 endif
 
@@ -624,6 +625,7 @@ TESTS = $(cpptests) $(ctests) $(dist_check_SCRIPTS)
 TESTS_ENVIRONMENT +=						\
 	CC="$(CC)"						\
 	CFLAGS="$(CFLAGS)"					\
+	LDFLAGS="$(LDFLAGS)"					\
 	LC_ALL="C"						\
 	LSAN_OPTIONS=suppressions=$(srcdir)/gnutls-asan.supp	\
 	CAFILE=$(srcdir)/cert-tests/data/ca-certs.pem		\

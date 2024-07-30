@@ -69,14 +69,15 @@ COMMON="-I${top_builddir}/lib/includes -L${top_builddir}/lib/.libs -I${srcdir}/.
 echo "Trying dynamic linking with:"
 echo "  * flags: $(${PKG_CONFIG} --libs gnutls)"
 echo "  * common: ${COMMON}"
-echo "  * lib: ${CFLAGS}"
-echo cc ${TMPFILE} -o ${TMPFILE_O} $(${PKG_CONFIG} --libs gnutls) $(${PKG_CONFIG} --cflags gnutls) ${COMMON} ${CFLAGS}
-${CC} ${TMPFILE} -o ${TMPFILE_O} $(${PKG_CONFIG} --libs gnutls) $(${PKG_CONFIG} --cflags gnutls) ${COMMON} ${CFLAGS}
+echo "  * cflags: ${CFLAGS}"
+echo "  * ldflags: ${LDFLAGS}"
+echo cc ${TMPFILE} -o ${TMPFILE_O} $(${PKG_CONFIG} --libs gnutls) $(${PKG_CONFIG} --cflags gnutls) ${COMMON} ${CFLAGS} ${LDFLAGS}
+${CC} ${TMPFILE} -o ${TMPFILE_O} $(${PKG_CONFIG} --libs gnutls) $(${PKG_CONFIG} --cflags gnutls) ${COMMON} ${CFLAGS} ${LDFLAGS}
 
 echo ""
 echo "Trying static linking with $(${PKG_CONFIG} --libs --static gnutls)"
-echo cc ${TMPFILE} -o ${TMPFILE_O} $(${PKG_CONFIG} --static --libs gnutls) $(${PKG_CONFIG} --cflags gnutls) ${COMMON} ${CFLAGS}
-${CC} ${TMPFILE} -o ${TMPFILE_O} $(${PKG_CONFIG} --static --libs gnutls) $(${PKG_CONFIG} --cflags gnutls) ${COMMON} ${CFLAGS}
+echo cc ${TMPFILE} -o ${TMPFILE_O} $(${PKG_CONFIG} --static --libs gnutls) $(${PKG_CONFIG} --cflags gnutls) ${COMMON} ${CFLAGS} ${LDFLAGS}
+${CC} ${TMPFILE} -o ${TMPFILE_O} $(${PKG_CONFIG} --static --libs gnutls) $(${PKG_CONFIG} --cflags gnutls) ${COMMON} ${CFLAGS} ${LDFLAGS}
 
 rm -f ${TMPFILE} ${TMPFILE_O}
 
