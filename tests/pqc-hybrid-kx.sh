@@ -31,6 +31,10 @@ if ! test -x "${CLI}"; then
 	exit 77
 fi
 
+if ! "${CLI}" --list | grep '^Public Key Systems: .*Kyber768.*' >/dev/null; then
+	exit 77
+fi
+
 . "${srcdir}/scripts/common.sh"
 testdir=`create_testdir pqc-hybrid-kx`
 
