@@ -234,9 +234,12 @@ const gnutls_group_t *gnutls_group_list(void)
 	if (groups[0] == 0) {
 		int i = 0;
 
-		GNUTLS_GROUP_LOOP(if (p->curve == 0 ||
-				      _gnutls_ecc_curve_is_supported(p->curve))
-					  groups[i++] = p->id;);
+		GNUTLS_GROUP_LOOP(
+			if ((p->curve == 0 ||
+			     _gnutls_ecc_curve_is_supported(p->curve)) &&
+			    (p->pk == 0 || _gnutls_pk_exists(p->pk)) &&
+			    (p->pk2 == 0 || _gnutls_pk_exists(p->pk2)))
+				groups[i++] = p->id;);
 		groups[i++] = 0;
 	}
 
