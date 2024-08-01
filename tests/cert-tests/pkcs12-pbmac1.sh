@@ -109,6 +109,21 @@ if test ${rc} != 0; then
 	exit 1
 fi
 
+# check if PBMAC1 is used by default in FIPS mode
+if test "$GNUTLS_FORCE_FIPS_MODE" = 1; then
+	${VALGRIND} "$CERTTOOL" --to-p12 --password 1234 --p12-name "my-key" --load-certificate "$srcdir/../certs/cert-ecc256.pem" --load-privkey "$srcdir/../certs/ecc256.pem" --outder --outfile "$TMPFILE" >/dev/null
+	rc=$?
+	if test $rc != 0; then
+		echo "PKCS12 FATAL encoding"
+		exit 1
+	fi
+	${VALGRIND} "$CERTTOOL" -d 99 --p12-info --inder --password 1234 \
+		    --infile "$TMPFILE" | grep "^	MAC: PBMAC1" || {
+		echo "Generated PKCS12 file doesn't use PBMAC1 in FIPS mode"
+		exit 1
+	}
+fi
+
 rm -rf "${testdir}"
 
 exit 0

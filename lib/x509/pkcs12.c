@@ -997,6 +997,12 @@ int gnutls_pkcs12_generate_mac3(gnutls_pkcs12_t pkcs12,
 	if (me->oid == NULL)
 		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 
+	/* Enable PBMAC1 by default in FIPS mode; otherwise the MAC
+	 * calculation will be FIPS non-compliant.
+	 */
+	if (_gnutls_fips_mode_enabled())
+		flags |= GNUTLS_PKCS12_USE_PBMAC1;
+
 	/* Generate the salt.
 	 */
 	salt.data = salt_data;
