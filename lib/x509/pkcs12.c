@@ -899,7 +899,7 @@ static int generate_mac_pkcs12(const mac_entry_st *me,
 			       const gnutls_datum_t *salt, unsigned iter_count,
 			       const gnutls_datum_t *data, asn1_node pkcs12)
 {
-	mac_hd_st hd;
+	gnutls_hmac_hd_t hd;
 	uint8_t mac_key_data[MAX_HASH_SIZE];
 	size_t mac_key_size = _gnutls_mac_get_algo_len(me);
 	uint8_t mac_data[MAX_HASH_SIZE];
@@ -926,15 +926,15 @@ static int generate_mac_pkcs12(const mac_entry_st *me,
 
 	/* MAC the data.
 	 */
-	result = _gnutls_mac_init(&hd, me, mac_key_data, mac_key_size);
+	result = gnutls_hmac_init(&hd, me->id, mac_key_data, mac_key_size);
 	if (result < 0) {
 		gnutls_assert();
 		return result;
 	}
 
-	_gnutls_mac(&hd, data->data, data->size);
+	gnutls_hmac(hd, data->data, data->size);
 
-	_gnutls_mac_deinit(&hd, mac_data);
+	gnutls_hmac_deinit(hd, mac_data);
 
 	mac.data = mac_data;
 	mac.size = _gnutls_mac_get_algo_len(me);
@@ -1175,7 +1175,7 @@ static int pkcs12_verify_mac_pkcs12(gnutls_pkcs12_t pkcs12,
 	gnutls_datum_t tmp = { NULL, 0 }, salt = { NULL, 0 };
 	unsigned mac_len, key_len;
 	int len;
-	mac_hd_st td1;
+	gnutls_hmac_hd_t td1;
 	unsigned iter_count;
 #if ENABLE_GOST
 	int gost_retry = 0;
@@ -1232,15 +1232,15 @@ pkcs12_try_gost:
 
 	/* MAC the data.
 	 */
-	result = _gnutls_mac_init(&td1, entry, key, key_len);
+	result = gnutls_hmac_init(&td1, entry->id, key, key_len);
 	if (result < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	_gnutls_mac(&td1, tmp.data, tmp.size);
+	gnutls_hmac(td1, tmp.data, tmp.size);
 
-	_gnutls_mac_deinit(&td1, mac_output);
+	gnutls_hmac_deinit(td1, mac_output);
 
 	len = sizeof(mac_output_orig);
 	result = asn1_read_value(pkcs12->pkcs12, "macData.mac.digest",
