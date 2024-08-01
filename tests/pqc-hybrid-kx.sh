@@ -31,11 +31,19 @@ if ! test -x "${CLI}"; then
 	exit 77
 fi
 
-if ! "${CLI}" --list | grep '^Public Key Systems: .*Kyber768.*' >/dev/null; then
-	exit 77
+. "${srcdir}/scripts/common.sh"
+
+if ! "${CLI}" --list | grep '^Groups: .*GROUP-X25519-KYBER768.*' >/dev/null; then
+    if "${CLI}" --list | grep '^Public Key Systems: .*KYBER768.*' >/dev/null; then
+	fail "KYBER768 is in Public Key Systems, while GROUP-X25519-KYBER768 is NOT in Groups"
+    fi
+    exit 77
+else
+    if ! "${CLI}" --list | grep '^Public Key Systems: .*KYBER768.*' >/dev/null; then
+	fail "KYBER768 is NOT in Public Key Systems, while GROUP-X25519-KYBER768 is in Groups"
+    fi
 fi
 
-. "${srcdir}/scripts/common.sh"
 testdir=`create_testdir pqc-hybrid-kx`
 
 KEY="$srcdir/../doc/credentials/x509/key-ecc.pem"
