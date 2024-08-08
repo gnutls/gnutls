@@ -652,6 +652,25 @@ fedora-abicoverage/test:
       - gnutls-prev-abi.tmp/
       - compat_reports/
 
+fedora-no-liboqs/test:
+  extends:
+    - .test
+    - .fedora
+  dependencies:
+    - fedora/build
+  needs:
+    - fedora/build
+  script:
+    - |
+      cat > /etc/crypto-policies/local.d/gnutls-ktls.config <<EOF
+      [global]
+      ktls = true
+      EOF
+      update-crypto-policies
+      echo "SYSTEM=NORMAL" >> tests/system.prio
+    - dnf remove -y liboqs
+    - make -j$CHECKJOBS check
+
 fedora-cross/bootstrap:
   extends:
     - .bootstrap
