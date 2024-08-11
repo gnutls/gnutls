@@ -56,8 +56,6 @@ export TZ="UTC"
 
 . "${srcdir}/scripts/common.sh"
 
-skip_if_no_datefudge
-
 eval "${GETPORT}"
 # Port for gnutls-serv
 TLS_SERVER_PORT=$PORT
@@ -239,12 +237,13 @@ _EOF
 echo "=== Bringing TLS server up ==="
 
 TESTDATE="2018-03-01 00:00:00"
+EPOCHTESTDATE=1519862400
 
 # Start OpenSSL TLS server
 #
 launch_bare_server \
-	  "$FAKETIME" "${TESTDATE}" \
-	  "${OPENSSL}" s_server -cert ${SERVER_CERT_FILE} -key ${SERVER_KEY_FILE} \
+	  "${OPENSSL}" s_server -attime "${EPOCHTESTDATE}" \
+	  -cert ${SERVER_CERT_FILE} -key ${SERVER_KEY_FILE} \
 	  -CAfile ${CA_FILE} -port ${PORT} -Verify 1 -verify_return_error -www
 SERVER_PID="${!}"
 wait_server "${SERVER_PID}"
