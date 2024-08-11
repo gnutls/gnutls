@@ -40,7 +40,8 @@ echo "*** Testing good HTTPS hosts ***"
 # www.vulcano.cl dane.nox.su www.kumari.net
 # used to work: good.dane.verisignlabs.com
 # used to work: fedoraproject.org
-HOSTS="www.freebsd.org torproject.org"
+# used to work: torproject.org
+HOSTS="www.freebsd.org"
 #HOSTS="${HOSTS} nohats.ca"
 for host in ${HOSTS}; do
 
