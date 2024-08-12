@@ -104,7 +104,7 @@ ensure_symbol (const char *name, void **symp)
     {
       void *sym = dlsym (gnutls_brotlidec_dlhandle, name);
       if (!sym)
-	return -errno;
+	return -EINVAL;
       *symp = sym;
     }
   return 0;
@@ -119,7 +119,7 @@ gnutls_brotlidec_ensure_library (const char *soname, int flags)
     {
       gnutls_brotlidec_dlhandle = dlopen (soname, flags);
       if (!gnutls_brotlidec_dlhandle)
-	return -errno;
+	return -EINVAL;
     }
 
 #define ENSURE_SYMBOL(name)					\

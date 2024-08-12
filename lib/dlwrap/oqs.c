@@ -104,7 +104,7 @@ ensure_symbol (const char *name, void **symp)
     {
       void *sym = dlsym (gnutls_oqs_dlhandle, name);
       if (!sym)
-	return -errno;
+	return -EINVAL;
       *symp = sym;
     }
   return 0;
@@ -119,7 +119,7 @@ gnutls_oqs_ensure_library (const char *soname, int flags)
     {
       gnutls_oqs_dlhandle = dlopen (soname, flags);
       if (!gnutls_oqs_dlhandle)
-	return -errno;
+	return -EINVAL;
     }
 
 #define ENSURE_SYMBOL(name)					\
