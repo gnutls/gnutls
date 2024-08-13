@@ -124,7 +124,9 @@ static void client(int fd)
 	do {
 		ret = gnutls_handshake(session);
 	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
-	if (ret >= 0)
+	if (ret < 0)
+		gnutls_alert_send_appropriate(session, ret);
+	else
 		fail("client: handshake should have failed\n");
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);
