@@ -53,8 +53,6 @@ export TZ="UTC"
 
 . "${srcdir}/scripts/common.sh"
 
-skip_if_no_datefudge
-
 eval "${GETPORT}"
 # Port for gnutls-serv
 TLS_SERVER_PORT=$PORT
@@ -76,6 +74,7 @@ fi
 
 CERTDATE="2016-04-28 00:00:00"
 TESTDATE="2016-04-29 00:00:00"
+EPOCHTESTDATE=1461888000
 
 OCSP_PID=""
 TLS_SERVER_PID=""
@@ -112,8 +111,8 @@ echo "=== Bringing OCSP server up ==="
 # SO_REUSEADDR usage.
 PORT=${OCSP_PORT}
 launch_bare_server \
-	  "$FAKETIME" "${TESTDATE}" \
-	  "${OPENSSL}" ocsp -index "${srcdir}/ocsp-tests/certs/ocsp_index.txt" -text \
+	  "${OPENSSL}" ocsp  -attime "${EPOCHTESTDATE}" \
+	  -index "${srcdir}/ocsp-tests/certs/ocsp_index.txt" -text \
 	  -port "${OCSP_PORT}" \
 	  -rsigner "${srcdir}/ocsp-tests/certs/ocsp-server.pem" \
 	  -rkey "${srcdir}/ocsp-tests/certs/ocsp-server.key" \

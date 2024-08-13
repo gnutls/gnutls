@@ -31,10 +31,6 @@ export TZ="UTC"
 
 . "${srcdir}/scripts/common.sh"
 
-# Note that in rare cases this test may fail because the
-# time set using faketime/datefudge could have changed since the generation
-# (if example the system was busy)
-
 "${OCSPTOOL}" --attime "2016-04-22" -e --load-signer "${srcdir}/ocsp-tests/certs/ca.pem" --infile "${srcdir}/ocsp-tests/response1.der"
 rc=$?
 
