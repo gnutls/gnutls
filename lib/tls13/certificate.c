@@ -95,8 +95,7 @@ int _gnutls13_recv_certificate(gnutls_session_t session)
 		ret = decompress_certificate(session, &buf);
 		if (ret < 0) {
 			gnutls_assert();
-			gnutls_alert_send(session, GNUTLS_AL_FATAL,
-					  GNUTLS_A_BAD_CERTIFICATE);
+			ret = GNUTLS_E_CERTIFICATE_ERROR;
 			goto cleanup;
 		}
 	}
