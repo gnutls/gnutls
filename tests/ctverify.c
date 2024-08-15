@@ -111,26 +111,69 @@ static void verify_scts(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
 	gnutls_datum_t log_id, sig;
 	gnutls_sign_algorithm_t sigalg;
 	gnutls_ct_sct_t sct;
+	struct sct_entry {
+		int found;
+		const char *log_name;
+		char log_id[32];
+	} *expected, expected_scts[] = {
+		{
+			.found = 0,
+			.log_name = NULL,
+			.log_id = {
+				0x7A, 0x32, 0x8C, 0x54, 0xD8, 0xB7, 0x2D, 0xB6, 0x20, 0xEA, 0x38, 0xE0, 0x52, 0x1E, 0xE9, 0x84,
+                                0x16, 0x70, 0x32, 0x13, 0x85, 0x4D, 0x3B, 0xD2, 0x2B, 0xC1, 0x3A, 0x57, 0xA3, 0x52, 0xEB, 0x52
+			}
+		},
+		{
+			.found = 1,
+			.log_name = "argon2023",
+			.log_id = {
+				0xE8, 0x3E, 0xD0, 0xDA, 0x3E, 0xF5, 0x06, 0x35, 0x32, 0xE7, 0x57, 0x28, 0xBC, 0x89, 0x6B, 0xC9,
+                                0x03, 0xD3, 0xCB, 0xD1, 0x11, 0x6B, 0xEC, 0xEB, 0x69, 0xE1, 0x77, 0x7D, 0x6D, 0x06, 0xBD, 0x6E
+			}
+		}
+	};
+#define SCT_LOG_ID_SIZE 32
+	size_t num_expected_scts = sizeof(expected_scts) / sizeof(struct sct_entry);
 
-	retval = gnutls_x509_ct_sct_get(x509_cert_scts, 1,
-					&timestamp, &log_id, &sigalg, &sig);
-	if (retval == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
-		fail("gnutls_x509_ct_sct_get: GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE");
-	if (retval < 0)
-		fail("gnutls_x509_ct_sct_get failed");
+	for (unsigned i = 0; ; i++) {
+		retval = gnutls_x509_ct_sct_get(x509_cert_scts, i,
+						&timestamp, &log_id, &sigalg, &sig);
+		if (retval == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+			if (i < num_expected_scts)
+				fail("gnutls_x509_ct_sct_get: GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE");
+			break;
+		}
+		if (retval < 0)
+			fail("gnutls_x509_ct_sct_get failed");
 
-	retval = gnutls_ct_sct_init(&sct,
-				    &log_id, sigalg, &sig, timestamp);
-	if (retval < 0)
-		fail("gnutls_ct_sct_init failed");
+		if (i == num_expected_scts)
+			fail("Certificate contains more SCTs than expected");
 
-	retval = gnutls_ct_verify(sct, cert, issuer, ct_logs_store, &log_name);
-	if (retval == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
-		fail("gnutls_ct_verify: GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE");
-	if (retval < 0)
-		fail("gnutls_ct_verify failed");
-	if (strcmp(log_name, "argon2023"))
-		fail("Unexpected log name");
+		expected = &expected_scts[i];
+		if (log_id.size != SCT_LOG_ID_SIZE)
+			fail("Log ID lengths do not match");
+		if (memcmp(log_id.data, expected->log_id, SCT_LOG_ID_SIZE))
+			fail("Log ID does not match");
+
+		retval = gnutls_ct_sct_init(&sct,
+					    &log_id, sigalg, &sig, timestamp);
+		if (retval < 0)
+			fail("gnutls_ct_sct_init failed");
+
+		retval = gnutls_ct_verify(sct, cert, issuer, ct_logs_store, &log_name);
+		if (retval == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+			if (expected->found)
+				fail("gnutls_ct_verify: GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE");
+
+			continue;
+		}
+		if (retval < 0)
+			fail("gnutls_ct_verify failed");
+
+		if (strcmp(log_name, expected->log_name))
+			fail("Unexpected log name");
+	}
 }
 
 static gnutls_x509_ct_scts_t read_scts_from_certificate(const gnutls_datum_t *ext)
