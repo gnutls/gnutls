@@ -70,12 +70,3 @@ name = drbg_aes_reseed
 
 # The following should be removed in the new release, after updating the
 # abi-dump repository:
-[suppress_function]
-name = gnutls_pkcs12_generate_mac3
-
-[suppress_type]
-name = gnutls_mac_algorithm_t
-changed_enumerators = GNUTLS_MAC_PBMAC1
-
-[suppress_function]
-name = gnutls_hash_squeeze
