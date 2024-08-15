@@ -1,5 +1,7 @@
 # Release process
 
+## General steps
+
 1. Create a new 'milestone' for the next release and move all issues
    present in the current release milestone.
 1. Verification of release notes: ensure that release notes
@@ -47,6 +49,13 @@
    [gnutls web site].
 1. Optionally announce the release on the @GnuTLS twitter account.
 1. Close the current release milestone.
+
+## Distribution specific steps
+
+- To update Fedora, you can use the [packit](http://packit.dev/) tool
+  to submit pull-requests to the package repository. Install the tool
+  and run `packit propose-downstream . $VERSION` in the checkout
+  directory.
 
 [abi-dump repository]: https://gitlab.com/gnutls/abi-dump
 [NEWS entry]: https://gitlab.com/gnutls/web-pages/-/tree/master/news-entries
