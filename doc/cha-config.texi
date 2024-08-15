@@ -27,7 +27,7 @@ used can be queried using @funcref{gnutls_get_system_config_file}.
 * Overriding the parameter verification profile::
 * Overriding the default priority string::
 * Enabling/Disabling system/acceleration protocols::
-* Enabling/Disabling RSAES-PKCS1-v1_5
+* Enabling/Disabling RSAES-PKCS1-v1_5::
 @end menu
 
 @node Application-specific priority strings

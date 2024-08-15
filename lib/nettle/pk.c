@@ -4049,7 +4049,9 @@ static int wrap_nettle_pk_verify_priv_params(gnutls_pk_algorithm_t algo,
 		if (_gnutls_liboqs_ensure() < 0 ||
 		    !GNUTLS_OQS_FUNC(OQS_KEM_alg_is_enabled)(
 			    OQS_KEM_alg_kyber_768))
-			ret = gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
+			return gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
+
+		ret = 0;
 		break;
 #endif
 #if ENABLE_GOST
