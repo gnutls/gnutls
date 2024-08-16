@@ -1158,7 +1158,7 @@ if test x$ac_brotli != xno; then
 else
     AC_MSG_RESULT(no)
 fi
-AM_CONDITIONAL(HAVE_LIBBROTLI, test "$with_libbrotlienc" != "no" && test "$with_libbrotlidec" != "no")
+AM_CONDITIONAL(HAVE_LIBBROTLI, test "$with_libbrotlienc" = yes && test "$with_libbrotlidec" = yes)
 
 AS_IF([test "$ac_cv_dlopen_soname_works" = yes], [
     save_CFLAGS=$CFLAGS
@@ -1203,7 +1203,7 @@ if test x$ac_zstd != xno; then
 else
     AC_MSG_RESULT(no)
 fi
-AM_CONDITIONAL(HAVE_LIBZSTD, test "$with_libzstd" != "no")
+AM_CONDITIONAL(HAVE_LIBZSTD, test "$with_libzstd" = yes)
 
 AS_IF([test "$ac_cv_dlopen_soname_works" = yes], [
     save_CFLAGS=$CFLAGS
