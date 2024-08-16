@@ -1100,11 +1100,6 @@ if test x$ac_zlib != xno; then
     PKG_CHECK_EXISTS(zlib, ZLIB_HAS_PKGCONFIG=y, ZLIB_HAS_PKGCONFIG=n)
     if test "$ZLIB_HAS_PKGCONFIG" = "y" ; then
         PKG_CHECK_MODULES(ZLIB, [zlib])
-	if test "x$GNUTLS_REQUIRES_PRIVATE" = x; then
-	    GNUTLS_REQUIRES_PRIVATE="Requires.private: zlib"
-	else
-	    GNUTLS_REQUIRES_PRIVATE="$GNUTLS_REQUIRES_PRIVATE, zlib"
-	fi
 	ac_zlib=yes
     else
 	AC_LIB_HAVE_LINKFLAGS(z,, [#include <zlib.h>], [compress (0, 0, 0, 0);])
@@ -1134,6 +1129,13 @@ AS_IF([test "$ac_cv_dlopen_soname_works" = yes], [
                    compress (0, 0, 0, 0);])])
     LIBS="$save_LIBS"
     CFLAGS="$save_CFLAGS"
+],
+      [test "$ZLIB_HAS_PKGCONFIG" = y && test "$ac_zlib" = yes], [
+    if test "x$GNUTLS_REQUIRES_PRIVATE" = x; then
+        GNUTLS_REQUIRES_PRIVATE="Requires.private: zlib"
+    else
+        GNUTLS_REQUIRES_PRIVATE="$GNUTLS_REQUIRES_PRIVATE, zlib"
+    fi
 ])
 
 AC_ARG_WITH(brotli,
@@ -1146,11 +1148,6 @@ if test x$ac_brotli != xno; then
     PKG_CHECK_MODULES(LIBBROTLIDEC, [libbrotlidec >= 1.0.0], [with_libbrotlidec=yes], [with_libbrotlidec=no])
     if test "${with_libbrotlienc}" = "yes" && test "${with_libbrotlidec}" = "yes"; then
 	AC_DEFINE([HAVE_LIBBROTLI], 1, [Define if BROTLI compression is enabled.])
-	if test "x$GNUTLS_REQUIRES_PRIVATE" = "x"; then
-	    GNUTLS_REQUIRES_PRIVATE="Requires.private: libbrotlienc, libbrotlidec"
-	else
-	    GNUTLS_REQUIRES_PRIVATE="${GNUTLS_REQUIRES_PRIVATE}, libbrotlienc, libbrotlidec"
-	fi
 	need_ltlibdl=yes
     else
 	AC_MSG_WARN(*** LIBBROTLI was not found. You will not be able to use BROTLI compression.)
@@ -1180,6 +1177,13 @@ AS_IF([test "$ac_cv_dlopen_soname_works" = yes], [
            BrotliDecoderVersion();])])
     LIBS="$save_LIBS"
     CFLAGS="$save_CFLAGS"
+],
+      [test "$with_libbrotlienc" = yes && test "$with_libbrotlidec" = yes], [
+    if test "x$GNUTLS_REQUIRES_PRIVATE" = "x"; then
+        GNUTLS_REQUIRES_PRIVATE="Requires.private: libbrotlienc, libbrotlidec"
+    else
+        GNUTLS_REQUIRES_PRIVATE="${GNUTLS_REQUIRES_PRIVATE}, libbrotlienc, libbrotlidec"
+    fi
 ])
 
 AC_ARG_WITH(zstd,
@@ -1191,11 +1195,6 @@ if test x$ac_zstd != xno; then
     PKG_CHECK_MODULES(LIBZSTD, [libzstd >= 1.3.0], [with_libzstd=yes], [with_libzstd=no])
     if test "${with_libzstd}" = "yes"; then
 	AC_DEFINE([HAVE_LIBZSTD], 1, [Define if ZSTD compression is enabled.])
-	if test "x$GNUTLS_REQUIRES_PRIVATE" = "x"; then
-	    GNUTLS_REQUIRES_PRIVATE="Requires.private: libzstd"
-	else
-	    GNUTLS_REQUIRES_PRIVATE="${GNUTLS_REQUIRES_PRIVATE}, libzstd"
-	fi
 	need_ltlibdl=yes
     else
 	AC_MSG_WARN(*** LIBZSTD was not found. You will not be able to use ZSTD compression.)
@@ -1215,6 +1214,13 @@ AS_IF([test "$ac_cv_dlopen_soname_works" = yes], [
            ZSTD_versionNumber();])])
     LIBS="$save_LIBS"
     CFLAGS="$save_CFLAGS"
+],
+      [test "$with_libzstd" = yes], [
+    if test "x$GNUTLS_REQUIRES_PRIVATE" = "x"; then
+        GNUTLS_REQUIRES_PRIVATE="Requires.private: libzstd"
+    else
+        GNUTLS_REQUIRES_PRIVATE="${GNUTLS_REQUIRES_PRIVATE}, libzstd"
+    fi
 ])
 
 AC_ARG_WITH(liboqs,
