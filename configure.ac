@@ -1256,6 +1256,13 @@ AS_IF([test "$ac_cv_dlopen_soname_works" = yes], [
                    OQS_version ();])])
     LIBS="$save_LIBS"
     CFLAGS="$save_CFLAGS"
+],
+      [test "$have_liboqs" = yes], [
+    if test "x$GNUTLS_REQUIRES_PRIVATE" = x; then
+        GNUTLS_REQUIRES_PRIVATE="Requires.private: liboqs"
+    else
+        GNUTLS_REQUIRES_PRIVATE="$GNUTLS_REQUIRES_PRIVATE, liboqs"
+    fi
 ])
 
 AM_CONDITIONAL(NEED_LTLIBDL, test "$need_ltlibdl" = yes)
