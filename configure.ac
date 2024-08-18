@@ -955,6 +955,7 @@ AM_CONDITIONAL(P11KIT_0_23_11_API, $PKG_CONFIG --atleast-version=0.23.11 p11-kit
 
 AM_CONDITIONAL(ENABLE_PKCS11, test "$with_p11_kit" != "no")
 
+AC_MSG_CHECKING([whether we can dlopen helper-libraries])
 save_LIBS=$LIBS
 LIBS="$LIBS -lm"
 LIBGNUTLS_CHECK_SONAME([m], [AC_LANG_PROGRAM([
@@ -974,6 +975,8 @@ AC_RUN_IFELSE(
   [ac_cv_dlopen_soname_works=yes],
   [ac_cv_dlopen_soname_works=no],
   [ac_cv_dlopen_soname_works=cross-compiling])
+
+AC_MSG_RESULT([$ac_cv_dlopen_soname_works])
 
 AM_CONDITIONAL([ENABLE_DLOPEN], [test "$ac_cv_dlopen_soname_works" = yes])
 need_ltlibdl=no
