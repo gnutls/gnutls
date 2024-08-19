@@ -94,7 +94,7 @@ if HAVE_ZLIB
 COBJECTS += dlwrap/zlib.c dlwrap/zlibfuncs.h dlwrap/zlib.h
 AM_CPPFLAGS += $(ZLIB_CFLAGS)
 
-if ENABLE_DLOPEN
+if ZLIB_ENABLE_DLOPEN
 AM_CPPFLAGS += -DGNUTLS_ZLIB_ENABLE_DLOPEN=1
 else
 thirdparty_libadd += $(ZLIB_LIBS)

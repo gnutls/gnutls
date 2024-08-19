@@ -1096,44 +1096,53 @@ AC_CHECK_SIZEOF(unsigned long int, 4)
 AC_CHECK_SIZEOF(unsigned int, 4)
 AC_CHECK_SIZEOF(time_t, 4)
 
-AC_ARG_WITH(zlib, AS_HELP_STRING([--without-zlib],
-                                 [disable zlib compression support]),
-            ac_zlib=$withval, ac_zlib=yes)
-if test x$ac_zlib != xno; then
-    PKG_CHECK_EXISTS(zlib, ZLIB_HAS_PKGCONFIG=y, ZLIB_HAS_PKGCONFIG=n)
-    if test "$ZLIB_HAS_PKGCONFIG" = "y" ; then
-        PKG_CHECK_MODULES(ZLIB, [zlib])
-	ac_zlib=yes
-    else
-	AC_LIB_HAVE_LINKFLAGS(z,, [#include <zlib.h>], [compress (0, 0, 0, 0);])
-	if test x$ac_cv_libz != xyes; then
+AC_ARG_WITH(zlib,
+   [AS_HELP_STRING([--with-zlib=yes/link/dlopen/no --without-zlib],
+                  [customize/disable zlib compression support])],
+            ac_zlib=$withval, ac_zlib=yes zlib_optional=yes)
+AS_CASE([$ac_zlib],
+  [yes],
+    [AM_COND_IF([ENABLE_DLOPEN], [ac_zlib=dlopen], [ac_zlib=link])],
+  [dlopen],
+    [AM_COND_IF([ENABLE_DLOPEN], [:],[AC_MSG_ERROR([[
+***
+*** Unable to dlopen ZLIB, try --with-zlib=link.
+*** ]])])],
+  [link], [:],
+  [no], [:],
+  [AC_MSG_ERROR([[Unknown argument ${ac_zlib} for --with-zlib]])])
+
+
+AS_IF([test x$ac_zlib != xno],
+    [PKG_CHECK_MODULES([ZLIB],[zlib],,
+	    [ac_zlib=no
+      AS_IF([test x$zlib_optional != xyes],
+        AC_MSG_ERROR([zlib requested but not available]))
 	    AC_MSG_WARN([[
 *** 
 *** ZLIB was not found. You will not be able to use ZLIB compression.
 *** ]])
-        fi
-	ac_zlib=$ac_cv_libz
-	ZLIB_LIBS=$LIBZ
-	LIBZ_PC=$LIBZ
-    fi
-fi
+      ])])
+
 if test x$ac_zlib != xno; then
     AC_DEFINE([HAVE_LIBZ], 1, [Define if ZLIB compression is enabled.])
     need_ltlibdl=yes
 fi
-AM_CONDITIONAL(HAVE_ZLIB, test "$ac_zlib" = "yes")
-AC_SUBST(LIBZ_PC)
+AM_CONDITIONAL(HAVE_ZLIB, test "$ac_zlib" != "no")
 
-AS_IF([test "$ac_cv_dlopen_soname_works" = yes], [
+AM_CONDITIONAL([ZLIB_ENABLE_DLOPEN], [test "$ac_zlib" = dlopen])
+AS_IF([test "$ac_zlib" = dlopen], [
+    save_CFLAGS=$CFLAGS
+    CFLAGS="$CFLAGS $ZLIB_CFLAGS"
     save_LIBS=$LIBS
     LIBS="$LIBS $ZLIB_LIBS"
     LIBGNUTLS_CHECK_SONAME([z], [AC_LANG_PROGRAM([
                    #include <zlib.h>],[
                    compress (0, 0, 0, 0);])])
-    LIBS="$save_LIBS"
     CFLAGS="$save_CFLAGS"
+    LIBS="$save_LIBS"
 ],
-      [test "$ZLIB_HAS_PKGCONFIG" = y && test "$ac_zlib" = yes], [
+    [test "$ac_zlib" = link], [
     if test "x$GNUTLS_REQUIRES_PRIVATE" = x; then
         GNUTLS_REQUIRES_PRIVATE="Requires.private: zlib"
     else
