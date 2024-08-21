@@ -157,14 +157,6 @@ void _gnutls_fips_mode_reset_zombie(void)
 #define GNUTLS_LIBRARY_SONAME "none"
 #endif
 
-#ifndef NETTLE_LIBRARY_SONAME
-#define NETTLE_LIBRARY_SONAME "none"
-#endif
-
-#ifndef HOGWEED_LIBRARY_SONAME
-#define HOGWEED_LIBRARY_SONAME "none"
-#endif
-
 #define HMAC_SIZE 32
 #define HMAC_ALGO GNUTLS_MAC_SHA256
 #define HMAC_FORMAT_VERSION 1
@@ -177,8 +169,12 @@ struct hmac_entry {
 struct hmac_file {
 	int version;
 	struct hmac_entry gnutls;
+#ifdef NETTLE_LIBRARY_SONAME
 	struct hmac_entry nettle;
+#endif
+#ifdef HOGWEED_LIBRARY_SONAME
 	struct hmac_entry hogweed;
+#endif
 #ifdef GMP_LIBRARY_SONAME
 	struct hmac_entry gmp;
 #endif
@@ -186,8 +182,12 @@ struct hmac_file {
 
 struct lib_paths {
 	char gnutls[GNUTLS_PATH_MAX];
+#ifdef NETTLE_LIBRARY_SONAME
 	char nettle[GNUTLS_PATH_MAX];
+#endif
+#ifdef HOGWEED_LIBRARY_SONAME
 	char hogweed[GNUTLS_PATH_MAX];
+#endif
 #ifdef GMP_LIBRARY_SONAME
 	char gmp[GNUTLS_PATH_MAX];
 #endif
@@ -250,10 +250,14 @@ static int handler(void *user, const char *section, const char *name,
 		}
 	} else if (!strcmp(section, GNUTLS_LIBRARY_SONAME)) {
 		return lib_handler(&p->gnutls, section, name, value);
+#ifdef NETTLE_LIBRARY_SONAME
 	} else if (!strcmp(section, NETTLE_LIBRARY_SONAME)) {
 		return lib_handler(&p->nettle, section, name, value);
+#endif
+#ifdef HOGWEED_LIBRARY_SONAME
 	} else if (!strcmp(section, HOGWEED_LIBRARY_SONAME)) {
 		return lib_handler(&p->hogweed, section, name, value);
+#endif
 #ifdef GMP_LIBRARY_SONAME
 	} else if (!strcmp(section, GMP_LIBRARY_SONAME)) {
 		return lib_handler(&p->gmp, section, name, value);
@@ -403,10 +407,14 @@ static int callback(struct dl_phdr_info *info, size_t size, void *data)
 
 	if (!strcmp(soname, GNUTLS_LIBRARY_SONAME))
 		_gnutls_str_cpy(paths->gnutls, GNUTLS_PATH_MAX, path);
+#ifdef NETTLE_LIBRARY_SONAME
 	else if (!strcmp(soname, NETTLE_LIBRARY_SONAME))
 		_gnutls_str_cpy(paths->nettle, GNUTLS_PATH_MAX, path);
+#endif
+#ifdef HOGWEED_LIBRARY_SONAME
 	else if (!strcmp(soname, HOGWEED_LIBRARY_SONAME))
 		_gnutls_str_cpy(paths->hogweed, GNUTLS_PATH_MAX, path);
+#endif
 #ifdef GMP_LIBRARY_SONAME
 	else if (!strcmp(soname, GMP_LIBRARY_SONAME))
 		_gnutls_str_cpy(paths->gmp, GNUTLS_PATH_MAX, path);
@@ -423,14 +431,18 @@ static int load_lib_paths(struct lib_paths *paths)
 		_gnutls_debug_log("Gnutls library path was not found\n");
 		return gnutls_assert_val(GNUTLS_E_FILE_ERROR);
 	}
+#ifdef NETTLE_LIBRARY_SONAME
 	if (paths->nettle[0] == '\0') {
 		_gnutls_debug_log("Nettle library path was not found\n");
 		return gnutls_assert_val(GNUTLS_E_FILE_ERROR);
 	}
+#endif
+#ifdef HOGWEED_LIBRARY_SONAME
 	if (paths->hogweed[0] == '\0') {
 		_gnutls_debug_log("Hogweed library path was not found\n");
 		return gnutls_assert_val(GNUTLS_E_FILE_ERROR);
 	}
+#endif
 #ifdef GMP_LIBRARY_SONAME
 	if (paths->gmp[0] == '\0') {
 		_gnutls_debug_log("Gmp library path was not found\n");
@@ -483,12 +495,16 @@ static int check_binary_integrity(void)
 	ret = check_lib_hmac(&hmac.gnutls, paths.gnutls);
 	if (ret < 0)
 		return ret;
+#ifdef NETTLE_LIBRARY_SONAME
 	ret = check_lib_hmac(&hmac.nettle, paths.nettle);
 	if (ret < 0)
 		return ret;
+#endif
+#ifdef HOGWEED_LIBRARY_SONAME
 	ret = check_lib_hmac(&hmac.hogweed, paths.hogweed);
 	if (ret < 0)
 		return ret;
+#endif
 #ifdef GMP_LIBRARY_SONAME
 	ret = check_lib_hmac(&hmac.gmp, paths.gmp);
 	if (ret < 0)
