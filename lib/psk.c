@@ -52,7 +52,7 @@ void gnutls_psk_free_client_credentials(gnutls_psk_client_credentials_t sc)
 
 /**
  * gnutls_psk_allocate_client_credentials:
- * @sc: is a pointer to a #gnutls_psk_server_credentials_t type.
+ * @sc: is a pointer to a #gnutls_psk_client_credentials_t type.
  *
  * Allocate a gnutls_psk_client_credentials_t structure.
  *
