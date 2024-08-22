@@ -189,6 +189,10 @@ int gnutls_credentials_set(gnutls_session_t session,
  * in case of a client, and #gnutls_srp_server_credentials_t, in case
  * of a server.
  *
+ * For %GNUTLS_CRD_PSK, @cred will be #gnutls_psk_client_credentials_t
+ * in case of a client, and #gnutls_psk_server_credentials_t, in case
+ * of a server.
+ *
  * For %GNUTLS_CRD_CERTIFICATE, @cred will be
  * #gnutls_certificate_credentials_t.
  *
