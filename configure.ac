@@ -1151,25 +1151,49 @@ AS_IF([test "$ac_zlib" = dlopen], [
 ])
 
 AC_ARG_WITH(brotli,
-	    AS_HELP_STRING([--without-brotli], [disable brotli compression support]),
-	    ac_brotli=$withval, ac_brotli=yes)
-AC_MSG_CHECKING([whether to include brotli compression support])
-if test x$ac_brotli != xno; then
-    AC_MSG_RESULT(yes)
-    PKG_CHECK_MODULES(LIBBROTLIENC, [libbrotlienc >= 1.0.0], [with_libbrotlienc=yes], [with_libbrotlienc=no])
-    PKG_CHECK_MODULES(LIBBROTLIDEC, [libbrotlidec >= 1.0.0], [with_libbrotlidec=yes], [with_libbrotlidec=no])
-    if test "${with_libbrotlienc}" = "yes" && test "${with_libbrotlidec}" = "yes"; then
-	AC_DEFINE([HAVE_LIBBROTLI], 1, [Define if BROTLI compression is enabled.])
-	need_ltlibdl=yes
-    else
-	AC_MSG_WARN(*** LIBBROTLI was not found. You will not be able to use BROTLI compression.)
-    fi
-else
-    AC_MSG_RESULT(no)
-fi
-AM_CONDITIONAL(HAVE_LIBBROTLI, test "$with_libbrotlienc" = yes && test "$with_libbrotlidec" = yes)
+   [AS_HELP_STRING([--with-brotli=yes/link/dlopen/no --without-brotli],
+                  [customize/disable brotli compression support])],
+            ac_brotli=$withval, ac_brotli=yes brotli_optional=yes)
+AS_CASE([$ac_brotli],
+  [yes],
+    [AM_COND_IF([ENABLE_DLOPEN], [ac_brotli=dlopen], [ac_brotli=link])],
+  [dlopen],
+    [AM_COND_IF([ENABLE_DLOPEN], [:],[AC_MSG_ERROR([[
+***
+*** Unable to dlopen BROTLI, try --with-brotli=link.
+*** ]])])],
+  [link], [:],
+  [no], [:],
+  [AC_MSG_ERROR([[Unknown argument ${ac_brotli} for --with-brotli]])])
 
-AS_IF([test "$ac_cv_dlopen_soname_works" = yes], [
+
+AS_IF([test x$ac_brotli != xno],
+  [PKG_CHECK_MODULES([LIBBROTLIENC],[libbrotlienc >= 1.0.0],
+    [PKG_CHECK_MODULES([LIBBROTLIDEC],[libbrotlidec >= 1.0.0],
+      [ac_found_brotli_enc_dec=yes],[ac_found_brotli_enc_dec=no])]
+    ,[ac_found_brotli_enc_dec=no])
+  ]
+)
+
+AS_IF([test x$ac_brotli != xno && test x$ac_found_brotli_enc_dec != xyes ],
+  [ac_brotli=no
+  AS_IF([test x$brotli_optional != xyes],
+    AC_MSG_ERROR([libbrotli support requested but not available]))
+  AC_MSG_WARN([[
+***
+*** LIBBROTLI was not found. You will not be able to use BROTLI compression.
+*** ]])
+  ]
+)
+
+if test x$ac_brotli != xno; then
+    AC_DEFINE([HAVE_LIBBROTLI], 1, [Define if BROTLI compression is enabled.])
+    need_ltlibdl=yes
+fi
+AM_CONDITIONAL(HAVE_LIBBROTLI, test "$ac_brotli" != "no")
+
+AM_CONDITIONAL([BROTLI_ENABLE_DLOPEN], [test "$ac_brotli" = dlopen])
+AS_IF([test "$ac_brotli" = dlopen], [
     save_CFLAGS=$CFLAGS
     CFLAGS="$CFLAGS $LIBBROTLIENC_CFLAGS"
     save_LIBS=$LIBS
@@ -1177,24 +1201,20 @@ AS_IF([test "$ac_cv_dlopen_soname_works" = yes], [
     LIBGNUTLS_CHECK_SONAME([brotlienc], [AC_LANG_PROGRAM([
            #include <brotli/encode.h>],[
            BrotliEncoderVersion();])])
-    LIBS="$save_LIBS"
-    CFLAGS="$save_CFLAGS"
 
-    save_CFLAGS=$CFLAGS
-    CFLAGS="$CFLAGS $LIBBROTLIDEC_CFLAGS"
-    save_LIBS=$LIBS
-    LIBS="$LIBS $LIBBROTLIDEC_LIBS"
+    CFLAGS="$save_CFLAGS $LIBBROTLIDEC_CFLAGS"
+    LIBS="$save_LIBS $LIBBROTLIDEC_LIBS"
     LIBGNUTLS_CHECK_SONAME([brotlidec], [AC_LANG_PROGRAM([
            #include <brotli/decode.h>],[
            BrotliDecoderVersion();])])
-    LIBS="$save_LIBS"
     CFLAGS="$save_CFLAGS"
+    LIBS="$save_LIBS"
 ],
-      [test "$with_libbrotlienc" = yes && test "$with_libbrotlidec" = yes], [
-    if test "x$GNUTLS_REQUIRES_PRIVATE" = "x"; then
+    [test "$ac_brotli" = link], [
+    if test "x$GNUTLS_REQUIRES_PRIVATE" = x; then
         GNUTLS_REQUIRES_PRIVATE="Requires.private: libbrotlienc, libbrotlidec"
     else
-        GNUTLS_REQUIRES_PRIVATE="${GNUTLS_REQUIRES_PRIVATE}, libbrotlienc, libbrotlidec"
+        GNUTLS_REQUIRES_PRIVATE="$GNUTLS_REQUIRES_PRIVATE, libbrotlienc, libbrotlidec"
     fi
 ])
 
