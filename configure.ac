@@ -1199,39 +1199,56 @@ AS_IF([test "$ac_cv_dlopen_soname_works" = yes], [
 ])
 
 AC_ARG_WITH(zstd,
-	    AS_HELP_STRING([--without-zstd], [disable zstd compression support]),
-	    ac_zstd=$withval, ac_zstd=yes)
-AC_MSG_CHECKING([whether to include zstd compression support])
-if test x$ac_zstd != xno; then
-    AC_MSG_RESULT(yes)
-    PKG_CHECK_MODULES(LIBZSTD, [libzstd >= 1.3.0], [with_libzstd=yes], [with_libzstd=no])
-    if test "${with_libzstd}" = "yes"; then
-	AC_DEFINE([HAVE_LIBZSTD], 1, [Define if ZSTD compression is enabled.])
-	need_ltlibdl=yes
-    else
-	AC_MSG_WARN(*** LIBZSTD was not found. You will not be able to use ZSTD compression.)
-    fi
-else
-    AC_MSG_RESULT(no)
-fi
-AM_CONDITIONAL(HAVE_LIBZSTD, test "$with_libzstd" = yes)
+   [AS_HELP_STRING([--with-zstd=yes/link/dlopen/no --without-zstd],
+                  [customize/disable zstd compression support])],
+            ac_libzstd=$withval, ac_libzstd=yes libzstd_optional=yes)
+AS_CASE([$ac_libzstd],
+  [yes],
+    [AM_COND_IF([ENABLE_DLOPEN], [ac_libzstd=dlopen], [ac_libzstd=link])],
+  [dlopen],
+    [AM_COND_IF([ENABLE_DLOPEN], [:],[AC_MSG_ERROR([[
+***
+*** Unable to dlopen LIBZSTD, try --with-libzstd=link.
+*** ]])])],
+  [link], [:],
+  [no], [:],
+  [AC_MSG_ERROR([[Unknown argument ${ac_libzstd} for --with-zstd]])])
 
-AS_IF([test "$ac_cv_dlopen_soname_works" = yes], [
+
+AS_IF([test x$ac_libzstd != xno],
+    [PKG_CHECK_MODULES([LIBZSTD],[libzstd],,
+	    [ac_libzstd=no
+      AS_IF([test x$libzstd_optional != xyes],
+        AC_MSG_ERROR([libzstd requested but not available]))
+	    AC_MSG_WARN([[
+***
+*** LIBZSTD was not found. You will not be able to use ZSTD compression.
+*** ]])
+      ])])
+
+if test x$ac_libzstd != xno; then
+    AC_DEFINE([HAVE_LIBZSTD], 1, [Define if ZSTD compression is enabled.])
+    need_ltlibdl=yes
+fi
+AM_CONDITIONAL(HAVE_LIBZSTD, test "$ac_libzstd" != "no")
+
+AM_CONDITIONAL([LIBZSTD_ENABLE_DLOPEN], [test "$ac_libzstd" = dlopen])
+AS_IF([test "$ac_libzstd" = dlopen], [
     save_CFLAGS=$CFLAGS
     CFLAGS="$CFLAGS $LIBZSTD_CFLAGS"
     save_LIBS=$LIBS
     LIBS="$LIBS $LIBZSTD_LIBS"
     LIBGNUTLS_CHECK_SONAME([zstd], [AC_LANG_PROGRAM([
-           #include <zstd.h>],[
-           ZSTD_versionNumber();])])
-    LIBS="$save_LIBS"
+                   #include <zstd.h>],[
+                   ZSTD_versionNumber();])])
     CFLAGS="$save_CFLAGS"
+    LIBS="$save_LIBS"
 ],
-      [test "$with_libzstd" = yes], [
-    if test "x$GNUTLS_REQUIRES_PRIVATE" = "x"; then
+    [test "$ac_libzstd" = link], [
+    if test "x$GNUTLS_REQUIRES_PRIVATE" = x; then
         GNUTLS_REQUIRES_PRIVATE="Requires.private: libzstd"
     else
-        GNUTLS_REQUIRES_PRIVATE="${GNUTLS_REQUIRES_PRIVATE}, libzstd"
+        GNUTLS_REQUIRES_PRIVATE="$GNUTLS_REQUIRES_PRIVATE, libzstd"
     fi
 ])
 

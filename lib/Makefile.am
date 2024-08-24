@@ -105,7 +105,7 @@ if HAVE_LIBZSTD
 COBJECTS += dlwrap/zstd.c dlwrap/zstdfuncs.h dlwrap/zstd.h
 AM_CPPFLAGS += $(LIBZSTD_CFLAGS)
 
-if ENABLE_DLOPEN
+if LIBZSTD_ENABLE_DLOPEN
 AM_CPPFLAGS += -DGNUTLS_ZSTD_ENABLE_DLOPEN=1
 else
 thirdparty_libadd += $(LIBZSTD_LIBS)
