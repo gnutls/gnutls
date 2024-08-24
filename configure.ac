@@ -1125,7 +1125,7 @@ AS_IF([test x$ac_zlib != xno],
       ])])
 
 if test x$ac_zlib != xno; then
-    AC_DEFINE([HAVE_LIBZ], 1, [Define if ZLIB compression is enabled.])
+    AC_DEFINE([HAVE_ZLIB], 1, [Define if ZLIB compression is enabled.])
     need_ltlibdl=yes
 fi
 AM_CONDITIONAL(HAVE_ZLIB, test "$ac_zlib" != "no")
