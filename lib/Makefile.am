@@ -131,7 +131,7 @@ if ENABLE_LIBOQS
 COBJECTS += dlwrap/oqs.c dlwrap/oqsfuncs.h dlwrap/oqs.h
 AM_CPPFLAGS += $(LIBOQS_CFLAGS)
 
-if ENABLE_DLOPEN
+if LIBOQS_ENABLE_DLOPEN
 AM_CPPFLAGS += -DGNUTLS_OQS_ENABLE_DLOPEN=1
 else
 thirdparty_libadd += $(LIBOQS_LIBS)

@@ -30,7 +30,7 @@ AM_CPPFLAGS = \
 	-I$(builddir)/../includes	\
 	-I$(srcdir)/..
 
-if ENABLE_DLOPEN
+if LIBOQS_ENABLE_DLOPEN
 AM_CPPFLAGS += $(LIBOQS_CFLAGS) -DGNUTLS_OQS_ENABLE_DLOPEN=1
 endif
 

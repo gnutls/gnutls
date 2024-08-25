@@ -1273,29 +1273,41 @@ AS_IF([test "$ac_libzstd" = dlopen], [
 ])
 
 AC_ARG_WITH(liboqs,
-	AS_HELP_STRING([--with-liboqs],
-		[Enable liboqs support.]),
-	[with_liboqs=$withval], [with_liboqs=no])
-AS_IF([test "$with_liboqs" != no], [PKG_CHECK_MODULES(LIBOQS, [liboqs >= 0.10.1], [have_liboqs=yes], [have_liboqs=no])])
-AS_IF([test "$have_liboqs" = yes], [AC_DEFINE([HAVE_LIBOQS], 1, [Have liboqs])],
-      [test "$with_liboqs" = yes], [AC_MSG_ERROR([[
+   [AS_HELP_STRING([--with-liboqs=yes/link/dlopen --with-liboqs],
+                  [customize/enable liboqs support])],
+            ac_liboqs=$withval, ac_liboqs=no)
+AS_CASE([$ac_liboqs],
+  [yes],
+    [AM_COND_IF([ENABLE_DLOPEN], [ac_liboqs=dlopen], [ac_liboqs=link])],
+  [dlopen],
+    [AM_COND_IF([ENABLE_DLOPEN], [:],[AC_MSG_ERROR([[
 ***
-*** liboqs support was requested but the required libraries were not found.
-*** ]])])
+*** Unable to dlopen LIBOQS, try --with-liboqs.
+*** ]])])],
+  [link], [:],
+  [no], [:],
+  [AC_MSG_ERROR([[Unknown argument ${ac_liboqs} for --with-liboqs]])])
 
-save_CFLAGS=$CFLAGS
-CFLAGS="$CFLAGS $LIBOQS_CFLAGS"
-AC_CHECK_DECLS([OQS_SHA3_set_callbacks])
-CFLAGS="$save_CFLAGS"
 
-# liboqs 0.10.1 didn't expose OQS_SHA3_set_callbacks from the header
-# file, so extra treatment is needed:
-# https://github.com/open-quantum-safe/liboqs/pull/1832
-AM_CONDITIONAL(NEED_LIBOQS_SHA3_OPS_H, test "$ac_cv_have_decl_OQS_SHA3_set_callbacks" != yes)
+AS_IF([test x$ac_liboqs != xno],
+    [PKG_CHECK_MODULES([LIBOQS],[liboqs >= 0.10.1],
+      [save_CFLAGS=$CFLAGS
+      CFLAGS="$CFLAGS $LIBOQS_CFLAGS"
+      AC_CHECK_DECLS([OQS_SHA3_set_callbacks])
+      CFLAGS="$save_CFLAGS"
+      # liboqs 0.10.1 didn't expose OQS_SHA3_set_callbacks from the header
+      # file, so extra treatment is needed:
+      # https://github.com/open-quantum-safe/liboqs/pull/1832
+      AC_DEFINE([HAVE_LIBOQS], 1, [Have liboqs])
+      need_ltlibdl=yes],
+      [AC_MSG_ERROR([liboqs support was requested but the required libraries were not found.])])])
 
-AM_CONDITIONAL(ENABLE_LIBOQS, test "$have_liboqs" = yes)
+AM_CONDITIONAL(ENABLE_LIBOQS, test "$ac_liboqs" != "no")
+AM_CONDITIONAL(NEED_LIBOQS_SHA3_OPS_H,
+  test "$ac_cv_have_decl_OQS_SHA3_set_callbacks" != yes)
+AM_CONDITIONAL([LIBOQS_ENABLE_DLOPEN], [test "$ac_liboqs" = dlopen])
 
-AS_IF([test "$ac_cv_dlopen_soname_works" = yes], [
+AS_IF([test "$ac_liboqs" = dlopen], [
     save_CFLAGS=$CFLAGS
     CFLAGS="$CFLAGS $LIBOQS_CFLAGS"
     save_LIBS=$LIBS
@@ -1303,10 +1315,10 @@ AS_IF([test "$ac_cv_dlopen_soname_works" = yes], [
     LIBGNUTLS_CHECK_SONAME([oqs], [AC_LANG_PROGRAM([
                    #include <oqs/oqs.h>],[
                    OQS_version ();])])
-    LIBS="$save_LIBS"
     CFLAGS="$save_CFLAGS"
+    LIBS="$save_LIBS"
 ],
-      [test "$have_liboqs" = yes], [
+    [test "$ac_liboqs" = link], [
     if test "x$GNUTLS_REQUIRES_PRIVATE" = x; then
         GNUTLS_REQUIRES_PRIVATE="Requires.private: liboqs"
     else
