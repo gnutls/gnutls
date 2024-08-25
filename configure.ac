@@ -982,9 +982,21 @@ AM_CONDITIONAL([ENABLE_DLOPEN], [test "$ac_cv_dlopen_soname_works" = yes])
 need_ltlibdl=no
 
 AC_ARG_WITH(tpm2,
-	AS_HELP_STRING([--without-tpm2],
-		[Disable TPM2 support.]),
-	[with_tpm2=$withval], [with_tpm2=auto])
+   [AS_HELP_STRING([--with-tpm2=yes/link/dlopen/no --without-tpm2],
+                  [customize/disable TPM2 support])],
+            with_tpm2=$withval, with_tpm2=yes tpm2_optional=yes)
+AS_CASE([$with_tpm2],
+  [yes],
+    [AM_COND_IF([ENABLE_DLOPEN], [with_tpm2=dlopen], [with_tpm2=link])],
+  [dlopen],
+    [AM_COND_IF([ENABLE_DLOPEN], [:],[AC_MSG_ERROR([[
+***
+*** Unable to dlopen TPM2, try --with-tpm2=link.
+*** ]])])],
+  [link], [:],
+  [no], [:],
+  [AC_MSG_ERROR([[Unknown argument ${with_tpm2} for --with-tpm2]])])
+
 AS_IF([test "$with_tpm2" != no], [
 	PKG_CHECK_MODULES(TSS2_ESYS, [tss2-esys],
 		[have_tss2_esys=yes], [have_tss2_esys=no])
@@ -993,24 +1005,26 @@ AS_IF([test "$with_tpm2" != no], [
 	PKG_CHECK_MODULES(TSS2_TCTILDR, [tss2-tctildr],
 		[have_tss2_tctildr=yes], [have_tss2_tctildr=no])
 ])
+
 AS_IF([test "$have_tss2_esys" = yes && test "$have_tss2_mu" = yes && test "$have_tss2_tctildr" = yes], [
 	tss2lib="tss2-esys tss2-mu tss2-tctildr"
 	AC_DEFINE([HAVE_TSS2], 1, [Have TSS2])
-	with_tpm2=yes
 	need_ltlibdl=yes
 ],
-      [test "$with_tpm2" = yes], [
+      [test x"$with_tpm2" != xno && test x$tpm2_optional != xyes ],[
 	AC_MSG_ERROR([[
 ***
 *** TPM2 support was requested but the required libraries were not found.
 *** To disable TPM2 support use --without-tpm2, otherwise you may get tpm2-tss from
 *** https://github.com/tpm2-software/tpm2-tss
-*** ]])
-])
+*** ]])],
+      [with_tpm2=no]
+)
 
 AM_CONDITIONAL(ENABLE_TPM2, test -n "$tss2lib")
+AM_CONDITIONAL([TPM2_ENABLE_DLOPEN], [test "$with_tpm2" = dlopen])
 
-AS_IF([test "$ac_cv_dlopen_soname_works" = yes], [
+AS_IF([test "$with_tpm2" = dlopen], [
     save_LIBS=$LIBS
     LIBS="$LIBS $TSS2_ESYS_LIBS"
     LIBGNUTLS_CHECK_SONAME([tss2-esys], [AC_LANG_PROGRAM([
