@@ -621,10 +621,7 @@ void read_crt_set(gnutls_x509_crt_t crt, const char *input_str, const char *oid)
 
 	fputs(input_str, stderr);
 	ret = getline(&lineptr, &linesize, stdin);
-	if (ret == -1)
-		return;
-
-	if (IS_NEWLINE(lineptr)) {
+	if (ret == -1 || IS_NEWLINE(lineptr)) {
 		free(lineptr);
 		return;
 	}
@@ -647,10 +644,7 @@ void read_crq_set(gnutls_x509_crq_t crq, const char *input_str, const char *oid)
 
 	fputs(input_str, stderr);
 	ret = getline(&lineptr, &linesize, stdin);
-	if (ret == -1)
-		return;
-
-	if (IS_NEWLINE(lineptr)) {
+	if (ret == -1 || IS_NEWLINE(lineptr)) {
 		free(lineptr);
 		return;
 	}
@@ -789,8 +783,10 @@ const char *read_str(const char *input_str)
 
 	fputs(input_str, stderr);
 	ret = getline(&lineptr, &linesize, stdin);
-	if (ret == -1)
+	if (ret == -1) {
+		free(lineptr);
 		return NULL;
+	}
 
 	ret = copystr_without_nl(input, sizeof(input), lineptr, ret);
 	free(lineptr);
