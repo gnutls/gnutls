@@ -613,8 +613,8 @@ gnutls_certificate_get_ocsp_expiration(gnutls_certificate_credentials_t sc,
  * explicit OCSP validity check on the peer's certificate. Should be called after
  * any of gnutls_certificate_verify_peers*() are called.
  *
- * This function is always usable on client side, but on server side only
- * under TLS 1.3, which is the first version of TLS that allows cliend-side OCSP
+ * This function is always usable on client side, but on server side only under
+ * TLS 1.3, which is the first version of TLS that allows clients to send OCSP
  * responses.
  *
  * Returns: Non-zero if the response was valid, or a zero if it wasn't sent,
