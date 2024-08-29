@@ -1921,6 +1921,7 @@ static int psk_callback(gnutls_session_t session, char **username,
 
 		if (ret == -1 || p == NULL) {
 			fprintf(stderr, "No username given, aborting...\n");
+			free(p);
 			return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 		}
 
