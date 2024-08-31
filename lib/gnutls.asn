@@ -189,7 +189,7 @@ TPMKey ::= SEQUENCE {
     privkey         OCTET STRING
 }
 
-DilithiumPrivateKey ::= SEQUENCE {
+MLDSAPrivateKey ::= SEQUENCE {
 	version                  INTEGER,
 	privateKeyAlgorithm      AlgorithmIdentifier,
 	privateKey               OCTET STRING,

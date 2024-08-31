@@ -279,7 +279,7 @@ void gnutls_pk_params_init(gnutls_pk_params_st *p);
 #define ECC_PRIVATE_PARAMS 3
 #define GOST_PRIVATE_PARAMS 3
 #ifdef HAVE_LIBOQS
-#define DILITHIUM_PRIVATE_PARAMS 4
+#define ML_DSA_PRIVATE_PARAMS 4
 #define FALCON_PRIVATE_PARAMS 4
 #define SPHINCS_PRIVATE_PARAMS 4
 #endif

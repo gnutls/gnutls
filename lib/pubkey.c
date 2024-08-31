@@ -60,18 +60,12 @@ struct OQS_alg_pubkey_bits {
 };
 
 struct OQS_alg_pubkey_bits pqc_pubkey_bits[] = {
-#if defined(GNUTLS_PK_EXP_DILITHIUM2) && \
-	defined(OQS_SIG_dilithium_2_length_public_key)
-	{ GNUTLS_PK_EXP_DILITHIUM2, OQS_SIG_dilithium_2_length_public_key },
-#endif
-#if defined(GNUTLS_PK_EXP_DILITHIUM3) && \
-	defined(OQS_SIG_dilithium_3_length_public_key)
-	{ GNUTLS_PK_EXP_DILITHIUM3, OQS_SIG_dilithium_3_length_public_key },
-#endif
-#if defined(GNUTLS_PK_EXP_DILITHIUM5) && \
-	defined(OQS_SIG_dilithium_5_length_public_key)
-	{ GNUTLS_PK_EXP_DILITHIUM5, OQS_SIG_dilithium_5_length_public_key },
-#endif
+	{ GNUTLS_PK_EXP_ML_DSA_44_IPD,
+	  OQS_SIG_ml_dsa_44_ipd_length_public_key },
+	{ GNUTLS_PK_EXP_ML_DSA_65_IPD,
+	  OQS_SIG_ml_dsa_65_ipd_length_public_key },
+	{ GNUTLS_PK_EXP_ML_DSA_87_IPD,
+	  OQS_SIG_ml_dsa_87_ipd_length_public_key },
 	{ GNUTLS_PK_EXP_FALCON512, OQS_SIG_falcon_512_length_public_key },
 	{ GNUTLS_PK_EXP_FALCON1024, OQS_SIG_falcon_1024_length_public_key },
 	{ GNUTLS_PK_EXP_SPHINCS_SHA2_128F,
@@ -135,9 +129,9 @@ unsigned pubkey_to_bits(const gnutls_pk_params_st *params)
 	case GNUTLS_PK_GOST_12_512:
 		return gnutls_ecc_curve_get_size(params->curve) * 8;
 #ifdef HAVE_LIBOQS
-	case GNUTLS_PK_EXP_DILITHIUM2:
-	case GNUTLS_PK_EXP_DILITHIUM3:
-	case GNUTLS_PK_EXP_DILITHIUM5:
+	case GNUTLS_PK_EXP_ML_DSA_44_IPD:
+	case GNUTLS_PK_EXP_ML_DSA_65_IPD:
+	case GNUTLS_PK_EXP_ML_DSA_87_IPD:
 	case GNUTLS_PK_EXP_FALCON512:
 	case GNUTLS_PK_EXP_FALCON1024:
 	case GNUTLS_PK_EXP_SPHINCS_SHA2_128F:
@@ -439,9 +433,9 @@ int gnutls_pubkey_get_preferred_hash_algorithm(gnutls_pubkey_t key,
 		ret = 0;
 		break;
 #ifdef HAVE_LIBOQS
-	case GNUTLS_PK_EXP_DILITHIUM2:
-	case GNUTLS_PK_EXP_DILITHIUM3:
-	case GNUTLS_PK_EXP_DILITHIUM5:
+	case GNUTLS_PK_EXP_ML_DSA_44_IPD:
+	case GNUTLS_PK_EXP_ML_DSA_65_IPD:
+	case GNUTLS_PK_EXP_ML_DSA_87_IPD:
 	case GNUTLS_PK_EXP_FALCON512:
 	case GNUTLS_PK_EXP_FALCON1024:
 	case GNUTLS_PK_EXP_SPHINCS_SHAKE_128F:
@@ -2764,9 +2758,9 @@ int pubkey_verify_data(const gnutls_sign_entry_st *se, const mac_entry_st *me,
 	case GNUTLS_PK_EDDSA_ED25519:
 	case GNUTLS_PK_EDDSA_ED448:
 #ifdef HAVE_LIBOQS
-	case GNUTLS_PK_EXP_DILITHIUM2:
-	case GNUTLS_PK_EXP_DILITHIUM3:
-	case GNUTLS_PK_EXP_DILITHIUM5:
+	case GNUTLS_PK_EXP_ML_DSA_44_IPD:
+	case GNUTLS_PK_EXP_ML_DSA_65_IPD:
+	case GNUTLS_PK_EXP_ML_DSA_87_IPD:
 	case GNUTLS_PK_EXP_FALCON512:
 	case GNUTLS_PK_EXP_FALCON1024:
 	case GNUTLS_PK_EXP_SPHINCS_SHA2_128F:

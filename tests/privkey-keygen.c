@@ -178,9 +178,9 @@ void doit(void)
 #endif
 			}
 #ifndef HAVE_LIBOQS
-			if (algorithm == GNUTLS_PK_EXP_DILITHIUM2 ||
-			    algorithm == GNUTLS_PK_EXP_DILITHIUM3 ||
-			    algorithm == GNUTLS_PK_EXP_DILITHIUM5 ||
+			if (algorithm == GNUTLS_PK_EXP_ML_DSA_44_IPD ||
+			    algorithm == GNUTLS_PK_EXP_ML_DSA_65_IPD ||
+			    algorithm == GNUTLS_PK_EXP_ML_DSA_87_IPD ||
 			    algorithm == GNUTLS_PK_EXP_FALCON512 ||
 			    algorithm == GNUTLS_PK_EXP_FALCON1024 ||
 			    algorithm == GNUTLS_PK_EXP_SPHINCS_SHA2_128F ||

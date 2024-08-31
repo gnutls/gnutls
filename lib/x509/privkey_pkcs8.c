@@ -83,9 +83,9 @@ inline static int _encode_privkey(gnutls_x509_privkey_t pkey,
 			gnutls_assert();
 		return ret;
 #ifdef HAVE_LIBOQS
-	case GNUTLS_PK_EXP_DILITHIUM2:
-	case GNUTLS_PK_EXP_DILITHIUM3:
-	case GNUTLS_PK_EXP_DILITHIUM5:
+	case GNUTLS_PK_EXP_ML_DSA_44_IPD:
+	case GNUTLS_PK_EXP_ML_DSA_65_IPD:
+	case GNUTLS_PK_EXP_ML_DSA_87_IPD:
 	case GNUTLS_PK_EXP_FALCON512:
 	case GNUTLS_PK_EXP_FALCON1024:
 	case GNUTLS_PK_EXP_SPHINCS_SHA2_128F:
@@ -100,7 +100,6 @@ inline static int _encode_privkey(gnutls_x509_privkey_t pkey,
 	case GNUTLS_PK_EXP_SPHINCS_SHAKE_192S:
 	case GNUTLS_PK_EXP_SPHINCS_SHAKE_256F:
 	case GNUTLS_PK_EXP_SPHINCS_SHAKE_256S:
-		// Dilithium public key is appended to private key
 		ret = _gnutls_x509_encode_string(
 			ASN1_ETYPE_OCTET_STRING, pkey->params.raw_priv.data,
 			pkey->params.raw_priv.size + pkey->params.raw_pub.size,
@@ -1493,24 +1492,12 @@ struct pqc_key_length_st {
 };
 
 struct pqc_key_length_st pqc_key_lengths[] = {
-#ifdef defined(GNUTLS_PK_EXP_DILITHIUM2) &&               \
-	defined(OQS_SIG_dilithium_2_length_secret_key) && \
-	defined(OQS_SIG_dilithium_2_length_public_key)
-	{ GNUTLS_PK_EXP_DILITHIUM2, OQS_SIG_dilithium_2_length_secret_key,
-	  OQS_SIG_dilithium_2_length_public_key },
-#endif
-#ifdef defined(GNUTLS_PK_EXP_DILITHIUM3) &&               \
-	defined(OQS_SIG_dilithium_3_length_secret_key) && \
-	defined(OQS_SIG_dilithium_3_length_public_key)
-	{ GNUTLS_PK_EXP_DILITHIUM3, OQS_SIG_dilithium_3_length_secret_key,
-	  OQS_SIG_dilithium_3_length_public_key },
-#endif
-#ifdef defined(GNUTLS_PK_EXP_DILITHIUM5) &&               \
-	defined(OQS_SIG_dilithium_5_length_secret_key) && \
-	defined(OQS_SIG_dilithium_5_length_public_key)
-	{ GNUTLS_PK_EXP_DILITHIUM5, OQS_SIG_dilithium_5_length_secret_key,
-	  OQS_SIG_dilithium_5_length_public_key },
-#endif
+	{ GNUTLS_PK_EXP_ML_DSA_44_IPD, OQS_SIG_ml_dsa_44_ipd_length_secret_key,
+	  OQS_SIG_ml_dsa_44_ipd_length_public_key },
+	{ GNUTLS_PK_EXP_ML_DSA_65_IPD, OQS_SIG_ml_dsa_65_ipd_length_secret_key,
+	  OQS_SIG_ml_dsa_65_ipd_length_public_key },
+	{ GNUTLS_PK_EXP_ML_DSA_87_IPD, OQS_SIG_ml_dsa_87_ipd_length_secret_key,
+	  OQS_SIG_ml_dsa_87_ipd_length_public_key },
 	{ GNUTLS_PK_EXP_FALCON512, OQS_SIG_falcon_512_length_secret_key,
 	  OQS_SIG_falcon_512_length_public_key },
 	{ GNUTLS_PK_EXP_FALCON1024, OQS_SIG_falcon_1024_length_secret_key,
@@ -1706,9 +1693,9 @@ static int decode_private_key_info(const gnutls_datum_t *der,
 						pkey->params.algo);
 		break;
 #ifdef HAVE_LIBOQS
-	case GNUTLS_PK_EXP_DILITHIUM2:
-	case GNUTLS_PK_EXP_DILITHIUM3:
-	case GNUTLS_PK_EXP_DILITHIUM5:
+	case GNUTLS_PK_EXP_ML_DSA_44_IPD:
+	case GNUTLS_PK_EXP_ML_DSA_65_IPD:
+	case GNUTLS_PK_EXP_ML_DSA_87_IPD:
 	case GNUTLS_PK_EXP_FALCON512:
 	case GNUTLS_PK_EXP_FALCON1024:
 	case GNUTLS_PK_EXP_SPHINCS_SHA2_128F:

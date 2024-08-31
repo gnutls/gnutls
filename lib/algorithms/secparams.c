@@ -24,6 +24,9 @@
 #include "algorithms.h"
 #include "errors.h"
 #include "x509/common.h"
+#ifdef HAVE_LIBOQS
+#include "oqs/oqs.h"
+#endif
 
 typedef struct {
 	const char *name;
@@ -36,7 +39,7 @@ typedef struct {
 	unsigned int subgroup_bits; /* subgroup bits */
 	unsigned int ecc_bits; /* bits for ECC keys */
 #ifdef HAVE_LIBOQS
-	unsigned int dilithium_bits;
+	unsigned int ml_dsa_bits;
 	unsigned int falcon_bits;
 	unsigned int sphincs_bits;
 #endif
@@ -71,17 +74,18 @@ static const gnutls_sec_params_entry sec_params[] = {
 	},
 	{ "Legacy", GNUTLS_SEC_PARAM_LEGACY, 96, 1024, 1024, 192, 192,
 #ifdef HAVE_LIBOQS
-	  0, 897, 32
+	  0, OQS_SIG_falcon_512_length_public_key,
+	  OQS_SIG_sphincs_sha2_128f_simple_length_public_key
 #endif
 	},
 	{ "Medium", GNUTLS_SEC_PARAM_MEDIUM, 112, 2048, 2048, 224, 224,
 #ifdef HAVE_LIBOQS
-	  1312, 0, 0
+	  OQS_SIG_ml_dsa_44_ipd_length_public_key, 0, 0
 #endif
 	},
 	{ "High", GNUTLS_SEC_PARAM_HIGH, 128, 3072, 3072, 256, 256,
 #ifdef HAVE_LIBOQS
-	  0, 0, 48
+	  0, 0, OQS_SIG_sphincs_sha2_192s_simple_length_public_key
 #endif
 	},
 #else
@@ -92,28 +96,30 @@ static const gnutls_sec_params_entry sec_params[] = {
 	}, /* ENISA-LEGACY */
 	{ "Legacy", GNUTLS_SEC_PARAM_LEGACY, 96, 1776, 2048, 192, 192,
 #ifdef HAVE_LIBOQS
-		 0, 897, 32
+		 0, OQS_SIG_falcon_512_length_public_key, OQS_SIG_sphincs_sha2_128f_simple_length_public_key
 #endif
 	 },
 	{ "Medium", GNUTLS_SEC_PARAM_MEDIUM, 112, 2048, 2048, 256, 224,
 #ifdef HAVE_LIBOQS
-		 1312, 0, 0
+		 OQS_SIG_ml_dsa_44_ipd_length_public_key, 0, 0
 #endif
 		 },
 	{ "High", GNUTLS_SEC_PARAM_HIGH, 128, 3072, 3072, 256, 256,
 #ifdef HAVE_LIBOQS
-		 0, 0, 48
+		 0, 0, OQS_SIG_sphincs_sha2_192s_simple_length_public_key
 #endif
 	},
 #endif
 	{ "Ultra", GNUTLS_SEC_PARAM_ULTRA, 192, 8192, 8192, 384, 384,
 #ifdef HAVE_LIBOQS
-	  1952, 0, 0
+	  OQS_SIG_ml_dsa_65_ipd_length_public_key, 0, 0
 #endif
 	},
 	{ "Future", GNUTLS_SEC_PARAM_FUTURE, 256, 15360, 15360, 512, 512,
 #ifdef HAVE_LIBOQS
-	  2592, 1793, 64
+	  OQS_SIG_ml_dsa_87_ipd_length_public_key,
+	  OQS_SIG_falcon_1024_length_public_key,
+	  OQS_SIG_sphincs_sha2_256f_simple_length_public_key
 #endif
 	},
 	{ NULL, 0, 0, 0, 0,
@@ -152,8 +158,8 @@ unsigned int gnutls_sec_param_to_pk_bits(gnutls_pk_algorithm_t algo,
 			else if (IS_EC(algo) || IS_GOSTEC(algo))
 				ret = p->ecc_bits;
 #ifdef HAVE_LIBOQS
-			else if (IS_DILITHIUM(algo))
-				ret = p->dilithium_bits;
+			else if (IS_ML_DSA(algo))
+				ret = p->ml_dsa_bits;
 			else if (IS_FALCON(algo))
 				ret = p->falcon_bits;
 			else if (IS_SPHINCS(algo))
@@ -289,9 +295,9 @@ gnutls_sec_param_t gnutls_pk_bits_to_sec_param(gnutls_pk_algorithm_t algo,
 			ret = p->sec_param;
 		}
 #ifdef HAVE_LIBOQS
-	} else if (IS_DILITHIUM(algo)) {
+	} else if (IS_ML_DSA(algo)) {
 		for (p = sec_params; p->name; p++) {
-			if (p->dilithium_bits > bits)
+			if (p->ml_dsa_bits > bits)
 				break;
 			ret = p->sec_param;
 		}

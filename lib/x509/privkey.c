@@ -372,42 +372,30 @@ int _gnutls_decode_pqc_keys(asn1_node *pkey_asn, const gnutls_datum_t *raw_key,
 	return GNUTLS_E_SUCCESS;
 }
 
-struct PQCAlgorithmVersion dilithium_versions[] = {
-#if defined(GNUTLS_PK_EXP_DILITHIUM2) &&                  \
-	defined(OQS_SIG_dilithium_2_length_secret_key) && \
-	defined(OQS_SIG_dilithium_2_length_public_key)
-	{ '\x02', GNUTLS_PK_EXP_DILITHIUM2,
-	  OQS_SIG_dilithium_2_length_secret_key,
-	  OQS_SIG_dilithium_2_length_public_key },
-#endif
-#if defined(GNUTLS_PK_EXP_DILITHIUM3) &&                  \
-	defined(OQS_SIG_dilithium_3_length_secret_key) && \
-	defined(OQS_SIG_dilithium_3_length_public_key)
-	{ '\x03', GNUTLS_PK_EXP_DILITHIUM3,
-	  OQS_SIG_dilithium_3_length_secret_key,
-	  OQS_SIG_dilithium_3_length_public_key },
-#endif
-#if defined(GNUTLS_PK_EXP_DILITHIUM5) &&                  \
-	defined(OQS_SIG_dilithium_5_length_secret_key) && \
-	defined(OQS_SIG_dilithium_5_length_public_key)
-	{ '\x05', GNUTLS_PK_EXP_DILITHIUM5,
-	  OQS_SIG_dilithium_5_length_secret_key,
-	  OQS_SIG_dilithium_5_length_public_key },
-#endif
+struct PQCAlgorithmVersion ml_dsa_versions[] = {
+	{ '\x04', GNUTLS_PK_EXP_ML_DSA_44_IPD,
+	  OQS_SIG_ml_dsa_44_ipd_length_secret_key,
+	  OQS_SIG_ml_dsa_44_ipd_length_public_key },
+	{ '\x06', GNUTLS_PK_EXP_ML_DSA_65_IPD,
+	  OQS_SIG_ml_dsa_65_ipd_length_secret_key,
+	  OQS_SIG_ml_dsa_65_ipd_length_public_key },
+	{ '\x08', GNUTLS_PK_EXP_ML_DSA_87_IPD,
+	  OQS_SIG_ml_dsa_87_ipd_length_secret_key,
+	  OQS_SIG_ml_dsa_87_ipd_length_public_key },
 
 	{ '\x00', GNUTLS_PK_UNKNOWN, 0, 0 }
 };
 
-static int _gnutls_set_dilithium_params(const uint8_t *version,
-					gnutls_x509_privkey_t pkey)
+static int _gnutls_set_ml_dsa_params(const uint8_t *version,
+				     gnutls_x509_privkey_t pkey)
 {
-	struct PQCAlgorithmVersion *v = dilithium_versions;
+	struct PQCAlgorithmVersion *v = ml_dsa_versions;
 	while (v->algorithm != GNUTLS_PK_UNKNOWN && v->version != *version)
 		v++;
 
 	pkey->params.raw_priv.size = v->secret_key_length;
 	pkey->params.raw_pub.size = v->public_key_length;
-	pkey->params.params_nr = DILITHIUM_PRIVATE_PARAMS;
+	pkey->params.params_nr = ML_DSA_PRIVATE_PARAMS;
 	pkey->params.algo = v->algorithm;
 
 	if (v->algorithm == GNUTLS_PK_UNKNOWN)
@@ -416,9 +404,9 @@ static int _gnutls_set_dilithium_params(const uint8_t *version,
 	return 0;
 }
 
-int _gnutls_privkey_decode_dilithium_key(asn1_node *pkey_asn,
-					 const gnutls_datum_t *raw_key,
-					 gnutls_x509_privkey_t pkey)
+int _gnutls_privkey_decode_ml_dsa_key(asn1_node *pkey_asn,
+				      const gnutls_datum_t *raw_key,
+				      gnutls_x509_privkey_t pkey)
 {
 	int result;
 	uint8_t version;
@@ -426,7 +414,7 @@ int _gnutls_privkey_decode_dilithium_key(asn1_node *pkey_asn,
 	gnutls_pk_params_init(&pkey->params);
 
 	if ((result = asn1_create_element(_gnutls_get_gnutls_asn(),
-					  "GNUTLS.DilithiumPrivateKey",
+					  "GNUTLS.MLDSAPrivateKey",
 					  pkey_asn)) != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
@@ -436,7 +424,7 @@ int _gnutls_privkey_decode_dilithium_key(asn1_node *pkey_asn,
 	if (result < 0)
 		goto error;
 
-	result = _gnutls_set_dilithium_params(&version, pkey);
+	result = _gnutls_set_ml_dsa_params(&version, pkey);
 	if (result < 0)
 		goto error;
 
@@ -688,7 +676,7 @@ error:
 #define PEM_KEY_RSA "RSA PRIVATE KEY"
 #define PEM_KEY_ECC "EC PRIVATE KEY"
 #ifdef HAVE_LIBOQS
-#define PEM_KEY_DILITHIUM "DILITHIUM PRIVATE KEY"
+#define PEM_KEY_ML_DSA "ML-DSA PRIVATE KEY"
 #define PEM_KEY_FALCON "FALCON PRIVATE KEY"
 #define PEM_KEY_SPHINCS "SPHINCS PRIVATE KEY"
 #endif
@@ -792,16 +780,16 @@ int gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
 						key->params.algo =
 							GNUTLS_PK_DSA;
 #ifdef HAVE_LIBOQS
-				} else if (left > sizeof(PEM_KEY_DILITHIUM) &&
-					   memcmp(ptr, PEM_KEY_DILITHIUM,
-						  sizeof(PEM_KEY_DILITHIUM) -
-							  1) == 0) {
+				} else if (left > sizeof(PEM_KEY_ML_DSA) &&
+					   memcmp(ptr, PEM_KEY_ML_DSA,
+						  sizeof(PEM_KEY_ML_DSA) - 1) ==
+						   0) {
 					result = _gnutls_fbase64_decode(
-						PEM_KEY_DILITHIUM, begin_ptr,
-						left, &_data);
+						PEM_KEY_ML_DSA, begin_ptr, left,
+						&_data);
 					if (result >= 0) {
 						key->params.algo =
-							GNUTLS_PK_EXP_DILITHIUM2;
+							GNUTLS_PK_EXP_ML_DSA_44_IPD;
 					}
 				} else if (left > sizeof(PEM_KEY_FALCON) &&
 					   memcmp(ptr, PEM_KEY_FALCON,
@@ -886,9 +874,9 @@ int gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
 			key->key = NULL;
 		}
 #ifdef HAVE_LIBOQS
-	} else if (key->params.algo == GNUTLS_PK_EXP_DILITHIUM2) {
-		result = _gnutls_privkey_decode_dilithium_key(&key->key, &_data,
-							      key);
+	} else if (key->params.algo == GNUTLS_PK_EXP_ML_DSA_44_IPD) {
+		result = _gnutls_privkey_decode_ml_dsa_key(&key->key, &_data,
+							   key);
 
 		if (result < 0) {
 			gnutls_assert();
@@ -1015,7 +1003,7 @@ fail:
 
 #ifdef HAVE_LIBOQS
 #define MAX_ALGORITHM_NAME_SIZE_IN_PEM_HEADER 21
-#define MAX_PEM_KEY_SIZE PEM_KEY_DILITHIUM
+#define MAX_PEM_KEY_SIZE PEM_KEY_SPHINCS
 #else
 #define MAX_ALGORITHM_NAME_SIZE_IN_PEM_HEADER 15
 #define MAX_PEM_KEY_SIZE PEM_KEY_RSA
@@ -1089,9 +1077,9 @@ int gnutls_x509_privkey_import2(gnutls_x509_privkey_t key,
 				    memcmp(ptr, PEM_KEY_DSA,
 					   sizeof(PEM_KEY_DSA) - 1) == 0
 #ifdef HAVE_LIBOQS
-				    || memcmp(ptr, PEM_KEY_DILITHIUM,
-					      sizeof(PEM_KEY_DILITHIUM) - 1) ==
-					       0 ||
+				    ||
+				    memcmp(ptr, PEM_KEY_ML_DSA,
+					   sizeof(PEM_KEY_ML_DSA) - 1) == 0 ||
 				    memcmp(ptr, PEM_KEY_FALCON,
 					   sizeof(PEM_KEY_FALCON) - 1) == 0 ||
 				    memcmp(ptr, PEM_KEY_SPHINCS,
@@ -1850,10 +1838,10 @@ static const char *set_msg(gnutls_x509_privkey_t key)
 	case GNUTLS_PK_EC:
 		return PEM_KEY_ECC;
 #ifdef HAVE_LIBOQS
-	case GNUTLS_PK_EXP_DILITHIUM2:
-	case GNUTLS_PK_EXP_DILITHIUM3:
-	case GNUTLS_PK_EXP_DILITHIUM5:
-		return PEM_KEY_DILITHIUM;
+	case GNUTLS_PK_EXP_ML_DSA_44_IPD:
+	case GNUTLS_PK_EXP_ML_DSA_65_IPD:
+	case GNUTLS_PK_EXP_ML_DSA_87_IPD:
+		return PEM_KEY_ML_DSA;
 	case GNUTLS_PK_EXP_FALCON512:
 	case GNUTLS_PK_EXP_FALCON1024:
 		return PEM_KEY_FALCON;

@@ -245,9 +245,9 @@ int _gnutls_privkey_decode_ecc_key(asn1_node *pkey_asn,
 int _gnutls_decode_pqc_keys(asn1_node *pkey_asn, const gnutls_datum_t *raw_key,
 			    gnutls_x509_privkey_t pkey, uint8_t *version);
 
-int _gnutls_privkey_decode_dilithium_key(asn1_node *pkey_asn,
-					 const gnutls_datum_t *raw_key,
-					 gnutls_x509_privkey_t pkey);
+int _gnutls_privkey_decode_ml_dsa_key(asn1_node *pkey_asn,
+				      const gnutls_datum_t *raw_key,
+				      gnutls_x509_privkey_t pkey);
 
 int _gnutls_privkey_decode_falcon_key(asn1_node *pkey_asn,
 				      const gnutls_datum_t *raw_key,

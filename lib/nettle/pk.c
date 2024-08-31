@@ -1437,12 +1437,12 @@ static inline int eddsa_sign(gnutls_pk_algorithm_t algo, const uint8_t *pub,
 static inline const char *convert_to_oqs_alg(gnutls_pk_algorithm_t algo)
 {
 	switch (algo) {
-	case GNUTLS_PK_EXP_DILITHIUM2:
-		return OQS_SIG_alg_dilithium_2;
-	case GNUTLS_PK_EXP_DILITHIUM3:
-		return OQS_SIG_alg_dilithium_3;
-	case GNUTLS_PK_EXP_DILITHIUM5:
-		return OQS_SIG_alg_dilithium_5;
+	case GNUTLS_PK_EXP_ML_DSA_44_IPD:
+		return OQS_SIG_alg_ml_dsa_44_ipd;
+	case GNUTLS_PK_EXP_ML_DSA_65_IPD:
+		return OQS_SIG_alg_ml_dsa_65_ipd;
+	case GNUTLS_PK_EXP_ML_DSA_87_IPD:
+		return OQS_SIG_alg_ml_dsa_87_ipd;
 	case GNUTLS_PK_EXP_FALCON512:
 		return OQS_SIG_alg_falcon_512;
 	case GNUTLS_PK_EXP_FALCON1024:
@@ -1472,8 +1472,8 @@ static inline const char *convert_to_oqs_alg(gnutls_pk_algorithm_t algo)
 	case GNUTLS_PK_EXP_SPHINCS_SHAKE_256S:
 		return OQS_SIG_alg_sphincs_shake_256s_simple;
 	default:
-		gnutls_assert_val(GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM);
-		return "";
+		gnutls_assert();
+		return NULL;
 	}
 }
 #endif
@@ -1898,9 +1898,9 @@ static int _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 		break;
 	}
 #ifdef HAVE_LIBOQS
-	case GNUTLS_PK_EXP_DILITHIUM2:
-	case GNUTLS_PK_EXP_DILITHIUM3:
-	case GNUTLS_PK_EXP_DILITHIUM5:
+	case GNUTLS_PK_EXP_ML_DSA_44_IPD:
+	case GNUTLS_PK_EXP_ML_DSA_65_IPD:
+	case GNUTLS_PK_EXP_ML_DSA_87_IPD:
 	case GNUTLS_PK_EXP_FALCON512:
 	case GNUTLS_PK_EXP_FALCON1024:
 	case GNUTLS_PK_EXP_SPHINCS_SHA2_128F:
@@ -1919,7 +1919,13 @@ static int _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 		OQS_STATUS rc;
 		size_t size;
 
-		sig = GNUTLS_OQS_FUNC(OQS_SIG_new)(convert_to_oqs_alg(algo));
+		const char *algo_name = convert_to_oqs_alg(algo);
+		if (algo_name == NULL ||
+		    !GNUTLS_OQS_FUNC(OQS_SIG_alg_is_enabled)(algo_name)) {
+			return gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
+		}
+
+		sig = GNUTLS_OQS_FUNC(OQS_SIG_new)(algo_name);
 		if (sig == NULL) {
 			ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 			goto oqs_fail;
@@ -2320,9 +2326,9 @@ static int _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 		break;
 	}
 #ifdef HAVE_LIBOQS
-	case GNUTLS_PK_EXP_DILITHIUM2:
-	case GNUTLS_PK_EXP_DILITHIUM3:
-	case GNUTLS_PK_EXP_DILITHIUM5:
+	case GNUTLS_PK_EXP_ML_DSA_44_IPD:
+	case GNUTLS_PK_EXP_ML_DSA_65_IPD:
+	case GNUTLS_PK_EXP_ML_DSA_87_IPD:
 	case GNUTLS_PK_EXP_FALCON512:
 	case GNUTLS_PK_EXP_FALCON1024:
 	case GNUTLS_PK_EXP_SPHINCS_SHA2_128F:
@@ -2340,7 +2346,13 @@ static int _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 		OQS_SIG *sig;
 		OQS_STATUS rc;
 
-		sig = GNUTLS_OQS_FUNC(OQS_SIG_new)(convert_to_oqs_alg(algo));
+		const char *algo_name = convert_to_oqs_alg(algo);
+		if (algo_name == NULL ||
+		    !GNUTLS_OQS_FUNC(OQS_SIG_alg_is_enabled)(algo_name)) {
+			return gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
+		}
+
+		sig = GNUTLS_OQS_FUNC(OQS_SIG_new)(algo_name);
 		if (sig == NULL) {
 			ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 			goto oqs_fail;
@@ -2749,10 +2761,9 @@ static int wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 	case GNUTLS_PK_GOST_12_256:
 	case GNUTLS_PK_GOST_12_512:
 #endif
-	case GNUTLS_PK_MLKEM768:
-	case GNUTLS_PK_EXP_DILITHIUM2:
-	case GNUTLS_PK_EXP_DILITHIUM3:
-	case GNUTLS_PK_EXP_DILITHIUM5:
+	case GNUTLS_PK_EXP_ML_DSA_44_IPD:
+	case GNUTLS_PK_EXP_ML_DSA_65_IPD:
+	case GNUTLS_PK_EXP_ML_DSA_87_IPD:
 	case GNUTLS_PK_EXP_FALCON512:
 	case GNUTLS_PK_EXP_FALCON1024:
 	case GNUTLS_PK_EXP_SPHINCS_SHA2_128F:
@@ -4015,9 +4026,9 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 		ret = 0;
 		break;
 	}
-	case GNUTLS_PK_EXP_DILITHIUM2:
-	case GNUTLS_PK_EXP_DILITHIUM3:
-	case GNUTLS_PK_EXP_DILITHIUM5:
+	case GNUTLS_PK_EXP_ML_DSA_44_IPD:
+	case GNUTLS_PK_EXP_ML_DSA_65_IPD:
+	case GNUTLS_PK_EXP_ML_DSA_87_IPD:
 	case GNUTLS_PK_EXP_FALCON512:
 	case GNUTLS_PK_EXP_FALCON1024:
 	case GNUTLS_PK_EXP_SPHINCS_SHA2_128F:
@@ -4047,8 +4058,15 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 
 			not_approved = true;
 
-			sig = GNUTLS_OQS_FUNC(OQS_SIG_new)(
-				convert_to_oqs_alg(algo));
+			const char *algo_name = convert_to_oqs_alg(algo);
+			if (algo_name == NULL ||
+			    !GNUTLS_OQS_FUNC(OQS_SIG_alg_is_enabled)(
+				    algo_name)) {
+				return gnutls_assert_val(
+					GNUTLS_E_UNKNOWN_PK_ALGORITHM);
+			}
+
+			sig = GNUTLS_OQS_FUNC(OQS_SIG_new)(algo_name);
 			if (sig == NULL) {
 				ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 				goto cleanup;
@@ -4351,10 +4369,9 @@ static int wrap_nettle_pk_verify_priv_params(gnutls_pk_algorithm_t algo,
 
 		ret = 0;
 		break;
-	}
-	case GNUTLS_PK_EXP_DILITHIUM2:
-	case GNUTLS_PK_EXP_DILITHIUM3:
-	case GNUTLS_PK_EXP_DILITHIUM5:
+	case GNUTLS_PK_EXP_ML_DSA_44_IPD:
+	case GNUTLS_PK_EXP_ML_DSA_65_IPD:
+	case GNUTLS_PK_EXP_ML_DSA_87_IPD:
 	case GNUTLS_PK_EXP_FALCON512:
 	case GNUTLS_PK_EXP_FALCON1024:
 	case GNUTLS_PK_EXP_SPHINCS_SHA2_128F:
