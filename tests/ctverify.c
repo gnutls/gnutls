@@ -280,6 +280,8 @@ void doit(void)
 
 	verify_scts(cert, issuer, x509_scts, logs_store);
 
+	gnutls_ct_logs_deinit(logs_store);
+
 	gnutls_x509_ext_ct_scts_deinit(x509_scts);
 	gnutls_x509_crt_deinit(cert);
 	gnutls_x509_crt_deinit(issuer);

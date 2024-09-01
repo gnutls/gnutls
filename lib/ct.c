@@ -169,6 +169,7 @@ static int generate_tbsCertificate(const gnutls_x509_crt_t crt, gnutls_datum_t *
 		goto bail;
 	}
 
+ 	/* Export the new structure to DER */
 	if ((retval = asn1_der_coding(tbsroot, "tbsCertificate", outbuf, &outlen, NULL))) {
 		gnutls_assert();
 		retval = _gnutls_asn2err(retval);
@@ -274,6 +275,16 @@ static int _gnutls_ct_sct_verify_precert(const gnutls_datum_t *precert_digest, c
 	return 0;
 }
 
+/**
+ * gnutls_ct_logs_init:
+ * @logs: a #gnutls_ct_logs_t type
+ *
+ * This function will initialize a log store. The log store will be initially empty.
+ * To add a new item, a new #gnutls_ct_log_t must be initialized first with gnutls_ct_log_init(),
+ * and then add it to the log store with gnutls_ct_add_log().
+ *
+ * Returns: Zero or a negative code on error.
+ */
 int gnutls_ct_logs_init(gnutls_ct_logs_t * logs)
 {
 	if (!logs)
@@ -289,6 +300,13 @@ int gnutls_ct_logs_init(gnutls_ct_logs_t * logs)
 	return 0;
 }
 
+/**
+ * gnutls_ct_logs_deinit:
+ * @logs: a log store
+ *
+ * Deinitialize the log store.
+ * This function will free up all the items for you.
+ */
 void gnutls_ct_logs_deinit(gnutls_ct_logs_t logs)
 {
 	if (logs) {
@@ -301,6 +319,22 @@ void gnutls_ct_logs_deinit(gnutls_ct_logs_t logs)
 	}
 }
 
+/**
+ * gnutls_ct_log_init:
+ * @log: the log entry that will be initialized
+ * @name: the name of the log entry
+ * @key: the public key of the log entry
+ * @flags: flags indicating how the public key should be decoded
+ * 
+ * Create a new log store entry with a name and a public key.
+ * This item can then be added to the log store with gnutls_ct_add_log().
+ * 
+ * The public key is always expected to be DER-encoded.
+ * Set 'flags' to `GNUTLS_CT_KEY_AS_BASE64` to indicate that the key has been additionally encoded
+ * in base64. Otherwise set 'flags' to zero.
+ * 
+ * Returns: Zero or a negative code on error.
+ */
 int gnutls_ct_log_init(gnutls_ct_log_t *log,
 		       const char *name,
 		       const gnutls_datum_t *key, int flags)
@@ -314,6 +348,9 @@ int gnutls_ct_log_init(gnutls_ct_log_t *log,
 	*log = gnutls_malloc(sizeof(struct gnutls_ct_log_st));
 	if (!*log)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+	(*log)->name = NULL;
+	(*log)->public_key = NULL;
 
 	/*
 	 * If key is in base64, decode it first.
@@ -349,13 +386,31 @@ bail:
 	return retval;
 }
 
+/**
+ * gnutls_ct_log_deinit:
+ * @log: a log entry
+ * 
+ * Deinitialize a log entry created with gnutls_ct_log_init, freeing all its elements from memory.
+ */
 void gnutls_ct_log_deinit(gnutls_ct_log_t log)
 {
 	_gnutls_free_log(log);
 	gnutls_free(log);
 }
 
-
+/**
+ * gnutls_ct_sct_init:
+ * @sct: a pointer to an SCT structure, a #gnutls_ct_sct_t type
+ * @logid: the log ID
+ * @signature_algorithm: the signing algorithm
+ * @signature: the signature
+ * @timestamp: the timestamp
+ * 
+ * Initialize a Signed Certificate Timestamp (SCT) structure.
+ * Set its log ID, signature, signing algorithm and timestamp fields to the given values.
+ * 
+ * Returns: Zero or a negative code on error.
+ */
 int gnutls_ct_sct_init(gnutls_ct_sct_t *sct,
 		       const gnutls_datum_t *logid,
 		       gnutls_sign_algorithm_t signature_algorithm, const gnutls_datum_t *signature,
@@ -398,6 +453,13 @@ bail:
 	return ret;
 }
 
+/**
+ * gnutls_ct_sct_deinit:
+ * @sct: A Signed Certificate Timestamp (SCT) structure
+ *
+ * Deinitialize a Signed Certificate Timestamp (SCT) structure created with gnutls_ct_sct_init,
+ * freeing all its elements.
+ */
 void gnutls_ct_sct_deinit(gnutls_ct_sct_t sct)
 {
 	_gnutls_free_datum(&sct->logid);
@@ -405,6 +467,26 @@ void gnutls_ct_sct_deinit(gnutls_ct_sct_t sct)
 	gnutls_free(sct);
 }
 
+/**
+ * gnutls_ct_verify:
+ * @sct: the Signed Certificate Timestap (SCT)
+ * @cert: the certificate where SCT was found
+ * @issuer: the issuer of the certificate
+ * @logs: the log store
+ * @log_name: optional, the name of the matching log entry
+ *
+ * Verify a Signed Certificate Timestamp (SCT) against the log store.
+ * The 'cert' field should be the certificate where such SCT was found.
+ * 
+ * This function will first look up the SCT's log ID in the log store, and if found,
+ * verify its signature. If no such log ID is found, `GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE`
+ * will be returned.
+ * 
+ * If `log_name` is provided, it will point to the name of the log that issued the SCT (matched
+ * by its log ID).
+ * 
+ * Returns: Zero or a negative code on error.
+ */
 int gnutls_ct_verify(gnutls_ct_sct_t sct,
 		     gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
 		     const gnutls_ct_logs_t logs,
@@ -413,8 +495,8 @@ int gnutls_ct_verify(gnutls_ct_sct_t sct,
 	int retval;
 	gnutls_hash_hd_t md;
 	gnutls_ct_log_t log;
-	uint8_t signature_digest[gnutls_hash_get_len(GNUTLS_DIG_SHA256)],
-		issuer_key_digest[gnutls_hash_get_len(GNUTLS_DIG_SHA256)];
+	uint8_t signature_digest[SHA256_OUTPUT_SIZE],
+		issuer_key_digest[SHA256_OUTPUT_SIZE];
 	gnutls_datum_t signed_data_digest, issuer_key_hash, crtder = {
 		.data = NULL,
 		.size = 0
@@ -425,7 +507,7 @@ int gnutls_ct_verify(gnutls_ct_sct_t sct,
 		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
 	if (log_name)
-		*log_name = log->name;  /* TODO should we copy it instead? */
+		*log_name = log->name;
 
 	/* TODO clarify - why SHA-256? */
 	if ((retval = gnutls_hash_init(&md, GNUTLS_DIG_SHA256)) < 0) {
@@ -447,7 +529,7 @@ int gnutls_ct_verify(gnutls_ct_sct_t sct,
 
 	/* Finally, compute the signature input */
 	issuer_key_hash.data = issuer_key_digest;
-	issuer_key_hash.size = gnutls_hash_get_len(GNUTLS_DIG_SHA256);
+	issuer_key_hash.size = SHA256_OUTPUT_SIZE;
 	if ((retval = _gnutls_update_hash_with_precert(md, sct->timestamp,
 						       crtder.data, crtder.size, &issuer_key_hash,
 						       NULL, 0)) < 0) {
@@ -459,7 +541,7 @@ int gnutls_ct_verify(gnutls_ct_sct_t sct,
 	_gnutls_free_datum(&crtder);
 
 	signed_data_digest.data = signature_digest;
-	signed_data_digest.size = gnutls_hash_get_len(GNUTLS_DIG_SHA256);
+	signed_data_digest.size = SHA256_OUTPUT_SIZE;
 	return _gnutls_ct_sct_verify_precert(&signed_data_digest,
 					     &sct->signature, sct->signature_algorithm, log, NULL);
 
@@ -469,6 +551,15 @@ bail:
 	return retval;
 }
 
+/**
+ * gnutls_ct_add_log:
+ * @logs: the log store
+ * @log: the log entry, initialized with gnutls_ct_log_init()
+ *
+ * Add a log entry to the given log store.
+ *
+ * Returns: Zero or a negative code on error.
+ */
 int gnutls_ct_add_log(gnutls_ct_logs_t logs, const gnutls_ct_log_t log)
 {
 	int retval;
@@ -487,6 +578,19 @@ end:
 	return retval;
 }
 
+/**
+ * gnutls_ct_get_log:
+ * @logs: the log store
+ * @idx: the item number to retrieve
+ * @name: output value of the log entry's name
+ * @public_key: output value of the public key
+ * 
+ * Returns the name and public key of the log entry, numbered 'idx', starting at zero.
+ * If 'idx' exceeds the number of items in the log store, `GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE`
+ * will be returned.
+ * 
+ * Returns: Zero or a negative code on error.
+ */
 int gnutls_ct_get_log(gnutls_ct_logs_t logs, unsigned idx,
 		      gnutls_datum_t *name,
 		      gnutls_pubkey_t *public_key)
