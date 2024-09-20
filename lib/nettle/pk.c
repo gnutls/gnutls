@@ -1035,7 +1035,7 @@ static inline int _rsa_oaep_decrypt(gnutls_digest_algorithm_t dig,
 		break;
 	default:
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_ALGORITHM;
+		return 0;
 	}
 
 	return decrypt_func(pub, key, rnd_ctx, rnd_func, label_length, label,
