@@ -92,7 +92,7 @@ AC_RUN_IFELSE(
       puts(outstr);
       return 0;
     ]])],
-  [AS_IF([test -n "$FAKETIME" && test `TZ=UTC $FAKETIME $FAKETIME_F_OPT "2006-09-23 00:00:00" ./conftest$EXEEXT` = "1158969600"], [
+  [AS_IF([test -n "$FAKETIME" && test "`TZ=UTC $FAKETIME $FAKETIME_F_OPT "2006-09-23 00:00:00" ./conftest$EXEEXT`" = "1158969600"], [
      ac_cv_faketime_works=yes
    ], [
      ac_cv_faketime_works=no
@@ -955,6 +955,7 @@ AM_CONDITIONAL(P11KIT_0_23_11_API, $PKG_CONFIG --atleast-version=0.23.11 p11-kit
 
 AM_CONDITIONAL(ENABLE_PKCS11, test "$with_p11_kit" != "no")
 
+AC_MSG_CHECKING([whether we can dlopen helper-libraries])
 save_LIBS=$LIBS
 LIBS="$LIBS -lm"
 LIBGNUTLS_CHECK_SONAME([m], [AC_LANG_PROGRAM([
@@ -975,13 +976,27 @@ AC_RUN_IFELSE(
   [ac_cv_dlopen_soname_works=no],
   [ac_cv_dlopen_soname_works=cross-compiling])
 
+AC_MSG_RESULT([$ac_cv_dlopen_soname_works])
+
 AM_CONDITIONAL([ENABLE_DLOPEN], [test "$ac_cv_dlopen_soname_works" = yes])
 need_ltlibdl=no
 
 AC_ARG_WITH(tpm2,
-	AS_HELP_STRING([--without-tpm2],
-		[Disable TPM2 support.]),
-	[with_tpm2=$withval], [with_tpm2=auto])
+   [AS_HELP_STRING([--with-tpm2=yes/link/dlopen/no --without-tpm2],
+                  [customize/disable TPM2 support])],
+            with_tpm2=$withval, with_tpm2=yes tpm2_optional=yes)
+AS_CASE([$with_tpm2],
+  [yes],
+    [AM_COND_IF([ENABLE_DLOPEN], [with_tpm2=dlopen], [with_tpm2=link])],
+  [dlopen],
+    [AM_COND_IF([ENABLE_DLOPEN], [:],[AC_MSG_ERROR([[
+***
+*** Unable to dlopen TPM2, try --with-tpm2=link.
+*** ]])])],
+  [link], [:],
+  [no], [:],
+  [AC_MSG_ERROR([[Unknown argument ${with_tpm2} for --with-tpm2]])])
+
 AS_IF([test "$with_tpm2" != no], [
 	PKG_CHECK_MODULES(TSS2_ESYS, [tss2-esys],
 		[have_tss2_esys=yes], [have_tss2_esys=no])
@@ -990,24 +1005,26 @@ AS_IF([test "$with_tpm2" != no], [
 	PKG_CHECK_MODULES(TSS2_TCTILDR, [tss2-tctildr],
 		[have_tss2_tctildr=yes], [have_tss2_tctildr=no])
 ])
+
 AS_IF([test "$have_tss2_esys" = yes && test "$have_tss2_mu" = yes && test "$have_tss2_tctildr" = yes], [
 	tss2lib="tss2-esys tss2-mu tss2-tctildr"
 	AC_DEFINE([HAVE_TSS2], 1, [Have TSS2])
-	with_tpm2=yes
 	need_ltlibdl=yes
 ],
-      [test "$with_tpm2" = yes], [
+      [test x"$with_tpm2" != xno && test x$tpm2_optional != xyes ],[
 	AC_MSG_ERROR([[
 ***
 *** TPM2 support was requested but the required libraries were not found.
 *** To disable TPM2 support use --without-tpm2, otherwise you may get tpm2-tss from
 *** https://github.com/tpm2-software/tpm2-tss
-*** ]])
-])
+*** ]])],
+      [with_tpm2=no]
+)
 
 AM_CONDITIONAL(ENABLE_TPM2, test -n "$tss2lib")
+AM_CONDITIONAL([TPM2_ENABLE_DLOPEN], [test "$with_tpm2" = dlopen])
 
-AS_IF([test "$ac_cv_dlopen_soname_works" = yes], [
+AS_IF([test "$with_tpm2" = dlopen], [
     save_LIBS=$LIBS
     LIBS="$LIBS $TSS2_ESYS_LIBS"
     LIBGNUTLS_CHECK_SONAME([tss2-esys], [AC_LANG_PROGRAM([
@@ -1093,44 +1110,53 @@ AC_CHECK_SIZEOF(unsigned long int, 4)
 AC_CHECK_SIZEOF(unsigned int, 4)
 AC_CHECK_SIZEOF(time_t, 4)
 
-AC_ARG_WITH(zlib, AS_HELP_STRING([--without-zlib],
-                                 [disable zlib compression support]),
-            ac_zlib=$withval, ac_zlib=yes)
-if test x$ac_zlib != xno; then
-    PKG_CHECK_EXISTS(zlib, ZLIB_HAS_PKGCONFIG=y, ZLIB_HAS_PKGCONFIG=n)
-    if test "$ZLIB_HAS_PKGCONFIG" = "y" ; then
-        PKG_CHECK_MODULES(ZLIB, [zlib])
-	ac_zlib=yes
-    else
-	AC_LIB_HAVE_LINKFLAGS(z,, [#include <zlib.h>], [compress (0, 0, 0, 0);])
-	if test x$ac_cv_libz != xyes; then
+AC_ARG_WITH(zlib,
+   [AS_HELP_STRING([--with-zlib=yes/link/dlopen/no --without-zlib],
+                  [customize/disable zlib compression support])],
+            ac_zlib=$withval, ac_zlib=yes zlib_optional=yes)
+AS_CASE([$ac_zlib],
+  [yes],
+    [AM_COND_IF([ENABLE_DLOPEN], [ac_zlib=dlopen], [ac_zlib=link])],
+  [dlopen],
+    [AM_COND_IF([ENABLE_DLOPEN], [:],[AC_MSG_ERROR([[
+***
+*** Unable to dlopen ZLIB, try --with-zlib=link.
+*** ]])])],
+  [link], [:],
+  [no], [:],
+  [AC_MSG_ERROR([[Unknown argument ${ac_zlib} for --with-zlib]])])
+
+
+AS_IF([test x$ac_zlib != xno],
+    [PKG_CHECK_MODULES([ZLIB],[zlib],,
+	    [ac_zlib=no
+      AS_IF([test x$zlib_optional != xyes],
+        AC_MSG_ERROR([zlib requested but not available]))
 	    AC_MSG_WARN([[
 *** 
 *** ZLIB was not found. You will not be able to use ZLIB compression.
 *** ]])
-        fi
-	ac_zlib=$ac_cv_libz
-	ZLIB_LIBS=$LIBZ
-	LIBZ_PC=$LIBZ
-    fi
-fi
+      ])])
+
 if test x$ac_zlib != xno; then
-    AC_DEFINE([HAVE_LIBZ], 1, [Define if ZLIB compression is enabled.])
+    AC_DEFINE([HAVE_ZLIB], 1, [Define if ZLIB compression is enabled.])
     need_ltlibdl=yes
 fi
-AM_CONDITIONAL(HAVE_ZLIB, test "$ac_zlib" = "yes")
-AC_SUBST(LIBZ_PC)
+AM_CONDITIONAL(HAVE_ZLIB, test "$ac_zlib" != "no")
 
-AS_IF([test "$ac_cv_dlopen_soname_works" = yes], [
+AM_CONDITIONAL([ZLIB_ENABLE_DLOPEN], [test "$ac_zlib" = dlopen])
+AS_IF([test "$ac_zlib" = dlopen], [
+    save_CFLAGS=$CFLAGS
+    CFLAGS="$CFLAGS $ZLIB_CFLAGS"
     save_LIBS=$LIBS
     LIBS="$LIBS $ZLIB_LIBS"
     LIBGNUTLS_CHECK_SONAME([z], [AC_LANG_PROGRAM([
                    #include <zlib.h>],[
                    compress (0, 0, 0, 0);])])
-    LIBS="$save_LIBS"
     CFLAGS="$save_CFLAGS"
+    LIBS="$save_LIBS"
 ],
-      [test "$ZLIB_HAS_PKGCONFIG" = y && test "$ac_zlib" = yes], [
+    [test "$ac_zlib" = link], [
     if test "x$GNUTLS_REQUIRES_PRIVATE" = x; then
         GNUTLS_REQUIRES_PRIVATE="Requires.private: zlib"
     else
@@ -1139,25 +1165,49 @@ AS_IF([test "$ac_cv_dlopen_soname_works" = yes], [
 ])
 
 AC_ARG_WITH(brotli,
-	    AS_HELP_STRING([--without-brotli], [disable brotli compression support]),
-	    ac_brotli=$withval, ac_brotli=yes)
-AC_MSG_CHECKING([whether to include brotli compression support])
-if test x$ac_brotli != xno; then
-    AC_MSG_RESULT(yes)
-    PKG_CHECK_MODULES(LIBBROTLIENC, [libbrotlienc >= 1.0.0], [with_libbrotlienc=yes], [with_libbrotlienc=no])
-    PKG_CHECK_MODULES(LIBBROTLIDEC, [libbrotlidec >= 1.0.0], [with_libbrotlidec=yes], [with_libbrotlidec=no])
-    if test "${with_libbrotlienc}" = "yes" && test "${with_libbrotlidec}" = "yes"; then
-	AC_DEFINE([HAVE_LIBBROTLI], 1, [Define if BROTLI compression is enabled.])
-	need_ltlibdl=yes
-    else
-	AC_MSG_WARN(*** LIBBROTLI was not found. You will not be able to use BROTLI compression.)
-    fi
-else
-    AC_MSG_RESULT(no)
-fi
-AM_CONDITIONAL(HAVE_LIBBROTLI, test "$with_libbrotlienc" = yes && test "$with_libbrotlidec" = yes)
+   [AS_HELP_STRING([--with-brotli=yes/link/dlopen/no --without-brotli],
+                  [customize/disable brotli compression support])],
+            ac_brotli=$withval, ac_brotli=yes brotli_optional=yes)
+AS_CASE([$ac_brotli],
+  [yes],
+    [AM_COND_IF([ENABLE_DLOPEN], [ac_brotli=dlopen], [ac_brotli=link])],
+  [dlopen],
+    [AM_COND_IF([ENABLE_DLOPEN], [:],[AC_MSG_ERROR([[
+***
+*** Unable to dlopen BROTLI, try --with-brotli=link.
+*** ]])])],
+  [link], [:],
+  [no], [:],
+  [AC_MSG_ERROR([[Unknown argument ${ac_brotli} for --with-brotli]])])
 
-AS_IF([test "$ac_cv_dlopen_soname_works" = yes], [
+
+AS_IF([test x$ac_brotli != xno],
+  [PKG_CHECK_MODULES([LIBBROTLIENC],[libbrotlienc >= 1.0.0],
+    [PKG_CHECK_MODULES([LIBBROTLIDEC],[libbrotlidec >= 1.0.0],
+      [ac_found_brotli_enc_dec=yes],[ac_found_brotli_enc_dec=no])]
+    ,[ac_found_brotli_enc_dec=no])
+  ]
+)
+
+AS_IF([test x$ac_brotli != xno && test x$ac_found_brotli_enc_dec != xyes ],
+  [ac_brotli=no
+  AS_IF([test x$brotli_optional != xyes],
+    AC_MSG_ERROR([libbrotli support requested but not available]))
+  AC_MSG_WARN([[
+***
+*** LIBBROTLI was not found. You will not be able to use BROTLI compression.
+*** ]])
+  ]
+)
+
+if test x$ac_brotli != xno; then
+    AC_DEFINE([HAVE_LIBBROTLI], 1, [Define if BROTLI compression is enabled.])
+    need_ltlibdl=yes
+fi
+AM_CONDITIONAL(HAVE_LIBBROTLI, test "$ac_brotli" != "no")
+
+AM_CONDITIONAL([BROTLI_ENABLE_DLOPEN], [test "$ac_brotli" = dlopen])
+AS_IF([test "$ac_brotli" = dlopen], [
     save_CFLAGS=$CFLAGS
     CFLAGS="$CFLAGS $LIBBROTLIENC_CFLAGS"
     save_LIBS=$LIBS
@@ -1165,88 +1215,113 @@ AS_IF([test "$ac_cv_dlopen_soname_works" = yes], [
     LIBGNUTLS_CHECK_SONAME([brotlienc], [AC_LANG_PROGRAM([
            #include <brotli/encode.h>],[
            BrotliEncoderVersion();])])
-    LIBS="$save_LIBS"
-    CFLAGS="$save_CFLAGS"
 
-    save_CFLAGS=$CFLAGS
-    CFLAGS="$CFLAGS $LIBBROTLIDEC_CFLAGS"
-    save_LIBS=$LIBS
-    LIBS="$LIBS $LIBBROTLIDEC_LIBS"
+    CFLAGS="$save_CFLAGS $LIBBROTLIDEC_CFLAGS"
+    LIBS="$save_LIBS $LIBBROTLIDEC_LIBS"
     LIBGNUTLS_CHECK_SONAME([brotlidec], [AC_LANG_PROGRAM([
            #include <brotli/decode.h>],[
            BrotliDecoderVersion();])])
-    LIBS="$save_LIBS"
     CFLAGS="$save_CFLAGS"
+    LIBS="$save_LIBS"
 ],
-      [test "$with_libbrotlienc" = yes && test "$with_libbrotlidec" = yes], [
-    if test "x$GNUTLS_REQUIRES_PRIVATE" = "x"; then
+    [test "$ac_brotli" = link], [
+    if test "x$GNUTLS_REQUIRES_PRIVATE" = x; then
         GNUTLS_REQUIRES_PRIVATE="Requires.private: libbrotlienc, libbrotlidec"
     else
-        GNUTLS_REQUIRES_PRIVATE="${GNUTLS_REQUIRES_PRIVATE}, libbrotlienc, libbrotlidec"
+        GNUTLS_REQUIRES_PRIVATE="$GNUTLS_REQUIRES_PRIVATE, libbrotlienc, libbrotlidec"
     fi
 ])
 
 AC_ARG_WITH(zstd,
-	    AS_HELP_STRING([--without-zstd], [disable zstd compression support]),
-	    ac_zstd=$withval, ac_zstd=yes)
-AC_MSG_CHECKING([whether to include zstd compression support])
-if test x$ac_zstd != xno; then
-    AC_MSG_RESULT(yes)
-    PKG_CHECK_MODULES(LIBZSTD, [libzstd >= 1.3.0], [with_libzstd=yes], [with_libzstd=no])
-    if test "${with_libzstd}" = "yes"; then
-	AC_DEFINE([HAVE_LIBZSTD], 1, [Define if ZSTD compression is enabled.])
-	need_ltlibdl=yes
-    else
-	AC_MSG_WARN(*** LIBZSTD was not found. You will not be able to use ZSTD compression.)
-    fi
-else
-    AC_MSG_RESULT(no)
-fi
-AM_CONDITIONAL(HAVE_LIBZSTD, test "$with_libzstd" = yes)
+   [AS_HELP_STRING([--with-zstd=yes/link/dlopen/no --without-zstd],
+                  [customize/disable zstd compression support])],
+            ac_libzstd=$withval, ac_libzstd=yes libzstd_optional=yes)
+AS_CASE([$ac_libzstd],
+  [yes],
+    [AM_COND_IF([ENABLE_DLOPEN], [ac_libzstd=dlopen], [ac_libzstd=link])],
+  [dlopen],
+    [AM_COND_IF([ENABLE_DLOPEN], [:],[AC_MSG_ERROR([[
+***
+*** Unable to dlopen LIBZSTD, try --with-libzstd=link.
+*** ]])])],
+  [link], [:],
+  [no], [:],
+  [AC_MSG_ERROR([[Unknown argument ${ac_libzstd} for --with-zstd]])])
 
-AS_IF([test "$ac_cv_dlopen_soname_works" = yes], [
+
+AS_IF([test x$ac_libzstd != xno],
+    [PKG_CHECK_MODULES([LIBZSTD],[libzstd],,
+	    [ac_libzstd=no
+      AS_IF([test x$libzstd_optional != xyes],
+        AC_MSG_ERROR([libzstd requested but not available]))
+	    AC_MSG_WARN([[
+***
+*** LIBZSTD was not found. You will not be able to use ZSTD compression.
+*** ]])
+      ])])
+
+if test x$ac_libzstd != xno; then
+    AC_DEFINE([HAVE_LIBZSTD], 1, [Define if ZSTD compression is enabled.])
+    need_ltlibdl=yes
+fi
+AM_CONDITIONAL(HAVE_LIBZSTD, test "$ac_libzstd" != "no")
+
+AM_CONDITIONAL([LIBZSTD_ENABLE_DLOPEN], [test "$ac_libzstd" = dlopen])
+AS_IF([test "$ac_libzstd" = dlopen], [
     save_CFLAGS=$CFLAGS
     CFLAGS="$CFLAGS $LIBZSTD_CFLAGS"
     save_LIBS=$LIBS
     LIBS="$LIBS $LIBZSTD_LIBS"
     LIBGNUTLS_CHECK_SONAME([zstd], [AC_LANG_PROGRAM([
-           #include <zstd.h>],[
-           ZSTD_versionNumber();])])
-    LIBS="$save_LIBS"
+                   #include <zstd.h>],[
+                   ZSTD_versionNumber();])])
     CFLAGS="$save_CFLAGS"
+    LIBS="$save_LIBS"
 ],
-      [test "$with_libzstd" = yes], [
-    if test "x$GNUTLS_REQUIRES_PRIVATE" = "x"; then
+    [test "$ac_libzstd" = link], [
+    if test "x$GNUTLS_REQUIRES_PRIVATE" = x; then
         GNUTLS_REQUIRES_PRIVATE="Requires.private: libzstd"
     else
-        GNUTLS_REQUIRES_PRIVATE="${GNUTLS_REQUIRES_PRIVATE}, libzstd"
+        GNUTLS_REQUIRES_PRIVATE="$GNUTLS_REQUIRES_PRIVATE, libzstd"
     fi
 ])
 
 AC_ARG_WITH(liboqs,
-	AS_HELP_STRING([--with-liboqs],
-		[Enable liboqs support.]),
-	[with_liboqs=$withval], [with_liboqs=no])
-AS_IF([test "$with_liboqs" != no], [PKG_CHECK_MODULES(LIBOQS, [liboqs >= 0.10.1], [have_liboqs=yes], [have_liboqs=no])])
-AS_IF([test "$have_liboqs" = yes], [AC_DEFINE([HAVE_LIBOQS], 1, [Have liboqs])],
-      [test "$with_liboqs" = yes], [AC_MSG_ERROR([[
+   [AS_HELP_STRING([--with-liboqs=yes/link/dlopen --with-liboqs],
+                  [customize/enable liboqs support])],
+            ac_liboqs=$withval, ac_liboqs=no)
+AS_CASE([$ac_liboqs],
+  [yes],
+    [AM_COND_IF([ENABLE_DLOPEN], [ac_liboqs=dlopen], [ac_liboqs=link])],
+  [dlopen],
+    [AM_COND_IF([ENABLE_DLOPEN], [:],[AC_MSG_ERROR([[
 ***
-*** liboqs support was requested but the required libraries were not found.
-*** ]])])
+*** Unable to dlopen LIBOQS, try --with-liboqs.
+*** ]])])],
+  [link], [:],
+  [no], [:],
+  [AC_MSG_ERROR([[Unknown argument ${ac_liboqs} for --with-liboqs]])])
 
-save_CFLAGS=$CFLAGS
-CFLAGS="$CFLAGS $LIBOQS_CFLAGS"
-AC_CHECK_DECLS([OQS_SHA3_set_callbacks])
-CFLAGS="$save_CFLAGS"
 
-# liboqs 0.10.1 didn't expose OQS_SHA3_set_callbacks from the header
-# file, so extra treatment is needed:
-# https://github.com/open-quantum-safe/liboqs/pull/1832
-AM_CONDITIONAL(NEED_LIBOQS_SHA3_OPS_H, test "$ac_cv_have_decl_OQS_SHA3_set_callbacks" != yes)
+AS_IF([test x$ac_liboqs != xno],
+    [PKG_CHECK_MODULES([LIBOQS],[liboqs >= 0.10.1],
+      [save_CFLAGS=$CFLAGS
+      CFLAGS="$CFLAGS $LIBOQS_CFLAGS"
+      AC_CHECK_DECLS([OQS_SHA3_set_callbacks])
+      CFLAGS="$save_CFLAGS"
+      # liboqs 0.10.1 didn't expose OQS_SHA3_set_callbacks from the header
+      # file, so extra treatment is needed:
+      # https://github.com/open-quantum-safe/liboqs/pull/1832
+      AC_DEFINE([HAVE_LIBOQS], 1, [Have liboqs])
+      need_ltlibdl=yes],
+      [AC_MSG_ERROR([liboqs support was requested but the required libraries were not found.])])])
 
-AM_CONDITIONAL(ENABLE_LIBOQS, test "$have_liboqs" = yes)
+AM_CONDITIONAL(ENABLE_LIBOQS, test "$ac_liboqs" != "no")
+AM_CONDITIONAL(NEED_LIBOQS_SHA3_OPS_H,
+  test "$ac_cv_have_decl_OQS_SHA3_set_callbacks" != yes)
+AM_CONDITIONAL([LIBOQS_ENABLE_DLOPEN], [test "$ac_liboqs" = dlopen])
 
-AS_IF([test "$ac_cv_dlopen_soname_works" = yes], [
+AS_IF([test "$ac_liboqs" = dlopen], [
     save_CFLAGS=$CFLAGS
     CFLAGS="$CFLAGS $LIBOQS_CFLAGS"
     save_LIBS=$LIBS
@@ -1254,10 +1329,10 @@ AS_IF([test "$ac_cv_dlopen_soname_works" = yes], [
     LIBGNUTLS_CHECK_SONAME([oqs], [AC_LANG_PROGRAM([
                    #include <oqs/oqs.h>],[
                    OQS_version ();])])
-    LIBS="$save_LIBS"
     CFLAGS="$save_CFLAGS"
+    LIBS="$save_LIBS"
 ],
-      [test "$have_liboqs" = yes], [
+    [test "$ac_liboqs" = link], [
     if test "x$GNUTLS_REQUIRES_PRIVATE" = x; then
         GNUTLS_REQUIRES_PRIVATE="Requires.private: liboqs"
     else

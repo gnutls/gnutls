@@ -48,7 +48,7 @@
 #define ZSTD_LIBRARY_SONAME "none"
 #endif
 
-#ifdef HAVE_LIBZ
+#ifdef HAVE_ZLIB
 #include "dlwrap/zlib.h"
 #endif
 
@@ -61,7 +61,7 @@
 #include "dlwrap/zstd.h"
 #endif
 
-#ifdef HAVE_LIBZ
+#ifdef HAVE_ZLIB
 static void zlib_deinit(void)
 {
 	gnutls_zlib_unload_library();
@@ -74,7 +74,7 @@ static int zlib_init(void)
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 	return 0;
 }
-#endif /* HAVE_LIBZ */
+#endif /* HAVE_ZLIB */
 
 #ifdef HAVE_LIBBROTLI
 
@@ -122,7 +122,7 @@ typedef struct {
 
 static comp_entry comp_algs[] = {
 	{ GNUTLS_COMP_NULL, "NULL", NULL, NULL },
-#ifdef HAVE_LIBZ
+#ifdef HAVE_ZLIB
 	{ GNUTLS_COMP_ZLIB, "ZLIB", zlib_init, zlib_deinit },
 #endif
 #ifdef HAVE_LIBBROTLI
@@ -135,7 +135,7 @@ static comp_entry comp_algs[] = {
 };
 
 static const gnutls_compression_method_t alg_list[] = { GNUTLS_COMP_NULL,
-#ifdef HAVE_LIBZ
+#ifdef HAVE_ZLIB
 							GNUTLS_COMP_ZLIB,
 #endif
 #ifdef HAVE_LIBBROTLI
@@ -236,7 +236,7 @@ const gnutls_compression_method_t *gnutls_compression_list(void)
 size_t _gnutls_compress_bound(gnutls_compression_method_t alg, size_t src_len)
 {
 	switch (alg) {
-#ifdef HAVE_LIBZ
+#ifdef HAVE_ZLIB
 	case GNUTLS_COMP_ZLIB:
 		return GNUTLS_ZLIB_FUNC(compressBound)(src_len);
 #endif
@@ -261,7 +261,7 @@ int _gnutls_compress(gnutls_compression_method_t alg, uint8_t *dst,
 	int ret = GNUTLS_E_COMPRESSION_FAILED;
 
 	switch (alg) {
-#ifdef HAVE_LIBZ
+#ifdef HAVE_ZLIB
 	case GNUTLS_COMP_ZLIB: {
 		int err;
 		uLongf comp_len = dst_len;
@@ -314,7 +314,7 @@ int _gnutls_decompress(gnutls_compression_method_t alg, uint8_t *dst,
 	int ret = GNUTLS_E_DECOMPRESSION_FAILED;
 
 	switch (alg) {
-#ifdef HAVE_LIBZ
+#ifdef HAVE_ZLIB
 	case GNUTLS_COMP_ZLIB: {
 		int err;
 		uLongf plain_len = dst_len;

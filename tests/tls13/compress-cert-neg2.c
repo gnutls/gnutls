@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#if defined(_WIN32) || !defined(HAVE_LIBZ)
+#if defined(_WIN32) || !defined(HAVE_ZLIB)
 
 int main(int argc, char **argv)
 {
