@@ -303,9 +303,9 @@ int _gnutls_x509_write_pubkey_params(const gnutls_pk_params_st *params,
 	case GNUTLS_PK_ECDH_X25519:
 	case GNUTLS_PK_ECDH_X448:
 #ifdef HAVE_LIBOQS
-	case GNUTLS_PK_EXP_ML_DSA_44_IPD:
-	case GNUTLS_PK_EXP_ML_DSA_65_IPD:
-	case GNUTLS_PK_EXP_ML_DSA_87_IPD:
+	case GNUTLS_PK_ML_DSA_44:
+	case GNUTLS_PK_ML_DSA_65:
+	case GNUTLS_PK_ML_DSA_87:
 	case GNUTLS_PK_EXP_FALCON512:
 	case GNUTLS_PK_EXP_FALCON1024:
 	case GNUTLS_PK_EXP_SPHINCS_SHA2_128F:
@@ -357,9 +357,9 @@ int _gnutls_x509_write_pubkey(const gnutls_pk_params_st *params,
 	case GNUTLS_PK_GOST_12_512:
 		return _gnutls_x509_write_gost_pubkey(params, der);
 #ifdef HAVE_LIBOQS
-	case GNUTLS_PK_EXP_ML_DSA_44_IPD:
-	case GNUTLS_PK_EXP_ML_DSA_65_IPD:
-	case GNUTLS_PK_EXP_ML_DSA_87_IPD:
+	case GNUTLS_PK_ML_DSA_44:
+	case GNUTLS_PK_ML_DSA_65:
+	case GNUTLS_PK_ML_DSA_87:
 	case GNUTLS_PK_EXP_FALCON512:
 	case GNUTLS_PK_EXP_FALCON1024:
 	case GNUTLS_PK_EXP_SPHINCS_SHA2_128F:
@@ -1254,11 +1254,11 @@ static int _gnutls_asn1_encode_pqc_alg(asn1_node *c2,
 static uint8_t _gnutls_get_pqc_alg_version(gnutls_pk_params_st *params)
 {
 	switch (params->algo) {
-	case GNUTLS_PK_EXP_ML_DSA_44_IPD:
+	case GNUTLS_PK_ML_DSA_44:
 		return '\x04';
-	case GNUTLS_PK_EXP_ML_DSA_65_IPD:
+	case GNUTLS_PK_ML_DSA_65:
 		return '\x06';
-	case GNUTLS_PK_EXP_ML_DSA_87_IPD:
+	case GNUTLS_PK_ML_DSA_87:
 		return '\x08';
 	case GNUTLS_PK_EXP_FALCON512:
 		return '\x01';
@@ -1428,9 +1428,9 @@ int _gnutls_asn1_encode_privkey(asn1_node *c2, gnutls_pk_params_st *params)
 		/* DH keys are only exportable in PKCS#8 format */
 		return GNUTLS_E_INVALID_REQUEST;
 #ifdef HAVE_LIBOQS
-	case GNUTLS_PK_EXP_ML_DSA_44_IPD:
-	case GNUTLS_PK_EXP_ML_DSA_65_IPD:
-	case GNUTLS_PK_EXP_ML_DSA_87_IPD:
+	case GNUTLS_PK_ML_DSA_44:
+	case GNUTLS_PK_ML_DSA_65:
+	case GNUTLS_PK_ML_DSA_87:
 		return _gnutls_asn1_encode_ml_dsa(c2, params);
 	case GNUTLS_PK_EXP_FALCON512:
 	case GNUTLS_PK_EXP_FALCON1024:

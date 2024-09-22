@@ -1437,12 +1437,12 @@ static inline int eddsa_sign(gnutls_pk_algorithm_t algo, const uint8_t *pub,
 static inline const char *convert_to_oqs_alg(gnutls_pk_algorithm_t algo)
 {
 	switch (algo) {
-	case GNUTLS_PK_EXP_ML_DSA_44_IPD:
-		return OQS_SIG_alg_ml_dsa_44_ipd;
-	case GNUTLS_PK_EXP_ML_DSA_65_IPD:
-		return OQS_SIG_alg_ml_dsa_65_ipd;
-	case GNUTLS_PK_EXP_ML_DSA_87_IPD:
-		return OQS_SIG_alg_ml_dsa_87_ipd;
+	case GNUTLS_PK_ML_DSA_44:
+		return OQS_SIG_alg_ml_dsa_44;
+	case GNUTLS_PK_ML_DSA_65:
+		return OQS_SIG_alg_ml_dsa_65;
+	case GNUTLS_PK_ML_DSA_87:
+		return OQS_SIG_alg_ml_dsa_87;
 	case GNUTLS_PK_EXP_FALCON512:
 		return OQS_SIG_alg_falcon_512;
 	case GNUTLS_PK_EXP_FALCON1024:
@@ -1898,9 +1898,9 @@ static int _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 		break;
 	}
 #ifdef HAVE_LIBOQS
-	case GNUTLS_PK_EXP_ML_DSA_44_IPD:
-	case GNUTLS_PK_EXP_ML_DSA_65_IPD:
-	case GNUTLS_PK_EXP_ML_DSA_87_IPD:
+	case GNUTLS_PK_ML_DSA_44:
+	case GNUTLS_PK_ML_DSA_65:
+	case GNUTLS_PK_ML_DSA_87:
 	case GNUTLS_PK_EXP_FALCON512:
 	case GNUTLS_PK_EXP_FALCON1024:
 	case GNUTLS_PK_EXP_SPHINCS_SHA2_128F:
@@ -2326,9 +2326,9 @@ static int _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 		break;
 	}
 #ifdef HAVE_LIBOQS
-	case GNUTLS_PK_EXP_ML_DSA_44_IPD:
-	case GNUTLS_PK_EXP_ML_DSA_65_IPD:
-	case GNUTLS_PK_EXP_ML_DSA_87_IPD:
+	case GNUTLS_PK_ML_DSA_44:
+	case GNUTLS_PK_ML_DSA_65:
+	case GNUTLS_PK_ML_DSA_87:
 	case GNUTLS_PK_EXP_FALCON512:
 	case GNUTLS_PK_EXP_FALCON1024:
 	case GNUTLS_PK_EXP_SPHINCS_SHA2_128F:
@@ -2540,7 +2540,25 @@ static int _wrap_nettle_pk_exists(gnutls_pk_algorithm_t pk)
 		return 1;
 #ifdef HAVE_LIBOQS
 	case GNUTLS_PK_MLKEM768:
-	case GNUTLS_PK_EXP_KYBER768: {
+	case GNUTLS_PK_EXP_KYBER768:
+	case GNUTLS_PK_ML_DSA_44:
+	case GNUTLS_PK_ML_DSA_65:
+	case GNUTLS_PK_ML_DSA_87:
+	case GNUTLS_PK_EXP_FALCON512:
+	case GNUTLS_PK_EXP_FALCON1024:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_128F:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_128S:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_192F:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_192S:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_256F:
+	case GNUTLS_PK_EXP_SPHINCS_SHA2_256S:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_128F:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_128S:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_192F:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_192S:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_256F:
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_256S:
+	{
 		const char *algo_name;
 
 		if (_gnutls_liboqs_ensure() < 0)
@@ -2761,9 +2779,9 @@ static int wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 	case GNUTLS_PK_GOST_12_256:
 	case GNUTLS_PK_GOST_12_512:
 #endif
-	case GNUTLS_PK_EXP_ML_DSA_44_IPD:
-	case GNUTLS_PK_EXP_ML_DSA_65_IPD:
-	case GNUTLS_PK_EXP_ML_DSA_87_IPD:
+	case GNUTLS_PK_ML_DSA_44:
+	case GNUTLS_PK_ML_DSA_65:
+	case GNUTLS_PK_ML_DSA_87:
 	case GNUTLS_PK_EXP_FALCON512:
 	case GNUTLS_PK_EXP_FALCON1024:
 	case GNUTLS_PK_EXP_SPHINCS_SHA2_128F:
@@ -4026,9 +4044,9 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 		ret = 0;
 		break;
 	}
-	case GNUTLS_PK_EXP_ML_DSA_44_IPD:
-	case GNUTLS_PK_EXP_ML_DSA_65_IPD:
-	case GNUTLS_PK_EXP_ML_DSA_87_IPD:
+	case GNUTLS_PK_ML_DSA_44:
+	case GNUTLS_PK_ML_DSA_65:
+	case GNUTLS_PK_ML_DSA_87:
 	case GNUTLS_PK_EXP_FALCON512:
 	case GNUTLS_PK_EXP_FALCON1024:
 	case GNUTLS_PK_EXP_SPHINCS_SHA2_128F:
@@ -4369,9 +4387,9 @@ static int wrap_nettle_pk_verify_priv_params(gnutls_pk_algorithm_t algo,
 
 		ret = 0;
 		break;
-	case GNUTLS_PK_EXP_ML_DSA_44_IPD:
-	case GNUTLS_PK_EXP_ML_DSA_65_IPD:
-	case GNUTLS_PK_EXP_ML_DSA_87_IPD:
+	case GNUTLS_PK_ML_DSA_44:
+	case GNUTLS_PK_ML_DSA_65:
+	case GNUTLS_PK_ML_DSA_87:
 	case GNUTLS_PK_EXP_FALCON512:
 	case GNUTLS_PK_EXP_FALCON1024:
 	case GNUTLS_PK_EXP_SPHINCS_SHA2_128F:

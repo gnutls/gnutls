@@ -39,7 +39,7 @@
 #include "ecc.h"
 
 #ifdef HAVE_LIBOQS
-#include <oqs/oqs.h>
+#include <dlwrap/oqs.h>
 #endif
 
 static int pubkey_verify_hashed_data(const gnutls_sign_entry_st *se,
@@ -54,18 +54,15 @@ static int pubkey_supports_sig(gnutls_pubkey_t pubkey,
 			       const gnutls_sign_entry_st *se);
 
 #ifdef HAVE_LIBOQS
-struct OQS_alg_pubkey_bits {
+struct pq_algorithm_pubkey_bits_st {
 	gnutls_pk_algorithm_t algorithm;
 	int pubkey_bits;
 };
 
-struct OQS_alg_pubkey_bits pqc_pubkey_bits[] = {
-	{ GNUTLS_PK_EXP_ML_DSA_44_IPD,
-	  OQS_SIG_ml_dsa_44_ipd_length_public_key },
-	{ GNUTLS_PK_EXP_ML_DSA_65_IPD,
-	  OQS_SIG_ml_dsa_65_ipd_length_public_key },
-	{ GNUTLS_PK_EXP_ML_DSA_87_IPD,
-	  OQS_SIG_ml_dsa_87_ipd_length_public_key },
+static const struct pq_algorithm_pubkey_bits_st pq_pubkey_bits[] = {
+	{ GNUTLS_PK_ML_DSA_44, OQS_SIG_ml_dsa_44_length_public_key },
+	{ GNUTLS_PK_ML_DSA_65, OQS_SIG_ml_dsa_65_length_public_key },
+	{ GNUTLS_PK_ML_DSA_87, OQS_SIG_ml_dsa_87_length_public_key },
 	{ GNUTLS_PK_EXP_FALCON512, OQS_SIG_falcon_512_length_public_key },
 	{ GNUTLS_PK_EXP_FALCON1024, OQS_SIG_falcon_1024_length_public_key },
 	{ GNUTLS_PK_EXP_SPHINCS_SHA2_128F,
@@ -96,9 +93,10 @@ struct OQS_alg_pubkey_bits pqc_pubkey_bits[] = {
 	{ GNUTLS_PK_UNKNOWN, 0 }
 };
 
-static int pqc_pubkey_to_bits(gnutls_pk_algorithm_t algo)
+static int pq_pubkey_to_bits(const gnutls_pk_algorithm_t algo)
 {
-	struct OQS_alg_pubkey_bits *pubkey_to_bits = pqc_pubkey_bits;
+	const struct pq_algorithm_pubkey_bits_st *pubkey_to_bits =
+		pq_pubkey_bits;
 	while (pubkey_to_bits->algorithm != algo &&
 	       pubkey_to_bits->algorithm != GNUTLS_PK_UNKNOWN)
 		pubkey_to_bits++;
@@ -129,9 +127,9 @@ unsigned pubkey_to_bits(const gnutls_pk_params_st *params)
 	case GNUTLS_PK_GOST_12_512:
 		return gnutls_ecc_curve_get_size(params->curve) * 8;
 #ifdef HAVE_LIBOQS
-	case GNUTLS_PK_EXP_ML_DSA_44_IPD:
-	case GNUTLS_PK_EXP_ML_DSA_65_IPD:
-	case GNUTLS_PK_EXP_ML_DSA_87_IPD:
+	case GNUTLS_PK_ML_DSA_44:
+	case GNUTLS_PK_ML_DSA_65:
+	case GNUTLS_PK_ML_DSA_87:
 	case GNUTLS_PK_EXP_FALCON512:
 	case GNUTLS_PK_EXP_FALCON1024:
 	case GNUTLS_PK_EXP_SPHINCS_SHA2_128F:
@@ -146,7 +144,7 @@ unsigned pubkey_to_bits(const gnutls_pk_params_st *params)
 	case GNUTLS_PK_EXP_SPHINCS_SHAKE_192S:
 	case GNUTLS_PK_EXP_SPHINCS_SHAKE_256F:
 	case GNUTLS_PK_EXP_SPHINCS_SHAKE_256S:
-		return pqc_pubkey_to_bits(params->algo);
+		return pq_pubkey_to_bits(params->algo);
 #endif
 	default:
 		return 0;
@@ -433,9 +431,9 @@ int gnutls_pubkey_get_preferred_hash_algorithm(gnutls_pubkey_t key,
 		ret = 0;
 		break;
 #ifdef HAVE_LIBOQS
-	case GNUTLS_PK_EXP_ML_DSA_44_IPD:
-	case GNUTLS_PK_EXP_ML_DSA_65_IPD:
-	case GNUTLS_PK_EXP_ML_DSA_87_IPD:
+	case GNUTLS_PK_ML_DSA_44:
+	case GNUTLS_PK_ML_DSA_65:
+	case GNUTLS_PK_ML_DSA_87:
 	case GNUTLS_PK_EXP_FALCON512:
 	case GNUTLS_PK_EXP_FALCON1024:
 	case GNUTLS_PK_EXP_SPHINCS_SHAKE_128F:
@@ -2758,9 +2756,9 @@ int pubkey_verify_data(const gnutls_sign_entry_st *se, const mac_entry_st *me,
 	case GNUTLS_PK_EDDSA_ED25519:
 	case GNUTLS_PK_EDDSA_ED448:
 #ifdef HAVE_LIBOQS
-	case GNUTLS_PK_EXP_ML_DSA_44_IPD:
-	case GNUTLS_PK_EXP_ML_DSA_65_IPD:
-	case GNUTLS_PK_EXP_ML_DSA_87_IPD:
+	case GNUTLS_PK_ML_DSA_44:
+	case GNUTLS_PK_ML_DSA_65:
+	case GNUTLS_PK_ML_DSA_87:
 	case GNUTLS_PK_EXP_FALCON512:
 	case GNUTLS_PK_EXP_FALCON1024:
 	case GNUTLS_PK_EXP_SPHINCS_SHA2_128F:

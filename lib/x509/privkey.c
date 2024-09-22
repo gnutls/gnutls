@@ -37,7 +37,7 @@
 #include "pin.h"
 
 #ifdef HAVE_LIBOQS
-#include <oqs/oqs.h>
+#include <dlwrap/oqs.h>
 #endif
 /**
  * gnutls_x509_privkey_init:
@@ -328,7 +328,7 @@ error:
 }
 
 #ifdef HAVE_LIBOQS
-struct PQCAlgorithmVersion {
+struct pqc_algorithm_version_st {
 	uint8_t version;
 	gnutls_pk_algorithm_t algorithm;
 	int secret_key_length;
@@ -372,16 +372,13 @@ int _gnutls_decode_pqc_keys(asn1_node *pkey_asn, const gnutls_datum_t *raw_key,
 	return GNUTLS_E_SUCCESS;
 }
 
-struct PQCAlgorithmVersion ml_dsa_versions[] = {
-	{ '\x04', GNUTLS_PK_EXP_ML_DSA_44_IPD,
-	  OQS_SIG_ml_dsa_44_ipd_length_secret_key,
-	  OQS_SIG_ml_dsa_44_ipd_length_public_key },
-	{ '\x06', GNUTLS_PK_EXP_ML_DSA_65_IPD,
-	  OQS_SIG_ml_dsa_65_ipd_length_secret_key,
-	  OQS_SIG_ml_dsa_65_ipd_length_public_key },
-	{ '\x08', GNUTLS_PK_EXP_ML_DSA_87_IPD,
-	  OQS_SIG_ml_dsa_87_ipd_length_secret_key,
-	  OQS_SIG_ml_dsa_87_ipd_length_public_key },
+static const struct pqc_algorithm_version_st ml_dsa_versions[] = {
+	{ '\x04', GNUTLS_PK_ML_DSA_44, OQS_SIG_ml_dsa_44_length_secret_key,
+	  OQS_SIG_ml_dsa_44_length_public_key },
+	{ '\x06', GNUTLS_PK_ML_DSA_65, OQS_SIG_ml_dsa_65_length_secret_key,
+	  OQS_SIG_ml_dsa_65_length_public_key },
+	{ '\x08', GNUTLS_PK_ML_DSA_87, OQS_SIG_ml_dsa_87_length_secret_key,
+	  OQS_SIG_ml_dsa_87_length_public_key },
 
 	{ '\x00', GNUTLS_PK_UNKNOWN, 0, 0 }
 };
@@ -389,7 +386,7 @@ struct PQCAlgorithmVersion ml_dsa_versions[] = {
 static int _gnutls_set_ml_dsa_params(const uint8_t *version,
 				     gnutls_x509_privkey_t pkey)
 {
-	struct PQCAlgorithmVersion *v = ml_dsa_versions;
+	const struct pqc_algorithm_version_st *v = ml_dsa_versions;
 	while (v->algorithm != GNUTLS_PK_UNKNOWN && v->version != *version)
 		v++;
 
@@ -437,7 +434,7 @@ error:
 	return result;
 }
 
-struct PQCAlgorithmVersion falcon_versions[] = {
+static const struct pqc_algorithm_version_st falcon_versions[] = {
 	{ '\x01', GNUTLS_PK_EXP_FALCON512, OQS_SIG_falcon_512_length_secret_key,
 	  OQS_SIG_falcon_512_length_public_key },
 	{ '\x02', GNUTLS_PK_EXP_FALCON1024,
@@ -450,7 +447,7 @@ struct PQCAlgorithmVersion falcon_versions[] = {
 static int _gnutls_set_falcon_params(const uint8_t *version,
 				     gnutls_x509_privkey_t pkey)
 {
-	struct PQCAlgorithmVersion *v = falcon_versions;
+	const struct pqc_algorithm_version_st *v = falcon_versions;
 	while (v->algorithm != GNUTLS_PK_UNKNOWN && v->version != *version)
 		v++;
 
@@ -498,7 +495,7 @@ error:
 	return result;
 }
 
-struct PQCAlgorithmVersion sphincs_versions[] = {
+static const struct pqc_algorithm_version_st sphincs_versions[] = {
 	{ '\x01', GNUTLS_PK_EXP_SPHINCS_SHA2_128F,
 	  OQS_SIG_sphincs_sha2_128f_simple_length_secret_key,
 	  OQS_SIG_sphincs_sha2_128f_simple_length_public_key },
@@ -542,7 +539,7 @@ struct PQCAlgorithmVersion sphincs_versions[] = {
 static int _gnutls_set_sphincs_params(const uint8_t *version,
 				      gnutls_x509_privkey_t pkey)
 {
-	struct PQCAlgorithmVersion *v = sphincs_versions;
+	const struct pqc_algorithm_version_st *v = sphincs_versions;
 	while (v->algorithm != GNUTLS_PK_UNKNOWN && v->version != *version)
 		v++;
 
@@ -789,7 +786,7 @@ int gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
 						&_data);
 					if (result >= 0) {
 						key->params.algo =
-							GNUTLS_PK_EXP_ML_DSA_44_IPD;
+							GNUTLS_PK_ML_DSA_44;
 					}
 				} else if (left > sizeof(PEM_KEY_FALCON) &&
 					   memcmp(ptr, PEM_KEY_FALCON,
@@ -874,7 +871,7 @@ int gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
 			key->key = NULL;
 		}
 #ifdef HAVE_LIBOQS
-	} else if (key->params.algo == GNUTLS_PK_EXP_ML_DSA_44_IPD) {
+	} else if (key->params.algo == GNUTLS_PK_ML_DSA_44) {
 		result = _gnutls_privkey_decode_ml_dsa_key(&key->key, &_data,
 							   key);
 
@@ -1003,10 +1000,8 @@ fail:
 
 #ifdef HAVE_LIBOQS
 #define MAX_ALGORITHM_NAME_SIZE_IN_PEM_HEADER 21
-#define MAX_PEM_KEY_SIZE PEM_KEY_SPHINCS
 #else
 #define MAX_ALGORITHM_NAME_SIZE_IN_PEM_HEADER 15
-#define MAX_PEM_KEY_SIZE PEM_KEY_RSA
 #endif
 
 /**
@@ -1069,21 +1064,27 @@ int gnutls_x509_privkey_import2(gnutls_x509_privkey_t key,
 				       ((ptrdiff_t)ptr - (ptrdiff_t)data->data);
 			}
 
-			if (ptr != NULL && left > sizeof(MAX_PEM_KEY_SIZE)) {
-				if (memcmp(ptr, PEM_KEY_RSA,
-					   sizeof(PEM_KEY_RSA) - 1) == 0 ||
-				    memcmp(ptr, PEM_KEY_ECC,
-					   sizeof(PEM_KEY_ECC) - 1) == 0 ||
-				    memcmp(ptr, PEM_KEY_DSA,
-					   sizeof(PEM_KEY_DSA) - 1) == 0
+			if (ptr != NULL) {
+				if ((left > sizeof(PEM_KEY_RSA) &&
+				     memcmp(ptr, PEM_KEY_RSA,
+					    sizeof(PEM_KEY_RSA) - 1) == 0) ||
+				    (left > sizeof(PEM_KEY_ECC) &&
+				     memcmp(ptr, PEM_KEY_ECC,
+					    sizeof(PEM_KEY_ECC) - 1) == 0) ||
+				    (left > sizeof(PEM_KEY_DSA) &&
+				     memcmp(ptr, PEM_KEY_DSA,
+					    sizeof(PEM_KEY_DSA) - 1) == 0)
 #ifdef HAVE_LIBOQS
 				    ||
-				    memcmp(ptr, PEM_KEY_ML_DSA,
-					   sizeof(PEM_KEY_ML_DSA) - 1) == 0 ||
-				    memcmp(ptr, PEM_KEY_FALCON,
-					   sizeof(PEM_KEY_FALCON) - 1) == 0 ||
-				    memcmp(ptr, PEM_KEY_SPHINCS,
-					   sizeof(PEM_KEY_SPHINCS) - 1) == 0
+				    (left > sizeof(PEM_KEY_ML_DSA) &&
+				     memcmp(ptr, PEM_KEY_ML_DSA,
+					    sizeof(PEM_KEY_ML_DSA) - 1) == 0) ||
+				    (left > sizeof(PEM_KEY_FALCON) &&
+				     memcmp(ptr, PEM_KEY_FALCON,
+					    sizeof(PEM_KEY_FALCON) - 1) == 0) ||
+				    (left > sizeof(PEM_KEY_SPHINCS) &&
+				     memcmp(ptr, PEM_KEY_SPHINCS,
+					    sizeof(PEM_KEY_SPHINCS) - 1) == 0)
 #endif
 				) {
 					head_enc = 0;
@@ -1838,9 +1839,9 @@ static const char *set_msg(gnutls_x509_privkey_t key)
 	case GNUTLS_PK_EC:
 		return PEM_KEY_ECC;
 #ifdef HAVE_LIBOQS
-	case GNUTLS_PK_EXP_ML_DSA_44_IPD:
-	case GNUTLS_PK_EXP_ML_DSA_65_IPD:
-	case GNUTLS_PK_EXP_ML_DSA_87_IPD:
+	case GNUTLS_PK_ML_DSA_44:
+	case GNUTLS_PK_ML_DSA_65:
+	case GNUTLS_PK_ML_DSA_87:
 		return PEM_KEY_ML_DSA;
 	case GNUTLS_PK_EXP_FALCON512:
 	case GNUTLS_PK_EXP_FALCON1024:

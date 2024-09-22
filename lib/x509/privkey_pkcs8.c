@@ -40,7 +40,7 @@
 #include "prov-seed.h"
 
 #ifdef HAVE_LIBOQS
-#include <oqs/oqs.h>
+#include <dlwrap/oqs.h>
 #endif
 
 static int _decode_pkcs8_ecc_key(asn1_node pkcs8_asn,
@@ -83,9 +83,9 @@ inline static int _encode_privkey(gnutls_x509_privkey_t pkey,
 			gnutls_assert();
 		return ret;
 #ifdef HAVE_LIBOQS
-	case GNUTLS_PK_EXP_ML_DSA_44_IPD:
-	case GNUTLS_PK_EXP_ML_DSA_65_IPD:
-	case GNUTLS_PK_EXP_ML_DSA_87_IPD:
+	case GNUTLS_PK_ML_DSA_44:
+	case GNUTLS_PK_ML_DSA_65:
+	case GNUTLS_PK_ML_DSA_87:
 	case GNUTLS_PK_EXP_FALCON512:
 	case GNUTLS_PK_EXP_FALCON1024:
 	case GNUTLS_PK_EXP_SPHINCS_SHA2_128F:
@@ -1485,19 +1485,19 @@ error:
 }
 
 #ifdef HAVE_LIBOQS
-struct pqc_key_length_st {
+struct pq_key_length_st {
 	gnutls_pk_algorithm_t algorithm;
 	int secret_key_length;
 	int public_key_length;
 };
 
-struct pqc_key_length_st pqc_key_lengths[] = {
-	{ GNUTLS_PK_EXP_ML_DSA_44_IPD, OQS_SIG_ml_dsa_44_ipd_length_secret_key,
-	  OQS_SIG_ml_dsa_44_ipd_length_public_key },
-	{ GNUTLS_PK_EXP_ML_DSA_65_IPD, OQS_SIG_ml_dsa_65_ipd_length_secret_key,
-	  OQS_SIG_ml_dsa_65_ipd_length_public_key },
-	{ GNUTLS_PK_EXP_ML_DSA_87_IPD, OQS_SIG_ml_dsa_87_ipd_length_secret_key,
-	  OQS_SIG_ml_dsa_87_ipd_length_public_key },
+static const struct pq_key_length_st pq_key_lengths[] = {
+	{ GNUTLS_PK_ML_DSA_44, OQS_SIG_ml_dsa_44_length_secret_key,
+	  OQS_SIG_ml_dsa_44_length_public_key },
+	{ GNUTLS_PK_ML_DSA_65, OQS_SIG_ml_dsa_65_length_secret_key,
+	  OQS_SIG_ml_dsa_65_length_public_key },
+	{ GNUTLS_PK_ML_DSA_87, OQS_SIG_ml_dsa_87_length_secret_key,
+	  OQS_SIG_ml_dsa_87_length_public_key },
 	{ GNUTLS_PK_EXP_FALCON512, OQS_SIG_falcon_512_length_secret_key,
 	  OQS_SIG_falcon_512_length_public_key },
 	{ GNUTLS_PK_EXP_FALCON1024, OQS_SIG_falcon_1024_length_secret_key,
@@ -1542,11 +1542,11 @@ struct pqc_key_length_st pqc_key_lengths[] = {
 	{ GNUTLS_PK_UNKNOWN, 0, 0 }
 };
 
-static int _get_pqc_keys_length(gnutls_pk_algorithm_t algo,
+static int _get_pqc_keys_length(const gnutls_pk_algorithm_t algo,
 				int *pqc_alg_secret_key_length,
 				int *pqc_alg_public_key_length)
 {
-	struct pqc_key_length_st *pqc_key_length = pqc_key_lengths;
+	const struct pq_key_length_st *pqc_key_length = pq_key_lengths;
 	while (pqc_key_length->algorithm != algo &&
 	       pqc_key_length->algorithm != GNUTLS_PK_UNKNOWN)
 		pqc_key_length++;
@@ -1693,9 +1693,9 @@ static int decode_private_key_info(const gnutls_datum_t *der,
 						pkey->params.algo);
 		break;
 #ifdef HAVE_LIBOQS
-	case GNUTLS_PK_EXP_ML_DSA_44_IPD:
-	case GNUTLS_PK_EXP_ML_DSA_65_IPD:
-	case GNUTLS_PK_EXP_ML_DSA_87_IPD:
+	case GNUTLS_PK_ML_DSA_44:
+	case GNUTLS_PK_ML_DSA_65:
+	case GNUTLS_PK_ML_DSA_87:
 	case GNUTLS_PK_EXP_FALCON512:
 	case GNUTLS_PK_EXP_FALCON1024:
 	case GNUTLS_PK_EXP_SPHINCS_SHA2_128F:

@@ -80,7 +80,7 @@ static const gnutls_sec_params_entry sec_params[] = {
 	},
 	{ "Medium", GNUTLS_SEC_PARAM_MEDIUM, 112, 2048, 2048, 224, 224,
 #ifdef HAVE_LIBOQS
-	  OQS_SIG_ml_dsa_44_ipd_length_public_key, 0, 0
+	  OQS_SIG_ml_dsa_44_length_public_key, 0, 0
 #endif
 	},
 	{ "High", GNUTLS_SEC_PARAM_HIGH, 128, 3072, 3072, 256, 256,
@@ -101,7 +101,7 @@ static const gnutls_sec_params_entry sec_params[] = {
 	 },
 	{ "Medium", GNUTLS_SEC_PARAM_MEDIUM, 112, 2048, 2048, 256, 224,
 #ifdef HAVE_LIBOQS
-		 OQS_SIG_ml_dsa_44_ipd_length_public_key, 0, 0
+		 OQS_SIG_ml_dsa_44_length_public_key, 0, 0
 #endif
 		 },
 	{ "High", GNUTLS_SEC_PARAM_HIGH, 128, 3072, 3072, 256, 256,
@@ -112,12 +112,12 @@ static const gnutls_sec_params_entry sec_params[] = {
 #endif
 	{ "Ultra", GNUTLS_SEC_PARAM_ULTRA, 192, 8192, 8192, 384, 384,
 #ifdef HAVE_LIBOQS
-	  OQS_SIG_ml_dsa_65_ipd_length_public_key, 0, 0
+	  OQS_SIG_ml_dsa_65_length_public_key, 0, 0
 #endif
 	},
 	{ "Future", GNUTLS_SEC_PARAM_FUTURE, 256, 15360, 15360, 512, 512,
 #ifdef HAVE_LIBOQS
-	  OQS_SIG_ml_dsa_87_ipd_length_public_key,
+	  OQS_SIG_ml_dsa_87_length_public_key,
 	  OQS_SIG_falcon_1024_length_public_key,
 	  OQS_SIG_sphincs_sha2_256f_simple_length_public_key
 #endif
