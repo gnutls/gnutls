@@ -28,7 +28,7 @@ static int _verify_response(gnutls_datum_t *data, gnutls_x509_crt_t cert,
    be checked, argv[2] holding the issuer for this certificate,
    and argv[3] holding a trusted certificate to verify OCSP's response.
    argv[4] is optional and should hold the server host name.
-   
+
    For simplicity the libcurl library is used.
  */
 
@@ -229,7 +229,7 @@ static int _verify_response(gnutls_datum_t *data, gnutls_x509_crt_t cert,
 {
 	gnutls_ocsp_resp_t resp;
 	int ret;
-	unsigned verify;
+	unsigned verify, resp_indx;
 	gnutls_datum_t rnonce;
 
 	ret = gnutls_ocsp_resp_init(&resp);
@@ -240,7 +240,11 @@ static int _verify_response(gnutls_datum_t *data, gnutls_x509_crt_t cert,
 	if (ret < 0)
 		exit(1);
 
-	ret = gnutls_ocsp_resp_check_crt(resp, 0, cert);
+	for (resp_indx = 0;; resp_indx++) {
+		ret = gnutls_ocsp_resp_check_crt(resp, resp_indx, cert);
+		if (ret == 0 || ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+			break;
+	}
 	if (ret < 0)
 		exit(1);
 

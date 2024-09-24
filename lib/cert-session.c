@@ -155,7 +155,7 @@ void gnutls_certificate_set_params_function(
  *
  * This function will set flags to tweak the operation of
  * the credentials structure. See the #gnutls_certificate_flags enumerations
- * for more information on the available flags. 
+ * for more information on the available flags.
  *
  * Since: 3.4.7
  **/
@@ -170,9 +170,9 @@ void gnutls_certificate_set_flags(gnutls_certificate_credentials_t res,
  * @res: is a gnutls_certificate_credentials_t type
  * @flags: are the flags
  *
- * This function will set the flags to be used for verification 
+ * This function will set the flags to be used for verification
  * of certificates and override any defaults.  The provided flags must be an OR of the
- * #gnutls_certificate_verify_flags enumerations. 
+ * #gnutls_certificate_verify_flags enumerations.
  *
  **/
 void gnutls_certificate_set_verify_flags(gnutls_certificate_credentials_t res,
@@ -223,7 +223,7 @@ static int _gnutls_ocsp_verify_mandatory_stapling(gnutls_session_t session,
 						  unsigned int *ocsp_status);
 
 /* If the certificate is revoked status will be GNUTLS_CERT_REVOKED.
- * 
+ *
  * Returns:
  *  Zero on success, a negative error code otherwise.
  */
@@ -236,7 +236,7 @@ static int check_ocsp_response(gnutls_session_t session, gnutls_x509_crt_t cert,
 {
 	gnutls_ocsp_resp_t resp;
 	int ret;
-	unsigned int status, cert_status;
+	unsigned int status, cert_status, resp_indx;
 	time_t rtime, vtime, ntime, now;
 	int check_failed = 0;
 
@@ -277,7 +277,11 @@ static int check_ocsp_response(gnutls_session_t session, gnutls_x509_crt_t cert,
 		goto cleanup;
 	}
 
-	ret = gnutls_ocsp_resp_check_crt(resp, 0, cert);
+	for (resp_indx = 0;; resp_indx++) {
+		ret = gnutls_ocsp_resp_check_crt(resp, resp_indx, cert);
+		if (ret == 0 || ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+			break;
+	}
 	if (ret < 0) {
 		ret = gnutls_assert_val(0);
 		_gnutls_audit_log(
@@ -365,7 +369,7 @@ static int check_ocsp_response(gnutls_session_t session, gnutls_x509_crt_t cert,
 	}
 
 	/* Report but do not fail on the following errors. That is
-	 * because including the OCSP response in the handshake shouldn't 
+	 * because including the OCSP response in the handshake shouldn't
 	 * cause more problems that not including it.
 	 */
 	if (ntime == -1) {
@@ -618,7 +622,7 @@ skip_ocsp:
  * This function will verify the peer's certificate and store
  * the status in the @status variable as a bitwise OR of gnutls_certificate_status_t
  * values or zero if the certificate is trusted. Note that value in @status
- * is set only when the return value of this function is success (i.e, failure 
+ * is set only when the return value of this function is success (i.e, failure
  * to trust a certificate does not imply a negative return value).
  * The default verification flags used by this function can be overridden
  * using gnutls_certificate_set_verify_flags().
@@ -626,7 +630,7 @@ skip_ocsp:
  * This function will take into account the stapled OCSP responses sent by the server,
  * as well as the following X.509 certificate extensions: Name Constraints,
  * Key Usage, and Basic Constraints (pathlen).
- * 
+ *
  * Note that you must also check the peer's name in order to check if
  * the verified certificate belongs to the actual peer, see gnutls_x509_crt_check_hostname(),
  * or use gnutls_certificate_verify_peers3().
@@ -657,7 +661,7 @@ int gnutls_certificate_verify_peers2(gnutls_session_t session,
  * This function will verify the peer's certificate and store the
  * the status in the @status variable as a bitwise OR of gnutls_certificate_status_t
  * values or zero if the certificate is trusted. Note that value in @status
- * is set only when the return value of this function is success (i.e, failure 
+ * is set only when the return value of this function is success (i.e, failure
  * to trust a certificate does not imply a negative return value).
  * The default verification flags used by this function can be overridden
  * using gnutls_certificate_set_verify_flags(). See the documentation
@@ -666,7 +670,7 @@ int gnutls_certificate_verify_peers2(gnutls_session_t session,
  * This function will take into account the stapled OCSP responses sent by the server,
  * as well as the following X.509 certificate extensions: Name Constraints,
  * Key Usage, and Basic Constraints (pathlen).
- * 
+ *
  * If the @hostname provided is non-NULL then this function will compare
  * the hostname in the certificate against it. The comparison will follow
  * the RFC6125 recommendations. If names do not match the
@@ -710,7 +714,7 @@ int gnutls_certificate_verify_peers3(gnutls_session_t session,
  * This function will verify the peer's certificate and store the
  * the status in the @status variable as a bitwise OR of gnutls_certificate_status_t
  * values or zero if the certificate is trusted. Note that value in @status
- * is set only when the return value of this function is success (i.e, failure 
+ * is set only when the return value of this function is success (i.e, failure
  * to trust a certificate does not imply a negative return value).
  * The default verification flags used by this function can be overridden
  * using gnutls_certificate_set_verify_flags(). See the documentation
@@ -719,16 +723,16 @@ int gnutls_certificate_verify_peers3(gnutls_session_t session,
  * This function will take into account the stapled OCSP responses sent by the server,
  * as well as the following X.509 certificate extensions: Name Constraints,
  * Key Usage, and Basic Constraints (pathlen).
- * 
+ *
  * The acceptable @data types are %GNUTLS_DT_DNS_HOSTNAME, %GNUTLS_DT_RFC822NAME and %GNUTLS_DT_KEY_PURPOSE_OID.
  * The former two accept as data a null-terminated hostname or email address, and the latter a null-terminated
  * object identifier (e.g., %GNUTLS_KP_TLS_WWW_SERVER).
  *
  * If a DNS hostname is provided then this function will compare
- * the hostname in the certificate against the given. If names do not match the 
+ * the hostname in the certificate against the given. If names do not match the
  * %GNUTLS_CERT_UNEXPECTED_OWNER status flag will be set.
  * If a key purpose OID is provided and the end-certificate contains the extended key
- * usage PKIX extension, it will be required to be have the provided key purpose 
+ * usage PKIX extension, it will be required to be have the provided key purpose
  * or be marked for any purpose, otherwise verification status will have the
  * %GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE flag set.
  *

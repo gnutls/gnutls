@@ -329,7 +329,7 @@ int check_ocsp_response(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
 {
 	gnutls_ocsp_resp_t resp;
 	int ret;
-	unsigned int status, cert_status;
+	unsigned int status, cert_status, resp_indx;
 	struct timespec r;
 	time_t rtime, vtime, ntime, now;
 	char timebuf1[SIMPLE_CTIME_BUF_SIZE];
@@ -350,7 +350,11 @@ int check_ocsp_response(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
 		exit(1);
 	}
 
-	ret = gnutls_ocsp_resp_check_crt(resp, 0, cert);
+	for (resp_indx = 0;; resp_indx++) {
+		ret = gnutls_ocsp_resp_check_crt(resp, resp_indx, cert);
+		if (ret == 0 || ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+			break;
+	}
 	if (ret < 0) {
 		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
 			printf("*** Got OCSP response with no data (ignoring)\n");
