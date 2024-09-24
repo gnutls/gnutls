@@ -277,7 +277,7 @@ static int check_ocsp_response(gnutls_session_t session, gnutls_x509_crt_t cert,
 		goto cleanup;
 	}
 
-	for (resp_indx = 0; ; resp_indx++) {
+	for (resp_indx = 0;; resp_indx++) {
 		ret = gnutls_ocsp_resp_check_crt(resp, resp_indx, cert);
 		if (ret == 0 || ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 			break;

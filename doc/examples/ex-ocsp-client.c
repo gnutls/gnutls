@@ -240,7 +240,7 @@ static int _verify_response(gnutls_datum_t *data, gnutls_x509_crt_t cert,
 	if (ret < 0)
 		exit(1);
 
-	for (resp_indx = 0; ; resp_indx++) {
+	for (resp_indx = 0;; resp_indx++) {
 		ret = gnutls_ocsp_resp_check_crt(resp, resp_indx, cert);
 		if (ret == 0 || ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 			break;

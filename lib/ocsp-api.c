@@ -201,7 +201,7 @@ static unsigned resp_matches_pcert(gnutls_ocsp_resp_t resp,
 		goto cleanup;
 	}
 
-	for (resp_indx = 0; ; resp_indx++) {
+	for (resp_indx = 0;; resp_indx++) {
 		ret = gnutls_ocsp_resp_check_crt(resp, resp_indx, crt);
 		if (ret == 0 || ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 			break;
