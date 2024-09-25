@@ -1,7 +1,11 @@
 #!/bin/sh
 
-# This script generates dlopen stubs for optional libraries using dlwrap tool:
-# https://crates.io/crates/dlwrap
+# This is a helper script for maintainers to easily (re)generate
+# dlopen wrappers under lib/dlwrap/*, using dlwrap[1].  Note that the
+# generation is not part of the GnuTLS build process, as the generated
+# code shall be pushed to the Git repository.
+#
+# 1. https://crates.io/crates/dlwrap
 
 # Copyright (c) 2023 Daiki Ueno
 # License: GPLv3+ <http://gnu.org/licenses/gpl.html>
