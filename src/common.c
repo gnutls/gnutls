@@ -297,9 +297,11 @@ int compress_cert_set_methods(gnutls_session_t session, const char **strings,
 			      size_t n_strings)
 {
 	int ret = 0;
+	size_t i, n_methods;
 	gnutls_compression_method_t *methods;
 
 	if (n_strings == 0) {
+		fprintf(stderr, "No compression methods found\n");
 		return 0;
 	}
 
@@ -308,24 +310,31 @@ int compress_cert_set_methods(gnutls_session_t session, const char **strings,
 #pragma GCC diagnostic ignored "-Wanalyzer-mismatching-deallocation"
 
 	methods = reallocarray(NULL, n_strings, sizeof(*methods));
-	if (!methods) {
+	if (methods == NULL) {
 		fprintf(stderr,
 			"Could not set certificate compression methods: %s\n",
 			gnutls_strerror(ret));
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	for (size_t i = 0; i < n_strings; ++i) {
-		methods[i] = gnutls_compression_get_id(strings[i]);
-		if (methods[i] == GNUTLS_COMP_UNKNOWN) {
-			fprintf(stderr, "Unknown compression method: %s\n",
+	for (i = 0, n_methods = 0; i < n_strings; ++i) {
+		methods[n_methods] = gnutls_compression_get_id(strings[i]);
+		if (methods[n_methods] == GNUTLS_COMP_UNKNOWN) {
+			fprintf(stderr,
+				"Unknown compression method: %s (ignoring)\n",
 				strings[i]);
-			goto cleanup;
+			continue;
 		}
+		++n_methods;
+	}
+
+	if (n_methods == 0) {
+		fprintf(stderr, "No compression methods found\n");
+		goto cleanup;
 	}
 
 	ret = gnutls_compress_certificate_set_methods(session, methods,
-						      n_strings);
+						      n_methods);
 	if (ret < 0) {
 		fprintf(stderr,
 			"Could not set certificate compression methods: %s\n",
