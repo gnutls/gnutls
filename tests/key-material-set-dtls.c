@@ -172,18 +172,24 @@ static void client(int fd)
 
 	/* skip past the sliding window */
 	for (i = 0; i < 96; i++) {
-		ret = gnutls_record_send(session, "hello", 5);
+		do {
+			ret = gnutls_record_send(session, "hello", 5);
+		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 		if (ret < 0) {
 			fail("gnutls_record_send: %s\n", gnutls_strerror(ret));
 		}
 
-		ret = gnutls_record_recv(session, buf, sizeof(buf));
+		do {
+			ret = gnutls_record_recv(session, buf, sizeof(buf));
+		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 		if (ret < 0) {
 			fail("gnutls_record_recv: %s\n", gnutls_strerror(ret));
 		}
 	}
 
-	ret = gnutls_record_send(session, "reset", 5);
+	do {
+		ret = gnutls_record_send(session, "reset", 5);
+	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 	if (ret < 0) {
 		fail("gnutls_record_send(reset): %s\n", gnutls_strerror(ret));
 	}
@@ -202,12 +208,16 @@ static void client(int fd)
 		exit(1);
 	}
 
-	ret = gnutls_record_send(session, "ping", 4);
+	do {
+		ret = gnutls_record_send(session, "ping", 4);
+	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 	if (ret < 0) {
 		fail("gnutls_record_send(ping): %s\n", gnutls_strerror(ret));
 	}
 
-	ret = gnutls_record_recv(session, buf, sizeof(buf));
+	do {
+		ret = gnutls_record_recv(session, buf, sizeof(buf));
+	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 	if (ret < 0) {
 		fail("gnutls_record_recv(pong): %s\n", gnutls_strerror(ret));
 	}
@@ -302,7 +312,9 @@ static void server(int fd)
 	}
 
 	do {
-		ret = gnutls_record_recv(session, buf, sizeof(buf));
+		do {
+			ret = gnutls_record_recv(session, buf, sizeof(buf));
+		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 		if (ret > 0) {
 			if (ret == 5 && memcmp(buf, "reset", 5) == 0) {
@@ -311,7 +323,10 @@ static void server(int fd)
 				break;
 			}
 
-			ret = gnutls_record_send(session, buf, ret);
+			do {
+				ret = gnutls_record_send(session, buf, ret);
+			} while (ret == GNUTLS_E_AGAIN ||
+				 ret == GNUTLS_E_INTERRUPTED);
 		}
 	} while (ret > 0);
 
@@ -329,10 +344,14 @@ static void server(int fd)
 		fail("error in %d\n", __LINE__);
 	}
 
-	ret = gnutls_record_recv(session, buf, sizeof(buf));
+	do {
+		ret = gnutls_record_recv(session, buf, sizeof(buf));
+	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 	if (ret == 4 && memcmp(buf, "ping", 4) == 0) {
-		ret = gnutls_record_send(session, "pong", 4);
+		do {
+			ret = gnutls_record_send(session, "pong", 4);
+		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 	} else if (ret > 0) {
 		fail("did not receive ping; received: %.*s\n", ret, buf);
 	} else if (ret < 0) {
