@@ -8,3 +8,4 @@ OQS_KEM_decaps
 OQS_KEM_keypair
 OQS_KEM_free
 OQS_randombytes_custom_algorithm
+OQS_version

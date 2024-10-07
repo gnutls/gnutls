@@ -1302,10 +1302,16 @@ AS_CASE([$ac_liboqs],
   [no], [:],
   [AC_MSG_ERROR([[Unknown argument ${ac_liboqs} for --with-liboqs]])])
 
+m4_define([min_liboqs_version_major], [0])
+m4_define([min_liboqs_version_minor], [11])
+m4_define([min_liboqs_version_micro], [0])
 
 AS_IF([test x$ac_liboqs != xno],
-    [PKG_CHECK_MODULES([LIBOQS],[liboqs >= 0.11.0],
+    [PKG_CHECK_MODULES([LIBOQS],[liboqs >= min_liboqs_version_major.min_liboqs_version_minor.min_liboqs_version_micro],
       [AC_DEFINE([HAVE_LIBOQS], 1, [Have liboqs])
+      AC_DEFINE([MIN_LIBOQS_VERSION_MAJOR], min_liboqs_version_major, [Major version of liboqs required])
+      AC_DEFINE([MIN_LIBOQS_VERSION_MINOR], min_liboqs_version_minor, [Minor version of liboqs required])
+      AC_DEFINE([MIN_LIBOQS_VERSION_MICRO], min_liboqs_version_micro, [Micro version of liboqs required])
       need_ltlibdl=yes],
       [AC_MSG_ERROR([liboqs support was requested but the required libraries were not found.])])])
 

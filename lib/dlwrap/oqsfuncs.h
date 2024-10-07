@@ -13,3 +13,4 @@ FUNC(OQS_STATUS, OQS_KEM_keypair, (const OQS_KEM *kem, uint8_t *public_key, uint
 FUNC(OQS_STATUS, OQS_KEM_encaps, (const OQS_KEM *kem, uint8_t *ciphertext, uint8_t *shared_secret, const uint8_t *public_key), (kem, ciphertext, shared_secret, public_key))
 FUNC(OQS_STATUS, OQS_KEM_decaps, (const OQS_KEM *kem, uint8_t *shared_secret, const uint8_t *ciphertext, const uint8_t *secret_key), (kem, shared_secret, ciphertext, secret_key))
 VOID_FUNC(void, OQS_KEM_free, (OQS_KEM *kem), (kem))
+FUNC(const char *, OQS_version, (void), ())
