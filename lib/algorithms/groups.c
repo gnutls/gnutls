@@ -30,11 +30,28 @@
 /* Supported ECC curves
  */
 
+#ifdef HAVE_LIBOQS
+static const gnutls_group_entry_st group_mlkem768 = {
+	.name = "MLKEM768",
+	.id = GNUTLS_GROUP_INVALID,
+	.curve = GNUTLS_ECC_CURVE_INVALID,
+	.pk = GNUTLS_PK_MLKEM768,
+};
+
 static const gnutls_group_entry_st group_kyber768 = {
 	.name = "KYBER768",
 	.id = GNUTLS_GROUP_INVALID,
 	.curve = GNUTLS_ECC_CURVE_INVALID,
 	.pk = GNUTLS_PK_EXP_KYBER768,
+};
+#endif
+
+static const gnutls_group_entry_st group_x25519 = {
+	.name = "X25519",
+	.id = GNUTLS_GROUP_X25519,
+	.curve = GNUTLS_ECC_CURVE_X25519,
+	.tls_id = 29,
+	.pk = GNUTLS_PK_ECDH_X25519,
 };
 
 static const gnutls_group_entry_st supported_groups[] = {
@@ -73,11 +90,7 @@ static const gnutls_group_entry_st supported_groups[] = {
 		.tls_id = 25,
 		.pk = GNUTLS_PK_ECDSA,
 	},
-	{ .name = "X25519",
-	  .id = GNUTLS_GROUP_X25519,
-	  .curve = GNUTLS_ECC_CURVE_X25519,
-	  .tls_id = 29,
-	  .pk = GNUTLS_PK_ECDH_X25519 },
+	group_x25519,
 #ifdef ENABLE_GOST
 	/* draft-smyshlyaev-tls12-gost-suites-06, Section 6 */
 	{
@@ -178,6 +191,18 @@ static const gnutls_group_entry_st supported_groups[] = {
 	  .tls_id = 0x104 },
 #endif
 #ifdef HAVE_LIBOQS
+	{ .name = "SECP256R1-MLKEM768",
+	  .id = GNUTLS_GROUP_EXP_SECP256R1_MLKEM768,
+	  .curve = GNUTLS_ECC_CURVE_SECP256R1,
+	  .pk = GNUTLS_PK_ECDSA,
+	  .tls_id = 0x11EB,
+	  .next = &group_mlkem768 },
+	{ .name = "X25519-MLKEM768",
+	  .id = GNUTLS_GROUP_EXP_X25519_MLKEM768,
+	  .curve = GNUTLS_ECC_CURVE_INVALID,
+	  .pk = GNUTLS_PK_MLKEM768,
+	  .tls_id = 0x11EC,
+	  .next = &group_x25519 },
 	{ .name = "X25519-KYBER768",
 	  .id = GNUTLS_GROUP_EXP_X25519_KYBER768,
 	  .curve = GNUTLS_ECC_CURVE_X25519,
