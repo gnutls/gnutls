@@ -1304,21 +1304,12 @@ AS_CASE([$ac_liboqs],
 
 
 AS_IF([test x$ac_liboqs != xno],
-    [PKG_CHECK_MODULES([LIBOQS],[liboqs >= 0.10.1],
-      [save_CFLAGS=$CFLAGS
-      CFLAGS="$CFLAGS $LIBOQS_CFLAGS"
-      AC_CHECK_DECLS([OQS_SHA3_set_callbacks])
-      CFLAGS="$save_CFLAGS"
-      # liboqs 0.10.1 didn't expose OQS_SHA3_set_callbacks from the header
-      # file, so extra treatment is needed:
-      # https://github.com/open-quantum-safe/liboqs/pull/1832
-      AC_DEFINE([HAVE_LIBOQS], 1, [Have liboqs])
+    [PKG_CHECK_MODULES([LIBOQS],[liboqs >= 0.11.0],
+      [AC_DEFINE([HAVE_LIBOQS], 1, [Have liboqs])
       need_ltlibdl=yes],
       [AC_MSG_ERROR([liboqs support was requested but the required libraries were not found.])])])
 
 AM_CONDITIONAL(ENABLE_LIBOQS, test "$ac_liboqs" != "no")
-AM_CONDITIONAL(NEED_LIBOQS_SHA3_OPS_H,
-  test "$ac_cv_have_decl_OQS_SHA3_set_callbacks" != yes)
 AM_CONDITIONAL([LIBOQS_ENABLE_DLOPEN], [test "$ac_liboqs" = dlopen])
 
 AS_IF([test "$ac_liboqs" = dlopen], [

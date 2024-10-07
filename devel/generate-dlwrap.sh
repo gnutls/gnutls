@@ -39,14 +39,6 @@ echo "Generating $DST/oqs.h"
 
 "$DLWRAP" --input /usr/include/oqs/oqs.h -o "$DST" --clang-resource-dir $(clang -print-resource-dir) --symbol-file "$SRC/oqs.syms" --license "SPDX-License-Identifier: MIT" --soname OQS_LIBRARY_SONAME_UNUSED --prefix gnutls_oqs --header-guard GNUTLS_LIB_DLWRAP_OQS_H_ --include "<oqs/oqs.h>"
 
-sed -i '/^#include <oqs\/oqs.h>/i\
-/* Local modification: remove this once liboqs 0.10.2 is released */\
-#include "config.h"\
-#if !HAVE_DECL_OQS_SHA3_SET_CALLBACKS\
-#include "liboqs/backport/sha3_ops.h"\
-#endif\
-' "$DST/oqs.h"
-
 echo "Generating $DST/tss2_esys.h"
 
 "$DLWRAP" --input /usr/include/tss2/tss2_esys.h -o "$DST" --clang-resource-dir $(clang -print-resource-dir) --symbol-file "$SRC/tss2-esys.syms" --license "SPDX-License-Identifier: BSD-2-Clause" --soname TSS2_ESYS_LIBRARY_SONAME_UNUSED --prefix gnutls_tss2_esys --header-guard GNUTLS_LIB_DLWRAP_TSS2_ESYS_H_ --include "<tss2/tss2_esys.h>"
