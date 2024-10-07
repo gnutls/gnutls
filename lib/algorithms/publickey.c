@@ -202,6 +202,12 @@ static const gnutls_pk_entry pk_algorithms[] = {
 	  .oid = ECDH_X448_OID,
 	  .id = GNUTLS_PK_ECDH_X448,
 	  .curve = GNUTLS_ECC_CURVE_X448 },
+	{ .name = "ML-KEM-768",
+	  .oid = NULL,
+	  .id = GNUTLS_PK_MLKEM768,
+	  .curve = GNUTLS_ECC_CURVE_INVALID },
+/* Hidden behind HAVE_LIBOQS as it will be removed in the future.
+	 */
 #ifdef HAVE_LIBOQS
 	{ .name = "KYBER768",
 	  .oid = NULL,
