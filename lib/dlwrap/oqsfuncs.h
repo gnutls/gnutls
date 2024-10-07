@@ -5,6 +5,7 @@
  */
 VOID_FUNC(void, OQS_init, (void), ())
 VOID_FUNC(void, OQS_destroy, (void), ())
+VOID_FUNC(void, OQS_SHA2_set_callbacks, (struct OQS_SHA2_callbacks *new_callbacks), (new_callbacks))
 VOID_FUNC(void, OQS_SHA3_set_callbacks, (struct OQS_SHA3_callbacks *new_callbacks), (new_callbacks))
 VOID_FUNC(void, OQS_randombytes_custom_algorithm, (void (*algorithm_ptr)(uint8_t *, size_t)), (algorithm_ptr))
 FUNC(int, OQS_KEM_alg_is_enabled, (const char *method_name), (method_name))

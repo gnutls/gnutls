@@ -36,4 +36,4 @@ endif
 
 noinst_LTLIBRARIES = libcrypto.la
 
-libcrypto_la_SOURCES = liboqs.h liboqs.c rand.h rand.c sha3.h sha3.c
+libcrypto_la_SOURCES = liboqs.h liboqs.c rand.h rand.c sha2.h sha2.c sha3.h sha3.c

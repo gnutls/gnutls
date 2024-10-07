@@ -41,6 +41,7 @@
 
 #include "dlwrap/oqs.h"
 #include "liboqs/rand.h"
+#include "liboqs/sha2.h"
 #include "liboqs/sha3.h"
 
 /* We can't use GNUTLS_ONCE here, as it wouldn't allow manual unloading */
@@ -119,6 +120,7 @@ int _gnutls_liboqs_ensure(void)
 		goto out;
 	}
 
+	_gnutls_liboqs_sha2_init();
 	_gnutls_liboqs_sha3_init();
 	GNUTLS_OQS_FUNC(OQS_init)();
 	_gnutls_liboqs_rand_init();
@@ -140,6 +142,7 @@ void _gnutls_liboqs_deinit(void)
 	if (_liboqs_init) {
 		_gnutls_liboqs_rand_deinit();
 		_gnutls_liboqs_sha3_deinit();
+		_gnutls_liboqs_sha2_deinit();
 		GNUTLS_OQS_FUNC(OQS_destroy)();
 	}
 

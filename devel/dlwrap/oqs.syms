@@ -1,3 +1,4 @@
+OQS_SHA2_set_callbacks
 OQS_SHA3_set_callbacks
 OQS_init
 OQS_destroy
