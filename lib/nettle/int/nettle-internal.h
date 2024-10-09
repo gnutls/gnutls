@@ -36,6 +36,9 @@
 #define GNUTLS_NETTLE_INT_NETTLE_INTERNAL_H_INCLUDED
 
 #include <assert.h>
+#ifdef HAVE_ALLOCA_H
+#include <alloca.h>
+#endif
 /* Needed for alloca on bsd systems. */
 #include <stdlib.h>
 
