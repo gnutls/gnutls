@@ -30,6 +30,13 @@
 /* Supported ECC curves
  */
 
+static const gnutls_group_entry_st group_kyber768 = {
+	.name = "KYBER768",
+	.id = GNUTLS_GROUP_INVALID,
+	.curve = GNUTLS_ECC_CURVE_INVALID,
+	.pk = GNUTLS_PK_EXP_KYBER768,
+};
+
 static const gnutls_group_entry_st supported_groups[] = {
 	{
 		.name = "SECP192R1",
@@ -175,8 +182,8 @@ static const gnutls_group_entry_st supported_groups[] = {
 	  .id = GNUTLS_GROUP_EXP_X25519_KYBER768,
 	  .curve = GNUTLS_ECC_CURVE_X25519,
 	  .pk = GNUTLS_PK_ECDH_X25519,
-	  .pk2 = GNUTLS_PK_EXP_KYBER768,
-	  .tls_id = 0x6399 },
+	  .tls_id = 0x6399,
+	  .next = &group_kyber768 },
 #endif
 	{ 0, 0, 0 }
 };
@@ -234,12 +241,21 @@ const gnutls_group_t *gnutls_group_list(void)
 	if (groups[0] == 0) {
 		int i = 0;
 
-		GNUTLS_GROUP_LOOP(
-			if ((p->curve == 0 ||
-			     _gnutls_ecc_curve_is_supported(p->curve)) &&
-			    (p->pk == 0 || _gnutls_pk_exists(p->pk)) &&
-			    (p->pk2 == 0 || _gnutls_pk_exists(p->pk2)))
-				groups[i++] = p->id;);
+		const gnutls_group_entry_st *p;
+
+		for (p = supported_groups; p->name != NULL; p++) {
+			const gnutls_group_entry_st *pp;
+
+			for (pp = p; pp != NULL; pp = pp->next) {
+				if ((pp->curve != 0 &&
+				     !_gnutls_ecc_curve_is_supported(
+					     pp->curve)) ||
+				    (pp->pk != 0 && !_gnutls_pk_exists(pp->pk)))
+					break;
+			}
+			if (pp == NULL)
+				groups[i++] = p->id;
+		}
 		groups[i++] = 0;
 	}
 
