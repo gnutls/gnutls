@@ -76,8 +76,8 @@ static int client_callback(gnutls_session_t session, unsigned htype,
 			   unsigned post, unsigned incoming,
 			   const gnutls_datum_t *msg)
 {
-	/* change compression method to BROTLI */
-	msg->data[1] = 0x02;
+	/* change uncompressed length */
+	msg->data[4] = ~msg->data[4];
 	return 0;
 }
 

@@ -95,7 +95,6 @@ int _gnutls13_recv_certificate(gnutls_session_t session)
 		ret = decompress_certificate(session, &buf);
 		if (ret < 0) {
 			gnutls_assert();
-			ret = GNUTLS_E_CERTIFICATE_ERROR;
 			goto cleanup;
 		}
 	}
@@ -665,7 +664,7 @@ static int decompress_certificate(gnutls_session_t session,
 
 	ret = _gnutls_buffer_pop_prefix16(buf, &method_num, 0);
 	if (ret < 0)
-		return gnutls_assert_val(ret);
+		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 	comp_method = _gnutls_compress_certificate_num2method(method_num);
 
 	if (!_gnutls_compress_certificate_is_method_enabled(session,
@@ -674,33 +673,32 @@ static int decompress_certificate(gnutls_session_t session,
 
 	ret = _gnutls_buffer_pop_prefix24(buf, &plain_exp_len, 0);
 	if (ret < 0)
-		return gnutls_assert_val(ret);
+		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
 	ret = _gnutls_buffer_pop_datum_prefix24(buf, &comp);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
+	if (ret < 0 || buf->length > 0)
+		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
 	plain.data = gnutls_malloc(plain_exp_len);
 	if (plain.data == NULL)
-		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 	ret = _gnutls_decompress(comp_method, plain.data, plain_exp_len,
 				 comp.data, comp.size);
 	if (ret < 0) {
-		gnutls_assert();
+		ret = gnutls_assert_val(GNUTLS_E_CERTIFICATE_ERROR);
 		goto cleanup;
 	}
 	plain.size = ret;
 
 	if (plain.size != plain_exp_len) {
-		gnutls_assert();
-		ret = GNUTLS_E_DECOMPRESSION_FAILED;
+		ret = gnutls_assert_val(GNUTLS_E_CERTIFICATE_ERROR);
 		goto cleanup;
 	}
 
 	_gnutls_buffer_clear(buf);
 	ret = _gnutls_buffer_append_data(buf, plain.data, plain.size);
 	if (ret < 0) {
-		gnutls_assert();
+		ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 		goto cleanup;
 	}
 
