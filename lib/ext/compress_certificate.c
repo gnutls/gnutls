@@ -194,6 +194,8 @@ int _gnutls_compress_certificate_recv_params(gnutls_session_t session,
 		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
 	DECR_LEN(data_size, bytes_len);
+	if (data_size > 0)
+		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
 	methods_len = 0;
 	for (i = 0; i < bytes_len / 2; ++i) {
