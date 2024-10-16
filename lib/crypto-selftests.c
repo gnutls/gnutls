@@ -2390,6 +2390,13 @@ static int test_xof(gnutls_digest_algorithm_t dig,
 			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
 		}
 
+		/* gnutls_hash must not be called after gnutls_hash_squeeze */
+		ret = gnutls_hash(hd, &vectors[i].plaintext, 1);
+		if (ret != GNUTLS_E_INVALID_REQUEST) {
+			gnutls_hash_deinit(hd, NULL);
+			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+		}
+
 		gnutls_hash_deinit(hd, NULL);
 
 		if (memcmp(data, vectors[i].output, vectors[i].output_size) !=
