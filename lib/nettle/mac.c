@@ -53,6 +53,7 @@ typedef void (*digest_func)(void *, size_t, uint8_t *);
 typedef void (*set_key_func)(void *, size_t, const uint8_t *);
 typedef void (*set_nonce_func)(void *, size_t, const uint8_t *);
 typedef void (*init_func)(void *);
+typedef bool (*finished_func)(void *);
 
 static int wrap_nettle_hash_init(gnutls_digest_algorithm_t algo, void **_ctx);
 
@@ -102,7 +103,28 @@ struct nettle_hash_ctx {
 	update_func update;
 	digest_func digest;
 	init_func init;
+	finished_func finished;
 };
+
+static bool _wrap_sha3_128_shake_finished(void *_ctx)
+{
+	struct sha3_128_ctx *ctx = _ctx;
+
+	/* Nettle uses one's complement of the index value to indicate
+	 * SHAKE is initialized.
+	 */
+	return ctx->index >= sizeof(ctx->block);
+}
+
+static bool _wrap_sha3_256_shake_finished(void *_ctx)
+{
+	struct sha3_256_ctx *ctx = _ctx;
+
+	/* Nettle uses one's complement of the index value to indicate
+	 * SHAKE is initialized.
+	 */
+	return ctx->index >= sizeof(ctx->block);
+}
 
 struct nettle_mac_ctx {
 	union {
@@ -587,6 +609,9 @@ static int wrap_nettle_hash_update(void *_ctx, const void *text,
 {
 	struct nettle_hash_ctx *ctx = _ctx;
 
+	if (ctx->finished && ctx->finished(ctx->ctx_ptr))
+		return GNUTLS_E_INVALID_REQUEST;
+
 	ctx->update(ctx->ctx_ptr, textsize, text);
 
 	return GNUTLS_E_SUCCESS;
@@ -665,6 +690,8 @@ static int _ctx_init(gnutls_digest_algorithm_t algo,
 {
 	/* Any FIPS140-2 related enforcement is performed on
 	 * gnutls_hash_init() and gnutls_hmac_init() */
+
+	ctx->finished = NULL;
 	switch (algo) {
 	case GNUTLS_DIG_MD5:
 		ctx->init = (init_func)md5_init;
@@ -748,6 +775,7 @@ static int _ctx_init(gnutls_digest_algorithm_t algo,
 		ctx->init = (init_func)sha3_128_init;
 		ctx->update = (update_func)sha3_128_update;
 		ctx->digest = (digest_func)sha3_128_shake_output;
+		ctx->finished = _wrap_sha3_128_shake_finished;
 		ctx->ctx_ptr = &ctx->ctx.sha3_128;
 		ctx->length = 0; /* unused */
 		break;
@@ -755,6 +783,7 @@ static int _ctx_init(gnutls_digest_algorithm_t algo,
 		ctx->init = (init_func)sha3_256_init;
 		ctx->update = (update_func)sha3_256_update;
 		ctx->digest = (digest_func)sha3_256_shake_output;
+		ctx->finished = _wrap_sha3_256_shake_finished;
 		ctx->ctx_ptr = &ctx->ctx.sha3_256;
 		ctx->length = 0; /* unused */
 		break;
