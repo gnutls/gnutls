@@ -2557,8 +2557,7 @@ static int _wrap_nettle_pk_exists(gnutls_pk_algorithm_t pk)
 	case GNUTLS_PK_EXP_SPHINCS_SHAKE_192F:
 	case GNUTLS_PK_EXP_SPHINCS_SHAKE_192S:
 	case GNUTLS_PK_EXP_SPHINCS_SHAKE_256F:
-	case GNUTLS_PK_EXP_SPHINCS_SHAKE_256S:
-	{
+	case GNUTLS_PK_EXP_SPHINCS_SHAKE_256S: {
 		const char *algo_name;
 
 		if (_gnutls_liboqs_ensure() < 0)
@@ -4387,6 +4386,7 @@ static int wrap_nettle_pk_verify_priv_params(gnutls_pk_algorithm_t algo,
 
 		ret = 0;
 		break;
+	}
 	case GNUTLS_PK_ML_DSA_44:
 	case GNUTLS_PK_ML_DSA_65:
 	case GNUTLS_PK_ML_DSA_87:
