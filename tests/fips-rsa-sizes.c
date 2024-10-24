@@ -250,35 +250,24 @@ void doit(void)
 
 	assert(gnutls_fips140_context_init(&fips_context) == 0);
 
-	/* 512-bit RSA: no generate, no sign, no verify */
 	generate_unsuccessfully(&privkey, &pubkey, 512);
 	sign_verify_unsuccessfully(privkey, pubkey);
-	/* 512-bit RSA again (to be safer about going in and out of FIPS) */
 	generate_unsuccessfully(&privkey, &pubkey, 512);
 	sign_verify_unsuccessfully(privkey, pubkey);
-	/* 600-bit RSA: no generate, no sign, no verify */
 	generate_unsuccessfully(&privkey, &pubkey, 600);
 	sign_verify_unsuccessfully(privkey, pubkey);
-
-	/* 768-bit RSA not-an-exception: nogenerate, nosign, verify */
 	generate_unsuccessfully(&privkey, &pubkey, 768);
 	sign_verify_unsuccessfully(privkey, pubkey);
-	/* 1024-bit RSA exception: nogenerate, nosign, verify */
 	generate_unsuccessfully(&privkey, &pubkey, 1024);
-	nosign_verify(privkey, pubkey);
-	/* 1280-bit RSA exception: nogenerate, nosign, verify */
+	sign_verify_unsuccessfully(privkey, pubkey);
 	generate_unsuccessfully(&privkey, &pubkey, 1280);
-	nosign_verify(privkey, pubkey);
-	/* 1500-bit RSA not-an-exception: nogenerate, nosign, noverify */
+	sign_verify_unsuccessfully(privkey, pubkey);
 	generate_unsuccessfully(&privkey, &pubkey, 1500);
 	sign_verify_unsuccessfully(privkey, pubkey);
-	/* 1536-bit RSA exception: nogenerate, nosign, verify */
 	generate_unsuccessfully(&privkey, &pubkey, 1536);
-	nosign_verify(privkey, pubkey);
-	/* 1792-bit RSA exception: nogenerate, nosign, verify */
+	sign_verify_unsuccessfully(privkey, pubkey);
 	generate_unsuccessfully(&privkey, &pubkey, 1792);
-	nosign_verify(privkey, pubkey);
-	/* 2000-bit RSA not-an-exception: nogenerate, nosign, noverify */
+	sign_verify_unsuccessfully(privkey, pubkey);
 	generate_unsuccessfully(&privkey, &pubkey, 2000);
 	sign_verify_unsuccessfully(privkey, pubkey);
 

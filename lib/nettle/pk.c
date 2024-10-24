@@ -2115,16 +2115,12 @@ static int _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 
 		bits = mpz_sizeinbase(pub.n, 2);
 
-		/* In FIPS 140-3, RSA key size should be larger than
-			 * 2048-bit or one of the known lengths (1024, 1280,
-			 * 1536, 1792; i.e., multiple of 256-bits).
-			 *
+		/* In FIPS 140-3, RSA key size should be larger than 2048-bit.
 			 * In addition to this, only SHA-1 and SHA-2 are allowed
 			 * for SigVer; it is checked in _pkcs1_rsa_verify_sig in
 			 * lib/pubkey.c.
 			 */
-		if (unlikely(bits < 2048 && bits != 1024 && bits != 1280 &&
-			     bits != 1536 && bits != 1792)) {
+		if (unlikely(bits < 2048)) {
 			not_approved = true;
 		}
 
