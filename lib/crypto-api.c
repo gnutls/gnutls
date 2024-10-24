@@ -970,6 +970,8 @@ int gnutls_hash_fast(gnutls_digest_algorithm_t algorithm, const void *ptext,
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 	} else if (not_approved) {
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_NOT_APPROVED);
+	} else {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_APPROVED);
 	}
 
 	return ret;
