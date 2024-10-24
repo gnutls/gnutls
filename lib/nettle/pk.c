@@ -2023,6 +2023,11 @@ static int _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 			goto cleanup;
 		}
 
+		/* P-192 is not supported in FIPS 140-3 */
+		if (curve_id == GNUTLS_ECC_CURVE_SECP192R1) {
+			not_approved = true;
+		}
+
 		ret = _gnutls_decode_ber_rs(signature, &tmp[0], &tmp[1]);
 		if (ret < 0) {
 			gnutls_assert();
