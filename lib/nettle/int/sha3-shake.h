@@ -48,6 +48,7 @@ extern "C" {
 #define sha3_128_shake_output gnutls_nettle_backport_sha3_128_shake_output
 #define sha3_256_shake gnutls_nettle_backport_sha3_256_shake
 #define sha3_256_shake_output gnutls_nettle_backport_sha3_256_shake_output
+#define sha3_128_ctx gnutls_nettle_backport_sha3_128_ctx
 
 #define SHA3_128_DIGEST_SIZE 16
 #define SHA3_128_BLOCK_SIZE 168
