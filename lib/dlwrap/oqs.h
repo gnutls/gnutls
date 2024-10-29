@@ -8,12 +8,6 @@
 #ifndef GNUTLS_LIB_DLWRAP_OQS_H_
 #define GNUTLS_LIB_DLWRAP_OQS_H_
 
-/* Local modification: remove this once liboqs 0.10.2 is released */
-#include "config.h"
-#if !HAVE_DECL_OQS_SHA3_SET_CALLBACKS
-#include "liboqs/backport/sha3_ops.h"
-#endif
-
 #include <oqs/oqs.h>
 
 #if defined(GNUTLS_OQS_ENABLE_DLOPEN) && GNUTLS_OQS_ENABLE_DLOPEN

@@ -36,8 +36,4 @@ endif
 
 noinst_LTLIBRARIES = libcrypto.la
 
-libcrypto_la_SOURCES = liboqs.h liboqs.c rand.h rand.c sha3.h sha3.c
-
-if NEED_LIBOQS_SHA3_OPS_H
-libcrypto_la_SOURCES += backport/sha3_ops.h
-endif
+libcrypto_la_SOURCES = liboqs.h liboqs.c rand.h rand.c sha2.h sha2.c sha3.h sha3.c

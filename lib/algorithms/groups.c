@@ -30,6 +30,30 @@
 /* Supported ECC curves
  */
 
+#ifdef HAVE_LIBOQS
+static const gnutls_group_entry_st group_mlkem768 = {
+	.name = "MLKEM768",
+	.id = GNUTLS_GROUP_INVALID,
+	.curve = GNUTLS_ECC_CURVE_INVALID,
+	.pk = GNUTLS_PK_MLKEM768,
+};
+
+static const gnutls_group_entry_st group_kyber768 = {
+	.name = "KYBER768",
+	.id = GNUTLS_GROUP_INVALID,
+	.curve = GNUTLS_ECC_CURVE_INVALID,
+	.pk = GNUTLS_PK_EXP_KYBER768,
+};
+#endif
+
+static const gnutls_group_entry_st group_x25519 = {
+	.name = "X25519",
+	.id = GNUTLS_GROUP_X25519,
+	.curve = GNUTLS_ECC_CURVE_X25519,
+	.tls_id = 29,
+	.pk = GNUTLS_PK_ECDH_X25519,
+};
+
 static const gnutls_group_entry_st supported_groups[] = {
 	{
 		.name = "SECP192R1",
@@ -66,11 +90,7 @@ static const gnutls_group_entry_st supported_groups[] = {
 		.tls_id = 25,
 		.pk = GNUTLS_PK_ECDSA,
 	},
-	{ .name = "X25519",
-	  .id = GNUTLS_GROUP_X25519,
-	  .curve = GNUTLS_ECC_CURVE_X25519,
-	  .tls_id = 29,
-	  .pk = GNUTLS_PK_ECDH_X25519 },
+	group_x25519,
 #ifdef ENABLE_GOST
 	/* draft-smyshlyaev-tls12-gost-suites-06, Section 6 */
 	{
@@ -171,12 +191,24 @@ static const gnutls_group_entry_st supported_groups[] = {
 	  .tls_id = 0x104 },
 #endif
 #ifdef HAVE_LIBOQS
+	{ .name = "SECP256R1-MLKEM768",
+	  .id = GNUTLS_GROUP_EXP_SECP256R1_MLKEM768,
+	  .curve = GNUTLS_ECC_CURVE_SECP256R1,
+	  .pk = GNUTLS_PK_ECDSA,
+	  .tls_id = 0x11EB,
+	  .next = &group_mlkem768 },
+	{ .name = "X25519-MLKEM768",
+	  .id = GNUTLS_GROUP_EXP_X25519_MLKEM768,
+	  .curve = GNUTLS_ECC_CURVE_INVALID,
+	  .pk = GNUTLS_PK_MLKEM768,
+	  .tls_id = 0x11EC,
+	  .next = &group_x25519 },
 	{ .name = "X25519-KYBER768",
 	  .id = GNUTLS_GROUP_EXP_X25519_KYBER768,
 	  .curve = GNUTLS_ECC_CURVE_X25519,
 	  .pk = GNUTLS_PK_ECDH_X25519,
-	  .pk2 = GNUTLS_PK_EXP_KYBER768,
-	  .tls_id = 0x6399 },
+	  .tls_id = 0x6399,
+	  .next = &group_kyber768 },
 #endif
 	{ 0, 0, 0 }
 };
@@ -234,12 +266,21 @@ const gnutls_group_t *gnutls_group_list(void)
 	if (groups[0] == 0) {
 		int i = 0;
 
-		GNUTLS_GROUP_LOOP(
-			if ((p->curve == 0 ||
-			     _gnutls_ecc_curve_is_supported(p->curve)) &&
-			    (p->pk == 0 || _gnutls_pk_exists(p->pk)) &&
-			    (p->pk2 == 0 || _gnutls_pk_exists(p->pk2)))
-				groups[i++] = p->id;);
+		const gnutls_group_entry_st *p;
+
+		for (p = supported_groups; p->name != NULL; p++) {
+			const gnutls_group_entry_st *pp;
+
+			for (pp = p; pp != NULL; pp = pp->next) {
+				if ((pp->curve != 0 &&
+				     !_gnutls_ecc_curve_is_supported(
+					     pp->curve)) ||
+				    (pp->pk != 0 && !_gnutls_pk_exists(pp->pk)))
+					break;
+			}
+			if (pp == NULL)
+				groups[i++] = p->id;
+		}
 		groups[i++] = 0;
 	}
 

@@ -2566,6 +2566,27 @@ static void add_dh(gnutls_priority_t priority_cache)
 	}
 }
 
+static void add_kem(gnutls_priority_t priority_cache)
+{
+	const gnutls_group_entry_st *ge;
+	unsigned i;
+
+	for (i = 0; i < priority_cache->_supported_ecc.num_priorities; i++) {
+		ge = _gnutls_id_to_group(
+			priority_cache->_supported_ecc.priorities[i]);
+		if (ge != NULL &&
+		    priority_cache->groups.size <
+			    sizeof(priority_cache->groups.entry) /
+				    sizeof(priority_cache->groups.entry[0])) {
+			/* do not add groups which do not correspond to enabled ciphersuites */
+			if (!IS_KEM(ge->pk))
+				continue;
+			priority_cache->groups
+				.entry[priority_cache->groups.size++] = ge;
+		}
+	}
+}
+
 /* This function was originally precalculating ciphersuite-specific items, however
  * it has now extended to much more than that. It provides a consistency check to
  * set parameters, and in cases it applies policy specific items.
@@ -2577,6 +2598,7 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 	const gnutls_sign_entry_st *se;
 	unsigned have_ec = 0;
 	unsigned have_dh = 0;
+	unsigned have_kem = 0;
 	unsigned tls_sig_sem = 0;
 	const version_entry_st *tlsmax = NULL, *vers;
 	const version_entry_st *dtlsmax = NULL;
@@ -2818,11 +2840,15 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 					have_dh = 1;
 					add_dh(priority_cache);
 				}
+				if (!have_kem) {
+					have_kem = 1;
+					add_kem(priority_cache);
+				}
 			}
 		}
 	}
 
-	if (have_tls13 && (!have_ec || !have_dh)) {
+	if (have_tls13 && (!have_ec || !have_dh || !have_kem)) {
 		/* scan groups to determine have_ec and have_dh */
 		for (i = 0; i < priority_cache->_supported_ecc.num_priorities;
 		     i++) {
@@ -2836,9 +2862,12 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 				} else if (ge->prime && !have_dh) {
 					add_dh(priority_cache);
 					have_dh = 1;
+				} else if (IS_KEM(ge->pk) && !have_kem) {
+					add_kem(priority_cache);
+					have_kem = 1;
 				}
 
-				if (have_dh && have_ec)
+				if (have_dh && have_ec && have_kem)
 					break;
 			}
 		}
