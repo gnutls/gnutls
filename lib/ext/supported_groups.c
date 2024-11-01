@@ -309,14 +309,15 @@ static int _gnutls_supported_groups_send_params(gnutls_session_t session,
 /* Returns 0 if the given ECC curve is allowed in the current
  * session. A negative error value is returned otherwise.
  */
-int _gnutls_session_supports_group(gnutls_session_t session, unsigned int group)
+bool _gnutls_session_supports_group(gnutls_session_t session,
+				    unsigned int group)
 {
 	unsigned i;
 
 	for (i = 0; i < session->internals.priorities->groups.size; i++) {
 		if (session->internals.priorities->groups.entry[i]->id == group)
-			return 0;
+			return true;
 	}
 
-	return GNUTLS_E_ECC_UNSUPPORTED_CURVE;
+	return false;
 }

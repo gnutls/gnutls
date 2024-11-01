@@ -27,7 +27,7 @@
 
 extern const hello_ext_entry_st ext_mod_supported_groups;
 
-int _gnutls_session_supports_group(gnutls_session_t session,
-				   unsigned int group);
+bool _gnutls_session_supports_group(gnutls_session_t session,
+				    unsigned int group);
 
 #endif /* GNUTLS_LIB_EXT_SUPPORTED_GROUPS_H */

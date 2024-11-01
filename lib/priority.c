@@ -2801,9 +2801,16 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 			if (_gnutls_digest_is_insecure(prf_digest))
 				continue;
 
-			if (priority_cache->cs.size < MAX_CIPHERSUITE_SIZE)
-				priority_cache->cs
-					.entry[priority_cache->cs.size++] = ce;
+			if (priority_cache->cs.size == MAX_CIPHERSUITE_SIZE)
+				continue;
+
+			priority_cache->cs.entry[priority_cache->cs.size++] =
+				ce;
+
+			if (!have_kem) {
+				have_kem = 1;
+				add_kem(priority_cache);
+			}
 		}
 	}
 
@@ -2840,16 +2847,12 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 					have_dh = 1;
 					add_dh(priority_cache);
 				}
-				if (!have_kem) {
-					have_kem = 1;
-					add_kem(priority_cache);
-				}
 			}
 		}
 	}
 
 	if (have_tls13 && (!have_ec || !have_dh || !have_kem)) {
-		/* scan groups to determine have_ec and have_dh */
+		/* scan groups to determine have_{ec,dh,kem} */
 		for (i = 0; i < priority_cache->_supported_ecc.num_priorities;
 		     i++) {
 			const gnutls_group_entry_st *ge;
