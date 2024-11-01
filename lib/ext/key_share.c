@@ -911,7 +911,8 @@ static int key_share_recv_params(gnutls_session_t session, const uint8_t *data,
 				_gnutls_handshake_log(
 					"EXT[%p]: received share for %s which is disabled\n",
 					session, group->name);
-				return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+				return gnutls_assert_val(
+					GNUTLS_E_ECC_UNSUPPORTED_CURVE);
 			}
 
 			_gnutls_session_group_set(session, group);
@@ -942,7 +943,8 @@ static int key_share_recv_params(gnutls_session_t session, const uint8_t *data,
 			_gnutls_handshake_log(
 				"EXT[%p]: received share for %s which is disabled\n",
 				session, group->name);
-			return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+			return gnutls_assert_val(
+				GNUTLS_E_ECC_UNSUPPORTED_CURVE);
 		}
 
 		_gnutls_session_group_set(session, group);
@@ -956,15 +958,23 @@ static int key_share_recv_params(gnutls_session_t session, const uint8_t *data,
 	return 0;
 }
 
-static inline bool pk_type_is_ecdhx(gnutls_pk_algorithm_t pk)
+static inline bool pk_types_overlap(const gnutls_group_entry_st *a,
+				    const gnutls_group_entry_st *b)
 {
-	return pk == GNUTLS_PK_ECDH_X25519 || pk == GNUTLS_PK_ECDH_X448;
-}
+	const gnutls_group_entry_st *pa;
 
-static inline bool pk_type_equal(gnutls_pk_algorithm_t a,
-				 gnutls_pk_algorithm_t b)
-{
-	return a == b || (pk_type_is_ecdhx(a) && pk_type_is_ecdhx(b));
+	for (pa = a; pa != NULL; pa = pa->next) {
+		const gnutls_group_entry_st *pb;
+
+		for (pb = b; pb != NULL; pb = pb->next) {
+			if (pa->pk == pb->pk ||
+			    (IS_ECDHX(pa->pk) && IS_ECDHX(pb->pk)) ||
+			    (IS_KEM(pa->pk) && IS_KEM(pb->pk)))
+				return true;
+		}
+	}
+
+	return false;
 }
 
 /* returns data_size or a negative number on failure
@@ -1009,7 +1019,9 @@ static int key_share_send_params(gnutls_session_t session,
 			if (ret < 0)
 				return gnutls_assert_val(ret);
 		} else {
-			gnutls_pk_algorithm_t selected_groups[3];
+			const gnutls_group_entry_st *selected_groups[3] = {
+				NULL,
+			};
 			unsigned max_groups = 2; /* GNUTLS_KEY_SHARE_TOP2 */
 
 			if (session->internals.flags & GNUTLS_KEY_SHARE_TOP)
@@ -1033,8 +1045,9 @@ static int key_share_send_params(gnutls_session_t session,
 						.entry[i];
 
 				for (j = 0; j < generated; j++) {
-					if (pk_type_equal(group->pk,
-							  selected_groups[j])) {
+					if (pk_types_overlap(
+						    group,
+						    selected_groups[j])) {
 						break;
 					}
 				}
@@ -1042,7 +1055,7 @@ static int key_share_send_params(gnutls_session_t session,
 					continue;
 				}
 
-				selected_groups[generated] = group->pk;
+				selected_groups[generated] = group;
 
 				ret = client_gen_key_share(session, group,
 							   extdata);

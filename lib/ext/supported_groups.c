@@ -309,7 +309,8 @@ static int _gnutls_supported_groups_send_params(gnutls_session_t session,
 /* Returns 0 if the given ECC curve is allowed in the current
  * session. A negative error value is returned otherwise.
  */
-bool _gnutls_session_supports_group(gnutls_session_t session, unsigned int group)
+bool _gnutls_session_supports_group(gnutls_session_t session,
+				    unsigned int group)
 {
 	unsigned i;
 
