@@ -567,7 +567,7 @@ static void test_ciphersuite_kx(const char *cipher_prio, unsigned pk)
 
 		total_diffs[total_diffs_size++] =
 			timespec_sub_ns(&tr_stop, &tr_start);
-		if (total_diffs_size >
+		if (total_diffs_size >=
 		    sizeof(total_diffs) / sizeof(total_diffs[0]))
 			abort();
 
