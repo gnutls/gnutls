@@ -132,6 +132,7 @@ gnutls_tss2_mu_ensure_library (const char *soname, int flags)
   err = ENSURE_SYMBOL(name);			\
   if (err < 0)					\
     {						\
+      dlclose (gnutls_tss2_mu_dlhandle);	\
       gnutls_tss2_mu_dlhandle = NULL;		\
       return err;				\
     }

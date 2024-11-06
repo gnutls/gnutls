@@ -132,6 +132,7 @@ gnutls_brotlidec_ensure_library (const char *soname, int flags)
   err = ENSURE_SYMBOL(name);			\
   if (err < 0)					\
     {						\
+      dlclose (gnutls_brotlidec_dlhandle);	\
       gnutls_brotlidec_dlhandle = NULL;		\
       return err;				\
     }
