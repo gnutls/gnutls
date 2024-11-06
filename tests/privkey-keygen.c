@@ -132,7 +132,7 @@ static bool is_supported_pk_algo(gnutls_pk_algorithm_t algo)
 void doit(void)
 {
 	gnutls_x509_privkey_t pkey, dst;
-	int ret, i;
+	int ret, algorithm, i;
 	gnutls_fips140_context_t fips_context;
 
 	ret = global_init();
@@ -163,6 +163,21 @@ void doit(void)
 			    algorithm == GNUTLS_PK_MLKEM768)
 				continue;
 
+			if (algorithm == GNUTLS_PK_GOST_01 ||
+			    algorithm == GNUTLS_PK_GOST_12_256 ||
+			    algorithm == GNUTLS_PK_GOST_12_512) {
+				/* Skip GOST algorithms:
+				 * - If they are disabled by ./configure option
+				 * - Or in FIPS140 mode
+				 */
+#ifdef ENABLE_GOST
+				if (gnutls_fips140_mode_enabled())
+					continue;
+#else
+				continue;
+#endif
+			}
+
 			ret = gnutls_x509_privkey_init(&pkey);
 			if (ret < 0) {
 				fail("gnutls_x509_privkey_init: %d\n", ret);
@@ -175,23 +190,22 @@ void doit(void)
 
 			FIPS_PUSH_CONTEXT();
 			ret = gnutls_x509_privkey_generate(
-				pkey, *algorithm,
-				gnutls_sec_param_to_pk_bits(*algorithm,
+				pkey, algorithm,
+				gnutls_sec_param_to_pk_bits(algorithm,
 							    sec_param[i]),
 				0);
 			if (ret < 0) {
 				fail("gnutls_x509_privkey_generate (%s-%d): %s (%d)\n",
-				     gnutls_pk_algorithm_get_name(*algorithm),
-				     gnutls_sec_param_to_pk_bits(*algorithm,
+				     gnutls_pk_algorithm_get_name(algorithm),
+				     gnutls_sec_param_to_pk_bits(algorithm,
 								 sec_param[i]),
 				     gnutls_strerror(ret), ret);
 			} else if (debug) {
 				success("Key[%s] generation ok: %d\n",
-					gnutls_pk_algorithm_get_name(
-						*algorithm),
+					gnutls_pk_algorithm_get_name(algorithm),
 					ret);
 			}
-			if (is_approved_pk_algo(*algorithm)) {
+			if (is_approved_pk_algo(algorithm)) {
 				FIPS_POP_CONTEXT(APPROVED);
 			} else {
 				FIPS_POP_CONTEXT(NOT_APPROVED);
@@ -200,7 +214,7 @@ void doit(void)
 			ret = gnutls_x509_privkey_verify_params(pkey);
 			if (ret < 0) {
 				fail("gnutls_x509_privkey_generate (%s): %s (%d)\n",
-				     gnutls_pk_algorithm_get_name(*algorithm),
+				     gnutls_pk_algorithm_get_name(algorithm),
 				     gnutls_strerror(ret), ret);
 			}
 
@@ -208,33 +222,33 @@ void doit(void)
 			ret = gnutls_x509_privkey_cpy(dst, pkey);
 			if (ret < 0) {
 				fail("gnutls_x509_privkey_cpy (%s): %s (%d)\n",
-				     gnutls_pk_algorithm_get_name(*algorithm),
+				     gnutls_pk_algorithm_get_name(algorithm),
 				     gnutls_strerror(ret), ret);
 			}
 
 			ret = gnutls_x509_privkey_verify_params(pkey);
 			if (ret < 0) {
 				fail("gnutls_x509_privkey_generate after cpy (%s): %s (%d)\n",
-				     gnutls_pk_algorithm_get_name(*algorithm),
+				     gnutls_pk_algorithm_get_name(algorithm),
 				     gnutls_strerror(ret), ret);
 			}
 
 			/* RSA-OAEP doesn't support signing */
-			if (*algorithm == GNUTLS_PK_RSA_OAEP) {
+			if (algorithm == GNUTLS_PK_RSA_OAEP) {
 				goto end;
 			}
 
 			FIPS_PUSH_CONTEXT();
-			sign_verify_data(*algorithm, pkey);
-			if (is_approved_pk_algo(*algorithm)) {
+			sign_verify_data(algorithm, pkey);
+			if (is_approved_pk_algo(algorithm)) {
 				FIPS_POP_CONTEXT(APPROVED);
 			} else {
 				FIPS_POP_CONTEXT(NOT_APPROVED);
 			}
 
 			FIPS_PUSH_CONTEXT();
-			sign_verify_data(*algorithm, dst);
-			if (is_approved_pk_algo(*algorithm)) {
+			sign_verify_data(algorithm, dst);
+			if (is_approved_pk_algo(algorithm)) {
 				FIPS_POP_CONTEXT(APPROVED);
 			} else {
 				FIPS_POP_CONTEXT(NOT_APPROVED);
@@ -244,8 +258,8 @@ void doit(void)
 			gnutls_x509_privkey_deinit(pkey);
 			gnutls_x509_privkey_deinit(dst);
 			success("Generated key with %s-%d\n",
-				gnutls_pk_algorithm_get_name(*algorithm),
-				gnutls_sec_param_to_pk_bits(*algorithm,
+				gnutls_pk_algorithm_get_name(algorithm),
+				gnutls_sec_param_to_pk_bits(algorithm,
 							    sec_param[i]));
 		}
 	}

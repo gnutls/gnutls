@@ -65,30 +65,6 @@ static const struct pq_algorithm_pubkey_bits_st pq_pubkey_bits[] = {
 	{ GNUTLS_PK_ML_DSA_87, OQS_SIG_ml_dsa_87_length_public_key },
 	{ GNUTLS_PK_EXP_FALCON512, OQS_SIG_falcon_512_length_public_key },
 	{ GNUTLS_PK_EXP_FALCON1024, OQS_SIG_falcon_1024_length_public_key },
-	{ GNUTLS_PK_EXP_SPHINCS_SHA2_128F,
-	  OQS_SIG_sphincs_sha2_128f_simple_length_public_key },
-	{ GNUTLS_PK_EXP_SPHINCS_SHA2_128S,
-	  OQS_SIG_sphincs_sha2_128s_simple_length_public_key },
-	{ GNUTLS_PK_EXP_SPHINCS_SHA2_192F,
-	  OQS_SIG_sphincs_sha2_192f_simple_length_public_key },
-	{ GNUTLS_PK_EXP_SPHINCS_SHA2_192S,
-	  OQS_SIG_sphincs_sha2_192s_simple_length_public_key },
-	{ GNUTLS_PK_EXP_SPHINCS_SHA2_256F,
-	  OQS_SIG_sphincs_sha2_256f_simple_length_public_key },
-	{ GNUTLS_PK_EXP_SPHINCS_SHA2_256S,
-	  OQS_SIG_sphincs_sha2_256s_simple_length_public_key },
-	{ GNUTLS_PK_EXP_SPHINCS_SHAKE_128F,
-	  OQS_SIG_sphincs_shake_128f_simple_length_public_key },
-	{ GNUTLS_PK_EXP_SPHINCS_SHAKE_128S,
-	  OQS_SIG_sphincs_shake_128s_simple_length_public_key },
-	{ GNUTLS_PK_EXP_SPHINCS_SHAKE_192F,
-	  OQS_SIG_sphincs_shake_192f_simple_length_public_key },
-	{ GNUTLS_PK_EXP_SPHINCS_SHAKE_192S,
-	  OQS_SIG_sphincs_shake_192s_simple_length_public_key },
-	{ GNUTLS_PK_EXP_SPHINCS_SHAKE_256F,
-	  OQS_SIG_sphincs_shake_256f_simple_length_public_key },
-	{ GNUTLS_PK_EXP_SPHINCS_SHAKE_256S,
-	  OQS_SIG_sphincs_shake_256s_simple_length_public_key },
 
 	{ GNUTLS_PK_UNKNOWN, 0 }
 };
@@ -132,18 +108,6 @@ unsigned pubkey_to_bits(const gnutls_pk_params_st *params)
 	case GNUTLS_PK_ML_DSA_87:
 	case GNUTLS_PK_EXP_FALCON512:
 	case GNUTLS_PK_EXP_FALCON1024:
-	case GNUTLS_PK_EXP_SPHINCS_SHA2_128F:
-	case GNUTLS_PK_EXP_SPHINCS_SHA2_128S:
-	case GNUTLS_PK_EXP_SPHINCS_SHA2_192F:
-	case GNUTLS_PK_EXP_SPHINCS_SHA2_192S:
-	case GNUTLS_PK_EXP_SPHINCS_SHA2_256F:
-	case GNUTLS_PK_EXP_SPHINCS_SHA2_256S:
-	case GNUTLS_PK_EXP_SPHINCS_SHAKE_128F:
-	case GNUTLS_PK_EXP_SPHINCS_SHAKE_128S:
-	case GNUTLS_PK_EXP_SPHINCS_SHAKE_192F:
-	case GNUTLS_PK_EXP_SPHINCS_SHAKE_192S:
-	case GNUTLS_PK_EXP_SPHINCS_SHAKE_256F:
-	case GNUTLS_PK_EXP_SPHINCS_SHAKE_256S:
 		return pq_pubkey_to_bits(params->algo);
 #endif
 	default:
@@ -436,24 +400,8 @@ int gnutls_pubkey_get_preferred_hash_algorithm(gnutls_pubkey_t key,
 	case GNUTLS_PK_ML_DSA_87:
 	case GNUTLS_PK_EXP_FALCON512:
 	case GNUTLS_PK_EXP_FALCON1024:
-	case GNUTLS_PK_EXP_SPHINCS_SHAKE_128F:
-	case GNUTLS_PK_EXP_SPHINCS_SHAKE_128S:
-	case GNUTLS_PK_EXP_SPHINCS_SHAKE_192F:
-	case GNUTLS_PK_EXP_SPHINCS_SHAKE_192S:
-	case GNUTLS_PK_EXP_SPHINCS_SHAKE_256F:
-	case GNUTLS_PK_EXP_SPHINCS_SHAKE_256S:
 		if (hash)
 			*hash = GNUTLS_DIG_SHAKE_256;
-		ret = 0;
-		break;
-	case GNUTLS_PK_EXP_SPHINCS_SHA2_128F:
-	case GNUTLS_PK_EXP_SPHINCS_SHA2_128S:
-	case GNUTLS_PK_EXP_SPHINCS_SHA2_192F:
-	case GNUTLS_PK_EXP_SPHINCS_SHA2_192S:
-	case GNUTLS_PK_EXP_SPHINCS_SHA2_256F:
-	case GNUTLS_PK_EXP_SPHINCS_SHA2_256S:
-		if (hash)
-			*hash = GNUTLS_DIG_SHA256;
 		ret = 0;
 		break;
 #endif
@@ -2761,18 +2709,6 @@ int pubkey_verify_data(const gnutls_sign_entry_st *se, const mac_entry_st *me,
 	case GNUTLS_PK_ML_DSA_87:
 	case GNUTLS_PK_EXP_FALCON512:
 	case GNUTLS_PK_EXP_FALCON1024:
-	case GNUTLS_PK_EXP_SPHINCS_SHA2_128F:
-	case GNUTLS_PK_EXP_SPHINCS_SHA2_128S:
-	case GNUTLS_PK_EXP_SPHINCS_SHA2_192F:
-	case GNUTLS_PK_EXP_SPHINCS_SHA2_192S:
-	case GNUTLS_PK_EXP_SPHINCS_SHA2_256F:
-	case GNUTLS_PK_EXP_SPHINCS_SHA2_256S:
-	case GNUTLS_PK_EXP_SPHINCS_SHAKE_128F:
-	case GNUTLS_PK_EXP_SPHINCS_SHAKE_128S:
-	case GNUTLS_PK_EXP_SPHINCS_SHAKE_192F:
-	case GNUTLS_PK_EXP_SPHINCS_SHAKE_192S:
-	case GNUTLS_PK_EXP_SPHINCS_SHAKE_256F:
-	case GNUTLS_PK_EXP_SPHINCS_SHAKE_256S:
 #endif
 		if (_gnutls_pk_verify(se->pk, data, signature, params,
 				      sign_params) != 0) {

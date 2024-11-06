@@ -62,24 +62,6 @@
 
 #define IS_FALCON(x) \
 	(((x) == GNUTLS_PK_EXP_FALCON512) || ((x) == GNUTLS_PK_EXP_FALCON1024))
-
-#define IS_SIMPLE_SPHINCS(x)                          \
-	(((x) == GNUTLS_PK_EXP_SPHINCS_SHA2_128S) ||  \
-	 ((x) == GNUTLS_PK_EXP_SPHINCS_SHA2_192S) ||  \
-	 ((x) == GNUTLS_PK_EXP_SPHINCS_SHA2_256S) ||  \
-	 ((x) == GNUTLS_PK_EXP_SPHINCS_SHAKE_128S) || \
-	 ((x) == GNUTLS_PK_EXP_SPHINCS_SHAKE_192S) || \
-	 ((x) == GNUTLS_PK_EXP_SPHINCS_SHAKE_256S))
-
-#define IS_FAST_SPHINCS(x)                            \
-	(((x) == GNUTLS_PK_EXP_SPHINCS_SHA2_128F) ||  \
-	 ((x) == GNUTLS_PK_EXP_SPHINCS_SHA2_192F) ||  \
-	 ((x) == GNUTLS_PK_EXP_SPHINCS_SHA2_256F) ||  \
-	 ((x) == GNUTLS_PK_EXP_SPHINCS_SHAKE_128F) || \
-	 ((x) == GNUTLS_PK_EXP_SPHINCS_SHAKE_192F) || \
-	 ((x) == GNUTLS_PK_EXP_SPHINCS_SHAKE_256F))
-
-#define IS_SPHINCS(x) (IS_SIMPLE_SPHINCS(x) || IS_FAST_SPHINCS(x))
 #endif
 
 #define SIG_SEM_PRE_TLS12 (1 << 1)

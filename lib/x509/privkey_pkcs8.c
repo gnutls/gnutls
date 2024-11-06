@@ -88,18 +88,6 @@ inline static int _encode_privkey(gnutls_x509_privkey_t pkey,
 	case GNUTLS_PK_ML_DSA_87:
 	case GNUTLS_PK_EXP_FALCON512:
 	case GNUTLS_PK_EXP_FALCON1024:
-	case GNUTLS_PK_EXP_SPHINCS_SHA2_128F:
-	case GNUTLS_PK_EXP_SPHINCS_SHA2_128S:
-	case GNUTLS_PK_EXP_SPHINCS_SHA2_192F:
-	case GNUTLS_PK_EXP_SPHINCS_SHA2_192S:
-	case GNUTLS_PK_EXP_SPHINCS_SHA2_256F:
-	case GNUTLS_PK_EXP_SPHINCS_SHA2_256S:
-	case GNUTLS_PK_EXP_SPHINCS_SHAKE_128F:
-	case GNUTLS_PK_EXP_SPHINCS_SHAKE_128S:
-	case GNUTLS_PK_EXP_SPHINCS_SHAKE_192F:
-	case GNUTLS_PK_EXP_SPHINCS_SHAKE_192S:
-	case GNUTLS_PK_EXP_SPHINCS_SHAKE_256F:
-	case GNUTLS_PK_EXP_SPHINCS_SHAKE_256S:
 		ret = _gnutls_x509_encode_string(
 			ASN1_ETYPE_OCTET_STRING, pkey->params.raw_priv.data,
 			pkey->params.raw_priv.size + pkey->params.raw_pub.size,
@@ -1502,42 +1490,6 @@ static const struct pq_key_length_st pq_key_lengths[] = {
 	  OQS_SIG_falcon_512_length_public_key },
 	{ GNUTLS_PK_EXP_FALCON1024, OQS_SIG_falcon_1024_length_secret_key,
 	  OQS_SIG_falcon_1024_length_public_key },
-	{ GNUTLS_PK_EXP_SPHINCS_SHA2_128F,
-	  OQS_SIG_sphincs_sha2_128f_simple_length_secret_key,
-	  OQS_SIG_sphincs_sha2_128f_simple_length_public_key },
-	{ GNUTLS_PK_EXP_SPHINCS_SHA2_128S,
-	  OQS_SIG_sphincs_sha2_128s_simple_length_secret_key,
-	  OQS_SIG_sphincs_sha2_128s_simple_length_public_key },
-	{ GNUTLS_PK_EXP_SPHINCS_SHA2_192F,
-	  OQS_SIG_sphincs_sha2_192f_simple_length_secret_key,
-	  OQS_SIG_sphincs_sha2_192f_simple_length_public_key },
-	{ GNUTLS_PK_EXP_SPHINCS_SHA2_192S,
-	  OQS_SIG_sphincs_sha2_192s_simple_length_secret_key,
-	  OQS_SIG_sphincs_sha2_192s_simple_length_public_key },
-	{ GNUTLS_PK_EXP_SPHINCS_SHA2_256F,
-	  OQS_SIG_sphincs_sha2_256f_simple_length_secret_key,
-	  OQS_SIG_sphincs_sha2_256f_simple_length_public_key },
-	{ GNUTLS_PK_EXP_SPHINCS_SHA2_256S,
-	  OQS_SIG_sphincs_sha2_256s_simple_length_secret_key,
-	  OQS_SIG_sphincs_sha2_256s_simple_length_public_key },
-	{ GNUTLS_PK_EXP_SPHINCS_SHAKE_128F,
-	  OQS_SIG_sphincs_shake_128f_simple_length_secret_key,
-	  OQS_SIG_sphincs_shake_128f_simple_length_public_key },
-	{ GNUTLS_PK_EXP_SPHINCS_SHAKE_128S,
-	  OQS_SIG_sphincs_shake_128s_simple_length_secret_key,
-	  OQS_SIG_sphincs_shake_128s_simple_length_public_key },
-	{ GNUTLS_PK_EXP_SPHINCS_SHAKE_192F,
-	  OQS_SIG_sphincs_shake_192f_simple_length_secret_key,
-	  OQS_SIG_sphincs_shake_192f_simple_length_public_key },
-	{ GNUTLS_PK_EXP_SPHINCS_SHAKE_192S,
-	  OQS_SIG_sphincs_shake_192s_simple_length_secret_key,
-	  OQS_SIG_sphincs_shake_192s_simple_length_public_key },
-	{ GNUTLS_PK_EXP_SPHINCS_SHAKE_256F,
-	  OQS_SIG_sphincs_shake_256f_simple_length_secret_key,
-	  OQS_SIG_sphincs_shake_256f_simple_length_public_key },
-	{ GNUTLS_PK_EXP_SPHINCS_SHAKE_256S,
-	  OQS_SIG_sphincs_shake_256s_simple_length_secret_key,
-	  OQS_SIG_sphincs_shake_256s_simple_length_public_key },
 
 	{ GNUTLS_PK_UNKNOWN, 0, 0 }
 };
@@ -1698,18 +1650,6 @@ static int decode_private_key_info(const gnutls_datum_t *der,
 	case GNUTLS_PK_ML_DSA_87:
 	case GNUTLS_PK_EXP_FALCON512:
 	case GNUTLS_PK_EXP_FALCON1024:
-	case GNUTLS_PK_EXP_SPHINCS_SHA2_128F:
-	case GNUTLS_PK_EXP_SPHINCS_SHA2_128S:
-	case GNUTLS_PK_EXP_SPHINCS_SHA2_192F:
-	case GNUTLS_PK_EXP_SPHINCS_SHA2_192S:
-	case GNUTLS_PK_EXP_SPHINCS_SHA2_256F:
-	case GNUTLS_PK_EXP_SPHINCS_SHA2_256S:
-	case GNUTLS_PK_EXP_SPHINCS_SHAKE_128F:
-	case GNUTLS_PK_EXP_SPHINCS_SHAKE_128S:
-	case GNUTLS_PK_EXP_SPHINCS_SHAKE_192F:
-	case GNUTLS_PK_EXP_SPHINCS_SHAKE_192S:
-	case GNUTLS_PK_EXP_SPHINCS_SHAKE_256F:
-	case GNUTLS_PK_EXP_SPHINCS_SHAKE_256S:
 		result = _decode_pkcs8_pqc_alg_key(pkcs8_asn, pkey, oid);
 		break;
 #endif

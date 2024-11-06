@@ -139,19 +139,7 @@ int _gnutls_get_asn_mpis(asn1_node asn, const char *root,
 	    pk_algorithm != GNUTLS_PK_ML_DSA_65 &&
 	    pk_algorithm != GNUTLS_PK_ML_DSA_87 &&
 	    pk_algorithm != GNUTLS_PK_EXP_FALCON512 &&
-	    pk_algorithm != GNUTLS_PK_EXP_FALCON1024 &&
-	    pk_algorithm != GNUTLS_PK_EXP_SPHINCS_SHA2_128F &&
-	    pk_algorithm != GNUTLS_PK_EXP_SPHINCS_SHA2_128S &&
-	    pk_algorithm != GNUTLS_PK_EXP_SPHINCS_SHA2_192F &&
-	    pk_algorithm != GNUTLS_PK_EXP_SPHINCS_SHA2_192S &&
-	    pk_algorithm != GNUTLS_PK_EXP_SPHINCS_SHA2_256F &&
-	    pk_algorithm != GNUTLS_PK_EXP_SPHINCS_SHA2_256S &&
-	    pk_algorithm != GNUTLS_PK_EXP_SPHINCS_SHAKE_128F &&
-	    pk_algorithm != GNUTLS_PK_EXP_SPHINCS_SHAKE_128S &&
-	    pk_algorithm != GNUTLS_PK_EXP_SPHINCS_SHAKE_192F &&
-	    pk_algorithm != GNUTLS_PK_EXP_SPHINCS_SHAKE_192S &&
-	    pk_algorithm != GNUTLS_PK_EXP_SPHINCS_SHAKE_256F &&
-	    pk_algorithm != GNUTLS_PK_EXP_SPHINCS_SHAKE_256S
+	    pk_algorithm != GNUTLS_PK_EXP_FALCON1024
 #endif
 	) {
 		/* RSA, EdDSA and PQ algorithms do not use parameters */

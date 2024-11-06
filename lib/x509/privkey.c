@@ -494,98 +494,6 @@ error:
 	gnutls_pk_params_release(&pkey->params);
 	return result;
 }
-
-static const struct pqc_algorithm_version_st sphincs_versions[] = {
-	{ '\x01', GNUTLS_PK_EXP_SPHINCS_SHA2_128F,
-	  OQS_SIG_sphincs_sha2_128f_simple_length_secret_key,
-	  OQS_SIG_sphincs_sha2_128f_simple_length_public_key },
-	{ '\x02', GNUTLS_PK_EXP_SPHINCS_SHA2_128S,
-	  OQS_SIG_sphincs_sha2_128s_simple_length_secret_key,
-	  OQS_SIG_sphincs_sha2_128s_simple_length_public_key },
-	{ '\x03', GNUTLS_PK_EXP_SPHINCS_SHA2_192F,
-	  OQS_SIG_sphincs_sha2_192f_simple_length_secret_key,
-	  OQS_SIG_sphincs_sha2_192f_simple_length_public_key },
-	{ '\x04', GNUTLS_PK_EXP_SPHINCS_SHA2_192S,
-	  OQS_SIG_sphincs_sha2_192s_simple_length_secret_key,
-	  OQS_SIG_sphincs_sha2_192s_simple_length_public_key },
-	{ '\x05', GNUTLS_PK_EXP_SPHINCS_SHA2_256F,
-	  OQS_SIG_sphincs_sha2_256f_simple_length_secret_key,
-	  OQS_SIG_sphincs_sha2_256f_simple_length_public_key },
-	{ '\x06', GNUTLS_PK_EXP_SPHINCS_SHA2_256S,
-	  OQS_SIG_sphincs_sha2_256s_simple_length_secret_key,
-	  OQS_SIG_sphincs_sha2_256s_simple_length_public_key },
-	{ '\x07', GNUTLS_PK_EXP_SPHINCS_SHAKE_128F,
-	  OQS_SIG_sphincs_shake_128f_simple_length_secret_key,
-	  OQS_SIG_sphincs_shake_128f_simple_length_public_key },
-	{ '\x08', GNUTLS_PK_EXP_SPHINCS_SHAKE_128S,
-	  OQS_SIG_sphincs_shake_128s_simple_length_secret_key,
-	  OQS_SIG_sphincs_shake_128s_simple_length_public_key },
-	{ '\x09', GNUTLS_PK_EXP_SPHINCS_SHAKE_192F,
-	  OQS_SIG_sphincs_shake_192f_simple_length_secret_key,
-	  OQS_SIG_sphincs_shake_192f_simple_length_public_key },
-	{ '\x0a', GNUTLS_PK_EXP_SPHINCS_SHAKE_192S,
-	  OQS_SIG_sphincs_shake_192s_simple_length_secret_key,
-	  OQS_SIG_sphincs_shake_192s_simple_length_public_key },
-	{ '\x0b', GNUTLS_PK_EXP_SPHINCS_SHAKE_256F,
-	  OQS_SIG_sphincs_shake_256f_simple_length_secret_key,
-	  OQS_SIG_sphincs_shake_256f_simple_length_public_key },
-	{ '\x0c', GNUTLS_PK_EXP_SPHINCS_SHAKE_256S,
-	  OQS_SIG_sphincs_shake_256s_simple_length_secret_key,
-	  OQS_SIG_sphincs_shake_256s_simple_length_public_key },
-
-	{ '\x00', GNUTLS_PK_UNKNOWN, 0, 0 }
-};
-
-static int _gnutls_set_sphincs_params(const uint8_t *version,
-				      gnutls_x509_privkey_t pkey)
-{
-	const struct pqc_algorithm_version_st *v = sphincs_versions;
-	while (v->algorithm != GNUTLS_PK_UNKNOWN && v->version != *version)
-		v++;
-
-	pkey->params.raw_priv.size = v->secret_key_length;
-	pkey->params.raw_pub.size = v->public_key_length;
-	pkey->params.params_nr = SPHINCS_PRIVATE_PARAMS;
-	pkey->params.algo = v->algorithm;
-
-	if (v->algorithm == GNUTLS_PK_UNKNOWN)
-		return GNUTLS_E_UNKNOWN_ALGORITHM;
-
-	return 0;
-}
-
-int _gnutls_privkey_decode_sphincs_key(asn1_node *pkey_asn,
-				       const gnutls_datum_t *raw_key,
-				       gnutls_x509_privkey_t pkey)
-{
-	int result;
-	uint8_t version;
-
-	gnutls_pk_params_init(&pkey->params);
-
-	if ((result = asn1_create_element(_gnutls_get_gnutls_asn(),
-					  "GNUTLS.SphincsPrivateKey",
-					  pkey_asn)) != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	result = _gnutls_decode_pqc_keys(pkey_asn, raw_key, pkey, &version);
-	if (result < 0)
-		goto error;
-
-	result = _gnutls_set_sphincs_params(&version, pkey);
-	if (result < 0)
-		goto error;
-
-	return 0;
-
-error:
-	asn1_delete_structure2(pkey_asn, ASN1_DELETE_FLAG_ZEROIZE);
-	gnutls_pk_params_clear(&pkey->params);
-	gnutls_pk_params_release(&pkey->params);
-	return result;
-}
 #endif
 
 static asn1_node decode_dsa_key(const gnutls_datum_t *raw_key,
@@ -675,7 +583,6 @@ error:
 #ifdef HAVE_LIBOQS
 #define PEM_KEY_ML_DSA "ML-DSA PRIVATE KEY"
 #define PEM_KEY_FALCON "FALCON PRIVATE KEY"
-#define PEM_KEY_SPHINCS "SPHINCS PRIVATE KEY"
 #endif
 #define PEM_KEY_PKCS8 "PRIVATE KEY"
 
@@ -799,17 +706,6 @@ int gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
 						key->params.algo =
 							GNUTLS_PK_EXP_FALCON512;
 					}
-				} else if (left > sizeof(PEM_KEY_SPHINCS) &&
-					   memcmp(ptr, PEM_KEY_SPHINCS,
-						  sizeof(PEM_KEY_SPHINCS) -
-							  1) == 0) {
-					result = _gnutls_fbase64_decode(
-						PEM_KEY_SPHINCS, begin_ptr,
-						left, &_data);
-					if (result >= 0) {
-						key->params.algo =
-							GNUTLS_PK_EXP_SPHINCS_SHA2_128F;
-					}
 #endif
 				}
 
@@ -882,14 +778,6 @@ int gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
 	} else if (key->params.algo == GNUTLS_PK_EXP_FALCON512) {
 		result = _gnutls_privkey_decode_falcon_key(&key->key, &_data,
 							   key);
-
-		if (result < 0) {
-			gnutls_assert();
-			key->key = NULL;
-		}
-	} else if (key->params.algo == GNUTLS_PK_EXP_SPHINCS_SHA2_128F) {
-		result = _gnutls_privkey_decode_sphincs_key(&key->key, &_data,
-							    key);
 
 		if (result < 0) {
 			gnutls_assert();
@@ -1081,10 +969,7 @@ int gnutls_x509_privkey_import2(gnutls_x509_privkey_t key,
 					    sizeof(PEM_KEY_ML_DSA) - 1) == 0) ||
 				    (left > sizeof(PEM_KEY_FALCON) &&
 				     memcmp(ptr, PEM_KEY_FALCON,
-					    sizeof(PEM_KEY_FALCON) - 1) == 0) ||
-				    (left > sizeof(PEM_KEY_SPHINCS) &&
-				     memcmp(ptr, PEM_KEY_SPHINCS,
-					    sizeof(PEM_KEY_SPHINCS) - 1) == 0)
+					    sizeof(PEM_KEY_FALCON) - 1) == 0)
 #endif
 				) {
 					head_enc = 0;
@@ -1846,19 +1731,6 @@ static const char *set_msg(gnutls_x509_privkey_t key)
 	case GNUTLS_PK_EXP_FALCON512:
 	case GNUTLS_PK_EXP_FALCON1024:
 		return PEM_KEY_FALCON;
-	case GNUTLS_PK_EXP_SPHINCS_SHA2_128F:
-	case GNUTLS_PK_EXP_SPHINCS_SHA2_128S:
-	case GNUTLS_PK_EXP_SPHINCS_SHA2_192F:
-	case GNUTLS_PK_EXP_SPHINCS_SHA2_192S:
-	case GNUTLS_PK_EXP_SPHINCS_SHA2_256F:
-	case GNUTLS_PK_EXP_SPHINCS_SHA2_256S:
-	case GNUTLS_PK_EXP_SPHINCS_SHAKE_128F:
-	case GNUTLS_PK_EXP_SPHINCS_SHAKE_128S:
-	case GNUTLS_PK_EXP_SPHINCS_SHAKE_192F:
-	case GNUTLS_PK_EXP_SPHINCS_SHAKE_192S:
-	case GNUTLS_PK_EXP_SPHINCS_SHAKE_256F:
-	case GNUTLS_PK_EXP_SPHINCS_SHAKE_256S:
-		return PEM_KEY_SPHINCS;
 #endif
 	default:
 		return "UNKNOWN";
