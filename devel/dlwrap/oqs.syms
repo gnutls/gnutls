@@ -1,3 +1,4 @@
+OQS_SHA2_set_callbacks
 OQS_SHA3_set_callbacks
 OQS_init
 OQS_destroy
@@ -8,3 +9,4 @@ OQS_KEM_decaps
 OQS_KEM_keypair
 OQS_KEM_free
 OQS_randombytes_custom_algorithm
+OQS_version

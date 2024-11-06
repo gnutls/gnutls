@@ -24,6 +24,7 @@
 #include "config.h"
 #endif
 
+#include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -103,17 +104,29 @@ static void sign_verify_data(gnutls_pk_algorithm_t algorithm,
 	gnutls_free(signature.data);
 }
 
-static unsigned int is_approved_pk_algo(gnutls_pk_algorithm_t algo)
+static bool is_approved_pk_algo(gnutls_pk_algorithm_t algo)
 {
 	switch (algo) {
 	case GNUTLS_PK_RSA:
 	case GNUTLS_PK_RSA_PSS:
 	case GNUTLS_PK_RSA_OAEP:
 	case GNUTLS_PK_EC:
-		return 1;
+		return true;
 	default:
-		return 0;
+		return false;
 	}
+}
+
+static bool is_supported_pk_algo(gnutls_pk_algorithm_t algo)
+{
+	const gnutls_pk_algorithm_t *p;
+
+	for (p = gnutls_pk_list(); *p != GNUTLS_PK_UNKNOWN; p++) {
+		if (*p == algo)
+			return true;
+	}
+
+	return false;
 }
 
 void doit(void)
@@ -138,12 +151,16 @@ void doit(void)
 	for (i = 0; i < MAX_TRIES; i++) {
 		for (algorithm = GNUTLS_PK_RSA; algorithm <= GNUTLS_PK_MAX;
 		     algorithm++) {
+			if (!is_supported_pk_algo(algorithm))
+				continue;
+
 			if (algorithm == GNUTLS_PK_DH ||
 #ifndef ENABLE_DSA
 			    algorithm == GNUTLS_PK_DSA ||
 #endif
 			    algorithm == GNUTLS_PK_ECDH_X25519 ||
-			    algorithm == GNUTLS_PK_ECDH_X448)
+			    algorithm == GNUTLS_PK_ECDH_X448 ||
+			    algorithm == GNUTLS_PK_MLKEM768)
 				continue;
 
 			if (algorithm == GNUTLS_PK_GOST_01 ||

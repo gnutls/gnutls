@@ -21,7 +21,7 @@ dnl Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.64)
 
 dnl when updating version also update LT_REVISION in m4/hooks.m4
-AC_INIT([GnuTLS], [3.8.7], [bugs@gnutls.org])
+AC_INIT([GnuTLS], [3.8.8], [bugs@gnutls.org])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIRS([m4 src/gl/m4 lib/unistring/m4])
 AC_CANONICAL_HOST
@@ -1302,23 +1302,20 @@ AS_CASE([$ac_liboqs],
   [no], [:],
   [AC_MSG_ERROR([[Unknown argument ${ac_liboqs} for --with-liboqs]])])
 
+m4_define([min_liboqs_version_major], [0])
+m4_define([min_liboqs_version_minor], [11])
+m4_define([min_liboqs_version_micro], [0])
 
 AS_IF([test x$ac_liboqs != xno],
-    [PKG_CHECK_MODULES([LIBOQS],[liboqs >= 0.10.1],
-      [save_CFLAGS=$CFLAGS
-      CFLAGS="$CFLAGS $LIBOQS_CFLAGS"
-      AC_CHECK_DECLS([OQS_SHA3_set_callbacks])
-      CFLAGS="$save_CFLAGS"
-      # liboqs 0.10.1 didn't expose OQS_SHA3_set_callbacks from the header
-      # file, so extra treatment is needed:
-      # https://github.com/open-quantum-safe/liboqs/pull/1832
-      AC_DEFINE([HAVE_LIBOQS], 1, [Have liboqs])
+    [PKG_CHECK_MODULES([LIBOQS],[liboqs >= min_liboqs_version_major.min_liboqs_version_minor.min_liboqs_version_micro],
+      [AC_DEFINE([HAVE_LIBOQS], 1, [Have liboqs])
+      AC_DEFINE([MIN_LIBOQS_VERSION_MAJOR], min_liboqs_version_major, [Major version of liboqs required])
+      AC_DEFINE([MIN_LIBOQS_VERSION_MINOR], min_liboqs_version_minor, [Minor version of liboqs required])
+      AC_DEFINE([MIN_LIBOQS_VERSION_MICRO], min_liboqs_version_micro, [Micro version of liboqs required])
       need_ltlibdl=yes],
       [AC_MSG_ERROR([liboqs support was requested but the required libraries were not found.])])])
 
 AM_CONDITIONAL(ENABLE_LIBOQS, test "$ac_liboqs" != "no")
-AM_CONDITIONAL(NEED_LIBOQS_SHA3_OPS_H,
-  test "$ac_cv_have_decl_OQS_SHA3_set_callbacks" != yes)
 AM_CONDITIONAL([LIBOQS_ENABLE_DLOPEN], [test "$ac_liboqs" = dlopen])
 
 AS_IF([test "$ac_liboqs" = dlopen], [

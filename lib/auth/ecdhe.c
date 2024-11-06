@@ -351,9 +351,8 @@ int _gnutls_proc_ecdh_common_server_kx(gnutls_session_t session, uint8_t *data,
 
 	i += 2;
 
-	ret = _gnutls_session_supports_group(session, group->id);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
+	if (!_gnutls_session_supports_group(session, group->id))
+		return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
 
 	ecurve = _gnutls_ecc_curve_get_params(group->curve);
 	if (ecurve == NULL) {

@@ -668,8 +668,7 @@ void doit(void)
 	}
 	FIPS_POP_CONTEXT(APPROVED);
 
-	/* Create a SHA256 hashed data for 2-pass signature API; not a
-	 * crypto operation */
+	/* Create a SHA256 hashed data for 2-pass signature API; approved */
 	FIPS_PUSH_CONTEXT();
 	ret = gnutls_hash_fast(GNUTLS_DIG_SHA256, data.data, data.size, hash);
 	if (ret < 0) {
@@ -677,7 +676,7 @@ void doit(void)
 	}
 	hashed_data.data = hash;
 	hashed_data.size = 32;
-	FIPS_POP_CONTEXT(INITIAL);
+	FIPS_POP_CONTEXT(APPROVED);
 
 	/* Create a signature with ECDSA and SHA256 (2-pass API); not-approved */
 	FIPS_PUSH_CONTEXT();
@@ -729,8 +728,7 @@ void doit(void)
 	FIPS_POP_CONTEXT(NOT_APPROVED);
 	gnutls_free(signature.data);
 
-	/* Create a SHA1 hashed data for 2-pass signature API; not a
-	 * crypto operation */
+	/* Create a SHA1 hashed data for 2-pass signature API; approved */
 	FIPS_PUSH_CONTEXT();
 	ret = gnutls_hash_fast(GNUTLS_DIG_SHA1, data.data, data.size, hash);
 	if (ret < 0) {
@@ -738,7 +736,7 @@ void doit(void)
 	}
 	hashed_data.data = hash;
 	hashed_data.size = 20;
-	FIPS_POP_CONTEXT(INITIAL);
+	FIPS_POP_CONTEXT(APPROVED);
 
 	/* Create a signature with ECDSA and SHA1 (2-pass API); not-approved */
 	FIPS_PUSH_CONTEXT();

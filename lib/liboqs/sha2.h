@@ -1,11 +1,9 @@
 /*
- * Copyright (C) 2011-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2024 Red Hat, Inc.
  *
- * Author: Nikos Mavrogiannopoulos
+ * This file is part of GNUTLS.
  *
- * This file is part of GnuTLS.
- *
- * The GnuTLS is free software; you can redistribute it and/or
+ * The GNUTLS library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
  * as published by the Free Software Foundation; either version 2.1 of
  * the License, or (at your option) any later version.
@@ -20,14 +18,10 @@
  *
  */
 
-#ifndef GNUTLS_LIB_EXT_SUPPORTED_GROUPS_H
-#define GNUTLS_LIB_EXT_SUPPORTED_GROUPS_H
+#ifndef GNUTLS_LIB_LIBOQS_SHA2_H
+#define GNUTLS_LIB_LIBOQS_SHA2_H
 
-#include "hello_ext.h"
+void _gnutls_liboqs_sha2_init(void);
+void _gnutls_liboqs_sha2_deinit(void);
 
-extern const hello_ext_entry_st ext_mod_supported_groups;
-
-bool _gnutls_session_supports_group(gnutls_session_t session,
-				    unsigned int group);
-
-#endif /* GNUTLS_LIB_EXT_SUPPORTED_GROUPS_H */
+#endif /* GNUTLS_LIB_LIBOQS_SHA2_H */

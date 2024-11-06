@@ -5,6 +5,34 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.8.8 (released 2024-11-05)
+
+** libgnutls: Experimental support for X25519MLKEM768 and SecP256r1MLKEM768 key exchange in TLS 1.3
+   The support for post-quantum key exchanges has been extended to
+   cover the final standard of ML-KEM, following
+   draft-kwiatkowski-tls-ecdhe-mlkem. The minimum supported version of
+   liboqs is bumped to 0.11.0.
+
+** libgnutls: All records included in an OCSP response are now checked in TLS
+   Previously, when multiple records are provided in a single OCSP
+   response, only the first record was considered; now all those
+   records are examined until the server certificate matches.
+
+** libgnutls: Handling of malformed compress_certificate extension is now more standard compliant
+   The server behavior of receiving a malformed compress_certificate
+   extension now more strictly follows RFC 8879; return
+   illegal_parameter alert instead of bad_certificate, as well as
+   overlong extension data is properly rejected.
+
+** build: More flexible library linking options for compression libraries, TPM, and liboqs support
+   The configure options, --with-zstd, --with-brotli, --with-zlib,
+   --with-tpm2, and --with-liboqs now take 4 states:
+   yes/link/dlopen/no, to specify how the libraries are linked or
+   loaded.
+
+** API and ABI modifications:
+No changes since last version.
+
 * Version 3.8.7 (released 2024-08-15)
 
 ** libgnutls: New configure option to compile out DSA support

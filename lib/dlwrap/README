@@ -1,0 +1,7 @@
+The files included in this directory were initially generated using
+dlwrap[1], through the `devel/generate-dlwrap.sh` script. That,
+however, doesn't mean dlwrap is needed at build-time nor modification
+to the generated files are prohibited, as they are maintained as part
+of the Git tree.
+
+1. https://crates.io/crates/dlwrap

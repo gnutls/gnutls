@@ -49,6 +49,12 @@
 	 ((x) == GNUTLS_PK_EDDSA_ED25519) || ((x) == GNUTLS_PK_ECDH_X448) || \
 	 ((x) == GNUTLS_PK_EDDSA_ED448))
 
+#define IS_ECDHX(x) \
+	(((x) == GNUTLS_PK_ECDH_X25519) || ((x) == GNUTLS_PK_ECDH_X448))
+
+#define IS_KEM(x) \
+	(((x) == GNUTLS_PK_MLKEM768) || ((x) == GNUTLS_PK_EXP_KYBER768))
+
 #define SIG_SEM_PRE_TLS12 (1 << 1)
 #define SIG_SEM_TLS13 (1 << 2)
 #define SIG_SEM_DEFAULT (SIG_SEM_PRE_TLS12 | SIG_SEM_TLS13)

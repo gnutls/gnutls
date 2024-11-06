@@ -157,6 +157,15 @@ inline static void _gnutls_ro_buffer_from_datum(gnutls_buffer_st *str,
 	str->data = data->data;
 }
 
+inline static void _gnutls_ro_buffer_init(gnutls_buffer_st *str,
+					  const void *data, size_t size)
+{
+	_gnutls_buffer_init(str);
+	str->length = size;
+	str->max_length = size;
+	str->data = (void *)data;
+}
+
 int _gnutls_buffer_append_escape(gnutls_buffer_st *dest, const void *data,
 				 size_t data_size, const char *invalid_chars);
 int _gnutls_buffer_unescape(gnutls_buffer_st *dest);

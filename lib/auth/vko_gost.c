@@ -144,9 +144,8 @@ static int vko_prepare_client_keys(gnutls_session_t session,
 		_gnutls_debug_log("received curve %s\n", group->name);
 	}
 
-	ret = _gnutls_session_supports_group(session, group->id);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
+	if (!_gnutls_session_supports_group(session, group->id))
+		return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
 
 	if (pub->algo == GNUTLS_PK_GOST_12_512) {
 		gnutls_sign_algorithm_set_server(session, GNUTLS_SIGN_GOST_512);
