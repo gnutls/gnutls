@@ -1,5 +1,6 @@
 OQS_SHA2_set_callbacks
 OQS_SHA3_set_callbacks
+OQS_SHA3_x4_set_callbacks
 OQS_init
 OQS_destroy
 OQS_KEM_alg_is_enabled

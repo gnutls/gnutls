@@ -15,3 +15,4 @@ FUNC(OQS_STATUS, OQS_KEM_decaps, (const OQS_KEM *kem, uint8_t *shared_secret, co
 VOID_FUNC(void, OQS_KEM_free, (OQS_KEM *kem), (kem))
 VOID_FUNC(void, OQS_SHA2_set_callbacks, (struct OQS_SHA2_callbacks *new_callbacks), (new_callbacks))
 VOID_FUNC(void, OQS_SHA3_set_callbacks, (struct OQS_SHA3_callbacks *new_callbacks), (new_callbacks))
+VOID_FUNC(void, OQS_SHA3_x4_set_callbacks, (struct OQS_SHA3_x4_callbacks *new_callbacks), (new_callbacks))
