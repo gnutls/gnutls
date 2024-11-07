@@ -142,11 +142,26 @@ out:
 void _gnutls_liboqs_deinit(void)
 {
 	if (_liboqs_init) {
+		const char *version;
+
 		_gnutls_liboqs_rand_deinit();
 		_gnutls_liboqs_sha3x4_deinit();
 		_gnutls_liboqs_sha3_deinit();
 		_gnutls_liboqs_sha2_deinit();
-		GNUTLS_OQS_FUNC(OQS_destroy)();
+
+		/* OQS_destroy in liboqs 0.11.0 unconditionally calls
+		 * OpenSSL functions for cleanup; see:
+		 * https://github.com/open-quantum-safe/liboqs/pull/1982
+		 *
+		 * As it doesn't do anything other than that so far,
+		 * just skip it for now */
+		version = GNUTLS_OQS_FUNC(OQS_version)();
+		if (unlikely(version == NULL)) {
+			_gnutls_debug_log(
+				"liboqs: unable to retrieve liboqs version\n");
+		} else if (check_version(version, 0, 11, 1)) {
+			GNUTLS_OQS_FUNC(OQS_destroy)();
+		}
 	}
 
 	gnutls_oqs_unload_library();
