@@ -132,6 +132,7 @@ gnutls_oqs_ensure_library (const char *soname, int flags)
   err = ENSURE_SYMBOL(name);			\
   if (err < 0)					\
     {						\
+      dlclose (gnutls_oqs_dlhandle);	\
       gnutls_oqs_dlhandle = NULL;		\
       return err;				\
     }

@@ -132,6 +132,7 @@ gnutls_zlib_ensure_library (const char *soname, int flags)
   err = ENSURE_SYMBOL(name);			\
   if (err < 0)					\
     {						\
+      dlclose (gnutls_zlib_dlhandle);	\
       gnutls_zlib_dlhandle = NULL;		\
       return err;				\
     }

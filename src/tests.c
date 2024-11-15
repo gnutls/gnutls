@@ -287,6 +287,9 @@ test_code_t test_vko_gost_12(gnutls_session_t session)
 	if (tls_ext_ok == 0)
 		return TEST_IGNORE;
 
+	if (gnutls_fips140_mode_enabled())
+		return TEST_IGNORE;
+
 	sprintf(prio_str,
 		INIT_STR ALL_CIPHERS ":" ALL_COMP ":%s:" ALL_MACS
 				     ":+VKO-GOST-12:%s",
@@ -375,6 +378,9 @@ test_code_t test_ecdhe_secp521r1(gnutls_session_t session)
 
 test_code_t test_ecdhe_x25519(gnutls_session_t session)
 {
+	if (gnutls_fips140_mode_enabled())
+		return TEST_IGNORE;
+
 	return test_ecdhe_curve(session, "+CURVE-X25519",
 				GNUTLS_ECC_CURVE_X25519);
 }
