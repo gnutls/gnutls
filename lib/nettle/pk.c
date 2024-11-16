@@ -1475,9 +1475,6 @@ static int _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 	case GNUTLS_PK_EDDSA_ED448: {
 		const gnutls_ecc_curve_entry_st *e;
 
-		/* EdDSA is not approved yet */
-		not_approved = true;
-
 		if (unlikely(get_eddsa_curve(algo) != pk_params->curve)) {
 			ret = gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
 			goto cleanup;
@@ -1954,9 +1951,6 @@ static int _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 	case GNUTLS_PK_EDDSA_ED25519: /* we do EdDSA */
 	case GNUTLS_PK_EDDSA_ED448: {
 		const gnutls_ecc_curve_entry_st *e;
-
-		/* EdDSA is not approved yet */
-		not_approved = true;
 
 		if (unlikely(get_eddsa_curve(algo) != pk_params->curve)) {
 			ret = gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
@@ -3452,9 +3446,6 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 	case GNUTLS_PK_EDDSA_ED25519:
 	case GNUTLS_PK_EDDSA_ED448: {
 		unsigned size = gnutls_ecc_curve_get_size(level);
-
-		/* EdDSA is not approved yet */
-		not_approved = true;
 
 		if (params->pkflags & GNUTLS_PK_FLAG_PROVABLE) {
 			ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);

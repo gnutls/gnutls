@@ -639,6 +639,16 @@ int _gnutls_fips_perform_self_checks2(void)
 		return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
 	}
 
+	ret = gnutls_pk_self_test(0, GNUTLS_PK_EDDSA_ED25519);
+	if (ret < 0) {
+		return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+	}
+
+	ret = gnutls_pk_self_test(0, GNUTLS_PK_EDDSA_ED448);
+	if (ret < 0) {
+		return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+	}
+
 	ret = gnutls_pk_self_test(0, GNUTLS_PK_DH);
 	if (ret < 0) {
 		return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
