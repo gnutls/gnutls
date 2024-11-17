@@ -433,67 +433,6 @@ error:
 	gnutls_pk_params_release(&pkey->params);
 	return result;
 }
-
-static const struct pqc_algorithm_version_st falcon_versions[] = {
-	{ '\x01', GNUTLS_PK_EXP_FALCON512, OQS_SIG_falcon_512_length_secret_key,
-	  OQS_SIG_falcon_512_length_public_key },
-	{ '\x02', GNUTLS_PK_EXP_FALCON1024,
-	  OQS_SIG_falcon_1024_length_secret_key,
-	  OQS_SIG_falcon_1024_length_public_key },
-
-	{ '\x00', GNUTLS_PK_UNKNOWN, 0, 0 }
-};
-
-static int _gnutls_set_falcon_params(const uint8_t *version,
-				     gnutls_x509_privkey_t pkey)
-{
-	const struct pqc_algorithm_version_st *v = falcon_versions;
-	while (v->algorithm != GNUTLS_PK_UNKNOWN && v->version != *version)
-		v++;
-
-	pkey->params.raw_priv.size = v->secret_key_length;
-	pkey->params.raw_pub.size = v->public_key_length;
-	pkey->params.params_nr = FALCON_PRIVATE_PARAMS;
-	pkey->params.algo = v->algorithm;
-
-	if (v->algorithm == GNUTLS_PK_UNKNOWN)
-		return GNUTLS_E_UNKNOWN_ALGORITHM;
-
-	return 0;
-}
-
-int _gnutls_privkey_decode_falcon_key(asn1_node *pkey_asn,
-				      const gnutls_datum_t *raw_key,
-				      gnutls_x509_privkey_t pkey)
-{
-	int result;
-	uint8_t version;
-
-	gnutls_pk_params_init(&pkey->params);
-
-	if ((result = asn1_create_element(_gnutls_get_gnutls_asn(),
-					  "GNUTLS.FalconPrivateKey",
-					  pkey_asn)) != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	result = _gnutls_decode_pqc_keys(pkey_asn, raw_key, pkey, &version);
-	if (result < 0)
-		goto error;
-
-	result = _gnutls_set_falcon_params(&version, pkey);
-	if (result < 0)
-		goto error;
-
-	return 0;
-
-error:
-	asn1_delete_structure2(pkey_asn, ASN1_DELETE_FLAG_ZEROIZE);
-	gnutls_pk_params_clear(&pkey->params);
-	gnutls_pk_params_release(&pkey->params);
-	return result;
-}
 #endif
 
 static asn1_node decode_dsa_key(const gnutls_datum_t *raw_key,
@@ -582,7 +521,6 @@ error:
 #define PEM_KEY_ECC "EC PRIVATE KEY"
 #ifdef HAVE_LIBOQS
 #define PEM_KEY_ML_DSA "ML-DSA PRIVATE KEY"
-#define PEM_KEY_FALCON "FALCON PRIVATE KEY"
 #endif
 #define PEM_KEY_PKCS8 "PRIVATE KEY"
 
@@ -695,17 +633,6 @@ int gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
 						key->params.algo =
 							GNUTLS_PK_ML_DSA_44;
 					}
-				} else if (left > sizeof(PEM_KEY_FALCON) &&
-					   memcmp(ptr, PEM_KEY_FALCON,
-						  sizeof(PEM_KEY_FALCON) - 1) ==
-						   0) {
-					result = _gnutls_fbase64_decode(
-						PEM_KEY_FALCON, begin_ptr, left,
-						&_data);
-					if (result >= 0) {
-						key->params.algo =
-							GNUTLS_PK_EXP_FALCON512;
-					}
 #endif
 				}
 
@@ -769,14 +696,6 @@ int gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
 #ifdef HAVE_LIBOQS
 	} else if (key->params.algo == GNUTLS_PK_ML_DSA_44) {
 		result = _gnutls_privkey_decode_ml_dsa_key(&key->key, &_data,
-							   key);
-
-		if (result < 0) {
-			gnutls_assert();
-			key->key = NULL;
-		}
-	} else if (key->params.algo == GNUTLS_PK_EXP_FALCON512) {
-		result = _gnutls_privkey_decode_falcon_key(&key->key, &_data,
 							   key);
 
 		if (result < 0) {
@@ -963,13 +882,9 @@ int gnutls_x509_privkey_import2(gnutls_x509_privkey_t key,
 				     memcmp(ptr, PEM_KEY_DSA,
 					    sizeof(PEM_KEY_DSA) - 1) == 0)
 #ifdef HAVE_LIBOQS
-				    ||
-				    (left > sizeof(PEM_KEY_ML_DSA) &&
-				     memcmp(ptr, PEM_KEY_ML_DSA,
-					    sizeof(PEM_KEY_ML_DSA) - 1) == 0) ||
-				    (left > sizeof(PEM_KEY_FALCON) &&
-				     memcmp(ptr, PEM_KEY_FALCON,
-					    sizeof(PEM_KEY_FALCON) - 1) == 0)
+				    || (left > sizeof(PEM_KEY_ML_DSA) &&
+					memcmp(ptr, PEM_KEY_ML_DSA,
+					       sizeof(PEM_KEY_ML_DSA) - 1) == 0)
 #endif
 				) {
 					head_enc = 0;
@@ -1728,9 +1643,6 @@ static const char *set_msg(gnutls_x509_privkey_t key)
 	case GNUTLS_PK_ML_DSA_65:
 	case GNUTLS_PK_ML_DSA_87:
 		return PEM_KEY_ML_DSA;
-	case GNUTLS_PK_EXP_FALCON512:
-	case GNUTLS_PK_EXP_FALCON1024:
-		return PEM_KEY_FALCON;
 #endif
 	default:
 		return "UNKNOWN";

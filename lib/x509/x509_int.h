@@ -249,10 +249,6 @@ int _gnutls_privkey_decode_ml_dsa_key(asn1_node *pkey_asn,
 				      const gnutls_datum_t *raw_key,
 				      gnutls_x509_privkey_t pkey);
 
-int _gnutls_privkey_decode_falcon_key(asn1_node *pkey_asn,
-				      const gnutls_datum_t *raw_key,
-				      gnutls_x509_privkey_t pkey);
-
 #endif
 
 int _gnutls_privkey_decode_eddsa_key(asn1_node *pkey_asn,

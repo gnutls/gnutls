@@ -59,9 +59,6 @@
 #define IS_ML_DSA(x)                                                     \
 	(((x) == GNUTLS_PK_ML_DSA_44) || ((x) == GNUTLS_PK_ML_DSA_65) || \
 	 ((x) == GNUTLS_PK_ML_DSA_87))
-
-#define IS_FALCON(x) \
-	(((x) == GNUTLS_PK_EXP_FALCON512) || ((x) == GNUTLS_PK_EXP_FALCON1024))
 #endif
 
 #define SIG_SEM_PRE_TLS12 (1 << 1)

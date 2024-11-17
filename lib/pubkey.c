@@ -63,8 +63,6 @@ static const struct pq_algorithm_pubkey_bits_st pq_pubkey_bits[] = {
 	{ GNUTLS_PK_ML_DSA_44, OQS_SIG_ml_dsa_44_length_public_key },
 	{ GNUTLS_PK_ML_DSA_65, OQS_SIG_ml_dsa_65_length_public_key },
 	{ GNUTLS_PK_ML_DSA_87, OQS_SIG_ml_dsa_87_length_public_key },
-	{ GNUTLS_PK_EXP_FALCON512, OQS_SIG_falcon_512_length_public_key },
-	{ GNUTLS_PK_EXP_FALCON1024, OQS_SIG_falcon_1024_length_public_key },
 
 	{ GNUTLS_PK_UNKNOWN, 0 }
 };
@@ -106,8 +104,6 @@ unsigned pubkey_to_bits(const gnutls_pk_params_st *params)
 	case GNUTLS_PK_ML_DSA_44:
 	case GNUTLS_PK_ML_DSA_65:
 	case GNUTLS_PK_ML_DSA_87:
-	case GNUTLS_PK_EXP_FALCON512:
-	case GNUTLS_PK_EXP_FALCON1024:
 		return pq_pubkey_to_bits(params->algo);
 #endif
 	default:
@@ -398,8 +394,6 @@ int gnutls_pubkey_get_preferred_hash_algorithm(gnutls_pubkey_t key,
 	case GNUTLS_PK_ML_DSA_44:
 	case GNUTLS_PK_ML_DSA_65:
 	case GNUTLS_PK_ML_DSA_87:
-	case GNUTLS_PK_EXP_FALCON512:
-	case GNUTLS_PK_EXP_FALCON1024:
 		if (hash)
 			*hash = GNUTLS_DIG_SHAKE_256;
 		ret = 0;
@@ -2707,8 +2701,6 @@ int pubkey_verify_data(const gnutls_sign_entry_st *se, const mac_entry_st *me,
 	case GNUTLS_PK_ML_DSA_44:
 	case GNUTLS_PK_ML_DSA_65:
 	case GNUTLS_PK_ML_DSA_87:
-	case GNUTLS_PK_EXP_FALCON512:
-	case GNUTLS_PK_EXP_FALCON1024:
 #endif
 		if (_gnutls_pk_verify(se->pk, data, signature, params,
 				      sign_params) != 0) {

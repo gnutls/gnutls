@@ -195,11 +195,4 @@ MLDSAPrivateKey ::= SEQUENCE {
 	privateKey               OCTET STRING,
 	publicKey                [1] OCTET STRING OPTIONAL
 }
-
-FalconPrivateKey ::= SEQUENCE {
-	version                  INTEGER,
-	privateKeyAlgorithm      AlgorithmIdentifier,
-	privateKey               OCTET STRING,
-	publicKey                [1] OCTET STRING OPTIONAL
-}
 END

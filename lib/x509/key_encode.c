@@ -306,8 +306,6 @@ int _gnutls_x509_write_pubkey_params(const gnutls_pk_params_st *params,
 	case GNUTLS_PK_ML_DSA_44:
 	case GNUTLS_PK_ML_DSA_65:
 	case GNUTLS_PK_ML_DSA_87:
-	case GNUTLS_PK_EXP_FALCON512:
-	case GNUTLS_PK_EXP_FALCON1024:
 #endif
 		der->data = NULL;
 		der->size = 0;
@@ -348,8 +346,6 @@ int _gnutls_x509_write_pubkey(const gnutls_pk_params_st *params,
 	case GNUTLS_PK_ML_DSA_44:
 	case GNUTLS_PK_ML_DSA_65:
 	case GNUTLS_PK_ML_DSA_87:
-	case GNUTLS_PK_EXP_FALCON512:
-	case GNUTLS_PK_EXP_FALCON1024:
 		return _gnutls_x509_write_pqc_alg_pubkey(params, der);
 #endif
 	default:
@@ -1236,10 +1232,6 @@ static uint8_t _gnutls_get_pqc_alg_version(gnutls_pk_params_st *params)
 		return '\x06';
 	case GNUTLS_PK_ML_DSA_87:
 		return '\x08';
-	case GNUTLS_PK_EXP_FALCON512:
-		return '\x01';
-	case GNUTLS_PK_EXP_FALCON1024:
-		return '\x02';
 	default:
 		return '\x00';
 	}
@@ -1281,43 +1273,6 @@ cleanup:
 
 	return ret;
 }
-
-static int _gnutls_asn1_encode_falcon(asn1_node *c2,
-				      gnutls_pk_params_st *params)
-{
-	int ret;
-	const char *oid;
-
-	oid = gnutls_pk_get_oid(params->algo);
-	if (oid == NULL)
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-
-	/* first make sure that no previously allocated data are leaked */
-	if (*c2 != NULL) {
-		asn1_delete_structure(c2);
-		*c2 = NULL;
-	}
-
-	if ((ret = asn1_create_element(_gnutls_get_gnutls_asn(),
-				       "GNUTLS.FalconPrivateKey", c2)) !=
-	    ASN1_SUCCESS) {
-		gnutls_assert();
-		ret = _gnutls_asn2err(ret);
-		goto cleanup;
-
-		ret = _gnutls_asn1_encode_pqc_alg(
-			c2, params, oid, _gnutls_get_pqc_alg_version(params));
-		if (ret < 0)
-			goto cleanup;
-
-		return GNUTLS_E_SUCCESS;
-	}
-
-cleanup:
-	asn1_delete_structure2(c2, ASN1_DELETE_FLAG_ZEROIZE);
-
-	return ret;
-}
 #endif
 
 int _gnutls_asn1_encode_privkey(asn1_node *c2, gnutls_pk_params_st *params)
@@ -1347,9 +1302,6 @@ int _gnutls_asn1_encode_privkey(asn1_node *c2, gnutls_pk_params_st *params)
 	case GNUTLS_PK_ML_DSA_65:
 	case GNUTLS_PK_ML_DSA_87:
 		return _gnutls_asn1_encode_ml_dsa(c2, params);
-	case GNUTLS_PK_EXP_FALCON512:
-	case GNUTLS_PK_EXP_FALCON1024:
-		return _gnutls_asn1_encode_falcon(c2, params);
 #endif
 	default:
 		return GNUTLS_E_UNIMPLEMENTED_FEATURE;

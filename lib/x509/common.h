@@ -118,12 +118,9 @@
 #define GOST28147_89_CPD_OID "1.2.643.2.2.31.4"
 
 #ifdef HAVE_LIBOQS
-#define ML_DSA_44_OID "1.3.6.1.4.1.2.267.12.4.4"
-#define ML_DSA_65_OID "1.3.6.1.4.1.2.267.12.6.5"
-#define ML_DSA_87_OID "1.3.6.1.4.1.2.267.12.8.7"
-
-#define FALCON512_OID "1.3.9999.3.1"
-#define FALCON1024_OID "1.3.9999.3.4"
+#define ML_DSA_44_OID "2.16.840.1.101.3.4.3.17"
+#define ML_DSA_65_OID "2.16.840.1.101.3.4.3.18"
+#define ML_DSA_87_OID "2.16.840.1.101.3.4.3.19"
 #endif
 
 #define ASN1_NULL "\x05\x00"

@@ -40,88 +40,93 @@ typedef struct {
 	unsigned int ecc_bits; /* bits for ECC keys */
 #ifdef HAVE_LIBOQS
 	unsigned int ml_dsa_bits;
-	unsigned int falcon_bits;
 #endif
 } gnutls_sec_params_entry;
 
 static const gnutls_sec_params_entry sec_params[] = {
 	{ "Insecure", GNUTLS_SEC_PARAM_INSECURE, 0, 0, 0, 0, 0,
 #ifdef HAVE_LIBOQS
-	  0, 0
+	  0
 #endif
 	},
 	{ "Export", GNUTLS_SEC_PARAM_EXPORT, 42, 512, 0, 84, 0,
 #ifdef HAVE_LIBOQS
-	  0, 0
+	  0
 #endif
 	},
 	{ "Very weak", GNUTLS_SEC_PARAM_VERY_WEAK, 64, 767, 0, 128, 0,
 #ifdef HAVE_LIBOQS
-	  0, 0
+	  0
 #endif
 	},
 	{ "Weak", GNUTLS_SEC_PARAM_WEAK, 72, 1008, 1008, 160, 160,
 #ifdef HAVE_LIBOQS
-	  0, 0
+	  0
 #endif
 	},
 #ifdef ENABLE_FIPS140
 	{ "Low", GNUTLS_SEC_PARAM_LOW, 80, 1024, 1024, 160, 160,
 #ifdef HAVE_LIBOQS
-	  0, 0
+	  0
 #endif
 	},
-	{ "Legacy", GNUTLS_SEC_PARAM_LEGACY, 96, 1024, 1024, 192, 192,
+	{
+		"Legacy",
+		GNUTLS_SEC_PARAM_LEGACY,
+		96,
+		1024,
+		1024,
+		192,
+		192,
 #ifdef HAVE_LIBOQS
-	  0, OQS_SIG_falcon_512_length_public_key
+		0,
 #endif
 	},
 	{ "Medium", GNUTLS_SEC_PARAM_MEDIUM, 112, 2048, 2048, 224, 224,
 #ifdef HAVE_LIBOQS
-	  OQS_SIG_ml_dsa_44_length_public_key, 0
+	  OQS_SIG_ml_dsa_44_length_public_key
 #endif
 	},
 	{ "High", GNUTLS_SEC_PARAM_HIGH, 128, 3072, 3072, 256, 256,
 #ifdef HAVE_LIBOQS
-	  0, 0
+	  0
 #endif
 	},
 #else
 	{ "Low", GNUTLS_SEC_PARAM_LOW, 80, 1024, 1024, 160, 160,
 #ifdef HAVE_LIBOQS
-		 0, 0
+		 0
 #endif
 	}, /* ENISA-LEGACY */
 	{ "Legacy", GNUTLS_SEC_PARAM_LEGACY, 96, 1776, 2048, 192, 192,
 #ifdef HAVE_LIBOQS
-		 0, OQS_SIG_falcon_512_length_public_key
+		 0
 #endif
 	 },
 	{ "Medium", GNUTLS_SEC_PARAM_MEDIUM, 112, 2048, 2048, 256, 224,
 #ifdef HAVE_LIBOQS
-		 OQS_SIG_ml_dsa_44_length_public_key, 0
+		 OQS_SIG_ml_dsa_44_length_public_key
 #endif
 		 },
 	{ "High", GNUTLS_SEC_PARAM_HIGH, 128, 3072, 3072, 256, 256,
 #ifdef HAVE_LIBOQS
-		 0, 0
+		 0
 #endif
 	},
 #endif
 	{ "Ultra", GNUTLS_SEC_PARAM_ULTRA, 192, 8192, 8192, 384, 384,
 #ifdef HAVE_LIBOQS
-	  OQS_SIG_ml_dsa_65_length_public_key, 0
+	  OQS_SIG_ml_dsa_65_length_public_key
 #endif
 	},
 	{ "Future", GNUTLS_SEC_PARAM_FUTURE, 256, 15360, 15360, 512, 512,
 #ifdef HAVE_LIBOQS
-	  OQS_SIG_ml_dsa_87_length_public_key,
-	  OQS_SIG_falcon_1024_length_public_key
+	  OQS_SIG_ml_dsa_87_length_public_key
 #endif
 	},
 	{ NULL, 0, 0, 0, 0, 0, 0,
 #ifdef HAVE_LIBOQS
-	  0, 0
+	  0
 #endif
 	}
 };
@@ -157,8 +162,6 @@ unsigned int gnutls_sec_param_to_pk_bits(gnutls_pk_algorithm_t algo,
 #ifdef HAVE_LIBOQS
 			else if (IS_ML_DSA(algo))
 				ret = p->ml_dsa_bits;
-			else if (IS_FALCON(algo))
-				ret = p->falcon_bits;
 #endif
 			else
 				ret = p->pk_bits;
@@ -293,12 +296,6 @@ gnutls_sec_param_t gnutls_pk_bits_to_sec_param(gnutls_pk_algorithm_t algo,
 	} else if (IS_ML_DSA(algo)) {
 		for (p = sec_params; p->name; p++) {
 			if (p->ml_dsa_bits > bits)
-				break;
-			ret = p->sec_param;
-		}
-	} else if (IS_FALCON(algo)) {
-		for (p = sec_params; p->name; p++) {
-			if (p->falcon_bits > bits)
 				break;
 			ret = p->sec_param;
 		}

@@ -137,9 +137,7 @@ int _gnutls_get_asn_mpis(asn1_node asn, const char *root,
 #ifdef HAVE_LIBOQS
 	    && pk_algorithm != GNUTLS_PK_ML_DSA_44 &&
 	    pk_algorithm != GNUTLS_PK_ML_DSA_65 &&
-	    pk_algorithm != GNUTLS_PK_ML_DSA_87 &&
-	    pk_algorithm != GNUTLS_PK_EXP_FALCON512 &&
-	    pk_algorithm != GNUTLS_PK_EXP_FALCON1024
+	    pk_algorithm != GNUTLS_PK_ML_DSA_87
 #endif
 	) {
 		/* RSA, EdDSA and PQ algorithms do not use parameters */
