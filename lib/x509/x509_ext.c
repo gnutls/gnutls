@@ -34,10 +34,6 @@
 #include "intprops.h"
 
 #define MAX_ENTRIES 64
-struct gnutls_subject_alt_names_st {
-	struct name_st *names;
-	unsigned int size;
-};
 
 /**
  * gnutls_subject_alt_names_init:
@@ -389,22 +385,15 @@ int gnutls_x509_ext_import_name_constraints(const gnutls_datum_t *ext,
 	}
 
 	if (flags & GNUTLS_NAME_CONSTRAINTS_FLAG_APPEND &&
-	    (nc->permitted != NULL || nc->excluded != NULL)) {
+	    !_gnutls_x509_name_constraints_is_empty(nc, 0)) {
 		ret = gnutls_x509_name_constraints_init(&nc2);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
 		}
 
-		ret = _gnutls_extract_name_constraints(c2, "permittedSubtrees",
-						       &nc2->permitted);
-		if (ret < 0) {
-			gnutls_assert();
-			goto cleanup;
-		}
-
-		ret = _gnutls_extract_name_constraints(c2, "excludedSubtrees",
-						       &nc2->excluded);
+		ret = _gnutls_x509_name_constraints_extract(
+			c2, "permittedSubtrees", "excludedSubtrees", nc2);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -416,18 +405,10 @@ int gnutls_x509_ext_import_name_constraints(const gnutls_datum_t *ext,
 			goto cleanup;
 		}
 	} else {
-		_gnutls_name_constraints_node_free(nc->permitted);
-		_gnutls_name_constraints_node_free(nc->excluded);
+		_gnutls_x509_name_constraints_clear(nc);
 
-		ret = _gnutls_extract_name_constraints(c2, "permittedSubtrees",
-						       &nc->permitted);
-		if (ret < 0) {
-			gnutls_assert();
-			goto cleanup;
-		}
-
-		ret = _gnutls_extract_name_constraints(c2, "excludedSubtrees",
-						       &nc->excluded);
+		ret = _gnutls_x509_name_constraints_extract(
+			c2, "permittedSubtrees", "excludedSubtrees", nc);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -463,9 +444,10 @@ int gnutls_x509_ext_export_name_constraints(gnutls_x509_name_constraints_t nc,
 	int ret, result;
 	uint8_t null = 0;
 	asn1_node c2 = NULL;
-	struct name_constraints_node_st *tmp;
+	unsigned rtype;
+	gnutls_datum_t rname;
 
-	if (nc->permitted == NULL && nc->excluded == NULL)
+	if (_gnutls_x509_name_constraints_is_empty(nc, 0))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	result = asn1_create_element(_gnutls_get_pkix(),
@@ -475,11 +457,20 @@ int gnutls_x509_ext_export_name_constraints(gnutls_x509_name_constraints_t nc,
 		return _gnutls_asn2err(result);
 	}
 
-	if (nc->permitted == NULL) {
+	ret = gnutls_x509_name_constraints_get_permitted(nc, 0, &rtype, &rname);
+	if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
 		(void)asn1_write_value(c2, "permittedSubtrees", NULL, 0);
 	} else {
-		tmp = nc->permitted;
-		do {
+		for (unsigned i = 0;; i++) {
+			ret = gnutls_x509_name_constraints_get_permitted(
+				nc, i, &rtype, &rname);
+			if (ret < 0) {
+				if (ret ==
+				    GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+					break;
+				gnutls_assert();
+				goto cleanup;
+			}
 			result = asn1_write_value(c2, "permittedSubtrees",
 						  "NEW", 1);
 			if (result != ASN1_SUCCESS) {
@@ -506,21 +497,29 @@ int gnutls_x509_ext_export_name_constraints(gnutls_x509_name_constraints_t nc,
 			}
 
 			ret = _gnutls_write_general_name(
-				c2, "permittedSubtrees.?LAST.base", tmp->type,
-				tmp->name.data, tmp->name.size);
+				c2, "permittedSubtrees.?LAST.base", rtype,
+				rname.data, rname.size);
 			if (ret < 0) {
 				gnutls_assert();
 				goto cleanup;
 			}
-			tmp = tmp->next;
-		} while (tmp != NULL);
+		}
 	}
 
-	if (nc->excluded == NULL) {
+	ret = gnutls_x509_name_constraints_get_excluded(nc, 0, &rtype, &rname);
+	if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
 		(void)asn1_write_value(c2, "excludedSubtrees", NULL, 0);
 	} else {
-		tmp = nc->excluded;
-		do {
+		for (unsigned i = 0;; i++) {
+			ret = gnutls_x509_name_constraints_get_excluded(
+				nc, i, &rtype, &rname);
+			if (ret < 0) {
+				if (ret ==
+				    GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+					break;
+				gnutls_assert();
+				goto cleanup;
+			}
 			result = asn1_write_value(c2, "excludedSubtrees", "NEW",
 						  1);
 			if (result != ASN1_SUCCESS) {
@@ -546,14 +545,13 @@ int gnutls_x509_ext_export_name_constraints(gnutls_x509_name_constraints_t nc,
 			}
 
 			ret = _gnutls_write_general_name(
-				c2, "excludedSubtrees.?LAST.base", tmp->type,
-				tmp->name.data, tmp->name.size);
+				c2, "excludedSubtrees.?LAST.base", rtype,
+				rname.data, rname.size);
 			if (ret < 0) {
 				gnutls_assert();
 				goto cleanup;
 			}
-			tmp = tmp->next;
-		} while (tmp != NULL);
+		}
 	}
 
 	ret = _gnutls_x509_der_encode(c2, "", ext, 0);
