@@ -224,6 +224,35 @@ static const char gost12_512_privkey[] =
 	"hsQ3JCCy4xnd5jWT\n"
 	"-----END PRIVATE KEY-----\n";
 
+/* ed25519 private key and signature */
+static const char eddsa_ed25519_privkey[] =
+	"-----BEGIN PRIVATE KEY-----\n"
+	"MC4CAQAwBQYDK2VwBCIEIH4WeqmZGZQlSY/8H85ZZimVd26h6I68gFNyBvyh3Vcy\n"
+	"-----END PRIVATE KEY-----\n";
+
+static const char eddsa_ed25519_sig[] =
+	"\xd1\xcb\x06\x1e\x22\xf2\xec\x56\xa6\xe6\xb3\x89\xb6\x1c\xcf\x13"
+	"\x95\x53\x3d\x12\x27\xea\x32\xfd\x5b\xe6\x5f\x24\xc9\xd0\xa9\x21"
+	"\x36\x63\x06\x20\xe4\xaf\xb1\x36\xc5\x21\x5c\xaa\xdc\x89\x62\xfa"
+	"\xc6\x4c\xea\x42\xd7\xd8\x39\x81\x46\x9f\x41\x09\x10\x94\x9f\x07";
+
+/* ed448 private key and signature */
+static const char eddsa_ed448_privkey[] =
+	"-----BEGIN PRIVATE KEY-----\n"
+	"MEcCAQAwBQYDK2VxBDsEOcUwM3PlIVddDpjHbTANVDGN82jtXJNMbq1oy5u5iJTe\n"
+	"dXGSbQ0e1N/7o1wIO+fKUR1G/CbcXu+XFQ==\n"
+	"-----END PRIVATE KEY-----\n";
+
+static const char eddsa_ed448_sig[] =
+	"\xe3\x13\x89\xef\x7d\x63\x93\xcf\x15\xfb\xe4\x98\x9d\x24\xec\x56"
+	"\xbe\xfc\xcd\xfd\xad\x54\xb3\x8b\xfb\x96\x1b\x08\xbe\xbe\xf0\xc4"
+	"\xff\x67\xf9\x3d\x57\x4a\x2e\x8c\x9c\x39\x83\x5b\x22\xab\x91\x1e"
+	"\x71\x23\x79\xba\x30\xaa\x6d\xbe\x80\xf7\xef\x59\xa5\x3b\xe3\xdf"
+	"\xba\x59\x29\xfe\xe2\xc5\xd2\xb4\xe4\xb5\x94\x2f\x2b\xad\xd9\x20"
+	"\xdc\x25\x75\xbb\xed\xc4\xdb\x72\x22\x6d\x79\x42\x27\xb3\xd9\x8c"
+	"\x80\x68\xd8\x75\x0c\x1c\x6a\xd7\x28\x01\x03\x29\xd0\x7e\x04\x65"
+	"\x2a\x00";
+
 static int test_rsa_enc(gnutls_pk_algorithm_t pk, unsigned bits,
 			gnutls_digest_algorithm_t dig)
 {
@@ -505,7 +534,8 @@ static int test_known_sig(gnutls_pk_algorithm_t pk, unsigned bits,
 	unsigned vflags = 0;
 
 	if (pk == GNUTLS_PK_EC || pk == GNUTLS_PK_GOST_01 ||
-	    pk == GNUTLS_PK_GOST_12_256 || pk == GNUTLS_PK_GOST_12_512) {
+	    pk == GNUTLS_PK_GOST_12_256 || pk == GNUTLS_PK_GOST_12_512 ||
+	    pk == GNUTLS_PK_EDDSA_ED25519 || pk == GNUTLS_PK_EDDSA_ED448) {
 		snprintf(param_name, sizeof(param_name), "%s",
 			 gnutls_ecc_curve_get_name(GNUTLS_BITS_TO_CURVE(bits)));
 		if (dig == GNUTLS_DIG_GOSTR_94)
@@ -1144,6 +1174,26 @@ int gnutls_pk_self_test(unsigned flags, gnutls_pk_algorithm_t pk)
 		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
 			return 0;
 #endif
+		FALLTHROUGH;
+	case GNUTLS_PK_EDDSA_ED25519:
+		PK_KNOWN_TEST(GNUTLS_PK_EDDSA_ED25519,
+			      GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_ED25519),
+			      GNUTLS_DIG_SHA512, eddsa_ed25519_privkey,
+			      eddsa_ed25519_sig, 0);
+
+		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
+			return 0;
+
+		FALLTHROUGH;
+	case GNUTLS_PK_EDDSA_ED448:
+		PK_KNOWN_TEST(GNUTLS_PK_EDDSA_ED448,
+			      GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_ED448),
+			      GNUTLS_DIG_SHAKE_256, eddsa_ed448_privkey,
+			      eddsa_ed448_sig, 0);
+
+		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
+			return 0;
+
 		break;
 	default:
 		return gnutls_assert_val(GNUTLS_E_NO_SELF_TEST);

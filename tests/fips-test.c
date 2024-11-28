@@ -761,6 +761,33 @@ void doit(void)
 	gnutls_pubkey_deinit(pubkey);
 	gnutls_privkey_deinit(privkey);
 
+	/* Import ED25519 key; not a security function */
+	FIPS_PUSH_CONTEXT();
+	import_keypair(&privkey, &pubkey, "ed25519.pem");
+	FIPS_POP_CONTEXT(INITIAL);
+
+	/* Create a signature with ED25519; approved */
+	FIPS_PUSH_CONTEXT();
+	ret = gnutls_privkey_sign_data2(privkey, GNUTLS_SIGN_EDDSA_ED25519, 0,
+					&data, &signature);
+	if (ret < 0) {
+		fail("gnutls_privkey_sign_data2 failed\n");
+	}
+	FIPS_POP_CONTEXT(APPROVED);
+
+	/* Verify a signature with ED25519; approved */
+	FIPS_PUSH_CONTEXT();
+	ret = gnutls_pubkey_verify_data2(pubkey, GNUTLS_SIGN_EDDSA_ED25519, 0,
+					 &data, &signature);
+	if (ret < 0) {
+		fail("gnutls_pubkey_verify_data2 failed\n");
+	}
+	FIPS_POP_CONTEXT(APPROVED);
+	gnutls_free(signature.data);
+
+	gnutls_pubkey_deinit(pubkey);
+	gnutls_privkey_deinit(privkey);
+
 	/* Test RND functions */
 	FIPS_PUSH_CONTEXT();
 	ret = gnutls_rnd(GNUTLS_RND_RANDOM, key16, sizeof(key16));
