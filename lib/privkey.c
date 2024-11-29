@@ -243,6 +243,11 @@ static int privkey_to_pubkey(gnutls_pk_algorithm_t pk,
 	case GNUTLS_PK_EDDSA_ED448:
 	case GNUTLS_PK_ECDH_X25519:
 	case GNUTLS_PK_ECDH_X448:
+#ifdef HAVE_LIBOQS
+	case GNUTLS_PK_ML_DSA_44:
+	case GNUTLS_PK_ML_DSA_65:
+	case GNUTLS_PK_ML_DSA_87:
+#endif
 		ret = _gnutls_set_datum(&pub->raw_pub, priv->raw_pub.data,
 					priv->raw_pub.size);
 		if (ret < 0)

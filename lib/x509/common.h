@@ -117,6 +117,12 @@
 #define GOST28147_89_CPC_OID "1.2.643.2.2.31.3"
 #define GOST28147_89_CPD_OID "1.2.643.2.2.31.4"
 
+#ifdef HAVE_LIBOQS
+#define ML_DSA_44_OID "2.16.840.1.101.3.4.3.17"
+#define ML_DSA_65_OID "2.16.840.1.101.3.4.3.18"
+#define ML_DSA_87_OID "2.16.840.1.101.3.4.3.19"
+#endif
+
 #define ASN1_NULL "\x05\x00"
 #define ASN1_NULL_SIZE 2
 

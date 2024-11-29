@@ -189,4 +189,10 @@ TPMKey ::= SEQUENCE {
     privkey         OCTET STRING
 }
 
+MLDSAPrivateKey ::= SEQUENCE {
+	version                  INTEGER,
+	privateKeyAlgorithm      AlgorithmIdentifier,
+	privateKey               OCTET STRING,
+	publicKey                [1] OCTET STRING OPTIONAL
+}
 END

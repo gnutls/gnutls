@@ -133,8 +133,14 @@ int _gnutls_get_asn_mpis(asn1_node asn, const char *root,
 	    pk_algorithm != GNUTLS_PK_EDDSA_ED25519 &&
 	    pk_algorithm != GNUTLS_PK_ECDH_X25519 &&
 	    pk_algorithm != GNUTLS_PK_EDDSA_ED448 &&
-	    pk_algorithm != GNUTLS_PK_ECDH_X448) {
-		/* RSA and EdDSA do not use parameters */
+	    pk_algorithm != GNUTLS_PK_ECDH_X448
+#ifdef HAVE_LIBOQS
+	    && pk_algorithm != GNUTLS_PK_ML_DSA_44 &&
+	    pk_algorithm != GNUTLS_PK_ML_DSA_65 &&
+	    pk_algorithm != GNUTLS_PK_ML_DSA_87
+#endif
+	) {
+		/* RSA, EdDSA and PQ algorithms do not use parameters */
 		result = _gnutls_x509_read_value(asn, name, &tmp);
 		if (pk_algorithm == GNUTLS_PK_RSA_PSS &&
 		    (result == GNUTLS_E_ASN1_VALUE_NOT_FOUND ||

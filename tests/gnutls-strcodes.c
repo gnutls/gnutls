@@ -95,8 +95,14 @@ void doit(void)
 	for (i = 0; i < GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC; i++)
 		check_non_null(gnutls_handshake_description_get_name(i));
 
-	for (i = GNUTLS_PK_UNKNOWN + 1; i <= GNUTLS_PK_MAX; i++)
+	for (i = GNUTLS_PK_UNKNOWN + 1; i <= GNUTLS_PK_MAX; i++) {
+#ifndef HAVE_LIBOQS
+		if (i == GNUTLS_PK_ML_DSA_44 || i == GNUTLS_PK_ML_DSA_65 ||
+		    i == GNUTLS_PK_ML_DSA_87)
+			continue;
+#endif
 		check_unique_non_null(gnutls_pk_algorithm_get_name(i));
+	}
 
 	for (i = GNUTLS_SIGN_UNKNOWN + 1; i <= GNUTLS_SIGN_MAX; i++) {
 		if (i == 19)
@@ -110,6 +116,11 @@ void doit(void)
 		    i == GNUTLS_SIGN_DSA_SHA3_256 ||
 		    i == GNUTLS_SIGN_DSA_SHA3_384 ||
 		    i == GNUTLS_SIGN_DSA_SHA3_512)
+			continue;
+#endif
+#ifndef HAVE_LIBOQS
+		if (i == GNUTLS_SIGN_ML_DSA_44 || i == GNUTLS_SIGN_ML_DSA_65 ||
+		    i == GNUTLS_SIGN_ML_DSA_87)
 			continue;
 #endif
 		check_unique_non_null(gnutls_sign_algorithm_get_name(i));

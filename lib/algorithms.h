@@ -55,6 +55,12 @@
 #define IS_KEM(x) \
 	(((x) == GNUTLS_PK_MLKEM768) || ((x) == GNUTLS_PK_EXP_KYBER768))
 
+#ifdef HAVE_LIBOQS
+#define IS_ML_DSA(x)                                                     \
+	(((x) == GNUTLS_PK_ML_DSA_44) || ((x) == GNUTLS_PK_ML_DSA_65) || \
+	 ((x) == GNUTLS_PK_ML_DSA_87))
+#endif
+
 #define SIG_SEM_PRE_TLS12 (1 << 1)
 #define SIG_SEM_TLS13 (1 << 2)
 #define SIG_SEM_DEFAULT (SIG_SEM_PRE_TLS12 | SIG_SEM_TLS13)

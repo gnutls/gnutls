@@ -278,6 +278,9 @@ void gnutls_pk_params_init(gnutls_pk_params_st *p);
 #define RSA_PRIVATE_PARAMS 8
 #define ECC_PRIVATE_PARAMS 3
 #define GOST_PRIVATE_PARAMS 3
+#ifdef HAVE_LIBOQS
+#define ML_DSA_PRIVATE_PARAMS 4
+#endif
 
 #if MAX_PRIV_PARAMS_SIZE - RSA_PRIVATE_PARAMS < 0
 #error INCREASE MAX_PRIV_PARAMS
