@@ -232,6 +232,9 @@ static int client_gen_key_share(gnutls_session_t session,
 				gnutls_buffer_st *extdata)
 {
 	unsigned int length_pos;
+	const gnutls_group_entry_st *groups[MAX_HYBRID_GROUPS + 1] = {
+		NULL,
+	};
 	int ret;
 
 	_gnutls_handshake_log("EXT[%p]: sending key share for %s\n", session,
@@ -247,8 +250,12 @@ static int client_gen_key_share(gnutls_session_t session,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	for (const gnutls_group_entry_st *p = group; p != NULL; p = p->next) {
-		ret = client_gen_key_share_single(session, p, extdata);
+	ret = _gnutls_group_expand(group, groups);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	for (size_t i = 0; groups[i]; i++) {
+		ret = client_gen_key_share_single(session, groups[i], extdata);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 	}
@@ -345,6 +352,9 @@ static int server_gen_key_share(gnutls_session_t session,
 				gnutls_buffer_st *extdata)
 {
 	unsigned int length_pos;
+	const gnutls_group_entry_st *groups[MAX_HYBRID_GROUPS + 1] = {
+		NULL,
+	};
 	int ret;
 
 	_gnutls_handshake_log("EXT[%p]: sending key share for %s\n", session,
@@ -360,8 +370,12 @@ static int server_gen_key_share(gnutls_session_t session,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	for (const gnutls_group_entry_st *p = group; p != NULL; p = p->next) {
-		ret = server_gen_key_share_single(session, p, extdata);
+	ret = _gnutls_group_expand(group, groups);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	for (size_t i = 0; groups[i]; i++) {
+		ret = server_gen_key_share_single(session, groups[i], extdata);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 	}
@@ -594,13 +608,19 @@ static int server_use_key_share(gnutls_session_t session,
 				const uint8_t *data, size_t data_size)
 {
 	gnutls_buffer_st buffer;
+	const gnutls_group_entry_st *groups[MAX_HYBRID_GROUPS + 1] = {
+		NULL,
+	};
+	int ret;
 
 	_gnutls_ro_buffer_init(&buffer, data, data_size);
 
-	for (const gnutls_group_entry_st *p = group; p != NULL; p = p->next) {
-		int ret;
+	ret = _gnutls_group_expand(group, groups);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
-		ret = server_use_key_share_single(session, p, &buffer);
+	for (size_t i = 0; groups[i]; i++) {
+		ret = server_use_key_share_single(session, groups[i], &buffer);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 	}
@@ -775,13 +795,19 @@ static int client_use_key_share(gnutls_session_t session,
 				const uint8_t *data, size_t data_size)
 {
 	gnutls_buffer_st buffer;
+	const gnutls_group_entry_st *groups[MAX_HYBRID_GROUPS + 1] = {
+		NULL,
+	};
+	int ret;
 
 	_gnutls_ro_buffer_init(&buffer, data, data_size);
 
-	for (const gnutls_group_entry_st *p = group; p != NULL; p = p->next) {
-		int ret;
+	ret = _gnutls_group_expand(group, groups);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
-		ret = client_use_key_share_single(session, p, &buffer);
+	for (size_t i = 0; groups[i]; i++) {
+		ret = client_use_key_share_single(session, groups[i], &buffer);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 	}
@@ -958,18 +984,39 @@ static int key_share_recv_params(gnutls_session_t session, const uint8_t *data,
 	return 0;
 }
 
+static inline bool pk_types_overlap_single(const gnutls_group_entry_st *a,
+					   const gnutls_group_entry_st *b)
+{
+	return a->pk == b->pk || (IS_ECDHX(a->pk) && IS_ECDHX(b->pk)) ||
+	       (IS_KEM(a->pk) && IS_KEM(b->pk));
+}
+
 static inline bool pk_types_overlap(const gnutls_group_entry_st *a,
 				    const gnutls_group_entry_st *b)
 {
-	const gnutls_group_entry_st *pa;
+	const gnutls_group_entry_st *sa[MAX_HYBRID_GROUPS + 1] = {
+		NULL,
+	};
+	const gnutls_group_entry_st *sb[MAX_HYBRID_GROUPS + 1] = {
+		NULL,
+	};
+	int ret;
 
-	for (pa = a; pa != NULL; pa = pa->next) {
-		const gnutls_group_entry_st *pb;
+	ret = _gnutls_group_expand(a, sa);
+	if (ret < 0) {
+		gnutls_assert();
+		return false;
+	}
 
-		for (pb = b; pb != NULL; pb = pb->next) {
-			if (pa->pk == pb->pk ||
-			    (IS_ECDHX(pa->pk) && IS_ECDHX(pb->pk)) ||
-			    (IS_KEM(pa->pk) && IS_KEM(pb->pk)))
+	ret = _gnutls_group_expand(b, sb);
+	if (ret < 0) {
+		gnutls_assert();
+		return false;
+	}
+
+	for (size_t i = 0; sa[i]; i++) {
+		for (size_t j = 0; sb[j]; j++) {
+			if (pk_types_overlap_single(sa[i], sb[j]))
 				return true;
 		}
 	}

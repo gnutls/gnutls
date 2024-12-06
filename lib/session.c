@@ -415,7 +415,11 @@ char *gnutls_session_get_desc(gnutls_session_t session)
 				snprintf(kx_name, sizeof(kx_name), "(PSK)");
 			}
 		} else if (group && sign_str) {
-			if (group->curve)
+			if (IS_GROUP_HYBRID(group))
+				snprintf(kx_name, sizeof(kx_name),
+					 "(HYBRID-%s)-(%s)", group_name,
+					 sign_str);
+			else if (group->curve)
 				snprintf(kx_name, sizeof(kx_name),
 					 "(ECDHE-%s)-(%s)", group_name,
 					 sign_str);

@@ -30,30 +30,6 @@
 /* Supported ECC curves
  */
 
-#ifdef HAVE_LIBOQS
-static const gnutls_group_entry_st group_mlkem768 = {
-	.name = "MLKEM768",
-	.id = GNUTLS_GROUP_INVALID,
-	.curve = GNUTLS_ECC_CURVE_INVALID,
-	.pk = GNUTLS_PK_MLKEM768,
-};
-
-static const gnutls_group_entry_st group_kyber768 = {
-	.name = "KYBER768",
-	.id = GNUTLS_GROUP_INVALID,
-	.curve = GNUTLS_ECC_CURVE_INVALID,
-	.pk = GNUTLS_PK_EXP_KYBER768,
-};
-#endif
-
-static const gnutls_group_entry_st group_x25519 = {
-	.name = "X25519",
-	.id = GNUTLS_GROUP_X25519,
-	.curve = GNUTLS_ECC_CURVE_X25519,
-	.tls_id = 29,
-	.pk = GNUTLS_PK_ECDH_X25519,
-};
-
 static const gnutls_group_entry_st supported_groups[] = {
 	{
 		.name = "SECP192R1",
@@ -90,7 +66,13 @@ static const gnutls_group_entry_st supported_groups[] = {
 		.tls_id = 25,
 		.pk = GNUTLS_PK_ECDSA,
 	},
-	group_x25519,
+	{
+		.name = "X25519",
+		.id = GNUTLS_GROUP_X25519,
+		.curve = GNUTLS_ECC_CURVE_X25519,
+		.tls_id = 29,
+		.pk = GNUTLS_PK_ECDH_X25519,
+	},
 #ifdef ENABLE_GOST
 	/* draft-smyshlyaev-tls12-gost-suites-06, Section 6 */
 	{
@@ -191,24 +173,33 @@ static const gnutls_group_entry_st supported_groups[] = {
 	  .tls_id = 0x104 },
 #endif
 #ifdef HAVE_LIBOQS
+	{
+		.name = "MLKEM768",
+		.id = GNUTLS_GROUP_EXP_MLKEM768,
+		.pk = GNUTLS_PK_MLKEM768,
+		/* absense of .tls_id means that this group alone cannot be used in TLS */
+	},
+	{
+		.name = "KYBER768",
+		.id = GNUTLS_GROUP_EXP_KYBER768,
+		.pk = GNUTLS_PK_EXP_KYBER768,
+		/* absense of .tls_id means that this group alone cannot be used in TLS */
+	},
 	{ .name = "SECP256R1-MLKEM768",
 	  .id = GNUTLS_GROUP_EXP_SECP256R1_MLKEM768,
-	  .curve = GNUTLS_ECC_CURVE_SECP256R1,
-	  .pk = GNUTLS_PK_ECDSA,
-	  .tls_id = 0x11EB,
-	  .next = &group_mlkem768 },
+	  .ids = { GNUTLS_GROUP_SECP256R1, GNUTLS_GROUP_EXP_MLKEM768,
+		   GNUTLS_GROUP_INVALID },
+	  .tls_id = 0x11EB },
 	{ .name = "X25519-MLKEM768",
 	  .id = GNUTLS_GROUP_EXP_X25519_MLKEM768,
-	  .curve = GNUTLS_ECC_CURVE_INVALID,
-	  .pk = GNUTLS_PK_MLKEM768,
-	  .tls_id = 0x11EC,
-	  .next = &group_x25519 },
+	  .ids = { GNUTLS_GROUP_EXP_MLKEM768, GNUTLS_GROUP_X25519,
+		   GNUTLS_GROUP_INVALID },
+	  .tls_id = 0x11EC },
 	{ .name = "X25519-KYBER768",
 	  .id = GNUTLS_GROUP_EXP_X25519_KYBER768,
-	  .curve = GNUTLS_ECC_CURVE_X25519,
-	  .pk = GNUTLS_PK_ECDH_X25519,
-	  .tls_id = 0x6399,
-	  .next = &group_kyber768 },
+	  .ids = { GNUTLS_GROUP_X25519, GNUTLS_GROUP_EXP_KYBER768,
+		   GNUTLS_GROUP_INVALID },
+	  .tls_id = 0x6399 },
 #endif
 	{ 0, 0, 0 }
 };
@@ -221,14 +212,46 @@ static const gnutls_group_entry_st supported_groups[] = {
 		}                                                  \
 	}
 
+static inline const gnutls_group_entry_st *group_to_entry(gnutls_group_t group)
+{
+	if (group == 0)
+		return NULL;
+
+	GNUTLS_GROUP_LOOP(if (p->id == group) { return p; });
+
+	return NULL;
+}
+
+static inline bool
+group_is_supported_standalone(const gnutls_group_entry_st *group)
+{
+	return group->pk != 0 && _gnutls_pk_exists(group->pk) &&
+	       (group->curve == 0 ||
+		_gnutls_ecc_curve_is_supported(group->curve));
+}
+
+static inline bool group_is_supported(const gnutls_group_entry_st *group)
+{
+	if (!IS_GROUP_HYBRID(group))
+		return group_is_supported_standalone(group);
+
+	for (size_t i = 0;
+	     i < MAX_HYBRID_GROUPS && group->ids[i] != GNUTLS_GROUP_INVALID;
+	     i++) {
+		const gnutls_group_entry_st *p = group_to_entry(group->ids[i]);
+		if (!p || !group_is_supported_standalone(p))
+			return false;
+	}
+
+	return true;
+}
+
 /* Returns the TLS id of the given curve
  */
 const gnutls_group_entry_st *_gnutls_tls_id_to_group(unsigned num)
 {
 	GNUTLS_GROUP_LOOP(
-		if (p->tls_id == num &&
-		    (p->curve == 0 ||
-		     _gnutls_ecc_curve_is_supported(p->curve))) { return p; });
+		if (p->tls_id == num && group_is_supported(p)) { return p; });
 
 	return NULL;
 }
@@ -239,10 +262,7 @@ const gnutls_group_entry_st *_gnutls_id_to_group(unsigned id)
 		return NULL;
 
 	GNUTLS_GROUP_LOOP(
-		if (p->id == id && (p->curve == 0 ||
-				    _gnutls_ecc_curve_is_supported(p->curve))) {
-			return p;
-		});
+		if (p->id == id && group_is_supported(p)) { return p; });
 
 	return NULL;
 }
@@ -261,27 +281,17 @@ const gnutls_group_entry_st *_gnutls_id_to_group(unsigned id)
  **/
 const gnutls_group_t *gnutls_group_list(void)
 {
-	static gnutls_group_t groups[MAX_ALGOS] = { 0 };
+	static gnutls_group_t groups[MAX_ALGOS + 1] = { 0 };
 
 	if (groups[0] == 0) {
-		int i = 0;
+		size_t i = 0;
 
-		const gnutls_group_entry_st *p;
-
-		for (p = supported_groups; p->name != NULL; p++) {
-			const gnutls_group_entry_st *pp;
-
-			for (pp = p; pp != NULL; pp = pp->next) {
-				if ((pp->curve != 0 &&
-				     !_gnutls_ecc_curve_is_supported(
-					     pp->curve)) ||
-				    (pp->pk != 0 && !_gnutls_pk_exists(pp->pk)))
-					break;
-			}
-			if (pp == NULL)
+		for (const gnutls_group_entry_st *p = supported_groups;
+		     p->name != NULL; p++) {
+			if (group_is_supported(p))
 				groups[i++] = p->id;
 		}
-		groups[i++] = 0;
+		groups[i++] = GNUTLS_GROUP_INVALID;
 	}
 
 	return groups;
@@ -343,4 +353,35 @@ const char *gnutls_group_get_name(gnutls_group_t group)
 	GNUTLS_GROUP_LOOP(if (p->id == group) { return p->name; });
 
 	return NULL;
+}
+
+/* Expand GROUP into hybrid SUBGROUPS if any, otherwise an array
+ * containing the GROUP itself. The result will be written to
+ * SUBGROUPS, which will be NUL-terminated.
+ */
+int _gnutls_group_expand(
+	const gnutls_group_entry_st *group,
+	const gnutls_group_entry_st *subgroups[MAX_HYBRID_GROUPS + 1])
+{
+	size_t pos = 0;
+
+	if (IS_GROUP_HYBRID(group)) {
+		for (size_t i = 0; i < MAX_HYBRID_GROUPS &&
+				   group->ids[i] != GNUTLS_GROUP_INVALID;
+		     i++) {
+			const gnutls_group_entry_st *p =
+				group_to_entry(group->ids[i]);
+			/* This shouldn't happen, as GROUP is assumed
+			 * to be supported before calling this
+			 * function. */
+			if (unlikely(!p))
+				return gnutls_assert_val(
+					GNUTLS_E_INTERNAL_ERROR);
+			subgroups[pos++] = p;
+		}
+	} else {
+		subgroups[pos++] = group;
+	}
+	subgroups[pos] = NULL;
+	return 0;
 }

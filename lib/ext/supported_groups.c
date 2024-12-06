@@ -106,9 +106,9 @@ static int _gnutls_supported_groups_recv_params(gnutls_session_t session,
 	unsigned min_dh;
 	unsigned j;
 	int serv_ec_idx, serv_dh_idx,
-		serv_kem_idx; /* index in server's priority listing */
+		serv_hybrid_idx; /* index in server's priority listing */
 	int cli_ec_pos, cli_dh_pos,
-		cli_kem_pos; /* position in listing sent by client */
+		cli_hybrid_pos; /* position in listing sent by client */
 
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
 		/* A client shouldn't receive this extension in TLS1.2. It is
@@ -134,8 +134,8 @@ static int _gnutls_supported_groups_recv_params(gnutls_session_t session,
 		/* we figure what is the minimum DH allowed for this session, if any */
 		min_dh = get_min_dh(session);
 
-		serv_ec_idx = serv_dh_idx = serv_kem_idx = -1;
-		cli_ec_pos = cli_dh_pos = cli_kem_pos = -1;
+		serv_ec_idx = serv_dh_idx = serv_hybrid_idx = -1;
+		cli_ec_pos = cli_dh_pos = cli_hybrid_pos = -1;
 
 		/* This extension is being processed prior to a ciphersuite being selected,
 		 * so we cannot rely on ciphersuite information. */
@@ -180,14 +180,15 @@ static int _gnutls_supported_groups_recv_params(gnutls_session_t session,
 								break;
 							serv_ec_idx = j;
 							cli_ec_pos = i;
-						} else if (IS_KEM(group->pk)) {
-							if (serv_kem_idx !=
+						} else if (IS_GROUP_HYBRID(
+								   group)) {
+							if (serv_hybrid_idx !=
 								    -1 &&
 							    (int)j >
-								    serv_kem_idx)
+								    serv_hybrid_idx)
 								break;
-							serv_kem_idx = j;
-							cli_kem_pos = i;
+							serv_hybrid_idx = j;
+							cli_hybrid_pos = i;
 						}
 					} else {
 						if (group->pk == GNUTLS_PK_DH) {
@@ -200,11 +201,13 @@ static int _gnutls_supported_groups_recv_params(gnutls_session_t session,
 								break;
 							cli_ec_pos = i;
 							serv_ec_idx = j;
-						} else if (IS_KEM(group->pk)) {
-							if (cli_kem_pos != -1)
+						} else if (IS_GROUP_HYBRID(
+								   group)) {
+							if (cli_hybrid_pos !=
+							    -1)
 								break;
-							cli_kem_pos = i;
-							serv_kem_idx = j;
+							cli_hybrid_pos = i;
+							serv_hybrid_idx = j;
 						}
 					}
 					break;
@@ -212,7 +215,7 @@ static int _gnutls_supported_groups_recv_params(gnutls_session_t session,
 			}
 		}
 
-		/* serv_{dh,ec,kem}_idx contain the index of the groups we want to use.
+		/* serv_{dh,ec,hybrid}_idx contain the index of the groups we want to use.
 		 */
 		if (serv_dh_idx != -1) {
 			session->internals.cand_dh_group =
@@ -236,18 +239,20 @@ static int _gnutls_supported_groups_recv_params(gnutls_session_t session,
 			}
 		}
 
-		/* KEM can only be used in TLS 1.3, where no separation from
-		 * ECDH and DH, and thus only cand_group is set here.
+		/* PQC hybrid key exchange groups can only be used in
+		 * TLS 1.3, where no distinction between ECDH and DH
+		 * in the group definitions, and thus only cand_group
+		 * is set here.
 		 */
-		if (serv_kem_idx != -1) {
+		if (serv_hybrid_idx != -1) {
 			if (session->internals.cand_group == NULL ||
 			    (session->internals.priorities->server_precedence &&
-			     serv_kem_idx < MIN(serv_ec_idx, serv_dh_idx)) ||
+			     serv_hybrid_idx < MIN(serv_ec_idx, serv_dh_idx)) ||
 			    (!session->internals.priorities->server_precedence &&
-			     cli_kem_pos < MIN(cli_ec_pos, cli_dh_pos))) {
+			     cli_hybrid_pos < MIN(cli_ec_pos, cli_dh_pos))) {
 				session->internals.cand_group =
 					session->internals.priorities->groups
-						.entry[serv_kem_idx];
+						.entry[serv_hybrid_idx];
 			}
 		}
 
