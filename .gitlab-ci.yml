@@ -404,7 +404,7 @@ fedora-interop/test:
     - tmt run plans -n interop tests -f "tag:interop-gnutls" -f "tag:interop-$TYPE" -f "tag:interop-$COMPONENT"  discover -v
     - echo "Slicing SLICE_TOTAL=$SLICES SLICE_ID=$SLICEID"
     - echo "Run the tests:"
-    - tmt run -a -e "SLICE_TOTAL=$SLICES" -e "SLICE_ID=$SLICEID" plans -n interop tests -f "tag:interop-gnutls" -f "tag:interop-$TYPE" -f "tag:interop-$COMPONENT" provision -h local execute -h tmt --interactive
+    - tmt run -a -e "SLICE_TOTAL=$SLICES" -e "SLICE_ID=$SLICEID" plans -n interop tests -f "tag:interop-gnutls" -f "tag:interop-$TYPE" -f "tag:interop-$COMPONENT" provision -h local --feeling-safe execute -h tmt --interactive
     - if [[ $PATH != $CI_PROJECT_DIR/src:* ]]; then echo "Wrong PATH=$PATH"; false; fi
 
 fedora-SSL-3.0/build:
