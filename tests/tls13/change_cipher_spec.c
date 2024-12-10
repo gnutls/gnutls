@@ -148,7 +148,7 @@ static void client(int fd, unsigned ccs_check)
 
 	if (ccs_check) {
 		if (client_sent_ccs != 1) {
-			fail("client: did not sent CCS\n");
+			fail("client: did not send CCS\n");
 		}
 	}
 
@@ -305,7 +305,7 @@ static void server(int fd, unsigned ccs_check)
 
 	if (ccs_check) {
 		if (server_sent_ccs != 1) {
-			fail("server: did not sent CCS\n");
+			fail("server: did not send CCS\n");
 		}
 	}
 

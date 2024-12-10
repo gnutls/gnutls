@@ -95,7 +95,7 @@ done
 
 for curve in ${INITIALLY_ENABLED_CURVES}; do
 	if ! grep -i "$curve" ${TMPFILE_OBSERVED_LOG};then
-		echo "Could not found $curve within --list output"
+		echo "Could not find $curve within --list output"
 		exit 1
 	fi
 done

@@ -64,7 +64,7 @@ if grep -i "SECP256R1" ${TMPFILE2} || grep -i "SECP521R1" ${TMPFILE2};then
 fi
 
 if ! grep -i "SECP384R1" ${TMPFILE2};then
-	echo "Could not found secp384r1"
+	echo "Could not find secp384r1"
 	exit 1
 fi
 
