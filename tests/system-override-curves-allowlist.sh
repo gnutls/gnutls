@@ -114,12 +114,12 @@ PID=$!
 wait_server ${PID}
 
 ${VALGRIND} "${CLI}" -p "${PORT}" 127.0.0.1 --priority ${EXAMPLE_DISABLED_PRIORITY} --insecure --logfile ${TMPFILE_OBSERVED_LOG} </dev/null >/dev/null ||
-	fail "expected connection to succeed (1)"
+	fail "" "expected connection to succeed (1)"
 
 export GNUTLS_SYSTEM_PRIORITY_FILE="${TMPFILE_CONFIG}"
 
 "${CLI}" -p "${PORT}" 127.0.0.1 --priority ${EXAMPLE_DISABLED_PRIORITY} --insecure --logfile ${TMPFILE_OBSERVED_LOG} </dev/null >/dev/null &&
-	fail "expected connection to fail (2)"
+	fail "" "expected connection to fail (2)"
 
 kill ${PID}
 wait
@@ -137,7 +137,7 @@ wait_server ${PID}
 unset GNUTLS_SYSTEM_PRIORITY_FILE
 
 ${VALGRIND} "${CLI}" -p "${PORT}" 127.0.0.1 --priority ${EXAMPLE_DISABLED_PRIORITY} --insecure --logfile ${TMPFILE_OBSERVED_LOG} </dev/null >/dev/null &&
-	fail "expected connection to fail (2)"
+	fail "" "expected connection to fail (2)"
 
 kill ${PID}
 wait

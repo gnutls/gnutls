@@ -70,11 +70,11 @@ export GNUTLS_SYSTEM_PRIORITY_FILE="$testdir/request.cfg"
 export GNUTLS_DEBUG_LEVEL=3
 
 "${CLI}" -p "${PORT}" 127.0.0.1 --priority "NORMAL:-VERS-ALL:+VERS-TLS1.2" --verify-hostname=localhost --x509cafile ${CA} --logfile="$testdir/client.log" </dev/null >/dev/null ||
-	fail "expected connection to succeed (1)"
+	fail "" "expected connection to succeed (1)"
 
 # "tls-session-hash" has precedence over %FORCE_SESSION_HASH
 "${CLI}" -p "${PORT}" 127.0.0.1 --priority "NORMAL:-VERS-ALL:+VERS-TLS1.2:%FORCE_SESSION_HASH" --verify-hostname=localhost --x509cafile ${CA} --logfile="$testdir/client.log" </dev/null >/dev/null ||
-	fail "expected connection to succeed (2)"
+	fail "" "expected connection to succeed (2)"
 
 echo kill ${PID}
 kill ${PID}

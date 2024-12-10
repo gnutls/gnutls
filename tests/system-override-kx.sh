@@ -65,18 +65,18 @@ PID=$!
 wait_server ${PID}
 
 "${CLI}" -p "${PORT}" 127.0.0.1 --priority NORMAL:-KX-ALL:+DHE-RSA --insecure --logfile ${TMPFILE2} </dev/null >/dev/null ||
-	fail "expected connection to succeed (1)"
+	fail "" "expected connection to succeed (1)"
 
 export GNUTLS_SYSTEM_PRIORITY_FILE="${TMPFILE}"
 
 "${CLI}" -p "${PORT}" 127.0.0.1 --priority NORMAL:-KX-ALL:+DHE-RSA --insecure --logfile ${TMPFILE2} </dev/null >/dev/null &&
-	fail "expected connection to fail (2)"
+	fail "" "expected connection to fail (2)"
 
 # test whether the unknown KX will be caught
 GNUTLS_SYSTEM_PRIORITY_FAIL_ON_INVALID=1
 export GNUTLS_SYSTEM_PRIORITY_FAIL_ON_INVALID
 "${CLI}" -p "${PORT}" 127.0.0.1 --priority NORMAL --insecure --logfile ${TMPFILE2} </dev/null >/dev/null &&
-	fail "expected connection to succeed (3)"
+	fail "" "expected connection to succeed (3)"
 
 unset GNUTLS_SYSTEM_PRIORITY_FAIL_ON_INVALID
 
@@ -96,7 +96,7 @@ wait_server ${PID}
 unset GNUTLS_SYSTEM_PRIORITY_FILE
 
 "${CLI}" -p "${PORT}" 127.0.0.1 --priority "NORMAL:-KX-ALL:+DHE-RSA" --insecure --logfile ${TMPFILE2} </dev/null >/dev/null &&
-	fail "expected connection to fail (2)"
+	fail "" "expected connection to fail (2)"
 
 kill ${PID}
 wait
