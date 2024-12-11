@@ -61,6 +61,8 @@
 	 ((x) == GNUTLS_PK_ML_DSA_87))
 #endif
 
+#define IS_GROUP_HYBRID(group) ((group)->ids[0] != GNUTLS_GROUP_INVALID)
+
 #define SIG_SEM_PRE_TLS12 (1 << 1)
 #define SIG_SEM_TLS13 (1 << 2)
 #define SIG_SEM_DEFAULT (SIG_SEM_PRE_TLS12 | SIG_SEM_TLS13)
@@ -498,6 +500,10 @@ gnutls_group_t _gnutls_ecc_curve_get_group(gnutls_ecc_curve_t);
 const gnutls_group_entry_st *_gnutls_tls_id_to_group(unsigned num);
 const gnutls_group_entry_st *_gnutls_id_to_group(unsigned id);
 gnutls_group_t _gnutls_group_get_id(const char *name);
+
+int _gnutls_group_expand(
+	const gnutls_group_entry_st *group,
+	const gnutls_group_entry_st *subgroups[MAX_HYBRID_GROUPS + 1]);
 
 gnutls_ecc_curve_t _gnutls_ecc_bits_to_curve(gnutls_pk_algorithm_t pk,
 					     int bits);

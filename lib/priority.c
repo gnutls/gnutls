@@ -2566,7 +2566,7 @@ static void add_dh(gnutls_priority_t priority_cache)
 	}
 }
 
-static void add_kem(gnutls_priority_t priority_cache)
+static void add_hybrid(gnutls_priority_t priority_cache)
 {
 	const gnutls_group_entry_st *ge;
 	unsigned i;
@@ -2579,7 +2579,7 @@ static void add_kem(gnutls_priority_t priority_cache)
 			    sizeof(priority_cache->groups.entry) /
 				    sizeof(priority_cache->groups.entry[0])) {
 			/* do not add groups which do not correspond to enabled ciphersuites */
-			if (!IS_KEM(ge->pk))
+			if (!IS_GROUP_HYBRID(ge))
 				continue;
 			priority_cache->groups
 				.entry[priority_cache->groups.size++] = ge;
@@ -2598,7 +2598,7 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 	const gnutls_sign_entry_st *se;
 	unsigned have_ec = 0;
 	unsigned have_dh = 0;
-	unsigned have_kem = 0;
+	unsigned have_hybrid = 0;
 	unsigned tls_sig_sem = 0;
 	const version_entry_st *tlsmax = NULL, *vers;
 	const version_entry_st *dtlsmax = NULL;
@@ -2807,9 +2807,9 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 			priority_cache->cs.entry[priority_cache->cs.size++] =
 				ce;
 
-			if (!have_kem) {
-				have_kem = 1;
-				add_kem(priority_cache);
+			if (!have_hybrid) {
+				have_hybrid = 1;
+				add_hybrid(priority_cache);
 			}
 		}
 	}
@@ -2851,8 +2851,8 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 		}
 	}
 
-	if (have_tls13 && (!have_ec || !have_dh || !have_kem)) {
-		/* scan groups to determine have_{ec,dh,kem} */
+	if (have_tls13 && (!have_ec || !have_dh || !have_hybrid)) {
+		/* scan groups to determine have_{ec,dh,hybrid} */
 		for (i = 0; i < priority_cache->_supported_ecc.num_priorities;
 		     i++) {
 			const gnutls_group_entry_st *ge;
@@ -2865,12 +2865,13 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 				} else if (ge->prime && !have_dh) {
 					add_dh(priority_cache);
 					have_dh = 1;
-				} else if (IS_KEM(ge->pk) && !have_kem) {
-					add_kem(priority_cache);
-					have_kem = 1;
+				} else if (IS_GROUP_HYBRID(ge) &&
+					   !have_hybrid) {
+					add_hybrid(priority_cache);
+					have_hybrid = 1;
 				}
 
-				if (have_dh && have_ec && have_kem)
+				if (have_dh && have_ec && have_hybrid)
 					break;
 			}
 		}
