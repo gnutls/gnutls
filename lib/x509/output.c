@@ -352,12 +352,19 @@ static void print_nc(gnutls_buffer_st *str, const char *prefix,
 	char new_prefix[16];
 
 	ret = gnutls_x509_name_constraints_init(&nc);
-	if (ret < 0)
+	if (ret < 0) {
+		addf(str, "error: gnutls_x509_name_constraints_init(): %s\n",
+		     gnutls_strerror(ret));
 		return;
+	}
 
 	ret = gnutls_x509_ext_import_name_constraints(der, nc, 0);
-	if (ret < 0)
+	if (ret < 0) {
+		addf(str,
+		     "error: gnutls_x509_ext_import_name_constraints(): %s\n",
+		     gnutls_strerror(ret));
 		goto cleanup;
+	}
 
 	snprintf(new_prefix, sizeof(new_prefix), "%s\t\t\t\t", prefix);
 
@@ -370,6 +377,10 @@ static void print_nc(gnutls_buffer_st *str, const char *prefix,
 				addf(str, _("%s\t\t\tPermitted:\n"), prefix);
 
 			print_name(str, new_prefix, type, &name, 1);
+		} else if (ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+			addf(str,
+			     "error: gnutls_x509_name_constraints_get_permitted(): %s\n",
+			     gnutls_strerror(ret));
 		}
 	} while (ret == 0);
 
@@ -383,6 +394,10 @@ static void print_nc(gnutls_buffer_st *str, const char *prefix,
 				addf(str, _("%s\t\t\tExcluded:\n"), prefix);
 
 			print_name(str, new_prefix, type, &name, 1);
+		} else if (ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+			addf(str,
+			     "error: gnutls_x509_name_constraints_get_excluded(): %s\n",
+			     gnutls_strerror(ret));
 		}
 	} while (ret == 0);
 
