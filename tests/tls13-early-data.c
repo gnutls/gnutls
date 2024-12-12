@@ -462,6 +462,9 @@ static void client(int sds[], const struct fixture *fixture)
 		gnutls_session_set_ptr(session, &callback_data);
 		gnutls_handshake_set_secret_function(session, secret_callback);
 
+		if (gnutls_record_get_max_early_data_size(session) != 0)
+			fail("client: max_early_data_size not 0 before connection\n");
+
 		if (t > 0) {
 			assert(gnutls_session_set_data(session,
 						       session_data.data,
@@ -485,6 +488,11 @@ static void client(int sds[], const struct fixture *fixture)
 		do {
 			ret = gnutls_handshake(session);
 		} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+
+		if (t == 0) {
+			if (gnutls_record_get_max_early_data_size(session) != 0)
+				fail("client: max_early_data_size not 0 after initial connection\n");
+		}
 
 		if (ret < 0) {
 			fail("client: Handshake failed: %s\n",
