@@ -1494,11 +1494,7 @@ static int _rsa_pss_sign_digest_tr(gnutls_digest_algorithm_t dig,
 		if (salt == NULL)
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-		ret = gnutls_rnd(GNUTLS_RND_NONCE, salt, salt_size);
-		if (ret < 0) {
-			gnutls_assert();
-			goto cleanup;
-		}
+		rnd_func(NULL, salt_size, salt);
 	}
 
 	ret = sign_func(pub, priv, rnd_ctx, rnd_func, salt_size, salt, digest,
@@ -1509,7 +1505,6 @@ static int _rsa_pss_sign_digest_tr(gnutls_digest_algorithm_t dig,
 	} else
 		ret = 0;
 
-cleanup:
 	gnutls_free(salt);
 	return ret;
 }
@@ -2126,6 +2121,7 @@ static int _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 	case GNUTLS_PK_RSA_PSS: {
 		struct rsa_private_key priv;
 		struct rsa_public_key pub;
+		nettle_random_func *random_func;
 		mpz_t s;
 
 		_rsa_params_to_privkey(pk_params, &priv);
@@ -2157,8 +2153,12 @@ static int _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 			not_approved = true;
 		}
 
+		if (_gnutls_get_lib_state() == LIB_STATE_SELFTEST)
+			random_func = rnd_nonce_func_fallback;
+		else
+			random_func = rnd_nonce_func;
 		ret = _rsa_pss_sign_digest_tr(sign_params->rsa_pss_dig, &pub,
-					      &priv, NULL, rnd_nonce_func,
+					      &priv, NULL, random_func,
 					      sign_params->salt_size,
 					      vdata->data, s);
 		if (ret < 0) {
