@@ -650,15 +650,19 @@ static int test_known_sig(gnutls_pk_algorithm_t pk, unsigned bits,
 		goto cleanup;
 	}
 
-	/* Test if a broken signature will cause verification error */
+	/* Test if a broken signature will cause verification
+	 * error. As this is not part of known-answer test, only
+	 * exercised when GNUTLS_SELF_TEST_FLAG_ALL is set. */
+	if (flags & GNUTLS_SELF_TEST_FLAG_ALL) {
+		ret = gnutls_pubkey_verify_data2(pub,
+						 gnutls_pk_to_sign(pk, dig),
+						 vflags, &bad_data, &sig);
 
-	ret = gnutls_pubkey_verify_data2(pub, gnutls_pk_to_sign(pk, dig), 0,
-					 &bad_data, &sig);
-
-	if (ret != GNUTLS_E_PK_SIG_VERIFY_FAILED) {
-		ret = GNUTLS_E_SELF_TEST_ERROR;
-		gnutls_assert();
-		goto cleanup;
+		if (ret != GNUTLS_E_PK_SIG_VERIFY_FAILED) {
+			ret = GNUTLS_E_SELF_TEST_ERROR;
+			gnutls_assert();
+			goto cleanup;
+		}
 	}
 
 	ret = 0;
