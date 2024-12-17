@@ -622,11 +622,9 @@ int _gnutls_fips_perform_self_checks2(void)
 	}
 
 	/* PK */
-	if (_gnutls_config_is_rsa_pkcs1_encrypt_allowed()) {
-		ret = gnutls_pk_self_test(0, GNUTLS_PK_RSA);
-		if (ret < 0) {
-			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
-		}
+	ret = gnutls_pk_self_test(0, GNUTLS_PK_RSA_PSS);
+	if (ret < 0) {
+		return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
 	}
 
 	ret = gnutls_pk_self_test(0, GNUTLS_PK_EC);

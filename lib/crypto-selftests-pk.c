@@ -87,6 +87,24 @@ static const char rsa_2048_sig[] =
 	"\xef\x62\x18\x39\x7a\x50\x01\x46\x1b\xde\x8d\x37\xbc\x90\x6c\x07"
 	"\xc0\x07\xed\x60\xce\x2e\x31\xd6\x8f\xe8\x75\xdb\x45\x21\xc6\xcb";
 
+static const char rsa_pss_2048_sig[] =
+	"\x28\x77\x99\x8b\xc6\xe2\x59\x5c\xa5\x5c\x30\x78\x13\xe2\xca\xe1"
+	"\x13\xf5\x5d\xd5\x9a\xd7\x71\xff\x41\x82\xf4\x61\xda\x3a\xb6\x10"
+	"\x20\x87\x63\x5a\x7e\x4e\xc2\x5e\xb1\x85\x0f\x84\x58\xa3\x27\x2d"
+	"\xe5\x03\xcf\x65\x1a\xb2\xe6\x8b\xcc\x28\xd8\xcc\x1a\x64\x2a\x2d"
+	"\x9a\x0b\xb7\x32\xfe\x03\x57\x8c\xa0\x9b\xf5\xd0\x51\xb5\x6c\x65"
+	"\xfe\xf9\xf3\xa4\xba\x09\x43\x80\x31\xc1\x02\x88\x78\xaa\x65\x87"
+	"\x8d\xb8\x51\xba\x76\x57\xa6\x55\x18\x45\x95\x4e\x22\x82\xb6\xfd"
+	"\xc9\x04\xf9\xb0\x56\x24\x31\x84\x2b\x70\x91\x55\x7d\x05\x1a\xd0"
+	"\x30\xae\x5c\xfd\x11\x0a\x2e\x86\x09\x05\x44\x9a\xb5\xaf\x30\x8a"
+	"\xb6\xa8\x65\x54\xaf\xdf\xf8\x9a\xca\xa0\x96\x26\x45\x09\x41\x33"
+	"\xf3\x44\x71\xe1\x31\x31\x4c\x53\x60\xcb\x7f\x0b\x02\x08\x39\xf9"
+	"\xe4\xb2\x43\xa6\x07\x1b\x7e\x15\x32\x36\x3d\xc6\x78\x0b\xf1\x9a"
+	"\x33\xe3\xee\x8c\x48\xd4\x7e\xcb\xd1\xe6\x93\x29\x13\x04\x40\x8c"
+	"\x72\xc6\x39\xab\xa1\x76\x4e\x87\x3b\x91\x06\xdf\x1d\x1e\x07\x5e"
+	"\xc2\x26\x7c\xd6\x38\x5d\xba\x9b\x50\x38\x44\x63\x91\x2a\x98\xd2"
+	"\x30\x3f\xfb\x79\x15\x5f\x2e\xd2\x3f\xb7\xc4\x69\xc2\x2d\x79\x8d";
+
 #ifdef ENABLE_DSA
 /* DSA 2048 private key and signature */
 static const char dsa_2048_privkey[] =
@@ -532,6 +550,7 @@ static int test_known_sig(gnutls_pk_algorithm_t pk, unsigned bits,
 	gnutls_privkey_t key;
 	char param_name[32];
 	unsigned vflags = 0;
+	gnutls_x509_spki_t spki = NULL;
 
 	if (pk == GNUTLS_PK_EC || pk == GNUTLS_PK_GOST_01 ||
 	    pk == GNUTLS_PK_GOST_12_256 || pk == GNUTLS_PK_GOST_12_512 ||
@@ -562,6 +581,22 @@ static int test_known_sig(gnutls_pk_algorithm_t pk, unsigned bits,
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
+	}
+
+	if (pk == GNUTLS_PK_RSA_PSS) {
+		ret = gnutls_x509_spki_init(&spki);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		gnutls_x509_spki_set_rsa_pss_params(spki, dig, 32);
+
+		ret = gnutls_privkey_set_spki(key, spki, 0);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
 	}
 
 	if (pk != (unsigned)gnutls_privkey_get_pk_algorithm(key, NULL)) {
@@ -629,10 +664,12 @@ static int test_known_sig(gnutls_pk_algorithm_t pk, unsigned bits,
 	ret = 0;
 
 cleanup:
-	gnutls_free(sig.data);
-	if (pub != 0)
+	if (spki != NULL)
+		gnutls_x509_spki_deinit(spki);
+	if (pub != NULL)
 		gnutls_pubkey_deinit(pub);
 	gnutls_privkey_deinit(key);
+	gnutls_free(sig.data);
 
 	if (ret == 0)
 		_gnutls_debug_log("%s-%s-known-sig self test succeeded\n",
@@ -1026,8 +1063,17 @@ int gnutls_pk_self_test(unsigned flags, gnutls_pk_algorithm_t pk)
 
 		FALLTHROUGH;
 	case GNUTLS_PK_RSA_PSS:
-		PK_TEST(GNUTLS_PK_RSA_PSS, test_sig, 2048,
-			GNUTLS_SIGN_RSA_PSS_RSAE_SHA256);
+		/* In POST, we switch the RNG to deterministic one so
+		 * the KAT for RSA-PSS work. */
+		if (is_post) {
+			PK_KNOWN_TEST(GNUTLS_PK_RSA_PSS, 2048,
+				      GNUTLS_DIG_SHA256, rsa_2048_privkey,
+				      rsa_pss_2048_sig,
+				      GNUTLS_PRIVKEY_SIGN_FLAG_RSA_PSS);
+		} else {
+			PK_TEST(GNUTLS_PK_RSA_PSS, test_sig, 2048,
+				GNUTLS_SIGN_RSA_PSS_RSAE_SHA256);
+		}
 
 		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
 			return 0;
