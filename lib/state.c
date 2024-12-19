@@ -660,8 +660,7 @@ int gnutls_init(gnutls_session_t *session, unsigned int flags)
 		(*session)->security_parameters.max_early_data_size =
 			DEFAULT_MAX_EARLY_DATA_SIZE;
 	} else {
-		(*session)->security_parameters.max_early_data_size =
-			UINT32_MAX;
+		(*session)->security_parameters.max_early_data_size = 0;
 	}
 
 	/* Everything else not initialized here is initialized as NULL

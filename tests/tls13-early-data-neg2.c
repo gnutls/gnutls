@@ -54,6 +54,8 @@ int main(void)
 #include "virt-time.h"
 
 /* This program checks that early data is refused upon resumption failure.
+ * It also checks that early data size is zero for the client unless the
+ * server explicitly negotiates the "early_data" extension.
  */
 
 static void server_log_func(int level, const char *str)
@@ -66,11 +68,12 @@ static void client_log_func(int level, const char *str)
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
 
-#define SESSIONS 2
+#define SESSIONS 3
 #define MAX_BUF 1024
 #define MSG "Hello TLS"
 #define EARLY_MSG "Hello TLS, it's early"
 #define PRIORITY "NORMAL:-VERS-ALL:+VERS-TLS1.3"
+#define DEFAULT_MAX_EARLY_DATA_SIZE 16384
 
 static void client(int sds[])
 {
@@ -105,13 +108,35 @@ static void client(int sds[])
 
 		gnutls_transport_set_int(session, sd);
 
+		if (gnutls_record_get_max_early_data_size(session) != 0)
+			fail("client: max_early_data_size not 0 before connection\n");
+
 		if (t > 0) {
 			assert(gnutls_session_set_data(session,
 						       session_data.data,
 						       session_data.size) >= 0);
-			assert(gnutls_record_send_early_data(
-				       session, EARLY_MSG, sizeof(EARLY_MSG)) >=
-			       0);
+			if (t == 1) {
+				if (gnutls_record_get_max_early_data_size(
+					    session) != 0)
+					fail("client: unexpected non-zero value of max_early_data_size = %d\n",
+					     (int)gnutls_record_get_max_early_data_size(
+						     session));
+				if (gnutls_record_send_early_data(
+					    session, EARLY_MSG,
+					    sizeof(EARLY_MSG)) >= 0)
+					fail("client: unexpected early data sent\n");
+			} else {
+				if (gnutls_record_get_max_early_data_size(
+					    session) !=
+				    DEFAULT_MAX_EARLY_DATA_SIZE)
+					fail("client: max_early_data_size mismatch %d != %d\n",
+					     (int)gnutls_record_get_max_early_data_size(
+						     session),
+					     DEFAULT_MAX_EARLY_DATA_SIZE);
+				assert(gnutls_record_send_early_data(
+					       session, EARLY_MSG,
+					       sizeof(EARLY_MSG)) >= 0);
+			}
 		}
 
 		/* Perform the TLS handshake
@@ -129,7 +154,7 @@ static void client(int sds[])
 				success("client: Handshake was completed\n");
 		}
 
-		if (t == 0) {
+		if (t < 2) {
 			/* get the session data size */
 			ret = gnutls_session_get_data2(session, &session_data);
 			if (ret < 0)
@@ -264,12 +289,14 @@ static void server(int sds[])
 		gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
 				       x509_cred);
 
-		/* Intentionally overwrite the previous key to cause resumption
-		 * failure. */
-		gnutls_session_ticket_key_generate(&session_ticket_key);
+		if (t > 0) {
+			/* Intentionally overwrite the previous key to cause resumption
+			 * failure. */
+			gnutls_session_ticket_key_generate(&session_ticket_key);
 
-		gnutls_session_ticket_enable_server(session,
-						    &session_ticket_key);
+			gnutls_session_ticket_enable_server(
+				session, &session_ticket_key);
+		}
 
 		gnutls_anti_replay_enable(session, anti_replay);
 
