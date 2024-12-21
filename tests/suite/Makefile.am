@@ -44,11 +44,14 @@ scripts_to_test = chain.sh \
 	testcompat-polarssl-serv-no-etm.sh \
 	testrandom.sh \
 	test-ciphersuite-names.sh \
-	tls-fuzzer/tls-fuzzer-nocert.sh \
+	multi-ticket-reception.sh
+
+if HAVE_PYTHON_SIX
+scripts_to_test += tls-fuzzer/tls-fuzzer-nocert.sh \
 	tls-fuzzer/tls-fuzzer-cert.sh tls-fuzzer/tls-fuzzer-alpn.sh \
 	tls-fuzzer/tls-fuzzer-nocert-tls13.sh tls-fuzzer/tls-fuzzer-psk.sh \
-	tls-fuzzer/tls-fuzzer-nolimit.sh tls-fuzzer/tls-fuzzer-nolimit-tls13.sh \
-	multi-ticket-reception.sh
+	tls-fuzzer/tls-fuzzer-nolimit.sh tls-fuzzer/tls-fuzzer-nolimit-tls13.sh
+endif
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT)					\
 	LC_ALL="C"							\
@@ -67,7 +70,9 @@ TESTS_ENVIRONMENT += ENABLE_NON_SUITEB_CURVES=1
 endif
 
 if ENABLE_SSL3
+if HAVE_PYTHON_SIX
 scripts_to_test += tls-fuzzer/tls-fuzzer-nocert-ssl3.sh
+endif
 TESTS_ENVIRONMENT += ENABLE_SSL3=1
 endif
 

@@ -536,6 +536,12 @@ if test "$full_test_suite" = yes || test -e "${srcdir}/.git"; then
 	AM_PATH_PYTHON([3.6])
 fi
 
+AM_CONDITIONAL([HAVE_PYTHON_SIX], [$PYTHON -c 'import six' 2>/dev/null])
+if test "$full_test_suite" = yes; then
+   AM_COND_IF([HAVE_PYTHON_SIX],,
+        AC_MSG_WARN(['six' python module not found; skipping tls-fuzzer tests]))
+fi
+
 AC_ARG_ENABLE(oldgnutls-interop,
   AS_HELP_STRING([--enable-oldgnutls-interop], [enable interoperability testing with old gnutls version]),
     enable_oldgnutls_interop=$enableval, enable_oldgnutls_interop=no)
