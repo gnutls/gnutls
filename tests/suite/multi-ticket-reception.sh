@@ -41,8 +41,10 @@ if test "${WINDIR}" != ""; then
 	exit 77
 fi
 
-if ! test -z "${VALGRIND}"; then
+if test -n "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=15"
+else
+	exit 77
 fi
 
 . "${srcdir}/../scripts/common.sh"
