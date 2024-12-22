@@ -419,18 +419,15 @@ printlist_LDADD = ../lib/libgnutls.la ../gl/libgnu.la
 alert_printlist_SOURCES = alert-printlist.c common.c common.h
 alert_printlist_LDADD = ../lib/libgnutls.la ../gl/libgnu.la
 
-error_codes.texi: $(top_srcdir)/lib/errors.c $(srcdir)/errcodes.c
-	$(MAKE) $(builddir)/errcodes
+error_codes.texi: $(top_srcdir)/lib/errors.c errcodes
 	$(builddir)/errcodes > $@-tmp
 	mv -f $@-tmp $@
 
-algorithms.texi: $(top_srcdir)/lib/algorithms/ciphers.c $(srcdir)/printlist.c
-	$(MAKE) $(builddir)/printlist
+algorithms.texi: $(top_srcdir)/lib/algorithms/ciphers.c printlist
 	$(builddir)/printlist > $@-tmp
 	mv -f $@-tmp $@
 
-alerts.texi: $(top_srcdir)/lib/alert.c $(srcdir)/alert-printlist.c
-	$(MAKE) $(builddir)/alert-printlist
+alerts.texi: $(top_srcdir)/lib/alert.c alert-printlist
 	$(builddir)/alert-printlist > $@-tmp
 	mv -f $@-tmp $@
 
@@ -444,11 +441,12 @@ enums.texi: $(HEADER_FILES)
 	mv -f $@-tmp $@
 
 gnutls_TEXINFOS += $(ENUMS) $(FUNCS) $(AUTOGENED_DOC)
-DISTCLEANFILES += $(ENUMS) stamp_enums stamp_functions
+DISTCLEANFILES += $(ENUMS) stamp_enums stamp_functions \
+  errcodes printlist alert-printlist
 
 
 stamp_functions: $(API_FILES)
-	-mkdir functions
+	$(MKDIR_P) functions
 	-rm -f functions/*.short
 	for i in $^; do \
 		$(PERL) $(srcdir)/scripts/split-texi.pl functions < $$i; \
@@ -459,7 +457,7 @@ stamp_functions: $(API_FILES)
 	echo $@ > $@
 
 stamp_enums: enums.texi
-	-mkdir enums
+	$(MKDIR_P) enums
 	$(PERL) $(srcdir)/scripts/split-texi.pl enums enum < $<
 	echo $@ > $@
 
