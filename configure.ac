@@ -964,7 +964,6 @@ AM_CONDITIONAL(P11KIT_0_23_11_API, $PKG_CONFIG --atleast-version=0.23.11 p11-kit
 
 AM_CONDITIONAL(ENABLE_PKCS11, test "$with_p11_kit" != "no")
 
-AC_MSG_CHECKING([whether we can dlopen helper-libraries])
 save_LIBS=$LIBS
 LIBS="$LIBS -lm"
 LIBGNUTLS_CHECK_SONAME([m], [AC_LANG_PROGRAM([
@@ -972,6 +971,8 @@ LIBGNUTLS_CHECK_SONAME([m], [AC_LANG_PROGRAM([
                trunc (0);])])
 LIBS="$save_LIBS"
 CFLAGS="$save_CFLAGS"
+
+AC_MSG_CHECKING([whether we can dlopen helper-libraries])
 
 AC_RUN_IFELSE(
   [AC_LANG_PROGRAM(
