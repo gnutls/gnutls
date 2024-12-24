@@ -30,7 +30,9 @@ P11DIR="p11-kit-conf.$$.tmp"
 PIN=1234
 PUK=1234
 
-for lib in ${libdir} ${libdir}/pkcs11 /usr/lib64/pkcs11/ /usr/lib/pkcs11/ /usr/lib/x86_64-linux-gnu/pkcs11/;do
+P11_MODULE_PATH=$(${PKG_CONFIG} p11-kit-1 --variable=p11_module_path)
+
+for lib in "${P11_MODULE_PATH}" ${libdir} ${libdir}/pkcs11 /usr/lib64/pkcs11/ /usr/lib/pkcs11/ /usr/lib/x86_64-linux-gnu/pkcs11/;do
 	if test -f "${lib}/p11-kit-trust.so"; then
 		TRUST_MODULE="${lib}/p11-kit-trust.so"
 		echo "located ${MODULE}"
