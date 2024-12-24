@@ -77,31 +77,31 @@ AS_IF([test -n "$FAKETIME"], [FAKETIME_F_OPT="-f"; AC_SUBST([FAKETIME_F_OPT])], 
   ])
 ])
 
-AC_MSG_CHECKING([whether faketime program works])
-AC_RUN_IFELSE(
-  [AC_LANG_PROGRAM(
-    [[#include <stdio.h>
-      #include <stdlib.h>
-      #include <time.h>
-    ]],
-    [[time_t t = time(NULL);
-      struct tm *tmp = localtime(&t);
-      char outstr[200];
-      if (!tmp) return 0;
-      if (!strftime(outstr, sizeof(outstr), "%s", tmp)) return 0;
-      puts(outstr);
-      return 0;
-    ]])],
-  [AS_IF([test -n "$FAKETIME" && test "`TZ=UTC $FAKETIME $FAKETIME_F_OPT "2006-09-23 00:00:00" ./conftest$EXEEXT`" = "1158969600"], [
-     ac_cv_faketime_works=yes
-   ], [
-     ac_cv_faketime_works=no
-   ])],
-  [ac_cv_faketime_works=no],
-  [ac_cv_faketime_works=cross-compiling])
+AC_CACHE_CHECK([whether faketime program works], [gnutls_cv_prog_faketime_works],
+  [AC_RUN_IFELSE(
+    [AC_LANG_PROGRAM(
+      [[#include <stdio.h>
+        #include <stdlib.h>
+        #include <time.h>
+      ]],
+      [[time_t t = time(NULL);
+        struct tm *tmp = localtime(&t);
+        char outstr[200];
+        if (!tmp) return 0;
+        if (!strftime(outstr, sizeof(outstr), "%s", tmp)) return 0;
+        puts(outstr);
+        return 0;
+      ]])],
+    [AS_IF([test -n "$FAKETIME" && test "`TZ=UTC $FAKETIME $FAKETIME_F_OPT "2006-09-23 00:00:00" ./conftest$EXEEXT`" = "1158969600"], [
+       gnutls_cv_prog_faketime_works=yes
+     ], [
+       gnutls_cv_prog_faketime_works=no
+     ])],
+    [gnutls_cv_prog_faketime_works=no],
+    [gnutls_cv_prog_faketime_works=cross-compiling])])
 
-AC_MSG_RESULT([$ac_cv_faketime_works])
-AC_SUBST([ac_cv_faketime_works])
+AC_MSG_RESULT([$gnutls_cv_faketime_works])
+AC_SUBST([gnutls_cv_faketime_works])
 
 AC_ARG_ENABLE(bash-tests,
   AS_HELP_STRING([--disable-bash-tests], [skip some tests that badly need bash]),
@@ -255,15 +255,21 @@ if test "$hw_accel" = aarch64; then
 fi
 
 # check for gcc's __get_cpuid_count functionality
-AC_MSG_CHECKING([for __get_cpuid_count])
-AC_LINK_IFELSE(
-   [AC_LANG_SOURCE([
-    #include <cpuid.h>
-    int main(void) { unsigned t1; return __get_cpuid_count(7, 0, &t1, &t1, &t1, &t1); }
-   ])],
-   [AC_DEFINE([HAVE_GET_CPUID_COUNT], [1], [use __get_cpuid_count]) AC_MSG_RESULT([yes])],
-   [AC_MSG_RESULT([no])]
-)
+AC_CACHE_CHECK([for __get_cpuid_count], [gnutls_cv_func___get_cpuid_count],
+  [AC_LINK_IFELSE(
+     [AC_LANG_PROGRAM(
+       [[#include <cpuid.h>
+       ]],
+       [[unsigned t1;
+         return __get_cpuid_count(7, 0, &t1, &t1, &t1, &t1);
+       ]])],
+     [gnutls_cv_func___get_cpuid_count=yes],
+     [gnutls_cv_func___get_cpuid_count=no]
+  )])
+
+AS_IF([test "$ac_cv_have___get_cpuid_count" = yes], [
+  AC_DEFINE([HAVE_GET_CPUID_COUNT], [1], [use __get_cpuid_count])
+])
 
 fi
 
@@ -322,53 +328,60 @@ AM_CONDITIONAL(ASM_X86, test x"$hw_accel" = x"x86" || test x"$hw_accel" = x"x86-
 AM_CONDITIONAL(HAVE_GCC_GNU89_INLINE_OPTION, test "$gnu89_inline" = "yes"])
 AM_CONDITIONAL(HAVE_GCC, test "$GCC" = "yes")
 
-dnl check for getrandom()
+dnl check for getrandom, KERN_ARND, and getentropy, in the order of precedence
 rnd_variant="auto-detect"
-AC_MSG_CHECKING([for getrandom])
-AC_LINK_IFELSE([AC_LANG_PROGRAM([
-	   #include <sys/random.h>],[
-		   getrandom(0, 0, 0);
-		  ])],
-		  [AC_MSG_RESULT(yes)
-		   AC_DEFINE([HAVE_GETRANDOM], 1, [Enable the Linux getrandom function])
-		   rnd_variant=getrandom],
-		  [AC_MSG_RESULT(no)])
 
-AC_MSG_CHECKING([for KERN_ARND])
-AC_LINK_IFELSE([AC_LANG_PROGRAM([
-	   #include <sys/sysctl.h>
-           #ifdef __linux__
-           #error 1
-           #endif
-           static int name[] = {CTL_KERN, KERN_ARND};
-	   ],[
-		   sysctl(0, 0, 0, 0, 0, 0);
-		  ])],
-		  [AC_MSG_RESULT(yes)
-		   AC_DEFINE([HAVE_KERN_ARND], 1, [Enable the BSD sysctl(KERN_ARND) function])
-		   rnd_variant=kern_arnd],
-		  [AC_MSG_RESULT(no)])
+AC_CACHE_CHECK([for getrandom], [gnutls_cv_func_getrandom],
+  [AC_LINK_IFELSE(
+    [AC_LANG_PROGRAM(
+      [[#include <sys/random.h>
+      ]],
+      [[getrandom(0, 0, 0);]])],
+    [gnutls_cv_func_getrandom=yes],
+    [gnutls_cv_func_getrandom=no])])
 
-AM_CONDITIONAL(HAVE_KERN_ARND, test "$rnd_variant" = "kern_arnd")
+AS_IF([test "$gnutls_cv_func_getrandom" = yes], [
+  AC_DEFINE([HAVE_GETRANDOM], 1, [Enable the Linux getrandom function])
+  rnd_variant=getrandom
+])
 
-AC_MSG_CHECKING([for getentropy])
-AC_LINK_IFELSE([AC_LANG_PROGRAM([
-	   #include <unistd.h>
-           #ifdef __APPLE__
-           #include <sys/random.h>
-           #endif
-           #ifdef __linux__
-           #error 1
-           #endif
-	   ],[
-		   getentropy(0, 0);
-		  ])],
-		  [AC_MSG_RESULT(yes)
-		   AC_DEFINE([HAVE_GETENTROPY], 1, [Enable the OpenBSD getentropy function])
-		   rnd_variant=getentropy],
-		  [AC_MSG_RESULT(no)])
+AC_CACHE_CHECK([for KERN_ARND], [gnutls_cv_kern_arnd],
+  [AC_LINK_IFELSE(
+    [AC_LANG_PROGRAM(
+      [[#include <sys/sysctl.h>
+        #ifdef __linux__
+        #error 1
+        #endif
+        static int name[] = {CTL_KERN, KERN_ARND};
+      ]],
+      [[sysctl(0, 0, 0, 0, 0, 0);]])],
+    [gnutls_cv_kern_arnd=yes],
+    [gnutls_cv_kern_arnd=no])])
 
-AM_CONDITIONAL(HAVE_GETENTROPY, test "$rnd_variant" = "getentropy")
+AM_CONDITIONAL(HAVE_KERN_ARND, test "$gnutls_cv_kern_arnd" = yes)
+AM_COND_IF([HAVE_KERN_ARND],
+  [AC_DEFINE([HAVE_KERN_ARND], 1, [Enable the BSD sysctl(KERN_ARND) function])
+   rnd_variant=kern_arnd])
+
+AC_CACHE_CHECK([for getentropy], [gnutls_cv_func_getentropy],
+  [AC_LINK_IFELSE(
+    [AC_LANG_PROGRAM(
+      [[#include <unistd.h>
+        #ifdef __APPLE__
+        #include <sys/random.h>
+        #endif
+        #ifdef __linux__
+        #error 1
+        #endif
+      ]],
+      [[getentropy(0, 0);]])],
+    [gnutls_cv_func_getentropy=yes],
+    [gnutls_cv_func_getentropy=no])])
+
+AM_CONDITIONAL(HAVE_GETENTROPY, test "$gnutls_cv_func_getentropy" = yes)
+AM_COND_IF([HAVE_GETENTROPY],
+  [AC_DEFINE([HAVE_GETENTROPY], 1, [Enable the OpenBSD getentropy function])
+   rnd_variant=getentropy])
 
 dnl Try the hooks.m4
 LIBGNUTLS_HOOKS
@@ -409,16 +422,31 @@ dnl headers. If we bypass the headers and just try linking (as AC_CHECK_FUNCS
 dnl does), we will accidentally detect functions which we shouldn't use. Set
 dnl ac_cv_func_* as well, to avoid later AC_CHECK_FUNCS from other included
 dnl scripts from overriding it.
-AC_MSG_CHECKING([for clock_gettime])
-AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <time.h>], [clock_gettime(0, 0);])],
-  [AC_MSG_RESULT(yes); ac_cv_func_clock_gettime=yes
-  AC_DEFINE([HAVE_CLOCK_GETTIME], 1, [Define to 1 if you have the `clock_gettime' function.])],
-  [AC_MSG_RESULT(no); ac_cv_func_clock_gettime=no])
-AC_MSG_CHECKING([for fmemopen])
-AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <stdio.h>], [fmemopen(0, 0, 0);])],
-  [AC_MSG_RESULT(yes); ac_cv_func_fmemopen=yes
-  AC_DEFINE([HAVE_FMEMOPEN], 1, [Define to 1 if you have the `fmemopen' function.])],
-  [AC_MSG_RESULT(no); ac_cv_func_fmemopen=no])
+AC_CACHE_CHECK([for clock_gettime], [gnutls_cv_func_clock_gettime],
+  [AC_LINK_IFELSE(
+    [AC_LANG_PROGRAM(
+      [[#include <time.h>
+      ]],
+      [[clock_gettime(0, 0);]])],
+    [gnutls_cv_func_clock_gettime=yes],
+    [gnutls_cv_func_clock_gettime=no])])
+
+AS_IF([test "$gnutls_cv_func_clock_gettime" = yes], [
+  AC_DEFINE([HAVE_CLOCK_GETTIME], 1, [Define to 1 if you have the `clock_gettime' function.])
+])
+
+AC_CACHE_CHECK([for fmemopen], [gnutls_cv_func_fmemopen],
+  [AC_LINK_IFELSE(
+    [AC_LANG_PROGRAM(
+      [[#include <stdio.h>
+      ]],
+      [[fmemopen(0, 0, 0);]])],
+    [gnutls_cv_func_fmemopen=yes],
+    [gnutls_cv_func_fmemopen=no])])
+
+AS_IF([test "$gnutls_cv_func_fmemopen" = yes], [
+  AC_DEFINE([HAVE_FMEMOPEN], 1, [Define to 1 if you have the `fmemopen' function.])
+])
 
 AM_CONDITIONAL(HAVE_FORK, test "$ac_cv_func_fork" != "no")
 
@@ -456,7 +484,7 @@ if test "$ac_cv_func_nanosleep" != "yes";then
   gnutls_needs_librt=yes
 fi
 
-if test "$ac_cv_func_clock_gettime" != "yes";then
+if test "$gnutls_cv_func_clock_gettime" != "yes";then
   AC_LIB_HAVE_LINKFLAGS(rt,, [#include <time.h>], [clock_gettime (0, 0);])
   gnutls_needs_librt=yes
 fi
@@ -972,23 +1000,20 @@ LIBGNUTLS_CHECK_SONAME([m], [AC_LANG_PROGRAM([
 LIBS="$save_LIBS"
 CFLAGS="$save_CFLAGS"
 
-AC_MSG_CHECKING([whether we can dlopen helper-libraries])
+AC_CACHE_CHECK([whether dlopen works with SONAME], [gnutls_cv_dlopen_soname_works],
+  [AC_RUN_IFELSE(
+    [AC_LANG_PROGRAM(
+      [[#include <dlfcn.h>
+        #include <stdlib.h>
+      ]],
+      [[void *handle = dlopen("$M_LIBRARY_SONAME", RTLD_LAZY | RTLD_GLOBAL);
+        return handle != NULL ? 0 : 1;
+      ]])],
+    [gnutls_cv_dlopen_soname_works=yes],
+    [gnutls_cv_dlopen_soname_works=no],
+    [gnutls_cv_dlopen_soname_works=cross-compiling])])
 
-AC_RUN_IFELSE(
-  [AC_LANG_PROGRAM(
-    [[#include <dlfcn.h>
-      #include <stdlib.h>
-    ]],
-    [[void *handle = dlopen("$M_LIBRARY_SONAME", RTLD_LAZY | RTLD_GLOBAL);
-      return handle != NULL ? 0 : 1;
-    ]])],
-  [ac_cv_dlopen_soname_works=yes],
-  [ac_cv_dlopen_soname_works=no],
-  [ac_cv_dlopen_soname_works=cross-compiling])
-
-AC_MSG_RESULT([$ac_cv_dlopen_soname_works])
-
-AM_CONDITIONAL([ENABLE_DLOPEN], [test "$ac_cv_dlopen_soname_works" = yes])
+AM_CONDITIONAL([ENABLE_DLOPEN], [test "$gnutls_cv_dlopen_soname_works" = yes])
 need_ltlibdl=no
 
 AC_ARG_WITH(tpm2,

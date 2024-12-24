@@ -79,7 +79,7 @@ endif
 TESTS_ENVIRONMENT +=					\
 	FAKETIME="$(FAKETIME)"				\
 	FAKETIME_F_OPT="$(FAKETIME_F_OPT)"		\
-	ac_cv_faketime_works="$(ac_cv_faketime_works)"
+	gnutls_cv_faketime_works="$(gnutls_cv_faketime_works)"
 
 if ENABLE_OLDGNUTLS_INTEROP
 scripts_to_test += testcompat-oldgnutls.sh

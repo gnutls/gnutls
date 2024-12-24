@@ -199,7 +199,7 @@ endif
 TESTS_ENVIRONMENT +=					\
 	FAKETIME="$(FAKETIME)"				\
 	FAKETIME_F_OPT="$(FAKETIME_F_OPT)"		\
-	ac_cv_faketime_works="$(ac_cv_faketime_works)"
+	gnutls_cv_faketime_works="$(gnutls_cv_faketime_works)"
 
 TEST_EXTENSIONS = .sh
 SH_LOG_COMPILER = $(SHELL)
