@@ -1863,6 +1863,11 @@ static int _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 		OQS_STATUS rc;
 		size_t size;
 
+		/* As of liboqs 0.12.0, liboqs implementation lacks
+		 * sufficient checks for ML-DSA.
+		 */
+		not_approved = true;
+
 		const char *algo_name = pk_to_liboqs_algo(algo);
 		if (algo_name == NULL ||
 		    !GNUTLS_OQS_FUNC(OQS_SIG_alg_is_enabled)(algo_name)) {
@@ -2272,6 +2277,11 @@ static int _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 	case GNUTLS_PK_ML_DSA_87: {
 		OQS_SIG *sig;
 		OQS_STATUS rc;
+
+		/* As of liboqs 0.12.0, liboqs implementation lacks
+		 * sufficient checks for ML-DSA.
+		 */
+		not_approved = true;
 
 		const char *algo_name = pk_to_liboqs_algo(algo);
 		if (algo_name == NULL ||
@@ -3087,6 +3097,9 @@ static int pct_test(gnutls_pk_algorithm_t algo,
 	case GNUTLS_PK_GOST_01:
 	case GNUTLS_PK_GOST_12_256:
 	case GNUTLS_PK_GOST_12_512:
+	case GNUTLS_PK_ML_DSA_44:
+	case GNUTLS_PK_ML_DSA_65:
+	case GNUTLS_PK_ML_DSA_87:
 		ret = _gnutls_pk_sign(algo, &sig, &ddata, params, &spki);
 		if (ret < 0) {
 			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
