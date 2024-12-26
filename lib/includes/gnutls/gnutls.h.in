@@ -892,6 +892,10 @@ typedef enum gnutls_certificate_print_formats {
  * @GNUTLS_PK_GOST_12_512: GOST R 34.10-2012 algorithm, 512-bit key per rfc7091.
  * @GNUTLS_PK_ECDH_X448: Elliptic curve algorithm, restricted to ECDH as per rfc7748.
  * @GNUTLS_PK_EDDSA_ED448: Edwards curve Digital signature algorithm. Used with SHAKE256 on signatures.
+ * @GNUTLS_PK_ML_KEM_768: ML-KEM-768 key encapsulation algorithm as per FIPS 203.
+ * @GNUTLS_PK_ML_DSA_44: ML-DSA-44 digital signature algorithm as per FIPS 204.
+ * @GNUTLS_PK_ML_DSA_65: ML-DSA-65 digital signature algorithm as per FIPS 204.
+ * @GNUTLS_PK_ML_DSA_87: ML-DSA-87 digital signature algorithm as per FIPS 204.
  *
  * Enumeration of different public-key algorithms.
  */
@@ -982,6 +986,9 @@ const char *gnutls_pk_algorithm_get_name(gnutls_pk_algorithm_t algorithm);
  * @GNUTLS_SIGN_GOST_256: Digital signature algorithm GOST R 34.10-2012 with GOST R 34.11-2012 256 bit
  * @GNUTLS_SIGN_GOST_512: Digital signature algorithm GOST R 34.10-2012 with GOST R 34.11-2012 512 bit
  * @GNUTLS_SIGN_EDDSA_ED448: Digital signature algorithm EdDSA with Ed448 curve.
+ * @GNUTLS_SIGN_ML_DSA_44: Digital signature algorithm ML-DSA-44.
+ * @GNUTLS_SIGN_ML_DSA_65: Digital signature algorithm ML-DSA-65.
+ * @GNUTLS_SIGN_ML_DSA_87: Digital signature algorithm ML-DSA-87.
  *
  * Enumeration of different digital signature algorithms.
  */
