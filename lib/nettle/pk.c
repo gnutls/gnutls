@@ -1868,6 +1868,9 @@ static int _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 		 */
 		not_approved = true;
 
+		if (_gnutls_liboqs_ensure() < 0)
+			return gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
+
 		const char *algo_name = pk_to_liboqs_algo(algo);
 		if (algo_name == NULL ||
 		    !GNUTLS_OQS_FUNC(OQS_SIG_alg_is_enabled)(algo_name)) {
@@ -2282,6 +2285,9 @@ static int _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 		 * sufficient checks for ML-DSA.
 		 */
 		not_approved = true;
+
+		if (_gnutls_liboqs_ensure() < 0)
+			return gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
 
 		const char *algo_name = pk_to_liboqs_algo(algo);
 		if (algo_name == NULL ||
