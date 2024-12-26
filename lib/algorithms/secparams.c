@@ -24,9 +24,6 @@
 #include "algorithms.h"
 #include "errors.h"
 #include "x509/common.h"
-#ifdef HAVE_LIBOQS
-#include "oqs/oqs.h"
-#endif
 
 typedef struct {
 	const char *name;
@@ -38,38 +35,16 @@ typedef struct {
 				 */
 	unsigned int subgroup_bits; /* subgroup bits */
 	unsigned int ecc_bits; /* bits for ECC keys */
-#ifdef HAVE_LIBOQS
 	unsigned int ml_dsa_bits;
-#endif
 } gnutls_sec_params_entry;
 
 static const gnutls_sec_params_entry sec_params[] = {
-	{ "Insecure", GNUTLS_SEC_PARAM_INSECURE, 0, 0, 0, 0, 0,
-#ifdef HAVE_LIBOQS
-	  0
-#endif
-	},
-	{ "Export", GNUTLS_SEC_PARAM_EXPORT, 42, 512, 0, 84, 0,
-#ifdef HAVE_LIBOQS
-	  0
-#endif
-	},
-	{ "Very weak", GNUTLS_SEC_PARAM_VERY_WEAK, 64, 767, 0, 128, 0,
-#ifdef HAVE_LIBOQS
-	  0
-#endif
-	},
-	{ "Weak", GNUTLS_SEC_PARAM_WEAK, 72, 1008, 1008, 160, 160,
-#ifdef HAVE_LIBOQS
-	  0
-#endif
-	},
+	{ "Insecure", GNUTLS_SEC_PARAM_INSECURE, 0, 0, 0, 0, 0, 0 },
+	{ "Export", GNUTLS_SEC_PARAM_EXPORT, 42, 512, 0, 84, 0, 0 },
+	{ "Very weak", GNUTLS_SEC_PARAM_VERY_WEAK, 64, 767, 0, 128, 0, 0 },
+	{ "Weak", GNUTLS_SEC_PARAM_WEAK, 72, 1008, 1008, 160, 160, 0 },
 #ifdef ENABLE_FIPS140
-	{ "Low", GNUTLS_SEC_PARAM_LOW, 80, 1024, 1024, 160, 160,
-#ifdef HAVE_LIBOQS
-	  0
-#endif
-	},
+	{ "Low", GNUTLS_SEC_PARAM_LOW, 80, 1024, 1024, 160, 160, 0 },
 	{
 		"Legacy",
 		GNUTLS_SEC_PARAM_LEGACY,
@@ -78,57 +53,22 @@ static const gnutls_sec_params_entry sec_params[] = {
 		1024,
 		192,
 		192,
-#ifdef HAVE_LIBOQS
 		0,
-#endif
 	},
-	{ "Medium", GNUTLS_SEC_PARAM_MEDIUM, 112, 2048, 2048, 224, 224,
-#ifdef HAVE_LIBOQS
-	  OQS_SIG_ml_dsa_44_length_public_key
-#endif
-	},
-	{ "High", GNUTLS_SEC_PARAM_HIGH, 128, 3072, 3072, 256, 256,
-#ifdef HAVE_LIBOQS
-	  0
-#endif
-	},
+	{ "Medium", GNUTLS_SEC_PARAM_MEDIUM, 112, 2048, 2048, 224, 224, 0 },
+	{ "High", GNUTLS_SEC_PARAM_HIGH, 128, 3072, 3072, 256, 256, 0 },
 #else
 	{ "Low", GNUTLS_SEC_PARAM_LOW, 80, 1024, 1024, 160, 160,
-#ifdef HAVE_LIBOQS
-		 0
-#endif
-	}, /* ENISA-LEGACY */
-	{ "Legacy", GNUTLS_SEC_PARAM_LEGACY, 96, 1776, 2048, 192, 192,
-#ifdef HAVE_LIBOQS
-		 0
-#endif
-	 },
-	{ "Medium", GNUTLS_SEC_PARAM_MEDIUM, 112, 2048, 2048, 256, 224,
-#ifdef HAVE_LIBOQS
-		 OQS_SIG_ml_dsa_44_length_public_key
-#endif
-		 },
-	{ "High", GNUTLS_SEC_PARAM_HIGH, 128, 3072, 3072, 256, 256,
-#ifdef HAVE_LIBOQS
-		 0
-#endif
-	},
+	  0 }, /* ENISA-LEGACY */
+	{ "Legacy", GNUTLS_SEC_PARAM_LEGACY, 96, 1776, 2048, 192, 192, 0 },
+	{ "Medium", GNUTLS_SEC_PARAM_MEDIUM, 112, 2048, 2048, 256, 224, 0 },
+	{ "High", GNUTLS_SEC_PARAM_HIGH, 128, 3072, 3072, 256, 256, 0 },
 #endif
 	{ "Ultra", GNUTLS_SEC_PARAM_ULTRA, 192, 8192, 8192, 384, 384,
-#ifdef HAVE_LIBOQS
-	  OQS_SIG_ml_dsa_65_length_public_key
-#endif
-	},
+	  ML_DSA_65_PUBKEY_SIZE },
 	{ "Future", GNUTLS_SEC_PARAM_FUTURE, 256, 15360, 15360, 512, 512,
-#ifdef HAVE_LIBOQS
-	  OQS_SIG_ml_dsa_87_length_public_key
-#endif
-	},
-	{ NULL, 0, 0, 0, 0, 0, 0,
-#ifdef HAVE_LIBOQS
-	  0
-#endif
-	}
+	  ML_DSA_87_PUBKEY_SIZE },
+	{ NULL, 0, 0, 0, 0, 0, 0, 0 }
 };
 
 /**
@@ -159,10 +99,8 @@ unsigned int gnutls_sec_param_to_pk_bits(gnutls_pk_algorithm_t algo,
 				ret = p->dsa_bits;
 			else if (IS_EC(algo) || IS_GOSTEC(algo))
 				ret = p->ecc_bits;
-#ifdef HAVE_LIBOQS
 			else if (IS_ML_DSA(algo))
 				ret = p->ml_dsa_bits;
-#endif
 			else
 				ret = p->pk_bits;
 			break;
@@ -292,14 +230,12 @@ gnutls_sec_param_t gnutls_pk_bits_to_sec_param(gnutls_pk_algorithm_t algo,
 				break;
 			ret = p->sec_param;
 		}
-#ifdef HAVE_LIBOQS
 	} else if (IS_ML_DSA(algo)) {
 		for (p = sec_params; p->name; p++) {
 			if (p->ml_dsa_bits > bits)
 				break;
 			ret = p->sec_param;
 		}
-#endif
 	} else {
 		for (p = sec_params; p->name; p++) {
 			if (p->pk_bits > bits)

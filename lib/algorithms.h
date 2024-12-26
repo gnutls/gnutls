@@ -55,11 +55,13 @@
 #define IS_KEM(x) \
 	(((x) == GNUTLS_PK_MLKEM768) || ((x) == GNUTLS_PK_EXP_KYBER768))
 
-#ifdef HAVE_LIBOQS
 #define IS_ML_DSA(x)                                                     \
 	(((x) == GNUTLS_PK_ML_DSA_44) || ((x) == GNUTLS_PK_ML_DSA_65) || \
 	 ((x) == GNUTLS_PK_ML_DSA_87))
-#endif
+
+#define ML_DSA_44_PUBKEY_SIZE 1312
+#define ML_DSA_65_PUBKEY_SIZE 1952
+#define ML_DSA_87_PUBKEY_SIZE 2592
 
 #define IS_GROUP_HYBRID(group) ((group)->ids[0] != GNUTLS_GROUP_INVALID)
 

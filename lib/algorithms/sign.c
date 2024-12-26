@@ -402,7 +402,6 @@ static SYSTEM_CONFIG_OR_CONST gnutls_sign_entry_st sign_algorithms[] = {
 	  .pk = GNUTLS_PK_DSA,
 	  .hash = GNUTLS_DIG_SHA512,
 	  .aid = TLS_SIGN_AID_UNKNOWN },
-#ifdef HAVE_LIBOQS
 	{ .name = "ML-DSA-44",
 	  .oid = ML_DSA_44_OID,
 	  .id = GNUTLS_SIGN_ML_DSA_44,
@@ -421,7 +420,6 @@ static SYSTEM_CONFIG_OR_CONST gnutls_sign_entry_st sign_algorithms[] = {
 	  .pk = GNUTLS_PK_ML_DSA_87,
 	  .hash = GNUTLS_DIG_SHAKE_256,
 	  .aid = TLS_SIGN_AID_UNKNOWN },
-#endif
 	{ .name = 0,
 	  .oid = 0,
 	  .id = 0,

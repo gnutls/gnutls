@@ -38,10 +38,6 @@
 #include "urls.h"
 #include "ecc.h"
 
-#ifdef HAVE_LIBOQS
-#include <dlwrap/oqs.h>
-#endif
-
 static int pubkey_verify_hashed_data(const gnutls_sign_entry_st *se,
 				     const mac_entry_st *me,
 				     const gnutls_datum_t *hash,
@@ -52,35 +48,6 @@ static int pubkey_verify_hashed_data(const gnutls_sign_entry_st *se,
 
 static int pubkey_supports_sig(gnutls_pubkey_t pubkey,
 			       const gnutls_sign_entry_st *se);
-
-#ifdef HAVE_LIBOQS
-struct pq_algorithm_pubkey_bits_st {
-	gnutls_pk_algorithm_t algorithm;
-	int pubkey_bits;
-};
-
-static const struct pq_algorithm_pubkey_bits_st pq_pubkey_bits[] = {
-	{ GNUTLS_PK_ML_DSA_44, OQS_SIG_ml_dsa_44_length_public_key },
-	{ GNUTLS_PK_ML_DSA_65, OQS_SIG_ml_dsa_65_length_public_key },
-	{ GNUTLS_PK_ML_DSA_87, OQS_SIG_ml_dsa_87_length_public_key },
-
-	{ GNUTLS_PK_UNKNOWN, 0 }
-};
-
-static int pq_pubkey_to_bits(const gnutls_pk_algorithm_t algo)
-{
-	const struct pq_algorithm_pubkey_bits_st *pubkey_to_bits =
-		pq_pubkey_bits;
-	while (pubkey_to_bits->algorithm != algo &&
-	       pubkey_to_bits->algorithm != GNUTLS_PK_UNKNOWN)
-		pubkey_to_bits++;
-
-	if (pubkey_to_bits->algorithm == GNUTLS_PK_UNKNOWN)
-		gnutls_assert();
-
-	return pubkey_to_bits->pubkey_bits;
-}
-#endif
 
 unsigned pubkey_to_bits(const gnutls_pk_params_st *params)
 {
@@ -100,12 +67,12 @@ unsigned pubkey_to_bits(const gnutls_pk_params_st *params)
 	case GNUTLS_PK_GOST_12_256:
 	case GNUTLS_PK_GOST_12_512:
 		return gnutls_ecc_curve_get_size(params->curve) * 8;
-#ifdef HAVE_LIBOQS
 	case GNUTLS_PK_ML_DSA_44:
+		return ML_DSA_44_PUBKEY_SIZE;
 	case GNUTLS_PK_ML_DSA_65:
+		return ML_DSA_65_PUBKEY_SIZE;
 	case GNUTLS_PK_ML_DSA_87:
-		return pq_pubkey_to_bits(params->algo);
-#endif
+		return ML_DSA_87_PUBKEY_SIZE;
 	default:
 		return 0;
 	}
@@ -390,7 +357,6 @@ int gnutls_pubkey_get_preferred_hash_algorithm(gnutls_pubkey_t key,
 				pubkey_to_bits(&key->params));
 		ret = 0;
 		break;
-#ifdef HAVE_LIBOQS
 	case GNUTLS_PK_ML_DSA_44:
 	case GNUTLS_PK_ML_DSA_65:
 	case GNUTLS_PK_ML_DSA_87:
@@ -398,7 +364,6 @@ int gnutls_pubkey_get_preferred_hash_algorithm(gnutls_pubkey_t key,
 			*hash = GNUTLS_DIG_SHAKE_256;
 		ret = 0;
 		break;
-#endif
 	default:
 		gnutls_assert();
 		ret = GNUTLS_E_INTERNAL_ERROR;
@@ -2697,11 +2662,9 @@ int pubkey_verify_data(const gnutls_sign_entry_st *se, const mac_entry_st *me,
 
 	case GNUTLS_PK_EDDSA_ED25519:
 	case GNUTLS_PK_EDDSA_ED448:
-#ifdef HAVE_LIBOQS
 	case GNUTLS_PK_ML_DSA_44:
 	case GNUTLS_PK_ML_DSA_65:
 	case GNUTLS_PK_ML_DSA_87:
-#endif
 		if (_gnutls_pk_verify(se->pk, data, signature, params,
 				      sign_params) != 0) {
 			gnutls_assert();
