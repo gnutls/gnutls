@@ -53,7 +53,7 @@
 	(((x) == GNUTLS_PK_ECDH_X25519) || ((x) == GNUTLS_PK_ECDH_X448))
 
 #define IS_KEM(x) \
-	(((x) == GNUTLS_PK_MLKEM768) || ((x) == GNUTLS_PK_EXP_KYBER768))
+	(((x) == GNUTLS_PK_ML_KEM_768) || ((x) == GNUTLS_PK_EXP_KYBER768))
 
 #define IS_ML_DSA(x)                                                     \
 	(((x) == GNUTLS_PK_ML_DSA_44) || ((x) == GNUTLS_PK_ML_DSA_65) || \

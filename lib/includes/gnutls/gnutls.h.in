@@ -874,6 +874,8 @@ typedef enum gnutls_certificate_print_formats {
 #define GNUTLS_PK_EC GNUTLS_PK_ECDSA
 
 #define GNUTLS_PK_ECDHX GNUTLS_PK_ECDH_X25519
+#define GNUTLS_PK_MLKEM768 GNUTLS_PK_ML_KEM_768
+
 /**
  * gnutls_pk_algorithm_t:
  * @GNUTLS_PK_UNKNOWN: Unknown public-key algorithm.
@@ -908,7 +910,7 @@ typedef enum {
 	GNUTLS_PK_ECDH_X448 = 11,
 	GNUTLS_PK_EDDSA_ED448 = 12,
 	GNUTLS_PK_RSA_OAEP = 13,
-	GNUTLS_PK_MLKEM768 = 14,
+	GNUTLS_PK_ML_KEM_768 = 14,
 	GNUTLS_PK_ML_DSA_44 = 15,
 	GNUTLS_PK_ML_DSA_65 = 16,
 	GNUTLS_PK_ML_DSA_87 = 17,
