@@ -121,7 +121,7 @@ dist_check_SCRIPTS = pathlen.sh aki.sh invalid-sig.sh email.sh \
 	smime.sh cert-time.sh alt-chain.sh pkcs7-list-sign.sh pkcs7-eddsa.sh certtool-ecdsa.sh \
 	key-id.sh pkcs8.sh pkcs8-decode.sh ecdsa.sh illegal-rsa.sh pkcs8-invalid.sh key-invalid.sh \
 	pkcs8-eddsa.sh certtool-subca.sh certtool-verify-profiles.sh x509-duplicate-ext.sh x25519-and-x448.sh \
-	reject-negative-serial.sh
+	reject-negative-serial.sh mldsa.sh
 
 dist_check_SCRIPTS += key-id.sh ecdsa.sh pkcs8-invalid.sh key-invalid.sh pkcs8-decode.sh pkcs8.sh pkcs8-eddsa.sh \
 	certtool-utf8.sh crq.sh
