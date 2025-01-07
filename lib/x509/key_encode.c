@@ -257,9 +257,8 @@ cleanup:
 	return ret;
 }
 
-#ifdef HAVE_LIBOQS
-static int _gnutls_x509_write_pqc_alg_pubkey(const gnutls_pk_params_st *params,
-					     gnutls_datum_t *raw)
+static int _gnutls_x509_write_ml_dsa_pubkey(const gnutls_pk_params_st *params,
+					    gnutls_datum_t *raw)
 {
 	int ret;
 
@@ -276,7 +275,6 @@ static int _gnutls_x509_write_pqc_alg_pubkey(const gnutls_pk_params_st *params,
 
 	return 0;
 }
-#endif
 
 int _gnutls_x509_write_pubkey_params(const gnutls_pk_params_st *params,
 				     gnutls_datum_t *der)
@@ -302,11 +300,9 @@ int _gnutls_x509_write_pubkey_params(const gnutls_pk_params_st *params,
 	case GNUTLS_PK_EDDSA_ED448:
 	case GNUTLS_PK_ECDH_X25519:
 	case GNUTLS_PK_ECDH_X448:
-#ifdef HAVE_LIBOQS
 	case GNUTLS_PK_ML_DSA_44:
 	case GNUTLS_PK_ML_DSA_65:
 	case GNUTLS_PK_ML_DSA_87:
-#endif
 		der->data = NULL;
 		der->size = 0;
 
@@ -342,12 +338,10 @@ int _gnutls_x509_write_pubkey(const gnutls_pk_params_st *params,
 	case GNUTLS_PK_GOST_12_256:
 	case GNUTLS_PK_GOST_12_512:
 		return _gnutls_x509_write_gost_pubkey(params, der);
-#ifdef HAVE_LIBOQS
 	case GNUTLS_PK_ML_DSA_44:
 	case GNUTLS_PK_ML_DSA_65:
 	case GNUTLS_PK_ML_DSA_87:
-		return _gnutls_x509_write_pqc_alg_pubkey(params, der);
-#endif
+		return _gnutls_x509_write_ml_dsa_pubkey(params, der);
 	default:
 		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 	}
@@ -1178,70 +1172,17 @@ cleanup:
 	return ret;
 }
 
-#ifdef HAVE_LIBOQS
-static int _gnutls_asn1_encode_pqc_alg(asn1_node *c2,
-				       gnutls_pk_params_st *params,
-				       const char *oid, uint8_t version)
-{
-	int ret;
-
-	if ((ret = asn1_write_value(*c2, "version", &version, 1)) !=
-	    ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(ret);
-	}
-
-	if ((ret = asn1_write_value(*c2, "privateKeyAlgorithm.algorithm", oid,
-				    1)) != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(ret);
-	}
-
-	if ((ret = asn1_write_value(*c2, "privateKeyAlgorithm.parameters", NULL,
-				    0)) != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(ret);
-	}
-
-	if (params->raw_pub.size == 0 || params->raw_priv.size == 0)
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-
-	ret = asn1_write_value(*c2, "privateKey", params->raw_priv.data,
-			       params->raw_priv.size);
-	if (ret != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(ret);
-	}
-
-	ret = asn1_write_value(*c2, "publicKey", params->raw_pub.data,
-			       params->raw_pub.size);
-	if (ret != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(ret);
-	}
-
-	return GNUTLS_E_SUCCESS;
-}
-
-static uint8_t _gnutls_get_pqc_alg_version(gnutls_pk_params_st *params)
-{
-	switch (params->algo) {
-	case GNUTLS_PK_ML_DSA_44:
-		return '\x04';
-	case GNUTLS_PK_ML_DSA_65:
-		return '\x06';
-	case GNUTLS_PK_ML_DSA_87:
-		return '\x08';
-	default:
-		return '\x00';
-	}
-}
-
+/* Encodes the ML-DSA parameters into an ASN.1 MLDSAPrivateKey structure.
+ */
 static int _gnutls_asn1_encode_ml_dsa(asn1_node *c2,
 				      gnutls_pk_params_st *params)
 {
-	int ret;
+	int result, ret;
 	const char *oid;
+	const uint8_t one = 1;
+
+	if (unlikely(params->raw_pub.size == 0 || params->raw_priv.size == 0))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	oid = gnutls_pk_get_oid(params->algo);
 	if (oid == NULL)
@@ -1253,27 +1194,59 @@ static int _gnutls_asn1_encode_ml_dsa(asn1_node *c2,
 		*c2 = NULL;
 	}
 
-	if ((ret = asn1_create_element(_gnutls_get_gnutls_asn(),
-				       "GNUTLS.MLDSAPrivateKey", c2)) !=
+	if ((result = asn1_create_element(_gnutls_get_gnutls_asn(),
+					  "GNUTLS.MLDSAPrivateKey", c2)) !=
 	    ASN1_SUCCESS) {
 		gnutls_assert();
-		ret = _gnutls_asn2err(ret);
+		ret = _gnutls_asn2err(result);
 		goto cleanup;
 	}
 
-	ret = _gnutls_asn1_encode_pqc_alg(c2, params, oid,
-					  _gnutls_get_pqc_alg_version(params));
-	if (ret < 0)
+	/* signify publicKey is embedded in a separate field */
+	if ((result = asn1_write_value(*c2, "version", &one, 1)) !=
+	    ASN1_SUCCESS) {
+		gnutls_assert();
+		ret = _gnutls_asn2err(result);
 		goto cleanup;
+	}
 
-	return GNUTLS_E_SUCCESS;
+	if ((result = asn1_write_value(*c2, "privateKeyAlgorithm.algorithm",
+				       oid, 1)) != ASN1_SUCCESS) {
+		gnutls_assert();
+		ret = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	if ((result = asn1_write_value(*c2, "privateKeyAlgorithm.parameters",
+				       NULL, 0)) != ASN1_SUCCESS) {
+		gnutls_assert();
+		ret = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	result = asn1_write_value(*c2, "privateKey", params->raw_priv.data,
+				  params->raw_priv.size);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		ret = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	result = asn1_write_value(*c2, "publicKey", params->raw_pub.data,
+				  params->raw_pub.size);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		ret = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	ret = GNUTLS_E_SUCCESS;
 
 cleanup:
 	asn1_delete_structure2(c2, ASN1_DELETE_FLAG_ZEROIZE);
 
 	return ret;
 }
-#endif
 
 int _gnutls_asn1_encode_privkey(asn1_node *c2, gnutls_pk_params_st *params)
 {
@@ -1297,12 +1270,10 @@ int _gnutls_asn1_encode_privkey(asn1_node *c2, gnutls_pk_params_st *params)
 	case GNUTLS_PK_DH:
 		/* DH keys are only exportable in PKCS#8 format */
 		return GNUTLS_E_INVALID_REQUEST;
-#ifdef HAVE_LIBOQS
 	case GNUTLS_PK_ML_DSA_44:
 	case GNUTLS_PK_ML_DSA_65:
 	case GNUTLS_PK_ML_DSA_87:
 		return _gnutls_asn1_encode_ml_dsa(c2, params);
-#endif
 	default:
 		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 	}
