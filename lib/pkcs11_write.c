@@ -367,19 +367,18 @@ static int add_pubkey(gnutls_pubkey_t pubkey, struct ck_attribute *a,
 			return ret;
 		}
 
+		ret = _gnutls_set_datum(&ecpoint, pubkey->params.raw_pub.data,
+					pubkey->params.raw_pub.size);
+		if (ret < 0) {
+			gnutls_assert();
+			_gnutls_free_datum(&params);
+			return ret;
+		}
+
 		a[*a_val].type = CKA_EC_PARAMS;
 		a[*a_val].value = params.data;
 		a[*a_val].value_len = params.size;
 		(*a_val)++;
-
-		ret = _gnutls_x509_encode_string(ASN1_ETYPE_OCTET_STRING,
-						 pubkey->params.raw_pub.data,
-						 pubkey->params.raw_pub.size,
-						 &ecpoint);
-		if (ret < 0) {
-			gnutls_assert();
-			return ret;
-		}
 
 		a[*a_val].type = CKA_EC_POINT;
 		a[*a_val].value = ecpoint.data;
