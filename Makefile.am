@@ -191,6 +191,9 @@ dist-hook:
 	mv ChangeLog $(distdir)
 	touch -c $(distdir)/doc/*.html $(distdir)/doc/*.pdf $(distdir)/doc/*.info
 
+distcheck-hook:
+	@test -d "$(top_srcdir)/po/.reference" || { echo "PO files are not downloaded; run ./bootstrap without --skip-po"; exit 1; }
+
 .PHONY: abi-check abi-dump-versioned abi-dump-latest pic-check symbol-check local-code-coverage-output files-update AUTHORS
 
 include $(top_srcdir)/cligen/cligen.mk

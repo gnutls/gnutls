@@ -61,15 +61,15 @@ export GNUTLS_DEBUG_LEVEL=3
 unset GNUTLS_SYSTEM_PRIORITY_FILE
 
 "${CLI}" --attime "2017-11-22" -p "${PORT}" 127.0.0.1 --priority NORMAL --verify-hostname localhost --x509cafile "${srcdir}/certs/ca-cert-ecc.pem" --logfile ${TMPFILE2} </dev/null >/dev/null ||
-	fail "expected connection to succeed (1)"
+	fail "" "expected connection to succeed (1)"
 
 export GNUTLS_SYSTEM_PRIORITY_FILE="${TMPFILE}"
 
 "${CLI}" --attime "2017-11-22" -p "${PORT}" 127.0.0.1 --priority NORMAL:%PROFILE_LOW --verify-hostname localhost --x509cafile "${srcdir}/certs/ca-cert-ecc.pem" --logfile ${TMPFILE2} </dev/null >/dev/null ||
-	fail "expected connection to succeed (2)"
+	fail "" "expected connection to succeed (2)"
 
 "${CLI}" --attime "2017-11-22" -p "${PORT}" 127.0.0.1 --priority NORMAL:%PROFILE_MEDIUM --verify-hostname localhost --x509cafile "${srcdir}/certs/ca-cert-ecc.pem" --logfile ${TMPFILE2} </dev/null >/dev/null ||
-	fail "expected connection to succeed (3)"
+	fail "" "expected connection to succeed (3)"
 
 # failure case, 384 bit min-profile, 256 bit key
 cat <<_EOF_ > ${TMPFILE}
@@ -81,15 +81,15 @@ _EOF_
 unset GNUTLS_SYSTEM_PRIORITY_FILE
 
 "${CLI}" --attime "2017-11-22" -p "${PORT}" 127.0.0.1 --priority NORMAL --verify-hostname localhost --x509cafile "${srcdir}/certs/ca-cert-ecc.pem" --logfile ${TMPFILE2} </dev/null >/dev/null ||
-	fail "expected connection to succeed (1)"
+	fail "" "expected connection to succeed (1)"
 
 export GNUTLS_SYSTEM_PRIORITY_FILE="${TMPFILE}"
 
 "${CLI}" --attime "2017-11-22" -p "${PORT}" 127.0.0.1 --priority NORMAL:%PROFILE_LOW --verify-hostname localhost --x509cafile "${srcdir}/certs/ca-cert-ecc.pem" --logfile ${TMPFILE2} </dev/null >/dev/null &&
-	fail "expected connection to fail (1)"
+	fail "" "expected connection to fail (1)"
 
 "${CLI}" --attime "2017-11-22" -p "${PORT}" 127.0.0.1 --priority NORMAL:%PROFILE_MEDIUM --verify-hostname localhost --x509cafile "${srcdir}/certs/ca-cert-ecc.pem" --logfile ${TMPFILE2} </dev/null >/dev/null &&
-	fail "expected connection to fail (2)"
+	fail "" "expected connection to fail (2)"
 
 kill ${PID}
 wait

@@ -74,14 +74,14 @@ static void decode(const char *test_name, const gnutls_datum_t *raw,
 				found = 1;
 				break;
 			} else {
-				fail("%s: did not found identity on index %d\n",
+				fail("%s: did not find identity on index %d\n",
 				     test_name, idx);
 			}
 		}
 	}
 
 	if (found == 0)
-		fail("%s: did not found identity!\n", test_name);
+		fail("%s: did not find identity!\n", test_name);
 
 	_gnutls13_psk_ext_iter_init(&iter, &p);
 	for (j = 0; j <= i; j++) {

@@ -426,18 +426,13 @@ AC_DEFUN([LIBGNUTLS_CHECK_SONAME],
 [
   m4_pushdef([soname], AS_TR_SH([$1]))
   m4_pushdef([SONAME], AS_TR_CPP([$1]))
-  AC_MSG_CHECKING([$1 [soname]])
-  AC_LINK_IFELSE([$2],
-	[soname[]_so=`(eval "$LDDPROG conftest$EXEEXT $LDDPOSTPROC") | grep '^lib[]$1\.so'`],
-	[soname[]_so=none])
-  if test -z "$soname[]_so"; then
-	soname[]_so=none
-  fi
-  AC_MSG_RESULT($soname[]_so)
-  if test "$soname[]_so" != none; then
-	SONAME[]_LIBRARY_SONAME="$soname[]_so"
-	AC_DEFINE_UNQUOTED([SONAME[]_LIBRARY_SONAME], ["$soname[]_so"], [The soname of $1 library])
-  fi
+  AC_CACHE_CHECK([$1 [soname]], [gnutls_cv_soname_[]soname],
+    [AC_LINK_IFELSE([$2],
+      [gnutls_cv_soname_[]soname=`(eval "$LDDPROG conftest$EXEEXT $LDDPOSTPROC") | grep '^lib[]$1\.so'`],
+      [gnutls_cv_soname_[]soname=none])])
+  AS_IF([test -z "$gnutls_cv_soname_[]soname"], [gnutls_cv_soname_[]soname=none],
+        [SONAME[]_LIBRARY_SONAME="$gnutls_cv_soname_[]soname"
+	 AC_DEFINE_UNQUOTED([SONAME[]_LIBRARY_SONAME], ["$gnutls_cv_soname_[]soname"], [The soname of $1 library])])
   m4_popdef([soname])
   m4_popdef([SONAME])
 ])

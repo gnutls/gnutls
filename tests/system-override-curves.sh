@@ -64,7 +64,7 @@ if grep -i "SECP256R1" ${TMPFILE2} || grep -i "SECP521R1" ${TMPFILE2};then
 fi
 
 if ! grep -i "SECP384R1" ${TMPFILE2};then
-	echo "Could not found secp384r1"
+	echo "Could not find secp384r1"
 	exit 1
 fi
 
@@ -81,12 +81,12 @@ PID=$!
 wait_server ${PID}
 
 "${CLI}" -p "${PORT}" 127.0.0.1 --priority NORMAL:-CURVE-ALL:+CURVE-SECP256R1:+CURVE-SECP521R1 --insecure --logfile ${TMPFILE2} </dev/null >/dev/null ||
-	fail "expected connection to succeed (1)"
+	fail "" "expected connection to succeed (1)"
 
 export GNUTLS_SYSTEM_PRIORITY_FILE="${TMPFILE}"
 
 "${CLI}" -p "${PORT}" 127.0.0.1 --priority NORMAL:-CURVE-ALL:+CURVE-SECP256R1:+CURVE-SECP521R1 --insecure --logfile ${TMPFILE2} </dev/null >/dev/null &&
-	fail "expected connection to fail (2)"
+	fail "" "expected connection to fail (2)"
 
 kill ${PID}
 wait
@@ -104,7 +104,7 @@ wait_server ${PID}
 unset GNUTLS_SYSTEM_PRIORITY_FILE
 
 "${CLI}" -p "${PORT}" 127.0.0.1 --priority "NORMAL:-CURVE-ALL:+CURVE-SECP256R1:+CURVE-SECP521R1" --insecure --logfile ${TMPFILE2} </dev/null >/dev/null &&
-	fail "expected connection to fail (2)"
+	fail "" "expected connection to fail (2)"
 
 kill ${PID}
 wait
