@@ -18,10 +18,10 @@ dnl Process this file with autoconf to produce a configure script.
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-AC_PREREQ(2.64)
+AC_PREREQ([2.71])
 
 dnl when updating version also update LT_REVISION in m4/hooks.m4
-AC_INIT([GnuTLS], [3.8.8], [bugs@gnutls.org])
+AC_INIT([GnuTLS],[3.8.8],[bugs@gnutls.org])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIRS([m4 src/gl/m4 lib/unistring/m4])
 AC_CANONICAL_HOST
@@ -52,11 +52,11 @@ AC_USE_SYSTEM_EXTENSIONS
 
 #
 # Require C99 support
-#    
-AC_PROG_CC_C99
-if test "$ac_cv_prog_cc_c99" = "no"; then
-  AC_MSG_WARN([[Compiler does not support C99. It may not be able to compile the project.]])
-fi
+#
+AS_CASE([$ac_prog_cc_stdc],
+  [c11 | c99], [AC_DEFINE([C99_MACROS], 1, [C99 macros are supported])],
+  [AC_MSG_WARN([[Compiler does not support C99. It may not be able to compile the project.]])]
+)
 
 AM_CONDITIONAL(CROSS_COMPILING, test "$cross_compiling" = yes)
 
@@ -137,7 +137,11 @@ AC_SUBST(NUMBER_VERSION, `printf "0x%02x%02x%02x" $MAJOR_VERSION $MINOR_VERSION 
 
 dnl C and C++ capabilities
 AC_C_INLINE
-AC_HEADER_STDC
+# Autoupdate added the next two lines to ensure that your configure
+# script's behavior did not change.  They are probably safe to remove.
+AC_CHECK_INCLUDES_DEFAULT
+AC_PROG_EGREP
+
 
 # For the C++ code
 AC_ARG_ENABLE(cxx,

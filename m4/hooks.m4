@@ -129,21 +129,6 @@ LIBTASN1_MINIMUM=4.9
     GNUTLS_REQUIRES_PRIVATE="${GNUTLS_REQUIRES_PRIVATE}, libtasn1"
   fi
 
-  AC_MSG_CHECKING([whether C99 macros are supported])
-  AC_TRY_COMPILE(,
-  [
-    #define test_mac(...)
-    int z,y,x;
-    test_mac(x,y,z);
-    return 0;
-  ], [
-    AC_DEFINE([C99_MACROS], 1, [C99 macros are supported])
-    AC_MSG_RESULT(yes)
-  ], [
-    AC_MSG_RESULT(no)
-    AC_MSG_WARN([C99 macros not supported. This may affect compiling.])
-  ])
-
   ac_strict_der_time=yes
   AC_MSG_CHECKING([whether to disable strict DER time encodings for backwards compatibility])
   AC_ARG_ENABLE(strict-der-time,

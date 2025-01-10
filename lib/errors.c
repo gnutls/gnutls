@@ -22,9 +22,7 @@
 
 #include "gnutls_int.h"
 #include "errors.h"
-#ifdef STDC_HEADERS
 #include <stdarg.h>
-#endif
 #include "str.h"
 
 #define ERROR_ENTRY(desc, name) { desc, #name, name }
