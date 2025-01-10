@@ -176,7 +176,7 @@ static const gnutls_group_entry_st supported_groups[] = {
 	{
 		.name = "MLKEM768",
 		.id = GNUTLS_GROUP_EXP_MLKEM768,
-		.pk = GNUTLS_PK_MLKEM768,
+		.pk = GNUTLS_PK_ML_KEM_768,
 		/* absense of .tls_id means that this group alone cannot be used in TLS */
 	},
 	{

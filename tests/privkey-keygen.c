@@ -162,7 +162,7 @@ void doit(void)
 #endif
 			    algorithm == GNUTLS_PK_ECDH_X25519 ||
 			    algorithm == GNUTLS_PK_ECDH_X448 ||
-			    algorithm == GNUTLS_PK_MLKEM768)
+			    algorithm == GNUTLS_PK_ML_KEM_768)
 				continue;
 
 			if (algorithm == GNUTLS_PK_GOST_01 ||

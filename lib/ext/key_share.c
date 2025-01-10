@@ -183,7 +183,7 @@ static int client_gen_key_share_single(gnutls_session_t session,
 		ret = 0;
 		break;
 
-	case GNUTLS_PK_MLKEM768:
+	case GNUTLS_PK_ML_KEM_768:
 	case GNUTLS_PK_EXP_KYBER768:
 		gnutls_pk_params_release(&session->key.kshare.kem_params);
 		gnutls_pk_params_init(&session->key.kshare.kem_params);
@@ -319,7 +319,7 @@ static int server_gen_key_share_single(gnutls_session_t session,
 		ret = 0;
 		break;
 
-	case GNUTLS_PK_MLKEM768:
+	case GNUTLS_PK_ML_KEM_768:
 	case GNUTLS_PK_EXP_KYBER768:
 		ret = gnutls_buffer_append_data(
 			extdata, session->key.kshare.kem_params.raw_pub.data,
@@ -562,7 +562,7 @@ static int server_use_key_share_single(gnutls_session_t session,
 
 		return 0;
 
-	case GNUTLS_PK_MLKEM768:
+	case GNUTLS_PK_ML_KEM_768:
 	case GNUTLS_PK_EXP_KYBER768: {
 		gnutls_pk_params_release(&session->key.kshare.kem_params);
 		gnutls_pk_params_init(&session->key.kshare.kem_params);
@@ -762,7 +762,7 @@ static int client_use_key_share_single(gnutls_session_t session,
 
 		return 0;
 
-	case GNUTLS_PK_MLKEM768:
+	case GNUTLS_PK_ML_KEM_768:
 	case GNUTLS_PK_EXP_KYBER768: {
 		if (KYBER768_CIPHERTEXT_SIZE > buffer->length)
 			return gnutls_assert_val(

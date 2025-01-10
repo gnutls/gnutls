@@ -204,7 +204,7 @@ static const gnutls_pk_entry pk_algorithms[] = {
 	  .curve = GNUTLS_ECC_CURVE_X448 },
 	{ .name = "ML-KEM-768",
 	  .oid = NULL,
-	  .id = GNUTLS_PK_MLKEM768,
+	  .id = GNUTLS_PK_ML_KEM_768,
 	  .curve = GNUTLS_ECC_CURVE_INVALID },
 /* Hidden behind HAVE_LIBOQS as it will be removed in the future.
 	 */
@@ -213,6 +213,7 @@ static const gnutls_pk_entry pk_algorithms[] = {
 	  .oid = NULL,
 	  .id = GNUTLS_PK_EXP_KYBER768,
 	  .curve = GNUTLS_ECC_CURVE_INVALID },
+#endif
 	{ .name = "ML-DSA-44",
 	  .oid = ML_DSA_44_OID,
 	  .id = GNUTLS_PK_ML_DSA_44,
@@ -228,7 +229,6 @@ static const gnutls_pk_entry pk_algorithms[] = {
 	  .id = GNUTLS_PK_ML_DSA_87,
 	  .curve = GNUTLS_ECC_CURVE_INVALID,
 	  .no_prehashed = 1 },
-#endif
 	{ .name = "UNKNOWN",
 	  .oid = NULL,
 	  .id = GNUTLS_PK_UNKNOWN,
