@@ -1544,6 +1544,17 @@ AC_DEFINE([INI_STOP_ON_FIRST_ERROR], 1, [whether to stop on first error])
 AC_DEFINE_UNQUOTED([INI_INLINE_COMMENT_PREFIXES], [";#"], [The inline comment prefixes])
 AC_DEFINE_UNQUOTED([INI_START_COMMENT_PREFIXES], [";#"], [The comment prefixes])
 
+AH_VERBATIM([gnutls_lib_no_replace_fchdir], [
+/* Work around build failure on mingw caused by mis-interactions
+ * between 'close' and 'fchdir' Gnulib modules through dependencies,
+ * suggested in:
+ * <https://lists.gnu.org/archive/html/bug-gnulib/2024-12/msg00179.html>
+ */
+#ifdef GNUTLS_BUILDING_LIB
+# undef REPLACE_FCHDIR
+#endif
+])
+
 AC_CONFIG_FILES([
   Makefile
   doc/Makefile
