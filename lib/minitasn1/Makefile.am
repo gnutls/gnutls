@@ -20,7 +20,7 @@
 
 include $(top_srcdir)/lib/common.mk
 
-AM_CPPFLAGS = -DASN1_BUILDING		\
+AM_CPPFLAGS += -DASN1_BUILDING=1	\
 	-I$(srcdir)/../../gl		\
 	-I$(builddir)/../../gl          \
 	-I$(srcdir)/..

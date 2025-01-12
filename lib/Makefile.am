@@ -37,7 +37,7 @@ localedir = $(datadir)/locale
 
 include $(top_srcdir)/lib/common.mk
 
-AM_CPPFLAGS =					\
+AM_CPPFLAGS +=					\
 	-DLOCALEDIR=\"$(localedir)\"		\
 	-I$(srcdir)/../gl			\
 	-I$(builddir)/../gl			\

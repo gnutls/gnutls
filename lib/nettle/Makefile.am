@@ -22,7 +22,7 @@ include $(top_srcdir)/lib/common.mk
 
 AM_CFLAGS += $(HOGWEED_CFLAGS) $(GMP_CFLAGS)
 
-AM_CPPFLAGS = \
+AM_CPPFLAGS += \
 	-I$(srcdir)/int		\
 	-I$(srcdir)/backport		\
 	-I$(srcdir)/../../gl		\
