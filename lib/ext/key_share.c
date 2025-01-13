@@ -40,6 +40,9 @@
 #define KYBER768_PUBLIC_KEY_SIZE 1184
 #define KYBER768_CIPHERTEXT_SIZE 1088
 
+#define MLKEM1024_PUBLIC_KEY_SIZE 1568
+#define MLKEM1024_CIPHERTEXT_SIZE 1568
+
 static int key_share_recv_params(gnutls_session_t session, const uint8_t *data,
 				 size_t data_size);
 static int key_share_send_params(gnutls_session_t session,
@@ -184,6 +187,7 @@ static int client_gen_key_share_single(gnutls_session_t session,
 		break;
 
 	case GNUTLS_PK_ML_KEM_768:
+	case GNUTLS_PK_ML_KEM_1024:
 	case GNUTLS_PK_EXP_KYBER768:
 		gnutls_pk_params_release(&session->key.kshare.kem_params);
 		gnutls_pk_params_init(&session->key.kshare.kem_params);
@@ -320,6 +324,7 @@ static int server_gen_key_share_single(gnutls_session_t session,
 		break;
 
 	case GNUTLS_PK_ML_KEM_768:
+	case GNUTLS_PK_ML_KEM_1024:
 	case GNUTLS_PK_EXP_KYBER768:
 		ret = gnutls_buffer_append_data(
 			extdata, session->key.kshare.kem_params.raw_pub.data,
@@ -407,6 +412,7 @@ static int server_use_key_share_single(gnutls_session_t session,
 	gnutls_pk_params_st pub;
 	const gnutls_ecc_curve_entry_st *curve;
 	int ret;
+	size_t public_key_size = 0;
 
 	switch (group->pk) {
 	case GNUTLS_PK_EC:
@@ -562,8 +568,20 @@ static int server_use_key_share_single(gnutls_session_t session,
 
 		return 0;
 
+	case GNUTLS_PK_EXP_KYBER768:
 	case GNUTLS_PK_ML_KEM_768:
-	case GNUTLS_PK_EXP_KYBER768: {
+	case GNUTLS_PK_ML_KEM_1024:
+		switch (group->pk) {
+		case GNUTLS_PK_EXP_KYBER768:
+		case GNUTLS_PK_ML_KEM_768:
+			public_key_size = KYBER768_PUBLIC_KEY_SIZE;
+			break;
+		case GNUTLS_PK_ML_KEM_1024:
+			public_key_size = MLKEM1024_PUBLIC_KEY_SIZE;
+			break;
+		default:
+			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+		}
 		gnutls_pk_params_release(&session->key.kshare.kem_params);
 		gnutls_pk_params_init(&session->key.kshare.kem_params);
 
@@ -574,14 +592,13 @@ static int server_use_key_share_single(gnutls_session_t session,
 			return gnutls_assert_val(ret);
 
 		/* server's public key is unused, but the raw_pub field
-		 * is used to store ciphertext */
+		* is used to store ciphertext */
 		gnutls_free(session->key.kshare.kem_params.raw_pub.data);
 
-		if (KYBER768_PUBLIC_KEY_SIZE > buffer->length)
+		if (public_key_size > buffer->length)
 			return gnutls_assert_val(
 				GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
-		_gnutls_buffer_pop_datum(buffer, &data,
-					 KYBER768_PUBLIC_KEY_SIZE);
+		_gnutls_buffer_pop_datum(buffer, &data, public_key_size);
 
 		ret = _gnutls_pk_encaps(group->pk,
 					&session->key.kshare.kem_params.raw_pub,
@@ -595,7 +612,7 @@ static int server_use_key_share_single(gnutls_session_t session,
 			return gnutls_assert_val(ret);
 
 		return 0;
-	}
+
 	default:
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 	}
@@ -643,6 +660,7 @@ static int client_use_key_share_single(gnutls_session_t session,
 	gnutls_pk_params_st pub;
 	const gnutls_ecc_curve_entry_st *curve;
 	int ret;
+	size_t public_key_size = 0;
 
 	switch (group->pk) {
 	case GNUTLS_PK_EC:
@@ -762,13 +780,24 @@ static int client_use_key_share_single(gnutls_session_t session,
 
 		return 0;
 
+	case GNUTLS_PK_EXP_KYBER768:
 	case GNUTLS_PK_ML_KEM_768:
-	case GNUTLS_PK_EXP_KYBER768: {
-		if (KYBER768_CIPHERTEXT_SIZE > buffer->length)
+	case GNUTLS_PK_ML_KEM_1024:
+		switch (group->pk) {
+		case GNUTLS_PK_EXP_KYBER768:
+		case GNUTLS_PK_ML_KEM_768:
+			public_key_size = KYBER768_CIPHERTEXT_SIZE;
+			break;
+		case GNUTLS_PK_ML_KEM_1024:
+			public_key_size = MLKEM1024_CIPHERTEXT_SIZE;
+			break;
+		default:
+			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+		}
+		if (public_key_size > buffer->length)
 			return gnutls_assert_val(
 				GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
-		_gnutls_buffer_pop_datum(buffer, &data,
-					 KYBER768_CIPHERTEXT_SIZE);
+		_gnutls_buffer_pop_datum(buffer, &data, public_key_size);
 
 		ret = _gnutls_pk_decaps(
 			group->pk, &key, &data,
@@ -782,7 +811,7 @@ static int client_use_key_share_single(gnutls_session_t session,
 			return gnutls_assert_val(ret);
 
 		return 0;
-	}
+
 	default:
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 	}

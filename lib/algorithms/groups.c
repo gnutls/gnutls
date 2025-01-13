@@ -180,6 +180,12 @@ static const gnutls_group_entry_st supported_groups[] = {
 		/* absense of .tls_id means that this group alone cannot be used in TLS */
 	},
 	{
+		.name = "MLKEM1024",
+		.id = GNUTLS_GROUP_EXP_MLKEM1024,
+		.pk = GNUTLS_PK_ML_KEM_1024,
+		/* absense of .tls_id means that this group alone cannot be used in TLS */
+	},
+	{
 		.name = "KYBER768",
 		.id = GNUTLS_GROUP_EXP_KYBER768,
 		.pk = GNUTLS_PK_EXP_KYBER768,
@@ -190,6 +196,11 @@ static const gnutls_group_entry_st supported_groups[] = {
 	  .ids = { GNUTLS_GROUP_SECP256R1, GNUTLS_GROUP_EXP_MLKEM768,
 		   GNUTLS_GROUP_INVALID },
 	  .tls_id = 0x11EB },
+	{ .name = "SECP384R1-MLKEM1024",
+	  .id = GNUTLS_GROUP_EXP_SECP384R1_MLKEM1024,
+	  .ids = { GNUTLS_GROUP_SECP384R1, GNUTLS_GROUP_EXP_MLKEM1024,
+		   GNUTLS_GROUP_INVALID },
+	  .tls_id = 0x11ED },
 	{ .name = "X25519-MLKEM768",
 	  .id = GNUTLS_GROUP_EXP_X25519_MLKEM768,
 	  .ids = { GNUTLS_GROUP_EXP_MLKEM768, GNUTLS_GROUP_X25519,
