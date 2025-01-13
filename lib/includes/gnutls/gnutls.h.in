@@ -893,6 +893,7 @@ typedef enum gnutls_certificate_print_formats {
  * @GNUTLS_PK_ECDH_X448: Elliptic curve algorithm, restricted to ECDH as per rfc7748.
  * @GNUTLS_PK_EDDSA_ED448: Edwards curve Digital signature algorithm. Used with SHAKE256 on signatures.
  * @GNUTLS_PK_ML_KEM_768: ML-KEM-768 key encapsulation algorithm as per FIPS 203.
+ * @GNUTLS_PK_ML_KEM_1024: ML-KEM-1024 key encapsulation algorithm as per FIPS 203.
  * @GNUTLS_PK_ML_DSA_44: ML-DSA-44 digital signature algorithm as per FIPS 204.
  * @GNUTLS_PK_ML_DSA_65: ML-DSA-65 digital signature algorithm as per FIPS 204.
  * @GNUTLS_PK_ML_DSA_87: ML-DSA-87 digital signature algorithm as per FIPS 204.
@@ -918,7 +919,8 @@ typedef enum {
 	GNUTLS_PK_ML_DSA_44 = 15,
 	GNUTLS_PK_ML_DSA_65 = 16,
 	GNUTLS_PK_ML_DSA_87 = 17,
-	GNUTLS_PK_MAX = GNUTLS_PK_ML_DSA_87,
+	GNUTLS_PK_ML_KEM_1024 = 18,
+	GNUTLS_PK_MAX = GNUTLS_PK_ML_KEM_1024,
 
 	/* Experimental algorithms */
 	GNUTLS_PK_EXP_KYBER768 = 256,
@@ -1161,11 +1163,13 @@ typedef enum {
 	/* Experimental algorithms */
 	GNUTLS_GROUP_EXP_X25519_KYBER768 = 512,
 	GNUTLS_GROUP_EXP_SECP256R1_MLKEM768 = 513,
+	GNUTLS_GROUP_EXP_SECP384R1_MLKEM1024 = 518,
 	GNUTLS_GROUP_EXP_X25519_MLKEM768 = 514,
 	GNUTLS_GROUP_EXP_KYBER768 = 515,
 	GNUTLS_GROUP_EXP_MLKEM768 = 516,
+	GNUTLS_GROUP_EXP_MLKEM1024 = 517,
 	GNUTLS_GROUP_EXP_MIN = GNUTLS_GROUP_EXP_X25519_KYBER768,
-	GNUTLS_GROUP_EXP_MAX = GNUTLS_GROUP_EXP_MLKEM768
+	GNUTLS_GROUP_EXP_MAX = GNUTLS_GROUP_EXP_SECP384R1_MLKEM1024
 } gnutls_group_t;
 
 /* macros to allow specifying a specific curve in gnutls_privkey_generate()
