@@ -101,9 +101,8 @@ static inline void switch_to_pkcs8_when_needed(common_info_st *cinfo,
 	    key_type == GNUTLS_PK_ECDH_X448 || key_type == GNUTLS_PK_GOST_01 ||
 	    key_type == GNUTLS_PK_GOST_12_256 ||
 	    key_type == GNUTLS_PK_GOST_12_512 ||
-	    key_type == GNUTLS_PK_ML_DSA_44 ||
-	    key_type == GNUTLS_PK_ML_DSA_65 ||
-	    key_type == GNUTLS_PK_ML_DSA_87) {
+	    key_type == GNUTLS_PK_MLDSA44 || key_type == GNUTLS_PK_MLDSA65 ||
+	    key_type == GNUTLS_PK_MLDSA87) {
 		if (cinfo->verbose)
 			fprintf(stderr,
 				"Assuming --pkcs8 is given; %s private keys can only be exported in PKCS#8 format\n",

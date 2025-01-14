@@ -52,21 +52,27 @@
 #define IS_ECDHX(x) \
 	(((x) == GNUTLS_PK_ECDH_X25519) || ((x) == GNUTLS_PK_ECDH_X448))
 
-#define IS_KEM(x)                                                           \
-	(((x) == GNUTLS_PK_ML_KEM_768) || ((x) == GNUTLS_PK_ML_KEM_1024) || \
+#define IS_KEM(x)                                                       \
+	(((x) == GNUTLS_PK_MLKEM768) || ((x) == GNUTLS_PK_MLKEM1024) || \
 	 ((x) == GNUTLS_PK_EXP_KYBER768))
 
-#define IS_ML_DSA(x)                                                     \
-	(((x) == GNUTLS_PK_ML_DSA_44) || ((x) == GNUTLS_PK_ML_DSA_65) || \
-	 ((x) == GNUTLS_PK_ML_DSA_87))
+#define IS_ML_DSA(x)                                                 \
+	(((x) == GNUTLS_PK_MLDSA44) || ((x) == GNUTLS_PK_MLDSA65) || \
+	 ((x) == GNUTLS_PK_MLDSA87))
 
-#define ML_DSA_44_PUBKEY_SIZE 1312
-#define ML_DSA_65_PUBKEY_SIZE 1952
-#define ML_DSA_87_PUBKEY_SIZE 2592
+#define MLKEM768_PUBKEY_SIZE 1184
+#define MLKEM768_CIPHERTEXT_SIZE 1088
 
-#define ML_DSA_44_PRIVKEY_SIZE 2560
-#define ML_DSA_65_PRIVKEY_SIZE 4032
-#define ML_DSA_87_PRIVKEY_SIZE 4896
+#define MLKEM1024_PUBKEY_SIZE 1568
+#define MLKEM1024_CIPHERTEXT_SIZE 1568
+
+#define MLDSA44_PUBKEY_SIZE 1312
+#define MLDSA65_PUBKEY_SIZE 1952
+#define MLDSA87_PUBKEY_SIZE 2592
+
+#define MLDSA44_PRIVKEY_SIZE 2560
+#define MLDSA65_PRIVKEY_SIZE 4032
+#define MLDSA87_PRIVKEY_SIZE 4896
 
 #define IS_GROUP_HYBRID(group) ((group)->ids[0] != GNUTLS_GROUP_INVALID)
 

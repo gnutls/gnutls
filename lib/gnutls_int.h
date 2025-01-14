@@ -767,6 +767,8 @@ typedef struct gnutls_group_entry_st {
 	const unsigned *q_bits;
 	gnutls_ecc_curve_t curve;
 	gnutls_pk_algorithm_t pk;
+	size_t pubkey_size; /* for KEM based groups */
+	size_t ciphertext_size; /* for KEM based groups */
 	gnutls_group_t ids[MAX_HYBRID_GROUPS + 1]; /* IDs of subgroups
 						    * comprising a
 						    * hybrid group,

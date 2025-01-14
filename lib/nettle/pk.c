@@ -695,17 +695,17 @@ cleanup:
 static const char *pk_to_liboqs_algo(gnutls_pk_algorithm_t algo)
 {
 	switch (algo) {
-	case GNUTLS_PK_ML_KEM_768:
+	case GNUTLS_PK_MLKEM768:
 		return OQS_KEM_alg_ml_kem_768;
 	case GNUTLS_PK_EXP_KYBER768:
 		return OQS_KEM_alg_kyber_768;
-	case GNUTLS_PK_ML_KEM_1024:
+	case GNUTLS_PK_MLKEM1024:
 		return OQS_KEM_alg_ml_kem_1024;
-	case GNUTLS_PK_ML_DSA_44:
+	case GNUTLS_PK_MLDSA44:
 		return OQS_SIG_alg_ml_dsa_44;
-	case GNUTLS_PK_ML_DSA_65:
+	case GNUTLS_PK_MLDSA65:
 		return OQS_SIG_alg_ml_dsa_65;
-	case GNUTLS_PK_ML_DSA_87:
+	case GNUTLS_PK_MLDSA87:
 		return OQS_SIG_alg_ml_dsa_87;
 	default:
 		gnutls_assert();
@@ -723,8 +723,8 @@ static int _wrap_nettle_pk_encaps(gnutls_pk_algorithm_t algo,
 
 	switch (algo) {
 #ifdef HAVE_LIBOQS
-	case GNUTLS_PK_ML_KEM_768:
-	case GNUTLS_PK_ML_KEM_1024:
+	case GNUTLS_PK_MLKEM768:
+	case GNUTLS_PK_MLKEM1024:
 	case GNUTLS_PK_EXP_KYBER768: {
 		OQS_KEM *kem = NULL;
 		const char *algo_name;
@@ -792,8 +792,8 @@ static int _wrap_nettle_pk_decaps(gnutls_pk_algorithm_t algo,
 
 	switch (algo) {
 #ifdef HAVE_LIBOQS
-	case GNUTLS_PK_ML_KEM_768:
-	case GNUTLS_PK_ML_KEM_1024:
+	case GNUTLS_PK_MLKEM768:
+	case GNUTLS_PK_MLKEM1024:
 	case GNUTLS_PK_EXP_KYBER768: {
 		OQS_KEM *kem = NULL;
 		const char *algo_name;
@@ -1860,9 +1860,9 @@ static int _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 		break;
 	}
 #ifdef HAVE_LIBOQS
-	case GNUTLS_PK_ML_DSA_44:
-	case GNUTLS_PK_ML_DSA_65:
-	case GNUTLS_PK_ML_DSA_87: {
+	case GNUTLS_PK_MLDSA44:
+	case GNUTLS_PK_MLDSA65:
+	case GNUTLS_PK_MLDSA87: {
 		OQS_SIG *sig;
 		OQS_STATUS rc;
 		size_t size;
@@ -2279,9 +2279,9 @@ static int _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 		break;
 	}
 #ifdef HAVE_LIBOQS
-	case GNUTLS_PK_ML_DSA_44:
-	case GNUTLS_PK_ML_DSA_65:
-	case GNUTLS_PK_ML_DSA_87: {
+	case GNUTLS_PK_MLDSA44:
+	case GNUTLS_PK_MLDSA65:
+	case GNUTLS_PK_MLDSA87: {
 		OQS_SIG *sig;
 		OQS_STATUS rc;
 
@@ -2486,8 +2486,8 @@ static int _wrap_nettle_pk_exists(gnutls_pk_algorithm_t pk)
 	case GNUTLS_PK_EDDSA_ED448:
 		return 1;
 #ifdef HAVE_LIBOQS
-	case GNUTLS_PK_ML_KEM_768:
-	case GNUTLS_PK_ML_KEM_1024:
+	case GNUTLS_PK_MLKEM768:
+	case GNUTLS_PK_MLKEM1024:
 	case GNUTLS_PK_EXP_KYBER768: {
 		const char *algo_name;
 
@@ -2498,9 +2498,9 @@ static int _wrap_nettle_pk_exists(gnutls_pk_algorithm_t pk)
 		return algo_name != NULL &&
 		       GNUTLS_OQS_FUNC(OQS_KEM_alg_is_enabled)(algo_name);
 	}
-	case GNUTLS_PK_ML_DSA_44:
-	case GNUTLS_PK_ML_DSA_65:
-	case GNUTLS_PK_ML_DSA_87: {
+	case GNUTLS_PK_MLDSA44:
+	case GNUTLS_PK_MLDSA65:
+	case GNUTLS_PK_MLDSA87: {
 		const char *algo_name;
 
 		if (_gnutls_liboqs_ensure() < 0)
@@ -2721,10 +2721,10 @@ static int wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 	case GNUTLS_PK_GOST_12_256:
 	case GNUTLS_PK_GOST_12_512:
 #endif
-	case GNUTLS_PK_ML_KEM_768:
-	case GNUTLS_PK_ML_DSA_44:
-	case GNUTLS_PK_ML_DSA_65:
-	case GNUTLS_PK_ML_DSA_87:
+	case GNUTLS_PK_MLKEM768:
+	case GNUTLS_PK_MLDSA44:
+	case GNUTLS_PK_MLDSA65:
+	case GNUTLS_PK_MLDSA87:
 		break;
 	default:
 		gnutls_assert();
@@ -3108,9 +3108,9 @@ static int pct_test(gnutls_pk_algorithm_t algo,
 	case GNUTLS_PK_GOST_01:
 	case GNUTLS_PK_GOST_12_256:
 	case GNUTLS_PK_GOST_12_512:
-	case GNUTLS_PK_ML_DSA_44:
-	case GNUTLS_PK_ML_DSA_65:
-	case GNUTLS_PK_ML_DSA_87:
+	case GNUTLS_PK_MLDSA44:
+	case GNUTLS_PK_MLDSA65:
+	case GNUTLS_PK_MLDSA87:
 		ret = _gnutls_pk_sign(algo, &sig, &ddata, params, &spki);
 		if (ret < 0) {
 			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
@@ -3153,8 +3153,8 @@ static int pct_test(gnutls_pk_algorithm_t algo,
 	case GNUTLS_PK_ECDH_X448:
 		break;
 #ifdef HAVE_LIBOQS
-	case GNUTLS_PK_ML_KEM_768:
-	case GNUTLS_PK_ML_KEM_1024:
+	case GNUTLS_PK_MLKEM768:
+	case GNUTLS_PK_MLKEM1024:
 	case GNUTLS_PK_EXP_KYBER768: {
 		const char *algo_name;
 
@@ -3919,8 +3919,8 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 		break;
 	}
 #ifdef HAVE_LIBOQS
-	case GNUTLS_PK_ML_KEM_768:
-	case GNUTLS_PK_ML_KEM_1024:
+	case GNUTLS_PK_MLKEM768:
+	case GNUTLS_PK_MLKEM1024:
 	case GNUTLS_PK_EXP_KYBER768: {
 		OQS_KEM *kem = NULL;
 		const char *algo_name;
@@ -3975,9 +3975,9 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 		ret = 0;
 		break;
 	}
-	case GNUTLS_PK_ML_DSA_44:
-	case GNUTLS_PK_ML_DSA_65:
-	case GNUTLS_PK_ML_DSA_87:
+	case GNUTLS_PK_MLDSA44:
+	case GNUTLS_PK_MLDSA65:
+	case GNUTLS_PK_MLDSA87:
 		if (params->pkflags & GNUTLS_PK_FLAG_PROVABLE)
 			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
@@ -4290,8 +4290,8 @@ static int wrap_nettle_pk_verify_priv_params(gnutls_pk_algorithm_t algo,
 		break;
 	}
 #ifdef HAVE_LIBOQS
-	case GNUTLS_PK_ML_KEM_768:
-	case GNUTLS_PK_ML_KEM_1024:
+	case GNUTLS_PK_MLKEM768:
+	case GNUTLS_PK_MLKEM1024:
 	case GNUTLS_PK_EXP_KYBER768: {
 		const char *algo_name;
 
@@ -4306,9 +4306,9 @@ static int wrap_nettle_pk_verify_priv_params(gnutls_pk_algorithm_t algo,
 		ret = 0;
 		break;
 	}
-	case GNUTLS_PK_ML_DSA_44:
-	case GNUTLS_PK_ML_DSA_65:
-	case GNUTLS_PK_ML_DSA_87: {
+	case GNUTLS_PK_MLDSA44:
+	case GNUTLS_PK_MLDSA65:
+	case GNUTLS_PK_MLDSA87: {
 		const char *algo_name;
 
 		if (_gnutls_liboqs_ensure() < 0)

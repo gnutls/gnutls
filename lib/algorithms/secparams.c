@@ -65,9 +65,9 @@ static const gnutls_sec_params_entry sec_params[] = {
 	{ "High", GNUTLS_SEC_PARAM_HIGH, 128, 3072, 3072, 256, 256, 0 },
 #endif
 	{ "Ultra", GNUTLS_SEC_PARAM_ULTRA, 192, 8192, 8192, 384, 384,
-	  ML_DSA_65_PUBKEY_SIZE },
+	  MLDSA65_PUBKEY_SIZE },
 	{ "Future", GNUTLS_SEC_PARAM_FUTURE, 256, 15360, 15360, 512, 512,
-	  ML_DSA_87_PUBKEY_SIZE },
+	  MLDSA87_PUBKEY_SIZE },
 	{ NULL, 0, 0, 0, 0, 0, 0, 0 }
 };
 

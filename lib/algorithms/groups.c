@@ -176,19 +176,25 @@ static const gnutls_group_entry_st supported_groups[] = {
 	{
 		.name = "MLKEM768",
 		.id = GNUTLS_GROUP_EXP_MLKEM768,
-		.pk = GNUTLS_PK_ML_KEM_768,
+		.pk = GNUTLS_PK_MLKEM768,
+		.pubkey_size = MLKEM768_PUBKEY_SIZE,
+		.ciphertext_size = MLKEM768_CIPHERTEXT_SIZE,
 		/* absense of .tls_id means that this group alone cannot be used in TLS */
 	},
 	{
 		.name = "MLKEM1024",
 		.id = GNUTLS_GROUP_EXP_MLKEM1024,
-		.pk = GNUTLS_PK_ML_KEM_1024,
+		.pk = GNUTLS_PK_MLKEM1024,
+		.pubkey_size = MLKEM1024_PUBKEY_SIZE,
+		.ciphertext_size = MLKEM1024_CIPHERTEXT_SIZE,
 		/* absense of .tls_id means that this group alone cannot be used in TLS */
 	},
 	{
 		.name = "KYBER768",
 		.id = GNUTLS_GROUP_EXP_KYBER768,
 		.pk = GNUTLS_PK_EXP_KYBER768,
+		.pubkey_size = MLKEM768_PUBKEY_SIZE,
+		.ciphertext_size = MLKEM768_CIPHERTEXT_SIZE,
 		/* absense of .tls_id means that this group alone cannot be used in TLS */
 	},
 	{ .name = "SECP256R1-MLKEM768",

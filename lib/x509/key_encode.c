@@ -300,9 +300,9 @@ int _gnutls_x509_write_pubkey_params(const gnutls_pk_params_st *params,
 	case GNUTLS_PK_EDDSA_ED448:
 	case GNUTLS_PK_ECDH_X25519:
 	case GNUTLS_PK_ECDH_X448:
-	case GNUTLS_PK_ML_DSA_44:
-	case GNUTLS_PK_ML_DSA_65:
-	case GNUTLS_PK_ML_DSA_87:
+	case GNUTLS_PK_MLDSA44:
+	case GNUTLS_PK_MLDSA65:
+	case GNUTLS_PK_MLDSA87:
 		der->data = NULL;
 		der->size = 0;
 
@@ -338,9 +338,9 @@ int _gnutls_x509_write_pubkey(const gnutls_pk_params_st *params,
 	case GNUTLS_PK_GOST_12_256:
 	case GNUTLS_PK_GOST_12_512:
 		return _gnutls_x509_write_gost_pubkey(params, der);
-	case GNUTLS_PK_ML_DSA_44:
-	case GNUTLS_PK_ML_DSA_65:
-	case GNUTLS_PK_ML_DSA_87:
+	case GNUTLS_PK_MLDSA44:
+	case GNUTLS_PK_MLDSA65:
+	case GNUTLS_PK_MLDSA87:
 		return _gnutls_x509_write_ml_dsa_pubkey(params, der);
 	default:
 		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
@@ -1270,9 +1270,9 @@ int _gnutls_asn1_encode_privkey(asn1_node *c2, gnutls_pk_params_st *params)
 	case GNUTLS_PK_DH:
 		/* DH keys are only exportable in PKCS#8 format */
 		return GNUTLS_E_INVALID_REQUEST;
-	case GNUTLS_PK_ML_DSA_44:
-	case GNUTLS_PK_ML_DSA_65:
-	case GNUTLS_PK_ML_DSA_87:
+	case GNUTLS_PK_MLDSA44:
+	case GNUTLS_PK_MLDSA65:
+	case GNUTLS_PK_MLDSA87:
 		return _gnutls_asn1_encode_ml_dsa(c2, params);
 	default:
 		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
