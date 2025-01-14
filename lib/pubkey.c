@@ -67,12 +67,12 @@ unsigned pubkey_to_bits(const gnutls_pk_params_st *params)
 	case GNUTLS_PK_GOST_12_256:
 	case GNUTLS_PK_GOST_12_512:
 		return gnutls_ecc_curve_get_size(params->curve) * 8;
-	case GNUTLS_PK_ML_DSA_44:
-		return ML_DSA_44_PUBKEY_SIZE;
-	case GNUTLS_PK_ML_DSA_65:
-		return ML_DSA_65_PUBKEY_SIZE;
-	case GNUTLS_PK_ML_DSA_87:
-		return ML_DSA_87_PUBKEY_SIZE;
+	case GNUTLS_PK_MLDSA44:
+		return MLDSA44_PUBKEY_SIZE;
+	case GNUTLS_PK_MLDSA65:
+		return MLDSA65_PUBKEY_SIZE;
+	case GNUTLS_PK_MLDSA87:
+		return MLDSA87_PUBKEY_SIZE;
 	default:
 		return 0;
 	}
@@ -357,9 +357,9 @@ int gnutls_pubkey_get_preferred_hash_algorithm(gnutls_pubkey_t key,
 				pubkey_to_bits(&key->params));
 		ret = 0;
 		break;
-	case GNUTLS_PK_ML_DSA_44:
-	case GNUTLS_PK_ML_DSA_65:
-	case GNUTLS_PK_ML_DSA_87:
+	case GNUTLS_PK_MLDSA44:
+	case GNUTLS_PK_MLDSA65:
+	case GNUTLS_PK_MLDSA87:
 		if (hash)
 			*hash = GNUTLS_DIG_SHAKE_256;
 		ret = 0;
@@ -2662,9 +2662,9 @@ int pubkey_verify_data(const gnutls_sign_entry_st *se, const mac_entry_st *me,
 
 	case GNUTLS_PK_EDDSA_ED25519:
 	case GNUTLS_PK_EDDSA_ED448:
-	case GNUTLS_PK_ML_DSA_44:
-	case GNUTLS_PK_ML_DSA_65:
-	case GNUTLS_PK_ML_DSA_87:
+	case GNUTLS_PK_MLDSA44:
+	case GNUTLS_PK_MLDSA65:
+	case GNUTLS_PK_MLDSA87:
 		if (_gnutls_pk_verify(se->pk, data, signature, params,
 				      sign_params) != 0) {
 			gnutls_assert();

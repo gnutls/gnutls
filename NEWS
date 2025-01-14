@@ -21,12 +21,12 @@ See the end for copying conditions.
    draft-kwiatkowski-tls-ecdhe-mlkem-03.
 
 ** API and ABI modifications:
-GNUTLS_PK_ML_DSA_44: New enum member of gnutls_pk_algorithm_t
-GNUTLS_PK_ML_DSA_65: New enum member of gnutls_pk_algorithm_t
-GNUTLS_PK_ML_DSA_87: New enum member of gnutls_pk_algorithm_t
-GNUTLS_SIGN_ML_DSA_44: New enum member of gnutls_sign_algorithm_t
-GNUTLS_SIGN_ML_DSA_65: New enum member of gnutls_sign_algorithm_t
-GNUTLS_SIGN_ML_DSA_87: New enum member of gnutls_sign_algorithm_t
+GNUTLS_PK_MLDSA44: New enum member of gnutls_pk_algorithm_t
+GNUTLS_PK_MLDSA65: New enum member of gnutls_pk_algorithm_t
+GNUTLS_PK_MLDSA87: New enum member of gnutls_pk_algorithm_t
+GNUTLS_SIGN_MLDSA44: New enum member of gnutls_sign_algorithm_t
+GNUTLS_SIGN_MLDSA65: New enum member of gnutls_sign_algorithm_t
+GNUTLS_SIGN_MLDSA87: New enum member of gnutls_sign_algorithm_t
 
 * Version 3.8.8 (released 2024-11-05)
 

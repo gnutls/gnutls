@@ -360,17 +360,17 @@ static int decode_ml_dsa_key(asn1_node *pkey_asn, const gnutls_datum_t *raw_key,
 	pkey->params.algo = gnutls_oid_to_pk(oid);
 
 	switch (pkey->params.algo) {
-	case GNUTLS_PK_ML_DSA_44:
-		raw_priv_size = ML_DSA_44_PRIVKEY_SIZE;
-		raw_pub_size = ML_DSA_44_PUBKEY_SIZE;
+	case GNUTLS_PK_MLDSA44:
+		raw_priv_size = MLDSA44_PRIVKEY_SIZE;
+		raw_pub_size = MLDSA44_PUBKEY_SIZE;
 		break;
-	case GNUTLS_PK_ML_DSA_65:
-		raw_priv_size = ML_DSA_65_PRIVKEY_SIZE;
-		raw_pub_size = ML_DSA_65_PUBKEY_SIZE;
+	case GNUTLS_PK_MLDSA65:
+		raw_priv_size = MLDSA65_PRIVKEY_SIZE;
+		raw_pub_size = MLDSA65_PUBKEY_SIZE;
 		break;
-	case GNUTLS_PK_ML_DSA_87:
-		raw_priv_size = ML_DSA_87_PRIVKEY_SIZE;
-		raw_pub_size = ML_DSA_87_PUBKEY_SIZE;
+	case GNUTLS_PK_MLDSA87:
+		raw_priv_size = MLDSA87_PRIVKEY_SIZE;
+		raw_pub_size = MLDSA87_PUBKEY_SIZE;
 		break;
 	default:
 		return gnutls_assert_val(
@@ -643,7 +643,7 @@ int gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
 						&_data);
 					if (result >= 0) {
 						key->params.algo =
-							GNUTLS_PK_ML_DSA_44;
+							GNUTLS_PK_MLDSA44;
 					}
 #endif
 				}
@@ -1648,9 +1648,9 @@ static const char *set_msg(gnutls_x509_privkey_t key)
 	case GNUTLS_PK_EC:
 		return PEM_KEY_ECC;
 #ifdef HAVE_LIBOQS
-	case GNUTLS_PK_ML_DSA_44:
-	case GNUTLS_PK_ML_DSA_65:
-	case GNUTLS_PK_ML_DSA_87:
+	case GNUTLS_PK_MLDSA44:
+	case GNUTLS_PK_MLDSA65:
+	case GNUTLS_PK_MLDSA87:
 		return PEM_KEY_ML_DSA;
 #endif
 	default:

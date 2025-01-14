@@ -83,9 +83,9 @@ inline static int _encode_privkey(gnutls_x509_privkey_t pkey,
 			gnutls_assert();
 		return ret;
 #ifdef HAVE_LIBOQS
-	case GNUTLS_PK_ML_DSA_44:
-	case GNUTLS_PK_ML_DSA_65:
-	case GNUTLS_PK_ML_DSA_87:
+	case GNUTLS_PK_MLDSA44:
+	case GNUTLS_PK_MLDSA65:
+	case GNUTLS_PK_MLDSA87:
 		ret = _gnutls_x509_encode_string(
 			ASN1_ETYPE_OCTET_STRING, pkey->params.raw_priv.data,
 			pkey->params.raw_priv.size + pkey->params.raw_pub.size,
@@ -1478,11 +1478,11 @@ struct pq_key_length_st {
 };
 
 static const struct pq_key_length_st pq_key_lengths[] = {
-	{ GNUTLS_PK_ML_DSA_44, OQS_SIG_ml_dsa_44_length_secret_key,
+	{ GNUTLS_PK_MLDSA44, OQS_SIG_ml_dsa_44_length_secret_key,
 	  OQS_SIG_ml_dsa_44_length_public_key },
-	{ GNUTLS_PK_ML_DSA_65, OQS_SIG_ml_dsa_65_length_secret_key,
+	{ GNUTLS_PK_MLDSA65, OQS_SIG_ml_dsa_65_length_secret_key,
 	  OQS_SIG_ml_dsa_65_length_public_key },
-	{ GNUTLS_PK_ML_DSA_87, OQS_SIG_ml_dsa_87_length_secret_key,
+	{ GNUTLS_PK_MLDSA87, OQS_SIG_ml_dsa_87_length_secret_key,
 	  OQS_SIG_ml_dsa_87_length_public_key },
 
 	{ GNUTLS_PK_UNKNOWN, 0, 0 }
@@ -1639,9 +1639,9 @@ static int decode_private_key_info(const gnutls_datum_t *der,
 						pkey->params.algo);
 		break;
 #ifdef HAVE_LIBOQS
-	case GNUTLS_PK_ML_DSA_44:
-	case GNUTLS_PK_ML_DSA_65:
-	case GNUTLS_PK_ML_DSA_87:
+	case GNUTLS_PK_MLDSA44:
+	case GNUTLS_PK_MLDSA65:
+	case GNUTLS_PK_MLDSA87:
 		result = _decode_pkcs8_pqc_alg_key(pkcs8_asn, pkey, oid);
 		break;
 #endif

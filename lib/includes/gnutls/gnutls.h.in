@@ -893,9 +893,9 @@ typedef enum gnutls_certificate_print_formats {
  * @GNUTLS_PK_EDDSA_ED448: Edwards curve Digital signature algorithm. Used with SHAKE256 on signatures.
  * @GNUTLS_PK_MLKEM768: ML-KEM-768 key encapsulation algorithm as per FIPS 203.
  * @GNUTLS_PK_MLKEM1024: ML-KEM-1024 key encapsulation algorithm as per FIPS 203.
- * @GNUTLS_PK_ML_DSA_44: ML-DSA-44 digital signature algorithm as per FIPS 204.
- * @GNUTLS_PK_ML_DSA_65: ML-DSA-65 digital signature algorithm as per FIPS 204.
- * @GNUTLS_PK_ML_DSA_87: ML-DSA-87 digital signature algorithm as per FIPS 204.
+ * @GNUTLS_PK_MLDSA44: ML-DSA-44 digital signature algorithm as per FIPS 204.
+ * @GNUTLS_PK_MLDSA65: ML-DSA-65 digital signature algorithm as per FIPS 204.
+ * @GNUTLS_PK_MLDSA87: ML-DSA-87 digital signature algorithm as per FIPS 204.
  *
  * Enumeration of different public-key algorithms.
  */
@@ -915,9 +915,9 @@ typedef enum {
 	GNUTLS_PK_EDDSA_ED448 = 12,
 	GNUTLS_PK_RSA_OAEP = 13,
 	GNUTLS_PK_MLKEM768 = 14,
-	GNUTLS_PK_ML_DSA_44 = 15,
-	GNUTLS_PK_ML_DSA_65 = 16,
-	GNUTLS_PK_ML_DSA_87 = 17,
+	GNUTLS_PK_MLDSA44 = 15,
+	GNUTLS_PK_MLDSA65 = 16,
+	GNUTLS_PK_MLDSA87 = 17,
 	GNUTLS_PK_MLKEM1024 = 18,
 	GNUTLS_PK_MAX = GNUTLS_PK_MLKEM1024,
 
@@ -987,9 +987,9 @@ const char *gnutls_pk_algorithm_get_name(gnutls_pk_algorithm_t algorithm);
  * @GNUTLS_SIGN_GOST_256: Digital signature algorithm GOST R 34.10-2012 with GOST R 34.11-2012 256 bit
  * @GNUTLS_SIGN_GOST_512: Digital signature algorithm GOST R 34.10-2012 with GOST R 34.11-2012 512 bit
  * @GNUTLS_SIGN_EDDSA_ED448: Digital signature algorithm EdDSA with Ed448 curve.
- * @GNUTLS_SIGN_ML_DSA_44: Digital signature algorithm ML-DSA-44.
- * @GNUTLS_SIGN_ML_DSA_65: Digital signature algorithm ML-DSA-65.
- * @GNUTLS_SIGN_ML_DSA_87: Digital signature algorithm ML-DSA-87.
+ * @GNUTLS_SIGN_MLDSA44: Digital signature algorithm ML-DSA-44.
+ * @GNUTLS_SIGN_MLDSA65: Digital signature algorithm ML-DSA-65.
+ * @GNUTLS_SIGN_MLDSA87: Digital signature algorithm ML-DSA-87.
  *
  * Enumeration of different digital signature algorithms.
  */
@@ -1048,10 +1048,10 @@ typedef enum {
 	GNUTLS_SIGN_GOST_512 = 45,
 	GNUTLS_SIGN_EDDSA_ED448 = 46,
 
-	GNUTLS_SIGN_ML_DSA_44 = 47,
-	GNUTLS_SIGN_ML_DSA_65 = 48,
-	GNUTLS_SIGN_ML_DSA_87 = 49,
-	GNUTLS_SIGN_MAX = GNUTLS_SIGN_ML_DSA_87
+	GNUTLS_SIGN_MLDSA44 = 47,
+	GNUTLS_SIGN_MLDSA65 = 48,
+	GNUTLS_SIGN_MLDSA87 = 49,
+	GNUTLS_SIGN_MAX = GNUTLS_SIGN_MLDSA87
 } gnutls_sign_algorithm_t;
 
 /**

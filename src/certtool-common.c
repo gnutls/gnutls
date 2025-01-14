@@ -1664,11 +1664,11 @@ gnutls_pk_algorithm_t figure_key_type(const char *key_type)
 	else if (strcasecmp(key_type, "gost12-512") == 0)
 		return GNUTLS_PK_GOST_12_512;
 	else if (strcasecmp(key_type, "mldsa44") == 0)
-		return GNUTLS_PK_ML_DSA_44;
+		return GNUTLS_PK_MLDSA44;
 	else if (strcasecmp(key_type, "mldsa65") == 0)
-		return GNUTLS_PK_ML_DSA_65;
+		return GNUTLS_PK_MLDSA65;
 	else if (strcasecmp(key_type, "mldsa87") == 0)
-		return GNUTLS_PK_ML_DSA_87;
+		return GNUTLS_PK_MLDSA87;
 	else {
 		fprintf(stderr, "unknown key type: %s\n", key_type);
 		return GNUTLS_PK_UNKNOWN;
