@@ -874,7 +874,6 @@ typedef enum gnutls_certificate_print_formats {
 #define GNUTLS_PK_EC GNUTLS_PK_ECDSA
 
 #define GNUTLS_PK_ECDHX GNUTLS_PK_ECDH_X25519
-#define GNUTLS_PK_MLKEM768 GNUTLS_PK_ML_KEM_768
 
 /**
  * gnutls_pk_algorithm_t:
@@ -892,8 +891,8 @@ typedef enum gnutls_certificate_print_formats {
  * @GNUTLS_PK_GOST_12_512: GOST R 34.10-2012 algorithm, 512-bit key per rfc7091.
  * @GNUTLS_PK_ECDH_X448: Elliptic curve algorithm, restricted to ECDH as per rfc7748.
  * @GNUTLS_PK_EDDSA_ED448: Edwards curve Digital signature algorithm. Used with SHAKE256 on signatures.
- * @GNUTLS_PK_ML_KEM_768: ML-KEM-768 key encapsulation algorithm as per FIPS 203.
- * @GNUTLS_PK_ML_KEM_1024: ML-KEM-1024 key encapsulation algorithm as per FIPS 203.
+ * @GNUTLS_PK_MLKEM768: ML-KEM-768 key encapsulation algorithm as per FIPS 203.
+ * @GNUTLS_PK_MLKEM1024: ML-KEM-1024 key encapsulation algorithm as per FIPS 203.
  * @GNUTLS_PK_ML_DSA_44: ML-DSA-44 digital signature algorithm as per FIPS 204.
  * @GNUTLS_PK_ML_DSA_65: ML-DSA-65 digital signature algorithm as per FIPS 204.
  * @GNUTLS_PK_ML_DSA_87: ML-DSA-87 digital signature algorithm as per FIPS 204.
@@ -915,12 +914,12 @@ typedef enum {
 	GNUTLS_PK_ECDH_X448 = 11,
 	GNUTLS_PK_EDDSA_ED448 = 12,
 	GNUTLS_PK_RSA_OAEP = 13,
-	GNUTLS_PK_ML_KEM_768 = 14,
+	GNUTLS_PK_MLKEM768 = 14,
 	GNUTLS_PK_ML_DSA_44 = 15,
 	GNUTLS_PK_ML_DSA_65 = 16,
 	GNUTLS_PK_ML_DSA_87 = 17,
-	GNUTLS_PK_ML_KEM_1024 = 18,
-	GNUTLS_PK_MAX = GNUTLS_PK_ML_KEM_1024,
+	GNUTLS_PK_MLKEM1024 = 18,
+	GNUTLS_PK_MAX = GNUTLS_PK_MLKEM1024,
 
 	/* Experimental algorithms */
 	GNUTLS_PK_EXP_KYBER768 = 256,

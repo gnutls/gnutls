@@ -14,6 +14,12 @@ See the end for copying conditions.
    currently marked as experimental and can only be enabled when
    compiled with --with-liboqs. Contributed by David Dudas.
 
+** libgnutls: Support for ML-KEM-1024 key encapsulation mechanism
+   The support for ML-KEM post-quantum key encapsulation mechanisms
+   has been extended to cover ML-KEM-1024, in addition to ML-KEM-768.
+   MLKEM1024 is only offered as SecP384r1MLKEM1024 hybrid as per
+   draft-kwiatkowski-tls-ecdhe-mlkem-03.
+
 ** API and ABI modifications:
 GNUTLS_PK_ML_DSA_44: New enum member of gnutls_pk_algorithm_t
 GNUTLS_PK_ML_DSA_65: New enum member of gnutls_pk_algorithm_t
@@ -21,13 +27,6 @@ GNUTLS_PK_ML_DSA_87: New enum member of gnutls_pk_algorithm_t
 GNUTLS_SIGN_ML_DSA_44: New enum member of gnutls_sign_algorithm_t
 GNUTLS_SIGN_ML_DSA_65: New enum member of gnutls_sign_algorithm_t
 GNUTLS_SIGN_ML_DSA_87: New enum member of gnutls_sign_algorithm_t
-GNUTLS_PK_ML_KEM_768: Renamed from GNUTLS_PK_MLKEM768; compatibility macro is provided
-** libgnutls: Support for ML-KEM-1024 key encapsulation mechanism
-   The support for ML-KEM post-quantum key encapsulation mechanisms
-   has been extended to cover ML-KEM-1024, in addition to ML-KEM-768.
-   MLKEM1024 is only offered as SecP384r1MLKEM1024 hybrid as per
-   draft-kwiatkowski-tls-ecdhe-mlkem-03.
-
 
 * Version 3.8.8 (released 2024-11-05)
 

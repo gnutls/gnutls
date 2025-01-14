@@ -204,11 +204,11 @@ static const gnutls_pk_entry pk_algorithms[] = {
 	  .curve = GNUTLS_ECC_CURVE_X448 },
 	{ .name = "ML-KEM-768",
 	  .oid = NULL,
-	  .id = GNUTLS_PK_ML_KEM_768,
+	  .id = GNUTLS_PK_MLKEM768,
 	  .curve = GNUTLS_ECC_CURVE_INVALID },
 	{ .name = "ML-KEM-1024",
 	  .oid = NULL,
-	  .id = GNUTLS_PK_ML_KEM_1024,
+	  .id = GNUTLS_PK_MLKEM1024,
 	  .curve = GNUTLS_ECC_CURVE_INVALID },
 /* Hidden behind HAVE_LIBOQS as it will be removed in the future.
 	 */
