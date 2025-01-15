@@ -482,7 +482,10 @@ static int gnutls_pubkey_import_ecc_eddsa(gnutls_pubkey_t key,
 					  const gnutls_datum_t *parameters,
 					  const gnutls_datum_t *ecpoint)
 {
-	int ret;
+	int ret, tag_len;
+	unsigned long tag = 0;
+	unsigned char class;
+	unsigned int etype;
 
 	gnutls_ecc_curve_t curve = GNUTLS_ECC_CURVE_INVALID;
 	gnutls_datum_t raw_point = { NULL, 0 };
@@ -492,16 +495,43 @@ static int gnutls_pubkey_import_ecc_eddsa(gnutls_pubkey_t key,
 		return gnutls_assert_val(ret);
 	}
 
-	ret = _gnutls_x509_decode_string(ASN1_ETYPE_OCTET_STRING, ecpoint->data,
-					 ecpoint->size, &raw_point, 0);
-	if (ret < 0) {
-		gnutls_assert();
-		gnutls_free(raw_point.data);
-		return ret;
+	/* Even though the PKCS#11 3.1 spec defines EC_POINT as
+	 * "Public key bytes in little endian order", previous version
+         * of the spec caused confusion and lot of implementations instead
+         * store EC_POINT DER encoded either as a BIT STRING or OCTET STRING.
+         * We need to check all three options.
+	 */
+	if (ecpoint->size == (unsigned int)gnutls_ecc_curve_get_size(curve)) {
+		raw_point.data = ecpoint->data;
+		raw_point.size = ecpoint->size;
+	} else {
+		ret = asn1_get_tag_der(ecpoint->data, ecpoint->size, &class,
+				       &tag_len, &tag);
+		if (ret != ASN1_SUCCESS)
+			return gnutls_assert_val(_gnutls_asn2err(ret));
+
+		switch (tag) {
+		case 0x03:
+			etype = ASN1_ETYPE_BIT_STRING;
+			break;
+		case 0x04:
+			etype = ASN1_ETYPE_OCTET_STRING;
+			break;
+		default:
+			return gnutls_assert_val(GNUTLS_E_ASN1_TAG_ERROR);
+		}
+
+		ret = _gnutls_x509_decode_string(etype, ecpoint->data,
+						 ecpoint->size, &raw_point, 0);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
 	}
+
 	ret = gnutls_pubkey_import_ecc_raw(key, curve, &raw_point, NULL);
 
-	gnutls_free(raw_point.data);
+	if (raw_point.data != ecpoint->data)
+		gnutls_free(raw_point.data);
+
 	return ret;
 }
 
