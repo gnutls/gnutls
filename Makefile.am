@@ -50,7 +50,7 @@ endif
 
 ACLOCAL_AMFLAGS = -I m4 -I src/gl/m4 -I lib/unistring/m4 --install
 
-EXTRA_DIST = cfg.mk maint.mk CONTRIBUTING.md README.md LICENSE AUTHORS NEWS \
+EXTRA_DIST = cfg.mk maint.mk CONTRIBUTING.md README.md COPYING.LESSERv2 COPYING AUTHORS NEWS \
 	ChangeLog THANKS INSTALL.md RELEASES.md .mailmap
 
 DISTCLEANFILES = AUTHORS

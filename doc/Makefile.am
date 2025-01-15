@@ -21,7 +21,7 @@
 EXTRA_DIST = TODO certtool.cfg gnutls.html	\
 	doxygen/Doxyfile.in doxygen/Doxyfile.orig texinfo.css \
 	stamp_enums stamp_functions \
-	doc.mk COPYING COPYING.LESSER
+	doc.mk
 
 IMAGES = \
 	gnutls-handshake-state.png	\
