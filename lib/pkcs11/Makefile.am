@@ -37,7 +37,8 @@ noinst_LTLIBRARIES = libgnutls_pkcs11.la
 
 libgnutls_pkcs11_la_SOURCES = \
 	p11_provider.c p11_provider.h \
-	p11_cipher.c p11_cipher.h
+	p11_cipher.c p11_cipher.h \
+	p11_pk.c
 
 libgnutls_pkcs11_la_LIBADD = $(P11_KIT_LIBS) $(LIBPMULTITHREAD)
 
