@@ -23,6 +23,7 @@
 #include "errors.h"
 #include "gnutls_int.h"
 #include "cipher_int.h"
+#include "p11_cipher.h"
 #include "p11_provider.h"
 
 #define P11_KIT_FUTURE_UNSTABLE_API
@@ -84,6 +85,12 @@ int _p11_provider_init(const char *module_path, const uint8_t *pin,
 	}
 	memcpy(_pin, pin, pin_size);
 
+	ret = _p11_ciphers_init(modules[0], slot);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
 	p11_provider.module = modules[0];
 	p11_provider.slot = slot;
 	p11_provider.pin = _pin;
@@ -97,6 +104,7 @@ error:
 	gnutls_free(_pin);
 	p11_kit_module_finalize(modules[0]);
 	p11_kit_module_release(modules[0]);
+	_p11_ciphers_deinit();
 	return ret;
 }
 
@@ -109,6 +117,7 @@ void _p11_provider_deinit(void)
 	p11_kit_module_finalize(p11_provider.module);
 	p11_kit_module_release(p11_provider.module);
 	memset(&p11_provider, 0, sizeof(p11_provider));
+	_p11_ciphers_deinit();
 }
 
 bool _p11_provider_is_initialized(void)

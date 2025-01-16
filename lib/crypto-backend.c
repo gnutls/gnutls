@@ -30,6 +30,10 @@
 #include "random.h"
 #include "cipher_int.h"
 
+#ifdef ENABLE_PKCS11
+#include "pkcs11/p11_provider.h"
+#endif
+
 /* default values for priorities */
 int crypto_mac_prio = INT_MAX;
 int crypto_digest_prio = INT_MAX;
