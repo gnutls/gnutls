@@ -28,7 +28,6 @@
 #include "crypto-backend.h"
 
 extern int crypto_cipher_prio;
-extern gnutls_crypto_cipher_st _gnutls_cipher_ops;
 
 typedef int (*cipher_encrypt_func)(void *hd, const void *plaintext, size_t,
 				   void *ciphertext, size_t);

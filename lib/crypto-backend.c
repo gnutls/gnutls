@@ -148,6 +148,65 @@ void _gnutls_crypto_deregister(void)
 	_deregister(&glob_dl);
 }
 
+extern gnutls_crypto_cipher_st _gnutls_cipher_ops;
+extern gnutls_crypto_pk_st _gnutls_pk_ops;
+extern gnutls_crypto_mac_st _gnutls_mac_ops;
+extern gnutls_crypto_digest_st _gnutls_digest_ops;
+extern gnutls_crypto_kdf_st _gnutls_kdf_ops;
+
+#ifdef ENABLE_PKCS11
+extern gnutls_crypto_cipher_st _gnutls_p11_cipher_ops;
+extern gnutls_crypto_pk_st _gnutls_p11_pk_ops;
+extern gnutls_crypto_mac_st _gnutls_p11_mac_ops;
+extern gnutls_crypto_digest_st _gnutls_p11_digest_ops;
+extern gnutls_crypto_kdf_st _gnutls_p11_kdf_ops;
+#endif
+
+const gnutls_crypto_cipher_st *_gnutls_cipher_backend(void)
+{
+#if defined(ENABLE_PKCS11) && defined(ENABLE_FIPS140)
+	if (_p11_provider_is_initialized())
+		return &_gnutls_p11_cipher_ops;
+#endif
+	return &_gnutls_cipher_ops;
+}
+
+const gnutls_crypto_pk_st *_gnutls_pk_backend(void)
+{
+#if defined(ENABLE_PKCS11) && defined(ENABLE_FIPS140)
+	if (_p11_provider_is_initialized())
+		return &_gnutls_p11_pk_ops;
+#endif
+	return &_gnutls_pk_ops;
+}
+
+const gnutls_crypto_mac_st *_gnutls_mac_backend(void)
+{
+#if defined(ENABLE_PKCS11) && defined(ENABLE_FIPS140)
+	if (_p11_provider_is_initialized())
+		return &_gnutls_p11_mac_ops;
+#endif
+	return &_gnutls_mac_ops;
+}
+
+const gnutls_crypto_digest_st *_gnutls_digest_backend(void)
+{
+#if defined(ENABLE_PKCS11) && defined(ENABLE_FIPS140)
+	if (_p11_provider_is_initialized())
+		return &_gnutls_p11_digest_ops;
+#endif
+	return &_gnutls_digest_ops;
+}
+
+const gnutls_crypto_kdf_st *_gnutls_kdf_backend(void)
+{
+#if defined(ENABLE_PKCS11) && defined(ENABLE_FIPS140)
+	if (_p11_provider_is_initialized())
+		return &_gnutls_p11_kdf_ops;
+#endif
+	return &_gnutls_kdf_ops;
+}
+
 /*-
  * gnutls_crypto_single_cipher_register:
  * @algorithm: is the gnutls algorithm identifier

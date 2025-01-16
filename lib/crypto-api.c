@@ -2054,8 +2054,6 @@ void gnutls_aead_cipher_deinit(gnutls_aead_cipher_hd_t handle)
 	gnutls_free(handle);
 }
 
-extern gnutls_crypto_kdf_st _gnutls_kdf_ops;
-
 /* Same as @gnutls_hkdf_extract but without changing FIPS context */
 int _gnutls_hkdf_extract(gnutls_mac_algorithm_t mac, const gnutls_datum_t *key,
 			 const gnutls_datum_t *salt, void *output)
@@ -2069,9 +2067,10 @@ int _gnutls_hkdf_extract(gnutls_mac_algorithm_t mac, const gnutls_datum_t *key,
 	/* We don't check whether MAC is approved, because HKDF is
 	 * only approved in TLS, which is handled separately. */
 
-	return _gnutls_kdf_ops.hkdf_extract(mac, key->data, key->size,
-					    salt ? salt->data : NULL,
-					    salt ? salt->size : 0, output);
+	return _gnutls_kdf_backend()->hkdf_extract(mac, key->data, key->size,
+						   salt ? salt->data : NULL,
+						   salt ? salt->size : 0,
+						   output);
 }
 
 /**
@@ -2115,9 +2114,9 @@ int _gnutls_hkdf_expand(gnutls_mac_algorithm_t mac, const gnutls_datum_t *key,
 	/* We don't check whether MAC is approved, because HKDF is
 	 * only approved in TLS, which is handled separately. */
 
-	return _gnutls_kdf_ops.hkdf_expand(mac, key->data, key->size,
-					   info->data, info->size, output,
-					   length);
+	return _gnutls_kdf_backend()->hkdf_expand(mac, key->data, key->size,
+						  info->data, info->size,
+						  output, length);
 }
 
 /**
@@ -2199,8 +2198,9 @@ int gnutls_pbkdf2(gnutls_mac_algorithm_t mac, const gnutls_datum_t *key,
 		not_approved = true;
 	}
 
-	ret = _gnutls_kdf_ops.pbkdf2(mac, key->data, key->size, salt->data,
-				     salt->size, iter_count, output, length);
+	ret = _gnutls_kdf_backend()->pbkdf2(mac, key->data, key->size,
+					    salt->data, salt->size, iter_count,
+					    output, length);
 	if (ret < 0) {
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 	} else if (not_approved) {

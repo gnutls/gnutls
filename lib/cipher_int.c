@@ -30,6 +30,10 @@
 #include "fips.h"
 #include "algorithms.h"
 
+#ifdef ENABLE_PKCS11
+#include "pkcs11/p11_provider.h"
+#endif
+
 #define SR_FB(x, cleanup)                                       \
 	ret = (x);                                              \
 	if (ret < 0) {                                          \
@@ -55,9 +59,6 @@
  */
 int _gnutls_cipher_exists(gnutls_cipher_algorithm_t cipher)
 {
-	const gnutls_crypto_cipher_st *cc;
-	int ret;
-
 	if (!is_cipher_algo_allowed(cipher))
 		return 0;
 
@@ -68,12 +69,10 @@ int _gnutls_cipher_exists(gnutls_cipher_algorithm_t cipher)
 	if (cipher == GNUTLS_CIPHER_NULL)
 		return 1;
 
-	cc = _gnutls_get_crypto_cipher(cipher);
-	if (cc != NULL)
+	if (_gnutls_get_crypto_cipher(cipher) != NULL)
 		return 1;
 
-	ret = _gnutls_cipher_ops.exists(cipher);
-	return ret;
+	return _gnutls_cipher_backend()->exists(cipher);
 }
 
 int _gnutls_cipher_init(cipher_hd_st *handle, const cipher_entry_st *e,
@@ -82,6 +81,7 @@ int _gnutls_cipher_init(cipher_hd_st *handle, const cipher_entry_st *e,
 {
 	int ret = GNUTLS_E_INTERNAL_ERROR;
 	const gnutls_crypto_cipher_st *cc = NULL;
+	const gnutls_crypto_cipher_st *fallback_cc = _gnutls_cipher_backend();
 
 	if (unlikely(e == NULL || e->id == GNUTLS_CIPHER_NULL))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -90,6 +90,12 @@ int _gnutls_cipher_init(cipher_hd_st *handle, const cipher_entry_st *e,
 
 	handle->e = e;
 	handle->handle = NULL;
+
+#if defined(ENABLE_PKCS11) && defined(ENABLE_FIPS140)
+	/* Prioritize crypto from pkcs11 provider */
+	if (_p11_provider_is_initialized())
+		goto fallback;
+#endif
 
 	/* check if a cipher has been registered
 	 */
@@ -130,34 +136,33 @@ int _gnutls_cipher_init(cipher_hd_st *handle, const cipher_entry_st *e,
 	}
 
 fallback:
-	handle->encrypt = _gnutls_cipher_ops.encrypt;
-	handle->decrypt = _gnutls_cipher_ops.decrypt;
-	handle->aead_encrypt = _gnutls_cipher_ops.aead_encrypt;
-	handle->aead_decrypt = _gnutls_cipher_ops.aead_decrypt;
-	handle->deinit = _gnutls_cipher_ops.deinit;
-	handle->auth = _gnutls_cipher_ops.auth;
-	handle->tag = _gnutls_cipher_ops.tag;
-	handle->setiv = _gnutls_cipher_ops.setiv;
-	handle->getiv = _gnutls_cipher_ops.getiv;
-	handle->setkey = _gnutls_cipher_ops.setkey;
+	handle->encrypt = fallback_cc->encrypt;
+	handle->decrypt = fallback_cc->decrypt;
+	handle->aead_encrypt = fallback_cc->aead_encrypt;
+	handle->aead_decrypt = fallback_cc->aead_decrypt;
+	handle->deinit = fallback_cc->deinit;
+	handle->auth = fallback_cc->auth;
+	handle->tag = fallback_cc->tag;
+	handle->setiv = fallback_cc->setiv;
+	handle->getiv = fallback_cc->getiv;
+	handle->setkey = fallback_cc->setkey;
 
 	/* otherwise use generic cipher interface
 	 */
-	ret = _gnutls_cipher_ops.init(e->id, &handle->handle, enc);
+	ret = fallback_cc->init(e->id, &handle->handle, enc);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
 	}
 
-	ret = _gnutls_cipher_ops.setkey(handle->handle, key->data, key->size);
+	ret = fallback_cc->setkey(handle->handle, key->data, key->size);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cc_cleanup;
 	}
 
 	if (iv) {
-		ret = _gnutls_cipher_ops.setiv(handle->handle, iv->data,
-					       iv->size);
+		ret = fallback_cc->setiv(handle->handle, iv->data, iv->size);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cc_cleanup;

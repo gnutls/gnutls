@@ -467,4 +467,10 @@ int _gnutls_rsa_pss_sign_pad(gnutls_x509_spki_st *params, size_t key_bits,
 			     const gnutls_datum_t *data, unsigned char *buffer,
 			     size_t buffer_size);
 
+const gnutls_crypto_cipher_st *_gnutls_cipher_backend(void) ATTRIBUTE_PURE;
+const gnutls_crypto_pk_st *_gnutls_pk_backend(void) ATTRIBUTE_PURE;
+const gnutls_crypto_mac_st *_gnutls_mac_backend(void) ATTRIBUTE_PURE;
+const gnutls_crypto_digest_st *_gnutls_digest_backend(void) ATTRIBUTE_PURE;
+const gnutls_crypto_kdf_st *_gnutls_kdf_backend(void) ATTRIBUTE_PURE;
+
 #endif /* GNUTLS_LIB_CRYPTO_BACKEND_H */
