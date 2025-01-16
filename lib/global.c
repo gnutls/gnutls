@@ -45,6 +45,10 @@
 #include <leancrypto.h>
 #endif
 
+#ifdef ENABLE_PKCS11
+#include "pkcs11/p11_provider.h"
+#endif
+
 /* Minimum library versions we accept. */
 #define GNUTLS_MIN_LIBTASN1_VERSION "0.3.4"
 
@@ -244,6 +248,10 @@ static int _gnutls_global_init(unsigned constructor)
 	int ret = 0, res;
 	int level;
 	const char *e;
+#if defined(ENABLE_PKCS11) && defined(ENABLE_FIPS140)
+	const char *p11_provider_path = NULL;
+	const char *p11_provider_pin = NULL;
+#endif
 
 	if (!constructor) {
 		ret = gnutls_static_mutex_lock(&global_init_mutex);
@@ -391,7 +399,24 @@ static int _gnutls_global_init(unsigned constructor)
 		_gnutls_fips_mode_reset_zombie();
 	}
 #endif
+
 	_gnutls_prepare_to_load_system_priorities();
+
+#if defined(ENABLE_PKCS11) && defined(ENABLE_FIPS140)
+	p11_provider_path = _gnutls_config_get_p11_provider_path();
+	p11_provider_pin = _gnutls_config_get_p11_provider_pin();
+
+	if (res == 1 && p11_provider_path != NULL) {
+		ret = _p11_provider_init(p11_provider_path,
+					 (const uint8_t *)p11_provider_pin,
+					 strlen(p11_provider_pin));
+		if (ret < 0) {
+			gnutls_assert();
+			goto out;
+		}
+	}
+#endif
+
 	_gnutls_switch_lib_state(LIB_STATE_OPERATIONAL);
 	ret = 0;
 
@@ -434,6 +459,10 @@ static void _gnutls_global_deinit(unsigned destructor)
 
 		_gnutls_supplemental_deinit();
 		_gnutls_unload_system_priorities();
+
+#if defined(ENABLE_PKCS11) && defined(ENABLE_FIPS140)
+		_p11_provider_deinit();
+#endif
 
 #ifdef ENABLE_PKCS11
 		/* Do not try to deinitialize the PKCS #11 libraries

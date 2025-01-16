@@ -1555,6 +1555,7 @@ AC_CONFIG_FILES([
   lib/includes/gnutls/gnutls.h
   lib/minitasn1/Makefile
   lib/nettle/Makefile
+  lib/pkcs11/Makefile
   lib/x509/Makefile
   lib/unistring/Makefile
   po/Makefile.in

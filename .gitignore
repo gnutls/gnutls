@@ -235,6 +235,9 @@ lib/openpgp/libgnutls_openpgp.la
 lib/openpgp/Makefile
 lib/openpgp/Makefile.in
 lib/openpgp/pgp-api.texi
+lib/pkcs11/libgnutls_pkcs11.la
+lib/pkcs11/Makefile
+lib/pkcs11/Makefile.in
 lib/priority_options.h
 .libs
 libtool

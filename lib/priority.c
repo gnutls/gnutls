@@ -1022,6 +1022,9 @@ struct cfg {
 	gnutls_compression_method_t
 		cert_comp_algs[MAX_COMPRESS_CERTIFICATE_METHODS + 1];
 
+	char *p11_provider_path;
+	char *p11_provider_pin;
+
 	ext_master_secret_t force_ext_master_secret;
 	bool force_ext_master_secret_set;
 };
@@ -1039,6 +1042,8 @@ static inline void cfg_deinit(struct cfg *cfg)
 	}
 	gnutls_free(cfg->priority_string);
 	gnutls_free(cfg->default_priority_string);
+	gnutls_free(cfg->p11_provider_path);
+	gnutls_free(cfg->p11_provider_pin);
 }
 
 /* Lock for reading and writing system_wide_config */
@@ -1052,6 +1057,7 @@ static unsigned system_priority_file_loaded = 0;
 
 #define GLOBAL_SECTION "global"
 #define CUSTOM_PRIORITY_SECTION "priorities"
+#define PROVIDER_SECTION "provider"
 #define OVERRIDES_SECTION "overrides"
 #define MAX_ALGO_NAME 2048
 
@@ -1137,6 +1143,12 @@ static inline void cfg_steal(struct cfg *dst, struct cfg *src)
 
 	dst->default_priority_string = src->default_priority_string;
 	src->default_priority_string = NULL;
+
+	dst->p11_provider_path = src->p11_provider_path;
+	src->p11_provider_path = NULL;
+
+	dst->p11_provider_pin = src->p11_provider_pin;
+	src->p11_provider_pin = NULL;
 
 	dst->allowlisting = src->allowlisting;
 	dst->ktls_enabled = src->ktls_enabled;
@@ -1607,6 +1619,49 @@ static int cfg_ini_handler(void *_ctx, const char *section, const char *name,
 					     value);
 		if (ret < 0)
 			return 0;
+	} else if (c_strcasecmp(section, PROVIDER_SECTION) == 0) {
+		if (c_strcasecmp(name, "path") == 0) {
+			gnutls_free(cfg->p11_provider_path);
+			cfg->p11_provider_path = NULL;
+			p = clear_spaces(value, str);
+			_gnutls_debug_log(
+				"cfg: adding pkcs11 provider path %s\n", p);
+			if (strlen(p) > 0) {
+				cfg->p11_provider_path = gnutls_strdup(p);
+				if (cfg->p11_provider_path == NULL) {
+					_gnutls_debug_log(
+						"cfg: failed setting pkcs11 provider path\n");
+					return 0;
+				}
+			} else {
+				_gnutls_debug_log(
+					"cfg: empty pkcs11 provider path, using default\n");
+				if (fail_on_invalid_config)
+					return 0;
+			}
+		} else if (c_strcasecmp(name, "pin") == 0) {
+			gnutls_free(cfg->p11_provider_pin);
+			cfg->p11_provider_pin = NULL;
+			p = clear_spaces(value, str);
+			_gnutls_debug_log("cfg: adding pkcs11 provider pin\n");
+			if (strlen(p) > 0) {
+				cfg->p11_provider_pin = gnutls_strdup(p);
+				if (cfg->p11_provider_pin == NULL) {
+					_gnutls_debug_log(
+						"cfg: failed setting pkcs11 provider pin\n");
+					return 0;
+				}
+			} else {
+				_gnutls_debug_log(
+					"cfg: empty pkcs11 provider pin, using default\n");
+				if (fail_on_invalid_config)
+					return 0;
+			}
+		} else {
+			_gnutls_debug_log("unknown parameter %s\n", name);
+			if (fail_on_invalid_config)
+				return 0;
+		}
 	} else if (c_strcasecmp(section, OVERRIDES_SECTION) == 0) {
 		if (!override_allowed(cfg->allowlisting, name)) {
 			_gnutls_debug_log(
@@ -4038,6 +4093,16 @@ int _gnutls_config_set_certificate_compression_methods(gnutls_session_t session)
 		return gnutls_assert_val(ret);
 
 	return 0;
+}
+
+const char *_gnutls_config_get_p11_provider_path(void)
+{
+	return system_wide_config.p11_provider_path;
+}
+
+const char *_gnutls_config_get_p11_provider_pin(void)
+{
+	return system_wide_config.p11_provider_pin;
 }
 
 /*

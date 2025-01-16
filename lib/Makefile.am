@@ -25,6 +25,10 @@ BUILT_SOURCES = pkix_asn1_tab.c gnutls_asn1_tab.c priority_options.h
 
 SUBDIRS = includes x509 auth ext algorithms extras accelerated
 
+if ENABLE_PKCS11
+SUBDIRS += pkcs11
+endif
+
 if ENABLE_MINITASN1
 SUBDIRS += minitasn1
 endif
@@ -217,6 +221,10 @@ libgnutls_la_LIBADD = ../gl/libgnu.la x509/libgnutls_x509.la \
 	extras/libgnutls_extras.la
 thirdparty_libadd += $(LTLIBINTL) $(LIBSOCKET) $(LTLIBNSL) \
 	$(P11_KIT_LIBS) $(LIB_SELECT) $(GNUTLS_LIBS_PRIVATE)
+
+if ENABLE_PKCS11
+libgnutls_la_LIBADD += pkcs11/libgnutls_pkcs11.la
+endif
 
 if HAVE_LIBIDN2
 thirdparty_libadd += $(LIBIDN2_LIBS)
