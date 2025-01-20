@@ -1326,10 +1326,34 @@ AS_IF([test "$ac_libzstd" = dlopen], [
     fi
 ])
 
+AC_ARG_WITH(leancrypto,
+   [AS_HELP_STRING([--with-leancrypto],
+                  [enable leancrypto support])],
+            ac_leancrypto=$withval, ac_leancrypto=no)
+
+AS_IF([test x$ac_leancrypto != xno],
+    [PKG_CHECK_MODULES([LEANCRYPTO], [leancrypto >= 1.2.0],
+      [AC_DEFINE([HAVE_LEANCRYPTO], 1, [Have leancrypto])],
+      [AC_MSG_ERROR([leancrypto support was requested but the required libraries were not found.])])])
+
+AM_CONDITIONAL(ENABLE_LEANCRYPTO, test "$ac_leancrypto" != "no")
+
+AM_COND_IF([ENABLE_LEANCRYPTO], [
+    if test "x$GNUTLS_REQUIRES_PRIVATE" = x; then
+        GNUTLS_REQUIRES_PRIVATE="Requires.private: leancrypto"
+    else
+        GNUTLS_REQUIRES_PRIVATE="$GNUTLS_REQUIRES_PRIVATE, leancrypto"
+    fi
+])
+
 AC_ARG_WITH(liboqs,
    [AS_HELP_STRING([--with-liboqs=yes/link/dlopen --with-liboqs],
                   [customize/enable liboqs support])],
             ac_liboqs=$withval, ac_liboqs=no)
+
+AS_IF([test "$ac_leancrypto" != no && test "$ac_liboqs" != no],
+  [AC_MSG_ERROR([--with-leancrypto and --with-liboqs are mutually exclusive])])
+
 AS_CASE([$ac_liboqs],
   [yes],
     [AM_COND_IF([ENABLE_DLOPEN], [ac_liboqs=dlopen], [ac_liboqs=link])],

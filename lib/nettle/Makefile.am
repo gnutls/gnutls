@@ -40,6 +40,10 @@ if LIBOQS_ENABLE_DLOPEN
 AM_CPPFLAGS += $(LIBOQS_CFLAGS) -DGNUTLS_OQS_ENABLE_DLOPEN=1
 endif
 
+if ENABLE_LEANCRYPTO
+AM_CPPFLAGS += $(LEANCRYPTO_CFLAGS)
+endif
+
 noinst_LTLIBRARIES = libcrypto.la
 
 libcrypto_la_SOURCES = pk.c mpi.c mac.c cipher.c init.c \

@@ -138,6 +138,11 @@ thirdparty_libadd += $(LIBOQS_LIBS)
 endif
 endif
 
+if ENABLE_LEANCRYPTO
+AM_CPPFLAGS += $(LEANCRYPTO_CFLAGS)
+thirdparty_libadd += $(LEANCRYPTO_LIBS)
+endif
+
 if ENABLE_GOST
 COBJECTS += vko.c
 endif

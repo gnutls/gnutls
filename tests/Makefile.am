@@ -603,9 +603,7 @@ ctests += win32-certopenstore
 
 endif
 
-if ENABLE_LIBOQS
 dist_check_SCRIPTS += pqc-hybrid-kx.sh
-endif
 
 cpptests =
 if ENABLE_CXX

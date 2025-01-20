@@ -38,6 +38,7 @@
 #include "pk.h"
 #include "attributes.h"
 #include "prov-seed.h"
+#include "intprops.h"
 
 static int _decode_pkcs8_ecc_key(asn1_node pkcs8_asn,
 				 gnutls_x509_privkey_t pkey);
@@ -80,15 +81,34 @@ inline static int _encode_privkey(gnutls_x509_privkey_t pkey,
 		return ret;
 	case GNUTLS_PK_MLDSA44:
 	case GNUTLS_PK_MLDSA65:
-	case GNUTLS_PK_MLDSA87:
-		ret = _gnutls_x509_encode_string(
-			ASN1_ETYPE_OCTET_STRING, pkey->params.raw_priv.data,
-			pkey->params.raw_priv.size + pkey->params.raw_pub.size,
-			raw);
+	case GNUTLS_PK_MLDSA87: {
+		gnutls_datum_t concatenated_key = { NULL, 0 };
+		size_t concatenated_key_size = 0;
+
+		if (!INT_ADD_OK(pkey->params.raw_priv.size,
+				pkey->params.raw_pub.size,
+				&concatenated_key_size))
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		ret = _gnutls_set_datum(&concatenated_key,
+					pkey->params.raw_priv.data,
+					pkey->params.raw_priv.size);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+		concatenated_key.data = gnutls_realloc_fast(
+			concatenated_key.data, concatenated_key_size);
+		if (!concatenated_key.data)
+			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		concatenated_key.size = concatenated_key_size;
+		memcpy(&concatenated_key.data[pkey->params.raw_priv.size],
+		       pkey->params.raw_pub.data, pkey->params.raw_pub.size);
+		ret = _gnutls_x509_encode_string(ASN1_ETYPE_OCTET_STRING,
+						 concatenated_key.data,
+						 concatenated_key.size, raw);
+		_gnutls_free_key_datum(&concatenated_key);
 		if (ret < 0)
 			gnutls_assert();
 		return ret;
-
+	}
 	case GNUTLS_PK_GOST_01:
 	case GNUTLS_PK_GOST_12_256:
 	case GNUTLS_PK_GOST_12_512:
