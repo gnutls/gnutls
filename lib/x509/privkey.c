@@ -36,9 +36,6 @@
 #include "ecc.h"
 #include "pin.h"
 
-#ifdef HAVE_LIBOQS
-#include <dlwrap/oqs.h>
-#endif
 /**
  * gnutls_x509_privkey_init:
  * @key: A pointer to the type to be initialized
@@ -531,9 +528,7 @@ error:
 #define PEM_KEY_DSA "DSA PRIVATE KEY"
 #define PEM_KEY_RSA "RSA PRIVATE KEY"
 #define PEM_KEY_ECC "EC PRIVATE KEY"
-#ifdef HAVE_LIBOQS
 #define PEM_KEY_ML_DSA "ML-DSA PRIVATE KEY"
-#endif
 #define PEM_KEY_PKCS8 "PRIVATE KEY"
 
 #define MAX_PEM_HEADER_SIZE 25
@@ -633,7 +628,6 @@ int gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
 					if (result >= 0)
 						key->params.algo =
 							GNUTLS_PK_DSA;
-#ifdef HAVE_LIBOQS
 				} else if (left > sizeof(PEM_KEY_ML_DSA) &&
 					   memcmp(ptr, PEM_KEY_ML_DSA,
 						  sizeof(PEM_KEY_ML_DSA) - 1) ==
@@ -645,7 +639,6 @@ int gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
 						key->params.algo =
 							GNUTLS_PK_MLDSA44;
 					}
-#endif
 				}
 
 				if (key->params.algo == GNUTLS_PK_UNKNOWN &&
@@ -814,11 +807,7 @@ fail:
 	return ret;
 }
 
-#ifdef HAVE_LIBOQS
 #define MAX_ALGORITHM_NAME_SIZE_IN_PEM_HEADER 21
-#else
-#define MAX_ALGORITHM_NAME_SIZE_IN_PEM_HEADER 15
-#endif
 
 /**
  * gnutls_x509_privkey_import2:
@@ -889,13 +878,10 @@ int gnutls_x509_privkey_import2(gnutls_x509_privkey_t key,
 					    sizeof(PEM_KEY_ECC) - 1) == 0) ||
 				    (left > sizeof(PEM_KEY_DSA) &&
 				     memcmp(ptr, PEM_KEY_DSA,
-					    sizeof(PEM_KEY_DSA) - 1) == 0)
-#ifdef HAVE_LIBOQS
-				    || (left > sizeof(PEM_KEY_ML_DSA) &&
-					memcmp(ptr, PEM_KEY_ML_DSA,
-					       sizeof(PEM_KEY_ML_DSA) - 1) == 0)
-#endif
-				) {
+					    sizeof(PEM_KEY_DSA) - 1) == 0) ||
+				    (left > sizeof(PEM_KEY_ML_DSA) &&
+				     memcmp(ptr, PEM_KEY_ML_DSA,
+					    sizeof(PEM_KEY_ML_DSA) - 1) == 0)) {
 					head_enc = 0;
 				}
 			}
@@ -1647,12 +1633,10 @@ static const char *set_msg(gnutls_x509_privkey_t key)
 		return PEM_KEY_DSA;
 	case GNUTLS_PK_EC:
 		return PEM_KEY_ECC;
-#ifdef HAVE_LIBOQS
 	case GNUTLS_PK_MLDSA44:
 	case GNUTLS_PK_MLDSA65:
 	case GNUTLS_PK_MLDSA87:
 		return PEM_KEY_ML_DSA;
-#endif
 	default:
 		return "UNKNOWN";
 	}

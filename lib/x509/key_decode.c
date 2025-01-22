@@ -735,13 +735,11 @@ int _gnutls_x509_read_pubkey(gnutls_pk_algorithm_t algo, uint8_t *der,
 			params->params_nr = GOST_PUBLIC_PARAMS;
 		}
 		break;
-#ifdef HAVE_LIBOQS
 	case GNUTLS_PK_MLDSA44:
 	case GNUTLS_PK_MLDSA65:
 	case GNUTLS_PK_MLDSA87:
 		ret = _gnutls_set_datum(&params->raw_pub, der, dersize);
 		break;
-#endif
 	default:
 		ret = gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 		break;
@@ -839,11 +837,9 @@ int _gnutls_x509_check_pubkey_params(gnutls_pk_params_st *params)
 	case GNUTLS_PK_GOST_01:
 	case GNUTLS_PK_GOST_12_256:
 	case GNUTLS_PK_GOST_12_512:
-#ifdef HAVE_LIBOQS
 	case GNUTLS_PK_MLDSA44:
 	case GNUTLS_PK_MLDSA65:
 	case GNUTLS_PK_MLDSA87:
-#endif
 		return 0;
 	default:
 		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
