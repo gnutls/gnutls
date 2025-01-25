@@ -22,7 +22,7 @@ ACLOCAL_AMFLAGS = -I ../m4 -I ../gl/m4
 
 include $(top_srcdir)/lib/common.mk
 
-AM_CPPFLAGS = \
+AM_CPPFLAGS += \
 	-I$(srcdir)/../gl		\
 	-I$(builddir)/../gl		\
 	-I$(builddir)/../lib/includes	\
