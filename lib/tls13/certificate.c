@@ -676,7 +676,7 @@ static int decompress_certificate(gnutls_session_t session,
 		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
 	ret = _gnutls_buffer_pop_datum_prefix24(buf, &comp);
-	if (ret < 0 || buf->length > 0)
+	if (ret < 0 || buf->length > 0 || comp.size == 0)
 		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
 	plain.data = gnutls_malloc(plain_exp_len);
