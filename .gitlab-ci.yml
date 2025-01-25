@@ -562,7 +562,7 @@ fedora-leancrypto/test:
   needs:
     - fedora-leancrypto/build
   script:
-    - PKG_CONFIG_PATH=${PWD}/leancrypto-git/$LEANCRYPTO_DIR/lib64/pkgconfig make -j$CHECKJOBS check
+    - PKG_CONFIG_PATH=${PWD}/leancrypto-git/$LEANCRYPTO_DIR/lib64/pkgconfig TESTS_ENABLED_GROUPS="GROUP-X25519-MLKEM768 GROUP-SECP256R1-MLKEM768 GROUP-SECP384R1-MLKEM1024" make -j$CHECKJOBS check
 
 fedora-threadsan/build:
   extends:
