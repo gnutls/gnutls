@@ -5,7 +5,7 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.8.9 (unreleased)
+* Version 3.8.9 (released 2025-02-07)
 
 ** libgnutls: leancrypto was added as an interim option for PQC
    The library can now be built with leancrypto instead of liboqs for
@@ -25,6 +25,12 @@ See the end for copying conditions.
    has been extended to cover ML-KEM-1024, in addition to ML-KEM-768.
    MLKEM1024 is only offered as SecP384r1MLKEM1024 hybrid as per
    draft-kwiatkowski-tls-ecdhe-mlkem-03.
+
+** libgnutls: Fix potential DoS in handling certificates with numerous name
+   constraints, as a follow-up of CVE-2024-12133 in libtasn1. The
+   bundled copy of libtasn1 has also been updated to the latest 4.20.0
+   release to complete the fix.  Reported by Bing Shi (#1553).
+   [GNUTLS-SA-2025-02-07, CVSS: medium] [CVE-2024-12243]
 
 ** API and ABI modifications:
 GNUTLS_PK_MLDSA44: New enum member of gnutls_pk_algorithm_t
