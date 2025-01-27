@@ -63,8 +63,8 @@ else
         fail '' 'ML-KEM-1024 is NOT in Public Key Systems, while GROUP-SECP384R1-MLKEM1024 is in Groups'
     fi
 fi
-# If none of those hybrid groups is supported, skip the test
-if ! "${CLI}" --list | grep '^Groups: .*GROUP-\(X25519-KYBER768\|SECP256R1-MLKEM768\|SECP384R1-MLKEM1024\|X25519-MLKEM768\).*' >/dev/null; then
+# If none of those hybrid groups is supported, and TESTS_ENABLED_GROUPS is not set, skip the test
+if test "${TESTS_ENABLED_GROUPS+unset}" = unset && ! "${CLI}" --list | grep '^Groups: .*GROUP-\(X25519-KYBER768\|SECP256R1-MLKEM768\|SECP384R1-MLKEM1024\|X25519-MLKEM768\).*' >/dev/null; then
     exit 77
 fi
 
@@ -77,8 +77,15 @@ CACERT="$srcdir/../doc/credentials/x509/ca.pem"
 # Test all supported hybrid groups
 for group in X25519-KYBER768 SECP256R1-MLKEM768 SECP384R1-MLKEM1024 X25519-MLKEM768; do
     if ! "${CLI}" --list | grep "^Groups: .*GROUP-$group.*" >/dev/null; then
-	echo "$group is not supported, skipping" >&2
-	continue
+	case "$TESTS_ENABLED_GROUPS" in
+	    *"$group"*)
+		fail '' "$group must be enabled"
+		;;
+	    *)
+		echo "$group is not supported nor enabled, skipping" >&2
+		continue
+		;;
+	esac
     fi
 
     eval "${GETPORT}"

@@ -68,4 +68,15 @@ inline static ATTRIBUTE_NONNULL() void _gnutls_free_key_datum(
 	dat->size = 0;
 }
 
+inline static ATTRIBUTE_NONNULL() gnutls_datum_t
+	_gnutls_steal_datum(gnutls_datum_t *src)
+{
+	gnutls_datum_t dst = *src;
+
+	src->data = NULL;
+	src->size = 0;
+
+	return dst;
+}
+
 #endif /* GNUTLS_LIB_DATUM_H */

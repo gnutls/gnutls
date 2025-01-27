@@ -33,6 +33,8 @@
 #include <valgrind/memcheck.h>
 #endif
 
+#include "attribute.h"
+
 /* These realloc functions will return ptr if size==0, and will free
  * the ptr if the new allocation failed.
  */
@@ -76,6 +78,13 @@ static inline void _gnutls_memory_mark_defined(void *addr, size_t size)
 	if (RUNNING_ON_VALGRIND)
 		VALGRIND_MAKE_MEM_DEFINED(addr, size);
 #endif
+}
+
+static inline ATTRIBUTE_NONNULL() void *_gnutls_steal_pointer(void **src)
+{
+	void *dst = *src;
+	*src = NULL;
+	return dst;
 }
 
 #endif /* GNUTLS_LIB_MEM_H */

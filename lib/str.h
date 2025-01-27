@@ -30,6 +30,7 @@
 #include "datum.h"
 #include <c-ctype.h>
 #include "errors.h"
+#include "attribute.h"
 
 #ifdef HAVE_DCGETTEXT
 #include "gettext.h"
@@ -95,6 +96,19 @@ inline static void _gnutls_buffer_reset(gnutls_buffer_st *buf)
 {
 	buf->data = buf->allocd;
 	buf->length = 0;
+}
+
+inline static ATTRIBUTE_NONNULL() gnutls_buffer_st
+	_gnutls_steal_buffer(gnutls_buffer_st *src)
+{
+	gnutls_buffer_st dst = *src;
+
+	src->allocd = NULL;
+	src->data = NULL;
+	src->max_length = 0;
+	src->length = 0;
+
+	return dst;
 }
 
 int _gnutls_buffer_resize(gnutls_buffer_st *, size_t new_size);
@@ -170,15 +184,8 @@ int _gnutls_buffer_append_escape(gnutls_buffer_st *dest, const void *data,
 				 size_t data_size, const char *invalid_chars);
 int _gnutls_buffer_unescape(gnutls_buffer_st *dest);
 
-#ifndef __attribute__
-/* This feature is available in gcc versions 2.5 and later.  */
-#if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 5)
-#define __attribute__(Spec) /* empty */
-#endif
-#endif
-
 int _gnutls_buffer_append_printf(gnutls_buffer_st *dest, const char *fmt, ...)
-	__attribute__((format(printf, 2, 3)));
+	ATTRIBUTE_FORMAT((printf, 2, 3));
 
 void _gnutls_buffer_hexprint(gnutls_buffer_st *str, const void *data,
 			     size_t len);

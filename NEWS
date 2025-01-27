@@ -7,12 +7,18 @@ See the end for copying conditions.
 
 * Version 3.8.9 (unreleased)
 
+** libgnutls: leancrypto was added as an interim option for PQC
+   The library can now be built with leancrypto instead of liboqs for
+   post-quantum cryptography (PQC), when configured with
+   --with-leancrypto option instead of --with-liboqs.
+
 ** libgnutls: Experimental support for ML-DSA signature algorithm
    The library and certtool now support ML-DSA signature algorithm as
    defined in FIPS 204 and based on
    draft-ietf-lamps-dilithium-certificates-04. This feature is
    currently marked as experimental and can only be enabled when
-   compiled with --with-liboqs. Contributed by David Dudas.
+   compiled with --with-leancrypto or --with-liboqs.
+   Contributed by David Dudas.
 
 ** libgnutls: Support for ML-KEM-1024 key encapsulation mechanism
    The support for ML-KEM post-quantum key encapsulation mechanisms

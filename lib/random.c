@@ -34,6 +34,10 @@
 #include "glthread/tls.h"
 #include "gthreads.h"
 
+#ifdef HAVE_LEANCRYPTO
+#include <leancrypto.h>
+#endif
+
 #if defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)
 extern gnutls_crypto_rnd_st _gnutls_fuzz_rnd_ops;
 #endif
@@ -65,6 +69,45 @@ static void delete_ctx(void *ctx)
 	gl_list_remove(list, ctx);
 	gnutls_static_mutex_unlock(&gnutls_rnd_list_mutex);
 }
+
+#ifdef HAVE_LEANCRYPTO
+static inline int seeded_rng_generate(void *state MAYBE_UNUSED,
+				      const uint8_t *addtl_input MAYBE_UNUSED,
+				      size_t addtl_input_len MAYBE_UNUSED,
+				      uint8_t *out, size_t outlen)
+{
+	if (gnutls_rnd(GNUTLS_RND_KEY, out, outlen) < 0) {
+		_gnutls_switch_lib_state(LIB_STATE_ERROR);
+		return -EFAULT;
+	}
+	return 0;
+}
+
+static inline int seeded_rng_seed(void *state MAYBE_UNUSED,
+				  const uint8_t *seed MAYBE_UNUSED,
+				  size_t seedlen MAYBE_UNUSED,
+				  const uint8_t *persbuf MAYBE_UNUSED,
+				  size_t perslen MAYBE_UNUSED)
+{
+	/* Do nothing */
+	return 0;
+}
+
+static inline void seeded_rng_zero(void *state MAYBE_UNUSED)
+{
+	/* Do nothing */
+}
+
+static const struct lc_rng seeded_rng = {
+	.generate = seeded_rng_generate,
+	.seed = seeded_rng_seed,
+	.zero = seeded_rng_zero,
+};
+
+struct lc_rng_ctx seeded_rng_ctx = {
+	.rng = &seeded_rng,
+};
+#endif
 
 static inline int _gnutls_rnd_init(void)
 {
@@ -121,6 +164,15 @@ int _gnutls_rnd_preinit(void)
 		if (ret < 0)
 			return ret;
 	}
+#endif
+
+#ifdef HAVE_LEANCRYPTO
+	/* Some leancrypto functions need a seeded RNG either given
+	 * explicitly as a parameter, or implicitly through the
+	 * lc_seeded_rng global variable. */
+	ret = lc_rng_set_seeded(&seeded_rng_ctx);
+	if (ret < 0)
+		return gnutls_assert_val(GNUTLS_E_RANDOM_FAILED);
 #endif
 
 	ret = _rnd_system_entropy_init();
