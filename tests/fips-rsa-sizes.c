@@ -250,12 +250,6 @@ void doit(void)
 
 	assert(gnutls_fips140_context_init(&fips_context) == 0);
 
-	generate_unsuccessfully(&privkey, &pubkey, 512);
-	sign_verify_unsuccessfully(privkey, pubkey);
-	generate_unsuccessfully(&privkey, &pubkey, 512);
-	sign_verify_unsuccessfully(privkey, pubkey);
-	generate_unsuccessfully(&privkey, &pubkey, 600);
-	sign_verify_unsuccessfully(privkey, pubkey);
 	generate_unsuccessfully(&privkey, &pubkey, 768);
 	sign_verify_unsuccessfully(privkey, pubkey);
 	generate_unsuccessfully(&privkey, &pubkey, 1024);

@@ -3213,7 +3213,6 @@ static int pct_test(gnutls_pk_algorithm_t algo,
 	gnutls_datum_t ddata, tmp = { NULL, 0 };
 	char gen_data[MAX_HASH_SIZE];
 	gnutls_x509_spki_st spki;
-	gnutls_fips140_context_t context;
 
 	ret = _gnutls_x509_spki_copy(&spki, &params->spki);
 	if (ret < 0) {
@@ -3270,25 +3269,23 @@ static int pct_test(gnutls_pk_algorithm_t algo,
 
 	switch (algo) {
 	case GNUTLS_PK_RSA:
-	case GNUTLS_PK_RSA_OAEP:
-		if (algo == GNUTLS_PK_RSA) {
-			/* Push a temporary FIPS context because _gnutls_pk_encrypt and
-			 * _gnutls_pk_decrypt below will mark RSAES-PKCS1-v1_5 operation
-			 * non-approved */
-			if (gnutls_fips140_context_init(&context) < 0) {
-				ret = gnutls_assert_val(
-					GNUTLS_E_PK_GENERATION_ERROR);
-				goto cleanup;
-			}
-			if (gnutls_fips140_push_context(context) < 0) {
-				ret = gnutls_assert_val(
-					GNUTLS_E_PK_GENERATION_ERROR);
-				gnutls_fips140_context_deinit(context);
-				goto cleanup;
-			}
+		/* To comply with FIPS 140-3 IG 10.3.A, additional comment 1,
+		 * Perform both key transport and signature PCTs for
+		 * unrestricted RSA key.  */
+		ret = pct_test(GNUTLS_PK_RSA_OAEP, params);
+		if (ret < 0) {
+			gnutls_assert();
+			break;
 		}
-
-		ret = _gnutls_pk_encrypt(algo, &sig, &ddata, params, &spki);
+		ret = pct_test(GNUTLS_PK_RSA_PSS, params);
+		if (ret < 0) {
+			gnutls_assert();
+			break;
+		}
+		break;
+	case GNUTLS_PK_RSA_OAEP:
+		ret = _gnutls_pk_encrypt(GNUTLS_PK_RSA_OAEP, &sig, &ddata,
+					 params, &spki);
 		if (ret < 0) {
 			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
 		}
@@ -3316,14 +3313,6 @@ static int pct_test(gnutls_pk_algorithm_t algo,
 			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
 		}
 
-		if (algo == GNUTLS_PK_RSA) {
-			if (unlikely(gnutls_fips140_pop_context() < 0)) {
-				ret = gnutls_assert_val(
-					GNUTLS_E_PK_GENERATION_ERROR);
-			}
-			gnutls_fips140_context_deinit(context);
-		}
-
 		if (ret < 0) {
 			goto cleanup;
 		}
@@ -3331,12 +3320,7 @@ static int pct_test(gnutls_pk_algorithm_t algo,
 		free(sig.data);
 		sig.data = NULL;
 
-		/* RSA-OAEP can't be used for signing */
-		if (algo == GNUTLS_PK_RSA_OAEP) {
-			break;
-		}
-
-		FALLTHROUGH;
+		break;
 	case GNUTLS_PK_EC: /* we only do keys for ECDSA */
 	case GNUTLS_PK_EDDSA_ED25519:
 	case GNUTLS_PK_EDDSA_ED448:
