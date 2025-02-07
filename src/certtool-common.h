@@ -94,7 +94,7 @@ static inline void switch_to_pkcs8_when_needed(common_info_st *cinfo,
 	if (cinfo->pkcs8)
 		return;
 
-	if (key_type == GNUTLS_PK_RSA_PSS ||
+	if (key_type == GNUTLS_PK_RSA_PSS || key_type == GNUTLS_PK_RSA_OAEP ||
 	    key_type == GNUTLS_PK_EDDSA_ED25519 ||
 	    key_type == GNUTLS_PK_EDDSA_ED448 ||
 	    key_type == GNUTLS_PK_ECDH_X25519 ||

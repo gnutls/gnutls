@@ -126,8 +126,4 @@ static const char *missing_cert_aia_ca[] = {
 	"-----END CERTIFICATE-----\n",
 };
 
-#if defined __clang__ || __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5)
-#pragma GCC diagnostic pop
-#endif
-
 #endif /* GNUTLS_TESTS_TEST_CHAINS_ISSUER_AIA_H */

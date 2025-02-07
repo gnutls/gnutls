@@ -29,6 +29,11 @@ struct name_st {
 	gnutls_datum_t othername_oid;
 };
 
+struct gnutls_subject_alt_names_st {
+	struct name_st *names;
+	unsigned int size;
+};
+
 int _gnutls_alt_name_process(gnutls_datum_t *out, unsigned type,
 			     const gnutls_datum_t *san, unsigned raw);
 

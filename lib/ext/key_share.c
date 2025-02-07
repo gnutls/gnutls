@@ -433,7 +433,8 @@ static int server_use_key_share_single(gnutls_session_t session,
 						   &pub.params[ECC_X],
 						   &pub.params[ECC_Y]);
 		if (ret < 0)
-			return gnutls_assert_val(ret);
+			return gnutls_assert_val(
+				GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 		pub.algo = group->pk;
 		pub.curve = curve->id;
@@ -664,7 +665,8 @@ static int client_use_key_share_single(gnutls_session_t session,
 						   &pub.params[ECC_X],
 						   &pub.params[ECC_Y]);
 		if (ret < 0)
-			return gnutls_assert_val(ret);
+			return gnutls_assert_val(
+				GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 		pub.algo = group->pk;
 		pub.curve = curve->id;

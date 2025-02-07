@@ -503,20 +503,13 @@ int _gnutls_x509_crt_check_revocation(gnutls_x509_crt_t cert,
 				      int crl_list_length,
 				      gnutls_verify_output_function func);
 
-typedef struct gnutls_name_constraints_st {
-	struct name_constraints_node_st *permitted;
-	struct name_constraints_node_st *excluded;
-} gnutls_name_constraints_st;
-
-typedef struct name_constraints_node_st {
-	unsigned type;
-	gnutls_datum_t name;
-	struct name_constraints_node_st *next;
-} name_constraints_node_st;
-
-int _gnutls_extract_name_constraints(asn1_node c2, const char *vstr,
-				     name_constraints_node_st **_nc);
-void _gnutls_name_constraints_node_free(name_constraints_node_st *node);
+bool _gnutls_x509_name_constraints_is_empty(gnutls_x509_name_constraints_t nc,
+					    unsigned type);
+int _gnutls_x509_name_constraints_extract(asn1_node c2,
+					  const char *permitted_name,
+					  const char *excluded_name,
+					  gnutls_x509_name_constraints_t nc);
+void _gnutls_x509_name_constraints_clear(gnutls_x509_name_constraints_t nc);
 int _gnutls_x509_name_constraints_merge(gnutls_x509_name_constraints_t nc,
 					gnutls_x509_name_constraints_t nc2);
 
