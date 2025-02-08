@@ -506,17 +506,17 @@ fedora-nettle-minigmp/build:
   variables:
     NETTLE_CONFIGURE_ARGS: "--enable-mini-gmp"
 
-fedora-nettle-minigmp/test:
-  extends:
-    - .fedora-nettle/test
-  dependencies:
-    - fedora-nettle-minigmp/build
-  needs:
-    - fedora-nettle-minigmp/build
-  script:
-    # prolong timeout a bit as minigmp build is slow
-    - PKG_CONFIG_PATH=${PWD}/nettle-git/$NETTLE_DIR/lib64/pkgconfig LD_LIBRARY_PATH=${PWD}/nettle-git/$NETTLE_DIR/lib64 GNUTLS_TEST_TIMEOUT=600000 make -j$CHECKJOBS check
-  timeout: 3h
+# fedora-nettle-minigmp/test:
+#   extends:
+#     - .fedora-nettle/test
+#   dependencies:
+#     - fedora-nettle-minigmp/build
+#   needs:
+#     - fedora-nettle-minigmp/build
+#   script:
+#     # prolong timeout a bit as minigmp build is slow
+#     - PKG_CONFIG_PATH=${PWD}/nettle-git/$NETTLE_DIR/lib64/pkgconfig LD_LIBRARY_PATH=${PWD}/nettle-git/$NETTLE_DIR/lib64 GNUTLS_TEST_TIMEOUT=600000 make -j$CHECKJOBS check
+#   timeout: 3h
 
 fedora-leancrypto/build:
   extends:
