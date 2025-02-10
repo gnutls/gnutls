@@ -51,13 +51,36 @@ static void tls_log_func(int level, const char *str)
 }
 
 #define HANDSHAKE_SESSION_ID_POS 34
+#define MAX_EXT_TYPES 64
 
 struct ctx_st {
 	unsigned hrr_seen;
 	unsigned hello_counter;
 	uint8_t session_id[32];
 	size_t session_id_len;
+	unsigned extensions[MAX_EXT_TYPES];
+	size_t extensions_size1;
+	size_t extensions_size2;
 };
+
+static int ext_callback(void *_ctx, unsigned tls_id, const unsigned char *data,
+			unsigned size)
+{
+	struct ctx_st *ctx = _ctx;
+	if (ctx->hello_counter == 0) {
+		assert(ctx->extensions_size1 < MAX_EXT_TYPES);
+		ctx->extensions[ctx->extensions_size1++] = tls_id;
+	} else {
+		assert(ctx->extensions_size2 < MAX_EXT_TYPES);
+		if (tls_id != ctx->extensions[ctx->extensions_size2]) {
+			fail("extension doesn't match at position %zu, %u != %u\n",
+			     ctx->extensions_size2, tls_id,
+			     ctx->extensions[ctx->extensions_size2]);
+		}
+		ctx->extensions_size2++;
+	}
+	return 0;
+}
 
 static int hello_callback(gnutls_session_t session, unsigned int htype,
 			  unsigned post, unsigned int incoming,
@@ -73,15 +96,25 @@ static int hello_callback(gnutls_session_t session, unsigned int htype,
 	    post == GNUTLS_HOOK_POST) {
 		size_t session_id_len;
 		uint8_t *session_id;
+		unsigned pos = HANDSHAKE_SESSION_ID_POS;
+		gnutls_datum_t mmsg;
+		int ret;
 
-		assert(msg->size > HANDSHAKE_SESSION_ID_POS + 1);
-		session_id_len = msg->data[HANDSHAKE_SESSION_ID_POS];
-		session_id = &msg->data[HANDSHAKE_SESSION_ID_POS + 1];
+		assert(msg->size > pos + 1);
+		session_id_len = msg->data[pos];
+		session_id = &msg->data[pos + 1];
+
+		SKIP8(pos, msg->size);
+		SKIP16(pos, msg->size);
+		SKIP8(pos, msg->size);
+
+		mmsg.data = &msg->data[pos];
+		mmsg.size = msg->size - pos;
 
 		if (ctx->hello_counter > 0) {
 			assert(msg->size > 4);
 			if (msg->data[0] != 0x03 || msg->data[1] != 0x03) {
-				fail("version is %d.%d expected 3,3\n",
+				fail("version is %d.%d expected 3.3\n",
 				     (int)msg->data[0], (int)msg->data[1]);
 			}
 
@@ -94,6 +127,12 @@ static int hello_callback(gnutls_session_t session, unsigned int htype,
 
 		ctx->session_id_len = session_id_len;
 		memcpy(ctx->session_id, session_id, session_id_len);
+
+		ret = gnutls_ext_raw_parse(ctx, ext_callback, &mmsg, 0);
+		if (ret < 0) {
+			fail("unable to parse extensions: %s\n",
+			     gnutls_strerror(ret));
+		}
 
 		ctx->hello_counter++;
 	}
@@ -163,6 +202,10 @@ void doit(void)
 	if (gnutls_group_get(server) != GNUTLS_GROUP_X25519)
 		myfail("group doesn't match the expected: %s\n",
 		       gnutls_group_get_name(gnutls_group_get(server)));
+
+	if (ctx.extensions_size1 != ctx.extensions_size2)
+		myfail("the number of extensions don't match in second Client Hello: %zu != %zu\n",
+		       ctx.extensions_size1, ctx.extensions_size2);
 
 	gnutls_bye(client, GNUTLS_SHUT_WR);
 	gnutls_bye(server, GNUTLS_SHUT_WR);

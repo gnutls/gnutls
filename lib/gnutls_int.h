@@ -1666,6 +1666,10 @@ typedef struct {
 	/* Compression method for certificate compression */
 	gnutls_compression_method_t compress_certificate_method;
 
+	/* To shuffle extension sending order */
+	extensions_t client_hello_exts[MAX_EXT_TYPES];
+	bool client_hello_exts_set;
+
 	/* If you add anything here, check _gnutls_handshake_internal_state_clear().
 	 */
 } internals_st;
