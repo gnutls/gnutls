@@ -31,6 +31,7 @@ int main(void)
 
 #include "cert-common.h"
 #include "utils.h"
+#include "ktls_utils.h"
 
 static void server_log_func(int level, const char *str)
 {
@@ -94,7 +95,8 @@ static void client(int fd, const char *prio)
 	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 	if (ret == 0) {
-		success("client: Peer has closed the TLS connection\n");
+		if (debug)
+			success("client: Peer has closed the TLS connection\n");
 		goto end;
 	} else if (ret < 0) {
 		fail("client: Error: %s\n", gnutls_strerror(ret));
@@ -116,7 +118,8 @@ static void client(int fd, const char *prio)
 	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 	if (ret == 0) {
-		success("client: Peer has closed the TLS connection\n");
+		if (debug)
+			success("client: Peer has closed the TLS connection\n");
 		goto end;
 	} else if (ret < 0) {
 		fail("client: Error: %s\n", gnutls_strerror(ret));
@@ -277,35 +280,16 @@ static void ch_handler(int sig)
 static void run(const char *prio)
 {
 	int ret;
-	struct sockaddr_in saddr;
-	socklen_t addrlen;
-	int listener;
-	int fd;
+	int client_fd, server_fd;
 
 	success("running ktls test with %s\n", prio);
 
 	signal(SIGCHLD, ch_handler);
 	signal(SIGPIPE, SIG_IGN);
 
-	listener = socket(AF_INET, SOCK_STREAM, 0);
-	if (listener == -1) {
-		fail("error in listener(): %s\n", strerror(errno));
-	}
-
-	memset(&saddr, 0, sizeof(saddr));
-	saddr.sin_family = AF_INET;
-	saddr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-	saddr.sin_port = 0;
-
-	ret = bind(listener, (struct sockaddr *)&saddr, sizeof(saddr));
-	if (ret == -1) {
-		fail("error in bind(): %s\n", strerror(errno));
-	}
-
-	addrlen = sizeof(saddr);
-	ret = getsockname(listener, (struct sockaddr *)&saddr, &addrlen);
-	if (ret == -1) {
-		fail("error in getsockname(): %s\n", strerror(errno));
+	if ((ret = create_socket_pair(&client_fd, &server_fd))) {
+		fail("Error in socket creation: %d\n", ret);
+		exit(1);
 	}
 
 	child = fork();
@@ -315,30 +299,20 @@ static void run(const char *prio)
 	}
 
 	if (child) {
-		int status;
 		/* parent */
-		ret = listen(listener, 1);
-		if (ret == -1) {
-			fail("error in listen(): %s\n", strerror(errno));
-		}
+		int status;
+		close(client_fd);
 
-		fd = accept(listener, NULL, NULL);
-		if (fd == -1) {
-			fail("error in accept(): %s\n", strerror(errno));
-		}
-		server(fd, prio);
+		server(server_fd, prio);
 
 		wait(&status);
 		check_wait_status(status);
 	} else {
-		fd = socket(AF_INET, SOCK_STREAM, 0);
-		if (fd == -1) {
-			fail("error in socket(): %s\n", strerror(errno));
-			exit(1);
-		}
-		usleep(1000000);
-		connect(fd, (struct sockaddr *)&saddr, addrlen);
-		client(fd, prio);
+		close(server_fd);
+		sleep(1);
+
+		client(client_fd, prio);
+
 		exit(0);
 	}
 }
