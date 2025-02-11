@@ -59,6 +59,7 @@ gnutls_transport_is_ktls_enabled(gnutls_session_t session)
 {
 	if (unlikely(!session->internals.initial_negotiation_completed)) {
 		_gnutls_debug_log("Initial negotiation is not yet complete\n");
+		gnutls_assert();
 		return 0;
 	}
 
@@ -82,7 +83,9 @@ void _gnutls_ktls_enable(gnutls_session_t session)
 		}
 	} else {
 		_gnutls_record_log(
-			"Unable to set TCP_ULP for read socket: %d\n", errno);
+			"kTLS: Unable to set TCP_ULP for read socket: %d\n",
+			errno);
+		gnutls_assert();
 	}
 
 	if (sockin != sockout) {
@@ -91,8 +94,9 @@ void _gnutls_ktls_enable(gnutls_session_t session)
 			session->internals.ktls_enabled |= GNUTLS_KTLS_SEND;
 		} else {
 			_gnutls_record_log(
-				"Unable to set TCP_ULP for write socket: %d\n",
+				"kTLS: Unable to set TCP_ULP for write socket: %d\n",
 				errno);
+			gnutls_assert();
 		}
 	}
 #endif
@@ -1064,6 +1068,13 @@ int _gnutls_ktls_recv_control_msg(gnutls_session_t session,
 		default:
 			return GNUTLS_E_PULL_ERROR;
 		}
+	} else if (unlikely(ret == -EKEYEXPIRED)) {
+		/* This will be received until a keyupdate is performed on the
+		   scoket. */
+		_gnutls_debug_log("kTLS: socket(recv) has not yet received "
+				  "updated keys\n");
+		gnutls_assert();
+		return GNUTLS_E_AGAIN;
 	}
 
 	/* connection closed */
