@@ -386,13 +386,16 @@ typedef struct gnutls_crypto_pk {
 	 * parameters, depending on the operation */
 	int (*encrypt)(gnutls_pk_algorithm_t, gnutls_datum_t *ciphertext,
 		       const gnutls_datum_t *plaintext,
-		       const gnutls_pk_params_st *pub);
+		       const gnutls_pk_params_st *pub,
+		       const gnutls_x509_spki_st *encrypt);
 	int (*decrypt)(gnutls_pk_algorithm_t, gnutls_datum_t *plaintext,
 		       const gnutls_datum_t *ciphertext,
-		       const gnutls_pk_params_st *priv);
+		       const gnutls_pk_params_st *priv,
+		       const gnutls_x509_spki_st *encrypt);
 	int (*decrypt2)(gnutls_pk_algorithm_t, const gnutls_datum_t *ciphertext,
 			unsigned char *plaintext, size_t paintext_size,
-			const gnutls_pk_params_st *priv);
+			const gnutls_pk_params_st *priv,
+			const gnutls_x509_spki_st *encrypt);
 	int (*sign)(gnutls_pk_algorithm_t, gnutls_datum_t *signature,
 		    const gnutls_datum_t *data, const gnutls_pk_params_st *priv,
 		    const gnutls_x509_spki_st *sign);

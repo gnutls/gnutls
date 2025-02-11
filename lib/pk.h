@@ -27,13 +27,18 @@
 
 extern int crypto_pk_prio;
 
-#define _gnutls_pk_encrypt(algo, ciphertext, plaintext, params) \
-	_gnutls_pk_backend()->encrypt(algo, ciphertext, plaintext, params)
-#define _gnutls_pk_decrypt(algo, ciphertext, plaintext, params) \
-	_gnutls_pk_backend()->decrypt(algo, ciphertext, plaintext, params)
-#define _gnutls_pk_decrypt2(algo, ciphertext, plaintext, size, params)    \
+#define _gnutls_pk_encrypt(algo, ciphertext, plaintext, params,            \
+			   encrypt_params)                                 \
+	_gnutls_pk_backend()->encrypt(algo, ciphertext, plaintext, params, \
+				      encrypt_params)
+#define _gnutls_pk_decrypt(algo, ciphertext, plaintext, params,            \
+			   encrypt_params)                                 \
+	_gnutls_pk_backend()->decrypt(algo, ciphertext, plaintext, params, \
+				      encrypt_params)
+#define _gnutls_pk_decrypt2(algo, ciphertext, plaintext, size, params,    \
+			    encrypt_params)                               \
 	_gnutls_pk_backend()->decrypt2(algo, ciphertext, plaintext, size, \
-				       params)
+				       params, encrypt_params)
 #define _gnutls_pk_sign(algo, sig, data, params, sign_params) \
 	_gnutls_pk_backend()->sign(algo, sig, data, params, sign_params)
 #define _gnutls_pk_verify(algo, data, sig, params, sign_params) \

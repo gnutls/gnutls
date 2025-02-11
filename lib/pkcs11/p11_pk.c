@@ -228,9 +228,9 @@ cleanup:
 }
 
 static bool init_rsa_oaep_param(CK_RSA_PKCS_OAEP_PARAMS *param,
-				const gnutls_pk_params_st *pk_params)
+				const gnutls_x509_spki_st *encrypt_params)
 {
-	switch (pk_params->spki.rsa_oaep_dig) {
+	switch (encrypt_params->rsa_oaep_dig) {
 	case GNUTLS_DIG_SHA256:
 		param->hashAlg = CKM_SHA256;
 		param->mgf = CKG_MGF1_SHA256;
@@ -247,8 +247,8 @@ static bool init_rsa_oaep_param(CK_RSA_PKCS_OAEP_PARAMS *param,
 		return false;
 	}
 	param->source = CKZ_DATA_SPECIFIED;
-	param->pSourceData = pk_params->spki.rsa_oaep_label.data;
-	param->ulSourceDataLen = pk_params->spki.rsa_oaep_label.size;
+	param->pSourceData = encrypt_params->rsa_oaep_label.data;
+	param->ulSourceDataLen = encrypt_params->rsa_oaep_label.size;
 	return true;
 }
 
@@ -706,7 +706,8 @@ static int derive_ecdh_secret(CK_SESSION_HANDLE session,
 static int _wrap_p11_pk_encrypt(gnutls_pk_algorithm_t algo,
 				gnutls_datum_t *ciphertext,
 				const gnutls_datum_t *plaintext,
-				const gnutls_pk_params_st *pk_params)
+				const gnutls_pk_params_st *pk_params,
+				const gnutls_x509_spki_st *encrypt_params)
 {
 	int ret = 0;
 	CK_RV rv;
@@ -742,7 +743,7 @@ static int _wrap_p11_pk_encrypt(gnutls_pk_algorithm_t algo,
 		mech.pParameter = &param_rsa_oaep;
 		mech.ulParameterLen = sizeof(param_rsa_oaep);
 
-		if (!init_rsa_oaep_param(&param_rsa_oaep, pk_params)) {
+		if (!init_rsa_oaep_param(&param_rsa_oaep, encrypt_params)) {
 			ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 			goto cleanup;
 		}
@@ -798,7 +799,8 @@ cleanup:
 static int _wrap_p11_pk_decrypt(gnutls_pk_algorithm_t algo,
 				gnutls_datum_t *plaintext,
 				const gnutls_datum_t *ciphertext,
-				const gnutls_pk_params_st *pk_params)
+				const gnutls_pk_params_st *pk_params,
+				const gnutls_x509_spki_st *encrypt_params)
 {
 	int ret = 0;
 	CK_RV rv;
@@ -834,7 +836,7 @@ static int _wrap_p11_pk_decrypt(gnutls_pk_algorithm_t algo,
 		mech.pParameter = &param_rsa_oaep;
 		mech.ulParameterLen = sizeof(param_rsa_oaep);
 
-		if (!init_rsa_oaep_param(&param_rsa_oaep, pk_params)) {
+		if (!init_rsa_oaep_param(&param_rsa_oaep, encrypt_params)) {
 			ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 			goto cleanup;
 		}
@@ -890,7 +892,8 @@ static int _wrap_p11_pk_decrypt2(gnutls_pk_algorithm_t algo,
 				 const gnutls_datum_t *ciphertext,
 				 unsigned char *plaintext,
 				 size_t plaintext_size,
-				 const gnutls_pk_params_st *pk_params)
+				 const gnutls_pk_params_st *pk_params,
+				 const gnutls_x509_spki_st *encrypt_params)
 {
 	int ret = 0;
 	uint32_t is_err;
@@ -928,7 +931,7 @@ static int _wrap_p11_pk_decrypt2(gnutls_pk_algorithm_t algo,
 		mech.pParameter = &param_rsa_oaep;
 		mech.ulParameterLen = sizeof(param_rsa_oaep);
 
-		if (!init_rsa_oaep_param(&param_rsa_oaep, pk_params)) {
+		if (!init_rsa_oaep_param(&param_rsa_oaep, encrypt_params)) {
 			ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 			goto cleanup;
 		}

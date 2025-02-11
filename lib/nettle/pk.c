@@ -1018,7 +1018,8 @@ static inline int _rsa_oaep_encrypt(gnutls_digest_algorithm_t dig,
 static int _wrap_nettle_pk_encrypt(gnutls_pk_algorithm_t algo,
 				   gnutls_datum_t *ciphertext,
 				   const gnutls_datum_t *plaintext,
-				   const gnutls_pk_params_st *pk_params)
+				   const gnutls_pk_params_st *pk_params,
+				   const gnutls_x509_spki_st *encrypt_params)
 {
 	int ret;
 	bool not_approved = false;
@@ -1094,10 +1095,10 @@ static int _wrap_nettle_pk_encrypt(gnutls_pk_algorithm_t algo,
 			goto cleanup;
 		}
 
-		ret = _rsa_oaep_encrypt(pk_params->spki.rsa_oaep_dig, &pub,
+		ret = _rsa_oaep_encrypt(encrypt_params->rsa_oaep_dig, &pub,
 					NULL, random_func,
-					pk_params->spki.rsa_oaep_label.size,
-					pk_params->spki.rsa_oaep_label.data,
+					encrypt_params->rsa_oaep_label.size,
+					encrypt_params->rsa_oaep_label.data,
 					plaintext->size, plaintext->data, buf);
 		if (ret == 0 || HAVE_LIB_ERROR()) {
 			ret = gnutls_assert_val(GNUTLS_E_ENCRYPTION_FAILED);
@@ -1192,7 +1193,8 @@ static inline int _rsa_oaep_decrypt(gnutls_digest_algorithm_t dig,
 static int _wrap_nettle_pk_decrypt(gnutls_pk_algorithm_t algo,
 				   gnutls_datum_t *plaintext,
 				   const gnutls_datum_t *ciphertext,
-				   const gnutls_pk_params_st *pk_params)
+				   const gnutls_pk_params_st *pk_params,
+				   const gnutls_x509_spki_st *encrypt_params)
 {
 	int ret;
 	bool not_approved = false;
@@ -1200,7 +1202,7 @@ static int _wrap_nettle_pk_decrypt(gnutls_pk_algorithm_t algo,
 
 	FAIL_IF_LIB_ERROR;
 
-	if (algo == GNUTLS_PK_RSA && pk_params->spki.pk == GNUTLS_PK_RSA_OAEP) {
+	if (algo == GNUTLS_PK_RSA && encrypt_params->pk == GNUTLS_PK_RSA_OAEP) {
 		algo = GNUTLS_PK_RSA_OAEP;
 	}
 
@@ -1285,10 +1287,10 @@ static int _wrap_nettle_pk_decrypt(gnutls_pk_algorithm_t algo,
 			random_func = rnd_nonce_func_fallback;
 		else
 			random_func = rnd_nonce_func;
-		ret = _rsa_oaep_decrypt(pk_params->spki.rsa_oaep_dig, &pub,
+		ret = _rsa_oaep_decrypt(encrypt_params->rsa_oaep_dig, &pub,
 					&priv, NULL, random_func,
-					pk_params->spki.rsa_oaep_label.size,
-					pk_params->spki.rsa_oaep_label.data,
+					encrypt_params->rsa_oaep_label.size,
+					encrypt_params->rsa_oaep_label.data,
 					&length, buf, ciphertext->data);
 
 		if (ret == 0 || HAVE_LIB_ERROR()) {
@@ -1354,7 +1356,8 @@ static int _wrap_nettle_pk_decrypt2(gnutls_pk_algorithm_t algo,
 				    const gnutls_datum_t *ciphertext,
 				    unsigned char *plaintext,
 				    size_t plaintext_size,
-				    const gnutls_pk_params_st *pk_params)
+				    const gnutls_pk_params_st *pk_params,
+				    const gnutls_x509_spki_st *encrypt_params)
 {
 	struct rsa_private_key priv;
 	struct rsa_public_key pub;
@@ -1370,7 +1373,7 @@ static int _wrap_nettle_pk_decrypt2(gnutls_pk_algorithm_t algo,
 		goto fail;
 	}
 
-	if (pk_params->spki.pk == GNUTLS_PK_RSA_OAEP) {
+	if (encrypt_params->pk == GNUTLS_PK_RSA_OAEP) {
 		algo = GNUTLS_PK_RSA_OAEP;
 	}
 
@@ -1407,10 +1410,10 @@ static int _wrap_nettle_pk_decrypt2(gnutls_pk_algorithm_t algo,
 				       ciphertext->data);
 		break;
 	case GNUTLS_PK_RSA_OAEP:
-		ret = _rsa_oaep_decrypt(pk_params->spki.rsa_oaep_dig, &pub,
+		ret = _rsa_oaep_decrypt(encrypt_params->rsa_oaep_dig, &pub,
 					&priv, NULL, random_func,
-					pk_params->spki.rsa_oaep_label.size,
-					pk_params->spki.rsa_oaep_label.data,
+					encrypt_params->rsa_oaep_label.size,
+					encrypt_params->rsa_oaep_label.data,
 					&plaintext_size, plaintext,
 					ciphertext->data);
 		break;
@@ -3254,6 +3257,11 @@ static int pct_test(gnutls_pk_algorithm_t algo,
 			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
 			goto cleanup;
 		}
+	} else if (algo == GNUTLS_PK_RSA_OAEP) {
+		if (spki.rsa_oaep_dig == GNUTLS_DIG_UNKNOWN)
+			spki.rsa_oaep_dig = GNUTLS_DIG_SHA256;
+		ddata.data = (void *)const_data;
+		ddata.size = sizeof(const_data);
 	} else {
 		ddata.data = (void *)const_data;
 		ddata.size = sizeof(const_data);
@@ -3279,7 +3287,7 @@ static int pct_test(gnutls_pk_algorithm_t algo,
 			}
 		}
 
-		ret = _gnutls_pk_encrypt(algo, &sig, &ddata, params);
+		ret = _gnutls_pk_encrypt(algo, &sig, &ddata, params, &spki);
 		if (ret < 0) {
 			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
 		}
@@ -3288,7 +3296,7 @@ static int pct_test(gnutls_pk_algorithm_t algo,
 			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
 		}
 		if (ret == 0 &&
-		    _gnutls_pk_decrypt(algo, &tmp, &sig, params) < 0) {
+		    _gnutls_pk_decrypt(algo, &tmp, &sig, params, &spki) < 0) {
 			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
 		}
 		if (ret == 0 &&

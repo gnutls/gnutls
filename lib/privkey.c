@@ -1590,7 +1590,8 @@ int gnutls_privkey_decrypt_data(gnutls_privkey_t key, unsigned int flags,
 	switch (key->type) {
 	case GNUTLS_PRIVKEY_X509:
 		return _gnutls_pk_decrypt(key->pk_algorithm, plaintext,
-					  ciphertext, &key->key.x509->params);
+					  ciphertext, &key->key.x509->params,
+					  &key->key.x509->params.spki);
 #ifdef ENABLE_PKCS11
 	case GNUTLS_PRIVKEY_PKCS11:
 		return _gnutls_pkcs11_privkey_decrypt_data(
@@ -1657,7 +1658,8 @@ int gnutls_privkey_decrypt_data2(gnutls_privkey_t key, unsigned int flags,
 	case GNUTLS_PRIVKEY_X509:
 		return _gnutls_pk_decrypt2(key->pk_algorithm, ciphertext,
 					   plaintext, plaintext_size,
-					   &key->key.x509->params);
+					   &key->key.x509->params,
+					   &key->key.x509->params.spki);
 #ifdef ENABLE_PKCS11
 	case GNUTLS_PRIVKEY_PKCS11:
 		return _gnutls_pkcs11_privkey_decrypt_data2(key->key.pkcs11,
