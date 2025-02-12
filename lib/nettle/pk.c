@@ -1368,7 +1368,8 @@ static int _wrap_nettle_pk_decrypt2(gnutls_pk_algorithm_t algo,
 
 	FAIL_IF_LIB_ERROR;
 
-	if (algo != GNUTLS_PK_RSA || plaintext == NULL) {
+	if ((algo != GNUTLS_PK_RSA && algo != GNUTLS_PK_RSA_OAEP) ||
+	    plaintext == NULL) {
 		ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 		goto fail;
 	}
@@ -3297,6 +3298,16 @@ static int pct_test(gnutls_pk_algorithm_t algo,
 		}
 		if (ret == 0 &&
 		    _gnutls_pk_decrypt(algo, &tmp, &sig, params, &spki) < 0) {
+			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
+		}
+		if (ret == 0 &&
+		    !(tmp.size == ddata.size &&
+		      memcmp(tmp.data, ddata.data, tmp.size) == 0)) {
+			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
+		}
+		if (ret == 0 &&
+		    _gnutls_pk_decrypt2(algo, &sig, tmp.data, tmp.size, params,
+					&spki) < 0) {
 			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
 		}
 		if (ret == 0 &&
