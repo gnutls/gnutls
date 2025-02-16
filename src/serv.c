@@ -1690,7 +1690,7 @@ static void tcp_server(const char *name, int port, int timeout)
 						    GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
 							j->earlydata_eof = 1;
 						}
-						if (r == 0) {
+						if (r >= 0) {
 							earlydata_read = 1;
 						}
 					}
