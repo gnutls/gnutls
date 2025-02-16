@@ -546,7 +546,7 @@ dist_check_SCRIPTS += fastopen.sh pkgconfig.sh starttls.sh starttls-ftp.sh start
 	sni-resume.sh ocsp-tests/ocsptool.sh cert-reencoding.sh pkcs7-cat.sh long-crl.sh \
 	serv-udp.sh logfile-option.sh gnutls-cli-resume.sh profile-tests.sh \
 	server-weak-keys.sh ocsp-tests/ocsp-signer-verify.sh cfg-test.sh \
-	sanity-lib.sh
+	sanity-lib.sh gnutls-cli-earlydata.sh
 
 if !DISABLE_SYSTEM_CONFIG
 dist_check_SCRIPTS += system-override-sig.sh system-override-hash.sh \
