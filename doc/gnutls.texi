@@ -163,6 +163,7 @@ Documentation License''.
 * Supported ciphersuites::
 * API reference::
 * Copying Information::
+* Additional Features::
 * Bibliography::
 * Function and Data Index::
 * Concept Index::
@@ -204,6 +205,8 @@ Documentation License''.
 @include cha-functions.texi
 
 @include cha-copying.texi
+
+@include cha-features.texi
 
 @include cha-bib.texi
 
