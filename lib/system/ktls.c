@@ -507,6 +507,14 @@ int _gnutls_ktls_set_keys(gnutls_session_t session,
 		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 	}
 
+	if (major < 6 || (major == 6 && minor < 14)) {
+		_gnutls_debug_log("Linux kernel version %lu.%lu doesn't yet "
+				  "support kTLS keyupdate, this will result in "
+				  "invalidation of the current session after a "
+				  "key-update is performed\n",
+				  major, minor);
+	}
+
 	/* check whether or not cipher suite supports ktls
 	 */
 	switch (cipher) {
