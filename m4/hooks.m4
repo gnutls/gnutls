@@ -414,7 +414,7 @@ AC_DEFUN([LIBGNUTLS_CHECK_SONAME],
   AC_CACHE_CHECK([$1 [soname]], [gnutls_cv_soname_[]soname],
     [AC_LINK_IFELSE([$2],
       [gnutls_cv_soname_[]soname=`(eval "$LDDPROG conftest$EXEEXT $LDDPOSTPROC") | grep '^lib[]$1\.so'`],
-      [gnutls_cv_soname_[]soname=none])])
+      [gnutls_cv_soname_[]soname=])])
   AS_IF([test -z "$gnutls_cv_soname_[]soname"], [gnutls_cv_soname_[]soname=none],
         [SONAME[]_LIBRARY_SONAME="$gnutls_cv_soname_[]soname"
 	 AC_DEFINE_UNQUOTED([SONAME[]_LIBRARY_SONAME], ["$gnutls_cv_soname_[]soname"], [The soname of $1 library])])

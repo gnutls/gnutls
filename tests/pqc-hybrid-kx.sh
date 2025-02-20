@@ -33,6 +33,13 @@ fi
 
 . "${srcdir}/scripts/common.sh"
 
+: ${ac_cv_sizeof_time_t=8}
+if test "${ac_cv_sizeof_time_t}" -ge 8; then
+	ATTIME_VALID="2038-10-12"  # almost the pregenerated cert expiration
+else
+	ATTIME_VALID="2030-12-17"  # end of epoch − 2590 days of validity
+fi
+
 # First check any mismatch in the gnutls-cli --list
 if ! "${CLI}" --list | grep '^Groups: .*GROUP-X25519-KYBER768.*' >/dev/null; then
     if "${CLI}" --list | grep '^Public Key Systems: .*KYBER768.*' >/dev/null; then
@@ -93,7 +100,7 @@ for group in X25519-KYBER768 SECP256R1-MLKEM768 SECP384R1-MLKEM1024 X25519-MLKEM
     PID=$!
     wait_server ${PID}
 
-    ${VALGRIND} "${CLI}" -p "${PORT}" localhost --priority "NORMAL:-GROUP-ALL:+GROUP-$group" --x509cafile="$CACERT" --logfile="$testdir/cli.log" </dev/null
+    ${VALGRIND} "${CLI}" --attime "${ATTIME_VALID}" -p "${PORT}" localhost --priority "NORMAL:-GROUP-ALL:+GROUP-$group" --x509cafile="$CACERT" --logfile="$testdir/cli.log" </dev/null
     kill ${PID}
     wait
 
@@ -112,7 +119,7 @@ for group in KYBER768 MLKEM768 MLKEM1024; do
     PID=$!
     wait_server ${PID}
 
-    ${VALGRIND} "${CLI}" -p "${PORT}" localhost --priority "NORMAL:-GROUP-ALL:+GROUP-$group" --x509cafile="$CACERT" --logfile="$testdir/cli.log" </dev/null
+    ${VALGRIND} "${CLI}" --attime "${ATTIME_VALID}" -p "${PORT}" localhost --priority "NORMAL:-GROUP-ALL:+GROUP-$group" --x509cafile="$CACERT" --logfile="$testdir/cli.log" </dev/null
     rc=$?
     kill ${PID}
     wait
@@ -140,7 +147,7 @@ for group in X25519-KYBER768 SECP256R1-MLKEM768 SECP384R1-MLKEM1024 X25519-MLKEM
     PID=$!
     wait_server ${PID}
 
-    ${VALGRIND} "${CLI}" -p "${PORT}" localhost --priority "NORMAL:-GROUP-ALL:+GROUP-$group" --x509cafile="$CACERT" --logfile="$testdir/cli.log" </dev/null
+    ${VALGRIND} "${CLI}" --attime "${ATTIME_VALID}" -p "${PORT}" localhost --priority "NORMAL:-GROUP-ALL:+GROUP-$group" --x509cafile="$CACERT" --logfile="$testdir/cli.log" </dev/null
     rc=$?
     kill ${PID}
     wait
