@@ -381,6 +381,10 @@ static const int _sign_priority_default[] = {
 	GNUTLS_SIGN_RSA_SHA1,
 	GNUTLS_SIGN_ECDSA_SHA1,
 
+	GNUTLS_SIGN_MLDSA44,
+	GNUTLS_SIGN_MLDSA65,
+	GNUTLS_SIGN_MLDSA87,
+
 	0
 };
 
