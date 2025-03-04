@@ -355,6 +355,10 @@ static const int _cipher_priority_secure192[] = {
 static const int *cipher_priority_secure192 = _cipher_priority_secure192;
 
 static const int _sign_priority_default[] = {
+	GNUTLS_SIGN_MLDSA44,
+	GNUTLS_SIGN_MLDSA65,
+	GNUTLS_SIGN_MLDSA87,
+
 	GNUTLS_SIGN_RSA_SHA256,
 	GNUTLS_SIGN_RSA_PSS_SHA256,
 	GNUTLS_SIGN_RSA_PSS_RSAE_SHA256,
@@ -380,10 +384,6 @@ static const int _sign_priority_default[] = {
 
 	GNUTLS_SIGN_RSA_SHA1,
 	GNUTLS_SIGN_ECDSA_SHA1,
-
-	GNUTLS_SIGN_MLDSA44,
-	GNUTLS_SIGN_MLDSA65,
-	GNUTLS_SIGN_MLDSA87,
 
 	0
 };
