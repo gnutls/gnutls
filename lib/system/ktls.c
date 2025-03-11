@@ -1122,8 +1122,44 @@ int _gnutls_ktls_recv_int(gnutls_session_t session, content_type_t type,
 				GNUTLS_E_UNIMPLEMENTED_FEATURE);
 			break;
 		case GNUTLS_ALERT:
+			if (ret < 2) {
+				return gnutls_assert_val(
+					GNUTLS_E_UNEXPECTED_PACKET);
+			}
+
+			uint8_t level = ((uint8_t *)data)[0];
+			uint8_t desc = ((uint8_t *)data)[1];
+
+			_gnutls_record_log(
+				"REC[%p]: Alert[%d|%d] - %s - was received\n",
+				session, level, desc,
+				gnutls_alert_get_name((int)desc));
+
+			session->internals.last_alert = desc;
+
+			/* if close notify is received and
+			 * the alert is not fatal
+			 */
+			if (desc == GNUTLS_A_CLOSE_NOTIFY &&
+			    level != GNUTLS_AL_FATAL) {
+				/* If we have been expecting for an alert do
+				 */
+				session->internals.read_eof = 1;
+				return 0;
+			}
+			/* if the alert is FATAL or WARNING
+			 * return the appropriate message
+			 */
+			gnutls_assert();
+			if (level == GNUTLS_AL_FATAL) {
+				session->internals.resumable = false;
+				session->internals.invalid_connection = 1;
+				return gnutls_assert_val(
+					GNUTLS_E_FATAL_ALERT_RECEIVED);
+			}
+
+			ret = GNUTLS_E_WARNING_ALERT_RECEIVED;
 			session_invalidate(session);
-			ret = 0;
 			break;
 		case GNUTLS_HANDSHAKE:
 			ret = gnutls_handshake_write(
