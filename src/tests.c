@@ -1770,7 +1770,9 @@ static test_code_t test_do_handshake_and_send_record(gnutls_session_t session)
 		return ret;
 
 	gnutls_record_send(session, snd_buf, sizeof(snd_buf) - 1);
-	ret = gnutls_record_recv(session, buf, sizeof(buf) - 1);
+	do {
+		ret = gnutls_record_recv(session, buf, sizeof(buf) - 1);
+	} while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
 	if (ret < 0)
 		return TEST_FAILED;
 

@@ -26,6 +26,7 @@
 : ${TIMEOUT=timeout}
 OUTFILE=cli-debug.$$.tmp
 TMPFILE=config.$$.tmp
+LOGFILE="$(basename "$0" .sh).log"
 unset RETCODE
 
 if ! test -x "${SERV}"; then
@@ -71,7 +72,7 @@ PID=$!
 wait_server ${PID}
 
 "$TIMEOUT" 1800 \
-"${DCLI}" --attime "2017-08-9" -p "${PORT}" localhost >$OUTFILE 2>&1 || fail ${PID} "gnutls-cli-debug run should have succeeded!"
+"${DCLI}" --attime "2017-08-9" -p "${PORT}" localhost >$OUTFILE 2>$LOGFILE  || fail ${PID} "gnutls-cli-debug run should have succeeded!"
 
 kill ${PID}
 wait
@@ -118,7 +119,7 @@ PID=$!
 wait_server ${PID}
 
 "$TIMEOUT" 1800 \
-"${DCLI}" --attime "2017-08-9" -p "${PORT}" localhost >$OUTFILE 2>&1 || fail ${PID} "gnutls-cli-debug run should have succeeded!"
+"${DCLI}" --attime "2017-08-9" -p "${PORT}" localhost >$OUTFILE 2>$LOGFILE  || fail ${PID} "gnutls-cli-debug run should have succeeded!"
 
 kill ${PID}
 wait
@@ -160,7 +161,7 @@ PID=$!
 wait_server ${PID}
 
 "$TIMEOUT" 1800 \
-"${DCLI}" --attime "2017-08-9" -p "${PORT}" localhost >$OUTFILE 2>&1 || fail ${PID} "gnutls-cli-debug run should have succeeded!"
+"${DCLI}" --attime "2017-08-9" -p "${PORT}" localhost >$OUTFILE 2>$LOGFILE  || fail ${PID} "gnutls-cli-debug run should have succeeded!"
 
 kill ${PID}
 wait
@@ -186,7 +187,7 @@ _EOF_
 
 GNUTLS_SYSTEM_PRIORITY_FILE="${TMPFILE}" \
 "$TIMEOUT" 1800 \
-"${DCLI}" --attime "2017-08-9" -p "${PORT}" localhost >$OUTFILE 2>&1 || fail ${PID} "gnutls-cli-debug run should have succeeded!"
+"${DCLI}" --attime "2017-08-9" -p "${PORT}" localhost >$OUTFILE 2>$LOGFILE  || fail ${PID} "gnutls-cli-debug run should have succeeded!"
 
 kill ${PID}
 wait
@@ -209,7 +210,7 @@ if test "${ENABLE_GOST}" = "1" && test "${GNUTLS_FORCE_FIPS_MODE}" != 1 ; then
 	wait_server ${PID}
 
 	"$TIMEOUT" 1800 \
-	"${DCLI}" --attime "2017-08-9" -p "${PORT}" localhost >$OUTFILE 2>&1 || fail ${PID} "gnutls-cli-debug run should have succeeded!"
+	"${DCLI}" --attime "2017-08-9" -p "${PORT}" localhost >$OUTFILE 2>$LOGFILE  || fail ${PID} "gnutls-cli-debug run should have succeeded!"
 
 	kill ${PID}
 	wait

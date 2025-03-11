@@ -67,6 +67,11 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "|<%d>| %s", level, str);
 }
 
+static void tls_audit_log_func(gnutls_session_t session, const char *str)
+{
+	fprintf(stderr, "|<%p>| %s", session, str);
+}
+
 typedef test_code_t (*TEST_FUNC)(gnutls_session_t);
 
 typedef struct {
@@ -277,6 +282,7 @@ int main(int argc, char **argv)
 	}
 
 	gnutls_global_set_log_function(tls_log_func);
+	gnutls_global_set_audit_log_function(tls_audit_log_func);
 	gnutls_global_set_log_level(debug);
 
 	/* get server name */
