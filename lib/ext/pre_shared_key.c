@@ -827,7 +827,9 @@ static int server_recv_params(gnutls_session_t session,
 	struct timespec ticket_creation_time = { 0, 0 };
 	enum binder_type binder_type;
 	bool refuse_early_data = false;
+	gnutls_mac_algorithm_t mac = GNUTLS_MAC_SHA384;
 
+retry_binder:
 	ret = _gnutls13_psk_ext_parser_init(&psk_parser, data, len);
 	if (ret < 0) {
 		/* No PSKs advertised by client */
@@ -885,6 +887,8 @@ static int server_recv_params(gnutls_session_t session,
 			uint8_t ipsk[MAX_HASH_SIZE];
 
 			prf = pskcred->binder_algo;
+			if (prf->id == GNUTLS_MAC_UNKNOWN)
+				prf = _gnutls_mac_to_entry(mac);
 
 			/* this fails only on configuration errors; as such we always
 			 * return its error code in that case */
@@ -974,6 +978,15 @@ static int server_recv_params(gnutls_session_t session,
 
 	if (_gnutls_mac_get_algo_len(prf) != binder_recvd.size ||
 	    gnutls_memcmp(binder_value, binder_recvd.data, binder_recvd.size)) {
+		/*
+		 * Older clients will always use SHA256 as binder algorithm
+		 * even for SHA384 PSKs, so we need to retry with SHA256
+		 * to calculate the correct binder value for those.
+		 */
+		if (prf->id == GNUTLS_MAC_UNKNOWN && mac == GNUTLS_MAC_SHA384) {
+			mac = GNUTLS_MAC_SHA256;
+			goto retry_binder;
+		}
 		gnutls_assert();
 		ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 		goto fail;

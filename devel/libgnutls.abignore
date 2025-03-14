@@ -74,3 +74,9 @@ name = drbg_aes_reseed
 [suppress_type]
 name = gnutls_cipher_algorithm_t
 changed_enumerators = GNUTLS_CIPHER_AES_128_CFB, GNUTLS_CIPHER_AES_192_CFB, GNUTLS_CIPHER_AES_256_CFB
+
+[suppress_function]
+name = gnutls_psk_allocate_client_credentials2
+
+[suppress_function]
+name = gnutls_psk_allocate_server_credentials2

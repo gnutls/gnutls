@@ -1450,6 +1450,15 @@ GNUTLS_3_8_6
 	*;
 } GNUTLS_3_8_4;
 
+GNUTLS_3_8_11
+{
+ global:
+	gnutls_psk_allocate_client_credentials2;
+	gnutls_psk_allocate_server_credentials2;
+ local:
+	*;
+} GNUTLS_3_8_6;
+
 GNUTLS_FIPS140_3_4 {
   global:
 	gnutls_cipher_self_test;
