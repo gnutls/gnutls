@@ -353,7 +353,7 @@ fedora/build:
       --disable-non-suiteb-curves
       --with-system-priority-file=/etc/crypto-policies/back-ends/gnutls.config
       --with-default-trust-store-pkcs11='pkcs11:'
-      --without-tpm --with-tpm2 --enable-ktls --with-liboqs
+      --without-tpm --with-tpm2 --enable-ktls
       --htmldir=/usr/share/doc/manual
       --with-unbound-root-key-file=/var/lib/unbound/root.key
       --enable-libdane --disable-rpath
@@ -706,25 +706,6 @@ fedora-abicoverage/test:
       - ./**/*.log
       - gnutls-prev-abi.tmp/
       - compat_reports/
-
-fedora-no-liboqs/test:
-  extends:
-    - .test
-    - .fedora
-  dependencies:
-    - fedora/build
-  needs:
-    - fedora/build
-  script:
-    - |
-      cat > /etc/crypto-policies/local.d/gnutls-ktls.config <<EOF
-      [global]
-      ktls = true
-      EOF
-      update-crypto-policies
-      echo "SYSTEM=NORMAL" >> tests/system.prio
-    - dnf remove -y liboqs
-    - make -j$CHECKJOBS check
 
 fedora-cross/bootstrap:
   extends:

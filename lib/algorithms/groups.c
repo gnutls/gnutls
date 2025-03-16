@@ -172,7 +172,7 @@ static const gnutls_group_entry_st supported_groups[] = {
 	  .pk = GNUTLS_PK_DH,
 	  .tls_id = 0x104 },
 #endif
-#if defined(HAVE_LIBOQS) || defined(HAVE_LEANCRYPTO)
+#ifdef HAVE_LEANCRYPTO
 	{
 		.name = "MLKEM768",
 		.id = GNUTLS_GROUP_EXP_MLKEM768,
@@ -190,17 +190,7 @@ static const gnutls_group_entry_st supported_groups[] = {
 		/* absense of .tls_id means that this group alone cannot be used in TLS */
 	},
 #endif
-#ifdef HAVE_LIBOQS
-	{
-		.name = "KYBER768",
-		.id = GNUTLS_GROUP_EXP_KYBER768,
-		.pk = GNUTLS_PK_EXP_KYBER768,
-		.pubkey_size = MLKEM768_PUBKEY_SIZE,
-		.ciphertext_size = MLKEM768_CIPHERTEXT_SIZE,
-		/* absense of .tls_id means that this group alone cannot be used in TLS */
-	},
-#endif
-#if defined(HAVE_LIBOQS) || defined(HAVE_LEANCRYPTO)
+#ifdef HAVE_LEANCRYPTO
 	{ .name = "SECP256R1-MLKEM768",
 	  .id = GNUTLS_GROUP_EXP_SECP256R1_MLKEM768,
 	  .ids = { GNUTLS_GROUP_SECP256R1, GNUTLS_GROUP_EXP_MLKEM768,
@@ -216,13 +206,6 @@ static const gnutls_group_entry_st supported_groups[] = {
 	  .ids = { GNUTLS_GROUP_EXP_MLKEM768, GNUTLS_GROUP_X25519,
 		   GNUTLS_GROUP_INVALID },
 	  .tls_id = 0x11EC },
-#endif
-#ifdef HAVE_LIBOQS
-	{ .name = "X25519-KYBER768",
-	  .id = GNUTLS_GROUP_EXP_X25519_KYBER768,
-	  .ids = { GNUTLS_GROUP_X25519, GNUTLS_GROUP_EXP_KYBER768,
-		   GNUTLS_GROUP_INVALID },
-	  .tls_id = 0x6399 },
 #endif
 	{ 0, 0, 0 }
 };

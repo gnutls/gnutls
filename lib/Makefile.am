@@ -29,10 +29,6 @@ if ENABLE_MINITASN1
 SUBDIRS += minitasn1
 endif
 
-if ENABLE_LIBOQS
-SUBDIRS += liboqs
-endif
-
 localedir = $(datadir)/locale
 
 include $(top_srcdir)/lib/common.mk
@@ -124,17 +120,6 @@ AM_CPPFLAGS += -DGNUTLS_BROTLIDEC_ENABLE_DLOPEN=1
 else
 thirdparty_libadd += $(LIBBROTLIENC_LIBS)
 thirdparty_libadd += $(LIBBROTLIDEC_LIBS)
-endif
-endif
-
-if ENABLE_LIBOQS
-COBJECTS += dlwrap/oqs.c dlwrap/oqsfuncs.h dlwrap/oqs.h
-AM_CPPFLAGS += $(LIBOQS_CFLAGS)
-
-if LIBOQS_ENABLE_DLOPEN
-AM_CPPFLAGS += -DGNUTLS_OQS_ENABLE_DLOPEN=1
-else
-thirdparty_libadd += $(LIBOQS_LIBS)
 endif
 endif
 
@@ -297,10 +282,6 @@ endif
 if ENABLE_NETTLE
 thirdparty_libadd += $(HOGWEED_LIBS) $(NETTLE_LIBS) $(GMP_LIBS)
 libgnutls_la_LIBADD += nettle/libcrypto.la
-endif
-
-if ENABLE_LIBOQS
-libgnutls_la_LIBADD += liboqs/libcrypto.la
 endif
 
 if HAVE_LD_OUTPUT_DEF

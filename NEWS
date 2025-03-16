@@ -5,6 +5,15 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.8.10 (unreleased)
+
+** libgnutls: liboqs support for PQC has been removed
+   For maintenance purposes, support for post-quantum cryptography
+   (PQC) is now only provided through leancrypto. The experimental key
+   exchange algorithm, X25519Kyber768Draft00, which is based on the
+   round 3 candidate of Kyber and only supported through liboqs has
+   also been removed altogether.
+
 * Version 3.8.9 (released 2025-02-07)
 
 ** libgnutls: leancrypto was added as an interim option for PQC
