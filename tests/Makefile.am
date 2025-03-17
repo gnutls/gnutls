@@ -21,7 +21,7 @@
 
 SUBDIRS = . cert-tests slow
 
-TESTS_ENVIRONMENT =
+TESTS_ENVIRONMENT = HOST_OS=$$(uname)
 
 if WINDOWS
 SUBDIRS += windows
