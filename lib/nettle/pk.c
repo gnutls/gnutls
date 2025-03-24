@@ -1005,15 +1005,14 @@ static int ml_kem_decaps(gnutls_pk_algorithm_t algo,
 	if (kem == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-	shared_secret->data = gnutls_malloc(kem->length_shared_secret);
-	if (shared_secret->data == NULL) {
-		GNUTLS_OQS_FUNC(OQS_KEM_free)(kem);
+	tmp_shared_secret.size = kem->length_shared_secret;
+	tmp_shared_secret.data = gnutls_malloc(tmp_shared_secret.size);
+	if (tmp_shared_secret.data == NULL) {
 		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 		goto cleanup;
 	}
-	shared_secret->size = kem->length_shared_secret;
 
-	rc = GNUTLS_OQS_FUNC(OQS_KEM_decaps)(kem, shared_secret->data,
+	rc = GNUTLS_OQS_FUNC(OQS_KEM_decaps)(kem, tmp_shared_secret.data,
 					     ciphertext->data, priv->data);
 	if (rc != OQS_SUCCESS) {
 		GNUTLS_OQS_FUNC(OQS_KEM_free)(kem);

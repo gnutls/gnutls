@@ -105,6 +105,7 @@ default:
   variables:
     COMPILER: clang
     NETTLE_DIR: nettle
+    NETTLE_BRANCH: release-3.10-fixes
 
 .fedora-leancrypto:
   extends:
@@ -467,7 +468,7 @@ fedora-FIPS140-2/test:
   needs:
     - fedora/bootstrap
   script:
-    - git clone --depth 1 --branch master https://gitlab.com/gnutls/nettle.git nettle-git
+    - git clone --depth 1 --branch $NETTLE_BRANCH https://gitlab.com/gnutls/nettle.git nettle-git
     - pushd nettle-git
     - rm -rf .git               # for artifacts:untracked to work
     - ./.bootstrap
