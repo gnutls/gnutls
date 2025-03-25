@@ -580,6 +580,11 @@ void socket_open_int(socket_st *hd, const char *hostname, const char *service,
 		}
 
 		if (hd->session) {
+			if (hd->rdata.data) {
+				gnutls_session_set_data(hd->session,
+							hd->rdata.data,
+							hd->rdata.size);
+			}
 			if (hd->edata.data) {
 				ret = gnutls_record_send_early_data(
 					hd->session, hd->edata.data,
@@ -590,11 +595,6 @@ void socket_open_int(socket_st *hd, const char *hostname, const char *service,
 					close(sd);
 					exit(1);
 				}
-			}
-			if (hd->rdata.data) {
-				gnutls_session_set_data(hd->session,
-							hd->rdata.data,
-							hd->rdata.size);
 			}
 
 			if (client_trace || server_trace) {
