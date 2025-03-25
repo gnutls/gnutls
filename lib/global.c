@@ -42,6 +42,9 @@
 #include "str.h"
 #include "global.h"
 #include "liboqs/liboqs.h"
+#ifdef HAVE_LEANCRYPTO
+#include <leancrypto.h>
+#endif
 
 /* Minimum library versions we accept. */
 #define GNUTLS_MIN_LIBTASN1_VERSION "0.3.4"
@@ -366,6 +369,9 @@ static int _gnutls_global_init(unsigned constructor)
 	_gnutls_register_accel_crypto();
 	_gnutls_cryptodev_init();
 	_gnutls_afalg_init();
+#ifdef HAVE_LEANCRYPTO
+	lc_init(0);
+#endif
 
 #ifdef ENABLE_FIPS140
 	/* These self tests are performed on the overridden algorithms
