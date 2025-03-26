@@ -2783,10 +2783,7 @@ static int _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 		if (hash_len > vdata->size)
 			hash_len = vdata->size;
 
-		/* SHA-1 is allowed for SigVer in FIPS 140-3 in legacy
-			 * mode */
 		switch (DIG_TO_MAC(sign_params->dsa_dig)) {
-		case GNUTLS_MAC_SHA1:
 		case GNUTLS_MAC_SHA256:
 		case GNUTLS_MAC_SHA384:
 		case GNUTLS_MAC_SHA512:
@@ -2856,7 +2853,7 @@ static int _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 		bits = mpz_sizeinbase(pub.n, 2);
 
 		/* In FIPS 140-3, RSA key size should be larger than 2048-bit.
-			 * In addition to this, only SHA-1 and SHA-2 are allowed
+			 * In addition to this, only SHA-2 is allowed
 			 * for SigVer; it is checked in _pkcs1_rsa_verify_sig in
 			 * lib/pubkey.c.
 			 */
@@ -2902,7 +2899,7 @@ static int _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 		}
 
 		/* RSA modulus size should be 2048-bit or larger in FIPS
-			 * 140-3.  In addition to this, only SHA-1 and SHA-2 are
+			 * 140-3.  In addition to this, only SHA-2 are
 			 * allowed for SigVer, while Nettle only supports
 			 * SHA256, SHA384, and SHA512 for RSA-PSS (see
 			 * _rsa_pss_verify_digest in this file for the details).
