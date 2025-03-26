@@ -72,9 +72,6 @@
 #include "dh.h"
 #ifdef HAVE_LEANCRYPTO
 #include <leancrypto.h>
-#elif defined HAVE_LIBOQS
-#include "dlwrap/oqs.h"
-#include "liboqs/liboqs.h"
 #endif
 #include "attribute.h"
 
@@ -898,199 +895,6 @@ cleanup:
 	zeroize_key(&sk, sizeof(sk));
 	return ret;
 }
-#elif defined HAVE_LIBOQS
-static const char *ml_kem_pk_to_liboqs_algo(gnutls_pk_algorithm_t algo)
-{
-	switch (algo) {
-	case GNUTLS_PK_MLKEM768:
-		return OQS_KEM_alg_ml_kem_768;
-	case GNUTLS_PK_EXP_KYBER768:
-		return OQS_KEM_alg_kyber_768;
-	case GNUTLS_PK_MLKEM1024:
-		return OQS_KEM_alg_ml_kem_1024;
-	default:
-		gnutls_assert();
-		return NULL;
-	}
-}
-
-static int ml_kem_exists(gnutls_pk_algorithm_t algo)
-{
-	const char *algo_name;
-
-	if (_gnutls_liboqs_ensure() < 0)
-		return 0;
-
-	algo_name = ml_kem_pk_to_liboqs_algo(algo);
-	return algo_name != NULL &&
-	       GNUTLS_OQS_FUNC(OQS_KEM_alg_is_enabled)(algo_name);
-}
-
-static int ml_kem_encaps(gnutls_pk_algorithm_t algo, gnutls_datum_t *ciphertext,
-			 gnutls_datum_t *shared_secret,
-			 const gnutls_datum_t *pub)
-{
-	int ret;
-	OQS_KEM *kem = NULL;
-	const char *algo_name;
-	gnutls_datum_t tmp_ciphertext = { NULL, 0 };
-	gnutls_datum_t tmp_shared_secret = { NULL, 0 };
-	OQS_STATUS rc;
-
-	if (_gnutls_liboqs_ensure() < 0)
-		return gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
-
-	algo_name = ml_kem_pk_to_liboqs_algo(algo);
-	if (algo_name == NULL ||
-	    !GNUTLS_OQS_FUNC(OQS_KEM_alg_is_enabled)(algo_name))
-		return gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
-
-	kem = GNUTLS_OQS_FUNC(OQS_KEM_new)(algo_name);
-	if (kem == NULL)
-		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-
-	tmp_ciphertext.size = kem->length_ciphertext;
-	tmp_ciphertext.data = gnutls_malloc(tmp_ciphertext.size);
-	if (tmp_ciphertext.data == NULL) {
-		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-		goto cleanup;
-	}
-
-	tmp_shared_secret.size = kem->length_shared_secret;
-	tmp_shared_secret.data = gnutls_malloc(tmp_shared_secret.size);
-	if (tmp_shared_secret.data == NULL) {
-		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-		goto cleanup;
-	}
-
-	rc = GNUTLS_OQS_FUNC(OQS_KEM_encaps)(kem, tmp_ciphertext.data,
-					     tmp_shared_secret.data, pub->data);
-	if (rc != OQS_SUCCESS) {
-		ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-		goto cleanup;
-	}
-
-	*ciphertext = _gnutls_steal_datum(&tmp_ciphertext);
-	*shared_secret = _gnutls_steal_datum(&tmp_shared_secret);
-
-	ret = 0;
-
-cleanup:
-	_gnutls_free_datum(&tmp_ciphertext);
-	_gnutls_free_key_datum(&tmp_shared_secret);
-	GNUTLS_OQS_FUNC(OQS_KEM_free)(kem);
-	return ret;
-}
-
-static int ml_kem_decaps(gnutls_pk_algorithm_t algo,
-			 gnutls_datum_t *shared_secret,
-			 const gnutls_datum_t *ciphertext,
-			 const gnutls_datum_t *priv)
-{
-	int ret;
-	OQS_KEM *kem = NULL;
-	const char *algo_name;
-	gnutls_datum_t tmp_shared_secret = { NULL, 0 };
-	OQS_STATUS rc;
-
-	if (_gnutls_liboqs_ensure() < 0)
-		return gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
-
-	algo_name = ml_kem_pk_to_liboqs_algo(algo);
-	if (algo_name == NULL ||
-	    !GNUTLS_OQS_FUNC(OQS_KEM_alg_is_enabled)(algo_name))
-		return gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
-
-	kem = GNUTLS_OQS_FUNC(OQS_KEM_new)(algo_name);
-	if (kem == NULL)
-		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-
-	tmp_shared_secret.size = kem->length_shared_secret;
-	tmp_shared_secret.data = gnutls_malloc(tmp_shared_secret.size);
-	if (tmp_shared_secret.data == NULL) {
-		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-		goto cleanup;
-	}
-
-	rc = GNUTLS_OQS_FUNC(OQS_KEM_decaps)(kem, tmp_shared_secret.data,
-					     ciphertext->data, priv->data);
-	if (rc != OQS_SUCCESS) {
-		GNUTLS_OQS_FUNC(OQS_KEM_free)(kem);
-		ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-		goto cleanup;
-	}
-
-	*shared_secret = _gnutls_steal_datum(&tmp_shared_secret);
-
-	ret = 0;
-
-cleanup:
-	_gnutls_free_key_datum(&tmp_shared_secret);
-	GNUTLS_OQS_FUNC(OQS_KEM_free)(kem);
-	return ret;
-}
-
-static int ml_kem_generate_keypair(gnutls_pk_algorithm_t algo,
-				   gnutls_datum_t *raw_priv,
-				   gnutls_datum_t *raw_pub)
-{
-	int ret;
-	OQS_KEM *kem = NULL;
-	const char *algo_name;
-	gnutls_datum_t tmp_raw_priv = { NULL, 0 };
-	gnutls_datum_t tmp_raw_pub = { NULL, 0 };
-	OQS_STATUS rc;
-
-	if (_gnutls_liboqs_ensure() < 0) {
-		ret = gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
-		goto cleanup;
-	}
-
-	algo_name = ml_kem_pk_to_liboqs_algo(algo);
-	if (algo_name == NULL ||
-	    !GNUTLS_OQS_FUNC(OQS_KEM_alg_is_enabled)(algo_name)) {
-		ret = gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
-		goto cleanup;
-	}
-
-	kem = GNUTLS_OQS_FUNC(OQS_KEM_new)(algo_name);
-	if (kem == NULL) {
-		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-		goto cleanup;
-	}
-
-	tmp_raw_priv.size = kem->length_secret_key;
-	tmp_raw_priv.data = gnutls_malloc(tmp_raw_priv.size);
-	if (tmp_raw_priv.data == NULL) {
-		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-		goto cleanup;
-	}
-
-	tmp_raw_pub.size = kem->length_public_key;
-	tmp_raw_pub.data = gnutls_malloc(tmp_raw_pub.size);
-	if (tmp_raw_pub.data == NULL) {
-		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-		goto cleanup;
-	}
-
-	rc = GNUTLS_OQS_FUNC(OQS_KEM_keypair)(kem, tmp_raw_pub.data,
-					      tmp_raw_priv.data);
-	if (rc != OQS_SUCCESS) {
-		ret = gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
-		goto cleanup;
-	}
-
-	*raw_priv = _gnutls_steal_datum(&tmp_raw_priv);
-	*raw_pub = _gnutls_steal_datum(&tmp_raw_pub);
-
-	ret = 0;
-
-cleanup:
-	_gnutls_free_key_datum(&tmp_raw_priv);
-	_gnutls_free_key_datum(&tmp_raw_pub);
-	GNUTLS_OQS_FUNC(OQS_KEM_free)(kem);
-	return ret;
-}
 #else
 static int ml_kem_exists(gnutls_pk_algorithm_t algo MAYBE_UNUSED)
 {
@@ -1129,9 +933,6 @@ static int _wrap_nettle_pk_encaps(gnutls_pk_algorithm_t algo,
 	switch (algo) {
 	case GNUTLS_PK_MLKEM768:
 	case GNUTLS_PK_MLKEM1024:
-#ifdef HAVE_LIBOQS
-	case GNUTLS_PK_EXP_KYBER768:
-#endif
 		return ml_kem_encaps(algo, ciphertext, shared_secret, pub);
 	default:
 		return gnutls_assert_val(GNUTLS_E_UNKNOWN_ALGORITHM);
@@ -1146,9 +947,6 @@ static int _wrap_nettle_pk_decaps(gnutls_pk_algorithm_t algo,
 	switch (algo) {
 	case GNUTLS_PK_MLKEM768:
 	case GNUTLS_PK_MLKEM1024:
-#ifdef HAVE_LIBOQS
-	case GNUTLS_PK_EXP_KYBER768:
-#endif
 		return ml_kem_decaps(algo, shared_secret, ciphertext, priv);
 	default:
 		return gnutls_assert_val(GNUTLS_E_UNKNOWN_ALGORITHM);
@@ -1932,180 +1730,6 @@ cleanup:
 	zeroize_key(&sk, sizeof(sk));
 	return ret;
 }
-#elif defined HAVE_LIBOQS
-static const char *ml_dsa_pk_to_liboqs_algo(gnutls_pk_algorithm_t algo)
-{
-	switch (algo) {
-	case GNUTLS_PK_MLDSA44:
-		return OQS_SIG_alg_ml_dsa_44;
-	case GNUTLS_PK_MLDSA65:
-		return OQS_SIG_alg_ml_dsa_65;
-	case GNUTLS_PK_MLDSA87:
-		return OQS_SIG_alg_ml_dsa_87;
-	default:
-		gnutls_assert();
-		return NULL;
-	}
-}
-
-static int ml_dsa_exists(gnutls_pk_algorithm_t algo)
-{
-	const char *algo_name;
-
-	if (_gnutls_liboqs_ensure() < 0)
-		return 0;
-
-	algo_name = ml_dsa_pk_to_liboqs_algo(algo);
-	return algo_name != NULL &&
-	       GNUTLS_OQS_FUNC(OQS_SIG_alg_is_enabled)(algo_name);
-}
-
-static int ml_dsa_sign(gnutls_pk_algorithm_t algo, gnutls_datum_t *signature,
-		       const gnutls_datum_t *message,
-		       const gnutls_datum_t *raw_priv)
-{
-	int ret;
-	OQS_SIG *sig;
-	OQS_STATUS rc;
-	gnutls_datum_t tmp_signature = { NULL, 0 };
-	size_t size;
-	const char *algo_name;
-
-	if (_gnutls_liboqs_ensure() < 0)
-		return gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
-
-	algo_name = ml_dsa_pk_to_liboqs_algo(algo);
-	if (algo_name == NULL ||
-	    !GNUTLS_OQS_FUNC(OQS_SIG_alg_is_enabled)(algo_name)) {
-		return gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
-	}
-
-	sig = GNUTLS_OQS_FUNC(OQS_SIG_new)(algo_name);
-	if (sig == NULL) {
-		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-		goto cleanup;
-	}
-
-	tmp_signature.size = sig->length_signature;
-	tmp_signature.data = gnutls_malloc(tmp_signature.size);
-	if (tmp_signature.data == NULL) {
-		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-		goto cleanup;
-	}
-
-	size = tmp_signature.size;
-	rc = GNUTLS_OQS_FUNC(OQS_SIG_sign)(sig, tmp_signature.data, &size,
-					   message->data, message->size,
-					   raw_priv->data);
-	if (rc != OQS_SUCCESS) {
-		ret = gnutls_assert_val(GNUTLS_E_PK_SIGN_FAILED);
-		goto cleanup;
-	}
-	tmp_signature.size = size;
-
-	*signature = _gnutls_steal_datum(&tmp_signature);
-
-	ret = GNUTLS_E_SUCCESS;
-
-cleanup:
-	_gnutls_free_datum(&tmp_signature);
-	GNUTLS_OQS_FUNC(OQS_SIG_free)(sig);
-	return ret;
-}
-
-static int ml_dsa_verify(gnutls_pk_algorithm_t algo,
-			 const gnutls_datum_t *signature,
-			 const gnutls_datum_t *message,
-			 const gnutls_datum_t *raw_pub)
-{
-	int ret;
-	OQS_SIG *sig;
-	OQS_STATUS rc;
-
-	if (_gnutls_liboqs_ensure() < 0)
-		return gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
-
-	const char *algo_name = ml_dsa_pk_to_liboqs_algo(algo);
-	if (algo_name == NULL ||
-	    !GNUTLS_OQS_FUNC(OQS_SIG_alg_is_enabled)(algo_name)) {
-		return gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
-	}
-
-	sig = GNUTLS_OQS_FUNC(OQS_SIG_new)(algo_name);
-	if (sig == NULL) {
-		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-		goto cleanup;
-	}
-
-	rc = GNUTLS_OQS_FUNC(OQS_SIG_verify)(sig, message->data, message->size,
-					     signature->data, signature->size,
-					     raw_pub->data);
-	if (rc != OQS_SUCCESS) {
-		ret = gnutls_assert_val(GNUTLS_E_PK_SIG_VERIFY_FAILED);
-		goto cleanup;
-	}
-
-	ret = GNUTLS_E_SUCCESS;
-
-cleanup:
-	GNUTLS_OQS_FUNC(OQS_SIG_free)(sig);
-	return ret;
-}
-
-static int ml_dsa_generate_keypair(gnutls_pk_algorithm_t algo,
-				   gnutls_datum_t *raw_priv,
-				   gnutls_datum_t *raw_pub)
-{
-	int ret;
-	OQS_SIG *sig = NULL;
-	gnutls_datum_t tmp_raw_priv = { NULL, 0 };
-	gnutls_datum_t tmp_raw_pub = { NULL, 0 };
-	OQS_STATUS rc;
-
-	if (_gnutls_liboqs_ensure() < 0)
-		return gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
-
-	const char *algo_name = ml_dsa_pk_to_liboqs_algo(algo);
-	if (algo_name == NULL ||
-	    !GNUTLS_OQS_FUNC(OQS_SIG_alg_is_enabled)(algo_name))
-		return gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
-
-	sig = GNUTLS_OQS_FUNC(OQS_SIG_new)(algo_name);
-	if (sig == NULL)
-		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-
-	tmp_raw_priv.size = sig->length_secret_key;
-	tmp_raw_priv.data = gnutls_malloc(tmp_raw_priv.size);
-	if (tmp_raw_priv.data == NULL) {
-		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-		goto cleanup;
-	}
-
-	tmp_raw_pub.size = sig->length_public_key;
-	tmp_raw_pub.data = gnutls_malloc(tmp_raw_pub.size);
-	if (tmp_raw_pub.data == NULL) {
-		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-		goto cleanup;
-	}
-
-	rc = GNUTLS_OQS_FUNC(OQS_SIG_keypair)(sig, tmp_raw_pub.data,
-					      tmp_raw_priv.data);
-	if (rc != OQS_SUCCESS) {
-		ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
-		goto cleanup;
-	}
-
-	*raw_priv = _gnutls_steal_datum(&tmp_raw_priv);
-	*raw_pub = _gnutls_steal_datum(&tmp_raw_pub);
-
-	ret = GNUTLS_E_SUCCESS;
-
-cleanup:
-	_gnutls_free_key_datum(&tmp_raw_priv);
-	_gnutls_free_key_datum(&tmp_raw_pub);
-	GNUTLS_OQS_FUNC(OQS_SIG_free)(sig);
-	return ret;
-}
 #else
 static int ml_dsa_exists(gnutls_pk_algorithm_t algo MAYBE_UNUSED)
 {
@@ -2555,12 +2179,6 @@ static int _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 	case GNUTLS_PK_MLDSA44:
 	case GNUTLS_PK_MLDSA65:
 	case GNUTLS_PK_MLDSA87:
-#if !defined(HAVE_LEANCRYPTO) && defined(HAVE_LIBOQS)
-		/* As of liboqs 0.12.0, liboqs implementation lacks
-		 * sufficient checks for ML-DSA.
-		 */
-		not_approved = true;
-#endif
 		ret = ml_dsa_sign(algo, signature, vdata, &pk_params->raw_priv);
 		if (ret < 0)
 			goto cleanup;
@@ -2934,12 +2552,6 @@ static int _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 	case GNUTLS_PK_MLDSA44:
 	case GNUTLS_PK_MLDSA65:
 	case GNUTLS_PK_MLDSA87:
-#if !defined(HAVE_LEANCRYPTO) && defined(HAVE_LIBOQS)
-		/* As of liboqs 0.12.0, liboqs implementation lacks
-		 * sufficient checks for ML-DSA.
-		 */
-		not_approved = true;
-#endif
 		ret = ml_dsa_verify(algo, signature, vdata,
 				    &pk_params->raw_pub);
 		if (ret < 0)
@@ -3110,9 +2722,6 @@ static int _wrap_nettle_pk_exists(gnutls_pk_algorithm_t pk)
 		return 1;
 	case GNUTLS_PK_MLKEM768:
 	case GNUTLS_PK_MLKEM1024:
-#ifdef HAVE_LIBOQS
-	case GNUTLS_PK_EXP_KYBER768:
-#endif
 		return ml_kem_exists(pk);
 	case GNUTLS_PK_MLDSA44:
 	case GNUTLS_PK_MLDSA65:
@@ -3761,9 +3370,6 @@ static int pct_test(gnutls_pk_algorithm_t algo,
 		break;
 	case GNUTLS_PK_MLKEM768:
 	case GNUTLS_PK_MLKEM1024:
-#ifdef HAVE_LIBOQS
-	case GNUTLS_PK_EXP_KYBER768:
-#endif
 		if (!ml_kem_exists(algo)) {
 			ret = gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
 			goto cleanup;
@@ -4496,9 +4102,6 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 	}
 	case GNUTLS_PK_MLKEM768:
 	case GNUTLS_PK_MLKEM1024:
-#ifdef HAVE_LIBOQS
-	case GNUTLS_PK_EXP_KYBER768:
-#endif
 		not_approved = true;
 		ret = ml_kem_generate_keypair(algo, &params->raw_priv,
 					      &params->raw_pub);
@@ -4774,9 +4377,6 @@ static int wrap_nettle_pk_verify_priv_params(gnutls_pk_algorithm_t algo,
 	}
 	case GNUTLS_PK_MLKEM768:
 	case GNUTLS_PK_MLKEM1024:
-#ifdef HAVE_LIBOQS
-	case GNUTLS_PK_EXP_KYBER768:
-#endif
 		if (!ml_kem_exists(algo))
 			return gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
 

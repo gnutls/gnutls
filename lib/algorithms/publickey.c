@@ -210,14 +210,6 @@ static const gnutls_pk_entry pk_algorithms[] = {
 	  .oid = NULL,
 	  .id = GNUTLS_PK_MLKEM1024,
 	  .curve = GNUTLS_ECC_CURVE_INVALID },
-/* Hidden behind HAVE_LIBOQS as it will be removed in the future.
-	 */
-#ifdef HAVE_LIBOQS
-	{ .name = "KYBER768",
-	  .oid = NULL,
-	  .id = GNUTLS_PK_EXP_KYBER768,
-	  .curve = GNUTLS_ECC_CURVE_INVALID },
-#endif
 	{ .name = "ML-DSA-44",
 	  .oid = MLDSA44_OID,
 	  .id = GNUTLS_PK_MLDSA44,

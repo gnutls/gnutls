@@ -41,7 +41,6 @@
 #include "system-keys.h"
 #include "str.h"
 #include "global.h"
-#include "liboqs/liboqs.h"
 #ifdef HAVE_LEANCRYPTO
 #include <leancrypto.h>
 #endif
@@ -450,9 +449,6 @@ static void _gnutls_global_deinit(unsigned destructor)
 #endif
 #ifdef HAVE_TPM2
 		_gnutls_tpm2_deinit();
-#endif
-#ifdef HAVE_LIBOQS
-		_gnutls_liboqs_deinit();
 #endif
 
 		_gnutls_nss_keylog_deinit();

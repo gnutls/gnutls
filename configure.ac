@@ -1345,61 +1345,6 @@ AM_COND_IF([ENABLE_LEANCRYPTO], [
     fi
 ])
 
-AC_ARG_WITH(liboqs,
-   [AS_HELP_STRING([--with-liboqs=yes/link/dlopen --with-liboqs],
-                  [customize/enable liboqs support])],
-            ac_liboqs=$withval, ac_liboqs=no)
-
-AS_IF([test "$ac_leancrypto" != no && test "$ac_liboqs" != no],
-  [AC_MSG_ERROR([--with-leancrypto and --with-liboqs are mutually exclusive])])
-
-AS_CASE([$ac_liboqs],
-  [yes],
-    [AM_COND_IF([ENABLE_DLOPEN], [ac_liboqs=dlopen], [ac_liboqs=link])],
-  [dlopen],
-    [AM_COND_IF([ENABLE_DLOPEN], [:],[AC_MSG_ERROR([[
-***
-*** Unable to dlopen LIBOQS, try --with-liboqs.
-*** ]])])],
-  [link], [:],
-  [no], [:],
-  [AC_MSG_ERROR([[Unknown argument ${ac_liboqs} for --with-liboqs]])])
-
-m4_define([min_liboqs_version_major], [0])
-m4_define([min_liboqs_version_minor], [11])
-m4_define([min_liboqs_version_micro], [0])
-
-AS_IF([test x$ac_liboqs != xno],
-    [PKG_CHECK_MODULES([LIBOQS],[liboqs >= min_liboqs_version_major.min_liboqs_version_minor.min_liboqs_version_micro],
-      [AC_DEFINE([HAVE_LIBOQS], 1, [Have liboqs])
-      AC_DEFINE([MIN_LIBOQS_VERSION_MAJOR], min_liboqs_version_major, [Major version of liboqs required])
-      AC_DEFINE([MIN_LIBOQS_VERSION_MINOR], min_liboqs_version_minor, [Minor version of liboqs required])
-      AC_DEFINE([MIN_LIBOQS_VERSION_MICRO], min_liboqs_version_micro, [Micro version of liboqs required])
-      need_ltlibdl=yes],
-      [AC_MSG_ERROR([liboqs support was requested but the required libraries were not found.])])])
-
-AM_CONDITIONAL(ENABLE_LIBOQS, test "$ac_liboqs" != "no")
-AM_CONDITIONAL([LIBOQS_ENABLE_DLOPEN], [test "$ac_liboqs" = dlopen])
-
-AS_IF([test "$ac_liboqs" = dlopen], [
-    save_CFLAGS=$CFLAGS
-    CFLAGS="$CFLAGS $LIBOQS_CFLAGS"
-    save_LIBS=$LIBS
-    LIBS="$LIBS $LIBOQS_LIBS"
-    LIBGNUTLS_CHECK_SONAME([oqs], [AC_LANG_PROGRAM([
-                   #include <oqs/oqs.h>],[
-                   OQS_version ();])])
-    CFLAGS="$save_CFLAGS"
-    LIBS="$save_LIBS"
-],
-    [test "$ac_liboqs" = link], [
-    if test "x$GNUTLS_REQUIRES_PRIVATE" = x; then
-        GNUTLS_REQUIRES_PRIVATE="Requires.private: liboqs"
-    else
-        GNUTLS_REQUIRES_PRIVATE="$GNUTLS_REQUIRES_PRIVATE, liboqs"
-    fi
-])
-
 AM_CONDITIONAL(NEED_LTLIBDL, test "$need_ltlibdl" = yes)
 
 # export for use in scripts
@@ -1608,7 +1553,6 @@ AC_CONFIG_FILES([
   lib/gnutls.pc
   lib/includes/Makefile
   lib/includes/gnutls/gnutls.h
-  lib/liboqs/Makefile
   lib/minitasn1/Makefile
   lib/nettle/Makefile
   lib/x509/Makefile
