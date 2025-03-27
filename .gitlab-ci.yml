@@ -529,7 +529,8 @@ fedora-leancrypto/build:
     - git clone --depth 1 --branch master https://github.com/smuellerDD/leancrypto.git leancrypto-git
     - pushd leancrypto-git
     - rm -rf .git               # for artifacts:untracked to work
-    - meson setup -Dprefix=${PWD}/$LEANCRYPTO_DIR -Ddefault_library=static
+    - &leancrypto-setup meson setup -Dprefix=${PWD}/$LEANCRYPTO_DIR
+        -Ddefault_library=static
         -Dascon=disabled -Dascon_keccak=disabled
         -Dbike_5=disabled -Dbike_3=disabled -Dbike_1=disabled
         -Dkyber_x25519=disabled -Ddilithium_ed25519=disabled
@@ -564,6 +565,36 @@ fedora-leancrypto/test:
     - fedora-leancrypto/build
   script:
     - PKG_CONFIG_PATH=${PWD}/leancrypto-git/$LEANCRYPTO_DIR/lib64/pkgconfig TESTS_ENABLED_GROUPS="GROUP-X25519-MLKEM768 GROUP-SECP256R1-MLKEM768 GROUP-SECP384R1-MLKEM1024" make -j$CHECKJOBS check
+
+fedora-leancrypto/build-fips:
+  extends:
+    - .build
+    - .fedora-leancrypto
+  needs:
+    - fedora/bootstrap
+  script:
+    - git clone --depth 1 --branch master https://github.com/smuellerDD/leancrypto.git leancrypto-git
+    - pushd leancrypto-git
+    - rm -rf .git               # for artifacts:untracked to work
+    - *leancrypto-setup
+    - meson compile -C _build
+    - meson install -C _build
+    - popd
+    - PKG_CONFIG_PATH=${PWD}/leancrypto-git/$LEANCRYPTO_DIR/lib64/pkgconfig dash ./configure --with-leancrypto --disable-doc --with-pkcs12-iter-count=10000 --enable-fips140-mode --disable-full-test-suite
+    - make -j$BUILDJOBS
+    # build tests, but don't execute them
+    - GNUTLS_FORCE_FIPS_MODE=1 make -j$BUILDJOBS check TESTS=""
+
+fedora-leancrypto/test-fips:
+  extends:
+    - .test
+    - .fedora-leancrypto
+  dependencies:
+    - fedora-leancrypto/build-fips
+  needs:
+    - fedora-leancrypto/build-fips
+  script:
+    - GNUTLS_FORCE_FIPS_MODE=1 PKG_CONFIG_PATH=${PWD}/leancrypto-git/$LEANCRYPTO_DIR/lib64/pkgconfig TESTS_ENABLED_GROUPS="GROUP-X25519-MLKEM768 GROUP-SECP256R1-MLKEM768 GROUP-SECP384R1-MLKEM1024" make -j$CHECKJOBS check
 
 fedora-threadsan/build:
   extends:
