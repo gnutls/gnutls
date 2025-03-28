@@ -7,6 +7,13 @@ See the end for copying conditions.
 
 * Version 3.8.10 (unreleased)
 
+** libgnutls: Linux kernel version 6.14 bring a Kernel TLS(kTLS) key update
+   support. The library running on the aforementioned version now utilizes the
+   kernel’s key update mechanism when kTLS is enabled, allowing uninterrupted
+   TLS session. The --enable-ktls configure option as well as the system-wide
+   kTLS configuration(see GnuTLS Documentation) are still required to enable
+   this feature.
+
 ** libgnutls: liboqs support for PQC has been removed
    For maintenance purposes, support for post-quantum cryptography
    (PQC) is now only provided through leancrypto. The experimental key

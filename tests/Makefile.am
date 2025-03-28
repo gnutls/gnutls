@@ -21,7 +21,7 @@
 
 SUBDIRS = . cert-tests slow
 
-TESTS_ENVIRONMENT =
+TESTS_ENVIRONMENT = HOST_OS=$$(uname)
 
 if WINDOWS
 SUBDIRS += windows
@@ -517,18 +517,22 @@ if ENABLE_TPM2
 dist_check_SCRIPTS += tpm2.sh
 endif
 
-if ENABLE_KTLS
-indirect_tests += gnutls_ktls
-dist_check_SCRIPTS += ktls.sh
-indirect_tests += ktls_keyupdate
-dist_check_SCRIPTS += ktls_keyupdate.sh
-endif
 
 if !WINDOWS
 
 #
 # List of tests not available/functional under windows
 #
+
+if ENABLE_KTLS
+indirect_tests += gnutls_ktls
+dist_check_SCRIPTS += ktls.sh
+
+indirect_tests += ktls_keyupdate
+ktls_keyupdate_SOURCES = tls13/key_update.c
+ktls_keyupdate_CFLAGS = -DUSE_KTLS
+dist_check_SCRIPTS += ktls_keyupdate.sh
+endif
 
 dist_check_SCRIPTS += dtls/dtls.sh dtls/dtls-resume.sh #dtls/dtls-nb
 

@@ -267,3 +267,29 @@ check_if_equal() {
 	diff -b -B "$1" "$2"
 	return $?
 }
+
+# works for FreeBSD and Linux
+# $1: the major version to check against
+# $2: the minor version to check against
+kernel_version_check() {
+	local required_major=$1
+	local required_minor=$2
+
+	kernel_version=$(uname -r | sed -E 's/^([0-9]+\.[0-9]+).*/\1/' 2>/dev/null)
+	kernel_major=$(echo $kernel_version | cut -d. -f1 2>/dev/null)
+	kernel_minor=$(echo $kernel_version | cut -d. -f2 2>/dev/null)
+
+	if ! [[ "$kernel_major" =~ ^[0-9]+$ ]] || ! [[ "$kernel_minor" =~ ^[0-9]+$ ]]; then
+		return 1
+	fi
+
+	if [ "$kernel_major" -lt "$required_major" ]; then
+		return 1
+	fi
+
+	if [ "$kernel_major" -eq "$required_major" ] && [ "$kernel_minor" -lt "$required_minor" ]; then
+		return 1
+	fi
+
+	return 0
+}

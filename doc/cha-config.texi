@@ -262,10 +262,12 @@ The following options can overwrite default behavior of protocols system-wide.
 ktls = true
 
 @end example
-@subsection Enabling KTLS
+@node Enabling kTLS
+@subsection Enabling kTLS
 When GnuTLS is build with -–enable-ktls configuration, KTLS is disabled by default.
 This can be enabled by setting @code{ktls = true} in @code{[global]} section.
 
+kTLS requires that the system support kTLS @ref{kTLS (Kernel TLS)}.
 
 @node Enabling/Disabling RSAES-PKCS1-v1_5
 @section Enabling/Disabling RSAES-PKCS1-v1_5

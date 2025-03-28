@@ -47,6 +47,67 @@ static void tls_log_func(int level, const char *str)
 #define MSG \
 	"Hello TLS, and hi and how are you and more data here... and more... and even more and even more more data..."
 
+#ifdef USE_KTLS
+/* For ktls flavour of the test, the test needs to be run with the kTLS enabled
+ * option in the GnuTLS configuration file, in the case of the GnuTLS testing,
+ * the shell script `tests/ktls_keyupdate.sh` does just that.
+ */
+
+#include "ktls_utils.h"
+
+#define RUN(s, n)                                         \
+	{                                                 \
+		int ret;                                  \
+		int cfd, sfd;                             \
+		if ((ret = create_sockets(&cfd, &sfd))) { \
+			fail("kTLS: %s\n", errors[ret]);  \
+			exit(1);                          \
+		}                                         \
+		run(s, n, cfd, sfd);                      \
+		close(cfd);                               \
+		close(sfd);                               \
+	}
+
+/* We could check specificaly but given how the setting of new keys work, let's
+ * check if something had gone sideways on both the receive and sending sockets.
+ */
+#define CHECK_KTLS_ENABLED(session)                             \
+	switch (gnutls_transport_is_ktls_enabled(session)) {    \
+	case GNUTLS_KTLS_RECV:                                  \
+		fail("kTLS: Only recv support is initiated\n"); \
+		break;                                          \
+	case GNUTLS_KTLS_SEND:                                  \
+		fail("kTLS: Only send support is initiated\n"); \
+		break;                                          \
+	case GNUTLS_KTLS_DUPLEX:                                \
+		break;                                          \
+	default:                                                \
+		fail("kTLS: dissabled\n");                      \
+	}
+
+/* ktls needs to use real sockets */
+char *errors[] = { "", "Failed to create the socket pair",
+		   "Failed to set the socket non-blocking" };
+
+inline static int create_sockets(int *cfd, int *sfd)
+{
+	int ret = create_socket_pair(cfd, sfd);
+	if (ret)
+		return 1;
+
+	if (set_nonblocking(*cfd) || set_nonblocking(*sfd))
+		return 2;
+
+	return 0;
+}
+
+#else /* non-kTLS */
+
+#define RUN(s, n) run(s, n, -1, -1)
+#define CHECK_KTLS_ENABLED(session) /* No-op */
+
+#endif /* non-kTLS */
+
 static unsigned key_update_msg_inc = 0;
 static unsigned key_update_msg_out = 0;
 
@@ -68,7 +129,7 @@ static int hsk_callback(gnutls_session_t session, unsigned int htype,
 	return 0;
 }
 
-static void run(const char *name, unsigned test)
+static void run(const char *name, unsigned test, int cfd, int sfd)
 {
 	/* Server stuff. */
 	gnutls_certificate_credentials_t ccred;
@@ -100,9 +161,14 @@ static void run(const char *name, unsigned test)
 		exit(1);
 
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, scred);
+#ifdef USE_KTLS
+	/* for kTLS you can't use custom push/pull functions */
+	gnutls_transport_set_int(server, sfd);
+#else
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
+#endif
 
 	/* Init client */
 	assert(gnutls_certificate_allocate_credentials(&ccred) >= 0);
@@ -118,13 +184,22 @@ static void run(const char *name, unsigned test)
 	if (ret < 0)
 		exit(1);
 
+#ifdef USE_KTLS
+	/* for kTLS you can't use custom push/pull functions */
+	gnutls_transport_set_int(client, cfd);
+#else
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
+#endif
 
 	HANDSHAKE(client, server);
 	if (debug)
 		success("Handshake established\n");
+
+	/* check kTLS initialization (both send and recv should be supported)*/
+	CHECK_KTLS_ENABLED(client);
+	CHECK_KTLS_ENABLED(server);
 
 	switch (test) {
 	case 0:
@@ -134,10 +209,14 @@ static void run(const char *name, unsigned test)
 			ret = gnutls_session_key_update(client, 0);
 		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
+		CHECK_KTLS_ENABLED(client);
+		CHECK_KTLS_ENABLED(server);
+
 		/* server receives the client key update and sends data */
 		TRANSFER(client, server, MSG, strlen(MSG), buffer, MAX_BUF);
 		TRANSFER(server, client, MSG, strlen(MSG), buffer, MAX_BUF);
 		EMPTY_BUF(server, client, buffer, MAX_BUF);
+
 		if (test != 0)
 			break;
 		sec_sleep(2);
@@ -151,10 +230,14 @@ static void run(const char *name, unsigned test)
 		if (ret < 0)
 			fail("error in key update: %s\n", gnutls_strerror(ret));
 
+		CHECK_KTLS_ENABLED(server);
+		CHECK_KTLS_ENABLED(client);
+
 		/* client receives the key update and sends data */
 		TRANSFER(client, server, MSG, strlen(MSG), buffer, MAX_BUF);
 		TRANSFER(server, client, MSG, strlen(MSG), buffer, MAX_BUF);
 		EMPTY_BUF(server, client, buffer, MAX_BUF);
+
 		if (test != 0)
 			break;
 		sec_sleep(2);
@@ -167,10 +250,14 @@ static void run(const char *name, unsigned test)
 		if (ret < 0)
 			fail("error in key update: %s\n", gnutls_strerror(ret));
 
+		CHECK_KTLS_ENABLED(client);
+		CHECK_KTLS_ENABLED(server);
+
 		/* server receives the client key update and sends data */
 		TRANSFER(client, server, MSG, strlen(MSG), buffer, MAX_BUF);
 		TRANSFER(server, client, MSG, strlen(MSG), buffer, MAX_BUF);
 		EMPTY_BUF(server, client, buffer, MAX_BUF);
+
 		if (test != 0)
 			break;
 		sec_sleep(2);
@@ -182,6 +269,9 @@ static void run(const char *name, unsigned test)
 		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 		if (ret < 0)
 			fail("error in key update: %s\n", gnutls_strerror(ret));
+
+		CHECK_KTLS_ENABLED(server);
+		CHECK_KTLS_ENABLED(client);
 
 		TRANSFER(client, server, MSG, strlen(MSG), buffer, MAX_BUF);
 		TRANSFER(server, client, MSG, strlen(MSG), buffer, MAX_BUF);
@@ -210,12 +300,18 @@ static void run(const char *name, unsigned test)
 		/* client receives key update */
 		EMPTY_BUF(server, client, buffer, MAX_BUF);
 
+		CHECK_KTLS_ENABLED(server);
+		CHECK_KTLS_ENABLED(client);
+
 		/* client uncorks and sends key update */
 		do {
 			ret = gnutls_record_uncork(client, GNUTLS_RECORD_WAIT);
 		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 		if (ret < 0)
 			fail("cannot send: %s\n", gnutls_strerror(ret));
+
+		CHECK_KTLS_ENABLED(server);
+		CHECK_KTLS_ENABLED(client);
 
 		EMPTY_BUF(server, client, buffer, MAX_BUF);
 
@@ -237,6 +333,9 @@ static void run(const char *name, unsigned test)
 		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 		if (ret < 0)
 			fail("error in key update: %s\n", gnutls_strerror(ret));
+
+		CHECK_KTLS_ENABLED(server);
+		CHECK_KTLS_ENABLED(client);
 
 		/* server receives the client key update and sends data */
 		TRANSFER(client, server, MSG, strlen(MSG), buffer, MAX_BUF);
@@ -263,11 +362,11 @@ static void run(const char *name, unsigned test)
 
 void doit(void)
 {
-	run("single", 1);
-	run("single", 2);
-	run("single", 3);
-	run("single", 4);
-	run("single", 5);
-	run("single", 6);
-	run("all", 0); /* all one after each other */
+	RUN("single", 1);
+	RUN("single", 2);
+	RUN("single", 3);
+	RUN("single", 4);
+	RUN("single", 5);
+	RUN("single", 6);
+	RUN("all", 0); /* all one after each other */
 }

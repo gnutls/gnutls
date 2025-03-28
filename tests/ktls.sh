@@ -19,25 +19,24 @@
 # You should have received a copy of the GNU General Public License
 # along with GnuTLS. If not, see <https://www.gnu.org/licenses/>.
 
-: ${builddir=.} ${host_os=`uname`}
+: ${builddir=.}
 
 . "$srcdir/scripts/common.sh"
 
-case "$host_os" in
+case "$HOST_OS" in
     FreeBSD)
-	if ! sysctl -n kern.ipc.tls.enable | grep 1 > /dev/null; then 
-		exit 77 
+	if ! sysctl -n kern.ipc.tls.enable | grep 1 > /dev/null; then
+		exit 77
 	fi
+
+	kernel_version_check 13 0 || exit 77
 	;;
     Linux)
-	if ! grep '^tls ' /proc/modules 2>&1 /dev/null; then 
-		exit 77 
+	if ! grep '^tls ' /proc/modules 2>&1 /dev/null; then
+		exit 77
 	fi
-	case "$(uname -r)" in
-	    4.* | 5.[0-9].* | 5.10.*)
-		exit 77 
-		;;
-	esac
+
+	kernel_version_check 5 10 || exit 77
 	;;
 esac
 

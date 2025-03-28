@@ -59,6 +59,7 @@ gnutls_transport_is_ktls_enabled(gnutls_session_t session)
 {
 	if (unlikely(!session->internals.initial_negotiation_completed)) {
 		_gnutls_debug_log("Initial negotiation is not yet complete\n");
+		gnutls_assert();
 		return 0;
 	}
 
@@ -82,7 +83,9 @@ void _gnutls_ktls_enable(gnutls_session_t session)
 		}
 	} else {
 		_gnutls_record_log(
-			"Unable to set TCP_ULP for read socket: %d\n", errno);
+			"kTLS: Unable to set TCP_ULP for read socket: %d\n",
+			errno);
+		gnutls_assert();
 	}
 
 	if (sockin != sockout) {
@@ -91,8 +94,9 @@ void _gnutls_ktls_enable(gnutls_session_t session)
 			session->internals.ktls_enabled |= GNUTLS_KTLS_SEND;
 		} else {
 			_gnutls_record_log(
-				"Unable to set TCP_ULP for write socket: %d\n",
+				"kTLS: Unable to set TCP_ULP for write socket: %d\n",
 				errno);
+			gnutls_assert();
 		}
 	}
 #endif
@@ -501,6 +505,14 @@ int _gnutls_ktls_set_keys(gnutls_session_t session,
 	/* setsockopt(SOL_TLS, TLS_RX) support added in 5.10 */
 	if (major < 5 || (major == 5 && minor < 10)) {
 		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+	}
+
+	if (major < 6 || (major == 6 && minor < 14)) {
+		_gnutls_debug_log("Linux kernel version %lu.%lu doesn't yet "
+				  "support kTLS keyupdate, this will result in "
+				  "invalidation of the current session after a "
+				  "key-update is performed\n",
+				  major, minor);
 	}
 
 	/* check whether or not cipher suite supports ktls
@@ -1064,6 +1076,13 @@ int _gnutls_ktls_recv_control_msg(gnutls_session_t session,
 		default:
 			return GNUTLS_E_PULL_ERROR;
 		}
+	} else if (unlikely(ret == -EKEYEXPIRED)) {
+		/* This will be received until a keyupdate is performed on the
+		   scoket. */
+		_gnutls_debug_log("kTLS: socket(recv) has not yet received "
+				  "updated keys\n");
+		gnutls_assert();
+		return GNUTLS_E_AGAIN;
 	}
 
 	/* connection closed */
@@ -1103,8 +1122,44 @@ int _gnutls_ktls_recv_int(gnutls_session_t session, content_type_t type,
 				GNUTLS_E_UNIMPLEMENTED_FEATURE);
 			break;
 		case GNUTLS_ALERT:
+			if (ret < 2) {
+				return gnutls_assert_val(
+					GNUTLS_E_UNEXPECTED_PACKET);
+			}
+
+			uint8_t level = ((uint8_t *)data)[0];
+			uint8_t desc = ((uint8_t *)data)[1];
+
+			_gnutls_record_log(
+				"REC[%p]: Alert[%d|%d] - %s - was received\n",
+				session, level, desc,
+				gnutls_alert_get_name((int)desc));
+
+			session->internals.last_alert = desc;
+
+			/* if close notify is received and
+			 * the alert is not fatal
+			 */
+			if (desc == GNUTLS_A_CLOSE_NOTIFY &&
+			    level != GNUTLS_AL_FATAL) {
+				/* If we have been expecting for an alert do
+				 */
+				session->internals.read_eof = 1;
+				return 0;
+			}
+			/* if the alert is FATAL or WARNING
+			 * return the appropriate message
+			 */
+			gnutls_assert();
+			if (level == GNUTLS_AL_FATAL) {
+				session->internals.resumable = false;
+				session->internals.invalid_connection = 1;
+				return gnutls_assert_val(
+					GNUTLS_E_FATAL_ALERT_RECEIVED);
+			}
+
+			ret = GNUTLS_E_WARNING_ALERT_RECEIVED;
 			session_invalidate(session);
-			ret = 0;
 			break;
 		case GNUTLS_HANDSHAKE:
 			ret = gnutls_handshake_write(

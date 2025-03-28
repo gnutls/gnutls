@@ -1,0 +1,25 @@
+@node Additional Features
+@appendix Additional Features
+
+@menu
+* kTLS (Kernel TLS)::
+@end menu
+
+@node kTLS (Kernel TLS)
+@section kTLS (Kernel TLS)
+@cindex kTLS (Kernel TLS)
+kTLS (Kernel TLS) is a Linux kernel feature that offloads TLS encryption and decryption operations to the kernel space, improving performance and reducing CPU overhead. It allows applications to leverage zero-copy data transmission, reducing context switches between user space and kernel space.
+
+The following table shows how to enable kTLS support on Linux and FreeBSD systems.
+@float Table,tab:ktls_support
+@multitable @columnfractions .40 .30 .30
+@headitem Description @tab Linux @tab FreeBSD
+@item Load kernel module @tab @code{modprobe tls} @tab @code{kldload tls}
+@item Check if module is loaded @tab @code{lsmod | grep tls} @tab @code{kldstat | grep tls}
+@item kTLS rekey support @tab v6.14 @tab not yet supported
+@end multitable
+@caption{kTLS system enable}
+@end float
+
+To enable ktls in GnuTLS @ref{Enabling kTLS}.
+

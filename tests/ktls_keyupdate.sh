@@ -23,9 +23,19 @@
 
 . "$srcdir/scripts/common.sh"
 
-if ! grep '^tls ' /proc/modules 2>&1 /dev/null; then
-    exit 77
-fi
+case "$HOST_OS" in
+    FreeBSD)
+	# key update is not yet supported on FreeBSD
+	exit 77
+	;;
+    Linux)
+	if ! grep '^tls ' /proc/modules 2>&1 /dev/null; then
+		exit 77
+	fi
+
+	kernel_version_check 6 14 || exit 77
+	;;
+esac
 
 testdir=`create_testdir ktls_keyupdate`
 
