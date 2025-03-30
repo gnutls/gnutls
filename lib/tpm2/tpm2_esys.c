@@ -60,7 +60,6 @@
 #include "gnutls_int.h"
 #include "abstract_int.h"
 
-#include <errno.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
@@ -90,6 +89,7 @@
 #include "dlwrap/tss2_mu.h"
 #include "dlwrap/tss2_esys.h"
 #include "dlwrap/tss2_tctildr.h"
+#include "tpm2/callbacks/esys_crypto_callbacks.h"
 
 struct tpm2_info_st {
 	TPM2B_PUBLIC pub;
@@ -385,6 +385,15 @@ static int init_tpm2_key(ESYS_CONTEXT **ctx, ESYS_TR *key_handle,
 	if (rc) {
 		gnutls_assert();
 		_gnutls_debug_log("tpm2: Esys_Initialize failed: 0x%x\n", rc);
+		goto error;
+	}
+
+	rc = _gnutls_setup_tss2_callbacks(*ctx);
+	if (rc) {
+		gnutls_assert();
+		_gnutls_debug_log(
+			"tpm2: _gnutls_setup_tpm2_callbacks failed: 0x%x\n",
+			rc);
 		goto error;
 	}
 

@@ -16,3 +16,4 @@ FUNC(TSS2_RC, Esys_CreatePrimary, (ESYS_CONTEXT *esysContext, ESYS_TR primaryHan
 FUNC(TSS2_RC, Esys_FlushContext, (ESYS_CONTEXT *esysContext, ESYS_TR flushHandle), (esysContext, flushHandle))
 FUNC(TSS2_RC, Esys_GetCapability, (ESYS_CONTEXT *esysContext, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, TPM2_CAP capability, UINT32 property, UINT32 propertyCount, TPMI_YES_NO *moreData, TPMS_CAPABILITY_DATA **capabilityData), (esysContext, shandle1, shandle2, shandle3, capability, property, propertyCount, moreData, capabilityData))
 VOID_FUNC(void, Esys_Free, (void *__ptr), (__ptr))
+FUNC(TSS2_RC, Esys_SetCryptoCallbacks, (ESYS_CONTEXT *esysContext, ESYS_CRYPTO_CALLBACKS *callbacks), (esysContext, callbacks))

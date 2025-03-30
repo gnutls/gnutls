@@ -35,7 +35,7 @@
 #include "fips.h"
 #include "system-keys.h"
 #include "urls.h"
-#include "tpm2.h"
+#include "tpm2/tpm2.h"
 #include "pkcs11_int.h"
 #include "abstract_int.h"
 

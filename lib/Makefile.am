@@ -137,7 +137,11 @@ COBJECTS += vko.c
 endif
 
 if ENABLE_TPM2
-COBJECTS += tpm2.c tpm2.h tpm2_esys.c
+COBJECTS += tpm2/tpm2.c tpm2/tpm2.h tpm2/tpm2_esys.c tpm2/callbacks/esys_crypto_callbacks.h tpm2/callbacks/esys_crypto_callbacks.c \
+			tpm2/callbacks/aes/aes_callbacks.h tpm2/callbacks/aes/aes_callbacks.c tpm2/callbacks/ecdh/ecdh_callbacks.h \
+			tpm2/callbacks/ecdh/ecdh_callbacks.c tpm2/callbacks/random/random_callbacks.h tpm2/callbacks/random/random_callbacks.c \
+			tpm2/callbacks/hmac/hmac_callbacks.h tpm2/callbacks/hmac/hmac_callbacks.c tpm2/callbacks/hash/hash_callbacks.h \
+			tpm2/callbacks/hash/hash_callbacks.c tpm2/callbacks/rsa/rsa_callbacks.h tpm2/callbacks/rsa/rsa_callbacks.c
 COBJECTS += dlwrap/tss2_esys.c dlwrap/tss2_esysfuncs.h dlwrap/tss2_esys.h
 COBJECTS += dlwrap/tss2_mu.c dlwrap/tss2_mufuncs.h dlwrap/tss2_mu.h
 COBJECTS += dlwrap/tss2_tctildr.c dlwrap/tss2_tctildrfuncs.h dlwrap/tss2_tctildr.h

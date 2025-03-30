@@ -853,7 +853,7 @@ fedora-cross/i686-linux-gnu/build:
     # for the target will cause the test suite to fail when p11-kit is enabled.
     - setarch i686 -- ./configure --disable-gcc-warnings
         --cache-file $CCACHE_FILE --disable-doc --disable-cxx
-        --without-p11-kit --disable-full-test-suite
+        --without-p11-kit --disable-full-test-suite --without-tpm2
         --with-pkcs12-iter-count=10000 CFLAGS="-m32 -march=i686"
     - setarch i686 -- make -j$BUILDJOBS
     # build tests, but don't execute them
