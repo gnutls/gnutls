@@ -104,6 +104,15 @@ int _gnutls_sign_algorithm_write_params(gnutls_session_t session,
 		    prev->id[1] == aid->id[1])
 			continue;
 
+		if (session->security_parameters.entity == GNUTLS_SERVER) {
+			const version_entry_st *ver = get_version(session);
+			if (unlikely(ver == NULL))
+				return gnutls_assert_val(
+					GNUTLS_E_INTERNAL_ERROR);
+			if ((aid->tls_sem & ver->tls_sig_sem) == 0)
+				continue;
+		}
+
 		/* Ignore non-GOST sign types for CertReq */
 		if (session->security_parameters.cs &&
 		    _gnutls_kx_is_vko_gost(
