@@ -163,6 +163,29 @@ void doit(void)
 		&server_ca3_eddsa_key, &server_ca3_eddsa_cert,
 		&server_ca3_eddsa_key, USE_CERT, GNUTLS_CRT_X509,
 		GNUTLS_CRT_X509);
+#ifdef HAVE_LEANCRYPTO
+	try_with_key("TLS 1.3 with ML-DSA-44 cli-cert (ctype X.509)",
+		     "NORMAL:-VERS-ALL:+VERS-TLS1.3:-SIGN-ALL:+SIGN-ML-DSA-44",
+		     GNUTLS_KX_ECDHE_RSA, GNUTLS_SIGN_MLDSA44,
+		     GNUTLS_SIGN_MLDSA44, &server_ca3_ml_dsa_44_cert,
+		     &server_ca3_ml_dsa_44_key, &server_ca3_ml_dsa_44_cert,
+		     &server_ca3_ml_dsa_44_key, USE_CERT, GNUTLS_CRT_X509,
+		     GNUTLS_CRT_X509);
+	try_with_key("TLS 1.3 with ML-DSA-65 cli-cert (ctype X.509)",
+		     "NORMAL:-VERS-ALL:+VERS-TLS1.3:-SIGN-ALL:+SIGN-ML-DSA-65",
+		     GNUTLS_KX_ECDHE_RSA, GNUTLS_SIGN_MLDSA65,
+		     GNUTLS_SIGN_MLDSA65, &server_ca3_ml_dsa_65_cert,
+		     &server_ca3_ml_dsa_65_key, &server_ca3_ml_dsa_65_cert,
+		     &server_ca3_ml_dsa_65_key, USE_CERT, GNUTLS_CRT_X509,
+		     GNUTLS_CRT_X509);
+	try_with_key("TLS 1.3 with ML-DSA-87 cli-cert (ctype X.509)",
+		     "NORMAL:-VERS-ALL:+VERS-TLS1.3:-SIGN-ALL:+SIGN-ML-DSA-87",
+		     GNUTLS_KX_ECDHE_RSA, GNUTLS_SIGN_MLDSA87,
+		     GNUTLS_SIGN_MLDSA87, &server_ca3_ml_dsa_87_cert,
+		     &server_ca3_ml_dsa_87_key, &server_ca3_ml_dsa_87_cert,
+		     &server_ca3_ml_dsa_87_key, USE_CERT, GNUTLS_CRT_X509,
+		     GNUTLS_CRT_X509);
+#endif
 
 	/* TLS 1.3 mis-matching groups */
 	/* Our policy is to send a key share for the first of each type of groups, so make sure
