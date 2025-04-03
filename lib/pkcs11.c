@@ -893,32 +893,34 @@ static int init = 0;
  */
 static void compat_load(const char *configfile)
 {
-	FILE *fp;
 	int ret;
-	char line[512];
 	const char *library;
+	gnutls_datum_t data;
+	char *str, *savep;
 
 	if (configfile == NULL)
 		configfile = "/etc/gnutls/pkcs11.conf";
 
-	fp = fopen(configfile, "re");
-	if (fp == NULL) {
-		gnutls_assert();
+	_gnutls_debug_log("Loading PKCS #11 libraries from %s\n", configfile);
+
+	ret = gnutls_load_file(configfile, &data);
+	if (ret < 0) {
+		_gnutls_debug_log("Could not load %s: %s\n", configfile,
+				  gnutls_strerror(ret));
 		return;
 	}
 
-	_gnutls_debug_log("Loading PKCS #11 libraries from %s\n", configfile);
-	while (fgets(line, sizeof(line), fp) != NULL) {
+	for (str = (char *)data.data;; str = NULL) {
+		char *line = strtok_r(str, "\n", &savep);
+		if (line == NULL)
+			break;
 		if (strncmp(line, "load", sizeof("load") - 1) == 0) {
 			char *p;
 			p = strchr(line, '=');
 			if (p == NULL)
 				continue;
 
-			library = ++p;
-			p = strchr(line, '\n');
-			if (p != NULL)
-				*p = 0;
+			library = p + 1;
 
 			ret = gnutls_pkcs11_add_provider(library, NULL);
 			if (ret < 0) {
@@ -929,9 +931,7 @@ static void compat_load(const char *configfile)
 			}
 		}
 	}
-	fclose(fp);
-
-	return;
+	gnutls_free(data.data);
 }
 
 static int auto_load(unsigned trusted)
