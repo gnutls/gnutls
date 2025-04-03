@@ -2179,6 +2179,7 @@ static int _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 	case GNUTLS_PK_MLDSA44:
 	case GNUTLS_PK_MLDSA65:
 	case GNUTLS_PK_MLDSA87:
+		not_approved = true;
 		ret = ml_dsa_sign(algo, signature, vdata, &pk_params->raw_priv);
 		if (ret < 0)
 			goto cleanup;
@@ -2552,6 +2553,7 @@ static int _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 	case GNUTLS_PK_MLDSA44:
 	case GNUTLS_PK_MLDSA65:
 	case GNUTLS_PK_MLDSA87:
+		not_approved = true;
 		ret = ml_dsa_verify(algo, signature, vdata,
 				    &pk_params->raw_pub);
 		if (ret < 0)
