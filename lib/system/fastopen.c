@@ -72,7 +72,7 @@ static ssize_t tfo_writev(gnutls_transport_ptr_t ptr, const giovec_t *iovec,
 			errno = EAGAIN;
 		}
 
-		if (ret == 0 || errno != EAGAIN) {
+		if (ret == 0 || (ret == -1 && errno != EAGAIN)) {
 			p->connect_only = 0;
 			p->connect_addrlen = 0;
 		}
@@ -128,7 +128,7 @@ static ssize_t tfo_writev(gnutls_transport_ptr_t ptr, const giovec_t *iovec,
 	connect_only:
 		ret = connect(fd, (struct sockaddr *)&p->connect_addr,
 			      p->connect_addrlen);
-		if (errno == ENOTCONN || errno == EINPROGRESS) {
+		if (ret == -1 && (errno == ENOTCONN || errno == EINPROGRESS)) {
 			gnutls_assert();
 			errno = EAGAIN;
 		}
@@ -154,7 +154,7 @@ static ssize_t tfo_writev(gnutls_transport_ptr_t ptr, const giovec_t *iovec,
 			ret = connect(fd, (struct sockaddr *)&p->connect_addr,
 				      p->connect_addrlen);
 		}
-		if (errno == ENOTCONN || errno == EINPROGRESS) {
+		if (ret == -1 && (errno == ENOTCONN || errno == EINPROGRESS)) {
 			gnutls_assert();
 			errno = EAGAIN;
 		}
@@ -162,13 +162,13 @@ static ssize_t tfo_writev(gnutls_transport_ptr_t ptr, const giovec_t *iovec,
 #else
 	ret = connect(fd, (struct sockaddr *)&p->connect_addr,
 		      p->connect_addrlen);
-	if (errno == ENOTCONN || errno == EINPROGRESS) {
+	if (ret == -1 && (errno == ENOTCONN || errno == EINPROGRESS)) {
 		gnutls_assert();
 		errno = EAGAIN;
 	}
 #endif
 
-	if (ret == 0 || errno != EAGAIN) {
+	if (ret >= 0 || (ret == -1 && errno != EAGAIN)) {
 		/* This has to be called just once, connect info not needed any more */
 		p->connect_addrlen = 0;
 	}
