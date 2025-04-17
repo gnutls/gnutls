@@ -37,11 +37,11 @@ _gnutls_convert_tpm2_cipher_alg(TPMI_AES_KEY_BITS key_bits, TPM2_ALG_ID mode)
 
 	switch (key_bits) {
 	case 128:
-		return GNUTLS_CIPHER_AES_128_CFB8;
+		return GNUTLS_CIPHER_AES_128_CFB;
 	case 192:
-		return GNUTLS_CIPHER_AES_192_CFB8;
+		return GNUTLS_CIPHER_AES_192_CFB;
 	case 256:
-		return GNUTLS_CIPHER_AES_256_CFB8;
+		return GNUTLS_CIPHER_AES_256_CFB;
 	default:
 		return GNUTLS_CIPHER_UNKNOWN;
 	}

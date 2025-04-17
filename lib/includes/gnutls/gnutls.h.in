@@ -150,6 +150,9 @@ extern "C" {
  * @GNUTLS_CIPHER_AES_192_GCM: AES in GCM mode with 192-bit keys (AEAD).
  * @GNUTLS_CIPHER_AES_128_SIV_GCM: AES in SIV-GCM mode with 128-bit key.
  * @GNUTLS_CIPHER_AES_256_SIV_GCM: AES in SIV-GCM mode with 256-bit key.
+ * @GNUTLS_CIPHER_AES_128_CFB8: AES in CFB mode with 128-bit keys.
+ * @GNUTLS_CIPHER_AES_192_CFB8: AES in CFB mode with 192-bit keys.
+ * @GNUTLS_CIPHER_AES_256_CFB8: AES in CFB mode with 256-bit keys.
  *
  * Enumeration of different symmetric encryption algorithms.
  */
@@ -198,6 +201,9 @@ typedef enum gnutls_cipher_algorithm {
 	GNUTLS_CIPHER_KUZNYECHIK_CTR_ACPKM = 41,
 	GNUTLS_CIPHER_AES_128_SIV_GCM = 42,
 	GNUTLS_CIPHER_AES_256_SIV_GCM = 43,
+	GNUTLS_CIPHER_AES_128_CFB = 44,
+	GNUTLS_CIPHER_AES_192_CFB = 45,
+	GNUTLS_CIPHER_AES_256_CFB = 46,
 
 	/* used only for PGP internals. Ignored in TLS/SSL
 	 */
