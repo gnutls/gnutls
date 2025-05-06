@@ -34,6 +34,7 @@
 #include <c-strcase.h>
 #include "fips.h"
 #include <errno.h>
+#include "ext/compress_certificate.h"
 #include "ext/srp.h"
 #include <gnutls/gnutls.h>
 #include "profiles.h"
@@ -1018,6 +1019,9 @@ struct cfg {
 	gnutls_ecc_curve_t ecc_curves[MAX_ALGOS + 1];
 	gnutls_sign_algorithm_t sigs_for_cert[MAX_ALGOS + 1];
 
+	gnutls_compression_method_t
+		cert_comp_algs[MAX_COMPRESS_CERTIFICATE_METHODS + 1];
+
 	ext_master_secret_t force_ext_master_secret;
 	bool force_ext_master_secret_set;
 };
@@ -1148,6 +1152,8 @@ static inline void cfg_steal(struct cfg *dst, struct cfg *src)
 	memcpy(dst->sigs, src->sigs, sizeof(src->sigs));
 	memcpy(dst->sigs_for_cert, src->sigs_for_cert,
 	       sizeof(src->sigs_for_cert));
+	memcpy(dst->cert_comp_algs, src->cert_comp_algs,
+	       sizeof(src->cert_comp_algs));
 }
 
 /*
@@ -2069,6 +2075,38 @@ static int cfg_ini_handler(void *_ctx, const char *section, const char *name,
 					return 0;
 				goto exit;
 			}
+		} else if (c_strcasecmp(name, "cert-compression-alg") == 0) {
+			gnutls_compression_method_t method;
+
+			p = clear_spaces(value, str);
+
+			method = gnutls_compression_get_id(p);
+			if (method == GNUTLS_COMP_UNKNOWN) {
+				_gnutls_debug_log(
+					"cfg: found unknown compression"
+					" method %s in %s\n",
+					p, name);
+				if (fail_on_invalid_config)
+					return 0;
+				goto exit;
+			}
+
+			i = 0;
+			while (cfg->cert_comp_algs[i] != 0)
+				i++;
+
+			if (i >= MAX_COMPRESS_CERTIFICATE_METHODS) {
+				_gnutls_debug_log(
+					"cfg: too many (%d) compression"
+					" methods from %s\n",
+					i, name);
+				if (fail_on_invalid_config)
+					return 0;
+				goto exit;
+			}
+
+			cfg->cert_comp_algs[i] = method;
+			cfg->cert_comp_algs[i + 1] = 0;
 		} else if (c_strcasecmp(name, "allow-rsa-pkcs1-encrypt") == 0) {
 			p = clear_spaces(value, str);
 			if (c_strcasecmp(p, "true") == 0) {
@@ -3979,6 +4017,27 @@ bool _gnutls_config_is_ktls_enabled(void)
 bool _gnutls_config_is_rsa_pkcs1_encrypt_allowed(void)
 {
 	return system_wide_config.allow_rsa_pkcs1_encrypt;
+}
+
+int _gnutls_config_set_certificate_compression_methods(gnutls_session_t session)
+{
+	int ret;
+	size_t n_algs = 0;
+
+	/* Don't override manually set compression methods */
+	if (_gnutls_compress_certificate_is_set(session) ||
+	    system_wide_config.cert_comp_algs[0] == 0)
+		return 0;
+
+	while (system_wide_config.cert_comp_algs[n_algs] != 0)
+		n_algs++;
+
+	ret = gnutls_compress_certificate_set_methods(
+		session, system_wide_config.cert_comp_algs, n_algs);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	return 0;
 }
 
 /*

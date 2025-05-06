@@ -349,6 +349,7 @@ tests/client
 tests/client-fastopen
 tests/client-sign-md5-rep
 tests/client_dsa_key
+tests/compress-cert-conf
 tests/conv-utf8
 tests/crl-basic
 tests/crl_apis

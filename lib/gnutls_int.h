@@ -1810,5 +1810,6 @@ extern unsigned int _gnutls_global_version;
 
 bool _gnutls_config_is_ktls_enabled(void);
 bool _gnutls_config_is_rsa_pkcs1_encrypt_allowed(void);
+int _gnutls_config_set_certificate_compression_methods(gnutls_session_t session);
 
 #endif /* GNUTLS_LIB_GNUTLS_INT_H */
