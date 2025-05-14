@@ -21,6 +21,9 @@ See the end for copying conditions.
    round 3 candidate of Kyber and only supported through liboqs has
    also been removed altogether.
 
+** libgnutls: TLS certificate compression methods can now be set with
+   cert-compression-alg configuration option in the gnutls priority file.
+
 * Version 3.8.9 (released 2025-02-07)
 
 ** libgnutls: leancrypto was added as an interim option for PQC

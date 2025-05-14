@@ -26,6 +26,7 @@ used can be queried using @funcref{gnutls_get_system_config_file}.
 * Querying for disabled algorithms and protocols::
 * Overriding the parameter verification profile::
 * Overriding the default priority string::
+* Enabling TLS certificate compression
 * Enabling/Disabling system/acceleration protocols::
 * Enabling/Disabling RSAES-PKCS1-v1_5::
 @end menu
@@ -250,6 +251,26 @@ Below example sets a more specific default priority string.
 @example
 [overrides]
 default-priority-string = SECURE128:-VERS-TLS-ALL:+VERS-TLS1.3
+
+@end example
+
+
+@node Enabling TLS certificate compression
+@section Enabling TLS certificate compression
+
+This option can be used to enable certificate compression in TLS 1.3 handshake.
+Note that setting certificate compression algorithms does not guarantee that
+the certificate will be compressed. Setting certificate compression algorithms
+will indicate to the peer which compression methods are supported and the peer
+may decide to compress the certificate with one of these methods. Algorithms
+that appear earlier in the list will be prefered over those appearing later.
+
+Below example shows how to enable the TLS certificate compression.
+@example
+[overrides]
+cert-compression-alg = brotli
+cert-compression-alg = zstd
+cert-compression-alg = zlib
 
 @end example
 

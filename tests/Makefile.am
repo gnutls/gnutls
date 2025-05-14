@@ -568,6 +568,11 @@ dist_check_SCRIPTS += system-override-sig-allowlist.sh \
 indirect_tests += system-override-curves-allowlist
 indirect_tests += protocol-set-allowlist
 
+dist_check_SCRIPTS += system-override-compress-cert.sh
+indirect_tests += compress-cert-conf
+compress_cert_conf_SOURCES = tls13/compress-cert-conf.c
+compress_cert_conf_LDADD = $(LDADD)
+
 dist_check_SCRIPTS += system-override-allow-rsa-pkcs1-encrypt.sh
 indirect_tests += rsaes-pkcs1-v1_5
 rsaes_pkcs1_v1_5_SOURCES = rsaes-pkcs1-v1_5.c

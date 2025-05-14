@@ -2866,6 +2866,11 @@ int gnutls_handshake(gnutls_session_t session)
 #endif
 	}
 
+	if (_gnutls_config_set_certificate_compression_methods(session) < 0)
+		_gnutls_audit_log(
+			session,
+			"Setting certificate compression methods failed\n");
+
 	if (session->internals.recv_state == RECV_STATE_FALSE_START) {
 		session_invalidate(session);
 		return gnutls_assert_val(GNUTLS_E_HANDSHAKE_DURING_FALSE_START);

@@ -84,6 +84,21 @@ bool _gnutls_compress_certificate_is_method_enabled(
 	return false;
 }
 
+/* Returns true when compression methods are set, false otherwise
+ */
+bool _gnutls_compress_certificate_is_set(gnutls_session_t session)
+{
+	compress_certificate_ext_st *priv;
+	gnutls_ext_priv_data_t epriv;
+
+	if (_gnutls_hello_ext_get_priv(
+		    session, GNUTLS_EXTENSION_COMPRESS_CERTIFICATE, &epriv) < 0)
+		return false;
+	priv = epriv;
+
+	return priv->methods_len != 0;
+}
+
 /**
  * gnutls_compress_certificate_get_selected_method:
  * @session: is a #gnutls_session_t type.
