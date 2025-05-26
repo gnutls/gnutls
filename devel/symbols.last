@@ -22,6 +22,7 @@ GNUTLS_3_8_1@GNUTLS_3_8_1
 GNUTLS_3_8_2@GNUTLS_3_8_2
 GNUTLS_3_8_4@GNUTLS_3_8_4
 GNUTLS_3_8_6@GNUTLS_3_8_6
+GNUTLS_3_8_10@GNUTLS_3_8_10
 _gnutls_global_init_skip@GNUTLS_3_4
 gnutls_aead_cipher_decrypt@GNUTLS_3_4
 gnutls_aead_cipher_decryptv2@GNUTLS_3_6_10
@@ -832,6 +833,7 @@ gnutls_session_ticket_enable_client@GNUTLS_3_4
 gnutls_session_ticket_enable_server@GNUTLS_3_4
 gnutls_session_ticket_key_generate@GNUTLS_3_4
 gnutls_session_ticket_send@GNUTLS_3_6_3
+gnutls_handshake_update_receiving_key@GNUTLS_3_8_6
 gnutls_set_default_priority@GNUTLS_3_4
 gnutls_set_default_priority_append@GNUTLS_3_6_3
 gnutls_sign_algorithm_get@GNUTLS_3_4

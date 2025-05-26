@@ -73,6 +73,9 @@ static int handshake_read_func(gnutls_session_t session,
 	if (htype == GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC)
 		return 0;
 
+	if (htype == GNUTLS_HANDSHAKE_KEY_UPDATE)
+		return 0;
+
 	return gnutls_handshake_write(peer, level, data, data_size);
 }
 
@@ -140,6 +143,17 @@ static void run(const char *name, const char *prio)
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
+
+	TRANSFER(client, server, MSG, strlen(MSG), buffer, MAX_BUF);
+	TRANSFER(server, client, MSG, strlen(MSG), buffer, MAX_BUF);
+
+	/* Trigger a KeyUpdate that won't actually be sent to the client,
+	 * as handshake_read_func() will drop the message.
+	 */
+	gnutls_session_key_update(server, GNUTLS_KU_PEER);
+
+	/* Manually update the client keys */
+	gnutls_handshake_update_receiving_key(client);
 
 	TRANSFER(client, server, MSG, strlen(MSG), buffer, MAX_BUF);
 	TRANSFER(server, client, MSG, strlen(MSG), buffer, MAX_BUF);
