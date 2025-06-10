@@ -23,50 +23,53 @@
 #ifndef GNUTLS_LIB_PK_H
 #define GNUTLS_LIB_PK_H
 
+#include "crypto-backend.h"
+
 extern int crypto_pk_prio;
-extern gnutls_crypto_pk_st _gnutls_pk_ops;
 
 #define _gnutls_pk_encrypt(algo, ciphertext, plaintext, params) \
-	_gnutls_pk_ops.encrypt(algo, ciphertext, plaintext, params)
+	_gnutls_pk_backend()->encrypt(algo, ciphertext, plaintext, params)
 #define _gnutls_pk_decrypt(algo, ciphertext, plaintext, params) \
-	_gnutls_pk_ops.decrypt(algo, ciphertext, plaintext, params)
-#define _gnutls_pk_decrypt2(algo, ciphertext, plaintext, size, params) \
-	_gnutls_pk_ops.decrypt2(algo, ciphertext, plaintext, size, params)
+	_gnutls_pk_backend()->decrypt(algo, ciphertext, plaintext, params)
+#define _gnutls_pk_decrypt2(algo, ciphertext, plaintext, size, params)    \
+	_gnutls_pk_backend()->decrypt2(algo, ciphertext, plaintext, size, \
+				       params)
 #define _gnutls_pk_sign(algo, sig, data, params, sign_params) \
-	_gnutls_pk_ops.sign(algo, sig, data, params, sign_params)
+	_gnutls_pk_backend()->sign(algo, sig, data, params, sign_params)
 #define _gnutls_pk_verify(algo, data, sig, params, sign_params) \
-	_gnutls_pk_ops.verify(algo, data, sig, params, sign_params)
+	_gnutls_pk_backend()->verify(algo, data, sig, params, sign_params)
 #define _gnutls_pk_verify_priv_params(algo, params) \
-	_gnutls_pk_ops.verify_priv_params(algo, params)
+	_gnutls_pk_backend()->verify_priv_params(algo, params)
 #define _gnutls_pk_verify_pub_params(algo, params) \
-	_gnutls_pk_ops.verify_pub_params(algo, params)
+	_gnutls_pk_backend()->verify_pub_params(algo, params)
 #define _gnutls_pk_derive(algo, out, pub, priv) \
-	_gnutls_pk_ops.derive(algo, out, pub, priv, NULL, 0)
+	_gnutls_pk_backend()->derive(algo, out, pub, priv, NULL, 0)
 #define _gnutls_pk_derive_nonce(algo, out, pub, priv, nonce) \
-	_gnutls_pk_ops.derive(algo, out, pub, priv, nonce, 0)
-#define _gnutls_pk_derive_tls13(algo, out, pub, priv) \
-	_gnutls_pk_ops.derive(algo, out, pub, priv, NULL, PK_DERIVE_TLS13)
+	_gnutls_pk_backend()->derive(algo, out, pub, priv, nonce, 0)
+#define _gnutls_pk_derive_tls13(algo, out, pub, priv)            \
+	_gnutls_pk_backend()->derive(algo, out, pub, priv, NULL, \
+				     PK_DERIVE_TLS13)
 #define _gnutls_pk_encaps(algo, ciphertext, shared_secret, pub) \
-	_gnutls_pk_ops.encaps(algo, ciphertext, shared_secret, pub)
+	_gnutls_pk_backend()->encaps(algo, ciphertext, shared_secret, pub)
 #define _gnutls_pk_decaps(algo, shared_secret, ciphertext, priv) \
-	_gnutls_pk_ops.decaps(algo, shared_secret, ciphertext, priv)
+	_gnutls_pk_backend()->decaps(algo, shared_secret, ciphertext, priv)
 #define _gnutls_pk_generate_keys(algo, bits, params, temporal) \
-	_gnutls_pk_ops.generate_keys(algo, bits, params, temporal)
+	_gnutls_pk_backend()->generate_keys(algo, bits, params, temporal)
 #define _gnutls_pk_generate_params(algo, bits, priv) \
-	_gnutls_pk_ops.generate_params(algo, bits, priv)
+	_gnutls_pk_backend()->generate_params(algo, bits, priv)
 #define _gnutls_pk_hash_algorithm(pk, sig, params, hash) \
-	_gnutls_pk_ops.hash_algorithm(pk, sig, params, hash)
-#define _gnutls_pk_curve_exists(curve) _gnutls_pk_ops.curve_exists(curve)
-#define _gnutls_pk_exists(algo) _gnutls_pk_ops.pk_exists(algo)
-#define _gnutls_pk_sign_exists(algo) _gnutls_pk_ops.sign_exists(algo)
+	_gnutls_pk_backend()->hash_algorithm(pk, sig, params, hash)
+#define _gnutls_pk_curve_exists(curve) _gnutls_pk_backend()->curve_exists(curve)
+#define _gnutls_pk_exists(algo) _gnutls_pk_backend()->pk_exists(algo)
+#define _gnutls_pk_sign_exists(algo) _gnutls_pk_backend()->sign_exists(algo)
 
 inline static int _gnutls_pk_fixup(gnutls_pk_algorithm_t algo,
 				   gnutls_direction_t direction,
 				   gnutls_pk_params_st *params)
 {
-	if (_gnutls_pk_ops.pk_fixup_private_params)
-		return _gnutls_pk_ops.pk_fixup_private_params(algo, direction,
-							      params);
+	if (_gnutls_pk_backend()->pk_fixup_private_params)
+		return _gnutls_pk_backend()->pk_fixup_private_params(
+			algo, direction, params);
 	return 0;
 }
 

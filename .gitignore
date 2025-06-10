@@ -235,6 +235,9 @@ lib/openpgp/libgnutls_openpgp.la
 lib/openpgp/Makefile
 lib/openpgp/Makefile.in
 lib/openpgp/pgp-api.texi
+lib/pkcs11/libgnutls_pkcs11.la
+lib/pkcs11/Makefile
+lib/pkcs11/Makefile.in
 lib/priority_options.h
 .libs
 libtool
@@ -599,6 +602,10 @@ tests/pkcs11/pkcs11-pubkey-import-rsa
 tests/pkcs11/pkcs11-rsa-pss-privkey-test
 tests/pkcs11/tls-neg-pkcs11-key
 tests/pkcs11/tls-neg-pkcs11-no-key
+tests/pkcs11-provider/pkcs11-provider-cipher
+tests/pkcs11-provider/pkcs11-provider-hmac
+tests/pkcs11-provider/pkcs11-provider-pk
+tests/pkcs11-provider/pkcs11-provider-sig
 tests/pkcs12-decode/Makefile
 tests/pkcs12-decode/Makefile.in
 tests/pkcs12_encode

@@ -30,6 +30,10 @@
 #include "algorithms.h"
 #include "fips.h"
 
+#ifdef ENABLE_PKCS11
+#include "pkcs11/p11_provider.h"
+#endif
+
 int _gnutls_hash_init(digest_hd_st *dig, const mac_entry_st *e)
 {
 	int result;
@@ -45,7 +49,12 @@ int _gnutls_hash_init(digest_hd_st *dig, const mac_entry_st *e)
 	/* check if a digest has been registered 
 	 */
 	cc = _gnutls_get_crypto_digest((gnutls_digest_algorithm_t)e->id);
-	if (cc != NULL && cc->init) {
+	if (
+#if defined(ENABLE_PKCS11) && defined(ENABLE_FIPS140)
+		/* Prioritize crypto from pkcs11 provider */
+		!_p11_provider_is_initialized() &&
+#endif
+		cc != NULL && cc->init) {
 		if (cc->init((gnutls_digest_algorithm_t)e->id, &dig->handle) <
 		    0) {
 			gnutls_assert();
@@ -60,17 +69,17 @@ int _gnutls_hash_init(digest_hd_st *dig, const mac_entry_st *e)
 		return 0;
 	}
 
-	result = _gnutls_digest_ops.init((gnutls_digest_algorithm_t)e->id,
-					 &dig->handle);
+	result = _gnutls_digest_backend()->init(
+		(gnutls_digest_algorithm_t)e->id, &dig->handle);
 	if (result < 0) {
 		gnutls_assert();
 		return result;
 	}
 
-	dig->hash = _gnutls_digest_ops.hash;
-	dig->output = _gnutls_digest_ops.output;
-	dig->deinit = _gnutls_digest_ops.deinit;
-	dig->copy = _gnutls_digest_ops.copy;
+	dig->hash = _gnutls_digest_backend()->hash;
+	dig->output = _gnutls_digest_backend()->output;
+	dig->deinit = _gnutls_digest_backend()->deinit;
+	dig->copy = _gnutls_digest_backend()->copy;
 
 	return 0;
 }
@@ -86,10 +95,15 @@ int _gnutls_digest_exists(gnutls_digest_algorithm_t algo)
 		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
 
 	cc = _gnutls_get_crypto_digest(algo);
-	if (cc != NULL)
+	if (
+#if defined(ENABLE_PKCS11) && defined(ENABLE_FIPS140)
+		/* Prioritize crypto from pkcs11 provider */
+		!_p11_provider_is_initialized() &&
+#endif
+		cc != NULL)
 		return 1;
 
-	return _gnutls_digest_ops.exists(algo);
+	return _gnutls_digest_backend()->exists(algo);
 }
 
 int _gnutls_hash_copy(const digest_hd_st *handle, digest_hd_st *dst)
@@ -130,7 +144,12 @@ int _gnutls_hash_fast(gnutls_digest_algorithm_t algorithm, const void *text,
 	/* check if a digest has been registered 
 	 */
 	cc = _gnutls_get_crypto_digest(algorithm);
-	if (cc != NULL) {
+	if (
+#if defined(ENABLE_PKCS11) && defined(ENABLE_FIPS140)
+		/* Prioritize crypto from pkcs11 provider */
+		!_p11_provider_is_initialized() &&
+#endif
+		cc != NULL) {
 		if (cc->fast(algorithm, text, textlen, digest) < 0) {
 			gnutls_assert();
 			return GNUTLS_E_HASH_FAILED;
@@ -139,7 +158,7 @@ int _gnutls_hash_fast(gnutls_digest_algorithm_t algorithm, const void *text,
 		return 0;
 	}
 
-	ret = _gnutls_digest_ops.fast(algorithm, text, textlen, digest);
+	ret = _gnutls_digest_backend()->fast(algorithm, text, textlen, digest);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -173,7 +192,12 @@ int _gnutls_mac_fast(gnutls_mac_algorithm_t algorithm, const void *key,
 	/* check if a digest has been registered 
 	 */
 	cc = _gnutls_get_crypto_mac(algorithm);
-	if (cc != NULL) {
+	if (
+#if defined(ENABLE_PKCS11) && defined(ENABLE_FIPS140)
+		/* Prioritize crypto from pkcs11 provider */
+		!_p11_provider_is_initialized() &&
+#endif
+		cc != NULL) {
 		if (cc->fast(algorithm, NULL, 0, key, keylen, text, textlen,
 			     digest) < 0) {
 			gnutls_assert();
@@ -183,8 +207,8 @@ int _gnutls_mac_fast(gnutls_mac_algorithm_t algorithm, const void *key,
 		return 0;
 	}
 
-	ret = _gnutls_mac_ops.fast(algorithm, NULL, 0, key, keylen, text,
-				   textlen, digest);
+	ret = _gnutls_mac_backend()->fast(algorithm, NULL, 0, key, keylen, text,
+					  textlen, digest);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -208,10 +232,15 @@ int _gnutls_mac_exists(gnutls_mac_algorithm_t algo)
 		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
 
 	cc = _gnutls_get_crypto_mac(algo);
-	if (cc != NULL)
+	if (
+#if defined(ENABLE_PKCS11) && defined(ENABLE_FIPS140)
+		/* Prioritize crypto from pkcs11 provider */
+		!_p11_provider_is_initialized() &&
+#endif
+		cc != NULL)
 		return 1;
 
-	return _gnutls_mac_ops.exists(algo);
+	return _gnutls_mac_backend()->exists(algo);
 }
 
 int _gnutls_mac_init(mac_hd_st *mac, const mac_entry_st *e, const void *key,
@@ -231,7 +260,13 @@ int _gnutls_mac_init(mac_hd_st *mac, const mac_entry_st *e, const void *key,
 	/* check if a digest has been registered 
 	 */
 	cc = _gnutls_get_crypto_mac(e->id);
-	if (cc != NULL && cc->init != NULL) {
+	if (
+#if defined(ENABLE_PKCS11) && defined(ENABLE_FIPS140)
+		/* Prioritize crypto from pkcs11 provider */
+		!_p11_provider_is_initialized() &&
+#endif
+		cc != NULL && cc->init != NULL) {
+
 		if (cc->init(e->id, &mac->handle) < 0) {
 			gnutls_assert();
 			return GNUTLS_E_HASH_FAILED;
@@ -253,20 +288,20 @@ int _gnutls_mac_init(mac_hd_st *mac, const mac_entry_st *e, const void *key,
 		return 0;
 	}
 
-	result = _gnutls_mac_ops.init(e->id, &mac->handle);
+	result = _gnutls_mac_backend()->init(e->id, &mac->handle);
 	if (result < 0) {
 		gnutls_assert();
 		return result;
 	}
 
-	mac->hash = _gnutls_mac_ops.hash;
-	mac->setnonce = _gnutls_mac_ops.setnonce;
-	mac->output = _gnutls_mac_ops.output;
-	mac->deinit = _gnutls_mac_ops.deinit;
-	mac->copy = _gnutls_mac_ops.copy;
-	mac->setkey = _gnutls_mac_ops.setkey;
+	mac->hash = _gnutls_mac_backend()->hash;
+	mac->setnonce = _gnutls_mac_backend()->setnonce;
+	mac->output = _gnutls_mac_backend()->output;
+	mac->deinit = _gnutls_mac_backend()->deinit;
+	mac->copy = _gnutls_mac_backend()->copy;
+	mac->setkey = _gnutls_mac_backend()->setkey;
 
-	if (_gnutls_mac_ops.setkey(mac->handle, key, keylen) < 0) {
+	if (_gnutls_mac_backend()->setkey(mac->handle, key, keylen) < 0) {
 		gnutls_assert();
 		mac->deinit(mac->handle);
 		return GNUTLS_E_HASH_FAILED;
