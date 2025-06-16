@@ -201,8 +201,10 @@ static int wrap_padlock_hmac_init(gnutls_mac_algorithm_t algo, void **_ctx)
 	ctx->algo = algo;
 
 	ret = _hmac_ctx_init(algo, ctx);
-	if (ret < 0)
+	if (ret < 0) {
+		gnutls_free(ctx);
 		return gnutls_assert_val(ret);
+	}
 
 	*_ctx = ctx;
 
