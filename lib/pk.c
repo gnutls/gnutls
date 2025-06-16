@@ -658,6 +658,7 @@ int encode_ber_digest_info(const mac_entry_st *e, const gnutls_datum_t *digest,
 	result = asn1_der_coding(dinfo, "", tmp_output, &tmp_output_size, NULL);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
+		gnutls_free(tmp_output);
 		asn1_delete_structure(&dinfo);
 		return _gnutls_asn2err(result);
 	}
