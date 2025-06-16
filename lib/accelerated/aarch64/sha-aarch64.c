@@ -293,6 +293,7 @@ static int wrap_aarch64_hash_init(gnutls_digest_algorithm_t algo, void **_ctx)
 	ctx->algo = algo;
 
 	if ((ret = _ctx_init(algo, ctx)) < 0) {
+		gnutls_free(ctx);
 		gnutls_assert();
 		return ret;
 	}
