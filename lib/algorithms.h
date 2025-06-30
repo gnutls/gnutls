@@ -204,7 +204,8 @@ inline static int _gnutls_mac_get_key_size(const mac_entry_st *e)
 inline static gnutls_digest_algorithm_t
 _gnutls_mac_to_dig(gnutls_mac_algorithm_t mac)
 {
-	if (unlikely(mac >= GNUTLS_MAC_AEAD))
+	if (mac >= GNUTLS_MAC_AEAD && mac != GNUTLS_MAC_SHAKE_128 &&
+	    mac != GNUTLS_MAC_SHAKE_256)
 		return GNUTLS_DIG_UNKNOWN;
 
 	return (gnutls_digest_algorithm_t)mac;
