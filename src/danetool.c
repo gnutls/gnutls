@@ -212,7 +212,6 @@ static void dane_check(const char *host, const char *proto, const char *service,
 	unsigned del = 0;
 	unsigned vflags = DANE_VFLAG_FAIL_IF_NOT_CHECKED;
 	const char *cstr;
-	char *str;
 	gnutls_x509_crt_t *clist = NULL;
 	unsigned int clist_size = 0;
 	gnutls_datum_t certs[MAX_CLIST_SIZE];
@@ -284,22 +283,19 @@ static void dane_check(const char *host, const char *proto, const char *service,
 		}
 
 		for (i = 0; i < entries; i++) {
-			size_t str_size;
+			gnutls_datum_t out = { NULL, 0 };
 			t.data = (void *)dane_data[i];
 			t.size = dane_data_len[i];
 
-			str_size = t.size * 2 + 1;
-			str = gnutls_malloc(str_size);
-
-			ret = gnutls_hex_encode(&t, str, &str_size);
+			ret = gnutls_hex_encode2(&t, &out);
 			if (ret < 0) {
 				fprintf(stderr, "gnutls_hex_encode: %s\n",
 					dane_strerror(ret));
 				retcode = 1;
 				goto error;
 			}
-			fprintf(outfile, "[%u]: %s\n", i, str);
-			gnutls_free(str);
+			fprintf(outfile, "[%u]: %s\n", i, out.data);
+			gnutls_free(out.data);
 		}
 		fprintf(outfile, "\n");
 	}
