@@ -223,6 +223,7 @@ typedef struct {
 	gnutls_gost_paramset_t gost_params; /* GNUTLS_PK_GOST_* */
 	gnutls_datum_t raw_pub; /* used by x25519 */
 	gnutls_datum_t raw_priv;
+	gnutls_datum_t raw_seed; /* used by ML-DSA */
 
 	unsigned int seed_size;
 	uint8_t seed[MAX_PVP_SEED_SIZE];
@@ -236,6 +237,12 @@ typedef struct {
 /**
  * gnutls_pk_flag_t:
  * @GNUTLS_PK_FLAG_NONE: No flag.
+ * @GNUTLS_PK_FLAG_PROVABLE: Use a provable construction when generating keys
+ * @GNUTLS_PK_FLAG_REPRODUCIBLE: Use a deterministic construction when generating keys
+ * @GNUTLS_PK_FLAG_RSA_PSS_FIXED_SALT_LENGTH: Disallow RSA-PSS signatures made
+ *   with mismatching salt length with digest length, as mandated in RFC 8446
+ *   4.2.3.
+ * @GNUTLS_PK_FLAG_EXPAND_KEYS_FROM_SEED: Expand keys from a seed.
  *
  * Enumeration of public-key flag.
  */
@@ -243,7 +250,8 @@ typedef enum {
 	GNUTLS_PK_FLAG_NONE = 0,
 	GNUTLS_PK_FLAG_PROVABLE = 1,
 	GNUTLS_PK_FLAG_REPRODUCIBLE = 2,
-	GNUTLS_PK_FLAG_RSA_PSS_FIXED_SALT_LENGTH = 4
+	GNUTLS_PK_FLAG_RSA_PSS_FIXED_SALT_LENGTH = 4,
+	GNUTLS_PK_FLAG_EXPAND_KEYS_FROM_SEED = 8
 } gnutls_pk_flag_t;
 
 #define FIX_SIGN_PARAMS(params, flags, dig)                            \

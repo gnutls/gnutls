@@ -550,6 +550,10 @@ void gnutls_pk_params_clear(gnutls_pk_params_st *p)
 		gnutls_memset(p->raw_priv.data, 0, p->raw_priv.size);
 		p->raw_priv.size = 0;
 	}
+	if (p->raw_seed.data != NULL) {
+		gnutls_memset(p->raw_seed.data, 0, p->raw_seed.size);
+		p->raw_seed.size = 0;
+	}
 }
 
 int _gnutls_find_rsa_pss_salt_size(unsigned bits, const mac_entry_st *me,
