@@ -189,10 +189,25 @@ TPMKey ::= SEQUENCE {
     privkey         OCTET STRING
 }
 
+-- Legacy private key format defined in
+-- draft-ietf-lamps-dilithium-certificates-04, section 6
 MLDSAPrivateKey ::= SEQUENCE {
 	version                  INTEGER,
 	privateKeyAlgorithm      AlgorithmIdentifier,
 	privateKey               OCTET STRING,
 	publicKey                [1] OCTET STRING OPTIONAL
+}
+
+-- Private key format used in the "privateKey" field of the
+-- OneAsymmetricKey structure (i.e., pkcs-8-PrivateKeyInfo in
+-- pkix.asn). See draft-ietf-lamps-dilithium-certificates-12, section
+-- 6, for more details.
+MLDSAInnerPrivateKey ::= CHOICE {
+  -- seed [0] OCTET STRING (SIZE (32))
+  expandedKey OCTET STRING,
+  both SEQUENCE {
+      seed OCTET STRING,
+      expandedKey OCTET STRING
+  }
 }
 END

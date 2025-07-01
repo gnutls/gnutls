@@ -345,7 +345,9 @@ pkcs-8-PrivateKeyInfo ::= SEQUENCE {
   version INTEGER,
   privateKeyAlgorithm AlgorithmIdentifier,
   privateKey OCTET STRING,
-  attributes [0] Attributes OPTIONAL }
+  attributes [0] Attributes OPTIONAL,
+  publicKey  [1] BIT STRING OPTIONAL
+ }
 
 -- Encrypted private-key information syntax
 
