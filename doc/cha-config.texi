@@ -48,8 +48,9 @@ The format is '@code{KEYWORD = VALUE}', e.g.,
 
 When used they may be followed by additional options that will be appended to the
 system string (e.g., '@code{@@EXAMPLE-PRIORITY:+SRP}'). '@code{EXAMPLE-PRIORITY=NORMAL:+ARCFOUR-128}'.
-Since version 3.5.1 applications are allowed to specify fallback keywords such as
-@@KEYWORD1,@@KEYWORD2, and the first valid keyword will be used.
+Since version 3.5.1 it is allowed to specify fallback keywords by
+separating them with a comma, such as @@KEYWORD1,KEYWORD2, and the
+first valid keyword will be used.
 
 The following example configuration defines a priority string called @code{@@SYSTEM}.
 When set, its full settings can be queried using @code{gnutls-cli --priority @@SYSTEM --list}.
