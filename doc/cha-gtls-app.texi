@@ -1318,8 +1318,9 @@ It may be followed by additional options that will be appended to the
 system string (e.g., "@@SYSTEM:+SRP"). The system file should have the
 format 'KEYWORD=VALUE', e.g., 'SYSTEM=NORMAL:+ARCFOUR-128'.
 
-Since version 3.5.1 it is allowed to specify fallback keywords such
-as @@KEYWORD1,@@KEYWORD2, and the first valid keyword will be used.
+Since version 3.5.1 it is allowed to specify fallback keywords by
+separating them with a comma, such as @@KEYWORD1,KEYWORD2, and the
+first valid keyword will be used.
 
 @item PERFORMANCE @tab
 All the known to be secure ciphersuites are enabled,
