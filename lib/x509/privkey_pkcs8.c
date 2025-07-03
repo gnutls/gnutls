@@ -38,7 +38,6 @@
 #include "pk.h"
 #include "attributes.h"
 #include "prov-seed.h"
-#include "intprops.h"
 
 static int _decode_pkcs8_ecc_key(asn1_node pkcs8_asn,
 				 gnutls_x509_privkey_t pkey);
@@ -52,6 +51,121 @@ static int decode_private_key_info(const gnutls_datum_t *der,
 #define PEM_PKCS8 "ENCRYPTED PRIVATE KEY"
 #define PEM_UNENCRYPTED_PKCS8 "PRIVATE KEY"
 
+typedef enum ml_dsa_privkey_format_flags_t {
+	ML_DSA_PRIVKEY_FORMAT_NONE = 0,
+	ML_DSA_PRIVKEY_FORMAT_SEED = 1 << 0,
+	ML_DSA_PRIVKEY_FORMAT_EXPANDED = 1 << 1,
+	ML_DSA_PRIVKEY_FORMAT_BOTH = ML_DSA_PRIVKEY_FORMAT_SEED |
+				     ML_DSA_PRIVKEY_FORMAT_EXPANDED,
+} ml_dsa_privkey_format_flags_t;
+
+static inline ml_dsa_privkey_format_flags_t
+flags_to_ml_dsa_privkey_format(gnutls_pkcs_encrypt_flags_t flags)
+{
+	ml_dsa_privkey_format_flags_t format = ML_DSA_PRIVKEY_FORMAT_NONE;
+
+	if (flags & GNUTLS_PKCS_MLDSA_SEED)
+		format |= ML_DSA_PRIVKEY_FORMAT_SEED;
+	if (flags & GNUTLS_PKCS_MLDSA_EXPANDED)
+		format |= ML_DSA_PRIVKEY_FORMAT_EXPANDED;
+
+	return format;
+}
+
+static int encode_ml_dsa_inner_private_key(const gnutls_x509_privkey_t pkey,
+					   gnutls_datum_t *raw_key,
+					   ml_dsa_privkey_format_flags_t format)
+{
+	int ret = 0;
+	asn1_node inner_asn = NULL;
+
+	/* The default is the "both" format if seed is available;
+	 * otherwise, "expanded" */
+	if (format == ML_DSA_PRIVKEY_FORMAT_NONE) {
+		format = pkey->params.raw_seed.data ?
+				 ML_DSA_PRIVKEY_FORMAT_BOTH :
+				 ML_DSA_PRIVKEY_FORMAT_EXPANDED;
+	}
+
+	/* libtasn1 doesn't support encoding instructions in CHOICE,
+	 * format it manually */
+	if (format == ML_DSA_PRIVKEY_FORMAT_SEED) {
+		raw_key->data = gnutls_malloc(34);
+		if (!raw_key->data)
+			return GNUTLS_E_MEMORY_ERROR;
+
+		raw_key->data[0] = 0x80;
+		raw_key->data[1] = 0x20;
+		memcpy(&raw_key->data[2], pkey->params.raw_seed.data, 32);
+		raw_key->size = 34;
+	} else {
+		int result;
+
+		result = asn1_create_element(_gnutls_get_gnutls_asn(),
+					     "GNUTLS.MLDSAInnerPrivateKey",
+					     &inner_asn);
+		if (result != ASN1_SUCCESS)
+			return gnutls_assert_val(_gnutls_asn2err(result));
+
+		switch (format) {
+		case ML_DSA_PRIVKEY_FORMAT_EXPANDED:
+			result = asn1_write_value(inner_asn, "", "expandedKey",
+						  1);
+			if (result != ASN1_SUCCESS) {
+				gnutls_assert();
+				ret = _gnutls_asn2err(result);
+				goto cleanup;
+			}
+			result = asn1_write_value(inner_asn, "expandedKey",
+						  pkey->params.raw_priv.data,
+						  pkey->params.raw_priv.size);
+			if (result != ASN1_SUCCESS) {
+				gnutls_assert();
+				ret = _gnutls_asn2err(result);
+				goto cleanup;
+			}
+			break;
+		case ML_DSA_PRIVKEY_FORMAT_BOTH:
+			result = asn1_write_value(inner_asn, "", "both", 1);
+			if (result != ASN1_SUCCESS) {
+				gnutls_assert();
+				ret = _gnutls_asn2err(result);
+				goto cleanup;
+			}
+			result = asn1_write_value(inner_asn, "both.seed",
+						  pkey->params.raw_seed.data,
+						  pkey->params.raw_seed.size);
+			if (result != ASN1_SUCCESS) {
+				gnutls_assert();
+				ret = _gnutls_asn2err(result);
+				goto cleanup;
+			}
+			result = asn1_write_value(inner_asn, "both.expandedKey",
+						  pkey->params.raw_priv.data,
+						  pkey->params.raw_priv.size);
+			if (result != ASN1_SUCCESS) {
+				gnutls_assert();
+				ret = _gnutls_asn2err(result);
+				goto cleanup;
+			}
+			break;
+		default:
+			ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+			goto cleanup;
+		}
+
+		ret = _gnutls_x509_der_encode(inner_asn, "", raw_key, 0);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+	}
+
+cleanup:
+	asn1_delete_structure2(&inner_asn, ASN1_DELETE_FLAG_ZEROIZE);
+	return ret;
+}
+
 /* Returns a negative error code if the encryption schema in
  * the OID is not supported. The schema ID is returned.
  */
@@ -60,7 +174,8 @@ static int decode_private_key_info(const gnutls_datum_t *der,
  * an ASN.1 INTEGER of the x value.
  */
 inline static int _encode_privkey(gnutls_x509_privkey_t pkey,
-				  gnutls_datum_t *raw)
+				  gnutls_datum_t *raw,
+				  gnutls_pkcs_encrypt_flags_t flags)
 {
 	int ret;
 	asn1_node spk = NULL;
@@ -81,34 +196,12 @@ inline static int _encode_privkey(gnutls_x509_privkey_t pkey,
 		return ret;
 	case GNUTLS_PK_MLDSA44:
 	case GNUTLS_PK_MLDSA65:
-	case GNUTLS_PK_MLDSA87: {
-		gnutls_datum_t concatenated_key = { NULL, 0 };
-		size_t concatenated_key_size = 0;
-
-		if (!INT_ADD_OK(pkey->params.raw_priv.size,
-				pkey->params.raw_pub.size,
-				&concatenated_key_size))
-			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-		ret = _gnutls_set_datum(&concatenated_key,
-					pkey->params.raw_priv.data,
-					pkey->params.raw_priv.size);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
-		concatenated_key.data = gnutls_realloc_fast(
-			concatenated_key.data, concatenated_key_size);
-		if (!concatenated_key.data)
-			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-		concatenated_key.size = concatenated_key_size;
-		memcpy(&concatenated_key.data[pkey->params.raw_priv.size],
-		       pkey->params.raw_pub.data, pkey->params.raw_pub.size);
-		ret = _gnutls_x509_encode_string(ASN1_ETYPE_OCTET_STRING,
-						 concatenated_key.data,
-						 concatenated_key.size, raw);
-		_gnutls_free_key_datum(&concatenated_key);
+	case GNUTLS_PK_MLDSA87:
+		ret = encode_ml_dsa_inner_private_key(
+			pkey, raw, flags_to_ml_dsa_privkey_format(flags));
 		if (ret < 0)
 			gnutls_assert();
-		return ret;
-	}
+		break;
 	case GNUTLS_PK_GOST_01:
 	case GNUTLS_PK_GOST_12_256:
 	case GNUTLS_PK_GOST_12_512:
@@ -191,7 +284,8 @@ error:
  * the asn1_node of private key info will be returned.
  */
 static int encode_to_private_key_info(gnutls_x509_privkey_t pkey,
-				      gnutls_datum_t *der, asn1_node *pkey_info)
+				      gnutls_datum_t *der, asn1_node *pkey_info,
+				      gnutls_pkcs_encrypt_flags_t flags)
 {
 	int result, len;
 	uint8_t null = 0;
@@ -251,7 +345,7 @@ static int encode_to_private_key_info(gnutls_x509_privkey_t pkey,
 
 	/* Write the raw private key
 	 */
-	result = _encode_privkey(pkey, &algo_privkey);
+	result = _encode_privkey(pkey, &algo_privkey, flags);
 	if (result < 0) {
 		gnutls_assert();
 		goto error;
@@ -477,7 +571,7 @@ int gnutls_x509_privkey_export_pkcs8(gnutls_x509_privkey_t key,
 	/* Get the private key info
 	 * tmp holds the DER encoding.
 	 */
-	ret = encode_to_private_key_info(key, &tmp, &pkey_info);
+	ret = encode_to_private_key_info(key, &tmp, &pkey_info, flags);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -671,7 +765,7 @@ int gnutls_x509_privkey_export2_pkcs8(gnutls_x509_privkey_t key,
 	/* Get the private key info
 	 * tmp holds the DER encoding.
 	 */
-	ret = encode_to_private_key_info(key, &tmp, &pkey_info);
+	ret = encode_to_private_key_info(key, &tmp, &pkey_info, flags);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
