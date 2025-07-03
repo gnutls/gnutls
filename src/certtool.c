@@ -1380,6 +1380,9 @@ static void cmd_parser(int argc, char **argv)
 		cinfo.seed_size = seed.size;
 	}
 
+	if (HAVE_OPT(KEY_FORMAT))
+		cinfo.pkcs8_flags |= figure_key_format(OPT_ARG(KEY_FORMAT));
+
 	if (HAVE_OPT(LABEL)) {
 		gnutls_datum_t hex;
 
@@ -2940,6 +2943,7 @@ void generate_pkcs8(common_info_st *cinfo)
 	password = get_password(cinfo, &flags, 1);
 
 	flags |= cipher_to_flags(cinfo->pkcs_cipher);
+	flags |= cinfo->pkcs8_flags;
 
 	size = lbuffer_size;
 	result = gnutls_x509_privkey_export_pkcs8(key, outcert_format, password,
@@ -3013,6 +3017,7 @@ void generate_pkcs12(common_info_st *cinfo)
 
 	pass = get_password(cinfo, &flags, 1);
 	flags |= cipher_to_flags(cinfo->pkcs_cipher);
+	flags |= cinfo->pkcs8_flags;
 
 	for (i = 0; i < ncrts; i++) {
 		gnutls_pkcs12_bag_t bag;

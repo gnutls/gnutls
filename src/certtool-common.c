@@ -1405,6 +1405,7 @@ void print_private_key(FILE *outfile, common_info_st *cinfo,
 
 		pass = get_password(cinfo, &flags, 0);
 		flags |= cipher_to_flags(cinfo->pkcs_cipher);
+		flags |= cinfo->pkcs8_flags;
 
 		if (cinfo->outtext && (flags & GNUTLS_PKCS_PLAIN))
 			privkey_info_int(outfile, cinfo, key);
@@ -1672,6 +1673,20 @@ gnutls_pk_algorithm_t figure_key_type(const char *key_type)
 	else {
 		fprintf(stderr, "unknown key type: %s\n", key_type);
 		return GNUTLS_PK_UNKNOWN;
+	}
+}
+
+gnutls_pkcs_encrypt_flags_t figure_key_format(const char *key_format)
+{
+	if (strcasecmp(key_format, "seed") == 0)
+		return GNUTLS_PKCS_MLDSA_SEED;
+	else if (strcasecmp(key_format, "expanded") == 0)
+		return GNUTLS_PKCS_MLDSA_EXPANDED;
+	else if (strcasecmp(key_format, "both") == 0)
+		return GNUTLS_PKCS_MLDSA_SEED | GNUTLS_PKCS_MLDSA_EXPANDED;
+	else {
+		fprintf(stderr, "unknown key format: %s\n", key_format);
+		return 0;
 	}
 }
 
