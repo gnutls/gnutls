@@ -1689,12 +1689,8 @@ static int ml_dsa_generate_keypair(gnutls_pk_algorithm_t algo,
 	if (type == LC_DILITHIUM_UNKNOWN)
 		return gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
 
-	if (raw_seed) {
-		ret = lc_dilithium_keypair_from_seed(&pk, &sk, raw_seed->data,
-						     raw_seed->size, type);
-	} else {
-		ret = lc_dilithium_keypair(&pk, &sk, lc_seeded_rng, type);
-	}
+	ret = lc_dilithium_keypair_from_seed(&pk, &sk, raw_seed->data,
+					     raw_seed->size, type);
 	if (ret < 0) {
 		ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
 		goto cleanup;
@@ -4124,12 +4120,20 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 		not_approved = true;
-		ret = ml_dsa_generate_keypair(
-			algo, &params->raw_priv, &params->raw_pub,
-			(params->pkflags &
-			 GNUTLS_PK_FLAG_EXPAND_KEYS_FROM_SEED) ?
-				&params->raw_seed :
-				NULL);
+
+		if (!(params->pkflags & GNUTLS_PK_FLAG_EXPAND_KEYS_FROM_SEED)) {
+			_gnutls_free_key_datum(&params->raw_seed);
+			params->raw_seed.data = gnutls_malloc(32);
+			params->raw_seed.size = 32;
+			ret = gnutls_rnd(GNUTLS_RND_KEY, params->raw_seed.data,
+					 params->raw_seed.size);
+			if (ret < 0)
+				goto cleanup;
+		}
+
+		ret = ml_dsa_generate_keypair(algo, &params->raw_priv,
+					      &params->raw_pub,
+					      &params->raw_seed);
 		if (ret < 0)
 			goto cleanup;
 		break;
