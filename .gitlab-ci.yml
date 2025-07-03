@@ -537,7 +537,8 @@ fedora-leancrypto/build:
         -Dx509_parser=disabled -Dx509_generator=disabled
         -Dpkcs7_parser=disabled -Dpkcs7_generator=disabled
         -Dsha2-256=disabled
-        -Dchacha20=disabled -Dchacha20_drng=disabled
+        -Dchacha20=disabled -Dchacha20poly1305=disabled
+        -Dchacha20_drng=disabled
         -Ddrbg_hash=disabled -Ddrbg_hmac=disabled
         -Dhash_crypt=disabled
         -Dhmac=disabled -Dhkdf=disabled

@@ -1673,7 +1673,8 @@ cleanup:
 
 static int ml_dsa_generate_keypair(gnutls_pk_algorithm_t algo,
 				   gnutls_datum_t *raw_priv,
-				   gnutls_datum_t *raw_pub)
+				   gnutls_datum_t *raw_pub,
+				   const gnutls_datum_t *raw_seed)
 {
 	int ret;
 	enum lc_dilithium_type type;
@@ -1688,7 +1689,12 @@ static int ml_dsa_generate_keypair(gnutls_pk_algorithm_t algo,
 	if (type == LC_DILITHIUM_UNKNOWN)
 		return gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
 
-	ret = lc_dilithium_keypair(&pk, &sk, lc_seeded_rng, type);
+	if (raw_seed) {
+		ret = lc_dilithium_keypair_from_seed(&pk, &sk, raw_seed->data,
+						     raw_seed->size, type);
+	} else {
+		ret = lc_dilithium_keypair(&pk, &sk, lc_seeded_rng, type);
+	}
 	if (ret < 0) {
 		ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
 		goto cleanup;
@@ -1754,7 +1760,8 @@ static int ml_dsa_verify(gnutls_pk_algorithm_t algo MAYBE_UNUSED,
 
 static int ml_dsa_generate_keypair(gnutls_pk_algorithm_t algo MAYBE_UNUSED,
 				   gnutls_datum_t *raw_priv MAYBE_UNUSED,
-				   gnutls_datum_t *raw_pub MAYBE_UNUSED)
+				   gnutls_datum_t *raw_pub MAYBE_UNUSED,
+				   const gnutls_datum_t *raw_seed MAYBE_UNUSED)
 {
 	return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM);
 }
@@ -4117,8 +4124,12 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 		not_approved = true;
-		ret = ml_dsa_generate_keypair(algo, &params->raw_priv,
-					      &params->raw_pub);
+		ret = ml_dsa_generate_keypair(
+			algo, &params->raw_priv, &params->raw_pub,
+			(params->pkflags &
+			 GNUTLS_PK_FLAG_EXPAND_KEYS_FROM_SEED) ?
+				&params->raw_seed :
+				NULL);
 		if (ret < 0)
 			goto cleanup;
 		break;

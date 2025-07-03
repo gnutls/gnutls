@@ -68,11 +68,11 @@ unsigned pubkey_to_bits(const gnutls_pk_params_st *params)
 	case GNUTLS_PK_GOST_12_512:
 		return gnutls_ecc_curve_get_size(params->curve) * 8;
 	case GNUTLS_PK_MLDSA44:
-		return MLDSA44_PUBKEY_SIZE;
+		return MLDSA44_PUBKEY_SIZE * 8;
 	case GNUTLS_PK_MLDSA65:
-		return MLDSA65_PUBKEY_SIZE;
+		return MLDSA65_PUBKEY_SIZE * 8;
 	case GNUTLS_PK_MLDSA87:
-		return MLDSA87_PUBKEY_SIZE;
+		return MLDSA87_PUBKEY_SIZE * 8;
 	default:
 		return 0;
 	}

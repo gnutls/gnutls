@@ -25,6 +25,7 @@
 : ${srcdir=.}
 : ${CLI=../../src/gnutls-cli${EXEEXT}}
 : ${CERTTOOL=../../src/certtool${EXEEXT}}
+: ${DIFF=diff}
 
 . "${srcdir}/../scripts/common.sh"
 testdir=`create_testdir mldsa`
@@ -55,61 +56,100 @@ for variant in 44 65 87; do
     TMPUSER=$testdir/$algo-user
     VERIFYOUT=$testdir/$algo-verify
 
-    echo ca > $TMPTEMPL
-    echo "cn = $algo CA" >> $TMPTEMPL
+    echo ca > "$TMPTEMPL"
+    echo "cn = $algo CA" >> "$TMPTEMPL"
 
-    "${CERTTOOL}" --generate-privkey --key-type=$algo > $TMPCAKEY 2>/dev/null
+    "${CERTTOOL}" --generate-privkey --key-type=$algo > "$TMPCAKEY" 2>/dev/null
 
-    "${CERTTOOL}" -d 2 --generate-self-signed --template $TMPTEMPL \
-	          --load-privkey $TMPCAKEY \
-	          --outfile $TMPCA >$TMPFILE 2>&1
+    "${CERTTOOL}" -d 2 --generate-self-signed --template "$TMPTEMPL" \
+	          --load-privkey "$TMPCAKEY" \
+	          --outfile "$TMPCA" >"$TMPFILE" 2>&1
 
     if [ $? != 0 ]; then
-	cat $TMPFILE
+	cat "$TMPFILE"
 	exit 1
     fi
 
-    echo ca > $TMPTEMPL
-    echo "cn = $algo Mid CA" >> $TMPTEMPL
+    echo ca > "$TMPTEMPL"
+    echo "cn = $algo Mid CA" >> "$TMPTEMPL"
 
-    "${CERTTOOL}" --generate-privkey --key-type=$algo > $TMPSUBCAKEY 2>/dev/null
+    "${CERTTOOL}" --generate-privkey --key-type=$algo > "$TMPSUBCAKEY" 2>/dev/null
 
-    "${CERTTOOL}" -d 2 --generate-certificate --template $TMPTEMPL \
-	          --load-ca-privkey $TMPCAKEY \
-	          --load-ca-certificate $TMPCA \
-	          --load-privkey $TMPSUBCAKEY \
-	          --outfile $TMPSUBCA >$TMPFILE 2>&1
+    "${CERTTOOL}" -d 2 --generate-certificate --template "$TMPTEMPL" \
+	          --load-ca-privkey "$TMPCAKEY" \
+	          --load-ca-certificate "$TMPCA" \
+	          --load-privkey "$TMPSUBCAKEY" \
+	          --outfile "$TMPSUBCA" >"$TMPFILE" 2>&1
 
     if [ $? != 0 ]; then
-	cat $TMPFILE
+	cat "$TMPFILE"
 	exit 1
     fi
 
-    echo "cn = End-user" > $TMPTEMPL
-    echo email_protection_key >> $TMPTEMPL
-    echo encryption_key >> $TMPTEMPL
+    echo "cn = End-user" > "$TMPTEMPL"
+    echo email_protection_key >> "$TMPTEMPL"
+    echo encryption_key >> "$TMPTEMPL"
 
-    "${CERTTOOL}" --generate-privkey --key-type=$algo > $TMPKEY 2>/dev/null
+    "${CERTTOOL}" --generate-privkey --key-type=$algo > "$TMPKEY" 2>/dev/null
 
-    "${CERTTOOL}" -d 2 --generate-certificate --template $TMPTEMPL \
-	          --load-ca-privkey $TMPSUBCAKEY \
-	          --load-ca-certificate $TMPSUBCA \
-	          --load-privkey $TMPKEY \
-	          --outfile $TMPUSER >$TMPFILE 2>&1
+    "${CERTTOOL}" -d 2 --generate-certificate --template "$TMPTEMPL" \
+	          --load-ca-privkey "$TMPSUBCAKEY" \
+	          --load-ca-certificate "$TMPSUBCA" \
+	          --load-privkey "$TMPKEY" \
+	          --outfile "$TMPUSER" >"$TMPFILE" 2>&1
 
     if [ $? != 0 ]; then
-	cat $TMPFILE
+	cat "$TMPFILE"
 	exit 1
     fi
 
-    cat $TMPUSER $TMPSUBCA $TMPCA > $TMPFILE
-    "${CERTTOOL}" --verify-chain <$TMPFILE > $VERIFYOUT
+    cat "$TMPUSER" "$TMPSUBCA" "$TMPCA" > "$TMPFILE"
+    "${CERTTOOL}" --verify-chain <"$TMPFILE" > "$VERIFYOUT"
 
     if [ $? != 0 ]; then
-	cat $VERIFYOUT
+	cat "$VERIFYOUT"
 	exit 1
     fi
 
+done
+
+# Run test vectors from draft-ietf-lamps-dilithium-certificates-12
+for variant in 44 65 87; do
+    if ! "${CLI}" --list | grep "^Public Key Systems: .*ML-DSA-$variant.*" >/dev/null; then
+	continue
+    fi
+    algo=mldsa$variant
+
+    for format in seed expanded both; do
+	echo "Testing ML-DSA-$variant ($format)"
+
+	TMPKEY=$testdir/key-$algo-$format-parsed
+	"${CERTTOOL}" -k --infile "data/key-$algo-$format.pem" >"$TMPKEY"
+	if [ $? != 0 ]; then
+	    cat "$TMPKEY"
+	    exit 1
+	fi
+
+	# The "expandedKey" format doesn't have public key part
+	if [ "$format" = seed ] || [ "$format" = both ]; then
+	    if ! "${DIFF}" "$TMPKEY" "data/key-$algo-default.pem"; then
+		exit 1
+	    fi
+	fi
+    done
+done
+
+# Inconsistencies in key-mldsa-inconsistent[23].pem can only be
+# detected at signing
+for n in 1; do
+    if ! "${CLI}" --list | grep "^Public Key Systems: .*ML-DSA.*" >/dev/null; then
+	continue
+    fi
+
+    echo "Testing inconsistent ML-DSA key ($n)"
+    if "${CERTTOOL}" -k --infile "data/key-mldsa-inconsistent$n.pem"; then
+	exit 1
+    fi
 done
 
 rm -rf "${testdir}"

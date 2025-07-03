@@ -110,7 +110,16 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/pbmac1_512_256.good.p12 data/pbmac1_512_512.good.p12 \
 	data/pbmac1-simple.p12 \
 	templates/simple-policy.tmpl data/simple-policy.pem templates/template-negative-serial.tmpl \
-	templates/template-encryption-only.tmpl
+	templates/template-encryption-only.tmpl \
+	data/key-mldsa44-seed.pem data/key-mldsa44-expanded.pem \
+	data/key-mldsa44-both.pem data/key-mldsa44-default.pem \
+	data/key-mldsa65-seed.pem data/key-mldsa65-expanded.pem \
+	data/key-mldsa65-both.pem data/key-mldsa65-default.pem \
+	data/key-mldsa87-seed.pem data/key-mldsa87-expanded.pem \
+	data/key-mldsa87-both.pem data/key-mldsa87-default.pem \
+	data/key-mldsa-inconsistent1.pem \
+	data/key-mldsa-inconsistent2.pem \
+	data/key-mldsa-inconsistent3.pem
 
 dist_check_SCRIPTS = pathlen.sh aki.sh invalid-sig.sh email.sh \
 	pkcs7.sh pkcs7-broken-sigs.sh privkey-import.sh name-constraints.sh certtool-long-cn.sh crl.sh provable-privkey.sh \
