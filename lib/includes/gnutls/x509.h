@@ -1018,6 +1018,8 @@ unsigned gnutls_x509_crt_check_key_purpose(gnutls_x509_crt_t cert,
  * @GNUTLS_PKCS_PBES2_GOST_CPB: PBES2 GOST 28147-89 CFB with CryptoPro-B S-box.
  * @GNUTLS_PKCS_PBES2_GOST_CPC: PBES2 GOST 28147-89 CFB with CryptoPro-C S-box.
  * @GNUTLS_PKCS_PBES2_GOST_CPD: PBES2 GOST 28147-89 CFB with CryptoPro-D S-box.
+ * @GNUTLS_PKCS_MLDSA_SEED: Emit seed as an ML-DSA private key.
+ * @GNUTLS_PKCS_MLDSA_EXPANDED: Emit an expanded ML-DSA private key.
  *
  * Enumeration of different PKCS encryption flags.
  */
@@ -1038,7 +1040,9 @@ typedef enum gnutls_pkcs_encrypt_flags_t {
 	GNUTLS_PKCS_PBES2_GOST_CPB = 1 << 13,
 	GNUTLS_PKCS_PBES2_GOST_CPC = 1 << 14,
 	GNUTLS_PKCS_PBES2_GOST_CPD = 1 << 15,
-	GNUTLS_PKCS_PBES1_DES_SHA1 = 1 << 16
+	GNUTLS_PKCS_PBES1_DES_SHA1 = 1 << 16,
+	GNUTLS_PKCS_MLDSA_SEED = 1 << 17,
+	GNUTLS_PKCS_MLDSA_EXPANDED = 1 << 18,
 } gnutls_pkcs_encrypt_flags_t;
 
 #define GNUTLS_PKCS_CIPHER_MASK(x) ((x) & (~(GNUTLS_PKCS_NULL_PASSWORD)))

@@ -188,6 +188,12 @@
           "argument-type": "string"
         },
         {
+          "long-option": "key-format",
+          "description": "Specify the key format to use on key generation",
+          "detail": "This option can be combined with --generate-privkey, to specify\nthe key format to be generated, when the key type is ML-DSA. Valid options are, 'seed', 'expanded', and 'both'.",
+          "argument-type": "string"
+        },
+        {
           "long-option": "bits",
           "description": "Specify the number of bits for key generation",
           "argument-type": "number"

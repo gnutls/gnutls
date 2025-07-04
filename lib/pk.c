@@ -532,6 +532,7 @@ void gnutls_pk_params_release(gnutls_pk_params_st *p)
 	}
 	gnutls_free(p->raw_priv.data);
 	gnutls_free(p->raw_pub.data);
+	gnutls_free(p->raw_seed.data);
 	_gnutls_x509_spki_clear(&p->spki);
 
 	p->params_nr = 0;

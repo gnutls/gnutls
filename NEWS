@@ -7,7 +7,7 @@ See the end for copying conditions.
 
 * Version 3.8.10 (unreleased)
 
-** libgnutls: Linux kernel version 6.14 bring a Kernel TLS(kTLS) key update
+** libgnutls: Linux kernel version 6.14 bring a Kernel TLS (kTLS) key update
    support. The library running on the aforementioned version now utilizes the
    kernel’s key update mechanism when kTLS is enabled, allowing uninterrupted
    TLS session. The --enable-ktls configure option as well as the system-wide
@@ -23,6 +23,17 @@ See the end for copying conditions.
 
 ** libgnutls: TLS certificate compression methods can now be set with
    cert-compression-alg configuration option in the gnutls priority file.
+
+** libgnutls: All variants of ML-DSA private key formats are supported
+   While the previous implementation of ML-DSA was based on
+   draft-ietf-lamps-dilithium-certificates-04, this updates it to
+   draft-ietf-lamps-dilithium-certificates-12 with support for all 3
+   variants of private key formats: "seed", "expandedKey", and "both".
+
+** libgnutls: ML-DSA signatures can now be used in TLS
+   The ML-DSA signature algorithms, ML-DSA-44, ML-DSA-65, and
+   ML-DSA-87, can now be used to digitally sign TLS handshake
+   messages.
 
 * Version 3.8.9 (released 2025-02-07)
 

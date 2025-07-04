@@ -85,6 +85,8 @@ typedef struct common_info {
 	unsigned sort_chain;
 
 	gnutls_sec_param_t verification_profile;
+
+	gnutls_pkcs_encrypt_flags_t pkcs8_flags;
 } common_info_st;
 
 static inline void switch_to_pkcs8_when_needed(common_info_st *cinfo,
@@ -196,6 +198,8 @@ void decode_seed(gnutls_datum_t *seed, const char *hex, unsigned hex_size);
 	((pk) == GNUTLS_PK_RSA || (pk) == GNUTLS_PK_RSA_PSS)
 
 gnutls_pk_algorithm_t figure_key_type(const char *key_type);
+
+gnutls_pkcs_encrypt_flags_t figure_key_format(const char *key_format);
 
 gnutls_digest_algorithm_t hash_to_id(const char *hash);
 

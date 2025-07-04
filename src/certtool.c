@@ -208,6 +208,11 @@ static gnutls_x509_privkey_t generate_private_key_int(common_info_st *cinfo)
 		if (ecc_bits < 256)
 			fprintf(stderr,
 				"Note that ECDSA keys with size less than 256 are not widely supported.\n\n");
+	} else if (key_type == GNUTLS_PK_MLDSA44 ||
+		   key_type == GNUTLS_PK_MLDSA65 ||
+		   key_type == GNUTLS_PK_MLDSA87) {
+		fprintf(stdlog, "Generating an %s private key...\n",
+			gnutls_pk_algorithm_get_name(key_type));
 	} else {
 		fprintf(stdlog, "Generating a %d bit %s private key...\n", bits,
 			gnutls_pk_algorithm_get_name(key_type));
@@ -1379,6 +1384,9 @@ static void cmd_parser(int argc, char **argv)
 		cinfo.seed = seed.data;
 		cinfo.seed_size = seed.size;
 	}
+
+	if (HAVE_OPT(KEY_FORMAT))
+		cinfo.pkcs8_flags |= figure_key_format(OPT_ARG(KEY_FORMAT));
 
 	if (HAVE_OPT(LABEL)) {
 		gnutls_datum_t hex;
@@ -2940,6 +2948,7 @@ void generate_pkcs8(common_info_st *cinfo)
 	password = get_password(cinfo, &flags, 1);
 
 	flags |= cipher_to_flags(cinfo->pkcs_cipher);
+	flags |= cinfo->pkcs8_flags;
 
 	size = lbuffer_size;
 	result = gnutls_x509_privkey_export_pkcs8(key, outcert_format, password,
@@ -3013,6 +3022,7 @@ void generate_pkcs12(common_info_st *cinfo)
 
 	pass = get_password(cinfo, &flags, 1);
 	flags |= cipher_to_flags(cinfo->pkcs_cipher);
+	flags |= cinfo->pkcs8_flags;
 
 	for (i = 0; i < ncrts; i++) {
 		gnutls_pkcs12_bag_t bag;
