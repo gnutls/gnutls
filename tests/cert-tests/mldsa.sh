@@ -38,6 +38,10 @@ if ! test -x "${CLI}"; then
 	exit 77
 fi
 
+if ! test -z "${VALGRIND}"; then
+	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
+fi
+
 for variant in 44 65 87; do
     echo "Testing ML-DSA-$variant"
 
@@ -59,9 +63,9 @@ for variant in 44 65 87; do
     echo ca > "$TMPTEMPL"
     echo "cn = $algo CA" >> "$TMPTEMPL"
 
-    "${CERTTOOL}" --generate-privkey --key-type=$algo > "$TMPCAKEY" 2>/dev/null
+    ${VALGRIND} "${CERTTOOL}" --generate-privkey --key-type=$algo > "$TMPCAKEY" 2>/dev/null
 
-    "${CERTTOOL}" -d 2 --generate-self-signed --template "$TMPTEMPL" \
+    ${VALGRIND} "${CERTTOOL}" -d 2 --generate-self-signed --template "$TMPTEMPL" \
 	          --load-privkey "$TMPCAKEY" \
 	          --outfile "$TMPCA" >"$TMPFILE" 2>&1
 
@@ -73,9 +77,9 @@ for variant in 44 65 87; do
     echo ca > "$TMPTEMPL"
     echo "cn = $algo Mid CA" >> "$TMPTEMPL"
 
-    "${CERTTOOL}" --generate-privkey --key-type=$algo > "$TMPSUBCAKEY" 2>/dev/null
+    ${VALGRIND} "${CERTTOOL}" --generate-privkey --key-type=$algo > "$TMPSUBCAKEY" 2>/dev/null
 
-    "${CERTTOOL}" -d 2 --generate-certificate --template "$TMPTEMPL" \
+    ${VALGRIND} "${CERTTOOL}" -d 2 --generate-certificate --template "$TMPTEMPL" \
 	          --load-ca-privkey "$TMPCAKEY" \
 	          --load-ca-certificate "$TMPCA" \
 	          --load-privkey "$TMPSUBCAKEY" \
@@ -90,9 +94,9 @@ for variant in 44 65 87; do
     echo email_protection_key >> "$TMPTEMPL"
     echo encryption_key >> "$TMPTEMPL"
 
-    "${CERTTOOL}" --generate-privkey --key-type=$algo > "$TMPKEY" 2>/dev/null
+    ${VALGRIND} "${CERTTOOL}" --generate-privkey --key-type=$algo > "$TMPKEY" 2>/dev/null
 
-    "${CERTTOOL}" -d 2 --generate-certificate --template "$TMPTEMPL" \
+    ${VALGRIND} "${CERTTOOL}" -d 2 --generate-certificate --template "$TMPTEMPL" \
 	          --load-ca-privkey "$TMPSUBCAKEY" \
 	          --load-ca-certificate "$TMPSUBCA" \
 	          --load-privkey "$TMPKEY" \
@@ -104,7 +108,7 @@ for variant in 44 65 87; do
     fi
 
     cat "$TMPUSER" "$TMPSUBCA" "$TMPCA" > "$TMPFILE"
-    "${CERTTOOL}" --verify-chain <"$TMPFILE" > "$VERIFYOUT"
+    ${VALGRIND} "${CERTTOOL}" --verify-chain <"$TMPFILE" > "$VERIFYOUT"
 
     if [ $? != 0 ]; then
 	cat "$VERIFYOUT"
@@ -126,7 +130,7 @@ for variant in 44 65 87; do
 	# Check default
 	TMPKEYDEFAULT=$testdir/key-$algo-$format-default
 	TMPKEY=$testdir/key-$algo-$format
-	"${CERTTOOL}" -k --no-text --infile "data/key-$algo-$format.pem" >"$TMPKEYDEFAULT"
+	${VALGRIND} "${CERTTOOL}" -k --no-text --infile "data/key-$algo-$format.pem" >"$TMPKEYDEFAULT"
 	if [ $? != 0 ]; then
 	    cat "$TMPKEYDEFAULT"
 	    exit 1
@@ -140,7 +144,7 @@ for variant in 44 65 87; do
 	fi
 
 	# Check roundtrip with --key-format
-	"${CERTTOOL}" -k --no-text --key-format "$format" --infile "data/key-$algo-$format.pem" >"$TMPKEY"
+	${VALGRIND} "${CERTTOOL}" -k --no-text --key-format "$format" --infile "data/key-$algo-$format.pem" >"$TMPKEY"
 	if [ $? != 0 ]; then
 	    cat "$TMPKEY"
 	    exit 1
