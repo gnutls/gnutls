@@ -1712,6 +1712,7 @@ static int decode_ml_dsa_inner_private_key(const gnutls_datum_t *raw_key,
 			_gnutls_free_key_datum(&raw_priv);
 			goto cleanup;
 		}
+		_gnutls_free_key_datum(&raw_priv);
 	}
 
 cleanup:
@@ -1795,6 +1796,7 @@ static int _decode_pkcs8_ml_dsa_key(asn1_node pkcs8_asn,
 			_gnutls_free_key_datum(&raw_pub);
 			goto cleanup;
 		}
+		_gnutls_free_key_datum(&raw_pub);
 	}
 
 	/* Sanity check that the resulting keys have the expected sizes */
