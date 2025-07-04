@@ -208,6 +208,11 @@ static gnutls_x509_privkey_t generate_private_key_int(common_info_st *cinfo)
 		if (ecc_bits < 256)
 			fprintf(stderr,
 				"Note that ECDSA keys with size less than 256 are not widely supported.\n\n");
+	} else if (key_type == GNUTLS_PK_MLDSA44 ||
+		   key_type == GNUTLS_PK_MLDSA65 ||
+		   key_type == GNUTLS_PK_MLDSA87) {
+		fprintf(stdlog, "Generating an %s private key...\n",
+			gnutls_pk_algorithm_get_name(key_type));
 	} else {
 		fprintf(stdlog, "Generating a %d bit %s private key...\n", bits,
 			gnutls_pk_algorithm_get_name(key_type));
