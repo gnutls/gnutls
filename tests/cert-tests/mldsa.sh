@@ -123,18 +123,31 @@ for variant in 44 65 87; do
     for format in seed expanded both; do
 	echo "Testing ML-DSA-$variant ($format)"
 
-	TMPKEY=$testdir/key-$algo-$format-parsed
-	"${CERTTOOL}" -k --infile "data/key-$algo-$format.pem" >"$TMPKEY"
+	# Check default
+	TMPKEYDEFAULT=$testdir/key-$algo-$format-default
+	TMPKEY=$testdir/key-$algo-$format
+	"${CERTTOOL}" -k --no-text --infile "data/key-$algo-$format.pem" >"$TMPKEYDEFAULT"
 	if [ $? != 0 ]; then
-	    cat "$TMPKEY"
+	    cat "$TMPKEYDEFAULT"
 	    exit 1
 	fi
 
 	# The "expandedKey" format doesn't have public key part
 	if [ "$format" = seed ] || [ "$format" = both ]; then
-	    if ! "${DIFF}" "$TMPKEY" "data/key-$algo-default.pem"; then
+	    if ! "${DIFF}" "$TMPKEYDEFAULT" "data/key-$algo-both.pem"; then
 		exit 1
 	    fi
+	fi
+
+	# Check roundtrip with --key-format
+	"${CERTTOOL}" -k --no-text --key-format "$format" --infile "data/key-$algo-$format.pem" >"$TMPKEY"
+	if [ $? != 0 ]; then
+	    cat "$TMPKEY"
+	    exit 1
+	fi
+
+	if ! "${DIFF}" "$TMPKEY" "data/key-$algo-$format.pem"; then
+	    exit 1
 	fi
     done
 done
