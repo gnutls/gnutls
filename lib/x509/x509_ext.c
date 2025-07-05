@@ -188,6 +188,7 @@ int gnutls_subject_alt_names_set(gnutls_subject_alt_names_t sans,
 	ret = subject_alt_names_set(&sans->names, &sans->size, san_type, &copy,
 				    ooc, 0);
 	if (ret < 0) {
+		gnutls_free(ooc);
 		gnutls_free(copy.data);
 		return gnutls_assert_val(ret);
 	}
@@ -796,6 +797,8 @@ int gnutls_x509_aki_set_cert_issuer(gnutls_x509_aki_t aki,
 				    &aki->cert_issuer.size, san_type, &t_san,
 				    (char *)t_othername_oid.data, 0);
 	if (ret < 0) {
+		gnutls_free(t_othername_oid.data);
+		gnutls_free(t_san.data);
 		gnutls_assert();
 		return ret;
 	}
