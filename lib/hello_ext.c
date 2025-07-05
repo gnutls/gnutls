@@ -1005,6 +1005,7 @@ int gnutls_session_ext_register(gnutls_session_t session, const char *name,
 	}
 
 	if (unlikely(INT_ADD_OVERFLOW(session->internals.rexts_size, 1))) {
+		gnutls_free(tmp_mod.name);
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 	}
 
@@ -1012,6 +1013,7 @@ int gnutls_session_ext_register(gnutls_session_t session, const char *name,
 				    session->internals.rexts_size + 1,
 				    sizeof(*exts));
 	if (exts == NULL) {
+		gnutls_free(tmp_mod.name);
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 	}
 
