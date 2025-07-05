@@ -82,23 +82,34 @@ static int server_cert_callback(gnutls_session_t session,
 		ret = gnutls_x509_crt_list_import2(
 			&certs, &certs_size, &server_ca3_localhost_cert_chain,
 			GNUTLS_X509_FMT_PEM, 0);
-		if (ret < 0)
+		if (ret < 0) {
+			gnutls_free(p);
 			return -1;
+		}
+
 		ret = gnutls_pcert_import_x509_list(p, certs, &certs_size, 0);
-		if (ret < 0)
+		if (ret < 0) {
+			gnutls_free(certs);
+			gnutls_free(p);
 			return -1;
+		}
+
 		for (i = 0; i < certs_size; i++)
 			gnutls_x509_crt_deinit(certs[i]);
 		gnutls_free(certs);
 
 		ret = gnutls_privkey_init(&lkey);
-		if (ret < 0)
+		if (ret < 0) {
+			gnutls_free(p);
 			return -1;
+		}
 
 		ret = gnutls_privkey_import_x509_raw(
 			lkey, &server_ca3_key, GNUTLS_X509_FMT_PEM, NULL, 0);
-		if (ret < 0)
+		if (ret < 0) {
+			gnutls_free(p);
 			return -1;
+		}
 
 		server_pcert = p;
 		server_pkey = lkey;
