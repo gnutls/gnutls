@@ -612,6 +612,15 @@ static const struct gnutls_library_config_st _gnutls_library_config[] = {
 #endif
 	{ "hardware-features", HW_FEATURES },
 	{ "tls-features", TLS_FEATURES },
+#ifdef DEFAULT_TRUST_STORE_PKCS11
+	{ "default-trust-store-pkcs11", DEFAULT_TRUST_STORE_PKCS11 },
+#endif
+#ifdef DEFAULT_TRUST_STORE_DIR
+	{ "default-trust-store-dir", DEFAULT_TRUST_STORE_DIR },
+#endif
+#ifdef DEFAULT_TRUST_STORE_FILE
+	{ "default-trust-store-file", DEFAULT_TRUST_STORE_FILE },
+#endif
 	{ "default-system-config", SYSTEM_PRIORITY_FILE },
 	{ NULL, NULL }
 };
