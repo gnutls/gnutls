@@ -783,6 +783,7 @@ gnutls_record_send_range@GNUTLS_3_4
 gnutls_record_set_max_early_data_size@GNUTLS_3_6_4
 gnutls_record_set_max_recv_size@GNUTLS_3_6_8
 gnutls_record_set_max_size@GNUTLS_3_4
+gnutls_record_get_max_send_size@GNUTLS_3_8_11
 gnutls_record_set_state@GNUTLS_3_4
 gnutls_record_set_timeout@GNUTLS_3_4
 gnutls_record_uncork@GNUTLS_3_4

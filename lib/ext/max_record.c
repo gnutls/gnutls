@@ -307,3 +307,18 @@ ssize_t gnutls_record_set_max_recv_size(gnutls_session_t session, size_t size)
 
 	return 0;
 }
+
+/**
+ * gnutls_record_get_max_send_size:
+ * @session: is a #gnutls_session_t type.
+ *
+ * Get the maximum plaintext send size. This maybe negotiated, or user specified.
+ *
+ * Returns: The maximum plaintext send size.
+ *
+ * Since: 3.8.11
+ **/
+size_t gnutls_record_get_max_send_size(gnutls_session_t session)
+{
+	return max_record_send_size(session);
+}
