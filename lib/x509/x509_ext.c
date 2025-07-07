@@ -3760,7 +3760,7 @@ int gnutls_x509_ext_ct_import_scts(const gnutls_datum_t *ext,
 	}
 
 	length = _gnutls_read_uint16(scts_content.data);
-	if (length < 4) {
+	if (length < 4 || length > scts_content.size) {
 		gnutls_free(scts_content.data);
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
