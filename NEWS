@@ -16,6 +16,10 @@ See the end for copying conditions.
    Reported by OpenAI Security Research Team. [GNUTLS-SA-2025-07-07-2,
    CVSS: low] [CVE-2025-32988]
 
+** certtool: Fix 1-byte write buffer overrun when parsing template
+   Reported by David Aitel. [GNUTLS-SA-2025-07-07-3,
+   CVSS: low] [CVE-2025-32990]
+
 ** libgnutls: PKCS#11 modules can now be used to override the default
    cryptographic backend. Use the [provider] section in the system-wide config
    to specify path and pin to the module (see system-wide config Documentation).

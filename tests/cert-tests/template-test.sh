@@ -297,6 +297,19 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
+# Test generation with too many other names
+
+"${CERTTOOL}" --generate-request \
+	--load-privkey "${srcdir}/data/template-test.key" \
+	--template "${srcdir}/templates/template-too-many-othernames.tmpl" \
+	--outfile ${TMPFILE} 2>/dev/null
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "Test with too many othernames failed"
+	exit ${rc}
+fi
+
 rm -f ${TMPFILE}
 
 exit 0
