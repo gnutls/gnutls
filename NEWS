@@ -12,9 +12,14 @@ See the end for copying conditions.
    and fix developed by Andrew Hamilton. [GNUTLS-SA-2025-07-07-1,
    CVSS: medium] [CVE-2025-32989]
 
+** libgnutls: Fix double-free upon error when exporting otherName in SAN
+   Reported by OpenAI Security Research Team. [GNUTLS-SA-2025-07-07-2,
+   CVSS: low] [CVE-2025-32988]
+
 ** libgnutls: PKCS#11 modules can now be used to override the default
    cryptographic backend. Use the [provider] section in the system-wide config
    to specify path and pin to the module (see system-wide config Documentation).
+
 ** libgnutls: Linux kernel version 6.14 bring a Kernel TLS (kTLS) key update
    support. The library running on the aforementioned version now utilizes the
    kernel’s key update mechanism when kTLS is enabled, allowing uninterrupted

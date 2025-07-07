@@ -754,7 +754,6 @@ int _gnutls_write_new_othername(asn1_node ext, const char *ext_name,
 	result = asn1_write_value(ext, name2, oid, 1);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
-		asn1_delete_structure(&ext);
 		return _gnutls_asn2err(result);
 	}
 
@@ -763,7 +762,6 @@ int _gnutls_write_new_othername(asn1_node ext, const char *ext_name,
 	result = asn1_write_value(ext, name2, data, data_size);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
-		asn1_delete_structure(&ext);
 		return _gnutls_asn2err(result);
 	}
 
