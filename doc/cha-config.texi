@@ -29,6 +29,7 @@ used can be queried using @funcref{gnutls_get_system_config_file}.
 * Enabling TLS certificate compression
 * Enabling/Disabling system/acceleration protocols::
 * Enabling/Disabling RSAES-PKCS1-v1_5::
+* Using PKCS#11 module as cryptographic backend
 @end menu
 
 @node Application-specific priority strings
@@ -301,5 +302,31 @@ Below example shows how to explicitely disable the RSAES-PKCS1-v1_5.
 @example
 [overrides]
 allow-rsa-pkcs1-encrypt = false
+@end example
 
+
+@node Using PKCS#11 module as cryptographic backend
+@section Using PKCS#11 module as cryptographic backend
+
+Since version 3.8.10 it is possible to plug a PKCS#11 module into GnuTLS
+and override the default cryptographic backend of the library with the
+cryptographic functions provided by the module.
+
+A PKCS#11 module can be configured to serve as cryptographic backend by adding
+@code{path} and @code{pin} in the @code{[provider]} section.
+
+@itemize
+@item @code{path}: path to the PKCS#11 module.
+@item @code{pin}: PIN for logging into the PKCS#11 token.
+@end itemize
+
+@subsection Examples
+
+The following example shows how to use a PKCS#11 module as cryptographic backend.
+Note that the module has to be initialized first.
+
+@example
+[provider]
+path = /usr/lib64/pkcs11/libkryoptic_pkcs11.so
+pin = 1234
 @end example
