@@ -41,9 +41,3 @@ libgnutls_pkcs11_la_SOURCES = \
 	p11_pk.c p11_mac.c p11_mac.h
 
 libgnutls_pkcs11_la_LIBADD = $(P11_KIT_LIBS) $(LIBPMULTITHREAD)
-
-if ENABLE_MINITASN1
-libgnutls_pkcs11_la_LIBADD += ../minitasn1/libminitasn1.la
-else
-libgnutls_pkcs11_la_LIBADD += $(LIBTASN1_LIBS)
-endif
