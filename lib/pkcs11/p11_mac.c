@@ -28,7 +28,6 @@
 #include "p11_provider.h"
 #include "x509/x509_int.h"
 
-#include <nettle/bignum.h>
 #include <p11-kit/pkcs11.h>
 
 struct p11_mac_ctx;

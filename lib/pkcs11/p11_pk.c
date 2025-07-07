@@ -29,7 +29,6 @@
 
 #include <libtasn1.h>
 #include <minmax.h>
-#include <nettle/bignum.h>
 #include <p11-kit/pkcs11.h>
 
 static bool mechanism_exists(CK_MECHANISM_TYPE mech)
