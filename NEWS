@@ -7,6 +7,10 @@ See the end for copying conditions.
 
 * Version 3.8.10 (unreleased)
 
+** libgnutls: PKCS#11 modules can now be used to override the default
+   cryptographic backend. Use the [provider] section in the system-wide config
+   to specify path and pin to the module (see system-wide config Documentation).
+
 ** libgnutls: Linux kernel version 6.14 bring a Kernel TLS (kTLS) key update
    support. The library running on the aforementioned version now utilizes the
    kernel’s key update mechanism when kTLS is enabled, allowing uninterrupted
