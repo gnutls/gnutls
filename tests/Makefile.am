@@ -131,6 +131,8 @@ ctests += tls13/hello_retry_request
 
 ctests += tls13/hello_retry_request_resume
 
+ctests += tls13/hello_retry_request_psk
+
 ctests += tls13/psk-ext
 
 ctests += tls13/key_update

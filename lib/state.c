@@ -202,7 +202,8 @@ gnutls_kx_algorithm_t gnutls_kx_get(gnutls_session_t session)
 		const gnutls_group_entry_st *group = get_group(session);
 
 		if (ver->tls13_sem) {
-			if (session->internals.hsk_flags & HSK_PSK_SELECTED) {
+			if (gnutls_auth_client_get_type(session) ==
+			    GNUTLS_CRD_PSK) {
 				if (group) {
 					if (group->pk == GNUTLS_PK_DH)
 						return GNUTLS_KX_DHE_PSK;
@@ -349,6 +350,7 @@ void reset_binders(gnutls_session_t session)
 	_gnutls_free_temp_key_datum(&session->key.binders[0].psk);
 	_gnutls_free_temp_key_datum(&session->key.binders[1].psk);
 	memset(session->key.binders, 0, sizeof(session->key.binders));
+	session->internals.hsk_flags &= ~HSK_PSK_SELECTED;
 }
 
 /* Check whether certificate credentials of type @cert_type are set

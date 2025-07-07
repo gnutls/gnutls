@@ -877,6 +877,7 @@ tests/tls13/compress-cert-neg
 tests/tls13/compress-cert-neg2
 tests/tls13/cookie
 tests/tls13/hello_retry_request
+tests/tls13/hello_retry_request_psk
 tests/tls13/hello_retry_request_resume
 tests/tls13/key_limits
 tests/tls13/key_share
