@@ -77,7 +77,8 @@ static TSS2_RC _gnutls_get_ecdh_point(TPM2B_PUBLIC *tpm_key,
 	if (ret < 0)
 		return TSS2_ESYS_RC_GENERAL_FAILURE;
 
-	ret = gnutls_privkey_generate(privkey, GNUTLS_PK_EC, 256, 0);
+	ret = gnutls_privkey_generate(privkey, GNUTLS_PK_EC,
+				      GNUTLS_CURVE_TO_BITS(curve), 0);
 	if (ret < 0)
 		goto fail;
 

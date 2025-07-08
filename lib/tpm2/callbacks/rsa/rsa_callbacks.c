@@ -48,13 +48,26 @@ static TSS2_RC _gnutls_rsa_pk_encrypt(TPM2B_PUBLIC *pub_tpm_key, size_t in_size,
 	if (pub_tpm_key->publicArea.parameters.rsaDetail.exponent != 0) {
 		uint32_t exp =
 			pub_tpm_key->publicArea.parameters.rsaDetail.exponent;
-		exponent.size = 3;
-		exponent.data = gnutls_malloc(3);
-		exponent.data[0] = (exp >> 16) & 0xFF;
-		exponent.data[1] = (exp >> 8) & 0xFF;
-		exponent.data[2] = exp & 0xFF;
+
+		size_t exp_size = 0;
+		if (exp < 256) {
+			exp_size = 1;
+		} else if (exp < 65536) {
+			exp_size = 2;
+		} else {
+			exp_size = 3;
+		}
+
+		exponent.size = exp_size;
+		exponent.data = gnutls_malloc(exp_size);
+		if (!exponent.data)
+			return TSS2_ESYS_RC_GENERAL_FAILURE;
+
+		for (size_t i = 0; i < exp_size; i++) {
+			exponent.data[exp_size - 1 - i] = (exp >> (8 * i)) &
+							  0xFF;
+		}
 	} else {
-		// Default exponent is 65537
 		static uint8_t default_exp[] = { 0x01, 0x00, 0x01 };
 		exponent.data = default_exp;
 		exponent.size = sizeof(default_exp);

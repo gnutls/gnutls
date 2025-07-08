@@ -60,7 +60,7 @@ static TSS2_RC _gnutls_aes_encrypt(uint8_t *key, TPM2_ALG_ID tpm_sym_alg,
 	if (cipher == GNUTLS_CIPHER_UNKNOWN)
 		return TSS2_ESYS_RC_NOT_IMPLEMENTED;
 
-	gnutls_datum_t key_datum = { key, key_bits / 8 };
+	gnutls_datum_t key_datum = { key, (key_bits + 7) / 8 };
 	gnutls_datum_t iv_datum = { iv, tpm2_aes_iv_size };
 
 	if (gnutls_cipher_init(&handle, cipher, &key_datum, &iv_datum) < 0)
