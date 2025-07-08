@@ -585,14 +585,14 @@ indirect_tests += pkcs11-provider/pkcs11-provider-pk \
 		  pkcs11-provider/pkcs11-provider-sig \
 		  pkcs11-provider/pkcs11-provider-cipher \
 		  pkcs11-provider/pkcs11-provider-hmac
-pkcs11_provider_pk_SOURCES = pkcs11-provider/pkcs11-provider-pk.c
-pkcs11_provider_sig_SOURCES = pkcs11-provider/pkcs11-provider-sig.c
-pkcs11_provider_cipher_SOURCES = pkcs11-provider/pkcs11-provider-cipher.c
-pkcs11_provider_hmac_SOURCES = pkcs11-provider/pkcs11-provider-hmac.c
-pkcs11_provider_pk_LDADD = $(LDADD)
-pkcs11_provider_sig_LDADD = $(LDADD)
-pkcs11_provider_cipher_LDADD = $(LDADD)
-pkcs11_provider_hmac_LDADD = $(LDADD)
+pkcs11_provider_pkcs11_provider_pk_SOURCES = pkcs11-provider/pkcs11-provider-pk.c
+pkcs11_provider_pkcs11_provider_sig_SOURCES = pkcs11-provider/pkcs11-provider-sig.c
+pkcs11_provider_pkcs11_provider_cipher_SOURCES = pkcs11-provider/pkcs11-provider-cipher.c
+pkcs11_provider_pkcs11_provider_hmac_SOURCES = pkcs11-provider/pkcs11-provider-hmac.c
+pkcs11_provider_pkcs11_provider_pk_LDADD = $(LDADD)
+pkcs11_provider_pkcs11_provider_sig_LDADD = $(LDADD)
+pkcs11_provider_pkcs11_provider_cipher_LDADD = $(LDADD)
+pkcs11_provider_pkcs11_provider_hmac_LDADD = $(LDADD)
 endif
 
 dist_check_SCRIPTS += gnutls-cli-self-signed.sh gnutls-cli-invalid-crl.sh gnutls-cli-rawpk.sh
