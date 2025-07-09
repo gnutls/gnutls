@@ -130,7 +130,7 @@ for variant in 44 65 87; do
 	# Check default
 	TMPKEYDEFAULT=$testdir/key-$algo-$format-default
 	TMPKEY=$testdir/key-$algo-$format
-	${VALGRIND} "${CERTTOOL}" -k --no-text --infile "data/key-$algo-$format.pem" >"$TMPKEYDEFAULT"
+	${VALGRIND} "${CERTTOOL}" -k --no-text --infile "$srcdir/data/key-$algo-$format.pem" >"$TMPKEYDEFAULT"
 	if [ $? != 0 ]; then
 	    cat "$TMPKEYDEFAULT"
 	    exit 1
@@ -138,19 +138,19 @@ for variant in 44 65 87; do
 
 	# The "expandedKey" format doesn't have public key part
 	if [ "$format" = seed ] || [ "$format" = both ]; then
-	    if ! "${DIFF}" "$TMPKEYDEFAULT" "data/key-$algo-both.pem"; then
+	    if ! "${DIFF}" "$TMPKEYDEFAULT" "$srcdir/data/key-$algo-both.pem"; then
 		exit 1
 	    fi
 	fi
 
 	# Check roundtrip with --key-format
-	${VALGRIND} "${CERTTOOL}" -k --no-text --key-format "$format" --infile "data/key-$algo-$format.pem" >"$TMPKEY"
+	${VALGRIND} "${CERTTOOL}" -k --no-text --key-format "$format" --infile "$srcdir/data/key-$algo-$format.pem" >"$TMPKEY"
 	if [ $? != 0 ]; then
 	    cat "$TMPKEY"
 	    exit 1
 	fi
 
-	if ! "${DIFF}" "$TMPKEY" "data/key-$algo-$format.pem"; then
+	if ! "${DIFF}" "$TMPKEY" "$srcdir/data/key-$algo-$format.pem"; then
 	    exit 1
 	fi
     done
@@ -164,7 +164,7 @@ for n in 1; do
     fi
 
     echo "Testing inconsistent ML-DSA key ($n)"
-    if "${CERTTOOL}" -k --infile "data/key-mldsa-inconsistent$n.pem"; then
+    if "${CERTTOOL}" -k --infile "$srcdir/data/key-mldsa-inconsistent$n.pem"; then
 	exit 1
     fi
 done
