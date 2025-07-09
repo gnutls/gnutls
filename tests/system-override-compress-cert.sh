@@ -19,12 +19,26 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 
+: ${CLI=../src/gnutls-cli${EXEEXT}}
+
 TEST=${builddir}/compress-cert-conf
 CONF=config.$$.tmp
 export GNUTLS_SYSTEM_PRIORITY_FILE=${CONF}
 export GNUTLS_SYSTEM_PRIORITY_FAIL_ON_INVALID=1
 
 if test "${WINDIR}" != ""; then
+	exit 77
+fi
+
+# The use of brotli is hard-coded in the tls13/compress-cert-conf.c
+if ! "$CLI" --list | grep '^Compression: .*COMP-BROTLI'; then
+	echo "Not built with brotli, skipping" 1>&2
+	exit 77
+fi
+
+# We need one other algorithm aside brotli, assuming zstd here
+if ! "$CLI" --list | grep '^Compression: .*COMP-ZSTD'; then
+	echo "Not built with zstd, skipping" 1>&2
 	exit 77
 fi
 
