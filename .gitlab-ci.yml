@@ -60,7 +60,9 @@ default:
 .bootstrap:
   stage: bootstrap
   tags:
-    - saas-linux-small-amd64
+    - gnutls
+  except:
+    - tags # TODO
   script:
     - devel/preserve-timestamp stamp.pre-bootstrap
     - SUBMODULE_NOFETCH=1 ./bootstrap --copy --skip-po
@@ -71,7 +73,7 @@ default:
 .build:
   stage: build
   tags:
-    - saas-linux-small-amd64
+    - gnutls
   except:
     - tags # TODO
   artifacts:
@@ -80,10 +82,10 @@ default:
 
 .test:
   stage: test
+  tags:
+    - gnutls
   script:
     - make -j$CHECKJOBS check
-  tags:
-    - saas-linux-small-amd64
   except:
     - tags # TODO
   artifacts:
@@ -133,6 +135,8 @@ default:
       fi
     - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
     - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
+  # FIXME: the above step doesn't work on a rootless container
+  allow_failure: true
 
 .mingw-vista:
   variables:
@@ -175,6 +179,8 @@ commit-check:
     - devel/check-headers.sh
     - git diff --exit-code # nothing should change version controlled files
   retry: 0
+  tags:
+    - gnutls
 
 doc-dist.Fedora:
   extends:
@@ -195,7 +201,8 @@ doc-dist.Fedora:
     - DB2EPUBDIR=$(dirname $(find /usr/share/sgml/docbook/xsl-ns-stylesheets-*/epub/bin/ -name dbtoepub -print))
     - PATH="$PATH:$DB2EPUBDIR" make -C doc gnutls.epub
     - make -j$CHECKJOBS distcheck
-
+  tags:
+    - gnutls
 
 # Two runs, one with normal backend and another with pkcs11 trust store
 UB+ASAN-Werror.Fedora.x86_64.gcc:
@@ -229,7 +236,7 @@ UB+ASAN-Werror.Fedora.x86_64.gcc:
     # Use $BUILDJOBS since most of the job is building all tests, then just running 4 tests
     - make -j$BUILDJOBS check -C tests TESTS="trust-store p11-kit-load.sh priority-init2 set-default-prio" SUBDIRS=.
   tags:
-    - saas-linux-small-amd64
+    - gnutls
   except:
     - tags
 
@@ -265,7 +272,7 @@ UB+ASAN-Werror-aggressive.Fedora.x86_64.gcc:
     # Use $BUILDJOBS since most of the job is building all tests, then just running 4 tests
     - make -j$BUILDJOBS check -C tests TESTS="trust-store p11-kit-load.sh priority-init2 set-default-prio" SUBDIRS=.
   tags:
-    - saas-linux-small-amd64
+    - gnutls
   except:
     - tags
 
@@ -607,6 +614,8 @@ fedora-threadsan/build:
     - setarch $(uname -m) -R -- dash ./configure --disable-gcc-warnings --disable-doc --cache-file $CCACHE_FILE --disable-non-suiteb-curves --enable-fips140-mode --disable-full-test-suite --with-pkcs12-iter-count=10000 CFLAGS="-fsanitize=thread -g -O2" CXXFLAGS=$CFLAGS
     - setarch $(uname -m) -R -- make -j$BUILDJOBS
     - setarch $(uname -m) -R -- make -j$BUILDJOBS -C tests check SUBDIRS=. TESTS="" TSAN_OPTIONS="suppressions=$(pwd)/devel/tsan.supp" GNUTLS_SKIP_FIPS_INTEGRITY_CHECKS=1 GNUTLS_FORCE_FIPS_MODE=1
+  # FIXME: the above step doesn't work on a rootless container
+  allow_failure: true
 
 fedora-threadsan/test:
   extends:
@@ -618,6 +627,8 @@ fedora-threadsan/test:
     - fedora-threadsan/build
   script:
     - setarch $(uname -m) -R -- make -j$CHECKJOBS -C tests check SUBDIRS=. TESTS="tls-pthread dtls-pthread fips-mode-pthread rng-pthread" TSAN_OPTIONS="suppressions=$(pwd)/devel/tsan.supp" GNUTLS_SKIP_FIPS_INTEGRITY_CHECKS=1 GNUTLS_FORCE_FIPS_MODE=1
+  # FIXME: the above step doesn't work on a rootless container
+  allow_failure: true
 
 fedora-static-analyzers/build:
   extends:
@@ -706,7 +717,7 @@ fedora-abicoverage/build:
     - make -j$BUILDJOBS
     - make -j$BUILDJOBS check TESTS=""
   tags:
-    - saas-linux-small-amd64
+    - gnutls
   except:
     - tags
 
@@ -761,7 +772,7 @@ fedora-cross/bootstrap:
     # build tests, but don't execute them
     - make -j$BUILDJOBS -C tests check TESTS=""
   tags:
-    - saas-linux-small-amd64
+    - gnutls
 
 .fedora-cross/test:
   extends:
@@ -775,7 +786,7 @@ fedora-cross/bootstrap:
     - make pic-check
     - make -j$BUILDJOBS -C tests check
   tags:
-    - saas-linux-small-amd64
+    - gnutls
 
 fedora-cross/aarch64-linux-gnu/build: # name is important, see .fedora-cross/build
   extends:
@@ -1034,6 +1045,8 @@ mingw32/archive:
   needs: # archive only if tests successful
     - mingw32/build
     - mingw32/test
+  tags:
+    - gnutls
 
 mingw32-vista/build:
   extends:
@@ -1063,3 +1076,5 @@ mingw32-vista/archive:
   needs: # archive only if tests successful
     - mingw32-vista/build
     - mingw32-vista/test
+  tags:
+    - gnutls

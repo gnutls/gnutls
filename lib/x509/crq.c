@@ -615,6 +615,13 @@ int gnutls_x509_crq_get_version(gnutls_x509_crq_t crq)
 		return _gnutls_asn2err(result);
 	}
 
+	/* Note that asn1_read_value can return success with */
+	/* len set to zero (without setting the data) in some */
+	/* conditions. */
+	if (unlikely(len <= 0)) {
+		return gnutls_assert_val(GNUTLS_E_ASN1_VALUE_NOT_VALID);
+	}
+
 	return (int)version[0] + 1;
 }
 

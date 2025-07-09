@@ -257,7 +257,7 @@ void cfg_init(void)
 	if (val != NULL) {                                                 \
 		if (s_name == NULL) {                                      \
 			i = 0;                                             \
-			s_name = malloc(sizeof(char *) * MAX_ENTRIES);     \
+			s_name = calloc(MAX_ENTRIES + 1, sizeof(char *));  \
 			CHECK_MALLOC(s_name);                              \
 			do {                                               \
 				if (val && strcmp(val->name, k_name) != 0) \
@@ -279,7 +279,7 @@ void cfg_init(void)
 		char *p;                                                      \
 		if (s_name == NULL) {                                         \
 			i = 0;                                                \
-			s_name = malloc(sizeof(char *) * MAX_ENTRIES);        \
+			s_name = calloc(MAX_ENTRIES + 1, sizeof(char *));     \
 			CHECK_MALLOC(s_name);                                 \
 			do {                                                  \
 				if (val && strcmp(val->name, k_name) != 0)    \

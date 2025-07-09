@@ -589,9 +589,28 @@ static int set_auth_types(gnutls_session_t session)
 		/* Under TLS1.3 this returns a KX which matches the negotiated
 		 * groups from the key shares; if we are resuming then the KX seen
 		 * here doesn't match the original session. */
-		if (!session->internals.resumed)
-			kx = gnutls_kx_get(session);
-		else
+		if (!session->internals.resumed) {
+			const gnutls_group_entry_st *group = get_group(session);
+
+			if (session->internals.hsk_flags & HSK_PSK_SELECTED) {
+				if (group) {
+					kx = group->pk == GNUTLS_PK_DH ?
+						     GNUTLS_KX_DHE_PSK :
+						     GNUTLS_KX_ECDHE_PSK;
+				} else {
+					kx = GNUTLS_KX_PSK;
+				}
+			} else if (group) {
+				/* Not necessarily be RSA, but just to
+				 * make _gnutls_map_kx_get_cred below
+				 * work.
+				 */
+				kx = group->pk == GNUTLS_PK_DH ?
+					     GNUTLS_KX_DHE_RSA :
+					     GNUTLS_KX_ECDHE_RSA;
+			} else
+				kx = GNUTLS_KX_UNKNOWN;
+		} else
 			kx = GNUTLS_KX_UNKNOWN;
 	} else {
 		/* TLS1.2 or earlier, kx is associated with ciphersuite */

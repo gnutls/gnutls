@@ -1170,6 +1170,8 @@ static int _gnutls_psk_recv_params(gnutls_session_t session,
 
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
 		if (session->internals.hsk_flags & HSK_PSK_KE_MODES_SENT) {
+			DECR_LEN(len, 2);
+
 			uint16_t selected_identity = _gnutls_read_uint16(data);
 
 			for (i = 0; i < sizeof(session->key.binders) /

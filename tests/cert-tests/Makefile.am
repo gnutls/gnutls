@@ -119,7 +119,8 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/key-mldsa87-both.pem \
 	data/key-mldsa-inconsistent1.pem \
 	data/key-mldsa-inconsistent2.pem \
-	data/key-mldsa-inconsistent3.pem
+	data/key-mldsa-inconsistent3.pem \
+	templates/template-too-many-othernames.tmpl
 
 dist_check_SCRIPTS = pathlen.sh aki.sh invalid-sig.sh email.sh \
 	pkcs7.sh pkcs7-broken-sigs.sh privkey-import.sh name-constraints.sh certtool-long-cn.sh crl.sh provable-privkey.sh \

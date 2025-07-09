@@ -5,13 +5,30 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.8.10 (unreleased)
+* Version 3.8.10 (released 2025-07-08)
+
+** libgnutls: Fix NULL pointer dereference when 2nd Client Hello omits PSK
+   Reported by Stefan Bühler. [GNUTLS-SA-2025-07-07-4, CVSS: medium]
+   [CVE-2025-6395]
+
+** libgnutls: Fix heap read buffer overrun in parsing X.509 SCTS timestamps
+   Spotted by oss-fuzz and reported by OpenAI Security Research Team,
+   and fix developed by Andrew Hamilton. [GNUTLS-SA-2025-07-07-1,
+   CVSS: medium] [CVE-2025-32989]
+
+** libgnutls: Fix double-free upon error when exporting otherName in SAN
+   Reported by OpenAI Security Research Team. [GNUTLS-SA-2025-07-07-2,
+   CVSS: low] [CVE-2025-32988]
+
+** certtool: Fix 1-byte write buffer overrun when parsing template
+   Reported by David Aitel. [GNUTLS-SA-2025-07-07-3,
+   CVSS: low] [CVE-2025-32990]
 
 ** libgnutls: PKCS#11 modules can now be used to override the default
    cryptographic backend. Use the [provider] section in the system-wide config
    to specify path and pin to the module (see system-wide config Documentation).
 
-** libgnutls: Linux kernel version 6.14 bring a Kernel TLS (kTLS) key update
+** libgnutls: Linux kernel version 6.14 brings a Kernel TLS (kTLS) key update
    support. The library running on the aforementioned version now utilizes the
    kernel’s key update mechanism when kTLS is enabled, allowing uninterrupted
    TLS session. The --enable-ktls configure option as well as the system-wide
@@ -38,6 +55,10 @@ See the end for copying conditions.
    The ML-DSA signature algorithms, ML-DSA-44, ML-DSA-65, and
    ML-DSA-87, can now be used to digitally sign TLS handshake
    messages.
+
+** API and ABI modifications:
+GNUTLS_PKCS_MLDSA_SEED: New enum member of gnutls_pkcs_encrypt_flags_t
+GNUTLS_PKCS_MLDSA_EXPANDED: New enum member of gnutls_pkcs_encrypt_flags_t
 
 * Version 3.8.9 (released 2025-02-07)
 
