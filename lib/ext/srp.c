@@ -258,6 +258,7 @@ static int _gnutls_srp_unpack(gnutls_buffer_st *ps,
 error:
 	_gnutls_free_datum(&username);
 	_gnutls_free_datum(&password);
+	gnutls_free(priv);
 	return ret;
 }
 
