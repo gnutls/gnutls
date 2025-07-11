@@ -70,3 +70,7 @@ name = drbg_aes_reseed
 
 # The following should be removed in the new release, after updating the
 # abi-dump repository:
+
+[suppress_type]
+name = gnutls_cipher_algorithm_t
+changed_enumerators = GNUTLS_CIPHER_AES_128_CFB, GNUTLS_CIPHER_AES_192_CFB, GNUTLS_CIPHER_AES_256_CFB

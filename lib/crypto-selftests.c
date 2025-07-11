@@ -366,6 +366,24 @@ const struct cipher_vectors_st aes128_cfb8_vectors[] = {
 	},
 };
 
+const struct cipher_vectors_st aes128_cfb_vectors[] = {
+	/* NIST 800-38a */
+	{
+		STR(key, key_size,
+		    "\x2b\x7e\x15\x16\x28\xae\xd2\xa6\xab\xf7\x15\x88\x09\xcf\x4f\x3c"),
+		STR(plaintext, plaintext_size,
+		    "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96\xe9\x3d\x7e\x11\x73\x93\x17\x2a"
+		    "\xae\x2d"),
+		.ciphertext =
+			(uint8_t *)"\x3b\x3f\xd9\x2e\xb7\x2d\xad\x20\x33\x34\x49\xf8\xe8\x3c\xfb\x4a"
+				   "\xc8\xa6",
+		STR(iv, iv_size,
+		    "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"),
+		STR(internal_iv, internal_iv_size,
+		    "\x3b\x3f\xd9\x2e\xb7\x2d\xad\x20\x33\x34\x49\xf8\xe8\x3c\xfb\x4a"),
+	},
+};
+
 const struct cipher_vectors_st aes192_cfb8_vectors[] = {
 	/* NIST 800-38a */
 	{
@@ -386,6 +404,25 @@ const struct cipher_vectors_st aes192_cfb8_vectors[] = {
 	},
 };
 
+const struct cipher_vectors_st aes192_cfb_vectors[] = {
+	/* NIST 800-38a */
+	{
+		STR(key, key_size,
+		    "\x8e\x73\xb0\xf7\xda\x0e\x64\x52\xc8\x10\xf3\x2b\x80\x90\x79\xe5"
+		    "\x62\xf8\xea\xd2\x52\x2c\x6b\x7b"),
+		STR(plaintext, plaintext_size,
+		    "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96\xe9\x3d\x7e\x11\x73\x93\x17\x2a"
+		    "\xae\x2d"),
+		.ciphertext =
+			(uint8_t *)"\xcd\xc8\x0d\x6f\xdd\xf1\x8c\xab\x34\xc2\x59\x09\xc9\x9a\x41\x74"
+				   "\x67\xce",
+		STR(iv, iv_size,
+		    "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"),
+		STR(internal_iv, internal_iv_size,
+		    "\xcd\xc8\x0d\x6f\xdd\xf1\x8c\xab\x34\xc2\x59\x09\xc9\x9a\x41\x74"),
+	},
+};
+
 const struct cipher_vectors_st aes256_cfb8_vectors[] = {
 	/* NIST 800-38a */
 	{
@@ -403,6 +440,25 @@ const struct cipher_vectors_st aes256_cfb8_vectors[] = {
 		/* the least significant 16 bytes of ciphertext */
 		STR(internal_iv, internal_iv_size,
 		    "\x1a\x85\x20\xa6\x4d\xb5\x5f\xcc\x8a\xc5\x54\x84\x4e\x88\x97\x00"),
+	},
+};
+
+const struct cipher_vectors_st aes256_cfb_vectors[] = {
+	/* NIST 800-38a */
+	{
+		STR(key, key_size,
+		    "\x60\x3d\xeb\x10\x15\xca\x71\xbe\x2b\x73\xae\xf0\x85\x7d\x77\x81"
+		    "\x1f\x35\x2c\x07\x3b\x61\x08\xd7\x2d\x98\x10\xa3\x09\x14\xdf\xf4"),
+		STR(plaintext, plaintext_size,
+		    "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96\xe9\x3d\x7e\x11\x73\x93\x17\x2a"
+		    "\xae\x2d"),
+		.ciphertext =
+			(uint8_t *)"\xdc\x7e\x84\xbf\xda\x79\x16\x4b\x7e\xcd\x84\x86\x98\x5d\x38\x60"
+				   "\x39\xff",
+		STR(iv, iv_size,
+		    "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"),
+		STR(internal_iv, internal_iv_size,
+		    "\xdc\x7e\x84\xbf\xda\x79\x16\x4b\x7e\xcd\x84\x86\x98\x5d\x38\x60"),
 	},
 };
 
@@ -2810,6 +2866,15 @@ int gnutls_cipher_self_test(unsigned flags, gnutls_cipher_algorithm_t cipher)
 		/* Optional check to exercise all block sizes */
 		CHECK(GNUTLS_CIPHER_AES_256_CFB8, test_cipher_all_block_sizes,
 		      aes256_cfb8_vectors);
+		FALLTHROUGH;
+		CASE(GNUTLS_CIPHER_AES_128_CFB, test_cipher,
+		     aes128_cfb_vectors);
+		FALLTHROUGH;
+		CASE(GNUTLS_CIPHER_AES_192_CFB, test_cipher,
+		     aes192_cfb_vectors);
+		FALLTHROUGH;
+		CASE(GNUTLS_CIPHER_AES_256_CFB, test_cipher,
+		     aes256_cfb_vectors);
 		FALLTHROUGH;
 		CASE(GNUTLS_CIPHER_AES_128_XTS, test_cipher,
 		     aes128_xts_vectors);

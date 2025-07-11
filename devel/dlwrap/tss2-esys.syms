@@ -11,3 +11,4 @@ Esys_FlushContext
 Esys_Finalize
 Esys_RSA_Decrypt
 Esys_Sign
+Esys_SetCryptoCallbacks

@@ -300,6 +300,9 @@ static inline void test_ciphers(void)
 	test_cipher_approved(GNUTLS_CIPHER_AES_128_CFB8);
 	test_cipher_approved(GNUTLS_CIPHER_AES_192_CFB8);
 	test_cipher_approved(GNUTLS_CIPHER_AES_256_CFB8);
+	test_cipher_approved(GNUTLS_CIPHER_AES_128_CFB);
+	test_cipher_approved(GNUTLS_CIPHER_AES_192_CFB);
+	test_cipher_approved(GNUTLS_CIPHER_AES_256_CFB);
 	test_cipher_allowed(GNUTLS_CIPHER_AES_128_GCM);
 	test_cipher_allowed(GNUTLS_CIPHER_AES_192_GCM);
 	test_cipher_allowed(GNUTLS_CIPHER_AES_256_GCM);

@@ -134,6 +134,9 @@ is_cipher_algo_approved_in_fips(gnutls_cipher_algorithm_t algo)
 	case GNUTLS_CIPHER_AES_128_CFB8:
 	case GNUTLS_CIPHER_AES_192_CFB8:
 	case GNUTLS_CIPHER_AES_256_CFB8:
+	case GNUTLS_CIPHER_AES_128_CFB:
+	case GNUTLS_CIPHER_AES_192_CFB:
+	case GNUTLS_CIPHER_AES_256_CFB:
 	case GNUTLS_CIPHER_AES_128_XTS:
 	case GNUTLS_CIPHER_AES_256_XTS:
 		return true;
