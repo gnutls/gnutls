@@ -117,6 +117,8 @@ int gnutls_certificate_set_rawpk_key_mem(
 	ret = gnutls_pcert_import_rawpk_raw(pcert, spki, format, key_usage, 0);
 	if (ret < 0) {
 		gnutls_privkey_deinit(privkey);
+		gnutls_pcert_deinit(pcert);
+		gnutls_free(pcert);
 
 		return gnutls_assert_val(ret);
 	}
@@ -131,6 +133,8 @@ int gnutls_certificate_set_rawpk_key_mem(
 			if (ret < 0) {
 				gnutls_privkey_deinit(privkey);
 				_gnutls_str_array_clear(&str_names);
+				gnutls_pcert_deinit(pcert);
+				gnutls_free(pcert);
 
 				return gnutls_assert_val(ret);
 			}
@@ -256,6 +260,7 @@ int gnutls_certificate_set_rawpk_key_file(
 		ret = gnutls_pubkey_init(&pubkey);
 		if (ret < 0) {
 			gnutls_privkey_deinit(privkey);
+			gnutls_free(pcert);
 
 			return gnutls_assert_val(ret);
 		}
@@ -264,6 +269,7 @@ int gnutls_certificate_set_rawpk_key_file(
 		if (ret < 0) {
 			gnutls_privkey_deinit(privkey);
 			gnutls_pubkey_deinit(pubkey);
+			gnutls_free(pcert);
 
 			return gnutls_assert_val(ret);
 		}
@@ -272,6 +278,7 @@ int gnutls_certificate_set_rawpk_key_file(
 		if (ret < 0) {
 			gnutls_privkey_deinit(privkey);
 			gnutls_pubkey_deinit(pubkey);
+			gnutls_free(pcert);
 
 			return gnutls_assert_val(ret);
 		}
@@ -285,6 +292,7 @@ int gnutls_certificate_set_rawpk_key_file(
 			rawpkfile, RF_BINARY | RF_SENSITIVE, &key_size);
 		if (rawpubkey.data == NULL) {
 			gnutls_privkey_deinit(privkey);
+			gnutls_free(pcert);
 
 			return gnutls_assert_val(GNUTLS_E_FILE_ERROR);
 		}
@@ -303,6 +311,7 @@ int gnutls_certificate_set_rawpk_key_file(
 
 		if (ret < 0) {
 			gnutls_privkey_deinit(privkey);
+			gnutls_free(pcert);
 
 			return gnutls_assert_val(ret);
 		}
@@ -318,6 +327,7 @@ int gnutls_certificate_set_rawpk_key_file(
 			if (ret < 0) {
 				gnutls_privkey_deinit(privkey);
 				_gnutls_str_array_clear(&str_names);
+				gnutls_free(pcert);
 
 				return gnutls_assert_val(ret);
 			}
