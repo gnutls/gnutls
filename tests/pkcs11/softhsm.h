@@ -70,7 +70,9 @@ inline static const char *softhsm_bin(void)
 {
 	const char *bin;
 
-	if (access(SOFTHSM_BIN1, X_OK) == 0) {
+	if (!system("softhsm2-util --version")) {
+		bin = "softhsm2-util";
+	} else if (access(SOFTHSM_BIN1, X_OK) == 0) {
 		bin = SOFTHSM_BIN1;
 	} else if (access(SOFTHSM_BIN2, X_OK) == 0) {
 		bin = SOFTHSM_BIN2;
