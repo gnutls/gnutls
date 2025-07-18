@@ -64,7 +64,7 @@ if ! test -f "${SOFTHSM_MODULE}"; then
 	exit 77
 fi
 
-if [ -z "$(which pkcs11-tool 2>/dev/null)" ]; then
+if ! command -v pkcs11-tool >/dev/null; then
 	echo "Need pkcs11-tool from opensc package to run this test."
 	exit 77
 fi

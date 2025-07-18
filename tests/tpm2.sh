@@ -29,27 +29,27 @@ if ! test -x "${CERTTOOL}"; then
 	exit 77
 fi
 
-if [ -z "$(which swtpm 2>/dev/null)" ]; then
+if ! command -v swtpm >/dev/null; then
 	echo "Need swtpm package to run this test."
 	exit 77
 fi
 
-if [ -z "$(which ncat 2>/dev/null)" ]; then
+if ! command -v ncat >/dev/null; then
 	echo "Need ncat from nmap-ncat package to run this test."
 	exit 77
 fi
 
-if [ -z "$(which tpm2_startup 2>/dev/null)" ]; then
+if ! command -v tpm2_startup >/dev/null; then
 	echo "Need tpm2_startup from tpm2-tools package to run this test."
 	exit 77
 fi
 
-if [ -z "$(which base64 2>/dev/null)" ]; then
+if ! command -v base64 >/dev/null; then
 	echo "Need the base64 tool to run this test."
 	exit 77
 fi
 
-if [ -z "$(which tpm2tss-genkey 2>/dev/null)" ]; then
+if ! command -v tpm2tss-genkey >/dev/null; then
 	echo "Need tpm2tss-genkey from tpm2-tss-engine package to run this test."
 	exit 77
 fi
