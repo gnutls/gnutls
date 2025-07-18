@@ -1672,7 +1672,7 @@ typedef struct {
 } internals_st;
 
 /* Maximum number of epochs we keep around. */
-#define MAX_EPOCH_INDEX 4
+#define MAX_EPOCH_INDEX 16
 
 #define reset_cand_groups(session)                                            \
 	session->internals.cand_ec_group = session->internals.cand_dh_group = \

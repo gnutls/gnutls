@@ -52,44 +52,46 @@ static inline int set_ktls_keys(gnutls_session_t session,
 	return 0;
 }
 
-static int update_keys(gnutls_session_t session, hs_stage_t stage)
+static int update_sending_key(gnutls_session_t session, hs_stage_t stage)
 {
 	int ret;
 
-	ret = _tls13_update_secret(session,
-				   session->key.proto.tls13.temp_secret,
-				   session->key.proto.tls13.temp_secret_size);
+	_gnutls_epoch_bump(session);
+	ret = _gnutls_epoch_dup(session, EPOCH_WRITE_CURRENT);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
+
+	ret = _tls13_write_connection_state_init(session, stage);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	if (IS_KTLS_ENABLED(session, GNUTLS_KTLS_SEND)) {
+		ret = set_ktls_keys(session, GNUTLS_KTLS_SEND);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+	}
+
+	return 0;
+}
+
+static int update_receiving_key(gnutls_session_t session, hs_stage_t stage)
+{
+	int ret;
 
 	_gnutls_epoch_bump(session);
 	ret = _gnutls_epoch_dup(session, EPOCH_READ_CURRENT);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	/* If we send a key update during early start, only update our
-	 * write keys */
-	if (session->internals.recv_state == RECV_STATE_EARLY_START) {
-		ret = _tls13_write_connection_state_init(session, stage);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
-
-		if (IS_KTLS_ENABLED(session, GNUTLS_KTLS_SEND))
-			ret = set_ktls_keys(session, GNUTLS_KTLS_SEND);
-	} else {
-		ret = _tls13_connection_state_init(session, stage);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
-
-		if (IS_KTLS_ENABLED(session, GNUTLS_KTLS_SEND) &&
-		    stage == STAGE_UPD_OURS)
-			ret = set_ktls_keys(session, GNUTLS_KTLS_SEND);
-		else if (IS_KTLS_ENABLED(session, GNUTLS_KTLS_RECV) &&
-			 stage == STAGE_UPD_PEERS)
-			ret = set_ktls_keys(session, GNUTLS_KTLS_RECV);
-	}
+	ret = _tls13_read_connection_state_init(session, stage);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
+
+	if (IS_KTLS_ENABLED(session, GNUTLS_KTLS_RECV)) {
+		ret = set_ktls_keys(session, GNUTLS_KTLS_RECV);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+	}
 
 	return 0;
 }
@@ -128,7 +130,13 @@ int _gnutls13_recv_key_update(gnutls_session_t session, gnutls_buffer_st *buf)
 	switch (buf->data[0]) {
 	case 0:
 		/* peer updated its key, not requested our key update */
-		ret = update_keys(session, STAGE_UPD_PEERS);
+		ret = _tls13_update_secret(
+			session, session->key.proto.tls13.temp_secret,
+			session->key.proto.tls13.temp_secret_size);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		ret = update_receiving_key(session, STAGE_UPD_PEERS);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
@@ -141,7 +149,13 @@ int _gnutls13_recv_key_update(gnutls_session_t session, gnutls_buffer_st *buf)
 		}
 
 		/* peer updated its key, requested our key update */
-		ret = update_keys(session, STAGE_UPD_PEERS);
+		ret = _tls13_update_secret(
+			session, session->key.proto.tls13.temp_secret,
+			session->key.proto.tls13.temp_secret_size);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		ret = update_receiving_key(session, STAGE_UPD_PEERS);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
@@ -248,7 +262,13 @@ int gnutls_session_key_update(gnutls_session_t session, unsigned flags)
 	_gnutls_epoch_gc(session);
 
 	/* it was completely sent, update the keys */
-	ret = update_keys(session, STAGE_UPD_OURS);
+	ret = _tls13_update_secret(session,
+				   session->key.proto.tls13.temp_secret,
+				   session->key.proto.tls13.temp_secret_size);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = update_sending_key(session, STAGE_UPD_OURS);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
