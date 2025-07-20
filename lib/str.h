@@ -111,7 +111,9 @@ inline static ATTRIBUTE_NONNULL() gnutls_buffer_st
 	return dst;
 }
 
-int _gnutls_buffer_resize(gnutls_buffer_st *, size_t new_size);
+void _gnutls_buffer_set_reclaiming(bool reclaiming);
+
+extern int (*_gnutls_buffer_resize)(gnutls_buffer_st *, size_t);
 
 int _gnutls_buffer_append_str(gnutls_buffer_st *, const char *str);
 
