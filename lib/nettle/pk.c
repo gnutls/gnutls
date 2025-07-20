@@ -3207,7 +3207,7 @@ static int pct_test(gnutls_pk_algorithm_t algo,
 	const char const_data_sha512[64] =
 		"onetwothreefourfivesixseveneightnineteneleventwelvethirteenfourt";
 	gnutls_datum_t ddata, tmp = { NULL, 0 };
-	char *gen_data = NULL;
+	char gen_data[MAX_HASH_SIZE];
 	gnutls_x509_spki_st spki;
 	gnutls_fips140_context_t context;
 
@@ -3223,7 +3223,6 @@ static int pct_test(gnutls_pk_algorithm_t algo,
 
 		me = _gnutls_dsa_q_to_hash(params, &hash_len);
 		spki.dsa_dig = MAC_TO_DIG(me->id);
-		gen_data = gnutls_malloc(hash_len);
 		gnutls_rnd(GNUTLS_RND_NONCE, gen_data, hash_len);
 
 		ddata.data = (void *)gen_data;
@@ -3391,7 +3390,6 @@ cleanup:
 		_gnutls_switch_lib_state(LIB_STATE_ERROR);
 	}
 	_gnutls_x509_spki_clear(&spki);
-	gnutls_free(gen_data);
 	gnutls_free(sig.data);
 	gnutls_free(tmp.data);
 	return ret;
