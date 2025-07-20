@@ -134,8 +134,6 @@ default:
       if test -e stamp.pre-bootstrap; then
         devel/preserve-timestamp --restore stamp.pre-bootstrap
       fi
-    - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
-    - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
   # FIXME: the above step doesn't work on a rootless container
   allow_failure: true
 
@@ -918,6 +916,9 @@ debian/test:
 .mingw/test:
   extends:
     - .test
+  before_script:
+    - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
+    - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
   script:
     # https://bugzilla.redhat.com/show_bug.cgi?id=2049401
     - mingw${arch_bits}-make -j$CHECKJOBS -C $PWD/tests check
