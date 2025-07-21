@@ -181,9 +181,9 @@ commit-check:
   tags:
     - gnutls
 
-doc-dist.Fedora:
+fedora-docdist/build:
   extends:
-    - .test
+    - .build
     - .fedora
   needs:
     - fedora/bootstrap
@@ -199,6 +199,17 @@ doc-dist.Fedora:
     - make -j$BUILDJOBS -C doc/latex gnutls.pdf
     - DB2EPUBDIR=$(dirname $(find /usr/share/sgml/docbook/xsl-ns-stylesheets-*/epub/bin/ -name dbtoepub -print))
     - PATH="$PATH:$DB2EPUBDIR" make -C doc gnutls.epub
+  tags:
+    - gnutls
+  when: manual
+
+fedora-docdist/test:
+  extends:
+    - .test
+    - .fedora
+  needs:
+    - fedora-docdist/build
+  script:
     - make -j$CHECKJOBS distcheck
   tags:
     - gnutls
@@ -648,45 +659,6 @@ fedora-static-analyzers/build:
 #     - cppcheck --cppcheck-build-dir=cache/cppcheck --force -q -Ilib/includes -Igl/ -Ilib/ -I. --error-exitcode=1 lib/ -i lib/unistring -i lib/minitasn1 -i lib/nettle/backport -i lib/nettle/ecc -j2 $CPPCHECK_OPTIONS
 #     - cppcheck --cppcheck-build-dir=cache/cppcheck --force -q -Ilib/includes -Igl/ -Ilibdane/ -I. --error-exitcode=1 libdane/ -j2 $CPPCHECK_OPTIONS
 #   timeout: 3h
-
-# TODO this does not work, so we keep using old job doc-dist.Fedora
-# Keeping it here until I figure it out.
-#fedora-docdist/build:
-#  extends:
-#    - .build
-#    - .fedora
-#  script:
-#    - SUBMODULE_NOFETCH=1 ./bootstrap
-#    - CFLAGS="-std=c99 -O2 -g" dash ./configure --disable-gcc-warnings --cache-file $CCACHE_FILE --prefix=/usr --libdir=/usr/lib64 --disable-cxx --disable-non-suiteb-curves --enable-gtk-doc --disable-maintainer-mode
-#    - make -j$BUILDJOBS -C doc stamp-vti
-#    - make -j$BUILDJOBS -C doc stamp_enums
-#    - make -j$BUILDJOBS
-#    - make -j$BUILDJOBS -C doc gnutls.html
-#    - make -j$BUILDJOBS -C doc/latex gnutls.pdf
-#    - DB2EPUBDIR=$(dirname $(find /usr/share/sgml/docbook/xsl-ns-stylesheets-*/epub/bin/ -name dbtoepub -print))
-#    - PATH="$PATH:$DB2EPUBDIR" make -C doc gnutls.epub
-#  # we don't throw away intermediate compilation results as /test job does some compiling, too
-#  artifacts:
-#    expire_in: 1 day
-#    paths:
-#      - ./
-#    exclude:
-#      - .git/ # passing forward .git causes warnings and possibly problems
-#      - ./**/.git/ # passing forward .git causes warnings and possibly problems
-#
-#fedora-docdist/test:
-#  extends:
-#    - .test
-#    - .fedora
-#  dependencies:
-#    - fedora-docdist/build
-#  needs:
-#    - fedora-docdist/build
-#  script: # shall we separate it to two jobs?
-#    - export CFLAGS="-std=c99 -O2 -g"
-#    - DB2EPUBDIR=$(dirname $(find /usr/share/sgml/docbook/xsl-ns-stylesheets-*/epub/bin/ -name dbtoepub -print))
-#    - PATH="$PATH:$DB2EPUBDIR" make -C doc gnutls.epub
-#    - make -j$CHECKJOBS distcheck
 
 fedora-abicoverage/build:
   extends:
