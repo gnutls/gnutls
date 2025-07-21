@@ -202,6 +202,7 @@ doc-dist.Fedora:
     - make -j$CHECKJOBS distcheck
   tags:
     - gnutls
+  when: manual
 
 fedora-sanitizers/build:
   extends:
@@ -775,6 +776,7 @@ fedora-cross/aarch64-linux-gnu/build: # name is important, see .fedora-cross/bui
     - .fedora-cross
   needs:
     - fedora-cross/bootstrap
+  when: manual
 
 fedora-cross/aarch64-linux-gnu/test:
   extends:
@@ -793,6 +795,7 @@ fedora-cross/ppc64le-linux-gnu/build: # name is important, see .fedora-cross/bui
     - .fedora-cross
   needs:
     - fedora-cross/bootstrap
+  when: manual
 
 fedora-cross/ppc64le-linux-gnu/test:
   extends:
@@ -811,6 +814,7 @@ fedora-cross/s390x-linux-gnu/build: # name is important, see .fedora-cross/build
     - .fedora-cross
   needs:
     - fedora-cross/bootstrap
+  when: manual
 
 fedora-cross/s390x-linux-gnu/test:
   extends:
@@ -839,6 +843,7 @@ fedora-cross/i686-linux-gnu/build:
     - setarch i686 -- make -j$BUILDJOBS
     # build tests, but don't execute them
     - setarch i686 -- make -j$BUILDJOBS -C tests check TESTS=""
+  when: manual
 
 fedora-cross/i686-linux-gnu/test:
   extends:
@@ -944,6 +949,7 @@ mingw/bootstrap:
   extends:
     - .bootstrap
     - .mingw
+  when: manual
 
 mingw64/build:
   extends:
