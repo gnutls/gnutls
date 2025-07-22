@@ -13,7 +13,7 @@ variables:
   # name to allow expiration of old caches.
   BUILD_IMAGES_PROJECT: gnutls/build-images
   DEBIAN_BUILD: buildenv-debian-testing
-  FEDORA_BUILD: buildenv-fedora40
+  FEDORA_BUILD: buildenv-fedora41
   FEDORA_CROSS_BUILD: buildenv-cross-fedora40
   MINGW_BUILD: buildenv-mingw-fedora40
   ALPINE_BASE_BUILD: buildenv-alpine-base
@@ -109,13 +109,6 @@ default:
     COMPILER: clang
     NETTLE_DIR: nettle
     NETTLE_BRANCH: release-3.10-fixes
-
-.fedora-leancrypto:
-  extends:
-    - .fedora
-  variables:
-    COMPILER: clang
-    LEANCRYPTO_DIR: leancrypto
 
 .debian:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$DEBIAN_BUILD
@@ -318,15 +311,14 @@ fedora/build:
   needs:
     - fedora/bootstrap
   script:
-    - dnf install -y libunistring-devel libtasn1-devel libidn-devel
-    - ./configure --cache-file $CCACHE_FILE --disable-doc
+    - dash ./configure --cache-file $CCACHE_FILE --disable-doc
       --program-prefix= --disable-dependency-tracking --prefix=/usr --exec-prefix=/usr
       --bindir=/usr/bin --sbindir=/usr/sbin --sysconfdir=/etc --datadir=/usr/share
       --includedir=/usr/include --libdir=/usr/lib64 --libexecdir=/usr/libexec
       --localstatedir=/var --runstatedir=/run --sharedstatedir=/var/lib
       --mandir=/usr/share/man --infodir=/usr/share/info
       --enable-fips140-mode
-      --with-fips140-module-name='Fedora Linux 39 gnutls'
+      --with-fips140-module-name='Fedora Linux 41 gnutls'
       --with-fips140-module-version=$(git describe)
       --enable-gost --enable-sha1-support --disable-static --disable-openssl-compatibility
       --disable-non-suiteb-curves
@@ -337,6 +329,7 @@ fedora/build:
       --with-unbound-root-key-file=/var/lib/unbound/root.key
       --enable-libdane --disable-rpath
       --with-default-priority-string=@SYSTEM
+      --with-leancrypto
     - make -j$BUILDJOBS
     # build tests, but don't execute them
     - make -j$BUILDJOBS check TESTS=""
@@ -351,13 +344,36 @@ fedora/test:
     - fedora/build
   script:
     - |
-      cat > /etc/crypto-policies/local.d/gnutls-ktls.config <<EOF
-      [global]
-      ktls = true
-      EOF
+      if test "$KTLS" = ktls; then
+        cp devel/gnutls-ktls.config /etc/crypto-policies/local.d
+      else
+        rm -f /etc/crypto-policies/local.d/gnutls-ktls.config
+      fi
       update-crypto-policies
       echo "SYSTEM=NORMAL" >> tests/system.prio
+    - |
+      case "$FIPS" in
+      fips)
+        export GNUTLS_FORCE_FIPS_MODE=1
+        ;;
+      no-fips)
+        export GNUTLS_FORCE_FIPS_MODE=0
+        ;;
+      esac
+    - |
+      case "$PQC" in
+      pqc)
+        export TESTS_ENABLED_GROUPS="GROUP-X25519-MLKEM768 GROUP-SECP256R1-MLKEM768 GROUP-SECP384R1-MLKEM1024"
+        ;;
+      no-pqc)
+        ;;
+      esac
     - make -j$CHECKJOBS check
+  parallel:
+    matrix:
+      - FIPS: [fips, no-fips]
+        PQC: [pqc, no-pqc]
+        KTLS: [ktls, no-ktls]
 
 fedora-interop/test:
   extends:
@@ -417,29 +433,6 @@ fedora-SSL-3.0/test:
   needs:
     - fedora-SSL-3.0/build
 
-fedora-FIPS140-2/build:
-  extends:
-    - .build
-    - .fedora
-  needs:
-    - fedora/bootstrap
-  script:
-    - dash ./configure --disable-gcc-warnings --cache-file $CCACHE_FILE --disable-non-suiteb-curves --enable-fips140-mode --disable-doc --disable-full-test-suite --with-pkcs12-iter-count=10000
-    - make -j$BUILDJOBS
-    # build tests, but don't execute them
-    - GNUTLS_FORCE_FIPS_MODE=1 make -j$BUILDJOBS check TESTS=""
-
-fedora-FIPS140-2/test:
-  extends:
-    - .test
-    - .fedora
-  dependencies:
-    - fedora-FIPS140-2/build
-  needs:
-    - fedora-FIPS140-2/build
-  script:
-    - GNUTLS_FORCE_FIPS_MODE=1 make -j$CHECKJOBS check
-
 .fedora-nettle/build:
   extends:
     - .build
@@ -497,84 +490,6 @@ fedora-nettle-minigmp/build:
 #     # prolong timeout a bit as minigmp build is slow
 #     - PKG_CONFIG_PATH=${PWD}/nettle-git/$NETTLE_DIR/lib64/pkgconfig LD_LIBRARY_PATH=${PWD}/nettle-git/$NETTLE_DIR/lib64 GNUTLS_TEST_TIMEOUT=600000 make -j$CHECKJOBS check
 #   timeout: 3h
-
-fedora-leancrypto/build:
-  extends:
-    - .build
-    - .fedora-leancrypto
-  needs:
-    - fedora/bootstrap
-  script:
-    - git clone --depth 1 --branch master https://github.com/smuellerDD/leancrypto.git leancrypto-git
-    - pushd leancrypto-git
-    - rm -rf .git               # for artifacts:untracked to work
-    - &leancrypto-setup meson setup -Dprefix=${PWD}/$LEANCRYPTO_DIR
-        -Ddefault_library=static
-        -Dascon=disabled -Dascon_keccak=disabled
-        -Dbike_5=disabled -Dbike_3=disabled -Dbike_1=disabled
-        -Dkyber_x25519=disabled -Ddilithium_ed25519=disabled
-        -Dx509_parser=disabled -Dx509_generator=disabled
-        -Dpkcs7_parser=disabled -Dpkcs7_generator=disabled
-        -Dsha2-256=disabled
-        -Dchacha20=disabled -Dchacha20poly1305=disabled
-        -Dchacha20_drng=disabled
-        -Ddrbg_hash=disabled -Ddrbg_hmac=disabled
-        -Dhash_crypt=disabled
-        -Dhmac=disabled -Dhkdf=disabled
-        -Dkdf_ctr=disabled -Dkdf_fb=disabled -Dkdf_dpi=disabled
-        -Dpbkdf2=disabled
-        -Dkmac_drng=disabled -Dcshake_drng=disabled
-        -Dhotp=disabled -Dtotp=disabled
-        -Daes_block=disabled -Daes_cbc=disabled -Daes_ctr=disabled
-        -Daes_kw=disabled -Dapps=disabled
-        _build
-    - meson compile -C _build
-    - meson install -C _build
-    - popd
-    - PKG_CONFIG_PATH=${PWD}/leancrypto-git/$LEANCRYPTO_DIR/lib64/pkgconfig dash ./configure --with-leancrypto --disable-doc --with-pkcs12-iter-count=10000
-    - make -j$BUILDJOBS
-    - make -j$BUILDJOBS check TESTS=""
-
-fedora-leancrypto/test:
-  extends:
-    - .test
-    - .fedora-leancrypto
-  dependencies:
-    - fedora-leancrypto/build
-  needs:
-    - fedora-leancrypto/build
-  script:
-    - PKG_CONFIG_PATH=${PWD}/leancrypto-git/$LEANCRYPTO_DIR/lib64/pkgconfig TESTS_ENABLED_GROUPS="GROUP-X25519-MLKEM768 GROUP-SECP256R1-MLKEM768 GROUP-SECP384R1-MLKEM1024" make -j$CHECKJOBS check
-
-fedora-leancrypto/build-fips:
-  extends:
-    - .build
-    - .fedora-leancrypto
-  needs:
-    - fedora/bootstrap
-  script:
-    - git clone --depth 1 --branch master https://github.com/smuellerDD/leancrypto.git leancrypto-git
-    - pushd leancrypto-git
-    - rm -rf .git               # for artifacts:untracked to work
-    - *leancrypto-setup
-    - meson compile -C _build
-    - meson install -C _build
-    - popd
-    - PKG_CONFIG_PATH=${PWD}/leancrypto-git/$LEANCRYPTO_DIR/lib64/pkgconfig dash ./configure --with-leancrypto --disable-doc --with-pkcs12-iter-count=10000 --enable-fips140-mode --disable-full-test-suite
-    - make -j$BUILDJOBS
-    # build tests, but don't execute them
-    - GNUTLS_FORCE_FIPS_MODE=1 make -j$BUILDJOBS check TESTS=""
-
-fedora-leancrypto/test-fips:
-  extends:
-    - .test
-    - .fedora-leancrypto
-  dependencies:
-    - fedora-leancrypto/build-fips
-  needs:
-    - fedora-leancrypto/build-fips
-  script:
-    - GNUTLS_FORCE_FIPS_MODE=1 PKG_CONFIG_PATH=${PWD}/leancrypto-git/$LEANCRYPTO_DIR/lib64/pkgconfig TESTS_ENABLED_GROUPS="GROUP-X25519-MLKEM768 GROUP-SECP256R1-MLKEM768 GROUP-SECP384R1-MLKEM1024" make -j$CHECKJOBS check
 
 fedora-threadsan/build:
   extends:
