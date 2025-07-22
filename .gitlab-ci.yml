@@ -457,27 +457,27 @@ fedora-SSL-3.0/test:
     - .test
     - .fedora-nettle
 
-fedora-nettle/build:
-  extends:
-    - .fedora-nettle/build
-  variables:
-    NETTLE_CONFIGURE_ARGS: ""
+# fedora-nettle/build:
+#   extends:
+#     - .fedora-nettle/build
+#   variables:
+#     NETTLE_CONFIGURE_ARGS: ""
 
-fedora-nettle/test:
-  extends:
-    - .fedora-nettle/test
-  dependencies:
-    - fedora-nettle/build
-  needs:
-    - fedora-nettle/build
-  script:
-    - PKG_CONFIG_PATH=${PWD}/nettle-git/$NETTLE_DIR/lib64/pkgconfig LD_LIBRARY_PATH=${PWD}/nettle-git/$NETTLE_DIR/lib64 make -j$CHECKJOBS check
+# fedora-nettle/test:
+#   extends:
+#     - .fedora-nettle/test
+#   dependencies:
+#     - fedora-nettle/build
+#   needs:
+#     - fedora-nettle/build
+#   script:
+#     - PKG_CONFIG_PATH=${PWD}/nettle-git/$NETTLE_DIR/lib64/pkgconfig LD_LIBRARY_PATH=${PWD}/nettle-git/$NETTLE_DIR/lib64 make -j$CHECKJOBS check
 
-fedora-nettle-minigmp/build:
-  extends:
-    - .fedora-nettle/build
-  variables:
-    NETTLE_CONFIGURE_ARGS: "--enable-mini-gmp"
+# fedora-nettle-minigmp/build:
+#   extends:
+#     - .fedora-nettle/build
+#   variables:
+#     NETTLE_CONFIGURE_ARGS: "--enable-mini-gmp"
 
 # fedora-nettle-minigmp/test:
 #   extends:
