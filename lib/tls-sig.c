@@ -810,7 +810,7 @@ int _gnutls_handshake_sign_crt_vrfy(gnutls_session_t session,
 		return _gnutls_handshake_sign_crt_vrfy12(session, cert, pkey,
 							 signature);
 
-		/* TLS 1.1 or earlier */
+	/* TLS 1.1 or earlier */
 #ifdef ENABLE_SSL3
 	if (ver->id == GNUTLS_SSL3)
 		return _gnutls_handshake_sign_crt_vrfy3(session, cert, ver,

@@ -158,7 +158,7 @@ void doit(void)
 	if (debug)
 		success("Commitment verification: passed\n");
 
-		/* Verify access to home dir */
+	/* Verify access to home dir */
 #ifndef _WIN32
 	setenv("HOME", getcwd(path, sizeof(path)), 1);
 
