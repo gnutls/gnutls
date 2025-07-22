@@ -165,9 +165,9 @@ commit-check:
   cache: {}
   script:
     # we want $ALPINE_BASE_BUILD without git, so we are adding it here
-    - apk add git bash grep clang18-extra-tools
+    - apk add git bash grep clang19-extra-tools
     - devel/check_if_signed
-    - PATH=/usr/lib/llvm18/bin:$PATH devel/indent-gnutls
+    - PATH=/usr/lib/llvm19/bin:$PATH devel/indent-gnutls
     - devel/check-headers.sh
     - git diff --exit-code # nothing should change version controlled files
   retry: 0
