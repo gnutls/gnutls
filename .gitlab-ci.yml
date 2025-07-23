@@ -130,11 +130,6 @@ default:
   # FIXME: the above step doesn't work on a rootless container
   allow_failure: true
 
-.mingw-vista:
-  variables:
-    # Target Vista instead of XP, currently the default in mingw
-    CPPFLAGS: "-D_WIN32_WINNT=0x600"
-
 .mingw32:
   extends:
     - .mingw
@@ -845,37 +840,6 @@ mingw64/archive:
     - mingw64/build
     - mingw64/test
 
-mingw64-vista/build:
-  extends:
-    - .mingw/build
-    - .mingw64
-    - .mingw-vista
-  needs:
-    - mingw/bootstrap
-
-mingw64-vista/test:
-  extends:
-    - .mingw/test
-    - .mingw64
-    - .mingw-vista
-  variables:
-    GNUTLS_NO_IMPLICIT_INIT: 1
-  dependencies:
-    - mingw64-vista/build
-  needs:
-    - mingw64-vista/build
-
-mingw64-vista/archive:
-  extends:
-    - .mingw/archive
-    - .mingw64
-    - .mingw-vista
-  dependencies:
-    - mingw64-vista/build
-  needs: # archive only if tests successful
-    - mingw64-vista/build
-    - mingw64-vista/test
-
 mingw32/build:
   extends:
     - .mingw/build
@@ -901,36 +865,5 @@ mingw32/archive:
   needs: # archive only if tests successful
     - mingw32/build
     - mingw32/test
-  tags:
-    - gnutls
-
-mingw32-vista/build:
-  extends:
-    - .mingw/build
-    - .mingw32
-    - .mingw-vista
-  needs:
-    - mingw/bootstrap
-
-mingw32-vista/test:
-  extends:
-    - .mingw/test
-    - .mingw32
-    - .mingw-vista
-  dependencies:
-    - mingw32-vista/build
-  needs:
-    - mingw32-vista/build
-
-mingw32-vista/archive:
-  extends:
-    - .mingw/archive
-    - .mingw32
-    - .mingw-vista
-  dependencies:
-    - mingw32-vista/build
-  needs: # archive only if tests successful
-    - mingw32-vista/build
-    - mingw32-vista/test
   tags:
     - gnutls
