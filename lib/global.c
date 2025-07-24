@@ -281,6 +281,14 @@ static int _gnutls_global_init(unsigned constructor)
 	bindtextdomain(PACKAGE, LOCALEDIR);
 #endif
 
+	e = secure_getenv("GNUTLS_BUFFER_RECLAIM");
+	if (e != NULL) {
+		bool reclaiming = e[0] == '1' && e[1] == '\0';
+		_gnutls_debug_log("Using %s buffer allocator...\n",
+				  reclaiming ? "reclaiming" : "non-reclaiming");
+		_gnutls_buffer_set_reclaiming(reclaiming);
+	}
+
 	res = gnutls_crypto_init();
 	if (res != 0) {
 		gnutls_assert();

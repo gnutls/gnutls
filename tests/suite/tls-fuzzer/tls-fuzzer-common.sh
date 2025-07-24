@@ -26,7 +26,10 @@ PSKFILE="${builddir}/tls-fuzzer.psk.$$.tmp"
 
 . "${srcdir}/../scripts/common.sh"
 
-eval "${GETPORT}"
+if test "${GNUTLS_FORCE_FIPS_MODE}" = 1 ; then
+	echo "Cannot run in FIPS140-2 mode"
+	exit 77
+fi
 
 if ! test -d "${srcdir}/tls-fuzzer/tlsfuzzer" ; then
 	exit 77
@@ -35,6 +38,8 @@ fi
 if test "${PYTHON}" = ":" ; then
 	exit 77
 fi
+
+eval "${GETPORT}"
 
 pushd "${srcdir}/tls-fuzzer/tlsfuzzer"
 

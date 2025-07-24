@@ -87,7 +87,7 @@ void doit(void)
 	if (gnutls_fips140_mode_enabled())
 		exit(77);
 
-		/* The overloading of time() seems to work in linux (ELF?)
+	/* The overloading of time() seems to work in linux (ELF?)
 	 * systems only. Disable it on windows.
 	 */
 #ifdef _WIN32

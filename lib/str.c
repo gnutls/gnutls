@@ -128,15 +128,13 @@ int gnutls_buffer_append_data(gnutls_buffer_t dest, const void *data,
 	return 0;
 }
 
-#ifdef AGGRESSIVE_REALLOC
-
 /* Use a simpler logic for reallocation; i.e., always call
  * gnutls_realloc_fast() and do not reclaim the no-longer-used
  * area which has been removed from the beginning of buffer
  * with _gnutls_buffer_pop_datum().  This helps hit more
  * issues when running under valgrind.
  */
-int _gnutls_buffer_resize(gnutls_buffer_st *dest, size_t new_size)
+static int buffer_resize_no_reclaim(gnutls_buffer_st *dest, size_t new_size)
 {
 	size_t unused;
 
@@ -155,8 +153,6 @@ int _gnutls_buffer_resize(gnutls_buffer_st *dest, size_t new_size)
 	return 0;
 }
 
-#else
-
 static void align_allocd_with_data(gnutls_buffer_st *dest)
 {
 	assert(dest->allocd != NULL);
@@ -166,7 +162,7 @@ static void align_allocd_with_data(gnutls_buffer_st *dest)
 	dest->data = dest->allocd;
 }
 
-int _gnutls_buffer_resize(gnutls_buffer_st *dest, size_t new_size)
+static int buffer_resize_reclaim(gnutls_buffer_st *dest, size_t new_size)
 {
 	if (unlikely(dest->data != NULL && dest->allocd == NULL))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -197,7 +193,14 @@ int _gnutls_buffer_resize(gnutls_buffer_st *dest, size_t new_size)
 	}
 }
 
-#endif
+int (*_gnutls_buffer_resize)(gnutls_buffer_st *,
+			     size_t) = buffer_resize_reclaim;
+
+void _gnutls_buffer_set_reclaiming(bool reclaiming)
+{
+	_gnutls_buffer_resize = reclaiming ? buffer_resize_reclaim :
+					     buffer_resize_no_reclaim;
+}
 
 /* Appends the provided string. The null termination byte is appended
  * but not included in length.

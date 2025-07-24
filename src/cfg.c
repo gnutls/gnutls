@@ -104,8 +104,10 @@ static int parser_getc(struct parser_st *parser)
 	if (parser->pushback_length > 0) {
 		return parser->pushback[--parser->pushback_length];
 	}
-	int c = getc(parser->fp);
-	return c;
+	if (feof(parser->fp) || ferror(parser->fp)) {
+		return EOF;
+	}
+	return getc(parser->fp);
 }
 
 static void parser_ungetc(struct parser_st *parser, int c)
