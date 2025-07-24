@@ -521,7 +521,7 @@ fedora-static-analyzers/build:
   #TODO originally, before_script was set to "/bin/true".. is there a reason not to create the cache?
   script:
     - scan-build ./configure --cache-file $CCACHE_FILE --disable-doc --enable-fips140-mode --with-pkcs12-iter-count=10000
-    - make -j$BUILDJOBS syntax-check gnulib_dir=$GNULIB_SRCDIR
+    - make -j$BUILDJOBS syntax-check gnulib_dir=$PWD/gnulib
     - make -j$BUILDJOBS -C gl
     - scan-build --status-bugs -o scan-build-lib make -j$BUILDJOBS -C lib
     - scan-build --status-bugs -o scan-build-lib make -j$BUILDJOBS -C libdane
