@@ -61,13 +61,34 @@ void gnutls_psk_free_client_credentials(gnutls_psk_client_credentials_t sc)
  **/
 int gnutls_psk_allocate_client_credentials(gnutls_psk_client_credentials_t *sc)
 {
+	/* TLS 1.3 - Default binder HMAC algorithm is SHA-256 */
+	return gnutls_psk_allocate_client_credentials2(sc, GNUTLS_MAC_SHA256);
+}
+
+/**
+ * gnutls_psk_allocate_client_credentials2:
+ * @sc: is a pointer to a #gnutls_psk_client_credentials_t type.
+ * @mac: encryption algorithm to use
+ *
+ * Allocate a gnutls_psk_client_credentials_t structure and initializes
+ * the HMAC binder algorithm to @mac.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
+ *   an error code is returned.
+ **/
+int gnutls_psk_allocate_client_credentials2(gnutls_psk_client_credentials_t *sc,
+					    gnutls_mac_algorithm_t mac)
+{
+	/* TLS 1.3 - Only SHA-256 and SHA-384 are allowed */
+	if (mac != GNUTLS_MAC_SHA256 && mac != GNUTLS_MAC_SHA384)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 	*sc = gnutls_calloc(1, sizeof(psk_client_credentials_st));
 
 	if (*sc == NULL)
 		return GNUTLS_E_MEMORY_ERROR;
 
-	/* TLS 1.3 - Default binder HMAC algorithm is SHA-256 */
-	(*sc)->binder_algo = _gnutls_mac_to_entry(GNUTLS_MAC_SHA256);
+	(*sc)->binder_algo = _gnutls_mac_to_entry(mac);
 	return 0;
 }
 
@@ -203,13 +224,40 @@ void gnutls_psk_free_server_credentials(gnutls_psk_server_credentials_t sc)
  **/
 int gnutls_psk_allocate_server_credentials(gnutls_psk_server_credentials_t *sc)
 {
+	/* TLS 1.3 - Default binder HMAC algorithm is SHA-256 */
+	return gnutls_psk_allocate_server_credentials2(sc, GNUTLS_MAC_SHA256);
+}
+
+/**
+ * gnutls_psk_allocate_server_credentials2:
+ * @sc: is a pointer to a #gnutls_psk_server_credentials_t type.
+ * @mac: encryption algorithm to use
+ *
+ * Allocate a gnutls_psk_server_credentials_t structure and initializes
+ * the HMAC binder algorithm to @mac. If @mac is set to GNUTLS_MAC_UNKNOWN
+ * both possible algorithms SHA384 and SHA256 are applied to find a matching
+ * binder value.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
+ *   an error code is returned.
+ **/
+int gnutls_psk_allocate_server_credentials2(gnutls_psk_server_credentials_t *sc,
+					    gnutls_mac_algorithm_t mac)
+{
+	/*
+	 * TLS 1.3 - Only SHA-256 and SHA-384 are allowed;
+	 * additionally allow GNUTLS_MAC_UNKNOWN for autodetection.
+	 */
+	if (mac != GNUTLS_MAC_SHA256 && mac != GNUTLS_MAC_SHA384 &&
+	    mac != GNUTLS_MAC_UNKNOWN)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 	*sc = gnutls_calloc(1, sizeof(psk_server_cred_st));
 
 	if (*sc == NULL)
 		return GNUTLS_E_MEMORY_ERROR;
 
-	/* TLS 1.3 - Default binder HMAC algorithm is SHA-256 */
-	(*sc)->binder_algo = _gnutls_mac_to_entry(GNUTLS_MAC_SHA256);
+	(*sc)->binder_algo = _gnutls_mac_to_entry(mac);
 	return 0;
 }
 

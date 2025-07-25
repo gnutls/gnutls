@@ -2595,6 +2595,9 @@ typedef enum gnutls_psk_key_flags {
 
 void gnutls_psk_free_client_credentials(gnutls_psk_client_credentials_t sc);
 int gnutls_psk_allocate_client_credentials(gnutls_psk_client_credentials_t *sc);
+int gnutls_psk_allocate_client_credentials2(gnutls_psk_client_credentials_t *sc,
+					    gnutls_mac_algorithm_t mac);
+
 int gnutls_psk_set_client_credentials(gnutls_psk_client_credentials_t res,
 				      const char *username,
 				      const gnutls_datum_t *key,
@@ -2606,6 +2609,8 @@ int gnutls_psk_set_client_credentials2(gnutls_psk_client_credentials_t res,
 
 void gnutls_psk_free_server_credentials(gnutls_psk_server_credentials_t sc);
 int gnutls_psk_allocate_server_credentials(gnutls_psk_server_credentials_t *sc);
+int gnutls_psk_allocate_server_credentials2(gnutls_psk_server_credentials_t *sc,
+					    gnutls_mac_algorithm_t mac);
 int gnutls_psk_set_server_credentials_file(gnutls_psk_server_credentials_t res,
 					   const char *password_file);
 
