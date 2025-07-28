@@ -277,7 +277,7 @@ fedora-minimal/build:
     - dnf install -y libtasn1-tools
     - dash ./configure --cache-file $CCACHE_FILE --with-included-libtasn1
       --disable-doc --disable-dtls-srtp-support --disable-alpn-support --disable-tests
-      --disable-heartbeat-support --disable-srp-authentication --disable-psk-authentication
+      --disable-psk-authentication
       --disable-anon-authentication --disable-dhe --disable-ecdhe
       --disable-ocsp --disable-non-suiteb-curves --with-included-unistring
       --disable-nls --disable-libdane --without-p11-kit --without-tpm --without-tpm2
@@ -409,7 +409,7 @@ fedora-interop/test:
     - tmt run -a -e "SLICE_TOTAL=$SLICES" -e "SLICE_ID=$SLICEID" plans -n interop tests -f "tag:interop-gnutls" -f "tag:interop-$TYPE" -f "tag:interop-$COMPONENT" provision -h local --feeling-safe execute -h tmt --interactive
     - if [[ $PATH != $CI_PROJECT_DIR/src:* ]]; then echo "Wrong PATH=$PATH"; false; fi
 
-fedora-SSL-3.0/build:
+fedora-legacy/build:
   extends:
     - .build
     - .fedora
@@ -417,19 +417,19 @@ fedora-SSL-3.0/build:
     - fedora/bootstrap
   script:
     - update-crypto-policies --set LEGACY
-    - dash ./configure --disable-tls13-interop --disable-gcc-warnings --cache-file $CCACHE_FILE --enable-sha1-support --enable-ssl3-support --enable-seccomp-tests --disable-doc --disable-strict-der-time --with-pkcs12-iter-count=10000
+    - dash ./configure --disable-tls13-interop --disable-gcc-warnings --cache-file $CCACHE_FILE --enable-sha1-support --enable-ssl3-support --enable-seccomp-tests --enable-heartbeat-support --enable-srp-authentication --disable-doc --disable-strict-der-time --with-pkcs12-iter-count=10000
     - make -j$BUILDJOBS
     # build tests, but don't execute them
     - make -j$BUILDJOBS check TESTS=""
 
-fedora-SSL-3.0/test:
+fedora-legacy/test:
   extends:
     - .test
     - .fedora
   dependencies:
-    - fedora-SSL-3.0/build
+    - fedora-legacy/build
   needs:
-    - fedora-SSL-3.0/build
+    - fedora-legacy/build
 
 .fedora-nettle/build:
   extends:
