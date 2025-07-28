@@ -183,7 +183,6 @@ fedora-docdist/build:
     - make -j$BUILDJOBS -C doc stamp_enums
     - make -j$BUILDJOBS
     - make -j$BUILDJOBS -C doc gnutls.html
-    - texconfig rehash
     - make -j$BUILDJOBS -C doc/latex gnutls.pdf
     - DB2EPUBDIR=$(dirname $(find /usr/share/sgml/docbook/xsl-ns-stylesheets-*/epub/bin/ -name dbtoepub -print))
     - PATH="$PATH:$DB2EPUBDIR" make -C doc gnutls.epub
