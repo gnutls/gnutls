@@ -599,6 +599,7 @@ fedora-cross/bootstrap:
   extends:
     - .bootstrap
     - .fedora-cross
+  when: manual
 
 .fedora-cross/build:
   extends:
