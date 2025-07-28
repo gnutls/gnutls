@@ -869,6 +869,11 @@ int gnutls_ext_register(const char *name, int id,
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
 	tmp_mod->name = gnutls_strdup(name);
+	if (tmp_mod->name == NULL) {
+		gnutls_free(tmp_mod);
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+	}
+
 	tmp_mod->free_struct = 1;
 	tmp_mod->tls_id = id;
 	tmp_mod->gid = gid;
@@ -978,6 +983,9 @@ int gnutls_session_ext_register(gnutls_session_t session, const char *name,
 
 	memset(&tmp_mod, 0, sizeof(hello_ext_entry_st));
 	tmp_mod.name = gnutls_strdup(name);
+	if (tmp_mod.name == NULL)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
 	tmp_mod.free_struct = 1;
 	tmp_mod.tls_id = id;
 	tmp_mod.gid = gid;

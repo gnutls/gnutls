@@ -41,17 +41,26 @@ static int srp_cb(gnutls_session_t session, const char *username,
 	int ret;
 
 	salt->data = (unsigned char *)gnutls_malloc(SALT_SIZE);
+	if (salt->data == NULL)
+		return -1;
+
 	memcpy(salt->data, (unsigned char *)SALT, SALT_SIZE);
 	salt->size = SALT_SIZE;
 
 	generator->data = (unsigned char *)gnutls_malloc(
 		gnutls_srp_1024_group_generator.size);
+	if (generator->data == NULL)
+		return -1;
+
 	memcpy(generator->data, gnutls_srp_1024_group_generator.data,
 	       gnutls_srp_1024_group_generator.size);
 	generator->size = gnutls_srp_1024_group_generator.size;
 
 	prime->data = (unsigned char *)gnutls_malloc(
 		gnutls_srp_1024_group_prime.size);
+	if (prime->data == NULL)
+		return -1;
+
 	memcpy(prime->data, gnutls_srp_1024_group_prime.data,
 	       gnutls_srp_1024_group_prime.size);
 	prime->size = gnutls_srp_1024_group_prime.size;

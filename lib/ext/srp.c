@@ -150,12 +150,15 @@ static int _gnutls_srp_send_params(gnutls_session_t session,
 		priv->username = gnutls_strdup(cred->username);
 		if (priv->username == NULL) {
 			gnutls_assert();
+			ret = GNUTLS_E_MEMORY_ERROR;
 			goto cleanup;
 		}
 
 		priv->password = gnutls_strdup(cred->password);
 		if (priv->password == NULL) {
+			gnutls_free(priv->username);
 			gnutls_assert();
+			ret = GNUTLS_E_MEMORY_ERROR;
 			goto cleanup;
 		}
 
@@ -171,7 +174,8 @@ static int _gnutls_srp_send_params(gnutls_session_t session,
 		if (cred->get_function(session, &username, &password) < 0 ||
 		    username == NULL || password == NULL) {
 			gnutls_assert();
-			return GNUTLS_E_ILLEGAL_SRP_USERNAME;
+			ret = GNUTLS_E_ILLEGAL_SRP_USERNAME;
+			goto cleanup;
 		}
 
 		len = MIN(strlen(username), 255);
@@ -258,6 +262,7 @@ static int _gnutls_srp_unpack(gnutls_buffer_st *ps,
 error:
 	_gnutls_free_datum(&username);
 	_gnutls_free_datum(&password);
+	gnutls_free(priv);
 	return ret;
 }
 
