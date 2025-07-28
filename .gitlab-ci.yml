@@ -368,7 +368,10 @@ fedora/test:
     matrix:
       - FIPS: [fips, no-fips]
         PQC: [pqc, no-pqc]
-        KTLS: [ktls, no-ktls]
+        KTLS: no-ktls
+      - FIPS: [fips, no-fips]
+        PQC: no-pqc
+        KTLS: ktls
 
 fedora-interop/test:
   extends:
