@@ -28,27 +28,27 @@ if [ "$(id -u)" -ne 0 ]; then
 	exit 77
 fi
 
-if [ -z "$(which swtpm 2>/dev/null)" ]; then
+if ! command -v swtpm >/dev/null; then
 	echo "Need swtpm package to run this test."
 	exit 77
 fi
 
-if [ -z "$(which tcsd 2>/dev/null)" ]; then
+if ! command -v tcsd >/dev/null; then
 	echo "Need tcsd (TrouSerS) package to run this test."
 	exit 77
 fi
 
-if [ -z "$(which tpm_createek 2>/dev/null)" ]; then
+if ! command -v tpm_createek >/dev/null; then
 	echo "Need tpm_createek from tpm-tools package to run this test."
 	exit 77
 fi
 
-if [ -z "$(which ncat 2>/dev/null)" ]; then
+if ! command -v ncat >/dev/null; then
 	echo "Need ncat from nmap-ncat package to run this test."
 	exit 77
 fi
 
-if [ -z "$(which expect 2>/dev/null)" ]; then
+if ! command -v expect >/dev/null; then
 	echo "Need expect from expect package to run this test."
 	exit 77
 fi

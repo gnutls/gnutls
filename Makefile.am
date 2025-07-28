@@ -18,9 +18,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this file.  If not, see <https://www.gnu.org/licenses/>.
 
+# Note: libdane is required by the abi-check-latest target used in
+# distcheck-hook.
 AM_DISTCHECK_CONFIGURE_FLAGS = \
 	--enable-doc \
 	--enable-gtk-doc \
+	--enable-libdane \
 	--disable-valgrind-tests
 
 SUBDIRS = gl lib extra
