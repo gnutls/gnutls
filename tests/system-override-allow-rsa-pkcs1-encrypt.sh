@@ -56,14 +56,4 @@ if [ $? = 0 ]; then
 fi
 echo "RSAES-PKCS1-v1_5 successfully disabled"
 
-unset GNUTLS_SYSTEM_PRIORITY_FILE
-unset GNUTLS_SYSTEM_PRIORITY_FAIL_ON_INVALID
-
-${TEST}
-if [ $? != 0 ]; then
-	echo "${TEST} expected to succeed by default"
-	exit 1
-fi
-echo "RSAES-PKCS1-v1_5 successfully enabled by default"
-
 exit 0

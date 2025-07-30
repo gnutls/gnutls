@@ -2336,7 +2336,7 @@ int gnutls_pubkey_encrypt_data(gnutls_pubkey_t key, unsigned int flags,
 	}
 
 	return _gnutls_pk_encrypt(key->params.algo, ciphertext, plaintext,
-				  &key->params);
+				  &key->params, &key->params.spki);
 }
 
 static int pubkey_supports_sig(gnutls_pubkey_t pubkey,

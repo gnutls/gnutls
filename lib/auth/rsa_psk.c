@@ -178,7 +178,7 @@ static int _gnutls_gen_rsa_psk_client_kx(gnutls_session_t session,
 
 	/* Encrypt premaster secret */
 	if ((ret = _gnutls_pk_encrypt(GNUTLS_PK_RSA, &sdata, &premaster_secret,
-				      &params)) < 0) {
+				      &params, &params.spki)) < 0) {
 		gnutls_assert();
 		return ret;
 	}
