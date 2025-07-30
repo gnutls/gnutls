@@ -388,6 +388,7 @@ static int init_tpm2_key(ESYS_CONTEXT **ctx, ESYS_TR *key_handle,
 		goto error;
 	}
 
+#ifdef HAVE_ESYS_SETCRYPTOCALLBACKS
 	rc = _gnutls_setup_tss2_callbacks(*ctx);
 	if (rc) {
 		gnutls_assert();
@@ -396,6 +397,7 @@ static int init_tpm2_key(ESYS_CONTEXT **ctx, ESYS_TR *key_handle,
 			rc);
 		goto error;
 	}
+#endif
 
 	rc = GNUTLS_TSS2_ESYS_FUNC(Esys_Startup)(*ctx, TPM2_SU_CLEAR);
 	if (rc == TPM2_RC_INITIALIZE) {
