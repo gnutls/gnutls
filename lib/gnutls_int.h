@@ -876,9 +876,6 @@ typedef struct {
 	/* The epoch that the next handshake will initialize. */
 	uint16_t epoch_next;
 
-	/* The epoch at index 0 of record_parameters. */
-	uint16_t epoch_min;
-
 	/* this is the ciphersuite we are going to use
 	 * moved here from internals in order to be restored
 	 * on resume;
