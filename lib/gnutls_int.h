@@ -876,9 +876,6 @@ typedef struct {
 	/* The epoch that the next handshake will initialize. */
 	uint16_t epoch_next;
 
-	/* The epoch at index 0 of record_parameters. */
-	uint16_t epoch_min;
-
 	/* this is the ciphersuite we are going to use
 	 * moved here from internals in order to be restored
 	 * on resume;
@@ -1675,7 +1672,7 @@ typedef struct {
 } internals_st;
 
 /* Maximum number of epochs we keep around. */
-#define MAX_EPOCH_INDEX 4
+#define MAX_EPOCH_INDEX 16
 
 #define reset_cand_groups(session)                                            \
 	session->internals.cand_ec_group = session->internals.cand_dh_group = \

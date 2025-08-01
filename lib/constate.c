@@ -932,17 +932,23 @@ static inline int epoch_resolve(gnutls_session_t session,
 static inline record_parameters_st **epoch_get_slot(gnutls_session_t session,
 						    uint16_t epoch)
 {
-	uint16_t epoch_index = epoch - session->security_parameters.epoch_min;
-
-	if (epoch_index >= MAX_EPOCH_INDEX) {
-		_gnutls_handshake_log(
-			"Epoch %d out of range (idx: %d, max: %d)\n",
-			(int)epoch, (int)epoch_index, MAX_EPOCH_INDEX);
-		gnutls_assert();
-		return NULL;
+	/* First look for a non-empty slot */
+	for (size_t i = 0; i < MAX_EPOCH_INDEX; i++) {
+		record_parameters_st **slot = &session->record_parameters[i];
+		if (*slot != NULL && (*slot)->epoch == epoch)
+			return slot;
 	}
-	/* The slot may still be empty (NULL) */
-	return &session->record_parameters[epoch_index];
+
+	/* Then look for an empty slot */
+	for (size_t i = 0; i < MAX_EPOCH_INDEX; i++) {
+		record_parameters_st **slot = &session->record_parameters[i];
+		if (*slot == NULL)
+			return slot;
+	}
+
+	gnutls_assert();
+	_gnutls_handshake_log("No slot available for epoch %u\n", epoch);
+	return NULL;
 }
 
 int _gnutls_epoch_get(gnutls_session_t session, unsigned int epoch_rel,
@@ -1063,8 +1069,7 @@ static inline int epoch_alive(gnutls_session_t session,
 
 void _gnutls_epoch_gc(gnutls_session_t session)
 {
-	int i, j;
-	unsigned int min_index = 0;
+	int i;
 
 	_gnutls_record_log("REC[%p]: Start of epoch cleanup\n", session);
 
@@ -1090,26 +1095,6 @@ void _gnutls_epoch_gc(gnutls_session_t session)
 			}
 		}
 	}
-
-	/* Look for contiguous NULLs at the start of the array */
-	for (i = 0;
-	     i < MAX_EPOCH_INDEX && session->record_parameters[i] == NULL; i++)
-		;
-	min_index = i;
-
-	/* Pick up the slack in the epoch window. */
-	if (min_index != 0) {
-		for (i = 0, j = min_index; j < MAX_EPOCH_INDEX; i++, j++) {
-			session->record_parameters[i] =
-				session->record_parameters[j];
-			session->record_parameters[j] = NULL;
-		}
-	}
-
-	/* Set the new epoch_min */
-	if (session->record_parameters[0] != NULL)
-		session->security_parameters.epoch_min =
-			session->record_parameters[0]->epoch;
 
 	gnutls_mutex_unlock(&session->internals.epoch_lock);
 
