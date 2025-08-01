@@ -414,7 +414,10 @@ static int name_constraints_node_list_intersect(
 				gnutls_assert();
 				goto cleanup;
 			}
-			used = 1;
+
+			if (t->type == t2->type)
+				used = 1;
+
 			// if intersection is not empty
 			if (tmp !=
 			    NULL) { // intersection for this type is not empty

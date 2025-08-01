@@ -418,6 +418,61 @@ void doit(void)
 	gnutls_x509_name_constraints_deinit(nc1);
 	gnutls_x509_name_constraints_deinit(nc2);
 
+	/* 5: variant of suite 0: after moving rfc822Name (ccc.com)
+	 * from NC1 to NC2, dNSName (xxx.ccc.com) should still be
+	 * rejected.
+	 *
+	 * NC1: permitted DNS org
+	 *      permitted DNS ccc.com
+	 * NC2: permitted DNS org
+	 *      permitted email ccc.com
+	 *      permitted DNS aaa.bbb.ccc.com
+	 */
+	suite = 5;
+
+	ret = gnutls_x509_name_constraints_init(&nc1);
+	check_for_error(ret);
+
+	ret = gnutls_x509_name_constraints_init(&nc2);
+	check_for_error(ret);
+
+	set_name("org", &name);
+	ret = gnutls_x509_name_constraints_add_permitted(
+		nc1, GNUTLS_SAN_DNSNAME, &name);
+	check_for_error(ret);
+
+	set_name("ccc.com", &name);
+	ret = gnutls_x509_name_constraints_add_permitted(
+		nc1, GNUTLS_SAN_DNSNAME, &name);
+	check_for_error(ret);
+
+	set_name("org", &name);
+	ret = gnutls_x509_name_constraints_add_permitted(
+		nc2, GNUTLS_SAN_DNSNAME, &name);
+	check_for_error(ret);
+
+	set_name("ccc.com", &name);
+	ret = gnutls_x509_name_constraints_add_permitted(
+		nc2, GNUTLS_SAN_RFC822NAME, &name);
+	check_for_error(ret);
+
+	set_name("aaa.bbb.ccc.com", &name);
+	ret = gnutls_x509_name_constraints_add_permitted(
+		nc2, GNUTLS_SAN_DNSNAME, &name);
+	check_for_error(ret);
+
+	ret = _gnutls_x509_name_constraints_merge(nc1, nc2);
+	check_for_error(ret);
+
+	/* check intersection of permitted */
+	set_name("xxx.ccc.com", &name);
+	ret = gnutls_x509_name_constraints_check(nc1, GNUTLS_SAN_DNSNAME,
+						 &name);
+	check_test_result(suite, ret, NAME_REJECTED, &name);
+
+	gnutls_x509_name_constraints_deinit(nc1);
+	gnutls_x509_name_constraints_deinit(nc2);
+
 	/* Test footer */
 
 	if (debug)
