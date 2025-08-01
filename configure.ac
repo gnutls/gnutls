@@ -1089,6 +1089,19 @@ AS_IF([test "$with_tpm2" = dlopen], [
     CFLAGS="$save_CFLAGS"
 ])
 
+AS_IF([test -n "$tss2lib"], [
+    # Check for Esys_SetCryptoCallbacks availability
+    save_LIBS=$LIBS
+    save_CFLAGS=$CFLAGS
+    LIBS="$LIBS $TSS2_ESYS_LIBS"
+    CFLAGS="$CFLAGS $TSS2_ESYS_CFLAGS"
+    AC_CHECK_FUNCS([Esys_SetCryptoCallbacks])
+    LIBS="$save_LIBS"
+    CFLAGS="$save_CFLAGS"
+])
+
+AM_CONDITIONAL(NEED_ESYS_CRYPTO_CALLBACKS, test "$ac_cv_func_Esys_SetCryptoCallbacks" = "yes")
+
 AC_ARG_WITH(tpm,
 	AS_HELP_STRING([--without-tpm],
 		[Disable TPM (trousers) support.]),

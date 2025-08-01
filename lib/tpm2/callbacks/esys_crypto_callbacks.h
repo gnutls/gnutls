@@ -26,6 +26,8 @@
 
 typedef struct ESYS_CONTEXT ESYS_CONTEXT;
 
+#ifdef HAVE_ESYS_SETCRYPTOCALLBACKS
 int _gnutls_setup_tss2_callbacks(ESYS_CONTEXT *ctx);
+#endif
 
 #endif /* GNUTLS_LIB_TPM2_ESYS_CALLBACKS_H */
