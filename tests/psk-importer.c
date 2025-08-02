@@ -71,6 +71,10 @@ static int server_pskfunc(gnutls_session_t session,
 		printf("psk: Got username with length %d\n", username->size);
 
 	key->data = gnutls_malloc(4);
+	if (key->data == NULL) {
+		return -1;
+	}
+
 	key->data[0] = 0xDE;
 	key->data[1] = 0xAD;
 	key->data[2] = 0xBE;
@@ -114,6 +118,11 @@ static int client_pskfunc(gnutls_session_t session, gnutls_datum_t *username,
 	}
 
 	key->data = gnutls_malloc(4);
+	if (key->data == NULL) {
+		gnutls_free(username->data);
+		return -1;
+	}
+
 	key->data[0] = 0xDE;
 	key->data[1] = 0xAD;
 	key->data[2] = 0xBE;
