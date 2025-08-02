@@ -402,6 +402,10 @@ int gnutls_x509_dn_init(gnutls_x509_dn_t *dn)
 	int result;
 
 	*dn = gnutls_calloc(1, sizeof(gnutls_x509_dn_st));
+	if (*dn == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 
 	if ((result = asn1_create_element(_gnutls_get_pkix(), "PKIX1.Name",
 					  &(*dn)->asn)) != ASN1_SUCCESS) {
