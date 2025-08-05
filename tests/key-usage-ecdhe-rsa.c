@@ -194,17 +194,23 @@ static int cert_callback(gnutls_session_t session,
 
 		ret = gnutls_pcert_import_x509_raw(p, &enc_cert,
 						   GNUTLS_X509_FMT_PEM, 0);
-		if (ret < 0)
+		if (ret < 0) {
+			gnutls_free(p);
 			return -1;
+		}
 
 		ret = gnutls_privkey_init(&lkey);
-		if (ret < 0)
+		if (ret < 0) {
+			gnutls_free(p);
 			return -1;
+		}
 
 		ret = gnutls_privkey_import_x509_raw(
 			lkey, &enc_key, GNUTLS_X509_FMT_PEM, NULL, 0);
-		if (ret < 0)
+		if (ret < 0) {
+			gnutls_free(p);
 			return -1;
+		}
 
 		g_pcert = p;
 		g_pkey = lkey;
