@@ -2245,6 +2245,10 @@ static int detailed_verification(gnutls_x509_crt_t cert,
 		ret = gnutls_x509_crl_get_number(crl, tmp, &tmp_size, NULL);
 		if (ret < 0) {
 			serial.data = (void *)gnutls_strdup("unnumbered");
+			if (serial.data == NULL) {
+				fprintf(stderr, "out of memory\n");
+				app_exit(1);
+			}
 		} else {
 			data.data = (void *)tmp;
 			data.size = tmp_size;
