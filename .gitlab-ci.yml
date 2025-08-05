@@ -31,7 +31,7 @@ variables:
   GNULIB_TOOL_IMPL: py
 
 cache:
-  key: "$CI_JOB_NAME-ver44"
+  key: "$CI_JOB_NAME-ver45"
   paths:
     - cache/
 

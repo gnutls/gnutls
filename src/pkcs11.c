@@ -322,10 +322,21 @@ void pkcs11_list(FILE *outfile, const char *url, int type, unsigned int flags,
 		if (vendor) {
 			objurl = gnutls_malloc(strlen(output) + strlen(vendor) +
 					       1);
+			if (objurl == NULL) {
+				fprintf(stderr, "memory error\n");
+				gnutls_free(output);
+				app_exit(1);
+			}
+
 			strcpy(objurl, output);
 			strcat(objurl, vendor);
 		} else {
 			objurl = gnutls_strdup(output);
+			if (objurl == NULL) {
+				fprintf(stderr, "memory error\n");
+				gnutls_free(output);
+				app_exit(1);
+			}
 		}
 
 		p = NULL;

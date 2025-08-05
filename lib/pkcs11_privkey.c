@@ -401,6 +401,12 @@ retry_login:
 	}
 
 	tmp.data = gnutls_malloc(siglen);
+	if (tmp.data == NULL) {
+		gnutls_assert();
+		ret = GNUTLS_E_MEMORY_ERROR;
+		goto cleanup;
+	}
+
 	tmp.size = siglen;
 
 	rv = pkcs11_sign(sinfo->module, sinfo->pks, hash->data, hash->size,
@@ -757,6 +763,12 @@ retry_login:
 	}
 
 	plaintext->data = gnutls_malloc(siglen);
+	if (plaintext->data == NULL) {
+		gnutls_assert();
+		ret = GNUTLS_E_MEMORY_ERROR;
+		goto cleanup;
+	}
+
 	plaintext->size = siglen;
 
 	rv = pkcs11_decrypt(key->sinfo.module, key->sinfo.pks, ciphertext->data,

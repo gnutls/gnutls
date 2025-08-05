@@ -321,6 +321,11 @@ static int pskfunc(gnutls_session_t session, const char *username,
 		   gnutls_datum_t *key)
 {
 	key->data = gnutls_malloc(4);
+	if (key->data == NULL) {
+		fprintf(stderr, "memory error\n");
+		return -1;
+	}
+
 	key->data[0] = 0xDE;
 	key->data[1] = 0xAD;
 	key->data[2] = 0xBE;
