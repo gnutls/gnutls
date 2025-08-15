@@ -84,6 +84,8 @@ static void client(int sd, const char *prio, unsigned exp_hint)
 	side = "client";
 
 	user.data = gnutls_malloc(4);
+	assert(user.data != NULL);
+
 	user.data[0] = 0xCA;
 	user.data[1] = 0xFE;
 	user.data[2] = 0xCA;

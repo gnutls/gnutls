@@ -272,11 +272,15 @@ static void get_dn_by_oid(gnutls_x509_crl_t crl,
 	       0);
 
 	char *crt_buf = gnutls_calloc(DN_MAX_LEN, sizeof(char));
+	assert(crt_buf != NULL);
+
 	size_t crt_buf_size = DN_MAX_LEN;
 	gnutls_x509_crt_get_issuer_dn_by_oid(crt, "2.5.4.3", 0, 0, crt_buf,
 					     &crt_buf_size);
 
 	char *crl_buf = gnutls_calloc(DN_MAX_LEN, sizeof(char));
+	assert(crl_buf != NULL);
+
 	size_t crl_buf_size = DN_MAX_LEN;
 	gnutls_x509_crl_get_issuer_dn_by_oid(crl, "2.5.4.3", 0, 0, crl_buf,
 					     &crl_buf_size);

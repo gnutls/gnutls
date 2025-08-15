@@ -86,6 +86,8 @@ static int srpfunc(gnutls_session_t session, const char *username,
 		printf("srp: username %s\n", username);
 
 	generator->data = gnutls_malloc(1);
+	assert(generator->data != NULL);
+
 	generator->data[0] = 2;
 	generator->size = 1;
 
