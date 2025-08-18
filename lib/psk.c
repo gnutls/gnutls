@@ -256,8 +256,12 @@ int gnutls_psk_allocate_server_credentials2(gnutls_psk_server_credentials_t *sc,
 
 	if (*sc == NULL)
 		return GNUTLS_E_MEMORY_ERROR;
-
-	(*sc)->binder_algo = _gnutls_mac_to_entry(mac);
+	/*
+	 * For GNUTLS_MAC_UNKNOWN, setting binder_algo to NULL allows
+	 * for auto-detction.
+	 */
+	(*sc)->binder_algo =
+		(mac == GNUTLS_MAC_UNKNOWN ? NULL : _gnutls_mac_to_entry(mac));
 	return 0;
 }
 

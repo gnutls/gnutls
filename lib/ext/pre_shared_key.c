@@ -886,9 +886,9 @@ retry_binder:
 			gnutls_psk_key_flags flags;
 			uint8_t ipsk[MAX_HASH_SIZE];
 
-			prf = pskcred->binder_algo;
-			if (prf->id == GNUTLS_MAC_UNKNOWN)
-				prf = _gnutls_mac_to_entry(mac);
+			prf = pskcred->binder_algo == NULL ?
+				      _gnutls_mac_to_entry(mac) :
+				      pskcred->binder_algo;
 
 			/* this fails only on configuration errors; as such we always
 			 * return its error code in that case */
@@ -983,7 +983,7 @@ retry_binder:
 		 * even for SHA384 PSKs, so we need to retry with SHA256
 		 * to calculate the correct binder value for those.
 		 */
-		if (prf->id == GNUTLS_MAC_UNKNOWN && mac == GNUTLS_MAC_SHA384) {
+		if (pskcred->binder_algo == NULL && mac == GNUTLS_MAC_SHA384) {
 			mac = GNUTLS_MAC_SHA256;
 			goto retry_binder;
 		}
