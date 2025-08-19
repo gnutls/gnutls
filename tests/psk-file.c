@@ -99,7 +99,8 @@ static void tls_log_func(int level, const char *str)
 
 static void client(int sd, const char *prio, const gnutls_datum_t *user,
 		   const gnutls_datum_t *key, unsigned expect_hint,
-		   int expect_fail, int exp_kx, unsigned binary_user)
+		   int expect_fail, int exp_kx, unsigned binary_user,
+		   gnutls_mac_algorithm_t mac)
 {
 	int ret, ii, kx;
 	gnutls_session_t session;
@@ -114,7 +115,12 @@ static void client(int sd, const char *prio, const gnutls_datum_t *user,
 
 	side = "client";
 
-	gnutls_psk_allocate_client_credentials(&pskcred);
+	/* gnutls_psk_allocate_client_credentials calls _credentials2
+	 * with GNUTLS_MAC_SHA256 */
+	if (mac != GNUTLS_MAC_SHA256)
+		gnutls_psk_allocate_client_credentials2(&pskcred, mac);
+	else
+		gnutls_psk_allocate_client_credentials(&pskcred);
 
 	if (binary_user) {
 		gnutls_psk_set_client_credentials2(pskcred, user, key,
@@ -214,7 +220,7 @@ end:
 
 static void server(int sd, const char *prio, const gnutls_datum_t *user,
 		   bool no_cred, int expect_fail, int exp_kx,
-		   unsigned binary_user)
+		   unsigned binary_user, gnutls_mac_algorithm_t mac)
 {
 	gnutls_psk_server_credentials_t server_pskcred;
 	int ret, kx;
@@ -237,7 +243,13 @@ static void server(int sd, const char *prio, const gnutls_datum_t *user,
 	if (psk_file == NULL)
 		psk_file = (char *)"psk.passwd";
 
-	gnutls_psk_allocate_server_credentials(&server_pskcred);
+	/* gnutls_psk_allocate_server_credentials calls _credentials2
+	 * with GNUTLS_MAC_SHA256 */
+	if (mac != GNUTLS_MAC_SHA256)
+		gnutls_psk_allocate_server_credentials2(&server_pskcred, mac);
+	else
+		gnutls_psk_allocate_server_credentials(&server_pskcred);
+
 	gnutls_psk_set_server_credentials_hint(server_pskcred, "hint");
 	ret = gnutls_psk_set_server_credentials_file(server_pskcred, psk_file);
 	if (ret < 0) {
@@ -378,11 +390,12 @@ static void print_user(const char *caption, const char *prio,
 			(const char *)user->data);
 }
 
-static void run_test3(const char *prio, const char *sprio,
+static void run_test4(const char *prio, const char *sprio,
 		      const gnutls_datum_t *user, const gnutls_datum_t *key,
 		      bool no_cred, unsigned expect_hint, int exp_kx,
 		      int expect_fail_cli, int expect_fail_serv,
-		      unsigned binary_user)
+		      unsigned binary_user, gnutls_mac_algorithm_t mac_cli,
+		      gnutls_mac_algorithm_t mac_serv)
 {
 	pid_t child;
 	int err;
@@ -414,15 +427,26 @@ static void run_test3(const char *prio, const char *sprio,
 		int status;
 		/* parent */
 		server(sockets[0], sprio ? sprio : prio, user, no_cred,
-		       expect_fail_serv, exp_kx, binary_user);
+		       expect_fail_serv, exp_kx, binary_user, mac_serv);
 		wait(&status);
 		check_wait_status(status);
 	} else {
 		close(sockets[0]);
 		client(sockets[1], prio, user, key, expect_hint,
-		       expect_fail_cli, exp_kx, binary_user);
+		       expect_fail_cli, exp_kx, binary_user, mac_cli);
 		exit(0);
 	}
+}
+
+static void run_test3(const char *prio, const char *sprio,
+		      const gnutls_datum_t *user, const gnutls_datum_t *key,
+		      bool no_cred, unsigned expect_hint, int exp_kx,
+		      int expect_fail_cli, int expect_fail_serv,
+		      unsigned binary_user)
+{
+	run_test4(prio, sprio, user, key, no_cred, expect_hint, exp_kx,
+		  expect_fail_cli, expect_fail_serv, binary_user,
+		  GNUTLS_MAC_SHA256, GNUTLS_MAC_SHA256);
 }
 
 static void run_test2(const char *prio, const char *sprio,
@@ -714,6 +738,15 @@ void doit(void)
 	run_test3("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK:+DHE-PSK", NULL,
 		  &user_null_2, &key, 1, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED,
 		  GNUTLS_E_INSUFFICIENT_CREDENTIALS, 1);
+
+	/* try with different PSK binder algorithms, where the server
+	 * should auto-detect */
+	run_test4("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK", NULL, &user_jas, &key,
+		  0, 0, GNUTLS_KX_PSK, 0, 0, 0, GNUTLS_MAC_SHA256,
+		  GNUTLS_MAC_UNKNOWN);
+	run_test4("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK", NULL, &user_jas, &key,
+		  0, 0, GNUTLS_KX_PSK, 0, 0, 0, GNUTLS_MAC_SHA384,
+		  GNUTLS_MAC_UNKNOWN);
 }
 
 #endif /* _WIN32 */
