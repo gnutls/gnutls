@@ -785,8 +785,8 @@ cleanup:
 	if (free_username)
 		_gnutls_free_datum(&username);
 
-	_gnutls_free_temp_key_datum(&user_key);
-	_gnutls_free_temp_key_datum(&rkey);
+	_gnutls_free_key_datum(&user_key);
+	_gnutls_free_key_datum(&rkey);
 
 	return ret;
 }
@@ -926,11 +926,11 @@ retry_binder:
 
 				ret = derive_ipsk(prf, &psk.identity, &key,
 						  ipsk);
-				_gnutls_free_temp_key_datum(&key);
 				if (ret < 0) {
 					gnutls_assert();
 					goto fail;
 				}
+				_gnutls_free_key_datum(&key);
 				ret = _gnutls_set_datum(&key, ipsk,
 							prf->output_size);
 				zeroize_key(ipsk, sizeof(ipsk));
@@ -985,6 +985,7 @@ retry_binder:
 		 */
 		if (pskcred->binder_algo == NULL && mac == GNUTLS_MAC_SHA384) {
 			mac = GNUTLS_MAC_SHA256;
+			_gnutls_free_key_datum(&key);
 			goto retry_binder;
 		}
 		gnutls_assert();
@@ -1085,7 +1086,7 @@ retry_binder:
 	}
 
 fail:
-	_gnutls_free_datum(&key);
+	_gnutls_free_key_datum(&key);
 	return ret;
 }
 
