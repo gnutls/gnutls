@@ -358,6 +358,11 @@ libpkcs11mock3_la_SOURCES = pkcs11/pkcs11-mock3.c
 libpkcs11mock3_la_LDFLAGS = -shared -rpath $(pkglibdir) -module -no-undefined -avoid-version
 libpkcs11mock3_la_LIBADD =  ../gl/libgnu.la
 
+noinst_LTLIBRARIES += libpkcs11mock4.la
+libpkcs11mock4_la_SOURCES = pkcs11/pkcs11-mock4.c
+libpkcs11mock4_la_LDFLAGS = -shared -rpath $(pkglibdir) -module -no-undefined -avoid-version
+libpkcs11mock4_la_LIBADD =  ../gl/libgnu.la
+
 pkcs11_cert_import_url_exts_SOURCES = pkcs11/pkcs11-cert-import-url-exts.c
 pkcs11_cert_import_url_exts_DEPENDENCIES = libpkcs11mock1.la libutils.la
 
@@ -503,13 +508,15 @@ pathbuf_CPPFLAGS = $(AM_CPPFLAGS) \
 if ENABLE_PKCS11
 if !WINDOWS
 ctests += tls13/post-handshake-with-cert-pkcs11 pkcs11/tls-neg-pkcs11-no-key \
-	global-init-override pkcs11/distrust-after
+	global-init-override pkcs11/distrust-after pkcs11/os-locking-ok
 tls13_post_handshake_with_cert_pkcs11_DEPENDENCIES = libpkcs11mock2.la libutils.la
 tls13_post_handshake_with_cert_pkcs11_LDADD = $(LDADD) $(LIBDL)
 pkcs11_tls_neg_pkcs11_no_key_DEPENDENCIES = libpkcs11mock2.la libutils.la
 pkcs11_tls_neg_pkcs11_no_key_LDADD = $(LDADD) $(LIBDL)
 pkcs11_distrust_after_DEPENDENCIES = libpkcs11mock3.la libutils.la
 pkcs11_distrust_after_LDADD = $(LDADD) $(LIBDL)
+pkcs11_os_locking_ok_DEPENDENCIES = libpkcs11mock4.la libutils.la
+pkcs11_os_locking_ok_LDADD = $(LDADD) $(LIBDL)
 endif
 endif
 
@@ -663,6 +670,7 @@ TESTS_ENVIRONMENT +=						\
 	P11MOCKLIB1=$(abs_builddir)/.libs/libpkcs11mock1.so	\
 	P11MOCKLIB2=$(abs_builddir)/.libs/libpkcs11mock2.so	\
 	P11MOCKLIB3=$(abs_builddir)/.libs/libpkcs11mock3.so	\
+	P11MOCKLIB4=$(abs_builddir)/.libs/libpkcs11mock4.so	\
 	PKCS12_MANY_CERTS_FILE=$(srcdir)/cert-tests/data/pkcs12_5certs.p12	\
 	PKCS12FILE=$(srcdir)/cert-tests/data/client.p12		\
 	PKCS12PASSWORD=foobar					\
