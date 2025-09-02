@@ -70,6 +70,7 @@
 #include "gnettle.h"
 #include "fips.h"
 #include "dh.h"
+#include "crau/crau.h"
 #ifdef HAVE_LEANCRYPTO
 #include <leancrypto.h>
 #endif
@@ -302,6 +303,10 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 	int ret;
 	bool not_approved = false;
 
+	crau_new_context_with_data("name", CRAU_STRING, "pk::derive",
+				   "pk::algorithm", CRAU_STRING,
+				   gnutls_pk_get_name(algo), NULL);
+
 	switch (algo) {
 	case GNUTLS_PK_DH: {
 		bigint_t f, x, q, prime;
@@ -368,6 +373,8 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 			goto dh_cleanup;
 		}
 
+		crau_data("pk::bits", CRAU_WORD, bits, NULL);
+
 		if (bits < 2048) {
 			not_approved = true;
 		}
@@ -429,6 +436,9 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 			ret = gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
 			goto cleanup;
 		}
+
+		crau_data("pk::curve", CRAU_STRING,
+			  gnutls_ecc_curve_get_name(priv->curve), NULL);
 
 		/* P-192 is not supported in FIPS 140-3 */
 		if (priv->curve == GNUTLS_ECC_CURVE_SECP192R1) {
@@ -634,6 +644,9 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 			goto cleanup;
 		}
 
+		crau_data("pk::curve", CRAU_STRING,
+			  gnutls_ecc_curve_get_name(priv->curve), NULL);
+
 		if (nonce == NULL) {
 			gnutls_assert();
 			ret = GNUTLS_E_INVALID_REQUEST;
@@ -687,6 +700,8 @@ cleanup:
 	} else {
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_APPROVED);
 	}
+
+	crau_pop_context();
 
 	return ret;
 }
@@ -930,13 +945,25 @@ static int _wrap_nettle_pk_encaps(gnutls_pk_algorithm_t algo,
 				  gnutls_datum_t *shared_secret,
 				  const gnutls_datum_t *pub)
 {
+	int ret;
+
 	switch (algo) {
 	case GNUTLS_PK_MLKEM768:
 	case GNUTLS_PK_MLKEM1024:
-		return ml_kem_encaps(algo, ciphertext, shared_secret, pub);
+		break;
 	default:
 		return gnutls_assert_val(GNUTLS_E_UNKNOWN_ALGORITHM);
 	}
+
+	crau_new_context_with_data("name", CRAU_STRING, "pk::encapsulate",
+				   "pk::algorithm", CRAU_STRING,
+				   gnutls_pk_get_name(algo), NULL);
+
+	ret = ml_kem_encaps(algo, ciphertext, shared_secret, pub);
+
+	crau_pop_context();
+
+	return ret;
 }
 
 static int _wrap_nettle_pk_decaps(gnutls_pk_algorithm_t algo,
@@ -944,13 +971,25 @@ static int _wrap_nettle_pk_decaps(gnutls_pk_algorithm_t algo,
 				  const gnutls_datum_t *ciphertext,
 				  const gnutls_datum_t *priv)
 {
+	int ret;
+
 	switch (algo) {
 	case GNUTLS_PK_MLKEM768:
 	case GNUTLS_PK_MLKEM1024:
-		return ml_kem_decaps(algo, shared_secret, ciphertext, priv);
+		break;
 	default:
 		return gnutls_assert_val(GNUTLS_E_UNKNOWN_ALGORITHM);
 	}
+
+	crau_new_context_with_data("name", CRAU_STRING, "pk::decapsulate",
+				   "pk::algorithm", CRAU_STRING,
+				   gnutls_pk_get_name(algo), NULL);
+
+	ret = ml_kem_decaps(algo, shared_secret, ciphertext, priv);
+
+	crau_pop_context();
+
+	return ret;
 }
 
 /* This wraps nettle_rsa_encrypt so it returns ciphertext as a byte
@@ -1031,10 +1070,15 @@ static int _wrap_nettle_pk_encrypt(gnutls_pk_algorithm_t algo,
 		algo = GNUTLS_PK_RSA_OAEP;
 	}
 
+	crau_new_context_with_data("name", CRAU_STRING, "pk::encrypt",
+				   "pk::algorithm", CRAU_STRING,
+				   gnutls_pk_get_name(algo), NULL);
+
 	switch (algo) {
 	case GNUTLS_PK_RSA: {
 		struct rsa_public_key pub;
 		nettle_random_func *random_func;
+		size_t bits;
 
 		if (!_gnutls_config_is_rsa_pkcs1_encrypt_allowed()) {
 			ret = gnutls_assert_val(
@@ -1050,6 +1094,10 @@ static int _wrap_nettle_pk_encrypt(gnutls_pk_algorithm_t algo,
 			gnutls_assert();
 			goto cleanup;
 		}
+
+		bits = mpz_sizeinbase(pub.n, 2);
+
+		crau_data("pk::bits", CRAU_WORD, bits, NULL);
 
 		if (_gnutls_get_lib_state() == LIB_STATE_SELFTEST)
 			random_func = rnd_nonce_func_fallback;
@@ -1077,12 +1125,19 @@ static int _wrap_nettle_pk_encrypt(gnutls_pk_algorithm_t algo,
 	case GNUTLS_PK_RSA_OAEP: {
 		struct rsa_public_key pub;
 		nettle_random_func *random_func;
+		size_t bits;
 
 		ret = _rsa_params_to_pubkey(pk_params, &pub);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
 		}
+
+		bits = mpz_sizeinbase(pub.n, 2);
+
+		crau_data("pk::bits", CRAU_WORD, bits, "pk::hash", CRAU_STRING,
+			  gnutls_digest_get_name(encrypt_params->rsa_oaep_dig),
+			  NULL);
 
 		if (_gnutls_get_lib_state() == LIB_STATE_SELFTEST)
 			random_func = rnd_nonce_func_fallback;
@@ -1126,6 +1181,8 @@ cleanup:
 	} else {
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_APPROVED);
 	}
+
+	crau_pop_context();
 
 	FAIL_IF_LIB_ERROR;
 	return ret;
@@ -1206,12 +1263,17 @@ static int _wrap_nettle_pk_decrypt(gnutls_pk_algorithm_t algo,
 		algo = GNUTLS_PK_RSA_OAEP;
 	}
 
+	crau_new_context_with_data("name", CRAU_STRING, "pk::decrypt",
+				   "pk::algorithm", CRAU_STRING,
+				   gnutls_pk_get_name(algo), NULL);
+
 	switch (algo) {
 	case GNUTLS_PK_RSA: {
 		struct rsa_private_key priv;
 		struct rsa_public_key pub;
 		size_t length;
 		nettle_random_func *random_func;
+		size_t bits;
 
 		if (!_gnutls_config_is_rsa_pkcs1_encrypt_allowed()) {
 			ret = gnutls_assert_val(
@@ -1228,6 +1290,10 @@ static int _wrap_nettle_pk_decrypt(gnutls_pk_algorithm_t algo,
 			gnutls_assert();
 			goto cleanup;
 		}
+
+		bits = mpz_sizeinbase(pub.n, 2);
+
+		crau_data("pk::bits", CRAU_WORD, bits, NULL);
 
 		if (ciphertext->size != pub.size) {
 			ret = gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
@@ -1263,6 +1329,7 @@ static int _wrap_nettle_pk_decrypt(gnutls_pk_algorithm_t algo,
 		struct rsa_public_key pub;
 		size_t length;
 		nettle_random_func *random_func;
+		size_t bits;
 
 		_rsa_params_to_privkey(pk_params, &priv);
 		ret = _rsa_params_to_pubkey(pk_params, &pub);
@@ -1270,6 +1337,12 @@ static int _wrap_nettle_pk_decrypt(gnutls_pk_algorithm_t algo,
 			gnutls_assert();
 			goto cleanup;
 		}
+
+		bits = mpz_sizeinbase(pub.n, 2);
+
+		crau_data("pk::bits", CRAU_WORD, bits, "pk::hash", CRAU_STRING,
+			  gnutls_digest_get_name(encrypt_params->rsa_oaep_dig),
+			  NULL);
 
 		if (ciphertext->size != pub.size) {
 			ret = gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
@@ -1321,6 +1394,8 @@ cleanup:
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_APPROVED);
 	}
 
+	crau_pop_context();
+
 	FAIL_IF_LIB_ERROR;
 	return ret;
 }
@@ -1365,6 +1440,7 @@ static int _wrap_nettle_pk_decrypt2(gnutls_pk_algorithm_t algo,
 	int ret;
 	nettle_random_func *random_func;
 	bool not_approved = false;
+	size_t bits;
 
 	FAIL_IF_LIB_ERROR;
 
@@ -1384,6 +1460,13 @@ static int _wrap_nettle_pk_decrypt2(gnutls_pk_algorithm_t algo,
 		gnutls_assert();
 		goto fail;
 	}
+
+	bits = mpz_sizeinbase(pub.n, 2);
+
+	crau_new_context_with_data("name", CRAU_STRING, "pk::decrypt",
+				   "pk::algorithm", CRAU_STRING,
+				   gnutls_pk_get_name(algo), "pk::bits",
+				   CRAU_WORD, bits, NULL);
 
 	if (ciphertext->size != pub.size) {
 		ret = gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
@@ -1411,6 +1494,10 @@ static int _wrap_nettle_pk_decrypt2(gnutls_pk_algorithm_t algo,
 				       ciphertext->data);
 		break;
 	case GNUTLS_PK_RSA_OAEP:
+		crau_data("pk::hash", CRAU_STRING,
+			  gnutls_digest_get_name(encrypt_params->rsa_oaep_dig),
+			  NULL);
+
 		ret = _rsa_oaep_decrypt(encrypt_params->rsa_oaep_dig, &pub,
 					&priv, NULL, random_func,
 					encrypt_params->rsa_oaep_label.size,
@@ -1448,6 +1535,8 @@ static int _wrap_nettle_pk_decrypt2(gnutls_pk_algorithm_t algo,
 
 fail:
 	_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
+
+	crau_pop_context();
 
 	return ret;
 }
@@ -1799,6 +1888,10 @@ static int _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 		goto cleanup;
 	}
 
+	crau_new_context_with_data("name", CRAU_STRING, "pk::sign",
+				   "pk::algorithm", CRAU_STRING,
+				   gnutls_pk_get_name(algo), NULL);
+
 	switch (algo) {
 	case GNUTLS_PK_EDDSA_ED25519: /* we do EdDSA */
 	case GNUTLS_PK_EDDSA_ED448: {
@@ -1853,6 +1946,9 @@ static int _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 			ret = gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
 			goto cleanup;
 		}
+
+		crau_data("pk::curve", CRAU_STRING,
+			  gnutls_ecc_curve_get_name(pk_params->curve), NULL);
 
 		ret = _ecc_params_to_privkey(pk_params, &priv, curve);
 		if (ret < 0) {
@@ -1943,6 +2039,10 @@ static int _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 			not_approved = true;
 		}
 
+		crau_data("pk::curve", CRAU_STRING,
+			  gnutls_ecc_curve_get_name(curve_id), "pk::hash",
+			  CRAU_STRING, _gnutls_mac_get_name(me), NULL);
+
 		mpz_init(q);
 
 		if (_gnutls_get_lib_state() == LIB_STATE_SELFTEST ||
@@ -2005,6 +2105,7 @@ static int _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 		gnutls_datum_t k = { NULL, 0 };
 		void *random_ctx;
 		nettle_random_func *random_func;
+		size_t bits;
 
 		/* DSA is currently being defined as sunset with the
 			 * current draft of FIPS 186-5 */
@@ -2028,6 +2129,9 @@ static int _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 				(int)vdata->size);
 			hash_len = vdata->size;
 		}
+
+		bits = mpz_sizeinbase(pub.p, 2);
+		crau_data("pk::bits", CRAU_WORD, bits, NULL);
 
 		if (_gnutls_get_lib_state() == LIB_STATE_SELFTEST ||
 		    (sign_params->flags & GNUTLS_PK_FLAG_REPRODUCIBLE)) {
@@ -2079,6 +2183,7 @@ static int _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 		struct rsa_public_key pub;
 		nettle_random_func *random_func;
 		mpz_t s;
+		size_t bits;
 
 		_rsa_params_to_privkey(pk_params, &priv);
 
@@ -2088,13 +2193,17 @@ static int _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 			goto cleanup;
 		}
 
+		bits = mpz_sizeinbase(pub.n, 2);
+
 		/* RSA modulus size should be 2048-bit or larger in FIPS
 			 * 140-3.  In addition to this, only SHA-2 is allowed
 			 * for SigGen; it is checked in pk_prepare_hash lib/pk.c
 			 */
-		if (unlikely(mpz_sizeinbase(pub.n, 2) < 2048)) {
+		if (unlikely(bits < 2048)) {
 			not_approved = true;
 		}
+
+		crau_data("pk::bits", CRAU_WORD, bits, NULL);
 
 		mpz_init(s);
 
@@ -2127,6 +2236,7 @@ static int _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 		struct rsa_public_key pub;
 		nettle_random_func *random_func;
 		mpz_t s;
+		size_t bits;
 
 		_rsa_params_to_privkey(pk_params, &priv);
 
@@ -2136,19 +2246,24 @@ static int _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 			goto cleanup;
 		}
 
+		bits = mpz_sizeinbase(pub.n, 2);
+
 		/* RSA modulus size should be 2048-bit or larger in FIPS
 			 * 140-3.  In addition to this, only SHA-2 is allowed
 			 * for SigGen; however, Nettle only support SHA256,
 			 * SHA384, and SHA512 for RSA-PSS (see
 			 * _rsa_pss_sign_digest_tr in this file for details).
 			 */
-		if (unlikely(mpz_sizeinbase(pub.n, 2) < 2048)) {
+		if (unlikely(bits < 2048)) {
 			not_approved = true;
 		}
 
 		mpz_init(s);
 
 		me = hash_to_entry(sign_params->rsa_pss_dig);
+
+		crau_data("pk::bits", CRAU_WORD, bits, "pk::hash", CRAU_STRING,
+			  _gnutls_mac_get_name(me), NULL);
 
 		/* According to FIPS 186-5 5.4, the salt length must be
 			 * in the range between 0 and the hash length inclusive.
@@ -2207,6 +2322,8 @@ cleanup:
 	} else {
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_APPROVED);
 	}
+
+	crau_pop_context();
 
 	FAIL_IF_LIB_ERROR;
 	return ret;
@@ -2289,6 +2406,10 @@ static int _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 		goto cleanup;
 	}
 
+	crau_new_context_with_data("name", CRAU_STRING, "pk::verify",
+				   "pk::algorithm", CRAU_STRING,
+				   gnutls_pk_get_name(algo), NULL);
+
 	switch (algo) {
 	case GNUTLS_PK_EDDSA_ED25519: /* we do EdDSA */
 	case GNUTLS_PK_EDDSA_ED448: {
@@ -2337,6 +2458,9 @@ static int _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 			goto cleanup;
 		}
 
+		crau_data("pk::curve", CRAU_STRING,
+			  gnutls_ecc_curve_get_name(pk_params->curve), NULL);
+
 		/* This call will return a valid MAC entry and
 			 * getters will check that is not null anyway. */
 		me = hash_to_entry(_gnutls_gost_digest(pk_params->algo));
@@ -2377,6 +2501,7 @@ static int _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 		struct dsa_signature sig;
 		int curve_id = pk_params->curve;
 		const struct ecc_curve *curve;
+		const mac_entry_st *me;
 
 		curve = get_supported_nist_curve(curve_id);
 		if (curve == NULL) {
@@ -2419,6 +2544,12 @@ static int _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 			not_approved = true;
 		}
 
+		me = hash_to_entry(sign_params->dsa_dig);
+
+		crau_data("pk::curve", CRAU_STRING,
+			  gnutls_ecc_curve_get_name(curve_id), "pk::hash",
+			  CRAU_STRING, _gnutls_mac_get_name(me), NULL);
+
 		ret = ecdsa_verify(&pub, hash_len, vdata->data, &sig);
 		if (ret == 0) {
 			gnutls_assert();
@@ -2434,6 +2565,7 @@ static int _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 		struct dsa_params pub;
 		struct dsa_signature sig;
 		bigint_t y;
+		size_t bits;
 
 		/* DSA is currently being defined as sunset with the
 			 * current draft of FIPS 186-5 */
@@ -2456,6 +2588,9 @@ static int _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 		if (hash_len > vdata->size)
 			hash_len = vdata->size;
 
+		bits = mpz_sizeinbase(pub.p, 2);
+		crau_data("pk::bits", CRAU_WORD, bits, NULL);
+
 		ret = dsa_verify(&pub, TOMPZ(y), hash_len, vdata->data, &sig);
 		if (ret == 0) {
 			gnutls_assert();
@@ -2477,6 +2612,8 @@ static int _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 		}
 
 		bits = mpz_sizeinbase(pub.n, 2);
+
+		crau_data("pk::bits", CRAU_WORD, bits, NULL);
 
 		/* In FIPS 140-3, RSA key size should be larger than 2048-bit.
 			 * In addition to this, only SHA-2 is allowed
@@ -2510,6 +2647,7 @@ static int _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 	}
 	case GNUTLS_PK_RSA_PSS: {
 		struct rsa_public_key pub;
+		size_t bits;
 
 		if ((sign_params->flags &
 		     GNUTLS_PK_FLAG_RSA_PSS_FIXED_SALT_LENGTH) &&
@@ -2524,13 +2662,15 @@ static int _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 			goto cleanup;
 		}
 
+		bits = mpz_sizeinbase(pub.n, 2);
+
 		/* RSA modulus size should be 2048-bit or larger in FIPS
 			 * 140-3.  In addition to this, only SHA-2 are
 			 * allowed for SigVer, while Nettle only supports
 			 * SHA256, SHA384, and SHA512 for RSA-PSS (see
 			 * _rsa_pss_verify_digest in this file for the details).
 			 */
-		if (unlikely(mpz_sizeinbase(pub.n, 2) < 2048)) {
+		if (unlikely(bits < 2048)) {
 			not_approved = true;
 		}
 
@@ -2545,6 +2685,10 @@ static int _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 			gnutls_assert();
 			goto cleanup;
 		}
+
+		crau_data("pk::bits", CRAU_WORD, bits, "pk::hash", CRAU_STRING,
+			  gnutls_digest_get_name(sign_params->rsa_pss_dig),
+			  NULL);
 
 		ret = _rsa_pss_verify_digest(sign_params->rsa_pss_dig, &pub,
 					     sign_params->salt_size,
@@ -2583,6 +2727,9 @@ cleanup:
 
 	_gnutls_mpi_release(&tmp[0]);
 	_gnutls_mpi_release(&tmp[1]);
+
+	crau_pop_context();
+
 	FAIL_IF_LIB_ERROR;
 	return ret;
 }
@@ -3504,6 +3651,10 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 		rnd_level = GNUTLS_RND_KEY;
 	}
 
+	crau_new_context_with_data("name", CRAU_STRING, "pk::generate",
+				   "pk::algorithm", CRAU_STRING,
+				   gnutls_pk_get_name(algo), NULL);
+
 	switch (algo) {
 #ifdef ENABLE_DSA
 	case GNUTLS_PK_DSA:
@@ -3844,6 +3995,9 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 				goto cleanup;
 			}
 
+			crau_data("pk::curve", CRAU_STRING,
+				  gnutls_ecc_curve_get_name(level), NULL);
+
 			/* P-192 is not supported in FIPS 140-3 */
 			if (level == GNUTLS_ECC_CURVE_SECP192R1) {
 				not_approved = true;
@@ -4169,6 +4323,8 @@ cleanup:
 	} else {
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_APPROVED);
 	}
+
+	crau_pop_context();
 
 	FAIL_IF_LIB_ERROR;
 	return ret;
