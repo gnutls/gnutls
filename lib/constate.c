@@ -1103,9 +1103,9 @@ void _gnutls_epoch_gc(gnutls_session_t session)
 
 static inline void free_record_state(record_state_st *state)
 {
-	zeroize_temp_key(state->mac_key, state->mac_key_size);
-	zeroize_temp_key(state->iv, state->iv_size);
-	zeroize_temp_key(state->key, state->key_size);
+	zeroize_key(state->mac_key, state->mac_key_size);
+	zeroize_key(state->iv, state->iv_size);
+	zeroize_key(state->key, state->key_size);
 
 	if (state->is_aead)
 		_gnutls_aead_cipher_deinit(&state->ctx.aead);

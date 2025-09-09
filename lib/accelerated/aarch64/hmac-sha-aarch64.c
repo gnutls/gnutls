@@ -263,7 +263,7 @@ static void wrap_aarch64_hmac_deinit(void *hd)
 {
 	struct aarch64_hmac_ctx *ctx = hd;
 
-	zeroize_temp_key(ctx, sizeof(*ctx));
+	zeroize_key(ctx, sizeof(*ctx));
 	gnutls_free(ctx);
 }
 
@@ -284,7 +284,7 @@ static int wrap_aarch64_hmac_fast(gnutls_mac_algorithm_t algo,
 	ctx.update(&ctx, text_size, text);
 	ctx.digest(&ctx, ctx.length, digest);
 
-	zeroize_temp_key(&ctx, sizeof(ctx));
+	zeroize_key(&ctx, sizeof(ctx));
 
 	return 0;
 }

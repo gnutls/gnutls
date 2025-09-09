@@ -756,7 +756,7 @@ finish:
 
 cleanup:
 	if (need_free) {
-		zeroize_temp_key(_data.data, _data.size);
+		zeroize_key(_data.data, _data.size);
 		_gnutls_free_datum(&_data);
 	}
 

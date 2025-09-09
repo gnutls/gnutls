@@ -152,7 +152,7 @@ static int set_gmac_aad(struct p11_mac_ctx *ctx, const void *aad,
 
 static int init_gmac_params(struct p11_mac_ctx *ctx)
 {
-	zeroize_temp_key(&ctx->params, sizeof(ctx->params));
+	zeroize_key(&ctx->params, sizeof(ctx->params));
 	ctx->params_size = sizeof(CK_GCM_PARAMS);
 	ctx->params.gcm.ulTagBits = ctx->mac->length * 8;
 	return 0;
@@ -162,7 +162,7 @@ static void free_gmac_params(struct p11_mac_ctx *ctx)
 {
 	gnutls_free(ctx->params.gcm.pIv);
 	gnutls_free(ctx->params.gcm.pAAD);
-	zeroize_temp_key(&ctx->params, sizeof(ctx->params));
+	zeroize_key(&ctx->params, sizeof(ctx->params));
 	ctx->params_size = 0;
 }
 
@@ -475,7 +475,7 @@ static void wrap_p11_mac_deinit(void *_ctx)
 	_p11_provider_close_session(ctx->session);
 	if (ctx->mac->free_params != NULL)
 		ctx->mac->free_params(ctx);
-	zeroize_temp_key(ctx, sizeof(*ctx));
+	zeroize_key(ctx, sizeof(*ctx));
 	gnutls_free(ctx);
 }
 
@@ -636,7 +636,7 @@ static void wrap_p11_hash_deinit(void *_ctx)
 	struct p11_digest_ctx *ctx = _ctx;
 
 	_p11_provider_close_session(ctx->session);
-	zeroize_temp_key(ctx, sizeof(*ctx));
+	zeroize_key(ctx, sizeof(*ctx));
 	gnutls_free(ctx);
 }
 

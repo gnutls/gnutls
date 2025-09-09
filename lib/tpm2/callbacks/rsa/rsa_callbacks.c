@@ -93,14 +93,14 @@ static TSS2_RC _gnutls_rsa_pk_encrypt(TPM2B_PUBLIC *pub_tpm_key, size_t in_size,
 		return TSS2_ESYS_RC_GENERAL_FAILURE;
 
 	if (output.size > max_out_size) {
-		zeroize_temp_key(output.data, output.size);
+		zeroize_key(output.data, output.size);
 		return TSS2_ESYS_RC_INSUFFICIENT_BUFFER;
 	}
 
 	memcpy(out_buffer, output.data, output.size);
 	*out_size = output.size;
 
-	zeroize_temp_key(output.data, output.size);
+	zeroize_key(output.data, output.size);
 	return TSS2_RC_SUCCESS;
 }
 

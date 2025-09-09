@@ -144,7 +144,7 @@ static void x86_aes_xts_deinit(void *_ctx)
 {
 	struct x86_aes_xts_ctx *ctx = _ctx;
 
-	zeroize_temp_key(ctx, sizeof(*ctx));
+	zeroize_key(ctx, sizeof(*ctx));
 	gnutls_free(ctx);
 }
 

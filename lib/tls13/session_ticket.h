@@ -40,8 +40,8 @@ int _gnutls13_unpack_session_ticket(gnutls_session_t session,
 
 inline static void tls13_ticket_deinit(tls13_ticket_st *ticket)
 {
-	zeroize_temp_key(&ticket->resumption_master_secret,
-			 sizeof(ticket->resumption_master_secret));
+	zeroize_key(&ticket->resumption_master_secret,
+		    sizeof(ticket->resumption_master_secret));
 
 	_gnutls_free_datum(&ticket->ticket);
 	memset(ticket, 0, sizeof(tls13_ticket_st));

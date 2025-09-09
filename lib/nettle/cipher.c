@@ -1633,7 +1633,7 @@ static void wrap_nettle_cipher_close(void *_ctx)
 {
 	struct nettle_cipher_ctx *ctx = _ctx;
 
-	zeroize_temp_key(ctx->ctx_ptr, ctx->cipher->ctx_size);
+	zeroize_key(ctx->ctx_ptr, ctx->cipher->ctx_size);
 	gnutls_free(ctx);
 }
 

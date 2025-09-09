@@ -347,8 +347,8 @@ const char *gnutls_ciphersuite_get(gnutls_session_t session)
 
 void reset_binders(gnutls_session_t session)
 {
-	_gnutls_free_temp_key_datum(&session->key.binders[0].psk);
-	_gnutls_free_temp_key_datum(&session->key.binders[1].psk);
+	_gnutls_free_key_datum(&session->key.binders[0].psk);
+	_gnutls_free_key_datum(&session->key.binders[1].psk);
 	memset(session->key.binders, 0, sizeof(session->key.binders));
 	session->internals.hsk_flags &= ~HSK_PSK_SELECTED;
 }
@@ -466,30 +466,30 @@ static void deinit_keys(gnutls_session_t session)
 	if (!vers->tls13_sem && session->key.binders[0].prf == NULL) {
 		gnutls_pk_params_release(&session->key.proto.tls12.ecdh.params);
 		gnutls_pk_params_release(&session->key.proto.tls12.dh.params);
-		zrelease_temp_mpi_key(&session->key.proto.tls12.ecdh.x);
-		zrelease_temp_mpi_key(&session->key.proto.tls12.ecdh.y);
-		_gnutls_free_temp_key_datum(&session->key.proto.tls12.ecdh.raw);
+		zrelease_mpi_key(&session->key.proto.tls12.ecdh.x);
+		zrelease_mpi_key(&session->key.proto.tls12.ecdh.y);
+		_gnutls_free_key_datum(&session->key.proto.tls12.ecdh.raw);
 
-		zrelease_temp_mpi_key(&session->key.proto.tls12.dh.client_Y);
+		zrelease_mpi_key(&session->key.proto.tls12.dh.client_Y);
 
 		/* SRP */
-		zrelease_temp_mpi_key(&session->key.proto.tls12.srp.srp_p);
-		zrelease_temp_mpi_key(&session->key.proto.tls12.srp.srp_g);
-		zrelease_temp_mpi_key(&session->key.proto.tls12.srp.srp_key);
+		zrelease_mpi_key(&session->key.proto.tls12.srp.srp_p);
+		zrelease_mpi_key(&session->key.proto.tls12.srp.srp_g);
+		zrelease_mpi_key(&session->key.proto.tls12.srp.srp_key);
 
-		zrelease_temp_mpi_key(&session->key.proto.tls12.srp.u);
-		zrelease_temp_mpi_key(&session->key.proto.tls12.srp.a);
-		zrelease_temp_mpi_key(&session->key.proto.tls12.srp.x);
-		zrelease_temp_mpi_key(&session->key.proto.tls12.srp.A);
-		zrelease_temp_mpi_key(&session->key.proto.tls12.srp.B);
-		zrelease_temp_mpi_key(&session->key.proto.tls12.srp.b);
+		zrelease_mpi_key(&session->key.proto.tls12.srp.u);
+		zrelease_mpi_key(&session->key.proto.tls12.srp.a);
+		zrelease_mpi_key(&session->key.proto.tls12.srp.x);
+		zrelease_mpi_key(&session->key.proto.tls12.srp.A);
+		zrelease_mpi_key(&session->key.proto.tls12.srp.B);
+		zrelease_mpi_key(&session->key.proto.tls12.srp.b);
 	} else {
 		gnutls_memset(session->key.proto.tls13.temp_secret, 0,
 			      sizeof(session->key.proto.tls13.temp_secret));
 	}
 
 	reset_binders(session);
-	_gnutls_free_temp_key_datum(&session->key.key);
+	_gnutls_free_key_datum(&session->key.key);
 }
 
 /* An internal version of _gnutls_handshake_internal_state_clear(),

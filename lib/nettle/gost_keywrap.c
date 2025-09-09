@@ -109,7 +109,7 @@ int _gnutls_gost_key_unwrap(gnutls_gost_paramset_t gost_params,
 					     cek->data);
 	if (ret == 0) {
 		gnutls_assert();
-		_gnutls_free_temp_key_datum(cek);
+		_gnutls_free_key_datum(cek);
 		return GNUTLS_E_DECRYPTION_FAILED;
 	}
 

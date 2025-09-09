@@ -402,7 +402,7 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 	dh_cleanup:
 		_gnutls_mpi_release(&r);
 		_gnutls_mpi_release(&primesub1);
-		zrelease_temp_mpi_key(&k);
+		zrelease_mpi_key(&k);
 		if (ret < 0)
 			goto cleanup;
 
