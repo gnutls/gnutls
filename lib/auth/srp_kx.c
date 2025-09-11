@@ -303,14 +303,14 @@ int _gnutls_gen_srp_client_kx(gnutls_session_t session, gnutls_buffer_st *data)
 
 	_gnutls_mpi_log("SRP B: ", B);
 
-	zrelease_temp_mpi_key(&_b);
-	zrelease_temp_mpi_key(&V);
-	zrelease_temp_mpi_key(&session->key.proto.tls12.srp.u);
-	zrelease_temp_mpi_key(&B);
+	zrelease_mpi_key(&_b);
+	zrelease_mpi_key(&V);
+	zrelease_mpi_key(&session->key.proto.tls12.srp.u);
+	zrelease_mpi_key(&B);
 
 	ret = _gnutls_mpi_dprint(session->key.proto.tls12.srp.srp_key,
 				 &session->key.key);
-	zrelease_temp_mpi_key(&S);
+	zrelease_mpi_key(&S);
 
 	if (ret < 0) {
 		gnutls_assert();
@@ -377,14 +377,14 @@ int _gnutls_proc_srp_client_kx(gnutls_session_t session, uint8_t *data,
 	_gnutls_mpi_log("SRP S: ", S);
 
 	_gnutls_mpi_release(&A);
-	zrelease_temp_mpi_key(&_b);
-	zrelease_temp_mpi_key(&V);
-	zrelease_temp_mpi_key(&session->key.proto.tls12.srp.u);
-	zrelease_temp_mpi_key(&B);
+	zrelease_mpi_key(&_b);
+	zrelease_mpi_key(&V);
+	zrelease_mpi_key(&session->key.proto.tls12.srp.u);
+	zrelease_mpi_key(&B);
 
 	ret = _gnutls_mpi_dprint(session->key.proto.tls12.srp.srp_key,
 				 &session->key.key);
-	zrelease_temp_mpi_key(&S);
+	zrelease_mpi_key(&S);
 
 	if (ret < 0) {
 		gnutls_assert();

@@ -46,17 +46,6 @@ inline static void _gnutls_free_datum(gnutls_datum_t *dat)
 	}
 }
 
-inline static ATTRIBUTE_NONNULL() void _gnutls_free_temp_key_datum(
-	gnutls_datum_t *dat)
-{
-	if (dat->data != NULL) {
-		zeroize_temp_key(dat->data, dat->size);
-		gnutls_free(dat->data);
-	}
-
-	dat->size = 0;
-}
-
 inline static ATTRIBUTE_NONNULL() void _gnutls_free_key_datum(
 	gnutls_datum_t *dat)
 {

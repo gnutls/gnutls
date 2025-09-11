@@ -55,9 +55,6 @@ unsigned _gnutls_mem_is_zero(const uint8_t *ptr, unsigned size);
 
 #define zeroize_key(x, size) gnutls_memset(x, 0, size)
 
-#define zeroize_temp_key zeroize_key
-#define zrelease_temp_mpi_key zrelease_mpi_key
-
 static inline void _gnutls_memory_mark_undefined(void *addr, size_t size)
 {
 #ifdef HAVE_SANITIZER_ASAN_INTERFACE_H

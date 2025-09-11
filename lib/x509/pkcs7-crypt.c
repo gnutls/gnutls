@@ -1209,7 +1209,7 @@ int _gnutls_pkcs_raw_decrypt_data(schema_id schema, asn1_node pkcs8_asn,
 
 	ret = gnutls_cipher_init(&ch, ce->id, &dkey, &d_iv);
 
-	zeroize_temp_key(key, key_size);
+	zeroize_key(key, key_size);
 	gnutls_free(key);
 
 	if (ret < 0) {
@@ -1255,7 +1255,7 @@ int _gnutls_pkcs_raw_decrypt_data(schema_id schema, asn1_node pkcs8_asn,
 
 cleanup:
 	if (password) {
-		zeroize_temp_key(password, pass_len);
+		zeroize_key(password, pass_len);
 		gnutls_free(password);
 	}
 
@@ -1263,15 +1263,15 @@ cleanup:
 
 error:
 	if (password) {
-		zeroize_temp_key(password, pass_len);
+		zeroize_key(password, pass_len);
 		gnutls_free(password);
 	}
 	if (enc.data) {
-		zeroize_temp_key(enc.data, enc.size);
+		zeroize_key(enc.data, enc.size);
 		gnutls_free(enc.data);
 	}
 	if (key) {
-		zeroize_temp_key(key, key_size);
+		zeroize_key(key, key_size);
 		gnutls_free(key);
 	}
 	if (ch) {

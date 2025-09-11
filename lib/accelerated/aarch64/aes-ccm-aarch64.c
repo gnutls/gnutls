@@ -181,7 +181,7 @@ static void aes_ccm_deinit(void *_ctx)
 {
 	struct ccm_aarch64_aes_ctx *ctx = _ctx;
 
-	zeroize_temp_key(ctx, sizeof(*ctx));
+	zeroize_key(ctx, sizeof(*ctx));
 	gnutls_free(ctx);
 }
 

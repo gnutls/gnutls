@@ -111,7 +111,7 @@ static int calc_ecdh_key(gnutls_session_t session, gnutls_datum_t *psk_key,
 	} else {
 		ret = _gnutls_set_psk_session_key(session, psk_key,
 						  &tmp_dh_key);
-		_gnutls_free_temp_key_datum(&tmp_dh_key);
+		_gnutls_free_key_datum(&tmp_dh_key);
 
 		if (ret < 0) {
 			ret = gnutls_assert_val(ret);

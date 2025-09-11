@@ -100,7 +100,7 @@ int _gnutls_set_psk_session_key(gnutls_session_t session,
 	ret = 0;
 
 error:
-	_gnutls_free_temp_key_datum(&pwd_psk);
+	_gnutls_free_key_datum(&pwd_psk);
 	return ret;
 }
 
@@ -168,7 +168,7 @@ int _gnutls_gen_psk_client_kx(gnutls_session_t session, gnutls_buffer_st *data)
 cleanup:
 	if (free) {
 		gnutls_free(username.data);
-		_gnutls_free_temp_key_datum(&key);
+		_gnutls_free_key_datum(&key);
 	}
 
 	return ret;

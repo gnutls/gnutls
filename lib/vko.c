@@ -59,7 +59,7 @@ static int _gnutls_gost_vko_key(gnutls_pk_params_st *pub,
 	ret = 0;
 
 cleanup:
-	_gnutls_free_temp_key_datum(&tmp_vko_key);
+	_gnutls_free_key_datum(&tmp_vko_key);
 
 	return ret;
 }

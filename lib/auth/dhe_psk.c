@@ -126,7 +126,7 @@ static int gen_ecdhe_psk_client_kx(gnutls_session_t session,
 cleanup:
 	if (free) {
 		_gnutls_free_datum(&username);
-		_gnutls_free_temp_key_datum(&key);
+		_gnutls_free_key_datum(&key);
 	}
 
 	return ret;
@@ -169,7 +169,7 @@ static int gen_dhe_psk_client_kx(gnutls_session_t session,
 cleanup:
 	if (free) {
 		_gnutls_free_datum(&username);
-		_gnutls_free_temp_key_datum(&key);
+		_gnutls_free_key_datum(&key);
 	}
 
 	return ret;

@@ -97,7 +97,7 @@ int _gnutls_proc_dh_common_client_kx(gnutls_session_t session, uint8_t *data,
 	} else { /* In DHE_PSK the key is set differently */
 		ret = _gnutls_set_psk_session_key(session, psk_key,
 						  &tmp_dh_key);
-		_gnutls_free_temp_key_datum(&tmp_dh_key);
+		_gnutls_free_key_datum(&tmp_dh_key);
 	}
 
 	if (ret < 0) {
@@ -163,7 +163,7 @@ int _gnutls_gen_dh_common_client_kx_int(gnutls_session_t session,
 		session->key.key.size = tmp_dh_key.size;
 	} else { /* In DHE_PSK the key is set differently */
 		ret = _gnutls_set_psk_session_key(session, pskkey, &tmp_dh_key);
-		_gnutls_free_temp_key_datum(&tmp_dh_key);
+		_gnutls_free_key_datum(&tmp_dh_key);
 	}
 
 	if (ret < 0) {
