@@ -462,6 +462,7 @@ tests/ktls_keyupdate
 tests/libpkcs11mock1.la
 tests/libpkcs11mock2.la
 tests/libpkcs11mock3.la
+tests/libpkcs11mock4.la
 tests/libutils.la
 tests/long-session-id
 tests/mini
@@ -581,6 +582,7 @@ tests/pkcs11/gnutls_pcert_list_import_x509_file
 tests/pkcs11/gnutls_x509_crt_list_import_url
 tests/pkcs11/list-objects
 tests/pkcs11/list-tokens
+tests/pkcs11/os-locking-ok
 tests/pkcs11/pkcs11-chainverify
 tests/pkcs11/pkcs11-combo
 tests/pkcs11/pkcs11-ec-privkey-test
