@@ -29,22 +29,22 @@
 
 #include <libtasn1.h>
 #include <minmax.h>
-#include <p11-kit/pkcs11.h>
+#include "pkcs11_int.h"
 
-static bool mechanism_exists(CK_MECHANISM_TYPE mech)
+static bool mechanism_exists(ck_mechanism_type_t mech)
 {
 	unsigned i;
-	CK_FUNCTION_LIST *module = _p11_provider_get_module();
-	CK_SLOT_ID slot = _p11_provider_get_slot();
-	CK_MECHANISM_TYPE *mechs = NULL;
-	CK_ULONG mech_count = 0;
+	struct ck_function_list *module = _p11_provider_get_module();
+	ck_slot_id_t slot = _p11_provider_get_slot();
+	ck_mechanism_type_t *mechs = NULL;
+	unsigned long mech_count = 0;
 
 	if (module->C_GetMechanismList(slot, NULL, &mech_count) != CKR_OK ||
 	    mech_count == 0)
 		return false;
 
 	mechs = _gnutls_reallocarray(NULL, mech_count,
-				     sizeof(CK_MECHANISM_TYPE));
+				     sizeof(ck_mechanism_type_t));
 	if (mechs == NULL)
 		return false;
 
@@ -64,32 +64,34 @@ static bool mechanism_exists(CK_MECHANISM_TYPE mech)
 	return false;
 }
 
-static CK_OBJECT_HANDLE import_rsa_pubkey(CK_SESSION_HANDLE session,
-					  const gnutls_pk_params_st *pk_params)
+static ck_object_handle_t
+import_rsa_pubkey(ck_session_handle_t session,
+		  const gnutls_pk_params_st *pk_params)
 {
-	CK_FUNCTION_LIST *module = _p11_provider_get_module();
-	CK_OBJECT_HANDLE object = CK_INVALID_HANDLE;
-	CK_OBJECT_CLASS klass = CKO_PUBLIC_KEY;
-	CK_KEY_TYPE key_type = CKK_RSA;
-	CK_BBOOL tval = CK_TRUE;
+	struct ck_function_list *module = _p11_provider_get_module();
+	ck_object_handle_t object = CK_INVALID_HANDLE;
+	ck_object_class_t klass = CKO_PUBLIC_KEY;
+	ck_key_type_t key_type = CKK_RSA;
+	bool tval = true;
 	gnutls_datum_t mod = { NULL, 0 };
 	gnutls_datum_t exp = { NULL, 0 };
-	CK_ATTRIBUTE attrs[] = { { CKA_CLASS, &klass, sizeof(klass) },
-				 { CKA_KEY_TYPE, &key_type, sizeof(key_type) },
-				 { CKA_ENCRYPT, &tval, sizeof(tval) },
-				 { CKA_VERIFY, &tval, sizeof(tval) },
-				 { CKA_MODULUS, NULL, 0 },
-				 { CKA_PUBLIC_EXPONENT, NULL, 0 } };
-	CK_ULONG attrs_len = sizeof(attrs) / sizeof(attrs[0]);
+	struct ck_attribute attrs[] = { { CKA_CLASS, &klass, sizeof(klass) },
+					{ CKA_KEY_TYPE, &key_type,
+					  sizeof(key_type) },
+					{ CKA_ENCRYPT, &tval, sizeof(tval) },
+					{ CKA_VERIFY, &tval, sizeof(tval) },
+					{ CKA_MODULUS, NULL, 0 },
+					{ CKA_PUBLIC_EXPONENT, NULL, 0 } };
+	unsigned long attrs_len = sizeof(attrs) / sizeof(attrs[0]);
 
 	if (_gnutls_mpi_dprint(pk_params->params[RSA_MODULUS], &mod) < 0 ||
 	    _gnutls_mpi_dprint(pk_params->params[RSA_PUB], &exp) < 0)
 		goto cleanup;
 
-	attrs[4].pValue = mod.data;
-	attrs[4].ulValueLen = mod.size;
-	attrs[5].pValue = exp.data;
-	attrs[5].ulValueLen = exp.size;
+	attrs[4].value = mod.data;
+	attrs[4].value_len = mod.size;
+	attrs[5].value = exp.data;
+	attrs[5].value_len = exp.size;
 
 	module->C_CreateObject(session, attrs, attrs_len, &object);
 
@@ -99,39 +101,41 @@ cleanup:
 	return object;
 }
 
-static CK_OBJECT_HANDLE import_rsa_privkey(CK_SESSION_HANDLE session,
-					   const gnutls_pk_params_st *pk_params)
+static ck_object_handle_t
+import_rsa_privkey(ck_session_handle_t session,
+		   const gnutls_pk_params_st *pk_params)
 {
-	CK_FUNCTION_LIST *module = _p11_provider_get_module();
-	CK_OBJECT_HANDLE object = CK_INVALID_HANDLE;
-	CK_OBJECT_CLASS klass = CKO_PRIVATE_KEY;
-	CK_KEY_TYPE key_type = CKK_RSA;
-	CK_BBOOL tval = CK_TRUE;
+	struct ck_function_list *module = _p11_provider_get_module();
+	ck_object_handle_t object = CK_INVALID_HANDLE;
+	ck_object_class_t klass = CKO_PRIVATE_KEY;
+	ck_key_type_t key_type = CKK_RSA;
+	bool tval = true;
 	gnutls_datum_t rsa_params[8];
 	size_t rsa_params_len = sizeof(rsa_params) / sizeof(rsa_params[0]);
 	unsigned i;
-	CK_ATTRIBUTE attrs[] = { { CKA_MODULUS, NULL, 0 },
-				 { CKA_PUBLIC_EXPONENT, NULL, 0 },
-				 { CKA_PRIVATE_EXPONENT, NULL, 0 },
-				 { CKA_PRIME_1, NULL, 0 },
-				 { CKA_PRIME_2, NULL, 0 },
-				 { CKA_COEFFICIENT, NULL, 0 },
-				 { CKA_EXPONENT_1, NULL, 0 },
-				 { CKA_EXPONENT_2, NULL, 0 },
-				 { CKA_CLASS, &klass, sizeof(klass) },
-				 { CKA_KEY_TYPE, &key_type, sizeof(key_type) },
-				 { CKA_SENSITIVE, &tval, sizeof(tval) },
-				 { CKA_DECRYPT, &tval, sizeof(tval) },
-				 { CKA_SIGN, &tval, sizeof(tval) } };
-	CK_ULONG attrs_len = sizeof(attrs) / sizeof(attrs[0]);
+	struct ck_attribute attrs[] = { { CKA_MODULUS, NULL, 0 },
+					{ CKA_PUBLIC_EXPONENT, NULL, 0 },
+					{ CKA_PRIVATE_EXPONENT, NULL, 0 },
+					{ CKA_PRIME_1, NULL, 0 },
+					{ CKA_PRIME_2, NULL, 0 },
+					{ CKA_COEFFICIENT, NULL, 0 },
+					{ CKA_EXPONENT_1, NULL, 0 },
+					{ CKA_EXPONENT_2, NULL, 0 },
+					{ CKA_CLASS, &klass, sizeof(klass) },
+					{ CKA_KEY_TYPE, &key_type,
+					  sizeof(key_type) },
+					{ CKA_SENSITIVE, &tval, sizeof(tval) },
+					{ CKA_DECRYPT, &tval, sizeof(tval) },
+					{ CKA_SIGN, &tval, sizeof(tval) } };
+	unsigned long attrs_len = sizeof(attrs) / sizeof(attrs[0]);
 
 	gnutls_memset(rsa_params, 0, sizeof(rsa_params));
 	for (i = 0; i < rsa_params_len; ++i) {
 		if (_gnutls_mpi_dprint(pk_params->params[i], rsa_params + i) <
 		    0)
 			goto cleanup;
-		attrs[i].pValue = rsa_params[i].data;
-		attrs[i].ulValueLen = rsa_params[i].size;
+		attrs[i].value = rsa_params[i].data;
+		attrs[i].value_len = rsa_params[i].size;
 	}
 
 	module->C_CreateObject(session, attrs, attrs_len, &object);
@@ -143,24 +147,25 @@ cleanup:
 	return object;
 }
 
-static CK_OBJECT_HANDLE import_ec_pubkey(CK_SESSION_HANDLE session,
-					 const gnutls_pk_params_st *pk_params)
+static ck_object_handle_t import_ec_pubkey(ck_session_handle_t session,
+					   const gnutls_pk_params_st *pk_params)
 {
-	CK_FUNCTION_LIST *module = _p11_provider_get_module();
-	CK_OBJECT_HANDLE object = CK_INVALID_HANDLE;
-	CK_OBJECT_CLASS klass = CKO_PUBLIC_KEY;
-	CK_KEY_TYPE key_type = CKK_EC;
-	CK_BBOOL tval = CK_TRUE;
+	struct ck_function_list *module = _p11_provider_get_module();
+	ck_object_handle_t object = CK_INVALID_HANDLE;
+	ck_object_class_t klass = CKO_PUBLIC_KEY;
+	ck_key_type_t key_type = CKK_EC;
+	bool tval = true;
 	gnutls_datum_t ec_curve = { NULL, 0 };
 	gnutls_datum_t ec_point = { NULL, 0 };
 	unsigned int tl_size = ASN1_MAX_TL_SIZE;
 	uint8_t *ec_point_der = NULL;
-	CK_ATTRIBUTE attrs[] = { { CKA_CLASS, &klass, sizeof(klass) },
-				 { CKA_KEY_TYPE, &key_type, sizeof(key_type) },
-				 { CKA_VERIFY, &tval, sizeof(tval) },
-				 { CKA_EC_PARAMS, NULL, 0 },
-				 { CKA_EC_POINT, NULL, 0 } };
-	CK_ULONG attrs_len = sizeof(attrs) / sizeof(attrs[0]);
+	struct ck_attribute attrs[] = { { CKA_CLASS, &klass, sizeof(klass) },
+					{ CKA_KEY_TYPE, &key_type,
+					  sizeof(key_type) },
+					{ CKA_VERIFY, &tval, sizeof(tval) },
+					{ CKA_EC_PARAMS, NULL, 0 },
+					{ CKA_EC_POINT, NULL, 0 } };
+	unsigned long attrs_len = sizeof(attrs) / sizeof(attrs[0]);
 
 	if (_gnutls_x509_write_ecc_params(pk_params->curve, &ec_curve) < 0 ||
 	    _gnutls_ecc_ansi_x962_export(
@@ -178,10 +183,10 @@ static CK_OBJECT_HANDLE import_ec_pubkey(CK_SESSION_HANDLE session,
 		goto cleanup;
 	memcpy(ec_point_der + tl_size, ec_point.data, ec_point.size);
 
-	attrs[3].pValue = ec_curve.data;
-	attrs[3].ulValueLen = ec_curve.size;
-	attrs[4].pValue = ec_point_der;
-	attrs[4].ulValueLen = tl_size + ec_point.size;
+	attrs[3].value = ec_curve.data;
+	attrs[3].value_len = ec_curve.size;
+	attrs[4].value = ec_point_der;
+	attrs[4].value_len = tl_size + ec_point.size;
 
 	module->C_CreateObject(session, attrs, attrs_len, &object);
 
@@ -192,32 +197,34 @@ cleanup:
 	return object;
 }
 
-static CK_OBJECT_HANDLE import_ec_privkey(CK_SESSION_HANDLE session,
-					  const gnutls_pk_params_st *pk_params)
+static ck_object_handle_t
+import_ec_privkey(ck_session_handle_t session,
+		  const gnutls_pk_params_st *pk_params)
 {
-	CK_FUNCTION_LIST *module = _p11_provider_get_module();
-	CK_OBJECT_HANDLE object = CK_INVALID_HANDLE;
-	CK_OBJECT_CLASS klass = CKO_PRIVATE_KEY;
-	CK_KEY_TYPE key_type = CKK_EC;
-	CK_BBOOL tval = CK_TRUE;
+	struct ck_function_list *module = _p11_provider_get_module();
+	ck_object_handle_t object = CK_INVALID_HANDLE;
+	ck_object_class_t klass = CKO_PRIVATE_KEY;
+	ck_key_type_t key_type = CKK_EC;
+	bool tval = true;
 	gnutls_datum_t ec_curve = { NULL, 0 };
 	gnutls_datum_t ecc_k = { NULL, 0 };
-	CK_ATTRIBUTE attrs[] = { { CKA_CLASS, &klass, sizeof(klass) },
-				 { CKA_KEY_TYPE, &key_type, sizeof(key_type) },
-				 { CKA_SENSITIVE, &tval, sizeof(tval) },
-				 { CKA_SIGN, &tval, sizeof(tval) },
-				 { CKA_EC_PARAMS, NULL, 0 },
-				 { CKA_VALUE, NULL, 0 } };
-	CK_ULONG attrs_len = sizeof(attrs) / sizeof(attrs[0]);
+	struct ck_attribute attrs[] = { { CKA_CLASS, &klass, sizeof(klass) },
+					{ CKA_KEY_TYPE, &key_type,
+					  sizeof(key_type) },
+					{ CKA_SENSITIVE, &tval, sizeof(tval) },
+					{ CKA_SIGN, &tval, sizeof(tval) },
+					{ CKA_EC_PARAMS, NULL, 0 },
+					{ CKA_VALUE, NULL, 0 } };
+	unsigned long attrs_len = sizeof(attrs) / sizeof(attrs[0]);
 
 	if (_gnutls_x509_write_ecc_params(pk_params->curve, &ec_curve) < 0 ||
 	    _gnutls_mpi_dprint(pk_params->params[ECC_K], &ecc_k) < 0)
 		goto cleanup;
 
-	attrs[4].pValue = ec_curve.data;
-	attrs[4].ulValueLen = ec_curve.size;
-	attrs[5].pValue = ecc_k.data;
-	attrs[5].ulValueLen = ecc_k.size;
+	attrs[4].value = ec_curve.data;
+	attrs[4].value_len = ec_curve.size;
+	attrs[5].value = ecc_k.data;
+	attrs[5].value_len = ecc_k.size;
 
 	module->C_CreateObject(session, attrs, attrs_len, &object);
 
@@ -227,72 +234,72 @@ cleanup:
 	return object;
 }
 
-static bool init_rsa_oaep_param(CK_RSA_PKCS_OAEP_PARAMS *param,
+static bool init_rsa_oaep_param(struct ck_rsa_pkcs_oaep_params *param,
 				const gnutls_x509_spki_st *encrypt_params)
 {
 	switch (encrypt_params->rsa_oaep_dig) {
 	case GNUTLS_DIG_SHA256:
-		param->hashAlg = CKM_SHA256;
+		param->hash_alg = CKM_SHA256;
 		param->mgf = CKG_MGF1_SHA256;
 		break;
 	case GNUTLS_DIG_SHA384:
-		param->hashAlg = CKM_SHA384;
+		param->hash_alg = CKM_SHA384;
 		param->mgf = CKG_MGF1_SHA384;
 		break;
 	case GNUTLS_DIG_SHA512:
-		param->hashAlg = CKM_SHA512;
+		param->hash_alg = CKM_SHA512;
 		param->mgf = CKG_MGF1_SHA512;
 		break;
 	default:
 		return false;
 	}
 	param->source = CKZ_DATA_SPECIFIED;
-	param->pSourceData = encrypt_params->rsa_oaep_label.data;
-	param->ulSourceDataLen = encrypt_params->rsa_oaep_label.size;
+	param->source_data = encrypt_params->rsa_oaep_label.data;
+	param->source_data_len = encrypt_params->rsa_oaep_label.size;
 	return true;
 }
 
-static bool init_rsa_pss_param(CK_RSA_PKCS_PSS_PARAMS *param,
+static bool init_rsa_pss_param(struct ck_rsa_pkcs_pss_params *param,
 			       const gnutls_x509_spki_st *sign_params)
 {
 	switch (sign_params->rsa_pss_dig) {
 	case GNUTLS_DIG_SHA256:
-		param->hashAlg = CKM_SHA256;
+		param->hash_alg = CKM_SHA256;
 		param->mgf = CKG_MGF1_SHA256;
 		break;
 	case GNUTLS_DIG_SHA384:
-		param->hashAlg = CKM_SHA384;
+		param->hash_alg = CKM_SHA384;
 		param->mgf = CKG_MGF1_SHA384;
 		break;
 	case GNUTLS_DIG_SHA512:
-		param->hashAlg = CKM_SHA512;
+		param->hash_alg = CKM_SHA512;
 		param->mgf = CKG_MGF1_SHA512;
 		break;
 	default:
 		return false;
 	}
-	param->sLen = sign_params->salt_size;
+	param->s_len = sign_params->salt_size;
 	return true;
 }
 
-static int generate_dh_params(CK_SESSION_HANDLE session,
-			      gnutls_pk_params_st *params, CK_ULONG bits)
+static int generate_dh_params(ck_session_handle_t session,
+			      gnutls_pk_params_st *params, unsigned long bits)
 {
 	int ret = 0;
 	unsigned i;
-	CK_RV rv;
-	CK_FUNCTION_LIST *module = _p11_provider_get_module();
-	CK_OBJECT_HANDLE obj = CK_INVALID_HANDLE;
-	CK_MECHANISM mech = { CKM_DH_PKCS_PARAMETER_GEN, NULL, 0 };
-	CK_ATTRIBUTE attrs[] = {
+	ck_rv_t rv;
+	struct ck_function_list *module = _p11_provider_get_module();
+	ck_object_handle_t obj = CK_INVALID_HANDLE;
+	struct ck_mechanism mech = { CKM_DH_PKCS_PARAMETER_GEN, NULL, 0 };
+	struct ck_attribute attrs[] = {
 		{ CKA_PRIME_BITS, &bits, sizeof(bits) },
 	};
-	CK_ATTRIBUTE param[] = {
+	struct ck_attribute param[] = {
 		{ CKA_PRIME, NULL, CK_UNAVAILABLE_INFORMATION },
 		{ CKA_BASE, NULL, CK_UNAVAILABLE_INFORMATION },
 	};
-	CK_ULONG attrs_len = sizeof(attrs) / sizeof(attrs[0]);
-	CK_ULONG param_len = sizeof(param) / sizeof(param[0]);
+	unsigned long attrs_len = sizeof(attrs) / sizeof(attrs[0]);
+	unsigned long param_len = sizeof(param) / sizeof(param[0]);
 
 	rv = module->C_GenerateKey(session, &mech, attrs, attrs_len, &obj);
 	if (rv != CKR_OK)
@@ -303,12 +310,12 @@ static int generate_dh_params(CK_SESSION_HANDLE session,
 		return gnutls_assert_val(GNUTLS_E_PKCS11_ERROR);
 
 	for (i = 0; i < param_len; ++i) {
-		if (param[i].ulValueLen == CK_UNAVAILABLE_INFORMATION) {
+		if (param[i].value_len == CK_UNAVAILABLE_INFORMATION) {
 			ret = gnutls_assert_val(GNUTLS_E_PKCS11_ERROR);
 			goto cleanup;
 		}
-		param[i].pValue = gnutls_malloc(param[i].ulValueLen);
-		if (param[i].pValue == NULL) {
+		param[i].value = gnutls_malloc(param[i].value_len);
+		if (param[i].value == NULL) {
 			ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 			goto cleanup;
 		}
@@ -320,10 +327,10 @@ static int generate_dh_params(CK_SESSION_HANDLE session,
 		goto cleanup;
 	}
 
-	if (_gnutls_mpi_init_scan(&params->params[DH_P], param[0].pValue,
-				  param[0].ulValueLen) < 0 ||
-	    _gnutls_mpi_init_scan(&params->params[DH_G], param[1].pValue,
-				  param[1].ulValueLen) < 0) {
+	if (_gnutls_mpi_init_scan(&params->params[DH_P], param[0].value,
+				  param[0].value_len) < 0 ||
+	    _gnutls_mpi_init_scan(&params->params[DH_G], param[1].value,
+				  param[1].value_len) < 0) {
 		ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 		goto cleanup;
 	}
@@ -331,35 +338,35 @@ static int generate_dh_params(CK_SESSION_HANDLE session,
 
 cleanup:
 	for (i = 0; i < param_len; ++i)
-		gnutls_free(param[i].pValue);
+		gnutls_free(param[i].value);
 
 	return ret;
 }
 
-static int generate_rsa_keys(CK_SESSION_HANDLE session,
-			     gnutls_pk_params_st *params, CK_ULONG bits)
+static int generate_rsa_keys(ck_session_handle_t session,
+			     gnutls_pk_params_st *params, unsigned long bits)
 {
 	int ret = 0;
 	unsigned i;
-	CK_RV rv;
-	CK_FUNCTION_LIST *module = _p11_provider_get_module();
-	CK_OBJECT_HANDLE pubkey = CK_INVALID_HANDLE;
-	CK_OBJECT_HANDLE privkey = CK_INVALID_HANDLE;
-	CK_MECHANISM mech = { CKM_RSA_PKCS_KEY_PAIR_GEN, NULL, 0 };
-	CK_BBOOL tval = CK_TRUE;
-	CK_BBOOL fval = CK_FALSE;
-	CK_ATTRIBUTE pub_attrs[] = {
+	ck_rv_t rv;
+	struct ck_function_list *module = _p11_provider_get_module();
+	ck_object_handle_t pubkey = CK_INVALID_HANDLE;
+	ck_object_handle_t privkey = CK_INVALID_HANDLE;
+	struct ck_mechanism mech = { CKM_RSA_PKCS_KEY_PAIR_GEN, NULL, 0 };
+	bool tval = true;
+	bool fval = false;
+	struct ck_attribute pub_attrs[] = {
 		{ CKA_ENCRYPT, &tval, sizeof(tval) },
 		{ CKA_VERIFY, &tval, sizeof(tval) },
 		{ CKA_MODULUS_BITS, &bits, sizeof(bits) },
 	};
-	CK_ATTRIBUTE priv_attrs[] = {
+	struct ck_attribute priv_attrs[] = {
 		{ CKA_SENSITIVE, &fval, sizeof(fval) },
 		{ CKA_EXTRACTABLE, &tval, sizeof(tval) },
 		{ CKA_DECRYPT, &tval, sizeof(tval) },
 		{ CKA_SIGN, &tval, sizeof(tval) },
 	};
-	CK_ATTRIBUTE priv[] = {
+	struct ck_attribute priv[] = {
 		{ CKA_MODULUS, NULL, CK_UNAVAILABLE_INFORMATION },
 		{ CKA_PUBLIC_EXPONENT, NULL, CK_UNAVAILABLE_INFORMATION },
 		{ CKA_PRIVATE_EXPONENT, NULL, CK_UNAVAILABLE_INFORMATION },
@@ -369,9 +376,10 @@ static int generate_rsa_keys(CK_SESSION_HANDLE session,
 		{ CKA_EXPONENT_1, NULL, CK_UNAVAILABLE_INFORMATION },
 		{ CKA_EXPONENT_2, NULL, CK_UNAVAILABLE_INFORMATION },
 	};
-	CK_ULONG pub_attrs_len = sizeof(pub_attrs) / sizeof(pub_attrs[0]);
-	CK_ULONG priv_attrs_len = sizeof(priv_attrs) / sizeof(priv_attrs[0]);
-	CK_ULONG priv_len = sizeof(priv) / sizeof(priv[0]);
+	unsigned long pub_attrs_len = sizeof(pub_attrs) / sizeof(pub_attrs[0]);
+	unsigned long priv_attrs_len =
+		sizeof(priv_attrs) / sizeof(priv_attrs[0]);
+	unsigned long priv_len = sizeof(priv) / sizeof(priv[0]);
 
 	rv = module->C_GenerateKeyPair(session, &mech, pub_attrs, pub_attrs_len,
 				       priv_attrs, priv_attrs_len, &pubkey,
@@ -384,12 +392,12 @@ static int generate_rsa_keys(CK_SESSION_HANDLE session,
 		return gnutls_assert_val(GNUTLS_E_PKCS11_ERROR);
 
 	for (i = 0; i < priv_len; ++i) {
-		if (priv[i].ulValueLen == CK_UNAVAILABLE_INFORMATION) {
+		if (priv[i].value_len == CK_UNAVAILABLE_INFORMATION) {
 			ret = gnutls_assert_val(GNUTLS_E_PKCS11_ERROR);
 			goto cleanup;
 		}
-		priv[i].pValue = gnutls_malloc(priv[i].ulValueLen);
-		if (priv[i].pValue == NULL) {
+		priv[i].value = gnutls_malloc(priv[i].value_len);
+		if (priv[i].value == NULL) {
 			ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 			goto cleanup;
 		}
@@ -403,8 +411,8 @@ static int generate_rsa_keys(CK_SESSION_HANDLE session,
 
 	params->params_nr = 0;
 	for (i = 0; i < priv_len; ++i) {
-		if (_gnutls_mpi_init_scan(&params->params[i], priv[i].pValue,
-					  priv[i].ulValueLen) < 0) {
+		if (_gnutls_mpi_init_scan(&params->params[i], priv[i].value,
+					  priv[i].value_len) < 0) {
 			ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 			goto cleanup;
 		}
@@ -413,42 +421,43 @@ static int generate_rsa_keys(CK_SESSION_HANDLE session,
 
 cleanup:
 	for (i = 0; i < priv_len; ++i)
-		gnutls_free(priv[i].pValue);
+		gnutls_free(priv[i].value);
 
 	return ret;
 }
 
-static int generate_dh_keys(CK_SESSION_HANDLE session,
+static int generate_dh_keys(ck_session_handle_t session,
 			    gnutls_pk_params_st *params)
 {
 	int ret = 0;
-	CK_RV rv;
-	CK_FUNCTION_LIST *module = _p11_provider_get_module();
-	CK_OBJECT_HANDLE pubkey = CK_INVALID_HANDLE;
-	CK_OBJECT_HANDLE privkey = CK_INVALID_HANDLE;
-	CK_MECHANISM mech = { CKM_DH_PKCS_KEY_PAIR_GEN, NULL, 0 };
-	CK_BBOOL tval = CK_TRUE;
-	CK_BBOOL fval = CK_FALSE;
+	ck_rv_t rv;
+	struct ck_function_list *module = _p11_provider_get_module();
+	ck_object_handle_t pubkey = CK_INVALID_HANDLE;
+	ck_object_handle_t privkey = CK_INVALID_HANDLE;
+	struct ck_mechanism mech = { CKM_DH_PKCS_KEY_PAIR_GEN, NULL, 0 };
+	bool tval = true;
+	bool fval = false;
 	gnutls_datum_t p = { NULL, 0 };
 	gnutls_datum_t g = { NULL, 0 };
-	CK_ATTRIBUTE pub_attrs[] = {
+	struct ck_attribute pub_attrs[] = {
 		{ CKA_PRIME, NULL, 0 },
 		{ CKA_BASE, NULL, 0 },
 	};
-	CK_ATTRIBUTE priv_attrs[] = {
+	struct ck_attribute priv_attrs[] = {
 		{ CKA_SENSITIVE, &fval, sizeof(fval) },
 		{ CKA_EXTRACTABLE, &tval, sizeof(tval) },
 	};
-	CK_ATTRIBUTE pub[] = {
+	struct ck_attribute pub[] = {
 		{ CKA_VALUE, NULL, CK_UNAVAILABLE_INFORMATION },
 	};
-	CK_ATTRIBUTE priv[] = {
+	struct ck_attribute priv[] = {
 		{ CKA_VALUE, NULL, CK_UNAVAILABLE_INFORMATION },
 	};
-	CK_ULONG pub_attrs_len = sizeof(pub_attrs) / sizeof(pub_attrs[0]);
-	CK_ULONG priv_attrs_len = sizeof(priv_attrs) / sizeof(priv_attrs[0]);
-	CK_ULONG pub_len = sizeof(pub) / sizeof(pub[0]);
-	CK_ULONG priv_len = sizeof(priv) / sizeof(priv[0]);
+	unsigned long pub_attrs_len = sizeof(pub_attrs) / sizeof(pub_attrs[0]);
+	unsigned long priv_attrs_len =
+		sizeof(priv_attrs) / sizeof(priv_attrs[0]);
+	unsigned long pub_len = sizeof(pub) / sizeof(pub[0]);
+	unsigned long priv_len = sizeof(priv) / sizeof(priv[0]);
 
 	/* Set attributes for key generation
 	 */
@@ -457,10 +466,10 @@ static int generate_dh_keys(CK_SESSION_HANDLE session,
 		ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 		goto cleanup;
 	}
-	pub_attrs[0].pValue = p.data;
-	pub_attrs[0].ulValueLen = p.size;
-	pub_attrs[1].pValue = g.data;
-	pub_attrs[1].ulValueLen = g.size;
+	pub_attrs[0].value = p.data;
+	pub_attrs[0].value_len = p.size;
+	pub_attrs[1].value = g.data;
+	pub_attrs[1].value_len = g.size;
 
 	rv = module->C_GenerateKeyPair(session, &mech, pub_attrs, pub_attrs_len,
 				       priv_attrs, priv_attrs_len, &pubkey,
@@ -473,12 +482,12 @@ static int generate_dh_keys(CK_SESSION_HANDLE session,
 	/* Retrieve public key
 	 */
 	rv = module->C_GetAttributeValue(session, pubkey, pub, pub_len);
-	if (rv != CKR_OK || pub[0].ulValueLen == CK_UNAVAILABLE_INFORMATION) {
+	if (rv != CKR_OK || pub[0].value_len == CK_UNAVAILABLE_INFORMATION) {
 		ret = gnutls_assert_val(GNUTLS_E_PKCS11_ERROR);
 		goto cleanup;
 	}
-	pub[0].pValue = gnutls_malloc(pub[0].ulValueLen);
-	if (pub[0].pValue == NULL) {
+	pub[0].value = gnutls_malloc(pub[0].value_len);
+	if (pub[0].value == NULL) {
 		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 		goto cleanup;
 	}
@@ -491,12 +500,12 @@ static int generate_dh_keys(CK_SESSION_HANDLE session,
 	/* Retrieve private key
 	 */
 	rv = module->C_GetAttributeValue(session, privkey, priv, priv_len);
-	if (rv != CKR_OK || priv[0].ulValueLen == CK_UNAVAILABLE_INFORMATION) {
+	if (rv != CKR_OK || priv[0].value_len == CK_UNAVAILABLE_INFORMATION) {
 		ret = gnutls_assert_val(GNUTLS_E_PKCS11_ERROR);
 		goto cleanup;
 	}
-	priv[0].pValue = gnutls_malloc(priv[0].ulValueLen);
-	if (priv[0].pValue == NULL) {
+	priv[0].value = gnutls_malloc(priv[0].value_len);
+	if (priv[0].value == NULL) {
 		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 		goto cleanup;
 	}
@@ -508,10 +517,10 @@ static int generate_dh_keys(CK_SESSION_HANDLE session,
 
 	/* Set result
 	 */
-	if (_gnutls_mpi_init_scan(&params->params[DH_Y], pub[0].pValue,
-				  pub[0].ulValueLen) < 0 ||
-	    _gnutls_mpi_init_scan(&params->params[DH_X], priv[0].pValue,
-				  priv[0].ulValueLen) < 0) {
+	if (_gnutls_mpi_init_scan(&params->params[DH_Y], pub[0].value,
+				  pub[0].value_len) < 0 ||
+	    _gnutls_mpi_init_scan(&params->params[DH_X], priv[0].value,
+				  priv[0].value_len) < 0) {
 		ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 		goto cleanup;
 	}
@@ -520,51 +529,52 @@ static int generate_dh_keys(CK_SESSION_HANDLE session,
 cleanup:
 	_gnutls_free_datum(&p);
 	_gnutls_free_datum(&g);
-	gnutls_free(pub[0].pValue);
-	gnutls_free(priv[0].pValue);
+	gnutls_free(pub[0].value);
+	gnutls_free(priv[0].value);
 	return ret;
 }
 
-static int generate_ec_keys(CK_SESSION_HANDLE session,
+static int generate_ec_keys(ck_session_handle_t session,
 			    gnutls_pk_params_st *params,
 			    gnutls_ecc_curve_t curve)
 {
 	int ret = 0;
 	uint8_t *pub_x962;
 	size_t pub_x962_len;
-	CK_RV rv;
-	CK_FUNCTION_LIST *module = _p11_provider_get_module();
-	CK_OBJECT_HANDLE pubkey = CK_INVALID_HANDLE;
-	CK_OBJECT_HANDLE privkey = CK_INVALID_HANDLE;
-	CK_MECHANISM mech = { CKM_EC_KEY_PAIR_GEN, NULL, 0 };
-	CK_BBOOL tval = CK_TRUE;
-	CK_BBOOL fval = CK_FALSE;
+	ck_rv_t rv;
+	struct ck_function_list *module = _p11_provider_get_module();
+	ck_object_handle_t pubkey = CK_INVALID_HANDLE;
+	ck_object_handle_t privkey = CK_INVALID_HANDLE;
+	struct ck_mechanism mech = { CKM_EC_KEY_PAIR_GEN, NULL, 0 };
+	bool tval = true;
+	bool fval = false;
 	gnutls_datum_t ec_curve = { NULL, 0 };
-	CK_ATTRIBUTE pub_attrs[] = {
+	struct ck_attribute pub_attrs[] = {
 		{ CKA_EC_PARAMS, NULL, 0 },
 	};
-	CK_ATTRIBUTE priv_attrs[] = {
+	struct ck_attribute priv_attrs[] = {
 		{ CKA_SENSITIVE, &fval, sizeof(fval) },
 		{ CKA_EXTRACTABLE, &tval, sizeof(tval) },
 	};
-	CK_ATTRIBUTE pub[] = {
+	struct ck_attribute pub[] = {
 		{ CKA_EC_POINT, NULL, CK_UNAVAILABLE_INFORMATION },
 	};
-	CK_ATTRIBUTE priv[] = {
+	struct ck_attribute priv[] = {
 		{ CKA_VALUE, NULL, CK_UNAVAILABLE_INFORMATION },
 	};
-	CK_ULONG pub_attrs_len = sizeof(pub_attrs) / sizeof(pub_attrs[0]);
-	CK_ULONG priv_attrs_len = sizeof(priv_attrs) / sizeof(priv_attrs[0]);
-	CK_ULONG pub_len = sizeof(pub) / sizeof(pub[0]);
-	CK_ULONG priv_len = sizeof(priv) / sizeof(priv[0]);
+	unsigned long pub_attrs_len = sizeof(pub_attrs) / sizeof(pub_attrs[0]);
+	unsigned long priv_attrs_len =
+		sizeof(priv_attrs) / sizeof(priv_attrs[0]);
+	unsigned long pub_len = sizeof(pub) / sizeof(pub[0]);
+	unsigned long priv_len = sizeof(priv) / sizeof(priv[0]);
 
 	/* Set attributes for key generation
 	 */
 	if (_gnutls_x509_write_ecc_params(curve, &ec_curve) < 0)
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-	pub_attrs[0].pValue = ec_curve.data;
-	pub_attrs[0].ulValueLen = ec_curve.size;
+	pub_attrs[0].value = ec_curve.data;
+	pub_attrs[0].value_len = ec_curve.size;
 
 	rv = module->C_GenerateKeyPair(session, &mech, pub_attrs, pub_attrs_len,
 				       priv_attrs, priv_attrs_len, &pubkey,
@@ -577,12 +587,12 @@ static int generate_ec_keys(CK_SESSION_HANDLE session,
 	/* Retrieve public key
 	 */
 	rv = module->C_GetAttributeValue(session, pubkey, pub, pub_len);
-	if (rv != CKR_OK || pub[0].ulValueLen == CK_UNAVAILABLE_INFORMATION) {
+	if (rv != CKR_OK || pub[0].value_len == CK_UNAVAILABLE_INFORMATION) {
 		ret = gnutls_assert_val(GNUTLS_E_PKCS11_ERROR);
 		goto cleanup;
 	}
-	pub[0].pValue = gnutls_malloc(pub[0].ulValueLen);
-	if (pub[0].pValue == NULL) {
+	pub[0].value = gnutls_malloc(pub[0].value_len);
+	if (pub[0].value == NULL) {
 		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 		goto cleanup;
 	}
@@ -595,12 +605,12 @@ static int generate_ec_keys(CK_SESSION_HANDLE session,
 	/* Retrieve private key
 	 */
 	rv = module->C_GetAttributeValue(session, privkey, priv, priv_len);
-	if (rv != CKR_OK || priv[0].ulValueLen == CK_UNAVAILABLE_INFORMATION) {
+	if (rv != CKR_OK || priv[0].value_len == CK_UNAVAILABLE_INFORMATION) {
 		ret = gnutls_assert_val(GNUTLS_E_PKCS11_ERROR);
 		goto cleanup;
 	}
-	priv[0].pValue = gnutls_malloc(priv[0].ulValueLen);
-	if (priv[0].pValue == NULL) {
+	priv[0].value = gnutls_malloc(priv[0].value_len);
+	if (priv[0].value == NULL) {
 		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 		goto cleanup;
 	}
@@ -610,8 +620,8 @@ static int generate_ec_keys(CK_SESSION_HANDLE session,
 		goto cleanup;
 	}
 
-	pub_x962 = (uint8_t *)pub[0].pValue + 2;
-	pub_x962_len = ((uint8_t *)pub[0].pValue)[1];
+	pub_x962 = (uint8_t *)pub[0].value + 2;
+	pub_x962_len = ((uint8_t *)pub[0].value)[1];
 
 	/* Set result
 	 */
@@ -621,8 +631,8 @@ static int generate_ec_keys(CK_SESSION_HANDLE session,
 		ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 		goto cleanup;
 	}
-	if (_gnutls_mpi_init_scan(&params->params[ECC_K], priv[0].pValue,
-				  priv[0].ulValueLen) < 0) {
+	if (_gnutls_mpi_init_scan(&params->params[ECC_K], priv[0].value,
+				  priv[0].value_len) < 0) {
 		ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 		goto cleanup;
 	}
@@ -631,28 +641,28 @@ static int generate_ec_keys(CK_SESSION_HANDLE session,
 
 cleanup:
 	_gnutls_free_datum(&ec_curve);
-	gnutls_free(pub[0].pValue);
-	gnutls_free(priv[0].pValue);
+	gnutls_free(pub[0].value);
+	gnutls_free(priv[0].value);
 	return ret;
 }
 
-static int derive_ecdh_secret(CK_SESSION_HANDLE session,
+static int derive_ecdh_secret(ck_session_handle_t session,
 			      const gnutls_pk_params_st *priv,
 			      const gnutls_pk_params_st *pub,
 			      gnutls_datum_t *out)
 {
-	CK_RV rv;
-	CK_FUNCTION_LIST *module = _p11_provider_get_module();
-	CK_OBJECT_HANDLE priv_obj = CK_INVALID_HANDLE;
-	CK_OBJECT_HANDLE secret_obj = CK_INVALID_HANDLE;
-	CK_OBJECT_CLASS klass = CKO_SECRET_KEY;
-	CK_KEY_TYPE key_type = CKK_EC;
-	CK_BBOOL tval = CK_TRUE, fval = CK_FALSE;
-	CK_ATTRIBUTE secret[] = {
+	ck_rv_t rv;
+	struct ck_function_list *module = _p11_provider_get_module();
+	ck_object_handle_t priv_obj = CK_INVALID_HANDLE;
+	ck_object_handle_t secret_obj = CK_INVALID_HANDLE;
+	ck_object_class_t klass = CKO_SECRET_KEY;
+	ck_key_type_t key_type = CKK_EC;
+	bool tval = true, fval = false;
+	struct ck_attribute secret[] = {
 		{ CKA_VALUE, NULL, CK_UNAVAILABLE_INFORMATION },
 	};
-	CK_ULONG secret_len = sizeof(secret) / sizeof(secret[0]);
-	CK_ATTRIBUTE attrs[] = {
+	unsigned long secret_len = sizeof(secret) / sizeof(secret[0]);
+	struct ck_attribute attrs[] = {
 		{ CKA_CLASS, &klass, sizeof(klass) },
 		{ CKA_KEY_TYPE, &key_type, sizeof(key_type) },
 		{ CKA_SENSITIVE, &fval, sizeof(fval) },
@@ -660,18 +670,18 @@ static int derive_ecdh_secret(CK_SESSION_HANDLE session,
 		{ CKA_ENCRYPT, &tval, sizeof(tval) },
 		{ CKA_DECRYPT, &tval, sizeof(tval) },
 	};
-	CK_ULONG attrs_len = sizeof(attrs) / sizeof(attrs[0]);
+	unsigned long attrs_len = sizeof(attrs) / sizeof(attrs[0]);
 	gnutls_datum_t ec_point = { 0 };
-	CK_ECDH1_DERIVE_PARAMS param = { 0 };
-	CK_MECHANISM mech = { CKM_ECDH1_DERIVE, &param, sizeof(param) };
+	struct ck_ecdh1_derive_params param = { 0 };
+	struct ck_mechanism mech = { CKM_ECDH1_DERIVE, &param, sizeof(param) };
 
 	if (_gnutls_ecc_ansi_x962_export(pub->curve, pub->params[ECC_X],
 					 pub->params[ECC_Y], &ec_point) < 0)
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 	param.kdf = CKD_NULL;
-	param.ulPublicDataLen = ec_point.size;
-	param.pPublicData = ec_point.data;
+	param.public_data_len = ec_point.size;
+	param.public_data = ec_point.data;
 
 	priv_obj = import_ec_privkey(session, priv);
 	if (priv_obj == CK_INVALID_HANDLE)
@@ -684,22 +694,22 @@ static int derive_ecdh_secret(CK_SESSION_HANDLE session,
 
 	rv = module->C_GetAttributeValue(session, secret_obj, secret,
 					 secret_len);
-	if (rv != CKR_OK || secret[0].ulValueLen == CK_UNAVAILABLE_INFORMATION)
+	if (rv != CKR_OK || secret[0].value_len == CK_UNAVAILABLE_INFORMATION)
 		return gnutls_assert_val(GNUTLS_E_PKCS11_ERROR);
 
-	secret[0].pValue = gnutls_malloc(secret[0].ulValueLen);
-	if (secret[0].pValue == NULL)
+	secret[0].value = gnutls_malloc(secret[0].value_len);
+	if (secret[0].value == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
 	rv = module->C_GetAttributeValue(session, secret_obj, secret,
 					 secret_len);
 	if (rv != CKR_OK) {
-		gnutls_free(secret[0].pValue);
+		gnutls_free(secret[0].value);
 		return gnutls_assert_val(GNUTLS_E_PKCS11_ERROR);
 	}
 
-	out->data = secret[0].pValue;
-	out->size = secret[0].ulValueLen;
+	out->data = secret[0].value;
+	out->size = secret[0].value_len;
 	return 0;
 }
 
@@ -710,14 +720,14 @@ static int _wrap_p11_pk_encrypt(gnutls_pk_algorithm_t algo,
 				const gnutls_x509_spki_st *encrypt_params)
 {
 	int ret = 0;
-	CK_RV rv;
-	CK_BYTE *c_data = NULL;
-	CK_ULONG c_size = 0;
-	CK_FUNCTION_LIST *module = _p11_provider_get_module();
-	CK_SESSION_HANDLE session = CK_INVALID_HANDLE;
-	CK_OBJECT_HANDLE key = CK_INVALID_HANDLE;
-	CK_MECHANISM mech = { 0 };
-	CK_RSA_PKCS_OAEP_PARAMS param_rsa_oaep;
+	ck_rv_t rv;
+	unsigned char *c_data = NULL;
+	unsigned long c_size = 0;
+	struct ck_function_list *module = _p11_provider_get_module();
+	ck_session_handle_t session = CK_INVALID_HANDLE;
+	ck_object_handle_t key = CK_INVALID_HANDLE;
+	struct ck_mechanism mech = { 0 };
+	struct ck_rsa_pkcs_oaep_params param_rsa_oaep;
 
 	session = _p11_provider_open_session();
 	if (session == CK_INVALID_HANDLE)
@@ -740,8 +750,8 @@ static int _wrap_p11_pk_encrypt(gnutls_pk_algorithm_t algo,
 		break;
 	case GNUTLS_PK_RSA_OAEP: {
 		mech.mechanism = CKM_RSA_PKCS_OAEP;
-		mech.pParameter = &param_rsa_oaep;
-		mech.ulParameterLen = sizeof(param_rsa_oaep);
+		mech.parameter = &param_rsa_oaep;
+		mech.parameter_len = sizeof(param_rsa_oaep);
 
 		if (!init_rsa_oaep_param(&param_rsa_oaep, encrypt_params)) {
 			ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -767,7 +777,7 @@ static int _wrap_p11_pk_encrypt(gnutls_pk_algorithm_t algo,
 		goto cleanup;
 	}
 
-	rv = module->C_Encrypt(session, (CK_BYTE_PTR)plaintext->data,
+	rv = module->C_Encrypt(session, (unsigned char *)plaintext->data,
 			       plaintext->size, NULL, &c_size);
 	if (rv != CKR_OK) {
 		ret = gnutls_assert_val(GNUTLS_E_PKCS11_ERROR);
@@ -780,7 +790,7 @@ static int _wrap_p11_pk_encrypt(gnutls_pk_algorithm_t algo,
 		goto cleanup;
 	}
 
-	rv = module->C_Encrypt(session, (CK_BYTE_PTR)plaintext->data,
+	rv = module->C_Encrypt(session, (unsigned char *)plaintext->data,
 			       plaintext->size, c_data, &c_size);
 	if (rv != CKR_OK) {
 		ret = gnutls_assert_val(GNUTLS_E_PKCS11_ERROR);
@@ -803,14 +813,14 @@ static int _wrap_p11_pk_decrypt(gnutls_pk_algorithm_t algo,
 				const gnutls_x509_spki_st *encrypt_params)
 {
 	int ret = 0;
-	CK_RV rv;
-	CK_BYTE *p_data = NULL;
-	CK_ULONG p_size = 0;
-	CK_FUNCTION_LIST *module = _p11_provider_get_module();
-	CK_SESSION_HANDLE session = CK_INVALID_HANDLE;
-	CK_OBJECT_HANDLE key = CK_INVALID_HANDLE;
-	CK_MECHANISM mech = { 0 };
-	CK_RSA_PKCS_OAEP_PARAMS param_rsa_oaep;
+	ck_rv_t rv;
+	unsigned char *p_data = NULL;
+	unsigned long p_size = 0;
+	struct ck_function_list *module = _p11_provider_get_module();
+	ck_session_handle_t session = CK_INVALID_HANDLE;
+	ck_object_handle_t key = CK_INVALID_HANDLE;
+	struct ck_mechanism mech = { 0 };
+	struct ck_rsa_pkcs_oaep_params param_rsa_oaep;
 
 	session = _p11_provider_open_session();
 	if (session == CK_INVALID_HANDLE)
@@ -833,8 +843,8 @@ static int _wrap_p11_pk_decrypt(gnutls_pk_algorithm_t algo,
 		break;
 	case GNUTLS_PK_RSA_OAEP:
 		mech.mechanism = CKM_RSA_PKCS_OAEP;
-		mech.pParameter = &param_rsa_oaep;
-		mech.ulParameterLen = sizeof(param_rsa_oaep);
+		mech.parameter = &param_rsa_oaep;
+		mech.parameter_len = sizeof(param_rsa_oaep);
 
 		if (!init_rsa_oaep_param(&param_rsa_oaep, encrypt_params)) {
 			ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -859,7 +869,7 @@ static int _wrap_p11_pk_decrypt(gnutls_pk_algorithm_t algo,
 		goto cleanup;
 	}
 
-	rv = module->C_Decrypt(session, (CK_BYTE_PTR)ciphertext->data,
+	rv = module->C_Decrypt(session, (unsigned char *)ciphertext->data,
 			       ciphertext->size, NULL, &p_size);
 	if (rv != CKR_OK) {
 		ret = gnutls_assert_val(GNUTLS_E_PKCS11_ERROR);
@@ -872,7 +882,7 @@ static int _wrap_p11_pk_decrypt(gnutls_pk_algorithm_t algo,
 		goto cleanup;
 	}
 
-	rv = module->C_Decrypt(session, (CK_BYTE_PTR)ciphertext->data,
+	rv = module->C_Decrypt(session, (unsigned char *)ciphertext->data,
 			       ciphertext->size, p_data, &p_size);
 	if (rv != CKR_OK) {
 		ret = gnutls_assert_val(GNUTLS_E_PKCS11_ERROR);
@@ -898,14 +908,14 @@ static int _wrap_p11_pk_decrypt2(gnutls_pk_algorithm_t algo,
 	int ret = 0;
 	uint32_t is_err;
 	size_t copy_size = 0;
-	CK_RV rv;
-	CK_BYTE *p_data = NULL;
-	CK_ULONG p_size = 0;
-	CK_FUNCTION_LIST *module = _p11_provider_get_module();
-	CK_SESSION_HANDLE session = CK_INVALID_HANDLE;
-	CK_OBJECT_HANDLE key = CK_INVALID_HANDLE;
-	CK_MECHANISM mech = { 0 };
-	CK_RSA_PKCS_OAEP_PARAMS param_rsa_oaep;
+	ck_rv_t rv;
+	unsigned char *p_data = NULL;
+	unsigned long p_size = 0;
+	struct ck_function_list *module = _p11_provider_get_module();
+	ck_session_handle_t session = CK_INVALID_HANDLE;
+	ck_object_handle_t key = CK_INVALID_HANDLE;
+	struct ck_mechanism mech = { 0 };
+	struct ck_rsa_pkcs_oaep_params param_rsa_oaep;
 
 	session = _p11_provider_open_session();
 	if (session == CK_INVALID_HANDLE)
@@ -928,8 +938,8 @@ static int _wrap_p11_pk_decrypt2(gnutls_pk_algorithm_t algo,
 		break;
 	case GNUTLS_PK_RSA_OAEP:
 		mech.mechanism = CKM_RSA_PKCS_OAEP;
-		mech.pParameter = &param_rsa_oaep;
-		mech.ulParameterLen = sizeof(param_rsa_oaep);
+		mech.parameter = &param_rsa_oaep;
+		mech.parameter_len = sizeof(param_rsa_oaep);
 
 		if (!init_rsa_oaep_param(&param_rsa_oaep, encrypt_params)) {
 			ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -954,7 +964,7 @@ static int _wrap_p11_pk_decrypt2(gnutls_pk_algorithm_t algo,
 		goto cleanup;
 	}
 
-	rv = module->C_Decrypt(session, (CK_BYTE_PTR)ciphertext->data,
+	rv = module->C_Decrypt(session, (unsigned char *)ciphertext->data,
 			       ciphertext->size, NULL, &p_size);
 	if (rv != CKR_OK) {
 		ret = gnutls_assert_val(GNUTLS_E_PKCS11_ERROR);
@@ -969,7 +979,7 @@ static int _wrap_p11_pk_decrypt2(gnutls_pk_algorithm_t algo,
 
 	copy_size = MIN(plaintext_size, p_size);
 
-	rv = module->C_Decrypt(session, (CK_BYTE_PTR)ciphertext->data,
+	rv = module->C_Decrypt(session, (unsigned char *)ciphertext->data,
 			       ciphertext->size, p_data, &p_size);
 	memcpy(plaintext, p_data, copy_size);
 	gnutls_free(p_data);
@@ -989,14 +999,14 @@ static int _wrap_p11_pk_sign(gnutls_pk_algorithm_t algo,
 			     const gnutls_x509_spki_st *sign_params)
 {
 	int ret = 0;
-	CK_RV rv;
-	CK_BYTE *s_data = NULL;
-	CK_ULONG s_size = 0;
-	CK_FUNCTION_LIST *module = _p11_provider_get_module();
-	CK_SESSION_HANDLE session = CK_INVALID_HANDLE;
-	CK_OBJECT_HANDLE key = CK_INVALID_HANDLE;
-	CK_MECHANISM mech = { 0 };
-	CK_RSA_PKCS_PSS_PARAMS param_rsa_pss;
+	ck_rv_t rv;
+	unsigned char *s_data = NULL;
+	unsigned long s_size = 0;
+	struct ck_function_list *module = _p11_provider_get_module();
+	ck_session_handle_t session = CK_INVALID_HANDLE;
+	ck_object_handle_t key = CK_INVALID_HANDLE;
+	struct ck_mechanism mech = { 0 };
+	struct ck_rsa_pkcs_pss_params param_rsa_pss;
 
 	session = _p11_provider_open_session();
 	if (session == CK_INVALID_HANDLE)
@@ -1010,8 +1020,8 @@ static int _wrap_p11_pk_sign(gnutls_pk_algorithm_t algo,
 		break;
 	case GNUTLS_PK_RSA_PSS:
 		mech.mechanism = CKM_RSA_PKCS_PSS;
-		mech.pParameter = &param_rsa_pss;
-		mech.ulParameterLen = sizeof(param_rsa_pss);
+		mech.parameter = &param_rsa_pss;
+		mech.parameter_len = sizeof(param_rsa_pss);
 
 		if (!init_rsa_pss_param(&param_rsa_pss, sign_params)) {
 			ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -1057,7 +1067,7 @@ static int _wrap_p11_pk_sign(gnutls_pk_algorithm_t algo,
 		goto cleanup;
 	}
 
-	rv = module->C_Sign(session, (CK_BYTE_PTR)vdata->data, vdata->size,
+	rv = module->C_Sign(session, (unsigned char *)vdata->data, vdata->size,
 			    NULL, &s_size);
 	if (rv != CKR_OK) {
 		ret = gnutls_assert_val(GNUTLS_E_PKCS11_ERROR);
@@ -1070,7 +1080,7 @@ static int _wrap_p11_pk_sign(gnutls_pk_algorithm_t algo,
 		goto cleanup;
 	}
 
-	rv = module->C_Sign(session, (CK_BYTE_PTR)vdata->data, vdata->size,
+	rv = module->C_Sign(session, (unsigned char *)vdata->data, vdata->size,
 			    s_data, &s_size);
 	if (rv != CKR_OK) {
 		ret = gnutls_assert_val(GNUTLS_E_PKCS11_ERROR);
@@ -1093,12 +1103,12 @@ static int _wrap_p11_pk_verify(gnutls_pk_algorithm_t algo,
 			       const gnutls_x509_spki_st *sign_params)
 {
 	int ret;
-	CK_RV rv;
-	CK_FUNCTION_LIST *module = _p11_provider_get_module();
-	CK_SESSION_HANDLE session = CK_INVALID_HANDLE;
-	CK_OBJECT_HANDLE key = CK_INVALID_HANDLE;
-	CK_MECHANISM mech = { 0 };
-	CK_RSA_PKCS_PSS_PARAMS param_rsa_pss;
+	ck_rv_t rv;
+	struct ck_function_list *module = _p11_provider_get_module();
+	ck_session_handle_t session = CK_INVALID_HANDLE;
+	ck_object_handle_t key = CK_INVALID_HANDLE;
+	struct ck_mechanism mech = { 0 };
+	struct ck_rsa_pkcs_pss_params param_rsa_pss;
 
 	session = _p11_provider_open_session();
 	if (session == CK_INVALID_HANDLE)
@@ -1112,8 +1122,8 @@ static int _wrap_p11_pk_verify(gnutls_pk_algorithm_t algo,
 		break;
 	case GNUTLS_PK_RSA_PSS:
 		mech.mechanism = CKM_RSA_PKCS_PSS;
-		mech.pParameter = &param_rsa_pss;
-		mech.ulParameterLen = sizeof(param_rsa_pss);
+		mech.parameter = &param_rsa_pss;
+		mech.parameter_len = sizeof(param_rsa_pss);
 
 		if (!init_rsa_pss_param(&param_rsa_pss, sign_params)) {
 			ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -1162,8 +1172,9 @@ static int _wrap_p11_pk_verify(gnutls_pk_algorithm_t algo,
 		goto cleanup;
 	}
 
-	rv = module->C_Verify(session, (CK_BYTE_PTR)vdata->data, vdata->size,
-			      (CK_BYTE_PTR)signature->data, signature->size);
+	rv = module->C_Verify(session, (unsigned char *)vdata->data,
+			      vdata->size, (unsigned char *)signature->data,
+			      signature->size);
 	if (rv == CKR_OK)
 		ret = 0;
 	else if (rv == CKR_SIGNATURE_INVALID || rv == CKR_SIGNATURE_LEN_RANGE)
@@ -1193,7 +1204,7 @@ static int wrap_p11_pk_generate_params(gnutls_pk_algorithm_t algo,
 				       gnutls_pk_params_st *params)
 {
 	int ret = 0;
-	CK_SESSION_HANDLE session = CK_INVALID_HANDLE;
+	ck_session_handle_t session = CK_INVALID_HANDLE;
 
 	session = _p11_provider_open_session();
 	if (session == CK_INVALID_HANDLE)
@@ -1201,7 +1212,7 @@ static int wrap_p11_pk_generate_params(gnutls_pk_algorithm_t algo,
 
 	switch (algo) {
 	case GNUTLS_PK_DH:
-		ret = generate_dh_params(session, params, (CK_ULONG)level);
+		ret = generate_dh_params(session, params, (unsigned long)level);
 		break;
 	case GNUTLS_PK_RSA:
 	case GNUTLS_PK_RSA_PSS:
@@ -1224,7 +1235,7 @@ static int wrap_p11_pk_generate_keys(gnutls_pk_algorithm_t algo,
 				     unsigned ephemeral /*non-zero if true */)
 {
 	int ret;
-	CK_SESSION_HANDLE session = CK_INVALID_HANDLE;
+	ck_session_handle_t session = CK_INVALID_HANDLE;
 
 	if (IS_EC(algo) && gnutls_ecc_curve_get_pk(level) != algo)
 		return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
@@ -1237,7 +1248,7 @@ static int wrap_p11_pk_generate_keys(gnutls_pk_algorithm_t algo,
 	case GNUTLS_PK_RSA:
 	case GNUTLS_PK_RSA_PSS:
 	case GNUTLS_PK_RSA_OAEP:
-		ret = generate_rsa_keys(session, params, (CK_ULONG)level);
+		ret = generate_rsa_keys(session, params, (unsigned long)level);
 		break;
 	case GNUTLS_PK_DH:
 		ret = generate_dh_keys(session, params);
@@ -1262,7 +1273,7 @@ static int _wrap_p11_pk_derive(gnutls_pk_algorithm_t algo, gnutls_datum_t *out,
 			       const gnutls_datum_t *nonce, unsigned int flags)
 {
 	int ret;
-	CK_SESSION_HANDLE session = CK_INVALID_HANDLE;
+	ck_session_handle_t session = CK_INVALID_HANDLE;
 
 	session = _p11_provider_open_session();
 	if (session == CK_INVALID_HANDLE)

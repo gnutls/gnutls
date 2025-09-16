@@ -29,7 +29,7 @@
 
 #define P11_KIT_FUTURE_UNSTABLE_API
 #include <p11-kit/iter.h>
-#include <p11-kit/pkcs11.h>
+#include "pkcs11_int.h"
 
 struct p11_cipher_ctx;
 typedef int (*init_params_func)(struct p11_cipher_ctx *ctx);
@@ -44,7 +44,7 @@ typedef int (*set_key_func)(struct p11_cipher_ctx *ctx, const void *key,
 
 struct p11_cipher_st {
 	gnutls_cipher_algorithm_t alg;
-	CK_MECHANISM_TYPE mech;
+	ck_mechanism_type_t mech;
 
 	size_t key_size;
 	size_t max_iv_size;
@@ -61,16 +61,16 @@ struct p11_cipher_st {
 
 union p11_cipher_params {
 	uint8_t iv[MAX_CIPHER_IV_SIZE];
-	CK_GCM_PARAMS gcm;
+	struct ck_gcm_params gcm;
 };
 
 struct p11_cipher_ctx {
 	const struct p11_cipher_st *cipher;
-	CK_SESSION_HANDLE session;
+	ck_session_handle_t session;
 	bool enc;
 	union p11_cipher_params params;
 	size_t params_size;
-	CK_OBJECT_HANDLE key;
+	ck_object_handle_t key;
 };
 
 /*************************************************/
@@ -113,14 +113,14 @@ static int get_iv_params(struct p11_cipher_ctx *ctx, void *iv, size_t iv_size)
 static int init_gcm_params(struct p11_cipher_ctx *ctx)
 {
 	gnutls_memset(&ctx->params, 0, sizeof(ctx->params));
-	ctx->params_size = sizeof(CK_GCM_PARAMS);
+	ctx->params_size = sizeof(struct ck_gcm_params);
 	return 0;
 }
 
 static void free_gcm_params(struct p11_cipher_ctx *ctx)
 {
-	gnutls_free(ctx->params.gcm.pIv);
-	gnutls_free(ctx->params.gcm.pAAD);
+	gnutls_free(ctx->params.gcm.iv_ptr);
+	gnutls_free(ctx->params.gcm.aad_ptr);
 	init_gcm_params(ctx);
 }
 
@@ -149,46 +149,47 @@ static int set_gcm_params(struct p11_cipher_ctx *ctx, const void *iv,
 	}
 
 	free_gcm_params(ctx);
-	ctx->params.gcm.pIv = _iv;
-	ctx->params.gcm.ulIvLen = iv_size;
-	ctx->params.gcm.pAAD = _auth;
-	ctx->params.gcm.ulAADLen = auth_size;
-	ctx->params.gcm.ulTagBits = tag_size * 8;
+	ctx->params.gcm.iv_ptr = _iv;
+	ctx->params.gcm.iv_len = iv_size;
+	ctx->params.gcm.aad_ptr = _auth;
+	ctx->params.gcm.aad_len = auth_size;
+	ctx->params.gcm.tag_bits = tag_size * 8;
 	return 0;
 }
 
 static int get_gcm_iv_params(struct p11_cipher_ctx *ctx, void *iv,
 			     size_t iv_size)
 {
-	if (ctx->params.gcm.pIv == NULL)
+	if (ctx->params.gcm.iv_ptr == NULL)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	if (iv_size < ctx->params.gcm.ulIvLen)
+	if (iv_size < ctx->params.gcm.iv_len)
 		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
 
-	memcpy(iv, ctx->params.gcm.pIv, ctx->params.gcm.ulIvLen);
-	return (int)ctx->params.gcm.ulIvLen;
+	memcpy(iv, ctx->params.gcm.iv_ptr, ctx->params.gcm.iv_len);
+	return (int)ctx->params.gcm.iv_len;
 }
 
 static int aes_set_key(struct p11_cipher_ctx *ctx, const void *key,
 		       size_t key_size)
 {
-	CK_RV rv;
-	CK_FUNCTION_LIST *module = _p11_provider_get_module();
-	CK_OBJECT_HANDLE obj = CK_INVALID_HANDLE;
-	CK_OBJECT_CLASS attr_class = CKO_SECRET_KEY;
-	CK_KEY_TYPE attr_key_type = CKK_AES;
-	CK_BBOOL attr_true = CK_TRUE;
-	CK_UTF8CHAR label[] = "AES secret key";
-	CK_ATTRIBUTE attrs[] = { { CKA_CLASS, &attr_class, sizeof(attr_class) },
-				 { CKA_KEY_TYPE, &attr_key_type,
-				   sizeof(attr_key_type) },
-				 { CKA_TOKEN, &attr_true, sizeof(attr_true) },
-				 { CKA_ENCRYPT, &attr_true, sizeof(attr_true) },
-				 { CKA_DECRYPT, &attr_true, sizeof(attr_true) },
-				 { CKA_LABEL, label, sizeof(label) - 1 },
-				 { CKA_VALUE, (CK_BYTE *)key, key_size } };
-	CK_ULONG n_attrs = sizeof(attrs) / sizeof(attrs[0]);
+	ck_rv_t rv;
+	struct ck_function_list *module = _p11_provider_get_module();
+	ck_object_handle_t obj = CK_INVALID_HANDLE;
+	ck_object_class_t attr_class = CKO_SECRET_KEY;
+	ck_key_type_t attr_key_type = CKK_AES;
+	bool attr_true = true;
+	unsigned char label[] = "AES secret key";
+	struct ck_attribute attrs[] = {
+		{ CKA_CLASS, &attr_class, sizeof(attr_class) },
+		{ CKA_KEY_TYPE, &attr_key_type, sizeof(attr_key_type) },
+		{ CKA_TOKEN, &attr_true, sizeof(attr_true) },
+		{ CKA_ENCRYPT, &attr_true, sizeof(attr_true) },
+		{ CKA_DECRYPT, &attr_true, sizeof(attr_true) },
+		{ CKA_LABEL, label, sizeof(label) - 1 },
+		{ CKA_VALUE, (unsigned char *)key, key_size }
+	};
+	unsigned long n_attrs = sizeof(attrs) / sizeof(attrs[0]);
 
 	if (key_size != ctx->cipher->key_size)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -277,13 +278,13 @@ static struct p11_cipher_st p11_ciphers[] = {
 	},
 };
 
-int _p11_ciphers_init(CK_FUNCTION_LIST *module, CK_SLOT_ID slot)
+int _p11_ciphers_init(struct ck_function_list *module, ck_slot_id_t slot)
 {
 	unsigned i, j;
-	CK_RV rv;
-	CK_MECHANISM_TYPE *mechs = NULL;
-	CK_ULONG mech_count = 0;
-	CK_MECHANISM_INFO *infos = NULL;
+	ck_rv_t rv;
+	ck_mechanism_type_t *mechs = NULL;
+	unsigned long mech_count = 0;
+	struct ck_mechanism_info *infos = NULL;
 
 	rv = module->C_GetMechanismList(slot, NULL, &mech_count);
 	if (rv != CKR_OK)
@@ -293,7 +294,7 @@ int _p11_ciphers_init(CK_FUNCTION_LIST *module, CK_SLOT_ID slot)
 		return 0;
 
 	mechs = _gnutls_reallocarray(NULL, mech_count,
-				     sizeof(CK_MECHANISM_TYPE));
+				     sizeof(ck_mechanism_type_t));
 	if (mechs == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
@@ -304,7 +305,7 @@ int _p11_ciphers_init(CK_FUNCTION_LIST *module, CK_SLOT_ID slot)
 	}
 
 	infos = _gnutls_reallocarray(NULL, mech_count,
-				     sizeof(CK_MECHANISM_INFO));
+				     sizeof(struct ck_mechanism_info));
 	if (infos == NULL) {
 		gnutls_free(mechs);
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
@@ -322,8 +323,8 @@ int _p11_ciphers_init(CK_FUNCTION_LIST *module, CK_SLOT_ID slot)
 	for (i = 0; i < P11_CIPHERS_COUNT; ++i) {
 		for (j = 0; j < mech_count; ++j) {
 			if (mechs[j] == p11_ciphers[i].mech &&
-			    infos[j].ulMinKeySize <= p11_ciphers[i].key_size &&
-			    infos[j].ulMaxKeySize >= p11_ciphers[i].key_size) {
+			    infos[j].min_key_size <= p11_ciphers[i].key_size &&
+			    infos[j].max_key_size >= p11_ciphers[i].key_size) {
 				p11_ciphers[i].available = true;
 				break;
 			}
@@ -353,7 +354,7 @@ static int wrap_p11_cipher_init(gnutls_cipher_algorithm_t alg, void **_ctx,
 	unsigned i;
 	struct p11_cipher_ctx *ctx = NULL;
 	const struct p11_cipher_st *cipher = NULL;
-	CK_SESSION_HANDLE session = CK_INVALID_HANDLE;
+	ck_session_handle_t session = CK_INVALID_HANDLE;
 
 	for (i = 0; i < P11_CIPHERS_COUNT; ++i) {
 		if (p11_ciphers[i].alg == alg && p11_ciphers[i].available) {
@@ -426,16 +427,17 @@ static int wrap_p11_cipher_encrypt(void *_ctx, const void *plain,
 				   size_t enc_size)
 {
 	struct p11_cipher_ctx *ctx = _ctx;
-	CK_RV rv;
-	CK_FUNCTION_LIST *module = _p11_provider_get_module();
-	CK_MECHANISM m = { ctx->cipher->mech, &ctx->params, ctx->params_size };
+	ck_rv_t rv;
+	struct ck_function_list *module = _p11_provider_get_module();
+	struct ck_mechanism m = { ctx->cipher->mech, &ctx->params,
+				  ctx->params_size };
 
 	rv = module->C_EncryptInit(ctx->session, &m, ctx->key);
 	if (rv != CKR_OK)
 		return gnutls_assert_val(GNUTLS_E_PKCS11_ERROR);
 
-	rv = module->C_Encrypt(ctx->session, (CK_BYTE_PTR)plain, plain_size,
-			       enc, (CK_ULONG_PTR)&enc_size);
+	rv = module->C_Encrypt(ctx->session, (unsigned char *)plain, plain_size,
+			       enc, (unsigned long *)&enc_size);
 	if (rv != CKR_OK)
 		return gnutls_assert_val(GNUTLS_E_PKCS11_ERROR);
 
@@ -446,20 +448,21 @@ static int wrap_p11_cipher_decrypt(void *_ctx, const void *enc, size_t enc_size,
 				   void *plain, size_t plain_size)
 {
 	struct p11_cipher_ctx *ctx = _ctx;
-	CK_RV rv;
+	ck_rv_t rv;
 	uint8_t *tmp = NULL;
 	uint32_t is_err;
 	size_t copy_size;
-	CK_ULONG expected_size = 0;
-	CK_FUNCTION_LIST *module = _p11_provider_get_module();
-	CK_MECHANISM m = { ctx->cipher->mech, &ctx->params, ctx->params_size };
+	unsigned long expected_size = 0;
+	struct ck_function_list *module = _p11_provider_get_module();
+	struct ck_mechanism m = { ctx->cipher->mech, &ctx->params,
+				  ctx->params_size };
 
 	rv = module->C_DecryptInit(ctx->session, &m, ctx->key);
 	if (rv != CKR_OK)
 		return gnutls_assert_val(GNUTLS_E_PKCS11_ERROR);
 
-	rv = module->C_Decrypt(ctx->session, (CK_BYTE_PTR)enc, enc_size, NULL,
-			       &expected_size);
+	rv = module->C_Decrypt(ctx->session, (unsigned char *)enc, enc_size,
+			       NULL, &expected_size);
 	if (rv != CKR_OK)
 		return gnutls_assert_val(GNUTLS_E_PKCS11_ERROR);
 
@@ -468,8 +471,8 @@ static int wrap_p11_cipher_decrypt(void *_ctx, const void *enc, size_t enc_size,
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
 	copy_size = MIN(plain_size, expected_size);
-	rv = module->C_Decrypt(ctx->session, (CK_BYTE_PTR)enc, enc_size, tmp,
-			       &expected_size);
+	rv = module->C_Decrypt(ctx->session, (unsigned char *)enc, enc_size,
+			       tmp, &expected_size);
 	memcpy(plain, tmp, copy_size);
 	gnutls_free(tmp);
 

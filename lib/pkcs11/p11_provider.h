@@ -27,15 +27,15 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include <p11-kit/pkcs11.h>
+#include "pkcs11_int.h"
 
 int _p11_provider_init(const char *module_path, const uint8_t *pin,
 		       size_t pin_size);
 void _p11_provider_deinit(void);
 bool _p11_provider_is_initialized(void);
-CK_SESSION_HANDLE _p11_provider_open_session(void);
-void _p11_provider_close_session(CK_SESSION_HANDLE session);
-CK_FUNCTION_LIST *_p11_provider_get_module(void);
-CK_SLOT_ID _p11_provider_get_slot(void);
+ck_session_handle_t _p11_provider_open_session(void);
+void _p11_provider_close_session(ck_session_handle_t session);
+struct ck_function_list *_p11_provider_get_module(void);
+ck_slot_id_t _p11_provider_get_slot(void);
 
 #endif /* GNUTLS_LIB_P11_PROVIDER_H */

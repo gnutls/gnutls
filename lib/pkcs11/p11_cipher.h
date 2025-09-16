@@ -23,9 +23,9 @@
 #ifndef GNUTLS_LIB_P11_CIPHER_H
 #define GNUTLS_LIB_P11_CIPHER_H
 
-#include <p11-kit/pkcs11.h>
+#include "pkcs11_int.h"
 
-int _p11_ciphers_init(CK_FUNCTION_LIST *module, CK_SLOT_ID slot);
+int _p11_ciphers_init(struct ck_function_list *module, ck_slot_id_t slot);
 void _p11_ciphers_deinit(void);
 
 #endif /* GNUTLS_LIB_P11_CIPHER_H */

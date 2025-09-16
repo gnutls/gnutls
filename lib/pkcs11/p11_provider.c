@@ -23,17 +23,17 @@
 #include "errors.h"
 #include "gnutls_int.h"
 #include "cipher_int.h"
+#include "pkcs11_int.h"
 #include "p11_cipher.h"
 #include "p11_mac.h"
 #include "p11_provider.h"
 
 #define P11_KIT_FUTURE_UNSTABLE_API
 #include <p11-kit/iter.h>
-#include <p11-kit/pkcs11.h>
 
 static struct {
-	CK_FUNCTION_LIST *module;
-	CK_SLOT_ID slot;
+	struct ck_function_list *module;
+	ck_slot_id_t slot;
 	uint8_t *pin;
 	size_t pin_size;
 	bool initialized;
@@ -43,10 +43,10 @@ int _p11_provider_init(const char *module_path, const uint8_t *pin,
 		       size_t pin_size)
 {
 	int ret;
-	CK_RV rv;
+	ck_rv_t rv;
 	P11KitIter *iter = NULL;
-	CK_FUNCTION_LIST *modules[2] = { 0 };
-	CK_SLOT_ID slot = 0;
+	struct ck_function_list *modules[2] = { 0 };
+	ck_slot_id_t slot = 0;
 	uint8_t *_pin = NULL;
 
 	if (p11_provider.initialized)
@@ -134,10 +134,10 @@ bool _p11_provider_is_initialized(void)
 	return p11_provider.initialized;
 }
 
-CK_SESSION_HANDLE _p11_provider_open_session(void)
+ck_session_handle_t _p11_provider_open_session(void)
 {
-	CK_RV rv;
-	CK_SESSION_HANDLE session = CK_INVALID_HANDLE;
+	ck_rv_t rv;
+	ck_session_handle_t session = CK_INVALID_HANDLE;
 
 	rv = p11_provider.module->C_OpenSession(
 		p11_provider.slot, CKF_SERIAL_SESSION | CKF_RW_SESSION, NULL,
@@ -155,7 +155,7 @@ CK_SESSION_HANDLE _p11_provider_open_session(void)
 	return session;
 }
 
-void _p11_provider_close_session(CK_SESSION_HANDLE session)
+void _p11_provider_close_session(ck_session_handle_t session)
 {
 	if (session == CK_INVALID_HANDLE)
 		return;
@@ -164,12 +164,12 @@ void _p11_provider_close_session(CK_SESSION_HANDLE session)
 	p11_provider.module->C_CloseSession(session);
 }
 
-CK_FUNCTION_LIST *_p11_provider_get_module(void)
+struct ck_function_list *_p11_provider_get_module(void)
 {
 	return p11_provider.module;
 }
 
-CK_SLOT_ID _p11_provider_get_slot(void)
+ck_slot_id_t _p11_provider_get_slot(void)
 {
 	return p11_provider.slot;
 }
