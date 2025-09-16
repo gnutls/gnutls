@@ -50,7 +50,7 @@ cat >"${PRIORITY_FILE}" <<_EOF_
 allow-rsa-pkcs1-encrypt = true
 
 [provider]
-path = ${MODULE}
+url = pkcs11:model=v1;manufacturer=Kryoptic%20Project;token=Kryoptic%20Token
 pin = ${PIN}
 _EOF_
 

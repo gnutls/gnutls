@@ -313,10 +313,10 @@ and override the default cryptographic backend of the library with the
 cryptographic functions provided by the module.
 
 A PKCS#11 module can be configured to serve as cryptographic backend by adding
-@code{path} and @code{pin} in the @code{[provider]} section.
+@code{url} and @code{pin} in the @code{[provider]} section.
 
 @itemize
-@item @code{path}: path to the PKCS#11 module.
+@item @code{url}: URL of the PKCS#11 module.
 @item @code{pin}: PIN for logging into the PKCS#11 token.
 @end itemize
 
@@ -327,6 +327,6 @@ Note that the module has to be initialized first.
 
 @example
 [provider]
-path = /usr/lib64/pkcs11/libkryoptic_pkcs11.so
+url = pkcs11:model=v1;manufacturer=Kryoptic%20Project;token=Kryoptic%20Token
 pin = 1234
 @end example
