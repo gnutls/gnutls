@@ -19,14 +19,11 @@
 # You should have received a copy of the GNU General Public License
 # along with GnuTLS.  If not, see <https://www.gnu.org/licenses/>.
 
-: ${testdir=$abs_top_builddir/tests/pkcs11-provider}
+: ${srcdir=.}
+: ${builddir=.}
+: ${P11TOOL=../src/p11tool${EXEEXT}}
 
 if test "${GNUTLS_FORCE_FIPS_MODE}" != 1; then
-	exit 77
-fi
-
-if [ -z "$(which pkcs11-tool 2>/dev/null)" ]; then
-	echo "Need pkcs11-tool from opensc package to run this test."
 	exit 77
 fi
 
@@ -36,23 +33,17 @@ if [ ! -f "$MODULE" ]; then
         exit 77
 fi
 
+. ${srcdir}/scripts/common.sh
+testdir=`create_testdir pkcs11-provider`
+
 LABEL="Kryoptic Token"
 PIN="12345"
-PRIORITY_FILE="${testdir}/gnutls.$$.conf"
-KRYOPTIC_DB="${testdir}/kryoptic.$$.sql"
-export KRYOPTIC_CONF="${testdir}/kryoptic.$$.conf"
+PRIORITY_FILE="${testdir}/gnutls.conf"
+KRYOPTIC_DB="${testdir}/kryoptic.sql"
+export KRYOPTIC_CONF="${testdir}/kryoptic.conf"
 export GNUTLS_SYSTEM_PRIORITY_FAIL_ON_INVALID=1
 export GNUTLS_SYSTEM_PRIORITY_FILE="${PRIORITY_FILE}"
 export GNUTLS_DEBUG_LEVEL=6
-
-cat >"${PRIORITY_FILE}" <<_EOF_
-[overrides]
-allow-rsa-pkcs1-encrypt = true
-
-[provider]
-path = ${MODULE}
-pin = ${PIN}
-_EOF_
 
 cat >"${KRYOPTIC_CONF}" <<_EOF_
 [ec_point_encoding]
@@ -67,61 +58,68 @@ _EOF_
 echo "Initializing token"
 
 # init token
-pkcs11-tool --module "${MODULE}" --init-token --label "${LABEL}" --so-pin "${PIN}" >/dev/null
+"$P11TOOL" --initialize --label "${LABEL}" --set-so-pin "${PIN}" "pkcs11:?module-path=${MODULE}" >/dev/null
 if test $? != 0; then
 	echo "failed to initialize token"
 	exit 1
 fi
+
 # set user pin
-pkcs11-tool --module "${MODULE}" --so-pin "${PIN}"  --login --login-type so --init-pin --pin "${PIN}" >/dev/null
+"$P11TOOL" --initialize-pin --set-so-pin "${PIN}" --set-pin "${PIN}" "pkcs11:?module-path=${MODULE}" >/dev/null
 if test $? != 0; then
 	echo "failed to set user pin"
 	exit 1
 fi
 
+cat >"${PRIORITY_FILE}" <<_EOF_
+[overrides]
+allow-rsa-pkcs1-encrypt = true
+
+[provider]
+url = pkcs11:model=v1;manufacturer=Kryoptic%20Project;token=Kryoptic%20Token
+pin = ${PIN}
+_EOF_
+
 echo "Testing public key algorithms"
-"${testdir}/pkcs11-provider-pk"
+"${builddir}/pkcs11-provider/pkcs11-provider-pk"
 rc=$?
 if test "${rc}" = "0"; then
 	echo "test passed"
 else
 	echo "test failed"
-	rm -f ${PRIORITY_FILE} ${KRYOPTIC_CONF} ${KRYOPTIC_DB}
 	exit ${rc}
 fi
 
 echo "Testing signatures"
-"${testdir}/pkcs11-provider-sig"
+"${builddir}/pkcs11-provider/pkcs11-provider-sig"
 rc=$?
 if test "${rc}" = "0"; then
 	echo "test passed"
 else
 	echo "test failed"
-	rm -f ${PRIORITY_FILE} ${KRYOPTIC_CONF} ${KRYOPTIC_DB}
 	exit ${rc}
 fi
 
 echo "Testing ciphers"
-"${testdir}/pkcs11-provider-cipher"
+"${builddir}/pkcs11-provider/pkcs11-provider-cipher"
 rc=$?
 if test "${rc}" = "0"; then
 	echo "test passed"
 else
 	echo "test failed"
-	rm -f ${PRIORITY_FILE} ${KRYOPTIC_CONF} ${KRYOPTIC_DB}
 	exit ${rc}
 fi
 
 echo "Testing hmacs"
-"${testdir}/pkcs11-provider-hmac"
+"${builddir}/pkcs11-provider/pkcs11-provider-hmac"
 rc=$?
 if test "${rc}" = "0"; then
 	echo "test passed"
 else
 	echo "test failed"
-	rm -f ${PRIORITY_FILE} ${KRYOPTIC_CONF} ${KRYOPTIC_DB}
 	exit ${rc}
 fi
 
-rm -f ${PRIORITY_FILE} ${KRYOPTIC_CONF} ${KRYOPTIC_DB}
+rm -rf "$testdir"
+
 exit ${rc}

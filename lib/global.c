@@ -249,7 +249,7 @@ static int _gnutls_global_init(unsigned constructor)
 	int level;
 	const char *e;
 #if defined(ENABLE_PKCS11) && defined(ENABLE_FIPS140)
-	const char *p11_provider_path = NULL;
+	const char *p11_provider_url = NULL;
 	const char *p11_provider_pin = NULL;
 #endif
 
@@ -411,11 +411,11 @@ static int _gnutls_global_init(unsigned constructor)
 	_gnutls_prepare_to_load_system_priorities();
 
 #if defined(ENABLE_PKCS11) && defined(ENABLE_FIPS140)
-	p11_provider_path = _gnutls_config_get_p11_provider_path();
+	p11_provider_url = _gnutls_config_get_p11_provider_url();
 	p11_provider_pin = _gnutls_config_get_p11_provider_pin();
 
-	if (res == 1 && p11_provider_path != NULL) {
-		ret = _p11_provider_init(p11_provider_path,
+	if (res == 1 && p11_provider_url != NULL) {
+		ret = _p11_provider_init(p11_provider_url,
 					 (const uint8_t *)p11_provider_pin,
 					 strlen(p11_provider_pin));
 		if (ret < 0) {

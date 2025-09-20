@@ -17,6 +17,11 @@ See the end for copying conditions.
    A new function gnutls_record_get_max_send_size() has been added to
    determine the maximum size of a TLS record to be sent to the peer.
 
+** libgnutls: PKCS#11 cryptographic provider configuration takes a token URI
+   instead of a module path. To allow using a PKCS#11 module exposing
+   multiple tokens, the "path" configuration keyword was replaced with
+   the "url" keyword.
+
 ** API and ABI modifications:
 gnutls_psk_allocate_client_credentials2: New function
 gnutls_psk_allocate_server_credentials2: New function

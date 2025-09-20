@@ -28,7 +28,7 @@
 #include "p11_provider.h"
 #include "x509/x509_int.h"
 
-#include <p11-kit/pkcs11.h>
+#include "pkcs11_int.h"
 
 struct p11_mac_ctx;
 typedef int (*init_params_func)(struct p11_mac_ctx *);
@@ -43,10 +43,10 @@ typedef int (*set_key_func)(struct p11_mac_ctx *, const void *, size_t);
 
 struct p11_mac_st {
 	gnutls_mac_algorithm_t alg;
-	CK_MECHANISM_TYPE mech;
+	ck_mechanism_type_t mech;
 
 	size_t length;
-	CK_KEY_TYPE key_type;
+	ck_key_type_t key_type;
 	size_t key_size;
 	size_t max_iv_size;
 
@@ -60,28 +60,28 @@ struct p11_mac_st {
 };
 
 union p11_mac_params {
-	CK_GCM_PARAMS gcm;
+	struct ck_gcm_params gcm;
 };
 
 struct p11_mac_ctx {
 	const struct p11_mac_st *mac;
-	CK_SESSION_HANDLE session;
+	ck_session_handle_t session;
 	union p11_mac_params params;
 	size_t params_size;
-	CK_OBJECT_HANDLE key;
+	ck_object_handle_t key;
 	bool sign_init;
 };
 
 struct p11_digest_st {
 	gnutls_digest_algorithm_t alg;
-	CK_MECHANISM_TYPE mech;
+	ck_mechanism_type_t mech;
 	size_t length;
 	bool available;
 };
 
 struct p11_digest_ctx {
 	const struct p11_digest_st *digest;
-	CK_SESSION_HANDLE session;
+	ck_session_handle_t session;
 };
 
 /*************************************************/
@@ -91,19 +91,20 @@ struct p11_digest_ctx {
 static int set_secret_key(struct p11_mac_ctx *ctx, const void *key,
 			  size_t key_size)
 {
-	CK_FUNCTION_LIST *module = _p11_provider_get_module();
-	CK_OBJECT_HANDLE obj = CK_INVALID_HANDLE;
-	CK_OBJECT_CLASS attr_class = CKO_SECRET_KEY;
-	CK_KEY_TYPE attr_key_type = ctx->mac->key_type;
-	CK_BBOOL attr_true = CK_TRUE;
-	CK_UTF8CHAR label[] = "secret key";
-	CK_ATTRIBUTE attrs[] = { { CKA_CLASS, &attr_class, sizeof(attr_class) },
-				 { CKA_KEY_TYPE, &attr_key_type,
-				   sizeof(attr_key_type) },
-				 { CKA_SIGN, &attr_true, sizeof(attr_true) },
-				 { CKA_LABEL, label, sizeof(label) - 1 },
-				 { CKA_VALUE, (CK_BYTE *)key, key_size } };
-	CK_ULONG n_attrs = sizeof(attrs) / sizeof(attrs[0]);
+	struct ck_function_list *module = _p11_provider_get_module();
+	ck_object_handle_t obj = CK_INVALID_HANDLE;
+	ck_object_class_t attr_class = CKO_SECRET_KEY;
+	ck_key_type_t attr_key_type = ctx->mac->key_type;
+	bool attr_true = true;
+	unsigned char label[] = "secret key";
+	struct ck_attribute attrs[] = {
+		{ CKA_CLASS, &attr_class, sizeof(attr_class) },
+		{ CKA_KEY_TYPE, &attr_key_type, sizeof(attr_key_type) },
+		{ CKA_SIGN, &attr_true, sizeof(attr_true) },
+		{ CKA_LABEL, label, sizeof(label) - 1 },
+		{ CKA_VALUE, (unsigned char *)key, key_size }
+	};
+	unsigned long n_attrs = sizeof(attrs) / sizeof(attrs[0]);
 
 	if (module->C_CreateObject(ctx->session, attrs, n_attrs, &obj) !=
 	    CKR_OK)
@@ -125,9 +126,9 @@ static int set_gmac_iv(struct p11_mac_ctx *ctx, const void *iv, size_t iv_size)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 	memcpy(_iv, iv, iv_size);
 
-	gnutls_free(ctx->params.gcm.pIv);
-	ctx->params.gcm.pIv = _iv;
-	ctx->params.gcm.ulIvLen = iv_size;
+	gnutls_free(ctx->params.gcm.iv_ptr);
+	ctx->params.gcm.iv_ptr = _iv;
+	ctx->params.gcm.iv_len = iv_size;
 	return 0;
 }
 
@@ -144,24 +145,24 @@ static int set_gmac_aad(struct p11_mac_ctx *ctx, const void *aad,
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 	memcpy(_aad, aad, aad_size);
 
-	gnutls_free(ctx->params.gcm.pAAD);
-	ctx->params.gcm.pAAD = _aad;
-	ctx->params.gcm.ulAADLen = aad_size;
+	gnutls_free(ctx->params.gcm.aad_ptr);
+	ctx->params.gcm.aad_ptr = _aad;
+	ctx->params.gcm.aad_len = aad_size;
 	return 0;
 }
 
 static int init_gmac_params(struct p11_mac_ctx *ctx)
 {
 	zeroize_key(&ctx->params, sizeof(ctx->params));
-	ctx->params_size = sizeof(CK_GCM_PARAMS);
-	ctx->params.gcm.ulTagBits = ctx->mac->length * 8;
+	ctx->params_size = sizeof(struct ck_gcm_params);
+	ctx->params.gcm.tag_bits = ctx->mac->length * 8;
 	return 0;
 }
 
 static void free_gmac_params(struct p11_mac_ctx *ctx)
 {
-	gnutls_free(ctx->params.gcm.pIv);
-	gnutls_free(ctx->params.gcm.pAAD);
+	gnutls_free(ctx->params.gcm.iv_ptr);
+	gnutls_free(ctx->params.gcm.aad_ptr);
 	zeroize_key(&ctx->params, sizeof(ctx->params));
 	ctx->params_size = 0;
 }
@@ -344,12 +345,12 @@ find_digest(gnutls_digest_algorithm_t alg)
 	return NULL;
 }
 
-int _p11_macs_init(CK_FUNCTION_LIST *module, CK_SLOT_ID slot)
+int _p11_macs_init(struct ck_function_list *module, ck_slot_id_t slot)
 {
 	unsigned i, j;
-	CK_RV rv;
-	CK_MECHANISM_TYPE *mechs = NULL;
-	CK_ULONG mech_count = 0;
+	ck_rv_t rv;
+	ck_mechanism_type_t *mechs = NULL;
+	unsigned long mech_count = 0;
 
 	rv = module->C_GetMechanismList(slot, NULL, &mech_count);
 	if (rv != CKR_OK)
@@ -359,7 +360,7 @@ int _p11_macs_init(CK_FUNCTION_LIST *module, CK_SLOT_ID slot)
 		return 0;
 
 	mechs = _gnutls_reallocarray(NULL, mech_count,
-				     sizeof(CK_MECHANISM_TYPE));
+				     sizeof(ck_mechanism_type_t));
 	if (mechs == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
@@ -410,8 +411,8 @@ static inline int sign_init(struct p11_mac_ctx *ctx, const void *data,
 			    size_t data_size)
 {
 	int ret;
-	CK_FUNCTION_LIST *module = _p11_provider_get_module();
-	CK_MECHANISM mech = { ctx->mac->mech, NULL, 0 };
+	struct ck_function_list *module = _p11_provider_get_module();
+	struct ck_mechanism mech = { ctx->mac->mech, NULL, 0 };
 
 	if (ctx->key == CK_INVALID_HANDLE)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -423,8 +424,8 @@ static inline int sign_init(struct p11_mac_ctx *ctx, const void *data,
 	}
 
 	if (ctx->mac->init_params != NULL) {
-		mech.pParameter = &ctx->params;
-		mech.ulParameterLen = ctx->params_size;
+		mech.parameter = &ctx->params;
+		mech.parameter_len = ctx->params_size;
 	}
 
 	if (module->C_SignInit(ctx->session, &mech, ctx->key) != CKR_OK)
@@ -437,7 +438,7 @@ static int wrap_p11_mac_init(gnutls_mac_algorithm_t alg, void **_ctx)
 {
 	struct p11_mac_ctx *ctx = NULL;
 	const struct p11_mac_st *mac = NULL;
-	CK_SESSION_HANDLE session = CK_INVALID_HANDLE;
+	ck_session_handle_t session = CK_INVALID_HANDLE;
 
 	mac = find_mac(alg);
 	if (mac == NULL)
@@ -508,7 +509,7 @@ static int wrap_p11_mac_set_nonce(void *_ctx, const void *nonce,
 static int wrap_p11_mac_update(void *_ctx, const void *text, size_t text_size)
 {
 	struct p11_mac_ctx *ctx = _ctx;
-	CK_FUNCTION_LIST *module = _p11_provider_get_module();
+	struct ck_function_list *module = _p11_provider_get_module();
 	int ret;
 
 	if (!ctx->sign_init) {
@@ -518,8 +519,8 @@ static int wrap_p11_mac_update(void *_ctx, const void *text, size_t text_size)
 		ctx->sign_init = true;
 	}
 
-	if (module->C_SignUpdate(ctx->session, (CK_BYTE_PTR)text, text_size) !=
-	    CKR_OK)
+	if (module->C_SignUpdate(ctx->session, (unsigned char *)text,
+				 text_size) != CKR_OK)
 		return gnutls_assert_val(GNUTLS_E_PKCS11_ERROR);
 
 	return 0;
@@ -528,8 +529,8 @@ static int wrap_p11_mac_update(void *_ctx, const void *text, size_t text_size)
 static int wrap_p11_mac_output(void *_ctx, void *digest, size_t _digest_size)
 {
 	struct p11_mac_ctx *ctx = _ctx;
-	CK_FUNCTION_LIST *module = _p11_provider_get_module();
-	CK_ULONG digest_size = ctx->mac->length;
+	struct ck_function_list *module = _p11_provider_get_module();
+	unsigned long digest_size = ctx->mac->length;
 	int ret;
 
 	if (_digest_size < digest_size)
@@ -542,7 +543,7 @@ static int wrap_p11_mac_output(void *_ctx, void *digest, size_t _digest_size)
 		ctx->sign_init = true;
 	}
 
-	if (module->C_SignFinal(ctx->session, (CK_BYTE_PTR)digest,
+	if (module->C_SignFinal(ctx->session, (unsigned char *)digest,
 				&digest_size) != CKR_OK)
 		return gnutls_assert_val(GNUTLS_E_PKCS11_ERROR);
 
@@ -554,9 +555,9 @@ static int wrap_p11_mac_fast(gnutls_mac_algorithm_t alg, const void *nonce,
 			     size_t key_size, const void *text,
 			     size_t text_size, void *digest)
 {
-	CK_FUNCTION_LIST *module = _p11_provider_get_module();
+	struct ck_function_list *module = _p11_provider_get_module();
 	struct p11_mac_ctx *ctx = NULL;
-	CK_ULONG digest_size = 0;
+	unsigned long digest_size = 0;
 	int ret = 0;
 
 	ret = wrap_p11_mac_init(alg, (void **)&ctx);
@@ -576,8 +577,8 @@ static int wrap_p11_mac_fast(gnutls_mac_algorithm_t alg, const void *nonce,
 	}
 
 	digest_size = ctx->mac->length;
-	if (module->C_Sign(ctx->session, (CK_BYTE_PTR)text, text_size, digest,
-			   &digest_size) != CKR_OK) {
+	if (module->C_Sign(ctx->session, (unsigned char *)text, text_size,
+			   digest, &digest_size) != CKR_OK) {
 		ret = gnutls_assert_val(GNUTLS_E_PKCS11_ERROR);
 		goto cleanup;
 	}
@@ -600,9 +601,9 @@ static int wrap_p11_hash_init(gnutls_digest_algorithm_t alg, void **_ctx)
 {
 	struct p11_digest_ctx *ctx = NULL;
 	const struct p11_digest_st *digest = NULL;
-	CK_MECHANISM mech = { 0 };
-	CK_SESSION_HANDLE session = CK_INVALID_HANDLE;
-	CK_FUNCTION_LIST *module = _p11_provider_get_module();
+	struct ck_mechanism mech = { 0 };
+	ck_session_handle_t session = CK_INVALID_HANDLE;
+	struct ck_function_list *module = _p11_provider_get_module();
 
 	digest = find_digest(alg);
 	if (digest == NULL)
@@ -648,9 +649,9 @@ static int wrap_p11_hash_exists(gnutls_digest_algorithm_t alg)
 static int wrap_p11_hash_update(void *_ctx, const void *text, size_t text_size)
 {
 	struct p11_digest_ctx *ctx = _ctx;
-	CK_FUNCTION_LIST *module = _p11_provider_get_module();
+	struct ck_function_list *module = _p11_provider_get_module();
 
-	if (module->C_DigestUpdate(ctx->session, (CK_BYTE_PTR)text,
+	if (module->C_DigestUpdate(ctx->session, (unsigned char *)text,
 				   text_size) != CKR_OK)
 		return gnutls_assert_val(GNUTLS_E_PKCS11_ERROR);
 
@@ -660,13 +661,13 @@ static int wrap_p11_hash_update(void *_ctx, const void *text, size_t text_size)
 static int wrap_p11_hash_output(void *_ctx, void *digest, size_t _digest_size)
 {
 	struct p11_digest_ctx *ctx = _ctx;
-	CK_FUNCTION_LIST *module = _p11_provider_get_module();
-	CK_ULONG digest_size = ctx->digest->length;
+	struct ck_function_list *module = _p11_provider_get_module();
+	unsigned long digest_size = ctx->digest->length;
 
 	if (_digest_size < digest_size)
 		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
 
-	if (module->C_DigestFinal(ctx->session, (CK_BYTE_PTR)digest,
+	if (module->C_DigestFinal(ctx->session, (unsigned char *)digest,
 				  &digest_size) != CKR_OK)
 		return gnutls_assert_val(GNUTLS_E_PKCS11_ERROR);
 
@@ -677,10 +678,10 @@ static int wrap_p11_hash_fast(gnutls_digest_algorithm_t alg, const void *text,
 			      size_t text_size, void *digest)
 {
 	const struct p11_digest_st *dig = NULL;
-	CK_FUNCTION_LIST *module = _p11_provider_get_module();
-	CK_SESSION_HANDLE session = CK_INVALID_HANDLE;
-	CK_MECHANISM mech = { 0 };
-	CK_ULONG digest_size = 0;
+	struct ck_function_list *module = _p11_provider_get_module();
+	ck_session_handle_t session = CK_INVALID_HANDLE;
+	struct ck_mechanism mech = { 0 };
+	unsigned long digest_size = 0;
 
 	dig = find_digest(alg);
 	if (dig == NULL)
@@ -697,7 +698,7 @@ static int wrap_p11_hash_fast(gnutls_digest_algorithm_t alg, const void *text,
 	}
 
 	digest_size = dig->length;
-	if (module->C_Digest(session, (CK_BYTE_PTR)text, text_size, digest,
+	if (module->C_Digest(session, (unsigned char *)text, text_size, digest,
 			     &digest_size) != CKR_OK) {
 		_p11_provider_close_session(session);
 		return gnutls_assert_val(GNUTLS_E_PKCS11_ERROR);
@@ -717,24 +718,24 @@ static void *wrap_p11_hash_copy(const void *_ctx)
 /*************************************************/
 
 #ifdef CKM_HKDF_DERIVE
-static CK_OBJECT_HANDLE hkdf_import_key(CK_SESSION_HANDLE session,
-					const void *key, size_t key_size)
+static ck_object_handle_t hkdf_import_key(ck_session_handle_t session,
+					  const void *key, size_t key_size)
 {
-	CK_FUNCTION_LIST *module = _p11_provider_get_module();
-	CK_OBJECT_HANDLE obj = CK_INVALID_HANDLE;
-	CK_OBJECT_CLASS attr_class = CKO_SECRET_KEY;
-	CK_KEY_TYPE attr_key_type = CKK_HKDF;
-	CK_BBOOL attr_true = CK_TRUE;
-	CK_BBOOL attr_false = CK_FALSE;
-	CK_ATTRIBUTE attrs[] = {
+	struct ck_function_list *module = _p11_provider_get_module();
+	ck_object_handle_t obj = CK_INVALID_HANDLE;
+	ck_object_class_t attr_class = CKO_SECRET_KEY;
+	ck_key_type_t attr_key_type = CKK_HKDF;
+	bool attr_true = true;
+	bool attr_false = false;
+	struct ck_attribute attrs[] = {
 		{ CKA_CLASS, &attr_class, sizeof(attr_class) },
 		{ CKA_KEY_TYPE, &attr_key_type, sizeof(attr_key_type) },
 		{ CKA_SENSITIVE, &attr_false, sizeof(attr_false) },
 		{ CKA_EXTRACTABLE, &attr_true, sizeof(attr_true) },
 		{ CKA_SIGN, &attr_true, sizeof(attr_true) },
-		{ CKA_VALUE, (CK_BYTE *)key, key_size }
+		{ CKA_VALUE, (unsigned char *)key, key_size }
 	};
-	CK_ULONG n_attrs = sizeof(attrs) / sizeof(attrs[0]);
+	unsigned long n_attrs = sizeof(attrs) / sizeof(attrs[0]);
 
 	if (module->C_CreateObject(session, attrs, n_attrs, &obj) != CKR_OK)
 		return CK_INVALID_HANDLE;
@@ -749,21 +750,21 @@ static int wrap_p11_hkdf_extract(gnutls_mac_algorithm_t _mac, const void *key,
 {
 #ifdef CKM_HKDF_DERIVE
 	const struct p11_mac_st *mac = NULL;
-	CK_FUNCTION_LIST *module = _p11_provider_get_module();
-	CK_SESSION_HANDLE session = CK_INVALID_HANDLE;
-	CK_OBJECT_HANDLE base_key = CK_INVALID_HANDLE;
-	CK_OBJECT_HANDLE new_key = CK_INVALID_HANDLE;
-	CK_HKDF_PARAMS params = { 0 };
-	CK_MECHANISM mech = { CKM_HKDF_DERIVE, &params, sizeof(params) };
-	CK_BBOOL attr_true = CK_TRUE;
-	CK_BBOOL attr_false = CK_FALSE;
-	CK_ATTRIBUTE attrs[] = {
+	struct ck_function_list *module = _p11_provider_get_module();
+	ck_session_handle_t session = CK_INVALID_HANDLE;
+	ck_object_handle_t base_key = CK_INVALID_HANDLE;
+	ck_object_handle_t new_key = CK_INVALID_HANDLE;
+	struct ck_hkdf_params params = { 0 };
+	struct ck_mechanism mech = { CKM_HKDF_DERIVE, &params, sizeof(params) };
+	bool attr_true = true;
+	bool attr_false = false;
+	struct ck_attribute attrs[] = {
 		{ CKA_SENSITIVE, &attr_false, sizeof(attr_false) },
 		{ CKA_EXTRACTABLE, &attr_true, sizeof(attr_true) },
 		{ CKA_SIGN, &attr_true, sizeof(attr_true) }
 	};
-	CK_ULONG n_attrs = sizeof(attrs) / sizeof(attrs[0]);
-	CK_ATTRIBUTE out = { CKA_VALUE, output, key_size };
+	unsigned long n_attrs = sizeof(attrs) / sizeof(attrs[0]);
+	struct ck_attribute out = { CKA_VALUE, output, key_size };
 
 	mac = find_mac(_mac);
 	if (mac == NULL)
@@ -772,15 +773,15 @@ static int wrap_p11_hkdf_extract(gnutls_mac_algorithm_t _mac, const void *key,
 	if (key_size != mac->length)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	params.bExtract = CK_TRUE;
-	params.prfHashMechanism = mac->mech;
+	params.extract = true;
+	params.prf_hash_mechanism = mac->mech;
 
 	if (salt != NULL && salt_size != 0) {
-		params.ulSaltType = CKF_HKDF_SALT_DATA;
-		params.pSalt = (CK_BYTE_PTR)salt;
-		params.ulSaltLen = salt_size;
+		params.salt_type = CKF_HKDF_SALT_DATA;
+		params.salt_ptr = (unsigned char *)salt;
+		params.salt_len = salt_size;
 	} else {
-		params.ulSaltType = CKF_HKDF_SALT_NULL;
+		params.salt_type = CKF_HKDF_SALT_NULL;
 	}
 
 	session = _p11_provider_open_session();
@@ -815,23 +816,23 @@ static int wrap_p11_hkdf_expand(gnutls_mac_algorithm_t _mac, const void *key,
 {
 #ifdef CKM_HKDF_DERIVE
 	const struct p11_mac_st *mac = NULL;
-	CK_FUNCTION_LIST *module = _p11_provider_get_module();
-	CK_SESSION_HANDLE session = CK_INVALID_HANDLE;
-	CK_OBJECT_HANDLE base_key = CK_INVALID_HANDLE;
-	CK_OBJECT_HANDLE new_key = CK_INVALID_HANDLE;
-	CK_HKDF_PARAMS params = { 0 };
-	CK_MECHANISM mech = { CKM_HKDF_DERIVE, &params, sizeof(params) };
-	CK_BBOOL attr_true = CK_TRUE;
-	CK_BBOOL attr_false = CK_FALSE;
-	CK_ULONG attr_len = length;
-	CK_ATTRIBUTE attrs[] = {
+	struct ck_function_list *module = _p11_provider_get_module();
+	ck_session_handle_t session = CK_INVALID_HANDLE;
+	ck_object_handle_t base_key = CK_INVALID_HANDLE;
+	ck_object_handle_t new_key = CK_INVALID_HANDLE;
+	struct ck_hkdf_params params = { 0 };
+	struct ck_mechanism mech = { CKM_HKDF_DERIVE, &params, sizeof(params) };
+	bool attr_true = true;
+	bool attr_false = false;
+	unsigned long attr_len = length;
+	struct ck_attribute attrs[] = {
 		{ CKA_SENSITIVE, &attr_false, sizeof(attr_false) },
 		{ CKA_EXTRACTABLE, &attr_true, sizeof(attr_true) },
 		{ CKA_SIGN, &attr_true, sizeof(attr_true) },
 		{ CKA_VALUE_LEN, &attr_len, sizeof(attr_len) }
 	};
-	CK_ULONG n_attrs = sizeof(attrs) / sizeof(attrs[0]);
-	CK_ATTRIBUTE out = { CKA_VALUE, output, length };
+	unsigned long n_attrs = sizeof(attrs) / sizeof(attrs[0]);
+	struct ck_attribute out = { CKA_VALUE, output, length };
 
 	mac = find_mac(_mac);
 	if (mac == NULL)
@@ -840,12 +841,12 @@ static int wrap_p11_hkdf_expand(gnutls_mac_algorithm_t _mac, const void *key,
 	if (key_size != mac->length)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	params.bExpand = CK_TRUE;
-	params.prfHashMechanism = mac->mech;
+	params.expand = true;
+	params.prf_hash_mechanism = mac->mech;
 
 	if (info != NULL && info_size != 0) {
-		params.pInfo = (CK_BYTE_PTR)info;
-		params.ulInfoLen = info_size;
+		params.info = (unsigned char *)info;
+		params.info_len = info_size;
 	}
 
 	session = _p11_provider_open_session();
@@ -878,26 +879,26 @@ static int wrap_p11_pbkdf2(gnutls_mac_algorithm_t _mac, const void *key,
 			   size_t key_size, const void *salt, size_t salt_size,
 			   unsigned iter_count, void *output, size_t length)
 {
-#ifdef CK_PKCS5_PBKD2_PARAMS2
+#ifdef CKZ_SALT_SPECIFIED
 	const struct p11_mac_st *mac = NULL;
-	CK_FUNCTION_LIST *module = _p11_provider_get_module();
-	CK_SESSION_HANDLE session = CK_INVALID_HANDLE;
-	CK_OBJECT_HANDLE new_key = CK_INVALID_HANDLE;
-	CK_PKCS5_PBKD2_PARAMS2 params = { 0 };
-	CK_MECHANISM mech = { CKM_PKCS5_PBKD2, &params, sizeof(params) };
-	CK_BBOOL attr_true = CK_TRUE;
-	CK_BBOOL attr_false = CK_FALSE;
-	CK_KEY_TYPE attr_key_type;
-	CK_ULONG attr_len = length;
-	CK_ATTRIBUTE attrs[] = {
+	struct ck_function_list *module = _p11_provider_get_module();
+	ck_session_handle_t session = CK_INVALID_HANDLE;
+	ck_object_handle_t new_key = CK_INVALID_HANDLE;
+	struct ck_pkcs5_pbkd2_params2 params = { 0 };
+	struct ck_mechanism mech = { CKM_PKCS5_PBKD2, &params, sizeof(params) };
+	bool attr_true = true;
+	bool attr_false = false;
+	ck_key_type_t attr_key_type;
+	unsigned long attr_len = length;
+	struct ck_attribute attrs[] = {
 		{ CKA_SENSITIVE, &attr_false, sizeof(attr_false) },
 		{ CKA_EXTRACTABLE, &attr_true, sizeof(attr_true) },
 		{ CKA_SIGN, &attr_true, sizeof(attr_true) },
 		{ CKA_KEY_TYPE, &attr_key_type, sizeof(attr_key_type) },
 		{ CKA_VALUE_LEN, &attr_len, sizeof(attr_len) }
 	};
-	CK_ULONG n_attrs = sizeof(attrs) / sizeof(attrs[0]);
-	CK_ATTRIBUTE out = { CKA_VALUE, output, length };
+	unsigned long n_attrs = sizeof(attrs) / sizeof(attrs[0]);
+	struct ck_attribute out = { CKA_VALUE, output, length };
 
 	mac = find_mac(_mac);
 	if (mac == NULL)
@@ -908,11 +909,11 @@ static int wrap_p11_pbkdf2(gnutls_mac_algorithm_t _mac, const void *key,
 
 	attr_key_type = mac->key_type;
 
-	params.saltSource = CKZ_SALT_SPECIFIED;
-	params.pSaltSourceData = (CK_BYTE_PTR)salt;
-	params.ulSaltSourceDataLen = salt_size;
-	params.pPassword = (CK_BYTE_PTR)key;
-	params.ulPasswordLen = key_size;
+	params.salt_source = CKZ_SALT_SPECIFIED;
+	params.salt_source_data = (unsigned char *)salt;
+	params.salt_source_data_len = salt_size;
+	params.password_ptr = (unsigned char *)key;
+	params.password_len = key_size;
 	params.iterations = iter_count;
 
 	switch (_mac) {
