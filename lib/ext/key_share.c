@@ -36,6 +36,7 @@
 #include "../ecc.h"
 #include "../algorithms.h"
 #include "pk.h"
+#include "crau/crau.h"
 
 static int key_share_recv_params(gnutls_session_t session, const uint8_t *data,
 				 size_t data_size);
@@ -252,11 +253,17 @@ static int client_gen_key_share(gnutls_session_t session,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
+	crau_new_context_with_data("name", CRAU_STRING, "tls::key_exchange",
+				   "tls::group", CRAU_WORD, group->tls_id,
+				   NULL);
+
 	for (size_t i = 0; groups[i]; i++) {
 		ret = client_gen_key_share_single(session, groups[i], extdata);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 	}
+
+	crau_pop_context();
 
 	/* copy actual length */
 	_gnutls_write_uint16(extdata->length - length_pos - 2,
@@ -373,11 +380,17 @@ static int server_gen_key_share(gnutls_session_t session,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
+	crau_new_context_with_data("name", CRAU_STRING, "tls::key_exchange",
+				   "tls::group", CRAU_WORD, group->tls_id,
+				   NULL);
+
 	for (size_t i = 0; groups[i]; i++) {
 		ret = server_gen_key_share_single(session, groups[i], extdata);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 	}
+
+	crau_pop_context();
 
 	/* copy actual length */
 	_gnutls_write_uint16(extdata->length - length_pos - 2,
@@ -619,11 +632,17 @@ static int server_use_key_share(gnutls_session_t session,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
+	crau_new_context_with_data("name", CRAU_STRING, "tls::key_exchange",
+				   "tls::group", CRAU_WORD, group->tls_id,
+				   NULL);
+
 	for (size_t i = 0; groups[i]; i++) {
 		ret = server_use_key_share_single(session, groups[i], &buffer);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 	}
+
+	crau_pop_context();
 
 	if (buffer.length > 0)
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
@@ -807,11 +826,17 @@ static int client_use_key_share(gnutls_session_t session,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
+	crau_new_context_with_data("name", CRAU_STRING, "tls::key_exchange",
+				   "tls::group", CRAU_WORD, group->tls_id,
+				   NULL);
+
 	for (size_t i = 0; groups[i]; i++) {
 		ret = client_use_key_share_single(session, groups[i], &buffer);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 	}
+
+	crau_pop_context();
 
 	if (buffer.length > 0)
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
