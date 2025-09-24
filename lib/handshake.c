@@ -59,6 +59,7 @@
 #include "tls13/session_ticket.h"
 #include "locks.h"
 #include "system/ktls.h"
+#include "crau/crau.h"
 
 static int check_if_null_comp_present(gnutls_session_t session, uint8_t *data,
 				      int datalen);
@@ -907,6 +908,9 @@ static int read_client_hello(gnutls_session_t session, uint8_t *data,
 
 	_gnutls_handshake_log("HSK[%p]: Selected version %s\n", session,
 			      vers->name);
+
+	crau_data("tls::protocol_version", CRAU_WORD,
+		  vers->major << 8 | vers->minor, NULL);
 
 	/* select appropriate compression method */
 	ret = check_if_null_comp_present(session, comp_ptr, comp_size);
@@ -2002,6 +2006,9 @@ static int read_server_hello(gnutls_session_t session, uint8_t *data,
 	    0)
 		return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
 
+	crau_data("tls::protocol_version", CRAU_WORD,
+		  vers->major << 8 | vers->minor, NULL);
+
 	/* set server random - done after final version is selected */
 	ret = _gnutls_set_server_random(session, vers, srandom_pos);
 	if (ret < 0)
@@ -2895,6 +2902,13 @@ int gnutls_handshake(gnutls_session_t session)
 		return gnutls_assert_val(GNUTLS_E_HANDSHAKE_DURING_FALSE_START);
 	}
 
+	crau_new_context_with_data("name", CRAU_STRING,
+				   session->security_parameters.entity ==
+						   GNUTLS_CLIENT ?
+					   "tls::handshake_client" :
+					   "tls::handshake_server",
+				   NULL);
+
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
 		do {
 			ret = handshake_client(session);
@@ -2902,6 +2916,8 @@ int gnutls_handshake(gnutls_session_t session)
 	} else {
 		ret = handshake_server(session);
 	}
+
+	crau_pop_context();
 
 	if (ret < 0) {
 		return _gnutls_abort_handshake(session, ret);
