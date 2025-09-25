@@ -274,3 +274,42 @@ int gnutls_session_key_update(gnutls_session_t session, unsigned flags)
 
 	return 0;
 }
+
+/**
+ * gnutls_handshake_update_receiving_key:
+ * @session: is a #gnutls_session_t type.
+ *
+ * This function will update/refresh the session receiving keys when
+ * the TLS protocol is 1.3 or better. Unlike gnutls_session_key_update()
+ * this function does not notify the peer, it will only update
+ * the local keys.
+ *
+ * If the negotiated version is not TLS 1.3 or better this
+ * function will return %GNUTLS_E_INVALID_REQUEST.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
+ *
+ * Since: 3.8.11
+ **/
+int gnutls_handshake_update_receiving_key(gnutls_session_t session)
+{
+	int ret;
+	const version_entry_st *vers = get_version(session);
+
+	if (!vers->tls13_sem)
+		return GNUTLS_E_INVALID_REQUEST;
+
+	_gnutls_epoch_gc(session);
+
+	ret = _tls13_update_secret(session,
+				   session->key.proto.tls13.temp_secret,
+				   session->key.proto.tls13.temp_secret_size);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = update_receiving_key(session, STAGE_UPD_PEERS);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	return 0;
+}

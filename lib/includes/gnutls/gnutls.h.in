@@ -1330,6 +1330,8 @@ int gnutls_rehandshake(gnutls_session_t session);
 #define GNUTLS_KU_PEER 1
 int gnutls_session_key_update(gnutls_session_t session, unsigned flags);
 
+int gnutls_handshake_update_receiving_key(gnutls_session_t session);
+
 gnutls_alert_description_t gnutls_alert_get(gnutls_session_t session);
 int gnutls_alert_send(gnutls_session_t session, gnutls_alert_level_t level,
 		      gnutls_alert_description_t desc);
