@@ -85,17 +85,17 @@ static int _gnutls_handshake_sign_data12(gnutls_session_t session,
 					 gnutls_privkey_t pkey,
 					 gnutls_datum_t *params,
 					 gnutls_datum_t *signature,
-					 gnutls_sign_algorithm_t sign_algo)
+					 const gnutls_sign_entry_st *se)
 {
 	gnutls_datum_t dconcat;
 	int ret;
 
 	_gnutls_handshake_log(
 		"HSK[%p]: signing TLS 1.2 handshake data: using %s\n", session,
-		gnutls_sign_algorithm_get_name(sign_algo));
+		se->name);
 
-	if (unlikely(gnutls_sign_supports_pk_algorithm(
-			     sign_algo, pkey->pk_algorithm) == 0))
+	if (unlikely(sign_supports_priv_pk_algorithm(se, pkey->pk_algorithm) ==
+		     0))
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 	dconcat.size = GNUTLS_RANDOM_SIZE * 2 + params->size;
@@ -110,8 +110,7 @@ static int _gnutls_handshake_sign_data12(gnutls_session_t session,
 	memcpy(dconcat.data + GNUTLS_RANDOM_SIZE * 2, params->data,
 	       params->size);
 
-	ret = gnutls_privkey_sign_data2(pkey, sign_algo, 0, &dconcat,
-					signature);
+	ret = gnutls_privkey_sign_data2(pkey, se->id, 0, &dconcat, signature);
 	if (ret < 0) {
 		gnutls_assert();
 	}
@@ -125,7 +124,7 @@ static int _gnutls_handshake_sign_data10(gnutls_session_t session,
 					 gnutls_privkey_t pkey,
 					 gnutls_datum_t *params,
 					 gnutls_datum_t *signature,
-					 gnutls_sign_algorithm_t sign_algo)
+					 const gnutls_sign_entry_st *se)
 {
 	gnutls_datum_t dconcat;
 	int ret;
@@ -138,21 +137,15 @@ static int _gnutls_handshake_sign_data10(gnutls_session_t session,
 	if (pk_algo == GNUTLS_PK_RSA)
 		me = hash_to_entry(GNUTLS_DIG_MD5_SHA1);
 	else
-		me = hash_to_entry(gnutls_sign_get_hash_algorithm(sign_algo));
+		me = hash_to_entry(se->hash);
 	if (me == NULL)
 		return gnutls_assert_val(GNUTLS_E_UNKNOWN_HASH_ALGORITHM);
 
-	if (unlikely(gnutls_sign_supports_pk_algorithm(sign_algo, pk_algo) ==
-		     0))
+	if (unlikely(sign_supports_priv_pk_algorithm(se, pk_algo) == 0))
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
-	pk_algo = gnutls_sign_get_pk_algorithm(sign_algo);
-	if (pk_algo == GNUTLS_PK_UNKNOWN)
-		return gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
-
 	_gnutls_handshake_log("HSK[%p]: signing handshake data: using %s\n",
-			      session,
-			      gnutls_sign_algorithm_get_name(sign_algo));
+			      session, se->name);
 
 	ret = _gnutls_hash_init(&td_sha, me);
 	if (ret < 0) {
@@ -191,6 +184,7 @@ int _gnutls_handshake_sign_data(gnutls_session_t session, gnutls_pcert_st *cert,
 {
 	const version_entry_st *ver = get_version(session);
 	unsigned key_usage = 0;
+	const gnutls_sign_entry_st *se;
 	int ret;
 
 	*sign_algo = session->security_parameters.server_sign_algo;
@@ -205,12 +199,14 @@ int _gnutls_handshake_sign_data(gnutls_session_t session, gnutls_pcert_st *cert,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
+	se = _gnutls_sign_to_entry(*sign_algo);
+
 	if (_gnutls_version_has_selectable_sighash(ver))
-		return _gnutls_handshake_sign_data12(
-			session, cert, pkey, params, signature, *sign_algo);
+		return _gnutls_handshake_sign_data12(session, cert, pkey,
+						     params, signature, se);
 	else
-		return _gnutls_handshake_sign_data10(
-			session, cert, pkey, params, signature, *sign_algo);
+		return _gnutls_handshake_sign_data10(session, cert, pkey,
+						     params, signature, se);
 }
 
 /* Generates a signature of all the random data and the parameters.
