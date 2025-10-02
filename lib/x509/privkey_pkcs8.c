@@ -274,7 +274,6 @@ inline static int _encode_privkey(gnutls_x509_privkey_t pkey,
 
 error:
 	asn1_delete_structure2(&spk, ASN1_DELETE_FLAG_ZEROIZE);
-	asn1_delete_structure(&spk);
 	return ret;
 }
 
