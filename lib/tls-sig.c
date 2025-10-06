@@ -39,6 +39,7 @@
 #include "state.h"
 #include "x509/common.h"
 #include "abstract_int.h"
+#include "crau/crau.h"
 
 int _gnutls_check_key_usage_for_sig(gnutls_session_t session,
 				    unsigned key_usage, unsigned our_cert)
@@ -85,17 +86,17 @@ static int _gnutls_handshake_sign_data12(gnutls_session_t session,
 					 gnutls_privkey_t pkey,
 					 gnutls_datum_t *params,
 					 gnutls_datum_t *signature,
-					 gnutls_sign_algorithm_t sign_algo)
+					 const gnutls_sign_entry_st *se)
 {
 	gnutls_datum_t dconcat;
 	int ret;
 
 	_gnutls_handshake_log(
 		"HSK[%p]: signing TLS 1.2 handshake data: using %s\n", session,
-		gnutls_sign_algorithm_get_name(sign_algo));
+		se->name);
 
-	if (unlikely(gnutls_sign_supports_pk_algorithm(
-			     sign_algo, pkey->pk_algorithm) == 0))
+	if (unlikely(sign_supports_priv_pk_algorithm(se, pkey->pk_algorithm) ==
+		     0))
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 	dconcat.size = GNUTLS_RANDOM_SIZE * 2 + params->size;
@@ -110,8 +111,7 @@ static int _gnutls_handshake_sign_data12(gnutls_session_t session,
 	memcpy(dconcat.data + GNUTLS_RANDOM_SIZE * 2, params->data,
 	       params->size);
 
-	ret = gnutls_privkey_sign_data2(pkey, sign_algo, 0, &dconcat,
-					signature);
+	ret = gnutls_privkey_sign_data2(pkey, se->id, 0, &dconcat, signature);
 	if (ret < 0) {
 		gnutls_assert();
 	}
@@ -125,7 +125,7 @@ static int _gnutls_handshake_sign_data10(gnutls_session_t session,
 					 gnutls_privkey_t pkey,
 					 gnutls_datum_t *params,
 					 gnutls_datum_t *signature,
-					 gnutls_sign_algorithm_t sign_algo)
+					 const gnutls_sign_entry_st *se)
 {
 	gnutls_datum_t dconcat;
 	int ret;
@@ -138,21 +138,15 @@ static int _gnutls_handshake_sign_data10(gnutls_session_t session,
 	if (pk_algo == GNUTLS_PK_RSA)
 		me = hash_to_entry(GNUTLS_DIG_MD5_SHA1);
 	else
-		me = hash_to_entry(gnutls_sign_get_hash_algorithm(sign_algo));
+		me = hash_to_entry(se->hash);
 	if (me == NULL)
 		return gnutls_assert_val(GNUTLS_E_UNKNOWN_HASH_ALGORITHM);
 
-	if (unlikely(gnutls_sign_supports_pk_algorithm(sign_algo, pk_algo) ==
-		     0))
+	if (unlikely(sign_supports_priv_pk_algorithm(se, pk_algo) == 0))
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
-	pk_algo = gnutls_sign_get_pk_algorithm(sign_algo);
-	if (pk_algo == GNUTLS_PK_UNKNOWN)
-		return gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
-
 	_gnutls_handshake_log("HSK[%p]: signing handshake data: using %s\n",
-			      session,
-			      gnutls_sign_algorithm_get_name(sign_algo));
+			      session, se->name);
 
 	ret = _gnutls_hash_init(&td_sha, me);
 	if (ret < 0) {
@@ -191,6 +185,7 @@ int _gnutls_handshake_sign_data(gnutls_session_t session, gnutls_pcert_st *cert,
 {
 	const version_entry_st *ver = get_version(session);
 	unsigned key_usage = 0;
+	const gnutls_sign_entry_st *se;
 	int ret;
 
 	*sign_algo = session->security_parameters.server_sign_algo;
@@ -205,12 +200,21 @@ int _gnutls_handshake_sign_data(gnutls_session_t session, gnutls_pcert_st *cert,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
+	se = _gnutls_sign_to_entry(*sign_algo);
+
+	crau_new_context_with_data("name", CRAU_STRING, "tls::sign",
+				   "tls::signature_algorithm", CRAU_WORD,
+				   se->aid.id[0] << 8 | se->aid.id[1], NULL);
+
 	if (_gnutls_version_has_selectable_sighash(ver))
-		return _gnutls_handshake_sign_data12(
-			session, cert, pkey, params, signature, *sign_algo);
+		ret = _gnutls_handshake_sign_data12(session, cert, pkey, params,
+						    signature, se);
 	else
-		return _gnutls_handshake_sign_data10(
-			session, cert, pkey, params, signature, *sign_algo);
+		ret = _gnutls_handshake_sign_data10(session, cert, pkey, params,
+						    signature, se);
+
+	crau_pop_context();
+	return ret;
 }
 
 /* Generates a signature of all the random data and the parameters.
@@ -230,6 +234,7 @@ static int _gnutls_handshake_verify_data10(gnutls_session_t session,
 	gnutls_digest_algorithm_t hash_algo;
 	const mac_entry_st *me;
 	gnutls_pk_algorithm_t pk_algo;
+	const gnutls_sign_entry_st *se;
 
 	pk_algo = gnutls_pubkey_get_pk_algorithm(cert->pubkey, NULL);
 	if (pk_algo == GNUTLS_PK_RSA) {
@@ -261,6 +266,12 @@ static int _gnutls_handshake_verify_data10(gnutls_session_t session,
 	dconcat.data = concat;
 	dconcat.size = _gnutls_hash_get_algo_len(me);
 
+	se = _gnutls_sign_to_entry(sign_algo);
+	if (se) {
+		crau_data("tls::signature_algorithm", CRAU_WORD,
+			  se->aid.id[0] << 8 | se->aid.id[1], NULL);
+	}
+
 	ret = gnutls_pubkey_verify_hash2(cert->pubkey, sign_algo,
 					 GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1 |
 						 verify_flags,
@@ -282,6 +293,9 @@ static int _gnutls_handshake_verify_data12(gnutls_session_t session,
 	int ret;
 	const version_entry_st *ver = get_version(session);
 	const gnutls_sign_entry_st *se = _gnutls_sign_to_entry(sign_algo);
+
+	if (unlikely(se == NULL))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	_gnutls_handshake_log(
 		"HSK[%p]: verify TLS 1.2 handshake data: using %s\n", session,
@@ -317,6 +331,9 @@ static int _gnutls_handshake_verify_data12(gnutls_session_t session,
 	memcpy(dconcat.data + GNUTLS_RANDOM_SIZE * 2, params->data,
 	       params->size);
 
+	crau_data("tls::signature_algorithm", CRAU_WORD,
+		  se->aid.id[0] << 8 | se->aid.id[1], NULL);
+
 	ret = gnutls_pubkey_verify_data2(cert->pubkey, sign_algo, verify_flags,
 					 &dconcat, signature);
 	if (ret < 0)
@@ -350,14 +367,19 @@ int _gnutls_handshake_verify_data(gnutls_session_t session,
 
 	gnutls_sign_algorithm_set_server(session, sign_algo);
 
+	crau_new_context_with_data("name", CRAU_STRING, "tls::verify", NULL);
+
 	if (_gnutls_version_has_selectable_sighash(ver))
-		return _gnutls_handshake_verify_data12(session, verify_flags,
-						       cert, params, signature,
-						       sign_algo);
+		ret = _gnutls_handshake_verify_data12(session, verify_flags,
+						      cert, params, signature,
+						      sign_algo);
 	else
-		return _gnutls_handshake_verify_data10(session, verify_flags,
-						       cert, params, signature,
-						       sign_algo);
+		ret = _gnutls_handshake_verify_data10(session, verify_flags,
+						      cert, params, signature,
+						      sign_algo);
+
+	crau_pop_context();
+	return ret;
 }
 
 /* Client certificate verify calculations
@@ -423,6 +445,9 @@ static int _gnutls_handshake_verify_crt_vrfy12(
 	dconcat.data = session->internals.handshake_hash_buffer.data;
 	dconcat.size = session->internals.handshake_hash_buffer_prev_len;
 
+	crau_data("tls::signature_algorithm", CRAU_WORD,
+		  se->aid.id[0] << 8 | se->aid.id[1], NULL);
+
 	/* Here we intentionally enable flag GNUTLS_VERIFY_ALLOW_BROKEN
 	 * because we have checked whether the currently used signature
 	 * algorithm is allowed in the session. */
@@ -453,6 +478,7 @@ static int _gnutls_handshake_verify_crt_vrfy3(gnutls_session_t session,
 	gnutls_datum_t dconcat;
 	gnutls_pk_algorithm_t pk =
 		gnutls_pubkey_get_pk_algorithm(cert->pubkey, NULL);
+	const gnutls_sign_entry_st *se;
 
 	ret = _gnutls_generate_master(session, 1);
 	if (ret < 0) {
@@ -502,6 +528,12 @@ static int _gnutls_handshake_verify_crt_vrfy3(gnutls_session_t session,
 
 	dconcat.size += 20;
 
+	se = _gnutls_sign_to_entry(sign_algo);
+	if (se) {
+		crau_data("tls::signature_algorithm", CRAU_WORD,
+			  se->aid.id[0] << 8 | se->aid.id[1], NULL);
+	}
+
 	ret = gnutls_pubkey_verify_hash2(cert->pubkey, GNUTLS_SIGN_UNKNOWN,
 					 GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1 |
 						 verify_flags,
@@ -523,6 +555,7 @@ static int _gnutls_handshake_verify_crt_vrfy10(
 	gnutls_datum_t dconcat;
 	gnutls_pk_algorithm_t pk_algo;
 	const mac_entry_st *me;
+	const gnutls_sign_entry_st *se;
 
 	/* TLS 1.0 and TLS 1.1 */
 	pk_algo = gnutls_pubkey_get_pk_algorithm(cert->pubkey, NULL);
@@ -547,6 +580,12 @@ static int _gnutls_handshake_verify_crt_vrfy10(
 
 	dconcat.data = concat;
 	dconcat.size = _gnutls_hash_get_algo_len(me);
+
+	se = _gnutls_sign_to_entry(sign_algo);
+	if (se) {
+		crau_data("tls::signature_algorithm", CRAU_WORD,
+			  se->aid.id[0] << 8 | se->aid.id[1], NULL);
+	}
 
 	ret = gnutls_pubkey_verify_hash2(cert->pubkey, sign_algo,
 					 GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1 |
@@ -590,19 +629,25 @@ int _gnutls_handshake_verify_crt_vrfy(gnutls_session_t session,
 
 	gnutls_sign_algorithm_set_client(session, sign_algo);
 
+	crau_new_context_with_data("name", CRAU_STRING, "tls::verify", NULL);
+
 	/* TLS 1.2 */
 	if (_gnutls_version_has_selectable_sighash(ver))
-		return _gnutls_handshake_verify_crt_vrfy12(
+		ret = _gnutls_handshake_verify_crt_vrfy12(
 			session, verify_flags, cert, signature, sign_algo);
 #ifdef ENABLE_SSL3
-	if (ver->id == GNUTLS_SSL3)
-		return _gnutls_handshake_verify_crt_vrfy3(
+	else if (ver->id == GNUTLS_SSL3)
+		ret = _gnutls_handshake_verify_crt_vrfy3(
 			session, verify_flags, cert, signature, sign_algo);
 #endif
+	else {
+		/* TLS 1.0 and TLS 1.1 */
+		ret = _gnutls_handshake_verify_crt_vrfy10(
+			session, verify_flags, cert, signature, sign_algo);
+	}
 
-	/* TLS 1.0 and TLS 1.1 */
-	return _gnutls_handshake_verify_crt_vrfy10(session, verify_flags, cert,
-						   signature, sign_algo);
+	crau_pop_context();
+	return ret;
 }
 
 /* the same as _gnutls_handshake_sign_crt_vrfy except that it is made for TLS 1.2.
@@ -629,10 +674,13 @@ static int _gnutls_handshake_sign_crt_vrfy12(gnutls_session_t session,
 	if (se == NULL)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	gnutls_sign_algorithm_set_client(session, sign_algo);
+	crau_data("tls::signature_algorithm", CRAU_WORD,
+		  se->aid.id[0] << 8 | se->aid.id[1], NULL);
 
-	if (unlikely(gnutls_sign_supports_pk_algorithm(
-			     sign_algo, pkey->pk_algorithm) == 0))
+	gnutls_sign_algorithm_set_client(session, se->id);
+
+	if (unlikely(sign_supports_priv_pk_algorithm(se, pkey->pk_algorithm) ==
+		     0))
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 	_gnutls_debug_log("sign handshake cert vrfy: picked %s\n",
@@ -724,7 +772,7 @@ static int _gnutls_handshake_sign_crt_vrfy3(gnutls_session_t session,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	return GNUTLS_SIGN_UNKNOWN;
+	return ret;
 }
 #endif
 
@@ -805,18 +853,24 @@ int _gnutls_handshake_sign_crt_vrfy(gnutls_session_t session,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
+	crau_new_context_with_data("name", CRAU_STRING, "tls::sign", NULL);
+
 	/* TLS 1.2 */
 	if (_gnutls_version_has_selectable_sighash(ver))
-		return _gnutls_handshake_sign_crt_vrfy12(session, cert, pkey,
-							 signature);
+		ret = _gnutls_handshake_sign_crt_vrfy12(session, cert, pkey,
+							signature);
 
 	/* TLS 1.1 or earlier */
 #ifdef ENABLE_SSL3
-	if (ver->id == GNUTLS_SSL3)
-		return _gnutls_handshake_sign_crt_vrfy3(session, cert, ver,
-							pkey, signature);
+	else if (ver->id == GNUTLS_SSL3)
+		ret = _gnutls_handshake_sign_crt_vrfy3(session, cert, ver, pkey,
+						       signature);
 #endif
+	else {
+		ret = _gnutls_handshake_sign_crt_vrfy10(session, cert, ver,
+							pkey, signature);
+	}
 
-	return _gnutls_handshake_sign_crt_vrfy10(session, cert, ver, pkey,
-						 signature);
+	crau_pop_context();
+	return ret;
 }

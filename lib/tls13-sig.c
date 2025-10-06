@@ -29,6 +29,7 @@
 #include "tls13-sig.h"
 #include "tls-sig.h"
 #include "hash_int.h"
+#include "crau/crau.h"
 
 #undef PREFIX_SIZE
 #define PREFIX_SIZE 64
@@ -83,6 +84,10 @@ int _gnutls13_handshake_verify_data(gnutls_session_t session,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
+	crau_new_context_with_data("name", CRAU_STRING, "tls::verify",
+				   "tls::signature_algorithm", CRAU_WORD,
+				   se->aid.id[0] << 8 | se->aid.id[1], NULL);
+
 	_gnutls_buffer_init(&buf);
 
 	memset(prefix, 0x20, sizeof(prefix));
@@ -134,6 +139,7 @@ int _gnutls13_handshake_verify_data(gnutls_session_t session,
 	ret = 0;
 cleanup:
 	_gnutls_buffer_clear(&buf);
+	crau_pop_context();
 
 	return ret;
 }
@@ -161,6 +167,10 @@ int _gnutls13_handshake_sign_data(gnutls_session_t session,
 	_gnutls_handshake_log(
 		"HSK[%p]: signing TLS 1.3 handshake data: using %s and PRF: %s\n",
 		session, se->name, session->security_parameters.prf->name);
+
+	crau_new_context_with_data("name", CRAU_STRING, "tls::sign",
+				   "tls::signature_algorithm", CRAU_WORD,
+				   se->aid.id[0] << 8 | se->aid.id[1], NULL);
 
 	_gnutls_buffer_init(&buf);
 
@@ -215,6 +225,7 @@ int _gnutls13_handshake_sign_data(gnutls_session_t session,
 	ret = 0;
 cleanup:
 	_gnutls_buffer_clear(&buf);
+	crau_pop_context();
 
 	return ret;
 }
