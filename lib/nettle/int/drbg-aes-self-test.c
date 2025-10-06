@@ -219,6 +219,6 @@ int drbg_aes_self_test(void)
 	gnutls_free(tmp);
 	return 1;
 fail:
-	free(tmp);
+	gnutls_free(tmp);
 	return 0;
 }
