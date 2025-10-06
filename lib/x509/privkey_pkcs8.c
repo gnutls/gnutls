@@ -166,9 +166,6 @@ cleanup:
 	return ret;
 }
 
-/* Returns a negative error code if the encryption schema in
- * the OID is not supported. The schema ID is returned.
- */
 /* Encodes a private key to the raw format PKCS #8 needs.
  * For RSA it is a PKCS #1 DER private key and for DSA it is
  * an ASN.1 INTEGER of the x value.
@@ -274,7 +271,6 @@ inline static int _encode_privkey(gnutls_x509_privkey_t pkey,
 
 error:
 	asn1_delete_structure2(&spk, ASN1_DELETE_FLAG_ZEROIZE);
-	asn1_delete_structure(&spk);
 	return ret;
 }
 
