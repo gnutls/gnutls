@@ -78,7 +78,7 @@ AS_IF([test -n "$FAKETIME"], [FAKETIME_F_OPT="-f"; AC_SUBST([FAKETIME_F_OPT])], 
 ])
 
 AC_CACHE_CHECK([whether faketime program works], [gnutls_cv_prog_faketime_works],
-  [AC_RUN_IFELSE(
+  [AC_LINK_IFELSE(
     [AC_LANG_PROGRAM(
       [[#include <stdio.h>
         #include <stdlib.h>
@@ -100,8 +100,7 @@ AC_CACHE_CHECK([whether faketime program works], [gnutls_cv_prog_faketime_works]
     [gnutls_cv_prog_faketime_works=no],
     [gnutls_cv_prog_faketime_works=cross-compiling])])
 
-AC_MSG_RESULT([$gnutls_cv_faketime_works])
-AC_SUBST([gnutls_cv_faketime_works])
+AC_SUBST([gnutls_cv_prog_faketime_works])
 
 AC_ARG_ENABLE(bash-tests,
   AS_HELP_STRING([--disable-bash-tests], [skip some tests that badly need bash]),

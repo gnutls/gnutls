@@ -96,7 +96,7 @@ GETPORT='
 '
 
 skip_if_no_datefudge() {
-	if test "$gnutls_cv_faketime_works" != yes; then
+	if test "$gnutls_cv_prog_faketime_works" != yes; then
 		exit 77
 	fi
 }
