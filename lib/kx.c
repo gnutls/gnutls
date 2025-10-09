@@ -138,8 +138,10 @@ static void keylog_once_init(void)
 	keylogfile = secure_getenv("SSLKEYLOGFILE");
 	if (keylogfile != NULL && *keylogfile != '\0') {
 		keylog = fopen(keylogfile, "ae");
-		_gnutls_debug_log("unable to open keylog file %s\n",
-				  keylogfile);
+		if (keylog == NULL)
+			_gnutls_debug_log(
+				"unable to open keylog file %s, error %d\n",
+				keylogfile, errno);
 	}
 }
 
