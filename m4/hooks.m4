@@ -392,10 +392,21 @@ LIBTASN1_MINIMUM=4.9
                    [disable crypto-auditing trace support])],
     [enable_crypto_auditing=$enableval], [enable_crypto_auditing=auto])
   AC_MSG_RESULT([$enable_crypto_auditing])
+  AC_CHECK_HEADERS([sys/sdt.h])
+  AC_CACHE_CHECK([whether <sys/sdt.h> defines DTRACE_PROBE],
+    [gnutls_cv_sys_sdt_dtrace_probe],
+    [AC_PREPROC_IFELSE(
+       [AC_LANG_SOURCE([[#include <sys/sdt.h>
+                         #ifndef DTRACE_PROBE
+                         # error "DTRACE_PROBE is not defined"
+                         #endif]])],
+       [gnutls_cv_sys_sdt_dtrace_probe=yes],
+       [gnutls_cv_sys_sdt_dtrace_probe=no])])
   AS_IF([test "$enable_crypto_auditing" != "no"],
-    [AC_CHECK_HEADERS([sys/sdt.h], [enable_crypto_auditing=yes],
+    [AS_IF([test "$gnutls_cv_sys_sdt_dtrace_probe" = "yes"],
+      [enable_crypto_auditing=yes],
       [AS_CASE([$enable_crypto_auditing],
-        [yes], [AC_MSG_ERROR([<sys/sdt.h> not found])],
+        [yes], [AC_MSG_ERROR([no compatible sys/sdt.h found])],
         [*], [enable_crypto_auditing=no])])])
   AS_IF([test "$enable_crypto_auditing" = "yes"],
         [AC_DEFINE([ENABLE_CRYPTO_AUDITING], [1], [enable crypto-auditing trace])])
