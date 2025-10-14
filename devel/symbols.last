@@ -22,7 +22,6 @@ GNUTLS_3_8_1@GNUTLS_3_8_1
 GNUTLS_3_8_2@GNUTLS_3_8_2
 GNUTLS_3_8_4@GNUTLS_3_8_4
 GNUTLS_3_8_6@GNUTLS_3_8_6
-GNUTLS_3_8_10@GNUTLS_3_8_10
 _gnutls_global_init_skip@GNUTLS_3_4
 gnutls_aead_cipher_decrypt@GNUTLS_3_4
 gnutls_aead_cipher_decryptv2@GNUTLS_3_6_10
@@ -302,6 +301,7 @@ gnutls_handshake_set_random@GNUTLS_3_4
 gnutls_handshake_set_read_function@GNUTLS_3_7_0
 gnutls_handshake_set_secret_function@GNUTLS_3_7_0
 gnutls_handshake_set_timeout@GNUTLS_3_4
+gnutls_handshake_update_receiving_key@GNUTLS_3_8_11
 gnutls_handshake_write@GNUTLS_3_7_0
 gnutls_hash@GNUTLS_3_4
 gnutls_hash_copy@GNUTLS_3_6_9
@@ -769,6 +769,7 @@ gnutls_record_discard_queued@GNUTLS_3_4
 gnutls_record_get_direction@GNUTLS_3_4
 gnutls_record_get_discarded@GNUTLS_3_4
 gnutls_record_get_max_early_data_size@GNUTLS_3_6_5
+gnutls_record_get_max_send_size@GNUTLS_3_8_11
 gnutls_record_get_max_size@GNUTLS_3_4
 gnutls_record_get_state@GNUTLS_3_4
 gnutls_record_overhead_size@GNUTLS_3_4
@@ -784,7 +785,6 @@ gnutls_record_send_range@GNUTLS_3_4
 gnutls_record_set_max_early_data_size@GNUTLS_3_6_4
 gnutls_record_set_max_recv_size@GNUTLS_3_6_8
 gnutls_record_set_max_size@GNUTLS_3_4
-gnutls_record_get_max_send_size@GNUTLS_3_8_11
 gnutls_record_set_state@GNUTLS_3_4
 gnutls_record_set_timeout@GNUTLS_3_4
 gnutls_record_uncork@GNUTLS_3_4
@@ -833,7 +833,6 @@ gnutls_session_ticket_enable_client@GNUTLS_3_4
 gnutls_session_ticket_enable_server@GNUTLS_3_4
 gnutls_session_ticket_key_generate@GNUTLS_3_4
 gnutls_session_ticket_send@GNUTLS_3_6_3
-gnutls_handshake_update_receiving_key@GNUTLS_3_8_6
 gnutls_set_default_priority@GNUTLS_3_4
 gnutls_set_default_priority_append@GNUTLS_3_6_3
 gnutls_sign_algorithm_get@GNUTLS_3_4

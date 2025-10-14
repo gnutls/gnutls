@@ -89,7 +89,7 @@ COBJECTS = range.c record.c compress.c debug.c cipher.c gthreads.h handshake-tls
 	crypto-selftests.c crypto-selftests-pk.c secrets.c extv.c extv.h \
 	hello_ext_lib.c hello_ext_lib.h ocsp-api.c stek.c cert-cred-rawpk.c \
 	iov.c iov.h system/ktls.c system/ktls.h pathbuf.c pathbuf.h \
-	crau/crau.h crau/macros.h
+	audit.h audit.c crau/crau.h crau/macros.h
 
 if HAVE_ZLIB
 COBJECTS += dlwrap/zlib.c dlwrap/zlibfuncs.h dlwrap/zlib.h

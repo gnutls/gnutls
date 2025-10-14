@@ -13,8 +13,9 @@
 
 #ifdef ENABLE_CRYPTO_AUDITING
 
-#ifdef HAVE_SYS_SDT_H
 #include <sys/sdt.h>
+#ifndef DTRACE_PROBE
+# error "no DTrace compatibile macros defined in <sys/sdt.h>"
 #endif
 
 /* Introduce a new context CONTEXT, derived from the parent context PARENT.

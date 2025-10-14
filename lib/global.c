@@ -49,9 +49,7 @@
 #include "pkcs11/p11_provider.h"
 #endif
 
-#define CRAU_IMPLEMENTATION 1
-#define CRAU_CONTEXT_STACK_DEPTH 8
-#include "crau/crau.h"
+#include "audit.h"
 
 /* Minimum library versions we accept. */
 #define GNUTLS_MIN_LIBTASN1_VERSION "0.3.4"
