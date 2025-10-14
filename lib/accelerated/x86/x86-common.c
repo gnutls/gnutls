@@ -339,8 +339,8 @@ static int check_fast_pclmul(void)
 
 static int check_phe_partial(void)
 {
-	const char text[64] = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-			      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+	const char text[SHA1_BLOCK_SIZE + 1 /*NUL*/] =
+		"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 	uint32_t iv[5] = { 0x67452301UL, 0xEFCDAB89UL, 0x98BADCFEUL,
 			   0x10325476UL, 0xC3D2E1F0UL };
 

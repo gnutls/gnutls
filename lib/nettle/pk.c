@@ -3363,11 +3363,11 @@ static int pct_test(gnutls_pk_algorithm_t algo,
 	int ret;
 	gnutls_datum_t sig = { NULL, 0 };
 	const char const_data[20] = "onetwothreefourfive";
-	const char const_data_sha256[32] = "onetwothreefourfivesixseveneight";
+	const char const_data_sha256[32] = "onetwothreefourfivesixseveneigh";
 	const char const_data_sha384[48] =
-		"onetwothreefourfivesixseveneightnineteneleventwe";
+		"onetwothreefourfivesixseveneightnineteneleventw";
 	const char const_data_sha512[64] =
-		"onetwothreefourfivesixseveneightnineteneleventwelvethirteenfourt";
+		"onetwothreefourfivesixseveneightnineteneleventwelvethirteenfour";
 	gnutls_datum_t ddata, tmp = { NULL, 0 };
 	char gen_data[MAX_HASH_SIZE];
 	gnutls_x509_spki_st spki;

@@ -68,7 +68,7 @@ typedef struct {
 static int client_send(gnutls_session_t session, gnutls_buffer_st *extdata,
 		       status_request_ext_st *priv)
 {
-	const uint8_t data[5] = "\x01\x00\x00\x00\x00";
+	const uint8_t data[5] = { 0x01, 0x00, 0x00, 0x00, 0x00 };
 	const int len = 5;
 	int ret;
 
