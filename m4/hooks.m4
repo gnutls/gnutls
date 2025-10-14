@@ -386,11 +386,11 @@ LIBTASN1_MINIMUM=4.9
   AM_CONDITIONAL(ENABLE_OCSP, test "$ac_enable_ocsp" != "no")
 
   # For crypto-auditing trace
-  AC_MSG_CHECKING([whether to disable crypto-auditing trace support])
+  AC_MSG_CHECKING([whether to enable crypto-auditing trace support])
   AC_ARG_ENABLE([crypto-auditing],
-    [AS_HELP_STRING([--disable-crypto-auditing],
-                   [disable crypto-auditing trace support])],
-    [enable_crypto_auditing=$enableval], [enable_crypto_auditing=auto])
+    [AS_HELP_STRING([--enable-crypto-auditing],
+                   [enable crypto-auditing trace support])],
+    [enable_crypto_auditing=$enableval], [enable_crypto_auditing=no])
   AC_MSG_RESULT([$enable_crypto_auditing])
   AC_CHECK_HEADERS([sys/sdt.h])
   AC_CACHE_CHECK([whether <sys/sdt.h> defines DTRACE_PROBE],
