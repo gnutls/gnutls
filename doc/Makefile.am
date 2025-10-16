@@ -420,20 +420,30 @@ printlist_LDADD = ../lib/libgnutls.la ../gl/libgnu.la
 alert_printlist_SOURCES = alert-printlist.c common.c common.h
 alert_printlist_LDADD = ../lib/libgnutls.la ../gl/libgnu.la
 
-error_codes.texi: $(top_srcdir)/lib/errors.c $(srcdir)/errcodes.c
-	$(MAKE) $(builddir)/errcodes
-	$(builddir)/errcodes > $@-tmp
-	mv -f $@-tmp $@
+# XXX: We cannot specify errcodes, printlist and alert-printlist as
+# prerequisites, as these are binaries not part of 'dist', that would
+# trigger the build of the .texi generated sources during 'make
+# distcheck'.  Furthermore, since the helper binaries share some
+# source files, they must be built sequentially to avoid races during
+# a parallel build.  This workaround is based on guidance from info
+# '(automake) Errors with distclean'.  Grouped targets (info "(make)
+# Multiple Targets") are not used here since that's a non-POSIX GNU
+# Make extension.
+stamp_error_codes: \
+		$(top_srcdir)/lib/errors.c errcodes.c \
+		$(top_srcdir)/lib/algorithms/ciphers.c printlist.c \
+		$(top_srcdir)/lib/alert.c alert-printlist.c
+	$(MAKE) $(AM_MAKEFLAGS) errcodes printlist alert-printlist
+	./errcodes > error_codes.texi-tmp
+	mv -f error_codes.texi-tmp error_codes.texi
+	./printlist > algorithms.texi-tmp
+	mv -f algorithms.texi-tmp algorithms.texi
+	./alert-printlist > alerts.texi-tmp
+	mv -f alerts.texi-tmp alerts.texi
+	echo $@ > $@
 
-algorithms.texi: $(top_srcdir)/lib/algorithms/ciphers.c $(srcdir)/printlist.c
-	$(MAKE) $(builddir)/printlist
-	$(builddir)/printlist > $@-tmp
-	mv -f $@-tmp $@
-
-alerts.texi: $(top_srcdir)/lib/alert.c $(srcdir)/alert-printlist.c
-	$(MAKE) $(builddir)/alert-printlist
-	$(builddir)/alert-printlist > $@-tmp
-	mv -f $@-tmp $@
+error_codes.texi algorithms.texi alerts.texi: stamp_error_codes
+	@:
 
 enums.texi: $(HEADER_FILES)
 	echo "" > $@-tmp
@@ -445,7 +455,7 @@ enums.texi: $(HEADER_FILES)
 	mv -f $@-tmp $@
 
 gnutls_TEXINFOS += $(ENUMS) $(FUNCS) $(AUTOGENED_DOC)
-DISTCLEANFILES += $(ENUMS) stamp_enums stamp_functions
+DISTCLEANFILES += $(ENUMS) stamp_enums stamp_error_codes stamp_functions
 
 
 stamp_functions: $(API_FILES)
