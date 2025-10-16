@@ -449,7 +449,7 @@ DISTCLEANFILES += $(ENUMS) stamp_enums stamp_functions
 
 
 stamp_functions: $(API_FILES)
-	-mkdir functions
+	$(MKDIR_P) functions
 	-rm -f functions/*.short
 	for i in $^; do \
 		$(PERL) $(srcdir)/scripts/split-texi.pl functions < $$i; \
@@ -460,7 +460,7 @@ stamp_functions: $(API_FILES)
 	echo $@ > $@
 
 stamp_enums: enums.texi
-	-mkdir enums
+	$(MKDIR_P) enums
 	$(PERL) $(srcdir)/scripts/split-texi.pl enums enum < $<
 	echo $@ > $@
 
