@@ -1457,6 +1457,9 @@ GNUTLS_3_8_11
 	gnutls_psk_allocate_server_credentials2;
 	gnutls_record_get_max_send_size;
 	gnutls_handshake_update_receiving_key;
+	gnutls_audit_push_context;
+	gnutls_audit_pop_context;
+	gnutls_audit_current_context;
  local:
 	*;
 } GNUTLS_3_8_6;

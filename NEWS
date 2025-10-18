@@ -27,11 +27,21 @@ See the end for copying conditions.
    multiple tokens, the "path" configuration keyword was replaced with
    the "url" keyword.
 
+** libgnutls: Support crypto-auditing probe points
+   crypto-auditing is a project to monitor which cryptographic
+   operations are taking place in the library at run time, through
+   eBPF. This adds necessary probe points for that, in public key
+   cryptography and the TLS use-case. To enable this, run configure
+   with --enable-crypto-auditing.
+
 ** API and ABI modifications:
 gnutls_psk_allocate_client_credentials2: New function
 gnutls_psk_allocate_server_credentials2: New function
 gnutls_record_get_max_send_size: New function
 gnutls_handshake_update_receiving_key: New function
+gnutls_audit_push_context: New function
+gnutls_audit_pop_context: New function
+gnutls_audit_current_context: New function
 
 * Version 3.8.10 (released 2025-07-08)
 
