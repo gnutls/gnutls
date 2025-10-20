@@ -970,11 +970,12 @@ static int _gnutls_asn1_encode_ecc(asn1_node *c2, gnutls_pk_params_st *params)
 {
 	int ret;
 	uint8_t one = '\x01';
-	gnutls_datum_t pubkey = { NULL, 0 };
-	const char *oid;
+	gnutls_datum_t raw_priv = { NULL, 0 }, raw_pub = { NULL, 0 };
+	const gnutls_datum_t *privkey, *pubkey;
+	const gnutls_ecc_curve_entry_st *ce;
 
-	oid = gnutls_ecc_curve_get_oid(params->curve);
-	if (oid == NULL)
+	ce = _gnutls_ecc_curve_get_params(params->curve);
+	if (ce->oid == NULL)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	/* first make sure that no previously allocated data are leaked */
@@ -997,49 +998,48 @@ static int _gnutls_asn1_encode_ecc(asn1_node *c2, gnutls_pk_params_st *params)
 		goto cleanup;
 	}
 
-	if (curve_is_eddsa(params->curve) ||
-	    curve_is_modern_ecdh(params->curve)) {
+	if (_curve_is_eddsa(ce) || _curve_is_modern_ecdh(ce)) {
 		if (params->raw_pub.size == 0 || params->raw_priv.size == 0)
 			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-		ret = asn1_write_value(*c2, "privateKey", params->raw_priv.data,
-				       params->raw_priv.size);
-		if (ret != ASN1_SUCCESS) {
-			gnutls_assert();
-			ret = _gnutls_asn2err(ret);
-			goto cleanup;
-		}
-
-		ret = asn1_write_value(*c2, "publicKey", params->raw_pub.data,
-				       params->raw_pub.size * 8);
-		if (ret != ASN1_SUCCESS) {
-			gnutls_assert();
-			ret = _gnutls_asn2err(ret);
-			goto cleanup;
-		}
+		privkey = &params->raw_priv;
+		pubkey = &params->raw_pub;
 	} else {
 		if (params->params_nr != ECC_PRIVATE_PARAMS)
 			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-		ret = _gnutls_ecc_ansi_x962_export(params->curve,
-						   params->params[ECC_X],
-						   params->params[ECC_Y],
-						   &pubkey);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
-
-		ret = _gnutls_x509_write_key_int(*c2, "privateKey",
-						 params->params[ECC_K], 1);
+		ret = _gnutls_mpi_dprint_size(params->params[ECC_K], &raw_priv,
+					      ce->size);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
 		}
 
-		if ((ret = asn1_write_value(*c2, "publicKey", pubkey.data,
-					    pubkey.size * 8)) != ASN1_SUCCESS) {
+		ret = _gnutls_ecc_ansi_x962_export(params->curve,
+						   params->params[ECC_X],
+						   params->params[ECC_Y],
+						   &raw_pub);
+		if (ret < 0) {
 			gnutls_assert();
-			ret = _gnutls_asn2err(ret);
 			goto cleanup;
 		}
+
+		privkey = &raw_priv;
+		pubkey = &raw_pub;
+	}
+
+	ret = asn1_write_value(*c2, "privateKey", privkey->data, privkey->size);
+	if (ret != ASN1_SUCCESS) {
+		gnutls_assert();
+		ret = _gnutls_asn2err(ret);
+		goto cleanup;
+	}
+
+	ret = asn1_write_value(*c2, "publicKey", pubkey->data,
+			       pubkey->size * 8);
+	if (ret != ASN1_SUCCESS) {
+		gnutls_assert();
+		ret = _gnutls_asn2err(ret);
+		goto cleanup;
 	}
 
 	/* write our choice */
@@ -1050,19 +1050,18 @@ static int _gnutls_asn1_encode_ecc(asn1_node *c2, gnutls_pk_params_st *params)
 		goto cleanup;
 	}
 
-	if ((ret = asn1_write_value(*c2, "parameters.namedCurve", oid, 1)) !=
-	    ASN1_SUCCESS) {
+	if ((ret = asn1_write_value(*c2, "parameters.namedCurve", ce->oid,
+				    1)) != ASN1_SUCCESS) {
 		gnutls_assert();
 		ret = _gnutls_asn2err(ret);
 		goto cleanup;
 	}
 
-	_gnutls_free_datum(&pubkey);
-	return 0;
-
 cleanup:
-	asn1_delete_structure2(c2, ASN1_DELETE_FLAG_ZEROIZE);
-	_gnutls_free_datum(&pubkey);
+	if (ret < 0)
+		asn1_delete_structure2(c2, ASN1_DELETE_FLAG_ZEROIZE);
+	_gnutls_free_datum(&raw_pub);
+	_gnutls_free_key_datum(&raw_priv);
 
 	return ret;
 }
