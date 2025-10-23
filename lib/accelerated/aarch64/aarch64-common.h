@@ -98,6 +98,12 @@ void register_aarch64_crypto(void);
 #define AARCH64_VALIDATE_LINK_REGISTER
 #endif /* __ARM_FEATURE_PAC_DEFAULT */
 
+#if defined(__ARM_FEATURE_GCS_DEFAULT) && __ARM_FEATURE_GCS_DEFAULT == 1
+#define GNU_PROPERTY_AARCH64_GCS (1 << 2)
+#else
+#define GNU_PROPERTY_AARCH64_GCS 0 /* No GCS */
+#endif
+
 /*
  * The GNU notes section declares if PAC and/or BTI are enabled. For BTI is important
  * as the first ELF loaded that does not support BTI disables the support. For PAC it
@@ -105,7 +111,8 @@ void register_aarch64_crypto(void);
  * it's instructions.
  */
 #if defined(__ASSEMBLER__)
-#if GNU_PROPERTY_AARCH64_POINTER_AUTH != 0 || GNU_PROPERTY_AARCH64_BTI != 0
+#if GNU_PROPERTY_AARCH64_POINTER_AUTH != 0 || GNU_PROPERTY_AARCH64_BTI != 0 || \
+	GNU_PROPERTY_AARCH64_GCS != 0
 /* clang-format off */
 .pushsection .note.gnu.property, "a";
 .balign 8;
@@ -115,7 +122,7 @@ void register_aarch64_crypto(void);
 .asciz "GNU";
 .long 0xc0000000; /* GNU_PROPERTY_AARCH64_FEATURE_1_AND */
 .long 4;
-.long(GNU_PROPERTY_AARCH64_POINTER_AUTH | GNU_PROPERTY_AARCH64_BTI);
+.long(GNU_PROPERTY_AARCH64_POINTER_AUTH | GNU_PROPERTY_AARCH64_BTI | GNU_PROPERTY_AARCH64_GCS);
 .long 0;
 .popsection;
 /* clang-format on */
