@@ -3340,8 +3340,8 @@ int gnutls_fips140_pop_context(void);
 int gnutls_fips140_run_self_tests(void);
 
 void gnutls_audit_push_context(long context);
-void gnutls_audit_pop_context();
-long gnutls_audit_current_context();
+void gnutls_audit_pop_context(void);
+long gnutls_audit_current_context(void);
 
 /**
  * gnutls_transport_ktls_enable_flags_t:
