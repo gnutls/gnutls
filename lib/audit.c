@@ -51,7 +51,7 @@ void gnutls_audit_push_context(long context)
  *
  * Since: 3.8.11
  **/
-void gnutls_audit_pop_context()
+void gnutls_audit_pop_context(void)
 {
 	crau_pop_context(&stack);
 }
@@ -67,7 +67,7 @@ void gnutls_audit_pop_context()
  *
  * Since: 3.8.11
  **/
-long gnutls_audit_current_context()
+long gnutls_audit_current_context(void)
 {
 	return crau_current_context(&stack);
 }
