@@ -69,13 +69,17 @@ void gnutls_credentials_clear(gnutls_session_t session)
  *
  * Sets the needed credentials for the specified type.  E.g. username,
  * password - or public and private keys etc.  The @cred parameter is
- * a structure that depends on the specified type and on the current
- * session (client or server).
+ * a structure that depends on the specified @type and on the current
+ * session (client or server). Only a single @cred may be set for
+ * each different @type, subsequent calls with the same @type will
+ * replace the previously set credentials.
  *
  * In order to minimize memory usage, and share credentials between
- * several threads gnutls keeps a pointer to cred, and not the whole
+ * several threads gnutls keeps a pointer to @cred, and not the whole
  * cred structure.  Thus you will have to keep the structure allocated
- * until you call gnutls_deinit().
+ * until you call gnutls_deinit(), or a future call of
+ * gnutls_credentials_set() with the same @type replaces the @cred
+ * structure.
  *
  * For %GNUTLS_CRD_ANON, @cred should be
  * #gnutls_anon_client_credentials_t in case of a client.  In case of
