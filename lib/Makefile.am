@@ -39,6 +39,7 @@ include $(top_srcdir)/lib/common.mk
 
 AM_CPPFLAGS +=					\
 	-DLOCALEDIR=\"$(localedir)\"		\
+	-DSYSTEM_PRIORITY_FILE=\"$(system_config_file)\" \
 	-I$(srcdir)/../gl			\
 	-I$(builddir)/../gl			\
 	-I$(builddir)/includes			\
