@@ -526,10 +526,7 @@ static void verify_response(gnutls_datum_t *nonce)
 			app_exit(1);
 		}
 
-		if (chain_size == 1)
-			signer = chain[0];
-		else
-			signer = chain[1];
+		signer = chain[MIN(1, chain_size - 1)];
 
 		v = _verify_response(&dat, nonce, signer, 1);
 
