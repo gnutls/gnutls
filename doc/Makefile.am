@@ -3022,3 +3022,7 @@ FUNCS += functions/gnutls_x509_trust_list_verify_crt2
 FUNCS += functions/gnutls_x509_trust_list_verify_crt2.short
 FUNCS += functions/gnutls_x509_trust_list_verify_named_crt
 FUNCS += functions/gnutls_x509_trust_list_verify_named_crt.short
+FUNCS += functions/gnutls_hpke_encap
+FUNCS += functions/gnutls_hpke_encap.short
+FUNCS += functions/gnutls_hpke_decap
+FUNCS += functions/gnutls_hpke_decap.short

@@ -1464,11 +1464,13 @@ GNUTLS_3_8_11
 	*;
 } GNUTLS_3_8_6;
 
-GNUTLS_3_8_13
+GNUTLS_3_8_12
 {
-global:
-	gnutls_pkcs11_obj_get_pk_algorithm;
-local:
+ global:
+    gnutls_pkcs11_obj_get_pk_algorithm;
+    gnutls_hpke_encap;
+    gnutls_hpke_decap;
+ local:
 	*;
 } GNUTLS_3_8_11;
 

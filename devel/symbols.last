@@ -1319,3 +1319,5 @@ gnutls_x509_trust_list_set_ptr@GNUTLS_3_7_0
 gnutls_x509_trust_list_verify_crt2@GNUTLS_3_4
 gnutls_x509_trust_list_verify_crt@GNUTLS_3_4
 gnutls_x509_trust_list_verify_named_crt@GNUTLS_3_4
+gnutls_hpke_encap@GNUTLS_3_8_12
+gnutls_hpke_decap@GNUTLS_3_8_12

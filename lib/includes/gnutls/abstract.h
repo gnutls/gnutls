@@ -679,6 +679,110 @@ int gnutls_pubkey_print(gnutls_pubkey_t pubkey,
 			gnutls_certificate_print_formats_t format,
 			gnutls_datum_t *out);
 
+/**
+ * gnutls_hpke_kem_t:
+ * @GNUTLS_HPKE_KEM_DHKEM_P256: DHKEM using P-256
+ * @GNUTLS_HPKE_KEM_DHKEM_P384: DHKEM using P-384
+ * @GNUTLS_HPKE_KEM_DHKEM_P521: DHKEM using P-521
+ * @GNUTLS_HPKE_KEM_DHKEM_X25519: DHKEM using X25519
+ * @GNUTLS_HPKE_KEM_DHKEM_X448: DHKEM using X448
+ * Enumeration of HPKE KEM algorithms.
+ */
+typedef enum gnutls_hpke_kem_t {
+	GNUTLS_HPKE_KEM_DHKEM_P256 = 0x0010,
+	GNUTLS_HPKE_KEM_DHKEM_P384 = 0x0011,
+	GNUTLS_HPKE_KEM_DHKEM_P521 = 0x0012,
+	GNUTLS_HPKE_KEM_DHKEM_X25519 = 0x0020,
+	GNUTLS_HPKE_KEM_DHKEM_X448 = 0x0021
+} gnutls_hpke_kem_t;
+
+/**
+ * gnutls_hpke_kdf_t:
+ * @GNUTLS_HPKE_KDF_HKDF_SHA256: HKDF using SHA-256
+ * @GNUTLS_HPKE_KDF_HKDF_SHA384: HKDF using SHA-384
+ * @GNUTLS_HPKE_KDF_HKDF_SHA512: HKDF using SHA-512
+ * Enumeration of HPKE KDF algorithms.
+ */
+typedef enum gnutls_hpke_kdf_t {
+	GNUTLS_HPKE_KDF_HKDF_SHA256 = 0x0001,
+	GNUTLS_HPKE_KDF_HKDF_SHA384 = 0x0002,
+	GNUTLS_HPKE_KDF_HKDF_SHA512 = 0x0003
+} gnutls_hpke_kdf_t;
+
+/**
+ * gnutls_hpke_aead_t:
+ * @GNUTLS_HPKE_AEAD_AES_128_GCM: AES-128-GCM
+ * @GNUTLS_HPKE_AEAD_AES_256_GCM: AES-256-GCM
+ * @GNUTLS_HPKE_AEAD_CHACHA20_POLY1305: ChaCha20-Poly1305
+ * Enumeration of HPKE AEAD algorithms.
+ */
+typedef enum gnutls_hpke_aead_t {
+	GNUTLS_HPKE_AEAD_AES_128_GCM = 0x0001,
+	GNUTLS_HPKE_AEAD_AES_256_GCM = 0x0002,
+	GNUTLS_HPKE_AEAD_CHACHA20_POLY1305 = 0x0003
+} gnutls_hpke_aead_t;
+
+/**
+ * gnutls_hpke_encap_context_t:
+ * @kem: KEM algorithm
+ * @kdf: KDF algorithm
+ * @aead: AEAD algorithm
+ * @info: application specific information (optional)
+ * @psk: pre-shared key (optional)
+ * @psk_id: pre-shared key identifier (optional)
+ * @receiver_pubkey: receiver's public key
+ * @sender_privkey: sender's private key (optional)
+ * Context for HPKE encapsulation.
+ */
+typedef struct gnutls_hpke_encap_context_t {
+	const gnutls_hpke_kem_t kem;
+	const gnutls_hpke_kdf_t kdf;
+	const gnutls_hpke_aead_t aead;
+
+	const gnutls_datum_t *info;
+	const gnutls_datum_t *psk;
+	const gnutls_datum_t *psk_id;
+
+	const gnutls_pubkey_t receiver_pubkey;
+	const gnutls_privkey_t sender_privkey;
+} gnutls_hpke_encap_context_t;
+
+/**
+ * gnutls_hpke_decap_context_t:
+ * @kem: KEM algorithm
+ * @kdf: KDF algorithm
+ * @aead: AEAD algorithm
+ * @info: application specific information (optional)
+ * @psk: pre-shared key (optional)
+ * @psk_id: pre-shared key identifier (optional)
+ * @enc: encapsulated key
+ * @receiver_privkey: receiver's private key
+ * @sender_pubkey: sender's public key (optional)
+ * Context for HPKE decapsulation.
+ */
+typedef struct gnutls_hpke_decap_context_t {
+	const gnutls_hpke_kem_t kem;
+	const gnutls_hpke_kdf_t kdf;
+	const gnutls_hpke_aead_t aead;
+
+	const gnutls_datum_t *info;
+	const gnutls_datum_t *psk;
+	const gnutls_datum_t *psk_id;
+
+	const gnutls_datum_t *enc;
+	const gnutls_privkey_t receiver_privkey;
+	const gnutls_pubkey_t sender_pubkey;
+} gnutls_hpke_decap_context_t;
+
+int gnutls_hpke_encap(const gnutls_hpke_encap_context_t *ctx,
+		      gnutls_datum_t *enc, gnutls_datum_t *key,
+		      gnutls_datum_t *base_nonce,
+		      gnutls_datum_t *exporter_secret);
+
+int gnutls_hpke_decap(const gnutls_hpke_decap_context_t *ctx,
+		      gnutls_datum_t *key, gnutls_datum_t *base_nonce,
+		      gnutls_datum_t *exporter_secret);
+
 #ifdef __cplusplus
 }
 #endif

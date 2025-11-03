@@ -1351,6 +1351,8 @@ APIMANS += gnutls_x509_trust_list_set_ptr.3
 APIMANS += gnutls_x509_trust_list_verify_crt.3
 APIMANS += gnutls_x509_trust_list_verify_crt2.3
 APIMANS += gnutls_x509_trust_list_verify_named_crt.3
+APIMANS += gnutls_hpke_encap.3
+APIMANS += gnutls_hpke_decap.3
 
 if ENABLE_DOC
 man_MANS += $(APIMANS)
