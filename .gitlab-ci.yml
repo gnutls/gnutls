@@ -15,8 +15,8 @@ variables:
   DEBIAN_BUILD: buildenv-debian-testing
   FEDORA_BUILD: buildenv-fedora42
   FEDORA_DOC_BUILD: buildenv-doc-fedora42
-  FEDORA_CROSS_BUILD: buildenv-cross-fedora40
-  MINGW_BUILD: buildenv-mingw-fedora40
+  FEDORA_CROSS_BUILD: buildenv-cross-fedora42
+  MINGW_BUILD: buildenv-mingw-fedora42
   ALPINE_BASE_BUILD: buildenv-alpine-base
   COMPILER: gcc
   CPPCHECK_OPTIONS: "--enable=warning --enable=performance --enable=portability --std=c99 --suppressions-list=devel/cppcheck.suppressions --template='{id}:{file}:{line},{severity},{message}'"
