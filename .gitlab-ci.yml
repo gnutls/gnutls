@@ -151,6 +151,7 @@ default:
 commit-check:
   stage: .pre
   variables:
+    GIT_STRATEGY: clone  # otherwise starts dirty on submodule updates
     GIT_SUBMODULE_STRATEGY: none
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$ALPINE_BASE_BUILD
   before_script: []
