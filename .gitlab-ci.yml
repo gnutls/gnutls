@@ -14,6 +14,7 @@ variables:
   BUILD_IMAGES_PROJECT: gnutls/build-images
   DEBIAN_BUILD: buildenv-debian-testing
   FEDORA_BUILD: buildenv-fedora41
+  FEDORA_DOC_BUILD: buildenv-doc-fedora42
   FEDORA_CROSS_BUILD: buildenv-cross-fedora40
   MINGW_BUILD: buildenv-mingw-fedora40
   ALPINE_BASE_BUILD: buildenv-alpine-base
@@ -99,6 +100,9 @@ default:
 .fedora:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
 
+.fedora-doc:
+  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_DOC_BUILD
+
 .fedora-cross:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_CROSS_BUILD
 
@@ -173,7 +177,7 @@ commit-check:
 fedora-docdist/build:
   extends:
     - .build
-    - .fedora
+    - .fedora-doc
   needs:
     - fedora/bootstrap
   script:
@@ -194,7 +198,7 @@ fedora-docdist/build:
 fedora-docdist/test:
   extends:
     - .test
-    - .fedora
+    - .fedora-doc
   needs:
     - fedora-docdist/build
   script:
