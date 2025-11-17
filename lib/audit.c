@@ -29,6 +29,7 @@ static _Thread_local struct crau_context_stack_st stack;
 
 /**
  * gnutls_audit_push_context:
+ * @context: an opaque context
  *
  * Push a new crypto-auditing context to the thread-local context
  * stack. The call must match the following gnutls_audit_pop_context()
