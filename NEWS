@@ -34,6 +34,11 @@ See the end for copying conditions.
    cryptography and the TLS use-case. To enable this, run configure
    with --enable-crypto-auditing.
 
+** build: The minimum version of Nettle has been updated to 3.10
+   Given Nettle 3.10 is ABI compatible with 3.6 and includes several
+   security relevant fixes, the library's minimum requirement of
+   Nettle is updated to 3.10.
+
 ** API and ABI modifications:
 gnutls_psk_allocate_client_credentials2: New function
 gnutls_psk_allocate_server_credentials2: New function
