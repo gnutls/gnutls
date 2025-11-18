@@ -582,6 +582,7 @@ tests/pkcs11/gnutls_pcert_list_import_x509_file
 tests/pkcs11/gnutls_x509_crt_list_import_url
 tests/pkcs11/list-objects
 tests/pkcs11/list-tokens
+tests/pkcs11/long-label
 tests/pkcs11/os-locking-ok
 tests/pkcs11/pkcs11-chainverify
 tests/pkcs11/pkcs11-combo
@@ -752,6 +753,7 @@ tests/slow/keygen
 tests/slow/mac-override
 tests/softhsm-*.db/
 tests/softhsm-distrust-after.config
+tests/softhsm-long-label.config
 tests/softhsm-neg-no-key.config
 tests/softhsm-post-handshake-with-cert-pkcs11.config
 tests/spki

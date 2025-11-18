@@ -28,6 +28,7 @@
 #include "pkcs11x.h"
 #include "x509/common.h"
 #include "pk.h"
+#include "minmax.h"
 
 static const ck_bool_t tval = 1;
 static const ck_bool_t fval = 0;
@@ -1172,7 +1173,7 @@ int gnutls_pkcs11_delete_url(const char *object_url, unsigned int flags)
  * gnutls_pkcs11_token_init:
  * @token_url: A PKCS #11 URL specifying a token
  * @so_pin: Security Officer's PIN
- * @label: A name to be used for the token
+ * @label: A name to be used for the token, at most 32 characters
  *
  * This function will initialize (format) a token. If the token is
  * at a factory defaults state the security officer's PIN given will be
@@ -1210,7 +1211,7 @@ int gnutls_pkcs11_token_init(const char *token_url, const char *so_pin,
 	/* so it seems memset has other uses than zeroing! */
 	memset(flabel, ' ', sizeof(flabel));
 	if (label != NULL)
-		memcpy(flabel, label, strlen(label));
+		memcpy(flabel, label, MIN(sizeof(flabel), strlen(label)));
 
 	rv = pkcs11_init_token(module, slot, (uint8_t *)so_pin, strlen(so_pin),
 			       (uint8_t *)flabel);

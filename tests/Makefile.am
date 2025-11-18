@@ -508,7 +508,7 @@ pathbuf_CPPFLAGS = $(AM_CPPFLAGS) \
 if ENABLE_PKCS11
 if !WINDOWS
 ctests += tls13/post-handshake-with-cert-pkcs11 pkcs11/tls-neg-pkcs11-no-key \
-	global-init-override pkcs11/distrust-after pkcs11/os-locking-ok
+	global-init-override pkcs11/distrust-after pkcs11/os-locking-ok pkcs11/long-label
 tls13_post_handshake_with_cert_pkcs11_DEPENDENCIES = libpkcs11mock2.la libutils.la
 tls13_post_handshake_with_cert_pkcs11_LDADD = $(LDADD) $(LIBDL)
 pkcs11_tls_neg_pkcs11_no_key_DEPENDENCIES = libpkcs11mock2.la libutils.la

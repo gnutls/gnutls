@@ -7,6 +7,10 @@ See the end for copying conditions.
 
 * Version 3.8.11 (unreleased)
 
+** libgnutls: Fix stack overwrite in gnutls_pkcs11_token_init
+   Reported by Luigino Camastra from Aisle Research. [GNUTLS-SA-2025-11-18,
+   CVSS: low] [CVE-2025-9820]
+
 ** libgnutls: MAC algorithms for PSK binders is now configurable
    The previous implementation assumed HMAC-SHA256 to calculate the
    PSK binders. With the new gnutls_psk_allocate_client_credentials2()
