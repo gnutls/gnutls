@@ -61,10 +61,6 @@ default:
 
 .bootstrap:
   stage: bootstrap
-  tags:
-    - gnutls
-  except:
-    - tags # TODO
   script:
     - devel/preserve-timestamp stamp.pre-bootstrap
     - SUBMODULE_NOFETCH=1 ./bootstrap --copy --skip-po
@@ -74,22 +70,14 @@ default:
 
 .build:
   stage: build
-  tags:
-    - gnutls
-  except:
-    - tags # TODO
   artifacts:
     expire_in: 1 day
     untracked: true
 
 .test:
   stage: test
-  tags:
-    - gnutls
   script:
     - make -j$CHECKJOBS check
-  except:
-    - tags # TODO
   artifacts:
     expire_in: 1 week
     when: on_failure
@@ -171,8 +159,6 @@ commit-check:
     - devel/check-headers.sh
     - git diff --exit-code # nothing should change version controlled files
   retry: 0
-  tags:
-    - gnutls
 
 fedora-docdist/build:
   extends:
@@ -191,8 +177,6 @@ fedora-docdist/build:
     - make -j$BUILDJOBS -C doc/latex gnutls.pdf
     - DB2EPUBDIR=$(dirname $(find /usr/share/sgml/docbook/xsl-ns-stylesheets-*/epub/bin/ -name dbtoepub -print))
     - PATH="$PATH:$DB2EPUBDIR" make -C doc gnutls.epub
-  tags:
-    - gnutls
   when: manual
 
 fedora-docdist/test:
@@ -203,8 +187,6 @@ fedora-docdist/test:
     - fedora-docdist/build
   script:
     - make -j$CHECKJOBS distcheck
-  tags:
-    - gnutls
   when: manual
 
 fedora-sanitizers/build:
@@ -222,10 +204,6 @@ fedora-sanitizers/build:
     - make -j$BUILDJOBS
     # build tests, but don't execute them
     - make -j$BUILDJOBS check TESTS=""
-  tags:
-    - gnutls
-  except:
-    - tags
 
 fedora-sanitizers/test:
   extends:
@@ -256,10 +234,6 @@ fedora-sanitizers/test:
   parallel:
     matrix:
       - RECLAIM: [reclaim, no-reclaim]
-  tags:
-    - gnutls
-  except:
-    - tags
 
 ##############################################################################
 ########################### Fedora pipelines #################################
@@ -566,10 +540,6 @@ fedora-abicoverage/build:
     - CFLAGS="-g -Og" dash ./configure --disable-gcc-warnings --cache-file $CCACHE_FILE  --prefix=/usr --libdir=/usr/lib64 --enable-code-coverage --disable-maintainer-mode --disable-doc --with-pkcs12-iter-count=10000
     - make -j$BUILDJOBS
     - make -j$BUILDJOBS check TESTS=""
-  tags:
-    - gnutls
-  except:
-    - tags
 
 fedora-abicoverage/test:
   extends:
@@ -622,8 +592,6 @@ fedora-cross/bootstrap:
     - make -j$BUILDJOBS
     # build tests, but don't execute them
     - make -j$BUILDJOBS -C tests check TESTS=""
-  tags:
-    - gnutls
 
 .fedora-cross/test:
   extends:
@@ -635,8 +603,6 @@ fedora-cross/bootstrap:
     - "[ -e /proc/sys/fs/binfmt_misc/qemu-$arch ] || cat /usr/lib/binfmt.d/qemu-$arch-static.conf > /proc/sys/fs/binfmt_misc/register"
     - make pic-check
     - make -j$BUILDJOBS -C tests check
-  tags:
-    - gnutls
 
 fedora-cross/aarch64-linux-gnu/build: # name is important, see .fedora-cross/build
   extends:
@@ -870,5 +836,3 @@ mingw32/archive:
   needs: # archive only if tests successful
     - mingw32/build
     - mingw32/test
-  tags:
-    - gnutls
