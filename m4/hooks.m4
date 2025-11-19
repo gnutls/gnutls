@@ -40,9 +40,9 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   #     in CONTRIBUTION.md for more info.
   #
   # Interfaces removed:                           AGE=0 (+bump all symbol versions in .map)
-  AC_SUBST(LT_CURRENT, 70)
-  AC_SUBST(LT_REVISION, 4)
-  AC_SUBST(LT_AGE, 40)
+  AC_SUBST(LT_CURRENT, 71)
+  AC_SUBST(LT_REVISION, 0)
+  AC_SUBST(LT_AGE, 41)
 
   AC_SUBST(LT_SSL_CURRENT, 27)
   AC_SUBST(LT_SSL_REVISION, 2)
@@ -68,7 +68,7 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   DLL_SSL_VERSION=`expr ${LT_SSL_CURRENT} - ${LT_SSL_AGE}`
   AC_SUBST(DLL_SSL_VERSION)
 
-NETTLE_MINIMUM=3.6
+NETTLE_MINIMUM=3.10
   PKG_CHECK_MODULES(NETTLE, [nettle >= $NETTLE_MINIMUM], [cryptolib="nettle"], [
 AC_MSG_ERROR([[
   ***

@@ -5,7 +5,11 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.8.11 (unreleased)
+* Version 3.8.11 (released 2025-11-18)
+
+** libgnutls: Fix stack overwrite in gnutls_pkcs11_token_init
+   Reported by Luigino Camastra from Aisle Research. [GNUTLS-SA-2025-11-18,
+   CVSS: low] [CVE-2025-9820]
 
 ** libgnutls: MAC algorithms for PSK binders is now configurable
    The previous implementation assumed HMAC-SHA256 to calculate the
@@ -33,6 +37,16 @@ See the end for copying conditions.
    eBPF. This adds necessary probe points for that, in public key
    cryptography and the TLS use-case. To enable this, run configure
    with --enable-crypto-auditing.
+
+** build: The minimum version of Nettle has been updated to 3.10
+   Given Nettle 3.10 is ABI compatible with 3.6 and includes several
+   security relevant fixes, the library's minimum requirement of
+   Nettle is updated to 3.10.
+
+** build: The default priority file path is now constructed from sysconfdir
+   Previously, the location of the default priority file was
+   hard-coded to be /etc/gnutls/config. Now it takes into account of
+   the --sysconfdir option given to the configure script.
 
 ** API and ABI modifications:
 gnutls_psk_allocate_client_credentials2: New function
