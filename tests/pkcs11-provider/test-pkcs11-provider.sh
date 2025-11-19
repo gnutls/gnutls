@@ -38,11 +38,8 @@ testdir=`create_testdir pkcs11-provider`
 
 LABEL="Kryoptic Token"
 PIN="12345"
-PRIORITY_FILE="${testdir}/gnutls.conf"
 KRYOPTIC_DB="${testdir}/kryoptic.sql"
 export KRYOPTIC_CONF="${testdir}/kryoptic.conf"
-export GNUTLS_SYSTEM_PRIORITY_FAIL_ON_INVALID=1
-export GNUTLS_SYSTEM_PRIORITY_FILE="${PRIORITY_FILE}"
 export GNUTLS_DEBUG_LEVEL=6
 
 cat >"${KRYOPTIC_CONF}" <<_EOF_
@@ -58,19 +55,20 @@ _EOF_
 echo "Initializing token"
 
 # init token
-"$P11TOOL" --initialize --label "${LABEL}" --set-so-pin "${PIN}" "pkcs11:?module-path=${MODULE}" >/dev/null
+"$P11TOOL" --initialize --label "${LABEL}" --set-so-pin "${PIN}" --provider "${MODULE}" pkcs11: >/dev/null
 if test $? != 0; then
 	echo "failed to initialize token"
 	exit 1
 fi
 
 # set user pin
-"$P11TOOL" --initialize-pin --set-so-pin "${PIN}" --set-pin "${PIN}" "pkcs11:?module-path=${MODULE}" >/dev/null
+"$P11TOOL" --initialize-pin --set-so-pin "${PIN}" --set-pin "${PIN}" --provider "${MODULE}" pkcs11: >/dev/null
 if test $? != 0; then
 	echo "failed to set user pin"
 	exit 1
 fi
 
+PRIORITY_FILE="${testdir}/gnutls.conf"
 cat >"${PRIORITY_FILE}" <<_EOF_
 [overrides]
 allow-rsa-pkcs1-encrypt = true
@@ -79,6 +77,9 @@ allow-rsa-pkcs1-encrypt = true
 url = pkcs11:model=v1;manufacturer=Kryoptic%20Project;token=Kryoptic%20Token
 pin = ${PIN}
 _EOF_
+
+export GNUTLS_SYSTEM_PRIORITY_FAIL_ON_INVALID=1
+export GNUTLS_SYSTEM_PRIORITY_FILE="${PRIORITY_FILE}"
 
 echo "Testing public key algorithms"
 "${builddir}/pkcs11-provider/pkcs11-provider-pk"

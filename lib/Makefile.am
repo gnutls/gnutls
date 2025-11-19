@@ -208,7 +208,7 @@ HFILES = abstract_int.h debug.h compress.h cipher.h	 \
 	file.h supplemental.h crypto.h random.h system.h\
 	locks.h mbuffers.h ecc.h pin.h fips.h \
 	priority_options.h secrets.h stek.h cert-cred.h \
-	audit.h audit_int.h
+	audit.h
 
 if ENABLE_PKCS11
 HFILES += pkcs11_int.h pkcs11x.h

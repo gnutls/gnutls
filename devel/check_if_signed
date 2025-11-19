@@ -7,7 +7,7 @@
 git remote add gitlab-gnutls-upstream-git-tree https://gitlab.com/gnutls/gnutls.git
 git fetch -q gitlab-gnutls-upstream-git-tree master
 
-if [ -z "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME"]; then
+if [ -z "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME" ]; then
   CI_MERGE_REQUEST_TARGET_BRANCH_NAME="gitlab-gnutls-upstream-git-tree/master"
 fi
 

@@ -14,6 +14,7 @@ variables:
   BUILD_IMAGES_PROJECT: gnutls/build-images
   DEBIAN_BUILD: buildenv-debian-testing
   FEDORA_BUILD: buildenv-fedora41
+  FEDORA_DOC_BUILD: buildenv-doc-fedora42
   FEDORA_CROSS_BUILD: buildenv-cross-fedora40
   MINGW_BUILD: buildenv-mingw-fedora40
   ALPINE_BASE_BUILD: buildenv-alpine-base
@@ -60,10 +61,6 @@ default:
 
 .bootstrap:
   stage: bootstrap
-  tags:
-    - gnutls
-  except:
-    - tags # TODO
   script:
     - devel/preserve-timestamp stamp.pre-bootstrap
     - SUBMODULE_NOFETCH=1 ./bootstrap --copy --skip-po
@@ -73,22 +70,14 @@ default:
 
 .build:
   stage: build
-  tags:
-    - gnutls
-  except:
-    - tags # TODO
   artifacts:
     expire_in: 1 day
     untracked: true
 
 .test:
   stage: test
-  tags:
-    - gnutls
   script:
     - make -j$CHECKJOBS check
-  except:
-    - tags # TODO
   artifacts:
     expire_in: 1 week
     when: on_failure
@@ -98,6 +87,9 @@ default:
 
 .fedora:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
+
+.fedora-doc:
+  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_DOC_BUILD
 
 .fedora-cross:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_CROSS_BUILD
@@ -151,6 +143,7 @@ default:
 commit-check:
   stage: .pre
   variables:
+    GIT_STRATEGY: clone  # otherwise starts dirty on submodule updates
     GIT_SUBMODULE_STRATEGY: none
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$ALPINE_BASE_BUILD
   before_script: []
@@ -166,13 +159,11 @@ commit-check:
     - devel/check-headers.sh
     - git diff --exit-code # nothing should change version controlled files
   retry: 0
-  tags:
-    - gnutls
 
 fedora-docdist/build:
   extends:
     - .build
-    - .fedora
+    - .fedora-doc
   needs:
     - fedora/bootstrap
   script:
@@ -186,20 +177,16 @@ fedora-docdist/build:
     - make -j$BUILDJOBS -C doc/latex gnutls.pdf
     - DB2EPUBDIR=$(dirname $(find /usr/share/sgml/docbook/xsl-ns-stylesheets-*/epub/bin/ -name dbtoepub -print))
     - PATH="$PATH:$DB2EPUBDIR" make -C doc gnutls.epub
-  tags:
-    - gnutls
   when: manual
 
 fedora-docdist/test:
   extends:
     - .test
-    - .fedora
+    - .fedora-doc
   needs:
     - fedora-docdist/build
   script:
     - make -j$CHECKJOBS distcheck
-  tags:
-    - gnutls
   when: manual
 
 fedora-sanitizers/build:
@@ -217,10 +204,6 @@ fedora-sanitizers/build:
     - make -j$BUILDJOBS
     # build tests, but don't execute them
     - make -j$BUILDJOBS check TESTS=""
-  tags:
-    - gnutls
-  except:
-    - tags
 
 fedora-sanitizers/test:
   extends:
@@ -251,10 +234,6 @@ fedora-sanitizers/test:
   parallel:
     matrix:
       - RECLAIM: [reclaim, no-reclaim]
-  tags:
-    - gnutls
-  except:
-    - tags
 
 ##############################################################################
 ########################### Fedora pipelines #################################
@@ -561,10 +540,6 @@ fedora-abicoverage/build:
     - CFLAGS="-g -Og" dash ./configure --disable-gcc-warnings --cache-file $CCACHE_FILE  --prefix=/usr --libdir=/usr/lib64 --enable-code-coverage --disable-maintainer-mode --disable-doc --with-pkcs12-iter-count=10000
     - make -j$BUILDJOBS
     - make -j$BUILDJOBS check TESTS=""
-  tags:
-    - gnutls
-  except:
-    - tags
 
 fedora-abicoverage/test:
   extends:
@@ -617,8 +592,6 @@ fedora-cross/bootstrap:
     - make -j$BUILDJOBS
     # build tests, but don't execute them
     - make -j$BUILDJOBS -C tests check TESTS=""
-  tags:
-    - gnutls
 
 .fedora-cross/test:
   extends:
@@ -627,12 +600,9 @@ fedora-cross/bootstrap:
     - host=$(echo $CI_JOB_NAME |cut -d/ -f2)
     - arch=$(echo $host |cut -d- -f1)
     - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
-    - echo -1 > /proc/sys/fs/binfmt_misc/qemu-$arch
-    - cat /usr/lib/binfmt.d/qemu-$arch-static.conf > /proc/sys/fs/binfmt_misc/register
+    - "[ -e /proc/sys/fs/binfmt_misc/qemu-$arch ] || cat /usr/lib/binfmt.d/qemu-$arch-static.conf > /proc/sys/fs/binfmt_misc/register"
     - make pic-check
     - make -j$BUILDJOBS -C tests check
-  tags:
-    - gnutls
 
 fedora-cross/aarch64-linux-gnu/build: # name is important, see .fedora-cross/build
   extends:
@@ -757,22 +727,20 @@ debian/test:
   extends:
     - .build
   script:
-#    - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
-#    - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
+    - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
+    - "[ -e /proc/sys/fs/binfmt_misc/DOSWin ] || echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register"
     - mingw${arch_bits}-configure --disable-gcc-warnings --host=${arch_name}-w64-mingw32 --target=${arch_name}-w64-mingw32 --cache-file $CCACHE_FILE --disable-nls --with-included-unistring --disable-non-suiteb-curves --disable-full-test-suite --disable-doc --with-pkcs12-iter-count=10000
     - mingw${arch_bits}-make -j$BUILDJOBS
-    # https://bugzilla.redhat.com/show_bug.cgi?id=2049401
-    - mingw${arch_bits}-make -j$BUILDJOBS -C $PWD/tests check TESTS=""
+    - mingw${arch_bits}-make -j$BUILDJOBS -C tests check TESTS=""
 
 .mingw/test:
   extends:
     - .test
   before_script:
     - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
-    - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
+    - "[ -e /proc/sys/fs/binfmt_misc/DOSWin ] || echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register"
   script:
-    # https://bugzilla.redhat.com/show_bug.cgi?id=2049401
-    - mingw${arch_bits}-make -j$CHECKJOBS -C $PWD/tests check
+    - mingw${arch_bits}-make -j$CHECKJOBS -C tests check
   timeout: 3h
 
 .mingw/archive:
@@ -868,5 +836,3 @@ mingw32/archive:
   needs: # archive only if tests successful
     - mingw32/build
     - mingw32/test
-  tags:
-    - gnutls
