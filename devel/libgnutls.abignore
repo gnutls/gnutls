@@ -70,28 +70,3 @@ name = drbg_aes_reseed
 
 # The following should be removed in the new release, after updating the
 # abi-dump repository:
-
-[suppress_type]
-name = gnutls_cipher_algorithm_t
-changed_enumerators = GNUTLS_CIPHER_AES_128_CFB, GNUTLS_CIPHER_AES_192_CFB, GNUTLS_CIPHER_AES_256_CFB
-
-[suppress_function]
-name = gnutls_psk_allocate_client_credentials2
-
-[suppress_function]
-name = gnutls_psk_allocate_server_credentials2
-
-[suppress_function]
-name = gnutls_audit_current_context
-
-[suppress_function]
-name = gnutls_audit_pop_context
-
-[suppress_function]
-name = gnutls_audit_push_context
-
-[suppress_function]
-name = gnutls_handshake_update_receiving_key
-
-[suppress_function]
-name = gnutls_record_get_max_send_size
