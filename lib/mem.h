@@ -23,7 +23,12 @@
 #ifndef GNUTLS_LIB_MEM_H
 #define GNUTLS_LIB_MEM_H
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif
+
+#include <stddef.h>
+#include <stdint.h>
 
 #ifdef HAVE_SANITIZER_ASAN_INTERFACE_H
 #include <sanitizer/asan_interface.h>
