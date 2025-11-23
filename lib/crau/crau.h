@@ -251,9 +251,10 @@ void crau_data(struct crau_context_stack_st *stack, ...)
 # else
 
 #  ifndef CRAU_MAYBE_UNUSED
-#   if defined(__has_c_attribute) && \
-    __has_c_attribute (__maybe_unused__)
-#    define CRAU_MAYBE_UNUSED [[__maybe_unused__]]
+#   if defined(__has_c_attribute)
+#    if __has_c_attribute (__maybe_unused__)
+#     define CRAU_MAYBE_UNUSED [[__maybe_unused__]]
+#    endif
 #   elif defined(__GNUC__)
 #    define CRAU_MAYBE_UNUSED __attribute__((__unused__))
 #   endif
