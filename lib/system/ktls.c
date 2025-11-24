@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2021 Free Software Foundation, Inc.
  *
- * Author: Fratnišek Krenželok
+ * Author: František Krenželok
  *
  * This file is part of GnuTLS.
  *
