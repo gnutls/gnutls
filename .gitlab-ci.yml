@@ -13,10 +13,11 @@ variables:
   # name to allow expiration of old caches.
   BUILD_IMAGES_PROJECT: gnutls/build-images
   DEBIAN_BUILD: buildenv-debian-testing
-  FEDORA_BUILD: buildenv-fedora41
+  FEDORA_BUILD: buildenv-fedora42
   FEDORA_DOC_BUILD: buildenv-doc-fedora42
-  FEDORA_CROSS_BUILD: buildenv-cross-fedora40
-  MINGW_BUILD: buildenv-mingw-fedora40
+  FEDORA_CROSS_BUILD: buildenv-cross-fedora42
+  FEDORA_I686_BUILD: buildenv-i686-fedora42
+  MINGW_BUILD: buildenv-mingw-fedora42
   ALPINE_BASE_BUILD: buildenv-alpine-base
   COMPILER: gcc
   CPPCHECK_OPTIONS: "--enable=warning --enable=performance --enable=portability --std=c99 --suppressions-list=devel/cppcheck.suppressions --template='{id}:{file}:{line},{severity},{message}'"
@@ -32,7 +33,7 @@ variables:
   GNULIB_TOOL_IMPL: py
 
 cache:
-  key: "$CI_JOB_NAME-ver45"
+  key: "$CI_JOB_NAME-ver46"
   paths:
     - cache/
 
@@ -93,6 +94,9 @@ default:
 
 .fedora-cross:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_CROSS_BUILD
+
+.fedora-i686:
+  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_I686_BUILD
 
 .fedora-nettle:
   extends:
@@ -661,12 +665,14 @@ fedora-cross/s390x-linux-gnu/test:
   timeout: 2h
   allow_failure: true
 
-fedora-cross/i686-linux-gnu/build:
+fedora-i686/build:
   extends:
     - .build
-    - .fedora
+    - .fedora-i686
   needs:
     - fedora/bootstrap
+  variables:
+    PKG_CONFIG: i686-redhat-linux-gnu-pkg-config
   script:
     # Fedora's softhsm package is not multiarch yet. Missing softhsm libraries
     # for the target will cause the test suite to fail when p11-kit is enabled.
@@ -679,14 +685,14 @@ fedora-cross/i686-linux-gnu/build:
     - setarch i686 -- make -j$BUILDJOBS -C tests check TESTS=""
   when: manual
 
-fedora-cross/i686-linux-gnu/test:
+fedora-i686/test:
   extends:
     - .test
-    - .fedora
+    - .fedora-i686
   dependencies:
-    - fedora-cross/i686-linux-gnu/build
+    - fedora-i686/build
   needs:
-    - fedora-cross/i686-linux-gnu/build
+    - fedora-i686/build
   script:
     - setarch i686 -- make -j$CHECKJOBS check
 
