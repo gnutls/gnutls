@@ -16,7 +16,7 @@
    `make abi-dump-latest`, and push any changes to the [abi-dump
    repository]; then do `make abi-check`
 1. Create a distribution tarball: note that this requires
-   the documentation to be generated. See the `doc-dist.Fedora` job in
+   the documentation to be generated. See the `fedora-docdist/build` job in
    [.gitlab-ci.yml](.gitlab-ci.yml), which does the same thing in the CI:
    ```console
    # Install necessary packages for documentation, and then:
