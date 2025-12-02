@@ -628,6 +628,10 @@ static int afalg_mac_output(void *ctx, void *digest, size_t digestsize)
 {
 	struct kcapi_handle *handle = ctx;
 
+	if (digest == NULL) {
+		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
+	}
+
 	if (kcapi_md_final(handle, digest, digestsize) < 0) {
 		gnutls_assert();
 		return GNUTLS_E_ENCRYPTION_FAILED;
