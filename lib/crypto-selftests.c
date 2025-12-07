@@ -2396,6 +2396,46 @@ static int test_digest(gnutls_digest_algorithm_t dig,
 					GNUTLS_E_SELF_TEST_ERROR);
 			}
 		}
+
+		/* Exercise gnutls_hash_output(..., NULL), which
+		 * resets the hash context
+		 */
+		if (flags & GNUTLS_SELF_TEST_FLAG_ALL) {
+			ret = gnutls_hash_init(&hd, dig);
+			if (ret < 0) {
+				_gnutls_debug_log("error initializing: %s\n",
+						  gnutls_digest_get_name(dig));
+				return gnutls_assert_val(
+					GNUTLS_E_SELF_TEST_ERROR);
+			}
+
+			/* First feed dummy content */
+			ret = gnutls_hash(hd, (void *)"dummy", 5);
+			if (ret < 0)
+				return gnutls_assert_val(
+					GNUTLS_E_SELF_TEST_ERROR);
+			/* Reset the context */
+			gnutls_hash_output(hd, NULL);
+
+			/* Then feed the actual content */
+			ret = gnutls_hash(hd, vectors[i].plaintext,
+					  vectors[i].plaintext_size);
+			if (ret < 0)
+				return gnutls_assert_val(
+					GNUTLS_E_SELF_TEST_ERROR);
+
+			memset(data, 0xbb, data_size);
+			gnutls_hash_deinit(hd, data);
+
+			if (memcmp(data, vectors[i].output,
+				   vectors[i].output_size) != 0) {
+				_gnutls_debug_log(
+					"%s reset test vector %d failed!\n",
+					gnutls_digest_get_name(dig), i);
+				return gnutls_assert_val(
+					GNUTLS_E_SELF_TEST_ERROR);
+			}
+		}
 	}
 
 	_gnutls_debug_log("%s self check succeeded\n",

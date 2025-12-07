@@ -310,6 +310,11 @@ static int wrap_padlock_hash_output(void *src_ctx, void *digest,
 	struct padlock_hash_ctx *ctx;
 	ctx = src_ctx;
 
+	if (digest == NULL) {
+		ctx->init(ctx->ctx_ptr);
+		return 0;
+	}
+
 	if (digestsize < ctx->length)
 		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
 
