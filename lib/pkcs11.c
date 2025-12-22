@@ -255,10 +255,6 @@ static const struct ck_c_initialize_args default_init_args = {
 	NULL,
 };
 
-static const struct ck_c_initialize_args no_thread_init_args = {
-	NULL, NULL, NULL, NULL, CKF_LIBRARY_CANT_CREATE_OS_THREADS, NULL,
-};
-
 static void pkcs11_provider_deinit(struct gnutls_pkcs11_provider_st *provider)
 {
 	p11_kit_module_finalize(provider->module);
@@ -284,15 +280,22 @@ static int pkcs11_provider_init(struct gnutls_pkcs11_provider_st *provider,
 		reserved = (char *)(p + sizeof("p11-kit:") - 1);
 	}
 
-	/* First try with CKF_OS_LOCKING_OK, then fall back without it */
+	/* First try with CKF_LIBRARY_CANT_CREATE_OS_THREADS |
+	 * CKF_OS_LOCKING_OK, then fall back without it */
 	args = default_init_args;
 	args.reserved = (void *)reserved;
 	rv = module->C_Initialize(&args);
 
-	if (rv == CKR_CANT_LOCK) {
-		args = no_thread_init_args;
-		args.reserved = (void *)reserved;
-		rv = module->C_Initialize(&args);
+	if (rv == CKR_NEED_TO_CREATE_THREADS || rv == CKR_CANT_LOCK) {
+		struct ck_c_initialize_args *pargs;
+		if (reserved) {
+			memset(&args, 0, sizeof(args));
+			args.reserved = (void *)reserved;
+			pargs = &args;
+		} else {
+			pargs = NULL;
+		}
+		rv = module->C_Initialize(pargs);
 	}
 
 	if (rv != CKR_OK) {
