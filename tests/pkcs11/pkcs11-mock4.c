@@ -54,19 +54,21 @@ static CK_FUNCTION_LIST override_funcs;
 #define _DESTRUCTOR __attribute__((destructor))
 #endif
 
+#define LOCK_FLAGS (CKF_LIBRARY_CANT_CREATE_OS_THREADS | CKF_OS_LOCKING_OK)
+
 static CK_RV override_C_Initialize(void *args)
 {
 	CK_C_INITIALIZE_ARGS *init_args = args;
 	static bool first = true;
 
-	assert(init_args);
-
 	if (first) {
-		assert(init_args->flags & CKF_OS_LOCKING_OK);
+		assert(init_args &&
+		       (init_args->flags & LOCK_FLAGS) == LOCK_FLAGS);
 		first = false;
 		return CKR_CANT_LOCK;
 	} else {
-		assert(!(init_args->flags & CKF_OS_LOCKING_OK));
+		assert(!init_args ||
+		       (init_args->flags & LOCK_FLAGS) != LOCK_FLAGS);
 	}
 
 	return base_C_Initialize(args);

@@ -755,6 +755,7 @@ tests/softhsm-*.db/
 tests/softhsm-distrust-after.config
 tests/softhsm-long-label.config
 tests/softhsm-neg-no-key.config
+tests/softhsm-os-locking-ok.config
 tests/softhsm-post-handshake-with-cert-pkcs11.config
 tests/spki
 tests/spki-abstract

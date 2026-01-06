@@ -62,6 +62,7 @@ GNUTLS_STATIC_MUTEX(pkcs11_mutex);
 
 struct gnutls_pkcs11_provider_st {
 	struct ck_function_list *module;
+	char *module_name;
 	unsigned active;
 	unsigned trusted; /* in the sense of p11-kit trusted:
 				 * it can be used for verification */
@@ -255,51 +256,51 @@ static const struct ck_c_initialize_args default_init_args = {
 	NULL,
 };
 
-static const struct ck_c_initialize_args no_thread_init_args = {
-	NULL, NULL, NULL, NULL, CKF_LIBRARY_CANT_CREATE_OS_THREADS, NULL,
-};
-
 static void pkcs11_provider_deinit(struct gnutls_pkcs11_provider_st *provider)
 {
 	p11_kit_module_finalize(provider->module);
 	p11_kit_module_release(provider->module);
 	gnutls_free(provider->init_args.reserved);
+	gnutls_free(provider->module_name);
 }
 
 static int pkcs11_provider_init(struct gnutls_pkcs11_provider_st *provider,
 				struct ck_function_list *module,
-				const void *params)
+				const char *module_name, const void *params)
 {
 	struct ck_c_initialize_args args;
 	const void *reserved = NULL;
 	ck_rv_t rv;
-	char *name;
 	char *p;
 
-	name = p11_kit_module_get_name(module);
-
-	_gnutls_debug_log("p11: Initializing module: %s\n", name);
+	_gnutls_debug_log("p11: Initializing module: %s\n", module_name);
 
 	if (params && (p = strstr(params, "p11-kit:")) != 0) {
 		reserved = (char *)(p + sizeof("p11-kit:") - 1);
 	}
 
-	/* First try with CKF_OS_LOCKING_OK, then fall back without it */
+	/* First try with CKF_LIBRARY_CANT_CREATE_OS_THREADS |
+	 * CKF_OS_LOCKING_OK, then fall back without it */
 	args = default_init_args;
 	args.reserved = (void *)reserved;
 	rv = module->C_Initialize(&args);
 
-	if (rv == CKR_CANT_LOCK) {
-		args = no_thread_init_args;
-		args.reserved = (void *)reserved;
-		rv = module->C_Initialize(&args);
+	if (rv == CKR_NEED_TO_CREATE_THREADS || rv == CKR_CANT_LOCK) {
+		struct ck_c_initialize_args *pargs;
+		if (reserved) {
+			memset(&args, 0, sizeof(args));
+			args.reserved = (void *)reserved;
+			pargs = &args;
+		} else {
+			pargs = NULL;
+		}
+		rv = module->C_Initialize(pargs);
 	}
 
 	if (rv != CKR_OK) {
 		int ret;
 
 		gnutls_assert();
-		free(name);
 		ret = pkcs11_rv_to_err(rv);
 		assert(ret < 0);
 		return ret;
@@ -308,13 +309,12 @@ static int pkcs11_provider_init(struct gnutls_pkcs11_provider_st *provider,
 	if (args.flags & CKF_OS_LOCKING_OK) {
 		_gnutls_debug_log(
 			"p11: Module %s is initialized in a thread-safe mode\n",
-			name);
+			module_name);
 	} else {
 		_gnutls_debug_log(
 			"p11: Module %s is initialized NOT in a thread-safe mode\n",
-			name);
+			module_name);
 	}
-	free(name);
 
 	if (args.reserved) {
 		args.reserved = gnutls_strdup((const char *)args.reserved);
@@ -324,6 +324,7 @@ static int pkcs11_provider_init(struct gnutls_pkcs11_provider_st *provider,
 
 	memset(provider, 0, sizeof(*provider));
 	provider->module = module;
+	provider->module_name = gnutls_strdup(module_name);
 	provider->init_args = args;
 	if (p11_kit_module_get_flags(module) & P11_KIT_MODULE_TRUSTED ||
 	    (params != NULL && strstr(params, "trusted") != 0))
@@ -350,10 +351,8 @@ static int pkcs11_provider_add(const struct gnutls_pkcs11_provider_st *provider)
 		/* already loaded, skip the rest */
 		if (provider->module == providers[i].module ||
 		    memcmp(&info, &providers[i].info, sizeof(info)) == 0) {
-			char *name = p11_kit_module_get_name(provider->module);
 			_gnutls_debug_log("p11: module %s is already loaded.\n",
-					  name);
-			free(name);
+					  provider->module_name);
 			return GNUTLS_E_INT_RET_0;
 		}
 	}
@@ -497,7 +496,7 @@ int gnutls_pkcs11_add_provider(const char *name, const char *params)
 		return GNUTLS_E_PKCS11_LOAD_ERROR;
 	}
 
-	ret = pkcs11_provider_init(&provider, module, params);
+	ret = pkcs11_provider_init(&provider, module, name, params);
 	if (ret != 0) {
 		p11_kit_module_release(module);
 		gnutls_assert();
@@ -1013,28 +1012,27 @@ static int auto_load(unsigned trusted)
 
 	for (i = 0; modules[i] != NULL; i++) {
 		struct gnutls_pkcs11_provider_st provider;
+		char *name = p11_kit_module_get_name(modules[i]);
 
-		ret = pkcs11_provider_init(&provider, modules[i], NULL);
+		ret = pkcs11_provider_init(&provider, modules[i], name, NULL);
 		if (ret < 0) {
 			gnutls_assert();
-			char *name = p11_kit_module_get_name(modules[i]);
 			_gnutls_debug_log(
 				"Cannot initialize PKCS #11 module: %s\n",
 				name);
-			free(name);
-			continue;
+			goto next;
 		}
 
 		ret = pkcs11_provider_add(&provider);
 		if (ret < 0) {
 			gnutls_assert();
-			char *name = p11_kit_module_get_name(provider.module);
 			_gnutls_debug_log("Cannot add PKCS #11 module: %s\n",
 					  name);
-			free(name);
 			pkcs11_provider_deinit(&provider);
-			continue;
+			goto next;
 		}
+	next:
+		free(name);
 	}
 
 	/* Shallow free */
