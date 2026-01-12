@@ -428,7 +428,7 @@ static char *_srp_crypt(const char *username, const char *passwd, int salt_size,
 			const gnutls_datum_t *g, const gnutls_datum_t *n)
 {
 	unsigned char salt[128];
-	static char result[1024];
+	static char result[2048];
 	gnutls_datum_t dat_salt, txt_salt;
 	gnutls_datum_t verifier, txt_verifier;
 
@@ -465,7 +465,15 @@ static char *_srp_crypt(const char *username, const char *passwd, int salt_size,
 		return NULL;
 	}
 
-	sprintf(result, "%s:%s", txt_verifier.data, txt_salt.data);
+	if (snprintf(result, sizeof(result), "%s:%s", txt_verifier.data,
+		     txt_salt.data) >= sizeof(result)) {
+		fprintf(stderr,
+			"Unexpectedly large SRP verifier - buffer too small\n");
+		free(txt_salt.data);
+		free(txt_verifier.data);
+		return NULL;
+	}
+
 	free(txt_salt.data);
 	free(txt_verifier.data);
 
