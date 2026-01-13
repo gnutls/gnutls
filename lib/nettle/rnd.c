@@ -79,6 +79,7 @@ struct generators_ctx_st {
 
 static void wrap_nettle_rnd_deinit(void *_ctx)
 {
+	zeroize_key(_ctx, sizeof(struct generators_ctx_st));
 	gnutls_free(_ctx);
 }
 
@@ -118,6 +119,7 @@ static int single_prng_init(struct prng_ctx_st *ctx,
 	chacha_set_nonce(&ctx->ctx, nonce);
 
 	zeroize_key(new_key, new_key_size);
+	zeroize_key(nonce, sizeof(nonce));
 
 	ctx->counter = 0;
 
@@ -128,7 +130,7 @@ static int single_prng_init(struct prng_ctx_st *ctx,
 
 static int wrap_nettle_rnd_init(void **_ctx)
 {
-	int ret;
+	int ret = 0;
 	uint8_t new_key[PRNG_KEY_SIZE * 2];
 	struct generators_ctx_st *ctx;
 
@@ -140,13 +142,13 @@ static int wrap_nettle_rnd_init(void **_ctx)
 	ret = _rnd_get_system_entropy(new_key, sizeof(new_key));
 	if (ret < 0) {
 		gnutls_assert();
-		goto fail;
+		goto cleanup;
 	}
 
 	ret = single_prng_init(&ctx->nonce, new_key, PRNG_KEY_SIZE, 1);
 	if (ret < 0) {
 		gnutls_assert();
-		goto fail;
+		goto cleanup;
 	}
 
 	/* initialize the random/key RNG */
@@ -154,13 +156,13 @@ static int wrap_nettle_rnd_init(void **_ctx)
 			       PRNG_KEY_SIZE, 1);
 	if (ret < 0) {
 		gnutls_assert();
-		goto fail;
+		goto cleanup;
 	}
 
-	*_ctx = ctx;
+	*_ctx = _gnutls_steal_pointer((void **)&ctx);
 
-	return 0;
-fail:
+cleanup:
+	zeroize_key(new_key, sizeof(new_key));
 	gnutls_free(ctx);
 	return ret;
 }
@@ -251,6 +253,7 @@ static int wrap_nettle_rnd(void *_ctx, int level, void *data, size_t datasize)
 	_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_NOT_APPROVED);
 
 cleanup:
+	zeroize_key(new_key, sizeof(new_key));
 	return ret;
 }
 
