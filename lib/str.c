@@ -101,7 +101,7 @@ void _gnutls_buffer_clear(gnutls_buffer_st *str)
 int gnutls_buffer_append_data(gnutls_buffer_t dest, const void *data,
 			      size_t data_size)
 {
-	size_t const tot_len = data_size + dest->length;
+	size_t tot_len;
 	int ret;
 
 	if (unlikely(dest->data != NULL && dest->allocd == NULL))
@@ -110,11 +110,8 @@ int gnutls_buffer_append_data(gnutls_buffer_t dest, const void *data,
 	if (data_size == 0)
 		return 0;
 
-	if (unlikely(sizeof(size_t) == 4 &&
-		     INT_ADD_OVERFLOW(((ssize_t)MAX(data_size, MIN_CHUNK)),
-				      ((ssize_t)dest->length)))) {
+	if (!INT_ADD_OK(data_size, dest->length, &tot_len))
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-	}
 
 	ret = _gnutls_buffer_resize(dest, tot_len);
 	if (ret < 0) {
@@ -137,12 +134,17 @@ int gnutls_buffer_append_data(gnutls_buffer_t dest, const void *data,
 static int buffer_resize_no_reclaim(gnutls_buffer_st *dest, size_t new_size)
 {
 	size_t unused;
+	size_t alloc_len;
 
 	if (unlikely(dest->data != NULL && dest->allocd == NULL))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	unused = MEMSUB(dest->data, dest->allocd);
-	dest->allocd = gnutls_realloc_fast(dest->allocd, new_size + unused);
+
+	if (!INT_ADD_OK(new_size, unused, &alloc_len))
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+	dest->allocd = gnutls_realloc_fast(dest->allocd, alloc_len);
 	if (dest->allocd == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
@@ -176,8 +178,11 @@ static int buffer_resize_reclaim(gnutls_buffer_st *dest, size_t new_size)
 		return 0;
 	} else {
 		size_t unused = MEMSUB(dest->data, dest->allocd);
-		size_t alloc_len = MAX(new_size, MIN_CHUNK) +
-				   MAX(dest->max_length, MIN_CHUNK);
+		size_t alloc_len;
+
+		if (!INT_ADD_OK(MAX(new_size, MIN_CHUNK),
+				MAX(dest->max_length, MIN_CHUNK), &alloc_len))
+			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
 		dest->allocd = gnutls_realloc_fast(dest->allocd, alloc_len);
 		if (dest->allocd == NULL) {
