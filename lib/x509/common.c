@@ -31,6 +31,7 @@
 #include "num.h"
 #include "x509_b64.h"
 #include <c-strcase.h>
+#include "intprops.h"
 #include "x509_int.h"
 #include "extras/hex.h"
 #include "common.h"
@@ -176,13 +177,18 @@ static int str_escape(const gnutls_datum_t *str, gnutls_datum_t *escaped)
 {
 	unsigned int j, i;
 	uint8_t *buffer = NULL;
+	size_t size;
 	int ret;
 
 	if (str == NULL)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	/* the string will be at most twice the original */
-	buffer = gnutls_malloc(str->size * 2 + 2);
+	if (!INT_MULTIPLY_OK(str->size, 2, &size) ||
+	    !INT_ADD_OK(size, 2, &size))
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+	buffer = gnutls_malloc(size);
 	if (buffer == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
