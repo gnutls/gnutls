@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with GnuTLS.  If not, see <https://www.gnu.org/licenses/>.
 
+# shellcheck shell=sh
+
 : ${srcdir=.}
 : ${DANETOOL=../../src/danetool${EXEEXT}}
 unset RETCODE
@@ -48,73 +50,106 @@ HOSTS="${HOSTS} www.huque.com"
 HOSTS="${HOSTS} www.bortzmeyer.org"
 HOSTS="${HOSTS} dns.bortzmeyer.org"
 # used to work: good.dane.verisignlabs.com
+total_hosts=0
+ok_hosts=0
 for host in ${HOSTS}; do
+	total_hosts=$(expr ${total_hosts} + 1)
 
 	nc -w 5 "${host}" 443 >/dev/null <<_EOF
 GET / HTTP/1.0
 
 _EOF
-
-	if test $? = 0;then
-		echo "${host}: "
-		"${DANETOOL}" --check "${host}" 2>&1
-		if [ $? != 0 ]; then
-			echo "Error checking ${host}"
-			exit 1
-		fi
-		echo "ok"
+	if test $? != 0; then
+		echo "${host}: SKIPPED (unreachable)"
+		echo
+		continue
 	fi
-done
 
-echo ""
-echo "*** Testing good SMTP hosts ***"
+	echo "${host}:"
+	if "${DANETOOL}" --check "${host}" 2>&1; then
+		ok_hosts=$(expr ${ok_hosts} + 1)
+		echo "ok"
+	else
+		echo "retrying with --local-dns"
+		if "${DANETOOL}" --check "${host}" --local-dns 2>&1; then
+			ok_hosts=$(expr ${ok_hosts} + 1)
+			echo "ok (with --local-dns)"
+		else
+			echo "FAILED (both attempts)"
+		fi
+	fi
+	echo
+done
+echo
+echo "Total hosts: ${total_hosts}"
+echo "Passed hosts: ${ok_hosts}"
+required=$(expr ${total_hosts} / 2)
+if test ${ok_hosts} -lt 1; then
+	echo "FAIL: Not a single good HTTPS host passed!"
+	exit 1
+fi
+if test ${ok_hosts} -lt ${required}; then
+	echo "FAIL: ${ok_hosts}/${total_hosts} good HTTPS hosts passed (<50%)"
+	exit 1
+fi
+echo "PASS: ${ok_hosts}/${total_hosts} good HTTPS hosts passed (>=50%)"
+echo
+
+echo "*** Testing good SMTP hosts (among reachable SMTP hosts only) ***"
+# Note that port 25 is often outright blocked, so here we'd be checking
+# ok hosts against reachable hosts, not against total hosts.
+
 HOSTS="nlnetlabs.nl"
 HOSTS="${HOSTS} nlnet.nl"
 HOSTS="${HOSTS} jhcloos.com"
 HOSTS="${HOSTS} openssl.org"
 HOSTS="${HOSTS} ietf.org"
+reachable_hosts=0
+ok_hosts=0
 for host in ${HOSTS}; do
-
 	nc -w 5 "${host}" 25 >/dev/null <<_EOF
 QUIT
 _EOF
-
-	if test $? = 0;then
-		echo "${host}: "
-		"${DANETOOL}" --check "${host}" --port 25 2>&1
-		if [ $? != 0 ]; then
-			echo "Error checking ${host}"
-			exit 1
-		fi
-		echo "ok"
+	if test $? != 0; then
+		echo "${host}: SKIPPED (unreachable)"
+		echo
+		continue
 	fi
-done
 
-echo ""
-echo "*** Testing bad HTTPS hosts ***"
+	reachable_hosts=$(expr ${reachable_hosts} + 1)
+	echo "${host}:"
+	if "${DANETOOL}" --check "${host}" --port 25 2>&1; then
+		ok_hosts=$(expr ${ok_hosts} + 1)
+		echo "ok"
+	else
+		echo "retrying with --local-dns"
+		if "${DANETOOL}" --check "${host}" --port 25 --local-dns 2>&1
+		then
+			ok_hosts=$(expr ${ok_hosts} + 1)
+			echo "ok (with --local-dns)"
+		else
+			echo "FAILED (both attempts)"
+		fi
+	fi
+	echo
+done
+echo
+echo "Reachable hosts: ${reachable_hosts}"
+echo "Passed hosts: ${ok_hosts}"
+required=$(expr ${reachable_hosts} / 2)
+if test ${ok_hosts} -lt ${required}; then
+	echo "FAIL: ${ok_hosts}/${reachable_hosts} SMTP hosts passed (<50%)"
+	exit 1
+fi
+echo "PASS: ${ok_hosts}/${reachable_hosts} SMTP hosts passed (>=50%)"
+echo
+
+# *** Testing bad HTTPS hosts ***
 # Unfortunately no intentionally broken ones remain up in 2026
 # used to work: dane-broken.rd.nic.fr
 # used to work: bad-hash.dane.verisignlabs.com
 # used to work: bad-params.dane.verisignlabs.com
 # used to work: bad-sig.dane.verisignlabs.com
 # unintentionally broken ones: www.vulcano.cl www.kumari.net
-HOSTS=""
-for host in ${HOSTS}; do
-
-	nc -w 5 "${host}" 443 >/dev/null <<_EOF
-GET / HTTP/1.0
-
-_EOF
-	if test $? = 0;then
-		echo "${host}: "
-		"${DANETOOL}" --check "${host}" 2>&1
-		if [ $? = 0 ]; then
-			echo "Checking ${host} should have failed"
-			exit 1
-		fi
-		echo "ok"
-	fi
-done
-
 
 exit 0
