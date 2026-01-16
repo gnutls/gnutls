@@ -38,12 +38,16 @@ fi
 
 echo ""
 echo "*** Testing good HTTPS hosts ***"
-# www.vulcano.cl dane.nox.su www.kumari.net
-# used to work: good.dane.verisignlabs.com
-# used to work: fedoraproject.org
-# used to work: torproject.org
 HOSTS="www.freebsd.org"
-#HOSTS="${HOSTS} nohats.ca"
+HOSTS="${HOSTS} fedoraproject.org"
+HOSTS="${HOSTS} torproject.org"
+HOSTS="${HOSTS} nohats.ca"
+HOSTS="${HOSTS} jhcloos.com"
+HOSTS="${HOSTS} www.afnic.fr"
+HOSTS="${HOSTS} www.huque.com"
+HOSTS="${HOSTS} www.bortzmeyer.org"
+HOSTS="${HOSTS} dns.bortzmeyer.org"
+# used to work: good.dane.verisignlabs.com
 for host in ${HOSTS}; do
 
 	nc -w 5 "${host}" 443 >/dev/null <<_EOF
