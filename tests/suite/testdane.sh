@@ -68,14 +68,17 @@ done
 
 echo ""
 echo "*** Testing good SMTP hosts ***"
-#HOSTS="dougbarton.us nlnetlabs.nl"
 HOSTS="nlnetlabs.nl"
+HOSTS="${HOSTS} nlnet.nl"
+HOSTS="${HOSTS} jhcloos.com"
+HOSTS="${HOSTS} openssl.org"
+HOSTS="${HOSTS} ietf.org"
 for host in ${HOSTS}; do
 
 	nc -w 5 "${host}" 25 >/dev/null <<_EOF
 QUIT
 _EOF
-	
+
 	if test $? = 0;then
 		echo "${host}: "
 		"${DANETOOL}" --check "${host}" --port 25 2>&1
