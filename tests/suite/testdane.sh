@@ -25,8 +25,9 @@ if ! test -x "${DANETOOL}"; then
 	exit 77
 fi
 
-# Unfortunately it is extremely fragile and fails 99% of the
-# time.
+# Unfortunately it is extremely fragile and fails 99% of the time.
+# It also depends on the external infrastructure, specific ports being blocked
+# and the DNS resolver setup of the host executing the tests.
 if test "${WINDIR}" != ""; then
 	exit 77
 fi
@@ -51,8 +52,8 @@ GET / HTTP/1.0
 _EOF
 
 	if test $? = 0;then
-		echo -n "${host}: "
-		"${DANETOOL}" --check "${host}" >/dev/null 2>&1
+		echo "${host}: "
+		"${DANETOOL}" --check "${host}" 2>&1
 		if [ $? != 0 ]; then
 			echo "Error checking ${host}"
 			exit 1
@@ -72,8 +73,8 @@ QUIT
 _EOF
 	
 	if test $? = 0;then
-		echo -n "${host}: "
-		"${DANETOOL}" --check "${host}" --port 25 >/dev/null 2>&1
+		echo "${host}: "
+		"${DANETOOL}" --check "${host}" --port 25 2>&1
 		if [ $? != 0 ]; then
 			echo "Error checking ${host}"
 			exit 1
@@ -84,11 +85,12 @@ done
 
 echo ""
 echo "*** Testing bad HTTPS hosts ***"
-# Not ok
+# Unfortunately no intentionally broken ones remain up in 2026
 # used to work: dane-broken.rd.nic.fr
 # used to work: bad-hash.dane.verisignlabs.com
 # used to work: bad-params.dane.verisignlabs.com
 # used to work: bad-sig.dane.verisignlabs.com
+# unintentionally broken ones: www.vulcano.cl www.kumari.net
 HOSTS=""
 for host in ${HOSTS}; do
 
@@ -97,8 +99,8 @@ GET / HTTP/1.0
 
 _EOF
 	if test $? = 0;then
-		echo -n "${host}: "
-		"${DANETOOL}" --check "${host}" >/dev/null 2>&1
+		echo "${host}: "
+		"${DANETOOL}" --check "${host}" 2>&1
 		if [ $? = 0 ]; then
 			echo "Checking ${host} should have failed"
 			exit 1
