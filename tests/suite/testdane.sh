@@ -34,6 +34,15 @@ if test "${WINDIR}" != ""; then
 	exit 77
 fi
 
+# First test we're not hitting the overly long DNS name issue.
+# We observe that happening when (podman) container names exceed 63 chars.
+# https://gitlab.com/gitlab-org/gitlab-runner/-/issues/27763#note_3024302939
+if "${DANETOOL}" --check example.com --local-dns 2>&1 | \
+		grep "Label length overflow" >/dev/null; then
+	echo "DNS name too long (container name >63 chars?)"
+	exit 77
+fi
+
 . "${srcdir}/../scripts/common.sh"
 
 # Fine hosts
