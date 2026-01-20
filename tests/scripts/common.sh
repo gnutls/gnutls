@@ -70,7 +70,7 @@ check_if_port_in_use() {
 	local PORT=$1
 	reserve_port $PORT
 	have_port_finder
-	if ! $PFCMD -an|grep "[\:\.]$PORT" >/dev/null 2>&1; then
+	if ! $PFCMD -an|grep -v ::|grep "[\:\.]$PORT" >/dev/null 2>&1; then
 		return 1
 	fi
 	unreserve_port $PORT
@@ -79,7 +79,7 @@ check_if_port_in_use() {
 check_if_port_listening() {
 	local PORT=$1
 	have_port_finder
-	$PFCMD -anl|grep "[\:\.]$PORT"|grep LISTEN >/dev/null 2>&1
+	$PFCMD -anl|grep -v ::|grep "[\:\.]$PORT"|grep LISTEN >/dev/null 2>&1
 }
 
 # Find a port number not currently in use.
