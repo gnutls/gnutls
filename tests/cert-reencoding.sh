@@ -1,7 +1,6 @@
 #!/bin/sh
 
-# Test case: Try to establish TLS connections with gnutls-cli and
-# check the validity of the server certificate via OCSP
+# Test case: check for DER re-encoding error on client side
 #
 # Copyright (C) 2016 Thomas Klute
 #
@@ -21,28 +20,12 @@
 # along with GnuTLS.  If not, see <https://www.gnu.org/licenses/>.
 
 : ${srcdir=.}
-: ${CERTTOOL=../src/certtool${EXEEXT}}
-: ${OCSPTOOL=../src/ocsptool${EXEEXT}}
-: ${SERV=../src/gnutls-serv${EXEEXT}}
 : ${CLI=../src/gnutls-cli${EXEEXT}}
-: ${DIFF=diff}
 SERVER_CERT_FILE="cert.$$.pem.tmp"
 SERVER_KEY_FILE="key.$$.pem.tmp"
 CLIENT_CERT_FILE="cli-cert.$$.pem.tmp"
 CLIENT_KEY_FILE="cli-key.$$.pem.tmp"
 CA_FILE="ca.$$.pem.tmp"
-
-if ! test -x "${CERTTOOL}"; then
-	exit 77
-fi
-
-if ! test -x "${OCSPTOOL}"; then
-	exit 77
-fi
-
-if ! test -x "${SERV}"; then
-	exit 77
-fi
 
 if ! test -x "${CLI}"; then
 	exit 77
@@ -57,12 +40,6 @@ export TZ="UTC"
 . "${srcdir}/scripts/common.sh"
 
 eval "${GETPORT}"
-# Port for gnutls-serv
-TLS_SERVER_PORT=$PORT
-
-# Port to use for OCSP server, must match the OCSP URI set in the
-# server_*.pem certificates
-eval "${GETPORT}"
 
 # Check for OpenSSL
 : ${OPENSSL=openssl}
@@ -72,7 +49,6 @@ if ! ("$OPENSSL" version) > /dev/null 2>&1; then
 fi
 
 SERVER_PID=""
-TLS_SERVER_PID=""
 stop_servers ()
 {
 	test -z "${SERVER_PID}" || kill "${SERVER_PID}"
@@ -242,13 +218,13 @@ EPOCHTESTDATE=1519862400
 # Start OpenSSL TLS server
 #
 launch_bare_server \
-	  "${OPENSSL}" s_server -attime "${EPOCHTESTDATE}" \
+	  "${OPENSSL}" s_server -4 -attime "${EPOCHTESTDATE}" \
 	  -cert ${SERVER_CERT_FILE} -key ${SERVER_KEY_FILE} \
 	  -CAfile ${CA_FILE} -port ${PORT} -Verify 1 -verify_return_error -www
 SERVER_PID="${!}"
 wait_server "${SERVER_PID}"
 
-"${CLI}" --attime "${TESTDATE}" --x509certfile ${CLIENT_CERT_FILE} \
+${VALGRIND} "${CLI}" --attime "${TESTDATE}" --x509certfile ${CLIENT_CERT_FILE} \
       --x509keyfile ${CLIENT_KEY_FILE} --x509cafile=${CA_FILE} \
       --port="${PORT}" localhost </dev/null
 rc=$?
@@ -257,13 +233,5 @@ if test "${rc}" != "0"; then
     echo "Failed to connect to server"
     exit 1
 fi
-
-kill ${SERVER_PID}
-
-rm -f "${SERVER_CERT_FILE}"
-rm -f "${SERVER_KEY_FILE}"
-rm -f "${CLIENT_CERT_FILE}"
-rm -f "${CLIENT_KEY_FILE}"
-rm -f "${CA_FILE}"
 
 exit 0
