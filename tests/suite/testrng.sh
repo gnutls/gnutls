@@ -55,11 +55,20 @@ if test -z "${RINPUTNO}"; then
 	RINPUTNO=201
 fi
 
+run_rng() {
+	./rng "$@"
+	ret=$?
+	if test ${ret} != 0; then
+		echo "./rng $* failed with exit code ${ret}"
+		exit 1
+	fi
+}
+
 echo ""
 echo "Testing nonce PRNG"
 
-./rng nonce 64 "${RNGFILE}"
-./rng nonce 64 "${RNGFILE2}"
+run_rng nonce 64 "${RNGFILE}"
+run_rng nonce 64 "${RNGFILE2}"
 cmp "${RNGFILE}" "${RNGFILE2}"  >/dev/null 2>&1
 ret=$?
 
@@ -68,7 +77,7 @@ if test ${ret} = 0; then
 	exit 1
 fi
 
-./rng nonce 100000000 "${RNGFILE}"
+run_rng nonce 100000000 "${RNGFILE}"
 
 dieharder -f "${RNGFILE}" -g ${RINPUTNO} ${OPTIONS} >"${OUTFILE}" 2>&1
 if ! test -z "${OPTIONS2}"; then
@@ -95,8 +104,8 @@ rm -f "${OUTFILE}"
 echo ""
 echo "Testing key PRNG"
 
-./rng key 64 "${RNGFILE}"
-./rng key 64 "${RNGFILE2}"
+run_rng key 64 "${RNGFILE}"
+run_rng key 64 "${RNGFILE2}"
 cmp "${RNGFILE}" "${RNGFILE2}" >/dev/null 2>&1
 ret=$?
 
@@ -105,7 +114,7 @@ if test ${ret} = 0; then
 	exit 1
 fi
 
-./rng key 100000000 "${RNGFILE}"
+run_rng key 100000000 "${RNGFILE}"
 
 dieharder -f "${RNGFILE}" -g ${RINPUTNO} ${OPTIONS} >"${OUTFILE}" 2>&1
 if ! test -z "${OPTIONS2}"; then
