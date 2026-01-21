@@ -64,6 +64,45 @@ run_rng() {
 	fi
 }
 
+expect_dieharder() {
+	expect="$1"
+	name="$2"
+
+	dieharder -f "${RNGFILE}" -g ${RINPUTNO} ${OPTIONS} \
+		>"${OUTFILE}" 2>&1
+	if ! test -z "${OPTIONS2}"; then
+		dieharder -f "${RNGFILE}" -g ${RINPUTNO} ${OPTIONS2} \
+			>>"${OUTFILE}" 2>&1
+	fi
+
+	if test "${expect}" = "pass"; then
+		if grep FAILED "${OUTFILE}" >/dev/null; then
+			echo "test failed for ${name}"
+			exit 1
+		fi
+		if ! grep PASSED "${OUTFILE}" >/dev/null; then
+			echo "could not run dieharder test? dieharder output:"
+			cat "${OUTFILE}"
+			echo "RNGFILE size: $(wc -c < "${RNGFILE}") bytes"
+			exit 1
+		fi
+	else
+		if grep PASSED "${OUTFILE}" >/dev/null; then
+			echo "test succeeded for ${name}!!!"
+			exit 1
+		fi
+		if ! grep FAILED "${OUTFILE}" >/dev/null; then
+			echo "could not run dieharder test? dieharder output:"
+			cat "${OUTFILE}"
+			echo "RNGFILE size: $(wc -c < "${RNGFILE}") bytes"
+			exit 1
+		fi
+	fi
+
+	cat "${OUTFILE}"
+	rm -f "${OUTFILE}"
+}
+
 echo ""
 echo "Testing nonce PRNG"
 
@@ -78,29 +117,8 @@ if test ${ret} = 0; then
 fi
 
 run_rng nonce 100000000 "${RNGFILE}"
+expect_dieharder pass nonce
 
-dieharder -f "${RNGFILE}" -g ${RINPUTNO} ${OPTIONS} >"${OUTFILE}" 2>&1
-if ! test -z "${OPTIONS2}"; then
-	dieharder -f "${RNGFILE}" -g ${RINPUTNO} ${OPTIONS2} >>"${OUTFILE}" 2>&1
-fi
-grep FAILED "${OUTFILE}" >/dev/null 2>&1
-ret=$?
-
-if test "${ret}" = "0"; then
-	echo "test failed for nonce"
-	exit 1
-fi
-
-grep PASSED "${OUTFILE}" >/dev/null 2>&1
-ret=$?
-
-if test "${ret}" != "0"; then
-	echo "could not run dieharder test?"
-	exit 1
-fi
-
-cat "${OUTFILE}"
-rm -f "${OUTFILE}"
 echo ""
 echo "Testing key PRNG"
 
@@ -115,56 +133,13 @@ if test ${ret} = 0; then
 fi
 
 run_rng key 100000000 "${RNGFILE}"
+expect_dieharder pass key
 
-dieharder -f "${RNGFILE}" -g ${RINPUTNO} ${OPTIONS} >"${OUTFILE}" 2>&1
-if ! test -z "${OPTIONS2}"; then
-	dieharder -f "${RNGFILE}" -g ${RINPUTNO} ${OPTIONS2} >>"${OUTFILE}" 2>&1
-fi
-grep FAILED "${OUTFILE}" >/dev/null 2>&1 
-ret=$?
-
-
-if test "${ret}" = "0"; then
-	echo "test failed for key"
-	exit 1
-fi
-
-grep PASSED "${OUTFILE}" >/dev/null 2>&1
-ret=$?
-
-if test "${ret}" != "0"; then
-	echo "could not run dieharder test?"
-	exit 1
-fi
-
-cat "${OUTFILE}"
-rm -f "${OUTFILE}"
 echo ""
 echo "Testing /dev/zero PRNG"
 dd if=/dev/zero of="${RNGFILE}" bs=4 count=10000000 >/dev/null 2>&1
+expect_dieharder fail /dev/zero
 
-dieharder -f "${RNGFILE}" -g ${RINPUTNO} ${OPTIONS} >"${OUTFILE}" 2>&1
-if ! test -z "${OPTIONS2}"; then
-	dieharder -f "${RNGFILE}" -g ${RINPUTNO} ${OPTIONS2} >>"${OUTFILE}" 2>&1
-fi
-grep PASSED "${OUTFILE}" >/dev/null 2>&1 
-ret=$?
-
-if test "${ret}" = "0"; then
-	echo "test succeeded for /dev/zero!!!"
-	exit 1
-fi
-
-grep FAILED "${OUTFILE}" >/dev/null 2>&1
-ret=$?
-
-if test "${ret}" != "0"; then
-	echo "could not run dieharder test?"
-	exit 1
-fi
-
-cat "${OUTFILE}"
-rm -f "${OUTFILE}"
 rm -f "${RNGFILE}"
 rm -f "${RNGFILE2}"
 
