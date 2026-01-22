@@ -80,7 +80,7 @@
 	  "arguments": ["-p", "@PORT@",
 			"-t", "180"]},
 	 {"name" : "test-tls13-finished.py",
-	  "comment" : "the disabled tests timeout very often due to slow tls-fuzzer implementation",
+	  "comment" : "the disabled tests timeout very often due tls-fuzzer being slow without m2crypto",
 	  "arguments": ["-p", "@PORT@",
 			"-e", "padding - cipher TLS_AES_128_GCM_SHA256, pad_byte 0, pad_left 0, pad_right 16777183",
 			"-e", "padding - cipher TLS_AES_256_GCM_SHA384, pad_byte 0, pad_left 0, pad_right 16777167"]},
