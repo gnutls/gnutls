@@ -196,7 +196,7 @@ int dane_query_to_raw_tlsa(dane_query_t q, unsigned int *data_entries,
 	*dane_data_len =
 		gnutls_calloc(q->data_entries + 1, sizeof(**dane_data_len));
 	if (*dane_data_len == NULL) {
-		free(*dane_data);
+		gnutls_free(*dane_data);
 		*dane_data = NULL;
 		return DANE_E_MEMORY_ERROR;
 	}
@@ -534,7 +534,7 @@ static int crt_to_pubkey(const gnutls_datum_t *raw_crt, gnutls_datum_t *out)
 	goto clean_certs;
 
 cleanup:
-	free(out->data);
+	gnutls_free(out->data);
 	out->data = NULL;
 clean_certs:
 	if (pub)
@@ -588,7 +588,7 @@ static int verify_ca(const gnutls_datum_t *raw_crt, unsigned raw_crt_size,
 				break;
 			}
 
-			free(pubkey.data);
+			gnutls_free(pubkey.data);
 			pubkey.data = NULL;
 		}
 
@@ -652,7 +652,7 @@ static int verify_ca(const gnutls_datum_t *raw_crt, unsigned raw_crt_size,
 
 	ret = 0;
 cleanup:
-	free(pubkey.data);
+	gnutls_free(pubkey.data);
 	if (crt != NULL)
 		gnutls_x509_crt_deinit(crt);
 	if (ca != NULL)
@@ -692,7 +692,7 @@ static int verify_ee(const gnutls_datum_t *raw_crt,
 
 	ret = 0;
 cleanup:
-	free(pubkey.data);
+	gnutls_free(pubkey.data);
 	return ret;
 }
 
@@ -969,7 +969,7 @@ int dane_verify_session_crt(dane_state_t s, gnutls_session_t session,
 				      &new_cert_list[cert_list_size]);
 	if (ret < 0) {
 		gnutls_assert();
-		free(new_cert_list);
+		gnutls_free(new_cert_list);
 		gnutls_x509_crt_deinit(crt);
 		goto failsafe;
 	}
@@ -980,7 +980,7 @@ int dane_verify_session_crt(dane_state_t s, gnutls_session_t session,
 		gnutls_assert();
 	}
 	gnutls_free(new_cert_list[cert_list_size].data);
-	free(new_cert_list);
+	gnutls_free(new_cert_list);
 	return ret;
 
 failsafe:
