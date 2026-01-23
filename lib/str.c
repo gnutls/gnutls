@@ -443,14 +443,23 @@ int _gnutls_buffer_unescape(gnutls_buffer_st *dest)
 char *_gnutls_bin2hex(const void *_old, size_t oldlen, char *buffer,
 		      size_t buffer_size, const char *separator)
 {
-	unsigned int i, j;
+	size_t i, j;
 	const uint8_t *old = _old;
 	int step = 2;
 	const char empty[] = "";
 
-	if (separator != NULL && separator[0] != 0)
-		step = 3;
-	else
+	if (unlikely(oldlen == 0)) {
+		if (buffer_size == 0) {
+			gnutls_assert();
+			return NULL;
+		}
+		buffer[0] = '\0';
+		return buffer;
+	}
+
+	if (separator != NULL) {
+		step += strlen(separator);
+	} else
 		separator = empty;
 
 	if (buffer_size < 3) {
