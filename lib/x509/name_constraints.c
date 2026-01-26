@@ -159,6 +159,23 @@ static int validate_name_constraints_node(gnutls_x509_subject_alt_name_t type,
 			return gnutls_assert_val(GNUTLS_E_MALFORMED_CIDR);
 	}
 
+	/* Validate DNS names and email addresses for malformed input */
+	if (type == GNUTLS_SAN_DNSNAME || type == GNUTLS_SAN_RFC822NAME) {
+		unsigned int i;
+		if (name->size == 0)
+			return GNUTLS_E_SUCCESS;
+
+		/* reject names with consecutive dots... */
+		for (i = 0; i + 1 < name->size; i++) {
+			if (name->data[i] == '.' && name->data[i + 1] == '.')
+				return gnutls_assert_val(
+					GNUTLS_E_ILLEGAL_PARAMETER);
+		}
+		/* ... or names consisting exclusively of dots */
+		if (name->size == 1 && name->data[0] == '.')
+			return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+	}
+
 	return GNUTLS_E_SUCCESS;
 }
 
