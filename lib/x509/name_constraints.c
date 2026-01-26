@@ -61,7 +61,7 @@ struct gnutls_name_constraints_st {
 
 static struct name_constraints_node_st *
 name_constraints_node_new(gnutls_x509_name_constraints_t nc, unsigned type,
-			  unsigned char *data, unsigned int size);
+			  const unsigned char *data, unsigned int size);
 
 static int
 name_constraints_node_list_add(struct name_constraints_node_list_st *list,
@@ -285,7 +285,7 @@ static void name_constraints_node_free(struct name_constraints_node_st *node)
  -*/
 static struct name_constraints_node_st *
 name_constraints_node_new(gnutls_x509_name_constraints_t nc, unsigned type,
-			  unsigned char *data, unsigned int size)
+			  const unsigned char *data, unsigned int size)
 {
 	struct name_constraints_node_st *tmp;
 	int ret;
@@ -339,6 +339,7 @@ static int name_constraints_node_list_intersect(
 	struct name_constraints_node_list_st removed = { .data = NULL,
 							 .size = 0,
 							 .capacity = 0 };
+	static const unsigned char universal_ip[32] = { 0 };
 
 	/* temporary array to see, if we need to add universal excluded constraints
 	 * (see phase 3 for details)
@@ -474,7 +475,7 @@ static int name_constraints_node_list_intersect(
 		case GNUTLS_SAN_IPADDRESS:
 			// add universal restricted range for IPv4
 			tmp = name_constraints_node_new(
-				nc, GNUTLS_SAN_IPADDRESS, NULL, 8);
+				nc, GNUTLS_SAN_IPADDRESS, universal_ip, 8);
 			if (tmp == NULL) {
 				gnutls_assert();
 				ret = GNUTLS_E_MEMORY_ERROR;
@@ -487,7 +488,7 @@ static int name_constraints_node_list_intersect(
 			}
 			// add universal restricted range for IPv6
 			tmp = name_constraints_node_new(
-				nc, GNUTLS_SAN_IPADDRESS, NULL, 32);
+				nc, GNUTLS_SAN_IPADDRESS, universal_ip, 32);
 			if (tmp == NULL) {
 				gnutls_assert();
 				ret = GNUTLS_E_MEMORY_ERROR;
