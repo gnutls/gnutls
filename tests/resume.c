@@ -317,6 +317,32 @@ static int hsk_hook_cb(gnutls_session_t session, unsigned int htype,
 	return 0;
 }
 
+#ifdef TLS13
+static int ticket_callback(gnutls_session_t session, unsigned int htype,
+			   unsigned post, unsigned int incoming,
+			   const gnutls_datum_t *msg)
+{
+	gnutls_datum_t *d;
+	int ret;
+
+	assert(htype == GNUTLS_HANDSHAKE_NEW_SESSION_TICKET);
+
+	d = gnutls_session_get_ptr(session);
+
+	if (post == GNUTLS_HOOK_POST) {
+		if (d->data)
+			gnutls_free(d->data);
+		ret = gnutls_session_get_data2(session, d);
+		assert(ret >= 0);
+		assert(d->size > 4);
+
+		return 0;
+	}
+
+	return 0;
+}
+#endif
+
 static void append_alpn(gnutls_session_t session, struct params_res *params,
 			unsigned alpn_counter)
 {
@@ -618,6 +644,14 @@ static void client(int sds[], struct params_res *params)
 			gnutls_handshake_set_hook_function(
 				session, GNUTLS_HANDSHAKE_SERVER_HELLO,
 				GNUTLS_HOOK_PRE, hsk_hook_cb);
+#ifdef TLS13
+		if (t == 0 || params->try_resumed_data) {
+			gnutls_session_set_ptr(session, &session_data);
+			gnutls_handshake_set_hook_function(
+				session, GNUTLS_HANDSHAKE_NEW_SESSION_TICKET,
+				GNUTLS_HOOK_BOTH, ticket_callback);
+		}
+#endif
 		gnutls_transport_set_int(session, sd);
 
 		/* Perform the TLS handshake
@@ -642,12 +676,15 @@ static void client(int sds[], struct params_res *params)
 				gnutls_session_ext_master_secret_status(
 					session);
 
+#ifndef TLS13
 			/* get the session data size */
 			ret = gnutls_session_get_data2(session, &session_data);
 			if (ret < 0)
 				fail("Getting resume data failed\n");
+#endif
 
 		} else { /* the second time we connect */
+#ifndef TLS13
 			if (params->try_resumed_data) {
 				gnutls_free(session_data.data);
 				ret = gnutls_session_get_data2(session,
@@ -655,6 +692,7 @@ static void client(int sds[], struct params_res *params)
 				if (ret < 0)
 					fail("Getting resume data failed\n");
 			}
+#endif
 
 			/* check if we actually resumed the previous session */
 			if (gnutls_session_is_resumed(session) != 0) {
