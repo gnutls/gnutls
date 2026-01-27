@@ -90,7 +90,7 @@ GETPORT='
         if test -n "$RANDOM"; then myrandom=$(($RANDOM + $RANDOM)); fi
         if test -z "$myrandom"; then myrandom=$(date +%N | sed s/^0*//); fi
         if test -z "$myrandom"; then myrandom=0; fi
-        PORT="$(((($$<<15)|$myrandom) % 63001 + 2000))"
+        PORT="$(((($$<<15)|$myrandom) % 30000 + 2000))"
         check_if_port_in_use $PORT;rc=$?
     done
 '
