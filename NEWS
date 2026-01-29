@@ -7,6 +7,13 @@ See the end for copying conditions.
 
 * Version 3.8.12 (unreleased)
 
+** libgnutls: Fix NULL pointer dereference in PSK binder verification
+   A TLS 1.3 resumption attempt with an invalid PSK binder value in ClientHello
+   could lead to a denial of service attack via crashing the server.
+   The updated code guards against the problematic dereference.
+   Reported by Jaehun Lee.
+   [Fixes: GNUTLS-SA-2026-02-09-1, CVSS: high] [CVE-2026-1584]
+
 ** libgnutls: Fix multiple unexploitable overflows
    Reported by Tim Rühsen (#1783, #1786).
 

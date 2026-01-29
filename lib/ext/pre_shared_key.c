@@ -983,7 +983,8 @@ retry_binder:
 		 * even for SHA384 PSKs, so we need to retry with SHA256
 		 * to calculate the correct binder value for those.
 		 */
-		if (pskcred->binder_algo == NULL && mac == GNUTLS_MAC_SHA384) {
+		if (pskcred && pskcred->binder_algo == NULL &&
+		    mac == GNUTLS_MAC_SHA384) {
 			mac = GNUTLS_MAC_SHA256;
 			_gnutls_free_key_datum(&key);
 			goto retry_binder;
