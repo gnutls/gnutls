@@ -14,6 +14,13 @@ See the end for copying conditions.
    Reported by Jaehun Lee.
    [Fixes: GNUTLS-SA-2026-02-09-1, CVSS: high] [CVE-2026-1584]
 
+** libgnutls: Fix name constraint processing performance issue
+   Verifying certificates with pathological amounts of name constraints
+   could lead to a denial of service attack via resource exhaustion.
+   Reworked processing algorithms exhibit better performance characteristics.
+   Reported by Tim Scheckenbach.
+   [Fixes: GNUTLS-SA-2026-02-09-2, CVSS: medium] [CVE-2025-14831]
+
 ** libgnutls: Fix multiple unexploitable overflows
    Reported by Tim Rühsen (#1783, #1786).
 
