@@ -7,6 +7,9 @@ See the end for copying conditions.
 
 * Version 3.8.12 (unreleased)
 
+** libgnutls: Fix multiple unexploitable overflows
+   Reported by Tim Rühsen (#1783, #1786).
+
 ** libgnutls: Fall back to thread-unsafe module initialization
    Improve fallback handling for PKCS#11 modules that
    don't support thread-safe initialization (#1774).
