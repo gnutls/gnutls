@@ -5,7 +5,7 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.8.12 (unreleased)
+* Version 3.8.12 (released 2026-02-09)
 
 ** libgnutls: Fix NULL pointer dereference in PSK binder verification
    A TLS 1.3 resumption attempt with an invalid PSK binder value in ClientHello
