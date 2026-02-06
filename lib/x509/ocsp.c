@@ -2466,6 +2466,7 @@ int gnutls_ocsp_resp_list_import2(gnutls_ocsp_resp_t **ocsps,
 	goto cleanup;
 
 fail:
+	assert((*size == 0 && *ocsps == NULL) || (*size > 0 && *ocsps != NULL));
 	for (i = 0; i < *size; i++) {
 		gnutls_ocsp_resp_deinit((*ocsps)[i]);
 	}

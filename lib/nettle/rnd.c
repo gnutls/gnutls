@@ -134,7 +134,7 @@ static int wrap_nettle_rnd_init(void **_ctx)
 	uint8_t new_key[PRNG_KEY_SIZE * 2];
 	struct generators_ctx_st *ctx;
 
-	ctx = calloc(1, sizeof(*ctx));
+	ctx = gnutls_calloc(1, sizeof(*ctx));
 	if (ctx == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
