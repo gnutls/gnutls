@@ -779,6 +779,7 @@ enum x86_cpu_vendor {
 	X86_CPU_VENDOR_OTHER,
 	X86_CPU_VENDOR_INTEL,
 	X86_CPU_VENDOR_AMD,
+	X86_CPU_VENDOR_HYGON,
 };
 
 static enum x86_cpu_vendor check_x86_cpu_vendor(void)
@@ -797,6 +798,11 @@ static enum x86_cpu_vendor check_x86_cpu_vendor(void)
 	if (memcmp(&b, "Auth", 4) == 0 && memcmp(&d, "enti", 4) == 0 &&
 	    memcmp(&c, "cAMD", 4) == 0) {
 		return X86_CPU_VENDOR_AMD;
+	}
+
+	if (memcmp(&b, "Hygo", 4) == 0 && memcmp(&d, "nGen", 4) == 0 &&
+	    memcmp(&c, "uine", 4) == 0) {
+		return X86_CPU_VENDOR_HYGON;
 	}
 
 	return X86_CPU_VENDOR_OTHER;
