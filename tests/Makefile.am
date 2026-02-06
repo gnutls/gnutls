@@ -517,6 +517,8 @@ pkcs11_distrust_after_DEPENDENCIES = libpkcs11mock3.la libutils.la
 pkcs11_distrust_after_LDADD = $(LDADD) $(LIBDL)
 pkcs11_os_locking_ok_DEPENDENCIES = libpkcs11mock4.la libutils.la
 pkcs11_os_locking_ok_LDADD = $(LDADD) $(LIBDL)
+pkcs11_long_label_DEPENDENCIES = libpkcs11mock4.la libutils.la
+pkcs11_long_label_LDADD = $(LDADD) $(LIBDL)
 endif
 endif
 
