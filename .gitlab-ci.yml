@@ -190,6 +190,8 @@ fedora-docdist/test:
   needs:
     - fedora-docdist/build
   script:
+    # Fake distcheck-hook that checks bootstrap is called without --skip-po
+    - mkdir -p po/.reference
     - make -j$CHECKJOBS distcheck
   when: manual
 
