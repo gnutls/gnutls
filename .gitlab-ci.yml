@@ -695,7 +695,8 @@ fedora-i686/test:
   dependencies:
     - fedora-i686/build
   needs:
-    - fedora-i686/build
+    - job: fedora-i686/build
+      optional: false
   script:
     - setarch i686 -- make -j$CHECKJOBS check
 
