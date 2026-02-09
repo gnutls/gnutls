@@ -102,6 +102,8 @@ void doit(void)
 	int rc;
 	unsigned int i, j, x;
 	unsigned char key[32];
+	gnutls_datum_t data;
+	size_t size;
 	char tmp[1024];
 
 	global_init();
@@ -121,15 +123,17 @@ void doit(void)
 				fail("_gnutls_pkcs12_string_to_key failed[0]: %d\n",
 				     rc);
 
-			if (strcmp(_gnutls_bin2hex(key, sizeof(key), tmp,
-						   sizeof(tmp), NULL),
-				   values[x]) != 0)
+			data.data = values[x];
+			data.size = strlen(values[x]);
+			size = sizeof(tmp);
+			rc = gnutls_hex_decode(&data, tmp, &size);
+			if (rc < 0)
+				fail("gnutls_hex_decode failed: %d\n", rc);
+			if (size != sizeof(key) || memcmp(key, tmp, size) != 0)
 				fail("_gnutls_pkcs12_string_to_key failed[1]\n");
 
 			if (debug)
-				printf("ij: %d.%d: %s\n", i, j,
-				       _gnutls_bin2hex(key, sizeof(key), tmp,
-						       sizeof(tmp), NULL));
+				printf("ij: %d.%d: %s\n", i, j, tmp);
 			x++;
 		}
 	}
@@ -145,15 +149,17 @@ void doit(void)
 			fail("_gnutls_pkcs12_string_to_key failed[2]: %d\n",
 			     rc);
 
-		if (memcmp(_gnutls_bin2hex(key, tv[i].keylen, tmp, sizeof(tmp),
-					   NULL),
-			   tv[i].key, tv[i].keylen) != 0)
+		data.data = tv[i].key;
+		data.size = strlen(tv[i].key);
+		size = sizeof(tmp);
+		rc = gnutls_hex_decode(&data, tmp, &size);
+		if (rc < 0)
+			fail("gnutls_hex_encode failed: %d\n", rc);
+		if (size != tv[i].keylen || memcmp(key, tmp, size) != 0)
 			fail("_gnutls_pkcs12_string_to_key failed[3]\n");
 
 		if (debug)
-			printf("tv[%d]: %s\n", i,
-			       _gnutls_bin2hex(key, tv[i].keylen, tmp,
-					       sizeof(tmp), NULL));
+			printf("tv[%d]: %s\n", i, tmp);
 	}
 	if (debug)
 		printf("\n");

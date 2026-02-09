@@ -5,6 +5,41 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.8.12 (released 2026-02-09)
+
+** libgnutls: Fix NULL pointer dereference in PSK binder verification
+   A TLS 1.3 resumption attempt with an invalid PSK binder value in ClientHello
+   could lead to a denial of service attack via crashing the server.
+   The updated code guards against the problematic dereference.
+   Reported by Jaehun Lee.
+   [Fixes: GNUTLS-SA-2026-02-09-1, CVSS: high] [CVE-2026-1584]
+
+** libgnutls: Fix name constraint processing performance issue
+   Verifying certificates with pathological amounts of name constraints
+   could lead to a denial of service attack via resource exhaustion.
+   Reworked processing algorithms exhibit better performance characteristics.
+   Reported by Tim Scheckenbach.
+   [Fixes: GNUTLS-SA-2026-02-09-2, CVSS: medium] [CVE-2025-14831]
+
+** libgnutls: Fix multiple unexploitable overflows
+   Reported by Tim Rühsen (#1783, #1786).
+
+** libgnutls: Fall back to thread-unsafe module initialization
+   Improve fallback handling for PKCS#11 modules that
+   don't support thread-safe initialization (#1774).
+   Also return filename from p11_kit_module_get_name() for unconfigured modules.
+
+** libgnutls: Accept NULL as digest argument for gnutls_hash_output
+   The accelerated implementation of gnutls_hash_output() now
+   properly accepts NULL as the digest argument, matching the
+   behavior of the reference implementation (#1769).
+
+** srptool: Avoid a stack buffer overflow when processing large SRP groups.
+   Reported and fixed by Mikhail Dmitrichenko (#1777).
+
+** API and ABI modifications:
+No changes since last version.
+
 * Version 3.8.11 (released 2025-11-18)
 
 ** libgnutls: Fix stack overwrite in gnutls_pkcs11_token_init

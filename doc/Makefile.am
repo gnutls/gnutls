@@ -455,7 +455,8 @@ enums.texi: $(HEADER_FILES)
 	mv -f $@-tmp $@
 
 gnutls_TEXINFOS += $(ENUMS) $(FUNCS) $(AUTOGENED_DOC)
-DISTCLEANFILES += $(ENUMS) stamp_enums stamp_error_codes stamp_functions
+DISTCLEANFILES += $(ENUMS) stamp_enums stamp_error_codes stamp_functions \
+  errcodes printlist alert-printlist
 
 
 stamp_functions: $(API_FILES)

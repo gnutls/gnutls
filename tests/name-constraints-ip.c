@@ -772,5 +772,5 @@ int main(int argc, char **argv)
 		cmocka_unit_test_setup_teardown(
 			check_ipv4v6_single_constraint_each, setup, teardown)
 	};
-	cmocka_run_group_tests(tests, NULL, NULL);
+	return cmocka_run_group_tests(tests, NULL, NULL);
 }
