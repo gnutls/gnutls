@@ -744,10 +744,9 @@ debian/test:
 .mingw/test:
   extends:
     - .test
-  before_script:
+  script:
     - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
     - "[ -e /proc/sys/fs/binfmt_misc/DOSWin ] || echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register"
-  script:
     - mingw${arch_bits}-make -j$CHECKJOBS -C tests check
   timeout: 3h
 
