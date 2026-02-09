@@ -606,6 +606,7 @@ fedora-cross/bootstrap:
     - host=$(echo $CI_JOB_NAME |cut -d/ -f2)
     - arch=$(echo $host |cut -d- -f1)
     - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
+    - "[ -e /proc/sys/fs/binfmt_misc/qemu-$arch ] && echo -1 > /proc/sys/fs/binfmt_misc/qemu-$arch"
     - "[ -e /proc/sys/fs/binfmt_misc/qemu-$arch ] || cat /usr/lib/binfmt.d/qemu-$arch-static.conf > /proc/sys/fs/binfmt_misc/register"
     - make pic-check
     - make -j$BUILDJOBS -C tests check
