@@ -177,6 +177,7 @@ doc/scripts/Makefile
 doc/scripts/Makefile.in
 doc/socket-api.texi
 doc/stamp_enums
+doc/stamp_error_codes
 doc/stamp_functions
 doc/stamp_invoke
 doc/stamp-vti
