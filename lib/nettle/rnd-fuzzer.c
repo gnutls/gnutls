@@ -47,8 +47,8 @@ struct r48_rand_data {
 #ifdef __clang__
 __attribute__((no_sanitize("integer")))
 #endif
-static int
-__r48_rand_iterate(unsigned short int xsubi[3], struct r48_rand_data *buffer)
+static int __r48_rand_iterate(unsigned short int xsubi[3],
+			      struct r48_rand_data *buffer)
 {
 	uint64_t X;
 	uint64_t result;
@@ -80,9 +80,8 @@ __attribute__((no_sanitize("integer")))
 #elif defined __GNUC__
 __attribute__((no_sanitize("shift-base")))
 #endif
-static int
-r48_r(unsigned short int xsubi[3], struct r48_rand_data *buffer,
-      long int *result)
+static int r48_r(unsigned short int xsubi[3], struct r48_rand_data *buffer,
+		 long int *result)
 {
 	/* Compute next state.  */
 	if (__r48_rand_iterate(xsubi, buffer) < 0)
