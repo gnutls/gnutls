@@ -1976,17 +1976,11 @@ int pkcs11_read_pubkey(struct ck_function_list *module, ck_session_handle_t pks,
 		    CKR_OK) {
 			gnutls_ecc_curve_t curve;
 			const gnutls_ecc_curve_entry_st *ce;
+			gnutls_datum_t temp_datum = { a[0].value,
+						      a[0].value_len };
 
-			pobj->pubkey[0].data = a[0].value;
-			pobj->pubkey[0].size = a[0].value_len;
-
-			pobj->pubkey[1].data = a[1].value;
-			pobj->pubkey[1].size = a[1].value_len;
-
-			pobj->pubkey_size = 2;
-
-			ret = _gnutls_pubkey_parse_ecc_eddsa_params(
-				&pobj->pubkey[0], &curve);
+			ret = _gnutls_pubkey_parse_ecc_eddsa_params(&temp_datum,
+								    &curve);
 			if (ret < 0) {
 				ret = GNUTLS_E_INVALID_REQUEST;
 				goto cleanup;
@@ -1996,6 +1990,11 @@ int pkcs11_read_pubkey(struct ck_function_list *module, ck_session_handle_t pks,
 				ret = GNUTLS_E_INVALID_REQUEST;
 				goto cleanup;
 			}
+			pobj->pubkey[0].data = a[0].value;
+			pobj->pubkey[0].size = a[0].value_len;
+			pobj->pubkey[1].data = a[1].value;
+			pobj->pubkey[1].size = a[1].value_len;
+			pobj->pubkey_size = 2;
 			pobj->pk_algorithm = ce->pk;
 		} else {
 			gnutls_assert();
