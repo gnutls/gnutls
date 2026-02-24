@@ -112,14 +112,15 @@ void pkcs11_delete(FILE *outfile, const char *url, unsigned int login_flags,
 	return;
 }
 
-static const char *get_key_algo_type(gnutls_pkcs11_obj_type_t otype,
+static const char *get_key_algo_type(gnutls_pkcs11_obj_t obj,
+				     gnutls_pkcs11_obj_type_t otype,
 				     const char *objurl, unsigned flags,
 				     time_t *exp)
 {
 	int ret;
 	gnutls_pubkey_t pubkey = NULL;
-	gnutls_privkey_t privkey = NULL;
 	gnutls_x509_crt_t crt = NULL;
+	gnutls_datum_t cert_raw = { NULL, 0 };
 	static char str[256];
 	const char *p;
 	unsigned int bits;
@@ -135,9 +136,14 @@ static const char *get_key_algo_type(gnutls_pkcs11_obj_type_t otype,
 		if (ret < 0)
 			goto fail;
 
-		ret = gnutls_x509_crt_import_url(crt, objurl, flags);
+		ret = gnutls_pkcs11_obj_export2(obj, &cert_raw);
 		if (ret < 0)
 			goto fail;
+		ret = gnutls_x509_crt_import(crt, &cert_raw,
+					     GNUTLS_X509_FMT_DER);
+		if (ret < 0)
+			goto fail;
+		gnutls_free(cert_raw.data);
 		ret = gnutls_x509_crt_get_pk_algorithm(crt, &bits);
 		if (ret < 0)
 			goto fail;
@@ -167,10 +173,10 @@ static const char *get_key_algo_type(gnutls_pkcs11_obj_type_t otype,
 		ret = gnutls_pubkey_init(&pubkey);
 		if (ret < 0)
 			goto fail;
-
-		ret = gnutls_pubkey_import_url(pubkey, objurl, flags);
+		ret = gnutls_pubkey_import_pkcs11(pubkey, obj, 0);
 		if (ret < 0)
 			goto fail;
+
 		ret = gnutls_pubkey_get_pk_algorithm(pubkey, &bits);
 		if (ret < 0)
 			goto fail;
@@ -194,44 +200,30 @@ static const char *get_key_algo_type(gnutls_pkcs11_obj_type_t otype,
 		gnutls_pubkey_deinit(pubkey);
 		return p;
 	case GNUTLS_PKCS11_OBJ_PRIVKEY:
-		ret = gnutls_privkey_init(&privkey);
-		if (ret < 0)
+		pk = gnutls_pkcs11_obj_get_pk_algorithm(obj, &bits);
+		if (pk < 0)
 			goto fail;
-
-		ret = gnutls_privkey_import_url(privkey, objurl, flags);
-		if (ret < 0)
-			goto fail;
-		ret = gnutls_privkey_get_pk_algorithm(privkey, &bits);
-		if (ret < 0)
-			goto fail;
-		pk = ret;
-
 		p = gnutls_pk_get_name(pk);
-		if (p) {
-			if ((pk == GNUTLS_PK_RSA || pk == GNUTLS_PK_DSA) &&
-			    bits > 0) {
+		if (p && bits > 0) {
+			if (pk == GNUTLS_PK_RSA || pk == GNUTLS_PK_DSA) {
 				snprintf(str, sizeof(str), "%s-%d", p, bits);
 				p = str;
-			} else if (pk == GNUTLS_PK_ECDSA &&
-				   gnutls_privkey_export_ecc_raw(
-					   privkey, &curve, NULL, NULL, NULL) >=
-					   0) {
+			} else if (pk == GNUTLS_PK_ECDSA) {
 				snprintf(str, sizeof(str), "%s-%s", p,
-					 gnutls_ecc_curve_get_name(curve));
+					 gnutls_ecc_curve_get_name(
+						 (gnutls_ecc_curve_t)bits));
 				p = str;
 			}
 		}
-
-		gnutls_privkey_deinit(privkey);
 		return p;
 	default:
 	fail:
 		if (crt)
 			gnutls_x509_crt_deinit(crt);
+		if (cert_raw.data)
+			gnutls_free(cert_raw.data);
 		if (pubkey)
 			gnutls_pubkey_deinit(pubkey);
-		if (privkey)
-			gnutls_privkey_deinit(privkey);
 		return NULL;
 	}
 }
@@ -344,7 +336,8 @@ void pkcs11_list(FILE *outfile, const char *url, int type, unsigned int flags,
 		if (otype == GNUTLS_PKCS11_OBJ_PRIVKEY ||
 		    otype == GNUTLS_PKCS11_OBJ_PUBKEY ||
 		    otype == GNUTLS_PKCS11_OBJ_X509_CRT) {
-			p = get_key_algo_type(otype, objurl, obj_flags, &exp);
+			p = get_key_algo_type(crt_list[i], otype, objurl,
+					      obj_flags, &exp);
 		}
 
 		if (p) {
