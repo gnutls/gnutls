@@ -24,7 +24,8 @@
 #include "gnutls_int.h"
 #include "hash_int.h"
 #include "errors.h"
-#include <nettle/sha.h>
+#include <nettle/sha1.h>
+#include <nettle/sha2.h>
 #include <nettle/hmac.h>
 #include <nettle/macros.h>
 #include "aes-padlock.h"

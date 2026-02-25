@@ -25,7 +25,8 @@
 #include <gnutls/crypto.h>
 #include "errors.h"
 #include "aes-x86.h"
-#include <nettle/sha.h>
+#include <nettle/sha1.h>
+#include <nettle/sha2.h>
 #include <nettle/macros.h>
 #include <nettle/nettle-meta.h>
 #include "sha-x86.h"

@@ -1,7 +1,8 @@
 #ifndef GNUTLS_LIB_ACCELERATED_AARCH64_SHA_AARCH64_H
 #define GNUTLS_LIB_ACCELERATED_AARCH64_SHA_AARCH64_H
 
-#include <nettle/sha.h>
+#include <nettle/sha1.h>
+#include <nettle/sha2.h>
 
 extern const struct nettle_hash aarch64_sha1;
 extern const struct nettle_hash aarch64_sha224;

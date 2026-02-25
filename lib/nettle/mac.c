@@ -29,7 +29,8 @@
 #include <nettle/md5.h>
 #include <nettle/md2.h>
 #include <nettle/ripemd160.h>
-#include <nettle/sha.h>
+#include <nettle/sha1.h>
+#include <nettle/sha2.h>
 #include <nettle/sha3.h>
 #ifndef HAVE_NETTLE_SHA3_128_SHAKE_OUTPUT
 #include "int/sha3-shake.h"
