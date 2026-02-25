@@ -25,6 +25,7 @@
 #include <nettle/bignum.h> /* includes gmp.h */
 #include <nettle/dsa.h>
 #include <nettle/sha2.h>
+#include <nettle/version.h>
 #include "fips.h"
 
 #define div_ceil(x, y) ((x + (y) - 1) / (y))
@@ -100,7 +101,11 @@ inline static void hash(uint8_t digest[DIGEST_SIZE], unsigned length,
 
 	sha384_init(&ctx);
 	sha384_update(&ctx, length, data);
+#if NETTLE_VERSION_MAJOR >= 4
+	sha384_digest(&ctx, digest);
+#else
 	sha384_digest(&ctx, DIGEST_SIZE, digest);
+#endif
 
 	return;
 }
