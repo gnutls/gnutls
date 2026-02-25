@@ -35,7 +35,7 @@
 #include "sha-x86.h"
 #include "algorithms.h"
 
-#ifdef HAVE_LIBNETTLE
+#if defined(HAVE_LIBNETTLE) && defined(HMAC_SET_KEY)
 
 typedef void (*update_func)(void *, size_t, const uint8_t *);
 typedef void (*digest_func)(void *, size_t, uint8_t *);
@@ -297,4 +297,4 @@ const gnutls_crypto_mac_st _gnutls_hmac_sha_x86_ssse3 = {
 	.fast = wrap_x86_hmac_fast,
 };
 
-#endif /* HAVE_LIBNETTLE */
+#endif /* HAVE_LIBNETTLE && HMAC_SET_KEY */

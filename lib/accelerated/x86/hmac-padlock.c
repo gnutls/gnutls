@@ -36,7 +36,7 @@
 #include "sha-padlock.h"
 #include "algorithms.h"
 
-#ifdef HAVE_LIBNETTLE
+#if defined(HAVE_LIBNETTLE) && defined(HMAC_SET_KEY)
 
 #define IPAD 0x36
 #define OPAD 0x5c
@@ -359,4 +359,4 @@ const gnutls_crypto_mac_st _gnutls_hmac_sha_padlock = {
 	.fast = wrap_padlock_hmac_fast,
 };
 
-#endif /* HAVE_LIBNETTLE */
+#endif /* HAVE_LIBNETTLE && HMAC_SET_KEY */
