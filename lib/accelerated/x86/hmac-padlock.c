@@ -280,39 +280,39 @@ static int wrap_padlock_hmac_fast(gnutls_mac_algorithm_t algo,
 {
 	if (algo == GNUTLS_MAC_SHA1 || algo == GNUTLS_MAC_SHA256) {
 		unsigned char *pad;
-		unsigned char pad2[SHA1_DATA_SIZE + MAX_SHA_DIGEST_SIZE];
+		unsigned char pad2[SHA1_BLOCK_SIZE + MAX_SHA_DIGEST_SIZE];
 		unsigned char hkey[MAX_SHA_DIGEST_SIZE];
 		unsigned int digest_size =
 			_gnutls_mac_get_algo_len(mac_to_entry(algo));
 
-		if (key_size > SHA1_DATA_SIZE) {
+		if (key_size > SHA1_BLOCK_SIZE) {
 			wrap_padlock_hash_fast((gnutls_digest_algorithm_t)algo,
 					       key, key_size, hkey);
 			key = hkey;
 			key_size = digest_size;
 		}
 
-		pad = gnutls_malloc(text_size + SHA1_DATA_SIZE);
+		pad = gnutls_malloc(text_size + SHA1_BLOCK_SIZE);
 		if (pad == NULL)
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-		memset(pad, IPAD, SHA1_DATA_SIZE);
+		memset(pad, IPAD, SHA1_BLOCK_SIZE);
 		memxor(pad, key, key_size);
 
-		memcpy(&pad[SHA1_DATA_SIZE], text, text_size);
+		memcpy(&pad[SHA1_BLOCK_SIZE], text, text_size);
 
 		wrap_padlock_hash_fast((gnutls_digest_algorithm_t)algo, pad,
-				       text_size + SHA1_DATA_SIZE,
-				       &pad2[SHA1_DATA_SIZE]);
+				       text_size + SHA1_BLOCK_SIZE,
+				       &pad2[SHA1_BLOCK_SIZE]);
 
-		zeroize_key(pad, text_size + SHA1_DATA_SIZE);
+		zeroize_key(pad, text_size + SHA1_BLOCK_SIZE);
 		gnutls_free(pad);
 
-		memset(pad2, OPAD, SHA1_DATA_SIZE);
+		memset(pad2, OPAD, SHA1_BLOCK_SIZE);
 		memxor(pad2, key, key_size);
 
 		wrap_padlock_hash_fast((gnutls_digest_algorithm_t)algo, pad2,
-				       digest_size + SHA1_DATA_SIZE, digest);
+				       digest_size + SHA1_BLOCK_SIZE, digest);
 
 		zeroize_key(pad2, sizeof(pad2));
 		zeroize_key(hkey, sizeof(hkey));

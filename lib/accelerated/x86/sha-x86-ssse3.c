@@ -82,7 +82,7 @@ void x86_sha1_update(struct sha1_ctx *ctx, size_t length, const uint8_t *data)
 	unsigned t2, i;
 
 	if ((res = ctx->index)) {
-		res = SHA1_DATA_SIZE - res;
+		res = SHA1_BLOCK_SIZE - res;
 		if (length < res)
 			res = length;
 		sha1_update(ctx, res, data);
@@ -96,14 +96,14 @@ void x86_sha1_update(struct sha1_ctx *ctx, size_t length, const uint8_t *data)
 	octx.h3 = ctx->state[3];
 	octx.h4 = ctx->state[4];
 
-	memcpy(octx.data, ctx->block, SHA1_DATA_SIZE);
+	memcpy(octx.data, ctx->block, SHA1_BLOCK_SIZE);
 	octx.num = ctx->index;
 
-	res = length % SHA1_DATA_SIZE;
+	res = length % SHA1_BLOCK_SIZE;
 	length -= res;
 
 	if (length > 0) {
-		t2 = length / SHA1_DATA_SIZE;
+		t2 = length / SHA1_BLOCK_SIZE;
 
 		sha1_block_data_order(&octx, data, t2);
 
@@ -140,7 +140,7 @@ void x86_sha256_update(struct sha256_ctx *ctx, size_t length,
 	unsigned t2, i;
 
 	if ((res = ctx->index)) {
-		res = SHA256_DATA_SIZE - res;
+		res = SHA256_BLOCK_SIZE - res;
 		if (length < res)
 			res = length;
 		sha256_update(ctx, res, data);
@@ -149,14 +149,14 @@ void x86_sha256_update(struct sha256_ctx *ctx, size_t length,
 	}
 
 	memcpy(octx.h, ctx->state, sizeof(octx.h));
-	memcpy(octx.data, ctx->block, SHA256_DATA_SIZE);
+	memcpy(octx.data, ctx->block, SHA256_BLOCK_SIZE);
 	octx.num = ctx->index;
 
-	res = length % SHA256_DATA_SIZE;
+	res = length % SHA256_BLOCK_SIZE;
 	length -= res;
 
 	if (length > 0) {
-		t2 = length / SHA1_DATA_SIZE;
+		t2 = length / SHA1_BLOCK_SIZE;
 		sha256_block_data_order(&octx, data, t2);
 
 		for (i = 0; i < t2; i++)
@@ -191,7 +191,7 @@ void x86_sha512_update(struct sha512_ctx *ctx, size_t length,
 	unsigned t2, i;
 
 	if ((res = ctx->index)) {
-		res = SHA512_DATA_SIZE - res;
+		res = SHA512_BLOCK_SIZE - res;
 		if (length < res)
 			res = length;
 		sha512_update(ctx, res, data);
@@ -200,14 +200,14 @@ void x86_sha512_update(struct sha512_ctx *ctx, size_t length,
 	}
 
 	memcpy(octx.h, ctx->state, sizeof(octx.h));
-	memcpy(octx.u.p, ctx->block, SHA512_DATA_SIZE);
+	memcpy(octx.u.p, ctx->block, SHA512_BLOCK_SIZE);
 	octx.num = ctx->index;
 
-	res = length % SHA512_DATA_SIZE;
+	res = length % SHA512_BLOCK_SIZE;
 	length -= res;
 
 	if (length > 0) {
-		t2 = length / SHA512_DATA_SIZE;
+		t2 = length / SHA512_BLOCK_SIZE;
 		sha512_block_data_order(&octx, data, t2);
 
 		for (i = 0; i < t2; i++)
