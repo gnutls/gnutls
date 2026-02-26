@@ -36,10 +36,8 @@ void sha1_block_data_order(void *c, const void *p, size_t len);
 void sha256_block_data_order(void *c, const void *p, size_t len);
 void sha512_block_data_order(void *c, const void *p, size_t len);
 
-typedef void (*update_func)(void *, size_t, const uint8_t *);
-typedef void (*digest_func)(void *, size_t, uint8_t *);
+/* Can't use nettle_set_key_func as it doesn't have the second argument */
 typedef void (*set_key_func)(void *, size_t, const uint8_t *);
-typedef void (*init_func)(void *);
 
 struct aarch64_hash_ctx {
 	union {
@@ -52,9 +50,9 @@ struct aarch64_hash_ctx {
 	void *ctx_ptr;
 	gnutls_digest_algorithm_t algo;
 	size_t length;
-	update_func update;
-	digest_func digest;
-	init_func init;
+	nettle_hash_update_func *update;
+	nettle_hash_digest_func *digest;
+	nettle_hash_init_func *init;
 };
 
 static int wrap_aarch64_hash_update(void *_ctx, const void *text,
@@ -234,41 +232,41 @@ static int _ctx_init(gnutls_digest_algorithm_t algo,
 	switch (algo) {
 	case GNUTLS_DIG_SHA1:
 		sha1_init(&ctx->ctx.sha1);
-		ctx->update = (update_func)aarch64_sha1_update;
-		ctx->digest = (digest_func)sha1_digest;
-		ctx->init = (init_func)sha1_init;
+		ctx->update = (nettle_hash_update_func *)aarch64_sha1_update;
+		ctx->digest = (nettle_hash_digest_func *)sha1_digest;
+		ctx->init = (nettle_hash_init_func *)sha1_init;
 		ctx->ctx_ptr = &ctx->ctx.sha1;
 		ctx->length = SHA1_DIGEST_SIZE;
 		break;
 	case GNUTLS_DIG_SHA224:
 		sha224_init(&ctx->ctx.sha224);
-		ctx->update = (update_func)aarch64_sha256_update;
-		ctx->digest = (digest_func)sha224_digest;
-		ctx->init = (init_func)sha224_init;
+		ctx->update = (nettle_hash_update_func *)aarch64_sha256_update;
+		ctx->digest = (nettle_hash_digest_func *)sha224_digest;
+		ctx->init = (nettle_hash_init_func *)sha224_init;
 		ctx->ctx_ptr = &ctx->ctx.sha224;
 		ctx->length = SHA224_DIGEST_SIZE;
 		break;
 	case GNUTLS_DIG_SHA256:
 		sha256_init(&ctx->ctx.sha256);
-		ctx->update = (update_func)aarch64_sha256_update;
-		ctx->digest = (digest_func)sha256_digest;
-		ctx->init = (init_func)sha256_init;
+		ctx->update = (nettle_hash_update_func *)aarch64_sha256_update;
+		ctx->digest = (nettle_hash_digest_func *)sha256_digest;
+		ctx->init = (nettle_hash_init_func *)sha256_init;
 		ctx->ctx_ptr = &ctx->ctx.sha256;
 		ctx->length = SHA256_DIGEST_SIZE;
 		break;
 	case GNUTLS_DIG_SHA384:
 		sha384_init(&ctx->ctx.sha384);
-		ctx->update = (update_func)aarch64_sha512_update;
-		ctx->digest = (digest_func)sha384_digest;
-		ctx->init = (init_func)sha384_init;
+		ctx->update = (nettle_hash_update_func *)aarch64_sha512_update;
+		ctx->digest = (nettle_hash_digest_func *)sha384_digest;
+		ctx->init = (nettle_hash_init_func *)sha384_init;
 		ctx->ctx_ptr = &ctx->ctx.sha384;
 		ctx->length = SHA384_DIGEST_SIZE;
 		break;
 	case GNUTLS_DIG_SHA512:
 		sha512_init(&ctx->ctx.sha512);
-		ctx->update = (update_func)aarch64_sha512_update;
-		ctx->digest = (digest_func)sha512_digest;
-		ctx->init = (init_func)sha512_init;
+		ctx->update = (nettle_hash_update_func *)aarch64_sha512_update;
+		ctx->digest = (nettle_hash_digest_func *)sha512_digest;
+		ctx->init = (nettle_hash_init_func *)sha512_init;
 		ctx->ctx_ptr = &ctx->ctx.sha512;
 		ctx->length = SHA512_DIGEST_SIZE;
 		break;
