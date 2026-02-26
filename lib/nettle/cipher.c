@@ -67,6 +67,7 @@
 #else
 #include "backport/siv-gcm.h"
 #endif
+#include <nettle/version.h>
 #include "fips.h"
 #include <intprops.h>
 
@@ -1370,7 +1371,7 @@ static int wrap_nettle_cipher_setiv(void *_ctx, const void *iv, size_t iv_size)
 		break;
 	case GNUTLS_CIPHER_SALSA20_256:
 	case GNUTLS_CIPHER_ESTREAM_SALSA20_256:
-		if (iv_size != SALSA20_IV_SIZE)
+		if (iv_size != SALSA20_NONCE_SIZE)
 			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 		break;
 	default:
@@ -1477,8 +1478,12 @@ static int wrap_nettle_cipher_aead_encrypt(void *_ctx, const void *nonce,
 
 		ctx->cipher->encrypt(ctx, plain_size, encr, plain);
 
+#if NETTLE_VERSION_MAJOR >= 4
+		ctx->cipher->tag(ctx->ctx_ptr, ((uint8_t *)encr) + plain_size);
+#else
 		ctx->cipher->tag(ctx->ctx_ptr, tag_size,
 				 ((uint8_t *)encr) + plain_size);
+#endif
 	} else {
 		/* CCM-style cipher */
 
@@ -1557,7 +1562,11 @@ static int wrap_nettle_cipher_aead_decrypt(void *_ctx, const void *nonce,
 
 		ctx->cipher->decrypt(ctx, encr_size, plain, encr);
 
+#if NETTLE_VERSION_MAJOR >= 4
+		ctx->cipher->tag(ctx->ctx_ptr, tag);
+#else
 		ctx->cipher->tag(ctx->ctx_ptr, tag_size, tag);
+#endif
 
 		if (gnutls_memcmp(((uint8_t *)encr) + encr_size, tag,
 				  tag_size) != 0)
@@ -1626,7 +1635,11 @@ static void wrap_nettle_cipher_tag(void *_ctx, void *tag, size_t tag_size)
 {
 	struct nettle_cipher_ctx *ctx = _ctx;
 
+#if NETTLE_VERSION_MAJOR >= 4
+	ctx->cipher->tag(ctx->ctx_ptr, tag);
+#else
 	ctx->cipher->tag(ctx->ctx_ptr, tag_size, tag);
+#endif
 }
 
 static void wrap_nettle_cipher_close(void *_ctx)
