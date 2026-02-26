@@ -44,9 +44,17 @@ void cmac_magma_update(struct cmac_magma_ctx *ctx, size_t length,
 	CMAC64_UPDATE(ctx, magma_encrypt, length, data);
 }
 
+#if NETTLE_VERSION_MAJOR >= 4
+void cmac_magma_digest(struct cmac_magma_ctx *ctx, uint8_t *digest)
+{
+	CMAC64_DIGEST(ctx, magma_encrypt, digest);
+}
+#else
 void cmac_magma_digest(struct cmac_magma_ctx *ctx, size_t length,
 		       uint8_t *digest)
 {
 	CMAC64_DIGEST(ctx, magma_encrypt, length, digest);
 }
+#endif
+
 #endif

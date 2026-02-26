@@ -29,6 +29,7 @@
 #include <nettle/sha2.h>
 #include <nettle/macros.h>
 #include <nettle/nettle-meta.h>
+#include <nettle/version.h>
 #include "sha-aarch64.h"
 #include "aarch64-common.h"
 
@@ -334,7 +335,15 @@ static int wrap_aarch64_hash_output(void *src_ctx, void *digest,
 	if (digestsize < ctx->length)
 		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
 
+#if NETTLE_VERSION_MAJOR >= 4
+	if (digestsize != ctx->length) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+	ctx->digest(ctx->ctx_ptr, digest);
+#else
 	ctx->digest(ctx->ctx_ptr, digestsize, digest);
+#endif
 
 	return 0;
 }
@@ -351,7 +360,12 @@ static int wrap_aarch64_hash_fast(gnutls_digest_algorithm_t algo,
 		return gnutls_assert_val(ret);
 
 	ctx.update(&ctx, text_size, text);
+#if NETTLE_VERSION_MAJOR >= 4
+	ctx.digest(&ctx, digest);
+#else
 	ctx.digest(&ctx, ctx.length, digest);
+#endif
+	zeroize_key(&ctx, sizeof(ctx));
 
 	return 0;
 }

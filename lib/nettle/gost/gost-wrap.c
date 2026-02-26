@@ -92,7 +92,11 @@ void gost28147_key_wrap_cryptopro(const struct gost28147_param *param,
 	gost28147_imit_set_param(&ictx, param);
 	gost28147_imit_set_nonce(&ictx, ukm);
 	gost28147_imit_update(&ictx, GOST28147_KEY_SIZE, cek);
+#if NETTLE_VERSION_MAJOR >= 4
+	gost28147_imit_digest(&ictx, imit);
+#else
 	gost28147_imit_digest(&ictx, GOST28147_IMIT_DIGEST_SIZE, imit);
+#endif
 }
 
 int gost28147_key_unwrap_cryptopro(const struct gost28147_param *param,
@@ -116,7 +120,11 @@ int gost28147_key_unwrap_cryptopro(const struct gost28147_param *param,
 	gost28147_imit_set_param(&ictx, param);
 	gost28147_imit_set_nonce(&ictx, ukm);
 	gost28147_imit_update(&ictx, GOST28147_KEY_SIZE, cek);
+#if NETTLE_VERSION_MAJOR >= 4
+	gost28147_imit_digest(&ictx, mac);
+#else
 	gost28147_imit_digest(&ictx, GOST28147_IMIT_DIGEST_SIZE, mac);
+#endif
 
 	return memeql_sec(mac, imit, GOST28147_IMIT_DIGEST_SIZE);
 }

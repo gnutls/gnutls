@@ -28,6 +28,7 @@
 #include <nettle/sha2.h>
 #include <nettle/hmac.h>
 #include <nettle/macros.h>
+#include <nettle/version.h>
 #include "aes-padlock.h"
 #include <assert.h>
 #include "sha-padlock.h"
@@ -128,8 +129,8 @@ static void _nettle_write_be32(unsigned length, uint8_t *dst, uint32_t *src)
 	}
 }
 
-static void padlock_sha1_digest(struct sha1_ctx *ctx, size_t length,
-				uint8_t *digest)
+static void _padlock_sha1_digest(struct sha1_ctx *ctx, size_t length,
+				 uint8_t *digest)
 {
 	uint64_t bit_count;
 
@@ -147,8 +148,8 @@ static void padlock_sha1_digest(struct sha1_ctx *ctx, size_t length,
 	_nettle_write_be32(length, digest, ctx->state);
 }
 
-static void padlock_sha256_digest(struct sha256_ctx *ctx, size_t length,
-				  uint8_t *digest)
+static void _padlock_sha256_digest(struct sha256_ctx *ctx, size_t length,
+				   uint8_t *digest)
 {
 	uint64_t bit_count;
 
@@ -168,8 +169,8 @@ static void padlock_sha256_digest(struct sha256_ctx *ctx, size_t length,
 	_nettle_write_be32(length, digest, ctx->state);
 }
 
-static void padlock_sha512_digest(struct sha512_ctx *ctx, size_t length,
-				  uint8_t *digest)
+static void _padlock_sha512_digest(struct sha512_ctx *ctx, size_t length,
+				   uint8_t *digest)
 {
 	uint64_t high, low;
 
@@ -208,6 +209,25 @@ static void padlock_sha512_digest(struct sha512_ctx *ctx, size_t length,
 		} while (leftover);
 	}
 }
+
+#if NETTLE_VERSION_MAJOR >= 4
+static void padlock_sha1_digest(struct sha1_ctx *ctx, uint8_t *digest)
+{
+	_padlock_sha1_digest(ctx, SHA1_DIGEST_SIZE, digest);
+}
+static void padlock_sha256_digest(struct sha256_ctx *ctx, uint8_t *digest)
+{
+	_padlock_sha256_digest(ctx, SHA256_DIGEST_SIZE, digest);
+}
+static void padlock_sha512_digest(struct sha512_ctx *ctx, uint8_t *digest)
+{
+	_padlock_sha512_digest(ctx, SHA512_DIGEST_SIZE, digest);
+}
+#else
+#define padlock_sha1_digest _padlock_sha1_digest
+#define padlock_sha256_digest _padlock_sha256_digest
+#define padlock_sha512_digest _padlock_sha512_digest
+#endif
 
 static int _ctx_init(gnutls_digest_algorithm_t algo,
 		     struct padlock_hash_ctx *ctx)
@@ -317,7 +337,15 @@ static int wrap_padlock_hash_output(void *src_ctx, void *digest,
 	if (digestsize < ctx->length)
 		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
 
+#if NETTLE_VERSION_MAJOR >= 4
+	if (digestsize != ctx->length) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+	ctx->digest(ctx->ctx_ptr, digest);
+#else
 	ctx->digest(ctx->ctx_ptr, digestsize, digest);
+#endif
 
 	ctx->init(ctx->ctx_ptr);
 
