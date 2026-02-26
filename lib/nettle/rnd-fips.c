@@ -30,6 +30,7 @@
 #include <nettle/sha2.h>
 #include "atfork.h"
 #include "rnd-common.h"
+#include <nettle/version.h>
 
 /* The block size is chosen arbitrarily */
 #define ENTROPY_BLOCK_SIZE SHA256_DIGEST_SIZE
@@ -103,7 +104,11 @@ static int get_entropy(struct fips_ctx *fctx, uint8_t *buffer, size_t length)
 
 		sha256_init(&ctx);
 		sha256_update(&ctx, sizeof(block), block);
+#if NETTLE_VERSION_MAJOR >= 4
+		sha256_digest(&ctx, hash);
+#else
 		sha256_digest(&ctx, sizeof(hash), hash);
+#endif
 
 		if (memcmp(hash, fctx->entropy_hash, sizeof(hash)) == 0) {
 			_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
@@ -189,7 +194,11 @@ static int _rngfips_ctx_init(struct fips_ctx *fctx)
 	sha256_init(&ctx);
 	sha256_update(&ctx, sizeof(block), block);
 	zeroize_key(block, sizeof(block));
+#if NETTLE_VERSION_MAJOR >= 4
+	sha256_digest(&ctx, fctx->entropy_hash);
+#else
 	sha256_digest(&ctx, sizeof(fctx->entropy_hash), fctx->entropy_hash);
+#endif
 
 	/* normal */
 	ret = drbg_init(fctx, &fctx->normal_context);
