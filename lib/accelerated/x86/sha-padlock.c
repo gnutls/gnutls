@@ -24,9 +24,11 @@
 #include "gnutls_int.h"
 #include "hash_int.h"
 #include "errors.h"
-#include <nettle/sha.h>
+#include <nettle/sha1.h>
+#include <nettle/sha2.h>
 #include <nettle/hmac.h>
 #include <nettle/macros.h>
+#include <nettle/version.h>
 #include "aes-padlock.h"
 #include <assert.h>
 #include "sha-padlock.h"
@@ -34,10 +36,8 @@
 
 #ifdef HAVE_LIBNETTLE
 
-typedef void (*update_func)(void *, size_t, const uint8_t *);
-typedef void (*digest_func)(void *, size_t, uint8_t *);
+/* Can't use nettle_set_key_func as it doesn't have the second argument */
 typedef void (*set_key_func)(void *, size_t, const uint8_t *);
-typedef void (*init_func)(void *);
 
 struct padlock_hash_ctx {
 	union {
@@ -50,9 +50,9 @@ struct padlock_hash_ctx {
 	void *ctx_ptr;
 	gnutls_digest_algorithm_t algo;
 	size_t length;
-	update_func update;
-	digest_func digest;
-	init_func init;
+	nettle_hash_update_func *update;
+	nettle_hash_digest_func *digest;
+	nettle_hash_init_func *init;
 };
 
 static int wrap_padlock_hash_update(void *_ctx, const void *text,
@@ -129,8 +129,8 @@ static void _nettle_write_be32(unsigned length, uint8_t *dst, uint32_t *src)
 	}
 }
 
-static void padlock_sha1_digest(struct sha1_ctx *ctx, size_t length,
-				uint8_t *digest)
+static void _padlock_sha1_digest(struct sha1_ctx *ctx, size_t length,
+				 uint8_t *digest)
 {
 	uint64_t bit_count;
 
@@ -148,8 +148,8 @@ static void padlock_sha1_digest(struct sha1_ctx *ctx, size_t length,
 	_nettle_write_be32(length, digest, ctx->state);
 }
 
-static void padlock_sha256_digest(struct sha256_ctx *ctx, size_t length,
-				  uint8_t *digest)
+static void _padlock_sha256_digest(struct sha256_ctx *ctx, size_t length,
+				   uint8_t *digest)
 {
 	uint64_t bit_count;
 
@@ -169,8 +169,8 @@ static void padlock_sha256_digest(struct sha256_ctx *ctx, size_t length,
 	_nettle_write_be32(length, digest, ctx->state);
 }
 
-static void padlock_sha512_digest(struct sha512_ctx *ctx, size_t length,
-				  uint8_t *digest)
+static void _padlock_sha512_digest(struct sha512_ctx *ctx, size_t length,
+				   uint8_t *digest)
 {
 	uint64_t high, low;
 
@@ -189,8 +189,8 @@ static void padlock_sha512_digest(struct sha512_ctx *ctx, size_t length,
 	/* This is slightly inefficient, as the numbers are converted to
 	   big-endian format, and will be converted back by the compression
 	   function. It's probably not worth the effort to fix this. */
-	WRITE_UINT64(ctx->block + (SHA512_DATA_SIZE - 16), high);
-	WRITE_UINT64(ctx->block + (SHA512_DATA_SIZE - 8), low);
+	WRITE_UINT64(ctx->block + (SHA512_BLOCK_SIZE - 16), high);
+	WRITE_UINT64(ctx->block + (SHA512_BLOCK_SIZE - 8), low);
 	SHA512_COMPRESS(ctx, ctx->block);
 
 	words = length / 8;
@@ -210,47 +210,66 @@ static void padlock_sha512_digest(struct sha512_ctx *ctx, size_t length,
 	}
 }
 
+#if NETTLE_VERSION_MAJOR >= 4
+static void padlock_sha1_digest(struct sha1_ctx *ctx, uint8_t *digest)
+{
+	_padlock_sha1_digest(ctx, SHA1_DIGEST_SIZE, digest);
+}
+static void padlock_sha256_digest(struct sha256_ctx *ctx, uint8_t *digest)
+{
+	_padlock_sha256_digest(ctx, SHA256_DIGEST_SIZE, digest);
+}
+static void padlock_sha512_digest(struct sha512_ctx *ctx, uint8_t *digest)
+{
+	_padlock_sha512_digest(ctx, SHA512_DIGEST_SIZE, digest);
+}
+#else
+#define padlock_sha1_digest _padlock_sha1_digest
+#define padlock_sha256_digest _padlock_sha256_digest
+#define padlock_sha512_digest _padlock_sha512_digest
+#endif
+
 static int _ctx_init(gnutls_digest_algorithm_t algo,
 		     struct padlock_hash_ctx *ctx)
 {
 	switch (algo) {
 	case GNUTLS_DIG_SHA1:
 		sha1_init(&ctx->ctx.sha1);
-		ctx->update = (update_func)padlock_sha1_update;
-		ctx->digest = (digest_func)padlock_sha1_digest;
-		ctx->init = (init_func)sha1_init;
+		ctx->update = (nettle_hash_update_func *)padlock_sha1_update;
+		ctx->digest = (nettle_hash_digest_func *)padlock_sha1_digest;
+		ctx->init = (nettle_hash_init_func *)sha1_init;
 		ctx->ctx_ptr = &ctx->ctx.sha1;
 		ctx->length = SHA1_DIGEST_SIZE;
 		break;
 	case GNUTLS_DIG_SHA224:
 		sha224_init(&ctx->ctx.sha224);
-		ctx->update = (update_func)padlock_sha256_update;
-		ctx->digest = (digest_func)padlock_sha256_digest;
-		ctx->init = (init_func)sha224_init;
+		ctx->update = (nettle_hash_update_func *)padlock_sha256_update;
+		ctx->digest = (nettle_hash_digest_func *)padlock_sha256_digest;
+		ctx->init = (nettle_hash_init_func *)sha224_init;
 		ctx->ctx_ptr = &ctx->ctx.sha224;
 		ctx->length = SHA224_DIGEST_SIZE;
 		break;
 	case GNUTLS_DIG_SHA256:
 		sha256_init(&ctx->ctx.sha256);
-		ctx->update = (update_func)padlock_sha256_update;
-		ctx->digest = (digest_func)padlock_sha256_digest;
-		ctx->init = (init_func)sha256_init;
+		ctx->update = (nettle_hash_update_func *)padlock_sha256_update;
+		ctx->digest = (nettle_hash_digest_func *)padlock_sha256_digest;
+		ctx->init = (nettle_hash_init_func *)sha256_init;
 		ctx->ctx_ptr = &ctx->ctx.sha256;
 		ctx->length = SHA256_DIGEST_SIZE;
 		break;
 	case GNUTLS_DIG_SHA384:
 		sha384_init(&ctx->ctx.sha384);
-		ctx->update = (update_func)padlock_sha512_update;
-		ctx->digest = (digest_func)padlock_sha512_digest;
-		ctx->init = (init_func)sha384_init;
+		ctx->update = (nettle_hash_update_func *)padlock_sha512_update;
+		ctx->digest = (nettle_hash_digest_func *)padlock_sha512_digest;
+		ctx->init = (nettle_hash_init_func *)sha384_init;
 		ctx->ctx_ptr = &ctx->ctx.sha384;
 		ctx->length = SHA384_DIGEST_SIZE;
 		break;
 	case GNUTLS_DIG_SHA512:
 		sha512_init(&ctx->ctx.sha512);
-		ctx->update = (update_func)padlock_sha512_update;
-		ctx->digest = (digest_func)padlock_sha512_digest;
-		ctx->init = (init_func)sha512_init;
+		ctx->update = (nettle_hash_update_func *)padlock_sha512_update;
+		ctx->digest = (nettle_hash_digest_func *)padlock_sha512_digest;
+		ctx->init = (nettle_hash_init_func *)sha512_init;
 		ctx->ctx_ptr = &ctx->ctx.sha512;
 		ctx->length = SHA512_DIGEST_SIZE;
 		break;
@@ -318,7 +337,15 @@ static int wrap_padlock_hash_output(void *src_ctx, void *digest,
 	if (digestsize < ctx->length)
 		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
 
+#if NETTLE_VERSION_MAJOR >= 4
+	if (digestsize != ctx->length) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+	ctx->digest(ctx->ctx_ptr, digest);
+#else
 	ctx->digest(ctx->ctx_ptr, digestsize, digest);
+#endif
 
 	ctx->init(ctx->ctx_ptr);
 

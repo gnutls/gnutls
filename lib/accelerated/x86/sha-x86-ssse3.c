@@ -25,9 +25,11 @@
 #include <gnutls/crypto.h>
 #include "errors.h"
 #include "aes-x86.h"
-#include <nettle/sha.h>
+#include <nettle/sha1.h>
+#include <nettle/sha2.h>
 #include <nettle/macros.h>
 #include <nettle/nettle-meta.h>
+#include <nettle/version.h>
 #include "sha-x86.h"
 #include "x86-common.h"
 
@@ -35,10 +37,8 @@ void sha1_block_data_order(void *c, const void *p, size_t len);
 void sha256_block_data_order(void *c, const void *p, size_t len);
 void sha512_block_data_order(void *c, const void *p, size_t len);
 
-typedef void (*update_func)(void *, size_t, const uint8_t *);
-typedef void (*digest_func)(void *, size_t, uint8_t *);
+/* Can't use nettle_set_key_func as it doesn't have the second argument */
 typedef void (*set_key_func)(void *, size_t, const uint8_t *);
-typedef void (*init_func)(void *);
 
 struct x86_hash_ctx {
 	union {
@@ -51,9 +51,9 @@ struct x86_hash_ctx {
 	void *ctx_ptr;
 	gnutls_digest_algorithm_t algo;
 	size_t length;
-	update_func update;
-	digest_func digest;
-	init_func init;
+	nettle_hash_update_func *update;
+	nettle_hash_digest_func *digest;
+	nettle_hash_init_func *init;
 };
 
 static int wrap_x86_hash_update(void *_ctx, const void *text, size_t textsize)
@@ -82,7 +82,7 @@ void x86_sha1_update(struct sha1_ctx *ctx, size_t length, const uint8_t *data)
 	unsigned t2, i;
 
 	if ((res = ctx->index)) {
-		res = SHA1_DATA_SIZE - res;
+		res = SHA1_BLOCK_SIZE - res;
 		if (length < res)
 			res = length;
 		sha1_update(ctx, res, data);
@@ -96,14 +96,14 @@ void x86_sha1_update(struct sha1_ctx *ctx, size_t length, const uint8_t *data)
 	octx.h3 = ctx->state[3];
 	octx.h4 = ctx->state[4];
 
-	memcpy(octx.data, ctx->block, SHA1_DATA_SIZE);
+	memcpy(octx.data, ctx->block, SHA1_BLOCK_SIZE);
 	octx.num = ctx->index;
 
-	res = length % SHA1_DATA_SIZE;
+	res = length % SHA1_BLOCK_SIZE;
 	length -= res;
 
 	if (length > 0) {
-		t2 = length / SHA1_DATA_SIZE;
+		t2 = length / SHA1_BLOCK_SIZE;
 
 		sha1_block_data_order(&octx, data, t2);
 
@@ -140,7 +140,7 @@ void x86_sha256_update(struct sha256_ctx *ctx, size_t length,
 	unsigned t2, i;
 
 	if ((res = ctx->index)) {
-		res = SHA256_DATA_SIZE - res;
+		res = SHA256_BLOCK_SIZE - res;
 		if (length < res)
 			res = length;
 		sha256_update(ctx, res, data);
@@ -149,14 +149,14 @@ void x86_sha256_update(struct sha256_ctx *ctx, size_t length,
 	}
 
 	memcpy(octx.h, ctx->state, sizeof(octx.h));
-	memcpy(octx.data, ctx->block, SHA256_DATA_SIZE);
+	memcpy(octx.data, ctx->block, SHA256_BLOCK_SIZE);
 	octx.num = ctx->index;
 
-	res = length % SHA256_DATA_SIZE;
+	res = length % SHA256_BLOCK_SIZE;
 	length -= res;
 
 	if (length > 0) {
-		t2 = length / SHA1_DATA_SIZE;
+		t2 = length / SHA1_BLOCK_SIZE;
 		sha256_block_data_order(&octx, data, t2);
 
 		for (i = 0; i < t2; i++)
@@ -191,7 +191,7 @@ void x86_sha512_update(struct sha512_ctx *ctx, size_t length,
 	unsigned t2, i;
 
 	if ((res = ctx->index)) {
-		res = SHA512_DATA_SIZE - res;
+		res = SHA512_BLOCK_SIZE - res;
 		if (length < res)
 			res = length;
 		sha512_update(ctx, res, data);
@@ -200,14 +200,14 @@ void x86_sha512_update(struct sha512_ctx *ctx, size_t length,
 	}
 
 	memcpy(octx.h, ctx->state, sizeof(octx.h));
-	memcpy(octx.u.p, ctx->block, SHA512_DATA_SIZE);
+	memcpy(octx.u.p, ctx->block, SHA512_BLOCK_SIZE);
 	octx.num = ctx->index;
 
-	res = length % SHA512_DATA_SIZE;
+	res = length % SHA512_BLOCK_SIZE;
 	length -= res;
 
 	if (length > 0) {
-		t2 = length / SHA512_DATA_SIZE;
+		t2 = length / SHA512_BLOCK_SIZE;
 		sha512_block_data_order(&octx, data, t2);
 
 		for (i = 0; i < t2; i++)
@@ -230,41 +230,41 @@ static int _ctx_init(gnutls_digest_algorithm_t algo, struct x86_hash_ctx *ctx)
 	switch (algo) {
 	case GNUTLS_DIG_SHA1:
 		sha1_init(&ctx->ctx.sha1);
-		ctx->update = (update_func)x86_sha1_update;
-		ctx->digest = (digest_func)sha1_digest;
-		ctx->init = (init_func)sha1_init;
+		ctx->update = (nettle_hash_update_func *)x86_sha1_update;
+		ctx->digest = (nettle_hash_digest_func *)sha1_digest;
+		ctx->init = (nettle_hash_init_func *)sha1_init;
 		ctx->ctx_ptr = &ctx->ctx.sha1;
 		ctx->length = SHA1_DIGEST_SIZE;
 		break;
 	case GNUTLS_DIG_SHA224:
 		sha224_init(&ctx->ctx.sha224);
-		ctx->update = (update_func)x86_sha256_update;
-		ctx->digest = (digest_func)sha224_digest;
-		ctx->init = (init_func)sha224_init;
+		ctx->update = (nettle_hash_update_func *)x86_sha256_update;
+		ctx->digest = (nettle_hash_digest_func *)sha224_digest;
+		ctx->init = (nettle_hash_init_func *)sha224_init;
 		ctx->ctx_ptr = &ctx->ctx.sha224;
 		ctx->length = SHA224_DIGEST_SIZE;
 		break;
 	case GNUTLS_DIG_SHA256:
 		sha256_init(&ctx->ctx.sha256);
-		ctx->update = (update_func)x86_sha256_update;
-		ctx->digest = (digest_func)sha256_digest;
-		ctx->init = (init_func)sha256_init;
+		ctx->update = (nettle_hash_update_func *)x86_sha256_update;
+		ctx->digest = (nettle_hash_digest_func *)sha256_digest;
+		ctx->init = (nettle_hash_init_func *)sha256_init;
 		ctx->ctx_ptr = &ctx->ctx.sha256;
 		ctx->length = SHA256_DIGEST_SIZE;
 		break;
 	case GNUTLS_DIG_SHA384:
 		sha384_init(&ctx->ctx.sha384);
-		ctx->update = (update_func)x86_sha512_update;
-		ctx->digest = (digest_func)sha384_digest;
-		ctx->init = (init_func)sha384_init;
+		ctx->update = (nettle_hash_update_func *)x86_sha512_update;
+		ctx->digest = (nettle_hash_digest_func *)sha384_digest;
+		ctx->init = (nettle_hash_init_func *)sha384_init;
 		ctx->ctx_ptr = &ctx->ctx.sha384;
 		ctx->length = SHA384_DIGEST_SIZE;
 		break;
 	case GNUTLS_DIG_SHA512:
 		sha512_init(&ctx->ctx.sha512);
-		ctx->update = (update_func)x86_sha512_update;
-		ctx->digest = (digest_func)sha512_digest;
-		ctx->init = (init_func)sha512_init;
+		ctx->update = (nettle_hash_update_func *)x86_sha512_update;
+		ctx->digest = (nettle_hash_digest_func *)sha512_digest;
+		ctx->init = (nettle_hash_init_func *)sha512_init;
 		ctx->ctx_ptr = &ctx->ctx.sha512;
 		ctx->length = SHA512_DIGEST_SIZE;
 		break;
@@ -331,7 +331,15 @@ static int wrap_x86_hash_output(void *src_ctx, void *digest, size_t digestsize)
 	if (digestsize < ctx->length)
 		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
 
+#if NETTLE_VERSION_MAJOR >= 4
+	if (digestsize != ctx->length) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+	ctx->digest(ctx->ctx_ptr, digest);
+#else
 	ctx->digest(ctx->ctx_ptr, digestsize, digest);
+#endif
 
 	return 0;
 }
@@ -347,7 +355,12 @@ static int wrap_x86_hash_fast(gnutls_digest_algorithm_t algo, const void *text,
 		return gnutls_assert_val(ret);
 
 	ctx.update(&ctx, text_size, text);
+#if NETTLE_VERSION_MAJOR >= 4
+	ctx.digest(&ctx, digest);
+#else
 	ctx.digest(&ctx, ctx.length, digest);
+#endif
+	zeroize_key(&ctx, sizeof(ctx));
 
 	return 0;
 }

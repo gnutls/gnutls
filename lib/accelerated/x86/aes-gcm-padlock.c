@@ -35,6 +35,7 @@
 #include "x86-common.h"
 #include <byteswap.h>
 #include <nettle/gcm.h>
+#include <nettle/version.h>
 #include "aes-padlock.h"
 
 #define GCM_BLOCK_SIZE 16
@@ -176,8 +177,14 @@ static int aes_gcm_auth(void *_ctx, const void *src, size_t src_size)
 static void aes_gcm_tag(void *_ctx, void *tag, size_t tagsize)
 {
 	struct gcm_padlock_aes_ctx *ctx = _ctx;
+	uint8_t buffer[GCM_DIGEST_SIZE];
 
-	GCM_DIGEST(&ctx->inner, padlock_aes_encrypt, tagsize, tag);
+#if NETTLE_VERSION_MAJOR >= 4
+	GCM_DIGEST(&ctx->inner, padlock_aes_encrypt, buffer);
+#else
+	GCM_DIGEST(&ctx->inner, padlock_aes_encrypt, sizeof(buffer), buffer);
+#endif
+	memcpy(tag, buffer, tagsize);
 }
 
 #include "aes-gcm-aead.h"

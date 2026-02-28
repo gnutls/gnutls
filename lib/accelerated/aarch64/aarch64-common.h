@@ -28,7 +28,7 @@
 	{ #name,                                      \
 	  sizeof(struct name##_ctx),                  \
 	  NAME##_DIGEST_SIZE,                         \
-	  NAME##_DATA_SIZE,                           \
+	  NAME##_BLOCK_SIZE,                          \
 	  (nettle_hash_init_func *)name##_init,       \
 	  (nettle_hash_update_func *)update_func,     \
 	  (nettle_hash_digest_func *)digest_func }

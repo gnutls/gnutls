@@ -43,6 +43,8 @@
 #ifndef HAVE_NETTLE_CMAC_MAGMA_UPDATE
 #include "magma.h"
 
+#include <nettle/version.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -58,8 +60,12 @@ void cmac_magma_set_key(struct cmac_magma_ctx *ctx, const uint8_t *key);
 void cmac_magma_update(struct cmac_magma_ctx *ctx, size_t length,
 		       const uint8_t *data);
 
+#if NETTLE_VERSION_MAJOR >= 4
+void cmac_magma_digest(struct cmac_magma_ctx *ctx, uint8_t *digest);
+#else
 void cmac_magma_digest(struct cmac_magma_ctx *ctx, size_t length,
 		       uint8_t *digest);
+#endif
 
 #ifdef __cplusplus
 }
@@ -83,8 +89,12 @@ void cmac_kuznyechik_set_key(struct cmac_kuznyechik_ctx *ctx,
 void cmac_kuznyechik_update(struct cmac_kuznyechik_ctx *ctx, size_t length,
 			    const uint8_t *data);
 
+#if NETTLE_VERSION_MAJOR >= 4
+void cmac_kuznyechik_digest(struct cmac_kuznyechik_ctx *ctx, uint8_t *digest);
+#else
 void cmac_kuznyechik_digest(struct cmac_kuznyechik_ctx *ctx, size_t length,
 			    uint8_t *digest);
+#endif
 
 #ifdef __cplusplus
 }

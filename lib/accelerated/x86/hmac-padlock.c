@@ -27,7 +27,8 @@
 #include "gnutls_int.h"
 #include "hash_int.h"
 #include "errors.h"
-#include <nettle/sha.h>
+#include <nettle/sha1.h>
+#include <nettle/sha2.h>
 #include <nettle/hmac.h>
 #include <nettle/macros.h>
 #include <nettle/memxor.h>
@@ -35,7 +36,7 @@
 #include "sha-padlock.h"
 #include "algorithms.h"
 
-#ifdef HAVE_LIBNETTLE
+#if defined(HAVE_LIBNETTLE) && defined(HMAC_SET_KEY)
 
 #define IPAD 0x36
 #define OPAD 0x5c
@@ -280,39 +281,39 @@ static int wrap_padlock_hmac_fast(gnutls_mac_algorithm_t algo,
 {
 	if (algo == GNUTLS_MAC_SHA1 || algo == GNUTLS_MAC_SHA256) {
 		unsigned char *pad;
-		unsigned char pad2[SHA1_DATA_SIZE + MAX_SHA_DIGEST_SIZE];
+		unsigned char pad2[SHA1_BLOCK_SIZE + MAX_SHA_DIGEST_SIZE];
 		unsigned char hkey[MAX_SHA_DIGEST_SIZE];
 		unsigned int digest_size =
 			_gnutls_mac_get_algo_len(mac_to_entry(algo));
 
-		if (key_size > SHA1_DATA_SIZE) {
+		if (key_size > SHA1_BLOCK_SIZE) {
 			wrap_padlock_hash_fast((gnutls_digest_algorithm_t)algo,
 					       key, key_size, hkey);
 			key = hkey;
 			key_size = digest_size;
 		}
 
-		pad = gnutls_malloc(text_size + SHA1_DATA_SIZE);
+		pad = gnutls_malloc(text_size + SHA1_BLOCK_SIZE);
 		if (pad == NULL)
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-		memset(pad, IPAD, SHA1_DATA_SIZE);
+		memset(pad, IPAD, SHA1_BLOCK_SIZE);
 		memxor(pad, key, key_size);
 
-		memcpy(&pad[SHA1_DATA_SIZE], text, text_size);
+		memcpy(&pad[SHA1_BLOCK_SIZE], text, text_size);
 
 		wrap_padlock_hash_fast((gnutls_digest_algorithm_t)algo, pad,
-				       text_size + SHA1_DATA_SIZE,
-				       &pad2[SHA1_DATA_SIZE]);
+				       text_size + SHA1_BLOCK_SIZE,
+				       &pad2[SHA1_BLOCK_SIZE]);
 
-		zeroize_key(pad, text_size + SHA1_DATA_SIZE);
+		zeroize_key(pad, text_size + SHA1_BLOCK_SIZE);
 		gnutls_free(pad);
 
-		memset(pad2, OPAD, SHA1_DATA_SIZE);
+		memset(pad2, OPAD, SHA1_BLOCK_SIZE);
 		memxor(pad2, key, key_size);
 
 		wrap_padlock_hash_fast((gnutls_digest_algorithm_t)algo, pad2,
-				       digest_size + SHA1_DATA_SIZE, digest);
+				       digest_size + SHA1_BLOCK_SIZE, digest);
 
 		zeroize_key(pad2, sizeof(pad2));
 		zeroize_key(hkey, sizeof(hkey));
@@ -358,4 +359,4 @@ const gnutls_crypto_mac_st _gnutls_hmac_sha_padlock = {
 	.fast = wrap_padlock_hmac_fast,
 };
 
-#endif /* HAVE_LIBNETTLE */
+#endif /* HAVE_LIBNETTLE && HMAC_SET_KEY */

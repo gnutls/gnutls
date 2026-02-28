@@ -40,6 +40,7 @@
 #ifndef HAVE_NETTLE_GOST28147_SET_KEY
 
 #include <nettle/nettle-types.h>
+#include <nettle/version.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -174,8 +175,12 @@ void gost28147_imit_set_param(struct gost28147_imit_ctx *ctx,
 void gost28147_imit_update(struct gost28147_imit_ctx *ctx, size_t length,
 			   const uint8_t *data);
 
+#if NETTLE_VERSION_MAJOR >= 4
+void gost28147_imit_digest(struct gost28147_imit_ctx *ctx, uint8_t *digest);
+#else
 void gost28147_imit_digest(struct gost28147_imit_ctx *ctx, size_t length,
 			   uint8_t *digest);
+#endif
 
 #ifdef __cplusplus
 }

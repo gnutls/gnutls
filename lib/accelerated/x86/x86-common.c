@@ -35,6 +35,7 @@
 #include "x86-common.h"
 #ifdef HAVE_LIBNETTLE
 #include <nettle/aes.h> /* for key generation in 192 and 256 bits */
+#include <nettle/hmac.h> /* to check if custom hmac is supported */
 #include "sha-padlock.h"
 #endif
 #include "aes-padlock.h"
@@ -459,6 +460,7 @@ static void register_x86_padlock_crypto(unsigned capabilities)
 			gnutls_assert();
 		}
 
+#if defined(HAVE_LIBNETTLE) && defined(HMAC_SET_KEY)
 		ret = gnutls_crypto_single_mac_register(
 			GNUTLS_MAC_SHA1, 80, &_gnutls_hmac_sha_x86_ssse3, 0);
 		if (ret < 0)
@@ -473,6 +475,7 @@ static void register_x86_padlock_crypto(unsigned capabilities)
 			GNUTLS_MAC_SHA256, 80, &_gnutls_hmac_sha_x86_ssse3, 0);
 		if (ret < 0)
 			gnutls_assert();
+#endif
 
 		ret = gnutls_crypto_single_digest_register(
 			GNUTLS_DIG_SHA384, 80, &_gnutls_sha_x86_ssse3, 0);
@@ -483,6 +486,7 @@ static void register_x86_padlock_crypto(unsigned capabilities)
 			GNUTLS_DIG_SHA512, 80, &_gnutls_sha_x86_ssse3, 0);
 		if (ret < 0)
 			gnutls_assert();
+#if defined(HAVE_LIBNETTLE) && defined(HMAC_SET_KEY)
 		ret = gnutls_crypto_single_mac_register(
 			GNUTLS_MAC_SHA384, 80, &_gnutls_hmac_sha_x86_ssse3, 0);
 		if (ret < 0)
@@ -492,6 +496,7 @@ static void register_x86_padlock_crypto(unsigned capabilities)
 			GNUTLS_MAC_SHA512, 80, &_gnutls_hmac_sha_x86_ssse3, 0);
 		if (ret < 0)
 			gnutls_assert();
+#endif
 	}
 
 	if (check_optimized_aes()) {
@@ -692,6 +697,7 @@ static void register_x86_padlock_crypto(unsigned capabilities)
 				gnutls_assert();
 			}
 
+#if defined(HAVE_LIBNETTLE) && defined(HMAC_SET_KEY)
 			ret = gnutls_crypto_single_mac_register(
 				GNUTLS_MAC_SHA384, 80,
 				&_gnutls_hmac_sha_padlock, 0);
@@ -705,6 +711,7 @@ static void register_x86_padlock_crypto(unsigned capabilities)
 			if (ret < 0) {
 				gnutls_assert();
 			}
+#endif
 		}
 
 		ret = gnutls_crypto_single_digest_register(
@@ -725,6 +732,7 @@ static void register_x86_padlock_crypto(unsigned capabilities)
 			gnutls_assert();
 		}
 
+#if defined(HAVE_LIBNETTLE) && defined(HMAC_SET_KEY)
 		ret = gnutls_crypto_single_mac_register(
 			GNUTLS_MAC_SHA1, 90, &_gnutls_hmac_sha_padlock, 0);
 		if (ret < 0) {
@@ -738,6 +746,7 @@ static void register_x86_padlock_crypto(unsigned capabilities)
 		if (ret < 0) {
 			gnutls_assert();
 		}
+#endif
 	} else if (phe) {
 		/* Original padlock PHE. Does not support incremental operations.
 		 */
@@ -755,6 +764,7 @@ static void register_x86_padlock_crypto(unsigned capabilities)
 			gnutls_assert();
 		}
 
+#if defined(HAVE_LIBNETTLE) && defined(HMAC_SET_KEY)
 		ret = gnutls_crypto_single_mac_register(
 			GNUTLS_MAC_SHA1, 90, &_gnutls_hmac_sha_padlock_oneshot,
 			0);
@@ -768,6 +778,7 @@ static void register_x86_padlock_crypto(unsigned capabilities)
 		if (ret < 0) {
 			gnutls_assert();
 		}
+#endif
 	}
 #endif
 
@@ -910,6 +921,7 @@ static void register_x86_intel_crypto(unsigned capabilities)
 			gnutls_assert();
 		}
 
+#if defined(HAVE_LIBNETTLE) && defined(HMAC_SET_KEY)
 		ret = gnutls_crypto_single_mac_register(
 			GNUTLS_MAC_SHA1, 80, &_gnutls_hmac_sha_x86_ssse3, 0);
 		if (ret < 0)
@@ -924,6 +936,7 @@ static void register_x86_intel_crypto(unsigned capabilities)
 			GNUTLS_MAC_SHA256, 80, &_gnutls_hmac_sha_x86_ssse3, 0);
 		if (ret < 0)
 			gnutls_assert();
+#endif
 
 		ret = gnutls_crypto_single_digest_register(
 			GNUTLS_DIG_SHA384, 80, &_gnutls_sha_x86_ssse3, 0);
@@ -934,6 +947,7 @@ static void register_x86_intel_crypto(unsigned capabilities)
 			GNUTLS_DIG_SHA512, 80, &_gnutls_sha_x86_ssse3, 0);
 		if (ret < 0)
 			gnutls_assert();
+#if defined(HAVE_LIBNETTLE) && defined(HMAC_SET_KEY)
 		ret = gnutls_crypto_single_mac_register(
 			GNUTLS_MAC_SHA384, 80, &_gnutls_hmac_sha_x86_ssse3, 0);
 		if (ret < 0)
@@ -943,6 +957,7 @@ static void register_x86_intel_crypto(unsigned capabilities)
 			GNUTLS_MAC_SHA512, 80, &_gnutls_hmac_sha_x86_ssse3, 0);
 		if (ret < 0)
 			gnutls_assert();
+#endif
 	}
 
 	if (check_optimized_aes()) {

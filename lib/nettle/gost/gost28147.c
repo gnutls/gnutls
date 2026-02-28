@@ -8631,8 +8631,8 @@ void gost28147_imit_update(struct gost28147_imit_ctx *ctx, size_t length,
 	MD_UPDATE(ctx, length, data, gost28147_imit_compress, ctx->count++);
 }
 
-void gost28147_imit_digest(struct gost28147_imit_ctx *ctx, size_t length,
-			   uint8_t *digest)
+static void _gost28147_imit_digest(struct gost28147_imit_ctx *ctx,
+				   size_t length, uint8_t *digest)
 {
 	assert(length <= GOST28147_IMIT_DIGEST_SIZE);
 	const uint8_t zero[GOST28147_IMIT_BLOCK_SIZE] = { 0 };
@@ -8650,4 +8650,18 @@ void gost28147_imit_digest(struct gost28147_imit_ctx *ctx, size_t length,
 	_nettle_write_le32(length, digest, ctx->state);
 	_gost28147_imit_reinit(ctx);
 }
+
+#if NETTLE_VERSION_MAJOR >= 4
+void gost28147_imit_digest(struct gost28147_imit_ctx *ctx, uint8_t *digest)
+{
+	_gost28147_imit_digest(ctx, GOST28147_IMIT_DIGEST_SIZE, digest);
+}
+#else
+void gost28147_imit_digest(struct gost28147_imit_ctx *ctx, size_t length,
+			   uint8_t *digest)
+{
+	_gost28147_imit_digest(ctx, length, digest);
+}
+#endif
+
 #endif

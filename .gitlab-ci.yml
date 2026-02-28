@@ -104,7 +104,7 @@ default:
   variables:
     COMPILER: clang
     NETTLE_DIR: nettle
-    NETTLE_BRANCH: release-3.10-fixes
+    NETTLE_BRANCH: master
 
 .debian:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$DEBIAN_BUILD
@@ -422,15 +422,16 @@ fedora-legacy/test:
   needs:
     - fedora/bootstrap
   script:
+    - dnf -y remove --no-autoremove nettle-devel # keep gmp-devel
     - git clone --depth 1 --branch $NETTLE_BRANCH https://gitlab.com/gnutls/nettle.git nettle-git
     - pushd nettle-git
     - rm -rf .git               # for artifacts:untracked to work
     - ./.bootstrap
-    - ./configure --disable-documentation --prefix=${PWD}/$NETTLE_DIR $NETTLE_CONFIGURE_ARGS
+    - ./configure --disable-documentation --prefix=${PWD}/$NETTLE_DIR --libdir='${prefix}/lib' $NETTLE_CONFIGURE_ARGS
     - make -j$BUILDJOBS
     - make -j$BUILDJOBS install
     - popd
-    - PKG_CONFIG_PATH=${PWD}/nettle-git/$NETTLE_DIR/lib64/pkgconfig dash ./configure --disable-gcc-warnings --disable-full-test-suite --disable-doc --with-pkcs12-iter-count=10000
+    - PKG_CONFIG_PATH=${PWD}/nettle-git/$NETTLE_DIR/lib/pkgconfig LD_LIBRARY_PATH=${PWD}/nettle-git/$NETTLE_DIR/lib dash ./configure --disable-gcc-warnings --disable-full-test-suite --disable-doc --with-pkcs12-iter-count=10000
     - make -j$BUILDJOBS
     - make -j$BUILDJOBS check TESTS=""
 
@@ -439,21 +440,21 @@ fedora-legacy/test:
     - .test
     - .fedora-nettle
 
-# fedora-nettle/build:
-#   extends:
-#     - .fedora-nettle/build
-#   variables:
-#     NETTLE_CONFIGURE_ARGS: ""
+fedora-nettle/build:
+  extends:
+    - .fedora-nettle/build
+  variables:
+    NETTLE_CONFIGURE_ARGS: ""
 
-# fedora-nettle/test:
-#   extends:
-#     - .fedora-nettle/test
-#   dependencies:
-#     - fedora-nettle/build
-#   needs:
-#     - fedora-nettle/build
-#   script:
-#     - PKG_CONFIG_PATH=${PWD}/nettle-git/$NETTLE_DIR/lib64/pkgconfig LD_LIBRARY_PATH=${PWD}/nettle-git/$NETTLE_DIR/lib64 make -j$CHECKJOBS check
+fedora-nettle/test:
+  extends:
+    - .fedora-nettle/test
+  dependencies:
+    - fedora-nettle/build
+  needs:
+    - fedora-nettle/build
+  script:
+    - PKG_CONFIG_PATH=${PWD}/nettle-git/$NETTLE_DIR/lib/pkgconfig LD_LIBRARY_PATH=${PWD}/nettle-git/$NETTLE_DIR/lib make -j$CHECKJOBS check
 
 # fedora-nettle-minigmp/build:
 #   extends:

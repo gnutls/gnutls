@@ -1,7 +1,8 @@
 #ifndef GNUTLS_LIB_ACCELERATED_X86_SHA_X86_H
 #define GNUTLS_LIB_ACCELERATED_X86_SHA_X86_H
 
-#include <nettle/sha.h>
+#include <nettle/sha1.h>
+#include <nettle/sha2.h>
 
 extern const struct nettle_hash x86_sha1;
 extern const struct nettle_hash x86_sha224;

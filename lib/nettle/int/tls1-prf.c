@@ -38,6 +38,7 @@
 #include "int/tls1-prf.h"
 #include <nettle/sha1.h>
 #include <nettle/md5.h>
+#include <nettle/version.h>
 
 /* The RFC2246 P_hash() function. The mac_ctx is expected to
  * be initialized and key set to be the secret key.
@@ -50,6 +51,7 @@ static void P_hash(void *mac_ctx, nettle_hash_update_func *update,
 	uint8_t Atmp[MAX_HASH_SIZE];
 	ssize_t left;
 	unsigned started = 0;
+	uint8_t tmp[MAX_HASH_SIZE];
 
 	/* round up */
 	left = dst_length;
@@ -63,7 +65,11 @@ static void P_hash(void *mac_ctx, nettle_hash_update_func *update,
 		} else {
 			update(mac_ctx, digest_size, Atmp);
 		}
+#if NETTLE_VERSION_MAJOR >= 4
+		digest(mac_ctx, Atmp); /* store A(i) */
+#else
 		digest(mac_ctx, digest_size, Atmp); /* store A(i) */
+#endif
 
 		update(mac_ctx, digest_size, Atmp); /* hash A(i) */
 		update(mac_ctx, label_size,
@@ -73,7 +79,12 @@ static void P_hash(void *mac_ctx, nettle_hash_update_func *update,
 		if (left < (ssize_t)digest_size)
 			digest_size = left;
 
-		digest(mac_ctx, digest_size, dst);
+#if NETTLE_VERSION_MAJOR >= 4
+		digest(mac_ctx, tmp);
+#else
+		digest(mac_ctx, digest_size, tmp);
+#endif
+		memcpy(dst, tmp, digest_size);
 
 		left -= digest_size;
 		dst += digest_size;

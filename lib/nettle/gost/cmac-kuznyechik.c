@@ -44,9 +44,17 @@ void cmac_kuznyechik_update(struct cmac_kuznyechik_ctx *ctx, size_t length,
 	CMAC128_UPDATE(ctx, kuznyechik_encrypt, length, data);
 }
 
+#if NETTLE_VERSION_MAJOR >= 4
+void cmac_kuznyechik_digest(struct cmac_kuznyechik_ctx *ctx, uint8_t *digest)
+{
+	CMAC128_DIGEST(ctx, kuznyechik_encrypt, digest);
+}
+#else
 void cmac_kuznyechik_digest(struct cmac_kuznyechik_ctx *ctx, size_t length,
 			    uint8_t *digest)
 {
 	CMAC128_DIGEST(ctx, kuznyechik_encrypt, length, digest);
 }
+#endif
+
 #endif
