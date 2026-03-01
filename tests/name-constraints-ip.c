@@ -749,6 +749,9 @@ static int teardown(void **state)
 
 int main(int argc, char **argv)
 {
+	int ret;
+	gnutls_global_init();
+
 	const struct CMUnitTest tests[] = {
 		cmocka_unit_test_setup_teardown(
 			check_generation_reading_basic_checking, setup,
@@ -773,5 +776,7 @@ int main(int argc, char **argv)
 		cmocka_unit_test_setup_teardown(
 			check_ipv4v6_single_constraint_each, setup, teardown)
 	};
-	return cmocka_run_group_tests(tests, NULL, NULL);
+	ret = cmocka_run_group_tests(tests, NULL, NULL);
+	gnutls_global_deinit();
+	return ret;
 }
