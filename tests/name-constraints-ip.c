@@ -51,11 +51,12 @@ extern int
 _gnutls_x509_name_constraints_merge(gnutls_x509_name_constraints_t nc,
 				    gnutls_x509_name_constraints_t nc2);
 
-static void check_for_error(int ret)
-{
-	if (ret != GNUTLS_E_SUCCESS)
-		fail_msg("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
-}
+#define check_for_error(ret)                                    \
+	do {                                                    \
+		if (ret != GNUTLS_E_SUCCESS)                    \
+			fail_msg("error in %d: %s\n", __LINE__, \
+				 gnutls_strerror(ret));         \
+	} while (0)
 
 #define IP_ACCEPTED 1
 #define IP_REJECTED 0
