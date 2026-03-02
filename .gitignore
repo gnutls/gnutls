@@ -192,6 +192,8 @@ fuzz/*_fuzzer
 *.gcda
 *.gcno
 *.gcov
+.gitlab-ci-local
+.gitlab-ci-local.yml
 /gl/*
 !/gl/override
 /GNUmakefile
