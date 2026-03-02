@@ -794,13 +794,11 @@ mingw32/bootstrap:
   extends:
     - .bootstrap
     - .mingw32
-  when: manual
 
 mingw64/bootstrap:
   extends:
     - .bootstrap
     - .mingw64
-  when: manual
 
 mingw64/build:
   extends:
