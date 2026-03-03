@@ -828,13 +828,6 @@ LIBS="$LIBS $NETTLE_LIBS"
 AC_CHECK_FUNCS(nettle_cmac_kuznyechik_update)
 LIBS=$save_LIBS
 
-# Check for SIV-GCM
-save_LIBS=$LIBS
-LIBS="$LIBS $NETTLE_LIBS"
-AC_CHECK_FUNCS(nettle_siv_gcm_encrypt_message)
-LIBS=$save_LIBS
-AM_CONDITIONAL([NEED_SIV_GCM], [test "$ac_cv_func_nettle_siv_gcm_encrypt_message" != yes])
-
 # Check for RSA-OAEP
 save_LIBS=$LIBS
 LIBS="$LIBS $HOGWEED_LIBS $NETTLE_LIBS $GMP_LIBS"

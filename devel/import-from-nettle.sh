@@ -11,13 +11,6 @@ DST=$srcdir/lib/nettle/backport
 
 IMPORTS="
 block-internal.h
-bswap-internal.h
-ctr-internal.h
-ctr.h
-ctr16.c
-ghash-internal.h
-ghash-set-key.c
-ghash-update.c
 gmp-glue.c
 gmp-glue.h
 md-internal.h
@@ -31,12 +24,6 @@ rsa-oaep-encrypt.c
 rsa-oaep-decrypt.c
 rsa-sec-compute-root.c
 rsa-sign-tr.c
-siv-gcm-aes128.c
-siv-gcm-aes256.c
-siv-gcm.c
-siv-gcm.h
-siv-ghash-set-key.c
-siv-ghash-update.c
 sha3.c
 sha3-internal.h
 sha3-shake.c
@@ -46,13 +33,10 @@ write-le64.c
 "
 
 PUBLIC="
-aes.h
 bignum.h
-ctr.h
 des.h
 ecc-curve.h
 ecc.h
-gcm.h
 macros.h
 md5.h
 memops.h
@@ -145,14 +129,6 @@ for f in $IMPORTS; do
 	  -e '/^#include <nettle\/sha3\.h>/a\
 #include "int/sha3-shake.h"
 ' \
-	  $dst > $dst-t && mv $dst-t $dst
-	;;
-    esac
-    # Avoid -Wcast-align=strict warnings
-    case $dst in
-      */ctr16.c)
-	sed \
-	  -e 's/\((union nettle_block16 \*) \)\(dst\)/\1(void *) \2/' \
 	  $dst > $dst-t && mv $dst-t $dst
 	;;
     esac

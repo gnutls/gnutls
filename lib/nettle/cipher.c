@@ -62,11 +62,7 @@
 #include <nettle/cfb.h>
 #include <nettle/xts.h>
 #include <nettle/siv-cmac.h>
-#ifdef HAVE_NETTLE_SIV_GCM_ENCRYPT_MESSAGE
 #include <nettle/siv-gcm.h>
-#else
-#include "backport/siv-gcm.h"
-#endif
 #include <nettle/version.h>
 #include "fips.h"
 #include <intprops.h>
