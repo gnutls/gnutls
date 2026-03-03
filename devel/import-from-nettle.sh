@@ -10,22 +10,9 @@ SRC=$srcdir/devel/nettle
 DST=$srcdir/lib/nettle/backport
 
 IMPORTS="
-block-internal.h
 "
 
 PUBLIC="
-bignum.h
-des.h
-ecc-curve.h
-ecc.h
-macros.h
-md5.h
-memops.h
-memxor.h
-nettle-meta.h
-nettle-types.h
-sha1.h
-sha2.h
 "
 
 test -d $DST || mkdir $DST
@@ -74,15 +61,6 @@ for f in $IMPORTS; do
 	    $dst > $dst-t && \
 	  mv $dst-t $dst
       ;;
-    esac
-    case $dst in
-      */*.[ch])
-	sed \
-	  -e '/^#include <nettle\/nettle-types\.h>/a\
-#include "block8.h"
-' \
-	  $dst > $dst-t && mv $dst-t $dst
-	;;
     esac
   else
     echo "Error: $src not found" 1>&2
