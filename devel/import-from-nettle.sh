@@ -11,14 +11,6 @@ DST=$srcdir/lib/nettle/backport
 
 IMPORTS="
 block-internal.h
-md-internal.h
-nettle-write.h
-sha3.c
-sha3-internal.h
-sha3-shake.c
-shake128.c
-shake256.c
-write-le64.c
 "
 
 PUBLIC="
@@ -34,7 +26,6 @@ nettle-meta.h
 nettle-types.h
 sha1.h
 sha2.h
-sha3.h
 "
 
 test -d $DST || mkdir $DST
@@ -89,15 +80,6 @@ for f in $IMPORTS; do
 	sed \
 	  -e '/^#include <nettle\/nettle-types\.h>/a\
 #include "block8.h"
-' \
-	  $dst > $dst-t && mv $dst-t $dst
-	;;
-    esac
-    case $dst in
-      */shake*.c)
-	sed \
-	  -e '/^#include <nettle\/sha3\.h>/a\
-#include "int/sha3-shake.h"
 ' \
 	  $dst > $dst-t && mv $dst-t $dst
 	;;
