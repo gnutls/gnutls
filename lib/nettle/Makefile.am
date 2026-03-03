@@ -81,9 +81,7 @@ endif
 if ENABLE_GOST
 libcrypto_la_SOURCES += \
 	gost/nettle-write.h gost/write-le32.c \
-	gost/gost28147.c gost/gost28147.h gost/gost-wrap.c \
-	gost/streebog.c gost/streebog.h gost/streebog-meta.c \
-	gost/hmac-streebog.c gost/hmac-gost.h
+	gost/gost28147.c gost/gost28147.h gost/gost-wrap.c
 
 libcrypto_la_SOURCES += \
 	gost/bignum-le.c gost/bignum-le.h

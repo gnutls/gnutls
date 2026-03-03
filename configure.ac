@@ -789,12 +789,6 @@ LIBS="$LIBS $NETTLE_LIBS"
 AC_CHECK_FUNCS(nettle_gost28147_set_key)
 LIBS=$save_LIBS
 
-# Check for Streebog support
-save_LIBS=$LIBS
-LIBS="$LIBS $NETTLE_LIBS"
-AC_CHECK_FUNCS(nettle_streebog512_update)
-LIBS=$save_LIBS
-
 # Check for Magma
 save_LIBS=$LIBS
 LIBS="$LIBS $NETTLE_LIBS"

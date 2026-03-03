@@ -38,7 +38,6 @@
 #include <nettle/pbkdf2.h>
 #include <nettle/cmac.h>
 #if ENABLE_GOST
-#include "gost/hmac-gost.h"
 #ifndef HAVE_NETTLE_GOST28147_SET_KEY
 #include "gost/gost28147.h"
 #endif
