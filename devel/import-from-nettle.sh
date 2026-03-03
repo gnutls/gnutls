@@ -11,19 +11,8 @@ DST=$srcdir/lib/nettle/backport
 
 IMPORTS="
 block-internal.h
-gmp-glue.c
-gmp-glue.h
 md-internal.h
 nettle-write.h
-oaep.c
-oaep.h
-pss-mgf1.h
-pss-mgf1.c
-rsa-internal.h
-rsa-oaep-encrypt.c
-rsa-oaep-decrypt.c
-rsa-sec-compute-root.c
-rsa-sign-tr.c
 sha3.c
 sha3-internal.h
 sha3-shake.c
@@ -43,7 +32,6 @@ memops.h
 memxor.h
 nettle-meta.h
 nettle-types.h
-rsa.h
 sha1.h
 sha2.h
 sha3.h
@@ -101,24 +89,6 @@ for f in $IMPORTS; do
 	sed \
 	  -e '/^#include <nettle\/nettle-types\.h>/a\
 #include "block8.h"
-' \
-	  $dst > $dst-t && mv $dst-t $dst
-	;;
-    esac
-    case $dst in
-      */rsa-sign-tr.c)
-	sed \
-	  -e '/^#include <nettle\/rsa\.h>/i\
-#define nettle_rsa_compute_root_tr _gnutls_nettle_backport_rsa_compute_root_tr\
-' \
-	  $dst > $dst-t && mv $dst-t $dst
-	;;
-    esac
-    case $dst in
-      */rsa-oaep-*.c)
-	sed \
-	  -e '/^#include <nettle\/rsa\.h>/a\
-#include "int/rsa-oaep.h"
 ' \
 	  $dst > $dst-t && mv $dst-t $dst
 	;;

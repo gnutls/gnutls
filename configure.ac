@@ -828,13 +828,6 @@ LIBS="$LIBS $NETTLE_LIBS"
 AC_CHECK_FUNCS(nettle_cmac_kuznyechik_update)
 LIBS=$save_LIBS
 
-# Check for RSA-OAEP
-save_LIBS=$LIBS
-LIBS="$LIBS $HOGWEED_LIBS $NETTLE_LIBS $GMP_LIBS"
-AC_CHECK_FUNCS(nettle_rsa_oaep_sha256_encrypt)
-LIBS=$save_LIBS
-AM_CONDITIONAL([NEED_RSA_OAEP], [test "$ac_cv_func_nettle_rsa_oaep_sha256_encrypt" != yes])
-
 # Check for specialized AES-CBC encryption
 save_LIBS=$LIBS
 LIBS="$LIBS $NETTLE_LIBS"
