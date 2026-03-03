@@ -498,8 +498,6 @@ static void _xts_aes256_decrypt(struct nettle_cipher_ctx *ctx, size_t length,
 	xts_aes256_decrypt_message(ctx->ctx_ptr, ctx->iv, length, dst, src);
 }
 
-#ifdef HAVE_NETTLE_CBC_AES128_ENCRYPT
-
 static void _cbc_aes128_encrypt(struct nettle_cipher_ctx *ctx, size_t length,
 				uint8_t *dst, const uint8_t *src)
 {
@@ -520,8 +518,6 @@ static void _cbc_aes256_encrypt(struct nettle_cipher_ctx *ctx, size_t length,
 	assert((length % ctx->cipher->block_size) == 0);
 	cbc_aes256_encrypt(ctx->ctx_ptr, ctx->iv, length, dst, src);
 }
-
-#endif /* HAVE_NETTLE_CBC_AES128_ENCRYPT */
 
 static const struct nettle_cipher_st builtin_ciphers[] = {
 	{
@@ -681,11 +677,7 @@ static const struct nettle_cipher_st builtin_ciphers[] = {
 
 		.ctx_size = sizeof(
 			struct CBC_CTX(struct aes128_ctx, AES_BLOCK_SIZE)),
-#ifdef HAVE_NETTLE_CBC_AES128_ENCRYPT
 		.encrypt = _cbc_aes128_encrypt,
-#else
-		.encrypt = _cbc_encrypt,
-#endif
 		.decrypt = _cbc_decrypt,
 		.set_encrypt_key =
 			(nettle_set_key_func *)aes128_set_encrypt_key,
@@ -702,11 +694,7 @@ static const struct nettle_cipher_st builtin_ciphers[] = {
 
 		.ctx_size = sizeof(
 			struct CBC_CTX(struct aes192_ctx, AES_BLOCK_SIZE)),
-#ifdef HAVE_NETTLE_CBC_AES128_ENCRYPT
 		.encrypt = _cbc_aes192_encrypt,
-#else
-		.encrypt = _cbc_encrypt,
-#endif
 		.decrypt = _cbc_decrypt,
 		.set_encrypt_key =
 			(nettle_set_key_func *)aes192_set_encrypt_key,
@@ -723,11 +711,7 @@ static const struct nettle_cipher_st builtin_ciphers[] = {
 
 		.ctx_size = sizeof(
 			struct CBC_CTX(struct aes256_ctx, AES_BLOCK_SIZE)),
-#ifdef HAVE_NETTLE_CBC_AES128_ENCRYPT
 		.encrypt = _cbc_aes256_encrypt,
-#else
-		.encrypt = _cbc_encrypt,
-#endif
 		.decrypt = _cbc_decrypt,
 		.set_encrypt_key =
 			(nettle_set_key_func *)aes256_set_encrypt_key,

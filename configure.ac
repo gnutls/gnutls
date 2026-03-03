@@ -828,12 +828,6 @@ LIBS="$LIBS $NETTLE_LIBS"
 AC_CHECK_FUNCS(nettle_cmac_kuznyechik_update)
 LIBS=$save_LIBS
 
-# Check for specialized AES-CBC encryption
-save_LIBS=$LIBS
-LIBS="$LIBS $NETTLE_LIBS"
-AC_CHECK_FUNCS(nettle_cbc_aes128_encrypt)
-LIBS=$save_LIBS
-
 # Check sonames of the linked libraries needed for FIPS selftests.
 save_CFLAGS=$CFLAGS
 CFLAGS="$CFLAGS $GMP_CFLAGS"
