@@ -285,10 +285,7 @@ int _gnutls_base64_decode(const uint8_t *data, size_t data_size,
 
 	ret = base64_decode_update(&ctx, &size, result->data, pdata.size,
 				   (void *)pdata.data);
-	/* Nettle 4 returns -1 on error, while Nettle 3 returns 0;
-	 * catch both
-	 */
-	if (ret <= 0 || size == 0) {
+	if (ret == 0 || size == 0) {
 		gnutls_assert();
 		ret = GNUTLS_E_BASE64_DECODING_ERROR;
 		goto fail;

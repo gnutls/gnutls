@@ -141,11 +141,13 @@ static void _register_aarch64_crypto(unsigned capabilities)
 			gnutls_assert();
 		}
 
+#if defined(HAVE_LIBNETTLE) && defined(HMAC_SET_KEY)
 		ret = gnutls_crypto_single_mac_register(
 			GNUTLS_MAC_SHA1, 80, &_gnutls_hmac_sha_aarch64, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
+#endif
 	}
 
 	if (_gnutls_arm_cpuid_s & ARMV8_SHA256) {
@@ -157,11 +159,13 @@ static void _register_aarch64_crypto(unsigned capabilities)
 			gnutls_assert();
 		}
 
+#if defined(HAVE_LIBNETTLE) && defined(HMAC_SET_KEY)
 		ret = gnutls_crypto_single_mac_register(
 			GNUTLS_MAC_SHA224, 80, &_gnutls_hmac_sha_aarch64, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
+#endif
 
 		ret = gnutls_crypto_single_digest_register(
 			GNUTLS_DIG_SHA256, 80, &_gnutls_sha_aarch64, 0);
@@ -169,11 +173,13 @@ static void _register_aarch64_crypto(unsigned capabilities)
 			gnutls_assert();
 		}
 
+#if defined(HAVE_LIBNETTLE) && defined(HMAC_SET_KEY)
 		ret = gnutls_crypto_single_mac_register(
 			GNUTLS_MAC_SHA256, 80, &_gnutls_hmac_sha_aarch64, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
+#endif
 
 		ret = gnutls_crypto_single_digest_register(
 			GNUTLS_DIG_SHA384, 80, &_gnutls_sha_aarch64, 0);
@@ -181,11 +187,13 @@ static void _register_aarch64_crypto(unsigned capabilities)
 			gnutls_assert();
 		}
 
+#if defined(HAVE_LIBNETTLE) && defined(HMAC_SET_KEY)
 		ret = gnutls_crypto_single_mac_register(
 			GNUTLS_MAC_SHA384, 80, &_gnutls_hmac_sha_aarch64, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
+#endif
 
 		ret = gnutls_crypto_single_digest_register(
 			GNUTLS_DIG_SHA512, 80, &_gnutls_sha_aarch64, 0);
@@ -193,11 +201,13 @@ static void _register_aarch64_crypto(unsigned capabilities)
 			gnutls_assert();
 		}
 
+#if defined(HAVE_LIBNETTLE) && defined(HMAC_SET_KEY)
 		ret = gnutls_crypto_single_mac_register(
 			GNUTLS_MAC_SHA512, 80, &_gnutls_hmac_sha_aarch64, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
+#endif
 	}
 
 	if (_gnutls_arm_cpuid_s & ARMV8_AES) {
