@@ -42,9 +42,6 @@
 #include "dsa-fips.h"
 #include "rsa-fips.h"
 #include <nettle/rsa.h>
-#ifndef HAVE_NETTLE_RSA_OAEP_SHA256_ENCRYPT
-#include "int/rsa-oaep.h"
-#endif
 #include <gnutls/crypto.h>
 #include <nettle/bignum.h>
 #include <nettle/ecc.h>

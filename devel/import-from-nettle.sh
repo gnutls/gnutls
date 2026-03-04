@@ -10,59 +10,9 @@ SRC=$srcdir/devel/nettle
 DST=$srcdir/lib/nettle/backport
 
 IMPORTS="
-block-internal.h
-bswap-internal.h
-ctr-internal.h
-ctr.h
-ctr16.c
-ghash-internal.h
-ghash-set-key.c
-ghash-update.c
-gmp-glue.c
-gmp-glue.h
-md-internal.h
-nettle-write.h
-oaep.c
-oaep.h
-pss-mgf1.h
-pss-mgf1.c
-rsa-internal.h
-rsa-oaep-encrypt.c
-rsa-oaep-decrypt.c
-rsa-sec-compute-root.c
-rsa-sign-tr.c
-siv-gcm-aes128.c
-siv-gcm-aes256.c
-siv-gcm.c
-siv-gcm.h
-siv-ghash-set-key.c
-siv-ghash-update.c
-sha3.c
-sha3-internal.h
-sha3-shake.c
-shake128.c
-shake256.c
-write-le64.c
 "
 
 PUBLIC="
-aes.h
-bignum.h
-ctr.h
-des.h
-ecc-curve.h
-ecc.h
-gcm.h
-macros.h
-md5.h
-memops.h
-memxor.h
-nettle-meta.h
-nettle-types.h
-rsa.h
-sha1.h
-sha2.h
-sha3.h
 "
 
 test -d $DST || mkdir $DST
@@ -111,50 +61,6 @@ for f in $IMPORTS; do
 	    $dst > $dst-t && \
 	  mv $dst-t $dst
       ;;
-    esac
-    case $dst in
-      */*.[ch])
-	sed \
-	  -e '/^#include <nettle\/nettle-types\.h>/a\
-#include "block8.h"
-' \
-	  $dst > $dst-t && mv $dst-t $dst
-	;;
-    esac
-    case $dst in
-      */rsa-sign-tr.c)
-	sed \
-	  -e '/^#include <nettle\/rsa\.h>/i\
-#define nettle_rsa_compute_root_tr _gnutls_nettle_backport_rsa_compute_root_tr\
-' \
-	  $dst > $dst-t && mv $dst-t $dst
-	;;
-    esac
-    case $dst in
-      */rsa-oaep-*.c)
-	sed \
-	  -e '/^#include <nettle\/rsa\.h>/a\
-#include "int/rsa-oaep.h"
-' \
-	  $dst > $dst-t && mv $dst-t $dst
-	;;
-    esac
-    case $dst in
-      */shake*.c)
-	sed \
-	  -e '/^#include <nettle\/sha3\.h>/a\
-#include "int/sha3-shake.h"
-' \
-	  $dst > $dst-t && mv $dst-t $dst
-	;;
-    esac
-    # Avoid -Wcast-align=strict warnings
-    case $dst in
-      */ctr16.c)
-	sed \
-	  -e 's/\((union nettle_block16 \*) \)\(dst\)/\1(void *) \2/' \
-	  $dst > $dst-t && mv $dst-t $dst
-	;;
     esac
   else
     echo "Error: $src not found" 1>&2

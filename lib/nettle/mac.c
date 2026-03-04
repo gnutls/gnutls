@@ -32,16 +32,12 @@
 #include <nettle/sha1.h>
 #include <nettle/sha2.h>
 #include <nettle/sha3.h>
-#ifndef HAVE_NETTLE_SHA3_128_SHAKE_OUTPUT
-#include "int/sha3-shake.h"
-#endif
 #include <nettle/hmac.h>
 #include <nettle/umac.h>
 #include <nettle/hkdf.h>
 #include <nettle/pbkdf2.h>
 #include <nettle/cmac.h>
 #if ENABLE_GOST
-#include "gost/hmac-gost.h"
 #ifndef HAVE_NETTLE_GOST28147_SET_KEY
 #include "gost/gost28147.h"
 #endif

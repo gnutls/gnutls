@@ -50,8 +50,7 @@ libcrypto_la_SOURCES = pk.c mpi.c mac.c cipher.c init.c \
 	int/dsa-compute-k.c int/dsa-compute-k.h \
 	int/ecdsa-compute-k.c int/ecdsa-compute-k.h \
 	int/mpn-base256.c int/mpn-base256.h \
-	int/block8.h backport/block-internal.h \
-	int/rsa-oaep.h int/rsa-pad.c int/nettle-internal.h int/sha3-shake.h
+	int/rsa-pad.c
 
 if WINDOWS
 if HAVE_BCRYPT
@@ -81,9 +80,7 @@ endif
 if ENABLE_GOST
 libcrypto_la_SOURCES += \
 	gost/nettle-write.h gost/write-le32.c \
-	gost/gost28147.c gost/gost28147.h gost/gost-wrap.c \
-	gost/streebog.c gost/streebog.h gost/streebog-meta.c \
-	gost/hmac-streebog.c gost/hmac-gost.h
+	gost/gost28147.c gost/gost28147.h gost/gost-wrap.c
 
 libcrypto_la_SOURCES += \
 	gost/bignum-le.c gost/bignum-le.h
@@ -98,51 +95,4 @@ libcrypto_la_SOURCES += \
 	gost/kuznyechik.c gost/kuznyechik.h gost/kuztable.h \
 	gost/acpkm.c gost/acpkm.h \
 	gost/cmac.h gost/cmac-magma.c gost/cmac-kuznyechik.c
-endif
-
-if NEED_SIV_GCM
-libcrypto_la_SOURCES += \
-	backport/bswap-internal.h \
-	backport/ctr-internal.h \
-	backport/ctr.h \
-	backport/ctr16.c \
-	backport/ghash-internal.h \
-	backport/ghash-set-key.c \
-	backport/ghash-update.c \
-	backport/siv-gcm-aes128.c \
-	backport/siv-gcm-aes256.c \
-	backport/siv-gcm.c \
-	backport/siv-gcm.h \
-	backport/siv-ghash-set-key.c \
-	backport/siv-ghash-update.c \
-	$(NULL)
-endif
-
-if NEED_RSA_OAEP
-libcrypto_la_SOURCES += \
-	backport/gmp-glue.c \
-	backport/gmp-glue.h \
-	backport/oaep.c \
-	backport/oaep.h \
-	backport/pss-mgf1.c \
-	backport/pss-mgf1.h \
-	backport/rsa-internal.h \
-	backport/rsa-oaep-encrypt.c \
-	backport/rsa-oaep-decrypt.c \
-	backport/rsa-sec-compute-root.c \
-	backport/rsa-sign-tr.c \
-	$(NULL)
-endif
-
-if NEED_SHAKE_OUTPUT
-libcrypto_la_SOURCES += \
-	backport/md-internal.h \
-	backport/nettle-write.h \
-	backport/sha3.c \
-	backport/sha3-internal.h \
-	backport/sha3-shake.c \
-	backport/shake128.c \
-	backport/shake256.c \
-	backport/write-le64.c \
-	$(NULL)
 endif

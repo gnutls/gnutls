@@ -783,25 +783,10 @@ if test x$enable_dsa != xno; then
 fi
 AM_CONDITIONAL([ENABLE_DSA], [test x$enable_dsa != xno])
 
-# We MUST require a Nettle version that has rsa_sec_decrypt now.
-save_LIBS=$LIBS
-LIBS="$LIBS $HOGWEED_LIBS $NETTLE_LIBS $GMP_LIBS"
-AC_CHECK_FUNCS(nettle_rsa_sec_decrypt,
-    [],
-    [AC_MSG_ERROR([Nettle lacks the required rsa_sec_decrypt function])]
-)
-LIBS=$save_LIBS
-
 # Check for GOST28147
 save_LIBS=$LIBS
 LIBS="$LIBS $NETTLE_LIBS"
 AC_CHECK_FUNCS(nettle_gost28147_set_key)
-LIBS=$save_LIBS
-
-# Check for Streebog support
-save_LIBS=$LIBS
-LIBS="$LIBS $NETTLE_LIBS"
-AC_CHECK_FUNCS(nettle_streebog512_update)
 LIBS=$save_LIBS
 
 # Check for Magma
@@ -827,33 +812,6 @@ save_LIBS=$LIBS
 LIBS="$LIBS $NETTLE_LIBS"
 AC_CHECK_FUNCS(nettle_cmac_kuznyechik_update)
 LIBS=$save_LIBS
-
-# Check for SIV-GCM
-save_LIBS=$LIBS
-LIBS="$LIBS $NETTLE_LIBS"
-AC_CHECK_FUNCS(nettle_siv_gcm_encrypt_message)
-LIBS=$save_LIBS
-AM_CONDITIONAL([NEED_SIV_GCM], [test "$ac_cv_func_nettle_siv_gcm_encrypt_message" != yes])
-
-# Check for RSA-OAEP
-save_LIBS=$LIBS
-LIBS="$LIBS $HOGWEED_LIBS $NETTLE_LIBS $GMP_LIBS"
-AC_CHECK_FUNCS(nettle_rsa_oaep_sha256_encrypt)
-LIBS=$save_LIBS
-AM_CONDITIONAL([NEED_RSA_OAEP], [test "$ac_cv_func_nettle_rsa_oaep_sha256_encrypt" != yes])
-
-# Check for specialized AES-CBC encryption
-save_LIBS=$LIBS
-LIBS="$LIBS $NETTLE_LIBS"
-AC_CHECK_FUNCS(nettle_cbc_aes128_encrypt)
-LIBS=$save_LIBS
-
-# Check for incremental SHAKE
-save_LIBS=$LIBS
-LIBS="$LIBS $NETTLE_LIBS"
-AC_CHECK_FUNCS(nettle_sha3_128_shake_output)
-LIBS=$save_LIBS
-AM_CONDITIONAL([NEED_SHAKE_OUTPUT], [test "$ac_cv_func_nettle_sha3_128_shake_output" != yes])
 
 # Check sonames of the linked libraries needed for FIPS selftests.
 save_CFLAGS=$CFLAGS
