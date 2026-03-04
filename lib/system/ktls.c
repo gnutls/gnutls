@@ -679,25 +679,15 @@ int _gnutls_ktls_set_keys(gnutls_session_t session,
 			assert(cipher_key.size ==
 			       TLS_CIPHER_CHACHA20_POLY1305_KEY_SIZE);
 
-			/* for TLS 1.2 IV is generated in kernel */
-			if (version == GNUTLS_TLS1_2) {
+			if (version == GNUTLS_TLS1_2)
 				crypto_info.info.version = TLS_1_2_VERSION;
-				memcpy(crypto_info.iv, seq_number,
-				       TLS_CIPHER_CHACHA20_POLY1305_IV_SIZE);
-			} else {
+			else
 				crypto_info.info.version = TLS_1_3_VERSION;
-				assert(iv.size ==
-				       TLS_CIPHER_CHACHA20_POLY1305_SALT_SIZE +
-					       TLS_CIPHER_CHACHA20_POLY1305_IV_SIZE);
+			/* TLS_CIPHER_CHACHA20_POLY1305_SALT_SIZE is 0 */
+			assert(iv.size == TLS_CIPHER_CHACHA20_POLY1305_IV_SIZE);
+			memcpy(crypto_info.iv, iv.data,
+			       TLS_CIPHER_CHACHA20_POLY1305_IV_SIZE);
 
-				memcpy(crypto_info.iv,
-				       iv.data +
-					       TLS_CIPHER_CHACHA20_POLY1305_SALT_SIZE,
-				       TLS_CIPHER_CHACHA20_POLY1305_IV_SIZE);
-			}
-
-			memcpy(crypto_info.salt, iv.data,
-			       TLS_CIPHER_CHACHA20_POLY1305_SALT_SIZE);
 			memcpy(crypto_info.rec_seq, seq_number,
 			       TLS_CIPHER_CHACHA20_POLY1305_REC_SEQ_SIZE);
 			memcpy(crypto_info.key, cipher_key.data,
@@ -854,25 +844,15 @@ int _gnutls_ktls_set_keys(gnutls_session_t session,
 			assert(cipher_key.size ==
 			       TLS_CIPHER_CHACHA20_POLY1305_KEY_SIZE);
 
-			/* for TLS 1.2 IV is generated in kernel */
-			if (version == GNUTLS_TLS1_2) {
+			if (version == GNUTLS_TLS1_2)
 				crypto_info.info.version = TLS_1_2_VERSION;
-				memcpy(crypto_info.iv, seq_number,
-				       TLS_CIPHER_CHACHA20_POLY1305_IV_SIZE);
-			} else {
+			else
 				crypto_info.info.version = TLS_1_3_VERSION;
-				assert(iv.size ==
-				       TLS_CIPHER_CHACHA20_POLY1305_SALT_SIZE +
-					       TLS_CIPHER_CHACHA20_POLY1305_IV_SIZE);
+			/* TLS_CIPHER_CHACHA20_POLY1305_SALT_SIZE is 0 */
+			assert(iv.size == TLS_CIPHER_CHACHA20_POLY1305_IV_SIZE);
+			memcpy(crypto_info.iv, iv.data,
+			       TLS_CIPHER_CHACHA20_POLY1305_IV_SIZE);
 
-				memcpy(crypto_info.iv,
-				       iv.data +
-					       TLS_CIPHER_CHACHA20_POLY1305_SALT_SIZE,
-				       TLS_CIPHER_CHACHA20_POLY1305_IV_SIZE);
-			}
-
-			memcpy(crypto_info.salt, iv.data,
-			       TLS_CIPHER_CHACHA20_POLY1305_SALT_SIZE);
 			memcpy(crypto_info.rec_seq, seq_number,
 			       TLS_CIPHER_CHACHA20_POLY1305_REC_SEQ_SIZE);
 			memcpy(crypto_info.key, cipher_key.data,
