@@ -54,9 +54,9 @@ AC_USE_SYSTEM_EXTENSIONS
 # Require C99 support
 #
 AS_CASE([$ac_prog_cc_stdc],
-  [c11 | c99], [AC_DEFINE([C99_MACROS], 1, [C99 macros are supported])],
-  [AC_MSG_WARN([[Compiler does not support C99. It may not be able to compile the project.]])]
-)
+  [c89],
+  [AC_MSG_WARN([[Compiler does not support C99. It may not be able to compile the project.]])],
+  [AC_DEFINE([C99_MACROS], 1, [C99 macros are supported])])
 
 AM_CONDITIONAL(CROSS_COMPILING, test "$cross_compiling" = yes)
 
