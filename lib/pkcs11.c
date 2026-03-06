@@ -149,6 +149,12 @@ void *_gnutls_token_data;
 
 static int auto_load(unsigned trusted);
 
+static int pkcs11_read_privkey_type(struct ck_function_list *module,
+				    ck_session_handle_t pks,
+				    ck_object_handle_t ctx,
+				    ck_key_type_t key_type,
+				    gnutls_pkcs11_obj_t pobj);
+
 int pkcs11_rv_to_err(ck_rv_t rv)
 {
 	switch (rv) {
@@ -1349,6 +1355,8 @@ void gnutls_pkcs11_obj_deinit(gnutls_pkcs11_obj_t obj)
 	unsigned i;
 	for (i = 0; i < obj->pubkey_size; i++)
 		_gnutls_free_datum(&obj->pubkey[i]);
+	for (i = 0; i < obj->privkey_size; i++)
+		_gnutls_free_datum(&obj->privkey_type[i]);
 	_gnutls_free_datum(&obj->raw);
 	p11_kit_uri_free(obj->info);
 	free(obj);
@@ -2014,24 +2022,204 @@ cleanup:
 	return ret;
 }
 
-static int
-pkcs11_obj_import_pubkey(struct ck_function_list *module,
-			 ck_session_handle_t pks, ck_object_handle_t ctx,
-			 gnutls_pkcs11_obj_t pobj, gnutls_datum_t *data,
-			 const gnutls_datum_t *id, const gnutls_datum_t *label,
-			 struct ck_token_info *tinfo, struct ck_info *lib_info)
+static int pkcs11_read_privkey_type(struct ck_function_list *module,
+				    ck_session_handle_t pks,
+				    ck_object_handle_t ctx,
+				    ck_key_type_t key_type,
+				    gnutls_pkcs11_obj_t pobj)
+{
+	struct ck_attribute a[2];
+	uint8_t *tmp1;
+	uint8_t *tmp2 = NULL;
+	size_t tmp1_size, tmp2_size;
+	int ret;
+	ck_rv_t rv;
+
+	pobj->pk_algorithm = GNUTLS_PK_UNKNOWN;
+	tmp1_size = tmp2_size = MAX_PK_PARAM_SIZE;
+	tmp1 = gnutls_calloc(1, tmp1_size);
+	if (tmp1 == NULL)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+	switch (key_type) {
+	case CKK_RSA:
+		a[0].type = CKA_MODULUS;
+		a[0].value = tmp1;
+		a[0].value_len = tmp1_size;
+
+		if (pkcs11_get_attribute_value(module, pks, ctx, a, 1) ==
+		    CKR_OK) {
+			pobj->privkey_type[0].data = a[0].value;
+			pobj->privkey_type[0].size = a[0].value_len;
+
+			pobj->privkey_size = 1;
+			pobj->pk_algorithm = GNUTLS_PK_RSA;
+		} else {
+			gnutls_assert();
+			ret = GNUTLS_E_PKCS11_ERROR;
+			goto cleanup;
+		}
+		break;
+	case CKK_DSA:
+		tmp2 = gnutls_calloc(1, tmp2_size);
+		if (tmp2 == NULL) {
+			ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+			goto cleanup;
+		}
+
+		a[0].type = CKA_PRIME;
+		a[0].value = tmp1;
+		a[0].value_len = tmp1_size;
+		a[1].type = CKA_SUBPRIME;
+		a[1].value = tmp2;
+		a[1].value_len = tmp2_size;
+
+		if ((rv = pkcs11_get_attribute_value(module, pks, ctx, a, 2)) ==
+		    CKR_OK) {
+			if ((ret = _gnutls_set_datum(&pobj->privkey_type[0],
+						     a[0].value,
+						     a[0].value_len)) < 0 ||
+			    (ret = _gnutls_set_datum(&pobj->privkey_type[1],
+						     a[1].value,
+						     a[1].value_len)) < 0) {
+				gnutls_assert();
+				_gnutls_free_datum(&pobj->privkey_type[1]);
+				_gnutls_free_datum(&pobj->privkey_type[0]);
+				goto cleanup;
+			}
+
+			pobj->privkey_size = 2;
+		} else {
+			gnutls_assert();
+			ret = pkcs11_rv_to_err(rv);
+			goto cleanup;
+		}
+
+		a[0].type = CKA_BASE;
+		a[0].value = tmp1;
+		a[0].value_len = tmp1_size;
+		a[1].type = CKA_VALUE;
+		a[1].value = tmp2;
+		a[1].value_len = tmp2_size;
+
+		if ((rv = pkcs11_get_attribute_value(module, pks, ctx, a, 2)) ==
+		    CKR_OK) {
+			pobj->privkey_type[2].data = a[0].value;
+			pobj->privkey_type[2].size = a[0].value_len;
+
+			pobj->privkey_type[3].data = a[1].value;
+			pobj->privkey_type[3].size = a[1].value_len;
+
+			pobj->privkey_size = 4;
+			pobj->pk_algorithm = GNUTLS_PK_DSA;
+		} else {
+			gnutls_assert();
+			_gnutls_free_datum(&pobj->privkey_type[1]);
+			_gnutls_free_datum(&pobj->privkey_type[0]);
+			ret = pkcs11_rv_to_err(rv);
+			goto cleanup;
+		}
+		break;
+	case CKK_ECDSA:
+		a[0].type = CKA_EC_PARAMS;
+		a[0].value = tmp1;
+		a[0].value_len = tmp1_size;
+
+		if ((rv = pkcs11_get_attribute_value(module, pks, ctx, a, 1)) ==
+		    CKR_OK) {
+			pobj->privkey_type[0].data = a[0].value;
+			pobj->privkey_type[0].size = a[0].value_len;
+
+			pobj->privkey_size = 1;
+			pobj->pk_algorithm = GNUTLS_PK_EC;
+		} else {
+			gnutls_assert();
+			ret = pkcs11_rv_to_err(rv);
+			goto cleanup;
+		}
+
+		break;
+#ifdef HAVE_PKCS11_EDDSA
+	case CKK_EC_EDWARDS:
+		a[0].type = CKA_EC_PARAMS;
+		a[0].value = tmp1;
+		a[0].value_len = tmp1_size;
+
+		if ((rv = pkcs11_get_attribute_value(module, pks, ctx, a, 1)) ==
+		    CKR_OK) {
+			gnutls_ecc_curve_t curve;
+			const gnutls_ecc_curve_entry_st *ce;
+			gnutls_datum_t temp_datum = { a[0].value,
+						      a[0].value_len };
+
+			ret = _gnutls_pubkey_parse_ecc_eddsa_params(&temp_datum,
+								    &curve);
+			if (ret < 0) {
+				ret = GNUTLS_E_INVALID_REQUEST;
+				goto cleanup;
+			}
+			ce = _gnutls_ecc_curve_get_params(curve);
+			if (unlikely(ce == NULL)) {
+				ret = GNUTLS_E_INVALID_REQUEST;
+				goto cleanup;
+			}
+			pobj->privkey_type[0].data = a[0].value;
+			pobj->privkey_type[0].size = a[0].value_len;
+			pobj->privkey_size = 1;
+			pobj->pk_algorithm = ce->pk;
+		} else {
+			gnutls_assert();
+
+			ret = pkcs11_rv_to_err(rv);
+			goto cleanup;
+		}
+		break;
+#endif
+	default:
+		_gnutls_debug_log(
+			"requested reading private key of unsupported type %u\n",
+			(unsigned)key_type);
+		ret = gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
+		goto cleanup;
+	}
+
+	return 0;
+
+cleanup:
+	gnutls_free(tmp1);
+	gnutls_free(tmp2);
+
+	return ret;
+}
+
+static int pkcs11_obj_import_pubkey_privkey(
+	struct ck_function_list *module, ck_session_handle_t pks,
+	ck_object_handle_t ctx, gnutls_pkcs11_obj_t pobj, gnutls_datum_t *data,
+	const gnutls_datum_t *id, const gnutls_datum_t *label,
+	struct ck_token_info *tinfo, struct ck_info *lib_info,
+	ck_object_class_t class)
 {
 	struct ck_attribute a[4];
 	ck_key_type_t key_type;
 	int ret;
 	ck_bool_t tval;
 
+	if (class != CKO_PUBLIC_KEY && class != CKO_PRIVATE_KEY)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 	a[0].type = CKA_KEY_TYPE;
 	a[0].value = &key_type;
 	a[0].value_len = sizeof(key_type);
 
 	if (pkcs11_get_attribute_value(module, pks, ctx, a, 1) == CKR_OK) {
-		ret = pkcs11_read_pubkey(module, pks, ctx, key_type, pobj);
+		// For private keys we only read the key type metadata
+		if (class == CKO_PUBLIC_KEY) {
+			ret = pkcs11_read_pubkey(module, pks, ctx, key_type,
+						 pobj);
+		} else {
+			ret = pkcs11_read_privkey_type(module, pks, ctx,
+						       key_type, pobj);
+		}
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 	}
@@ -2093,8 +2281,7 @@ pkcs11_obj_import_pubkey(struct ck_function_list *module,
 		}
 	}
 
-	ret = pkcs11_obj_import(CKO_PUBLIC_KEY, pobj, data, id, label, tinfo,
-				lib_info);
+	ret = pkcs11_obj_import(class, pobj, data, id, label, tinfo, lib_info);
 	return ret;
 }
 
@@ -2239,10 +2426,11 @@ static int pkcs11_import_object(ck_object_handle_t ctx, ck_object_class_t class,
 		/* data will be null */
 	}
 
-	if (class == CKO_PUBLIC_KEY) {
-		ret = pkcs11_obj_import_pubkey(sinfo->module, sinfo->pks, ctx,
-					       pobj, &data, &id, &label, tinfo,
-					       lib_info);
+	if (class == CKO_PUBLIC_KEY || class == CKO_PRIVATE_KEY) {
+		ret = pkcs11_obj_import_pubkey_privkey(sinfo->module,
+						       sinfo->pks, ctx, pobj,
+						       &data, &id, &label,
+						       tinfo, lib_info, class);
 	} else {
 		ret = pkcs11_obj_import(class, pobj, &data, &id, &label, tinfo,
 					lib_info);
@@ -4958,4 +5146,112 @@ cleanup:
 	gnutls_free(priv.serial.data);
 
 	return ret;
+}
+
+/**
+ * gnutls_pkcs11_obj_get_pk_algorithm:
+ * @obj: The pkcs11 object
+ * @bits: Will hold the rsa/dsa bit count or the ecc curve
+ * This function given a pkcs11 object with privkey_type initialized,
+ * will return the algorithm type on success , and will store the number
+ * of bits if the algo type is %GNUTLS_PK_RSA or %GNUTLS_PK_DSA, or the curve
+ * if the algo type is %GNUTLS_PK_ECDSA.
+ *
+ * The return value needs to be checked to determine if bits represents
+ * the ecc curve or the number of bits.
+ *
+ * Returns: The private key algorithm associated with the object on success
+ * or a an error code otherwise.
+ *
+ * Since: 3.8.13
+ **/
+int gnutls_pkcs11_obj_get_pk_algorithm(gnutls_pkcs11_obj_t obj,
+				       unsigned int *bits)
+{
+	gnutls_pk_algorithm_t pk;
+	gnutls_pk_params_st temp_params;
+	int ret;
+	int curve_len;
+	char oid_string[128] = { 0 };
+	if (!obj || !bits)
+		return GNUTLS_E_INVALID_REQUEST;
+
+	if (obj->type != GNUTLS_PKCS11_OBJ_PRIVKEY) {
+		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+	}
+
+	// first make sure privkey_type is properly populated
+	for (unsigned i = 0; i < obj->privkey_size; i++) {
+		if (obj->privkey_type[i].data == NULL ||
+		    obj->privkey_type[i].size == 0) {
+			return GNUTLS_E_INVALID_REQUEST;
+		}
+	}
+
+	pk = obj->pk_algorithm;
+
+	switch (pk) {
+	case GNUTLS_PK_RSA:
+		*bits = obj->privkey_type[0].size * 8;
+		return pk;
+	case GNUTLS_PK_DSA:
+		gnutls_pk_params_init(&temp_params);
+		if (_gnutls_mpi_init_scan_nz(&temp_params.params[DSA_P],
+					     obj->privkey_type[0].data,
+					     obj->privkey_type[0].size)) {
+			gnutls_assert();
+			ret = GNUTLS_E_MPI_SCAN_FAILED;
+			goto dsa_cleanup;
+		}
+
+		if (_gnutls_mpi_init_scan_nz(&temp_params.params[DSA_Q],
+					     obj->privkey_type[1].data,
+					     obj->privkey_type[1].size)) {
+			gnutls_assert();
+			ret = GNUTLS_E_MPI_SCAN_FAILED;
+			goto dsa_cleanup;
+		}
+
+		if (_gnutls_mpi_init_scan_nz(&temp_params.params[DSA_G],
+					     obj->privkey_type[2].data,
+					     obj->privkey_type[2].size)) {
+			gnutls_assert();
+			ret = GNUTLS_E_MPI_SCAN_FAILED;
+			goto dsa_cleanup;
+		}
+
+		if (_gnutls_mpi_init_scan_nz(&temp_params.params[DSA_Y],
+					     obj->privkey_type[3].data,
+					     obj->privkey_type[3].size)) {
+			gnutls_assert();
+			ret = GNUTLS_E_MPI_SCAN_FAILED;
+			goto dsa_cleanup;
+		}
+
+		temp_params.params_nr = DSA_PUBLIC_PARAMS;
+		temp_params.algo = GNUTLS_PK_DSA;
+		*bits = pubkey_to_bits(&temp_params);
+		ret = pk;
+
+	dsa_cleanup:
+		gnutls_pk_params_release(&temp_params);
+		return ret;
+
+	case GNUTLS_PK_ECDSA:
+	case GNUTLS_PK_EDDSA_ED25519:
+		ret = asn1_get_object_id_der(obj->privkey_type[0].data + 1,
+					     obj->privkey_type[0].size - 1,
+					     &curve_len, oid_string,
+					     sizeof(oid_string));
+		if (ret != ASN1_SUCCESS) {
+			gnutls_assert();
+			return _gnutls_asn2err(ret);
+		}
+		*bits = gnutls_oid_to_ecc_curve(oid_string);
+		return pk;
+
+	default:
+		gnutls_assert();
+		return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
+	}
 }

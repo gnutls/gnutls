@@ -62,6 +62,13 @@ struct gnutls_pkcs11_obj_st {
 	/* only when pubkey */
 	gnutls_datum_t pubkey[MAX_PUBLIC_PARAMS_SIZE];
 	unsigned pubkey_size;
+
+	/* only when privkey.
+	 * use MAX_PUBLIC_PARAMS_SIZE instead of MAX_PRIV_PARAMS_SIZE
+	 * since we only care about the types for now*/
+	gnutls_datum_t privkey_type[MAX_PUBLIC_PARAMS_SIZE];
+	unsigned privkey_size;
+
 	gnutls_pk_algorithm_t pk_algorithm;
 	unsigned int key_usage;
 

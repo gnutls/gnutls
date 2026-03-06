@@ -482,6 +482,9 @@ int gnutls_pkcs11_copy_attached_extension(const char *token_url,
 					  const char *label,
 					  unsigned int flags);
 
+int gnutls_pkcs11_obj_get_pk_algorithm(gnutls_pkcs11_obj_t obj,
+				       unsigned int *bits);
+
 #define gnutls_x509_crt_import_pkcs11_url gnutls_x509_crt_import_url
 
 #ifdef __cplusplus
