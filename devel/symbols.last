@@ -18,6 +18,7 @@ GNUTLS_3_7_4@GNUTLS_3_7_4
 GNUTLS_3_7_5@GNUTLS_3_7_5
 GNUTLS_3_7_7@GNUTLS_3_7_7
 GNUTLS_3_8_11@GNUTLS_3_8_11
+GNUTLS_3_8_13@GNUTLS_3_8_13
 GNUTLS_3_8_1@GNUTLS_3_8_1
 GNUTLS_3_8_2@GNUTLS_3_8_2
 GNUTLS_3_8_4@GNUTLS_3_8_4
@@ -521,6 +522,7 @@ gnutls_pkcs11_obj_flags_get_str@GNUTLS_3_4
 gnutls_pkcs11_obj_get_exts@GNUTLS_3_4
 gnutls_pkcs11_obj_get_flags@GNUTLS_3_4
 gnutls_pkcs11_obj_get_info@GNUTLS_3_4
+gnutls_pkcs11_obj_get_pk_algorithm@GNUTLS_3_8_13
 gnutls_pkcs11_obj_get_ptr@GNUTLS_3_6_3
 gnutls_pkcs11_obj_get_type@GNUTLS_3_4
 gnutls_pkcs11_obj_import_url@GNUTLS_3_4
