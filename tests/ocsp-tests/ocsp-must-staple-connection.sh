@@ -292,20 +292,30 @@ wait_server $TLS_SERVER_PID
 
 wait_for_port "${TLS_SERVER_PORT}"
 
-echo "test 123456" | \
-	"${CLI}" --attime "${TESTDATE}" --ocsp --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
-		 --port="${TLS_SERVER_PORT}" localhost
+out=$(
+    echo "test 123456" | \
+        "${CLI}" --attime "${TESTDATE}" --ocsp \
+             --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
+             --port="${TLS_SERVER_PORT}" localhost \
+             2>&1
+)
 rc=$?
+printf '%s\n' "$out"
 
 if test "${rc}" = "0"; then
     echo "Connecting to server with valid certificate and invalid staple succeeded"
     exit 1
 fi
 
+if ! echo "${out}" | grep "Got OCSP response with an unrelated certificate" > /dev/null
+then
+    echo '"Got OCSP response with an unrelated certificate" not found in output'
+    exit 1
+fi
+
 kill "${TLS_SERVER_PID}"
 wait "${TLS_SERVER_PID}"
 unset TLS_SERVER_PID
-
 
 echo "=== Test 5: Server with valid certificate - expired staple ==="
 
