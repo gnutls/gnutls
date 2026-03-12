@@ -13,10 +13,10 @@ variables:
   # name to allow expiration of old caches.
   BUILD_IMAGES_PROJECT: gnutls/build-images
   DEBIAN_BUILD: buildenv-debian-testing
-  FEDORA_BUILD: buildenv-fedora42
-  FEDORA_DOC_BUILD: buildenv-doc-fedora42
-  FEDORA_CROSS_BUILD: buildenv-cross-fedora42
-  FEDORA_I686_BUILD: buildenv-i686-fedora42
+  FEDORA_BUILD: buildenv-fedora43
+  FEDORA_DOC_BUILD: buildenv-doc-fedora43
+  FEDORA_CROSS_BUILD: buildenv-cross-fedora43
+  FEDORA_I686_BUILD: buildenv-i686-fedora43
   MINGW32_BUILD: buildenv-mingw32-fedora43
   MINGW64_BUILD: buildenv-mingw64-fedora43
   ALPINE_BASE_BUILD: buildenv-alpine-base
@@ -34,7 +34,7 @@ variables:
   GNULIB_TOOL_IMPL: py
 
 cache:
-  key: "$CI_JOB_NAME-ver46"
+  key: "$CI_JOB_NAME-ver47"
   paths:
     - cache/
 
@@ -159,7 +159,7 @@ commit-check:
   cache: {}
   script:
     # we want $ALPINE_BASE_BUILD without git, so we are adding it here
-    - apk add git bash grep clang19-extra-tools
+    - apk add git bash grep clang21-extra-tools
     - devel/check_if_signed
     - PATH=/usr/lib/llvm19/bin:$PATH devel/indent-gnutls
     - devel/check-headers.sh

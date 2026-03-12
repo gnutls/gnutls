@@ -184,9 +184,8 @@ static inline
 #ifdef __GNUC__
 	__attribute__((always_inline))
 #endif
-	int
-	gnutls_assert_val_int(int val, const char *file, const char *func,
-			      int line)
+	int gnutls_assert_val_int(int val, const char *file, const char *func,
+				  int line)
 {
 	_gnutls_assert_log("ASSERT: %s[%s]:%d\n", file, func, line);
 	return val;
