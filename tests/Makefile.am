@@ -61,7 +61,9 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
 	ocsp-tests/response2.der ocsp-tests/response3.der ocsp-tests/certs/ocsp_index.txt ocsp-tests/certs/ocsp_index.txt.attr \
 	ocsp-tests/response1.pem ocsp-tests/response2.pem \
 	ocsp-tests/certs/server_good.key ocsp-tests/certs/server_bad.key ocsp-tests/certs/server_good.template \
-	ocsp-tests/certs/server_bad.template ocsp-tests/certs/ocsp-staple-unrelated.der ocsp-tests/suppressions.valgrind \
+	ocsp-tests/certs/server_bad.template ocsp-tests/certs/ocsp-staple-unrelated.der \
+	ocsp-tests/certs/ocsp-staple-empty.der \
+	ocsp-tests/suppressions.valgrind \
 	ocsp-tests/signer-verify/response-ca.der \
 	ocsp-tests/signer-verify/response-delegated.der \
 	ocsp-tests/signer-verify/response-non-delegated.der \

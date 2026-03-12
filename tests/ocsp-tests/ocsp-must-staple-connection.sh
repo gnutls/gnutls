@@ -317,6 +317,51 @@ kill "${TLS_SERVER_PID}"
 wait "${TLS_SERVER_PID}"
 unset TLS_SERVER_PID
 
+echo "=== Test 4.1: Server with valid certificate - no response staple ==="
+
+rm -f "${OCSP_RESPONSE_FILE}"
+cp "${srcdir}/ocsp-tests/certs/ocsp-staple-empty.der" "${OCSP_RESPONSE_FILE}"
+
+eval "${GETPORT}"
+# Port for gnutls-serv
+TLS_SERVER_PORT=$PORT
+PORT=${TLS_SERVER_PORT}
+launch_bare_server \
+	"${SERV}" --attime "${TESTDATE}" --echo --disable-client-cert \
+	--x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
+	--x509certfile="${SERVER_CERT_FILE}" \
+	--port="${TLS_SERVER_PORT}" \
+	--ocsp-response="${OCSP_RESPONSE_FILE}" --ignore-ocsp-response-errors
+TLS_SERVER_PID="${!}"
+wait_server $TLS_SERVER_PID
+
+wait_for_port "${TLS_SERVER_PORT}"
+
+out=$(
+    echo "test 123456" | \
+        "${CLI}" --attime "${TESTDATE}" --ocsp \
+             --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
+             --port="${TLS_SERVER_PORT}" localhost \
+             2>&1
+)
+rc=$?
+printf '%s\n' "$out"
+
+if test "${rc}" = "0"; then
+    echo "Connecting to server with valid certificate and no response staple succeeded"
+    exit 1
+fi
+
+if ! echo "${out}" | grep  "Got OCSP response with no certificates" > /dev/null
+then
+    echo '"Got OCSP response with no certificates" not found in output'
+    exit 1
+fi
+
+kill "${TLS_SERVER_PID}"
+wait "${TLS_SERVER_PID}"
+unset TLS_SERVER_PID
+
 echo "=== Test 5: Server with valid certificate - expired staple ==="
 
 rm -f "${OCSP_RESPONSE_FILE}"
