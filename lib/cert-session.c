@@ -343,9 +343,9 @@ static int check_ocsp_response(gnutls_session_t session, gnutls_x509_crt_t cert,
 		goto cleanup;
 	}
 
-	ret = gnutls_ocsp_resp_get_single(resp, 0, NULL, NULL, NULL, NULL,
-					  &cert_status, &vtime, &ntime, &rtime,
-					  NULL);
+	ret = gnutls_ocsp_resp_get_single(resp, resp_indx, NULL, NULL, NULL,
+					  NULL, &cert_status, &vtime, &ntime,
+					  &rtime, NULL);
 	if (ret < 0) {
 		_gnutls_audit_log(
 			session,
