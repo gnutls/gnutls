@@ -283,10 +283,16 @@ static int check_ocsp_response(gnutls_session_t session, gnutls_x509_crt_t cert,
 			break;
 	}
 	if (ret < 0) {
+		if (resp_indx == 0 &&
+		    ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+			_gnutls_audit_log(session, "Got OCSP response with"
+						   " no certificates.\n");
+		} else {
+			_gnutls_audit_log(session,
+					  "Got OCSP response with"
+					  " an unrelated certificate.\n");
+		}
 		ret = gnutls_assert_val(0);
-		_gnutls_audit_log(
-			session,
-			"Got OCSP response with an unrelated certificate.\n");
 		check_failed = 1;
 		*ostatus |= GNUTLS_CERT_INVALID;
 		*ostatus |= GNUTLS_CERT_INVALID_OCSP_STATUS;
