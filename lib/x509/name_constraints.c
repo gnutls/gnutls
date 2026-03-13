@@ -544,7 +544,8 @@ static int validate_name_constraints_node(gnutls_x509_subject_alt_name_t type,
 	if (type != GNUTLS_SAN_DNSNAME && type != GNUTLS_SAN_RFC822NAME &&
 	    type != GNUTLS_SAN_DN && type != GNUTLS_SAN_URI &&
 	    type != GNUTLS_SAN_IPADDRESS &&
-	    type != GNUTLS_SAN_OTHERNAME_MSUSERPRINCIPAL) {
+	    type != GNUTLS_SAN_OTHERNAME_MSUSERPRINCIPAL &&
+	    type != GNUTLS_SAN_OTHERNAME_SRV) {
 		return gnutls_assert_val(GNUTLS_E_X509_UNKNOWN_SAN);
 	}
 
