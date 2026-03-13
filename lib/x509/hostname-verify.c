@@ -108,7 +108,7 @@ unsigned gnutls_x509_crt_check_ip(gnutls_x509_crt_t cert,
  * that we do not fallback to CN-ID if we encounter a supported name
  * type.
  */
-#define IS_SAN_SUPPORTED(san) \
+#define PRECLUDES_CN_FALLBACK(san) \
 	(san == GNUTLS_SAN_DNSNAME || san == GNUTLS_SAN_IPADDRESS)
 
 /**
@@ -151,13 +151,12 @@ unsigned gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 {
 	char dnsname[MAX_CN];
 	size_t dnsnamesize;
-	int found_dnsname = 0;
 	int ret = 0;
 	int i = 0;
 	struct in_addr ipv4;
 	const char *p = NULL;
 	char *a_hostname;
-	unsigned have_other_addresses = 0;
+	bool cn_fallback_allowed = true;
 	gnutls_datum_t out;
 
 	/* check whether @hostname is an ip address */
@@ -213,9 +212,10 @@ hostname_fallback:
 		ret = gnutls_x509_crt_get_subject_alt_name(cert, i, dnsname,
 							   &dnsnamesize, NULL);
 
-		if (ret == GNUTLS_SAN_DNSNAME) {
-			found_dnsname = 1;
+		if (PRECLUDES_CN_FALLBACK(ret))
+			cn_fallback_allowed = false;
 
+		if (ret == GNUTLS_SAN_DNSNAME) {
 			if (memchr(dnsname, '\0', dnsnamesize)) {
 				_gnutls_debug_log(
 					"certificate has %s with embedded null in name\n",
@@ -236,13 +236,10 @@ hostname_fallback:
 				ret = 1;
 				goto cleanup;
 			}
-		} else {
-			if (IS_SAN_SUPPORTED(ret))
-				have_other_addresses = 1;
 		}
 	}
 
-	if (!have_other_addresses && !found_dnsname &&
+	if (cn_fallback_allowed &&
 	    _gnutls_check_key_purpose(cert, GNUTLS_KP_TLS_WWW_SERVER, 0) != 0) {
 		/* did not get the necessary extension, use CN instead, if the
 		 * certificate would have been acceptable for a TLS WWW server purpose.
