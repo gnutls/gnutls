@@ -108,8 +108,9 @@ unsigned gnutls_x509_crt_check_ip(gnutls_x509_crt_t cert,
  * that we do not fallback to CN-ID if we encounter a supported name
  * type.
  */
-#define PRECLUDES_CN_FALLBACK(san) \
-	(san == GNUTLS_SAN_DNSNAME || san == GNUTLS_SAN_IPADDRESS)
+#define PRECLUDES_CN_FALLBACK(san)                                   \
+	(san == GNUTLS_SAN_DNSNAME || san == GNUTLS_SAN_IPADDRESS || \
+	 san == GNUTLS_SAN_URI || san == GNUTLS_SAN_OTHERNAME_SRV)
 
 /**
  * gnutls_x509_crt_check_hostname2:
