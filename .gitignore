@@ -438,7 +438,7 @@ tests/handshake-write
 tests/hex
 tests/hostname-check
 tests/hostname-check-utf8
-tests/hpke
+tests/hpke-tests
 tests/id-on-xmppAddr
 tests/infoaccess
 tests/init_roundtrip

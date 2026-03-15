@@ -1341,20 +1341,16 @@ int gnutls_x509_privkey_import_ecc_raw(gnutls_x509_privkey_t key,
 			goto cleanup;
 		}
 
-		if (curve_is_eddsa(curve)) {
-			size = gnutls_ecc_curve_get_size(curve);
-			if (x->size != size || k->size != size) {
-				ret = gnutls_assert_val(
-					GNUTLS_E_INVALID_REQUEST);
-				goto cleanup;
-			}
+		size = gnutls_ecc_curve_get_size(curve);
+		if (x->size != size || k->size != size) {
+			ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			goto cleanup;
+		}
 
-			ret = _gnutls_set_datum(&key->params.raw_pub, x->data,
-						x->size);
-			if (ret < 0) {
-				gnutls_assert();
-				goto cleanup;
-			}
+		ret = _gnutls_set_datum(&key->params.raw_pub, x->data, x->size);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
 		}
 
 		ret = _gnutls_set_datum(&key->params.raw_priv, k->data,
