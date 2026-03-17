@@ -82,11 +82,27 @@ static inline void _gnutls_memory_mark_defined(void *addr, size_t size)
 #endif
 }
 
-static inline ATTRIBUTE_NONNULL() void *_gnutls_take_pointer(void **src)
+static inline ATTRIBUTE_NONNULL() void *_gnutls_take_pointer(void *src)
 {
-	void *dst = *src;
-	*src = NULL;
+	void **ptr = (void **)src;
+	void *dst;
+
+	dst = *ptr;
+	*ptr = NULL;
+
 	return dst;
 }
+
+/* Type-safety */
+#if (((defined __GNUC__ &&                                                    \
+       __GNUC__ + (__GNUC_MINOR__ >= 1) > 3) /* both C and C++ mode */        \
+      || (defined __clang__ && __clang_major__ >= 3 /* both C and C++ mode */ \
+	  && !(defined __cplusplus &&                                         \
+	       !defined __GNUC__))) /* except for clang-cl in C++ mode */     \
+     && !defined __STRICT_ANSI__) /* but not with -std=c99 or -std=c11 */     \
+	|| (defined __SUNPRO_C && __SUNPRO_C >= 0x5110) /* C mode */          \
+	|| __STDC_VERSION__ >= 202311L /* C mode */
+#define _gnutls_take_pointer(pp) ((typeof(*pp))(_gnutls_take_pointer)(pp))
+#endif /* HAVE_TYPEOF */
 
 #endif /* GNUTLS_LIB_MEM_H */
