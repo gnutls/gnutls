@@ -406,7 +406,11 @@ int gnutls_x509_ext_import_name_constraints(const gnutls_datum_t *ext,
 			goto cleanup;
 		}
 	} else {
-		_gnutls_x509_name_constraints_clear(nc);
+		ret = _gnutls_x509_name_constraints_clear(nc);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
 
 		ret = _gnutls_x509_name_constraints_extract(
 			c2, "permittedSubtrees", "excludedSubtrees", nc);

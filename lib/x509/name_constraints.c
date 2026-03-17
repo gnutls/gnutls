@@ -40,6 +40,8 @@
 #include "ip-in-cidr.h"
 #include "intprops.h"
 #include "minmax.h"
+#include "gl_array_list.h"
+#include "gl_rbtree_list.h"
 
 #include <assert.h>
 #include <string.h>
@@ -52,16 +54,12 @@ struct name_constraints_node_st {
 };
 
 struct name_constraints_node_list_st {
-	struct name_constraints_node_st **data;
-	size_t size;
-	size_t capacity;
-	/* sorted-on-demand view, valid only when dirty == false */
-	bool dirty;
-	struct name_constraints_node_st **sorted_view;
+	gl_list_t items;
+	gl_list_t sorted_items;
 };
 
 struct gnutls_name_constraints_st {
-	struct name_constraints_node_list_st nodes; /* owns elements */
+	gl_list_t nodes; /* owns elements */
 	struct name_constraints_node_list_st permitted; /* borrows elements */
 	struct name_constraints_node_list_st excluded; /* borrows elements */
 };
@@ -326,14 +324,13 @@ compare_name_constraint_nodes(const struct name_constraints_node_st *n1,
 	}
 }
 
-/* qsort-compatible wrapper */
-static int compare_name_constraint_nodes_qsort(const void *a, const void *b)
+static int compare_name_constraint_nodes_wrapper(const void *a, const void *b)
 {
-	const struct name_constraints_node_st *const *n1 = a;
-	const struct name_constraints_node_st *const *n2 = b;
+	const struct name_constraints_node_st *n1 = a;
+	const struct name_constraints_node_st *n2 = b;
 	enum name_constraint_relation rel;
 
-	rel = compare_name_constraint_nodes(*n1, *n2);
+	rel = compare_name_constraint_nodes(n1, n2);
 	switch (rel) {
 	case NC_SORTS_BEFORE:
 	case NC_INCLUDED_BY:
@@ -347,71 +344,71 @@ static int compare_name_constraint_nodes_qsort(const void *a, const void *b)
 	}
 }
 
-/* Bring the sorted view up to date with the list data; clear the dirty flag. */
-static int ensure_sorted(struct name_constraints_node_list_st *list)
-{
-	struct name_constraints_node_st **new_data;
-
-	if (!list->dirty)
-		return GNUTLS_E_SUCCESS;
-	if (!list->size) {
-		list->dirty = false;
-		return GNUTLS_E_SUCCESS;
-	}
-
-	/* reallocate sorted view to match current size */
-	new_data =
-		_gnutls_reallocarray(list->sorted_view, list->size,
-				     sizeof(struct name_constraints_node_st *));
-	if (!new_data)
-		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-	list->sorted_view = new_data;
-
-	/* copy pointers and sort in-place */
-	memcpy(list->sorted_view, list->data,
-	       list->size * sizeof(struct name_constraints_node_st *));
-	qsort(list->sorted_view, list->size,
-	      sizeof(struct name_constraints_node_st *),
-	      compare_name_constraint_nodes_qsort);
-
-	list->dirty = false;
-	return GNUTLS_E_SUCCESS;
-}
-
 static int
 name_constraints_node_list_add(struct name_constraints_node_list_st *list,
-			       struct name_constraints_node_st *node)
+			       const struct name_constraints_node_st *node)
 {
-	if (!list->capacity || list->size == list->capacity) {
-		size_t new_capacity = list->capacity;
-		struct name_constraints_node_st **new_data;
-
-		if (!INT_MULTIPLY_OK(new_capacity, 2, &new_capacity) ||
-		    !INT_ADD_OK(new_capacity, 1, &new_capacity))
-			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-		new_data = _gnutls_reallocarray(
-			list->data, new_capacity,
-			sizeof(struct name_constraints_node_st *));
-		if (!new_data)
-			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-		list->capacity = new_capacity;
-		list->data = new_data;
-	}
-	list->dirty = true;
-	list->data[list->size++] = node;
+	if (!gl_list_nx_add_last(list->items, node))
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+	if (!gl_sortedlist_nx_add(list->sorted_items,
+				  (gl_listelement_compar_fn)
+					  compare_name_constraint_nodes_wrapper,
+				  node))
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 	return 0;
 }
 
-static void
-name_constraints_node_list_clear(struct name_constraints_node_list_st *list)
+static int
+name_constraints_node_list_init(struct name_constraints_node_list_st *list)
 {
-	gnutls_free(list->data);
-	gnutls_free(list->sorted_view);
-	list->data = NULL;
-	list->sorted_view = NULL;
-	list->capacity = 0;
-	list->size = 0;
-	list->dirty = false;
+	int ret;
+	gl_list_t items = NULL, sorted_items = NULL;
+
+	items = gl_list_nx_create_empty(GL_ARRAY_LIST, NULL, NULL, NULL, true);
+	if (!items) {
+		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		goto cleanup;
+	}
+
+	sorted_items =
+		gl_list_nx_create_empty(GL_RBTREE_LIST, NULL, NULL, NULL, true);
+	if (!sorted_items) {
+		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		goto cleanup;
+	}
+
+	list->items = _gnutls_take_pointer(&items);
+	list->sorted_items = _gnutls_take_pointer(&sorted_items);
+
+	ret = GNUTLS_E_SUCCESS;
+
+cleanup:
+	if (items)
+		gl_list_free(items);
+	if (sorted_items)
+		gl_list_free(sorted_items);
+	return ret;
+}
+
+static void
+name_constraints_node_list_deinit(struct name_constraints_node_list_st *list)
+{
+	if (list->items)
+		gl_list_free(list->items);
+	if (list->sorted_items)
+		gl_list_free(list->sorted_items);
+}
+
+static struct name_constraints_node_list_st
+name_constraints_node_list_take(struct name_constraints_node_list_st *list)
+{
+	struct name_constraints_node_list_st dst;
+
+	dst = *list;
+	dst.items = _gnutls_take_pointer(&list->items);
+	dst.sorted_items = _gnutls_take_pointer(&list->sorted_items);
+
+	return dst;
 }
 
 static int
@@ -460,21 +457,33 @@ name_constraints_node_add_copy(gnutls_x509_name_constraints_t nc,
 bool _gnutls_x509_name_constraints_is_empty(gnutls_x509_name_constraints_t nc,
 					    unsigned type)
 {
-	if (nc->permitted.size == 0 && nc->excluded.size == 0)
+	if (gl_list_size(nc->permitted.items) == 0 &&
+	    gl_list_size(nc->excluded.items) == 0)
 		return true;
 
 	if (type == 0)
 		return false;
 
-	for (size_t i = 0; i < nc->permitted.size; i++) {
-		if (nc->permitted.data[i]->type == type)
-			return false;
-	}
+	const struct name_constraints_node_st *node;
+	gl_list_iterator_t iter;
 
-	for (size_t i = 0; i < nc->excluded.size; i++) {
-		if (nc->excluded.data[i]->type == type)
+	iter = gl_list_iterator(nc->permitted.items);
+	while (gl_list_iterator_next(&iter, (const void **)&node, NULL)) {
+		if (node->type == type) {
+			gl_list_iterator_free(&iter);
 			return false;
+		}
 	}
+	gl_list_iterator_free(&iter);
+
+	iter = gl_list_iterator(nc->excluded.items);
+	while (gl_list_iterator_next(&iter, (const void **)&node, NULL)) {
+		if (node->type == type) {
+			gl_list_iterator_free(&iter);
+			return false;
+		}
+	}
+	gl_list_iterator_free(&iter);
 
 	/* no constraint for that type exists */
 	return true;
@@ -667,8 +676,7 @@ name_constraints_node_new(gnutls_x509_name_constraints_t nc, unsigned type,
 		}
 	}
 
-	ret = name_constraints_node_list_add(&nc->nodes, tmp);
-	if (ret < 0) {
+	if (!gl_list_nx_add_last(nc->nodes, tmp)) {
 		gnutls_assert();
 		name_constraints_node_free(tmp);
 		return NULL;
@@ -677,10 +685,11 @@ name_constraints_node_new(gnutls_x509_name_constraints_t nc, unsigned type,
 	return tmp;
 }
 
-static int
-name_constraints_node_list_union(gnutls_x509_name_constraints_t nc,
-				 struct name_constraints_node_list_st *nodes,
-				 struct name_constraints_node_list_st *nodes2);
+static int name_constraints_node_list_union(
+	gnutls_x509_name_constraints_t nc,
+	struct name_constraints_node_list_st *result,
+	const struct name_constraints_node_list_st *nodes1,
+	const struct name_constraints_node_list_st *nodes2);
 
 #define type_bitmask_t uint8_t /* increase if GNUTLS_SAN_MAX grows */
 #define type_bitmask_set(mask, t) ((mask) |= (1u << (t)))
@@ -695,97 +704,105 @@ typedef char assert_ipaddr[(GNUTLS_SAN_IPADDRESS <= GNUTLS_SAN_MAX) ? 1 : -1];
 /*-
  * @brief name_constraints_node_list_intersect:
  * @nc: %gnutls_x509_name_constraints_t
- * @permitted: first name constraints list (permitted)
- * @permitted2: name constraints list to merge with (permitted)
- * @excluded: Corresponding excluded name constraints list
+ * @result: resulting name constraints list (permitted)
+ * @permitted1: first name constraints list (permitted)
+ * @permitted2: second name constraints list (permitted)
+ * @excluded: corresponding excluded name constraints list
  *
- * This function finds the intersection of @permitted and @permitted2. The result is placed in @permitted,
- * the original @permitted is modified. @permitted2 is not changed. If necessary, a universal
- * excluded name constraint node of the right type is added to the list provided
- * in @excluded.
+ * This function finds the intersection of @permitted1 and
+ * @permitted2. The result is placed in @result. If necessary, a
+ * universal excluded name constraint node of the right type is added
+ * to the list provided in @excluded.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a negative error value.
  -*/
 static int name_constraints_node_list_intersect(
 	gnutls_x509_name_constraints_t nc,
-	struct name_constraints_node_list_st *permitted,
-	struct name_constraints_node_list_st *permitted2,
+	struct name_constraints_node_list_st *result,
+	const struct name_constraints_node_list_st *permitted1,
+	const struct name_constraints_node_list_st *permitted2,
 	struct name_constraints_node_list_st *excluded)
 {
-	struct name_constraints_node_st *nc1, *nc2;
-	struct name_constraints_node_list_st result = { 0 };
-	struct name_constraints_node_list_st unsupp2 = { 0 };
-	enum name_constraint_relation rel;
-	unsigned type;
-	int ret = GNUTLS_E_SUCCESS;
-	size_t i, j, p1_unsupp = 0, p2_unsupp = 0;
+	struct name_constraints_node_list_st unsupp1 = {
+		NULL,
+	};
+	struct name_constraints_node_list_st unsupp2 = {
+		NULL,
+	};
+	int ret;
+	size_t i, j, p1_unsupp, p2_unsupp;
 	type_bitmask_t universal_exclude_needed = 0;
 	type_bitmask_t types_in_p1 = 0, types_in_p2 = 0;
 	static const unsigned char universal_ip[32] = { 0 };
 
-	if (permitted->size == 0 || permitted2->size == 0)
+	if (gl_list_size(permitted1->items) == 0 ||
+	    gl_list_size(permitted2->items) == 0)
 		return GNUTLS_E_SUCCESS;
 
-	/* make sorted views of the arrays */
-	ret = ensure_sorted(permitted);
+	ret = name_constraints_node_list_init(&unsupp1);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
-	ret = ensure_sorted(permitted2);
+
+	ret = name_constraints_node_list_init(&unsupp2);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
 	/* deal with the leading unsupported types first: count, then union */
-	while (p1_unsupp < permitted->size &&
-	       !is_supported_type(permitted->sorted_view[p1_unsupp]->type))
-		p1_unsupp++;
-	while (p2_unsupp < permitted2->size &&
-	       !is_supported_type(permitted2->sorted_view[p2_unsupp]->type))
-		p2_unsupp++;
-	if (p1_unsupp) { /* copy p1 unsupported type pointers into result */
-		result.data = gnutls_calloc(
-			p1_unsupp, sizeof(struct name_constraints_node_st *));
-		if (!result.data) {
-			ret = GNUTLS_E_MEMORY_ERROR;
-			gnutls_assert();
-			goto cleanup;
-		}
-		memcpy(result.data, permitted->sorted_view,
-		       p1_unsupp * sizeof(struct name_constraints_node_st *));
-		result.size = result.capacity = p1_unsupp;
-		result.dirty = true;
-	}
-	if (p2_unsupp) { /* union will make deep copies from p2 */
-		unsupp2.data = permitted2->sorted_view; /* so, just alias */
-		unsupp2.size = unsupp2.capacity = p2_unsupp;
-		unsupp2.dirty = false; /* we know it's sorted */
-		unsupp2.sorted_view = permitted2->sorted_view;
-		ret = name_constraints_node_list_union(nc, &result, &unsupp2);
+	for (p1_unsupp = 0; p1_unsupp < gl_list_size(permitted1->sorted_items);
+	     p1_unsupp++) {
+		const struct name_constraints_node_st *node =
+			gl_list_get_at(permitted1->sorted_items, p1_unsupp);
+		if (is_supported_type(node->type))
+			break;
+		/* copy p1 unsupported type pointers into result */
+		ret = name_constraints_node_list_add(&unsupp1, node);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
 		}
 	}
+	for (p2_unsupp = 0; p2_unsupp < gl_list_size(permitted2->sorted_items);
+	     p2_unsupp++) {
+		const struct name_constraints_node_st *node =
+			gl_list_get_at(permitted2->sorted_items, p2_unsupp);
+		if (is_supported_type(node->type))
+			break;
+		/* copy p2 unsupported type pointers into result */
+		ret = name_constraints_node_list_add(&unsupp2, node);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+	}
+	/* result = unsupp1 | unsupp2 */
+	ret = name_constraints_node_list_union(nc, result, &unsupp1, &unsupp2);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
 
 	/* with that out of the way, pre-compute the supported types we have */
-	for (i = p1_unsupp; i < permitted->size; i++) {
-		type = permitted->sorted_view[i]->type;
-		if (type < 1 || type > GNUTLS_SAN_MAX) {
+	for (i = p1_unsupp; i < gl_list_size(permitted1->sorted_items); i++) {
+		const struct name_constraints_node_st *node =
+			gl_list_get_at(permitted1->sorted_items, i);
+		if (node->type < 1 || node->type > GNUTLS_SAN_MAX) {
 			ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 			goto cleanup;
 		}
-		type_bitmask_set(types_in_p1, type);
+		type_bitmask_set(types_in_p1, node->type);
 	}
-	for (j = p2_unsupp; j < permitted2->size; j++) {
-		type = permitted2->sorted_view[j]->type;
-		if (type < 1 || type > GNUTLS_SAN_MAX) {
+	for (j = p2_unsupp; j < gl_list_size(permitted2->sorted_items); j++) {
+		const struct name_constraints_node_st *node =
+			gl_list_get_at(permitted2->sorted_items, j);
+		if (node->type < 1 || node->type > GNUTLS_SAN_MAX) {
 			ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 			goto cleanup;
 		}
-		type_bitmask_set(types_in_p2, type);
+		type_bitmask_set(types_in_p2, node->type);
 	}
 	/* universal excludes might be needed for types intersecting to empty */
 	universal_exclude_needed = types_in_p1 & types_in_p2;
@@ -793,10 +810,17 @@ static int name_constraints_node_list_intersect(
 	/* go through supported type NCs and intersect in a single pass */
 	i = p1_unsupp;
 	j = p2_unsupp;
-	while (i < permitted->size || j < permitted2->size) {
-		nc1 = (i < permitted->size) ? permitted->sorted_view[i] : NULL;
-		nc2 = (j < permitted2->size) ? permitted2->sorted_view[j] :
-					       NULL;
+	while (i < gl_list_size(permitted1->sorted_items) ||
+	       j < gl_list_size(permitted2->sorted_items)) {
+		const struct name_constraints_node_st *nc1, *nc2;
+		enum name_constraint_relation rel;
+
+		nc1 = i < gl_list_size(permitted1->sorted_items) ?
+			      gl_list_get_at(permitted1->sorted_items, i) :
+			      NULL;
+		nc2 = j < gl_list_size(permitted2->sorted_items) ?
+			      gl_list_get_at(permitted2->sorted_items, j) :
+			      NULL;
 		rel = compare_name_constraint_nodes(nc1, nc2);
 
 		switch (rel) {
@@ -804,34 +828,33 @@ static int name_constraints_node_list_intersect(
 			assert(nc1 != NULL); /* comparator-guaranteed */
 			/* if nothing to intersect with, shallow-copy nc1 */
 			if (!type_bitmask_in(types_in_p2, nc1->type))
-				ret = name_constraints_node_list_add(&result,
-								     nc1);
+				ret = name_constraints_node_list_add(result, nc1);
 			i++; /* otherwise skip nc1 */
 			break;
 		case NC_SORTS_AFTER:
 			assert(nc2 != NULL); /* comparator-guaranteed */
 			/* if nothing to intersect with, deep-copy nc2 */
 			if (!type_bitmask_in(types_in_p1, nc2->type))
-				ret = name_constraints_node_add_copy(
-					nc, &result, nc2);
+				ret = name_constraints_node_add_copy(nc, result,
+								     nc2);
 			j++; /* otherwise skip nc2 */
 			break;
 		case NC_INCLUDED_BY: /* add nc1, shallow-copy */
 			assert(nc1 != NULL && nc2 != NULL); /* comparator */
 			type_bitmask_clr(universal_exclude_needed, nc1->type);
-			ret = name_constraints_node_list_add(&result, nc1);
+			ret = name_constraints_node_list_add(result, nc1);
 			i++;
 			break;
 		case NC_INCLUDES: /* pick nc2, deep-copy */
 			assert(nc1 != NULL && nc2 != NULL); /* comparator */
 			type_bitmask_clr(universal_exclude_needed, nc2->type);
-			ret = name_constraints_node_add_copy(nc, &result, nc2);
+			ret = name_constraints_node_add_copy(nc, result, nc2);
 			j++;
 			break;
 		case NC_EQUAL: /* pick whichever: nc1, shallow-copy */
 			assert(nc1 != NULL && nc2 != NULL); /* loop condition */
 			type_bitmask_clr(universal_exclude_needed, nc1->type);
-			ret = name_constraints_node_list_add(&result, nc1);
+			ret = name_constraints_node_list_add(result, nc1);
 			i++;
 			j++;
 			break;
@@ -844,7 +867,8 @@ static int name_constraints_node_list_intersect(
 
 	/* finishing touch: add universal excluded constraints for types where
 	 * both lists had constraints, but all intersections ended up empty */
-	for (type = 1; type <= GNUTLS_SAN_MAX; type++) {
+	for (gnutls_x509_subject_alt_name_t type = GNUTLS_SAN_DNSNAME;
+	     type <= GNUTLS_SAN_MAX; type++) {
 		if (!type_bitmask_in(universal_exclude_needed, type))
 			continue;
 		_gnutls_hard_log(
@@ -884,18 +908,11 @@ static int name_constraints_node_list_intersect(
 		}
 	}
 
-	gnutls_free(permitted->data);
-	gnutls_free(permitted->sorted_view);
-	permitted->data = result.data;
-	permitted->sorted_view = NULL;
-	permitted->size = result.size;
-	permitted->capacity = result.capacity;
-	permitted->dirty = true;
-
-	result.data = NULL;
 	ret = GNUTLS_E_SUCCESS;
+
 cleanup:
-	name_constraints_node_list_clear(&result);
+	name_constraints_node_list_deinit(&unsupp1);
+	name_constraints_node_list_deinit(&unsupp2);
 	return ret;
 }
 
@@ -904,95 +921,65 @@ cleanup:
 #undef type_bitmask_clr
 #undef type_bitmask_in
 
-static int
-name_constraints_node_list_union(gnutls_x509_name_constraints_t nc,
-				 struct name_constraints_node_list_st *nodes,
-				 struct name_constraints_node_list_st *nodes2)
+static int name_constraints_node_list_union(
+	gnutls_x509_name_constraints_t nc,
+	struct name_constraints_node_list_st *result,
+	const struct name_constraints_node_list_st *nodes1,
+	const struct name_constraints_node_list_st *nodes2)
 {
 	int ret;
 	size_t i = 0, j = 0;
-	struct name_constraints_node_st *nc1;
-	const struct name_constraints_node_st *nc2;
-	enum name_constraint_relation rel;
-	struct name_constraints_node_list_st result = { 0 };
-
-	if (nodes2->size == 0) /* nothing to do */
-		return GNUTLS_E_SUCCESS;
-
-	ret = ensure_sorted(nodes);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-	ret = ensure_sorted(nodes2);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
 
 	/* traverse both lists in a single pass and merge them w/o duplicates */
-	while (i < nodes->size || j < nodes2->size) {
-		nc1 = (i < nodes->size) ? nodes->sorted_view[i] : NULL;
-		nc2 = (j < nodes2->size) ? nodes2->sorted_view[j] : NULL;
+	while (i < gl_list_size(nodes1->sorted_items) ||
+	       j < gl_list_size(nodes2->sorted_items)) {
+		const struct name_constraints_node_st *nc1, *nc2;
+		enum name_constraint_relation rel;
+
+		nc1 = i < gl_list_size(nodes1->items) ?
+			      gl_list_get_at(nodes1->sorted_items, i) :
+			      NULL;
+		nc2 = j < gl_list_size(nodes2->items) ?
+			      gl_list_get_at(nodes2->sorted_items, j) :
+			      NULL;
 
 		rel = compare_name_constraint_nodes(nc1, nc2);
 		switch (rel) {
 		case NC_SORTS_BEFORE:
 			assert(nc1 != NULL); /* comparator-guaranteed */
-			ret = name_constraints_node_list_add(&result, nc1);
+			ret = name_constraints_node_list_add(result, nc1);
 			i++;
 			break;
 		case NC_SORTS_AFTER:
 			assert(nc2 != NULL); /* comparator-guaranteed */
-			ret = name_constraints_node_add_copy(nc, &result, nc2);
+			ret = name_constraints_node_add_copy(nc, result, nc2);
 			j++;
 			break;
 		case NC_INCLUDES: /* nc1 is broader, shallow-copy it */
 			assert(nc1 != NULL && nc2 != NULL); /* comparator */
-			ret = name_constraints_node_list_add(&result, nc1);
+			ret = name_constraints_node_list_add(result, nc1);
 			i++;
 			j++;
 			break;
 		case NC_INCLUDED_BY: /* nc2 is broader, deep-copy it */
 			assert(nc1 != NULL && nc2 != NULL); /* comparator */
-			ret = name_constraints_node_add_copy(nc, &result, nc2);
+			ret = name_constraints_node_add_copy(nc, result, nc2);
 			i++;
 			j++;
 			break;
 		case NC_EQUAL:
 			assert(nc1 != NULL && nc2 != NULL); /* loop condition */
-			ret = name_constraints_node_list_add(&result, nc1);
+			ret = name_constraints_node_list_add(result, nc1);
 			i++;
 			j++;
 			break;
 		}
 		if (ret < 0) {
-			gnutls_assert();
-			goto cleanup;
+			return gnutls_assert_val(ret);
 		}
 	}
 
-	gnutls_free(nodes->data);
-	gnutls_free(nodes->sorted_view);
-	nodes->data = result.data;
-	nodes->sorted_view = NULL;
-	nodes->size = result.size;
-	nodes->capacity = result.capacity;
-	nodes->dirty = true;
-	/* since we know it's sorted, populate sorted_view almost for free */
-	nodes->sorted_view = gnutls_calloc(
-		nodes->size, sizeof(struct name_constraints_node_st *));
-	if (!nodes->sorted_view)
-		return GNUTLS_E_SUCCESS; /* we tried, no harm done */
-	memcpy(nodes->sorted_view, nodes->data,
-	       nodes->size * sizeof(struct name_constraints_node_st *));
-	nodes->dirty = false;
-
-	result.data = NULL;
-	return GNUTLS_E_SUCCESS;
-cleanup:
-	name_constraints_node_list_clear(&result);
-	return gnutls_assert_val(ret);
+	return 0;
 }
 
 /**
@@ -1057,15 +1044,71 @@ cleanup:
 	return ret;
 }
 
-void _gnutls_x509_name_constraints_clear(gnutls_x509_name_constraints_t nc)
+static void name_constraints_deinit(struct gnutls_name_constraints_st *nc)
 {
-	for (size_t i = 0; i < nc->nodes.size; i++) {
-		struct name_constraints_node_st *node = nc->nodes.data[i];
-		name_constraints_node_free(node);
+	if (nc->nodes)
+		gl_list_free(nc->nodes);
+	name_constraints_node_list_deinit(&nc->permitted);
+	name_constraints_node_list_deinit(&nc->excluded);
+}
+
+static struct gnutls_name_constraints_st
+name_constraints_take(struct gnutls_name_constraints_st *nc)
+{
+	struct gnutls_name_constraints_st dst;
+
+	dst = *nc;
+	dst.nodes = _gnutls_take_pointer(&nc->nodes);
+	dst.permitted = name_constraints_node_list_take(&nc->permitted);
+	dst.excluded = name_constraints_node_list_take(&nc->excluded);
+
+	return dst;
+}
+
+static int name_constraints_init(struct gnutls_name_constraints_st *nc)
+{
+	struct gnutls_name_constraints_st tmp = {
+		NULL,
+	};
+	int ret;
+
+	tmp.nodes = gl_list_nx_create_empty(
+		GL_ARRAY_LIST, NULL, NULL,
+		(gl_listelement_dispose_fn)name_constraints_node_free, true);
+	if (!tmp.nodes) {
+		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		goto cleanup;
 	}
-	name_constraints_node_list_clear(&nc->nodes);
-	name_constraints_node_list_clear(&nc->permitted);
-	name_constraints_node_list_clear(&nc->excluded);
+
+	ret = name_constraints_node_list_init(&tmp.permitted);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = name_constraints_node_list_init(&tmp.excluded);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	*nc = name_constraints_take(&tmp);
+
+	ret = 0;
+
+cleanup:
+	if (tmp.nodes)
+		gl_list_free(tmp.nodes);
+	name_constraints_node_list_deinit(&tmp.permitted);
+	name_constraints_node_list_deinit(&tmp.excluded);
+	name_constraints_deinit(&tmp);
+	return ret;
+}
+
+int _gnutls_x509_name_constraints_clear(gnutls_x509_name_constraints_t nc)
+{
+	name_constraints_deinit(nc);
+	return name_constraints_init(nc);
 }
 
 /**
@@ -1078,7 +1121,7 @@ void _gnutls_x509_name_constraints_clear(gnutls_x509_name_constraints_t nc)
  **/
 void gnutls_x509_name_constraints_deinit(gnutls_x509_name_constraints_t nc)
 {
-	_gnutls_x509_name_constraints_clear(nc);
+	name_constraints_deinit(nc);
 	gnutls_free(nc);
 }
 
@@ -1095,6 +1138,7 @@ void gnutls_x509_name_constraints_deinit(gnutls_x509_name_constraints_t nc)
 int gnutls_x509_name_constraints_init(gnutls_x509_name_constraints_t *nc)
 {
 	struct gnutls_name_constraints_st *tmp;
+	int ret;
 
 	tmp = gnutls_calloc(1, sizeof(struct gnutls_name_constraints_st));
 	if (tmp == NULL) {
@@ -1102,8 +1146,21 @@ int gnutls_x509_name_constraints_init(gnutls_x509_name_constraints_t *nc)
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	*nc = tmp;
-	return 0;
+	ret = name_constraints_init(tmp);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	*nc = _gnutls_take_pointer(&tmp);
+	ret = 0;
+
+cleanup:
+	if (tmp) {
+		name_constraints_deinit(tmp);
+		gnutls_free(tmp);
+	}
+	return ret;
 }
 
 static int name_constraints_add(gnutls_x509_name_constraints_t nc,
@@ -1146,23 +1203,45 @@ static int name_constraints_add(gnutls_x509_name_constraints_t nc,
 int _gnutls_x509_name_constraints_merge(gnutls_x509_name_constraints_t nc,
 					gnutls_x509_name_constraints_t nc2)
 {
+	struct name_constraints_node_list_st permitted = { NULL, }, excluded = { NULL, };
 	int ret;
 
-	ret = name_constraints_node_list_intersect(
-		nc, &nc->permitted, &nc2->permitted, &nc->excluded);
+	ret = name_constraints_node_list_init(&permitted);
 	if (ret < 0) {
 		gnutls_assert();
-		return ret;
+		goto cleanup;
 	}
 
-	ret = name_constraints_node_list_union(nc, &nc->excluded,
+	ret = name_constraints_node_list_intersect(
+		nc, &permitted, &nc->permitted, &nc2->permitted, &nc->excluded);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = name_constraints_node_list_init(&excluded);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = name_constraints_node_list_union(nc, &excluded, &nc->excluded,
 					       &nc2->excluded);
 	if (ret < 0) {
 		gnutls_assert();
-		return ret;
+		goto cleanup;
 	}
+	name_constraints_node_list_deinit(&nc->permitted);
+	nc->permitted = name_constraints_node_list_take(&permitted);
+	name_constraints_node_list_deinit(&nc->excluded);
+	nc->excluded = name_constraints_node_list_take(&excluded);
 
-	return 0;
+	ret = GNUTLS_E_SUCCESS;
+
+cleanup:
+	name_constraints_node_list_deinit(&permitted);
+	name_constraints_node_list_deinit(&excluded);
+	return ret;
 }
 
 /**
@@ -1571,7 +1650,8 @@ gnutls_x509_name_constraints_check_crt(gnutls_x509_name_constraints_t nc,
 	if (_gnutls_x509_name_constraints_is_empty(nc, type) != 0)
 		return 1; /* shortcut; no constraints to check */
 
-	if (!INT_ADD_OK(nc->permitted.size, nc->excluded.size, &checks) ||
+	if (!INT_ADD_OK(gl_list_size(nc->permitted.items),
+			gl_list_size(nc->excluded.items), &checks) ||
 	    !INT_MULTIPLY_OK(checks, cert->san->size, &checks) ||
 	    checks > MAX_NC_CHECKS) {
 		return gnutls_assert_val(0);
@@ -1776,10 +1856,10 @@ int gnutls_x509_name_constraints_get_permitted(gnutls_x509_name_constraints_t nc
 {
 	const struct name_constraints_node_st *tmp;
 
-	if (idx >= nc->permitted.size)
+	if (idx >= gl_list_size(nc->permitted.items))
 		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
-	tmp = nc->permitted.data[idx];
+	tmp = gl_list_get_at(nc->permitted.items, idx);
 
 	*type = tmp->type;
 	*name = tmp->name;
@@ -1812,10 +1892,10 @@ int gnutls_x509_name_constraints_get_excluded(gnutls_x509_name_constraints_t nc,
 {
 	const struct name_constraints_node_st *tmp;
 
-	if (idx >= nc->excluded.size)
+	if (idx >= gl_list_size(nc->excluded.items))
 		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
-	tmp = nc->excluded.data[idx];
+	tmp = gl_list_get_at(nc->excluded.items, idx);
 
 	*type = tmp->type;
 	*name = tmp->name;
