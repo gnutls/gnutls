@@ -517,6 +517,11 @@ fedora-static-analyzers/build:
     - make -j$BUILDJOBS -C src/gl
     - scan-build --status-bugs -o scan-build-lib make -j$BUILDJOBS -C src
   #TODO originally, after_script was set to "/bin/true".. is there a reason not to create the cache?
+  artifacts:
+    expire_in: 1 week
+    when: on_failure
+    paths:
+      - scan-build-lib
 
 # FIXME: we disable this, as cppcheck currently hangs at the usage of
 # Gnulib's <intprops.h>: <https://trac.cppcheck.net/ticket/10192>.
