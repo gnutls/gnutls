@@ -26,7 +26,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
 #include <gnutls/gnutls.h>
 #include "utils.h"
 #include "eagain-common.h"
@@ -34,14 +33,14 @@
 /* This test checks whether the server switching certificates is detected
  * by the client */
 
+#define SIZEOF(array) (sizeof(array) / sizeof(array[0]))
+
 const char *side;
 
 static void tls_log_func(int level, const char *str)
 {
 	fprintf(stderr, "%s|<%d>| %s", side, level, str);
 }
-
-#include "cert-common.h"
 
 static int pskfunc(gnutls_session_t session, const char *username,
 		   gnutls_datum_t *key)
@@ -73,6 +72,9 @@ static void try(const char *prio, gnutls_kx_algorithm_t kx,
 	gnutls_session_t client;
 	const gnutls_datum_t key = { (void *)"DEADBEEF", 8 };
 	int cret = GNUTLS_E_AGAIN;
+
+	success("testing: prio=%s kx=%s allow_change=%d\n", prio,
+		gnutls_kx_get_name(kx), allow_change);
 
 	/* General init. */
 	gnutls_global_set_log_function(tls_log_func);
@@ -163,26 +165,28 @@ static void try(const char *prio, gnutls_kx_algorithm_t kx,
 
 void doit(void)
 {
+	const char *prio_list[] = {
+		"NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+PSK",
+		"NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+DHE-PSK",
+		"NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ECDHE-PSK",
+	};
+	const gnutls_kx_algorithm_t kx_list[] = {
+		GNUTLS_KX_PSK,
+		GNUTLS_KX_DHE_PSK,
+		GNUTLS_KX_ECDHE_PSK,
+	};
+	assert(SIZEOF(prio_list) == SIZEOF(kx_list));
+
 	global_init();
 
-	/* Allow change of ID */
-	try("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+PSK", GNUTLS_KX_PSK, 0);
-	reset_buffers();
-	try("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+DHE-PSK", GNUTLS_KX_DHE_PSK,
-	    0);
-	reset_buffers();
-	try("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ECDHE-PSK",
-	    GNUTLS_KX_ECDHE_PSK, 0);
-	reset_buffers();
+	/* loop over allowed (0) and disallowed (1) ID change */
+	for (unsigned allow = 0; allow <= 1; allow++) {
+		/* loop over priority strings/key exchange algorithms */
+		for (unsigned i = 0; i < SIZEOF(prio_list); i++) {
+			try(prio_list[i], kx_list[i], allow);
+			reset_buffers();
+		}
+	}
 
-	/* Prohibit (default) change of ID */
-	try("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+PSK", GNUTLS_KX_PSK, 1);
-	reset_buffers();
-	try("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+DHE-PSK", GNUTLS_KX_DHE_PSK,
-	    1);
-	reset_buffers();
-	try("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ECDHE-PSK",
-	    GNUTLS_KX_ECDHE_PSK, 1);
-	reset_buffers();
 	gnutls_global_deinit();
 }
