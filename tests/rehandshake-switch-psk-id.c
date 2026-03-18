@@ -57,7 +57,7 @@ static int pskfunc(gnutls_session_t session, const char *username,
 }
 
 static void try(const char *prio, gnutls_kx_algorithm_t kx,
-		unsigned allow_change)
+		unsigned allow_change, const char *username)
 {
 	int ret;
 	/* Server stuff. */
@@ -73,8 +73,8 @@ static void try(const char *prio, gnutls_kx_algorithm_t kx,
 	const gnutls_datum_t key = { (void *)"DEADBEEF", 8 };
 	int cret = GNUTLS_E_AGAIN;
 
-	success("testing: prio=%s kx=%s allow_change=%d\n", prio,
-		gnutls_kx_get_name(kx), allow_change);
+	success("testing: prio=%s kx=%s allow_change=%d username=%s\n", prio,
+		gnutls_kx_get_name(kx), allow_change, username);
 
 	/* General init. */
 	gnutls_global_set_log_function(tls_log_func);
@@ -114,7 +114,7 @@ static void try(const char *prio, gnutls_kx_algorithm_t kx,
 	if (ret < 0)
 		exit(1);
 
-	gnutls_psk_set_client_credentials(clientpskcred2, "test2", &key,
+	gnutls_psk_set_client_credentials(clientpskcred2, username, &key,
 					  GNUTLS_PSK_KEY_HEX);
 
 	ret = gnutls_init(&client, GNUTLS_CLIENT);
@@ -177,14 +177,21 @@ void doit(void)
 	};
 	assert(SIZEOF(prio_list) == SIZEOF(kx_list));
 
+	/* same length, different length */
+	const char *usernames[] = { "test2", "test3-but-longer" };
+
 	global_init();
 
 	/* loop over allowed (0) and disallowed (1) ID change */
 	for (unsigned allow = 0; allow <= 1; allow++) {
 		/* loop over priority strings/key exchange algorithms */
 		for (unsigned i = 0; i < SIZEOF(prio_list); i++) {
-			try(prio_list[i], kx_list[i], allow);
-			reset_buffers();
+			/* loop over usernames to rehandshake to */
+			for (unsigned j = 0; j < SIZEOF(usernames); j++) {
+				try(prio_list[i], kx_list[i], allow,
+				    usernames[j]);
+				reset_buffers();
+			}
 		}
 	}
 
