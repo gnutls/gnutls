@@ -2132,7 +2132,8 @@ static int check_ocsp_purpose(gnutls_x509_crt_t signercert)
 			return gnutls_assert_val(rc);
 		}
 
-		if (memcmp(oidtmp, GNUTLS_KP_OCSP_SIGNING, oidsize) != 0) {
+		if (oidsize != sizeof(GNUTLS_KP_OCSP_SIGNING) - 1 ||
+		    memcmp(oidtmp, GNUTLS_KP_OCSP_SIGNING, oidsize) != 0) {
 			gnutls_assert();
 			continue;
 		}
