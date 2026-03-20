@@ -49,7 +49,7 @@
 #define MAX_NC_CHECKS (1 << 20)
 
 struct name_constraints_node_st {
-	unsigned type;
+	gnutls_x509_subject_alt_name_t type;
 	gnutls_datum_t name;
 };
 
@@ -65,7 +65,8 @@ struct gnutls_name_constraints_st {
 };
 
 static struct name_constraints_node_st *
-name_constraints_node_new(gnutls_x509_name_constraints_t nc, unsigned type,
+name_constraints_node_new(gnutls_x509_name_constraints_t nc,
+			  gnutls_x509_subject_alt_name_t type,
 			  const unsigned char *data, unsigned int size);
 
 /* An enum for "rich" comparisons that not only let us sort name constraints,
@@ -271,7 +272,7 @@ static enum name_constraint_relation compare_ip_ncs(const gnutls_datum_t *n1,
 	return NC_EQUAL;
 }
 
-static inline bool is_supported_type(unsigned type)
+static inline bool is_supported_type(gnutls_x509_subject_alt_name_t type)
 {
 	/* all of these should be under GNUTLS_SAN_MAX (intersect bitmasks) */
 	return type == GNUTLS_SAN_DNSNAME || type == GNUTLS_SAN_RFC822NAME ||
@@ -414,8 +415,8 @@ name_constraints_node_list_take(struct name_constraints_node_list_st *list)
 static int
 name_constraints_node_add_new(gnutls_x509_name_constraints_t nc,
 			      struct name_constraints_node_list_st *list,
-			      unsigned type, const unsigned char *data,
-			      unsigned int size)
+			      gnutls_x509_subject_alt_name_t type,
+			      const unsigned char *data, unsigned int size)
 {
 	struct name_constraints_node_st *node;
 	int ret;
@@ -549,7 +550,7 @@ static int extract_name_constraints(gnutls_x509_name_constraints_t nc,
 	char tmpstr[128];
 	unsigned indx;
 	gnutls_datum_t tmp = { NULL, 0 };
-	unsigned int type;
+	gnutls_x509_subject_alt_name_t type;
 
 	for (indx = 1;; indx++) {
 		snprintf(tmpstr, sizeof(tmpstr), "%s.?%u.base", vstr, indx);
@@ -656,7 +657,8 @@ static void name_constraints_node_free(struct name_constraints_node_st *node)
  * Returns: Pointer to newly allocated node or NULL in case of memory error.
  -*/
 static struct name_constraints_node_st *
-name_constraints_node_new(gnutls_x509_name_constraints_t nc, unsigned type,
+name_constraints_node_new(gnutls_x509_name_constraints_t nc,
+			  gnutls_x509_subject_alt_name_t type,
 			  const unsigned char *data, unsigned int size)
 {
 	struct name_constraints_node_st *tmp;
@@ -789,19 +791,15 @@ static int name_constraints_node_list_intersect(
 	for (i = p1_unsupp; i < gl_list_size(permitted1->sorted_items); i++) {
 		const struct name_constraints_node_st *node =
 			gl_list_get_at(permitted1->sorted_items, i);
-		if (node->type < 1 || node->type > GNUTLS_SAN_MAX) {
-			ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
-			goto cleanup;
-		}
+		assert(node->type >= GNUTLS_SAN_DNSNAME &&
+		       node->type <= GNUTLS_SAN_MAX);
 		type_bitmask_set(types_in_p1, node->type);
 	}
 	for (j = p2_unsupp; j < gl_list_size(permitted2->sorted_items); j++) {
 		const struct name_constraints_node_st *node =
 			gl_list_get_at(permitted2->sorted_items, j);
-		if (node->type < 1 || node->type > GNUTLS_SAN_MAX) {
-			ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
-			goto cleanup;
-		}
+		assert(node->type >= GNUTLS_SAN_DNSNAME &&
+		       node->type <= GNUTLS_SAN_MAX);
 		type_bitmask_set(types_in_p2, node->type);
 	}
 	/* universal excludes might be needed for types intersecting to empty */
