@@ -165,6 +165,50 @@ static uint64_t read_u48(const uint8_t *p)
 	return seq;
 }
 
+static void make_0frag(uint8_t *dst, const uint8_t *src)
+{
+	memcpy(dst, src, 13 + 12);
+	dst[13 + 6] = dst[13 + 7] = dst[13 + 8] = 0; /* frag offset = 0 */
+	dst[13 + 9] = dst[13 + 10] = dst[13 + 11] = 0; /* frag length = 0 */
+	/* record payload length: just the 12-byte handshake header, no data */
+	dst[11] = 0;
+	dst[12] = 12;
+}
+
+ATTRIBUTE_NONNULL((2))
+static ssize_t client_push_inj0(gnutls_transport_ptr_t tr, const void *d_,
+				size_t l)
+{
+	static uint32_t seq = 0;
+	const uint8_t *d = (const uint8_t *)d_;
+	uint8_t frag[13 + 12];
+	uint8_t *b;
+
+	if (l < 13) /* too short for a DTLS record header */
+		return queue_put(&c2s, d, l);
+	if (!(d[3] == 0 && d[4] == 0)) /* not epoch 0: encrypted, don't touch */
+		return queue_put(&c2s, d, l);
+
+	b = malloc(l);
+	assert(b);
+	memcpy(b, d, l);
+
+	if (l >= 13 + 12 && d[0] == 22) { /* handshake record: inject 0-frag */
+		make_0frag(frag, d);
+		write_u48(frag + 5, seq++); /* 0-frag first */
+		queue_put(&c2s, frag, sizeof(frag));
+
+		write_u48(b + 5, seq++); /* real second */
+		queue_put(&c2s, b, l);
+	} else { /* other (e.g. CCS): just renumber */
+		write_u48(b + 5, seq++);
+		queue_put(&c2s, b, l);
+	}
+
+	free(b);
+	return l;
+}
+
 static void test(gnutls_push_func client_push, bool expect_success)
 {
 	gnutls_session_t client, server;
@@ -462,7 +506,10 @@ static ssize_t client_push_split_hello_bad_seq(gnutls_transport_ptr_t tr,
 void doit(void)
 {
 	global_init();
+	success("normal:\n");
 	test(client_push_normal, true);
+	success("valid 0-len fragments injected every 2nd push in epoch0:\n");
+	test(client_push_inj0, true);
 	success("malicious reassembly bug exploitation (#1816):\n");
 	test_malicious1816();
 	success("split client hello smoke-test\n");
