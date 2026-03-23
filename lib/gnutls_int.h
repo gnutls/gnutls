@@ -460,10 +460,10 @@ typedef struct {
 	uint16_t sequence;
 
 	/* indicate whether that message is complete.
-	 * complete means start_offset == 0 and end_offset == length
+	 * complete means start_offset == 0 and frag_length == length
 	 */
 	uint32_t start_offset;
-	uint32_t end_offset;
+	uint32_t frag_length; /* used exclusively in DTLS reassembly */
 
 	uint8_t header[MAX_HANDSHAKE_HEADER_SIZE];
 	int header_size;
