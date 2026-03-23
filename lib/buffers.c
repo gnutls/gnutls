@@ -931,14 +931,9 @@ static int parse_handshake_header(gnutls_session_t session, mbuffer_st *bufel,
 	memcpy(hsk->header, _mbuffer_get_udata_ptr(bufel),
 	       handshake_header_size);
 
-	if (hsk->length > 0 &&
-	    (frag_length > data_size ||
-	     (frag_length > 0 &&
-	      hsk->start_offset + frag_length > hsk->length))) {
+	if (frag_length > data_size) /* fragment straight up lying to us */
 		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
-	} else if (hsk->length == 0 &&
-		   hsk->start_offset + frag_length != hsk->start_offset &&
-		   hsk->start_offset != 0)
+	if (frag_length + hsk->start_offset > hsk->length) /* reassembly OOB */
 		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
 	return handshake_header_size;
