@@ -447,24 +447,21 @@ name_constraints_node_add_copy(gnutls_x509_name_constraints_t nc,
 /*-
  * _gnutls_x509_name_constraints_is_empty:
  * @nc: name constraints structure
- * @type: type (gnutls_x509_subject_alt_name_t or 0)
  *
  * Test whether given name constraints structure has any constraints (permitted
- * or excluded) of a given type. @nc must be allocated (not NULL) before the call.
- * If @type is 0, type checking will be skipped.
+ * or excluded). @nc must be allocated (not NULL) before the call.
  *
- * Returns: false if @nc contains constraints of type @type, true otherwise
+ * Returns: true if @nc contains no constraints, false otherwise
  -*/
-bool _gnutls_x509_name_constraints_is_empty(gnutls_x509_name_constraints_t nc,
-					    unsigned type)
+bool _gnutls_x509_name_constraints_is_empty(gnutls_x509_name_constraints_t nc)
 {
-	if (gl_list_size(nc->permitted.items) == 0 &&
-	    gl_list_size(nc->excluded.items) == 0)
-		return true;
+	return gl_list_size(nc->permitted.items) == 0 &&
+	       gl_list_size(nc->excluded.items) == 0;
+}
 
-	if (type == 0)
-		return false;
-
+static bool name_constraints_contains_type(gnutls_x509_name_constraints_t nc,
+					   gnutls_x509_subject_alt_name_t type)
+{
 	const struct name_constraints_node_st *node;
 	gl_list_iterator_t iter;
 
@@ -472,7 +469,7 @@ bool _gnutls_x509_name_constraints_is_empty(gnutls_x509_name_constraints_t nc,
 	while (gl_list_iterator_next(&iter, (const void **)&node, NULL)) {
 		if (node->type == type) {
 			gl_list_iterator_free(&iter);
-			return false;
+			return true;
 		}
 	}
 	gl_list_iterator_free(&iter);
@@ -481,13 +478,13 @@ bool _gnutls_x509_name_constraints_is_empty(gnutls_x509_name_constraints_t nc,
 	while (gl_list_iterator_next(&iter, (const void **)&node, NULL)) {
 		if (node->type == type) {
 			gl_list_iterator_free(&iter);
-			return false;
+			return true;
 		}
 	}
 	gl_list_iterator_free(&iter);
 
 	/* no constraint for that type exists */
-	return true;
+	return false;
 }
 
 /*-
@@ -1645,7 +1642,7 @@ gnutls_x509_name_constraints_check_crt(gnutls_x509_name_constraints_t nc,
 	unsigned found_one;
 	size_t checks;
 
-	if (_gnutls_x509_name_constraints_is_empty(nc, type) != 0)
+	if (!name_constraints_contains_type(nc, type))
 		return 1; /* shortcut; no constraints to check */
 
 	if (!INT_ADD_OK(gl_list_size(nc->permitted.items),

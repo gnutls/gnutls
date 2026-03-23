@@ -503,8 +503,7 @@ int _gnutls_x509_crt_check_revocation(gnutls_x509_crt_t cert,
 				      int crl_list_length,
 				      gnutls_verify_output_function func);
 
-bool _gnutls_x509_name_constraints_is_empty(gnutls_x509_name_constraints_t nc,
-					    unsigned type);
+bool _gnutls_x509_name_constraints_is_empty(gnutls_x509_name_constraints_t nc);
 int _gnutls_x509_name_constraints_extract(asn1_node c2,
 					  const char *permitted_name,
 					  const char *excluded_name,

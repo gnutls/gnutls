@@ -386,7 +386,7 @@ int gnutls_x509_ext_import_name_constraints(const gnutls_datum_t *ext,
 	}
 
 	if (flags & GNUTLS_NAME_CONSTRAINTS_FLAG_APPEND &&
-	    !_gnutls_x509_name_constraints_is_empty(nc, 0)) {
+	    !_gnutls_x509_name_constraints_is_empty(nc)) {
 		ret = gnutls_x509_name_constraints_init(&nc2);
 		if (ret < 0) {
 			gnutls_assert();
@@ -452,7 +452,7 @@ int gnutls_x509_ext_export_name_constraints(gnutls_x509_name_constraints_t nc,
 	unsigned rtype;
 	gnutls_datum_t rname;
 
-	if (_gnutls_x509_name_constraints_is_empty(nc, 0))
+	if (_gnutls_x509_name_constraints_is_empty(nc))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	result = asn1_create_element(_gnutls_get_pkix(),
