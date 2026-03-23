@@ -1325,8 +1325,8 @@ cleanup:
 	return ret;
 }
 
-static unsigned dnsname_matches(const gnutls_datum_t *name,
-				const gnutls_datum_t *suffix)
+static bool dnsname_matches(const gnutls_datum_t *name,
+			    const gnutls_datum_t *suffix)
 {
 	_gnutls_hard_log("matching %.*s with DNS constraint %.*s\n", name->size,
 			 name->data, suffix->size, suffix->data);
@@ -1335,8 +1335,8 @@ static unsigned dnsname_matches(const gnutls_datum_t *name,
 	return rel == NC_EQUAL || rel == NC_INCLUDED_BY;
 }
 
-static unsigned email_matches(const gnutls_datum_t *name,
-			      const gnutls_datum_t *suffix)
+static bool email_matches(const gnutls_datum_t *name,
+			  const gnutls_datum_t *suffix)
 {
 	_gnutls_hard_log("matching %.*s with e-mail constraint %.*s\n",
 			 name->size, name->data, suffix->size, suffix->data);
@@ -1348,9 +1348,8 @@ static unsigned email_matches(const gnutls_datum_t *name,
 /*
  * Returns: true if the certification is acceptable, and false otherwise.
  */
-static unsigned
-check_unsupported_constraint(gnutls_x509_name_constraints_t nc,
-			     gnutls_x509_subject_alt_name_t type)
+static bool check_unsupported_constraint(gnutls_x509_name_constraints_t nc,
+					 gnutls_x509_subject_alt_name_t type)
 {
 	unsigned i;
 	int ret;
@@ -1368,21 +1367,21 @@ check_unsupported_constraint(gnutls_x509_name_constraints_t nc,
 			if (rtype != type)
 				continue;
 			else
-				return gnutls_assert_val(0);
+				return gnutls_assert_val(false);
 		}
 
 	} while (ret == 0);
 
-	return 1;
+	return true;
 }
 
-static unsigned check_dns_constraints(gnutls_x509_name_constraints_t nc,
-				      const gnutls_datum_t *name)
+static bool check_dns_constraints(gnutls_x509_name_constraints_t nc,
+				  const gnutls_datum_t *name)
 {
 	unsigned i;
 	int ret;
 	unsigned rtype;
-	unsigned allowed_found = 0;
+	bool allowed_found = false;
 	gnutls_datum_t rname;
 
 	/* check restrictions */
@@ -1397,10 +1396,10 @@ static unsigned check_dns_constraints(gnutls_x509_name_constraints_t nc,
 			/* a name of value 0 means that the CA shouldn't have issued
 			 * a certificate with a DNSNAME. */
 			if (rname.size == 0)
-				return gnutls_assert_val(0);
+				return gnutls_assert_val(false);
 
-			if (dnsname_matches(name, &rname) != 0)
-				return gnutls_assert_val(0); /* rejected */
+			if (dnsname_matches(name, &rname))
+				return gnutls_assert_val(false); /* rejected */
 		}
 	} while (ret == 0);
 
@@ -1416,16 +1415,16 @@ static unsigned check_dns_constraints(gnutls_x509_name_constraints_t nc,
 			if (rname.size == 0)
 				continue;
 
-			allowed_found = 1;
+			allowed_found = true;
 
-			if (dnsname_matches(name, &rname) != 0)
-				return 1; /* accepted */
+			if (dnsname_matches(name, &rname))
+				return true; /* accepted */
 		}
 	} while (ret == 0);
 
-	if (allowed_found !=
-	    0) /* there are allowed directives but this host wasn't found */
-		return gnutls_assert_val(0);
+	/* there are allowed directives but this host wasn't found */
+	if (allowed_found)
+		return gnutls_assert_val(false);
 
 	return 1;
 }
@@ -1436,7 +1435,7 @@ static unsigned check_email_constraints(gnutls_x509_name_constraints_t nc,
 	unsigned i;
 	int ret;
 	unsigned rtype;
-	unsigned allowed_found = 0;
+	bool allowed_found = false;
 	gnutls_datum_t rname;
 
 	/* check restrictions */
@@ -1451,10 +1450,10 @@ static unsigned check_email_constraints(gnutls_x509_name_constraints_t nc,
 			/* a name of value 0 means that the CA shouldn't have issued
 			 * a certificate with an e-mail. */
 			if (rname.size == 0)
-				return gnutls_assert_val(0);
+				return gnutls_assert_val(false);
 
-			if (email_matches(name, &rname) != 0)
-				return gnutls_assert_val(0); /* rejected */
+			if (email_matches(name, &rname))
+				return gnutls_assert_val(false); /* rejected */
 		}
 	} while (ret == 0);
 
@@ -1470,16 +1469,16 @@ static unsigned check_email_constraints(gnutls_x509_name_constraints_t nc,
 			if (rname.size == 0)
 				continue;
 
-			allowed_found = 1;
+			allowed_found = true;
 
-			if (email_matches(name, &rname) != 0)
-				return 1; /* accepted */
+			if (email_matches(name, &rname))
+				return true; /* accepted */
 		}
 	} while (ret == 0);
 
-	if (allowed_found !=
-	    0) /* there are allowed directives but this host wasn't found */
-		return gnutls_assert_val(0);
+	/* there are allowed directives but this host wasn't found */
+	if (allowed_found)
+		return gnutls_assert_val(false);
 
 	return 1;
 }
@@ -1490,7 +1489,7 @@ static unsigned check_ip_constraints(gnutls_x509_name_constraints_t nc,
 	unsigned i;
 	int ret;
 	unsigned rtype;
-	unsigned allowed_found = 0;
+	bool allowed_found = false;
 	gnutls_datum_t rname;
 
 	/* check restrictions */
@@ -1506,8 +1505,8 @@ static unsigned check_ip_constraints(gnutls_x509_name_constraints_t nc,
 			if (name->size != rname.size / 2)
 				continue;
 
-			if (ip_in_cidr(name, &rname) != 0)
-				return gnutls_assert_val(0); /* rejected */
+			if (ip_in_cidr(name, &rname))
+				return gnutls_assert_val(false); /* rejected */
 		}
 	} while (ret == 0);
 
@@ -1524,16 +1523,16 @@ static unsigned check_ip_constraints(gnutls_x509_name_constraints_t nc,
 			if (name->size != rname.size / 2)
 				continue;
 
-			allowed_found = 1;
+			allowed_found = true;
 
-			if (ip_in_cidr(name, &rname) != 0)
-				return 1; /* accepted */
+			if (ip_in_cidr(name, &rname))
+				return true; /* accepted */
 		}
 	} while (ret == 0);
 
-	if (allowed_found !=
-	    0) /* there are allowed directives but this host wasn't found */
-		return gnutls_assert_val(0);
+	/* there are allowed directives but this host wasn't found */
+	if (allowed_found)
+		return gnutls_assert_val(false);
 
 	return 1;
 }
