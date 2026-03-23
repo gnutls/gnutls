@@ -503,6 +503,63 @@ static ssize_t client_push_split_hello_bad_seq(gnutls_transport_ptr_t tr,
 	return l;
 }
 
+static void test_malicious1811(void)
+{
+	static const uint8_t dgram[] = {
+		22, /* type = handshake */
+		0xfe, 0xfd, /* version = DTLS 1.2 */
+		0x00, 0x00, /* epoch = 0 */
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* seq = 0 */
+		0x00, 0x0c, /* record length = 12 */
+
+		0x01, /* type = ClientHello */
+		0xff, 0xff, 0xff, /* length = 0xffffff (!) */
+		0x00, 0x00, /* msg seq = 0 */
+		0x00, 0x00, 0x02, /* frag_offset = 2 (!) */
+		0x00, 0x00, 0x00, /* frag_length = 0 (!) */
+	};
+	gnutls_session_t server;
+	gnutls_certificate_credentials_t scred;
+	int sr;
+
+	if (debug)
+		gnutls_global_set_log_level(4711);
+
+	gnutls_certificate_allocate_credentials(&scred);
+	gnutls_certificate_set_x509_key_mem(scred, &server_cert, &server_key,
+					    GNUTLS_X509_FMT_PEM);
+
+	gnutls_init(&server, GNUTLS_SERVER | GNUTLS_DATAGRAM);
+	gnutls_priority_set_direct(server, "NORMAL:+VERS-DTLS1.2", NULL);
+	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, scred);
+
+	gnutls_dtls_set_timeouts(server, get_dtls_retransmit_timeout(),
+				 get_timeout());
+
+	gnutls_transport_set_ptr(server, server);
+	gnutls_transport_set_push_function(server, server_push);
+	gnutls_transport_set_pull_function(server, server_pull);
+	gnutls_transport_set_pull_timeout_function(server,
+						   c2s_pull_timeout_once);
+
+	queue_put(&c2s, dgram, sizeof(dgram));
+
+	gnutls_global_set_log_function(server_log_func);
+	do {
+		sr = gnutls_handshake(server); /* crashes if vulnerable */
+	} while (c2s.head != c2s.tail && !gnutls_error_is_fatal(sr));
+	if (gnutls_error_is_fatal(sr))
+		fail("server: %s\n", gnutls_strerror(sr));
+
+	success("OK\n");
+
+	queue_reset(&c2s);
+	queue_reset(&s2c);
+
+	gnutls_deinit(server);
+	gnutls_certificate_free_credentials(scred);
+}
+
 void doit(void)
 {
 	global_init();
@@ -516,6 +573,8 @@ void doit(void)
 	test(client_push_split_hello, true);
 	success("split client hello smoke-test and mangle sequence number\n");
 	test(client_push_split_hello_bad_seq, false);
+	success("malicious injection aiming for an underflow (#1811):\n");
+	test_malicious1811();
 	gnutls_global_deinit();
 }
 
