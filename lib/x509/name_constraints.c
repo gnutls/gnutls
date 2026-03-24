@@ -712,6 +712,47 @@ static int name_constraints_node_list_union(
 	const struct name_constraints_node_list_st *nodes1,
 	const struct name_constraints_node_list_st *nodes2);
 
+static san_flags_t name_constraints_node_list_types(
+	const struct name_constraints_node_list_st *nodes)
+{
+	const struct name_constraints_node_st *node;
+	gl_list_iterator_t iter;
+	san_flags_t flags = 0;
+
+	iter = gl_list_iterator(nodes->sorted_items);
+	while (gl_list_iterator_next(&iter, (const void **)&node, NULL))
+		flags |= SAN_FLAG(node->type);
+	gl_list_iterator_free(&iter);
+	return flags;
+}
+
+static int name_constraints_node_list_partition(
+	struct name_constraints_node_list_st *supported,
+	struct name_constraints_node_list_st *unsupported,
+	const struct name_constraints_node_list_st *nodes)
+{
+	int ret;
+	const struct name_constraints_node_st *node = NULL;
+	gl_list_iterator_t iter;
+
+	iter = gl_list_iterator(nodes->sorted_items);
+	while (gl_list_iterator_next(&iter, (const void **)&node, NULL)) {
+		ret = name_constraints_node_list_add(
+			is_supported_type(node->type) ? supported : unsupported,
+			node);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+	}
+
+	ret = GNUTLS_E_SUCCESS;
+
+cleanup:
+	gl_list_iterator_free(&iter);
+	return ret;
+}
+
 /*-
  * @brief name_constraints_node_list_intersect:
  * @nc: %gnutls_x509_name_constraints_t
@@ -734,14 +775,11 @@ static int name_constraints_node_list_intersect(
 	const struct name_constraints_node_list_st *permitted2,
 	struct name_constraints_node_list_st *excluded)
 {
-	struct name_constraints_node_list_st unsupp1 = {
-		NULL,
-	};
-	struct name_constraints_node_list_st unsupp2 = {
-		NULL,
-	};
+	struct name_constraints_node_list_st supported1 = { NULL, }, unsupported1 = { NULL, };
+	struct name_constraints_node_list_st supported2 = { NULL, }, unsupported2 = { NULL, };
 	int ret;
-	size_t i, j, p1_unsupp, p2_unsupp;
+	const struct name_constraints_node_st *node1 = NULL, *node2 = NULL;
+	gl_list_iterator_t iter1, iter2;
 	san_flags_t universal_exclude_needed = 0;
 	san_flags_t types_in_p1 = 0, types_in_p2 = 0;
 	static const unsigned char universal_ip[32] = { 0 };
@@ -750,128 +788,151 @@ static int name_constraints_node_list_intersect(
 	    gl_list_size(permitted2->items) == 0)
 		return GNUTLS_E_SUCCESS;
 
-	ret = name_constraints_node_list_init(&unsupp1);
+	/* First partition PERMITTED1 into supported and unsupported lists */
+	ret = name_constraints_node_list_init(&supported1);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	ret = name_constraints_node_list_init(&unsupp2);
+	ret = name_constraints_node_list_init(&unsupported1);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	/* deal with the leading unsupported types first: count, then union */
-	for (p1_unsupp = 0; p1_unsupp < gl_list_size(permitted1->sorted_items);
-	     p1_unsupp++) {
-		const struct name_constraints_node_st *node =
-			gl_list_get_at(permitted1->sorted_items, p1_unsupp);
-		if (is_supported_type(node->type))
-			break;
-		/* copy p1 unsupported type pointers into result */
-		ret = name_constraints_node_list_add(&unsupp1, node);
-		if (ret < 0) {
-			gnutls_assert();
-			goto cleanup;
-		}
-	}
-	for (p2_unsupp = 0; p2_unsupp < gl_list_size(permitted2->sorted_items);
-	     p2_unsupp++) {
-		const struct name_constraints_node_st *node =
-			gl_list_get_at(permitted2->sorted_items, p2_unsupp);
-		if (is_supported_type(node->type))
-			break;
-		/* copy p2 unsupported type pointers into result */
-		ret = name_constraints_node_list_add(&unsupp2, node);
-		if (ret < 0) {
-			gnutls_assert();
-			goto cleanup;
-		}
-	}
-	/* result = unsupp1 | unsupp2 */
-	ret = name_constraints_node_list_union(nc, result, &unsupp1, &unsupp2);
+	ret = name_constraints_node_list_partition(&supported1, &unsupported1,
+						   permitted1);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	/* with that out of the way, pre-compute the supported types we have */
-	for (i = p1_unsupp; i < gl_list_size(permitted1->sorted_items); i++) {
-		const struct name_constraints_node_st *node =
-			gl_list_get_at(permitted1->sorted_items, i);
-		assert(node->type >= GNUTLS_SAN_DNSNAME &&
-		       node->type <= GNUTLS_SAN_MAX);
-		types_in_p1 |= SAN_FLAG(node->type);
+	/* Do the same for PERMITTED2 */
+	ret = name_constraints_node_list_init(&supported2);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
 	}
-	for (j = p2_unsupp; j < gl_list_size(permitted2->sorted_items); j++) {
-		const struct name_constraints_node_st *node =
-			gl_list_get_at(permitted2->sorted_items, j);
-		assert(node->type >= GNUTLS_SAN_DNSNAME &&
-		       node->type <= GNUTLS_SAN_MAX);
-		types_in_p2 |= SAN_FLAG(node->type);
+
+	ret = name_constraints_node_list_init(&unsupported2);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
 	}
-	/* universal excludes might be needed for types intersecting to empty */
+
+	ret = name_constraints_node_list_partition(&supported2, &unsupported2,
+						   permitted2);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	/* Store unsupported1 | unsupported2 as a temporary result */
+	ret = name_constraints_node_list_union(nc, result, &unsupported1,
+					       &unsupported2);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	/* Secondly figure out which types are in supported1 and supported2 */
+	types_in_p1 = name_constraints_node_list_types(&supported1);
+	types_in_p2 = name_constraints_node_list_types(&supported2);
+	/* Universal excludes might be needed for types intersecting
+	 * to empty */
 	universal_exclude_needed = types_in_p1 & types_in_p2;
 
-	/* go through supported type NCs and intersect in a single pass */
-	i = p1_unsupp;
-	j = p2_unsupp;
-	while (i < gl_list_size(permitted1->sorted_items) ||
-	       j < gl_list_size(permitted2->sorted_items)) {
-		const struct name_constraints_node_st *nc1, *nc2;
+	/* Finally go through supported type NCs and intersect in a
+	 * single pass */
+	iter1 = gl_list_iterator(supported1.sorted_items);
+	iter2 = gl_list_iterator(supported2.sorted_items);
+	gl_list_iterator_next(&iter1, (const void **)&node1, NULL);
+	gl_list_iterator_next(&iter2, (const void **)&node2, NULL);
+	while (node1 || node2) {
 		enum name_constraint_relation rel;
 
-		nc1 = i < gl_list_size(permitted1->sorted_items) ?
-			      gl_list_get_at(permitted1->sorted_items, i) :
-			      NULL;
-		nc2 = j < gl_list_size(permitted2->sorted_items) ?
-			      gl_list_get_at(permitted2->sorted_items, j) :
-			      NULL;
-		rel = compare_name_constraint_nodes(nc1, nc2);
-
+		rel = compare_name_constraint_nodes(node1, node2);
 		switch (rel) {
 		case NC_SORTS_BEFORE:
-			assert(nc1 != NULL); /* comparator-guaranteed */
-			/* if nothing to intersect with, shallow-copy nc1 */
-			if (!(types_in_p2 & SAN_FLAG(nc1->type)))
+			assert(node1 != NULL); /* comparator-guaranteed */
+			/* if nothing to intersect with, shallow-copy node1 */
+			if (!(types_in_p2 & SAN_FLAG(node1->type))) {
 				ret = name_constraints_node_list_add(result,
-								     nc1);
-			i++; /* otherwise skip nc1 */
+								     node1);
+				if (ret < 0) {
+					gnutls_assert();
+					goto out;
+				}
+			}
+			/* otherwise skip node1 */
+			node1 = NULL;
+			gl_list_iterator_next(&iter1, (const void **)&node1,
+					      NULL);
 			break;
 		case NC_SORTS_AFTER:
-			assert(nc2 != NULL); /* comparator-guaranteed */
-			/* if nothing to intersect with, deep-copy nc2 */
-			if (!(types_in_p1 & SAN_FLAG(nc2->type)))
+			assert(node2 != NULL); /* comparator-guaranteed */
+			/* if nothing to intersect with, deep-copy node2 */
+			if (!(types_in_p1 & SAN_FLAG(node2->type))) {
 				ret = name_constraints_node_add_copy(nc, result,
-								     nc2);
-			j++; /* otherwise skip nc2 */
+								     node2);
+				if (ret < 0) {
+					gnutls_assert();
+					goto out;
+				}
+			}
+			/* otherwise skip node2 */
+			node2 = NULL;
+			gl_list_iterator_next(&iter2, (const void **)&node2,
+					      NULL);
 			break;
-		case NC_INCLUDED_BY: /* add nc1, shallow-copy */
-			assert(nc1 != NULL && nc2 != NULL); /* comparator */
-			universal_exclude_needed &= ~SAN_FLAG(nc1->type);
-			ret = name_constraints_node_list_add(result, nc1);
-			i++;
+		case NC_INCLUDED_BY: /* add node1, shallow-copy */
+			assert(node1 != NULL && node2 != NULL); /* comparator */
+			universal_exclude_needed &= ~SAN_FLAG(node1->type);
+			ret = name_constraints_node_list_add(result, node1);
+			if (ret < 0) {
+				gnutls_assert();
+				goto out;
+			}
+			node1 = NULL;
+			gl_list_iterator_next(&iter1, (const void **)&node1,
+					      NULL);
 			break;
-		case NC_INCLUDES: /* pick nc2, deep-copy */
-			assert(nc1 != NULL && nc2 != NULL); /* comparator */
-			universal_exclude_needed &= ~SAN_FLAG(nc2->type);
-			ret = name_constraints_node_add_copy(nc, result, nc2);
-			j++;
+		case NC_INCLUDES: /* pick node2, deep-copy */
+			assert(node1 != NULL && node2 != NULL); /* comparator */
+			universal_exclude_needed &= ~SAN_FLAG(node2->type);
+			ret = name_constraints_node_add_copy(nc, result, node2);
+			if (ret < 0) {
+				gnutls_assert();
+				goto out;
+			}
+			node2 = NULL;
+			gl_list_iterator_next(&iter2, (const void **)&node2,
+					      NULL);
 			break;
 		case NC_EQUAL: /* pick whichever: nc1, shallow-copy */
-			assert(nc1 != NULL && nc2 != NULL); /* loop condition */
-			universal_exclude_needed &= ~SAN_FLAG(nc1->type);
-			ret = name_constraints_node_list_add(result, nc1);
-			i++;
-			j++;
+			assert(node1 != NULL &&
+			       node2 != NULL); /* loop condition */
+			universal_exclude_needed &= ~SAN_FLAG(node1->type);
+			ret = name_constraints_node_list_add(result, node1);
+			if (ret < 0) {
+				gnutls_assert();
+				goto out;
+			}
+			node1 = NULL;
+			gl_list_iterator_next(&iter1, (const void **)&node1,
+					      NULL);
+			node2 = NULL;
+			gl_list_iterator_next(&iter2, (const void **)&node2,
+					      NULL);
 			break;
 		}
-		if (ret < 0) {
-			gnutls_assert();
-			goto cleanup;
-		}
 	}
+out:
+	gl_list_iterator_free(&iter1);
+	gl_list_iterator_free(&iter2);
+	if (ret < 0)
+		goto cleanup;
 
 	/* finishing touch: add universal excluded constraints for types where
 	 * both lists had constraints, but all intersections ended up empty */
@@ -919,8 +980,10 @@ static int name_constraints_node_list_intersect(
 	ret = GNUTLS_E_SUCCESS;
 
 cleanup:
-	name_constraints_node_list_deinit(&unsupp1);
-	name_constraints_node_list_deinit(&unsupp2);
+	name_constraints_node_list_deinit(&supported1);
+	name_constraints_node_list_deinit(&unsupported1);
+	name_constraints_node_list_deinit(&supported2);
+	name_constraints_node_list_deinit(&unsupported2);
 	return ret;
 }
 
@@ -931,58 +994,94 @@ static int name_constraints_node_list_union(
 	const struct name_constraints_node_list_st *nodes2)
 {
 	int ret;
-	size_t i = 0, j = 0;
+	gl_list_iterator_t iter1, iter2;
+	const struct name_constraints_node_st *node1 = NULL, *node2 = NULL;
 
 	/* traverse both lists in a single pass and merge them w/o duplicates */
-	while (i < gl_list_size(nodes1->sorted_items) ||
-	       j < gl_list_size(nodes2->sorted_items)) {
-		const struct name_constraints_node_st *nc1, *nc2;
+	iter1 = gl_list_iterator(nodes1->sorted_items);
+	iter2 = gl_list_iterator(nodes2->sorted_items);
+	gl_list_iterator_next(&iter1, (const void **)&node1, NULL);
+	gl_list_iterator_next(&iter2, (const void **)&node2, NULL);
+	while (node1 || node2) {
 		enum name_constraint_relation rel;
 
-		nc1 = i < gl_list_size(nodes1->items) ?
-			      gl_list_get_at(nodes1->sorted_items, i) :
-			      NULL;
-		nc2 = j < gl_list_size(nodes2->items) ?
-			      gl_list_get_at(nodes2->sorted_items, j) :
-			      NULL;
-
-		rel = compare_name_constraint_nodes(nc1, nc2);
+		rel = compare_name_constraint_nodes(node1, node2);
 		switch (rel) {
 		case NC_SORTS_BEFORE:
-			assert(nc1 != NULL); /* comparator-guaranteed */
-			ret = name_constraints_node_list_add(result, nc1);
-			i++;
+			assert(node1 != NULL); /* comparator-guaranteed */
+			ret = name_constraints_node_list_add(result, node1);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+			node1 = NULL;
+			gl_list_iterator_next(&iter1, (const void **)&node1,
+					      NULL);
 			break;
 		case NC_SORTS_AFTER:
-			assert(nc2 != NULL); /* comparator-guaranteed */
-			ret = name_constraints_node_add_copy(nc, result, nc2);
-			j++;
+			assert(node2 != NULL); /* comparator-guaranteed */
+			ret = name_constraints_node_add_copy(nc, result, node2);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+			node2 = NULL;
+			gl_list_iterator_next(&iter2, (const void **)&node2,
+					      NULL);
 			break;
-		case NC_INCLUDES: /* nc1 is broader, shallow-copy it */
-			assert(nc1 != NULL && nc2 != NULL); /* comparator */
-			ret = name_constraints_node_list_add(result, nc1);
-			i++;
-			j++;
+		case NC_INCLUDES: /* node1 is broader, shallow-copy it */
+			assert(node1 != NULL && node2 != NULL); /* comparator */
+			ret = name_constraints_node_list_add(result, node1);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+			node1 = NULL;
+			gl_list_iterator_next(&iter1, (const void **)&node1,
+					      NULL);
+			node2 = NULL;
+			gl_list_iterator_next(&iter2, (const void **)&node2,
+					      NULL);
 			break;
-		case NC_INCLUDED_BY: /* nc2 is broader, deep-copy it */
-			assert(nc1 != NULL && nc2 != NULL); /* comparator */
-			ret = name_constraints_node_add_copy(nc, result, nc2);
-			i++;
-			j++;
+		case NC_INCLUDED_BY: /* node2 is broader, deep-copy it */
+			assert(node1 != NULL && node2 != NULL); /* comparator */
+			ret = name_constraints_node_add_copy(nc, result, node2);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+			node1 = NULL;
+			gl_list_iterator_next(&iter1, (const void **)&node1,
+					      NULL);
+			node2 = NULL;
+			gl_list_iterator_next(&iter2, (const void **)&node2,
+					      NULL);
 			break;
 		case NC_EQUAL:
-			assert(nc1 != NULL && nc2 != NULL); /* loop condition */
-			ret = name_constraints_node_list_add(result, nc1);
-			i++;
-			j++;
+			assert(node1 != NULL &&
+			       node2 != NULL); /* loop condition */
+			ret = name_constraints_node_list_add(result, node1);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+			node1 = NULL;
+			gl_list_iterator_next(&iter1, (const void **)&node1,
+					      NULL);
+			node2 = NULL;
+			gl_list_iterator_next(&iter2, (const void **)&node2,
+					      NULL);
 			break;
-		}
-		if (ret < 0) {
-			return gnutls_assert_val(ret);
 		}
 	}
 
-	return 0;
+	ret = GNUTLS_E_SUCCESS;
+
+cleanup:
+	gl_list_iterator_free(&iter1);
+	gl_list_iterator_free(&iter2);
+
+	return ret;
 }
 
 /**
