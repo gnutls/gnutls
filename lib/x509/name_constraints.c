@@ -42,11 +42,33 @@
 #include "minmax.h"
 #include "gl_array_list.h"
 #include "gl_rbtree_list.h"
+#include "verify.h"
 
 #include <assert.h>
 #include <string.h>
+#include <limits.h>
 
 #define MAX_NC_CHECKS (1 << 20)
+
+#define SAN_MIN GNUTLS_SAN_DNSNAME
+
+/* For historical reasons, these are not in the range
+ * SAN_MIN..GNUTLS_SAN_MAX. They should probably deserve a separate
+ * enum type.
+ */
+#define SAN_OTHERNAME_MIN GNUTLS_SAN_OTHERNAME_XMPP
+#define SAN_OTHERNAME_MAX GNUTLS_SAN_OTHERNAME_MSUSERPRINCIPAL
+
+typedef unsigned long san_flags_t;
+
+#define SAN_BIT(san)                                 \
+	((san) <= GNUTLS_SAN_MAX ? (san) - SAN_MIN : \
+				   GNUTLS_SAN_MAX + (san) - SAN_OTHERNAME_MIN)
+
+verify(SAN_BIT(SAN_OTHERNAME_MIN) > SAN_BIT(GNUTLS_SAN_MAX));
+verify(SAN_BIT(SAN_OTHERNAME_MAX) < CHAR_BIT * sizeof(san_flags_t));
+
+#define SAN_FLAG(san) (1UL << SAN_BIT(san))
 
 struct name_constraints_node_st {
 	gnutls_x509_subject_alt_name_t type;
@@ -690,16 +712,6 @@ static int name_constraints_node_list_union(
 	const struct name_constraints_node_list_st *nodes1,
 	const struct name_constraints_node_list_st *nodes2);
 
-#define type_bitmask_t uint8_t /* increase if GNUTLS_SAN_MAX grows */
-#define type_bitmask_set(mask, t) ((mask) |= (1u << (t)))
-#define type_bitmask_clr(mask, t) ((mask) &= ~(1u << (t)))
-#define type_bitmask_in(mask, t) ((mask) & (1u << (t)))
-/* C99-compatible compile-time assertions; gnutls_int.h undefines verify */
-typedef char assert_san_max[(GNUTLS_SAN_MAX < 8) ? 1 : -1];
-typedef char assert_dnsname[(GNUTLS_SAN_DNSNAME <= GNUTLS_SAN_MAX) ? 1 : -1];
-typedef char assert_rfc822[(GNUTLS_SAN_RFC822NAME <= GNUTLS_SAN_MAX) ? 1 : -1];
-typedef char assert_ipaddr[(GNUTLS_SAN_IPADDRESS <= GNUTLS_SAN_MAX) ? 1 : -1];
-
 /*-
  * @brief name_constraints_node_list_intersect:
  * @nc: %gnutls_x509_name_constraints_t
@@ -730,8 +742,8 @@ static int name_constraints_node_list_intersect(
 	};
 	int ret;
 	size_t i, j, p1_unsupp, p2_unsupp;
-	type_bitmask_t universal_exclude_needed = 0;
-	type_bitmask_t types_in_p1 = 0, types_in_p2 = 0;
+	san_flags_t universal_exclude_needed = 0;
+	san_flags_t types_in_p1 = 0, types_in_p2 = 0;
 	static const unsigned char universal_ip[32] = { 0 };
 
 	if (gl_list_size(permitted1->items) == 0 ||
@@ -790,14 +802,14 @@ static int name_constraints_node_list_intersect(
 			gl_list_get_at(permitted1->sorted_items, i);
 		assert(node->type >= GNUTLS_SAN_DNSNAME &&
 		       node->type <= GNUTLS_SAN_MAX);
-		type_bitmask_set(types_in_p1, node->type);
+		types_in_p1 |= SAN_FLAG(node->type);
 	}
 	for (j = p2_unsupp; j < gl_list_size(permitted2->sorted_items); j++) {
 		const struct name_constraints_node_st *node =
 			gl_list_get_at(permitted2->sorted_items, j);
 		assert(node->type >= GNUTLS_SAN_DNSNAME &&
 		       node->type <= GNUTLS_SAN_MAX);
-		type_bitmask_set(types_in_p2, node->type);
+		types_in_p2 |= SAN_FLAG(node->type);
 	}
 	/* universal excludes might be needed for types intersecting to empty */
 	universal_exclude_needed = types_in_p1 & types_in_p2;
@@ -822,33 +834,34 @@ static int name_constraints_node_list_intersect(
 		case NC_SORTS_BEFORE:
 			assert(nc1 != NULL); /* comparator-guaranteed */
 			/* if nothing to intersect with, shallow-copy nc1 */
-			if (!type_bitmask_in(types_in_p2, nc1->type))
-				ret = name_constraints_node_list_add(result, nc1);
+			if (!(types_in_p2 & SAN_FLAG(nc1->type)))
+				ret = name_constraints_node_list_add(result,
+								     nc1);
 			i++; /* otherwise skip nc1 */
 			break;
 		case NC_SORTS_AFTER:
 			assert(nc2 != NULL); /* comparator-guaranteed */
 			/* if nothing to intersect with, deep-copy nc2 */
-			if (!type_bitmask_in(types_in_p1, nc2->type))
+			if (!(types_in_p1 & SAN_FLAG(nc2->type)))
 				ret = name_constraints_node_add_copy(nc, result,
 								     nc2);
 			j++; /* otherwise skip nc2 */
 			break;
 		case NC_INCLUDED_BY: /* add nc1, shallow-copy */
 			assert(nc1 != NULL && nc2 != NULL); /* comparator */
-			type_bitmask_clr(universal_exclude_needed, nc1->type);
+			universal_exclude_needed &= ~SAN_FLAG(nc1->type);
 			ret = name_constraints_node_list_add(result, nc1);
 			i++;
 			break;
 		case NC_INCLUDES: /* pick nc2, deep-copy */
 			assert(nc1 != NULL && nc2 != NULL); /* comparator */
-			type_bitmask_clr(universal_exclude_needed, nc2->type);
+			universal_exclude_needed &= ~SAN_FLAG(nc2->type);
 			ret = name_constraints_node_add_copy(nc, result, nc2);
 			j++;
 			break;
 		case NC_EQUAL: /* pick whichever: nc1, shallow-copy */
 			assert(nc1 != NULL && nc2 != NULL); /* loop condition */
-			type_bitmask_clr(universal_exclude_needed, nc1->type);
+			universal_exclude_needed &= ~SAN_FLAG(nc1->type);
 			ret = name_constraints_node_list_add(result, nc1);
 			i++;
 			j++;
@@ -862,9 +875,9 @@ static int name_constraints_node_list_intersect(
 
 	/* finishing touch: add universal excluded constraints for types where
 	 * both lists had constraints, but all intersections ended up empty */
-	for (gnutls_x509_subject_alt_name_t type = GNUTLS_SAN_DNSNAME;
+	for (gnutls_x509_subject_alt_name_t type = SAN_MIN;
 	     type <= GNUTLS_SAN_MAX; type++) {
-		if (!type_bitmask_in(universal_exclude_needed, type))
+		if (!(universal_exclude_needed & SAN_FLAG(type)))
 			continue;
 		_gnutls_hard_log(
 			"Adding universal excluded name constraint for type %d.\n",
@@ -910,11 +923,6 @@ cleanup:
 	name_constraints_node_list_deinit(&unsupp2);
 	return ret;
 }
-
-#undef type_bitmask_t
-#undef type_bitmask_set
-#undef type_bitmask_clr
-#undef type_bitmask_in
 
 static int name_constraints_node_list_union(
 	gnutls_x509_name_constraints_t nc,
@@ -1580,13 +1588,14 @@ check_unsupported_constraint2(gnutls_x509_crt_t cert,
 			      gnutls_x509_name_constraints_t nc,
 			      gnutls_x509_subject_alt_name_t type)
 {
-	unsigned idx, found_one;
+	unsigned idx;
+	bool found_one;
 	char name[MAX_CN];
 	size_t name_size;
 	unsigned san_type;
 	int ret;
 
-	found_one = 0;
+	found_one = false;
 
 	for (idx = 0;; idx++) {
 		name_size = sizeof(name);
@@ -1600,11 +1609,11 @@ check_unsupported_constraint2(gnutls_x509_crt_t cert,
 		if (san_type != GNUTLS_SAN_URI)
 			continue;
 
-		found_one = 1;
+		found_one = true;
 		break;
 	}
 
-	if (found_one != 0)
+	if (found_one)
 		return check_unsupported_constraint(nc, type);
 
 	/* no name was found in the certificate, so accept */
@@ -1638,7 +1647,7 @@ gnutls_x509_name_constraints_check_crt(gnutls_x509_name_constraints_t nc,
 	int ret;
 	unsigned idx, t, san_type;
 	gnutls_datum_t n;
-	unsigned found_one;
+	bool found_one;
 	size_t checks;
 
 	if (!name_constraints_contains_type(nc, type))
@@ -1652,7 +1661,7 @@ gnutls_x509_name_constraints_check_crt(gnutls_x509_name_constraints_t nc,
 	}
 
 	if (type == GNUTLS_SAN_RFC822NAME) {
-		found_one = 0;
+		found_one = false;
 		for (idx = 0;; idx++) {
 			name_size = sizeof(name);
 			ret = gnutls_x509_crt_get_subject_alt_name2(
@@ -1665,7 +1674,7 @@ gnutls_x509_name_constraints_check_crt(gnutls_x509_name_constraints_t nc,
 			if (san_type != GNUTLS_SAN_RFC822NAME)
 				continue;
 
-			found_one = 1;
+			found_one = true;
 			n.data = (void *)name;
 			n.size = name_size;
 			t = gnutls_x509_name_constraints_check(
@@ -1676,7 +1685,7 @@ gnutls_x509_name_constraints_check_crt(gnutls_x509_name_constraints_t nc,
 
 		/* there is at least a single e-mail. That means that the EMAIL field will
 		 * not be used for verifying the identity of the holder. */
-		if (found_one != 0)
+		if (found_one)
 			return 1;
 
 		do {
@@ -1697,7 +1706,7 @@ gnutls_x509_name_constraints_check_crt(gnutls_x509_name_constraints_t nc,
 			else if (ret < 0)
 				return gnutls_assert_val(0);
 
-			found_one = 1;
+			found_one = true;
 			n.data = (void *)name;
 			n.size = name_size;
 			t = gnutls_x509_name_constraints_check(
@@ -1707,7 +1716,7 @@ gnutls_x509_name_constraints_check_crt(gnutls_x509_name_constraints_t nc,
 		} while (0);
 
 		/* passed */
-		if (found_one != 0)
+		if (found_one)
 			return 1;
 		else {
 			/* no name was found. According to RFC5280: 
@@ -1716,7 +1725,7 @@ gnutls_x509_name_constraints_check_crt(gnutls_x509_name_constraints_t nc,
 			return gnutls_assert_val(1);
 		}
 	} else if (type == GNUTLS_SAN_DNSNAME) {
-		found_one = 0;
+		found_one = false;
 		for (idx = 0;; idx++) {
 			name_size = sizeof(name);
 			ret = gnutls_x509_crt_get_subject_alt_name2(
@@ -1729,7 +1738,7 @@ gnutls_x509_name_constraints_check_crt(gnutls_x509_name_constraints_t nc,
 			if (san_type != GNUTLS_SAN_DNSNAME)
 				continue;
 
-			found_one = 1;
+			found_one = true;
 			n.data = (void *)name;
 			n.size = name_size;
 			t = gnutls_x509_name_constraints_check(
@@ -1740,7 +1749,7 @@ gnutls_x509_name_constraints_check_crt(gnutls_x509_name_constraints_t nc,
 
 		/* there is at least a single DNS name. That means that the CN will
 		 * not be used for verifying the identity of the holder. */
-		if (found_one != 0)
+		if (found_one)
 			return 1;
 
 		/* verify the name constraints against the CN, if the certificate is
@@ -1768,7 +1777,7 @@ gnutls_x509_name_constraints_check_crt(gnutls_x509_name_constraints_t nc,
 				else if (ret < 0)
 					return gnutls_assert_val(0);
 
-				found_one = 1;
+				found_one = true;
 				n.data = (void *)name;
 				n.size = name_size;
 				t = gnutls_x509_name_constraints_check(
@@ -1778,7 +1787,7 @@ gnutls_x509_name_constraints_check_crt(gnutls_x509_name_constraints_t nc,
 			} while (0);
 
 		/* passed */
-		if (found_one != 0)
+		if (found_one)
 			return 1;
 		else {
 			/* no name was found. According to RFC5280: 
@@ -1787,7 +1796,7 @@ gnutls_x509_name_constraints_check_crt(gnutls_x509_name_constraints_t nc,
 			return gnutls_assert_val(1);
 		}
 	} else if (type == GNUTLS_SAN_IPADDRESS) {
-		found_one = 0;
+		found_one = false;
 		for (idx = 0;; idx++) {
 			name_size = sizeof(name);
 			ret = gnutls_x509_crt_get_subject_alt_name2(
@@ -1800,7 +1809,7 @@ gnutls_x509_name_constraints_check_crt(gnutls_x509_name_constraints_t nc,
 			if (san_type != GNUTLS_SAN_IPADDRESS)
 				continue;
 
-			found_one = 1;
+			found_one = true;
 			n.data = (void *)name;
 			n.size = name_size;
 			t = gnutls_x509_name_constraints_check(
@@ -1811,7 +1820,7 @@ gnutls_x509_name_constraints_check_crt(gnutls_x509_name_constraints_t nc,
 
 		/* there is at least a single IP address. */
 
-		if (found_one != 0) {
+		if (found_one) {
 			return 1;
 		} else {
 			/* no name was found. According to RFC5280:
