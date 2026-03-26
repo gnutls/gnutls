@@ -85,7 +85,7 @@ int _p11_provider_init(const char *url, const uint8_t *pin_data,
 
 	p11_provider.module = module;
 	p11_provider.slot = slot;
-	p11_provider.pin = _gnutls_steal_datum(&pin);
+	p11_provider.pin = _gnutls_take_datum(&pin);
 	p11_provider.initialized = true;
 	return 0;
 
