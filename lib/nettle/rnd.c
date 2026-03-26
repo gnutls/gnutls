@@ -159,7 +159,7 @@ static int wrap_nettle_rnd_init(void **_ctx)
 		goto cleanup;
 	}
 
-	*_ctx = _gnutls_steal_pointer((void **)&ctx);
+	*_ctx = _gnutls_take_pointer((void **)&ctx);
 
 cleanup:
 	zeroize_key(new_key, sizeof(new_key));

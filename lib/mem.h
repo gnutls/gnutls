@@ -82,7 +82,7 @@ static inline void _gnutls_memory_mark_defined(void *addr, size_t size)
 #endif
 }
 
-static inline ATTRIBUTE_NONNULL() void *_gnutls_steal_pointer(void **src)
+static inline ATTRIBUTE_NONNULL() void *_gnutls_take_pointer(void **src)
 {
 	void *dst = *src;
 	*src = NULL;

@@ -58,7 +58,7 @@ inline static ATTRIBUTE_NONNULL() void _gnutls_free_key_datum(
 }
 
 inline static ATTRIBUTE_NONNULL() gnutls_datum_t
-	_gnutls_steal_datum(gnutls_datum_t *src)
+	_gnutls_take_datum(gnutls_datum_t *src)
 {
 	gnutls_datum_t dst = *src;
 

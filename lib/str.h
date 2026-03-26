@@ -99,7 +99,7 @@ inline static void _gnutls_buffer_reset(gnutls_buffer_st *buf)
 }
 
 inline static ATTRIBUTE_NONNULL() gnutls_buffer_st
-	_gnutls_steal_buffer(gnutls_buffer_st *src)
+	_gnutls_take_buffer(gnutls_buffer_st *src)
 {
 	gnutls_buffer_st dst = *src;
 

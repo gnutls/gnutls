@@ -779,8 +779,8 @@ static int ml_kem_encaps(gnutls_pk_algorithm_t algo, gnutls_datum_t *ciphertext,
 		goto cleanup;
 	}
 
-	*ciphertext = _gnutls_steal_datum(&tmp_ciphertext);
-	*shared_secret = _gnutls_steal_datum(&tmp_shared_secret);
+	*ciphertext = _gnutls_take_datum(&tmp_ciphertext);
+	*shared_secret = _gnutls_take_datum(&tmp_shared_secret);
 
 	ret = 0;
 
@@ -839,7 +839,7 @@ static int ml_kem_decaps(gnutls_pk_algorithm_t algo,
 		goto cleanup;
 	}
 
-	*shared_secret = _gnutls_steal_datum(&tmp_shared_secret);
+	*shared_secret = _gnutls_take_datum(&tmp_shared_secret);
 
 	ret = 0;
 
@@ -897,8 +897,8 @@ static int ml_kem_generate_keypair(gnutls_pk_algorithm_t algo,
 		goto cleanup;
 	}
 
-	*raw_priv = _gnutls_steal_datum(&tmp_raw_priv);
-	*raw_pub = _gnutls_steal_datum(&tmp_raw_pub);
+	*raw_priv = _gnutls_take_datum(&tmp_raw_priv);
+	*raw_pub = _gnutls_take_datum(&tmp_raw_pub);
 
 	ret = 0;
 
@@ -1713,7 +1713,7 @@ static int ml_dsa_sign(gnutls_pk_algorithm_t algo, gnutls_datum_t *signature,
 	if (ret < 0)
 		goto cleanup;
 
-	*signature = _gnutls_steal_datum(&tmp_signature);
+	*signature = _gnutls_take_datum(&tmp_signature);
 
 	ret = 0;
 
@@ -1812,8 +1812,8 @@ static int ml_dsa_generate_keypair(gnutls_pk_algorithm_t algo,
 		goto cleanup;
 	}
 
-	*raw_priv = _gnutls_steal_datum(&tmp_raw_priv);
-	*raw_pub = _gnutls_steal_datum(&tmp_raw_pub);
+	*raw_priv = _gnutls_take_datum(&tmp_raw_priv);
+	*raw_pub = _gnutls_take_datum(&tmp_raw_pub);
 
 	ret = 0;
 

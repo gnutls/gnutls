@@ -1689,7 +1689,7 @@ static int decode_ml_dsa_inner_private_key(const gnutls_datum_t *raw_key,
 	if (pkey->params.raw_seed.data) {
 		/* For checking any inconsistency */
 		gnutls_datum_t raw_priv =
-			_gnutls_steal_datum(&pkey->params.raw_priv);
+			_gnutls_take_datum(&pkey->params.raw_priv);
 
 		pkey->params.pkflags |= GNUTLS_PK_FLAG_EXPAND_KEYS_FROM_SEED;
 		ret = _gnutls_pk_generate_keys(pkey->params.algo, 0,
@@ -1774,7 +1774,7 @@ static int _decode_pkcs8_ml_dsa_key(asn1_node pkcs8_asn,
 	if (version == 1) {
 		/* For checking any inconsistency */
 		gnutls_datum_t raw_pub =
-			_gnutls_steal_datum(&pkey->params.raw_pub);
+			_gnutls_take_datum(&pkey->params.raw_pub);
 
 		ret = _gnutls_x509_read_value(pkcs8_asn, "publicKey",
 					      &pkey->params.raw_pub);
