@@ -4,7 +4,7 @@
     "name": "gnutls-cli",
     "title": "GnuTLS client",
     "description": "Simple client program to set up a TLS connection.",
-    "detail": "Simple client program to set up a TLS connection to some other computer. \nIt sets up a TLS connection and forwards data from the standard input to the secured socket and vice versa.",
+    "detail": "Simple client program to set up a TLS connection to some other computer. \nIt sets up a TLS connection and forwards data from the standard input to the secured socket and vice versa.\nNote that this program is only meant for testing and diagnostic purposes. For more practical use-cases, consider using alternatives like GNU Wget.",
     "short-usage": "Usage: gnutls-cli [options] hostname\ngnutls-cli --help for usage instructions.\n",
     "argument": "[hostname]",
     "reorder-arguments": true
