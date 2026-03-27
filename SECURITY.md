@@ -13,6 +13,10 @@ the [CVSS](https://www.first.org/cvss) metric. Only vulnerabilities
 at the high or critical level are handled with this process. Other
 issues are handled with the normal release process.
 
+Some of the bundled programs, including gnutls-cli and gnutls-serv,
+are for testing and diagnostic purposes. Issues reported against those
+programs and not library proper are not treated as a vulnerability.
+
 # Committing a fix
 
 The fix when is made available, preferably within 1 month of the report,
