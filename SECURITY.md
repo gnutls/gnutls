@@ -9,7 +9,7 @@ issue.
 # Which issues are security issues
 
 A metric we consult to assessing security vulnerabilities is
-the [CVSS](https://www.first.org/cvss) metric. Only vulnerabilities
+the [CVSS](https://www.first.org/cvss) v3.1 metric. Only vulnerabilities
 at the high or critical level are handled with this process.
 Issues of lower severity are managed separately, often with different
 estimated times of arrival (ETAs) and backport targets.
