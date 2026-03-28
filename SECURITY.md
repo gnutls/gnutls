@@ -10,8 +10,9 @@ issue.
 
 A metric we consult to assessing security vulnerabilities is
 the [CVSS](https://www.first.org/cvss) metric. Only vulnerabilities
-at the high or critical level are handled with this process. Other
-issues are handled with the normal release process.
+at the high or critical level are handled with this process.
+Issues of lower severity are managed separately, often with different
+estimated times of arrival (ETAs) and backport targets.
 
 Some of the bundled programs, including gnutls-cli and gnutls-serv,
 are for testing and diagnostic purposes. Issues reported against those
