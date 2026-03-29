@@ -923,6 +923,9 @@ test_sign_set_pin () {
 # $3: certfile
 # $4: keyfile
 # $5: cafile
+# $6: client certfile
+# $7: client keyfile
+# $8: test name
 #
 # Tests using a certificate and key pair using gnutls-serv and gnutls-cli.
 use_certificate_test () {
@@ -931,7 +934,9 @@ use_certificate_test () {
 	certfile="$3"
 	keyfile="$4"
 	cafile="$5"
-	txt="$6"
+	cli_certfile="$6"
+	cli_keyfile="$7"
+	txt="$8"
 
 	echo -n "* Using PKCS #11 with gnutls-cli (${txt})... "
 	# start server
@@ -948,8 +953,8 @@ use_certificate_test () {
 	${VALGRIND} "${CLI}" --attime "$TESTDATE" ${ADDITIONAL_PARAM} -p "${PORT}" localhost --priority NORMAL --x509cafile="${cafile}" </dev/null >>"${LOGFILE}" 2>&1 && \
 		fail ${PID} "Connection should have failed!"
 
-	${VALGRIND} "${CLI}" --attime "$TESTDATE" ${ADDITIONAL_PARAM} -p "${PORT}" localhost --priority NORMAL --x509certfile="${certfile}" \
-	--x509keyfile="$keyfile" --x509cafile="${cafile}" </dev/null >>"${LOGFILE}" 2>&1 || \
+	${VALGRIND} "${CLI}" --attime "$TESTDATE" ${ADDITIONAL_PARAM} -p "${PORT}" localhost --priority NORMAL --x509certfile="${cli_certfile}" \
+	--x509keyfile="$cli_keyfile" --x509cafile="${cafile}" </dev/null >>"${LOGFILE}" 2>&1 || \
 		fail ${PID} "Connection (with files) should have succeeded!"
 
 	${VALGRIND} "${CLI}" --attime "$TESTDATE" ${ADDITIONAL_PARAM} -p "${PORT}" localhost --priority NORMAL --x509certfile="${token};object=gnutls-client;object-type=cert" \
@@ -1211,9 +1216,9 @@ write_serv_cert "${TOKEN}" "${TEST_PIN}" "${srcdir}/testpkcs11-certs/server.crt"
 write_serv_pubkey "${TOKEN}" "${TEST_PIN}" "${srcdir}/testpkcs11-certs/server.crt"
 test_sign "${TOKEN}" "${TEST_PIN}"
 
-use_certificate_test "${TOKEN}" "${TEST_PIN}" "${TOKEN};object=serv-cert;object-type=cert" "${TOKEN};object=serv-key;object-type=private" "${srcdir}/testpkcs11-certs/ca.crt" "full URLs"
+use_certificate_test "${TOKEN}" "${TEST_PIN}" "${TOKEN};object=serv-cert;object-type=cert" "${TOKEN};object=serv-key;object-type=private" "${srcdir}/testpkcs11-certs/ca.crt" "${srcdir}/testpkcs11-certs/client.crt" "${srcdir}/testpkcs11-certs/client.key" "full URLs"
 
-use_certificate_test "${TOKEN}" "${TEST_PIN}" "${TOKEN};object=serv-cert" "${TOKEN};object=serv-key" "${srcdir}/testpkcs11-certs/ca.crt" "abbrv URLs"
+use_certificate_test "${TOKEN}" "${TEST_PIN}" "${TOKEN};object=serv-cert" "${TOKEN};object=serv-key" "${srcdir}/testpkcs11-certs/ca.crt" "${srcdir}/testpkcs11-certs/client.crt" "${srcdir}/testpkcs11-certs/client.key" "abbrv URLs"
 
 write_certificate_id_test_rsa "${TOKEN}" "${TEST_PIN}" "${srcdir}/testpkcs11-certs/ca.key" "${srcdir}/testpkcs11-certs/ca.crt"
 write_certificate_id_test_rsa2 "${TOKEN}" "${TEST_PIN}" "${srcdir}/testpkcs11-certs/ca.key" "${srcdir}/testpkcs11-certs/ca.crt"
