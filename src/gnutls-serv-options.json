@@ -4,7 +4,7 @@
     "name": "gnutls-serv",
     "title": "GnuTLS server",
     "description": "Simple server program to act as an HTTPS or TLS echo service.",
-    "detail": "Server program that listens to incoming TLS connections.",
+    "detail": "Server program that listens to incoming TLS connections.\nNote that this program is only meant for testing and diagnostic purposes.",
     "short-usage": "Usage: gnutls-serv [options]\ngnutls-serv --help for usage instructions.\n"
   },
   "sections": [
