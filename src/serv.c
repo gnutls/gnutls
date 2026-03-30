@@ -293,7 +293,8 @@ static int cert_verify_callback(gnutls_session_t session)
 			return 0;
 
 		if (ENABLED_OPT(VERIFY_CLIENT_CERT)) {
-			if (cert_verify(session, NULL, NULL) == 0) {
+			if (cert_verify(session, NULL,
+					GNUTLS_KP_TLS_WWW_CLIENT) == 0) {
 				do {
 					ret = gnutls_alert_send(
 						session, GNUTLS_AL_FATAL,
