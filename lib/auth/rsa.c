@@ -158,6 +158,7 @@ static int proc_rsa_client_kx(gnutls_session_t session, uint8_t *data,
 	int ret, dsize;
 	ssize_t data_size = _data_size;
 	volatile uint8_t ver_maj, ver_min;
+	unsigned int key_bits;
 
 #ifdef ENABLE_SSL3
 	if (get_num_version(session) == GNUTLS_SSL3) {
@@ -180,6 +181,10 @@ static int proc_rsa_client_kx(gnutls_session_t session, uint8_t *data,
 		}
 		ciphertext.size = dsize;
 	}
+	gnutls_privkey_get_pk_algorithm(session->internals.selected_key,
+					&key_bits);
+	if (ciphertext.size != (key_bits + 7) / 8)
+		return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 
 	ver_maj = _gnutls_get_adv_version_major(session);
 	ver_min = _gnutls_get_adv_version_minor(session);
