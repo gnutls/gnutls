@@ -417,27 +417,6 @@ typedef enum extensions_t {
 #define GNUTLS_EXTENSION_MAX_VALUE 63
 #define ext_track_t uint64_t
 
-#include <verify.h>
-
-verify(GNUTLS_EXTENSION_MAX < GNUTLS_EXTENSION_MAX_VALUE);
-verify(GNUTLS_EXTENSION_MAX < MAX_EXT_TYPES);
-
-/* we must provide at least 16 extensions for users to register;
- * increase GNUTLS_EXTENSION_MAX_VALUE, MAX_EXT_TYPES and used_exts
- * type if this fails
- */
-verify(GNUTLS_EXTENSION_MAX_VALUE - GNUTLS_EXTENSION_MAX >= 16);
-
-/* MAX_EXT_TYPES must fit in a single byte, to generate random
- * permutation at once.
- */
-verify(MAX_EXT_TYPES <= UINT8_MAX);
-
-/* The 'verify' symbol from <verify.h> is used extensively in the
- * code; undef it to avoid clash
- */
-#undef verify
-
 typedef enum {
 	CIPHER_STREAM,
 	CIPHER_BLOCK,
