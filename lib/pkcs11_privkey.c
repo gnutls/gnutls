@@ -838,7 +838,7 @@ int _gnutls_pkcs11_privkey_decrypt_data2(gnutls_pkcs11_privkey_t key,
 	if (ret != 0)
 		return gnutls_assert_val(GNUTLS_E_LOCKING_ERROR);
 
-	buffer = gnutls_malloc(siglen);
+	buffer = gnutls_malloc(MAX((size_t)siglen, plaintext_size));
 	if (!buffer) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
