@@ -25,10 +25,10 @@
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#include "hpke/helpers/hpke-params.h"
-#include "hpke/helpers/hpke-builders.h"
-#include "hpke/helpers/hpke-key-management.h"
-#include "hpke/helpers/hpke-hkdf.h"
+#include "hpke/hpke-params.h"
+#include "hpke/hpke-builders.h"
+#include "hpke/hpke-key-management.h"
+#include "hpke/hpke-hkdf.h"
 
 #include "errors.h"
 

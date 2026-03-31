@@ -23,7 +23,7 @@ ACLOCAL_AMFLAGS = -I ../m4 -I ../gl/m4
 EXTRA_DIST = priority_options.gperf common.mk inih/LICENSE.txt dlwrap/README crau/LICENSE crau/UNLICENSE crau/README.md
 BUILT_SOURCES = pkix_asn1_tab.c gnutls_asn1_tab.c priority_options.h
 
-SUBDIRS = includes x509 auth ext algorithms extras accelerated
+SUBDIRS = includes x509 auth ext algorithms extras accelerated hpke
 
 if ENABLE_PKCS11
 SUBDIRS += pkcs11
@@ -90,11 +90,7 @@ COBJECTS = range.c record.c compress.c debug.c cipher.c gthreads.h handshake-tls
 	crypto-selftests.c crypto-selftests-pk.c secrets.c extv.c extv.h \
 	hello_ext_lib.c hello_ext_lib.h ocsp-api.c stek.c cert-cred-rawpk.c \
 	iov.c iov.h system/ktls.c system/ktls.h pathbuf.c pathbuf.h \
-	audit.h audit.c crau/crau.h crau/macros.h hpke/hpke.c \ 
-	hpke/helpers/hpke-params.c hpke/helpers/hpke-params.h  \
-	hpke/helpers/hpke-builders.c hpke/helpers/hpke-builders.h \
-	hpke/helpers/hpke-key-management.h hpke/helpers/hpke-key-management.c \
-	hpke/helpers/hpke-hkdf.h hpke/helpers/hpke-hkdf.c
+	audit.h audit.c crau/crau.h crau/macros.h
 
 if HAVE_ZLIB
 COBJECTS += dlwrap/zlib.c dlwrap/zlibfuncs.h dlwrap/zlib.h
@@ -232,7 +228,7 @@ libgnutls_la_LDFLAGS = -no-undefined \
 libgnutls_la_LIBADD = ../gl/libgnu.la x509/libgnutls_x509.la \
 	ext/libgnutls_ext.la \
 	auth/libgnutls_auth.la algorithms/libgnutls_alg.la \
-	extras/libgnutls_extras.la
+	extras/libgnutls_extras.la hpke/libgnutls_hpke.la
 thirdparty_libadd += $(LTLIBINTL) $(LIBSOCKET) $(LTLIBNSL) \
 	$(P11_KIT_LIBS) $(LIB_SELECT) $(GNUTLS_LIBS_PRIVATE)
 
