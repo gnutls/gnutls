@@ -28,7 +28,7 @@
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#include <gnutls/abstract.h>
+#include <gnutls/hpke.h>
 
 #define GNUTLS_HPKE_MAX_DHKEM_PUBKEY_SIZE 133
 #define GNUTLS_HPKE_MAX_HASH_SIZE 64

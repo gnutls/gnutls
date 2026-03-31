@@ -28,7 +28,7 @@
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#include "gnutls/abstract.h"
+#include "gnutls/hpke.h"
 
 int _gnutls_is_kem_dh(const gnutls_hpke_kem_t kem);
 

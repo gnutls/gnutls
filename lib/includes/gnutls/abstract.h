@@ -30,8 +30,6 @@
 #include <gnutls/openpgp.h>
 #include <gnutls/tpm.h>
 
-#include <stdint.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -680,115 +678,6 @@ int gnutls_certificate_set_key(gnutls_certificate_credentials_t res,
 int gnutls_pubkey_print(gnutls_pubkey_t pubkey,
 			gnutls_certificate_print_formats_t format,
 			gnutls_datum_t *out);
-
-/**
- * gnutls_hpke_kem_t:
- * @GNUTLS_HPKE_KEM_DHKEM_P256: DHKEM using P-256
- * @GNUTLS_HPKE_KEM_DHKEM_P384: DHKEM using P-384
- * @GNUTLS_HPKE_KEM_DHKEM_P521: DHKEM using P-521
- * @GNUTLS_HPKE_KEM_DHKEM_X25519: DHKEM using X25519
- * @GNUTLS_HPKE_KEM_DHKEM_X448: DHKEM using X448
- * Enumeration of HPKE KEM algorithms.
- */
-typedef enum gnutls_hpke_kem_t {
-	GNUTLS_HPKE_KEM_DHKEM_P256 = 0x0010,
-	GNUTLS_HPKE_KEM_DHKEM_P384 = 0x0011,
-	GNUTLS_HPKE_KEM_DHKEM_P521 = 0x0012,
-	GNUTLS_HPKE_KEM_DHKEM_X25519 = 0x0020,
-	GNUTLS_HPKE_KEM_DHKEM_X448 = 0x0021
-} gnutls_hpke_kem_t;
-
-/**
- * gnutls_hpke_kdf_t:
- * @GNUTLS_HPKE_KDF_HKDF_SHA256: HKDF using SHA-256
- * @GNUTLS_HPKE_KDF_HKDF_SHA384: HKDF using SHA-384
- * @GNUTLS_HPKE_KDF_HKDF_SHA512: HKDF using SHA-512
- * Enumeration of HPKE KDF algorithms.
- */
-typedef enum gnutls_hpke_kdf_t {
-	GNUTLS_HPKE_KDF_HKDF_SHA256 = 0x0001,
-	GNUTLS_HPKE_KDF_HKDF_SHA384 = 0x0002,
-	GNUTLS_HPKE_KDF_HKDF_SHA512 = 0x0003
-} gnutls_hpke_kdf_t;
-
-/**
- * gnutls_hpke_aead_t:
- * @GNUTLS_HPKE_AEAD_AES_128_GCM: AES-128-GCM
- * @GNUTLS_HPKE_AEAD_AES_256_GCM: AES-256-GCM
- * @GNUTLS_HPKE_AEAD_CHACHA20_POLY1305: ChaCha20-Poly1305
- * Enumeration of HPKE AEAD algorithms.
- */
-typedef enum gnutls_hpke_aead_t {
-	GNUTLS_HPKE_AEAD_AES_128_GCM = 0x0001,
-	GNUTLS_HPKE_AEAD_AES_256_GCM = 0x0002,
-	GNUTLS_HPKE_AEAD_CHACHA20_POLY1305 = 0x0003,
-	GNUTLS_HPKE_AEAD_EXPORT_ONLY = 0xFFFF
-} gnutls_hpke_aead_t;
-
-typedef enum gnutls_hpke_mode_t {
-	GNUTLS_HPKE_MODE_BASE = 0,
-	GNUTLS_HPKE_MODE_PSK = 1,
-	GNUTLS_HPKE_MODE_AUTH = 2,
-	GNUTLS_HPKE_MODE_AUTH_PSK = 3
-} gnutls_hpke_mode_t;
-
-typedef enum gnutls_hpke_role_t {
-	GNUTLS_HPKE_ROLE_SENDER = 0,
-	GNUTLS_HPKE_ROLE_RECEIVER = 1
-} gnutls_hpke_role_t;
-
-typedef struct gnutls_hpke_context_st *gnutls_hpke_context_t;
-
-int gnutls_hpke_context_init(gnutls_hpke_context_t *ctx,
-			     const gnutls_hpke_mode_t mode,
-			     const gnutls_hpke_role_t role,
-			     const gnutls_hpke_kem_t kem,
-			     const gnutls_hpke_kdf_t kdf,
-			     const gnutls_hpke_aead_t aead);
-
-int gnutls_hpke_context_deinit(gnutls_hpke_context_t ctx);
-
-int gnutls_hpke_context_set_psk(gnutls_hpke_context_t ctx,
-				const gnutls_datum_t *psk,
-				const gnutls_datum_t *psk_id);
-
-int gnutls_hpke_context_set_sender_privkey(gnutls_hpke_context_t ctx,
-					   gnutls_privkey_t sender_privkey);
-
-int gnutls_hpke_context_set_sender_pubkey(gnutls_hpke_context_t ctx,
-					  gnutls_pubkey_t sender_pubkey);
-
-size_t gnutls_hpke_context_get_enc_size(const gnutls_hpke_context_t ctx);
-
-int gnutls_hpke_encap(gnutls_hpke_context_t ctx, const gnutls_datum_t *info,
-		      gnutls_datum_t *enc, gnutls_pubkey_t receiver_pubkey);
-
-int gnutls_hpke_seal(gnutls_hpke_context_t ctx, const gnutls_datum_t *aad,
-		     const gnutls_datum_t *plaintext,
-		     gnutls_datum_t *ciphertext);
-
-int gnutls_hpke_decap(gnutls_hpke_context_t ctx, const gnutls_datum_t *info,
-		      const gnutls_datum_t *enc,
-		      gnutls_privkey_t receiver_privkey);
-
-int gnutls_hpke_open(gnutls_hpke_context_t ctx, const gnutls_datum_t *aad,
-		     const gnutls_datum_t *ciphertext,
-		     gnutls_datum_t *plaintext);
-
-int gnutls_hpke_context_set_ikme(gnutls_hpke_context_t ctx,
-				 const gnutls_datum_t *ikme);
-
-int gnutls_hpke_generate_keypair(const gnutls_hpke_kem_t kem,
-				 const gnutls_datum_t *ikm,
-				 gnutls_privkey_t *privkey,
-				 gnutls_pubkey_t *pubkey);
-
-int gnutls_hpke_get_seq(gnutls_hpke_context_t ctx, uint64_t *seq);
-int gnutls_hpke_set_seq(gnutls_hpke_context_t ctx, uint64_t seq);
-
-int gnutls_hpke_export(gnutls_hpke_context_t ctx,
-		       const gnutls_datum_t *exporter_context, const size_t L,
-		       gnutls_datum_t *secret);
 #ifdef __cplusplus
 }
 #endif

@@ -28,6 +28,7 @@
 
 #include <gnutls/gnutls.h>
 #include <gnutls/crypto.h>
+#include <gnutls/hpke.h>
 #include <gnutls/abstract.h>
 
 #include "utils.h"
