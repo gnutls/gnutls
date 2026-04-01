@@ -43,9 +43,11 @@ static void start(gnutls_cipher_algorithm_t algo, size_t plaintext_size,
 	uint8_t key16[64];
 	uint8_t iv16[32];
 	uint8_t plaintext[128];
+	uint8_t plaintext2[128];
 	uint8_t ciphertext[128];
 	size_t block_size;
 	size_t size;
+	size_t ciphertext_size;
 	gnutls_datum_t key, iv;
 
 	success("%s %zu %u\n", gnutls_cipher_get_name(algo), plaintext_size,
@@ -80,39 +82,41 @@ static void start(gnutls_cipher_algorithm_t algo, size_t plaintext_size,
 	}
 
 	/* Get the ciphertext size */
-	ret = gnutls_cipher_encrypt3(ch, plaintext, plaintext_size, NULL, &size,
-				     flags);
+	ret = gnutls_cipher_encrypt3(ch, plaintext, plaintext_size, NULL,
+				     &ciphertext_size, flags);
 	if (ret < 0) {
 		fail("gnutls_cipher_encrypt3 failed\n");
 	}
 
 	if (flags & GNUTLS_CIPHER_PADDING_PKCS7) {
-		if (size <= plaintext_size) {
+		if (ciphertext_size <= plaintext_size) {
 			fail("no padding appended\n");
 		}
-		if (size != CLAMP(plaintext_size, block_size)) {
-			fail("size does not match: %zu (expected %zu)\n", size,
+		if (ciphertext_size != CLAMP(plaintext_size, block_size)) {
+			fail("size does not match: %zu (expected %zu)\n",
+			     ciphertext_size,
 			     CLAMP(plaintext_size, block_size));
 		}
 	} else {
-		if (size != plaintext_size) {
-			fail("size does not match: %zu (expected %zu)\n", size,
-			     plaintext_size);
+		if (ciphertext_size != plaintext_size) {
+			fail("size does not match: %zu (expected %zu)\n",
+			     ciphertext_size, plaintext_size);
 		}
 	}
 
 	/* Encrypt with padding */
 	ret = gnutls_cipher_encrypt3(ch, plaintext, plaintext_size, ciphertext,
-				     &size, flags);
+				     &ciphertext_size, flags);
 	if (ret < 0) {
 		fail("gnutls_cipher_encrypt3 failed\n");
 	}
 
 	/* Decrypt with padding */
-	ret = gnutls_cipher_decrypt3(ch, ciphertext, size, ciphertext, &size,
-				     flags);
+	size = ciphertext_size;
+	ret = gnutls_cipher_decrypt3(ch, ciphertext, ciphertext_size,
+				     plaintext2, &size, flags);
 	if (ret < 0) {
-		fail("gnutls_cipher_encrypt3 failed\n");
+		fail("gnutls_cipher_decrypt3 failed\n");
 	}
 
 	if (size != plaintext_size) {
@@ -120,8 +124,31 @@ static void start(gnutls_cipher_algorithm_t algo, size_t plaintext_size,
 		     plaintext_size);
 	}
 
-	if (memcmp(ciphertext, plaintext, size) != 0) {
+	if (memcmp(plaintext2, plaintext, size) != 0) {
 		fail("plaintext does not match\n");
+	}
+
+	if ((flags & GNUTLS_CIPHER_PADDING_PKCS7) &&
+	    plaintext_size % block_size != 0) {
+		/* Encrypt with manual padding */
+		memset(&plaintext[plaintext_size],
+		       ciphertext_size - plaintext_size,
+		       ciphertext_size - plaintext_size);
+		/* Insert a wrong padding byte */
+		plaintext[plaintext_size] = block_size;
+		ret = gnutls_cipher_encrypt3(ch, plaintext, ciphertext_size,
+					     ciphertext, &ciphertext_size, 0);
+		if (ret < 0) {
+			fail("gnutls_cipher_encrypt3 failed\n");
+		}
+
+		/* Decrypt with padding */
+		size = ciphertext_size;
+		ret = gnutls_cipher_decrypt3(ch, ciphertext, ciphertext_size,
+					     plaintext, &size, flags);
+		if (ret != GNUTLS_E_DECRYPTION_FAILED) {
+			fail("gnutls_cipher_decrypt3 succeeded\n");
+		}
 	}
 
 	gnutls_cipher_deinit(ch);
