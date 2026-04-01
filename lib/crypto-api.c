@@ -498,6 +498,39 @@ error:
 	return ret;
 }
 
+/* If succeeds, returns the number of padding bytes to be removed;
+ * zero otherwise.
+ */
+unsigned int _gnutls_pkcs7_unpad(const uint8_t *block, unsigned int block_size)
+{
+	uint8_t padding = block[block_size - 1];
+	volatile unsigned int mask = ~0;
+	volatile unsigned int count = 0;
+
+	/* Count consecutive PADDING bytes from the end, in a
+	 * constant-time manner.
+	 */
+	for (size_t i = block_size; i > 0; i--) {
+		volatile unsigned int mask2;
+
+		mask2 = -(unsigned int)(block[i - 1] == padding);
+		mask2 &= -(unsigned int)(count < padding);
+
+		/* MASK is initially ~0 and will be flipped to 0 upon first
+		 * non-padding bytes.
+		 */
+		mask &= mask2;
+		count += 1 & mask;
+	}
+
+	/* PADDING == 0 is effectively excluded here, given COUNT
+	 * will never be 0.
+	 */
+	mask = -(unsigned int)(count <= block_size);
+	mask &= -(unsigned int)(count == padding);
+	return count & mask;
+}
+
 /**
  * gnutls_cipher_decrypt3:
  * @handle: is a #gnutls_cipher_hd_t type
@@ -532,22 +565,17 @@ int gnutls_cipher_decrypt3(gnutls_cipher_hd_t handle, const void *ctext,
 	if (_gnutls_cipher_type(h->ctx_enc.e) == CIPHER_BLOCK &&
 	    (flags & GNUTLS_CIPHER_PADDING_PKCS7)) {
 		uint8_t *p = ptext;
-		uint8_t padding = p[*ptext_len - 1];
-		if (!padding ||
-		    padding > _gnutls_cipher_get_block_size(h->ctx_enc.e)) {
-			return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
-		}
-		/* Check that the prior bytes are all PADDING */
-		for (size_t i = *ptext_len - padding; i < *ptext_len; i++) {
-			if (padding != p[*ptext_len - 1]) {
-				return gnutls_assert_val(
-					GNUTLS_E_DECRYPTION_FAILED);
-			}
-		}
+		size_t block_size = _gnutls_cipher_get_block_size(h->ctx_enc.e);
+		uint8_t *block = &p[*ptext_len - block_size];
+		unsigned int padding = _gnutls_pkcs7_unpad(block, block_size);
+		volatile unsigned int mask;
+
+		mask = -(unsigned int)(padding == 0);
+		ret = GNUTLS_E_DECRYPTION_FAILED & mask;
 		*ptext_len -= padding;
 	}
 
-	return 0;
+	return ret;
 }
 
 /**
