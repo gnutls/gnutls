@@ -89,8 +89,7 @@ int _gnutls_hpke_pubkey_to_datum(const gnutls_pubkey_t pk,
 
 	if (curve == GNUTLS_ECC_CURVE_X25519 ||
 	    curve == GNUTLS_ECC_CURVE_X448) {
-		if (x.data == NULL ||
-		    x.size > GNUTLS_HPKE_MAX_DHKEM_PUBKEY_SIZE) {
+		if (x.data == NULL || x.size > HPKE_MAX_DHKEM_PUBKEY_SIZE) {
 			ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 			goto cleanup;
 		}
@@ -103,7 +102,7 @@ int _gnutls_hpke_pubkey_to_datum(const gnutls_pubkey_t pk,
 	size_t coord_size = gnutls_ecc_curve_get_size(curve);
 	size_t total_size = 1 + 2 * coord_size;
 
-	if (coord_size == 0 || total_size > GNUTLS_HPKE_MAX_DHKEM_PUBKEY_SIZE) {
+	if (coord_size == 0 || total_size > HPKE_MAX_DHKEM_PUBKEY_SIZE) {
 		ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 		goto cleanup;
 	}
@@ -250,10 +249,9 @@ static int _gnutls_hpke_montgomery_curve_keypair_from_raw_privkey(
 	gnutls_privkey_t *privkey, gnutls_pubkey_t *pubkey)
 {
 	int ret;
-	unsigned char
-		labeled_expand_info[GNUTLS_HPKE_MAX_LABELED_EXPAND_INFO_SIZE] = {
-			0
-		};
+	unsigned char labeled_expand_info[HPKE_MAX_LABELED_EXPAND_INFO_SIZE] = {
+		0
+	};
 	size_t labeled_expand_info_size = 0;
 	unsigned char sk_buf[GNUTLS_HPKE_MAX_MONTGOMERY_KEY_SIZE] = { 0 };
 	size_t sk_size = 0;
@@ -497,10 +495,9 @@ static int _gnutls_hpke_prime_curve_keypair_from_raw_privkey(
 	gnutls_privkey_t *privkey, gnutls_pubkey_t *pubkey)
 {
 	int ret;
-	unsigned char
-		labeled_expand_info[GNUTLS_HPKE_MAX_LABELED_EXPAND_INFO_SIZE] = {
-			0
-		};
+	unsigned char labeled_expand_info[HPKE_MAX_LABELED_EXPAND_INFO_SIZE] = {
+		0
+	};
 	size_t labeled_expand_info_size = 0;
 	unsigned char sk_buf[GNUTLS_HPKE_MAX_RAW_KEY_COORDINATE_SIZE] = { 0 };
 	size_t sk_size = 0;
@@ -618,7 +615,7 @@ int _gnutls_hpke_keypair_from_ikm(const gnutls_hpke_kem_t kem,
 				  gnutls_pubkey_t *pubkey)
 {
 	int ret;
-	unsigned char dkp_prk_buf[GNUTLS_HPKE_MAX_HASH_SIZE] = { 0 };
+	unsigned char dkp_prk_buf[HPKE_MAX_HASH_SIZE] = { 0 };
 	size_t dkp_prk_len = 0;
 
 	const gnutls_mac_algorithm_t mac = _gnutls_hpke_kem_to_mac(kem);
@@ -633,14 +630,12 @@ int _gnutls_hpke_keypair_from_ikm(const gnutls_hpke_kem_t kem,
 		goto cleanup;
 	}
 
-	unsigned char suite_id_buf[GNUTLS_HPKE_SUITE_ID_SIZE] = { 0 };
+	unsigned char suite_id_buf[HPKE_SUITE_ID_SIZE] = { 0 };
 	_gnutls_hpke_build_kem_suite_id(kem, suite_id_buf);
 
-	ret = _gnutls_hpke_labeled_extract(mac, suite_id_buf,
-					   GNUTLS_HPKE_SUITE_ID_SIZE, NULL, 0,
-					   dkp_prk_label,
-					   sizeof(dkp_prk_label) - 1, ikme,
-					   dkp_prk_buf, &dkp_prk_len);
+	ret = _gnutls_hpke_labeled_extract(
+		mac, suite_id_buf, HPKE_SUITE_ID_SIZE, NULL, 0, dkp_prk_label,
+		sizeof(dkp_prk_label) - 1, ikme, dkp_prk_buf, &dkp_prk_len);
 	if (ret < 0) {
 		ret = gnutls_assert_val(ret);
 		goto cleanup;
@@ -653,14 +648,14 @@ int _gnutls_hpke_keypair_from_ikm(const gnutls_hpke_kem_t kem,
 	case GNUTLS_HPKE_KEM_DHKEM_X25519:
 		ret = _gnutls_hpke_montgomery_curve_keypair_from_raw_privkey(
 			mac, kem, &dkp_prk, curve, suite_id_buf,
-			GNUTLS_HPKE_SUITE_ID_SIZE, privkey, pubkey);
+			HPKE_SUITE_ID_SIZE, privkey, pubkey);
 		break;
 	case GNUTLS_HPKE_KEM_DHKEM_P256:
 	case GNUTLS_HPKE_KEM_DHKEM_P384:
 	case GNUTLS_HPKE_KEM_DHKEM_P521:
 		ret = _gnutls_hpke_prime_curve_keypair_from_raw_privkey(
 			mac, kem, &dkp_prk, curve, suite_id_buf,
-			GNUTLS_HPKE_SUITE_ID_SIZE, privkey, pubkey);
+			HPKE_SUITE_ID_SIZE, privkey, pubkey);
 		break;
 	default:
 		ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);

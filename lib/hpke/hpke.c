@@ -40,20 +40,19 @@ static const unsigned char base_nonce_expand_label[] = "base_nonce";
 static const unsigned char exporter_secret_expand_label[] = "exp";
 static const unsigned char export_secret_label[] = "sec";
 
-#define GNUTLS_HPKE_MAX_PARAMETER_SIZE 66
-#define GNUTLS_HPKE_PSK_MIN_SIZE 32
-#define GNUTLS_SCHEDULING_SUITE_ID_SIZE 10
-#define GNUTLS_HPKE_IKM_LABEL_MAX_SIZE 256
-#define GNUTLS_HPKE_MAX_SALT_SIZE 64
-#define GNUTLS_HPKE_MAX_EAE_PRK_SIZE 64
-#define GNUTLS_HPKE_MAX_SHARED_SECRET_SIZE 64
-#define GNUTLS_HPKE_MAX_INFO_LABEL_SIZE 448
-#define GNUTLS_HPKE_MAX_DH_SIZE 132
-#define GNUTLS_HPKE_MAX_KEY_SCHEDULE_CONTEXT_SIZE \
-	1 + GNUTLS_HPKE_MAX_HASH_SIZE + GNUTLS_HPKE_MAX_HASH_SIZE
-#define GNUTLS_HPKE_MAX_NONCE_SIZE 12
-#define GNUTLS_HPKE_MAX_LABELED_EXPORT_INFO_MAX_SIZE \
-	22 + GNUTLS_HPKE_MAX_PARAMETER_SIZE
+#define HPKE_MAX_PARAMETER_SIZE 66
+#define HPKE_PSK_MIN_SIZE 32
+#define HPKE_SCHEDULING_SUITE_ID_SIZE 10
+#define HPKE_IKM_LABEL_MAX_SIZE 256
+#define HPKE_MAX_SALT_SIZE 64
+#define HPKE_MAX_EAE_PRK_SIZE 64
+#define HPKE_MAX_SHARED_SECRET_SIZE 64
+#define HPKE_MAX_INFO_LABEL_SIZE 448
+#define HPKE_MAX_DH_SIZE 132
+#define HPKE_MAX_KEY_SCHEDULE_CONTEXT_SIZE \
+	1 + HPKE_MAX_HASH_SIZE + HPKE_MAX_HASH_SIZE
+#define HPKE_MAX_NONCE_SIZE 12
+#define HPKE_MAX_LABELED_EXPORT_INFO_MAX_SIZE 22 + HPKE_MAX_PARAMETER_SIZE
 
 struct gnutls_hpke_context_st {
 	gnutls_hpke_mode_t mode;
@@ -101,15 +100,10 @@ static int _gnutls_hpke_validate_pubkey_for_kem(gnutls_pubkey_t pk,
 						gnutls_hpke_kem_t kem)
 {
 	int ret;
-	unsigned int bits = 0;
 	gnutls_pk_algorithm_t pk_algo;
 	gnutls_ecc_curve_t curve;
 
-	if (pk == NULL) {
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-	}
-
-	pk_algo = gnutls_pubkey_get_pk_algorithm(pk, &bits);
+	pk_algo = gnutls_pubkey_get_pk_algorithm(pk, NULL);
 	if (pk_algo == GNUTLS_PK_UNKNOWN) {
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
@@ -174,13 +168,13 @@ static int _gnutls_hpke_get_shared_secret(
 	size_t *shared_secret_size)
 {
 	int ret = 0;
-	unsigned char receiver_pubkey_raw[GNUTLS_HPKE_MAX_DHKEM_PUBKEY_SIZE];
+	unsigned char receiver_pubkey_raw[HPKE_MAX_DHKEM_PUBKEY_SIZE];
 	size_t receiver_pubkey_raw_size = 0;
-	unsigned char sender_pubkey_raw[GNUTLS_HPKE_MAX_DHKEM_PUBKEY_SIZE];
+	unsigned char sender_pubkey_raw[HPKE_MAX_DHKEM_PUBKEY_SIZE];
 	size_t sender_pubkey_raw_size = 0;
-	unsigned char ephemeral_pubkey_raw[GNUTLS_HPKE_MAX_DHKEM_PUBKEY_SIZE];
+	unsigned char ephemeral_pubkey_raw[HPKE_MAX_DHKEM_PUBKEY_SIZE];
 	size_t ephemeral_pubkey_raw_size = 0;
-	unsigned char info_label[GNUTLS_HPKE_MAX_INFO_LABEL_SIZE] = { 0 };
+	unsigned char info_label[HPKE_MAX_INFO_LABEL_SIZE] = { 0 };
 	size_t info_label_size = 0;
 
 	const gnutls_mac_algorithm_t mac = _gnutls_hpke_kdf_to_mac(kdf);
@@ -193,19 +187,19 @@ static int _gnutls_hpke_get_shared_secret(
 		return gnutls_assert_val(GNUTLS_E_UNKNOWN_HASH_ALGORITHM);
 	}
 
-	unsigned char suite_id[GNUTLS_HPKE_SUITE_ID_SIZE] = { 0 };
+	unsigned char suite_id[HPKE_SUITE_ID_SIZE] = { 0 };
 	_gnutls_hpke_build_kem_suite_id(kem, suite_id);
 
-	unsigned char ikm_label[GNUTLS_HPKE_IKM_LABEL_MAX_SIZE];
+	unsigned char ikm_label[HPKE_IKM_LABEL_MAX_SIZE];
 	size_t ikm_label_size = 0;
-	_gnutls_hpke_build_ikm_label(suite_id, GNUTLS_HPKE_SUITE_ID_SIZE, dh,
-				     dh_size, ikm_label, &ikm_label_size);
+	_gnutls_hpke_build_ikm_label(suite_id, HPKE_SUITE_ID_SIZE, dh, dh_size,
+				     ikm_label, &ikm_label_size);
 
 	gnutls_datum_t ikm_label_datum = { ikm_label, ikm_label_size };
 
-	unsigned char salt[GNUTLS_HPKE_MAX_SALT_SIZE] = { 0 };
+	unsigned char salt[HPKE_MAX_SALT_SIZE] = { 0 };
 	gnutls_datum_t salt_datum = { salt, Nh };
-	unsigned char eae_prk[GNUTLS_HPKE_MAX_EAE_PRK_SIZE] = { 0 };
+	unsigned char eae_prk[HPKE_MAX_EAE_PRK_SIZE] = { 0 };
 
 	ret = gnutls_hkdf_extract(mac, &ikm_label_datum, &salt_datum, eae_prk);
 	if (ret < 0) {
@@ -241,8 +235,8 @@ static int _gnutls_hpke_get_shared_secret(
 	_gnutls_hpke_build_info_label(
 		receiver_pubkey_raw, receiver_pubkey_raw_size,
 		sender_pubkey_raw, sender_pubkey_raw_size, ephemeral_pubkey_raw,
-		ephemeral_pubkey_raw_size, suite_id, GNUTLS_HPKE_SUITE_ID_SIZE,
-		Nh, info_label, &info_label_size);
+		ephemeral_pubkey_raw_size, suite_id, HPKE_SUITE_ID_SIZE, Nh,
+		info_label, &info_label_size);
 
 	gnutls_datum_t eae_prk_datum = { eae_prk, Nh };
 	gnutls_datum_t info_label_datum = { info_label, info_label_size };
@@ -326,7 +320,7 @@ static int _gnutls_hpke_dhkem_encap(const gnutls_hpke_context_t ctx,
 	gnutls_privkey_t ephemeral_privkey = NULL;
 	gnutls_pubkey_t ephemeral_pubkey = NULL;
 	gnutls_pubkey_t sender_pubkey = NULL;
-	unsigned char dh[GNUTLS_HPKE_MAX_DH_SIZE];
+	unsigned char dh[HPKE_MAX_DH_SIZE];
 	size_t dh_size = 0;
 
 	ret = _gnutls_hpke_generate_keypair(ctx->ikme, ctx->kem,
@@ -337,7 +331,7 @@ static int _gnutls_hpke_dhkem_encap(const gnutls_hpke_context_t ctx,
 		goto cleanup;
 	}
 
-	unsigned char pubkey_raw[GNUTLS_HPKE_MAX_DHKEM_PUBKEY_SIZE];
+	unsigned char pubkey_raw[HPKE_MAX_DHKEM_PUBKEY_SIZE];
 	size_t pubkey_raw_size = 0;
 	ret = _gnutls_hpke_pubkey_to_datum(ephemeral_pubkey, pubkey_raw,
 					   &pubkey_raw_size);
@@ -468,7 +462,7 @@ static int _gnutls_hpke_dhkem_decap(
 	gnutls_pubkey_t receiver_pubkey = NULL;
 	gnutls_pubkey_t ephemeral_pubkey = NULL;
 	gnutls_ecc_curve_t curve;
-	unsigned char dh[GNUTLS_HPKE_MAX_DH_SIZE];
+	unsigned char dh[HPKE_MAX_DH_SIZE];
 	size_t dh_size = 0;
 
 	ret = gnutls_privkey_export_ecc_raw(receiver_privkey, &curve, NULL,
@@ -544,19 +538,19 @@ static int _gnutls_hpke_schedule(const unsigned char *shared_secret,
 {
 	int ret = 0;
 
-	unsigned char psk_id_hash[GNUTLS_HPKE_MAX_HASH_SIZE] = { 0 };
+	unsigned char psk_id_hash[HPKE_MAX_HASH_SIZE] = { 0 };
 	size_t psk_id_hash_size = 0;
-	unsigned char info_hash[GNUTLS_HPKE_MAX_HASH_SIZE] = { 0 };
+	unsigned char info_hash[HPKE_MAX_HASH_SIZE] = { 0 };
 	size_t info_hash_size = 0;
-	unsigned char key_schedule_context
-		[GNUTLS_HPKE_MAX_KEY_SCHEDULE_CONTEXT_SIZE] = { 0 };
+	unsigned char key_schedule_context[HPKE_MAX_KEY_SCHEDULE_CONTEXT_SIZE] = {
+		0
+	};
 	size_t key_schedule_context_size = 0;
-	unsigned char secret[GNUTLS_HPKE_MAX_HASH_SIZE] = { 0 };
+	unsigned char secret[HPKE_MAX_HASH_SIZE] = { 0 };
 	size_t secret_size = 0;
-	unsigned char
-		labeled_expand_info[GNUTLS_HPKE_MAX_LABELED_EXPAND_INFO_SIZE] = {
-			0
-		};
+	unsigned char labeled_expand_info[HPKE_MAX_LABELED_EXPAND_INFO_SIZE] = {
+		0
+	};
 	size_t labeled_expand_info_size = 0;
 
 	const gnutls_mac_algorithm_t mac = _gnutls_hpke_kdf_to_mac(ctx->kdf);
@@ -569,13 +563,13 @@ static int _gnutls_hpke_schedule(const unsigned char *shared_secret,
 		return gnutls_assert_val(GNUTLS_E_UNKNOWN_HASH_ALGORITHM);
 	}
 
-	unsigned char salt[GNUTLS_HPKE_MAX_SALT_SIZE] = { 0 };
-	unsigned char suite_id[GNUTLS_SCHEDULING_SUITE_ID_SIZE];
+	unsigned char salt[HPKE_MAX_SALT_SIZE] = { 0 };
+	unsigned char suite_id[HPKE_SCHEDULING_SUITE_ID_SIZE];
 	_gnutls_hpke_build_suite_id_for_scheduling(ctx->kem, ctx->kdf,
 						   ctx->aead, suite_id);
 
 	ret = _gnutls_hpke_labeled_extract(
-		mac, suite_id, GNUTLS_SCHEDULING_SUITE_ID_SIZE, salt, Nh,
+		mac, suite_id, HPKE_SCHEDULING_SUITE_ID_SIZE, salt, Nh,
 		psk_id_hash_label, sizeof(psk_id_hash_label) - 1, ctx->psk_id,
 		psk_id_hash, &psk_id_hash_size);
 	if (ret < 0) {
@@ -584,8 +578,8 @@ static int _gnutls_hpke_schedule(const unsigned char *shared_secret,
 	}
 
 	ret = _gnutls_hpke_labeled_extract(mac, suite_id,
-					   GNUTLS_SCHEDULING_SUITE_ID_SIZE,
-					   salt, Nh, info_hash_label,
+					   HPKE_SCHEDULING_SUITE_ID_SIZE, salt,
+					   Nh, info_hash_label,
 					   sizeof(info_hash_label) - 1, info,
 					   info_hash, &info_hash_size);
 	if (ret < 0) {
@@ -599,7 +593,7 @@ static int _gnutls_hpke_schedule(const unsigned char *shared_secret,
 		&key_schedule_context_size);
 
 	ret = _gnutls_hpke_labeled_extract(
-		mac, suite_id, GNUTLS_SCHEDULING_SUITE_ID_SIZE, shared_secret,
+		mac, suite_id, HPKE_SCHEDULING_SUITE_ID_SIZE, shared_secret,
 		shared_secret_size, secret_hash_label,
 		sizeof(secret_hash_label) - 1, ctx->psk, secret, &secret_size);
 	if (ret < 0) {
@@ -631,7 +625,7 @@ static int _gnutls_hpke_schedule(const unsigned char *shared_secret,
 		ctx->key.size = Nk;
 
 		_gnutls_hpke_build_expand_info(
-			suite_id, GNUTLS_SCHEDULING_SUITE_ID_SIZE,
+			suite_id, HPKE_SCHEDULING_SUITE_ID_SIZE,
 			key_expand_label, sizeof(key_expand_label) - 1,
 			key_schedule_context, key_schedule_context_size, Nk,
 			labeled_expand_info, &labeled_expand_info_size);
@@ -655,7 +649,7 @@ static int _gnutls_hpke_schedule(const unsigned char *shared_secret,
 		ctx->base_nonce.size = Nn;
 
 		_gnutls_hpke_build_expand_info(
-			suite_id, GNUTLS_SCHEDULING_SUITE_ID_SIZE,
+			suite_id, HPKE_SCHEDULING_SUITE_ID_SIZE,
 			base_nonce_expand_label,
 			sizeof(base_nonce_expand_label) - 1,
 			key_schedule_context, key_schedule_context_size, Nn,
@@ -678,12 +672,13 @@ static int _gnutls_hpke_schedule(const unsigned char *shared_secret,
 	}
 	ctx->exporter_secret.size = Nh;
 
-	_gnutls_hpke_build_expand_info(
-		suite_id, GNUTLS_SCHEDULING_SUITE_ID_SIZE,
-		exporter_secret_expand_label,
-		sizeof(exporter_secret_expand_label) - 1, key_schedule_context,
-		key_schedule_context_size, Nh, labeled_expand_info,
-		&labeled_expand_info_size);
+	_gnutls_hpke_build_expand_info(suite_id, HPKE_SCHEDULING_SUITE_ID_SIZE,
+				       exporter_secret_expand_label,
+				       sizeof(exporter_secret_expand_label) - 1,
+				       key_schedule_context,
+				       key_schedule_context_size, Nh,
+				       labeled_expand_info,
+				       &labeled_expand_info_size);
 	expand_info.data = labeled_expand_info;
 	expand_info.size = labeled_expand_info_size;
 	ret = gnutls_hkdf_expand(mac, &secret_datum, &expand_info,
@@ -881,13 +876,12 @@ int gnutls_hpke_context_set_psk(gnutls_hpke_context_t ctx,
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
 
-	if (psk->size < GNUTLS_HPKE_PSK_MIN_SIZE ||
-	    psk->size > GNUTLS_HPKE_MAX_PARAMETER_SIZE) {
+	if (psk->size < HPKE_PSK_MIN_SIZE ||
+	    psk->size > HPKE_MAX_PARAMETER_SIZE) {
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
 
-	if (psk_id->size == 0 ||
-	    psk_id->size > GNUTLS_HPKE_MAX_PARAMETER_SIZE) {
+	if (psk_id->size == 0 || psk_id->size > HPKE_MAX_PARAMETER_SIZE) {
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
 
@@ -1095,7 +1089,7 @@ int gnutls_hpke_encap(gnutls_hpke_context_t ctx, const gnutls_datum_t *info,
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
 
-	if (info != NULL && info->size > GNUTLS_HPKE_MAX_PARAMETER_SIZE) {
+	if (info != NULL && info->size > HPKE_MAX_PARAMETER_SIZE) {
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
 
@@ -1127,7 +1121,7 @@ int gnutls_hpke_encap(gnutls_hpke_context_t ctx, const gnutls_datum_t *info,
 		return gnutls_assert_val(ret);
 	}
 
-	unsigned char shared_secret[GNUTLS_HPKE_MAX_SHARED_SECRET_SIZE];
+	unsigned char shared_secret[HPKE_MAX_SHARED_SECRET_SIZE];
 	size_t shared_secret_size = 0;
 	if (_gnutls_is_kem_dh(ctx->kem)) {
 		ret = _gnutls_hpke_dhkem_encap(ctx, receiver_pubkey, enc,
@@ -1238,7 +1232,7 @@ int gnutls_hpke_seal(gnutls_hpke_context_t ctx, const gnutls_datum_t *aad,
 	int ret;
 	gnutls_aead_cipher_hd_t hd = NULL;
 
-	unsigned char nonce[GNUTLS_HPKE_MAX_NONCE_SIZE] = { 0 };
+	unsigned char nonce[HPKE_MAX_NONCE_SIZE] = { 0 };
 	size_t nonce_size = 0;
 	_gnutls_hpke_get_seq_nonce(&ctx->base_nonce, ctx->seq, nonce,
 				   &nonce_size);
@@ -1321,7 +1315,7 @@ int gnutls_hpke_decap(gnutls_hpke_context_t ctx, const gnutls_datum_t *info,
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
 
-	if (info != NULL && info->size > GNUTLS_HPKE_MAX_PARAMETER_SIZE) {
+	if (info != NULL && info->size > HPKE_MAX_PARAMETER_SIZE) {
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
 
@@ -1353,7 +1347,7 @@ int gnutls_hpke_decap(gnutls_hpke_context_t ctx, const gnutls_datum_t *info,
 		return gnutls_assert_val(ret);
 	}
 
-	unsigned char shared_secret[GNUTLS_HPKE_MAX_SHARED_SECRET_SIZE];
+	unsigned char shared_secret[HPKE_MAX_SHARED_SECRET_SIZE];
 	size_t shared_secret_size = 0;
 	if (_gnutls_is_kem_dh(ctx->kem)) {
 		ret = _gnutls_hpke_dhkem_decap(ctx->kem, ctx->kdf, ctx->mode,
@@ -1448,7 +1442,7 @@ int gnutls_hpke_open(gnutls_hpke_context_t ctx, const gnutls_datum_t *aad,
 	int ret;
 	gnutls_aead_cipher_hd_t hd = NULL;
 
-	unsigned char nonce[GNUTLS_HPKE_MAX_NONCE_SIZE] = { 0 };
+	unsigned char nonce[HPKE_MAX_NONCE_SIZE] = { 0 };
 	size_t nonce_size = 0;
 	_gnutls_hpke_get_seq_nonce(&ctx->base_nonce, ctx->seq, nonce,
 				   &nonce_size);
@@ -1519,7 +1513,7 @@ int gnutls_hpke_context_set_ikme(gnutls_hpke_context_t ctx,
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
 
-	if (ikme->size == 0 || ikme->size > GNUTLS_HPKE_MAX_PARAMETER_SIZE) {
+	if (ikme->size == 0 || ikme->size > HPKE_MAX_PARAMETER_SIZE) {
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
 
@@ -1664,22 +1658,21 @@ int gnutls_hpke_export(gnutls_hpke_context_t ctx,
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
 
-	if (exporter_context->size > GNUTLS_HPKE_MAX_PARAMETER_SIZE) {
+	if (exporter_context->size > HPKE_MAX_PARAMETER_SIZE) {
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
 
 	int ret;
-	unsigned char suite_id[GNUTLS_SCHEDULING_SUITE_ID_SIZE];
+	unsigned char suite_id[HPKE_SCHEDULING_SUITE_ID_SIZE];
 
 	_gnutls_hpke_build_suite_id_for_scheduling(ctx->kem, ctx->kdf,
 						   ctx->aead, suite_id);
 
-	unsigned char
-		labeled_export_info[GNUTLS_HPKE_MAX_LABELED_EXPORT_INFO_MAX_SIZE];
+	unsigned char labeled_export_info[HPKE_MAX_LABELED_EXPORT_INFO_MAX_SIZE];
 	size_t labeled_export_info_size = 0;
 
 	_gnutls_hpke_build_expand_info(
-		suite_id, GNUTLS_SCHEDULING_SUITE_ID_SIZE, export_secret_label,
+		suite_id, HPKE_SCHEDULING_SUITE_ID_SIZE, export_secret_label,
 		sizeof(export_secret_label) - 1, exporter_context->data,
 		exporter_context->size, L, labeled_export_info,
 		&labeled_export_info_size);

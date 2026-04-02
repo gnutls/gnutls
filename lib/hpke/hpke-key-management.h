@@ -30,10 +30,10 @@
 
 #include <gnutls/hpke.h>
 
-#define GNUTLS_HPKE_MAX_DHKEM_PUBKEY_SIZE 133
-#define GNUTLS_HPKE_MAX_HASH_SIZE 64
-#define GNUTLS_HPKE_SUITE_ID_SIZE 5
-#define GNUTLS_HPKE_MAX_LABELED_EXPAND_INFO_SIZE 158
+#define HPKE_MAX_DHKEM_PUBKEY_SIZE 133
+#define HPKE_MAX_HASH_SIZE 64
+#define HPKE_SUITE_ID_SIZE 5
+#define HPKE_MAX_LABELED_EXPAND_INFO_SIZE 158
 
 int _gnutls_hpke_pubkey_to_datum(const gnutls_pubkey_t pk,
 				 unsigned char *pubkey_raw,

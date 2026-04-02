@@ -28,7 +28,7 @@
 
 #include <gnutls/crypto.h>
 
-#define GNUTLS_HPKE_MAX_EXTRACT_KEY_SIZE 94
+#define HPKE_MAX_EXTRACT_KEY_SIZE 94
 
 int _gnutls_hpke_labeled_extract(
 	const gnutls_mac_algorithm_t mac, const unsigned char *suite_id,
@@ -38,7 +38,7 @@ int _gnutls_hpke_labeled_extract(
 	unsigned char *hash_out_buf, size_t *hash_out_len)
 {
 	int ret;
-	unsigned char extract_key_buf[GNUTLS_HPKE_MAX_EXTRACT_KEY_SIZE] = { 0 };
+	unsigned char extract_key_buf[HPKE_MAX_EXTRACT_KEY_SIZE] = { 0 };
 	size_t extract_key_size = 0;
 
 	size_t hash_size = gnutls_hmac_get_len(mac);
