@@ -77,19 +77,19 @@ struct gnutls_hpke_context_st {
 	uint64_t seq;
 };
 
-static int _gnutls_hpke_is_auth_mode(const gnutls_hpke_mode_t mode)
+static bool _gnutls_hpke_is_auth_mode(const gnutls_hpke_mode_t mode)
 {
 	return mode == GNUTLS_HPKE_MODE_AUTH ||
 	       mode == GNUTLS_HPKE_MODE_AUTH_PSK;
 }
 
-static int _gnutls_hpke_is_psk_mode(const gnutls_hpke_mode_t mode)
+static bool _gnutls_hpke_is_psk_mode(const gnutls_hpke_mode_t mode)
 {
 	return mode == GNUTLS_HPKE_MODE_PSK ||
 	       mode == GNUTLS_HPKE_MODE_AUTH_PSK;
 }
 
-static int _gnutls_is_key_curve_type_compatible_with_param_dhkem(
+static bool _gnutls_is_key_curve_type_compatible_with_param_dhkem(
 	const gnutls_hpke_kem_t kem, const gnutls_ecc_curve_t curve)
 {
 	const gnutls_ecc_curve_t expected_curve =
