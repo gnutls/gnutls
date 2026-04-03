@@ -30,35 +30,30 @@
 
 #define HPKE_MAX_EXTRACT_KEY_SIZE 94
 
-int _gnutls_hpke_labeled_extract(
-	const gnutls_mac_algorithm_t mac, const unsigned char *suite_id,
-	const size_t suite_id_size, const unsigned char *salt,
-	const size_t salt_size, const unsigned char *label,
-	const size_t label_size, const gnutls_datum_t *ikm,
-	unsigned char *hash_out_buf, size_t *hash_out_len)
+int _gnutls_hpke_labeled_extract(const gnutls_mac_algorithm_t mac,
+				 const gnutls_datum_t *suite_id,
+				 const gnutls_datum_t *salt,
+				 const gnutls_datum_t *label,
+				 const gnutls_datum_t *ikm, gnutls_datum_t *out)
 {
-	int ret;
 	unsigned char extract_key_buf[HPKE_MAX_EXTRACT_KEY_SIZE] = { 0 };
-	size_t extract_key_size = 0;
+	gnutls_datum_t extract_key = { extract_key_buf, 0 };
 
-	size_t hash_size = gnutls_hmac_get_len(mac);
-	if (hash_size == 0) {
+	out->size = gnutls_hmac_get_len(mac);
+	if (out->size == 0) {
 		return gnutls_assert_val(GNUTLS_E_UNKNOWN_HASH_ALGORITHM);
 	}
 
-	_gnutls_hpke_build_labeled_extract_key(suite_id, suite_id_size, label,
-					       label_size, ikm, extract_key_buf,
-					       &extract_key_size);
+	_gnutls_hpke_build_labeled_extract_key(suite_id, label, ikm,
+					       &extract_key);
 
-	gnutls_datum_t extract_key = { extract_key_buf, extract_key_size };
-	gnutls_datum_t salt_datum = { (unsigned char *)salt, salt_size };
-	ret = gnutls_hkdf_extract(mac, &extract_key, &salt_datum, hash_out_buf);
+	int ret = gnutls_hkdf_extract(mac, &extract_key, salt, out->data);
 	if (ret < 0) {
+		out->size = 0;
 		gnutls_assert_val(ret);
 	}
-	*hash_out_len = hash_size;
 
-	gnutls_memset(extract_key_buf, 0, extract_key_size);
+	zeroize_key(extract_key.data, extract_key.size);
 
 	return ret;
 }

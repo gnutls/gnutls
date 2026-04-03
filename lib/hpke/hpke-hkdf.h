@@ -30,11 +30,11 @@
 
 #include <gnutls/gnutls.h>
 
-int _gnutls_hpke_labeled_extract(
-	const gnutls_mac_algorithm_t mac, const unsigned char *suite_id,
-	const size_t suite_id_size, const unsigned char *salt,
-	const size_t salt_size, const unsigned char *label,
-	const size_t label_size, const gnutls_datum_t *ikm,
-	unsigned char *hash_out_buf, size_t *hash_out_len);
+int _gnutls_hpke_labeled_extract(const gnutls_mac_algorithm_t mac,
+				 const gnutls_datum_t *suite_id,
+				 const gnutls_datum_t *salt,
+				 const gnutls_datum_t *label,
+				 const gnutls_datum_t *ikm,
+				 gnutls_datum_t *out);
 
 #endif /* HPKE_HKDF_HELPER_H */

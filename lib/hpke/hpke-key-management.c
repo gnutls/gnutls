@@ -36,10 +36,6 @@
 #define GNUTLS_HPKE_MAX_RAW_KEY_COORDINATE_SIZE 66
 #define GNUTLS_HPKE_MAX_MONTGOMERY_KEY_SIZE 56
 
-static const unsigned char dkp_prk_label[] = "dkp_prk";
-static const unsigned char sk_label[] = "sk";
-static const unsigned char candidate_label[] = "candidate";
-
 static const unsigned char p256_order[32] = {
 	0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff,
 	0xff, 0xff, 0xff, 0xff, 0xff, 0xbc, 0xe6, 0xfa, 0xad, 0xa7, 0x17,
@@ -62,24 +58,22 @@ static const unsigned char p521_order[66] = {
 	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
 };
 
-static void _gnutls_hpke_coord_pad_left_to_buf(const gnutls_datum_t *in,
-					       size_t out_size,
-					       unsigned char *out)
+static void coord_pad_left_to_buf(const gnutls_datum_t *in, size_t out_size,
+				  unsigned char *out)
 {
 	gnutls_memset(out, 0, out_size - in->size);
 	memcpy(out + (out_size - in->size), in->data, in->size);
 }
 
 int _gnutls_hpke_pubkey_to_datum(const gnutls_pubkey_t pk,
-				 unsigned char *pubkey_raw,
-				 size_t *pubkey_raw_size)
+				 gnutls_datum_t *pubkey_raw)
 {
 	int ret;
 	gnutls_ecc_curve_t curve;
 	gnutls_datum_t x = { NULL, 0 };
 	gnutls_datum_t y = { NULL, 0 };
 
-	*pubkey_raw_size = 0;
+	pubkey_raw->size = 0;
 
 	ret = gnutls_pubkey_export_ecc_raw2(pk, &curve, &x, &y,
 					    GNUTLS_EXPORT_FLAG_NO_LZ);
@@ -94,8 +88,8 @@ int _gnutls_hpke_pubkey_to_datum(const gnutls_pubkey_t pk,
 			goto cleanup;
 		}
 
-		memcpy(pubkey_raw, x.data, x.size);
-		*pubkey_raw_size = x.size;
+		memcpy(pubkey_raw->data, x.data, x.size);
+		pubkey_raw->size = x.size;
 		goto cleanup;
 	}
 
@@ -107,29 +101,24 @@ int _gnutls_hpke_pubkey_to_datum(const gnutls_pubkey_t pk,
 		goto cleanup;
 	}
 
-	_gnutls_hpke_coord_pad_left_to_buf(&x, coord_size, pubkey_raw + 1);
-	_gnutls_hpke_coord_pad_left_to_buf(&y, coord_size,
-					   pubkey_raw + 1 + coord_size);
+	coord_pad_left_to_buf(&x, coord_size, pubkey_raw->data + 1);
+	coord_pad_left_to_buf(&y, coord_size,
+			      pubkey_raw->data + 1 + coord_size);
 
-	pubkey_raw[0] = 0x04;
-	*pubkey_raw_size = total_size;
-	ret = 0;
+	pubkey_raw->data[0] = 0x04;
+	pubkey_raw->size = total_size;
 
 cleanup:
-	if (x.data != NULL) {
-		gnutls_free(x.data);
-	}
-
-	if (y.data != NULL) {
-		gnutls_free(y.data);
-	}
+	_gnutls_free_datum(&x);
+	_gnutls_free_datum(&y);
 
 	return ret;
 }
 
-static int _gnutls_hpke_extract_coordinates_from_pubkey_datum(
-	const gnutls_ecc_curve_t curve, const gnutls_datum_t *datum,
-	unsigned char *x, size_t *x_size, unsigned char *y, size_t *y_size)
+static int extract_coordinates_from_pubkey_datum(const gnutls_ecc_curve_t curve,
+						 const gnutls_datum_t *datum,
+						 gnutls_datum_t *x,
+						 gnutls_datum_t *y)
 {
 	const size_t coord_size = gnutls_ecc_curve_get_size(curve);
 
@@ -144,18 +133,18 @@ static int _gnutls_hpke_extract_coordinates_from_pubkey_datum(
 			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 		}
 
-		memcpy(x, datum->data, coord_size);
-		*x_size = coord_size;
+		memcpy(x->data, datum->data, coord_size);
+		x->size = coord_size;
 	} else {
 		if (datum->size != 1 + 2 * coord_size ||
 		    datum->data[0] != 0x04) {
 			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 		}
 
-		memcpy(x, datum->data + 1, coord_size);
-		*x_size = coord_size;
-		memcpy(y, datum->data + 1 + coord_size, coord_size);
-		*y_size = coord_size;
+		memcpy(x->data, datum->data + 1, coord_size);
+		x->size = coord_size;
+		memcpy(y->data, datum->data + 1 + coord_size, coord_size);
+		y->size = coord_size;
 	}
 
 	return 0;
@@ -166,13 +155,14 @@ int _gnutls_hpke_datum_to_pubkey(const gnutls_ecc_curve_t curve,
 				 gnutls_pubkey_t *pk)
 {
 	int ret;
-	unsigned char x[GNUTLS_HPKE_MAX_RAW_KEY_COORDINATE_SIZE];
-	size_t x_size = 0;
-	unsigned char y[GNUTLS_HPKE_MAX_RAW_KEY_COORDINATE_SIZE];
-	size_t y_size = 0;
 
-	ret = _gnutls_hpke_extract_coordinates_from_pubkey_datum(
-		curve, datum, x, &x_size, y, &y_size);
+	unsigned char x_buf[GNUTLS_HPKE_MAX_RAW_KEY_COORDINATE_SIZE];
+	unsigned char y_buf[GNUTLS_HPKE_MAX_RAW_KEY_COORDINATE_SIZE];
+
+	gnutls_datum_t x = { x_buf, 0 };
+	gnutls_datum_t y = { y_buf, 0 };
+
+	ret = extract_coordinates_from_pubkey_datum(curve, datum, &x, &y);
 	if (ret < 0) {
 		return gnutls_assert_val(ret);
 	}
@@ -182,9 +172,7 @@ int _gnutls_hpke_datum_to_pubkey(const gnutls_ecc_curve_t curve,
 		return gnutls_assert_val(ret);
 	}
 
-	gnutls_datum_t x_datum = { x, x_size };
-	gnutls_datum_t y_datum = { y, y_size };
-	ret = gnutls_pubkey_import_ecc_raw(*pk, curve, &x_datum, &y_datum);
+	ret = gnutls_pubkey_import_ecc_raw(*pk, curve, &x, &y);
 	if (ret < 0) {
 		gnutls_assert_val(ret);
 		gnutls_pubkey_deinit(*pk);
@@ -195,8 +183,7 @@ int _gnutls_hpke_datum_to_pubkey(const gnutls_ecc_curve_t curve,
 	return ret;
 }
 
-static void _gnutls_hpke_clamp_sk(const gnutls_hpke_kem_t kem,
-				  unsigned char *sk_buf)
+static void clamp_sk(const gnutls_hpke_kem_t kem, unsigned char *sk_buf)
 {
 	switch (kem) {
 	case GNUTLS_HPKE_KEM_DHKEM_X25519: {
@@ -215,15 +202,14 @@ static void _gnutls_hpke_clamp_sk(const gnutls_hpke_kem_t kem,
 	}
 }
 
-static int
-_gnutls_hpke_derive_montgomery_curve_public_key(const gnutls_hpke_kem_t kem,
-						const gnutls_datum_t *priv_raw,
-						unsigned char *pub_raw)
+static int derive_montgomery_curve_public_key(const gnutls_hpke_kem_t kem,
+					      const gnutls_datum_t *priv_raw,
+					      unsigned char *pub_raw)
 {
 	uint8_t k[GNUTLS_HPKE_MAX_MONTGOMERY_KEY_SIZE];
 
 	memcpy(k, priv_raw->data, priv_raw->size);
-	_gnutls_hpke_clamp_sk(kem, k);
+	clamp_sk(kem, k);
 
 	switch (kem) {
 	case GNUTLS_HPKE_KEM_DHKEM_X25519: {
@@ -238,57 +224,56 @@ _gnutls_hpke_derive_montgomery_curve_public_key(const gnutls_hpke_kem_t kem,
 		break;
 	}
 
-	gnutls_memset(k, 0, sizeof(k));
+	zeroize_key(k, sizeof(k));
 	return 0;
 }
 
-static int _gnutls_hpke_montgomery_curve_keypair_from_raw_privkey(
+static int montgomery_curve_keypair_from_raw_privkey(
 	const gnutls_mac_algorithm_t mac, const gnutls_hpke_kem_t kem,
 	const gnutls_datum_t *dkp_prk, const gnutls_ecc_curve_t curve,
-	const unsigned char *suite_id, size_t suite_id_size,
-	gnutls_privkey_t *privkey, gnutls_pubkey_t *pubkey)
+	const gnutls_datum_t *suite_id, gnutls_privkey_t *privkey,
+	gnutls_pubkey_t *pubkey)
 {
 	int ret;
-	unsigned char labeled_expand_info[HPKE_MAX_LABELED_EXPAND_INFO_SIZE] = {
-		0
-	};
-	size_t labeled_expand_info_size = 0;
+	unsigned char
+		labeled_expand_info_buf[HPKE_MAX_LABELED_EXPAND_INFO_SIZE] = {
+			0
+		};
 	unsigned char sk_buf[GNUTLS_HPKE_MAX_MONTGOMERY_KEY_SIZE] = { 0 };
-	size_t sk_size = 0;
 
-	sk_size = gnutls_ecc_curve_get_size(curve);
-	if (sk_size == 0) {
+	gnutls_datum_t labeled_expand_info = { labeled_expand_info_buf, 0 };
+	gnutls_datum_t sk = { sk_buf, 0 };
+
+	sk.size = gnutls_ecc_curve_get_size(curve);
+	if (sk.size == 0) {
 		ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 		goto cleanup;
 	}
 
-	_gnutls_hpke_build_expand_info(suite_id, suite_id_size, sk_label,
-				       sizeof(sk_label) - 1, NULL, 0, sk_size,
-				       labeled_expand_info,
-				       &labeled_expand_info_size);
-	gnutls_datum_t labeled_expand_info_datum = { labeled_expand_info,
-						     labeled_expand_info_size };
-	ret = gnutls_hkdf_expand(mac, dkp_prk, &labeled_expand_info_datum,
-				 sk_buf, sk_size);
+	const gnutls_datum_t sk_label = { (void *)"sk", sizeof("sk") - 1 };
+
+	_gnutls_hpke_build_expand_info(suite_id, &sk_label, NULL, sk.size,
+				       &labeled_expand_info);
+	ret = gnutls_hkdf_expand(mac, dkp_prk, &labeled_expand_info, sk.data,
+				 sk.size);
 	if (ret < 0) {
 		ret = gnutls_assert_val(ret);
 		goto cleanup;
 	}
 
-	_gnutls_hpke_clamp_sk(kem, sk_buf);
+	clamp_sk(kem, sk.data);
 	ret = gnutls_privkey_init(privkey);
 	if (ret < 0) {
 		gnutls_assert_val(ret);
 		goto cleanup;
 	}
 
-	gnutls_datum_t k = { sk_buf, sk_size };
 	unsigned char pk_buf[32];
 
-	_gnutls_hpke_derive_montgomery_curve_public_key(kem, &k, pk_buf);
+	derive_montgomery_curve_public_key(kem, &sk, pk_buf);
 
 	gnutls_datum_t x = { pk_buf, 32 };
-	ret = gnutls_privkey_import_ecc_raw(*privkey, curve, &x, NULL, &k);
+	ret = gnutls_privkey_import_ecc_raw(*privkey, curve, &x, NULL, &sk);
 	if (ret < 0) {
 		gnutls_assert_val(ret);
 		goto error;
@@ -309,25 +294,18 @@ static int _gnutls_hpke_montgomery_curve_keypair_from_raw_privkey(
 	goto cleanup;
 
 error:
-	if (privkey != NULL && *privkey != NULL) {
-		gnutls_privkey_deinit(*privkey);
-		*privkey = NULL;
-	}
-
-	if (pubkey != NULL && *pubkey != NULL) {
-		gnutls_pubkey_deinit(*pubkey);
-		*pubkey = NULL;
-	}
+	gnutls_privkey_deinit(*privkey);
+	gnutls_pubkey_deinit(*pubkey);
 
 cleanup:
 
-	gnutls_memset(sk_buf, 0, sizeof(sk_buf));
-	gnutls_memset(labeled_expand_info, 0, sizeof(labeled_expand_info));
+	zeroize_key(sk.data, sk.size);
+	zeroize_key(labeled_expand_info.data, labeled_expand_info.size);
 
 	return ret;
 }
 
-static int _gnutls_hpke_is_all_zero(const unsigned char *buf, size_t len)
+static int is_all_zero(const unsigned char *buf, size_t len)
 {
 	size_t i;
 	unsigned char acc = 0;
@@ -338,8 +316,7 @@ static int _gnutls_hpke_is_all_zero(const unsigned char *buf, size_t len)
 	return acc == 0;
 }
 
-static const unsigned char *
-_gnutls_hpke_get_kem_order(const gnutls_hpke_kem_t kem)
+static const unsigned char *get_kem_order(const gnutls_hpke_kem_t kem)
 {
 	switch (kem) {
 	case GNUTLS_HPKE_KEM_DHKEM_P256:
@@ -353,8 +330,7 @@ _gnutls_hpke_get_kem_order(const gnutls_hpke_kem_t kem)
 	}
 }
 
-static int _gnutls_hpke_be_lt(const unsigned char *a, const unsigned char *b,
-			      size_t len)
+static int be_lt(const unsigned char *a, const unsigned char *b, size_t len)
 {
 	size_t i;
 
@@ -368,10 +344,9 @@ static int _gnutls_hpke_be_lt(const unsigned char *a, const unsigned char *b,
 	return 0;
 }
 
-static int
-_gnutls_hpke_get_ecc_and_curve_len_for_curve(const gnutls_ecc_curve_t curve,
-					     const struct ecc_curve **ecc,
-					     size_t *coord_size)
+static int get_ecc_and_curve_len_for_curve(const gnutls_ecc_curve_t curve,
+					   const struct ecc_curve **ecc,
+					   size_t *coord_size)
 {
 	switch (curve) {
 	case GNUTLS_ECC_CURVE_SECP256R1:
@@ -393,32 +368,31 @@ _gnutls_hpke_get_ecc_and_curve_len_for_curve(const gnutls_ecc_curve_t curve,
 	return 0;
 }
 
-static int _gnutls_hpke_export_pubkey_coordinate(const size_t coord_size,
-						 mpz_t p, unsigned char *p_raw,
-						 size_t *p_raw_size)
+static int export_pubkey_coordinate(const size_t coord_size, mpz_t p,
+				    gnutls_datum_t *raw)
 {
 	unsigned char tmp[66];
 	size_t count = 0;
 
 	memset(tmp, 0, sizeof(tmp));
-	memset(p_raw, 0, coord_size);
+	memset(raw->data, 0, coord_size);
 
 	mpz_export(tmp, &count, 1, 1, 1, 0, p);
 	if (count > coord_size) {
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 	}
 
-	memcpy(p_raw + (coord_size - count), tmp, count);
-	*p_raw_size = coord_size;
+	memcpy(raw->data + (coord_size - count), tmp, count);
+	raw->size = coord_size;
 
-	gnutls_memset(tmp, 0, sizeof(tmp));
+	zeroize_key(tmp, sizeof(tmp));
 
 	return 0;
 }
 
-static int _gnutls_hpke_derive_raw_public_key_for_prime_curve(
-	const gnutls_ecc_curve_t curve, const gnutls_datum_t *priv_raw,
-	unsigned char *x, size_t *x_len, unsigned char *y, size_t *y_len)
+static int raw_public_key_for_prime_curve(const gnutls_ecc_curve_t curve,
+					  const gnutls_datum_t *priv_raw,
+					  gnutls_datum_t *x, gnutls_datum_t *y)
 {
 	int ret = 0;
 	const struct ecc_curve *ecc = NULL;
@@ -430,14 +404,13 @@ static int _gnutls_hpke_derive_raw_public_key_for_prime_curve(
 	int point_inited = 0;
 	int mpz_inited = 0;
 
-	ret = _gnutls_hpke_get_ecc_and_curve_len_for_curve(curve, &ecc,
-							   &coord_len);
+	ret = get_ecc_and_curve_len_for_curve(curve, &ecc, &coord_len);
 	if (ret < 0) {
 		return gnutls_assert_val(ret);
 	}
 
-	*x_len = 0;
-	*y_len = 0;
+	x->size = 0;
+	y->size = 0;
 
 	mpz_init(k);
 	mpz_init(px);
@@ -460,13 +433,13 @@ static int _gnutls_hpke_derive_raw_public_key_for_prime_curve(
 	ecc_point_mul_g(&p, &s);
 	ecc_point_get(&p, px, py);
 
-	ret = _gnutls_hpke_export_pubkey_coordinate(coord_len, px, x, x_len);
+	ret = export_pubkey_coordinate(coord_len, px, x);
 	if (ret < 0) {
 		ret = gnutls_assert_val(ret);
 		goto cleanup;
 	}
 
-	ret = _gnutls_hpke_export_pubkey_coordinate(coord_len, py, y, y_len);
+	ret = export_pubkey_coordinate(coord_len, py, y);
 	if (ret < 0) {
 		ret = gnutls_assert_val(ret);
 		goto cleanup;
@@ -488,40 +461,39 @@ cleanup:
 	return ret;
 }
 
-static int _gnutls_hpke_prime_curve_keypair_from_raw_privkey(
+static int prime_curve_keypair_from_raw_privkey(
 	const gnutls_mac_algorithm_t mac, const gnutls_hpke_kem_t kem,
 	const gnutls_datum_t *dkp_prk, const gnutls_ecc_curve_t curve,
-	const unsigned char *suite_id, size_t suite_id_size,
-	gnutls_privkey_t *privkey, gnutls_pubkey_t *pubkey)
+	const gnutls_datum_t *suite_id, gnutls_privkey_t *privkey,
+	gnutls_pubkey_t *pubkey)
 {
 	int ret;
-	unsigned char labeled_expand_info[HPKE_MAX_LABELED_EXPAND_INFO_SIZE] = {
-		0
-	};
-	size_t labeled_expand_info_size = 0;
+	unsigned char
+		labeled_expand_info_buf[HPKE_MAX_LABELED_EXPAND_INFO_SIZE] = {
+			0
+		};
 	unsigned char sk_buf[GNUTLS_HPKE_MAX_RAW_KEY_COORDINATE_SIZE] = { 0 };
-	size_t sk_size = 0;
 
-	sk_size = gnutls_ecc_curve_get_size(curve);
-	if (sk_size == 0) {
+	gnutls_datum_t labeled_expand_info = { labeled_expand_info_buf, 0 };
+	gnutls_datum_t sk = { sk_buf, 0 };
+
+	sk.size = gnutls_ecc_curve_get_size(curve);
+	if (sk.size == 0) {
 		ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 		goto cleanup;
 	}
 
-	for (size_t counter = 0; counter < 256; counter++) {
-		_gnutls_hpke_build_expand_info(suite_id, suite_id_size,
-					       candidate_label,
-					       sizeof(candidate_label) - 1,
-					       (unsigned char *)&counter, 1,
-					       sk_size, labeled_expand_info,
-					       &labeled_expand_info_size);
-		gnutls_datum_t labeled_expand_info_datum = {
-			labeled_expand_info, labeled_expand_info_size
-		};
+	const gnutls_datum_t candidate_label = { (void *)"candidate",
+						 sizeof("candidate") - 1 };
 
-		ret = gnutls_hkdf_expand(mac, dkp_prk,
-					 &labeled_expand_info_datum, sk_buf,
-					 sk_size);
+	for (size_t counter = 0; counter < 256; counter++) {
+		gnutls_datum_t context = { (void *)&counter, 1 };
+		_gnutls_hpke_build_expand_info(suite_id, &candidate_label,
+					       &context, sk.size,
+					       &labeled_expand_info);
+
+		ret = gnutls_hkdf_expand(mac, dkp_prk, &labeled_expand_info,
+					 sk.data, sk.size);
 		if (ret < 0) {
 			gnutls_assert_val(ret);
 			goto cleanup;
@@ -531,17 +503,17 @@ static int _gnutls_hpke_prime_curve_keypair_from_raw_privkey(
 			sk_buf[0] &= 0x01;
 		}
 
-		if (_gnutls_hpke_is_all_zero(sk_buf, sk_size)) {
+		if (is_all_zero(sk.data, sk.size)) {
 			continue;
 		}
 
-		const unsigned char *order = _gnutls_hpke_get_kem_order(kem);
+		const unsigned char *order = get_kem_order(kem);
 		if (order == NULL) {
 			ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 			goto cleanup;
 		}
 
-		ret = _gnutls_hpke_be_lt(sk_buf, order, sk_size);
+		ret = be_lt(sk.data, order, sk.size);
 		if (!ret) {
 			continue;
 		}
@@ -552,22 +524,20 @@ static int _gnutls_hpke_prime_curve_keypair_from_raw_privkey(
 			goto cleanup;
 		}
 
-		gnutls_datum_t k = { sk_buf, sk_size };
 		unsigned char x_buf[GNUTLS_HPKE_MAX_RAW_KEY_COORDINATE_SIZE];
-		size_t x_buf_len = 0;
 		unsigned char y_buf[GNUTLS_HPKE_MAX_RAW_KEY_COORDINATE_SIZE];
-		size_t y_buf_len = 0;
-		ret = _gnutls_hpke_derive_raw_public_key_for_prime_curve(
-			curve, &k, x_buf, &x_buf_len, y_buf, &y_buf_len);
+
+		gnutls_datum_t x = { x_buf, 0 };
+		gnutls_datum_t y = { y_buf, 0 };
+
+		ret = raw_public_key_for_prime_curve(curve, &sk, &x, &y);
 		if (ret < 0) {
 			gnutls_assert_val(ret);
 			goto error;
 		}
 
-		gnutls_datum_t x = { x_buf, x_buf_len };
-		gnutls_datum_t y = { y_buf, y_buf_len };
 		ret = gnutls_privkey_import_ecc_raw(*privkey, curve, &x, &y,
-						    &k);
+						    &sk);
 		if (ret < 0) {
 			gnutls_assert_val(ret);
 			goto error;
@@ -591,20 +561,12 @@ static int _gnutls_hpke_prime_curve_keypair_from_raw_privkey(
 	goto cleanup;
 
 error:
-	if (privkey != NULL && *privkey != NULL) {
-		gnutls_privkey_deinit(*privkey);
-		*privkey = NULL;
-	}
-
-	if (pubkey != NULL && *pubkey != NULL) {
-		gnutls_pubkey_deinit(*pubkey);
-		*pubkey = NULL;
-	}
+	gnutls_privkey_deinit(*privkey);
+	gnutls_pubkey_deinit(*pubkey);
 
 cleanup:
-
-	gnutls_memset(sk_buf, 0, sizeof(sk_buf));
-	gnutls_memset(labeled_expand_info, 0, sizeof(labeled_expand_info));
+	zeroize_key(sk.data, sk.size);
+	zeroize_key(labeled_expand_info.data, labeled_expand_info.size);
 
 	return ret;
 }
@@ -616,7 +578,7 @@ int _gnutls_hpke_keypair_from_ikm(const gnutls_hpke_kem_t kem,
 {
 	int ret;
 	unsigned char dkp_prk_buf[HPKE_MAX_HASH_SIZE] = { 0 };
-	size_t dkp_prk_len = 0;
+	gnutls_datum_t dkp_prk = { dkp_prk_buf, 0 };
 
 	const gnutls_mac_algorithm_t mac = _gnutls_hpke_kem_to_mac(kem);
 	if (mac == GNUTLS_MAC_UNKNOWN) {
@@ -633,45 +595,44 @@ int _gnutls_hpke_keypair_from_ikm(const gnutls_hpke_kem_t kem,
 	unsigned char suite_id_buf[HPKE_SUITE_ID_SIZE] = { 0 };
 	_gnutls_hpke_build_kem_suite_id(kem, suite_id_buf);
 
-	ret = _gnutls_hpke_labeled_extract(
-		mac, suite_id_buf, HPKE_SUITE_ID_SIZE, NULL, 0, dkp_prk_label,
-		sizeof(dkp_prk_label) - 1, ikme, dkp_prk_buf, &dkp_prk_len);
+	gnutls_datum_t suite_id = { suite_id_buf, HPKE_SUITE_ID_SIZE };
+	gnutls_datum_t dkp_prk_label = { (void *)"dkp_prk",
+					 sizeof("dkp_prk") - 1 };
+
+	ret = _gnutls_hpke_labeled_extract(mac, &suite_id, NULL, &dkp_prk_label,
+					   ikme, &dkp_prk);
 	if (ret < 0) {
 		ret = gnutls_assert_val(ret);
 		goto cleanup;
 	}
 
-	gnutls_datum_t dkp_prk = { dkp_prk_buf, dkp_prk_len };
-
 	switch (kem) {
 	case GNUTLS_HPKE_KEM_DHKEM_X448:
 	case GNUTLS_HPKE_KEM_DHKEM_X25519:
-		ret = _gnutls_hpke_montgomery_curve_keypair_from_raw_privkey(
-			mac, kem, &dkp_prk, curve, suite_id_buf,
-			HPKE_SUITE_ID_SIZE, privkey, pubkey);
+		ret = montgomery_curve_keypair_from_raw_privkey(
+			mac, kem, &dkp_prk, curve, &suite_id, privkey, pubkey);
 		break;
 	case GNUTLS_HPKE_KEM_DHKEM_P256:
 	case GNUTLS_HPKE_KEM_DHKEM_P384:
 	case GNUTLS_HPKE_KEM_DHKEM_P521:
-		ret = _gnutls_hpke_prime_curve_keypair_from_raw_privkey(
-			mac, kem, &dkp_prk, curve, suite_id_buf,
-			HPKE_SUITE_ID_SIZE, privkey, pubkey);
+		ret = prime_curve_keypair_from_raw_privkey(
+			mac, kem, &dkp_prk, curve, &suite_id, privkey, pubkey);
 		break;
 	default:
 		ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
 
 cleanup:
-
-	gnutls_memset(dkp_prk_buf, 0, dkp_prk_len);
+	zeroize_key(dkp_prk.data, dkp_prk.size);
 
 	return ret;
 }
 
-static int _gnutls_hpke_generate_new_keypair(
-	const gnutls_ecc_curve_t curve, const gnutls_hpke_kem_t kem,
-	const gnutls_pk_algorithm_t pk_algo,
-	gnutls_privkey_t *ephemeral_privkey, gnutls_pubkey_t *ephemeral_pubkey)
+static int generate_new_keypair(const gnutls_ecc_curve_t curve,
+				const gnutls_hpke_kem_t kem,
+				const gnutls_pk_algorithm_t pk_algo,
+				gnutls_privkey_t *ephemeral_privkey,
+				gnutls_pubkey_t *ephemeral_pubkey)
 {
 	int ret;
 
@@ -729,9 +690,8 @@ int _gnutls_hpke_generate_keypair(const gnutls_datum_t *ikme,
 			return ret;
 		}
 
-		ret = _gnutls_hpke_generate_new_keypair(curve, kem, pk_algo,
-							ephemeral_privkey,
-							ephemeral_pubkey);
+		ret = generate_new_keypair(curve, kem, pk_algo,
+					   ephemeral_privkey, ephemeral_pubkey);
 		if (ret < 0) {
 			gnutls_assert_val(ret);
 			return ret;

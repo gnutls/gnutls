@@ -36,8 +36,7 @@
 #define HPKE_MAX_LABELED_EXPAND_INFO_SIZE 158
 
 int _gnutls_hpke_pubkey_to_datum(const gnutls_pubkey_t pk,
-				 unsigned char *pubkey_raw,
-				 size_t *pubkey_raw_size);
+				 gnutls_datum_t *pubkey_raw);
 
 int _gnutls_hpke_datum_to_pubkey(const gnutls_ecc_curve_t curve,
 				 const gnutls_datum_t *datum,

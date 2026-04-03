@@ -29,75 +29,65 @@ static const unsigned char hpke_v1_label[] = "HPKE-v1";
 static const unsigned char eae_prk_label[] = "eae_prk";
 static const unsigned char shared_secret_label[] = "shared_secret";
 
-static void _gnutls_hpke_append_buf(unsigned char *dst, size_t *dst_len,
-				    const unsigned char *src, size_t src_len)
+static void append_datum(gnutls_datum_t *dst, const gnutls_datum_t *src)
 {
-	memcpy(dst + *dst_len, src, src_len);
-	*dst_len += src_len;
+	memcpy(dst->data + dst->size, src->data, src->size);
+	dst->size += src->size;
+}
+
+static void append_bytes(gnutls_datum_t *dst, const unsigned char *src,
+			 const size_t src_size)
+{
+	memcpy(dst->data + dst->size, src, src_size);
+	dst->size += src_size;
 }
 
 void _gnutls_hpke_build_key_context_for_scheduling(
-	const uint8_t mode, const unsigned char *psk_id_hash,
-	const size_t psk_id_hash_len, const unsigned char *info_hash,
-	const size_t info_hash_len, unsigned char *key_schedule_context_buf,
-	size_t *key_schedule_context_len)
-{
-	*key_schedule_context_len = 0;
+	const uint8_t mode, const gnutls_datum_t *psk_id_hash,
+	const gnutls_datum_t *info_hash, gnutls_datum_t *key_schedule_context)
 
-	_gnutls_hpke_append_buf(key_schedule_context_buf,
-				key_schedule_context_len, &mode, 1);
-	_gnutls_hpke_append_buf(key_schedule_context_buf,
-				key_schedule_context_len, psk_id_hash,
-				psk_id_hash_len);
-	_gnutls_hpke_append_buf(key_schedule_context_buf,
-				key_schedule_context_len, info_hash,
-				info_hash_len);
+{
+	key_schedule_context->size = 0;
+
+	append_bytes(key_schedule_context, &mode, 1);
+	append_datum(key_schedule_context, psk_id_hash);
+	append_datum(key_schedule_context, info_hash);
 }
 
-void _gnutls_hpke_build_expand_info(
-	const unsigned char *suite_id, const size_t suite_id_size,
-	const unsigned char *label, const size_t label_size,
-	const unsigned char *context, const size_t context_size, const size_t L,
-	unsigned char *expand_info_buf, size_t *expand_info_len)
+void _gnutls_hpke_build_expand_info(const gnutls_datum_t *suite_id,
+				    const gnutls_datum_t *label,
+				    const gnutls_datum_t *context,
+				    const size_t L, gnutls_datum_t *expand_info)
 {
-	*expand_info_len = 0;
+	expand_info->size = 0;
 
 	unsigned char L_buf[2];
 	L_buf[0] = (L >> 8) & 0xff;
 	L_buf[1] = L & 0xff;
 
-	_gnutls_hpke_append_buf(expand_info_buf, expand_info_len, L_buf, 2);
-	_gnutls_hpke_append_buf(expand_info_buf, expand_info_len, hpke_v1_label,
-				sizeof(hpke_v1_label) - 1);
-	_gnutls_hpke_append_buf(expand_info_buf, expand_info_len, suite_id,
-				suite_id_size);
-	_gnutls_hpke_append_buf(expand_info_buf, expand_info_len, label,
-				label_size);
+	append_bytes(expand_info, L_buf, 2);
+	append_bytes(expand_info, hpke_v1_label, sizeof(hpke_v1_label) - 1);
+	append_datum(expand_info, suite_id);
+	append_datum(expand_info, label);
+
 	if (context != NULL) {
-		_gnutls_hpke_append_buf(expand_info_buf, expand_info_len,
-					context, context_size);
+		append_datum(expand_info, context);
 	}
 }
 
-void _gnutls_hpke_build_labeled_extract_key(const unsigned char *suite_id,
-					    const size_t suite_id_size,
-					    const unsigned char *label,
-					    const size_t label_size,
+void _gnutls_hpke_build_labeled_extract_key(const gnutls_datum_t *suite_id,
+					    const gnutls_datum_t *label,
 					    const gnutls_datum_t *ikm,
-					    unsigned char *extract_key_buf,
-					    size_t *extract_key_len)
+					    gnutls_datum_t *extract_key)
 {
-	*extract_key_len = 0;
+	extract_key->size = 0;
 
-	_gnutls_hpke_append_buf(extract_key_buf, extract_key_len, hpke_v1_label,
-				sizeof(hpke_v1_label) - 1);
-	_gnutls_hpke_append_buf(extract_key_buf, extract_key_len, suite_id,
-				suite_id_size);
-	_gnutls_hpke_append_buf(extract_key_buf, extract_key_len, label,
-				label_size);
+	append_bytes(extract_key, hpke_v1_label, sizeof(hpke_v1_label) - 1);
+	append_datum(extract_key, suite_id);
+	append_datum(extract_key, label);
+
 	if (ikm != NULL) {
-		_gnutls_hpke_append_buf(extract_key_buf, extract_key_len,
-					ikm->data, ikm->size);
+		append_datum(extract_key, ikm);
 	}
 }
 
@@ -111,53 +101,39 @@ void _gnutls_hpke_build_kem_suite_id(const uint16_t kem_id,
 	suite_id[4] = kem_id & 0xff;
 }
 
-void _gnutls_hpke_build_ikm_label(const unsigned char *suite_id,
-				  const size_t suite_id_size,
-				  const unsigned char *dh, const size_t dh_size,
-				  unsigned char *ikm_label_buf,
-				  size_t *ikm_label_len)
+void _gnutls_hpke_build_ikm_label(const gnutls_datum_t *suite_id,
+				  const gnutls_datum_t *dh,
+				  gnutls_datum_t *ikm_label)
 {
-	*ikm_label_len = 0;
+	ikm_label->size = 0;
 
-	_gnutls_hpke_append_buf(ikm_label_buf, ikm_label_len, hpke_v1_label,
-				sizeof(hpke_v1_label) - 1);
-	_gnutls_hpke_append_buf(ikm_label_buf, ikm_label_len, suite_id,
-				suite_id_size);
-	_gnutls_hpke_append_buf(ikm_label_buf, ikm_label_len, eae_prk_label,
-				sizeof(eae_prk_label) - 1);
-	_gnutls_hpke_append_buf(ikm_label_buf, ikm_label_len, dh, dh_size);
+	append_bytes(ikm_label, hpke_v1_label, sizeof(hpke_v1_label) - 1);
+	append_datum(ikm_label, suite_id);
+	append_bytes(ikm_label, eae_prk_label, sizeof(eae_prk_label) - 1);
+	append_datum(ikm_label, dh);
 }
 
-void _gnutls_hpke_build_info_label(
-	const unsigned char *receiver_pubkey_raw,
-	size_t receiver_pubkey_raw_size, const unsigned char *sender_pubkey_raw,
-	size_t sender_pubkey_raw_size,
-	const unsigned char *ephemeral_pubkey_raw,
-	size_t ephemeral_pubkey_raw_size, const unsigned char *suite_id,
-	const size_t suite_id_size, const uint16_t Nsecret,
-	unsigned char *info_label_buf, size_t *info_label_len)
+void _gnutls_hpke_build_info_label(const gnutls_datum_t *pkR_raw,
+				   const gnutls_datum_t *pkS_raw,
+				   const gnutls_datum_t *pkE_raw,
+				   const gnutls_datum_t *suite_id,
+				   const uint16_t Nh,
+				   gnutls_datum_t *info_label)
 {
-	*info_label_len = 0;
+	info_label->size = 0;
 
-	unsigned char Nsecret_buf[2];
-	Nsecret_buf[0] = (Nsecret >> 8) & 0xff;
-	Nsecret_buf[1] = Nsecret & 0xff;
+	unsigned char Nh_buf[2];
+	Nh_buf[0] = (Nh >> 8) & 0xff;
+	Nh_buf[1] = Nh & 0xff;
 
-	_gnutls_hpke_append_buf(info_label_buf, info_label_len, Nsecret_buf, 2);
-	_gnutls_hpke_append_buf(info_label_buf, info_label_len, hpke_v1_label,
-				sizeof(hpke_v1_label) - 1);
-	_gnutls_hpke_append_buf(info_label_buf, info_label_len, suite_id,
-				suite_id_size);
-	_gnutls_hpke_append_buf(info_label_buf, info_label_len,
-				shared_secret_label,
-				sizeof(shared_secret_label) - 1);
-	_gnutls_hpke_append_buf(info_label_buf, info_label_len,
-				ephemeral_pubkey_raw,
-				ephemeral_pubkey_raw_size);
-	_gnutls_hpke_append_buf(info_label_buf, info_label_len,
-				receiver_pubkey_raw, receiver_pubkey_raw_size);
-	_gnutls_hpke_append_buf(info_label_buf, info_label_len,
-				sender_pubkey_raw, sender_pubkey_raw_size);
+	append_bytes(info_label, Nh_buf, 2);
+	append_bytes(info_label, hpke_v1_label, sizeof(hpke_v1_label) - 1);
+	append_datum(info_label, suite_id);
+	append_bytes(info_label, shared_secret_label,
+		     sizeof(shared_secret_label) - 1);
+	append_datum(info_label, pkE_raw);
+	append_datum(info_label, pkR_raw);
+	append_datum(info_label, pkS_raw);
 }
 
 void _gnutls_hpke_build_suite_id_for_scheduling(const uint16_t kem_id,
