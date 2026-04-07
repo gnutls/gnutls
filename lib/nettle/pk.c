@@ -4434,8 +4434,11 @@ static int wrap_nettle_pk_verify_priv_params(gnutls_pk_algorithm_t algo,
 			goto rsa_cleanup;
 		}
 
-		mpz_invert(TOMPZ(t1), TOMPZ(params->params[RSA_PRIME2]),
-			   TOMPZ(params->params[RSA_PRIME1]));
+		if (!mpz_invert(TOMPZ(t1), TOMPZ(params->params[RSA_PRIME2]),
+				TOMPZ(params->params[RSA_PRIME1]))) {
+			ret = gnutls_assert_val(GNUTLS_E_PK_INVALID_PRIVKEY);
+			goto rsa_cleanup;
+		}
 		if (_gnutls_mpi_cmp(t1, params->params[RSA_COEF]) != 0) {
 			ret = gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
 			goto rsa_cleanup;
