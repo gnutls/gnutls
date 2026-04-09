@@ -173,12 +173,14 @@ static int privkey_to_pubkey(gnutls_pk_algorithm_t pk,
 	case GNUTLS_PK_RSA_PSS:
 	case GNUTLS_PK_RSA_OAEP:
 	case GNUTLS_PK_RSA:
-		pub->params[0] = _gnutls_mpi_copy(priv->params[0]);
-		pub->params[1] = _gnutls_mpi_copy(priv->params[1]);
+		pub->params[RSA_MODULUS] =
+			_gnutls_mpi_copy(priv->params[RSA_MODULUS]);
+		pub->params[RSA_PUB] = _gnutls_mpi_copy(priv->params[RSA_PUB]);
 
 		pub->params_nr = RSA_PUBLIC_PARAMS;
 
-		if (pub->params[0] == NULL || pub->params[1] == NULL) {
+		if (pub->params[RSA_MODULUS] == NULL ||
+		    pub->params[RSA_PUB] == NULL) {
 			gnutls_assert();
 			ret = GNUTLS_E_MEMORY_ERROR;
 			goto cleanup;
