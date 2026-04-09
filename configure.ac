@@ -1315,6 +1315,13 @@ AM_COND_IF([ENABLE_LEANCRYPTO], [
     fi
 ])
 
+AM_COND_IF([ENABLE_LEANCRYPTO], [
+    save_LIBS=$LIBS
+    LIBS="$LIBS $LEANCRYPTO_LIBS"
+    AC_CHECK_FUNCS([lc_dilithium_pk_from_sk])
+    LIBS=$save_LIBS
+])
+
 AM_CONDITIONAL(NEED_LTLIBDL, test "$need_ltlibdl" = yes)
 
 # export for use in scripts
