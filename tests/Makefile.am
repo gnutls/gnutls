@@ -370,6 +370,11 @@ libpkcs11mock4_la_SOURCES = pkcs11/pkcs11-mock4.c
 libpkcs11mock4_la_LDFLAGS = -shared -rpath $(pkglibdir) -module -no-undefined -avoid-version
 libpkcs11mock4_la_LIBADD =  ../gl/libgnu.la
 
+noinst_LTLIBRARIES += libpkcs11mock5.la
+libpkcs11mock5_la_SOURCES = pkcs11/pkcs11-mock5.c
+libpkcs11mock5_la_LDFLAGS = -shared -rpath $(pkglibdir) -module -no-undefined -avoid-version
+libpkcs11mock5_la_LIBADD =  ../gl/libgnu.la
+
 pkcs11_cert_import_url_exts_SOURCES = pkcs11/pkcs11-cert-import-url-exts.c
 pkcs11_cert_import_url_exts_DEPENDENCIES = libpkcs11mock1.la libutils.la
 
@@ -688,6 +693,7 @@ TESTS_ENVIRONMENT +=						\
 	P11MOCKLIB2=$(abs_builddir)/.libs/libpkcs11mock2.so	\
 	P11MOCKLIB3=$(abs_builddir)/.libs/libpkcs11mock3.so	\
 	P11MOCKLIB4=$(abs_builddir)/.libs/libpkcs11mock4.so	\
+	P11MOCKLIB5=$(abs_builddir)/.libs/libpkcs11mock5.so	\
 	PKCS12_MANY_CERTS_FILE=$(srcdir)/cert-tests/data/pkcs12_5certs.p12	\
 	PKCS12FILE=$(srcdir)/cert-tests/data/client.p12		\
 	PKCS12PASSWORD=foobar					\
