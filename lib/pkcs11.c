@@ -3869,6 +3869,7 @@ int gnutls_x509_crt_list_import_pkcs11(gnutls_x509_crt_t *certs,
 cleanup:
 	for (j = 0; j < i; j++) {
 		gnutls_x509_crt_deinit(certs[j]);
+		certs[j] = NULL;
 	}
 
 	return ret;
