@@ -4846,7 +4846,8 @@ static int wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 	if (direction != GNUTLS_IMPORT)
 		return 0;
 
-	if (algo == GNUTLS_PK_RSA) {
+	switch (algo) {
+	case GNUTLS_PK_RSA: {
 		struct rsa_private_key priv;
 
 		if (params->params[RSA_PRIV] == NULL) {
@@ -4896,8 +4897,10 @@ static int wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 		if (ret == 0) {
 			return gnutls_assert_val(GNUTLS_E_PK_INVALID_PRIVKEY);
 		}
-	} else if (algo == GNUTLS_PK_EDDSA_ED25519 ||
-		   algo == GNUTLS_PK_EDDSA_ED448) {
+	} break;
+
+	case GNUTLS_PK_EDDSA_ED25519:
+	case GNUTLS_PK_EDDSA_ED448:
 		if (unlikely(get_eddsa_curve(algo) != params->curve))
 			return gnutls_assert_val(
 				GNUTLS_E_ECC_UNSUPPORTED_CURVE);
@@ -4921,8 +4924,10 @@ static int wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 		}
 
 		params->raw_pub.size = params->raw_priv.size;
-	} else if (algo == GNUTLS_PK_ECDH_X25519 ||
-		   algo == GNUTLS_PK_ECDH_X448) {
+		break;
+
+	case GNUTLS_PK_ECDH_X25519:
+	case GNUTLS_PK_ECDH_X448:
 		if (unlikely(get_ecdh_curve(algo) != params->curve))
 			return gnutls_assert_val(
 				GNUTLS_E_ECC_UNSUPPORTED_CURVE);
@@ -4946,7 +4951,9 @@ static int wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 		}
 
 		params->raw_pub.size = params->raw_priv.size;
-	} else if (algo == GNUTLS_PK_RSA_PSS) {
+		break;
+
+	case GNUTLS_PK_RSA_PSS:
 		if (params->params_nr < RSA_PRIVATE_PARAMS - 3)
 			return gnutls_assert_val(GNUTLS_E_PK_INVALID_PRIVKEY);
 
@@ -4959,20 +4966,22 @@ static int wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 				params->spki.salt_size, pub_size,
 				GNUTLS_E_PK_INVALID_PUBKEY_PARAMS);
 		}
-	}
+		break;
+
 #ifdef ENABLE_DSA
-	else if (algo == GNUTLS_PK_DSA) {
+	case GNUTLS_PK_DSA:
 		if (params->params[DSA_Y] == NULL) {
 			ret = calc_dsa_pub(params);
 			if (ret < 0)
 				return gnutls_assert_val(ret);
 			params->params_nr++;
 		}
-	}
+		break;
 #endif
 #if ENABLE_GOST
-	else if (algo == GNUTLS_PK_GOST_01 || algo == GNUTLS_PK_GOST_12_256 ||
-		 algo == GNUTLS_PK_GOST_12_512) {
+	case GNUTLS_PK_GOST_01:
+	case GNUTLS_PK_GOST_12_256:
+	case GNUTLS_PK_GOST_12_512: {
 		struct ecc_point r;
 		struct ecc_scalar priv;
 		const struct ecc_curve *curve;
@@ -5003,8 +5012,11 @@ static int wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 
 		ecc_point_clear(&r);
 		ecc_scalar_clear(&priv);
-	}
+	} break;
 #endif
+	default:
+		break;
+	}
 
 	return 0;
 }
