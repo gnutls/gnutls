@@ -1824,7 +1824,67 @@ cleanup:
 	zeroize_key(&sk, sizeof(sk));
 	return ret;
 }
-#else
+
+#ifdef HAVE_LC_DILITHIUM_PK_FROM_SK
+static int ml_dsa_privkey_to_pubkey(gnutls_pk_algorithm_t algo,
+				    const gnutls_datum_t *raw_priv,
+				    gnutls_datum_t *raw_pub)
+{
+	int ret;
+	enum lc_dilithium_type type;
+	struct lc_dilithium_sk sk;
+	struct lc_dilithium_pk pk;
+	gnutls_datum_t tmp_raw_pub = { NULL, 0 };
+	uint8_t *ptr;
+	size_t len;
+
+	type = ml_dsa_pk_to_lc_dilithium_type(algo);
+	if (type == LC_DILITHIUM_UNKNOWN)
+		return gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
+
+	ret = lc_dilithium_sk_load(&sk, raw_priv->data, raw_priv->size);
+	if (ret < 0 || lc_dilithium_sk_type(&sk) != type) {
+		ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		goto cleanup;
+	}
+
+	ret = lc_dilithium_pk_from_sk(&pk, &sk);
+	if (ret < 0) {
+		ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+		goto cleanup;
+	}
+
+	ret = lc_dilithium_pk_ptr(&ptr, &len, &pk);
+	if (ret < 0) {
+		ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+		goto cleanup;
+	}
+
+	ret = _gnutls_set_datum(&tmp_raw_pub, ptr, len);
+	if (ret < 0) {
+		ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+		goto cleanup;
+	}
+
+	*raw_pub = _gnutls_take_datum(&tmp_raw_pub);
+
+	ret = 0;
+
+cleanup:
+	_gnutls_free_key_datum(&tmp_raw_pub);
+	zeroize_key(&pk, sizeof(pk));
+	zeroize_key(&sk, sizeof(sk));
+	return ret;
+}
+#else /* !HAVE_LC_DILITHIUM_PK_FROM_SK */
+static int ml_dsa_privkey_to_pubkey(gnutls_pk_algorithm_t algo MAYBE_UNUSED,
+				    const gnutls_datum_t *raw_priv MAYBE_UNUSED,
+				    gnutls_datum_t *raw_pub MAYBE_UNUSED)
+{
+	return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
+}
+#endif
+#else /* !HAVE_LEANCRYPTO */
 static int ml_dsa_exists(gnutls_pk_algorithm_t algo MAYBE_UNUSED)
 {
 	return 0;
@@ -1850,6 +1910,13 @@ static int ml_dsa_generate_keypair(gnutls_pk_algorithm_t algo MAYBE_UNUSED,
 				   gnutls_datum_t *raw_priv MAYBE_UNUSED,
 				   gnutls_datum_t *raw_pub MAYBE_UNUSED,
 				   const gnutls_datum_t *raw_seed MAYBE_UNUSED)
+{
+	return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM);
+}
+
+static int ml_dsa_privkey_to_pubkey(gnutls_pk_algorithm_t algo MAYBE_UNUSED,
+				    const gnutls_datum_t *raw_priv MAYBE_UNUSED,
+				    gnutls_datum_t *raw_pub MAYBE_UNUSED)
 {
 	return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM);
 }
@@ -4846,7 +4913,8 @@ static int wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 	if (direction != GNUTLS_IMPORT)
 		return 0;
 
-	if (algo == GNUTLS_PK_RSA) {
+	switch (algo) {
+	case GNUTLS_PK_RSA: {
 		struct rsa_private_key priv;
 
 		if (params->params[RSA_PRIV] == NULL) {
@@ -4896,8 +4964,10 @@ static int wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 		if (ret == 0) {
 			return gnutls_assert_val(GNUTLS_E_PK_INVALID_PRIVKEY);
 		}
-	} else if (algo == GNUTLS_PK_EDDSA_ED25519 ||
-		   algo == GNUTLS_PK_EDDSA_ED448) {
+	} break;
+
+	case GNUTLS_PK_EDDSA_ED25519:
+	case GNUTLS_PK_EDDSA_ED448:
 		if (unlikely(get_eddsa_curve(algo) != params->curve))
 			return gnutls_assert_val(
 				GNUTLS_E_ECC_UNSUPPORTED_CURVE);
@@ -4921,8 +4991,10 @@ static int wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 		}
 
 		params->raw_pub.size = params->raw_priv.size;
-	} else if (algo == GNUTLS_PK_ECDH_X25519 ||
-		   algo == GNUTLS_PK_ECDH_X448) {
+		break;
+
+	case GNUTLS_PK_ECDH_X25519:
+	case GNUTLS_PK_ECDH_X448:
 		if (unlikely(get_ecdh_curve(algo) != params->curve))
 			return gnutls_assert_val(
 				GNUTLS_E_ECC_UNSUPPORTED_CURVE);
@@ -4946,7 +5018,9 @@ static int wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 		}
 
 		params->raw_pub.size = params->raw_priv.size;
-	} else if (algo == GNUTLS_PK_RSA_PSS) {
+		break;
+
+	case GNUTLS_PK_RSA_PSS:
 		if (params->params_nr < RSA_PRIVATE_PARAMS - 3)
 			return gnutls_assert_val(GNUTLS_E_PK_INVALID_PRIVKEY);
 
@@ -4959,20 +5033,39 @@ static int wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 				params->spki.salt_size, pub_size,
 				GNUTLS_E_PK_INVALID_PUBKEY_PARAMS);
 		}
-	}
+		break;
+
+	case GNUTLS_PK_MLDSA44:
+	case GNUTLS_PK_MLDSA65:
+	case GNUTLS_PK_MLDSA87:
+		if (params->raw_pub.data == NULL) {
+			ret = ml_dsa_privkey_to_pubkey(algo, &params->raw_priv,
+						       &params->raw_pub);
+			if (ret < 0) {
+				if (ret == GNUTLS_E_UNIMPLEMENTED_FEATURE) {
+					_gnutls_debug_log(
+						"Deriving public key from an ML-DSA private key is not implemented; ignoring the request\n");
+					return 0;
+				}
+				return gnutls_assert_val(ret);
+			}
+		}
+		break;
+
 #ifdef ENABLE_DSA
-	else if (algo == GNUTLS_PK_DSA) {
+	case GNUTLS_PK_DSA:
 		if (params->params[DSA_Y] == NULL) {
 			ret = calc_dsa_pub(params);
 			if (ret < 0)
 				return gnutls_assert_val(ret);
 			params->params_nr++;
 		}
-	}
+		break;
 #endif
 #if ENABLE_GOST
-	else if (algo == GNUTLS_PK_GOST_01 || algo == GNUTLS_PK_GOST_12_256 ||
-		 algo == GNUTLS_PK_GOST_12_512) {
+	case GNUTLS_PK_GOST_01:
+	case GNUTLS_PK_GOST_12_256:
+	case GNUTLS_PK_GOST_12_512: {
 		struct ecc_point r;
 		struct ecc_scalar priv;
 		const struct ecc_curve *curve;
@@ -5003,8 +5096,11 @@ static int wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 
 		ecc_point_clear(&r);
 		ecc_scalar_clear(&priv);
-	}
+	} break;
 #endif
+	default:
+		break;
+	}
 
 	return 0;
 }

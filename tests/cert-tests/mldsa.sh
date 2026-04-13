@@ -127,21 +127,46 @@ for variant in 44 65 87; do
     for format in seed expanded both; do
 	echo "Testing ML-DSA-$variant ($format)"
 
-	# Check default
-	TMPKEYDEFAULT=$testdir/key-$algo-$format-default
 	TMPKEY=$testdir/key-$algo-$format
-	${VALGRIND} "${CERTTOOL}" -k --no-text --infile "$srcdir/data/key-$algo-$format.pem" >"$TMPKEYDEFAULT"
-	if [ $? != 0 ]; then
-	    cat "$TMPKEYDEFAULT"
-	    exit 1
-	fi
 
-	# The "expandedKey" format doesn't have public key part
-	if [ "$format" = seed ] || [ "$format" = both ]; then
-	    if ! "${DIFF}" "$TMPKEYDEFAULT" "$srcdir/data/key-$algo-both.pem"; then
-		exit 1
-	    fi
-	fi
+	# Check certtool --key-info would result in the same output as
+	# "both" for "seed and "both" formats.
+	#
+	# As for "expandedKey" format, it is not possible to recover a
+	# seed, so compare the textual information about public key.
+	case "$format" in
+	    seed | both)
+		TMPKEYBODY=$testdir/key-$algo-$format-default
+		${VALGRIND} "${CERTTOOL}" -k --no-text --infile "$srcdir/data/key-$algo-$format.pem" >"$TMPKEYBODY"
+		if [ $? != 0 ]; then
+		    cat "$TMPKEYBODY"
+		    exit 1
+		fi
+
+		if ! "${DIFF}" "$TMPKEYBODY" "$srcdir/data/key-$algo-both.pem"; then
+		    exit 1
+		fi
+		;;
+	    expandedKey)
+		TMPKEYTEXT=$testdir/key-$algo-$format-text
+		${VALGRIND} "${CERTTOOL}" -k --infile "$srcdir/data/key-$algo-$format.pem" | sed -n '1,/^-----BEGIN/p' | head -n-1 >"$TMPKEYTEXT"
+		if [ $? != 0 ]; then
+		    cat "$TMPKEYTEXT"
+		    exit 1
+		fi
+
+		TMPKEYTEXT2=$testdir/key-$algo-both-text
+		${VALGRIND} "${CERTTOOL}" -k --infile "$srcdir/data/key-$algo-both.pem" | sed -n '1,/^-----BEGIN/p' | head -n-1 >"$TMPKEYTEXT2"
+		if [ $? != 0 ]; then
+		    cat "$TMPKEYTEXT2"
+		    exit 1
+		fi
+
+		if ! "${DIFF}" "$TMPKEYTEXT" "$TMPKEYTEXT2"; then
+		    exit 1
+		fi
+		;;
+	esac
 
 	# Check roundtrip with --key-format
 	${VALGRIND} "${CERTTOOL}" -k --no-text --key-format "$format" --infile "$srcdir/data/key-$algo-$format.pem" >"$TMPKEY"
