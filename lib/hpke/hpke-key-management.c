@@ -28,11 +28,6 @@
 
 #include "errors.h"
 
-#include <nettle/curve25519.h>
-#include <nettle/curve448.h>
-#include <nettle/ecc.h>
-#include <nettle/ecc-curve.h>
-
 #define GNUTLS_HPKE_MAX_RAW_KEY_COORDINATE_SIZE 66
 #define GNUTLS_HPKE_MAX_MONTGOMERY_KEY_SIZE 56
 
@@ -202,32 +197,6 @@ static void clamp_sk(const gnutls_hpke_kem_t kem, unsigned char *sk_buf)
 	}
 }
 
-static int derive_montgomery_curve_public_key(const gnutls_hpke_kem_t kem,
-					      const gnutls_datum_t *priv_raw,
-					      unsigned char *pub_raw)
-{
-	uint8_t k[GNUTLS_HPKE_MAX_MONTGOMERY_KEY_SIZE];
-
-	memcpy(k, priv_raw->data, priv_raw->size);
-	clamp_sk(kem, k);
-
-	switch (kem) {
-	case GNUTLS_HPKE_KEM_DHKEM_X25519: {
-		static const uint8_t basepoint[32] = { 9 };
-		curve25519_mul(pub_raw, k, basepoint);
-	} break;
-	case GNUTLS_HPKE_KEM_DHKEM_X448: {
-		static const uint8_t basepoint[56] = { 5 };
-		curve448_mul(pub_raw, k, basepoint);
-	} break;
-	default:
-		break;
-	}
-
-	zeroize_key(k, sizeof(k));
-	return 0;
-}
-
 static int montgomery_curve_keypair_from_raw_privkey(
 	const gnutls_mac_algorithm_t mac, const gnutls_hpke_kem_t kem,
 	const gnutls_datum_t *dkp_prk, const gnutls_ecc_curve_t curve,
@@ -268,12 +237,7 @@ static int montgomery_curve_keypair_from_raw_privkey(
 		goto cleanup;
 	}
 
-	unsigned char pk_buf[32];
-
-	derive_montgomery_curve_public_key(kem, &sk, pk_buf);
-
-	gnutls_datum_t x = { pk_buf, 32 };
-	ret = gnutls_privkey_import_ecc_raw(*privkey, curve, &x, NULL, &sk);
+	ret = gnutls_privkey_import_ecc_raw(*privkey, curve, NULL, NULL, &sk);
 	if (ret < 0) {
 		gnutls_assert_val(ret);
 		goto error;
@@ -285,7 +249,7 @@ static int montgomery_curve_keypair_from_raw_privkey(
 		goto error;
 	}
 
-	ret = gnutls_pubkey_import_ecc_raw(*pubkey, curve, &x, NULL);
+	ret = gnutls_pubkey_import_privkey(*pubkey, *privkey, 0, 0);
 	if (ret < 0) {
 		gnutls_assert_val(ret);
 		goto error;
@@ -342,123 +306,6 @@ static int be_lt(const unsigned char *a, const unsigned char *b, size_t len)
 	}
 
 	return 0;
-}
-
-static int get_ecc_and_curve_len_for_curve(const gnutls_ecc_curve_t curve,
-					   const struct ecc_curve **ecc,
-					   size_t *coord_size)
-{
-	switch (curve) {
-	case GNUTLS_ECC_CURVE_SECP256R1:
-		*ecc = nettle_get_secp_256r1();
-		*coord_size = 32;
-		break;
-	case GNUTLS_ECC_CURVE_SECP384R1:
-		*ecc = nettle_get_secp_384r1();
-		*coord_size = 48;
-		break;
-	case GNUTLS_ECC_CURVE_SECP521R1:
-		*ecc = nettle_get_secp_521r1();
-		*coord_size = 66;
-		break;
-	default:
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-	}
-
-	return 0;
-}
-
-static int export_pubkey_coordinate(const size_t coord_size, mpz_t p,
-				    gnutls_datum_t *raw)
-{
-	unsigned char tmp[66];
-	size_t count = 0;
-
-	memset(tmp, 0, sizeof(tmp));
-	memset(raw->data, 0, coord_size);
-
-	mpz_export(tmp, &count, 1, 1, 1, 0, p);
-	if (count > coord_size) {
-		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
-	}
-
-	memcpy(raw->data + (coord_size - count), tmp, count);
-	raw->size = coord_size;
-
-	zeroize_key(tmp, sizeof(tmp));
-
-	return 0;
-}
-
-static int raw_public_key_for_prime_curve(const gnutls_ecc_curve_t curve,
-					  const gnutls_datum_t *priv_raw,
-					  gnutls_datum_t *x, gnutls_datum_t *y)
-{
-	int ret = 0;
-	const struct ecc_curve *ecc = NULL;
-	struct ecc_scalar s;
-	struct ecc_point p;
-	mpz_t k, px, py;
-	size_t coord_len = 0;
-	int scalar_inited = 0;
-	int point_inited = 0;
-	int mpz_inited = 0;
-
-	ret = get_ecc_and_curve_len_for_curve(curve, &ecc, &coord_len);
-	if (ret < 0) {
-		return gnutls_assert_val(ret);
-	}
-
-	x->size = 0;
-	y->size = 0;
-
-	mpz_init(k);
-	mpz_init(px);
-	mpz_init(py);
-	mpz_inited = 1;
-
-	mpz_import(k, priv_raw->size, 1, 1, 1, 0, priv_raw->data);
-
-	ecc_scalar_init(&s, ecc);
-	scalar_inited = 1;
-
-	if (!ecc_scalar_set(&s, k)) {
-		ret = gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
-		goto cleanup;
-	}
-
-	ecc_point_init(&p, ecc);
-	point_inited = 1;
-
-	ecc_point_mul_g(&p, &s);
-	ecc_point_get(&p, px, py);
-
-	ret = export_pubkey_coordinate(coord_len, px, x);
-	if (ret < 0) {
-		ret = gnutls_assert_val(ret);
-		goto cleanup;
-	}
-
-	ret = export_pubkey_coordinate(coord_len, py, y);
-	if (ret < 0) {
-		ret = gnutls_assert_val(ret);
-		goto cleanup;
-	}
-
-	ret = 0;
-
-cleanup:
-	if (point_inited)
-		ecc_point_clear(&p);
-	if (scalar_inited)
-		ecc_scalar_clear(&s);
-	if (mpz_inited) {
-		mpz_clear(k);
-		mpz_clear(px);
-		mpz_clear(py);
-	}
-
-	return ret;
 }
 
 static int prime_curve_keypair_from_raw_privkey(
@@ -524,19 +371,7 @@ static int prime_curve_keypair_from_raw_privkey(
 			goto cleanup;
 		}
 
-		unsigned char x_buf[GNUTLS_HPKE_MAX_RAW_KEY_COORDINATE_SIZE];
-		unsigned char y_buf[GNUTLS_HPKE_MAX_RAW_KEY_COORDINATE_SIZE];
-
-		gnutls_datum_t x = { x_buf, 0 };
-		gnutls_datum_t y = { y_buf, 0 };
-
-		ret = raw_public_key_for_prime_curve(curve, &sk, &x, &y);
-		if (ret < 0) {
-			gnutls_assert_val(ret);
-			goto error;
-		}
-
-		ret = gnutls_privkey_import_ecc_raw(*privkey, curve, &x, &y,
+		ret = gnutls_privkey_import_ecc_raw(*privkey, curve, NULL, NULL,
 						    &sk);
 		if (ret < 0) {
 			gnutls_assert_val(ret);
@@ -549,7 +384,7 @@ static int prime_curve_keypair_from_raw_privkey(
 			goto error;
 		}
 
-		ret = gnutls_pubkey_import_ecc_raw(*pubkey, curve, &x, &y);
+		ret = gnutls_pubkey_import_privkey(*pubkey, *privkey, 0, 0);
 		if (ret < 0) {
 			gnutls_assert_val(ret);
 			goto error;
