@@ -846,7 +846,7 @@ int gnutls_x509_rdn_get_by_oid(const gnutls_datum_t *idn, const char *oid,
 	asn1_node dn = NULL;
 	gnutls_datum_t td;
 
-	if (buf_size == 0) {
+	if (buf_size == NULL) {
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
@@ -897,7 +897,7 @@ int gnutls_x509_rdn_get_oid(const gnutls_datum_t *idn, unsigned indx, void *buf,
 	int result;
 	asn1_node dn = NULL;
 
-	if (buf_size == 0) {
+	if (buf_size == NULL) {
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 

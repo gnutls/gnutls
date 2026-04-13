@@ -29,7 +29,6 @@
 #include <gnutls/abstract.h>
 #include <stdbool.h>
 #include <string.h>
-#include <stdlib.h>
 #include "utils.h"
 
 static void genkey(gnutls_ecc_curve_t curve, gnutls_datum_t *x,
@@ -61,7 +60,7 @@ static void compute_key(const char *name, gnutls_ecc_curve_t curve,
 			int expect_error_on_import, int expect_error_on_derive,
 			const gnutls_datum_t *result)
 {
-	gnutls_datum_t Z = { 0 };
+	gnutls_datum_t Z = { NULL, 0 };
 	bool ok;
 	int ret;
 	gnutls_privkey_t privkey = NULL;
@@ -129,9 +128,9 @@ void doit(void)
 		{
 			"[x == 0, y == 0]",
 			GNUTLS_ECC_CURVE_SECP256R1,
-			{ 0 },
-			{ 0 },
-			{ 0 },
+			{ NULL, 0 },
+			{ NULL, 0 },
+			{ NULL, 0 },
 			{ (void *)"\x00", 1 },
 			{ (void *)"\x00", 1 },
 			{ NULL, 0 },
@@ -143,9 +142,9 @@ void doit(void)
 		{
 			"[x > p - 1]",
 			GNUTLS_ECC_CURVE_SECP256R1,
-			{ 0 },
-			{ 0 },
-			{ 0 },
+			{ NULL, 0 },
+			{ NULL, 0 },
+			{ NULL, 0 },
 			{ (void *)"\xff\xff\xff\xff\x00\x00\x00\x01"
 				  "\x00\x00\x00\x00\x00\x00\x00\x00"
 				  "\x00\x00\x00\x00\xff\xff\xff\xff"
@@ -159,9 +158,9 @@ void doit(void)
 		{
 			"[y > p - 1]",
 			GNUTLS_ECC_CURVE_SECP256R1,
-			{ 0 },
-			{ 0 },
-			{ 0 },
+			{ NULL, 0 },
+			{ NULL, 0 },
+			{ NULL, 0 },
 			{ (void *)"\x02", 1 },
 			{ (void *)"\xff\xff\xff\xff\x00\x00\x00\x01"
 				  "\x00\x00\x00\x00\x00\x00\x00\x00"
@@ -238,7 +237,7 @@ void doit(void)
 			0,
 			0,
 		},
-		{ 0 }
+		{ NULL, 0 }
 	};
 
 	global_init();

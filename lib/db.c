@@ -291,7 +291,7 @@ int _gnutls_server_register_current_session(gnutls_session_t session)
 
 int _gnutls_check_resumed_params(gnutls_session_t session)
 {
-	time_t timestamp = gnutls_time(0);
+	time_t timestamp = gnutls_time(NULL);
 	const version_entry_st *vers;
 
 	/* check whether the session is expired */

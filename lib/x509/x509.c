@@ -40,7 +40,7 @@
 #include "system-keys.h"
 #include "gl_linkedhash_list.h"
 #include "gl_list.h"
-#include "hash-pjw-bare.h"
+#include <hashcode-mem.h>
 
 static int crt_reinit(gnutls_x509_crt_t crt)
 {
@@ -3012,7 +3012,7 @@ int gnutls_x509_crt_get_fingerprint(gnutls_x509_crt_t cert,
 	int result;
 	gnutls_datum_t tmp;
 
-	if (buf_size == 0 || cert == NULL) {
+	if (buf_size == NULL || cert == NULL) {
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
@@ -4518,7 +4518,7 @@ int gnutls_x509_crt_verify_data3(gnutls_x509_crt_t crt,
 	gnutls_pubkey_deinit(pubkey);
 
 	if (ret >= 0) {
-		time_t now = gnutls_time(0);
+		time_t now = gnutls_time(NULL);
 		int res;
 		unsigned usage, i;
 

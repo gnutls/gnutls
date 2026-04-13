@@ -338,7 +338,7 @@ find_issuer(gnutls_x509_crt_t cert, const gnutls_x509_crt_t *trusted_cas,
 			if (issuer == NULL) {
 				issuer = trusted_cas[i];
 			} else {
-				time_t now = gnutls_time(0);
+				time_t now = gnutls_time(NULL);
 
 				if (now < gnutls_x509_crt_get_expiration_time(
 						  trusted_cas[i]) &&
@@ -963,7 +963,7 @@ unsigned int _gnutls_verify_crt_status(
 {
 	int i = 0, ret;
 	unsigned int status = 0, output;
-	time_t now = gnutls_time(0);
+	time_t now = gnutls_time(NULL);
 	verify_state_st vparams;
 
 	if (clist_size > 1) {
@@ -1199,7 +1199,7 @@ unsigned int _gnutls_pkcs11_verify_crt_status(
 	unsigned int status = 0, i;
 	gnutls_x509_crt_t issuer = NULL;
 	gnutls_datum_t raw_issuer = { NULL, 0 };
-	time_t now = gnutls_time(0);
+	time_t now = gnutls_time(NULL);
 	time_t distrust_after;
 
 	if (clist_size > 1) {
@@ -1675,7 +1675,7 @@ int gnutls_x509_crl_verify(gnutls_x509_crl_t crl,
 	gnutls_datum_t crl_signature = { NULL, 0 };
 	gnutls_x509_crt_t issuer = NULL;
 	int result, sigalg;
-	time_t now = gnutls_time(0);
+	time_t now = gnutls_time(NULL);
 	time_t nextu;
 	unsigned int usage;
 

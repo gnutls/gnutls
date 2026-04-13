@@ -97,7 +97,7 @@ inline static int is_ip(const char *hostname)
 {
 	int len = strlen(hostname);
 
-	if (strchr(hostname, ':') != 0)
+	if (strchr(hostname, ':') != NULL)
 		return 1;
 	else if (len > 2 && c_isdigit(hostname[0]) &&
 		 c_isdigit(hostname[len - 1]))

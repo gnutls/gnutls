@@ -138,13 +138,13 @@ enum role {
 
 static int permutations2[2][2] = { { 0, 1 }, { 1, 0 } };
 
-static const char *permutation_names2[] = { "01", "10", 0 };
+static const char *permutation_names2[] = { "01", "10", NULL };
 
 static int permutations3[6][3] = { { 0, 1, 2 }, { 0, 2, 1 }, { 1, 0, 2 },
 				   { 1, 2, 0 }, { 2, 0, 1 }, { 2, 1, 0 } };
 
 static const char *permutation_names3[] = { "012", "021", "102", "120",
-					    "201", "210", 0 };
+					    "201", "210", NULL };
 
 static int permutations5[120][5] = {
 	{ 0, 1, 2, 3, 4 }, { 0, 2, 1, 3, 4 }, { 1, 0, 2, 3, 4 },
@@ -205,7 +205,7 @@ static const char *permutation_names5[] = {
 	"40123", "40213", "41023", "41203", "42013", "42103", "40132", "40231",
 	"41032", "41230", "42031", "42130", "40312", "40321", "41302", "41320",
 	"42301", "42310", "43012", "43021", "43102", "43120", "43201", "43210",
-	0
+	NULL
 };
 
 static const char *filter_names[8] = { "SHello",
@@ -338,45 +338,45 @@ filter_packet_state_t state_packet_ServerFinished = { 0 };
 filter_packet_state_t state_packet_ServerFinishedResume = { 0 };
 
 static filter_permute_state_t state_permute_ServerHello = {
-	0,
-	{ { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } },
-	0,
+	NULL,
+	{ { NULL, 0 }, { NULL, 0 }, { NULL, 0 }, { NULL, 0 }, { NULL, 0 } },
+	NULL,
 	0
 };
 static filter_permute_state_t state_permute_ServerHelloFull = {
-	0,
-	{ { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } },
-	0,
+	NULL,
+	{ { NULL, 0 }, { NULL, 0 }, { NULL, 0 }, { NULL, 0 }, { NULL, 0 } },
+	NULL,
 	0
 };
 static filter_permute_state_t state_permute_ServerFinished = {
-	0,
-	{ { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } },
-	0,
+	NULL,
+	{ { NULL, 0 }, { NULL, 0 }, { NULL, 0 }, { NULL, 0 }, { NULL, 0 } },
+	NULL,
 	0
 };
 static filter_permute_state_t state_permute_ServerFinishedResume = {
-	0,
-	{ { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } },
-	0,
+	NULL,
+	{ { NULL, 0 }, { NULL, 0 }, { NULL, 0 }, { NULL, 0 }, { NULL, 0 } },
+	NULL,
 	0
 };
 static filter_permute_state_t state_permute_ClientFinished = {
-	0,
-	{ { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } },
-	0,
+	NULL,
+	{ { NULL, 0 }, { NULL, 0 }, { NULL, 0 }, { NULL, 0 }, { NULL, 0 } },
+	NULL,
 	0
 };
 static filter_permute_state_t state_permute_ClientFinishedResume = {
-	0,
-	{ { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } },
-	0,
+	NULL,
+	{ { NULL, 0 }, { NULL, 0 }, { NULL, 0 }, { NULL, 0 }, { NULL, 0 } },
+	NULL,
 	0
 };
 static filter_permute_state_t state_permute_ClientFinishedFull = {
-	0,
-	{ { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } },
-	0,
+	NULL,
+	{ { NULL, 0 }, { NULL, 0 }, { NULL, 0 }, { NULL, 0 }, { NULL, 0 } },
+	NULL,
 	0
 };
 
@@ -678,14 +678,14 @@ DECLARE_PERMUTE(ClientFinishedResume)
 DECLARE_PERMUTE(ClientFinishedFull)
 // }}}
 // {{{ emergency deadlock resolution time bomb
-timer_t killtimer_tid = 0;
+timer_t killtimer_tid = NULL;
 
 static void killtimer_set(void)
 {
 	struct sigevent sig;
 	struct itimerspec tout = { { 0, 0 }, { 2 * timeout_seconds, 0 } };
 
-	if (killtimer_tid != 0) {
+	if (killtimer_tid != NULL) {
 		timer_delete(killtimer_tid);
 	}
 
@@ -697,7 +697,7 @@ static void killtimer_set(void)
 		exit(3);
 	}
 
-	timer_settime(killtimer_tid, 0, &tout, 0);
+	timer_settime(killtimer_tid, 0, &tout, NULL);
 }
 
 // }}}
@@ -739,7 +739,8 @@ static void session_init(int sock, int server)
 	gnutls_init(&session, GNUTLS_DATAGRAM |
 				      (server ? GNUTLS_SERVER : GNUTLS_CLIENT) |
 				      GNUTLS_NONBLOCK * nonblock);
-	gnutls_priority_set_direct(session, "NORMAL:+ECDHE-RSA:+ANON-ECDH", 0);
+	gnutls_priority_set_direct(session, "NORMAL:+ECDHE-RSA:+ANON-ECDH",
+				   NULL);
 	gnutls_transport_set_int(session, sock);
 
 	if (full) {
@@ -766,7 +767,7 @@ static void session_init(int sock, int server)
 static void client(int sock)
 {
 	int err = 0;
-	time_t started = time(0);
+	time_t started = time(NULL);
 	const char *line = "foobar!";
 	char buffer[8192];
 	int len, ret;
@@ -784,7 +785,7 @@ static void client(int sock)
 				await(sock, t ? t : 100);
 			}
 		} while (err != 0);
-		process_error_or_timeout(err, time(0) - started);
+		process_error_or_timeout(err, time(NULL) - started);
 
 		ret = gnutls_session_get_data2(session, &data);
 		if (ret < 0) {
@@ -813,7 +814,7 @@ static void client(int sock)
 			await(sock, t ? t : 100);
 		}
 	} while (err != 0);
-	process_error_or_timeout(err, time(0) - started);
+	process_error_or_timeout(err, time(NULL) - started);
 
 	if (debug) {
 		fprintf(stdout, "%i %s| handshake complete\n", run_id,
@@ -891,7 +892,7 @@ static void server(int sock)
 {
 	int err;
 	const char *line = "server foobar!";
-	time_t started = time(0);
+	time_t started = time(NULL);
 	char buffer[8192];
 	int len;
 
@@ -913,7 +914,7 @@ static void server(int sock)
 				await(sock, t ? t : 100);
 			}
 		} while (err != 0);
-		process_error_or_timeout(err, time(0) - started);
+		process_error_or_timeout(err, time(NULL) - started);
 
 		gnutls_deinit(session);
 
@@ -941,7 +942,7 @@ static void server(int sock)
 			await(sock, t ? t : 100);
 		}
 	} while (err != 0);
-	process_error_or_timeout(err, time(0) - started);
+	process_error_or_timeout(err, time(NULL) - started);
 
 	log("handshake complete\n");
 
@@ -1044,7 +1045,7 @@ static int run_test(void)
 	while (waitpid(pid2, &status2, 0) < 0 && errno == EINTR)
 		;
 	kill(pid1, 15);
-	while (waitpid(pid1, 0, 0) < 0 && errno == EINTR)
+	while (waitpid(pid1, NULL, 0) < 0 && errno == EINTR)
 		;
 
 	close(fds[0]);

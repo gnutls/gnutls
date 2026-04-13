@@ -45,7 +45,7 @@ static time_t _now;
 		gnutls_global_set_time_function(mytime); \
 	}
 
-#define virt_time_init() virt_time_init_at(time(0))
+#define virt_time_init() virt_time_init_at(time(NULL))
 
 static time_t mytime(time_t *t)
 {

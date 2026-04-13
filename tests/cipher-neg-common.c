@@ -69,12 +69,14 @@ static void try(test_case_st *test)
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
-	assert(gnutls_priority_set_direct(server, test->server_prio, 0) >= 0);
+	assert(gnutls_priority_set_direct(server, test->server_prio, NULL) >=
+	       0);
 
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
-	assert(gnutls_priority_set_direct(client, test->client_prio, 0) >= 0);
+	assert(gnutls_priority_set_direct(client, test->client_prio, NULL) >=
+	       0);
 
 	HANDSHAKE(client, server);
 

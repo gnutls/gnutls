@@ -125,7 +125,7 @@ static void *recv_thread(void *arg)
 		success("closing recv thread\n");
 	}
 
-	pthread_exit(0);
+	pthread_exit(NULL);
 }
 
 static void do_thread_stuff(gnutls_session_t session)
@@ -168,7 +168,7 @@ static void do_thread_stuff(gnutls_session_t session)
 	/* the receiving thread will receive the EOF and close */
 
 	assert(pthread_join(id, &rval) == 0);
-	assert(rval == 0);
+	assert(rval == NULL);
 }
 
 static void do_reflect_stuff(gnutls_session_t session)

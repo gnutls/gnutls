@@ -1287,7 +1287,7 @@ begin:
 	/* receive headers */
 	ret = recv_headers(
 		session, record_params, type, htype, &record,
-		(!(session->internals.flags & GNUTLS_NONBLOCK)) ? &ms : 0);
+		(!(session->internals.flags & GNUTLS_NONBLOCK)) ? &ms : NULL);
 	if (ret < 0) {
 		ret = gnutls_assert_val_fatal(ret);
 		goto recv_error;
@@ -1302,7 +1302,7 @@ begin:
 	 */
 	ret = _gnutls_io_read_buffered(
 		session, record.packet_size, record.type,
-		(!(session->internals.flags & GNUTLS_NONBLOCK)) ? &ms : 0);
+		(!(session->internals.flags & GNUTLS_NONBLOCK)) ? &ms : NULL);
 	if (ret != record.packet_size) {
 		gnutls_assert();
 		goto recv_error;

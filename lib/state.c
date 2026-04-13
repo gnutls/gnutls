@@ -194,7 +194,7 @@ gnutls_certificate_type_get2(gnutls_session_t session,
  **/
 gnutls_kx_algorithm_t gnutls_kx_get(gnutls_session_t session)
 {
-	if (session->security_parameters.cs == 0)
+	if (session->security_parameters.cs == NULL)
 		return 0;
 
 	if (session->security_parameters.cs->kx_algorithm == 0) { /* TLS 1.3 */
@@ -513,8 +513,8 @@ static void handshake_internal_state_clear1(gnutls_session_t session)
 	session->internals.dtls.hsk_read_seq = 0;
 	session->internals.dtls.hsk_write_seq = 0;
 
-	session->internals.cand_ec_group = 0;
-	session->internals.cand_dh_group = 0;
+	session->internals.cand_ec_group = NULL;
+	session->internals.cand_dh_group = NULL;
 
 	session->internals.hrr_cs[0] = CS_INVALID_MAJOR;
 	session->internals.hrr_cs[1] = CS_INVALID_MINOR;

@@ -26,7 +26,6 @@
 #include "gnutls/gnutls.h"
 #include "ecdh_callbacks.h"
 #include "datum.h"
-#include "mem.h"
 
 #include <string.h>
 #include <tss2/tss2_esys.h>
@@ -66,7 +65,7 @@ static TSS2_RC _gnutls_get_ecdh_point(TPM2B_PUBLIC *tpm_key,
 			     tpm_key->publicArea.unique.ecc.x.size };
 	gnutls_datum_t y = { tpm_key->publicArea.unique.ecc.y.buffer,
 			     tpm_key->publicArea.unique.ecc.y.size };
-	gnutls_datum_t shared = { 0 };
+	gnutls_datum_t shared = { NULL, 0 };
 	gnutls_ecc_curve_t curve = _gnutls_convert_tpm2_ecc_curve(
 		tpm_key->publicArea.parameters.eccDetail.curveID);
 
@@ -90,7 +89,7 @@ static TSS2_RC _gnutls_get_ecdh_point(TPM2B_PUBLIC *tpm_key,
 	if (ret < 0)
 		goto fail;
 
-	ret = gnutls_privkey_derive_secret(privkey, peerkey, 0, &shared, 0);
+	ret = gnutls_privkey_derive_secret(privkey, peerkey, NULL, &shared, 0);
 	if (ret < 0)
 		goto fail;
 

@@ -185,7 +185,7 @@ static int append_status_request(void *_ctx, gnutls_buffer_st *buf)
 		if (ctx->cert_index < session->internals.selected_ocsp_length) {
 			if ((session->internals.selected_ocsp[ctx->cert_index]
 					     .exptime != 0 &&
-			     gnutls_time(0) >=
+			     gnutls_time(NULL) >=
 				     session->internals
 					     .selected_ocsp[ctx->cert_index]
 					     .exptime) ||
@@ -217,7 +217,7 @@ static int append_status_request(void *_ctx, gnutls_buffer_st *buf)
 	} else
 		return 0;
 
-	if (ret == GNUTLS_E_NO_CERTIFICATE_STATUS || resp.data == 0) {
+	if (ret == GNUTLS_E_NO_CERTIFICATE_STATUS || resp.data == NULL) {
 		return 0;
 	} else if (ret < 0) {
 		return gnutls_assert_val(ret);

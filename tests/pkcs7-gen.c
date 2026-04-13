@@ -118,8 +118,8 @@ void doit(void)
 		exit(1);
 	}
 
-	ret = gnutls_privkey_import_x509_raw(pkey, &key, GNUTLS_X509_FMT_PEM, 0,
-					     0);
+	ret = gnutls_privkey_import_x509_raw(pkey, &key, GNUTLS_X509_FMT_PEM,
+					     NULL, 0);
 	if (ret < 0) {
 		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
 		exit(1);

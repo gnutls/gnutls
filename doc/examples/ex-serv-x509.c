@@ -99,6 +99,7 @@ int main(void)
 	/* Socket operations
 	 */
 	listen_sd = socket(AF_INET, SOCK_STREAM, 0);
+	CHECK(listen_sd);
 
 	memset(&sa_serv, '\0', sizeof(sa_serv));
 	sa_serv.sin_family = AF_INET;
@@ -108,9 +109,11 @@ int main(void)
 	setsockopt(listen_sd, SOL_SOCKET, SO_REUSEADDR, (void *)&optval,
 		   sizeof(int));
 
-	bind(listen_sd, (struct sockaddr *)&sa_serv, sizeof(sa_serv));
+	ret = bind(listen_sd, (struct sockaddr *)&sa_serv, sizeof(sa_serv));
+	CHECK(ret);
 
-	listen(listen_sd, 1024);
+	ret = listen(listen_sd, 1024);
+	CHECK(ret);
 
 	printf("Server ready. Listening to port '%d'.\n\n", PORT);
 

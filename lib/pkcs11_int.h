@@ -426,7 +426,7 @@ const char *pkcs11_strerror(ck_rv_t rv);
  * a token. */
 inline static bool is_pkcs11_url_object(const char *url)
 {
-	if (strstr(url, "id=") != 0 || strstr(url, "object=") != 0)
+	if (strstr(url, "id=") != NULL || strstr(url, "object=") != NULL)
 		return 1;
 	return 0;
 }

@@ -250,6 +250,10 @@ static int runlistener(void)
 				close(fd);
 		}
 	}
+	if (listenfd >= 0) {
+		close(listenfd);
+	}
+
 	return 0;
 }
 
@@ -284,18 +288,18 @@ static void processoptions(int argc, char **argv)
 {
 	while (1) {
 		static const struct option longopts[] = {
-			{ "connect", required_argument, 0, 'c' },
-			{ "listen", required_argument, 0, 'l' },
-			{ "key", required_argument, 0, 'K' },
-			{ "cert", required_argument, 0, 'C' },
-			{ "cacert", required_argument, 0, 'A' },
-			{ "hostname", required_argument, 0, 'H' },
-			{ "server", no_argument, 0, 's' },
-			{ "insecure", no_argument, 0, 'i' },
-			{ "nofork", no_argument, 0, 'n' },
-			{ "debug", no_argument, 0, 'd' },
-			{ "help", no_argument, 0, 'h' },
-			{ 0, 0, 0, 0 }
+			{ "connect", required_argument, NULL, 'c' },
+			{ "listen", required_argument, NULL, 'l' },
+			{ "key", required_argument, NULL, 'K' },
+			{ "cert", required_argument, NULL, 'C' },
+			{ "cacert", required_argument, NULL, 'A' },
+			{ "hostname", required_argument, NULL, 'H' },
+			{ "server", no_argument, NULL, 's' },
+			{ "insecure", no_argument, NULL, 'i' },
+			{ "nofork", no_argument, NULL, 'n' },
+			{ "debug", no_argument, NULL, 'd' },
+			{ "help", no_argument, NULL, 'h' },
+			{ NULL, 0, NULL, 0 }
 		};
 
 		int optidx = 0;

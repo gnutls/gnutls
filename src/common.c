@@ -575,7 +575,7 @@ int print_info(gnutls_session_t session, int verbose, int flags)
 	}
 
 		if ((flags & P_WAIT_FOR_CERT) &&
-		    gnutls_certificate_get_ours(session) == 0)
+		    gnutls_certificate_get_ours(session) == NULL)
 			log_msg(stdout, "- No certificate was sent to peer\n");
 
 		if (flags & P_PRINT_CERT)

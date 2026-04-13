@@ -2203,7 +2203,7 @@ static int detailed_verification(gnutls_x509_crt_t cert,
 	ret = gnutls_x509_crt_get_dn3(cert, &name, 0);
 	if (ret < 0) {
 		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
-			name.data = 0;
+			name.data = NULL;
 			name.size = 0;
 		} else {
 			fprintf(stderr, "gnutls_x509_crt_get_dn: %s\n",
@@ -3843,9 +3843,9 @@ static gnutls_pubkey_t find_pubkey(gnutls_x509_crt_t crt, common_info_st *cinfo)
 				}
 
 				if (memmem(pem.data, pem.size,
-					   "BEGIN CERTIFICATE", 16) != 0 ||
+					   "BEGIN CERTIFICATE", 16) != NULL ||
 				    memmem(pem.data, pem.size, "BEGIN X509",
-					   10) != 0) {
+					   10) != NULL) {
 					ret = gnutls_x509_crt_init(&crt);
 					if (ret < 0) {
 						fprintf(stderr,
@@ -3895,7 +3895,7 @@ void pubkey_info(gnutls_x509_crt_t crt, common_info_st *cinfo)
 	gnutls_pubkey_t pubkey;
 
 	pubkey = find_pubkey(crt, cinfo);
-	if (pubkey == 0) {
+	if (pubkey == NULL) {
 		fprintf(stderr, "find public key error\n");
 		app_exit(1);
 	}
@@ -3916,7 +3916,7 @@ static void pubkey_keyid(common_info_st *cinfo)
 	unsigned flags;
 
 	pubkey = find_pubkey(NULL, cinfo);
-	if (pubkey == 0) {
+	if (pubkey == NULL) {
 		fprintf(stderr, "find public key error\n");
 		app_exit(1);
 	}

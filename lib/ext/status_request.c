@@ -175,7 +175,7 @@ static int server_send(gnutls_session_t session, gnutls_buffer_st *extdata,
 	if (session->internals.selected_ocsp_length > 0) {
 		if (session->internals.selected_ocsp[0].response.data) {
 			if (session->internals.selected_ocsp[0].exptime != 0 &&
-			    (gnutls_time(0) >=
+			    (gnutls_time(NULL) >=
 			     session->internals.selected_ocsp[0].exptime)) {
 				gnutls_assert();
 				return 0;
@@ -389,7 +389,7 @@ int _gnutls_parse_ocsp_response(gnutls_session_t session, const uint8_t *data,
 	int ret;
 	ssize_t r_size;
 
-	resp->data = 0;
+	resp->data = NULL;
 	resp->size = 0;
 
 	/* minimum message is type (1) + response (3) + data */

@@ -671,7 +671,7 @@ static int derive_ecdh_secret(ck_session_handle_t session,
 		{ CKA_DECRYPT, &tval, sizeof(tval) },
 	};
 	unsigned long attrs_len = sizeof(attrs) / sizeof(attrs[0]);
-	gnutls_datum_t ec_point = { 0 };
+	gnutls_datum_t ec_point = { NULL, 0 };
 	struct ck_ecdh1_derive_params param = { 0 };
 	struct ck_mechanism mech = { CKM_ECDH1_DERIVE, &param, sizeof(param) };
 

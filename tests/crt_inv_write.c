@@ -94,7 +94,7 @@ static void do_crt_with_exts(unsigned version)
 	if (ret != 0)
 		fail("error\n");
 
-	ret = gnutls_x509_crt_set_activation_time(crt, mytime(0));
+	ret = gnutls_x509_crt_set_activation_time(crt, mytime(NULL));
 	if (ret != 0)
 		fail("error\n");
 
@@ -179,7 +179,7 @@ static void do_v1_invalid_crt(void)
 	if (ret != 0)
 		fail("error\n");
 
-	ret = gnutls_x509_crt_set_activation_time(crt, mytime(0));
+	ret = gnutls_x509_crt_set_activation_time(crt, mytime(NULL));
 	if (ret != 0)
 		fail("error\n");
 

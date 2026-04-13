@@ -70,12 +70,12 @@ static void try(const char *name, const char *sprio, const char *cprio,
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
-	assert(gnutls_priority_set_direct(server, sprio, 0) >= 0);
+	assert(gnutls_priority_set_direct(server, sprio, NULL) >= 0);
 
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
-	assert(gnutls_priority_set_direct(client, cprio, 0) >= 0);
+	assert(gnutls_priority_set_direct(client, cprio, NULL) >= 0);
 
 	HANDSHAKE_EXPECT(client, server, cerr, serr);
 

@@ -310,7 +310,7 @@ static int verify_pubkey(const char *file, const char *host,
 	size_t line_size = 0;
 	int ret, l2, mismatch = 0;
 	size_t host_len = 0, service_len = 0;
-	time_t now = gnutls_time(0);
+	time_t now = gnutls_time(NULL);
 	gnutls_datum_t b64key = { NULL, 0 };
 
 	ret = raw_pubkey_to_base64(pubkey, &b64key);

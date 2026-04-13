@@ -26,7 +26,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
 #include <gnutls/gnutls.h>
 #include "utils.h"
 #include "eagain-common.h"
@@ -49,8 +48,8 @@ static void tls_log_func(int level, const char *str)
 static int check_binding_data(gnutls_session_t client, gnutls_session_t server,
 			      int cbtype, const char *cbname, int negative)
 {
-	gnutls_datum_t client_cb = { 0 };
-	gnutls_datum_t server_cb = { 0 };
+	gnutls_datum_t client_cb = { NULL, 0 };
+	gnutls_datum_t server_cb = { NULL, 0 };
 
 	if (gnutls_session_channel_binding(client, cbtype, &client_cb) !=
 	    GNUTLS_E_SUCCESS) {

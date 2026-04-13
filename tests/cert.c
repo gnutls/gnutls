@@ -67,9 +67,9 @@ static int getnextcert(DIR **dirp, gnutls_datum_t *der, int *exp_ret)
 		    && d->d_type == DT_REG
 #endif
 		) {
-			if (strstr(d->d_name, ".der") == 0)
+			if (strstr(d->d_name, ".der") == NULL)
 				continue;
-			if (strstr(d->d_name, ".err") != 0)
+			if (strstr(d->d_name, ".err") != NULL)
 				continue;
 			snprintf(path, sizeof(path), "%s/%s", cert_dir,
 				 d->d_name);

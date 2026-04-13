@@ -190,7 +190,7 @@ static int wrap_nettle_rnd(void *_ctx, int level, void *data, size_t datasize)
 	 */
 	memset(data, 0, datasize);
 
-	now = gnutls_time(0);
+	now = gnutls_time(NULL);
 
 	/* We re-seed based on time in addition to output data. That is,
 	 * to prevent a temporal state compromise to become permanent for low

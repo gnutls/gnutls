@@ -1559,7 +1559,7 @@ static void tcp_server(const char *name, int port, int timeout)
 		gl_list_t accepted_list = gl_list_create_empty(
 			GL_LINKED_LIST, NULL, NULL, NULL, true);
 		fd_set rd, wr;
-		time_t now = time(0);
+		time_t now = time(NULL);
 #ifndef _WIN32
 		int val;
 #endif
@@ -1634,7 +1634,7 @@ static void tcp_server(const char *name, int port, int timeout)
 					perror("accept()");
 				} else {
 					char timebuf[SIMPLE_CTIME_BUF_SIZE];
-					time_t tt = time(0);
+					time_t tt = time(NULL);
 					char *ctt;
 					listener_item *jj;
 
@@ -2037,7 +2037,7 @@ static void wrap_db_deinit(void)
 static int wrap_db_store(void *dbf, gnutls_datum_t key, gnutls_datum_t data)
 {
 	int i;
-	time_t now = time(0);
+	time_t now = time(NULL);
 	void *ptr = NULL;
 
 	if (key.size > SESSION_ID_SIZE)
@@ -2093,7 +2093,7 @@ static int wrap_db_store(void *dbf, gnutls_datum_t key, gnutls_datum_t data)
 static gnutls_datum_t wrap_db_fetch(void *dbf, gnutls_datum_t key)
 {
 	gnutls_datum_t res = { NULL, 0 };
-	time_t now = time(0);
+	time_t now = time(NULL);
 	int i;
 
 	for (i = 0; i < cache_db_ptr; i++) {
@@ -2138,7 +2138,7 @@ static int wrap_db_delete(void *dbf, gnutls_datum_t key)
 static int anti_replay_db_add(void *dbf, time_t exp, const gnutls_datum_t *key,
 			      const gnutls_datum_t *data)
 {
-	time_t now = time(0);
+	time_t now = time(NULL);
 	int i;
 
 	for (i = 0; i < cache_db_ptr; i++) {

@@ -1470,7 +1470,7 @@ int _pkcs11_privkey_get_pubkey(gnutls_pkcs11_privkey_t pkey,
 		goto cleanup;
 	}
 
-	obj->pk_algorithm = gnutls_pkcs11_privkey_get_pk_algorithm(pkey, 0);
+	obj->pk_algorithm = gnutls_pkcs11_privkey_get_pk_algorithm(pkey, NULL);
 	obj->type = GNUTLS_PKCS11_OBJ_PUBKEY;
 	pk_to_genmech(obj->pk_algorithm, &key_type);
 

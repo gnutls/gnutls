@@ -29,7 +29,6 @@
 #include "tls-sig.h"
 #include "str.h"
 #include "datum.h"
-#include <hash-pjw-bare.h>
 #include "x509_int.h"
 #include "common.h"
 #include <gnutls/x509-ext.h>
@@ -37,6 +36,7 @@
 #include "intprops.h"
 #include "gl_linkedhash_list.h"
 #include "gl_list.h"
+#include <hashcode-mem.h>
 
 struct named_cert_st {
 	gnutls_x509_crt_t cert;

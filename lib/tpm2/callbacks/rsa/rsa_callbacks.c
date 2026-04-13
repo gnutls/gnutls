@@ -84,7 +84,7 @@ static TSS2_RC _gnutls_rsa_pk_encrypt(TPM2B_PUBLIC *pub_tpm_key, size_t in_size,
 	}
 
 	gnutls_datum_t input = { .data = in_buffer, .size = in_size };
-	gnutls_datum_t output = { 0 };
+	gnutls_datum_t output = { NULL, 0 };
 
 	ret = gnutls_pubkey_encrypt_data(pubkey, 0, &input, &output);
 	gnutls_pubkey_deinit(pubkey);

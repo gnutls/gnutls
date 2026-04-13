@@ -2506,7 +2506,7 @@ time_t _gnutls_ocsp_get_validity(gnutls_ocsp_resp_const_t resp)
 		return gnutls_assert_val(-1);
 	}
 
-	now = gnutls_time(0);
+	now = gnutls_time(NULL);
 
 	if (ntime == -1) {
 		/* This is a problematic case, and there is no consensus on how

@@ -258,7 +258,7 @@ static SYSTEM_CONFIG_OR_CONST gnutls_ecc_curve_entry_st ecc_curves[] = {
 		.supported = 1,
 	},
 #endif
-	{ 0, 0, 0 }
+	{ NULL, NULL, 0 }
 };
 
 #define GNUTLS_ECC_CURVE_LOOP(b)                             \

@@ -75,6 +75,10 @@ static void search_for_str(const char *filename, const char *label,
 	FILE *fp = fopen(filename, "r");
 	char *p;
 
+	if (fp == NULL) {
+		fail("Failed to open file");
+	}
+
 	while ((p = fgets(line, sizeof(line), fp)) != NULL) {
 		success("%s", line);
 		if (strncmp(line, label, strlen(label)) == 0 &&

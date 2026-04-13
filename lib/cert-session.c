@@ -240,7 +240,7 @@ static int check_ocsp_response(gnutls_session_t session, gnutls_x509_crt_t cert,
 	time_t rtime, vtime, ntime, now;
 	int check_failed = 0;
 
-	now = gnutls_time(0);
+	now = gnutls_time(NULL);
 
 	ret = gnutls_ocsp_resp_init(&resp);
 	if (ret < 0)
