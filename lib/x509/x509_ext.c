@@ -3758,13 +3758,13 @@ int gnutls_x509_ext_ct_import_scts(const gnutls_datum_t *ext,
 	if (retval < 0)
 		return gnutls_assert_val(retval);
 
-	if (scts_content.size < 2) {
+	if (scts_content.size < sizeof(uint16_t)) {
 		gnutls_free(scts_content.data);
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
 
 	length = _gnutls_read_uint16(scts_content.data);
-	if (length < 4 || length > scts_content.size) {
+	if (length < 4 || length > scts_content.size - sizeof(uint16_t)) {
 		gnutls_free(scts_content.data);
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
@@ -3775,11 +3775,11 @@ int gnutls_x509_ext_ct_import_scts(const gnutls_datum_t *ext,
 			break;
 
 		sct_length = _gnutls_read_uint16(ptr);
-		if (sct_length == 0 || sct_length > length)
-			break;
-
 		ptr += sizeof(uint16_t);
 		length -= sizeof(uint16_t);
+
+		if (sct_length == 0 || sct_length > length)
+			break;
 
 		/*
 		 * _gnutls_parse_ct_sct() will try to read exactly sct_length bytes,
