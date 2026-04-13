@@ -5183,7 +5183,7 @@ static int wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 		_gnutls_free_key_datum(&k);
 		break;
 	default:
-		return 0;
+		break;
 	}
 
 	return ret;

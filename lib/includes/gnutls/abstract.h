@@ -678,6 +678,7 @@ int gnutls_certificate_set_key(gnutls_certificate_credentials_t res,
 int gnutls_pubkey_print(gnutls_pubkey_t pubkey,
 			gnutls_certificate_print_formats_t format,
 			gnutls_datum_t *out);
+
 #ifdef __cplusplus
 }
 #endif
