@@ -224,8 +224,6 @@ static int check_x509_privkey(void)
 	gnutls_ecc_curve_t curve;
 	int ret;
 
-	global_init();
-
 	ret = gnutls_x509_privkey_init(&key);
 	if (ret < 0)
 		fail("error\n");
@@ -334,8 +332,6 @@ static int check_privkey_import_export(void)
 #endif
 	unsigned i;
 	int ret;
-
-	global_init();
 
 #ifdef ENABLE_DSA
 	ret = gnutls_privkey_init(&key);
@@ -683,8 +679,6 @@ static int check_dsa(void)
 	gnutls_pubkey_t pub;
 	gnutls_datum_t p, q, g, y, x;
 	int ret;
-
-	global_init();
 
 	success("Checking DSA key operations\n");
 
@@ -1269,6 +1263,8 @@ static int check_pubkey_derivation_if_not_provided(void)
 
 			CMP_DATUM(gnutls_ecc_curve_get_name(curve), &x,
 				  test_vectors[i].expected_raw_pk);
+
+			gnutls_free(x.data);
 			break;
 		}
 		case GNUTLS_ECC_CURVE_SECP256R1:
@@ -1295,6 +1291,9 @@ static int check_pubkey_derivation_if_not_provided(void)
 						  1 + x.size + y.size };
 			CMP_DATUM(gnutls_ecc_curve_get_name(curve), &pk_raw,
 				  test_vectors[i].expected_raw_pk);
+
+			gnutls_free(x.data);
+			gnutls_free(y.data);
 			break;
 		}
 		default:
@@ -1310,6 +1309,7 @@ static int check_pubkey_derivation_if_not_provided(void)
 
 void doit(void)
 {
+	global_init();
 	if (check_x509_privkey() != 0) {
 		fail("error in privkey check\n");
 		exit(1);
@@ -1347,4 +1347,6 @@ void doit(void)
 	if (check_pubkey_derivation_if_not_provided() != 0) {
 		fail("error in pubkey derivation\n");
 	}
+
+	global_deinit();
 }
