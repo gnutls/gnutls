@@ -7,9 +7,25 @@ See the end for copying conditions.
 
 * Version 3.8.13 (unreleased)
 
+** build: Support building with Nettle 4.0
+   Nettle 4.0 was released in Feburary 2026, with API incompatibile
+   changes from 3.10. The library can now compile with it, while
+   Nettle 3.10 is still supported (#1791).
+
+** libgnutls: Support deriving ML-DSA public key from an expanded private key
+   RFC 9881 defines 3 private key formats for ML-DSA: "seed",
+   "expandedKey" and both. It is now possible to derive a public key
+   from a private key in the "expandedKey" format (#1723).
+
+** libgnutls: Fix loading BIT STRING encoded EdDSA key from PKCS#11
+   For compatibility reasons, the library supports two formats for
+   EdDSA private keys: either ASN.1 BIT STRING (raw) or OCTET STRING
+   (DER). Previously, loading a private key in the former format
+   resulted in a failure, which is now fixed (#1749).
+
 ** libgnutls: Added HPKE (RFC 9180) implementation as a technology
    preview. The implementation and the related API might suffer
-   modification in the following period. (#1506)
+   modification in the following period (#1506).
 
 ** API and ABI modifications:
 gnutls_hpke_kem_t: New enum
