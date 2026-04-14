@@ -370,7 +370,7 @@ static int take_option(struct options_st *options, struct cfg_option_st *option)
 
 static void clear_options(struct options_st *options)
 {
-	for (size_t i = 0; options->length; i++) {
+	for (size_t i = 0; i < options->length; i++) {
 		clear_option(&options->data[i]);
 	}
 }
