@@ -373,6 +373,8 @@ static void clear_options(struct options_st *options)
 	for (size_t i = 0; i < options->length; i++) {
 		clear_option(&options->data[i]);
 	}
+	free(options->data);
+	memset(options, 0, sizeof(struct options_st));
 }
 
 cfg_option_t cfg_load(const char *filename)
