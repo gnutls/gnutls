@@ -800,10 +800,6 @@ static int name_constraints_node_list_intersect(
 	san_flags_t types_in_p1 = 0, types_in_p2 = 0;
 	static const unsigned char universal_ip[32] = { 0 };
 
-	if (gl_list_size(permitted1->items) == 0 ||
-	    gl_list_size(permitted2->items) == 0)
-		return GNUTLS_E_SUCCESS;
-
 	/* First partition PERMITTED1 into supported and unsupported lists */
 	ret = name_constraints_node_list_init(&supported1);
 	if (ret < 0) {
