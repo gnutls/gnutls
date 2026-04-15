@@ -5038,6 +5038,9 @@ static int wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 	case GNUTLS_PK_MLDSA44:
 	case GNUTLS_PK_MLDSA65:
 	case GNUTLS_PK_MLDSA87:
+		if (params->raw_priv.data == NULL)
+			return gnutls_assert_val(GNUTLS_E_PK_INVALID_PRIVKEY);
+
 		if (params->raw_pub.data == NULL) {
 			ret = ml_dsa_privkey_to_pubkey(algo, &params->raw_priv,
 						       &params->raw_pub);
