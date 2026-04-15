@@ -1632,7 +1632,7 @@ test_code_t test_chain_order(gnutls_session_t session)
 	if (cert_list_size == 1)
 		return TEST_SUCCEED;
 
-	p = 0;
+	p = NULL;
 	p_size = 0;
 	pos = NULL;
 	for (i = 0; i < cert_list_size; i++) {

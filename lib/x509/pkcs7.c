@@ -2210,7 +2210,7 @@ static int write_attributes(asn1_node c2, const char *root,
 		}
 
 		snprintf(name, sizeof(name), "%s.?LAST.values.?1", root);
-		ret = _gnutls_x509_set_raw_time(c2, name, gnutls_time(0));
+		ret = _gnutls_x509_set_raw_time(c2, name, gnutls_time(NULL));
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;

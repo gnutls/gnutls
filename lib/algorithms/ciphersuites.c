@@ -1162,7 +1162,7 @@ static const gnutls_cipher_suite_entry_st cs_algorithms[] = {
 		  GNUTLS_VERSION_UNKNOWN, GNUTLS_MAC_STREEBOG_256),
 #endif
 
-	{ 0, { 0, 0 }, 0, 0, 0, 0, 0, 0 }
+	{ NULL, { 0, 0 }, NULL, 0, 0, 0, 0, 0 }
 };
 
 #define CIPHER_SUITE_LOOP(b)                                    \

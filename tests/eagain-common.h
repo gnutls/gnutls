@@ -176,7 +176,7 @@ static size_t to_client_len = 0;
 
 #ifdef RANDOMIZE
 #define RETURN_RND_EAGAIN(session)                           \
-	unsigned int rnd = time(0);                          \
+	unsigned int rnd = time(NULL);                       \
 	if (rnd++ % 3 == 0) {                                \
 		gnutls_transport_set_errno(session, EAGAIN); \
 		return -1;                                   \
@@ -341,7 +341,7 @@ inline static int record_send_loop(gnutls_session_t session, const void *data,
 	size_t retry_sizeofdata;
 
 	if (use_null_on_retry) {
-		retry_data = 0;
+		retry_data = NULL;
 		retry_sizeofdata = 0;
 	} else {
 		retry_data = data;

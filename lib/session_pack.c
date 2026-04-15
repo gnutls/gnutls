@@ -1156,9 +1156,9 @@ int gnutls_session_set_premaster(gnutls_session_t session, unsigned int entity,
 			.max_record_recv_size = DEFAULT_MAX_RECORD_SIZE;
 
 	session->internals.resumed_security_parameters.timestamp =
-		gnutls_time(0);
+		gnutls_time(NULL);
 
-	session->internals.resumed_security_parameters.grp = 0;
+	session->internals.resumed_security_parameters.grp = NULL;
 
 	session->internals.resumed_security_parameters.post_handshake_auth = 0;
 

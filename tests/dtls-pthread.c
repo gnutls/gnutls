@@ -27,7 +27,6 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
-#include <errno.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/dtls.h>
 #include <signal.h>
@@ -118,7 +117,7 @@ static void *recv_thread(void *arg)
 		success("closing recv thread\n");
 	}
 
-	pthread_exit(0);
+	pthread_exit(NULL);
 }
 
 static void do_thread_stuff(gnutls_session_t session)
@@ -154,7 +153,7 @@ static void do_thread_stuff(gnutls_session_t session)
 	if (debug)
 		success("closing sending thread\n");
 	assert(pthread_join(id, &rval) == 0);
-	assert(rval == 0);
+	assert(rval == NULL);
 
 	do {
 		ret = gnutls_bye(session, GNUTLS_SHUT_RDWR);

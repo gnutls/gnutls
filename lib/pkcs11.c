@@ -275,7 +275,7 @@ static int pkcs11_provider_init(struct gnutls_pkcs11_provider_st *provider,
 
 	_gnutls_debug_log("p11: Initializing module: %s\n", module_name);
 
-	if (params && (p = strstr(params, "p11-kit:")) != 0) {
+	if (params && (p = strstr(params, "p11-kit:")) != NULL) {
 		reserved = (char *)(p + sizeof("p11-kit:") - 1);
 	}
 
@@ -327,7 +327,7 @@ static int pkcs11_provider_init(struct gnutls_pkcs11_provider_st *provider,
 	provider->module_name = gnutls_strdup(module_name);
 	provider->init_args = args;
 	if (p11_kit_module_get_flags(module) & P11_KIT_MODULE_TRUSTED ||
-	    (params != NULL && strstr(params, "trusted") != 0))
+	    (params != NULL && strstr(params, "trusted") != NULL))
 		provider->trusted = 1;
 
 	return 0;
@@ -4171,7 +4171,7 @@ static int find_cert_cb(struct ck_function_list *module,
 	else
 		tries = 1;
 
-	now = gnutls_time(0);
+	now = gnutls_time(NULL);
 	for (i = 0; i < tries; i++) {
 		a_vals = 0;
 		class = CKO_CERTIFICATE;

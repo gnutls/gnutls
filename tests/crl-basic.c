@@ -129,7 +129,7 @@ static struct {
 		   .crt_revoke_time = 1274996231,
 		   .crt_serial = "\x0b\x98\x94\xf9\x7c\x6a",
 		   .crt_serial_size = 6 },
-		 { NULL, NULL, 0, 0 } };
+		 { NULL, NULL, 0, NULL } };
 
 static void tls_log_func(int level, const char *str)
 {

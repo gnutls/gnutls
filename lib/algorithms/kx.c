@@ -131,7 +131,7 @@ static const gnutls_kx_algo_entry _gnutls_kx_algorithms[] = {
 	 * as priority strings, but they will be a no-op.
 	 */
 	{ "RSA-EXPORT", GNUTLS_KX_INVALID, NULL, 0, 0 },
-	{ 0, 0, 0, 0, 0 }
+	{ NULL, 0, NULL, 0, 0 }
 };
 
 #define GNUTLS_KX_LOOP(b)                                       \

@@ -229,7 +229,7 @@ static const gnutls_pk_entry pk_algorithms[] = {
 	  .oid = NULL,
 	  .id = GNUTLS_PK_UNKNOWN,
 	  .curve = GNUTLS_ECC_CURVE_INVALID },
-	{ 0, 0, 0, 0 }
+	{ NULL, NULL, 0, 0 }
 };
 
 #define GNUTLS_PK_LOOP(b)                                       \

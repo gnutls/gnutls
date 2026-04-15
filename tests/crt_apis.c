@@ -129,7 +129,7 @@ void doit(void)
 	if (ret != 0)
 		fail("error\n");
 
-	ret = gnutls_x509_crt_set_activation_time(crt, mytime(0));
+	ret = gnutls_x509_crt_set_activation_time(crt, mytime(NULL));
 	if (ret != 0)
 		fail("error\n");
 

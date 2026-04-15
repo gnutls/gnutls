@@ -693,7 +693,7 @@ static int check_dsa(void)
 		fail("error\n");
 
 	ret = gnutls_privkey_import_x509_raw(key, &dsa_key, GNUTLS_X509_FMT_PEM,
-					     0, 0);
+					     NULL, 0);
 	if (ret < 0)
 		fail("error\n");
 
@@ -774,7 +774,7 @@ static int check_rsa(void)
 		fail("error\n");
 
 	ret = gnutls_privkey_import_x509_raw(key, &rsa_key, GNUTLS_X509_FMT_PEM,
-					     0, 0);
+					     NULL, 0);
 	if (ret < 0)
 		fail("error\n");
 
@@ -855,7 +855,7 @@ static int check_ecc(void)
 		fail("error\n");
 
 	ret = gnutls_privkey_import_x509_raw(key, &server_ecc_key,
-					     GNUTLS_X509_FMT_PEM, 0, 0);
+					     GNUTLS_X509_FMT_PEM, NULL, 0);
 	if (ret < 0)
 		fail("error\n");
 
@@ -968,7 +968,7 @@ static int check_ed25519(void)
 		fail("error\n");
 
 	ret = gnutls_privkey_import_x509_raw(key, &server_ca3_eddsa_key,
-					     GNUTLS_X509_FMT_PEM, 0, 0);
+					     GNUTLS_X509_FMT_PEM, NULL, 0);
 	if (ret < 0)
 		fail("error\n");
 
@@ -1060,7 +1060,7 @@ static int check_gost(void)
 		fail("error\n");
 
 	ret = gnutls_privkey_import_x509_raw(key, &server_ca3_gost01_key,
-					     GNUTLS_X509_FMT_PEM, 0, 0);
+					     GNUTLS_X509_FMT_PEM, NULL, 0);
 	if (ret < 0)
 		fail("error\n");
 

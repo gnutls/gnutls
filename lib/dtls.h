@@ -82,7 +82,7 @@ inline static void _dtls_async_timer_init(gnutls_session_t session)
 			"DTLS[%p]: Initializing timer for handshake state.\n",
 			session);
 		session->internals.dtls.async_term =
-			gnutls_time(0) + MAX_DTLS_TIMEOUT / 1000;
+			gnutls_time(NULL) + MAX_DTLS_TIMEOUT / 1000;
 	} else {
 		_dtls_reset_hsk_state(session);
 		_gnutls_handshake_io_buffer_clear(session);
@@ -101,7 +101,7 @@ inline static void _dtls_async_timer_check(gnutls_session_t session)
 		return;
 
 	if (session->internals.dtls.async_term != 0) {
-		time_t _now = time(0);
+		time_t _now = time(NULL);
 
 		/* check if we need to expire the queued handshake data */
 		if (_now > session->internals.dtls.async_term) {

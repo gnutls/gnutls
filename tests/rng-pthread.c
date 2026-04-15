@@ -23,11 +23,9 @@
 #include "config.h"
 #endif
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
-#include <errno.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/crypto.h>
 #include <signal.h>
@@ -73,7 +71,7 @@ static void *start_thread(void *arg)
 	if (debug)
 		hexprint(data->buf, sizeof(data->buf));
 
-	pthread_exit(0);
+	pthread_exit(NULL);
 }
 
 #define MAX_THREADS 48

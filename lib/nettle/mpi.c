@@ -113,7 +113,7 @@ static int wrap_nettle_mpi_init_multi(bigint_t *w, ...)
 				goto fail;
 			}
 		}
-	} while (next != 0);
+	} while (next != NULL);
 
 	va_end(args);
 

@@ -38,7 +38,7 @@ int _gnutls_setup_tss2_callbacks(ESYS_CONTEXT *ctx)
 {
 	TSS2_RC rc;
 
-	struct ESYS_CRYPTO_CALLBACKS callbacks = { 0 };
+	struct ESYS_CRYPTO_CALLBACKS callbacks = { NULL };
 
 	_gnutls_set_tss2_rsa_callbacks(&callbacks);
 	_gnutls_set_tss2_hash_callbacks(&callbacks);

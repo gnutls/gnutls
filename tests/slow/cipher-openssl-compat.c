@@ -104,17 +104,18 @@ static int cipher_test(const char *ocipher, gnutls_cipher_algorithm_t gcipher,
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
 		if (gcipher == GNUTLS_CIPHER_AES_128_CCM ||
 		    gcipher == GNUTLS_CIPHER_AES_256_CCM) {
-			assert(EVP_CipherInit_ex(ctx, evp_cipher, 0, 0, 0, 0) >
-			       0);
+			assert(EVP_CipherInit_ex(ctx, evp_cipher, NULL, NULL,
+						 NULL, 0) > 0);
 
 			assert(EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_CCM_SET_IVLEN,
-						   dnonce.size, 0) == 1);
+						   dnonce.size, NULL) == 1);
 			assert(EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_CCM_SET_TAG,
 						   tag_size,
 						   enc_data + enc_data_size -
 							   tag_size) == 1);
 
-			assert(EVP_CipherInit_ex(ctx, 0, 0, key, nonce, 0) > 0);
+			assert(EVP_CipherInit_ex(ctx, NULL, NULL, key, nonce,
+						 0) > 0);
 
 			dec_data_size2 = sizeof(dec_data);
 			/* Add plain size */

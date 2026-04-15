@@ -155,7 +155,7 @@ static SYSTEM_CONFIG_OR_CONST version_entry_st sup_versions[] = {
 	  .only_extension = 0,
 	  .tls_sig_sem = SIG_SEM_PRE_TLS12,
 	  .false_start = 1 },
-	{ 0, 0, 0, 0, 0 }
+	{ NULL, 0, 0, 0, 0 }
 };
 
 const version_entry_st *version_to_entry(gnutls_protocol_t version)

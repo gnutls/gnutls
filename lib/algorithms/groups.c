@@ -207,7 +207,7 @@ static const gnutls_group_entry_st supported_groups[] = {
 		   GNUTLS_GROUP_INVALID },
 	  .tls_id = 0x11EC },
 #endif
-	{ 0, 0, 0 }
+	{ NULL, 0, NULL }
 };
 
 #define GNUTLS_GROUP_LOOP(b)                                       \

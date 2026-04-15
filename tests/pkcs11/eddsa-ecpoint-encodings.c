@@ -64,7 +64,7 @@ static void test_eddsa_encoding(const char *name, const gnutls_datum_t *ecpoint,
 	int ret;
 	gnutls_pubkey_t pubkey;
 	gnutls_pk_algorithm_t pk_alg;
-	gnutls_datum_t exported = { 0 };
+	gnutls_datum_t exported = { NULL, 0 };
 
 	success("Testing: EdDSA %s encoding\n", name);
 

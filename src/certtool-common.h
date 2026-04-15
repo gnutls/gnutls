@@ -114,7 +114,7 @@ static inline void switch_to_pkcs8_when_needed(common_info_st *cinfo,
 			cinfo->password = "";
 	}
 
-	if (gnutls_x509_privkey_get_seed(key, NULL, NULL, 0) !=
+	if (gnutls_x509_privkey_get_seed(key, NULL, NULL, NULL) !=
 	    GNUTLS_E_INVALID_REQUEST) {
 		if (cinfo->verbose)
 			fprintf(stderr,

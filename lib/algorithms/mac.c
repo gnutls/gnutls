@@ -205,7 +205,7 @@ static SYSTEM_CONFIG_OR_CONST mac_entry_st hash_algorithms[] = {
 	  .block_size = 16 },
 	{ .name = "PBMAC1", .id = GNUTLS_MAC_PBMAC1, .placeholder = 1 },
 	{ .name = "MAC-NULL", .id = GNUTLS_MAC_NULL },
-	{ 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+	{ NULL, NULL, NULL, 0, 0, 0, 0, 0, 0 }
 };
 
 #define GNUTLS_HASH_LOOP(b)                               \

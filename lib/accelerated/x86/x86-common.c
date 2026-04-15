@@ -131,7 +131,7 @@ static inline void get_cpuid_level7(unsigned int *eax, unsigned int *ebx,
 				    unsigned int *ecx, unsigned int *edx)
 {
 	/* we avoid using __get_cpuid_count, because it is not available with gcc 4.8 */
-	if (__get_cpuid_max(7, 0) < 7)
+	if (__get_cpuid_max(7, NULL) < 7)
 		return;
 
 	__cpuid_count(7, 0, *eax, *ebx, *ecx, *edx);

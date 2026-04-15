@@ -100,7 +100,7 @@ static void start(struct test_st *test)
 				/* the &ep value is only accurate when the default priorities are not overridden;
 				 * otherwise it should be a pointer to the start of the string */
 				if (strchr(_gnutls_default_priority_string,
-					   '@') != 0) {
+					   '@') != NULL) {
 					if (ep != test->add_prio) {
 						fail("error expected error on start of string[%d]: %s\n",
 						     test->err_pos,

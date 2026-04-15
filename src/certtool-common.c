@@ -733,7 +733,7 @@ int get_bits(gnutls_pk_algorithm_t key_type, int info_bits,
 		}
 		bits = info_bits;
 	} else {
-		if (info_sec_param == 0) {
+		if (info_sec_param == NULL) {
 			/* For ECDSA keys use 256 bits or better, as they are widely supported */
 			info_sec_param = "HIGH";
 		}

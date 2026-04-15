@@ -89,7 +89,7 @@ static void append_crt(gnutls_x509_crl_t crl, const gnutls_datum_t *pem)
 
 	assert(gnutls_x509_crt_init(&crt) >= 0);
 	assert(gnutls_x509_crt_import(crt, pem, GNUTLS_X509_FMT_PEM) >= 0);
-	ret = gnutls_x509_crl_set_crt(crl, crt, mytime(0));
+	ret = gnutls_x509_crl_set_crt(crl, crt, mytime(NULL));
 	if (ret != 0)
 		fail("gnutls_x509_crl_set_crt: %s\n", gnutls_strerror(ret));
 
@@ -181,17 +181,18 @@ static gnutls_x509_crl_t generate_crl(unsigned skip_optional)
 	if (ret != 0)
 		fail("gnutls_x509_crl_set_version\n");
 
-	ret = gnutls_x509_crl_set_this_update(crl, mytime(0));
+	ret = gnutls_x509_crl_set_this_update(crl, mytime(NULL));
 	if (ret != 0)
 		fail("gnutls_x509_crl_set_this_update\n");
 
 	if (!skip_optional) {
-		ret = gnutls_x509_crl_set_next_update(crl, mytime(0) + 120);
+		ret = gnutls_x509_crl_set_next_update(crl, mytime(NULL) + 120);
 		if (ret != 0)
 			fail("gnutls_x509_crl_set_next_update\n");
 	}
 
-	ret = gnutls_x509_crl_set_crt_serial(crl, "\x01\x02\x03", 3, mytime(0));
+	ret = gnutls_x509_crl_set_crt_serial(crl, "\x01\x02\x03", 3,
+					     mytime(NULL));
 	if (ret != 0)
 		fail("gnutls_x509_crl_set_serial %d\n", ret);
 

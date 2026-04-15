@@ -399,7 +399,7 @@ static const cipher_entry_st algorithms[] = {
 	  .blocksize = 1,
 	  .keysize = 0,
 	  .type = CIPHER_STREAM },
-	{ 0, 0, 0, 0, 0, 0, 0 }
+	{ NULL, 0, 0, 0, 0, 0, 0 }
 };
 
 #define GNUTLS_CIPHER_LOOP(b)                        \

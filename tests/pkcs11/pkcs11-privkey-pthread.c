@@ -27,7 +27,6 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
-#include <errno.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/abstract.h>
 #include <gnutls/crypto.h>
@@ -103,7 +102,7 @@ static void *start_thread(void *arg)
 
 	gnutls_free(sig.data);
 
-	pthread_exit(0);
+	pthread_exit(NULL);
 }
 
 #define MAX_THREADS 48

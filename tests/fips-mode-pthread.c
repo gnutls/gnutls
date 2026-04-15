@@ -23,11 +23,8 @@
 #include "config.h"
 #endif
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include <string.h>
-#include <errno.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/crypto.h>
 #include <signal.h>
@@ -101,7 +98,7 @@ static void *test_set_per_thread(void *arg)
 	/* put to a random state */
 	gnutls_fips140_set_mode(data->set_mode, GNUTLS_FIPS140_SET_MODE_THREAD);
 
-	pthread_exit(0);
+	pthread_exit(NULL);
 }
 
 #define MAX_THREADS 48

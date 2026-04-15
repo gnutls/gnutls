@@ -298,10 +298,10 @@ void doit(void)
 	signal(SIGPIPE, SIG_IGN);
 
 	for (; tries >= 0; tries--) {
-		tstart = time(0);
+		tstart = time(NULL);
 		start(2, 0);
 
-		tstop = time(0);
+		tstop = time(NULL);
 
 		tstop = tstop - tstart;
 
@@ -317,10 +317,10 @@ void doit(void)
 	}
 
 	for (; tries >= 0; tries--) {
-		tstart = time(0);
+		tstart = time(NULL);
 		start(2, 1);
 
-		tstop = time(0);
+		tstop = time(NULL);
 
 		tstop = tstop - tstart;
 

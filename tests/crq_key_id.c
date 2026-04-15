@@ -177,15 +177,11 @@ void doit(void)
 			     (int)crq_key_id_len, (int)pkey_key_id_len);
 		}
 
-		if (pkey_key_id) {
-			free(pkey_key_id);
-			pkey_key_id = NULL;
-		}
+		free(pkey_key_id);
+		pkey_key_id = NULL;
 
-		if (crq_key_id) {
-			free(crq_key_id);
-			crq_key_id = NULL;
-		}
+		free(crq_key_id);
+		crq_key_id = NULL;
 
 		gnutls_x509_crq_deinit(crq);
 		gnutls_x509_privkey_deinit(pkey);

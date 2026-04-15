@@ -484,7 +484,7 @@ void doit(void)
 					    tests[i].needs_decryption);
 		if (privkey == NULL && tests[i].exp_key_err < 0)
 			continue;
-		assert(privkey != 0);
+		assert(privkey != NULL);
 
 		try_with_key(tests[i].name, tests[i].prio, tests[i].exp_kx, 0,
 			     0, tests[i].cert, privkey, tests[i].exp_serv_err);

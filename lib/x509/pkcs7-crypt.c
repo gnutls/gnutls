@@ -204,7 +204,7 @@ static const struct pkcs_cipher_schema_st avail_pkcs_cipher_schemas[] = {
 	  .desc = NULL,
 	  .iv_name = NULL,
 	  .decrypt_only = 0 },
-	{ 0, 0, 0, 0, 0 }
+	{ 0, NULL, 0, 0, 0 }
 };
 
 #define PBES2_SCHEMA_LOOP(b)                                                  \

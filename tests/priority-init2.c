@@ -99,7 +99,7 @@ static void start(struct test_st *test)
 		if (ret < 0) {
 			if (test->exp_err == ret) {
 				if (strchr(_gnutls_default_priority_string,
-					   '@') != 0) {
+					   '@') != NULL) {
 					if (ep != test->add_prio) {
 						fail("error expected error on start of string[%d]: %s\n",
 						     test->err_pos,

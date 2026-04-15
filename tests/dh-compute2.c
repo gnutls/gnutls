@@ -29,7 +29,6 @@
 #include <gnutls/abstract.h>
 #include <stdbool.h>
 #include <string.h>
-#include <stdlib.h>
 #include "utils.h"
 #include "dh-compute.h"
 
@@ -161,7 +160,7 @@ static void compute_key(const char *name, const gnutls_dh_params_t dh_params,
 			int expect_error_on_import, int expect_error_on_derive,
 			const gnutls_datum_t *result)
 {
-	gnutls_datum_t Z = { 0 };
+	gnutls_datum_t Z = { NULL, 0 };
 	bool ok;
 	int ret;
 	gnutls_privkey_t privkey = NULL;
