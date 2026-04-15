@@ -897,6 +897,25 @@ char srv_and_cn[] =
 	"p9Nnj64WFIqbTLoqM3nt7+zqFZDvwh+8ZEVcE1MazHOYhDQj1uU3jqIq/sZE8w==\n"
 	"-----END CERTIFICATE-----\n";
 
+char pem_1825_oversized_san[] =
+	"ca\n"
+	"cn = example.com\n"
+	"dns_name = <'a' * 256>\n"
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIICOTCCAeugAwIBAgIURFygaiK3EBmc5AMZToFitMMikhcwBQYDK2VwMBYxFDAS\n"
+	"BgNVBAMTC2V4YW1wbGUuY29tMB4XDTI2MDQxNTE2MDYwMFoXDTI3MDQxNTE2MDYw\n"
+	"MFowFjEUMBIGA1UEAxMLZXhhbXBsZS5jb20wKjAFBgMrZXADIQBHqgbjhT1zZ3h9\n"
+	"okSrhd2+0Lr0Uj1q81sqHrcCEdqVpaOCAUkwggFFMA8GA1UdEwEB/wQFMAMBAf8w\n"
+	"ggERBgNVHREEggEIMIIBBIKCAQBhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFh\n"
+	"YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFh\n"
+	"YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFh\n"
+	"YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFh\n"
+	"YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFh\n"
+	"YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhMB0GA1UdDgQWBBT+\n"
+	"/oWt1Lrfz7Awk9h8yDoz1TKyHjAFBgMrZXADQQBfR5ByQyxpLEsVM5+ihYjSbmYF\n"
+	"1pOFndq0UIKPkWsRqBpitzDIVrVTLlIcY0fQpsxITNgdoIU68WynLGVrRHIF\n"
+	"-----END CERTIFICATE-----\n";
+
 void doit(void)
 {
 	gnutls_x509_crt_t x509;
@@ -1313,6 +1332,21 @@ void doit(void)
 	ret = gnutls_x509_crt_check_hostname(x509, "example.org");
 	if (ret)
 		fail("%d: Hostname incorrectly falls back to CN (%d)\n",
+		     __LINE__, ret);
+
+	if (debug)
+		success("Testing oversized SAN (#1825)...\n");
+	data.data = (unsigned char *)pem_1825_oversized_san;
+	data.size = strlen(pem_1825_oversized_san);
+
+	ret = gnutls_x509_crt_import(x509, &data, GNUTLS_X509_FMT_PEM);
+	if (ret < 0)
+		fail("%d: gnutls_x509_crt_import: %d\n", __LINE__, ret);
+
+	ret = gnutls_x509_crt_check_hostname(x509, "example.com");
+	if (ret)
+		fail("%d: Hostname incorrectly falls back to CN "
+		     "with oversized SAN (%d)\n",
 		     __LINE__, ret);
 
 	gnutls_x509_crt_deinit(x509);
