@@ -1199,10 +1199,6 @@ static int name_constraints_init(struct gnutls_name_constraints_st *nc)
 	ret = 0;
 
 cleanup:
-	if (tmp.nodes)
-		gl_list_free(tmp.nodes);
-	name_constraints_node_list_deinit(&tmp.permitted);
-	name_constraints_node_list_deinit(&tmp.excluded);
 	name_constraints_deinit(&tmp);
 	return ret;
 }
