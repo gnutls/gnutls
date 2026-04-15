@@ -1529,7 +1529,7 @@ static bool check_dns_constraints(gnutls_x509_name_constraints_t nc,
 	if (allowed_found)
 		return gnutls_assert_val(false);
 
-	return 1;
+	return true;
 }
 
 static unsigned check_email_constraints(gnutls_x509_name_constraints_t nc,
@@ -1583,7 +1583,7 @@ static unsigned check_email_constraints(gnutls_x509_name_constraints_t nc,
 	if (allowed_found)
 		return gnutls_assert_val(false);
 
-	return 1;
+	return true;
 }
 
 static unsigned check_ip_constraints(gnutls_x509_name_constraints_t nc,
@@ -1637,7 +1637,7 @@ static unsigned check_ip_constraints(gnutls_x509_name_constraints_t nc,
 	if (allowed_found)
 		return gnutls_assert_val(false);
 
-	return 1;
+	return true;
 }
 
 /**
@@ -1678,10 +1678,9 @@ unsigned gnutls_x509_name_constraints_check(gnutls_x509_name_constraints_t nc,
  *
  * Returns: true if the certification is acceptable, and false otherwise
  */
-static unsigned
-check_unsupported_constraint2(gnutls_x509_crt_t cert,
-			      gnutls_x509_name_constraints_t nc,
-			      gnutls_x509_subject_alt_name_t type)
+static bool check_unsupported_constraint2(gnutls_x509_crt_t cert,
+					  gnutls_x509_name_constraints_t nc,
+					  gnutls_x509_subject_alt_name_t type)
 {
 	unsigned idx;
 	bool found_one;
@@ -1699,7 +1698,7 @@ check_unsupported_constraint2(gnutls_x509_crt_t cert,
 		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 			break;
 		else if (ret < 0)
-			return gnutls_assert_val(0);
+			return gnutls_assert_val(false);
 
 		if (san_type != GNUTLS_SAN_URI)
 			continue;
@@ -1712,7 +1711,7 @@ check_unsupported_constraint2(gnutls_x509_crt_t cert,
 		return check_unsupported_constraint(nc, type);
 
 	/* no name was found in the certificate, so accept */
-	return 1;
+	return true;
 }
 
 /**
