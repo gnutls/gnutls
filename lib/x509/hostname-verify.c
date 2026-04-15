@@ -213,6 +213,20 @@ hostname_fallback:
 		ret = gnutls_x509_crt_get_subject_alt_name(cert, i, dnsname,
 							   &dnsnamesize, NULL);
 
+		if (ret < 0) {
+			if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER) {
+				/* oversized SAN; proceed without CN fallback */
+				_gnutls_debug_log("oversized SAN ignored, "
+						  "disabling CN fallback\n");
+				cn_fallback_allowed = false;
+				ret = 0;
+				continue;
+			}
+			if (ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+				gnutls_assert();
+			break;
+		}
+
 		if (PRECLUDES_CN_FALLBACK(ret))
 			cn_fallback_allowed = false;
 

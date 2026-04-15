@@ -75,6 +75,20 @@ unsigned gnutls_x509_crt_check_email(gnutls_x509_crt_t cert, const char *email,
 		ret = gnutls_x509_crt_get_subject_alt_name(
 			cert, i, rfc822name, &rfc822namesize, NULL);
 
+		if (ret < 0) {
+			if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER) {
+				/* oversized SAN; proceed without DN fallback */
+				_gnutls_debug_log("oversized SAN ignored, "
+						  "disabling DN fallback\n");
+				dn_fallback_allowed = false;
+				ret = 0;
+				continue;
+			}
+			if (ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+				gnutls_assert();
+			break;
+		}
+
 		if (ret == GNUTLS_SAN_RFC822NAME) {
 			dn_fallback_allowed = false;
 
