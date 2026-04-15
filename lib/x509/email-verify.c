@@ -42,7 +42,7 @@ unsigned gnutls_x509_crt_check_email(gnutls_x509_crt_t cert, const char *email,
 {
 	char rfc822name[MAX_CN];
 	size_t rfc822namesize;
-	int found_rfc822name = 0;
+	bool dn_fallback_allowed = true;
 	int ret = 0;
 	int i = 0;
 	char *a_email;
@@ -76,7 +76,7 @@ unsigned gnutls_x509_crt_check_email(gnutls_x509_crt_t cert, const char *email,
 			cert, i, rfc822name, &rfc822namesize, NULL);
 
 		if (ret == GNUTLS_SAN_RFC822NAME) {
-			found_rfc822name = 1;
+			dn_fallback_allowed = false;
 
 			if (memchr(rfc822name, '\0', rfc822namesize)) {
 				_gnutls_debug_log(
@@ -102,12 +102,10 @@ unsigned gnutls_x509_crt_check_email(gnutls_x509_crt_t cert, const char *email,
 		}
 	}
 
-	if (!found_rfc822name) {
-		/* did not get the necessary extension, use CN instead
-		 */
+	if (dn_fallback_allowed) {
+		/* did not get the necessary extension, use DN email instead */
 
-		/* enforce the RFC6125 (§1.8) requirement that only
-		 * a single CN must be present */
+		/* only a single one must be present */
 		rfc822namesize = sizeof(rfc822name);
 		ret = gnutls_x509_crt_get_dn_by_oid(cert,
 						    GNUTLS_OID_PKCS9_EMAIL, 1,
