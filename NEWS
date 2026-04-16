@@ -5,6 +5,35 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.8.13 (unreleased)
+
+** libgnutls: Added HPKE (RFC 9180) implementation as a technology
+   preview. The implementation and the related API might suffer
+   modification in the following period. (#1506)
+
+** API and ABI modifications:
+gnutls_hpke_kem_t: New enum
+gnutls_hpke_kdf_t: New enum
+gnutls_hpke_aead_t: New enum
+gnutls_hpke_mode_t: New enum
+gnutls_hpke_role_t: New enum
+gnutls_hpke_context_st: New context structure
+gnutls_hpke_context_init: New function
+gnutls_hpke_context_deinit: New function
+gnutls_hpke_context_set_psk: New function
+gnutls_hpke_context_set_sender_privkey: New function
+gnutls_hpke_context_set_sender_pubkey: New function
+gnutls_hpke_context_get_enc_size: New function
+gnutls_hpke_encap: New function
+gnutls_hpke_seal: New function
+gnutls_hpke_decap: New function
+gnutls_hpke_open: New function
+gnutls_hpke_context_set_ikme: New function
+gnutls_hpke_generate_keypair: New function
+gnutls_hpke_get_seq: New function
+gnutls_hpke_set_seq: New function
+gnutls_hpke_export: New function
+
 * Version 3.8.12 (released 2026-02-09)
 
 ** libgnutls: Fix NULL pointer dereference in PSK binder verification

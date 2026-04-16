@@ -22,6 +22,7 @@
  */
 
 #include "hpke-builders.h"
+#include "lib/num.h"
 
 #include <string.h>
 
@@ -145,10 +146,7 @@ void _gnutls_hpke_build_suite_id_for_scheduling(const uint16_t kem_id,
 	suite_id[1] = 'P';
 	suite_id[2] = 'K';
 	suite_id[3] = 'E';
-	suite_id[4] = (kem_id >> 8) & 0xff;
-	suite_id[5] = kem_id & 0xff;
-	suite_id[6] = (kdf_id >> 8) & 0xff;
-	suite_id[7] = kdf_id & 0xff;
-	suite_id[8] = (aead_id >> 8) & 0xff;
-	suite_id[9] = aead_id & 0xff;
+	_gnutls_write_uint16(kem_id, &suite_id[4]);
+	_gnutls_write_uint16(kdf_id, &suite_id[6]);
+	_gnutls_write_uint16(aead_id, &suite_id[8]);
 }
