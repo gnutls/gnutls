@@ -1010,6 +1010,26 @@ static int merge_handshake_packet(gnutls_session_t session,
 		_gnutls_handshake_buffer_move(&recv_buf[pos], hsk);
 
 	} else {
+		if (hsk->length != recv_buf[pos].length) {
+			/* inconsistent across fragments */
+			_gnutls_handshake_buffer_clear(hsk);
+			return gnutls_assert_val(
+				GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+		}
+		/* start_offset + data.length <= hsk->length <= max_length */
+		if (hsk->length < hsk->start_offset + hsk->data.length) {
+			/* impossible claims, overflow requested */
+			_gnutls_handshake_buffer_clear(hsk);
+			return gnutls_assert_val(
+				GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+		}
+		if (hsk->length > recv_buf[pos].data.max_length) {
+			/* we don't have this much allocated, overflow guard */
+			_gnutls_handshake_buffer_clear(hsk);
+			return gnutls_assert_val(
+				GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+		}
+
 		if (hsk->start_offset < recv_buf[pos].start_offset &&
 		    hsk->end_offset + 1 >= recv_buf[pos].start_offset) {
 			memcpy(&recv_buf[pos].data.data[hsk->start_offset],
