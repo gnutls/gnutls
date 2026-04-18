@@ -560,6 +560,7 @@ APIMANS += gnutls_pkcs11_obj_flags_get_str.3
 APIMANS += gnutls_pkcs11_obj_get_exts.3
 APIMANS += gnutls_pkcs11_obj_get_flags.3
 APIMANS += gnutls_pkcs11_obj_get_info.3
+APIMANS += gnutls_pkcs11_obj_get_pk_algorithm.3
 APIMANS += gnutls_pkcs11_obj_get_ptr.3
 APIMANS += gnutls_pkcs11_obj_get_type.3
 APIMANS += gnutls_pkcs11_obj_import_url.3

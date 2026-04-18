@@ -1464,6 +1464,14 @@ GNUTLS_3_8_11
 	*;
 } GNUTLS_3_8_6;
 
+GNUTLS_3_8_13
+{
+global:
+	gnutls_pkcs11_obj_get_pk_algorithm;
+local:
+	*;
+} GNUTLS_3_8_11;
+
 GNUTLS_FIPS140_3_4 {
   global:
 	gnutls_cipher_self_test;
