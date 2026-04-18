@@ -1535,6 +1535,7 @@ AC_CONFIG_FILES([
   lib/pkcs11/Makefile
   lib/x509/Makefile
   lib/unistring/Makefile
+  lib/hpke/Makefile
   po/Makefile.in
   src/Makefile
   src/gl/Makefile

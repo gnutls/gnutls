@@ -150,6 +150,8 @@ typedef int ssize_t;
  * supported groups/curves is not present */
 #define DEFAULT_EC_GROUP GNUTLS_GROUP_SECP256R1
 
+#define MIN(x, y) ((x) < (y) ? (x) : (y))
+
 typedef enum transport_t {
 	GNUTLS_STREAM,
 	GNUTLS_DGRAM

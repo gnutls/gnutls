@@ -142,6 +142,8 @@ unsigned char ecc_params[] = "\x06\x08\x2a\x86\x48\xce\x3d\x03\x01\x07";
 unsigned char ecc_point[] =
 	"\x04\x41\x04\x3c\x15\x6f\x1d\x48\x3e\x64\x59\x13\x2c\x6d\x04\x1a\x38\x0d\x30\x5c\xe4\x3f\x55\xcb\xd9\x17\x15\x46\x72\x71\x92\xc1\xf8\xc6\x33\x3d\x04\x2e\xc8\xc1\x0f\xc0\x50\x04\x7b\x9f\xc9\x48\xb5\x40\xfa\x6f\x93\x82\x59\x61\x5e\x72\x57\xcb\x83\x06\xbd\xcc\x82\x94\xc1";
 
+#define MAX_PRIME_CURVE_PUBKEY_SIZE 266
+
 static int _gnutls_privkey_export2_pkcs8(gnutls_privkey_t key,
 					 gnutls_x509_crt_fmt_t f,
 					 const char *password, unsigned flags,
@@ -163,6 +165,8 @@ static int _gnutls_privkey_export2_pkcs8(gnutls_privkey_t key,
 }
 
 #define CMP(name, dat, v) cmp(name, __LINE__, dat, v, sizeof(v) - 1)
+#define CMP_DATUM(name, dat1, dat2) \
+	cmp(name, __LINE__, dat1, dat2.data, dat2.size)
 static int cmp(const char *name, int line, gnutls_datum_t *v1,
 	       unsigned char *v2, unsigned size)
 {
@@ -219,8 +223,6 @@ static int check_x509_privkey(void)
 	gnutls_datum_t m, e, u, e1, e2, d;
 	gnutls_ecc_curve_t curve;
 	int ret;
-
-	global_init();
 
 	ret = gnutls_x509_privkey_init(&key);
 	if (ret < 0)
@@ -330,8 +332,6 @@ static int check_privkey_import_export(void)
 #endif
 	unsigned i;
 	int ret;
-
-	global_init();
 
 #ifdef ENABLE_DSA
 	ret = gnutls_privkey_init(&key);
@@ -679,8 +679,6 @@ static int check_dsa(void)
 	gnutls_pubkey_t pub;
 	gnutls_datum_t p, q, g, y, x;
 	int ret;
-
-	global_init();
 
 	success("Checking DSA key operations\n");
 
@@ -1154,8 +1152,164 @@ static int check_gost(void)
 	return 0;
 }
 
+typedef struct pubkey_generation_if_not_provided_test_vector_st {
+	gnutls_datum_t raw_sk;
+	gnutls_datum_t expected_raw_pk;
+	gnutls_ecc_curve_t curve;
+} pubkey_generation_if_not_provided_test_vector_t;
+
+#define HEX_ARRAY_TO_DATUM(...)             \
+	{ (unsigned char[]){ __VA_ARGS__ }, \
+	  sizeof((unsigned char[]){ __VA_ARGS__ }) }
+
+static int check_pubkey_derivation_if_not_provided(void)
+{
+	// Since this feature is implemented as a dependency for HPKE,
+	// the test vectors will be used from RFC9180 appendices.
+	pubkey_generation_if_not_provided_test_vector_t test_vectors[] = {
+		{
+			// RFC9180 A.1.1.
+			.raw_sk = HEX_ARRAY_TO_DATUM(
+				0x52, 0xc4, 0xa7, 0x58, 0xa8, 0x02, 0xcd, 0x8b,
+				0x93, 0x6e, 0xce, 0xea, 0x31, 0x44, 0x32, 0x79,
+				0x8d, 0x5b, 0xaf, 0x2d, 0x7e, 0x92, 0x35, 0xdc,
+				0x08, 0x4a, 0xb1, 0xb9, 0xcf, 0xa2, 0xf7, 0x36),
+			.expected_raw_pk = HEX_ARRAY_TO_DATUM(
+				0x37, 0xfd, 0xa3, 0x56, 0x7b, 0xdb, 0xd6, 0x28,
+				0xe8, 0x86, 0x68, 0xc3, 0xc8, 0xd7, 0xe9, 0x7d,
+				0x1d, 0x12, 0x53, 0xb6, 0xd4, 0xea, 0x6d, 0x44,
+				0xc1, 0x50, 0xf7, 0x41, 0xf1, 0xbf, 0x44, 0x31),
+			.curve = GNUTLS_ECC_CURVE_X25519,
+		},
+		{ // RFC 9180 A.3.1.
+		  .raw_sk = HEX_ARRAY_TO_DATUM(
+			  0x49, 0x95, 0x78, 0x8e, 0xf4, 0xb9, 0xd6, 0x13, 0x2b,
+			  0x24, 0x9c, 0xe5, 0x9a, 0x77, 0x28, 0x14, 0x93, 0xeb,
+			  0x39, 0xaf, 0x37, 0x3d, 0x23, 0x6a, 0x1f, 0xe4, 0x15,
+			  0xcb, 0x0c, 0x2d, 0x7b, 0xeb
+
+			  ),
+		  .expected_raw_pk = HEX_ARRAY_TO_DATUM(
+			  0x04, 0xa9, 0x27, 0x19, 0xc6, 0x19, 0x5d, 0x50, 0x85,
+			  0x10, 0x4f, 0x46, 0x9a, 0x8b, 0x98, 0x14, 0xd5, 0x83,
+			  0x8f, 0xf7, 0x2b, 0x60, 0x50, 0x1e, 0x2c, 0x44, 0x66,
+			  0xe5, 0xe6, 0x7b, 0x32, 0x5a, 0xc9, 0x85, 0x36, 0xd7,
+			  0xb6, 0x1a, 0x1a, 0xf4, 0xb7, 0x8e, 0x5b, 0x7f, 0x95,
+			  0x1c, 0x09, 0x00, 0xbe, 0x86, 0x3c, 0x40, 0x3c, 0xe6,
+			  0x5c, 0x9b, 0xfc, 0xb9, 0x38, 0x26, 0x57, 0x22, 0x2d,
+			  0x18, 0xc4),
+		  .curve = GNUTLS_ECC_CURVE_SECP256R1 },
+		{ // RFC 9180 A.6.1.
+		  .raw_sk = HEX_ARRAY_TO_DATUM(
+			  0x01, 0x47, 0x84, 0xc6, 0x92, 0xda, 0x35, 0xdf, 0x6e,
+			  0xcd, 0xe9, 0x8e, 0xe4, 0x3a, 0xc4, 0x25, 0xdb, 0xdd,
+			  0x09, 0x69, 0xc0, 0xc7, 0x2b, 0x42, 0xf2, 0xe7, 0x08,
+			  0xab, 0x9d, 0x53, 0x54, 0x15, 0xa8, 0x56, 0x9b, 0xda,
+			  0xcf, 0xcc, 0x0a, 0x11, 0x4c, 0x85, 0xb8, 0xe3, 0xf2,
+			  0x6a, 0xcf, 0x4d, 0x68, 0x11, 0x5f, 0x8c, 0x91, 0xa6,
+			  0x61, 0x78, 0xcd, 0xbd, 0x03, 0xb7, 0xbc, 0xc5, 0x29,
+			  0x1e, 0x37, 0x4b),
+		  .expected_raw_pk = HEX_ARRAY_TO_DATUM(
+			  0x04, 0x01, 0x38, 0xb3, 0x85, 0xca, 0x16, 0xbb, 0x0d,
+			  0x5f, 0xa0, 0xc0, 0x66, 0x5f, 0xbb, 0xd7, 0xe6, 0x9e,
+			  0x3e, 0xe2, 0x9f, 0x63, 0x99, 0x1d, 0x3e, 0x9b, 0x5f,
+			  0xa7, 0x40, 0xaa, 0xb8, 0x90, 0x0a, 0xae, 0xed, 0x46,
+			  0xed, 0x73, 0xa4, 0x90, 0x55, 0x75, 0x84, 0x25, 0xa0,
+			  0xce, 0x36, 0x50, 0x7c, 0x54, 0xb2, 0x9c, 0xc5, 0xb8,
+			  0x5a, 0x5c, 0xee, 0x6b, 0xae, 0x0c, 0xf1, 0xc2, 0x1f,
+			  0x27, 0x31, 0xec, 0xe2, 0x01, 0x3d, 0xc3, 0xfb, 0x7c,
+			  0x8d, 0x21, 0x65, 0x4b, 0xb1, 0x61, 0xb4, 0x63, 0x96,
+			  0x2c, 0xa1, 0x9e, 0x8c, 0x65, 0x4f, 0xf2, 0x4c, 0x94,
+			  0xdd, 0x28, 0x98, 0xde, 0x12, 0x05, 0x1f, 0x1e, 0xd0,
+			  0x69, 0x22, 0x37, 0xfb, 0x02, 0xb2, 0xf8, 0xd1, 0xdc,
+			  0x1c, 0x73, 0xe9, 0xb3, 0x66, 0xb5, 0x29, 0xeb, 0x43,
+			  0x6e, 0x98, 0xa9, 0x96, 0xee, 0x52, 0x2a, 0xef, 0x86,
+			  0x3d, 0xd5, 0x73, 0x9d, 0x2f, 0x29, 0xb0),
+		  .curve = GNUTLS_ECC_CURVE_SECP521R1 }
+	};
+
+	int ret = 0;
+	const int number_of_test_vectors =
+		sizeof(test_vectors) / sizeof(test_vectors[0]);
+
+	for (int i = 0; i < number_of_test_vectors; i++) {
+		gnutls_privkey_t sk;
+
+		gnutls_ecc_curve_t curve = test_vectors[i].curve;
+
+		ret = gnutls_privkey_init(&sk);
+		if (ret != 0) {
+			fail("Failed to initialize private key for curve: %s\n",
+			     gnutls_ecc_curve_get_name(curve));
+		}
+
+		ret = gnutls_privkey_import_ecc_raw(sk, curve, NULL, NULL,
+						    &test_vectors[i].raw_sk);
+		if (ret != 0) {
+			fail("Failed to import raw key for curve: %s\n",
+			     gnutls_ecc_curve_get_name(curve));
+		}
+
+		switch (curve) {
+		case GNUTLS_ECC_CURVE_X25519: {
+			gnutls_datum_t x;
+
+			ret = gnutls_privkey_export_ecc_raw(sk, NULL, &x, NULL,
+							    NULL);
+			if (ret != 0) {
+				fail("Failed to export private key for curve: %s\n",
+				     gnutls_ecc_curve_get_name(curve));
+			}
+
+			CMP_DATUM(gnutls_ecc_curve_get_name(curve), &x,
+				  test_vectors[i].expected_raw_pk);
+
+			gnutls_free(x.data);
+			break;
+		}
+		case GNUTLS_ECC_CURVE_SECP256R1:
+		case GNUTLS_ECC_CURVE_SECP521R1: {
+			gnutls_datum_t x;
+			gnutls_datum_t y;
+
+			ret = gnutls_privkey_export_ecc_raw2(
+				sk, NULL, &x, &y, NULL,
+				GNUTLS_EXPORT_FLAG_NO_LZ);
+			if (ret != 0) {
+				fail("Failed to export private key for curve: %s\n",
+				     gnutls_ecc_curve_get_name(curve));
+			}
+
+			unsigned char pk_raw_buf[MAX_PRIME_CURVE_PUBKEY_SIZE] = {
+				0
+			};
+			pk_raw_buf[0] = 0x04;
+			memcpy(pk_raw_buf + 1, x.data, x.size);
+			memcpy(pk_raw_buf + 1 + x.size, y.data, y.size);
+
+			gnutls_datum_t pk_raw = { pk_raw_buf,
+						  1 + x.size + y.size };
+			CMP_DATUM(gnutls_ecc_curve_get_name(curve), &pk_raw,
+				  test_vectors[i].expected_raw_pk);
+
+			gnutls_free(x.data);
+			gnutls_free(y.data);
+			break;
+		}
+		default:
+			fail("Unexpected curve: %s\n",
+			     gnutls_ecc_curve_get_name(curve));
+		}
+
+		gnutls_privkey_deinit(sk);
+	}
+
+	return ret;
+}
+
 void doit(void)
 {
+	global_init();
 	if (check_x509_privkey() != 0) {
 		fail("error in privkey check\n");
 		exit(1);
@@ -1189,4 +1343,10 @@ void doit(void)
 	if (check_gost() != 0) {
 		fail("error in gost check\n");
 	}
+
+	if (check_pubkey_derivation_if_not_provided() != 0) {
+		fail("error in pubkey derivation\n");
+	}
+
+	global_deinit();
 }

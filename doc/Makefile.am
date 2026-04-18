@@ -242,7 +242,7 @@ MAINTAINERCLEANFILES =
 API_FILES=gnutls-api.texi socket-api.texi x509-api.texi pkcs12-api.texi \
 	tpm-api.texi pkcs11-api.texi abstract-api.texi compat-api.texi \
 	dtls-api.texi crypto-api.texi ocsp-api.texi tpm-api.texi dane-api.texi \
-	pkcs7-api.texi
+	pkcs7-api.texi hpke-api.texi
 
 MAINTAINERCLEANFILES += stamp_enums stamp_functions functions enums
 
@@ -395,6 +395,19 @@ ocsp-api.texi: $(top_srcdir)/lib/includes/gnutls/ocsp.h
 			$(C_X509_SOURCE_FILES) >> $@-tmp && \
 		echo "ok"; \
 	done
+	mv -f $@-tmp $@
+
+hpke-api.texi: $(top_srcdir)/lib/includes/gnutls/hpke.h
+	echo "" > $@-tmp
+	cat $^ >$@-headers-tmp
+	for i in `$(PERL) $(top_srcdir)/doc/scripts/getfuncs.pl < $@-headers-tmp |sort|uniq`; do \
+		echo $(ECHO_N) "Creating documentation for $$i... " && \
+		$(PERL) $(srcdir)/scripts/gdoc -texinfo \
+			-function $$i \
+			$(C_SOURCE_FILES) >> $@-tmp && \
+		echo "ok"; \
+	done
+	rm -f $@-headers-tmp
 	mv -f $@-tmp $@
 
 # Generated texinfos.
@@ -1212,6 +1225,36 @@ FUNCS += functions/gnutls_hmac_output
 FUNCS += functions/gnutls_hmac_output.short
 FUNCS += functions/gnutls_hmac_set_nonce
 FUNCS += functions/gnutls_hmac_set_nonce.short
+FUNCS += functions/gnutls_hpke_context_deinit
+FUNCS += functions/gnutls_hpke_context_deinit.short
+FUNCS += functions/gnutls_hpke_context_get_enc_size
+FUNCS += functions/gnutls_hpke_context_get_enc_size.short
+FUNCS += functions/gnutls_hpke_context_init
+FUNCS += functions/gnutls_hpke_context_init.short
+FUNCS += functions/gnutls_hpke_context_set_ikme
+FUNCS += functions/gnutls_hpke_context_set_ikme.short
+FUNCS += functions/gnutls_hpke_context_set_psk
+FUNCS += functions/gnutls_hpke_context_set_psk.short
+FUNCS += functions/gnutls_hpke_context_set_sender_privkey
+FUNCS += functions/gnutls_hpke_context_set_sender_privkey.short
+FUNCS += functions/gnutls_hpke_context_set_sender_pubkey
+FUNCS += functions/gnutls_hpke_context_set_sender_pubkey.short
+FUNCS += functions/gnutls_hpke_decap
+FUNCS += functions/gnutls_hpke_decap.short
+FUNCS += functions/gnutls_hpke_encap
+FUNCS += functions/gnutls_hpke_encap.short
+FUNCS += functions/gnutls_hpke_export
+FUNCS += functions/gnutls_hpke_export.short
+FUNCS += functions/gnutls_hpke_generate_keypair
+FUNCS += functions/gnutls_hpke_generate_keypair.short
+FUNCS += functions/gnutls_hpke_get_seq
+FUNCS += functions/gnutls_hpke_get_seq.short
+FUNCS += functions/gnutls_hpke_open
+FUNCS += functions/gnutls_hpke_open.short
+FUNCS += functions/gnutls_hpke_seal
+FUNCS += functions/gnutls_hpke_seal.short
+FUNCS += functions/gnutls_hpke_set_seq
+FUNCS += functions/gnutls_hpke_set_seq.short
 FUNCS += functions/gnutls_idna_map
 FUNCS += functions/gnutls_idna_map.short
 FUNCS += functions/gnutls_idna_reverse_map

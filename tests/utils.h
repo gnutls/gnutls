@@ -63,6 +63,14 @@ inline static int global_init(void)
 	return gnutls_global_init();
 }
 
+inline static void global_deinit(void)
+{
+#ifdef ENABLE_PKCS11
+	gnutls_pkcs11_deinit();
+#endif
+	gnutls_global_deinit();
+}
+
 extern int debug;
 extern int error_count;
 extern int break_on_error;

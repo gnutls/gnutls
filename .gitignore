@@ -183,6 +183,7 @@ doc/stamp-vti
 doc/tpm-api.texi
 doc/version.texi
 doc/x509-api.texi
+doc/hpke-api.texi
 extra/includes/Makefile
 extra/includes/Makefile.in
 extra/libgnutls-openssl.la
@@ -250,6 +251,7 @@ lib/x509/Makefile.in
 lib/x509/supported_exts.h
 lib/x509/x509-api.texi
 lib/*_asn1_tab.c
+lib/hpke/libgnutls_hpke.la
 *.lo
 *.log
 m4/*
@@ -438,6 +440,7 @@ tests/handshake-write
 tests/hex
 tests/hostname-check
 tests/hostname-check-utf8
+tests/hpke-tests
 tests/id-on-xmppAddr
 tests/infoaccess
 tests/init_roundtrip

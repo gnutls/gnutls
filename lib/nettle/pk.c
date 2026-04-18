@@ -73,6 +73,8 @@
 #endif
 #include "attribute.h"
 
+#define MAX_PRIME_CURVE_COORD_SIZE 66
+
 static inline const struct ecc_curve *get_supported_nist_curve(int curve);
 static inline const struct ecc_curve *get_supported_gost_curve(int curve);
 
@@ -4908,7 +4910,7 @@ static int wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 				gnutls_direction_t direction,
 				gnutls_pk_params_st *params)
 {
-	int ret;
+	int ret = 0;
 
 	if (direction != GNUTLS_IMPORT)
 		return 0;
@@ -4964,8 +4966,8 @@ static int wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 		if (ret == 0) {
 			return gnutls_assert_val(GNUTLS_E_PK_INVALID_PRIVKEY);
 		}
+		ret = 0;
 	} break;
-
 	case GNUTLS_PK_EDDSA_ED25519:
 	case GNUTLS_PK_EDDSA_ED448:
 		if (unlikely(get_eddsa_curve(algo) != params->curve))
@@ -5098,11 +5100,93 @@ static int wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 		ecc_scalar_clear(&priv);
 	} break;
 #endif
+	case GNUTLS_PK_EC:
+		if (params->params_nr == ECC_PRIVATE_PARAMS) {
+			return 0;
+		}
+		struct ecc_scalar s;
+		struct ecc_point p;
+		mpz_t pk, px, py;
+		gnutls_datum_t k = { NULL, 0 };
+		unsigned char exported_mpz_buf[MAX_PRIME_CURVE_COORD_SIZE] = {
+			0
+		};
+		uint8_t x_buf[MAX_PRIME_CURVE_COORD_SIZE] = { 0 };
+		uint8_t y_buf[MAX_PRIME_CURVE_COORD_SIZE] = { 0 };
+		size_t count = 0;
+
+		const struct ecc_curve *ecc =
+			get_supported_nist_curve(params->curve);
+
+		if (ecc == NULL) {
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		}
+
+		size_t coord_size = gnutls_ecc_curve_get_size(params->curve);
+		if (coord_size == 0) {
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		}
+
+		mpz_init(pk);
+		mpz_init(px);
+		mpz_init(py);
+
+		ret = _gnutls_mpi_dprint(params->params[ECC_K], &k);
+		if (ret != 0) {
+			ret = gnutls_assert_val(ret);
+			goto cleanup;
+		}
+
+		mpz_import(pk, k.size, 1, 1, 1, 0, k.data);
+
+		ecc_scalar_init(&s, ecc);
+
+		if (!ecc_scalar_set(&s, pk)) {
+			ret = gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+			goto cleanup;
+		}
+
+		ecc_point_init(&p, ecc);
+		ecc_point_mul_g(&p, &s);
+		ecc_point_get(&p, px, py);
+
+		mpz_export(exported_mpz_buf, &count, 1, 1, 1, 0, px);
+		memcpy(x_buf + (coord_size - count), exported_mpz_buf, count);
+
+		zeroize_key(exported_mpz_buf, MAX_PRIME_CURVE_COORD_SIZE);
+		mpz_export(exported_mpz_buf, &count, 1, 1, 1, 0, py);
+		memcpy(y_buf + (coord_size - count), exported_mpz_buf, count);
+
+		ret = _gnutls_mpi_init_scan(&params->params[ECC_X], x_buf,
+					    coord_size);
+		if (ret != 0) {
+			ret = gnutls_assert_val(GNUTLS_E_MPI_SCAN_FAILED);
+			goto cleanup;
+		}
+		params->params_nr++;
+
+		ret = _gnutls_mpi_init_scan(&params->params[ECC_Y], y_buf,
+					    coord_size);
+		if (ret != 0) {
+			ret = gnutls_assert_val(GNUTLS_E_MPI_SCAN_FAILED);
+			goto cleanup;
+		}
+		params->params_nr++;
+
+	cleanup:
+		ecc_point_clear(&p);
+		ecc_scalar_clear(&s);
+		mpz_clear(pk);
+		mpz_clear(px);
+		mpz_clear(py);
+
+		_gnutls_free_key_datum(&k);
+		break;
 	default:
 		break;
 	}
 
-	return 0;
+	return ret;
 }
 
 int crypto_pk_prio = INT_MAX;

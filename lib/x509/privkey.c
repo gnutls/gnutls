@@ -1341,20 +1341,10 @@ int gnutls_x509_privkey_import_ecc_raw(gnutls_x509_privkey_t key,
 			goto cleanup;
 		}
 
-		if (curve_is_eddsa(curve)) {
-			size = gnutls_ecc_curve_get_size(curve);
-			if (x->size != size || k->size != size) {
-				ret = gnutls_assert_val(
-					GNUTLS_E_INVALID_REQUEST);
-				goto cleanup;
-			}
-
-			ret = _gnutls_set_datum(&key->params.raw_pub, x->data,
-						x->size);
-			if (ret < 0) {
-				gnutls_assert();
-				goto cleanup;
-			}
+		size = gnutls_ecc_curve_get_size(curve);
+		if ((x && x->size != size) || k->size != size) {
+			ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			goto cleanup;
 		}
 
 		ret = _gnutls_set_datum(&key->params.raw_priv, k->data,
@@ -1364,24 +1354,24 @@ int gnutls_x509_privkey_import_ecc_raw(gnutls_x509_privkey_t key,
 			goto cleanup;
 		}
 
+		if (x) {
+			ret = _gnutls_set_datum(&key->params.raw_pub, x->data,
+						x->size);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+		} else {
+			ret = _gnutls_pk_fixup(key->params.algo, GNUTLS_IMPORT,
+					       &key->params);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+		}
+
 		return 0;
 	}
-
-	if (_gnutls_mpi_init_scan_nz(&key->params.params[ECC_X], x->data,
-				     x->size)) {
-		gnutls_assert();
-		ret = GNUTLS_E_MPI_SCAN_FAILED;
-		goto cleanup;
-	}
-	key->params.params_nr++;
-
-	if (_gnutls_mpi_init_scan_nz(&key->params.params[ECC_Y], y->data,
-				     y->size)) {
-		gnutls_assert();
-		ret = GNUTLS_E_MPI_SCAN_FAILED;
-		goto cleanup;
-	}
-	key->params.params_nr++;
 
 	if (_gnutls_mpi_init_scan_nz(&key->params.params[ECC_K], k->data,
 				     k->size)) {
@@ -1393,10 +1383,29 @@ int gnutls_x509_privkey_import_ecc_raw(gnutls_x509_privkey_t key,
 
 	key->params.algo = GNUTLS_PK_EC;
 
-	ret = _gnutls_pk_fixup(GNUTLS_PK_EC, GNUTLS_IMPORT, &key->params);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
+	if (x && y) {
+		ret = _gnutls_mpi_init_scan_nz(&key->params.params[ECC_X],
+					       x->data, x->size);
+		if (ret < 0) {
+			ret = gnutls_assert_val(GNUTLS_E_MPI_SCAN_FAILED);
+			goto cleanup;
+		}
+		key->params.params_nr++;
+
+		ret = _gnutls_mpi_init_scan_nz(&key->params.params[ECC_Y],
+					       y->data, y->size);
+		if (ret < 0) {
+			ret = gnutls_assert_val(GNUTLS_E_MPI_SCAN_FAILED);
+			goto cleanup;
+		}
+		key->params.params_nr++;
+	} else {
+		ret = _gnutls_pk_fixup(GNUTLS_PK_EC, GNUTLS_IMPORT,
+				       &key->params);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
 	}
 
 	ret = _gnutls_asn1_encode_privkey(&key->key, &key->params);
