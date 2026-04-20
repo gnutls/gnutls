@@ -104,10 +104,9 @@ typedef enum gnutls_hpke_role_t {
 
 typedef struct gnutls_hpke_context_st *gnutls_hpke_context_t;
 
-int gnutls_hpke_init(gnutls_hpke_context_t *ctx, const gnutls_hpke_mode_t mode,
-		     const gnutls_hpke_role_t role, const gnutls_hpke_kem_t kem,
-		     const gnutls_hpke_kdf_t kdf,
-		     const gnutls_hpke_aead_t aead);
+int gnutls_hpke_init(gnutls_hpke_context_t *ctx, gnutls_hpke_mode_t mode,
+		     gnutls_hpke_role_t role, gnutls_hpke_kem_t kem,
+		     gnutls_hpke_kdf_t kdf, gnutls_hpke_aead_t aead);
 
 int gnutls_hpke_deinit(gnutls_hpke_context_t ctx);
 
@@ -139,7 +138,7 @@ int gnutls_hpke_open(gnutls_hpke_context_t ctx, const gnutls_datum_t *aad,
 
 int gnutls_hpke_set_ikme(gnutls_hpke_context_t ctx, const gnutls_datum_t *ikme);
 
-int gnutls_hpke_generate_keypair(const gnutls_hpke_kem_t kem,
+int gnutls_hpke_generate_keypair(gnutls_hpke_kem_t kem,
 				 const gnutls_datum_t *ikm,
 				 gnutls_privkey_t *privkey,
 				 gnutls_pubkey_t *pubkey);

@@ -75,20 +75,20 @@ struct gnutls_hpke_context_st {
 	uint64_t seq;
 };
 
-static bool is_auth_mode(const gnutls_hpke_mode_t mode)
+static bool is_auth_mode(gnutls_hpke_mode_t mode)
 {
 	return mode == GNUTLS_HPKE_MODE_AUTH ||
 	       mode == GNUTLS_HPKE_MODE_AUTH_PSK;
 }
 
-static bool is_psk_mode(const gnutls_hpke_mode_t mode)
+static bool is_psk_mode(gnutls_hpke_mode_t mode)
 {
 	return mode == GNUTLS_HPKE_MODE_PSK ||
 	       mode == GNUTLS_HPKE_MODE_AUTH_PSK;
 }
 
 static bool
-is_key_curve_type_compatible_with_param_dhkem(const gnutls_hpke_kem_t kem,
+is_key_curve_type_compatible_with_param_dhkem(gnutls_hpke_kem_t kem,
 					      const gnutls_ecc_curve_t curve)
 {
 	const gnutls_ecc_curve_t expected_curve =
@@ -155,11 +155,12 @@ static int validate_privkey_for_kem(gnutls_privkey_t sk, gnutls_hpke_kem_t kem)
 	return 0;
 }
 
-static int
-get_shared_secret(const gnutls_hpke_kem_t kem, const gnutls_hpke_kdf_t kdf,
-		  const gnutls_hpke_mode_t mode, const gnutls_pubkey_t pkR,
-		  const gnutls_pubkey_t pkS, const gnutls_pubkey_t pkE,
-		  const gnutls_datum_t *dh, gnutls_datum_t *shared_secret)
+static int get_shared_secret(gnutls_hpke_kem_t kem, gnutls_hpke_kdf_t kdf,
+			     gnutls_hpke_mode_t mode, const gnutls_pubkey_t pkR,
+			     const gnutls_pubkey_t pkS,
+			     const gnutls_pubkey_t pkE,
+			     const gnutls_datum_t *dh,
+			     gnutls_datum_t *shared_secret)
 {
 	int ret = 0;
 
@@ -247,7 +248,7 @@ cleanup:
 	return ret;
 }
 
-static int encap_get_dh(const gnutls_hpke_mode_t mode,
+static int encap_get_dh(gnutls_hpke_mode_t mode,
 			const gnutls_pubkey_t receiver_pubkey,
 			const gnutls_privkey_t ephemeral_privkey,
 			const gnutls_privkey_t sender_privkey,
@@ -372,7 +373,7 @@ cleanup:
 	return ret;
 }
 
-static int decap_get_dh(const gnutls_hpke_mode_t mode,
+static int decap_get_dh(gnutls_hpke_mode_t mode,
 			const gnutls_pubkey_t ephemeral_pubkey,
 			const gnutls_pubkey_t sender_pubkey,
 			const gnutls_privkey_t receiver_privkey,
@@ -413,8 +414,8 @@ cleanup:
 	return ret;
 }
 
-static int dhkem_decap(const gnutls_hpke_kem_t kem, const gnutls_hpke_kdf_t kdf,
-		       const gnutls_hpke_mode_t mode,
+static int dhkem_decap(gnutls_hpke_kem_t kem, gnutls_hpke_kdf_t kdf,
+		       gnutls_hpke_mode_t mode,
 		       const gnutls_privkey_t receiver_privkey,
 		       const gnutls_pubkey_t sender_pubkey,
 		       const gnutls_datum_t *enc, gnutls_datum_t *shared_secret)
@@ -671,9 +672,9 @@ cleanup:
  * is no longer needed to free any allocated resources and securely erase sensitive information.
  * Returns: 0 on success, or a negative error code on failure
  */
-int gnutls_hpke_init(gnutls_hpke_context_t *ctx, const gnutls_hpke_mode_t mode,
-		     const gnutls_hpke_role_t role, const gnutls_hpke_kem_t kem,
-		     const gnutls_hpke_kdf_t kdf, const gnutls_hpke_aead_t aead)
+int gnutls_hpke_init(gnutls_hpke_context_t *ctx, gnutls_hpke_mode_t mode,
+		     gnutls_hpke_role_t role, gnutls_hpke_kem_t kem,
+		     gnutls_hpke_kdf_t kdf, gnutls_hpke_aead_t aead)
 {
 	if (ctx == NULL) {
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -1423,7 +1424,7 @@ int gnutls_hpke_set_ikme(gnutls_hpke_context_t ctx, const gnutls_datum_t *ikme)
  *
  * It returns 0 on success, or a negative error code on failure.
  */
-int gnutls_hpke_generate_keypair(const gnutls_hpke_kem_t kem,
+int gnutls_hpke_generate_keypair(gnutls_hpke_kem_t kem,
 				 const gnutls_datum_t *ikm,
 				 gnutls_privkey_t *privkey,
 				 gnutls_pubkey_t *pubkey)
