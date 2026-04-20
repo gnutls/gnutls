@@ -300,9 +300,21 @@ static int dhkem_encap(const gnutls_hpke_context_t ctx,
 	unsigned char dh_buf[HPKE_MAX_DH_SIZE];
 	gnutls_datum_t dh = { dh_buf, 0 };
 
+	ret = gnutls_pubkey_init(&ephemeral_pubkey);
+	if (ret < 0) {
+		ret = gnutls_assert_val(ret);
+		goto cleanup;
+	}
+
+	ret = gnutls_privkey_init(&ephemeral_privkey);
+	if (ret < 0) {
+		ret = gnutls_assert_val(ret);
+		goto cleanup;
+	}
+
 	ret = _gnutls_hpke_generate_keypair(ctx->ikme, ctx->kem,
-					    receiver_pubkey, &ephemeral_privkey,
-					    &ephemeral_pubkey);
+					    receiver_pubkey, ephemeral_privkey,
+					    ephemeral_pubkey);
 	if (ret < 0) {
 		gnutls_assert_val(ret);
 		goto cleanup;
@@ -440,7 +452,13 @@ static int dhkem_decap(gnutls_hpke_kem_t kem, gnutls_hpke_kdf_t kdf,
 		goto cleanup;
 	}
 
-	ret = _gnutls_hpke_datum_to_pubkey(curve, enc, &ephemeral_pubkey);
+	ret = gnutls_pubkey_init(&ephemeral_pubkey);
+	if (ret < 0) {
+		ret = gnutls_assert_val(ret);
+		goto cleanup;
+	}
+
+	ret = _gnutls_hpke_datum_to_pubkey(curve, enc, ephemeral_pubkey);
 	if (ret < 0) {
 		gnutls_assert_val(ret);
 		goto cleanup;
@@ -1415,8 +1433,8 @@ int gnutls_hpke_set_ikme(gnutls_hpke_context_t ctx, const gnutls_datum_t *ikme)
  * @kem: The KEM algorithm to use for key pair generation.
  * @ikm: A pointer to a gnutls_datum_t structure containing the input key material (IKM) to be used for key pair
  * generation. This should be a non-empty byte string that serves as the seed for key pair generation.
- * @privkey: A pointer to a gnutls_privkey_t variable where the generated private key will be stored. The function will initialize this variable with the generated private key.
- * @pubkey: A pointer to a gnutls_pubkey_t variable where the generated public key will be stored. The function will initialize this variable with the generated public key.
+ * @privkey: An initialized private key.
+ * @pubkey: An initialized public key.
  *
  * This function generates a key pair (private key and public key) for the specified KEM algorithm using the provided
  * input key material (IKM). The IKM is used as a seed for the key generation process, allowing for deterministic key
@@ -1427,8 +1445,8 @@ int gnutls_hpke_set_ikme(gnutls_hpke_context_t ctx, const gnutls_datum_t *ikme)
  */
 int gnutls_hpke_generate_keypair(gnutls_hpke_kem_t kem,
 				 const gnutls_datum_t *ikm,
-				 gnutls_privkey_t *privkey,
-				 gnutls_pubkey_t *pubkey)
+				 gnutls_privkey_t privkey,
+				 gnutls_pubkey_t pubkey)
 {
 	int ret;
 	if (ikm == NULL || ikm->data == NULL || ikm->size == 0 ||

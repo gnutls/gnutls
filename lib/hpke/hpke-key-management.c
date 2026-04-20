@@ -147,7 +147,7 @@ static int extract_coordinates_from_pubkey_datum(const gnutls_ecc_curve_t curve,
 
 int _gnutls_hpke_datum_to_pubkey(const gnutls_ecc_curve_t curve,
 				 const gnutls_datum_t *datum,
-				 gnutls_pubkey_t *pk)
+				 gnutls_pubkey_t pubkey)
 {
 	int ret;
 
@@ -162,16 +162,9 @@ int _gnutls_hpke_datum_to_pubkey(const gnutls_ecc_curve_t curve,
 		return gnutls_assert_val(ret);
 	}
 
-	ret = gnutls_pubkey_init(pk);
-	if (ret < 0) {
-		return gnutls_assert_val(ret);
-	}
-
-	ret = gnutls_pubkey_import_ecc_raw(*pk, curve, &x, &y);
+	ret = gnutls_pubkey_import_ecc_raw(pubkey, curve, &x, &y);
 	if (ret < 0) {
 		gnutls_assert_val(ret);
-		gnutls_pubkey_deinit(*pk);
-		*pk = NULL;
 		return ret;
 	}
 
@@ -200,8 +193,8 @@ static void clamp_sk(const gnutls_hpke_kem_t kem, unsigned char *sk_buf)
 static int montgomery_curve_keypair_from_raw_privkey(
 	const gnutls_mac_algorithm_t mac, const gnutls_hpke_kem_t kem,
 	const gnutls_datum_t *dkp_prk, const gnutls_ecc_curve_t curve,
-	const gnutls_datum_t *suite_id, gnutls_privkey_t *privkey,
-	gnutls_pubkey_t *pubkey)
+	const gnutls_datum_t *suite_id, gnutls_privkey_t privkey,
+	gnutls_pubkey_t pubkey)
 {
 	int ret;
 	unsigned char
@@ -231,35 +224,18 @@ static int montgomery_curve_keypair_from_raw_privkey(
 	}
 
 	clamp_sk(kem, sk.data);
-	ret = gnutls_privkey_init(privkey);
+
+	ret = gnutls_privkey_import_ecc_raw(privkey, curve, NULL, NULL, &sk);
 	if (ret < 0) {
 		gnutls_assert_val(ret);
 		goto cleanup;
 	}
 
-	ret = gnutls_privkey_import_ecc_raw(*privkey, curve, NULL, NULL, &sk);
+	ret = gnutls_pubkey_import_privkey(pubkey, privkey, 0, 0);
 	if (ret < 0) {
 		gnutls_assert_val(ret);
-		goto error;
+		goto cleanup;
 	}
-
-	ret = gnutls_pubkey_init(pubkey);
-	if (ret < 0) {
-		gnutls_assert_val(ret);
-		goto error;
-	}
-
-	ret = gnutls_pubkey_import_privkey(*pubkey, *privkey, 0, 0);
-	if (ret < 0) {
-		gnutls_assert_val(ret);
-		goto error;
-	}
-
-	goto cleanup;
-
-error:
-	gnutls_privkey_deinit(*privkey);
-	gnutls_pubkey_deinit(*pubkey);
 
 cleanup:
 
@@ -311,8 +287,8 @@ static int be_lt(const unsigned char *a, const unsigned char *b, size_t len)
 static int prime_curve_keypair_from_raw_privkey(
 	const gnutls_mac_algorithm_t mac, const gnutls_hpke_kem_t kem,
 	const gnutls_datum_t *dkp_prk, const gnutls_ecc_curve_t curve,
-	const gnutls_datum_t *suite_id, gnutls_privkey_t *privkey,
-	gnutls_pubkey_t *pubkey)
+	const gnutls_datum_t *suite_id, gnutls_privkey_t privkey,
+	gnutls_pubkey_t pubkey)
 {
 	int ret;
 	unsigned char
@@ -365,39 +341,21 @@ static int prime_curve_keypair_from_raw_privkey(
 			continue;
 		}
 
-		ret = gnutls_privkey_init(privkey);
-		if (ret < 0) {
-			ret = gnutls_assert_val(ret);
-			goto cleanup;
-		}
-
-		ret = gnutls_privkey_import_ecc_raw(*privkey, curve, NULL, NULL,
+		ret = gnutls_privkey_import_ecc_raw(privkey, curve, NULL, NULL,
 						    &sk);
 		if (ret < 0) {
 			gnutls_assert_val(ret);
-			goto error;
+			goto cleanup;
 		}
 
-		ret = gnutls_pubkey_init(pubkey);
+		ret = gnutls_pubkey_import_privkey(pubkey, privkey, 0, 0);
 		if (ret < 0) {
 			gnutls_assert_val(ret);
-			goto error;
-		}
-
-		ret = gnutls_pubkey_import_privkey(*pubkey, *privkey, 0, 0);
-		if (ret < 0) {
-			gnutls_assert_val(ret);
-			goto error;
+			goto cleanup;
 		}
 
 		break;
 	}
-
-	goto cleanup;
-
-error:
-	gnutls_privkey_deinit(*privkey);
-	gnutls_pubkey_deinit(*pubkey);
 
 cleanup:
 	zeroize_key(sk.data, sk.size);
@@ -408,8 +366,8 @@ cleanup:
 
 int _gnutls_hpke_keypair_from_ikm(const gnutls_hpke_kem_t kem,
 				  const gnutls_datum_t *ikme,
-				  gnutls_privkey_t *privkey,
-				  gnutls_pubkey_t *pubkey)
+				  gnutls_privkey_t privkey,
+				  gnutls_pubkey_t pubkey)
 {
 	int ret;
 	unsigned char dkp_prk_buf[HPKE_MAX_HASH_SIZE] = { 0 };
@@ -466,8 +424,8 @@ cleanup:
 static int generate_new_keypair(const gnutls_ecc_curve_t curve,
 				const gnutls_hpke_kem_t kem,
 				const gnutls_pk_algorithm_t pk_algo,
-				gnutls_privkey_t *ephemeral_privkey,
-				gnutls_pubkey_t *ephemeral_pubkey)
+				gnutls_privkey_t ephemeral_privkey,
+				gnutls_pubkey_t ephemeral_pubkey)
 {
 	int ret;
 
@@ -478,21 +436,15 @@ static int generate_new_keypair(const gnutls_ecc_curve_t curve,
 		return ret;
 	}
 
-	ret = gnutls_privkey_generate(*ephemeral_privkey, pk_algo,
+	ret = gnutls_privkey_generate(ephemeral_privkey, pk_algo,
 				      GNUTLS_CURVE_TO_BITS(curve), 0);
 	if (ret < 0) {
 		gnutls_assert_val(ret);
 		return ret;
 	}
 
-	ret = gnutls_pubkey_init(ephemeral_pubkey);
-	if (ret < 0) {
-		gnutls_assert_val(ret);
-		return ret;
-	}
-
-	ret = gnutls_pubkey_import_privkey(*ephemeral_pubkey,
-					   *ephemeral_privkey, 0, 0);
+	ret = gnutls_pubkey_import_privkey(ephemeral_pubkey, ephemeral_privkey,
+					   0, 0);
 	if (ret < 0) {
 		gnutls_assert_val(ret);
 		return ret;
@@ -504,8 +456,8 @@ static int generate_new_keypair(const gnutls_ecc_curve_t curve,
 int _gnutls_hpke_generate_keypair(const gnutls_datum_t *ikme,
 				  const gnutls_hpke_kem_t kem,
 				  const gnutls_pubkey_t receiver_pubkey,
-				  gnutls_privkey_t *ephemeral_privkey,
-				  gnutls_pubkey_t *ephemeral_pubkey)
+				  gnutls_privkey_t ephemeral_privkey,
+				  gnutls_pubkey_t ephemeral_pubkey)
 {
 	int ret;
 	if (ikme == NULL) {
