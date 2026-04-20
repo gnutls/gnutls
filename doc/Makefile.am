@@ -241,7 +241,7 @@ MAINTAINERCLEANFILES =
 
 API_FILES=gnutls-api.texi socket-api.texi x509-api.texi pkcs12-api.texi \
 	tpm-api.texi pkcs11-api.texi abstract-api.texi compat-api.texi \
-	dtls-api.texi crypto-api.texi ocsp-api.texi tpm-api.texi dane-api.texi \
+	dtls-api.texi crypto-api.texi ocsp-api.texi dane-api.texi \
 	pkcs7-api.texi hpke-api.texi
 
 MAINTAINERCLEANFILES += stamp_enums stamp_functions functions enums

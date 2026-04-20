@@ -12,6 +12,7 @@ to the random number generation. For a low-level crypto API the usage of nettle
 * Symmetric algorithms::
 * Public key algorithms::
 * Cryptographic Message Syntax / PKCS7::
+* Hybrid Public Key Encryption::
 * Hash and MAC functions::
 * Random number generation::
 * Overriding algorithms::
@@ -137,6 +138,33 @@ in the structure are listed below.
 
 To append certificates, or CRLs in the structure the following functions are provided.
 @showfuncD{gnutls_pkcs7_set_crt_raw,gnutls_pkcs7_set_crt,gnutls_pkcs7_set_crl_raw,gnutls_pkcs7_set_crl}
+
+@node Hybrid Public Key Encryption
+@section Hybrid Public Key Encryption
+@cindex public key algorithms
+@cindex HPKE
+
+Hybrid Public Key Encryption (HPKE) is a flexible cryptographic
+protocol which enables to encrypt arbitrary data to a recipient, by
+combining key encapsulation mechanisms (KEM) and authenticated
+encryption with additional data (AEAD). It is standardized as RFC
+9180.
+
+In GnuTLS, the basic functions to initialize, deinitialize, and derive
+a key pair are listed below.
+@showfuncC{gnutls_hpke_init,gnutls_hpke_deinit,gnutls_hpke_derive_keypair}
+
+To encrypt data, each peer first needs to agree on a shared
+secret. This can be done using a given KEM algorithm, with the
+encapsulation and decapsulation operations.
+@showfuncB{gnutls_hpke_encap,gnutls_hpke_decap}
+
+Afterwards, data can be encrypted to a recipient using
+@funcref{gnutls_hpke_seal} and the recipient can decrypt it using
+@funcref{gnutls_hpke_open}. Applications can also export the keying
+material without actually encrypting or decrypting data, using
+@funcref{gnutls_hpke_export}.
+@showfuncC{gnutls_hpke_seal,gnutls_hpke_open,gnutls_hpke_export}
 
 @node Hash and MAC functions
 @section Hash and MAC functions
