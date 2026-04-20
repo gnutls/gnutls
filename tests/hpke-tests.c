@@ -117,29 +117,29 @@ static void test_hpke(const hpke_test_parameters_st *params)
 	gnutls_datum_t ciphertext_out = { NULL, 0 };
 	gnutls_datum_t exporter_out = { NULL, 0 };
 
-	ret = gnutls_hpke_context_init(&sender_ctx, params->mode,
-				       GNUTLS_HPKE_ROLE_SENDER, params->kem,
-				       params->kdf, params->aead);
+	ret = gnutls_hpke_init(&sender_ctx, params->mode,
+			       GNUTLS_HPKE_ROLE_SENDER, params->kem,
+			       params->kdf, params->aead);
 	if (ret < 0) {
-		fail("gnutls_hpke_context_init (mode: %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
+		fail("gnutls_hpke_init (mode: %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
 		     params->mode, params->kem, params->kdf, params->aead,
 		     gnutls_strerror(ret));
 		goto cleanup;
 	}
 
-	ret = gnutls_hpke_context_set_ikme(sender_ctx, &params->ikmE);
+	ret = gnutls_hpke_set_ikme(sender_ctx, &params->ikmE);
 	if (ret < 0) {
-		fail("gnutls_hpke_context_set_ikme (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
+		fail("gnutls_hpke_set_ikme (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
 		     params->mode, params->kem, params->kdf, params->aead,
 		     gnutls_strerror(ret));
 		goto cleanup;
 	}
 
 	if (params->psk != NULL && params->psk_id != NULL) {
-		ret = gnutls_hpke_context_set_psk(sender_ctx, params->psk,
-						  params->psk_id);
+		ret = gnutls_hpke_set_psk(sender_ctx, params->psk,
+					  params->psk_id);
 		if (ret < 0) {
-			fail("gnutls_hpke_context_set_psk (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
+			fail("gnutls_hpke_set_psk (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
 			     params->mode, params->kem, params->kdf,
 			     params->aead, gnutls_strerror(ret));
 			goto cleanup;
@@ -156,9 +156,9 @@ static void test_hpke(const hpke_test_parameters_st *params)
 			goto cleanup;
 		}
 
-		ret = gnutls_hpke_context_set_sender_privkey(sender_ctx, skS);
+		ret = gnutls_hpke_set_sender_privkey(sender_ctx, skS);
 		if (ret < 0) {
-			fail("gnutls_hpke_context_set_sender_privkey (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
+			fail("gnutls_hpke_set_sender_privkey (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
 			     params->mode, params->kem, params->kdf,
 			     params->aead, gnutls_strerror(ret));
 			goto cleanup;
@@ -189,9 +189,9 @@ static void test_hpke(const hpke_test_parameters_st *params)
 		goto cleanup;
 	}
 
-	ret = gnutls_hpke_context_init(&receiver_ctx, params->mode,
-				       GNUTLS_HPKE_ROLE_RECEIVER, params->kem,
-				       params->kdf, params->aead);
+	ret = gnutls_hpke_init(&receiver_ctx, params->mode,
+			       GNUTLS_HPKE_ROLE_RECEIVER, params->kem,
+			       params->kdf, params->aead);
 	if (ret < 0) {
 		fail("gnutls_context_init (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
 		     params->mode, params->kem, params->kdf, params->aead,
@@ -200,10 +200,10 @@ static void test_hpke(const hpke_test_parameters_st *params)
 	}
 
 	if (params->psk != NULL && params->psk_id != NULL) {
-		ret = gnutls_hpke_context_set_psk(receiver_ctx, params->psk,
-						  params->psk_id);
+		ret = gnutls_hpke_set_psk(receiver_ctx, params->psk,
+					  params->psk_id);
 		if (ret < 0) {
-			fail("gnutls_hpke_context_set_psk (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
+			fail("gnutls_hpke_set_psk (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
 			     params->mode, params->kem, params->kdf,
 			     params->aead, gnutls_strerror(ret));
 			goto cleanup;
@@ -211,9 +211,9 @@ static void test_hpke(const hpke_test_parameters_st *params)
 	}
 
 	if (params->ikmS != NULL) {
-		ret = gnutls_hpke_context_set_sender_pubkey(receiver_ctx, pkS);
+		ret = gnutls_hpke_set_sender_pubkey(receiver_ctx, pkS);
 		if (ret < 0) {
-			fail("gnutls_hpke_context_set_sender_pubkey (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
+			fail("gnutls_hpke_set_sender_pubkey (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
 			     params->mode, params->kem, params->kdf,
 			     params->aead, gnutls_strerror(ret));
 			goto cleanup;
@@ -322,8 +322,8 @@ cleanup:
 	gnutls_pubkey_deinit(pkR);
 	gnutls_privkey_deinit(skS);
 	gnutls_pubkey_deinit(pkS);
-	gnutls_hpke_context_deinit(sender_ctx);
-	gnutls_hpke_context_deinit(receiver_ctx);
+	gnutls_hpke_deinit(sender_ctx);
+	gnutls_hpke_deinit(receiver_ctx);
 
 	if (enc.data != NULL) {
 		gnutls_free(enc.data);

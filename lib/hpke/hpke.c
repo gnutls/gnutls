@@ -658,7 +658,7 @@ cleanup:
 }
 
 /**
- * gnutls_hpke_context_init:
+ * gnutls_hpke_init:
  * @ctx: A pointer to the HPKE context to initialize.
  * @mode: The HPKE mode to use (Base, PSK, Auth, or AuthPSK).
  * @role: The role of the context (Sender or Receiver).
@@ -667,16 +667,13 @@ cleanup:
  * @aead: The AEAD algorithm to use (e.g., AES-128-GCM).
  * This function initializes the HPKE context with the specified parameters.
  * It allocates memory for the context and sets the initial values for the fields based on the provided parameters.
- * The context must be deinitialized using gnutls_hpke_context_deinit() when it
+ * The context must be deinitialized using gnutls_hpke_deinit() when it
  * is no longer needed to free any allocated resources and securely erase sensitive information.
  * Returns: 0 on success, or a negative error code on failure
  */
-int gnutls_hpke_context_init(gnutls_hpke_context_t *ctx,
-			     const gnutls_hpke_mode_t mode,
-			     const gnutls_hpke_role_t role,
-			     const gnutls_hpke_kem_t kem,
-			     const gnutls_hpke_kdf_t kdf,
-			     const gnutls_hpke_aead_t aead)
+int gnutls_hpke_init(gnutls_hpke_context_t *ctx, const gnutls_hpke_mode_t mode,
+		     const gnutls_hpke_role_t role, const gnutls_hpke_kem_t kem,
+		     const gnutls_hpke_kdf_t kdf, const gnutls_hpke_aead_t aead)
 {
 	if (ctx == NULL) {
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -714,7 +711,7 @@ int gnutls_hpke_context_init(gnutls_hpke_context_t *ctx,
 }
 
 /**
- * gnutls_hpke_context_deinit:
+ * gnutls_hpke_deinit:
  * @ctx: The HPKE context to deinitialize.
  *
  * This function deinitializes the HPKE context and securely erases any
@@ -723,7 +720,7 @@ int gnutls_hpke_context_init(gnutls_hpke_context_t *ctx,
  * to prevent sensitive data from lingering in memory.
  * Returns: 0 on success, or a negative error code on failure.
  */
-int gnutls_hpke_context_deinit(gnutls_hpke_context_t ctx)
+int gnutls_hpke_deinit(gnutls_hpke_context_t ctx)
 {
 	if (ctx == NULL) {
 		return 0;
@@ -756,21 +753,20 @@ int gnutls_hpke_context_deinit(gnutls_hpke_context_t ctx)
 }
 
 /**
- * gnutls_hpke_context_set_psk:
+ * gnutls_hpke_set_psk:
  * @ctx: The HPKE context to set the PSK for.
  * @psk: A pointer to a gnutls_datum_t structure containing the PSK value and its size.
  * @psk_id: A pointer to a gnutls_datum_t structure containing the PSK identifier and its size.
  *
- * This function sets the PSK and its identifier in the HPKE context. 
+ * This function sets the PSK and its identifier in the HPKE context.
  * It securely erases any existing PSK and PSK identifier in the context before setting the new values.
  * The function checks that the provided PSK and PSK identifier are valid and that the context is in
  * a mode that supports PSKs.
  *
  * It returns 0 on success, or a negative error code on failure.
  */
-int gnutls_hpke_context_set_psk(gnutls_hpke_context_t ctx,
-				const gnutls_datum_t *psk,
-				const gnutls_datum_t *psk_id)
+int gnutls_hpke_set_psk(gnutls_hpke_context_t ctx, const gnutls_datum_t *psk,
+			const gnutls_datum_t *psk_id)
 {
 	if (ctx == NULL || psk == NULL || psk_id == NULL) {
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -849,7 +845,7 @@ error:
 }
 
 /**
- * gnutls_hpke_context_set_sender_privkey:
+ * gnutls_hpke_set_sender_privkey:
  * @ctx: The HPKE context to set the sender's private key for.
  * @sender_privkey: The sender's private key to set in the context.
  *
@@ -862,8 +858,8 @@ error:
  *
  * It returns 0 on success, or a negative error code on failure.
  */
-int gnutls_hpke_context_set_sender_privkey(gnutls_hpke_context_t ctx,
-					   gnutls_privkey_t sender_privkey)
+int gnutls_hpke_set_sender_privkey(gnutls_hpke_context_t ctx,
+				   gnutls_privkey_t sender_privkey)
 {
 	if (ctx == NULL || sender_privkey == NULL) {
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -884,7 +880,7 @@ int gnutls_hpke_context_set_sender_privkey(gnutls_hpke_context_t ctx,
 }
 
 /**
- * gnutls_hpke_context_set_sender_pubkey:
+ * gnutls_hpke_set_sender_pubkey:
  * @ctx: The HPKE context to set the sender's public key for.
  * @sender_pubkey: The sender's public key to set in the context.
  *
@@ -897,8 +893,8 @@ int gnutls_hpke_context_set_sender_privkey(gnutls_hpke_context_t ctx,
  *
  * It returns 0 on success, or a negative error code on failure.
  */
-int gnutls_hpke_context_set_sender_pubkey(gnutls_hpke_context_t ctx,
-					  gnutls_pubkey_t sender_pubkey)
+int gnutls_hpke_set_sender_pubkey(gnutls_hpke_context_t ctx,
+				  gnutls_pubkey_t sender_pubkey)
 {
 	if (ctx == NULL || sender_pubkey == NULL) {
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -919,7 +915,7 @@ int gnutls_hpke_context_set_sender_pubkey(gnutls_hpke_context_t ctx,
 }
 
 /**
- * gnutls_hpke_context_get_enc_size:
+ * gnutls_hpke_get_enc_size:
  * @ctx: The HPKE context to get the encapsulated key size for.
  *
  * This function returns the size of the encapsulated key (enc) that will be generated by gnutls_hpke_encap() for the
@@ -929,7 +925,7 @@ int gnutls_hpke_context_set_sender_pubkey(gnutls_hpke_context_t ctx,
  * It returns the size of the encapsulated key in bytes, or 0 if the context is NULL or if there is an error determining
  * the size.
  */
-size_t gnutls_hpke_context_get_enc_size(const gnutls_hpke_context_t ctx)
+size_t gnutls_hpke_get_enc_size(const gnutls_hpke_context_t ctx)
 {
 	if (ctx == NULL) {
 		return 0;
@@ -1364,7 +1360,7 @@ cleanup:
 }
 
 /**
- * gnutls_hpke_context_set_ikme:
+ * gnutls_hpke_set_ikme:
  * @ctx: The HPKE context to set the IKME for.
  * @ikme: A pointer to a gnutls_datum_t structure containing the IKME value and its size.
  *
@@ -1374,8 +1370,7 @@ cleanup:
  *
  * It returns 0 on success, or a negative error code on failure.
  */
-int gnutls_hpke_context_set_ikme(gnutls_hpke_context_t ctx,
-				 const gnutls_datum_t *ikme)
+int gnutls_hpke_set_ikme(gnutls_hpke_context_t ctx, const gnutls_datum_t *ikme)
 {
 	if (ctx == NULL || ikme == NULL || ikme->data == NULL) {
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -1498,7 +1493,7 @@ int gnutls_hpke_set_seq(gnutls_hpke_context_t ctx, uint64_t seq)
  * gnutls_hpke_export:
  * @ctx: The HPKE context to use for exporting the secret.
  * @exporter_context: A pointer to a gnutls_datum_t structure containing the application-specific context to be included
- * in the export. 
+ * in the export.
  * @L: The length in bytes of the secret to be exported. This should be a positive integer that does not exceed the
  * maximum allowed size for HPKE exports.
  * @secret: A pointer to a gnutls_datum_t structure where the exported secret will be stored. The function will allocate

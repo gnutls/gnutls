@@ -16,9 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
-
  * along with this program.  If not, see <https://www.gnu.org/licenses/>
-
  *
  */
 
@@ -104,26 +102,23 @@ typedef enum gnutls_hpke_role_t {
 
 typedef struct gnutls_hpke_context_st *gnutls_hpke_context_t;
 
-int gnutls_hpke_context_init(gnutls_hpke_context_t *ctx,
-			     const gnutls_hpke_mode_t mode,
-			     const gnutls_hpke_role_t role,
-			     const gnutls_hpke_kem_t kem,
-			     const gnutls_hpke_kdf_t kdf,
-			     const gnutls_hpke_aead_t aead);
+int gnutls_hpke_init(gnutls_hpke_context_t *ctx, const gnutls_hpke_mode_t mode,
+		     const gnutls_hpke_role_t role, const gnutls_hpke_kem_t kem,
+		     const gnutls_hpke_kdf_t kdf,
+		     const gnutls_hpke_aead_t aead);
 
-int gnutls_hpke_context_deinit(gnutls_hpke_context_t ctx);
+int gnutls_hpke_deinit(gnutls_hpke_context_t ctx);
 
-int gnutls_hpke_context_set_psk(gnutls_hpke_context_t ctx,
-				const gnutls_datum_t *psk,
-				const gnutls_datum_t *psk_id);
+int gnutls_hpke_set_psk(gnutls_hpke_context_t ctx, const gnutls_datum_t *psk,
+			const gnutls_datum_t *psk_id);
 
-int gnutls_hpke_context_set_sender_privkey(gnutls_hpke_context_t ctx,
-					   gnutls_privkey_t sender_privkey);
+int gnutls_hpke_set_sender_privkey(gnutls_hpke_context_t ctx,
+				   gnutls_privkey_t sender_privkey);
 
-int gnutls_hpke_context_set_sender_pubkey(gnutls_hpke_context_t ctx,
-					  gnutls_pubkey_t sender_pubkey);
+int gnutls_hpke_set_sender_pubkey(gnutls_hpke_context_t ctx,
+				  gnutls_pubkey_t sender_pubkey);
 
-size_t gnutls_hpke_context_get_enc_size(const gnutls_hpke_context_t ctx);
+size_t gnutls_hpke_get_enc_size(const gnutls_hpke_context_t ctx);
 
 int gnutls_hpke_encap(gnutls_hpke_context_t ctx, const gnutls_datum_t *info,
 		      gnutls_datum_t *enc, gnutls_pubkey_t receiver_pubkey);
@@ -140,8 +135,7 @@ int gnutls_hpke_open(gnutls_hpke_context_t ctx, const gnutls_datum_t *aad,
 		     const gnutls_datum_t *ciphertext,
 		     gnutls_datum_t *plaintext);
 
-int gnutls_hpke_context_set_ikme(gnutls_hpke_context_t ctx,
-				 const gnutls_datum_t *ikme);
+int gnutls_hpke_set_ikme(gnutls_hpke_context_t ctx, const gnutls_datum_t *ikme);
 
 int gnutls_hpke_generate_keypair(const gnutls_hpke_kem_t kem,
 				 const gnutls_datum_t *ikm,
@@ -159,4 +153,4 @@ int gnutls_hpke_export(gnutls_hpke_context_t ctx,
 }
 #endif
 
-#endif // GNUTLS_HPKE_H
+#endif /* GNUTLS_HPKE_H */
