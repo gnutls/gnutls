@@ -114,15 +114,16 @@ int gnutls_hpke_set_psk(gnutls_hpke_context_t ctx, const gnutls_datum_t *psk,
 			const gnutls_datum_t *psk_id);
 
 int gnutls_hpke_set_sender_privkey(gnutls_hpke_context_t ctx,
-				   gnutls_privkey_t sender_privkey);
+				   const gnutls_privkey_t sender_privkey);
 
 int gnutls_hpke_set_sender_pubkey(gnutls_hpke_context_t ctx,
-				  gnutls_pubkey_t sender_pubkey);
+				  const gnutls_pubkey_t sender_pubkey);
 
 size_t gnutls_hpke_get_enc_size(const gnutls_hpke_context_t ctx);
 
 int gnutls_hpke_encap(gnutls_hpke_context_t ctx, const gnutls_datum_t *info,
-		      gnutls_datum_t *enc, gnutls_pubkey_t receiver_pubkey);
+		      gnutls_datum_t *enc,
+		      const gnutls_pubkey_t receiver_pubkey);
 
 int gnutls_hpke_seal(gnutls_hpke_context_t ctx, const gnutls_datum_t *aad,
 		     const gnutls_datum_t *plaintext,
@@ -130,7 +131,7 @@ int gnutls_hpke_seal(gnutls_hpke_context_t ctx, const gnutls_datum_t *aad,
 
 int gnutls_hpke_decap(gnutls_hpke_context_t ctx, const gnutls_datum_t *info,
 		      const gnutls_datum_t *enc,
-		      gnutls_privkey_t receiver_privkey);
+		      const gnutls_privkey_t receiver_privkey);
 
 int gnutls_hpke_open(gnutls_hpke_context_t ctx, const gnutls_datum_t *aad,
 		     const gnutls_datum_t *ciphertext,

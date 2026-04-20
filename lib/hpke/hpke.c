@@ -961,7 +961,8 @@ size_t gnutls_hpke_get_enc_size(const gnutls_hpke_context_t ctx)
  * It returns 0 on success, or a negative error code on failure.
  */
 int gnutls_hpke_encap(gnutls_hpke_context_t ctx, const gnutls_datum_t *info,
-		      gnutls_datum_t *enc, gnutls_pubkey_t receiver_pubkey)
+		      gnutls_datum_t *enc,
+		      const gnutls_pubkey_t receiver_pubkey)
 {
 	int ret;
 	if (ctx == NULL || enc == NULL || receiver_pubkey == NULL) {
@@ -1180,7 +1181,7 @@ cleanup:
  */
 int gnutls_hpke_decap(gnutls_hpke_context_t ctx, const gnutls_datum_t *info,
 		      const gnutls_datum_t *enc,
-		      gnutls_privkey_t receiver_privkey)
+		      const gnutls_privkey_t receiver_privkey)
 {
 	int ret;
 	if (ctx == NULL || enc == NULL || receiver_privkey == NULL) {
