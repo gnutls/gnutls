@@ -53,8 +53,4 @@ int _gnutls_hpke_generate_keypair(const gnutls_datum_t *ikme,
 				  gnutls_privkey_t ephemeral_privkey,
 				  gnutls_pubkey_t ephemeral_pubkey);
 
-int _gnutls_hpke_privkey_clone(gnutls_privkey_t src, gnutls_privkey_t *dst);
-
-int _gnutls_hpke_pubkey_clone(gnutls_pubkey_t src, gnutls_pubkey_t *dst);
-
 #endif /* HPKE_KEY_MANAGEMENT_HELPER_H */

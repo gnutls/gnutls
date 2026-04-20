@@ -61,13 +61,7 @@ struct gnutls_hpke_context_st {
 	gnutls_hpke_kdf_t kdf;
 	gnutls_hpke_aead_t aead;
 
-	gnutls_datum_t *psk;
-	gnutls_datum_t *psk_id;
-
 	gnutls_datum_t *ikme;
-
-	gnutls_pubkey_t sender_pubkey;
-	gnutls_privkey_t sender_privkey;
 
 	gnutls_datum_t key;
 	gnutls_datum_t base_nonce;
@@ -291,6 +285,7 @@ cleanup:
 
 static int dhkem_encap(const gnutls_hpke_context_t ctx,
 		       const gnutls_pubkey_t receiver_pubkey,
+		       const gnutls_privkey_t sender_privkey,
 		       gnutls_datum_t *enc, gnutls_datum_t *shared_secret)
 {
 	int ret = 0;
@@ -338,7 +333,7 @@ static int dhkem_encap(const gnutls_hpke_context_t ctx,
 	memcpy(enc->data, pubkey_raw.data, pubkey_raw.size);
 
 	ret = encap_get_dh(ctx->mode, receiver_pubkey, ephemeral_privkey,
-			   ctx->sender_privkey, &dh);
+			   sender_privkey, &dh);
 	if (ret < 0) {
 		ret = gnutls_assert_val(ret);
 		goto error;
@@ -351,7 +346,7 @@ static int dhkem_encap(const gnutls_hpke_context_t ctx,
 			goto error;
 		}
 		ret = gnutls_pubkey_import_privkey(sender_pubkey,
-						   ctx->sender_privkey, 0, 0);
+						   sender_privkey, 0, 0);
 		if (ret < 0) {
 			ret = gnutls_assert_val(ret);
 			goto error;
@@ -509,8 +504,10 @@ cleanup:
 	return ret;
 }
 
-static int schedule(const gnutls_datum_t *shared_secret,
-		    const gnutls_datum_t *info, gnutls_hpke_context_t ctx)
+static int schedule(gnutls_hpke_context_t ctx,
+		    const gnutls_datum_t *shared_secret,
+		    const gnutls_datum_t *info, const gnutls_datum_t *psk,
+		    const gnutls_datum_t *psk_id)
 {
 	int ret = 0;
 
@@ -553,7 +550,7 @@ static int schedule(const gnutls_datum_t *shared_secret,
 						   ctx->aead, suite_id_buf);
 
 	ret = _gnutls_hpke_labeled_extract(mac, &suite_id, &salt,
-					   &psk_id_hash_label, ctx->psk_id,
+					   &psk_id_hash_label, psk_id,
 					   &psk_id_hash);
 	if (ret < 0) {
 		gnutls_assert_val(ret);
@@ -571,8 +568,7 @@ static int schedule(const gnutls_datum_t *shared_secret,
 		ctx->mode, &psk_id_hash, &info_hash, &key_schedule_context);
 
 	ret = _gnutls_hpke_labeled_extract(mac, &suite_id, shared_secret,
-					   &secret_hash_label, ctx->psk,
-					   &secret);
+					   &secret_hash_label, psk, &secret);
 	if (ret < 0) {
 		gnutls_assert_val(ret);
 		goto cleanup;
@@ -710,13 +706,7 @@ int gnutls_hpke_init(gnutls_hpke_context_t *ctx, gnutls_hpke_mode_t mode,
 	(*ctx)->kdf = kdf;
 	(*ctx)->aead = aead;
 
-	(*ctx)->psk = NULL;
-	(*ctx)->psk_id = NULL;
-
 	(*ctx)->ikme = NULL;
-
-	(*ctx)->sender_pubkey = NULL;
-	(*ctx)->sender_privkey = NULL;
 
 	(*ctx)->key.data = NULL;
 	(*ctx)->key.size = 0;
@@ -745,22 +735,9 @@ int gnutls_hpke_deinit(gnutls_hpke_context_t ctx)
 		return 0;
 	}
 
-	if (ctx->psk != NULL) {
-		_gnutls_free_key_datum(ctx->psk);
-		gnutls_free(ctx->psk);
-	}
-
-	if (ctx->psk_id != NULL) {
-		_gnutls_free_key_datum(ctx->psk_id);
-		gnutls_free(ctx->psk_id);
-	}
-
 	_gnutls_free_key_datum(&ctx->key);
 	_gnutls_free_key_datum(&ctx->base_nonce);
 	_gnutls_free_key_datum(&ctx->exporter_secret);
-
-	gnutls_pubkey_deinit(ctx->sender_pubkey);
-	gnutls_privkey_deinit(ctx->sender_privkey);
 
 	if (ctx->ikme != NULL) {
 		_gnutls_free_key_datum(ctx->ikme);
@@ -769,168 +746,6 @@ int gnutls_hpke_deinit(gnutls_hpke_context_t ctx)
 
 	gnutls_free(ctx);
 	return 0;
-}
-
-/**
- * gnutls_hpke_set_psk:
- * @ctx: The HPKE context to set the PSK for.
- * @psk: A pointer to a gnutls_datum_t structure containing the PSK value and its size.
- * @psk_id: A pointer to a gnutls_datum_t structure containing the PSK identifier and its size.
- *
- * This function sets the PSK and its identifier in the HPKE context.
- * It securely erases any existing PSK and PSK identifier in the context before setting the new values.
- * The function checks that the provided PSK and PSK identifier are valid and that the context is in
- * a mode that supports PSKs.
- *
- * It returns 0 on success, or a negative error code on failure.
- */
-int gnutls_hpke_set_psk(gnutls_hpke_context_t ctx, const gnutls_datum_t *psk,
-			const gnutls_datum_t *psk_id)
-{
-	if (ctx == NULL || psk == NULL || psk_id == NULL) {
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-	}
-
-	if (!is_psk_mode(ctx->mode)) {
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-	}
-
-	if (psk->size < HPKE_PSK_MIN_SIZE ||
-	    psk->size > HPKE_MAX_PARAMETER_SIZE) {
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-	}
-
-	if (psk_id->size == 0 || psk_id->size > HPKE_MAX_PARAMETER_SIZE) {
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-	}
-
-	int ret = 0;
-
-	if (ctx->psk != NULL) {
-		_gnutls_free_key_datum(ctx->psk);
-		gnutls_free(ctx->psk);
-		ctx->psk = NULL;
-	}
-
-	if (ctx->psk_id != NULL) {
-		_gnutls_free_key_datum(ctx->psk_id);
-		gnutls_free(ctx->psk_id);
-		ctx->psk_id = NULL;
-	}
-
-	ctx->psk = gnutls_malloc(sizeof(*ctx->psk));
-	if (ctx->psk == NULL) {
-		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-		goto error;
-	}
-
-	ctx->psk_id = gnutls_malloc(sizeof(*ctx->psk_id));
-	if (ctx->psk_id == NULL) {
-		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-		goto error;
-	}
-
-	ctx->psk->size = psk->size;
-	ctx->psk->data = gnutls_malloc(ctx->psk->size);
-	if (ctx->psk->data == NULL) {
-		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-		goto error;
-	}
-	memcpy(ctx->psk->data, psk->data, psk->size);
-
-	ctx->psk_id->size = psk_id->size;
-	ctx->psk_id->data = gnutls_malloc(ctx->psk_id->size);
-	if (ctx->psk_id->data == NULL) {
-		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-		goto error;
-	}
-	memcpy(ctx->psk_id->data, psk_id->data, psk_id->size);
-
-	return ret;
-error:
-	if (ctx->psk != NULL) {
-		_gnutls_free_key_datum(ctx->psk);
-		gnutls_free(ctx->psk);
-		ctx->psk = NULL;
-	}
-
-	if (ctx->psk_id != NULL) {
-		_gnutls_free_key_datum(ctx->psk_id);
-		gnutls_free(ctx->psk_id);
-		ctx->psk_id = NULL;
-	}
-
-	return ret;
-}
-
-/**
- * gnutls_hpke_set_sender_privkey:
- * @ctx: The HPKE context to set the sender's private key for.
- * @sender_privkey: The sender's private key to set in the context.
- *
- * This function should be used by the sender in authenticated modes (Auth and AuthPSK) to set their private key in the
- * HPKE context.
- *
- * This function sets the sender's private key in the HPKE context. It securely erases any existing sender's private key
- * in the context before setting the new value. The function checks that the provided sender's private key is valid and
- * that the context is in a mode that supports authentication and that the role of the context is Sender.
- *
- * It returns 0 on success, or a negative error code on failure.
- */
-int gnutls_hpke_set_sender_privkey(gnutls_hpke_context_t ctx,
-				   gnutls_privkey_t sender_privkey)
-{
-	if (ctx == NULL || sender_privkey == NULL) {
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-	}
-
-	if (!is_auth_mode(ctx->mode)) {
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-	}
-
-	if (ctx->role != GNUTLS_HPKE_ROLE_SENDER) {
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-	}
-
-	gnutls_privkey_deinit(ctx->sender_privkey);
-	ctx->sender_privkey = NULL;
-
-	return _gnutls_hpke_privkey_clone(sender_privkey, &ctx->sender_privkey);
-}
-
-/**
- * gnutls_hpke_set_sender_pubkey:
- * @ctx: The HPKE context to set the sender's public key for.
- * @sender_pubkey: The sender's public key to set in the context.
- *
- * This function should be used by the receiver in authenticated modes (Auth and AuthPSK) to set the sender's public key
- * in the HPKE context.
- *
- * This function sets the sender's public key in the HPKE context. It securely erases any existing sender's public key
- * in the context before setting the new value. The function checks that the provided sender's public key is valid and
- * that the context is in a mode that supports authentication and that the role of the context is Receiver.
- *
- * It returns 0 on success, or a negative error code on failure.
- */
-int gnutls_hpke_set_sender_pubkey(gnutls_hpke_context_t ctx,
-				  gnutls_pubkey_t sender_pubkey)
-{
-	if (ctx == NULL || sender_pubkey == NULL) {
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-	}
-
-	if (!is_auth_mode(ctx->mode)) {
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-	}
-
-	if (ctx->role != GNUTLS_HPKE_ROLE_RECEIVER) {
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-	}
-
-	gnutls_pubkey_deinit(ctx->sender_pubkey);
-	ctx->sender_pubkey = NULL;
-
-	return _gnutls_hpke_pubkey_clone(sender_pubkey, &ctx->sender_pubkey);
 }
 
 /**
@@ -968,6 +783,9 @@ size_t gnutls_hpke_get_enc_size(const gnutls_hpke_context_t ctx)
  * no longer needed.
  * @receiver_pubkey: The receiver's public key to use for encapsulation. This must be a valid public key that is
  * compatible with the KEM algorithm specified in the HPKE context.
+ * @sender_privkey: The sender's private key needed for AuthEncap operation (optional).
+ * @psk: The pre-shared key (optional).
+ * @psk_id: The pre-shared key identifier (optional).
  *
  * This function performs the encapsulation operation of HPKE. It generates an encapsulated key (enc) that can be sent
  * to the receiver, who can then use it to derive the shared secret. The function checks that the context is properly
@@ -980,7 +798,9 @@ size_t gnutls_hpke_get_enc_size(const gnutls_hpke_context_t ctx)
  */
 int gnutls_hpke_encap(gnutls_hpke_context_t ctx, const gnutls_datum_t *info,
 		      gnutls_datum_t *enc,
-		      const gnutls_pubkey_t receiver_pubkey)
+		      const gnutls_pubkey_t receiver_pubkey,
+		      const gnutls_privkey_t sender_privkey,
+		      const gnutls_datum_t *psk, const gnutls_datum_t *psk_id)
 {
 	int ret;
 	if (ctx == NULL || enc == NULL || receiver_pubkey == NULL) {
@@ -996,18 +816,26 @@ int gnutls_hpke_encap(gnutls_hpke_context_t ctx, const gnutls_datum_t *info,
 	}
 
 	if (is_auth_mode(ctx->mode)) {
-		if (ctx->sender_privkey == NULL) {
+		if (sender_privkey == NULL) {
 			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 		}
 
-		ret = validate_privkey_for_kem(ctx->sender_privkey, ctx->kem);
+		ret = validate_privkey_for_kem(sender_privkey, ctx->kem);
 		if (ret < 0) {
 			return gnutls_assert_val(ret);
 		}
 	}
 
 	if (is_psk_mode(ctx->mode)) {
-		if (ctx->psk == NULL || ctx->psk_id == NULL) {
+		if (psk == NULL || psk_id == NULL) {
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		}
+		if (psk->size < HPKE_PSK_MIN_SIZE ||
+		    psk->size > HPKE_MAX_PARAMETER_SIZE) {
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		}
+		if (psk_id->size == 0 ||
+		    psk_id->size > HPKE_MAX_PARAMETER_SIZE) {
 			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 		}
 	}
@@ -1026,7 +854,8 @@ int gnutls_hpke_encap(gnutls_hpke_context_t ctx, const gnutls_datum_t *info,
 	gnutls_datum_t shared_secret = { shared_secret_buf, 0 };
 
 	if (_gnutls_is_kem_dh(ctx->kem)) {
-		ret = dhkem_encap(ctx, receiver_pubkey, enc, &shared_secret);
+		ret = dhkem_encap(ctx, receiver_pubkey, sender_privkey, enc,
+				  &shared_secret);
 		if (ret < 0) {
 			gnutls_assert_val(ret);
 			goto error;
@@ -1036,7 +865,7 @@ int gnutls_hpke_encap(gnutls_hpke_context_t ctx, const gnutls_datum_t *info,
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
 
-	ret = schedule(&shared_secret, info, ctx);
+	ret = schedule(ctx, &shared_secret, info, psk, psk_id);
 	if (ret < 0) {
 		gnutls_assert_val(ret);
 		goto error;
@@ -1187,6 +1016,9 @@ cleanup:
  * @receiver_privkey: The receiver's private key to use for decapsulation. This must be a valid private key that is
  * compatible with the KEM algorithm specified in the HPKE context and that corresponds to the receiver's public key used
  * during encapsulation.
+ * @sender_pubkey: The sender's public key for AuthDecap operation (optional).
+ * @psk: The pre-shared key (optional).
+ * @psk_id: The pre-shared key identifier (optional).
  *
  * This function performs the decapsulation operation of HPKE. It takes the encapsulated key (enc) received from the
  * sender and uses it along with the receiver's private key to derive the shared secret. It then uses this shared secret
@@ -1199,7 +1031,9 @@ cleanup:
  */
 int gnutls_hpke_decap(gnutls_hpke_context_t ctx, const gnutls_datum_t *info,
 		      const gnutls_datum_t *enc,
-		      const gnutls_privkey_t receiver_privkey)
+		      const gnutls_privkey_t receiver_privkey,
+		      const gnutls_pubkey_t sender_pubkey,
+		      const gnutls_datum_t *psk, const gnutls_datum_t *psk_id)
 {
 	int ret;
 	if (ctx == NULL || enc == NULL || receiver_privkey == NULL) {
@@ -1215,18 +1049,26 @@ int gnutls_hpke_decap(gnutls_hpke_context_t ctx, const gnutls_datum_t *info,
 	}
 
 	if (is_auth_mode(ctx->mode)) {
-		if (ctx->sender_pubkey == NULL) {
+		if (sender_pubkey == NULL) {
 			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 		}
 
-		ret = validate_pubkey_for_kem(ctx->sender_pubkey, ctx->kem);
+		ret = validate_pubkey_for_kem(sender_pubkey, ctx->kem);
 		if (ret < 0) {
 			return gnutls_assert_val(ret);
 		}
 	}
 
 	if (is_psk_mode(ctx->mode)) {
-		if (ctx->psk == NULL || ctx->psk_id == NULL) {
+		if (psk == NULL || psk_id == NULL) {
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		}
+		if (psk->size < HPKE_PSK_MIN_SIZE ||
+		    psk->size > HPKE_MAX_PARAMETER_SIZE) {
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		}
+		if (psk_id->size == 0 ||
+		    psk_id->size > HPKE_MAX_PARAMETER_SIZE) {
 			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 		}
 	}
@@ -1246,7 +1088,7 @@ int gnutls_hpke_decap(gnutls_hpke_context_t ctx, const gnutls_datum_t *info,
 
 	if (_gnutls_is_kem_dh(ctx->kem)) {
 		ret = dhkem_decap(ctx->kem, ctx->kdf, ctx->mode,
-				  receiver_privkey, ctx->sender_pubkey, enc,
+				  receiver_privkey, sender_pubkey, enc,
 				  &shared_secret);
 		if (ret < 0) {
 			gnutls_assert_val(ret);
@@ -1258,7 +1100,7 @@ int gnutls_hpke_decap(gnutls_hpke_context_t ctx, const gnutls_datum_t *info,
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
 
-	ret = schedule(&shared_secret, info, ctx);
+	ret = schedule(ctx, &shared_secret, info, psk, psk_id);
 	if (ret < 0) {
 		gnutls_assert_val(ret);
 		goto cleanup;

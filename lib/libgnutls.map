@@ -1472,9 +1472,6 @@ GNUTLS_3_8_13
     gnutls_hpke_decap;
     gnutls_hpke_init;
     gnutls_hpke_deinit;
-    gnutls_hpke_set_psk;
-    gnutls_hpke_set_sender_privkey;
-    gnutls_hpke_set_sender_pubkey;
     gnutls_hpke_get_enc_size;
     gnutls_hpke_seal;
     gnutls_hpke_open;

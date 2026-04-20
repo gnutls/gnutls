@@ -133,16 +133,6 @@ static void test_hpke(const hpke_test_parameters_st *params)
 		     gnutls_strerror(ret));
 	}
 
-	if (params->psk != NULL && params->psk_id != NULL) {
-		ret = gnutls_hpke_set_psk(sender_ctx, params->psk,
-					  params->psk_id);
-		if (ret < 0) {
-			fail("gnutls_hpke_set_psk (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
-			     params->mode, params->kem, params->kdf,
-			     params->aead, gnutls_strerror(ret));
-		}
-	}
-
 	if (params->ikmS != NULL) {
 		ret = gnutls_privkey_init(&skS);
 		if (ret < 0) {
@@ -156,13 +146,6 @@ static void test_hpke(const hpke_test_parameters_st *params)
 						   skS, pkS);
 		if (ret < 0) {
 			fail("gnutls_hpke_generate_keypair (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
-			     params->mode, params->kem, params->kdf,
-			     params->aead, gnutls_strerror(ret));
-		}
-
-		ret = gnutls_hpke_set_sender_privkey(sender_ctx, skS);
-		if (ret < 0) {
-			fail("gnutls_hpke_set_sender_privkey (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
 			     params->mode, params->kem, params->kdf,
 			     params->aead, gnutls_strerror(ret));
 		}
@@ -184,7 +167,8 @@ static void test_hpke(const hpke_test_parameters_st *params)
 		     gnutls_strerror(ret));
 	}
 
-	ret = gnutls_hpke_encap(sender_ctx, &params->info, &enc, pkR);
+	ret = gnutls_hpke_encap(sender_ctx, &params->info, &enc, pkR, skS,
+				params->psk, params->psk_id);
 	if (ret < 0) {
 		fail("gnutls_hpke_encap (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
 		     params->mode, params->kem, params->kdf, params->aead,
@@ -206,26 +190,8 @@ static void test_hpke(const hpke_test_parameters_st *params)
 		     gnutls_strerror(ret));
 	}
 
-	if (params->psk != NULL && params->psk_id != NULL) {
-		ret = gnutls_hpke_set_psk(receiver_ctx, params->psk,
-					  params->psk_id);
-		if (ret < 0) {
-			fail("gnutls_hpke_set_psk (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
-			     params->mode, params->kem, params->kdf,
-			     params->aead, gnutls_strerror(ret));
-		}
-	}
-
-	if (params->ikmS != NULL) {
-		ret = gnutls_hpke_set_sender_pubkey(receiver_ctx, pkS);
-		if (ret < 0) {
-			fail("gnutls_hpke_set_sender_pubkey (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
-			     params->mode, params->kem, params->kdf,
-			     params->aead, gnutls_strerror(ret));
-		}
-	}
-
-	ret = gnutls_hpke_decap(receiver_ctx, &params->info, &enc, skR);
+	ret = gnutls_hpke_decap(receiver_ctx, &params->info, &enc, skR, pkS,
+				params->psk, params->psk_id);
 	if (ret < 0) {
 		fail("gnutls_hpke_decap (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
 		     params->mode, params->kem, params->kdf, params->aead,
