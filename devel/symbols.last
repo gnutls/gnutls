@@ -343,12 +343,9 @@ gnutls_hpke_encap@GNUTLS_3_8_13
 gnutls_hpke_export@GNUTLS_3_8_13
 gnutls_hpke_generate_keypair@GNUTLS_3_8_13
 gnutls_hpke_get_enc_size@GNUTLS_3_8_13
-gnutls_hpke_get_seq@GNUTLS_3_8_13
 gnutls_hpke_init@GNUTLS_3_8_13
 gnutls_hpke_open@GNUTLS_3_8_13
 gnutls_hpke_seal@GNUTLS_3_8_13
-gnutls_hpke_set_ikme@GNUTLS_3_8_13
-gnutls_hpke_set_seq@GNUTLS_3_8_13
 gnutls_idna_map@GNUTLS_3_4
 gnutls_idna_reverse_map@GNUTLS_3_4
 gnutls_init@GNUTLS_3_4

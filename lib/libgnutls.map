@@ -1475,10 +1475,7 @@ GNUTLS_3_8_13
     gnutls_hpke_get_enc_size;
     gnutls_hpke_seal;
     gnutls_hpke_open;
-    gnutls_hpke_set_ikme;
     gnutls_hpke_generate_keypair;
-    gnutls_hpke_get_seq;
-    gnutls_hpke_set_seq;
     gnutls_hpke_export;
  local:
 	*;
@@ -1596,4 +1593,7 @@ GNUTLS_PRIVATE_3_4 {
 	_gnutls_pathbuf_deinit;
 	# needed by tests/pkcs11/eddsa-ecpoint-encodings
 	_gnutls_pubkey_import_ecc_eddsa;
+	# needed by tests/hpke-tests
+        _gnutls_hpke_get_seq;
+	_gnutls_hpke_set_ikme;
 } GNUTLS_3_4;

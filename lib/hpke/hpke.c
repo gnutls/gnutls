@@ -69,6 +69,11 @@ struct gnutls_hpke_context_st {
 	uint64_t seq;
 };
 
+/* For testing purposes */
+extern int _gnutls_hpke_get_seq(gnutls_hpke_context_t ctx, uint64_t *seq);
+extern int _gnutls_hpke_set_ikme(gnutls_hpke_context_t ctx,
+				 const gnutls_datum_t *ikme);
+
 static bool is_auth_mode(gnutls_hpke_mode_t mode)
 {
 	return mode == GNUTLS_HPKE_MODE_AUTH ||
@@ -1222,7 +1227,7 @@ cleanup:
 }
 
 /**
- * gnutls_hpke_set_ikme:
+ * _gnutls_hpke_set_ikme:
  * @ctx: The HPKE context to set the IKME for.
  * @ikme: A pointer to a gnutls_datum_t structure containing the IKME value and its size.
  *
@@ -1232,7 +1237,7 @@ cleanup:
  *
  * It returns 0 on success, or a negative error code on failure.
  */
-int gnutls_hpke_set_ikme(gnutls_hpke_context_t ctx, const gnutls_datum_t *ikme)
+int _gnutls_hpke_set_ikme(gnutls_hpke_context_t ctx, const gnutls_datum_t *ikme)
 {
 	if (ctx == NULL || ikme == NULL || ikme->data == NULL) {
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -1305,7 +1310,7 @@ int gnutls_hpke_generate_keypair(gnutls_hpke_kem_t kem,
 }
 
 /**
- * gnutls_hpke_get_seq:
+ * _gnutls_hpke_get_seq:
  * @ctx: The HPKE context to get the sequence number from.
  * @seq: A pointer to a uint64_t variable where the current sequence number will be stored.
  *
@@ -1315,39 +1320,13 @@ int gnutls_hpke_generate_keypair(gnutls_hpke_kem_t kem,
  *
  * It returns 0 on success, or a negative error code on failure.
  */
-int gnutls_hpke_get_seq(gnutls_hpke_context_t ctx, uint64_t *seq)
+int _gnutls_hpke_get_seq(gnutls_hpke_context_t ctx, uint64_t *seq)
 {
 	if (ctx == NULL || seq == NULL) {
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
 
 	*seq = ctx->seq;
-	return 0;
-}
-
-/**
- * gnutls_hpke_set_seq:
- * @ctx: The HPKE context to set the sequence number for.
- * @seq: The sequence number to set in the context.
- *
- * This function sets the sequence number in the HPKE context. The sequence number is used to derive unique nonces for
- * encryption and decryption operations in HPKE. The function checks that the provided parameters are valid and that the
- * context is properly initialized and that the role of the context is Receiver, as only the receiver should be setting
- * the sequence number (the sender's sequence number is managed internally by gnutls_hpke_seal()).
- *
- * It returns 0 on success, or a negative error code on failure.
- */
-int gnutls_hpke_set_seq(gnutls_hpke_context_t ctx, uint64_t seq)
-{
-	if (ctx == NULL) {
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-	}
-
-	if (ctx->role == GNUTLS_HPKE_ROLE_SENDER) {
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-	}
-
-	ctx->seq = seq;
 	return 0;
 }
 

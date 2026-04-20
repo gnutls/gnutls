@@ -36,6 +36,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+extern int _gnutls_hpke_get_seq(gnutls_hpke_context_t ctx, uint64_t *seq);
+extern int _gnutls_hpke_set_ikme(gnutls_hpke_context_t ctx,
+				 const gnutls_datum_t *ikme);
+
 static unsigned char info[] = { 0x4f, 0x64, 0x65, 0x20, 0x6f, 0x6e, 0x20,
 				0x61, 0x20, 0x47, 0x72, 0x65, 0x63, 0x69,
 				0x61, 0x6e, 0x20, 0x55, 0x72, 0x6e };
@@ -126,9 +130,9 @@ static void test_hpke(const hpke_test_parameters_st *params)
 		     gnutls_strerror(ret));
 	}
 
-	ret = gnutls_hpke_set_ikme(sender_ctx, &params->ikmE);
+	ret = _gnutls_hpke_set_ikme(sender_ctx, &params->ikmE);
 	if (ret < 0) {
-		fail("gnutls_hpke_set_ikme (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
+		fail("_gnutls_hpke_set_ikme (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
 		     params->mode, params->kem, params->kdf, params->aead,
 		     gnutls_strerror(ret));
 	}
@@ -235,9 +239,9 @@ static void test_hpke(const hpke_test_parameters_st *params)
 		}
 
 		uint64_t seq;
-		ret = gnutls_hpke_get_seq(receiver_ctx, &seq);
+		ret = _gnutls_hpke_get_seq(receiver_ctx, &seq);
 		if (ret < 0) {
-			fail("gnutls_hpke_get_seq (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
+			fail("_gnutls_hpke_get_seq (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
 			     params->mode, params->kem, params->kdf,
 			     params->aead, gnutls_strerror(ret));
 		}
