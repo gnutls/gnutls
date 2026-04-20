@@ -375,7 +375,7 @@ int gnutls_pkcs12_bag_set_data(gnutls_pkcs12_bag_t bag,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	if (bag->bag_elements == MAX_BAG_ELEMENTS - 1) {
+	if (bag->bag_elements >= MAX_BAG_ELEMENTS - 1) {
 		gnutls_assert();
 		/* bag is full */
 		return GNUTLS_E_MEMORY_ERROR;
