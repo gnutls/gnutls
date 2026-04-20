@@ -23,9 +23,15 @@ See the end for copying conditions.
    (DER). Previously, loading a private key in the former format
    resulted in a failure, which is now fixed (#1749).
 
-** libgnutls: Added HPKE (RFC 9180) implementation as a technology
-   preview. The implementation and the related API might suffer
-   modification in the following period (#1506).
+** libgnutls: HPKE (RFC 9180) is now supported as a technology preview
+   The Hybrid Public Key Encryption (HPKE) is a flexible cryptographic
+   protocol which enables to encrypt arbitrary data to a recipient, by
+   combining key encapsulation mechanism (KEM) and authenticated
+   encryption with additional data (AEAD). GnuTLS now includes the
+   implementation contributed by David Dudas. Given this is a
+   technology preview, the implementation and the API might suffer
+   modification in the following period. Use --enable-hpke to turn on
+   this feature. (#1506)
 
 ** API and ABI modifications:
 gnutls_hpke_kem_t: New enum
