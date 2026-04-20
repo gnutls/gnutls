@@ -135,7 +135,7 @@ int gnutls_hpke_derive_keypair(gnutls_hpke_kem_t kem, const gnutls_datum_t *ikm,
 			       gnutls_pubkey_t pubkey);
 
 int gnutls_hpke_export(gnutls_hpke_context_t ctx,
-		       const gnutls_datum_t *exporter_context, const size_t L,
+		       const gnutls_datum_t *exporter_context, size_t length,
 		       gnutls_datum_t *secret);
 
 #ifdef __cplusplus
