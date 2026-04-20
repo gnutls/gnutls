@@ -971,7 +971,8 @@ static int merge_handshake_packet(gnutls_session_t session,
 		session->internals.handshake_recv_buffer;
 
 	for (i = 0; i < session->internals.handshake_recv_buffer_size; i++) {
-		if (recv_buf[i].htype == hsk->htype) {
+		if (recv_buf[i].htype == hsk->htype &&
+		    recv_buf[i].sequence == hsk->sequence) {
 			exists = 1;
 			pos = i;
 			break;
