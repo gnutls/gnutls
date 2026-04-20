@@ -1276,7 +1276,7 @@ int _gnutls_hpke_set_ikme(gnutls_hpke_context_t ctx, const gnutls_datum_t *ikme)
 }
 
 /**
- * gnutls_hpke_generate_keypair:
+ * gnutls_hpke_derive_keypair:
  * @kem: The KEM algorithm to use for key pair generation.
  * @ikm: A pointer to a gnutls_datum_t structure containing the input key material (IKM) to be used for key pair
  * generation. This should be a non-empty byte string that serves as the seed for key pair generation.
@@ -1290,10 +1290,8 @@ int _gnutls_hpke_set_ikme(gnutls_hpke_context_t ctx, const gnutls_datum_t *ikme)
  *
  * It returns 0 on success, or a negative error code on failure.
  */
-int gnutls_hpke_generate_keypair(gnutls_hpke_kem_t kem,
-				 const gnutls_datum_t *ikm,
-				 gnutls_privkey_t privkey,
-				 gnutls_pubkey_t pubkey)
+int gnutls_hpke_derive_keypair(gnutls_hpke_kem_t kem, const gnutls_datum_t *ikm,
+			       gnutls_privkey_t privkey, gnutls_pubkey_t pubkey)
 {
 	int ret;
 	if (ikm == NULL || ikm->data == NULL || ikm->size == 0 ||

@@ -146,10 +146,10 @@ static void test_hpke(const hpke_test_parameters_st *params)
 		if (ret < 0) {
 			fail("gnutls_pubkey_init: %s\n", gnutls_strerror(ret));
 		}
-		ret = gnutls_hpke_generate_keypair(params->kem, params->ikmS,
-						   skS, pkS);
+		ret = gnutls_hpke_derive_keypair(params->kem, params->ikmS, skS,
+						 pkS);
 		if (ret < 0) {
-			fail("gnutls_hpke_generate_keypair (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
+			fail("gnutls_hpke_derive_keypair (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
 			     params->mode, params->kem, params->kdf,
 			     params->aead, gnutls_strerror(ret));
 		}
@@ -163,10 +163,9 @@ static void test_hpke(const hpke_test_parameters_st *params)
 	if (ret < 0) {
 		fail("gnutls_pubkey_init: %s\n", gnutls_strerror(ret));
 	}
-	ret = gnutls_hpke_generate_keypair(params->kem, &params->ikmR, skR,
-					   pkR);
+	ret = gnutls_hpke_derive_keypair(params->kem, &params->ikmR, skR, pkR);
 	if (ret < 0) {
-		fail("gnutls_hpke_generate_keypair (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
+		fail("gnutls_hpke_derive_keypair (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
 		     params->mode, params->kem, params->kdf, params->aead,
 		     gnutls_strerror(ret));
 	}

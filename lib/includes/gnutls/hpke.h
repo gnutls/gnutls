@@ -132,10 +132,9 @@ int gnutls_hpke_open(gnutls_hpke_context_t ctx, const gnutls_datum_t *aad,
 		     const gnutls_datum_t *ciphertext,
 		     gnutls_datum_t *plaintext);
 
-int gnutls_hpke_generate_keypair(gnutls_hpke_kem_t kem,
-				 const gnutls_datum_t *ikm,
-				 gnutls_privkey_t privkey,
-				 gnutls_pubkey_t pubkey);
+int gnutls_hpke_derive_keypair(gnutls_hpke_kem_t kem, const gnutls_datum_t *ikm,
+			       gnutls_privkey_t privkey,
+			       gnutls_pubkey_t pubkey);
 
 int gnutls_hpke_export(gnutls_hpke_context_t ctx,
 		       const gnutls_datum_t *exporter_context, const size_t L,

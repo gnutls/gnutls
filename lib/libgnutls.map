@@ -1475,7 +1475,7 @@ GNUTLS_3_8_13
     gnutls_hpke_get_enc_size;
     gnutls_hpke_seal;
     gnutls_hpke_open;
-    gnutls_hpke_generate_keypair;
+    gnutls_hpke_derive_keypair;
     gnutls_hpke_export;
  local:
 	*;

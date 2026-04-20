@@ -339,9 +339,9 @@ gnutls_hmac_output@GNUTLS_3_4
 gnutls_hmac_set_nonce@GNUTLS_3_4
 gnutls_hpke_decap@GNUTLS_3_8_13
 gnutls_hpke_deinit@GNUTLS_3_8_13
+gnutls_hpke_derive_keypair@GNUTLS_3_8_13
 gnutls_hpke_encap@GNUTLS_3_8_13
 gnutls_hpke_export@GNUTLS_3_8_13
-gnutls_hpke_generate_keypair@GNUTLS_3_8_13
 gnutls_hpke_get_enc_size@GNUTLS_3_8_13
 gnutls_hpke_init@GNUTLS_3_8_13
 gnutls_hpke_open@GNUTLS_3_8_13

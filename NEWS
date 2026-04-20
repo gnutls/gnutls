@@ -41,7 +41,7 @@ gnutls_hpke_encap: New function
 gnutls_hpke_seal: New function
 gnutls_hpke_decap: New function
 gnutls_hpke_open: New function
-gnutls_hpke_generate_keypair: New function
+gnutls_hpke_derive_keypair: New function
 gnutls_hpke_export: New function
 
 * Version 3.8.12 (released 2026-02-09)
