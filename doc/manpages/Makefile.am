@@ -451,7 +451,6 @@ APIMANS += gnutls_hpke_deinit.3
 APIMANS += gnutls_hpke_derive_keypair.3
 APIMANS += gnutls_hpke_encap.3
 APIMANS += gnutls_hpke_export.3
-APIMANS += gnutls_hpke_get_enc_size.3
 APIMANS += gnutls_hpke_init.3
 APIMANS += gnutls_hpke_open.3
 APIMANS += gnutls_hpke_seal.3

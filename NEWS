@@ -36,7 +36,6 @@ gnutls_hpke_role_t: New enum
 gnutls_hpke_context_st: New context structure
 gnutls_hpke_init: New function
 gnutls_hpke_deinit: New function
-gnutls_hpke_get_enc_size: New function
 gnutls_hpke_encap: New function
 gnutls_hpke_seal: New function
 gnutls_hpke_decap: New function

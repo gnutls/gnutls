@@ -342,7 +342,6 @@ gnutls_hpke_deinit@GNUTLS_3_8_13
 gnutls_hpke_derive_keypair@GNUTLS_3_8_13
 gnutls_hpke_encap@GNUTLS_3_8_13
 gnutls_hpke_export@GNUTLS_3_8_13
-gnutls_hpke_get_enc_size@GNUTLS_3_8_13
 gnutls_hpke_init@GNUTLS_3_8_13
 gnutls_hpke_open@GNUTLS_3_8_13
 gnutls_hpke_seal@GNUTLS_3_8_13

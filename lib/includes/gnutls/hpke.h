@@ -110,8 +110,6 @@ int gnutls_hpke_init(gnutls_hpke_context_t *ctx, gnutls_hpke_mode_t mode,
 
 int gnutls_hpke_deinit(gnutls_hpke_context_t ctx);
 
-size_t gnutls_hpke_get_enc_size(const gnutls_hpke_context_t ctx);
-
 int gnutls_hpke_encap(gnutls_hpke_context_t ctx, const gnutls_datum_t *info,
 		      gnutls_datum_t *enc,
 		      const gnutls_pubkey_t receiver_pubkey,
