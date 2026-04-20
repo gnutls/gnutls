@@ -66,6 +66,7 @@ typedef enum gnutls_hpke_kdf_t {
  * @GNUTLS_HPKE_AEAD_AES_128_GCM: AES-128-GCM
  * @GNUTLS_HPKE_AEAD_AES_256_GCM: AES-256-GCM
  * @GNUTLS_HPKE_AEAD_CHACHA20_POLY1305: ChaCha20-Poly1305
+ * @GNUTLS_HPKE_AEAD_EXPORT_ONLY: AEAD is unused, export operation only
  * Enumeration of HPKE AEAD algorithms.
  */
 typedef enum gnutls_hpke_aead_t {
@@ -77,10 +78,10 @@ typedef enum gnutls_hpke_aead_t {
 
 /**
  * gnutls_hpke_mode_t:
- * GNUTLS_HPKE_MODE_BASE: HPKE base mode
- * GNUTLS_HPKE_MODE_PSK: HPKE psk mode
- * GNUTLS_HPKE_MODE_AUTH: HPKE auth mode
- * GNUTLS_HPKE_MODE_AUTH_PSK: HPKE auth+psk mode
+ * @GNUTLS_HPKE_MODE_BASE: HPKE base mode
+ * @GNUTLS_HPKE_MODE_PSK: HPKE psk mode
+ * @GNUTLS_HPKE_MODE_AUTH: HPKE auth mode
+ * @GNUTLS_HPKE_MODE_AUTH_PSK: HPKE auth+psk mode
  * Enumeration of HPKE modes.
  */
 typedef enum gnutls_hpke_mode_t {
@@ -91,9 +92,10 @@ typedef enum gnutls_hpke_mode_t {
 } gnutls_hpke_mode_t;
 
 /**
- * gnutls_hpke_role_t
- * GNUTLS_HPKE_ROLE_SENDER: HPKE sender role
- * GNUTLS_HPKE_ROLE_RECEIVER: HPKE receiver role
+ * gnutls_hpke_role_t:
+ * @GNUTLS_HPKE_ROLE_SENDER: HPKE sender role
+ * @GNUTLS_HPKE_ROLE_RECEIVER: HPKE receiver role
+ * Enumeration of HPKE roles.
  */
 typedef enum gnutls_hpke_role_t {
 	GNUTLS_HPKE_ROLE_SENDER = 0,
