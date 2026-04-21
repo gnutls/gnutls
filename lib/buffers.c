@@ -844,11 +844,7 @@ static int handshake_compare(const void *_e1, const void *_e2)
 {
 	const handshake_buffer_st *e1 = _e1;
 	const handshake_buffer_st *e2 = _e2;
-
-	if (e1->sequence <= e2->sequence)
-		return 1;
-	else
-		return -1;
+	return (e1->sequence < e2->sequence) - (e1->sequence > e2->sequence);
 }
 
 #define SSL2_HEADERS 1
