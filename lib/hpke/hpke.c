@@ -162,18 +162,15 @@ static int get_shared_secret(gnutls_hpke_kem_t kem, gnutls_hpke_kdf_t kdf,
 {
 	int ret = 0;
 
-	unsigned char pkR_raw_buf[HPKE_MAX_DHKEM_PUBKEY_SIZE];
-	unsigned char pkS_raw_buf[HPKE_MAX_DHKEM_PUBKEY_SIZE];
-	unsigned char pkE_raw_buf[HPKE_MAX_DHKEM_PUBKEY_SIZE];
 	unsigned char info_label_buf[HPKE_MAX_INFO_LABEL_SIZE] = { 0 };
 	unsigned char suite_id_buf[HPKE_SUITE_ID_SIZE] = { 0 };
 	unsigned char ikm_label_buf[HPKE_IKM_LABEL_MAX_SIZE];
 	unsigned char salt_buf[HPKE_MAX_SALT_SIZE] = { 0 };
 	unsigned char eae_prk_buf[HPKE_MAX_EAE_PRK_SIZE] = { 0 };
 
-	gnutls_datum_t pkR_raw = { pkR_raw_buf, 0 };
-	gnutls_datum_t pkS_raw = { pkS_raw_buf, 0 };
-	gnutls_datum_t pkE_raw = { pkE_raw_buf, 0 };
+	gnutls_datum_t pkR_raw = { NULL, 0 };
+	gnutls_datum_t pkS_raw = { NULL, 0 };
+	gnutls_datum_t pkE_raw = { NULL, 0 };
 	gnutls_datum_t info_label = { info_label_buf, 0 };
 	gnutls_datum_t suite_id = { suite_id_buf, HPKE_SUITE_ID_SIZE };
 	gnutls_datum_t ikm_label = { ikm_label_buf, 0 };
@@ -222,8 +219,8 @@ static int get_shared_secret(gnutls_hpke_kem_t kem, gnutls_hpke_kdf_t kdf,
 		}
 	}
 
-	_gnutls_hpke_build_info_label(&pkR_raw, &pkS_raw, &pkE_raw, &suite_id,
-				      Nh, &info_label);
+	_gnutls_hpke_build_info_label(&pkR_raw, pkS_raw.data ? &pkS_raw : NULL,
+				      &pkE_raw, &suite_id, Nh, &info_label);
 
 	shared_secret->size = Nh;
 	ret = gnutls_hkdf_expand(mac, &eae_prk, &info_label,
@@ -239,9 +236,9 @@ cleanup:
 	zeroize_key(ikm_label.data, ikm_label.size);
 	zeroize_key(eae_prk.data, eae_prk.size);
 	zeroize_key(info_label.data, info_label.size);
-	zeroize_key(pkR_raw.data, pkR_raw.size);
-	zeroize_key(pkS_raw.data, pkS_raw.size);
-	zeroize_key(pkE_raw.data, pkE_raw.size);
+	_gnutls_free_key_datum(&pkR_raw);
+	_gnutls_free_key_datum(&pkS_raw);
+	_gnutls_free_key_datum(&pkE_raw);
 
 	return ret;
 }
@@ -298,6 +295,7 @@ static int dhkem_encap(const gnutls_hpke_context_t ctx,
 	gnutls_pubkey_t sender_pubkey = NULL;
 	unsigned char dh_buf[HPKE_MAX_DH_SIZE];
 	gnutls_datum_t dh = { dh_buf, 0 };
+	gnutls_datum_t pubkey_raw = { NULL, 0 };
 
 	ret = gnutls_pubkey_init(&ephemeral_pubkey);
 	if (ret < 0) {
@@ -319,8 +317,6 @@ static int dhkem_encap(const gnutls_hpke_context_t ctx,
 		goto cleanup;
 	}
 
-	unsigned char pubkey_raw_buffer[HPKE_MAX_DHKEM_PUBKEY_SIZE];
-	gnutls_datum_t pubkey_raw = { pubkey_raw_buffer, 0 };
 	ret = _gnutls_hpke_pubkey_to_datum(ephemeral_pubkey, &pubkey_raw);
 	if (ret < 0) {
 		gnutls_assert();
@@ -365,6 +361,7 @@ static int dhkem_encap(const gnutls_hpke_context_t ctx,
 cleanup:
 	zeroize_key(dh.data, dh.size);
 
+	_gnutls_free_key_datum(&pubkey_raw);
 	gnutls_pubkey_deinit(ephemeral_pubkey);
 	gnutls_privkey_deinit(ephemeral_privkey);
 	gnutls_pubkey_deinit(sender_pubkey);

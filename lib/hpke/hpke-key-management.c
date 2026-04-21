@@ -26,6 +26,9 @@
 #include "hpke-builders.h"
 #include "hpke-hkdf.h"
 
+#include "gnutls_int.h"
+#include "abstract_int.h"
+#include "ecc.h"
 #include "errors.h"
 
 #define GNUTLS_HPKE_MAX_RAW_KEY_COORDINATE_SIZE 66
@@ -53,122 +56,86 @@ static const unsigned char p521_order[66] = {
 	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
 };
 
-static void coord_pad_left_to_buf(const gnutls_datum_t *in, size_t out_size,
-				  unsigned char *out)
-{
-	gnutls_memset(out, 0, out_size - in->size);
-	memcpy(out + (out_size - in->size), in->data, in->size);
-}
-
-int _gnutls_hpke_pubkey_to_datum(const gnutls_pubkey_t pk,
+int _gnutls_hpke_pubkey_to_datum(const gnutls_pubkey_t pubkey,
 				 gnutls_datum_t *pubkey_raw)
 {
 	int ret;
-	gnutls_ecc_curve_t curve;
-	gnutls_datum_t x = { NULL, 0 };
-	gnutls_datum_t y = { NULL, 0 };
+	gnutls_pk_params_st *params = &pubkey->params;
 
-	pubkey_raw->size = 0;
-
-	ret = gnutls_pubkey_export_ecc_raw2(pk, &curve, &x, &y,
-					    GNUTLS_EXPORT_FLAG_NO_LZ);
-	if (ret < 0) {
-		return gnutls_assert_val(ret);
-	}
-
-	if (curve == GNUTLS_ECC_CURVE_X25519 ||
-	    curve == GNUTLS_ECC_CURVE_X448) {
-		if (x.data == NULL || x.size > HPKE_MAX_DHKEM_PUBKEY_SIZE) {
-			ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
-			goto cleanup;
+	switch (params->curve) {
+	case GNUTLS_ECC_CURVE_X25519:
+	case GNUTLS_ECC_CURVE_X448:
+		if (params->raw_pub.data == NULL ||
+		    params->raw_pub.size > HPKE_MAX_DHKEM_PUBKEY_SIZE) {
+			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 		}
 
-		memcpy(pubkey_raw->data, x.data, x.size);
-		pubkey_raw->size = x.size;
-		goto cleanup;
-	}
-
-	size_t coord_size = gnutls_ecc_curve_get_size(curve);
-	size_t total_size = 1 + 2 * coord_size;
-
-	if (coord_size == 0 || total_size > HPKE_MAX_DHKEM_PUBKEY_SIZE) {
-		ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
-		goto cleanup;
-	}
-
-	coord_pad_left_to_buf(&x, coord_size, pubkey_raw->data + 1);
-	coord_pad_left_to_buf(&y, coord_size,
-			      pubkey_raw->data + 1 + coord_size);
-
-	pubkey_raw->data[0] = 0x04;
-	pubkey_raw->size = total_size;
-
-cleanup:
-	_gnutls_free_datum(&x);
-	_gnutls_free_datum(&y);
-
-	return ret;
-}
-
-static int extract_coordinates_from_pubkey_datum(const gnutls_ecc_curve_t curve,
-						 const gnutls_datum_t *datum,
-						 gnutls_datum_t *x,
-						 gnutls_datum_t *y)
-{
-	const size_t coord_size = gnutls_ecc_curve_get_size(curve);
-
-	if (coord_size == 0 ||
-	    coord_size > GNUTLS_HPKE_MAX_RAW_KEY_COORDINATE_SIZE) {
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-	}
-
-	if (curve == GNUTLS_ECC_CURVE_X25519 ||
-	    curve == GNUTLS_ECC_CURVE_X448) {
-		if (datum->size != coord_size) {
-			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		ret = _gnutls_set_datum(pubkey_raw, params->raw_pub.data,
+					params->raw_pub.size);
+		if (ret < 0) {
+			return gnutls_assert_val(ret);
 		}
-
-		memcpy(x->data, datum->data, coord_size);
-		x->size = coord_size;
-	} else {
-		if (datum->size != 1 + 2 * coord_size ||
-		    datum->data[0] != 0x04) {
-			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		break;
+	case GNUTLS_ECC_CURVE_SECP256R1:
+	case GNUTLS_ECC_CURVE_SECP384R1:
+	case GNUTLS_ECC_CURVE_SECP521R1:
+		ret = _gnutls_ecc_ansi_x962_export(params->curve,
+						   params->params[ECC_X],
+						   params->params[ECC_Y],
+						   pubkey_raw);
+		if (ret < 0) {
+			return gnutls_assert_val(ret);
 		}
-
-		memcpy(x->data, datum->data + 1, coord_size);
-		x->size = coord_size;
-		memcpy(y->data, datum->data + 1 + coord_size, coord_size);
-		y->size = coord_size;
+		break;
+	default:
+		return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
 	}
 
 	return 0;
 }
 
 int _gnutls_hpke_datum_to_pubkey(const gnutls_ecc_curve_t curve,
-				 const gnutls_datum_t *datum,
+				 const gnutls_datum_t *pubkey_raw,
 				 gnutls_pubkey_t pubkey)
 {
 	int ret;
+	gnutls_pk_params_st *params = &pubkey->params;
 
-	unsigned char x_buf[GNUTLS_HPKE_MAX_RAW_KEY_COORDINATE_SIZE];
-	unsigned char y_buf[GNUTLS_HPKE_MAX_RAW_KEY_COORDINATE_SIZE];
+	gnutls_pk_params_release(params);
+	gnutls_pk_params_init(params);
 
-	gnutls_datum_t x = { x_buf, 0 };
-	gnutls_datum_t y = { y_buf, 0 };
-
-	ret = extract_coordinates_from_pubkey_datum(curve, datum, &x, &y);
-	if (ret < 0) {
-		return gnutls_assert_val(ret);
+	switch (curve) {
+	case GNUTLS_ECC_CURVE_X25519:
+	case GNUTLS_ECC_CURVE_X448:
+		ret = _gnutls_set_datum(&params->raw_pub, pubkey_raw->data,
+					pubkey_raw->size);
+		if (ret < 0) {
+			return gnutls_assert_val(ret);
+		}
+		params->algo = curve == GNUTLS_ECC_CURVE_X25519 ?
+				       GNUTLS_PK_ECDH_X25519 :
+				       GNUTLS_PK_ECDH_X448;
+		break;
+	case GNUTLS_ECC_CURVE_SECP256R1:
+	case GNUTLS_ECC_CURVE_SECP384R1:
+	case GNUTLS_ECC_CURVE_SECP521R1:
+		ret = _gnutls_ecc_ansi_x962_import(pubkey_raw->data,
+						   pubkey_raw->size,
+						   &params->params[ECC_X],
+						   &params->params[ECC_Y]);
+		if (ret < 0) {
+			return gnutls_assert_val(ret);
+		}
+		params->params_nr = ECC_PUBLIC_PARAMS;
+		params->algo = GNUTLS_PK_ECDSA;
+		break;
+	default:
+		return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
 	}
 
-	ret = gnutls_pubkey_import_ecc_raw(pubkey, curve, &x, &y);
-	if (ret < 0) {
-		gnutls_assert_val(ret);
-		return ret;
-	}
+	params->curve = curve;
 
-	return ret;
+	return 0;
 }
 
 static void clamp_sk(const gnutls_hpke_kem_t kem, unsigned char *sk_buf)

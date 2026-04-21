@@ -134,7 +134,8 @@ void _gnutls_hpke_build_info_label(const gnutls_datum_t *pkR_raw,
 		     sizeof(shared_secret_label) - 1);
 	append_datum(info_label, pkE_raw);
 	append_datum(info_label, pkR_raw);
-	append_datum(info_label, pkS_raw);
+	if (pkS_raw)
+		append_datum(info_label, pkS_raw);
 }
 
 void _gnutls_hpke_build_suite_id_for_scheduling(const uint16_t kem_id,
