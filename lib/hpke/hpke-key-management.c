@@ -236,20 +236,6 @@ static const unsigned char *get_kem_order(const gnutls_hpke_kem_t kem)
 	}
 }
 
-static int be_lt(const unsigned char *a, const unsigned char *b, size_t len)
-{
-	size_t i;
-
-	for (i = 0; i < len; i++) {
-		if (a[i] < b[i])
-			return 1;
-		if (a[i] > b[i])
-			return 0;
-	}
-
-	return 0;
-}
-
 static int prime_curve_keypair_from_raw_privkey(
 	const gnutls_mac_algorithm_t mac, const gnutls_hpke_kem_t kem,
 	const gnutls_datum_t *dkp_prk, const gnutls_ecc_curve_t curve,
@@ -302,8 +288,7 @@ static int prime_curve_keypair_from_raw_privkey(
 			goto cleanup;
 		}
 
-		ret = be_lt(sk.data, order, sk.size);
-		if (!ret) {
+		if (memcmp(sk.data, order, sk.size) >= 0) {
 			continue;
 		}
 
