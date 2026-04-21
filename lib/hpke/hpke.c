@@ -60,7 +60,7 @@ struct gnutls_hpke_context_st {
 	gnutls_hpke_kdf_t kdf;
 	gnutls_hpke_aead_t aead;
 
-	gnutls_datum_t *ikme;
+	gnutls_datum_t ikme;
 
 	gnutls_datum_t key;
 	gnutls_datum_t base_nonce;
@@ -311,7 +311,7 @@ static int dhkem_encap(const gnutls_hpke_context_t ctx,
 		goto cleanup;
 	}
 
-	ret = _gnutls_hpke_generate_keypair(ctx->ikme, ctx->kem,
+	ret = _gnutls_hpke_generate_keypair(&ctx->ikme, ctx->kem,
 					    receiver_pubkey, ephemeral_privkey,
 					    ephemeral_pubkey);
 	if (ret < 0) {
@@ -323,37 +323,28 @@ static int dhkem_encap(const gnutls_hpke_context_t ctx,
 	gnutls_datum_t pubkey_raw = { pubkey_raw_buffer, 0 };
 	ret = _gnutls_hpke_pubkey_to_datum(ephemeral_pubkey, &pubkey_raw);
 	if (ret < 0) {
-		ret = gnutls_assert_val(ret);
+		gnutls_assert();
 		goto cleanup;
 	}
-
-	enc->size = pubkey_raw.size;
-	enc->data = gnutls_malloc(enc->size);
-	if (enc->data == NULL) {
-		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-		goto cleanup;
-	}
-
-	memcpy(enc->data, pubkey_raw.data, pubkey_raw.size);
 
 	ret = encap_get_dh(ctx->mode, receiver_pubkey, ephemeral_privkey,
 			   sender_privkey, &dh);
 	if (ret < 0) {
 		ret = gnutls_assert_val(ret);
-		goto error;
+		goto cleanup;
 	}
 
 	if (is_auth_mode(ctx->mode)) {
 		ret = gnutls_pubkey_init(&sender_pubkey);
 		if (ret < 0) {
 			ret = gnutls_assert_val(ret);
-			goto error;
+			goto cleanup;
 		}
 		ret = gnutls_pubkey_import_privkey(sender_pubkey,
 						   sender_privkey, 0, 0);
 		if (ret < 0) {
 			ret = gnutls_assert_val(ret);
-			goto error;
+			goto cleanup;
 		}
 	}
 
@@ -366,13 +357,10 @@ static int dhkem_encap(const gnutls_hpke_context_t ctx,
 			shared_secret->size = 0;
 		}
 		gnutls_assert_val(ret);
-		goto error;
+		goto cleanup;
 	}
 
-	goto cleanup;
-
-error:
-	_gnutls_free_key_datum(enc);
+	*enc = _gnutls_take_datum(&pubkey_raw);
 
 cleanup:
 	zeroize_key(dh.data, dh.size);
@@ -696,7 +684,7 @@ int gnutls_hpke_init(gnutls_hpke_context_t *ctx, gnutls_hpke_mode_t mode,
 	(*ctx)->kdf = kdf;
 	(*ctx)->aead = aead;
 
-	(*ctx)->ikme = NULL;
+	(*ctx)->ikme.data = NULL;
 
 	(*ctx)->key.data = NULL;
 	(*ctx)->key.size = 0;
@@ -718,11 +706,7 @@ int gnutls_hpke_deinit(gnutls_hpke_context_t ctx)
 	_gnutls_free_key_datum(&ctx->key);
 	_gnutls_free_key_datum(&ctx->base_nonce);
 	_gnutls_free_key_datum(&ctx->exporter_secret);
-
-	if (ctx->ikme != NULL) {
-		_gnutls_free_key_datum(ctx->ikme);
-		gnutls_free(ctx->ikme);
-	}
+	_gnutls_free_key_datum(&ctx->ikme);
 
 	gnutls_free(ctx);
 	return 0;
@@ -1102,6 +1086,8 @@ cleanup:
  -*/
 int _gnutls_hpke_set_ikme(gnutls_hpke_context_t ctx, const gnutls_datum_t *ikme)
 {
+	int ret;
+
 	if (ctx == NULL || ikme == NULL || ikme->data == NULL) {
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
@@ -1114,26 +1100,11 @@ int _gnutls_hpke_set_ikme(gnutls_hpke_context_t ctx, const gnutls_datum_t *ikme)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
 
-	if (ctx->ikme != NULL) {
-		_gnutls_free_key_datum(ctx->ikme);
-		gnutls_free(ctx->ikme);
-		ctx->ikme = NULL;
+	_gnutls_free_key_datum(&ctx->ikme);
+	ret = _gnutls_set_datum(&ctx->ikme, ikme->data, ikme->size);
+	if (ret < 0) {
+		return gnutls_assert_val(ret);
 	}
-
-	ctx->ikme = gnutls_malloc(sizeof(*ctx->ikme));
-	if (ctx->ikme == NULL) {
-		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-	}
-
-	ctx->ikme->size = ikme->size;
-	ctx->ikme->data = gnutls_malloc(ctx->ikme->size);
-	if (ctx->ikme->data == NULL) {
-		gnutls_free(ctx->ikme);
-		ctx->ikme = NULL;
-		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-	}
-
-	memcpy(ctx->ikme->data, ikme->data, ikme->size);
 
 	return 0;
 }
