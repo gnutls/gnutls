@@ -75,7 +75,7 @@ static void client(int sd, const char *prio, bool exp_hint, bool rsa)
 	gnutls_psk_client_credentials_t pskcred;
 	gnutls_certificate_credentials_t xcred = NULL;
 	/* Need to enable anonymous KX specifically. */
-	const gnutls_datum_t key = { (void *)"DEADBEEF", 8 };
+	const gnutls_datum_t key = { (void *)"DEAD00BEEF", 10 };
 	gnutls_datum_t user;
 	const char *hint;
 
@@ -193,7 +193,7 @@ static int pskfunc(gnutls_session_t session, const gnutls_datum_t *username,
 		   gnutls_datum_t *key)
 {
 	const unsigned char expected_user[] = { 0xCA, 0xFE, 0x00, 0xCA, 0xFE };
-	const unsigned char expected_key[] = { 0xDE, 0xAD, 0xBE, 0xEF };
+	const unsigned char expected_key[] = { 0xDE, 0xAD, 0x00, 0xBE, 0xEF };
 
 	if (debug)
 		printf("psk: Got username with length %d\n", username->size);
@@ -204,9 +204,9 @@ static int pskfunc(gnutls_session_t session, const gnutls_datum_t *username,
 		fail("pskfunc: username mismatch: got %u bytes, expected 5\n",
 		     username->size);
 
-	key->data = gnutls_malloc(4);
-	memcpy(key->data, expected_key, 4);
-	key->size = 4;
+	key->data = gnutls_malloc(5);
+	memcpy(key->data, expected_key, 5);
+	key->size = 5;
 
 	return 0;
 }
