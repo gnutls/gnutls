@@ -971,8 +971,20 @@ static int merge_handshake_packet(gnutls_session_t session,
 		session->internals.handshake_recv_buffer;
 
 	for (i = 0; i < session->internals.handshake_recv_buffer_size; i++) {
-		if (recv_buf[i].htype == hsk->htype &&
-		    recv_buf[i].sequence == hsk->sequence) {
+		if (recv_buf[i].sequence == hsk->sequence) {
+			if (recv_buf[i].htype != hsk->htype) {
+				_gnutls_audit_log(
+					session,
+					"Discarded unexpected handshake packet "
+					"with duplicate sequence %d, but "
+					"mismatched type %s (previously %s)\n",
+					hsk->sequence,
+					_gnutls_handshake2str(hsk->htype),
+					_gnutls_handshake2str(
+						recv_buf[i].htype));
+				_gnutls_handshake_buffer_clear(hsk);
+				return 0;
+			}
 			exists = 1;
 			pos = i;
 			break;
