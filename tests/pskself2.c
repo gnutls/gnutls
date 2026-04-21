@@ -86,14 +86,15 @@ static void client(int sd, const char *prio, bool exp_hint, bool rsa)
 
 	side = "client";
 
-	user.data = gnutls_malloc(4);
+	user.data = gnutls_malloc(5);
 	assert(user.data != NULL);
 
 	user.data[0] = 0xCA;
 	user.data[1] = 0xFE;
-	user.data[2] = 0xCA;
-	user.data[3] = 0xFE;
-	user.size = 4;
+	user.data[2] = 0x00;
+	user.data[3] = 0xCA;
+	user.data[4] = 0xFE;
+	user.size = 5;
 
 	gnutls_psk_allocate_client_credentials(&pskcred);
 	ret = gnutls_psk_set_client_credentials2(pskcred, &user, &key,
@@ -191,14 +192,20 @@ end:
 static int pskfunc(gnutls_session_t session, const gnutls_datum_t *username,
 		   gnutls_datum_t *key)
 {
+	const unsigned char expected_user[] = { 0xCA, 0xFE, 0x00, 0xCA, 0xFE };
+	const unsigned char expected_key[] = { 0xDE, 0xAD, 0xBE, 0xEF };
+
 	if (debug)
 		printf("psk: Got username with length %d\n", username->size);
 
+	/* verify callback received full 5-byte username (#1850) */
+	if (username->size != 5 ||
+	    memcmp(username->data, expected_user, 5) != 0)
+		fail("pskfunc: username mismatch: got %u bytes, expected 5\n",
+		     username->size);
+
 	key->data = gnutls_malloc(4);
-	key->data[0] = 0xDE;
-	key->data[1] = 0xAD;
-	key->data[2] = 0xBE;
-	key->data[3] = 0xEF;
+	memcpy(key->data, expected_key, 4);
 	key->size = 4;
 
 	return 0;
@@ -211,8 +218,8 @@ static void server(int sd, const char *prio, bool rsa)
 	int ret;
 	gnutls_session_t session;
 	gnutls_datum_t psk_username;
-	char buffer[MAX_BUF + 1],
-		expected_psk_username[] = { 0xDE, 0xAD, 0xBE, 0xEF };
+	char buffer[MAX_BUF + 1];
+	const char expected_psk_username[] = { 0xCA, 0xFE, 0x00, 0xCA, 0xFE };
 
 	/* this must be called once in the program
 	 */
@@ -264,8 +271,8 @@ static void server(int sd, const char *prio, bool rsa)
 		if (gnutls_psk_server_get_username2(session, &psk_username) < 0)
 			fail("server: Could not get PSK username\n");
 
-		if (psk_username.size != 4 ||
-		    memcmp(psk_username.data, expected_psk_username, 4))
+		if (psk_username.size != 5 ||
+		    memcmp(psk_username.data, expected_psk_username, 5))
 			fail("server: Unexpected PSK username\n");
 
 		success("server: PSK username length: %d\n", psk_username.size);
