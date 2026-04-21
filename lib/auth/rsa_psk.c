@@ -321,8 +321,7 @@ static int _gnutls_proc_rsa_psk_client_kx(gnutls_session_t session,
 	 * filled in if the key is not found.
 	 */
 	ret = _gnutls_psk_pwd_find_entry(session, info->username,
-					 strlen(info->username), &pwd_psk,
-					 NULL);
+					 info->username_len, &pwd_psk, NULL);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
