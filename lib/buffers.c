@@ -853,7 +853,7 @@ static int parse_handshake_header(gnutls_session_t session, mbuffer_st *bufel,
 {
 	uint8_t *dataptr = NULL; /* for realloc */
 	size_t handshake_header_size = HANDSHAKE_HEADER_SIZE(session),
-	       data_size, frag_size;
+	       data_size, frag_length;
 
 	/* Note: SSL2_HEADERS == 1 */
 	if (_mbuffer_get_udata_size(bufel) < handshake_header_size)
@@ -868,7 +868,7 @@ static int parse_handshake_header(gnutls_session_t session, mbuffer_st *bufel,
 		handshake_header_size =
 			SSL2_HEADERS; /* we've already read one byte */
 
-		frag_size =
+		frag_length =
 			_mbuffer_get_udata_size(bufel) -
 			handshake_header_size; /* we've read the first byte */
 
@@ -879,7 +879,7 @@ static int parse_handshake_header(gnutls_session_t session, mbuffer_st *bufel,
 
 		hsk->sequence = 0;
 		hsk->start_offset = 0;
-		hsk->length = frag_size;
+		hsk->length = frag_length;
 	} else
 #endif
 	{ /* TLS or DTLS handshake headers */
@@ -894,13 +894,13 @@ static int parse_handshake_header(gnutls_session_t session, mbuffer_st *bufel,
 		if (IS_DTLS(session)) {
 			hsk->sequence = _gnutls_read_uint16(&dataptr[4]);
 			hsk->start_offset = _gnutls_read_uint24(&dataptr[6]);
-			frag_size = _gnutls_read_uint24(&dataptr[9]);
+			frag_length = _gnutls_read_uint24(&dataptr[9]);
 		} else {
 			hsk->sequence = 0;
 			hsk->start_offset = 0;
-			frag_size = MIN((_mbuffer_get_udata_size(bufel) -
-					 handshake_header_size),
-					hsk->length);
+			frag_length = MIN((_mbuffer_get_udata_size(bufel) -
+					   handshake_header_size),
+					  hsk->length);
 		}
 
 		/* TLS1.3: distinguish server hello versus hello retry request.
@@ -919,8 +919,8 @@ static int parse_handshake_header(gnutls_session_t session, mbuffer_st *bufel,
 	}
 	data_size = _mbuffer_get_udata_size(bufel) - handshake_header_size;
 
-	if (frag_size > 0)
-		hsk->end_offset = hsk->start_offset + frag_size - 1;
+	if (frag_length > 0)
+		hsk->end_offset = hsk->start_offset + frag_length - 1;
 	else
 		hsk->end_offset = 0;
 
@@ -928,15 +928,15 @@ static int parse_handshake_header(gnutls_session_t session, mbuffer_st *bufel,
 		"HSK[%p]: %s (%u) was received. Length %d[%d], frag offset %d, frag length: %d, sequence: %d\n",
 		session, _gnutls_handshake2str(hsk->htype),
 		(unsigned)hsk->htype, (int)hsk->length, (int)data_size,
-		hsk->start_offset, (int)frag_size, (int)hsk->sequence);
+		hsk->start_offset, (int)frag_length, (int)hsk->sequence);
 
 	hsk->header_size = handshake_header_size;
 	memcpy(hsk->header, _mbuffer_get_udata_ptr(bufel),
 	       handshake_header_size);
 
 	if (hsk->length > 0 &&
-	    (frag_size > data_size ||
-	     (frag_size > 0 && hsk->end_offset >= hsk->length))) {
+	    (frag_length > data_size ||
+	     (frag_length > 0 && hsk->end_offset >= hsk->length))) {
 		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 	} else if (hsk->length == 0 && hsk->end_offset != 0 &&
 		   hsk->start_offset != 0)
