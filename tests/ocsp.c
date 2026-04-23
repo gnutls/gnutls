@@ -614,327 +614,221 @@ static void ocsp_invalid_calls(void)
 	int rc;
 
 	rc = gnutls_ocsp_req_init(&req);
-	if (rc != GNUTLS_E_SUCCESS) {
+	if (rc != GNUTLS_E_SUCCESS)
 		fail("gnutls_ocsp_req_init alloc\n");
-		exit(1);
-	}
 	rc = gnutls_ocsp_resp_init(&resp);
-	if (rc != GNUTLS_E_SUCCESS) {
+	if (rc != GNUTLS_E_SUCCESS)
 		fail("gnutls_ocsp_resp_init alloc\n");
-		exit(1);
-	}
 
 	gnutls_ocsp_req_deinit(NULL);
 	gnutls_ocsp_resp_deinit(NULL);
 
 	rc = gnutls_ocsp_req_import(NULL, NULL);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_req_import NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_req_import(NULL, p);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_req_import NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_req_import(req, NULL);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_req_import NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_resp_import(NULL, NULL);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_resp_import NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_resp_import(NULL, p);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_resp_import NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_resp_import(resp, NULL);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_resp_import NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_req_export(NULL, NULL);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_req_export NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_req_export(NULL, p);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_req_export NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_req_export(req, NULL);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_req_export NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_resp_export(NULL, NULL);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_resp_export NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_resp_export(NULL, p);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_resp_export NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_resp_export(resp, NULL);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_resp_export NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_req_get_version(NULL);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_req_get_version NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_req_get_cert_id(NULL, 0, NULL, NULL, NULL, NULL);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_req_get_cert_id NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_req_get_cert_id(req, 0, NULL, NULL, NULL, NULL);
-	if (rc != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+	if (rc != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 		fail("gnutls_ocsp_req_get_cert_id empty\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_req_add_cert_id(NULL, 0, NULL, NULL, NULL);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_req_add_cert_id NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_req_add_cert_id(req, 0, NULL, NULL, NULL);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_req_add_cert_id NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_req_add_cert_id(req, GNUTLS_DIG_SHA1, NULL, NULL,
 					 NULL);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_req_add_cert_id NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_req_add_cert_id(req, GNUTLS_DIG_SHA1, p, NULL, NULL);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_req_add_cert_id NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_req_add_cert_id(req, GNUTLS_DIG_SHA1, NULL, p, NULL);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_req_add_cert_id NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_req_add_cert_id(req, GNUTLS_DIG_SHA1, NULL, NULL, p);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_req_add_cert_id NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_req_add_cert_id(req, GNUTLS_DIG_SHA1, p, p, NULL);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_req_add_cert_id NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_req_add_cert_id(req, GNUTLS_DIG_SHA1, p, NULL, p);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_req_add_cert_id NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_req_add_cert_id(req, GNUTLS_DIG_SHA1, NULL, p, p);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_req_add_cert_id NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_req_add_cert(NULL, 0, NULL, NULL);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_req_add_cert_id NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_req_add_cert(req, 0, NULL, NULL);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_req_add_cert_id NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_req_add_cert(req, 0, p, NULL);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_req_add_cert_id NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_req_add_cert(req, 0, NULL, p);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_req_add_cert_id NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_req_get_extension(NULL, 0, NULL, NULL, NULL);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_req_get_extension NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_req_get_extension(req, 0, NULL, NULL, NULL);
-	if (rc != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+	if (rc != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 		fail("gnutls_ocsp_req_get_extension NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_req_get_extension(req, 0, p, p, p);
-	if (rc != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+	if (rc != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 		fail("gnutls_ocsp_req_get_extension NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_req_set_extension(NULL, NULL, 0, NULL);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_req_set_extension NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_req_set_extension(req, NULL, 0, NULL);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_req_set_extension NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_req_set_extension(req, p, 0, NULL);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_req_set_extension NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_req_set_extension(req, NULL, 0, p);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_req_set_extension NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_req_get_nonce(NULL, NULL, NULL);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_req_get_nonce NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_req_get_nonce(NULL, NULL, p);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_req_get_nonce NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_req_set_nonce(NULL, 0, NULL);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_req_set_nonce NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_req_set_nonce(req, 0, NULL);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_req_set_nonce NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_req_randomize_nonce(NULL);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_req_randomize_nonce NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_resp_get_status(NULL);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_resp_get_status NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_resp_get_status(resp);
-	if (rc != GNUTLS_E_ASN1_VALUE_NOT_FOUND) {
+	if (rc != GNUTLS_E_ASN1_VALUE_NOT_FOUND)
 		fail("gnutls_ocsp_resp_get_status %d\n", rc);
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_resp_get_response(NULL, NULL, NULL);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_resp_get_response NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_resp_get_response(NULL, p, p);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_resp_get_response NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_resp_get_response(resp, NULL, NULL);
-	if (rc != GNUTLS_E_SUCCESS) {
+	if (rc != GNUTLS_E_SUCCESS)
 		fail("gnutls_ocsp_resp_get_response %d\n", rc);
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_resp_get_version(NULL);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_resp_get_version NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_resp_get_version(resp);
-	if (rc != 1) {
+	if (rc != 1)
 		fail("gnutls_ocsp_resp_get_version ret %d\n", rc);
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_resp_get_responder(NULL, NULL);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_resp_get_responder NULL\n");
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_resp_get_responder(resp, NULL);
-	if (rc != GNUTLS_E_INVALID_REQUEST) {
+	if (rc != GNUTLS_E_INVALID_REQUEST)
 		fail("gnutls_ocsp_resp_get_responder 2nd %d\n", rc);
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_resp_get_responder(resp, &dat);
-	if (rc != 0 && dat.data != NULL) {
+	if (rc != 0 && dat.data != NULL)
 		fail("gnutls_ocsp_resp_get_responder %d\n", rc);
-		exit(1);
-	}
 
 	rc = gnutls_ocsp_resp_get_responder_raw_id(
 		resp, GNUTLS_OCSP_RESP_ID_KEY, &dat);
-	if (rc != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+	if (rc != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 		fail("gnutls_ocsp_resp_get_responder_raw_id %s\n",
 		     gnutls_strerror(rc));
-		exit(1);
-	}
 
 	gnutls_free(dat.data);
 
@@ -952,26 +846,20 @@ static void req_parse(void)
 	/* init request */
 
 	ret = gnutls_ocsp_req_init(&req);
-	if (ret != 0) {
+	if (ret != 0)
 		fail("gnutls_ocsp_req_init\n");
-		exit(1);
-	}
 
 	/* import ocsp request */
 
 	ret = gnutls_ocsp_req_import(req, &req1);
-	if (ret != 0) {
+	if (ret != 0)
 		fail("gnutls_ocsp_req_import %d\n", ret);
-		exit(1);
-	}
 
 	/* simple version query */
 
 	ret = gnutls_ocsp_req_get_version(req);
-	if (ret != 1) {
+	if (ret != 1)
 		fail("gnutls_ocsp_req_get_version %d\n", ret);
-		exit(1);
-	}
 
 	/* check nonce */
 	{
@@ -981,21 +869,15 @@ static void req_parse(void)
 		unsigned int critical;
 
 		ret = gnutls_ocsp_req_get_nonce(req, &critical, &got);
-		if (ret != 0) {
+		if (ret != 0)
 			fail("gnutls_ocsp_req_get_nonce %d\n", ret);
-			exit(1);
-		}
 
-		if (critical != 0) {
+		if (critical != 0)
 			fail("unexpected critical %d\n", critical);
-			exit(1);
-		}
 
 		if (expect.size != got.size ||
-		    memcmp(expect.data, got.data, got.size) != 0) {
+		    memcmp(expect.data, got.data, got.size) != 0)
 			fail("ocsp request nonce memcmp failed\n");
-			exit(1);
-		}
 
 		gnutls_free(got.data);
 	}
@@ -1003,10 +885,8 @@ static void req_parse(void)
 	/* print request */
 
 	ret = gnutls_ocsp_req_print(req, GNUTLS_OCSP_PRINT_FULL, &d);
-	if (ret != 0) {
+	if (ret != 0)
 		fail("gnutls_ocsp_req_print\n");
-		exit(1);
-	}
 
 	if (strlen(REQ1INFO) != d.size ||
 	    memcmp(REQ1INFO, d.data, strlen(REQ1INFO)) != 0) {
@@ -1014,23 +894,18 @@ static void req_parse(void)
 		       strlen(REQ1INFO), REQ1INFO, (int)d.size, (int)d.size,
 		       d.data);
 		fail("ocsp request print failed\n");
-		exit(1);
 	}
 	gnutls_free(d.data);
 
 	/* test export */
 	ret = gnutls_ocsp_req_export(req, &d);
-	if (ret != 0) {
+	if (ret != 0)
 		fail("gnutls_ocsp_req_export %d\n", ret);
-		exit(1);
-	}
 
 	/* compare against earlier imported bytes */
 
-	if (req1.size != d.size || memcmp(req1.data, d.data, d.size) != 0) {
+	if (req1.size != d.size || memcmp(req1.data, d.data, d.size) != 0)
 		fail("ocsp request export memcmp failed\n");
-		exit(1);
-	}
 	gnutls_free(d.data);
 
 	/* test setting nonce */
@@ -1041,98 +916,68 @@ static void req_parse(void)
 		unsigned critical;
 
 		ret = gnutls_ocsp_req_set_nonce(req, 0, &n1);
-		if (ret != 0) {
+		if (ret != 0)
 			fail("gnutls_ocsp_req_set_nonce %d\n", ret);
-			exit(1);
-		}
 
 		ret = gnutls_ocsp_req_get_nonce(req, &critical, &got);
-		if (ret != 0) {
+		if (ret != 0)
 			fail("gnutls_ocsp_req_get_nonce %d\n", ret);
-			exit(1);
-		}
 
-		if (critical != 0) {
+		if (critical != 0)
 			fail("unexpected critical %d\n", critical);
-			exit(1);
-		}
 
 		if (n1.size != got.size ||
-		    memcmp(n1.data, got.data, got.size) != 0) {
+		    memcmp(n1.data, got.data, got.size) != 0)
 			fail("ocsp request parse nonce memcmp failed\n");
-			exit(1);
-		}
 
 		gnutls_free(got.data);
 
 		/* set another time */
 
 		ret = gnutls_ocsp_req_set_nonce(req, 1, &n2);
-		if (ret != 0) {
+		if (ret != 0)
 			fail("gnutls_ocsp_req_set_nonce %d\n", ret);
-			exit(1);
-		}
 
 		ret = gnutls_ocsp_req_get_nonce(req, &critical, &got);
-		if (ret != 0) {
+		if (ret != 0)
 			fail("gnutls_ocsp_req_get_nonce %d\n", ret);
-			exit(1);
-		}
 
-		if (critical != 1) {
+		if (critical != 1)
 			fail("unexpected critical %d\n", critical);
-			exit(1);
-		}
 
 		if (n2.size != got.size ||
-		    memcmp(n2.data, got.data, got.size) != 0) {
+		    memcmp(n2.data, got.data, got.size) != 0)
 			fail("ocsp request parse2 nonce memcmp failed\n");
-			exit(1);
-		}
 
 		gnutls_free(got.data);
 
 		/* randomize nonce */
 
 		ret = gnutls_ocsp_req_randomize_nonce(req);
-		if (ret != 0) {
+		if (ret != 0)
 			fail("gnutls_ocsp_req_randomize_nonce %d\n", ret);
-			exit(1);
-		}
 
 		ret = gnutls_ocsp_req_get_nonce(req, &critical, &n1);
-		if (ret != 0) {
+		if (ret != 0)
 			fail("gnutls_ocsp_req_get_nonce %d\n", ret);
-			exit(1);
-		}
 
-		if (critical != 0) {
+		if (critical != 0)
 			fail("unexpected random critical %d\n", critical);
-			exit(1);
-		}
 
 		ret = gnutls_ocsp_req_randomize_nonce(req);
-		if (ret != 0) {
+		if (ret != 0)
 			fail("gnutls_ocsp_req_randomize_nonce %d\n", ret);
-			exit(1);
-		}
 
 		ret = gnutls_ocsp_req_get_nonce(req, &critical, &n2);
-		if (ret != 0) {
+		if (ret != 0)
 			fail("gnutls_ocsp_req_get_nonce %d\n", ret);
-			exit(1);
-		}
 
-		if (critical != 0) {
+		if (critical != 0)
 			fail("unexpected random critical %d\n", critical);
-			exit(1);
-		}
 
 		if (n2.size == got.size &&
-		    memcmp(n1.data, n2.data, n1.size) == 0) {
+		    memcmp(n1.data, n2.data, n1.size) == 0)
 			fail("ocsp request random nonce memcmp failed\n");
-			exit(1);
-		}
 
 		gnutls_free(n1.data);
 		gnutls_free(n2.data);
@@ -1154,10 +999,8 @@ static void req_addcert_id(void)
 	/* init request */
 
 	ret = gnutls_ocsp_req_init(&req);
-	if (ret != 0) {
+	if (ret != 0)
 		fail("gnutls_ocsp_req_init\n");
-		exit(1);
-	}
 
 	/* add ocsp request nonce */
 
@@ -1167,10 +1010,8 @@ static void req_addcert_id(void)
 
 		ret = gnutls_ocsp_req_set_extension(req, "1.3.6.1.5.5.7.48.1.2",
 						    0, &nonce);
-		if (ret != 0) {
+		if (ret != 0)
 			fail("gnutls_ocsp_req_set_extension %d\n", ret);
-			exit(1);
-		}
 	}
 
 	/* add cert_id */
@@ -1186,19 +1027,15 @@ static void req_addcert_id(void)
 						  &issuer_name_hash,
 						  &issuer_key_hash,
 						  &serial_number);
-		if (ret != 0) {
+		if (ret != 0)
 			fail("gnutls_ocsp_add_cert_id %d\n", ret);
-			exit(1);
-		}
 	}
 
 	/* print request */
 
 	ret = gnutls_ocsp_req_print(req, GNUTLS_OCSP_PRINT_FULL, &d);
-	if (ret != 0) {
+	if (ret != 0)
 		fail("gnutls_ocsp_req_print\n");
-		exit(1);
-	}
 
 	if (strlen(REQ1INFO) != d.size ||
 	    memcmp(REQ1INFO, d.data, strlen(REQ1INFO)) != 0) {
@@ -1206,23 +1043,18 @@ static void req_addcert_id(void)
 		       strlen(REQ1INFO), REQ1INFO, (int)d.size, (int)d.size,
 		       d.data);
 		fail("ocsp request print failed\n");
-		exit(1);
 	}
 	gnutls_free(d.data);
 
 	/* test export */
 	ret = gnutls_ocsp_req_export(req, &d);
-	if (ret != 0) {
+	if (ret != 0)
 		fail("gnutls_ocsp_req_export %d\n", ret);
-		exit(1);
-	}
 
 	/* compare against earlier imported bytes */
 
-	if (req1.size != d.size || memcmp(req1.data, d.data, d.size) != 0) {
+	if (req1.size != d.size || memcmp(req1.data, d.data, d.size) != 0)
 		fail("ocsp request export memcmp failed\n");
-		exit(1);
-	}
 	gnutls_free(d.data);
 
 	/* cleanup */
@@ -1241,10 +1073,8 @@ static void req_addcert(void)
 	/* init request */
 
 	ret = gnutls_ocsp_req_init(&req);
-	if (ret != 0) {
+	if (ret != 0)
 		fail("gnutls_ocsp_req_init\n");
-		exit(1);
-	}
 
 	/* add ocsp request nonce */
 
@@ -1254,10 +1084,8 @@ static void req_addcert(void)
 
 		ret = gnutls_ocsp_req_set_extension(req, "1.3.6.1.5.5.7.48.1.2",
 						    0, &nonce);
-		if (ret != 0) {
+		if (ret != 0)
 			fail("gnutls_ocsp_req_set_extension %d\n", ret);
-			exit(1);
-		}
 	}
 
 	/* add cert_id */
@@ -1265,37 +1093,27 @@ static void req_addcert(void)
 		gnutls_x509_crt_t issuer = NULL, subject = NULL;
 
 		ret = gnutls_x509_crt_init(&issuer);
-		if (ret < 0) {
+		if (ret < 0)
 			fail("gnutls_x509_crt_init (issuer) %d\n", ret);
-			exit(1);
-		}
 
 		ret = gnutls_x509_crt_init(&subject);
-		if (ret < 0) {
+		if (ret < 0)
 			fail("gnutls_x509_crt_init (subject) %d\n", ret);
-			exit(1);
-		}
 
 		ret = gnutls_x509_crt_import(issuer, &issuer_data,
 					     GNUTLS_X509_FMT_PEM);
-		if (ret < 0) {
+		if (ret < 0)
 			fail("gnutls_x509_crt_import (issuer) %d\n", ret);
-			exit(1);
-		}
 
 		ret = gnutls_x509_crt_import(subject, &subject_data,
 					     GNUTLS_X509_FMT_PEM);
-		if (ret < 0) {
+		if (ret < 0)
 			fail("gnutls_x509_crt_import (subject) %d\n", ret);
-			exit(1);
-		}
 
 		ret = gnutls_ocsp_req_add_cert(req, GNUTLS_DIG_SHA1, issuer,
 					       subject);
-		if (ret != 0) {
+		if (ret != 0)
 			fail("gnutls_ocsp_add_cert %d\n", ret);
-			exit(1);
-		}
 
 		gnutls_x509_crt_deinit(subject);
 		gnutls_x509_crt_deinit(issuer);
@@ -1304,10 +1122,8 @@ static void req_addcert(void)
 	/* print request */
 
 	ret = gnutls_ocsp_req_print(req, GNUTLS_OCSP_PRINT_FULL, &d);
-	if (ret != 0) {
+	if (ret != 0)
 		fail("gnutls_ocsp_req_print\n");
-		exit(1);
-	}
 
 	if (strlen(REQ1INFO) != d.size ||
 	    memcmp(REQ1INFO, d.data, strlen(REQ1INFO)) != 0) {
@@ -1315,23 +1131,18 @@ static void req_addcert(void)
 		       strlen(REQ1INFO), REQ1INFO, (int)d.size, (int)d.size,
 		       d.data);
 		fail("ocsp request print failed\n");
-		exit(1);
 	}
 	gnutls_free(d.data);
 
 	/* test export */
 	ret = gnutls_ocsp_req_export(req, &d);
-	if (ret != 0) {
+	if (ret != 0)
 		fail("gnutls_ocsp_req_export %d\n", ret);
-		exit(1);
-	}
 
 	/* compare against earlier imported bytes */
 
-	if (req1.size != d.size || memcmp(req1.data, d.data, d.size) != 0) {
+	if (req1.size != d.size || memcmp(req1.data, d.data, d.size) != 0)
 		fail("ocsp request export memcmp failed\n");
-		exit(1);
-	}
 	gnutls_free(d.data);
 
 	/* cleanup */
@@ -1395,27 +1206,21 @@ static void resp_import(void)
 	/* init response */
 
 	ret = gnutls_ocsp_resp_init(&resp);
-	if (ret != 0) {
+	if (ret != 0)
 		fail("gnutls_ocsp_resp_init\n");
-		exit(1);
-	}
 
 	/* import ocsp response */
 
 	ret = gnutls_ocsp_resp_import(resp, &resp1);
-	if (ret != 0) {
+	if (ret != 0)
 		fail("gnutls_ocsp_resp_import[%d]: %s\n", __LINE__,
 		     gnutls_strerror(ret));
-		exit(1);
-	}
 
 	/* print response */
 
 	ret = gnutls_ocsp_resp_print(resp, GNUTLS_OCSP_PRINT_FULL, &d);
-	if (ret != 0) {
+	if (ret != 0)
 		fail("gnutls_ocsp_resp_print\n");
-		exit(1);
-	}
 
 	if (strlen(RESP1INFO) != d.size ||
 	    memcmp(RESP1INFO, d.data, strlen(RESP1INFO)) != 0) {
@@ -1423,34 +1228,28 @@ static void resp_import(void)
 		       strlen(RESP1INFO), RESP1INFO, (int)d.size, (int)d.size,
 		       d.data);
 		fail("ocsp response print failed\n");
-		exit(1);
 	}
 	gnutls_free(d.data);
 
 	/* import ocsp response */
 
 	ret = gnutls_ocsp_resp_import(resp, &resp2);
-	if (ret != 0) {
+	if (ret != 0)
 		fail("gnutls_ocsp_resp_import[%d]: %s\n", __LINE__,
 		     gnutls_strerror(ret));
-		exit(1);
-	}
 
 	check_ocsp_resp(resp);
 
 	/* print response */
 	ret = gnutls_ocsp_resp_print(resp, GNUTLS_OCSP_PRINT_FULL, &d);
-	if (ret != 0) {
+	if (ret != 0)
 		fail("gnutls_ocsp_resp_print\n");
-		exit(1);
-	}
 
 	if (memcmp(RESP2INFO, d.data, strlen(RESP2INFO)) != 0) {
 		printf("expected (len %ld):\n%s\ngot (len %d):\n%.*s\n",
 		       strlen(RESP2INFO), RESP2INFO, (int)d.size, (int)d.size,
 		       d.data);
 		fail("ocsp response print failed\n");
-		exit(1);
 	}
 	gnutls_free(d.data);
 
@@ -1461,32 +1260,25 @@ static void resp_import(void)
 	/* import ocsp response 3 */
 
 	ret = gnutls_ocsp_resp_init(&resp);
-	if (ret != 0) {
+	if (ret != 0)
 		fail("gnutls_ocsp_resp_init\n");
-		exit(1);
-	}
 
 	ret = gnutls_ocsp_resp_import(resp, &resp3);
-	if (ret != 0) {
+	if (ret != 0)
 		fail("gnutls_ocsp_resp_import[%d]: %s\n", __LINE__,
 		     gnutls_strerror(ret));
-		exit(1);
-	}
 
 	/* print response */
 
 	ret = gnutls_ocsp_resp_print(resp, GNUTLS_OCSP_PRINT_FULL, &d);
-	if (ret != 0) {
+	if (ret != 0)
 		fail("gnutls_ocsp_resp_print 3\n");
-		exit(1);
-	}
 
 	if (memcmp(RESP3INFO, d.data, strlen(RESP3INFO)) != 0) {
 		printf("expected (len %ld):\n%s\ngot (len %d):\n%.*s\n",
 		       strlen(RESP3INFO), RESP3INFO, (int)d.size, (int)d.size,
 		       d.data);
 		fail("ocsp response 3 print failed\n");
-		exit(1);
 	}
 	gnutls_free(d.data);
 
@@ -1506,204 +1298,144 @@ static void resp_verify(void)
 	/* init response */
 
 	ret = gnutls_ocsp_resp_init(&resp);
-	if (ret != 0) {
+	if (ret != 0)
 		fail("gnutls_ocsp_resp_init\n");
-		exit(1);
-	}
 
 	/* import ocsp response */
 
 	ret = gnutls_ocsp_resp_import(resp, &blog_resp);
-	if (ret != 0) {
+	if (ret != 0)
 		fail("gnutls_ocsp_resp_import %d\n", ret);
-		exit(1);
-	}
 
 	ret = gnutls_x509_crt_init(&cert);
-	if (ret < 0) {
+	if (ret < 0)
 		fail("gnutls_x509_crt_init (cert) %d\n", ret);
-		exit(1);
-	}
 
 	ret = gnutls_x509_crt_init(&issuer);
-	if (ret < 0) {
+	if (ret < 0)
 		fail("gnutls_x509_crt_init (issuer) %d\n", ret);
-		exit(1);
-	}
 
 	ret = gnutls_x509_crt_init(&signer);
-	if (ret < 0) {
+	if (ret < 0)
 		fail("gnutls_x509_crt_init (signer) %d\n", ret);
-		exit(1);
-	}
 
 	ret = gnutls_x509_crt_import(cert, &blog_cert_data,
 				     GNUTLS_X509_FMT_PEM);
-	if (ret < 0) {
+	if (ret < 0)
 		fail("gnutls_x509_crt_import (cert) %d\n", ret);
-		exit(1);
-	}
 
 	ret = gnutls_x509_crt_import(issuer, &blog_issuer_data,
 				     GNUTLS_X509_FMT_PEM);
-	if (ret < 0) {
+	if (ret < 0)
 		fail("gnutls_x509_crt_import (issuer) %d\n", ret);
-		exit(1);
-	}
 
 	ret = gnutls_x509_crt_import(signer, &blog_signer_data,
 				     GNUTLS_X509_FMT_PEM);
-	if (ret < 0) {
+	if (ret < 0)
 		fail("gnutls_x509_crt_import (signer) %d\n", ret);
-		exit(1);
-	}
 
 	/* check direct verify with signer (should succeed) */
 
 	ret = gnutls_ocsp_resp_verify_direct(resp, signer, &verify, 0);
-	if (ret < 0) {
+	if (ret < 0)
 		fail("gnutls_ocsp_resp_verify_direct (signer) %d\n", ret);
-		exit(1);
-	}
 
-	if (verify != 0) {
+	if (verify != 0)
 		fail("gnutls_ocsp_resp_verify_direct %d\n", verify);
-		exit(1);
-	}
 
 	/* check direct verify with cert (should fail) */
 
 	ret = gnutls_ocsp_resp_verify_direct(resp, cert, &verify,
 					     GNUTLS_VERIFY_ALLOW_BROKEN);
-	if (ret < 0) {
+	if (ret < 0)
 		fail("gnutls_ocsp_resp_verify_direct (cert) %d\n", ret);
-		exit(1);
-	}
 
-	if (verify != GNUTLS_OCSP_VERIFY_UNTRUSTED_SIGNER) {
+	if (verify != GNUTLS_OCSP_VERIFY_UNTRUSTED_SIGNER)
 		fail("gnutls_ocsp_resp_verify_direct3 %d\n", verify);
-		exit(1);
-	}
 
 	/* check trust verify with issuer (should succeed) */
 
 	ret = gnutls_x509_trust_list_init(&list, 0);
-	if (ret < 0) {
+	if (ret < 0)
 		fail("gnutls_x509_trust_list_init %d\n", ret);
-		exit(1);
-	}
 
 	ret = gnutls_x509_trust_list_add_cas(list, &issuer, 1, 0);
-	if (ret < 0) {
+	if (ret < 0)
 		fail("gnutls_x509_trust_list_add_cas %d\n", ret);
-		exit(1);
-	}
 
 	ret = gnutls_ocsp_resp_verify(resp, list, &verify,
 				      GNUTLS_VERIFY_ALLOW_BROKEN);
-	if (ret < 0) {
+	if (ret < 0)
 		fail("gnutls_ocsp_resp_verify (issuer) %d\n", ret);
-		exit(1);
-	}
 
-	if (verify != 0) {
+	if (verify != 0)
 		fail("gnutls_ocsp_resp_verify %d\n", verify);
-		exit(1);
-	}
 
 	gnutls_x509_trust_list_deinit(list, 0);
 
 	/* check trust verify with signer (should succeed) */
 
 	ret = gnutls_x509_trust_list_init(&list, 0);
-	if (ret < 0) {
+	if (ret < 0)
 		fail("gnutls_x509_trust_list_init %d\n", ret);
-		exit(1);
-	}
 
 	ret = gnutls_x509_trust_list_add_cas(list, &signer, 1, 0);
-	if (ret < 0) {
+	if (ret < 0)
 		fail("gnutls_x509_trust_list_add_cas %d\n", ret);
-		exit(1);
-	}
 
 	ret = gnutls_ocsp_resp_verify(resp, list, &verify, 0);
-	if (ret < 0) {
+	if (ret < 0)
 		fail("gnutls_ocsp_resp_verify (issuer) %d\n", ret);
-		exit(1);
-	}
 
-	if (verify != 0) {
+	if (verify != 0)
 		fail("gnutls_ocsp_resp_verify %d\n", verify);
-		exit(1);
-	}
 
 	gnutls_x509_trust_list_deinit(list, 0);
 
 	/* check trust verify with cert (should fail) */
 
 	ret = gnutls_x509_trust_list_init(&list, 0);
-	if (ret < 0) {
+	if (ret < 0)
 		fail("gnutls_x509_trust_list_init %d\n", ret);
-		exit(1);
-	}
 
 	ret = gnutls_x509_trust_list_add_cas(list, &cert, 1, 0);
-	if (ret < 0) {
+	if (ret < 0)
 		fail("gnutls_x509_trust_list_add_cas %d\n", ret);
-		exit(1);
-	}
 
 	ret = gnutls_ocsp_resp_verify(resp, list, &verify,
 				      GNUTLS_VERIFY_ALLOW_BROKEN);
-	if (ret < 0) {
+	if (ret < 0)
 		fail("gnutls_ocsp_resp_verify (issuer) %d\n", ret);
-		exit(1);
-	}
 
-	if (verify != GNUTLS_OCSP_VERIFY_UNTRUSTED_SIGNER) {
+	if (verify != GNUTLS_OCSP_VERIFY_UNTRUSTED_SIGNER)
 		fail("gnutls_ocsp_resp_verify %d\n", verify);
-		exit(1);
-	}
 
 	gnutls_x509_trust_list_deinit(list, 0);
 
 	/* check trust verify with all certs (should succeed) */
 
 	ret = gnutls_x509_trust_list_init(&list, 0);
-	if (ret < 0) {
+	if (ret < 0)
 		fail("gnutls_x509_trust_list_init %d\n", ret);
-		exit(1);
-	}
 
 	ret = gnutls_x509_trust_list_add_cas(list, &cert, 1, 0);
-	if (ret < 0) {
+	if (ret < 0)
 		fail("gnutls_x509_trust_list_add_cas %d\n", ret);
-		exit(1);
-	}
 
 	ret = gnutls_x509_trust_list_add_cas(list, &issuer, 1, 0);
-	if (ret < 0) {
+	if (ret < 0)
 		fail("gnutls_x509_trust_list_add_cas %d\n", ret);
-		exit(1);
-	}
 
 	ret = gnutls_x509_trust_list_add_cas(list, &signer, 1, 0);
-	if (ret < 0) {
+	if (ret < 0)
 		fail("gnutls_x509_trust_list_add_cas %d\n", ret);
-		exit(1);
-	}
 
 	ret = gnutls_ocsp_resp_verify(resp, list, &verify, 0);
-	if (ret < 0) {
+	if (ret < 0)
 		fail("gnutls_ocsp_resp_verify (issuer) %d\n", ret);
-		exit(1);
-	}
 
-	if (verify != 0) {
+	if (verify != 0)
 		fail("gnutls_ocsp_resp_verify %d\n", verify);
-		exit(1);
-	}
 
 	gnutls_x509_trust_list_deinit(list, 0);
 
@@ -1775,45 +1507,33 @@ static void long_resp_check(void)
 	/* init response */
 
 	ret = gnutls_ocsp_resp_init(&resp);
-	if (ret != 0) {
+	if (ret != 0)
 		fail("gnutls_ocsp_resp_init\n");
-		exit(1);
-	}
 
 	/* import ocsp response */
 
 	ret = gnutls_ocsp_resp_import(resp, &long_resp);
-	if (ret != 0) {
+	if (ret != 0)
 		fail("gnutls_ocsp_resp_import[%d]: %s\n", __LINE__,
 		     gnutls_strerror(ret));
-		exit(1);
-	}
 
 	ret = gnutls_x509_crt_init(&signer);
-	if (ret < 0) {
+	if (ret < 0)
 		fail("gnutls_x509_crt_init (signer) %d\n", ret);
-		exit(1);
-	}
 
 	ret = gnutls_x509_crt_import(signer, &long_resp_signer_data,
 				     GNUTLS_X509_FMT_PEM);
-	if (ret < 0) {
+	if (ret < 0)
 		fail("gnutls_x509_crt_import (cert) %d\n", ret);
-		exit(1);
-	}
 
 	/* check direct verify with signer (should succeed) */
 
 	ret = gnutls_ocsp_resp_verify_direct(resp, signer, &verify, 0);
-	if (ret < 0) {
+	if (ret < 0)
 		fail("gnutls_ocsp_resp_verify_direct (signer) %d\n", ret);
-		exit(1);
-	}
 
-	if (verify != 0) {
+	if (verify != 0)
 		fail("gnutls_ocsp_resp_verify_direct %d\n", verify);
-		exit(1);
-	}
 
 	gnutls_x509_crt_deinit(signer);
 	gnutls_ocsp_resp_deinit(resp);
@@ -1824,10 +1544,8 @@ void doit(void)
 	int ret;
 
 	ret = global_init();
-	if (ret < 0) {
+	if (ret < 0)
 		fail("global_init\n");
-		exit(1);
-	}
 
 	gnutls_global_set_time_function(mytime);
 	gnutls_global_set_log_function(tls_log_func);
