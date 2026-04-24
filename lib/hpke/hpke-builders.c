@@ -22,7 +22,7 @@
  */
 
 #include "hpke-builders.h"
-#include "lib/num.h"
+#include "num.h"
 
 #include <string.h>
 
