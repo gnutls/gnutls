@@ -17,6 +17,18 @@ See the end for copying conditions.
    Haruto Kimura (Stella), Oscar Reparaz and Zou Dikai.
    [GNUTLS-SA-2026-04-29-1, CVSS: high] [CVE-2026-33846]
 
+** libgnutls: Fix qsort comparator in DTLS reassembly
+   The comparator function used for ordering DTLS packets
+   by sequence numbers did not follow qsort comparator contracts
+   in case of packets with duplicate sequence numbers,
+   which could lead to unstable ordering or undefined behaviour.
+   Return 0 in such cases makes the sorting stable.
+   Additionally, discard packets with same sequence numbers
+   and differing handshake type,
+   so that they don't end up being sorted in the first place.
+   Reported by Joshua Rogers of AISLE Research Team.
+   [GNUTLS-SA-2026-04-29-2, CVSS: high] [CVE-2026-42009]
+
 ** build: Support building with Nettle 4.0
    Nettle 4.0 was released in Feburary 2026, with API incompatibile
    changes from 3.10. The library can now compile with it, while
