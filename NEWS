@@ -7,6 +7,16 @@ See the end for copying conditions.
 
 * Version 3.8.13 (unreleased)
 
+** libgnutls: Add more checks to DTLS reassembly
+   Previously, gnutls didn't check that DTLS fragments claimed
+   a consistent message_length value.
+   Additionally, a crucial array size check was missing,
+   enabling an attacker to cause a heap overwrite.
+   Reject fragments with mismatching length and add a missing boundary check.
+   Independently reported by
+   Haruto Kimura (Stella), Oscar Reparaz and Zou Dikai.
+   [GNUTLS-SA-2026-04-29-1, CVSS: high] [CVE-2026-33846]
+
 ** build: Support building with Nettle 4.0
    Nettle 4.0 was released in Feburary 2026, with API incompatibile
    changes from 3.10. The library can now compile with it, while
