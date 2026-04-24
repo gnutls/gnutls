@@ -29,6 +29,13 @@ See the end for copying conditions.
    Reported by Joshua Rogers of AISLE Research Team.
    [GNUTLS-SA-2026-04-29-2, CVSS: high] [CVE-2026-42009]
 
+** libgnutls: Fix crashing on an underflow with a DTLS datagram
+   A remotely triggerable underflow in the DTLS reassembly code led to
+   a heap overrun.
+   Prevent the underflow from happening.
+   Reported by Joshua Rogers of AISLE Research Team.
+   [GNUTLS-SA-2026-04-29-3, CVSS: high] [CVE-2026-33845]
+
 ** build: Support building with Nettle 4.0
    Nettle 4.0 was released in Feburary 2026, with API incompatibile
    changes from 3.10. The library can now compile with it, while
