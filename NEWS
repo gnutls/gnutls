@@ -36,6 +36,14 @@ See the end for copying conditions.
    Reported by Joshua Rogers of AISLE Research Team.
    [GNUTLS-SA-2026-04-29-3, CVSS: high] [CVE-2026-33845]
 
+** libgnutls: Fix RSA-PSK identity truncation
+   Servers configured with RSA-PSK have wrongfully matched usernames with NUL
+   character in them to ones truncated to NUL character,
+   which could lead to an authentication bypass.
+   Fix the check to perform comparison up to the full username length.
+   Reported by Joshua Rogers of AISLE Research Team.
+   [GNUTLS-SA-2026-04-29-4, CVSS: high] [CVE-2026-42010]
+
 ** build: Support building with Nettle 4.0
    Nettle 4.0 was released in Feburary 2026, with API incompatibile
    changes from 3.10. The library can now compile with it, while
