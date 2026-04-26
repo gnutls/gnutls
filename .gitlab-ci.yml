@@ -311,6 +311,7 @@ fedora/build:
       --enable-libdane --disable-rpath
       --with-default-priority-string=@SYSTEM
       --with-leancrypto
+      --enable-hpke
     - make -j$BUILDJOBS
     # build tests, but don't execute them
     - make -j$BUILDJOBS check TESTS=""
