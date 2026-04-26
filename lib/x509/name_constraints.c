@@ -42,7 +42,6 @@
 #include "minmax.h"
 #include "gl_array_list.h"
 #include "gl_rbtree_list.h"
-#include "verify.h"
 
 #include <assert.h>
 #include <string.h>
@@ -65,8 +64,8 @@ typedef unsigned long san_flags_t;
 	((san) <= GNUTLS_SAN_MAX ? (san) - SAN_MIN : \
 				   GNUTLS_SAN_MAX + (san) - SAN_OTHERNAME_MIN)
 
-verify(SAN_BIT(SAN_OTHERNAME_MIN) > SAN_BIT(GNUTLS_SAN_MAX));
-verify(SAN_BIT(SAN_OTHERNAME_MAX) < CHAR_BIT * sizeof(san_flags_t));
+static_assert(SAN_BIT(SAN_OTHERNAME_MIN) > SAN_BIT(GNUTLS_SAN_MAX));
+static_assert(SAN_BIT(SAN_OTHERNAME_MAX) < CHAR_BIT * sizeof(san_flags_t));
 
 #define SAN_FLAG(san) (1UL << SAN_BIT(san))
 
