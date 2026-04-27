@@ -110,7 +110,7 @@ done
 # KEM based groups cannot be used standalone
 for group in KYBER768 MLKEM768 MLKEM1024; do
     if ! "${CLI}" --list | grep "^Groups: .*GROUP-$group.*" >/dev/null; then
-	"$group is not supported, skipping"
+	echo "$group is not supported, skipping" >&2
 	continue
     fi
 
