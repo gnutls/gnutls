@@ -1441,6 +1441,7 @@ static int wrap_nettle_cipher_aead_encrypt(void *_ctx, const void *nonce,
 
 	if (ctx->cipher->aead_encrypt == NULL) {
 		/* proper AEAD cipher */
+		uint8_t tag[MAX_HASH_SIZE];
 		unsigned max_iv;
 
 		if (encr_size < plain_size + tag_size)
@@ -1459,11 +1460,11 @@ static int wrap_nettle_cipher_aead_encrypt(void *_ctx, const void *nonce,
 		ctx->cipher->encrypt(ctx, plain_size, encr, plain);
 
 #if NETTLE_VERSION_MAJOR >= 4
-		ctx->cipher->tag(ctx->ctx_ptr, ((uint8_t *)encr) + plain_size);
+		ctx->cipher->tag(ctx->ctx_ptr, tag);
 #else
-		ctx->cipher->tag(ctx->ctx_ptr, tag_size,
-				 ((uint8_t *)encr) + plain_size);
+		ctx->cipher->tag(ctx->ctx_ptr, tag_size, tag);
 #endif
+		memcpy(((uint8_t *)encr) + plain_size, tag, tag_size);
 	} else {
 		/* CCM-style cipher */
 
@@ -1614,12 +1615,14 @@ static int wrap_nettle_cipher_auth(void *_ctx, const void *plain,
 static void wrap_nettle_cipher_tag(void *_ctx, void *tag, size_t tag_size)
 {
 	struct nettle_cipher_ctx *ctx = _ctx;
+	uint8_t buf[MAX_HASH_SIZE];
 
 #if NETTLE_VERSION_MAJOR >= 4
-	ctx->cipher->tag(ctx->ctx_ptr, tag);
+	ctx->cipher->tag(ctx->ctx_ptr, buf);
 #else
-	ctx->cipher->tag(ctx->ctx_ptr, tag_size, tag);
+	ctx->cipher->tag(ctx->ctx_ptr, tag_size, buf);
 #endif
+	memcpy(tag, buf, tag_size);
 }
 
 static void wrap_nettle_cipher_close(void *_ctx)

@@ -177,6 +177,7 @@ doc/scripts/Makefile
 doc/scripts/Makefile.in
 doc/socket-api.texi
 doc/stamp_enums
+doc/stamp_error_codes
 doc/stamp_functions
 doc/stamp_invoke
 doc/stamp-vti
@@ -574,6 +575,7 @@ tests/pkcs11-get-raw-issuer-exts
 tests/pkcs11-import-url-privkey
 tests/pkcs11-import-url-privkey-caps
 tests/pkcs11-mechanisms
+tests/pkcs11-obj-get-pk-algorithm
 tests/pkcs11-obj-raw
 tests/pkcs11-privkey-always-auth
 tests/pkcs11-privkey-export
@@ -598,7 +600,6 @@ tests/pkcs11/pkcs11-get-issuer
 tests/pkcs11/pkcs11-import-url-privkey
 tests/pkcs11/pkcs11-import-with-pin
 tests/pkcs11/pkcs11-is-known
-tests/pkcs11/pkcs11-obj-get-pk-algorithm
 tests/pkcs11/pkcs11-obj-import
 tests/pkcs11/pkcs11-pin-func
 tests/pkcs11/pkcs11-privkey

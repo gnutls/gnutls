@@ -20,7 +20,7 @@
 
 EXTRA_DIST = TODO certtool.cfg gnutls.html	\
 	doxygen/Doxyfile.in doxygen/Doxyfile.orig texinfo.css \
-	stamp_enums stamp_functions \
+	stamp_enums stamp_functions stamp_error_codes \
 	doc.mk
 
 IMAGES = \
@@ -236,6 +236,7 @@ AM_MAKEINFOHTMLFLAGS = $(AM_MAKEINFOFLAGS) \
 	--no-split --css-include=$(srcdir)/texinfo.css
 
 MAINTAINERCLEANFILES =
+DISTCLEANFILES =
 
 # Generated texinfos.
 
@@ -244,7 +245,7 @@ API_FILES=gnutls-api.texi socket-api.texi x509-api.texi pkcs12-api.texi \
 	dtls-api.texi crypto-api.texi ocsp-api.texi tpm-api.texi dane-api.texi \
 	pkcs7-api.texi hpke-api.texi
 
-MAINTAINERCLEANFILES += stamp_enums stamp_functions functions enums
+MAINTAINERCLEANFILES += stamp_enums stamp_functions stamp_error_codes
 
 gnutls_TEXINFOS += $(API_FILES)
 
@@ -416,13 +417,14 @@ if !WINDOWS
 gnutls_TEXINFOS += error_codes.texi algorithms.texi alerts.texi enums.texi
 endif
 
-DISTCLEANFILES = error_codes.texi algorithms.texi alerts.texi enums.texi
+MAINTAINERCLEANFILES += error_codes.texi algorithms.texi alerts.texi enums.texi
 
 AM_CPPFLAGS = \
 	-I$(top_builddir)/lib/includes -I$(top_srcdir)/lib/includes \
 	-I$(top_builddir)/
 
 EXTRA_PROGRAMS = errcodes printlist alert-printlist
+DISTCLEANFILES += $(EXTRA_PROGRAMS)
 
 errcodes_SOURCES = errcodes.c common.c common.h
 errcodes_LDADD = ../lib/libgnutls.la ../gl/libgnu.la
@@ -468,8 +470,7 @@ enums.texi: $(HEADER_FILES)
 	mv -f $@-tmp $@
 
 gnutls_TEXINFOS += $(ENUMS) $(FUNCS) $(AUTOGENED_DOC)
-DISTCLEANFILES += $(ENUMS) stamp_enums stamp_error_codes stamp_functions \
-  errcodes printlist alert-printlist
+MAINTAINERCLEANFILES += $(ENUMS) $(FUNCS) $(AUTOGENED_DOC)
 
 
 stamp_functions: $(API_FILES)

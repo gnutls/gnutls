@@ -59,21 +59,20 @@
 #include "ext/server_cert_type.h"
 #include "ext/compress_certificate.h"
 #include "intprops.h"
-#include "verify.h"
 
-verify(GNUTLS_EXTENSION_MAX < GNUTLS_EXTENSION_MAX_VALUE);
-verify(GNUTLS_EXTENSION_MAX < MAX_EXT_TYPES);
+static_assert(GNUTLS_EXTENSION_MAX < GNUTLS_EXTENSION_MAX_VALUE);
+static_assert(GNUTLS_EXTENSION_MAX < MAX_EXT_TYPES);
 
 /* we must provide at least 16 extensions for users to register;
  * increase GNUTLS_EXTENSION_MAX_VALUE, MAX_EXT_TYPES and used_exts
  * type if this fails
  */
-verify(GNUTLS_EXTENSION_MAX_VALUE - GNUTLS_EXTENSION_MAX >= 16);
+static_assert(GNUTLS_EXTENSION_MAX_VALUE - GNUTLS_EXTENSION_MAX >= 16);
 
 /* MAX_EXT_TYPES must fit in a single byte, to generate random
  * permutation at once.
  */
-verify(MAX_EXT_TYPES <= UINT8_MAX);
+static_assert(MAX_EXT_TYPES <= UINT8_MAX);
 
 static void unset_ext_data(gnutls_session_t session,
 			   const struct hello_ext_entry_st *, unsigned idx);
