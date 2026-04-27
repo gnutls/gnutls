@@ -62,6 +62,14 @@ See the end for copying conditions.
    Reported by Haruto Kimura (Stella).
    [GNUTLS-SA-2026-04-29-6, CVSS: medium] [CVE-2026-42011]
 
+** libgnutls: Suppress CN fallback in presence of URI and SRV SAN
+   Certificates containing URI or SRV Subject Alternative Names
+   no longer fall back to checking DNS hostnames against Common Name
+   to avoid potential misuse of such certificates
+   beyond their original purpose.
+   Reported by Oleh Konko (1seal).
+   [GNUTLS-SA-2026-04-27-7, CVSS: medium] [CVE-2026-42012]
+
 ** build: Support building with Nettle 4.0
    Nettle 4.0 was released in Feburary 2026, with API incompatibile
    changes from 3.10. The library can now compile with it, while
