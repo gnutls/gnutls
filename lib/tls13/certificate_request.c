@@ -108,15 +108,21 @@ static int parse_cert_extension(void *_ctx, unsigned tls_id,
 			if (se == NULL)
 				continue;
 
+			gnutls_pk_algorithm_t algo;
+			if (se->cert_pk != GNUTLS_PK_UNKNOWN)
+				algo = se->cert_pk;
+			else
+				algo = se->pk;
+
 			if (ctx->pk_algos_length >=
 			    sizeof(ctx->pk_algos) / sizeof(ctx->pk_algos[0]))
 				break;
 
-			if (is_algo_in_list(se->pk, ctx->pk_algos,
+			if (is_algo_in_list(algo, ctx->pk_algos,
 					    ctx->pk_algos_length))
 				continue;
 
-			ctx->pk_algos[ctx->pk_algos_length++] = se->pk;
+			ctx->pk_algos[ctx->pk_algos_length++] = algo;
 		}
 #ifdef ENABLE_OCSP
 	} else if (tls_id == ext_mod_status_request.tls_id) {
