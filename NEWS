@@ -182,7 +182,26 @@ See the end for copying conditions.
    implementation contributed by David Dudas. Given this is a
    technology preview, the implementation and the API might suffer
    modification in the following period. Use --enable-hpke to turn on
-   this feature. (#1506)
+   this feature (#1506).
+
+** libgnutls: Fix TLS 1.3 client certificate selection
+   For servers that send a signature_algorithms extension in CertificateRequest
+   with new rsa_pss_rsae_* algorithms and without the legacy rsa_pkcs1_* ones,
+   the client now properly considers RSA when selecting a certificate to send.
+   This fixes TLS 1.3 interoperability with newer Java servers
+   when using client certificates.
+   Contributed by Romain Tartière (#1842).
+
+** libgnutls: Fix kTLS ChaCha20-Poly1305 IV for TLS 1.2
+   When using kTLS with ChaCha20-Poly1305 under TLS 1.2,
+   an incorrect value was passed as the IV to the kernel,
+   causing connections to fail early.
+
+** libgnutls: Allow fetching object type metadata for PKCS#11 keys
+   A new library function, gnutls_pkcs11_obj_get_pk_algorithm,
+   has been added to check the public key algorithms of PKCS#11 key objects.
+   Object types other than CKO_PRIVATE_KEY are currently not supported.
+   Contributed by Ghadi Elie Rahme (!2074).
 
 ** API and ABI modifications:
 gnutls_hpke_kem_t: New enum
