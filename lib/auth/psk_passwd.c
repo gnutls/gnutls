@@ -78,7 +78,7 @@ ATTRIBUTE_NONNULL((1, 2))
 static bool username_matches(const gnutls_datum_t *username, const char *line,
 			     size_t line_size)
 {
-	int retval;
+	bool retval;
 	unsigned i;
 	gnutls_datum_t hexline, hex_username = { NULL, 0 };
 
@@ -91,13 +91,16 @@ static bool username_matches(const gnutls_datum_t *username, const char *line,
 		return false;
 
 	if (line_size == 0)
-		return (username->size == 0);
+		return false;
 
 	/* move to first ':' */
 	i = 0;
 	while ((i < line_size) && (line[i] != '\0') && (line[i] != ':')) {
 		i++;
 	}
+
+	if (line[i] != ':')
+		return false;
 
 	/* if format is in hex, e.g. #FAFAFA */
 	if (line[0] == '#' && line_size > 1) {
@@ -107,19 +110,17 @@ static bool username_matches(const gnutls_datum_t *username, const char *line,
 		if (gnutls_hex_decode2(&hexline, &hex_username) < 0)
 			return gnutls_assert_val(0);
 
-		if (hex_username.size == username->size)
-			retval = memcmp(username->data, hex_username.data,
-					username->size);
-		else
-			retval = -1;
+		retval = hex_username.size == username->size &&
+			 memcmp(username->data, hex_username.data,
+				username->size) == 0;
 
 		_gnutls_free_datum(&hex_username);
 	} else {
-		retval = strncmp((const char *)username->data, line,
-				 MAX(i, username->size));
+		retval = i == username->size &&
+			 strncmp((const char *)username->data, line, i) == 0;
 	}
 
-	return (retval == 0);
+	return retval;
 }
 
 /* Randomizes the given password entry. It actually sets a random password. 
