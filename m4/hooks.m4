@@ -412,6 +412,17 @@ LIBTASN1_MINIMUM=4.9
         [AC_DEFINE([ENABLE_CRYPTO_AUDITING], [1], [enable crypto-auditing trace])])
   AM_CONDITIONAL([ENABLE_CRYPTO_AUDITING], [test "$enable_crypto_auditing" = "yes"])
 
+  # Turn this on by default, when the API becomes stable
+  AC_MSG_CHECKING([whether to enable HPKE support])
+  AC_ARG_ENABLE([hpke],
+    [AS_HELP_STRING([--enable-hpke],
+                   [enable the HPKE support])],
+    [ac_enable_hpke=$enableval], [ac_enable_hpke=no])
+  AC_MSG_RESULT([$ac_enable_hpke])
+  AS_IF([test "$ac_enable_hpke" = "yes"],
+        [AC_DEFINE([ENABLE_HPKE], 1, [enable HPKE])])
+  AM_CONDITIONAL([ENABLE_HPKE], [test "$ac_enable_hpke" = "yes"])
+
   # For storing integers in pointers without warnings
   # https://developer.gnome.org/doc/API/2.0/glib/glib-Type-Conversion-Macros.html#desc
   AC_CHECK_SIZEOF(void *)

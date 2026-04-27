@@ -14,6 +14,7 @@
 * Abstract key API::
 * Socket specific API::
 * DANE API::
+* HPKE API::
 * Cryptographic API::
 * Compatibility API::
 @end menu
@@ -107,6 +108,14 @@ Their prototypes lie in @file{gnutls/dane.h}. Note that you need to link
 with the @code{libgnutls-dane} library to use them.
 
 @include dane-api.texi
+
+@node HPKE API
+@section HPKE API
+
+The following functions are to be used for HPKE structures handling.
+Their prototypes lie in @file{gnutls/hpke.h}.
+
+@include hpke-api.texi
 
 @node Cryptographic API
 @section Cryptographic API

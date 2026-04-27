@@ -1470,18 +1470,11 @@ GNUTLS_3_8_13
     gnutls_pkcs11_obj_get_pk_algorithm;
     gnutls_hpke_encap;
     gnutls_hpke_decap;
-    gnutls_hpke_context_init;
-    gnutls_hpke_context_deinit;
-    gnutls_hpke_context_set_psk;
-    gnutls_hpke_context_set_sender_privkey;
-    gnutls_hpke_context_set_sender_pubkey;
-    gnutls_hpke_context_get_enc_size;
+    gnutls_hpke_init;
+    gnutls_hpke_deinit;
     gnutls_hpke_seal;
     gnutls_hpke_open;
-    gnutls_hpke_context_set_ikme;
-    gnutls_hpke_generate_keypair;
-    gnutls_hpke_get_seq;
-    gnutls_hpke_set_seq;
+    gnutls_hpke_derive_keypair;
     gnutls_hpke_export;
  local:
 	*;
@@ -1599,4 +1592,7 @@ GNUTLS_PRIVATE_3_4 {
 	_gnutls_pathbuf_deinit;
 	# needed by tests/pkcs11/eddsa-ecpoint-encodings
 	_gnutls_pubkey_import_ecc_eddsa;
+	# needed by tests/hpke-tests
+        _gnutls_hpke_get_seq;
+	_gnutls_hpke_set_ikme;
 } GNUTLS_3_4;

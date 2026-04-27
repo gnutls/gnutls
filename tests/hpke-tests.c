@@ -36,6 +36,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+extern int _gnutls_hpke_get_seq(gnutls_hpke_context_t ctx, uint64_t *seq);
+extern int _gnutls_hpke_set_ikme(gnutls_hpke_context_t ctx,
+				 const gnutls_datum_t *ikme);
+
 static unsigned char info[] = { 0x4f, 0x64, 0x65, 0x20, 0x6f, 0x6e, 0x20,
 				0x61, 0x20, 0x47, 0x72, 0x65, 0x63, 0x69,
 				0x61, 0x6e, 0x20, 0x55, 0x72, 0x6e };
@@ -117,115 +121,84 @@ static void test_hpke(const hpke_test_parameters_st *params)
 	gnutls_datum_t ciphertext_out = { NULL, 0 };
 	gnutls_datum_t exporter_out = { NULL, 0 };
 
-	ret = gnutls_hpke_context_init(&sender_ctx, params->mode,
-				       GNUTLS_HPKE_ROLE_SENDER, params->kem,
-				       params->kdf, params->aead);
+	ret = gnutls_hpke_init(&sender_ctx, params->mode,
+			       GNUTLS_HPKE_ROLE_SENDER, params->kem,
+			       params->kdf, params->aead);
 	if (ret < 0) {
-		fail("gnutls_hpke_context_init (mode: %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
+		fail("gnutls_hpke_init (mode: %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
 		     params->mode, params->kem, params->kdf, params->aead,
 		     gnutls_strerror(ret));
-		goto cleanup;
 	}
 
-	ret = gnutls_hpke_context_set_ikme(sender_ctx, &params->ikmE);
+	ret = _gnutls_hpke_set_ikme(sender_ctx, &params->ikmE);
 	if (ret < 0) {
-		fail("gnutls_hpke_context_set_ikme (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
+		fail("_gnutls_hpke_set_ikme (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
 		     params->mode, params->kem, params->kdf, params->aead,
 		     gnutls_strerror(ret));
-		goto cleanup;
-	}
-
-	if (params->psk != NULL && params->psk_id != NULL) {
-		ret = gnutls_hpke_context_set_psk(sender_ctx, params->psk,
-						  params->psk_id);
-		if (ret < 0) {
-			fail("gnutls_hpke_context_set_psk (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
-			     params->mode, params->kem, params->kdf,
-			     params->aead, gnutls_strerror(ret));
-			goto cleanup;
-		}
 	}
 
 	if (params->ikmS != NULL) {
-		ret = gnutls_hpke_generate_keypair(params->kem, params->ikmS,
-						   &skS, &pkS);
+		ret = gnutls_privkey_init(&skS);
 		if (ret < 0) {
-			fail("gnutls_hpke_generate_keypair (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
-			     params->mode, params->kem, params->kdf,
-			     params->aead, gnutls_strerror(ret));
-			goto cleanup;
+			fail("gnutls_privkey_init: %s\n", gnutls_strerror(ret));
 		}
-
-		ret = gnutls_hpke_context_set_sender_privkey(sender_ctx, skS);
+		ret = gnutls_pubkey_init(&pkS);
 		if (ret < 0) {
-			fail("gnutls_hpke_context_set_sender_privkey (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
+			fail("gnutls_pubkey_init: %s\n", gnutls_strerror(ret));
+		}
+		ret = gnutls_hpke_derive_keypair(params->kem, params->ikmS, skS,
+						 pkS);
+		if (ret < 0) {
+			fail("gnutls_hpke_derive_keypair (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
 			     params->mode, params->kem, params->kdf,
 			     params->aead, gnutls_strerror(ret));
-			goto cleanup;
 		}
 	}
 
-	ret = gnutls_hpke_generate_keypair(params->kem, &params->ikmR, &skR,
-					   &pkR);
+	ret = gnutls_privkey_init(&skR);
 	if (ret < 0) {
-		fail("gnutls_hpke_generate_keypair (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
+		fail("gnutls_privkey_init: %s\n", gnutls_strerror(ret));
+	}
+	ret = gnutls_pubkey_init(&pkR);
+	if (ret < 0) {
+		fail("gnutls_pubkey_init: %s\n", gnutls_strerror(ret));
+	}
+	ret = gnutls_hpke_derive_keypair(params->kem, &params->ikmR, skR, pkR);
+	if (ret < 0) {
+		fail("gnutls_hpke_derive_keypair (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
 		     params->mode, params->kem, params->kdf, params->aead,
 		     gnutls_strerror(ret));
-		goto cleanup;
 	}
 
-	ret = gnutls_hpke_encap(sender_ctx, &params->info, &enc, pkR);
+	ret = gnutls_hpke_encap(sender_ctx, &params->info, &enc, pkR, skS,
+				params->psk, params->psk_id);
 	if (ret < 0) {
 		fail("gnutls_hpke_encap (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
 		     params->mode, params->kem, params->kdf, params->aead,
 		     gnutls_strerror(ret));
-		goto cleanup;
 	}
 
 	if (params->expected_enc.size != enc.size ||
 	    memcmp(params->expected_enc.data, enc.data, enc.size) != 0) {
 		fail("enc does not match expected value (mode %d, kem: %d, kdf: %d, aead: %d)\n",
 		     params->mode, params->kem, params->kdf, params->aead);
-		goto cleanup;
 	}
 
-	ret = gnutls_hpke_context_init(&receiver_ctx, params->mode,
-				       GNUTLS_HPKE_ROLE_RECEIVER, params->kem,
-				       params->kdf, params->aead);
+	ret = gnutls_hpke_init(&receiver_ctx, params->mode,
+			       GNUTLS_HPKE_ROLE_RECEIVER, params->kem,
+			       params->kdf, params->aead);
 	if (ret < 0) {
 		fail("gnutls_context_init (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
 		     params->mode, params->kem, params->kdf, params->aead,
 		     gnutls_strerror(ret));
-		goto cleanup;
 	}
 
-	if (params->psk != NULL && params->psk_id != NULL) {
-		ret = gnutls_hpke_context_set_psk(receiver_ctx, params->psk,
-						  params->psk_id);
-		if (ret < 0) {
-			fail("gnutls_hpke_context_set_psk (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
-			     params->mode, params->kem, params->kdf,
-			     params->aead, gnutls_strerror(ret));
-			goto cleanup;
-		}
-	}
-
-	if (params->ikmS != NULL) {
-		ret = gnutls_hpke_context_set_sender_pubkey(receiver_ctx, pkS);
-		if (ret < 0) {
-			fail("gnutls_hpke_context_set_sender_pubkey (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
-			     params->mode, params->kem, params->kdf,
-			     params->aead, gnutls_strerror(ret));
-			goto cleanup;
-		}
-	}
-
-	ret = gnutls_hpke_decap(receiver_ctx, &params->info, &enc, skR);
+	ret = gnutls_hpke_decap(receiver_ctx, &params->info, &enc, skR, pkS,
+				params->psk, params->psk_id);
 	if (ret < 0) {
 		fail("gnutls_hpke_decap (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
 		     params->mode, params->kem, params->kdf, params->aead,
 		     gnutls_strerror(ret));
-		goto cleanup;
 	}
 
 	for (size_t i = 0; i < params->num_encryption_parameters; i++) {
@@ -237,7 +210,6 @@ static void test_hpke(const hpke_test_parameters_st *params)
 			fail("gnutls_hpke_seal (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
 			     params->mode, params->kem, params->kdf,
 			     params->aead, gnutls_strerror(ret));
-			goto cleanup;
 		}
 
 		if (enc_params->expected_ciphertext.size !=
@@ -247,7 +219,6 @@ static void test_hpke(const hpke_test_parameters_st *params)
 			fail("ciphertext does not match expected value (mode %d, kem: %d, kdf: %d, aead: %d)\n",
 			     params->mode, params->kem, params->kdf,
 			     params->aead);
-			goto cleanup;
 		}
 
 		ret = gnutls_hpke_open(receiver_ctx, &enc_params->aad,
@@ -256,7 +227,6 @@ static void test_hpke(const hpke_test_parameters_st *params)
 			fail("gnutls_hpke_open (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
 			     params->mode, params->kem, params->kdf,
 			     params->aead, gnutls_strerror(ret));
-			goto cleanup;
 		}
 
 		if (enc_params->plaintext.size != plaintext_out.size ||
@@ -265,23 +235,20 @@ static void test_hpke(const hpke_test_parameters_st *params)
 			fail("decrypted plaintext does not match original plaintext (mode %d, kem: %d, kdf: %d, aead: %d)\n",
 			     params->mode, params->kem, params->kdf,
 			     params->aead);
-			goto cleanup;
 		}
 
 		uint64_t seq;
-		ret = gnutls_hpke_get_seq(receiver_ctx, &seq);
+		ret = _gnutls_hpke_get_seq(receiver_ctx, &seq);
 		if (ret < 0) {
-			fail("gnutls_hpke_get_seq (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
+			fail("_gnutls_hpke_get_seq (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
 			     params->mode, params->kem, params->kdf,
 			     params->aead, gnutls_strerror(ret));
-			goto cleanup;
 		}
 
 		if (seq != enc_params->sequence_number + 1) {
 			fail("sequence number does not match expected value (mode %d, kem: %d, kdf: %d, aead: %d)\n",
 			     params->mode, params->kem, params->kdf,
 			     params->aead);
-			goto cleanup;
 		}
 
 		gnutls_free(ciphertext_out.data);
@@ -300,7 +267,6 @@ static void test_hpke(const hpke_test_parameters_st *params)
 			fail("gnutls_hpke_export (mode %d, kem: %d, kdf: %d, aead: %d) failed: %s\n",
 			     params->mode, params->kem, params->kdf,
 			     params->aead, gnutls_strerror(ret));
-			goto cleanup;
 		}
 
 		if (exp_params->expected_exporter_value.size !=
@@ -310,36 +276,23 @@ static void test_hpke(const hpke_test_parameters_st *params)
 			fail("exported value does not match expected value (mode %d, kem: %d, kdf: %d, aead: %d)\n",
 			     params->mode, params->kem, params->kdf,
 			     params->aead);
-			goto cleanup;
 		}
 
 		gnutls_free(exporter_out.data);
 		exporter_out.data = NULL;
 	}
 
-cleanup:
 	gnutls_privkey_deinit(skR);
 	gnutls_pubkey_deinit(pkR);
 	gnutls_privkey_deinit(skS);
 	gnutls_pubkey_deinit(pkS);
-	gnutls_hpke_context_deinit(sender_ctx);
-	gnutls_hpke_context_deinit(receiver_ctx);
+	gnutls_hpke_deinit(sender_ctx);
+	gnutls_hpke_deinit(receiver_ctx);
 
-	if (enc.data != NULL) {
-		gnutls_free(enc.data);
-	}
-
-	if (plaintext_out.data != NULL) {
-		gnutls_free(plaintext_out.data);
-	}
-
-	if (ciphertext_out.data != NULL) {
-		gnutls_free(ciphertext_out.data);
-	}
-
-	if (exporter_out.data != NULL) {
-		gnutls_free(exporter_out.data);
-	}
+	gnutls_free(enc.data);
+	gnutls_free(plaintext_out.data);
+	gnutls_free(ciphertext_out.data);
+	gnutls_free(exporter_out.data);
 }
 
 static void rfc9180_a11(void)

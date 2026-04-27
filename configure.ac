@@ -1614,6 +1614,7 @@ if features are disabled)
   FIPS140 mode:         $enable_fips
   Strict DER time:	$ac_strict_der_time
   Audit trace:		$enable_crypto_auditing
+  HPKE support:         $ac_enable_hpke
 ])
 
 AC_MSG_NOTICE([Optional libraries:

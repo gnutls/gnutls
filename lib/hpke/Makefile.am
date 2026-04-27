@@ -35,9 +35,13 @@ endif
 
 noinst_LTLIBRARIES = libgnutls_hpke.la
 
-libgnutls_hpke_la_SOURCES = \
+libgnutls_hpke_la_SOURCES = hpke-api.c
+
+if ENABLE_HPKE
+libgnutls_hpke_la_SOURCES += \
 	hpke.c \
 	hpke-builders.c \
 	hpke-hkdf.c \
 	hpke-key-management.c \
 	hpke-params.c
+endif

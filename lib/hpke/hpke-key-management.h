@@ -40,21 +40,17 @@ int _gnutls_hpke_pubkey_to_datum(const gnutls_pubkey_t pk,
 
 int _gnutls_hpke_datum_to_pubkey(const gnutls_ecc_curve_t curve,
 				 const gnutls_datum_t *datum,
-				 gnutls_pubkey_t *pk);
+				 gnutls_pubkey_t pubkey);
 
 int _gnutls_hpke_keypair_from_ikm(const gnutls_hpke_kem_t kem,
 				  const gnutls_datum_t *ikme,
-				  gnutls_privkey_t *privkey,
-				  gnutls_pubkey_t *pubkey);
+				  gnutls_privkey_t privkey,
+				  gnutls_pubkey_t pubkey);
 
 int _gnutls_hpke_generate_keypair(const gnutls_datum_t *ikme,
 				  const gnutls_hpke_kem_t kem,
 				  const gnutls_pubkey_t receiver_pubkey,
-				  gnutls_privkey_t *ephemeral_privkey,
-				  gnutls_pubkey_t *ephemeral_pubkey);
-
-int _gnutls_hpke_privkey_clone(gnutls_privkey_t src, gnutls_privkey_t *dst);
-
-int _gnutls_hpke_pubkey_clone(gnutls_pubkey_t src, gnutls_pubkey_t *dst);
+				  gnutls_privkey_t ephemeral_privkey,
+				  gnutls_pubkey_t ephemeral_pubkey);
 
 #endif /* HPKE_KEY_MANAGEMENT_HELPER_H */
