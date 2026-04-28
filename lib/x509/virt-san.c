@@ -108,11 +108,7 @@ int _gnutls_alt_name_assign_virt_type(struct name_st *name, unsigned type,
 			if (ret < 0)
 				return gnutls_assert_val(ret);
 
-			name->type = GNUTLS_SAN_OTHERNAME;
-			name->san.data = encoded.data;
-			name->san.size = encoded.size;
-			name->othername_oid.data = (void *)gnutls_strdup(oid);
-			name->othername_oid.size = strlen(oid);
+			name->san = _gnutls_take_datum(&encoded);
 			break;
 
 		case GNUTLS_SAN_OTHERNAME_KRB5PRINCIPAL:
@@ -120,15 +116,19 @@ int _gnutls_alt_name_assign_virt_type(struct name_st *name, unsigned type,
 							    &name->san);
 			if (ret < 0)
 				return gnutls_assert_val(ret);
-
-			name->othername_oid.data = (void *)gnutls_strdup(oid);
-			name->othername_oid.size = strlen(oid);
-			name->type = GNUTLS_SAN_OTHERNAME;
 			break;
 
 		default:
 			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 		}
+		ret = _gnutls_set_strdatum(&name->othername_oid, oid,
+					   strlen(oid));
+		if (ret < 0) {
+			gnutls_assert();
+			_gnutls_free_datum(&name->san);
+			return ret;
+		}
+		name->type = GNUTLS_SAN_OTHERNAME;
 
 		gnutls_free(san->data);
 	}
