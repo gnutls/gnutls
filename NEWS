@@ -106,6 +106,14 @@ See the end for copying conditions.
    Joshua Rogers of AISLE Research Team.
    [GNUTLS-SA-2026-04-29-12, CVSS: low] [CVE-2026-3832]
 
+** libgnutls: Fix timing side-channel in PKCS#7 padding removal
+   The PKCS#7 padding check performed during decryption was not constant-time,
+   potentially leaking information about the padding bytes
+   through timing differences.
+   Rewritten to remove padding in a branch-free manner.
+   Reported by Doria Tang of Stony Brook University.
+   [GNUTLS-SA-2026-04-29-13, CVSS: low] [CVE-2026-5419]
+
 ** build: Support building with Nettle 4.0
    Nettle 4.0 was released in Feburary 2026, with API incompatibile
    changes from 3.10. The library can now compile with it, while
