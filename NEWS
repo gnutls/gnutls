@@ -77,6 +77,13 @@ See the end for copying conditions.
    Joshua Rogers of AISLE Research Team.
    [GNUTLS-SA-2026-04-27-8, CVSS: medium] [CVE-2026-42013]
 
+** libgnutls: Fix use-after-free in gnutls_pkcs11_token_set_pin
+   Changing the Security Officer PIN with gnutls_pkcs11_token_set_pin()
+   with oldpin == NULL for a token lacking a protected authentication path
+   led to a use-after-free.
+   Reported by Luigino Camastra and Joshua Rogers of AISLE Research Team.
+   [GNUTLS-SA-2026-04-29-9, CVSS: medium] [CVE-2026-42014]
+
 ** build: Support building with Nettle 4.0
    Nettle 4.0 was released in Feburary 2026, with API incompatibile
    changes from 3.10. The library can now compile with it, while
