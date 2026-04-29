@@ -22,6 +22,7 @@
 : ${srcdir=.}
 : ${builddir=.}
 : ${P11TOOL=../src/p11tool${EXEEXT}}
+: ${DIFF=diff}
 
 if test "${GNUTLS_FORCE_FIPS_MODE}" != 1; then
 	exit 77
@@ -37,8 +38,11 @@ fi
 testdir=`create_testdir pkcs11-provider`
 
 LABEL="Kryoptic Token"
+URL="pkcs11:model=v1;manufacturer=Kryoptic%20Project;token=Kryoptic%20Token"
 PIN="12345"
 KRYOPTIC_DB="${testdir}/kryoptic.sql"
+TOKEN_OBJECTS="${testdir}/token-objects.log"
+TOKEN_OBJECTS_REFERENCE="${testdir}/token-objects.reference.log"
 export KRYOPTIC_CONF="${testdir}/kryoptic.conf"
 export GNUTLS_DEBUG_LEVEL=6
 
@@ -74,12 +78,35 @@ cat >"${PRIORITY_FILE}" <<_EOF_
 allow-rsa-pkcs1-encrypt = true
 
 [provider]
-url = pkcs11:model=v1;manufacturer=Kryoptic%20Project;token=Kryoptic%20Token
+url = ${URL}
 pin = ${PIN}
 _EOF_
 
 export GNUTLS_SYSTEM_PRIORITY_FAIL_ON_INVALID=1
 export GNUTLS_SYSTEM_PRIORITY_FILE="${PRIORITY_FILE}"
+
+list_token() {
+	"$P11TOOL" --list-all --provider "${MODULE}" --login \
+		--set-pin "${PIN}" "${URL}" >"${TOKEN_OBJECTS}" 2>&1
+	rc=$?
+	if test "${rc}" != "0"; then
+		cat "${TOKEN_OBJECTS}"
+		echo 'test failed: listing token objects failed'
+		exit "${rc}"
+	fi
+}
+
+compare_token_to_reference() {
+	$DIFF "${TOKEN_OBJECTS_REFERENCE}" "${TOKEN_OBJECTS}"
+	rc=$?
+	if test "${rc}" != "0"; then
+		echo 'test failed: token object list has changed'
+		exit "${rc}"
+	fi
+}
+
+list_token
+cat "${TOKEN_OBJECTS}" > "${TOKEN_OBJECTS_REFERENCE}"
 
 echo "Testing public key algorithms"
 "${builddir}/pkcs11-provider/pkcs11-provider-pk"
@@ -121,6 +148,7 @@ else
 	exit ${rc}
 fi
 
-rm -rf "$testdir"
+list_token
+compare_token_to_reference
 
-exit ${rc}
+rm -rf "$testdir"

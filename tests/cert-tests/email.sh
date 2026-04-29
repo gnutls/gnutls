@@ -95,5 +95,16 @@ if test "${rc}" != "1"; then
 	exit 1
 fi
 
+# #1825: oversized SAN does not preclude fallback to DN email
+${VALGRIND} "${CERTTOOL}" \
+	--infile "${srcdir}/email-certs/oversized-san.pem" \
+	--load-ca-certificate "${srcdir}/email-certs/oversized-san.pem" \
+	--verify --verify-email test@example.com
+rc=$?
+
+if test "${rc}" != "1"; then
+	echo "email test 9 failed"
+	exit 1
+fi
 
 exit 0

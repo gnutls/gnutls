@@ -804,6 +804,118 @@ char txt_ip_in_cn[] =
 	"f0+Un2eHAxFcRZPWdPy1/mn83NUMnjquuA/HHcju+pcoZrEwAI3PPQHgsGQ=\n"
 	"-----END CERTIFICATE-----\n";
 
+char dns_uri_and_cn[] =
+	"organization = GnuTLS test\n"
+	"cn = example.org\n"
+	"expiration_days = 365\n"
+	"tls_www_server\n"
+	"dns_name = alt.example.org\n"
+	"uri = http://example.org/\n"
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIEWzCCAsOgAwIBAgIUZ2rP89A5RbTdVMCQ86E9qWLSZz4wDQYJKoZIhvcNAQEL\n"
+	"BQAwLDEUMBIGA1UEChMLR251VExTIHRlc3QxFDASBgNVBAMTC2V4YW1wbGUub3Jn\n"
+	"MB4XDTI2MDMxMzE1NDIwNVoXDTI3MDMxMzE1NDIwNVowLDEUMBIGA1UEChMLR251\n"
+	"VExTIHRlc3QxFDASBgNVBAMTC2V4YW1wbGUub3JnMIIBojANBgkqhkiG9w0BAQEF\n"
+	"AAOCAY8AMIIBigKCAYEArEgcC7WDqNJCpO0J3UfCraRWzmwk7soTg7pMmCv1FHWP\n"
+	"ywxfXxbl0jvRK/Owyv7q5QRdfcxSYhxydrloCOdWXhGQejgzcpgLu/Y3Ij0CjIzr\n"
+	"C38vMSS7yUjAuzB4IYtZsgyuB+bCfGH2Y227ntuniIjEnuekA18gfFemRUQ8PDao\n"
+	"EzNAPn8Q3cFlHh5Kr3gkDUduQlRhZdK0ryU/XaAUxz9G9TminIKCl4h1bKNT2pXN\n"
+	"08Cg3eOEi3Bl8lCCA7ufODl5frfrDcjNkxqRKN99zMa9A9hcRzYNF9/asX+BXFyh\n"
+	"7qbypKXAHBi6xi055+CRIBTxFC960qAluv2cOlo1tzZ0Nta75GhWCqLaVZgI0D0n\n"
+	"6SPZPEknVjGPQx1vSnq3ZNdNDdG83yw4QjFtujXdKrflcJafCg3D6LCvEyDPBdYC\n"
+	"reTJ9xWNCdsxdzlTdDk11CbxdIz4jA7qA/forbY9Dv7l0iC9d2zWmn4DOv23QIki\n"
+	"Uw46/ymnpeFaUTyNyyNHAgMBAAGjdTBzMAwGA1UdEwEB/wQCMAAwLwYDVR0RBCgw\n"
+	"JoIPYWx0LmV4YW1wbGUub3JnhhNodHRwOi8vZXhhbXBsZS5vcmcvMBMGA1UdJQQM\n"
+	"MAoGCCsGAQUFBwMBMB0GA1UdDgQWBBSXBONihYHHlbM9mrezDF7o607tFTANBgkq\n"
+	"hkiG9w0BAQsFAAOCAYEAHk3bGPAl8YvQE84KZnCnVWBfayFeHKXlN/o/MvpYtPb2\n"
+	"y9cnD8IMmruW3A/UL+md2xx24V+pQWmugB2e879N/Q3QVsSbHFlzPei4tieK5VVd\n"
+	"gLC2iG7N8YjQ0SNRDF22A1QQDcVzdCXOggivs4MelF1zaGfY3ywHOhiHXt0jDj1o\n"
+	"2bP5OflElDFVF7m38RDwdeGokb+raW/2lOJZe4oKpdmllyUtLvrQhdwpogwnbpvH\n"
+	"7ln5Tq4wDNIcxM+Y4MQwe6m0AEELdFZjBmfsZthmaGrbppLTbp14rzC6kKqZ9ay/\n"
+	"zG06DhPalDCR+Bqvmh2Qp25xgqThv9AX8JQU6W8avnkfyxFZwBEJZ0lNoOyLZV2Z\n"
+	"4vmflZyOih9ccGUaYXWXzyc+vxNZjFQwjWNss2vynVvp4+5DUeMWeAj/unvjrxy2\n"
+	"HOsI4FrD94g5PchhXyKXRmeJk4mcr0jtE5ycbmiDU3sXz6xM7hsdBeNFyr47L2nj\n"
+	"OfWEK8ArBc3uTEgp2tIA\n"
+	"-----END CERTIFICATE-----\n";
+
+char uri_and_cn[] =
+	"organization = GnuTLS test\n"
+	"expiration_days = 365\n"
+	"tls_www_server\n"
+	"uri = http://example.org/\n"
+	"cn = example.org\n"
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIESjCCArKgAwIBAgIUNC/WOkhQZc6stg6RSrVPaUHRmLwwDQYJKoZIhvcNAQEL\n"
+	"BQAwLDEUMBIGA1UEChMLR251VExTIHRlc3QxFDASBgNVBAMTC2V4YW1wbGUub3Jn\n"
+	"MB4XDTI2MDMxMzE1NTAwNVoXDTI3MDMxMzE1NTAwNVowLDEUMBIGA1UEChMLR251\n"
+	"VExTIHRlc3QxFDASBgNVBAMTC2V4YW1wbGUub3JnMIIBojANBgkqhkiG9w0BAQEF\n"
+	"AAOCAY8AMIIBigKCAYEArEgcC7WDqNJCpO0J3UfCraRWzmwk7soTg7pMmCv1FHWP\n"
+	"ywxfXxbl0jvRK/Owyv7q5QRdfcxSYhxydrloCOdWXhGQejgzcpgLu/Y3Ij0CjIzr\n"
+	"C38vMSS7yUjAuzB4IYtZsgyuB+bCfGH2Y227ntuniIjEnuekA18gfFemRUQ8PDao\n"
+	"EzNAPn8Q3cFlHh5Kr3gkDUduQlRhZdK0ryU/XaAUxz9G9TminIKCl4h1bKNT2pXN\n"
+	"08Cg3eOEi3Bl8lCCA7ufODl5frfrDcjNkxqRKN99zMa9A9hcRzYNF9/asX+BXFyh\n"
+	"7qbypKXAHBi6xi055+CRIBTxFC960qAluv2cOlo1tzZ0Nta75GhWCqLaVZgI0D0n\n"
+	"6SPZPEknVjGPQx1vSnq3ZNdNDdG83yw4QjFtujXdKrflcJafCg3D6LCvEyDPBdYC\n"
+	"reTJ9xWNCdsxdzlTdDk11CbxdIz4jA7qA/forbY9Dv7l0iC9d2zWmn4DOv23QIki\n"
+	"Uw46/ymnpeFaUTyNyyNHAgMBAAGjZDBiMAwGA1UdEwEB/wQCMAAwHgYDVR0RBBcw\n"
+	"FYYTaHR0cDovL2V4YW1wbGUub3JnLzATBgNVHSUEDDAKBggrBgEFBQcDATAdBgNV\n"
+	"HQ4EFgQUlwTjYoWBx5WzPZq3swxe6OtO7RUwDQYJKoZIhvcNAQELBQADggGBAE6w\n"
+	"uGfQy1pi+VbvHFc64QZJhf6r0FQl8Y5kWPu7OI2o+M5/FmY9hXmXxJzAfGH3ecE8\n"
+	"PL/bnR9zRCHTi1ONogukPKPmm/x3AQehn54hvgjZXGFOMxGBB5wSbsEzjCQxgKOO\n"
+	"uzUKZ0zgJin5YEi9g3DGKYi1qDNceNB9LjsWq372FKze0y2zZT7U2xiQcXlKgIZ6\n"
+	"KEcRBQVDygKNeU8ux0Q+lSaymsT9dhs6uahmGUTbbLcsKxsPhJjfC3IWTH+vK3tV\n"
+	"yjjnHcfcITAYSYHOM8+2+5EMOCZmGxCqv3unDkJRYY2xrp3+kXyGXXKRw+yNs4MT\n"
+	"Zc9zymseS+rB+9SDYO4DHDIV+jMJPMcqjJSlglMhs53Z4HFuWcuYJ6FzbRyM7hky\n"
+	"X4El+DWVaajh10QZApiWnRTTafJzJTbYljbpdZVgDX6chAyQRTKj6Di7YrrXmlYZ\n"
+	"iPKiHBqRUnCnxe8HYoBeK5Dw1lzCmgqXp5wjRqo5UHaemgZQTjdlPiWeovEiVg==\n"
+	"-----END CERTIFICATE-----\n";
+
+char srv_and_cn[] =
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIESjCCArKgAwIBAgIBATANBgkqhkiG9w0BAQsFADAsMRQwEgYDVQQKEwtHbnVU\n"
+	"TFMgdGVzdDEUMBIGA1UEAxMLZXhhbXBsZS5vcmcwHhcNMjYwMzEzMTY0OTU5WhcN\n"
+	"MjcwMzEzMTY0OTU5WjAsMRQwEgYDVQQKEwtHbnVUTFMgdGVzdDEUMBIGA1UEAxML\n"
+	"ZXhhbXBsZS5vcmcwggGiMA0GCSqGSIb3DQEBAQUAA4IBjwAwggGKAoIBgQCsSBwL\n"
+	"tYOo0kKk7QndR8KtpFbObCTuyhODukyYK/UUdY/LDF9fFuXSO9Er87DK/urlBF19\n"
+	"zFJiHHJ2uWgI51ZeEZB6ODNymAu79jciPQKMjOsLfy8xJLvJSMC7MHghi1myDK4H\n"
+	"5sJ8YfZjbbue26eIiMSe56QDXyB8V6ZFRDw8NqgTM0A+fxDdwWUeHkqveCQNR25C\n"
+	"VGFl0rSvJT9doBTHP0b1OaKcgoKXiHVso1Palc3TwKDd44SLcGXyUIIDu584OXl+\n"
+	"t+sNyM2TGpEo333Mxr0D2FxHNg0X39qxf4FcXKHupvKkpcAcGLrGLTnn4JEgFPEU\n"
+	"L3rSoCW6/Zw6WjW3NnQ21rvkaFYKotpVmAjQPSfpI9k8SSdWMY9DHW9Kerdk100N\n"
+	"0bzfLDhCMW26Nd0qt+Vwlp8KDcPosK8TIM8F1gKt5Mn3FY0J2zF3OVN0OTXUJvF0\n"
+	"jPiMDuoD9+ittj0O/uXSIL13bNaafgM6/bdAiSJTDjr/Kael4VpRPI3LI0cCAwEA\n"
+	"AaN3MHUwDAYDVR0TAQH/BAIwADATBgNVHSUEDDAKBggrBgEFBQcDATAdBgNVHQ4E\n"
+	"FgQUlwTjYoWBx5WzPZq3swxe6OtO7RUwMQYDVR0RBCowKKAmBggrBgEFBQcIB6Aa\n"
+	"FhhfeG1wcC1jbGllbnQuZXhhbXBsZS5vcmcwDQYJKoZIhvcNAQELBQADggGBAI0B\n"
+	"WAylO7fWCLtWJqfMrHa3JFH2rkQRf5WV+Z5JqcxlP47m6220+xBiV/iIZT0V6Un/\n"
+	"Z/4Je+jrx6vFIAxtTR1gmyfLo8TfzkEmwPT+uHb16RFkJbi5ik47Mm+31VOrq2G/\n"
+	"s1FP0oNCG6LAnVN1a3Np5uorbUJlTkrd9MxymIvbZMQ56pZvI8TeNgescxD3xY96\n"
+	"/yQXFBy3wu8PIJblG/7r5vPSY8BrEqpRZ0Dch4EoU2RVybE0vXUUTL2moripnHzF\n"
+	"4+mm4Fa8mNb6nII8RjmFDJJzKCQlpmm4R8iNaCvULv8jVO899XUwDSL8+hHt6jZK\n"
+	"aU0pWVCorxpUmgQiQmBAIYvreSM4nKtljSwT2+SBaMna+MaZk2vfBDO15tZH0LWW\n"
+	"OYpnqQQkihP9my4jESvn8FE4NtF5x44XuJVKTVSas1o49XLXq/94fT4DZGa6rdSx\n"
+	"p9Nnj64WFIqbTLoqM3nt7+zqFZDvwh+8ZEVcE1MazHOYhDQj1uU3jqIq/sZE8w==\n"
+	"-----END CERTIFICATE-----\n";
+
+char pem_1825_oversized_san[] =
+	"ca\n"
+	"cn = example.com\n"
+	"dns_name = <'a' * 256>\n"
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIICOTCCAeugAwIBAgIURFygaiK3EBmc5AMZToFitMMikhcwBQYDK2VwMBYxFDAS\n"
+	"BgNVBAMTC2V4YW1wbGUuY29tMB4XDTI2MDQxNTE2MDYwMFoXDTI3MDQxNTE2MDYw\n"
+	"MFowFjEUMBIGA1UEAxMLZXhhbXBsZS5jb20wKjAFBgMrZXADIQBHqgbjhT1zZ3h9\n"
+	"okSrhd2+0Lr0Uj1q81sqHrcCEdqVpaOCAUkwggFFMA8GA1UdEwEB/wQFMAMBAf8w\n"
+	"ggERBgNVHREEggEIMIIBBIKCAQBhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFh\n"
+	"YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFh\n"
+	"YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFh\n"
+	"YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFh\n"
+	"YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFh\n"
+	"YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhMB0GA1UdDgQWBBT+\n"
+	"/oWt1Lrfz7Awk9h8yDoz1TKyHjAFBgMrZXADQQBfR5ByQyxpLEsVM5+ihYjSbmYF\n"
+	"1pOFndq0UIKPkWsRqBpitzDIVrVTLlIcY0fQpsxITNgdoIU68WynLGVrRHIF\n"
+	"-----END CERTIFICATE-----\n";
+
 void doit(void)
 {
 	gnutls_x509_crt_t x509;
@@ -1174,6 +1286,68 @@ void doit(void)
 	ret = gnutls_x509_crt_check_hostname(x509, "172.15.1.1");
 	if (ret)
 		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
+
+	if (debug)
+		success("Testing not falling back to CN with DNS+URI SAN...\n");
+	data.data = (unsigned char *)dns_uri_and_cn;
+	data.size = strlen(dns_uri_and_cn);
+
+	ret = gnutls_x509_crt_import(x509, &data, GNUTLS_X509_FMT_PEM);
+	if (ret < 0)
+		fail("%d: gnutls_x509_crt_import: %d\n", __LINE__, ret);
+
+	ret = gnutls_x509_crt_check_hostname(x509, "example.org");
+	if (ret)
+		fail("%d: Hostname incorrectly falls back to CN (%d)\n",
+		     __LINE__, ret);
+
+	ret = gnutls_x509_crt_check_hostname(x509, "alt.example.org");
+	if (!ret)
+		fail("%d: Hostname does not match a valid DNS SAN (%d)\n",
+		     __LINE__, ret);
+
+	if (debug)
+		success("Testing not falling back to CN with URI SAN...\n");
+	data.data = (unsigned char *)uri_and_cn;
+	data.size = strlen(uri_and_cn);
+
+	ret = gnutls_x509_crt_import(x509, &data, GNUTLS_X509_FMT_PEM);
+	if (ret < 0)
+		fail("%d: gnutls_x509_crt_import: %d\n", __LINE__, ret);
+
+	ret = gnutls_x509_crt_check_hostname(x509, "example.org");
+	if (ret)
+		fail("%d: Hostname incorrectly falls back to CN (%d)\n",
+		     __LINE__, ret);
+
+	if (debug)
+		success("Testing not falling back to CN with SRV SAN...\n");
+	data.data = (unsigned char *)srv_and_cn;
+	data.size = strlen(srv_and_cn);
+
+	ret = gnutls_x509_crt_import(x509, &data, GNUTLS_X509_FMT_PEM);
+	if (ret < 0)
+		fail("%d: gnutls_x509_crt_import: %d\n", __LINE__, ret);
+
+	ret = gnutls_x509_crt_check_hostname(x509, "example.org");
+	if (ret)
+		fail("%d: Hostname incorrectly falls back to CN (%d)\n",
+		     __LINE__, ret);
+
+	if (debug)
+		success("Testing oversized SAN (#1825)...\n");
+	data.data = (unsigned char *)pem_1825_oversized_san;
+	data.size = strlen(pem_1825_oversized_san);
+
+	ret = gnutls_x509_crt_import(x509, &data, GNUTLS_X509_FMT_PEM);
+	if (ret < 0)
+		fail("%d: gnutls_x509_crt_import: %d\n", __LINE__, ret);
+
+	ret = gnutls_x509_crt_check_hostname(x509, "example.com");
+	if (ret)
+		fail("%d: Hostname incorrectly falls back to CN "
+		     "with oversized SAN (%d)\n",
+		     __LINE__, ret);
 
 	gnutls_x509_crt_deinit(x509);
 

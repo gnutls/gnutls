@@ -462,7 +462,7 @@ static int server_use_key_share_single(gnutls_session_t session,
 			return gnutls_assert_val(ret);
 
 		ret = append_key_datum(&session->key.key, &key);
-		_gnutls_free_datum(&key);
+		_gnutls_free_key_datum(&key);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
@@ -506,7 +506,7 @@ static int server_use_key_share_single(gnutls_session_t session,
 			return gnutls_assert_val(ret);
 
 		ret = append_key_datum(&session->key.key, &key);
-		_gnutls_free_datum(&key);
+		_gnutls_free_key_datum(&key);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
@@ -603,7 +603,7 @@ static int server_use_key_share_single(gnutls_session_t session,
 			return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
 
 		ret = append_key_datum(&session->key.key, &key);
-		_gnutls_free_datum(&key);
+		_gnutls_free_key_datum(&key);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
@@ -700,7 +700,7 @@ static int client_use_key_share_single(gnutls_session_t session,
 			return gnutls_assert_val(ret);
 
 		ret = append_key_datum(&session->key.key, &key);
-		_gnutls_free_datum(&key);
+		_gnutls_free_key_datum(&key);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
@@ -739,7 +739,7 @@ static int client_use_key_share_single(gnutls_session_t session,
 			return gnutls_assert_val(ret);
 
 		ret = append_key_datum(&session->key.key, &key);
-		_gnutls_free_datum(&key);
+		_gnutls_free_key_datum(&key);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
@@ -776,7 +776,7 @@ static int client_use_key_share_single(gnutls_session_t session,
 			return gnutls_assert_val(ret);
 
 		ret = append_key_datum(&session->key.key, &key);
-		_gnutls_free_datum(&key);
+		_gnutls_free_key_datum(&key);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
@@ -797,7 +797,7 @@ static int client_use_key_share_single(gnutls_session_t session,
 			return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
 
 		ret = append_key_datum(&session->key.key, &key);
-		_gnutls_free_datum(&key);
+		_gnutls_free_key_datum(&key);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 

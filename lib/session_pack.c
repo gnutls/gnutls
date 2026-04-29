@@ -973,6 +973,10 @@ static int unpack_security_parameters(gnutls_session_t session,
 		&session->internals.resumed_security_parameters.session_id_size,
 		1);
 
+	if (session->internals.resumed_security_parameters.session_id_size >
+	    GNUTLS_MAX_SESSION_ID_SIZE)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 	BUFFER_POP(
 		ps, session->internals.resumed_security_parameters.session_id,
 		session->internals.resumed_security_parameters.session_id_size);

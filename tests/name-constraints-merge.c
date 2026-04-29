@@ -473,6 +473,119 @@ void doit(void)
 	gnutls_x509_name_constraints_deinit(nc1);
 	gnutls_x509_name_constraints_deinit(nc2);
 
+	/* 6: test intersecting empty permitted with non-empty permitted
+	 * NC1: excluded DNS excluded.example.org  (empty permitted)
+	 * NC2: permitted DNS permitted.example.org
+	 * Expected result:
+	 *   permitted=[permitted.example.org], excluded=[excluded.example.org]
+	 *   unrelated.example.com is rejected
+	 */
+	suite = 6;
+
+	ret = gnutls_x509_name_constraints_init(&nc1);
+	check_for_error(ret);
+
+	ret = gnutls_x509_name_constraints_init(&nc2);
+	check_for_error(ret);
+
+	set_name("excluded.example.org", &name);
+	ret = gnutls_x509_name_constraints_add_excluded(nc1, GNUTLS_SAN_DNSNAME,
+							&name);
+	check_for_error(ret);
+
+	set_name("permitted.example.org", &name);
+	ret = gnutls_x509_name_constraints_add_permitted(
+		nc2, GNUTLS_SAN_DNSNAME, &name);
+	check_for_error(ret);
+
+	ret = _gnutls_x509_name_constraints_merge(nc1, nc2);
+	check_for_error(ret);
+
+	set_name("unrelated.example.com", &name); /* entirely unrelated */
+	ret = gnutls_x509_name_constraints_check(nc1, GNUTLS_SAN_DNSNAME,
+						 &name);
+	check_test_result(suite, ret, NAME_REJECTED, &name); /* #1814 */
+
+	set_name("permitted.example.org", &name); /* permitted, direct */
+	ret = gnutls_x509_name_constraints_check(nc1, GNUTLS_SAN_DNSNAME,
+						 &name);
+	check_test_result(suite, ret, NAME_ACCEPTED, &name); /* sanity */
+
+	set_name("sub.permitted.example.org", &name); /* permitted, subdomain */
+	ret = gnutls_x509_name_constraints_check(nc1, GNUTLS_SAN_DNSNAME,
+						 &name);
+	check_test_result(suite, ret, NAME_ACCEPTED, &name); /* sanity */
+
+	set_name("excluded.example.org", &name); /* excluded, direct */
+	ret = gnutls_x509_name_constraints_check(nc1, GNUTLS_SAN_DNSNAME,
+						 &name);
+	check_test_result(suite, ret, NAME_REJECTED, &name); /* sanity */
+
+	set_name("sub.excluded.example.org", &name); /* excluded, subdomain */
+	ret = gnutls_x509_name_constraints_check(nc1, GNUTLS_SAN_DNSNAME,
+						 &name);
+	check_test_result(suite, ret, NAME_REJECTED, &name); /* sanity */
+
+	gnutls_x509_name_constraints_deinit(nc1);
+	gnutls_x509_name_constraints_deinit(nc2);
+
+	/* 7: test intersecting non-empty permitted with empty permitted
+	 * (same as 6, but swapped to ensure order doesn't matter)
+	 * NC1: permitted DNS permitted.example.org
+	 * NC2: excluded DNS excluded.example.org  (empty permitted)
+	 * Expected result:
+	 *   permitted=[permitted.example.org], excluded=[excluded.example.org]
+	 *   unrelated.example.com is rejected
+	 */
+	suite = 7;
+
+	ret = gnutls_x509_name_constraints_init(&nc1);
+	check_for_error(ret);
+
+	ret = gnutls_x509_name_constraints_init(&nc2);
+	check_for_error(ret);
+
+	set_name("permitted.example.org", &name);
+	ret = gnutls_x509_name_constraints_add_permitted(
+		nc1, GNUTLS_SAN_DNSNAME, &name);
+	check_for_error(ret);
+
+	set_name("excluded.example.org", &name);
+	ret = gnutls_x509_name_constraints_add_excluded(nc2, GNUTLS_SAN_DNSNAME,
+							&name);
+	check_for_error(ret);
+
+	ret = _gnutls_x509_name_constraints_merge(nc1, nc2);
+	check_for_error(ret);
+
+	set_name("unrelated.example.com", &name); /* entirely unrelated */
+	ret = gnutls_x509_name_constraints_check(nc1, GNUTLS_SAN_DNSNAME,
+						 &name);
+	check_test_result(suite, ret, NAME_REJECTED, &name); /* #1814 */
+
+	set_name("permitted.example.org", &name); /* permitted, direct */
+	ret = gnutls_x509_name_constraints_check(nc1, GNUTLS_SAN_DNSNAME,
+						 &name);
+	check_test_result(suite, ret, NAME_ACCEPTED, &name); /* sanity */
+
+	set_name("sub.permitted.example.org", &name); /* permitted, subdomain */
+	ret = gnutls_x509_name_constraints_check(nc1, GNUTLS_SAN_DNSNAME,
+						 &name);
+	check_test_result(suite, ret, NAME_ACCEPTED, &name); /* sanity */
+
+	set_name("excluded.example.org", &name); /* excluded, direct */
+	ret = gnutls_x509_name_constraints_check(nc1, GNUTLS_SAN_DNSNAME,
+						 &name);
+	check_test_result(suite, ret, NAME_REJECTED, &name); /* sanity */
+
+	set_name("sub.excluded.example.org", &name); /* excluded, subdomain */
+	ret = gnutls_x509_name_constraints_check(nc1, GNUTLS_SAN_DNSNAME,
+						 &name);
+	check_test_result(suite, ret, NAME_REJECTED, &name); /* sanity */
+
+	gnutls_x509_name_constraints_deinit(nc1);
+	gnutls_x509_name_constraints_deinit(nc2);
+
 	/* Test footer */
 
 	if (debug)

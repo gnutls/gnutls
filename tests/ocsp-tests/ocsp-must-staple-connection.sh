@@ -85,6 +85,7 @@ OCSP_RESPONSE_FILE="$testdir/ms-resp.tmp"
 OCSP_REQ_FILE="$testdir/ms-req.tmp"
 INDEXFILE="$testdir/ocsp_index.txt"
 ATTRFILE="${INDEXFILE}.attr"
+SERVER_CERT_BAD_FILE="$testdir/ms-cert-bad.pem.tmp"
 
 stop_servers ()
 {
@@ -117,6 +118,20 @@ ${CERTTOOL} \
 	--load-ca-certificate "${srcdir}/ocsp-tests/certs/ca.pem" \
 	--load-privkey "${srcdir}/ocsp-tests/certs/server_good.key" \
 	--template "${TEMPLATE_FILE}" --outfile "${SERVER_CERT_FILE}" 2>/dev/null
+
+echo "=== Generating bad server certificate ==="
+
+rm -f "$TEMPLATE_FILE"
+cp "${srcdir}/ocsp-tests/certs/server_bad.template" "$TEMPLATE_FILE"
+chmod u+w "$TEMPLATE_FILE"
+echo "ocsp_uri=http://localhost:${OCSP_PORT}/ocsp/" >>"$TEMPLATE_FILE"
+
+${CERTTOOL} \
+	--attime "${CERTDATE}" \
+	--generate-certificate --load-ca-privkey "${srcdir}/ocsp-tests/certs/ca.key" \
+	--load-ca-certificate "${srcdir}/ocsp-tests/certs/ca.pem" \
+	--load-privkey "${srcdir}/ocsp-tests/certs/server_bad.key" \
+	--template "${TEMPLATE_FILE}" --outfile "${SERVER_CERT_BAD_FILE}" 2>/dev/null
 
 echo "=== Bringing OCSP server up ==="
 
@@ -277,13 +292,24 @@ wait_server $TLS_SERVER_PID
 
 wait_for_port "${TLS_SERVER_PORT}"
 
-echo "test 123456" | \
-	"${CLI}" --attime "${TESTDATE}" --ocsp --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
-		 --port="${TLS_SERVER_PORT}" localhost
+out=$(
+    echo "test 123456" | \
+        "${CLI}" --attime "${TESTDATE}" --ocsp \
+             --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
+             --port="${TLS_SERVER_PORT}" localhost \
+             2>&1
+)
 rc=$?
+printf '%s\n' "$out"
 
 if test "${rc}" = "0"; then
     echo "Connecting to server with valid certificate and invalid staple succeeded"
+    exit 1
+fi
+
+if ! echo "${out}" | grep "Got OCSP response with an unrelated certificate" > /dev/null
+then
+    echo '"Got OCSP response with an unrelated certificate" not found in output'
     exit 1
 fi
 
@@ -291,6 +317,50 @@ kill "${TLS_SERVER_PID}"
 wait "${TLS_SERVER_PID}"
 unset TLS_SERVER_PID
 
+echo "=== Test 4.1: Server with valid certificate - no response staple ==="
+
+rm -f "${OCSP_RESPONSE_FILE}"
+cp "${srcdir}/ocsp-tests/certs/ocsp-staple-empty.der" "${OCSP_RESPONSE_FILE}"
+
+eval "${GETPORT}"
+# Port for gnutls-serv
+TLS_SERVER_PORT=$PORT
+PORT=${TLS_SERVER_PORT}
+launch_bare_server \
+	"${SERV}" --attime "${TESTDATE}" --echo --disable-client-cert \
+	--x509keyfile="${srcdir}/ocsp-tests/certs/server_good.key" \
+	--x509certfile="${SERVER_CERT_FILE}" \
+	--port="${TLS_SERVER_PORT}" \
+	--ocsp-response="${OCSP_RESPONSE_FILE}" --ignore-ocsp-response-errors
+TLS_SERVER_PID="${!}"
+wait_server $TLS_SERVER_PID
+
+wait_for_port "${TLS_SERVER_PORT}"
+
+out=$(
+    echo "test 123456" | \
+        "${CLI}" --attime "${TESTDATE}" --ocsp \
+             --x509cafile="${srcdir}/ocsp-tests/certs/ca.pem" \
+             --port="${TLS_SERVER_PORT}" localhost \
+             2>&1
+)
+rc=$?
+printf '%s\n' "$out"
+
+if test "${rc}" = "0"; then
+    echo "Connecting to server with valid certificate and no response staple succeeded"
+    exit 1
+fi
+
+if ! echo "${out}" | grep  "Got OCSP response with no certificates" > /dev/null
+then
+    echo '"Got OCSP response with no certificates" not found in output'
+    exit 1
+fi
+
+kill "${TLS_SERVER_PID}"
+wait "${TLS_SERVER_PID}"
+unset TLS_SERVER_PID
 
 echo "=== Test 5: Server with valid certificate - expired staple ==="
 
@@ -486,6 +556,61 @@ kill "${TLS_SERVER_PID}"
 wait "${TLS_SERVER_PID}"
 unset TLS_SERVER_PID
 
+echo "=== Test 10: Server with revoked certificate - CVE-2026-3832 ==="
+
+# The revocation status was always mistakenly checked for the first cert.
+# Check a pair of responses: (irrelevant good unrevoked, relevant bad revoked).
+
+rm -f "${OCSP_RESPONSE_FILE}"
+
+"$FAKETIME" "${TESTDATE}" \
+    ${OPENSSL} ocsp -index "${INDEXFILE}" \
+    -issuer "${srcdir}/ocsp-tests/certs/ca.pem" \
+    -CA "${srcdir}/ocsp-tests/certs/ca.pem" \
+    -rsigner "${srcdir}/ocsp-tests/certs/ocsp-server.pem" \
+    -rkey "${srcdir}/ocsp-tests/certs/ocsp-server.key" \
+    -cert "${SERVER_CERT_FILE}" \
+    -cert "${SERVER_CERT_BAD_FILE}" \
+    -respout "${OCSP_RESPONSE_FILE}"
+
+eval "${GETPORT}"
+# Port for gnutls-serv
+TLS_SERVER_PORT=$PORT
+PORT=${TLS_SERVER_PORT}
+launch_bare_server \
+    "${SERV}" --attime "${TESTDATE}" --echo --disable-client-cert \
+    --x509keyfile="${srcdir}/ocsp-tests/certs/server_bad.key" \
+    --x509certfile="${SERVER_CERT_BAD_FILE}" \
+    --port="${TLS_SERVER_PORT}" \
+    --ocsp-response="${OCSP_RESPONSE_FILE}" --ignore-ocsp-response-errors
+TLS_SERVER_PID="${!}"
+wait_server $TLS_SERVER_PID
+
+wait_for_port "${TLS_SERVER_PORT}"
+
+out=$(
+    echo "test 123456" | \
+        "${CLI}" -d1 --attime "${TESTDATE}" --ocsp \
+        --x509cafile "${srcdir}/ocsp-tests/certs/ca.pem" \
+        --port "${TLS_SERVER_PORT}" localhost \
+        2>&1
+    rc=$?
+)
+printf '%s\n' "$out"
+
+if test "${rc}" = "0"; then
+    echo 'ERROR: client accepted a revoked leaf (CVE-2026-3832)'
+    exit 1
+fi
+if ! echo "${out}" | grep "The certificate was revoked via OCSP" >/dev/null
+then
+    echo '"The certificate was revoked via OCSP" not found in output'
+    exit 1
+fi
+
+kill "${TLS_SERVER_PID}"
+wait "${TLS_SERVER_PID}"
+unset TLS_SERVER_PID
 
 kill ${OCSP_PID}
 wait ${OCSP_PID}

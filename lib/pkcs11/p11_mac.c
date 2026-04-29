@@ -806,8 +806,10 @@ static int wrap_p11_hkdf_extract(gnutls_mac_algorithm_t _mac, const void *key,
 	}
 
 	_p11_provider_close_session(session);
-#endif
 	return 0;
+#else
+	return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
+#endif
 }
 
 static int wrap_p11_hkdf_expand(gnutls_mac_algorithm_t _mac, const void *key,
@@ -871,8 +873,10 @@ static int wrap_p11_hkdf_expand(gnutls_mac_algorithm_t _mac, const void *key,
 	}
 
 	_p11_provider_close_session(session);
-#endif
 	return 0;
+#else
+	return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
+#endif
 }
 
 static int wrap_p11_pbkdf2(gnutls_mac_algorithm_t _mac, const void *key,
@@ -952,8 +956,10 @@ static int wrap_p11_pbkdf2(gnutls_mac_algorithm_t _mac, const void *key,
 	}
 
 	_p11_provider_close_session(session);
-#endif
 	return 0;
+#else
+	return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
+#endif
 }
 
 gnutls_crypto_mac_st _gnutls_p11_mac_ops = {

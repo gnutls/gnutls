@@ -80,10 +80,10 @@ int _gnutls_check_id_for_change(gnutls_session_t session)
 
 		if (session->internals.saved_username &&
 		    session->internals.saved_username_size != -1) {
-			if (session->internals.saved_username_size ==
-				    username_length &&
-			    strncmp(session->internals.saved_username, username,
-				    username_length)) {
+			if (session->internals.saved_username_size !=
+				    username_length ||
+			    memcmp(session->internals.saved_username, username,
+				   username_length)) {
 				_gnutls_debug_log(
 					"Session's PSK username changed during rehandshake; aborting!\n");
 				return gnutls_assert_val(

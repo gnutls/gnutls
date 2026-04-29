@@ -183,7 +183,6 @@ static int aes_set_key(struct p11_cipher_ctx *ctx, const void *key,
 	struct ck_attribute attrs[] = {
 		{ CKA_CLASS, &attr_class, sizeof(attr_class) },
 		{ CKA_KEY_TYPE, &attr_key_type, sizeof(attr_key_type) },
-		{ CKA_TOKEN, &attr_true, sizeof(attr_true) },
 		{ CKA_ENCRYPT, &attr_true, sizeof(attr_true) },
 		{ CKA_DECRYPT, &attr_true, sizeof(attr_true) },
 		{ CKA_LABEL, label, sizeof(label) - 1 },

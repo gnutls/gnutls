@@ -108,6 +108,21 @@ const char key_lowercase_iv[] =
 	"57ohSPIR3bXgRZuefjxBhQYthUPcZ+qktrbURcvHNLs=\n"
 	"-----END RSA PRIVATE KEY-----\n";
 
+const char key_newlines_head[] = /* key2... */
+	"-----BEGIN RSA PRIVATE KEY-----\n"
+	"Proc-Type: 4,ENCRYPTED\n"
+	"DEK-Info: AES-128-CBC,2A57FF97B701B3F760145D7446929481\n";
+/* ... with many newlines inserted in here */
+const char key_newlines_tail[] =
+	"mGAPhSw48wZBnkHOhfMDg8yL2IBgMuTmeKE4xoHi7T6isHBNfkqMd0iJ+DJP/OKb\n"
+	"t+7lkKjj/xQ7w/bOBvBxlfRe4MW6+ejCdAFD9XSolW6WN6CEJPMI4UtmOK5inqcC\n"
+	"8l2l54f/VGrVN9uavU3KlXCjrd3Jp9B0Mu4Zh/UU4+EWs9rJAZfLIn+vHZ3OHetx\n"
+	"g74LdV7nC7lt/fjxc1caNIfgHs40dUt9FVrnJvAtkcNMtcjX/D+L8ZrLgQzIWFcs\n"
+	"WAbUZj7Me22mCli3RPET7Je37K59IzfWgbWFCGaNu3X02g5xtCfdcn/Uqy9eofH0\n"
+	"YjKRhpgXPeGJCkoRqDeUHQNPpVP5HrzDZMVK3E4DC03C8qvgsYvuwYt3KkbG2fuA\n"
+	"F3bDyqlxSOm7uxF/K3YzI44v8/D8GGnLBTpN+ANBdiY=\n";
+/* "-----END RSA PRIVATE KEY-----\n"; intentionally omitted */
+
 static int good_pwd_cb(void *userdata, int attempt, const char *token_url,
 		       const char *token_label, unsigned int flags, char *pin,
 		       size_t pin_max)
@@ -279,6 +294,28 @@ void doit(void)
 		fail("gnutls_x509_privkey_import2 (bad pin): %s\n",
 		     gnutls_strerror(ret));
 	}
+	gnutls_x509_privkey_deinit(pkey);
+
+	/* import_openssl with a key having too many newlines in the header,
+	 * (fails with #1818.4 unfixed under ASAN) */
+	ret = gnutls_x509_privkey_init(&pkey);
+	if (ret < 0)
+		fail("gnutls_x509_privkey_init: %d\n", ret);
+
+	//gnutls_x509_privkey_set_pin_function(pkey, good_pwd_cb, NULL);
+	key.size = 1024 * 1024 * 1024;
+	key.data = gnutls_malloc(key.size);
+	memset(key.data, '\n', key.size);
+	memcpy(key.data, key_newlines_head, sizeof(key_newlines_head) - 1);
+	memcpy(key.data + key.size - sizeof(key_newlines_tail),
+	       key_newlines_tail, sizeof(key_newlines_tail));
+
+	ret = gnutls_x509_privkey_import_openssl(pkey, &key, "a123456");
+	if (ret != GNUTLS_E_BASE64_DECODING_ERROR) {
+		fail("gnutls_x509_import_openssl (full of newlines): %s\n",
+		     gnutls_strerror(ret));
+	}
+	gnutls_free(key.data);
 	gnutls_x509_privkey_deinit(pkey);
 
 	gnutls_global_deinit();

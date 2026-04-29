@@ -366,6 +366,58 @@ void doit(void)
 
 	gnutls_x509_name_constraints_deinit(nc);
 
+	/* 4b: case insensitivity */
+
+	ret = gnutls_x509_name_constraints_init(&nc);
+	check_for_error(ret);
+
+	set_name("example.net", &name);
+	ret = gnutls_x509_name_constraints_add_excluded(nc, GNUTLS_SAN_DNSNAME,
+							&name);
+	check_for_error(ret);
+	set_name("email@example.net", &name);
+	ret = gnutls_x509_name_constraints_add_excluded(
+		nc, GNUTLS_SAN_RFC822NAME, &name);
+	check_for_error(ret);
+
+	set_name("example.org", &name); /* unrelated: accepted */
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DNSNAME, &name);
+	check_test_result(ret, NAME_ACCEPTED, &name);
+
+	set_name("example.net", &name); /* exact match: rejected */
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DNSNAME, &name);
+	check_test_result(ret, NAME_REJECTED, &name);
+
+	set_name("eXample.net", &name); /* case *insensitive*: rejected */
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DNSNAME, &name);
+	check_test_result(ret, NAME_REJECTED, &name);
+
+	set_name("mail@example.net", &name); /* unrelated: accepted */
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_RFC822NAME,
+						 &name);
+	check_test_result(ret, NAME_ACCEPTED, &name);
+
+	set_name("email@example.net", &name); /* exact match: rejected */
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_RFC822NAME,
+						 &name);
+	check_test_result(ret, NAME_REJECTED, &name);
+
+	set_name("eMail@example.net", &name); /* case *sensitive*: accepted */
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_RFC822NAME,
+						 &name);
+	check_test_result(ret, NAME_ACCEPTED, &name);
+
+	set_name("email@EXAMPLE.NET", &name); /* case *insensitive*: rejected */
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_RFC822NAME,
+						 &name);
+	check_test_result(ret, NAME_REJECTED, &name);
+
+	set_name("www.ExAmPlE.NeT", &name); /* case *insensitive*: inexact */
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DNSNAME, &name);
+	check_test_result(ret, NAME_REJECTED, &name);
+
+	gnutls_x509_name_constraints_deinit(nc);
+
 	// Test suite end.
 
 	if (debug)

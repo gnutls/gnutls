@@ -61,7 +61,9 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
 	ocsp-tests/response2.der ocsp-tests/response3.der ocsp-tests/certs/ocsp_index.txt ocsp-tests/certs/ocsp_index.txt.attr \
 	ocsp-tests/response1.pem ocsp-tests/response2.pem \
 	ocsp-tests/certs/server_good.key ocsp-tests/certs/server_bad.key ocsp-tests/certs/server_good.template \
-	ocsp-tests/certs/server_bad.template ocsp-tests/certs/ocsp-staple-unrelated.der ocsp-tests/suppressions.valgrind \
+	ocsp-tests/certs/server_bad.template ocsp-tests/certs/ocsp-staple-unrelated.der \
+	ocsp-tests/certs/ocsp-staple-empty.der \
+	ocsp-tests/suppressions.valgrind \
 	ocsp-tests/signer-verify/response-ca.der \
 	ocsp-tests/signer-verify/response-delegated.der \
 	ocsp-tests/signer-verify/response-non-delegated.der \
@@ -241,7 +243,8 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 x509cert-dntypes id-on-xmppAddr tls13-compat-mode ciphersuite-name \
 	 x509-upnconstraint xts-key-check cipher-padding pkcs7-verify-double-free \
 	 fips-rsa-sizes tls12-rehandshake-ticket pathbuf tls-force-ems \
-	 psk-importer privkey-derive dh-compute2 ecdh-compute2
+	 psk-importer privkey-derive dh-compute2 ecdh-compute2 pkcs7-pad \
+	 mini-dtls-fragments
 
 ctests += tls-channel-binding
 
@@ -366,6 +369,11 @@ noinst_LTLIBRARIES += libpkcs11mock4.la
 libpkcs11mock4_la_SOURCES = pkcs11/pkcs11-mock4.c
 libpkcs11mock4_la_LDFLAGS = -shared -rpath $(pkglibdir) -module -no-undefined -avoid-version
 libpkcs11mock4_la_LIBADD =  ../gl/libgnu.la
+
+noinst_LTLIBRARIES += libpkcs11mock5.la
+libpkcs11mock5_la_SOURCES = pkcs11/pkcs11-mock5.c
+libpkcs11mock5_la_LDFLAGS = -shared -rpath $(pkglibdir) -module -no-undefined -avoid-version
+libpkcs11mock5_la_LIBADD =  ../gl/libgnu.la
 
 pkcs11_cert_import_url_exts_SOURCES = pkcs11/pkcs11-cert-import-url-exts.c
 pkcs11_cert_import_url_exts_DEPENDENCIES = libpkcs11mock1.la libutils.la
@@ -513,10 +521,15 @@ pathbuf_CPPFLAGS = $(AM_CPPFLAGS) \
 	-I$(top_srcdir)/gl	\
 	-I$(top_builddir)/gl
 
+mini_dtls_fragments_CPPFLAGS = $(AM_CPPFLAGS) \
+	-I$(top_srcdir)/gl	\
+	-I$(top_builddir)/gl
+
 if ENABLE_PKCS11
 if !WINDOWS
 ctests += tls13/post-handshake-with-cert-pkcs11 pkcs11/tls-neg-pkcs11-no-key \
-	global-init-override pkcs11/distrust-after pkcs11/os-locking-ok pkcs11/long-label
+	global-init-override pkcs11/distrust-after pkcs11/os-locking-ok pkcs11/long-label \
+	pkcs11/trust-list-fault
 tls13_post_handshake_with_cert_pkcs11_DEPENDENCIES = libpkcs11mock2.la libutils.la
 tls13_post_handshake_with_cert_pkcs11_LDADD = $(LDADD) $(LIBDL)
 pkcs11_tls_neg_pkcs11_no_key_DEPENDENCIES = libpkcs11mock2.la libutils.la
@@ -527,6 +540,8 @@ pkcs11_os_locking_ok_DEPENDENCIES = libpkcs11mock4.la libutils.la
 pkcs11_os_locking_ok_LDADD = $(LDADD) $(LIBDL)
 pkcs11_long_label_DEPENDENCIES = libpkcs11mock4.la libutils.la
 pkcs11_long_label_LDADD = $(LDADD) $(LIBDL)
+pkcs11_trust_fault_DEPENDENCIES = libpkcs11mock5.la libutils.la
+pkcs11_trust_fault_LDADD = $(LDADD) $(LIBDL)
 endif
 endif
 
@@ -681,6 +696,7 @@ TESTS_ENVIRONMENT +=						\
 	P11MOCKLIB2=$(abs_builddir)/.libs/libpkcs11mock2.so	\
 	P11MOCKLIB3=$(abs_builddir)/.libs/libpkcs11mock3.so	\
 	P11MOCKLIB4=$(abs_builddir)/.libs/libpkcs11mock4.so	\
+	P11MOCKLIB5=$(abs_builddir)/.libs/libpkcs11mock5.so	\
 	PKCS12_MANY_CERTS_FILE=$(srcdir)/cert-tests/data/pkcs12_5certs.p12	\
 	PKCS12FILE=$(srcdir)/cert-tests/data/client.p12		\
 	PKCS12PASSWORD=foobar					\

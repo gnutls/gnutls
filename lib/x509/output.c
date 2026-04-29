@@ -121,6 +121,7 @@ static void print_name(gnutls_buffer_st *str, const char *prefix, unsigned type,
 	if ((type == GNUTLS_SAN_DNSNAME || type == GNUTLS_SAN_OTHERNAME_XMPP ||
 	     type == GNUTLS_SAN_OTHERNAME_KRB5PRINCIPAL ||
 	     type == GNUTLS_SAN_OTHERNAME_MSUSERPRINCIPAL ||
+	     type == GNUTLS_SAN_OTHERNAME_SRV ||
 	     type == GNUTLS_SAN_RFC822NAME || type == GNUTLS_SAN_URI) &&
 	    sname != NULL && strlen(sname) != name->size) {
 		adds(str, _("warning: SAN contains an embedded NUL, "
@@ -178,6 +179,11 @@ static void print_name(gnutls_buffer_st *str, const char *prefix, unsigned type,
 	case GNUTLS_SAN_OTHERNAME_MSUSERPRINCIPAL:
 		addf(str, _("%sUser Principal Name: %.*s\n"), prefix,
 		     name->size, NON_NULL(name->data));
+		break;
+
+	case GNUTLS_SAN_OTHERNAME_SRV:
+		addf(str, _("%sSRVName: %.*s\n"), prefix, name->size,
+		     NON_NULL(name->data));
 		break;
 
 	default:

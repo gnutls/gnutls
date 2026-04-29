@@ -45,6 +45,9 @@ static int san_othername_to_virtual(const char *oid, size_t size)
 			 memcmp(oid, MSUSER_PRINCIPAL_NAME_OID,
 				sizeof(MSUSER_PRINCIPAL_NAME_OID) - 1) == 0)
 			return GNUTLS_SAN_OTHERNAME_MSUSERPRINCIPAL;
+		else if ((unsigned)size == (sizeof(SRV_OID) - 1) &&
+			 memcmp(oid, SRV_OID, sizeof(SRV_OID) - 1) == 0)
+			return GNUTLS_SAN_OTHERNAME_SRV;
 	}
 
 	return GNUTLS_SAN_OTHERNAME;
@@ -59,6 +62,8 @@ static const char *virtual_to_othername_oid(unsigned type)
 		return KRB5_PRINCIPAL_OID;
 	case GNUTLS_SAN_OTHERNAME_MSUSERPRINCIPAL:
 		return MSUSER_PRINCIPAL_NAME_OID;
+	case GNUTLS_SAN_OTHERNAME_SRV:
+		return SRV_OID;
 	default:
 		return NULL;
 	}
@@ -108,11 +113,7 @@ int _gnutls_alt_name_assign_virt_type(struct name_st *name, unsigned type,
 			if (ret < 0)
 				return gnutls_assert_val(ret);
 
-			name->type = GNUTLS_SAN_OTHERNAME;
-			name->san.data = encoded.data;
-			name->san.size = encoded.size;
-			name->othername_oid.data = (void *)gnutls_strdup(oid);
-			name->othername_oid.size = strlen(oid);
+			name->san = _gnutls_take_datum(&encoded);
 			break;
 
 		case GNUTLS_SAN_OTHERNAME_KRB5PRINCIPAL:
@@ -120,15 +121,28 @@ int _gnutls_alt_name_assign_virt_type(struct name_st *name, unsigned type,
 							    &name->san);
 			if (ret < 0)
 				return gnutls_assert_val(ret);
+			break;
 
-			name->othername_oid.data = (void *)gnutls_strdup(oid);
-			name->othername_oid.size = strlen(oid);
-			name->type = GNUTLS_SAN_OTHERNAME;
+		case GNUTLS_SAN_OTHERNAME_SRV:
+			ret = _gnutls_x509_encode_string(ASN1_ETYPE_IA5_STRING,
+							 san->data, san->size,
+							 &encoded);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+			name->san = _gnutls_take_datum(&encoded);
 			break;
 
 		default:
 			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 		}
+		ret = _gnutls_set_strdatum(&name->othername_oid, oid,
+					   strlen(oid));
+		if (ret < 0) {
+			gnutls_assert();
+			_gnutls_free_datum(&name->san);
+			return ret;
+		}
+		name->type = GNUTLS_SAN_OTHERNAME;
 
 		gnutls_free(san->data);
 	}
@@ -184,6 +198,15 @@ int gnutls_x509_othername_to_virtual(const char *oid,
 		return 0;
 	case GNUTLS_SAN_OTHERNAME_MSUSERPRINCIPAL:
 		ret = _gnutls_x509_decode_string(ASN1_ETYPE_UTF8_STRING,
+						 othername->data,
+						 othername->size, virt, 0);
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
+		return 0;
+	case GNUTLS_SAN_OTHERNAME_SRV:
+		ret = _gnutls_x509_decode_string(ASN1_ETYPE_IA5_STRING,
 						 othername->data,
 						 othername->size, virt, 0);
 		if (ret < 0) {

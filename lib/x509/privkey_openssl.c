@@ -173,7 +173,8 @@ int gnutls_x509_privkey_import_openssl(gnutls_x509_privkey_t key,
 
 	for (i = 0; i < sizeof(pem_ciphers) / sizeof(pem_ciphers[0]); i++) {
 		l = strlen(pem_ciphers[i].name);
-		if (!strncmp(pem_header, pem_ciphers[i].name, l) &&
+		if (pem_header_size > l &&
+		    !strncmp(pem_header, pem_ciphers[i].name, l) &&
 		    pem_header[l] == ',') {
 			pem_header += l + 1;
 			cipher = pem_ciphers[i].cipher;
@@ -217,6 +218,8 @@ int gnutls_x509_privkey_import_openssl(gnutls_x509_privkey_t key,
 	while (*pem_header == '\n' || *pem_header == '\r')
 		pem_header++;
 
+	pem_header_size =
+		data->size - (ptrdiff_t)(pem_header - pem_header_start);
 	ret = _gnutls_base64_decode((const void *)pem_header, pem_header_size,
 				    &b64_data);
 	if (ret < 0) {
