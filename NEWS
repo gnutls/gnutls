@@ -142,6 +142,12 @@ See the end for copying conditions.
    Independently reported by Kamil Frankowicz and
    Joshua Rogers of AISLE Research Team.
 
+** libgnutls: Fix a theoretical double-free during certificate import
+   If gnutls_x509_crt_list_import_pkcs11 failed partway through,
+   the trust list cleanup code would try to free already-deinitialized
+   certificate entries, leading to a double-free (#1819).
+   Reported by Joshua Rogers of AISLE Research Team.
+
 ** build: Support building with Nettle 4.0
    Nettle 4.0 was released in Feburary 2026, with API incompatibile
    changes from 3.10. The library can now compile with it, while
