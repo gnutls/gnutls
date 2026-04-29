@@ -114,6 +114,11 @@ See the end for copying conditions.
    Reported by Doria Tang of Stony Brook University.
    [GNUTLS-SA-2026-04-29-13, CVSS: low] [CVE-2026-5419]
 
+** libgnutls: Fix PSK username comparison during rehandshake
+   Rehandshaking to a username with embedded NUL character could theoretically
+   allow bypassing the GNUTLS_ALLOW_ID_CHANGE protection (#1808).
+   Reported and fixed by Joshua Rogers of AISLE Research Team.
+
 ** build: Support building with Nettle 4.0
    Nettle 4.0 was released in Feburary 2026, with API incompatibile
    changes from 3.10. The library can now compile with it, while
