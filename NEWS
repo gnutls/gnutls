@@ -130,6 +130,12 @@ See the end for copying conditions.
    were created as persistent objects and accumulating.
    They are now ephemeral (#1813).
 
+** libgnutls: Fix missing RSA key coprimality check in verify_params
+   gnutls_privkey_verify_params overlooked the scenario of p and q
+   not being co-prime.
+   It now returns GNUTLS_E_PK_INVALID_PRIVKEY in this case (#1818).
+   Reported by Kamil Frankowicz.
+
 ** build: Support building with Nettle 4.0
    Nettle 4.0 was released in Feburary 2026, with API incompatibile
    changes from 3.10. The library can now compile with it, while
