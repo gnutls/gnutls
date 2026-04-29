@@ -97,6 +97,15 @@ See the end for copying conditions.
    Reported by Zou Dikai.
    [GNUTLS-SA-2026-04-29-11, CVSS: low] [CVE-2026-42015]
 
+** libgnutls: Fix multi-entry OCSP response revocation bypass
+   When validating a certificate against a multi-entry OCSP response,
+   the revocation status was always checked for the first entry
+   instead of the entry matching the certificate,
+   which could lead to accepting revoked certificates.
+   Independently reported by Oleh Konko (1seal) and
+   Joshua Rogers of AISLE Research Team.
+   [GNUTLS-SA-2026-04-29-12, CVSS: low] [CVE-2026-3832]
+
 ** build: Support building with Nettle 4.0
    Nettle 4.0 was released in Feburary 2026, with API incompatibile
    changes from 3.10. The library can now compile with it, while
