@@ -119,6 +119,12 @@ See the end for copying conditions.
    allow bypassing the GNUTLS_ALLOW_ID_CHANGE protection (#1808).
    Reported and fixed by Joshua Rogers of AISLE Research Team.
 
+** libgnutls: Fix OID length check for OCSP delegated signer EKU
+   The OCSP signing EKU OID was compared without verifying its length,
+   allowing a shorter OID that shares the same prefix to match.
+   The check now verifies the length as well (#1810).
+   Reported by Joshua Rogers of AISLE Research Team.
+
 ** build: Support building with Nettle 4.0
    Nettle 4.0 was released in Feburary 2026, with API incompatibile
    changes from 3.10. The library can now compile with it, while
