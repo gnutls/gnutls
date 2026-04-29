@@ -70,6 +70,13 @@ See the end for copying conditions.
    Reported by Oleh Konko (1seal).
    [GNUTLS-SA-2026-04-27-7, CVSS: medium] [CVE-2026-42012]
 
+** libgnutls: Suppress CN fallback for oversized SAN
+   Validation of certificates with oversized Subject Alternative Names
+   no longer falls back to checking DNS hostnames against Common Name.
+   Independently reported by Haruto Kimura (Stella) and
+   Joshua Rogers of AISLE Research Team.
+   [GNUTLS-SA-2026-04-27-8, CVSS: medium] [CVE-2026-42013]
+
 ** build: Support building with Nettle 4.0
    Nettle 4.0 was released in Feburary 2026, with API incompatibile
    changes from 3.10. The library can now compile with it, while
