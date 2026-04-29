@@ -136,6 +136,12 @@ See the end for copying conditions.
    It now returns GNUTLS_E_PK_INVALID_PRIVKEY in this case (#1818).
    Reported by Kamil Frankowicz.
 
+** libgnutls: Fix overread when parsing OpenSSL PEM private keys
+   Insufficient bounds checking on the PEM header length could lead
+   to short heap overreads on specially crafted inputs (#1854).
+   Independently reported by Kamil Frankowicz and
+   Joshua Rogers of AISLE Research Team.
+
 ** build: Support building with Nettle 4.0
    Nettle 4.0 was released in Feburary 2026, with API incompatibile
    changes from 3.10. The library can now compile with it, while
