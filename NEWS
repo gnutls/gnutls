@@ -44,6 +44,17 @@ See the end for copying conditions.
    Reported by Joshua Rogers of AISLE Research Team.
    [GNUTLS-SA-2026-04-29-4, CVSS: high] [CVE-2026-42010]
 
+** libgnutls: Fix case-sensitivity of domain name comparison in name constraints
+   Domain name comparison during name constraints processing
+   was case-sensitive, violating RFC 5280 section 7.2.
+   For excluded name constraints, this could lead to
+   incorrectly accepting domain names that should've been rejected.
+   DNS name comparison and the domain part of email names
+   now perform case-insensitive comparison.
+   Independently reported by Oleh Konko (1seal) and
+   Joshua Rogers of AISLE Research Team.
+   [GNUTLS-SA-2026-04-29-5, CVSS: high] [CVE-2026-3833]
+
 ** build: Support building with Nettle 4.0
    Nettle 4.0 was released in Feburary 2026, with API incompatibile
    changes from 3.10. The library can now compile with it, while
