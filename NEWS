@@ -125,6 +125,11 @@ See the end for copying conditions.
    The check now verifies the length as well (#1810).
    Reported by Joshua Rogers of AISLE Research Team.
 
+** libgnutls: Fix AES keys persisting with pkcs11-provider
+   When using the pkcs11-provider, AES keys used for cipher operations
+   were created as persistent objects and accumulating.
+   They are now ephemeral (#1813).
+
 ** build: Support building with Nettle 4.0
    Nettle 4.0 was released in Feburary 2026, with API incompatibile
    changes from 3.10. The library can now compile with it, while
