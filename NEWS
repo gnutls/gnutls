@@ -148,6 +148,12 @@ See the end for copying conditions.
    certificate entries, leading to a double-free (#1819).
    Reported by Joshua Rogers of AISLE Research Team.
 
+** libgnutls: Fix heap overread in SCT extension parser
+   The list-length validation didn't account for the 2-byte length field,
+   allowing a specially crafted SCT extension to cause
+   a 2-byte overread past the buffer (#1822).
+   Reported by Joshua Rogers of AISLE Research Team.
+
 ** build: Support building with Nettle 4.0
    Nettle 4.0 was released in Feburary 2026, with API incompatibile
    changes from 3.10. The library can now compile with it, while
