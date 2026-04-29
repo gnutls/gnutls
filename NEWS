@@ -55,6 +55,13 @@ See the end for copying conditions.
    Joshua Rogers of AISLE Research Team.
    [GNUTLS-SA-2026-04-29-5, CVSS: high] [CVE-2026-3833]
 
+** libgnutls: Fix intersecting empty constraints
+   Permitted name constraints were wrongfully ignored
+   when prior CAs only had excluded name constraints,
+   resulting in a name constraint bypass.
+   Reported by Haruto Kimura (Stella).
+   [GNUTLS-SA-2026-04-29-6, CVSS: medium] [CVE-2026-42011]
+
 ** build: Support building with Nettle 4.0
    Nettle 4.0 was released in Feburary 2026, with API incompatibile
    changes from 3.10. The library can now compile with it, while
