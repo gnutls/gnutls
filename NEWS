@@ -154,6 +154,10 @@ See the end for copying conditions.
    a 2-byte overread past the buffer (#1822).
    Reported by Joshua Rogers of AISLE Research Team.
 
+** libgnutls: Zeroize shared secret derived during hybrid key exchange
+   The derived shared secret was not zeroized before being freed (#1841).
+   Reported by liyue.
+
 ** build: Support building with Nettle 4.0
    Nettle 4.0 was released in Feburary 2026, with API incompatibile
    changes from 3.10. The library can now compile with it, while
