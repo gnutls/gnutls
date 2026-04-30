@@ -23,18 +23,6 @@
 #include "config.h"
 #endif
 
-#include <stdio.h>
-#include <stdlib.h>
-
-#if defined(_WIN32)
-
-int main(void)
-{
-	exit(77);
-}
-
-#else
-
 #include <assert.h>
 #include <errno.h>
 #include <stdbool.h>
@@ -577,5 +565,3 @@ void doit(void)
 	test_malicious1811();
 	gnutls_global_deinit();
 }
-
-#endif /* _WIN32 */
