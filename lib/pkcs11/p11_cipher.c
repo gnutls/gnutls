@@ -486,8 +486,13 @@ static int wrap_p11_cipher_aead_encrypt(void *_ctx, const void *iv,
 					void *enc, size_t enc_size)
 {
 	struct p11_cipher_ctx *ctx = _ctx;
+	int ret;
 
-	ctx->cipher->set_params(ctx, iv, iv_size, auth, auth_size, tag_size);
+	ret = ctx->cipher->set_params(ctx, iv, iv_size, auth, auth_size,
+				      tag_size);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
 	return wrap_p11_cipher_encrypt(_ctx, plain, plain_size, enc, enc_size);
 }
 
@@ -498,8 +503,13 @@ static int wrap_p11_cipher_aead_decrypt(void *_ctx, const void *iv,
 					void *plain, size_t plain_size)
 {
 	struct p11_cipher_ctx *ctx = _ctx;
+	int ret;
 
-	ctx->cipher->set_params(ctx, iv, iv_size, auth, auth_size, tag_size);
+	ret = ctx->cipher->set_params(ctx, iv, iv_size, auth, auth_size,
+				      tag_size);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
 	return wrap_p11_cipher_decrypt(_ctx, enc, enc_size, plain, plain_size);
 }
 

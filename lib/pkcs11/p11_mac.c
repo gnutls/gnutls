@@ -564,11 +564,21 @@ static int wrap_p11_mac_fast(gnutls_mac_algorithm_t alg, const void *nonce,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	if (ctx->mac->set_nonce != NULL)
-		ctx->mac->set_nonce(ctx, nonce, nonce_size);
+	if (ctx->mac->set_nonce != NULL) {
+		ret = ctx->mac->set_nonce(ctx, nonce, nonce_size);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+	}
 
-	if (ctx->mac->set_key != NULL)
-		ctx->mac->set_key(ctx, key, key_size);
+	if (ctx->mac->set_key != NULL) {
+		ret = ctx->mac->set_key(ctx, key, key_size);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+	}
 
 	ret = sign_init(ctx, text, text_size);
 	if (ret < 0) {
