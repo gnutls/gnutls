@@ -53,7 +53,7 @@ See the end for copying conditions.
    now perform case-insensitive comparison.
    Independently reported by Oleh Konko (1seal) and
    Joshua Rogers of AISLE Research Team.
-   [GNUTLS-SA-2026-04-29-5, CVSS: high] [CVE-2026-3833]
+   [GNUTLS-SA-2026-04-29-5, CVSS: medium] [CVE-2026-3833]
 
 ** libgnutls: Fix intersecting empty constraints
    Permitted name constraints were wrongfully ignored
