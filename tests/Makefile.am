@@ -524,6 +524,7 @@ pathbuf_CPPFLAGS = $(AM_CPPFLAGS) \
 mini_dtls_fragments_CPPFLAGS = $(AM_CPPFLAGS) \
 	-I$(top_srcdir)/gl	\
 	-I$(top_builddir)/gl
+mini_dtls_fragments_LDADD = $(LDADD) ../gl/libgnu.la
 
 if ENABLE_PKCS11
 if !WINDOWS
