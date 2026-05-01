@@ -255,9 +255,15 @@ void crau_data(struct crau_context_stack_st *stack, ...)
 #    if __has_c_attribute (__maybe_unused__)
 #     define CRAU_MAYBE_UNUSED [[__maybe_unused__]]
 #    endif
-#   elif defined(__GNUC__)
+#   endif
+#  endif /* CRAU_MAYBE_UNUSED */
+#  ifndef CRAU_MAYBE_UNUSED
+#   ifdef __GNUC__
 #    define CRAU_MAYBE_UNUSED __attribute__((__unused__))
 #   endif
+#  endif /* CRAU_MAYBE_UNUSED */
+#  ifndef CRAU_MAYBE_UNUSED
+#   define CRAU_MAYBE_UNUSED
 #  endif /* CRAU_MAYBE_UNUSED */
 
 void crau_push_context(struct crau_context_stack_st *stack CRAU_MAYBE_UNUSED,
