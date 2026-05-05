@@ -337,8 +337,10 @@ static int capi_sign(gnutls_privkey_t key, void *userdata,
 	signature->size = ret_sig;
 	signature->data = (unsigned char *)gnutls_malloc(signature->size);
 
-	if (signature->data == NULL)
-		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+	if (signature->data == NULL) {
+		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		goto fail;
+	}
 
 	if (!CryptSignHash(hHash, priv->dwKeySpec, NULL, 0, signature->data,
 			   &ret_sig)) {
