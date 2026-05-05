@@ -742,7 +742,7 @@ static void print_crldist(gnutls_buffer_st *str, gnutls_datum_t *der)
 		else if (err < 0) {
 			addf(str, "error: get_crl_dist_points: %s\n",
 			     gnutls_strerror(err));
-			return;
+			goto cleanup;
 		}
 
 		print_name(str, "\t\t\t", type, &dist, 0);
