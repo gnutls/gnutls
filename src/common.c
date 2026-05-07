@@ -37,6 +37,7 @@
 #include <time.h>
 #include "common.h"
 #include <unistd.h>
+#include "minmax.h"
 
 #ifndef _WIN32
 #include <signal.h>
@@ -1169,7 +1170,6 @@ void getenv_copy(char *str, size_t max_str_size, const char *envvar)
 	return;
 }
 
-#define MIN(x, y) ((x) < (y)) ? (x) : (y)
 #define MAX_CACHE_TRIES 5
 int pin_callback(void *user, int attempt, const char *token_url,
 		 const char *token_label, unsigned int flags, char *pin,

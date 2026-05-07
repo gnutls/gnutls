@@ -54,6 +54,7 @@ typedef int ssize_t;
 #include <time.h>
 
 #include "attribute.h"
+#include "minmax.h"
 
 #define ENABLE_ALIGN16
 
@@ -149,8 +150,6 @@ typedef int ssize_t;
 /* The EC group to be used when the extension
  * supported groups/curves is not present */
 #define DEFAULT_EC_GROUP GNUTLS_GROUP_SECP256R1
-
-#define MIN(x, y) ((x) < (y) ? (x) : (y))
 
 typedef enum transport_t {
 	GNUTLS_STREAM,

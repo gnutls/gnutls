@@ -469,6 +469,7 @@ tests/libpkcs11mock1.la
 tests/libpkcs11mock2.la
 tests/libpkcs11mock3.la
 tests/libpkcs11mock4.la
+tests/libpkcs11mock5.la
 tests/libutils.la
 tests/long-session-id
 tests/mini

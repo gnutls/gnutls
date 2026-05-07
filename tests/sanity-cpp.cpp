@@ -28,17 +28,20 @@
 #include <iostream>
 #include <assert.h>
 
-extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include "cert-common.h"
 #include <setjmp.h>
+
+/* These header files assume C linkage */
+extern "C" {
+#include "cert-common.h"
 #include <cmocka.h>
+}
+
 #undef MIN
 #define MIN(x,y) (x > y ? y : x)
-}
 
 /* This is a basic test for C++ API */
 static void tls_log_func(int level, const char *str)
