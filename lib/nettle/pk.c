@@ -2258,6 +2258,14 @@ static int _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 		    (sign_params->flags & GNUTLS_PK_FLAG_REPRODUCIBLE)) {
 			mp_limb_t h[DSA_COMPUTE_K_ITCH];
 
+			k.data = buf;
+			k.size = (mpz_sizeinbase(pub.q, 2) + 7) / 8;
+			if (k.size > sizeof(buf)) {
+				ret = gnutls_assert_val(
+					GNUTLS_E_INVALID_REQUEST);
+				goto dsa_fail;
+			}
+
 			ret = _gnutls_dsa_compute_k(
 				h, mpz_limbs_read(pub.q),
 				mpz_limbs_read(TOMPZ(priv)), mpz_size(pub.q),
@@ -2266,9 +2274,6 @@ static int _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 				vdata->size);
 			if (ret < 0)
 				goto dsa_fail;
-
-			k.data = buf;
-			k.size = (mpz_sizeinbase(pub.q, 2) + 7) / 8;
 
 			_gnutls_dsa_compute_k_finish(k.data, k.size, h,
 						     mpz_size(pub.q));

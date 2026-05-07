@@ -55,10 +55,11 @@ struct _key_tests_st {
 	gnutls_digest_algorithm_t digest;
 	gnutls_sign_algorithm_t sigalgo;
 	unsigned int sign_flags;
+	int ret;
 };
 
-/* Test vectors from RFC 6979 */
 #ifdef ENABLE_DSA
+/* Test vectors from RFC 6979 */
 static const char dsa_privkey_rfc6979[] =
 	"-----BEGIN DSA PRIVATE KEY-----\n"
 	"MIIBugIBAAKBgQCG9coD3P6yJQY/+DCgx2m53Z1hU62R184n94fEMni0R+ZTO4ax\n"
@@ -71,6 +72,23 @@ static const char dsa_privkey_rfc6979[] =
 	"VC7mGHHARAy4fDIvxLTS7F4efsdm4b6NTOk1Q33BHDyP1CYziTPr/nOcs0ZfTTZo\n"
 	"xeRzUIJTseaC9ly9xPrpPC6iEjkOVJBahuIiMXC0Tqp9pd2f/Pt/OwIUQRYCyxmm\n"
 	"zMNElNedmO8eftWvJfc=\n"
+	"-----END DSA PRIVATE KEY-----\n";
+
+/* Obscure key with 513-bit subgroup */
+static const char dsa_privkey_subgroup_513[] =
+	"-----BEGIN DSA PRIVATE KEY-----\n"
+	"MIICEgIBAAKBgQCT8xafxC0pOlrl0lyB1wrfAaMC6EFg6eC8C0zqkiJusXUkX6gN\n"
+	"ROpcRWUmQjR32nlyB2pqcYB3Zcx0czmkneai8MztnBc/efUy4h+NrhJcAsWcDqFv\n"
+	"6ggUOL0n/TBCLLbHtzZAULepBz2gYqPAoQvVnIyUvhFfgbL7AF7nUZHVJQJBAWRB\n"
+	"r7IprIAkBzimiIeJRcBr2+377NlnezBDkjhObImpFnq57+X6EXDUD4AGpqU7Q0WY\n"
+	"pP2SWtQT9LsrabecWZUCgYA+SZEdQDU0z0tlbJ19Bkl3o+cirVAaLyHCGl0wXq4C\n"
+	"WE/Rlw0BUXdoywGXgPtng84kxydDdpKde0xIdU6r/tNHmvIPrNXTiCM6RP++fMQA\n"
+	"+0SaWzntZ7VYCy16WRwQS1AArEIxlzF+AejS7aMgM40yuDm5fiRjcTOHNUFYViMm\n"
+	"9AKBgE/ik+WfivnAh1jNRDdgb82K5WCEy6yYnyE/nBhoCcz5n4F5iB4vooUr8j3/\n"
+	"jmm83p7xlAuKoV9mh5K2QEBqZq1YMRwO+w/k2G+l3RqwdP8pF7EFq4NBRmbrQop5\n"
+	"/+ciCzKk5RXs7WP5CcDcWvpvr+AnaHOe6lmlVJ0wCK4fbVmtAkBbUgJuqhWmnf/2\n"
+	"wubc10/d0hcEVQtMbuwa+gMMpwR04JTnVNdHwjFRkCx6RVT0YHZoXqxw4Wxx4Rv8\n"
+	"Pjb3ynIw\n"
 	"-----END DSA PRIVATE KEY-----\n";
 #endif
 
@@ -85,7 +103,7 @@ static const char sample[] = "sample";
 
 static const struct _key_tests_st tests[] = {
 #ifdef ENABLE_DSA
-	{ .name = "dsa key",
+	{ .name = "dsa key (RFC 6979)",
 	  .key = { (void *)dsa_privkey_rfc6979,
 		   sizeof(dsa_privkey_rfc6979) - 1 },
 	  .msg = { (void *)sample, sizeof(sample) - 1 },
@@ -95,8 +113,17 @@ static const struct _key_tests_st tests[] = {
 	  .digest = GNUTLS_DIG_SHA256,
 	  .sigalgo = GNUTLS_SIGN_DSA_SHA256,
 	  .sign_flags = GNUTLS_PRIVKEY_FLAG_REPRODUCIBLE },
+	{ .name = "dsa key (513-bit subgroup)",
+	  .key = { (void *)dsa_privkey_subgroup_513,
+		   sizeof(dsa_privkey_subgroup_513) - 1 },
+	  .msg = { (void *)sample, sizeof(sample) - 1 },
+	  .pk = GNUTLS_PK_DSA,
+	  .digest = GNUTLS_DIG_SHA256,
+	  .sigalgo = GNUTLS_SIGN_DSA_SHA256,
+	  .sign_flags = GNUTLS_PRIVKEY_FLAG_REPRODUCIBLE,
+	  .ret = GNUTLS_E_INVALID_REQUEST },
 #endif
-	{ .name = "ecdsa key",
+	{ .name = "ecdsa key (RFC 6979)",
 	  .key = { (void *)ecdsa_secp256r1_privkey_rfc6979,
 		   sizeof(ecdsa_secp256r1_privkey_rfc6979) - 1 },
 	  .msg = { (void *)sample, sizeof(sample) - 1 },
@@ -184,9 +211,12 @@ void doit(void)
 					"gnutls_privkey_sign_data unexpectedly succeeds\n");
 			success(" - skipping\n");
 			goto next;
-		} else {
-			if (ret < 0)
-				testfail("gnutls_privkey_sign_data\n");
+		} else if (ret < 0) {
+			if (ret == tests[i].ret) {
+				success(" - skipping\n");
+				goto next;
+			}
+			testfail("gnutls_privkey_sign_data\n");
 		}
 
 		if (signature.size != tests[i].sig.size ||
