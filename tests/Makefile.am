@@ -541,8 +541,8 @@ pkcs11_os_locking_ok_DEPENDENCIES = libpkcs11mock4.la libutils.la
 pkcs11_os_locking_ok_LDADD = $(LDADD) $(LIBDL)
 pkcs11_long_label_DEPENDENCIES = libpkcs11mock4.la libutils.la
 pkcs11_long_label_LDADD = $(LDADD) $(LIBDL)
-pkcs11_trust_fault_DEPENDENCIES = libpkcs11mock5.la libutils.la
-pkcs11_trust_fault_LDADD = $(LDADD) $(LIBDL)
+pkcs11_trust_list_fault_DEPENDENCIES = libpkcs11mock5.la libutils.la
+pkcs11_trust_list_fault_LDADD = $(LDADD) $(LIBDL)
 endif
 endif
 
