@@ -498,6 +498,8 @@ error:
 	return ret;
 }
 
+unsigned int _gnutls_pkcs7_unpad(const uint8_t *block, unsigned int block_size);
+
 /* If succeeds, returns the number of padding bytes to be removed;
  * zero otherwise.
  */
