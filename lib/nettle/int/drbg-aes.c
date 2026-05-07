@@ -103,7 +103,7 @@ int drbg_aes_random(struct drbg_aes_ctx *ctx, unsigned length, uint8_t *dst)
 
 	while (left > 0) {
 		p_len = MIN(MAX_DRBG_AES_GENERATE_SIZE, left);
-		ret = drbg_aes_generate(ctx, p_len, p, 0, 0);
+		ret = drbg_aes_generate(ctx, p_len, p, 0, NULL);
 		if (ret == 0)
 			return ret;
 
