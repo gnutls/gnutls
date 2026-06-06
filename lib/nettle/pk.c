@@ -3423,6 +3423,126 @@ cleanup:
 	return ret;
 }
 
+static gnutls_sign_algorithm_t pct_pk_to_sign(gnutls_pk_algorithm_t algo,
+					      const gnutls_x509_spki_st *spki)
+{
+	switch (algo) {
+	case GNUTLS_PK_RSA_PSS:
+		return gnutls_pk_to_sign(algo, spki->rsa_pss_dig);
+#ifdef ENABLE_DSA
+	case GNUTLS_PK_DSA:
+#endif
+	case GNUTLS_PK_ECDSA:
+		return gnutls_pk_to_sign(algo, spki->dsa_dig);
+	case GNUTLS_PK_EDDSA_ED25519:
+		return GNUTLS_SIGN_EDDSA_ED25519;
+	case GNUTLS_PK_EDDSA_ED448:
+		return GNUTLS_SIGN_EDDSA_ED448;
+#if ENABLE_GOST
+	case GNUTLS_PK_GOST_01:
+		return GNUTLS_SIGN_GOST_94;
+	case GNUTLS_PK_GOST_12_256:
+		return GNUTLS_SIGN_GOST_256;
+	case GNUTLS_PK_GOST_12_512:
+		return GNUTLS_SIGN_GOST_512;
+#endif
+	case GNUTLS_PK_MLDSA44:
+		return GNUTLS_SIGN_MLDSA44;
+	case GNUTLS_PK_MLDSA65:
+		return GNUTLS_SIGN_MLDSA65;
+	case GNUTLS_PK_MLDSA87:
+		return GNUTLS_SIGN_MLDSA87;
+	default:
+		return GNUTLS_SIGN_UNKNOWN;
+	}
+}
+
+static int pct_hash_sign_test(gnutls_pk_algorithm_t algo,
+			      const gnutls_pk_params_st *params,
+			      const gnutls_x509_spki_st *spki,
+			      const gnutls_datum_t *data)
+{
+	gnutls_privkey_t privkey = NULL;
+	gnutls_pubkey_t pubkey = NULL;
+	gnutls_x509_privkey_t xprivkey = NULL;
+	gnutls_datum_t sig = { NULL, 0 };
+	gnutls_sign_algorithm_t sign_algo;
+	int ret;
+
+	sign_algo = pct_pk_to_sign(algo, spki);
+	if (sign_algo == GNUTLS_SIGN_UNKNOWN)
+		return gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
+
+	ret = gnutls_x509_privkey_init(&xprivkey);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = _gnutls_pk_params_copy(&xprivkey->params, params);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = gnutls_privkey_init(&privkey);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = gnutls_privkey_import_x509(privkey, xprivkey,
+					 GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+	xprivkey = NULL;
+
+	ret = gnutls_pubkey_init(&pubkey);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = gnutls_pubkey_import_privkey(pubkey, privkey, 0, 0);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = gnutls_privkey_sign_data2(privkey, sign_algo, 0, data, &sig);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	/* Ignore algorithm disablement through configuration during PCT.  */
+	ret = gnutls_pubkey_verify_data2(
+		pubkey, sign_algo, GNUTLS_VERIFY_ALLOW_BROKEN, data, &sig);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+cleanup:
+	if (ret < 0) {
+		_gnutls_debug_log("PCT: %s hash+sign self-test failed: %s\n",
+				  gnutls_sign_get_name(sign_algo),
+				  gnutls_strerror(ret));
+	} else {
+		_gnutls_debug_log("PCT: %s hash+sign self-test succeeded\n",
+				  gnutls_sign_get_name(sign_algo));
+	}
+
+	gnutls_x509_privkey_deinit(xprivkey);
+	gnutls_privkey_deinit(privkey);
+	gnutls_pubkey_deinit(pubkey);
+	_gnutls_free_datum(&sig);
+
+	return ret;
+}
+
 static int pct_test(gnutls_pk_algorithm_t algo,
 		    const gnutls_pk_params_st *params)
 {
@@ -3567,7 +3687,19 @@ static int pct_test(gnutls_pk_algorithm_t algo,
 		ret = _gnutls_pk_verify(algo, &ddata, &sig, params, &spki);
 		if (ret < 0) {
 			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
-			gnutls_assert();
+			goto cleanup;
+		}
+
+		/* Exercise the combined hash+sign operation, using
+		 * the abstract key interface.
+		 *
+		 * FIXME: rework this once the crypto-backend
+		 * interface natively supports hash+sign operation, see:
+		 * https://gitlab.com/gnutls/gnutls/-/merge_requests/2066
+		 */
+		ret = pct_hash_sign_test(algo, params, &spki, &ddata);
+		if (ret < 0) {
+			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
 			goto cleanup;
 		}
 		break;
