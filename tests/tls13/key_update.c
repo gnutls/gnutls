@@ -279,8 +279,10 @@ static void run(const char *name, unsigned test, int cfd, int sfd)
 		TRANSFER(server, client, MSG, strlen(MSG), buffer, MAX_BUF);
 		EMPTY_BUF(server, client, buffer, MAX_BUF);
 
+		if (test != 0)
+			break;
 		virt_sec_sleep(2);
-		break;
+		FALLTHROUGH;
 	case 5:
 		success("%s: client cork\n", name);
 		gnutls_record_cork(client);
@@ -317,8 +319,10 @@ static void run(const char *name, unsigned test, int cfd, int sfd)
 
 		EMPTY_BUF(server, client, buffer, MAX_BUF);
 
+		if (test != 0)
+			break;
 		virt_sec_sleep(2);
-		break;
+		FALLTHROUGH;
 	case 6:
 		key_update_msg_inc = 0;
 		key_update_msg_out = 0;
