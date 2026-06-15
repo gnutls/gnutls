@@ -35,6 +35,7 @@
 #include "utils.h"
 #define RANDOMIZE
 #include "eagain-common.h"
+#include "virt-time.h"
 
 const char *side = "";
 
@@ -144,6 +145,7 @@ static void run(const char *name, unsigned test, int cfd, int sfd)
 
 	/* General init. */
 	global_init();
+	virt_time_init();
 	gnutls_global_set_log_function(tls_log_func);
 	if (debug)
 		gnutls_global_set_log_level(9);
@@ -219,7 +221,7 @@ static void run(const char *name, unsigned test, int cfd, int sfd)
 
 		if (test != 0)
 			break;
-		sec_sleep(2);
+		virt_sec_sleep(2);
 		FALLTHROUGH;
 	case 2:
 		success("%s: updating server's key\n", name);
@@ -240,7 +242,7 @@ static void run(const char *name, unsigned test, int cfd, int sfd)
 
 		if (test != 0)
 			break;
-		sec_sleep(2);
+		virt_sec_sleep(2);
 		FALLTHROUGH;
 	case 3:
 		success("%s: updating client's key and asking server\n", name);
@@ -260,7 +262,7 @@ static void run(const char *name, unsigned test, int cfd, int sfd)
 
 		if (test != 0)
 			break;
-		sec_sleep(2);
+		virt_sec_sleep(2);
 		FALLTHROUGH;
 	case 4:
 		success("%s: updating server's key and asking client\n", name);
@@ -277,8 +279,10 @@ static void run(const char *name, unsigned test, int cfd, int sfd)
 		TRANSFER(server, client, MSG, strlen(MSG), buffer, MAX_BUF);
 		EMPTY_BUF(server, client, buffer, MAX_BUF);
 
-		sec_sleep(2);
-		break;
+		if (test != 0)
+			break;
+		virt_sec_sleep(2);
+		FALLTHROUGH;
 	case 5:
 		success("%s: client cork\n", name);
 		gnutls_record_cork(client);
@@ -315,8 +319,10 @@ static void run(const char *name, unsigned test, int cfd, int sfd)
 
 		EMPTY_BUF(server, client, buffer, MAX_BUF);
 
-		sec_sleep(2);
-		break;
+		if (test != 0)
+			break;
+		virt_sec_sleep(2);
+		FALLTHROUGH;
 	case 6:
 		key_update_msg_inc = 0;
 		key_update_msg_out = 0;
