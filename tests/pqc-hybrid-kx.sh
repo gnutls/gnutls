@@ -95,16 +95,23 @@ for group in X25519-KYBER768 SECP256R1-MLKEM768 SECP384R1-MLKEM1024 X25519-MLKEM
 	esac
     fi
 
-    eval "${GETPORT}"
-    launch_server --echo --priority "NORMAL:-GROUP-ALL:+GROUP-$group" --x509keyfile="$KEY" --x509certfile="$CERT"
-    PID=$!
-    wait_server ${PID}
+    # Test hybrid alone, hybrid+EC, hybrid+FFDH, and hybrid+EC+FFDH:
+    # https://gitlab.com/gnutls/gnutls/-/work_items/1828
+    for prio in "NORMAL:-GROUP-ALL:+GROUP-$group" \
+		    "NORMAL:-GROUP-ALL:+GROUP-$group:+GROUP-X25519" \
+		    "NORMAL:-GROUP-ALL:+GROUP-$group:+GROUP-FFDHE2048" \
+		    "NORMAL:-GROUP-ALL:+GROUP-$group:+GROUP-X25519:+GROUP-FFDHE2048"; do
+	eval "${GETPORT}"
+	launch_server --echo --priority "$prio" --x509keyfile="$KEY" --x509certfile="$CERT"
+	PID=$!
+	wait_server ${PID}
 
-    ${VALGRIND} "${CLI}" --attime "${ATTIME_VALID}" -p "${PORT}" localhost --priority "NORMAL:-GROUP-ALL:+GROUP-$group" --x509cafile="$CACERT" --logfile="$testdir/cli.log" </dev/null
-    kill ${PID}
-    wait
+	${VALGRIND} "${CLI}" --attime "${ATTIME_VALID}" -p "${PORT}" localhost --priority "$prio" --x509cafile="$CACERT" --logfile="$testdir/cli.log" </dev/null
+	kill ${PID}
+	wait
 
-    grep -- "- Description: (TLS1.3-X.509)-(HYBRID-$group)-(ECDSA-SECP256R1-SHA256)-(AES-256-GCM)" "$testdir/cli.log" || { echo "unexpected handshake description"; cat "$testdir/cli.log"; exit 1; }
+	grep -- "- Description: (TLS1.3-X.509)-(HYBRID-$group)-(ECDSA-SECP256R1-SHA256)-(AES-256-GCM)" "$testdir/cli.log" || { echo "unexpected handshake description"; cat "$testdir/cli.log"; exit 1; }
+    done
 done
 
 # KEM based groups cannot be used standalone
