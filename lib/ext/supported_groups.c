@@ -247,9 +247,15 @@ static int _gnutls_supported_groups_recv_params(gnutls_session_t session,
 		if (serv_hybrid_idx != -1) {
 			if (session->internals.cand_group == NULL ||
 			    (session->internals.priorities->server_precedence &&
-			     serv_hybrid_idx < MIN(serv_ec_idx, serv_dh_idx)) ||
+			     (serv_dh_idx == -1 ||
+			      serv_hybrid_idx < serv_dh_idx) &&
+			     (serv_ec_idx == -1 ||
+			      serv_hybrid_idx < serv_ec_idx)) ||
 			    (!session->internals.priorities->server_precedence &&
-			     cli_hybrid_pos < MIN(cli_ec_pos, cli_dh_pos))) {
+			     (cli_dh_pos == -1 ||
+			      cli_hybrid_pos < cli_dh_pos) &&
+			     (cli_ec_pos == -1 ||
+			      cli_hybrid_pos < cli_ec_pos))) {
 				session->internals.cand_group =
 					session->internals.priorities->groups
 						.entry[serv_hybrid_idx];
