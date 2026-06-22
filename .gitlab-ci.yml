@@ -183,7 +183,6 @@ fedora-docdist/build:
     - make -j$BUILDJOBS -C doc/latex gnutls.pdf
     - DB2EPUBDIR=$(dirname $(find /usr/share/sgml/docbook/xsl-ns-stylesheets-*/epub/bin/ -name dbtoepub -print))
     - PATH="$PATH:$DB2EPUBDIR" make -C doc gnutls.epub
-  when: manual
 
 fedora-docdist/test:
   extends:
@@ -195,7 +194,6 @@ fedora-docdist/test:
     # Fake distcheck-hook that checks bootstrap is called without --skip-po
     - mkdir -p po/.reference
     - make -j$CHECKJOBS distcheck
-  when: manual
 
 fedora-sanitizers/build:
   extends:
@@ -584,7 +582,6 @@ fedora-cross/bootstrap:
   extends:
     - .bootstrap
     - .fedora-cross
-  when: manual
 
 .fedora-cross/build:
   extends:
@@ -621,7 +618,6 @@ fedora-cross/aarch64-linux-gnu/build: # name is important, see .fedora-cross/bui
     - .fedora-cross
   needs:
     - fedora-cross/bootstrap
-  when: manual
 
 fedora-cross/aarch64-linux-gnu/test:
   extends:
@@ -640,7 +636,6 @@ fedora-cross/ppc64le-linux-gnu/build: # name is important, see .fedora-cross/bui
     - .fedora-cross
   needs:
     - fedora-cross/bootstrap
-  when: manual
 
 fedora-cross/ppc64le-linux-gnu/test:
   extends:
@@ -659,7 +654,6 @@ fedora-cross/s390x-linux-gnu/build: # name is important, see .fedora-cross/build
     - .fedora-cross
   needs:
     - fedora-cross/bootstrap
-  when: manual
 
 fedora-cross/s390x-linux-gnu/test:
   extends:
