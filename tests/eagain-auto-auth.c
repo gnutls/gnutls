@@ -36,8 +36,7 @@
 #include "cert-common.h"
 #include "cmocka-common.h"
 
-/* This tests operation under non-blocking mode in TLS1.2/TLS1.3
- * rekey/rehandshake.
+/* This tests the GNUTLS_AUTO_REAUTH flag functionality under non-blocking mode.
  */
 static void tls_log_func(int level, const char *str)
 {
@@ -214,8 +213,14 @@ static void async_handshake(void **glob_state, const char *prio, unsigned rehsk)
 	msglen = strlen(MSG);
 	TRANSFER(client, server, MSG, msglen, buffer, MAX_BUF);
 
-	assert_true(gnutls_bye(client, GNUTLS_SHUT_WR) >= 0);
-	assert_true(gnutls_bye(server, GNUTLS_SHUT_WR) >= 0);
+	do {
+		cret = gnutls_bye(client, GNUTLS_SHUT_WR);
+	} while (cret == GNUTLS_E_AGAIN || cret == GNUTLS_E_INTERRUPTED);
+	assert_return_code(cret, 0);
+	do {
+		sret = gnutls_bye(server, GNUTLS_SHUT_WR);
+	} while (sret == GNUTLS_E_AGAIN || sret == GNUTLS_E_INTERRUPTED);
+	assert_return_code(sret, 0);
 
 	gnutls_deinit(client);
 	gnutls_deinit(server);
