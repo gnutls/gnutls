@@ -201,8 +201,15 @@ static void run(const char *name, bool exceed_limit)
 		EMPTY_BUF(server, client, buffer, MAX_BUF);
 	}
 
-	gnutls_bye(client, GNUTLS_SHUT_WR);
-	gnutls_bye(server, GNUTLS_SHUT_WR);
+	do {
+		cret = gnutls_bye(client, GNUTLS_SHUT_WR);
+	} while (cret == GNUTLS_E_AGAIN || cret == GNUTLS_E_INTERRUPTED);
+	assert(cret >= 0);
+
+	do {
+		sret = gnutls_bye(server, GNUTLS_SHUT_WR);
+	} while (sret == GNUTLS_E_AGAIN || sret == GNUTLS_E_INTERRUPTED);
+	assert(sret >= 0);
 
 	gnutls_deinit(client);
 	gnutls_deinit(server);

@@ -355,8 +355,17 @@ static void run(const char *name, unsigned test, int cfd, int sfd)
 		break;
 	}
 
-	gnutls_bye(client, GNUTLS_SHUT_WR);
-	gnutls_bye(server, GNUTLS_SHUT_WR);
+	do {
+		cret = gnutls_bye(client, GNUTLS_SHUT_WR);
+	} while (cret < 0 && !gnutls_error_is_fatal(cret));
+	if (cret < 0)
+		fail("error in client bye: %s\n", gnutls_strerror(cret));
+
+	do {
+		sret = gnutls_bye(server, GNUTLS_SHUT_WR);
+	} while (sret < 0 && !gnutls_error_is_fatal(sret));
+	if (sret < 0)
+		fail("error in server bye: %s\n", gnutls_strerror(sret));
 
 	gnutls_deinit(client);
 	gnutls_deinit(server);

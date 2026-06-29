@@ -144,8 +144,14 @@ static void async_handshake(void **glob_state, const char *prio, unsigned rehsk)
 	msglen = strlen(MSG);
 	TRANSFER(client, server, MSG, msglen, buffer, MAX_BUF);
 
-	gnutls_bye(client, GNUTLS_SHUT_WR);
-	gnutls_bye(server, GNUTLS_SHUT_WR);
+	do {
+		cret = gnutls_bye(client, GNUTLS_SHUT_WR);
+	} while (cret == GNUTLS_E_AGAIN || cret == GNUTLS_E_INTERRUPTED);
+	assert_return_code(cret, 0);
+	do {
+		sret = gnutls_bye(server, GNUTLS_SHUT_WR);
+	} while (sret == GNUTLS_E_AGAIN || sret == GNUTLS_E_INTERRUPTED);
+	assert_return_code(sret, 0);
 
 	gnutls_deinit(client);
 	gnutls_deinit(server);
