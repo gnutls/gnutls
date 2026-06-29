@@ -175,12 +175,18 @@ static char to_client[64 * 1024];
 static size_t to_client_len = 0;
 
 #ifdef RANDOMIZE
-#define RETURN_RND_EAGAIN(session)                           \
-	unsigned int rnd = time(NULL);                       \
-	if (rnd++ % 3 == 0) {                                \
-		gnutls_transport_set_errno(session, EAGAIN); \
-		return -1;                                   \
-	}
+static time_t rnd_eagain_time = 0;
+static time_t rnd_eagain_counter = 0;
+#define RETURN_RND_EAGAIN(session)                                          \
+	do {                                                                \
+		time_t _eagain_now = time(NULL);                            \
+		if (_eagain_now != rnd_eagain_time)                         \
+			rnd_eagain_counter = rnd_eagain_time = _eagain_now; \
+		if (rnd_eagain_counter++ % 6 < 3) {                         \
+			gnutls_transport_set_errno(session, EAGAIN);        \
+			return -1;                                          \
+		}                                                           \
+	} while (0)
 #else
 #define RETURN_RND_EAGAIN(session)
 #endif
