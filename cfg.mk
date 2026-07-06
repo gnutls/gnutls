@@ -156,11 +156,11 @@ web:
 	-cp -v doc/reference/html/*.html doc/reference/html/*.png doc/reference/html/*.devhelp* doc/reference/html/*.css $(htmldir)/reference/
 
 ASM_SOURCES_XXX := \
-	lib/accelerated/aarch64/XXX/ghash-aarch64.s \
-	lib/accelerated/aarch64/XXX/aes-aarch64.s \
-	lib/accelerated/aarch64/XXX/sha1-armv8.s \
-	lib/accelerated/aarch64/XXX/sha256-armv8.s \
-	lib/accelerated/aarch64/XXX/sha512-armv8.s \
+	lib/accelerated/aarch64/XXX/ghash-aarch64.S \
+	lib/accelerated/aarch64/XXX/aes-aarch64.S \
+	lib/accelerated/aarch64/XXX/sha1-armv8.S \
+	lib/accelerated/aarch64/XXX/sha256-armv8.S \
+	lib/accelerated/aarch64/XXX/sha512-armv8.S \
 	lib/accelerated/x86/XXX/ghash-x86_64.s \
 	lib/accelerated/x86/XXX/aesni-x86_64.s \
 	lib/accelerated/x86/XXX/aesni-x86.s \
@@ -262,32 +262,24 @@ lib/accelerated/x86/macosx/%.s: devel/perlasm/%.pl ./lib/accelerated/x86/x86-com
 	echo "" >> $@
 	sed -i 's/OPENSSL_ia32cap_P/GNUTLS_x86_cpuid_s/g' $@
 
-lib/accelerated/aarch64/elf/%.s: devel/perlasm/%.pl lib/accelerated/aarch64/aarch64-common.h .submodule.stamp
-	rm -f $@tmp
-	CC=aarch64-linux-gnu-gcc perl $< linux64 \
+lib/accelerated/aarch64/elf/%.S: devel/perlasm/%.pl lib/accelerated/aarch64/aarch64-common.h .submodule.stamp
+	perl $< linux64 \
 		$(if $(findstring $(<F),$(PL_NEEDS_FPIC)),-fPIC) \
 		$@.tmp
-	cat $@.tmp | /usr/bin/perl -ne '/^#(line)?\s*[0-9]+/ or print' > $@.tmp.S
-	echo "" >> $@.tmp.S
-	sed -i 's/OPENSSL_armcap_P/_gnutls_arm_cpuid_s/g' $@.tmp.S
-	sed -i 's/arm_arch.h/aarch64-common.h/g' $@.tmp.S
-	aarch64-linux-gnu-gcc $(CFLAGS) -D__ARM_MAX_ARCH__=8 -Ilib/accelerated/aarch64 -Wa,--noexecstack -E $@.tmp.S -o $@.tmp.s
-	cat $<.license $@.tmp.s > $@
+	cat $<.license $@.tmp > $@ && rm -f $@.tmp
+	echo "" >> $@
 	echo ".section .note.GNU-stack,\"\",%progbits" >> $@
-	rm -f $@.tmp.S $@.tmp.s $@.tmp
+	sed -i 's/OPENSSL_armcap_P/_gnutls_arm_cpuid_s/g' $@
+	sed -i 's/arm_arch.h/aarch64-common.h/g' $@
 
-lib/accelerated/aarch64/macosx/%.s: devel/perlasm/%.pl .submodule.stamp
-	rm -f $@tmp
-	CC=aarch64-linux-gnu-gcc perl $< ios64 \
+lib/accelerated/aarch64/macosx/%.S: devel/perlasm/%.pl .submodule.stamp
+	perl $< ios64 \
 		$(if $(findstring $(<F),$(PL_NEEDS_FPIC)),-fPIC) \
 		$@.tmp
-	cat $@.tmp | /usr/bin/perl -ne '/^#(line)?\s*[0-9]+/ or print' > $@.tmp.S
-	echo "" >> $@.tmp.S
-	sed -i 's/OPENSSL_armcap_P/_gnutls_arm_cpuid_s/g' $@.tmp.S
-	sed -i 's/arm_arch.h/aarch64-common.h/g' $@.tmp.S
-	aarch64-linux-gnu-gcc -D__ARM_MAX_ARCH__=8 -Ilib/accelerated/aarch64 -Wa,--noexecstack -E $@.tmp.S -o $@.tmp.s
-	cat $<.license $@.tmp.s > $@
-	rm -f $@.tmp.S $@.tmp.s $@.tmp
+	cat $<.license $@.tmp > $@ && rm -f $@.tmp
+	echo "" >> $@
+	sed -i 's/OPENSSL_armcap_P/_gnutls_arm_cpuid_s/g' $@
+	sed -i 's/arm_arch.h/aarch64-common.h/g' $@
 
-lib/accelerated/aarch64/coff/%.s: devel/perlasm/%.pl .submodule.stamp
+lib/accelerated/aarch64/coff/%.S: devel/perlasm/%.pl .submodule.stamp
 	@true
