@@ -1,1 +1,3 @@
-^tests/cert-tests/pkcs12.sh
+^lib/accelerated/aarch64/elf/.*\.S$
+^lib/accelerated/aarch64/macosx/.*\.S$
+^tests/cert-tests/pkcs12.sh$
