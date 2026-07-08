@@ -33,6 +33,8 @@ if ENABLE_MINITASN1
 AM_CPPFLAGS += -I$(srcdir)/../../minitasn1
 endif
 
+AM_CPPFLAGS += -D__ARM_MAX_ARCH__=8
+
 #ensure that we have all aarch64 instruction sets enabled for the assembler
 AM_CCASFLAGS = $(AARCH64_CCASFLAGS)
 
@@ -44,9 +46,9 @@ libaarch64_la_SOURCES = aarch64-common.c aarch64-common.h sha-aarch64.h sha-aarc
 	hmac-sha-aarch64.c aes-cbc-aarch64.c aes-gcm-aarch64.c aes-aarch64.h aes-ccm-aarch64.c
 
 if MACOSX
-libaarch64_la_SOURCES += macosx/sha1-armv8.s macosx/sha512-armv8.s macosx/sha256-armv8.s \
-	macosx/aes-aarch64.s macosx/ghash-aarch64.s
+libaarch64_la_SOURCES += macosx/sha1-armv8.S macosx/sha512-armv8.S macosx/sha256-armv8.S \
+	macosx/aes-aarch64.S macosx/ghash-aarch64.S
 else
-libaarch64_la_SOURCES += elf/sha1-armv8.s elf/sha512-armv8.s elf/sha256-armv8.s \
-	elf/aes-aarch64.s elf/ghash-aarch64.s
+libaarch64_la_SOURCES += elf/sha1-armv8.S elf/sha512-armv8.S elf/sha256-armv8.S \
+	elf/aes-aarch64.S elf/ghash-aarch64.S
 endif
