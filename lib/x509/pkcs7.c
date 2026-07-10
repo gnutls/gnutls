@@ -370,9 +370,9 @@ int gnutls_pkcs7_get_crt_raw2(gnutls_pkcs7_t pkcs7, unsigned indx,
 			goto cleanup;
 		}
 
-		result = asn1_der_decoding_startEnd(pkcs7->signed_data,
-						    tmp.data, tmp.size, root2,
-						    &start, &end);
+		result = _asn1_der_decoding_startEnd(pkcs7->signed_data,
+						     tmp.data, tmp.size, root2,
+						     &start, &end);
 
 		if (result != ASN1_SUCCESS) {
 			gnutls_assert();
@@ -1827,8 +1827,8 @@ int gnutls_pkcs7_get_crl_raw2(gnutls_pkcs7_t pkcs7, unsigned indx,
 
 	/* Get the raw CRL
 	 */
-	result = asn1_der_decoding_startEnd(pkcs7->signed_data, tmp.data,
-					    tmp.size, root2, &start, &end);
+	result = _asn1_der_decoding_startEnd(pkcs7->signed_data, tmp.data,
+					     tmp.size, root2, &start, &end);
 
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();

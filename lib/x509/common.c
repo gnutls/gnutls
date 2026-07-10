@@ -1201,8 +1201,8 @@ int _gnutls_x509_get_signed_data(asn1_node src, const gnutls_datum_t *der,
 
 	/* Get the signed data
 	 */
-	result = asn1_der_decoding_startEnd(src, der->data, der->size, src_name,
-					    &start, &end);
+	result = _asn1_der_decoding_startEnd(src, der->data, der->size,
+					     src_name, &start, &end);
 	if (result != ASN1_SUCCESS) {
 		result = _gnutls_asn2err(result);
 		gnutls_assert();
@@ -1535,8 +1535,8 @@ int _gnutls_x509_get_raw_field2(asn1_node c2, const gnutls_datum_t *raw,
 {
 	int result, len1;
 	int start1, end1;
-	result = asn1_der_decoding_startEnd(c2, raw->data, raw->size, whom,
-					    &start1, &end1);
+	result = _asn1_der_decoding_startEnd(c2, raw->data, raw->size, whom,
+					     &start1, &end1);
 
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();

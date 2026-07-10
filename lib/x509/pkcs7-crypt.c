@@ -364,7 +364,7 @@ int _gnutls_pkcs7_decrypt_data(const gnutls_datum_t *data, const char *password,
 
 	/* Get the DER encoding of the parameters.
 	 */
-	result = asn1_der_decoding_startEnd(
+	result = _asn1_der_decoding_startEnd(
 		pkcs7_asn, data->data, data->size,
 		"encryptedContentInfo.contentEncryptionAlgorithm.parameters",
 		&params_start, &params_end);
@@ -459,7 +459,7 @@ int _gnutls_pkcs7_data_enc_info(const gnutls_datum_t *data,
 
 	/* Get the DER encoding of the parameters.
 	 */
-	result = asn1_der_decoding_startEnd(
+	result = _asn1_der_decoding_startEnd(
 		pkcs7_asn, data->data, data->size,
 		"encryptedContentInfo.contentEncryptionAlgorithm.parameters",
 		&params_start, &params_end);
@@ -651,9 +651,9 @@ int _gnutls_read_pbkdf2_params(asn1_node pasn, const gnutls_datum_t *der,
 		return _gnutls_asn2err(result);
 	}
 
-	result = asn1_der_decoding_startEnd(pasn, der->data, der->size,
-					    "keyDerivationFunc.parameters",
-					    &params_start, &params_end);
+	result = _asn1_der_decoding_startEnd(pasn, der->data, der->size,
+					     "keyDerivationFunc.parameters",
+					     &params_start, &params_end);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
@@ -877,9 +877,9 @@ static int read_pbes2_enc_params(asn1_node pasn, const gnutls_datum_t *der,
 	}
 	_gnutls_hard_log("encryptionScheme.algorithm: %s\n", params->pbes2_oid);
 
-	result = asn1_der_decoding_startEnd(pasn, der->data, der->size,
-					    "encryptionScheme.parameters",
-					    &params_start, &params_end);
+	result = _asn1_der_decoding_startEnd(pasn, der->data, der->size,
+					     "encryptionScheme.parameters",
+					     &params_start, &params_end);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);

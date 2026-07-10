@@ -32,6 +32,7 @@
 #include "dh.h"
 #include "num.h"
 #include "libtasn1.h"
+#include "x509/common.h"
 #include "datum.h"
 #include "ext/signature.h"
 #include "pk.h"
@@ -158,10 +159,10 @@ static int cert_get_issuer_dn(gnutls_pcert_st *cert, gnutls_datum_t *odn)
 		return _gnutls_asn2err(result);
 	}
 
-	result = asn1_der_decoding_startEnd(dn, cert->cert.data,
-					    cert->cert.size,
-					    "tbsCertificate.issuer", &start,
-					    &end);
+	result = _asn1_der_decoding_startEnd(dn, cert->cert.data,
+					     cert->cert.size,
+					     "tbsCertificate.issuer", &start,
+					     &end);
 
 	if (result != ASN1_SUCCESS) {
 		/* couldn't decode DER */
