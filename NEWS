@@ -7,6 +7,15 @@ See the end for copying conditions.
 
 * Version 3.8.14 (unreleased)
 
+** libgnutls: Fix stale params reuse in PKCS#11 AEAD/MAC wrappers
+   The AEAD encrypt/decrypt and MAC wrappers of the PKCS#11 back-end
+   discarded the return value of the per-call params/nonce setter
+   and proceeded with whatever stale state remained.
+   If the setter failed, the previous call's IV/AAD/tag (AEAD)
+   or nonce/key (MAC) were subsequently reused.
+   The error from set_params/set_nonce/set_key is now propagated (#1856, #1872).
+   Reported by Joshua Rogers of AISLE Research Team.
+
 ** libgnutls: Add gnutls_pubkey_{import,export}_mldsa_raw()
    These functions obtain and restore
    the raw FIPS 204 ML-DSA public key octet string.
