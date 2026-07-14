@@ -7,6 +7,13 @@ See the end for copying conditions.
 
 * Version 3.8.14 (unreleased)
 
+** libgnutls: Fix crash on certificate list memory allocation failure
+   On allocation failure, the certificate list pointer and count could
+   get out of sync, causing a NULL deref or double-free during session cleanup.
+   Both fields are now zeroized before the allocation.
+   Reported by Joshua Rogers of AISLE Research Team.
+   [GNUTLS-SA-2026-11-18-1, severity: low] [CVE-2026-127039]
+
 ** libgnutls: Fix stale params reuse in PKCS#11 AEAD/MAC wrappers
    The AEAD encrypt/decrypt and MAC wrappers of the PKCS#11 back-end
    discarded the return value of the per-call params/nonce setter
