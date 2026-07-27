@@ -14,6 +14,11 @@ See the end for copying conditions.
    Reported by Joshua Rogers of AISLE Research Team.
    [GNUTLS-SA-2026-11-18-1, severity: low] [CVE-2026-127039]
 
+** libgnutls: Fix memory leak in kTLS key setup on FreeBSD
+   The iv and cipher_key buffers allocated for the tls_enable structure
+   were not freed after setsockopt. They're now freed on all exit paths (#1865).
+   Reported by Joshua Rogers of AISLE Research Team.
+
 ** libgnutls: Fix stale params reuse in PKCS#11 AEAD/MAC wrappers
    The AEAD encrypt/decrypt and MAC wrappers of the PKCS#11 back-end
    discarded the return value of the per-call params/nonce setter
