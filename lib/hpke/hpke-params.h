@@ -28,7 +28,23 @@
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#include "gnutls/hpke.h"
+#include <gnutls/hpke.h>
+
+struct gnutls_hpke_context_st {
+	gnutls_hpke_mode_t mode;
+	gnutls_hpke_role_t role;
+
+	gnutls_hpke_kem_t kem;
+	gnutls_hpke_kdf_t kdf;
+	gnutls_hpke_aead_t aead;
+
+	gnutls_datum_t ikme;
+
+	gnutls_datum_t key;
+	gnutls_datum_t base_nonce;
+	gnutls_datum_t exporter_secret;
+	uint64_t seq;
+};
 
 int _gnutls_is_kem_dh(const gnutls_hpke_kem_t kem);
 

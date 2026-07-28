@@ -19,6 +19,7 @@ GNUTLS_3_7_5@GNUTLS_3_7_5
 GNUTLS_3_7_7@GNUTLS_3_7_7
 GNUTLS_3_8_11@GNUTLS_3_8_11
 GNUTLS_3_8_13@GNUTLS_3_8_13
+GNUTLS_3_8_14@GNUTLS_3_8_14
 GNUTLS_3_8_1@GNUTLS_3_8_1
 GNUTLS_3_8_2@GNUTLS_3_8_2
 GNUTLS_3_8_4@GNUTLS_3_8_4
@@ -342,6 +343,8 @@ gnutls_hpke_deinit@GNUTLS_3_8_13
 gnutls_hpke_derive_keypair@GNUTLS_3_8_13
 gnutls_hpke_encap@GNUTLS_3_8_13
 gnutls_hpke_export@GNUTLS_3_8_13
+gnutls_hpke_export_pubkey@GNUTLS_3_8_14
+gnutls_hpke_import_pubkey@GNUTLS_3_8_14
 gnutls_hpke_init@GNUTLS_3_8_13
 gnutls_hpke_open@GNUTLS_3_8_13
 gnutls_hpke_seal@GNUTLS_3_8_13

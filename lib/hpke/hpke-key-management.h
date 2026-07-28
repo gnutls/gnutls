@@ -35,13 +35,6 @@
 #define HPKE_SUITE_ID_SIZE 5
 #define HPKE_MAX_LABELED_EXPAND_INFO_SIZE 158
 
-int _gnutls_hpke_pubkey_to_datum(const gnutls_pubkey_t pk,
-				 gnutls_datum_t *pubkey_raw);
-
-int _gnutls_hpke_datum_to_pubkey(const gnutls_ecc_curve_t curve,
-				 const gnutls_datum_t *datum,
-				 gnutls_pubkey_t pubkey);
-
 int _gnutls_hpke_keypair_from_ikm(const gnutls_hpke_kem_t kem,
 				  const gnutls_datum_t *ikme,
 				  gnutls_privkey_t privkey,

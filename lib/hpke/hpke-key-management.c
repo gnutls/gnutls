@@ -55,11 +55,16 @@ static const unsigned char p521_order[66] = {
 	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
 };
 
-int _gnutls_hpke_pubkey_to_datum(const gnutls_pubkey_t pubkey,
-				 gnutls_datum_t *pubkey_raw)
+int gnutls_hpke_export_pubkey(const gnutls_hpke_context_t ctx,
+			      const gnutls_pubkey_t pubkey,
+			      gnutls_datum_t *pubkey_raw)
 {
 	int ret;
+	gnutls_ecc_curve_t curve = _gnutls_hpke_kem_to_curve(ctx->kem);
 	gnutls_pk_params_st *params = &pubkey->params;
+
+	if (params->curve != curve)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	switch (params->curve) {
 	case GNUTLS_ECC_CURVE_X25519:
@@ -93,11 +98,12 @@ int _gnutls_hpke_pubkey_to_datum(const gnutls_pubkey_t pubkey,
 	return 0;
 }
 
-int _gnutls_hpke_datum_to_pubkey(const gnutls_ecc_curve_t curve,
-				 const gnutls_datum_t *pubkey_raw,
-				 gnutls_pubkey_t pubkey)
+int gnutls_hpke_import_pubkey(const gnutls_hpke_context_t ctx,
+			      gnutls_pubkey_t pubkey,
+			      const gnutls_datum_t *pubkey_raw)
 {
 	int ret;
+	gnutls_ecc_curve_t curve = _gnutls_hpke_kem_to_curve(ctx->kem);
 	gnutls_pk_params_st *params = &pubkey->params;
 
 	gnutls_pk_params_release(params);
