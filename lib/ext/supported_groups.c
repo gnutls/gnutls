@@ -313,18 +313,12 @@ static int _gnutls_supported_groups_send_params(gnutls_session_t session,
 	}
 }
 
-/* Returns 0 if the given ECC curve is allowed in the current
- * session. A negative error value is returned otherwise.
+/* Returns true if the given group is allowed in the current session;
+ * false otherwise.
  */
 bool _gnutls_session_supports_group(gnutls_session_t session,
-				    unsigned int group)
+				    const gnutls_group_entry_st *group)
 {
-	unsigned i;
-
-	for (i = 0; i < session->internals.priorities->groups.size; i++) {
-		if (session->internals.priorities->groups.entry[i]->id == group)
-			return true;
-	}
-
-	return false;
+	return find_group(&session->internals.priorities->groups, group) !=
+	       NOT_FOUND;
 }
