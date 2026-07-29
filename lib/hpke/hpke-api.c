@@ -36,6 +36,8 @@
 #define gnutls_hpke_open _gnutls_hpke_open
 #define gnutls_hpke_derive_keypair _gnutls_hpke_derive_keypair
 #define gnutls_hpke_export _gnutls_hpke_export
+#define gnutls_hpke_import_pubkey _gnutls_hpke_import_pubkey
+#define gnutls_hpke_export_pubkey _gnutls_hpke_export_pubkey
 #endif
 
 #include <gnutls/hpke.h>
@@ -305,7 +307,48 @@ int gnutls_hpke_derive_keypair(gnutls_hpke_kem_t kem, const gnutls_datum_t *ikm,
 int gnutls_hpke_export(gnutls_hpke_context_t ctx,
 		       const gnutls_datum_t *exporter_context, size_t length,
 		       gnutls_datum_t *secret)
+{
+	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+}
 
+/**
+ * gnutls_hpke_import_pubkey:
+ * @ctx: The HPKE context to use for exporting the public key.
+ * @pubkey: An initialized public key.
+ * @pubkey_raw: A raw public key data in a gnutls_datum_t structure.
+ *
+ * This function imports raw public key data from @pubkey_raw, which
+ * must be compatible with the HPKE context @ctx.
+ *
+ * Returns: 0 on success, or a negative error code on failure
+ * Since: 3.8.14
+ */
+int gnutls_hpke_import_pubkey(const gnutls_hpke_context_t ctx,
+			      gnutls_pubkey_t pubkey,
+			      const gnutls_datum_t *pubkey_raw)
+{
+	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+}
+
+/**
+ * gnutls_hpke_export_pubkey:
+ * @ctx: The HPKE context to use for exporting the public key.
+ * @pubkey: An initialized public key.
+ * @pubkey_raw: A pointer to a gnutls_datum_t structure where the exported raw public key data will be stored.
+ *
+ * This function exports raw public key data from @pubkey, which
+ * must be compatible with the HPKE context @ctx.
+ *
+ * The function will allocate memory for @pubkey_raw, and the caller is
+ * responsible for freeing this memory using gnutls_free() when it is
+ * no longer needed.
+ *
+ * Returns: 0 on success, or a negative error code on failure
+ * Since: 3.8.14
+ */
+int gnutls_hpke_export_pubkey(const gnutls_hpke_context_t ctx,
+			      const gnutls_pubkey_t pubkey,
+			      gnutls_datum_t *pubkey_raw)
 {
 	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }

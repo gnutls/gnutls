@@ -52,22 +52,6 @@ static const gnutls_datum_t secret_hash_label = { (void *)"secret",
 #define HPKE_MAX_NONCE_SIZE 12
 #define HPKE_MAX_LABELED_EXPORT_INFO_MAX_SIZE 22 + HPKE_MAX_PARAMETER_SIZE
 
-struct gnutls_hpke_context_st {
-	gnutls_hpke_mode_t mode;
-	gnutls_hpke_role_t role;
-
-	gnutls_hpke_kem_t kem;
-	gnutls_hpke_kdf_t kdf;
-	gnutls_hpke_aead_t aead;
-
-	gnutls_datum_t ikme;
-
-	gnutls_datum_t key;
-	gnutls_datum_t base_nonce;
-	gnutls_datum_t exporter_secret;
-	uint64_t seq;
-};
-
 /* For testing purposes */
 extern int _gnutls_hpke_get_seq(gnutls_hpke_context_t ctx, uint64_t *seq);
 extern int _gnutls_hpke_set_ikme(gnutls_hpke_context_t ctx,
@@ -153,12 +137,10 @@ static int validate_privkey_for_kem(gnutls_privkey_t sk, gnutls_hpke_kem_t kem)
 	return 0;
 }
 
-static int get_shared_secret(gnutls_hpke_kem_t kem, gnutls_hpke_kdf_t kdf,
-			     gnutls_hpke_mode_t mode, const gnutls_pubkey_t pkR,
-			     const gnutls_pubkey_t pkS,
-			     const gnutls_pubkey_t pkE,
-			     const gnutls_datum_t *dh,
-			     gnutls_datum_t *shared_secret)
+static int
+get_shared_secret(gnutls_hpke_context_t ctx, const gnutls_pubkey_t pkR,
+		  const gnutls_pubkey_t pkS, const gnutls_pubkey_t pkE,
+		  const gnutls_datum_t *dh, gnutls_datum_t *shared_secret)
 {
 	int ret = 0;
 
@@ -177,7 +159,7 @@ static int get_shared_secret(gnutls_hpke_kem_t kem, gnutls_hpke_kdf_t kdf,
 	gnutls_datum_t salt = { salt_buf, 0 };
 	gnutls_datum_t eae_prk = { eae_prk_buf, 0 };
 
-	const gnutls_mac_algorithm_t mac = _gnutls_hpke_kdf_to_mac(kdf);
+	const gnutls_mac_algorithm_t mac = _gnutls_hpke_kdf_to_mac(ctx->kdf);
 	if (mac == GNUTLS_MAC_UNKNOWN) {
 		return gnutls_assert_val(GNUTLS_E_UNKNOWN_HASH_ALGORITHM);
 	}
@@ -190,7 +172,7 @@ static int get_shared_secret(gnutls_hpke_kem_t kem, gnutls_hpke_kdf_t kdf,
 	salt.size = Nh;
 	eae_prk.size = Nh;
 
-	_gnutls_hpke_build_kem_suite_id(kem, suite_id.data);
+	_gnutls_hpke_build_kem_suite_id(ctx->kem, suite_id.data);
 	_gnutls_hpke_build_ikm_label(&suite_id, dh, &ikm_label);
 
 	ret = gnutls_hkdf_extract(mac, &ikm_label, &salt, eae_prk.data);
@@ -199,20 +181,20 @@ static int get_shared_secret(gnutls_hpke_kem_t kem, gnutls_hpke_kdf_t kdf,
 		goto cleanup;
 	}
 
-	ret = _gnutls_hpke_pubkey_to_datum(pkE, &pkE_raw);
+	ret = gnutls_hpke_export_pubkey(ctx, pkE, &pkE_raw);
 	if (ret != 0) {
 		gnutls_assert_val(ret);
 		goto cleanup;
 	}
 
-	ret = _gnutls_hpke_pubkey_to_datum(pkR, &pkR_raw);
+	ret = gnutls_hpke_export_pubkey(ctx, pkR, &pkR_raw);
 	if (ret != 0) {
 		gnutls_assert_val(ret);
 		goto cleanup;
 	}
 
-	if (is_auth_mode(mode)) {
-		ret = _gnutls_hpke_pubkey_to_datum(pkS, &pkS_raw);
+	if (is_auth_mode(ctx->mode)) {
+		ret = gnutls_hpke_export_pubkey(ctx, pkS, &pkS_raw);
 		if (ret != 0) {
 			gnutls_assert_val(ret);
 			goto cleanup;
@@ -317,7 +299,7 @@ static int dhkem_encap(const gnutls_hpke_context_t ctx,
 		goto cleanup;
 	}
 
-	ret = _gnutls_hpke_pubkey_to_datum(ephemeral_pubkey, &pubkey_raw);
+	ret = gnutls_hpke_export_pubkey(ctx, ephemeral_pubkey, &pubkey_raw);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -344,9 +326,8 @@ static int dhkem_encap(const gnutls_hpke_context_t ctx,
 		}
 	}
 
-	ret = get_shared_secret(ctx->kem, ctx->kdf, ctx->mode, receiver_pubkey,
-				sender_pubkey, ephemeral_pubkey, &dh,
-				shared_secret);
+	ret = get_shared_secret(ctx, receiver_pubkey, sender_pubkey,
+				ephemeral_pubkey, &dh, shared_secret);
 	if (ret < 0) {
 		if (shared_secret->size > 0) {
 			zeroize_key(shared_secret, shared_secret->size);
@@ -410,8 +391,7 @@ cleanup:
 	return ret;
 }
 
-static int dhkem_decap(gnutls_hpke_kem_t kem, gnutls_hpke_kdf_t kdf,
-		       gnutls_hpke_mode_t mode,
+static int dhkem_decap(gnutls_hpke_context_t ctx,
 		       const gnutls_privkey_t receiver_privkey,
 		       const gnutls_pubkey_t sender_pubkey,
 		       const gnutls_datum_t *enc, gnutls_datum_t *shared_secret)
@@ -431,7 +411,7 @@ static int dhkem_decap(gnutls_hpke_kem_t kem, gnutls_hpke_kdf_t kdf,
 		goto cleanup;
 	}
 
-	if (!is_key_curve_type_compatible_with_param_dhkem(kem, curve)) {
+	if (!is_key_curve_type_compatible_with_param_dhkem(ctx->kem, curve)) {
 		ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 		goto cleanup;
 	}
@@ -442,19 +422,19 @@ static int dhkem_decap(gnutls_hpke_kem_t kem, gnutls_hpke_kdf_t kdf,
 		goto cleanup;
 	}
 
-	ret = _gnutls_hpke_datum_to_pubkey(curve, enc, ephemeral_pubkey);
+	ret = gnutls_hpke_import_pubkey(ctx, ephemeral_pubkey, enc);
 	if (ret < 0) {
 		gnutls_assert_val(ret);
 		goto cleanup;
 	}
 
-	ret = validate_pubkey_for_kem(ephemeral_pubkey, kem);
+	ret = validate_pubkey_for_kem(ephemeral_pubkey, ctx->kem);
 	if (ret < 0) {
 		gnutls_assert_val(ret);
 		goto cleanup;
 	}
 
-	ret = decap_get_dh(mode, ephemeral_pubkey, sender_pubkey,
+	ret = decap_get_dh(ctx->mode, ephemeral_pubkey, sender_pubkey,
 			   receiver_privkey, &dh);
 	if (ret < 0) {
 		gnutls_assert_val(ret);
@@ -474,7 +454,7 @@ static int dhkem_decap(gnutls_hpke_kem_t kem, gnutls_hpke_kdf_t kdf,
 		goto cleanup;
 	}
 
-	ret = get_shared_secret(kem, kdf, mode, receiver_pubkey, sender_pubkey,
+	ret = get_shared_secret(ctx, receiver_pubkey, sender_pubkey,
 				ephemeral_pubkey, &dh, shared_secret);
 	if (ret < 0) {
 		if (shared_secret->size > 0) {
@@ -956,8 +936,7 @@ int gnutls_hpke_decap(gnutls_hpke_context_t ctx, const gnutls_datum_t *info,
 	gnutls_datum_t shared_secret = { shared_secret_buf, 0 };
 
 	if (_gnutls_is_kem_dh(ctx->kem)) {
-		ret = dhkem_decap(ctx->kem, ctx->kdf, ctx->mode,
-				  receiver_privkey, sender_pubkey, enc,
+		ret = dhkem_decap(ctx, receiver_privkey, sender_pubkey, enc,
 				  &shared_secret);
 		if (ret < 0) {
 			gnutls_assert_val(ret);

@@ -1480,6 +1480,15 @@ GNUTLS_3_8_13
 	*;
 } GNUTLS_3_8_11;
 
+GNUTLS_3_8_14
+{
+ global:
+    gnutls_hpke_import_pubkey;
+    gnutls_hpke_export_pubkey;
+ local:
+	*;
+} GNUTLS_3_8_13;
+
 GNUTLS_FIPS140_3_4 {
   global:
 	gnutls_cipher_self_test;

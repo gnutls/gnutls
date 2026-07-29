@@ -41,7 +41,11 @@ if ENABLE_HPKE
 libgnutls_hpke_la_SOURCES += \
 	hpke.c \
 	hpke-builders.c \
+	hpke-builders.h \
 	hpke-hkdf.c \
+	hpke-hkdf.h \
 	hpke-key-management.c \
-	hpke-params.c
+	hpke-key-management.h \
+	hpke-params.c \
+	hpke-params.h
 endif

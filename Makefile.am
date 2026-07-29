@@ -24,6 +24,7 @@ AM_DISTCHECK_CONFIGURE_FLAGS = \
 	--enable-doc \
 	--enable-gtk-doc \
 	--enable-libdane \
+	--enable-hpke \
 	--disable-valgrind-tests
 
 SUBDIRS = gl lib extra
