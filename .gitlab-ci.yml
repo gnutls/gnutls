@@ -175,7 +175,7 @@ fedora-docdist/build:
   script:
     # Fake distcheck-hook that checks bootstrap is called without --skip-po
     - mkdir -p po/.reference
-    - CFLAGS="-std=c99 -O2 -g" dash ./configure --disable-gcc-warnings --cache-file $CCACHE_FILE --prefix=/usr --libdir=/usr/lib64 --disable-cxx --disable-non-suiteb-curves --enable-gtk-doc --disable-maintainer-mode --with-pkcs12-iter-count=10000
+    - CFLAGS="-std=c99 -O2 -g" dash ./configure --disable-gcc-warnings --cache-file $CCACHE_FILE --prefix=/usr --libdir=/usr/lib64 --disable-cxx --disable-non-suiteb-curves --enable-gtk-doc --enable-hpke --disable-maintainer-mode --with-pkcs12-iter-count=10000
     - make -j$BUILDJOBS -C doc stamp-vti
     - make -j$BUILDJOBS -C doc stamp_enums
     - make -j$BUILDJOBS
