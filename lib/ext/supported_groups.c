@@ -271,47 +271,46 @@ static int _gnutls_supported_groups_recv_params(gnutls_session_t session,
 	}
 }
 
+static int client_send_params(gnutls_session_t session,
+			      gnutls_buffer_st *extdata)
+{
+	const group_list_st *groups = &session->internals.priorities->groups;
+
+	if (groups->size == 0)
+		return 0;
+
+	size_t spos = extdata->length;
+
+	int ret = _gnutls_buffer_append_prefix(extdata, 16, groups->size * 2);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	for (size_t i = 0; i < groups->size; i++) {
+		const gnutls_group_entry_st *group = groups->entry[i];
+
+		_gnutls_handshake_log("EXT[%p]: Sent group %s (0x%x)\n",
+				      session, group->name, group->tls_id);
+
+		ret = _gnutls_buffer_append_prefix(extdata, 16, group->tls_id);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+	}
+
+	return extdata->length - spos;
+}
+
 /* returns data_size or a negative number on failure
  */
 static int _gnutls_supported_groups_send_params(gnutls_session_t session,
 						gnutls_buffer_st *extdata)
 {
-	unsigned len, i;
-	int ret;
-	uint16_t p;
-
-	/* this extension is only being sent on client side */
-	if (session->security_parameters.entity == GNUTLS_CLIENT) {
-		len = session->internals.priorities->groups.size;
-		if (len > 0) {
-			ret = _gnutls_buffer_append_prefix(extdata, 16,
-							   len * 2);
-			if (ret < 0)
-				return gnutls_assert_val(ret);
-
-			for (i = 0; i < len; i++) {
-				p = session->internals.priorities->groups
-					    .entry[i]
-					    ->tls_id;
-
-				_gnutls_handshake_log(
-					"EXT[%p]: Sent group %s (0x%x)\n",
-					session,
-					session->internals.priorities->groups
-						.entry[i]
-						->name,
-					(unsigned)p);
-
-				ret = _gnutls_buffer_append_prefix(extdata, 16,
-								   p);
-				if (ret < 0)
-					return gnutls_assert_val(ret);
-			}
-			return (len + 1) * 2;
-		}
+	switch (session->security_parameters.entity) {
+	case GNUTLS_CLIENT:
+		/* this extension is only being sent on client side */
+		return client_send_params(session, extdata);
+	case GNUTLS_SERVER:
+		return gnutls_assert_val(0);
 	}
-
-	return 0;
 }
 
 /* Returns 0 if the given ECC curve is allowed in the current
