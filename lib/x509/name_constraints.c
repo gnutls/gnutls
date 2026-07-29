@@ -1632,11 +1632,11 @@ static unsigned check_ip_constraints(gnutls_x509_name_constraints_t nc,
 			if (rtype != GNUTLS_SAN_IPADDRESS)
 				continue;
 
+			allowed_found = true;
+
 			/* do not check IPv4 against IPv6 constraints and vice versa */
 			if (name->size != rname.size / 2)
 				continue;
-
-			allowed_found = true;
 
 			if (ip_in_cidr(name, &rname))
 				return true; /* accepted */
