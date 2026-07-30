@@ -689,7 +689,6 @@ fedora-i686/build:
     - setarch i686 -- make -j$BUILDJOBS
     # build tests, but don't execute them
     - setarch i686 -- make -j$BUILDJOBS -C tests check TESTS=""
-  when: manual
 
 fedora-i686/test:
   extends:
