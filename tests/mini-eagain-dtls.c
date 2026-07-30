@@ -78,7 +78,8 @@ void doit(void)
 		"NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH",
 		NULL);
 	if (ret < 0)
-		exit(1);
+		fail("error in server priority_set_direct: %s\n",
+		     gnutls_strerror(ret));
 	gnutls_credentials_set(server, GNUTLS_CRD_ANON, s_anoncred);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
@@ -94,7 +95,8 @@ void doit(void)
 		"NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH",
 		NULL);
 	if (cret < 0)
-		exit(1);
+		fail("error in client priority_set_direct: %s\n",
+		     gnutls_strerror(cret));
 	gnutls_credentials_set(client, GNUTLS_CRD_ANON, c_anoncred);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
@@ -111,7 +113,9 @@ void doit(void)
 
 	do {
 		ret = gnutls_record_send(client, MSG, strlen(MSG));
-	} while (ret == GNUTLS_E_AGAIN);
+	} while (ret < 0 && !gnutls_error_is_fatal(ret));
+	if (ret < 0)
+		fail("error in record_send: %s\n", gnutls_strerror(ret));
 
 	msglen = strlen(MSG);
 	TRANSFER(client, server, MSG, msglen, buffer, MAX_BUF);
