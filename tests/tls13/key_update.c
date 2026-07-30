@@ -210,6 +210,8 @@ static void run(const char *name, unsigned test, int cfd, int sfd)
 		do {
 			ret = gnutls_session_key_update(client, 0);
 		} while (ret < 0 && !gnutls_error_is_fatal(ret));
+		if (ret < 0)
+			fail("error in key update: %s\n", gnutls_strerror(ret));
 
 		CHECK_KTLS_ENABLED(client);
 		CHECK_KTLS_ENABLED(server);
