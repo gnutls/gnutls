@@ -24,6 +24,7 @@
 #include "config.h"
 #endif
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -36,8 +37,7 @@
 #include "cert-common.h"
 #include "cmocka-common.h"
 
-/* This tests operation under non-blocking mode in TLS1.2/TLS1.3
- * rekey/rehandshake.
+/* This tests the GNUTLS_AUTO_REAUTH flag functionality under non-blocking mode.
  */
 static void tls_log_func(int level, const char *str)
 {
@@ -47,6 +47,22 @@ static void tls_log_func(int level, const char *str)
 #define MAX_BUF 1024
 #define MSG \
 	"Hello TLS, and hi and how are you and more data here... and more... and even more and even more more data..."
+
+#define MAX_HSK_MESSAGES 16
+static unsigned hsk_types[MAX_HSK_MESSAGES];
+static unsigned hsk_count = 0;
+
+static int hsk_callback(gnutls_session_t session, unsigned int htype,
+			unsigned post, unsigned int incoming,
+			const gnutls_datum_t *msg)
+{
+	assert_int_equal(post, GNUTLS_HOOK_POST);
+	if (!incoming)
+		return 0;
+	assert_true(hsk_count < MAX_HSK_MESSAGES);
+	hsk_types[hsk_count++] = htype;
+	return 0;
+}
 
 static unsigned int cert_asked = 0;
 
@@ -104,6 +120,10 @@ static void async_handshake(void **glob_state, const char *prio, unsigned rehsk)
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
 
+	hsk_count = 0;
+	gnutls_handshake_set_hook_function(server, GNUTLS_HANDSHAKE_ANY,
+					   GNUTLS_HOOK_POST, hsk_callback);
+
 	/* Init client */
 
 	ret = gnutls_certificate_allocate_credentials(&clientx509cred);
@@ -129,93 +149,86 @@ static void async_handshake(void **glob_state, const char *prio, unsigned rehsk)
 
 	if (rehsk == 1) {
 		char b[1];
-		unsigned hstarted = 0;
 
+		assert_int_equal(hsk_count, 3);
+		assert_int_equal(hsk_types[0], GNUTLS_HANDSHAKE_CLIENT_HELLO);
+		assert_int_equal(hsk_types[1],
+				 GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE);
+		assert_int_equal(hsk_types[2], GNUTLS_HANDSHAKE_FINISHED);
+
+		/* initiate a rehandshake on the server */
 		do {
 			sret = gnutls_rehandshake(server);
 		} while (sret == GNUTLS_E_AGAIN ||
 			 sret == GNUTLS_E_INTERRUPTED);
-		assert_true(sret == 0);
-		assert_true(gnutls_record_get_direction(server) == 1);
+		assert_return_code(sret, 0);
 
-		sret = cret = GNUTLS_E_AGAIN;
+		/* spin until both process it */
 		do {
-			if (!hstarted) {
-				sret = gnutls_record_recv(server, b, 1);
-				if (sret == GNUTLS_E_INTERRUPTED)
-					sret = GNUTLS_E_AGAIN;
+			/* drive client so that it AUTO_REAUTHs */
+			cret = gnutls_record_recv(client, b, 1);
+			assert_true(cret == GNUTLS_E_AGAIN ||
+				    cret == GNUTLS_E_INTERRUPTED);
 
-				if (sret == GNUTLS_E_REHANDSHAKE) {
-					hstarted = 1;
-					sret = GNUTLS_E_AGAIN;
-				}
-				assert_true(sret == GNUTLS_E_AGAIN);
-			}
+			sret = gnutls_record_recv(server, b, 1);
+		} while (sret != GNUTLS_E_REHANDSHAKE);
+		assert_int_equal(hsk_count, 3); /* CH isn't processed yet */
 
-			if (sret == GNUTLS_E_AGAIN && hstarted) {
-				sret = gnutls_handshake(server);
-				if (sret == GNUTLS_E_INTERRUPTED)
-					sret = GNUTLS_E_AGAIN;
-				assert_true(sret == GNUTLS_E_AGAIN ||
-					    sret == 0);
-			}
+		/* drive rehandshake to completion */
+		do {
+			cret = gnutls_record_recv(client, b, 1);
+			assert_true(cret == GNUTLS_E_AGAIN ||
+				    cret == GNUTLS_E_INTERRUPTED);
 
-			/* we are done in client side */
-			if (hstarted &&
-			    gnutls_record_get_direction(client) == 0 &&
-			    to_client_len == 0)
-				cret = 0;
-
-			if (cret == GNUTLS_E_AGAIN) {
-				cret = gnutls_record_recv(client, b, 1);
-				if (cret == GNUTLS_E_INTERRUPTED)
-					cret = GNUTLS_E_AGAIN;
-			}
-			assert_true(cret == GNUTLS_E_AGAIN || cret >= 0);
-
-		} while (cret == GNUTLS_E_AGAIN || sret == GNUTLS_E_AGAIN);
-		assert_true(hstarted != 0);
+			sret = gnutls_handshake(server);
+		} while (hsk_count < 6 || (sret == GNUTLS_E_AGAIN ||
+					   sret == GNUTLS_E_INTERRUPTED));
+		assert_return_code(sret, 0);
+		assert_int_equal(hsk_count, 6);
+		assert_int_equal(hsk_types[3], GNUTLS_HANDSHAKE_CLIENT_HELLO);
+		assert_int_equal(hsk_types[4],
+				 GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE);
+		assert_int_equal(hsk_types[5], GNUTLS_HANDSHAKE_FINISHED);
 	} else {
 		char b[1];
+
+		assert_int_equal(hsk_count, 2);
+		assert_int_equal(hsk_types[0], GNUTLS_HANDSHAKE_CLIENT_HELLO);
+		assert_int_equal(hsk_types[1], GNUTLS_HANDSHAKE_FINISHED);
 
 		gnutls_certificate_server_set_request(server,
 						      GNUTLS_CERT_REQUEST);
 
+		bool reauth_succeeded = false;
 		do {
-			sret = gnutls_reauth(server, 0);
-		} while (sret == GNUTLS_E_INTERRUPTED);
-
-		assert_true(sret == GNUTLS_E_AGAIN || sret >= 0);
-
-		cret = GNUTLS_E_AGAIN;
-		do {
-			if (cret == GNUTLS_E_AGAIN) {
-				cret = gnutls_record_recv(client, b, 1);
-				if (cret == GNUTLS_E_INTERRUPTED)
-					cret = GNUTLS_E_AGAIN;
-			}
-
-			if (sret == GNUTLS_E_AGAIN) {
+			cret = gnutls_record_recv(client, b, 1);
+			assert_true(cret == GNUTLS_E_AGAIN ||
+				    cret == GNUTLS_E_INTERRUPTED);
+			if (!reauth_succeeded)
 				sret = gnutls_reauth(server, 0);
-				if (sret == GNUTLS_E_INTERRUPTED)
-					sret = GNUTLS_E_AGAIN;
-			}
-
-			/* we are done in client side */
-			if (gnutls_record_get_direction(client) == 0 &&
-			    to_client_len == 0)
-				cret = 0;
-		} while (cret == GNUTLS_E_AGAIN || sret == GNUTLS_E_AGAIN);
+			if (sret == 0)
+				reauth_succeeded = 1;
+		} while (hsk_count < 4 || (sret == GNUTLS_E_AGAIN ||
+					   sret == GNUTLS_E_INTERRUPTED));
+		assert_return_code(sret, 0);
+		assert_int_equal(hsk_count, 4);
+		assert_int_equal(hsk_types[2],
+				 GNUTLS_HANDSHAKE_CERTIFICATE_PKT);
+		assert_int_equal(hsk_types[3], GNUTLS_HANDSHAKE_FINISHED);
 	}
-	assert_return_code(cret, 0);
-	assert_return_code(sret, 0);
 	assert_return_code(cert_asked, 1);
 
 	msglen = strlen(MSG);
 	TRANSFER(client, server, MSG, msglen, buffer, MAX_BUF);
 
-	assert_true(gnutls_bye(client, GNUTLS_SHUT_WR) >= 0);
-	assert_true(gnutls_bye(server, GNUTLS_SHUT_WR) >= 0);
+	do {
+		cret = gnutls_bye(client, GNUTLS_SHUT_WR);
+	} while (cret == GNUTLS_E_AGAIN || cret == GNUTLS_E_INTERRUPTED);
+	assert_return_code(cret, 0);
+	do {
+		sret = gnutls_bye(server, GNUTLS_SHUT_WR);
+	} while (sret == GNUTLS_E_AGAIN || sret == GNUTLS_E_INTERRUPTED);
+	assert_return_code(sret, 0);
 
 	gnutls_deinit(client);
 	gnutls_deinit(server);

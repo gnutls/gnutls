@@ -178,7 +178,9 @@ static void run(const char *name, bool exceed_limit)
 		/* server receives the client key update and sends data */
 		ret = record_send_loop(client, MSG, strlen(MSG), 0);
 		assert(ret == strlen(MSG));
-		ret = gnutls_record_recv(server, buffer, MAX_BUF);
+		do {
+			ret = gnutls_record_recv(server, buffer, MAX_BUF);
+		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 		if (ret != GNUTLS_E_TOO_MANY_HANDSHAKE_PACKETS)
 			fail("server didn't reject excessive number of key updates\n");
 		else {
@@ -201,8 +203,15 @@ static void run(const char *name, bool exceed_limit)
 		EMPTY_BUF(server, client, buffer, MAX_BUF);
 	}
 
-	gnutls_bye(client, GNUTLS_SHUT_WR);
-	gnutls_bye(server, GNUTLS_SHUT_WR);
+	do {
+		cret = gnutls_bye(client, GNUTLS_SHUT_WR);
+	} while (cret == GNUTLS_E_AGAIN || cret == GNUTLS_E_INTERRUPTED);
+	assert(cret >= 0);
+
+	do {
+		sret = gnutls_bye(server, GNUTLS_SHUT_WR);
+	} while (sret == GNUTLS_E_AGAIN || sret == GNUTLS_E_INTERRUPTED);
+	assert(sret >= 0);
 
 	gnutls_deinit(client);
 	gnutls_deinit(server);
