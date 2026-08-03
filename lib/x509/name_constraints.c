@@ -1461,16 +1461,16 @@ static bool email_matches(const gnutls_datum_t *name,
 /*
  * Returns: true if the certification is acceptable, and false otherwise.
  */
-static bool check_unsupported_constraint(gnutls_x509_name_constraints_t nc,
-					 gnutls_x509_subject_alt_name_t type)
+static bool has_constraints_of_type(gnutls_x509_name_constraints_t nc,
+				    gnutls_x509_subject_alt_name_t type)
 {
 	unsigned i;
 	int ret;
 	unsigned rtype;
 	gnutls_datum_t rname;
 
-	/* check if there is a restrictions with that type, if
-	 * yes, then reject the name.
+	/* check if there are restrictions with that type,
+	 * if yes, then reject the name.
 	 */
 	i = 0;
 	do {
@@ -1678,7 +1678,7 @@ unsigned gnutls_x509_name_constraints_check(gnutls_x509_name_constraints_t nc,
 	if (type == GNUTLS_SAN_IPADDRESS)
 		return check_ip_constraints(nc, name);
 
-	return check_unsupported_constraint(nc, type);
+	return has_constraints_of_type(nc, type);
 }
 
 /* This function checks for unsupported constraints, that we also
@@ -1688,9 +1688,9 @@ unsigned gnutls_x509_name_constraints_check(gnutls_x509_name_constraints_t nc,
  *
  * Returns: true if the certification is acceptable, and false otherwise
  */
-static bool check_unsupported_constraint2(gnutls_x509_crt_t cert,
-					  gnutls_x509_name_constraints_t nc,
-					  gnutls_x509_subject_alt_name_t type)
+static bool check_unsupported_constraint(gnutls_x509_crt_t cert,
+					 gnutls_x509_name_constraints_t nc,
+					 gnutls_x509_subject_alt_name_t type)
 {
 	unsigned idx;
 	bool found_one;
@@ -1718,7 +1718,7 @@ static bool check_unsupported_constraint2(gnutls_x509_crt_t cert,
 	}
 
 	if (found_one)
-		return check_unsupported_constraint(nc, type);
+		return has_constraints_of_type(nc, type);
 
 	/* no name was found in the certificate, so accept */
 	return true;
@@ -1933,9 +1933,9 @@ gnutls_x509_name_constraints_check_crt(gnutls_x509_name_constraints_t nc,
 			return gnutls_assert_val(1);
 		}
 	} else if (type == GNUTLS_SAN_URI) {
-		return check_unsupported_constraint2(cert, nc, type);
+		return check_unsupported_constraint(cert, nc, type);
 	} else
-		return check_unsupported_constraint(nc, type);
+		return has_constraints_of_type(nc, type);
 }
 
 /**
