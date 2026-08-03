@@ -347,9 +347,115 @@ void doit(void)
 	gnutls_x509_name_constraints_deinit(nc);
 	gnutls_x509_crt_deinit(crt);
 
-	/* 4: corner cases */
+	/* 4: unsupported constraints */
 
-	/* 4a: empty excluded name (works as wildcard) */
+	/* 4a: SAN_DN */
+
+	ret = gnutls_x509_name_constraints_init(&nc);
+	check_for_error(ret);
+
+	set_name("CN=Test2", &name); /* no constraints: accepted */
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DN, &name);
+	check_test_result(ret, NAME_ACCEPTED, &name);
+
+	set_name("example.com", &name);
+	ret = gnutls_x509_name_constraints_add_excluded(nc, GNUTLS_SAN_DNSNAME,
+							&name);
+	check_for_error(ret);
+
+	set_name("CN=Test2", &name); /* unrelated constraints: still accepted */
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DN, &name);
+	check_test_result(ret, NAME_ACCEPTED, &name);
+
+	set_name("CN=Test1", &name);
+	ret = gnutls_x509_name_constraints_add_permitted(nc, GNUTLS_SAN_DN,
+							 &name);
+	check_for_error(ret);
+
+	set_name("CN=Test2", &name); /* mismatch: rejected (unsupported) */
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DN, &name);
+	check_test_result(ret, NAME_REJECTED, &name);
+
+	set_name("CN=Test2", &name);
+	ret = gnutls_x509_name_constraints_add_permitted(nc, GNUTLS_SAN_DN,
+							 &name);
+	check_for_error(ret);
+
+	set_name("CN=Test2", &name); /* match: rejected (unsupported) */
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DN, &name);
+	check_test_result(ret, NAME_REJECTED, &name);
+
+	gnutls_x509_name_constraints_deinit(nc);
+
+	ret = gnutls_x509_name_constraints_init(&nc);
+	check_for_error(ret);
+
+	set_name("CN=Test1", &name);
+	ret = gnutls_x509_name_constraints_add_excluded(nc, GNUTLS_SAN_DN,
+							&name);
+	check_for_error(ret);
+
+	set_name("CN=TestX", &name); /* mismatch: rejected (unsupported) */
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DN, &name);
+	check_test_result(ret, NAME_REJECTED, &name);
+
+	gnutls_x509_name_constraints_deinit(nc);
+
+	/* 4b: SAN_URI */
+
+	ret = gnutls_x509_name_constraints_init(&nc);
+	check_for_error(ret);
+
+	set_name("spiffe://example.org/", &name); /* no constraints: accepted */
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_URI, &name);
+	check_test_result(ret, NAME_ACCEPTED, &name);
+
+	set_name("CN=Test1", &name);
+	ret = gnutls_x509_name_constraints_add_permitted(nc, GNUTLS_SAN_DN,
+							 &name);
+	check_for_error(ret);
+
+	set_name("spiffe://example.org/", &name); /* unrelated type: accepted */
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_URI, &name);
+	check_test_result(ret, NAME_ACCEPTED, &name);
+
+	set_name("spiffe://example.org/excluded", &name);
+	ret = gnutls_x509_name_constraints_add_excluded(nc, GNUTLS_SAN_URI,
+							&name);
+	check_for_error(ret);
+
+	set_name("spiffe://example.org/", &name); /* rejected (unsupported) */
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_URI, &name);
+	check_test_result(ret, NAME_REJECTED, &name);
+
+	set_name("spiffe://example.org/", &name);
+	ret = gnutls_x509_name_constraints_add_permitted(nc, GNUTLS_SAN_URI,
+							 &name);
+	check_for_error(ret);
+
+	set_name("spiffe://example.org/", &name); /* rejected (unsupported) */
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_URI, &name);
+	check_test_result(ret, NAME_REJECTED, &name);
+
+	gnutls_x509_name_constraints_deinit(nc);
+
+	ret = gnutls_x509_name_constraints_init(&nc);
+	check_for_error(ret);
+
+	set_name("spiffe://example.org/", &name);
+	ret = gnutls_x509_name_constraints_add_permitted(nc, GNUTLS_SAN_URI,
+							 &name);
+	check_for_error(ret);
+
+	set_name("spiffe://example.org/", &name); /* rejected (unsupported) */
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_URI, &name);
+	check_test_result(ret, NAME_REJECTED, &name);
+
+	gnutls_x509_name_constraints_deinit(nc);
+
+	/* 5: corner cases */
+
+	/* 5a: empty excluded name (works as wildcard) */
 
 	ret = gnutls_x509_name_constraints_init(&nc);
 	check_for_error(ret);
@@ -365,7 +471,7 @@ void doit(void)
 
 	gnutls_x509_name_constraints_deinit(nc);
 
-	/* 4b: case insensitivity */
+	/* 5b: case insensitivity */
 
 	ret = gnutls_x509_name_constraints_init(&nc);
 	check_for_error(ret);
