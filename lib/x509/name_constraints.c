@@ -1937,12 +1937,9 @@ gnutls_x509_name_constraints_check_crt(gnutls_x509_name_constraints_t nc,
 			 */
 			return gnutls_assert_val(1);
 		}
-	} else if (type == GNUTLS_SAN_URI) {
+	} else {
 		return check_unsupported_constraint(cert, nc, type);
-	} else if (type == GNUTLS_SAN_DN) {
-		return check_unsupported_constraint(cert, nc, type);
-	} else
-		return has_constraints_of_type(nc, type);
+	}
 }
 
 /**
