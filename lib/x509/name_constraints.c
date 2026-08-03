@@ -1480,6 +1480,14 @@ static bool has_constraints_of_type(gnutls_x509_name_constraints_t nc,
 		if (rtype == type)
 			return gnutls_assert_val(false);
 	}
+	for (i = 0;; i++) {
+		ret = gnutls_x509_name_constraints_get_permitted(nc, i, &rtype,
+								 &rname);
+		if (ret < 0)
+			break;
+		if (rtype == type)
+			return gnutls_assert_val(false);
+	}
 
 	return true;
 }
