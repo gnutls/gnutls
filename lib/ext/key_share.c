@@ -958,8 +958,7 @@ static int key_share_recv_params(gnutls_session_t session, const uint8_t *data,
 				group->name);
 
 			/* check if we support it */
-			if (!_gnutls_session_supports_group(session,
-							    group->id)) {
+			if (!_gnutls_session_supports_group(session, group)) {
 				_gnutls_handshake_log(
 					"EXT[%p]: received share for %s which is disabled\n",
 					session, group->name);
@@ -991,7 +990,7 @@ static int key_share_recv_params(gnutls_session_t session, const uint8_t *data,
 				GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 		/* check if we support it */
-		if (!_gnutls_session_supports_group(session, group->id)) {
+		if (!_gnutls_session_supports_group(session, group)) {
 			_gnutls_handshake_log(
 				"EXT[%p]: received share for %s which is disabled\n",
 				session, group->name);
