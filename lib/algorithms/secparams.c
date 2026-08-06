@@ -31,8 +31,8 @@ typedef struct {
 	unsigned int bits; /* security level */
 	unsigned int pk_bits; /* DH, RSA, SRP */
 	unsigned int dsa_bits; /* bits for DSA. Handled differently since
-				 * choice of key size in DSA is political.
-				 */
+				* choice of key size in DSA is political.
+				*/
 	unsigned int subgroup_bits; /* subgroup bits */
 	unsigned int ecc_bits; /* bits for ECC keys */
 	unsigned int ml_dsa_bits;

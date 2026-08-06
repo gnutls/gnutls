@@ -1097,7 +1097,7 @@ static void record_read_headers(gnutls_session_t session,
 		record->header_size = record->packet_size = 2;
 		record->type =
 			GNUTLS_HANDSHAKE; /* we accept only v2 client hello
-							 */
+					   */
 
 		/* in order to assist the handshake protocol.
 		 * V2 compatibility is a mess.

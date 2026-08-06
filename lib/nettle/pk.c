@@ -478,14 +478,14 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 		}
 
 		/* Perform ECC Full Public-Key Validation Routine
-			 * according to SP800-56A (revision 3), 5.6.2.3.3.
-			 */
+		 * according to SP800-56A (revision 3), 5.6.2.3.3.
+		 */
 
 		/* Step 1: verify that Q is not an identity
-			 * element (an infinity point). Note that this
-			 * cannot happen in the nettle implementation,
-			 * because it cannot represent an infinity point
-			 * on curves. */
+		 * element (an infinity point). Note that this
+		 * cannot happen in the nettle implementation,
+		 * because it cannot represent an infinity point
+		 * on curves. */
 		ret = ecc_shared_secret(&ecc_priv, &ecc_pub, out->data,
 					out->size);
 		if (ret < 0) {
@@ -500,11 +500,11 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 			ecc_point_get(&r, x, y);
 
 			/* Step 2: verify that both coordinates of Q are
-				 * in the range [0, p - 1].
-				 *
-				 * Step 3: verify that Q lie on the curve
-				 *
-				 * Both checks are performed in nettle.  */
+			 * in the range [0, p - 1].
+			 *
+			 * Step 3: verify that Q lie on the curve
+			 *
+			 * Both checks are performed in nettle.  */
 			if (!ecc_point_set(&r, x, y)) {
 				ret = gnutls_assert_val(
 					GNUTLS_E_ILLEGAL_PARAMETER);
@@ -512,16 +512,16 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 			}
 
 			/* Step 4: verify that n * Q, where n is the
-				 * curve order, result in an identity element
-				 *
-				 * Since nettle internally cannot represent an
-				 * identity element on curves, we validate this
-				 * instead:
-				 *
-				 *   (n - 1) * Q = -Q
-				 *
-				 * That effectively means: n * Q = -Q + Q = O
-				 */
+			 * curve order, result in an identity element
+			 *
+			 * Since nettle internally cannot represent an
+			 * identity element on curves, we validate this
+			 * instead:
+			 *
+			 *   (n - 1) * Q = -Q
+			 *
+			 * That effectively means: n * Q = -Q + Q = O
+			 */
 			order = get_supported_nist_curve_order(priv->curve);
 			if (unlikely(order == NULL)) {
 				ret = gnutls_assert_val(
@@ -2031,7 +2031,7 @@ static int _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 		}
 
 		/* This call will return a valid MAC entry and
-			 * getters will check that is not null anyway. */
+		 * getters will check that is not null anyway. */
 		me = hash_to_entry(_gnutls_gost_digest(pk_params->algo));
 		if (_gnutls_mac_get_algo_len(me) != vdata->size) {
 			_gnutls_debug_log(
@@ -2183,7 +2183,7 @@ static int _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 		size_t bits;
 
 		/* DSA is currently being defined as sunset with the
-			 * current draft of FIPS 186-5 */
+		 * current draft of FIPS 186-5 */
 		not_approved = true;
 
 		memset(&priv, 0, sizeof(priv));
@@ -2271,9 +2271,9 @@ static int _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 		bits = mpz_sizeinbase(pub.n, 2);
 
 		/* RSA modulus size should be 2048-bit or larger in FIPS
-			 * 140-3.  In addition to this, only SHA-2 is allowed
-			 * for SigGen; it is checked in pk_prepare_hash lib/pk.c
-			 */
+		 * 140-3.  In addition to this, only SHA-2 is allowed
+		 * for SigGen; it is checked in pk_prepare_hash lib/pk.c
+		 */
 		if (unlikely(bits < 2048)) {
 			not_approved = true;
 		}
@@ -2324,11 +2324,11 @@ static int _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 		bits = mpz_sizeinbase(pub.n, 2);
 
 		/* RSA modulus size should be 2048-bit or larger in FIPS
-			 * 140-3.  In addition to this, only SHA-2 is allowed
-			 * for SigGen; however, Nettle only support SHA256,
-			 * SHA384, and SHA512 for RSA-PSS (see
-			 * _rsa_pss_sign_digest_tr in this file for details).
-			 */
+		 * 140-3.  In addition to this, only SHA-2 is allowed
+		 * for SigGen; however, Nettle only support SHA256,
+		 * SHA384, and SHA512 for RSA-PSS (see
+		 * _rsa_pss_sign_digest_tr in this file for details).
+		 */
 		if (unlikely(bits < 2048)) {
 			not_approved = true;
 		}
@@ -2341,8 +2341,8 @@ static int _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 				   CRAU_STRING, _gnutls_mac_get_name(me), NULL);
 
 		/* According to FIPS 186-5 5.4, the salt length must be
-			 * in the range between 0 and the hash length inclusive.
-			 */
+		 * in the range between 0 and the hash length inclusive.
+		 */
 		if (sign_params->salt_size > _gnutls_mac_get_algo_len(me)) {
 			not_approved = true;
 		}
@@ -2538,7 +2538,7 @@ static int _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 				   NULL);
 
 		/* This call will return a valid MAC entry and
-			 * getters will check that is not null anyway. */
+		 * getters will check that is not null anyway. */
 		me = hash_to_entry(_gnutls_gost_digest(pk_params->algo));
 		if (_gnutls_mac_get_algo_len(me) != vdata->size) {
 			ret = gnutls_assert_val(GNUTLS_E_PK_SIG_VERIFY_FAILED);
@@ -2645,7 +2645,7 @@ static int _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 		size_t bits;
 
 		/* DSA is currently being defined as sunset with the
-			 * current draft of FIPS 186-5 */
+		 * current draft of FIPS 186-5 */
 		not_approved = true;
 
 		ret = _gnutls_decode_ber_rs(signature, &tmp[0], &tmp[1]);
@@ -2693,10 +2693,10 @@ static int _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 		_gnutls_audit_data("pk::bits", CRAU_WORD, bits, NULL);
 
 		/* In FIPS 140-3, RSA key size should be larger than 2048-bit.
-			 * In addition to this, only SHA-2 is allowed
-			 * for SigVer; it is checked in _pkcs1_rsa_verify_sig in
-			 * lib/pubkey.c.
-			 */
+		 * In addition to this, only SHA-2 is allowed
+		 * for SigVer; it is checked in _pkcs1_rsa_verify_sig in
+		 * lib/pubkey.c.
+		 */
 		if (unlikely(bits < 2048)) {
 			not_approved = true;
 		}
@@ -2742,11 +2742,11 @@ static int _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 		bits = mpz_sizeinbase(pub.n, 2);
 
 		/* RSA modulus size should be 2048-bit or larger in FIPS
-			 * 140-3.  In addition to this, only SHA-2 are
-			 * allowed for SigVer, while Nettle only supports
-			 * SHA256, SHA384, and SHA512 for RSA-PSS (see
-			 * _rsa_pss_verify_digest in this file for the details).
-			 */
+		 * 140-3.  In addition to this, only SHA-2 are
+		 * allowed for SigVer, while Nettle only supports
+		 * SHA256, SHA384, and SHA512 for RSA-PSS (see
+		 * _rsa_pss_verify_digest in this file for the details).
+		 */
 		if (unlikely(bits < 2048)) {
 			not_approved = true;
 		}
@@ -3707,15 +3707,15 @@ static int pct_test(gnutls_pk_algorithm_t algo,
 		mpz_t y;
 
 		/* Perform SP800 56A (rev 3) 5.6.2.1.4 Owner Assurance
-			 * of Pair-wise Consistency check, even if we only
-			 * support ephemeral DH, as it is required by FIPS
-			 * 140-3 IG 10.3.A.
-			 *
-			 * Use the private key, x, along with the generator g
-			 * and prime modulus p included in the domain
-			 * parameters associated with the key pair to compute
-			 * g^x mod p. Compare the result to the public key, y.
-			 */
+		 * of Pair-wise Consistency check, even if we only
+		 * support ephemeral DH, as it is required by FIPS
+		 * 140-3 IG 10.3.A.
+		 *
+		 * Use the private key, x, along with the generator g
+		 * and prime modulus p included in the domain
+		 * parameters associated with the key pair to compute
+		 * g^x mod p. Compare the result to the public key, y.
+		 */
 		mpz_init(y);
 		mpz_powm(y, TOMPZ(params->params[DSA_G]),
 			 TOMPZ(params->params[DSA_X]),
@@ -3992,8 +3992,8 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 #ifdef ENABLE_FIPS140
 		if (_gnutls_fips_mode_enabled()) {
 			/* Perform FFC full public key validation checks
-				 * according to SP800-56A (revision 3), 5.6.2.3.1.
-				 */
+			 * according to SP800-56A (revision 3), 5.6.2.3.1.
+			 */
 
 			/* Step 1: 2 <= y <= p - 2 */
 			mpz_sub_ui(primesub1, pub.p, 1);
@@ -4076,11 +4076,11 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			} else {
 				unsigned retries = 0;
 				/* The provable RSA key generation process is deterministic
-					 * but has an internal maximum iteration counter and when
-					 * exceed will fail for certain random seeds. This is a very
-					 * rare condition, but it nevertheless happens and even CI builds fail
-					 * occasionally. When we generate the random seed internally, remediate
-					 * by retrying a different seed on failure. */
+				 * but has an internal maximum iteration counter and when
+				 * exceed will fail for certain random seeds. This is a very
+				 * rare condition, but it nevertheless happens and even CI builds fail
+				 * occasionally. When we generate the random seed internally, remediate
+				 * by retrying a different seed on failure. */
 				do {
 					params->seed_size =
 						sizeof(params->seed);
@@ -4113,8 +4113,8 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 		}
 
 		/* In FIPS 140-3, pub.n should be 2048-bit or larger; it
-			 * is assured in rsa_generate_fips186_4_keypair in
-			 * lib/nettle/int/rsa-keygen-fips186.c. */
+		 * is assured in rsa_generate_fips186_4_keypair in
+		 * lib/nettle/int/rsa-keygen-fips186.c. */
 
 		mpz_set(TOMPZ(params->params[RSA_MODULUS]), pub.n);
 		mpz_set(TOMPZ(params->params[RSA_PUB]), pub.e);

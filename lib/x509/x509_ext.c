@@ -1103,8 +1103,8 @@ int gnutls_x509_ext_import_key_usage(const gnutls_datum_t *ext,
 static int _last_key_usage_set_bit(int usage)
 {
 	/* the byte ordering is a bit strange here, see how GNUTLS_KEY_* is laid out, and how 
- * asn1_write_value() writes out BIT STRING objects.
- */
+	 * asn1_write_value() writes out BIT STRING objects.
+	 */
 	if (usage & GNUTLS_KEY_DECIPHER_ONLY)
 		return 9;
 	else if (usage & GNUTLS_KEY_ENCIPHER_ONLY)

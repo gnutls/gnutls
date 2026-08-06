@@ -831,7 +831,7 @@ int _gnutls_connection_state_init(gnutls_session_t session)
 	int ret;
 
 	/* Setup the master secret 
- */
+	 */
 	if ((ret = _gnutls_generate_master(session, 0)) < 0)
 		return gnutls_assert_val(ret);
 
@@ -882,8 +882,8 @@ int _gnutls_write_connection_state_init(gnutls_session_t session)
 			session->security_parameters.max_user_record_send_size;
 
 	/* Update internals from CipherSuite selected.
- * If we are resuming just copy the connection session
- */
+	 * If we are resuming just copy the connection session
+	 */
 	if (session->internals.resumed &&
 	    session->security_parameters.entity == GNUTLS_SERVER)
 		_gnutls_set_resumed_parameters(session);

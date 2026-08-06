@@ -65,7 +65,7 @@ struct gnutls_pkcs11_provider_st {
 	char *module_name;
 	unsigned active;
 	unsigned trusted; /* in the sense of p11-kit trusted:
-				 * it can be used for verification */
+			   * it can be used for verification */
 	struct ck_info info;
 	struct ck_c_initialize_args init_args;
 };
@@ -379,7 +379,7 @@ static int pkcs11_provider_add(const struct gnutls_pkcs11_provider_st *provider)
  *
  * The output value of the callback will be returned if it is
  * a negative one (indicating failure).
-*/
+ */
 int _gnutls_pkcs11_check_init(init_level_t req_level, void *priv,
 			      pkcs11_reinit_function cb)
 {
@@ -1464,7 +1464,7 @@ int gnutls_pkcs11_obj_export3(gnutls_pkcs11_obj_t obj,
 		}
 	case GNUTLS_PKCS11_OBJ_PUBKEY: {
 		/* that approach allows to return a public key even if
-			 * CKA_VALUE is not set */
+		 * CKA_VALUE is not set */
 		gnutls_pubkey_t pubkey;
 
 		ret = gnutls_pubkey_init(&pubkey);

@@ -657,7 +657,7 @@ int gnutls_pkcs8_info(const gnutls_datum_t *data, gnutls_x509_crt_fmt_t format,
 					     data->size, &_data);
 
 		if (ret < 0) { /* Try the encrypted header 
-				 */
+				*/
 			ret = _gnutls_fbase64_decode(PEM_PKCS8, data->data,
 						     data->size, &_data);
 
@@ -800,9 +800,9 @@ int gnutls_x509_privkey_export2_pkcs8(gnutls_x509_privkey_t key,
 }
 
 /* We've gotten this far. In the real world it's almost certain
-	 * that we're dealing with a good file, but wrong password.
-	 * Sadly like 90% of random data is somehow valid DER for the
-	 * a first small number of bytes, so no easy way to guarantee. */
+ * that we're dealing with a good file, but wrong password.
+ * Sadly like 90% of random data is somehow valid DER for the
+ * a first small number of bytes, so no easy way to guarantee. */
 #define CHECK_ERR_FOR_ENCRYPTED(result)                     \
 	if (result == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND ||    \
 	    result == GNUTLS_E_ASN1_IDENTIFIER_NOT_FOUND || \
@@ -1980,7 +1980,7 @@ int gnutls_x509_privkey_import_pkcs8(gnutls_x509_privkey_t key,
 						data->data, data->size, &_data);
 
 		if (result < 0) { /* Try the encrypted header 
-					 */
+				   */
 			result = _gnutls_fbase64_decode(PEM_PKCS8, data->data,
 							data->size, &_data);
 
