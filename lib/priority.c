@@ -249,16 +249,16 @@ static const int *kx_priority_suiteb = _kx_priority_suiteb;
 
 static const int _kx_priority_secure[] = {
 /* The ciphersuites that offer forward secrecy take
-	 * precedence
-	 */
+ * precedence
+ */
 #ifdef ENABLE_ECDHE
 	GNUTLS_KX_ECDHE_ECDSA, GNUTLS_KX_ECDHE_RSA,
 #endif
 	GNUTLS_KX_RSA,
 /* KX-RSA is now ahead of DHE-RSA and DHE-DSS due to the compatibility
-	 * issues the DHE ciphersuites have. That is, one cannot enforce a specific
-	 * security level without dropping the connection.
-	 */
+ * issues the DHE ciphersuites have. That is, one cannot enforce a specific
+ * security level without dropping the connection.
+ */
 #ifdef ENABLE_DHE
 	GNUTLS_KX_DHE_RSA,
 #endif
@@ -688,8 +688,8 @@ static const struct priority_groups_st pgroups[] = {
 	  .sign_list = &sign_priority_secure128,
 	  .group_list = &supported_groups_secure128,
 	  /* The profile should have been HIGH but if we don't allow
-	  * SHA-1 (80-bits) as signature algorithm we are not able
-	  * to connect anywhere with this level */
+	   * SHA-1 (80-bits) as signature algorithm we are not able
+	   * to connect anywhere with this level */
 	  .profile = GNUTLS_PROFILE_LOW,
 	  .sec_param = GNUTLS_SEC_PARAM_LOW },
 	{ .name = LEVEL_SECURE192,
@@ -3685,7 +3685,7 @@ int gnutls_priority_set_direct(gnutls_session_t session, const char *priorities,
 
 /* Breaks a list of "xxx", "yyy", to a character array, of
  * MAX_COMMA_SEP_ELEMENTS size; Note that the given string is modified.
-  */
+ */
 static void break_list(char *list, char *broken_list[MAX_ELEMENTS], int *size)
 {
 	char *p = list;
@@ -3701,8 +3701,8 @@ static void break_list(char *list, char *broken_list[MAX_ELEMENTS], int *size)
 		if (p) {
 			*p = 0;
 			p++; /* move to next entry and skip white
-				 * space.
-				 */
+			      * space.
+			      */
 			while (*p == ' ')
 				p++;
 		}

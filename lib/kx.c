@@ -416,7 +416,7 @@ int _gnutls_send_client_certificate_verify(gnutls_session_t session, int again)
 	    NULL) {
 		gnutls_assert();
 		return 0; /* this algorithm does not support cli_crt_vrfy 
-				 */
+			   */
 	}
 
 	if (again == 0) {
@@ -496,7 +496,7 @@ int _gnutls_send_client_certificate(gnutls_session_t session, int again)
 					 GNUTLS_A_SSL3_NO_CERTIFICATE);
 
 	} else /* TLS 1.0 or SSL 3.0 with a valid certificate 
-				 */
+		*/
 #endif
 		return _gnutls_send_handshake(session, bufel,
 					      GNUTLS_HANDSHAKE_CERTIFICATE_PKT);

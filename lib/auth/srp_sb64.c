@@ -144,7 +144,7 @@ static int _gnutls_sbase64_encode(uint8_t *data, size_t data_size,
 
 	i = j = 0;
 	/* encode the bytes that are not a multiple of 3 
- */
+	 */
 	if (mod > 0) {
 		tmp = encode(tmpres, &data[0], mod);
 		if (tmp < 0) {
@@ -157,7 +157,7 @@ static int _gnutls_sbase64_encode(uint8_t *data, size_t data_size,
 		j = tmp;
 	}
 	/* encode the rest
- */
+	 */
 	for (; i < data_size; i += 3, j += 4) {
 		tmp = encode(tmpres, &data[i], data_size - i);
 		if (tmp < 0) {

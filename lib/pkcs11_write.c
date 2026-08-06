@@ -286,8 +286,8 @@ static int add_pubkey(gnutls_pubkey_t pubkey, struct ck_attribute *a,
 		gnutls_datum_t m, e;
 
 		/* PKCS#11 defines integers as unsigned having most significant byte
-			 * first, e.g., 32768 = 0x80 0x00. This is interpreted literraly by
-			 * some HSMs which do not accept an integer with a leading zero */
+		 * first, e.g., 32768 = 0x80 0x00. This is interpreted literraly by
+		 * some HSMs which do not accept an integer with a leading zero */
 		ret = gnutls_pubkey_export_rsa_raw2(pubkey, &m, &e,
 						    GNUTLS_EXPORT_FLAG_NO_LZ);
 		if (ret < 0) {

@@ -868,8 +868,8 @@ int _gnutls_proc_srp_server_kx(gnutls_session_t session, uint8_t *data,
 	}
 
 	return i; /* return the processed data
-				 * needed in auth_srp_rsa.
-				 */
+		   * needed in auth_srp_rsa.
+		   */
 }
 
 #endif /* ENABLE_SRP */

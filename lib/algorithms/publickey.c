@@ -32,12 +32,12 @@ typedef struct {
 	gnutls_pk_algorithm_t pk_algorithm;
 	enum encipher_type
 		encipher_type; /* CIPHER_ENCRYPT if this algorithm is to be used
-						 * for encryption, CIPHER_SIGN if signature only,
-						 * CIPHER_IGN if this does not apply at all.
-						 *
-						 * This is useful to certificate cipher suites, which check
-						 * against the certificate key usage bits.
-						 */
+			* for encryption, CIPHER_SIGN if signature only,
+			* CIPHER_IGN if this does not apply at all.
+			*
+			* This is useful to certificate cipher suites, which check
+			* against the certificate key usage bits.
+			*/
 } gnutls_pk_map;
 
 /* This table maps the Key exchange algorithms to

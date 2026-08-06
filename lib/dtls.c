@@ -833,29 +833,29 @@ int gnutls_dtls_cookie_send(gnutls_datum_t *key, void *client_data,
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	/* send
- *  struct {
- *    ContentType type - 1 byte GNUTLS_HANDSHAKE;
- *    ProtocolVersion version; - 2 bytes (254,255)
- *    uint16 epoch; - 2 bytes (0, 0)
- *    uint48 sequence_number; - 4 bytes (0,0,0,0)
- *    uint16 length; - 2 bytes (COOKIE_SIZE+1+2)+DTLS_HANDSHAKE_HEADER_SIZE
- *    uint8_t fragment[DTLSPlaintext.length];
- *  } DTLSPlaintext;
- *
- *
- * struct {
- *    HandshakeType msg_type; 1 byte - GNUTLS_HANDSHAKE_HELLO_VERIFY_REQUEST
- *    uint24 length; - COOKIE_SIZE+3
- *    uint16 message_seq; - 2 bytes (0,0)
- *    uint24 fragment_offset; - 3 bytes (0,0,0)
- *    uint24 fragment_length; - same as length
- * }
- *
- * struct {
- *   ProtocolVersion server_version;
- *   uint8_t cookie<0..32>;
- * } HelloVerifyRequest;
- */
+	 *  struct {
+	 *    ContentType type - 1 byte GNUTLS_HANDSHAKE;
+	 *    ProtocolVersion version; - 2 bytes (254,255)
+	 *    uint16 epoch; - 2 bytes (0, 0)
+	 *    uint48 sequence_number; - 4 bytes (0,0,0,0)
+	 *    uint16 length; - 2 bytes (COOKIE_SIZE+1+2)+DTLS_HANDSHAKE_HEADER_SIZE
+	 *    uint8_t fragment[DTLSPlaintext.length];
+	 *  } DTLSPlaintext;
+	 *
+	 *
+	 * struct {
+	 *    HandshakeType msg_type; 1 byte - GNUTLS_HANDSHAKE_HELLO_VERIFY_REQUEST
+	 *    uint24 length; - COOKIE_SIZE+3
+	 *    uint16 message_seq; - 2 bytes (0,0)
+	 *    uint24 fragment_offset; - 3 bytes (0,0,0)
+	 *    uint24 fragment_length; - same as length
+	 * }
+	 *
+	 * struct {
+	 *   ProtocolVersion server_version;
+	 *   uint8_t cookie<0..32>;
+	 * } HelloVerifyRequest;
+	 */
 
 	hvr[hvr_size++] = GNUTLS_HANDSHAKE;
 	/* version */

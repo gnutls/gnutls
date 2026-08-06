@@ -534,7 +534,7 @@ void gnutls_global_deinit(void)
  *   actual version string of the library; return %NULL if the
  *   condition is not met.  If %NULL is passed to this function no
  *   check is done and only the version string is returned.
-  **/
+ **/
 const char *gnutls_check_version(const char *req_version)
 {
 	if (!req_version || strverscmp(req_version, VERSION) <= 0)

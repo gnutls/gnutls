@@ -51,7 +51,7 @@ typedef struct {
 	gnutls_kx_algorithm_t algorithm;
 	gnutls_credentials_type_t client_type;
 	gnutls_credentials_type_t server_type; /* The type of credentials a server
-						 * needs to set */
+						* needs to set */
 } gnutls_cred_map;
 
 static const gnutls_cred_map cred_mappings[] = {

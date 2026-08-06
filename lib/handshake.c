@@ -1437,8 +1437,8 @@ int _gnutls_send_handshake2(gnutls_session_t session, mbuffer_st *bufel,
 		 * but are cached instead */
 		switch (type) {
 		case GNUTLS_HANDSHAKE_CERTIFICATE_PKT: /* this one is followed by ServerHelloDone
-							 * or ClientKeyExchange always.
-							 */
+							* or ClientKeyExchange always.
+							*/
 		case GNUTLS_HANDSHAKE_COMPRESSED_CERTIFICATE_PKT: /* as above */
 		case GNUTLS_HANDSHAKE_CERTIFICATE_STATUS:
 		case GNUTLS_HANDSHAKE_SERVER_KEY_EXCHANGE: /* as above */
@@ -1714,7 +1714,7 @@ int _gnutls_recv_handshake(gnutls_session_t session,
 			goto cleanup;
 		} else {
 			/* during hello retry parsing, we reset handshake hash buffer,
-				 * re-add this message */
+			 * re-add this message */
 			ret = handshake_hash_add_recvd(session, hsk.htype,
 						       hsk.header,
 						       hsk.header_size,
@@ -1725,7 +1725,7 @@ int _gnutls_recv_handshake(gnutls_session_t session,
 			}
 
 			/* Signal our caller we have received a retry request
-				   and ClientHello needs to be sent again. */
+			   and ClientHello needs to be sent again. */
 			ret = 1;
 		}
 

@@ -67,11 +67,10 @@ static const int MONTHDAYS[] = {
 #define ISLEAP(year) \
 	(((year) % 4) == 0 && (((year) % 100) != 0 || ((year) % 400) == 0))
 
-/*
- **  Given a struct tm representing a calendar time in UTC, convert it to
- **  seconds since epoch.  Returns (time_t) -1 if the time is not
- **  convertible.  Note that this function does not canonicalize the provided
- **  struct tm, nor does it allow out of range values or years before 1970.
+/* Given a struct tm representing a calendar time in UTC, convert it to
+ * seconds since epoch.  Returns (time_t) -1 if the time is not
+ * convertible.  Note that this function does not canonicalize the provided
+ * struct tm, nor does it allow out of range values or years before 1970.
  */
 static time_t mktime_utc(const struct fake_tm *tm)
 {
@@ -79,10 +78,10 @@ static time_t mktime_utc(const struct fake_tm *tm)
 	int i;
 
 	/* We do allow some ill-formed dates, but we don't do anything special
- * with them and our callers really shouldn't pass them to us.  Do
- * explicitly disallow the ones that would cause invalid array accesses
- * or other algorithm problems.
- */
+	 * with them and our callers really shouldn't pass them to us.  Do
+	 * explicitly disallow the ones that would cause invalid array accesses
+	 * or other algorithm problems.
+	 */
 	if (tm->tm_mon < 0 || tm->tm_mon > 11 || tm->tm_year < 1970)
 		return (time_t)-1;
 
@@ -92,7 +91,7 @@ static time_t mktime_utc(const struct fake_tm *tm)
 		return (time_t)-1;
 
 	/* Convert to a time_t.
- */
+	 */
 	for (i = 1970; i < tm->tm_year; i++)
 		result += 365 + ISLEAP(i);
 	for (i = 0; i < tm->tm_mon; i++)
@@ -133,25 +132,25 @@ static time_t time2gtime(const char *ttime, int year)
 	xx[2] = 0;
 
 	/* get the month
- */
+	 */
 	memcpy(xx, ttime, 2); /* month */
 	etime.tm_mon = atoi(xx) - 1;
 	ttime += 2;
 
 	/* get the day
- */
+	 */
 	memcpy(xx, ttime, 2); /* day */
 	etime.tm_mday = atoi(xx);
 	ttime += 2;
 
 	/* get the hour
- */
+	 */
 	memcpy(xx, ttime, 2); /* hour */
 	etime.tm_hour = atoi(xx);
 	ttime += 2;
 
 	/* get the minutes
- */
+	 */
 	memcpy(xx, ttime, 2); /* minutes */
 	etime.tm_min = atoi(xx);
 	ttime += 2;
@@ -192,7 +191,7 @@ time_t _gnutls_utcTime2gtime(const char *ttime)
 	xx[2] = 0;
 
 	/* get the year
- */
+	 */
 	memcpy(xx, ttime, 2); /* year */
 	year = atoi(xx);
 	ttime += 2;
@@ -233,7 +232,7 @@ time_t _gnutls_x509_generalTime2gtime(const char *ttime)
 	xx[4] = 0;
 
 	/* get the year
- */
+	 */
 	memcpy(xx, ttime, 4); /* year */
 	year = atoi(xx);
 	ttime += 4;

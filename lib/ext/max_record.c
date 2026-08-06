@@ -89,7 +89,7 @@ static int _gnutls_max_record_recv_params(gnutls_session_t session,
 				new_size;
 		}
 	} else { /* CLIENT SIDE - we must check if the sent record size is the right one 
-				 */
+		  */
 		if (data_size > 0) {
 			if (data_size != 1) {
 				gnutls_assert();

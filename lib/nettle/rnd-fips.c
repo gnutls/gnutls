@@ -238,7 +238,7 @@ static int _rngfips_ctx_reinit(struct fips_ctx *fctx)
 static int _rngfips_init(void **_ctx)
 {
 	/* Basic initialization is required to
-   do a few checks on the implementation.  */
+	   do a few checks on the implementation.  */
 	struct fips_ctx *ctx;
 	int ret;
 

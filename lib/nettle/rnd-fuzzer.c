@@ -41,7 +41,7 @@ struct r48_rand_data {
 	unsigned short int __c; /* Additive const. in congruential formula.  */
 	unsigned short int __init; /* Flag for initializing.  */
 	__extension__ unsigned long long int __a; /* Factor in congruential
-							   formula.  */
+						     formula.  */
 };
 
 #ifdef __clang__

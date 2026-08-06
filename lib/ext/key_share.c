@@ -588,7 +588,7 @@ static int server_use_key_share_single(gnutls_session_t session,
 			return gnutls_assert_val(ret);
 
 		/* server's public key is unused, but the raw_pub field
-		* is used to store ciphertext */
+		 * is used to store ciphertext */
 		gnutls_free(session->key.kshare.kem_params.raw_pub.data);
 
 		if (group->pubkey_size > buffer->length)

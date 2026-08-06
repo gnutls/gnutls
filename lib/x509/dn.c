@@ -75,7 +75,7 @@ static int append_elements(asn1_node asn1_struct, const char *asn1_rdn_name,
 	}
 
 	do { /* Move to the attribute type and values
-				 */
+	      */
 		k2++;
 
 		if (tmpbuffer1[0] != 0)
@@ -354,7 +354,7 @@ int _gnutls_x509_parse_dn_oid(asn1_node asn1_struct, const char *asn1_rdn_name,
 		k2 = 0;
 
 		do { /* Move to the attribute type and values
-				 */
+		      */
 			k2++;
 
 			if (tmpbuffer1[0] != 0)
@@ -496,7 +496,7 @@ int _gnutls_x509_get_dn_oid(asn1_node asn1_struct, const char *asn1_rdn_name,
 		k2 = 0;
 
 		do { /* Move to the attribute type and values
-				 */
+		      */
 			k2++;
 
 			if (tmpbuffer1[0] != 0)
