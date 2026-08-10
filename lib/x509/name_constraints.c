@@ -1734,8 +1734,8 @@ static bool check_unsupported_constraint2(gnutls_x509_crt_t cert,
  * @nc using the RFC5280 rules. It will traverse all the certificate's names and
  * alternative names.
  *
- * Currently this function is limited to DNS
- * names and emails (of type %GNUTLS_SAN_DNSNAME and %GNUTLS_SAN_RFC822NAME).
+ * Currently this function is limited to DNS names, emails and IP addresses
+ * (types %GNUTLS_SAN_DNSNAME, %GNUTLS_SAN_RFC822NAME and %GNUTLS_SAN_IPADDRESS).
  *
  * Returns: zero if the provided name is not acceptable, and non-zero otherwise.
  *
