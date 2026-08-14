@@ -68,6 +68,88 @@ static const char _domaincontroller[] = {
 	"-----END CERTIFICATE-----"
 };
 
+static const char _dc_permitted[] = {
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIEGTCCAwGgAwIBAgIUE/05VErpwLTz8EmFwbcH6j8xBaMwDQYJKoZIhvcNAQEL\n"
+	"BQAwNDEVMBMGA1UECgwMRXhhbXBsZSBJbmMuMRswGQYDVQQDDBJFeGFtcGxlIENv\n"
+	"cnAgQUQgQ0EwHhcNMjYwODE0MTQxMTMyWhcNMjcwODE0MTQxMTMyWjAiMSAwHgYD\n"
+	"VQQDDBdleGFtcGxlZGMwMS5leGFtcGxlLmNvbTCCASIwDQYJKoZIhvcNAQEBBQAD\n"
+	"ggEPADCCAQoCggEBAIkk/DHp6jfdqkQIUkIy+42pqeRD0QYbvnvSlDqAfthBBmnf\n"
+	"YMGZCjUOOybM+FYbP4x8smF5eMOzqpTgpvbYftqOraqWD3wk3UpiSIJFya5t0NWK\n"
+	"TsuMDn6dCgNewwI2G4DdFV3XcAKlByO0oTvjLhW2C7n7jed+IWpNFNbAsah8alUe\n"
+	"gQvDYN7AlRRHzJRrzO0IlzcWihpHMTy+cwD1+tpUHVUAMw1EfkpEQk64QMS7ULYU\n"
+	"16m7Ed4zhTqaiopoPTP6kcGbdwXZU07yRR5dTE1wpCKrD1RUQQjxhJrUGKHfZ8y1\n"
+	"SLC5SLvD2J1jkGL6zAf1UM4etCe9XN6y4OL6SQMCAwEAAaOCATMwggEvMAwGA1Ud\n"
+	"EwEB/wQCMAAwDgYDVR0PAQH/BAQDAgeAMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggr\n"
+	"BgEFBQcDAjArBgNVHREEJDAioCAGCisGAQQBgjcUAgOgEgwQdXNlckBleGFtcGxl\n"
+	"LmNvbTA7BgNVHR8ENDAyMDCgLqAshipodHRwOi8vcGtpLmV4YW1wbGUuY29tL2Nk\n"
+	"cC9FeGFtcGxlQURDQS5jcmwwRgYIKwYBBQUHAQEEOjA4MDYGCCsGAQUFBzAChipo\n"
+	"dHRwOi8vcGtpLmV4YW1wbGUuY29tL2FpYS9FeGFtcGxlQURDQS5jZXIwHQYDVR0O\n"
+	"BBYEFClqogDiApw9Pk/p38ylfnUpkuxcMB8GA1UdIwQYMBaAFFCXR+0zjvq4+SIY\n"
+	"wOhimX7pqDu9MA0GCSqGSIb3DQEBCwUAA4IBAQBXSzrk+YP+AUlYq695rzTjk0JM\n"
+	"pClpSy3y9zWupjktA8hrl8lFUIlK1UE3W+HUeWVJuLozofv7w5QlTnnlQJw4fX2y\n"
+	"JPyMf8SYhEWL/4cXbtWegvIZoSa74A1opPCA4xsLAlkcNzF8Kmsil+UpWMeyCWpF\n"
+	"fnhRzUGuf2sGjfQyNxyoxbauobazQJNJ5ulZxAk15/XWiXMaM4nSV7SoWhzzPuou\n"
+	"69VkFFxLunHqPw/j70oexCztAsYE/zkw8WkqfU2iiX9R9MxEL2UenXqbP1sffnKy\n"
+	"ngJd+uUb/fyrm10JHpFZ7ju/t+4BJBBolkdrdYMQ8PfYOALoG2F4x1Pkf9h+\n"
+	"-----END CERTIFICATE-----\n"
+};
+
+static const char _dc_excluded[] = {
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIEIzCCAwugAwIBAgIUE/05VErpwLTz8EmFwbcH6j8xBaQwDQYJKoZIhvcNAQEL\n"
+	"BQAwNDEVMBMGA1UECgwMRXhhbXBsZSBJbmMuMRswGQYDVQQDDBJFeGFtcGxlIENv\n"
+	"cnAgQUQgQ0EwHhcNMjYwODE0MTQxMzAwWhcNMjcwODE0MTQxMzAwWjAiMSAwHgYD\n"
+	"VQQDDBdleGFtcGxlZGMwMS5leGFtcGxlLmNvbTCCASIwDQYJKoZIhvcNAQEBBQAD\n"
+	"ggEPADCCAQoCggEBAIkk/DHp6jfdqkQIUkIy+42pqeRD0QYbvnvSlDqAfthBBmnf\n"
+	"YMGZCjUOOybM+FYbP4x8smF5eMOzqpTgpvbYftqOraqWD3wk3UpiSIJFya5t0NWK\n"
+	"TsuMDn6dCgNewwI2G4DdFV3XcAKlByO0oTvjLhW2C7n7jed+IWpNFNbAsah8alUe\n"
+	"gQvDYN7AlRRHzJRrzO0IlzcWihpHMTy+cwD1+tpUHVUAMw1EfkpEQk64QMS7ULYU\n"
+	"16m7Ed4zhTqaiopoPTP6kcGbdwXZU07yRR5dTE1wpCKrD1RUQQjxhJrUGKHfZ8y1\n"
+	"SLC5SLvD2J1jkGL6zAf1UM4etCe9XN6y4OL6SQMCAwEAAaOCAT0wggE5MAwGA1Ud\n"
+	"EwEB/wQCMAAwDgYDVR0PAQH/BAQDAgeAMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggr\n"
+	"BgEFBQcDAjA1BgNVHREELjAsoCoGCisGAQQBgjcUAgOgHAwadXNlckBzdWJkb21h\n"
+	"aW4uZXhhbXBsZS5jb20wOwYDVR0fBDQwMjAwoC6gLIYqaHR0cDovL3BraS5leGFt\n"
+	"cGxlLmNvbS9jZHAvRXhhbXBsZUFEQ0EuY3JsMEYGCCsGAQUFBwEBBDowODA2Bggr\n"
+	"BgEFBQcwAoYqaHR0cDovL3BraS5leGFtcGxlLmNvbS9haWEvRXhhbXBsZUFEQ0Eu\n"
+	"Y2VyMB0GA1UdDgQWBBQpaqIA4gKcPT5P6d/MpX51KZLsXDAfBgNVHSMEGDAWgBRQ\n"
+	"l0ftM476uPkiGMDoYpl+6ag7vTANBgkqhkiG9w0BAQsFAAOCAQEAONtRvg85A801\n"
+	"yNupQn+pHCqvyq8sUMBplWEoZKt1OC9SSA3nEhHaMtu66yFvl31/J7g4eatVHm7p\n"
+	"cxKqSW7J3E5mgCWPnFcuGPd0DL60Gzdx/3OmST/a13hOWu1vViWWK8BsHrhY99At\n"
+	"QwDMacQWjvKcyrpxdrPgjUPJ7mmfYTmcxyeRTx+RytzYmzCqt/2xO1yOd0CLEp+y\n"
+	"oFUU77tJgYq5mW93SF96tCFHRvctgulKP1MJ5umfKAI+ztyyuHxFBtIIXsnpMqQy\n"
+	"27zjwuILdD9sA0nxfp79arL9MoYaKoBgq7Kp8vCfIiOWkT0knQ3bwEQGEiwEqqko\n"
+	"6fhEhykznQ==\n"
+	"-----END CERTIFICATE-----\n"
+};
+
+static const char _dc_unrelated[] = {
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIEGzCCAwOgAwIBAgIUE/05VErpwLTz8EmFwbcH6j8xBaUwDQYJKoZIhvcNAQEL\n"
+	"BQAwNDEVMBMGA1UECgwMRXhhbXBsZSBJbmMuMRswGQYDVQQDDBJFeGFtcGxlIENv\n"
+	"cnAgQUQgQ0EwHhcNMjYwODE0MTQxNDM2WhcNMjcwODE0MTQxNDM2WjAiMSAwHgYD\n"
+	"VQQDDBdleGFtcGxlZGMwMS5leGFtcGxlLmNvbTCCASIwDQYJKoZIhvcNAQEBBQAD\n"
+	"ggEPADCCAQoCggEBAIkk/DHp6jfdqkQIUkIy+42pqeRD0QYbvnvSlDqAfthBBmnf\n"
+	"YMGZCjUOOybM+FYbP4x8smF5eMOzqpTgpvbYftqOraqWD3wk3UpiSIJFya5t0NWK\n"
+	"TsuMDn6dCgNewwI2G4DdFV3XcAKlByO0oTvjLhW2C7n7jed+IWpNFNbAsah8alUe\n"
+	"gQvDYN7AlRRHzJRrzO0IlzcWihpHMTy+cwD1+tpUHVUAMw1EfkpEQk64QMS7ULYU\n"
+	"16m7Ed4zhTqaiopoPTP6kcGbdwXZU07yRR5dTE1wpCKrD1RUQQjxhJrUGKHfZ8y1\n"
+	"SLC5SLvD2J1jkGL6zAf1UM4etCe9XN6y4OL6SQMCAwEAAaOCATUwggExMAwGA1Ud\n"
+	"EwEB/wQCMAAwDgYDVR0PAQH/BAQDAgeAMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggr\n"
+	"BgEFBQcDAjAtBgNVHREEJjAkoCIGCisGAQQBgjcUAgOgFAwSdXNlckB1bnJlbGF0\n"
+	"ZWQuY29tMDsGA1UdHwQ0MDIwMKAuoCyGKmh0dHA6Ly9wa2kuZXhhbXBsZS5jb20v\n"
+	"Y2RwL0V4YW1wbGVBRENBLmNybDBGBggrBgEFBQcBAQQ6MDgwNgYIKwYBBQUHMAKG\n"
+	"Kmh0dHA6Ly9wa2kuZXhhbXBsZS5jb20vYWlhL0V4YW1wbGVBRENBLmNlcjAdBgNV\n"
+	"HQ4EFgQUKWqiAOICnD0+T+nfzKV+dSmS7FwwHwYDVR0jBBgwFoAUUJdH7TOO+rj5\n"
+	"IhjA6GKZfumoO70wDQYJKoZIhvcNAQELBQADggEBAKpMflYIqdjbEIqxX6VGVAb+\n"
+	"zYZs5ziGdJE4yVLd3kqWPJDyyhrWSBo8wZWz1B9BckLsiguGIu935njFzQug0BzM\n"
+	"auqbHzemPpSOF9ysuxxSiUv1o09yKfG5UAQASk/BW6vaL0XkF3qVKGp7EJesS5HZ\n"
+	"cmhIsHAFD6Dz1j5P2e8n2B5t0OnSuC1thApKjpdu29N9PqT4GusTn6RBAKQmg48d\n"
+	"aaImhujXNlcF9gA7c5JzGI4pskb0EkFa4YzNGVz/DdayI2t6BRUpIUe4Cs0tJir+\n"
+	"ZApn46kOw5PFqkJGSmcb/0UxjL8uvlYs8nNViBZ79K1DUnD2dYAjSXGSZcHu3yU=\n"
+	"-----END CERTIFICATE-----\n"
+};
+
 static const char _issuingca[] = {
 	/* The intermediate CA with name constraints */
 	"-----BEGIN CERTIFICATE-----\n"
@@ -279,6 +361,12 @@ void doit(void)
 
 	verify_leaf(chain, 2, name_constraints, "domaincontroller",
 		    _domaincontroller, GNUTLS_SAN_DNSNAME, 1);
+	verify_leaf(chain, 2, name_constraints, "dc-permitted", _dc_permitted,
+		    GNUTLS_SAN_OTHERNAME_MSUSERPRINCIPAL, 0); /* fail closed */
+	verify_leaf(chain, 2, name_constraints, "dc-excluded", _dc_excluded,
+		    GNUTLS_SAN_OTHERNAME_MSUSERPRINCIPAL, 0); /* #1875 */
+	verify_leaf(chain, 2, name_constraints, "dc-unrelated", _dc_unrelated,
+		    GNUTLS_SAN_OTHERNAME_MSUSERPRINCIPAL, 0);
 
 	gnutls_x509_name_constraints_deinit(name_constraints);
 	gnutls_x509_crt_deinit(issuingca);
@@ -490,5 +578,111 @@ WS2r9yp5JOv6Sjpwb/P3nVm33UyvrNUg/ls5/Uxj5DPFUwl6M0AXcAmNaiysuKio
 qj5R+3eSjHqPMGOl2hIhyoxp6gr+udm+OjifZDfZ4Ak6n5lYXD1qZhyPdz91D2kD
 uPdk+nIVa5yrqp6rgrc4Tb/CoU9vgLgkW7yG4CejVTJTDzVuUMrKLulvAfK4q1Ax
 ZbEbl7om
+-----END CERTIFICATE-----
+$ openssl x509 -req -in domaincontroller.csr -CA issuing-ca.pem \
+               -CAkey issuing-ca.key -CAcreateserial -days 365 \
+               -out dc-permitted.pem -extfile - <<EOF
+basicConstraints=critical,CA:FALSE
+keyUsage=critical,digitalSignature
+extendedKeyUsage = serverAuth, clientAuth
+subjectAltName=otherName:${UPN};UTF8:user@example.com
+crlDistributionPoints=URI:http://pki.example.com/cdp/ExampleADCA.crl
+authorityInfoAccess = caIssuers;URI:http://pki.example.com/aia/ExampleADCA.cer
+EOF
+$ cat dc-permitted.pem
+-----BEGIN CERTIFICATE-----
+MIIEGTCCAwGgAwIBAgIUE/05VErpwLTz8EmFwbcH6j8xBaMwDQYJKoZIhvcNAQEL
+BQAwNDEVMBMGA1UECgwMRXhhbXBsZSBJbmMuMRswGQYDVQQDDBJFeGFtcGxlIENv
+cnAgQUQgQ0EwHhcNMjYwODE0MTQxMTMyWhcNMjcwODE0MTQxMTMyWjAiMSAwHgYD
+VQQDDBdleGFtcGxlZGMwMS5leGFtcGxlLmNvbTCCASIwDQYJKoZIhvcNAQEBBQAD
+ggEPADCCAQoCggEBAIkk/DHp6jfdqkQIUkIy+42pqeRD0QYbvnvSlDqAfthBBmnf
+YMGZCjUOOybM+FYbP4x8smF5eMOzqpTgpvbYftqOraqWD3wk3UpiSIJFya5t0NWK
+TsuMDn6dCgNewwI2G4DdFV3XcAKlByO0oTvjLhW2C7n7jed+IWpNFNbAsah8alUe
+gQvDYN7AlRRHzJRrzO0IlzcWihpHMTy+cwD1+tpUHVUAMw1EfkpEQk64QMS7ULYU
+16m7Ed4zhTqaiopoPTP6kcGbdwXZU07yRR5dTE1wpCKrD1RUQQjxhJrUGKHfZ8y1
+SLC5SLvD2J1jkGL6zAf1UM4etCe9XN6y4OL6SQMCAwEAAaOCATMwggEvMAwGA1Ud
+EwEB/wQCMAAwDgYDVR0PAQH/BAQDAgeAMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggr
+BgEFBQcDAjArBgNVHREEJDAioCAGCisGAQQBgjcUAgOgEgwQdXNlckBleGFtcGxl
+LmNvbTA7BgNVHR8ENDAyMDCgLqAshipodHRwOi8vcGtpLmV4YW1wbGUuY29tL2Nk
+cC9FeGFtcGxlQURDQS5jcmwwRgYIKwYBBQUHAQEEOjA4MDYGCCsGAQUFBzAChipo
+dHRwOi8vcGtpLmV4YW1wbGUuY29tL2FpYS9FeGFtcGxlQURDQS5jZXIwHQYDVR0O
+BBYEFClqogDiApw9Pk/p38ylfnUpkuxcMB8GA1UdIwQYMBaAFFCXR+0zjvq4+SIY
+wOhimX7pqDu9MA0GCSqGSIb3DQEBCwUAA4IBAQBXSzrk+YP+AUlYq695rzTjk0JM
+pClpSy3y9zWupjktA8hrl8lFUIlK1UE3W+HUeWVJuLozofv7w5QlTnnlQJw4fX2y
+JPyMf8SYhEWL/4cXbtWegvIZoSa74A1opPCA4xsLAlkcNzF8Kmsil+UpWMeyCWpF
+fnhRzUGuf2sGjfQyNxyoxbauobazQJNJ5ulZxAk15/XWiXMaM4nSV7SoWhzzPuou
+69VkFFxLunHqPw/j70oexCztAsYE/zkw8WkqfU2iiX9R9MxEL2UenXqbP1sffnKy
+ngJd+uUb/fyrm10JHpFZ7ju/t+4BJBBolkdrdYMQ8PfYOALoG2F4x1Pkf9h+
+-----END CERTIFICATE-----
+$ openssl x509 -req -in domaincontroller.csr -CA issuing-ca.pem \
+               -CAkey issuing-ca.key -CAcreateserial -days 365 \
+               -out dc-excluded.pem -extfile - <<EOF
+basicConstraints=critical,CA:FALSE
+keyUsage=critical,digitalSignature
+extendedKeyUsage = serverAuth, clientAuth
+subjectAltName=otherName:${UPN};UTF8:user@subdomain.example.com
+crlDistributionPoints=URI:http://pki.example.com/cdp/ExampleADCA.crl
+authorityInfoAccess = caIssuers;URI:http://pki.example.com/aia/ExampleADCA.cer
+EOF
+$ cat dc-excluded.pem
+-----BEGIN CERTIFICATE-----
+MIIEIzCCAwugAwIBAgIUE/05VErpwLTz8EmFwbcH6j8xBaQwDQYJKoZIhvcNAQEL
+BQAwNDEVMBMGA1UECgwMRXhhbXBsZSBJbmMuMRswGQYDVQQDDBJFeGFtcGxlIENv
+cnAgQUQgQ0EwHhcNMjYwODE0MTQxMzAwWhcNMjcwODE0MTQxMzAwWjAiMSAwHgYD
+VQQDDBdleGFtcGxlZGMwMS5leGFtcGxlLmNvbTCCASIwDQYJKoZIhvcNAQEBBQAD
+ggEPADCCAQoCggEBAIkk/DHp6jfdqkQIUkIy+42pqeRD0QYbvnvSlDqAfthBBmnf
+YMGZCjUOOybM+FYbP4x8smF5eMOzqpTgpvbYftqOraqWD3wk3UpiSIJFya5t0NWK
+TsuMDn6dCgNewwI2G4DdFV3XcAKlByO0oTvjLhW2C7n7jed+IWpNFNbAsah8alUe
+gQvDYN7AlRRHzJRrzO0IlzcWihpHMTy+cwD1+tpUHVUAMw1EfkpEQk64QMS7ULYU
+16m7Ed4zhTqaiopoPTP6kcGbdwXZU07yRR5dTE1wpCKrD1RUQQjxhJrUGKHfZ8y1
+SLC5SLvD2J1jkGL6zAf1UM4etCe9XN6y4OL6SQMCAwEAAaOCAT0wggE5MAwGA1Ud
+EwEB/wQCMAAwDgYDVR0PAQH/BAQDAgeAMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggr
+BgEFBQcDAjA1BgNVHREELjAsoCoGCisGAQQBgjcUAgOgHAwadXNlckBzdWJkb21h
+aW4uZXhhbXBsZS5jb20wOwYDVR0fBDQwMjAwoC6gLIYqaHR0cDovL3BraS5leGFt
+cGxlLmNvbS9jZHAvRXhhbXBsZUFEQ0EuY3JsMEYGCCsGAQUFBwEBBDowODA2Bggr
+BgEFBQcwAoYqaHR0cDovL3BraS5leGFtcGxlLmNvbS9haWEvRXhhbXBsZUFEQ0Eu
+Y2VyMB0GA1UdDgQWBBQpaqIA4gKcPT5P6d/MpX51KZLsXDAfBgNVHSMEGDAWgBRQ
+l0ftM476uPkiGMDoYpl+6ag7vTANBgkqhkiG9w0BAQsFAAOCAQEAONtRvg85A801
+yNupQn+pHCqvyq8sUMBplWEoZKt1OC9SSA3nEhHaMtu66yFvl31/J7g4eatVHm7p
+cxKqSW7J3E5mgCWPnFcuGPd0DL60Gzdx/3OmST/a13hOWu1vViWWK8BsHrhY99At
+QwDMacQWjvKcyrpxdrPgjUPJ7mmfYTmcxyeRTx+RytzYmzCqt/2xO1yOd0CLEp+y
+oFUU77tJgYq5mW93SF96tCFHRvctgulKP1MJ5umfKAI+ztyyuHxFBtIIXsnpMqQy
+27zjwuILdD9sA0nxfp79arL9MoYaKoBgq7Kp8vCfIiOWkT0knQ3bwEQGEiwEqqko
+6fhEhykznQ==
+-----END CERTIFICATE-----
+$ openssl x509 -req -in domaincontroller.csr -CA issuing-ca.pem \
+               -CAkey issuing-ca.key -CAcreateserial -days 365 \
+               -out dc-unrelated.pem -extfile - <<EOF
+basicConstraints=critical,CA:FALSE
+keyUsage=critical,digitalSignature
+extendedKeyUsage = serverAuth, clientAuth
+subjectAltName=otherName:${UPN};UTF8:user@unrelated.com
+crlDistributionPoints=URI:http://pki.example.com/cdp/ExampleADCA.crl
+authorityInfoAccess = caIssuers;URI:http://pki.example.com/aia/ExampleADCA.cer
+EOF
+$ cat dc-unrelated.pem
+-----BEGIN CERTIFICATE-----
+MIIEGzCCAwOgAwIBAgIUE/05VErpwLTz8EmFwbcH6j8xBaUwDQYJKoZIhvcNAQEL
+BQAwNDEVMBMGA1UECgwMRXhhbXBsZSBJbmMuMRswGQYDVQQDDBJFeGFtcGxlIENv
+cnAgQUQgQ0EwHhcNMjYwODE0MTQxNDM2WhcNMjcwODE0MTQxNDM2WjAiMSAwHgYD
+VQQDDBdleGFtcGxlZGMwMS5leGFtcGxlLmNvbTCCASIwDQYJKoZIhvcNAQEBBQAD
+ggEPADCCAQoCggEBAIkk/DHp6jfdqkQIUkIy+42pqeRD0QYbvnvSlDqAfthBBmnf
+YMGZCjUOOybM+FYbP4x8smF5eMOzqpTgpvbYftqOraqWD3wk3UpiSIJFya5t0NWK
+TsuMDn6dCgNewwI2G4DdFV3XcAKlByO0oTvjLhW2C7n7jed+IWpNFNbAsah8alUe
+gQvDYN7AlRRHzJRrzO0IlzcWihpHMTy+cwD1+tpUHVUAMw1EfkpEQk64QMS7ULYU
+16m7Ed4zhTqaiopoPTP6kcGbdwXZU07yRR5dTE1wpCKrD1RUQQjxhJrUGKHfZ8y1
+SLC5SLvD2J1jkGL6zAf1UM4etCe9XN6y4OL6SQMCAwEAAaOCATUwggExMAwGA1Ud
+EwEB/wQCMAAwDgYDVR0PAQH/BAQDAgeAMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggr
+BgEFBQcDAjAtBgNVHREEJjAkoCIGCisGAQQBgjcUAgOgFAwSdXNlckB1bnJlbGF0
+ZWQuY29tMDsGA1UdHwQ0MDIwMKAuoCyGKmh0dHA6Ly9wa2kuZXhhbXBsZS5jb20v
+Y2RwL0V4YW1wbGVBRENBLmNybDBGBggrBgEFBQcBAQQ6MDgwNgYIKwYBBQUHMAKG
+Kmh0dHA6Ly9wa2kuZXhhbXBsZS5jb20vYWlhL0V4YW1wbGVBRENBLmNlcjAdBgNV
+HQ4EFgQUKWqiAOICnD0+T+nfzKV+dSmS7FwwHwYDVR0jBBgwFoAUUJdH7TOO+rj5
+IhjA6GKZfumoO70wDQYJKoZIhvcNAQELBQADggEBAKpMflYIqdjbEIqxX6VGVAb+
+zYZs5ziGdJE4yVLd3kqWPJDyyhrWSBo8wZWz1B9BckLsiguGIu935njFzQug0BzM
+auqbHzemPpSOF9ysuxxSiUv1o09yKfG5UAQASk/BW6vaL0XkF3qVKGp7EJesS5HZ
+cmhIsHAFD6Dz1j5P2e8n2B5t0OnSuC1thApKjpdu29N9PqT4GusTn6RBAKQmg48d
+aaImhujXNlcF9gA7c5JzGI4pskb0EkFa4YzNGVz/DdayI2t6BRUpIUe4Cs0tJir+
+ZApn46kOw5PFqkJGSmcb/0UxjL8uvlYs8nNViBZ79K1DUnD2dYAjSXGSZcHu3yU=
 -----END CERTIFICATE-----
 */
