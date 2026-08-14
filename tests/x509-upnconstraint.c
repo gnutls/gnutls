@@ -36,7 +36,8 @@
  */
 
 void verify_upn_constraints(gnutls_x509_name_constraints_t);
-void verify_leaf(gnutls_x509_name_constraints_t, const char *, const char *,
+void verify_leaf(const gnutls_x509_crt_t *, unsigned,
+		 gnutls_x509_name_constraints_t, const char *, const char *,
 		 unsigned, bool);
 
 static const char _domaincontroller[] = {
@@ -95,6 +96,30 @@ static const char _issuingca[] = {
 	"t0DIBsj/X7oFxpCW3uBBl3l3TXR4Uwn8tltHpW9KW2CDqPyAdmkcNLuFteSRRm63\n"
 	"DNzG0CPLUcmT0eJQmgBxPw+sq8y13qdfkiGbOQG9nYeGxHIUKYdZbQWK21fzFUIo\n"
 	"m0vG1t/gTxtyOQrIBWfpDI59pChZiGq3u0haaX9qrYsVlV9kzgNIZg==\n"
+	"-----END CERTIFICATE-----\n"
+};
+
+static const char _rootca[] = {
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIDXTCCAkWgAwIBAgIUYZX1t9BkTOKLka9yTXNTZmvw+NowDQYJKoZIhvcNAQEL\n"
+	"BQAwNjEVMBMGA1UECgwMRXhhbXBsZSBJbmMuMR0wGwYDVQQDDBRFeGFtcGxlIENv\n"
+	"cnAgUm9vdCBDQTAeFw0yNjA4MTQxMjI0MzVaFw00NjA4MDkxMjI0MzVaMDYxFTAT\n"
+	"BgNVBAoMDEV4YW1wbGUgSW5jLjEdMBsGA1UEAwwURXhhbXBsZSBDb3JwIFJvb3Qg\n"
+	"Q0EwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCz7dh2aa4Ha1xv73UQ\n"
+	"Iu3Dtmg8qBw/tBPou2lOwQu8lfvy/Stt0RsAtMlHdGv6XgkJk4LT9kBwaxqAcBw6\n"
+	"UGvvg/R2mk218mn/qCEE3+LeWELmDV13wMmuj3OTM4MdqK37k1dg3ydhlvW0E8+K\n"
+	"F/ayXJdXPUBzJBN0W/zAHo9r0q7Au/fDZQGKUn63BK4D6jPO8RRjo5ONnVT98uhB\n"
+	"xQook2/Ip2+uY1JMHqMFHQdhB+xMRrwCJyJEin33j1/WFrDkdlxhpEtad6H5IW0z\n"
+	"kF4rKWHIdBcHmrDEe5OGx2kzUXN+bwUymo1r/u8q25ZYv9FLWIfEl81dxiB3m1gG\n"
+	"oEtnAgMBAAGjYzBhMB8GA1UdIwQYMBaAFIlLkhdtgHDNkZBLiBUz0xYdZj4IMA8G\n"
+	"A1UdEwEB/wQFMAMBAf8wDgYDVR0PAQH/BAQDAgEGMB0GA1UdDgQWBBSJS5IXbYBw\n"
+	"zZGQS4gVM9MWHWY+CDANBgkqhkiG9w0BAQsFAAOCAQEAbNgfrSARnymvBmwJfscf\n"
+	"xgSKtyuwZY290qF817kf+FnEVXKDK9mVz7wa1HBsJKQKOKN0Wx2vsKrLYN7mslyy\n"
+	"6ZLBO2xY1jkV3K9cCAQp08kZo0sVtSD7iL9TBtDU5Pv0T16dZSODcm4lfQ8foLKW\n"
+	"u/7N6ESxOIwgx0Cp2SIUNuiIjKgeoiXAh1w7hOucDSEasxWRk+Cny2mwSz2WP5Eu\n"
+	"+vEua3cJJaibFjZ/r6/CuPiDd81zpr7EVjYQeGxJCnNlQEiWJhf72V8bEVPAMVWr\n"
+	"ZYiJaPjr/WCy5eQXOVpYROp+0xMrIOkb+/4HM5mmsBt+5ikQeMX3rW67LO55csvp\n"
+	"5A==\n"
 	"-----END CERTIFICATE-----\n"
 };
 
@@ -169,13 +194,16 @@ void verify_upn_constraints(gnutls_x509_name_constraints_t name_constraints)
 		     constraint.data, subdomain3);
 }
 
-void verify_leaf(gnutls_x509_name_constraints_t name_constraints,
-		 const char *label, const char *cert_pem, unsigned int san_type,
+void verify_leaf(const gnutls_x509_crt_t *chain, unsigned chain_len,
+		 gnutls_x509_name_constraints_t name_constraints,
+		 const char *label, const char *cert_pem, unsigned san_type,
 		 bool expect_pass)
 {
 	int ret;
 	gnutls_x509_crt_t crt;
 	gnutls_datum_t datum = { (void *)cert_pem, strlen(cert_pem) };
+	unsigned status;
+	bool violated;
 
 	gnutls_x509_crt_init(&crt);
 
@@ -192,6 +220,19 @@ void verify_leaf(gnutls_x509_name_constraints_t name_constraints,
 	else if (!expect_pass && ret > 0)
 		fail("Error %s leaf constraint accepted unexpectedly\n", label);
 
+	ret = gnutls_x509_crt_verify(crt, chain, chain_len,
+				     GNUTLS_VERIFY_DISABLE_TIME_CHECKS,
+				     &status);
+	if (ret < 0)
+		fail("Error %s certificate verify error: %s\n", label,
+		     gnutls_strerror(ret));
+	violated = status & GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE;
+
+	if (expect_pass && violated)
+		fail("Error %s certificate rejected unexpectedly\n", label);
+	else if (!expect_pass && !violated)
+		fail("Error %s certificate accepted unexpectedly\n", label);
+
 	gnutls_x509_crt_deinit(crt);
 }
 
@@ -199,18 +240,28 @@ void doit(void)
 {
 	int ret;
 	unsigned int critical = 0;
-	gnutls_x509_crt_t issuingca;
+	gnutls_x509_crt_t issuingca, rootca;
+	gnutls_x509_crt_t chain[2];
 	gnutls_datum_t issuingca_datum = { (void *)_issuingca,
 					   sizeof(_issuingca) - 1 };
+	gnutls_datum_t rootca_datum = { (void *)_rootca, sizeof(_rootca) - 1 };
 
 	global_init();
 
 	gnutls_x509_crt_init(&issuingca);
-
 	ret = gnutls_x509_crt_import(issuingca, &issuingca_datum,
 				     GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		fail("Error importing issuing CA: %s\n", gnutls_strerror(ret));
+
+	gnutls_x509_crt_init(&rootca);
+	ret = gnutls_x509_crt_import(rootca, &rootca_datum,
+				     GNUTLS_X509_FMT_PEM);
+	if (ret < 0)
+		fail("Error importing root CA: %s\n", gnutls_strerror(ret));
+
+	chain[0] = issuingca;
+	chain[1] = rootca;
 
 	gnutls_x509_name_constraints_t name_constraints = NULL;
 
@@ -226,11 +277,12 @@ void doit(void)
 
 	verify_upn_constraints(name_constraints);
 
-	verify_leaf(name_constraints, "domaincontroller", _domaincontroller,
-		    GNUTLS_SAN_DNSNAME, 1);
+	verify_leaf(chain, 2, name_constraints, "domaincontroller",
+		    _domaincontroller, GNUTLS_SAN_DNSNAME, 1);
 
 	gnutls_x509_name_constraints_deinit(name_constraints);
 	gnutls_x509_crt_deinit(issuingca);
+	gnutls_x509_crt_deinit(rootca);
 
 	success("UPN constraints tests completed successfully\n");
 
