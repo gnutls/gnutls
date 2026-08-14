@@ -25,6 +25,8 @@
 #include <gnutls/x509.h>
 #include <gnutls/x509-ext.h>
 
+#include <stdbool.h>
+
 /* Test that UPN OTHERNAME constraints in a CA certificate are parsed correctly
  *
  * Test that a leaf certificate with a DNSName validates correctly
@@ -34,7 +36,8 @@
  */
 
 void verify_upn_constraints(gnutls_x509_name_constraints_t);
-void verify_non_upn_leaf(gnutls_x509_name_constraints_t);
+void verify_leaf(gnutls_x509_name_constraints_t, const char *, const char *,
+		 unsigned, bool);
 
 static const char _domaincontroller[] = {
 	"-----BEGIN CERTIFICATE-----\n"
@@ -166,29 +169,30 @@ void verify_upn_constraints(gnutls_x509_name_constraints_t name_constraints)
 		     constraint.data, subdomain3);
 }
 
-void verify_non_upn_leaf(gnutls_x509_name_constraints_t name_constraints)
+void verify_leaf(gnutls_x509_name_constraints_t name_constraints,
+		 const char *label, const char *cert_pem, unsigned int san_type,
+		 bool expect_pass)
 {
-	// This test specifically checks for resolution of issue 1132
-	int ret = 0;
-	gnutls_x509_crt_t domaincontroller;
-	gnutls_datum_t domaincontroller_datum = {
-		(void *)_domaincontroller, sizeof(_domaincontroller) - 1
-	};
+	int ret;
+	gnutls_x509_crt_t crt;
+	gnutls_datum_t datum = { (void *)cert_pem, strlen(cert_pem) };
 
-	gnutls_x509_crt_init(&domaincontroller);
+	gnutls_x509_crt_init(&crt);
 
-	ret = gnutls_x509_crt_import(domaincontroller, &domaincontroller_datum,
-				     GNUTLS_X509_FMT_PEM);
+	ret = gnutls_x509_crt_import(crt, &datum, GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
-		fail("Error importing domain controller cert: %s\n",
+		fail("Error importing %s cert: %s\n", label,
 		     gnutls_strerror(ret));
 
-	ret = gnutls_x509_name_constraints_check_crt(
-		name_constraints, GNUTLS_SAN_DNSNAME, domaincontroller);
-	if (ret < 0)
-		fail("Error failed to verify leaf cert against constraints\n");
+	ret = gnutls_x509_name_constraints_check_crt(name_constraints, san_type,
+						     crt);
 
-	gnutls_x509_crt_deinit(domaincontroller);
+	if (expect_pass && ret <= 0)
+		fail("Error %s leaf constraint rejected unexpectedly\n", label);
+	else if (!expect_pass && ret > 0)
+		fail("Error %s leaf constraint accepted unexpectedly\n", label);
+
+	gnutls_x509_crt_deinit(crt);
 }
 
 void doit(void)
@@ -222,7 +226,8 @@ void doit(void)
 
 	verify_upn_constraints(name_constraints);
 
-	verify_non_upn_leaf(name_constraints);
+	verify_leaf(name_constraints, "domaincontroller", _domaincontroller,
+		    GNUTLS_SAN_DNSNAME, 1);
 
 	gnutls_x509_name_constraints_deinit(name_constraints);
 	gnutls_x509_crt_deinit(issuingca);
