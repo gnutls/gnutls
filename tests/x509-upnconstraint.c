@@ -25,8 +25,7 @@
 #include <gnutls/x509.h>
 #include <gnutls/x509-ext.h>
 
-/* Test that UPN OTHERNAME constraints in a CA certificate 
- * are parsed correctly
+/* Test that UPN OTHERNAME constraints in a CA certificate are parsed correctly
  *
  * Test that a leaf certificate with a DNSName validates correctly
  * when issued by a CA with UPN OTHERNAME constraints (Issue 1132)
@@ -111,87 +110,63 @@ void verify_upn_constraints(gnutls_x509_name_constraints_t name_constraints)
 	gnutls_datum_t constraint = { NULL, 0 };
 	ret = gnutls_x509_name_constraints_get_permitted(name_constraints, 3,
 							 &type, &constraint);
-	if (ret < 0) {
-		fail("Error getting permitted constraint line %d: %s\n",
-		     __LINE__, gnutls_strerror(ret));
-		exit(1);
-	}
+	if (ret < 0)
+		fail("Error getting permitted constraint: %s\n",
+		     gnutls_strerror(ret));
 
-	if (type != GNUTLS_SAN_OTHERNAME_MSUSERPRINCIPAL) {
-		fail("Error permitted constraint 3 is not UPN line: %d Found: %u\n",
-		     __LINE__, type);
-		exit(1);
-	}
+	if (type != GNUTLS_SAN_OTHERNAME_MSUSERPRINCIPAL)
+		fail("Error permitted constraint 3 is not UPN, found: %u\n",
+		     type);
 
 	if ((constraint.size != sizeof(example3) - 1) ||
-	    !memeq(constraint.data, example3, sizeof(example3) - 1)) {
-		fail("Error permitted constraint 3 was %s expected %s line: %d\n",
-		     constraint.data, example3, __LINE__);
-		exit(1);
-	}
+	    !memeq(constraint.data, example3, sizeof(example3) - 1))
+		fail("Error permitted constraint 3 was %s expected %s\n",
+		     constraint.data, example3);
 
 	ret = gnutls_x509_name_constraints_get_permitted(name_constraints, 4,
 							 &type, &constraint);
-	if (ret < 0) {
-		fail("Error getting permitted constraint line %d: %s\n",
-		     __LINE__, gnutls_strerror(ret));
-		exit(1);
-	}
+	if (ret < 0)
+		fail("Error getting permitted constraint: %s\n",
+		     gnutls_strerror(ret));
 
-	if (type != GNUTLS_SAN_OTHERNAME_MSUSERPRINCIPAL) {
-		fail("Error permitted constraint 4 is not UPN line: %d Found: %u\n",
-		     __LINE__, type);
-		exit(1);
-	}
+	if (type != GNUTLS_SAN_OTHERNAME_MSUSERPRINCIPAL)
+		fail("Error permitted constraint 4 is not UPN, found: %u\n",
+		     type);
 
 	if ((constraint.size != sizeof(example4) - 1) ||
-	    !memeq(constraint.data, example4, sizeof(example4) - 1)) {
-		fail("Error permitted constraint 4 was %s expected %s line: %d\n",
-		     constraint.data, example4, __LINE__);
-		exit(1);
-	}
+	    !memeq(constraint.data, example4, sizeof(example4) - 1))
+		fail("Error permitted constraint 4 was %s expected %s\n",
+		     constraint.data, example4);
 
 	ret = gnutls_x509_name_constraints_get_excluded(name_constraints, 2,
 							&type, &constraint);
-	if (ret < 0) {
-		fail("Error getting excluded constraint line %d: %s\n",
-		     __LINE__, gnutls_strerror(ret));
-		exit(1);
-	}
+	if (ret < 0)
+		fail("Error getting excluded constraint: %s\n",
+		     gnutls_strerror(ret));
 
-	if (type != GNUTLS_SAN_OTHERNAME_MSUSERPRINCIPAL) {
-		fail("Error excluded constraint 2 is not UPN line: %d Found %u\n",
-		     __LINE__, type);
-		exit(1);
-	}
+	if (type != GNUTLS_SAN_OTHERNAME_MSUSERPRINCIPAL)
+		fail("Error excluded constraint 2 is not UPN, found %u\n",
+		     type);
 
 	if ((constraint.size != sizeof(subdomain2) - 1) ||
-	    !memeq(constraint.data, subdomain2, sizeof(subdomain2) - 1)) {
-		fail("Error excluded constraint 2 was %s expected %s line: %d\n",
-		     constraint.data, subdomain2, __LINE__);
-		exit(1);
-	}
+	    !memeq(constraint.data, subdomain2, sizeof(subdomain2) - 1))
+		fail("Error excluded constraint 2 was %s expected %s\n",
+		     constraint.data, subdomain2);
 
 	ret = gnutls_x509_name_constraints_get_excluded(name_constraints, 3,
 							&type, &constraint);
-	if (ret < 0) {
-		fail("Error getting excluded constraint line %d: %s\n",
-		     __LINE__, gnutls_strerror(ret));
-		exit(1);
-	}
+	if (ret < 0)
+		fail("Error getting excluded constraint: %s\n",
+		     gnutls_strerror(ret));
 
-	if (type != GNUTLS_SAN_OTHERNAME_MSUSERPRINCIPAL) {
-		fail("Error excluded constraint 3 is not UPN line: %d Found %u\n",
-		     __LINE__, type);
-		exit(1);
-	}
+	if (type != GNUTLS_SAN_OTHERNAME_MSUSERPRINCIPAL)
+		fail("Error excluded constraint 3 is not UPN, found %u\n",
+		     type);
 
 	if ((constraint.size != sizeof(subdomain3) - 1) ||
-	    !memeq(constraint.data, subdomain3, sizeof(subdomain3) - 1)) {
-		fail("Error excluded constraint 3 was %s expected %s line: %d\n",
-		     constraint.data, subdomain3, __LINE__);
-		exit(1);
-	}
+	    !memeq(constraint.data, subdomain3, sizeof(subdomain3) - 1))
+		fail("Error excluded constraint 3 was %s expected %s\n",
+		     constraint.data, subdomain3);
 }
 
 void verify_non_upn_leaf(gnutls_x509_name_constraints_t name_constraints)
@@ -207,19 +182,14 @@ void verify_non_upn_leaf(gnutls_x509_name_constraints_t name_constraints)
 
 	ret = gnutls_x509_crt_import(domaincontroller, &domaincontroller_datum,
 				     GNUTLS_X509_FMT_PEM);
-	if (ret < 0) {
-		fail("Error importing domain controller cert line %d: %s\n",
-		     __LINE__, gnutls_strerror(ret));
-		exit(1);
-	}
+	if (ret < 0)
+		fail("Error importing domain controller cert: %s\n",
+		     gnutls_strerror(ret));
 
 	ret = gnutls_x509_name_constraints_check_crt(
 		name_constraints, GNUTLS_SAN_DNSNAME, domaincontroller);
-	if (ret < 0) {
-		fail("Error failed to verify leaf cert against constraints line: %d\n",
-		     __LINE__);
-		exit(1);
-	}
+	if (ret < 0)
+		fail("Error failed to verify leaf cert against constraints\n");
 
 	gnutls_x509_crt_deinit(domaincontroller);
 }
@@ -238,28 +208,20 @@ void doit(void)
 
 	ret = gnutls_x509_crt_import(issuingca, &issuingca_datum,
 				     GNUTLS_X509_FMT_PEM);
-	if (ret < 0) {
-		fail("Error importing issuing CA line %d: %s\n", __LINE__,
-		     gnutls_strerror(ret));
-		exit(1);
-	}
+	if (ret < 0)
+		fail("Error importing issuing CA: %s\n", gnutls_strerror(ret));
 
 	gnutls_x509_name_constraints_t name_constraints = NULL;
 
 	ret = gnutls_x509_name_constraints_init(&name_constraints);
-	if (ret < 0) {
-		fail("Error initializing constraints structure line %d: %s\n",
-		     __LINE__, gnutls_strerror(ret));
-		exit(1);
-	}
+	if (ret < 0)
+		fail("Error initializing constraints structure: %s\n",
+		     gnutls_strerror(ret));
 
 	ret = gnutls_x509_crt_get_name_constraints(issuingca, name_constraints,
 						   0, &critical);
-	if (ret < 0) {
-		// Failure here is potentially a regression to issue 1132 behavior
-		fail("Error loading constraints line: %d\n", __LINE__);
-		exit(1);
-	}
+	if (ret < 0) /* #1132 */
+		fail("Error loading constraints\n");
 
 	verify_upn_constraints(name_constraints);
 
