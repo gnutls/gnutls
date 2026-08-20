@@ -1472,18 +1472,14 @@ static bool has_constraints_of_type(gnutls_x509_name_constraints_t nc,
 	/* check if there are restrictions with that type,
 	 * if yes, then reject the name.
 	 */
-	i = 0;
-	do {
-		ret = gnutls_x509_name_constraints_get_excluded(nc, i++, &rtype,
+	for (i = 0;; i++) {
+		ret = gnutls_x509_name_constraints_get_excluded(nc, i, &rtype,
 								&rname);
-		if (ret >= 0) {
-			if (rtype != type)
-				continue;
-			else
-				return gnutls_assert_val(false);
-		}
-
-	} while (ret == 0);
+		if (ret < 0)
+			break;
+		if (rtype == type)
+			return gnutls_assert_val(false);
+	}
 
 	return true;
 }
