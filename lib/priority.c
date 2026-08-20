@@ -2608,12 +2608,9 @@ const char *gnutls_get_system_config_file(void)
  */
 char *_gnutls_resolve_priorities(const char *priorities)
 {
-	const char *p = priorities;
-	const char *additional = NULL;
-	char *resolved = NULL;
-	const char *ss, *ss_next;
-	unsigned ss_len, ss_next_len;
-	size_t n, n2 = 0;
+	const char *p = priorities, *next, *end;
+	const char *expanded = NULL;
+	char *resolved = NULL, *rp = NULL;
 	int ret;
 
 	while (c_isspace(*p)) {
@@ -2625,11 +2622,8 @@ char *_gnutls_resolve_priorities(const char *priorities)
 		return gnutls_strdup(p);
 	}
 
-	ss = p + 1;
-	additional = strchr(ss, ':');
-	if (additional) {
-		additional++;
-	}
+	p++;
+	end = strchrnul(p, ':');
 
 	/* Always try to refresh the cached data, to allow it to be
 	 * updated without restarting all applications.
@@ -2640,71 +2634,57 @@ char *_gnutls_resolve_priorities(const char *priorities)
 				  gnutls_strerror(ret));
 	}
 
-	do {
-		ss_next = strchr(ss, ',');
-		if (ss_next) {
-			if (additional && ss_next > additional) {
-				ss_next = NULL;
-			} else {
-				ss_next++;
-			}
-		}
+	/* The loop below will access system_wide_config. Protect it
+	 * until a copy is made.
+	 */
+	ret = gnutls_rwlock_rdlock(&system_wide_config_rwlock);
+	if (ret < 0) {
+		_gnutls_debug_log("cannot read system priority strings: %s\n",
+				  gnutls_strerror(ret));
+		return NULL;
+	}
 
-		if (ss_next) {
-			ss_len = ss_next - ss - 1;
-			ss_next_len = additional - ss_next - 1;
-		} else if (additional) {
-			ss_len = additional - ss - 1;
-			ss_next_len = 0;
+	/* Loop until any of comma separated keywords resolves. */
+	while (p < end) {
+		next = memchr(p, ',', end - p);
+		if (!next)
+			next = end;
+
+		if (system_wide_config.allowlisting &&
+		    next - p == sizeof(LEVEL_SYSTEM) - 1 &&
+		    memeq(p, LEVEL_SYSTEM, next - p)) {
+			expanded = system_wide_config.priority_string;
 		} else {
-			ss_len = strlen(ss);
-			ss_next_len = 0;
+			expanded = name_value_array_value(
+				system_wide_config.priority_strings, p,
+				next - p);
 		}
 
-		ret = gnutls_rwlock_rdlock(&system_wide_config_rwlock);
-		if (ret < 0) {
-			_gnutls_debug_log(
-				"cannot read system priority strings: %s\n",
-				gnutls_strerror(ret));
+		if (expanded) {
+			/* Logged later. */
 			break;
 		}
-		if (system_wide_config.allowlisting &&
-		    ss_len == sizeof(LEVEL_SYSTEM) - 1 &&
-		    strncmp(LEVEL_SYSTEM, ss, ss_len) == 0) {
-			p = system_wide_config.priority_string;
-		} else {
-			p = name_value_array_value(
-				system_wide_config.priority_strings, ss,
-				ss_len);
-		}
 
+		p = next + 1;
+	}
+
+	if (expanded) {
+		resolved = gnutls_malloc(strlen(expanded) + strlen(end) + 1);
+		if (resolved)
+			rp = stpcpy(resolved, expanded);
+	}
+
+	(void)gnutls_rwlock_unlock(&system_wide_config_rwlock);
+
+	if (rp) {
+		/* Log this only after releasing
+		 * system_wide_config_rwlock. EXPANDED is already
+		 * copied to RESOLVED above. */
 		_gnutls_debug_log("resolved '%.*s' to '%s', next '%.*s'\n",
-				  ss_len, ss, S(p), ss_next_len, S(ss_next));
-
-		if (p) {
-			n = strlen(p);
-			if (additional) {
-				n2 = strlen(additional);
-			}
-
-			resolved = gnutls_malloc(n + n2 + 1 + 1);
-			if (resolved) {
-				memcpy(resolved, p, n);
-				if (additional) {
-					resolved[n] = ':';
-					memcpy(&resolved[n + 1], additional,
-					       n2);
-					resolved[n + n2 + 1] = 0;
-				} else {
-					resolved[n] = 0;
-				}
-			}
-		}
-
-		(void)gnutls_rwlock_unlock(&system_wide_config_rwlock);
-
-		ss = ss_next;
-	} while (ss && !resolved);
+				  (int)(next - p), p, S(resolved),
+				  (int)(end - next), S(next));
+		stpcpy(rp, end);
+	}
 
 	if (resolved) {
 		_gnutls_debug_log("selected priority string: %s\n", resolved);
