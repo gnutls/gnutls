@@ -429,10 +429,14 @@ cleanup:
 static void
 name_constraints_node_list_deinit(struct name_constraints_node_list_st *list)
 {
-	if (list->items)
+	if (list->items) {
 		gl_list_free(list->items);
-	if (list->sorted_items)
+		list->items = NULL;
+	}
+	if (list->sorted_items) {
 		gl_list_free(list->sorted_items);
+		list->sorted_items = NULL;
+	}
 }
 
 static struct name_constraints_node_list_st
@@ -1158,8 +1162,10 @@ cleanup:
 
 static void name_constraints_deinit(struct gnutls_name_constraints_st *nc)
 {
-	if (nc->nodes)
+	if (nc->nodes) {
 		gl_list_free(nc->nodes);
+		nc->nodes = NULL;
+	}
 	name_constraints_node_list_deinit(&nc->permitted);
 	name_constraints_node_list_deinit(&nc->excluded);
 }
