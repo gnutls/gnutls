@@ -444,17 +444,21 @@ void doit(void)
 {
 	signal(SIGCHLD, ch_handler);
 
+#ifdef ENABLE_TLS1_1
 	start(AES_CBC, 0);
+#endif
 	start(AES_CBC_SHA256, 0);
 	start(AES_GCM, 0);
 	start(TLS13_AES_GCM, 0);
 
+#ifdef ENABLE_TLS1_1
 	if (!gnutls_fips140_mode_enabled()) {
 		start(NULL_SHA1, 0);
 
 		start(ARCFOUR_SHA1, 0);
 		start(ARCFOUR_MD5, 0);
 	}
+#endif
 }
 
 #endif /* _WIN32 */

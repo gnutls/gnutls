@@ -313,6 +313,7 @@ void doit(void)
 
 	/* overhead for CBC depends on MTU */
 
+#ifdef ENABLE_TLS1_1
 	/* 13 + 20(sha1) + 16(iv) + 16(pad) */
 	start("NONE:+VERS-DTLS1.0:%NO_ETM:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA",
 	      65);
@@ -321,6 +322,7 @@ void doit(void)
 	if (!gnutls_fips140_mode_enabled())
 		start("NONE:+VERS-DTLS1.0:+3DES-CBC:%NO_ETM:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA",
 		      49);
+#endif
 
 	/* 13 + 16(tag) + 4(iv) */
 	start("NONE:+VERS-DTLS1.2:+AES-128-GCM:%NO_ETM:+AEAD:+SIGN-ALL:+COMP-NULL:+RSA",

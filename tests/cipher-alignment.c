@@ -507,7 +507,9 @@ void doit(void)
 		fail("%d: cannot register cipher\n", __LINE__);
 	}
 
+#ifdef ENABLE_TLS1_1
 	start("NORMAL:-CIPHER-ALL:+AES-128-CBC:-VERS-ALL:+VERS-TLS1.1");
+#endif
 	start("NORMAL:-CIPHER-ALL:+AES-128-CBC:-VERS-ALL:+VERS-TLS1.2");
 
 	assert(aes_init != 0);

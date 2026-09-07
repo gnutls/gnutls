@@ -37,6 +37,7 @@
 
 void doit(void)
 {
+#ifdef ENABLE_TLS1_1
 	global_init();
 
 	try_x509("TLS 1.1 with anon-ecdh",
@@ -113,4 +114,7 @@ void doit(void)
 		&server_ca3_rsa_pss_cert, &server_ca3_rsa_pss_key, NULL, NULL);
 
 	gnutls_global_deinit();
+#else
+	exit(77);
+#endif
 }

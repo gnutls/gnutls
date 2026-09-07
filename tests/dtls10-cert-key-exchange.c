@@ -37,6 +37,7 @@
 
 void doit(void)
 {
+#ifdef ENABLE_TLS1_1
 	global_init();
 
 	dtls_try("DTLS 1.0 with anon-ecdh",
@@ -106,4 +107,7 @@ void doit(void)
 			  ASK_CERT);
 
 	gnutls_global_deinit();
+#else
+	exit(77);
+#endif
 }

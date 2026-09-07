@@ -347,6 +347,7 @@ static const test_st tests[] = {
 	  .key = &server_ca3_ecc_key,
 	  .sig = GNUTLS_SIGN_ECDSA_SHA256,
 	  .exp_kx = GNUTLS_KX_ECDHE_ECDSA },
+#ifdef ENABLE_TLS1_1
 	{ .name = "tls1.0 ecc key",
 	  .pk = GNUTLS_PK_ECDSA,
 	  .prio = "NORMAL:-KX-ALL:+ECDHE-RSA:+ECDHE-ECDSA:-VERS-ALL:+VERS-TLS1.0",
@@ -361,6 +362,7 @@ static const test_st tests[] = {
 	  .key = &server_ca3_ecc_key,
 	  .sig = GNUTLS_SIGN_ECDSA_SHA256,
 	  .exp_kx = GNUTLS_KX_ECDHE_ECDSA },
+#endif
 	{ .name = "tls1.2 rsa-sign key",
 	  .pk = GNUTLS_PK_RSA,
 	  .prio = "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA:-VERS-ALL:+VERS-TLS1.2",
@@ -368,6 +370,7 @@ static const test_st tests[] = {
 	  .key = &server_ca3_key,
 	  .sig = GNUTLS_SIGN_RSA_SHA256,
 	  .exp_kx = GNUTLS_KX_ECDHE_RSA },
+#ifdef ENABLE_TLS1_1
 	{ .name = "tls1.0 rsa-sign key",
 	  .pk = GNUTLS_PK_RSA,
 	  .prio = "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA:-VERS-ALL:+VERS-TLS1.0",
@@ -388,6 +391,7 @@ static const test_st tests[] = {
 	  .key = &server_ca3_key,
 	  .sig = GNUTLS_SIGN_RSA_SHA256,
 	  .exp_kx = GNUTLS_KX_ECDHE_RSA },
+#endif
 	{ .name = "tls1.2 rsa-sign key with rsa-pss sigs prioritized",
 	  .pk = GNUTLS_PK_RSA,
 	  .prio = "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA:-SIGN-ALL:+SIGN-RSA-PSS-SHA256:+SIGN-RSA-PSS-SHA384:+SIGN-RSA-PSS-SHA512:+SIGN-RSA-SHA256:+SIGN-RSA-SHA384:+SIGN-RSA-SHA512:-VERS-ALL:+VERS-TLS1.2",

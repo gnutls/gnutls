@@ -76,20 +76,28 @@ fi
 if test "${ENABLE_SSL3}" = "1";then
 echo "Running with SSL3.0 enabled"
 check SSL3.0 "NORMAL:-VERS-ALL:+VERS-SSL3.0:+ARCFOUR-128"
+if test "${ENABLE_TLS1_1}" = "1";then
 check old-SSL3.0-TLS1.1 "NORMAL:-VERS-ALL:+VERS-TLS1.0:+VERS-SSL3.0:+VERS-TLS1.1"
+fi
 else
 echo "Running without support for SSL3.0"
+if test "${ENABLE_TLS1_1}" = "1";then
 check SSL3.0-TLS1.1 "NORMAL:-VERS-ALL:+VERS-TLS1.0:+VERS-SSL3.0:+VERS-TLS1.1"
 fi
+fi
+if test "${ENABLE_TLS1_1}" = "1";then
 check TLS1.0 "NORMAL:-VERS-ALL:+VERS-TLS1.0"
 check TLS1.1 "NORMAL:-VERS-ALL:+VERS-TLS1.1"
 check DTLS1.0 "NORMAL:-VERS-ALL:+VERS-DTLS1.0"
+fi
 # Priority strings prior to 3.6.x did not require the +GROUP option; here we
 # test whether these work as expected.
+if test "${ENABLE_TLS1_1}" = "1";then
 check legacy1 "NONE:+VERS-TLS-ALL:+MAC-ALL:+RSA:+AES-128-GCM:+SIGN-ALL:+COMP-NULL"
 check legacy2 "NONE:+VERS-TLS-ALL:+MAC-ALL:+RSA:+CAMELLIA-256-GCM:+SIGN-ALL:+COMP-NULL"
 check legacy3 "NONE:+VERS-TLS-ALL:+MAC-ALL:+RSA:+CAMELLIA-256-GCM:+SIGN-ALL:+COMP-NULL:+CTYPE-OPENPGP"
 check legacy4 "NONE:+VERS-TLS-ALL:+MAC-ALL:+RSA:+CAMELLIA-256-GCM:+SIGN-ALL:+COMP-NULL:-CTYPE-OPENPGP"
+fi
 
 
 rm -f ${TMPFILE}

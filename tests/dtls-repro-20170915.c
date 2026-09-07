@@ -37,6 +37,9 @@
 
 void doit(void)
 {
+#ifndef ENABLE_TLS1_1
+	exit(77);
+#endif
 	global_init();
 
 	dtls_try_with_key_mtu(

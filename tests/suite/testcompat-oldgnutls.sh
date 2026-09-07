@@ -50,6 +50,10 @@ if test "${WINDIR}" != ""; then
 	exit 77
 fi
 
+if test "${ENABLE_TLS1_1}" != "1"; then
+	exit 77
+fi
+
 LDPATH=/usr/local/OLDGNUTLS/lib/x86_64-linux-gnu:/usr/local/OLDGNUTLS/usr/lib/x86_64-linux-gnu
 
 . "${srcdir}/../scripts/common.sh"

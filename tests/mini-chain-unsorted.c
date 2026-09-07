@@ -348,10 +348,14 @@ static void ch_handler(int sig)
 
 void doit(void)
 {
+#ifdef ENABLE_TLS1_1
 	signal(SIGCHLD, ch_handler);
 	signal(SIGPIPE, SIG_IGN);
 
 	start();
+#else
+	exit(77);
+#endif
 }
 
 #endif /* _WIN32 */

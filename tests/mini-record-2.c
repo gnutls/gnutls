@@ -441,17 +441,21 @@ void doit(void)
 {
 	signal(SIGCHLD, ch_handler);
 
+#ifdef ENABLE_TLS1_1
 	start("aes-cbc", AES_CBC, 1);
+#endif
 	start("aes-cbc-sha256", AES_CBC_SHA256, 1);
 	start("aes-gcm", AES_GCM, 0);
 	start("aes-ccm", AES_CCM, 0);
 	start("aes-ccm-8", AES_CCM_8, 0);
 
 	if (!gnutls_fips140_mode_enabled()) {
+#ifdef ENABLE_TLS1_1
 		start("null-sha1", NULL_SHA1, 0);
 
 		start("arcfour-sha1", ARCFOUR_SHA1, 0);
 		start("arcfour-md5", ARCFOUR_MD5, 0);
+#endif
 		start("chacha20-poly1305", CHACHA_POLY1305, 0);
 		start("tls13-chacha20-poly1305", TLS13_CHACHA_POLY1305, 0);
 	}

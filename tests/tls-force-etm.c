@@ -343,10 +343,12 @@ static void ch_handler(int sig)
 }
 
 static struct test_st tests[] = {
+#ifdef ENABLE_TLS1_1
 	{ .name = "aes-cbc-hmac-sha1 with force etm",
 	  .server_prio = AES_CBC ":%FORCE_ETM",
 	  .client_prio = AES_CBC ":%FORCE_ETM",
 	  .etm = 1 },
+#endif
 	{ .name = "aes-cbc-hmac-sha256 with force etm",
 	  .server_prio = AES_CBC_SHA256 ":%FORCE_ETM",
 	  .client_prio = AES_CBC_SHA256 ":%FORCE_ETM",
@@ -359,6 +361,7 @@ static struct test_st tests[] = {
 	  .server_prio = AES_GCM ":%FORCE_ETM",
 	  .client_prio = AES_GCM ":%FORCE_ETM",
 	  .etm = 0 },
+#ifdef ENABLE_TLS1_1
 	{ .name = "server aes-cbc-hmac-sha1 with force etm failure",
 	  .server_prio = AES_CBC ":%FORCE_ETM",
 	  .client_prio = AES_CBC ":%NO_ETM",
@@ -371,6 +374,7 @@ static struct test_st tests[] = {
 	  .etm = 0,
 	  .client_err = GNUTLS_E_UNWANTED_ALGORITHM,
 	  .server_err = -1 }
+#endif
 };
 
 void doit(void)

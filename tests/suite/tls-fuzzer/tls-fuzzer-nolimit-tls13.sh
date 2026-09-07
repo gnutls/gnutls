@@ -20,7 +20,11 @@
 : ${srcdir=.}
 
 tls_fuzzer_prepare() {
-PRIORITY="NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:+VERS-TLS1.1:%ALLOW_SMALL_RECORDS"
+PRIORITY="NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2"
+if test "${ENABLE_TLS1_1}" = "1"; then
+	PRIORITY="${PRIORITY}:+VERS-TLS1.1"
+fi
+PRIORITY="${PRIORITY}:%ALLOW_SMALL_RECORDS"
 
 sed -e "s|@SERVER@|$SERV|g" -e "s/@PORT@/$PORT/g" -e "s/@PRIORITY@/$PRIORITY/g" ../gnutls-nolimit-tls13.json >${TMPFILE}
 }

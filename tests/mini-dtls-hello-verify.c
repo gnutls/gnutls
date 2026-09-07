@@ -307,6 +307,7 @@ static void server(int fd)
 
 void doit(void)
 {
+#ifdef ENABLE_TLS1_1
 	int fd[2];
 	int ret;
 
@@ -337,6 +338,9 @@ void doit(void)
 		client(fd[1]);
 		exit(0);
 	}
+#else
+	exit(77);
+#endif
 }
 
 #endif /* _WIN32 */

@@ -57,7 +57,11 @@ fi
 
 echo "Checking various DSA key sizes (port ${PORT})"
 
+PRIO="--priority NORMAL:+DHE-DSS:+SIGN-DSA-SHA512:+SIGN-DSA-SHA384:+SIGN-DSA-SHA256:+SIGN-DSA-SHA1"
+
 # DSA 1024 + TLS 1.0
+
+if test "${ENABLE_TLS1_1}" = "1";then
 
 echo "Checking DSA-1024 with TLS 1.0"
 
@@ -72,24 +76,26 @@ PRIO="--priority NORMAL:+DHE-DSS:+SIGN-DSA-SHA512:+SIGN-DSA-SHA384:+SIGN-DSA-SHA
 
 echo "Checking server DSA-1024 with client DSA-1024 and TLS 1.0"
 
-#try with client key of 1024 bits (should succeed) 
+#try with client key of 1024 bits (should succeed)
 "${CLI}" ${DEBUG} ${PRIO} -p "${PORT}" 127.0.0.1 --insecure --x509certfile "${srcdir}/data/cert.dsa.1024.pem" --x509keyfile "${srcdir}/data/dsa.1024.pem" </dev/null >/dev/null || \
 	fail "${PID}" "Failed connection to a server with DSA 1024 key and TLS 1.0!"
 
 echo "Checking server DSA-1024 with client DSA-2048 and TLS 1.0"
 
-#try with client key of 2048 bits (should fail) 
+#try with client key of 2048 bits (should fail)
 "${CLI}" ${DEBUG} ${PRIO} -p "${PORT}" 127.0.0.1 --insecure --x509certfile "${srcdir}/data/cert.dsa.2048.pem" --x509keyfile "${srcdir}/data/dsa.2048.pem" </dev/null >/dev/null 2>&1 && \
 	fail "${PID}" "Succeeded connection to a server with a client DSA 2048 key and TLS 1.0!"
 
 echo "Checking server DSA-1024 with client DSA-3072 and TLS 1.0"
 
-#try with client key of 3072 bits (should fail) 
+#try with client key of 3072 bits (should fail)
 "${CLI}" ${DEBUG} ${PRIO} -p "${PORT}" 127.0.0.1 --insecure --x509certfile "${srcdir}/data/cert.dsa.3072.pem" --x509keyfile "${srcdir}/data/dsa.3072.pem" </dev/null >/dev/null 2>&1 && \
 	fail "${PID}" "Succeeded connection to a server with a client DSA 3072 key and TLS 1.0!"
 
 kill "${PID}"
 wait
+
+fi # ENABLE_TLS1_1
 
 # DSA 1024 + TLS 1.2
 

@@ -490,6 +490,9 @@ static void start(void)
 
 void doit(void)
 {
+#ifndef ENABLE_TLS1_1
+	exit(77);
+#endif
 	start();
 }
 

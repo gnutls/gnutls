@@ -62,6 +62,17 @@ CERT4=${srcdir}/../doc/credentials/x509/cert-gost12.pem
 CAFILE=${srcdir}/../doc/credentials/x509/ca.pem
 TMPFILE=outcert.$$.tmp
 
+check_text() {
+	echo " - Checking ${OUTFILE} for \"$1\""
+	grep "$1" $OUTFILE >/dev/null
+	if test $? != 0; then
+		echo "failed"
+		exit 1
+	fi
+}
+
+if test "${ENABLE_TLS1_1}" = "1";then
+
 # TLS1.1 and TLS1.2 test
 echo "Checking output of gnutls-cli-debug for TLS1.1 and TLS1.2 server"
 
@@ -76,15 +87,6 @@ wait_server ${PID}
 
 kill ${PID}
 wait
-
-check_text() {
-	echo " - Checking ${OUTFILE} for \"$1\""
-	grep "$1" $OUTFILE >/dev/null
-	if test $? != 0; then
-		echo "failed"
-		exit 1
-	fi
-}
 
 check_text "whether we need to disable TLS 1.2... no"
 check_text "for TLS 1.0 (RFC2246) support... no"
@@ -108,6 +110,8 @@ fi
 
 rm -f ${OUTFILE}
 
+fi # ENABLE_TLS1_1
+
 # TLS1.3 and TLS1.2 test
 echo ""
 echo "Checking output of gnutls-cli-debug for TLS1.3 and TLS1.2 server"
@@ -125,8 +129,10 @@ kill ${PID}
 wait
 
 check_text "whether we need to disable TLS 1.2... no"
+if test "${ENABLE_TLS1_1}" = "1";then
 check_text "for TLS 1.0 (RFC2246) support... no"
 check_text "for TLS 1.1 (RFC4346) support... no"
+fi
 check_text "for TLS 1.2 (RFC5246) support... yes"
 check_text "for TLS 1.3 (RFC8446) support... yes"
 check_text "TLS1.2 neg fallback from TLS 1.6 to... TLS1.2"

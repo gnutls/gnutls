@@ -222,18 +222,32 @@ static int client_hello_callback(gnutls_session_t session, unsigned int htype,
 				fail("extension length is odd!\n");
 			}
 
+#ifdef ENABLE_TLS1_1
 			if (size != 6) {
 				fail("expected three versions only (%d)!\n",
 				     (int)size);
 			}
+#else
+			if (size != 4) {
+				fail("expected two versions only (%d)!\n",
+				     (int)size);
+			}
+#endif
 			pos++;
 
+#ifdef ENABLE_TLS1_1
 			success("client hello:\n\t%d.%d\n\t%d.%d\n\t%d.%d\n",
 				(int)msg->data[pos], (int)msg->data[pos + 1],
 				(int)msg->data[pos + 2],
 				(int)msg->data[pos + 3],
 				(int)msg->data[pos + 4],
 				(int)msg->data[pos + 5]);
+#else
+			success("client hello:\n\t%d.%d\n\t%d.%d\n",
+				(int)msg->data[pos], (int)msg->data[pos + 1],
+				(int)msg->data[pos + 2],
+				(int)msg->data[pos + 3]);
+#endif
 
 			if (msg->data[pos] != 0x03 ||
 			    msg->data[pos + 1] != 0x04) {
@@ -251,12 +265,14 @@ static int client_hello_callback(gnutls_session_t session, unsigned int htype,
 			}
 			pos += 2;
 
+#ifdef ENABLE_TLS1_1
 			if (msg->data[pos] != 0x03 ||
 			    msg->data[pos + 1] != 0x01) {
 				fail("fail expected TLS 1.0, got %d.%d\n",
 				     (int)msg->data[pos],
 				     (int)msg->data[pos + 1]);
 			}
+#endif
 			pos += 2;
 			client_hello_ok = 1;
 			break;
