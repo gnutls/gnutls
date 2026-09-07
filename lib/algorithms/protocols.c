@@ -52,12 +52,14 @@ static SYSTEM_CONFIG_OR_CONST version_entry_st sup_versions[] = {
 	  .major = 3,
 	  .minor = 1,
 	  .transport = GNUTLS_STREAM,
+#ifdef ENABLE_TLS1_1
 	  .supported = 1,
+#endif
 	  .explicit_iv = 0,
 	  .extensions = 1,
 	  .selectable_sighash = 0,
 	  .selectable_prf = 0,
-	  .obsolete = 0,
+	  .obsolete = 1,
 	  .only_extension = 0,
 	  .tls_sig_sem = SIG_SEM_PRE_TLS12,
 	  .false_start = 0 },
@@ -67,12 +69,14 @@ static SYSTEM_CONFIG_OR_CONST version_entry_st sup_versions[] = {
 	  .major = 3,
 	  .minor = 2,
 	  .transport = GNUTLS_STREAM,
+#ifdef ENABLE_TLS1_1
 	  .supported = 1,
+#endif
 	  .explicit_iv = 1,
 	  .extensions = 1,
 	  .selectable_sighash = 0,
 	  .selectable_prf = 0,
-	  .obsolete = 0,
+	  .obsolete = 1,
 	  .only_extension = 0,
 	  .tls_sig_sem = SIG_SEM_PRE_TLS12,
 	  .false_start = 0 },
@@ -116,12 +120,14 @@ static SYSTEM_CONFIG_OR_CONST version_entry_st sup_versions[] = {
 	  .major = 1,
 	  .minor = 0,
 	  .transport = GNUTLS_DGRAM,
+#ifdef ENABLE_TLS1_1
 	  .supported = 1,
+#endif
 	  .explicit_iv = 1,
 	  .extensions = 1,
 	  .selectable_sighash = 0,
 	  .selectable_prf = 0,
-	  .obsolete = 0,
+	  .obsolete = 1,
 	  .only_extension = 0,
 	  .tls_sig_sem = SIG_SEM_PRE_TLS12,
 	  .false_start = 0 },
@@ -131,12 +137,14 @@ static SYSTEM_CONFIG_OR_CONST version_entry_st sup_versions[] = {
 	  .major = 254,
 	  .minor = 255,
 	  .transport = GNUTLS_DGRAM,
+#ifdef ENABLE_TLS1_1
 	  .supported = 1,
+#endif
 	  .explicit_iv = 1,
 	  .extensions = 1,
 	  .selectable_sighash = 0,
 	  .selectable_prf = 0,
-	  .obsolete = 0,
+	  .obsolete = 1,
 	  .only_extension = 0,
 	  .tls_sig_sem = SIG_SEM_PRE_TLS12,
 	  .false_start = 0 },
@@ -305,7 +313,7 @@ const version_entry_st *_gnutls_version_max(gnutls_session_t session)
 
 		for (p = sup_versions; p->name != NULL; p++) {
 			if (p->id == cur_prot) {
-#ifndef ENABLE_SSL3
+#if !defined(ENABLE_SSL3) || !defined(ENABLE_TLS1_1)
 				if (p->obsolete != 0)
 					break;
 #endif
@@ -559,7 +567,7 @@ int _gnutls_nversion_is_supported(gnutls_session_t session, unsigned char major,
 
 	for (p = sup_versions; p->name != NULL; p++) {
 		if (p->major == major && p->minor == minor) {
-#ifndef ENABLE_SSL3
+#if !defined(ENABLE_SSL3) || !defined(ENABLE_TLS1_1)
 			if (p->obsolete != 0)
 				return 0;
 #endif

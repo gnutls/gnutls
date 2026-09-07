@@ -151,6 +151,22 @@ AC_MSG_ERROR([[
 
   AM_CONDITIONAL(ENABLE_SSL3, test "$ac_enable_ssl3" != "no")
 
+  ac_enable_tls11=no
+  AC_MSG_CHECKING([whether to disable the TLS 1.0 and TLS 1.1 protocols])
+  AC_ARG_ENABLE(tls11-support,
+    AS_HELP_STRING([--enable-tls11-support],
+                   [enable support for the TLS 1.0, TLS 1.1, and DTLS 1.0 protocols]),
+    ac_enable_tls11=$enableval)
+  if test x$ac_enable_tls11 != xno; then
+   AC_MSG_RESULT(no)
+   AC_DEFINE([ENABLE_TLS1_1], 1, [enable TLS1.0/TLS1.1/DTLS1.0 support])
+  else
+   ac_full=0
+   AC_MSG_RESULT(yes)
+  fi
+
+  AM_CONDITIONAL(ENABLE_TLS1_1, test "$ac_enable_tls11" != "no")
+
   ac_enable_ssl2=yes
   AC_MSG_CHECKING([whether to disable the SSL 2.0 client hello])
   AC_ARG_ENABLE(ssl2-support,

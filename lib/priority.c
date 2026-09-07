@@ -195,24 +195,37 @@ static const int *supported_groups_secure192 = _supported_groups_secure192;
 
 static const int protocol_priority[] = { GNUTLS_TLS1_3,
 					 GNUTLS_TLS1_2,
+#ifdef ENABLE_TLS1_1
 					 GNUTLS_TLS1_1,
 					 GNUTLS_TLS1_0,
+#endif
 					 GNUTLS_DTLS1_2,
+#ifdef ENABLE_TLS1_1
 					 GNUTLS_DTLS1_0,
+#endif
 					 0 };
 
 /* contains all the supported TLS protocols, intended to be used for eliminating them
  */
 static const int stream_protocol_priority[] = { GNUTLS_TLS1_3, GNUTLS_TLS1_2,
+#ifdef ENABLE_TLS1_1
 						GNUTLS_TLS1_1, GNUTLS_TLS1_0,
+#endif
 						0 };
 
 /* contains all the supported DTLS protocols, intended to be used for eliminating them
  */
-static const int dgram_protocol_priority[] = { GNUTLS_DTLS1_2, GNUTLS_DTLS1_0,
-					       GNUTLS_DTLS0_9, 0 };
+static const int dgram_protocol_priority[] = { GNUTLS_DTLS1_2,
+#ifdef ENABLE_TLS1_1
+					       GNUTLS_DTLS1_0,
+					       GNUTLS_DTLS0_9,
+#endif
+					       0 };
 
-static const int dtls_protocol_priority[] = { GNUTLS_DTLS1_2, GNUTLS_DTLS1_0,
+static const int dtls_protocol_priority[] = { GNUTLS_DTLS1_2,
+#ifdef ENABLE_TLS1_1
+					      GNUTLS_DTLS1_0,
+#endif
 					      0 };
 
 static const int _protocol_priority_suiteb[] = { GNUTLS_TLS1_2, 0 };
@@ -3035,6 +3048,26 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 				  GNUTLS_SSL3)) {
 		ret = gnutls_assert_val(GNUTLS_E_NO_PRIORITIES_WERE_SET);
 		goto out;
+	}
+#endif
+#ifndef ENABLE_TLS1_1
+	{
+		unsigned has_valid = 0;
+		for (i = 0; i < priority_cache->protocol.num_priorities; i++) {
+			gnutls_protocol_t p =
+				priority_cache->protocol.priorities[i];
+			if (p != GNUTLS_TLS1_0 && p != GNUTLS_TLS1_1 &&
+			    p != GNUTLS_DTLS1_0 && p != GNUTLS_DTLS0_9 &&
+			    p != GNUTLS_SSL3) {
+				has_valid = 1;
+				break;
+			}
+		}
+		if (!has_valid) {
+			ret = gnutls_assert_val(
+				GNUTLS_E_NO_PRIORITIES_WERE_SET);
+			goto out;
+		}
 	}
 #endif
 

@@ -5,6 +5,12 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+** libgnutls: TLS 1.0, TLS 1.1, and DTLS 1.0 are now disabled by default
+as per RFC 8996. The minimum supported protocol versions are now TLS 1.2
+and DTLS 1.2. To re-enable the deprecated protocols for backward
+compatibility, use the --enable-tls11-support configure option. This
+option will be removed in a future release.
+
 ** build: The --with-nettle-mini configure option has been removed.
 GnuTLS builds must now link against GMP. Mini-GMP lacks relevant
 optimizations and side-channel protections.

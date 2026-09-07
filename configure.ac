@@ -1443,6 +1443,9 @@ tls_features=
 if test "$ac_enable_ssl3" = yes; then
 	tls_features="$tls_features ssl3"
 fi
+if test "$ac_enable_tls11" = yes; then
+	tls_features="$tls_features tls1-1"
+fi
 if test "$ac_enable_ssl2" = yes; then
 	tls_features="$tls_features ssl2-compat"
 fi
@@ -1592,6 +1595,7 @@ AC_MSG_NOTICE([Optional features:
 if features are disabled)
 
   SSL3.0 support:       $ac_enable_ssl3
+  TLS1.0/1.1 support:   $ac_enable_tls11
   SSL2.0 client hello:  $ac_enable_ssl2
   Allow SHA1 sign:      $ac_allow_sha1
   DTLS-SRTP support:    $ac_enable_srtp
