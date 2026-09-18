@@ -40,7 +40,7 @@
 #include "system-keys.h"
 #include "gl_linkedhash_list.h"
 #include "gl_list.h"
-#include <hashcode-mem.h>
+#include "hashcode-mem.h"
 
 static int crt_reinit(gnutls_x509_crt_t crt)
 {
