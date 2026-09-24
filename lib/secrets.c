@@ -44,24 +44,23 @@ int _tls13_init_secret(gnutls_session_t session, const uint8_t *psk,
 int _tls13_init_secret2(const mac_entry_st *prf, const uint8_t *psk,
 			size_t psk_size, void *out)
 {
-	uint8_t buf[128] = { 0 };
-	uint8_t salt[MAX_HASH_SIZE] = { 0 };
+	const uint8_t buf[128] = { 0 };
 
 	if (unlikely(prf == NULL))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 	/* when no PSK, use the zero-value */
 	if (psk == NULL) {
-		psk_size = prf->output_size;
-		if (unlikely(psk_size >= sizeof(buf)))
+		if (unlikely(prf->output_size >= sizeof(buf)))
 			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
-		psk = (uint8_t *)buf;
+		psk_size = prf->output_size;
+		psk = buf;
 	}
 
-	/* passing an empty salt trips FIPS indicator, so pass real zeroes */
-	memset(salt, 0, prf->output_size);
-	return gnutls_hmac_fast(prf->id, salt, prf->output_size, psk, psk_size,
-				out);
+	return _gnutls_hkdf_extract(prf->id,
+				    &(gnutls_datum_t){ .data = (uint8_t *)psk,
+						       .size = psk_size },
+				    NULL, out);
 }
 
 /* HKDF-Extract(Prev-Secret, key) */
