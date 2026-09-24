@@ -45,6 +45,7 @@ int _tls13_init_secret2(const mac_entry_st *prf, const uint8_t *psk,
 			size_t psk_size, void *out)
 {
 	const uint8_t buf[128] = { 0 };
+	int ret;
 
 	if (unlikely(prf == NULL))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
@@ -57,10 +58,16 @@ int _tls13_init_secret2(const mac_entry_st *prf, const uint8_t *psk,
 		psk = buf;
 	}
 
-	return _gnutls_hkdf_extract(prf->id,
-				    &(gnutls_datum_t){ .data = (uint8_t *)psk,
-						       .size = psk_size },
-				    NULL, out);
+	ret = _gnutls_hkdf_extract(prf->id,
+				   &(gnutls_datum_t){ .data = (uint8_t *)psk,
+						      .size = psk_size },
+				   NULL, out);
+	if (ret < 0)
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
+	else
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_APPROVED);
+
+	return ret;
 }
 
 /* HKDF-Extract(Prev-Secret, key) */
