@@ -262,6 +262,7 @@ Makefile.user
 *.o
 *.out
 *.plist
+result
 src/benchmark
 src/benchmark-cipher
 src/benchmark-tls
