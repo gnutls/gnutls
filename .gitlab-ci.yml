@@ -830,3 +830,24 @@ mingw32/archive:
   needs: # archive only if tests successful
     - mingw32/build
     - mingw32/test
+
+release-ready:  # extra release readiness checks. follows fedora/build flags
+  extends:
+    - .test
+    - .fedora
+  dependencies:
+    - fedora/build
+  needs:
+    - fedora/build
+  script:
+    - |
+      # fail if anything but comments remains below the temp suppressions marker
+      MARKER='should be removed in the new release'
+      if sed -n "/$MARKER/,\$p" devel/libgnutls.abignore | grep '^\s*[^\s#]'
+      then
+        echo "devel/libgnutls.abignore still contains suppressions" \
+             "to remove before release (see devel/release-steps.md)"
+        exit 1
+      fi
+    - make symbol-check abi-check-latest abi-check
+  when: manual  # passes only once after abi-dump is updated (release-steps.md)
