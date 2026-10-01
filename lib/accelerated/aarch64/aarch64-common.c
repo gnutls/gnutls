@@ -85,7 +85,8 @@ static void discover_caps(unsigned int *caps)
 	unsigned long c;
 
 #ifdef HAVE_ELF_AUX_INFO
-	elf_aux_info(AT_HWCAP, &c, sizeof(c));
+	if (elf_aux_info(AT_HWCAP, &c, sizeof(c)) != 0)
+		c = 0;
 #else
 	c = getauxval(AT_HWCAP);
 #endif
