@@ -61,9 +61,6 @@ in
     substituteInPlace aminclude_static.am Makefile.in \
       --replace-fail "$dline" '# from AX_AM_MACROS_STATIC'
 
-    substituteInPlace cfg.mk \
-      --replace-fail '--since="2014 November 07"' '--since="2014-11-07 00:00:00 +0000"'
-
     CFLAGS="-std=c99 -O2 -g" ./configure \
       --disable-gcc-warnings \
       --prefix=/usr --libdir=/usr/lib64 \
