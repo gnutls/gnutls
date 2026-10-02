@@ -56,6 +56,10 @@
    ```console
    scp -oHostKeyAlgorithms=+ssh-rsa gnutls-$VERSION.tar.xz* gnutls-$VERSION-w*.zip* ftp.gnupg.org:/home/ftp/gcrypt/gnutls/v$(expr $VERSION : '\([0-9]*\.[0-9]*\)')/
    ```
+1. Update the website in the [web-pages repository]:
+   in its Makefile, bump `DOC_VERSION` and push to master.
+   The `pages` job should then rebuild the manual (html/epub/pdf)
+   using the new tarball and redeploy the site; make sure it passes.
 1. Reveal and close the security issues addressed in the release.
 1. Close the security fixes merge requests addressed in the release.
 1. Create and send announcement email based on previously sent email
