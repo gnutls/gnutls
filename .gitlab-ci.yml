@@ -850,4 +850,7 @@ release-ready:  # extra release readiness checks. follows fedora/build flags
         exit 1
       fi
     - make symbol-check abi-check-latest abi-check
+    # the top NEWS version header must be Version x.y.z (released YYYY-MM-DD),
+    # and the release date must be recent
+    - devel/check-news
   when: manual  # passes only once after abi-dump is updated (release-steps.md)
