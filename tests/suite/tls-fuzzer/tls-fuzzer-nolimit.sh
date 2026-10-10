@@ -20,7 +20,13 @@
 : ${srcdir=.}
 
 tls_fuzzer_prepare() {
-VERSIONS="-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:+VERS-TLS1.1:+VERS-TLS1.0:+VERS-SSL3.0"
+VERSIONS="-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2"
+if test "${ENABLE_TLS1_1}" = "1"; then
+	VERSIONS="${VERSIONS}:+VERS-TLS1.1:+VERS-TLS1.0"
+fi
+if test "${ENABLE_SSL3}" = "1"; then
+	VERSIONS="${VERSIONS}:+VERS-SSL3.0"
+fi
 PRIORITY="NORMAL:%VERIFY_ALLOW_SIGN_WITH_SHA1:+ARCFOUR-128:+3DES-CBC:+DHE-DSS:+SIGN-DSA-SHA256:+SIGN-DSA-SHA1:-CURVE-SECP192R1:${VERSIONS}:+SHA256:%ALLOW_SMALL_RECORDS"
 ${CLI} --list --priority "${PRIORITY}" >/dev/null 2>&1
 if test $? != 0;then
@@ -28,6 +34,10 @@ if test $? != 0;then
 fi
 
 sed -e "s|@SERVER@|$SERV|g" -e "s/@PORT@/$PORT/g" -e "s/@PRIORITY@/$PRIORITY/g" ../gnutls-nolimit.json >${TMPFILE}
+if test "${ENABLE_TLS1_1}" != "1"; then
+	sed -i '/TLS 1\.[01]/{s/"-x"/"-e"/;n;s/"-X"/"-e"/;}' ${TMPFILE}
+	sed -i '/"-e", "check.*TLS 1\.0/{ p; s/TLS 1\.0/TLS 1.1/; }' ${TMPFILE}
+fi
 }
 
 . "${srcdir}/tls-fuzzer/tls-fuzzer-common.sh"

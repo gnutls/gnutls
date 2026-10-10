@@ -414,7 +414,11 @@ static void start(void)
 
 void doit(void)
 {
+#ifdef ENABLE_TLS1_1
 	start();
+#else
+	exit(77);
+#endif
 }
 
 #endif /* _WIN32 */

@@ -314,10 +314,14 @@ static void run(int proto, int cipher, int mac)
 
 void doit(void)
 {
+#ifdef ENABLE_TLS1_1
 	signal(SIGPIPE, SIG_IGN);
 
 	run(GNUTLS_DTLS0_9, GNUTLS_CIPHER_AES_128_CBC, GNUTLS_MAC_SHA1);
 	run(GNUTLS_DTLS0_9, GNUTLS_CIPHER_AES_128_GCM, GNUTLS_MAC_AEAD);
+#else
+	exit(77);
+#endif
 }
 
 #endif /* _WIN32 */

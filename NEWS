@@ -5,6 +5,11 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+** libgnutls: Added --enable-tls11-support configure option to control
+support for TLS 1.0, TLS 1.1, and DTLS 1.0 (RFC 8996). These protocols
+are currently enabled by default. A future release will disable them by
+default.
+
 ** build: The --with-nettle-mini configure option has been removed.
 GnuTLS builds must now link against GMP. Mini-GMP lacks relevant
 optimizations and side-channel protections.

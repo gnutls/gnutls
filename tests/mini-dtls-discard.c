@@ -292,8 +292,12 @@ static void start(const char *prio)
 
 void doit(void)
 {
+#ifdef ENABLE_TLS1_1
 	start("NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL");
 	start("NONE:+VERS-DTLS1.2:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL");
+#else
+	exit(77);
+#endif
 }
 
 #endif /* _WIN32 */

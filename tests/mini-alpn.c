@@ -297,9 +297,13 @@ static void start(const char *p1, const char *p2)
 
 void doit(void)
 {
+#ifdef ENABLE_TLS1_1
 	start("h2", "http/1.1");
 	start("spdy/2", "spdy/3");
 	start("spdy/3", "spdy/2");
+#else
+	exit(77);
+#endif
 }
 
 #endif /* _WIN32 */

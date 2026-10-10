@@ -336,7 +336,9 @@ void doit(void)
 {
 	signal(SIGCHLD, ch_handler);
 
+#ifdef ENABLE_TLS1_1
 	start(AES_CBC, 1);
+#endif
 	start(AES_CBC_SHA256, 1);
 	start(AES_GCM, 0);
 }

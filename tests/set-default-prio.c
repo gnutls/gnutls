@@ -283,12 +283,14 @@ struct test_st tests[] = {
 	  .add_prio = "%FORCE_ETM:%%NO_TICKETS",
 	  .exp_err = GNUTLS_E_INVALID_REQUEST,
 	  .err_pos = 0 },
+#ifdef ENABLE_TLS1_1
 	{ .name = "additional flag for version (functional)",
 	  .def_prio = "NORMAL",
 	  .add_prio = "-VERS-ALL:+VERS-TLS1.1",
 	  .exp_err = 0,
 	  .exp_etm = 1,
 	  .exp_vers = GNUTLS_TLS1_1 }
+#endif
 };
 
 void doit(void)

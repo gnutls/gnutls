@@ -343,28 +343,36 @@ void doit(void)
 	signal(SIGPIPE, SIG_IGN);
 	signal(SIGCHLD, ch_handler);
 
+#ifdef ENABLE_TLS1_1
 	start("aes-cbc", AES_CBC, 1);
+#endif
 	start("aes-cbc-sha256", AES_CBC_SHA256, 1);
 	start("aes-gcm", AES_GCM, 0);
 	start("aes-ccm", AES_CCM, 0);
 	start("aes-ccm-8", AES_CCM_8, 0);
 
 	if (!gnutls_fips140_mode_enabled()) {
+#ifdef ENABLE_TLS1_1
 		start("null-sha1", NULL_SHA1, 0);
 
 		start("arcfour-sha1", ARCFOUR_SHA1, 0);
 		start("arcfour-md5", ARCFOUR_MD5, 0);
+#endif
 	}
 
+#ifdef ENABLE_TLS1_1
 	start("aes-cbc-no-etm", AES_CBC NO_ETM, 1);
+#endif
 	start("aes-cbc-sha256-no-etm", AES_CBC_SHA256 NO_ETM, 1);
 	start("aes-gcm-no-etm", AES_GCM NO_ETM, 0);
 
 	if (!gnutls_fips140_mode_enabled()) {
+#ifdef ENABLE_TLS1_1
 		start("null-sha1-no-etm", NULL_SHA1 NO_ETM, 0);
 
 		start("arcfour-sha1-no-etm", ARCFOUR_SHA1 NO_ETM, 0);
 		start("arcfour-md5-no-etm", ARCFOUR_MD5 NO_ETM, 0);
+#endif
 		start("tls13-chacha20-poly1305", TLS13_CHACHA_POLY1305, 0);
 	}
 

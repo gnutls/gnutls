@@ -47,6 +47,10 @@ if test "${WINDIR}" != ""; then
 	exit 77
 fi
 
+if test "${ENABLE_TLS1_1}" != "1"; then
+	exit 77
+fi
+
 . "${srcdir}/../scripts/common.sh"
 
 

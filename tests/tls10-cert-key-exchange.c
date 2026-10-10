@@ -37,6 +37,7 @@
 
 void doit(void)
 {
+#ifdef ENABLE_TLS1_1
 	global_init();
 
 	try_x509("TLS 1.0 with anon-ecdh",
@@ -104,4 +105,7 @@ void doit(void)
 		     GNUTLS_CRT_X509, GNUTLS_CRT_X509);
 
 	gnutls_global_deinit();
+#else
+	exit(77);
+#endif
 }

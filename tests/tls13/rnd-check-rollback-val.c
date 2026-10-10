@@ -268,6 +268,9 @@ static void ch_handler(int sig)
 
 void doit(void)
 {
+#if defined(TLS11) && !defined(ENABLE_TLS1_1)
+	exit(77);
+#endif
 	int fd[2];
 	int ret;
 	pid_t child;

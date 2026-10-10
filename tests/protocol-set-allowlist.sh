@@ -143,6 +143,7 @@ if ! ${GREP} -Fqx 'Protocols: VERS-TLS1.2, VERS-TLS1.3' "${TMPFILE_LIST}"; then
 	exit 1
 fi
 
+if test "${ENABLE_TLS1_1}" = "1";then
 # Smoke-test that TLS 1.1 is enableable with these algorithms
 
 with_config_file \
@@ -157,6 +158,7 @@ if ! ${GREP} -Fqx 'Protocols: VERS-TLS1.2, VERS-TLS1.1' "${TMPFILE_LIST}"; then
 	echo 'could not enable TLS 1.1 with a @SYSTEM:+VERS-TLS1.1'
 	exit 1
 fi
+fi # ENABLE_TLS1_1
 
 ### Harness for the actual tests
 
@@ -288,17 +290,20 @@ protocol_set_enabled TLS1.3 -> OK
 connect -> connection established: (TLS1.3)-(DHE-FFDHE3072)-(RSA-PSS-RSAE-SHA256)-(AES-128-GCM)
 EOF
 
+if test "${ENABLE_TLS1_1}" = "1";then
 test_with_helper 'going down to TLS1.1' <<EOF
 protocol_set_enabled TLS1.1 -> OK
 protocol_set_disabled TLS1.2 -> OK
 connect -> connection established: (TLS1.1)-(RSA)-(AES-128-CBC)-(SHA1)
 EOF
+fi # ENABLE_TLS1_1
 
 test_with_helper 'going up to TLS 1.3' <<EOF
 protocol_set_enabled TLS1.3 -> OK
 connect -> connection established: (TLS1.3)-(DHE-FFDHE3072)-(RSA-PSS-RSAE-SHA256)-(AES-128-GCM)
 EOF
 
+if test "${ENABLE_TLS1_1}" = "1";then
 test_with_helper 'useless toggles' <<EOF
 protocol_set_disabled TLS1.2 -> OK
 protocol_set_disabled TLS1.2 -> OK
@@ -328,6 +333,7 @@ protocol_set_disabled TLS1.3 -> OK
 protocol_set_disabled TLS1.2 -> OK
 connect -> connection established: (TLS1.1)-(RSA)-(AES-128-CBC)-(SHA1)
 EOF
+fi # ENABLE_TLS1_1
 
 terminate_proc ${SERVER_PID}
 
@@ -360,6 +366,7 @@ protocol_set_enabled TLS1.3 -> OK
 connect -> connection established: (TLS1.3)-(DHE-FFDHE3072)-(RSA-PSS-RSAE-SHA256)-(AES-128-GCM)
 EOF
 
+if test "${ENABLE_TLS1_1}" = "1";then
 test_with_helper 'enable 1.1' <<EOF
 protocol_set_enabled TLS1.1 -> OK
 connect -> handshake failed: A TLS fatal alert has been received.
@@ -387,9 +394,11 @@ protocol_set_enabled TLS1.1 -> OK
 protocol_set_enabled TLS1.3 -> OK
 connect -> connection established: (TLS1.3)-(DHE-FFDHE3072)-(RSA-PSS-RSAE-SHA256)-(AES-128-GCM)
 EOF
+fi # ENABLE_TLS1_1
 
 terminate_proc ${SERVER_PID}
 
+if test "${ENABLE_TLS1_1}" = "1";then
 #### Tests against a TLS 1.1 + TLS 1.2 server
 #
 eval "${GETPORT}"
@@ -430,5 +439,6 @@ connect -> connection established: (TLS1.1)-(RSA)-(AES-128-CBC)-(SHA1)
 EOF
 
 terminate_proc ${SERVER_PID}
+fi # ENABLE_TLS1_1
 
 exit 0

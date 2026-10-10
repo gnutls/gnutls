@@ -128,8 +128,10 @@ void doit(void)
 	/* check SSL 3.0 which is disabled by default */
 	try(3, 0, GNUTLS_E_AGAIN, GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
 	reset_buffers();
+#ifdef ENABLE_TLS1_1
 	try(3, 2, 0, 0);
 	reset_buffers();
+#endif
 	try(3, 23, 0, 0);
 	reset_buffers();
 	try(4, 0, 0, 0);

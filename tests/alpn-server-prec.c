@@ -298,6 +298,9 @@ static void start(const char *p1, const char *p2, const char *cp1,
 
 void doit(void)
 {
+#ifndef ENABLE_TLS1_1
+	exit(77);
+#endif
 	/* A, B - A, B -> A */
 	start("h2", "http/1.1", "h2", "http/1.1", "h2");
 

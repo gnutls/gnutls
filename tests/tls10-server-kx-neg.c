@@ -349,6 +349,7 @@ test_case_st tests[] = {
 
 void doit(void)
 {
+#ifdef ENABLE_TLS1_1
 	unsigned i;
 	global_init();
 
@@ -357,4 +358,7 @@ void doit(void)
 	}
 
 	gnutls_global_deinit();
+#else
+	exit(77);
+#endif
 }

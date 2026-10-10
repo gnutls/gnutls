@@ -48,6 +48,7 @@ static int handshake = 0;
 
 void doit(void)
 {
+#ifdef ENABLE_TLS1_1
 	/* Server stuff. */
 	gnutls_anon_server_credentials_t s_anoncred;
 	const gnutls_datum_t p3 = { (void *)pkcs3, strlen(pkcs3) };
@@ -144,4 +145,7 @@ void doit(void)
 	gnutls_dh_params_deinit(dh_params);
 
 	gnutls_global_deinit();
+#else
+	exit(77);
+#endif
 }

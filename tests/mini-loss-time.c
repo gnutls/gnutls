@@ -290,6 +290,7 @@ static void ch_handler(int sig)
 
 void doit(void)
 {
+#ifdef ENABLE_TLS1_1
 	time_t tstart, tstop;
 	int tries =
 		5; /* we try multiple times because in very busy systems the suite may fail to finish on time */
@@ -334,6 +335,9 @@ void doit(void)
 		} else
 			break;
 	}
+#else
+	exit(77);
+#endif
 }
 
 #endif /* _WIN32 */

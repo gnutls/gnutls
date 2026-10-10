@@ -380,6 +380,8 @@ void doit(void)
 {
 	start("NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3");
 	start("NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2");
+#ifdef ENABLE_TLS1_1
 	start("NORMAL:-VERS-TLS-ALL:+VERS-TLS1.1");
+#endif
 	start("NORMAL");
 }

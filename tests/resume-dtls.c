@@ -368,6 +368,7 @@ static void server(int sds[], struct params_res *params)
 
 void doit(void)
 {
+#ifdef ENABLE_TLS1_1
 	int i, err;
 
 	signal(SIGCHLD, SIG_IGN);
@@ -419,6 +420,9 @@ void doit(void)
 		}
 	}
 	global_stop();
+#else
+	exit(77);
+#endif
 }
 
 /* Functions and other stuff needed for session resuming.

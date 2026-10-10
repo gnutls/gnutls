@@ -103,22 +103,26 @@ static const TLS_TEST tls_tests[] = {
 	 * buggy */
 	{ "whether we need to disable TLS 1.2", test_tls_disable2, "no", "yes",
 	  "dunno" },
+#ifdef ENABLE_TLS1_1
 	{ "whether we need to disable TLS 1.1", test_tls_disable1, "no", "yes",
 	  "dunno" },
 	{ "whether we need to disable TLS 1.0", test_tls_disable0, "no", "yes",
 	  "dunno" },
+#endif
 	/* The following test will disable extensions if the server
 	 * is buggy */
 	{ "whether %NO_EXTENSIONS is required", test_no_extensions, "no", "yes",
 	  "dunno" },
 	{ "whether %COMPAT is required", test_record_padding, "no", "yes",
 	  "dunno" },
+#ifdef ENABLE_TLS1_1
 	{ "for TLS 1.0 (RFC2246) support", test_tls1, "yes", "no", "dunno" },
 	{ "for TLS 1.0 (RFC2246) support with TLS 1.0 record version",
 	  test_tls1_nossl3, "yes", "no", "dunno" },
 	{ "for TLS 1.1 (RFC4346) support", test_tls1_1, "yes", "no", "dunno" },
 	{ "fallback from TLS 1.1 to", test_tls1_1_fallback, "TLS 1.0", "failed",
 	  "SSL 3.0" },
+#endif
 	{ "for TLS 1.2 (RFC5246) support", test_tls1_2, "yes", "no", "dunno" },
 	{ "for TLS 1.3 (RFC8446) support", test_tls1_3, "yes", "no", "dunno" },
 	{ "for known TLS or SSL protocols support", test_known_protocols, "yes",

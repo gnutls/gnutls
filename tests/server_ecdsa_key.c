@@ -88,9 +88,11 @@ void doit(void)
 		exit(1);
 	}
 
+#ifdef ENABLE_TLS1_1
 	test_cli_serv_expect(serv_cred, cli_cred, "NORMAL",
 			     "NORMAL:-VERS-TLS1.1:+VERS-TLS1.2:-SIGN-ALL", NULL,
 			     0, 0);
+#endif
 	test_cli_serv_expect(
 		serv_cred, cli_cred, "NORMAL",
 		"NORMAL:-SIGN-ECDSA-SHA224:-SIGN-ECDSA-SHA1:-SIGN-ECDSA-SHA256:-SIGN-ECDSA-SHA384:-SIGN-ECDSA-SHA512:-SIGN-ECDSA-SECP256R1-SHA256:-SIGN-ECDSA-SECP384R1-SHA384:-SIGN-ECDSA-SECP521R1-SHA512",

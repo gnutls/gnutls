@@ -359,8 +359,12 @@ static void start(int server_initiated)
 
 void doit(void)
 {
+#ifdef ENABLE_TLS1_1
 	start(0);
 	start(1);
+#else
+	exit(77);
+#endif
 }
 
 #endif /* _WIN32 */

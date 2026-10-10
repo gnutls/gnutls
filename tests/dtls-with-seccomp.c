@@ -292,7 +292,9 @@ static void run(const char *name, const char *prio)
 
 void doit(void)
 {
+#ifdef ENABLE_TLS1_1
 	run("dtls1.0", "NORMAL:-KX-ALL:+ECDHE-RSA:-VERS-ALL:+VERS-DTLS1.0");
+#endif
 	run("dtls1.2", "NORMAL:-KX-ALL:+ECDHE-RSA:-VERS-ALL:+VERS-DTLS1.2");
 	run("default", "NORMAL");
 }

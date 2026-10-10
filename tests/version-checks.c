@@ -157,19 +157,23 @@ void doit(void)
 {
 	global_init();
 
+#ifdef ENABLE_TLS1_1
 	try("NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0", GNUTLS_TLS1_0);
 	reset_buffers();
 	try("NORMAL:-VERS-TLS-ALL:+VERS-TLS1.1", GNUTLS_TLS1_1);
 	reset_buffers();
+#endif
 	try("NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2", GNUTLS_TLS1_2);
 	reset_buffers();
 	try("NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3", GNUTLS_TLS1_3);
 	reset_buffers();
+#ifdef ENABLE_TLS1_1
 	try("NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3:+VERS-TLS1.0", GNUTLS_TLS1_0);
 	reset_buffers();
 	/* similar to above test, but checks a different syntax */
 	try("NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.1", GNUTLS_TLS1_1);
 	reset_buffers();
+#endif
 	try("NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3:+VERS-TLS1.2", GNUTLS_TLS1_3);
 	reset_buffers();
 	/* If TLS 1.3 is enabled in the server, prefer the latest
@@ -183,14 +187,18 @@ void doit(void)
 	try("NORMAL:-VERS-TLS-ALL:+VERS-SSL3.0", -1);
 	reset_buffers();
 #endif
+#ifdef ENABLE_TLS1_1
 	try("NORMAL:-VERS-ALL:+VERS-DTLS1.0", GNUTLS_DTLS1_0);
 	reset_buffers();
+#endif
 	try("NORMAL:-VERS-DTLS-ALL:+VERS-DTLS1.2", GNUTLS_DTLS1_2);
 	reset_buffers();
 
+#ifdef ENABLE_TLS1_1
 	/* special test for this legacy crap */
 	try("NONE:+VERS-DTLS0.9:+COMP-NULL:+AES-128-CBC:+SHA1:+RSA:%COMPAT",
 	    GNUTLS_DTLS0_9);
 	reset_buffers();
+#endif
 	gnutls_global_deinit();
 }

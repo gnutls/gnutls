@@ -317,7 +317,9 @@ static void start(const char *prio)
 
 void doit(void)
 {
+#ifdef ENABLE_TLS1_1
 	start("NORMAL:-VERS-ALL:+VERS-TLS1.1");
+#endif
 	start("NORMAL:-VERS-ALL:+VERS-TLS1.2");
 	start("NORMAL:-VERS-ALL:+VERS-TLS1.3");
 	start("NORMAL");
