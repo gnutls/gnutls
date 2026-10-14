@@ -64,6 +64,8 @@ int _tls13_init_secret2(const mac_entry_st *prf, const uint8_t *psk,
 				   NULL, out);
 	if (ret < 0)
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
+	else if (unlikely(!is_mac_algo_approved_in_fips(prf->id)))
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_NOT_APPROVED);
 	else
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_APPROVED);
 
@@ -87,6 +89,9 @@ int _tls13_update_secret(gnutls_session_t session, const uint8_t *key,
 				   &salt, session->key.proto.tls13.temp_secret);
 	if (ret < 0)
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
+	else if (unlikely(!is_mac_algo_approved_in_fips(
+			 session->security_parameters.prf->id)))
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_NOT_APPROVED);
 	else
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_APPROVED);
 
@@ -177,6 +182,8 @@ int _tls13_expand_secret2(const mac_entry_st *prf, const char *label,
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_ERROR);
 		gnutls_assert();
 		goto cleanup;
+	} else if (unlikely(!is_mac_algo_approved_in_fips(prf->id))) {
+		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_NOT_APPROVED);
 	} else {
 		_gnutls_switch_fips_state(GNUTLS_FIPS140_OP_APPROVED);
 	}
