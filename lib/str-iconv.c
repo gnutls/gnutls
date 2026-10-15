@@ -34,11 +34,15 @@
 #include <uninorm.h>
 #include "num.h"
 
+/* Copies @units 16-bit code units from @src to @dst, converting them
+ * from or to the requested endianness. @src and @dst must not overlap,
+ * unless they are the same buffer, as the copy is done with memcpy().
+ */
 static void change_u16_endianness(uint8_t *dst, const uint8_t *src,
-				  unsigned size, unsigned be)
+				  size_t units, unsigned be)
 {
 	unsigned convert = 0;
-	unsigned i;
+	size_t i;
 	uint8_t tmp;
 
 #ifdef WORDS_BIGENDIAN
@@ -51,14 +55,14 @@ static void change_u16_endianness(uint8_t *dst, const uint8_t *src,
 
 	/* convert to LE */
 	if (convert) {
-		for (i = 0; i < size; i += 2) {
-			tmp = src[i];
-			dst[i] = src[1 + i];
-			dst[1 + i] = tmp;
+		for (i = 0; i < units; i++) {
+			tmp = src[2 * i];
+			dst[2 * i] = src[2 * i + 1];
+			dst[2 * i + 1] = tmp;
 		}
 	} else {
 		if (dst != src)
-			memcpy(dst, src, size);
+			memcpy(dst, src, units * 2);
 	}
 }
 
@@ -76,7 +80,7 @@ int _gnutls_ucs2_to_utf8(const void *data, size_t size, gnutls_datum_t *output,
 		size -= 2;
 	}
 
-	if (size == 0)
+	if (size == 0 || size % 2 != 0)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	src = gnutls_malloc(size + 2);
@@ -84,7 +88,7 @@ int _gnutls_ucs2_to_utf8(const void *data, size_t size, gnutls_datum_t *output,
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
 	/* convert to LE if needed */
-	change_u16_endianness(src, data, size, be);
+	change_u16_endianness(src, data, size / 2, be);
 
 	dstlen = 0;
 	tmp_dst = u16_to_u8((uint16_t *)src, size / 2, NULL, &dstlen);
@@ -152,7 +156,7 @@ int _gnutls_utf8_to_ucs2(const void *data, size_t size, gnutls_datum_t *output,
 	}
 
 	/* convert to BE */
-	change_u16_endianness(dst, (uint8_t *)tmp_dst, dstlen, be);
+	change_u16_endianness(dst, (uint8_t *)nrm_dst, nrm_size, be);
 	dst[dstlen] = 0;
 	dst[dstlen + 1] = 0;
 
