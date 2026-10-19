@@ -429,6 +429,7 @@ ctests += pkcs11-cert-import-url-exts pkcs11-get-exts pkcs11-get-raw-issuer-exts
 	pkcs11/pkcs11-rsa-pss-privkey-test pkcs11/tls-neg-pkcs11-key pkcs11/pkcs11-privkey-generate \
 	pkcs11/gnutls_x509_crt_list_import_url pkcs11/gnutls_pcert_list_import_x509_file \
 	pkcs11/pkcs11-eddsa-privkey-test pkcs11/eddsa-ecpoint-encodings \
+	pkcs11/pkcs11-dsa-privkey-sensitive \
 	pkcs11-obj-get-pk-algorithm pkcs11-token-raw pkcs11-obj-raw
 
 if P11KIT_0_23_11_API
