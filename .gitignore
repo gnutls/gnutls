@@ -533,6 +533,7 @@ tests/missingissuer
 tests/missingissuer_aia
 tests/moredn
 tests/mpi
+tests/mr
 tests/multi-alerts
 tests/naked-alerts
 tests/name-constraints
