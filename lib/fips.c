@@ -42,11 +42,6 @@
 
 unsigned int _gnutls_lib_state = LIB_STATE_POWERON;
 
-struct gnutls_fips140_context_st {
-	gnutls_fips140_operation_state_t state;
-	struct gnutls_fips140_context_st *next;
-};
-
 #ifdef ENABLE_FIPS140
 
 #include <dlfcn.h>

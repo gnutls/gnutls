@@ -75,6 +75,17 @@ unsigned _gnutls_fips_mode_enabled(void);
 void _gnutls_lib_simulate_error(void);
 void _gnutls_lib_force_operational(void);
 
+typedef struct gnutls_fips140_context_st {
+	gnutls_fips140_operation_state_t state;
+	struct gnutls_fips140_context_st *next;
+} gnutls_fips140_context_st;
+
+#define GNUTLS_FIPS140_CONTEXT_INIT                 \
+	{                                           \
+		.state = GNUTLS_FIPS140_OP_INITIAL, \
+		.next = NULL,                       \
+	}
+
 inline static bool
 is_mac_algo_hmac_approved_in_fips(gnutls_mac_algorithm_t algo)
 {
