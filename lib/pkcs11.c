@@ -2027,15 +2027,14 @@ static int pkcs11_read_privkey_type(struct ck_function_list *module,
 				    ck_key_type_t key_type,
 				    gnutls_pkcs11_obj_t pobj)
 {
-	struct ck_attribute a[2];
+	struct ck_attribute a[1];
 	uint8_t *tmp1;
-	uint8_t *tmp2 = NULL;
-	size_t tmp1_size, tmp2_size;
+	size_t tmp1_size;
 	int ret;
 	ck_rv_t rv;
 
 	pobj->pk_algorithm = GNUTLS_PK_UNKNOWN;
-	tmp1_size = tmp2_size = MAX_PK_PARAM_SIZE;
+	tmp1_size = MAX_PK_PARAM_SIZE;
 	tmp1 = gnutls_calloc(1, tmp1_size);
 	if (tmp1 == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
@@ -2060,64 +2059,23 @@ static int pkcs11_read_privkey_type(struct ck_function_list *module,
 		}
 		break;
 	case CKK_DSA:
-		tmp2 = gnutls_calloc(1, tmp2_size);
-		if (tmp2 == NULL) {
-			ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-			goto cleanup;
-		}
-
+		// Only CKA_PRIME is needed for DSA because its bit length represents the key size.
 		a[0].type = CKA_PRIME;
 		a[0].value = tmp1;
 		a[0].value_len = tmp1_size;
-		a[1].type = CKA_SUBPRIME;
-		a[1].value = tmp2;
-		a[1].value_len = tmp2_size;
 
-		if ((rv = pkcs11_get_attribute_value(module, pks, ctx, a, 2)) ==
+		if ((rv = pkcs11_get_attribute_value(module, pks, ctx, a, 1)) !=
 		    CKR_OK) {
-			if ((ret = _gnutls_set_datum(&pobj->privkey_type[0],
-						     a[0].value,
-						     a[0].value_len)) < 0 ||
-			    (ret = _gnutls_set_datum(&pobj->privkey_type[1],
-						     a[1].value,
-						     a[1].value_len)) < 0) {
-				gnutls_assert();
-				_gnutls_free_datum(&pobj->privkey_type[1]);
-				_gnutls_free_datum(&pobj->privkey_type[0]);
-				goto cleanup;
-			}
-
-			pobj->privkey_size = 2;
-		} else {
 			gnutls_assert();
 			ret = pkcs11_rv_to_err(rv);
 			goto cleanup;
 		}
 
-		a[0].type = CKA_BASE;
-		a[0].value = tmp1;
-		a[0].value_len = tmp1_size;
-		a[1].type = CKA_VALUE;
-		a[1].value = tmp2;
-		a[1].value_len = tmp2_size;
+		pobj->privkey_type[0].data = a[0].value;
+		pobj->privkey_type[0].size = a[0].value_len;
 
-		if ((rv = pkcs11_get_attribute_value(module, pks, ctx, a, 2)) ==
-		    CKR_OK) {
-			pobj->privkey_type[2].data = a[0].value;
-			pobj->privkey_type[2].size = a[0].value_len;
-
-			pobj->privkey_type[3].data = a[1].value;
-			pobj->privkey_type[3].size = a[1].value_len;
-
-			pobj->privkey_size = 4;
-			pobj->pk_algorithm = GNUTLS_PK_DSA;
-		} else {
-			gnutls_assert();
-			_gnutls_free_datum(&pobj->privkey_type[1]);
-			_gnutls_free_datum(&pobj->privkey_type[0]);
-			ret = pkcs11_rv_to_err(rv);
-			goto cleanup;
-		}
+		pobj->privkey_size = 1;
+		pobj->pk_algorithm = GNUTLS_PK_DSA;
 		break;
 	case CKK_ECDSA:
 		a[0].type = CKA_EC_PARAMS;
@@ -2186,7 +2144,6 @@ static int pkcs11_read_privkey_type(struct ck_function_list *module,
 
 cleanup:
 	gnutls_free(tmp1);
-	gnutls_free(tmp2);
 
 	return ret;
 }
@@ -5204,31 +5161,7 @@ int gnutls_pkcs11_obj_get_pk_algorithm(gnutls_pkcs11_obj_t obj,
 			goto dsa_cleanup;
 		}
 
-		if (_gnutls_mpi_init_scan_nz(&temp_params.params[DSA_Q],
-					     obj->privkey_type[1].data,
-					     obj->privkey_type[1].size)) {
-			gnutls_assert();
-			ret = GNUTLS_E_MPI_SCAN_FAILED;
-			goto dsa_cleanup;
-		}
-
-		if (_gnutls_mpi_init_scan_nz(&temp_params.params[DSA_G],
-					     obj->privkey_type[2].data,
-					     obj->privkey_type[2].size)) {
-			gnutls_assert();
-			ret = GNUTLS_E_MPI_SCAN_FAILED;
-			goto dsa_cleanup;
-		}
-
-		if (_gnutls_mpi_init_scan_nz(&temp_params.params[DSA_Y],
-					     obj->privkey_type[3].data,
-					     obj->privkey_type[3].size)) {
-			gnutls_assert();
-			ret = GNUTLS_E_MPI_SCAN_FAILED;
-			goto dsa_cleanup;
-		}
-
-		temp_params.params_nr = DSA_PUBLIC_PARAMS;
+		temp_params.params_nr = 1;
 		temp_params.algo = GNUTLS_PK_DSA;
 		*bits = pubkey_to_bits(&temp_params);
 		ret = pk;
