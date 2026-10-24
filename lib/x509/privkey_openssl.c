@@ -195,6 +195,16 @@ int gnutls_x509_privkey_import_openssl(gnutls_x509_privkey_t key,
 	if (!salt.data)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
+	/* The salt is hex-encoded right after the cipher name; make sure
+	 * the whole 2*iv_size characters are present before decoding. */
+	pem_header_size =
+		data->size - (ptrdiff_t)(pem_header - pem_header_start);
+	if ((size_t)pem_header_size < salt.size * 2) {
+		gnutls_assert();
+		ret = GNUTLS_E_PARSING_ERROR;
+		goto out_salt;
+	}
+
 	hex_data.data = (unsigned char *)pem_header;
 	hex_data.size = salt.size * 2;
 	salt_size = salt.size;
@@ -210,16 +220,21 @@ int gnutls_x509_privkey_import_openssl(gnutls_x509_privkey_t key,
 	}
 
 	pem_header += hex_data.size;
-	if (*pem_header != '\r' && *pem_header != '\n') {
+
+	pem_header_size =
+		data->size - (ptrdiff_t)(pem_header - pem_header_start);
+	if (pem_header_size < 1 ||
+	    (*pem_header != '\r' && *pem_header != '\n')) {
 		gnutls_assert();
 		ret = GNUTLS_E_INVALID_REQUEST;
 		goto out_salt;
 	}
-	while (*pem_header == '\n' || *pem_header == '\r')
+	while (pem_header_size > 0 &&
+	       (*pem_header == '\n' || *pem_header == '\r')) {
 		pem_header++;
+		pem_header_size--;
+	}
 
-	pem_header_size =
-		data->size - (ptrdiff_t)(pem_header - pem_header_start);
 	ret = _gnutls_base64_decode((const void *)pem_header, pem_header_size,
 				    &b64_data);
 	if (ret < 0) {
