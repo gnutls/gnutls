@@ -533,6 +533,7 @@ tests/missingissuer
 tests/missingissuer_aia
 tests/moredn
 tests/mpi
+tests/mr
 tests/multi-alerts
 tests/naked-alerts
 tests/name-constraints
@@ -690,6 +691,7 @@ tests/rsa-psk
 tests/rsa-psk-cb
 tests/rsa-rsa-oaep
 tests/rsa-rsa-pss
+tests/rsa-validate
 tests/rsaes-pkcs1-v1_5
 tests/safe-renegotiation/Makefile
 tests/safe-renegotiation/Makefile.in

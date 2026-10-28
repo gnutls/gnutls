@@ -1158,6 +1158,29 @@ static int _wrap_nettle_pk_encrypt(gnutls_pk_algorithm_t algo,
 			goto cleanup;
 		}
 
+#ifdef ENABLE_FIPS140
+		if (_gnutls_fips_mode_enabled() &&
+		    _gnutls_get_lib_state() != LIB_STATE_SELFTEST) {
+			/* gnutls_rnd (called from rnd_nonce_func)
+			 * will flip FIPS service indicator; use a
+			 * temprary context
+			 */
+			gnutls_fips140_context_st context =
+				GNUTLS_FIPS140_CONTEXT_INIT;
+
+			ret = gnutls_fips140_push_context(&context);
+			if (ret < 0)
+				goto cleanup;
+
+			not_approved = !rsa_validate_sp800_56b_r2_public(
+				&pub, NULL, rnd_nonce_func);
+
+			ret = gnutls_fips140_pop_context();
+			if (ret < 0)
+				goto cleanup;
+		}
+#endif
+
 		bits = mpz_sizeinbase(pub.n, 2);
 
 		_gnutls_audit_data(
@@ -2760,6 +2783,29 @@ static int _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 			gnutls_assert();
 			goto cleanup;
 		}
+
+#ifdef ENABLE_FIPS140
+		if (_gnutls_fips_mode_enabled() &&
+		    _gnutls_get_lib_state() != LIB_STATE_SELFTEST) {
+			/* gnutls_rnd (called from rnd_nonce_func)
+			 * will flip FIPS service indicator; use a
+			 * temprary context
+			 */
+			gnutls_fips140_context_st context =
+				GNUTLS_FIPS140_CONTEXT_INIT;
+
+			ret = gnutls_fips140_push_context(&context);
+			if (ret < 0)
+				goto cleanup;
+
+			not_approved = !rsa_validate_sp800_56b_r2_public(
+				&pub, NULL, rnd_nonce_func);
+
+			ret = gnutls_fips140_pop_context();
+			if (ret < 0)
+				goto cleanup;
+		}
+#endif
 
 		bits = mpz_sizeinbase(pub.n, 2);
 

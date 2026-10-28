@@ -41,4 +41,8 @@ int rsa_generate_fips186_4_keypair(struct rsa_public_key *pub,
 				   /* Desired size of modulo, in bits */
 				   unsigned n_size);
 
+unsigned rsa_validate_sp800_56b_r2_public(struct rsa_public_key *pub,
+					  void *random_ctx,
+					  nettle_random_func *random);
+
 #endif /* GNUTLS_LIB_NETTLE_INT_RSA_FIPS_H */

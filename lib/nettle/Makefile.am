@@ -46,7 +46,7 @@ libcrypto_la_SOURCES = pk.c mpi.c mac.c cipher.c init.c \
 	int/dsa-compute-k.c int/dsa-compute-k.h \
 	int/ecdsa-compute-k.c int/ecdsa-compute-k.h \
 	int/mpn-base256.c int/mpn-base256.h \
-	int/rsa-pad.c
+	int/rsa-pad.c int/mr.c int/mr.h int/rsa-validate.c
 
 if WINDOWS
 if HAVE_BCRYPT

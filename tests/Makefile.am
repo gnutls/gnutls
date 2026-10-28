@@ -452,6 +452,14 @@ rsa_illegal_import_CPPFLAGS = $(AM_CPPFLAGS) $(NETTLE_CFLAGS)
 cipher_alignment_CPPFLAGS = $(AM_CPPFLAGS) $(NETTLE_CFLAGS)
 cipher_alignment_LDADD = $(LDADD) $(NETTLE_LIBS)
 
+ctests += mr
+mr_CPPFLAGS = $(AM_CPPFLAGS) $(NETTLE_CFLAGS)
+mr_LDADD = $(LDADD) $(NETTLE_LIBS)
+
+ctests += rsa-validate
+rsa_validate_CPPFLAGS = $(AM_CPPFLAGS) $(NETTLE_CFLAGS)
+rsa_validate_LDADD = $(LDADD) $(NETTLE_LIBS)
+
 if ENABLE_OPENSSL
 ctests +=  openssl
 openssl_LDADD = ../extra/libgnutls-openssl.la $(LDADD)
