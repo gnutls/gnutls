@@ -65,7 +65,7 @@ default:
   stage: bootstrap
   script:
     - devel/preserve-timestamp stamp.pre-bootstrap
-    - SUBMODULE_NOFETCH=1 ./bootstrap --copy --skip-po
+    - SUBMODULE_NOFETCH=1 ./bootstrap --copy
   artifacts:
     expire_in: 1 day
     untracked: true
@@ -173,8 +173,6 @@ fedora-docdist/build:
   needs:
     - fedora/bootstrap
   script:
-    # Fake distcheck-hook that checks bootstrap is called without --skip-po
-    - mkdir -p po/.reference
     - CFLAGS="-std=c99 -O2 -g" dash ./configure --disable-gcc-warnings --cache-file $CCACHE_FILE --prefix=/usr --libdir=/usr/lib64 --disable-cxx --disable-non-suiteb-curves --enable-gtk-doc --enable-hpke --disable-maintainer-mode --with-pkcs12-iter-count=10000
     - make -j$BUILDJOBS -C doc stamp-vti
     - make -j$BUILDJOBS -C doc stamp_enums
@@ -191,8 +189,6 @@ fedora-docdist/test:
   needs:
     - fedora-docdist/build
   script:
-    # Fake distcheck-hook that checks bootstrap is called without --skip-po
-    - mkdir -p po/.reference
     - make -j$CHECKJOBS distcheck
 
 fedora-sanitizers/build:

@@ -9,5 +9,8 @@
 /Rules-quot
 /Makevars.template
 /Makefile.in.in
+/fetch-po
 *
-!POTFILES.in
+!/LINGUAS
+!/POTFILES.in
+!/*.po

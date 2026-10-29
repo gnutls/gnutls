@@ -196,7 +196,14 @@ dist-hook:
 	touch -c $(distdir)/doc/*.html $(distdir)/doc/*.pdf $(distdir)/doc/*.info
 
 distcheck-hook:
-	@test -d "$(top_srcdir)/po/.reference" || { echo "PO files are not downloaded; run ./bootstrap without --skip-po"; exit 1; }
+	@test -s "$(distdir)/po/gnutls.pot" \
+	  || { echo "po/gnutls.pot is empty or missing"; exit 1; }
+	@test -s "$(distdir)/po/LINGUAS" \
+	  || { echo "po/LINGUAS is empty or missing"; exit 1; }
+	@for lang in $$(cat "$(distdir)/po/LINGUAS"); do \
+	  test -s "$(distdir)/po/$$lang.po" \
+	    || { echo "po/$$lang.po is missing"; exit 1; }; \
+	done
 
 .PHONY: abi-check abi-dump-versioned abi-dump-latest pic-check symbol-check local-code-coverage-output files-update AUTHORS
 

@@ -1,0 +1,1688 @@
+# Traditional Chinese Messages for gnutls
+# Copyright (C) 2026 Free Software Foundation, Inc.
+# This file is distributed under the same license as the gnutls package.
+# Alang Hsu <alang.hsu@gmail.com>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnutls 3.6.8\n"
+"Report-Msgid-Bugs-To: bug-gnutls@gnu.org\n"
+"POT-Creation-Date: 2019-05-25 22:49+0200\n"
+"PO-Revision-Date: 2026-09-22 17:29+0800\n"
+"Last-Translator: Alang Hsu <alang.hsu@gmail.com>\n"
+"Language-Team: Chinese (traditional) <zh-l10n@lists.slat.org>\n"
+"Language: zh_TW\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Bugs: Report translation errors to the Language-Team address.\n"
+
+#: lib/alert.c:39
+msgid "Close notify"
+msgstr "關閉通知"
+
+#: lib/alert.c:40
+msgid "Unexpected message"
+msgstr "非預期的訊息"
+
+#: lib/alert.c:41
+msgid "Bad record MAC"
+msgstr "記錄 MAC 不良"
+
+#: lib/alert.c:42
+msgid "Decryption failed"
+msgstr "解密失敗"
+
+#: lib/alert.c:43
+msgid "Record overflow"
+msgstr "記錄溢位"
+
+#: lib/alert.c:45
+msgid "Decompression failed"
+msgstr "解壓縮失敗"
+
+#: lib/alert.c:46
+msgid "Handshake failed"
+msgstr "交握失敗"
+
+#: lib/alert.c:47
+msgid "Certificate is bad"
+msgstr "憑證不良"
+
+#: lib/alert.c:49
+msgid "Certificate is not supported"
+msgstr "不支援此憑證"
+
+#: lib/alert.c:51
+msgid "Certificate was revoked"
+msgstr "憑證已被撤銷"
+
+#: lib/alert.c:53
+msgid "Certificate is expired"
+msgstr "憑證已過期"
+
+#: lib/alert.c:55
+msgid "Unknown certificate"
+msgstr "未知的憑證"
+
+#: lib/alert.c:56
+msgid "Illegal parameter"
+msgstr "參數不合法"
+
+#: lib/alert.c:57
+msgid "CA is unknown"
+msgstr "未知的 CA"
+
+#: lib/alert.c:58
+msgid "Access was denied"
+msgstr "存取被拒"
+
+#: lib/alert.c:59
+msgid "Decode error"
+msgstr "解碼錯誤"
+
+#: lib/alert.c:60
+msgid "Decrypt error"
+msgstr "解密錯誤"
+
+#: lib/alert.c:61
+msgid "Export restriction"
+msgstr "匯出限制"
+
+#: lib/alert.c:63
+msgid "Error in protocol version"
+msgstr "協定版本錯誤"
+
+#: lib/alert.c:65
+msgid "Insufficient security"
+msgstr "安全性不足"
+
+#: lib/alert.c:66
+msgid "User canceled"
+msgstr "使用者取消"
+
+#: lib/alert.c:68
+msgid "No certificate (SSL 3.0)"
+msgstr "無憑證 (SSL 3.0)"
+
+#: lib/alert.c:69
+msgid "Internal error"
+msgstr "內部錯誤"
+
+#: lib/alert.c:71
+msgid "Inappropriate fallback"
+msgstr "不適當的回退"
+
+#: lib/alert.c:73
+msgid "No renegotiation is allowed"
+msgstr "不允許重新協商"
+
+#: lib/alert.c:75
+msgid "Could not retrieve the specified certificate"
+msgstr "無法取得指定的憑證"
+
+#: lib/alert.c:77
+msgid "An unsupported extension was sent"
+msgstr "傳送了不受支援的擴充"
+
+#: lib/alert.c:79
+msgid "The server name sent was not recognized"
+msgstr "傳送的伺服器名稱無法辨識"
+
+#: lib/alert.c:81
+msgid "The SRP/PSK username is missing or not known"
+msgstr "缺少 SRP/PSK 使用者名稱或名稱未知"
+
+#: lib/alert.c:83
+msgid "An extension was expected but was not seen"
+msgstr "預期有擴充但未見到"
+
+#: lib/alert.c:86
+msgid "No supported application protocol could be negotiated"
+msgstr "無法協商出支援的應用協定"
+
+#: lib/alert.c:88
+msgid "Certificate is required"
+msgstr "需要憑證"
+
+#: lib/errors.c:43
+msgid "Could not negotiate a supported cipher suite."
+msgstr "無法協商出支援的密碼套件。"
+
+#: lib/errors.c:45
+msgid "No or insufficient priorities were set."
+msgstr "未設定優先順序或優先順序不足。"
+
+#: lib/errors.c:47
+msgid "The cipher type is unsupported."
+msgstr "不支援此密碼類型。"
+
+#: lib/errors.c:49
+msgid "The certificate and the given key do not match."
+msgstr "憑證與給定的金鑰不相符。"
+
+#: lib/errors.c:52
+msgid "Could not negotiate a supported compression method."
+msgstr "無法協商出支援的壓縮方式。"
+
+#: lib/errors.c:54
+msgid "An unknown public key algorithm was encountered."
+msgstr "遇到未知的公鑰演算法。"
+
+#: lib/errors.c:57
+msgid "An algorithm that is not enabled was negotiated."
+msgstr "協商出的演算法尚未啟用。"
+
+#: lib/errors.c:60
+msgid "A packet with illegal or unsupported version was received."
+msgstr "收到版本不合法或不受支援的封包。"
+
+#: lib/errors.c:63
+msgid "The Diffie-Hellman prime sent by the server is not acceptable (not long enough)."
+msgstr "伺服器傳送的 Diffie-Hellman 質數無法接受（長度不足）。"
+
+#: lib/errors.c:66
+msgid "Error decoding the received TLS packet."
+msgstr "解碼收到的 TLS 封包時發生錯誤。"
+
+#: lib/errors.c:69
+msgid "A TLS record packet with invalid length was received."
+msgstr "收到長度無效的 TLS 記錄封包。"
+
+#: lib/errors.c:71
+msgid "The TLS connection was non-properly terminated."
+msgstr "TLS 連線未正常終止。"
+
+#: lib/errors.c:74
+msgid "The specified session has been invalidated for some reason."
+msgstr "指定的工作階段因故失效。"
+
+#: lib/errors.c:77
+msgid "GnuTLS internal error."
+msgstr "GnuTLS 內部錯誤。"
+
+#: lib/errors.c:79
+msgid "A connection with inappropriate fallback was attempted."
+msgstr "嘗試了回退方式不當的連線。"
+
+#: lib/errors.c:81
+msgid "An illegal TLS extension was received."
+msgstr "收到不合法的 TLS 擴充。"
+
+#: lib/errors.c:83
+msgid "An required TLS extension was received."
+msgstr "收到必要的 TLS 擴充。"
+
+#: lib/errors.c:85
+msgid "A TLS fatal alert has been received."
+msgstr "收到 TLS 致命警告。"
+
+#: lib/errors.c:87
+msgid "An unexpected TLS packet was received."
+msgstr "收到非預期的 TLS 封包。"
+
+#: lib/errors.c:89
+msgid "Failed to import the key into store."
+msgstr "無法將金鑰匯入儲存區。"
+
+#: lib/errors.c:92
+msgid "An error was encountered at the TLS Finished packet calculation."
+msgstr "計算 TLS Finished 封包時發生錯誤。"
+
+#: lib/errors.c:94 libdane/errors.c:67
+msgid "No certificate was found."
+msgstr "找不到憑證。"
+
+#: lib/errors.c:96
+msgid "Certificate is required."
+msgstr "需要憑證。"
+
+#: lib/errors.c:99
+msgid "The given DSA key is incompatible with the selected TLS protocol."
+msgstr "給定的 DSA 金鑰與所選的 TLS 協定不相容。"
+
+#: lib/errors.c:102
+msgid "There is already a crypto algorithm with lower priority."
+msgstr "已有優先順序較低的加密演算法。"
+
+#: lib/errors.c:105
+msgid "No temporary RSA parameters were found."
+msgstr "找不到暫時 RSA 參數。"
+
+#: lib/errors.c:107
+msgid "No temporary DH parameters were found."
+msgstr "找不到暫時 DH 參數。"
+
+#: lib/errors.c:109
+msgid "An unexpected TLS handshake packet was received."
+msgstr "收到非預期的 TLS 交握封包。"
+
+#: lib/errors.c:111
+msgid "The scanning of a large integer has failed."
+msgstr "掃描大整數失敗。"
+
+#: lib/errors.c:113
+msgid "Could not export a large integer."
+msgstr "無法匯出大整數。"
+
+#: lib/errors.c:115
+msgid "Decryption has failed."
+msgstr "解密失敗。"
+
+#: lib/errors.c:117
+msgid "Encryption has failed."
+msgstr "加密失敗。"
+
+#: lib/errors.c:119
+msgid "Public key decryption has failed."
+msgstr "公鑰解密失敗。"
+
+#: lib/errors.c:121
+msgid "Public key encryption has failed."
+msgstr "公鑰加密失敗。"
+
+#: lib/errors.c:123
+msgid "Public key signing has failed."
+msgstr "公鑰簽署失敗。"
+
+#: lib/errors.c:125
+msgid "Public key signature verification has failed."
+msgstr "公鑰簽章驗證失敗。"
+
+#: lib/errors.c:128
+msgid "Decompression of the TLS record packet has failed."
+msgstr "TLS 記錄封包解壓縮失敗。"
+
+#: lib/errors.c:130
+msgid "Compression of the TLS record packet has failed."
+msgstr "TLS 記錄封包壓縮失敗。"
+
+#: lib/errors.c:133
+msgid "Internal error in memory allocation."
+msgstr "分配記憶體時發生內部錯誤。"
+
+#: lib/errors.c:136
+msgid "An unimplemented or disabled feature has been requested."
+msgstr "請求了未實作或已停用的功能。"
+
+#: lib/errors.c:138
+msgid "Insufficient credentials for that request."
+msgstr "該請求的憑據不足。"
+
+#: lib/errors.c:140
+msgid "Error in password/key file."
+msgstr "密碼／金鑰檔發生錯誤。"
+
+#: lib/errors.c:141
+msgid "Wrong padding in PKCS1 packet."
+msgstr "PKCS1 封包的填充錯誤。"
+
+#: lib/errors.c:143
+msgid "The session or certificate has expired."
+msgstr "工作階段或憑證已過期。"
+
+#: lib/errors.c:145
+msgid "The certificate is not yet activated."
+msgstr "憑證尚未生效。"
+
+#: lib/errors.c:147
+msgid "Hashing has failed."
+msgstr "雜湊失敗。"
+
+#: lib/errors.c:148
+msgid "Base64 decoding error."
+msgstr "Base64 解碼錯誤。"
+
+#: lib/errors.c:150
+msgid "Base64 unexpected header error."
+msgstr "Base64 出現非預期的標頭錯誤。"
+
+#: lib/errors.c:152
+msgid "Base64 encoding error."
+msgstr "Base64 編碼錯誤。"
+
+#: lib/errors.c:154
+msgid "Parsing error in password/key file."
+msgstr "解析密碼／金鑰檔時發生錯誤。"
+
+#: lib/errors.c:156
+msgid "The requested data were not available."
+msgstr "請求的資料無法取得。"
+
+#: lib/errors.c:158
+msgid "There are no embedded data in the structure."
+msgstr "結構中無內嵌資料。"
+
+#: lib/errors.c:160
+msgid "Error in the pull function."
+msgstr "pull 函式發生錯誤。"
+
+#: lib/errors.c:161
+msgid "Error in the push function."
+msgstr "push 函式發生錯誤。"
+
+#: lib/errors.c:163
+msgid "The upper limit of record packet sequence numbers has been reached. Wow!"
+msgstr "記錄封包序號已達上限。哇！"
+
+#: lib/errors.c:165
+msgid "Error in the certificate."
+msgstr "憑證發生錯誤。"
+
+#: lib/errors.c:167
+msgid "Error in the time fields of certificate."
+msgstr "憑證的時間欄位發生錯誤。"
+
+#: lib/errors.c:169
+msgid "Error in the certificate verification."
+msgstr "憑證驗證時發生錯誤。"
+
+#: lib/errors.c:171
+msgid "Error in the CRL verification."
+msgstr "CRL 驗證時發生錯誤。"
+
+#: lib/errors.c:173
+msgid "Error in the private key verification; seed doesn't match."
+msgstr "私鑰驗證時發生錯誤；種子不相符。"
+
+#: lib/errors.c:175
+msgid "Could not authenticate peer."
+msgstr "無法驗證對等端。"
+
+#: lib/errors.c:178
+msgid "Unknown Subject Alternative name in X.509 certificate."
+msgstr "X.509 憑證中有未知的主體別名。"
+
+#: lib/errors.c:181
+msgid "CIDR name constraint is malformed in size or structure."
+msgstr "CIDR 名稱限制的大小或結構異常。"
+
+#: lib/errors.c:185
+msgid "Unsupported critical extension in X.509 certificate."
+msgstr "X.509 憑證中含有不受支援的關鍵擴充。"
+
+#: lib/errors.c:187
+msgid "Unsupported extension in X.509 certificate."
+msgstr "X.509 憑證中含有不受支援的擴充。"
+
+#: lib/errors.c:190
+msgid "Key usage violation in certificate has been detected."
+msgstr "偵測到憑證中的金鑰用途違規。"
+
+#: lib/errors.c:192 lib/errors.c:454
+msgid "Function was interrupted."
+msgstr "函式被中斷。"
+
+#: lib/errors.c:194
+msgid "TLS Application data were received, while expecting handshake data."
+msgstr "期待交握資料時卻收到 TLS 應用資料。"
+
+#: lib/errors.c:196
+msgid "Error in Database backend."
+msgstr "資料庫後端發生錯誤。"
+
+#: lib/errors.c:197
+msgid "The Database entry already exists."
+msgstr "資料庫項目已存在。"
+
+#: lib/errors.c:198
+msgid "The certificate type is not supported."
+msgstr "不支援此憑證類型。"
+
+#: lib/errors.c:201
+msgid "The given memory buffer is too short to hold parameters."
+msgstr "給定的記憶體緩衝區過短，無法容納參數。"
+
+#: lib/errors.c:203 libdane/errors.c:61
+msgid "The request is invalid."
+msgstr "請求無效。"
+
+#: lib/errors.c:205
+msgid "The cookie was bad."
+msgstr "cookie 無效。"
+
+#: lib/errors.c:206
+msgid "An illegal parameter has been received."
+msgstr "收到不合法的參數。"
+
+#: lib/errors.c:208
+msgid "An illegal parameter was found."
+msgstr "發現不合法的參數。"
+
+#: lib/errors.c:210
+msgid "Error while reading file."
+msgstr "讀取檔案時發生錯誤。"
+
+#: lib/errors.c:211
+msgid "A disallowed SNI server name has been received."
+msgstr "收到不允許的 SNI 伺服器名稱。"
+
+#: lib/errors.c:214
+msgid "ASN1 parser: Element was not found."
+msgstr "ASN1 解析器：找不到元素。"
+
+#: lib/errors.c:216
+msgid "ASN1 parser: Identifier was not found"
+msgstr "ASN1 解析器：找不到識別碼"
+
+#: lib/errors.c:218
+msgid "ASN1 parser: Error in DER parsing."
+msgstr "ASN1 解析器：DER 解析錯誤。"
+
+#: lib/errors.c:220
+msgid "ASN1 parser: Value was not found."
+msgstr "ASN1 解析器：找不到值。"
+
+#: lib/errors.c:222
+msgid "ASN1 parser: Generic parsing error."
+msgstr "ASN1 解析器：一般解析錯誤。"
+
+#: lib/errors.c:224
+msgid "ASN1 parser: Value is not valid."
+msgstr "ASN1 解析器：值無效。"
+
+#: lib/errors.c:226
+msgid "ASN1 parser: Error in TAG."
+msgstr "ASN1 解析器：TAG 錯誤。"
+
+#: lib/errors.c:228
+msgid "ASN1 parser: error in implicit tag"
+msgstr "ASN1 解析器：隱含標籤錯誤"
+
+#: lib/errors.c:230
+msgid "ASN1 parser: Error in type 'ANY'."
+msgstr "ASN1 解析器：類型「ANY」錯誤。"
+
+#: lib/errors.c:232
+msgid "ASN1 parser: Syntax error."
+msgstr "ASN1 解析器：語法錯誤。"
+
+#: lib/errors.c:234
+msgid "ASN1 parser: Overflow in DER parsing."
+msgstr "ASN1 解析器：DER 解析溢位。"
+
+#: lib/errors.c:238
+msgid "Too many empty record packets have been received."
+msgstr "收到過多空記錄封包。"
+
+#: lib/errors.c:240
+msgid "Too many handshake packets have been received."
+msgstr "收到過多交握封包。"
+
+#: lib/errors.c:242
+msgid "More than a single object matches the criteria."
+msgstr "符合條件的物件超過一個。"
+
+#: lib/errors.c:244
+msgid "The crypto library version is too old."
+msgstr "加密程式庫版本過舊。"
+
+#: lib/errors.c:247
+msgid "The tasn1 library version is too old."
+msgstr "tasn1 程式庫版本過舊。"
+
+#: lib/errors.c:249
+msgid "The OpenPGP User ID is revoked."
+msgstr "OpenPGP 使用者 ID 已被撤銷。"
+
+#: lib/errors.c:251
+msgid "The OpenPGP key has not a preferred key set."
+msgstr "OpenPGP 金鑰未設定偏好金鑰。"
+
+#: lib/errors.c:253
+msgid "Error loading the keyring."
+msgstr "載入鑰匙圈時發生錯誤。"
+
+#: lib/errors.c:255
+msgid "The initialization of crypto backend has failed."
+msgstr "加密後端初始化失敗。"
+
+#: lib/errors.c:258
+msgid "No supported compression algorithms have been found."
+msgstr "找不到支援的壓縮演算法。"
+
+#: lib/errors.c:260
+msgid "No supported cipher suites have been found."
+msgstr "找不到支援的密碼套件。"
+
+#: lib/errors.c:262
+msgid "Could not get OpenPGP key."
+msgstr "無法取得 OpenPGP 金鑰。"
+
+#: lib/errors.c:264
+msgid "Could not find OpenPGP subkey."
+msgstr "找不到 OpenPGP 子金鑰。"
+
+#: lib/errors.c:266
+msgid "Safe renegotiation failed."
+msgstr "安全重新協商失敗。"
+
+#: lib/errors.c:268
+msgid "Unsafe renegotiation denied."
+msgstr "拒絕不安全的重新協商。"
+
+#: lib/errors.c:271
+msgid "The SRP username supplied is illegal."
+msgstr "提供的 SRP 使用者名稱不合法。"
+
+#: lib/errors.c:273
+msgid "The username supplied is unknown."
+msgstr "提供的使用者名稱未知。"
+
+#: lib/errors.c:276
+msgid "The OpenPGP fingerprint is not supported."
+msgstr "不支援 OpenPGP 指紋。"
+
+#: lib/errors.c:278
+msgid "The signature algorithm is not supported."
+msgstr "不支援此簽章演算法。"
+
+#: lib/errors.c:280
+msgid "The certificate has unsupported attributes."
+msgstr "憑證含有不受支援的屬性。"
+
+#: lib/errors.c:282
+msgid "The OID is not supported."
+msgstr "不支援此 OID。"
+
+#: lib/errors.c:284
+msgid "The hash algorithm is unknown."
+msgstr "未知的雜湊演算法。"
+
+#: lib/errors.c:286
+msgid "The PKCS structure's content type is unknown."
+msgstr "PKCS 結構的內容類型未知。"
+
+#: lib/errors.c:288
+msgid "The PKCS structure's bag type is unknown."
+msgstr "PKCS 結構的袋類型未知。"
+
+#: lib/errors.c:290 lib/errors.c:296
+msgid "The given password contains invalid characters."
+msgstr "給定的密碼含有無效字元。"
+
+#: lib/errors.c:292
+msgid "The given string contains invalid UTF-8 characters."
+msgstr "給定的字串含有無效的 UTF-8 字元。"
+
+#: lib/errors.c:294
+msgid "The given email string contains non-ASCII characters before '@'."
+msgstr "給定的電子郵件字串在「@」前含有非 ASCII 字元。"
+
+#: lib/errors.c:299
+msgid "The Message Authentication Code verification failed."
+msgstr "訊息驗證碼驗證失敗。"
+
+#: lib/errors.c:301
+msgid "Some constraint limits were reached."
+msgstr "已達某些限制上限。"
+
+#: lib/errors.c:303
+msgid "Failed to acquire random data."
+msgstr "無法取得隨機資料。"
+
+#: lib/errors.c:305
+msgid "Verifying TLS/IA phase checksum failed"
+msgstr "驗證 TLS/IA 階段檢查碼失敗"
+
+#: lib/errors.c:308
+msgid "The specified algorithm or protocol is unknown."
+msgstr "指定的演算法或協定未知。"
+
+#: lib/errors.c:311
+msgid "The handshake data size is too large."
+msgstr "交握資料量過大。"
+
+#: lib/errors.c:314
+msgid "Error opening /dev/crypto"
+msgstr "開啟 /dev/crypto 時發生錯誤"
+
+#: lib/errors.c:317
+msgid "Error interfacing with /dev/crypto"
+msgstr "與 /dev/crypto 介接時發生錯誤"
+
+#: lib/errors.c:319
+msgid "Peer has terminated the connection"
+msgstr "對等端已終止連線"
+
+#: lib/errors.c:321
+msgid "Channel binding data not available"
+msgstr "通道綁定資料無法取得"
+
+#: lib/errors.c:324
+msgid "TPM error."
+msgstr "TPM 錯誤。"
+
+#: lib/errors.c:326
+msgid "The TPM library (trousers) cannot be found."
+msgstr "找不到 TPM 程式庫 (trousers)。"
+
+#: lib/errors.c:328
+msgid "TPM is not initialized."
+msgstr "TPM 尚未初始化。"
+
+#: lib/errors.c:330
+msgid "TPM key was not found in persistent storage."
+msgstr "在永久儲存區中找不到 TPM 金鑰。"
+
+#: lib/errors.c:332
+msgid "Cannot initialize a session with the TPM."
+msgstr "無法以 TPM 初始化工作階段。"
+
+#: lib/errors.c:334
+msgid "PKCS #11 error."
+msgstr "PKCS #11 錯誤。"
+
+#: lib/errors.c:336
+msgid "PKCS #11 initialization error."
+msgstr "PKCS #11 初始化錯誤。"
+
+#: lib/errors.c:338
+msgid "Error in parsing."
+msgstr "解析時發生錯誤。"
+
+#: lib/errors.c:340
+msgid "Error in provided PIN."
+msgstr "提供的 PIN 發生錯誤。"
+
+#: lib/errors.c:342
+msgid "Error in provided SRK password for TPM."
+msgstr "提供給 TPM 的 SRK 密碼發生錯誤。"
+
+#: lib/errors.c:345
+msgid "Error in provided password for key to be loaded in TPM."
+msgstr "要載入 TPM 的金鑰密碼發生錯誤。"
+
+#: lib/errors.c:347
+msgid "PKCS #11 error in slot"
+msgstr "PKCS #11 插槽錯誤"
+
+#: lib/errors.c:349
+msgid "Thread locking error"
+msgstr "執行緒鎖定錯誤"
+
+#: lib/errors.c:351
+msgid "PKCS #11 error in attribute"
+msgstr "PKCS #11 屬性錯誤"
+
+#: lib/errors.c:353
+msgid "PKCS #11 error in device"
+msgstr "PKCS #11 裝置錯誤"
+
+#: lib/errors.c:355
+msgid "PKCS #11 error in data"
+msgstr "PKCS #11 資料錯誤"
+
+#: lib/errors.c:357
+msgid "PKCS #11 unsupported feature"
+msgstr "PKCS #11 不支援的功能"
+
+#: lib/errors.c:359
+msgid "PKCS #11 error in key"
+msgstr "PKCS #11 金鑰錯誤"
+
+#: lib/errors.c:361
+msgid "PKCS #11 PIN expired"
+msgstr "PKCS #11 PIN 過期"
+
+#: lib/errors.c:363
+msgid "PKCS #11 PIN locked"
+msgstr "PKCS #11 PIN 鎖定"
+
+#: lib/errors.c:365
+msgid "PKCS #11 error in session"
+msgstr "PKCS #11 工作階段錯誤"
+
+#: lib/errors.c:367
+msgid "PKCS #11 error in signature"
+msgstr "PKCS #11 簽章錯誤"
+
+#: lib/errors.c:369
+msgid "PKCS #11 error in token"
+msgstr "PKCS #11 權杖錯誤"
+
+#: lib/errors.c:371
+msgid "PKCS #11 user error"
+msgstr "PKCS #11 使用者錯誤"
+
+#: lib/errors.c:373
+msgid "The operation timed out"
+msgstr "作業逾時"
+
+#: lib/errors.c:375
+msgid "The operation was cancelled due to user error"
+msgstr "作業因使用者錯誤而取消"
+
+#: lib/errors.c:377
+msgid "No supported ECC curves were found"
+msgstr "找不到支援的 ECC 曲線"
+
+#: lib/errors.c:379
+msgid "The curve is unsupported"
+msgstr "不支援此曲線"
+
+#: lib/errors.c:381
+msgid "The requested PKCS #11 object is not available"
+msgstr "請求的 PKCS #11 物件無法取得"
+
+#: lib/errors.c:384
+msgid "The provided X.509 certificate list is not sorted (in subject to issuer order)"
+msgstr "提供的 X.509 憑證清單未排序（應依主體至發行者順序）"
+
+#: lib/errors.c:386
+msgid "The OCSP response is invalid"
+msgstr "OCSP 回應無效"
+
+#: lib/errors.c:388
+msgid "The OCSP response provided doesn't match the available certificates"
+msgstr "提供的 OCSP 回應與可用憑證不相符"
+
+#: lib/errors.c:390
+msgid "There is no certificate status (OCSP)."
+msgstr "無憑證狀態 (OCSP)。"
+
+#: lib/errors.c:392
+msgid "Error in the system's randomness device."
+msgstr "系統亂數裝置發生錯誤。"
+
+#: lib/errors.c:395
+msgid "No common application protocol could be negotiated."
+msgstr "無法協商出共同的應用協定。"
+
+#: lib/errors.c:397
+msgid "Error while performing self checks."
+msgstr "執行自我檢查時發生錯誤。"
+
+#: lib/errors.c:399
+msgid "There is no self test for this algorithm."
+msgstr "此演算法無自我測試。"
+
+#: lib/errors.c:401
+msgid "An error has been detected in the library and cannot continue operations."
+msgstr "程式庫偵測到錯誤，無法繼續運作。"
+
+#: lib/errors.c:403
+msgid "Error in sockets initialization."
+msgstr "通訊端初始化時發生錯誤。"
+
+#: lib/errors.c:405
+msgid "Error in public key generation."
+msgstr "產生公鑰時發生錯誤。"
+
+#: lib/errors.c:407
+msgid "Invalid TLS extensions length field."
+msgstr "TLS 擴充長度欄位無效。"
+
+#: lib/errors.c:409
+msgid "Peer's certificate or username has changed during a rehandshake."
+msgstr "重新交握期間對等端的憑證或使用者名稱已變更。"
+
+#: lib/errors.c:411
+msgid "The provided string has an embedded null."
+msgstr "提供的字串含有內嵌 null。"
+
+#: lib/errors.c:413
+msgid "Attempted handshake during false start."
+msgstr "在假啟動期間嘗試交握。"
+
+#: lib/errors.c:415
+msgid "The SNI host name not recognised."
+msgstr "SNI 主機名稱無法辨識。"
+
+#: lib/errors.c:417
+msgid "There was an issue converting to or from UTF8."
+msgstr "轉換至 UTF8 或自 UTF8 轉換時發生問題。"
+
+#: lib/errors.c:419
+msgid "Cannot perform this action while handshake is in progress."
+msgstr "交握進行中無法執行此動作。"
+
+#: lib/errors.c:421
+msgid "The public key is invalid."
+msgstr "公鑰無效。"
+
+#: lib/errors.c:423
+msgid "There are no validation parameters present."
+msgstr "無驗證參數。"
+
+#: lib/errors.c:425
+msgid "The public key parameters are invalid."
+msgstr "公鑰參數無效。"
+
+#: lib/errors.c:427
+msgid "The private key is invalid."
+msgstr "私鑰無效。"
+
+#: lib/errors.c:429
+msgid "The DER time encoding is invalid."
+msgstr "DER 時間編碼無效。"
+
+#: lib/errors.c:431
+msgid "The signature is incompatible with the public key."
+msgstr "簽章與公鑰不相容。"
+
+#: lib/errors.c:433
+msgid "One of the involved algorithms has insufficient security level."
+msgstr "相關演算法之一的安全等級不足。"
+
+#: lib/errors.c:435
+msgid "No common key share with peer."
+msgstr "與對等端無共同金鑰份額。"
+
+#: lib/errors.c:437
+msgid "The early data were rejected."
+msgstr "早期資料被拒絕。"
+
+#: lib/errors.c:443 libdane/errors.c:42
+msgid "Success."
+msgstr "成功。"
+
+#: lib/errors.c:444
+msgid "A TLS warning alert has been received."
+msgstr "收到 TLS 警告。"
+
+#: lib/errors.c:446
+msgid "A heartbeat pong message was received."
+msgstr "收到心跳 pong 訊息。"
+
+#: lib/errors.c:448
+msgid "A heartbeat ping message was received."
+msgstr "收到心跳 ping 訊息。"
+
+#: lib/errors.c:450
+msgid "Resource temporarily unavailable, try again."
+msgstr "資源暫時無法使用，請再試一次。"
+
+#: lib/errors.c:452
+msgid "The transmitted packet is too large (EMSGSIZE)."
+msgstr "傳送的封包過大 (EMSGSIZE)。"
+
+#: lib/errors.c:455
+msgid "Rehandshake was requested by the peer."
+msgstr "對等端要求重新交握。"
+
+#: lib/errors.c:457
+msgid "Re-authentication was requested by the peer."
+msgstr "對等端要求重新驗證。"
+
+#: lib/errors.c:549 libdane/errors.c:100
+msgid "(unknown error code)"
+msgstr "（未知錯誤碼）"
+
+#: lib/x509/ocsp.c:2605
+msgid "The OCSP response is trusted. "
+msgstr "OCSP 回應受信任。"
+
+#: lib/x509/ocsp.c:2610
+msgid "The OCSP response's signer could not be found. "
+msgstr "找不到 OCSP 回應的簽署者。"
+
+#: lib/x509/ocsp.c:2615
+msgid "Error in the signer's key usageflags. "
+msgstr "簽署者金鑰用途旗標錯誤。"
+
+#: lib/x509/ocsp.c:2620
+msgid "The OCSP response's signer is not trusted. "
+msgstr "OCSP 回應的簽署者不受信任。"
+
+#: lib/x509/ocsp.c:2625
+msgid "The OCSP response depends on insecure algorithms. "
+msgstr "OCSP 回應依賴不安全的演算法。"
+
+#: lib/x509/ocsp.c:2630
+msgid "The OCSP response's signature cannot be validated. "
+msgstr "OCSP 回應的簽章無法驗證。"
+
+#: lib/x509/ocsp.c:2635
+msgid "The OCSP response's signer's certificate is not activated. "
+msgstr "OCSP 回應簽署者的憑證尚未生效。"
+
+#: lib/x509/ocsp.c:2640
+msgid "The OCSP response's signer's certificate is expired. "
+msgstr "OCSP 回應簽署者的憑證已過期。"
+
+#: lib/x509/ocsp.c:2644
+msgid "Memory error"
+msgstr "記憶體錯誤"
+
+#: lib/x509/ocsp_output.c:50 lib/x509/ocsp_output.c:276 lib/x509/output.c:1575
+#: lib/x509/output.c:2108 lib/x509/output.c:2506
+#, c-format
+msgid "\tVersion: %d\n"
+msgstr "\t版本：%d\n"
+
+#: lib/x509/ocsp_output.c:136 lib/x509/ocsp_output.c:500 lib/x509/output.c:2276
+#: lib/x509/output.c:2670
+msgid "\t\t\tASCII: "
+msgstr "\t\t\tASCII："
+
+#: lib/x509/ocsp_output.c:141 lib/x509/ocsp_output.c:505 lib/x509/output.c:2280
+#: lib/x509/output.c:2675
+msgid "\t\t\tHexdump: "
+msgstr "\t\t\tHexdump："
+
+#: lib/x509/ocsp_output.c:186
+msgid "OCSP Request Information:\n"
+msgstr "OCSP 請求資訊：\n"
+
+#: lib/x509/ocsp_output.c:289
+msgid "\tResponder Key ID: "
+msgstr "\t回應者金鑰 ID："
+
+#: lib/x509/ocsp_output.c:299
+#, c-format
+msgid "\tResponder ID: %s\n"
+msgstr "\t回應者 ID：%s\n"
+
+#: lib/x509/ocsp_output.c:320
+#, c-format
+msgid "\tProduced At: %s\n"
+msgstr "\t產生於：%s\n"
+
+#: lib/x509/ocsp_output.c:414
+#, c-format
+msgid "\t\tRevocation time: %s\n"
+msgstr "\t\t撤銷時間：%s\n"
+
+#: lib/x509/ocsp_output.c:434
+#, c-format
+msgid "\t\tThis Update: %s\n"
+msgstr "\t\t此次更新：%s\n"
+
+#: lib/x509/ocsp_output.c:452
+#, c-format
+msgid "\t\tNext Update: %s\n"
+msgstr "\t\t下次更新：%s\n"
+
+#: lib/x509/ocsp_output.c:524 lib/x509/output.c:1239 lib/x509/output.c:1510
+#: lib/x509/output.c:1636 lib/x509/output.c:1656 lib/x509/output.c:1700
+#: lib/x509/output.c:1928 lib/x509/output.c:1941 lib/x509/output.c:2355
+#: lib/x509/output.c:2483 lib/x509/output.c:2534
+msgid "unknown"
+msgstr "未知"
+
+#: lib/x509/ocsp_output.c:525 lib/x509/output.c:1704 lib/x509/output.c:2359
+#: lib/x509/output.c:2538
+#, c-format
+msgid "\tSignature Algorithm: %s\n"
+msgstr "\t簽章演算法：%s\n"
+
+#: lib/x509/ocsp_output.c:529 lib/x509/output.c:1711 lib/x509/output.c:2364
+msgid "warning: signed using a broken signature algorithm that can be forged.\n"
+msgstr "警告：使用可能被偽造的損壞簽章演算法簽署。\n"
+
+#: lib/x509/ocsp_output.c:543 lib/x509/output.c:1737 lib/x509/output.c:2390
+msgid "\tSignature:\n"
+msgstr "\t簽章：\n"
+
+#: lib/x509/ocsp_output.c:651
+msgid "OCSP Response Information:\n"
+msgstr "OCSP 回應資訊：\n"
+
+#: lib/x509/output.c:54 lib/x509/output.c:84
+#, c-format
+msgid "%s%s: %.*s (contains illegal chars)\n"
+msgstr "%s%s：%.*s（含有不合法字元）\n"
+
+#: lib/x509/output.c:60 lib/x509/output.c:90
+#, c-format
+msgid "%s%s: %.*s (%s)\n"
+msgstr "%s%s：%.*s (%s)\n"
+
+#: lib/x509/output.c:68 lib/x509/output.c:98
+#, c-format
+msgid "%s%s: %.*s\n"
+msgstr "%s%s：%.*s\n"
+
+#: lib/x509/output.c:114
+msgid "warning: SAN contains an embedded NUL, replacing with '!'\n"
+msgstr "警告：SAN 含有內嵌 NUL，以「!」取代。\n"
+
+#: lib/x509/output.c:130
+#, c-format
+msgid "%sURI: %.*s\n"
+msgstr "%sURI：%.*s\n"
+
+#: lib/x509/output.c:144
+#, c-format
+msgid "%sdirectoryName: %.*s\n"
+msgstr "%sdirectoryName：%.*s\n"
+
+#: lib/x509/output.c:148
+#, c-format
+msgid "%sXMPP Address: %.*s\n"
+msgstr "%sXMPP 位址：%.*s\n"
+
+#: lib/x509/output.c:152
+#, c-format
+msgid "%sKRB5Principal: %.*s\n"
+msgstr "%sKRB5Principal：%.*s\n"
+
+#: lib/x509/output.c:156
+#, c-format
+msgid "%sUnknown name: "
+msgstr "%s未知名稱："
+
+#: lib/x509/output.c:298
+#, c-format
+msgid "\t\t\tPath Length Constraint: %d\n"
+msgstr "\t\t\t路徑長度限制：%d\n"
+
+#: lib/x509/output.c:300
+#, c-format
+msgid "\t\t\tPolicy Language: %s"
+msgstr "\t\t\t原則語言：%s"
+
+#: lib/x509/output.c:308
+msgid ""
+"\t\t\tPolicy:\n"
+"\t\t\t\tASCII: "
+msgstr ""
+"\t\t\t原則：\n"
+"\t\t\t\tASCII："
+
+#: lib/x509/output.c:310
+msgid ""
+"\n"
+"\t\t\t\tHexdump: "
+msgstr ""
+"\n"
+"\t\t\t\tHexdump："
+
+#: lib/x509/output.c:343
+#, c-format
+msgid "%s\t\t\tPermitted:\n"
+msgstr "%s\t\t\t允許：\n"
+
+#: lib/x509/output.c:355
+#, c-format
+msgid "%s\t\t\tExcluded:\n"
+msgstr "%s\t\t\t排除：\n"
+
+#: lib/x509/output.c:395 lib/x509/output.c:397 lib/x509/output.c:399
+#, c-format
+msgid "\t\t\tAccess Method: %s (%s)\n"
+msgstr "\t\t\t存取方法：%s (%s)\n"
+
+#: lib/x509/output.c:503
+#, c-format
+msgid "%sDigital signature.\n"
+msgstr "%s數位簽章。\n"
+
+#: lib/x509/output.c:505
+#, c-format
+msgid "%sNon repudiation.\n"
+msgstr "%s不可否認性。\n"
+
+#: lib/x509/output.c:507
+#, c-format
+msgid "%sKey encipherment.\n"
+msgstr "%s金鑰加密。\n"
+
+#: lib/x509/output.c:509
+#, c-format
+msgid "%sData encipherment.\n"
+msgstr "%s資料加密。\n"
+
+#: lib/x509/output.c:511
+#, c-format
+msgid "%sKey agreement.\n"
+msgstr "%s金鑰協議。\n"
+
+#: lib/x509/output.c:513
+#, c-format
+msgid "%sCertificate signing.\n"
+msgstr "%s憑證簽署。\n"
+
+#: lib/x509/output.c:515
+#, c-format
+msgid "%sCRL signing.\n"
+msgstr "%sCRL 簽署。\n"
+
+#: lib/x509/output.c:517
+#, c-format
+msgid "%sKey encipher only.\n"
+msgstr "%s僅金鑰加密。\n"
+
+#: lib/x509/output.c:519
+#, c-format
+msgid "%sKey decipher only.\n"
+msgstr "%s僅金鑰解密。\n"
+
+#: lib/x509/output.c:563
+#, c-format
+msgid "\t\t\tNot Before: %s\n"
+msgstr "\t\t\t有效起始：%s\n"
+
+#: lib/x509/output.c:572
+#, c-format
+msgid "\t\t\tNot After: %s\n"
+msgstr "\t\t\t有效結束：%s\n"
+
+#: lib/x509/output.c:650
+#, c-format
+msgid "%s\t\t\tTLS WWW Server.\n"
+msgstr "%s\t\t\tTLS WWW 伺服器。\n"
+
+#: lib/x509/output.c:652
+#, c-format
+msgid "%s\t\t\tTLS WWW Client.\n"
+msgstr "%s\t\t\tTLS WWW 用戶端。\n"
+
+#: lib/x509/output.c:654
+#, c-format
+msgid "%s\t\t\tCode signing.\n"
+msgstr "%s\t\t\t程式碼簽署。\n"
+
+#: lib/x509/output.c:656
+#, c-format
+msgid "%s\t\t\tEmail protection.\n"
+msgstr "%s\t\t\t電子郵件保護。\n"
+
+#: lib/x509/output.c:659
+#, c-format
+msgid "%s\t\t\tTime stamping.\n"
+msgstr "%s\t\t\t時間戳記。\n"
+
+#: lib/x509/output.c:661
+#, c-format
+msgid "%s\t\t\tOCSP signing.\n"
+msgstr "%s\t\t\tOCSP 簽署。\n"
+
+#: lib/x509/output.c:663
+#, c-format
+msgid "%s\t\t\tIpsec IKE.\n"
+msgstr "%s\t\t\tIpsec IKE。\n"
+
+#: lib/x509/output.c:665
+#, c-format
+msgid "%s\t\t\tAny purpose.\n"
+msgstr "%s\t\t\t任何用途。\n"
+
+#: lib/x509/output.c:688
+#, c-format
+msgid "%s\t\t\tCertificate Authority (CA): FALSE\n"
+msgstr "%s\t\t\t憑證機構 (CA)：否\n"
+
+#: lib/x509/output.c:691
+#, c-format
+msgid "%s\t\t\tCertificate Authority (CA): TRUE\n"
+msgstr "%s\t\t\t憑證機構 (CA)：是\n"
+
+#: lib/x509/output.c:695
+#, c-format
+msgid "%s\t\t\tPath Length Constraint: %d\n"
+msgstr "%s\t\t\t路徑長度限制：%d\n"
+
+#: lib/x509/output.c:751
+#, c-format
+msgid "%s\t\t\totherName OID: %.*s\n"
+msgstr "%s\t\t\totherName OID：%.*s\n"
+
+#: lib/x509/output.c:753
+#, c-format
+msgid "%s\t\t\totherName DER: "
+msgstr "%s\t\t\totherName DER："
+
+#: lib/x509/output.c:756
+#, c-format
+msgid ""
+"\n"
+"%s\t\t\totherName ASCII: "
+msgstr ""
+"\n"
+"%s\t\t\totherName ASCII："
+
+#: lib/x509/output.c:896
+#, c-format
+msgid "%s\t\tBasic Constraints (%s):\n"
+msgstr "%s\t\t基本限制 (%s)：\n"
+
+#: lib/x509/output.c:898 lib/x509/output.c:912 lib/x509/output.c:957
+#: lib/x509/output.c:991 lib/x509/output.c:1004 lib/x509/output.c:1016
+#: lib/x509/output.c:1031 lib/x509/output.c:1043 lib/x509/output.c:1056
+#: lib/x509/output.c:1068 lib/x509/output.c:1082 lib/x509/output.c:1096
+#: lib/x509/output.c:1104 lib/x509/output.c:1115 lib/x509/output.c:1126
+#: lib/x509/output.c:1134 lib/x509/output.c:2217 lib/x509/output.c:2242
+#: lib/x509/output.c:2262
+msgid "critical"
+msgstr "關鍵"
+
+#: lib/x509/output.c:898 lib/x509/output.c:912 lib/x509/output.c:958
+#: lib/x509/output.c:992 lib/x509/output.c:1004 lib/x509/output.c:1016
+#: lib/x509/output.c:1031 lib/x509/output.c:1043 lib/x509/output.c:1056
+#: lib/x509/output.c:1068 lib/x509/output.c:1082 lib/x509/output.c:1096
+#: lib/x509/output.c:1104 lib/x509/output.c:1115 lib/x509/output.c:1126
+#: lib/x509/output.c:1134 lib/x509/output.c:2218 lib/x509/output.c:2243
+#: lib/x509/output.c:2263
+msgid "not critical"
+msgstr "非關鍵"
+
+#: lib/x509/output.c:910
+#, c-format
+msgid "%s\t\tSubject Key Identifier (%s):\n"
+msgstr "%s\t\t主體金鑰識別碼 (%s)：\n"
+
+#: lib/x509/output.c:1002
+#, c-format
+msgid "%s\t\tAuthority Key Identifier (%s):\n"
+msgstr "%s\t\t機構金鑰識別碼 (%s)：\n"
+
+#: lib/x509/output.c:1015
+#, c-format
+msgid "%s\t\tKey Usage (%s):\n"
+msgstr "%s\t\t金鑰用途 (%s)：\n"
+
+#: lib/x509/output.c:1029
+#, c-format
+msgid "%s\t\tPrivate Key Usage Period (%s):\n"
+msgstr "%s\t\t私鑰使用期限 (%s)：\n"
+
+#: lib/x509/output.c:1042
+#, c-format
+msgid "%s\t\tKey Purpose (%s):\n"
+msgstr "%s\t\t金鑰目的 (%s)：\n"
+
+#: lib/x509/output.c:1054
+#, c-format
+msgid "%s\t\tSubject Alternative Name (%s):\n"
+msgstr "%s\t\t主體別名 (%s)：\n"
+
+#: lib/x509/output.c:1066
+#, c-format
+msgid "%s\t\tIssuer Alternative Name (%s):\n"
+msgstr "%s\t\t發行者別名 (%s)：\n"
+
+#: lib/x509/output.c:1080
+#, c-format
+msgid "%s\t\tCRL Distribution points (%s):\n"
+msgstr "%s\t\tCRL 分發點 (%s)：\n"
+
+#: lib/x509/output.c:1094
+#, c-format
+msgid "%s\t\tProxy Certificate Information (%s):\n"
+msgstr "%s\t\t代理憑證資訊 (%s)：\n"
+
+#: lib/x509/output.c:1102
+#, c-format
+msgid "%s\t\tAuthority Information Access (%s):\n"
+msgstr "%s\t\t機構資訊存取 (%s)：\n"
+
+#: lib/x509/output.c:1114
+#, c-format
+msgid "%s\t\tName Constraints (%s):\n"
+msgstr "%s\t\t名稱限制 (%s)：\n"
+
+#: lib/x509/output.c:1124
+#, c-format
+msgid "%s\t\tTLS Features (%s):\n"
+msgstr "%s\t\tTLS 功能 (%s)：\n"
+
+#: lib/x509/output.c:1132
+#, c-format
+msgid "%s\t\tUnknown extension %s (%s):\n"
+msgstr "%s\t\t未知擴充 %s (%s)：\n"
+
+#: lib/x509/output.c:1136
+#, c-format
+msgid "%s\t\t\tASCII: "
+msgstr "%s\t\t\tASCII："
+
+#: lib/x509/output.c:1140
+#, c-format
+msgid "%s\t\t\tHexdump: "
+msgstr "%s\t\t\tHexdump："
+
+#: lib/x509/output.c:1189
+#, c-format
+msgid "%s\tExtensions:\n"
+msgstr "%s\t擴充：\n"
+
+#: lib/x509/output.c:1241
+#, c-format
+msgid "\t%sPublic Key Algorithm: %s\n"
+msgstr "\t%s公鑰演算法：%s\n"
+
+#: lib/x509/output.c:1243
+#, c-format
+msgid "\tAlgorithm Security Level: %s (%d bits)\n"
+msgstr "\t演算法安全等級：%s (%d 位元)\n"
+
+#: lib/x509/output.c:1248
+msgid "\t\tParameters:\n"
+msgstr "\t\t參數：\n"
+
+#: lib/x509/output.c:1268
+#, c-format
+msgid "\t\tModulus (bits %d): "
+msgstr "\t\t模數 (%d 位元)："
+
+#: lib/x509/output.c:1275
+#, c-format
+msgid "\t\tExponent (bits %d): "
+msgstr "\t\t指數 (%d 位元)："
+
+#: lib/x509/output.c:1283
+#, c-format
+msgid "\t\tModulus (bits %d):\n"
+msgstr "\t\t模數 (%d 位元)：\n"
+
+#: lib/x509/output.c:1290
+#, c-format
+msgid "\t\tExponent (bits %d):\n"
+msgstr "\t\t指數 (%d 位元)：\n"
+
+#: lib/x509/output.c:1317 lib/x509/output.c:1437
+#, c-format
+msgid "\t\tCurve:\t%s\n"
+msgstr "\t\t曲線：\t%s\n"
+
+#: lib/x509/output.c:1321 lib/x509/output.c:1447
+msgid "\t\tX: "
+msgstr "\t\tX: "
+
+#: lib/x509/output.c:1327 lib/x509/output.c:1452
+msgid "\t\tY: "
+msgstr "\t\tY: "
+
+#: lib/x509/output.c:1334 lib/x509/output.c:1458
+msgid "\t\tX:\n"
+msgstr "\t\tX:\n"
+
+#: lib/x509/output.c:1339 lib/x509/output.c:1462
+msgid "\t\tY:\n"
+msgstr "\t\tY:\n"
+
+#: lib/x509/output.c:1367
+#, c-format
+msgid "\t\tPublic key (bits %d): "
+msgstr "\t\t公鑰 (%d 位元)："
+
+#: lib/x509/output.c:1373
+msgid "\t\tP: "
+msgstr "\t\tP: "
+
+#: lib/x509/output.c:1378
+msgid "\t\tQ: "
+msgstr "\t\tQ: "
+
+#: lib/x509/output.c:1383
+msgid "\t\tG: "
+msgstr "\t\tG: "
+
+#: lib/x509/output.c:1391
+#, c-format
+msgid "\t\tPublic key (bits %d):\n"
+msgstr "\t\t公鑰 (%d 位元)：\n"
+
+#: lib/x509/output.c:1396
+msgid "\t\tP:\n"
+msgstr "\t\tP:\n"
+
+#: lib/x509/output.c:1400
+msgid "\t\tQ:\n"
+msgstr "\t\tQ:\n"
+
+#: lib/x509/output.c:1404
+msgid "\t\tG:\n"
+msgstr "\t\tG:\n"
+
+#: lib/x509/output.c:1439
+#, c-format
+msgid "\t\tDigest:\t%s\n"
+msgstr "\t\t摘要：\t%s\n"
+
+#: lib/x509/output.c:1441
+#, c-format
+msgid "\t\tParamSet: %s\n"
+msgstr "\t\t參數集：%s\n"
+
+#: lib/x509/output.c:1554 lib/x509/output.c:2473
+msgid "Subject "
+msgstr "主體"
+
+#: lib/x509/output.c:1590
+msgid "\tSerial Number (hex): "
+msgstr "\t序號 (hex)："
+
+#: lib/x509/output.c:1603 lib/x509/output.c:2118
+msgid "\tIssuer:\n"
+msgstr "\t發行者：\n"
+
+#: lib/x509/output.c:1608 lib/x509/output.c:2123
+#, c-format
+msgid "\tIssuer: %s\n"
+msgstr "\t發行者：%s\n"
+
+#: lib/x509/output.c:1617
+msgid "\tValidity:\n"
+msgstr "\t有效期：\n"
+
+#: lib/x509/output.c:1634 lib/x509/output.c:1636
+#, c-format
+msgid "\t\tNot Before: %s\n"
+msgstr "\t\t有效起始：%s\n"
+
+#: lib/x509/output.c:1654 lib/x509/output.c:1656
+#, c-format
+msgid "\t\tNot After: %s\n"
+msgstr "\t\t有效結束：%s\n"
+
+#: lib/x509/output.c:1667 lib/x509/output.c:2516
+msgid "\tSubject:\n"
+msgstr "\t主體：\n"
+
+#: lib/x509/output.c:1672 lib/x509/output.c:2521
+#, c-format
+msgid "\tSubject: %s\n"
+msgstr "\t主體：%s\n"
+
+#: lib/x509/output.c:1751
+msgid "\tFingerprint:\n"
+msgstr "\t指紋：\n"
+
+#: lib/x509/output.c:1760
+msgid "\t\tsha1:"
+msgstr "\t\tsha1:"
+
+#: lib/x509/output.c:1771
+msgid "\t\tsha256:"
+msgstr "\t\tsha256:"
+
+#: lib/x509/output.c:1805
+#, c-format
+msgid ""
+"%sPublic Key ID:\n"
+"%s\tsha1:"
+msgstr ""
+"%s公鑰 ID：\n"
+"%s\tsha1:"
+
+#: lib/x509/output.c:1811
+#, c-format
+msgid ""
+"%sPublic Key PIN:\n"
+"%s\tpin-sha256:"
+msgstr ""
+"%s公鑰 PIN：\n"
+"%s\tpin-sha256:"
+
+#: lib/x509/output.c:1883
+msgid "no subject,"
+msgstr "無主體，"
+
+#: lib/x509/output.c:1899
+msgid "no issuer,"
+msgstr "無發行者，"
+
+#: lib/x509/output.c:1946
+#, c-format
+msgid "signed using %s (broken!), "
+msgstr "使用 %s 簽署（已損壞！），"
+
+#: lib/x509/output.c:1948
+#, c-format
+msgid "signed using %s, "
+msgstr "使用 %s 簽署，"
+
+#: lib/x509/output.c:2084
+msgid "X.509 Certificate Information:\n"
+msgstr "X.509 憑證資訊：\n"
+
+#: lib/x509/output.c:2088 lib/x509/output.c:2728
+msgid "Other Information:\n"
+msgstr "其他資訊：\n"
+
+#: lib/x509/output.c:2103
+msgid "\tVersion: 1 (default)\n"
+msgstr "\t版本：1（預設）\n"
+
+#: lib/x509/output.c:2132
+msgid "\tUpdate dates:\n"
+msgstr "\t更新日期：\n"
+
+#: lib/x509/output.c:2149
+#, c-format
+msgid "\t\tIssued: %s\n"
+msgstr "\t\t發行：%s\n"
+
+#: lib/x509/output.c:2169
+#, c-format
+msgid "\t\tNext at: %s\n"
+msgstr "\t\t下次更新：%s\n"
+
+#: lib/x509/output.c:2200
+msgid "\tExtensions:\n"
+msgstr "\t擴充：\n"
+
+#: lib/x509/output.c:2216
+#, c-format
+msgid "\t\tCRL Number (%s): "
+msgstr "\t\tCRL 編號 (%s)："
+
+#: lib/x509/output.c:2241
+#, c-format
+msgid "\t\tAuthority Key Identifier (%s):\n"
+msgstr "\t\t機構金鑰識別碼 (%s)：\n"
+
+#: lib/x509/output.c:2260
+#, c-format
+msgid "\t\tUnknown extension %s (%s):\n"
+msgstr "\t\t未知擴充 %s (%s)：\n"
+
+#: lib/x509/output.c:2297
+#, c-format
+msgid "\tRevoked certificates (%d):\n"
+msgstr "\t已撤銷憑證 (%d)：\n"
+
+#: lib/x509/output.c:2300
+msgid "\tNo revoked certificates.\n"
+msgstr "\t無已撤銷憑證。\n"
+
+#: lib/x509/output.c:2321
+msgid "\t\tSerial Number (hex): "
+msgstr "\t\t序號 (hex)："
+
+#: lib/x509/output.c:2339
+#, c-format
+msgid "\t\tRevoked at: %s\n"
+msgstr "\t\t撤銷於：%s\n"
+
+#: lib/x509/output.c:2421
+msgid "X.509 Certificate Revocation List Information:\n"
+msgstr "X.509 憑證撤銷清單資訊：\n"
+
+#: lib/x509/output.c:2571
+msgid "\tAttributes:\n"
+msgstr "\t屬性：\n"
+
+#: lib/x509/output.c:2628
+#, c-format
+msgid "\t\tChallenge password: %s\n"
+msgstr "\t\t質詢密碼：%s\n"
+
+#: lib/x509/output.c:2638
+#, c-format
+msgid "\t\tUnknown attribute %s:\n"
+msgstr "\t\t未知屬性 %s：\n"
+
+#: lib/x509/output.c:2724
+msgid "PKCS #10 Certificate Request Information:\n"
+msgstr "PKCS #10 憑證申請資訊：\n"
+
+#: lib/x509/output.c:2751
+msgid "Public Key Usage:\n"
+msgstr "公鑰用途：\n"
+
+#: lib/x509/output.c:2791
+msgid "Public Key Information:\n"
+msgstr "公鑰資訊：\n"
+
+#: libdane/dane.c:1050
+msgid "Certificate matches. "
+msgstr "憑證相符。"
+
+#: libdane/dane.c:1053
+msgid "Verification failed. "
+msgstr "驗證失敗。"
+
+#: libdane/dane.c:1058
+msgid "CA constrains were violated. "
+msgstr "CA 限制被違反。"
+
+#: libdane/dane.c:1062
+msgid "The certificate differs. "
+msgstr "憑證不相同。"
+
+#: libdane/dane.c:1067
+msgid "There were no DANE information. "
+msgstr "無 DANE 資訊。"
+
+#: libdane/errors.c:43
+msgid "There was error initializing the DNS query."
+msgstr "初始化 DNS 查詢時發生錯誤。"
+
+#: libdane/errors.c:45
+msgid "There was an error while resolving."
+msgstr "解析時發生錯誤。"
+
+#: libdane/errors.c:47
+msgid "No DANE data were found."
+msgstr "找不到 DANE 資料。"
+
+#: libdane/errors.c:49
+msgid "Unknown DANE data were found."
+msgstr "發現未知的 DANE 資料。"
+
+#: libdane/errors.c:51
+msgid "No DNSSEC signature was found."
+msgstr "找不到 DNSSEC 簽章。"
+
+#: libdane/errors.c:53
+msgid "Received corrupt data."
+msgstr "收到毀損的資料。"
+
+#: libdane/errors.c:55
+msgid "The DNSSEC signature is invalid."
+msgstr "DNSSEC 簽章無效。"
+
+#: libdane/errors.c:57
+msgid "There was a memory error."
+msgstr "發生記憶體錯誤。"
+
+#: libdane/errors.c:59
+msgid "The requested data are not available."
+msgstr "請求的資料無法取得。"
+
+#: libdane/errors.c:63
+msgid "There was an error in the certificate."
+msgstr "憑證發生錯誤。"
+
+#: libdane/errors.c:65
+msgid "There was an error in the public key."
+msgstr "公鑰發生錯誤。"
+
+#: libdane/errors.c:69
+msgid "Error in file."
+msgstr "檔案發生錯誤。"

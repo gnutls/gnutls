@@ -17,6 +17,14 @@
    *.abi files under [devel/abi-dump](devel/abi-dump) submodule, run
    `make abi-dump-latest`, and push any changes to the [abi-dump
    repository]; then do `make abi-check`
+1. Sync [gnutls translations] from [Translation Project]:
+   ```console
+   rm po/*.po
+   wget -np -r -l1 -nd -nv -A.po -P po \
+     https://translationproject.org/latest/gnutls/
+   ls po/*.po | sed 's|.*/||; s|\.po$||' | LC_ALL=C sort > po/LINGUAS
+   git add -A po/ && git commit -sm 'po: sync from translationproject.org' po/
+   ```
 1. Create a distribution tarball: note that this requires
    the documentation to be generated. See the `fedora-docdist/build` job in
    [.gitlab-ci.yml](.gitlab-ci.yml), which does the same thing in the CI:
@@ -58,6 +66,8 @@
    A commit auto-generates the [gnutls web site].
 1. Optionally announce the release on the @GnuTLS twitter account.
 1. Close the current release milestone.
+1. Notify the [Translation Project] of the new release, according to
+   the guidance from the [Translation Project maintainers page].
 
 ## Distribution specific steps
 
@@ -72,6 +82,9 @@
 [web-pages repository]: https://gitlab.com/gnutls/web-pages/
 [gnutls web site]: https://gnutls.gitlab.io/web-pages/
 [git-evtag]: https://github.com/cgwalters/git-evtag
+[gnutls translations]: https://translationproject.org/latest/gnutls
+[Translation Project]: https://translationproject.org
+[Translation Project maintainers page]: https://translationproject.org/html/maintainers.html
 [CI/CD jobs]: https://gitlab.com/gnutls/gnutls/-/jobs
 [gnutls-help@lists.gnutls.org list]: https://lists.gnutls.org/pipermail/gnutls-help
 [info-gnu@gnu.org list]: https://lists.gnu.org/archive/html/info-gnu
