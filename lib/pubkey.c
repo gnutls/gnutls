@@ -1421,6 +1421,59 @@ int gnutls_pubkey_export_gost_raw2(gnutls_pubkey_t key,
 }
 
 /**
+ * gnutls_pubkey_export_mldsa_raw:
+ * @key: Holds the public key
+ * @pub: will hold the raw public key (may be %NULL)
+ *
+ * This function will export the ML-DSA public key found in @key as a
+ * raw octet string (FIPS 204 / NIST ML-DSA public key encoding).  The
+ * buffer is allocated using gnutls_malloc() and stored in @pub.  The
+ * ML-DSA parameter set can be obtained with
+ * gnutls_pubkey_get_pk_algorithm().
+ *
+ * This is intended for applications such as DNSSEC that need the raw
+ * public key material rather than a SubjectPublicKeyInfo encoding.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
+ *
+ * Since: 3.8.15
+ **/
+int gnutls_pubkey_export_mldsa_raw(gnutls_pubkey_t key, gnutls_datum_t *pub)
+{
+	size_t expected;
+
+	if (key == NULL)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	if (!IS_ML_DSA(key->params.algo))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	switch (key->params.algo) {
+	case GNUTLS_PK_MLDSA44:
+		expected = MLDSA44_PUBKEY_SIZE;
+		break;
+	case GNUTLS_PK_MLDSA65:
+		expected = MLDSA65_PUBKEY_SIZE;
+		break;
+	case GNUTLS_PK_MLDSA87:
+		expected = MLDSA87_PUBKEY_SIZE;
+		break;
+	default:
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
+
+	if (key->params.raw_pub.data == NULL ||
+	    key->params.raw_pub.size != expected)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	if (pub == NULL)
+		return 0;
+
+	return _gnutls_set_datum(pub, key->params.raw_pub.data,
+				 key->params.raw_pub.size);
+}
+
+/**
  * gnutls_pubkey_import:
  * @key: The public key. 
  * @data: The DER or PEM encoded certificate. 
@@ -1982,6 +2035,66 @@ int gnutls_pubkey_import_gost_raw(gnutls_pubkey_t key, gnutls_ecc_curve_t curve,
 cleanup:
 	gnutls_pk_params_release(&key->params);
 	return ret;
+}
+
+/**
+ * gnutls_pubkey_import_mldsa_raw:
+ * @key: The structure to store the parsed key
+ * @algo: one of %GNUTLS_PK_MLDSA44, %GNUTLS_PK_MLDSA65, or %GNUTLS_PK_MLDSA87
+ * @pub: holds the raw public key
+ *
+ * This function will convert the given raw ML-DSA public key (FIPS 204
+ * public key encoding) to a #gnutls_pubkey_t.  The output will be
+ * stored in @key.  @pub must have the length required by @algo
+ * (1312, 1952, or 2592 octets respectively).
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.8.15
+ **/
+int gnutls_pubkey_import_mldsa_raw(gnutls_pubkey_t key,
+				   gnutls_pk_algorithm_t algo,
+				   const gnutls_datum_t *pub)
+{
+	size_t expected;
+	int ret;
+
+	if (key == NULL || pub == NULL || pub->data == NULL)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	if (!IS_ML_DSA(algo))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	switch (algo) {
+	case GNUTLS_PK_MLDSA44:
+		expected = MLDSA44_PUBKEY_SIZE;
+		break;
+	case GNUTLS_PK_MLDSA65:
+		expected = MLDSA65_PUBKEY_SIZE;
+		break;
+	case GNUTLS_PK_MLDSA87:
+		expected = MLDSA87_PUBKEY_SIZE;
+		break;
+	default:
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
+
+	if (pub->size != expected)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	gnutls_pk_params_release(&key->params);
+	gnutls_pk_params_init(&key->params);
+
+	ret = _gnutls_set_datum(&key->params.raw_pub, pub->data, pub->size);
+	if (ret < 0) {
+		gnutls_assert();
+		gnutls_pk_params_release(&key->params);
+		return ret;
+	}
+
+	key->params.algo = algo;
+	return 0;
 }
 
 /**
