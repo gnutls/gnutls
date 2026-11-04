@@ -5,28 +5,39 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-** libgnutls: Added gnutls_pubkey_export_mldsa_raw() and
-gnutls_pubkey_import_mldsa_raw() to obtain and restore the raw FIPS 204
-ML-DSA public key octet string. This is needed by applications such as
-DNSSEC that cannot use SubjectPublicKeyInfo alone.
-[#1917]
+* Version 3.8.14 (unreleased)
 
-** libgnutls: Added --enable-tls11-support configure option to control
-support for TLS 1.0, TLS 1.1, and DTLS 1.0 (RFC 8996). These protocols
-are currently enabled by default. A future release will disable them by
-default.
+** libgnutls: Add gnutls_pubkey_{import,export}_mldsa_raw()
+   These functions obtain and restore
+   the raw FIPS 204 ML-DSA public key octet string.
+   This is needed by applications such as DNSSEC
+   that cannot use SubjectPublicKeyInfo alone (#1917).
 
-** build: The --with-nettle-mini configure option has been removed.
-GnuTLS builds must now link against GMP. Mini-GMP lacks relevant
-optimizations and side-channel protections.
-[#1946]
+** libgnutls: Add --enable-tls11-support configure option
+   It is now possible to compile out support
+   for TLS 1.0, TLS 1.1, and DTLS 1.0 (RFC 8996) (!2151).
+   These protocols are currently enabled by default.
+   A future release will disable them by default.
 
-** minitasn1: The internal copy of libtasn1 has now been removed.
-The ./configure --with-included-libtasn1 parameter is also removed.
-If you are building GnuTLS in an environment without libtasn1, please
-modify your scripts to also build and install libtasn1 first.  This
-decision is made to reduce maintainance in the long-term, as we no
-longer have to keep track of minitasn1-related issues.
+** build: Remove --with-nettle-mini configure option
+   GnuTLS builds must now link against GMP.
+   Mini-GMP lacks relevant optimizations and side-channel protections (#1946).
+
+** minitasn1: Remove the internal copy of libtasn1
+   The ./configure --with-included-libtasn1 parameter is also removed.
+   If you are building GnuTLS in an environment without libtasn1,
+   please modify your scripts to also build and install libtasn1 first.
+   This decision is made to reduce maintenance in the long-term,
+   as we no longer have to keep track of minitasn1-related issues (!1938).
+
+** API and ABI modifications:
+gnutls_hpke_import_pubkey: New function
+gnutls_hpke_export_pubkey: New function
+gnutls_pubkey_export_mldsa_raw: New function
+gnutls_pubkey_import_mldsa_raw: New function
+GNUTLS_SAN_MIN: New enum member of gnutls_x509_subject_alt_name_t
+GNUTLS_SAN_OTHERNAME_MIN: New enum member of gnutls_x509_subject_alt_name_t
+GNUTLS_SAN_OTHERNAME_MAX: New enum member of gnutls_x509_subject_alt_name_t
 
 * Version 3.8.13 (released 2026-04-29)
 
