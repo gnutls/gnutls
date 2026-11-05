@@ -28,15 +28,8 @@
 
 int gnutls_is_secure_memory(const void *mem);
 
-extern asn1_node _gnutls_pkix1_asn;
-extern asn1_node _gnutls_gnutls_asn;
-
-/* removed const from asn1_node* to
- * prevent warnings, since libtasn1 doesn't
- * use the const keyword in its functions.
- */
-#define _gnutls_get_gnutls_asn() ((asn1_node)_gnutls_gnutls_asn)
-#define _gnutls_get_pkix() ((asn1_node)_gnutls_pkix1_asn)
+extern asn1_node_const _gnutls_get_gnutls_asn(void);
+extern asn1_node_const _gnutls_get_pkix(void);
 
 extern gnutls_log_func _gnutls_log_func;
 extern gnutls_audit_log_func _gnutls_audit_log_func;

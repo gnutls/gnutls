@@ -81,8 +81,8 @@ inline static int _gnutls_global_init_skip(void)
 extern const asn1_static_node gnutls_asn1_tab[];
 extern const asn1_static_node pkix_asn1_tab[];
 
-asn1_node _gnutls_pkix1_asn = NULL;
-asn1_node _gnutls_gnutls_asn = NULL;
+static asn1_node _gnutls_pkix1_asn = NULL;
+static asn1_node _gnutls_gnutls_asn = NULL;
 
 gnutls_log_func _gnutls_log_func = NULL;
 gnutls_audit_log_func _gnutls_audit_log_func = NULL;
@@ -206,6 +206,16 @@ void gnutls_global_set_mem_functions(gnutls_alloc_function alloc_func,
 {
 	_gnutls_debug_log(
 		"called the deprecated gnutls_global_set_mem_functions()\n");
+}
+
+asn1_node_const _gnutls_get_gnutls_asn(void)
+{
+	return (asn1_node_const)_gnutls_gnutls_asn;
+}
+
+asn1_node_const _gnutls_get_pkix(void)
+{
+	return (asn1_node_const)_gnutls_pkix1_asn;
 }
 
 GNUTLS_STATIC_MUTEX(global_init_mutex);
