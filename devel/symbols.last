@@ -20,7 +20,6 @@ GNUTLS_3_7_7@GNUTLS_3_7_7
 GNUTLS_3_8_11@GNUTLS_3_8_11
 GNUTLS_3_8_13@GNUTLS_3_8_13
 GNUTLS_3_8_14@GNUTLS_3_8_14
-GNUTLS_3_8_15@GNUTLS_3_8_15
 GNUTLS_3_8_1@GNUTLS_3_8_1
 GNUTLS_3_8_2@GNUTLS_3_8_2
 GNUTLS_3_8_4@GNUTLS_3_8_4
@@ -740,7 +739,7 @@ gnutls_pubkey_export_ecc_raw2@GNUTLS_3_6_0
 gnutls_pubkey_export_ecc_raw@GNUTLS_3_4
 gnutls_pubkey_export_ecc_x962@GNUTLS_3_4
 gnutls_pubkey_export_gost_raw2@GNUTLS_3_6_3
-gnutls_pubkey_export_mldsa_raw@GNUTLS_3_8_15
+gnutls_pubkey_export_mldsa_raw@GNUTLS_3_8_14
 gnutls_pubkey_export_rsa_raw2@GNUTLS_3_6_0
 gnutls_pubkey_export_rsa_raw@GNUTLS_3_4
 gnutls_pubkey_get_key_id@GNUTLS_3_4
@@ -755,7 +754,7 @@ gnutls_pubkey_import_dsa_raw@GNUTLS_3_4
 gnutls_pubkey_import_ecc_raw@GNUTLS_3_4
 gnutls_pubkey_import_ecc_x962@GNUTLS_3_4
 gnutls_pubkey_import_gost_raw@GNUTLS_3_6_3
-gnutls_pubkey_import_mldsa_raw@GNUTLS_3_8_15
+gnutls_pubkey_import_mldsa_raw@GNUTLS_3_8_14
 gnutls_pubkey_import_openpgp@GNUTLS_3_4
 gnutls_pubkey_import_openpgp_raw@GNUTLS_3_4
 gnutls_pubkey_import_pkcs11@GNUTLS_3_4

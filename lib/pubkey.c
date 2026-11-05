@@ -1436,7 +1436,7 @@ int gnutls_pubkey_export_gost_raw2(gnutls_pubkey_t key,
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
- * Since: 3.8.15
+ * Since: 3.8.14
  **/
 int gnutls_pubkey_export_mldsa_raw(gnutls_pubkey_t key, gnutls_datum_t *pub)
 {
@@ -2051,7 +2051,7 @@ cleanup:
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
- * Since: 3.8.15
+ * Since: 3.8.14
  **/
 int gnutls_pubkey_import_mldsa_raw(gnutls_pubkey_t key,
 				   gnutls_pk_algorithm_t algo,
@@ -2094,6 +2094,7 @@ int gnutls_pubkey_import_mldsa_raw(gnutls_pubkey_t key,
 	}
 
 	key->params.algo = algo;
+	key->bits = pubkey_to_bits(&key->params);
 	return 0;
 }
 

@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2026
+ * Copyright (C) 2026 Mohammadreza Khellat.
+ *
+ * Author: Mohammadreza Khellat
  *
  * This file is part of GnuTLS.
  *
