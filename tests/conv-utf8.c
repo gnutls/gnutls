@@ -113,6 +113,9 @@ UTF8_MATCH(check_utf8_ok3, "简体中文", "\x7B\x80\x4F\x53\x4E\x2D\x65\x87");
 UTF8_MATCH(
 	check_utf8_ok4, "Σὲ γνωρίζω ἀπὸ",
 	"\x03\xA3\x1F\x72\x00\x20\x03\xB3\x03\xBD\x03\xC9\x03\xC1\x03\xAF\x03\xB6\x03\xC9\x00\x20\x1F\x00\x03\xC0\x1F\x78");
+UTF8_MATCH(check_utf8_nfc1, "e\xcc\x81\x61", "\x00\xE9\x00\x61");
+UTF8_MATCH(check_utf8_nfc2, "\xe0\xa5\x98\xe0\xa5\x98",
+	   "\x09\x15\x09\x3C\x09\x15\x09\x3C");
 
 UTF16_MATCH(check_utf16_ok1, "abcd", "\x00\x61\x00\x62\x00\x63\x00\x64");
 UTF16_MATCH(check_utf16_ok2, "ユーザー別サイト",
@@ -125,16 +128,20 @@ UTF16_MATCH(
 UTF8_FAIL(check_utf8_fail1, "\xfe\xff\xaa\x80\xff", 5);
 UTF8_FAIL(check_utf8_fail2, "\x64\x00\x62\xf3\x64\x65", 6);
 UTF16_FAIL(check_utf16_fail1, "\xd8\x00\xdb\xff\x00\x63\x00\x04", 8);
+UTF16_FAIL(check_utf16_fail2, "\x00\x61\x00\x62\x00", 5);
 
 int main(void)
 {
 	const struct CMUnitTest tests[] = { cmocka_unit_test(check_utf8_fail1),
 					    cmocka_unit_test(check_utf8_fail2),
 					    cmocka_unit_test(check_utf16_fail1),
+					    cmocka_unit_test(check_utf16_fail2),
 					    cmocka_unit_test(check_utf8_ok1),
 					    cmocka_unit_test(check_utf8_ok2),
 					    cmocka_unit_test(check_utf8_ok3),
 					    cmocka_unit_test(check_utf8_ok4),
+					    cmocka_unit_test(check_utf8_nfc1),
+					    cmocka_unit_test(check_utf8_nfc2),
 					    cmocka_unit_test(check_utf16_ok1),
 					    cmocka_unit_test(check_utf16_ok2),
 					    cmocka_unit_test(check_utf16_ok3),
