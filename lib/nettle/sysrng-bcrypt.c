@@ -36,7 +36,7 @@
 #include <nettle/yarrow.h>
 #include <errno.h>
 #include "rnd-common.h"
-#include <hash-pjw-bare.h>
+#include "hashcode-mem.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>

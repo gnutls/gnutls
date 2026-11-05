@@ -42,7 +42,9 @@
 #include "inih/ini.h"
 #include "locks.h"
 #include "profiles.h"
-#include "name_val_array.h"
+#include "gl_linkedhash_list.h"
+#include "gl_list.h"
+#include "hashcode-mem.h"
 
 #define MAX_ELEMENTS GNUTLS_MAX_ALGORITHM_NUM
 
@@ -1010,12 +1012,111 @@ static void dummy_func(gnutls_priority_t c)
 
 #include <priority_options.h>
 
+struct name_value_st {
+	char *name;
+	size_t name_size;
+	char *value;
+};
+
+static inline void name_value_free(struct name_value_st *nv)
+{
+	if (nv) {
+		gnutls_free(nv->name);
+		gnutls_free(nv->value);
+		gnutls_free(nv);
+	}
+}
+
+static inline int name_value_init(struct name_value_st **res, const char *name,
+				  const char *value)
+{
+	struct name_value_st *nv;
+
+	nv = gnutls_calloc(1, sizeof(*nv));
+	if (!nv)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+	nv->name = gnutls_strdup(name);
+	nv->value = gnutls_strdup(value);
+	if (!nv->name || !nv->value) {
+		name_value_free(nv);
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+	}
+
+	nv->name_size = strlen(nv->name);
+
+	*res = _gnutls_take_pointer(&nv);
+
+	return 0;
+}
+
+static bool name_value_equals(const void *o1, const void *o2)
+{
+	const struct name_value_st *nv1 = (const struct name_value_st *)o1;
+	const struct name_value_st *nv2 = (const struct name_value_st *)o2;
+
+	return nv1->name_size == nv2->name_size &&
+	       memeq(nv1->name, nv2->name, nv1->name_size);
+}
+
+static size_t name_value_hashcode(const void *o)
+{
+	const struct name_value_st *nv = (const struct name_value_st *)o;
+
+	return hash_pjw_bare(nv->name, nv->name_size);
+}
+
+static void name_value_dispose(const void *o)
+{
+	struct name_value_st *nv = (struct name_value_st *)o;
+
+	name_value_free(nv);
+}
+
+static inline const char *
+name_value_array_value(gl_list_t array, const char *name, size_t name_size)
+{
+	gl_list_node_t node = gl_list_search(
+		array, &(struct name_value_st){ .name = (char *)name,
+						.name_size = name_size });
+
+	if (node) {
+		const struct name_value_st *nv =
+			gl_list_node_value(array, node);
+
+		if (unlikely(!nv)) {
+			gnutls_assert();
+			return NULL;
+		}
+		return nv->value;
+	}
+	return NULL;
+}
+
+static inline int name_value_array_append(gl_list_t array, const char *name,
+					  const char *value)
+{
+	struct name_value_st *nv;
+	int ret;
+
+	ret = name_value_init(&nv, name, value);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	if (!gl_list_nx_add_last(array, nv)) {
+		name_value_free(nv);
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+	}
+
+	return 0;
+}
+
 struct cfg {
 	bool allowlisting;
 	bool ktls_enabled;
 	bool allow_rsa_pkcs1_encrypt;
 
-	name_val_array_t priority_strings;
+	gl_list_t priority_strings;
 	char *priority_string;
 	char *default_priority_string;
 	gnutls_certificate_verification_profiles_t verification_profile;
@@ -1045,12 +1146,16 @@ static inline void cfg_init(struct cfg *cfg)
 {
 	memset(cfg, 0, sizeof(*cfg));
 	cfg->allow_rsa_pkcs1_encrypt = true;
+	cfg->priority_strings = gl_list_nx_create_empty(
+		GL_LINKEDHASH_LIST, name_value_equals, name_value_hashcode,
+		name_value_dispose, false);
 }
 
 static inline void cfg_deinit(struct cfg *cfg)
 {
 	if (cfg->priority_strings) {
-		_name_val_array_clear(&cfg->priority_strings);
+		gl_list_free(cfg->priority_strings);
+		cfg->priority_strings = NULL;
 	}
 	gnutls_free(cfg->priority_string);
 	gnutls_free(cfg->default_priority_string);
@@ -1076,14 +1181,6 @@ static unsigned system_priority_file_loaded = 0;
 bool _gnutls_allowlisting_mode(void)
 {
 	return system_wide_config.allowlisting;
-}
-
-static void _clear_default_system_priority(void)
-{
-	gnutls_free(system_wide_config.default_priority_string);
-	system_wide_config.default_priority_string = NULL;
-
-	_gnutls_default_priority_string = DEFAULT_PRIORITY_STRING;
 }
 
 gnutls_certificate_verification_profiles_t
@@ -1141,43 +1238,6 @@ static inline void ini_ctx_deinit(struct ini_ctx *ctx)
 	gnutls_free(ctx->sigs_for_cert);
 	gnutls_free(ctx->versions);
 	gnutls_free(ctx->curves);
-}
-
-static inline void cfg_steal(struct cfg *dst, struct cfg *src)
-{
-	dst->verification_profile = src->verification_profile;
-
-	dst->priority_strings = src->priority_strings;
-	src->priority_strings = NULL;
-
-	dst->priority_string = src->priority_string;
-	src->priority_string = NULL;
-
-	dst->default_priority_string = src->default_priority_string;
-	src->default_priority_string = NULL;
-
-	dst->p11_provider_url = src->p11_provider_url;
-	src->p11_provider_url = NULL;
-
-	dst->p11_provider_pin = src->p11_provider_pin;
-	src->p11_provider_pin = NULL;
-
-	dst->allowlisting = src->allowlisting;
-	dst->ktls_enabled = src->ktls_enabled;
-	dst->allow_rsa_pkcs1_encrypt = src->allow_rsa_pkcs1_encrypt;
-	dst->force_ext_master_secret = src->force_ext_master_secret;
-	dst->force_ext_master_secret_set = src->force_ext_master_secret_set;
-	memcpy(dst->ciphers, src->ciphers, sizeof(src->ciphers));
-	memcpy(dst->macs, src->macs, sizeof(src->macs));
-	memcpy(dst->groups, src->groups, sizeof(src->groups));
-	memcpy(dst->kxs, src->kxs, sizeof(src->kxs));
-	memcpy(dst->hashes, src->hashes, sizeof(src->hashes));
-	memcpy(dst->ecc_curves, src->ecc_curves, sizeof(src->ecc_curves));
-	memcpy(dst->sigs, src->sigs, sizeof(src->sigs));
-	memcpy(dst->sigs_for_cert, src->sigs_for_cert,
-	       sizeof(src->sigs_for_cert));
-	memcpy(dst->cert_comp_algs, src->cert_comp_algs,
-	       sizeof(src->cert_comp_algs));
 }
 
 /*
@@ -1458,12 +1518,11 @@ cfg_ecc_curves_remove(struct cfg *cfg, gnutls_ecc_curve_t curve)
 	return _cfg_ecc_curves_remark(cfg);
 }
 
-static inline int cfg_apply(struct cfg *cfg, struct ini_ctx *ctx)
+static inline int ini_ctx_finish(struct ini_ctx *ctx, struct cfg *res)
 {
 	size_t i;
 	int ret;
-
-	cfg_steal(cfg, &ctx->cfg);
+	struct cfg *cfg = &ctx->cfg;
 
 	if (cfg->default_priority_string) {
 		_gnutls_default_priority_string = cfg->default_priority_string;
@@ -1473,26 +1532,30 @@ static inline int cfg_apply(struct cfg *cfg, struct ini_ctx *ctx)
 		/* also updates `flags` of global `hash_algorithms[]` */
 		ret = cfg_hashes_set_array(cfg, ctx->hashes, ctx->hashes_size);
 		if (unlikely(ret < 0)) {
-			return gnutls_assert_val(ret);
+			gnutls_assert();
+			goto out;
 		}
 		/* also updates `flags` of global `sign_algorithms[]` */
 		ret = cfg_sigs_set_arrays(cfg, ctx->sigs, ctx->sigs_size,
 					  ctx->sigs_for_cert,
 					  ctx->sigs_for_cert_size);
 		if (unlikely(ret < 0)) {
-			return gnutls_assert_val(ret);
+			gnutls_assert();
+			goto out;
 		}
 		/* also updates `supported` field of global `sup_versions[]` */
 		ret = cfg_versions_set_array(cfg, ctx->versions,
 					     ctx->versions_size);
 		if (unlikely(ret < 0)) {
-			return gnutls_assert_val(ret);
+			gnutls_assert();
+			goto out;
 		}
 		/* also updates `supported` field of global `ecc_curves[]` */
 		ret = cfg_ecc_curves_set_array(cfg, ctx->curves,
 					       ctx->curves_size);
 		if (unlikely(ret < 0)) {
-			return gnutls_assert_val(ret);
+			gnutls_assert();
+			goto out;
 		}
 	} else {
 		/* updates same global arrays as above, but doesn't store
@@ -1501,38 +1564,50 @@ static inline int cfg_apply(struct cfg *cfg, struct ini_ctx *ctx)
 		for (i = 0; i < ctx->hashes_size; i++) {
 			ret = _gnutls_digest_mark_insecure(ctx->hashes[i]);
 			if (unlikely(ret < 0)) {
-				return ret;
+				gnutls_assert();
+				goto out;
 			}
 		}
 		for (i = 0; i < ctx->sigs_size; i++) {
 			ret = _gnutls_sign_mark_insecure(ctx->sigs[i],
 							 _INSECURE);
 			if (unlikely(ret < 0)) {
-				return ret;
+				gnutls_assert();
+				goto out;
 			}
 		}
 		for (i = 0; i < ctx->sigs_for_cert_size; i++) {
 			ret = _gnutls_sign_mark_insecure(ctx->sigs_for_cert[i],
 							 _INSECURE_FOR_CERTS);
 			if (unlikely(ret < 0)) {
-				return ret;
+				gnutls_assert();
+				goto out;
 			}
 		}
 		for (i = 0; i < ctx->versions_size; i++) {
 			ret = _gnutls_version_mark_disabled(ctx->versions[i]);
 			if (unlikely(ret < 0)) {
-				return ret;
+				gnutls_assert();
+				goto out;
 			}
 		}
 		for (i = 0; i < ctx->curves_size; i++) {
 			ret = _gnutls_ecc_curve_mark_disabled(ctx->curves[i]);
 			if (unlikely(ret < 0)) {
-				return ret;
+				gnutls_assert();
+				goto out;
 			}
 		}
 	}
 
-	return 0;
+	cfg_deinit(res);
+	memcpy(res, cfg, sizeof(*cfg));
+	memset(cfg, 0, sizeof(*cfg));
+	ret = 0;
+
+out:
+	ini_ctx_deinit(ctx);
+	return ret;
 }
 
 /* This function parses the global section of the configuration file.
@@ -1606,7 +1681,7 @@ static bool override_allowed(bool allowlisting, const char *name)
 }
 
 /* This function parses a gnutls configuration file.  Updating internal settings
- * according to the parsed configuration is done by cfg_apply.
+ * according to the parsed configuration is done by ini_ctx_finish.
  */
 static int cfg_ini_handler(void *_ctx, const char *section, const char *name,
 			   const char *value)
@@ -1627,8 +1702,8 @@ static int cfg_ini_handler(void *_ctx, const char *section, const char *name,
 		_gnutls_debug_log("cfg: adding priority: %s -> %s\n", name,
 				  value);
 
-		ret = _name_val_array_append(&cfg->priority_strings, name,
-					     value);
+		ret = name_value_array_append(cfg->priority_strings, name,
+					      value);
 		if (ret < 0)
 			return 0;
 	} else if (c_strcasecmp(section, PROVIDER_SECTION) == 0) {
@@ -2344,6 +2419,10 @@ static inline bool load_system_priority_file(void)
 	FILE *fp;
 	struct ini_ctx ctx;
 
+	/* Prepare an empty config in case the below fails to
+	 * initialize system_wide_config.
+	 */
+	cfg_deinit(&system_wide_config);
 	cfg_init(&system_wide_config);
 
 	fp = fopen(system_priority_file, "re");
@@ -2376,8 +2455,12 @@ static inline bool load_system_priority_file(void)
 				  system_priority_file, err);
 		return false;
 	}
-	cfg_apply(&system_wide_config, &ctx);
-	ini_ctx_deinit(&ctx);
+	err = ini_ctx_finish(&ctx, &system_wide_config);
+	if (err) {
+		_gnutls_debug_log("cfg: unable to apply: %s: %d\n",
+				  system_priority_file, err);
+		return false;
+	}
 	return true;
 }
 
@@ -2401,6 +2484,7 @@ static int _gnutls_update_system_priorities(bool defer_system_wide)
 		if (ret < 0)
 			goto out;
 		/* If system-wide config is unavailable, apply the defaults */
+		cfg_deinit(&system_wide_config);
 		cfg_init(&system_wide_config);
 		goto out;
 	}
@@ -2493,9 +2577,8 @@ void _gnutls_prepare_to_load_system_priorities(void)
 
 void _gnutls_unload_system_priorities(void)
 {
-	_name_val_array_clear(&system_wide_config.priority_strings);
-	gnutls_free(system_wide_config.priority_string);
-	_clear_default_system_priority();
+	cfg_deinit(&system_wide_config);
+	_gnutls_default_priority_string = DEFAULT_PRIORITY_STRING;
 	system_priority_last_mod = 0;
 }
 
@@ -2590,7 +2673,7 @@ char *_gnutls_resolve_priorities(const char *priorities)
 		    strncmp(LEVEL_SYSTEM, ss, ss_len) == 0) {
 			p = system_wide_config.priority_string;
 		} else {
-			p = _name_val_array_value(
+			p = name_value_array_value(
 				system_wide_config.priority_strings, ss,
 				ss_len);
 		}

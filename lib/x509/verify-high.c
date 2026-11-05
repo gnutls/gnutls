@@ -36,7 +36,7 @@
 #include "intprops.h"
 #include "gl_linkedhash_list.h"
 #include "gl_list.h"
-#include <hashcode-mem.h>
+#include "hashcode-mem.h"
 
 struct named_cert_st {
 	gnutls_x509_crt_t cert;
