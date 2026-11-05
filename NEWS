@@ -14,6 +14,13 @@ See the end for copying conditions.
    Reported by Joshua Rogers of AISLE Research Team.
    [GNUTLS-SA-2026-11-18-1, severity: low] [CVE-2026-127039]
 
+** libgnutls: Fix crash in RSA-PSK username copy memory allocation failure
+   A missing return on a failed username copy could crash the handshake
+   when memory allocation fails.
+   The error is now propagated, aborting the handshake.
+   Reported by Joshua Rogers of AISLE Research Team.
+   [GNUTLS-SA-2026-11-18-2, severity: low] [CVE-2026-127040]
+
 ** libgnutls: Fix memory leak in kTLS key setup on FreeBSD
    The iv and cipher_key buffers allocated for the tls_enable structure
    were not freed after setsockopt. They're now freed on all exit paths (#1865).
