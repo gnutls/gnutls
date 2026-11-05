@@ -1485,6 +1485,8 @@ GNUTLS_3_8_14
  global:
     gnutls_hpke_import_pubkey;
     gnutls_hpke_export_pubkey;
+    gnutls_pubkey_export_mldsa_raw;
+    gnutls_pubkey_import_mldsa_raw;
  local:
 	*;
 } GNUTLS_3_8_13;
