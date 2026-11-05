@@ -453,12 +453,12 @@ cipher_alignment_CPPFLAGS = $(AM_CPPFLAGS) $(NETTLE_CFLAGS)
 cipher_alignment_LDADD = $(LDADD) $(NETTLE_LIBS)
 
 ctests += mr
-mr_CPPFLAGS = $(AM_CPPFLAGS) $(NETTLE_CFLAGS)
-mr_LDADD = $(LDADD) $(NETTLE_LIBS)
+mr_CPPFLAGS = $(AM_CPPFLAGS) $(HOGWEED_CFLAGS)
+mr_LDADD = $(LDADD) $(HOGWEED_LIBS)
 
 ctests += rsa-validate
-rsa_validate_CPPFLAGS = $(AM_CPPFLAGS) $(NETTLE_CFLAGS)
-rsa_validate_LDADD = $(LDADD) $(NETTLE_LIBS)
+rsa_validate_CPPFLAGS = $(AM_CPPFLAGS) $(HOGWEED_CFLAGS)
+rsa_validate_LDADD = $(LDADD) $(HOGWEED_LIBS)
 
 if ENABLE_OPENSSL
 ctests +=  openssl
