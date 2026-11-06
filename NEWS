@@ -21,6 +21,12 @@ See the end for copying conditions.
    Reported by Joshua Rogers of AISLE Research Team.
    [GNUTLS-SA-2026-11-18-2, severity: low] [CVE-2026-127040]
 
+** libgnutls: Fix HCRYPTHASH handle leak in CAPI signing on allocation failure
+   The HCRYPTHASH handle created in capi_sign() was not destroyed
+   when the memory allocation for the signature buffer failed.
+   It is now released on all exit paths (#1867).
+   Reported by Joshua Rogers of AISLE Research Team.
+
 ** libgnutls: Fix memory leak in kTLS key setup on FreeBSD
    The iv and cipher_key buffers allocated for the tls_enable structure
    were not freed after setsockopt. They're now freed on all exit paths (#1865).
