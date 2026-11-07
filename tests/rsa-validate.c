@@ -126,9 +126,10 @@
 	"8df812190b668b985daecba7c240a128" \
 	"9ffe8a87c0a646b38617f0ff1b56e579"
 
-extern unsigned rsa_validate_sp800_56b_r2_public(struct rsa_public_key *pub,
-						 void *random_ctx,
-						 nettle_random_func *random);
+extern unsigned
+_gnutls_rsa_validate_sp800_56b_r2_public(struct rsa_public_key *pub,
+					 void *random_ctx,
+					 nettle_random_func *random);
 
 static unsigned run(const char *n, const char *e)
 {
@@ -141,7 +142,7 @@ static unsigned run(const char *n, const char *e)
 	mpz_set_str(pub.n, n, 16);
 	mpz_set_str(pub.e, e, 16);
 
-	unsigned res = rsa_validate_sp800_56b_r2_public(
+	unsigned res = _gnutls_rsa_validate_sp800_56b_r2_public(
 		&pub, &rng, (nettle_random_func *)knuth_lfib_random);
 
 	rsa_public_key_clear(&pub);

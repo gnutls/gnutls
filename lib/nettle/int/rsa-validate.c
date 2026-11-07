@@ -37,9 +37,9 @@
 	"641831369080887268041164681593453560544410298362920842256746157156" \
 	"8587963766123806881456648026733413053968363611105"
 
-unsigned rsa_validate_sp800_56b_r2_public(struct rsa_public_key *pub,
-					  void *random_ctx,
-					  nettle_random_func *random)
+unsigned _gnutls_rsa_validate_sp800_56b_r2_public(struct rsa_public_key *pub,
+						  void *random_ctx,
+						  nettle_random_func *random)
 {
 	/* (a) Length of the modulus: Check that the length of the
 	 * modulus n (nlen) is even and provides 112-bit security
@@ -76,7 +76,7 @@ unsigned rsa_validate_sp800_56b_r2_public(struct rsa_public_key *pub,
 	 */
 	mpz_t g;
 	mpz_init(g);
-	enum mr_result res = miller_rabin_enhanced(
+	enum mr_result res = _gnutls_miller_rabin_enhanced(
 		pub->n, 5 /* max. in Table B.1 of FIPS 186-5 */, random_ctx,
 		random, g);
 	if (res != MR_COMPOSITE_NOT_PRIME_POWER) {

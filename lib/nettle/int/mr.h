@@ -34,8 +34,9 @@ enum mr_result {
 	MR_ERROR
 };
 
-enum mr_result miller_rabin_enhanced(const mpz_t w, size_t iterations,
-				     void *rng_ctx, nettle_random_func *rng,
-				     mpz_t factor);
+enum mr_result _gnutls_miller_rabin_enhanced(const mpz_t w, size_t iterations,
+					     void *rng_ctx,
+					     nettle_random_func *rng,
+					     mpz_t factor);
 
 #endif /* GNUTLS_LIB_NETTLE_INT_MR_H */
