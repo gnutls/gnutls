@@ -97,9 +97,10 @@ static enum mr_result mr_round(const mpz_t w, const mpz_t w_minus_1,
  * so that (1 - 0.2)^155 ≈ 2^-64. */
 #define MAX_RANDOM_DRAWS 155
 
-enum mr_result miller_rabin_enhanced(const mpz_t w, size_t iterations,
-				     void *rng_ctx, nettle_random_func *rng,
-				     mpz_t factor)
+enum mr_result _gnutls_miller_rabin_enhanced(const mpz_t w, size_t iterations,
+					     void *rng_ctx,
+					     nettle_random_func *rng,
+					     mpz_t factor)
 {
 	if (mpz_cmp_ui(w, 3) <= 0 || mpz_even_p(w) || iterations == 0)
 		return MR_ERROR;

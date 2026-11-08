@@ -36,10 +36,9 @@ enum mr_result {
 	MR_ERROR /* invalid input                          */
 };
 
-extern enum mr_result miller_rabin_enhanced(const mpz_t w, size_t iterations,
-					    void *rng_ctx,
-					    nettle_random_func *rng,
-					    mpz_t factor);
+extern enum mr_result
+_gnutls_miller_rabin_enhanced(const mpz_t w, size_t iterations, void *rng_ctx,
+			      nettle_random_func *rng, mpz_t factor);
 
 #define SEED 13
 #define ITERATIONS 40
@@ -69,7 +68,7 @@ static enum mr_result run(const char *dec, unsigned iterations)
 		fail("bad test literal: %s\n", dec);
 
 	knuth_lfib_init(&rng, SEED);
-	enum mr_result r = miller_rabin_enhanced(
+	enum mr_result r = _gnutls_miller_rabin_enhanced(
 		w, iterations, &rng, (nettle_random_func *)knuth_lfib_random,
 		g);
 

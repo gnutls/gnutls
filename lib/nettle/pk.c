@@ -1172,8 +1172,9 @@ static int _wrap_nettle_pk_encrypt(gnutls_pk_algorithm_t algo,
 			if (ret < 0)
 				goto cleanup;
 
-			not_approved = !rsa_validate_sp800_56b_r2_public(
-				&pub, NULL, rnd_nonce_func);
+			not_approved =
+				!_gnutls_rsa_validate_sp800_56b_r2_public(
+					&pub, NULL, rnd_nonce_func);
 
 			ret = gnutls_fips140_pop_context();
 			if (ret < 0)
@@ -2798,8 +2799,9 @@ static int _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 			if (ret < 0)
 				goto cleanup;
 
-			not_approved = !rsa_validate_sp800_56b_r2_public(
-				&pub, NULL, rnd_nonce_func);
+			not_approved =
+				!_gnutls_rsa_validate_sp800_56b_r2_public(
+					&pub, NULL, rnd_nonce_func);
 
 			ret = gnutls_fips140_pop_context();
 			if (ret < 0)
