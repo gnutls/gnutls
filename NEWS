@@ -21,6 +21,11 @@ See the end for copying conditions.
    Reported by Joshua Rogers of AISLE Research Team.
    [GNUTLS-SA-2026-11-18-2, severity: low] [CVE-2026-127040]
 
+** libgnutls: Fix CRL distribution points leak in certificate printing
+   Printing certificates with gnutls_x509_crt_print() could leak memory
+   if enumerating CRL distribution points failed (#1866).
+   Reported by Joshua Rogers of AISLE Research Team.
+
 ** libgnutls: Fix HCRYPTHASH handle leak in CAPI signing on allocation failure
    The HCRYPTHASH handle created in capi_sign() was not destroyed
    when the memory allocation for the signature buffer failed.
