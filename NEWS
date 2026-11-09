@@ -21,6 +21,12 @@ See the end for copying conditions.
    Reported by Joshua Rogers of AISLE Research Team.
    [GNUTLS-SA-2026-11-18-2, severity: low] [CVE-2026-127040]
 
+** libgnutls: Fix buffer overrun in deterministic DSA signing
+   A malformed DSA private key with a q value exceeding 512 bits
+   could overrun a fixed-size buffer when signing in reproducible mode.
+   Such keys are now rejected with GNUTLS_E_INVALID_REQUEST (#1857).
+   Reported by Joshua Rogers of AISLE Research Team.
+
 ** libgnutls: Fix CRL distribution points leak in certificate printing
    Printing certificates with gnutls_x509_crt_print() could leak memory
    if enumerating CRL distribution points failed (#1866).
