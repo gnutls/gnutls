@@ -128,7 +128,7 @@ clang-copy:
 # ChangeLog must be PHONY, else it isn't generated on 'make distcheck'
 .PHONY: ChangeLog
 ChangeLog:
-	(cd "$(srcdir)" ; if test -d .git ; then git log --no-merges --no-decorate --pretty  --since="2014 November 07"|grep -v ^'commit' ; else echo "Empty" ; fi) > ChangeLog
+	(cd "$(srcdir)" ; if test -d .git ; then git log --no-merges --no-decorate --pretty  --since="2014-11-07 00:00:00 +0000"|grep -v ^'commit' ; else echo "Empty" ; fi) > ChangeLog
 
 tag = $(PACKAGE)_`echo $(VERSION) | sed 's/\./_/g'`
 

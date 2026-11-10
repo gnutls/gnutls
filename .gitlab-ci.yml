@@ -830,3 +830,138 @@ mingw32/archive:
   needs: # archive only if tests successful
     - mingw32/build
     - mingw32/test
+
+release-ready:  # extra release readiness checks. follows fedora/build flags
+  extends:
+    - .test
+    - .fedora
+  dependencies:
+    - fedora/build
+  needs:
+    - fedora/build
+  script:
+    - |
+      # fail if anything but comments remains below the temp suppressions marker
+      MARKER='should be removed in the new release'
+      if sed -n "/$MARKER/,\$p" devel/libgnutls.abignore | grep '^\s*[^\s#]'
+      then
+        echo "devel/libgnutls.abignore still contains suppressions" \
+             "to remove before release (see devel/release-steps.md)"
+        exit 1
+      fi
+    - make symbol-check abi-check-latest abi-check
+    # the top NEWS version header must be Version x.y.z (released YYYY-MM-DD),
+    # and the release date must be recent
+    - devel/check-news
+  when: manual  # passes only once after abi-dump is updated (release-steps.md)
+  allow_failure: true
+
+.release-tarball:  # see devel/nix
+  image: nixos/nix:latest
+  variables:
+    NIX_CONFIG: "experimental-features = nix-command flakes"
+    GIT_DEPTH: 0  # bootstrap needs full history for AUTHORS
+    GIT_SUBMODULE_DEPTH: 1  # we shouldn't need history on submodules
+    GIT_SUBMODULE_STRATEGY: normal  # we shouldn't need the nested submodules
+  # no ccache/timestamp bookkeeping (the default scripts need tools the
+  # nixos/nix image doesn't have)
+  before_script: []
+  after_script: []
+  when: manual
+
+.build-release-tarball:
+  extends:
+    - .release-tarball
+  stage: build
+  needs: []
+  # the two jobs produce differently-named copies of the same tarball; the
+  # archive job cross-compares them
+  artifacts:
+    name: "gnutls-release-tarball"
+    expire_in: 1 week
+    paths:
+      - "release-tarball-[ab].tar.xz"
+      - "release-tarball-[ab].closure"
+
+release-tarball/test-docs:  # build pdf/epub/html, mirrors the web-pages `pages` job
+  extends: .release-tarball
+  stage: test
+  needs:
+    - release-tarball/build-a
+  script:
+    - nix-store --import < release-tarball-a.closure
+    - rm release-tarball-a.closure release-tarball-a.tar.xz
+    - nix build "path:$CI_PROJECT_DIR?dir=devel/nix#docs"
+
+release-tarball/build-a:
+  extends: .build-release-tarball
+  script:
+    - p=$(nix build -L "path:$CI_PROJECT_DIR?dir=devel/nix#release-tarball" --print-out-paths --no-link)
+    - cp "$p" release-tarball-a.tar.xz
+    - nix-store --export "$p" > release-tarball-a.closure
+
+release-tarball/build-b:
+  extends: .build-release-tarball
+  script:
+    - p=$(nix build -L "path:$CI_PROJECT_DIR?dir=devel/nix#release-tarball" --print-out-paths --no-link)
+    - cp "$p" release-tarball-b.tar.xz
+    - nix-store --export "$p" > release-tarball-b.closure
+
+release-tarball/test-minimal:
+  extends: .release-tarball
+  stage: test
+  needs:
+    - release-tarball/build-a
+  script:
+    - nix-store --import < release-tarball-a.closure
+    - rm release-tarball-a.closure release-tarball-a.tar.xz
+    - nix build "path:$CI_PROJECT_DIR?dir=devel/nix#minimal"
+
+release-tarball/test-revdeps:
+  extends: .release-tarball
+  stage: test
+  needs:
+    - release-tarball/build-b
+  script:
+    - nix-store --import < release-tarball-b.closure
+    - rm release-tarball-b.closure release-tarball-b.tar.xz
+    - nix build "path:$CI_PROJECT_DIR?dir=devel/nix#nixpkgs-like" "path:$CI_PROJECT_DIR?dir=devel/nix#revdeps"
+
+release-tarball/archive:
+  extends: .release-tarball
+  stage: archive
+  needs:
+    - job: release-tarball/build-a
+      artifacts: true
+    - job: release-tarball/build-b
+      artifacts: true
+  script:
+    - version=$(grep -m1 -F 'AC_INIT([GnuTLS],' configure.ac | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+    - test "$(sha256sum < release-tarball-a.tar.xz)" = "$(sha256sum < release-tarball-b.tar.xz)"
+    - |
+      if test -n "$CI_COMMIT_TAG"; then
+        name="gnutls-$version"
+      else
+        base=$(git describe --tags --abbrev=0)
+        count=$(git rev-list --count "${base}..HEAD")
+        name="gnutls-${base}+${count}-${CI_COMMIT_SHORT_SHA}"
+      fi
+    - mv release-tarball-a.tar.xz "$name.tar.xz"
+    - rm release-tarball-b.tar.xz
+    # diff with newest already-released tarball of the same minor version
+    - minor=${version%.*}
+    - baseurl=https://gnupg.org/ftp/gcrypt/gnutls/v$minor
+    - listing=$(curl -fsSL "$baseurl/")
+    - tarballs=$(grep -oE "gnutls-${version%.*}\.[0-9]+\.tar\.xz" <<<"$listing")
+    - prev=$(sort -Vu <<<"$tarballs" | tail -1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+') || exit 0
+    - curl -fsSL -o "prev-$prev.tar.xz" "$baseurl/gnutls-$prev.tar.xz"
+    - mkdir "gnutls-$CI_COMMIT_SHORT_SHA"
+    - nix shell nixpkgs#xz -c sh -c "tar xJf prev-$prev.tar.xz && tar xJf $name.tar.xz --strip-components=1 -C gnutls-$CI_COMMIT_SHORT_SHA"
+    - nix shell nixpkgs#diffutils -c sh -c "diff -ruN gnutls-$prev gnutls-$CI_COMMIT_SHORT_SHA > gnutls-$prev-to-$CI_COMMIT_SHORT_SHA.patch || true"
+    - rm "prev-$prev.tar.xz"
+  artifacts:
+    name: "gnutls-release-tarball"
+    expire_in: 1 week
+    paths:
+      - "gnutls-*.tar.xz"
+      - "gnutls-*-to-*.patch"

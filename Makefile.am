@@ -184,10 +184,6 @@ files-update:
 	@echo "******************************************************************************************"
 
 dist-hook:
-	if test -d "$(top_srcdir)/devel";then \
-		$(MAKE) -C $(top_srcdir) symbol-check && \
-		$(MAKE) -C $(top_srcdir) abi-check-latest; \
-	fi
 	$(MAKE) -C doc/ compare-makefile
 	$(MAKE) -C doc/ compare-exported
 	$(MAKE) -C doc/manpages compare-makefile
@@ -204,6 +200,10 @@ distcheck-hook:
 	  test -s "$(distdir)/po/$$lang.po" \
 	    || { echo "po/$$lang.po is missing"; exit 1; }; \
 	done
+	if test -d "$(top_srcdir)/devel"; then \
+		$(MAKE) -C $(top_srcdir) symbol-check && \
+		$(MAKE) -C $(top_srcdir) abi-check-latest; \
+	fi
 
 .PHONY: abi-check abi-dump-versioned abi-dump-latest pic-check symbol-check local-code-coverage-output files-update AUTHORS
 

@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# Ensure the top NEWS version header is "Version x.y.z (released YYYY-MM-DD)".
+# The date must be close to the current commit date as well.
+# Gets run as part of the manual `release-ready` job.
+
+set -Eeuo pipefail; shopt -s inherit_errexit
+
+version=$(grep -m1 -F 'AC_INIT([GnuTLS],' configure.ac |
+          grep -oE '[0-9]+\.[0-9]+\.[0-9]+') \
+  || { echo "configure.ac: no x.y.z version in AC_INIT"; exit 1; }
+top=$(grep -m1 '^\* Version ' NEWS) \
+  || { echo "NEWS: no '* Version ' header found"; exit 1; }
+pat="\* Version ${version//./\\.} \\(released [0-9]{4}-[0-9]{2}-[0-9]{2}\)"
+grep -xE "$pat" <<<"$top" \
+  || { echo "NEWS: top header must be exactly" \
+            "'* Version $version (released YYYY-MM-DD)', got: $top"; exit 1; }
+
+date_news=$(grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}' <<<"$top")
+time_news=$(date -ud "$date_news" +%s 2>/dev/null) \
+  || { echo "NEWS: invalid release date $date_news"; exit 1; }
+time_git=$(git log -1 --format=%ct)
+days=$(( ( time_git - time_news ) / 86400 ))
+(( days > -30 && days < 30 )) \
+  || { echo "NEWS: release date $date_news is" \
+            "more than 30 days away from the commit date"; exit 1; }

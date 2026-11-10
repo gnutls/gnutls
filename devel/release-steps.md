@@ -25,13 +25,12 @@
    ls po/*.po | sed 's|.*/||; s|\.po$||' | LC_ALL=C sort > po/LINGUAS
    git add -A po/ && git commit -sm 'po: sync from translationproject.org' po/
    ```
-1. Create a distribution tarball: note that this requires
-   the documentation to be generated. See the `fedora-docdist/build` job in
-   [.gitlab-ci.yml](.gitlab-ci.yml), which does the same thing in the CI:
-   ```console
-   # Install necessary packages for documentation, and then:
-   make distcheck
-   ```
+1. Make sure `make distcheck` passes.
+1. Make sure all CI jobs pass, including the manual `release-ready` one.
+1. Update `flake.lock`: `nix flake update --flake ./devel/nix`.
+1. Create a distribution tarball with
+   `nix build -L 'path:.?dir=devel/nix#release-tarball' -o gnutls-$VERSION.tar.xz`,
+   or grab one from the `release-tarball/archive` CI job.
 1. Create a detached GPG signature:
    ```console
    gpg --detach-sign --user your-key-id gnutls-$VERSION.tar.xz
@@ -46,15 +45,21 @@
    git tag -s $VERSION -m "released $VERSION"
    git push --atomic origin $VERSION
    ```
-1. Upload the tarball and the signature to ftp.gnupg.org:
-   ```console
-   scp -oHostKeyAlgorithms=+ssh-rsa gnutls-$VERSION.tar.xz* ftp.gnupg.org:/home/ftp/gcrypt/gnutls/v$(expr $VERSION : '\([0-9]*\.[0-9]*\)')/
-   ```
+1. Make sure the tarball CI generated from the tagged commit
+   is identical to the one you've prepared before.
+   Re-sign the CI one if they differ.
 1. Download `mingw32/archive` artifact for new release from [CI/CD jobs].
    Rename downloaded zip file to `gnutls-$VERSION-w32.zip`.
    Create a detached GPG signature.
-   Upload zip and signature files to ftp.gnupg.org.
    Do the same analogically for `mingw64/archive`.
+1. Upload the tarball, the zips and their signatures to ftp.gnupg.org:
+   ```console
+   scp -oHostKeyAlgorithms=+ssh-rsa gnutls-$VERSION.tar.xz* gnutls-$VERSION-w*.zip* ftp.gnupg.org:/home/ftp/gcrypt/gnutls/v$(expr $VERSION : '\([0-9]*\.[0-9]*\)')/
+   ```
+1. Update the website in the [web-pages repository]:
+   in its Makefile, bump `DOC_VERSION` and push to master.
+   The `pages` job should then rebuild the manual (html/epub/pdf)
+   using the new tarball and redeploy the site; make sure it passes.
 1. Reveal and close the security issues addressed in the release.
 1. Close the security fixes merge requests addressed in the release.
 1. Create and send announcement email based on previously sent email
