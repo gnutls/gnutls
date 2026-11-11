@@ -27,10 +27,12 @@
 #include <stdbool.h>
 
 /* Test that directoryName (DN) name constraints in a CA certificate
- * are enforced on the end certificate (RFC 5280 4.2.1.10).
+ * are enforced on the end certificate's DN names (RFC 5280 4.2.1.10).
  *
  * We cannot match DN names, so we fail closed:
- * if the CA carries a DN constraint, the end certificate is rejected.
+ * a certificate with a DN name (a directoryName SAN, or a non-empty subject DN)
+ * is rejected if the CA carries a DN constraint,
+ * while a certificate with no DN name at all is accepted.
  */
 
 void verify_leaf(const gnutls_x509_crt_t *, unsigned,
@@ -202,7 +204,7 @@ void doit(void)
 	verify_leaf(chain, 1, name_constraints, "leaf-san", _leaf_san,
 		    GNUTLS_SAN_DN, 0);
 	verify_leaf(chain, 1, name_constraints, "leaf-none", _leaf_none,
-		    GNUTLS_SAN_DN, 0);
+		    GNUTLS_SAN_DN, 1);
 
 	gnutls_x509_name_constraints_deinit(name_constraints);
 	gnutls_x509_crt_deinit(ca);

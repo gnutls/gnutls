@@ -1710,12 +1710,17 @@ static bool check_unsupported_constraint(gnutls_x509_crt_t cert,
 		else if (ret < 0)
 			return gnutls_assert_val(false);
 
-		if (san_type != GNUTLS_SAN_URI)
+		if (san_type != type)
 			continue;
 
 		found_one = true;
 		break;
 	}
+
+	/* For directoryName, subject also counts as a name. We don't match DNs,
+	 * so reject on non-empty. Cheap check: size > 2 (0x30 0x00). */
+	if (type == GNUTLS_SAN_DN && cert->raw_dn.size > 2)
+		found_one = true;
 
 	if (found_one)
 		return has_constraints_of_type(nc, type);
@@ -1933,6 +1938,8 @@ gnutls_x509_name_constraints_check_crt(gnutls_x509_name_constraints_t nc,
 			return gnutls_assert_val(1);
 		}
 	} else if (type == GNUTLS_SAN_URI) {
+		return check_unsupported_constraint(cert, nc, type);
+	} else if (type == GNUTLS_SAN_DN) {
 		return check_unsupported_constraint(cert, nc, type);
 	} else
 		return has_constraints_of_type(nc, type);
