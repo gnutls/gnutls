@@ -126,6 +126,94 @@ static const char _leaf_none[] = {
 	"Y9o3tK8QzZaBW9KNeNWAzhqTTYZD/ac=\n"
 	"-----END CERTIFICATE-----"
 };
+static const char _ca_permitted[] = {
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIDazCCAlOgAwIBAgIUKOIhmaOGJJ0AuEl/koa8uQdjYRowDQYJKoZIhvcNAQEL\n"
+	"BQAwOTEVMBMGA1UECgwMRXhhbXBsZSBJbmMuMSAwHgYDVQQDDBdFeGFtcGxlIENB\n"
+	"IEROIFBlcm1pdHRlZDAeFw0yNjExMTExODMzMjlaFw0zNjExMDgxODMzMjlaMDkx\n"
+	"FTATBgNVBAoMDEV4YW1wbGUgSW5jLjEgMB4GA1UEAwwXRXhhbXBsZSBDQSBETiBQ\n"
+	"ZXJtaXR0ZWQwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCoItvTyPaU\n"
+	"3hemFACTbsq6JCePfwLakqzpU5O3E40yUaNUni164Z16+xPO5SdjwzcEJ67Mue3T\n"
+	"Z07ZrUqe3UTsdzEoeY2RrDrLCG9IByy90jYriWiA+UvBBM8TIZagH11JmEsTc0ah\n"
+	"DGgsOiAWpIyS21780oe5m4ojMd3NeOZPpF4waX67EJjEU9FAtEazKgWTR7jyfitL\n"
+	"JgO3wmnFsym/iW3LyuTzXAIhBR+MyGcw/wAe3P+DyuyubQQcHQF87lkI8J3JRuCh\n"
+	"duYOlOv8B6cGG0McuIwwATuQqtUa4g8qTS194UBEu8Ml6QdH0hOGE1R5OD2PCKjy\n"
+	"h+RQZ1jRfPtJAgMBAAGjazBpMA8GA1UdEwEB/wQFMAMBAf8wDgYDVR0PAQH/BAQD\n"
+	"AgEGMCcGA1UdHgQgMB6gHDAapBgwFjEUMBIGA1UECgwLYmFkLmV4YW1wbGUwHQYD\n"
+	"VR0OBBYEFMnFsp2qL/bIuN1yn+krywaoqX2FMA0GCSqGSIb3DQEBCwUAA4IBAQAC\n"
+	"NwiB8bka4tMT7i4smPOyaJqutTDBh8N79RoFLoSiygvsq325dN7sEHrnd9b82po+\n"
+	"ypIsLjI7iMfhVGYZgk2+NnO4MR6d8xuLXwmyoNV5ELjRKjHGYVJY7+nO8UHAKFSw\n"
+	"qbL9StUA+wKYUGQFrpYcC5WvbqZMxHVnwONwg5OcwGogPKkaX5sNXcTeuyEaOa2L\n"
+	"MjyPn+WxTXEbWNkQeSEwz3hh4wUEZvUFCiHvPVN921C+lmx3oHMOhRUGgmpttIpG\n"
+	"Z9lt/1ebexM68dF2+vBBpBmphXVW4x/pC704NoxKJOTv+Pke13UQGFCm0ofwoDgx\n"
+	"vz+KbIuZEMEVNK0bl9Cu\n"
+	"-----END CERTIFICATE-----"
+};
+static const char _perm_leaf_subject[] = {
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIDQTCCAimgAwIBAgIUOwgi8PBl82PB8rHe4HHogGqAFK0wDQYJKoZIhvcNAQEL\n"
+	"BQAwOTEVMBMGA1UECgwMRXhhbXBsZSBJbmMuMSAwHgYDVQQDDBdFeGFtcGxlIENB\n"
+	"IEROIFBlcm1pdHRlZDAeFw0yNjExMTExODM1MzhaFw0zNjExMDgxODM1MzhaMC0x\n"
+	"FDASBgNVBAoMC2JhZC5leGFtcGxlMRUwEwYDVQQDDAxsZWFmLXN1YmplY3QwggEi\n"
+	"MA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC4LMVAXGeOqiwurrbkL/o6UiGn\n"
+	"8YIRr9H2X4WPX/ODO9txX1cBjOFaoay1C2ZRiKylQlwNQ3d3aptWfoAEyxN2LVqn\n"
+	"Mbby31ygw3em4IQ0tr1AhXbBXwH1dgp3P7q/byWfKQelOwtJjGDw/YL6KjdCMldU\n"
+	"64OOCvx3Y0RxzFl86QsHNbE6rGyWYU3jdUdAPqwqYV//gupr6ymY6i4IpQ07EAbg\n"
+	"EZlt8x5J0QumY9qCeSBbWVIQk/tlwE3Dk5IgHdDqWRxYybdvJfaxchcoJ+jty3IZ\n"
+	"n8TMyLH7qDbr3HowtkPrzKmTtxFUFIgcuaSuWVO4pbNIzpDFuJGEmU/ds77vAgMB\n"
+	"AAGjTTBLMAkGA1UdEwQCMAAwHQYDVR0OBBYEFFMXdBLVfY5Zi/eWH6gev+iTQI1u\n"
+	"MB8GA1UdIwQYMBaAFMnFsp2qL/bIuN1yn+krywaoqX2FMA0GCSqGSIb3DQEBCwUA\n"
+	"A4IBAQBGRk0FcWsZvAKylAigVt6l8Il4BNs9Mfye8H4sAUtx4682Cu5TgjCbrC9F\n"
+	"SiCw6U60MJb2qmUUiRdzbof6cg7p6sS+NlPYl6zdj/XoWAAg0e2Fq+U95fHhB8Af\n"
+	"TWWhWS0ccT45cr6eQGwbW6/0wFRgpBJx9mwes/9NhBRxOJAODWYhtgwWOYuiNpDm\n"
+	"WxjkEJRRINNzhJUAZBEbWylMUnigqc+30a7MVq8QlUtrfTfgCC3bsSygq94xJrGF\n"
+	"oPWojgOp6hSVfr4PeG8JR5Nmo+YTp5MuNtPsdxau92lIK3g6SfZTkzlynTW1NUEC\n"
+	"TJEhOE2SluBw/yd0PQgrL5DQVKxd\n"
+	"-----END CERTIFICATE-----"
+};
+static const char _perm_leaf_san[] = {
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIDTjCCAjagAwIBAgIUOwgi8PBl82PB8rHe4HHogGqAFK4wDQYJKoZIhvcNAQEL\n"
+	"BQAwOTEVMBMGA1UECgwMRXhhbXBsZSBJbmMuMSAwHgYDVQQDDBdFeGFtcGxlIENB\n"
+	"IEROIFBlcm1pdHRlZDAeFw0yNjExMTExODM1MzhaFw0zNjExMDgxODM1MzhaMAAw\n"
+	"ggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDEImeg2liXjiUI096Lu0HB\n"
+	"xlRHPrfn2Uepqn/AfyUNVV8tAfDzA+iAsy4eXrKL/6Oke2tfVa7WAoiCujDl9xJy\n"
+	"gi+1UMixYDyOxzBn5K/sUuy1oXWz1L2sZOv8GtXfkAqNUdGz2PsKxR2rZyuLcBXu\n"
+	"zkzEOYHZLuQw8TjB1+6ZNOPAZyixrmuiaN88K/f2Y+Bsxd1i4qTc3bsaxaklswmR\n"
+	"4+eKdvjHKFhfjF5OTRxEa4Rx7lg6cstCvoLQFO+RWvtgwQK+P7QokgZH4Mc16oMu\n"
+	"WNX4X/YxQX2usbQXF1vJByWDmXmci3ZvtEp++vVstwy5rhJbXqu+64Iisp7cAuvT\n"
+	"AgMBAAGjgYYwgYMwCQYDVR0TBAIwADA2BgNVHREELzAtpCswKTEUMBIGA1UECgwL\n"
+	"YmFkLmV4YW1wbGUxETAPBgNVBAMMCGxlYWYtc2FuMB0GA1UdDgQWBBS368KjInRA\n"
+	"BUTjSLAaRbC7QMBXGTAfBgNVHSMEGDAWgBTJxbKdqi/2yLjdcp/pK8sGqKl9hTAN\n"
+	"BgkqhkiG9w0BAQsFAAOCAQEAYdgYckqxuk/x0iiFRQCEwMlOn24C7srHQwLdO7EK\n"
+	"Cc6Bx4SG9H1ek4EScEzuinQYhEJ5YjblGmXFkfLJu3RP6h2yxhh5w/bQetiKt0Lm\n"
+	"5aMx/Kc0F1alY/bgGfhmF9gzmiJQP517gWNsQnpiCkTWHwFtP4P59G+j5lm569AO\n"
+	"zJu4kOY7EFZ0WqK39Ep9iA7GcPfcG5lqlRAQtZwJQ6dSVI6b1RJd8ypeXbvSuCD4\n"
+	"UR9nHUg36RiOz5VOZ+ltk8D+I+2Xa3OO0uWL0P8Tj9UsBeY/+TXqBjGPchWPSjyo\n"
+	"hVO4JHhOQfQKeprsGet3AKbqEuB1Wqyua7gVC8Ts1fyRLQ==\n"
+	"-----END CERTIFICATE-----"
+};
+static const char _perm_leaf_none[] = {
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIDFDCCAfygAwIBAgIUOwgi8PBl82PB8rHe4HHogGqAFK8wDQYJKoZIhvcNAQEL\n"
+	"BQAwOTEVMBMGA1UECgwMRXhhbXBsZSBJbmMuMSAwHgYDVQQDDBdFeGFtcGxlIENB\n"
+	"IEROIFBlcm1pdHRlZDAeFw0yNjExMTExODM1MzhaFw0zNjExMDgxODM1MzhaMAAw\n"
+	"ggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDOEzx/w+sZAHAnDS2kAvcl\n"
+	"hbsXAxT0HpfQPPXYYMPYx0LQzbIDHPZe0NIP6zNAZcpgNo6WqW4vXr+Cg2BuUL/A\n"
+	"imB9BUzfI0aGO268E6JGCGY5cGy10rJ1gd8SNDe09FC1mcUY8W6GWMrZ/N0HMX5H\n"
+	"nC0MdWAwpruLGfJK8GFj8rCSG9uoMrMMSIaR4dzIaT8gKSe/DfR0ikokXGV2lyBr\n"
+	"vFNx2WWqEYt77zyXHfDKUuN5LuYhbDmMu4rWlrgbVrEDzzIFGJTb1DTuDUeNHSzJ\n"
+	"QzZB0NmC3a7GAvv4Qrg9W9nU8Ezhtme2oL6IEO3PACup/JrituHblWsGCVWTAQqV\n"
+	"AgMBAAGjTTBLMAkGA1UdEwQCMAAwHQYDVR0OBBYEFCQDS/U/LiNvmakjZZwkhJ+t\n"
+	"dAjZMB8GA1UdIwQYMBaAFMnFsp2qL/bIuN1yn+krywaoqX2FMA0GCSqGSIb3DQEB\n"
+	"CwUAA4IBAQCmwkfpjE9G0C6rahxa8AqymJXd0TnguOJa+Nw16B7KNYlAKNf6uw5p\n"
+	"n7ZW8cRbjgojOXeAe0E8p2e7DUoTrz/SAJP5J5BpjrIZDFGxnQu4fh6u3ZWjMfkp\n"
+	"FEp/oJwXkNYXlLMUAdU9XeIPCMbIDXdfxHU+5vtvo0tDFvVq7mQCbqwlOCLmL6U/\n"
+	"Y1ccYxVOUJATgrwVcxBcSyXmweI3T0+vBEVA9Ov1hrioLzOQEQJYM82EyiG5RuKa\n"
+	"g1ZYCT43yRZcmhP1kisdomGzXybBkt3Wx5GC5tnnVem86921gKLcVRW08a5J8W6L\n"
+	"FH6jq2PwrHs/0xqd9M4PKN6/TxA59K+O\n"
+	"-----END CERTIFICATE-----"
+};
 
 void verify_leaf(const gnutls_x509_crt_t *chain, unsigned chain_len,
 		 gnutls_x509_name_constraints_t name_constraints,
@@ -206,8 +294,40 @@ void doit(void)
 	verify_leaf(chain, 1, name_constraints, "leaf-none", _leaf_none,
 		    GNUTLS_SAN_DN, 1);
 
+	gnutls_x509_crt_t ca_perm;
+	gnutls_datum_t ca_perm_datum = { (void *)_ca_permitted,
+					 sizeof(_ca_permitted) - 1 };
+	gnutls_x509_name_constraints_t name_constraints_perm = NULL;
+
+	gnutls_x509_crt_init(&ca_perm);
+	ret = gnutls_x509_crt_import(ca_perm, &ca_perm_datum,
+				     GNUTLS_X509_FMT_PEM);
+	if (ret < 0)
+		fail("Error importing CA: %s\n", gnutls_strerror(ret));
+
+	chain[0] = ca_perm;
+
+	ret = gnutls_x509_name_constraints_init(&name_constraints_perm);
+	if (ret < 0)
+		fail("Error initializing constraints structure: %s\n",
+		     gnutls_strerror(ret));
+
+	ret = gnutls_x509_crt_get_name_constraints(
+		ca_perm, name_constraints_perm, 0, &critical);
+	if (ret < 0)
+		fail("Error loading constraints\n");
+
+	verify_leaf(chain, 1, name_constraints_perm, "perm-leaf-subject",
+		    _perm_leaf_subject, GNUTLS_SAN_DN, 0);
+	verify_leaf(chain, 1, name_constraints_perm, "perm-leaf-san",
+		    _perm_leaf_san, GNUTLS_SAN_DN, 0);
+	verify_leaf(chain, 1, name_constraints_perm, "perm-leaf-none",
+		    _perm_leaf_none, GNUTLS_SAN_DN, 1);
+
 	gnutls_x509_name_constraints_deinit(name_constraints);
+	gnutls_x509_name_constraints_deinit(name_constraints_perm);
 	gnutls_x509_crt_deinit(ca);
+	gnutls_x509_crt_deinit(ca_perm);
 
 	success("DN constraint tests completed successfully\n");
 
@@ -244,7 +364,8 @@ edD0m3c8lKbCcrHNch6aWo8XlnprsgS6XRh6WmKKtmGxulMjwR4f1iskhTDWDkrS
 S1xaAaXTV0GsPNACDgNUD4Va
 -----END PRIVATE KEY-----
 $ openssl req -new -key ca-excluded.key \
-              -subj "/O=Example Inc./CN=Example CA DN Excluded" -out ca-excluded.csr
+              -subj "/O=Example Inc./CN=Example CA DN Excluded" \
+              -out ca-excluded.csr
 $ openssl x509 -req -in ca-excluded.csr -signkey ca-excluded.key \
                -days 3650 -out ca-excluded.pem -extfile - <<EOF
 basicConstraints=critical,CA:TRUE
@@ -449,4 +570,241 @@ SmDZPsnG8t8ck5YVwOYHyf7e0SDUC8GUErHh+op90P+ZplZAYLi0lSd2pl9UhQT2
 P9YrK/Qwux1PXTMJlMm/f5EZ/CkJdMoY7c9jebarRzfRkj9wUj6Vv0ha/8J6RGWc
 Y9o3tK8QzZaBW9KNeNWAzhqTTYZD/ac=
 -----END CERTIFICATE-----
+$ openssl genrsa 2048 | tee ca-permitted.key
+-----BEGIN PRIVATE KEY-----
+MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCoItvTyPaU3hem
+FACTbsq6JCePfwLakqzpU5O3E40yUaNUni164Z16+xPO5SdjwzcEJ67Mue3TZ07Z
+rUqe3UTsdzEoeY2RrDrLCG9IByy90jYriWiA+UvBBM8TIZagH11JmEsTc0ahDGgs
+OiAWpIyS21780oe5m4ojMd3NeOZPpF4waX67EJjEU9FAtEazKgWTR7jyfitLJgO3
+wmnFsym/iW3LyuTzXAIhBR+MyGcw/wAe3P+DyuyubQQcHQF87lkI8J3JRuChduYO
+lOv8B6cGG0McuIwwATuQqtUa4g8qTS194UBEu8Ml6QdH0hOGE1R5OD2PCKjyh+RQ
+Z1jRfPtJAgMBAAECggEAFskelG10KUmN1+Z3C4PkumQi7lnul5NwFnDKoHFoXazd
+nx6OmEwSDPQQw6WfeHAguRHtqPX7in5CG9LVvYDMEeW3Rj5u1pKKJzC97/t070aZ
+K75D6NKgFwjhTTzsjkeh21Llvb2OEU4+odvAtIDZQh+zmDypwxgWmN1tqyZaw+kQ
+UfbnecGza53idX4ew3BsAn2C19TrCigz5pzlaLRoJLUQOn5yIyfW8KX2QhAi3/OO
+IR8PZIhlkFOzGwTkFwTLPk4F3lS0bASxmmqn96QBnh4M/u3bR7RNgn6GCn6udomn
+DpyPSeoSPEhyGTF9XQcSNJqXGzSv1q/AmZI6mJr8HwKBgQDtbuGLDTsHVwzgFFHB
+a+fCHZxwFH6mam0Bn+tw1/LdFtldzlkieOEdcjFCteoPVcT1i06SekjbgxmTBgAs
+tUGOMaIGzvzGvuXK+mC9XmGffnyl1dr791hRJ5b4abyNJZC1cFu8qHZv0m+Q6CAq
+Xur3IsxqzEKaJ5k1IzHnihgS1wKBgQC1SLzf1/DjWY2APqDNQ7VJeNMfyHzoMEjE
+GR0kyA4DYpioxQ9HYf6oxc2YnL+A2x0KxegGWV706lIAo0cvUZJ38MPppiZz98cl
+rtY/huSOOHbR0s9gPfm3q/ZuimpExpLx/9dZI5pz5r7Jlaaf4cfBHv+kEmfjfQTB
+U4ywE5++3wKBgCTxTKyLCXUx6THwV2wl8vB0FQQnXDFee8l17XcoUoRt6rI6ygmg
+Dz66psl/boSmTrf5zebimfV1p4QFuf860JFkTZaLnC78QtrbLDQqvDvJvXE8Hg94
+Q8iUxVuvcAPyJVrluZBYEd2CO5OrWl3dWOfNBUtUrsQ3hxIKgNhK10YPAoGAQ2LD
+Wo2hbFE4iQg+q65Ub/gqunDDBWgVVFdlfuuiUd3Pk0SU9lrV15SXZPg3M0W/mOaR
+5fJIms+TJcuLxWoUAOONX4e0WX0sGLTRzRFuWfNhL4OmNEc1UPHqC5MGB4Ss0Kni
+Oa9DVXvbRYGMS3gY0Y+dRTbWSTiKkPZmoHja848CgYEA4ZIjQpPhyTVvJYYgd907
+6rnNr+8Z9pv5GBFnZw5NVQgSz2K9EUH3pfIMYZimaPAm2N2aoNz+JK80VHPhvkt2
+3LlTjoBDP3szQhUTM2K4I2Cpzprhc12e9GpVncPhu8M4UUh1EXQ9Q+4CnAu1YwSg
+ZHgPVJdJeir/ihQsQFWIV9E=
+-----END PRIVATE KEY-----
+$ openssl req -new -key ca-permitted.key \
+              -subj "/O=Example Inc./CN=Example CA DN Permitted" \
+              -out ca-permitted.csr
+$ openssl x509 -req -in ca-permitted.csr -signkey ca-permitted.key \
+               -days 3650 -out ca-permitted.pem -extfile - <<EOF
+basicConstraints=critical,CA:TRUE
+keyUsage=critical,keyCertSign,cRLSign
+nameConstraints = permitted;dirName:perm
+[perm]
+O = bad.example
+EOF
+$ cat ca-permitted.pem
+-----BEGIN CERTIFICATE-----
+MIIDazCCAlOgAwIBAgIUKOIhmaOGJJ0AuEl/koa8uQdjYRowDQYJKoZIhvcNAQEL
+BQAwOTEVMBMGA1UECgwMRXhhbXBsZSBJbmMuMSAwHgYDVQQDDBdFeGFtcGxlIENB
+IEROIFBlcm1pdHRlZDAeFw0yNjExMTExODMzMjlaFw0zNjExMDgxODMzMjlaMDkx
+FTATBgNVBAoMDEV4YW1wbGUgSW5jLjEgMB4GA1UEAwwXRXhhbXBsZSBDQSBETiBQ
+ZXJtaXR0ZWQwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCoItvTyPaU
+3hemFACTbsq6JCePfwLakqzpU5O3E40yUaNUni164Z16+xPO5SdjwzcEJ67Mue3T
+Z07ZrUqe3UTsdzEoeY2RrDrLCG9IByy90jYriWiA+UvBBM8TIZagH11JmEsTc0ah
+DGgsOiAWpIyS21780oe5m4ojMd3NeOZPpF4waX67EJjEU9FAtEazKgWTR7jyfitL
+JgO3wmnFsym/iW3LyuTzXAIhBR+MyGcw/wAe3P+DyuyubQQcHQF87lkI8J3JRuCh
+duYOlOv8B6cGG0McuIwwATuQqtUa4g8qTS194UBEu8Ml6QdH0hOGE1R5OD2PCKjy
+h+RQZ1jRfPtJAgMBAAGjazBpMA8GA1UdEwEB/wQFMAMBAf8wDgYDVR0PAQH/BAQD
+AgEGMCcGA1UdHgQgMB6gHDAapBgwFjEUMBIGA1UECgwLYmFkLmV4YW1wbGUwHQYD
+VR0OBBYEFMnFsp2qL/bIuN1yn+krywaoqX2FMA0GCSqGSIb3DQEBCwUAA4IBAQAC
+NwiB8bka4tMT7i4smPOyaJqutTDBh8N79RoFLoSiygvsq325dN7sEHrnd9b82po+
+ypIsLjI7iMfhVGYZgk2+NnO4MR6d8xuLXwmyoNV5ELjRKjHGYVJY7+nO8UHAKFSw
+qbL9StUA+wKYUGQFrpYcC5WvbqZMxHVnwONwg5OcwGogPKkaX5sNXcTeuyEaOa2L
+MjyPn+WxTXEbWNkQeSEwz3hh4wUEZvUFCiHvPVN921C+lmx3oHMOhRUGgmpttIpG
+Z9lt/1ebexM68dF2+vBBpBmphXVW4x/pC704NoxKJOTv+Pke13UQGFCm0ofwoDgx
+vz+KbIuZEMEVNK0bl9Cu
+-----END CERTIFICATE-----
+$ openssl genrsa 2048 | tee perm-leaf-subject.key
+-----BEGIN PRIVATE KEY-----
+MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC4LMVAXGeOqiwu
+rrbkL/o6UiGn8YIRr9H2X4WPX/ODO9txX1cBjOFaoay1C2ZRiKylQlwNQ3d3aptW
+foAEyxN2LVqnMbby31ygw3em4IQ0tr1AhXbBXwH1dgp3P7q/byWfKQelOwtJjGDw
+/YL6KjdCMldU64OOCvx3Y0RxzFl86QsHNbE6rGyWYU3jdUdAPqwqYV//gupr6ymY
+6i4IpQ07EAbgEZlt8x5J0QumY9qCeSBbWVIQk/tlwE3Dk5IgHdDqWRxYybdvJfax
+chcoJ+jty3IZn8TMyLH7qDbr3HowtkPrzKmTtxFUFIgcuaSuWVO4pbNIzpDFuJGE
+mU/ds77vAgMBAAECggEAFnTnDET4H44iWwLUrBgpg6j2D5tEB9IPYOIez++cKplG
+1ZkRa8/4vmtOOrkMHc7zdicUQE3EqFvoWvCLvYnhcpxvHEnUi+KuUa/jzAY+OIs7
+oj1j0Io8G+jrt8Seia8MwE5pbz020B38yAWxTb2OBVVMDr+0x8IRLKF++/01wCQY
++FbLMmDa+9Esj+4BRkmb+Tr46X+FWLTNJ8rCN8+lOe4R/Fx4sVimTS4DjX5Nb9lD
+rLDonQBFXXuuI5zuBIu9EF14MjbgcqlGRSCHovpOT64jt/VmL3hfbHr5CDs+Lynh
+OT5ybrnbRH8foT5mKzQa7nx06HsND4zsPFWuRnunQQKBgQDzKpahv+IXUle+mTPu
+LvPWhfJ8lwsTHXycL4Jvu8X41mS1WOH3vZ0bSLRaVOdCQHJfcMUgjhMTBytpYZn9
+v1pKyWg23lP+p9uvSscpSgc2SXnFJJ7eZupeR7g/uHcbcbwEiV3/zDze3oPDfMRe
+X7KHDSTK1lQAMV4RGTeIYYRroQKBgQDB5SaGElG0rfm4xf4InZ0opyA8OpxVxwLB
+a1SFe2yU50VJUCIsuyc35rx/Os9QZW+PCaKZkNPOI8tE9kR935oti7M1g7dHQe7Z
+qiyN97G/bLjZ1h3zuqZlOzZ+GRXoS7W1ySZ/EdLfgbHTQOf/nc3IdEsCwDMTNAWM
+hVV1NhegjwKBgCsWp9x/oPOa/rticGZLYZ/o2mAjb63ycqtGa+mar2j5rJzJ5Di/
+G8DC8Fp1YwlFXD73P6cWJeEgSxwAVIY3SyunZtUaLm4YloAIUyRI3uBKws4hQBmO
+yQbt1INOD6UIUVXIdaSnLz4a1eRlDnLeqEbwGE3tDrN+C/ohqsp65TkhAoGBALzZ
+zGPZg+tPaGMntP3/RgtKfIMtMwf5Bh4NxA0e4etGNp3pht+6icBQ5FenmDTeF4Ji
+CBU6kpG9G0bX9m4DU8/4uVvuJp0pAtLOhQbhsiaYZpMFkbbKnTcMLU80b7oJw7qD
+aRNq8NDxKZpxJYY61Svg2Q6c1SJnEOCFHW9EeE7RAoGBALXLtPSMf5zfqpdOc2Ez
+kD8FfOJVZCFgw+umDCPJ2WE3Qk1mIBr2wVferVQD7irz0HmH0wW1V7YqNPwA1MtL
+jqp4+iMNpZ5eLSpbwUvyFWT1gmbFGsgx0AXZIADdDchEcrg+NREsRO5Zc4L4rVvm
+Wd2Ga29Rf2KZCzFToKXwnKb1
+-----END PRIVATE KEY-----
+$ openssl req -new -key perm-leaf-subject.key \
+              -subj "/O=bad.example/CN=leaf-subject" -out perm-leaf-subject.csr
+$ openssl x509 -req -in perm-leaf-subject.csr -CA ca-permitted.pem \
+               -CAkey ca-permitted.key -CAcreateserial -days 3650 \
+               -out perm-leaf-subject.pem -extfile - <<EOF
+basicConstraints=CA:FALSE
+EOF
+$ cat perm-leaf-subject.pem
+-----BEGIN CERTIFICATE-----
+MIIDQTCCAimgAwIBAgIUOwgi8PBl82PB8rHe4HHogGqAFK0wDQYJKoZIhvcNAQEL
+BQAwOTEVMBMGA1UECgwMRXhhbXBsZSBJbmMuMSAwHgYDVQQDDBdFeGFtcGxlIENB
+IEROIFBlcm1pdHRlZDAeFw0yNjExMTExODM1MzhaFw0zNjExMDgxODM1MzhaMC0x
+FDASBgNVBAoMC2JhZC5leGFtcGxlMRUwEwYDVQQDDAxsZWFmLXN1YmplY3QwggEi
+MA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC4LMVAXGeOqiwurrbkL/o6UiGn
+8YIRr9H2X4WPX/ODO9txX1cBjOFaoay1C2ZRiKylQlwNQ3d3aptWfoAEyxN2LVqn
+Mbby31ygw3em4IQ0tr1AhXbBXwH1dgp3P7q/byWfKQelOwtJjGDw/YL6KjdCMldU
+64OOCvx3Y0RxzFl86QsHNbE6rGyWYU3jdUdAPqwqYV//gupr6ymY6i4IpQ07EAbg
+EZlt8x5J0QumY9qCeSBbWVIQk/tlwE3Dk5IgHdDqWRxYybdvJfaxchcoJ+jty3IZ
+n8TMyLH7qDbr3HowtkPrzKmTtxFUFIgcuaSuWVO4pbNIzpDFuJGEmU/ds77vAgMB
+AAGjTTBLMAkGA1UdEwQCMAAwHQYDVR0OBBYEFFMXdBLVfY5Zi/eWH6gev+iTQI1u
+MB8GA1UdIwQYMBaAFMnFsp2qL/bIuN1yn+krywaoqX2FMA0GCSqGSIb3DQEBCwUA
+A4IBAQBGRk0FcWsZvAKylAigVt6l8Il4BNs9Mfye8H4sAUtx4682Cu5TgjCbrC9F
+SiCw6U60MJb2qmUUiRdzbof6cg7p6sS+NlPYl6zdj/XoWAAg0e2Fq+U95fHhB8Af
+TWWhWS0ccT45cr6eQGwbW6/0wFRgpBJx9mwes/9NhBRxOJAODWYhtgwWOYuiNpDm
+WxjkEJRRINNzhJUAZBEbWylMUnigqc+30a7MVq8QlUtrfTfgCC3bsSygq94xJrGF
+oPWojgOp6hSVfr4PeG8JR5Nmo+YTp5MuNtPsdxau92lIK3g6SfZTkzlynTW1NUEC
+TJEhOE2SluBw/yd0PQgrL5DQVKxd
+-----END CERTIFICATE-----
+$ openssl genrsa 2048 | tee perm-leaf-san.key
+-----BEGIN PRIVATE KEY-----
+MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDEImeg2liXjiUI
+096Lu0HBxlRHPrfn2Uepqn/AfyUNVV8tAfDzA+iAsy4eXrKL/6Oke2tfVa7WAoiC
+ujDl9xJygi+1UMixYDyOxzBn5K/sUuy1oXWz1L2sZOv8GtXfkAqNUdGz2PsKxR2r
+ZyuLcBXuzkzEOYHZLuQw8TjB1+6ZNOPAZyixrmuiaN88K/f2Y+Bsxd1i4qTc3bsa
+xaklswmR4+eKdvjHKFhfjF5OTRxEa4Rx7lg6cstCvoLQFO+RWvtgwQK+P7QokgZH
+4Mc16oMuWNX4X/YxQX2usbQXF1vJByWDmXmci3ZvtEp++vVstwy5rhJbXqu+64Ii
+sp7cAuvTAgMBAAECggEABcdCglMS4edgLYuaA0fePuIKJzP9bkLQ562MQfswKxDL
+n9ahmkDdOR10sfrCpXk/zixZeqxaXRe9NqZbPNgAnrsGW//0406DujkhssEVpcLA
+ePSezenqN9ZpVW4WkWJiM5oOsY7zWafhB36GO+XVEsoLkCRmY1c/hdACU6oTvEbt
+BXPZcbGuNZHhqg92T/j68fe6u1O1B14YOsYX/VxYJs0nkDZiaVp1D40csXM1I7k6
+yZM4fhi1T0Za3SwWTTN+I/5xWwNlMOudmy9rMJrkPenp0XsqoBsvL8FghKigDy8g
+qB6QWTawGC2RkRqgYNdkGTuvDvqw2FG8PKe4apmlEQKBgQDj/0xcD44+pC9ivVDs
+OOH98M4Ksf4KrU/5t4VOFKYXOfJGm1C5l/GtBXLijwSIcnnYzZ29ecY+0i5VSyiV
+hiT9vNH/5q+j/gm0DyrmsuwWO2mKu09qQb945rtdb71ikLPlujELPyG74rLng96B
+piKwOUwKofpBODKFvDkGJPUIxwKBgQDcOUXMRQGWXfDS5bNF8QuMSGGxuOVnV3/O
+vlKax+yNy91Ek/04lv5zSvYuxZua6M5jMgX5q3W8cEoZpAjmu+XWCcohx9FgDE05
+MFqo+xt7iGt8AUUJg0nlNO1yA9od8g43/AAnwHN5Czhq8/qUF297wy7QDjp9HRsi
+DnFJfcSwlQKBgG4+PuTw3J3rc8IxulROeO/6JRbE1ArDnL0pgPqtP1ZRvZVoelMT
+Zld8H/3um4mCmOo9Gf3JSRONO7wgWGJcd7x9NamgGOOZ7YU0JFFiyIdDeRgM1CyT
+2AqUvppCcnebcnEtY5OFlkEsL8eEWu2jsHg3bE5j3gb1LnC9/3C6JAV3AoGASZIA
+lVtASoGboHkISQdb+kN8D6lbSgjbM7A1XGwJxN0kUHK4F52p585VLA7sCvZXbKAb
+iusS7B7/Qk2gg6SmBblDg8GDWvkBG2fiAa3R4pUSg1zROXpYx2/FG1/aEEL7KQzQ
+6HbMnNV4xZI4Vhz2K3xrOSpns8Bzfg8hHZIckXkCgYEAxqv0ngcnJVttBt2gLS6N
+/yaF80hnA71Uj2/niIKvb3J1Zp6L8EnHEwDbyHtZ2WA66bP+RHPwpl83RbFRaIXN
+bAFGV2QP58ud+CRj9Y/J2nyfLYxVTeEnfAZRyYZnX/dh9LuWS2VteOrlMZliupnp
+I///Bf8+GuHfcrGSLbkMQj0=
+-----END PRIVATE KEY-----
+$ openssl req -new -key perm-leaf-san.key \
+              -subj "/" -out perm-leaf-san.csr
+$ openssl x509 -req -in perm-leaf-san.csr -CA ca-permitted.pem \
+               -CAkey ca-permitted.key -CAcreateserial -days 3650 \
+               -out perm-leaf-san.pem -extfile - <<EOF
+basicConstraints=CA:FALSE
+subjectAltName = dirName:leafsan
+[leafsan]
+O = bad.example
+CN = leaf-san
+EOF
+$ cat perm-leaf-san.pem
+-----BEGIN CERTIFICATE-----
+MIIDTjCCAjagAwIBAgIUOwgi8PBl82PB8rHe4HHogGqAFK4wDQYJKoZIhvcNAQEL
+BQAwOTEVMBMGA1UECgwMRXhhbXBsZSBJbmMuMSAwHgYDVQQDDBdFeGFtcGxlIENB
+IEROIFBlcm1pdHRlZDAeFw0yNjExMTExODM1MzhaFw0zNjExMDgxODM1MzhaMAAw
+ggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDEImeg2liXjiUI096Lu0HB
+xlRHPrfn2Uepqn/AfyUNVV8tAfDzA+iAsy4eXrKL/6Oke2tfVa7WAoiCujDl9xJy
+gi+1UMixYDyOxzBn5K/sUuy1oXWz1L2sZOv8GtXfkAqNUdGz2PsKxR2rZyuLcBXu
+zkzEOYHZLuQw8TjB1+6ZNOPAZyixrmuiaN88K/f2Y+Bsxd1i4qTc3bsaxaklswmR
+4+eKdvjHKFhfjF5OTRxEa4Rx7lg6cstCvoLQFO+RWvtgwQK+P7QokgZH4Mc16oMu
+WNX4X/YxQX2usbQXF1vJByWDmXmci3ZvtEp++vVstwy5rhJbXqu+64Iisp7cAuvT
+AgMBAAGjgYYwgYMwCQYDVR0TBAIwADA2BgNVHREELzAtpCswKTEUMBIGA1UECgwL
+YmFkLmV4YW1wbGUxETAPBgNVBAMMCGxlYWYtc2FuMB0GA1UdDgQWBBS368KjInRA
+BUTjSLAaRbC7QMBXGTAfBgNVHSMEGDAWgBTJxbKdqi/2yLjdcp/pK8sGqKl9hTAN
+BgkqhkiG9w0BAQsFAAOCAQEAYdgYckqxuk/x0iiFRQCEwMlOn24C7srHQwLdO7EK
+Cc6Bx4SG9H1ek4EScEzuinQYhEJ5YjblGmXFkfLJu3RP6h2yxhh5w/bQetiKt0Lm
+5aMx/Kc0F1alY/bgGfhmF9gzmiJQP517gWNsQnpiCkTWHwFtP4P59G+j5lm569AO
+zJu4kOY7EFZ0WqK39Ep9iA7GcPfcG5lqlRAQtZwJQ6dSVI6b1RJd8ypeXbvSuCD4
+UR9nHUg36RiOz5VOZ+ltk8D+I+2Xa3OO0uWL0P8Tj9UsBeY/+TXqBjGPchWPSjyo
+hVO4JHhOQfQKeprsGet3AKbqEuB1Wqyua7gVC8Ts1fyRLQ==
+-----END CERTIFICATE-----
+$ openssl genrsa 2048 | tee perm-leaf-none.key
+-----BEGIN PRIVATE KEY-----
+MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDOEzx/w+sZAHAn
+DS2kAvclhbsXAxT0HpfQPPXYYMPYx0LQzbIDHPZe0NIP6zNAZcpgNo6WqW4vXr+C
+g2BuUL/AimB9BUzfI0aGO268E6JGCGY5cGy10rJ1gd8SNDe09FC1mcUY8W6GWMrZ
+/N0HMX5HnC0MdWAwpruLGfJK8GFj8rCSG9uoMrMMSIaR4dzIaT8gKSe/DfR0ikok
+XGV2lyBrvFNx2WWqEYt77zyXHfDKUuN5LuYhbDmMu4rWlrgbVrEDzzIFGJTb1DTu
+DUeNHSzJQzZB0NmC3a7GAvv4Qrg9W9nU8Ezhtme2oL6IEO3PACup/JrituHblWsG
+CVWTAQqVAgMBAAECggEAAVuBSAQsRC3Ldbsxl3ivh3wLur/Gv3VRVOO56Nl5hy/u
+bqRHbZufIdb1TOAk2WIL3oaT4BLKPesKKII61eJkfCoZ/AJxB0oOGMWpppKCIwnC
+7QW8Qy+NBMojHbvhuNu57/nmoV67XPL9YkjQoE+apqUba0J9eWr3v33sKZACZdKi
+tAw2F/mdlzS7lmlYiscyikNMOKixUiJaGfnek/LtQ4ceSqmspa+u/n4bujWyAOKv
+I4Orc+u9dkTkC981s/QUyJrrBTynG3W1EyIZ2gRaA9q0PU7bZd9h3K9m+aLhWj7b
+mwTA8zpK/QOIxvI5YnShTy5DbTeFGKDcfvYPwKeGFwKBgQDvF4lNKNjzBZ+L4KWm
+cFQum18huCtpZRdUdEtMvCEZl6X7jzmZcnNCqMQZlpv1Jynmc4c4FjhzM4apGqTJ
+xTKIw1KdULhNG9AdUqP3Z/tS/PKJVgh8xqXRGRbeL0DYWrl1Bjp5GfJKcnYRWtOu
+C8GJjOV8j0UWYxIFsZIP88WbIwKBgQDcpfjEHPc2jgdy3jlz4jqXRdlVGZ2WugNk
++mMyGRoLTYuRmITPYi2BtUeWzhbCitqyiqkujarcOZFwyfdIb4f/SIzuv9ZDDtFP
+gNvzJrs98/nN01pbPDNHfJ0Xp4dtAUlagNBLOPHxrSyjhbb5gPAj6nbEBelHBjUL
+p4MBW5Wa5wKBgQCkGX5mVBPbcM+ZnN11CAHvXzqDFTnOg9DoaU1JZJI/U4NbzmjV
+NeWAKf82JNX0BCZRApgbWbzy7LmPFTdnOQ6/KXhpev6UBfPoPFFHvLmVswDwW/lF
+Ur56boLwinQySsqhVF4LwlA24qrArJs/CNiUBP15aYgcnnC/MaozgrftCwKBgQDF
+DdDiTEAXz7YlRwOmU7ch3DahQrQzpUJczyUB29sflwx7ZevOTg74FQ6vRrSa32k7
+JIy9T7X04dDbGvQmE70wJvn+SwMudjBGQX2tZLy6Moa44/WBH31obYjaVDqlBg4d
+robXdy7UOGVyUHu9zgIpAT86B1Fzpb5//wUHlGRCpwKBgQC62i3OPgiWKFNkmMBC
+9mRFVm86a6SCcwBvipRzqYp47fDxtn3Yu7z0zWuNls56yNi6Wzpw4UGQaNsxi3vM
+kUeMtR3Hv6DKf2Myedi04Ryw1LRgNr2B17NehDXF4UWFt2VK8Hj/2eVnB58wJVOK
+KnLFGtdEM2I9JlOvgj8ORmORxg==
+-----END PRIVATE KEY-----
+$ openssl req -new -key perm-leaf-none.key \
+              -subj "/" -out perm-leaf-none.csr
+$ openssl x509 -req -in perm-leaf-none.csr -CA ca-permitted.pem \
+               -CAkey ca-permitted.key -CAcreateserial -days 3650 \
+               -out perm-leaf-none.pem -extfile - <<EOF
+basicConstraints=CA:FALSE
+EOF
+$ cat perm-leaf-none.pem
+-----BEGIN CERTIFICATE-----
+MIIDFDCCAfygAwIBAgIUOwgi8PBl82PB8rHe4HHogGqAFK8wDQYJKoZIhvcNAQEL
+BQAwOTEVMBMGA1UECgwMRXhhbXBsZSBJbmMuMSAwHgYDVQQDDBdFeGFtcGxlIENB
+IEROIFBlcm1pdHRlZDAeFw0yNjExMTExODM1MzhaFw0zNjExMDgxODM1MzhaMAAw
+ggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDOEzx/w+sZAHAnDS2kAvcl
+hbsXAxT0HpfQPPXYYMPYx0LQzbIDHPZe0NIP6zNAZcpgNo6WqW4vXr+Cg2BuUL/A
+imB9BUzfI0aGO268E6JGCGY5cGy10rJ1gd8SNDe09FC1mcUY8W6GWMrZ/N0HMX5H
+nC0MdWAwpruLGfJK8GFj8rCSG9uoMrMMSIaR4dzIaT8gKSe/DfR0ikokXGV2lyBr
+vFNx2WWqEYt77zyXHfDKUuN5LuYhbDmMu4rWlrgbVrEDzzIFGJTb1DTuDUeNHSzJ
+QzZB0NmC3a7GAvv4Qrg9W9nU8Ezhtme2oL6IEO3PACup/JrituHblWsGCVWTAQqV
+AgMBAAGjTTBLMAkGA1UdEwQCMAAwHQYDVR0OBBYEFCQDS/U/LiNvmakjZZwkhJ+t
+dAjZMB8GA1UdIwQYMBaAFMnFsp2qL/bIuN1yn+krywaoqX2FMA0GCSqGSIb3DQEB
+CwUAA4IBAQCmwkfpjE9G0C6rahxa8AqymJXd0TnguOJa+Nw16B7KNYlAKNf6uw5p
+n7ZW8cRbjgojOXeAe0E8p2e7DUoTrz/SAJP5J5BpjrIZDFGxnQu4fh6u3ZWjMfkp
+FEp/oJwXkNYXlLMUAdU9XeIPCMbIDXdfxHU+5vtvo0tDFvVq7mQCbqwlOCLmL6U/
+Y1ccYxVOUJATgrwVcxBcSyXmweI3T0+vBEVA9Ov1hrioLzOQEQJYM82EyiG5RuKa
+g1ZYCT43yRZcmhP1kisdomGzXybBkt3Wx5GC5tnnVem86921gKLcVRW08a5J8W6L
+FH6jq2PwrHs/0xqd9M4PKN6/TxA59K+O
+-----END CERTIFICATE-----
+
 */
