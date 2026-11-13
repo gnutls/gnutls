@@ -52,6 +52,12 @@ See the end for copying conditions.
    The error from set_params/set_nonce/set_key is now propagated (#1856, #1872).
    Reported by Joshua Rogers of AISLE Research Team.
 
+** libgnutls: Initialize reasons in CRL DistributionPoint parsing
+   The CRL reasons bitmap was read into an uninitialized buffer,
+   which could result in incorrect reason flags returned to the caller (#1925).
+   GnuTLS itself does not act on those flags.
+   Reported by Huzaifa Sidhpurwala, Red Hat Product Security.
+
 ** libgnutls: Add gnutls_pubkey_{import,export}_mldsa_raw()
    These functions obtain and restore
    the raw FIPS 204 ML-DSA public key octet string.
