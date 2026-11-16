@@ -76,6 +76,17 @@ See the end for copying conditions.
    Reported by Zou Dikai, Joshua Rogers of AISLE Research Team,
    Mitchell Benjamin of Revamp Studio, and Corban Villa of UC Berkeley.
 
+** libgnutls: Count subject as name for DN constraint validation
+   An excludedSubtree of that type used to reject any certificate,
+   while a permittedSubtree was ignored entirely.
+   The check now rejects a certificate featuring a DN
+   (in a subjectAltName or as a non-empty subject)
+   in the presence of any directoryName constraint.
+   GnuTLS does not implement matching DNs against the constraint,
+   so even valid DNs that a permittedSubtree constraint
+   would have previously allowed are now rejected (#1890).
+   Reported by Jack Lloyd.
+
 ** libgnutls: Add gnutls_pubkey_{import,export}_mldsa_raw()
    These functions obtain and restore
    the raw FIPS 204 ML-DSA public key octet string.
