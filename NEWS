@@ -76,6 +76,16 @@ See the end for copying conditions.
    Reported by Zou Dikai, Joshua Rogers of AISLE Research Team,
    Mitchell Benjamin of Revamp Studio, and Corban Villa of UC Berkeley.
 
+** libgnutls: Check all SAN types against name constraints
+   Chain verification only consulted name constraints of
+   DNS, e-mail, directoryName, URI and IP address SAN types.
+   Other types, notably UPN, were not checked at all,
+   so an excludedSubtree for UPN did not reject the chain.
+   All SAN types GnuTLS is aware of are now checked uniformly;
+   types for which no matching is implemented are rejected
+   when any constraint of the corresponding type is present (#1875).
+   Reported by Yu-Fu Fu.
+
 ** libgnutls: Count subject as name for DN constraint validation
    An excludedSubtree of that type used to reject any certificate,
    while a permittedSubtree was ignored entirely.
