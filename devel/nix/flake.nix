@@ -19,12 +19,24 @@
         # ... and build it the way nixpkgs builds gnutls
         nixpkgs-like = pkgs.gnutls.overrideAttrs { src = rt; inherit version; };
         # ... and build a handful of reverse dependencies with the latter
-        revdeps = pkgs.linkFarm "gnutls-revdeps" (
-          lib.map (p: {
-            inherit (p) name;
-            path = p.override { gnutls = nixpkgs-like; };
-          }) (with pkgs; [ chrony curlWithGnuTls openconnect tlspool ])
+        overrideGnutls = p: p.override { gnutls = nixpkgs-like; };
+        forceCheck = p: p.overrideAttrs (_: { doCheck = true; });
+        revdeps' = (lib.map overrideGnutls (with pkgs; [
+          chrony
+          curlWithGnuTls
+          openconnect
+          (forceCheck guile-gnutls)
+        ])) ++ (
+          let
+            # libmicrohttpd is packaged in an odd way, can't easily override
+            overrideGnutls' = p: p.override {
+              callPackage = f: args:
+                pkgs.callPackage f (args // { gnutls = nixpkgs-like; });
+            };
+          in [ (overrideGnutls' (forceCheck pkgs.libmicrohttpd)) ]
         );
+        revdeps = pkgs.linkFarm "gnutls-revdeps"
+          (lib.map (p: { inherit (p) name; path = p; }) revdeps');
         # ... and build the manual (html/epub/pdf) using it, web-pages -style
         docs = pkgs.callPackage ./docs.nix {
           inherit src version;

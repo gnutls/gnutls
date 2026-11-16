@@ -8,10 +8,14 @@ let
     # configure requirements
     gmp nettle p11-kit libtasn1 libidn2 libunistring unbound unbound.lib
     brotli zlib zstd libev
+    # test dependencies
+    openssl
+    # maintainer tools
+    libabigail clang-tools yq-go gitlab-ci-local
     # docs
     gtk-doc texinfo
     # misc
-    diffutils file gnutar python3 xz clang-tools yq-go gitlab-ci-local
+    diffutils file gnutar python3 xz
   ];
 
   cached = name: mkShell {
