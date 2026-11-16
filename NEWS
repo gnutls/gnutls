@@ -58,6 +58,13 @@ See the end for copying conditions.
    GnuTLS itself does not act on those flags.
    Reported by Huzaifa Sidhpurwala, Red Hat Product Security.
 
+** libgnutls: Fix cross-family IP name constraints
+   An IPv6 permitted name constraint did not preclude matching IPv4 SAN
+   and vice versa.
+   Addresses from a family not covered by a permitted name constraint
+   are now rejected (#1920).
+   Reported by Huzaifa Sidhpurwala, Red Hat Product Security.
+
 ** libgnutls: Add gnutls_pubkey_{import,export}_mldsa_raw()
    These functions obtain and restore
    the raw FIPS 204 ML-DSA public key octet string.
