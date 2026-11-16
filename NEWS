@@ -21,6 +21,15 @@ See the end for copying conditions.
    Reported by Joshua Rogers of AISLE Research Team.
    [GNUTLS-SA-2026-11-18-2, severity: low] [CVE-2026-127040]
 
+** libgnutls: Make name constraints deinitialization idempotent
+   If reinitializing the name constraints were to fail due to memory pressure,
+   the verification context cleanup
+   could have freed the same internal lists a second time,
+   crashing the application.
+   The deinitialization functions now clear the pointers after freeing.
+   Reported by Xuqing Yang.
+   [GNUTLS-SA-2026-11-18-3, severity: low] [CVE-2026-127231]
+
 ** libgnutls: Fix buffer overrun in deterministic DSA signing
    A malformed DSA private key with a q value exceeding 512 bits
    could overrun a fixed-size buffer when signing in reproducible mode.
