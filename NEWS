@@ -65,6 +65,17 @@ See the end for copying conditions.
    are now rejected (#1920).
    Reported by Huzaifa Sidhpurwala, Red Hat Product Security.
 
+** libgnutls: Reject on unsupported permitted name constraint types
+   Permitted subtrees of constraint types GnuTLS does not match (notably URI)
+   were parsed but ignored.
+   A leaf carrying a SAN of the matching type
+   is now rejected with GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE.
+   Previously accepted certificate chains
+   featuring intermediate CAs carrying such constraint types
+   may be rejected now (#1836, #1851, #1894, #1895).
+   Reported by Zou Dikai, Joshua Rogers of AISLE Research Team,
+   Mitchell Benjamin of Revamp Studio, and Corban Villa of UC Berkeley.
+
 ** libgnutls: Add gnutls_pubkey_{import,export}_mldsa_raw()
    These functions obtain and restore
    the raw FIPS 204 ML-DSA public key octet string.
