@@ -33,7 +33,7 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/single-ca.p7b data/single-ca.p7b.out data/full.p7b data/full.p7b.out data/detached.p7b \
 	data/pkcs7-detached.txt data/p7-combined.out data/template-generalized.pem \
 	templates/template-generalized.tmpl data/privkey1.pem data/privkey2.pem data/privkey3.pem \
-	data/name-constraints-ip.pem data/cert-invalid-utf8.der data/very-long-dn.pem \
+	data/name-constraints-ip.pem data/name-constraints-ip-nodn.pem data/cert-invalid-utf8.der data/very-long-dn.pem \
 	data/provable3072.pem data/provable2048.pem data/provable-dsa2048.pem \
 	data/provable-dsa2048-fips.pem templates/template-crq.tmpl data/invalid-sig5.pem \
 	templates/template-unique.tmpl data/template-unique.pem data/invalid-sig4.pem \

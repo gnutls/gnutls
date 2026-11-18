@@ -148,8 +148,9 @@ int _gnutls_ktls_set_keys(gnutls_session_t session,
 				crypto_info.iv =
 					gnutls_malloc(TLS_AEAD_GCM_LEN);
 				if (!crypto_info.iv) {
-					gnutls_assert();
-					return GNUTLS_E_MEMORY_ERROR;
+					ret = gnutls_assert_val(
+						GNUTLS_E_MEMORY_ERROR);
+					goto cleanup_recv;
 				}
 				crypto_info.iv_len = TLS_AEAD_GCM_LEN;
 				memcpy(crypto_info.iv, seq_number,
@@ -162,8 +163,9 @@ int _gnutls_ktls_set_keys(gnutls_session_t session,
 				crypto_info.iv =
 					gnutls_malloc(TLS_1_3_GCM_IV_LEN);
 				if (!crypto_info.iv) {
-					gnutls_assert();
-					return GNUTLS_E_MEMORY_ERROR;
+					ret = gnutls_assert_val(
+						GNUTLS_E_MEMORY_ERROR);
+					goto cleanup_recv;
 				}
 				crypto_info.iv_len = TLS_1_3_GCM_IV_LEN;
 				memcpy(crypto_info.iv, iv.data,
@@ -176,8 +178,8 @@ int _gnutls_ktls_set_keys(gnutls_session_t session,
 			crypto_info.cipher_key =
 				gnutls_malloc(AES_128_GMAC_KEY_LEN);
 			if (!crypto_info.cipher_key) {
-				gnutls_assert();
-				return GNUTLS_E_MEMORY_ERROR;
+				ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+				goto cleanup_recv;
 			}
 			memcpy(crypto_info.cipher_key, cipher_key.data,
 			       AES_128_GMAC_KEY_LEN);
@@ -186,8 +188,9 @@ int _gnutls_ktls_set_keys(gnutls_session_t session,
 				       &crypto_info, sizeof(crypto_info))) {
 				session->internals.ktls_enabled &=
 					~GNUTLS_KTLS_RECV;
-				return gnutls_assert_val(
+				ret = gnutls_assert_val(
 					GNUTLS_E_INTERNAL_ERROR);
+				goto cleanup_recv;
 			}
 		} break;
 		case GNUTLS_CIPHER_AES_256_GCM: {
@@ -200,8 +203,9 @@ int _gnutls_ktls_set_keys(gnutls_session_t session,
 				crypto_info.iv =
 					gnutls_malloc(TLS_AEAD_GCM_LEN);
 				if (!crypto_info.iv) {
-					gnutls_assert();
-					return GNUTLS_E_MEMORY_ERROR;
+					ret = gnutls_assert_val(
+						GNUTLS_E_MEMORY_ERROR);
+					goto cleanup_recv;
 				}
 				crypto_info.iv_len = TLS_AEAD_GCM_LEN;
 				memcpy(crypto_info.iv, seq_number,
@@ -214,8 +218,9 @@ int _gnutls_ktls_set_keys(gnutls_session_t session,
 				crypto_info.iv =
 					gnutls_malloc(TLS_1_3_GCM_IV_LEN);
 				if (!crypto_info.iv) {
-					gnutls_assert();
-					return GNUTLS_E_MEMORY_ERROR;
+					ret = gnutls_assert_val(
+						GNUTLS_E_MEMORY_ERROR);
+					goto cleanup_recv;
 				}
 				crypto_info.iv_len = TLS_1_3_GCM_IV_LEN;
 				memcpy(crypto_info.iv, iv.data,
@@ -228,8 +233,8 @@ int _gnutls_ktls_set_keys(gnutls_session_t session,
 			crypto_info.cipher_key =
 				gnutls_malloc(AES_256_GMAC_KEY_LEN);
 			if (!crypto_info.cipher_key) {
-				gnutls_assert();
-				return GNUTLS_E_MEMORY_ERROR;
+				ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+				goto cleanup_recv;
 			}
 			memcpy(crypto_info.cipher_key, cipher_key.data,
 			       AES_256_GMAC_KEY_LEN);
@@ -238,8 +243,9 @@ int _gnutls_ktls_set_keys(gnutls_session_t session,
 				       &crypto_info, sizeof(crypto_info))) {
 				session->internals.ktls_enabled &=
 					~GNUTLS_KTLS_RECV;
-				return gnutls_assert_val(
+				ret = gnutls_assert_val(
 					GNUTLS_E_INTERNAL_ERROR);
+				goto cleanup_recv;
 			}
 
 		} break;
@@ -259,8 +265,8 @@ int _gnutls_ktls_set_keys(gnutls_session_t session,
 			crypto_info.iv =
 				gnutls_malloc(CHACHA20_POLY1305_IV_LEN);
 			if (!crypto_info.iv) {
-				gnutls_assert();
-				return GNUTLS_E_MEMORY_ERROR;
+				ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+				goto cleanup_recv;
 			}
 			crypto_info.iv_len = TLS_CHACHA20_IV_LEN;
 			memcpy(crypto_info.iv, iv.data, TLS_CHACHA20_IV_LEN);
@@ -271,8 +277,8 @@ int _gnutls_ktls_set_keys(gnutls_session_t session,
 			crypto_info.cipher_key =
 				gnutls_malloc(POLY1305_KEY_LEN);
 			if (!crypto_info.cipher_key) {
-				gnutls_assert();
-				return GNUTLS_E_MEMORY_ERROR;
+				ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+				goto cleanup_recv;
 			}
 			memcpy(crypto_info.cipher_key, cipher_key.data,
 			       POLY1305_KEY_LEN);
@@ -281,14 +287,21 @@ int _gnutls_ktls_set_keys(gnutls_session_t session,
 				       &crypto_info, sizeof(crypto_info))) {
 				session->internals.ktls_enabled &=
 					~GNUTLS_KTLS_RECV;
-				return gnutls_assert_val(
+				ret = gnutls_assert_val(
 					GNUTLS_E_INTERNAL_ERROR);
+				goto cleanup_recv;
 			}
 
 		} break;
 		default:
 			assert(0);
 		}
+	cleanup_recv:
+		gnutls_free(crypto_info.iv);
+		gnutls_free(crypto_info.cipher_key);
+
+		if (ret < 0)
+			return ret;
 	}
 
 	ret = gnutls_record_get_state(session, 0, &mac_key, &iv, &cipher_key,
@@ -311,8 +324,9 @@ int _gnutls_ktls_set_keys(gnutls_session_t session,
 				crypto_info.iv =
 					gnutls_malloc(TLS_AEAD_GCM_LEN);
 				if (!crypto_info.iv) {
-					gnutls_assert();
-					return GNUTLS_E_MEMORY_ERROR;
+					ret = gnutls_assert_val(
+						GNUTLS_E_MEMORY_ERROR);
+					goto cleanup_send;
 				}
 				crypto_info.iv_len = TLS_AEAD_GCM_LEN;
 				memcpy(crypto_info.iv, seq_number,
@@ -325,8 +339,9 @@ int _gnutls_ktls_set_keys(gnutls_session_t session,
 				crypto_info.iv =
 					gnutls_malloc(TLS_1_3_GCM_IV_LEN);
 				if (!crypto_info.iv) {
-					gnutls_assert();
-					return GNUTLS_E_MEMORY_ERROR;
+					ret = gnutls_assert_val(
+						GNUTLS_E_MEMORY_ERROR);
+					goto cleanup_send;
 				}
 				crypto_info.iv_len = TLS_1_3_GCM_IV_LEN;
 				memcpy(crypto_info.iv, iv.data,
@@ -339,8 +354,8 @@ int _gnutls_ktls_set_keys(gnutls_session_t session,
 			crypto_info.cipher_key =
 				gnutls_malloc(AES_128_GMAC_KEY_LEN);
 			if (!crypto_info.cipher_key) {
-				gnutls_assert();
-				return GNUTLS_E_MEMORY_ERROR;
+				ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+				goto cleanup_send;
 			}
 			memcpy(crypto_info.cipher_key, cipher_key.data,
 			       AES_128_GMAC_KEY_LEN);
@@ -349,8 +364,9 @@ int _gnutls_ktls_set_keys(gnutls_session_t session,
 				       &crypto_info, sizeof(crypto_info))) {
 				session->internals.ktls_enabled &=
 					~GNUTLS_KTLS_SEND;
-				return gnutls_assert_val(
+				ret = gnutls_assert_val(
 					GNUTLS_E_INTERNAL_ERROR);
+				goto cleanup_send;
 			}
 		} break;
 		case GNUTLS_CIPHER_AES_256_GCM: {
@@ -363,8 +379,9 @@ int _gnutls_ktls_set_keys(gnutls_session_t session,
 				crypto_info.iv =
 					gnutls_malloc(TLS_AEAD_GCM_LEN);
 				if (!crypto_info.iv) {
-					gnutls_assert();
-					return GNUTLS_E_MEMORY_ERROR;
+					ret = gnutls_assert_val(
+						GNUTLS_E_MEMORY_ERROR);
+					goto cleanup_send;
 				}
 				crypto_info.iv_len = TLS_AEAD_GCM_LEN;
 				memcpy(crypto_info.iv, seq_number,
@@ -377,8 +394,9 @@ int _gnutls_ktls_set_keys(gnutls_session_t session,
 				crypto_info.iv =
 					gnutls_malloc(TLS_1_3_GCM_IV_LEN);
 				if (!crypto_info.iv) {
-					gnutls_assert();
-					return GNUTLS_E_MEMORY_ERROR;
+					ret = gnutls_assert_val(
+						GNUTLS_E_MEMORY_ERROR);
+					goto cleanup_send;
 				}
 				crypto_info.iv_len = TLS_1_3_GCM_IV_LEN;
 				memcpy(crypto_info.iv, iv.data,
@@ -391,8 +409,8 @@ int _gnutls_ktls_set_keys(gnutls_session_t session,
 			crypto_info.cipher_key =
 				gnutls_malloc(AES_256_GMAC_KEY_LEN);
 			if (!crypto_info.cipher_key) {
-				gnutls_assert();
-				return GNUTLS_E_MEMORY_ERROR;
+				ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+				goto cleanup_send;
 			}
 			memcpy(crypto_info.cipher_key, cipher_key.data,
 			       AES_256_GMAC_KEY_LEN);
@@ -401,8 +419,9 @@ int _gnutls_ktls_set_keys(gnutls_session_t session,
 				       &crypto_info, sizeof(crypto_info))) {
 				session->internals.ktls_enabled &=
 					~GNUTLS_KTLS_SEND;
-				return gnutls_assert_val(
+				ret = gnutls_assert_val(
 					GNUTLS_E_INTERNAL_ERROR);
+				goto cleanup_send;
 			}
 
 		} break;
@@ -422,8 +441,8 @@ int _gnutls_ktls_set_keys(gnutls_session_t session,
 			crypto_info.iv =
 				gnutls_malloc(CHACHA20_POLY1305_IV_LEN);
 			if (!crypto_info.iv) {
-				gnutls_assert();
-				return GNUTLS_E_MEMORY_ERROR;
+				ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+				goto cleanup_send;
 			}
 			crypto_info.iv_len = TLS_CHACHA20_IV_LEN;
 			memcpy(crypto_info.iv, iv.data, TLS_CHACHA20_IV_LEN);
@@ -434,8 +453,8 @@ int _gnutls_ktls_set_keys(gnutls_session_t session,
 			crypto_info.cipher_key =
 				gnutls_malloc(POLY1305_KEY_LEN);
 			if (!crypto_info.cipher_key) {
-				gnutls_assert();
-				return GNUTLS_E_MEMORY_ERROR;
+				ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+				goto cleanup_send;
 			}
 			memcpy(crypto_info.cipher_key, cipher_key.data,
 			       POLY1305_KEY_LEN);
@@ -444,8 +463,9 @@ int _gnutls_ktls_set_keys(gnutls_session_t session,
 				       &crypto_info, sizeof(crypto_info))) {
 				session->internals.ktls_enabled &=
 					~GNUTLS_KTLS_SEND;
-				return gnutls_assert_val(
+				ret = gnutls_assert_val(
 					GNUTLS_E_INTERNAL_ERROR);
+				goto cleanup_send;
 			}
 
 		} break;
@@ -460,6 +480,13 @@ int _gnutls_ktls_set_keys(gnutls_session_t session,
 		// set callback for sending alert messages
 		gnutls_alert_set_read_function(session,
 					       _gnutls_ktls_send_alert_msg);
+
+	cleanup_send:
+		gnutls_free(crypto_info.iv);
+		gnutls_free(crypto_info.cipher_key);
+
+		if (ret < 0)
+			return ret;
 	}
 
 	return in;

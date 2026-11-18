@@ -715,46 +715,28 @@ static unsigned verify_crt(gnutls_x509_trust_list_t tlist,
 
 			/* only check name constraints in server certificates, not CAs */
 			if (end_cert != 0) {
-				ret = gnutls_x509_name_constraints_check_crt(
-					vparams->nc, GNUTLS_SAN_DNSNAME, cert);
-				if (ret == 0) {
-					MARK_INVALID(
-						GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE);
-					goto nc_done;
+				for (gnutls_x509_subject_alt_name_t sant =
+					     GNUTLS_SAN_MIN;
+				     sant <= GNUTLS_SAN_MAX; sant++) {
+					ret = gnutls_x509_name_constraints_check_crt(
+						vparams->nc, sant, cert);
+					if (ret == 0) {
+						MARK_INVALID(
+							GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE);
+						goto nc_done;
+					}
 				}
 
-				ret = gnutls_x509_name_constraints_check_crt(
-					vparams->nc, GNUTLS_SAN_RFC822NAME,
-					cert);
-				if (ret == 0) {
-					MARK_INVALID(
-						GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE);
-					goto nc_done;
-				}
-
-				ret = gnutls_x509_name_constraints_check_crt(
-					vparams->nc, GNUTLS_SAN_DN, cert);
-				if (ret == 0) {
-					MARK_INVALID(
-						GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE);
-					goto nc_done;
-				}
-
-				ret = gnutls_x509_name_constraints_check_crt(
-					vparams->nc, GNUTLS_SAN_URI, cert);
-				if (ret == 0) {
-					MARK_INVALID(
-						GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE);
-					goto nc_done;
-				}
-
-				ret = gnutls_x509_name_constraints_check_crt(
-					vparams->nc, GNUTLS_SAN_IPADDRESS,
-					cert);
-				if (ret == 0) {
-					MARK_INVALID(
-						GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE);
-					goto nc_done;
+				for (gnutls_x509_subject_alt_name_t sant =
+					     GNUTLS_SAN_OTHERNAME_MIN;
+				     sant <= GNUTLS_SAN_OTHERNAME_MAX; sant++) {
+					ret = gnutls_x509_name_constraints_check_crt(
+						vparams->nc, sant, cert);
+					if (ret == 0) {
+						MARK_INVALID(
+							GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE);
+						goto nc_done;
+					}
 				}
 			}
 		}

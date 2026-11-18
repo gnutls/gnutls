@@ -32,6 +32,7 @@
 #include "dh.h"
 #include "num.h"
 #include "libtasn1.h"
+#include "x509/common.h"
 #include "datum.h"
 #include "ext/signature.h"
 #include "pk.h"
@@ -83,31 +84,26 @@ enum CertificateSigTypeFlags {
 int _gnutls_pcert_to_auth_info(cert_auth_info_t info, gnutls_pcert_st *certs,
 			       size_t ncerts)
 {
-	size_t i, j;
-
 	if (info->raw_certificate_list != NULL) {
-		for (j = 0; j < info->ncerts; j++)
-			_gnutls_free_datum(&info->raw_certificate_list[j]);
+		for (size_t i = 0; i < info->ncerts; i++)
+			_gnutls_free_datum(&info->raw_certificate_list[i]);
 		gnutls_free(info->raw_certificate_list);
 	}
+	info->raw_certificate_list = NULL;
+	info->ncerts = 0;
 
-	if (ncerts == 0) {
-		info->raw_certificate_list = NULL;
-		info->ncerts = 0;
+	if (ncerts == 0)
 		return 0;
-	}
 
 	info->raw_certificate_list =
 		gnutls_calloc(ncerts, sizeof(gnutls_datum_t));
-	if (info->raw_certificate_list == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
+	if (info->raw_certificate_list == NULL)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
 	info->cert_type = certs[0].type;
 	info->ncerts = ncerts;
 
-	for (i = 0; i < ncerts; i++) {
+	for (size_t i = 0; i < ncerts; i++) {
 		info->raw_certificate_list[i].data = certs[i].cert.data;
 		info->raw_certificate_list[i].size = certs[i].cert.size;
 		certs[i].cert.data = NULL;
@@ -158,10 +154,10 @@ static int cert_get_issuer_dn(gnutls_pcert_st *cert, gnutls_datum_t *odn)
 		return _gnutls_asn2err(result);
 	}
 
-	result = asn1_der_decoding_startEnd(dn, cert->cert.data,
-					    cert->cert.size,
-					    "tbsCertificate.issuer", &start,
-					    &end);
+	result = _asn1_der_decoding_startEnd(dn, cert->cert.data,
+					     cert->cert.size,
+					     "tbsCertificate.issuer", &start,
+					     &end);
 
 	if (result != ASN1_SUCCESS) {
 		/* couldn't decode DER */

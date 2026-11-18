@@ -848,10 +848,10 @@ static int pkcs8_key_decrypt(const gnutls_datum_t *raw_key, asn1_node pkcs8_asn,
 
 	/* Get the DER encoding of the parameters.
 	 */
-	result = asn1_der_decoding_startEnd(pkcs8_asn, raw_key->data,
-					    raw_key->size,
-					    "encryptionAlgorithm.parameters",
-					    &params_start, &params_end);
+	result = _asn1_der_decoding_startEnd(pkcs8_asn, raw_key->data,
+					     raw_key->size,
+					     "encryptionAlgorithm.parameters",
+					     &params_start, &params_end);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
@@ -978,10 +978,10 @@ static int pkcs8_key_info(const gnutls_datum_t *raw_key,
 
 	/* Get the DER encoding of the parameters.
 	 */
-	result = asn1_der_decoding_startEnd(pkcs8_asn, raw_key->data,
-					    raw_key->size,
-					    "encryptionAlgorithm.parameters",
-					    &params_start, &params_end);
+	result = _asn1_der_decoding_startEnd(pkcs8_asn, raw_key->data,
+					     raw_key->size,
+					     "encryptionAlgorithm.parameters",
+					     &params_start, &params_end);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);

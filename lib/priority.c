@@ -4104,7 +4104,7 @@ int gnutls_priority_certificate_type_list2(gnutls_priority_t pcache,
 		break;
 	default:
 		// Invalid target given
-		gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
 
 	// Found a matching target but non of them had any ctypes set

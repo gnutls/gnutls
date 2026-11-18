@@ -2390,6 +2390,7 @@ int gnutls_x509_ext_import_crl_dist_points(const gnutls_datum_t *ext,
 	do {
 		snprintf(name, sizeof(name), "?%u.reasons", (unsigned)i + 1);
 
+		memset(reasons, 0, sizeof(reasons));
 		len = sizeof(reasons);
 		result = asn1_read_value(c2, name, reasons, &len);
 

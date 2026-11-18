@@ -429,10 +429,14 @@ cleanup:
 static void
 name_constraints_node_list_deinit(struct name_constraints_node_list_st *list)
 {
-	if (list->items)
+	if (list->items) {
 		gl_list_free(list->items);
-	if (list->sorted_items)
+		list->items = NULL;
+	}
+	if (list->sorted_items) {
 		gl_list_free(list->sorted_items);
+		list->sorted_items = NULL;
+	}
 }
 
 static struct name_constraints_node_list_st
@@ -1158,8 +1162,10 @@ cleanup:
 
 static void name_constraints_deinit(struct gnutls_name_constraints_st *nc)
 {
-	if (nc->nodes)
+	if (nc->nodes) {
 		gl_list_free(nc->nodes);
+		nc->nodes = NULL;
+	}
 	name_constraints_node_list_deinit(&nc->permitted);
 	name_constraints_node_list_deinit(&nc->excluded);
 }
@@ -1461,29 +1467,33 @@ static bool email_matches(const gnutls_datum_t *name,
 /*
  * Returns: true if the certification is acceptable, and false otherwise.
  */
-static bool check_unsupported_constraint(gnutls_x509_name_constraints_t nc,
-					 gnutls_x509_subject_alt_name_t type)
+static bool has_constraints_of_type(gnutls_x509_name_constraints_t nc,
+				    gnutls_x509_subject_alt_name_t type)
 {
 	unsigned i;
 	int ret;
 	unsigned rtype;
 	gnutls_datum_t rname;
 
-	/* check if there is a restrictions with that type, if
-	 * yes, then reject the name.
+	/* check if there are restrictions with that type,
+	 * if yes, then reject the name.
 	 */
-	i = 0;
-	do {
-		ret = gnutls_x509_name_constraints_get_excluded(nc, i++, &rtype,
+	for (i = 0;; i++) {
+		ret = gnutls_x509_name_constraints_get_excluded(nc, i, &rtype,
 								&rname);
-		if (ret >= 0) {
-			if (rtype != type)
-				continue;
-			else
-				return gnutls_assert_val(false);
-		}
-
-	} while (ret == 0);
+		if (ret < 0)
+			break;
+		if (rtype == type)
+			return gnutls_assert_val(false);
+	}
+	for (i = 0;; i++) {
+		ret = gnutls_x509_name_constraints_get_permitted(nc, i, &rtype,
+								 &rname);
+		if (ret < 0)
+			break;
+		if (rtype == type)
+			return gnutls_assert_val(false);
+	}
 
 	return true;
 }
@@ -1632,11 +1642,11 @@ static unsigned check_ip_constraints(gnutls_x509_name_constraints_t nc,
 			if (rtype != GNUTLS_SAN_IPADDRESS)
 				continue;
 
+			allowed_found = true;
+
 			/* do not check IPv4 against IPv6 constraints and vice versa */
 			if (name->size != rname.size / 2)
 				continue;
-
-			allowed_found = true;
 
 			if (ip_in_cidr(name, &rname))
 				return true; /* accepted */
@@ -1678,7 +1688,7 @@ unsigned gnutls_x509_name_constraints_check(gnutls_x509_name_constraints_t nc,
 	if (type == GNUTLS_SAN_IPADDRESS)
 		return check_ip_constraints(nc, name);
 
-	return check_unsupported_constraint(nc, type);
+	return has_constraints_of_type(nc, type);
 }
 
 /* This function checks for unsupported constraints, that we also
@@ -1688,9 +1698,9 @@ unsigned gnutls_x509_name_constraints_check(gnutls_x509_name_constraints_t nc,
  *
  * Returns: true if the certification is acceptable, and false otherwise
  */
-static bool check_unsupported_constraint2(gnutls_x509_crt_t cert,
-					  gnutls_x509_name_constraints_t nc,
-					  gnutls_x509_subject_alt_name_t type)
+static bool check_unsupported_constraint(gnutls_x509_crt_t cert,
+					 gnutls_x509_name_constraints_t nc,
+					 gnutls_x509_subject_alt_name_t type)
 {
 	unsigned idx;
 	bool found_one;
@@ -1710,15 +1720,20 @@ static bool check_unsupported_constraint2(gnutls_x509_crt_t cert,
 		else if (ret < 0)
 			return gnutls_assert_val(false);
 
-		if (san_type != GNUTLS_SAN_URI)
+		if (san_type != type)
 			continue;
 
 		found_one = true;
 		break;
 	}
 
+	/* For directoryName, subject also counts as a name. We don't match DNs,
+	 * so reject on non-empty. Cheap check: size > 2 (0x30 0x00). */
+	if (type == GNUTLS_SAN_DN && cert->raw_dn.size > 2)
+		found_one = true;
+
 	if (found_one)
-		return check_unsupported_constraint(nc, type);
+		return has_constraints_of_type(nc, type);
 
 	/* no name was found in the certificate, so accept */
 	return true;
@@ -1734,8 +1749,8 @@ static bool check_unsupported_constraint2(gnutls_x509_crt_t cert,
  * @nc using the RFC5280 rules. It will traverse all the certificate's names and
  * alternative names.
  *
- * Currently this function is limited to DNS
- * names and emails (of type %GNUTLS_SAN_DNSNAME and %GNUTLS_SAN_RFC822NAME).
+ * Currently this function is limited to DNS names, emails and IP addresses
+ * (types %GNUTLS_SAN_DNSNAME, %GNUTLS_SAN_RFC822NAME and %GNUTLS_SAN_IPADDRESS).
  *
  * Returns: zero if the provided name is not acceptable, and non-zero otherwise.
  *
@@ -1932,10 +1947,9 @@ gnutls_x509_name_constraints_check_crt(gnutls_x509_name_constraints_t nc,
 			 */
 			return gnutls_assert_val(1);
 		}
-	} else if (type == GNUTLS_SAN_URI) {
-		return check_unsupported_constraint2(cert, nc, type);
-	} else
-		return check_unsupported_constraint(nc, type);
+	} else {
+		return check_unsupported_constraint(cert, nc, type);
+	}
 }
 
 /**

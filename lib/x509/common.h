@@ -299,4 +299,21 @@ inline static int _asn1_strict_der_decode(asn1_node *element, const void *ider,
 				  errorDescription);
 }
 
+inline static int _asn1_der_decoding_startEnd(asn1_node node, const void *buf,
+					      size_t buf_size, const char *name,
+					      int *start, int *end)
+{
+	int ret;
+	ret = asn1_der_decoding_startEnd(node, buf, buf_size, name, start, end);
+	if (ret != ASN1_SUCCESS) {
+		return ret;
+	}
+	/* defense in depth against potential libtasn1 misbehaviour */
+	if (*start < 0 || *start > *end || (size_t)*end >= buf_size) {
+		gnutls_assert();
+		return ASN1_GENERIC_ERROR;
+	}
+	return ret;
+}
+
 #endif /* GNUTLS_LIB_X509_COMMON_H */

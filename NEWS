@@ -5,28 +5,138 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-** libgnutls: Added gnutls_pubkey_export_mldsa_raw() and
-gnutls_pubkey_import_mldsa_raw() to obtain and restore the raw FIPS 204
-ML-DSA public key octet string. This is needed by applications such as
-DNSSEC that cannot use SubjectPublicKeyInfo alone.
-[#1917]
+* Version 3.8.14 (released 2026-11-18)
 
-** libgnutls: Added --enable-tls11-support configure option to control
-support for TLS 1.0, TLS 1.1, and DTLS 1.0 (RFC 8996). These protocols
-are currently enabled by default. A future release will disable them by
-default.
+** libgnutls: Fix crash on certificate list memory allocation failure
+   On allocation failure, the certificate list pointer and count could
+   get out of sync, causing a NULL deref or double-free during session cleanup.
+   Both fields are now zeroized before the allocation.
+   Reported by Joshua Rogers of AISLE Research Team.
+   [GNUTLS-SA-2026-11-18-1, severity: low] [CVE-2026-127039]
 
-** build: The --with-nettle-mini configure option has been removed.
-GnuTLS builds must now link against GMP. Mini-GMP lacks relevant
-optimizations and side-channel protections.
-[#1946]
+** libgnutls: Fix crash in RSA-PSK username copy memory allocation failure
+   A missing return on a failed username copy could crash the handshake
+   when memory allocation fails.
+   The error is now propagated, aborting the handshake.
+   Reported by Joshua Rogers of AISLE Research Team.
+   [GNUTLS-SA-2026-11-18-2, severity: low] [CVE-2026-127040]
 
-** minitasn1: The internal copy of libtasn1 has now been removed.
-The ./configure --with-included-libtasn1 parameter is also removed.
-If you are building GnuTLS in an environment without libtasn1, please
-modify your scripts to also build and install libtasn1 first.  This
-decision is made to reduce maintainance in the long-term, as we no
-longer have to keep track of minitasn1-related issues.
+** libgnutls: Make name constraints deinitialization idempotent
+   If reinitializing the name constraints were to fail due to memory pressure,
+   the verification context cleanup
+   could have freed the same internal lists a second time,
+   crashing the application.
+   The deinitialization functions now clear the pointers after freeing.
+   Reported by Xuqing Yang.
+   [GNUTLS-SA-2026-11-18-3, severity: low] [CVE-2026-127231]
+
+** libgnutls: Fix buffer overrun in deterministic DSA signing
+   A malformed DSA private key with a q value exceeding 512 bits
+   could overrun a fixed-size buffer when signing in reproducible mode.
+   Such keys are now rejected with GNUTLS_E_INVALID_REQUEST (#1857).
+   Reported by Joshua Rogers of AISLE Research Team.
+
+** libgnutls: Fix CRL distribution points leak in certificate printing
+   Printing certificates with gnutls_x509_crt_print() could leak memory
+   if enumerating CRL distribution points failed (#1866).
+   Reported by Joshua Rogers of AISLE Research Team.
+
+** libgnutls: Fix HCRYPTHASH handle leak in CAPI signing on allocation failure
+   The HCRYPTHASH handle created in capi_sign() was not destroyed
+   when the memory allocation for the signature buffer failed.
+   It is now released on all exit paths (#1867).
+   Reported by Joshua Rogers of AISLE Research Team.
+
+** libgnutls: Fix memory leak in kTLS key setup on FreeBSD
+   The iv and cipher_key buffers allocated for the tls_enable structure
+   were not freed after setsockopt. They're now freed on all exit paths (#1865).
+   Reported by Joshua Rogers of AISLE Research Team.
+
+** libgnutls: Fix stale params reuse in PKCS#11 AEAD/MAC wrappers
+   The AEAD encrypt/decrypt and MAC wrappers of the PKCS#11 back-end
+   discarded the return value of the per-call params/nonce setter
+   and proceeded with whatever stale state remained.
+   If the setter failed, the previous call's IV/AAD/tag (AEAD)
+   or nonce/key (MAC) were subsequently reused.
+   The error from set_params/set_nonce/set_key is now propagated (#1856, #1872).
+   Reported by Joshua Rogers of AISLE Research Team.
+
+** libgnutls: Initialize reasons in CRL DistributionPoint parsing
+   The CRL reasons bitmap was read into an uninitialized buffer,
+   which could result in incorrect reason flags returned to the caller (#1925).
+   GnuTLS itself does not act on those flags.
+   Reported by Huzaifa Sidhpurwala, Red Hat Product Security.
+
+** libgnutls: Fix cross-family IP name constraints
+   An IPv6 permitted name constraint did not preclude matching IPv4 SAN
+   and vice versa.
+   Addresses from a family not covered by a permitted name constraint
+   are now rejected (#1920).
+   Reported by Huzaifa Sidhpurwala, Red Hat Product Security.
+
+** libgnutls: Reject on unsupported permitted name constraint types
+   Permitted subtrees of constraint types GnuTLS does not match (notably URI)
+   were parsed but ignored.
+   A leaf carrying a SAN of the matching type
+   is now rejected with GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE.
+   Previously accepted certificate chains
+   featuring intermediate CAs carrying such constraint types
+   may be rejected now (#1836, #1851, #1894, #1895).
+   Reported by Zou Dikai, Joshua Rogers of AISLE Research Team,
+   Mitchell Benjamin of Revamp Studio, and Corban Villa of UC Berkeley.
+
+** libgnutls: Check all SAN types against name constraints
+   Chain verification only consulted name constraints of
+   DNS, e-mail, directoryName, URI and IP address SAN types.
+   Other types, notably UPN, were not checked at all,
+   so an excludedSubtree for UPN did not reject the chain.
+   All SAN types GnuTLS is aware of are now checked uniformly;
+   types for which no matching is implemented are rejected
+   when any constraint of the corresponding type is present (#1875).
+   Reported by Yu-Fu Fu.
+
+** libgnutls: Count subject as name for DN constraint validation
+   An excludedSubtree of that type used to reject any certificate,
+   while a permittedSubtree was ignored entirely.
+   The check now rejects a certificate featuring a DN
+   (in a subjectAltName or as a non-empty subject)
+   in the presence of any directoryName constraint.
+   GnuTLS does not implement matching DNs against the constraint,
+   so even valid DNs that a permittedSubtree constraint
+   would have previously allowed are now rejected (#1890).
+   Reported by Jack Lloyd.
+
+** libgnutls: Add gnutls_pubkey_{import,export}_mldsa_raw()
+   These functions obtain and restore
+   the raw FIPS 204 ML-DSA public key octet string.
+   This is needed by applications such as DNSSEC
+   that cannot use SubjectPublicKeyInfo alone (#1917).
+
+** libgnutls: Add --enable-tls11-support configure option
+   It is now possible to compile out support
+   for TLS 1.0, TLS 1.1, and DTLS 1.0 (RFC 8996) (!2151).
+   These protocols are currently enabled by default.
+   A future release will disable them by default.
+
+** build: Remove --with-nettle-mini configure option
+   GnuTLS builds must now link against GMP.
+   Mini-GMP lacks relevant optimizations and side-channel protections (#1946).
+
+** minitasn1: Remove the internal copy of libtasn1
+   The ./configure --with-included-libtasn1 parameter is also removed.
+   If you are building GnuTLS in an environment without libtasn1,
+   please modify your scripts to also build and install libtasn1 first.
+   This decision is made to reduce maintenance in the long-term,
+   as we no longer have to keep track of minitasn1-related issues (!1938).
+
+** API and ABI modifications:
+gnutls_hpke_import_pubkey: New function
+gnutls_hpke_export_pubkey: New function
+gnutls_pubkey_export_mldsa_raw: New function
+gnutls_pubkey_import_mldsa_raw: New function
+GNUTLS_SAN_MIN: New enum member of gnutls_x509_subject_alt_name_t
+GNUTLS_SAN_OTHERNAME_MIN: New enum member of gnutls_x509_subject_alt_name_t
+GNUTLS_SAN_OTHERNAME_MAX: New enum member of gnutls_x509_subject_alt_name_t
 
 * Version 3.8.13 (released 2026-04-29)
 

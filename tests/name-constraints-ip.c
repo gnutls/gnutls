@@ -320,6 +320,11 @@ static void check_simple_intersection(void **glob_state)
 	ip->size = 4; // strip network mask
 	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_IPADDRESS, ip);
 	check_test_result(ret, IP_REJECTED, ip);
+
+	parse_cidr("::ffff:cb00:7102/128", ip); // v6 (mapping of a v4)
+	ip->size = 16; // strip network mask
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_IPADDRESS, ip);
+	check_test_result(ret, IP_REJECTED, ip);
 }
 
 static void check_empty_intersection(void **glob_state)
@@ -546,6 +551,11 @@ static void check_ipv6_intersection(void **glob_state)
 	ip->size = 16; // strip network mask
 	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_IPADDRESS, ip);
 	check_test_result(ret, IP_REJECTED, ip);
+
+	parse_cidr("127.0.0.1/32", ip); // v4
+	ip->size = 4; // strip network mask
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_IPADDRESS, ip);
+	check_test_result(ret, IP_REJECTED, ip);
 }
 
 static void check_empty_ipv4_intersection_ipv6_remains(void **glob_state)
@@ -719,6 +729,62 @@ static void check_ipv4v6_single_constraint_each(void **glob_state)
 	check_test_result(ret, IP_REJECTED, ip);
 }
 
+static void check_ipv4_only(void **glob_state)
+{
+	/* 12: test IPv4 range against IPv4 and IPv6 SAN */
+	int ret;
+	gnutls_x509_name_constraints_t nc = ((test_vars_t *)*glob_state)->nc;
+	gnutls_datum_t *ip = &(((test_vars_t *)*glob_state)->ip);
+
+	parse_cidr("127.0.113.0/24", ip);
+	ret = gnutls_x509_name_constraints_add_permitted(
+		nc, GNUTLS_SAN_IPADDRESS, ip);
+	check_for_error(ret);
+
+	parse_cidr("127.0.113.2/32", ip);
+	ip->size = 4; // strip network mask
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_IPADDRESS, ip);
+	check_test_result(ret, IP_ACCEPTED, ip);
+
+	parse_cidr("127.0.112.2/32", ip);
+	ip->size = 4; // strip network mask
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_IPADDRESS, ip);
+	check_test_result(ret, IP_REJECTED, ip);
+
+	parse_cidr("::1/128", ip);
+	ip->size = 16; // strip network mask
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_IPADDRESS, ip);
+	check_test_result(ret, IP_REJECTED, ip);
+}
+
+static void check_ipv6_only(void **glob_state)
+{
+	/* 13: test IPv6 range against IPv6 and IPv4 SAN */
+	int ret;
+	gnutls_x509_name_constraints_t nc = ((test_vars_t *)*glob_state)->nc;
+	gnutls_datum_t *ip = &(((test_vars_t *)*glob_state)->ip);
+
+	parse_cidr("bfa6::/16", ip);
+	ret = gnutls_x509_name_constraints_add_permitted(
+		nc, GNUTLS_SAN_IPADDRESS, ip);
+	check_for_error(ret);
+
+	parse_cidr("bfa6:ab01::/128", ip);
+	ip->size = 16; // strip network mask
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_IPADDRESS, ip);
+	check_test_result(ret, IP_ACCEPTED, ip);
+
+	parse_cidr("bfa7:ab01::/128", ip);
+	ip->size = 16; // strip network mask
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_IPADDRESS, ip);
+	check_test_result(ret, IP_REJECTED, ip);
+
+	parse_cidr("127.0.113.2/32", ip);
+	ip->size = 4; // strip network mask
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_IPADDRESS, ip);
+	check_test_result(ret, IP_REJECTED, ip);
+}
+
 static int setup(void **state)
 {
 	test_vars_t *test_vars = gnutls_malloc(sizeof(test_vars_t));
@@ -774,7 +840,11 @@ int main(int argc, char **argv)
 		cmocka_unit_test_setup_teardown(
 			check_empty_ipv4v6_intersections, setup, teardown),
 		cmocka_unit_test_setup_teardown(
-			check_ipv4v6_single_constraint_each, setup, teardown)
+			check_ipv4v6_single_constraint_each, setup, teardown),
+		cmocka_unit_test_setup_teardown(check_ipv4_only, setup,
+						teardown),
+		cmocka_unit_test_setup_teardown(check_ipv6_only, setup,
+						teardown),
 	};
 	ret = cmocka_run_group_tests(tests, NULL, NULL);
 	gnutls_global_deinit();

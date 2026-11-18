@@ -35,15 +35,25 @@ TMPFILE=constraints.$$.pem.tmp
 
 . ${srcdir}/../scripts/common.sh
 
-${VALGRIND} "${CERTTOOL}" --attime "2016-04-22" --verify-allow-broken -e --infile "${srcdir}/data/name-constraints-ip.pem"
+# Permitted DirName: no DN subtree matching, so a DN name is rejected.
+OUTPUT=$(${VALGRIND} "${CERTTOOL}" --attime "2016-04-22" --verify-allow-broken -e --infile "${srcdir}/data/name-constraints-ip.pem" 2>&1)
 rc=$?
 
-if test "${rc}" != "0"; then
+if test "${rc}" = "0"; then
 	echo "name constraints test 1 failed"
 	exit 1
 fi
 
-${VALGRIND} "${CERTTOOL}" -i --infile "${srcdir}/data/name-constraints-ip2.pem" --outfile "${TMPFILE}"
+if ! echo "${OUTPUT}" | grep "violates the signer's constraints" > /dev/null
+then
+	echo "name constraints test 1 failed: unexpected verification error"
+	echo "${OUTPUT}"
+	exit 1
+fi
+
+echo "${OUTPUT}"
+
+${VALGRIND} "${CERTTOOL}" --attime "2016-04-22" --verify-allow-broken -e --infile "${srcdir}/data/name-constraints-ip-nodn.pem"
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -51,11 +61,19 @@ if test "${rc}" != "0"; then
 	exit 1
 fi
 
-${DIFF} -I ^warning "${TMPFILE}" "${srcdir}/data/name-constraints-ip2.pem" >/dev/null 2>&1
+${VALGRIND} "${CERTTOOL}" -i --infile "${srcdir}/data/name-constraints-ip2.pem" --outfile "${TMPFILE}"
 rc=$?
 
 if test "${rc}" != "0"; then
 	echo "name constraints test 3 failed"
+	exit 1
+fi
+
+${DIFF} -I ^warning "${TMPFILE}" "${srcdir}/data/name-constraints-ip2.pem" >/dev/null 2>&1
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "name constraints test 4 failed"
 	exit 1
 fi
 
